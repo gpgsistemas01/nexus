@@ -7,50 +7,62 @@ La vista muestra los componentes compartidos por `auth`, `admin`, `sales` y `war
 **Diagrama de componentes:** `DIA-ARQ-CMP-001`.
 
 ```mermaid
-C4Component
-    title Componentes y conexión entre frontend y backend
+flowchart LR
+    user["Usuario"] --> browser["Navegador"]
 
-    Container(browser, "Navegador", "Web browser", "Ejecuta el frontend y presenta la interfaz")
+    subgraph frontend["Frontend entregado al navegador"]
+        direction TB
+        visual["«component»<br/>Componentes visuales<br/>Page · formularios · modales · tablas<br/>public/js/ui · DataTable · Select2 · SweetAlert"]
+        application["«component»<br/>Aplicación y composición<br/>application/&lt;dominio&gt;<br/>CRUD · reportes · salidas"]
+        http["«component»<br/>Transporte HTTP<br/>services/{auth, admin, sales, warehouse}<br/>axiosInstanceApi"]
+        socketClient["«component»<br/>Cliente Socket.IO<br/>window.io · indexPage"]
 
-    Container_Boundary(frontend, "Frontend entregado al navegador") {
-        Component(visual, "Componentes visuales", "Page · formularios · modales · tablas", "public/js/ui · DataTable · Select2 · SweetAlert")
-        Component(application, "Aplicación y composición", "application/<dominio>", "CRUD · reportes · salidas")
-        Component(http, "Transporte HTTP", "services/{auth, admin, sales, warehouse}", "axiosInstanceApi")
-        Component(socketClient, "Cliente Socket.IO", "window.io", "indexPage")
-    }
+        visual --> application --> http
+        socketClient -->|"CustomEvent"| visual
+    end
 
-    Container_Boundary(server, "Backend · Node.js / Express") {
-        Component(web, "Web MVC", "routes/web · controllers/web", "views/pages · views/shared · layout")
-        Component(static, "Archivos estáticos", "Express", "express.static")
-        Component(api, "Frontera API", "routes/api · middleware", "controllers/api · DTO")
-        Component(domain, "Servicios backend", "auth · admin · sales · warehouse", "Reglas de negocio y transacciones")
-        Component(shared, "Servicios compartidos", "auditoría · documentos · inventario", "Capacidades reutilizadas entre dominios")
-        Component(persistence, "Persistencia", "baseRepository · Prisma", "Acceso a datos")
-        Component(realtime, "Servidor Socket.IO", "socketUtils", "Publicación de eventos")
-    }
+    browser -->|"ejecuta y presenta"| visual
 
-    Rel(visual, application, "Delega acciones")
-    Rel(application, http, "Solicita operaciones")
-    Rel(socketClient, visual, "Publica CustomEvent")
-    Rel(browser, web, "Solicita navegación", "HTTP GET")
-    Rel(web, browser, "Entrega HTML o redirección", "HTTP")
-    Rel(browser, static, "Solicita JS/CSS", "HTTP GET")
-    Rel(static, visual, "Entrega módulos y estilos", "HTTP")
-    Rel(http, api, "Envía JSON, query o descarga", "HTTP /api")
-    Rel(api, http, "Responde JSON o Blob", "HTTP /api")
-    Rel(socketClient, realtime, "Establece conexión", "Socket.IO")
-    Rel(realtime, socketClient, "Publica eventos de inventario", "Socket.IO")
-    Rel(api, domain, "Delega")
-    Rel(domain, shared, "Reutiliza")
-    Rel(domain, persistence, "Persiste")
-    Rel(shared, persistence, "Persiste")
-    Rel(api, realtime, "Emite después de la escritura")
+    webInterface(("«interface»<br/>HTTP web"))
+    staticInterface(("«interface»<br/>HTTP estático"))
+    apiInterface(("«interface»<br/>HTTP /api"))
+    eventInterface(("«interface»<br/>Socket.IO"))
+
+    subgraph server["Backend · Node.js / Express"]
+        direction TB
+        web["«component»<br/>Web MVC<br/>routes/web · controllers/web<br/>views/pages · views/shared · layout"]
+        static["«component»<br/>Archivos estáticos<br/>Express<br/>express.static"]
+        api["«component»<br/>Frontera API<br/>routes/api · middleware<br/>controllers/api · DTO"]
+        domain["«component»<br/>Servicios backend<br/>auth · admin · sales · warehouse<br/>Reglas de negocio y transacciones"]
+        shared["«component»<br/>Servicios compartidos<br/>auditoría · documentos · inventario<br/>Capacidades reutilizadas entre dominios"]
+        persistence["«component»<br/>Persistencia<br/>baseRepository · Prisma<br/>Acceso a datos"]
+        realtime["«component»<br/>Servidor Socket.IO<br/>socketUtils<br/>Publicación de eventos"]
+
+        api --> domain
+        domain --> shared
+        domain --> persistence
+        shared --> persistence
+        api -->|"emite después de la escritura"| realtime
+    end
+
+    web ---|"provee"| webInterface
+    visual -.->|"usa · navegación y HTML"| webInterface
+    static ---|"provee"| staticInterface
+    visual -.->|"usa · JS y CSS"| staticInterface
+    api ---|"provee"| apiInterface
+    http -.->|"usa · JSON, query o descarga"| apiInterface
+    realtime ---|"provee"| eventInterface
+    socketClient -.->|"usa · conexión y eventos"| eventInterface
 ```
 
-El bloque usa `C4Component` y declara cada pieza mediante `Component(...)`; la figura y
-la identificación visual del componente las genera Mermaid, sin estereotipos ni glifos
-añadidos manualmente. Los protocolos se conservan en las relaciones que cruzan las
-fronteras del navegador y del backend.
+Mermaid no ofrece un elemento de interfaz dentro de `C4Component`; por eso esta vista
+usa `flowchart` y conserva explícitamente los estereotipos visuales de componente e
+interfaz. Cada contrato que cruza las fronteras se representa por separado: HTTP web,
+HTTP estático, HTTP `/api` y Socket.IO. De este modo, agregar otra interfaz no obliga a
+fusionarla con las existentes ni a tratarla como un componente. La línea continua une
+la interfaz con el componente que la provee; la flecha discontinua parte del componente
+que la usa. Un componente puede conectarse con tantas interfaces como contratos exponga
+o consuma.
 
 El diagrama general se complementa con [OpenAPI](../../openapi/openapi.json), las
 [secuencias por caso de uso](../processes/index.md) y el
