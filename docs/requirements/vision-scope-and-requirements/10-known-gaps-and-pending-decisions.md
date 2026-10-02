@@ -13,4 +13,4 @@
    SLA, política de retención y recuperación, clasificación de datos y criterios de
    aceptación acordados con usuarios. Este documento no inventa esos compromisos.
 5. **Cobertura.** Persisten servicios sin cobertura CRUD completa; el inventario
-   actualizado se mantiene en `docs/testing/service-test-coverage.md`.
+   actualizado se mantiene en `docs/testing/test-plan.md`.
