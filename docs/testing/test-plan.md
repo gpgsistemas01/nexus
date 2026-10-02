@@ -9,7 +9,9 @@
 ## Objetivo y alcance
 
 Este plan es la fuente de verdad de la estrategia, las técnicas, la ubicación, la
-cobertura CRUD mínima y la ejecución de pruebas de Nexus. La
+cobertura CRUD mínima y la ejecución de pruebas de Nexus. El
+[registro selectivo de casos automatizados](automated-test-case-index.md) conserva las
+fichas que necesitan trazabilidad documental por su riesgo, mientras la
 [cobertura por caso de uso](use-case-test-types.md) es una vista complementaria de la
 evidencia funcional vigente y de sus brechas.
 
@@ -24,12 +26,12 @@ los artefactos y 29119-4 para las técnicas de diseño, sin declarar conformidad
 
 Nexus separa tres registros para no confundir lo que se planeó con lo que realmente se
 ejecutó. En una prueba automatizada, el archivo, sus fixtures y sus nombres
-`describe`/`it` son la implementación ejecutable; el
-[índice de casos automatizados](automated-test-case-index.md) documenta cada caso con la
-ficha definida en este plan. La vista por caso de uso enlaza sólo la evidencia funcional
-relevante. Una prueba manual o una validación de aceptación sin archivo ejecutable
-conserva las tres tablas en la incidencia o en un documento de la familia
-`docs/testing`.
+`describe`/`it` son la especificación ejecutable y la fuente de verdad de sus datos y
+aserciones. El [registro selectivo](automated-test-case-index.md) añade una ficha sólo
+para los casos que requieren trazabilidad estable fuera del código. La vista por caso de
+uso enlaza únicamente la evidencia funcional relevante. Una prueba manual o una
+validación de aceptación sin archivo ejecutable conserva las tres tablas en la
+incidencia o en un documento de la familia `docs/testing`.
 
 ### 1. Diseño y trazabilidad
 
@@ -43,7 +45,8 @@ resultados independientes.
 
 ### 2. Especificación del caso y datos
 
-Cada caso registra al menos los datos de entrada y el resultado esperado que permiten
+Cada caso que requiere ficha documental registra al menos los datos de entrada y el
+resultado esperado que permiten
 decidir objetivamente si pasa. En operaciones de escritura, los datos de prueba deben
 identificar los valores que se intentan registrar y el resultado esperado debe indicar
 tanto la respuesta que devuelve el sistema como los datos que deben quedar persistidos
@@ -65,16 +68,30 @@ repeticiones.
 | --- | --- | --- | --- | --- | --- | --- |
 | `EP-NNN` | ID del caso, `SU-*`, ruta o comando focalizado | Commit, Node/Vitest, SO y servicios usados | Fecha y persona o CI | Conteos y observación obtenida | Aprobado, fallido, bloqueado o no ejecutado | Salida de CI, consulta verificable o incidencia |
 
-El [índice de casos automatizados](automated-test-case-index.md) registra las fichas de
-las pruebas escritas en el código. El [resumen por caso de uso](use-case-test-types.md)
-registra únicamente su trazabilidad funcional. Los resultados reales se conservan en
-CI o en la solicitud de cambio, no en un archivo versionado.
+El [registro selectivo de casos automatizados](automated-test-case-index.md) registra las
+fichas que justifican documentación adicional. El [resumen por caso de
+uso](use-case-test-types.md) registra únicamente su trazabilidad funcional. Los
+resultados reales se conservan en CI o en la solicitud de cambio, no en un archivo
+versionado.
 
-Al agregar, eliminar o modificar un `it` o una fila materializada por `it.each`, se
-actualiza en el mismo cambio su ficha `CP-*`: precondiciones, datos, acción, resultado
-esperado y limpieza. El identificador permanece estable mientras el objetivo del caso
-no cambie; un objetivo nuevo recibe un identificador nuevo y un caso retirado se elimina
-del índice.
+No se replica manualmente cada `it` ni cada fila materializada por `it.each`: mantener
+dos inventarios completos haría divergir la documentación del ejecutable. La selección
+se realiza en este orden:
+
+1. se documenta toda integración HTTP/Prisma que compruebe persistencia fuera de mocks;
+2. de las unitarias se documentan sólo las que protegen autorización o una invariante
+   crítica de integridad —transacción, rollback, stock, movimiento o transición—;
+3. se añade cualquier otro caso únicamente si un criterio de aceptación o riesgo
+   regulatorio exige un identificador estable.
+
+Una interacción ordinaria con un repository simulado, una transformación, un DTO o una
+validación general no entra por el solo hecho de tocar datos. Las variaciones de una
+misma regla se agrupan en una ficha cuando comparten precondición y resultado de negocio.
+
+Las demás unitarias se mantienen mediante su archivo, nombre y aserciones; el registro
+selectivo conserva únicamente un inventario de suites para localizarlas. Si un caso
+entra o sale de los criterios anteriores, su ficha se agrega, actualiza o retira en el
+mismo cambio. El identificador permanece estable mientras no cambie su objetivo.
 
 ## Cobertura CRUD mínima
 
