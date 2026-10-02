@@ -97,16 +97,19 @@ stock, movimientos, detalles y rollback cuando esos efectos formen parte del flu
 
 ## Niveles y ubicación
 
-| Nivel | Ubicación | Uso |
-| --- | --- | --- |
-| Unitario | `tests/unit/<ruta paralela al código>` | reglas, límites, decisiones y transformaciones de un registro o consulta |
-| Integración | `tests/integration/controllers` | CRUD por HTTP con servicios reales y comprobación mediante Prisma |
-| Esquema | migraciones sobre `DATABASE_TEST_URL` | restricciones, relaciones y atomicidad no demostrables con mocks |
-| Documentación | `npm run docs:check` | documentos generados sincronizados con código y Prisma |
+| Nivel | Ubicación | Alcance | Lo que no demuestra |
+| --- | --- | --- | --- |
+| Unitario | `tests/unit/<ruta paralela al código>` | Una regla, función o colaboración aislada; sustituye dependencias cuando corresponde. | Persistencia real ni el flujo completo entre capas. |
+| Integración | `tests/integration/controllers` | Request HTTP, controller, servicios y Prisma contra una base aislada. | Recorrido de navegador ni aceptación del usuario. |
 
 No se crea un nivel unitario para componentes visuales o infraestructura incidental.
 Si un helper compartido coordina datos CRUD, se prueba una vez en la ruta paralela a su
 módulo y los contextos reutilizan ese contrato.
+
+Las migraciones aplicadas sobre `DATABASE_TEST_URL` preparan el esquema para
+integración; `npm run docs:check` valida documentación. Son comprobaciones de soporte,
+no niveles adicionales de prueba funcional. Actualmente no existe una suite automatizada
+de sistema, navegador o aceptación; cuando se requiera, se registra de forma separada.
 
 ### Técnicas de diseño
 

@@ -28,6 +28,10 @@ decisión y transiciones. Nexus no declara conformidad.
 - **Brecha:** no existe prueba automatizada funcionalmente relevante para ese nivel.
 - Varios `CU-*` se agrupan sólo cuando comparten evidencia, datos y resultado esperado.
 
+En esta matriz, una unitaria demuestra una regla aislada y una integración demuestra el
+flujo HTTP hasta Prisma con base real. Ninguna de las dos se presenta como prueba de
+navegador o aceptación.
+
 Cada fila es trazabilidad resumida, no una especificación ni un registro de ejecución.
 La preparación y las aserciones permanecen en el archivo ejecutable enlazado. Los casos
 de riesgo que necesitan identificador y ficha documental se encuentran en el
