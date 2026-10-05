@@ -19,7 +19,7 @@ Esta guía corresponde al actor **Personal de almacén (área Almacén y proveed
 
 - Consulta y mantiene personas y sus asignaciones cuando cuenta con el permiso correspondiente, sin
   crear por ello una cuenta de acceso.
-- Registra y consulta materiales, mermas, entradas y salidas; surte y recibe devoluciones conforme al
+- Registra y consulta materiales, consumibles, mermas, entradas y salidas; surte y recibe devoluciones conforme al
   estado del documento y a la existencia disponible.
 - Utiliza los clientes y proveedores autorizados dentro de compras, materiales y salidas, y puede
   registrarlos desde esos formularios cuando no existen; no accede a sus vistas independientes.

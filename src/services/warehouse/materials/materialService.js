@@ -8,6 +8,7 @@ import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findInitialStockAdjustmentReason } from "../reasonService.js";
+import { MATERIAL_TYPES } from "../../../constants/inventory.js";
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
 
@@ -42,7 +43,8 @@ const findMaterialByIdentity = ({ tx, rest, relations }) => tx.material.findFirs
         presentationId: relations.presentationId,
         unitMeasureId: relations.unitMeasureId,
         base: rest.base ?? null,
-        height: rest.height ?? null
+        height: rest.height ?? null,
+        type: rest.type ?? MATERIAL_TYPES.MATERIAL
     },
     select: { id: true }
 });
@@ -62,6 +64,7 @@ export const findAllMaterials = async ({
         take,
         search,
         supplierId,
+        type: MATERIAL_TYPES.MATERIAL,
         orderBy,
         orderDir,
         canReadCosts
@@ -113,13 +116,14 @@ export const findMaterialsSnapshot = async ({
 
 export const existsMaterial = async ({
     tx,
-    id
+    id,
+    type = null
 }) => {
 
     const db = getDb(tx);
 
     const materialExists = await db.material.findUnique({
-        where: { id },
+        where: { id, ...(type && { type }) },
         select: { id: true }
     });
 
@@ -130,7 +134,8 @@ export const existsMaterial = async ({
 
 export const createMaterial = async ({
     materialDto,
-    userId = null
+    userId = null,
+    type = MATERIAL_TYPES.MATERIAL
 }) => {
 
     try {
@@ -139,7 +144,7 @@ export const createMaterial = async ({
             const { newStock, observations, ...materialData } = materialDto;
             const { rest, relations } = await prepareMaterialData({
                 tx,
-                materialDto: materialData
+                materialDto: { ...materialData, type }
             });
 
             const existingMaterial = await findMaterialByIdentity({ tx, rest, relations });
@@ -217,13 +222,13 @@ export const createMaterial = async ({
     };
 };
 
-export const updateMaterial = async (materialDto, id) => {
+export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
 
     try {
 
         const material = await getDb().$transaction(async (tx) => {
 
-            await existsMaterial({ tx, id });
+            await existsMaterial({ tx, id, type });
             const { supplierId, maxUnitCost, isActive, ...materialData } = materialDto;
 
             const currentMaterial = await tx.material.findUnique({
@@ -233,7 +238,8 @@ export const updateMaterial = async (materialDto, id) => {
                     presentationId: true,
                     unitMeasureId: true,
                     base: true,
-                    height: true
+                    height: true,
+                    type: true
                 }
             });
 
@@ -244,6 +250,7 @@ export const updateMaterial = async (materialDto, id) => {
                     unitMeasureId: currentMaterial.unitMeasureId,
                     base: currentMaterial.base ?? null,
                     height: currentMaterial.height ?? null,
+                    type: currentMaterial.type,
                     NOT: { id }
                 },
                 select: { id: true }
@@ -298,10 +305,13 @@ export const updateMaterial = async (materialDto, id) => {
 export const updateMaterialStock = async ({
     materialDto,
     userId,
-    id
+    id,
+    type = null
 }) => {
 
     try {
+
+        if (type) await existsMaterial({ id, type });
 
         const stockAdjustment = await createStockAdjustment({
             materialId: id,
@@ -335,7 +345,7 @@ export const updateMaterialStock = async ({
     }
 };
 
-export const deleteMaterial = async (supplierMaterialId) => {
+export const deleteMaterial = async (supplierMaterialId, { type = null } = {}) => {
 
     try {
 
@@ -343,10 +353,11 @@ export const deleteMaterial = async (supplierMaterialId) => {
 
             const supplierMaterial = await tx.supplierMaterial.findUnique({
                 where: { id: supplierMaterialId },
-                select: { materialId: true }
+                select: { materialId: true, material: { select: { type: true } } }
             });
 
             if (!supplierMaterial) throw new MaterialNotFound();
+            if (type && supplierMaterial.material.type !== type) throw new MaterialNotFound();
 
             const { materialId } = supplierMaterial;
 

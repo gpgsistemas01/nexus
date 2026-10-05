@@ -1,3 +1,22 @@
+<%- include('../../../shared/tables/tableFilters', {
+    selectInputs: [
+        {
+            id: 'supplierFilter',
+            label: 'Proveedor:',
+            col: 'col-12 col-md-6 col-lg-4'
+        }
+    ],
+    dateInputs: []
+}) %>
+
+<%- include('../../../shared/tables/mainTable', { title: 'Consumibles' }) %>
+
+<%- include('../materials/materialModal') %>
+
+<%- include('../suppliers/supplierModal') %>
+
+<script type="module" src="/js/pages/warehouse/consumables/consumablesPage.js"></script>
+
 <%- contentFor('title') %>
 Consumibles
 <%- contentFor('layoutType') %>

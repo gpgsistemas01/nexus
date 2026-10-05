@@ -87,6 +87,14 @@ const captureTemplates = [
     { id: 'CAP-CAT-MAT-04-STOCK', module: 'materials', name: '04-adjustment-stock.png', route: '/almacen/materiales', ready: '#table', action: click('#table tbody .btn-adjust-stock', '#materialModal.show'), area: 'sistemas', useCases: ['CU-ALM-05'] },
     { id: 'CAP-REP-MAT-05-EXPORT', module: 'materials', name: '05-export-report.png', route: '/almacen/materiales', ready: '#table', action: reportDialog, useCases: ['CU-ALM-06'] },
 
+    { id: 'CAP-CAT-CON-00-NAVIGATION', module: 'consumables', name: '00-access-menu-main.png', route: '/almacen/consumibles', ready: '#table', action: openMainMenu, useCases: ['CU-ALM-17'] },
+    { id: 'CAP-CAT-CON-01-LIST', module: 'consumables', name: '01-list-inventory.png', route: '/almacen/consumibles', ready: '#table', action: openFilters, useCases: ['CU-ALM-17', 'CU-ALM-22'] },
+    { id: 'CAP-CAT-CON-02-CREATE', module: 'consumables', name: '02-form-creation.png', route: '/almacen/consumibles', ready: '#table', action: click('button:has-text("Nuevo consumible")', '#materialModal.show'), useCases: ['CU-ALM-18'] },
+    { id: 'CAP-CAT-CON-03-EDIT', module: 'consumables', name: '03-form-edit.png', route: '/almacen/consumibles', ready: '#table', action: click('#table tbody .btn-edit', '#materialModal.show', 'al menos un consumible'), useCases: ['CU-ALM-19'] },
+    { id: 'CAP-CAT-CON-04-REMOVE', module: 'consumables', name: '04-remove-confirmation.png', route: '/almacen/consumibles', ready: '#table', action: click('#table tbody .btn-delete', '.swal2-popup', 'un consumible que pueda retirarse'), useCases: ['CU-ALM-20'] },
+    { id: 'CAP-CAT-CON-05-STOCK', module: 'consumables', name: '05-adjustment-stock.png', route: '/almacen/consumibles', ready: '#table', action: click('#table tbody .btn-adjust-stock', '#materialModal.show', 'al menos un consumible'), area: 'sistemas', useCases: ['CU-ALM-21'] },
+    { id: 'CAP-REP-CON-06-EXPORT', module: 'consumables', name: '06-export-report.png', route: '/almacen/consumibles', ready: '#table', action: reportDialog, useCases: ['CU-ALM-22'] },
+
     { id: 'CAP-CAT-SUP-00-NAVIGATION', module: 'suppliers', name: '00-access-menu-main.png', route: '/proveedores', ready: '#table', action: openMainMenu, useCases: ['CU-CAT-01'] },
     { id: 'CAP-CAT-SUP-01-LIST', module: 'suppliers', name: '01-list.png', route: '/proveedores', ready: '#table', useCases: ['CU-CAT-01', 'CU-CAT-04'] },
     { id: 'CAP-CAT-SUP-02-CREATE', module: 'suppliers', name: '02-form-creation.png', route: '/proveedores', ready: '#table', action: click('button:has-text("Nuevo proveedor")', '#supplierModal.show'), useCases: ['CU-CAT-02'] },
@@ -180,6 +188,7 @@ const captureTemplates = [
 const systemAreaModules = ['catalogs/', 'users', 'material-movements', 'waste-movements'];
 const sharedOperationalModules = [
     'materials',
+    'consumables',
     'waste',
     'suppliers',
     'clients',

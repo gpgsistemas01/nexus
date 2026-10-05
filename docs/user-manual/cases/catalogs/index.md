@@ -100,3 +100,25 @@ utilizarla nuevamente en una nueva salida.
 16. [16. CAP-CAT-WAS-03-EDIT — Formulario edicion](16-cap-cat-was-03-edit.md)
 17. [17. CAP-CAT-WAS-04-STOCK — Ajuste existencia](17-cap-cat-was-04-stock.md)
 18. [18. CAP-CAT-WAS-05-ADD-STOCK — Agregar existencia](18-cap-cat-was-05-add-stock.md)
+
+### Consumibles e inventario
+
+**Propósito.** Consultar y mantener el inventario de consumibles sin mezclarlo con el
+inventario de materiales.
+
+**Ruta en el menú:** **Menú principal → Almacén → Consumibles**.
+
+<a id="CAP-CAT-CON-00-NAVIGATION"></a>
+![CAP-CAT-CON-00-NAVIGATION: acceso a consumibles desde el menú principal](../../images/consumables/00-access-menu-main.png)
+
+La identidad del consumible conserva **Nombre**, **Presentación** y **Unidad** y se
+clasifica explícitamente como consumible. No capture **Base** ni **Altura**: que un
+registro no tenga dimensiones no basta para convertirlo en consumible. La existencia,
+el costo máximo y el estado pertenecen a la oferta del proveedor mostrada en la fila.
+
+19. [19. CAP-CAT-CON-01-LIST — Listado de consumibles](19-cap-cat-con-01-list.md)
+20. [20. CAP-REP-CON-06-EXPORT — Exportar inventario de consumibles](20-cap-rep-con-06-export.md)
+21. [21. CAP-CAT-CON-02-CREATE — Formulario de alta](21-cap-cat-con-02-create.md)
+22. [22. CAP-CAT-CON-03-EDIT — Formulario de edición](22-cap-cat-con-03-edit.md)
+23. [23. CAP-CAT-CON-04-REMOVE — Retirar oferta](23-cap-cat-con-04-remove.md)
+24. [24. CAP-CAT-CON-05-STOCK — Ajustar existencia](24-cap-cat-con-05-stock.md)

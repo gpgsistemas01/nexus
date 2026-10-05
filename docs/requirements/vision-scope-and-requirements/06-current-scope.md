@@ -6,13 +6,15 @@
 2. Cuentas de usuario, personas, roles, departamentos y asignaciones de acceso.
 3. Catálogo de materiales con presentación, unidad de medida y relaciones por
    proveedor, incluido stock físico y cantidad convertida.
-4. Proveedores, clientes y asesores asociados a personas.
-5. Recepciones de compra con detalle, importes, correcciones, cancelación de líneas y
+4. Catálogo e inventario administrativo de consumibles, clasificados explícitamente
+   dentro de `Material`, sin dimensiones y separados de materiales en consultas y reportes.
+5. Proveedores, clientes y asesores asociados a personas.
+6. Recepciones de compra con detalle, importes, correcciones, cancelación de líneas y
    movimientos de entrada.
-6. Salidas de almacén con detalle por proveedor, surtido parcial o total,
+7. Salidas de almacén con detalle por proveedor, surtido parcial o total,
    devoluciones y movimientos de salida.
-7. Mermas, ajustes de stock, motivos y movimientos independientes de merma.
-8. Historial de movimientos, notificaciones en tiempo real y reportes Excel de
+8. Mermas, ajustes de stock, motivos y movimientos independientes de merma.
+9. Historial de movimientos, notificaciones en tiempo real y reportes Excel de
    inventario, compras, salidas, mermas, proveedores, clientes, personas, usuarios y
    movimientos.
 

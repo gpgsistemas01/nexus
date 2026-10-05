@@ -28,6 +28,8 @@ describe('documentExportContentUtils', () => {
             .toBe('Información general y anexos');
         expect(exportedDocumentTitle('manuales/almacen/almacen-materiales.pdf'))
             .toBe('Almacén de materiales');
+        expect(exportedDocumentTitle('manuales/almacen/almacen-consumibles.pdf'))
+            .toBe('Almacén de consumibles');
     });
 
     it('evita repetir la introducción del actor en cada documento modular del manual', () => {

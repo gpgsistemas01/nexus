@@ -2,6 +2,7 @@ import authApiRoutes from './authApiRoute.js';
 import clientApiRoutes from './sales/clientApiRoute.js';
 import salesReportApiRoutes from './sales/reportApiRoute.js';
 import materialApiRoutes from './warehouse/materialApiRoute.js';
+import consumableApiRoutes from './warehouse/consumableApiRoute.js';
 import wasteApiRoutes from './warehouse/wasteApiRoute.js';
 import wasteIssueApiRoutes from './warehouse/wasteIssueApiRoute.js';
 import supplierApiRoutes from './warehouse/supplierApiRoute.js';
@@ -25,6 +26,7 @@ const API_ROUTES = [
     ['/sales/clients', clientApiRoutes],
     ['/sales/reports', salesReportApiRoutes],
     ['/warehouse/materials', materialApiRoutes],
+    ['/warehouse/consumables', consumableApiRoutes],
     ['/warehouse/wastes', wasteApiRoutes],
     ['/warehouse/waste-issues', wasteIssueApiRoutes],
     ['/warehouse/suppliers', supplierApiRoutes],

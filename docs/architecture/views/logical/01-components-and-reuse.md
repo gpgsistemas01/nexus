@@ -43,33 +43,38 @@ C4Component
     Rel(socketClient, events, "se suscribe", "Socket.IO")
 ```
 
-El diagrama usa `C4Component`: cada rectángulo es un componente y cada contenedor marca
-su entorno de ejecución. Las flechas expresan dependencias estructurales, no una secuencia
-temporal; se leen como «el origen usa o requiere al destino». Los protocolos sólo se
-indican cuando la dependencia cruza una frontera técnica.
+Mermaid no reproduce de forma nativa el glifo de componente, los puertos y los conectores
+*ball-and-socket* de UML. Esta vista usa su representación equivalente mediante
+clasificadores: `<<component>>` identifica componentes, `<<interface>>` identifica
+contratos, la realización `<|..` une una interfaz con quien la provee y la dependencia
+`..>` parte de quien la requiere. Las convenciones y el límite de esta aproximación se
+detallan en las
+[colaboraciones enfocadas por capacidad](03-component-collaborations-by-capability.md#notación-uml-adoptada-en-mermaid).
 
-Esta vista evita representar cada interfaz como un nodo adicional. C4 permite comunicar
-la responsabilidad y la dependencia sin simular los conectores *ball-and-socket* de UML,
-que Mermaid no soporta de forma nativa. Los contratos HTTP detallados permanecen en
-[OpenAPI](../../openapi/openapi.json) y las operaciones concretas en las secuencias por
-[caso de uso](../processes/index.md).
+Cada contrato que cruza las fronteras se representa por separado: HTTP web, HTTP
+estático, HTTP `/api` y Socket.IO. De este modo, agregar otra interfaz no obliga a
+fusionarla con las existentes ni a tratarla como un componente. Un componente puede
+realizar o requerir tantas interfaces como contratos estables exponga o consuma.
 
-## Límite con los diagramas de procesos
+El diagrama general se complementa con [OpenAPI](../../openapi/openapi.json), las
+[secuencias por caso de uso](../processes/index.md) y el
+[patrón de componentes visuales](../development/design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md).
+Las [colaboraciones enfocadas por capacidad](03-component-collaborations-by-capability.md)
+seleccionan de esta vista únicamente los componentes e interfaces necesarios cuando un
+recorrido coordina varios dominios o mecanismos de inventario; no sustituyen las
+secuencias ni duplican un diagrama por cada caso de uso.
 
-No se mantienen diagramas de componentes por compra, corrección, cancelación, surtimiento
-o devolución. Esas vistas terminaban describiendo orden, transacciones y acciones
-posteriores al commit, por lo que duplicaban los diagramas dinámicos existentes:
+### Canales comprobados en la implementación
 
-- el [recorrido extremo a extremo](../processes/01-end-to-end-interaction.md) explica el
-  pipeline general de una interacción;
-- las colecciones de secuencias de [frontend](../processes/frontend-code-sequences/index.md)
-  y [backend](../processes/backend-code-sequences/index.md) explican cada `CU-*`; y
-- los [diagramas dinámicos de implementación](../development/code-diagrams/05-views-dynamic.md)
-  ubican middleware, DTO, transacción, persistencia y publicación de eventos.
+La implementación usa estos canales:
 
-Sólo se modifica `DIA-ARQ-CMP-001` cuando aparece, desaparece o cambia la responsabilidad
-o dependencia estable de un componente. Un cambio de orden, endpoint, payload, regla de
-transacción o respuesta se documenta en el artefacto dinámico propietario.
+| Canal | Recorrido real | Uso |
+| --- | --- | --- |
+| Página web | Navegador → ruta web → middleware/controller web → `res.render` o redirección. | Entrega el HTML EJS inicial. |
+| Archivos estáticos | HTML → `GET /js/*` o `/css/*` → `express.static`. | Entrega los módulos ES y estilos que forman el frontend en el navegador. |
+| API operacional | Página/UI → aplicación frontend → archivo `*Service.js` → `apiRequest` → Axios → ruta `/api` → middleware → controller API → servicio backend → Prisma o efecto. | Consultas, escrituras y descargas; la respuesta vuelve por la misma petición como JSON o `Blob`. |
+| Renovación de sesión | Interceptor de `axiosInstanceApi.js` → `POST /api/auth/refresh` → reintento de la petición original; si falla, redirección a `/`. | Recupera una petición que recibió `401`; Axios envía las cookies porque usa `withCredentials`. |
+| Tiempo real | Controller API después de una escritura → `emitInventoryUpdated` → Socket.IO → `indexPage.js` → `CustomEvent` → DataTable interesado. | Notifica cambios de materiales, consumibles, mermas y movimientos; no reemplaza la respuesta HTTP ni transporta la escritura inicial. |
 
 ## Reutilización comprobada en el frontend
 

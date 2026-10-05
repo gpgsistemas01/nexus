@@ -36,7 +36,8 @@ mezclan bajo un documento genérico de identidad o catálogos.
 El manual de Sistemas contiene `movimientos-materiales`, `movimientos-mermas`, `usuarios`,
 `catalogo-areas`, `catalogo-roles`, `catalogo-presentaciones`, `catalogo-unidades-medida`,
 `catalogo-motivos-ajuste`, `catalogo-estados-cumplimiento`, `personas`, `clientes` y `proveedores`.
-El manual de Almacén contiene `almacen-materiales`, `almacen-mermas`, `compras`, `salidas-materiales` y `salidas-mermas`.
+El manual de Almacén contiene `almacen-materiales`, `almacen-consumibles`, `almacen-mermas`,
+`compras`, `salidas-materiales` y `salidas-mermas`.
 Ambos agregan por separado `autenticacion` para explicar el acceso y el menú. Esta asignación
 coincide con los módulos por área usados por el inventario de capturas; no agrega a un manual un
 recorrido sólo porque la política técnica permita reutilizar alguna operación desde otro contexto.
@@ -59,7 +60,7 @@ de salidas incorpora el alta contextual de cliente; incluir esos procedimientos 
 los listados independientes **Proveedores** o **Clientes**.
 
 Los reportes tampoco producen un documento genérico: el reporte de inventario queda en
-`almacen-materiales` o `almacen-mermas`; el de compras en `compras`; los de salidas en su destino;
+`almacen-materiales`, `almacen-consumibles` o `almacen-mermas`; el de compras en `compras`; los de salidas en su destino;
 los de personas, usuarios, clientes y proveedores en el documento del mismo módulo; y cada reporte
 de movimientos en `movimientos-materiales` o `movimientos-mermas`. Así, la captura del diálogo de
 exportación permanece junto a la consulta y los filtros cuyo alcance descarga.

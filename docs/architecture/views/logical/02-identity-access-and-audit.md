@@ -78,11 +78,11 @@ El backend entrega `user.permissions`, `user.scope` y `user.organization` en las
 editButton.hidden = !window.meta.permissions?.includes('materials:write');
 ```
 
-El menú principal y las acciones de personas, materiales y mermas ya usan capacidades
+El menú principal y las acciones de personas, materiales, consumibles y mermas ya usan capacidades
 derivadas. `scope` se reserva para el alcance de datos (`departmentIds`, `canReadAll`);
 para columnas o flujo, el frontend consume permisos calculados por el backend. En
-particular, `inventory:costs-read` controla las columnas de costo de materiales y
-mermas; las consultas de Prisma sólo seleccionan esos campos cuando el permiso está
+particular, `inventory:costs-read` controla las columnas de costo de materiales,
+consumibles y mermas; las consultas de Prisma sólo seleccionan esos campos cuando el permiso está
 concedido, por lo que un asesor de ventas no puede recuperarlos inspeccionando la
 respuesta HTTP.
 `user.organization` queda disponible como contexto informativo. El navegador ya no
