@@ -1,5 +1,5 @@
 <a id="CAP-CAT-CON-03-EDIT"></a>
-# 22. CAP-CAT-CON-03-EDIT — Formulario de edición
+# 21. CAP-CAT-CON-03-EDIT — Formulario de edición
 
 **Casos de uso:** `CU-ALM-19` — Editar consumible.
 

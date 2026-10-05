@@ -6,6 +6,11 @@ Cada procedimiento identifica sus casos de uso, controles, errores posibles y ca
 
 ### Catálogos auxiliares
 
+Cada catálogo auxiliar se publica como una sección independiente del manual del
+administrador; por eso su archivo conserva el prefijo `01-` dentro de su propio paquete
+y no participa en la secuencia compartida `02-` a `24-` de los procedimientos de
+inventario, proveedores y clientes.
+
 - [Áreas](01-catalog-areas.md)
 - [Roles](01-catalog-roles.md)
 - [Presentaciones](01-catalog-presentations.md)
@@ -36,10 +41,10 @@ los reportes, **Sólo activos** la excluye, mientras **Sólo con existencia** pu
 conserva stock. Volver a marcarla permite usar esa oferta nuevamente en operaciones nuevas.
 
 2. [2. CAP-CAT-MAT-01-LIST — Listado inventario](02-cap-cat-mat-01-list.md)
-3. [3. CAP-REP-MAT-05-EXPORT — Exportar inventario](03-cap-rep-mat-05-export.md)
-4. [4. CAP-CAT-MAT-02-CREATE — Formulario alta](04-cap-cat-mat-02-create.md)
-5. [5. CAP-CAT-MAT-03-EDIT — Formulario edicion](05-cap-cat-mat-03-edit.md)
-6. [6. CAP-CAT-MAT-04-STOCK — Ajuste existencia](06-cap-cat-mat-04-stock.md)
+3. [3. CAP-CAT-MAT-02-CREATE — Formulario alta](03-cap-cat-mat-02-create.md)
+4. [4. CAP-CAT-MAT-03-EDIT — Formulario edición](04-cap-cat-mat-03-edit.md)
+5. [5. CAP-CAT-MAT-04-STOCK — Ajuste existencia](05-cap-cat-mat-04-stock.md)
+6. [6. CAP-REP-MAT-05-EXPORT — Exportar inventario](06-cap-rep-mat-05-export.md)
 
 ### Proveedores
 
@@ -95,11 +100,11 @@ conservarla cuando se elige **Sólo con existencia** y aún tiene stock. Volver 
 utilizarla nuevamente en una nueva salida.
 
 13. [13. CAP-CAT-WAS-01-LIST — Listado inventario](13-cap-cat-was-01-list.md)
-14. [14. CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas](14-cap-rep-was-05-export.md)
-15. [15. CAP-CAT-WAS-02-CREATE — Formulario registro](15-cap-cat-was-02-create.md)
-16. [16. CAP-CAT-WAS-03-EDIT — Formulario edicion](16-cap-cat-was-03-edit.md)
-17. [17. CAP-CAT-WAS-04-STOCK — Ajuste existencia](17-cap-cat-was-04-stock.md)
-18. [18. CAP-CAT-WAS-05-ADD-STOCK — Agregar existencia](18-cap-cat-was-05-add-stock.md)
+14. [14. CAP-CAT-WAS-02-CREATE — Formulario registro](14-cap-cat-was-02-create.md)
+15. [15. CAP-CAT-WAS-03-EDIT — Formulario edición](15-cap-cat-was-03-edit.md)
+16. [16. CAP-CAT-WAS-04-STOCK — Ajuste existencia](16-cap-cat-was-04-stock.md)
+17. [17. CAP-CAT-WAS-05-ADD-STOCK — Agregar existencia](17-cap-cat-was-05-add-stock.md)
+18. [18. CAP-REP-WAS-05-EXPORT — Exportar inventario de mermas](18-cap-rep-was-05-export.md)
 
 ### Consumibles e inventario
 
@@ -117,8 +122,8 @@ registro no tenga dimensiones no basta para convertirlo en consumible. La existe
 el costo máximo y el estado pertenecen a la oferta del proveedor mostrada en la fila.
 
 19. [19. CAP-CAT-CON-01-LIST — Listado de consumibles](19-cap-cat-con-01-list.md)
-20. [20. CAP-REP-CON-06-EXPORT — Exportar inventario de consumibles](20-cap-rep-con-06-export.md)
-21. [21. CAP-CAT-CON-02-CREATE — Formulario de alta](21-cap-cat-con-02-create.md)
-22. [22. CAP-CAT-CON-03-EDIT — Formulario de edición](22-cap-cat-con-03-edit.md)
-23. [23. CAP-CAT-CON-04-REMOVE — Retirar oferta](23-cap-cat-con-04-remove.md)
-24. [24. CAP-CAT-CON-05-STOCK — Ajustar existencia](24-cap-cat-con-05-stock.md)
+20. [20. CAP-CAT-CON-02-CREATE — Formulario de alta](20-cap-cat-con-02-create.md)
+21. [21. CAP-CAT-CON-03-EDIT — Formulario de edición](21-cap-cat-con-03-edit.md)
+22. [22. CAP-CAT-CON-04-REMOVE — Retirar oferta](22-cap-cat-con-04-remove.md)
+23. [23. CAP-CAT-CON-05-STOCK — Ajustar existencia](23-cap-cat-con-05-stock.md)
+24. [24. CAP-REP-CON-06-EXPORT — Exportar inventario de consumibles](24-cap-rep-con-06-export.md)

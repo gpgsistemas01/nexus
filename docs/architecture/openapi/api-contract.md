@@ -35,6 +35,23 @@ cubiertas y detecta tanto rutas ausentes como definiciones obsoletas.
 
 ## Reglas contractuales complementarias
 
+### Errores no atribuibles a la validación de entrada
+
+Las respuestas distintas de `400` conservan un `code` estable para que la interfaz y
+soporte identifiquen la causa sin mostrar detalles internos del servidor. Las respuestas
+compartidas de OpenAPI documentan su estructura y ejemplos. En particular:
+
+| HTTP | `code` | Significado y recuperación |
+| --- | --- | --- |
+| `500` | `SERVER_ERROR` | Ocurrió un fallo interno no controlado. El detalle técnico se registra en el servidor y no forma parte de la respuesta pública. |
+| `503` | `DATABASE_TABLE_MISSING` | Prisma informó `P2021`: falta una tabla requerida. Operaciones debe revisar y aplicar las migraciones pendientes antes de reintentar. |
+| `503` | `DATABASE_COLUMN_MISSING` | Prisma informó `P2022`: falta una columna requerida. Operaciones debe revisar y aplicar las migraciones pendientes antes de reintentar. |
+| `503` | `PRISMA_CLIENT_OUT_OF_SYNC` | `PrismaClientValidationError` rechazó un argumento o campo que forma parte del esquema vigente; se debe regenerar el cliente Prisma del despliegue. |
+
+Los errores operativos de dominio pueden aportar otros códigos para `401`, `403`,
+`404`, `409` o `500`; cada operación referencia la respuesta correspondiente y el
+cliente debe tratar el código como identificador, no el texto como contrato.
+
 ### Exportación mensual de reportes
 
 Los endpoints de exportación de compras, salidas y movimientos aceptan

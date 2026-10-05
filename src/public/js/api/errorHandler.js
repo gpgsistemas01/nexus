@@ -11,6 +11,13 @@ const getFallbackMessage = (err) => {
     return data?.message || getErrorMessage(data) || data?.detail || data?.error || err?.message || 'Ocurrió un error inesperado.';
 };
 
+const getFallbackMessageWithCode = err => {
+    const data = err?.data ?? err?.response?.data ?? null;
+    const message = getFallbackMessage(err);
+
+    return data?.code ? `${ message } (Código: ${ data.code })` : message;
+};
+
 export const normalizeJqAjaxError = (jqXHR, errorThrown = null) => {
 
     const data = jqXHR?.responseJSON ?? null;
@@ -88,14 +95,14 @@ export const handleApiError = ({
         }
 
         default:
-            notifications.showError(getFallbackMessage(err));
+            notifications.showError(getFallbackMessageWithCode(err));
             if (rethrow) throw err;
     }
 };
 
 export const handleDataTableError = (err, table = null) => {
 
-    const { status, message } = err;
+    const { status, data, message } = err;
 
     switch (status) {
 
@@ -118,7 +125,9 @@ export const handleDataTableError = (err, table = null) => {
 
         default:
             notifications.showError(
-                message || 'No fue posible cargar la información.'
+                data?.code
+                    ? getFallbackMessageWithCode(err)
+                    : message || 'No fue posible cargar la información.'
             );
 
             if (table) table.clear().draw();

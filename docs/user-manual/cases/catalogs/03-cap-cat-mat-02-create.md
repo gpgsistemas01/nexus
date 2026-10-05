@@ -1,5 +1,5 @@
 <a id="CAP-CAT-MAT-02-CREATE"></a>
-# 4. CAP-CAT-MAT-02-CREATE — Formulario alta
+# 3. CAP-CAT-MAT-02-CREATE — Formulario alta
 
 **Casos de uso:** `CU-ALM-02` — Crear material.
 
