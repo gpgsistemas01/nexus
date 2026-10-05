@@ -299,6 +299,7 @@ export const buildMonthlyGoodsReceiptSummary = (rows = []) => {
 export const findWarehouseReportRows = async ({
     search = '',
     inventoryScope = 'activeOrStock',
+    type = null,
     orderBy = 'name',
     orderDir = 'asc'
 } = {}) => {
@@ -308,6 +309,8 @@ export const findWarehouseReportRows = async ({
         activeOrStock: { OR: [{ isActive: true }, { currentStock: { not: 0 } }] }
     };
     const where = { AND: [scopeFilter[inventoryScope] || scopeFilter.activeOrStock] };
+
+    if (type) where.AND.push({ material: { type } });
 
     if (search) where.AND.push({
         material: { name: { contains: search, mode: 'insensitive' } }

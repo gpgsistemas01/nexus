@@ -6,6 +6,7 @@ import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCru
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { materialDataFields, materialEditableDataFields } from './materialFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
+import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
@@ -15,7 +16,8 @@ export const openMaterialModal = ({
     mode = FORM_MODES.CREATE,
     data = null,
     onSave = null,
-    creationContext = null
+    creationContext = null,
+    resource = INVENTORY_RESOURCES.MATERIAL
 }) => {
 
     const form = document.querySelector(FORM_SELECTORS.MATERIAL);
@@ -24,11 +26,13 @@ export const openMaterialModal = ({
     const isEditing = isEditMode(mode);
     const isAdjustingStock = isStockMode(mode);
     const isGoodsReceiptCreation = creationContext === goodsReceiptCreationContext;
+    const isConsumable = resource === INVENTORY_RESOURCES.CONSUMABLE;
 
     initializeInventoryCrudModal({ form, mode, data });
     initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL });
     setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
     form.dataset.creationContext = creationContext || '';
+    form.dataset.resource = resource;
 
     form.elements.name.value = data?.name ?? '';
     form.elements.minStock.value = data?.minStock ?? '';
@@ -43,6 +47,11 @@ export const openMaterialModal = ({
         form,
         selector: stockDataSectionSelector,
         isVisible: !isEditing && !isGoodsReceiptCreation
+    });
+    setFormSectionVisibility({
+        form,
+        isVisible: !isConsumable,
+        fieldNames: ['base', 'height']
     });
     setFormSectionVisibility({
         form,
@@ -70,11 +79,12 @@ export const openMaterialModal = ({
         name: !isAdjustingStock ? initialStockReasonName : null,
         isDisabled: !isAdjustingStock
     });
+    const resourceLabel = isConsumable ? 'consumible' : 'material';
     modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = isEditing
-        ? 'Editar material'
+        ? `Editar ${ resourceLabel }`
         : isAdjustingStock
-            ? 'Ajustar stock de material'
-            : 'Registrar material';
+            ? `Ajustar stock de ${ resourceLabel }`
+            : `Registrar ${ resourceLabel }`;
     form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = isEditing
         ? 'Actualizar'
         : isAdjustingStock

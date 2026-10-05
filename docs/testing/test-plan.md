@@ -151,6 +151,7 @@ Vitest.
 | --- | --- |
 | Catálogos, clientes y proveedores | Mantener integraciones de alta y consulta; ampliar actualización o baja sólo al modificar esos flujos. |
 | Salidas de merma | Mantener registro, persistencia, movimiento y rollback existentes. |
+| Consumibles | Mantener la cobertura unitaria por operación e incorporar integración HTTP/Prisma de consulta, alta, edición, retiro y ajuste; comprobar además que reporte y selectores no mezclen tipos. |
 | Salidas de material | Incorporar integración HTTP de registro, entrega/devolución, stock y rollback. |
 | Entradas de compra | Incorporar integración HTTP de registro, corrección, costo, movimiento y rollback. |
 | Personas y usuarios | Incorporar persistencia de relaciones de rol y departamento. |

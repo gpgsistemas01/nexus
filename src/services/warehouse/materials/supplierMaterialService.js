@@ -136,6 +136,7 @@ export const findAllSupplierMaterials = async ({
     take = 10,
     search = '',
     supplierId = null,
+    type = null,
     orderBy = 'id',
     orderDir = 'asc',
     canReadCosts = false
@@ -154,6 +155,10 @@ export const findAllSupplierMaterials = async ({
 
     if (supplierId) where.AND.push({
         supplierId
+    });
+
+    if (type) where.AND.push({
+        material: { type }
     });
 
     if (where.AND.length === 0) delete where.AND;
@@ -205,7 +210,9 @@ export const findAllSupplierMaterials = async ({
         return 0;
     });
 
-    const totalPromise = countTotalSupplierMaterials();
+    const totalPromise = countTotalSupplierMaterials({
+        ...(type && { where: { material: { type } } })
+    });
     const hasFilters = Object.keys(where).length > 0;
     const [deletableMaterialIds, total, filtered] = await Promise.all([
         findDeletableMaterialIds({

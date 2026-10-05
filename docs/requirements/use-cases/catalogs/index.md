@@ -20,6 +20,12 @@
 | `CU-ALM-14` | Generar reporte de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 | `CU-ALM-15` | Consultar movimientos de mermas | Consulta autorizada sin modificar datos. |
 | `CU-ALM-16` | Generar reporte de movimientos de mermas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-ALM-17` | Consultar consumibles | Listado separado de consumibles, ofertas de proveedor y existencias. |
+| `CU-ALM-18` | Crear consumible | Alta sin dimensiones, con unidad explícita e inventario inicial. |
+| `CU-ALM-19` | Editar consumible | Actualización de datos generales admitidos. |
+| `CU-ALM-20` | Retirar consumible | Retiro condicionado por la historia operativa. |
+| `CU-ALM-21` | Ajustar existencia de consumible | Ajuste trazable de inventario. |
+| `CU-ALM-22` | Generar reporte de inventario de consumibles | Archivo Excel limitado a registros `CONSUMABLE`. |
 
 ### Grupo funcional CAT — Catálogos
 
@@ -83,6 +89,12 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 - [`CU-ALM-14` — Generar reporte de mermas](cu-alm-14.md)
 - [`CU-ALM-15` — Consultar movimientos de mermas](cu-alm-15.md)
 - [`CU-ALM-16` — Generar reporte de movimientos de mermas](cu-alm-16.md)
+- [`CU-ALM-17` — Consultar consumibles](cu-alm-17.md)
+- [`CU-ALM-18` — Crear consumible](cu-alm-18.md)
+- [`CU-ALM-19` — Editar consumible](cu-alm-19.md)
+- [`CU-ALM-20` — Retirar consumible](cu-alm-20.md)
+- [`CU-ALM-21` — Ajustar existencia de consumible](cu-alm-21.md)
+- [`CU-ALM-22` — Generar reporte de inventario de consumibles](cu-alm-22.md)
 
 ### Grupo funcional CAT — Catálogos
 

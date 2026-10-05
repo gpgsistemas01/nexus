@@ -1,0 +1,4 @@
+CREATE TYPE "MaterialType" AS ENUM ('MATERIAL', 'CONSUMABLE');
+
+ALTER TABLE "Material"
+ADD COLUMN "type" "MaterialType" NOT NULL DEFAULT 'MATERIAL';

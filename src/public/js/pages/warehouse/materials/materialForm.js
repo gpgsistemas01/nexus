@@ -1,17 +1,34 @@
 import { useForm } from "../../../ui/forms/formUI.js";
 import { editMaterial, editMaterialStock, registerMaterial } from "../../../application/warehouse/materials/materials.js";
+import { editConsumable, editConsumableStock, registerConsumable } from '../../../application/warehouse/consumables/consumables.js';
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
 import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";
 import { goodsReceiptMaterialCreateValidation, materialCreateValidation, materialEditValidation, materialStockValidation } from "../../../utils/validations/validators.js";
 import { materialCreateFields, materialSecondaryDataFields, materialStockRequestFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
+import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
 
 const formId = FORM_SELECTORS.MATERIAL;
 const goodsReceiptCreationContext = 'goodsReceipt';
 
 const getCreationContext = (form) => form.dataset.creationContext || null;
 const isGoodsReceiptCreation = (form) => getCreationContext(form) === goodsReceiptCreationContext;
+const resourceRequests = Object.freeze({
+    [INVENTORY_RESOURCES.MATERIAL]: {
+        create: registerMaterial,
+        edit: editMaterial,
+        stock: editMaterialStock
+    },
+    [INVENTORY_RESOURCES.CONSUMABLE]: {
+        create: registerConsumable,
+        edit: editConsumable,
+        stock: editConsumableStock
+    }
+});
+
+const getResourceRequests = form => resourceRequests[form.dataset.resource]
+    ?? resourceRequests[INVENTORY_RESOURCES.MATERIAL];
 
 const getMaterialValidation = (form) => {
 
@@ -50,11 +67,13 @@ useForm({
     },
     sendRequest: async ({ formData, form }) => {
 
+        const requests = getResourceRequests(form);
+
         const material = await handleSubmit({
             form,
             formData,
-            create: ({ formData }) => registerMaterial({ formData, creationContext: getCreationContext(form) }),
-            update: isStockMode(form.dataset.mode) ? editMaterialStock : editMaterial
+            create: ({ formData }) => requests.create({ formData, creationContext: getCreationContext(form) }),
+            update: isStockMode(form.dataset.mode) ? requests.stock : requests.edit
         });
 
         form.onSave?.(material);

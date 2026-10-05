@@ -67,6 +67,23 @@ describe('listado del CRUD de materiales', () => {
     }));
   });
 
+  it('filtra los consumibles mediante su clasificación explícita', async () => {
+    await findAllSupplierMaterials({ type: 'CONSUMABLE' });
+
+    expect(supplierMaterialFindMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: {
+        AND: [
+          { material: { type: 'CONSUMABLE' } }
+        ]
+      }
+    }));
+    expect(supplierMaterialCount).toHaveBeenCalledWith({
+      where: {
+        material: { type: 'CONSUMABLE' }
+      }
+    });
+  });
+
   it('conserva el mismo contrato anidado al consultar un material recién creado', async () => {
     const supplierMaterial = {
       id: 'offer-1',

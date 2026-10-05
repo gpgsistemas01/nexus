@@ -2,6 +2,7 @@ import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findGoodsIssu
 import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
 import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
+import { MATERIAL_TYPES } from '../../../constants/inventory.js';
 
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_materiales';
@@ -101,6 +102,7 @@ export const exportWarehouseReportExcel = async (req, res) => {
     const rows = await findWarehouseReportRows({
         search: getDataTableSearch(req.query),
         inventoryScope: req.query.inventoryScope,
+        type: Object.values(MATERIAL_TYPES).includes(req.query.type) ? req.query.type : null,
         orderBy,
         orderDir
     });

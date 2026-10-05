@@ -9,7 +9,7 @@ confundir tres conceptos diferentes:
 - **estado:** grado en que la evidencia actual satisface el requisito.
 
 El alcance actual comprende autenticación, administración de identidades, catálogos,
-compras, inventario de materiales, inventario de merma, salidas, devoluciones,
+compras, inventarios separados de materiales, consumibles y mermas, salidas, devoluciones,
 movimientos y reportes. El contrato OpenAPI de las operaciones registradas forma parte
 de la línea base; una interfaz completa de requisiciones y los objetivos de nivel de
 servicio permanecen fuera de la línea base implementada.

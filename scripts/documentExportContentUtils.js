@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const documentTitles = new Map([
     ['almacen-materiales', 'Almacén de materiales'],
+    ['almacen-consumibles', 'Almacén de consumibles'],
     ['almacen-mermas', 'Almacén de mermas'],
     ['autenticacion', 'Autenticación'],
     ['catalogo-areas', 'Catálogo de áreas'],

@@ -138,6 +138,13 @@ const MANUALS = Object.freeze({
                 '04-cap-cat-mat-02-create.md',
                 '05-cap-cat-mat-03-edit.md'
             ])),
+            'almacen-consumibles': manualPart(warehouse, manualCaseFiles('catalogs', [
+                '19-cap-cat-con-01-list.md',
+                '20-cap-rep-con-06-export.md',
+                '21-cap-cat-con-02-create.md',
+                '22-cap-cat-con-03-edit.md',
+                '23-cap-cat-con-04-remove.md'
+            ])),
             'almacen-mermas': manualPart(warehouse, manualCaseFiles('catalogs', [
                 '13-cap-cat-was-01-list.md',
                 '14-cap-rep-was-05-export.md',

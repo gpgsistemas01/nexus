@@ -1,6 +1,6 @@
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
-import { getAllMaterials } from "../../../application/warehouse/materials/materials.js";
+import { getAllMaterials } from '../../../application/warehouse/materials/materials.js';
 import { buildPaginatedSelectParams, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { setMdbWrapperInputValue } from '../../mdb/baseInstance.js';
 import { mapSelectMaterialData, parseInventorySelectJson } from "../../../utils/warehouseInventoryUtils.js";
