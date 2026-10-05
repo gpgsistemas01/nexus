@@ -13,6 +13,7 @@ classDiagram
     class Cliente
     class Proveedor
     class Material
+    class Consumible
     class Merma
     class OfertaProveedorMaterial
     class EntradaCompra
@@ -26,6 +27,7 @@ classDiagram
     Persona "1" --> "0..*" AsignacionAcceso : desempeña
     Proveedor "1" --> "0..*" OfertaProveedorMaterial : ofrece
     Material "1" --> "0..*" OfertaProveedorMaterial : cotizado como
+    Material <|-- Consumible : clasificación de inventario
     Material "1" --> "0..*" Merma : origina
     Proveedor "1" --> "0..*" EntradaCompra : abastece
     EntradaCompra "1" *-- "1..*" DetalleDocumento : contiene
@@ -39,6 +41,11 @@ classDiagram
     SalidaMerma "1" --> "0..*" Movimiento : produce
     Movimiento "0..*" --> "1" Existencia : modifica
 ```
+
+`Consumible` representa la clasificación explícita `CONSUMABLE` de una identidad
+persistida en `Material`; no es otra tabla ni se infiere por unidad o ausencia de
+dimensiones. Reutiliza la oferta, existencia, ajuste y movimiento de material, mientras
+sus consultas y reportes se mantienen separados.
 
 `Persona` puede ser solicitante, receptor o referencia comercial sin que eso convierta
 a esa persona en usuario. En particular, **asesor** es un dato del contexto comercial,

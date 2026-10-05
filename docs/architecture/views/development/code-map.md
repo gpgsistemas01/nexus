@@ -13,28 +13,28 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    controllers["controllers (35 módulos)"] --> constants["constants (10 módulos)"]
-    controllers["controllers (35 módulos)"] --> dtos["dtos (10 módulos)"]
-    controllers["controllers (35 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (35 módulos)"] --> services["services (52 módulos)"]
-    controllers["controllers (35 módulos)"] --> utils["utils (11 módulos)"]
+    controllers["controllers (36 módulos)"] --> constants["constants (10 módulos)"]
+    controllers["controllers (36 módulos)"] --> dtos["dtos (10 módulos)"]
+    controllers["controllers (36 módulos)"] --> messages["messages (2 módulos)"]
+    controllers["controllers (36 módulos)"] --> services["services (53 módulos)"]
+    controllers["controllers (36 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
     errors["errors (18 módulos)"] --> messages["messages (2 módulos)"]
-    errors["errors (18 módulos)"] --> public["public (187 módulos)"]
+    errors["errors (18 módulos)"] --> public["public (193 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (10 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (52 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (53 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
     repository["repository (1 módulos)"] --> lib["lib (2 módulos)"]
-    routes["routes (39 módulos)"] --> constants["constants (10 módulos)"]
-    routes["routes (39 módulos)"] --> controllers["controllers (35 módulos)"]
-    routes["routes (39 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (39 módulos)"] --> validators["validators (15 módulos)"]
-    services["services (52 módulos)"] --> constants["constants (10 módulos)"]
-    services["services (52 módulos)"] --> dtos["dtos (10 módulos)"]
-    services["services (52 módulos)"] --> errors["errors (18 módulos)"]
-    services["services (52 módulos)"] --> repository["repository (1 módulos)"]
-    services["services (52 módulos)"] --> utils["utils (11 módulos)"]
+    routes["routes (40 módulos)"] --> constants["constants (10 módulos)"]
+    routes["routes (40 módulos)"] --> controllers["controllers (36 módulos)"]
+    routes["routes (40 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (40 módulos)"] --> validators["validators (15 módulos)"]
+    services["services (53 módulos)"] --> constants["constants (10 módulos)"]
+    services["services (53 módulos)"] --> dtos["dtos (10 módulos)"]
+    services["services (53 módulos)"] --> errors["errors (18 módulos)"]
+    services["services (53 módulos)"] --> repository["repository (1 módulos)"]
+    services["services (53 módulos)"] --> utils["utils (11 módulos)"]
     utils["utils (11 módulos)"] --> constants["constants (10 módulos)"]
     utils["utils (11 módulos)"] --> errors["errors (18 módulos)"]
     validators["validators (15 módulos)"] --> constants["constants (10 módulos)"]
@@ -45,7 +45,7 @@ flowchart LR
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (65)
+## Endpoints API (70)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -61,6 +61,11 @@ flowchart LR
 | `PATCH` | `/api/warehouse/materials/:id` | [`src/routes/api/warehouse/materialApiRoute.js`](../../../../src/routes/api/warehouse/materialApiRoute.js) |
 | `PATCH` | `/api/warehouse/materials/:id/stock` | [`src/routes/api/warehouse/materialApiRoute.js`](../../../../src/routes/api/warehouse/materialApiRoute.js) |
 | `DELETE` | `/api/warehouse/materials/:id` | [`src/routes/api/warehouse/materialApiRoute.js`](../../../../src/routes/api/warehouse/materialApiRoute.js) |
+| `GET` | `/api/warehouse/consumables` | [`src/routes/api/warehouse/consumableApiRoute.js`](../../../../src/routes/api/warehouse/consumableApiRoute.js) |
+| `POST` | `/api/warehouse/consumables` | [`src/routes/api/warehouse/consumableApiRoute.js`](../../../../src/routes/api/warehouse/consumableApiRoute.js) |
+| `PATCH` | `/api/warehouse/consumables/:id` | [`src/routes/api/warehouse/consumableApiRoute.js`](../../../../src/routes/api/warehouse/consumableApiRoute.js) |
+| `PATCH` | `/api/warehouse/consumables/:id/stock` | [`src/routes/api/warehouse/consumableApiRoute.js`](../../../../src/routes/api/warehouse/consumableApiRoute.js) |
+| `DELETE` | `/api/warehouse/consumables/:id` | [`src/routes/api/warehouse/consumableApiRoute.js`](../../../../src/routes/api/warehouse/consumableApiRoute.js) |
 | `GET` | `/api/warehouse/wastes/material-templates` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `GET` | `/api/warehouse/wastes` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `POST` | `/api/warehouse/wastes` | [`src/routes/api/warehouse/wasteApiRoute.js`](../../../../src/routes/api/warehouse/wasteApiRoute.js) |
@@ -160,6 +165,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/createDataTableListController.js`](../../../../src/controllers/api/createDataTableListController.js) | `createDataTableListController` |
 | [`src/controllers/api/sales/clientController.js`](../../../../src/controllers/api/sales/clientController.js) | `editClient`, `getAllClients`, `registerClient` |
 | [`src/controllers/api/sales/reportController.js`](../../../../src/controllers/api/sales/reportController.js) | `exportClientReport` |
+| [`src/controllers/api/warehouse/consumableController.js`](../../../../src/controllers/api/warehouse/consumableController.js) | `editConsumable`, `editConsumableStock`, `getAllConsumables`, `registerConsumable`, `removeConsumable` |
 | [`src/controllers/api/warehouse/fulfillmentStatusController.js`](../../../../src/controllers/api/warehouse/fulfillmentStatusController.js) | `getAllFulfillmentStatuses` |
 | [`src/controllers/api/warehouse/goodsIssueController.js`](../../../../src/controllers/api/warehouse/goodsIssueController.js) | `editGoodsIssue`, `editGoodsIssueDetails`, `editGoodsIssueHeader`, `getAllGoodsIssues`, `registerGoodsIssue`, `registerGoodsIssueDetailReturn` |
 | [`src/controllers/api/warehouse/goodsReceiptController.js`](../../../../src/controllers/api/warehouse/goodsReceiptController.js) | `cancelGoodsReceiptDetail`, `correctGoodsReceiptDetail`, `editGoodsReceiptHeader`, `getAllGoodsReceipts`, `registerGoodsReceipt` |
@@ -214,6 +220,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/sales/clientService.js`](../../../../src/services/sales/clientService.js) | `createClient`, `findAllClients`, `findClientById`, `updateClient` |
 | [`src/services/serviceErrorHandler.js`](../../../../src/services/serviceErrorHandler.js) | `executeServiceOperation`, `handleServiceError` |
 | [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `createStockAdjustment`, `createStockAdjustmentByQuantityChange` |
+| [`src/services/warehouse/consumables/consumableService.js`](../../../../src/services/warehouse/consumables/consumableService.js) | `createConsumable`, `deleteConsumable`, `findAllConsumables`, `updateConsumable`, `updateConsumableStock` |
 | [`src/services/warehouse/fulfillmentStatusService.js`](../../../../src/services/warehouse/fulfillmentStatusService.js) | `findAllFulfillmentStatuses`, `findFulfillmentStatusIdByName`, `findFulfillmentStatusIdsByName` |
 | [`src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js`](../../../../src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js) | `returnGoodsIssueDetail` |
 | [`src/services/warehouse/goodsIssues/goodsIssueDetailSelect.js`](../../../../src/services/warehouse/goodsIssues/goodsIssueDetailSelect.js) | `GOODS_ISSUE_DETAIL_SELECT` |

@@ -176,6 +176,7 @@ usuarios y responsables se mantiene en el
 | `minStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `base` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `height` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `type` | `MaterialType` | Sí | — | `MATERIAL` | — |
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |
@@ -734,6 +735,7 @@ usuarios y responsables se mantiene en el
 | Tipo | Valores permitidos por Prisma |
 | --- | --- |
 | `CriticalWriteAuditAction` | `CREATE`, `UPDATE`, `DELETE` |
+| `MaterialType` | `MATERIAL`, `CONSUMABLE` |
 | `GoodsReceiptDetailStatus` | `ACTIVE`, `CANCELED` |
 | `AdjustmentStatus` | `PENDING`, `APPLIED`, `CANCELLED` |
 | `StockAdjustmentType` | `INCREASE`, `DECREASE` |

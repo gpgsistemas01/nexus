@@ -47,3 +47,22 @@ normativa:
 La obligatoriedad de una columna no sustituye una precondición del caso de uso; una
 restricción Prisma no sustituye una regla de negocio; y una decisión de privilegios de
 PostgreSQL no concede permisos funcionales a un usuario de Nexus.
+
+## Clasificación del material
+
+`Material.type` se modela con el enum `MaterialType` porque sus valores determinan
+comportamientos compilados y rutas separadas (`MATERIAL` y `CONSUMABLE`), no un catálogo
+administrable. Esta forma mantiene la clasificación obligatoria, evita relaciones y
+consultas adicionales y permite que ambas variantes reutilicen la misma identidad,
+oferta, existencia y movimiento.
+
+Una tabla de tipos sólo sería apropiada si el negocio necesitara crear tipos en tiempo
+de ejecución o asociarles metadatos, permisos o reglas configurables. Mientras cada tipo
+requiera soporte explícito en código, agregar otro valor mediante migración y actualizar
+sus flujos conserva mejor la integridad que exponer una relación administrable.
+
+Si una variante incorpora después atributos o relaciones que no corresponden a todos los
+materiales, éstos pueden residir en un modelo de extensión con relación uno a uno hacia
+`Material`. Esa evolución no exige convertir `MaterialType` en un catálogo: el enum sigue
+actuando como discriminador cerrado y el modelo de extensión conserva únicamente los
+datos propios de la variante.

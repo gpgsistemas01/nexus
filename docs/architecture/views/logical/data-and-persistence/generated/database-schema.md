@@ -115,6 +115,7 @@ erDiagram
         Decimal minStock
         Decimal base
         Decimal height
+        MaterialType type
     }
     UnitMeasure {
         String id PK

@@ -1,4 +1,3 @@
-import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { openMaterialModal } from "../../../../pages/warehouse/materials/materialModal.js";
 import { configureRealtimeReload } from '../../core/base/tableOperations.js';
@@ -7,15 +6,15 @@ import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { setupTableFilters } from "../../core/filters/tableFilter.js";
 import { notifications } from "../../../swal/swalComponent.js";
 import { deleteMaterial, getAllMaterials } from "../../../../application/warehouse/materials/materials.js";
-import { getResponsiveRowData } from '../../core/responsive/rowData.js';
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
 import { hasPermission, UI_PERMISSIONS } from "../../../../constants/permissions.js";
 import { exportWarehouseReport } from "../../../../application/warehouse/report.js";
 import { formatFileName } from "../../../../utils/formatters.js";
 import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
 import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "../../shared/inventory/warehouseInventoryDatatable.js";
-import { handleApiError } from "../../../../api/errorHandler.js";
-import { mapMaterialRowToFormData } from './materialRow.js';
+import { INVENTORY_RESOURCES, MATERIAL_TYPES } from '../../../../constants/inventory.js';
+import { bindMaterialInventoryActions } from '../../shared/inventory/materialInventoryActions.js';
+
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
@@ -57,7 +56,7 @@ export const createMaterialDatatable = async (context) => {
         canManageItems: canManageMaterials,
         renderActions: (_, __, row) => renderActionButtons({
             status: 'Abierta',
-            context: 'material',
+            context: INVENTORY_RESOURCES.MATERIAL,
             canAdjustStock: hasPermission(context, UI_PERMISSIONS.MATERIALS_ADJUST_STOCK),
             canDeleteMaterial: canManageMaterials && row.canDelete
         })
@@ -115,7 +114,8 @@ export const createMaterialDatatable = async (context) => {
                     allowInventoryScope: true,
                     request: ({ inventoryScope } = {}) => exportWarehouseReport(buildTableExportParams(table, {
                         ...filters.getValues(),
-                        inventoryScope
+                        inventoryScope,
+                        type: MATERIAL_TYPES.MATERIAL
                     }))
                 })
             ]
@@ -124,43 +124,15 @@ export const createMaterialDatatable = async (context) => {
 
     configureMaterialsRealtime(table);
 
-    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function () {
-
-        const data = getResponsiveRowData(table, this);
-
-        openMaterialModal({ mode: FORM_MODES.EDIT, data: mapMaterialRowToFormData(data) });
-    });
-
-    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-adjust-stock', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openMaterialModal({ mode: FORM_MODES.EDIT_STOCK, data: mapMaterialRowToFormData(data) });
-    });
-
-    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-delete-material', async function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        const result = await notifications.showConfirmation({
+    bindMaterialInventoryActions({
+        table,
+        resource: INVENTORY_RESOURCES.MATERIAL,
+        remove: deleteMaterial,
+        deleteConfirmation: {
             title: '¿Eliminar material de este proveedor?',
-            text: 'Se eliminará únicamente la relación entre el material y el proveedor mostrada en esta fila. Si es la última relación del material, también se eliminará el material. Esto solo es posible si el material no tiene historial de compras, salidas, mermas, movimientos ni ajustes de stock. El proveedor no se eliminará.',
-            icon: 'warning',
-            confirmButtonText: 'Eliminar',
-            cancelButtonText: 'Cancelar',
-            variant: 'danger'
-        });
-
-        if (!result.isConfirmed) return;
-
-        try {
-            const response = await deleteMaterial({ id: data.id });
-
-            notifications.showSuccess(response.message || '¡Relación entre material y proveedor eliminada exitosamente!');
-            table.ajax.reload(null, false);
-        } catch (err) {
-            handleApiError({ err, rethrow: false });
-        }
+            text: 'Se eliminará únicamente la relación entre el material y el proveedor mostrada en esta fila. Si es la última relación del material, también se eliminará el material. Esto solo es posible si el material no tiene historial de compras, salidas, mermas, movimientos ni ajustes de stock. El proveedor no se eliminará.'
+        },
+        deleteSuccessMessage: '¡Relación entre material y proveedor eliminada exitosamente!'
     });
 
 }

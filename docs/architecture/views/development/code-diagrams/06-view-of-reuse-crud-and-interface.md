@@ -1,6 +1,6 @@
 # 6. Diagramas de reutilización: CRUD e interfaz
 
-El primer diagrama evita representar cliente, proveedor, material o merma como implementaciones
+El primer diagrama evita representar cliente, proveedor, material, consumible o merma como implementaciones
 aisladas cuando el código ya ofrece piezas comunes. Una flecha discontinua significa que
 el recurso configura o consume el componente, no que todos tengan idénticas reglas. Se
 aplican **Factory functions** y **composición sobre herencia**: el recurso inyecta su
@@ -17,6 +17,7 @@ flowchart TB
     dataTable["Plugins DataTable compartidos"] -.-> catalogApps
     select2["Select2 base y dominios"] -.-> catalogApps
     inventoryUi["inventorySelectUI y utilidades de inventario"] -.-> materialFlow["Flujo de material"]
+    inventoryUi -.-> consumableFlow["Flujo de consumible"]
     inventoryUi -.-> wasteFlow["Flujo de merma"]
 
     catalogApps --> resourceRules{"Reglas del recurso"}
@@ -56,7 +57,7 @@ flowchart LR
     end
 
     subgraph adapters["Configuración por dominio"]
-        crudModules["persons · users · clients · suppliers<br/>materials · wastes · goodsReceipts · admin/catalogs"]
+        crudModules["persons · users · clients · suppliers<br/>materials · consumables · wastes · goodsReceipts · admin/catalogs"]
         issueModules["goodsIssues · wasteIssues"]
         listControllers["role · department · reason<br/>fulfillmentStatus · presentation · unitMeasure"]
         reportModules["admin/report · sales/report · warehouse/report"]

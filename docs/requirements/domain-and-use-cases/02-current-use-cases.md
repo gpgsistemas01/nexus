@@ -115,13 +115,23 @@ flowchart LR
             ucWasteMovements(["CU-ALM-15 Consultar movimientos de mermas"])
             ucWasteMovementReport(["CU-ALM-16 Generar reporte de movimientos de mermas"])
         end
+        subgraph consumableWarehouseFamily["Consumibles"]
+            ucConsumableQuery(["CU-ALM-17 Consultar consumibles"])
+            ucConsumableCreate(["CU-ALM-18 Crear consumible"])
+            ucConsumableEdit(["CU-ALM-19 Editar consumible"])
+            ucConsumableRemove(["CU-ALM-20 Retirar consumible"])
+            ucConsumableStock(["CU-ALM-21 Ajustar existencia de consumible"])
+            ucConsumableReport(["CU-ALM-22 Generar reporte de inventario de consumibles"])
+        end
     end
 
     warehouse --- ucMaterialQuery
     warehouse --- ucWasteQuery
     warehouse --- ucWasteAddStock
+    warehouse --- ucConsumableQuery
     admin --- ucMaterialStock
     admin --- ucWasteStock
+    admin --- ucConsumableStock
     ucMaterialQuery --- ucMaterialCreate
     ucMaterialQuery --- ucMaterialEdit
     ucMaterialQuery --- ucMaterialRemove
@@ -135,9 +145,14 @@ flowchart LR
     ucWasteQuery --- ucWasteMovements
     ucWasteMovements --- ucWasteMovementReport
     ucWasteStock -. "«extend»" .-> ucWasteQuery
+    ucConsumableQuery --- ucConsumableCreate
+    ucConsumableQuery --- ucConsumableEdit
+    ucConsumableQuery --- ucConsumableRemove
+    ucConsumableQuery --- ucConsumableReport
+    ucConsumableStock -. "«extend»" .-> ucConsumableQuery
 ```
 
-El grupo de **Almacén** concentra los casos operativos de material y merma porque comparten
+El grupo de **Almacén** concentra los casos operativos de material, consumible y merma porque comparten
 actor, reglas de inventario, ciclo de consulta y operación sobre la misma área funcional.
 Los recursos comerciales y de configuración quedan para `CAT`, mientras los documentos de
 entrada y salida mantienen su propio grupo de negocio. Los identificadores vigentes de este

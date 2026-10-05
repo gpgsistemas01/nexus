@@ -23,7 +23,7 @@ capturas, exportaciones o solicitudes de soporte.
 
 ## Módulos
 
-Las secciones de entradas, salidas, inventario, materiales, mermas, clientes, proveedores,
+Las secciones de entradas, salidas, inventario, materiales, consumibles, mermas, clientes, proveedores,
 personas y usuarios se presentan en los [procedimientos y casos](procedures.md), siguiendo la
 secuencia **propósito → precondiciones → recorrido principal → alternativas → errores →
 resultado**. Cada procedimiento muestra la captura estable al aparecer la pantalla que representa
@@ -39,6 +39,7 @@ en cada procedimiento.
 Cada exportación se realiza desde el módulo donde se consultó y filtró la información:
 
 - materiales y su reporte de inventario;
+- consumibles y su reporte de inventario separado;
 - proveedores y clientes con su exportación desde el listado;
 - mermas y su reporte de inventario;
 - compras y su reporte mensual;

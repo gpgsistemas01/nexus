@@ -38,6 +38,15 @@
     "/api/warehouse/materials/{id}/stock": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1materials~1{id}~1stock"
     },
+    "/api/warehouse/consumables": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1consumables"
+    },
+    "/api/warehouse/consumables/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1consumables~1{id}"
+    },
+    "/api/warehouse/consumables/{id}/stock": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1consumables~1{id}~1stock"
+    },
     "/api/warehouse/wastes/material-templates": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1wastes~1material-templates"
     },
