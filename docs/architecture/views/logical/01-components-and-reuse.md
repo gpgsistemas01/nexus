@@ -1,94 +1,46 @@
 # 1. Componentes y reutilización de frontend y backend
 
-La vista muestra los componentes compartidos por `auth`, `admin`, `sales` y `warehouse`.
+Esta vista muestra la descomposición estática de Nexus: qué componentes existen, dónde
+se ejecutan y de cuáles dependen. No representa el orden de una petición ni los pasos de
+un caso de uso; esos recorridos pertenecen a la [vista de procesos](../processes/index.md).
 
-## Componentes y conexión entre frontend y backend
+## Componentes y dependencias
 
-**Diagrama de componentes:** `DIA-ARQ-CMP-001`.
+**Diagrama de componentes C4:** `DIA-ARQ-CMP-001`.
 
 ```mermaid
-classDiagram
-    direction LR
+C4Component
+    title Componentes de Nexus y sus dependencias
 
-    class VisualComponents {
-        <<component>>
-        Page, formularios, modales y tablas
-    }
-    class FrontendApplication {
-        <<component>>
-        CRUD, reportes y salidas por dominio
-    }
-    class HttpClient {
-        <<component>>
-        Servicios frontend y axiosInstanceApi
-    }
-    class SocketClient {
-        <<component>>
-        window.io e indexPage
-    }
-    class WebMvc {
-        <<component>>
-        Rutas web, controllers, EJS y layout
-    }
-    class StaticFiles {
-        <<component>>
-        express.static
-    }
-    class ApiBoundary {
-        <<component>>
-        Rutas API, middleware, controllers y DTO
-    }
-    class DomainServices {
-        <<component>>
-        Reglas y transacciones por dominio
-    }
-    class SharedServices {
-        <<component>>
-        Auditoría, documentos e inventario
-    }
-    class Persistence {
-        <<component>>
-        baseRepository y Prisma
-    }
-    class RealtimeServer {
-        <<component>>
-        socketUtils y publicación de eventos
+    Container_Boundary(frontend, "Frontend · navegador") {
+        Component(visual, "Interfaz visual", "EJS · public/js/ui", "Páginas, formularios, modales y tablas")
+        Component(application, "Aplicación frontend", "application/<dominio>", "Coordina la interfaz por dominio")
+        Component(http, "Cliente HTTP", "services/<dominio> · Axios", "Consume la API operacional")
+        Component(socketClient, "Cliente de eventos", "Socket.IO · CustomEvent", "Recibe notificaciones de inventario")
     }
 
-    class WebHttp {
-        <<interface>>
-        +renderPage()
-    }
-    class StaticHttp {
-        <<interface>>
-        +getAsset()
-    }
-    class OperationalApi {
-        <<interface>>
-        +requestJson()
-        +downloadBlob()
-    }
-    class RealtimeEvents {
-        <<interface>>
-        +inventoryUpdated(context)
+    Container_Boundary(server, "Backend · Node.js / Express") {
+        Component(web, "Web MVC", "routes/web · controllers/web · EJS", "Entrega navegación y HTML")
+        Component(static, "Archivos estáticos", "express.static", "Entrega JavaScript y CSS")
+        Component(api, "API operacional", "routes/api · middleware · controllers/api · DTO", "Expone operaciones HTTP")
+        Component(domain, "Servicios de dominio", "auth · admin · sales · warehouse", "Concentra reglas y transacciones")
+        Component(shared, "Servicios compartidos", "auditoría · documentos · inventario", "Reutiliza capacidades entre dominios")
+        Component(persistence, "Persistencia", "repositories · Prisma", "Accede al modelo persistente")
+        Component(events, "Publicador de eventos", "Socket.IO", "Publica notificaciones no durables")
     }
 
-    VisualComponents ..> FrontendApplication : delegates
-    FrontendApplication ..> HttpClient : requires transport
-    SocketClient ..> VisualComponents : dispatches CustomEvent
-    WebHttp <|.. WebMvc : provides
-    VisualComponents ..> WebHttp : requires navigation and HTML
-    StaticHttp <|.. StaticFiles : provides
-    VisualComponents ..> StaticHttp : requires JS and CSS
-    OperationalApi <|.. ApiBoundary : provides
-    HttpClient ..> OperationalApi : requires
-    ApiBoundary ..> DomainServices : delegates
-    DomainServices ..> SharedServices : collaborates
-    DomainServices ..> Persistence : persists
-    SharedServices ..> Persistence : persists
-    RealtimeEvents <|.. RealtimeServer : provides
-    SocketClient ..> RealtimeEvents : requires
-    ApiBoundary ..> RealtimeServer : publishes after mutation
+    Rel(visual, application, "usa")
+    Rel(application, http, "usa")
+    Rel(socketClient, visual, "notifica mediante CustomEvent")
+    Rel(visual, web, "requiere navegación y HTML", "HTTP web")
+    Rel(visual, static, "requiere módulos y estilos", "HTTP estático")
+    Rel(http, api, "consume", "HTTP /api")
+    Rel(api, domain, "delega en")
+    Rel(domain, shared, "reutiliza")
+    Rel(domain, persistence, "depende de")
+    Rel(shared, persistence, "depende de")
+    Rel(api, events, "solicita publicación")
+    Rel(socketClient, events, "se suscribe", "Socket.IO")
 ```
 
 Mermaid no reproduce de forma nativa el glifo de componente, los puertos y los conectores
@@ -130,7 +82,7 @@ Las factories, configuradores y consumidores se detallan en los
 [diagramas de reutilización](../development/code-diagrams/06-view-of-reuse-crud-and-interface.md)
 y en el patrón [`DIA-PAT-CON-001`](../development/design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia).
 
-## Criterio para extender un flujo
+## Criterio para extender un componente
 
 1. Registrar la ruta bajo el dominio existente y mantener juntos sus nombres a través
    de ruta, controlador, servicio, aplicación y página.
@@ -139,8 +91,5 @@ y en el patrón [`DIA-PAT-CON-001`](../development/design-and-construction-patte
    selectores, payloads y reglas que no sean generales.
 3. Mantener una sola transacción backend para escrituras compuestas y propagar `tx` a
    cada colaborador.
-4. Representar una colaboración nueva en este diagrama sólo si cambia la estructura;
-   el detalle de imports y rutas pertenece al [mapa generado](../development/code-map.md)
-   y las secuencias concretas a las colecciones de
-   [frontend](../processes/frontend-code-sequences/index.md) y
-   [backend](../processes/backend-code-sequences/index.md).
+4. Representar una dependencia nueva en este diagrama sólo si cambia la estructura; el
+   detalle de imports y rutas pertenece al [mapa generado](../development/code-map.md).
