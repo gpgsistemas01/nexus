@@ -16,6 +16,7 @@ import { publicDir, viewsDir } from './utils/pathsUtils.js';
 import { errorMap } from './messages/codeMessages.js';
 import { initSocket } from './utils/socketUtils.js';
 import { isAppError } from './errors/AppError.js';
+import { normalizeDatabaseError } from './errors/databaseError.js';
 import { appConfig } from './config/appConfig.js';
 import { getAuthTokenInfo } from './middleware/authMiddleware.js';
 import { auditWrites } from './middleware/auditMiddleware.js';
@@ -82,11 +83,25 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
 
-    if (isAppError(err)) return res.status(err.statusCode).json({
-        code: err.code,
-        message: err.message,
-        meta: err.meta
-    });
+    const responseError = normalizeDatabaseError(err);
+
+    if (isAppError(responseError)) {
+        if (responseError !== err) logger.error(
+            {
+                err,
+                ...getRequestLogContext(req),
+                method: req.method,
+                code: responseError.code
+            },
+            'Esquema de base de datos desactualizado'
+        );
+
+        return res.status(responseError.statusCode).json({
+            code: responseError.code,
+            message: responseError.message,
+            meta: responseError.meta
+        });
+    }
 
     logger.error(
         {
@@ -99,7 +114,7 @@ app.use((err, req, res, next) => {
 
     res.status(500).json({
         code: errorMap.message.SERVER_ERROR,
-        message: err?.message || 'Error interno del servidor.'
+        message: 'Error interno del servidor.'
     });
 });
 

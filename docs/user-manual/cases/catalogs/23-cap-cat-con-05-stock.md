@@ -1,5 +1,5 @@
 <a id="CAP-CAT-CON-05-STOCK"></a>
-# 24. CAP-CAT-CON-05-STOCK — Ajustar existencia
+# 23. CAP-CAT-CON-05-STOCK — Ajustar existencia
 
 **Casos de uso:** `CU-ALM-21` — Ajustar existencia de consumible.
 

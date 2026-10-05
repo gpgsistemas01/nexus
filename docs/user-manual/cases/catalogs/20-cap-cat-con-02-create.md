@@ -1,5 +1,5 @@
 <a id="CAP-CAT-CON-02-CREATE"></a>
-# 21. CAP-CAT-CON-02-CREATE — Formulario de alta
+# 20. CAP-CAT-CON-02-CREATE — Formulario de alta
 
 **Casos de uso:** `CU-ALM-18` — Crear consumible.
 
