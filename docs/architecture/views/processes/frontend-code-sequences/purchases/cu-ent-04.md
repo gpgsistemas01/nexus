@@ -23,7 +23,7 @@ sequenceDiagram
         Application->>Request: correctGoodsReceiptDetailRequest({ id, detailId, formData })
         activate Application
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
-        HTTP->>Transport: envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections
+        HTTP->>Transport: envía PATCH /api/warehouse/goods-receipts/materials/:id/details/:detailId/corrections
         Transport-->>HTTP: HTTP 2xx { code, data }
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: correctGoodsReceiptDetailRequest(): Promise[AxiosResponse]

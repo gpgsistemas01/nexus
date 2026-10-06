@@ -15,7 +15,7 @@
    devoluciones y movimientos de salida.
 8. Mermas, ajustes de stock, motivos y movimientos independientes de merma.
 9. Historial de movimientos, notificaciones en tiempo real y reportes Excel de
-   inventario, compras, salidas, mermas, proveedores, clientes, personas, usuarios y
+   inventario, compras separadas de materiales y consumibles, salidas, mermas, proveedores, clientes, personas, usuarios y
    movimientos.
 
 ### Fuera del alcance actual

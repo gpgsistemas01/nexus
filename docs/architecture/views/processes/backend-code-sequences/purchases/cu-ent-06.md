@@ -12,13 +12,13 @@ sequenceDiagram
     participant Excel as src/utils/reportExcelUtils.js
     participant ErrorHandler as src/app.js
 
-    Client->>Route: GET /api/warehouse/reports/goods-receipts/excel
-    Route->>Controller: exportGoodsReceiptReportExcel(req, res)
+    Client->>Route: GET /api/warehouse/reports/goods-receipts/materials/excel
+    Route->>Controller: exportMaterialGoodsReceiptReportExcel(req, res)
     activate Controller
-    Controller->>Query: reportService.findGoodsReceiptReportRows({ search, startDate, endDate, supplierId, personId, orderBy, orderDir })
+    Controller->>Query: materialGoodsReceiptService.findMaterialGoodsReceiptReportRows({ search, startDate, endDate, supplierId, personId, orderBy, orderDir })
     activate Query
     alt Servicio resuelto
-        Query-->>Controller: reportService.findGoodsReceiptReportRows(): Promise[Object[]]
+        Query-->>Controller: materialGoodsReceiptService.findMaterialGoodsReceiptReportRows(): Promise[Object[]]
         Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
         Excel-->>Client: HTTP 200 archivo XLSX
     else AppError propagado

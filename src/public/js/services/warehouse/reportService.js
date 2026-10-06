@@ -1,4 +1,5 @@
 import { apiRequest } from "../axiosInstanceApi.js";
+import { goodsReceiptContext } from '../../pages/warehouse/goodsReceipts/goodsReceiptContext.js';
 
 export const exportWarehouseReportRequest = async (params = {}) =>
     apiRequest({
@@ -27,7 +28,7 @@ export const exportWasteIssueReportRequest = async (params = {}) =>
 export const exportGoodsReceiptReportRequest = async (params = {}) =>
     apiRequest({
         method: 'get',
-        url: '/api/warehouse/reports/goods-receipts/excel',
+        url: `/api/warehouse/reports/goods-receipts/${ goodsReceiptContext.resource === 'consumable' ? 'consumables' : 'materials' }/excel`,
         responseType: 'blob',
         params
     });

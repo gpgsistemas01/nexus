@@ -19,7 +19,7 @@ sequenceDiagram
     Application->>Request: cancelGoodsReceiptDetailRequest({ id, detailId, formData })
     activate Application
     Request->>HTTP: apiRequest({ method: 'patch', url, data })
-    HTTP->>Transport: envía PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
+    HTTP->>Transport: envía PATCH /api/warehouse/goods-receipts/materials/:id/details/:detailId/cancel
     Transport-->>HTTP: HTTP 2xx { code, data }
     HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
     Request-->>Application: cancelGoodsReceiptDetailRequest(): Promise[AxiosResponse]

@@ -80,18 +80,6 @@
     "/api/warehouse/suppliers/{id}": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1suppliers~1{id}"
     },
-    "/api/warehouse/goods-receipts": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts"
-    },
-    "/api/warehouse/goods-receipts/{id}": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1{id}"
-    },
-    "/api/warehouse/goods-receipts/{id}/details/{detailId}/corrections": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1{id}~1details~1{detailId}~1corrections"
-    },
-    "/api/warehouse/goods-receipts/{id}/details/{detailId}/cancel": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1{id}~1details~1{detailId}~1cancel"
-    },
     "/api/warehouse/goods-issues": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues"
     },
@@ -115,9 +103,6 @@
     },
     "/api/warehouse/reports/waste-issues/excel": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1waste-issues~1excel"
-    },
-    "/api/warehouse/reports/goods-receipts/excel": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-receipts~1excel"
     },
     "/api/warehouse/reports/wastes/excel": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1wastes~1excel"
@@ -181,6 +166,36 @@
     },
     "/api/warehouse/wastes/{id}/stock-additions": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1wastes~1{id}~1stock-additions"
+    },
+    "/api/warehouse/goods-receipts/materials": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1materials"
+    },
+    "/api/warehouse/goods-receipts/consumables": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1consumables"
+    },
+    "/api/warehouse/goods-receipts/materials/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1materials~1{id}"
+    },
+    "/api/warehouse/goods-receipts/consumables/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1consumables~1{id}"
+    },
+    "/api/warehouse/goods-receipts/materials/{id}/details/{detailId}/corrections": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1materials~1{id}~1details~1{detailId}~1corrections"
+    },
+    "/api/warehouse/goods-receipts/consumables/{id}/details/{detailId}/corrections": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1consumables~1{id}~1details~1{detailId}~1corrections"
+    },
+    "/api/warehouse/goods-receipts/materials/{id}/details/{detailId}/cancel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1materials~1{id}~1details~1{detailId}~1cancel"
+    },
+    "/api/warehouse/goods-receipts/consumables/{id}/details/{detailId}/cancel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-receipts~1consumables~1{id}~1details~1{detailId}~1cancel"
+    },
+    "/api/warehouse/reports/goods-receipts/materials/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-receipts~1materials~1excel"
+    },
+    "/api/warehouse/reports/goods-receipts/consumables/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-receipts~1consumables~1excel"
     }
   },
   "components": {

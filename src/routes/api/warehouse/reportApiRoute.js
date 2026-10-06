@@ -1,15 +1,13 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { exportGoodsIssueReportExcel, exportGoodsReceiptReportExcel, exportSupplierReportExcel, exportWarehouseReportExcel, exportWasteIssueReportExcel, exportWasteReportExcel } from '../../../controllers/api/warehouse/reportController.js';
+import { exportConsumableGoodsReceiptReportExcel, exportGoodsIssueReportExcel, exportMaterialGoodsReceiptReportExcel, exportSupplierReportExcel, exportWarehouseReportExcel, exportWasteIssueReportExcel, exportWasteReportExcel } from '../../../controllers/api/warehouse/reportController.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
-
-
 router.get(
-    '/inventory/excel', 
-    verifyApiTokenRequired, 
+    '/inventory/excel',
+    verifyApiTokenRequired,
     authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ),
     exportWarehouseReportExcel
 );
@@ -29,10 +27,17 @@ router.get(
 );
 
 router.get(
-    '/goods-receipts/excel',
+    '/goods-receipts/materials/excel',
     verifyApiTokenRequired,
     authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ),
-    exportGoodsReceiptReportExcel
+    exportMaterialGoodsReceiptReportExcel
+);
+
+router.get(
+    '/goods-receipts/consumables/excel',
+    verifyApiTokenRequired,
+    authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ),
+    exportConsumableGoodsReceiptReportExcel
 );
 
 router.get(
