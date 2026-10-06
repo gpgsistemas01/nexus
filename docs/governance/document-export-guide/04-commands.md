@@ -43,7 +43,7 @@ intención de forma explícita. Markdown permanece como fuente navegable y por e
 copia HTML equivalente.
 
 Los nombres de los archivos siguen los mismos grupos funcionales que las fichas `CU-*`:
-autenticación, identidad y acceso, catálogos y compras de material. Las salidas son la excepción:
+autenticación, identidad y acceso, catálogos y compras de materiales y consumibles. Las salidas son la excepción:
 material y merma se entregan en archivos distintos. Las
 capturas de consultas y exportaciones se incluyen en el grupo del caso de uso al que dan evidencia;
 no se genera un grupo genérico de reportes.

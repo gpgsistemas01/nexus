@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - features
   pull_request:
 
 jobs:
@@ -36,13 +37,13 @@ jobs:
       - name: Commit updated diagrams on the main branch
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          if git diff --quiet -- docs/generated; then
+          if git diff --quiet -- docs/architecture/views/development/code-map.md docs/architecture/views/logical/data-and-persistence/generated/; then
             echo "Generated diagrams are already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/generated
+          git add docs/architecture/views/development/code-map.md docs/architecture/views/logical/data-and-persistence/generated/
           git commit -m "docs: actualizar diagramas generados"
           git push
 

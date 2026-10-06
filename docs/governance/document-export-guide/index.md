@@ -1,7 +1,7 @@
 # Guía de exportación documental
 
 Este documento concentra la preparación, validación y generación de los paquetes documentales.
-La organización y las fuentes de verdad permanecen en el [índice de documentación](../README.md).
+La organización y las fuentes de verdad permanecen en el [índice de documentación](../../README.md).
 
 ## Propósito y alcance
 
