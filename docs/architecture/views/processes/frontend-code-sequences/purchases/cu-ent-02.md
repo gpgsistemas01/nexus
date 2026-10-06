@@ -66,7 +66,7 @@ sequenceDiagram
         Form->>App: registerGoodsReceipt({ formData })
         App->>Request: registerGoodsReceiptRequest({ data: formData })
         Request->>HTTP: apiRequest({ method: 'post',<br/>url: GOODS_RECEIPTS_API_ROUTE, data: formData })
-        HTTP->>API: POST /api/warehouse/goods-receipts
+        HTTP->>API: POST /api/warehouse/goods-receipts/materials
         alt La factura ya existe para el proveedor
             API-->>HTTP: 409 { code, message, meta }
             HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }

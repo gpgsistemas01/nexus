@@ -295,6 +295,13 @@
       "referenceNumber": {
         "type": "string"
       },
+      "type": {
+        "type": "string",
+        "enum": [
+          "MATERIAL",
+          "CONSUMABLE"
+        ]
+      },
       "supplierId": {
         "type": "string",
         "format": "uuid"
@@ -332,7 +339,8 @@
     "additionalProperties": false,
     "required": [
       "id",
-      "referenceNumber"
+      "referenceNumber",
+      "type"
     ]
   },
   "GoodsReceiptDetail": {

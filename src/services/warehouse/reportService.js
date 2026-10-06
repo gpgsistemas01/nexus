@@ -393,6 +393,7 @@ export const findGoodsReceiptReportRows = async ({
     endDate = '',
     supplierId = '',
     personId = '',
+    type = null,
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 } = {}) => {
@@ -405,6 +406,7 @@ export const findGoodsReceiptReportRows = async ({
         endDate,
         supplierId,
         personId,
+        type,
         excludeCanceled: true,
         activeDetailsOnly: true,
         orderBy,
@@ -413,6 +415,7 @@ export const findGoodsReceiptReportRows = async ({
 
     return mapGoodsReceiptDetailRows(goodsReceiptsResult.data);
 };
+
 
 export const findSupplierReportRows = async ({
     search = '',

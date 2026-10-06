@@ -1,6 +1,7 @@
 import { apiRequest } from "../axiosInstanceApi.js";
+import { goodsReceiptContext } from '../../pages/warehouse/goodsReceipts/goodsReceiptContext.js';
 
-export const GOODS_RECEIPTS_API_ROUTE = '/api/warehouse/goods-receipts';
+export const GOODS_RECEIPTS_API_ROUTE = `/api/warehouse/goods-receipts/${ goodsReceiptContext.resource === 'consumable' ? 'consumables' : 'materials' }`;
 
 export const getAllGoodsReceiptsRequest = ({ params }) => apiRequest({
     method: 'get',

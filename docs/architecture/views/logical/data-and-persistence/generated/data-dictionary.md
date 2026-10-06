@@ -247,6 +247,7 @@ usuarios y responsables se mantiene en el
 | `totalQuantity` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `totalNetPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
 | `totalGrossPurchaseAmount` | `Decimal` | Sí | — | — | `@db.Decimal(18, 6)` |
+| `type` | `MaterialType` | Sí | — | `MATERIAL` | — |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `updatedAt` | `DateTime` | Sí | — | — | `@updatedAt` |
 

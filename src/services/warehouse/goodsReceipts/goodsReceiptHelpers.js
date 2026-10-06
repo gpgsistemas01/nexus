@@ -21,7 +21,7 @@ export const GOODS_RECEIPT_DETAIL_INCLUDE = Object.freeze({
     }
 });
 
-export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId = null, requireActive = true } = {}) => {
+export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId = null, type = null, requireActive = true } = {}) => {
 
     const materialIds = details.map(d => d.materialId);
 
@@ -34,6 +34,7 @@ export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId 
         const material = materialMap.get(materialId);
 
         if (!material) throw new MaterialNotFound();
+        if (type && material.type !== type) throw new MaterialNotFound();
         if (requireActive && !material.isActive) throw new MaterialInactiveConflict();
 
         const { name, base, height } = material;
@@ -168,8 +169,8 @@ export const cancelGoodsReceiptDetailAndTotals = ({ tx, goodsReceiptId, detailId
     })
 );
 
-export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceiptId, supplierId, details }) => {
-    const processedDetails = await buildGoodsReceiptDetails(details, { tx, supplierId });
+export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceiptId, supplierId, details, type = null }) => {
+    const processedDetails = await buildGoodsReceiptDetails(details, { tx, supplierId, type });
     const createdDetails = await tx.goodsReceiptDetail.createManyAndReturn({
         data: processedDetails.map(detail => ({
             ...detail,

@@ -16,6 +16,7 @@ import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
 import { GOODS_RECEIPT_STATUS_LABELS } from '../../../../constants/goodsReceiptStatuses.js';
 import { updateTotals } from '../../../../ui/forms/totalsSummaryUI.js';
 import { refreshMaterialTable } from '../../shared/inventory/renderMaterialDatatable.js';
+import { INVENTORY_RESOURCES } from '../../../../constants/inventory.js';
 
 export let details = [];
 let filters = {
@@ -24,7 +25,7 @@ let filters = {
 const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 
-export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal }) => {
+export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal, resource }) => {
 
     let table;
     filters = await setupTableFilters({
@@ -76,7 +77,7 @@ export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal }) => 
                     action: () => openGoodsReceiptModal({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
-                    filename: formatFileName('reporte_compras'),
+                    filename: formatFileName(`reporte_compras_${ resource === INVENTORY_RESOURCES.CONSUMABLE ? 'consumibles' : 'materiales' }`),
                     request: ({ monthlyReport = false, reportMonth = '' } = {}) => exportGoodsReceiptReport(buildTableExportParams(table, {
                         ...filters.getValues(),
                         monthlyReport,

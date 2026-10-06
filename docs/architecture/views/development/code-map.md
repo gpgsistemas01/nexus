@@ -16,25 +16,25 @@ flowchart LR
     controllers["controllers (36 módulos)"] --> constants["constants (10 módulos)"]
     controllers["controllers (36 módulos)"] --> dtos["dtos (10 módulos)"]
     controllers["controllers (36 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (36 módulos)"] --> services["services (53 módulos)"]
+    controllers["controllers (36 módulos)"] --> services["services (55 módulos)"]
     controllers["controllers (36 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
-    errors["errors (19 módulos)"] --> messages["messages (2 módulos)"]
-    errors["errors (19 módulos)"] --> public["public (193 módulos)"]
+    errors["errors (18 módulos)"] --> messages["messages (2 módulos)"]
+    errors["errors (18 módulos)"] --> public["public (194 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (10 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (53 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (55 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
     repository["repository (1 módulos)"] --> lib["lib (2 módulos)"]
     routes["routes (40 módulos)"] --> constants["constants (10 módulos)"]
     routes["routes (40 módulos)"] --> controllers["controllers (36 módulos)"]
     routes["routes (40 módulos)"] --> middleware["middleware (5 módulos)"]
     routes["routes (40 módulos)"] --> validators["validators (15 módulos)"]
-    services["services (53 módulos)"] --> constants["constants (10 módulos)"]
-    services["services (53 módulos)"] --> dtos["dtos (10 módulos)"]
-    services["services (53 módulos)"] --> errors["errors (19 módulos)"]
-    services["services (53 módulos)"] --> repository["repository (1 módulos)"]
-    services["services (53 módulos)"] --> utils["utils (11 módulos)"]
+    services["services (55 módulos)"] --> constants["constants (10 módulos)"]
+    services["services (55 módulos)"] --> dtos["dtos (10 módulos)"]
+    services["services (55 módulos)"] --> errors["errors (18 módulos)"]
+    services["services (55 módulos)"] --> repository["repository (1 módulos)"]
+    services["services (55 módulos)"] --> utils["utils (11 módulos)"]
     utils["utils (11 módulos)"] --> constants["constants (10 módulos)"]
     utils["utils (11 módulos)"] --> errors["errors (19 módulos)"]
     validators["validators (15 módulos)"] --> constants["constants (10 módulos)"]
@@ -45,7 +45,7 @@ flowchart LR
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (70)
+## Endpoints API (76)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -81,11 +81,16 @@ flowchart LR
 | `GET` | `/api/warehouse/suppliers` | [`src/routes/api/warehouse/supplierApiRoute.js`](../../../../src/routes/api/warehouse/supplierApiRoute.js) |
 | `POST` | `/api/warehouse/suppliers` | [`src/routes/api/warehouse/supplierApiRoute.js`](../../../../src/routes/api/warehouse/supplierApiRoute.js) |
 | `PUT` | `/api/warehouse/suppliers/:id` | [`src/routes/api/warehouse/supplierApiRoute.js`](../../../../src/routes/api/warehouse/supplierApiRoute.js) |
-| `GET` | `/api/warehouse/goods-receipts` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
-| `POST` | `/api/warehouse/goods-receipts` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
-| `PATCH` | `/api/warehouse/goods-receipts/:id` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
-| `PATCH` | `/api/warehouse/goods-receipts/:id/details/:detailId/corrections` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
-| `PATCH` | `/api/warehouse/goods-receipts/:id/details/:detailId/cancel` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `GET` | `/api/warehouse/goods-receipts/materials` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `POST` | `/api/warehouse/goods-receipts/materials` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `PATCH` | `/api/warehouse/goods-receipts/materials/:id` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `PATCH` | `/api/warehouse/goods-receipts/materials/:id/details/:detailId/corrections` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `PATCH` | `/api/warehouse/goods-receipts/materials/:id/details/:detailId/cancel` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `GET` | `/api/warehouse/goods-receipts/consumables` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `POST` | `/api/warehouse/goods-receipts/consumables` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `PATCH` | `/api/warehouse/goods-receipts/consumables/:id` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `PATCH` | `/api/warehouse/goods-receipts/consumables/:id/details/:detailId/corrections` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
+| `PATCH` | `/api/warehouse/goods-receipts/consumables/:id/details/:detailId/cancel` | [`src/routes/api/warehouse/goodsReceiptApiRoute.js`](../../../../src/routes/api/warehouse/goodsReceiptApiRoute.js) |
 | `GET` | `/api/warehouse/goods-issues` | [`src/routes/api/warehouse/goodsIssueApiRoute.js`](../../../../src/routes/api/warehouse/goodsIssueApiRoute.js) |
 | `POST` | `/api/warehouse/goods-issues` | [`src/routes/api/warehouse/goodsIssueApiRoute.js`](../../../../src/routes/api/warehouse/goodsIssueApiRoute.js) |
 | `PATCH` | `/api/warehouse/goods-issues/:id` | [`src/routes/api/warehouse/goodsIssueApiRoute.js`](../../../../src/routes/api/warehouse/goodsIssueApiRoute.js) |
@@ -95,7 +100,8 @@ flowchart LR
 | `GET` | `/api/warehouse/reports/inventory/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../../../src/routes/api/warehouse/reportApiRoute.js) |
 | `GET` | `/api/warehouse/reports/goods-issues/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../../../src/routes/api/warehouse/reportApiRoute.js) |
 | `GET` | `/api/warehouse/reports/waste-issues/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../../../src/routes/api/warehouse/reportApiRoute.js) |
-| `GET` | `/api/warehouse/reports/goods-receipts/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../../../src/routes/api/warehouse/reportApiRoute.js) |
+| `GET` | `/api/warehouse/reports/goods-receipts/materials/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../../../src/routes/api/warehouse/reportApiRoute.js) |
+| `GET` | `/api/warehouse/reports/goods-receipts/consumables/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../../../src/routes/api/warehouse/reportApiRoute.js) |
 | `GET` | `/api/warehouse/reports/wastes/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../../../src/routes/api/warehouse/reportApiRoute.js) |
 | `GET` | `/api/warehouse/reports/suppliers/excel` | [`src/routes/api/warehouse/reportApiRoute.js`](../../../../src/routes/api/warehouse/reportApiRoute.js) |
 | `GET` | `/api/warehouse/unit-measures` | [`src/routes/api/warehouse/unitMeasureApiRoute.js`](../../../../src/routes/api/warehouse/unitMeasureApiRoute.js) |
@@ -120,7 +126,7 @@ flowchart LR
 | `POST` | `/api/admin/catalogs/:catalog` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 | `PUT` | `/api/admin/catalogs/:catalog/:id` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 
-## Rutas web (19)
+## Rutas web (21)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -132,6 +138,8 @@ flowchart LR
 | `GET` | `/almacen/consumibles` | [`src/routes/web/warehouse/consumableWebRoute.js`](../../../../src/routes/web/warehouse/consumableWebRoute.js) |
 | `GET` | `/almacen/mermas` | [`src/routes/web/warehouse/wasteWebRoute.js`](../../../../src/routes/web/warehouse/wasteWebRoute.js) |
 | `GET` | `/compras` | [`src/routes/web/warehouse/goodsReceiptWebRoute.js`](../../../../src/routes/web/warehouse/goodsReceiptWebRoute.js) |
+| `GET` | `/compras/materiales` | [`src/routes/web/warehouse/goodsReceiptWebRoute.js`](../../../../src/routes/web/warehouse/goodsReceiptWebRoute.js) |
+| `GET` | `/compras/consumibles` | [`src/routes/web/warehouse/goodsReceiptWebRoute.js`](../../../../src/routes/web/warehouse/goodsReceiptWebRoute.js) |
 | `GET` | `/salidas/materiales` | [`src/routes/web/warehouse/goodsIssueWebRoute.js`](../../../../src/routes/web/warehouse/goodsIssueWebRoute.js) |
 | `GET` | `/salidas/mermas` | [`src/routes/web/warehouse/wasteIssueWebRoute.js`](../../../../src/routes/web/warehouse/wasteIssueWebRoute.js) |
 | `GET` | `/usuarios-sistemas` | [`src/routes/web/admin/userWebRoute.js`](../../../../src/routes/web/admin/userWebRoute.js) |
@@ -168,11 +176,11 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/warehouse/consumableController.js`](../../../../src/controllers/api/warehouse/consumableController.js) | `editConsumable`, `editConsumableStock`, `getAllConsumables`, `registerConsumable`, `removeConsumable` |
 | [`src/controllers/api/warehouse/fulfillmentStatusController.js`](../../../../src/controllers/api/warehouse/fulfillmentStatusController.js) | `getAllFulfillmentStatuses` |
 | [`src/controllers/api/warehouse/goodsIssueController.js`](../../../../src/controllers/api/warehouse/goodsIssueController.js) | `editGoodsIssue`, `editGoodsIssueDetails`, `editGoodsIssueHeader`, `getAllGoodsIssues`, `registerGoodsIssue`, `registerGoodsIssueDetailReturn` |
-| [`src/controllers/api/warehouse/goodsReceiptController.js`](../../../../src/controllers/api/warehouse/goodsReceiptController.js) | `cancelGoodsReceiptDetail`, `correctGoodsReceiptDetail`, `editGoodsReceiptHeader`, `getAllGoodsReceipts`, `registerGoodsReceipt` |
+| [`src/controllers/api/warehouse/goodsReceiptController.js`](../../../../src/controllers/api/warehouse/goodsReceiptController.js) | `cancelConsumableGoodsReceiptDetail`, `cancelMaterialGoodsReceiptDetail`, `correctConsumableGoodsReceiptDetail`, `correctMaterialGoodsReceiptDetail`, `editConsumableGoodsReceipt`, `editMaterialGoodsReceipt`, `getAllConsumableGoodsReceipts`, `getAllMaterialGoodsReceipts`, `registerConsumableGoodsReceipt`, `registerMaterialGoodsReceipt` |
 | [`src/controllers/api/warehouse/materialController.js`](../../../../src/controllers/api/warehouse/materialController.js) | `editMaterial`, `editMaterialStock`, `getAllMaterials`, `registerMaterial`, `removeMaterial` |
 | [`src/controllers/api/warehouse/presentationController.js`](../../../../src/controllers/api/warehouse/presentationController.js) | `getAllPresentations` |
 | [`src/controllers/api/warehouse/reasonController.js`](../../../../src/controllers/api/warehouse/reasonController.js) | `getAllReasons` |
-| [`src/controllers/api/warehouse/reportController.js`](../../../../src/controllers/api/warehouse/reportController.js) | `exportGoodsIssueReportExcel`, `exportGoodsReceiptReportExcel`, `exportSupplierReportExcel`, `exportWarehouseReportExcel`, `exportWasteIssueReportExcel`, `exportWasteReportExcel` |
+| [`src/controllers/api/warehouse/reportController.js`](../../../../src/controllers/api/warehouse/reportController.js) | `exportConsumableGoodsReceiptReportExcel`, `exportGoodsIssueReportExcel`, `exportMaterialGoodsReceiptReportExcel`, `exportSupplierReportExcel`, `exportWarehouseReportExcel`, `exportWasteIssueReportExcel`, `exportWasteReportExcel` |
 | [`src/controllers/api/warehouse/supplierController.js`](../../../../src/controllers/api/warehouse/supplierController.js) | `editSupplier`, `getAllSuppliers`, `registerSupplier` |
 | [`src/controllers/api/warehouse/unitMeasureController.js`](../../../../src/controllers/api/warehouse/unitMeasureController.js) | `getAllUnitMeasures` |
 | [`src/controllers/api/warehouse/wasteController.js`](../../../../src/controllers/api/warehouse/wasteController.js) | `editWaste`, `editWasteStock`, `getAllWastes`, `getWasteMaterialTemplates`, `registerWaste`, `registerWasteStockAddition` |
@@ -185,7 +193,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/web/sales/clientController.js`](../../../../src/controllers/web/sales/clientController.js) | `getClientsPage` |
 | [`src/controllers/web/warehouse/consumableController.js`](../../../../src/controllers/web/warehouse/consumableController.js) | `getConsumablesPage` |
 | [`src/controllers/web/warehouse/goodsIssueController.js`](../../../../src/controllers/web/warehouse/goodsIssueController.js) | `getGoodsIssuesPage` |
-| [`src/controllers/web/warehouse/goodsReceiptController.js`](../../../../src/controllers/web/warehouse/goodsReceiptController.js) | `getGoodsReceiptsPage` |
+| [`src/controllers/web/warehouse/goodsReceiptController.js`](../../../../src/controllers/web/warehouse/goodsReceiptController.js) | `getConsumableGoodsReceiptsPage`, `getMaterialGoodsReceiptsPage` |
 | [`src/controllers/web/warehouse/materialController.js`](../../../../src/controllers/web/warehouse/materialController.js) | `getMaterialsPage` |
 | [`src/controllers/web/warehouse/supplierController.js`](../../../../src/controllers/web/warehouse/supplierController.js) | `getSuppliersPage` |
 | [`src/controllers/web/warehouse/wasteController.js`](../../../../src/controllers/web/warehouse/wasteController.js) | `getWastesPage` |
@@ -227,12 +235,14 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/goodsIssues/goodsIssueFulfillmentRules.js`](../../../../src/services/warehouse/goodsIssues/goodsIssueFulfillmentRules.js) | `resolveGoodsIssueDetailFulfillmentStatusName` |
 | [`src/services/warehouse/goodsIssues/goodsIssueHelpers.js`](../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js) | `buildGoodsIssueDetails` |
 | [`src/services/warehouse/goodsIssues/goodsIssueService.js`](../../../../src/services/warehouse/goodsIssues/goodsIssueService.js) | `createGoodsIssue`, `findAllGoodsIssues`, `updateGoodsIssue`, `updateGoodsIssueDetails`, `updateGoodsIssueHeader` |
+| [`src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js) | `cancelConsumableGoodsReceiptDetailLine`, `correctConsumableGoodsReceiptDetailLine`, `createConsumableGoodsReceipt`, `findAllConsumableGoodsReceipts`, `findConsumableGoodsReceiptReportRows`, `updateConsumableGoodsReceipt` |
 | [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js`](../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js) | `cancelGoodsReceiptDetailLine` |
 | [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js`](../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js) | `correctGoodsReceiptDetailLine` |
 | [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js`](../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js) | `GOODS_RECEIPT_DETAIL_STATUS`, `createGoodsReceiptDetailChange`, `createGoodsReceiptDetailChangeMovementAndUpdateStock`, `findReceiptDetailForChange` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) | `GOODS_RECEIPT_DETAIL_INCLUDE`, `buildGoodsReceiptDetails`, `calculateGoodsReceiptTotals`, `cancelGoodsReceiptDetailAndTotals`, `correctGoodsReceiptDetailAndTotals`, `createGoodsReceiptDetailsAndUpdateTotals` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) | `assertGoodsReceiptInvoiceAvailable` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) | `createGoodsReceipt`, `findAllGoodsReceipts`, `updateGoodsReceipt` |
+| [`src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) | `cancelMaterialGoodsReceiptDetailLine`, `correctMaterialGoodsReceiptDetailLine`, `createMaterialGoodsReceipt`, `findAllMaterialGoodsReceipts`, `findMaterialGoodsReceiptReportRows`, `updateMaterialGoodsReceipt` |
 | [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
 | [`src/services/warehouse/issues/issueHeaderService.js`](../../../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
 | [`src/services/warehouse/materials/materialHelpers.js`](../../../../src/services/warehouse/materials/materialHelpers.js) | `prepareMaterialData`, `withRetry` |
