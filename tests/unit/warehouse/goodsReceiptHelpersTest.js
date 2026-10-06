@@ -113,6 +113,25 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
         })).rejects.toMatchObject({ code: 'MATERIAL_INACTIVE_CONFLICT' });
     });
 
+    it('rechaza detalles de un tipo distinto al contexto de compra', async () => {
+        const tx = {
+            material: {
+                findMany: vi.fn().mockResolvedValue([{
+                    id: 'consumable-id',
+                    type: 'CONSUMABLE',
+                    name: 'Consumible',
+                    isActive: true,
+                    base: null,
+                    height: null
+                }])
+            }
+        };
+
+        await expect(buildGoodsReceiptDetails([
+            { materialId: 'consumable-id', quantity: 1, costPerUnitType: 10 }
+        ], { tx, type: 'MATERIAL' })).rejects.toMatchObject({ code: 'MATERIAL_NOT_FOUND' });
+    });
+
     it('permite calcular una corrección histórica aunque el material esté inactivo', async () => {
         const tx = {
             material: {

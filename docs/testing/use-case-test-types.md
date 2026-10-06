@@ -74,10 +74,10 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 | `CU-SAL-08..12` | `wasteIssueControllerTest.js`, `wasteIssueControllerDbTest.js`. | Unitarias de consulta/DTO/edición/surtido e integración de documento, stock, movimiento, parcial y rollback con fixtures reales. | **Unitarias e integración existentes.** |
 | `CU-SAL-13` | `wasteIssueControllerTest.js`. | Unitaria de devolución con cantidad, observación, usuario y servicio simulado. | **Unitaria existente**; falta integración. |
 | `CU-SAL-14` | `reportControllerTest.js`. | Unitaria de fórmula/contenido operativo del reporte con escritor simulado. | **Unitaria existente**; falta integración del archivo. |
-| `CU-ENT-01..02` | Sin prueba de servidor o integración directa. | Consulta/alta con proveedor, receptor, detalles, costos, permisos y persistencia. | **Brecha**; el contrato frontend no basta. |
-| `CU-ENT-03..04` | `goodsReceiptControllerTest.js`. | Unitaria de edición/corrección con DTO, IDs, cantidades/costos y evento posterior. | **Unitaria existente**; falta integración. |
-| `CU-ENT-05` | Sin prueba funcional directa de cancelación. | Compra/detalle existente, estado cancelable, stock/movimiento y ausencia de efectos parciales. | **Brecha.** |
-| `CU-ENT-06` | `reportControllerTest.js`. | Unitaria de fórmulas de importes y resúmenes con datos decimales y escritor simulado. | **Unitaria existente**; falta integración del archivo. |
+| `CU-ENT-01..02`, `CU-ENT-07..08` | `goodsReceiptContextServicesTest.js` cubre la delimitación de tipo; sin integración directa de consulta/alta. | Consulta/alta con proveedor, receptor, detalles, costos, permisos, tipo y persistencia. | **Unitaria parcial**; falta integración. |
+| `CU-ENT-03..04`, `CU-ENT-09..10` | `goodsReceiptControllerTest.js` y `goodsReceiptContextServicesTest.js`. | Unitaria de edición/corrección con DTO, IDs, cantidades/costos, tipo y evento posterior. | **Unitaria existente**; falta integración. |
+| `CU-ENT-05`, `CU-ENT-11` | Sin prueba funcional directa de cancelación. | Compra/detalle existente, contexto, estado cancelable, stock/movimiento y ausencia de efectos parciales. | **Brecha.** |
+| `CU-ENT-06`, `CU-ENT-12` | `reportControllerTest.js` y `goodsReceiptContextServicesTest.js`. | Unitaria de delimitación, fórmulas, importes y resúmenes con escritor simulado. | **Unitaria existente**; falta integración del archivo. |
 
 ## Regla de mantenimiento
 

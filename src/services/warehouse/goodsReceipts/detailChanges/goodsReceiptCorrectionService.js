@@ -29,13 +29,14 @@ export const correctGoodsReceiptDetailLine = async ({
     id,
     detailId,
     correctionDto,
-    userId
+    userId,
+    type = null
 }) => {
     const { quantity, costPerUnitType } = correctionDto;
 
     try {
         const result = await getDb().$transaction(async (tx) => {
-            const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId });
+            const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId, type });
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
             if (currentDetail.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED) {

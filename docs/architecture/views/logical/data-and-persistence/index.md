@@ -66,3 +66,69 @@ materiales, éstos pueden residir en un modelo de extensión con relación uno a
 `Material`. Esa evolución no exige convertir `MaterialType` en un catálogo: el enum sigue
 actuando como discriminador cerrado y el modelo de extensión conserva únicamente los
 datos propios de la variante.
+
+## Persistencia de compras por tipo de inventario
+
+Las compras de materiales y las compras de consumibles **comparten las tablas
+`GoodsReceipt` y `GoodsReceiptDetail`**. No son dos entidades de negocio distintas: tienen
+el mismo encabezado, proveedor, receptor, comprobante, estados, totales, correcciones,
+cancelaciones y movimientos. Separarlas físicamente duplicaría esas restricciones y
+obligaría a mantener dos flujos transaccionales equivalentes.
+
+La separación requerida es de contexto operativo dentro del mismo agregado, no mediante
+tablas duplicadas. `GoodsReceipt.type` conserva el contexto en el encabezado y permite
+consultarlo directamente; cada ruta API delega en un controller y un servicio específico
+de materiales o consumibles, sin aceptar el tipo como parámetro del cliente. Esas
+operaciones específicas reutilizan internamente el flujo común y fijan el discriminador
+en el backend. El servicio además comprueba `Material.type` en
+todos los detalles antes de crear o ampliar una compra. Por tanto, una compra es
+homogénea —todos sus detalles son `MATERIAL` o todos son `CONSUMABLE`— aunque ambas clases
+se almacenen en el mismo modelo relacional. Los reportes conservan el mismo filtro para
+no mezclar resultados.
+
+Esta decisión mantiene una sola fuente para folios, facturas e historial. Sólo se
+justificarían tablas separadas si alguno de los dos tipos adquiriera encabezado, ciclo de
+vida o relaciones propios; una diferencia de navegación o de catálogo seleccionable no
+es suficiente para duplicar el agregado persistente.
+
+Los dos contextos también comparten la serie anual de folios `REC`: el folio identifica
+una compra dentro del agregado común y no codifica el tipo de inventario. Por ello, las
+secuencias visibles en cada pantalla pueden tener saltos cuando entre dos compras del
+mismo tipo se registró una del otro; no existe duplicidad ni pérdida de trazabilidad.
+
+Los reportes operativos también derivan el contexto de la operación del servidor. Las rutas
+`/reports/goods-receipts/materials/excel` y
+`/reports/goods-receipts/consumables/excel` fijan respectivamente `MATERIAL` y
+`CONSUMABLE` mediante controllers específicos; el backend filtra por `GoodsReceipt.type` antes de construir el detalle y
+los resúmenes, y distingue la hoja y el nombre del archivo. El frontend no envía ni puede
+alterar el discriminador como parámetro de consulta.
+
+### Organización de servicios de compras
+
+El backend conserva el código reutilizable en la raíz de `goodsReceipts`: creación y
+actualización transaccional, construcción de detalles y cambios compartidos de corrección
+y cancelación. Las fachadas específicas se mantienen separadas en
+`goodsReceipts/materials/materialGoodsReceiptService.js` y
+`goodsReceipts/consumables/consumableGoodsReceiptService.js`. Cada fachada fija su
+`MaterialType` y expone consulta, alta, edición, corrección, cancelación y reporte para un
+solo contexto.
+
+Así, consumibles no queda representado como un subcaso dentro de la carpeta de materiales:
+ambos contextos son hermanos que dependen del mismo núcleo neutral. La reutilización del
+modelo `Material` y de sus reglas de inventario permanece intencional, mientras las rutas
+y controllers sólo importan la fachada específica que les corresponde. Como
+`GoodsReceipt.type` identifica el encabezado, la consulta de edición ya no selecciona
+`Material.type` de cada detalle; ese dato sólo se consulta al validar detalles nuevos.
+
+Las rutas y controllers permanecen agrupados en archivos comunes porque comparten
+autenticación, permisos, validadores y traducción HTTP; dentro de esos archivos existen
+paths y exports explícitos para cada contexto. Separarlos en archivos duplicados no
+aportaría aislamiento adicional: la frontera efectiva está en el endpoint y en la
+fachada de servicio específica. Si los permisos o contratos divergen en el futuro, esa
+diferencia sí justificaría routers o controllers físicos independientes.
+
+En frontend se conserva únicamente `goodsReceiptContext.resource`. Es necesario para que
+la vista EJS reutilizada elija endpoint, selector, etiquetas y nombre de exportación. No
+contiene `MaterialType`, no se envía como dato de negocio y no decide la autorización ni
+la persistencia; esas responsabilidades permanecen en las operaciones específicas del
+backend.

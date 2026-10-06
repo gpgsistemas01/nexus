@@ -25,7 +25,7 @@ ellos aporta información al grupo. Si todos participan de la misma forma, el ac
 los representa sin enumerar cada rol o área.
 
 Se conservan seis grupos funcionales propietarios porque representan capacidades estables del
-negocio: autenticación, identidad y acceso, almacén, catálogos, compras de material y
+negocio: autenticación, identidad y acceso, almacén, catálogos, compras de materiales y consumibles y
 salidas. Las consultas y exportaciones se integran en el grupo del recurso que las
 origina; no forman un paquete funcional independiente. Dividirlos otra vez en nuevos
 grupos por cada entidad fragmentaría procesos que comparten actor, reglas y ciclo
@@ -241,7 +241,7 @@ medida, motivos de ajuste y estados de cumplimiento alimentan controles de selec
 dentro de otros flujos. Se conservan como soporte técnico autorizado de esos casos, pero
 no reciben identificador ni se representan como objetivos independientes del actor.
 
-### Grupo funcional ENT — Compras de material
+### Grupo funcional ENT — Compras de materiales y consumibles
 
 ```mermaid
 flowchart LR
@@ -249,21 +249,33 @@ flowchart LR
     admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
     admin -- "generaliza" --> warehouse
 
-    subgraph receiptPackage["Nexus · Grupo funcional ENT: Compras de material"]
+    subgraph receiptPackage["Nexus · Grupo funcional ENT: Compras"]
         ucReceiptQuery(["CU-ENT-01 Consultar compras de material"])
         ucReceiptCreate(["CU-ENT-02 Crear compra de material"])
         ucReceiptEdit(["CU-ENT-03 Editar compra de material"])
         ucReceiptCorrect(["CU-ENT-04 Corregir material de una compra"])
         ucReceiptCancel(["CU-ENT-05 Cancelar material de una compra"])
         ucPurchaseReport(["CU-ENT-06 Generar reporte de compras de material"])
+        ucConsumableReceiptQuery(["CU-ENT-07 Consultar compras de consumible"])
+        ucConsumableReceiptCreate(["CU-ENT-08 Crear compra de consumible"])
+        ucConsumableReceiptEdit(["CU-ENT-09 Editar compra de consumible"])
+        ucConsumableReceiptCorrect(["CU-ENT-10 Corregir consumible de una compra"])
+        ucConsumableReceiptCancel(["CU-ENT-11 Cancelar consumible de una compra"])
+        ucConsumablePurchaseReport(["CU-ENT-12 Generar reporte de compras de consumible"])
     end
 
     warehouse --- ucReceiptQuery
+    warehouse --- ucConsumableReceiptQuery
     ucReceiptQuery --- ucReceiptCreate
     ucReceiptQuery --- ucReceiptEdit
     ucReceiptQuery --- ucReceiptCorrect
     ucReceiptQuery --- ucReceiptCancel
     ucReceiptQuery --- ucPurchaseReport
+    ucConsumableReceiptQuery --- ucConsumableReceiptCreate
+    ucConsumableReceiptQuery --- ucConsumableReceiptEdit
+    ucConsumableReceiptQuery --- ucConsumableReceiptCorrect
+    ucConsumableReceiptQuery --- ucConsumableReceiptCancel
+    ucConsumableReceiptQuery --- ucConsumablePurchaseReport
 ```
 
 ### Grupo funcional SAL — Salidas de material y de merma

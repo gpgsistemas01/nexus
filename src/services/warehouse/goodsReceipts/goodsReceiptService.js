@@ -50,6 +50,7 @@ export const findAllGoodsReceipts = async ({
     endDate = '',
     supplierId = '',
     personId = '',
+    type = null,
     excludeCanceled = false,
     activeDetailsOnly = false,
     orderBy = 'referenceNumber',
@@ -59,6 +60,7 @@ export const findAllGoodsReceipts = async ({
     const where = {
         ...(supplierId && { supplierId }),
         ...(personId && { receivedById: personId }),
+        ...(type && { type }),
         ...(excludeCanceled && {
             status: {
                 isNot: { name: GOODS_RECEIPT_STATUS_NAMES.CANCELED }
@@ -103,6 +105,7 @@ export const findAllGoodsReceipts = async ({
             totalNetPurchaseAmount: true,
             totalQuantity: true,
             receptionDate: true,
+            type: true,
             id: true,
             status: {
                 select: {
@@ -116,7 +119,9 @@ export const findAllGoodsReceipts = async ({
         }
     });
 
-    const total = await getDb().goodsReceipt.count();
+    const total = await getDb().goodsReceipt.count({
+        where: type ? { type } : undefined
+    });
     const filtered = await getDb().goodsReceipt.count({ where });
 
     return {
@@ -126,7 +131,7 @@ export const findAllGoodsReceipts = async ({
     };
 };
 
-export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
+export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
 
     let referenceNumber = null;
 
@@ -147,7 +152,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
 
         if (!receivedBy) throw new PersonReceivedByNotFound();
 
-        const processedDetails = await buildGoodsReceiptDetails(details, { supplierId });
+        const processedDetails = await buildGoodsReceiptDetails(details, { supplierId, type });
 
         const totals = calculateGoodsReceiptTotals(processedDetails);
 
@@ -160,6 +165,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
                     ...goodsReceiptData,
                     ...totals,
                     referenceNumber,
+                    type,
                     supplierName: supplier.tradeName,
                     receivedByName: receivedBy.fullName,
                     status: {
@@ -238,7 +244,7 @@ export const createGoodsReceipt = async ({ goodsReceiptDto }) => {
     }
 }
 
-export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
+export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) => {
 
     try {
 
@@ -250,6 +256,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                 where: { id },
                 select: {
                     id: true,
+                    type: true,
                     supplierId: true,
                     supplier: {
                         select: { isActive: true }
@@ -258,11 +265,15 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                         select: { name: true }
                     }
                 }
+
             }),
             findPersonById({ id: receivedById })
         ]);
 
         if (!goodsReceipt) throw new GoodsReceiptNotFound();
+        if (type && goodsReceipt.type !== type) {
+            throw new GoodsReceiptNotFound();
+        }
 
         if (goodsReceipt.status.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) {
             throw new GoodsReceiptAlreadyCanceled();
@@ -311,7 +322,8 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto }) => {
                 tx,
                 goodsReceiptId: id,
                 supplierId: goodsReceipt.supplierId,
-                details: newDetails
+                details: newDetails,
+                type
             });
 
             await applyInventoryMovement({

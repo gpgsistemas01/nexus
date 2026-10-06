@@ -16,7 +16,7 @@ sequenceDiagram
     participant Validator as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
     participant ReceiptDto as goodsReceiptDto: Object<br/>src/dtos/goodsReceiptDTO.js
-    participant Service as src/services/warehouse/goodsReceipts/goodsReceiptService.js
+    participant Service as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
     participant Supplier as src/services/warehouse/supplierService.js
     participant Invoice as src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js
     participant Person as src/services/admin/person/personService.js
@@ -28,7 +28,7 @@ sequenceDiagram
     participant Socket as src/utils/socketUtils.js
     participant ErrorHandler as src/app.js
 
-    Browser->>Router: POST /api/warehouse/goods-receipts { req.body }
+    Browser->>Router: POST /api/warehouse/goods-receipts/materials { req.body }
     Router->>Auth: verifyApiTokenRequired(req, res, next)
     Auth->>Validator: goodsReceiptValidation[] y validate(req, res, next)
     Validator->>Auth: authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE)(req, res, next)
@@ -39,11 +39,11 @@ sequenceDiagram
     else PERMISSIONS.GOODS_RECEIPTS_MANAGE denegado
         Auth-->>Browser: HTTP 403 { code, message }
     else Pipeline aceptado
-        Router->>Controller: registerGoodsReceipt(req, res)
+        Router->>Controller: registerMaterialGoodsReceipt(req, res)
         Controller->>ReceiptDto: createGoodsReceiptDtoForRegister(req.body)
         ReceiptDto-->>Controller: createGoodsReceiptDtoForRegister(): Object (goodsReceiptDto)
         Controller->>Controller: sanitizeEmptyStrings(goodsReceiptDto)
-        Controller->>Service: createGoodsReceipt({ goodsReceiptDto: sanitizedGoodsReceiptDto })
+        Controller->>Service: createMaterialGoodsReceipt({ goodsReceiptDto: sanitizedGoodsReceiptDto })
         activate Service
         Service->>Supplier: findUniqueSupplier({ id: supplierId })
         Service->>Invoice: assertGoodsReceiptInvoiceAvailable({ supplierId, invoice })
