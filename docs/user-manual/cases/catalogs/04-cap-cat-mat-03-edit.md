@@ -1,5 +1,5 @@
 <a id="CAP-CAT-MAT-03-EDIT"></a>
-# 5. CAP-CAT-MAT-03-EDIT — Formulario edicion
+# 4. CAP-CAT-MAT-03-EDIT — Formulario edición
 
 **Casos de uso:** `CU-ALM-03` — Editar material; `CU-ALM-04` — Retirar material.
 

@@ -20,11 +20,45 @@
     }
   },
   "ServerError": {
-    "description": "Error no controlado.",
+    "description": "Error no controlado. Retorna el código estable `SERVER_ERROR` y no expone el detalle interno.",
     "content": {
       "application/json": {
         "schema": {
           "$ref": "../openapi.json#/components/schemas/Error"
+        },
+        "example": {
+          "code": "SERVER_ERROR",
+          "message": "Error interno del servidor."
+        }
+      }
+    }
+  },
+  "DatabaseSchemaUnavailable": {
+    "description": "El esquema disponible para la aplicación no coincide con el cliente o la base de datos desplegados. Distingue una tabla ausente (`DATABASE_TABLE_MISSING`, Prisma `P2021`), una columna ausente (`DATABASE_COLUMN_MISSING`, Prisma `P2022`) y un cliente generado desactualizado (`PRISMA_CLIENT_OUT_OF_SYNC`, `PrismaClientValidationError` por un argumento o campo desconocido).",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "../openapi.json#/components/schemas/Error"
+        },
+        "examples": {
+          "missingTable": {
+            "value": {
+              "code": "DATABASE_TABLE_MISSING",
+              "message": "Falta una tabla requerida en la base de datos. Contacta a soporte."
+            }
+          },
+          "missingColumn": {
+            "value": {
+              "code": "DATABASE_COLUMN_MISSING",
+              "message": "Falta una columna requerida en la base de datos. Contacta a soporte."
+            }
+          },
+          "outdatedClient": {
+            "value": {
+              "code": "PRISMA_CLIENT_OUT_OF_SYNC",
+              "message": "El cliente de base de datos no está actualizado. Contacta a soporte."
+            }
+          }
         }
       }
     }

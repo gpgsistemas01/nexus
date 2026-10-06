@@ -1,5 +1,5 @@
 <a id="CAP-CAT-WAS-04-STOCK"></a>
-# 17. CAP-CAT-WAS-04-STOCK — Ajuste existencia
+# 16. CAP-CAT-WAS-04-STOCK — Ajuste existencia
 
 **Acceso:** exclusivo del Administrador del sistema con `wastes:adjust-stock`.
 

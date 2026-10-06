@@ -6,7 +6,7 @@ Cada captura tiene un identificador estable `CAP-<grupo>-<ámbito>-<paso>-<estad
 identificador permite relacionarla con uno o más casos de uso sin depender del nombre del
 archivo. Ese mismo identificador se publica como ancla junto a la imagen en los
 [procedimientos del manual](procedures.md), de modo que puede citarse como, por ejemplo,
-`cases/catalogs/04-cap-cat-mat-02-create.md#CAP-CAT-MAT-02-CREATE-ALMACEN`. La ruta conserva el patrón
+`cases/catalogs/03-cap-cat-mat-02-create.md#CAP-CAT-MAT-02-CREATE-ALMACEN`. La ruta conserva el patrón
 `build/docs/screenshots/areas/<área>/<módulo>/NN-description.png`: las pantallas sin sesión también
 se duplican por área para que cada ejecución produzca un conjunto completo y autocontenido. Esta
 ruta pertenece a los artefactos ignorados por Git y evita incluir PNG en el diff. `NN` expresa el orden

@@ -30,6 +30,9 @@ Las tablas siguientes agrupan los mensajes por operación y muestran la recupera
 | Registro relacionado no encontrado | Diálogo de advertencia con el nombre del elemento que no se encontró. | Actualice el listado y seleccione un registro vigente. |
 | Conflicto con el estado o las reglas del proceso | Diálogo de advertencia que explica la regla incumplida. | Revise el estado actual y siga la alternativa indicada en este catálogo. |
 | Error del servidor o de base de datos | Notificación **Error del servidor.**, **Error interno del servidor.** o un mensaje que comienza con **Error de base de datos...** | Conserve el mensaje y el folio visible, deje de repetir la escritura y contacte a soporte. |
+| Tabla de base de datos ausente | Notificación **Falta una tabla requerida en la base de datos. Contacta a soporte.** (`DATABASE_TABLE_MISSING`) | No repita la operación. Informe a soporte el código para que revise las migraciones pendientes. |
+| Columna de base de datos ausente | Notificación **Falta una columna requerida en la base de datos. Contacta a soporte.** (`DATABASE_COLUMN_MISSING`) | No repita la operación. Informe a soporte el código para que revise las migraciones pendientes. |
+| Cliente Prisma desactualizado | Notificación **El cliente de base de datos no está actualizado. Contacta a soporte.** (`PRISMA_CLIENT_OUT_OF_SYNC`) | No repita la operación. Informe a soporte el código para que regenere el cliente Prisma del despliegue. |
 | Problema de conexión | Mensaje **No fue posible conectar con el servidor.** u **Ocurrió un error inesperado.** | Verifique la conexión; antes de repetir una escritura, actualice el listado para confirmar su estado. |
 
 Los textos pueden incluir el nombre de un material, proveedor, área, proyecto o folio ficticio del
