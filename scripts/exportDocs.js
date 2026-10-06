@@ -134,23 +134,26 @@ const MANUALS = Object.freeze({
             autenticacion: manualPart(warehouse, manualCases.authentication),
             'almacen-materiales': manualPart(warehouse, manualCaseFiles('catalogs', [
                 '02-cap-cat-mat-01-list.md',
-                '03-cap-rep-mat-05-export.md',
-                '04-cap-cat-mat-02-create.md',
-                '05-cap-cat-mat-03-edit.md'
+                '03-cap-cat-mat-02-create.md',
+                '04-cap-cat-mat-03-edit.md',
+                '05-cap-cat-mat-04-stock.md',
+                '06-cap-rep-mat-05-export.md'
             ])),
             'almacen-consumibles': manualPart(warehouse, manualCaseFiles('catalogs', [
                 '19-cap-cat-con-01-list.md',
-                '20-cap-rep-con-06-export.md',
-                '21-cap-cat-con-02-create.md',
-                '22-cap-cat-con-03-edit.md',
-                '23-cap-cat-con-04-remove.md'
+                '20-cap-cat-con-02-create.md',
+                '21-cap-cat-con-03-edit.md',
+                '22-cap-cat-con-04-remove.md',
+                '23-cap-cat-con-05-stock.md',
+                '24-cap-rep-con-06-export.md'
             ])),
             'almacen-mermas': manualPart(warehouse, manualCaseFiles('catalogs', [
                 '13-cap-cat-was-01-list.md',
-                '14-cap-rep-was-05-export.md',
-                '15-cap-cat-was-02-create.md',
-                '16-cap-cat-was-03-edit.md',
-                '18-cap-cat-was-05-add-stock.md'
+                '14-cap-cat-was-02-create.md',
+                '15-cap-cat-was-03-edit.md',
+                '16-cap-cat-was-04-stock.md',
+                '17-cap-cat-was-05-add-stock.md',
+                '18-cap-rep-was-05-export.md'
             ])),
             compras: manualPart(warehouse, [
                 ...manualCases.purchases,

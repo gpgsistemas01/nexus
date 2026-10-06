@@ -1,5 +1,5 @@
 <a id="CAP-CAT-CON-04-REMOVE"></a>
-# 23. CAP-CAT-CON-04-REMOVE — Retirar oferta
+# 22. CAP-CAT-CON-04-REMOVE — Retirar oferta
 
 **Casos de uso:** `CU-ALM-20` — Retirar consumible.
 

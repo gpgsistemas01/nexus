@@ -1,5 +1,5 @@
 <a id="CAP-CAT-WAS-03-EDIT"></a>
-# 16. CAP-CAT-WAS-03-EDIT — Formulario edicion
+# 15. CAP-CAT-WAS-03-EDIT — Formulario edición
 
 **Casos de uso:** `CU-ALM-11` — Editar merma.
 

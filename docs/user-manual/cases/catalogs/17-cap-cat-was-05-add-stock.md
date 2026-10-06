@@ -1,5 +1,5 @@
 <a id="CAP-CAT-WAS-05-ADD-STOCK"></a>
-# 18. CAP-CAT-WAS-05-ADD-STOCK — Agregar existencia
+# 17. CAP-CAT-WAS-05-ADD-STOCK — Agregar existencia
 
 **Caso de uso:** `CU-ALM-13` — Agregar existencia de merma.
 

@@ -215,6 +215,9 @@
       },
       "ServerError": {
         "$ref": "./components/responses.json#/ServerError"
+      },
+      "DatabaseSchemaUnavailable": {
+        "$ref": "./components/responses.json#/DatabaseSchemaUnavailable"
       }
     },
     "schemas": {
