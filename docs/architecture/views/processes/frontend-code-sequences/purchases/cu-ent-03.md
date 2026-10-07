@@ -7,34 +7,45 @@
 sequenceDiagram
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js<br/>goodsReceiptForm.js
-    participant Application as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
-    participant Request as src/public/js/services/warehouse/goodsReceiptService.js
+    participant View as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js
+    participant Application as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js<br/>src/public/js/application/warehouse/goodsReceipts/materials/materialGoodsReceipts.js<br/>src/public/js/application/createCrudApplication.js
+    participant Request as src/public/js/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js<br/>src/public/js/services/warehouse/goodsReceipts/createGoodsReceiptRequests.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>src/controllers/api/warehouse/goodsReceiptController.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsReceipts/materials/materialGoodsReceiptApiRoute.js<br/>src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js
+    participant Form as src/public/js/ui/forms/formUI.js
+    participant FormUtils as src/public/js/utils/formUtils.js
 
     Initiator->>Browser: inicia CU-ENT-03 — Editar compra de material
-    Browser->>View: goodsReceiptModal.js abre una compra existente
-    View->>View: validateFields(goodsReceiptEditValidation, formData)
-    alt goodsReceiptEditValidation devuelve errores
-        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
-    else Formulario válido
-        View->>Application: editGoodsReceiptHeader({ id, formData })
-        Application->>Request: editGoodsReceiptHeaderRequest({ id, formData })
-        activate Application
+    Browser->>Form: submit manejado por useForm(...)
+    Form->>View: normalizeData({ form, formData }) — callback configurado
+    View-->>Form: normalizeData(): Object — datos normalizados
+    Form->>View: getErrors({ form, formData }) — callback configurado
+    View->>FormUtils: validateFields(goodsReceiptEditValidation, formData)
+    FormUtils-->>View: validateFields(): Object — errores por campo
+    View-->>Form: getErrors(): Object
+    alt Hay errores de validación
+        Form->>Browser: normalizeFormErrors({ form, errors })
+    else Datos válidos
+        Form->>View: sendRequest({ form, formData }) — callback configurado
+        View->>FormUtils: handleSubmit({ form, formData, create, update: editGoodsReceiptHeader })
+        FormUtils->>Application: editGoodsReceiptHeader({ id, formData })
+        Application->>Request: editMaterialGoodsReceiptHeaderRequest({ id, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
-        HTTP->>Transport: envía PATCH /api/warehouse/goods-receipts/materials/:id
-        Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-        Request-->>Application: editGoodsReceiptHeaderRequest(): Promise[AxiosResponse]
+        HTTP->>Transport: PATCH /api/warehouse/goods-receipts/materials/:id
         alt Respuesta exitosa
-            Application-->>View: editGoodsReceiptHeader(): Promise[{ message: string }]
-            View-->>Browser: DOM o DataTable actualizado con response.data
-        else Respuesta rechazada
-            Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
-            View-->>Browser: formulario o filtros conservados, mensaje visible
+            Transport-->>HTTP: HTTP 200 { goodsReceipt, code }
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: editMaterialGoodsReceiptHeaderRequest(): Promise[AxiosResponse]
+            Application-->>FormUtils: editGoodsReceiptHeader(): Promise[{ message }]
+            FormUtils->>Browser: notifications.showSuccess(response.message)
+            FormUtils->>Browser: closeModal(form)
+            FormUtils->>Browser: reloadMainTable({ resetPaging: mode === CREATE })
+        else Error HTTP o de dominio
+            Transport-->>HTTP: HTTP de error { code, message }
+            HTTP-->>Request: error normalizado
+            Request-->>Application: error propagado
+            Application-->>FormUtils: error propagado
+            Form->>Browser: handleApiError({ err, form }) conserva el formulario
         end
-        deactivate Application
     end
 ```
-

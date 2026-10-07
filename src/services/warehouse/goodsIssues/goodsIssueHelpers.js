@@ -1,3 +1,5 @@
+import { MATERIAL_TYPES } from '../../../constants/inventory.js';
+import { GoodsIssueNotFound } from '../../../errors/warehouse/goodsIssueError.js';
 import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
@@ -5,9 +7,22 @@ import { buildStockKey } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { findSupplierMaterialsSnapshot } from "../materials/supplierMaterialService.js";
 
+export const buildGoodsIssueContextWhere = (type = MATERIAL_TYPES.MATERIAL) => {
+    if (!Object.values(MATERIAL_TYPES).includes(type)) throw new GoodsIssueNotFound();
+
+    return {
+        type,
+        details: {
+            some: {},
+            every: { material: { type } }
+        }
+    };
+};
+
 export const buildGoodsIssueDetails = async ({
     details,
-    initialFulfillmentStatusId = null
+    initialFulfillmentStatusId = null,
+    type = MATERIAL_TYPES.MATERIAL
 }) => {
 
     const pairs = [
@@ -36,7 +51,7 @@ export const buildGoodsIssueDetails = async ({
         const key = buildStockKey(materialId, supplierId);
         const sp = spMap.get(key);
 
-        if (!sp) throw new MaterialNotFound();
+        if (!sp || sp.material.type !== type) throw new MaterialNotFound();
         if (!sp.isActive) throw new MaterialInactiveConflict();
         if (!sp.supplier.isActive) throw new SupplierInactiveConflict();
 

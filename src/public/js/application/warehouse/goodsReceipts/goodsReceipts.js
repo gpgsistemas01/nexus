@@ -1,23 +1,10 @@
-import { editGoodsReceiptHeaderRequest, getAllGoodsReceiptsRequest, registerGoodsReceiptRequest, correctGoodsReceiptDetailRequest, cancelGoodsReceiptDetailRequest } from "../../../services/warehouse/goodsReceiptService.js";
-import { createCrudApplication } from '../../createCrudApplication.js';
+import * as materialApplication from './materials/materialGoodsReceipts.js';
+import * as consumableApplication from './consumables/consumableGoodsReceipts.js';
+import { goodsReceiptContext } from '../../../pages/warehouse/goodsReceipts/goodsReceiptContext.js';
 
-const goodsReceiptApplication = createCrudApplication({
-    requests: {
-        getAll: getAllGoodsReceiptsRequest,
-        register: registerGoodsReceiptRequest,
-        edit: editGoodsReceiptHeaderRequest,
-        correctDetail: correctGoodsReceiptDetailRequest,
-        cancelDetail: cancelGoodsReceiptDetailRequest
-    },
-    dataKeys: {
-        correctDetail: 'correction',
-        cancelDetail: 'correction'
-    },
-    additionalMutations: ['correctDetail', 'cancelDetail']
-});
-
-export const getAllGoodsReceipts = goodsReceiptApplication.getAll;
-export const registerGoodsReceipt = goodsReceiptApplication.register;
-export const editGoodsReceiptHeader = goodsReceiptApplication.edit;
-export const correctGoodsReceiptDetail = goodsReceiptApplication.correctDetail;
-export const cancelGoodsReceiptDetail = goodsReceiptApplication.cancelDetail;
+const consumable = goodsReceiptContext.resource === 'consumable';
+export const getAllGoodsReceipts = consumable ? consumableApplication.getAllConsumableGoodsReceipts : materialApplication.getAllMaterialGoodsReceipts;
+export const registerGoodsReceipt = consumable ? consumableApplication.registerConsumableGoodsReceipt : materialApplication.registerMaterialGoodsReceipt;
+export const editGoodsReceiptHeader = consumable ? consumableApplication.editConsumableGoodsReceiptHeader : materialApplication.editMaterialGoodsReceiptHeader;
+export const correctGoodsReceiptDetail = consumable ? consumableApplication.correctConsumableGoodsReceiptDetail : materialApplication.correctMaterialGoodsReceiptDetail;
+export const cancelGoodsReceiptDetail = consumable ? consumableApplication.cancelConsumableGoodsReceiptDetail : materialApplication.cancelMaterialGoodsReceiptDetail;

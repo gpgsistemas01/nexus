@@ -8,36 +8,47 @@ sequenceDiagram
     actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View as src/public/js/pages/warehouse/goodsIssues/goodsIssueForm.js
-    participant Application as src/public/js/application/warehouse/goodsIssues/goodsIssues.js
-    participant Request as src/public/js/services/warehouse/goodsIssueService.js
+    participant Application as src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>src/public/js/application/warehouse/goodsIssues/materials/materialGoodsIssues.js<br/>src/public/js/application/createCrudApplication.js
+    participant Request as src/public/js/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js<br/>src/public/js/services/warehouse/goodsIssues/createGoodsIssueRequests.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js<br/>src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js
+    participant Form as src/public/js/ui/forms/formUI.js
+    participant FormUtils as src/public/js/utils/formUtils.js
 
     Initiator->>Browser: inicia CU-SAL-05 — Surtir material
-    Browser->>View: Acción Surtir dentro de los detalles de salida
-    View->>View: mapIssueDetailsToSupplyRequest(goodsIssueDetails)
-    View->>View: validateDetailsFields(issueProjectQuantityDetailsValidation,<br/>mapIssueDetailsToSupplyRequest(goodsIssueDetails))
-    loop Cada detalle seleccionado
-        View->>View: validateFields(issueProjectQuantityDetailsValidation, detail)
+    Browser->>Form: submit manejado por useForm(...)
+    Form->>View: normalizeData({ form, formData }) — callback configurado
+    View-->>Form: normalizeData(): Object — datos normalizados
+    Form->>View: getErrors({ form, formData }) — callback configurado
+    View->>FormUtils: validateDetailsFields(issueProjectQuantityDetailsValidation, detailsToSupply)
+    loop Cada detalle pendiente
+        FormUtils->>FormUtils: validateFields(issueProjectQuantityDetailsValidation, detail)
     end
-    alt No hay detalle seleccionado o alguna cantidad es inválida
-        View-->>Browser: useForm.getErrors() conserva datos y muestra el error por detalle
-    else Detalles de surtimiento válidos
-        View->>Application: editGoodsIssueDetails({ id, formData })
-        Application->>Request: editGoodsIssueDetailsRequest({ id, data: formData })
-        activate Application
+    FormUtils-->>View: validateDetailsFields(): Object — errores por campo
+    View-->>Form: getErrors(): Object
+    alt Hay errores de validación
+        Form->>Browser: normalizeFormErrors({ form, errors })
+    else Datos válidos
+        Form->>View: sendRequest({ form, formData }) — callback configurado
+        View->>FormUtils: handleSubmit({ form, formData, create, update: editGoodsIssueDetails })
+        FormUtils->>Application: editGoodsIssueDetails({ id, formData })
+        Application->>Request: editMaterialGoodsIssueDetailsRequest({ id, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
-        HTTP->>Transport: enviar PATCH /api/warehouse/goods-issues/:id/details
-        Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-        Request-->>Application: editGoodsIssueDetailsRequest(): Promise[AxiosResponse]
+        HTTP->>Transport: PATCH /api/warehouse/goods-issues/materials/:id/details
         alt Respuesta exitosa
-            Application-->>View: editGoodsIssueDetails(): Promise[{ message: string }]
-            View-->>Browser: DOM o DataTable actualizado con response.data
-        else Respuesta rechazada
-            Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
-            View-->>Browser: formulario o filtros conservados, mensaje visible
+            Transport-->>HTTP: HTTP 200 { goodsIssue, code }
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: editMaterialGoodsIssueDetailsRequest(): Promise[AxiosResponse]
+            Application-->>FormUtils: editGoodsIssueDetails(): Promise[{ message }]
+            FormUtils->>Browser: notifications.showSuccess(response.message)
+            FormUtils->>Browser: closeModal(form)
+            FormUtils->>Browser: reloadMainTable({ resetPaging: mode === CREATE })
+        else Error HTTP o de dominio
+            Transport-->>HTTP: HTTP de error { code, message }
+            HTTP-->>Request: error normalizado
+            Request-->>Application: error propagado
+            Application-->>FormUtils: error propagado
+            Form->>Browser: handleApiError({ err, form }) conserva el formulario
         end
-        deactivate Application
     end
 ```

@@ -1,3 +1,4 @@
+import { buildGoodsReceiptContextWhere } from '../goodsReceiptHelpers.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
 import { createInventoryMovement } from '../../../inventory/movementService.js';
 import { buildInventoryMovementDetail } from '../../../inventory/movementHelpers.js';
@@ -18,7 +19,7 @@ export const findReceiptDetailForChange = ({ tx, goodsReceiptId, detailId, type 
         where: {
             id: detailId,
             goodsReceiptId,
-            ...(type && { goodsReceipt: { type } })
+            ...(type && { goodsReceipt: buildGoodsReceiptContextWhere(type) })
         },
         include: {
             goodsReceipt: true,

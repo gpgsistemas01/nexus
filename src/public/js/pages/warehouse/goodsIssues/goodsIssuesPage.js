@@ -4,7 +4,7 @@ import '../../sales/clients/clientForm.js';
 import './goodsIssueForm.js';
 import { openGoodsIssueModal } from './goodsIssueModal.js';
 
-createGoodsIssueDatatable({
+export const startGoodsIssuesPage = () => createGoodsIssueDatatable({
     context: window.meta || {},
     ...createIssueTableActions({ openIssueModal: openGoodsIssueModal })
 });

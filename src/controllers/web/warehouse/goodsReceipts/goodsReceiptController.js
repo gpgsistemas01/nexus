@@ -1,4 +1,4 @@
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../constants/inventory.js';
 
 const renderGoodsReceiptsPage = ({ req, res, resource }) => {
 

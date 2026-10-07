@@ -28,7 +28,7 @@ sequenceDiagram
         activate Application
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: enviar PATCH /api/warehouse/waste-issues/:id/details
-        Transport-->>HTTP: HTTP 2xx { code, data }
+        Transport-->>HTTP: HTTP 200 { wasteIssue, code }
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: editWasteIssueDetailsRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa

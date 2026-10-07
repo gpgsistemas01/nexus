@@ -23,7 +23,7 @@ vi.mock('../../../../../src/services/warehouse/goodsReceipts/consumables/consuma
 
 vi.mock('../../../../../src/utils/socketUtils.js', () => ({ emitInventoryUpdated }));
 
-import { editMaterialGoodsReceipt } from '../../../../../src/controllers/api/warehouse/goodsReceiptController.js';
+import { editMaterialGoodsReceipt } from '../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js';
 
 describe('actualización CRUD de entradas de compra', () => {
   beforeEach(() => vi.clearAllMocks());

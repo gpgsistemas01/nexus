@@ -1,37 +1,41 @@
 <a id="cu-ent-07"></a>
 # `CU-ENT-07` — Consultar compras de consumible
 
-> Esta secuencia usa la ruta y la fachada específicas de consumibles; los componentes con nombres históricos de material pertenecen al núcleo compartido de inventario.
-
 **Patrones:** `BE-P01`.
 
 ```mermaid
 sequenceDiagram
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
-    participant Domain as src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js
+    participant Route as src/routes/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptApiRoute.js
+    participant Auth as src/middleware/authMiddleware.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js<br/>src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js
+    participant Facade as src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js
+    participant Core as src/services/warehouse/goodsReceipts/goodsReceiptService.js
+    participant Helpers as src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler as src/app.js
 
     Client->>Route: GET /api/warehouse/goods-receipts/consumables
-    Route->>Controller: getAllConsumableGoodsReceipts(req, res)
-    activate Controller
-    Controller->>Domain: consumableGoodsReceiptService.findAllConsumableGoodsReceipts({ skip, take, search, startDate, endDate, supplierId, personId, orderBy, orderDir })
-    activate Domain
-    Domain->>Prisma: goodsReceipt.findMany({ where, include, skip, take, orderBy })
-    Prisma-->>Domain: findMany(): Promise[GoodsReceipt[]]
-    Domain->>Prisma: goodsReceipt.count({ where })
-    Prisma-->>Domain: count(): Promise[number]
-    alt Servicio resuelto
-        Domain-->>Controller: consumableGoodsReceiptService.findAllConsumableGoodsReceipts(): Promise[{ data: GoodsReceipt[], recordsTotal: number, recordsFiltered: number }]
-        Controller-->>Client: HTTP 2xx { code, data }
-    else AppError propagado
-        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-        Controller->>ErrorHandler: next(error)
-        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    Route->>Auth: verifyApiTokenRequired(req, res, next)
+    Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE)(req, res, next)
+    alt Token o permiso rechazados
+        Route-->>Client: HTTP 401 o 403 — error de middleware
+    else Pipeline aceptado
+        Route->>Controller: getAllConsumableGoodsReceipts(req, res)
+        Controller->>Controller: getDataTablePaging(req.query) — filtros, búsqueda y orden de compras
+        Controller->>Facade: findAllConsumableGoodsReceipts(query)
+        Facade->>Core: findAllGoodsReceipts({ ...options, type: CONSUMABLE })
+        Core->>Helpers: buildGoodsReceiptContextWhere(type)
+        Helpers-->>Core: buildGoodsReceiptContextWhere(): Object
+        Core->>Prisma: goodsReceipt.findMany({ where, skip, take, orderBy, select })
+        Prisma-->>Core: findMany(): Promise[GoodsReceipt[]]
+        Core->>Prisma: goodsReceipt.count({ where: contextWhere })
+        Prisma-->>Core: count(): Promise[number] — total
+        opt Hay filtros adicionales
+            Core->>Prisma: goodsReceipt.count({ where })
+            Prisma-->>Core: count(): Promise[number] — filtered
+        end
+        Core-->>Facade: findAllGoodsReceipts(): Promise[{ data, recordsTotal, recordsFiltered }]
+        Facade-->>Controller: findAllConsumableGoodsReceipts(): Promise[{ data, recordsTotal, recordsFiltered }]
+        Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
     end
-    deactivate Domain
-    deactivate Controller
 ```
-

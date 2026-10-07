@@ -20,7 +20,7 @@ sequenceDiagram
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/waste-issues
-    Transport-->>HTTP: HTTP 2xx { code, data }
+    Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }
     HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
     Request-->>Application: getAllWasteIssuesRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa

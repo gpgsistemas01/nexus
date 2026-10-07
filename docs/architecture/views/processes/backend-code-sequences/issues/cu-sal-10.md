@@ -33,7 +33,7 @@ sequenceDiagram
         activate Domain
         alt Servicio resuelto
             Domain-->>Controller: wasteIssueService.updateWasteIssueHeader(): Promise[WasteIssue]
-            Controller-->>Client: HTTP 2xx { code, data }
+            Controller-->>Client: HTTP 200 { wasteIssue, code }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }
             Controller->>ErrorHandler: next(error)

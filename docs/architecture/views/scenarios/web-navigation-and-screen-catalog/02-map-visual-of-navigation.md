@@ -58,6 +58,7 @@ flowchart TB
     menu -->|"goods:receipts-page-view"| purchases["Compras<br/>/compras"]
     menu --> issues(["Salidas"])
     issues -->|"goods:issues-page-view"| goodsIssues["Materiales<br/>/salidas/materiales"]
+    issues -->|"goods:issues-page-view"| consumableIssues["Consumibles<br/>/salidas/consumibles"]
     issues -->|"waste:issues-page-view"| wasteIssues["Mermas<br/>/salidas/mermas"]
     menu -->|"persons:page-view"| persons["Personas<br/>/personas"]
 ```
@@ -79,6 +80,7 @@ flowchart TB
     menu -->|"goods:receipts-page-view"| purchases["Compras<br/>/compras"]
     menu --> issues(["Salidas"])
     issues -->|"goods:issues-page-view"| goodsIssues["Materiales<br/>/salidas/materiales"]
+    issues -->|"goods:issues-page-view"| consumableIssues["Consumibles<br/>/salidas/consumibles"]
     issues -->|"waste:issues-page-view"| wasteIssues["Mermas<br/>/salidas/mermas"]
     menu --> movements(["Movimientos"])
     movements -->|"movements:read"| materialMovements["Materiales<br/>/movimientos/materiales"]

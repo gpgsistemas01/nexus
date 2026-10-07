@@ -1,60 +1,66 @@
-# Información común de uso
+# Primeros pasos en Nexus
 
-## Acceso por actor y seguridad
+## Antes de entrar
 
-Las opciones disponibles dependen del actor autenticado y de los permisos asignados. Nexus
-comprueba la autorización en cada operación. **Catálogos** corresponde sólo al administrador del
-sistema; **Consumibles** pertenece a Almacén y usa el acceso de consulta de materiales.
+Tenga a la mano la dirección de Nexus y su cuenta asignada. Abra esa dirección
+en el navegador e ingrese su **Nombre de usuario** y **Contraseña**. Pulse
+**Ingresar**. Al entrar, abra **Menú principal** para conocer las opciones de su cuenta.
 
-## Antes de comenzar
+Si una opción que necesita no aparece, solicite revisar su acceso con el
+administrador. Los menús pueden ser distintos entre compañeros.
 
-Este manual se prepara para personal autorizado. Requiere un navegador compatible, la URL del
-entorno y una cuenta asignada. Las opciones visibles dependen del rol y el área; una ausencia de
-opción no se debe resolver compartiendo credenciales.
+## Conozca las tres secciones de almacén
 
-🟥 **DATO SENSIBLE:** no incluya contraseñas, cookies, tokens ni datos personales en
-capturas, exportaciones o solicitudes de soporte.
+| Sección | Para qué sirve | Qué debe comprobar |
+| --- | --- | --- |
+| **Almacén** | Consultar los artículos y cuánto hay disponible de cada proveedor. | Nombre, proveedor, existencia y unidad. |
+| **Compras** | Registrar lo recibido de un proveedor. | Comprobante, artículos, cantidades y costos antes de guardar. |
+| **Salidas** | Registrar lo solicitado y después entregar o recibir devoluciones. | Cliente, solicitante, artículos y estado de surtido. |
 
-## Acceso
+Elija **Materiales** o **Consumibles** según el artículo. Cada opción tiene su
+propio listado. Las **Mermas** se consultan y operan en su opción correspondiente.
 
-1. Abra la URL de Nexus.
-2. Capture sus credenciales y seleccione **Iniciar sesión**.
-3. Compruebe que se muestre la página autorizada para su cuenta.
+Una compra guardada incrementa existencias. Crear una salida sólo registra la
+solicitud: la existencia disminuye al confirmar **Surtir**. Una devolución
+reintegra la cantidad que efectivamente se devuelve.
 
-## Módulos
+## Su primera consulta
 
-Las secciones de entradas, salidas, inventario, materiales, consumibles, mermas, clientes, proveedores,
-personas y usuarios se presentan en los [procedimientos y casos](procedures.md), siguiendo la
-secuencia **propósito → precondiciones → recorrido principal → alternativas → errores →
-resultado**. Cada procedimiento muestra la captura estable al aparecer la pantalla que representa
-y advierte si modifica existencias o genera un archivo. Esa entrada divide el recorrido por grupo
-funcional y ofrece guías específicas para administrador, almacén y usuarios de consultas y reportes.
+1. Abra **Menú principal → Almacén → Materiales** o **Consumibles**.
+2. Ubique el buscador y escriba el nombre de un artículo que conozca.
+3. Abra **Filtros**, seleccione un proveedor si necesita acotar el resultado
+   y pulse **Buscar / filtrar**.
+4. Lea la fila: confirme artículo, proveedor, existencia y unidad. Un artículo
+   puede aparecer con distintos proveedores y cada uno conserva su existencia.
+5. Pulse **Limpiar filtros** para volver al listado sin esos filtros.
 
-La [matriz de validación y modos de formulario](form-validation-matrix.md) permite localizar los
-campos comprobados, la recuperación esperada y las excepciones de edición sin duplicar las reglas
-en cada procedimiento.
+Consultar no modifica inventario. Cuando ya reconozca la pantalla, siga el
+[recorrido de su función](procedures.md#elija-su-recorrido) antes de registrar operaciones.
 
-### Continuidad de consultas y exportaciones
+## Cómo reconocer los controles
 
-Cada exportación se realiza desde el módulo donde se consultó y filtró la información:
+- El **buscador** localiza filas del listado; **Filtros** permite combinar criterios.
+- Un selector como **Buscar proveedor...** permite buscar y elegir una opción.
+  Compruebe que la opción quede seleccionada, no sólo escrita.
+- **Agregar** incorpora un renglón al formulario. Revíselo antes de guardar.
+- **Guardar** registra una operación nueva; **Actualizar** confirma los cambios.
+- **Regresar** cierra el formulario sin confirmar esa edición. Una corrección,
+  cancelación, devolución o surtido ya confirmado se conserva aunque cierre el formulario.
+- **Exportar Excel** descarga un archivo con el alcance elegido en el diálogo.
 
-- materiales y su reporte de inventario;
-- consumibles y su reporte de inventario separado;
-- proveedores y clientes con su exportación desde el listado;
-- mermas y su reporte de inventario;
-- compras y su reporte mensual;
-- salidas de material o merma y el reporte del mismo contexto;
-- personas y usuarios con su exportación desde el listado;
-- movimientos de material o merma y su reporte correspondiente.
+## Después de guardar
 
-El recorrido es **abrir módulo → consultar → filtrar → exportar → recibir archivo**.
+Busque el mensaje de confirmación y vuelva a localizar el registro en la tabla.
+Anote su **Folio** para consultarlo después. Si la operación afecta existencias,
+revise el artículo y proveedor en **Almacén**. En una salida, compruebe además
+el **Estado de surtido**.
 
-## Solución de problemas
+Si un campo muestra un error, corrija ese dato y vuelva a revisar el formulario.
+Si perdió la conexión o no sabe si se guardó, consulte primero el listado;
+no repita la operación sin comprobar su resultado. El [catálogo de mensajes](error-messages.md)
+ayuda a resolver los rechazos habituales.
 
-Consulte el [catálogo de mensajes de error](error-messages.md) para identificar cómo se presenta
-cada tipo de fallo, qué información conservar y cuándo debe intentarse nuevamente la operación.
+## Termine la sesión
 
-- Si una opción no aparece, solicite validar rol, departamento y permiso; no intente otra cuenta.
-- Si una operación falla, conserve el mensaje y la referencia mostrada, y evite repetir una
-  escritura hasta confirmar su estado.
-- No incluya contraseñas, cookies ni datos personales en una captura de soporte.
+Use **Menú principal → Cerrar sesión** cuando termine. No comparta su cuenta
+ni incluya contraseñas o datos personales en capturas de soporte.

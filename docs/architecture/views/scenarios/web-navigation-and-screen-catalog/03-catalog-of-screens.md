@@ -21,6 +21,7 @@ sólo cuando la sesión posee el permiso indicado por
 | Mermas (`/almacen/mermas`) | Consultar y administrar existencias de merma con todas las celdas de cada fila centradas, incluido el nombre. | Filtrar, registrar/editar, agregar stock para almacén y ajustar stock sólo para administración. | `src/views/pages/warehouse/wastes/wastesPage.ejs` |
 | Compras de materiales y consumibles (`/compras/materiales`, `/compras/consumibles`) | Consultar y registrar entradas separadas por tipo de inventario mediante un flujo compartido. | Filtrar, registrar compra, crear el material o consumible del contexto, administrar proveedores y corregir detalles sin mezclar tipos. | `src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs` |
 | Salidas de almacén (`/salidas/materiales`) | Consultar y registrar entregas de materiales. | Filtrar, registrar salida, seleccionar cliente y devolver detalles. | `src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs` |
+| Salidas de consumibles (`/salidas/consumibles`) | Consultar y registrar entregas de consumibles. | Seleccionar consumibles mediante Select2, surtir y devolver detalles. Reutiliza el flujo y los permisos de salidas de materiales. | `src/views/pages/warehouse/goodsIssues/goodsIssuesPage.ejs` |
 | Salidas de mermas (`/salidas/mermas`) | Consultar y registrar salidas de merma. | Registrar, editar, surtir y devolver detalles de merma. | `src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs` |
 | Proveedores (`/proveedores`) | Consultar y administrar proveedores. | Crear/editar desde modal. | `src/views/pages/warehouse/suppliers/suppliersPage.ejs` |
 
@@ -54,3 +55,13 @@ flowchart LR
     oldWasteIssues["/salidas-mermas"] -->|"308"| newWasteIssues["/salidas/mermas"]
     oldProfiles["/perfiles"] -->|"308"| newPersons["/personas"]
 ```
+
+Las salidas de materiales y consumibles reutilizan la misma vista y permisos. El
+contexto de cada página determina el catálogo consultado por Select2, su texto de
+búsqueda y las rutas específicas del listado, las escrituras y la exportación.
+Como en compras, cada ruta usa una fachada que fija el tipo de inventario;
+`GoodsIssue.type` persiste el contexto y el servidor comprueba que cada detalle
+pertenezca al mismo tipo. No se
+permite editar, surtir ni devolver una salida desde el contexto contrario. Los
+documentos históricos mixtos o vacíos se conservan en la base, pero no aparecen
+en estas secciones ni admiten escrituras desde ellas hasta regularizar su contexto.

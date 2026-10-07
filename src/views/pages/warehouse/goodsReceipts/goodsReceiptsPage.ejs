@@ -111,7 +111,7 @@
 
 <%- include('../suppliers/supplierModal') %>
 
-<script type="module" src="/js/pages/warehouse/goodsReceipts/goodsReceiptsPage.js"></script>
+<script type="module" src="/js/pages/warehouse/goodsReceipts/<%= inventoryResource === 'consumable' ? 'consumables/consumableGoodsReceiptsPage' : 'materials/materialGoodsReceiptsPage' %>.js"></script>
 
 <%- include('./corrections/correctionModal') %>
 

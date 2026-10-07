@@ -80,26 +80,44 @@
     "/api/warehouse/suppliers/{id}": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1suppliers~1{id}"
     },
-    "/api/warehouse/goods-issues": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues"
+    "/api/warehouse/goods-issues/materials": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1materials"
     },
-    "/api/warehouse/goods-issues/{id}": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1{id}"
+    "/api/warehouse/goods-issues/consumables": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1consumables"
     },
-    "/api/warehouse/goods-issues/{id}/header": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1{id}~1header"
+    "/api/warehouse/goods-issues/materials/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1materials~1{id}"
     },
-    "/api/warehouse/goods-issues/{id}/details": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1{id}~1details"
+    "/api/warehouse/goods-issues/consumables/{id}": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1consumables~1{id}"
     },
-    "/api/warehouse/goods-issues/{id}/details/{detailId}/returns": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1{id}~1details~1{detailId}~1returns"
+    "/api/warehouse/goods-issues/materials/{id}/header": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1materials~1{id}~1header"
+    },
+    "/api/warehouse/goods-issues/consumables/{id}/header": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1consumables~1{id}~1header"
+    },
+    "/api/warehouse/goods-issues/materials/{id}/details": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1materials~1{id}~1details"
+    },
+    "/api/warehouse/goods-issues/consumables/{id}/details": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1consumables~1{id}~1details"
+    },
+    "/api/warehouse/goods-issues/materials/{id}/details/{detailId}/returns": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1materials~1{id}~1details~1{detailId}~1returns"
+    },
+    "/api/warehouse/goods-issues/consumables/{id}/details/{detailId}/returns": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1goods-issues~1consumables~1{id}~1details~1{detailId}~1returns"
     },
     "/api/warehouse/reports/inventory/excel": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1inventory~1excel"
     },
-    "/api/warehouse/reports/goods-issues/excel": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-issues~1excel"
+    "/api/warehouse/reports/goods-issues/materials/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-issues~1materials~1excel"
+    },
+    "/api/warehouse/reports/goods-issues/consumables/excel": {
+      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-issues~1consumables~1excel"
     },
     "/api/warehouse/reports/waste-issues/excel": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1waste-issues~1excel"

@@ -171,6 +171,9 @@ const MANUALS = Object.freeze({
                 ]),
                 ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
             ]),
+            'salidas-consumibles': manualPart(warehouse, manualCaseFiles('issues', [
+                '15-cap-sal-con-01-walkthrough.md'
+            ])),
             'salidas-mermas': manualPart(warehouse, [
                 ...manualCaseFiles('issues', [
                     '08-cap-sal-was-01-list.md',

@@ -17,7 +17,7 @@ import { findPersonById } from "../../admin/person/personService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
-import { buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from "./goodsReceiptHelpers.js";
+import { buildGoodsReceiptContextWhere, buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from "./goodsReceiptHelpers.js";
 import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
@@ -54,13 +54,15 @@ export const findAllGoodsReceipts = async ({
     excludeCanceled = false,
     activeDetailsOnly = false,
     orderBy = 'referenceNumber',
-    orderDir = 'desc'
+    orderDir = 'desc',
+    includeCounts = true
 }) => {
 
+    const contextWhere = buildGoodsReceiptContextWhere(type);
     const where = {
         ...(supplierId && { supplierId }),
         ...(personId && { receivedById: personId }),
-        ...(type && { type }),
+        ...contextWhere,
         ...(excludeCanceled && {
             status: {
                 isNot: { name: GOODS_RECEIPT_STATUS_NAMES.CANCELED }
@@ -119,10 +121,15 @@ export const findAllGoodsReceipts = async ({
         }
     });
 
+    if (!includeCounts) return { data: goodsReceipts };
+
     const total = await getDb().goodsReceipt.count({
-        where: type ? { type } : undefined
+        where: type ? contextWhere : undefined
     });
-    const filtered = await getDb().goodsReceipt.count({ where });
+    const hasAdditionalFilters = Object.keys(where).some(key => !Object.hasOwn(contextWhere, key));
+    const filtered = hasAdditionalFilters
+        ? await getDb().goodsReceipt.count({ where })
+        : total;
 
     return {
         data: goodsReceipts,
@@ -253,7 +260,7 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
 
         const [goodsReceipt, receivedBy] = await Promise.all([
             getDb().goodsReceipt.findUnique({
-                where: { id },
+                where: { id, ...buildGoodsReceiptContextWhere(type) },
                 select: {
                     id: true,
                     type: true,
@@ -271,9 +278,6 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
         ]);
 
         if (!goodsReceipt) throw new GoodsReceiptNotFound();
-        if (type && goodsReceipt.type !== type) {
-            throw new GoodsReceiptNotFound();
-        }
 
         if (goodsReceipt.status.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) {
             throw new GoodsReceiptAlreadyCanceled();
@@ -298,8 +302,14 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
         let addedDetails = [];
 
         const updatedGoodsReceipt = await getDb().$transaction(async (tx) => {
+            const currentReceipt = await tx.goodsReceipt.findUnique({
+                where: { id, ...buildGoodsReceiptContextWhere(type) },
+                select: { id: true }
+            });
+            if (!currentReceipt) throw new GoodsReceiptNotFound();
+
             const updatedHeader = await tx.goodsReceipt.update({
-                where: { id },
+                where: { id, ...buildGoodsReceiptContextWhere(type) },
                 data: {
                     ...goodsReceiptData,
                     receivedByName: receivedBy.fullName,

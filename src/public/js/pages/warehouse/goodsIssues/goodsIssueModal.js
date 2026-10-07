@@ -14,10 +14,13 @@ import {
 } from '../../../ui/issues/issueFormUI.js';
 import { openModal } from '../../../ui/modalUI.js';
 import { mapIssueDetailToTable } from '../../../utils/warehouseInventoryUtils.js';
+import { goodsIssueContext } from './goodsIssueContext.js';
 import { initializeGoodsIssueReturns } from './returns/goodsIssueReturn.js';
 
 const modalId = MODAL_SELECTORS.GOODS_ISSUE;
 const formId = FORM_SELECTORS.GOODS_ISSUE;
+
+const inventoryLabel = goodsIssueContext.resource === 'consumable' ? 'consumibles' : 'materiales';
 const GOODS_ISSUE_ENTITY_NAME = 'salida';
 
 const context = window.meta || {};
@@ -63,8 +66,8 @@ export const openGoodsIssueModal = ({ mode, data = null }) => {
         entityName: GOODS_ISSUE_ENTITY_NAME,
         referenceNumber: data?.referenceNumber,
         createTitle: 'Registrar salida',
-        detailAction: 'Surtir materiales de la',
-        returnAction: 'Devolver materiales surtidos de la'
+        detailAction: `Surtir ${ inventoryLabel } de la`,
+        returnAction: `Devolver ${ inventoryLabel } surtidos de la`
     });
 
     createWarehouseIssueDetailsTable({

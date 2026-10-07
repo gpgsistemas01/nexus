@@ -4,23 +4,15 @@ import {
     createGoodsIssueDtoForRegister,
     createGoodsIssueDtoForReturn,
     createGoodsIssueHeaderDtoForEdit
-} from "../../../dtos/goodsIssueDTO.js";
-import { successCodeMessages } from "../../../messages/codeMessages.js";
-import {
-    createGoodsIssue,
-    findAllGoodsIssues,
-    updateGoodsIssue,
-    updateGoodsIssueDetails,
-    updateGoodsIssueHeader
-} from "../../../services/warehouse/goodsIssues/goodsIssueService.js";
-import { returnGoodsIssueDetail } from '../../../services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js';
-import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
-import { emitInventoryUpdated } from "../../../utils/socketUtils.js";
-import { getIssueDataTableQuery } from '../../../utils/issueQueryUtils.js';
+} from "../../../../../dtos/goodsIssueDTO.js";
+import { successCodeMessages } from "../../../../../messages/codeMessages.js";
+import { sanitizeEmptyStrings } from "../../../../../utils/formattersUtils.js";
+import { emitInventoryUpdated } from "../../../../../utils/socketUtils.js";
+import { getIssueDataTableQuery } from '../../../../../utils/issueQueryUtils.js';
 
 const DATATABLE_COLUMNS = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
 
-export const getAllGoodsIssues = async (req, res) => {
+export const buildListHandler = findAllGoodsIssues => async (req, res) => {
 
     const query = getIssueDataTableQuery({
         query: req.query,
@@ -35,7 +27,7 @@ export const getAllGoodsIssues = async (req, res) => {
     return res.status(200).json(result);
 };
 
-export const registerGoodsIssue = async (req, res) => {
+export const buildRegisterHandler = createGoodsIssue => async (req, res) => {
 
     const goodsIssueDto = createGoodsIssueDtoForRegister(req.body);
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
@@ -50,7 +42,7 @@ export const registerGoodsIssue = async (req, res) => {
     });
 };
 
-export const editGoodsIssue = async (req, res) => {
+export const buildEditHandler = updateGoodsIssue => async (req, res) => {
 
     const goodsIssueDto = createGoodsIssueDtoForEdit(req.body);
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
@@ -66,7 +58,7 @@ export const editGoodsIssue = async (req, res) => {
     });
 };
 
-export const editGoodsIssueHeader = async (req, res) => {
+export const buildHeaderHandler = updateGoodsIssueHeader => async (req, res) => {
 
     const goodsIssueDto = createGoodsIssueHeaderDtoForEdit(req.body);
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
@@ -82,7 +74,7 @@ export const editGoodsIssueHeader = async (req, res) => {
     });
 };
 
-export const editGoodsIssueDetails = async (req, res) => {
+export const buildDetailsHandler = ({ updateGoodsIssueDetails, inventoryContext }) => async (req, res) => {
 
     const goodsIssueDto = createGoodsIssueDetailsDtoForEdit(req.body);
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
@@ -92,7 +84,7 @@ export const editGoodsIssueDetails = async (req, res) => {
         id: req.params.id
     });
 
-    emitInventoryUpdated({ context: 'material', source: 'goods-issue-supplied' });
+    emitInventoryUpdated({ context: inventoryContext, source: 'goods-issue-supplied' });
 
     return res.status(200).json({
         goodsIssue,
@@ -100,7 +92,7 @@ export const editGoodsIssueDetails = async (req, res) => {
     });
 };
 
-export const registerGoodsIssueDetailReturn = async (req, res) => {
+export const buildReturnHandler = ({ returnGoodsIssueDetail, inventoryContext }) => async (req, res) => {
 
     const returnDto = createGoodsIssueDtoForReturn(req.body);
     const sanitizedReturnDto = sanitizeEmptyStrings(returnDto);
@@ -112,7 +104,7 @@ export const registerGoodsIssueDetailReturn = async (req, res) => {
         userId: req.user.id
     });
 
-    emitInventoryUpdated({ context: 'material', source: 'goods-issue-return-created' });
+    emitInventoryUpdated({ context: inventoryContext, source: 'goods-issue-return-created' });
 
     return res.status(200).json({
         goodsIssueReturn,

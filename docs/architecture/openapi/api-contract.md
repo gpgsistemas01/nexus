@@ -90,3 +90,9 @@ OpenAPI del área correspondiente. Este documento se actualiza únicamente cuand
 alguna de las reglas complementarias que explica —el periodo de los reportes o la
 precisión decimal—. Así, OpenAPI conserva el contrato verificable de cada operación y
 este Markdown conserva el contexto compartido que requiere explicación adicional.
+
+### Contextos de compras y salidas
+
+La ruta fija el contexto de materiales o consumibles; el payload y la query
+no pueden cambiarlo. Listados, reportes y escrituras verifican cabecera y
+detalles del mismo tipo. Véase la [regla de separación](../../requirements/requirements-specification/06-operation-modes-and-effects.md#separación-de-compras-y-salidas).

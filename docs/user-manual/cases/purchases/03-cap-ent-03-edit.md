@@ -5,6 +5,8 @@
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Compras](../../error-messages.md#errores-compras).
 
+**Antes de empezar:** Localice la compra por folio y confirme proveedor y estado. El proveedor y los detalles ya guardados se conservan; para cambiar cantidad o costo, abra la corrección del renglón.
+
 **Controles que debe usar:** Acción **Editar registro**; opciones **Factura** y **Remisión**; campo **Número de Factura**; selectores **Buscar proveedor...** y **Buscar persona que recibe...**; campos **Fecha y hora de recepción:** y **Observaciones**; selector **Buscar material...**; campos **Cantidad** y **Costo por Presentación**; botones **Agregar**, **Actualizar** y **Regresar**.
 
 1. En la fila de la compra, seleccione **Editar registro** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
@@ -13,3 +15,5 @@
 
 2. Modifique el comprobante, la persona que recibe, la fecha o las observaciones. Para incorporar un detalle nuevo, elija el material, capture **Cantidad** y **Costo por Presentación**, seleccione **Agregar** y compruebe que el renglón aparezca en la tabla. Repita la operación para cada detalle nuevo.
 3. Revise la tabla y seleccione **Actualizar** para guardar o **Regresar** para salir sin confirmar. El proveedor y los renglones ya confirmados permanecen deshabilitados; para cambiar la cantidad o el costo de uno de esos renglones, use **Corregir detalle de compra**.
+
+**Compruebe el resultado:** Vuelva a abrir la compra y compruebe los datos actualizados. Si agregó detalles, revise también sus totales y existencias.

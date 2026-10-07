@@ -2,6 +2,14 @@
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
+## Para su primera visita
+
+Empiece en **Almacén → Materiales**, **Consumibles** o **Mermas**, según el artículo. Busque un registro conocido y lea nombre, proveedor, unidad y existencia. Cada proveedor puede tener su propia existencia del mismo artículo.
+
+Antes de registrar un artículo, búsquelo para evitar duplicados. Después de guardar, compruebe sus datos en el listado. Una compra registra lo recibido; una salida registra lo solicitado y descuenta al surtir. No use un ajuste de existencia como sustituto de esas operaciones.
+
+El administrador encuentra las opciones de apoyo en **Catálogos**, y los listados independientes de **Clientes** y **Proveedores** en el menú. El personal de almacén selecciona clientes y proveedores desde sus formularios de operación.
+
 ## Capítulos
 
 ### Catálogos auxiliares

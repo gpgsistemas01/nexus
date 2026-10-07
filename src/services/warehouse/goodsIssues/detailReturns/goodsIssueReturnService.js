@@ -5,7 +5,7 @@ import {
     GoodsIssueReturnStatusConflict
 } from '../../../../errors/warehouse/goodsIssueError.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../constants/warehouseStatuses.js';
-import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
+import { INVENTORY_MOVEMENT_TYPES, MATERIAL_TYPES } from '../../../../constants/inventory.js';
 import { getDb } from '../../../../repository/baseRepository.js';
 import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
 import { createServiceLogger } from '../../../../utils/logger.js';
@@ -13,13 +13,14 @@ import { handleServiceError } from '../../../serviceErrorHandler.js';
 import { applyInventoryMovement } from '../../../inventory/movementService.js';
 import { findFulfillmentStatusIdsByName } from '../../fulfillmentStatusService.js';
 import { resolveIssueFulfillmentStatus } from '../../issues/issueFulfillmentRules.js';
+import { buildGoodsIssueContextWhere } from '../goodsIssueHelpers.js';
 import { GOODS_ISSUE_DETAIL_SELECT } from '../goodsIssueDetailSelect.js';
 import { resolveGoodsIssueDetailFulfillmentStatusName } from '../goodsIssueFulfillmentRules.js';
 
 const FLOAT_EPSILON = 0.000001;
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueReturnService');
 
-export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }) => {
+export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, type = MATERIAL_TYPES.MATERIAL }) => {
     const { returnQuantity: requestedReturnQuantityInput, observations = null } = returnDto;
 
     try {
@@ -29,7 +30,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                 names: Object.values(FULFILLMENT_STATUS_NAMES)
             });
             const detail = await tx.goodsIssueDetail.findFirst({
-                where: { id: detailId, goodsIssueId: id },
+                where: { id: detailId, goodsIssueId: id, goodsIssue: buildGoodsIssueContextWhere(type) },
                 include: { goodsIssue: { include: { fulfillmentStatus: true } } }
             });
 
@@ -90,7 +91,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId }
                 : resolveIssueFulfillmentStatus(refreshedDetails);
 
             await tx.goodsIssue.update({
-                where: { id },
+                where: { id, ...buildGoodsIssueContextWhere(type) },
                 data: {
                     fulfillmentStatus: { connect: { name: fulfillmentName } },
                     status: {

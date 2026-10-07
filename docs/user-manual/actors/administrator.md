@@ -1,8 +1,8 @@
 ---
 title: Manual del administrador del sistema
-subtitle: "Nexus · Versión documental 0.2 · Sistema 1.0.0 · Estado: En revisión"
+subtitle: "Nexus · Versión documental 0.3 · Sistema 1.0.0 · Estado: En revisión"
 author: Equipo Nexus
-date: 2026-09-04
+date: 2026-10-07
 ---
 
 # Manual del administrador del sistema
@@ -11,9 +11,11 @@ date: 2026-09-04
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 0.2 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+| 0.3 | 1.0.0 | En revisión | 2026-10-07 | Equipo Nexus |
 
-Esta guía corresponde al actor **Administrador del sistema (área Sistemas)**. Las opciones visibles dependen de sus permisos efectivos; esta clasificación no autoriza por sí sola una operación.
+Esta guía le ayuda a conocer la operación y preparar los accesos de otras
+personas. Comience por [primeros pasos](../overview.md); después revise personas,
+cuentas y catálogos antes de acompañar una operación de almacén.
 
 ## Responsabilidades y límites
 
@@ -25,11 +27,19 @@ Esta guía corresponde al actor **Administrador del sistema (área Sistemas)**. 
 - Debe usar únicamente las acciones concedidas por el servidor; pertenecer al área Sistemas no
   sustituye la comprobación de permisos de cada solicitud.
 
-## Recorrido recomendado
+## Su primer recorrido acompañado
 
-1. Inicie en [autenticación y navegación](../cases/authentication/index.md).
-2. Use [identidad y acceso](../cases/identity-access/index.md) para administrar personas, áreas, roles, usuarios y contraseñas.
-3. Use **Catálogos auxiliares** y elija la pantalla independiente de **Áreas**, **Roles**, **Presentaciones**, **Unidades de medida**, **Motivos de ajuste** o **Estados de cumplimiento**. Siga el procedimiento de [catálogos e inventario](../cases/catalogs/index.md#catálogos-auxiliares) para consultar, crear o editar únicamente esos recursos; clientes y proveedores conservan sus módulos propios.
-4. Use los recorridos de [compras](../cases/purchases/index.md) y [salidas](../cases/issues/index.md) cuando necesite intervenir en la operación de almacén.
-5. Cuando tenga el permiso correspondiente, consulte [movimientos y reportes](../cases/reports/index.md).
-6. Ante un rechazo, siga el vínculo **Errores posibles** del procedimiento; no cambie de cuenta para eludir permisos.
+1. Entre con su cuenta y abra **Menú principal**. Identifique **Personas**, **Usuarios**,
+   **Catálogos**, **Almacén**, **Compras**, **Salidas** y **Movimientos**.
+2. Consulte una [persona](../cases/identity-access/01-cap-ida-per-01-list.md) conocida.
+   Revise su nombre y asignaciones de área y rol. Una persona no es una cuenta.
+3. Consulte su [usuario](../cases/identity-access/04-cap-ida-usr-01-list.md) y la persona
+   vinculada. Prepare una cuenta nueva sólo cuando la incorporación esté autorizada.
+4. Reconozca los [catálogos auxiliares](../cases/catalogs/index.md#catálogos-auxiliares).
+   Antes de agregar una opción, busque si ya existe.
+5. Consulte un artículo en **Almacén** y siga su folio en una compra y una salida.
+   Distinga solicitud, recepción, surtido y devolución antes de intervenir.
+6. Revise [Movimientos](../cases/reports/index.md) para comprobar qué operación
+   cambió la existencia y descargue un reporte del periodo requerido.
+7. Acompañe al personal con el [recorrido de almacén](warehouse.md) y confirme
+   que cada cuenta vea las opciones que necesita. Termine con **Cerrar sesión**.
