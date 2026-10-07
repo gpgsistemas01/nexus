@@ -31,21 +31,6 @@ que el usuario pueda ubicar los campos y las acciones descritas en el procedimie
 Cuando un procedimiento requiere sustituir un filtro predeterminado, se incluye además una captura
 del valor nuevo ya aplicado y de los resultados que habilitan el paso siguiente.
 
-## Capturas pendientes de versionar
-
-Los recorridos de consumibles ya tienen procedimientos e identificadores, pero faltan
-las siete imágenes de `images/consumables/` (`00` a `06`) y las seis imágenes de
-`images/purchases/` para compras de consumibles (`07` a `12`). Las referencias de esos
-procedimientos se conservan como destinos previstos; aún no constituyen evidencia visual.
-
-Mientras falten esos archivos, `npm run docs:export -- --check` y la validación de
-`manuales` fallan por imágenes ausentes. Para completar la entrega, prepare los datos
-y la sesión de Almacén, siga el [flujo de capturas](../governance/document-export-guide/08-update-the-screenshots-of-the-manual.md),
-revise los PNG generados y copie las capturas aprobadas a las rutas versionadas
-referenciadas por cada procedimiento. Después vuelva a validar los manuales.
-
-El recorrido de salidas de consumibles también requiere capturas propias; no se deben sustituir por imágenes de materiales.
-
 ## Inventario automatizado
 
 La siguiente tabla refleja el arreglo `captures` de `scripts/captureManualScreenshots.js`. Para

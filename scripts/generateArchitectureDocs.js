@@ -575,6 +575,15 @@ const parsePrismaModels = (schema) => {
             if (compoundPrimaryKeys.has(field.name)) field.keys = [field.keys, 'PK'].filter(Boolean).join(',');
             if (foreignKeys.has(field.name)) field.keys = [field.keys, 'FK'].filter(Boolean).join(',');
         });
+        const uniqueKeys = [
+            ...fields.filter(({ attributes }) => attributes.includes('@id') || attributes.includes('@unique'))
+                .map(({ name: fieldName }) => [fieldName]),
+            ...[...body.matchAll(/@@(?:id|unique)\(\[([^\]]+)\]/g)]
+                .map((key) => key[1].split(',').map((value) => value.trim()))
+        ];
+        relations.forEach((relation) => {
+            relation.unique = uniqueKeys.some((keys) => keys.every((key) => relation.foreignKeys.includes(key)));
+        });
         models.set(name, { fields, relations });
     }
     return models;
@@ -659,15 +668,24 @@ const renderDataDictionaryModel = (name, model) => {
 const generateDatabaseSchema = async () => {
     const models = parsePrismaModels(await readFile(path.join(ROOT, 'prisma/schema.prisma'), 'utf8'));
     validateDatabaseAreas(models);
+    const allRelations = [...models.entries()].flatMap(([source, model]) => (
+        model.relations.map((relation) => ({ source, ...relation }))
+    ));
+    const renderRelation = ({ source, field, target, optional, unique }) => (
+        `    ${target} ${optional ? 'o|' : '||'}--${unique ? 'o|' : 'o{'} ${source} : "${field}"`
+    );
+    const isolatedModels = [...models.keys()].filter((name) => (
+        !allRelations.some(({ source, target }) => source === name || target === name)
+    ));
     const diagrams = DATABASE_AREAS.flatMap(([title, names]) => {
         const sections = [];
         for (let offset = 0; offset < names.length; offset += 3) {
             const subset = names.slice(offset, offset + 3);
             const selected = new Set(subset);
             const entities = subset.map((name) => renderEntity(name, models.get(name))).join('\n');
-            const relations = subset.flatMap((source) => models.get(source).relations
-                .filter(({ target }) => selected.has(target))
-                .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`));
+            const relations = allRelations
+                .filter(({ source, target }) => selected.has(source) || selected.has(target))
+                .map(renderRelation);
             sections.push(`### ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${entities}\n${relations.join('\n')}\n\`\`\``);
         }
         return [`## ${title}\n\n${sections.join('\n\n')}`];
@@ -676,8 +694,9 @@ const generateDatabaseSchema = async () => {
         const sections = [];
         for (let offset = 0; offset < names.length; offset += 3) {
             const subset = names.slice(offset, offset + 3);
-            const relations = subset.flatMap((source) => models.get(source).relations
-                .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`));
+            const relations = allRelations
+                .filter(({ source }) => subset.includes(source))
+                .map(renderRelation);
             if (relations.length) {
                 sections.push(`### ${title}: ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${relations.join('\n')}\n\`\`\``);
             }
@@ -689,14 +708,23 @@ const generateDatabaseSchema = async () => {
 
 Estos diagramas ER se generan desde los modelos y relaciones de
 \`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
-GitHub. Los atributos se distribuyen en figuras de hasta tres modelos; todas las
-relaciones, incluidas las que cruzan figuras o áreas, se muestran en la sección final.
+GitHub. Los atributos se distribuyen en figuras de hasta tres modelos. Cada figura
+incluye sus relaciones entrantes y salientes; los modelos externos aparecen sólo por
+nombre, con sus atributos en su propia figura. Todas las relaciones también se reúnen
+en la sección final.
 
 La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
 verdad el esquema Prisma y sus migraciones. Para consultar obligatoriedad, valores
 predeterminados y tipos de cada campo, usa el
 [diccionario técnico](data-dictionary.md).
+
+Las cardinalidades distinguen relaciones uno a muchos de relaciones uno a uno cuando
+la FK es única. El extremo del destino indica si la referencia es obligatoria
+(\`||\`) u opcional (\`o|\`); el extremo del modelo que contiene la FK indica cero o
+muchos (\`o{\`) o cero o uno (\`o|\`).
+
+Modelos sin relaciones FK entrantes ni salientes en Prisma: ${isolatedModels.map((name) => `\`${name}\``).join(', ') || 'ninguno'}.
 
 ${diagrams}
 
@@ -709,9 +737,10 @@ imagen. Los atributos completos permanecen en las vistas anteriores y en el dicc
 
 ${relationDiagrams}
 
-Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Una relación puede
-aparecer con el nombre del campo inverso porque la vista se deriva de la relación Prisma;
-la dirección de lectura no implica propiedad del proceso de negocio.
+Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Cada asociación
+usa el nombre del campo que declara la FK en Prisma; las colecciones inversas no
+generan una segunda asociación. La dirección de lectura no implica propiedad del
+proceso de negocio.
 `;
 };
 

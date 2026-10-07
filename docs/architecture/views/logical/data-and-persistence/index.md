@@ -8,8 +8,11 @@
 
 ## Vistas del modelo
 
-1. [Diagramas entidad–relación](generated/database-schema.md): cinco vistas por área y
-   relaciones transversales, generadas desde Prisma.
+1. [Diagramas entidad–relación](generated/database-schema.md): cuatro vistas por área y
+   vistas de relaciones por grupos de modelos, generadas desde Prisma. Los atributos
+   se distribuyen en figuras de hasta tres modelos. Cada figura muestra
+   también las asociaciones con modelos externos para evitar entidades aparentemente
+   aisladas; sus atributos se detallan en la figura propietaria.
 2. [Diccionario técnico](generated/data-dictionary.md): modelos, campos, tipos, claves y
    relaciones que complementan la lectura de los diagramas.
 
@@ -20,6 +23,13 @@ ejecutar migraciones, recuperar despliegues ni aprovisionar cuentas de base de d
 procedimientos pertenecen a la [vista física](../../physical/index.md). Tampoco redefine
 reglas funcionales: Prisma es la fuente técnica y los requisitos explican el significado
 de negocio.
+
+`Project` existe como modelo persistente y `GoodsIssue.projectId` lo referencia de
+forma opcional. El campo textual `projectNumber`, presente en salidas de materiales y
+mermas, no es una FK ni implica una relación con `Project`. De igual forma,
+`Project.client` es texto, mientras `GoodsIssue.clientId` referencia a `Client`.
+Los diagramas representan únicamente las relaciones declaradas en Prisma; los
+modelos sin FK entrantes ni salientes se identifican explícitamente en la vista ER.
 
 ## Propiedad de la información
 

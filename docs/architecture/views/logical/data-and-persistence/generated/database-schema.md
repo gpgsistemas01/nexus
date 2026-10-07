@@ -3,14 +3,23 @@
 
 Estos diagramas ER se generan desde los modelos y relaciones de
 `prisma/schema.prisma`. Se separan por área para que puedan leerse y revisarse en
-GitHub. Los atributos se distribuyen en figuras de hasta tres modelos; todas las
-relaciones, incluidas las que cruzan figuras o áreas, se muestran en la sección final.
+GitHub. Los atributos se distribuyen en figuras de hasta tres modelos. Cada figura
+incluye sus relaciones entrantes y salientes; los modelos externos aparecen sólo por
+nombre, con sus atributos en su propia figura. Todas las relaciones también se reúnen
+en la sección final.
 
 La marca `PK` identifica claves primarias, `FK` claves foráneas y `UK` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
 verdad el esquema Prisma y sus migraciones. Para consultar obligatoriedad, valores
 predeterminados y tipos de cada campo, usa el
 [diccionario técnico](data-dictionary.md).
+
+Las cardinalidades distinguen relaciones uno a muchos de relaciones uno a uno cuando
+la FK es única. El extremo del destino indica si la referencia es obligatoria
+(`||`) u opcional (`o|`); el extremo del modelo que contiene la FK indica cero o
+muchos (`o{`) o cero o uno (`o|`).
+
+Modelos sin relaciones FK entrantes ni salientes en Prisma: `ReferenceNumberCounter`.
 
 ## Identidad, acceso y auditoría
 
@@ -36,7 +45,24 @@ erDiagram
         String password
         Boolean isActive
     }
-
+    Person o|--o{ User : "person"
+    User o|--o{ CriticalWriteAudit : "actor"
+    User ||--o{ UserRoleDepartment : "user"
+    Role ||--o{ UserRoleDepartment : "role"
+    Department ||--o{ UserRoleDepartment : "department"
+    Department ||--o{ PersonRoleDepartment : "department"
+    Role ||--o{ PersonRoleDepartment : "role"
+    User ||--o{ WasteStockAdjustment : "createdBy"
+    User o|--o{ WasteStockAdjustment : "approvedBy"
+    User ||--o{ WasteStockEntry : "createdBy"
+    User ||--o{ WasteIssue : "createdBy"
+    Department ||--o{ WasteIssue : "department"
+    User o|--o{ WasteIssueReturn : "returnedBy"
+    Department ||--o{ GoodsIssue : "department"
+    User o|--o{ GoodsIssueReturn : "returnedBy"
+    User ||--o{ StockAdjustment : "createdBy"
+    User o|--o{ StockAdjustment : "approvedBy"
+    User ||--o{ GoodsReceiptDetailChange : "changedBy"
 ```
 
 ### Person · UserRoleDepartment · PersonRoleDepartment
@@ -59,7 +85,21 @@ erDiagram
         String personId PK,FK
         String roleId PK,FK
     }
+    Person o|--o{ User : "person"
+    User ||--o{ UserRoleDepartment : "user"
+    Role ||--o{ UserRoleDepartment : "role"
+    Department ||--o{ UserRoleDepartment : "department"
+    Department ||--o{ PersonRoleDepartment : "department"
     Person ||--o{ PersonRoleDepartment : "person"
+    Role ||--o{ PersonRoleDepartment : "role"
+    Person ||--o{ WasteIssue : "requester"
+    Person ||--o{ WasteIssue : "advisor"
+    Person o|--o{ Client : "advisor"
+    Person ||--o{ GoodsReceipt : "receivedBy"
+    Person o|--o{ GoodsIssue : "approver"
+    Person ||--o{ GoodsIssue : "requester"
+    Person o|--o{ GoodsIssue : "warehouseStaff"
+    Person ||--o{ GoodsIssue : "advisor"
 ```
 
 ### CriticalWriteAudit
@@ -82,7 +122,7 @@ erDiagram
         String userAgent
         DateTime createdAt
     }
-
+    User o|--o{ CriticalWriteAudit : "actor"
 ```
 
 ## Catálogos y relaciones comerciales
@@ -108,7 +148,14 @@ erDiagram
         String name
         DateTime date
     }
-
+    FulfillmentStatus ||--o{ WasteIssue : "fulfillmentStatus"
+    Status ||--o{ WasteIssue : "status"
+    FulfillmentStatus ||--o{ WasteIssueDetail : "fulfillmentStatus"
+    Status ||--o{ GoodsReceipt : "status"
+    Status ||--o{ GoodsIssue : "status"
+    Project o|--o{ GoodsIssue : "project"
+    FulfillmentStatus o|--o{ GoodsIssue : "fulfillmentStatus"
+    FulfillmentStatus ||--o{ GoodsIssueDetail : "fulfillmentStatus"
 ```
 
 ### Client · Supplier · Material
@@ -141,7 +188,24 @@ erDiagram
         Decimal height
         MaterialType type
     }
-
+    Presentation ||--o{ Material : "presentation"
+    UnitMeasure ||--o{ Material : "unitMeasure"
+    Supplier ||--o{ SupplierMaterial : "supplier"
+    Material ||--o{ SupplierMaterial : "material"
+    Supplier ||--o{ Waste : "supplier"
+    Client ||--o{ WasteIssue : "client"
+    Person o|--o{ Client : "advisor"
+    Supplier ||--o{ GoodsReceipt : "supplier"
+    Material ||--o{ GoodsReceiptDetail : "material"
+    Client ||--o{ GoodsIssue : "client"
+    Material ||--o{ GoodsIssueDetail : "material"
+    Supplier ||--o{ GoodsIssueDetail : "supplier"
+    Material ||--o{ MovementDetail : "material"
+    Supplier ||--o{ MovementDetail : "supplier"
+    Material ||--o{ StockAdjustmentDetail : "material"
+    Supplier ||--o{ StockAdjustmentDetail : "supplier"
+    Material ||--o{ GoodsReceiptDetailChange : "previousMaterial"
+    Material ||--o{ GoodsReceiptDetailChange : "correctedMaterial"
 ```
 
 ### UnitMeasure · Presentation · SupplierMaterial
@@ -170,7 +234,12 @@ erDiagram
         String supplierId FK
         String materialId FK
     }
-
+    Presentation ||--o{ Material : "presentation"
+    UnitMeasure ||--o{ Material : "unitMeasure"
+    Supplier ||--o{ SupplierMaterial : "supplier"
+    Material ||--o{ SupplierMaterial : "material"
+    Presentation ||--o{ Waste : "presentation"
+    UnitMeasure ||--o{ Waste : "unitMeasure"
 ```
 
 ### ReferenceNumberCounter
@@ -254,9 +323,20 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    Person ||--o{ GoodsReceipt : "receivedBy"
+    Supplier ||--o{ GoodsReceipt : "supplier"
+    Status ||--o{ GoodsReceipt : "status"
     GoodsReceipt ||--o{ GoodsReceiptDetail : "goodsReceipt"
+    Material ||--o{ GoodsReceiptDetail : "material"
+    GoodsReceipt o|--o{ InventoryMovement : "goodsReceipt"
+    GoodsReceiptDetail o|--o{ MovementDetail : "goodsReceiptDetail"
     GoodsReceipt ||--o{ GoodsReceiptDetailChange : "goodsReceipt"
     GoodsReceiptDetail ||--o{ GoodsReceiptDetailChange : "goodsReceiptDetail"
+    StockAdjustmentReason ||--o{ GoodsReceiptDetailChange : "reason"
+    User ||--o{ GoodsReceiptDetailChange : "changedBy"
+    Material ||--o{ GoodsReceiptDetailChange : "previousMaterial"
+    Material ||--o{ GoodsReceiptDetailChange : "correctedMaterial"
+    InventoryMovement o|--o| GoodsReceiptDetailChange : "inventoryMovement"
 ```
 
 ### GoodsIssue · GoodsIssueDetail · GoodsIssueReturn
@@ -323,9 +403,25 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    Department ||--o{ GoodsIssue : "department"
+    Person o|--o{ GoodsIssue : "approver"
+    Person ||--o{ GoodsIssue : "requester"
+    Person o|--o{ GoodsIssue : "warehouseStaff"
+    Status ||--o{ GoodsIssue : "status"
+    Project o|--o{ GoodsIssue : "project"
+    Client ||--o{ GoodsIssue : "client"
+    Person ||--o{ GoodsIssue : "advisor"
+    FulfillmentStatus o|--o{ GoodsIssue : "fulfillmentStatus"
+    Material ||--o{ GoodsIssueDetail : "material"
+    Supplier ||--o{ GoodsIssueDetail : "supplier"
     GoodsIssue ||--o{ GoodsIssueDetail : "goodsIssue"
+    FulfillmentStatus ||--o{ GoodsIssueDetail : "fulfillmentStatus"
     GoodsIssue ||--o{ GoodsIssueReturn : "goodsIssue"
     GoodsIssueDetail ||--o{ GoodsIssueReturn : "goodsIssueDetail"
+    MovementDetail o|--o| GoodsIssueReturn : "movementDetail"
+    User o|--o{ GoodsIssueReturn : "returnedBy"
+    GoodsIssue o|--o{ InventoryMovement : "goodsIssue"
+    GoodsIssueDetail o|--o{ MovementDetail : "goodsIssueDetail"
 ```
 
 ### InventoryMovement · MovementDetail · StockAdjustment
@@ -371,8 +467,21 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    StockAdjustment o|--o{ InventoryMovement : "stockAdjustment"
+    MovementDetail o|--o| GoodsIssueReturn : "movementDetail"
+    GoodsReceipt o|--o{ InventoryMovement : "goodsReceipt"
+    GoodsIssue o|--o{ InventoryMovement : "goodsIssue"
+    StockAdjustment o|--o| InventoryMovement : "stockAdjustment"
+    Material ||--o{ MovementDetail : "material"
+    Supplier ||--o{ MovementDetail : "supplier"
+    GoodsReceiptDetail o|--o{ MovementDetail : "goodsReceiptDetail"
+    GoodsIssueDetail o|--o{ MovementDetail : "goodsIssueDetail"
+    StockAdjustmentDetail o|--o{ MovementDetail : "stockAdjustmentDetail"
     InventoryMovement ||--o{ MovementDetail : "movement"
+    StockAdjustmentReason ||--o{ StockAdjustment : "reason"
+    User ||--o{ StockAdjustment : "createdBy"
+    User o|--o{ StockAdjustment : "approvedBy"
+    StockAdjustment ||--o{ StockAdjustmentDetail : "stockAdjustment"
+    InventoryMovement o|--o| GoodsReceiptDetailChange : "inventoryMovement"
 ```
 
 ### StockAdjustmentDetail · StockAdjustmentReason
@@ -402,7 +511,13 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-
+    StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
+    StockAdjustmentDetail o|--o{ MovementDetail : "stockAdjustmentDetail"
+    StockAdjustmentReason ||--o{ StockAdjustment : "reason"
+    StockAdjustment ||--o{ StockAdjustmentDetail : "stockAdjustment"
+    Material ||--o{ StockAdjustmentDetail : "material"
+    Supplier ||--o{ StockAdjustmentDetail : "supplier"
+    StockAdjustmentReason ||--o{ GoodsReceiptDetailChange : "reason"
 ```
 
 ## Mermas e inventario de merma
@@ -464,8 +579,27 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    Supplier ||--o{ Waste : "supplier"
+    Presentation ||--o{ Waste : "presentation"
+    UnitMeasure ||--o{ Waste : "unitMeasure"
+    Waste ||--o{ WasteStockAdjustmentDetail : "waste"
+    WasteIssue o|--o{ WasteMovement : "wasteIssue"
+    Waste ||--o{ WasteStockEntry : "waste"
+    Waste ||--o{ WasteMovementDetail : "waste"
+    WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
+    User ||--o{ WasteIssue : "createdBy"
+    Department ||--o{ WasteIssue : "department"
+    Person ||--o{ WasteIssue : "requester"
+    Client ||--o{ WasteIssue : "client"
+    Person ||--o{ WasteIssue : "advisor"
+    FulfillmentStatus ||--o{ WasteIssue : "fulfillmentStatus"
+    Status ||--o{ WasteIssue : "status"
     WasteIssue ||--o{ WasteIssueDetail : "wasteIssue"
     Waste ||--o{ WasteIssueDetail : "waste"
+    FulfillmentStatus ||--o{ WasteIssueDetail : "fulfillmentStatus"
+    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
+    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
+    Waste ||--o{ WasteIssueReturn : "waste"
 ```
 
 ### WasteIssueReturn · WasteMovement · WasteMovementDetail
@@ -508,8 +642,18 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    WasteMovementDetail o|--o{ WasteIssueReturn : "movementDetail"
+    WasteMovement o|--o| WasteStockAdjustment : "movement"
+    WasteIssue o|--o{ WasteMovement : "wasteIssue"
+    WasteMovement ||--o| WasteStockEntry : "movement"
+    Waste ||--o{ WasteMovementDetail : "waste"
+    WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
     WasteMovement ||--o{ WasteMovementDetail : "movement"
+    WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
+    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
+    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
+    WasteMovementDetail o|--o| WasteIssueReturn : "movementDetail"
+    User o|--o{ WasteIssueReturn : "returnedBy"
+    Waste ||--o{ WasteIssueReturn : "waste"
 ```
 
 ### WasteStockEntry · WasteStockAdjustment · WasteStockAdjustmentDetail
@@ -559,7 +703,16 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
+    User ||--o{ WasteStockAdjustment : "createdBy"
+    User o|--o{ WasteStockAdjustment : "approvedBy"
+    WasteMovement o|--o| WasteStockAdjustment : "movement"
     WasteStockAdjustment ||--o{ WasteStockAdjustmentDetail : "wasteStockAdjustment"
+    Waste ||--o{ WasteStockAdjustmentDetail : "waste"
+    Waste ||--o{ WasteStockEntry : "waste"
+    User ||--o{ WasteStockEntry : "createdBy"
+    WasteMovement ||--o| WasteStockEntry : "movement"
+    WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
 ```
 
 ## Relaciones por grupo de modelos
@@ -603,9 +756,9 @@ erDiagram
 ```mermaid
 erDiagram
     direction LR
-    Person o|--o{ Client : "advisor"
     Presentation ||--o{ Material : "presentation"
     UnitMeasure ||--o{ Material : "unitMeasure"
+    Person o|--o{ Client : "advisor"
 ```
 
 ### Catálogos y relaciones comerciales: UnitMeasure · Presentation · SupplierMaterial
@@ -633,7 +786,7 @@ erDiagram
     User ||--o{ GoodsReceiptDetailChange : "changedBy"
     Material ||--o{ GoodsReceiptDetailChange : "previousMaterial"
     Material ||--o{ GoodsReceiptDetailChange : "correctedMaterial"
-    InventoryMovement o|--o{ GoodsReceiptDetailChange : "inventoryMovement"
+    InventoryMovement o|--o| GoodsReceiptDetailChange : "inventoryMovement"
 ```
 
 ### Compras e inventario de materiales: GoodsIssue · GoodsIssueDetail · GoodsIssueReturn
@@ -656,7 +809,7 @@ erDiagram
     FulfillmentStatus ||--o{ GoodsIssueDetail : "fulfillmentStatus"
     GoodsIssue ||--o{ GoodsIssueReturn : "goodsIssue"
     GoodsIssueDetail ||--o{ GoodsIssueReturn : "goodsIssueDetail"
-    MovementDetail o|--o{ GoodsIssueReturn : "movementDetail"
+    MovementDetail o|--o| GoodsIssueReturn : "movementDetail"
     User o|--o{ GoodsIssueReturn : "returnedBy"
 ```
 
@@ -667,7 +820,7 @@ erDiagram
     direction LR
     GoodsReceipt o|--o{ InventoryMovement : "goodsReceipt"
     GoodsIssue o|--o{ InventoryMovement : "goodsIssue"
-    StockAdjustment o|--o{ InventoryMovement : "stockAdjustment"
+    StockAdjustment o|--o| InventoryMovement : "stockAdjustment"
     Material ||--o{ MovementDetail : "material"
     Supplier ||--o{ MovementDetail : "supplier"
     GoodsReceiptDetail o|--o{ MovementDetail : "goodsReceiptDetail"
@@ -714,16 +867,16 @@ erDiagram
 ```mermaid
 erDiagram
     direction LR
-    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
-    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
-    WasteMovementDetail o|--o{ WasteIssueReturn : "movementDetail"
-    User o|--o{ WasteIssueReturn : "returnedBy"
-    Waste ||--o{ WasteIssueReturn : "waste"
     WasteIssue o|--o{ WasteMovement : "wasteIssue"
     Waste ||--o{ WasteMovementDetail : "waste"
     WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
     WasteMovement ||--o{ WasteMovementDetail : "movement"
     WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
+    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
+    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
+    WasteMovementDetail o|--o| WasteIssueReturn : "movementDetail"
+    User o|--o{ WasteIssueReturn : "returnedBy"
+    Waste ||--o{ WasteIssueReturn : "waste"
 ```
 
 ### Mermas e inventario de merma: WasteStockEntry · WasteStockAdjustment · WasteStockAdjustmentDetail
@@ -731,17 +884,18 @@ erDiagram
 ```mermaid
 erDiagram
     direction LR
-    Waste ||--o{ WasteStockEntry : "waste"
-    User ||--o{ WasteStockEntry : "createdBy"
-    WasteMovement ||--o{ WasteStockEntry : "movement"
     StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
     User ||--o{ WasteStockAdjustment : "createdBy"
     User o|--o{ WasteStockAdjustment : "approvedBy"
-    WasteMovement o|--o{ WasteStockAdjustment : "movement"
+    WasteMovement o|--o| WasteStockAdjustment : "movement"
     WasteStockAdjustment ||--o{ WasteStockAdjustmentDetail : "wasteStockAdjustment"
     Waste ||--o{ WasteStockAdjustmentDetail : "waste"
+    Waste ||--o{ WasteStockEntry : "waste"
+    User ||--o{ WasteStockEntry : "createdBy"
+    WasteMovement ||--o| WasteStockEntry : "movement"
 ```
 
-Consulta el esquema Prisma para las reglas `onDelete`/`onUpdate`. Una relación puede
-aparecer con el nombre del campo inverso porque la vista se deriva de la relación Prisma;
-la dirección de lectura no implica propiedad del proceso de negocio.
+Consulta el esquema Prisma para las reglas `onDelete`/`onUpdate`. Cada asociación
+usa el nombre del campo que declara la FK en Prisma; las colecciones inversas no
+generan una segunda asociación. La dirección de lectura no implica propiedad del
+proceso de negocio.
