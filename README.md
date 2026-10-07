@@ -238,7 +238,10 @@ La sintaxis admitida para ambos procesos se concentra en la sección
 
 - `/` página de inicio.
 - `/inicio-sesion`, `/revocar-sesion`, `/cerrar-sesion` para autenticación web.
-- `/materiales`, `/mermas`, `/compras`, `/salidas-almacen`, `/proveedores` para almacén.
+- `/materiales`, `/almacen/consumibles`, `/mermas` y `/salidas-almacen` para inventario.
+- `/compras/materiales` y `/compras/consumibles` para compras separadas por contexto;
+  `/compras` redirige a `/compras/materiales`.
+- `/proveedores` para el catálogo administrativo de proveedores.
 - `/usuarios-sistemas`, `/personas`, `/movimientos` para administración.
 - `/clientes` como catálogo contextual administrado por sistemas.
 
@@ -254,10 +257,12 @@ Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json`
 - `/api/auth`
 - `/api/sales/clients`
 - `/api/sales/reports`
+- `/api/warehouse/consumables`
 - `/api/warehouse/materials`
 - `/api/warehouse/wastes`
 - `/api/warehouse/suppliers`
-- `/api/warehouse/goods-receipts`
+- `/api/warehouse/goods-receipts/materials`
+- `/api/warehouse/goods-receipts/consumables`
 - `/api/warehouse/goods-issues`
 - `/api/warehouse/notifications`
 - `/api/warehouse/reports`

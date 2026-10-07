@@ -5,7 +5,7 @@ cubre todos sus módulos propietarios de servicio, aplicación, página y EJS; l
 compartidos aparecen después en una ficha transversal. De este modo no se presenta
 materiales como si fuera el único flujo documentado ni se repite una ficha idéntica por
 cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../../../openapi/api-contract.md)
-y las páginas publicadas en el [mapa generado](../code-map.md#rutas-web-19).
+y las páginas publicadas en el [mapa generado](../code-map.md#rutas-web-21).
 
 ### Fichas de flujos funcionales
 

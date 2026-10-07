@@ -47,9 +47,9 @@ Mermaid no reproduce de forma nativa el glifo de componente, los puertos y los c
 *ball-and-socket* de UML. Esta vista usa su representación equivalente mediante
 clasificadores: `<<component>>` identifica componentes, `<<interface>>` identifica
 contratos, la realización `<|..` une una interfaz con quien la provee y la dependencia
-`..>` parte de quien la requiere. Las convenciones y el límite de esta aproximación se
-detallan en las
-[colaboraciones enfocadas por capacidad](03-component-collaborations-by-capability.md#notación-uml-adoptada-en-mermaid).
+`..>` parte de quien la requiere. Esta notación aproxima componentes y contratos con
+Mermaid; las [colaboraciones por dominio](../development/code-diagrams/04-view-structural-domains-and-collaborations.md)
+complementan la vista con las dependencias entre capas y servicios compartidos.
 
 Cada contrato que cruza las fronteras se representa por separado: HTTP web, HTTP
 estático, HTTP `/api` y Socket.IO. De este modo, agregar otra interfaz no obliga a
@@ -59,7 +59,7 @@ realizar o requerir tantas interfaces como contratos estables exponga o consuma.
 El diagrama general se complementa con [OpenAPI](../../openapi/openapi.json), las
 [secuencias por caso de uso](../processes/index.md) y el
 [patrón de componentes visuales](../development/design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md).
-Las [colaboraciones enfocadas por capacidad](03-component-collaborations-by-capability.md)
+Las [colaboraciones enfocadas por capacidad](../development/code-diagrams/04-view-structural-domains-and-collaborations.md)
 seleccionan de esta vista únicamente los componentes e interfaces necesarios cuando un
 recorrido coordina varios dominios o mecanismos de inventario; no sustituyen las
 secuencias ni duplican un diagrama por cada caso de uso.
