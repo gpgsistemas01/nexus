@@ -5,16 +5,17 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Router@{ "type": "boundary" } as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
-    participant CorrectionDto as correctionDto: Object<br/>src/dtos/goodsReceiptDTO.js
-    participant Service as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
-    participant Change as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js
-    participant Reason as src/services/warehouse/reasonService.js
-    participant Inventory as src/services/inventory/movementService.js
+    participant CorrectionDto@{ "type": "entity" } as correctionDto: Object<br/>src/dtos/goodsReceiptDTO.js
+    participant Service@{ "type": "control" } as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
+    participant Change@{ "type": "control" } as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js
+    participant Reason@{ "type": "control" } as src/services/warehouse/reasonService.js
+    participant Inventory@{ "type": "control" } as src/services/inventory/movementService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 

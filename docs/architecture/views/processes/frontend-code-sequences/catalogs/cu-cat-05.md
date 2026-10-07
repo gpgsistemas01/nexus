@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View as src/views/pages/sales/clients/clientsPage.ejs<br/>src/public/js/pages/sales/clients/clientsPage.js
-    participant Application as src/public/js/application/sales/clients/clients.js
+    participant View@{ "type": "boundary" } as src/views/pages/sales/clients/clientsPage.ejs<br/>src/public/js/pages/sales/clients/clientsPage.js
+    participant Application@{ "type": "control" } as src/public/js/application/sales/clients/clients.js
     participant Request as src/public/js/services/sales/clientService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js

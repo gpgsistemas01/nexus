@@ -5,14 +5,15 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant EJS as src/views/pages/warehouse/wastes/wastesPage.ejs
-    participant Page as src/public/js/pages/warehouse/wastes/wastesPage.js
-    participant Table as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
-    participant Modal as src/public/js/pages/warehouse/wastes/wasteStockAdditionModal.js
-    participant Form as src/public/js/pages/warehouse/wastes/wasteStockAdditionForm.js
-    participant Application as src/public/js/application/warehouse/wastes/wastes.js
+    participant EJS@{ "type": "boundary" } as src/views/pages/warehouse/wastes/wastesPage.ejs
+    participant Page@{ "type": "boundary" } as src/public/js/pages/warehouse/wastes/wastesPage.js
+    participant Table@{ "type": "boundary" } as src/public/js/plugins/datatable/warehouse/wastes/wasteDatatable.js
+    participant Modal@{ "type": "boundary" } as src/public/js/pages/warehouse/wastes/wasteStockAdditionModal.js
+    participant Form@{ "type": "boundary" } as src/public/js/pages/warehouse/wastes/wasteStockAdditionForm.js
+    participant Application@{ "type": "control" } as src/public/js/application/warehouse/wastes/wastes.js
     participant Request as src/public/js/services/warehouse/wasteService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteApiRoute.js<br/>src/controllers/api/warehouse/wasteController.js

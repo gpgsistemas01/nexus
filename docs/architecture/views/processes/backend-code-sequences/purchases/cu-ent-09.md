@@ -7,13 +7,14 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
-    participant ReceiptDto as goodsReceiptDto: Object<br/>src/dtos/goodsReceiptDTO.js
-    participant Domain as src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js
+    participant ReceiptDto@{ "type": "entity" } as goodsReceiptDto: Object<br/>src/dtos/goodsReceiptDTO.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js
     participant ErrorHandler as src/app.js
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/consumables/:id

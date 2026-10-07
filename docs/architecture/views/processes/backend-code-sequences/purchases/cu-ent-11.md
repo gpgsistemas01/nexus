@@ -7,10 +7,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/goodsReceiptApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
-    participant Domain as src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js
     participant ErrorHandler as src/app.js
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/consumables/:id/details/:detailId/cancel

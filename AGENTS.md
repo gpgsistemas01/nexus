@@ -60,6 +60,25 @@
 - Si cambian routers, imports entre áreas o Prisma, ejecuta `npm run docs:architecture` y versiona los archivos generados resultantes.
 - Si cambia comportamiento, reglas, endpoints, permisos o flujos, actualiza el artefacto curado propietario además de comprobar los documentos generados.
 
+## Diagramas y exportación
+
+- Usa Mermaid para los diagramas; no introduzcas PlantUML. Consulta los documentos propietarios y contrasta participantes, mensajes, permisos y relaciones con el código o los requisitos correspondientes.
+- Usa notación UML cuando corresponda: actores y límites del sistema en casos de uso, roles de participantes y mensajes numerados en secuencias, y relaciones y multiplicidades en clases. No inventes relaciones `include`/`extend`, composición, concurrencia o transiciones sólo para enriquecer la presentación.
+- Conserva la semántica propia de los diagramas ER y de flujo. Identifica como aproximaciones los diagramas que Mermaid no representa con notación UML completa, como despliegue.
+- Los casos de uso `usecase-beta` requieren un visor compatible con Mermaid 12. No elimines metadatos UML de participantes para adaptar el contenido a un renderizador anterior.
+- Mantén las versiones y la configuración del renderizador centralizadas en `scripts/mermaidExportUtils.js`; `scripts/prepareMermaidCli.js` comprueba su compatibilidad. Si cambian versiones o configuración, conserva su participación en la clave de caché de imágenes.
+- Al cambiar diagramas o el exportador, valida el renderizado de los diagramas afectados y una exportación representativa con `npm run docs:export -- <familia> <seccion> ambos`. Comprueba legibilidad y ausencia de recortes en DOCX/PDF; `docs:check` no sustituye esa verificación. Consulta `docs/governance/document-export-guide/03-prepare-the-tools.md` para herramientas y configuración.
+
+## Capturas del manual
+
+- La automatización de capturas no crea ni modifica registros. Las capturas de edición requieren datos existentes y permisos adecuados en una sesión del entorno de prueba; un listado vacío no demuestra por sí solo una función pendiente de implementar.
+- Ante una captura pendiente, revisa su preparación y el selector antes de cambiar código. Conserva la reanudación automática con `npm run docs:screenshots -- --area <area>` y no omitas silenciosamente una captura requerida.
+
+## Integración continua
+
+- Consulta `.github/workflows/ci.yml` como fuente de los disparadores y comprobaciones. Conserva la ejecución en los pushes a `features` y en los pull requests al modificar CI.
+- La comprobación de documentación fuera de `main` debe validar los archivos versionados; conserva la regeneración y el commit automáticos restringidos al push a `main`.
+
 ## Imports y exports
 
 - Después de agregar, eliminar, mover o renombrar código, revisa imports, exports y referencias.

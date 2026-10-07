@@ -5,11 +5,12 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js
-    participant Dialog as src/public/js/ui/reportExportDialog.js
-    participant Application as src/public/js/application/warehouse/report.js
+    participant View@{ "type": "boundary" } as src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js
+    participant Dialog@{ "type": "boundary" } as src/public/js/ui/reportExportDialog.js
+    participant Application@{ "type": "control" } as src/public/js/application/warehouse/report.js
     participant Request as src/public/js/services/warehouse/reportService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js

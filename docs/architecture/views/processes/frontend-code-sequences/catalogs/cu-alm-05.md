@@ -5,12 +5,13 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant EJS as src/views/pages/warehouse/materials/materialsPage.ejs
-    participant Form as src/public/js/pages/warehouse/materials/materialForm.js
-    participant App as src/public/js/application/warehouse/materials/materials.js
-    participant Factory as src/public/js/application/createCrudApplication.js
+    participant EJS@{ "type": "boundary" } as src/views/pages/warehouse/materials/materialsPage.ejs
+    participant Form@{ "type": "boundary" } as src/public/js/pages/warehouse/materials/materialForm.js
+    participant App@{ "type": "control" } as src/public/js/application/warehouse/materials/materials.js
+    participant Factory@{ "type": "control" } as src/public/js/application/createCrudApplication.js
     participant Request as src/public/js/services/warehouse/materialService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/warehouse/materialController.js

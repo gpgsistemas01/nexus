@@ -4,7 +4,7 @@
 operaciones equivalentes a través de las capas?
 
 ```mermaid
-flowchart LR
+flowchart TB
     list["1 · Consulta"] --> create["2 · Creación"]
     create --> update["3 · Actualización general"]
     update --> specialized["4 · Actualizaciones especializadas<br/>encabezado · detalles · devolución"]

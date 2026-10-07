@@ -10,7 +10,7 @@ puntos reutilizados sólo cuando el router o servicio los configura. El recorrid
 durable después de una mutación exitosa.
 
 ```mermaid
-flowchart LR
+flowchart TB
     browser["Navegador"] --> webRoute["Ruta web"]
     webRoute --> ejs["Página EJS y componentes shared"]
     ejs --> client["Aplicación y plugins del navegador"]

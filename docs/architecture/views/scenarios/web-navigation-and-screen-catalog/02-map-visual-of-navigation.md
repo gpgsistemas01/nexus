@@ -29,15 +29,15 @@ stateDiagram-v2
     state "Cerrar sesión<br/>/cerrar-sesion" as Logout
     state "No encontrada<br/>/error/404" as NotFound
 
-    Root --> Login: sin sesión
-    Root --> Authenticated: con sesión
-    Login --> Authenticated: credenciales válidas
-    Authenticated --> Refresh: token vencido
-    Refresh --> Authenticated: renovación válida
-    Refresh --> Login: renovación inválida
+    Root --> Login: abrir [sesión ausente] / mostrar inicio de sesión
+    Root --> Authenticated: abrir [sesión válida] / mostrar área
+    Login --> Authenticated: iniciar sesión [credenciales válidas] / autenticar
+    Authenticated --> Refresh: solicitar recurso [token vencido] / renovar sesión
+    Refresh --> Authenticated: renovar [token válido] / restablecer sesión
+    Refresh --> Login: renovar [token inválido] / solicitar autenticación
     Authenticated --> Logout: solicitud POST
     Logout --> Login: sesión cerrada
-    Authenticated --> NotFound: URL inexistente o acceso denegado
+    Authenticated --> NotFound: navegar [ruta inexistente o acceso denegado] / mostrar error
     NotFound --> Root: volver al inicio
 ```
 
@@ -49,7 +49,7 @@ Los accesos independientes de administración, movimientos, clientes, proveedore
 catálogos auxiliares no forman parte de este recorrido.
 
 ```mermaid
-flowchart TB
+flowchart LR
     actor["Personal de almacén"] --> menu(["Menú principal"])
     menu --> warehouse(["Almacén"])
     warehouse -->|"materials:read"| materials["Materiales<br/>/almacen/materiales"]
@@ -70,7 +70,7 @@ leerse sin depender del mapa anterior; las etiquetas reproducen el permiso compr
 por el menú compartido para mostrar cada opción.
 
 ```mermaid
-flowchart TB
+flowchart LR
     actor["Administrador del sistema"] --> menu(["Menú principal"])
     menu --> warehouse(["Almacén"])
     warehouse -->|"materials:read"| materials["Materiales<br/>/almacen/materiales"]

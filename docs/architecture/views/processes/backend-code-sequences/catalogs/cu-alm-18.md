@@ -5,71 +5,72 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/consumableApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/materialValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/consumableApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/materialValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/consumableController.js
-    participant MaterialDto as materialDto: Object<br/>src/dtos/materialDTO.js
-    participant Domain as src/services/warehouse/consumables/consumableService.js
-    participant Helpers as src/services/warehouse/materials/materialHelpers.js
-    participant Relations as src/services/warehouse/materials/materialRelations.js
-    participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
-    participant Reason as src/services/warehouse/reasonService.js
-    participant Adjustment as src/services/warehouse/adjustmentService.js
+    participant MaterialDto@{ "type": "entity" } as materialDto: Object<br/>src/dtos/materialDTO.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/consumables/consumableService.js
+    participant MaterialService@{ "type": "control" } as src/services/warehouse/materials/materialService.js
+    participant Helpers@{ "type": "control" } as src/services/warehouse/materials/materialHelpers.js
+    participant Relations@{ "type": "control" } as src/services/warehouse/materials/materialRelations.js
+    participant SupplierMaterial@{ "type": "control" } as src/services/warehouse/materials/supplierMaterialService.js
+    participant Reason@{ "type": "control" } as src/services/warehouse/reasonService.js
+    participant Adjustment@{ "type": "control" } as src/services/warehouse/adjustmentService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 
-    Client->>Route: POST /api/warehouse/consumables { req.body }
+    Client->>Route: POST /api/warehouse/consumables
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     Auth->>Validator: materialValidation[] y validate(req, res, next)
     Validator->>Auth: authorizeUserApi(PERMISSIONS.MATERIALS_WRITE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else materialValidation rechaza req.body según creationContext
+    alt [autenticación, validación o permiso rechazados]
+        Auth-->>Client: HTTP 401/403 { code, message }
         Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.MATERIALS_WRITE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
+    else [pipeline aceptado]
         Route->>Controller: registerConsumable(req, res)
         Controller->>MaterialDto: createMaterialDtoForRegister(req.body)
-        alt req.body.creationContext es goodsReceipt
-            MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
-        else Alta directa de consumible
-            MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
-        end
+        MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
         Controller->>Controller: sanitizeEmptyStrings(materialDto)
-        Controller->>Domain: createConsumable({ consumableDto: sanitizedMaterialDto, userId: req.user.id })
-        activate Domain
-        Domain->>Prisma: getDb().$transaction(async tx => ...)
-        Domain->>Helpers: prepareConsumibleData({ tx, materialDto: consumibleData })
-        Helpers-->>Domain: prepareConsumibleData(): Promise[Object ({ rest, relations })]
-        Domain->>Prisma: tx.material.findFirst({ identidad })
-        alt Identidad existente
-            Domain->>Prisma: tx.supplierMaterial.findUnique({ supplierId_materialId })
-            break Relación con el proveedor ya existente
-                Domain-->>Controller: throw ConsumibleAlreadyExists
+        Controller->>Domain: createConsumable({ consumableDto, userId })
+        Domain->>MaterialService: createMaterial({ materialDto: dimensiones nulas, type: CONSUMABLE, userId })
+        activate MaterialService
+        MaterialService->>Prisma: getDb().$transaction(async tx => ...)
+        MaterialService->>Helpers: prepareMaterialData({ tx, materialDto })
+        Helpers-->>MaterialService: prepareMaterialData(): Promise[Object ({ rest, relations })]
+        MaterialService->>MaterialService: findMaterialByIdentity({ tx, rest, relations })
+        MaterialService->>Prisma: tx.material.findFirst({ where: identidad CONSUMABLE })
+        alt [identidad existente]
+            MaterialService->>Prisma: tx.supplierMaterial.findUnique({ where: supplierId_materialId })
+            break [oferta duplicada]
+                MaterialService-->>Domain: throw MaterialAlreadyExists y rollback
             end
-        else Identidad nueva
-            Domain->>Prisma: tx.material.create({ data: buildConsumibleData(...) })
-            Prisma-->>Domain: create(): Promise[{ id: number }]
+        else [identidad nueva]
+            MaterialService->>Prisma: tx.material.create({ data: buildMaterialData({ rest, relations }) })
+            Prisma-->>MaterialService: create(): Promise[{ id: string }]
         end
-        Domain->>Relations: syncSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
-        opt Alta directa con newStock
-            Domain->>Reason: findInitialStockAdjustmentReason({ tx })
-            Reason-->>Domain: findInitialStockAdjustmentReason(): Promise[Object]
-            Domain->>Adjustment: createStockAdjustment({ tx, materialId, supplierId, reasonId, observations, newStock, userId })
+        MaterialService->>Relations: syncSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
+        opt [newStock definido]
+            MaterialService->>Reason: findInitialStockAdjustmentReason({ tx })
+            Reason-->>MaterialService: findInitialStockAdjustmentReason(): Promise[Object]
+            MaterialService->>Adjustment: createStockAdjustment({ tx, materialId, supplierId, reasonId, observations, newStock, userId })
         end
-        Domain->>SupplierMaterial: findSupplierMaterialByIds({ tx, materialId, supplierId })
-        SupplierMaterial-->>Domain: findSupplierMaterialByIds(): Promise[SupplierMaterial]
-        Prisma-->>Domain: commit
-        Domain-->>Controller: createConsumable(): Promise[SupplierMaterial]
-        Controller-->>Client: HTTP 200 { material: supplierMaterial, code }
-        opt AppError o error de persistencia
+        MaterialService->>SupplierMaterial: findSupplierMaterialByIds({ tx, materialId, supplierId })
+        SupplierMaterial-->>MaterialService: findSupplierMaterialByIds(): Promise[SupplierMaterial]
+        alt [transacción confirmada]
+            Prisma-->>MaterialService: commit
+            MaterialService-->>Domain: createMaterial(): Promise[SupplierMaterial]
+            Domain-->>Controller: createConsumable(): Promise[SupplierMaterial]
+            Controller-->>Client: HTTP 200 { material: supplierMaterial, code }
+        else [error de dominio o persistencia]
+            Prisma-->>MaterialService: rollback
+            MaterialService-->>Domain: throw AppError
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }
             Controller->>ErrorHandler: next(error)
             ErrorHandler-->>Client: HTTP error { code, message, meta }
         end
-        deactivate Domain
+        deactivate MaterialService
     end
 ```

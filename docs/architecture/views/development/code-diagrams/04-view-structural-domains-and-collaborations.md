@@ -2,33 +2,43 @@
 
 Este diagrama responde qué dominios de transporte coordinan servicios compartidos. No
 muestra cada import; para ello se usa el grafo generado de dependencias entre áreas. Los
-subgrafos hacen visible el patrón **Monolito modular** y las flechas internas respetan la
+espacios de nombres hacen visible el patrón **Monolito modular** y las dependencias UML discontinuas respetan la
 **arquitectura por capas** sin presentar cada carpeta como un servicio desplegable.
 
 ```mermaid
-flowchart LR
-    subgraph admin["admin"]
-        adminRoutes["Rutas y controllers<br/>usuarios · personas · movimientos · reportes"]
-        adminServices["Servicios<br/>personas · usuarios · roles · departamentos"]
-        adminRoutes --> adminServices
-    end
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction LR
+    namespace Admin {
+        class AdminTransport { <<module>> }
+        class AdminServices { <<service>> }
+    }
+    namespace Sales {
+        class SalesTransport { <<module>> }
+        class ClientService { <<service>> }
+    }
+    namespace Warehouse {
+        class WarehouseTransport { <<module>> }
+        class CatalogServices { <<service>> }
+        class DocumentServices { <<service>> }
+    }
+    class InventoryServices { <<service>> }
+    class DocumentReference { <<service>> }
 
-    subgraph sales["sales"]
-        salesRoutes["Rutas y controllers<br/>clientes · reportes"]
-        salesServices["Servicio de clientes"]
-        salesRoutes --> salesServices
-    end
-
-    subgraph warehouse["warehouse"]
-        warehouseRoutes["Rutas y controllers<br/>catálogos · entradas · salidas · reportes"]
-        catalogServices["Servicios de catálogo<br/>material · proveedor · merma"]
-        documentServices["Servicios documentales<br/>entrada · salida material · salida merma"]
-        warehouseRoutes --> catalogServices
-        warehouseRoutes --> documentServices
-    end
-
-    documentServices --> inventory["Servicios compartidos de inventario<br/>stock · movimiento · consulta"]
-    catalogServices --> inventory
-    documentServices --> reference["Referencia documental"]
-    adminRoutes --> inventory
+    AdminTransport ..> AdminServices : coordina
+    SalesTransport ..> ClientService : coordina
+    WarehouseTransport ..> CatalogServices : coordina
+    WarehouseTransport ..> DocumentServices : coordina
+    DocumentServices ..> InventoryServices : usa
+    CatalogServices ..> InventoryServices : usa
+    DocumentServices ..> DocumentReference : usa
+    AdminTransport ..> InventoryServices : consulta
 ```
+
+Los clasificadores representan módulos funcionales, no clases JavaScript.
+`«module»` y `«service»` son estereotipos descriptivos locales; `..>` indica
+dependencia y no orden temporal ni herencia.

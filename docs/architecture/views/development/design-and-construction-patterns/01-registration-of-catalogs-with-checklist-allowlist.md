@@ -152,11 +152,12 @@ y el servicio HTTP sólo sustituye método, URL y payload según la acción eleg
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Admin as Administrador
-    participant Page as src/public/js/pages/admin/catalogs/catalogsPage.js
-    participant Table as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
-    participant Form as src/public/js/pages/admin/catalogs/catalogForm.js<br/>src/public/js/pages/admin/catalogs/catalogModal.js
-    participant FrontApp as src/public/js/application/admin/catalogs/catalogs.js<br/>src/public/js/application/createCrudApplication.js
+    participant Page@{ "type": "boundary" } as src/public/js/pages/admin/catalogs/catalogsPage.js
+    participant Table@{ "type": "boundary" } as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Form@{ "type": "boundary" } as src/public/js/pages/admin/catalogs/catalogForm.js<br/>src/public/js/pages/admin/catalogs/catalogModal.js
+    participant FrontApp@{ "type": "control" } as src/public/js/application/admin/catalogs/catalogs.js<br/>src/public/js/application/createCrudApplication.js
     participant Http as src/public/js/services/admin/catalogService.js
     participant Api as API administrativa de catálogos
 
@@ -198,11 +199,12 @@ Prisma permitido.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/catalogApiRoute.js
-    participant Validation as src/middleware/authMiddleware.js<br/>src/middleware/validatorMiddleware.js<br/>src/validators/forms/catalogValidations.js
-    participant Controller as src/controllers/api/admin/catalogController.js
-    participant BackService as src/services/admin/catalogService.js<br/>src/constants/catalogs.js
+    participant Route@{ "type": "boundary" } as src/routes/api/admin/catalogApiRoute.js
+    participant Validation@{ "type": "control" } as src/middleware/authMiddleware.js<br/>src/middleware/validatorMiddleware.js<br/>src/validators/forms/catalogValidations.js
+    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
+    participant BackService@{ "type": "control" } as src/services/admin/catalogService.js<br/>src/constants/catalogs.js
     participant Db as Prisma / PostgreSQL
 
     Client->>Route: GET, POST o PUT /api/admin/catalogs/:catalog

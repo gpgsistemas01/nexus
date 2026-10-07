@@ -5,12 +5,13 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant Origin as src/public/js/pages/warehouse/suppliers/suppliersPage.js<br/>src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
+    participant Origin@{ "type": "boundary" } as src/public/js/pages/warehouse/suppliers/suppliersPage.js<br/>src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
     participant Select as src/public/js/plugins/select2/domains/supplier.js
-    participant View as src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>src/public/js/pages/warehouse/suppliers/supplierForm.js
-    participant Application as src/public/js/application/warehouse/suppliers/suppliers.js
+    participant View@{ "type": "boundary" } as src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>src/public/js/pages/warehouse/suppliers/supplierForm.js
+    participant Application@{ "type": "control" } as src/public/js/application/warehouse/suppliers/suppliers.js
     participant Request as src/public/js/services/warehouse/supplierService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js

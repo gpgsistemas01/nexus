@@ -5,18 +5,19 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/warehouse/consumables/consumableDatatable.js
-    participant RowAdapter as src/public/js/plugins/datatable/warehouse/materials/materialRow.js
-    participant Application as src/public/js/application/warehouse/consumables/consumables.js
+    participant View@{ "type": "boundary" } as src/public/js/plugins/datatable/warehouse/consumables/consumableDatatable.js
+    participant RowAdapter@{ "type": "boundary" } as src/public/js/plugins/datatable/warehouse/materials/materialRow.js
+    participant Application@{ "type": "control" } as src/public/js/application/warehouse/consumables/consumables.js
     participant Request as src/public/js/services/warehouse/consumableService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/consumableApiRoute.js<br/>src/controllers/api/warehouse/consumableController.js
 
     Initiator->>Browser: inicia CU-ALM-17 — Consultar consumibles
-    Browser->>View: consumablesPage inicializa el DataTable de inventario
-    View->>Application: getAllConsumables({ params })
+    Browser->>View: createConsumableDatatable(context)
+    View->>Application: getAllConsumables(params)
     Application->>Request: getAllConsumablesRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })

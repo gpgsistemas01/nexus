@@ -10,23 +10,24 @@ web independiente de clientes.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/goodsIssueApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/goodsIssueValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/goodsIssueApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/goodsIssueValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssueController.js
-    participant IssueDto as goodsIssueDto: Object<br/>src/dtos/goodsIssueDTO.js
-    participant Domain as src/services/warehouse/goodsIssues/goodsIssueService.js
-    participant Header as src/services/warehouse/issues/issueHeaderService.js
-    participant Person as src/services/admin/person/personService.js
-    participant ClientData as src/services/sales/clientService.js
-    participant Department as src/services/admin/departmentService.js
-    participant AdvisorRule as src/services/admin/person/personRules.js
-    participant Fulfillment as src/services/warehouse/fulfillmentStatusService.js
-    participant DetailBuilder as src/services/warehouse/goodsIssues/goodsIssueHelpers.js
-    participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
-    participant Stock as src/services/inventory/stockHelpers.js
-    participant Reference as src/services/document/referenceNumberService.js
+    participant IssueDto@{ "type": "entity" } as goodsIssueDto: Object<br/>src/dtos/goodsIssueDTO.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/goodsIssues/goodsIssueService.js
+    participant Header@{ "type": "control" } as src/services/warehouse/issues/issueHeaderService.js
+    participant Person@{ "type": "control" } as src/services/admin/person/personService.js
+    participant ClientData@{ "type": "control" } as src/services/sales/clientService.js
+    participant Department@{ "type": "control" } as src/services/admin/departmentService.js
+    participant AdvisorRule@{ "type": "control" } as src/services/admin/person/personRules.js
+    participant Fulfillment@{ "type": "control" } as src/services/warehouse/fulfillmentStatusService.js
+    participant DetailBuilder@{ "type": "control" } as src/services/warehouse/goodsIssues/goodsIssueHelpers.js
+    participant SupplierMaterial@{ "type": "control" } as src/services/warehouse/materials/supplierMaterialService.js
+    participant Stock@{ "type": "control" } as src/services/inventory/stockHelpers.js
+    participant Reference@{ "type": "control" } as src/services/document/referenceNumberService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 

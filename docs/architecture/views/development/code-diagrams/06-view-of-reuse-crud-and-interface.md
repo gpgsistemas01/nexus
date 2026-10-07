@@ -1,8 +1,8 @@
 # 6. Diagramas de reutilización: CRUD e interfaz
 
 El primer diagrama evita representar cliente, proveedor, material, consumible o merma como implementaciones
-aisladas cuando el código ya ofrece piezas comunes. Una flecha discontinua significa que
-el recurso configura o consume el componente, no que todos tengan idénticas reglas. Se
+aisladas cuando el código ya ofrece piezas comunes. Una dependencia UML discontinua apunta desde
+el consumidor hacia la pieza que configura o consume, no que todos tengan idénticas reglas. Se
 aplican **Factory functions** y **composición sobre herencia**: el recurso inyecta su
 configuración y conserva localmente sus reglas de dominio.
 
@@ -10,20 +10,44 @@ configuración y conserva localmente sus reglas de dominio.
 configurarse o componerse antes de implementar otra variante?
 
 ```mermaid
-flowchart TB
-    crudFactory["createCrudApplication"] -.-> catalogApps["Aplicaciones CRUD de catálogo"]
-    listFactory["createDataTableListController"] -.-> listControllers["Controllers de listado"]
-    sharedForms["Vistas shared/forms"] -.-> catalogPages["Páginas de catálogo y documentos"]
-    dataTable["Plugins DataTable compartidos"] -.-> catalogApps
-    select2["Select2 base y dominios"] -.-> catalogApps
-    inventoryUi["inventorySelectUI y utilidades de inventario"] -.-> materialFlow["Flujo de material"]
-    inventoryUi -.-> consumableFlow["Flujo de consumible"]
-    inventoryUi -.-> wasteFlow["Flujo de merma"]
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction LR
+    namespace Aplicaciones {
+        class CrudFactory { <<factory>> }
+        class CatalogApplications { <<module>> }
+        class ResourceRules { <<policy>> }
+    }
+    namespace Listados {
+        class ListControllerFactory { <<factory>> }
+        class ListControllers { <<module>> }
+    }
+    namespace Formularios {
+        class SharedForms { <<boundary>> }
+        class CatalogPages { <<boundary>> }
+        class DataTablePlugins { <<component>> }
+        class Select2Plugins { <<component>> }
+    }
+    namespace Inventario {
+        class MaterialFlow { <<module>> }
+        class ConsumableFlow { <<module>> }
+        class WasteFlow { <<module>> }
+        class InventoryUI { <<component>> }
+    }
 
-    catalogApps --> resourceRules{"Reglas del recurso"}
-    resourceRules --> identity["Identidad y relaciones"]
-    resourceRules --> removal["Eliminar, activar o desactivar"]
-    resourceRules --> permissions["Permiso y validación"]
+    CatalogApplications ..> CrudFactory : configura createCrudApplication
+    ListControllers ..> ListControllerFactory : inyecta consulta
+    CatalogPages ..> SharedForms : reutiliza
+    CatalogApplications ..> ResourceRules : conserva reglas del recurso
+    CatalogPages ..> DataTablePlugins : usa
+    CatalogPages ..> Select2Plugins : usa
+    MaterialFlow ..> InventoryUI : usa
+    ConsumableFlow ..> InventoryUI : usa
+    WasteFlow ..> InventoryUI : usa
 ```
 
 La diferencia de contexto se conserva en configuraciones, validadores y servicios de
@@ -48,41 +72,47 @@ abstracción para sus consumidores actuales:
 compartidas a los módulos de dominio que las aplican actualmente?
 
 ```mermaid
-flowchart LR
-    subgraph shared["Piezas comunes"]
-        crud["createCrudApplication"]
-        issue["createIssueApplication"]
-        list["createDataTableListController"]
-        report["createReportApplication"]
-    end
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction LR
+    namespace Shared {
+        class CrudFactory { <<factory>> }
+        class IssueFactory { <<factory>> }
+        class ListFactory { <<factory>> }
+        class ReportFactory { <<factory>> }
+    }
+    namespace DomainAdapters {
+        class CrudModules { <<module>> }
+        class IssueModules { <<module>> }
+        class ListControllers { <<module>> }
+        class ReportModules { <<module>> }
+    }
+    class CrudOperations { <<interface>> }
+    class IssueOperations { <<interface>> }
+    class TableResponse { <<interface>> }
+    class ReportDownload { <<interface>> }
 
-    subgraph adapters["Configuración por dominio"]
-        crudModules["persons · users · clients · suppliers<br/>materials · consumables · wastes · goodsReceipts · admin/catalogs"]
-        issueModules["goodsIssues · wasteIssues"]
-        listControllers["role · department · reason<br/>fulfillmentStatus · presentation · unitMeasure"]
-        reportModules["admin/report · sales/report · warehouse/report"]
-    end
-
-    subgraph results["Aplicación observable"]
-        crudContract["CRUD con nombres y requests del recurso"]
-        issueContract["CRUD compuesto con encabezado,<br/>detalles y devolución"]
-        listContract["Respuesta DataTable uniforme"]
-        reportContract["Descarga de archivo uniforme"]
-    end
-
-    crud -. configura .-> crudModules --> crudContract
-    crud -. compone .-> issue
-    issue -. configura .-> issueModules --> issueContract
-    list -. inyecta consulta .-> listControllers --> listContract
-    report -. inyecta request .-> reportModules --> reportContract
+    CrudModules ..> CrudFactory : configura requests
+    IssueFactory ..> CrudFactory : compone operaciones
+    IssueModules ..> IssueFactory : configura detalles
+    ListControllers ..> ListFactory : inyecta consulta
+    ReportModules ..> ReportFactory : inyecta request
+    CrudOperations <|.. CrudModules : expone
+    IssueOperations <|.. IssueModules : expone
+    TableResponse <|.. ListControllers : expone
+    ReportDownload <|.. ReportModules : expone
 ```
 
-Este diagrama se lee de izquierda a derecha: la pieza común concentra el mecanismo,
-el módulo intermedio inyecta dependencias y conserva nombres del dominio, y el último
-nodo muestra el contrato que reciben sus consumidores. Las líneas discontinuas expresan
-configuración o composición; las continuas, el resultado que expone cada adaptador. Así
-se puede localizar una reutilización concreta sin interpretar que todos los dominios
-comparten sus reglas.
+Los espacios de nombres agrupan factories y adaptadores. `..>` apunta del consumidor
+hacia la dependencia; `<|..` expresa realización del contrato expuesto. Los contratos
+son interfaces conceptuales de módulos ES, no declaraciones de clases JavaScript.
+La composición de operaciones se expresa como dependencia: no se agrega un rombo de
+propiedad si el código sólo reutiliza una factory. `«factory»` y `«module»` son
+estereotipos descriptivos locales.
 
 | Aplicación observada | Cómo se materializa | Evidencia que debe revisarse al cambiarla |
 | --- | --- | --- |

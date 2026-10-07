@@ -64,9 +64,9 @@ stateDiagram-v2
     Consulta --> CambioPassword: seleccionar acción de contraseña
     Edicion --> Enviando: editUser
     CambioPassword --> Enviando: editUserPassword
-    Enviando --> Consulta: respuesta exitosa
-    Enviando --> Edicion: error al editar
-    Enviando --> CambioPassword: error de contraseña
+    Enviando --> Consulta: recibir [HTTP exitoso] / refrescar consulta
+    Enviando --> Edicion: recibir [error de edición] / conservar formulario
+    Enviando --> CambioPassword: recibir [error de contraseña] / conservar formulario
 ```
 
 **Estado técnico complementario:** `DIA-FE-TEC-EST-CU-ALM-05`. Representa el ciclo
@@ -76,9 +76,9 @@ del modo de ajuste sin atribuir al navegador la validación definitiva del stock
 stateDiagram-v2
     [*] --> Consulta
     Consulta --> Ajuste: abrir material en modo stock
-    Ajuste --> Invalido: validación visual fallida
+    Ajuste --> Invalido: validar [datos inválidos] / mostrar errores
     Invalido --> Ajuste: corregir formulario
     Ajuste --> Enviando: confirmar ajuste
-    Enviando --> Consulta: PATCH exitoso y onSave
-    Enviando --> Ajuste: error normalizado
+    Enviando --> Consulta: recibir [PATCH exitoso] / ejecutar onSave
+    Enviando --> Ajuste: recibir [request rechazado] / mostrar error
 ```

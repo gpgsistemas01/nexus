@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View as src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs
-    participant Application as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
+    participant View@{ "type": "boundary" } as src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs
+    participant Application@{ "type": "control" } as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
     participant Request as src/public/js/services/warehouse/goodsReceiptService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>src/controllers/api/warehouse/goodsReceiptController.js

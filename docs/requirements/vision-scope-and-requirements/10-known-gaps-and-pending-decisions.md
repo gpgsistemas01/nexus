@@ -2,10 +2,14 @@
 
 1. **Proyectos sin CRUD.** `Project` participa en salidas, pero no tiene
    rutas ni servicio de administración. Debe definirse su fuente de datos y responsable.
-2. **Catálogos parcialmente administrables.** Estados, roles, departamentos,
-   presentaciones, unidades, motivos y estados de surtido se consultan, pero no todos
-   tienen mantenimiento desde la aplicación. Debe decidirse cuáles son datos maestros
-   administrados y cuáles pertenecen exclusivamente al seed.
+2. **Brecha de administración de catálogos resuelta.** Áreas, roles,
+   presentaciones, unidades de medida, motivos de ajuste y estados de cumplimiento
+   permiten consulta, alta, edición y cambio de estado desde la administración
+   compartida, protegida por `catalogs:manage`. El alcance está definido en
+   [la SRS de catálogos](../requirements-specification/04-unified-catalog-by-scope/02-catalogs-operational-and-commercial.md)
+   (`RF-CAT-019` a `RF-CAT-024`); la lista de recursos administrables permanece
+   restringida en `src/constants/catalogs.js`. Los demás estados técnicos no se
+   consideran catálogos administrables dentro del alcance vigente.
 3. **Auditoría incompleta.** Algunos hechos registran `User` creador/aprobador, mientras
    otros solo conservan una `Person` participante o marcas de tiempo. La ampliación de
    auditoría está detallada en `docs/architecture/views/logical/02-identity-access-and-audit.md`.

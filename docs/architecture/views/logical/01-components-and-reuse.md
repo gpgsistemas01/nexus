@@ -6,41 +6,90 @@ un caso de uso; esos recorridos pertenecen a la [vista de procesos](../processes
 
 ## Componentes y dependencias
 
-**Diagrama de componentes C4:** `DIA-ARQ-CMP-001`.
+**Componentes y contratos con clasificadores UML en Mermaid:** `DIA-ARQ-CMP-001`.
+
+### Contratos HTTP entre frontend y backend
 
 ```mermaid
-C4Component
-    title Componentes de Nexus y sus dependencias
-
-    Container_Boundary(frontend, "Frontend · navegador") {
-        Component(visual, "Interfaz visual", "EJS · public/js/ui", "Páginas, formularios, modales y tablas")
-        Component(application, "Aplicación frontend", "application/<dominio>", "Coordina la interfaz por dominio")
-        Component(http, "Cliente HTTP", "services/<dominio> · Axios", "Consume la API operacional")
-        Component(socketClient, "Cliente de eventos", "Socket.IO · CustomEvent", "Recibe notificaciones de inventario")
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction TB
+    namespace Navegador {
+        class Visual { <<component>> }
+        class Application { <<component>> }
+        class HttpClient { <<component>> }
     }
-
-    Container_Boundary(server, "Backend · Node.js / Express") {
-        Component(web, "Web MVC", "routes/web · controllers/web · EJS", "Entrega navegación y HTML")
-        Component(static, "Archivos estáticos", "express.static", "Entrega JavaScript y CSS")
-        Component(api, "API operacional", "routes/api · middleware · controllers/api · DTO", "Expone operaciones HTTP")
-        Component(domain, "Servicios de dominio", "auth · admin · sales · warehouse", "Concentra reglas y transacciones")
-        Component(shared, "Servicios compartidos", "auditoría · documentos · inventario", "Reutiliza capacidades entre dominios")
-        Component(persistence, "Persistencia", "repositories · Prisma", "Accede al modelo persistente")
-        Component(events, "Publicador de eventos", "Socket.IO", "Publica notificaciones no durables")
+    namespace Backend {
+        class WebMVC { <<component>> }
+        class StaticFiles { <<component>> }
+        class OperationalAPI { <<component>> }
     }
+    class WebHTTP { <<interface>> }
+    class StaticHTTP { <<interface>> }
+    class ApiHTTP { <<interface>> }
 
-    Rel(visual, application, "usa")
-    Rel(application, http, "usa")
-    Rel(socketClient, visual, "notifica mediante CustomEvent")
-    Rel(visual, web, "requiere navegación y HTML", "HTTP web")
-    Rel(visual, static, "requiere módulos y estilos", "HTTP estático")
-    Rel(http, api, "consume", "HTTP /api")
-    Rel(api, domain, "delega en")
-    Rel(domain, shared, "reutiliza")
-    Rel(domain, persistence, "depende de")
-    Rel(shared, persistence, "depende de")
-    Rel(api, events, "solicita publicación")
-    Rel(socketClient, events, "se suscribe", "Socket.IO")
+    Visual ..> Application : usa
+    Application ..> HttpClient : usa
+    Visual ..> WebHTTP : requiere HTML
+    WebHTTP <|.. WebMVC : provee
+    Visual ..> StaticHTTP : requiere módulos y estilos
+    StaticHTTP <|.. StaticFiles : provee
+    HttpClient ..> ApiHTTP : requiere JSON y archivos
+    ApiHTTP <|.. OperationalAPI : provee
+```
+
+### Colaboración interna del backend
+
+`OperationalAPI` corresponde al proveedor de la interfaz HTTP de la figura anterior.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction TB
+    class OperationalAPI { <<component>> }
+    class DomainServices { <<component>> }
+    class SharedServices { <<component>> }
+    class Persistence { <<component>> }
+    OperationalAPI ..> DomainServices : delega
+    DomainServices ..> SharedServices : reutiliza
+    DomainServices ..> Persistence : persiste
+    SharedServices ..> Persistence : persiste
+```
+
+### Canal de eventos
+
+Esta figura separa Socket.IO de las peticiones HTTP para conservar legibilidad.
+`OperationalAPI` y `Visual` son los mismos componentes de la figura anterior.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction TB
+    namespace Navegador {
+        class EventClient { <<component>> }
+        class Visual { <<component>> }
+    }
+    namespace Backend {
+        class OperationalAPI { <<component>> }
+        class EventPublisher { <<component>> }
+    }
+    class SocketEvents { <<interface>> }
+    OperationalAPI ..> EventPublisher : publica después de escribir
+    SocketEvents <|.. EventPublisher : provee
+    EventClient ..> SocketEvents : se suscribe
+    EventClient ..> Visual : notifica mediante CustomEvent
 ```
 
 Mermaid no reproduce de forma nativa el glifo de componente, los puertos y los conectores

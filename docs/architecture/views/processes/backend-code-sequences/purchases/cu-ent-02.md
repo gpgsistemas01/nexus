@@ -10,20 +10,21 @@ independiente de proveedores.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Browser as Navegador
-    participant Router as src/routes/api/warehouse/goodsReceiptApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Router@{ "type": "boundary" } as src/routes/api/warehouse/goodsReceiptApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
-    participant ReceiptDto as goodsReceiptDto: Object<br/>src/dtos/goodsReceiptDTO.js
-    participant Service as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
-    participant Supplier as src/services/warehouse/supplierService.js
-    participant Invoice as src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js
-    participant Person as src/services/admin/person/personService.js
-    participant DetailBuilder as src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js
-    participant Reference as src/services/document/referenceNumberService.js
-    participant Inventory as src/services/inventory/movementService.js
-    participant Material as src/services/warehouse/materials/supplierMaterialService.js
+    participant ReceiptDto@{ "type": "entity" } as goodsReceiptDto: Object<br/>src/dtos/goodsReceiptDTO.js
+    participant Service@{ "type": "control" } as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
+    participant Supplier@{ "type": "control" } as src/services/warehouse/supplierService.js
+    participant Invoice@{ "type": "control" } as src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js
+    participant Person@{ "type": "control" } as src/services/admin/person/personService.js
+    participant DetailBuilder@{ "type": "control" } as src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js
+    participant Reference@{ "type": "control" } as src/services/document/referenceNumberService.js
+    participant Inventory@{ "type": "control" } as src/services/inventory/movementService.js
+    participant Material@{ "type": "control" } as src/services/warehouse/materials/supplierMaterialService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
     participant ErrorHandler as src/app.js

@@ -5,18 +5,19 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Router as src/routes/api/warehouse/materialApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/materialValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Router@{ "type": "boundary" } as src/routes/api/warehouse/materialApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/materialValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
-    participant StockDto as materialDto: Object<br/>src/dtos/materialDTO.js
-    participant Service as src/services/warehouse/materials/materialService.js
-    participant Adjustment as src/services/warehouse/adjustmentService.js
-    participant Reference as src/services/document/referenceNumberService.js
-    participant Stock as src/services/inventory/stockHelpers.js
-    participant Movement as src/services/inventory/movementService.js
-    participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
+    participant StockDto@{ "type": "entity" } as materialDto: Object<br/>src/dtos/materialDTO.js
+    participant Service@{ "type": "control" } as src/services/warehouse/materials/materialService.js
+    participant Adjustment@{ "type": "control" } as src/services/warehouse/adjustmentService.js
+    participant Reference@{ "type": "control" } as src/services/document/referenceNumberService.js
+    participant Stock@{ "type": "control" } as src/services/inventory/stockHelpers.js
+    participant Movement@{ "type": "control" } as src/services/inventory/movementService.js
+    participant SupplierMaterial@{ "type": "control" } as src/services/warehouse/materials/supplierMaterialService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 

@@ -98,6 +98,7 @@ const RESERVED_SEQUENCE_ALIASES = new Set([
 ]);
 const MIN_SEQUENCE_MESSAGES = 5;
 const MIN_SEQUENCE_CALLS = 2;
+const SEQUENCE_MESSAGE_PATTERN = /^\s*\S+(?:--?>>|--?\)|--?x)\S+:/;
 const EXTERNAL_SEQUENCE_PARTICIPANTS = new Set([
     'Cliente HTTP / web',
     'Navegador',
@@ -152,6 +153,33 @@ const validateUseCaseDiagramCoverage = async () => {
             failures.push(`${name}: la cobertura o el orden no coincide con el catálogo de casos de uso`);
         }
     };
+
+    const useCaseSource = await readFile(path.join(ROOT,
+        'docs/requirements/domain-and-use-cases/02-current-use-cases.md'), 'utf8');
+    const useCaseDiagrams = getMermaidBlocks(useCaseSource);
+    const diagramCaseIds = [];
+    for (const diagram of useCaseDiagrams) {
+        if (!diagram.startsWith('usecase-beta\n')) {
+            failures.push('casos de uso: debe emplearse la notación nativa usecase-beta');
+        }
+        const actors = new Set([...diagram.matchAll(/^\s*actor\s+(\w+)\(/gm)].map(match => match[1]));
+        const cases = [...diagram.matchAll(/^\s*(\w+)\("(CU-[A-Z]+-\d+) (.+)"\)/gm)];
+        diagramCaseIds.push(...cases.map(([, , id]) => id));
+        for (const [, alias, id, title] of cases) {
+            if (title !== expectedTitles.get(id)) {
+                failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
+            }
+            const actor = expectedActors.get(id) === 'Usuario registrado' ? 'user'
+                : expectedActors.get(id) === 'Personal de almacén' ? 'warehouse' : 'admin';
+            if (!actors.has(actor) || !new RegExp(`^\\s*${actor} -- ${alias}$`, 'm').test(diagram)) {
+                failures.push(`casos de uso: ${id} no se asocia con su actor normativo`);
+            }
+        }
+        if (/^\s*uc\w+\s+--\s+uc\w+/m.test(diagram)) {
+            failures.push('casos de uso: la navegación entre objetivos no es una asociación UML');
+        }
+    }
+    validateIds('diagramas de casos de uso', diagramCaseIds);
 
     for (const side of ['backend', 'frontend']) {
         const source = sources.get(`${side}Diagrams`);
@@ -208,7 +236,7 @@ const validateUseCaseDiagramCoverage = async () => {
                     && !/^\s*participant\s+\S+@\{\s*"type"\s*:\s*"database"\s*\}\s+as\s+Prisma \/ PostgreSQL$/m.test(sequence))) {
                 failures.push(`diagramas ${side}: ${id} debe representar Prisma / PostgreSQL con la figura database`);
             }
-            const messages = sequence.split('\n').filter((line) => line.includes('->>'));
+            const messages = sequence.split('\n').filter((line) => SEQUENCE_MESSAGE_PATTERN.test(line));
             if (messages.length < MIN_SEQUENCE_MESSAGES) {
                 failures.push(`diagramas ${side}: ${id} no alcanza el detalle mínimo de ${MIN_SEQUENCE_MESSAGES} mensajes ordenados`);
             }
@@ -285,7 +313,7 @@ const validateUseCaseDiagramCoverage = async () => {
             ]);
             const nonTechnicalMessages = messages.filter((line) => {
                 if (line.includes('-->>')) return false;
-                const [, sender = '', label = ''] = line.match(/^\s*([^\s-]+)->>[^:]+:\s*(.+)$/) ?? [];
+                const [, sender = '', label = ''] = line.match(/^\s*([^\s-]+)(?:->>|-\)|--\))[^:]+:\s*(.+)$/) ?? [];
                 if (actorAliases.has(sender.toLowerCase())) return false;
                 return !/\b[A-Za-z_$][\w$]*(?:\?\.|\.)?[A-Za-z_$]*\s*\(/.test(label)
                     && !/\b[A-Za-z_$][\w$]*Validation\[\]/.test(label)
@@ -355,7 +383,7 @@ const validateUseCaseDiagramCoverage = async () => {
             if (block.split('\n').some((line) => line.includes(';'))) {
                 failures.push(`${name}: una secuencia Mermaid contiene un punto y coma no compatible con GitHub`);
             }
-            const messages = block.split('\n').filter((line) => line.includes('->>'));
+            const messages = block.split('\n').filter((line) => SEQUENCE_MESSAGE_PATTERN.test(line));
             if (messages.length < MIN_SEQUENCE_MESSAGES) {
                 failures.push(`${name}: una secuencia no alcanza el detalle mínimo de ${MIN_SEQUENCE_MESSAGES} mensajes ordenados`);
             }
@@ -631,28 +659,38 @@ const renderDataDictionaryModel = (name, model) => {
 const generateDatabaseSchema = async () => {
     const models = parsePrismaModels(await readFile(path.join(ROOT, 'prisma/schema.prisma'), 'utf8'));
     validateDatabaseAreas(models);
-    const areaByModel = new Map(DATABASE_AREAS.flatMap(([area, names]) => (
-        names.map((name) => [name, area])
-    )));
-    const diagrams = DATABASE_AREAS.map(([title, names]) => {
-        const selected = new Set(names);
-        const entities = names.map((name) => renderEntity(name, models.get(name))).join('\n');
-        const relations = names.flatMap((source) => models.get(source).relations
-            .filter(({ target }) => selected.has(target))
-            .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`));
-        return `## ${title}\n\n\`\`\`mermaid\nerDiagram\n${entities}\n${relations.join('\n')}\n\`\`\``;
+    const diagrams = DATABASE_AREAS.flatMap(([title, names]) => {
+        const sections = [];
+        for (let offset = 0; offset < names.length; offset += 3) {
+            const subset = names.slice(offset, offset + 3);
+            const selected = new Set(subset);
+            const entities = subset.map((name) => renderEntity(name, models.get(name))).join('\n');
+            const relations = subset.flatMap((source) => models.get(source).relations
+                .filter(({ target }) => selected.has(target))
+                .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`));
+            sections.push(`### ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${entities}\n${relations.join('\n')}\n\`\`\``);
+        }
+        return [`## ${title}\n\n${sections.join('\n\n')}`];
     }).join('\n\n');
-    const crossAreaRelations = [...models.entries()].flatMap(([source, model]) => (
-        model.relations
-            .filter(({ target }) => areaByModel.get(source) !== areaByModel.get(target))
-            .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`)
-    ));
+    const relationDiagrams = DATABASE_AREAS.flatMap(([title, names]) => {
+        const sections = [];
+        for (let offset = 0; offset < names.length; offset += 3) {
+            const subset = names.slice(offset, offset + 3);
+            const relations = subset.flatMap((source) => models.get(source).relations
+                .map(({ field, target, optional }) => `    ${target} ${optional ? 'o|' : '||'}--o{ ${source} : "${field}"`));
+            if (relations.length) {
+                sections.push(`### ${title}: ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${relations.join('\n')}\n\`\`\``);
+            }
+        }
+        return sections;
+    }).join('\n\n');
     return `<!-- Archivo generado por scripts/generateArchitectureDocs.js. No editar manualmente. -->
 # Diagramas de la base de datos
 
 Estos diagramas ER se generan desde los modelos y relaciones de
 \`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
-GitHub; las relaciones que cruzan áreas se describen en la sección final.
+GitHub. Los atributos se distribuyen en figuras de hasta tres modelos; todas las
+relaciones, incluidas las que cruzan figuras o áreas, se muestran en la sección final.
 
 La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
@@ -662,18 +700,14 @@ predeterminados y tipos de cada campo, usa el
 
 ${diagrams}
 
-## Relaciones entre áreas
+## Relaciones por grupo de modelos
 
-Los modelos de identidad y catálogo son referenciados desde los documentos de compra,
-salida, ajuste y merma. Para evitar repetir entidades y producir diagramas ilegibles,
-cada diagrama anterior detalla las relaciones internas de su área y la vista siguiente
-muestra sólo las asociaciones que cruzan esos límites. Los atributos permanecen en las
-vistas por área y en el diccionario técnico.
+Cada figura muestra las relaciones cuyo modelo de origen pertenece al grupo indicado,
+incluidas las referencias a otras áreas. Los modelos referenciados pueden repetirse
+entre figuras para conservar todas las asociaciones sin concentrarlas en una sola
+imagen. Los atributos completos permanecen en las vistas anteriores y en el diccionario.
 
-\`\`\`mermaid
-erDiagram
-${crossAreaRelations.join('\n')}
-\`\`\`
+${relationDiagrams}
 
 Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Una relación puede
 aparecer con el nombre del campo inverso porque la vista se deriva de la relación Prisma;

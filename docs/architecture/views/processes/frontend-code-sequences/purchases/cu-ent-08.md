@@ -7,17 +7,18 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant Modal as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
-    participant Form as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js
-    participant DetailUI as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptDetails.js<br/>src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js
+    participant Modal@{ "type": "boundary" } as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
+    participant Form@{ "type": "boundary" } as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptForm.js
+    participant DetailUI@{ "type": "boundary" } as src/public/js/pages/warehouse/goodsReceipts/goodsReceiptDetails.js<br/>src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js
     participant SupplierSelect as src/public/js/plugins/select2/domains/supplier.js
-    participant SupplierModal as src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>supplierForm.js
-    participant MaterialUI as src/public/js/plugins/select2/modules/goodsReceiptSelect.js<br/>src/public/js/pages/warehouse/materials/materialModal.js
-    participant MaterialApp as src/public/js/application/warehouse/materials/materials.js
+    participant SupplierModal@{ "type": "boundary" } as src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>supplierForm.js
+    participant MaterialUI@{ "type": "boundary" } as src/public/js/plugins/select2/modules/goodsReceiptSelect.js<br/>src/public/js/pages/warehouse/materials/materialModal.js
+    participant MaterialApp@{ "type": "control" } as src/public/js/application/warehouse/materials/materials.js
     participant MaterialRequest as src/public/js/services/warehouse/materialService.js
-    participant App as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
+    participant App@{ "type": "control" } as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
     participant Request as src/public/js/services/warehouse/goodsReceiptService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js

@@ -19,14 +19,32 @@ los diagramas de cada caso con infraestructura repetida.
 transporte y reglas sin declarar un MVC estricto?
 
 ```mermaid
-flowchart LR
-    modular["Monolito modular<br/>admin · sales · warehouse"] --> routes["routes / controllers"]
-    routes --> dto["DTO funcional<br/>src/dtos"]
-    dto --> services["services de dominio"]
-    services --> db["getDb / Prisma"]
-    browser["Capas del navegador"] --> clientService["public/js/services"]
-    clientService --> application["public/js/application"]
-    application --> pages["public/js/pages y EJS"]
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction LR
+    namespace Backend {
+        class Routes { <<boundary>> }
+        class Controllers { <<control>> }
+        class DTO { <<entity>> }
+        class DomainServices { <<control>> }
+        class Persistence { <<component>> }
+    }
+    namespace Frontend {
+        class Pages { <<boundary>> }
+        class Applications { <<control>> }
+        class HttpServices { <<component>> }
+    }
+    Routes ..> Controllers : delega
+    Controllers ..> DTO : normaliza
+    Controllers ..> DomainServices : coordina
+    DomainServices ..> Persistence : accede con getDb
+    Pages ..> Applications : usa
+    Applications ..> HttpServices : requiere requests
+    HttpServices ..> Routes : HTTP
 ```
 
 ### Pipeline, DTO y políticas declarativas
@@ -36,13 +54,14 @@ antes de entregar datos normalizados al caso de uso?
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Client as Cliente HTTP
     participant Route@{ "type": "boundary" } as routes/api/*ApiRoute.js
     participant Auth@{ "type": "control" } as middleware/authMiddleware.js
     participant Validation@{ "type": "control" } as validators/forms/* + validatorMiddleware.validate
     participant Controller@{ "type": "control" } as controllers/api/*Controller.js
-    participant Dto as resourceDto: Object<br/>dtos/*DTO.js
-    participant Service as services/*Service.js
+    participant Dto@{ "type": "entity" } as resourceDto: Object<br/>dtos/*DTO.js
+    participant Service@{ "type": "control" } as services/*Service.js
 
     Client->>Route: enviar petición
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -92,10 +111,11 @@ variante sin duplicar el flujo común?
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Module as application/warehouse/materials/materials.js
     participant Factory as application/createCrudApplication.js
     participant Mutation as createApplicationMutation
-    participant Request as services/warehouse/materialService.js
+    participant Request@{ "type": "control" } as services/warehouse/materialService.js
     participant Page as pages/warehouse/materials/materialForm.js
 
     Module->>Factory: createCrudApplication({ requests, dataKeys, additionalMutations })
@@ -130,8 +150,9 @@ atómica, publicación y trazabilidad sin confundir sus límites?
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Controller as controllers/api/*Controller.js
-    participant Service as services/*Service.js (Transaction Script)
+    participant Service@{ "type": "control" } as services/*Service.js (Transaction Script)
     participant Prisma as lib/prisma.js $transaction
     participant Writes as services auxiliares + repository/getDb(tx)
     participant Events as utils/socketUtils.emitInventoryUpdated

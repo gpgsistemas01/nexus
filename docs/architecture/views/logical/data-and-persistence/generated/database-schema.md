@@ -3,7 +3,8 @@
 
 Estos diagramas ER se generan desde los modelos y relaciones de
 `prisma/schema.prisma`. Se separan por área para que puedan leerse y revisarse en
-GitHub; las relaciones que cruzan áreas se describen en la sección final.
+GitHub. Los atributos se distribuyen en figuras de hasta tres modelos; todas las
+relaciones, incluidas las que cruzan figuras o áreas, se muestran en la sección final.
 
 La marca `PK` identifica claves primarias, `FK` claves foráneas y `UK` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
@@ -13,8 +14,11 @@ predeterminados y tipos de cada campo, usa el
 
 ## Identidad, acceso y auditoría
 
+### Department · Role · User
+
 ```mermaid
 erDiagram
+    direction LR
     Department {
         String id PK
         String name UK
@@ -32,6 +36,14 @@ erDiagram
         String password
         Boolean isActive
     }
+
+```
+
+### Person · UserRoleDepartment · PersonRoleDepartment
+
+```mermaid
+erDiagram
+    direction LR
     Person {
         String id PK
         String fullName
@@ -47,6 +59,14 @@ erDiagram
         String personId PK,FK
         String roleId PK,FK
     }
+    Person ||--o{ PersonRoleDepartment : "person"
+```
+
+### CriticalWriteAudit
+
+```mermaid
+erDiagram
+    direction LR
     CriticalWriteAudit {
         String id PK
         String actorId FK
@@ -62,20 +82,16 @@ erDiagram
         String userAgent
         DateTime createdAt
     }
-    Person o|--o{ User : "person"
-    User ||--o{ UserRoleDepartment : "user"
-    Role ||--o{ UserRoleDepartment : "role"
-    Department ||--o{ UserRoleDepartment : "department"
-    Department ||--o{ PersonRoleDepartment : "department"
-    Person ||--o{ PersonRoleDepartment : "person"
-    Role ||--o{ PersonRoleDepartment : "role"
-    User o|--o{ CriticalWriteAudit : "actor"
+
 ```
 
 ## Catálogos y relaciones comerciales
 
+### Status · FulfillmentStatus · Project
+
 ```mermaid
 erDiagram
+    direction LR
     Status {
         String id PK
         String name UK
@@ -92,6 +108,14 @@ erDiagram
         String name
         DateTime date
     }
+
+```
+
+### Client · Supplier · Material
+
+```mermaid
+erDiagram
+    direction LR
     Client {
         String id PK
         String name
@@ -117,6 +141,14 @@ erDiagram
         Decimal height
         MaterialType type
     }
+
+```
+
+### UnitMeasure · Presentation · SupplierMaterial
+
+```mermaid
+erDiagram
+    direction LR
     UnitMeasure {
         String id PK
         String name
@@ -138,22 +170,30 @@ erDiagram
         String supplierId FK
         String materialId FK
     }
+
+```
+
+### ReferenceNumberCounter
+
+```mermaid
+erDiagram
+    direction LR
     ReferenceNumberCounter {
         String id PK
         String prefix
         Int counter
         Int year
     }
-    Presentation ||--o{ Material : "presentation"
-    UnitMeasure ||--o{ Material : "unitMeasure"
-    Supplier ||--o{ SupplierMaterial : "supplier"
-    Material ||--o{ SupplierMaterial : "material"
+
 ```
 
 ## Compras e inventario de materiales
 
+### GoodsReceipt · GoodsReceiptDetail · GoodsReceiptDetailChange
+
 ```mermaid
 erDiagram
+    direction LR
     GoodsReceipt {
         String id PK
         String invoice
@@ -214,6 +254,16 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    GoodsReceipt ||--o{ GoodsReceiptDetail : "goodsReceipt"
+    GoodsReceipt ||--o{ GoodsReceiptDetailChange : "goodsReceipt"
+    GoodsReceiptDetail ||--o{ GoodsReceiptDetailChange : "goodsReceiptDetail"
+```
+
+### GoodsIssue · GoodsIssueDetail · GoodsIssueReturn
+
+```mermaid
+erDiagram
+    direction LR
     GoodsIssue {
         String id PK
         String referenceNumber UK
@@ -272,6 +322,16 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    GoodsIssue ||--o{ GoodsIssueDetail : "goodsIssue"
+    GoodsIssue ||--o{ GoodsIssueReturn : "goodsIssue"
+    GoodsIssueDetail ||--o{ GoodsIssueReturn : "goodsIssueDetail"
+```
+
+### InventoryMovement · MovementDetail · StockAdjustment
+
+```mermaid
+erDiagram
+    direction LR
     InventoryMovement {
         String id PK
         String referenceNumber UK
@@ -310,6 +370,15 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    StockAdjustment o|--o{ InventoryMovement : "stockAdjustment"
+    InventoryMovement ||--o{ MovementDetail : "movement"
+```
+
+### StockAdjustmentDetail · StockAdjustmentReason
+
+```mermaid
+erDiagram
+    direction LR
     StockAdjustmentDetail {
         String id PK
         String stockAdjustmentId FK
@@ -332,30 +401,16 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    GoodsReceipt ||--o{ GoodsReceiptDetail : "goodsReceipt"
-    GoodsReceipt ||--o{ GoodsReceiptDetailChange : "goodsReceipt"
-    GoodsReceiptDetail ||--o{ GoodsReceiptDetailChange : "goodsReceiptDetail"
-    StockAdjustmentReason ||--o{ GoodsReceiptDetailChange : "reason"
-    InventoryMovement o|--o{ GoodsReceiptDetailChange : "inventoryMovement"
-    GoodsIssue ||--o{ GoodsIssueDetail : "goodsIssue"
-    GoodsIssue ||--o{ GoodsIssueReturn : "goodsIssue"
-    GoodsIssueDetail ||--o{ GoodsIssueReturn : "goodsIssueDetail"
-    MovementDetail o|--o{ GoodsIssueReturn : "movementDetail"
-    GoodsReceipt o|--o{ InventoryMovement : "goodsReceipt"
-    GoodsIssue o|--o{ InventoryMovement : "goodsIssue"
-    StockAdjustment o|--o{ InventoryMovement : "stockAdjustment"
-    GoodsReceiptDetail o|--o{ MovementDetail : "goodsReceiptDetail"
-    GoodsIssueDetail o|--o{ MovementDetail : "goodsIssueDetail"
-    StockAdjustmentDetail o|--o{ MovementDetail : "stockAdjustmentDetail"
-    InventoryMovement ||--o{ MovementDetail : "movement"
-    StockAdjustmentReason ||--o{ StockAdjustment : "reason"
-    StockAdjustment ||--o{ StockAdjustmentDetail : "stockAdjustment"
+
 ```
 
 ## Mermas e inventario de merma
 
+### Waste · WasteIssue · WasteIssueDetail
+
 ```mermaid
 erDiagram
+    direction LR
     Waste {
         String id PK
         String supplierId FK
@@ -408,6 +463,15 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    WasteIssue ||--o{ WasteIssueDetail : "wasteIssue"
+    Waste ||--o{ WasteIssueDetail : "waste"
+```
+
+### WasteIssueReturn · WasteMovement · WasteMovementDetail
+
+```mermaid
+erDiagram
+    direction LR
     WasteIssueReturn {
         String id PK
         String wasteIssueId FK
@@ -443,6 +507,15 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
+    WasteMovementDetail o|--o{ WasteIssueReturn : "movementDetail"
+    WasteMovement ||--o{ WasteMovementDetail : "movement"
+```
+
+### WasteStockEntry · WasteStockAdjustment · WasteStockAdjustmentDetail
+
+```mermaid
+erDiagram
+    direction LR
     WasteStockEntry {
         String id PK
         String referenceNumber UK
@@ -485,55 +558,88 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    WasteIssue ||--o{ WasteIssueDetail : "wasteIssue"
-    Waste ||--o{ WasteIssueDetail : "waste"
-    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
-    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
-    WasteMovementDetail o|--o{ WasteIssueReturn : "movementDetail"
-    Waste ||--o{ WasteIssueReturn : "waste"
-    WasteIssue o|--o{ WasteMovement : "wasteIssue"
-    Waste ||--o{ WasteMovementDetail : "waste"
-    WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
-    WasteMovement ||--o{ WasteMovementDetail : "movement"
-    WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
-    Waste ||--o{ WasteStockEntry : "waste"
-    WasteMovement ||--o{ WasteStockEntry : "movement"
-    WasteMovement o|--o{ WasteStockAdjustment : "movement"
     WasteStockAdjustment ||--o{ WasteStockAdjustmentDetail : "wasteStockAdjustment"
-    Waste ||--o{ WasteStockAdjustmentDetail : "waste"
 ```
 
-## Relaciones entre áreas
+## Relaciones por grupo de modelos
 
-Los modelos de identidad y catálogo son referenciados desde los documentos de compra,
-salida, ajuste y merma. Para evitar repetir entidades y producir diagramas ilegibles,
-cada diagrama anterior detalla las relaciones internas de su área y la vista siguiente
-muestra sólo las asociaciones que cruzan esos límites. Los atributos permanecen en las
-vistas por área y en el diccionario técnico.
+Cada figura muestra las relaciones cuyo modelo de origen pertenece al grupo indicado,
+incluidas las referencias a otras áreas. Los modelos referenciados pueden repetirse
+entre figuras para conservar todas las asociaciones sin concentrarlas en una sola
+imagen. Los atributos completos permanecen en las vistas anteriores y en el diccionario.
+
+### Identidad, acceso y auditoría: Department · Role · User
 
 ```mermaid
 erDiagram
-    Supplier ||--o{ Waste : "supplier"
-    Presentation ||--o{ Waste : "presentation"
-    UnitMeasure ||--o{ Waste : "unitMeasure"
-    StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
-    User ||--o{ WasteStockAdjustment : "createdBy"
-    User o|--o{ WasteStockAdjustment : "approvedBy"
-    User ||--o{ WasteStockEntry : "createdBy"
-    User ||--o{ WasteIssue : "createdBy"
-    Department ||--o{ WasteIssue : "department"
-    Person ||--o{ WasteIssue : "requester"
-    Client ||--o{ WasteIssue : "client"
-    Person ||--o{ WasteIssue : "advisor"
-    FulfillmentStatus ||--o{ WasteIssue : "fulfillmentStatus"
-    Status ||--o{ WasteIssue : "status"
-    FulfillmentStatus ||--o{ WasteIssueDetail : "fulfillmentStatus"
-    User o|--o{ WasteIssueReturn : "returnedBy"
+    direction LR
+    Person o|--o{ User : "person"
+```
+
+### Identidad, acceso y auditoría: Person · UserRoleDepartment · PersonRoleDepartment
+
+```mermaid
+erDiagram
+    direction LR
+    User ||--o{ UserRoleDepartment : "user"
+    Role ||--o{ UserRoleDepartment : "role"
+    Department ||--o{ UserRoleDepartment : "department"
+    Department ||--o{ PersonRoleDepartment : "department"
+    Person ||--o{ PersonRoleDepartment : "person"
+    Role ||--o{ PersonRoleDepartment : "role"
+```
+
+### Identidad, acceso y auditoría: CriticalWriteAudit
+
+```mermaid
+erDiagram
+    direction LR
+    User o|--o{ CriticalWriteAudit : "actor"
+```
+
+### Catálogos y relaciones comerciales: Client · Supplier · Material
+
+```mermaid
+erDiagram
+    direction LR
     Person o|--o{ Client : "advisor"
+    Presentation ||--o{ Material : "presentation"
+    UnitMeasure ||--o{ Material : "unitMeasure"
+```
+
+### Catálogos y relaciones comerciales: UnitMeasure · Presentation · SupplierMaterial
+
+```mermaid
+erDiagram
+    direction LR
+    Supplier ||--o{ SupplierMaterial : "supplier"
+    Material ||--o{ SupplierMaterial : "material"
+```
+
+### Compras e inventario de materiales: GoodsReceipt · GoodsReceiptDetail · GoodsReceiptDetailChange
+
+```mermaid
+erDiagram
+    direction LR
     Person ||--o{ GoodsReceipt : "receivedBy"
     Supplier ||--o{ GoodsReceipt : "supplier"
     Status ||--o{ GoodsReceipt : "status"
+    GoodsReceipt ||--o{ GoodsReceiptDetail : "goodsReceipt"
     Material ||--o{ GoodsReceiptDetail : "material"
+    GoodsReceipt ||--o{ GoodsReceiptDetailChange : "goodsReceipt"
+    GoodsReceiptDetail ||--o{ GoodsReceiptDetailChange : "goodsReceiptDetail"
+    StockAdjustmentReason ||--o{ GoodsReceiptDetailChange : "reason"
+    User ||--o{ GoodsReceiptDetailChange : "changedBy"
+    Material ||--o{ GoodsReceiptDetailChange : "previousMaterial"
+    Material ||--o{ GoodsReceiptDetailChange : "correctedMaterial"
+    InventoryMovement o|--o{ GoodsReceiptDetailChange : "inventoryMovement"
+```
+
+### Compras e inventario de materiales: GoodsIssue · GoodsIssueDetail · GoodsIssueReturn
+
+```mermaid
+erDiagram
+    direction LR
     Department ||--o{ GoodsIssue : "department"
     Person o|--o{ GoodsIssue : "approver"
     Person ||--o{ GoodsIssue : "requester"
@@ -545,17 +651,94 @@ erDiagram
     FulfillmentStatus o|--o{ GoodsIssue : "fulfillmentStatus"
     Material ||--o{ GoodsIssueDetail : "material"
     Supplier ||--o{ GoodsIssueDetail : "supplier"
+    GoodsIssue ||--o{ GoodsIssueDetail : "goodsIssue"
     FulfillmentStatus ||--o{ GoodsIssueDetail : "fulfillmentStatus"
+    GoodsIssue ||--o{ GoodsIssueReturn : "goodsIssue"
+    GoodsIssueDetail ||--o{ GoodsIssueReturn : "goodsIssueDetail"
+    MovementDetail o|--o{ GoodsIssueReturn : "movementDetail"
     User o|--o{ GoodsIssueReturn : "returnedBy"
+```
+
+### Compras e inventario de materiales: InventoryMovement · MovementDetail · StockAdjustment
+
+```mermaid
+erDiagram
+    direction LR
+    GoodsReceipt o|--o{ InventoryMovement : "goodsReceipt"
+    GoodsIssue o|--o{ InventoryMovement : "goodsIssue"
+    StockAdjustment o|--o{ InventoryMovement : "stockAdjustment"
     Material ||--o{ MovementDetail : "material"
     Supplier ||--o{ MovementDetail : "supplier"
+    GoodsReceiptDetail o|--o{ MovementDetail : "goodsReceiptDetail"
+    GoodsIssueDetail o|--o{ MovementDetail : "goodsIssueDetail"
+    StockAdjustmentDetail o|--o{ MovementDetail : "stockAdjustmentDetail"
+    InventoryMovement ||--o{ MovementDetail : "movement"
+    StockAdjustmentReason ||--o{ StockAdjustment : "reason"
     User ||--o{ StockAdjustment : "createdBy"
     User o|--o{ StockAdjustment : "approvedBy"
+```
+
+### Compras e inventario de materiales: StockAdjustmentDetail · StockAdjustmentReason
+
+```mermaid
+erDiagram
+    direction LR
+    StockAdjustment ||--o{ StockAdjustmentDetail : "stockAdjustment"
     Material ||--o{ StockAdjustmentDetail : "material"
     Supplier ||--o{ StockAdjustmentDetail : "supplier"
-    User ||--o{ GoodsReceiptDetailChange : "changedBy"
-    Material ||--o{ GoodsReceiptDetailChange : "previousMaterial"
-    Material ||--o{ GoodsReceiptDetailChange : "correctedMaterial"
+```
+
+### Mermas e inventario de merma: Waste · WasteIssue · WasteIssueDetail
+
+```mermaid
+erDiagram
+    direction LR
+    Supplier ||--o{ Waste : "supplier"
+    Presentation ||--o{ Waste : "presentation"
+    UnitMeasure ||--o{ Waste : "unitMeasure"
+    User ||--o{ WasteIssue : "createdBy"
+    Department ||--o{ WasteIssue : "department"
+    Person ||--o{ WasteIssue : "requester"
+    Client ||--o{ WasteIssue : "client"
+    Person ||--o{ WasteIssue : "advisor"
+    FulfillmentStatus ||--o{ WasteIssue : "fulfillmentStatus"
+    Status ||--o{ WasteIssue : "status"
+    WasteIssue ||--o{ WasteIssueDetail : "wasteIssue"
+    Waste ||--o{ WasteIssueDetail : "waste"
+    FulfillmentStatus ||--o{ WasteIssueDetail : "fulfillmentStatus"
+```
+
+### Mermas e inventario de merma: WasteIssueReturn · WasteMovement · WasteMovementDetail
+
+```mermaid
+erDiagram
+    direction LR
+    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
+    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
+    WasteMovementDetail o|--o{ WasteIssueReturn : "movementDetail"
+    User o|--o{ WasteIssueReturn : "returnedBy"
+    Waste ||--o{ WasteIssueReturn : "waste"
+    WasteIssue o|--o{ WasteMovement : "wasteIssue"
+    Waste ||--o{ WasteMovementDetail : "waste"
+    WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
+    WasteMovement ||--o{ WasteMovementDetail : "movement"
+    WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
+```
+
+### Mermas e inventario de merma: WasteStockEntry · WasteStockAdjustment · WasteStockAdjustmentDetail
+
+```mermaid
+erDiagram
+    direction LR
+    Waste ||--o{ WasteStockEntry : "waste"
+    User ||--o{ WasteStockEntry : "createdBy"
+    WasteMovement ||--o{ WasteStockEntry : "movement"
+    StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
+    User ||--o{ WasteStockAdjustment : "createdBy"
+    User o|--o{ WasteStockAdjustment : "approvedBy"
+    WasteMovement o|--o{ WasteStockAdjustment : "movement"
+    WasteStockAdjustment ||--o{ WasteStockAdjustmentDetail : "wasteStockAdjustment"
+    Waste ||--o{ WasteStockAdjustmentDetail : "waste"
 ```
 
 Consulta el esquema Prisma para las reglas `onDelete`/`onUpdate`. Una relación puede

@@ -7,16 +7,36 @@ y sus consumidores en los
 Este capítulo conserva únicamente las variantes y reglas de exposición.
 
 ```mermaid
-flowchart LR
-    requests["Requests y claves<br/>del recurso"] --> crud["createCrudApplication"]
-    crud --> operations["getAll · register · edit<br/>additionalMutations"]
-    operations --> domain["Exports con nombres<br/>del dominio"]
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction LR
+    class CrudFactory {
+        <<factory>>
+        createCrudApplication(config) Object
+    }
+    class IssueFactory {
+        <<factory>>
+        createIssueApplication(config) Object
+    }
+    class ListFactory {
+        <<factory>>
+        createDataTableListController(config) Function
+    }
+    class DomainApplication { <<module>> }
+    class IssueApplication { <<module>> }
+    class ListController { <<module>> }
+    class RequestConfiguration { <<configuration>> }
 
-    crud -. compone .-> issue["createIssueApplication"]
-    issue --> issueOps["editHeader · editDetails<br/>returnDetail"]
-
-    query["Consulta + columnas + orden"] --> list["createDataTableListController"]
-    list --> controller["Controller tabular<br/>del dominio"]
+    DomainApplication ..> CrudFactory : configura
+    IssueApplication ..> IssueFactory : configura
+    IssueFactory ..> CrudFactory : compone operaciones
+    ListController ..> ListFactory : inyecta consulta
+    CrudFactory ..> RequestConfiguration : recibe
+    IssueFactory ..> RequestConfiguration : recibe
 ```
 
 ### Contratos configurables

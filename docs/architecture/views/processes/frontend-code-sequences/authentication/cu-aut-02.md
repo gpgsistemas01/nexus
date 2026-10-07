@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Usuario registrado
     participant Browser as Navegador
-    participant View as src/views/layout/ui/logoutForm.ejs
-    participant Route as src/routes/web/auth/logoutWebRoute.js
+    participant View@{ "type": "boundary" } as src/views/layout/ui/logoutForm.ejs
+    participant Route@{ "type": "boundary" } as src/routes/web/auth/logoutWebRoute.js
     participant Controller@{ "type": "control" } as src/controllers/web/authController.js
 
     Initiator->>Browser: inicia CU-AUT-02 — Cerrar sesión

@@ -5,11 +5,12 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant Issue as src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js
-    participant Return as src/public/js/ui/issues/issueReturnUI.js
-    participant App as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
+    participant Issue@{ "type": "boundary" } as src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js
+    participant Return@{ "type": "boundary" } as src/public/js/ui/issues/issueReturnUI.js
+    participant App@{ "type": "control" } as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
     participant Request as src/public/js/services/warehouse/wasteIssueService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/warehouse/wasteIssueController.js

@@ -5,15 +5,16 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/issueReturnValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Router@{ "type": "boundary" } as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/issueReturnValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteIssueController.js
-    participant ReturnDto as returnDto: Object<br/>src/dtos/wasteIssueDTO.js
-    participant Service as src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js
-    participant Movement as src/services/warehouse/wastes/wasteMovementService.js
-    participant Status as src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
+    participant ReturnDto@{ "type": "entity" } as returnDto: Object<br/>src/dtos/wasteIssueDTO.js
+    participant Service@{ "type": "control" } as src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js
+    participant Movement@{ "type": "control" } as src/services/warehouse/wastes/wasteMovementService.js
+    participant Status@{ "type": "control" } as src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 

@@ -112,6 +112,7 @@ explícita esa garantía *best effort*.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Browser as Cliente HTTP autenticado
     participant Audit as auditWrites
     participant Route as Ruta/controller/servicio
@@ -149,16 +150,16 @@ vuelve a consultar estas condiciones en `authorizeUserApi` y `authorizeUserWeb`.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> TokenValido: firma y vigencia aceptadas
-    TokenValido --> Invalido: usuario inexistente o inactivo
-    TokenValido --> Invalido: persona asociada inactiva
-    TokenValido --> Invalido: sin asignaciones
-    TokenValido --> UsuarioActivo: User activo y persona activa o ausente
-    UsuarioActivo --> Autorizado: existe asignación rol/departamento permitida
-    UsuarioActivo --> Prohibido: ninguna asignación satisface el permiso
-    Autorizado --> MiddlewareSuperado: req.user validado y next()
-    Invalido --> Rechazado401: INVALID_AUTH
-    Prohibido --> Rechazado403: FORBIDDEN
+    [*] --> TokenValido: validar token [firma y vigencia válidas]
+    TokenValido --> Invalido: consultar usuario [inexistente o inactivo]
+    TokenValido --> Invalido: consultar persona [inactiva]
+    TokenValido --> Invalido: consultar acceso [sin asignaciones]
+    TokenValido --> UsuarioActivo: consultar identidad [usuario activo y persona activa o ausente]
+    UsuarioActivo --> Autorizado: autorizar [asignación permitida]
+    UsuarioActivo --> Prohibido: autorizar [permiso insuficiente]
+    Autorizado --> MiddlewareSuperado: continuar / establecer req.user y ejecutar next()
+    Invalido --> Rechazado401: rechazar / responder 401 INVALID_AUTH
+    Prohibido --> Rechazado403: rechazar / responder 403 FORBIDDEN
     MiddlewareSuperado --> [*]
     Rechazado401 --> [*]
     Rechazado403 --> [*]
@@ -174,12 +175,12 @@ transacción de corrección; los estados funcionales permanecen en requisitos.
 ```mermaid
 stateDiagram-v2
     [*] --> Recibida: correctGoodsReceiptDetail
-    Recibida --> Validada: detalle y DTO válidos
-    Recibida --> Rechazada: error de dominio
+    Recibida --> Validada: validar [detalle y DTO válidos]
+    Recibida --> Rechazada: validar [error de dominio] / rechazar
     Validada --> TransaccionAbierta: correctGoodsReceiptDetailLine
-    TransaccionAbierta --> Rollback: falla en stock, movimiento o historial
-    TransaccionAbierta --> Commit: escrituras completas
-    Commit --> EventoPublicado: emitInventoryUpdated
+    TransaccionAbierta --> Rollback: persistir [fallo de escritura] / revertir transacción
+    TransaccionAbierta --> Commit: persistir [escrituras completas] / confirmar transacción
+    Commit --> EventoPublicado: confirmar / emitir emitInventoryUpdated()
     Rollback --> Respondida
     EventoPublicado --> Respondida
     Rechazada --> Respondida
