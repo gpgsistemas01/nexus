@@ -1,18 +1,11 @@
 import { apiRequest } from "../axiosInstanceApi.js";
-import { goodsReceiptContext } from '../../pages/warehouse/goodsReceipts/goodsReceiptContext.js';
+export { exportGoodsIssueReportRequest } from './goodsIssues/goodsIssueService.js';
+export { exportGoodsReceiptReportRequest } from './goodsReceipts/goodsReceiptService.js';
 
 export const exportWarehouseReportRequest = async (params = {}) =>
     apiRequest({
         method: 'get',
         url: '/api/warehouse/reports/inventory/excel',
-        responseType: 'blob',
-        params
-    });
-
-export const exportGoodsIssueReportRequest = async (params = {}) =>
-    apiRequest({
-        method: 'get',
-        url: '/api/warehouse/reports/goods-issues/excel',
         responseType: 'blob',
         params
     });
@@ -25,13 +18,6 @@ export const exportWasteIssueReportRequest = async (params = {}) =>
         params
     });
 
-export const exportGoodsReceiptReportRequest = async (params = {}) =>
-    apiRequest({
-        method: 'get',
-        url: `/api/warehouse/reports/goods-receipts/${ goodsReceiptContext.resource === 'consumable' ? 'consumables' : 'materials' }/excel`,
-        responseType: 'blob',
-        params
-    });
 
 export const exportWasteReportRequest = async (params = {}) =>
     apiRequest({

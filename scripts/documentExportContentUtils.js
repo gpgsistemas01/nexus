@@ -20,6 +20,7 @@ const documentTitles = new Map([
     ['personas', 'Personas'],
     ['proveedores', 'Proveedores'],
     ['salidas-materiales', 'Salidas de materiales'],
+    ['salidas-consumibles', 'Salidas de consumibles'],
     ['salidas-mermas', 'Salidas de mermas'],
     ['usuarios', 'Usuarios']
 ]);

@@ -21,11 +21,11 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         View->>Application: editWasteIssue({ id, formData })
-        Application->>Request: editWasteIssueRequest({ id, formData })
+        Application->>Request: editWasteIssueRequest({ id, data: formData })
         activate Application
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: envía PATCH /api/warehouse/waste-issues/:id
-        Transport-->>HTTP: HTTP 2xx { code, data }
+        Transport-->>HTTP: HTTP 200 { wasteIssue, code }
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: editWasteIssueRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa

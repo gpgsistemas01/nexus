@@ -1,6 +1,4 @@
-import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findGoodsIssueReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
-import { findMaterialGoodsReceiptReportRows } from '../../../services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js';
-import { findConsumableGoodsReceiptReportRows } from '../../../services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js';
+import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
 import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
@@ -9,7 +7,6 @@ import { MATERIAL_TYPES } from '../../../constants/inventory.js';
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_materiales';
 const GOODS_ISSUE_SHEET_NAME = 'Salidas';
-const GOODS_ISSUE_FILENAME = 'reporte_salidas';
 const WASTE_ISSUE_SHEET_NAME = 'Salidas de merma';
 const WASTE_ISSUE_FILENAME = 'reporte_salidas_merma';
 const GOODS_RECEIPT_SHEET_NAME = 'Compras';
@@ -145,7 +142,7 @@ export const exportWarehouseReportExcel = async (req, res) => {
     });
 };
 
-export const exportGoodsIssueReportExcel = async (req, res) => {
+export const buildGoodsIssueReportHandler = ({ findGoodsIssueReportRows, filename }) => async (req, res) => {
     const rows = await findGoodsIssueReportRows({
         ...buildIssueReportQuery(req),
         accesses: req.user?.accesses || [],
@@ -155,7 +152,7 @@ export const exportGoodsIssueReportExcel = async (req, res) => {
         res,
         data: buildIssueReportData(rows),
         sheetName: GOODS_ISSUE_SHEET_NAME,
-        filename: GOODS_ISSUE_FILENAME
+        filename
     });
 };
 
@@ -173,7 +170,7 @@ export const exportWasteIssueReportExcel = async (req, res) => {
     });
 };
 
-const exportGoodsReceiptReportExcel = async ({ req, res, materialType, findGoodsReceiptReportRows }) => {
+export const exportGoodsReceiptReportExcel = async ({ req, res, materialType, findGoodsReceiptReportRows }) => {
 
     const columns = ['referenceNumber', 'receptionDate', 'supplierName', 'invoice', null];
     const { orderBy, orderDir } = getDataTableOrder({
@@ -299,21 +296,6 @@ const exportGoodsReceiptReportExcel = async ({ req, res, materialType, findGoods
         filename: `${ GOODS_RECEIPT_FILENAME }_${ isConsumableReport ? 'consumibles' : 'materiales' }`
     });
 };
-
-export const exportMaterialGoodsReceiptReportExcel = (req, res) => exportGoodsReceiptReportExcel({
-    req,
-    res,
-    materialType: MATERIAL_TYPES.MATERIAL,
-    findGoodsReceiptReportRows: findMaterialGoodsReceiptReportRows
-});
-
-export const exportConsumableGoodsReceiptReportExcel = (req, res) => exportGoodsReceiptReportExcel({
-    req,
-    res,
-    materialType: MATERIAL_TYPES.CONSUMABLE,
-    findGoodsReceiptReportRows: findConsumableGoodsReceiptReportRows
-});
-
 
 export const exportWasteReportExcel = async (req, res) => {
 

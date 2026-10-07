@@ -8,34 +8,45 @@ sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as src/public/js/pages/warehouse/goodsIssues/goodsIssueModal.js<br/>goodsIssueForm.js
-    participant Application@{ "type": "control" } as src/public/js/application/warehouse/goodsIssues/goodsIssues.js
-    participant Request as src/public/js/services/warehouse/goodsIssueService.js
+    participant View@{ "type": "boundary" } as src/public/js/pages/warehouse/goodsIssues/goodsIssueForm.js
+    participant Application@{ "type": "control" } as src/public/js/application/warehouse/goodsIssues/goodsIssues.js<br/>src/public/js/application/warehouse/goodsIssues/materials/materialGoodsIssues.js<br/>src/public/js/application/createCrudApplication.js
+    participant Request as src/public/js/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js<br/>src/public/js/services/warehouse/goodsIssues/createGoodsIssueRequests.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsIssueApiRoute.js<br/>src/controllers/api/warehouse/goodsIssueController.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js<br/>src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js
+    participant Form as src/public/js/ui/forms/formUI.js
+    participant FormUtils as src/public/js/utils/formUtils.js
 
     Initiator->>Browser: inicia CU-SAL-03 — Editar encabezado de salida de material
-    Browser->>View: Modo encabezado de goodsIssueModal.js
-    View->>View: validateFields(goodsIssueValidation, formData)
-    alt goodsIssueValidation devuelve errores
-        View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
-    else Formulario válido
-        View->>Application: editGoodsIssueHeader({ id, formData })
-        Application->>Request: editGoodsIssueHeaderRequest({ id, formData })
-        activate Application
+    Browser->>Form: submit manejado por useForm(...)
+    Form->>View: normalizeData({ form, formData }) — callback configurado
+    View-->>Form: normalizeData(): Object — datos normalizados
+    Form->>View: getErrors({ form, formData }) — callback configurado
+    View->>FormUtils: validateFields(goodsIssueValidation, formData)
+    FormUtils-->>View: validateFields(): Object — errores por campo
+    View-->>Form: getErrors(): Object
+    alt Hay errores de validación
+        Form->>Browser: normalizeFormErrors({ form, errors })
+    else Datos válidos
+        Form->>View: sendRequest({ form, formData }) — callback configurado
+        View->>FormUtils: handleSubmit({ form, formData, create, update: editGoodsIssueHeader })
+        FormUtils->>Application: editGoodsIssueHeader({ id, formData })
+        Application->>Request: editMaterialGoodsIssueHeaderRequest({ id, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
-        HTTP->>Transport: envía PATCH /api/warehouse/goods-issues/:id/header
-        Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-        Request-->>Application: editGoodsIssueHeaderRequest(): Promise[AxiosResponse]
+        HTTP->>Transport: PATCH /api/warehouse/goods-issues/materials/:id/header
         alt Respuesta exitosa
-            Application-->>View: editGoodsIssueHeader(): Promise[{ message: string }]
-            View-->>Browser: DOM o DataTable actualizado con response.data
-        else Respuesta rechazada
-            Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
-            View-->>Browser: formulario o filtros conservados, mensaje visible
+            Transport-->>HTTP: HTTP 200 { goodsIssue, code }
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: editMaterialGoodsIssueHeaderRequest(): Promise[AxiosResponse]
+            Application-->>FormUtils: editGoodsIssueHeader(): Promise[{ message }]
+            FormUtils->>Browser: notifications.showSuccess(response.message)
+            FormUtils->>Browser: closeModal(form)
+            FormUtils->>Browser: reloadMainTable({ resetPaging: mode === CREATE })
+        else Error HTTP o de dominio
+            Transport-->>HTTP: HTTP de error { code, message }
+            HTTP-->>Request: error normalizado
+            Request-->>Application: error propagado
+            Application-->>FormUtils: error propagado
+            Form->>Browser: handleApiError({ err, form }) conserva el formulario
         end
-        deactivate Application
     end
 ```
-

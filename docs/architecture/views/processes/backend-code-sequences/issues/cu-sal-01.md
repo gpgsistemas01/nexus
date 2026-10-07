@@ -7,30 +7,32 @@
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/goodsIssueApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssueController.js
-    participant Domain@{ "type": "control" } as src/services/warehouse/goodsIssues/goodsIssueService.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js<br/>src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js
+    participant Facade@{ "type": "control" } as src/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js
+    participant Core@{ "type": "control" } as src/services/warehouse/goodsIssues/goodsIssueService.js
+    participant Helpers as src/services/warehouse/goodsIssues/goodsIssueHelpers.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler as src/app.js
 
-    Client->>Route: GET /api/warehouse/goods-issues
-    Route->>Controller: getAllGoodsIssues(req, res)
-    activate Controller
-    Controller->>Domain: goodsIssueService.findAllGoodsIssues({ ...query, accesses: req.user?.accesses })
-    activate Domain
-    Domain->>Prisma: goodsIssue.findMany({ where, include, skip, take, orderBy })
-    Prisma-->>Domain: findMany(): Promise[GoodsIssue[]]
-    Domain->>Prisma: goodsIssue.count({ where })
-    Prisma-->>Domain: count(): Promise[number]
-    alt Servicio resuelto
-        Domain-->>Controller: goodsIssueService.findAllGoodsIssues(): Promise[{ data: GoodsIssue[], recordsTotal: number, recordsFiltered: number }]
-        Controller-->>Client: HTTP 2xx { code, data }
-    else AppError propagado
-        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-        Controller->>ErrorHandler: next(error)
-        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    Client->>Route: GET /api/warehouse/goods-issues/materials
+    Route->>Auth: verifyApiTokenRequired(req, res, next)
+    Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE)(req, res, next)
+    alt Token o permiso rechazados
+        Route-->>Client: HTTP 401 o 403 — error de middleware
+    else Pipeline aceptado
+        Route->>Controller: getAllMaterialGoodsIssues(req, res)
+        Controller->>Controller: getIssueDataTableQuery({ query, columns })
+        Controller->>Facade: findAllMaterialGoodsIssues(query)
+        Facade->>Core: findAllGoodsIssues({ ...options, type: MATERIAL })
+        Core->>Helpers: buildGoodsIssueContextWhere(type)
+        Helpers-->>Core: buildGoodsIssueContextWhere(): Object
+        Core->>Prisma: goodsIssue.findMany({ where, skip, take, orderBy, include })
+        Prisma-->>Core: findMany(): Promise[GoodsIssue[]]
+        Core->>Prisma: goodsIssue.count({ where })
+        Prisma-->>Core: count(): Promise[number] — total y filtered iguales
+        Core-->>Facade: findAllGoodsIssues(): Promise[{ data, recordsTotal, recordsFiltered }]
+        Facade-->>Controller: findAllMaterialGoodsIssues(): Promise[{ data, recordsTotal, recordsFiltered }]
+        Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
     end
-    deactivate Domain
-    deactivate Controller
 ```
-

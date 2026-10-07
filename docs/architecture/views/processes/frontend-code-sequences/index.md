@@ -6,6 +6,9 @@ respuesta y sus efectos. El objetivo y el flujo de negocio permanecen en los
 Esta colección es la evidencia detallada caso–código; la documentación técnica conserva
 responsabilidades y decisiones reutilizables sin mantener una segunda matriz equivalente.
 
+Compras y salidas separan materiales y consumibles mediante módulos específicos;
+las secuencias reutilizan los componentes comunes de cada proceso.
+
 | Aspecto | Contenido de la secuencia frontend |
 | --- | --- |
 | Inicio | Actor canónico, navegador y evento de la interfaz. |

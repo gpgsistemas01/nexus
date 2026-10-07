@@ -44,6 +44,8 @@ y la sesión de Almacén, siga el [flujo de capturas](../governance/document-exp
 revise los PNG generados y copie las capturas aprobadas a las rutas versionadas
 referenciadas por cada procedimiento. Después vuelva a validar los manuales.
 
+El recorrido de salidas de consumibles también requiere capturas propias; no se deben sustituir por imágenes de materiales.
+
 ## Inventario automatizado
 
 La siguiente tabla refleja el arreglo `captures` de `scripts/captureManualScreenshots.js`. Para

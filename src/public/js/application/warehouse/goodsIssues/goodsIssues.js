@@ -1,21 +1,11 @@
-import { editGoodsIssueHeaderRequest, editGoodsIssueDetailsRequest, editGoodsIssueRequest, getAllGoodsIssuesRequest, registerGoodsIssueRequest, returnGoodsIssueDetailRequest } from "../../../services/warehouse/goodsIssueService.js";
-import { createIssueApplication } from '../issues/createIssueApplication.js';
+import * as materialApplication from './materials/materialGoodsIssues.js';
+import * as consumableApplication from './consumables/consumableGoodsIssues.js';
+import { goodsIssueContext } from '../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
 
-const goodsIssueApplication = createIssueApplication({
-    requests: {
-        getAll: getAllGoodsIssuesRequest,
-        register: registerGoodsIssueRequest,
-        edit: editGoodsIssueRequest,
-        editHeader: editGoodsIssueHeaderRequest,
-        editDetails: editGoodsIssueDetailsRequest,
-        returnDetail: returnGoodsIssueDetailRequest
-    },
-    dataKeys: { issueReturn: 'goodsIssueReturn' }
-});
-
-export const getAllGoodsIssues = goodsIssueApplication.getAll;
-export const registerGoodsIssue = goodsIssueApplication.register;
-export const editGoodsIssue = goodsIssueApplication.edit;
-export const editGoodsIssueHeader = goodsIssueApplication.editHeader;
-export const editGoodsIssueDetails = goodsIssueApplication.editDetails;
-export const returnGoodsIssueDetail = goodsIssueApplication.returnDetail;
+const consumable = goodsIssueContext.resource === 'consumable';
+export const getAllGoodsIssues = consumable ? consumableApplication.getAllConsumableGoodsIssues : materialApplication.getAllMaterialGoodsIssues;
+export const registerGoodsIssue = consumable ? consumableApplication.registerConsumableGoodsIssue : materialApplication.registerMaterialGoodsIssue;
+export const editGoodsIssue = consumable ? consumableApplication.editConsumableGoodsIssue : materialApplication.editMaterialGoodsIssue;
+export const editGoodsIssueHeader = consumable ? consumableApplication.editConsumableGoodsIssueHeader : materialApplication.editMaterialGoodsIssueHeader;
+export const editGoodsIssueDetails = consumable ? consumableApplication.editConsumableGoodsIssueDetails : materialApplication.editMaterialGoodsIssueDetails;
+export const returnGoodsIssueDetail = consumable ? consumableApplication.returnConsumableGoodsIssueDetail : materialApplication.returnMaterialGoodsIssueDetail;

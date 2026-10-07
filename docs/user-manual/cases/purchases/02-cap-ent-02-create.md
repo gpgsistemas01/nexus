@@ -5,6 +5,8 @@
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Compras](../../error-messages.md#errores-compras).
 
+**Antes de empezar:** Abra **Menú principal → Compras → Materiales**. Tenga el comprobante de recepción, proveedor, persona que recibe y cantidades y costos de los artículos.
+
 **Controles que debe usar:** Botón **Nueva compra**; opciones **Factura** o **Remisión**; campo **Número de Factura**; selectores **Buscar proveedor...** y **Buscar persona que recibe...**; campos **Fecha y hora de recepción:** y **Observaciones**; selector **Buscar material...**, campos **Cantidad** y **Costo por Presentación**, botón **Agregar** y botón **Guardar**.
 
 1. Seleccione **Nueva compra** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
@@ -12,14 +14,12 @@
    ![CAP-ENT-02-CREATE: formulario registro](../../images/purchases/02-form-registration.png)
 
 2. Elija la opción **Factura** o **Remisión**. Complete **Número de Factura** cuando corresponda; elija opciones en **Buscar proveedor...** y **Buscar persona que recibe...**; capture **Fecha y hora de recepción:** y **Observaciones**.
-3. En el detalle, elija una opción en **Buscar material...**. Si no existe, escriba su nombre y
-   seleccione **Nuevo material**; complete la identidad y la oferta en el formulario que se abre y
-   seleccione **Guardar**. En este contexto Nexus no muestra ni solicita **Costo Máximo**, **Nueva
-   cantidad**, razón de stock inicial u **Observaciones**, y devuelve el material nuevo seleccionado
-   con existencia cero y sin costo máximo.
-4. Complete **Cantidad** y **Costo por Presentación**, y pulse **Agregar** por cada renglón. Estos
-   valores pertenecen al detalle de la compra: crear el material por sí solo no incrementa la
-   existencia ni registra un ajuste inicial.
+3. Busque el artículo en **Buscar material...** y elija la opción del proveedor correcto.
+   Si no existe, use **Nuevo material**, complete su formulario y guarde. Regresará
+   a la compra con el artículo seleccionado; su existencia todavía será cero.
+4. Capture **Cantidad** y **Costo por Presentación** y pulse **Agregar**. Compruebe
+   el renglón y los totales. Repita el paso para cada artículo recibido. **Agregar**
+   prepara el formulario; la recepción se registra al guardar la compra.
 5. Revise el encabezado y los detalles, y seleccione **Guardar**.
 
    🟨 **ADVERTENCIA:** confirmar la compra incrementa la existencia de cada renglón. Si Nexus no
@@ -31,7 +31,4 @@ cantidad incrementa la existencia al confirmar. En cambio, una factura no se reg
 para el mismo proveedor: si Nexus indica el folio donde ya existe, abra esa compra y agregue ahí los
 materiales faltantes.
 
-🟦 **EXCEPCIÓN DEL PROCESO:** el formulario **Nuevo material** abierto desde una compra no es
-equivalente al alta directa del módulo **Almacén → Materiales**. En el alta directa, **Costo
-Máximo** y **Nueva cantidad** son obligatorios y se registra el ajuste inicial; en una compra, el
-costo y la existencia proceden exclusivamente del detalle al confirmar **Guardar**.
+**Compruebe el resultado:** El listado muestra la compra con su folio. Revise sus renglones y compruebe la existencia del mismo artículo y proveedor en **Almacén → Materiales**.

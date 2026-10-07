@@ -5,53 +5,58 @@
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    participant Browser as Navegador
-    participant Router@{ "type": "boundary" } as src/routes/api/warehouse/goodsIssueApiRoute.js
+    participant Client as Cliente HTTP / web
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js
     participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
     participant Validator@{ "type": "control" } as src/validators/forms/goodsIssueValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssueController.js
-    participant ReturnDto@{ "type": "entity" } as returnDto: Object<br/>src/dtos/goodsIssueDTO.js
-    participant Service@{ "type": "control" } as src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js
-    participant Inventory@{ "type": "control" } as src/services/inventory/movementService.js
-    participant Status@{ "type": "control" } as src/services/warehouse/issues/issueFulfillmentRules.js
+    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js<br/>src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js
+    participant Facade@{ "type": "control" } as src/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js
+    participant Core@{ "type": "control" } as src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js
+    participant Helpers as src/services/warehouse/goodsIssues/goodsIssueHelpers.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant Inventory as src/services/inventory/movementService.js
     participant Socket as src/utils/socketUtils.js
+    participant DTO@{ "type": "entity" } as goodsIssueDto: Object<br/>src/dtos/goodsIssueDTO.js
+    participant Header as src/services/warehouse/issues/issueHeaderService.js
+    participant ErrorHandler as src/app.js
+    participant Fulfillment as src/services/warehouse/fulfillmentStatusService.js
+    participant Status as src/services/warehouse/issues/issueFulfillmentRules.js
 
-    Browser->>Router: PATCH /:id/details/:detailId/returns
-    Router->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: goodsIssueReturnValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Browser: HTTP 401 { code, message }
-    else goodsIssueReturnValidation rechaza req.body/req.params
-        Validator-->>Browser: HTTP 400 { errors }
-    else PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE denegado
-        Auth-->>Browser: HTTP 403 { code, message }
+    Client->>Route: PATCH /api/warehouse/goods-issues/materials/:id/details/:detailId/returns
+    Route->>Auth: verifyApiTokenRequired(req, res, next)
+    Route->>Validator: goodsIssueReturnValidation[] y validate(req, res, next)
+    Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE)(req, res, next)
+    alt Token, validación o permiso rechazados
+        Route-->>Client: HTTP 401, 400 o 403 — error de middleware
     else Pipeline aceptado
-        Router->>Controller: registerGoodsIssueDetailReturn(req, res)
-        Controller->>ReturnDto: createGoodsIssueDtoForReturn(req.body)
-        ReturnDto-->>Controller: createGoodsIssueDtoForReturn(): Object (returnDto)
-        Controller->>Service: returnGoodsIssueDetail({ id, detailId, returnDto, userId })
-        Service->>Prisma: getDb().$transaction(async tx)
-        Service->>Prisma: tx.goodsIssueDetail.findFirst({ where: { id: detailId, goodsIssueId: id } })
-        Service->>Service: returnGoodsIssueDetail() valida estado, cantidad y devoluciones
-        alt Cantidad no retornable
-            Service-->>Service: error de dominio
-            Service-->>Controller: rollback y error
-        else Cantidad válida
-            Service->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
-            Service->>Prisma: tx.goodsIssueReturn.create({ data })
-            Service->>Prisma: tx.goodsIssueDetail.findMany({ where: { goodsIssueId: id } })
-            alt todos los detalles quedan Cancelado
-                Service->>Status: resolveIssueFulfillmentStatus(details)
-            else existe algún detalle no cancelado
-                Service->>Status: resolveIssueFulfillmentStatus(refreshedDetails) sin cancelar el encabezado
+        Route->>Controller: registerMaterialGoodsIssueDetailReturn(req, res)
+        Controller->>DTO: createGoodsIssueDtoForReturn(req.body)
+        DTO-->>Controller: createGoodsIssueDtoForReturn(): Object — DTO normalizado
+        Controller->>Controller: sanitizeEmptyStrings(dto)
+        Controller->>Facade: returnMaterialGoodsIssueDetail(options con DTO, identificadores y actor cuando corresponde)
+        Facade->>Core: returnGoodsIssueDetail({ ...options, type: MATERIAL })
+        alt Servicio resuelto
+            critical getDb().$transaction(async tx => ...)
+                Core->>Fulfillment: findFulfillmentStatusIdsByName({ tx, names })
+                Core->>Prisma: tx.goodsIssueDetail.findFirst({ where: { id: detailId, goodsIssueId: id, goodsIssue: contextWhere } })
+                Core->>Core: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
+                Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
+                Core->>Prisma: tx.goodsIssueDetail.update({ where: { id: detailId }, data: devolución y cumplimiento })
+                Core->>Prisma: tx.goodsIssueDetail.findMany({ where: { goodsIssueId: id } })
+                Core->>Status: resolveIssueFulfillmentStatus(refreshedDetails) si no están todos cancelados
+                Core->>Prisma: tx.goodsIssue.update({ where: { id, ...contextWhere }, data: estados derivados })
+                Core->>Prisma: tx.goodsIssueReturn.create({ data: { returnedById: userId, movementDetailId, ... } })
             end
-            Prisma-->>Service: salida actualizada y commit
-            Service-->>Controller: returnGoodsIssueDetail(): Promise[{ goodsIssue: GoodsIssue, goodsIssueReturn: GoodsIssueReturn }]
+            Prisma-->>Core: commit de devolución
+            Core-->>Facade: returnGoodsIssueDetail(): Promise[{ ...goodsIssueReturn, detail: updatedDetail }]
+            Facade-->>Controller: returnMaterialGoodsIssueDetail(): Promise[{ ...goodsIssueReturn, detail: updatedDetail }]
             Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-issue-return-created' })
-            Controller-->>Browser: 200 { goodsIssueReturn, code }
+            Controller-->>Client: HTTP 200 { goodsIssueReturn, code }
+        else Error de dominio o persistencia
+            Core-->>Facade: error — rollback si falló la transacción
+            Facade-->>Controller: error propagado
+            Controller->>ErrorHandler: next(error) — propagación de Express
+            ErrorHandler-->>Client: HTTP de error { code, message }
         end
     end
 ```

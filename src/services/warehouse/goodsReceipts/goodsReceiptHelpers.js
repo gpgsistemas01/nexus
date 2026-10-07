@@ -3,9 +3,23 @@ import { roundTo } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { findMaterialsSnapshot } from "../materials/materialService.js";
-import { GoodsReceiptDetailAlreadyCanceled } from "../../../errors/warehouse/goodsReceiptError.js";
+import { MATERIAL_TYPES } from "../../../constants/inventory.js";
+import { GoodsReceiptDetailAlreadyCanceled, GoodsReceiptNotFound } from "../../../errors/warehouse/goodsReceiptError.js";
 
 const IVA_RATE = 1.16;
+
+export const buildGoodsReceiptContextWhere = (type = null) => {
+    if (type === null) return {};
+    if (!Object.values(MATERIAL_TYPES).includes(type)) throw new GoodsReceiptNotFound();
+
+    return {
+        type,
+        details: {
+            some: {},
+            every: { material: { type } }
+        }
+    };
+};
 
 /**
  * Relation graph for raw purchase details returned to the browser. Scalar

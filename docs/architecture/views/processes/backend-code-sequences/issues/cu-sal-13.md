@@ -42,15 +42,16 @@ sequenceDiagram
         else Cantidad válida
             Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId: id }, movementType: ENTRY, details })
             Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
-            Service->>Prisma: tx.wasteIssueReturn.create({ data })
+            Service->>Prisma: tx.wasteIssueDetail.update({ where: { id: detailId }, data: devolución y cumplimiento })
             Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
             alt todos los detalles quedan Cancelado
                 Service->>Prisma: tx.wasteIssue.update({ where: { id }, data })
             end
+            Service->>Prisma: tx.wasteIssueReturn.create({ data })
             Prisma-->>Service: salida de merma actualizada y commit
-            Service-->>Controller: returnWasteIssueDetail(): Promise[WasteIssueReturn]
+            Service-->>Controller: returnWasteIssueDetail(): Promise[{ ...wasteIssueReturn, detail: updatedDetail }]
             Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' })
-            Controller-->>Client: 200 devolución registrada
+            Controller-->>Client: 200 { wasteIssueReturn, code }
         end
     end
 ```

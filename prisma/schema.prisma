@@ -545,6 +545,7 @@ enum GoodsReceiptDetailStatus {
 
 model GoodsIssue {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type            MaterialType @default(MATERIAL)
   referenceNumber String    @unique @db.VarChar(50)
   approvedDate    DateTime?
   requestDate     DateTime
@@ -583,6 +584,7 @@ model GoodsIssue {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([type])
   @@index([departmentId])
   @@index([requesterId])
   @@index([clientId])

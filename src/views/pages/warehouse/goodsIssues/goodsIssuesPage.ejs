@@ -1,6 +1,8 @@
+<div id="goodsIssueContext" data-resource="<%= inventoryResource %>" hidden></div>
+
 <%- include('../../../shared/issues/issueFilters') %>
 
-<%- include('../../../shared/tables/mainTable', { title: 'Salidas de material' }) %>
+<%- include('../../../shared/tables/mainTable', { title: `Salidas de ${ inventoryResource === 'consumable' ? 'consumibles' : 'materiales' }` }) %>
 
 <%- include('../../../shared/issues/issueModal', {
     issue: {
@@ -28,9 +30,9 @@
 
 <%- include('../../sales/clients/clientModal') %>
 
-<script type="module" src="/js/pages/warehouse/goodsIssues/goodsIssuesPage.js"></script>
+<script type="module" src="/js/pages/warehouse/goodsIssues/<%= inventoryResource === 'consumable' ? 'consumables/consumableGoodsIssuesPage' : 'materials/materialGoodsIssuesPage' %>.js"></script>
 
 <%- contentFor('title') %>
-Salidas del material
+Salidas de <%= inventoryResource === 'consumable' ? 'consumibles' : 'materiales' %>
 <%- contentFor('layoutType') %>
 site

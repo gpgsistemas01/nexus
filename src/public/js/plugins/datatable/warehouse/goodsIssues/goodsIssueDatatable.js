@@ -1,6 +1,7 @@
 import { getAllGoodsIssues } from "../../../../application/warehouse/goodsIssues/goodsIssues.js";
 import { exportGoodsIssueReport } from "../../../../application/warehouse/report.js";
 import { createIssueDatatable } from '../../shared/issues/issueDatatable.js';
+import { goodsIssueContext } from '../../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
 
 export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
@@ -19,7 +20,7 @@ export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onE
         buttons: canManage ? [{ text: 'Nueva salida', action: onCreate }] : [],
         exportOptions: {
             report: exportGoodsIssueReport,
-            filename: 'reporte_salidas'
+            filename: `reporte_salidas_${ goodsIssueContext.resource === 'consumable' ? 'consumibles' : 'materiales' }`
         },
         actions: { onEdit, onEditDetails, onReturnDetails }
     });

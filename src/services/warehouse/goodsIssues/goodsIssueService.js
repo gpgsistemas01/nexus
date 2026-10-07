@@ -17,7 +17,7 @@ const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueServi
 import { getDb } from "../../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
 import { findFulfillmentStatusIdByName, findFulfillmentStatusIdsByName } from "../fulfillmentStatusService.js";
-import { buildGoodsIssueDetails } from "./goodsIssueHelpers.js";
+import { buildGoodsIssueContextWhere, buildGoodsIssueDetails } from "./goodsIssueHelpers.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { normalizeDecimal } from "../../../utils/formattersUtils.js";
 import { handleServiceError } from "../../serviceErrorHandler.js";
@@ -25,7 +25,7 @@ import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { ROLE_NAMES } from "../../../constants/roles.js";
 import { DEPARTMENT_NAMES } from "../../../constants/departments.js";
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
-import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
+import { INVENTORY_MOVEMENT_TYPES, MATERIAL_TYPES } from "../../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { resolveIssueHeaderData } from "../issues/issueHeaderService.js";
 import { resolveIssueFulfillmentStatus } from "../issues/issueFulfillmentRules.js";
@@ -55,7 +55,9 @@ export const findAllGoodsIssues = async ({
     personId = '',
     orderBy = 'referenceNumber',
     orderDir = 'desc',
-    accesses = []
+    type = MATERIAL_TYPES.MATERIAL,
+    accesses = [],
+    includeCounts = true
 }) => {
 
     const db = getDb();
@@ -69,6 +71,7 @@ export const findAllGoodsIssues = async ({
     const userDepartments = accesses.map(a => a.department);
 
     const where = {
+        ...buildGoodsIssueContextWhere(type),
         ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
         ...(clientId && { clientId }),
         ...(departmentId && { departmentId }),
@@ -139,6 +142,8 @@ export const findAllGoodsIssues = async ({
         }
     });
 
+    if (!includeCounts) return { data: goodsIssues };
+
     const total = await db.goodsIssue.count({ where });
     const filtered = total;
 
@@ -149,7 +154,7 @@ export const findAllGoodsIssues = async ({
     };
 };
 
-export const createGoodsIssue = async ({ goodsIssueDto }) => {
+export const createGoodsIssue = async ({ goodsIssueDto, type = MATERIAL_TYPES.MATERIAL }) => {
 
     let referenceNumber = null;
 
@@ -170,7 +175,8 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
         const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ name: FULFILLMENT_STATUS_NAMES.PENDING });
         const processedDetails = await buildGoodsIssueDetails({
             details,
-            initialFulfillmentStatusId: pendingFulfillmentStatusId
+            initialFulfillmentStatusId: pendingFulfillmentStatusId,
+            type
         });
 
         const result = await getDb().$transaction(async (tx) => {
@@ -180,6 +186,7 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
             const goodsIssue = await tx.goodsIssue.create({
                 data: {
                     ...headerData,
+                    type,
                     referenceNumber,
                     fulfillmentStatus: {
                         connect: {
@@ -227,14 +234,14 @@ export const createGoodsIssue = async ({ goodsIssueDto }) => {
     }
 };
 
-export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
+export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPES.MATERIAL }) => {
 
     try {
 
         const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
 
         const goodsIssue = await getDb().goodsIssue.findUnique({
-            where: { id },
+            where: { id, ...buildGoodsIssueContextWhere(type) },
             select: {
                 id: true,
                 status: true,
@@ -275,10 +282,17 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
         const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ name: FULFILLMENT_STATUS_NAMES.PENDING });
         const processedDetails = await buildGoodsIssueDetails({
             details,
-            initialFulfillmentStatusId: pendingFulfillmentStatusId
+            initialFulfillmentStatusId: pendingFulfillmentStatusId,
+            type
         });
 
         const updatedGoodsIssue = await getDb().$transaction(async (tx) => {
+
+            const currentIssue = await tx.goodsIssue.findUnique({
+                where: { id, ...buildGoodsIssueContextWhere(type) },
+                select: { id: true }
+            });
+            if (!currentIssue) throw new GoodsIssueNotFound();
 
             await tx.goodsIssueDetail.deleteMany({
                 where: { goodsIssueId: id }
@@ -292,7 +306,7 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
             });
 
             return await tx.goodsIssue.update({
-                where: { id },
+                where: { id, ...buildGoodsIssueContextWhere(type) },
                 data: {
                     ...headerData,
 
@@ -335,14 +349,14 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto }) => {
     }
 };
 
-export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
+export const updateGoodsIssueHeader = async ({ id, goodsIssueDto, type = MATERIAL_TYPES.MATERIAL }) => {
 
     try {
 
         const { requesterId, advisorId, departmentId, clientId, ...goodsIssueData } = goodsIssueDto;
 
         const goodsIssue = await getDb().goodsIssue.findUnique({
-            where: { id },
+            where: { id, ...buildGoodsIssueContextWhere(type) },
             select: { id: true }
         });
 
@@ -359,7 +373,7 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
         });
 
         const updatedGoodsIssue = await getDb().goodsIssue.update({
-            where: { id },
+            where: { id, ...buildGoodsIssueContextWhere(type) },
             data: {
                 ...headerData
             },
@@ -395,7 +409,7 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto }) => {
     }
 };
 
-export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
+export const updateGoodsIssueDetails = async ({ id, goodsIssueDto, type = MATERIAL_TYPES.MATERIAL }) => {
 
     const { details = [] } = goodsIssueDto;
     const detailIds = details.map(detail => detail.id);
@@ -403,7 +417,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
     try {
 
         const goodsIssue = await getDb().goodsIssue.findUnique({
-            where: { id },
+            where: { id, ...buildGoodsIssueContextWhere(type) },
             select: {
                 id: true,
                 status: true,
@@ -471,6 +485,12 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
 
         return await getDb().$transaction(async (tx) => {
 
+            const currentIssue = await tx.goodsIssue.findUnique({
+                where: { id, ...buildGoodsIssueContextWhere(type) },
+                select: { id: true }
+            });
+            if (!currentIssue) throw new GoodsIssueNotFound();
+
             const statusIdsByName = await findFulfillmentStatusIdsByName({ tx, names: Object.values(FULFILLMENT_STATUS_NAMES) });
 
             if (supplyRequests.length) {
@@ -533,7 +553,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
             const fulfillmentName = resolveIssueFulfillmentStatus(refreshed);
 
             return await tx.goodsIssue.update({
-                where: { id },
+                where: { id, ...buildGoodsIssueContextWhere(type) },
                 data: {
                     fulfillmentStatus: {
                         connect: { name: fulfillmentName }
@@ -544,6 +564,7 @@ export const updateGoodsIssueDetails = async ({ id, goodsIssueDto }) => {
                 },
                 select: {
                     id: true,
+                    type: true,
                     status: true,
                     fulfillmentStatus: true,
                     details: {

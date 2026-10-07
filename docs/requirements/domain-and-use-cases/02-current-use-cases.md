@@ -406,7 +406,10 @@ direction LR
     warehouse -- ucConsumablePurchaseReport
 ```
 
-### Grupo funcional SAL — Salidas de material y de merma
+### Grupo funcional SAL — Salidas de materiales, consumibles y mermas
+
+Consumibles sigue los recorridos `CU-SAL-01` a `CU-SAL-07` con pantalla,
+rutas y recursos propios, y las mismas transiciones de estado.
 
 #### Salidas de materiales
 

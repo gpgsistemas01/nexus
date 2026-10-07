@@ -34,23 +34,24 @@ sequenceDiagram
         Router->>Controller: editWasteIssueDetails(req, res)
         Controller->>IssueDto: createWasteIssueDetailsDtoForEdit(req.body)
         IssueDto-->>Controller: createWasteIssueDetailsDtoForEdit(): Object (wasteIssueDto)
-        Controller->>Service: updateWasteIssueDetails({ id, details: wasteIssueDto.details })
+        Controller->>Service: updateWasteIssueDetails({ id, wasteIssueDto: sanitizedWasteIssueDto })
         Service->>Prisma: updateWasteIssueDetailsTransaction({ id, wasteIssueDto }) abre getDb().$transaction()
         Service->>Service: updateWasteIssueDetailsTransaction() valida estado, ids y snapshots
         Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
         loop Cada detalle nuevo con isSupplied
             Service->>Rules: resolveIssueDetailFulfillmentStatus(detail)
             Service->>Prisma: tx.wasteIssueDetail.update({ where, data })
-            Service->>Movement: movementDetails.push({ wasteIssueDetailId, quantity })
-            Movement->>Stock: applyWasteStockChange({ tx, wasteId, quantityDelta })
+            Service->>Service: supplyDetails.push({ wasteIssueDetailId, quantity })
         end
         Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId }, movementType: ISSUE, details })
+        Movement->>Stock: applyWasteStockChange({ tx, id: wasteId, quantityChange, convertedQuantityChange })
         Movement->>Prisma: createWasteMovement({ tx, reference, movementType: ISSUE, details })
+        Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
         Service->>Rules: resolveIssueFulfillmentStatus(details)
         Service->>Prisma: tx.wasteIssue.update({ where, data })
         alt Commit confirmado
             Service-->>Controller: updateWasteIssueDetails(): Promise[WasteIssue]
-            Controller->>Socket: emitInventoryUpdated()
+            Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' })
             Controller-->>Client: 200 { wasteIssue, code }
         else Stock insuficiente, estado inválido o error Prisma
             Prisma-->>Service: error de dominio o persistencia

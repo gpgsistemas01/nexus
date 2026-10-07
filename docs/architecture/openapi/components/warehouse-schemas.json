@@ -237,6 +237,14 @@
         "items": {
           "$ref": "../openapi.json#/components/schemas/IssueDetail"
         }
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "MATERIAL",
+          "CONSUMABLE"
+        ],
+        "description": "Tipo persistido de las salidas de materiales y consumibles; no aplica a salidas de merma."
       }
     },
     "additionalProperties": false,

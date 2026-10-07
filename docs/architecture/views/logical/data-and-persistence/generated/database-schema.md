@@ -266,6 +266,7 @@ erDiagram
     direction LR
     GoodsIssue {
         String id PK
+        MaterialType type
         String referenceNumber UK
         DateTime approvedDate
         DateTime requestDate

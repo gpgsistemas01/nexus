@@ -1,3 +1,7 @@
+import materialGoodsIssueReportApiRoute from './warehouse/goodsIssues/materials/materialGoodsIssueReportApiRoute.js';
+import consumableGoodsIssueReportApiRoute from './warehouse/goodsIssues/consumables/consumableGoodsIssueReportApiRoute.js';
+import materialGoodsReceiptReportApiRoute from './warehouse/goodsReceipts/materials/materialGoodsReceiptReportApiRoute.js';
+import consumableGoodsReceiptReportApiRoute from './warehouse/goodsReceipts/consumables/consumableGoodsReceiptReportApiRoute.js';
 import authApiRoutes from './authApiRoute.js';
 import clientApiRoutes from './sales/clientApiRoute.js';
 import salesReportApiRoutes from './sales/reportApiRoute.js';
@@ -6,8 +10,10 @@ import consumableApiRoutes from './warehouse/consumableApiRoute.js';
 import wasteApiRoutes from './warehouse/wasteApiRoute.js';
 import wasteIssueApiRoutes from './warehouse/wasteIssueApiRoute.js';
 import supplierApiRoutes from './warehouse/supplierApiRoute.js';
-import goodsReceiptApiRoutes from './warehouse/goodsReceiptApiRoute.js';
-import goodsIssueApiRoutes from './warehouse/goodsIssueApiRoute.js';
+import materialGoodsReceiptApiRoutes from './warehouse/goodsReceipts/materials/materialGoodsReceiptApiRoute.js';
+import consumableGoodsReceiptApiRoutes from './warehouse/goodsReceipts/consumables/consumableGoodsReceiptApiRoute.js';
+import materialGoodsIssueApiRoutes from './warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js';
+import consumableGoodsIssueApiRoutes from './warehouse/goodsIssues/consumables/consumableGoodsIssueApiRoute.js';
 import warehouseReportApiRoutes from './warehouse/reportApiRoute.js';
 import unitMeasuresApiRoutes from './warehouse/unitMeasureApiRoute.js';
 import presentationApiRoutes from './warehouse/presentationApiRoute.js';
@@ -30,8 +36,14 @@ const API_ROUTES = [
     ['/warehouse/wastes', wasteApiRoutes],
     ['/warehouse/waste-issues', wasteIssueApiRoutes],
     ['/warehouse/suppliers', supplierApiRoutes],
-    ['/warehouse/goods-receipts', goodsReceiptApiRoutes],
-    ['/warehouse/goods-issues', goodsIssueApiRoutes],
+    ['/warehouse/goods-receipts/materials', materialGoodsReceiptApiRoutes],
+    ['/warehouse/goods-receipts/consumables', consumableGoodsReceiptApiRoutes],
+    ['/warehouse/goods-issues/materials', materialGoodsIssueApiRoutes],
+    ['/warehouse/goods-issues/consumables', consumableGoodsIssueApiRoutes],
+    ['/warehouse/reports/goods-issues/materials', materialGoodsIssueReportApiRoute],
+    ['/warehouse/reports/goods-issues/consumables', consumableGoodsIssueReportApiRoute],
+    ['/warehouse/reports/goods-receipts/materials', materialGoodsReceiptReportApiRoute],
+    ['/warehouse/reports/goods-receipts/consumables', consumableGoodsReceiptReportApiRoute],
     ['/warehouse/reports', warehouseReportApiRoutes],
     ['/warehouse/unit-measures', unitMeasuresApiRoutes],
     ['/warehouse/presentations', presentationApiRoutes],
