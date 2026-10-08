@@ -2,7 +2,7 @@
 
 ### Relación con la colección canónica
 
-Los 85 recorridos `DIA-BE-CU-*` de `backend-code-sequences/index.md` forman la colección
+Los 92 recorridos `DIA-BE-CU-*` de `backend-code-sequences/index.md` forman la colección
 canónica por caso y son propietarios del orden ruta → controller → servicio →
 persistencia o efecto. Este documento conserva únicamente diagramas que contestan una
 pregunta adicional. Un diagrama complementario no reemplaza la secuencia enlazada, no

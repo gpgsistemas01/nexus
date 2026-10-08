@@ -25,12 +25,6 @@ sus existencias y sus movimientos debe quedar completo, sin cambios parciales.
 
 
 
-## Fichas específicas
-
-### Grupo funcional ENT — Compras de material
-
-Cada ficha describe un objetivo del actor, sus condiciones y sus efectos sobre el negocio. Los objetivos se mantienen separados aunque compartan información o reglas.
-
 ## Fichas por caso de uso
 
 - [`CU-ENT-01` — Consultar compras de material](cu-ent-01.md)

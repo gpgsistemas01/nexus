@@ -191,7 +191,7 @@ trazabilidad técnica; un identificador retirado no se reasigna a un objetivo di
 | `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
 | `CAT` | Catálogos | Recursos comerciales y contextuales reutilizados por documentos. |
 | `ENT` | Compras de materiales y consumibles | Consulta, registro, edición, corrección, cancelación y reporte de ambos contextos de compra. |
-| `SAL` | Salidas de material y de merma | Consulta, creación, edición, surtimiento y devolución de materiales o mermas. |
+| `SAL` | Salidas de material, merma y consumible | Consulta, creación, edición, surtimiento y devolución de materiales, consumibles o mermas. |
 
 #### Criterio de agrupación vigente
 
@@ -213,7 +213,7 @@ como listas planas difíciles de revisar.
 | `ALM` | Materiales y sus movimientos; mermas y sus movimientos; consumibles. | `CU-ALM-01` a `CU-ALM-22` |
 | `CAT` | Proveedores; clientes; catálogos auxiliares y reportes complementarios. | `CU-CAT-01` a `CU-CAT-26` |
 | `ENT` | Compras de materiales, consumibles y sus reportes. | `CU-ENT-01` a `CU-ENT-12` |
-| `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
+| `SAL` | Salidas de material, merma y consumible con sus reportes. | `CU-SAL-01` a `CU-SAL-21` |
 
 Las familias internas son ayudas visuales, no nuevos grupos funcionales, permisos ni
 módulos de código. Un caso conserva un único identificador y una única entidad aunque su
@@ -223,7 +223,7 @@ El orden anterior determina la lectura dentro de cada grupo. La numeración sigu
 orden de lectura del catálogo dentro de cada grupo propietario. El catálogo y las fichas
 se presentan después en esa misma secuencia. No se conserva al final del grupo una
 operación especial que pertenece a una familia anterior. Los seis grupos funcionales
-se presentan en veinte figuras de detalle para facilitar la lectura de los 85 casos,
+se presentan en veintiuna figuras de detalle para facilitar la lectura de los 92 casos,
 no por una exigencia de UML. La numeración continúa dentro del mismo grupo y no se
 reinicia por figura; separar inventarios y movimientos no crea una familia nueva.
 Las extensiones de otros grupos se representan junto al caso base, reutilizando el
@@ -244,7 +244,7 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 - [ALM — Almacén](catalogs/index.md)
 - [CAT — Catálogos](catalogs/index.md)
 - [ENT — Compras de materiales y consumibles](purchases/index.md)
-- [SAL — Salidas de material y de merma](issues/index.md)
+- [SAL — Salidas de material, merma y consumible](issues/index.md)
 
 ## Reglas compartidas entre familias
 

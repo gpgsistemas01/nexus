@@ -15,12 +15,6 @@
 | `CU-IDA-09` | Generar reporte de usuarios | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 
 
-## Fichas específicas
-
-### Grupo funcional IDA — Identidad y acceso
-
-Cada ficha describe un objetivo del actor, sus condiciones y sus efectos sobre el negocio. Los objetivos se mantienen separados aunque compartan información o reglas.
-
 ## Fichas por caso de uso
 
 - [`CU-IDA-01` — Consultar personas](cu-ida-01.md)

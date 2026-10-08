@@ -30,7 +30,7 @@ o altas desde selectores. El administrador hereda las asociaciones de Almacén m
 generalización, sin duplicarlas.
 
 La separación en vistas es una decisión de legibilidad, no una exigencia de UML. Un
-único diagrama con los 85 casos y todas las asociaciones dificultaría su revisión. Las
+único diagrama con los 92 casos y todas las asociaciones dificultaría su revisión. Las
 relaciones se muestran junto al caso base y no en una vista independiente que obligue a
 reconstruirlas entre diagramas. La jerarquía de autenticación enlaza Personal de almacén con Usuario registrado y
 Administrador del sistema con Personal de almacén. La generalización operativa se
@@ -58,9 +58,9 @@ La decisión y las familias resultantes se resumen en el
 
 ### Numeración y orden de lectura
 
-Los 85 casos conservan una secuencia continua dentro de cada grupo propietario:
-`AUT` 01–02, `IDA` 01–09, `ALM` 01–22, `CAT` 01–26, `ENT` 01–12 y `SAL` 01–14.
-Las veinte figuras no reinician ni cambian esa numeración. Por ejemplo, Materiales
+Los 92 casos conservan una secuencia continua dentro de cada grupo propietario:
+`AUT` 01–02, `IDA` 01–09, `ALM` 01–22, `CAT` 01–26, `ENT` 01–12 y `SAL` 01–21.
+Las veintiuna figuras no reinician ni cambian esa numeración. Por ejemplo, Materiales
 presenta `CU-ALM-01` a `CU-ALM-06`, Movimientos de materiales continúa con
 `CU-ALM-07` y `CU-ALM-08`, y Mermas comienza en `CU-ALM-09`.
 
@@ -533,8 +533,8 @@ direction LR
 
 ### Grupo funcional SAL — Salidas de materiales, consumibles y mermas
 
-Consumibles sigue los recorridos `CU-SAL-01` a `CU-SAL-07` con pantalla,
-rutas y recursos propios, y las mismas transiciones de estado.
+Los tres contextos conservan casos propios. Consumibles utiliza `CU-SAL-15` a
+`CU-SAL-21`, con las mismas transiciones de estado y existencias separadas.
 
 #### Salidas de materiales
 
@@ -600,9 +600,44 @@ direction LR
     ucWasteIssueQuery -- ucWasteIssueReport
 ```
 
+
+#### Salidas de consumibles
+
+```mermaid
+usecase-beta
+%%{init: {"layout": "dagre"}}%%
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary issuePackage3["Nexus · Salidas de consumibles"]
+        ucConsumableIssueQuery("CU-SAL-15 Consultar salidas de consumible")
+        ucConsumableIssueCreate("CU-SAL-16 Crear salida de consumible")
+        ucConsumableIssueHeader("CU-SAL-17 Editar encabezado de salida de consumible")
+        ucConsumableIssueDetails("CU-SAL-18 Editar detalles de consumible de una salida")
+        ucConsumableSupply("CU-SAL-19 Surtir consumible")
+        ucConsumableReturn("CU-SAL-20 Devolver consumible surtido")
+        ucConsumableIssueReport("CU-SAL-21 Generar reporte de salidas de consumible")
+        clientExtension("CU-CAT-06 Crear cliente")
+    end
+
+    clientExtension ..>:extend ucConsumableIssueCreate
+
+    warehouse -- ucConsumableIssueQuery
+    warehouse -- clientExtension
+
+    ucConsumableIssueQuery -- ucConsumableIssueCreate
+    ucConsumableIssueQuery -- ucConsumableIssueHeader
+    ucConsumableIssueQuery -- ucConsumableIssueDetails
+    ucConsumableIssueQuery -- ucConsumableSupply
+    ucConsumableIssueQuery -- ucConsumableReturn
+    ucConsumableIssueQuery -- ucConsumableIssueReport
+```
+
 ### Condiciones y puntos de extensión
 
-Las cinco extensiones se dibujan en las vistas `ENT` y `SAL`, junto a sus casos base.
+Las seis extensiones se dibujan en las vistas `ENT` y `SAL`, junto a sus casos base.
 Los casos referenciados conservan su identificador y su definición en `CAT` o `ALM`.
 Esta tabla complementa las flechas con la condición, el punto de inserción y el retorno
 que también figuran en las fichas.
@@ -614,6 +649,7 @@ que también figuran en las fichas.
 | `CU-ALM-02` Crear material | `CU-ENT-02` Crear compra de material | Paso 3, seleccionar material; el actor elige **Registrar material** (A5). | Material con existencia cero seleccionado; continúa el detalle en el paso 4. |
 | `CU-ALM-18` Crear consumible | `CU-ENT-08` Crear compra de consumible | Paso 3, seleccionar consumible; el actor elige **Registrar consumible** (A5). | Consumible con existencia cero seleccionado; continúa el detalle en el paso 4. |
 | `CU-CAT-06` Crear cliente | `CU-SAL-02` Crear salida de material | Paso 3, seleccionar cliente; el actor elige **Nuevo cliente** (A3). | Cliente creado seleccionado; continúa la captura del paso 3. |
+| `CU-CAT-06` Crear cliente | `CU-SAL-16` Crear salida de consumible | Paso 3, seleccionar cliente; el actor elige **Nuevo cliente** (A3). | Cliente creado seleccionado; continúa la captura del paso 3. |
 
 Las bases pueden completarse seleccionando recursos existentes; las extensiones no son
 obligatorias y por ello no se representan con `«include»`. Si un alta se cancela o
@@ -651,8 +687,8 @@ su acceso. La revisión no encontró otra capacidad implementada con actor, disp
 resultado de negocio que permanezca oculta; proyectos, ajustes parciales y requisiciones
 continúan fuera del diagrama por su estado no vigente.
 
-`CU-SAL-05` y `CU-SAL-12` actualizan la existencia y registra el movimiento como parte de su propio
-flujo; `CU-SAL-06` y `CU-SAL-13` registran la reversión y el movimiento inverso. No existe una relación
+`CU-SAL-05`, `CU-SAL-12` y `CU-SAL-19` actualizan la existencia y registran el movimiento como parte de su propio
+flujo; `CU-SAL-06`, `CU-SAL-13` y `CU-SAL-20` registran la reversión y el movimiento inverso. No existe una relación
 `«include»` con `CU-ALM-07` y `CU-ALM-15`: consultar movimientos es otro objetivo iniciado por un
 actor, mientras registrar un movimiento es una responsabilidad interna de Nexus. Por la
 misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
@@ -697,7 +733,7 @@ define una participación particular, se conserva la asociación directa corresp
   Su participación desde selectores se muestra en las extensiones de Compras.
 - Las altas de proveedores y clientes desde selectores (`CU-CAT-02` y `CU-CAT-06`)
   mantienen la asociación con Personal de almacén, que no participa en la consulta
-  independiente de esos catálogos según las fichas vigentes. Las cinco extensiones de
+  independiente de esos catálogos según las fichas vigentes. Las seis extensiones de
   altas conservan sus asociaciones en Compras y Salidas, donde se inicia ese contexto.
 - Iniciar y cerrar sesión (`CU-AUT-01` y `CU-AUT-02`) conservan sus asociaciones
   independientes porque no parten de una consulta.
@@ -705,7 +741,7 @@ define una participación particular, se conserva la asociación directa corresp
 Los enlaces desde Consulta son una convención
 visual del documento y no una relación UML de inclusión, extensión o generalización.
 Sólo `«include»` y `«extend»` llevan su estereotipo; la generalización se identifica por
-el triángulo hueco, sin etiqueta. Las cinco extensiones opcionales se conservan junto
+el triángulo hueco, sin etiqueta. Las seis extensiones opcionales se conservan junto
 a sus casos base y en la tabla de condiciones y las fichas correspondientes.
 
 Los grupos son ayudas de lectura, no límites del sistema ni permisos. El Administrador

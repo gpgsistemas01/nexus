@@ -1,7 +1,7 @@
 # 1. Propósito y alcance
 
 Este documento, junto con las [fichas de casos de uso](../use-cases/index.md), define una
-línea base revisable de capacidades, reglas y atributos de calidad sin
+propuesta versionada y revisable de capacidades, reglas y atributos de calidad sin
 confundir tres conceptos diferentes:
 
 - **requisito:** comportamiento o restricción que el producto debe cumplir;
@@ -25,3 +25,6 @@ alternativos y excepciones, se describen por familias en el
 [catálogo de casos de uso](../use-cases/index.md). Los
 requisitos de esta colección conservan los criterios verificables y la evidencia sin
 duplicar allí la narrativa de interacción.
+
+El paquete está **En revisión**. Su contenido no constituye una línea base aprobada
+hasta registrar la aceptación funcional conforme al gobierno de versionado.

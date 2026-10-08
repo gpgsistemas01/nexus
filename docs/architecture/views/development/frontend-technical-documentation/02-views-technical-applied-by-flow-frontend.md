@@ -2,7 +2,7 @@
 
 ### Relación con la colección canónica
 
-La columna **Diagrama aplicable** del catálogo de componentes orienta hacia los 85
+La columna **Diagrama aplicable** del catálogo de componentes orienta hacia los 92
 recorridos `DIA-FE-CU-*` de `frontend-code-sequences/index.md`. Esa colección es propietaria del orden
 interacción → UI → aplicación → request → endpoint → resultado visible. Este documento
 conserva sólo diagramas que responden una pregunta adicional sobre los límites del

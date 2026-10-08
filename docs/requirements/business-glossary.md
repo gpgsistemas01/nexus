@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Este glosario forma parte de la línea base de requisitos. Define el vocabulario que
+Este glosario forma parte del paquete versionado de requisitos, actualmente en revisión. Define el vocabulario que
 usuarios, responsables funcionales, desarrollo y pruebas deben interpretar de la misma
 forma. No es un inventario de columnas: el
 [diccionario técnico de datos](../architecture/views/logical/data-and-persistence/generated/data-dictionary.md) describe nombres, tipos y
@@ -138,7 +138,7 @@ fuente de verdad.
 | SRS | Especificación de requisitos de software que conserva obligaciones, reglas, criterios, estados y trazabilidad. | Complementa visión y alcance; no equivale a arquitectura ni a código. |
 | Requisito | Obligación identificada y verificable sobre una capacidad, dato, regla o calidad. | Su fuente normativa es la SRS; el código aporta evidencia, no aceptación funcional. |
 | Criterio de aceptación | Condición observable que permite comprobar el cumplimiento de un requisito o resultado acordado. | Aprobar pruebas técnicas no sustituye la aceptación de negocio. |
-| Línea base de requisitos | Conjunto versionado de requisitos y vocabulario usado como referencia de revisión. | Su versionado no prueba aprobación funcional; ésta requiere evidencia explícita. |
+| Línea base de requisitos | Conjunto versionado y aprobado de requisitos y vocabulario usado como referencia para cambios. | Un paquete En revisión es una propuesta; su versionado no demuestra aceptación funcional. |
 | Guarda | Condición que debe cumplirse para tomar una transición de estado. | Se representa entre corchetes; no es una acción ni su efecto. |
 | Efecto de transición | Resultado de ejecutar una transición, por ejemplo incorporar, descontar o reponer existencia. | Puede nombrarse brevemente y definirse en una leyenda; no exige código de programación. |
 | SLA | Acuerdo de nivel de servicio con medidas y compromisos aceptados. | Nexus no tiene aquí valores comprometidos; están pendientes de acuerdo. |

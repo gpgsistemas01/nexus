@@ -1,6 +1,6 @@
 ---
 title: Especificación de requisitos de Nexus
-document-version: 1.3
+document-version: 1.4
 system-version: 1.0.0
 status: En revisión
 ---
@@ -11,7 +11,7 @@ status: En revisión
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.3 | 1.0.0 | En revisión | 2026-10-01 | Equipo Nexus |
+| 1.4 | 1.0.0 | En revisión | 2026-10-08 | Equipo Nexus |
 
 Este es el punto de entrada y la portada del paquete exportable de requisitos. La
 [especificación de requisitos](requirements-specification/index.md) conserva la definición
@@ -58,3 +58,9 @@ realización pertenecen a las vistas de procesos y desarrollo de arquitectura.
 `scripts/exportDocs.js` conserva este mismo orden al generar el paquete `requisitos`.
 Las imágenes que se incorporen a estas secciones pertenecen a
 `docs/requirements/images/<sección>/`.
+
+## Control de cambios
+
+| Versión | Fecha | Cambio |
+| --- | --- | --- |
+| 1.4 | 2026-10-08 | Revisión de visión, glosario y SRS; incorporación de los siete casos de salida de consumibles, referencias y realizaciones; conserva el alcance del sistema 1.0.0 y los IDs anteriores. |

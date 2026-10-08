@@ -66,12 +66,11 @@ comprueba que cada ID enlazado exista una sola vez como definición y que el alc
 la ficha coincida con el requisito. Las reglas citadas por rangos se leen con todos sus
 identificadores intermedios.
 
-Las salidas de consumibles están implementadas y se rigen por `RF-ISS-001` a
-`RF-ISS-006`, con evidencia en las rutas y servicios específicos de consumibles.
-Las fichas `CU-SAL-01` a `CU-SAL-07` describen expresamente material; no se presentan
-como cobertura documental completa de consumibles ni se renombran sus IDs para otro
-contexto. Falta documentar explícitamente esa variante en los casos y sus realizaciones;
-esta brecha no convierte la capacidad implementada en una propuesta.
+Las salidas de consumibles se describen en `CU-SAL-15` a `CU-SAL-21`. Sus
+operaciones se rigen por `RF-ISS-001` a `RF-ISS-006`, la separación por `RN-034`
+y los reportes por `RF-REP-002` y `RF-REP-004`. Cada caso tiene una ficha propia y
+secuencias frontend/backend; `CU-CAT-06` extiende opcionalmente el alta cuando falta
+el cliente. Sus pruebas y brechas se identifican en el catálogo de cobertura.
 
 `RF-CAT-004` y `RF-WST-001`, `RF-CAT-016` y `RF-MER-005`, y `RF-CAT-017` y
 `RF-MER-003` se comprueban como referencias a la misma consulta, garantía o edición,

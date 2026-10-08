@@ -26,8 +26,6 @@ se especifica en `RF-CAT-019` a `RF-CAT-024`; no continúa registrada como brech
 La revisión de este documento es una revisión local de contenido, no certificación ISO
 ni constancia de aprobación funcional.
 
-La SRS identifica además una brecha documental: las salidas de consumibles están
-implementadas, pero sus casos de uso y realizaciones no tienen aún una descripción
-explícita equivalente a la de materiales. Su seguimiento se conserva en las
-[reglas de trazabilidad](../requirements-specification/05-requirement-traceability-rules.md#cobertura-y-límites-de-evidencia);
-no implica acceso nuevo ni una funcionalidad futura.
+La descripción de salidas de consumibles se completó con `CU-SAL-15` a `CU-SAL-21`,
+sus diagramas y realizaciones técnicas. Su cobertura y las brechas de prueba vigentes
+se consultan en el [catálogo de pruebas por caso](../../testing/use-case-test-types.md).

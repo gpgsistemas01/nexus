@@ -63,12 +63,6 @@ Administrador del sistema. Personal de almacén participa únicamente en `CU-CAT
 iniciados desde los selectores de una compra o salida autorizada; al terminar, Nexus devuelve el
 registro creado al formulario de origen sin abrir ni habilitar el listado independiente.
 
-## Fichas específicas
-
-### Grupo funcional CAT — Catálogos
-
-Cada ficha describe un objetivo del actor, sus condiciones y sus efectos sobre el negocio. Los objetivos se mantienen separados aunque compartan información o reglas.
-
 ## Fichas por caso de uso
 
 ### Grupo funcional ALM — Almacén
