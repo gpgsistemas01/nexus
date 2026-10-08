@@ -173,7 +173,7 @@ const validateUseCaseDiagramCoverage = async () => {
         const caseAliases = new Set(cases.map(([, alias]) => alias));
         const queryAliases = new Set(cases.filter(([, , , title]) => title.startsWith('Consultar '))
             .map(([, alias]) => alias));
-        const associations = [...diagram.matchAll(/^\s*(\w+) -- (\w+)$/gm)]
+        const associations = [...diagram.matchAll(/^\s*(\w+) -{2,} (\w+)$/gm)]
             .map(([, from, to]) => [from, to]);
         for (const [from, to] of associations) {
             if (!caseAliases.has(to) || (!actors.has(from) && !queryAliases.has(from))) {

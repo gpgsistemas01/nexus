@@ -70,9 +70,12 @@ y Reporte. En Movimientos sólo corresponden Consulta y Reporte; Autenticación 
 Inicio y Cierre de sesión. Los casos referenciados como extensiones mantienen el número
 de su grupo propietario, aunque aparezcan dentro de otra figura.
 
-La ubicación de los óvalos responde a la distribución de las relaciones en Mermaid;
-no establece un recorrido obligatorio ni cambia el orden de las fichas. Un diagrama de
-casos de uso muestra objetivos y participación, no una secuencia de ejecución.
+Los casos propios de cada figura se leen por número en el mismo orden que sus fichas:
+de arriba hacia abajo y, si comparten una fila como en Autenticación, de izquierda
+a derecha. La longitud de las asociaciones conserva esa distribución
+en Dagre; no añade relaciones ni cambia su significado. Las extensiones de otros
+grupos se sitúan junto a su caso base y conservan su identificador propietario.
+Un diagrama de casos de uso muestra objetivos y participación, no una secuencia de ejecución.
 Se mantienen varias figuras por grupo para conservar la legibilidad de las operaciones
 y actores: agrupar todos los casos en una sola figura no es una exigencia de UML.
 
@@ -80,7 +83,8 @@ y actores: agrupar todos los casos en una sola figura no es una exigencia de UML
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor user("Usuario registrado")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
@@ -102,7 +106,8 @@ direction LR
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -117,15 +122,16 @@ direction LR
     warehouse -- ucPersonQuery
 
     ucPersonQuery -- ucPersonCreate
-    ucPersonQuery -- ucPersonEdit
-    ucPersonQuery -- ucPersonReport
+    ucPersonQuery --- ucPersonEdit
+    ucPersonQuery ---- ucPersonReport
 ```
 
 #### Usuarios y credenciales
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary identityPackage2["Nexus · Usuarios y credenciales"]
@@ -139,9 +145,9 @@ direction LR
     admin -- ucUserQuery
 
     ucUserQuery -- ucUserCreate
-    ucUserQuery -- ucUserEdit
-    ucUserQuery -- ucPasswordEdit
-    ucUserQuery -- ucUserReport
+    ucUserQuery --- ucUserEdit
+    ucUserQuery ---- ucPasswordEdit
+    ucUserQuery ----- ucUserReport
 ```
 
 ### Grupo funcional ALM — Almacén
@@ -150,7 +156,8 @@ direction LR
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -165,12 +172,12 @@ direction LR
     end
 
     warehouse -- ucMaterialQuery
-    admin -- ucMaterialStock
+    admin ------- ucMaterialStock
 
     ucMaterialQuery -- ucMaterialCreate
-    ucMaterialQuery -- ucMaterialEdit
-    ucMaterialQuery -- ucMaterialRemove
-    ucMaterialQuery -- ucMaterialInventoryReport
+    ucMaterialQuery --- ucMaterialEdit
+    ucMaterialQuery ---- ucMaterialRemove
+    ucMaterialQuery ------ ucMaterialInventoryReport
 ```
 
 #### Movimientos de materiales
@@ -181,7 +188,8 @@ consulta de movimientos.
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary materialMovementsPackage["Nexus · Movimientos de materiales"]
@@ -197,7 +205,8 @@ direction LR
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -212,12 +221,12 @@ direction LR
     end
 
     warehouse -- ucWasteQuery
-    admin -- ucWasteStock
+    admin ------ ucWasteStock
 
     ucWasteQuery -- ucWasteCreate
-    ucWasteQuery -- ucWasteEdit
-    ucWasteQuery -- ucWasteAddStock
-    ucWasteQuery -- ucWasteReport
+    ucWasteQuery --- ucWasteEdit
+    ucWasteQuery ----- ucWasteAddStock
+    ucWasteQuery ------ ucWasteReport
 ```
 
 #### Movimientos de mermas
@@ -228,7 +237,8 @@ consulta de movimientos.
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary wasteMovementsPackage["Nexus · Movimientos de mermas"]
@@ -244,7 +254,8 @@ direction LR
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -259,12 +270,12 @@ direction LR
     end
 
     warehouse -- ucConsumableQuery
-    admin -- ucConsumableStock
+    admin ------- ucConsumableStock
 
     ucConsumableQuery -- ucConsumableCreate
-    ucConsumableQuery -- ucConsumableEdit
-    ucConsumableQuery -- ucConsumableRemove
-    ucConsumableQuery -- ucConsumableReport
+    ucConsumableQuery --- ucConsumableEdit
+    ucConsumableQuery ---- ucConsumableRemove
+    ucConsumableQuery ------ ucConsumableReport
 ```
 
 El grupo de **Almacén** concentra los casos operativos de material, consumible y merma porque comparten
@@ -279,7 +290,8 @@ grupo usan la familia estable `CU-ALM-*`.
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
     actor warehouse("Personal de almacén")
     admin --|> warehouse
@@ -291,19 +303,20 @@ direction LR
         ucSupplierReport("CU-CAT-04 Generar reporte de proveedores")
     end
 
-    admin -- ucSupplierQuery
-    warehouse -- ucSupplierCreate
+    admin --- ucSupplierQuery
+    warehouse --- ucSupplierCreate
 
     ucSupplierQuery -- ucSupplierCreate
-    ucSupplierQuery -- ucSupplierEdit
-    ucSupplierQuery -- ucSupplierReport
+    ucSupplierQuery --- ucSupplierEdit
+    ucSupplierQuery ---- ucSupplierReport
 ```
 
 #### Clientes
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
     actor warehouse("Personal de almacén")
     admin --|> warehouse
@@ -315,19 +328,20 @@ direction LR
         ucClientReport("CU-CAT-08 Generar reporte de clientes")
     end
 
-    admin -- ucClientQuery
-    warehouse -- ucClientCreate
+    admin --- ucClientQuery
+    warehouse --- ucClientCreate
 
     ucClientQuery -- ucClientCreate
-    ucClientQuery -- ucClientEdit
-    ucClientQuery -- ucClientReport
+    ucClientQuery --- ucClientEdit
+    ucClientQuery ---- ucClientReport
 ```
 
 #### Áreas
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage3["Nexus · Áreas"]
@@ -339,14 +353,15 @@ direction LR
     admin -- ucAreaQuery
 
     ucAreaQuery -- ucAreaCreate
-    ucAreaQuery -- ucAreaEdit
+    ucAreaQuery --- ucAreaEdit
 ```
 
 #### Roles
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage4["Nexus · Roles"]
@@ -358,14 +373,15 @@ direction LR
     admin -- ucRoleQuery
 
     ucRoleQuery -- ucRoleCreate
-    ucRoleQuery -- ucRoleEdit
+    ucRoleQuery --- ucRoleEdit
 ```
 
 #### Presentaciones
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage5["Nexus · Presentaciones"]
@@ -377,14 +393,15 @@ direction LR
     admin -- ucPresentationQuery
 
     ucPresentationQuery -- ucPresentationCreate
-    ucPresentationQuery -- ucPresentationEdit
+    ucPresentationQuery --- ucPresentationEdit
 ```
 
 #### Unidades de medida
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage6["Nexus · Unidades de medida"]
@@ -396,14 +413,15 @@ direction LR
     admin -- ucUnitMeasureQuery
 
     ucUnitMeasureQuery -- ucUnitMeasureCreate
-    ucUnitMeasureQuery -- ucUnitMeasureEdit
+    ucUnitMeasureQuery --- ucUnitMeasureEdit
 ```
 
 #### Motivos de ajuste
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage7["Nexus · Motivos de ajuste"]
@@ -415,14 +433,15 @@ direction LR
     admin -- ucAdjustmentReasonQuery
 
     ucAdjustmentReasonQuery -- ucAdjustmentReasonCreate
-    ucAdjustmentReasonQuery -- ucAdjustmentReasonEdit
+    ucAdjustmentReasonQuery --- ucAdjustmentReasonEdit
 ```
 
 #### Estados de cumplimiento
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage8["Nexus · Estados de cumplimiento"]
@@ -434,7 +453,7 @@ direction LR
     admin -- ucFulfillmentStatusQuery
 
     ucFulfillmentStatusQuery -- ucFulfillmentStatusCreate
-    ucFulfillmentStatusQuery -- ucFulfillmentStatusEdit
+    ucFulfillmentStatusQuery --- ucFulfillmentStatusEdit
 ```
 
 Las consultas, edición y reportes de **Proveedores** y **Clientes** se asocian
@@ -449,7 +468,8 @@ son soporte de otros objetivos y no nuevos casos de uso.
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -473,17 +493,18 @@ direction LR
     warehouse -- materialExtension
 
     ucReceiptQuery -- ucReceiptCreate
-    ucReceiptQuery -- ucReceiptEdit
-    ucReceiptQuery -- ucReceiptCorrect
-    ucReceiptQuery -- ucReceiptCancel
-    ucReceiptQuery -- ucPurchaseReport
+    ucReceiptQuery --- ucReceiptEdit
+    ucReceiptQuery ---- ucReceiptCorrect
+    ucReceiptQuery ----- ucReceiptCancel
+    ucReceiptQuery ------ ucPurchaseReport
 ```
 
 #### Compras de consumibles
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -507,10 +528,10 @@ direction LR
     warehouse -- consumableExtension
 
     ucConsumableReceiptQuery -- ucConsumableReceiptCreate
-    ucConsumableReceiptQuery -- ucConsumableReceiptEdit
-    ucConsumableReceiptQuery -- ucConsumableReceiptCorrect
-    ucConsumableReceiptQuery -- ucConsumableReceiptCancel
-    ucConsumableReceiptQuery -- ucConsumablePurchaseReport
+    ucConsumableReceiptQuery --- ucConsumableReceiptEdit
+    ucConsumableReceiptQuery ---- ucConsumableReceiptCorrect
+    ucConsumableReceiptQuery ----- ucConsumableReceiptCancel
+    ucConsumableReceiptQuery ------ ucConsumablePurchaseReport
 ```
 
 ### Grupo funcional SAL — Salidas de materiales, consumibles y mermas
@@ -522,7 +543,8 @@ rutas y recursos propios, y las mismas transiciones de estado.
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -544,18 +566,19 @@ direction LR
     warehouse -- clientExtension
 
     ucMaterialIssueQuery -- ucMaterialIssueCreate
-    ucMaterialIssueQuery -- ucMaterialIssueHeader
-    ucMaterialIssueQuery -- ucMaterialIssueDetails
-    ucMaterialIssueQuery -- ucMaterialSupply
-    ucMaterialIssueQuery -- ucMaterialReturn
-    ucMaterialIssueQuery -- ucMaterialIssueReport
+    ucMaterialIssueQuery --- ucMaterialIssueHeader
+    ucMaterialIssueQuery ---- ucMaterialIssueDetails
+    ucMaterialIssueQuery ----- ucMaterialSupply
+    ucMaterialIssueQuery ------ ucMaterialReturn
+    ucMaterialIssueQuery ------- ucMaterialIssueReport
 ```
 
 #### Salidas de mermas
 
 ```mermaid
 usecase-beta
-direction LR
+%%{init: {"layout": "dagre"}}%%
+direction TB
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -573,11 +596,11 @@ direction LR
     warehouse -- ucWasteIssueQuery
 
     ucWasteIssueQuery -- ucWasteIssueCreate
-    ucWasteIssueQuery -- ucWasteIssueHeader
-    ucWasteIssueQuery -- ucWasteIssueDetails
-    ucWasteIssueQuery -- ucWasteSupply
-    ucWasteIssueQuery -- ucWasteReturn
-    ucWasteIssueQuery -- ucWasteIssueReport
+    ucWasteIssueQuery --- ucWasteIssueHeader
+    ucWasteIssueQuery ---- ucWasteIssueDetails
+    ucWasteIssueQuery ----- ucWasteSupply
+    ucWasteIssueQuery ------ ucWasteReturn
+    ucWasteIssueQuery ------- ucWasteIssueReport
 ```
 
 ### Condiciones y puntos de extensión

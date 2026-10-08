@@ -5,7 +5,14 @@ export const MERMAID_VERSION = '12.1.0';
 export const MERMAID_EXPORT_CONFIG = Object.freeze({
     theme: 'neutral',
     look: 'classic',
-    fontFamily: 'Arial, sans-serif'
+    fontFamily: 'Arial, sans-serif',
+    usecase: Object.freeze({
+        usecaseFontSize: 16,
+        actorFontSize: 16,
+        wrappingWidth: 240,
+        nodeSpacing: 20,
+        rankSpacing: 40
+    })
 });
 
 export const getMermaidImageId = (source) => createHash('sha256')
