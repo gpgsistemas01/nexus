@@ -29,16 +29,18 @@ objetivos de distinta complejidad.
 
 Las asociaciones directas enlazan al actor con cada caso en el que participa. Las
 fichas nombran a los actores autorizados para iniciar el objetivo; una relación entre
-casos no hereda actores ni concede permisos. Personal de almacén y Administrador del
-sistema especializan a Usuario registrado y heredan sus objetivos de autenticación;
-ninguno es especialización del otro. Las capacidades operativas compartidas se muestran
-mediante asociaciones explícitas.
+casos no hereda actores ni concede permisos. Personal de almacén especializa a
+Usuario registrado; Administrador del sistema especializa a Personal de almacén y
+hereda todas sus asociaciones. Los casos exclusivos del administrador conservan
+asociaciones directas adicionales; no se duplican las funciones heredadas.
 
 La notación, dirección y límites de la representación Mermaid se explican en el
 [diagrama de casos de uso](../domain-and-use-cases/02-current-use-cases.md). Las
 asociaciones son líneas continuas sin punta; la generalización tiene un triángulo hueco
 hacia el general; `«include»` y `«extend»` son dependencias discontinuas con el estereotipo
-correspondiente. La navegación entre objetivos independientes permanece en las fichas.
+correspondiente. La generalización no lleva texto adicional. Los enlaces desde Consulta
+a otras operaciones se dibujan sin etiqueta como convención visual del documento;
+no constituyen inclusión, extensión ni herencia de actores.
 
 ## Estructura de las fichas
 
@@ -92,8 +94,9 @@ quedan más interacciones. No se usa «volver» o «continuar» sin indicar el p
 destino fuera otro caso de uso, no se redactaría como un salto de control informal:
 
 - Una asociación simple conecta al actor con el caso en el que participa; se dibuja
-  como línea continua sin punta ni frase. No se usa para unir dos objetivos por
-  compartir una pantalla. Cuando una consulta presenta operaciones de mantenimiento,
+  como línea continua sin punta ni frase. Los enlaces sin texto entre consultas y
+  operaciones conservan la organización visual por recurso y no transmiten actores
+  ni permisos. Cuando una consulta presenta operaciones de mantenimiento,
   la selección termina la consulta y dispara un caso independiente, que comprueba de
   nuevo sus precondiciones y autorización; esa navegación se describe en las fichas.
 - `«include»` identifica un caso requerido que el caso base incorpora siempre; al
@@ -112,9 +115,8 @@ por sí solo una relación UML.
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
 En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela
 como actor externo ni inicia el caso por sí mismo.
-El **Administrador del sistema** puede iniciar los casos que le asignan explícitamente
-las fichas y las asociaciones operativas; ese acceso no proviene de una generalización
-respecto del Personal de almacén. **Dirección** no se atribuye como
+El **Administrador del sistema** hereda las funciones del Personal de almacén
+mediante generalización y tiene asociaciones adicionales con sus casos exclusivos. **Dirección** no se atribuye como
 actor mientras no se definan y autoricen sus objetivos concretos.
 Los casos de catálogos siguen listar-crear-actualizar y sólo incluyen eliminar, activar,
 desactivar o ajustar cuando el contexto lo permite. Los documentos comparten encabezado
@@ -211,8 +213,10 @@ se presentan después en esa misma secuencia. No se conserva al final del grupo 
 operación especial que pertenece a una familia anterior. Las seis vistas funcionales
 se conservan para facilitar la lectura de los 85 casos, no por una exigencia de UML.
 Las extensiones de otros grupos se representan junto al caso base, reutilizando el
-identificador del caso y sin duplicar su ficha. La jerarquía de actores se muestra en AUT y es común a todas las vistas. Las asociaciones actor–caso no llevan frase; `«include»` y `«extend»`
-llevan su estereotipo y la generalización su triángulo hueco.
+identificador del caso y sin duplicar su ficha. La jerarquía de actores se muestra en
+AUT y la generalización operativa se conserva donde aparecen ambos actores. Las
+asociaciones actor–caso y los enlaces desde Consulta no llevan frase; sólo `«include»`
+y `«extend»` llevan su estereotipo y la generalización su triángulo hueco sin texto.
 
 Los prefijos anteriores sustituyen `IAM`, `REC` e `ISS`, que mezclaban abreviaturas en
 inglés con nombres de grupos en español. Las referencias normativas se actualizan en
@@ -258,3 +262,4 @@ validaciones, transacciones y pruebas CRUD.
 5. Proyectos, requisiciones y ajustes sin flujo HTTP completo permanecen en la
    especificación con su estado correspondiente; se incorporarán aquí sólo al pasar a
    alcance vigente.
+
