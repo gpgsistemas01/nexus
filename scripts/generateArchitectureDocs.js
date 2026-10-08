@@ -209,6 +209,15 @@ const validateUseCaseDiagramCoverage = async () => {
             }
         }
         for (const [, alias, id, title] of cases) {
+            if (/^(?:Crear|Registrar) /.test(title)) {
+                for (const [actor, target] of associations.filter(([from]) => actors.has(from))) {
+                    if (target === alias && associations.some(([from, to]) => (
+                        queryAliases.has(from) && to === alias && reachableByActor.get(actor)?.has(from)
+                    ))) {
+                        failures.push(`casos de uso: ${id} repite la asociación de ${actor} que ya se muestra desde su consulta`);
+                    }
+                }
+            }
             if (title !== expectedTitles.get(id)) {
                 failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
             }

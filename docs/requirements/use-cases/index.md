@@ -198,7 +198,7 @@ como listas planas difíciles de revisar.
 | --- | --- | --- |
 | `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
 | `IDA` | Personas; usuarios y credenciales; sus consultas y reportes. | `CU-IDA-01` a `CU-IDA-09` |
-| `ALM` | Materiales, consumibles y mermas; inventarios y movimientos del almacén. | `CU-ALM-01` a `CU-ALM-22` |
+| `ALM` | Materiales y sus movimientos; mermas y sus movimientos; consumibles. | `CU-ALM-01` a `CU-ALM-22` |
 | `CAT` | Proveedores; clientes; catálogos auxiliares y reportes complementarios. | `CU-CAT-01` a `CU-CAT-26` |
 | `ENT` | Compras de materiales, consumibles y sus reportes. | `CU-ENT-01` a `CU-ENT-12` |
 | `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
@@ -210,8 +210,10 @@ implementación reutilice validaciones, formularios, servicios o exportadores.
 El orden anterior determina la lectura dentro de cada grupo. La numeración sigue el
 orden de lectura del catálogo dentro de cada grupo propietario. El catálogo y las fichas
 se presentan después en esa misma secuencia. No se conserva al final del grupo una
-operación especial que pertenece a una familia anterior. Las seis vistas funcionales
-se conservan para facilitar la lectura de los 85 casos, no por una exigencia de UML.
+operación especial que pertenece a una familia anterior. Los seis grupos funcionales
+se presentan en veinte figuras de detalle para facilitar la lectura de los 85 casos,
+no por una exigencia de UML. La numeración continúa dentro del mismo grupo y no se
+reinicia por figura; separar inventarios y movimientos no crea una familia nueva.
 Las extensiones de otros grupos se representan junto al caso base, reutilizando el
 identificador del caso y sin duplicar su ficha. La jerarquía de actores se muestra en
 AUT y la generalización operativa se conserva donde aparecen ambos actores. Las

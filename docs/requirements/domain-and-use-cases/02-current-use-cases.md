@@ -56,6 +56,26 @@ Mermaid no admite límites anidados en `usecase-beta`.
 La decisión y las familias resultantes se resumen en el
 [criterio de agrupación vigente](../use-cases/index.md#criterio-de-agrupación-vigente).
 
+### Numeración y orden de lectura
+
+Los 85 casos conservan una secuencia continua dentro de cada grupo propietario:
+`AUT` 01–02, `IDA` 01–09, `ALM` 01–22, `CAT` 01–26, `ENT` 01–12 y `SAL` 01–14.
+Las veinte figuras no reinician ni cambian esa numeración. Por ejemplo, Materiales
+presenta `CU-ALM-01` a `CU-ALM-06`, Movimientos de materiales continúa con
+`CU-ALM-07` y `CU-ALM-08`, y Mermas comienza en `CU-ALM-09`.
+
+El catálogo, las fichas y las declaraciones de casos en los diagramas conservan el
+mismo orden: Consulta, Crear o Registrar, Editar, operaciones particulares del recurso
+y Reporte. En Movimientos sólo corresponden Consulta y Reporte; Autenticación conserva
+Inicio y Cierre de sesión. Los casos referenciados como extensiones mantienen el número
+de su grupo propietario, aunque aparezcan dentro de otra figura.
+
+La ubicación de los óvalos responde a la distribución de las relaciones en Mermaid;
+no establece un recorrido obligatorio ni cambia el orden de las fichas. Un diagrama de
+casos de uso muestra objetivos y participación, no una secuencia de ejecución.
+Se mantienen varias figuras por grupo para conservar la legibilidad de las operaciones
+y actores: agrupar todos los casos en una sola figura no es una exigencia de UML.
+
 ### Grupo funcional AUT — Autenticación
 
 ```mermaid
@@ -145,7 +165,6 @@ direction LR
     end
 
     warehouse -- ucMaterialQuery
-    warehouse -- ucMaterialCreate
     admin -- ucMaterialStock
 
     ucMaterialQuery -- ucMaterialCreate
@@ -240,7 +259,6 @@ direction LR
     end
 
     warehouse -- ucConsumableQuery
-    warehouse -- ucConsumableCreate
     admin -- ucConsumableStock
 
     ucConsumableQuery -- ucConsumableCreate
@@ -654,9 +672,13 @@ define una participación particular, se conserva la asociación directa corresp
   independientes, asociadas sólo con el administrador y sin enlaces desde las consultas
   de materiales o mermas. Sus reportes (`CU-ALM-08` y `CU-ALM-16`) parten únicamente de
   la consulta de movimientos correspondiente.
-- Las altas de proveedores, clientes, materiales y consumibles desde selectores
-  (`CU-CAT-02`, `CU-CAT-06`, `CU-ALM-02` y `CU-ALM-18`) conservan su participación
-  directa y las referencias de extensión en Compras y Salidas.
+- Las altas de materiales y consumibles (`CU-ALM-02` y `CU-ALM-18`) se enlazan desde
+  su consulta en las vistas de inventario, sin repetir la asociación directa del actor.
+  Su participación desde selectores se muestra en las extensiones de Compras.
+- Las altas de proveedores y clientes desde selectores (`CU-CAT-02` y `CU-CAT-06`)
+  mantienen la asociación con Personal de almacén, que no participa en la consulta
+  independiente de esos catálogos según las fichas vigentes. Las cinco extensiones de
+  altas conservan sus asociaciones en Compras y Salidas, donde se inicia ese contexto.
 - Iniciar y cerrar sesión (`CU-AUT-01` y `CU-AUT-02`) conservan sus asociaciones
   independientes porque no parten de una consulta.
 
