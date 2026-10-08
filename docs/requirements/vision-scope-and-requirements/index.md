@@ -15,7 +15,7 @@ la solución técnica. Esas responsabilidades pertenecen respectivamente a la
 4. [4. Áreas del contexto organizacional](04-organizational-context-areas.md)
 5. [5. Usuarios y partes interesadas](05-users-and-stakeholders.md)
 6. [6. Alcance actual](06-current-scope.md)
-7. [7. Criterios de calidad para redactar requisitos](07-quality-criteria-for-requirements.md)
+7. [7. Criterios de revisión de visión y alcance](07-quality-criteria-for-requirements.md)
 8. [8. Alcance funcional por grupo](08-functional-scope-by-group.md)
 9. [9. Alcance de datos y calidad](09-data-and-quality-scope.md)
 10. [10. Brechas conocidas y decisiones pendientes](10-known-gaps-and-pending-decisions.md)

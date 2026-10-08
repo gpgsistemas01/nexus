@@ -13,3 +13,8 @@ componentes, despliegue, decisiones y realización técnica. Este documento enla
 artefactos en vez de duplicarlos. Cuando cambia el propósito, un interesado o el límite
 del producto se actualiza esta visión; cuando sólo cambia el detalle normativo o técnico,
 se actualiza el artefacto propietario y se revisa aquí únicamente su impacto en alcance.
+
+El vocabulario compartido se mantiene en el [glosario](../business-glossary.md).
+La revisión se orienta por ISO/IEC/IEEE 29148:2018, ISO/IEC/IEEE 15289:2019 e ISO/IEC
+25010:2023 con el alcance local del capítulo 7. Los acuerdos y metas todavía no
+aprobados se identifican como pendientes en vez de atribuirles conformidad ISO.

@@ -1,35 +1,27 @@
-# 7. Criterios de calidad para redactar requisitos
+# 7. Criterios de revisión de visión y alcance
 
-Cada requisito de este documento debe cumplir simultáneamente estas condiciones antes
-de considerarse aprobado:
+Este documento resume necesidades y límites; no mantiene una segunda especificación de
+requisitos. Se revisa con los siguientes criterios locales, orientados por las normas
+adoptadas en el [registro de aplicación](../../governance/standards-application/index.md).
 
-| Condición | Regla de revisión |
+| Aspecto | Criterio de revisión |
 | --- | --- |
-| Necesario | Responde a una necesidad de un actor o a una restricción indispensable del negocio. |
-| Correcto | Coincide con el comportamiento observable del código y con las restricciones de Prisma. |
-| Claro y no ambiguo | Usa un sujeto y un verbo obligatorio; evita expresiones como «rápido», «adecuado», «cuando aplique» o «etcétera». |
-| Atómico | Expresa una capacidad o regla verificable. Si dos comportamientos pueden aprobarse por separado, se documentan con identificadores distintos. |
-| Completo | Indica actor o contexto, precondición relevante, respuesta esperada y datos afectados. |
-| Consistente | No contradice otro requisito, el alcance, los estados del dominio ni la terminología `User`/`Person`. |
-| Factible | Puede satisfacerse con la arquitectura y datos actuales; si requiere una decisión o desarrollo, se registra como brecha. |
-| Verificable | Tiene un criterio de aceptación observable mediante una prueba, consulta de datos o inspección de configuración. |
-| Trazable | Conserva un identificador estable y una referencia al código, prueba o modelo que lo sustenta. |
-| Independiente de implementación | Describe el resultado de negocio; solo menciona tecnología cuando esta constituye una restricción del proyecto. |
+| Necesidad y objetivos | Explicar el problema, el valor esperado y qué resultado se busca; distinguir objetivos de resultados medidos. |
+| Interesados | Identificar participación, preocupaciones y límites; separar actores con acceso de otras partes interesadas. |
+| Alcance | Expresar inclusiones y exclusiones coherentes con los grupos normativos y distinguir capacidad vigente de propuesta. |
+| Contexto | Hacer explícitos supuestos, dependencias y restricciones relevantes sin presentarlos como acuerdos confirmados. |
+| Terminología | Reutilizar el glosario y separar persona, usuario, responsabilidad y acceso; distinguir los tres contextos de inventario. |
+| Calidad y aceptación | Enlazar necesidades de calidad; registrar como pendientes los indicadores, umbrales y responsables que aún no se han acordado. |
+| Consistencia y trazabilidad | Vincular objetivos y capacidades con la SRS; registrar discrepancias con la implementación sin convertir el código en aprobación de negocio. |
+| Mantenimiento | Conservar decisiones pendientes y revisar el impacto de cambios de objetivos, interesados o límites. |
 
-### Plantilla y estado
+[ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) orienta la ingeniería de
+necesidades y requisitos; [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html)
+orienta el propósito y contenido de los elementos de información del ciclo de vida;
+[ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) aporta el modelo de calidad
+para revisar necesidades del producto. La tabla anterior es una adaptación local, no
+una plantilla obligatoria ni una evaluación de conformidad cláusula por cláusula.
 
-La forma preferida es: **«Dado** [contexto], **cuando** [actor/evento], **el sistema
-debe** [respuesta observable] **de modo que** [resultado verificable]». Los requisitos
-pueden tener uno de estos estados:
-
-- **Implementado:** existe evidencia en una ruta o servicio y en el modelo cuando hay
-  persistencia.
-- **Parcial:** solo una parte es accesible o verificable; se registra también como
-  brecha.
-- **Propuesto:** requiere validación del propietario de negocio y no se presenta como
-  capacidad vigente.
-
-El alcance siguiente incluye capacidades implementadas, parciales, modeladas o fuera
-del alcance vigente. Su estado, criterios y evidencia se consultan en la especificación;
-una modificación debe actualizar en el mismo cambio el enunciado, la trazabilidad y la
-prueba correspondiente.
+Los identificadores, criterios de aceptación, estados y evidencia de cada requisito
+se mantienen en la [SRS](../requirements-specification/index.md). «Implementado» describe
+evidencia de una capacidad, no aceptación funcional ni consecución de un objetivo.

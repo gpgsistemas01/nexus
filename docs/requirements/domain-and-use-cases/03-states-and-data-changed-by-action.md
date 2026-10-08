@@ -2,7 +2,9 @@
 
 Los diagramas muestran estados de negocio. Las etiquetas **acción [condición]**
 conservan las guardas que distinguen transiciones; los efectos de inventario se
-resumen al final. Los modos de formulario no son estados.
+resumen una sola vez en la tabla común. Los modos de formulario no son estados.
+La notación **acción [guarda] / efecto** permite nombrar un efecto breve sin código.
+Aquí las acciones remiten a la tabla para no repetirlo en cada flecha.
 
 ## Cumplimiento de una salida de material, consumible o merma
 
@@ -87,13 +89,19 @@ suficiente; devolver no puede superar el saldo entregado; reducir o cancelar una
 recepción exige existencia suficiente para revertirla. Un rechazo conserva el estado
 y no confirma cambios.
 
-| Acción | Efecto de inventario |
-| --- | --- |
-| Registrar salida o editar datos generales | No modifica existencias. |
-| Registrar compra o agregar un detalle de compra | Incorpora las cantidades recibidas. |
-| Surtir | Descuenta las cantidades entregadas. |
-| Devolver | Repone las cantidades recibidas de vuelta. |
-| Corregir o cancelar un detalle de compra | Ajusta la diferencia o revierte su recepción. |
+| Acción | Efecto breve | Cambio de existencia |
+| --- | --- | --- |
+| Registrar salida o editar datos generales | Sin cambio | Ninguno. |
+| Registrar compra o detalle | Incorporar recepción | + cantidad recibida. |
+| Surtir | Descontar entrega | − cantidad entregada. |
+| Devolver | Reponer devolución | + cantidad devuelta. |
+| Corregir cantidad recibida | Aplicar diferencia | + (cantidad corregida − cantidad anterior). |
+| Corregir sólo costo de compra | Sin cambio de cantidad | Ninguno; conserva el cambio de costo e importes. |
+| Cancelar detalle de compra | Revertir recepción | − cantidad recibida vigente del detalle. |
+
+Los signos resumen cambios en la unidad de existencia del recurso, con su conversión
+cuando corresponda. Documento y detalle muestran la misma operación a distinta escala;
+no duplican el efecto. Otros datos modificados se especifican en la SRS.
 
 El final cierra el ciclo operativo; los documentos, detalles y su historia permanecen
 consultables. Los campos, condiciones de edición y reglas completas se mantienen en

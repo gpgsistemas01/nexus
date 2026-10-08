@@ -1,13 +1,14 @@
 # 3. Descripción del producto
 
-Nexus es una aplicación web autenticada de control operativo. Combina páginas
-renderizadas en servidor y una API REST para registrar catálogos, entradas, salidas,
-existencias, mermas y movimientos; aplica autorización por rol, área y permiso, y
-mantiene trazabilidad mediante referencias, historiales y auditoría. También ofrece
-consultas, reportes Excel y actualizaciones en tiempo real para apoyar la operación y la
-supervisión.
+Nexus es una aplicación web autenticada para registrar y consultar catálogos,
+recepciones de compra, salidas, existencias, mermas y movimientos. Restringe las acciones
+según los accesos autorizados, conserva referencias e historia de las operaciones y
+ofrece reportes Excel y notificaciones para apoyar el trabajo de almacén.
 
-El producto centraliza el inventario y sus documentos relacionados; no es un ERP, un
-sistema contable ni una plataforma general de gestión de proyectos. Las personas,
-clientes, proyectos y áreas aportan identidad y contexto a la operación, pero sólo las
-capacidades declaradas como vigentes forman parte del producto disponible.
+El producto centraliza el inventario y sus documentos relacionados. La contabilidad,
+la facturación fiscal y la administración general de proyectos permanecen fuera del
+alcance vigente. Personas, clientes y áreas aportan identidad y contexto a la operación;
+un dato registrado no convierte a su titular en usuario ni le concede acceso.
+
+La arquitectura describe los mecanismos técnicos. Esta visión describe el resultado
+que reciben los usuarios y los límites de su participación.

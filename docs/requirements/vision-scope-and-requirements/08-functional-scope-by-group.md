@@ -12,13 +12,8 @@ mostrar el alcance y los rangos que deben revisarse juntos.
 | Identidades y acceso | `RF-IAM-001` a `RF-IAM-008` | Consultar, crear y actualizar usuarios o personas, cambiar contraseña y consultar catálogos de acceso. |
 | Catálogos | `RF-CAT-001` a `RF-CAT-029` | Consultar, crear, actualizar, retirar o ajustar materiales, consumibles, mermas y catálogos auxiliares según su política. |
 | Entradas | `RF-REC-001` a `RF-REC-008` | Consultar, registrar, editar, corregir y cancelar entradas o detalles. |
-| Salidas de material | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, editar detalles, surtir y devolver. |
-| Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-010` | Operar inventario y salidas de merma conservando snapshots, reglas dimensionales y el alta trazable de existencia. |
+| Salidas de material y consumible | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, editar detalles, surtir y devolver. |
+| Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-010` | Operar inventario y salidas de merma conservando datos históricos, reglas dimensionales y el alta trazable de existencia. |
 | Ajustes | `RF-ADJ-001`, `RF-ADJ-002` | Registrar y aplicar inmediatamente ajustes autorizados de materiales, consumibles o mermas con movimiento y trazabilidad. |
 | Movimientos y reportes | `RF-REP-001` a `RF-REP-010` | Consultar y exportar información autorizada con reglas propias por reporte, incluido el inventario separado de consumibles. |
 | Capacidades no vigentes | `RF-REQ-001`, `RF-PRJ-001`, `RF-PRJ-002` | Requisiciones fuera de alcance y proyectos modelados sin CRUD registrado. |
-
-La misma regla de granularidad aplica a todos los grupos: otra operación recibe otro
-`RF-*` cuando cambia el resultado observable, permiso, validación principal o prueba de
-cumplimiento. Los atributos de una misma identidad y las variantes del mismo resultado
-permanecen como condiciones o criterios `CA-*`; no se crea un requisito por campo.

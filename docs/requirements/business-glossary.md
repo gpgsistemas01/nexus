@@ -27,7 +27,9 @@ fuente de verdad.
 | --- | --- | --- |
 | Persona | Individuo que participa en un proceso del negocio, aun cuando no tenga credenciales para entrar a Nexus. | No es sinónimo de usuario. En código corresponde al concepto persistido `Person`. |
 | Usuario | Cuenta autenticable que ejecuta acciones en Nexus y permite atribuir auditoría. Puede estar vinculada con una persona. | No se usa para nombrar genéricamente a cualquier solicitante o asesor. |
-| Asignación de acceso | Combinación de rol y departamento asociada a un usuario o persona para describir su participación y calcular permisos. | No es por sí sola un permiso almacenado; los permisos se calculan con la política del servidor. |
+| Asignación organizacional | Vínculo de un rol y un área con una cuenta o persona, según su finalidad. | Concepto general del dominio; sus variantes son acceso de usuario y responsabilidad de persona. |
+| Acceso de usuario | Asignación de rol y área a una cuenta que interviene en la determinación de sus permisos. | «Asignación de acceso» es alias aceptado; no es un permiso individual ni se concede por asignar responsabilidades a una persona. |
+| Responsabilidad de persona | Asignación de rol y área que describe la participación organizacional de una persona. | No autoriza una cuenta ni convierte a la persona en usuario. |
 | Rol | Responsabilidad organizacional considerada por la política de autorización. | No equivale a un caso de uso ni a un permiso individual. |
 | Área o departamento | Área organizacional que aporta contexto y alcance a una asignación o salida. | La interfaz usa «Área» y el modelo técnico usa `Department`; no es un rol ni concede acceso por sí sola. |
 | Permiso | Capacidad concreta que la política de autorización concede para consultar o ejecutar una operación cuando al menos una asignación combina un rol y un área admitidos. | No se deduce únicamente del nombre del rol, del área, de que una opción sea visible ni de que exista una ruta. Siempre se comprueba en el servidor. |
@@ -44,17 +46,18 @@ fuente de verdad.
 
 | Término canónico | Definición compartida | Alias o distinción importante |
 | --- | --- | --- |
+| Artículo de compra | Concepto común que agrupa material y consumible, adquirido mediante una entrada de compra. | Clase abstracta del dominio; no incluye merma ni constituye un catálogo adicional. |
 | Material | Artículo base administrado en inventario, definido por nombre, presentación, unidad y reglas de existencia. | No representa por sí solo la existencia de un proveedor concreto. |
 | Contexto de inventario | Clasificación como material o consumible que delimita consultas, selectores y operaciones. | Es independiente del área organizacional y los permisos. |
 | Identidad de material | Combinación de clasificación como material o consumible, nombre recortado y comparado sin distinguir mayúsculas, presentación, unidad de medida, base y altura que permite reconocer el mismo artículo aunque lo ofrezcan proveedores distintos. | Base y altura ocupan posiciones distintas y pueden omitirse sólo como pareja. El proveedor no forma parte de esta identidad: se conserva en la oferta proveedor-material. Cambiar existencia, cantidad convertida, costo máximo, stock mínimo o el estado activo de una oferta no crea otra identidad. |
 | Dimensiones | Base y altura opcionales que caracterizan físicamente un material o una merma y participan en el cálculo de cantidad convertida. | No son cantidades de inventario. En textos operativos, «ancho» y «largo» se interpretan como los campos **Base** y **Altura** mostrados por Nexus. |
 | Presentación | Forma comercial o física en que se identifica un material. | Es catálogo auxiliar; no es la unidad de medida. |
 | Unidad de medida | Unidad y símbolo usados para expresar cantidades de un material. | Debe conservarse separada de factores o cantidades convertidas. |
-| Consumible | Artículo clasificado explícitamente como consumible, sin dimensiones y con unidad pieza. | Conserva proveedor, costo y existencia mediante la oferta proveedor-material. Sus operaciones se separan de materiales. |
-| Catálogo auxiliar | Conjunto controlado de opciones que clasifica o configura otros registros, como presentación, unidad, motivo o estado de cumplimiento. | Su lectura dentro de un selector operativo no concede mantenimiento; las seis variantes registradas sólo pueden administrarse desde sus pantallas protegidas con `catalogs:manage`. |
-| Alta contextual | Creación de un registro desde el selector de otra operación para incorporarlo y seleccionarlo en el formulario de origen. | Reutiliza el alta autorizada, pero no concede acceso al listado independiente ni a las acciones de consulta, edición o reporte del catálogo. En el alcance vigente aplica a materiales desde una compra, proveedores desde formularios operativos y clientes desde una salida. |
+| Consumible | Artículo clasificado explícitamente como consumible, sin dimensiones, con presentación y unidad de medida explícitas. | Conserva proveedor, costo y existencia mediante la oferta proveedor-material. Sus operaciones se separan de materiales. |
+| Catálogo auxiliar | Conjunto controlado de opciones que clasifica o configura otros registros, como presentación, unidad, motivo o estado de cumplimiento. | Su lectura dentro de un selector operativo no concede mantenimiento; las seis variantes registradas sólo pueden administrarse por el administrador autorizado desde sus pantallas de mantenimiento. |
+| Alta contextual | Creación de un registro desde el selector de otra operación para incorporarlo y seleccionarlo en el formulario de origen. | Reutiliza el alta autorizada, pero no concede acceso al listado independiente ni a las acciones de consulta, edición o reporte del catálogo. En el alcance vigente aplica a materiales o consumibles desde su compra correspondiente, proveedores desde formularios operativos y clientes desde una salida. |
 | Proveedor | Organización que suministra materiales y participa en entradas de compra. | Sus nombres legal y comercial son datos distintos. |
-| Oferta proveedor-material | Relación única entre proveedor y material que conserva costo máximo, existencia y estado activo asociados. | En código corresponde a `SupplierMaterial`; no es un material duplicado. |
+| Oferta de proveedor | Relación única entre proveedor y material que conserva costo máximo, existencia y estado activo asociados. | «Oferta proveedor-material» es alias aceptado, también para consumibles. En código corresponde a `SupplierMaterial`; no duplica el artículo base. |
 | Inventario | Vista de existencias de materiales o consumibles por proveedor, o de existencias independientes de merma. | No es un único saldo global: materiales, consumibles y mermas se consultan y reportan en contextos separados, aunque los consumibles reutilicen las relaciones y movimientos de `Material`. |
 | Existencia | Cantidad disponible de un recurso en un contexto identificable. | `stock` es el nombre técnico aceptado; toda modificación debe quedar explicada por un movimiento o ajuste permitido. |
 | Stock mínimo | Umbral de referencia configurado para señalar que una existencia es baja. | No es stock disponible, reserva ni límite máximo; modificarlo no mueve inventario. La interfaz también lo presenta como **Stock Mínimo**. |
@@ -68,7 +71,9 @@ fuente de verdad.
 
 | Término canónico | Definición compartida | Alias o distinción importante |
 | --- | --- | --- |
-| Documento operativo | Encabezado y detalles que registran una intención o hecho de inventario con referencia y estado. | Entrada, salida y ajuste tienen reglas propias; compartir estructura no iguala sus transiciones. |
+| Documento operativo | Registro de una intención o hecho de inventario con referencia y estado; puede contener encabezado y detalles según su tipo. | «Documento de inventario» es el concepto general usado en el dominio. Entradas, salidas y ajustes tienen estructuras y reglas propias. |
+| Salida de artículos | Concepto común de las salidas de material y consumible. | Clase abstracta del dominio; cada documento mantiene un solo contexto, sin mezclar ambos tipos. No incluye salida de merma. |
+| Entrada adicional de merma | Documento de incorporación de una cantidad positiva a una merma existente. | Corresponde a **Agregar stock**; no es compra ni ajuste que sustituya el saldo total. |
 | Requisición de compra | Solicitud planificada de materiales con eventual aprobación y entrega. | No forma parte del código ni del esquema vigente; requiere un nuevo alcance antes de reimplementarse. |
 | Entrada de compra | Recepción de materiales o consumibles de un proveedor que incrementa existencias y genera trazabilidad de movimiento. | En código se denomina `GoodsReceipt`; «compra» en la UI no sustituye la recepción efectiva. |
 | Documento homogéneo | Compra o salida con detalles del mismo contexto que su cabecera. | Debe tener al menos un detalle; los cancelados conservan su clasificación. |
@@ -88,13 +93,17 @@ fuente de verdad.
 | Cancelación | Transición que invalida un documento o detalle conforme a sus reglas, conservando su historia. | En salidas es un resultado derivado: la devolución total cancela el detalle y sólo la cancelación de todos los detalles cancela el encabezado; no existe una acción ni un endpoint de cancelación directa. |
 | Ajuste de stock | Operación autorizada que establece una nueva cantidad total, aplica inmediatamente la diferencia de existencia y genera su movimiento, razón y trazabilidad. | En el flujo vigente no queda una solicitud pendiente de aprobación: el usuario que ejecuta el ajuste queda registrado como creador y aprobador. No es una entrada ni una salida. |
 | Razón de ajuste | Opción del catálogo que explica por qué se establece una nueva cantidad de stock. | **Stock inicial** se asigna automáticamente durante un alta. No sustituye las observaciones ni es el motivo interno de una corrección o cancelación de compra. |
+| Efecto de inventario | Cambio de existencia de un recurso ocasionado por una operación confirmada, con cantidad anterior y posterior. | Un movimiento puede reunir efectos sobre varios recursos. Cada efecto corresponde a una oferta de proveedor o a una merma, no a ambas. |
+| Trazabilidad | Posibilidad de seguir la relación entre operación, documento, cantidades, participantes e historia conservada. | No implica asignar entregas a compras concretas sin lotes ni garantiza auditoría exhaustiva. |
+| Auditoría | Evidencia que permite revisar quién ejecutó una acción, cuándo y qué cambió, con el alcance disponible. | La persona participante no sustituye al usuario que ejecutó la acción; su cobertura tiene brechas documentadas. |
+| Datos históricos | Valores conservados para interpretar una operación tal como se registró. | «Snapshot» es alias técnico; un cambio posterior del catálogo no debe reinterpretar el documento histórico. |
 | Movimiento | Registro inmutable del efecto de una entrada, salida, devolución, corrección o ajuste sobre existencias. | El documento de origen explica la operación y el movimiento demuestra su efecto. Los movimientos forman un historial por recurso y saldo; no asignan una salida a una entrada específica cuando no existen lotes o partidas. |
 | Folio o referencia documental | Identificador legible y único que enlaza documentos y movimientos con su origen. | La interfaz usa **Folio** y el código `referenceNumber`; no sustituye el UUID técnico ni el número de factura o proyecto. |
 | Estado | Situación general de un documento o registro. | Se distingue del estado de cumplimiento de una entrega. |
 | Estado activo | Indicador de disponibilidad de un registro de catálogo para operaciones posteriores. | Activar o desactivar no elimina el registro, no cambia su identidad ni modifica sus existencias o historia. |
 | Estado de compra | Situación derivada de una entrada: **Confirmada** mientras conserva detalles activos y **Cancelada** cuando todos sus detalles se cancelaron. | No se captura directamente. Corregir un detalle no cancela la compra y editar el encabezado no cambia el estado. |
 | Estado de detalle de compra | Situación **Activo** o **Cancelado** de un renglón de entrada. | Un detalle corregido permanece activo; cancelar revierte su inventario, lo excluye de los totales activos y conserva su historia. |
-| Estado de cumplimiento | Grado de surtimiento de una salida o detalle: **Pendiente**, **Surtido parcial**, **Surtido** o **Cancelado** según corresponda. | Se deriva de las cantidades surtidas y devueltas; no debe usarse como sinónimo de estado activo o de aprobación. |
+| Estado de cumplimiento | Grado de surtimiento de una salida o detalle: **Pendiente**, **Surtido parcial**, **Surtido** o **Cancelado** para la salida; el detalle usa **Pendiente**, **Surtido** y **Cancelado**. | El cumplimiento parcial indica que quedan otros detalles pendientes. Se deriva de suministros y devoluciones; no es estado activo ni aprobación. |
 | Tipo de movimiento | Clasificación del efecto registrado en inventario: entrada, salida, ajuste o devolución presentada a partir de su movimiento de reversa. | Describe el efecto sobre stock; no es el tipo de comprobante ni el estado del documento de origen. |
 
 ## Cantidades
@@ -102,15 +111,44 @@ fuente de verdad.
 | Término canónico | Definición compartida | Regla de uso |
 | --- | --- | --- |
 | Cantidad solicitada | Cantidad registrada como objetivo en un detalle de salida. | Es la base para validar acumulados de suministro y devolución. |
+| Cantidad pendiente de surtir | Cantidad solicitada menos la cantidad ya suministrada del detalle. | Se entrega completa al surtir el detalle; una devolución no vuelve a abrirlo como pendiente. |
 | Cantidad suministrada | Acumulado efectivamente entregado para un detalle. | No puede quedar incompatible con cantidad solicitada y devoluciones. |
 | Cantidad devuelta | Acumulado reingresado después de un suministro. | Cada incremento requiere trazabilidad con su movimiento de reversa. |
+| Saldo entregado | Cantidad suministrada de un detalle menos sus devoluciones anteriores. | Es el máximo disponible para una nueva devolución; no es existencia de almacén ni cantidad pendiente de surtir. |
 | Cantidad convertida | Cantidad expresada mediante la conversión definida por el contexto del material o merma. | Debe nombrarse junto con la unidad o regla de conversión aplicable. |
 | Cantidad de proyecto | Cantidad informada al surtir para comparar el consumo previsto por el proyecto con la cantidad convertida del detalle. | No sustituye la cantidad solicitada ni determina por sí sola cuánto stock se descuenta; la diferencia se conserva por separado. |
 | Cantidad a agregar | Cantidad positiva que se suma a la existencia vigente mediante **Agregar stock** de una merma y queda respaldada por un documento individual de entrada y su movimiento. | Es incremental: no representa el saldo final, no requiere una razón de ajuste y no sustituye una entrada de compra ni **Ajustar stock**. |
 | Nueva cantidad | Existencia total que debe quedar después de un alta o ajuste. | Sustituye el stock vigente; no representa un incremento que Nexus sumará automáticamente. |
 | Costo por presentación | Costo capturado para la cantidad expresada en la presentación de un detalle de compra. | Se usa para calcular los montos del renglón y el costo por unidad convertida; no es el costo máximo. |
-| Monto sin/con IVA | Importe de un detalle o compra antes o después de aplicar el IVA utilizado por Nexus. | El monto con IVA se calcula a partir del monto sin IVA; ninguno representa una cantidad de inventario. |
-| Existencia anterior/nueva | Valores antes y después de una mutación atómica. | Se conservan en movimientos o ajustes para explicar la diferencia. |
+| Monto sin/con IVA | Importe de un detalle o compra antes o después de aplicar el impuesto al valor agregado (IVA) utilizado por Nexus. | El monto con IVA se calcula a partir del monto sin IVA; ninguno representa una cantidad de inventario. |
+| Existencia anterior/nueva | Valores antes y después de una operación confirmada que afecta inventario. | Se conservan en movimientos o ajustes para explicar la diferencia. |
+
+## Requisitos, alcance y representación
+
+| Término canónico | Definición compartida | Distinción importante |
+| --- | --- | --- |
+| Parte interesada | Persona, grupo u organización con necesidades o preocupaciones sobre el producto. | No toda parte interesada es usuario o actor de un caso de uso. |
+| Actor de caso de uso | Papel externo que interactúa con Nexus para alcanzar un objetivo. | Puede generalizar otro papel; no representa una entidad de datos ni una pantalla. |
+| Objetivo de negocio | Resultado de valor que justifica el producto o una capacidad. | Una capacidad implementada no demuestra una meta alcanzada; requiere indicadores acordados. |
+| Alcance vigente | Capacidades y límites incluidos actualmente en el producto. | Un concepto modelado o una propuesta no equivalen a una capacidad disponible. |
+| Supuesto | Condición que se toma como base para analizar u operar y debe confirmarse. | No es un hecho verificado ni un requisito aprobado por sí mismo. |
+| Dependencia | Condición, dato o servicio necesario para una capacidad u operación. | Su disponibilidad y responsabilidad requieren revisión. |
+| Restricción | Límite que condiciona una solución u operación. | Debe tener fuente; no se deduce de una preferencia de implementación. |
+| Riesgo | Posible situación que afecta un objetivo o la operación. | No es un incidente ya ocurrido; las decisiones abiertas pueden dejar riesgos sin tratar. |
+| SRS | Especificación de requisitos de software que conserva obligaciones, reglas, criterios, estados y trazabilidad. | Complementa visión y alcance; no equivale a arquitectura ni a código. |
+| Requisito | Obligación identificada y verificable sobre una capacidad, dato, regla o calidad. | Su fuente normativa es la SRS; el código aporta evidencia, no aceptación funcional. |
+| Criterio de aceptación | Condición observable que permite comprobar el cumplimiento de un requisito o resultado acordado. | Aprobar pruebas técnicas no sustituye la aceptación de negocio. |
+| Línea base de requisitos | Conjunto versionado de requisitos y vocabulario usado como referencia de revisión. | Su versionado no prueba aprobación funcional; ésta requiere evidencia explícita. |
+| Guarda | Condición que debe cumplirse para tomar una transición de estado. | Se representa entre corchetes; no es una acción ni su efecto. |
+| Efecto de transición | Resultado de ejecutar una transición, por ejemplo incorporar, descontar o reponer existencia. | Puede nombrarse brevemente y definirse en una leyenda; no exige código de programación. |
+| SLA | Acuerdo de nivel de servicio con medidas y compromisos aceptados. | Nexus no tiene aquí valores comprometidos; están pendientes de acuerdo. |
+| RTO | Objetivo de tiempo de recuperación del servicio después de una interrupción. | Es un objetivo por acordar, no un tiempo demostrado. |
+| RPO | Objetivo de pérdida máxima de datos expresada como intervalo entre el último punto recuperable y la interrupción. | Es distinto de RTO; requiere política y medios de recuperación acordados. |
+
+El modelo conceptual puede omitir atributos cuando su propósito es explicar conceptos
+y relaciones. Si una característica resulta imprescindible para distinguir un concepto
+o entender una regla, se incorpora como atributo de negocio en una vista que lo requiera,
+sin copiar identificadores, claves o estructuras internas de la base de datos.
 
 ## Gobierno del glosario
 

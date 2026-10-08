@@ -5,7 +5,11 @@ vistas del mismo dominio para facilitar la lectura; un concepto repetido conserv
 mismo significado. Los nombres y las multiplicidades describen reglas funcionales,
 sin reproducir tablas, campos internos ni componentes de software. Esta vista muestra
 únicamente conceptos y relaciones: omitir atributos no significa que una entidad carezca
-de datos. Sus características se definen en el glosario y en los requisitos correspondientes.
+de datos. Sus características se definen en el [glosario](../business-glossary.md) y en los
+requisitos correspondientes. En estas cuatro vistas no se necesitan compartimentos de
+atributos para entender las relaciones. Si otra vista necesita explicar una identidad o
+un cálculo, puede mostrar sólo los atributos de negocio relevantes; UML no obliga a
+listar todos los campos ni a convertir el dominio en el modelo de base de datos.
 
 Las figuras usan clases UML en Mermaid. Las asociaciones indican vínculos entre
 conceptos; la generalización agrupa variantes de un concepto y apunta al general.
