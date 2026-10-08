@@ -30,12 +30,12 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 | Entrada / editar | `edit`; entrada no cancelada | tipo de comprobante, factura cuando aplica, receptor, fecha, observaciones y detalles **nuevos** | el proveedor permanece bloqueado; una partida persistida se cambia mediante `correct`, no sobrescribiéndola |
 | Entrada / consultar | `view`; entrada cancelada | ninguno | formulario, detalles y acciones permanecen en sólo lectura |
 | Entrada / corregir o cancelar detalle | `correct`; detalle persistido y documento habilitado | cantidad/costo corregidos, motivo, valores anterior y nuevo | ajusta stock y movimiento conservando historia |
-| Salida de material o merma / crear | `create`; documento nuevo | cliente, asesor, área, solicitante, proyecto, fecha de solicitud, observaciones y detalles solicitados | no descuenta stock mientras el detalle no se surta |
-| Salida de material o merma / editar completa | `edit`; salida pendiente | encabezado y detalles nuevos o cantidades todavía no surtidas | no reescribe cantidades ya surtidas o devueltas |
-| Salida de material o merma / editar encabezado | `edit-header`; salida no cancelada que ya no está pendiente | cliente, asesor, área, solicitante, proyecto, fecha de solicitud y observaciones | los detalles permanecen en sólo lectura y no cambia inventario |
-| Salida de material o merma / surtir | `edit-detail`; detalle pendiente o parcial | selección del detalle y cantidad de proyecto a surtir | el encabezado permanece bloqueado; reduce existencia y crea movimiento atómicamente |
-| Salida de material o merma / devolver | `return`; detalle con cantidad surtida disponible | cantidad devuelta y observaciones de devolución | encabezado y detalles originales permanecen bloqueados; incrementa existencia y crea movimiento inverso |
-| Salida de material o merma / consultar | `view`; salida cancelada | ninguno | formulario y detalles permanecen en sólo lectura |
+| Salida de material, consumible o merma / crear | `create`; documento nuevo | cliente, asesor, área, solicitante, proyecto, fecha de solicitud, observaciones y detalles solicitados | no descuenta stock mientras el detalle no se surta |
+| Salida de material, consumible o merma / editar completa | `edit`; salida pendiente | encabezado y detalles nuevos o cantidades todavía no surtidas | no reescribe cantidades ya surtidas o devueltas |
+| Salida de material, consumible o merma / editar encabezado | `edit-header`; salida no cancelada que ya no está pendiente | cliente, asesor, área, solicitante, proyecto, fecha de solicitud y observaciones | los detalles permanecen en sólo lectura y no cambia inventario |
+| Salida de material, consumible o merma / surtir | `edit-detail`; detalle pendiente o parcial | selección del detalle y cantidad de proyecto a surtir | el encabezado permanece bloqueado; reduce existencia y crea movimiento atómicamente |
+| Salida de material, consumible o merma / devolver | `return`; salida con cumplimiento Surtido y detalle con cantidad surtida disponible | cantidad devuelta y observaciones de devolución | encabezado y detalles originales permanecen bloqueados; incrementa existencia y crea movimiento inverso |
+| Salida de material, consumible o merma / consultar | `view`; salida cancelada | ninguno | formulario y detalles permanecen en sólo lectura |
 
 Los nombres técnicos de los campos HTTP pertenecen al
 [contrato API](../../architecture/openapi/api-contract.md); las reglas observables pertenecen al
