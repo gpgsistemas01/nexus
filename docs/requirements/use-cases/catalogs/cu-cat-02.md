@@ -5,6 +5,7 @@
 | Identificador | `CU-CAT-02` |
 | Nombre | Crear proveedor. |
 | Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ENT-02` y `CU-ENT-08` únicamente cuando el alta se inicia desde su selector de proveedor (paso 3, A6); devuelve el proveedor seleccionado y reanuda la compra. El alta desde `CU-CAT-01` es un objetivo independiente, no una extensión de la consulta. |
 | Disparador | Selecciona **Nuevo proveedor** desde `CU-CAT-01` Consultar proveedores o desde el selector de proveedor de una operación autorizada. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta. |
 | Flujo principal | 1. **Actor:** selecciona **Nuevo proveedor** desde el listado independiente o desde un selector operativo **(ver E1)**.<br>2. **Nexus:** muestra el mismo formulario reutilizable con la casilla **Activo** seleccionada inicialmente.<br>3. **Actor:** captura razón social, nombre comercial y teléfono, revisa el estado y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** valida que la información sea válida; registra el proveedor y muestra la confirmación. Si el origen fue el listado de Sistemas, lo actualiza; si fue un selector operativo, agrega y selecciona el proveedor creado sin conceder acceso al listado independiente. Además, guarda los cambios de la operación en la base de datos **(ver EBD)**. |

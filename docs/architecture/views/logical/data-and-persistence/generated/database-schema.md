@@ -1,12 +1,16 @@
 <!-- Archivo generado por scripts/generateArchitectureDocs.js. No editar manualmente. -->
 # Diagramas de la base de datos
 
-Estos diagramas ER se generan desde los modelos y relaciones de
+Estos diagramas representan el modelo relacional persistente con notación ER de pata
+de cuervo. Se generan desde los modelos y relaciones de
 `prisma/schema.prisma`. Se separan por área para que puedan leerse y revisarse en
 GitHub. Los atributos se distribuyen en figuras de hasta tres modelos. Cada figura
-incluye sus relaciones entrantes y salientes; los modelos externos aparecen sólo por
-nombre, con sus atributos en su propia figura. Todas las relaciones también se reúnen
-en la sección final.
+incluye sus relaciones entrantes y salientes; los modelos externos muestran sólo las
+claves que intervienen en esas conexiones y conservan sus atributos completos en su
+figura propietaria. Cada conexión expresa FK = clave referenciada entre los modelos de sus extremos; la
+tabla final detalla los nombres completos. Los nombres de
+relación del ORM no son columnas adicionales. Todas las correspondencias de claves se
+reúnen en una tabla final para evitar otra colección de diagramas sin atributos.
 
 La marca `PK` identifica claves primarias, `FK` claves foráneas y `UK` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
@@ -45,24 +49,66 @@ erDiagram
         String password
         Boolean isActive
     }
-    Person o|--o{ User : "person"
-    User o|--o{ CriticalWriteAudit : "actor"
-    User ||--o{ UserRoleDepartment : "user"
-    Role ||--o{ UserRoleDepartment : "role"
-    Department ||--o{ UserRoleDepartment : "department"
-    Department ||--o{ PersonRoleDepartment : "department"
-    Role ||--o{ PersonRoleDepartment : "role"
-    User ||--o{ WasteStockAdjustment : "createdBy"
-    User o|--o{ WasteStockAdjustment : "approvedBy"
-    User ||--o{ WasteStockEntry : "createdBy"
-    User ||--o{ WasteIssue : "createdBy"
-    Department ||--o{ WasteIssue : "department"
-    User o|--o{ WasteIssueReturn : "returnedBy"
-    Department ||--o{ GoodsIssue : "department"
-    User o|--o{ GoodsIssueReturn : "returnedBy"
-    User ||--o{ StockAdjustment : "createdBy"
-    User o|--o{ StockAdjustment : "approvedBy"
-    User ||--o{ GoodsReceiptDetailChange : "changedBy"
+    Person {
+        String id PK
+    }
+    CriticalWriteAudit {
+        String actorId FK
+    }
+    UserRoleDepartment {
+        String userId PK,FK
+        String roleId PK,FK
+        String departmentId PK,FK
+    }
+    PersonRoleDepartment {
+        String departmentId PK,FK
+        String roleId PK,FK
+    }
+    WasteStockAdjustment {
+        String createdById FK
+        String approvedById FK
+    }
+    WasteStockEntry {
+        String createdById FK
+    }
+    WasteIssue {
+        String createdById FK
+        String departmentId FK
+    }
+    WasteIssueReturn {
+        String returnedById FK
+    }
+    GoodsIssue {
+        String departmentId FK
+    }
+    GoodsIssueReturn {
+        String returnedById FK
+    }
+    StockAdjustment {
+        String createdById FK
+        String approvedById FK
+    }
+    GoodsReceiptDetailChange {
+        String changedById FK
+    }
+    Person o|..o{ User : "personId = id"
+    User o|..o{ CriticalWriteAudit : "actorId = id"
+    User ||--o{ UserRoleDepartment : "userId = id"
+    Role ||--o{ UserRoleDepartment : "roleId = id"
+    Department ||--o{ UserRoleDepartment : "departmentId = id"
+    Department ||--o{ PersonRoleDepartment : "departmentId = id"
+    Role ||--o{ PersonRoleDepartment : "roleId = id"
+    User ||..o{ WasteStockAdjustment : "createdById = id"
+    User o|..o{ WasteStockAdjustment : "approvedById = id"
+    User ||..o{ WasteStockEntry : "createdById = id"
+    User ||..o{ WasteIssue : "createdById = id"
+    Department ||..o{ WasteIssue : "departmentId = id"
+    User o|..o{ WasteIssueReturn : "returnedById = id"
+    Department ||..o{ GoodsIssue : "departmentId = id"
+    User o|..o{ GoodsIssueReturn : "returnedById = id"
+    User ||..o{ StockAdjustment : "createdById = id"
+    User o|..o{ StockAdjustment : "approvedById = id"
+    User ||..o{ GoodsReceiptDetailChange : "changedById = id"
 ```
 
 ### Person · UserRoleDepartment · PersonRoleDepartment
@@ -85,21 +131,47 @@ erDiagram
         String personId PK,FK
         String roleId PK,FK
     }
-    Person o|--o{ User : "person"
-    User ||--o{ UserRoleDepartment : "user"
-    Role ||--o{ UserRoleDepartment : "role"
-    Department ||--o{ UserRoleDepartment : "department"
-    Department ||--o{ PersonRoleDepartment : "department"
-    Person ||--o{ PersonRoleDepartment : "person"
-    Role ||--o{ PersonRoleDepartment : "role"
-    Person ||--o{ WasteIssue : "requester"
-    Person ||--o{ WasteIssue : "advisor"
-    Person o|--o{ Client : "advisor"
-    Person ||--o{ GoodsReceipt : "receivedBy"
-    Person o|--o{ GoodsIssue : "approver"
-    Person ||--o{ GoodsIssue : "requester"
-    Person o|--o{ GoodsIssue : "warehouseStaff"
-    Person ||--o{ GoodsIssue : "advisor"
+    User {
+        String id PK
+        String personId FK
+    }
+    Role {
+        String id PK
+    }
+    Department {
+        String id PK
+    }
+    WasteIssue {
+        String requesterId FK
+        String advisorId FK
+    }
+    Client {
+        String advisorId FK
+    }
+    GoodsReceipt {
+        String receivedById FK
+    }
+    GoodsIssue {
+        String approverId FK
+        String requesterId FK
+        String warehouseStaffId FK
+        String advisorId FK
+    }
+    Person o|..o{ User : "personId = id"
+    User ||--o{ UserRoleDepartment : "userId = id"
+    Role ||--o{ UserRoleDepartment : "roleId = id"
+    Department ||--o{ UserRoleDepartment : "departmentId = id"
+    Department ||--o{ PersonRoleDepartment : "departmentId = id"
+    Person ||--o{ PersonRoleDepartment : "personId = id"
+    Role ||--o{ PersonRoleDepartment : "roleId = id"
+    Person ||..o{ WasteIssue : "requesterId = id"
+    Person ||..o{ WasteIssue : "advisorId = id"
+    Person o|..o{ Client : "advisorId = id"
+    Person ||..o{ GoodsReceipt : "receivedById = id"
+    Person o|..o{ GoodsIssue : "approverId = id"
+    Person ||..o{ GoodsIssue : "requesterId = id"
+    Person o|..o{ GoodsIssue : "warehouseStaffId = id"
+    Person ||..o{ GoodsIssue : "advisorId = id"
 ```
 
 ### CriticalWriteAudit
@@ -122,7 +194,10 @@ erDiagram
         String userAgent
         DateTime createdAt
     }
-    User o|--o{ CriticalWriteAudit : "actor"
+    User {
+        String id PK
+    }
+    User o|..o{ CriticalWriteAudit : "actorId = id"
 ```
 
 ## Catálogos y relaciones comerciales
@@ -148,14 +223,32 @@ erDiagram
         String name
         DateTime date
     }
-    FulfillmentStatus ||--o{ WasteIssue : "fulfillmentStatus"
-    Status ||--o{ WasteIssue : "status"
-    FulfillmentStatus ||--o{ WasteIssueDetail : "fulfillmentStatus"
-    Status ||--o{ GoodsReceipt : "status"
-    Status ||--o{ GoodsIssue : "status"
-    Project o|--o{ GoodsIssue : "project"
-    FulfillmentStatus o|--o{ GoodsIssue : "fulfillmentStatus"
-    FulfillmentStatus ||--o{ GoodsIssueDetail : "fulfillmentStatus"
+    WasteIssue {
+        String fulfillmentStatusId FK
+        String statusId FK
+    }
+    WasteIssueDetail {
+        String fulfillmentStatusId FK
+    }
+    GoodsReceipt {
+        String statusId FK
+    }
+    GoodsIssue {
+        String statusId FK
+        String projectId FK
+        String fulfillmentStatusId FK
+    }
+    GoodsIssueDetail {
+        String fulfillmentStatusId FK
+    }
+    FulfillmentStatus ||..o{ WasteIssue : "fulfillmentStatusId = id"
+    Status ||..o{ WasteIssue : "statusId = id"
+    FulfillmentStatus ||..o{ WasteIssueDetail : "fulfillmentStatusId = id"
+    Status ||..o{ GoodsReceipt : "statusId = id"
+    Status ||..o{ GoodsIssue : "statusId = id"
+    Project o|..o{ GoodsIssue : "projectId = id"
+    FulfillmentStatus o|..o{ GoodsIssue : "fulfillmentStatusId = id"
+    FulfillmentStatus ||..o{ GoodsIssueDetail : "fulfillmentStatusId = id"
 ```
 
 ### Client · Supplier · Material
@@ -188,24 +281,68 @@ erDiagram
         Decimal height
         MaterialType type
     }
-    Presentation ||--o{ Material : "presentation"
-    UnitMeasure ||--o{ Material : "unitMeasure"
-    Supplier ||--o{ SupplierMaterial : "supplier"
-    Material ||--o{ SupplierMaterial : "material"
-    Supplier ||--o{ Waste : "supplier"
-    Client ||--o{ WasteIssue : "client"
-    Person o|--o{ Client : "advisor"
-    Supplier ||--o{ GoodsReceipt : "supplier"
-    Material ||--o{ GoodsReceiptDetail : "material"
-    Client ||--o{ GoodsIssue : "client"
-    Material ||--o{ GoodsIssueDetail : "material"
-    Supplier ||--o{ GoodsIssueDetail : "supplier"
-    Material ||--o{ MovementDetail : "material"
-    Supplier ||--o{ MovementDetail : "supplier"
-    Material ||--o{ StockAdjustmentDetail : "material"
-    Supplier ||--o{ StockAdjustmentDetail : "supplier"
-    Material ||--o{ GoodsReceiptDetailChange : "previousMaterial"
-    Material ||--o{ GoodsReceiptDetailChange : "correctedMaterial"
+    Presentation {
+        String id PK
+    }
+    UnitMeasure {
+        String id PK
+    }
+    SupplierMaterial {
+        String supplierId FK
+        String materialId FK
+    }
+    Waste {
+        String supplierId FK
+    }
+    WasteIssue {
+        String clientId FK
+    }
+    Person {
+        String id PK
+    }
+    GoodsReceipt {
+        String supplierId FK
+    }
+    GoodsReceiptDetail {
+        String materialId FK
+    }
+    GoodsIssue {
+        String clientId FK
+    }
+    GoodsIssueDetail {
+        String materialId FK
+        String supplierId FK
+    }
+    MovementDetail {
+        String materialId FK
+        String supplierId FK
+    }
+    StockAdjustmentDetail {
+        String materialId FK
+        String supplierId FK
+    }
+    GoodsReceiptDetailChange {
+        String previousMaterialId FK
+        String correctedMaterialId FK
+    }
+    Presentation ||..o{ Material : "presentationId = id"
+    UnitMeasure ||..o{ Material : "unitMeasureId = id"
+    Supplier ||..o{ SupplierMaterial : "supplierId = id"
+    Material ||..o{ SupplierMaterial : "materialId = id"
+    Supplier ||..o{ Waste : "supplierId = id"
+    Client ||..o{ WasteIssue : "clientId = id"
+    Person o|..o{ Client : "advisorId = id"
+    Supplier ||..o{ GoodsReceipt : "supplierId = id"
+    Material ||..o{ GoodsReceiptDetail : "materialId = id"
+    Client ||..o{ GoodsIssue : "clientId = id"
+    Material ||..o{ GoodsIssueDetail : "materialId = id"
+    Supplier ||..o{ GoodsIssueDetail : "supplierId = id"
+    Material ||..o{ MovementDetail : "materialId = id"
+    Supplier ||..o{ MovementDetail : "supplierId = id"
+    Material ||..o{ StockAdjustmentDetail : "materialId = id"
+    Supplier ||..o{ StockAdjustmentDetail : "supplierId = id"
+    Material ||..o{ GoodsReceiptDetailChange : "previousMaterialId = id"
+    Material ||..o{ GoodsReceiptDetailChange : "correctedMaterialId = id"
 ```
 
 ### UnitMeasure · Presentation · SupplierMaterial
@@ -234,12 +371,24 @@ erDiagram
         String supplierId FK
         String materialId FK
     }
-    Presentation ||--o{ Material : "presentation"
-    UnitMeasure ||--o{ Material : "unitMeasure"
-    Supplier ||--o{ SupplierMaterial : "supplier"
-    Material ||--o{ SupplierMaterial : "material"
-    Presentation ||--o{ Waste : "presentation"
-    UnitMeasure ||--o{ Waste : "unitMeasure"
+    Material {
+        String id PK
+        String presentationId FK
+        String unitMeasureId FK
+    }
+    Supplier {
+        String id PK
+    }
+    Waste {
+        String presentationId FK
+        String unitMeasureId FK
+    }
+    Presentation ||..o{ Material : "presentationId = id"
+    UnitMeasure ||..o{ Material : "unitMeasureId = id"
+    Supplier ||..o{ SupplierMaterial : "supplierId = id"
+    Material ||..o{ SupplierMaterial : "materialId = id"
+    Presentation ||..o{ Waste : "presentationId = id"
+    UnitMeasure ||..o{ Waste : "unitMeasureId = id"
 ```
 
 ### ReferenceNumberCounter
@@ -253,6 +402,7 @@ erDiagram
         Int counter
         Int year
     }
+
 
 ```
 
@@ -323,20 +473,45 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    Person ||--o{ GoodsReceipt : "receivedBy"
-    Supplier ||--o{ GoodsReceipt : "supplier"
-    Status ||--o{ GoodsReceipt : "status"
-    GoodsReceipt ||--o{ GoodsReceiptDetail : "goodsReceipt"
-    Material ||--o{ GoodsReceiptDetail : "material"
-    GoodsReceipt o|--o{ InventoryMovement : "goodsReceipt"
-    GoodsReceiptDetail o|--o{ MovementDetail : "goodsReceiptDetail"
-    GoodsReceipt ||--o{ GoodsReceiptDetailChange : "goodsReceipt"
-    GoodsReceiptDetail ||--o{ GoodsReceiptDetailChange : "goodsReceiptDetail"
-    StockAdjustmentReason ||--o{ GoodsReceiptDetailChange : "reason"
-    User ||--o{ GoodsReceiptDetailChange : "changedBy"
-    Material ||--o{ GoodsReceiptDetailChange : "previousMaterial"
-    Material ||--o{ GoodsReceiptDetailChange : "correctedMaterial"
-    InventoryMovement o|--o| GoodsReceiptDetailChange : "inventoryMovement"
+    Person {
+        String id PK
+    }
+    Supplier {
+        String id PK
+    }
+    Status {
+        String id PK
+    }
+    Material {
+        String id PK
+    }
+    InventoryMovement {
+        String id PK
+        String goodsReceiptId FK
+    }
+    MovementDetail {
+        String goodsReceiptDetailId FK
+    }
+    StockAdjustmentReason {
+        String id PK
+    }
+    User {
+        String id PK
+    }
+    Person ||..o{ GoodsReceipt : "receivedById = id"
+    Supplier ||..o{ GoodsReceipt : "supplierId = id"
+    Status ||..o{ GoodsReceipt : "statusId = id"
+    GoodsReceipt ||..o{ GoodsReceiptDetail : "goodsReceiptId = id"
+    Material ||..o{ GoodsReceiptDetail : "materialId = id"
+    GoodsReceipt o|..o{ InventoryMovement : "goodsReceiptId = id"
+    GoodsReceiptDetail o|..o{ MovementDetail : "goodsReceiptDetailId = id"
+    GoodsReceipt ||..o{ GoodsReceiptDetailChange : "goodsReceiptId = id"
+    GoodsReceiptDetail ||..o{ GoodsReceiptDetailChange : "goodsReceiptDetailId = id"
+    StockAdjustmentReason ||..o{ GoodsReceiptDetailChange : "reasonId = id"
+    User ||..o{ GoodsReceiptDetailChange : "changedById = id"
+    Material ||..o{ GoodsReceiptDetailChange : "previousMaterialId = id"
+    Material ||..o{ GoodsReceiptDetailChange : "correctedMaterialId = id"
+    InventoryMovement o|..o| GoodsReceiptDetailChange : "inventoryMovementId = id"
 ```
 
 ### GoodsIssue · GoodsIssueDetail · GoodsIssueReturn
@@ -403,25 +578,59 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    Department ||--o{ GoodsIssue : "department"
-    Person o|--o{ GoodsIssue : "approver"
-    Person ||--o{ GoodsIssue : "requester"
-    Person o|--o{ GoodsIssue : "warehouseStaff"
-    Status ||--o{ GoodsIssue : "status"
-    Project o|--o{ GoodsIssue : "project"
-    Client ||--o{ GoodsIssue : "client"
-    Person ||--o{ GoodsIssue : "advisor"
-    FulfillmentStatus o|--o{ GoodsIssue : "fulfillmentStatus"
-    Material ||--o{ GoodsIssueDetail : "material"
-    Supplier ||--o{ GoodsIssueDetail : "supplier"
-    GoodsIssue ||--o{ GoodsIssueDetail : "goodsIssue"
-    FulfillmentStatus ||--o{ GoodsIssueDetail : "fulfillmentStatus"
-    GoodsIssue ||--o{ GoodsIssueReturn : "goodsIssue"
-    GoodsIssueDetail ||--o{ GoodsIssueReturn : "goodsIssueDetail"
-    MovementDetail o|--o| GoodsIssueReturn : "movementDetail"
-    User o|--o{ GoodsIssueReturn : "returnedBy"
-    GoodsIssue o|--o{ InventoryMovement : "goodsIssue"
-    GoodsIssueDetail o|--o{ MovementDetail : "goodsIssueDetail"
+    Department {
+        String id PK
+    }
+    Person {
+        String id PK
+    }
+    Status {
+        String id PK
+    }
+    Project {
+        String id PK
+    }
+    Client {
+        String id PK
+    }
+    FulfillmentStatus {
+        String id PK
+    }
+    Material {
+        String id PK
+    }
+    Supplier {
+        String id PK
+    }
+    MovementDetail {
+        String id PK
+        String goodsIssueDetailId FK
+    }
+    User {
+        String id PK
+    }
+    InventoryMovement {
+        String goodsIssueId FK
+    }
+    Department ||..o{ GoodsIssue : "departmentId = id"
+    Person o|..o{ GoodsIssue : "approverId = id"
+    Person ||..o{ GoodsIssue : "requesterId = id"
+    Person o|..o{ GoodsIssue : "warehouseStaffId = id"
+    Status ||..o{ GoodsIssue : "statusId = id"
+    Project o|..o{ GoodsIssue : "projectId = id"
+    Client ||..o{ GoodsIssue : "clientId = id"
+    Person ||..o{ GoodsIssue : "advisorId = id"
+    FulfillmentStatus o|..o{ GoodsIssue : "fulfillmentStatusId = id"
+    Material ||..o{ GoodsIssueDetail : "materialId = id"
+    Supplier ||..o{ GoodsIssueDetail : "supplierId = id"
+    GoodsIssue ||..o{ GoodsIssueDetail : "goodsIssueId = id"
+    FulfillmentStatus ||..o{ GoodsIssueDetail : "fulfillmentStatusId = id"
+    GoodsIssue ||..o{ GoodsIssueReturn : "goodsIssueId = id"
+    GoodsIssueDetail ||..o{ GoodsIssueReturn : "goodsIssueDetailId = id"
+    MovementDetail o|..o| GoodsIssueReturn : "movementDetailId = id"
+    User o|..o{ GoodsIssueReturn : "returnedById = id"
+    GoodsIssue o|..o{ InventoryMovement : "goodsIssueId = id"
+    GoodsIssueDetail o|..o{ MovementDetail : "goodsIssueDetailId = id"
 ```
 
 ### InventoryMovement · MovementDetail · StockAdjustment
@@ -467,21 +676,55 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    MovementDetail o|--o| GoodsIssueReturn : "movementDetail"
-    GoodsReceipt o|--o{ InventoryMovement : "goodsReceipt"
-    GoodsIssue o|--o{ InventoryMovement : "goodsIssue"
-    StockAdjustment o|--o| InventoryMovement : "stockAdjustment"
-    Material ||--o{ MovementDetail : "material"
-    Supplier ||--o{ MovementDetail : "supplier"
-    GoodsReceiptDetail o|--o{ MovementDetail : "goodsReceiptDetail"
-    GoodsIssueDetail o|--o{ MovementDetail : "goodsIssueDetail"
-    StockAdjustmentDetail o|--o{ MovementDetail : "stockAdjustmentDetail"
-    InventoryMovement ||--o{ MovementDetail : "movement"
-    StockAdjustmentReason ||--o{ StockAdjustment : "reason"
-    User ||--o{ StockAdjustment : "createdBy"
-    User o|--o{ StockAdjustment : "approvedBy"
-    StockAdjustment ||--o{ StockAdjustmentDetail : "stockAdjustment"
-    InventoryMovement o|--o| GoodsReceiptDetailChange : "inventoryMovement"
+    GoodsIssueReturn {
+        String movementDetailId UK,FK
+    }
+    GoodsReceipt {
+        String id PK
+    }
+    GoodsIssue {
+        String id PK
+    }
+    Material {
+        String id PK
+    }
+    Supplier {
+        String id PK
+    }
+    GoodsReceiptDetail {
+        String id PK
+    }
+    GoodsIssueDetail {
+        String id PK
+    }
+    StockAdjustmentDetail {
+        String id PK
+        String stockAdjustmentId FK
+    }
+    StockAdjustmentReason {
+        String id PK
+    }
+    User {
+        String id PK
+    }
+    GoodsReceiptDetailChange {
+        String inventoryMovementId UK,FK
+    }
+    MovementDetail o|..o| GoodsIssueReturn : "movementDetailId = id"
+    GoodsReceipt o|..o{ InventoryMovement : "goodsReceiptId = id"
+    GoodsIssue o|..o{ InventoryMovement : "goodsIssueId = id"
+    StockAdjustment o|..o| InventoryMovement : "stockAdjustmentId = id"
+    Material ||..o{ MovementDetail : "materialId = id"
+    Supplier ||..o{ MovementDetail : "supplierId = id"
+    GoodsReceiptDetail o|..o{ MovementDetail : "goodsReceiptDetailId = id"
+    GoodsIssueDetail o|..o{ MovementDetail : "goodsIssueDetailId = id"
+    StockAdjustmentDetail o|..o{ MovementDetail : "stockAdjustmentDetailId = id"
+    InventoryMovement ||..o{ MovementDetail : "movementId = id"
+    StockAdjustmentReason ||..o{ StockAdjustment : "reasonId = id"
+    User ||..o{ StockAdjustment : "createdById = id"
+    User o|..o{ StockAdjustment : "approvedById = id"
+    StockAdjustment ||..o{ StockAdjustmentDetail : "stockAdjustmentId = id"
+    InventoryMovement o|..o| GoodsReceiptDetailChange : "inventoryMovementId = id"
 ```
 
 ### StockAdjustmentDetail · StockAdjustmentReason
@@ -511,13 +754,32 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
-    StockAdjustmentDetail o|--o{ MovementDetail : "stockAdjustmentDetail"
-    StockAdjustmentReason ||--o{ StockAdjustment : "reason"
-    StockAdjustment ||--o{ StockAdjustmentDetail : "stockAdjustment"
-    Material ||--o{ StockAdjustmentDetail : "material"
-    Supplier ||--o{ StockAdjustmentDetail : "supplier"
-    StockAdjustmentReason ||--o{ GoodsReceiptDetailChange : "reason"
+    WasteStockAdjustment {
+        String reasonId FK
+    }
+    MovementDetail {
+        String stockAdjustmentDetailId FK
+    }
+    StockAdjustment {
+        String id PK
+        String reasonId FK
+    }
+    Material {
+        String id PK
+    }
+    Supplier {
+        String id PK
+    }
+    GoodsReceiptDetailChange {
+        String reasonId FK
+    }
+    StockAdjustmentReason ||..o{ WasteStockAdjustment : "reasonId = id"
+    StockAdjustmentDetail o|..o{ MovementDetail : "stockAdjustmentDetailId = id"
+    StockAdjustmentReason ||..o{ StockAdjustment : "reasonId = id"
+    StockAdjustment ||..o{ StockAdjustmentDetail : "stockAdjustmentId = id"
+    Material ||..o{ StockAdjustmentDetail : "materialId = id"
+    Supplier ||..o{ StockAdjustmentDetail : "supplierId = id"
+    StockAdjustmentReason ||..o{ GoodsReceiptDetailChange : "reasonId = id"
 ```
 
 ## Mermas e inventario de merma
@@ -579,27 +841,72 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    Supplier ||--o{ Waste : "supplier"
-    Presentation ||--o{ Waste : "presentation"
-    UnitMeasure ||--o{ Waste : "unitMeasure"
-    Waste ||--o{ WasteStockAdjustmentDetail : "waste"
-    WasteIssue o|--o{ WasteMovement : "wasteIssue"
-    Waste ||--o{ WasteStockEntry : "waste"
-    Waste ||--o{ WasteMovementDetail : "waste"
-    WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
-    User ||--o{ WasteIssue : "createdBy"
-    Department ||--o{ WasteIssue : "department"
-    Person ||--o{ WasteIssue : "requester"
-    Client ||--o{ WasteIssue : "client"
-    Person ||--o{ WasteIssue : "advisor"
-    FulfillmentStatus ||--o{ WasteIssue : "fulfillmentStatus"
-    Status ||--o{ WasteIssue : "status"
-    WasteIssue ||--o{ WasteIssueDetail : "wasteIssue"
-    Waste ||--o{ WasteIssueDetail : "waste"
-    FulfillmentStatus ||--o{ WasteIssueDetail : "fulfillmentStatus"
-    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
-    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
-    Waste ||--o{ WasteIssueReturn : "waste"
+    Supplier {
+        String id PK
+    }
+    Presentation {
+        String id PK
+    }
+    UnitMeasure {
+        String id PK
+    }
+    WasteStockAdjustmentDetail {
+        String wasteId FK
+    }
+    WasteMovement {
+        String wasteIssueId FK
+    }
+    WasteStockEntry {
+        String wasteId FK
+    }
+    WasteMovementDetail {
+        String wasteId FK
+        String wasteIssueDetailId FK
+    }
+    User {
+        String id PK
+    }
+    Department {
+        String id PK
+    }
+    Person {
+        String id PK
+    }
+    Client {
+        String id PK
+    }
+    FulfillmentStatus {
+        String id PK
+    }
+    Status {
+        String id PK
+    }
+    WasteIssueReturn {
+        String wasteIssueId FK
+        String wasteIssueDetailId FK
+        String wasteId FK
+    }
+    Supplier ||..o{ Waste : "supplierId = id"
+    Presentation ||..o{ Waste : "presentationId = id"
+    UnitMeasure ||..o{ Waste : "unitMeasureId = id"
+    Waste ||..o{ WasteStockAdjustmentDetail : "wasteId = id"
+    WasteIssue o|..o{ WasteMovement : "wasteIssueId = id"
+    Waste ||..o{ WasteStockEntry : "wasteId = id"
+    Waste ||..o{ WasteMovementDetail : "wasteId = id"
+    WasteIssueDetail o|..o{ WasteMovementDetail : "wasteIssueDetailId = id"
+    User ||..o{ WasteIssue : "createdById = id"
+    Department ||..o{ WasteIssue : "departmentId = id"
+    Person ||..o{ WasteIssue : "requesterId = id"
+    Client ||..o{ WasteIssue : "clientId = id"
+    Person ||..o{ WasteIssue : "advisorId = id"
+    FulfillmentStatus ||..o{ WasteIssue : "fulfillmentStatusId = id"
+    Status ||..o{ WasteIssue : "statusId = id"
+    WasteIssue ||..o{ WasteIssueDetail : "wasteIssueId = id"
+    Waste ||..o{ WasteIssueDetail : "wasteId = id"
+    FulfillmentStatus ||..o{ WasteIssueDetail : "fulfillmentStatusId = id"
+    WasteIssue ||..o{ WasteIssueReturn : "wasteIssueId = id"
+    WasteIssueDetail ||..o{ WasteIssueReturn : "wasteIssueDetailId = id"
+    Waste ||..o{ WasteIssueReturn : "wasteId = id"
 ```
 
 ### WasteIssueReturn · WasteMovement · WasteMovementDetail
@@ -642,18 +949,39 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    WasteMovement o|--o| WasteStockAdjustment : "movement"
-    WasteIssue o|--o{ WasteMovement : "wasteIssue"
-    WasteMovement ||--o| WasteStockEntry : "movement"
-    Waste ||--o{ WasteMovementDetail : "waste"
-    WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
-    WasteMovement ||--o{ WasteMovementDetail : "movement"
-    WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
-    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
-    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
-    WasteMovementDetail o|--o| WasteIssueReturn : "movementDetail"
-    User o|--o{ WasteIssueReturn : "returnedBy"
-    Waste ||--o{ WasteIssueReturn : "waste"
+    WasteStockAdjustment {
+        String wasteMovementId UK,FK
+    }
+    WasteIssue {
+        String id PK
+    }
+    WasteStockEntry {
+        String wasteMovementId UK,FK
+    }
+    Waste {
+        String id PK
+    }
+    WasteStockAdjustmentDetail {
+        String id PK
+    }
+    WasteIssueDetail {
+        String id PK
+    }
+    User {
+        String id PK
+    }
+    WasteMovement o|..o| WasteStockAdjustment : "wasteMovementId = id"
+    WasteIssue o|..o{ WasteMovement : "wasteIssueId = id"
+    WasteMovement ||..o| WasteStockEntry : "wasteMovementId = id"
+    Waste ||..o{ WasteMovementDetail : "wasteId = id"
+    WasteStockAdjustmentDetail o|..o{ WasteMovementDetail : "wasteStockAdjustmentDetailId = id"
+    WasteMovement ||..o{ WasteMovementDetail : "movementId = id"
+    WasteIssueDetail o|..o{ WasteMovementDetail : "wasteIssueDetailId = id"
+    WasteIssue ||..o{ WasteIssueReturn : "wasteIssueId = id"
+    WasteIssueDetail ||..o{ WasteIssueReturn : "wasteIssueDetailId = id"
+    WasteMovementDetail o|..o| WasteIssueReturn : "movementDetailId = id"
+    User o|..o{ WasteIssueReturn : "returnedById = id"
+    Waste ||..o{ WasteIssueReturn : "wasteId = id"
 ```
 
 ### WasteStockEntry · WasteStockAdjustment · WasteStockAdjustmentDetail
@@ -703,197 +1031,131 @@ erDiagram
         DateTime createdAt
         DateTime updatedAt
     }
-    StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
-    User ||--o{ WasteStockAdjustment : "createdBy"
-    User o|--o{ WasteStockAdjustment : "approvedBy"
-    WasteMovement o|--o| WasteStockAdjustment : "movement"
-    WasteStockAdjustment ||--o{ WasteStockAdjustmentDetail : "wasteStockAdjustment"
-    Waste ||--o{ WasteStockAdjustmentDetail : "waste"
-    Waste ||--o{ WasteStockEntry : "waste"
-    User ||--o{ WasteStockEntry : "createdBy"
-    WasteMovement ||--o| WasteStockEntry : "movement"
-    WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
+    StockAdjustmentReason {
+        String id PK
+    }
+    User {
+        String id PK
+    }
+    WasteMovement {
+        String id PK
+    }
+    Waste {
+        String id PK
+    }
+    WasteMovementDetail {
+        String wasteStockAdjustmentDetailId FK
+    }
+    StockAdjustmentReason ||..o{ WasteStockAdjustment : "reasonId = id"
+    User ||..o{ WasteStockAdjustment : "createdById = id"
+    User o|..o{ WasteStockAdjustment : "approvedById = id"
+    WasteMovement o|..o| WasteStockAdjustment : "wasteMovementId = id"
+    WasteStockAdjustment ||..o{ WasteStockAdjustmentDetail : "wasteStockAdjustmentId = id"
+    Waste ||..o{ WasteStockAdjustmentDetail : "wasteId = id"
+    Waste ||..o{ WasteStockEntry : "wasteId = id"
+    User ||..o{ WasteStockEntry : "createdById = id"
+    WasteMovement ||..o| WasteStockEntry : "wasteMovementId = id"
+    WasteStockAdjustmentDetail o|..o{ WasteMovementDetail : "wasteStockAdjustmentDetailId = id"
 ```
 
-## Relaciones por grupo de modelos
+## Correspondencias de claves entre modelos
 
-Cada figura muestra las relaciones cuyo modelo de origen pertenece al grupo indicado,
-incluidas las referencias a otras áreas. Los modelos referenciados pueden repetirse
-entre figuras para conservar todas las asociaciones sin concentrarlas en una sola
-imagen. Los atributos completos permanecen en las vistas anteriores y en el diccionario.
+Las claves compuestas se corresponden por posición. «Referenciados por dependiente»
+indica cuántos destinos admite cada registro con FK; «Dependientes por referenciado»
+indica la cardinalidad inversa. La línea continua del diagrama identifica una FK que
+forma parte de la PK del dependiente; la discontinua, una relación no identificadora.
 
-### Identidad, acceso y auditoría: Department · Role · User
-
-```mermaid
-erDiagram
-    direction LR
-    Person o|--o{ User : "person"
-```
-
-### Identidad, acceso y auditoría: Person · UserRoleDepartment · PersonRoleDepartment
-
-```mermaid
-erDiagram
-    direction LR
-    User ||--o{ UserRoleDepartment : "user"
-    Role ||--o{ UserRoleDepartment : "role"
-    Department ||--o{ UserRoleDepartment : "department"
-    Department ||--o{ PersonRoleDepartment : "department"
-    Person ||--o{ PersonRoleDepartment : "person"
-    Role ||--o{ PersonRoleDepartment : "role"
-```
-
-### Identidad, acceso y auditoría: CriticalWriteAudit
-
-```mermaid
-erDiagram
-    direction LR
-    User o|--o{ CriticalWriteAudit : "actor"
-```
-
-### Catálogos y relaciones comerciales: Client · Supplier · Material
-
-```mermaid
-erDiagram
-    direction LR
-    Presentation ||--o{ Material : "presentation"
-    UnitMeasure ||--o{ Material : "unitMeasure"
-    Person o|--o{ Client : "advisor"
-```
-
-### Catálogos y relaciones comerciales: UnitMeasure · Presentation · SupplierMaterial
-
-```mermaid
-erDiagram
-    direction LR
-    Supplier ||--o{ SupplierMaterial : "supplier"
-    Material ||--o{ SupplierMaterial : "material"
-```
-
-### Compras e inventario de materiales: GoodsReceipt · GoodsReceiptDetail · GoodsReceiptDetailChange
-
-```mermaid
-erDiagram
-    direction LR
-    Person ||--o{ GoodsReceipt : "receivedBy"
-    Supplier ||--o{ GoodsReceipt : "supplier"
-    Status ||--o{ GoodsReceipt : "status"
-    GoodsReceipt ||--o{ GoodsReceiptDetail : "goodsReceipt"
-    Material ||--o{ GoodsReceiptDetail : "material"
-    GoodsReceipt ||--o{ GoodsReceiptDetailChange : "goodsReceipt"
-    GoodsReceiptDetail ||--o{ GoodsReceiptDetailChange : "goodsReceiptDetail"
-    StockAdjustmentReason ||--o{ GoodsReceiptDetailChange : "reason"
-    User ||--o{ GoodsReceiptDetailChange : "changedBy"
-    Material ||--o{ GoodsReceiptDetailChange : "previousMaterial"
-    Material ||--o{ GoodsReceiptDetailChange : "correctedMaterial"
-    InventoryMovement o|--o| GoodsReceiptDetailChange : "inventoryMovement"
-```
-
-### Compras e inventario de materiales: GoodsIssue · GoodsIssueDetail · GoodsIssueReturn
-
-```mermaid
-erDiagram
-    direction LR
-    Department ||--o{ GoodsIssue : "department"
-    Person o|--o{ GoodsIssue : "approver"
-    Person ||--o{ GoodsIssue : "requester"
-    Person o|--o{ GoodsIssue : "warehouseStaff"
-    Status ||--o{ GoodsIssue : "status"
-    Project o|--o{ GoodsIssue : "project"
-    Client ||--o{ GoodsIssue : "client"
-    Person ||--o{ GoodsIssue : "advisor"
-    FulfillmentStatus o|--o{ GoodsIssue : "fulfillmentStatus"
-    Material ||--o{ GoodsIssueDetail : "material"
-    Supplier ||--o{ GoodsIssueDetail : "supplier"
-    GoodsIssue ||--o{ GoodsIssueDetail : "goodsIssue"
-    FulfillmentStatus ||--o{ GoodsIssueDetail : "fulfillmentStatus"
-    GoodsIssue ||--o{ GoodsIssueReturn : "goodsIssue"
-    GoodsIssueDetail ||--o{ GoodsIssueReturn : "goodsIssueDetail"
-    MovementDetail o|--o| GoodsIssueReturn : "movementDetail"
-    User o|--o{ GoodsIssueReturn : "returnedBy"
-```
-
-### Compras e inventario de materiales: InventoryMovement · MovementDetail · StockAdjustment
-
-```mermaid
-erDiagram
-    direction LR
-    GoodsReceipt o|--o{ InventoryMovement : "goodsReceipt"
-    GoodsIssue o|--o{ InventoryMovement : "goodsIssue"
-    StockAdjustment o|--o| InventoryMovement : "stockAdjustment"
-    Material ||--o{ MovementDetail : "material"
-    Supplier ||--o{ MovementDetail : "supplier"
-    GoodsReceiptDetail o|--o{ MovementDetail : "goodsReceiptDetail"
-    GoodsIssueDetail o|--o{ MovementDetail : "goodsIssueDetail"
-    StockAdjustmentDetail o|--o{ MovementDetail : "stockAdjustmentDetail"
-    InventoryMovement ||--o{ MovementDetail : "movement"
-    StockAdjustmentReason ||--o{ StockAdjustment : "reason"
-    User ||--o{ StockAdjustment : "createdBy"
-    User o|--o{ StockAdjustment : "approvedBy"
-```
-
-### Compras e inventario de materiales: StockAdjustmentDetail · StockAdjustmentReason
-
-```mermaid
-erDiagram
-    direction LR
-    StockAdjustment ||--o{ StockAdjustmentDetail : "stockAdjustment"
-    Material ||--o{ StockAdjustmentDetail : "material"
-    Supplier ||--o{ StockAdjustmentDetail : "supplier"
-```
-
-### Mermas e inventario de merma: Waste · WasteIssue · WasteIssueDetail
-
-```mermaid
-erDiagram
-    direction LR
-    Supplier ||--o{ Waste : "supplier"
-    Presentation ||--o{ Waste : "presentation"
-    UnitMeasure ||--o{ Waste : "unitMeasure"
-    User ||--o{ WasteIssue : "createdBy"
-    Department ||--o{ WasteIssue : "department"
-    Person ||--o{ WasteIssue : "requester"
-    Client ||--o{ WasteIssue : "client"
-    Person ||--o{ WasteIssue : "advisor"
-    FulfillmentStatus ||--o{ WasteIssue : "fulfillmentStatus"
-    Status ||--o{ WasteIssue : "status"
-    WasteIssue ||--o{ WasteIssueDetail : "wasteIssue"
-    Waste ||--o{ WasteIssueDetail : "waste"
-    FulfillmentStatus ||--o{ WasteIssueDetail : "fulfillmentStatus"
-```
-
-### Mermas e inventario de merma: WasteIssueReturn · WasteMovement · WasteMovementDetail
-
-```mermaid
-erDiagram
-    direction LR
-    WasteIssue o|--o{ WasteMovement : "wasteIssue"
-    Waste ||--o{ WasteMovementDetail : "waste"
-    WasteStockAdjustmentDetail o|--o{ WasteMovementDetail : "wasteStockAdjustmentDetail"
-    WasteMovement ||--o{ WasteMovementDetail : "movement"
-    WasteIssueDetail o|--o{ WasteMovementDetail : "wasteIssueDetail"
-    WasteIssue ||--o{ WasteIssueReturn : "wasteIssue"
-    WasteIssueDetail ||--o{ WasteIssueReturn : "wasteIssueDetail"
-    WasteMovementDetail o|--o| WasteIssueReturn : "movementDetail"
-    User o|--o{ WasteIssueReturn : "returnedBy"
-    Waste ||--o{ WasteIssueReturn : "waste"
-```
-
-### Mermas e inventario de merma: WasteStockEntry · WasteStockAdjustment · WasteStockAdjustmentDetail
-
-```mermaid
-erDiagram
-    direction LR
-    StockAdjustmentReason ||--o{ WasteStockAdjustment : "reason"
-    User ||--o{ WasteStockAdjustment : "createdBy"
-    User o|--o{ WasteStockAdjustment : "approvedBy"
-    WasteMovement o|--o| WasteStockAdjustment : "movement"
-    WasteStockAdjustment ||--o{ WasteStockAdjustmentDetail : "wasteStockAdjustment"
-    Waste ||--o{ WasteStockAdjustmentDetail : "waste"
-    Waste ||--o{ WasteStockEntry : "waste"
-    User ||--o{ WasteStockEntry : "createdBy"
-    WasteMovement ||--o| WasteStockEntry : "movement"
-```
+| Campos FK del dependiente | Clave referenciada | Referenciados por dependiente | Dependientes por referenciado |
+| --- | --- | --- | --- |
+| `User.personId` | `Person.id` | 0..1 | 0..N |
+| `CriticalWriteAudit.actorId` | `User.id` | 0..1 | 0..N |
+| `UserRoleDepartment.userId` | `User.id` | 1 | 0..N |
+| `UserRoleDepartment.roleId` | `Role.id` | 1 | 0..N |
+| `UserRoleDepartment.departmentId` | `Department.id` | 1 | 0..N |
+| `PersonRoleDepartment.departmentId` | `Department.id` | 1 | 0..N |
+| `PersonRoleDepartment.personId` | `Person.id` | 1 | 0..N |
+| `PersonRoleDepartment.roleId` | `Role.id` | 1 | 0..N |
+| `Material.presentationId` | `Presentation.id` | 1 | 0..N |
+| `Material.unitMeasureId` | `UnitMeasure.id` | 1 | 0..N |
+| `SupplierMaterial.supplierId` | `Supplier.id` | 1 | 0..N |
+| `SupplierMaterial.materialId` | `Material.id` | 1 | 0..N |
+| `Waste.supplierId` | `Supplier.id` | 1 | 0..N |
+| `Waste.presentationId` | `Presentation.id` | 1 | 0..N |
+| `Waste.unitMeasureId` | `UnitMeasure.id` | 1 | 0..N |
+| `WasteStockAdjustment.reasonId` | `StockAdjustmentReason.id` | 1 | 0..N |
+| `WasteStockAdjustment.createdById` | `User.id` | 1 | 0..N |
+| `WasteStockAdjustment.approvedById` | `User.id` | 0..1 | 0..N |
+| `WasteStockAdjustment.wasteMovementId` | `WasteMovement.id` | 0..1 | 0..1 |
+| `WasteStockAdjustmentDetail.wasteStockAdjustmentId` | `WasteStockAdjustment.id` | 1 | 0..N |
+| `WasteStockAdjustmentDetail.wasteId` | `Waste.id` | 1 | 0..N |
+| `WasteMovement.wasteIssueId` | `WasteIssue.id` | 0..1 | 0..N |
+| `WasteStockEntry.wasteId` | `Waste.id` | 1 | 0..N |
+| `WasteStockEntry.createdById` | `User.id` | 1 | 0..N |
+| `WasteStockEntry.wasteMovementId` | `WasteMovement.id` | 1 | 0..1 |
+| `WasteMovementDetail.wasteId` | `Waste.id` | 1 | 0..N |
+| `WasteMovementDetail.wasteStockAdjustmentDetailId` | `WasteStockAdjustmentDetail.id` | 0..1 | 0..N |
+| `WasteMovementDetail.movementId` | `WasteMovement.id` | 1 | 0..N |
+| `WasteMovementDetail.wasteIssueDetailId` | `WasteIssueDetail.id` | 0..1 | 0..N |
+| `WasteIssue.createdById` | `User.id` | 1 | 0..N |
+| `WasteIssue.departmentId` | `Department.id` | 1 | 0..N |
+| `WasteIssue.requesterId` | `Person.id` | 1 | 0..N |
+| `WasteIssue.clientId` | `Client.id` | 1 | 0..N |
+| `WasteIssue.advisorId` | `Person.id` | 1 | 0..N |
+| `WasteIssue.fulfillmentStatusId` | `FulfillmentStatus.id` | 1 | 0..N |
+| `WasteIssue.statusId` | `Status.id` | 1 | 0..N |
+| `WasteIssueDetail.wasteIssueId` | `WasteIssue.id` | 1 | 0..N |
+| `WasteIssueDetail.wasteId` | `Waste.id` | 1 | 0..N |
+| `WasteIssueDetail.fulfillmentStatusId` | `FulfillmentStatus.id` | 1 | 0..N |
+| `WasteIssueReturn.wasteIssueId` | `WasteIssue.id` | 1 | 0..N |
+| `WasteIssueReturn.wasteIssueDetailId` | `WasteIssueDetail.id` | 1 | 0..N |
+| `WasteIssueReturn.movementDetailId` | `WasteMovementDetail.id` | 0..1 | 0..1 |
+| `WasteIssueReturn.returnedById` | `User.id` | 0..1 | 0..N |
+| `WasteIssueReturn.wasteId` | `Waste.id` | 1 | 0..N |
+| `Client.advisorId` | `Person.id` | 0..1 | 0..N |
+| `GoodsReceipt.receivedById` | `Person.id` | 1 | 0..N |
+| `GoodsReceipt.supplierId` | `Supplier.id` | 1 | 0..N |
+| `GoodsReceipt.statusId` | `Status.id` | 1 | 0..N |
+| `GoodsReceiptDetail.goodsReceiptId` | `GoodsReceipt.id` | 1 | 0..N |
+| `GoodsReceiptDetail.materialId` | `Material.id` | 1 | 0..N |
+| `GoodsIssue.departmentId` | `Department.id` | 1 | 0..N |
+| `GoodsIssue.approverId` | `Person.id` | 0..1 | 0..N |
+| `GoodsIssue.requesterId` | `Person.id` | 1 | 0..N |
+| `GoodsIssue.warehouseStaffId` | `Person.id` | 0..1 | 0..N |
+| `GoodsIssue.statusId` | `Status.id` | 1 | 0..N |
+| `GoodsIssue.projectId` | `Project.id` | 0..1 | 0..N |
+| `GoodsIssue.clientId` | `Client.id` | 1 | 0..N |
+| `GoodsIssue.advisorId` | `Person.id` | 1 | 0..N |
+| `GoodsIssue.fulfillmentStatusId` | `FulfillmentStatus.id` | 0..1 | 0..N |
+| `GoodsIssueDetail.materialId` | `Material.id` | 1 | 0..N |
+| `GoodsIssueDetail.supplierId` | `Supplier.id` | 1 | 0..N |
+| `GoodsIssueDetail.goodsIssueId` | `GoodsIssue.id` | 1 | 0..N |
+| `GoodsIssueDetail.fulfillmentStatusId` | `FulfillmentStatus.id` | 1 | 0..N |
+| `GoodsIssueReturn.goodsIssueId` | `GoodsIssue.id` | 1 | 0..N |
+| `GoodsIssueReturn.goodsIssueDetailId` | `GoodsIssueDetail.id` | 1 | 0..N |
+| `GoodsIssueReturn.movementDetailId` | `MovementDetail.id` | 0..1 | 0..1 |
+| `GoodsIssueReturn.returnedById` | `User.id` | 0..1 | 0..N |
+| `InventoryMovement.goodsReceiptId` | `GoodsReceipt.id` | 0..1 | 0..N |
+| `InventoryMovement.goodsIssueId` | `GoodsIssue.id` | 0..1 | 0..N |
+| `InventoryMovement.stockAdjustmentId` | `StockAdjustment.id` | 0..1 | 0..1 |
+| `MovementDetail.materialId` | `Material.id` | 1 | 0..N |
+| `MovementDetail.supplierId` | `Supplier.id` | 1 | 0..N |
+| `MovementDetail.goodsReceiptDetailId` | `GoodsReceiptDetail.id` | 0..1 | 0..N |
+| `MovementDetail.goodsIssueDetailId` | `GoodsIssueDetail.id` | 0..1 | 0..N |
+| `MovementDetail.stockAdjustmentDetailId` | `StockAdjustmentDetail.id` | 0..1 | 0..N |
+| `MovementDetail.movementId` | `InventoryMovement.id` | 1 | 0..N |
+| `StockAdjustment.reasonId` | `StockAdjustmentReason.id` | 1 | 0..N |
+| `StockAdjustment.createdById` | `User.id` | 1 | 0..N |
+| `StockAdjustment.approvedById` | `User.id` | 0..1 | 0..N |
+| `StockAdjustmentDetail.stockAdjustmentId` | `StockAdjustment.id` | 1 | 0..N |
+| `StockAdjustmentDetail.materialId` | `Material.id` | 1 | 0..N |
+| `StockAdjustmentDetail.supplierId` | `Supplier.id` | 1 | 0..N |
+| `GoodsReceiptDetailChange.goodsReceiptId` | `GoodsReceipt.id` | 1 | 0..N |
+| `GoodsReceiptDetailChange.goodsReceiptDetailId` | `GoodsReceiptDetail.id` | 1 | 0..N |
+| `GoodsReceiptDetailChange.reasonId` | `StockAdjustmentReason.id` | 1 | 0..N |
+| `GoodsReceiptDetailChange.changedById` | `User.id` | 1 | 0..N |
+| `GoodsReceiptDetailChange.previousMaterialId` | `Material.id` | 1 | 0..N |
+| `GoodsReceiptDetailChange.correctedMaterialId` | `Material.id` | 1 | 0..N |
+| `GoodsReceiptDetailChange.inventoryMovementId` | `InventoryMovement.id` | 0..1 | 0..1 |
 
 Consulta el esquema Prisma para las reglas `onDelete`/`onUpdate`. Cada asociación
 usa el nombre del campo que declara la FK en Prisma; las colecciones inversas no

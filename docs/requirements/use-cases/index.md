@@ -27,15 +27,18 @@ objetivos de distinta complejidad.
 
 ## Semántica de actores y generalización UML
 
-Las asociaciones directas del diagrama indican qué actor inicia cada objetivo. Cuando un
-caso tiene una asociación directa con un actor, su ficha nombra ese actor y, si ese actor
-es una generalización no abstracta, también su especialización mediante “o”.
-Cuando un caso sólo está conectado con otro caso de uso, hereda el actor de ese caso
-relacionado. La generalización `Administrador del sistema --generaliza--> Personal de
-almacén` se conserva en el diagrama, pero no se añade como segundo actor en una ficha que
-ya tiene una asociación directa.
-Las asociaciones entre casos de uso sólo representan objetivos relacionados o
-continuaciones visibles; no sustituyen la asociación del actor ni conceden permisos.
+Las asociaciones directas enlazan al actor con cada caso en el que participa. Las
+fichas nombran a los actores autorizados para iniciar el objetivo; una relación entre
+casos no hereda actores ni concede permisos. Personal de almacén y Administrador del
+sistema especializan a Usuario registrado y heredan sus objetivos de autenticación;
+ninguno es especialización del otro. Las capacidades operativas compartidas se muestran
+mediante asociaciones explícitas.
+
+La notación, dirección y límites de la representación Mermaid se explican en el
+[diagrama de casos de uso](../domain-and-use-cases/02-current-use-cases.md). Las
+asociaciones son líneas continuas sin punta; la generalización tiene un triángulo hueco
+hacia el general; `«include»` y `«extend»` son dependencias discontinuas con el estereotipo
+correspondiente. La navegación entre objetivos independientes permanece en las fichas.
 
 ## Estructura de las fichas
 
@@ -88,13 +91,11 @@ principal** cuando retorna dentro del mismo caso, o **termina el caso de uso** c
 quedan más interacciones. No se usa «volver» o «continuar» sin indicar el paso. Si el
 destino fuera otro caso de uso, no se redactaría como un salto de control informal:
 
-- Una asociación simple enlaza objetivos relacionados y se dibuja sin texto; no implica
-  por sí misma inclusión, extensión ni una llamada entre casos. Cuando una consulta
-  presenta operaciones de mantenimiento, su acción prioritaria cierra el flujo principal
-  y dispara el caso siguiente; las demás acciones se documentan como alternativas. El
-  actor ejecuta el **disparador documentado en la ficha del caso siguiente** y termina
-  la consulta; después, **Nexus inicia** el caso seleccionado. Ambos objetivos permanecen
-  independientes y el segundo vuelve a comprobar sus precondiciones y autorización.
+- Una asociación simple conecta al actor con el caso en el que participa; se dibuja
+  como línea continua sin punta ni frase. No se usa para unir dos objetivos por
+  compartir una pantalla. Cuando una consulta presenta operaciones de mantenimiento,
+  la selección termina la consulta y dispara un caso independiente, que comprueba de
+  nuevo sus precondiciones y autorización; esa navegación se describe en las fichas.
 - `«include»` identifica un caso requerido que el caso base incorpora siempre; al
   concluir, la interacción continúa en el paso siguiente a la inclusión.
 - `«extend»` identifica comportamiento opcional que se inserta en un punto de extensión
@@ -102,17 +103,18 @@ destino fuera otro caso de uso, no se redactaría como un salto de control infor
 - La **generalización** identifica un caso especializado que sustituye el comportamiento
   heredado aplicable; no representa una llamada entre casos.
 
-La relación debe aparecer también en el diagrama y nombrar ambos identificadores `CU-*`.
-Estas continuaciones son asociaciones entre objetivos independientes, no saltos de
-control, `«include»` ni `«extend»`; compartir servicios de inventario, persistencia o
-consulta tampoco crea por sí solo una relación UML.
+Las inclusiones, extensiones o generalizaciones entre casos deben aparecer también en
+el diagrama y nombrar ambos identificadores `CU-*`; una extensión documenta su condición,
+punto de inserción y retorno. Las continuaciones de navegación no son relaciones UML
+entre casos; compartir servicios de inventario, persistencia o consulta tampoco crea
+por sí solo una relación UML.
 
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
 En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela
 como actor externo ni inicia el caso por sí mismo.
-El **Administrador del sistema** puede iniciar todos los casos vigentes mediante la
-generalización mostrada en el diagrama; las fichas conservan al actor operativo primario
-para explicar el objetivo sin repetir esa herencia. **Dirección** no se atribuye como
+El **Administrador del sistema** puede iniciar los casos que le asignan explícitamente
+las fichas y las asociaciones operativas; ese acceso no proviene de una generalización
+respecto del Personal de almacén. **Dirección** no se atribuye como
 actor mientras no se definan y autoricen sus objetivos concretos.
 Los casos de catálogos siguen listar-crear-actualizar y sólo incluyen eliminar, activar,
 desactivar o ajustar cuando el contexto lo permite. Los documentos comparten encabezado
@@ -206,9 +208,11 @@ implementación reutilice validaciones, formularios, servicios o exportadores.
 El orden anterior determina la lectura dentro de cada grupo. La numeración sigue el
 orden de lectura del catálogo dentro de cada grupo propietario. El catálogo y las fichas
 se presentan después en esa misma secuencia. No se conserva al final del grupo una
-operación especial que pertenece a una familia anterior. Las asociaciones simples se
-dibujan sin etiqueta; sólo una relación `«include»` o `«extend»` debe indicar su
-semántica explícitamente.
+operación especial que pertenece a una familia anterior. Las seis vistas funcionales
+se conservan para facilitar la lectura de los 85 casos, no por una exigencia de UML.
+Las extensiones de otros grupos se representan junto al caso base, reutilizando el
+identificador del caso y sin duplicar su ficha. La jerarquía de actores se muestra en AUT y es común a todas las vistas. Las asociaciones actor–caso no llevan frase; `«include»` y `«extend»`
+llevan su estereotipo y la generalización su triángulo hueco.
 
 Los prefijos anteriores sustituyen `IAM`, `REC` e `ISS`, que mezclaban abreviaturas en
 inglés con nombres de grupos en español. Las referencias normativas se actualizan en

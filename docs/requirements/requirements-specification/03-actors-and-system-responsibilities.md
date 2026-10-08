@@ -19,8 +19,9 @@ nombra al actor que inicia el objetivo. La
 la arquitectura y OpenAPI describen su realización. Estas fuentes se
 complementan y no se repiten aquí como otra matriz.
 
-El Administrador del sistema hereda en el diagrama las capacidades asociadas al Personal
-de almacén, no a la inversa. Solicitantes, aprobadores, asesores, receptores y proveedores
+Personal de almacén y Administrador del sistema especializan a Usuario registrado y
+comparten las asociaciones de autenticación. Sus asociaciones operativas son explícitas;
+no existe herencia entre ambos actores. Solicitantes, aprobadores, asesores, receptores y proveedores
 pueden participar en un documento sin convertirse por ello en actores con acceso. Las
 lecturas auxiliares para selectores tampoco conceden mantenimiento del catálogo ni
 sustituyen los controles de acceso del sistema.

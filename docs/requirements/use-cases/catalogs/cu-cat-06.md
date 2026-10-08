@@ -5,6 +5,7 @@
 | Identificador | `CU-CAT-06` |
 | Nombre | Crear cliente. |
 | Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-SAL-02` cuando el alta se inicia desde su selector de cliente (paso 3, A3); devuelve el cliente seleccionado y reanuda la salida. El alta desde `CU-CAT-05` es un objetivo independiente, no una extensión de la consulta. |
 | Disparador | Selecciona **Nuevo cliente** desde `CU-CAT-05` Consultar clientes o desde el selector de cliente de una salida autorizada. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** selecciona **Nuevo cliente** desde el listado independiente o desde el selector de una salida **(ver E1)**.<br>2. **Nexus:** muestra el mismo formulario reutilizable con el cliente inicialmente activo.<br>3. **Actor:** captura el nombre, revisa la casilla **Activo** y confirma **(ver A1)**.<br>4. **Nexus:** comprueba que la información sea válida; registra el cliente y muestra la confirmación. Si el origen fue el listado de Sistemas, lo actualiza; si fue el selector de una salida, agrega y selecciona el cliente creado sin conceder acceso al listado independiente. Además, guarda los cambios de la operación en la base de datos **(ver EBD)**. |

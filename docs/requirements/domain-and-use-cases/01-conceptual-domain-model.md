@@ -3,7 +3,10 @@
 Se usa `classDiagram`, notación UML soportada por Mermaid. Las clases no representan
 clases JavaScript ni copian tablas: son conceptos del negocio. La multiplicidad indica
 la relación conceptual vigente; una relación pendiente se omite para no presentar una
-intención como parte del dominio operativo.
+intención como parte del dominio operativo. Los nombres sobre asociaciones de clases
+describen su significado y son válidos en UML; no se aplica aquí la convención de dejar
+sin frase las asociaciones actor–caso. El triángulo de generalización apunta a `Material`
+y los rombos de composición están en el documento que contiene los detalles.
 
 ```mermaid
 ---
@@ -43,7 +46,7 @@ classDiagram
     Persona "1" -- "0..*" AsignacionPersona : desempeña
     Proveedor "1" -- "0..*" OfertaProveedorMaterial : ofrece
     Material "1" -- "0..*" OfertaProveedorMaterial : cotizado como
-    Material <|-- Consumible : especialización conceptual
+    Material <|-- Consumible
     note for Consumible "Restricción: type = CONSUMABLE. Se persiste en Material."
     Merma ..> Material : usa como plantilla y conserva snapshots
     Proveedor "1" -- "0..*" EntradaCompra : abastece

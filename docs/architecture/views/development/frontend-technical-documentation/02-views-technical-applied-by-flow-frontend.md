@@ -2,7 +2,7 @@
 
 ### Relación con la colección canónica
 
-La columna **Diagrama aplicable** del catálogo de componentes orienta hacia los 73
+La columna **Diagrama aplicable** del catálogo de componentes orienta hacia los 85
 recorridos `DIA-FE-CU-*` de `frontend-code-sequences/index.md`. Esa colección es propietaria del orden
 interacción → UI → aplicación → request → endpoint → resultado visible. Este documento
 conserva sólo diagramas que responden una pregunta adicional sobre los límites del
@@ -35,19 +35,31 @@ secuencia de cada consumidor.
 la dependencia proveedor → material y la preparación de snapshots; no representa las
 decisiones de persistencia del servicio.
 
+La figura usa la [convención de actividades](../../processes/index.md#notación-de-actividades)
+como aproximación a UML mediante Mermaid.
+
 ```mermaid
 flowchart TB
-    open["Abrir wasteModal en modo crear"] --> supplier["Seleccionar proveedor"]
-    supplier --> clear["Limpiar plantilla de material anterior"]
-    clear --> load["wasteMaterialService consulta materiales del proveedor"]
-    load --> choose{"¿Se seleccionó una plantilla?"}
-    choose -->|No| blocked["Mantener material y envío sin completar"]
-    choose -->|Sí| map["wasteMaterialTemplate adapta nombre, medidas y costo propuesto"]
-    map --> editable["Usuario completa campos editables"]
+    initial@{ shape: f-circ } --> open("Abrir wasteModal en modo crear")
+    open --> supplier("Seleccionar proveedor")
+    supplier --> clear("Limpiar plantilla anterior")
+    clear --> load("Consultar materiales del proveedor")
+    load --> mergeTemplate{" "}
+    mergeTemplate --> choose{"¿Se seleccionó una plantilla?"}
+    choose -->|"[no]"| blocked("Mantener el envío sin habilitar y esperar selección")
+    blocked --> mergeTemplate
+    choose -->|"[sí]"| map("Adaptar nombre, medidas y costo propuesto")
+    map --> mergeEdit{" "}
+    mergeEdit --> editable("Completar o corregir campos editables")
     editable --> validate{"¿Validación del navegador correcta?"}
-    validate -->|No| errors["Mostrar errores sin llamar la API"]
-    validate -->|Sí| register["registerWaste → POST /api/warehouse/wastes"]
+    validate -->|"[no]"| errors("Mostrar errores sin llamar la API")
+    errors --> mergeEdit
+    validate -->|"[sí]"| register("Enviar POST /api/warehouse/wastes")
+    register --> final@{ shape: fr-circ }
 ```
+
+El final corresponde al envío de la petición, que es el límite de esta actividad de
+preparación; la respuesta y los errores HTTP continúan en la secuencia `DIA-FE-CU-ALM-10`.
 
 ### Estados técnicos complementarios
 

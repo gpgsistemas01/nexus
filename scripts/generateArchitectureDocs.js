@@ -164,9 +164,11 @@ const validateUseCaseDiagramCoverage = async () => {
         }
         const actors = new Set([...diagram.matchAll(/^\s*actor\s+(\w+)\(/gm)].map(match => match[1]));
         const cases = [...diagram.matchAll(/^\s*(\w+)\("(CU-[A-Z]+-\d+) (.+)"\)/gm)];
-        diagramCaseIds.push(...cases.map(([, , id]) => id));
+        diagramCaseIds.push(...cases.filter(([, , , title]) => !title.includes(' · referencia a '))
+            .map(([, , id]) => id));
         for (const [, alias, id, title] of cases) {
-            if (title !== expectedTitles.get(id)) {
+            const normalizedTitle = title.replace(/ · referencia a (?:CAT|ALM)$/, '');
+            if (normalizedTitle !== expectedTitles.get(id)) {
                 failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
             }
             const actor = expectedActors.get(id) === 'Usuario registrado' ? 'user'
@@ -561,7 +563,14 @@ const parsePrismaModels = (schema) => {
             const [, fieldName, type, modifier = '', attributes] = field;
             const relation = attributes.match(/@relation\([^)]*fields:\s*\[([^\]]+)\]/);
             if (relation) {
-                relations.push({ field: fieldName, target: type, optional: modifier === '?', foreignKeys: relation[1].split(',').map((value) => value.trim()) });
+                const references = attributes.match(/references:\s*\[([^\]]+)\]/);
+                relations.push({
+                    field: fieldName,
+                    target: type,
+                    optional: modifier === '?',
+                    foreignKeys: relation[1].split(',').map((value) => value.trim()),
+                    references: references[1].split(',').map((value) => value.trim())
+                });
                 continue;
             }
             if (modifier === '[]' || (!scalarTypes.has(type) && !enumTypes.has(type))) continue;
@@ -576,13 +585,15 @@ const parsePrismaModels = (schema) => {
             if (foreignKeys.has(field.name)) field.keys = [field.keys, 'FK'].filter(Boolean).join(',');
         });
         const uniqueKeys = [
-            ...fields.filter(({ attributes }) => attributes.includes('@id') || attributes.includes('@unique'))
-                .map(({ name: fieldName }) => [fieldName]),
+            ...fields.filter((field) => /@id\b|@unique\b/.test(field.attributes)).map((field) => [field.name]),
             ...[...body.matchAll(/@@(?:id|unique)\(\[([^\]]+)\]/g)]
-                .map((key) => key[1].split(',').map((value) => value.trim()))
+                .map((match) => match[1].split(',').map((value) => value.trim()))
         ];
         relations.forEach((relation) => {
             relation.unique = uniqueKeys.some((keys) => keys.every((key) => relation.foreignKeys.includes(key)));
+            relation.identifying = relation.foreignKeys.every((key) => (
+                fields.find((field) => field.name === key).keys.split(',').includes('PK')
+            ));
         });
         models.set(name, { fields, relations });
     }
@@ -603,6 +614,12 @@ const renderEntity = (name, model) => [
     ...model.fields.map(({ name: field, type, keys }) => `        ${type} ${field}${keys ? ` ${keys}` : ''}`),
     '    }'
 ].join('\n');
+
+const renderDatabaseRelation = (source, relation) => {
+    const { target, optional, unique, identifying, foreignKeys, references } = relation;
+    const mapping = foreignKeys.map((key, index) => `${key} = ${references[index]}`).join(', ');
+    return `    ${target} ${optional ? 'o|' : '||'}${identifying ? '--' : '..'}${unique ? 'o|' : 'o{'} ${source} : "${mapping}"`;
+};
 
 const validateDatabaseAreas = (models) => {
     const documented = new Set(DATABASE_AREAS.flatMap(([, names]) => names));
@@ -671,9 +688,7 @@ const generateDatabaseSchema = async () => {
     const allRelations = [...models.entries()].flatMap(([source, model]) => (
         model.relations.map((relation) => ({ source, ...relation }))
     ));
-    const renderRelation = ({ source, field, target, optional, unique }) => (
-        `    ${target} ${optional ? 'o|' : '||'}--${unique ? 'o|' : 'o{'} ${source} : "${field}"`
-    );
+    const renderRelation = ({ source, ...relation }) => renderDatabaseRelation(source, relation);
     const isolatedModels = [...models.keys()].filter((name) => (
         !allRelations.some(({ source, target }) => source === name || target === name)
     ));
@@ -683,35 +698,41 @@ const generateDatabaseSchema = async () => {
             const subset = names.slice(offset, offset + 3);
             const selected = new Set(subset);
             const entities = subset.map((name) => renderEntity(name, models.get(name))).join('\n');
-            const relations = allRelations
-                .filter(({ source, target }) => selected.has(source) || selected.has(target))
-                .map(renderRelation);
-            sections.push(`### ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${entities}\n${relations.join('\n')}\n\`\`\``);
+            const visibleRelations = allRelations
+                .filter(({ source, target }) => selected.has(source) || selected.has(target));
+            const externalNames = [...new Set(visibleRelations.flatMap(({ source, target }) => [source, target]))]
+                .filter((name) => !selected.has(name));
+            const externalEntities = externalNames.map((name) => {
+                const keys = new Set(visibleRelations.flatMap((relation) => [
+                    ...(relation.source === name ? relation.foreignKeys : []),
+                    ...(relation.target === name ? relation.references : [])
+                ]));
+                const model = models.get(name);
+                return renderEntity(name, { fields: model.fields.filter((field) => keys.has(field.name)) });
+            }).join('\n');
+            const relations = visibleRelations.map(renderRelation);
+            sections.push(`### ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${entities}\n${externalEntities}\n${relations.join('\n')}\n\`\`\``);
         }
         return [`## ${title}\n\n${sections.join('\n\n')}`];
     }).join('\n\n');
-    const relationDiagrams = DATABASE_AREAS.flatMap(([title, names]) => {
-        const sections = [];
-        for (let offset = 0; offset < names.length; offset += 3) {
-            const subset = names.slice(offset, offset + 3);
-            const relations = allRelations
-                .filter(({ source }) => subset.includes(source))
-                .map(renderRelation);
-            if (relations.length) {
-                sections.push(`### ${title}: ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${relations.join('\n')}\n\`\`\``);
-            }
-        }
-        return sections;
-    }).join('\n\n');
+    const crossAreaRelations = allRelations.map(({ source, target, optional, unique, foreignKeys, references }) => {
+        const from = foreignKeys.map((key) => `\`${source}.${key}\``).join(', ');
+        const to = references.map((key) => `\`${target}.${key}\``).join(', ');
+        return `| ${from} | ${to} | ${optional ? '0..1' : '1'} | ${unique ? '0..1' : '0..N'} |`;
+    });
     return `<!-- Archivo generado por scripts/generateArchitectureDocs.js. No editar manualmente. -->
 # Diagramas de la base de datos
 
-Estos diagramas ER se generan desde los modelos y relaciones de
+Estos diagramas representan el modelo relacional persistente con notación ER de pata
+de cuervo. Se generan desde los modelos y relaciones de
 \`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
 GitHub. Los atributos se distribuyen en figuras de hasta tres modelos. Cada figura
-incluye sus relaciones entrantes y salientes; los modelos externos aparecen sólo por
-nombre, con sus atributos en su propia figura. Todas las relaciones también se reúnen
-en la sección final.
+incluye sus relaciones entrantes y salientes; los modelos externos muestran sólo las
+claves que intervienen en esas conexiones y conservan sus atributos completos en su
+figura propietaria. Cada conexión expresa FK = clave referenciada entre los modelos de sus extremos; la
+tabla final detalla los nombres completos. Los nombres de
+relación del ORM no son columnas adicionales. Todas las correspondencias de claves se
+reúnen en una tabla final para evitar otra colección de diagramas sin atributos.
 
 La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
 únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
@@ -728,14 +749,16 @@ Modelos sin relaciones FK entrantes ni salientes en Prisma: ${isolatedModels.map
 
 ${diagrams}
 
-## Relaciones por grupo de modelos
+## Correspondencias de claves entre modelos
 
-Cada figura muestra las relaciones cuyo modelo de origen pertenece al grupo indicado,
-incluidas las referencias a otras áreas. Los modelos referenciados pueden repetirse
-entre figuras para conservar todas las asociaciones sin concentrarlas en una sola
-imagen. Los atributos completos permanecen en las vistas anteriores y en el diccionario.
+Las claves compuestas se corresponden por posición. «Referenciados por dependiente»
+indica cuántos destinos admite cada registro con FK; «Dependientes por referenciado»
+indica la cardinalidad inversa. La línea continua del diagrama identifica una FK que
+forma parte de la PK del dependiente; la discontinua, una relación no identificadora.
 
-${relationDiagrams}
+| Campos FK del dependiente | Clave referenciada | Referenciados por dependiente | Dependientes por referenciado |
+| --- | --- | --- | --- |
+${crossAreaRelations.join('\n')}
 
 Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Cada asociación
 usa el nombre del campo que declara la FK en Prisma; las colecciones inversas no

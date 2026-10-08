@@ -106,29 +106,36 @@ esas copias repetirían el patrón sin aportar decisiones diferentes. Se crea un
 adicional únicamente cuando una operación incorpore otra coordinación, por ejemplo una
 transacción de inventario o una política de eliminación propia.
 
+La figura usa la [convención de actividades](../../processes/index.md#notación-de-actividades)
+como aproximación a UML mediante Mermaid.
+
 ```mermaid
 flowchart TD
-    open["Administrador abre<br/>un catálogo autorizado"] --> list["Nexus consulta y muestra<br/>todos sus registros"]
-    list --> choice{"¿Qué necesita hacer?"}
-
-    choice -->|Consultar| review["Revisar, buscar<br/>o cambiar de página"]
-    review --> list
-
-    choice -->|Nuevo/Nueva + entidad| createForm["Abrir formulario<br/>con Activo marcado"]
-    createForm --> capture["Capturar los campos<br/>del catálogo"]
-
-    choice -->|Editar registro| editForm["Abrir formulario<br/>con valores vigentes"]
-    editForm --> capture
-
-    capture --> confirm["Guardar al crear<br/>Actualizar al editar"]
-    confirm --> authorize["Nexus comprueba autorización<br/>y datos permitidos"]
-    authorize --> valid{"¿La información<br/>es válida?"}
-    valid -->|No| correction["Mostrar campos por corregir<br/>sin guardar cambios"]
-    correction --> capture
-    valid -->|Sí| persist["Crear o actualizar<br/>el registro"]
-    persist --> refresh["Confirmar y refrescar<br/>el mismo listado"]
-    refresh --> list
+    initial@{ shape: f-circ } --> open("Abrir un catálogo autorizado")
+    open --> mergeList{" "}
+    mergeList --> list("Consultar y mostrar registros")
+    list --> choice{"¿Qué necesita hacer el actor?"}
+    choice -->|"[consultar]"| review("Revisar, buscar o cambiar de página")
+    review --> mergeList
+    choice -->|"[crear]"| createForm("Abrir formulario con Activo marcado")
+    choice -->|"[editar]"| editForm("Abrir formulario con valores vigentes")
+    choice -->|"[salir]"| final@{ shape: fr-circ }
+    createForm --> mergeCapture{" "}
+    editForm --> mergeCapture
+    mergeCapture --> capture("Capturar o corregir campos del catálogo")
+    capture --> confirm("Confirmar alta o edición")
+    confirm --> authorize("Comprobar autorización y datos permitidos")
+    authorize --> valid{"¿La información es válida?"}
+    valid -->|"[no]"| correction("Mostrar campos por corregir sin guardar cambios")
+    correction --> mergeCapture
+    valid -->|"[sí]"| persist("Crear o actualizar el registro")
+    persist --> refresh("Confirmar la operación")
+    refresh --> mergeList
 ```
+
+El final representa que el actor deja el catálogo; no exige una operación de cierre de
+sesión. Esta vista resume el ciclo exitoso y la corrección de datos, sin repetir todas
+las excepciones de autorización o persistencia de las fichas.
 
 La rama **Editar registro** incluye activar o desactivar mediante la casilla **Activo**; no existe
 una acción de eliminación dentro de este patrón. El listado administrativo conserva los
