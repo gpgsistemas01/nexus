@@ -36,6 +36,8 @@ todos sus detalles están íntegramente devueltos; no existe cancelación direct
 
 El saldo entregado es la cantidad surtida menos las devoluciones anteriores.
 Una devolución parcial conserva `Surtido`; devolver todo el saldo cancela el detalle.
+Ambas transiciones requieren que el encabezado de la salida esté completamente
+`Surtido`; un detalle ya entregado no puede devolverse mientras otro siga pendiente.
 
 ```mermaid
 stateDiagram-v2
@@ -45,8 +47,8 @@ stateDiagram-v2
     state "Cancelado" as Cancelado
     [*] --> Pendiente: registrar detalle
     Pendiente --> Surtido: surtir toda la cantidad pendiente
-    Surtido --> Surtido: devolver [parte del saldo]
-    Surtido --> Cancelado: devolver [todo el saldo]
+    Surtido --> Surtido: devolver [salida surtida y retorno parcial]
+    Surtido --> Cancelado: devolver [salida surtida y retorno total]
     Cancelado --> [*]
 ```
 
