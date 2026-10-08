@@ -4,15 +4,17 @@ Este documento contiene una **decisión operativa de infraestructura**. No defin
 permisos funcionales de Nexus ni la estructura del modelo persistente; esas fuentes y su
 relación se localizan desde el [modelo persistente](../logical/data-and-persistence/index.md).
 
-## ¿Ya está resuelto?
+## Estado de implementación
 
 Está resuelto **el enrutamiento de las conexiones**, pero no la creación ni los
 privilegios de las cuentas:
 
 - La aplicación obtiene su conexión de `DATABASE_URL`.
-- Prisma CLI obtiene su conexión de `DIRECT_URL` al ejecutar migraciones.
-- El entrypoint exige `DIRECT_URL`, ejecuta `prisma migrate deploy` y después inicia la
-  aplicación, que vuelve a usar `DATABASE_URL`.
+- Prisma CLI prefiere `DIRECT_URL`; fuera del entrypoint, la configuración puede
+  recurrir a `DATABASE_URL` si la URL directa no está definida.
+- Con `RUN_MIGRATIONS=true` (valor predeterminado), el entrypoint exige `DIRECT_URL`,
+  ejecuta `prisma migrate deploy` y después inicia la aplicación con `DATABASE_URL`.
+  Con `false`, omite las migraciones; otro valor impide el arranque.
 
 Esto permite colocar credenciales distintas en ambas URLs, pero PostgreSQL o el
 proveedor administrado todavía debe crear esas cuentas y conceder sus privilegios.
@@ -137,7 +139,8 @@ DIRECT_URL="postgresql://nexus_migrator:<secret-migrator>@db.example.com:5432/ne
 La imagen actual puede seguir ejecutando migraciones y aplicación en el mismo
 contenedor porque cada fase resuelve una variable distinta. Para una separación más
 estricta, el pipeline de despliegue puede ejecutar `npm run db:migrate` como un job con
-solo `DIRECT_URL`, y arrancar el contenedor de aplicación con:
+`DIRECT_URL` y `NODE_ENV=production`, sin `DATABASE_URL`. Después puede arrancar
+el contenedor de aplicación con:
 
 ```env
 RUN_MIGRATIONS=false
@@ -145,7 +148,10 @@ DATABASE_URL="postgresql://nexus_app:<secret-app>@pooler.example.com:6543/nexus"
 ```
 
 En ese modo el proceso de aplicación nunca recibe el secreto de migración. El job debe
-terminar correctamente antes de desplegar la nueva versión.
+terminar correctamente antes de desplegar la nueva versión. Esta separación es una
+alternativa de infraestructura; el repositorio no contiene un job de despliegue que
+la implemente. Los workflows de CI verifican documentación y pruebas, sin demostrar
+por sí solos que las cuentas del proveedor ya estén separadas.
 
 ## Verificación
 
@@ -271,7 +277,7 @@ en el esquema Prisma. Tras el despliegue, las facturas que incluyan el marcador
 `[DUPLICADO:` deben compararse con sus documentos fuente y corregirse mediante el
 flujo normal del CRUD de entradas de compra.
 
-## ¿Es obligatorio hacerlo ahora?
+## Adopción de cuentas separadas
 
 No requiere cambios al esquema Prisma y no bloquea el funcionamiento actual. Es una
 medida de defensa en profundidad que limita el impacto de una inyección SQL, una

@@ -85,11 +85,17 @@ flowchart LR
 operativos del mapa `DIA-ARQ-NAV-001` y de los accesos administrativos siguientes.
 Los catálogos auxiliares se detallan en una figura aparte para conservar la legibilidad;
 ambas figuras representan opciones del mismo menú, no pasos obligatorios.
+Almacén, Compras y Salidas son submenús; sus destinos operativos se detallan en la
+figura del Personal de almacén y también están disponibles para el administrador.
+El submenú Catálogos se desarrolla en la figura siguiente. Los identificadores de
+diagrama son referencias documentales y no forman parte de las opciones de Nexus.
 
 ```mermaid
 flowchart LR
     actor["Administrador del sistema"] --> menu(["Menú principal"])
-    menu --> shared["Almacén, Compras y Salidas<br/>Mapa DIA-ARQ-NAV-001"]
+    menu --> warehouse(["Almacén"])
+    menu --> purchases(["Compras"])
+    menu --> issues(["Salidas"])
     menu --> movements(["Movimientos"])
     movements -->|"movements:read"| materialMovements["Materiales<br/>/movimientos/materiales"]
     movements -->|"movements:read"| wasteMovements["Mermas<br/>/movimientos/mermas"]
@@ -97,7 +103,7 @@ flowchart LR
     menu -->|"persons:page-view"| persons["Personas<br/>/personas"]
     menu -->|"clients:page-view"| clients["Clientes<br/>/clientes"]
     menu -->|"suppliers:page-view"| suppliers["Proveedores<br/>/proveedores"]
-    menu --> catalogs["Catálogos auxiliares<br/>Mapa DIA-ARQ-NAV-003"]
+    menu --> catalogs(["Catálogos"])
 ```
 
 ### Catálogos auxiliares del administrador
