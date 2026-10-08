@@ -166,6 +166,40 @@ const validateUseCaseDiagramCoverage = async () => {
         const cases = [...diagram.matchAll(/^\s*(\w+)\("(CU-[A-Z]+-\d+) (.+)"\)/gm)];
         diagramCaseIds.push(...cases.filter(([, , , title]) => !title.includes(' · referencia a '))
             .map(([, , id]) => id));
+        const caseAliases = new Set(cases.map(([, alias]) => alias));
+        const queryAliases = new Set(cases.filter(([, , , title]) => title.startsWith('Consultar '))
+            .map(([, alias]) => alias));
+        const associations = [...diagram.matchAll(/^\s*(\w+) -- (\w+)$/gm)]
+            .map(([, from, to]) => [from, to]);
+        for (const [from, to] of associations) {
+            if (!caseAliases.has(to) || (!actors.has(from) && !queryAliases.has(from))) {
+                failures.push(`casos de uso: enlace ${from} -- ${to} sin actor o consulta de origen válidos`);
+            }
+        }
+        const generalizations = [...diagram.matchAll(/^\s*(\w+) --\|> (\w+)$/gm)]
+            .map(([, specialized, general]) => [specialized, general]);
+        for (const [specialized, general] of generalizations) {
+            if (!actors.has(specialized) || !actors.has(general) || specialized === general) {
+                failures.push(`casos de uso: generalización ${specialized} --|> ${general} entre actores inválidos`);
+            }
+            if (associations.some(([from]) => from === specialized)) {
+                failures.push(`casos de uso: ${specialized} debe heredar las asociaciones de ${general} sin enlaces propios en esta figura`);
+            }
+        }
+        // Los enlaces desde Consulta organizan operaciones; no conceden permisos.
+        // La participación normativa se comprueba desde el actor de cada ficha.
+        const reachableByActor = new Map([...actors].map((actor) => {
+            const reachable = new Set([actor]);
+            const pending = [actor];
+            for (let index = 0; index < pending.length; index += 1) {
+                for (const [from, to] of [...associations, ...generalizations]) {
+                    if (from !== pending[index] || reachable.has(to)) continue;
+                    reachable.add(to);
+                    pending.push(to);
+                }
+            }
+            return [actor, reachable];
+        }));
         for (const [, alias, id, title] of cases) {
             const normalizedTitle = title.replace(/ · referencia a (?:CAT|ALM)$/, '');
             if (normalizedTitle !== expectedTitles.get(id)) {
@@ -173,12 +207,9 @@ const validateUseCaseDiagramCoverage = async () => {
             }
             const actor = expectedActors.get(id) === 'Usuario registrado' ? 'user'
                 : expectedActors.get(id) === 'Personal de almacén' ? 'warehouse' : 'admin';
-            if (!actors.has(actor) || !new RegExp(`^\\s*${actor} -- ${alias}$`, 'm').test(diagram)) {
-                failures.push(`casos de uso: ${id} no se asocia con su actor normativo`);
+            if (!reachableByActor.get(actor)?.has(alias)) {
+                failures.push(`casos de uso: ${id} no se asocia con su actor normativo directamente, por herencia o desde Consulta`);
             }
-        }
-        if (/^\s*uc\w+\s+--\s+uc\w+/m.test(diagram)) {
-            failures.push('casos de uso: la navegación entre objetivos no es una asociación UML');
         }
     }
     validateIds('diagramas de casos de uso', diagramCaseIds);
