@@ -69,6 +69,10 @@ const manualAdditionalPart = (actor) => [
 const manualCaseFiles = (group, names) => names.map((name) => (
     `docs/user-manual/cases/${group}/${name}`
 ));
+const consumableIssueManualCases = [
+    ...manualCaseFiles('issues', ['15-cap-sal-con-01-walkthrough.md']),
+    ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
+];
 const administrator = 'docs/user-manual/actors/administrator.md';
 const warehouse = 'docs/user-manual/actors/warehouse.md';
 const MANUALS = Object.freeze({
@@ -77,6 +81,7 @@ const MANUALS = Object.freeze({
         parts: {
             'informacion-general-y-anexos': manualAdditionalPart(administrator),
             autenticacion: manualPart(administrator, manualCases.authentication),
+            'salidas-consumibles': manualPart(administrator, consumableIssueManualCases),
             'movimientos-materiales': manualPart(administrator, manualCaseFiles('reports', [
                 '01-cap-rep-mov-mat-01-list.md',
                 '02-cap-rep-mov-mat-02-export.md'
@@ -170,9 +175,7 @@ const MANUALS = Object.freeze({
                 ]),
                 ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
             ]),
-            'salidas-consumibles': manualPart(warehouse, manualCaseFiles('issues', [
-                '15-cap-sal-con-01-walkthrough.md'
-            ])),
+            'salidas-consumibles': manualPart(warehouse, consumableIssueManualCases),
             'salidas-mermas': manualPart(warehouse, [
                 ...manualCaseFiles('issues', [
                     '08-cap-sal-was-01-list.md',

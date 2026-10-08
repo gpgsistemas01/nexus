@@ -33,6 +33,7 @@ sobre campos y modos, consulte la [matriz de formularios](form-validation-matrix
 | Consultar existencia o registrar un artículo | [Catálogos e inventario](cases/catalogs/index.md) |
 | Registrar una entrega de un proveedor | [Compras de materiales y consumibles](cases/purchases/index.md) |
 | Solicitar, surtir o devolver artículos | [Salidas de materiales, consumibles y mermas](cases/issues/index.md) |
+| Consultar, registrar, editar, surtir, devolver o reportar salidas de consumibles | [Recorrido de consumibles: CU-SAL-15 a CU-SAL-21](cases/issues/15-cap-sal-con-01-walkthrough.md) |
 | Consultar movimientos y exportar su historial | [Movimientos y reportes](cases/reports/index.md), para el administrador |
 
 Los reportes de compras, salidas e inventario se descargan desde su propio

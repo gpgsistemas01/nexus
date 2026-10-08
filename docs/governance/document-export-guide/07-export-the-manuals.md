@@ -35,12 +35,15 @@ mezclan bajo un documento genérico de identidad o catálogos.
 
 El manual de Sistemas contiene `movimientos-materiales`, `movimientos-mermas`, `usuarios`,
 `catalogo-areas`, `catalogo-roles`, `catalogo-presentaciones`, `catalogo-unidades-medida`,
-`catalogo-motivos-ajuste`, `catalogo-estados-cumplimiento`, `personas`, `clientes` y `proveedores`.
+`catalogo-motivos-ajuste`, `catalogo-estados-cumplimiento`, `personas`, `clientes`, `proveedores` y `salidas-consumibles`.
 El manual de Almacén contiene `almacen-materiales`, `almacen-consumibles`, `almacen-mermas`,
-`compras`, `salidas-materiales` y `salidas-mermas`.
+`compras`, `salidas-materiales`, `salidas-consumibles` y `salidas-mermas`.
 Ambos agregan por separado `autenticacion` para explicar el acceso y el menú. Esta asignación
 coincide con los módulos por área usados por el inventario de capturas; no agrega a un manual un
 recorrido sólo porque la política técnica permita reutilizar alguna operación desde otro contexto.
+El recorrido de salidas de consumibles se incluye explícitamente para ambos actores conforme a
+`CU-SAL-15` a `CU-SAL-21`; cada paquete incluye también la creación contextual de cliente
+(`CU-CAT-06`), sin conceder al Personal de almacén acceso al listado independiente de clientes.
 
 Cada actor recibe además un único documento `informacion-general-y-anexos` con las indicaciones
 comunes de uso, las convenciones de los procedimientos, la matriz de validación y el catálogo de

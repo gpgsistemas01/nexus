@@ -1,8 +1,8 @@
 ---
 title: Manual del personal de almacén
-subtitle: "Nexus · Versión documental 0.3 · Sistema 1.0.0 · Estado: En revisión"
+subtitle: "Nexus · Versión documental 0.4 · Sistema 1.0.0 · Estado: En revisión"
 author: Equipo Nexus
-date: 2026-10-07
+date: 2026-10-08
 ---
 
 # Manual del personal de almacén
@@ -11,7 +11,7 @@ date: 2026-10-07
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 0.3 | 1.0.0 | En revisión | 2026-10-07 | Equipo Nexus |
+| 0.4 | 1.0.0 | En revisión | 2026-10-08 | Equipo Nexus |
 
 Esta guía le acompaña desde la primera consulta hasta la confirmación de una
 compra, salida o devolución. Comience por [primeros pasos](../overview.md) y use
@@ -47,3 +47,7 @@ los procedimientos durante la operación.
 Para dar de alta un proveedor o cliente durante una operación, use la opción
 que aparece en su selector. Sus listados independientes, cuentas, catálogos
 auxiliares e historiales de movimientos corresponden al administrador.
+
+## Salidas de consumibles
+
+Desde **Salidas → Consumibles**, siga el [recorrido de salidas de consumibles](../cases/issues/15-cap-sal-con-01-walkthrough.md): consulta (`CU-SAL-15`), registro (`CU-SAL-16`), edición de encabezado (`CU-SAL-17`), edición de detalles (`CU-SAL-18`), surtido (`CU-SAL-19`), devolución (`CU-SAL-20`) y reporte Excel (`CU-SAL-21`). La creación y las acciones de cada registro parten de la consulta.

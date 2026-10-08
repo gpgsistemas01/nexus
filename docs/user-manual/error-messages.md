@@ -112,13 +112,18 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **Razón para modificar el detalle de compra no encontrada.** | Solicite revisar el catálogo de motivos antes de continuar. |
 
 <a id="errores-salidas-material"></a>
-## Salidas de material
+<a id="errores-salidas-consumibles"></a>
+## Salidas de material y consumible
+
+Las salidas de consumibles comparten estos mensajes con las de material; algunos avisos
+conservan la palabra «material». Compruebe siempre el artículo y la existencia en
+**Almacén → Consumibles** cuando la operación provenga de **Salidas → Consumibles**.
 
 | Mensaje visible | Recuperación |
 |---|---|
 | **Salida de almacén no encontrada.** o **Detalle de salida de almacén no encontrado.** | Actualice el listado y vuelva a seleccionar la salida o el detalle. |
 | **Stock inexistente para realizar la salida...** | Verifique material, proveedor y dimensiones; no confirme la salida. |
-| **Stock insuficiente para realizar la salida...** | Reduzca la cantidad o espere a que exista disponibilidad confirmada. |
+| **Stock insuficiente para realizar la salida...** | Confirme disponibilidad antes de surtir; la entrega de un renglón consume toda su cantidad pendiente. |
 | **No se puede realizar la salida porque el material no tiene costo unitario máximo configurado...** | Solicite configurar el costo máximo del material antes de surtir. |
 | **La salida solo puede editarse cuando está pendiente.** | Actualice la salida y use únicamente la acción disponible para su estado. |
 | **La salida ya tiene materiales surtidos y no puede editarse en general.** | Edite sólo el encabezado o use devolución, según las acciones disponibles. |
