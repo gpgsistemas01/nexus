@@ -24,27 +24,29 @@ sequenceDiagram
 
     Client->>Route: GET /api/warehouse/reports/goods-issues/materials/excel
     Route->>Auth: verifyApiTokenRequired(req, res, next)
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
     Route->>Auth: authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ)(req, res, next)
-    alt Token o permiso rechazados
-        Route-->>Client: HTTP 401 o 403 — error de middleware
-    else Pipeline aceptado
-        Route->>Controller: exportMaterialGoodsIssueReportExcel(req, res)
-        alt Exportación resuelta
-            Controller->>Controller: buildIssueReportQuery(req) — periodo mensual cuando corresponde
-            Controller->>Facade: findMaterialGoodsIssueReportRows(options)
-            Facade->>Query: findGoodsIssueReportRows({ ...options, type: MATERIAL })
-            Query->>List: findAllGoodsIssues({ ...filtros, type, includeCounts: false, skip: 0, take: 100000 })
-            List->>Prisma: goodsIssue.findMany({ where: contexto y filtros })
-            Prisma-->>List: findMany(): Promise[GoodsIssue[]]
-            List-->>Query: findAllGoodsIssues(): Promise[{ data }] — sin conteos
-            Query-->>Facade: findGoodsIssueReportRows(): Promise[Object[]]
-            Facade-->>Controller: findMaterialGoodsIssueReportRows(): Promise[Object[]]
-            Controller->>Controller: buildIssueReportData(rows)
-            Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
-            Excel-->>Client: HTTP 200 archivo XLSX
-        else Error de lectura o exportación
-            Controller-->>ErrorHandler: error propagado por Express
-            ErrorHandler-->>Client: HTTP de error { code, message }
-        end
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: exportMaterialGoodsIssueReportExcel(req, res)
+    alt Exportación resuelta
+        Controller->>Controller: buildIssueReportQuery(req) — periodo mensual cuando corresponde
+        Controller->>Facade: findMaterialGoodsIssueReportRows(options)
+        Facade->>Query: findGoodsIssueReportRows({ ...options, type: MATERIAL })
+        Query->>List: findAllGoodsIssues({ ...filtros, type, includeCounts: false, skip: 0, take: 100000 })
+        List->>Prisma: goodsIssue.findMany({ where: contexto y filtros })
+        Prisma-->>List: findMany(): Promise[GoodsIssue[]]
+        List-->>Query: findAllGoodsIssues(): Promise[{ data }] — sin conteos
+        Query-->>Facade: findGoodsIssueReportRows(): Promise[Object[]]
+        Facade-->>Controller: findMaterialGoodsIssueReportRows(): Promise[Object[]]
+        Controller->>Controller: buildIssueReportData(rows)
+        Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
+        Excel-->>Client: HTTP 200 archivo XLSX
+    else Error de lectura o exportación
+        Controller-->>ErrorHandler: error propagado por Express
+        ErrorHandler-->>Client: HTTP de error { code, message }
     end
 ```

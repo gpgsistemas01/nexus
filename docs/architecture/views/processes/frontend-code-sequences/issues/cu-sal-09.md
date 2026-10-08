@@ -51,8 +51,8 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         View->>Application: registerWasteIssue({ formData })
-        Application->>Request: registerWasteIssueRequest({ data: formData })
         activate Application
+        Application->>Request: registerWasteIssueRequest({ data: formData })
         Request->>HTTP: apiRequest({ method: 'post', url: ROUTE, data: formData })
         HTTP->>Transport: envía POST /api/warehouse/waste-issues
         Transport-->>HTTP: HTTP 200 { wasteIssue, code }

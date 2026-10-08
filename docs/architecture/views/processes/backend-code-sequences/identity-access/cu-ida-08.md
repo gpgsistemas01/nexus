@@ -17,30 +17,31 @@ sequenceDiagram
 
     Client->>Route: PATCH /api/admin/users/:id/password
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: userPasswordValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.USERS_MANAGE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else userPasswordValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.USERS_MANAGE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: editUserPassword(req, res)
-        activate Controller
-        Controller->>PasswordDto: createUserPasswordDtoForEdit(req.body)
-        PasswordDto-->>Controller: createUserPasswordDtoForEdit(): Object (userPasswordDto)
-        Controller->>Domain: userService.updateUserPassword({ id: req.params.id, userPasswordDto }) cifra y sustituye la contraseña
-        activate Domain
-        alt Servicio resuelto
-            Domain-->>Controller: userService.updateUserPassword(): Promise[User]
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Validator: userPasswordValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.USERS_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: editUserPassword(req, res)
+    activate Controller
+    Controller->>PasswordDto: createUserPasswordDtoForEdit(req.body)
+    PasswordDto-->>Controller: createUserPasswordDtoForEdit(): Object (userPasswordDto)
+    Controller->>Domain: userService.updateUserPassword({ id: req.params.id, userPasswordDto }) cifra y sustituye la contraseña
+    activate Domain
+    alt Servicio resuelto
+        Domain-->>Controller: userService.updateUserPassword(): Promise[User]
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```

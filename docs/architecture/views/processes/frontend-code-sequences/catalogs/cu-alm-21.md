@@ -23,7 +23,7 @@ sequenceDiagram
         Form-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         Form->>App: editConsumableStock({ formData, id })
-        App->>Factory: createApplicationMutation({ request: editConsumableStockRequest, dataKey: null })({ formData, id })
+        App->>Factory: ejecutar función retornada por createApplicationMutation(): { formData, id }
         Factory->>Request: editConsumableStockRequest({ data: formData, id })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>API: PATCH /api/warehouse/consumables/:id/stock
@@ -31,13 +31,16 @@ sequenceDiagram
             API-->>HTTP: 200 { material, code }
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>Factory: editConsumableStockRequest(): Promise[AxiosResponse]
-            Factory-->>Form: editConsumableStock(): Promise[{ message: string }]
+            Factory-->>App: editConsumableStock(): Promise[{ message: string }]
+            App-->>Form: editConsumableStock(): Promise[{ message: string }]
+            Form-->>Browser: handleSubmit(): confirmar, cerrar modal y recargar listado
             Form->>Form: form.onSave?.(undefined)
         else Respuesta HTTP rechazada
             API-->>HTTP: status HTTP { code, message }
             HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
             Request-->>Factory: editConsumableStockRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
-            Factory-->>Form: editConsumableStock(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Factory-->>App: editConsumableStock(): throw { status: number, data: Object | null, message: string, raw: Error }
+            App-->>Form: editConsumableStock(): throw { status: number, data: Object | null, message: string, raw: Error }
         end
     end
 ```

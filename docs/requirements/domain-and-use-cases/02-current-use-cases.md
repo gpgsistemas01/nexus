@@ -70,11 +70,12 @@ y Reporte. En Movimientos sólo corresponden Consulta y Reporte; Autenticación 
 Inicio y Cierre de sesión. Los casos referenciados como extensiones mantienen el número
 de su grupo propietario, aunque aparezcan dentro de otra figura.
 
-Los diagramas tienen orientación horizontal. Los casos propios de cada figura se
-leen de izquierda a derecha por número, en el mismo orden que sus fichas; cuando
-comparten una columna, se leen de arriba hacia abajo. La longitud de las asociaciones
-conserva esa distribución en Dagre; no añade relaciones ni cambia su significado. Las extensiones de otros
-grupos se sitúan junto a su caso base y conservan su identificador propietario.
+Los diagramas mantienen la lectura horizontal desde el actor hacia Consulta y sus
+operaciones. Los casos se declaran por número, como sus fichas. Las asociaciones cortas
+agrupan las operaciones próximas a Consulta; no se fuerza una columna por identificador.
+La ubicación expresa las asociaciones, sin imponer un flujo de ejecución. El ajuste exclusivo del administrador conserva
+su enlace propio, separado de la consulta compartida. Las extensiones de otros grupos
+se sitúan junto a su caso base y conservan su identificador propietario.
 Un diagrama de casos de uso muestra objetivos y participación, no una secuencia de ejecución.
 Se mantienen varias figuras por grupo para conservar la legibilidad de las operaciones
 y actores: agrupar todos los casos en una sola figura no es una exigencia de UML.
@@ -122,8 +123,8 @@ direction LR
     warehouse -- ucPersonQuery
 
     ucPersonQuery -- ucPersonCreate
-    ucPersonQuery --- ucPersonEdit
-    ucPersonQuery ---- ucPersonReport
+    ucPersonQuery -- ucPersonEdit
+    ucPersonQuery -- ucPersonReport
 ```
 
 #### Usuarios y credenciales
@@ -145,9 +146,9 @@ direction LR
     admin -- ucUserQuery
 
     ucUserQuery -- ucUserCreate
-    ucUserQuery --- ucUserEdit
-    ucUserQuery ---- ucPasswordEdit
-    ucUserQuery ----- ucUserReport
+    ucUserQuery -- ucUserEdit
+    ucUserQuery -- ucPasswordEdit
+    ucUserQuery -- ucUserReport
 ```
 
 ### Grupo funcional ALM — Almacén
@@ -172,12 +173,12 @@ direction LR
     end
 
     warehouse -- ucMaterialQuery
-    admin ------- ucMaterialStock
+    admin -- ucMaterialStock
 
     ucMaterialQuery -- ucMaterialCreate
-    ucMaterialQuery --- ucMaterialEdit
-    ucMaterialQuery ---- ucMaterialRemove
-    ucMaterialQuery ------ ucMaterialInventoryReport
+    ucMaterialQuery -- ucMaterialEdit
+    ucMaterialQuery -- ucMaterialRemove
+    ucMaterialQuery -- ucMaterialInventoryReport
 ```
 
 #### Movimientos de materiales
@@ -221,12 +222,12 @@ direction LR
     end
 
     warehouse -- ucWasteQuery
-    admin ------ ucWasteStock
+    admin -- ucWasteStock
 
     ucWasteQuery -- ucWasteCreate
-    ucWasteQuery --- ucWasteEdit
-    ucWasteQuery ----- ucWasteAddStock
-    ucWasteQuery ------ ucWasteReport
+    ucWasteQuery -- ucWasteEdit
+    ucWasteQuery -- ucWasteAddStock
+    ucWasteQuery -- ucWasteReport
 ```
 
 #### Movimientos de mermas
@@ -270,12 +271,12 @@ direction LR
     end
 
     warehouse -- ucConsumableQuery
-    admin ------- ucConsumableStock
+    admin -- ucConsumableStock
 
     ucConsumableQuery -- ucConsumableCreate
-    ucConsumableQuery --- ucConsumableEdit
-    ucConsumableQuery ---- ucConsumableRemove
-    ucConsumableQuery ------ ucConsumableReport
+    ucConsumableQuery -- ucConsumableEdit
+    ucConsumableQuery -- ucConsumableRemove
+    ucConsumableQuery -- ucConsumableReport
 ```
 
 El grupo de **Almacén** concentra los casos operativos de material, consumible y merma porque comparten
@@ -304,8 +305,8 @@ direction LR
     admin -- ucSupplierQuery
 
     ucSupplierQuery -- ucSupplierCreate
-    ucSupplierQuery --- ucSupplierEdit
-    ucSupplierQuery ---- ucSupplierReport
+    ucSupplierQuery -- ucSupplierEdit
+    ucSupplierQuery -- ucSupplierReport
 ```
 
 #### Clientes
@@ -326,8 +327,8 @@ direction LR
     admin -- ucClientQuery
 
     ucClientQuery -- ucClientCreate
-    ucClientQuery --- ucClientEdit
-    ucClientQuery ---- ucClientReport
+    ucClientQuery -- ucClientEdit
+    ucClientQuery -- ucClientReport
 ```
 
 #### Áreas
@@ -347,7 +348,7 @@ direction LR
     admin -- ucAreaQuery
 
     ucAreaQuery -- ucAreaCreate
-    ucAreaQuery --- ucAreaEdit
+    ucAreaQuery -- ucAreaEdit
 ```
 
 #### Roles
@@ -367,7 +368,7 @@ direction LR
     admin -- ucRoleQuery
 
     ucRoleQuery -- ucRoleCreate
-    ucRoleQuery --- ucRoleEdit
+    ucRoleQuery -- ucRoleEdit
 ```
 
 #### Presentaciones
@@ -387,7 +388,7 @@ direction LR
     admin -- ucPresentationQuery
 
     ucPresentationQuery -- ucPresentationCreate
-    ucPresentationQuery --- ucPresentationEdit
+    ucPresentationQuery -- ucPresentationEdit
 ```
 
 #### Unidades de medida
@@ -407,7 +408,7 @@ direction LR
     admin -- ucUnitMeasureQuery
 
     ucUnitMeasureQuery -- ucUnitMeasureCreate
-    ucUnitMeasureQuery --- ucUnitMeasureEdit
+    ucUnitMeasureQuery -- ucUnitMeasureEdit
 ```
 
 #### Motivos de ajuste
@@ -427,7 +428,7 @@ direction LR
     admin -- ucAdjustmentReasonQuery
 
     ucAdjustmentReasonQuery -- ucAdjustmentReasonCreate
-    ucAdjustmentReasonQuery --- ucAdjustmentReasonEdit
+    ucAdjustmentReasonQuery -- ucAdjustmentReasonEdit
 ```
 
 #### Estados de cumplimiento
@@ -447,7 +448,7 @@ direction LR
     admin -- ucFulfillmentStatusQuery
 
     ucFulfillmentStatusQuery -- ucFulfillmentStatusCreate
-    ucFulfillmentStatusQuery --- ucFulfillmentStatusEdit
+    ucFulfillmentStatusQuery -- ucFulfillmentStatusEdit
 ```
 
 Las consultas, edición y reportes de **Proveedores** y **Clientes** se asocian
@@ -489,10 +490,10 @@ direction LR
     warehouse -- materialExtension
 
     ucReceiptQuery -- ucReceiptCreate
-    ucReceiptQuery --- ucReceiptEdit
-    ucReceiptQuery ---- ucReceiptCorrect
-    ucReceiptQuery ----- ucReceiptCancel
-    ucReceiptQuery ------ ucPurchaseReport
+    ucReceiptQuery -- ucReceiptEdit
+    ucReceiptQuery -- ucReceiptCorrect
+    ucReceiptQuery -- ucReceiptCancel
+    ucReceiptQuery -- ucPurchaseReport
 ```
 
 #### Compras de consumibles
@@ -524,10 +525,10 @@ direction LR
     warehouse -- consumableExtension
 
     ucConsumableReceiptQuery -- ucConsumableReceiptCreate
-    ucConsumableReceiptQuery --- ucConsumableReceiptEdit
-    ucConsumableReceiptQuery ---- ucConsumableReceiptCorrect
-    ucConsumableReceiptQuery ----- ucConsumableReceiptCancel
-    ucConsumableReceiptQuery ------ ucConsumablePurchaseReport
+    ucConsumableReceiptQuery -- ucConsumableReceiptEdit
+    ucConsumableReceiptQuery -- ucConsumableReceiptCorrect
+    ucConsumableReceiptQuery -- ucConsumableReceiptCancel
+    ucConsumableReceiptQuery -- ucConsumablePurchaseReport
 ```
 
 ### Grupo funcional SAL — Salidas de materiales, consumibles y mermas
@@ -562,11 +563,11 @@ direction LR
     warehouse -- clientExtension
 
     ucMaterialIssueQuery -- ucMaterialIssueCreate
-    ucMaterialIssueQuery --- ucMaterialIssueHeader
-    ucMaterialIssueQuery ---- ucMaterialIssueDetails
-    ucMaterialIssueQuery ----- ucMaterialSupply
-    ucMaterialIssueQuery ------ ucMaterialReturn
-    ucMaterialIssueQuery ------- ucMaterialIssueReport
+    ucMaterialIssueQuery -- ucMaterialIssueHeader
+    ucMaterialIssueQuery -- ucMaterialIssueDetails
+    ucMaterialIssueQuery -- ucMaterialSupply
+    ucMaterialIssueQuery -- ucMaterialReturn
+    ucMaterialIssueQuery -- ucMaterialIssueReport
 ```
 
 #### Salidas de mermas
@@ -592,11 +593,11 @@ direction LR
     warehouse -- ucWasteIssueQuery
 
     ucWasteIssueQuery -- ucWasteIssueCreate
-    ucWasteIssueQuery --- ucWasteIssueHeader
-    ucWasteIssueQuery ---- ucWasteIssueDetails
-    ucWasteIssueQuery ----- ucWasteSupply
-    ucWasteIssueQuery ------ ucWasteReturn
-    ucWasteIssueQuery ------- ucWasteIssueReport
+    ucWasteIssueQuery -- ucWasteIssueHeader
+    ucWasteIssueQuery -- ucWasteIssueDetails
+    ucWasteIssueQuery -- ucWasteSupply
+    ucWasteIssueQuery -- ucWasteReturn
+    ucWasteIssueQuery -- ucWasteIssueReport
 ```
 
 ### Condiciones y puntos de extensión
@@ -607,7 +608,7 @@ Esta tabla complementa las flechas con la condición, el punto de inserción y e
 que también figuran en las fichas.
 
 | Extensión | Caso base | Punto de extensión y condición | Retorno al caso base |
-| --- | --- | --- | --- |
+| -- | -- | -- | -- |
 | `CU-CAT-02` Crear proveedor | `CU-ENT-02` Crear compra de material | Paso 3, seleccionar proveedor; el actor elige **Nuevo proveedor** (A6). | Proveedor creado seleccionado; continúa la captura del paso 3. |
 | `CU-CAT-02` Crear proveedor | `CU-ENT-08` Crear compra de consumible | Paso 3, seleccionar proveedor; el actor elige **Nuevo proveedor** (A6). | Proveedor creado seleccionado; continúa la captura del paso 3. |
 | `CU-ALM-02` Crear material | `CU-ENT-02` Crear compra de material | Paso 3, seleccionar material; el actor elige **Registrar material** (A5). | Material con existencia cero seleccionado; continúa el detalle en el paso 4. |
@@ -632,7 +633,7 @@ aunque no pertenezcan a un CRUD operativo.
 La revisión aplica estas decisiones de forma explícita:
 
 | Situación revisada | Decisión de modelado | Motivo |
-| --- | --- | --- |
+| -- | -- | -- |
 | El actor persigue un resultado observable y Nexus ofrece una interacción completa para lograrlo. | Incluir como caso de uso. | Expone una capacidad y su impacto en el trabajo o control del negocio. |
 | El comportamiento siempre forma parte del objetivo base y tiene un objetivo reutilizable propio. | Modelar `«include»`, sólo si ambos casos y el retorno al caso base están definidos. | La ejecución obligatoria no debe confundirse con una asociación temática. |
 | El comportamiento es opcional, se inserta bajo una condición y tiene sentido como objetivo separado. | Modelar `«extend»`, sólo si existe un punto de extensión explícito. | Una alternativa interna no crea por sí sola otro caso. |

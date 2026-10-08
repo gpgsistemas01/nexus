@@ -21,17 +21,20 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         View->>Application: updatePerson({ id, formData })
-        Application->>Request: updatePersonRequest({ id, formData })
         activate Application
+        Application->>Request: updatePersonRequest({ id, formData })
         Request->>HTTP: apiRequest({ method: 'put', url, data })
         HTTP->>Transport: envía PUT /api/admin/persons/:id
-        Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-        Request-->>Application: updatePersonRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
+            Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: updatePersonRequest(): Promise[AxiosResponse]
             Application-->>View: updatePerson(): Promise[{ message: string, data: Person }]
             View-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
+            Transport-->>HTTP: HTTP de error — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
             Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: formulario o filtros conservados, mensaje visible
         end

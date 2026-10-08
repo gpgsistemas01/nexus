@@ -68,17 +68,17 @@ sequenceDiagram
     alt token inválido o ausente
         Auth-->>Client: responder rechazo de autenticación
     else sesión autenticada
-        Auth->>Validation: ejecutar validaciones declaradas por la ruta
+        Route->>Validation: ejecutar validaciones declaradas por la ruta
         Validation->>Validation: validate(req, res, next) consolida errores
         alt entrada inválida
             Validation-->>Client: responder error de validación
         else entrada aceptada
-            Validation->>Auth: authorizeUserApi
+            Route->>Auth: authorizeUserApi
             Auth->>Auth: evaluar PERMISSIONS y AUTHORIZATION_POLICIES
             alt permiso denegado
                 Auth-->>Client: responder rechazo de autorización
             else permiso concedido
-                Auth->>Controller: controller(req, res) con req.user
+                Route->>Controller: controller(req, res) con req.user
                 opt el endpoint acepta un DTO
                     Controller->>Dto: create*Dto(req.body)
                     Dto-->>Controller: resourceDto normalizado
@@ -130,7 +130,8 @@ sequenceDiagram
     Module->>Mutation: materialApplication.register(...)
     Mutation->>Request: registerMaterialRequest({ data })
     Request-->>Mutation: response
-    Mutation-->>Page: createSuccessResponseFromRequest({ response, dataKey })
+    Mutation-->>Module: createSuccessResponseFromRequest({ response, dataKey })
+    Module-->>Page: resultado de registerMaterial()
 ```
 
 Esta secuencia muestra la construcción en dos momentos que el resumen del patrón no
@@ -153,28 +154,32 @@ sequenceDiagram
     autonumber
     participant Controller as controllers/api/*Controller.js
     participant Service@{ "type": "control" } as services/*Service.js (Transaction Script)
-    participant Prisma as lib/prisma.js $transaction
+    participant Prisma@{ "type": "database" } as lib/prisma.js $transaction
     participant Writes as services auxiliares + repository/getDb(tx)
     participant Events as utils/socketUtils.emitInventoryUpdated
+    participant Response as Respuesta Express
     participant Audit as middleware/auditMiddleware.auditWrites
+    participant AuditService as services/audit/auditService.persistWriteAudit
 
     Controller->>Service: función importada({ DTO, id, userId })
     Service->>Prisma: prisma.$transaction(async tx => ...)
-    Prisma->>Writes: helper({ ..., tx }) usa getDb(tx)
+    Note over Service,Prisma: El callback conserva el mismo tx
+    Service->>Writes: helper({ ..., tx }) usa getDb(tx)
     Writes->>Writes: escribir documento, detalle, existencia y movimiento
     alt falla una escritura
-        Writes-->>Prisma: propagar error
+        Writes-->>Service: propagar error del callback
         Prisma-->>Service: rollback
         Service-->>Controller: propagar error sin publicar
     else todas las escrituras terminan
-        Writes-->>Prisma: resultado
+        Writes-->>Service: resultado del callback
         Prisma-->>Service: commit
         Service-->>Controller: devolver resultado confirmado
         opt mutación de inventario
             Controller->>Events: publicar actualización no durable
         end
-        Controller-->>Audit: finalizar respuesta HTTP exitosa
-        Audit->>Audit: sanitizar y persistir CriticalWriteAudit best effort
+        Controller->>Response: emitir respuesta HTTP exitosa
+        Response-->>Audit: evento finish
+        Audit-)AuditService: persistWriteAudit() sin esperar su resultado
     end
 ```
 

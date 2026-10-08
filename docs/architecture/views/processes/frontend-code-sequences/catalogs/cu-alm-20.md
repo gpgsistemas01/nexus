@@ -22,8 +22,8 @@ sequenceDiagram
         View-->>Browser: conservar registro sin enviar DELETE
     end
     View->>Application: deleteConsumable({ id: data.id })
-    Application->>Request: deleteConsumableRequest({ id })
     activate Application
+    Application->>Request: deleteConsumableRequest({ id })
     Request->>HTTP: apiRequest({ method: 'delete', url })
     HTTP->>Transport: envía DELETE /api/warehouse/consumables/:id
     Transport-->>HTTP: HTTP 200 { material, code }

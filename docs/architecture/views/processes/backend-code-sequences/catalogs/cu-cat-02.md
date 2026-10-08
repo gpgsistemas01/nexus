@@ -21,30 +21,31 @@ sequenceDiagram
 
     Client->>Route: POST /api/warehouse/suppliers
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: supplierValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.SUPPLIERS_MANAGE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else supplierValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.SUPPLIERS_MANAGE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: registerSupplier(req, res)
-        activate Controller
-        Controller->>SupplierDto: createSupplierDtoForRegister(req.body)
-        SupplierDto-->>Controller: createSupplierDtoForRegister(): Object (supplierDto)
-        Controller->>Domain: supplierService.createSupplier({ supplierDto }) persiste el proveedor
-        activate Domain
-        alt Servicio resuelto
-            Domain-->>Controller: supplierService.createSupplier(): Promise[Supplier]
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Validator: supplierValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.SUPPLIERS_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: registerSupplier(req, res)
+    activate Controller
+    Controller->>SupplierDto: createSupplierDtoForRegister(req.body)
+    SupplierDto-->>Controller: createSupplierDtoForRegister(): Object (supplierDto)
+    Controller->>Domain: supplierService.createSupplier({ supplierDto }) persiste el proveedor
+    activate Domain
+    alt Servicio resuelto
+        Domain-->>Controller: supplierService.createSupplier(): Promise[Supplier]
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```

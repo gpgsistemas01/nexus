@@ -20,37 +20,38 @@ sequenceDiagram
 
     Client->>Router: POST /api/warehouse/wastes/:id/stock-additions + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: wasteStockAdditionValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTES_ADD_STOCK)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else wasteStockAdditionValidation rechaza req.body/req.params
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
+    Router->>Validator: wasteStockAdditionValidation[] y validate(req, res, next)
+    break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTES_ADD_STOCK denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Router->>Controller: registerWasteStockAddition(req, res)
-        Controller->>StockDto: createWasteDtoForStockAddition(req.body)
-        StockDto-->>Controller: createWasteDtoForStockAddition(): Object (entryDto)
-        Controller->>Service: addWasteStock({ id, entryDto, userId })
-        Service->>Prisma: getDb().$transaction(async tx => ...)
-        Service->>Prisma: tx.waste.findUnique({ where: { id } })
-        Service->>Entry: registerWasteStockEntry({ tx, waste, quantity, observations, userId })
-        Entry->>Prisma: generateYearlyReferenceNumber({ type: WASTE_STOCK_ENTRY, tx })
-        Entry->>Movement: applyWasteMovement({ tx, movementType: ENTRY, details })
-        Movement->>Prisma: applyWasteStockChange({ tx, id, quantityChange, convertedQuantityChange })
-        Movement->>Movement: createWasteMovement({ tx, movementType: ENTRY, details })
-        Movement->>Prisma: tx.wasteMovement.create({ type: ENTRY, details })
-        Entry->>Prisma: tx.wasteStockEntry.create({ folio, actor, captura, saldos, movementId })
-        alt Commit confirmado
-            Prisma-->>Service: $transaction(): Promise[Waste]
-            Service-->>Controller: addWasteStock(): Promise[Waste]
-            Controller->>Socket: emitInventoryUpdated()
-            Controller-->>Client: 200 { waste, code }
-        else Cantidad o persistencia rechazada
-            Prisma-->>Service: error Prisma
-            Service-->>Controller: error de dominio tipado y rollback
-            Controller-->>Client: status HTTP { code, message }
-        end
+    end
+    Router->>Auth: authorizeUserApi(PERMISSIONS.WASTES_ADD_STOCK)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Router->>Controller: registerWasteStockAddition(req, res)
+    Controller->>StockDto: createWasteDtoForStockAddition(req.body)
+    StockDto-->>Controller: createWasteDtoForStockAddition(): Object (entryDto)
+    Controller->>Service: addWasteStock({ id, entryDto, userId })
+    Service->>Prisma: getDb().$transaction(async tx => ...)
+    Service->>Prisma: tx.waste.findUnique({ where: { id } })
+    Service->>Entry: registerWasteStockEntry({ tx, waste, quantity, observations, userId })
+    Entry->>Prisma: generateYearlyReferenceNumber({ type: WASTE_STOCK_ENTRY, tx })
+    Entry->>Movement: applyWasteMovement({ tx, movementType: ENTRY, details })
+    Movement->>Prisma: applyWasteStockChange({ tx, id, quantityChange, convertedQuantityChange })
+    Movement->>Movement: createWasteMovement({ tx, movementType: ENTRY, details })
+    Movement->>Prisma: tx.wasteMovement.create({ type: ENTRY, details })
+    Entry->>Prisma: tx.wasteStockEntry.create({ folio, actor, captura, saldos, movementId })
+    alt Commit confirmado
+        Prisma-->>Service: $transaction(): Promise[Waste]
+        Service-->>Controller: addWasteStock(): Promise[Waste]
+        Controller->>Socket: emitInventoryUpdated()
+        Controller-->>Client: 200 { waste, code }
+    else Cantidad o persistencia rechazada
+        Prisma-->>Service: error Prisma
+        Service-->>Controller: error de dominio tipado y rollback
+        Controller-->>Client: status HTTP { code, message }
     end
 ```

@@ -19,6 +19,9 @@ sequenceDiagram
     EJS->>Form: import './loginForm.js'
     Browser->>Form: captura y envía credenciales
     Form->>Form: validateFields(loginValidation, formData)
+    break Validación local rechazada
+        Form-->>Browser: mostrar errores sin invocar loginRequest
+    end
     Form->>App: login({ formData })
     App->>Request: loginRequest({ data: formData })
     Request->>HTTP: apiRequest({ method: 'post', url, data })

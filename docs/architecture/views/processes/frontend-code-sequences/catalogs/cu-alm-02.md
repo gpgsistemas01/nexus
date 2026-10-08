@@ -32,8 +32,8 @@ sequenceDiagram
         else Alta directa
             View->>Application: registerMaterial({ formData, creationContext: null })
         end
-        Application->>Request: registerMaterialRequest({ data })
         activate Application
+        Application->>Request: registerMaterialRequest({ data })
         Request->>HTTP: apiRequest({ method: 'post', url: MATERIALS_API_ROUTE, data })
         HTTP->>Transport: POST /api/warehouse/materials { data }
         alt HTTP 200

@@ -20,8 +20,8 @@ sequenceDiagram
     View->>Dialog: showInventoryExportDialog()
     Dialog-->>View: showInventoryExportDialog(): Promise[SweetAlertResult ({ inventoryScope: activeOrStock | active | inStock })]
     View->>Application: exportWarehouseReport({ ...params, type: CONSUMABLE, inventoryScope })
-    Application->>Request: exportWarehouseReportRequest(params)
     activate Application
+    Application->>Request: exportWarehouseReportRequest(params)
     Request->>HTTP: apiRequest({ method: 'get', url, params, responseType: 'blob' })
     HTTP->>Transport: descarga GET /api/warehouse/reports/inventory/excel
     Transport-->>HTTP: HTTP 200 archivo XLSX

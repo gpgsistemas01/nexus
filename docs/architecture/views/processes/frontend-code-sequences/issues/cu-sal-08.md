@@ -17,8 +17,8 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-SAL-08 — Consultar salidas de merma
     Browser->>View: wasteIssuesPage.ejs y su DataTable cargan salidas de merma
     View->>Application: getAllWasteIssues({ params })
-    Application->>Request: getAllWasteIssuesRequest({ params })
     activate Application
+    Application->>Request: getAllWasteIssuesRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/waste-issues
     Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }

@@ -64,11 +64,11 @@ aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid
 | --- | --- | ---: | --- |
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
 | Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
-| Almacén | `CU-ALM-01..16` | 16 | Completo |
+| Almacén | `CU-ALM-01..22` | 22 | Completo |
 | Catálogos | `CU-CAT-01..26` | 26 | Completo |
-| Entradas | `CU-ENT-01..06` | 6 | Completo |
+| Entradas | `CU-ENT-01..12` | 12 | Completo |
 | Salidas | `CU-SAL-01..14` | 14 | Completo |
-| **Total** | Seis grupos propietarios | **73** | **73 de 73** |
+| **Total** | Seis grupos propietarios | **85** | **85 de 85** |
 
 Los casos `CU-AUT-01` y `CU-AUT-02` se conservan aquí porque iniciar y cerrar sesión son
 objetivos funcionales con código propio, no para repetir la autenticación dentro de cada

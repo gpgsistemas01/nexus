@@ -17,22 +17,24 @@ sequenceDiagram
 
     Client->>Route: GET /api/warehouse/goods-issues/materials
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE)(req, res, next)
-    alt Token o permiso rechazados
-        Route-->>Client: HTTP 401 o 403 — error de middleware
-    else Pipeline aceptado
-        Route->>Controller: getAllMaterialGoodsIssues(req, res)
-        Controller->>Controller: getIssueDataTableQuery({ query, columns })
-        Controller->>Facade: findAllMaterialGoodsIssues(query)
-        Facade->>Core: findAllGoodsIssues({ ...options, type: MATERIAL })
-        Core->>Helpers: buildGoodsIssueContextWhere(type)
-        Helpers-->>Core: buildGoodsIssueContextWhere(): Object
-        Core->>Prisma: goodsIssue.findMany({ where, skip, take, orderBy, include })
-        Prisma-->>Core: findMany(): Promise[GoodsIssue[]]
-        Core->>Prisma: goodsIssue.count({ where })
-        Prisma-->>Core: count(): Promise[number] — total y filtered iguales
-        Core-->>Facade: findAllGoodsIssues(): Promise[{ data, recordsTotal, recordsFiltered }]
-        Facade-->>Controller: findAllMaterialGoodsIssues(): Promise[{ data, recordsTotal, recordsFiltered }]
-        Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: getAllMaterialGoodsIssues(req, res)
+    Controller->>Controller: getIssueDataTableQuery({ query, columns })
+    Controller->>Facade: findAllMaterialGoodsIssues(query)
+    Facade->>Core: findAllGoodsIssues({ ...options, type: MATERIAL })
+    Core->>Helpers: buildGoodsIssueContextWhere(type)
+    Helpers-->>Core: buildGoodsIssueContextWhere(): Object
+    Core->>Prisma: goodsIssue.findMany({ where, skip, take, orderBy, include })
+    Prisma-->>Core: findMany(): Promise[GoodsIssue[]]
+    Core->>Prisma: goodsIssue.count({ where })
+    Prisma-->>Core: count(): Promise[number] — total y filtered iguales
+    Core-->>Facade: findAllGoodsIssues(): Promise[{ data, recordsTotal, recordsFiltered }]
+    Facade-->>Controller: findAllMaterialGoodsIssues(): Promise[{ data, recordsTotal, recordsFiltered }]
+    Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
 ```

@@ -17,17 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-18 — Consultar unidad de medida
     Browser->>View: abrir y cargar la tabla del catálogo
     View->>Application: getAllCatalogEntries({ params, catalog })
-    Application->>Request: getCatalogEntriesRequest({ params, catalog })
     activate Application
+    Application->>Request: getCatalogEntriesRequest({ params, catalog })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consume GET /api/admin/catalogs/unit-measures
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-    Request-->>Application: getCatalogEntriesRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
+        Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: getCatalogEntriesRequest(): Promise[AxiosResponse]
         Application-->>View: getAllCatalogEntries(): Promise[AxiosResponse]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
+        Transport-->>HTTP: HTTP de error — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
         Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end

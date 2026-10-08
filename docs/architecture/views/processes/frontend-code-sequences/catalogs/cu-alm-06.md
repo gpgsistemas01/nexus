@@ -20,17 +20,20 @@ sequenceDiagram
     View->>Dialog: showInventoryExportDialog()
     Dialog-->>View: showInventoryExportDialog(): Promise['active' | 'stock']
     View->>Application: exportWarehouseReport({ params })
-    Application->>Request: exportWarehouseReportRequest({ params })
     activate Application
+    Application->>Request: exportWarehouseReportRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/warehouse/reports/inventory/excel
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-    Request-->>Application: exportWarehouseReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
+        Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: exportWarehouseReportRequest(): Promise[AxiosResponse]
         Application-->>View: exportWarehouseReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
+        Transport-->>HTTP: HTTP de error — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
         Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end

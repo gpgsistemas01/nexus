@@ -29,38 +29,45 @@ sequenceDiagram
 
     Client->>Route: POST /api/warehouse/goods-receipts/consumables
     Route->>Auth: verifyApiTokenRequired(req, res, next)
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
     Route->>Validator: goodsReceiptValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
     Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE)(req, res, next)
-    alt Token, validación o permiso rechazados
-        Route-->>Client: HTTP 401, 400 o 403 — error de middleware
-    else Pipeline aceptado
-        Route->>Controller: registerConsumableGoodsReceipt(req, res)
-        Controller->>DTO: createGoodsReceiptDtoForRegister(req.body)
-        DTO-->>Controller: createGoodsReceiptDtoForRegister(): Object — DTO normalizado
-        Controller->>Controller: sanitizeEmptyStrings(dto)
-        Controller->>Facade: createConsumableGoodsReceipt(options con DTO, identificadores y actor cuando corresponde)
-        Facade->>Core: createGoodsReceipt({ ...options, type: CONSUMABLE })
-        alt Servicio resuelto
-            Core->>Invoice: assertGoodsReceiptInvoiceAvailable({ supplierId, invoice }) tras consultar proveedor y receptor
-            Core->>Helpers: buildGoodsReceiptDetails(details, { supplierId, type })
-            Core->>Helpers: calculateGoodsReceiptTotals(processedDetails)
-            critical getDb().$transaction(async tx => ...)
-                Core->>Reference: generateYearlyReferenceNumber({ tx, ... })
-                Core->>Prisma: tx.goodsReceipt.create({ data: { type, referenceNumber, ... } })
-                Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
-                Inventory->>Prisma: createInventoryMovement({ tx, ... }) y actualización de existencias
-            end
-            Prisma-->>Core: commit y compra creada
-            Core->>Costs: updateMaterialUnitCostIfHigher({ supplierId, materialId, conversionUnitCost }) tras commit
-            Core-->>Facade: createGoodsReceipt(): Promise[GoodsReceipt]
-            Facade-->>Controller: createConsumableGoodsReceipt(): Promise[GoodsReceipt]
-            Controller->>Socket: emitInventoryUpdated({ context: 'consumable', source: 'goods-receipt-created' })
-            Controller-->>Client: HTTP 200 { goodsReceipt, code }
-        else Error de dominio o persistencia
-            Core-->>Facade: error — rollback si falló la transacción
-            Facade-->>Controller: error propagado
-            Controller->>ErrorHandler: next(error) — propagación de Express
-            ErrorHandler-->>Client: HTTP de error { code, message }
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: registerConsumableGoodsReceipt(req, res)
+    Controller->>DTO: createGoodsReceiptDtoForRegister(req.body)
+    DTO-->>Controller: createGoodsReceiptDtoForRegister(): Object — DTO normalizado
+    Controller->>Controller: sanitizeEmptyStrings(dto)
+    Controller->>Facade: createConsumableGoodsReceipt(options con DTO, identificadores y actor cuando corresponde)
+    Facade->>Core: createGoodsReceipt({ ...options, type: CONSUMABLE })
+    alt Servicio resuelto
+        Core->>Invoice: assertGoodsReceiptInvoiceAvailable({ supplierId, invoice }) tras consultar proveedor y receptor
+        Core->>Helpers: buildGoodsReceiptDetails(details, { supplierId, type })
+        Core->>Helpers: calculateGoodsReceiptTotals(processedDetails)
+        Core->>Prisma: getDb().$transaction(async tx => ...)
+        rect rgb(245, 245, 245)
+            Note over Core,Prisma: getDb().$transaction(async tx => ...)
+            Core->>Reference: generateYearlyReferenceNumber({ tx, ... })
+            Core->>Prisma: tx.goodsReceipt.create({ data: { type, referenceNumber, ... } })
+            Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
+            Inventory->>Prisma: createInventoryMovement({ tx, ... }) y actualización de existencias
         end
+        Prisma-->>Core: commit y compra creada
+        Core->>Costs: updateMaterialUnitCostIfHigher({ supplierId, materialId, conversionUnitCost }) tras commit
+        Core-->>Facade: createGoodsReceipt(): Promise[GoodsReceipt]
+        Facade-->>Controller: createConsumableGoodsReceipt(): Promise[GoodsReceipt]
+        Controller->>Socket: emitInventoryUpdated({ context: 'consumable', source: 'goods-receipt-created' })
+        Controller-->>Client: HTTP 200 { goodsReceipt, code }
+    else Error de dominio o persistencia
+        Core-->>Facade: error — rollback si falló la transacción
+        Facade-->>Controller: error propagado
+        Controller->>ErrorHandler: next(error) — propagación de Express
+        ErrorHandler-->>Client: HTTP de error { code, message }
     end
 ```

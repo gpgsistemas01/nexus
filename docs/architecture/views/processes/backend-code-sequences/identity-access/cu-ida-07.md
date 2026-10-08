@@ -17,31 +17,32 @@ sequenceDiagram
 
     Client->>Route: PATCH /api/admin/users/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: userEditValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.USERS_MANAGE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else userEditValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.USERS_MANAGE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: editUser(req, res)
-        activate Controller
-        Controller->>UserDto: createUserDtoForEdit(req.body)
-        UserDto-->>Controller: createUserDtoForEdit(): Object (userDto)
-        Controller->>Domain: userService.updateUser({ id: req.params.id, userDto }) actualiza cuenta y asignación autorizada
-        activate Domain
-        alt Servicio resuelto
-            Domain-->>Controller: userService.updateUser(): Promise[User]
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Validator: userEditValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.USERS_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: editUser(req, res)
+    activate Controller
+    Controller->>UserDto: createUserDtoForEdit(req.body)
+    UserDto-->>Controller: createUserDtoForEdit(): Object (userDto)
+    Controller->>Domain: userService.updateUser({ id: req.params.id, userDto }) actualiza cuenta y asignación autorizada
+    activate Domain
+    alt Servicio resuelto
+        Domain-->>Controller: userService.updateUser(): Promise[User]
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```
 

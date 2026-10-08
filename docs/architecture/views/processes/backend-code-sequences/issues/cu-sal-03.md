@@ -22,30 +22,35 @@ sequenceDiagram
 
     Client->>Route: PATCH /api/warehouse/goods-issues/materials/:id/header
     Route->>Auth: verifyApiTokenRequired(req, res, next)
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
     Route->>Validator: goodsIssueHeaderValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
     Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE)(req, res, next)
-    alt Token, validación o permiso rechazados
-        Route-->>Client: HTTP 401, 400 o 403 — error de middleware
-    else Pipeline aceptado
-        Route->>Controller: editMaterialGoodsIssueHeader(req, res)
-        Controller->>DTO: createGoodsIssueHeaderDtoForEdit(req.body)
-        DTO-->>Controller: createGoodsIssueHeaderDtoForEdit(): Object — DTO normalizado
-        Controller->>Controller: sanitizeEmptyStrings(dto)
-        Controller->>Facade: updateMaterialGoodsIssueHeader(options con DTO, identificadores y actor cuando corresponde)
-        Facade->>Core: updateGoodsIssueHeader({ ...options, type: MATERIAL })
-        alt Servicio resuelto
-            Core->>Helpers: buildGoodsIssueContextWhere(type)
-            Core->>Prisma: goodsIssue.findUnique({ where: { id, ...contextWhere }, include: estados y detalles })
-            Core->>Header: resolveIssueHeaderData(options)
-            Core->>Prisma: goodsIssue.update({ where: { id, ...contextWhere }, data: headerData })
-            Core-->>Facade: updateGoodsIssueHeader(): Promise[GoodsIssue]
-            Facade-->>Controller: updateMaterialGoodsIssueHeader(): Promise[GoodsIssue]
-            Controller-->>Client: HTTP 200 { goodsIssue, code }
-        else Error de dominio o persistencia
-            Core-->>Facade: error — rollback si falló la transacción
-            Facade-->>Controller: error propagado
-            Controller->>ErrorHandler: next(error) — propagación de Express
-            ErrorHandler-->>Client: HTTP de error { code, message }
-        end
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: editMaterialGoodsIssueHeader(req, res)
+    Controller->>DTO: createGoodsIssueHeaderDtoForEdit(req.body)
+    DTO-->>Controller: createGoodsIssueHeaderDtoForEdit(): Object — DTO normalizado
+    Controller->>Controller: sanitizeEmptyStrings(dto)
+    Controller->>Facade: updateMaterialGoodsIssueHeader(options con DTO, identificadores y actor cuando corresponde)
+    Facade->>Core: updateGoodsIssueHeader({ ...options, type: MATERIAL })
+    alt Servicio resuelto
+        Core->>Helpers: buildGoodsIssueContextWhere(type)
+        Core->>Prisma: goodsIssue.findUnique({ where: { id, ...contextWhere }, include: estados y detalles })
+        Core->>Header: resolveIssueHeaderData(options)
+        Core->>Prisma: goodsIssue.update({ where: { id, ...contextWhere }, data: headerData })
+        Core-->>Facade: updateGoodsIssueHeader(): Promise[GoodsIssue]
+        Facade-->>Controller: updateMaterialGoodsIssueHeader(): Promise[GoodsIssue]
+        Controller-->>Client: HTTP 200 { goodsIssue, code }
+    else Error de dominio o persistencia
+        Core-->>Facade: error — rollback si falló la transacción
+        Facade-->>Controller: error propagado
+        Controller->>ErrorHandler: next(error) — propagación de Express
+        ErrorHandler-->>Client: HTTP de error { code, message }
     end
 ```

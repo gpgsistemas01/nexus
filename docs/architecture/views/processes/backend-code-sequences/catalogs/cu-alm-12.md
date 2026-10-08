@@ -22,36 +22,37 @@ sequenceDiagram
 
     Client->>Router: PATCH /api/warehouse/wastes/:id/stock + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: wasteStockValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTES_ADJUST_STOCK)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else wasteStockValidation rechaza req.body/req.params
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
+    Router->>Validator: wasteStockValidation[] y validate(req, res, next)
+    break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTES_ADJUST_STOCK denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Router->>Controller: editWasteStock(req, res)
-        Controller->>StockDto: createWasteDtoForStockUpdate(req.body)
-        StockDto-->>Controller: createWasteDtoForStockUpdate(): Object (wasteStockDto)
-        Controller->>Service: updateWasteStock({ id, wasteStockDto, userId })
-        Service->>Prisma: getDb().$transaction(async tx => ...)
-        Service->>Prisma: tx.waste.findUnique({ where: { id } })
-        Service->>Adjustment: registerWasteStockAdjustment({ tx, waste, wasteStockDto, userId })
-        Adjustment->>Stock: calculateStockAdjustmentValues({ currentStock, newStock })
-        Adjustment->>Reference: generateYearlyReferenceNumber({ type, tx })
-        Adjustment->>Prisma: tx.wasteStockAdjustment.create({ data })
-        Adjustment->>Movement: createWasteMovement({ tx, type: ADJUSTMENT, details })
-        Adjustment->>Prisma: tx.waste.update({ where, data })
-        alt Commit confirmado
-            Prisma-->>Service: $transaction(): Promise[Waste]
-            Service-->>Controller: updateWasteStock(): Promise[Waste]
-            Controller->>Socket: emitInventoryUpdated()
-            Controller-->>Client: 200 { waste, code }
-        else Regla de stock o persistencia rechazada
-            Prisma-->>Service: error Prisma
-            Service-->>Controller: error de dominio tipado y rollback
-            Controller-->>Client: status HTTP { code, message }
-        end
+    end
+    Router->>Auth: authorizeUserApi(PERMISSIONS.WASTES_ADJUST_STOCK)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Router->>Controller: editWasteStock(req, res)
+    Controller->>StockDto: createWasteDtoForStockUpdate(req.body)
+    StockDto-->>Controller: createWasteDtoForStockUpdate(): Object (wasteStockDto)
+    Controller->>Service: updateWasteStock({ id, wasteStockDto, userId })
+    Service->>Prisma: getDb().$transaction(async tx => ...)
+    Service->>Prisma: tx.waste.findUnique({ where: { id } })
+    Service->>Adjustment: registerWasteStockAdjustment({ tx, waste, wasteStockDto, userId })
+    Adjustment->>Stock: calculateStockAdjustmentValues({ currentStock, newStock })
+    Adjustment->>Reference: generateYearlyReferenceNumber({ type, tx })
+    Adjustment->>Prisma: tx.wasteStockAdjustment.create({ data })
+    Adjustment->>Movement: createWasteMovement({ tx, type: ADJUSTMENT, details })
+    Adjustment->>Prisma: tx.waste.update({ where, data })
+    alt Commit confirmado
+        Prisma-->>Service: $transaction(): Promise[Waste]
+        Service-->>Controller: updateWasteStock(): Promise[Waste]
+        Controller->>Socket: emitInventoryUpdated()
+        Controller-->>Client: 200 { waste, code }
+    else Regla de stock o persistencia rechazada
+        Prisma-->>Service: error Prisma
+        Service-->>Controller: error de dominio tipado y rollback
+        Controller-->>Client: status HTTP { code, message }
     end
 ```

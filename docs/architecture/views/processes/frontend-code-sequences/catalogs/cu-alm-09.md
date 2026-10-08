@@ -17,17 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-09 — Consultar mermas
     Browser->>View: wastesPage.ejs y wastesPage.js cargan mermas
     View->>Application: getAllWastes({ params })
-    Application->>Request: getAllWastesRequest({ params })
     activate Application
+    Application->>Request: getAllWastesRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/wastes
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-    Request-->>Application: getAllWastesRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
+        Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: getAllWastesRequest(): Promise[AxiosResponse]
         Application-->>View: getAllWastes(): Promise[AxiosResponse]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
+        Transport-->>HTTP: HTTP de error — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
         Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end

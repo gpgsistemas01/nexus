@@ -21,21 +21,24 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         View->>Application: registerWaste({ formData })
-        Application->>Request: registerWasteRequest({ data: formData })
         activate Application
+        Application->>Request: registerWasteRequest({ data: formData })
         Request->>HTTP: apiRequest({ method: 'post', url, data })
         HTTP->>Transport: enviar POST /api/warehouse/wastes
         alt Misma identidad de merma
             Transport-->>View: 409 WASTE_ALREADY_EXISTS y no incrementar stock
         else Merma nueva
         end
-        Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-        Request-->>Application: registerWasteRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
+            Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: registerWasteRequest(): Promise[AxiosResponse]
             Application-->>View: registerWaste(): Promise[{ message: string, data: Waste }]
             View-->>Browser: modal cerrado y #table recargada
         else Respuesta rechazada
+            Transport-->>HTTP: HTTP de error — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
             Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: formulario o filtros conservados, mensaje visible
         end

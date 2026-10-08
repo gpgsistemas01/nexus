@@ -25,28 +25,30 @@ sequenceDiagram
 
     Client->>Route: GET /api/warehouse/reports/goods-receipts/consumables/excel
     Route->>Auth: verifyApiTokenRequired(req, res, next)
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
     Route->>Auth: authorizeUserApi(PERMISSIONS.WAREHOUSE_REPORTS_READ)(req, res, next)
-    alt Token o permiso rechazados
-        Route-->>Client: HTTP 401 o 403 — error de middleware
-    else Pipeline aceptado
-        Route->>Controller: exportConsumableGoodsReceiptReportExcel(req, res)
-        alt Exportación resuelta
-            Controller->>Core: exportGoodsReceiptReportExcel({ req, res, materialType, findGoodsReceiptReportRows })
-            Core->>Core: getReportMonthDateRange(reportMonth) cuando el reporte es mensual
-            Core->>Facade: findConsumableGoodsReceiptReportRows(options)
-            Facade->>Query: findGoodsReceiptReportRows({ ...options, type: CONSUMABLE })
-            Query->>List: findAllGoodsReceipts({ ...filtros, type, includeCounts: false, skip: 0, take: 100000 })
-            List->>Prisma: goodsReceipt.findMany({ where: contexto y filtros })
-            Prisma-->>List: findMany(): Promise[GoodsReceipt[]]
-            List-->>Query: findAllGoodsReceipts(): Promise[{ data }] — sin conteos
-            Query-->>Facade: findGoodsReceiptReportRows(): Promise[Object[]]
-            Facade-->>Core: findConsumableGoodsReceiptReportRows(): Promise[Object[]]
-            Core->>Core: buildMonthlyGoodsReceiptSummary(rows) si se solicita resumen mensual
-            Core->>Excel: sendExcelReport({ res, data, sheetName, filename })
-            Excel-->>Client: HTTP 200 archivo XLSX
-        else Error de lectura o exportación
-            Core-->>ErrorHandler: error propagado por Express
-            ErrorHandler-->>Client: HTTP de error { code, message }
-        end
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: exportConsumableGoodsReceiptReportExcel(req, res)
+    alt Exportación resuelta
+        Controller->>Core: exportGoodsReceiptReportExcel({ req, res, materialType, findGoodsReceiptReportRows })
+        Core->>Core: getReportMonthDateRange(reportMonth) cuando el reporte es mensual
+        Core->>Facade: findConsumableGoodsReceiptReportRows(options)
+        Facade->>Query: findGoodsReceiptReportRows({ ...options, type: CONSUMABLE })
+        Query->>List: findAllGoodsReceipts({ ...filtros, type, includeCounts: false, skip: 0, take: 100000 })
+        List->>Prisma: goodsReceipt.findMany({ where: contexto y filtros })
+        Prisma-->>List: findMany(): Promise[GoodsReceipt[]]
+        List-->>Query: findAllGoodsReceipts(): Promise[{ data }] — sin conteos
+        Query-->>Facade: findGoodsReceiptReportRows(): Promise[Object[]]
+        Facade-->>Core: findConsumableGoodsReceiptReportRows(): Promise[Object[]]
+        Core->>Core: buildMonthlyGoodsReceiptSummary(rows) si se solicita resumen mensual
+        Core->>Excel: sendExcelReport({ res, data, sheetName, filename })
+        Excel-->>Client: HTTP 200 archivo XLSX
+    else Error de lectura o exportación
+        Core-->>ErrorHandler: error propagado por Express
+        ErrorHandler-->>Client: HTTP de error { code, message }
     end
 ```

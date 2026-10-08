@@ -20,17 +20,20 @@ sequenceDiagram
     View->>Dialog: showReportExportDialog(currentMonth)
     Dialog-->>View: showReportExportDialog(): Promise[boolean]
     View->>Application: exportMovementReport({ params, type: materials })
-    Application->>Request: exportMovementReportRequest({ params, type: materials })
     activate Application
+    Application->>Request: exportMovementReportRequest({ params, type: materials })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/admin/reports/movements/materials/excel
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-    Request-->>Application: exportMovementReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
+        Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: exportMovementReportRequest(): Promise[AxiosResponse]
         Application-->>View: exportMovementReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
+        Transport-->>HTTP: HTTP de error — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
         Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end

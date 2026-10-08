@@ -22,54 +22,55 @@ sequenceDiagram
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: wasteIssueUpdateValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_MANAGE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else wasteIssueUpdateValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTE_ISSUES_MANAGE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: editWasteIssue(req, res)
-        activate Controller
-        Controller->>IssueDto: createWasteIssueDtoForEdit(req.body)
-        IssueDto-->>Controller: createWasteIssueDtoForEdit(): Object (wasteIssueDto)
-        Controller->>Controller: sanitizeEmptyStrings(wasteIssueDto)
-        Controller->>Domain: updateWasteIssue({ id: req.params.id, wasteIssueDto: sanitizedWasteIssueDto })
-        activate Domain
-        Domain->>Operation: executeServiceOperation({ action: updateWasteIssueTransaction, fallbackError })
-        Operation->>Domain: updateWasteIssueTransaction({ id, wasteIssueDto })
-        Domain->>Prisma: getDb().$transaction(async tx => ...)
-        Domain->>Prisma: tx.wasteIssue.findUnique({ id, details })
-        Prisma-->>Domain: findUnique(): Promise[WasteIssue|null]
-        alt Salida existente, sin cantidades surtidas y datos válidos
-            Domain->>Fulfillment: findWasteIssueFulfillmentStatusIds(tx)
-            Fulfillment-->>Domain: findWasteIssueFulfillmentStatusIds(): Promise[Map]
-            Domain->>Domain: buildWasteIssueDetails({ tx, details: requestedDetails, fulfillmentStatusId: pendingStatusId })
-            Domain->>Prisma: tx.waste.findMany({ id: uniqueIds, isActive: true })
-            Prisma-->>Domain: findMany(): Promise[Waste[]]
-            loop Cada detalle solicitado
-                Domain->>Stock: calculateConvertedQuantity({ quantity, base, height })
-                Stock-->>Domain: calculateConvertedQuantity(): number
-            end
-            Domain->>Header: resolveIssueHeaderData({ tx, dto: headerDto })
-            Header-->>Domain: resolveIssueHeaderData(): Promise[Object]
-            Domain->>Prisma: tx.wasteIssueDetail.deleteMany({ wasteIssueId: id })
-            Domain->>Prisma: tx.wasteIssue.update({ id, headerData, fulfillmentStatus: PENDING, details })
-            Prisma-->>Domain: update(): Promise[WasteIssue]
-            Prisma-->>Domain: commit
-            Domain-->>Operation: updateWasteIssueTransaction(): Promise[WasteIssue]
-            Operation-->>Domain: executeServiceOperation(): Promise[WasteIssue]
-            Domain-->>Controller: updateWasteIssue(): Promise[WasteIssue]
-            Controller-->>Client: HTTP 200 { wasteIssue, code: UPDATED_WASTE_ISSUE }
-        else Salida inexistente, ya surtida, merma inválida o error de persistencia
-            Prisma-->>Domain: rollback
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Validator: wasteIssueUpdateValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: editWasteIssue(req, res)
+    activate Controller
+    Controller->>IssueDto: createWasteIssueDtoForEdit(req.body)
+    IssueDto-->>Controller: createWasteIssueDtoForEdit(): Object (wasteIssueDto)
+    Controller->>Controller: sanitizeEmptyStrings(wasteIssueDto)
+    Controller->>Domain: updateWasteIssue({ id: req.params.id, wasteIssueDto: sanitizedWasteIssueDto })
+    activate Domain
+    Domain->>Operation: executeServiceOperation({ action: updateWasteIssueTransaction, fallbackError })
+    Operation->>Domain: updateWasteIssueTransaction({ id, wasteIssueDto })
+    Domain->>Prisma: getDb().$transaction(async tx => ...)
+    Domain->>Prisma: tx.wasteIssue.findUnique({ id, details })
+    Prisma-->>Domain: findUnique(): Promise[WasteIssue|null]
+    alt Salida existente, sin cantidades surtidas y datos válidos
+        Domain->>Fulfillment: findWasteIssueFulfillmentStatusIds(tx)
+        Fulfillment-->>Domain: findWasteIssueFulfillmentStatusIds(): Promise[Map]
+        Domain->>Domain: buildWasteIssueDetails({ tx, details: requestedDetails, fulfillmentStatusId: pendingStatusId })
+        Domain->>Prisma: tx.waste.findMany({ id: uniqueIds, isActive: true })
+        Prisma-->>Domain: findMany(): Promise[Waste[]]
+        loop Cada detalle solicitado
+            Domain->>Stock: calculateConvertedQuantity({ quantity, base, height })
+            Stock-->>Domain: calculateConvertedQuantity(): number
+        end
+        Domain->>Header: resolveIssueHeaderData({ tx, dto: headerDto })
+        Header-->>Domain: resolveIssueHeaderData(): Promise[Object]
+        Domain->>Prisma: tx.wasteIssueDetail.deleteMany({ wasteIssueId: id })
+        Domain->>Prisma: tx.wasteIssue.update({ id, headerData, fulfillmentStatus: PENDING, details })
+        Prisma-->>Domain: update(): Promise[WasteIssue]
+        Prisma-->>Domain: commit
+        Domain-->>Operation: updateWasteIssueTransaction(): Promise[WasteIssue]
+        Operation-->>Domain: executeServiceOperation(): Promise[WasteIssue]
+        Domain-->>Controller: updateWasteIssue(): Promise[WasteIssue]
+        Controller-->>Client: HTTP 200 { wasteIssue, code: UPDATED_WASTE_ISSUE }
+    else Salida inexistente, ya surtida, merma inválida o error de persistencia
+        Prisma-->>Domain: rollback
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```

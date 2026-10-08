@@ -24,8 +24,17 @@ sequenceDiagram
 
     Client->>Route: POST /api/warehouse/consumables
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: materialValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.MATERIALS_WRITE)(req, res, next)
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
+    Route->>Validator: materialValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.MATERIALS_WRITE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
     alt [autenticación, validación o permiso rechazados]
         Auth-->>Client: HTTP 401/403 { code, message }
         Validator-->>Client: HTTP 400 { errors }

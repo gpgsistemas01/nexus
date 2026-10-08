@@ -18,8 +18,8 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-01 — Consultar materiales
     Browser->>View: materialsPage inicializa el DataTable de inventario
     View->>Application: getAllMaterials({ params })
-    Application->>Request: getAllMaterialsRequest({ params })
     activate Application
+    Application->>Request: getAllMaterialsRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/materials
     Transport-->>HTTP: HTTP 200 { data: SupplierMaterial[],<br/>recordsTotal: number, recordsFiltered: number }

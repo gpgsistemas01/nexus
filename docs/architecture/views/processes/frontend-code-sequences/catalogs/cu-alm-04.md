@@ -18,17 +18,20 @@ sequenceDiagram
     Browser->>View: solicita retirar la fila proveedor-material
     View->>View: obtiene data.id (id de SupplierMaterial, no material.id)
     View->>Application: deleteMaterial({ id: data.id })
-    Application->>Request: deleteMaterialRequest({ id })
     activate Application
+    Application->>Request: deleteMaterialRequest({ id })
     Request->>HTTP: apiRequest({ method: 'delete', url })
     HTTP->>Transport: envía DELETE /api/warehouse/materials/:id
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-    Request-->>Application: deleteMaterialRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
+        Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: deleteMaterialRequest(): Promise[AxiosResponse]
         Application-->>View: deleteMaterial(): Promise[{ message: string }]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
+        Transport-->>HTTP: HTTP de error — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
         Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end

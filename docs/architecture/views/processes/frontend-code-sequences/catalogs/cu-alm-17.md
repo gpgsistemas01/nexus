@@ -18,8 +18,8 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-ALM-17 — Consultar consumibles
     Browser->>View: createConsumableDatatable(context)
     View->>Application: getAllConsumables(params)
-    Application->>Request: getAllConsumablesRequest({ params })
     activate Application
+    Application->>Request: getAllConsumablesRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/consumables
     Transport-->>HTTP: HTTP 200 { data: SupplierMaterial[],<br/>recordsTotal: number, recordsFiltered: number }

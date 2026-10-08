@@ -17,31 +17,32 @@ sequenceDiagram
 
     Client->>Route: PATCH /api/warehouse/wastes/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: wasteEditValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTES_WRITE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else wasteEditValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTES_WRITE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: editWaste(req, res)
-        activate Controller
-        Controller->>WasteDto: createWasteDtoForEdit(req.body)
-        WasteDto-->>Controller: createWasteDtoForEdit(): Object (wasteDto)
-        Controller->>Domain: wasteService.updateWaste({ id: req.params.id, wasteDto }) actualiza datos sin tratar stock como edición
-        activate Domain
-        alt Servicio resuelto
-            Domain-->>Controller: wasteService.updateWaste(): Promise[Waste]
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Validator: wasteEditValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.WASTES_WRITE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: editWaste(req, res)
+    activate Controller
+    Controller->>WasteDto: createWasteDtoForEdit(req.body)
+    WasteDto-->>Controller: createWasteDtoForEdit(): Object (wasteDto)
+    Controller->>Domain: wasteService.updateWaste({ id: req.params.id, wasteDto }) actualiza datos sin tratar stock como edición
+    activate Domain
+    alt Servicio resuelto
+        Domain-->>Controller: wasteService.updateWaste(): Promise[Waste]
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```
 

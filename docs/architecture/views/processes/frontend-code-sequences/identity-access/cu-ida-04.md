@@ -20,17 +20,20 @@ sequenceDiagram
     View->>Dialog: showFilteredExportDialog()
     Dialog-->>View: showFilteredExportDialog(): Promise[boolean]
     View->>Application: exportPersonReport({ params })
-    Application->>Request: exportPersonReportRequest({ params })
     activate Application
+    Application->>Request: exportPersonReportRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: descarga GET /api/admin/reports/persons/excel
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-    Request-->>Application: exportPersonReportRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
+        Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: exportPersonReportRequest(): Promise[AxiosResponse]
         Application-->>View: exportPersonReport(): Promise[Blob]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
+        Transport-->>HTTP: HTTP de error — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
         Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end

@@ -32,17 +32,20 @@ sequenceDiagram
         Form-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         Form->>Application: addWasteStock({ id, formData })
-        Application->>Request: addWasteStockRequest({ id, formData })
         activate Application
+        Application->>Request: addWasteStockRequest({ id, formData })
         Request->>HTTP: apiRequest({ method: 'post', url, data })
         HTTP->>Transport: envía POST /api/warehouse/wastes/:id/stock-additions
-        Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-        Request-->>Application: addWasteStockRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
+            Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: addWasteStockRequest(): Promise[AxiosResponse]
             Application-->>Form: addWasteStock(): Promise[{ message: string, data: Waste }]
             Form-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
+            Transport-->>HTTP: HTTP de error — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
             Application-->>Form: throw { status: number, data: Object | null, message: string, raw: Error }
             Form-->>Browser: formulario o filtros conservados, mensaje visible
         end

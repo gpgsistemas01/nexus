@@ -19,7 +19,13 @@ sequenceDiagram
 
     Client->>Route: GET /api/warehouse/wastes/material-templates
     Route->>Auth: verifyApiTokenRequired(req, res, next)
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
     Route->>Auth: authorizeUserApi(PERMISSIONS.WASTES_READ)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
     Route->>Controller: getWasteMaterialTemplates(req, res)
     Controller->>Domain: findWasteMaterialTemplates({ search, skip, take, supplierId })
     Domain-->>Controller: findWasteMaterialTemplates(): Promise[Object[]]
@@ -27,39 +33,40 @@ sequenceDiagram
 
     Client->>Route: POST /api/warehouse/wastes
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: wasteValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTES_WRITE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else wasteValidation rechaza req.body
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTES_WRITE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: registerWaste(req, res)
-        activate Controller
-        Controller->>WasteDto: createWasteDtoForRegister(req.body)
-        WasteDto-->>Controller: createWasteDtoForRegister(): Object (wasteDto)
-        Controller->>Formatter: sanitizeEmptyStrings(wasteDto)
-        Formatter-->>Controller: sanitizeEmptyStrings(): Object (sanitizedWasteDto)
-        Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
-        activate Domain
-        Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height })
-        alt La merma ya existe
-            Domain-->>Controller: WASTE_ALREADY_EXISTS sin incrementar stock
-        else La merma no existe
-            Domain->>Domain: createWasteWithInitialStockAdjustment({ wasteDto, userId }) crea merma, ajuste y movimiento inicial
-        end
-        alt Registro confirmado
-            Domain-->>Controller: createWasteWithInitialStockAdjustment(): Promise[Waste]
-            Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-created' })
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Validator: wasteValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.WASTES_WRITE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: registerWaste(req, res)
+    activate Controller
+    Controller->>WasteDto: createWasteDtoForRegister(req.body)
+    WasteDto-->>Controller: createWasteDtoForRegister(): Object (wasteDto)
+    Controller->>Formatter: sanitizeEmptyStrings(wasteDto)
+    Formatter-->>Controller: sanitizeEmptyStrings(): Object (sanitizedWasteDto)
+    Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
+    activate Domain
+    Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height })
+    alt La merma ya existe
+        Domain-->>Controller: WASTE_ALREADY_EXISTS sin incrementar stock
+    else La merma no existe
+        Domain->>Domain: createWasteWithInitialStockAdjustment({ wasteDto, userId }) crea merma, ajuste y movimiento inicial
+    end
+    alt Registro confirmado
+        Domain-->>Controller: createWasteWithInitialStockAdjustment(): Promise[Waste]
+        Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-created' })
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```

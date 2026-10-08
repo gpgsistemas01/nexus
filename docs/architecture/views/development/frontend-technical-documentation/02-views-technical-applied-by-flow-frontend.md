@@ -20,7 +20,7 @@ flowchart LR
 | Diagrama conservado | Pregunta adicional | Complementa |
 | --- | --- | --- |
 | `DIA-FE-ACT-001` · `CU-ALM-10` | ¿Cómo condicionan proveedor y plantilla la habilitación y el envío? | `DIA-FE-CU-ALM-10`; muestra decisiones de UI y termina en el mismo `POST`. |
-| `DIA-FE-TEC-EST-CU-IDA-08` | ¿Cómo alterna el formulario entre consulta, edición y contraseña? | `DIA-FE-CU-IDA-08`; no crea otro caso ni otra API. |
+| `DIA-FE-TEC-EST-CU-IDA-08` | ¿Cómo se conserva el modo contraseña ante envío, éxito o rechazo? | `DIA-FE-CU-IDA-08`; no crea otro caso ni otra API. |
 | `DIA-FE-TEC-EST-CU-ALM-05` | ¿Cómo evoluciona el modo de ajuste ante validación, envío y error? | `DIA-FE-CU-ALM-05`; no representa estado persistido ni validación definitiva. |
 
 Las antiguas secuencias selectivas de login, ajuste, corrección y devoluciones no se
@@ -66,31 +66,67 @@ preparación; la respuesta y los errores HTTP continúan en la secuencia `DIA-FE
 Estos diagramas permanecen aquí porque añaden ciclos técnicos que no repite la colección
 de secuencias por caso.
 
-**Estado técnico complementario:** `DIA-FE-TEC-EST-CU-IDA-08`. Expone los modos
-que gobiernan los campos y la mutación del formulario de usuario.
+**Estado técnico complementario:** `DIA-FE-TEC-EST-CU-IDA-08`. El objeto modelado es
+el modal en modo contraseña (`FORM_MODES.EDIT_PASSWORD`), abierto desde la consulta.
+El envío conserva ese modo ante un error recuperable; no cambia al modo de edición de
+datos ni modela el estado persistido del usuario.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Consulta
-    Consulta --> Edicion: abrir cuenta existente
-    Consulta --> CambioPassword: seleccionar acción de contraseña
-    Edicion --> Enviando: editUser
-    CambioPassword --> Enviando: editUserPassword
-    Enviando --> Consulta: recibir [HTTP exitoso] / refrescar consulta
-    Enviando --> Edicion: recibir [error de edición] / conservar formulario
-    Enviando --> CambioPassword: recibir [error de contraseña] / conservar formulario
+    state "Consulta (modal cerrado)" as Consulta
+    state "Contraseña abierta (edit-password)" as Password
+    state "Enviando contraseña" as Enviando
+    state "Formulario bloqueado tras error" as Bloqueado
+    state "Fuera de la página" as Fuera
+    [*] --> Consulta: abrir usuarios
+    Consulta --> Password: abrir contraseña / deshabilitar campos de identidad
+    Password --> Password: validar [datos inválidos] / mostrar errores
+    Password --> Enviando: enviar [password válido] / editUserPassword()
+    Enviando --> Consulta: resolver [éxito] / cerrar y recargar
+    Enviando --> Password: rechazar [HTTP recuperable] / habilitar reintento
+    Enviando --> Bloqueado: rechazar [otro error sin redirección] / notificar
+    Enviando --> Fuera: sesión perdida / redirigir a raíz
+    Password --> Consulta: cerrar modal
+    Bloqueado --> Consulta: cerrar modal
+    Fuera --> [*]
 ```
 
-**Estado técnico complementario:** `DIA-FE-TEC-EST-CU-ALM-05`. Representa el ciclo
-del modo de ajuste sin atribuir al navegador la validación definitiva del stock.
+La elección del modo ocurre en `userModal.js`; la validación y la mutación se seleccionan
+en `userForm.js`. `handleSubmit` cierra el modal y recarga la tabla sólo tras el éxito.
+`handleApiError` permite reintentar HTTP 400, 403, 404 y 409; la figura los agrupa
+como «HTTP recuperable». Para los demás
+fallos, la implementación actual notifica sin restablecer `submitting`: cerrar y volver
+a abrir el modal inicializa el formulario. El cliente HTTP intenta renovar una sesión
+ante 401 antes de abandonar la página.
+
+**Estado técnico complementario:** `DIA-FE-TEC-EST-CU-ALM-05`. Modela el modal de ajuste
+abierto desde Materiales. La validación local no concede el permiso ni valida el stock
+definitivamente; el servidor vuelve a comprobar ambos.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Consulta
-    Consulta --> Ajuste: abrir material en modo stock
-    Ajuste --> Invalido: validar [datos inválidos] / mostrar errores
-    Invalido --> Ajuste: corregir formulario
-    Ajuste --> Enviando: confirmar ajuste
-    Enviando --> Consulta: recibir [PATCH exitoso] / ejecutar onSave
-    Enviando --> Ajuste: recibir [request rechazado] / mostrar error
+    state "Consulta de materiales (modal cerrado)" as Consulta
+    state "Ajuste abierto (edit-stock)" as Ajuste
+    state "Enviando ajuste (submitting=true)" as Enviando
+    state "Formulario bloqueado tras error" as Bloqueado
+    state "Fuera de la página de materiales" as Fuera
+    [*] --> Consulta: abrir la página
+    Consulta --> Ajuste: abrir ajuste / openMaterialModal(edit-stock)
+    Ajuste --> Ajuste: validar [datos inválidos] / mostrar errores
+    Ajuste --> Enviando: enviar [datos válidos] / editMaterialStock()
+    Enviando --> Consulta: resolver [éxito] / cerrar, recargar y onSave
+    Enviando --> Ajuste: rechazar [HTTP recuperable] / habilitar reintento
+    Enviando --> Bloqueado: rechazar [otro error sin redirección] / notificar
+    Enviando --> Fuera: sesión perdida / redirigir a raíz
+    Bloqueado --> Consulta: cerrar modal
+    Ajuste --> Consulta: cerrar el modal
+    Fuera --> [*]
+    note right of Enviando
+        Un segundo submit no crea otra petición.
+        No hay un estado persistido llamado Ajuste o Inválido.
+    end note
 ```
+
+La evidencia está en `materialModal.js`, `materialForm.js`, `formUI.js`, `formUtils.js`
+y `api/errorHandler.js`. La rama de reintento agrupa HTTP 400, 403, 404 y 409, que restablecen el
+estado de envío; no atribuye esa garantía a todos los errores de red o servidor.

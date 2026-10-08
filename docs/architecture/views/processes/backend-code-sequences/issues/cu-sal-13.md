@@ -20,38 +20,39 @@ sequenceDiagram
 
     Client->>Router: PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: issueReturnValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else issueReturnValidation rechaza req.body/req.params
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
+    Router->>Validator: issueReturnValidation[] y validate(req, res, next)
+    break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTE_ISSUES_SUPPLY denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Router->>Controller: registerWasteIssueDetailReturn(req, res)
-        Controller->>ReturnDto: createWasteIssueDtoForReturn(req.body)
-        ReturnDto-->>Controller: createWasteIssueDtoForReturn(): Object (returnDto)
-        Controller->>Service: returnWasteIssueDetail({ id, detailId, returnDto, userId })
-        Service->>Prisma: getDb().$transaction(async tx => ...)
-        Service->>Prisma: tx.wasteIssueDetail.findFirst({ where: { id: detailId, wasteIssueId: id } })
-        Service->>Service: returnWasteIssueDetailTransaction({ id, detailId, returnDto, userId }) valida estado y cantidad
-        alt Cantidad de merma no retornable
-            Service-->>Service: error de dominio
-            Service-->>Controller: rollback y error
-        else Cantidad válida
-            Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId: id }, movementType: ENTRY, details })
-            Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
-            Service->>Prisma: tx.wasteIssueDetail.update({ where: { id: detailId }, data: devolución y cumplimiento })
-            Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
-            alt todos los detalles quedan Cancelado
-                Service->>Prisma: tx.wasteIssue.update({ where: { id }, data })
-            end
-            Service->>Prisma: tx.wasteIssueReturn.create({ data })
-            Prisma-->>Service: salida de merma actualizada y commit
-            Service-->>Controller: returnWasteIssueDetail(): Promise[{ ...wasteIssueReturn, detail: updatedDetail }]
-            Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' })
-            Controller-->>Client: 200 { wasteIssueReturn, code }
+    end
+    Router->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Router->>Controller: registerWasteIssueDetailReturn(req, res)
+    Controller->>ReturnDto: createWasteIssueDtoForReturn(req.body)
+    ReturnDto-->>Controller: createWasteIssueDtoForReturn(): Object (returnDto)
+    Controller->>Service: returnWasteIssueDetail({ id, detailId, returnDto, userId })
+    Service->>Prisma: getDb().$transaction(async tx => ...)
+    Service->>Prisma: tx.wasteIssueDetail.findFirst({ where: { id: detailId, wasteIssueId: id } })
+    Service->>Service: returnWasteIssueDetailTransaction({ id, detailId, returnDto, userId }) valida estado y cantidad
+    alt Cantidad de merma no retornable
+        Service-->>Service: error de dominio
+        Service-->>Controller: rollback y error
+    else Cantidad válida
+        Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId: id }, movementType: ENTRY, details })
+        Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
+        Service->>Prisma: tx.wasteIssueDetail.update({ where: { id: detailId }, data: devolución y cumplimiento })
+        Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
+        alt todos los detalles quedan Cancelado
+            Service->>Prisma: tx.wasteIssue.update({ where: { id }, data })
         end
+        Service->>Prisma: tx.wasteIssueReturn.create({ data })
+        Prisma-->>Service: salida de merma actualizada y commit
+        Service-->>Controller: returnWasteIssueDetail(): Promise[{ ...wasteIssueReturn, detail: updatedDetail }]
+        Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' })
+        Controller-->>Client: 200 { wasteIssueReturn, code }
     end
 ```

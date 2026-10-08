@@ -21,8 +21,8 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         View->>Application: editConsumable({ id, formData })
-        Application->>Request: editConsumableRequest({ id, data: formData })
         activate Application
+        Application->>Request: editConsumableRequest({ id, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: envía PATCH /api/warehouse/consumables/:id
         Transport-->>HTTP: HTTP 200 { material, code }

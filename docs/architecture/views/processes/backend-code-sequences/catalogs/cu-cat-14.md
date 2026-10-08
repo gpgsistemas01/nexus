@@ -16,29 +16,30 @@ sequenceDiagram
 
     Client->>Route: PUT /api/admin/catalogs/roles/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Auth: authorizeUserApi(PERMISSIONS.CATALOGS_MANAGE)(req, res, next)
-    Auth->>Validator: catalogEntryEditValidation[] y validate(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else PERMISSIONS.CATALOGS_MANAGE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else catalogEntryEditValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
-    else Pipeline aceptado
-        Route->>Controller: editCatalogEntry(req, res)
-        activate Controller
-        Controller->>Domain: updateCatalogEntry(req.params.catalog, req.params.id, req.body) normaliza y actualiza únicamente los campos permitidos
-        activate Domain
-        alt Servicio resuelto
-            Domain-->>Controller: updateCatalogEntry(): Promise[Object]
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.CATALOGS_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Validator: catalogEntryEditValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Controller: editCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: updateCatalogEntry(req.params.catalog, req.params.id, req.body) normaliza y actualiza únicamente los campos permitidos
+    activate Domain
+    alt Servicio resuelto
+        Domain-->>Controller: updateCatalogEntry(): Promise[Object]
+        Controller-->>Client: HTTP 2xx { code, data }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```
 

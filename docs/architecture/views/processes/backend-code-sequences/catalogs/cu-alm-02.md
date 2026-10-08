@@ -23,54 +23,55 @@ sequenceDiagram
 
     Client->>Route: POST /api/warehouse/materials { req.body }
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: materialValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.MATERIALS_WRITE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else materialValidation rechaza req.body según creationContext
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.MATERIALS_WRITE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: registerMaterial(req, res)
-        Controller->>MaterialDto: createMaterialDtoForRegister(req.body)
-        alt req.body.creationContext es goodsReceipt
-            MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
-        else Alta directa de material
-            MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
-        end
-        Controller->>Controller: sanitizeEmptyStrings(materialDto)
-        Controller->>Domain: createMaterial({ materialDto: sanitizedMaterialDto, userId: req.user.id })
-        activate Domain
-        Domain->>Prisma: getDb().$transaction(async tx => ...)
-        Domain->>Helpers: prepareMaterialData({ tx, materialDto: materialData })
-        Helpers-->>Domain: prepareMaterialData(): Promise[Object ({ rest, relations })]
-        Domain->>Prisma: tx.material.findFirst({ identidad })
-        alt Identidad existente
-            Domain->>Prisma: tx.supplierMaterial.findUnique({ supplierId_materialId })
-            break Relación con el proveedor ya existente
-                Domain-->>Controller: throw MaterialAlreadyExists
-            end
-        else Identidad nueva
-            Domain->>Prisma: tx.material.create({ data: buildMaterialData(...) })
-            Prisma-->>Domain: create(): Promise[{ id: number }]
-        end
-        Domain->>Relations: syncSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
-        opt Alta directa con newStock
-            Domain->>Reason: findInitialStockAdjustmentReason({ tx })
-            Reason-->>Domain: findInitialStockAdjustmentReason(): Promise[Object]
-            Domain->>Adjustment: createStockAdjustment({ tx, materialId, supplierId, reasonId, observations, newStock, userId })
-        end
-        Domain->>SupplierMaterial: findSupplierMaterialByIds({ tx, materialId, supplierId })
-        SupplierMaterial-->>Domain: findSupplierMaterialByIds(): Promise[SupplierMaterial]
-        Prisma-->>Domain: commit
-        Domain-->>Controller: createMaterial(): Promise[SupplierMaterial]
-        Controller-->>Client: HTTP 200 { material: supplierMaterial, code }
-        opt AppError o error de persistencia
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: HTTP error { code, message, meta }
-        end
-        deactivate Domain
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Validator: materialValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.MATERIALS_WRITE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: registerMaterial(req, res)
+    Controller->>MaterialDto: createMaterialDtoForRegister(req.body)
+    alt req.body.creationContext es goodsReceipt
+        MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
+    else Alta directa de material
+        MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
+    end
+    Controller->>Controller: sanitizeEmptyStrings(materialDto)
+    Controller->>Domain: createMaterial({ materialDto: sanitizedMaterialDto, userId: req.user.id })
+    activate Domain
+    Domain->>Prisma: getDb().$transaction(async tx => ...)
+    Domain->>Helpers: prepareMaterialData({ tx, materialDto: materialData })
+    Helpers-->>Domain: prepareMaterialData(): Promise[Object ({ rest, relations })]
+    Domain->>Prisma: tx.material.findFirst({ identidad })
+    alt Identidad existente
+        Domain->>Prisma: tx.supplierMaterial.findUnique({ supplierId_materialId })
+        break Relación con el proveedor ya existente
+            Domain-->>Controller: throw MaterialAlreadyExists
+        end
+    else Identidad nueva
+        Domain->>Prisma: tx.material.create({ data: buildMaterialData(...) })
+        Prisma-->>Domain: create(): Promise[{ id: number }]
+    end
+    Domain->>Relations: syncSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
+    opt Alta directa con newStock
+        Domain->>Reason: findInitialStockAdjustmentReason({ tx })
+        Reason-->>Domain: findInitialStockAdjustmentReason(): Promise[Object]
+        Domain->>Adjustment: createStockAdjustment({ tx, materialId, supplierId, reasonId, observations, newStock, userId })
+    end
+    Domain->>SupplierMaterial: findSupplierMaterialByIds({ tx, materialId, supplierId })
+    SupplierMaterial-->>Domain: findSupplierMaterialByIds(): Promise[SupplierMaterial]
+    Prisma-->>Domain: commit
+    Domain-->>Controller: createMaterial(): Promise[SupplierMaterial]
+    Controller-->>Client: HTTP 200 { material: supplierMaterial, code }
+    opt AppError o error de persistencia
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: HTTP error { code, message, meta }
+    end
+    deactivate Domain
 ```

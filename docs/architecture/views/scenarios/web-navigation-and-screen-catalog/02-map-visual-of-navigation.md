@@ -9,15 +9,16 @@ rutas vuelven a comprobar la autorización en el servidor.
 Los diagramas se contrastan con el partial compartido `src/views/layout/ui/navList.ejs`.
 La definición normativa de los actores permanece en la
 [SRS](../../../../requirements/requirements-specification/03-actors-and-system-responsibilities.md):
-ambos actores especializan a Usuario registrado. Sus destinos operativos compartidos
-se autorizan explícitamente; no hay generalización entre Administrador y Personal de almacén.
+ambos actores acceden a destinos operativos compartidos que se autorizan explícitamente
+en el servidor. La generalización funcional de los casos de uso no sustituye esas políticas.
 
 ## Acceso y sesión compartidos
 
 **Identificador:** `DIA-ARQ-EST-001`.
 
 La raíz dirige a la autenticación o al área protegida según la sesión. Este recorrido es
-común a ambos actores y no representa una pantalla adicional para el área autenticada.
+común a ambos actores. Los nodos identifican ubicaciones de navegación o una sesión
+autenticada, no estados persistidos del usuario ni de un documento.
 
 ```mermaid
 stateDiagram-v2
@@ -31,8 +32,9 @@ stateDiagram-v2
 
     Root --> Login: abrir [sesión ausente] / mostrar inicio de sesión
     Root --> Authenticated: abrir [sesión válida] / mostrar área
+    Login --> Login: iniciar sesión [credenciales rechazadas] / conservar formulario y mostrar error
     Login --> Authenticated: iniciar sesión [credenciales válidas] / autenticar
-    Authenticated --> Refresh: solicitar recurso [token vencido] / renovar sesión
+    Authenticated --> Refresh: solicitar recurso [token ausente o vencido] / renovar sesión
     Refresh --> Authenticated: renovar [token válido] / restablecer sesión
     Refresh --> Login: renovar [token inválido] / solicitar autenticación
     Authenticated --> Logout: solicitud POST

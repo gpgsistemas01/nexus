@@ -1,6 +1,7 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { getSequenceStructureErrors } from './sequenceDiagramUtils.js';
 
 const ROOT = process.cwd();
 const OUTPUTS = {
@@ -273,6 +274,9 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${id} debe contener exactamente una secuencia de código`);
             }
             const sequence = getMermaidBlocks(body)[0] ?? '';
+            for (const error of getSequenceStructureErrors(sequence)) {
+                failures.push(`diagramas ${side}: ${id}: ${error}`);
+            }
             const visualActors = [...sequence.matchAll(/^\s*actor\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
             if (side === 'frontend') {
                 if (visualActors.length !== 1 || visualActors[0]?.[2] !== expectedActors.get(id)) {
@@ -313,9 +317,9 @@ const validateUseCaseDiagramCoverage = async () => {
             if (sequence.includes('Variables de frontera:')) {
                 failures.push(`diagramas ${side}: ${id} transcribe variables de frontera que pertenecen al código enlazado`);
             }
-            if (!/^\s*alt\s+/m.test(sequence)
-                || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback)\b/i.test(sequence)) {
-                failures.push(`diagramas ${side}: ${id} no representa el error devuelto con una respuesta discontinua dentro de alt/else`);
+            if (!/^\s*(?:alt|break)\s+/m.test(sequence)
+                || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback|INVALID_AUTH|FORBIDDEN)\b/i.test(sequence)) {
+                failures.push(`diagramas ${side}: ${id} no representa el error devuelto con una respuesta discontinua dentro de alt/else o break`);
             }
             const tracedParticipants = sequence.match(/participant .* as .*src\//g) ?? [];
             if (tracedParticipants.length < 2) {

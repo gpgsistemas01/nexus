@@ -22,8 +22,8 @@ flowchart LR
 | `DIA-BE-ACT-002` · `CU-ENT-05` | ¿Qué decisiones provocan rechazo, rollback o cancelación? | `DIA-BE-CU-ENT-05` y la máquina normativa si cambia un estado de negocio. |
 | `DIA-BE-ACT-001` · `CU-SAL-05` | ¿Cómo se separan actualización, surtimiento y errores? | `DIA-BE-CU-SAL-05` y los estados normativos de salidas. |
 | `DIA-BE-SEQ-006` · `RN-008` | ¿Cuándo ocurre la auditoría y puede revertir la operación? | Escrituras API observadas mediante `finish`; documenta la garantía *best effort*. |
-| `DIA-BE-TEC-EST-AUT-01` | ¿Qué condiciones permiten superar autorización? | Secuencias autenticadas; distingue token, cuenta activa y permiso efectivo. |
-| `DIA-BE-TEC-EST-CU-ENT-04` | ¿Cuál es el ciclo técnico de una corrección? | `DIA-BE-CU-ENT-04`, su transacción y la publicación posterior. |
+| `DIA-BE-ACT-AUT-01` | ¿Qué condiciones permiten superar autorización? | Secuencias autenticadas; distingue token, cuenta activa y permiso efectivo. |
+| `DIA-BE-TEC-EST-CU-ENT-04` | ¿Cuál es el ciclo técnico de una corrección? | `DIA-BE-CU-ENT-04`, su transacción; distingue los efectos posteriores al commit. |
 
 Las antiguas secuencias selectivas de autenticación, ajustes, entrada, corrección,
 surtimientos y devoluciones no se mantienen aquí: respondían la misma pregunta que sus
@@ -152,65 +152,82 @@ sequenceDiagram
     Browser->>Audit: POST/PUT/PATCH/DELETE bajo /api
     Audit->>Response: registrar listener once(finish)
     Audit->>Route: next()
-    Route-->>Response: completar operación y status
+    Route->>Response: completar operación y emitir respuesta HTTP
+    Response-->>Browser: respuesta de la operación
     Response-->>Audit: finish
     alt status >= 400 o actor ausente
-        Audit-->>Audit: no persistir auditoría
+        Note over Audit: No se invoca persistWriteAudit
     else escritura exitosa con actor
-        Audit->>AuditService: request y status para construir datos saneados
+        Audit-)AuditService: persistWriteAudit({ req, statusCode }) sin esperar la promesa
         AuditService->>Prisma: create audit trail
-        alt falla la persistencia de auditoría
-            AuditService-->>Logger: registrar error sin revertir operación
+        opt falla la persistencia de auditoría
+            AuditService-->>Audit: promesa rechazada
+            Audit->>Logger: logger.error(err) sin revertir operación
         end
     end
 ```
 
-### Estados técnicos complementarios
+### Estados y decisiones técnicas complementarias
 
 Estos diagramas permanecen aquí porque añaden ciclos técnicos que no repite la colección
 de secuencias por caso.
 
-**Estado técnico complementario:** `DIA-BE-TEC-EST-AUT-01`. Una máquina de estados es
-la representación adecuada porque la pregunta es si la cuenta conserva las condiciones para
-atravesar el middleware entre peticiones; una secuencia explica el orden de una petición,
-pero no expresa con igual claridad la pérdida de elegibilidad. `getLoggedUser(userId)`
-vuelve a consultar estas condiciones en `authorizeUserApi` y `authorizeUserWeb`.
+### Decisiones de autenticación y autorización API
+
+**Identificador:** `DIA-BE-ACT-AUT-01`. Representa el flujo de una petición API
+protegida, no estados persistidos de la cuenta. `verifyApiTokenRequired` verifica el
+JWT; `authorizeUserApi` consulta de nuevo la identidad y sus asignaciones y evalúa la
+política del recurso. Una petición nueva vuelve a realizar estas comprobaciones.
+
+La figura usa la [convención de actividades](../../processes/index.md#notación-de-actividades)
+como aproximación a UML mediante Mermaid. La validación del payload, cuando la ruta la
+exige, ocurre entre ambos middleware y puede terminar con HTTP 400; aquí se detalla
+únicamente la decisión de acceso.
+
+```mermaid
+flowchart TB
+    initial@{ shape: f-circ } --> token("verifyApiTokenRequired: leer y verificar accessToken")
+    token --> validToken{"¿Token presente, firmado y vigente?"}
+    validToken -->|"[no]"| merge401{" "}
+    validToken -->|"[sí]"| identity("authorizeUserApi: getLoggedUser(req.userId)")
+    identity --> validIdentity{"¿Usuario activo, persona activa o ausente y asignaciones?"}
+    validIdentity -->|"[no]"| merge401
+    validIdentity -->|"[sí]"| permission{"¿Alguna asignación cumple la política?"}
+    permission -->|"[no]"| forbidden("Responder HTTP 403 FORBIDDEN")
+    permission -->|"[sí]"| allowed("Establecer req.user y ejecutar next()")
+    merge401 --> unauthorized("Responder HTTP 401 INVALID_AUTH")
+    unauthorized --> mergeFinal{" "}
+    forbidden --> mergeFinal
+    allowed --> mergeFinal
+    mergeFinal --> final@{ shape: fr-circ }
+```
+
+En web, `verifyCookiesAuthTokenRequired` redirige a `/revocar-sesion` y
+`authorizeUserWeb` redirige a `/error/404`; los HTTP 401/403 de esta figura corresponden
+al pipeline API. El JWT no evita que una desactivación o la pérdida de asignaciones
+bloquee la siguiente petición.
+
+### Estados de la transacción de corrección
+
+**Estado técnico complementario:** `DIA-BE-TEC-EST-CU-ENT-04`. El objeto modelado es
+la transacción de `correctGoodsReceiptDetailLine`, no la compra ni la respuesta HTTP.
+La búsqueda del detalle, las comprobaciones de dominio y las escrituras ocurren dentro
+del callback de `$transaction`; un rechazo en cualquiera de ellas revierte la transacción.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> TokenValido: validar token [firma y vigencia válidas]
-    TokenValido --> Invalido: consultar usuario [inexistente o inactivo]
-    TokenValido --> Invalido: consultar persona [inactiva]
-    TokenValido --> Invalido: consultar acceso [sin asignaciones]
-    TokenValido --> UsuarioActivo: consultar identidad [usuario activo y persona activa o ausente]
-    UsuarioActivo --> Autorizado: autorizar [asignación permitida]
-    UsuarioActivo --> Prohibido: autorizar [permiso insuficiente]
-    Autorizado --> MiddlewareSuperado: continuar / establecer req.user y ejecutar next()
-    Invalido --> Rechazado401: rechazar / responder 401 INVALID_AUTH
-    Prohibido --> Rechazado403: rechazar / responder 403 FORBIDDEN
-    MiddlewareSuperado --> [*]
-    Rechazado401 --> [*]
-    Rechazado403 --> [*]
+    state "Transacción abierta" as Abierta
+    state "Confirmada (commit)" as Confirmada
+    state "Revertida (rollback)" as Revertida
+    [*] --> Abierta: invocar $transaction(callback)
+    Abierta --> Revertida: callback rechazado / rollback
+    Abierta --> Confirmada: callback resuelto / commit
+    Revertida --> [*]: propagar error
+    Confirmada --> [*]: devolver resultado
 ```
 
-El estado **Usuario activo** exige `User.isActive`, una `Person.isActive` cuando la cuenta
-es humana y al menos una asignación vigente. El JWT sólo conduce a **Token válido**; no
-evita que una desactivación o la pérdida de asignaciones bloquee la siguiente petición.
-
-**Estado técnico complementario:** `DIA-BE-TEC-EST-CU-ENT-04`. Muestra el ciclo de la
-transacción de corrección; los estados funcionales permanecen en requisitos.
-
-```mermaid
-stateDiagram-v2
-    [*] --> Recibida: correctGoodsReceiptDetail
-    Recibida --> Validada: validar [detalle y DTO válidos]
-    Recibida --> Rechazada: validar [error de dominio] / rechazar
-    Validada --> TransaccionAbierta: correctGoodsReceiptDetailLine
-    TransaccionAbierta --> Rollback: persistir [fallo de escritura] / revertir transacción
-    TransaccionAbierta --> Commit: persistir [escrituras completas] / confirmar transacción
-    Commit --> EventoPublicado: confirmar / emitir emitInventoryUpdated()
-    Rollback --> Respondida
-    EventoPublicado --> Respondida
-    Rechazada --> Respondida
-    Respondida --> [*]
-```
+El recálculo de costos ocurre después del commit. Si falla, el servicio propaga un
+error sin revertir lo confirmado; el controller publica sólo cuando el servicio retorna
+con éxito. Los estados funcionales de la compra permanecen en requisitos. La secuencia
+`DIA-BE-CU-ENT-04` muestra el recálculo posterior, el retorno al controller y
+`emitInventoryUpdated`; esas acciones no son estados de la transacción.

@@ -21,17 +21,20 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         View->>Application: editCatalogEntry({ catalog, id, data })
-        Application->>Request: editCatalogEntryRequest({ catalog, id, data })
         activate Application
+        Application->>Request: editCatalogEntryRequest({ catalog, id, data })
         Request->>HTTP: apiRequest({ method: 'put', url, data })
         HTTP->>Transport: consume PUT /api/admin/catalogs/roles/:id
-        Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-        Request-->>Application: editCatalogEntryRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
+            Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: editCatalogEntryRequest(): Promise[AxiosResponse]
             Application-->>View: editCatalogEntry(): Promise[{ message: string, data: Object }]
             View-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
+            Transport-->>HTTP: HTTP de error — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
             Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: formulario o filtros conservados, mensaje visible
         end

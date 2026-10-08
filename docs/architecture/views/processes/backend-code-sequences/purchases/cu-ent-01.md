@@ -17,26 +17,28 @@ sequenceDiagram
 
     Client->>Route: GET /api/warehouse/goods-receipts/materials
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE)(req, res, next)
-    alt Token o permiso rechazados
-        Route-->>Client: HTTP 401 o 403 — error de middleware
-    else Pipeline aceptado
-        Route->>Controller: getAllMaterialGoodsReceipts(req, res)
-        Controller->>Controller: getDataTablePaging(req.query) — filtros, búsqueda y orden de compras
-        Controller->>Facade: findAllMaterialGoodsReceipts(query)
-        Facade->>Core: findAllGoodsReceipts({ ...options, type: MATERIAL })
-        Core->>Helpers: buildGoodsReceiptContextWhere(type)
-        Helpers-->>Core: buildGoodsReceiptContextWhere(): Object
-        Core->>Prisma: goodsReceipt.findMany({ where, skip, take, orderBy, select })
-        Prisma-->>Core: findMany(): Promise[GoodsReceipt[]]
-        Core->>Prisma: goodsReceipt.count({ where: contextWhere })
-        Prisma-->>Core: count(): Promise[number] — total
-        opt Hay filtros adicionales
-            Core->>Prisma: goodsReceipt.count({ where })
-            Prisma-->>Core: count(): Promise[number] — filtered
-        end
-        Core-->>Facade: findAllGoodsReceipts(): Promise[{ data, recordsTotal, recordsFiltered }]
-        Facade-->>Controller: findAllMaterialGoodsReceipts(): Promise[{ data, recordsTotal, recordsFiltered }]
-        Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: getAllMaterialGoodsReceipts(req, res)
+    Controller->>Controller: getDataTablePaging(req.query) — filtros, búsqueda y orden de compras
+    Controller->>Facade: findAllMaterialGoodsReceipts(query)
+    Facade->>Core: findAllGoodsReceipts({ ...options, type: MATERIAL })
+    Core->>Helpers: buildGoodsReceiptContextWhere(type)
+    Helpers-->>Core: buildGoodsReceiptContextWhere(): Object
+    Core->>Prisma: goodsReceipt.findMany({ where, skip, take, orderBy, select })
+    Prisma-->>Core: findMany(): Promise[GoodsReceipt[]]
+    Core->>Prisma: goodsReceipt.count({ where: contextWhere })
+    Prisma-->>Core: count(): Promise[number] — total
+    opt Hay filtros adicionales
+        Core->>Prisma: goodsReceipt.count({ where })
+        Prisma-->>Core: count(): Promise[number] — filtered
+    end
+    Core-->>Facade: findAllGoodsReceipts(): Promise[{ data, recordsTotal, recordsFiltered }]
+    Facade-->>Controller: findAllMaterialGoodsReceipts(): Promise[{ data, recordsTotal, recordsFiltered }]
+    Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
 ```

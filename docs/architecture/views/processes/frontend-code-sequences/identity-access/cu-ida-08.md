@@ -21,17 +21,20 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         View->>Application: editUserPassword({ id, formData })
-        Application->>Request: editUserPasswordRequest({ id, formData })
         activate Application
+        Application->>Request: editUserPasswordRequest({ id, formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: envía PATCH /api/admin/users/:id/password
-        Transport-->>HTTP: HTTP 2xx { code, data }
-        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-        Request-->>Application: editUserPasswordRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa
+            Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+            Request-->>Application: editUserPasswordRequest(): Promise[AxiosResponse]
             Application-->>View: editUserPassword(): Promise[{ message: string }]
-            View-->>Browser: DOM o DataTable actualizado con response.data
+            View-->>Browser: handleSubmit(): confirmar, cerrar modal y recargar listado
         else Respuesta rechazada
+            Transport-->>HTTP: HTTP de error — respuesta del endpoint
+            HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
             Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>Browser: formulario o filtros conservados, mensaje visible
         end

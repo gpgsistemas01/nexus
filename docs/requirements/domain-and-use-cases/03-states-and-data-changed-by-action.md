@@ -22,15 +22,18 @@ stateDiagram-v2
     state "Cancelado" as Cancelada
     [*] --> Pendiente: crear [datos válidos] / guardar sin descontar stock
     Pendiente --> Pendiente: editar [campos admitidos] / actualizar documento
-    Pendiente --> Parcial: surtir [cantidad parcial y stock suficiente] / recalcular cumplimiento
-    Pendiente --> Surtida: surtir [todos los detalles completos] / recalcular cumplimiento
-    Parcial --> Parcial: surtir [quedan cantidades pendientes] / recalcular cumplimiento
-    Parcial --> Surtida: surtir [todos los detalles completos] / recalcular cumplimiento
-    Surtida --> Surtida: devolver [cantidad parcial] / revertir stock y movimiento
-    Surtida --> Cancelada: devolver [todos los detalles cancelados] / recalcular cumplimiento
-    Parcial --> Cancelada: devolver [todos los detalles cancelados] / recalcular cumplimiento
+    Pendiente --> Parcial: surtir [algunos detalles surtidos y stock suficiente] / recalcular cumplimiento
+    Pendiente --> Surtida: surtir [todos los detalles surtidos] / recalcular cumplimiento
+    Parcial --> Parcial: surtir [quedan detalles pendientes] / recalcular cumplimiento
+    Parcial --> Surtida: surtir [todos los detalles surtidos] / recalcular cumplimiento
+    Surtida --> Surtida: devolver [no todos los detalles están devueltos íntegramente] / registrar devolución y reponer stock
+    Surtida --> Cancelada: devolver [todos los detalles devueltos íntegramente] / recalcular cumplimiento
     Cancelada --> [*]
 ```
+
+Sólo se devuelve desde el cumplimiento `Surtido`; una salida `Surtido parcial` no
+puede iniciar la devolución. El cumplimiento parcial del encabezado expresa que
+algunos detalles están surtidos y otros pendientes, no un modo de formulario.
 
 `Parcial` es la etiqueta abreviada de cumplimiento `Surtido parcial` y `Surtida` representa
 el cumplimiento persistido `Surtido`. La devolución es una operación, no un estado ni un
@@ -39,3 +42,9 @@ devolver todo lo surtido deriva `Cancelado` para ese detalle. Sólo cuando todos
 resultan cancelados se derivan cumplimiento `Cancelado` y estado documental `Cancelada`
 para el encabezado. Esta aclaración evita interpretar el diagrama como un catálogo adicional
 de estados o como una acción independiente de cancelación.
+
+El final indica que terminó el ciclo de surtimiento y devolución; el documento cancelado
+y su historial permanecen disponibles para consulta.
+
+Si la autorización, las cantidades o el stock provocan un rechazo, la operación no
+confirma cambios y el documento conserva su cumplimiento anterior.

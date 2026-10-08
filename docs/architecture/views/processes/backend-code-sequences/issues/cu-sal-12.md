@@ -22,42 +22,43 @@ sequenceDiagram
 
     Client->>Router: PATCH /api/warehouse/waste-issues/:id/details + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: wasteIssueDetailsValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else wasteIssueDetailsValidation rechaza req.body/req.params
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
+    Router->>Validator: wasteIssueDetailsValidation[] y validate(req, res, next)
+    break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTE_ISSUES_SUPPLY denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Router->>Controller: editWasteIssueDetails(req, res)
-        Controller->>IssueDto: createWasteIssueDetailsDtoForEdit(req.body)
-        IssueDto-->>Controller: createWasteIssueDetailsDtoForEdit(): Object (wasteIssueDto)
-        Controller->>Service: updateWasteIssueDetails({ id, wasteIssueDto: sanitizedWasteIssueDto })
-        Service->>Prisma: updateWasteIssueDetailsTransaction({ id, wasteIssueDto }) abre getDb().$transaction()
-        Service->>Service: updateWasteIssueDetailsTransaction() valida estado, ids y snapshots
-        Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
-        loop Cada detalle nuevo con isSupplied
-            Service->>Rules: resolveIssueDetailFulfillmentStatus(detail)
-            Service->>Prisma: tx.wasteIssueDetail.update({ where, data })
-            Service->>Service: supplyDetails.push({ wasteIssueDetailId, quantity })
-        end
-        Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId }, movementType: ISSUE, details })
-        Movement->>Stock: applyWasteStockChange({ tx, id: wasteId, quantityChange, convertedQuantityChange })
-        Movement->>Prisma: createWasteMovement({ tx, reference, movementType: ISSUE, details })
-        Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
-        Service->>Rules: resolveIssueFulfillmentStatus(details)
-        Service->>Prisma: tx.wasteIssue.update({ where, data })
-        alt Commit confirmado
-            Service-->>Controller: updateWasteIssueDetails(): Promise[WasteIssue]
-            Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' })
-            Controller-->>Client: 200 { wasteIssue, code }
-        else Stock insuficiente, estado inválido o error Prisma
-            Prisma-->>Service: error de dominio o persistencia
-            Service-->>Controller: error tipado y rollback
-            Controller-->>Client: status HTTP { code, message }
-        end
+    end
+    Router->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_SUPPLY)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Router->>Controller: editWasteIssueDetails(req, res)
+    Controller->>IssueDto: createWasteIssueDetailsDtoForEdit(req.body)
+    IssueDto-->>Controller: createWasteIssueDetailsDtoForEdit(): Object (wasteIssueDto)
+    Controller->>Service: updateWasteIssueDetails({ id, wasteIssueDto: sanitizedWasteIssueDto })
+    Service->>Prisma: updateWasteIssueDetailsTransaction({ id, wasteIssueDto }) abre getDb().$transaction()
+    Service->>Service: updateWasteIssueDetailsTransaction() valida estado, ids y snapshots
+    Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
+    loop Cada detalle nuevo con isSupplied
+        Service->>Rules: resolveIssueDetailFulfillmentStatus(detail)
+        Service->>Prisma: tx.wasteIssueDetail.update({ where, data })
+        Service->>Service: supplyDetails.push({ wasteIssueDetailId, quantity })
+    end
+    Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId }, movementType: ISSUE, details })
+    Movement->>Stock: applyWasteStockChange({ tx, id: wasteId, quantityChange, convertedQuantityChange })
+    Movement->>Prisma: createWasteMovement({ tx, reference, movementType: ISSUE, details })
+    Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
+    Service->>Rules: resolveIssueFulfillmentStatus(details)
+    Service->>Prisma: tx.wasteIssue.update({ where, data })
+    alt Commit confirmado
+        Service-->>Controller: updateWasteIssueDetails(): Promise[WasteIssue]
+        Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-issue-supplied' })
+        Controller-->>Client: 200 { wasteIssue, code }
+    else Stock insuficiente, estado inválido o error Prisma
+        Prisma-->>Service: error de dominio o persistencia
+        Service-->>Controller: error tipado y rollback
+        Controller-->>Client: status HTTP { code, message }
     end
 ```
 

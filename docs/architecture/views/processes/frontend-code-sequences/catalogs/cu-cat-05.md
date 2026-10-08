@@ -17,17 +17,20 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-05 — Consultar clientes
     Browser->>View: clientsPage.ejs y clientsPage.js cargan clientes
     View->>Application: getAllClients({ params })
-    Application->>Request: getAllClientsRequest({ params })
     activate Application
+    Application->>Request: getAllClientsRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/sales/clients
-    Transport-->>HTTP: HTTP 2xx { code, data }
-    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
-    Request-->>Application: getAllClientsRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa
+        Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+        Request-->>Application: getAllClientsRequest(): Promise[AxiosResponse]
         Application-->>View: getAllClients(): Promise[AxiosResponse]
         View-->>Browser: DOM o DataTable actualizado con response.data
     else Respuesta rechazada
+        Transport-->>HTTP: HTTP de error — respuesta del endpoint
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
+        Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
         Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
         View-->>Browser: formulario o filtros conservados, mensaje visible
     end

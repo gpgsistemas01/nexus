@@ -23,40 +23,47 @@ sequenceDiagram
 
     Client->>Route: PATCH /api/warehouse/goods-issues/materials/:id/details
     Route->>Auth: verifyApiTokenRequired(req, res, next)
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
     Route->>Validator: goodsIssueDetailsValidation[] y validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
     Route->>Auth: authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE)(req, res, next)
-    alt Token, validación o permiso rechazados
-        Route-->>Client: HTTP 401, 400 o 403 — error de middleware
-    else Pipeline aceptado
-        Route->>Controller: editMaterialGoodsIssueDetails(req, res)
-        Controller->>DTO: createGoodsIssueDetailsDtoForEdit(req.body)
-        DTO-->>Controller: createGoodsIssueDetailsDtoForEdit(): Object — DTO normalizado
-        Controller->>Controller: sanitizeEmptyStrings(dto)
-        Controller->>Facade: updateMaterialGoodsIssueDetails(options con DTO, identificadores y actor cuando corresponde)
-        Facade->>Core: updateGoodsIssueDetails({ ...options, type: MATERIAL })
-        alt Servicio resuelto
-            Core->>Prisma: goodsIssue.findUnique({ where: { id, ...contextWhere }, include: detalles })
-            Core->>Core: updateGoodsIssueDetails() — calcular cantidades pendientes tras validar estado
-            critical getDb().$transaction(async tx => ...)
-                Core->>Prisma: tx.goodsIssue.findUnique({ where: { id, ...contextWhere }, select: { id: true } })
-                Core->>Fulfillment: findFulfillmentStatusIdsByName({ tx, names })
-                opt Hay cantidades pendientes por surtir
-                    Core->>Inventory: applyInventoryMovement({ tx, movementType: ISSUE, details })
-                end
-                Core->>Prisma: tx.goodsIssueDetail.update({ where: { id: detailId }, data: cantidades y cumplimiento })
-                Core->>Prisma: tx.goodsIssueDetail.findMany({ where: { goodsIssueId: id } })
-                Core->>Prisma: tx.goodsIssue.update({ where: { id, ...contextWhere }, data: cumplimiento })
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: editMaterialGoodsIssueDetails(req, res)
+    Controller->>DTO: createGoodsIssueDetailsDtoForEdit(req.body)
+    DTO-->>Controller: createGoodsIssueDetailsDtoForEdit(): Object — DTO normalizado
+    Controller->>Controller: sanitizeEmptyStrings(dto)
+    Controller->>Facade: updateMaterialGoodsIssueDetails(options con DTO, identificadores y actor cuando corresponde)
+    Facade->>Core: updateGoodsIssueDetails({ ...options, type: MATERIAL })
+    alt Servicio resuelto
+        Core->>Prisma: goodsIssue.findUnique({ where: { id, ...contextWhere }, include: detalles })
+        Core->>Core: updateGoodsIssueDetails() — calcular cantidades pendientes tras validar estado
+        Core->>Prisma: getDb().$transaction(async tx => ...)
+        rect rgb(245, 245, 245)
+            Note over Core,Prisma: getDb().$transaction(async tx => ...)
+            Core->>Prisma: tx.goodsIssue.findUnique({ where: { id, ...contextWhere }, select: { id: true } })
+            Core->>Fulfillment: findFulfillmentStatusIdsByName({ tx, names })
+            opt Hay cantidades pendientes por surtir
+                Core->>Inventory: applyInventoryMovement({ tx, movementType: ISSUE, details })
             end
-            Prisma-->>Core: commit de surtido
-            Core-->>Facade: updateGoodsIssueDetails(): Promise[GoodsIssue]
-            Facade-->>Controller: updateMaterialGoodsIssueDetails(): Promise[GoodsIssue]
-            Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-issue-supplied' })
-            Controller-->>Client: HTTP 200 { goodsIssue, code }
-        else Error de dominio o persistencia
-            Core-->>Facade: error — rollback si falló la transacción
-            Facade-->>Controller: error propagado
-            Controller->>ErrorHandler: next(error) — propagación de Express
-            ErrorHandler-->>Client: HTTP de error { code, message }
+            Core->>Prisma: tx.goodsIssueDetail.update({ where: { id: detailId }, data: cantidades y cumplimiento })
+            Core->>Prisma: tx.goodsIssueDetail.findMany({ where: { goodsIssueId: id } })
+            Core->>Prisma: tx.goodsIssue.update({ where: { id, ...contextWhere }, data: cumplimiento })
         end
+        Prisma-->>Core: commit de surtido
+        Core-->>Facade: updateGoodsIssueDetails(): Promise[GoodsIssue]
+        Facade-->>Controller: updateMaterialGoodsIssueDetails(): Promise[GoodsIssue]
+        Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-issue-supplied' })
+        Controller-->>Client: HTTP 200 { goodsIssue, code }
+    else Error de dominio o persistencia
+        Core-->>Facade: error — rollback si falló la transacción
+        Facade-->>Controller: error propagado
+        Controller->>ErrorHandler: next(error) — propagación de Express
+        ErrorHandler-->>Client: HTTP de error { code, message }
     end
 ```

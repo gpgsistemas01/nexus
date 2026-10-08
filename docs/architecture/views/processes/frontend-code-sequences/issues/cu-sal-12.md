@@ -25,8 +25,8 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra el error por detalle
     else Detalles de surtimiento válidos
         View->>Application: editWasteIssueDetails({ id, formData })
-        Application->>Request: editWasteIssueDetailsRequest({ id, data: formData })
         activate Application
+        Application->>Request: editWasteIssueDetailsRequest({ id, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: enviar PATCH /api/warehouse/waste-issues/:id/details
         Transport-->>HTTP: HTTP 200 { wasteIssue, code }
