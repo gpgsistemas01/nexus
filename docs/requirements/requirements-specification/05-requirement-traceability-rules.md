@@ -10,7 +10,7 @@ La evidencia técnica de un requisito se recorre sin mantener una matriz paralel
 muestra responsables y dependencias; las secuencias frontend/backend identificadas por
 `CU-*` explican cada realización; el mapa generado localiza rutas y exports; y el
 [catálogo de pruebas](../../testing/use-case-test-types.md) registra cobertura y brechas.
-Los identificadores compartidos conservan la relación bidireccional
+Los identificadores compartidos permiten revisar la relación bidireccional
 `requisito ↔ caso ↔ diseño ↔ código ↔ prueba`.
 
 No todo requisito debe crear un caso de uso independiente. Los requisitos de soporte
@@ -29,7 +29,7 @@ negocio que deciden sus variantes, rechazos o efectos. Una referencia no reempla
 paso observable; la ficha debe expresar también dónde valida Nexus la regla y qué
 resultado conserva cuando se incumple.
 
-Las reglas transversales siguientes no se repiten en las 79 fichas vigentes. Aplican por
+Las reglas transversales siguientes no se repiten en cada ficha vigente. Aplican por
 la naturaleza de la interacción y se revisan junto con sus precondiciones y excepciones:
 
 | Alcance de casos de uso | Requisitos y reglas aplicables |
@@ -37,7 +37,7 @@ la naturaleza de la interacción y se revisan junto con sus precondiciones y exc
 | Todo `CU-*` que accede a una operación protegida | `RN-001` y `RN-009`: sesión y permiso comprobados en el servidor antes de exponer datos o ejecutar el objetivo. `CU-AUT-01` es la excepción de entrada y valida credenciales conforme a `RF-AUT-001`; `CU-AUT-02` exige una sesión vigente. |
 | Todo `CU-*` que crea, edita, retira, ajusta, corrige, cancela, surte, devuelve o cambia credenciales | `RN-010`: validación de la entrada en el servidor antes de persistir. |
 | Toda escritura crítica configurada para auditoría | `RN-008`: registro del actor, acción, recurso, resultado y datos admitidos; la configuración de auditoría determina el alcance, no la mera presencia de un botón en la ficha. |
-| Altas, correcciones, cancelaciones, ajustes, surtimientos y devoluciones que generan movimientos | `RN-002`, `RN-011` y `RN-013` cuando cambian conjuntamente documento, detalle o stock: atomicidad, vínculo único con el origen y cantidad positiva. Cada ficha operativa agrega además las reglas específicas que cambian su recorrido. |
+| Altas, correcciones, cancelaciones, ajustes, surtimientos y devoluciones que generan movimientos | `RN-002`, `RN-011` y `RN-013` cuando cambian conjuntamente documento, detalle o stock: confirmación sin cambios parciales, vínculo único con el origen y condiciones de cantidad según la operación. Cada ficha operativa agrega además las reglas específicas que cambian su recorrido. |
 
 Los requisitos de soporte tampoco originan artificialmente otro caso de uso. Su relación
 con los objetivos vigentes se interpreta así:
@@ -58,3 +58,23 @@ Los requisitos de datos `RD-*` y de calidad `RC-*` se verifican sobre la soluci�
 evidencias técnicas; sólo se incorporan a una ficha si producen una decisión observable
 del recorrido. Esta separación evita convertir despliegue, pruebas, logging o estructura
 de persistencia en acciones ficticias del actor.
+
+## Cobertura y límites de evidencia
+
+Los IDs estables no prueban por sí solos una relación bidireccional completa. La revisión
+comprueba que cada ID enlazado exista una sola vez como definición y que el alcance de
+la ficha coincida con el requisito. Las reglas citadas por rangos se leen con todos sus
+identificadores intermedios.
+
+Las salidas de consumibles están implementadas y se rigen por `RF-ISS-001` a
+`RF-ISS-006`, con evidencia en las rutas y servicios específicos de consumibles.
+Las fichas `CU-SAL-01` a `CU-SAL-07` describen expresamente material; no se presentan
+como cobertura documental completa de consumibles ni se renombran sus IDs para otro
+contexto. Falta documentar explícitamente esa variante en los casos y sus realizaciones;
+esta brecha no convierte la capacidad implementada en una propuesta.
+
+`RF-CAT-004` y `RF-WST-001`, `RF-CAT-016` y `RF-MER-005`, y `RF-CAT-017` y
+`RF-MER-003` se comprueban como referencias a la misma consulta, garantía o edición,
+respectivamente. Mantener sus IDs históricos no exige nuevas operaciones. Todo requisito
+que todavía carezca de evidencia suficiente conserva su brecha o estado; no se supone
+que tenga una prueba sólo porque otro flujo reutilice el mismo servicio.

@@ -36,6 +36,7 @@ obligación.
 | Parcial | Existe parte del flujo, pero falta una operación, interfaz o evidencia relevante. |
 | Modelado | Existen entidades o piezas aisladas, pero no un flujo web/API registrado. |
 | Propuesto | Requiere decisión o implementación futura; no debe anunciarse como disponible. |
+| Fuera del alcance actual | Capacidad excluida del producto vigente, conservada como referencia histórica de alcance; no se ofrece ni se verifica como capacidad disponible. |
 
 El estado describe la evidencia del repositorio, no la aprobación del producto por un
 usuario responsable. Esa aprobación debe registrarse en la historia o incidencia que
@@ -53,3 +54,19 @@ contrato funcional de las operaciones. La composición técnica se consulta en e
 [diagrama de componentes](../../architecture/views/logical/01-components-and-reuse.md),
 los métodos y rutas en [OpenAPI](../../architecture/openapi/openapi.json) y la
 autorización efectiva en la política del servidor.
+
+### 2.4 Condiciones y comprobación
+
+La obligación y sus criterios expresan resultados del negocio. Los nombres de rutas,
+modelos, campos y herramientas se conservan en la evidencia, salvo que constituyan una
+restricción técnica explícita de datos, seguridad u operación. No se eliminan esas
+restricciones de `RD-*` o `RC-*` para hacerlas parecer funciones de un actor.
+
+Cada criterio `CA-<ID>-<n>` pertenece al requisito indicado y conserva numeración local.
+Las condiciones transversales se enlazan mediante `RN-*`, sin copiar su definición.
+Una operación rechazada conserva los datos e inventario anteriores y no deja cambios
+parciales; una consulta o reporte no modifica los datos consultados.
+
+Los IDs son referencias estables, no pasos de un flujo. El orden de interacción se lee
+en las fichas de casos de uso; corregir redacción o alcance no renumera requisitos ni
+asigna un ID existente a una capacidad distinta.

@@ -11,7 +11,7 @@ mostrar el alcance y los rangos que deben revisarse juntos.
 | Autenticación | `RF-AUT-001` a `RF-AUT-003` | Iniciar, renovar y cerrar sesión como obligaciones independientes. |
 | Identidades y acceso | `RF-IAM-001` a `RF-IAM-008` | Consultar, crear y actualizar usuarios o personas, cambiar contraseña y consultar catálogos de acceso. |
 | Catálogos | `RF-CAT-001` a `RF-CAT-029` | Consultar, crear, actualizar, retirar o ajustar materiales, consumibles, mermas y catálogos auxiliares según su política. |
-| Entradas | `RF-REC-001` a `RF-REC-008` | Consultar, registrar, editar, corregir y cancelar entradas o detalles. |
+| Entradas | `RF-REC-001` a `RF-REC-011` | Consultar, registrar, editar, corregir y cancelar entradas o detalles. |
 | Salidas de material y consumible | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, editar detalles, surtir y devolver. |
 | Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-010` | Operar inventario y salidas de merma conservando datos históricos, reglas dimensionales y el alta trazable de existencia. |
 | Ajustes | `RF-ADJ-001`, `RF-ADJ-002` | Registrar y aplicar inmediatamente ajustes autorizados de materiales, consumibles o mermas con movimiento y trazabilidad. |
