@@ -20,8 +20,11 @@ La vista se divide en bloques por grupo funcional para mantenerla legible. Estos
 no son paquetes UML ni paquetes documentales: el único límite de sistema es Nexus. Cada
 bloque conserva los actores fuera del sistema y presenta los casos de su grupo
 propietario. Compras y Salidas incluyen referencias a casos de otros grupos cuando
-intervienen como extensiones; la repetición del identificador no crea otro caso. Las asociaciones con las consultas
-se muestran para el actor autorizado; las operaciones se despliegan desde la consulta.
+intervienen como extensiones; la repetición del identificador no crea otro caso.
+Cada óvalo conserva únicamente el identificador y el nombre normativo del objetivo.
+El grupo propietario y la condición de referencia se explican en el texto y en la
+tabla de extensiones, sin añadir esas aclaraciones a la etiqueta del caso.
+Las asociaciones con las consultas se muestran para el actor autorizado; las operaciones se despliegan desde la consulta.
 Se conservan los enlaces directos que distinguen casos exclusivos del administrador
 o altas desde selectores. El administrador hereda las asociaciones de Almacén mediante
 generalización, sin duplicarlas.
@@ -31,13 +34,13 @@ La separación en vistas es una decisión de legibilidad, no una exigencia de UM
 relaciones se muestran junto al caso base y no en una vista independiente que obligue a
 reconstruirlas entre diagramas. La jerarquía de autenticación enlaza Personal de almacén con Usuario registrado y
 Administrador del sistema con Personal de almacén. La generalización operativa se
-repite en las vistas de capacidades compartidas. En esas figuras, sólo el actor general
-se asocia con los casos; el especializado participa por herencia y no repite enlaces.
-Las vistas de Materiales, Mermas, Consumibles, Proveedores y Clientes también muestran
-casos exclusivos del administrador: conservan las asociaciones particulares de sus
-fichas sin repetir la generalización en la misma figura. La jerarquía de Autenticación
-sigue definiendo la herencia entre estos actores. La generalización no lleva palabra
-adicional, sólo el triángulo hueco hacia el actor general.
+repite en las figuras que muestran ambos actores. Las asociaciones compartidas se
+muestran sólo en el actor general: el administrador las hereda sin repetirlas y puede
+además asociarse con sus casos exclusivos. Así, Personal de almacén participa en la
+consulta, mientras el administrador hereda esa participación y se asocia directamente
+con Ajustar existencia. No hay un enlace desde la consulta compartida hacia el ajuste.
+La generalización no lleva palabra adicional, sólo el triángulo hueco hacia el actor
+general.
 
 Se conservan seis grupos funcionales propietarios porque representan capacidades estables del
 negocio: autenticación, identidad y acceso, almacén, catálogos, compras de materiales y consumibles y
@@ -130,6 +133,7 @@ usecase-beta
 direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    admin --|> warehouse
 
     systemBoundary warehousePackage1["Nexus · Materiales"]
         ucMaterialQuery("CU-ALM-01 Consultar materiales")
@@ -138,23 +142,36 @@ direction LR
         ucMaterialRemove("CU-ALM-04 Retirar material")
         ucMaterialStock("CU-ALM-05 Ajustar existencia de material")
         ucMaterialInventoryReport("CU-ALM-06 Generar reporte de inventario de materiales")
-        ucMaterialMovements("CU-ALM-07 Consultar movimientos de materiales")
-        ucMaterialMovementReport("CU-ALM-08 Generar reporte de movimientos de materiales")
     end
 
     warehouse -- ucMaterialQuery
     warehouse -- ucMaterialCreate
     admin -- ucMaterialStock
-    admin -- ucMaterialMovements
-    admin -- ucMaterialMovementReport
 
     ucMaterialQuery -- ucMaterialCreate
     ucMaterialQuery -- ucMaterialEdit
     ucMaterialQuery -- ucMaterialRemove
     ucMaterialQuery -- ucMaterialInventoryReport
-    ucMaterialQuery -- ucMaterialMovements
+```
+
+#### Movimientos de materiales
+
+La consulta de movimientos es independiente de la consulta de materiales. Sólo el
+Administrador del sistema del área Sistemas accede a ella; su reporte parte de esta
+consulta de movimientos.
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary materialMovementsPackage["Nexus · Movimientos de materiales"]
+        ucMaterialMovements("CU-ALM-07 Consultar movimientos de materiales")
+        ucMaterialMovementReport("CU-ALM-08 Generar reporte de movimientos de materiales")
+    end
+
+    admin -- ucMaterialMovements
     ucMaterialMovements -- ucMaterialMovementReport
-    ucMaterialQuery -- ucMaterialStock
 ```
 
 #### Mermas
@@ -164,6 +181,7 @@ usecase-beta
 direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    admin --|> warehouse
 
     systemBoundary warehousePackage2["Nexus · Mermas"]
         ucWasteQuery("CU-ALM-09 Consultar mermas")
@@ -172,22 +190,35 @@ direction LR
         ucWasteStock("CU-ALM-12 Ajustar existencia de merma")
         ucWasteAddStock("CU-ALM-13 Agregar existencia de merma")
         ucWasteReport("CU-ALM-14 Generar reporte de mermas")
-        ucWasteMovements("CU-ALM-15 Consultar movimientos de mermas")
-        ucWasteMovementReport("CU-ALM-16 Generar reporte de movimientos de mermas")
     end
 
     warehouse -- ucWasteQuery
     admin -- ucWasteStock
-    admin -- ucWasteMovements
-    admin -- ucWasteMovementReport
 
     ucWasteQuery -- ucWasteCreate
     ucWasteQuery -- ucWasteEdit
     ucWasteQuery -- ucWasteAddStock
     ucWasteQuery -- ucWasteReport
-    ucWasteQuery -- ucWasteMovements
+```
+
+#### Movimientos de mermas
+
+La consulta de movimientos es independiente de la consulta de mermas. Sólo el
+Administrador del sistema del área Sistemas accede a ella; su reporte parte de esta
+consulta de movimientos.
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary wasteMovementsPackage["Nexus · Movimientos de mermas"]
+        ucWasteMovements("CU-ALM-15 Consultar movimientos de mermas")
+        ucWasteMovementReport("CU-ALM-16 Generar reporte de movimientos de mermas")
+    end
+
+    admin -- ucWasteMovements
     ucWasteMovements -- ucWasteMovementReport
-    ucWasteQuery -- ucWasteStock
 ```
 
 #### Consumibles
@@ -197,6 +228,7 @@ usecase-beta
 direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    admin --|> warehouse
 
     systemBoundary warehousePackage3["Nexus · Consumibles"]
         ucConsumableQuery("CU-ALM-17 Consultar consumibles")
@@ -215,7 +247,6 @@ direction LR
     ucConsumableQuery -- ucConsumableEdit
     ucConsumableQuery -- ucConsumableRemove
     ucConsumableQuery -- ucConsumableReport
-    ucConsumableQuery -- ucConsumableStock
 ```
 
 El grupo de **Almacén** concentra los casos operativos de material, consumible y merma porque comparten
@@ -233,6 +264,7 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
     actor warehouse("Personal de almacén")
+    admin --|> warehouse
 
     systemBoundary catalogPackage1["Nexus · Proveedores"]
         ucSupplierQuery("CU-CAT-01 Consultar proveedores")
@@ -256,6 +288,7 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
     actor warehouse("Personal de almacén")
+    admin --|> warehouse
 
     systemBoundary catalogPackage2["Nexus · Clientes"]
         ucClientQuery("CU-CAT-05 Consultar clientes")
@@ -410,8 +443,8 @@ direction LR
         ucReceiptCorrect("CU-ENT-04 Corregir material de una compra")
         ucReceiptCancel("CU-ENT-05 Cancelar material de una compra")
         ucPurchaseReport("CU-ENT-06 Generar reporte de compras de material")
-        supplierExtension("CU-CAT-02 Crear proveedor · referencia a CAT")
-        materialExtension("CU-ALM-02 Crear material · referencia a ALM")
+        supplierExtension("CU-CAT-02 Crear proveedor")
+        materialExtension("CU-ALM-02 Crear material")
     end
 
     supplierExtension ..>:extend ucReceiptCreate
@@ -444,8 +477,8 @@ direction LR
         ucConsumableReceiptCorrect("CU-ENT-10 Corregir consumible de una compra")
         ucConsumableReceiptCancel("CU-ENT-11 Cancelar consumible de una compra")
         ucConsumablePurchaseReport("CU-ENT-12 Generar reporte de compras de consumible")
-        supplierExtension("CU-CAT-02 Crear proveedor · referencia a CAT")
-        consumableExtension("CU-ALM-18 Crear consumible · referencia a ALM")
+        supplierExtension("CU-CAT-02 Crear proveedor")
+        consumableExtension("CU-ALM-18 Crear consumible")
     end
 
     supplierExtension ..>:extend ucConsumableReceiptCreate
@@ -484,7 +517,7 @@ direction LR
         ucMaterialSupply("CU-SAL-05 Surtir material")
         ucMaterialReturn("CU-SAL-06 Devolver material surtido")
         ucMaterialIssueReport("CU-SAL-07 Generar reporte de salidas de material")
-        clientExtension("CU-CAT-06 Crear cliente · referencia a CAT")
+        clientExtension("CU-CAT-06 Crear cliente")
     end
 
     clientExtension ..>:extend ucMaterialIssueCreate
@@ -612,10 +645,15 @@ sus operaciones mediante enlaces sin texto, sin repetir el enlace del actor a ca
 operación. El administrador hereda las asociaciones de Almacén. Cuando una ficha
 define una participación particular, se conserva la asociación directa correspondiente:
 
-- Los ajustes de existencia y las consultas y reportes de movimientos exclusivos del
-  administrador (`CU-ALM-05`, `CU-ALM-07`, `CU-ALM-08`, `CU-ALM-12`, `CU-ALM-15`,
-  `CU-ALM-16` y `CU-ALM-21`) mantienen su enlace para distinguirlos de las operaciones
-  compartidas con Almacén.
+- Los ajustes de existencia exclusivos del administrador (`CU-ALM-05`, `CU-ALM-12`
+  y `CU-ALM-21`) mantienen su enlace para distinguirlos de las operaciones compartidas
+  con Almacén. No se enlazan desde la consulta compartida, para no atribuir el ajuste
+  al Personal de almacén. Abrir el ajuste desde esa pantalla es el disparador descrito
+  en la ficha; sólo el administrador autorizado puede ejecutarlo.
+- Las consultas de movimientos (`CU-ALM-07` y `CU-ALM-15`) se muestran en figuras
+  independientes, asociadas sólo con el administrador y sin enlaces desde las consultas
+  de materiales o mermas. Sus reportes (`CU-ALM-08` y `CU-ALM-16`) parten únicamente de
+  la consulta de movimientos correspondiente.
 - Las altas de proveedores, clientes, materiales y consumibles desde selectores
   (`CU-CAT-02`, `CU-CAT-06`, `CU-ALM-02` y `CU-ALM-18`) conservan su participación
   directa y las referencias de extensión en Compras y Salidas.

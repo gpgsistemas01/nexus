@@ -164,7 +164,11 @@ const validateUseCaseDiagramCoverage = async () => {
         }
         const actors = new Set([...diagram.matchAll(/^\s*actor\s+(\w+)\(/gm)].map(match => match[1]));
         const cases = [...diagram.matchAll(/^\s*(\w+)\("(CU-[A-Z]+-\d+) (.+)"\)/gm)];
-        diagramCaseIds.push(...cases.filter(([, , , title]) => !title.includes(' · referencia a '))
+        // Los casos que extienden otro objetivo se definen en su grupo propietario;
+        // aquí se reconocen por la relación, sin añadir metadatos a su nombre visible.
+        const extensionAliases = new Set([...diagram.matchAll(/^\s*(\w+) \.\.>:extend \w+$/gm)]
+            .map(([, alias]) => alias));
+        diagramCaseIds.push(...cases.filter(([, alias]) => !extensionAliases.has(alias))
             .map(([, , id]) => id));
         const caseAliases = new Set(cases.map(([, alias]) => alias));
         const queryAliases = new Set(cases.filter(([, , , title]) => title.startsWith('Consultar '))
@@ -182,9 +186,6 @@ const validateUseCaseDiagramCoverage = async () => {
             if (!actors.has(specialized) || !actors.has(general) || specialized === general) {
                 failures.push(`casos de uso: generalización ${specialized} --|> ${general} entre actores inválidos`);
             }
-            if (associations.some(([from]) => from === specialized)) {
-                failures.push(`casos de uso: ${specialized} debe heredar las asociaciones de ${general} sin enlaces propios en esta figura`);
-            }
         }
         // Los enlaces desde Consulta organizan operaciones; no conceden permisos.
         // La participación normativa se comprueba desde el actor de cada ficha.
@@ -200,15 +201,24 @@ const validateUseCaseDiagramCoverage = async () => {
             }
             return [actor, reachable];
         }));
+        for (const [specialized, general] of generalizations) {
+            for (const [from, to] of associations) {
+                if (from === specialized && reachableByActor.get(general)?.has(to)) {
+                    failures.push(`casos de uso: ${specialized} repite el enlace a ${to} que ya hereda de ${general}`);
+                }
+            }
+        }
         for (const [, alias, id, title] of cases) {
-            const normalizedTitle = title.replace(/ · referencia a (?:CAT|ALM)$/, '');
-            if (normalizedTitle !== expectedTitles.get(id)) {
+            if (title !== expectedTitles.get(id)) {
                 failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
             }
             const actor = expectedActors.get(id) === 'Usuario registrado' ? 'user'
                 : expectedActors.get(id) === 'Personal de almacén' ? 'warehouse' : 'admin';
             if (!reachableByActor.get(actor)?.has(alias)) {
                 failures.push(`casos de uso: ${id} no se asocia con su actor normativo directamente, por herencia o desde Consulta`);
+            }
+            if (actor === 'admin' && reachableByActor.get('warehouse')?.has(alias)) {
+                failures.push(`casos de uso: ${id} es exclusivo del administrador y no debe enlazarse desde Personal de almacén ni sus consultas`);
             }
         }
     }
