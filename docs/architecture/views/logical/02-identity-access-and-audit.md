@@ -1,144 +1,67 @@
 # 2. Identidad, acceso y auditoría
 
-Este documento contiene una **decisión de diseño de acceso**, no la definición de los
-requisitos ni el inventario de tablas. El recorrido hacia requisitos, modelo y evidencia
-se mantiene en el [modelo persistente](data-and-persistence/index.md).
+Esta vista separa identidad de negocio, autorización y registro de escrituras.
+Las tablas se detallan en el [modelo persistente](data-and-persistence/index.md).
 
-## Decisión
+## Identidades y asignaciones
 
-- `User` es la cuenta autenticada y el actor de seguridad/auditoría.
-- `Person` representa a la persona que participa en el negocio: solicitante,
-  aprobador, receptor, asesor, etcétera.
-- No se debe agregar `userId` a todas las tablas. Las operaciones críticas deben
-  guardar al actor explícito o emitir un evento de auditoría transaccional.
-- No se necesita una cuenta PostgreSQL por cada usuario de Nexus. La aplicación usa
-  una cuenta técnica; la separación de cuentas de runtime/migración se describe en
-  [separación de cuentas PostgreSQL](../physical/02-postgresql-runtime-and-migration-roles.md).
+| Elemento | Responsabilidad |
+| --- | --- |
+| `User` | Cuenta autenticada y actor de seguridad o auditoría. |
+| `Person` | Participante del negocio: solicitante, receptor, asesor o aprobador. |
+| `UserRoleDepartment` | Asigna rol y departamento a una cuenta para autorizar acciones. |
+| `PersonRoleDepartment` | Clasifica a una persona para búsquedas y operaciones; no concede acceso a una cuenta. |
+| Cuenta PostgreSQL | Identidad de infraestructura compartida por la aplicación; no corresponde a cada usuario de Nexus. |
 
-## Modelo actual de acceso
+`User.personId` es opcional. Las cuentas humanas requieren una persona activa; las
+cuentas técnicas no requieren una persona ficticia. Una cuenta inactiva o sin
+asignaciones válidas no puede iniciar sesión, renovar ni superar la autorización.
+La relación cuenta–persona no es uno a uno: `personId` no tiene una restricción única.
 
-La base de datos guarda las asignaciones, no las definiciones de permisos:
+## Autorización
 
-- `UserRoleDepartment`: rol/departamento de una cuenta; se usa para autorización.
-- `PersonRoleDepartment`: clasificación de una persona para búsquedas y procesos del
-  negocio. Tiene un propósito diferente y no debe sincronizarse con el acceso de la
-  cuenta.
-- `PERMISSIONS` y `AUTHORIZATION_POLICIES`: acciones y combinaciones autorizadas,
-  versionadas en `src/constants/permissions.js`.
+`getLoggedUser` lee las asignaciones vigentes y deriva `permissions`, `scope` y
+`organization`. Las combinaciones autorizadas se definen en
+`src/constants/permissions.js`; los permisos derivados no se persisten. Cambiar una
+asignación afecta la siguiente petición autenticada; cambiar la matriz requiere
+actualizar el código.
 
-El flujo se mantiene simple y sin una consulta adicional de permisos:
+| Comprobación | Resultado ante rechazo |
+| --- | --- |
+| Token y cuenta válidos | La API devuelve `401 INVALID_AUTH`; web intenta renovar cuando falta un token válido. |
+| Permiso en una misma combinación rol/departamento | La API devuelve `403 FORBIDDEN`; la autorización web rechazada redirige a `/error/404`. |
+| Regla del recurso y alcance de datos | El servidor aplica los filtros y restricciones del caso; devuelve el error correspondiente sin conceder acceso adicional. |
 
-```text
-1. El administrador asigna rol + departamento en UserRoleDepartment.
-2. getLoggedUser lee esas asignaciones.
-3. La matriz deriva permissions; el backend calcula scope y contexto organizacional.
-4. Backend autoriza; frontend solo muestra u oculta controles.
-```
+El login y la renovación comprueban la cuenta y sus asignaciones. El detalle del
+acceso web se mantiene en la [vista de escenarios](../scenarios/web-navigation-and-screen-catalog/02-map-visual-of-navigation.md).
 
-El administrador asigna rol/departamento al usuario. El backend recalcula sus permisos
-al cargar la sesión; no copia ni persiste el arreglo derivado. Cambiar una asignación
-surte efecto en la siguiente carga autenticada. Cambiar la matriz requiere desplegar
-código. No hay tablas, caché, sincronización ni administración adicional de permisos.
+## Presentación y alcance
 
-Si el negocio necesita modificar la matriz desde la interfaz, habrá que añadir tablas
-`Permission`/`RolePermission`, migración, seed, UI administrativa, auditoría y
-protección contra retirar el último administrador. No es el comportamiento actual.
+El frontend usa `user.permissions` para el menú, acciones y columnas. No reconstruye
+la matriz a partir del rol o departamento. `inventory:costs-read` controla además la
+selección de costos en el servidor; ocultar una columna no protege por sí solo el dato.
 
-## Autenticación y errores
-
-Una petición protegida pasa por:
-
-1. Token válido y usuario activo con al menos un acceso. Si falla: `401 INVALID_AUTH`.
-2. Permiso requerido contra una misma combinación rol/departamento. Si falla:
-   `403 FORBIDDEN`.
-3. Regla del registro: departamento, propietario, estado y separación de funciones.
-   Según el caso debe responder `403`, `404` o un error de dominio.
-
-El login y la renovación rechazan usuarios inactivos o sin accesos. Los cambios de
-asignación se consultan nuevamente, por lo que no hay que esperar a que expire el
-access token para bloquear las rutas.
-
-Para cuentas humanas, `Person.isActive` también condiciona el acceso: una cuenta
-asociada a una persona inactiva no puede iniciar sesión, renovar su sesión ni superar
-la autorización de una petición. Las cuentas técnicas se representan con
-`User.personId = null`; no requieren una persona ficticia y dependen de
-`User.isActive` y de sus asignaciones. No se permite crear ni actualizar una cuenta
-para asociarla a una persona inactiva.
-
-No existen excepciones globales de lectura por método HTTP, rol o departamento. Cada
-recurso de lectura debe declarar en `AUTHORIZATION_POLICIES` las combinaciones que lo
-pueden consultar, incluidas las de Director o Dirección cuando correspondan.
-
-## Frontend
-
-El backend entrega `user.permissions`, `user.scope` y `user.organization` en las vistas y mediante
-`GET /api/auth/me`. Para mostrar acciones nuevas, el frontend debe usar:
-
-```js
-editButton.hidden = !window.meta.permissions?.includes('materials:write');
-```
-
-El menú principal y las acciones de personas, materiales, consumibles y mermas ya usan capacidades
-derivadas. `scope` se reserva para el alcance de datos (`departmentIds`, `canReadAll`);
-para columnas o flujo, el frontend consume permisos calculados por el backend. En
-particular, `inventory:costs-read` controla las columnas de costo de materiales,
-consumibles y mermas; las consultas de Prisma sólo seleccionan esos campos cuando el permiso está
-concedido, por lo que un asesor de ventas no puede recuperarlos inspeccionando la
-respuesta HTTP.
-`user.organization` queda disponible como contexto informativo. El navegador ya no
-interpreta directamente la relación rol/área.
-
-`scope` solo es necesario cuando un permiso no implica acceso a todos los registros.
-Por ejemplo, `goods-issues:read` puede permitir leer únicamente el departamento del
-usuario. En ese caso el backend debe aplicar `scope.departmentIds` en el `where` de
-Prisma; enviarlo al frontend no aplica seguridad. Para acciones verdaderamente
-globales basta el permiso y no se necesita una condición adicional de scope.
-
-Rol y departamento siguen siendo útiles para etiquetas, filtros y contexto. No deben
-usarse para volver a construir en el navegador la matriz de una acción.
-
-Por tanto, el frontend no debe validar de nuevo la relación rol/área cuando ya consulta
-`user.permissions`. La relación sigue siendo necesaria en backend porque es la
-fuente persistida con la que se calculan esos permisos y porque puede definir el alcance
-de los datos; no es una segunda condición que el botón deba repetir.
-
-Los permisos del frontend solo mejoran la experiencia de usuario. Modificar
-`window.meta`, mostrar un botón oculto o llamar directamente a la API no concede
-acceso: el middleware del backend vuelve a autorizar cada petición.
-
-Las rutas que renderizan componentes asociados a permisos amplios como
-`GOODS_ISSUES_MANAGE` exigen esa capacidad completa. Si el negocio necesita distinguir
-entre crear, editar, aprobar o devolver, primero debe dividirse el permiso en la matriz
-del backend y luego asignar cada nueva capacidad al botón correspondiente.
+`scope` delimita registros cuando la operación lo requiere; el servidor debe aplicarlo
+en sus consultas. `organization` es contexto informativo. Mostrar un botón, modificar
+los metadatos del navegador o llamar directamente a la API no sustituye la autorización.
 
 ## Auditoría de escrituras
 
-`createdAt` y `updatedAt` indican cuándo cambió una fila, pero no quién la cambió ni los
-valores anteriores. Se recomienda:
+Los campos como `createdById` o `returnedById` identifican al usuario que ejecuta una
+operación; los participantes documentales referencian a `Person`. Las fechas de una
+fila no identifican por sí solas al actor ni sus valores anteriores.
 
-- Campos de actor `User` cuando forman parte del flujo (`createdById`, `approvedById`,
-  `returnedById`, etcétera).
-- `Person` para participantes documentales (`requesterId`, `receivedById`, etcétera).
-- Una tabla de auditoría inmutable para altas, ediciones, bajas lógicas y transiciones
-  relevantes, con `actorUserId`, acción, entidad, `before`, `after`, `requestId` y fecha.
-- No guardar contraseñas, cookies, tokens ni secretos en la auditoría.
+El middleware `auditWrites` registra en `CriticalWriteAudit` las escrituras API
+exitosas con actor identificado: acción, recurso, entidad cuando se conoce, petición,
+fecha y datos de entrada filtrados. Excluye campos sensibles como contraseñas y tokens.
+El registro ocurre después de terminar la respuesta, fuera de la transacción de negocio;
+un fallo de auditoría se registra en el log y no revierte la operación confirmada.
 
-Prioridad: inventario/ajustes, correcciones y cancelaciones, devoluciones, aprobación,
-usuarios/asignaciones y cambios de contraseña o estado.
+Quedan por completar la cobertura verificada por operación, los valores anterior y
+resultante y la retención de auditoría. También permanecen pendientes la revocación
+persistente de refresh tokens, el rate limiting de login/refresh, la protección CSRF y
+la autorización por objeto uniforme. Estas capacidades no se deducen de la existencia
+de una tabla o de un permiso.
 
-## Brechas pendientes
-
-| Prioridad | Pendiente |
-| --- | --- |
-| P0 | Persistir, rotar y revocar refresh tokens; hoy logout solo borra la cookie local. |
-| P0 | Activar rate limiting para login y refresh. |
-| P0 | Aplicar autorización por objeto de forma uniforme en filtros y transacciones Prisma. |
-| P1 | Completar la cobertura de `CriticalWriteAudit`: la tabla y varias escrituras críticas ya existen, pero usuarios, asignaciones y cambios de contraseña/estado aún requieren una matriz verificada de eventos, actor y valores anterior/resultante. |
-| P1 | Definir protección CSRF explícita para métodos mutables. |
-| P2 | Aprovisionar credenciales PostgreSQL distintas para runtime y migraciones. |
-| P2 | Documentar y automatizar la retención, respaldo, restauración y revisión de auditoría sin almacenar secretos. |
-
-El manejo actual es una base válida, pero el cierre de seguridad requiere priorizar
-sesiones refresh, rate limiting, alcance por objeto y cobertura completa de auditoría. La
-presencia del modelo `CriticalWriteAudit` no cierra por sí sola la brecha: su aceptación
-requiere pruebas por cada operación incluida en la matriz de escrituras críticas.
+La separación de credenciales de aplicación y migración se explica en la
+[vista física](../physical/02-postgresql-runtime-and-migration-roles.md).

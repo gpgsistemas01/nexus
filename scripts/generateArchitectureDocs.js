@@ -676,7 +676,7 @@ const renderEntity = (name, model) => [
 
 const renderDatabaseRelation = (source, relation) => {
     const { target, optional, unique, identifying, foreignKeys, references } = relation;
-    const mapping = foreignKeys.map((key, index) => `${key} = ${references[index]}`).join(', ');
+    const mapping = foreignKeys.map((key, index) => `${key} = ${target}.${references[index]}`).join(', ');
     return `    ${target} ${optional ? 'o|' : '||'}${identifying ? '--' : '..'}${unique ? 'o|' : 'o{'} ${source} : "${mapping}"`;
 };
 
@@ -753,12 +753,27 @@ const generateDatabaseSchema = async () => {
     ));
     const diagrams = DATABASE_AREAS.flatMap(([title, names]) => {
         const sections = [];
-        for (let offset = 0; offset < names.length; offset += 3) {
-            const subset = names.slice(offset, offset + 3);
+        const groups = [];
+        let subset = [];
+        let relationCount = 0;
+        for (const name of names) {
+            const count = models.get(name).relations.length;
+            if (subset.length && (subset.length === 3 || relationCount + count > 6)) {
+                groups.push(subset);
+                subset = [];
+                relationCount = 0;
+            }
+            subset.push(name);
+            relationCount += count;
+        }
+        if (subset.length) groups.push(subset);
+        for (const subset of groups) {
             const selected = new Set(subset);
-            const entities = subset.map((name) => renderEntity(name, models.get(name))).join('\n');
+            const entities = subset.map((name) => renderEntity(name, {
+                fields: models.get(name).fields.filter((field) => field.keys)
+            })).join('\n');
             const visibleRelations = allRelations
-                .filter(({ source, target }) => selected.has(source) || selected.has(target));
+                .filter(({ source }) => selected.has(source));
             const externalNames = [...new Set(visibleRelations.flatMap(({ source, target }) => [source, target]))]
                 .filter((name) => !selected.has(name));
             const externalEntities = externalNames.map((name) => {
@@ -767,7 +782,7 @@ const generateDatabaseSchema = async () => {
                     ...(relation.target === name ? relation.references : [])
                 ]));
                 const model = models.get(name);
-                return renderEntity(name, { fields: model.fields.filter((field) => keys.has(field.name)) });
+                return renderEntity(name, { fields: model.fields.filter((field) => keys.has(field.name) || field.keys.split(',').includes('PK')) });
             }).join('\n');
             const relations = visibleRelations.map(renderRelation);
             sections.push(`### ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${entities}\n${externalEntities}\n${relations.join('\n')}\n\`\`\``);
@@ -782,27 +797,21 @@ const generateDatabaseSchema = async () => {
     return `<!-- Archivo generado por scripts/generateArchitectureDocs.js. No editar manualmente. -->
 # Diagramas de la base de datos
 
-Estos diagramas representan el modelo relacional persistente con notación ER de pata
-de cuervo. Se generan desde los modelos y relaciones de
-\`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
-GitHub. Los atributos se distribuyen en figuras de hasta tres modelos. Cada figura
-incluye sus relaciones entrantes y salientes; los modelos externos muestran sólo las
-claves que intervienen en esas conexiones y conservan sus atributos completos en su
-figura propietaria. Cada conexión expresa FK = clave referenciada entre los modelos de sus extremos; la
-tabla final detalla los nombres completos. Los nombres de
-relación del ORM no son columnas adicionales. Todas las correspondencias de claves se
-reúnen en una tabla final para evitar otra colección de diagramas sin atributos.
+Estos diagramas ER de pata de cuervo se generan desde \`prisma/schema.prisma\`.
+Cada figura muestra las claves de hasta tres modelos y sus relaciones salientes.
+Cada FK aparece una vez, en la figura de su tabla dependiente; la tabla final permite
+consultar también las relaciones entrantes. Los modelos referenciados conservan su
+PK completa y las columnas utilizadas en esas conexiones. El [diccionario](data-dictionary.md) contiene
+los demás atributos, tipos y valores predeterminados.
 
-La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
-únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
-verdad el esquema Prisma y sus migraciones. Para consultar obligatoriedad, valores
-predeterminados y tipos de cada campo, usa el
-[diccionario técnico](data-dictionary.md).
+Las líneas unen tablas, no filas de atributos. La etiqueta identifica
+\`FK = TablaReferenciada.clave\`; la tabla final muestra ambos nombres completos.
+\`PK\` es clave primaria, \`FK\` clave foránea y \`UK\` unicidad individual. Las claves
+compuestas y demás restricciones se comprueban en Prisma y sus migraciones.
 
-Las cardinalidades distinguen relaciones uno a muchos de relaciones uno a uno cuando
-la FK es única. El extremo del destino indica si la referencia es obligatoria
-(\`||\`) u opcional (\`o|\`); el extremo del modelo que contiene la FK indica cero o
-muchos (\`o{\`) o cero o uno (\`o|\`).
+En el extremo referenciado, \`||\` indica uno obligatorio y \`o|\` cero o uno.
+En el dependiente, \`o{\` indica cero o muchos y \`o|\` cero o uno cuando la FK es
+única. Las propiedades de relación del ORM no son columnas adicionales.
 
 Modelos sin relaciones FK entrantes ni salientes en Prisma: ${isolatedModels.map((name) => `\`${name}\``).join(', ') || 'ninguno'}.
 
@@ -819,10 +828,9 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | --- | --- | --- | --- |
 ${crossAreaRelations.join('\n')}
 
-Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Cada asociación
-usa el nombre del campo que declara la FK en Prisma; las colecciones inversas no
-generan una segunda asociación. La dirección de lectura no implica propiedad del
-proceso de negocio.
+Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Las etiquetas muestran los campos FK y su destino; las colecciones inversas no
+generan una segunda asociación. La posición de una línea no cambia la
+correspondencia de claves.
 `;
 };
 

@@ -4,147 +4,63 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.0 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+| 1.1 | 1.0.0 | En revisión | 2026-10-08 | Equipo Nexus |
 
 ## Vistas del modelo
 
-1. [Diagramas del modelo relacional](generated/database-schema.md): vistas por área
-   con hasta tres modelos detallados por figura. Cada figura incluye sus relaciones
-   entrantes y salientes y las claves utilizadas en los modelos externos; una tabla
-   reúne las correspondencias FK → clave referenciada y sus cardinalidades.
-2. [Diccionario técnico](generated/data-dictionary.md): modelos, campos, tipos, claves y
-   relaciones que complementan la lectura de los diagramas.
+1. [Diagramas ER](generated/database-schema.md): tablas, claves y cardinalidades,
+   agrupadas por área; la tabla final detalla cada correspondencia FK → clave referenciada.
+2. [Diccionario técnico](generated/data-dictionary.md): campos, tipos, obligatoriedad,
+   valores predeterminados y relaciones.
 
-## Propósito
+Prisma y sus migraciones son la fuente técnica. El
+[modelo conceptual](../../../../requirements/domain-and-use-cases/01-conceptual-domain-model.md)
+define el significado de negocio; los procedimientos de migración y cuentas pertenecen
+a la [vista física](../../physical/index.md).
 
-Esta página presenta el modelo relacional persistente mediante diagramas con notación
-ER de pata de cuervo. Cada conexión identifica los campos FK y las claves referenciadas;
-los atributos escalares se incluyen en las vistas por área. Las propiedades de relación
-de Prisma no son columnas: expresan la navegación del ORM sobre esas claves. Un modelo
-ER conceptual describiría entidades, atributos y asociaciones del negocio sin requerir
-claves foráneas; ése no es el propósito de estas vistas técnicas.
+## Lectura del ER
 
-No es una guía para
-ejecutar migraciones, recuperar despliegues ni aprovisionar cuentas de base de datos. Esos
-procedimientos pertenecen a la [vista física](../../physical/index.md). Tampoco redefine
-reglas funcionales: Prisma es la fuente técnica y los requisitos explican el significado
-de negocio.
+Las líneas unen tablas, no filas individuales de atributos. Su etiqueta identifica
+la FK del dependiente y la clave que referencia; la tabla final da ambos nombres
+completos. `PK` significa clave primaria, `FK` clave foránea y `UK` unicidad individual.
+Las claves y restricciones compuestas se comprueban en Prisma.
 
-`Project` existe como modelo persistente y `GoodsIssue.projectId` lo referencia de
-forma opcional. El campo textual `projectNumber`, presente en salidas de materiales y
-mermas, no es una FK ni implica una relación con `Project`. De igual forma,
-`Project.client` es texto, mientras `GoodsIssue.clientId` referencia a `Client`.
-Los diagramas representan únicamente las relaciones declaradas en Prisma; los
-modelos sin FK entrantes ni salientes se identifican explícitamente en la vista ER.
+Cada figura muestra las claves de sus modelos y las relaciones que éstos declaran
+como dependientes. Los modelos referenciados muestran sus PK completas y las columnas
+utilizadas en esas conexiones. Las relaciones entrantes se consultan en la tabla final;
+los atributos restantes, en el diccionario. Las propiedades de relación del ORM
+no son columnas adicionales.
 
-## Propiedad de la información
+`GoodsIssue.projectId` referencia opcionalmente a `Project`. En cambio,
+`projectNumber` es texto en las salidas de materiales, consumibles y mermas;
+no es una FK ni implica un CRUD de proyectos. `Project.client` también es texto,
+mientras `GoodsIssue.clientId` referencia a `Client`.
 
-| Pregunta | Artefacto propietario | Evidencia o vista complementaria |
-| --- | --- | --- |
-| ¿Qué comportamiento o restricción debe cumplir Nexus? | [Especificación de requisitos](../../../../requirements/requirements-specification/index.md) y [políticas transversales](../../../../requirements/requirements-specification/04-unified-catalog-by-scope/05-cross-cutting-business-policies.md#45-políticas-transversales-del-negocio). | Los [casos de uso](../../../../requirements/use-cases/index.md) organizan la interacción; no redefinen columnas. |
-| ¿Qué significa un concepto para el negocio? | [Glosario](../../../../requirements/business-glossary.md) y [modelo de dominio](../../../../requirements/domain-and-use-cases/index.md). | El diccionario técnico enlaza estos artefactos, pero no infiere significado desde nombres de tablas. |
-| ¿Cómo se separan cuenta, persona, asignación y autorización? | [Identidad, acceso y auditoría](../02-identity-access-and-audit.md), como decisión de diseño. | `prisma/schema.prisma`, políticas del servidor y el [diagrama ER](generated/database-schema.md) son evidencia. |
-| ¿Qué estructura persistente existe? | `prisma/schema.prisma` y las migraciones de `prisma/migrations`. | El [diagrama ER](generated/database-schema.md) y el [diccionario técnico](generated/data-dictionary.md) se generan desde Prisma. |
-| ¿Qué cuenta de PostgreSQL ejecuta la aplicación o las migraciones? | [Roles PostgreSQL](../../physical/02-postgresql-runtime-and-migration-roles.md), en la vista física. | `DATABASE_URL`, `DIRECT_URL`, `prisma.config.ts` y `docker-entrypoint.sh` prueban el enrutamiento; el proveedor administra los privilegios reales. |
-| ¿Cuál es el contrato HTTP de un dato? | [Contrato de la API](../../../openapi/api-contract.md) y [OpenAPI 3.1](../../../openapi/openapi.json). | Rutas, validadores, DTO, controladores y pruebas de integración aportan la evidencia que debe conservarse sincronizada con el contrato procesable. |
+## Contextos de inventario compartidos
 
-## Recorrido de trazabilidad
+| Estructura | Separación y reutilización |
+| --- | --- |
+| `Material.type` | El enum `MaterialType` distingue `MATERIAL` y `CONSUMABLE`. Ambos comparten oferta, existencia y movimiento; no es un catálogo administrable. |
+| `GoodsReceipt` y `GoodsReceiptDetail` | Compras de materiales y consumibles comparten tablas. El encabezado conserva `type` y los detalles deben pertenecer al mismo contexto. |
+| `GoodsIssue` y `GoodsIssueDetail` | Salidas de materiales y consumibles comparten tablas, con `type` en el encabezado y validación del contexto de sus detalles. Las mermas conservan sus propios modelos. |
 
-Para revisar un dato o una relación se sigue este orden, sin buscar una segunda fuente
-normativa:
+Las rutas delegan en fachadas específicas que fijan el contexto en el servidor y
+reutilizan el núcleo transaccional. El frontend elige endpoints, selectores y etiquetas;
+no decide el discriminador persistido. Consultas, escrituras y reportes conservan la
+separación de tipos y rechazan operaciones desde el contexto contrario.
 
-1. partir del `RF-*`, `RN-*` o `CU-*` que justifica el comportamiento;
-2. confirmar el significado en el glosario y el modelo de dominio;
-3. revisar la decisión de diseño de acceso o persistencia cuando corresponda;
-4. comprobar campos, claves y relaciones en Prisma y sus migraciones;
-5. usar el diccionario y el diagrama ER sólo como vistas generadas;
-6. localizar ruta, validación, servicio y prueba desde la evidencia del requisito.
+Las compras comparten la serie anual `REC`; los saltos de folio dentro de una pantalla
+pueden corresponder a registros del otro contexto. La reutilización física de tablas
+no elimina los casos de uso propios de cada tipo de inventario.
 
-La obligatoriedad de una columna no sustituye una precondición del caso de uso; una
-restricción Prisma no sustituye una regla de negocio; y una decisión de privilegios de
-PostgreSQL no concede permisos funcionales a un usuario de Nexus.
+## Trazabilidad y mantenimiento
 
-## Clasificación del material
+Revisar el requisito o caso de uso, confirmar su significado en el
+[glosario](../../../../requirements/business-glossary.md) y contrastar campos y
+restricciones con Prisma. El [contrato HTTP](../../../openapi/api-contract.md) explica
+cómo se intercambian esos datos; las [decisiones de acceso](../02-identity-access-and-audit.md)
+explican quién puede operarlos.
 
-`Material.type` se modela con el enum `MaterialType` porque sus valores determinan
-comportamientos compilados y rutas separadas (`MATERIAL` y `CONSUMABLE`), no un catálogo
-administrable. Esta forma mantiene la clasificación obligatoria, evita relaciones y
-consultas adicionales y permite que ambas variantes reutilicen la misma identidad,
-oferta, existencia y movimiento.
-
-Una tabla de tipos sólo sería apropiada si el negocio necesitara crear tipos en tiempo
-de ejecución o asociarles metadatos, permisos o reglas configurables. Mientras cada tipo
-requiera soporte explícito en código, agregar otro valor mediante migración y actualizar
-sus flujos conserva mejor la integridad que exponer una relación administrable.
-
-Si una variante incorpora después atributos o relaciones que no corresponden a todos los
-materiales, éstos pueden residir en un modelo de extensión con relación uno a uno hacia
-`Material`. Esa evolución no exige convertir `MaterialType` en un catálogo: el enum sigue
-actuando como discriminador cerrado y el modelo de extensión conserva únicamente los
-datos propios de la variante.
-
-## Persistencia de compras por tipo de inventario
-
-Las compras de materiales y las compras de consumibles **comparten las tablas
-`GoodsReceipt` y `GoodsReceiptDetail`**. No son dos entidades de negocio distintas: tienen
-el mismo encabezado, proveedor, receptor, comprobante, estados, totales, correcciones,
-cancelaciones y movimientos. Separarlas físicamente duplicaría esas restricciones y
-obligaría a mantener dos flujos transaccionales equivalentes.
-
-La separación requerida es de contexto operativo dentro del mismo agregado, no mediante
-tablas duplicadas. `GoodsReceipt.type` conserva el contexto en el encabezado y permite
-consultarlo directamente; cada ruta API delega en un controller y un servicio específico
-de materiales o consumibles, sin aceptar el tipo como parámetro del cliente. Esas
-operaciones específicas reutilizan internamente el flujo común y fijan el discriminador
-en el backend. El servicio además comprueba `Material.type` en
-todos los detalles antes de crear o ampliar una compra. Por tanto, una compra es
-homogénea —todos sus detalles son `MATERIAL` o todos son `CONSUMABLE`— aunque ambas clases
-se almacenen en el mismo modelo relacional. Los reportes conservan el mismo filtro para
-no mezclar resultados.
-
-Esta decisión mantiene una sola fuente para folios, facturas e historial. Sólo se
-justificarían tablas separadas si alguno de los dos tipos adquiriera encabezado, ciclo de
-vida o relaciones propios; una diferencia de navegación o de catálogo seleccionable no
-es suficiente para duplicar el agregado persistente.
-
-Los dos contextos también comparten la serie anual de folios `REC`: el folio identifica
-una compra dentro del agregado común y no codifica el tipo de inventario. Por ello, las
-secuencias visibles en cada pantalla pueden tener saltos cuando entre dos compras del
-mismo tipo se registró una del otro; no existe duplicidad ni pérdida de trazabilidad.
-
-Los reportes operativos también derivan el contexto de la operación del servidor. Las rutas
-`/reports/goods-receipts/materials/excel` y
-`/reports/goods-receipts/consumables/excel` fijan respectivamente `MATERIAL` y
-`CONSUMABLE` mediante controllers específicos; el backend filtra por `GoodsReceipt.type` antes de construir el detalle y
-los resúmenes, y distingue la hoja y el nombre del archivo. El frontend no envía ni puede
-alterar el discriminador como parámetro de consulta.
-
-### Organización de servicios de compras
-
-El backend conserva el código reutilizable en la raíz de `goodsReceipts`: creación y
-actualización transaccional, construcción de detalles y cambios compartidos de corrección
-y cancelación. Las fachadas específicas se mantienen separadas en
-`goodsReceipts/materials/materialGoodsReceiptService.js` y
-`goodsReceipts/consumables/consumableGoodsReceiptService.js`. Cada fachada fija su
-`MaterialType` y expone consulta, alta, edición, corrección, cancelación y reporte para un
-solo contexto.
-
-Así, consumibles no queda representado como un subcaso dentro de la carpeta de materiales:
-ambos contextos son hermanos que dependen del mismo núcleo neutral. La reutilización del
-modelo `Material` y de sus reglas de inventario permanece intencional, mientras las rutas
-y controllers sólo importan la fachada específica que les corresponde. Como
-`GoodsReceipt.type` identifica el encabezado, la consulta de edición ya no selecciona
-`Material.type` de cada detalle; ese dato sólo se consulta al validar detalles nuevos.
-
-Las rutas y controllers permanecen agrupados en archivos comunes porque comparten
-autenticación, permisos, validadores y traducción HTTP; dentro de esos archivos existen
-paths y exports explícitos para cada contexto. Separarlos en archivos duplicados no
-aportaría aislamiento adicional: la frontera efectiva está en el endpoint y en la
-fachada de servicio específica. Si los permisos o contratos divergen en el futuro, esa
-diferencia sí justificaría routers o controllers físicos independientes.
-
-En frontend se conserva únicamente `goodsReceiptContext.resource`. Es necesario para que
-la vista EJS reutilizada elija endpoint, selector, etiquetas y nombre de exportación. No
-contiene `MaterialType`, no se envía como dato de negocio y no decide la autorización ni
-la persistencia; esas responsabilidades permanecen en las operaciones específicas del
-backend.
+Los diagramas y el diccionario se regeneran con `npm run docs:architecture` y se
+comprueban con `npm run docs:check`. No se editan manualmente. Una restricción de
+columna no sustituye una regla de negocio ni concede permisos a un actor.
