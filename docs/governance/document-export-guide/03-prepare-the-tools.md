@@ -23,22 +23,32 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
      abrir la terminal integrada. Windows no utiliza `sudo`.
    - **Debian o Ubuntu:** ejecuta `sudo apt-get install pandoc`. Si la cuenta no dispone de
      `sudo`, solicita la instalación al administrador del equipo.
-3. Mermaid CLI se instala automáticamente cuando el paquete contiene un diagrama que aún debe
-   renderizarse. La instalación es temporal y no modifica `package.json` ni `package-lock.json`. Si
+3. El exportador comprueba Mermaid CLI `12.0.0` y Mermaid `12.1.0` cuando el paquete contiene
+   diagramas; prepara automáticamente esas versiones si faltan o no coinciden. Mermaid CLI
+   requiere Node.js `>=22.13.0`; Node.js 24 satisface esa condición y el rango del proyecto.
+   La instalación es temporal y no modifica `package.json` ni `package-lock.json`. Si
    el entorno no tiene acceso al registro de npm, puede prepararse manualmente con:
 
    ```bash
-   npm install --not-save @mermaid-js/mermaid-cli
+   npm install --no-save --package-lock=false @mermaid-js/mermaid-cli@12.0.0 mermaid@12.1.0
    ```
 
    El exportador detecta los bloques `mermaid`, prepara el CLI cuando hace falta, incorpora las
    imágenes PNG al documento y conserva una copia visual en `build/docs/diagrams/`. El código
    empleado para generar cada imagen queda en
    `build/docs/diagram-sources/`, separado de los PNG. Las fuentes Markdown no se modifican. Si el
-   paquete no contiene diagramas, esta herramienta no se invoca. Los nombres se derivan del
-   contenido de cada diagrama: una exportación posterior reutiliza los PNG que ya coincidan y sólo
-   convierte diagramas nuevos o modificados. Para forzar su regeneración completa, elimina
+   paquete no contiene diagramas, esta herramienta no se invoca. El renderizado conserva actores
+   y figuras UML de frontera, control y entidad; no las convierte en participantes rectangulares.
+   La exportación fija el tema `neutral`, la apariencia `classic` y la tipografía Arial para
+   mantener legibles los símbolos. El visor Markdown requiere Mermaid 12 para `usecase-beta`;
+   su compatibilidad depende del visor, no del exportador.
+   Los nombres se derivan del contenido, versiones y configuración del renderizador: una
+   exportación posterior reutiliza los PNG compatibles y regenera los afectados por cambios.
+   Para forzar su regeneración completa, elimina
    `build/docs/diagrams/` antes de exportar.
+   Si el entorno necesita un Chromium o argumentos de lanzamiento propios, puede indicar un
+   archivo JSON de Puppeteer mediante `DOCS_MERMAID_PUPPETEER_CONFIG`; el exportador lo pasa al CLI.
+   La ruta de generación permanece Mermaid → PNG → Pandoc → DOCX → LibreOffice → PDF.
 4. DOCX no requiere otra herramienta. Para PDF, el exportador genera primero ese mismo DOCX y
    después lo convierte con LibreOffice en modo no interactivo. Así DOCX y PDF recorren la misma
    maquetación y ya no se necesita TeX Live ni configurar `DOCS_PDF_ENGINE`.

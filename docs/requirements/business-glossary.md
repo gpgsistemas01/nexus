@@ -45,11 +45,12 @@ fuente de verdad.
 | Término canónico | Definición compartida | Alias o distinción importante |
 | --- | --- | --- |
 | Material | Artículo base administrado en inventario, definido por nombre, presentación, unidad y reglas de existencia. | No representa por sí solo la existencia de un proveedor concreto. |
-| Identidad de material | Combinación de nombre recortado y comparado sin distinguir mayúsculas, presentación, unidad de medida, base y altura que permite reconocer el mismo artículo aunque lo ofrezcan proveedores distintos. | Base y altura ocupan posiciones distintas y pueden omitirse sólo como pareja. El proveedor no forma parte de esta identidad: se conserva en la oferta proveedor-material. Cambiar existencia, cantidad convertida, costo máximo, stock mínimo o el estado activo de una oferta no crea otra identidad. |
+| Contexto de inventario | Clasificación como material o consumible que delimita consultas, selectores y operaciones. | Es independiente del área organizacional y los permisos. |
+| Identidad de material | Combinación de clasificación como material o consumible, nombre recortado y comparado sin distinguir mayúsculas, presentación, unidad de medida, base y altura que permite reconocer el mismo artículo aunque lo ofrezcan proveedores distintos. | Base y altura ocupan posiciones distintas y pueden omitirse sólo como pareja. El proveedor no forma parte de esta identidad: se conserva en la oferta proveedor-material. Cambiar existencia, cantidad convertida, costo máximo, stock mínimo o el estado activo de una oferta no crea otra identidad. |
 | Dimensiones | Base y altura opcionales que caracterizan físicamente un material o una merma y participan en el cálculo de cantidad convertida. | No son cantidades de inventario. En textos operativos, «ancho» y «largo» se interpretan como los campos **Base** y **Altura** mostrados por Nexus. |
 | Presentación | Forma comercial o física en que se identifica un material. | Es catálogo auxiliar; no es la unidad de medida. |
 | Unidad de medida | Unidad y símbolo usados para expresar cantidades de un material. | Debe conservarse separada de factores o cantidades convertidas. |
-| Consumible | Material de almacén identificado por su clasificación explícita como consumible. | Actualmente no tiene dimensiones y usa la unidad de medida pieza; esas propiedades no sustituyen la clasificación ni se usan para inferirla. Reutiliza la relación de oferta entre proveedor y material para conservar proveedor, costo y existencia, sin introducir una relación exclusiva ni cálculos por metros cuadrados. Sus consultas y flujos operativos permanecen separados de los materiales. |
+| Consumible | Artículo clasificado explícitamente como consumible, sin dimensiones y con unidad pieza. | Conserva proveedor, costo y existencia mediante la oferta proveedor-material. Sus operaciones se separan de materiales. |
 | Catálogo auxiliar | Conjunto controlado de opciones que clasifica o configura otros registros, como presentación, unidad, motivo o estado de cumplimiento. | Su lectura dentro de un selector operativo no concede mantenimiento; las seis variantes registradas sólo pueden administrarse desde sus pantallas protegidas con `catalogs:manage`. |
 | Alta contextual | Creación de un registro desde el selector de otra operación para incorporarlo y seleccionarlo en el formulario de origen. | Reutiliza el alta autorizada, pero no concede acceso al listado independiente ni a las acciones de consulta, edición o reporte del catálogo. En el alcance vigente aplica a materiales desde una compra, proveedores desde formularios operativos y clientes desde una salida. |
 | Proveedor | Organización que suministra materiales y participa en entradas de compra. | Sus nombres legal y comercial son datos distintos. |
@@ -69,11 +70,15 @@ fuente de verdad.
 | --- | --- | --- |
 | Documento operativo | Encabezado y detalles que registran una intención o hecho de inventario con referencia y estado. | Entrada, salida y ajuste tienen reglas propias; compartir estructura no iguala sus transiciones. |
 | Requisición de compra | Solicitud planificada de materiales con eventual aprobación y entrega. | No forma parte del código ni del esquema vigente; requiere un nuevo alcance antes de reimplementarse. |
-| Entrada de compra | Recepción de materiales de un proveedor que incrementa existencias y genera trazabilidad de movimiento. | En código se denomina `GoodsReceipt`; «compra» en la UI no sustituye la recepción efectiva. |
+| Entrada de compra | Recepción de materiales o consumibles de un proveedor que incrementa existencias y genera trazabilidad de movimiento. | En código se denomina `GoodsReceipt`; «compra» en la UI no sustituye la recepción efectiva. |
+| Documento homogéneo | Compra o salida con detalles del mismo contexto que su cabecera. | Debe tener al menos un detalle; los cancelados conservan su clasificación. |
+| Documento mixto | Documento histórico con detalles de materiales y consumibles. | Se conserva para regularización y queda excluido de las operaciones de ambos contextos. |
+| Regularización de contexto | Corrección trazable de la coherencia entre la cabecera y sus detalles. | No hay un flujo de regularización implementado. |
 | Tipo de comprobante | Selección que indica si una compra se recibe con factura o con remisión. | Controla si el número de factura debe capturarse; no es el estado de la compra. |
 | Factura | Número de comprobante informado para una compra facturada. | No representa un flujo de facturación fiscal. Sólo puede identificar una compra por proveedor; una compra con remisión no lleva número de factura. |
 | Remisión | Tipo de comprobante usado para registrar una compra que no se recibe con factura. | No es una factura pendiente ni requiere un número de factura. |
 | Salida de material | Documento que solicita y suministra materiales a un cliente/proyecto, con posibilidad de devolución. | En código se denomina `GoodsIssue`. |
+| Salida de consumible | Documento para solicitar, surtir y devolver consumibles a un cliente o proyecto. | Comparte el proceso de `GoodsIssue`, con catálogo y existencias de consumibles. |
 | Salida de merma | Documento que solicita y suministra existencias de merma, con posibilidad de devolución. | Reutiliza el patrón de salida, pero conserva stock y movimientos de merma separados. |
 | Encabezado | Datos generales compartidos por todos los detalles de un documento, como actores, fechas, cliente, proyecto y observaciones. | Editar encabezado no equivale a cambiar cantidades de detalle. |
 | Detalle | Renglón de un documento que identifica recurso, cantidad, importes o estado de cumplimiento. | Sus operaciones pueden requerir un permiso diferente del encabezado. |
@@ -112,7 +117,7 @@ fuente de verdad.
 1. Un requisito nuevo reutiliza primero un término canónico; no crea un sinónimo por
    módulo o pantalla.
 2. Una diferencia real de contexto se expresa con un calificativo, por ejemplo «salida
-   de material» y «salida de merma», y reutiliza el proceso común cuando corresponde.
+   de material», «salida de consumible» y «salida de merma», y reutiliza el proceso común cuando corresponde.
 3. El responsable funcional valida definiciones nuevas o ambiguas antes de aceptar el
    requisito. Desarrollo verifica su correspondencia con rutas, DTO, servicios y datos.
 4. Cambiar el significado de un término obliga a revisar requisitos, casos de uso,

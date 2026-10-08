@@ -5,6 +5,8 @@
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Salidas de material](../../error-messages.md#errores-salidas-material).
 
+**Antes de empezar:** Abra **Salidas → Materiales**. Tenga cliente, asesor, área, solicitante, proyecto cuando corresponda y la lista de materiales y cantidades solicitadas.
+
 **Controles que debe usar:** Botón **Nueva salida**; selectores **Buscar cliente...**, **Buscar asesor...**, **Buscar área...** y **Buscar solicitante...**; campos **Número de proyecto**, **Fecha y hora de solicitud:** y **Observaciones**; selector **Buscar material...**, campo **Cantidad**, botón **Agregar** y botón **Guardar**.
 
 1. Seleccione **Nueva salida** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
@@ -19,3 +21,5 @@
 Cada combinación de material y proveedor debe aparecer una sola vez. Si vuelve a agregar la misma
 combinación antes de guardar, el formulario reemplaza la cantidad del renglón existente; no crea
 otro renglón ni suma ambas cantidades. Capture en **Cantidad** el total que desea solicitar.
+
+**Compruebe el resultado:** La salida aparece con folio y estado **Pendiente**. Registrar la solicitud todavía no descuenta existencia; la entrega se confirma después con **Surtir detalle**.

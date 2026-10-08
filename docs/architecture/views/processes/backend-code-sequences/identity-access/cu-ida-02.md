@@ -5,13 +5,14 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/personApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/personValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Route@{ "type": "boundary" } as src/routes/api/admin/personApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/personValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/personController.js
-    participant PersonDto as personDto: Object<br/>src/dtos/personDTO.js
-    participant Domain as src/services/admin/person/personService.js
+    participant PersonDto@{ "type": "entity" } as personDto: Object<br/>src/dtos/personDTO.js
+    participant Domain@{ "type": "control" } as src/services/admin/person/personService.js
     participant ErrorHandler as src/app.js
 
     Client->>Route: POST /api/admin/persons

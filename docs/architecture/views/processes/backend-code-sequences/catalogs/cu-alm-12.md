@@ -5,17 +5,18 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Router as src/routes/api/warehouse/wasteApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/wasteValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Router@{ "type": "boundary" } as src/routes/api/warehouse/wasteApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/wasteValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
-    participant StockDto as wasteStockDto: Object<br/>src/dtos/wasteDTO.js
-    participant Service as src/services/warehouse/wastes/wasteService.js
-    participant Adjustment as src/services/warehouse/wastes/wasteStockAdjustmentService.js
-    participant Reference as src/services/document/referenceNumberService.js
-    participant Stock as src/services/inventory/stockHelpers.js
-    participant Movement as src/services/warehouse/wastes/wasteMovementService.js
+    participant StockDto@{ "type": "entity" } as wasteStockDto: Object<br/>src/dtos/wasteDTO.js
+    participant Service@{ "type": "control" } as src/services/warehouse/wastes/wasteService.js
+    participant Adjustment@{ "type": "control" } as src/services/warehouse/wastes/wasteStockAdjustmentService.js
+    participant Reference@{ "type": "control" } as src/services/document/referenceNumberService.js
+    participant Stock@{ "type": "control" } as src/services/inventory/stockHelpers.js
+    participant Movement@{ "type": "control" } as src/services/warehouse/wastes/wasteMovementService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 

@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View as src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueForm.js
-    participant Application as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
+    participant View@{ "type": "boundary" } as src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueForm.js
+    participant Application@{ "type": "control" } as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
     participant Request as src/public/js/services/warehouse/wasteIssueService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>src/controllers/api/warehouse/wasteIssueController.js
@@ -20,11 +21,11 @@ sequenceDiagram
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
         View->>Application: editWasteIssueHeader({ id, formData })
-        Application->>Request: editWasteIssueHeaderRequest({ id, formData })
+        Application->>Request: editWasteIssueHeaderRequest({ id, data: formData })
         activate Application
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: envía PATCH /api/warehouse/waste-issues/:id/header
-        Transport-->>HTTP: HTTP 2xx { code, data }
+        Transport-->>HTTP: HTTP 200 { wasteIssue, code }
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: editWasteIssueHeaderRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa

@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/wasteIssueApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteIssueController.js
-    participant Domain as src/services/warehouse/wasteIssues/wasteIssueService.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/wasteIssues/wasteIssueService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 
@@ -23,7 +24,7 @@ sequenceDiagram
     Prisma-->>Domain: count(): Promise[number]
     alt Servicio resuelto
         Domain-->>Controller: wasteIssueService.findAllWasteIssues(): Promise[{ data: WasteIssue[], recordsTotal: number, recordsFiltered: number }]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)

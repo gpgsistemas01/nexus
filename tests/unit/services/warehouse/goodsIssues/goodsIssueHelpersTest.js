@@ -20,6 +20,7 @@ const supplierMaterial = {
     maxUnitCost: 10,
     material: {
         id: 'material-1',
+        type: 'MATERIAL',
         name: 'Material',
         base: null,
         height: null,
@@ -49,6 +50,25 @@ describe('buildGoodsIssueDetails', () => {
 
         await expect(buildGoodsIssueDetails({ details: [detail] }))
             .rejects.toMatchObject({ code });
+    });
+
+    it.each([
+        ['MATERIAL', 'CONSUMABLE'],
+        ['CONSUMABLE', 'MATERIAL']
+    ])('rechaza detalles de %s cuando el inventario pertenece al otro tipo', async (contextType, type) => {
+        findSupplierMaterialsSnapshot.mockResolvedValue([{
+            ...supplierMaterial, material: { ...supplierMaterial.material, type }
+        }]);
+        await expect(buildGoodsIssueDetails({ details: [detail], type: contextType }))
+            .rejects.toMatchObject({ code: 'MATERIAL_NOT_FOUND' });
+    });
+
+    it('acepta consumibles en su propio contexto', async () => {
+        findSupplierMaterialsSnapshot.mockResolvedValue([{
+            ...supplierMaterial, material: { ...supplierMaterial.material, type: 'CONSUMABLE' }
+        }]);
+        await expect(buildGoodsIssueDetails({ details: [detail], type: 'CONSUMABLE' }))
+            .resolves.toHaveLength(1);
     });
 
     it('construye el detalle cuando material y proveedor están activos', async () => {

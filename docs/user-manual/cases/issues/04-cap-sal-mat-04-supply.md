@@ -5,6 +5,8 @@
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Salidas de material](../../error-messages.md#errores-salidas-material).
 
+**Antes de empezar:** Localice la salida y confirme que la entrega corresponde a ese cliente o proyecto. Revise la existencia y los renglones pendientes antes de marcar **Surtir**.
+
 **Controles que debe usar:** Acción **Surtir detalle**; casilla de la columna **Surtir** y campo de la columna **Cantidad de proyecto** de cada renglón pendiente; botón **Surtir**.
 
 1. En la fila de la salida, seleccione **Surtir detalle** para abrir sus renglones pendientes. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
@@ -20,3 +22,5 @@
 
 Después de confirmar, compruebe cuáles renglones quedaron surtidos y la existencia mostrada. Si el
 resultado es incierto, actualice la salida antes de intentar surtir nuevamente.
+
+**Compruebe el resultado:** Revise qué renglones quedaron surtidos y el estado de la salida. Marcar **Surtir** entrega la cantidad pendiente del renglón; **Cantidad de proyecto** es una referencia de consumo, no la cantidad a descontar.

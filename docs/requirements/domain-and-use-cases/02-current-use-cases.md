@@ -1,28 +1,35 @@
 # 2. Casos de uso vigentes
 
-El diagrama se mantiene en Mermaid para que GitHub lo represente correctamente. Es una
-**aproximación visual a un diagrama UML de casos de uso**, no UML estricto: Mermaid no
-ofrece ese tipo de diagrama y se emplean nodos de `flowchart` con la semántica que se
-explica a continuación. Los límites rectangulares representan el sistema. Cada actor se
-muestra fuera de esos límites como un clasificador con el estereotipo UML `«actor»`; se
-usa esta notación alternativa a la figura humana porque Mermaid no incorpora actores en
-`flowchart`. Las asociaciones muestran quién inicia un objetivo y no equivalen a
-permisos individuales. Cuando una acción opcional nace dentro de una consulta, se usa
-`«extend»` hacia el caso base; la asociación directa con el actor sigue indicando quién
-puede iniciar la acción. Ventas no es
-actor: el área no tiene acceso. Tampoco se asignan salidas a otras áreas solicitantes;
-su participación futura queda pendiente de definición.
+Los diagramas usan la notación de casos de uso de Mermaid 12 (`usecase-beta`):
+actores fuera del límite de Nexus, óvalos para objetivos y asociaciones directas entre
+actor y objetivo. La generalización apunta del actor especializado al general con un
+triángulo hueco. Las asociaciones expresan participación funcional; cada operación
+conserva sus comprobaciones de permiso en el servidor. Los enlaces sin etiqueta desde
+Consulta conservan la organización visual por recurso del documento; no representan
+inclusión, extensión, generalización ni herencia de actores. `«include»` y `«extend»` se reservan para
+comportamientos y puntos de extensión explícitos en las fichas normativas.
+Ventas y Dirección no son actores con acceso vigente; su participación futura sigue
+pendiente de definición. La visualización Markdown requiere un visor con Mermaid 12;
+la exportación usa el renderizador compatible preparado por el proyecto.
 
 Los participantes, precondiciones, garantías, pasos, alternativas y excepciones de cada
 objetivo se detallan por tema en el
 [catálogo de descripciones de casos de uso](../use-cases/index.md).
 La vista se divide en bloques por grupo funcional para mantenerla legible. Estos bloques
 no son paquetes UML ni paquetes documentales: el único límite de sistema es Nexus. Cada
-bloque conserva los actores fuera del sistema y muestra una sola vez los casos que le
-pertenecen; juntos forman el diagrama de casos de uso. Los actores concretos se
-generalizan mediante un actor común cuando comparten asociaciones y la distinción entre
-ellos aporta información al grupo. Si todos participan de la misma forma, el actor común
-los representa sin enumerar cada rol o área.
+bloque conserva los actores fuera del sistema y presenta los casos de su grupo
+propietario. Compras y Salidas incluyen referencias a casos de otros grupos cuando
+intervienen como extensiones; la repetición del identificador no crea otro caso. Las asociaciones de cada actor
+se muestran explícitamente para Almacén y los casos exclusivos del administrador;
+este último hereda las asociaciones de Almacén mediante generalización, sin duplicarlas.
+
+La separación en vistas es una decisión de legibilidad, no una exigencia de UML. Un
+único diagrama con los 85 casos y todas las asociaciones dificultaría su revisión. Las
+relaciones se muestran junto al caso base y no en una vista independiente que obligue a
+reconstruirlas entre diagramas. La jerarquía de autenticación enlaza Personal de almacén con Usuario registrado y
+Administrador del sistema con Personal de almacén. La generalización operativa se
+repite en las figuras que muestran ambos actores para hacer visible la herencia;
+no lleva palabra adicional, sólo el triángulo hueco hacia el actor general.
 
 Se conservan seis grupos funcionales propietarios porque representan capacidades estables del
 negocio: autenticación, identidad y acceso, almacén, catálogos, compras de materiales y consumibles y
@@ -30,126 +37,197 @@ salidas. Las consultas y exportaciones se integran en el grupo del recurso que l
 origina; no forman un paquete funcional independiente. Dividirlos otra vez en nuevos
 grupos por cada entidad fragmentaría procesos que comparten actor, reglas y ciclo
 operativo; agruparlos sólo por acción mezclaría entidades con validaciones distintas.
-Dentro de cada grupo se usa por ello un **segundo nivel visual por entidad o documento**.
-Este nivel mejora la lectura, pero no cambia identificadores ni fusiona casos de uso.
+Dentro de cada grupo los objetivos se ordenan por entidad o documento.
+Esta organización conserva identificadores y no fusiona casos de uso. Cada grupo
+se divide en figuras por recurso para que los óvalos sigan siendo legibles al exportar;
+cada figura muestra una parte del mismo límite de Nexus y no crea otro sistema.
+Mermaid no admite límites anidados en `usecase-beta`.
 La decisión y las familias resultantes se resumen en el
 [criterio de agrupación vigente](../use-cases/index.md#criterio-de-agrupación-vigente).
 
 ### Grupo funcional AUT — Autenticación
 
 ```mermaid
-flowchart LR
-    user["«actor»<br/>Usuario registrado"]
+usecase-beta
+direction LR
+    actor user("Usuario registrado")
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    warehouse --|> user
+    admin --|> warehouse
 
-    subgraph authPackage["Nexus · Grupo funcional AUT: Autenticación"]
-        ucLogin(["CU-AUT-01 Iniciar sesión"])
-        ucLogout(["CU-AUT-02 Cerrar sesión"])
+    systemBoundary authPackage1["Nexus · Autenticación"]
+        ucLogin("CU-AUT-01 Iniciar sesión")
+        ucLogout("CU-AUT-02 Cerrar sesión")
     end
 
-    user --- ucLogin
-    user --- ucLogout
+    user -- ucLogin
+    user -- ucLogout
 ```
 
 ### Grupo funcional IDA — Identidad y acceso
 
-```mermaid
-flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+#### Personas
 
-    subgraph identityPackage["Nexus · Grupo funcional IDA: Identidad y acceso"]
-        subgraph personFamily["Personas"]
-            ucPersonQuery(["CU-IDA-01 Consultar personas"])
-            ucPersonCreate(["CU-IDA-02 Crear persona"])
-            ucPersonEdit(["CU-IDA-03 Editar persona"])
-            ucPersonReport(["CU-IDA-04 Generar reporte de personas"])
-        end
-        subgraph userFamily["Usuarios y credenciales"]
-            ucUserQuery(["CU-IDA-05 Consultar usuarios"])
-            ucUserCreate(["CU-IDA-06 Crear usuario y asignar acceso"])
-            ucUserEdit(["CU-IDA-07 Editar usuario y acceso"])
-            ucPasswordEdit(["CU-IDA-08 Cambiar contraseña de usuario"])
-            ucUserReport(["CU-IDA-09 Generar reporte de usuarios"])
-        end
+```mermaid
+usecase-beta
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary identityPackage1["Nexus · Personas"]
+        ucPersonQuery("CU-IDA-01 Consultar personas")
+        ucPersonCreate("CU-IDA-02 Crear persona")
+        ucPersonEdit("CU-IDA-03 Editar persona")
+        ucPersonReport("CU-IDA-04 Generar reporte de personas")
     end
 
-    admin -- "generaliza" --> warehouse
-    warehouse --- ucPersonQuery
-    admin --- ucUserQuery
-    ucPersonQuery --- ucPersonCreate
-    ucPersonQuery --- ucPersonEdit
-    ucPersonQuery --- ucPersonReport
-    ucUserQuery --- ucUserCreate
-    ucUserQuery --- ucUserEdit
-    ucUserQuery --- ucPasswordEdit
-    ucUserQuery --- ucUserReport
+    warehouse -- ucPersonQuery
+    warehouse -- ucPersonCreate
+    warehouse -- ucPersonEdit
+    warehouse -- ucPersonReport
+
+    ucPersonQuery -- ucPersonCreate
+    ucPersonQuery -- ucPersonEdit
+    ucPersonQuery -- ucPersonReport
+```
+
+#### Usuarios y credenciales
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary identityPackage2["Nexus · Usuarios y credenciales"]
+        ucUserQuery("CU-IDA-05 Consultar usuarios")
+        ucUserCreate("CU-IDA-06 Crear usuario y asignar acceso")
+        ucUserEdit("CU-IDA-07 Editar usuario y acceso")
+        ucPasswordEdit("CU-IDA-08 Cambiar contraseña de usuario")
+        ucUserReport("CU-IDA-09 Generar reporte de usuarios")
+    end
+
+    admin -- ucUserQuery
+    admin -- ucUserCreate
+    admin -- ucUserEdit
+    admin -- ucPasswordEdit
+    admin -- ucUserReport
+
+    ucUserQuery -- ucUserCreate
+    ucUserQuery -- ucUserEdit
+    ucUserQuery -- ucPasswordEdit
+    ucUserQuery -- ucUserReport
 ```
 
 ### Grupo funcional ALM — Almacén
 
-```mermaid
-flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
-    admin -- "generaliza" --> warehouse
+#### Materiales
 
-    subgraph warehousePackage["Nexus · Grupo funcional ALM: Almacén"]
-        direction TB
-        subgraph materialWarehouseFamily["Materiales"]
-            ucMaterialQuery(["CU-ALM-01 Consultar materiales"])
-            ucMaterialCreate(["CU-ALM-02 Crear material"])
-            ucMaterialEdit(["CU-ALM-03 Editar material"])
-            ucMaterialRemove(["CU-ALM-04 Retirar material"])
-            ucMaterialStock(["CU-ALM-05 Ajustar existencia de material"])
-            ucMaterialInventoryReport(["CU-ALM-06 Generar reporte de inventario de materiales"])
-            ucMaterialMovements(["CU-ALM-07 Consultar movimientos de materiales"])
-            ucMaterialMovementReport(["CU-ALM-08 Generar reporte de movimientos de materiales"])
-        end
-        subgraph wasteWarehouseFamily["Mermas"]
-            ucWasteQuery(["CU-ALM-09 Consultar mermas"])
-            ucWasteCreate(["CU-ALM-10 Registrar merma"])
-            ucWasteEdit(["CU-ALM-11 Editar merma"])
-            ucWasteStock(["CU-ALM-12 Ajustar existencia de merma"])
-            ucWasteAddStock(["CU-ALM-13 Agregar existencia de merma"])
-            ucWasteReport(["CU-ALM-14 Generar reporte de mermas"])
-            ucWasteMovements(["CU-ALM-15 Consultar movimientos de mermas"])
-            ucWasteMovementReport(["CU-ALM-16 Generar reporte de movimientos de mermas"])
-        end
-        subgraph consumableWarehouseFamily["Consumibles"]
-            ucConsumableQuery(["CU-ALM-17 Consultar consumibles"])
-            ucConsumableCreate(["CU-ALM-18 Crear consumible"])
-            ucConsumableEdit(["CU-ALM-19 Editar consumible"])
-            ucConsumableRemove(["CU-ALM-20 Retirar consumible"])
-            ucConsumableStock(["CU-ALM-21 Ajustar existencia de consumible"])
-            ucConsumableReport(["CU-ALM-22 Generar reporte de inventario de consumibles"])
-        end
+```mermaid
+usecase-beta
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary warehousePackage1["Nexus · Materiales"]
+        ucMaterialQuery("CU-ALM-01 Consultar materiales")
+        ucMaterialCreate("CU-ALM-02 Crear material")
+        ucMaterialEdit("CU-ALM-03 Editar material")
+        ucMaterialRemove("CU-ALM-04 Retirar material")
+        ucMaterialStock("CU-ALM-05 Ajustar existencia de material")
+        ucMaterialInventoryReport("CU-ALM-06 Generar reporte de inventario de materiales")
+        ucMaterialMovements("CU-ALM-07 Consultar movimientos de materiales")
+        ucMaterialMovementReport("CU-ALM-08 Generar reporte de movimientos de materiales")
     end
 
-    warehouse --- ucMaterialQuery
-    warehouse --- ucWasteQuery
-    warehouse --- ucWasteAddStock
-    warehouse --- ucConsumableQuery
-    admin --- ucMaterialStock
-    admin --- ucWasteStock
-    admin --- ucConsumableStock
-    ucMaterialQuery --- ucMaterialCreate
-    ucMaterialQuery --- ucMaterialEdit
-    ucMaterialQuery --- ucMaterialRemove
-    ucMaterialQuery --- ucMaterialInventoryReport
-    ucMaterialQuery --- ucMaterialMovements
-    ucMaterialMovements --- ucMaterialMovementReport
-    ucMaterialStock -. "«extend»" .-> ucMaterialQuery
-    ucWasteQuery --- ucWasteCreate
-    ucWasteQuery --- ucWasteEdit
-    ucWasteQuery --- ucWasteReport
-    ucWasteQuery --- ucWasteMovements
-    ucWasteMovements --- ucWasteMovementReport
-    ucWasteStock -. "«extend»" .-> ucWasteQuery
-    ucConsumableQuery --- ucConsumableCreate
-    ucConsumableQuery --- ucConsumableEdit
-    ucConsumableQuery --- ucConsumableRemove
-    ucConsumableQuery --- ucConsumableReport
-    ucConsumableStock -. "«extend»" .-> ucConsumableQuery
+    warehouse -- ucMaterialQuery
+    warehouse -- ucMaterialCreate
+    warehouse -- ucMaterialEdit
+    warehouse -- ucMaterialRemove
+    admin -- ucMaterialStock
+    warehouse -- ucMaterialInventoryReport
+    admin -- ucMaterialMovements
+    admin -- ucMaterialMovementReport
+
+    ucMaterialQuery -- ucMaterialCreate
+    ucMaterialQuery -- ucMaterialEdit
+    ucMaterialQuery -- ucMaterialRemove
+    ucMaterialQuery -- ucMaterialInventoryReport
+    ucMaterialQuery -- ucMaterialMovements
+    ucMaterialMovements -- ucMaterialMovementReport
+    ucMaterialQuery -- ucMaterialStock
+```
+
+#### Mermas
+
+```mermaid
+usecase-beta
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary warehousePackage2["Nexus · Mermas"]
+        ucWasteQuery("CU-ALM-09 Consultar mermas")
+        ucWasteCreate("CU-ALM-10 Registrar merma")
+        ucWasteEdit("CU-ALM-11 Editar merma")
+        ucWasteStock("CU-ALM-12 Ajustar existencia de merma")
+        ucWasteAddStock("CU-ALM-13 Agregar existencia de merma")
+        ucWasteReport("CU-ALM-14 Generar reporte de mermas")
+        ucWasteMovements("CU-ALM-15 Consultar movimientos de mermas")
+        ucWasteMovementReport("CU-ALM-16 Generar reporte de movimientos de mermas")
+    end
+
+    warehouse -- ucWasteQuery
+    warehouse -- ucWasteCreate
+    warehouse -- ucWasteEdit
+    admin -- ucWasteStock
+    warehouse -- ucWasteAddStock
+    warehouse -- ucWasteReport
+    admin -- ucWasteMovements
+    admin -- ucWasteMovementReport
+
+    ucWasteQuery -- ucWasteCreate
+    ucWasteQuery -- ucWasteEdit
+    ucWasteQuery -- ucWasteAddStock
+    ucWasteQuery -- ucWasteReport
+    ucWasteQuery -- ucWasteMovements
+    ucWasteMovements -- ucWasteMovementReport
+    ucWasteQuery -- ucWasteStock
+```
+
+#### Consumibles
+
+```mermaid
+usecase-beta
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary warehousePackage3["Nexus · Consumibles"]
+        ucConsumableQuery("CU-ALM-17 Consultar consumibles")
+        ucConsumableCreate("CU-ALM-18 Crear consumible")
+        ucConsumableEdit("CU-ALM-19 Editar consumible")
+        ucConsumableRemove("CU-ALM-20 Retirar consumible")
+        ucConsumableStock("CU-ALM-21 Ajustar existencia de consumible")
+        ucConsumableReport("CU-ALM-22 Generar reporte de inventario de consumibles")
+    end
+
+    warehouse -- ucConsumableQuery
+    warehouse -- ucConsumableCreate
+    warehouse -- ucConsumableEdit
+    warehouse -- ucConsumableRemove
+    admin -- ucConsumableStock
+    warehouse -- ucConsumableReport
+
+    ucConsumableQuery -- ucConsumableCreate
+    ucConsumableQuery -- ucConsumableEdit
+    ucConsumableQuery -- ucConsumableRemove
+    ucConsumableQuery -- ucConsumableReport
+    ucConsumableQuery -- ucConsumableStock
 ```
 
 El grupo de **Almacén** concentra los casos operativos de material, consumible y merma porque comparten
@@ -160,168 +238,369 @@ grupo usan la familia estable `CU-ALM-*`.
 
 ### Grupo funcional CAT — Catálogos
 
-```mermaid
-flowchart LR
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
+#### Proveedores
 
-    subgraph catalogPackage["Nexus · Grupo funcional CAT: Catálogos"]
-        direction TB
-        subgraph supplierCatalogFamily["Proveedores"]
-            ucSupplierQuery(["CU-CAT-01 Consultar proveedores"])
-            ucSupplierCreate(["CU-CAT-02 Crear proveedor"])
-            ucSupplierEdit(["CU-CAT-03 Editar proveedor"])
-            ucSupplierReport(["CU-CAT-04 Generar reporte de proveedores"])
-        end
-        subgraph clientCatalogFamily["Clientes"]
-            ucClientQuery(["CU-CAT-05 Consultar clientes"])
-            ucClientCreate(["CU-CAT-06 Crear cliente"])
-            ucClientEdit(["CU-CAT-07 Editar cliente"])
-            ucClientReport(["CU-CAT-08 Generar reporte de clientes"])
-        end
-        subgraph auxiliaryCatalogFamily["Catálogos auxiliares"]
-            ucAreaQuery(["CU-CAT-09 Consultar área"])
-            ucAreaCreate(["CU-CAT-10 Crear área"])
-            ucAreaEdit(["CU-CAT-11 Editar área"])
-            ucRoleQuery(["CU-CAT-12 Consultar rol"])
-            ucRoleCreate(["CU-CAT-13 Crear rol"])
-            ucRoleEdit(["CU-CAT-14 Editar rol"])
-            ucPresentationQuery(["CU-CAT-15 Consultar presentación"])
-            ucPresentationCreate(["CU-CAT-16 Crear presentación"])
-            ucPresentationEdit(["CU-CAT-17 Editar presentación"])
-            ucUnitMeasureQuery(["CU-CAT-18 Consultar unidad de medida"])
-            ucUnitMeasureCreate(["CU-CAT-19 Crear unidad de medida"])
-            ucUnitMeasureEdit(["CU-CAT-20 Editar unidad de medida"])
-            ucAdjustmentReasonQuery(["CU-CAT-21 Consultar motivo de ajuste"])
-            ucAdjustmentReasonCreate(["CU-CAT-22 Crear motivo de ajuste"])
-            ucAdjustmentReasonEdit(["CU-CAT-23 Editar motivo de ajuste"])
-            ucFulfillmentStatusQuery(["CU-CAT-24 Consultar estado de cumplimiento"])
-            ucFulfillmentStatusCreate(["CU-CAT-25 Crear estado de cumplimiento"])
-            ucFulfillmentStatusEdit(["CU-CAT-26 Editar estado de cumplimiento"])
-        end
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+    actor warehouse("Personal de almacén")
+    admin --|> warehouse
+
+    systemBoundary catalogPackage1["Nexus · Proveedores"]
+        ucSupplierQuery("CU-CAT-01 Consultar proveedores")
+        ucSupplierCreate("CU-CAT-02 Crear proveedor")
+        ucSupplierEdit("CU-CAT-03 Editar proveedor")
+        ucSupplierReport("CU-CAT-04 Generar reporte de proveedores")
     end
 
-    admin --- ucSupplierQuery
-    admin --- ucClientQuery
-    warehouse --- ucSupplierCreate
-    warehouse --- ucClientCreate
-    admin --- ucAreaQuery
-    admin --- ucRoleQuery
-    admin --- ucPresentationQuery
-    admin --- ucUnitMeasureQuery
-    admin --- ucAdjustmentReasonQuery
-    admin --- ucFulfillmentStatusQuery
-    ucSupplierQuery --- ucSupplierCreate
-    ucSupplierQuery --- ucSupplierEdit
-    ucSupplierQuery --- ucSupplierReport
-    ucClientQuery --- ucClientCreate
-    ucClientQuery --- ucClientEdit
-    ucClientQuery --- ucClientReport
-    ucAreaQuery --- ucAreaCreate
-    ucAreaQuery --- ucAreaEdit
-    ucRoleQuery --- ucRoleCreate
-    ucRoleQuery --- ucRoleEdit
-    ucPresentationQuery --- ucPresentationCreate
-    ucPresentationQuery --- ucPresentationEdit
-    ucUnitMeasureQuery --- ucUnitMeasureCreate
-    ucUnitMeasureQuery --- ucUnitMeasureEdit
-    ucAdjustmentReasonQuery --- ucAdjustmentReasonCreate
-    ucAdjustmentReasonQuery --- ucAdjustmentReasonEdit
-    ucFulfillmentStatusQuery --- ucFulfillmentStatusCreate
-    ucFulfillmentStatusQuery --- ucFulfillmentStatusEdit
+    admin -- ucSupplierQuery
+    warehouse -- ucSupplierCreate
+    admin -- ucSupplierEdit
+    admin -- ucSupplierReport
+
+    ucSupplierQuery -- ucSupplierCreate
+    ucSupplierQuery -- ucSupplierEdit
+    ucSupplierQuery -- ucSupplierReport
 ```
 
-Las consultas de **Proveedores** y **Clientes** se asocian con el personal de almacén;
-el administrador hereda esa asociación y las operaciones disponibles se conectan por
-medio de cada consulta, igual que en los demás grupos. La administración de **Áreas**,
-**Roles**, **Presentaciones**, **Unidades de medida**,
-**Motivos de ajuste** y **Estados de cumplimiento** se asocia directamente con el
-administrador: no se hereda hacia Almacén y exige `catalogs:manage` en cada vista y
-solicitud API. Las consultas operativas de roles, áreas, presentaciones, unidades de
-medida, motivos de ajuste y estados de cumplimiento alimentan controles de selección
-dentro de otros flujos. Se conservan como soporte técnico autorizado de esos casos, pero
-no reciben identificador ni se representan como objetivos independientes del actor.
+#### Clientes
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+    actor warehouse("Personal de almacén")
+    admin --|> warehouse
+
+    systemBoundary catalogPackage2["Nexus · Clientes"]
+        ucClientQuery("CU-CAT-05 Consultar clientes")
+        ucClientCreate("CU-CAT-06 Crear cliente")
+        ucClientEdit("CU-CAT-07 Editar cliente")
+        ucClientReport("CU-CAT-08 Generar reporte de clientes")
+    end
+
+    admin -- ucClientQuery
+    warehouse -- ucClientCreate
+    admin -- ucClientEdit
+    admin -- ucClientReport
+
+    ucClientQuery -- ucClientCreate
+    ucClientQuery -- ucClientEdit
+    ucClientQuery -- ucClientReport
+```
+
+#### Áreas
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary catalogPackage3["Nexus · Áreas"]
+        ucAreaQuery("CU-CAT-09 Consultar área")
+        ucAreaCreate("CU-CAT-10 Crear área")
+        ucAreaEdit("CU-CAT-11 Editar área")
+    end
+
+    admin -- ucAreaQuery
+    admin -- ucAreaCreate
+    admin -- ucAreaEdit
+
+    ucAreaQuery -- ucAreaCreate
+    ucAreaQuery -- ucAreaEdit
+```
+
+#### Roles
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary catalogPackage4["Nexus · Roles"]
+        ucRoleQuery("CU-CAT-12 Consultar rol")
+        ucRoleCreate("CU-CAT-13 Crear rol")
+        ucRoleEdit("CU-CAT-14 Editar rol")
+    end
+
+    admin -- ucRoleQuery
+    admin -- ucRoleCreate
+    admin -- ucRoleEdit
+
+    ucRoleQuery -- ucRoleCreate
+    ucRoleQuery -- ucRoleEdit
+```
+
+#### Presentaciones
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary catalogPackage5["Nexus · Presentaciones"]
+        ucPresentationQuery("CU-CAT-15 Consultar presentación")
+        ucPresentationCreate("CU-CAT-16 Crear presentación")
+        ucPresentationEdit("CU-CAT-17 Editar presentación")
+    end
+
+    admin -- ucPresentationQuery
+    admin -- ucPresentationCreate
+    admin -- ucPresentationEdit
+
+    ucPresentationQuery -- ucPresentationCreate
+    ucPresentationQuery -- ucPresentationEdit
+```
+
+#### Unidades de medida
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary catalogPackage6["Nexus · Unidades de medida"]
+        ucUnitMeasureQuery("CU-CAT-18 Consultar unidad de medida")
+        ucUnitMeasureCreate("CU-CAT-19 Crear unidad de medida")
+        ucUnitMeasureEdit("CU-CAT-20 Editar unidad de medida")
+    end
+
+    admin -- ucUnitMeasureQuery
+    admin -- ucUnitMeasureCreate
+    admin -- ucUnitMeasureEdit
+
+    ucUnitMeasureQuery -- ucUnitMeasureCreate
+    ucUnitMeasureQuery -- ucUnitMeasureEdit
+```
+
+#### Motivos de ajuste
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary catalogPackage7["Nexus · Motivos de ajuste"]
+        ucAdjustmentReasonQuery("CU-CAT-21 Consultar motivo de ajuste")
+        ucAdjustmentReasonCreate("CU-CAT-22 Crear motivo de ajuste")
+        ucAdjustmentReasonEdit("CU-CAT-23 Editar motivo de ajuste")
+    end
+
+    admin -- ucAdjustmentReasonQuery
+    admin -- ucAdjustmentReasonCreate
+    admin -- ucAdjustmentReasonEdit
+
+    ucAdjustmentReasonQuery -- ucAdjustmentReasonCreate
+    ucAdjustmentReasonQuery -- ucAdjustmentReasonEdit
+```
+
+#### Estados de cumplimiento
+
+```mermaid
+usecase-beta
+direction LR
+    actor admin("Administrador del sistema")
+
+    systemBoundary catalogPackage8["Nexus · Estados de cumplimiento"]
+        ucFulfillmentStatusQuery("CU-CAT-24 Consultar estado de cumplimiento")
+        ucFulfillmentStatusCreate("CU-CAT-25 Crear estado de cumplimiento")
+        ucFulfillmentStatusEdit("CU-CAT-26 Editar estado de cumplimiento")
+    end
+
+    admin -- ucFulfillmentStatusQuery
+    admin -- ucFulfillmentStatusCreate
+    admin -- ucFulfillmentStatusEdit
+
+    ucFulfillmentStatusQuery -- ucFulfillmentStatusCreate
+    ucFulfillmentStatusQuery -- ucFulfillmentStatusEdit
+```
+
+Las consultas, edición y reportes de **Proveedores** y **Clientes** se asocian
+con el Administrador. Personal de almacén participa únicamente en sus altas desde
+selectores operativos. Los seis catálogos auxiliares se asocian con el Administrador
+y exigen `catalogs:manage`. Las lecturas que sólo alimentan controles de selección
+son soporte de otros objetivos y no nuevos casos de uso.
 
 ### Grupo funcional ENT — Compras de materiales y consumibles
 
-```mermaid
-flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
-    admin -- "generaliza" --> warehouse
-
-    subgraph receiptPackage["Nexus · Grupo funcional ENT: Compras"]
-        ucReceiptQuery(["CU-ENT-01 Consultar compras de material"])
-        ucReceiptCreate(["CU-ENT-02 Crear compra de material"])
-        ucReceiptEdit(["CU-ENT-03 Editar compra de material"])
-        ucReceiptCorrect(["CU-ENT-04 Corregir material de una compra"])
-        ucReceiptCancel(["CU-ENT-05 Cancelar material de una compra"])
-        ucPurchaseReport(["CU-ENT-06 Generar reporte de compras de material"])
-        ucConsumableReceiptQuery(["CU-ENT-07 Consultar compras de consumible"])
-        ucConsumableReceiptCreate(["CU-ENT-08 Crear compra de consumible"])
-        ucConsumableReceiptEdit(["CU-ENT-09 Editar compra de consumible"])
-        ucConsumableReceiptCorrect(["CU-ENT-10 Corregir consumible de una compra"])
-        ucConsumableReceiptCancel(["CU-ENT-11 Cancelar consumible de una compra"])
-        ucConsumablePurchaseReport(["CU-ENT-12 Generar reporte de compras de consumible"])
-    end
-
-    warehouse --- ucReceiptQuery
-    warehouse --- ucConsumableReceiptQuery
-    ucReceiptQuery --- ucReceiptCreate
-    ucReceiptQuery --- ucReceiptEdit
-    ucReceiptQuery --- ucReceiptCorrect
-    ucReceiptQuery --- ucReceiptCancel
-    ucReceiptQuery --- ucPurchaseReport
-    ucConsumableReceiptQuery --- ucConsumableReceiptCreate
-    ucConsumableReceiptQuery --- ucConsumableReceiptEdit
-    ucConsumableReceiptQuery --- ucConsumableReceiptCorrect
-    ucConsumableReceiptQuery --- ucConsumableReceiptCancel
-    ucConsumableReceiptQuery --- ucConsumablePurchaseReport
-```
-
-### Grupo funcional SAL — Salidas de material y de merma
+#### Compras de materiales
 
 ```mermaid
-flowchart LR
-    warehouse["«actor»<br/>Personal de almacén (área Almacén y proveduría)"]
-    admin["«actor»<br/>Administrador del sistema (área Sistemas)"]
-    admin -- "generaliza" --> warehouse
+usecase-beta
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
 
-    subgraph issuePackage["Nexus · Grupo funcional SAL: Salidas"]
-        subgraph materialIssueFamily["Salidas de material"]
-            ucMaterialIssueQuery(["CU-SAL-01 Consultar salidas de material"])
-            ucMaterialIssueCreate(["CU-SAL-02 Crear salida de material"])
-            ucMaterialIssueHeader(["CU-SAL-03 Editar encabezado de salida de material"])
-            ucMaterialIssueDetails(["CU-SAL-04 Editar detalles de material de una salida"])
-            ucMaterialSupply(["CU-SAL-05 Surtir material"])
-            ucMaterialReturn(["CU-SAL-06 Devolver material surtido"])
-            ucMaterialIssueReport(["CU-SAL-07 Generar reporte de salidas de material"])
-        end
-        subgraph wasteIssueFamily["Salidas de merma"]
-            ucWasteIssueQuery(["CU-SAL-08 Consultar salidas de merma"])
-            ucWasteIssueCreate(["CU-SAL-09 Crear salida de merma"])
-            ucWasteIssueHeader(["CU-SAL-10 Editar encabezado de salida de merma"])
-            ucWasteIssueDetails(["CU-SAL-11 Editar detalles de merma de una salida"])
-            ucWasteSupply(["CU-SAL-12 Surtir merma"])
-            ucWasteReturn(["CU-SAL-13 Devolver merma surtida"])
-            ucWasteIssueReport(["CU-SAL-14 Generar reporte de salidas de merma"])
-        end
+    systemBoundary receiptPackage1["Nexus · Compras de materiales"]
+        ucReceiptQuery("CU-ENT-01 Consultar compras de material")
+        ucReceiptCreate("CU-ENT-02 Crear compra de material")
+        ucReceiptEdit("CU-ENT-03 Editar compra de material")
+        ucReceiptCorrect("CU-ENT-04 Corregir material de una compra")
+        ucReceiptCancel("CU-ENT-05 Cancelar material de una compra")
+        ucPurchaseReport("CU-ENT-06 Generar reporte de compras de material")
+        supplierExtension("CU-CAT-02 Crear proveedor · referencia a CAT")
+        materialExtension("CU-ALM-02 Crear material · referencia a ALM")
     end
 
-    warehouse --- ucMaterialIssueQuery
-    warehouse --- ucWasteIssueQuery
-    ucMaterialIssueQuery --- ucMaterialIssueCreate
-    ucMaterialIssueQuery --- ucMaterialIssueHeader
-    ucMaterialIssueQuery --- ucMaterialIssueDetails
-    ucMaterialIssueQuery --- ucMaterialSupply
-    ucMaterialIssueQuery --- ucMaterialReturn
-    ucMaterialIssueQuery --- ucMaterialIssueReport
-    ucWasteIssueQuery --- ucWasteIssueCreate
-    ucWasteIssueQuery --- ucWasteIssueHeader
-    ucWasteIssueQuery --- ucWasteIssueDetails
-    ucWasteIssueQuery --- ucWasteSupply
-    ucWasteIssueQuery --- ucWasteReturn
-    ucWasteIssueQuery --- ucWasteIssueReport
+    supplierExtension ..>:extend ucReceiptCreate
+    materialExtension ..>:extend ucReceiptCreate
+
+    warehouse -- ucReceiptQuery
+    warehouse -- ucReceiptCreate
+    warehouse -- ucReceiptEdit
+    warehouse -- ucReceiptCorrect
+    warehouse -- ucReceiptCancel
+    warehouse -- ucPurchaseReport
+    warehouse -- supplierExtension
+    warehouse -- materialExtension
+
+    ucReceiptQuery -- ucReceiptCreate
+    ucReceiptQuery -- ucReceiptEdit
+    ucReceiptQuery -- ucReceiptCorrect
+    ucReceiptQuery -- ucReceiptCancel
+    ucReceiptQuery -- ucPurchaseReport
 ```
+
+#### Compras de consumibles
+
+```mermaid
+usecase-beta
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary receiptPackage2["Nexus · Compras de consumibles"]
+        ucConsumableReceiptQuery("CU-ENT-07 Consultar compras de consumible")
+        ucConsumableReceiptCreate("CU-ENT-08 Crear compra de consumible")
+        ucConsumableReceiptEdit("CU-ENT-09 Editar compra de consumible")
+        ucConsumableReceiptCorrect("CU-ENT-10 Corregir consumible de una compra")
+        ucConsumableReceiptCancel("CU-ENT-11 Cancelar consumible de una compra")
+        ucConsumablePurchaseReport("CU-ENT-12 Generar reporte de compras de consumible")
+        supplierExtension("CU-CAT-02 Crear proveedor · referencia a CAT")
+        consumableExtension("CU-ALM-18 Crear consumible · referencia a ALM")
+    end
+
+    supplierExtension ..>:extend ucConsumableReceiptCreate
+    consumableExtension ..>:extend ucConsumableReceiptCreate
+
+    warehouse -- ucConsumableReceiptQuery
+    warehouse -- ucConsumableReceiptCreate
+    warehouse -- ucConsumableReceiptEdit
+    warehouse -- ucConsumableReceiptCorrect
+    warehouse -- ucConsumableReceiptCancel
+    warehouse -- ucConsumablePurchaseReport
+    warehouse -- supplierExtension
+    warehouse -- consumableExtension
+
+    ucConsumableReceiptQuery -- ucConsumableReceiptCreate
+    ucConsumableReceiptQuery -- ucConsumableReceiptEdit
+    ucConsumableReceiptQuery -- ucConsumableReceiptCorrect
+    ucConsumableReceiptQuery -- ucConsumableReceiptCancel
+    ucConsumableReceiptQuery -- ucConsumablePurchaseReport
+```
+
+### Grupo funcional SAL — Salidas de materiales, consumibles y mermas
+
+Consumibles sigue los recorridos `CU-SAL-01` a `CU-SAL-07` con pantalla,
+rutas y recursos propios, y las mismas transiciones de estado.
+
+#### Salidas de materiales
+
+```mermaid
+usecase-beta
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary issuePackage1["Nexus · Salidas de materiales"]
+        ucMaterialIssueQuery("CU-SAL-01 Consultar salidas de material")
+        ucMaterialIssueCreate("CU-SAL-02 Crear salida de material")
+        ucMaterialIssueHeader("CU-SAL-03 Editar encabezado de salida de material")
+        ucMaterialIssueDetails("CU-SAL-04 Editar detalles de material de una salida")
+        ucMaterialSupply("CU-SAL-05 Surtir material")
+        ucMaterialReturn("CU-SAL-06 Devolver material surtido")
+        ucMaterialIssueReport("CU-SAL-07 Generar reporte de salidas de material")
+        clientExtension("CU-CAT-06 Crear cliente · referencia a CAT")
+    end
+
+    clientExtension ..>:extend ucMaterialIssueCreate
+
+    warehouse -- ucMaterialIssueQuery
+    warehouse -- ucMaterialIssueCreate
+    warehouse -- ucMaterialIssueHeader
+    warehouse -- ucMaterialIssueDetails
+    warehouse -- ucMaterialSupply
+    warehouse -- ucMaterialReturn
+    warehouse -- ucMaterialIssueReport
+    warehouse -- clientExtension
+
+    ucMaterialIssueQuery -- ucMaterialIssueCreate
+    ucMaterialIssueQuery -- ucMaterialIssueHeader
+    ucMaterialIssueQuery -- ucMaterialIssueDetails
+    ucMaterialIssueQuery -- ucMaterialSupply
+    ucMaterialIssueQuery -- ucMaterialReturn
+    ucMaterialIssueQuery -- ucMaterialIssueReport
+```
+
+#### Salidas de mermas
+
+```mermaid
+usecase-beta
+direction LR
+    actor warehouse("Personal de almacén")
+    actor admin("Administrador del sistema")
+    admin --|> warehouse
+
+    systemBoundary issuePackage2["Nexus · Salidas de mermas"]
+        ucWasteIssueQuery("CU-SAL-08 Consultar salidas de merma")
+        ucWasteIssueCreate("CU-SAL-09 Crear salida de merma")
+        ucWasteIssueHeader("CU-SAL-10 Editar encabezado de salida de merma")
+        ucWasteIssueDetails("CU-SAL-11 Editar detalles de merma de una salida")
+        ucWasteSupply("CU-SAL-12 Surtir merma")
+        ucWasteReturn("CU-SAL-13 Devolver merma surtida")
+        ucWasteIssueReport("CU-SAL-14 Generar reporte de salidas de merma")
+    end
+
+    warehouse -- ucWasteIssueQuery
+    warehouse -- ucWasteIssueCreate
+    warehouse -- ucWasteIssueHeader
+    warehouse -- ucWasteIssueDetails
+    warehouse -- ucWasteSupply
+    warehouse -- ucWasteReturn
+    warehouse -- ucWasteIssueReport
+
+    ucWasteIssueQuery -- ucWasteIssueCreate
+    ucWasteIssueQuery -- ucWasteIssueHeader
+    ucWasteIssueQuery -- ucWasteIssueDetails
+    ucWasteIssueQuery -- ucWasteSupply
+    ucWasteIssueQuery -- ucWasteReturn
+    ucWasteIssueQuery -- ucWasteIssueReport
+```
+
+### Condiciones y puntos de extensión
+
+Las cinco extensiones se dibujan en las vistas `ENT` y `SAL`, junto a sus casos base.
+Los casos referenciados conservan su identificador y su definición en `CAT` o `ALM`.
+Esta tabla complementa las flechas con la condición, el punto de inserción y el retorno
+que también figuran en las fichas.
+
+| Extensión | Caso base | Punto de extensión y condición | Retorno al caso base |
+| --- | --- | --- | --- |
+| `CU-CAT-02` Crear proveedor | `CU-ENT-02` Crear compra de material | Paso 3, seleccionar proveedor; el actor elige **Nuevo proveedor** (A6). | Proveedor creado seleccionado; continúa la captura del paso 3. |
+| `CU-CAT-02` Crear proveedor | `CU-ENT-08` Crear compra de consumible | Paso 3, seleccionar proveedor; el actor elige **Nuevo proveedor** (A6). | Proveedor creado seleccionado; continúa la captura del paso 3. |
+| `CU-ALM-02` Crear material | `CU-ENT-02` Crear compra de material | Paso 3, seleccionar material; el actor elige **Registrar material** (A5). | Material con existencia cero seleccionado; continúa el detalle en el paso 4. |
+| `CU-ALM-18` Crear consumible | `CU-ENT-08` Crear compra de consumible | Paso 3, seleccionar consumible; el actor elige **Registrar consumible** (A5). | Consumible con existencia cero seleccionado; continúa el detalle en el paso 4. |
+| `CU-CAT-06` Crear cliente | `CU-SAL-02` Crear salida de material | Paso 3, seleccionar cliente; el actor elige **Nuevo cliente** (A3). | Cliente creado seleccionado; continúa la captura del paso 3. |
+
+Las bases pueden completarse seleccionando recursos existentes; las extensiones no son
+obligatorias y por ello no se representan con `«include»`. Si un alta se cancela o
+falla, no se confirma el documento base; el actor puede elegir un recurso existente,
+reintentar o abandonar el formulario. Cada alta conserva su propia autorización y
+persistencia: la relación UML no implica una única transacción con la compra o salida.
 
 ### Criterio de inclusión, exclusión y relaciones entre casos
 
@@ -360,17 +639,15 @@ actor, mientras registrar un movimiento es una responsabilidad interna de Nexus.
 misma razón, compartir servicios entre grupos no se representa como salto, inclusión o
 extensión entre casos de uso.
 
-Los actores vigentes son **Personal de almacén** del área Almacén y proveduría y
-**Administrador del sistema** del área Sistemas. El Administrador del sistema se muestra
-como especialización en los grupos operativos donde su acceso heredado debe distinguirse
-del correspondiente al Personal de almacén; en `CAT` conserva además asociaciones
-directas con las consultas y operaciones restringidas de proveedores, clientes, ajustes y catálogos
-auxiliares. Personal de almacén sólo se asocia con las altas `CU-CAT-02` y `CU-CAT-06`, que inicia
-desde selectores operativos sin acceso a los listados independientes. En `AUT`, **Usuario registrado** representa a ambos porque no varían
-los casos de inicio y cierre de sesión. Esta generalización expresa disponibilidad
-funcional, no omite las comprobaciones de permiso del servidor. Solicitantes,
-aprobadores, asesores y proveedores participan como roles o entidades del negocio, pero
-no se dibujan como actores porque no inician estos casos mediante acceso a Nexus.
+Los actores operativos vigentes son **Personal de almacén** del área Almacén y
+proveduría y **Administrador del sistema** del área Sistemas. Personal de almacén
+especializa a **Usuario registrado**; el administrador especializa a Personal de almacén
+y hereda sus asociaciones, incluidas las de autenticación. Además tiene casos propios. Los
+movimientos y sus reportes (`CU-ALM-07`, `CU-ALM-08`, `CU-ALM-15`, `CU-ALM-16`), los
+ajustes y las operaciones administrativas conservan asociaciones exclusivas con el
+administrador, conforme a sus fichas. Solicitantes, aprobadores, asesores y proveedores
+participan como roles o entidades del negocio, pero no se dibujan como actores porque
+no inician estos casos mediante acceso a Nexus.
 
 Cada caso pertenece a un único grupo funcional propietario; no quedan casos sueltos ni
 un paquete independiente de reportes dentro del límite de Nexus. Los identificadores se numeran secuencialmente dentro de su grupo propietario y los
@@ -382,18 +659,13 @@ describen su realización técnica.
 No se usa «administrar» o «mantener» como objetivo: cada óvalo expresa una operación
 observable.
 
-Dentro de cada grupo, la lectura se organiza por recurso: desde la consulta se trazan
-asociaciones simples, sin etiqueta, hacia las operaciones CRUD y específicas que le
-corresponden. En `CAT`, las asociaciones directas adicionales del administrador hacen
-explícitas las operaciones restringidas comprobadas por las rutas API. Sólo las
-relaciones con semántica `«include»` o `«extend»` deben indicarla explícitamente.
-Corregir, cancelar, ajustar, cambiar estado, surtir o devolver permanecen junto al
-recurso que modifican y reciben la secuencia correspondiente a esa posición.
-Cuando el orden cambia, catálogo, fichas, diagramas y referencias técnicas se renumeran
-en conjunto para conservar la trazabilidad. Una asociación simple no implica inclusión,
-extensión ni dependencia de ejecución; una relación `«include»` o `«extend»` sólo existe
-cuando aparece etiquetada explícitamente.
-La generalización de actores también se identifica de forma expresa.
+Cada objetivo se asocia con su actor primario; el administrador hereda las funciones
+de Almacén y se asocia además con sus casos exclusivos. Desde cada consulta se
+despliegan sus operaciones mediante enlaces sin texto. Estos enlaces son una convención
+visual del documento y no una relación UML de inclusión, extensión o generalización.
+Sólo `«include»` y `«extend»` llevan su estereotipo; la generalización se identifica por
+el triángulo hueco, sin etiqueta. Las cinco extensiones opcionales se conservan junto
+a sus casos base y en la tabla de condiciones y las fichas correspondientes.
 
 Los grupos son ayudas de lectura, no límites del sistema ni permisos. El Administrador
 del sistema del área Sistemas tiene acceso vigente a todos los casos visualizados, pero
@@ -417,3 +689,4 @@ caso sin que ambos deban compartir nombre.
 No se dibujan operaciones pendientes como asociaciones. Las áreas que eventualmente
 soliciten o registren salidas, y el mantenimiento de proyectos, deben definirse primero
 como alcance, permisos y criterios de aceptación.
+

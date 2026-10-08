@@ -9,8 +9,8 @@ rutas vuelven a comprobar la autorización en el servidor.
 Los diagramas se contrastan con el partial compartido `src/views/layout/ui/navList.ejs`.
 La definición normativa de los actores permanece en la
 [SRS](../../../../requirements/requirements-specification/03-actors-and-system-responsibilities.md):
-el Administrador del sistema hereda las capacidades operativas del Personal de almacén,
-pero no a la inversa.
+ambos actores especializan a Usuario registrado. Sus destinos operativos compartidos
+se autorizan explícitamente; no hay generalización entre Administrador y Personal de almacén.
 
 ## Acceso y sesión compartidos
 
@@ -29,15 +29,15 @@ stateDiagram-v2
     state "Cerrar sesión<br/>/cerrar-sesion" as Logout
     state "No encontrada<br/>/error/404" as NotFound
 
-    Root --> Login: sin sesión
-    Root --> Authenticated: con sesión
-    Login --> Authenticated: credenciales válidas
-    Authenticated --> Refresh: token vencido
-    Refresh --> Authenticated: renovación válida
-    Refresh --> Login: renovación inválida
+    Root --> Login: abrir [sesión ausente] / mostrar inicio de sesión
+    Root --> Authenticated: abrir [sesión válida] / mostrar área
+    Login --> Authenticated: iniciar sesión [credenciales válidas] / autenticar
+    Authenticated --> Refresh: solicitar recurso [token vencido] / renovar sesión
+    Refresh --> Authenticated: renovar [token válido] / restablecer sesión
+    Refresh --> Login: renovar [token inválido] / solicitar autenticación
     Authenticated --> Logout: solicitud POST
     Logout --> Login: sesión cerrada
-    Authenticated --> NotFound: URL inexistente o acceso denegado
+    Authenticated --> NotFound: navegar [ruta inexistente o acceso denegado] / mostrar error
     NotFound --> Root: volver al inicio
 ```
 
@@ -49,7 +49,7 @@ Los accesos independientes de administración, movimientos, clientes, proveedore
 catálogos auxiliares no forman parte de este recorrido.
 
 ```mermaid
-flowchart TB
+flowchart LR
     actor["Personal de almacén"] --> menu(["Menú principal"])
     menu --> warehouse(["Almacén"])
     warehouse -->|"materials:read"| materials["Materiales<br/>/almacen/materiales"]
@@ -58,6 +58,7 @@ flowchart TB
     menu -->|"goods:receipts-page-view"| purchases["Compras<br/>/compras"]
     menu --> issues(["Salidas"])
     issues -->|"goods:issues-page-view"| goodsIssues["Materiales<br/>/salidas/materiales"]
+    issues -->|"goods:issues-page-view"| consumableIssues["Consumibles<br/>/salidas/consumibles"]
     issues -->|"waste:issues-page-view"| wasteIssues["Mermas<br/>/salidas/mermas"]
     menu -->|"persons:page-view"| persons["Personas<br/>/personas"]
 ```
@@ -70,7 +71,7 @@ leerse sin depender del mapa anterior; las etiquetas reproducen el permiso compr
 por el menú compartido para mostrar cada opción.
 
 ```mermaid
-flowchart TB
+flowchart LR
     actor["Administrador del sistema"] --> menu(["Menú principal"])
     menu --> warehouse(["Almacén"])
     warehouse -->|"materials:read"| materials["Materiales<br/>/almacen/materiales"]
@@ -79,6 +80,7 @@ flowchart TB
     menu -->|"goods:receipts-page-view"| purchases["Compras<br/>/compras"]
     menu --> issues(["Salidas"])
     issues -->|"goods:issues-page-view"| goodsIssues["Materiales<br/>/salidas/materiales"]
+    issues -->|"goods:issues-page-view"| consumableIssues["Consumibles<br/>/salidas/consumibles"]
     issues -->|"waste:issues-page-view"| wasteIssues["Mermas<br/>/salidas/mermas"]
     menu --> movements(["Movimientos"])
     movements -->|"movements:read"| materialMovements["Materiales<br/>/movimientos/materiales"]

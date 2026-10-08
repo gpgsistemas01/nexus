@@ -5,8 +5,9 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/web/auth/logoutWebRoute.js
+    participant Route@{ "type": "boundary" } as src/routes/web/auth/logoutWebRoute.js
     participant Controller@{ "type": "control" } as src/controllers/web/authController.js
     participant Response as Respuesta Express
 

@@ -5,11 +5,12 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/materialApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
-    participant Domain as src/services/warehouse/materials/materialService.js
-    participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/materials/materialService.js
+    participant SupplierMaterial@{ "type": "control" } as src/services/warehouse/materials/supplierMaterialService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 

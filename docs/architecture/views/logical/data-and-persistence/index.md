@@ -8,18 +8,34 @@
 
 ## Vistas del modelo
 
-1. [Diagramas entidad–relación](generated/database-schema.md): cinco vistas por área y
-   relaciones transversales, generadas desde Prisma.
+1. [Diagramas del modelo relacional](generated/database-schema.md): vistas por área
+   con hasta tres modelos detallados por figura. Cada figura incluye sus relaciones
+   entrantes y salientes y las claves utilizadas en los modelos externos; una tabla
+   reúne las correspondencias FK → clave referenciada y sus cardinalidades.
 2. [Diccionario técnico](generated/data-dictionary.md): modelos, campos, tipos, claves y
    relaciones que complementan la lectura de los diagramas.
 
 ## Propósito
 
-Esta página presenta la estructura de datos mediante sus vistas ER. No es una guía para
+Esta página presenta el modelo relacional persistente mediante diagramas con notación
+ER de pata de cuervo. Cada conexión identifica los campos FK y las claves referenciadas;
+los atributos escalares se incluyen en las vistas por área. Las propiedades de relación
+de Prisma no son columnas: expresan la navegación del ORM sobre esas claves. Un modelo
+ER conceptual describiría entidades, atributos y asociaciones del negocio sin requerir
+claves foráneas; ése no es el propósito de estas vistas técnicas.
+
+No es una guía para
 ejecutar migraciones, recuperar despliegues ni aprovisionar cuentas de base de datos. Esos
 procedimientos pertenecen a la [vista física](../../physical/index.md). Tampoco redefine
 reglas funcionales: Prisma es la fuente técnica y los requisitos explican el significado
 de negocio.
+
+`Project` existe como modelo persistente y `GoodsIssue.projectId` lo referencia de
+forma opcional. El campo textual `projectNumber`, presente en salidas de materiales y
+mermas, no es una FK ni implica una relación con `Project`. De igual forma,
+`Project.client` es texto, mientras `GoodsIssue.clientId` referencia a `Client`.
+Los diagramas representan únicamente las relaciones declaradas en Prisma; los
+modelos sin FK entrantes ni salientes se identifican explícitamente en la vista ER.
 
 ## Propiedad de la información
 

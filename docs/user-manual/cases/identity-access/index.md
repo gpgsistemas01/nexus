@@ -2,6 +2,12 @@
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
+## Para su primera visita
+
+Busque primero una persona conocida y revise sus datos. **Personas** representa a quienes participan en la operación; **Usuarios** administra las cuentas que permiten entrar a Nexus. Registrar una persona no crea automáticamente una cuenta.
+
+Antes de un alta, busque si el registro ya existe. Al guardar, vuelva al listado y compruebe nombre, estado y asignaciones. Para una cuenta, confirme también la persona vinculada y el rol que necesita; administrar usuarios corresponde al administrador.
+
 ## Capítulos
 
 ### Personas

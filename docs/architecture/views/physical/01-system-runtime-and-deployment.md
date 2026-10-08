@@ -19,7 +19,7 @@ flowchart LR
 
     warehouse -->|"Registra y consulta la operación<br/>de inventario"| nexus
     systems -->|"Administra accesos, personas,<br/>catálogos y ajustes protegidos"| nexus
-    management -->|"Consulta trazabilidad,<br/>reportes e indicadores"| nexus
+    management -.->|"Alcance de supervisión<br/>pendiente de definición"| nexus
     nexus -->|"Persiste y consulta<br/>datos operativos"| supabase
 ```
 
@@ -31,7 +31,7 @@ actores intercambien información de negocio.
 ### Contenedores y capas
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph client["Navegador"]
         pages["Vistas EJS renderizadas"]
         scripts["JavaScript de páginas, módulos y servicios"]
@@ -71,15 +71,15 @@ de datos y las flechas indican comunicación o secuencia de arranque. Las creden
 se inyectan como variables de entorno en Render y no forman parte de la imagen.
 
 ```mermaid
-flowchart TB
+flowchart LR
     browser["Navegador del usuario"]
 
-    subgraph render["Render · servicio web administrado"]
+    subgraph render["«node» Render · servicio web administrado"]
         publicEndpoint["Endpoint público de Render"]
-        subgraph appContainer["Contenedor app · imagen Nexus"]
-            entrypoint["docker-entrypoint.sh<br/>NODE_ENV=production"]
-            migrations["Prisma CLI<br/>migrate deploy"]
-            nodeApp["Node.js / Express / Socket.IO<br/>puerto 3000"]
+        subgraph appContainer["«executionEnvironment» Contenedor app · Nexus"]
+            entrypoint["«artifact» docker-entrypoint.sh<br/>NODE_ENV=production"]
+            migrations["«artifact» Prisma CLI<br/>migrate deploy"]
+            nodeApp["«executionEnvironment» Node.js<br/>Express / Socket.IO · puerto 3000"]
 
             entrypoint -->|"RUN_MIGRATIONS=true"| migrations
             migrations -->|"migración correcta"| nodeApp
@@ -89,7 +89,7 @@ flowchart TB
         publicEndpoint --> nodeApp
     end
 
-    subgraph supabase["Supabase · servicio administrado"]
+    subgraph supabase["«node» Supabase · servicio administrado"]
         runtimeEndpoint["Endpoint de ejecución<br/>DATABASE_URL · directo o pooler"]
         database[("PostgreSQL<br/>base Nexus")]
         runtimeEndpoint --> database
@@ -119,9 +119,9 @@ operará PostgreSQL en infraestructura propia.
 flowchart LR
     browserTarget["Navegador del usuario"]
 
-    subgraph vps["VPS · objetivo"]
+    subgraph vps["«device» VPS · objetivo"]
         ingress["Proxy inverso y TLS<br/>por definir"]
-        nexusContainer["Contenedor Nexus<br/>Node.js · puerto interno 3000"]
+        nexusContainer["«executionEnvironment» Contenedor Nexus<br/>Node.js · puerto interno 3000"]
         ingress -.-> nexusContainer
     end
 
@@ -130,3 +130,9 @@ flowchart LR
     browserTarget -.->|"HTTPS"| ingress
     nexusContainer -.->|"DATABASE_URL / DIRECT_URL"| targetDatabase
 ```
+
+Esta vista de despliegue usa `flowchart` con estereotipos UML explícitos;
+no representa puertos ni conectores UML nativos. Las flechas de arranque del
+contenedor expresan control de ejecución y se distinguen de los canales HTTPS/SQL
+etiquetados. La topología objetivo conserva líneas discontinuas porque no está
+implementada.

@@ -1,4 +1,4 @@
-# Casos: Salidas de material y merma
+# Casos: Salidas de materiales, consumibles y mermas
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
@@ -68,3 +68,11 @@ sin campos editables.
 12. [12. CAP-SAL-WAS-05-RETURN — Devolver detalle](12-cap-sal-was-05-return.md)
 13. [13. CAP-REP-SAL-WAS-06-EXPORT — Exportar reporte](13-cap-rep-sal-was-06-export.md)
 14. [14. CAP-SAL-WAS-08-VIEW — Consultar salida cancelada](14-cap-sal-was-08-view.md)
+
+### Salidas de consumibles
+
+**Ruta en el menú:** **Menú principal → Salidas → Consumibles**.
+
+Consulte el recorrido propio de consumibles para registrar la solicitud, surtir, devolver y comprobar existencias.
+
+15. [15. CAP-SAL-CON-01-WALKTHROUGH — Recorrido de salidas de consumibles](15-cap-sal-con-01-walkthrough.md)

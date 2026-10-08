@@ -11,14 +11,28 @@ al menos dos consumidores y un contrato independiente del contexto.
 mezclar transporte, caso de uso, plugins y reglas visuales?
 
 ```mermaid
-flowchart LR
-    page["pages / entry point<br/>coordina la pantalla"] --> application["application<br/>operaciones del caso"]
-    application --> transport["services<br/>transporte HTTP"]
-    page --> resourceUi["UI del recurso<br/>campos y efectos propios"]
-    resourceUi --> sharedUi["public/js/ui<br/>contrato visual reutilizable"]
-    resourceUi --> plugins["plugins<br/>DataTable · Select2 · SweetAlert"]
-    page --> ejs["views/pages<br/>composición EJS"]
-    ejs --> sharedEjs["views/shared<br/>controls · forms · layout · tables"]
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction LR
+    class PageEntry { <<boundary>> }
+    class Application { <<control>> }
+    class HttpTransport { <<component>> }
+    class ResourceUI { <<boundary>> }
+    class SharedUI { <<component>> }
+    class Plugins { <<component>> }
+    class PageEJS { <<artifact>> }
+    class SharedEJS { <<artifact>> }
+    PageEntry ..> Application : usa operaciones
+    Application ..> HttpTransport : requiere requests
+    PageEntry ..> ResourceUI : coordina campos y efectos
+    ResourceUI ..> SharedUI : reutiliza contrato visual
+    ResourceUI ..> Plugins : adapta DataTable y Select2
+    PageEJS ..> PageEntry : carga entry point
+    PageEJS ..> SharedEJS : incluye parciales
 ```
 
 | Pieza compartida | Contrato común | Variación que permanece en el recurso |
@@ -99,7 +113,7 @@ y su representación física en el
 modal y el contrato paginado sin duplicar adaptadores por recurso?
 
 ```mermaid
-flowchart LR
+flowchart TB
     modal["modalSelector"] --> scope["scopeSelectors<br/>delimita controles"]
     scope --> domain["plugins/select2/domains<br/>mapeo del dominio"]
     domain --> base["Select2 base<br/>start · length · search"]

@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View as src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs
-    participant Application as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
+    participant View@{ "type": "boundary" } as src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs
+    participant Application@{ "type": "control" } as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
     participant Request as src/public/js/services/warehouse/wasteIssueService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>src/controllers/api/warehouse/wasteIssueController.js
@@ -20,7 +21,7 @@ sequenceDiagram
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: consulta GET /api/warehouse/waste-issues
-    Transport-->>HTTP: HTTP 2xx { code, data }
+    Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }
     HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
     Request-->>Application: getAllWasteIssuesRequest(): Promise[AxiosResponse]
     alt Respuesta exitosa

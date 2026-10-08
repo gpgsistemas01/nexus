@@ -5,15 +5,16 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Router as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/issueReturnValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Router@{ "type": "boundary" } as src/routes/api/warehouse/wasteIssueApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/issueReturnValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteIssueController.js
-    participant ReturnDto as returnDto: Object<br/>src/dtos/wasteIssueDTO.js
-    participant Service as src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js
-    participant Movement as src/services/warehouse/wastes/wasteMovementService.js
-    participant Status as src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
+    participant ReturnDto@{ "type": "entity" } as returnDto: Object<br/>src/dtos/wasteIssueDTO.js
+    participant Service@{ "type": "control" } as src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js
+    participant Movement@{ "type": "control" } as src/services/warehouse/wastes/wasteMovementService.js
+    participant Status@{ "type": "control" } as src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
@@ -41,15 +42,16 @@ sequenceDiagram
         else Cantidad válida
             Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId: id }, movementType: ENTRY, details })
             Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
-            Service->>Prisma: tx.wasteIssueReturn.create({ data })
+            Service->>Prisma: tx.wasteIssueDetail.update({ where: { id: detailId }, data: devolución y cumplimiento })
             Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
             alt todos los detalles quedan Cancelado
                 Service->>Prisma: tx.wasteIssue.update({ where: { id }, data })
             end
+            Service->>Prisma: tx.wasteIssueReturn.create({ data })
             Prisma-->>Service: salida de merma actualizada y commit
-            Service-->>Controller: returnWasteIssueDetail(): Promise[WasteIssueReturn]
+            Service-->>Controller: returnWasteIssueDetail(): Promise[{ ...wasteIssueReturn, detail: updatedDetail }]
             Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-issue-return-created' })
-            Controller-->>Client: 200 devolución registrada
+            Controller-->>Client: 200 { wasteIssueReturn, code }
         end
     end
 ```

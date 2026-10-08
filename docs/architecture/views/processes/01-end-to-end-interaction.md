@@ -7,12 +7,13 @@ de cada intercambio permanece en el contrato API y en OpenAPI.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor U as Usuario
-    participant V as Vista EJS + JS
-    participant R as Ruta / middleware
-    participant C as Controlador
-    participant S as Servicio
-    participant P as Prisma / PostgreSQL
+    participant V@{ "type": "boundary" } as Vista EJS + JS
+    participant R@{ "type": "boundary" } as Ruta / middleware
+    participant C@{ "type": "control" } as Controlador
+    participant S@{ "type": "control" } as Servicio
+    participant P@{ "type": "database" } as Prisma / PostgreSQL
 
     U->>V: abre una pantalla o ejecuta una acción
     V->>R: petición web o API

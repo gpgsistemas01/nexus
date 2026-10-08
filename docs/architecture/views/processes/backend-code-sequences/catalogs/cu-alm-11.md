@@ -5,13 +5,14 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/wasteApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/wasteValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/wasteApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/wasteValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
-    participant WasteDto as wasteDto: Object<br/>src/dtos/wasteDTO.js
-    participant Domain as src/services/warehouse/wastes/wasteService.js
+    participant WasteDto@{ "type": "entity" } as wasteDto: Object<br/>src/dtos/wasteDTO.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/wastes/wasteService.js
     participant ErrorHandler as src/app.js
 
     Client->>Route: PATCH /api/warehouse/wastes/:id

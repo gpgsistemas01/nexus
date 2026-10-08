@@ -5,13 +5,14 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/supplierApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/supplierValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/supplierApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/supplierValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
-    participant SupplierDto as supplierDto: Object<br/>src/dtos/supplierDTO.js
-    participant Domain as src/services/warehouse/supplierService.js
+    participant SupplierDto@{ "type": "entity" } as supplierDto: Object<br/>src/dtos/supplierDTO.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/supplierService.js
     participant ErrorHandler as src/app.js
 
     Client->>Route: PUT /api/warehouse/suppliers/:id

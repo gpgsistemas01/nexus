@@ -25,6 +25,7 @@ const SUPPLIER_MATERIAL_SNAPSHOT_INCLUDE = {
     material: {
         select: {
             id: true,
+            type: true,
             name: true,
             base: true,
             height: true,

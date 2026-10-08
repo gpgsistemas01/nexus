@@ -5,17 +5,18 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/reportApiRoute.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/reportApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
-    participant Query as src/services/warehouse/reportService.js
+    participant Query@{ "type": "control" } as src/services/warehouse/reportService.js
     participant Excel as src/utils/reportExcelUtils.js
     participant ErrorHandler as src/app.js
 
-    Client->>Route: GET /api/warehouse/reports/inventory/excel
+    Client->>Route: GET /api/warehouse/reports/inventory/excel?type=CONSUMABLE
     Route->>Controller: exportWarehouseReportExcel(req, res)
     activate Controller
-    Controller->>Query: reportService.findWarehouseReportRows({ search: getDataTableSearch(req.query), inventoryScope: req.query.inventoryScope, orderBy, orderDir })
+    Controller->>Query: reportService.findWarehouseReportRows({ search: getDataTableSearch(req.query), inventoryScope: req.query.inventoryScope, type: CONSUMABLE, orderBy, orderDir })
     activate Query
     alt Servicio resuelto
         Query-->>Controller: reportService.findWarehouseReportRows(): Promise[Object[]]

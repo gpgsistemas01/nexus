@@ -1,42 +1,41 @@
-# Procedimientos y casos
+# Guía para aprender a usar Nexus
 
-## Cómo seguir un procedimiento
+## Elija su recorrido
 
-Cada procedimiento indica su propósito, las condiciones previas, los controles necesarios, los
-pasos y el resultado que debe comprobar. Use sólo las acciones visibles para su cuenta y para el
-estado actual del registro.
+Si es su primer día, comience con [primeros pasos](overview.md). Después abra
+el manual de su función:
 
-- **Precondiciones:** confirme que cuenta con autorización y que los registros relacionados están
-  vigentes.
-- **Alternativas y errores:** si una acción no aparece, valide sus permisos y el estado del
-  registro. Si Nexus rechaza un dato, corrija el campo señalado. Antes de repetir una escritura,
-  compruebe si el registro o la existencia cambiaron.
-- **Capturas:** utilícelas para localizar controles y reconocer el modo o estado descrito.
-- **Resultado:** confirme el mensaje y el estado visible. Las acciones de existencia, surtido,
-  devolución y corrección modifican inventario; las de exportación generan un archivo.
+- [Personal de almacén](actors/warehouse.md): consultar existencia, registrar recepciones,
+  preparar salidas, surtir y recibir devoluciones.
+- [Administrador del sistema](actors/administrator.md): preparar catálogos, personas y
+  cuentas, y revisar la operación e historiales autorizados.
 
-🟨 **ADVERTENCIA:** antes de confirmar una escritura, revise la
-[matriz de validación y modos](form-validation-matrix.md). Una acción visible después de surtir,
-devolver, corregir o cancelar puede habilitar menos campos que la edición general.
+Empiece por una consulta. Practique una escritura cuando tenga el documento
+real y haya confirmado con la persona que le capacita qué debe registrar.
 
-🟥 **DATO SENSIBLE:** no incluya contraseñas, cookies, tokens ni datos personales en archivos,
-capturas o solicitudes de soporte.
+## Cómo seguir las guías
 
-## Casos por grupo funcional
+Abra el procedimiento en la misma pantalla donde va a trabajar. En los recorridos guiados, revise
+**Antes de empezar**, siga los pasos y termine con **Compruebe el resultado**.
+Los nombres en negritas corresponden a controles de Nexus. Las capturas disponibles
+sirven para ubicarlos; su cuenta puede mostrar menos acciones.
 
-Seleccione el grupo correspondiente a la tarea que necesita completar:
+Si un campo está bloqueado, revise el estado del documento antes de buscar otra
+forma de editarlo. Si Nexus señala un dato, corrija ese campo. Para dudas específicas
+sobre campos y modos, consulte la [matriz de formularios](form-validation-matrix.md).
 
-- [Autenticación y navegación](cases/authentication/index.md): iniciar sesión y recuperarse de una página no encontrada.
-- [Identidad y acceso](cases/identity-access/index.md): administrar personas, accesos, usuarios y contraseñas.
-- [Catálogos e inventario](cases/catalogs/index.md): consultar y mantener materiales, proveedores, clientes y mermas.
-- [Compras de materiales y consumibles](cases/purchases/index.md): registrar, editar, corregir, cancelar y exportar cada contexto.
-- [Salidas de material y merma](cases/issues/index.md): registrar, surtir, devolver y exportar salidas.
-- [Exportaciones desde consultas](cases/reports/index.md): exportar inventarios y movimientos desde su consulta correspondiente.
+## Busque la tarea que necesita
 
-## Manuales por actor
+| Quiero… | Abra esta guía |
+| --- | --- |
+| Entrar, reconocer el menú o cerrar sesión | [Acceso y navegación](cases/authentication/index.md) |
+| Registrar una persona o administrar cuentas | [Personas y usuarios](cases/identity-access/index.md) |
+| Consultar existencia o registrar un artículo | [Catálogos e inventario](cases/catalogs/index.md) |
+| Registrar una entrega de un proveedor | [Compras de materiales y consumibles](cases/purchases/index.md) |
+| Solicitar, surtir o devolver artículos | [Salidas de materiales, consumibles y mermas](cases/issues/index.md) |
+| Consultar movimientos y exportar su historial | [Movimientos y reportes](cases/reports/index.md), para el administrador |
 
-- [Administrador del sistema](actors/administrator.md): administración, catálogos, operación e
-  historiales autorizados.
-- [Personal de almacén](actors/warehouse.md): inventario, compras y salidas permitidas.
-
-Los reportes aparecen únicamente en el manual del actor que puede abrir el módulo.
+Los reportes de compras, salidas e inventario se descargan desde su propio
+listado con **Exportar Excel**. Para usar los filtros de la pantalla, seleccione
+**Personalizado: usar filtros aplicados**; para un periodo mensual, elija
+**Mes actual** u **Otro mes** y compruebe el periodo antes de descargar.

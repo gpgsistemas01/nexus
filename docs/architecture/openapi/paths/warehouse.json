@@ -900,9 +900,9 @@
       ]
     }
   },
-  "/api/warehouse/goods-issues": {
+  "/api/warehouse/goods-issues/materials": {
     "get": {
-      "operationId": "getWarehouseGoodsIssues",
+      "operationId": "getWarehouseMaterialGoodsIssues",
       "security": [
         {
           "cookieAuth": []
@@ -928,10 +928,11 @@
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
-      }
+      },
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     },
     "post": {
-      "operationId": "postWarehouseGoodsIssues",
+      "operationId": "postWarehouseMaterialGoodsIssues",
       "security": [
         {
           "cookieAuth": []
@@ -967,12 +968,85 @@
             }
           }
         }
-      }
+      },
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
-  "/api/warehouse/goods-issues/{id}": {
+  "/api/warehouse/goods-issues/consumables": {
+    "get": {
+      "operationId": "getWarehouseConsumableGoodsIssues",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/IssueList"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    },
+    "post": {
+      "operationId": "postWarehouseConsumableGoodsIssues",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsIssueResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/GoodsIssueRequest"
+            }
+          }
+        }
+      },
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    }
+  },
+  "/api/warehouse/goods-issues/materials/{id}": {
     "patch": {
-      "operationId": "patchWarehouseGoodsIssuesId",
+      "operationId": "patchWarehouseMaterialGoodsIssuesId",
       "security": [
         {
           "cookieAuth": []
@@ -1019,12 +1093,66 @@
             "format": "uuid"
           }
         }
-      ]
+      ],
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
-  "/api/warehouse/goods-issues/{id}/header": {
+  "/api/warehouse/goods-issues/consumables/{id}": {
     "patch": {
-      "operationId": "patchWarehouseGoodsIssuesIdHeader",
+      "operationId": "patchWarehouseConsumableGoodsIssuesId",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsIssueResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/GoodsIssueRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    }
+  },
+  "/api/warehouse/goods-issues/materials/{id}/header": {
+    "patch": {
+      "operationId": "patchWarehouseMaterialGoodsIssuesIdHeader",
       "security": [
         {
           "cookieAuth": []
@@ -1071,12 +1199,66 @@
             "format": "uuid"
           }
         }
-      ]
+      ],
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
-  "/api/warehouse/goods-issues/{id}/details": {
+  "/api/warehouse/goods-issues/consumables/{id}/header": {
     "patch": {
-      "operationId": "patchWarehouseGoodsIssuesIdDetails",
+      "operationId": "patchWarehouseConsumableGoodsIssuesIdHeader",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsIssueResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/IssueHeaderRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    }
+  },
+  "/api/warehouse/goods-issues/materials/{id}/details": {
+    "patch": {
+      "operationId": "patchWarehouseMaterialGoodsIssuesIdDetails",
       "security": [
         {
           "cookieAuth": []
@@ -1123,12 +1305,66 @@
             "format": "uuid"
           }
         }
-      ]
+      ],
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
-  "/api/warehouse/goods-issues/{id}/details/{detailId}/returns": {
+  "/api/warehouse/goods-issues/consumables/{id}/details": {
     "patch": {
-      "operationId": "patchWarehouseGoodsIssuesIdDetailsDetailidReturns",
+      "operationId": "patchWarehouseConsumableGoodsIssuesIdDetails",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsIssueResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/IssueDetailsUpdateRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    }
+  },
+  "/api/warehouse/goods-issues/materials/{id}/details/{detailId}/returns": {
+    "patch": {
+      "operationId": "patchWarehouseMaterialGoodsIssuesIdDetailsDetailidReturns",
       "security": [
         {
           "cookieAuth": []
@@ -1184,7 +1420,70 @@
             "format": "uuid"
           }
         }
-      ]
+      ],
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    }
+  },
+  "/api/warehouse/goods-issues/consumables/{id}/details/{detailId}/returns": {
+    "patch": {
+      "operationId": "patchWarehouseConsumableGoodsIssuesIdDetailsDetailidReturns",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsIssueReturnResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/ReturnRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "detailId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/reports/inventory/excel": {
@@ -1219,9 +1518,9 @@
       }
     }
   },
-  "/api/warehouse/reports/goods-issues/excel": {
+  "/api/warehouse/reports/goods-issues/materials/excel": {
     "get": {
-      "operationId": "getWarehouseReportsGoodsIssuesExcel",
+      "operationId": "getWarehouseReportsMaterialGoodsIssuesExcel",
       "security": [
         {
           "cookieAuth": []
@@ -1248,7 +1547,41 @@
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
-      }
+      },
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    }
+  },
+  "/api/warehouse/reports/goods-issues/consumables/excel": {
+    "get": {
+      "operationId": "getWarehouseReportsConsumableGoodsIssuesExcel",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/reports/waste-issues/excel": {

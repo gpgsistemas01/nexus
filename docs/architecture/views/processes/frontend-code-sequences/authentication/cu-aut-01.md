@@ -5,11 +5,12 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Usuario registrado
     participant Browser as Navegador
-    participant EJS as src/views/pages/home/login/loginPage.ejs
-    participant Form as src/public/js/pages/home/login/loginForm.js
-    participant App as src/public/js/application/auth/login.js
+    participant EJS@{ "type": "boundary" } as src/views/pages/home/login/loginPage.ejs
+    participant Form@{ "type": "boundary" } as src/public/js/pages/home/login/loginForm.js
+    participant App@{ "type": "control" } as src/public/js/application/auth/login.js
     participant Request as src/public/js/services/authService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant API@{ "type": "control" } as src/controllers/api/authController.js

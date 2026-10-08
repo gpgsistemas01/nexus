@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
-    participant Application as src/public/js/application/admin/catalogs/catalogs.js
+    participant View@{ "type": "boundary" } as src/public/js/plugins/datatable/admin/catalogs/catalogDatatable.js
+    participant Application@{ "type": "control" } as src/public/js/application/admin/catalogs/catalogs.js
     participant Request as src/public/js/services/admin/catalogService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/catalogApiRoute.js<br/>src/controllers/api/admin/catalogController.js

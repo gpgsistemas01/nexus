@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View as src/public/js/pages/admin/movements/movementsPage.js
-    participant Application as src/public/js/application/admin/movements/movements.js
+    participant View@{ "type": "boundary" } as src/public/js/pages/admin/movements/movementsPage.js
+    participant Application@{ "type": "control" } as src/public/js/application/admin/movements/movements.js
     participant Request as src/public/js/services/admin/movementService.js
     participant HTTP as src/public/js/services/axiosInstanceApi.js
     participant Transport@{ "type": "control" } as src/routes/api/admin/movementApiRoute.js<br/>src/controllers/api/admin/movementController.js

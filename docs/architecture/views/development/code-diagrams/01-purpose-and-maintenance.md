@@ -7,7 +7,11 @@ routers, capas, coordinación de servicios o componentes reutilizables. El
 e imports; estas representaciones agrupan esa evidencia para que una persona pueda comprenderla
 sin recorrer todos los archivos.
 
-Las flechas continuas significan llamada o delegación; las discontinuas significan
-configuración o reutilización. Ninguna asociación concede permisos ni convierte una ruta
+En las secuencias, las flechas continuas representan llamadas y las discontinuas,
+retornos. En los clasificadores UML, `..>` representa dependencia, `<|..` realización,
+`<|--` generalización y `*--` composición con propiedad del ciclo de vida. Los
+estereotipos describen responsabilidades y no convierten módulos ES en clases.
+Los flujos y mapas conservan su propia leyenda cuando Mermaid no ofrece el tipo UML.
+Ninguna asociación concede permisos ni convierte una ruta
 en caso de uso. Los objetivos del actor se mantienen en el
 [diagrama de casos de uso](../../../../requirements/domain-and-use-cases/02-current-use-cases.md).

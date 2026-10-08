@@ -5,7 +5,7 @@ fotografía revisada contra los routers vigentes: 61 rutas API y 16 rutas web. E
 de método, ruta y archivo permanece en el mapa generado.
 
 ```mermaid
-flowchart TB
+flowchart LR
     nexus["Nexus HTTP"]
     api["API · 61 rutas"]
     web["Web · 16 rutas"]

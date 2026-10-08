@@ -5,18 +5,19 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/warehouse/materialApiRoute.js
-    participant Auth as src/middleware/authMiddleware.js
-    participant Validator as src/validators/forms/materialValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/materialApiRoute.js
+    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
+    participant Validator@{ "type": "control" } as src/validators/forms/materialValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/materialController.js
-    participant MaterialDto as materialDto: Object<br/>src/dtos/materialDTO.js
-    participant Domain as src/services/warehouse/materials/materialService.js
-    participant Helpers as src/services/warehouse/materials/materialHelpers.js
-    participant Relations as src/services/warehouse/materials/materialRelations.js
-    participant SupplierMaterial as src/services/warehouse/materials/supplierMaterialService.js
-    participant Reason as src/services/warehouse/reasonService.js
-    participant Adjustment as src/services/warehouse/adjustmentService.js
+    participant MaterialDto@{ "type": "entity" } as materialDto: Object<br/>src/dtos/materialDTO.js
+    participant Domain@{ "type": "control" } as src/services/warehouse/materials/materialService.js
+    participant Helpers@{ "type": "control" } as src/services/warehouse/materials/materialHelpers.js
+    participant Relations@{ "type": "control" } as src/services/warehouse/materials/materialRelations.js
+    participant SupplierMaterial@{ "type": "control" } as src/services/warehouse/materials/supplierMaterialService.js
+    participant Reason@{ "type": "control" } as src/services/warehouse/reasonService.js
+    participant Adjustment@{ "type": "control" } as src/services/warehouse/adjustmentService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 

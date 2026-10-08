@@ -1,4 +1,23 @@
-const customSequenceParticipant = /^(\s*(?:actor|participant)\s+[A-Za-z_][\w-]*)@\{[^\r\n}]*\}(\s+as\s+)/gm;
+import { createHash } from 'node:crypto';
+
+export const MERMAID_CLI_VERSION = '12.0.0';
+export const MERMAID_VERSION = '12.1.0';
+export const MERMAID_EXPORT_CONFIG = Object.freeze({
+    theme: 'neutral',
+    look: 'classic',
+    fontFamily: 'Arial, sans-serif'
+});
+
+export const getMermaidImageId = (source) => createHash('sha256')
+    .update(JSON.stringify({
+        source,
+        cliVersion: MERMAID_CLI_VERSION,
+        mermaidVersion: MERMAID_VERSION,
+        config: MERMAID_EXPORT_CONFIG,
+        backgroundColor: 'white',
+        scale: 2
+    }))
+    .digest('hex').slice(0, 16);
 
 export const normalizeMermaidSource = (source) => {
     const content = source.replace(/\r?\n$/, '');
@@ -6,9 +25,7 @@ export const normalizeMermaidSource = (source) => {
         ? `${content.replace(/\\r\\n|\\n/g, '\n')}\n`
         : source;
 
-    // Mermaid's experimental sequence participant shapes can render non-finite SVG
-    // coordinates in headless Chromium. Published diagrams use the stable shape.
-    return normalizedLines.replace(customSequenceParticipant, '$1$2');
+    return normalizedLines;
 };
 
 export const hasInvalidSvgGeometry = (output) => (

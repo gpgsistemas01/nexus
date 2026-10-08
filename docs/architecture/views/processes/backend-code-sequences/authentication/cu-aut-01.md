@@ -5,14 +5,15 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Browser as Navegador
-    participant Router as src/routes/api/authApiRoute.js
-    participant Validator as src/validators/forms/authValidations.js<br/>src/middleware/validatorMiddleware.js
+    participant Router@{ "type": "boundary" } as src/routes/api/authApiRoute.js
+    participant Validator@{ "type": "control" } as src/validators/forms/authValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/authController.js
-    participant Service as src/services/authService.js
-    participant User as src/services/admin/userService.js
+    participant Service@{ "type": "control" } as src/services/authService.js
+    participant User@{ "type": "control" } as src/services/admin/userService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Token as src/services/jwtService.js
+    participant Token@{ "type": "control" } as src/services/jwtService.js
     participant Cookies as src/utils/cookiesUtils.js
 
     Browser->>Router: POST /api/auth/login { name, password }

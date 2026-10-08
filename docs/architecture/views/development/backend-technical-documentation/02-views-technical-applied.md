@@ -2,7 +2,7 @@
 
 ### Relación con la colección canónica
 
-Los 73 recorridos `DIA-BE-CU-*` de `backend-code-sequences/index.md` forman la colección
+Los 85 recorridos `DIA-BE-CU-*` de `backend-code-sequences/index.md` forman la colección
 canónica por caso y son propietarios del orden ruta → controller → servicio →
 persistencia o efecto. Este documento conserva únicamente diagramas que contestan una
 pregunta adicional. Un diagrama complementario no reemplaza la secuencia enlazada, no
@@ -57,19 +57,34 @@ Se revisa si cambia el orden de montaje en `src/app.js`, el contrato de
 **Identificador:** `DIA-BE-ACT-002`. **Caso:** `CU-ENT-05`. Este diagrama enfatiza las
 decisiones exclusivas de cancelación y la ausencia de una segunda identidad corregida.
 
+La figura usa la [convención de actividades](../../processes/index.md#notación-de-actividades)
+como aproximación a UML mediante Mermaid.
+
 ```mermaid
 flowchart TB
-    request["cancelGoodsReceiptDetailLine({ id, detailId, userId })"] --> transaction["Abrir $transaction"]
-    transaction --> find{"¿Entrada y detalle activo existen?"}
-    find -->|No| notFound["Propagar error sin cambios"]
-    find -->|Sí| reason{"¿Existe motivo de cancelación?"}
-    reason -->|No| reasonError["GoodsReceiptDetailChangeReasonNotFound"]
-    reason -->|Sí| reverse{"¿Puede revertirse la existencia recibida?"}
-    reverse -->|No| stockError["Conflicto; rollback"]
-    reverse -->|Sí| movement["Crear movimiento inverso y actualizar stock"]
-    movement --> cancel["Marcar detalle cancelado y recalcular totales"]
-    cancel --> history["Guardar cambio, motivo y actor"]
-    history --> commit["Commit y devolver entrada actualizada"]
+    initial@{ shape: f-circ } --> request("Recibir cancelGoodsReceiptDetailLine")
+    request --> transaction("Abrir $transaction")
+    transaction --> find{"¿Existen entrada y detalle?"}
+    find -->|"[no]"| notFound("Propagar GoodsReceiptNotFound")
+    find -->|"[sí]"| active{"¿El detalle sigue activo?"}
+    active -->|"[no]"| alreadyCanceled("Propagar GoodsReceiptDetailAlreadyCanceled")
+    active -->|"[sí]"| reason{"¿Existe motivo de cancelación?"}
+    reason -->|"[no]"| reasonError("Propagar GoodsReceiptDetailChangeReasonNotFound")
+    reason -->|"[sí]"| reverse{"¿Puede revertirse la existencia recibida?"}
+    reverse -->|"[no]"| stockError("Propagar conflicto de existencia")
+    reverse -->|"[sí]"| movement("Crear movimiento inverso y actualizar stock")
+    movement --> cancel("Marcar detalle cancelado y recalcular totales")
+    cancel --> history("Guardar cambio, motivo y actor")
+    history --> commit("Confirmar la transacción")
+    commit --> costs("Recalcular costos fuera de la transacción")
+    costs --> result("Devolver entrada actualizada")
+    result --> final@{ shape: fr-circ }
+    notFound --> rejected{" "}
+    alreadyCanceled --> rejected
+    reasonError --> rejected
+    stockError --> rejected
+    rejected --> rollback("Revertir la transacción y propagar el error")
+    rollback --> final
 ```
 
 ### Actividad de decisión y surtimiento de materiales
@@ -78,22 +93,35 @@ flowchart TB
 `DIA-BE-CU-SAL-05` exclusivamente para `GoodsIssue`: hace visibles sus errores y sus
 decisiones de estado sin presentarlas como equivalentes a las de `WasteIssue`.
 
+La figura usa la [convención de actividades](../../processes/index.md#notación-de-actividades)
+como aproximación a UML mediante Mermaid.
+
 ```mermaid
 flowchart TB
-    load["Cargar salida y detalles solicitados"] --> exists{"¿Existe la salida?"}
-    exists -->|No| notFound["GoodsIssueNotFound"]
-    exists -->|Sí| editable{"¿Estado Pendiente<br/>o Surtido parcial?"}
-    editable -->|No| conflict["GoodsIssueNotPendingConflict"]
-    editable -->|Sí| classify["Separar actualizaciones<br/>y solicitudes de surtimiento"]
-    classify --> transaction["Abrir $transaction"]
+    initial@{ shape: f-circ } --> load("Cargar salida y detalles solicitados")
+    load --> exists{"¿Existe la salida?"}
+    exists -->|"[no]"| notFound("Propagar GoodsIssueNotFound")
+    exists -->|"[sí]"| editable{"¿Estado Pendiente o Surtido parcial?"}
+    editable -->|"[no]"| conflict("Propagar GoodsIssueNotPendingConflict")
+    editable -->|"[sí]"| classify("Separar actualizaciones y solicitudes de surtimiento")
+    classify --> transaction("Abrir $transaction")
     transaction --> supply{"¿Hay cantidades por surtir?"}
-    supply -->|Sí| movement["applyInventoryMovement<br/>tipo ISSUE"]
-    supply -->|No| update["Actualizar detalles"]
-    movement --> update
-    update --> refresh["Releer detalles"]
-    refresh --> headerStatus["resolveIssueFulfillmentStatus"]
-    headerStatus --> result["Actualizar y devolver encabezado"]
+    supply -->|"[sí]"| movement("Aplicar movimiento de inventario ISSUE")
+    supply -->|"[no]"| mergeUpdate{" "}
+    movement --> mergeUpdate
+    mergeUpdate --> update("Actualizar detalles")
+    update --> refresh("Releer detalles")
+    refresh --> headerStatus("Resolver cumplimiento del encabezado")
+    headerStatus --> result("Actualizar encabezado y confirmar transacción")
+    result --> final@{ shape: fr-circ }
+    notFound --> final
+    conflict --> final
 ```
+
+La actividad resume las decisiones de dominio, sin desplegar cada fallo técnico de
+lectura o escritura. Un fallo dentro de la transacción provoca rollback y termina la
+operación; su propagación se detalla en la secuencia canónica. El recálculo de costos de
+la cancelación ocurre después del commit y no puede revertir esa transacción.
 
 La actividad complementa la secuencia porque hace visibles errores y bifurcaciones. La
 evidencia del adaptador está en
@@ -112,6 +140,7 @@ explícita esa garantía *best effort*.
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Browser as Cliente HTTP autenticado
     participant Audit as auditWrites
     participant Route as Ruta/controller/servicio
@@ -149,16 +178,16 @@ vuelve a consultar estas condiciones en `authorizeUserApi` y `authorizeUserWeb`.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> TokenValido: firma y vigencia aceptadas
-    TokenValido --> Invalido: usuario inexistente o inactivo
-    TokenValido --> Invalido: persona asociada inactiva
-    TokenValido --> Invalido: sin asignaciones
-    TokenValido --> UsuarioActivo: User activo y persona activa o ausente
-    UsuarioActivo --> Autorizado: existe asignación rol/departamento permitida
-    UsuarioActivo --> Prohibido: ninguna asignación satisface el permiso
-    Autorizado --> MiddlewareSuperado: req.user validado y next()
-    Invalido --> Rechazado401: INVALID_AUTH
-    Prohibido --> Rechazado403: FORBIDDEN
+    [*] --> TokenValido: validar token [firma y vigencia válidas]
+    TokenValido --> Invalido: consultar usuario [inexistente o inactivo]
+    TokenValido --> Invalido: consultar persona [inactiva]
+    TokenValido --> Invalido: consultar acceso [sin asignaciones]
+    TokenValido --> UsuarioActivo: consultar identidad [usuario activo y persona activa o ausente]
+    UsuarioActivo --> Autorizado: autorizar [asignación permitida]
+    UsuarioActivo --> Prohibido: autorizar [permiso insuficiente]
+    Autorizado --> MiddlewareSuperado: continuar / establecer req.user y ejecutar next()
+    Invalido --> Rechazado401: rechazar / responder 401 INVALID_AUTH
+    Prohibido --> Rechazado403: rechazar / responder 403 FORBIDDEN
     MiddlewareSuperado --> [*]
     Rechazado401 --> [*]
     Rechazado403 --> [*]
@@ -174,12 +203,12 @@ transacción de corrección; los estados funcionales permanecen en requisitos.
 ```mermaid
 stateDiagram-v2
     [*] --> Recibida: correctGoodsReceiptDetail
-    Recibida --> Validada: detalle y DTO válidos
-    Recibida --> Rechazada: error de dominio
+    Recibida --> Validada: validar [detalle y DTO válidos]
+    Recibida --> Rechazada: validar [error de dominio] / rechazar
     Validada --> TransaccionAbierta: correctGoodsReceiptDetailLine
-    TransaccionAbierta --> Rollback: falla en stock, movimiento o historial
-    TransaccionAbierta --> Commit: escrituras completas
-    Commit --> EventoPublicado: emitInventoryUpdated
+    TransaccionAbierta --> Rollback: persistir [fallo de escritura] / revertir transacción
+    TransaccionAbierta --> Commit: persistir [escrituras completas] / confirmar transacción
+    Commit --> EventoPublicado: confirmar / emitir emitInventoryUpdated()
     Rollback --> Respondida
     EventoPublicado --> Respondida
     Rechazada --> Respondida

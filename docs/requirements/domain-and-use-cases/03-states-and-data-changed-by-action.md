@@ -16,15 +16,19 @@ salidas de material y merma.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Pendiente: crear encabezado y detalles
-    Pendiente --> Pendiente: editar encabezado o detalles admitidos
-    Pendiente --> Parcial: surtir parte de al menos un detalle
-    Pendiente --> Surtida: surtir todos los detalles
-    Parcial --> Parcial: surtir sin completar el documento
-    Parcial --> Surtida: completar todos los detalles
-    Surtida --> Surtida: devolución parcial de un detalle
-    Surtida --> Cancelada: devolver todo lo surtido de todos los detalles
-    Parcial --> Cancelada: devolver todo lo surtido de todos los detalles
+    state "Pendiente" as Pendiente
+    state "Surtido parcial" as Parcial
+    state "Surtido" as Surtida
+    state "Cancelado" as Cancelada
+    [*] --> Pendiente: crear [datos válidos] / guardar sin descontar stock
+    Pendiente --> Pendiente: editar [campos admitidos] / actualizar documento
+    Pendiente --> Parcial: surtir [cantidad parcial y stock suficiente] / recalcular cumplimiento
+    Pendiente --> Surtida: surtir [todos los detalles completos] / recalcular cumplimiento
+    Parcial --> Parcial: surtir [quedan cantidades pendientes] / recalcular cumplimiento
+    Parcial --> Surtida: surtir [todos los detalles completos] / recalcular cumplimiento
+    Surtida --> Surtida: devolver [cantidad parcial] / revertir stock y movimiento
+    Surtida --> Cancelada: devolver [todos los detalles cancelados] / recalcular cumplimiento
+    Parcial --> Cancelada: devolver [todos los detalles cancelados] / recalcular cumplimiento
     Cancelada --> [*]
 ```
 

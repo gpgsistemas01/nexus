@@ -5,6 +5,8 @@
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Salidas de material](../../error-messages.md#errores-salidas-material).
 
+**Antes de empezar:** Busque la salida por folio y revise su estado. Mientras esté pendiente puede modificar los detalles; después del primer surtido sólo podrá editar el encabezado permitido.
+
 **Controles que debe usar:** Acción **Editar registro**; selectores **Buscar cliente...**, **Buscar asesor...**, **Buscar área...** y **Buscar solicitante...**; campos **Número de proyecto**, **Fecha y hora de solicitud:** y **Observaciones**; cuando el estado lo permita, selector **Buscar material...**, campo **Cantidad** y botón **Agregar**; botones **Actualizar** y **Regresar**.
 
 1. En la fila de la salida, seleccione **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
@@ -13,3 +15,5 @@
 
 2. Modifique los selectores y campos indicados. Mientras la salida esté pendiente, para incorporar un detalle elija una opción en **Buscar material...**, complete **Cantidad**, seleccione **Agregar** y compruebe que el renglón aparezca en la tabla; repita la operación cuando necesite más detalles. Después del primer surtido, los detalles quedan deshabilitados.
 3. Revise la tabla y seleccione **Actualizar** para guardar o **Regresar** para salir sin confirmar.
+
+**Compruebe el resultado:** Vuelva a abrir el folio y confirme los datos actualizados. Editar el encabezado no equivale a surtir materiales.

@@ -5,8 +5,8 @@ import logoutWebRoutes from './auth/logoutWebRoute.js';
 import materialWebRoutes from './warehouse/materialWebRoute.js';
 import consumableWebRoutes from './warehouse/consumableWebRoute.js';
 import wasteWebRoutes from './warehouse/wasteWebRoute.js';
-import goodsReceiptWebRoutes from './warehouse/goodsReceiptWebRoute.js';
-import goodsIssueWebRoutes from './warehouse/goodsIssueWebRoute.js';
+import goodsReceiptWebRoutes from './warehouse/goodsReceipts/goodsReceiptWebRoute.js';
+import goodsIssueWebRoutes from './warehouse/goodsIssues/goodsIssueWebRoute.js';
 import wasteIssueWebRoutes from './warehouse/wasteIssueWebRoute.js';
 import userWebRoutes from './admin/userWebRoute.js';
 import personWebRoutes from './admin/personWebRoute.js';
@@ -24,7 +24,7 @@ const WEB_ROUTES = [
     ['/almacen/consumibles', consumableWebRoutes],
     ['/almacen/mermas', wasteWebRoutes],
     ['/compras', goodsReceiptWebRoutes],
-    ['/salidas/materiales', goodsIssueWebRoutes],
+    ['/salidas', goodsIssueWebRoutes],
     ['/salidas/mermas', wasteIssueWebRoutes],
     ['/usuarios-sistemas', userWebRoutes],
     ['/personas', personWebRoutes],

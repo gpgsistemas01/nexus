@@ -5,6 +5,8 @@
 
 **Errores posibles:** [Compras](../../error-messages.md#errores-compras).
 
+**Antes de empezar:** Abra **Compras → Materiales**. Si necesita un reporte personalizado, aplique primero los filtros del listado.
+
 **Controles que debe usar:** Botón **Exportar Excel**; opciones **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados**; campo **Mes del reporte** y botón **Descargar**.
 
 1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
@@ -13,3 +15,5 @@
 
 2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.
+
+**Compruebe el resultado:** Abra el archivo descargado y confirme el periodo, proveedor y artículos. La descarga no modifica la compra ni la existencia.

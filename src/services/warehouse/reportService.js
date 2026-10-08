@@ -326,6 +326,7 @@ export const findWarehouseReportRows = async ({
 };
 
 export const findGoodsIssueReportRows = async ({
+    type,
     search = '',
     startDate = '',
     endDate = '',
@@ -339,6 +340,8 @@ export const findGoodsIssueReportRows = async ({
     orderDir = 'desc'
 } = {}) => {
     const goodsIssuesResult = await findAllGoodsIssues({
+        includeCounts: false,
+        type,
         skip: 0,
         take: 100000,
         search,
@@ -399,6 +402,7 @@ export const findGoodsReceiptReportRows = async ({
 } = {}) => {
 
     const goodsReceiptsResult = await findAllGoodsReceipts({
+        includeCounts: false,
         skip: 0,
         take: 100000,
         search,

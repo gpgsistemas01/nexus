@@ -5,6 +5,8 @@
 
 **Errores posibles:** [Compras](../../error-messages.md#errores-compras).
 
+**Antes de empezar:** Abra **Menú principal → Compras → Materiales**. Tenga el folio, factura o proveedor de la compra que quiere localizar.
+
 **Controles que debe usar:** Buscador **Buscar por Folio o N° Factura**; filtros **Fecha de inicio:**, **Fecha de fin:**, **Proveedor:** y **Persona que recibe:**; botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nueva compra**; acción **Editar registro** por fila.
 
 1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
@@ -14,3 +16,5 @@
 2. Escriba un término en **Buscar por Folio o N° Factura** o complete **Fecha de inicio:**, **Fecha de fin:**, **Proveedor:** y **Persona que recibe:**.
 3. Seleccione **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
 4. En la tabla, seleccione **Nueva compra**, **Exportar Excel** o **Editar registro**, según la operación requerida.
+
+**Compruebe el resultado:** Confirme folio, proveedor y fecha en la fila encontrada. Limpiar los filtros no modifica la compra.

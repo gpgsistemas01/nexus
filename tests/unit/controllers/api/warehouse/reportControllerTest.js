@@ -40,6 +40,14 @@ vi.mock('../../../../../src/services/warehouse/goodsReceipts/consumables/consuma
   findConsumableGoodsReceiptReportRows
 }));
 
+vi.mock('../../../../../src/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js', () => ({
+  findMaterialGoodsIssueReportRows: findGoodsIssueReportRows
+}));
+
+vi.mock('../../../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js', () => ({
+  findConsumableGoodsIssueReportRows: vi.fn()
+}));
+
 vi.mock('../../../../../src/utils/requestQueryUtils.js', () => ({
   getDataTableOrder: () => ({ orderBy: 'name', orderDir: 'asc' }),
   getDataTableSearch: () => '',
@@ -53,11 +61,10 @@ vi.mock('../../../../../src/utils/formattersUtils.js', () => ({
 vi.mock('../../../../../src/utils/reportExcelUtils.js', () => ({ createFormulaCell, sendExcelReport }));
 
 import {
-  exportGoodsIssueReportExcel,
-  exportConsumableGoodsReceiptReportExcel,
-  exportMaterialGoodsReceiptReportExcel,
   exportWasteReportExcel
 } from '../../../../../src/controllers/api/warehouse/reportController.js';
+
+import { exportMaterialGoodsIssueReportExcel } from '../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueReportController.js';
 
 describe('exportación del reporte de mermas', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -111,7 +118,7 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
       convertedQuantityDifference: 2
     }]);
 
-    await exportGoodsIssueReportExcel({ query: {}, user: { accesses: [] } }, {});
+    await exportMaterialGoodsIssueReportExcel({ query: {}, user: { accesses: [] } }, {});
 
     const { data } = sendExcelReport.mock.calls[0][0];
     expect(data[1][17]).toEqual({ f: 'O2-Q2', t: 'n', v: 2 });
@@ -192,7 +199,7 @@ describe('consulta mensual de reportes operativos', () => {
     getReportMonthDateRange.mockReturnValue({ startDate: '2025-02-01', endDate: '2025-02-28' });
     findGoodsIssueReportRows.mockResolvedValue([]);
 
-    await exportGoodsIssueReportExcel({
+    await exportMaterialGoodsIssueReportExcel({
       query: {
         monthlyReport: 'true',
         reportMonth: '2025-02',
@@ -211,3 +218,6 @@ describe('consulta mensual de reportes operativos', () => {
     }));
   });
 });
+
+import { exportMaterialGoodsReceiptReportExcel } from '../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js';
+import { exportConsumableGoodsReceiptReportExcel } from '../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptReportController.js';

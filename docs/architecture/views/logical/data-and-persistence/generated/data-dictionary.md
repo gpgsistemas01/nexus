@@ -324,6 +324,7 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
+| `type` | `MaterialType` | Sí | — | `MATERIAL` | — |
 | `referenceNumber` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `approvedDate` | `DateTime?` | No | — | — | — |
 | `requestDate` | `DateTime` | Sí | — | — | — |

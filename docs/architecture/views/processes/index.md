@@ -22,6 +22,38 @@ realización dinámica. Requisitos mantiene el flujo normativo en cada ficha `CU
 duplica una actividad por caso. Si una actividad deja de agregar una pregunta distinta,
 se elimina en lugar de trasladarla o actualizar dos representaciones equivalentes.
 
+## Notación de actividades
+
+Los diagramas de actividad siguen vigentes en [UML 2.5.1](https://www.omg.org/spec/UML/2.5.1).
+Se usan para explicar flujo de control, alternativas y concurrencia; una secuencia
+explica mensajes entre participantes y una máquina de estados explica cambios de estado.
+Son perspectivas complementarias, no reemplazos entre sí.
+
+Mermaid no dispone de un tipo nativo `activityDiagram`. Las cuatro actividades de Nexus
+se representan mediante `flowchart` con una convención común, como aproximaciones a UML:
+
+| Elemento de actividad UML | Representación en estas vistas |
+| --- | --- |
+| Nodo inicial | Círculo sólido pequeño, sin nombre de acción (`f-circ`). |
+| Acción | Rectángulo con esquinas redondeadas y verbo que describe el trabajo. |
+| Flujo de control | Línea continua con flecha; no usa `«include»` ni `«extend»`. |
+| Decisión | Rombo con salidas alternativas y guardas entre corchetes, como `[sí]` y `[no]`. |
+| Reunión de alternativas (merge) | Rombo que reúne caminos excluyentes; no sincroniza tareas. |
+| Final de actividad | Círculo con centro sólido (`fr-circ`), sin etiqueta ni tamaño dependiente del texto. |
+
+Las guardas de una decisión deben ser excluyentes y cubrir las alternativas relevantes.
+No se emplean varias entradas directas a una acción para sugerir una reunión de caminos:
+se muestra el rombo de merge. Ninguna de estas cuatro actividades requiere concurrencia;
+por eso no se añaden barras fork/join. Si se modela trabajo paralelo, UML requiere una
+barra de bifurcación y otra de sincronización cuando corresponda, no rombos. Las
+particiones o carriles se agregan sólo cuando hace falta distinguir responsabilidades;
+el alcance de estas vistas ya identifica navegador, servidor o ciclo compartido.
+
+`flowchart` conserva esta semántica, pero no constituye conformidad gráfica UML estricta.
+Una entrega que exija todos los símbolos UML nativos requiere un editor o renderizador
+que soporte actividades UML, por ejemplo PlantUML. No se elimina una actividad útil por
+la limitación del renderizador ni se presenta una máquina de estados como sustituto.
+
 ### Resultado de la revisión de actividades
 
 | Actividad conservada | Ubicación propietaria | Por qué se requiere |

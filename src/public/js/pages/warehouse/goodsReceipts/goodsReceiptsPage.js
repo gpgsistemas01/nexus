@@ -3,6 +3,5 @@ import '../materials/materialForm.js';
 import '../suppliers/supplierForm.js';
 import './goodsReceiptForm.js';
 import { openGoodsReceiptModal } from './goodsReceiptModal.js';
-import { goodsReceiptContext } from './goodsReceiptContext.js';
 
-createGoodsReceiptDatatable({ openGoodsReceiptModal, resource: goodsReceiptContext.resource });
+export const startGoodsReceiptsPage = ({ resource }) => createGoodsReceiptDatatable({ openGoodsReceiptModal, resource });

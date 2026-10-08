@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/admin/personApiRoute.js
+    participant Route@{ "type": "boundary" } as src/routes/api/admin/personApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/admin/personController.js
-    participant Domain as src/services/admin/person/personService.js
+    participant Domain@{ "type": "control" } as src/services/admin/person/personService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant ErrorHandler as src/app.js
 

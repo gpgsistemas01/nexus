@@ -5,10 +5,11 @@
 
 ```mermaid
 sequenceDiagram
+    autonumber
     participant Client as Cliente HTTP / web
-    participant Route as src/routes/api/sales/reportApiRoute.js
+    participant Route@{ "type": "boundary" } as src/routes/api/sales/reportApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/sales/reportController.js
-    participant Query as src/services/sales/clientService.js
+    participant Query@{ "type": "control" } as src/services/sales/clientService.js
     participant Excel as src/utils/reportExcelUtils.js
     participant ErrorHandler as src/app.js
 

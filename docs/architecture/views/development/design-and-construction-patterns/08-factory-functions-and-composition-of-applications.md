@@ -7,16 +7,36 @@ y sus consumidores en los
 Este capítulo conserva únicamente las variantes y reglas de exposición.
 
 ```mermaid
-flowchart LR
-    requests["Requests y claves<br/>del recurso"] --> crud["createCrudApplication"]
-    crud --> operations["getAll · register · edit<br/>additionalMutations"]
-    operations --> domain["Exports con nombres<br/>del dominio"]
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction LR
+    class CrudFactory {
+        <<factory>>
+        createCrudApplication(config) Object
+    }
+    class IssueFactory {
+        <<factory>>
+        createIssueApplication(config) Object
+    }
+    class ListFactory {
+        <<factory>>
+        createDataTableListController(config) Function
+    }
+    class DomainApplication { <<module>> }
+    class IssueApplication { <<module>> }
+    class ListController { <<module>> }
+    class RequestConfiguration { <<configuration>> }
 
-    crud -. compone .-> issue["createIssueApplication"]
-    issue --> issueOps["editHeader · editDetails<br/>returnDetail"]
-
-    query["Consulta + columnas + orden"] --> list["createDataTableListController"]
-    list --> controller["Controller tabular<br/>del dominio"]
+    DomainApplication ..> CrudFactory : configura
+    IssueApplication ..> IssueFactory : configura
+    IssueFactory ..> CrudFactory : compone operaciones
+    ListController ..> ListFactory : inyecta consulta
+    CrudFactory ..> RequestConfiguration : recibe
+    IssueFactory ..> RequestConfiguration : recibe
 ```
 
 ### Contratos configurables
@@ -55,3 +75,22 @@ controller conserva columnas, servicio y autorización propios.
 Estas construcciones son **factory functions**, no *Factory Method*, *Abstract Factory*
 ni *Template Method*: no existen jerarquías de creadores o productos y la
 especialización se realiza por composición de objetos, no por herencia.
+
+### Compras y salidas por contexto
+
+`goodsReceipts` y `goodsIssues` agrupan sus archivos por módulo en cada capa.
+Las carpetas `materials` y `consumables` contienen servicios, controllers,
+routers, reportes, solicitudes, aplicaciones y entradas de página específicos.
+Los routers importan su controller y se registran en el índice API; los
+reportes conservan el prefijo `/warehouse/reports`.
+
+Las fábricas comparten handlers, solicitudes y aplicaciones. Formularios,
+tablas y adaptadores de página reutilizan ese núcleo. Las fachadas fijan el
+tipo; `buildGoodsReceiptContextWhere` y `buildGoodsIssueContextWhere` exigen
+cabecera y detalles del mismo contexto mediante `type`, `some: {}` y `every`.
+Compras conserva las operaciones comunes con `type: null`.
+
+Los reportes usan `includeCounts: false` para consultar sólo datos. Los
+listados mantienen los conteos; compras reutiliza el total cuando no hay
+filtros adicionales. Las escrituras conservan la comprobación transaccional.
+La regla funcional está en [modos y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md).

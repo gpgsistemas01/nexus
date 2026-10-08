@@ -56,3 +56,14 @@ visual del formulario en un estado persistido del documento.
    pruebas propios. No se resume como actualización genérica.
 5. Los contextos equivalentes reutilizan fábricas, componentes y coordinación común,
    pero mantienen separadas sus reglas, existencias y movimientos.
+
+### Separación de compras y salidas
+
+La ruta fija el tipo persistido de materiales o consumibles; no puede cambiarse
+por query ni payload. Cada documento debe tener al menos un detalle y todos
+sus recursos deben coincidir con el tipo de cabecera, incluidos los cancelados.
+
+Listados, reportes y escrituras aplican esta regla. Las operaciones cruzadas
+se rechazan sin cambios de documento, stock ni trazabilidad. Los documentos
+históricos mixtos o vacíos se conservan para regularización, pero quedan
+excluidos de ambos contextos.

@@ -1,7 +1,6 @@
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { existsSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
@@ -16,7 +15,7 @@ import {
 } from './documentExportContentUtils.js';
 import { removeDocumentOutput } from './documentOutputUtils.js';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
-import { hasInvalidSvgGeometry, normalizeMermaidSource } from './mermaidExportUtils.js';
+import { getMermaidImageId, hasInvalidSvgGeometry, MERMAID_EXPORT_CONFIG, normalizeMermaidSource } from './mermaidExportUtils.js';
 import { validatePdfOutput } from './pdfExportUtils.js';
 import {
     preparePdfConverter,
@@ -171,6 +170,9 @@ const MANUALS = Object.freeze({
                 ]),
                 ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
             ]),
+            'salidas-consumibles': manualPart(warehouse, manualCaseFiles('issues', [
+                '15-cap-sal-con-01-walkthrough.md'
+            ])),
             'salidas-mermas': manualPart(warehouse, [
                 ...manualCaseFiles('issues', [
                     '08-cap-sal-was-01-list.md',
@@ -590,6 +592,9 @@ await Promise.all([
     mkdir(openApiOutputDirectory, { recursive: true })
 ]);
 const mermaidExecutable = path.join(ROOT, 'node_modules', '@mermaid-js', 'mermaid-cli', 'src', 'cli.js');
+const mermaidConfigFile = path.join(temporaryDirectory, 'mermaid-config.json');
+await writeFile(mermaidConfigFile, JSON.stringify(MERMAID_EXPORT_CONFIG));
+let mermaidPrepared = false;
 
 const prepareSource = async (source, publicationSources, firstFigureNumber, currentOutput, outputFormat) => {
     const sourceContent = await readFile(path.join(ROOT, source), 'utf8');
@@ -597,6 +602,15 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
         ? prepareManualEntry(sourceContent, currentOutput)
         : sourceContent;
     const blocks = [...content.matchAll(mermaidBlock)];
+    if (blocks.length && !mermaidPrepared) {
+        try {
+            prepareMermaidCli({ executable: mermaidExecutable });
+            mermaidPrepared = true;
+        } catch (error) {
+            console.error(error.message);
+            return null;
+        }
+    }
 
     const renderedSource = path.join(temporaryDirectory, source);
     await mkdir(path.dirname(renderedSource), { recursive: true });
@@ -613,7 +627,7 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
     ));
     for (const match of blocks) {
         const diagram = normalizeMermaidSource(match[1]);
-        const id = createHash('sha256').update(diagram).digest('hex').slice(0, 16);
+        const id = getMermaidImageId(diagram);
         const input = path.join(diagramSourceDirectory, `${id}.mmd`);
         const image = path.join(diagramOutputDirectory, `${id}.png`);
         const validationMarker = path.join(diagramOutputDirectory, `${id}.validated`);
@@ -623,13 +637,12 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
                 rm(image, { force: true }),
                 rm(validationMarker, { force: true })
             ]);
-            try {
-                prepareMermaidCli({ executable: mermaidExecutable });
-            } catch (error) {
-                console.error(error.message);
-                return null;
+            const mermaidArguments = [mermaidExecutable, '--input', input, '--output', image,
+                '--configFile', mermaidConfigFile, '--backgroundColor', 'white', '--scale', '2'];
+            if (process.env.DOCS_MERMAID_PUPPETEER_CONFIG) {
+                mermaidArguments.push('--puppeteerConfigFile', process.env.DOCS_MERMAID_PUPPETEER_CONFIG);
             }
-            const result = spawnSync(process.execPath, [mermaidExecutable, '--input', input, '--output', image, '--backgroundColor', 'white', '--scale', '2'], { cwd: ROOT, encoding: 'utf8' });
+            const result = spawnSync(process.execPath, mermaidArguments, { cwd: ROOT, encoding: 'utf8' });
             if (result.stdout) process.stdout.write(result.stdout);
             if (result.stderr) process.stderr.write(result.stderr);
             if (result.error?.code === 'ENOENT') {
