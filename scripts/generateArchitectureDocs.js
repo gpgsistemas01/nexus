@@ -119,15 +119,19 @@ const validateUseCaseDiagramCoverage = async () => {
         [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
             .map((match) => [match[1], match[2]])
     );
+    const permittedActors = new Map();
     const expectedActors = new Map(
         [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — .+\r?\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)]
             .map(([, id, body]) => {
                 const declaredActor = body.match(/^\| Actor \| (.*?) \|$/m)?.[1] ?? '';
-                const actor = declaredActor.startsWith('Usuario registrado')
-                    ? 'Usuario registrado'
-                    : declaredActor.includes('Personal de almacén')
-                        ? 'Personal de almacén'
-                        : 'Administrador del sistema';
+                const actors = [
+                    ['Usuario registrado', 'user'],
+                    ['Personal de almacén', 'warehouse'],
+                    ['Administrador del sistema', 'admin']
+                ].filter(([label]) => declaredActor.includes(label)).map(([, alias]) => alias);
+                permittedActors.set(id, actors);
+                const actor = actors[0] === 'user' ? 'Usuario registrado'
+                    : actors[0] === 'warehouse' ? 'Personal de almacén' : 'Administrador del sistema';
                 return [id, actor];
             })
     );
@@ -212,21 +216,22 @@ const validateUseCaseDiagramCoverage = async () => {
             if (/^(?:Crear|Registrar) /.test(title)) {
                 for (const [actor, target] of associations.filter(([from]) => actors.has(from))) {
                     if (target === alias && associations.some(([from, to]) => (
-                        queryAliases.has(from) && to === alias && reachableByActor.get(actor)?.has(from)
+                        queryAliases.has(from) && to === alias && !extensionAliases.has(alias)
                     ))) {
-                        failures.push(`casos de uso: ${id} repite la asociación de ${actor} que ya se muestra desde su consulta`);
+                        failures.push(`casos de uso: ${id} repite la asociación de ${actor} que en esta vista ya se muestra desde Consulta`);
                     }
                 }
             }
             if (title !== expectedTitles.get(id)) {
                 failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
             }
-            const actor = expectedActors.get(id) === 'Usuario registrado' ? 'user'
-                : expectedActors.get(id) === 'Personal de almacén' ? 'warehouse' : 'admin';
-            if (!reachableByActor.get(actor)?.has(alias)) {
+            const normativeActors = permittedActors.get(id) ?? [];
+            const visibleActors = normativeActors.filter(actor => actors.has(actor));
+            if (!visibleActors.length || visibleActors.some(actor => !reachableByActor.get(actor)?.has(alias))) {
                 failures.push(`casos de uso: ${id} no se asocia con su actor normativo directamente, por herencia o desde Consulta`);
             }
-            if (actor === 'admin' && reachableByActor.get('warehouse')?.has(alias)) {
+            if (normativeActors.length === 1 && normativeActors[0] === 'admin'
+                && reachableByActor.get('warehouse')?.has(alias)) {
                 failures.push(`casos de uso: ${id} es exclusivo del administrador y no debe enlazarse desde Personal de almacén ni sus consultas`);
             }
         }

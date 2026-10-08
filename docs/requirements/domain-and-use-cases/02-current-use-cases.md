@@ -70,10 +70,10 @@ y Reporte. En Movimientos sólo corresponden Consulta y Reporte; Autenticación 
 Inicio y Cierre de sesión. Los casos referenciados como extensiones mantienen el número
 de su grupo propietario, aunque aparezcan dentro de otra figura.
 
-Los casos propios de cada figura se leen por número en el mismo orden que sus fichas:
-de arriba hacia abajo y, si comparten una fila como en Autenticación, de izquierda
-a derecha. La longitud de las asociaciones conserva esa distribución
-en Dagre; no añade relaciones ni cambia su significado. Las extensiones de otros
+Los diagramas tienen orientación horizontal. Los casos propios de cada figura se
+leen de izquierda a derecha por número, en el mismo orden que sus fichas; cuando
+comparten una columna, se leen de arriba hacia abajo. La longitud de las asociaciones
+conserva esa distribución en Dagre; no añade relaciones ni cambia su significado. Las extensiones de otros
 grupos se sitúan junto a su caso base y conservan su identificador propietario.
 Un diagrama de casos de uso muestra objetivos y participación, no una secuencia de ejecución.
 Se mantienen varias figuras por grupo para conservar la legibilidad de las operaciones
@@ -84,7 +84,7 @@ y actores: agrupar todos los casos en una sola figura no es una exigencia de UML
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor user("Usuario registrado")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
@@ -107,7 +107,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -131,7 +131,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary identityPackage2["Nexus · Usuarios y credenciales"]
@@ -157,7 +157,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -189,7 +189,7 @@ consulta de movimientos.
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary materialMovementsPackage["Nexus · Movimientos de materiales"]
@@ -206,7 +206,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -238,7 +238,7 @@ consulta de movimientos.
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary wasteMovementsPackage["Nexus · Movimientos de mermas"]
@@ -255,7 +255,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -291,10 +291,8 @@ grupo usan la familia estable `CU-ALM-*`.
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
-    actor warehouse("Personal de almacén")
-    admin --|> warehouse
 
     systemBoundary catalogPackage1["Nexus · Proveedores"]
         ucSupplierQuery("CU-CAT-01 Consultar proveedores")
@@ -303,8 +301,7 @@ direction TB
         ucSupplierReport("CU-CAT-04 Generar reporte de proveedores")
     end
 
-    admin --- ucSupplierQuery
-    warehouse --- ucSupplierCreate
+    admin -- ucSupplierQuery
 
     ucSupplierQuery -- ucSupplierCreate
     ucSupplierQuery --- ucSupplierEdit
@@ -316,10 +313,8 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
-    actor warehouse("Personal de almacén")
-    admin --|> warehouse
 
     systemBoundary catalogPackage2["Nexus · Clientes"]
         ucClientQuery("CU-CAT-05 Consultar clientes")
@@ -328,8 +323,7 @@ direction TB
         ucClientReport("CU-CAT-08 Generar reporte de clientes")
     end
 
-    admin --- ucClientQuery
-    warehouse --- ucClientCreate
+    admin -- ucClientQuery
 
     ucClientQuery -- ucClientCreate
     ucClientQuery --- ucClientEdit
@@ -341,7 +335,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage3["Nexus · Áreas"]
@@ -361,7 +355,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage4["Nexus · Roles"]
@@ -381,7 +375,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage5["Nexus · Presentaciones"]
@@ -401,7 +395,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage6["Nexus · Unidades de medida"]
@@ -421,7 +415,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage7["Nexus · Motivos de ajuste"]
@@ -441,7 +435,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage8["Nexus · Estados de cumplimiento"]
@@ -457,9 +451,11 @@ direction TB
 ```
 
 Las consultas, edición y reportes de **Proveedores** y **Clientes** se asocian
-con el Administrador. Personal de almacén participa únicamente en sus altas desde
-selectores operativos. Los seis catálogos auxiliares se asocian con el Administrador
-y exigen `catalogs:manage`. Las lecturas que sólo alimentan controles de selección
+con el Administrador, y Crear se muestra desde la consulta correspondiente. Estas
+vistas representan la administración independiente del catálogo. La participación de
+Personal de almacén en altas desde selectores se muestra en Compras y Salidas, junto
+al caso base correspondiente; no se repite como asociación directa en el catálogo.
+Los seis catálogos auxiliares se asocian con el Administrador y exigen `catalogs:manage`. Las lecturas que sólo alimentan controles de selección
 son soporte de otros objetivos y no nuevos casos de uso.
 
 ### Grupo funcional ENT — Compras de materiales y consumibles
@@ -469,7 +465,7 @@ son soporte de otros objetivos y no nuevos casos de uso.
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -504,7 +500,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -544,7 +540,7 @@ rutas y recursos propios, y las mismas transiciones de estado.
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -578,7 +574,7 @@ direction TB
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
-direction TB
+direction LR
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
