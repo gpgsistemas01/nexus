@@ -59,10 +59,10 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   participante y una acción observable. Los turnos alternan entre actor y Nexus; cuando
   varias acciones consecutivas corresponden al mismo participante, se integran en un
   solo paso. La captura de filas incluye la acción **Agregar** y la revisión de cada
-  renglón. Toda consulta o escritura identifica la interacción con la base de datos y
-  remite a su excepción técnica. La lectura precede a la presentación de resultados o
-  a la generación del reporte; su fallo no se describe como una escritura ni como una
-  reversión de datos. Se nombran los controles que disparan cada acción, el formulario,
+  renglón. La consulta describe la información que obtiene el actor; una modificación describe
+  los datos y efectos de negocio que quedan confirmados. El paso remite a una excepción
+  de operación cuando ésta no puede completarse, sin explicar bases de datos,
+  transacciones ni componentes internos. Se nombran los controles que disparan cada acción, el formulario,
   diálogo o tabla que abre Nexus y los mensajes de confirmación o error. La validación
   y la conservación del resultado se describen cuando forman parte del caso. Una
   expresión como «verifica el resultado» debe indicar qué se muestra o qué cambia.
@@ -86,6 +86,10 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   conservan si el caso se rechaza o falla.
 - **Reglas y requisitos relacionados:** referencias a criterios normativos que no se
   duplican dentro de la ficha.
+
+La excepción **EOP — Operación no completada** describe el aviso al actor y los
+efectos de negocio que se conservan ante un fallo; no prescribe cómo se resuelve
+la persistencia o la comunicación interna.
 
 Cada flujo alternativo y cada excepción comienza con un título que permite reconocer
 rápidamente la situación. El flujo alternativo indica el paso del flujo principal
@@ -242,19 +246,18 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 - [ENT — Compras de materiales y consumibles](purchases/index.md)
 - [SAL — Salidas de material y de merma](issues/index.md)
 
-## Relación entre familias y reutilización
+## Reglas compartidas entre familias
 
-| Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
-| --- | --- | --- | --- |
-| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-ALM-01` a `CU-ALM-06`; `CU-ALM-09` a `CU-ALM-13`; `CU-ALM-17` a `CU-ALM-21`; `CU-CAT-01` a `CU-CAT-26` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
-| Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
-| Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-09` a `CU-SAL-13` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
-| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-14`, `CU-ALM-16`, `CU-ALM-22`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
+| Tema | Información o regla compartida | Diferencia que debe conservarse |
+| --- | --- | --- |
+| Identidades y catálogos | Nombre, clasificación, estado activo y datos que identifican cada registro. | La autorización, la identidad del recurso y las condiciones para retirarlo. |
+| Documentos con detalles | Folio, participantes, fechas, recursos, cantidades y confirmación del documento completo. | La compra incorpora existencias al registrarse; la salida las descuenta al surtir. |
+| Entregas y devoluciones | Cantidades solicitadas, surtidas y devueltas, y su historia. | La existencia de material por proveedor y la existencia propia de merma. |
+| Consultas y reportes | Criterios de búsqueda, alcance y orden de la información. | Los datos, agrupaciones, cálculos y autorizaciones propios de cada reporte. |
 
-Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
-los [patrones de diseño y construcción](../../architecture/views/development/design-and-construction-patterns/index.md), se replica
-el proceso existente sólo cuando cambia el contexto, y se mantienen explícitas sus
-validaciones, transacciones y pruebas CRUD.
+Compartir información o reglas no fusiona objetivos del actor ni convierte una
+operación en otra. La realización técnica y su reutilización se describen en los
+[patrones de diseño y construcción](../../architecture/views/development/design-and-construction-patterns/index.md).
 
 ## Trazabilidad y mantenimiento
 
@@ -262,14 +265,14 @@ validaciones, transacciones y pruebas CRUD.
    diagrama de casos de uso en el mismo cambio.
 2. Si cambia una operación, se revisan también la especificación, la matriz de
    operaciones y el plan de pruebas.
-3. Las pruebas unitarias conservan la ruta paralela al código; las integraciones CRUD
-   atraviesan HTTP y Prisma en `tests/integration/controllers/*DbTest.js`, conforme a
-   el [plan de pruebas](../../testing/test-plan.md).
+3. La evidencia de verificación se mantiene en el
+   [plan de pruebas](../../testing/test-plan.md), sin introducir su implementación en
+   los pasos que realiza el actor.
 4. Un caso nuevo debe completar identificador, nombre, actor y disparador,
    participación de actores y sistema, precondiciones, pasos granulares del flujo
    principal, secuencias actor–Nexus y destino para cada alternativa, excepciones,
    resultado y reglas o requisitos relacionados antes de considerarse documentado.
-5. Proyectos, requisiciones y ajustes sin flujo HTTP completo permanecen en la
-   especificación con su estado correspondiente; se incorporarán aquí sólo al pasar a
-   alcance vigente.
+5. Los objetivos fuera del alcance vigente, como el mantenimiento de proyectos o
+   las requisiciones, permanecen en la especificación con su estado correspondiente;
+   sólo se incorporan al catálogo cuando su recorrido esté disponible.
 

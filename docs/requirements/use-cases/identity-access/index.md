@@ -9,9 +9,9 @@
 | `CU-IDA-03` | Editar persona | Actualización de datos y asignaciones de persona. |
 | `CU-IDA-04` | Generar reporte de personas | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 | `CU-IDA-05` | Consultar usuarios | Listado de cuentas y accesos. |
-| `CU-IDA-06` | Crear usuario y asignar acceso | Alta transaccional de cuenta y asignación. |
-| `CU-IDA-07` | Editar usuario y acceso | Actualización transaccional de cuenta y asignación. |
-| `CU-IDA-08` | Cambiar contraseña de usuario | Sustitución del hash de la contraseña, sin almacenar su valor en texto claro. |
+| `CU-IDA-06` | Crear usuario y asignar acceso | Registro conjunto de la cuenta y su asignación de acceso. |
+| `CU-IDA-07` | Editar usuario y acceso | Actualización conjunta de la cuenta y su asignación de acceso. |
+| `CU-IDA-08` | Cambiar contraseña de usuario | Cambio de contraseña sin exponer la anterior ni la nueva. |
 | `CU-IDA-09` | Generar reporte de usuarios | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 
 
@@ -19,7 +19,7 @@
 
 ### Grupo funcional IDA — Identidad y acceso
 
-Cada ficha representa una sola acción sobre una sola entidad. Los elementos compartidos se reutilizan en la implementación, pero no fusionan objetivos del actor.
+Cada ficha describe un objetivo del actor, sus condiciones y sus efectos sobre el negocio. Los objetivos se mantienen separados aunque compartan información o reglas.
 
 ## Fichas por caso de uso
 

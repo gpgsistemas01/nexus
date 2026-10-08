@@ -82,7 +82,7 @@ fuente de verdad.
 | Salida de merma | Documento que solicita y suministra existencias de merma, con posibilidad de devolución. | Reutiliza el patrón de salida, pero conserva stock y movimientos de merma separados. |
 | Encabezado | Datos generales compartidos por todos los detalles de un documento, como actores, fechas, cliente, proyecto y observaciones. | Editar encabezado no equivale a cambiar cantidades de detalle. |
 | Detalle | Renglón de un documento que identifica recurso, cantidad, importes o estado de cumplimiento. | Sus operaciones pueden requerir un permiso diferente del encabezado. |
-| Suministro o entrega | Aplicación total o parcial de un detalle que afecta existencia y registra movimiento. | No es sinónimo de crear o editar el documento. |
+| Suministro o entrega | Entrega de toda la cantidad pendiente de uno o varios detalles, con descuento de existencia y registro de movimiento. | Una salida queda parcialmente surtida si quedan otros detalles pendientes; no es sinónimo de crear o editar el documento. |
 | Devolución | Operación que reingresa una cantidad previamente suministrada y la enlaza con documento, detalle y movimiento originales. | Puede ser parcial o total, no elimina el suministro histórico y no es una acción directa de cancelación. |
 | Corrección | Cambio trazable de un detalle de entrada que conserva valor anterior, valor corregido, motivo y actor. | No es una edición silenciosa ni una devolución. |
 | Cancelación | Transición que invalida un documento o detalle conforme a sus reglas, conservando su historia. | En salidas es un resultado derivado: la devolución total cancela el detalle y sólo la cancelación de todos los detalles cancela el encabezado; no existe una acción ni un endpoint de cancelación directa. |

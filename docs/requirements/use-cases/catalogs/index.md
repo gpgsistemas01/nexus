@@ -25,7 +25,7 @@
 | `CU-ALM-19` | Editar consumible | Actualización de datos generales admitidos. |
 | `CU-ALM-20` | Retirar consumible | Retiro condicionado por la historia operativa. |
 | `CU-ALM-21` | Ajustar existencia de consumible | Ajuste trazable de inventario. |
-| `CU-ALM-22` | Generar reporte de inventario de consumibles | Archivo Excel limitado a registros `CONSUMABLE`. |
+| `CU-ALM-22` | Generar reporte de inventario de consumibles | Archivo Excel limitado al catálogo de consumibles. |
 
 ### Grupo funcional CAT — Catálogos
 
@@ -36,8 +36,8 @@
 | `CU-CAT-03` | Editar proveedor | Actualización de datos admitidos. |
 | `CU-CAT-04` | Generar reporte de proveedores | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 | `CU-CAT-05` | Consultar clientes | Listado de clientes autorizados. |
-| `CU-CAT-06` | Crear cliente | Alta con asesor opcional válido. |
-| `CU-CAT-07` | Editar cliente | Actualización de datos y asesor opcional. |
+| `CU-CAT-06` | Crear cliente | Registro del nombre y estado del cliente. |
+| `CU-CAT-07` | Editar cliente | Actualización del nombre y estado del cliente. |
 | `CU-CAT-08` | Generar reporte de clientes | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 | `CU-CAT-09` | Consultar área | Pantalla y listado independiente de Áreas, restringidos al administrador. |
 | `CU-CAT-10` | Crear área | Alta de área con los campos permitidos. |
@@ -67,7 +67,7 @@ registro creado al formulario de origen sin abrir ni habilitar el listado indepe
 
 ### Grupo funcional CAT — Catálogos
 
-Cada ficha representa una sola acción sobre una sola entidad. Los elementos compartidos se reutilizan en la implementación, pero no fusionan objetivos del actor.
+Cada ficha describe un objetivo del actor, sus condiciones y sus efectos sobre el negocio. Los objetivos se mantienen separados aunque compartan información o reglas.
 
 ## Fichas por caso de uso
 

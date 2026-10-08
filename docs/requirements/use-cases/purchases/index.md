@@ -1,28 +1,23 @@
 # Casos de uso — ENT
 
-Materiales y consumibles tienen casos de uso independientes porque representan objetivos
-visibles distintos para el actor. La implementación reutiliza la misma lógica
-transaccional, pero cada listado, compra, corrección, cancelación y reporte permanece en
-su contexto y conserva trazabilidad propia.
-
-Esta separación documental **no duplica la implementación**: es una refactorización por
-fachadas de contexto. Los controllers comparten sus builders y las fachadas de materiales
-y consumibles delegan en los mismos servicios transaccionales, helpers de detalle,
-corrección y cancelación. Los `CU-*` describen objetivos del negocio; no equivalen a una
-copia del código por cada ficha.
+Materiales y consumibles tienen casos de uso independientes porque el actor consulta
+compras, recibe artículos, corrige detalles y genera reportes en contextos separados.
+Una compra incorpora las cantidades recibidas a la existencia de su proveedor y conserva
+la historia de sus correcciones y cancelaciones. El registro del documento, sus detalles,
+sus existencias y sus movimientos debe quedar completo, sin cambios parciales.
 
 ### Grupo funcional ENT — Compras de inventario
 
 | Identificador | Caso de uso específico | Evidencia funcional |
 | --- | --- | --- |
 | `CU-ENT-01` | Consultar compras de material | Listado y detalle sin modificar inventario. |
-| `CU-ENT-02` | Crear compra de material | Compra, alta contextual de materiales no catalogados, detalles, existencias y movimientos transaccionales. |
+| `CU-ENT-02` | Crear compra de material | Compra, alta contextual de materiales no catalogados, detalles, existencias y movimientos registrados sin cambios parciales. |
 | `CU-ENT-03` | Editar compra de material | Edición de encabezado y detalles admitidos. |
 | `CU-ENT-04` | Corregir material de una compra | Corrección de cantidad o costo con historial. |
 | `CU-ENT-05` | Cancelar material de una compra | Cancelación del detalle y reversión de inventario. |
 | `CU-ENT-06` | Generar reporte de compras de material | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 | `CU-ENT-07` | Consultar compras de consumible | Listado y detalle de consumibles sin modificar inventario. |
-| `CU-ENT-08` | Crear compra de consumible | Compra, alta contextual de consumibles, existencias y movimientos transaccionales. |
+| `CU-ENT-08` | Crear compra de consumible | Compra, alta contextual de consumibles, existencias y movimientos registrados sin cambios parciales. |
 | `CU-ENT-09` | Editar compra de consumible | Edición de encabezado y detalles admitidos. |
 | `CU-ENT-10` | Corregir consumible de una compra | Corrección de cantidad o costo con historial. |
 | `CU-ENT-11` | Cancelar consumible de una compra | Cancelación del detalle y reversión de inventario. |
@@ -34,7 +29,7 @@ copia del código por cada ficha.
 
 ### Grupo funcional ENT — Compras de material
 
-Cada ficha representa una sola acción sobre una sola entidad. Los elementos compartidos se reutilizan en la implementación, pero no fusionan objetivos del actor.
+Cada ficha describe un objetivo del actor, sus condiciones y sus efectos sobre el negocio. Los objetivos se mantienen separados aunque compartan información o reglas.
 
 ## Fichas por caso de uso
 

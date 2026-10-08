@@ -19,17 +19,15 @@
 | `CU-SAL-13` | Devolver merma surtida | Reintegro de existencia y movimiento inverso. |
 | `CU-SAL-14` | Generar reporte de salidas de merma | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 
-La evidencia orienta la búsqueda, pero no impone una organización por casos de uso
-dentro de `src`: la aplicación está organizada por capas y dominio. Las pruebas
-unitarias siguen la ubicación paralela al artefacto y las integraciones CRUD permanecen
-bajo `tests/integration/controllers`.
-
+Registrar una salida expresa lo solicitado y no descuenta existencias. Surtir registra
+la entrega; devolver repone lo recibido de vuelta y conserva la historia de la salida.
+Los efectos corresponden al recurso y proveedor que identifica cada detalle.
 
 ## Fichas específicas
 
 ### Grupo funcional SAL — Salidas de material y de merma
 
-Cada ficha representa una sola acción sobre una sola entidad. Los elementos compartidos se reutilizan en la implementación, pero no fusionan objetivos del actor.
+Cada ficha describe un objetivo del actor, sus condiciones y sus efectos sobre el negocio. Los objetivos se mantienen separados aunque compartan información o reglas.
 
 ## Fichas por caso de uso
 
