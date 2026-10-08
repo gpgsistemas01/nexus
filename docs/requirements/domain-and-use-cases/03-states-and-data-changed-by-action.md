@@ -8,8 +8,8 @@ una condición funcional. La máquina resume el **cumplimiento agregado** común
 de material y merma. El estado de cada detalle y el del encabezado se derivan después de
 la operación, no se asignan desde el formulario.
 
-Las diferencias de permisos, campos y efectos se consultan en la
-[modos, precondiciones y efectos](../requirements-specification/06-operation-modes-and-effects.md),
+Las diferencias de permisos, campos y efectos se consultan en el capítulo
+[Modos, precondiciones y efectos](../requirements-specification/06-operation-modes-and-effects.md),
 y las reglas verificables están en `src/constants/warehouseStatuses.js`,
 `src/services/warehouse/issues/issueFulfillmentRules.js` y los servicios específicos de
 salidas de material y merma.
@@ -35,12 +35,12 @@ Sólo se devuelve desde el cumplimiento `Surtido`; una salida `Surtido parcial` 
 puede iniciar la devolución. El cumplimiento parcial del encabezado expresa que
 algunos detalles están surtidos y otros pendientes, no un modo de formulario.
 
-`Parcial` es la etiqueta abreviada de cumplimiento `Surtido parcial` y `Surtida` representa
-el cumplimiento persistido `Surtido`. La devolución es una operación, no un estado ni un
+`Parcial` y `Surtida` son identificadores internos del diagrama para los estados de
+cumplimiento `Surtido parcial` y `Surtido`, respectivamente. La devolución es una operación, no un estado ni un
 sinónimo de cancelar: una devolución parcial conserva el detalle `Surtido`, mientras que
-devolver todo lo surtido deriva `Cancelado` para ese detalle. Sólo cuando todos los detalles
-resultan cancelados se derivan cumplimiento `Cancelado` y estado documental `Cancelada`
-para el encabezado. Esta aclaración evita interpretar el diagrama como un catálogo adicional
+devolver toda la cantidad surtida deja ese detalle con cumplimiento `Cancelado`. Sólo
+cuando todos los detalles están cancelados, el encabezado queda con cumplimiento
+`Cancelado` y estado documental `Cancelada`. Esta aclaración evita interpretar el diagrama como un catálogo adicional
 de estados o como una acción independiente de cancelación.
 
 El final indica que terminó el ciclo de surtimiento y devolución; el documento cancelado

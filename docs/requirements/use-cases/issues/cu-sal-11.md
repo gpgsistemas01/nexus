@@ -5,7 +5,7 @@
 | Identificador | `CU-SAL-11` |
 | Nombre | Editar detalles de merma de una salida. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Disparador | Necesita agregar o corregir mermas de una salida todavía modificables y abre los detalles. |
+| Disparador | Necesita agregar o corregir los detalles de merma que todavía pueden modificarse en una salida y abre los detalles. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. La salida existe.<br>4. La salida se encuentra en un estado que admite modificar sus detalles. |
 | Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable **(ver E1)**.<br>2. **Nexus:** muestra las mermas actuales, cantidades y acciones permitidas.<br>3. **Actor:** modifica la cantidad de un renglón existente o selecciona merma y cantidad para un detalle nuevo y selecciona «Agregar» **(ver A1)**.<br>4. **Nexus:** valida los datos del renglón y refleja la adición o modificación en la tabla de detalles.<br>5. **Actor:** repite la operación para cada detalle necesario, revisa la tabla y confirma los cambios.<br>6. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados; actualiza los detalles sin descontar existencias y confirma el resultado. Además, guarda los cambios de la operación en la base de datos **(ver EBD)**. |
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta campos incompletos, formatos incorrectos, relaciones no permitidas o cantidades fuera de las reglas del caso y los señala sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 3 del flujo principal. |

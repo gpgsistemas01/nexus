@@ -63,12 +63,12 @@ preparación; la respuesta y los errores HTTP continúan en la secuencia `DIA-FE
 
 ### Estados técnicos complementarios
 
-Estos diagramas permanecen aquí porque añaden ciclos técnicos que no repite la colección
-de secuencias por caso.
+Estos diagramas describen los estados del formulario durante la interacción, como
+complemento de las secuencias por caso de uso.
 
 **Estado técnico complementario:** `DIA-FE-TEC-EST-CU-IDA-08`. El objeto modelado es
 el modal en modo contraseña (`FORM_MODES.EDIT_PASSWORD`), abierto desde la consulta.
-El envío conserva ese modo ante un error recuperable; no cambia al modo de edición de
+El formulario conserva ese modo ante un error que permite reintentar el envío; no cambia al modo de edición de
 datos ni modela el estado persistido del usuario.
 
 ```mermaid
@@ -94,14 +94,13 @@ stateDiagram-v2
 La elección del modo ocurre en `userModal.js`; la validación y la mutación se seleccionan
 en `userForm.js`. `handleSubmit` cierra el modal y recarga la tabla sólo tras el éxito.
 `handleApiError` permite reintentar HTTP 400, 403, 404 y 409; la figura los agrupa
-como «HTTP recuperable». Para los demás
-fallos, la implementación actual notifica sin restablecer `submitting`: cerrar y volver
+como «HTTP recuperable». Para los demás fallos, la implementación actual notifica sin restablecer `submitting`: cerrar y volver
 a abrir el modal inicializa el formulario. El cliente HTTP intenta renovar una sesión
 ante 401 antes de abandonar la página.
 
 **Estado técnico complementario:** `DIA-FE-TEC-EST-CU-ALM-05`. Modela el modal de ajuste
-abierto desde Materiales. La validación local no concede el permiso ni valida el stock
-definitivamente; el servidor vuelve a comprobar ambos.
+abierto desde Materiales. El servidor comprueba el permiso y la existencia disponible antes de aplicar el ajuste;
+la validación local del formulario no sustituye esas comprobaciones.
 
 ```mermaid
 stateDiagram-v2
@@ -128,5 +127,6 @@ stateDiagram-v2
 ```
 
 La evidencia está en `materialModal.js`, `materialForm.js`, `formUI.js`, `formUtils.js`
-y `api/errorHandler.js`. La rama de reintento agrupa HTTP 400, 403, 404 y 409, que restablecen el
-estado de envío; no atribuye esa garantía a todos los errores de red o servidor.
+y `api/errorHandler.js`. Ante HTTP 400, 403, 404 y 409, el manejador de errores restablece el estado de envío y
+permite reintentar. Los demás errores de red o servidor siguen el comportamiento
+descrito para el formulario de contraseña.

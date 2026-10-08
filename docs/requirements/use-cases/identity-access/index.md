@@ -11,7 +11,7 @@
 | `CU-IDA-05` | Consultar usuarios | Listado de cuentas y accesos. |
 | `CU-IDA-06` | Crear usuario y asignar acceso | Alta transaccional de cuenta y asignación. |
 | `CU-IDA-07` | Editar usuario y acceso | Actualización transaccional de cuenta y asignación. |
-| `CU-IDA-08` | Cambiar contraseña de usuario | Actualización cifrada de la credencial. |
+| `CU-IDA-08` | Cambiar contraseña de usuario | Sustitución del hash de la contraseña, sin almacenar su valor en texto claro. |
 | `CU-IDA-09` | Generar reporte de usuarios | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
 
 

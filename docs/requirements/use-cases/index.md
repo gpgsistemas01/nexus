@@ -8,8 +8,9 @@ casos que comparten tema, actor, ciclo CRUD o efectos de inventario para revisar
 semejanzas sin concentrar recorridos distintos en una sola ficha. Cada `CU-*` conserva
 su propio archivo y los índices de grupo reúnen únicamente navegación y reglas comunes.
 
-Las descripciones expresan comportamiento de negocio, no endpoints ni permisos. La
-[sección de modos y efectos](../requirements-specification/06-operation-modes-and-effects.md)
+Las descripciones expresan comportamiento de negocio y las autorizaciones necesarias.
+La implementación de endpoints y las comprobaciones internas se describen en arquitectura.
+La [sección de modos y efectos](../requirements-specification/06-operation-modes-and-effects.md)
 detalla el contrato funcional; la [especificación de requisitos](../requirements-specification/index.md) contiene
 criterios verificables y reglas. La evidencia técnica pertenece a arquitectura y pruebas,
 enlazadas mediante componentes, secuencias y el catálogo de pruebas. Una capacidad parcial, modelada o
@@ -27,9 +28,10 @@ objetivos de distinta complejidad.
 
 ## Semántica de actores y generalización UML
 
-Las asociaciones directas enlazan al actor con cada caso en el que participa. Las
-fichas nombran a los actores autorizados para iniciar el objetivo; una relación entre
-casos no hereda actores ni concede permisos. Personal de almacén especializa a
+En los diagramas, las asociaciones compartidas enlazan al actor general con la consulta
+del recurso. Las asociaciones directas con otras operaciones corresponden a los casos
+particulares justificados en las fichas. Estas nombran a los actores autorizados para
+iniciar el objetivo; una relación entre casos no hereda actores ni concede permisos. Personal de almacén especializa a
 Usuario registrado; Administrador del sistema especializa a Personal de almacén y
 hereda todas sus asociaciones. Los casos exclusivos del administrador conservan
 asociaciones directas adicionales; no se duplican las funciones heredadas.
@@ -54,12 +56,18 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   cada condición se registra por separado y no se confunde con una acción de validación
   ni con un resultado obtenido durante el flujo.
 - **Flujo principal:** interacción numerada paso a paso; cada paso identifica un solo
-  participante y una acción observable. Los turnos alternan entre actor y Nexus; cuando varias acciones consecutivas corresponden al mismo participante, se integran en un solo paso. Capturar filas de una tabla describe además la acción **Agregar** y la revisión de cada renglón, no sólo la captura genérica. Toda consulta o escritura identifica la interacción con la base de datos y remite a su excepción técnica. Se nombran el botón, enlace o acción que dispara cada transición; el formulario,
-  diálogo o tabla que abre Nexus; los mensajes de confirmación o error; y la validación
-  y conservación del resultado cuando forman parte del caso. Expresiones pasivas como
-  «revisa» o «verifica el resultado» no sustituyen una interacción observable. El paso
-  desde el que se desprende una variante o un rechazo incluye entre paréntesis
-  **(ver A1)** o **(ver E1)**, según el identificador correspondiente.
+  participante y una acción observable. Los turnos alternan entre actor y Nexus; cuando
+  varias acciones consecutivas corresponden al mismo participante, se integran en un
+  solo paso. La captura de filas incluye la acción **Agregar** y la revisión de cada
+  renglón. Toda consulta o escritura identifica la interacción con la base de datos y
+  remite a su excepción técnica. La lectura precede a la presentación de resultados o
+  a la generación del reporte; su fallo no se describe como una escritura ni como una
+  reversión de datos. Se nombran los controles que disparan cada acción, el formulario,
+  diálogo o tabla que abre Nexus y los mensajes de confirmación o error. La validación
+  y la conservación del resultado se describen cuando forman parte del caso. Una
+  expresión como «verifica el resultado» debe indicar qué se muestra o qué cambia.
+  El paso que origina una variante o un rechazo incluye la referencia **(ver A1)** o
+  **(ver E1)**, según corresponda.
 - **Flujos alternativos:** título breve seguido de una secuencia propia por variante,
   con numeración reiniciada, la interacción actor–Nexus y un destino explícito. Además
   de las decisiones que cambian el recorrido, incluyen la captura de información

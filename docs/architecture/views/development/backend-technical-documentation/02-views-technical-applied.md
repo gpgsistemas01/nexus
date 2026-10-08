@@ -22,7 +22,7 @@ flowchart LR
 | `DIA-BE-ACT-002` · `CU-ENT-05` | ¿Qué decisiones provocan rechazo, rollback o cancelación? | `DIA-BE-CU-ENT-05` y la máquina normativa si cambia un estado de negocio. |
 | `DIA-BE-ACT-001` · `CU-SAL-05` | ¿Cómo se separan actualización, surtimiento y errores? | `DIA-BE-CU-SAL-05` y los estados normativos de salidas. |
 | `DIA-BE-SEQ-006` · `RN-008` | ¿Cuándo ocurre la auditoría y puede revertir la operación? | Escrituras API observadas mediante `finish`; documenta la garantía *best effort*. |
-| `DIA-BE-ACT-AUT-01` | ¿Qué condiciones permiten superar autorización? | Secuencias autenticadas; distingue token, cuenta activa y permiso efectivo. |
+| `DIA-BE-ACT-AUT-01` | ¿Qué condiciones permiten autorizar una petición? | Secuencias autenticadas; distingue token, cuenta activa y permiso efectivo. |
 | `DIA-BE-TEC-EST-CU-ENT-04` | ¿Cuál es el ciclo técnico de una corrección? | `DIA-BE-CU-ENT-04`, su transacción; distingue los efectos posteriores al commit. |
 
 Las antiguas secuencias selectivas de autenticación, ajustes, entrada, corrección,
@@ -167,10 +167,8 @@ sequenceDiagram
     end
 ```
 
-### Estados y decisiones técnicas complementarias
-
-Estos diagramas permanecen aquí porque añaden ciclos técnicos que no repite la colección
-de secuencias por caso.
+Los siguientes diagramas explican las decisiones de acceso y el ciclo de una transacción,
+como complemento de las secuencias por caso de uso.
 
 ### Decisiones de autenticación y autorización API
 
@@ -181,7 +179,7 @@ política del recurso. Una petición nueva vuelve a realizar estas comprobacione
 
 La figura usa la [convención de actividades](../../processes/index.md#notación-de-actividades)
 como aproximación a UML mediante Mermaid. La validación del payload, cuando la ruta la
-exige, ocurre entre ambos middleware y puede terminar con HTTP 400; aquí se detalla
+exige, ocurre entre ambos componentes de middleware y puede terminar con HTTP 400; aquí se detalla
 únicamente la decisión de acceso.
 
 ```mermaid
@@ -204,7 +202,7 @@ flowchart TB
 
 En web, `verifyCookiesAuthTokenRequired` redirige a `/revocar-sesion` y
 `authorizeUserWeb` redirige a `/error/404`; los HTTP 401/403 de esta figura corresponden
-al pipeline API. El JWT no evita que una desactivación o la pérdida de asignaciones
+al procesamiento de peticiones API. El JWT no evita que una desactivación o la pérdida de asignaciones
 bloquee la siguiente petición.
 
 ### Estados de la transacción de corrección
@@ -227,7 +225,7 @@ stateDiagram-v2
 ```
 
 El recálculo de costos ocurre después del commit. Si falla, el servicio propaga un
-error sin revertir lo confirmado; el controller publica sólo cuando el servicio retorna
+error sin revertir lo confirmado; el controlador emite la actualización de inventario sólo cuando el servicio termina
 con éxito. Los estados funcionales de la compra permanecen en requisitos. La secuencia
 `DIA-BE-CU-ENT-04` muestra el recálculo posterior, el retorno al controller y
 `emitInventoryUpdated`; esas acciones no son estados de la transacción.

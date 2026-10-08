@@ -725,6 +725,7 @@ try {
             const args = [
                 ...scopedSources,
                 '--from=markdown+header_attributes+implicit_figures',
+                `--lua-filter=${path.join(ROOT, 'scripts/documentExportLineBreaks.lua')}`,
                 '--standalone',
                 '--metadata=lang:es-MX',
                 `--output=${docxOutput}`,
@@ -769,6 +770,7 @@ try {
             const pdfDocxArguments = [
                 ...pdfPreparedSources.map(source => path.relative(temporaryDirectory, source)),
                 '--from=markdown+header_attributes+implicit_figures',
+                `--lua-filter=${path.join(ROOT, 'scripts/documentExportLineBreaks.lua')}`,
                 '--standalone',
                 '--metadata=lang:es-MX',
                 `--output=${conversionInput}`,
