@@ -3,16 +3,34 @@
 
 **Patrones:** `BE-P02`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`catalogApiRoute.js`](../../../../../../src/routes/api/admin/catalogApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`catalogValidations.js`](../../../../../../src/validators/forms/catalogValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`catalogController.js`](../../../../../../src/controllers/api/admin/catalogController.js) |
+| `Domain` | control | [`catalogService.js`](../../../../../../src/services/admin/catalogService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/admin/catalogApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/catalogValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
-    participant Domain@{ "type": "control" } as src/services/admin/catalogService.js
-    participant ErrorHandler as src/app.js
+    participant Route@{ "type": "boundary" } as Router API
+    participant Auth@{ "type": "control" } as Acceso
+    participant Validator@{ "type": "control" } as Validación HTTP
+    participant Controller@{ "type": "control" } as Controller
+    participant Domain@{ "type": "control" } as Servicio de dominio
+    participant ErrorHandler@{ "type": "control" } as Errores Express
 
     Client->>Route: POST /api/admin/catalogs/unit-measures
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -33,7 +51,7 @@ sequenceDiagram
     activate Domain
     alt Servicio resuelto
         Domain-->>Controller: createCatalogEntry(): Promise[Object]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Controller-->>Client: HTTP 201 { data, code }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)

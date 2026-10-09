@@ -3,18 +3,37 @@
 
 **Patrones:** `FE-P02`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `Origin` | boundary | [`suppliersPage.js`](../../../../../../src/public/js/pages/warehouse/suppliers/suppliersPage.js)<br/>[`goodsReceiptModal.js`](../../../../../../src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js) |
+| `Select` | boundary | [`supplier.js`](../../../../../../src/public/js/plugins/select2/domains/supplier.js) |
+| `View` | boundary | [`supplierModal.js`](../../../../../../src/public/js/pages/warehouse/suppliers/supplierModal.js)<br/>[`supplierForm.js`](../../../../../../src/public/js/pages/warehouse/suppliers/supplierForm.js) |
+| `Application` | control | [`suppliers.js`](../../../../../../src/public/js/application/warehouse/suppliers/suppliers.js) |
+| `Request` | boundary | [`supplierService.js`](../../../../../../src/public/js/services/warehouse/supplierService.js) |
+| `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
+| `Transport` | control | [`supplierApiRoute.js`](../../../../../../src/routes/api/warehouse/supplierApiRoute.js)<br/>[`supplierController.js`](../../../../../../src/controllers/api/warehouse/supplierController.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant Origin@{ "type": "boundary" } as src/public/js/pages/warehouse/suppliers/suppliersPage.js<br/>src/public/js/pages/warehouse/goodsReceipts/goodsReceiptModal.js
-    participant Select as src/public/js/plugins/select2/domains/supplier.js
-    participant View@{ "type": "boundary" } as src/public/js/pages/warehouse/suppliers/supplierModal.js<br/>src/public/js/pages/warehouse/suppliers/supplierForm.js
-    participant Application@{ "type": "control" } as src/public/js/application/warehouse/suppliers/suppliers.js
-    participant Request as src/public/js/services/warehouse/supplierService.js
-    participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/supplierApiRoute.js<br/>src/controllers/api/warehouse/supplierController.js
+    participant Origin@{ "type": "boundary" } as Documento origen
+    participant Select@{ "type": "boundary" } as Select2
+    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant Application@{ "type": "control" } as Application
+    participant Request@{ "type": "boundary" } as Requests del recurso
+    participant HTTP@{ "type": "boundary" } as Cliente HTTP
+    participant Transport@{ "type": "control" } as Endpoint API
 
     alt Sistemas inicia desde el listado independiente
     Initiator->>Browser: inicia CU-CAT-02 — Crear proveedor

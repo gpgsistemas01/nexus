@@ -3,17 +3,36 @@
 
 **Patrones:** `BE-P01`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`clientApiRoute.js`](../../../../../../src/routes/api/sales/clientApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`clientValidations.js`](../../../../../../src/validators/forms/clientValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`clientController.js`](../../../../../../src/controllers/api/sales/clientController.js) |
+| `ClientDto` | control | [`clientDTO.js`](../../../../../../src/dtos/clientDTO.js) |
+| `Domain` | control | [`clientService.js`](../../../../../../src/services/sales/clientService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/sales/clientApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/clientValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant ClientDto@{ "type": "entity" } as clientDto: Object<br/>src/dtos/clientDTO.js
-    participant Domain@{ "type": "control" } as src/services/sales/clientService.js
-    participant ErrorHandler as src/app.js
+    participant Route@{ "type": "boundary" } as Router API
+    participant Auth@{ "type": "control" } as Acceso
+    participant Validator@{ "type": "control" } as Validación HTTP
+    participant Controller@{ "type": "control" } as Controller
+    participant ClientDto@{ "type": "control" } as DTO funcional
+    participant Domain@{ "type": "control" } as Servicio de dominio
+    participant ErrorHandler@{ "type": "control" } as Errores Express
 
     Client->>Route: PUT /api/sales/clients/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -31,12 +50,14 @@ sequenceDiagram
     Route->>Controller: editClient(req, res)
     activate Controller
     Controller->>ClientDto: createClientDtoForEdit(req.body)
+    activate ClientDto
     ClientDto-->>Controller: createClientDtoForEdit(): Object (clientDto)
+    deactivate ClientDto
     Controller->>Domain: clientService.updateClient({ id: req.params.id, clientDto }) actualiza Client
     activate Domain
     alt Servicio resuelto
         Domain-->>Controller: clientService.updateClient(): Promise[Client]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Controller-->>Client: HTTP 200 { client, code }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)

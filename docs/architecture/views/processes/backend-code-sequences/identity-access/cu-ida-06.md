@@ -3,17 +3,36 @@
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`userApiRoute.js`](../../../../../../src/routes/api/admin/userApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`userValidations.js`](../../../../../../src/validators/forms/userValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`userController.js`](../../../../../../src/controllers/api/admin/userController.js) |
+| `UserDto` | control | [`userDTO.js`](../../../../../../src/dtos/userDTO.js) |
+| `Domain` | control | [`userService.js`](../../../../../../src/services/admin/userService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/admin/userApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/userValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/admin/userController.js
-    participant UserDto@{ "type": "entity" } as userDto: Object<br/>src/dtos/userDTO.js
-    participant Domain@{ "type": "control" } as src/services/admin/userService.js
-    participant ErrorHandler as src/app.js
+    participant Route@{ "type": "boundary" } as Router API
+    participant Auth@{ "type": "control" } as Acceso
+    participant Validator@{ "type": "control" } as Validación HTTP
+    participant Controller@{ "type": "control" } as Controller
+    participant UserDto@{ "type": "control" } as DTO funcional
+    participant Domain@{ "type": "control" } as Servicio de dominio
+    participant ErrorHandler@{ "type": "control" } as Errores Express
 
     Client->>Route: POST /api/admin/users
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -31,12 +50,14 @@ sequenceDiagram
     Route->>Controller: registerUser(req, res)
     activate Controller
     Controller->>UserDto: createUserDtoForRegister(req.body)
+    activate UserDto
     UserDto-->>Controller: createUserDtoForRegister(): Object (userDto)
+    deactivate UserDto
     Controller->>Domain: userService.createUser({ userDto }) crea cuenta, contraseña cifrada y acceso
     activate Domain
     alt Servicio resuelto
         Domain-->>Controller: userService.createUser(): Promise[User]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Controller-->>Client: HTTP 200 { datos y código de operación }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)

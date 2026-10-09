@@ -3,20 +3,41 @@
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `Router` | boundary | [`wasteApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`wasteController.js`](../../../../../../src/controllers/api/warehouse/wasteController.js) |
+| `StockDto` | control | [`wasteDTO.js`](../../../../../../src/dtos/wasteDTO.js) |
+| `Service` | control | [`wasteService.js`](../../../../../../src/services/warehouse/wastes/wasteService.js) |
+| `Entry` | control | [`wasteStockEntryService.js`](../../../../../../src/services/warehouse/wastes/wasteStockEntryService.js) |
+| `Movement` | control | [`wasteMovementService.js`](../../../../../../src/services/warehouse/wastes/wasteMovementService.js) |
+| `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Router@{ "type": "boundary" } as src/routes/api/warehouse/wasteApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/wasteValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteController.js
-    participant StockDto@{ "type": "entity" } as entryDto: Object<br/>src/dtos/wasteDTO.js
-    participant Service@{ "type": "control" } as src/services/warehouse/wastes/wasteService.js
-    participant Entry@{ "type": "control" } as src/services/warehouse/wastes/wasteStockEntryService.js
-    participant Movement@{ "type": "control" } as src/services/warehouse/wastes/wasteMovementService.js
+    participant Router@{ "type": "boundary" } as Router web
+    participant Auth@{ "type": "control" } as Acceso
+    participant Validator@{ "type": "control" } as Validación HTTP
+    participant Controller@{ "type": "control" } as Controller
+    participant StockDto@{ "type": "control" } as DTO funcional
+    participant Service@{ "type": "control" } as Service
+    participant Entry@{ "type": "control" } as Entrada de stock
+    participant Movement@{ "type": "control" } as Movimiento
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Socket as src/utils/socketUtils.js
+    participant Socket@{ "type": "control" } as Eventos Socket.IO
 
     Client->>Router: POST /api/warehouse/wastes/:id/stock-additions + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
@@ -33,7 +54,9 @@ sequenceDiagram
     end
     Router->>Controller: registerWasteStockAddition(req, res)
     Controller->>StockDto: createWasteDtoForStockAddition(req.body)
+    activate StockDto
     StockDto-->>Controller: createWasteDtoForStockAddition(): Object (entryDto)
+    deactivate StockDto
     Controller->>Service: addWasteStock({ id, entryDto, userId })
     Service->>Prisma: getDb().$transaction(async tx => ...)
     Service->>Prisma: tx.waste.findUnique({ where: { id } })

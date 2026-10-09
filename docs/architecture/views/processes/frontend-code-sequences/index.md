@@ -41,7 +41,7 @@ sólo complementan decisiones o modos que requieren otra representación.
 Cada caso conserva una línea **Patrones** con códigos de este índice y enlaza el
 [catálogo canónico](../../development/design-and-construction-patterns/02-confirmed-patterns.md#2-resumen-de-patrones-confirmados).
 La referencia identifica las soluciones aplicadas sin repetirlas dentro de Mermaid. La
-implementación se reconoce directamente por las rutas `src/...`, símbolos y llamadas
+implementación se reconoce en la tabla de trazabilidad y en los símbolos y llamadas
 del recorrido concreto.
 
 | Código | Patrón aplicado | Vista canónica | Elementos que permiten reconocerlo |

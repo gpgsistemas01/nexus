@@ -3,17 +3,35 @@
 
 **Patrones:** `FE-P01`, `FE-P09`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `EJS` | boundary | [`loginPage.ejs`](../../../../../../src/views/pages/home/login/loginPage.ejs) |
+| `Form` | boundary | [`loginForm.js`](../../../../../../src/public/js/pages/home/login/loginForm.js) |
+| `App` | control | [`login.js`](../../../../../../src/public/js/application/auth/login.js) |
+| `Request` | boundary | [`authService.js`](../../../../../../src/public/js/services/authService.js) |
+| `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
+| `API` | control | [`authController.js`](../../../../../../src/controllers/api/authController.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Usuario registrado
     participant Browser as Navegador
-    participant EJS@{ "type": "boundary" } as src/views/pages/home/login/loginPage.ejs
-    participant Form@{ "type": "boundary" } as src/public/js/pages/home/login/loginForm.js
-    participant App@{ "type": "control" } as src/public/js/application/auth/login.js
-    participant Request as src/public/js/services/authService.js
-    participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant API@{ "type": "control" } as src/controllers/api/authController.js
+    participant EJS@{ "type": "boundary" } as Plantilla EJS
+    participant Form@{ "type": "boundary" } as useForm
+    participant App@{ "type": "control" } as Application
+    participant Request@{ "type": "boundary" } as Requests del recurso
+    participant HTTP@{ "type": "boundary" } as Cliente HTTP
+    participant API@{ "type": "control" } as Endpoint API
 
     Initiator->>Browser: inicia CU-AUT-01 — Iniciar sesión
     EJS->>Form: import './loginForm.js'

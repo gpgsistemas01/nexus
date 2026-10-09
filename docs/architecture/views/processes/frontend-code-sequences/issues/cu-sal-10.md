@@ -3,16 +3,33 @@
 
 **Patrones:** `FE-P05`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `View` | boundary | [`wasteIssueModal.js`](../../../../../../src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js) |
+| `Application` | control | [`wasteIssues.js`](../../../../../../src/public/js/application/warehouse/wasteIssues/wasteIssues.js) |
+| `Request` | boundary | [`wasteIssueService.js`](../../../../../../src/public/js/services/warehouse/wasteIssueService.js) |
+| `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
+| `Transport` | control | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js)<br/>[`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueForm.js
-    participant Application@{ "type": "control" } as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
-    participant Request as src/public/js/services/warehouse/wasteIssueService.js
-    participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant Application@{ "type": "control" } as Application
+    participant Request@{ "type": "boundary" } as Requests del recurso
+    participant HTTP@{ "type": "boundary" } as Cliente HTTP
+    participant Transport@{ "type": "control" } as Endpoint API
 
     Initiator->>Browser: inicia CU-SAL-10 — Editar encabezado de salida de merma
     Browser->>View: Modo encabezado de wasteIssueModal.js
@@ -25,7 +42,9 @@ sequenceDiagram
         Application->>Request: editWasteIssueHeaderRequest({ id, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: envía PATCH /api/warehouse/waste-issues/:id/header
+        activate Transport
         Transport-->>HTTP: HTTP 200 { wasteIssue, code }
+        deactivate Transport
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: editWasteIssueHeaderRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa

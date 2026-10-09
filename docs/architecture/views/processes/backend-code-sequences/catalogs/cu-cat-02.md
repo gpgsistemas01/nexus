@@ -7,17 +7,36 @@ El origen visual no altera el contrato backend: tanto el listado de Sistemas com
 compra llaman al mismo `POST`. `suppliers:manage` autoriza el alta de Almacén, mientras
 `suppliers:page-view` se comprueba únicamente al intentar abrir la vista web `/proveedores`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`supplierApiRoute.js`](../../../../../../src/routes/api/warehouse/supplierApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`supplierValidations.js`](../../../../../../src/validators/forms/supplierValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`supplierController.js`](../../../../../../src/controllers/api/warehouse/supplierController.js) |
+| `SupplierDto` | control | [`supplierDTO.js`](../../../../../../src/dtos/supplierDTO.js) |
+| `Domain` | control | [`supplierService.js`](../../../../../../src/services/warehouse/supplierService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/supplierApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/supplierValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/supplierController.js
-    participant SupplierDto@{ "type": "entity" } as supplierDto: Object<br/>src/dtos/supplierDTO.js
-    participant Domain@{ "type": "control" } as src/services/warehouse/supplierService.js
-    participant ErrorHandler as src/app.js
+    participant Route@{ "type": "boundary" } as Router API
+    participant Auth@{ "type": "control" } as Acceso
+    participant Validator@{ "type": "control" } as Validación HTTP
+    participant Controller@{ "type": "control" } as Controller
+    participant SupplierDto@{ "type": "control" } as DTO funcional
+    participant Domain@{ "type": "control" } as Servicio de dominio
+    participant ErrorHandler@{ "type": "control" } as Errores Express
 
     Client->>Route: POST /api/warehouse/suppliers
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -35,12 +54,14 @@ sequenceDiagram
     Route->>Controller: registerSupplier(req, res)
     activate Controller
     Controller->>SupplierDto: createSupplierDtoForRegister(req.body)
+    activate SupplierDto
     SupplierDto-->>Controller: createSupplierDtoForRegister(): Object (supplierDto)
+    deactivate SupplierDto
     Controller->>Domain: supplierService.createSupplier({ supplierDto }) persiste el proveedor
     activate Domain
     alt Servicio resuelto
         Domain-->>Controller: supplierService.createSupplier(): Promise[Supplier]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Controller-->>Client: HTTP 200 { supplier, code }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)

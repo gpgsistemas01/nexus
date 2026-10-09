@@ -3,16 +3,33 @@
 
 **Patrones:** `FE-P02`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `View` | boundary | [`personModal.js`](../../../../../../src/public/js/pages/admin/persons/personModal.js)<br/>[`personForm.js`](../../../../../../src/public/js/pages/admin/persons/personForm.js) |
+| `Application` | control | [`persons.js`](../../../../../../src/public/js/application/admin/persons/persons.js) |
+| `Request` | boundary | [`personService.js`](../../../../../../src/public/js/services/admin/personService.js) |
+| `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
+| `Transport` | control | [`personApiRoute.js`](../../../../../../src/routes/api/admin/personApiRoute.js)<br/>[`personController.js`](../../../../../../src/controllers/api/admin/personController.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as src/public/js/pages/admin/persons/personModal.js<br/>src/public/js/pages/admin/persons/personForm.js
-    participant Application@{ "type": "control" } as src/public/js/application/admin/persons/persons.js
-    participant Request as src/public/js/services/admin/personService.js
-    participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/admin/personApiRoute.js<br/>src/controllers/api/admin/personController.js
+    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant Application@{ "type": "control" } as Application
+    participant Request@{ "type": "boundary" } as Requests del recurso
+    participant HTTP@{ "type": "boundary" } as Cliente HTTP
+    participant Transport@{ "type": "control" } as Endpoint API
 
     Initiator->>Browser: inicia CU-IDA-03 — Editar persona
     Browser->>View: personModal.js precarga la persona seleccionada
@@ -26,7 +43,7 @@ sequenceDiagram
         Request->>HTTP: apiRequest({ method: 'put', url, data })
         HTTP->>Transport: envía PUT /api/admin/persons/:id
         alt Respuesta exitosa
-            Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+            Transport-->>HTTP: HTTP 200 { datos y código de operación }
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>Application: updatePersonRequest(): Promise[AxiosResponse]
             Application-->>View: updatePerson(): Promise[{ message: string, data: Person }]

@@ -6,6 +6,20 @@ export const MERMAID_EXPORT_CONFIG = Object.freeze({
     theme: 'neutral',
     look: 'classic',
     fontFamily: 'Arial, sans-serif',
+    sequence: Object.freeze({
+        wrap: true,
+        width: 110,
+        height: 60,
+        actorMargin: 24,
+        messageMargin: 32,
+        noteMargin: 12,
+        diagramMarginX: 20,
+        diagramMarginY: 20,
+        actorFontSize: 15,
+        messageFontSize: 15,
+        noteFontSize: 14,
+        mirrorActors: false
+    }),
     usecase: Object.freeze({
         usecaseFontSize: 16,
         actorFontSize: 16,

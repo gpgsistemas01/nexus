@@ -1,7 +1,7 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import { getSequenceStructureErrors } from './sequenceDiagramUtils.js';
+import { getSequenceParticipantSources, getSequenceStructureErrors } from './sequenceDiagramUtils.js';
 
 const ROOT = process.cwd();
 const OUTPUTS = {
@@ -264,17 +264,24 @@ const validateUseCaseDiagramCoverage = async () => {
             if (title !== expectedTitles.get(id)) {
                 failures.push(`diagramas ${side}: ${id} no conserva el nombre normativo (${expectedTitles.get(id)})`);
             }
-            if ((body.match(/^```mermaid$/gm) ?? []).length !== 1) {
-                failures.push(`diagramas ${side}: ${id} debe contener exactamente un bloque Mermaid`);
+            if (!(body.match(/^```mermaid$/gm) ?? []).length) {
+                failures.push(`diagramas ${side}: ${id} debe contener al menos un bloque Mermaid`);
             }
             if (!body.includes('**Patrones:**')) {
                 failures.push(`diagramas ${side}: ${id} no referencia sus patrones aplicados`);
             }
-            if ((body.match(/^sequenceDiagram$/gm) ?? []).length !== 1) {
-                failures.push(`diagramas ${side}: ${id} debe contener exactamente una secuencia de código`);
+            if (!(body.match(/^sequenceDiagram$/gm) ?? []).length) {
+                failures.push(`diagramas ${side}: ${id} debe contener una secuencia de código o sus niveles complementarios`);
             }
-            const sequence = getMermaidBlocks(body)[0] ?? '';
-            for (const error of getSequenceStructureErrors(sequence)) {
+            const sequences = getMermaidBlocks(body);
+            if (sequences.length > 1 && (side !== 'backend' || sequences.length !== 2
+                || !body.includes('## Secuencia de entrada y coordinación')
+                || !body.includes('## Colaboración interna del dominio'))) {
+                failures.push(`diagramas ${side}: ${id} debe identificar los dos niveles complementarios del mismo caso`);
+            }
+            const sequence = sequences.join('\n');
+            const participantSourceMap = getSequenceParticipantSources(body, sequence);
+            for (const error of sequences.flatMap(getSequenceStructureErrors)) {
                 failures.push(`diagramas ${side}: ${id}: ${error}`);
             }
             const visualActors = [...sequence.matchAll(/^\s*actor\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
@@ -321,15 +328,18 @@ const validateUseCaseDiagramCoverage = async () => {
                 || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback|INVALID_AUTH|FORBIDDEN)\b/i.test(sequence)) {
                 failures.push(`diagramas ${side}: ${id} no representa el error devuelto con una respuesta discontinua dentro de alt/else o break`);
             }
-            const tracedParticipants = sequence.match(/participant .* as .*src\//g) ?? [];
+            const tracedParticipants = [...participantSourceMap.values()].filter((paths) => paths.length);
             if (tracedParticipants.length < 2) {
                 failures.push(`diagramas ${side}: ${id} no traza al menos dos participantes a archivos src/`);
             }
             if (side === 'frontend' && sequence.includes('/api/')
-                && !sequence.includes('participant HTTP as src/public/js/services/axiosInstanceApi.js')) {
+                && !participantSourceMap.get('HTTP')?.includes('src/public/js/services/axiosInstanceApi.js')) {
                 failures.push(`diagramas frontend: ${id} no identifica el cliente HTTP compartido axiosInstanceApi.js`);
             }
-            if (side === 'frontend' && /^\s*participant .*src\/public\/js\/application\/.*<br\/>src\/public\/js\/services\//m.test(sequence)) {
+            if (side === 'frontend' && [...participantSourceMap.values()].some((paths) => (
+                paths.some((sourcePath) => sourcePath.startsWith('src/public/js/application/'))
+                && paths.some((sourcePath) => sourcePath.startsWith('src/public/js/services/'))
+            ))) {
                 failures.push(`diagramas frontend: ${id} agrupa aplicación y request sin identificar sus archivos como participantes separados`);
             }
             if (new RegExp(`(?:BE|FE)-P\\d{2}`).test(sequence)) {
@@ -349,7 +359,7 @@ const validateUseCaseDiagramCoverage = async () => {
             }
             const technicalAliases = new Set(
                 [...sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)]
-                    .filter(([, , label]) => label.includes('src/') || label === 'Prisma / PostgreSQL')
+                    .filter(([, alias, label]) => participantSourceMap.get(alias)?.length || label === 'Prisma / PostgreSQL')
                     .map(([, alias]) => alias)
             );
             const untypedMethodResponses = messages.filter((line) => {
@@ -389,9 +399,9 @@ const validateUseCaseDiagramCoverage = async () => {
                 if (label.includes('«object»')) {
                     failures.push(`diagramas ${side}: ${id} representa ${alias} sólo con el estereotipo «object» en vez de una instancia visual`);
                 }
-                const paths = label.match(SOURCE_PATH_PATTERN) ?? [];
-                if (label.includes('src/dtos/') && !/^[A-Za-z_$][\w$]*Dto: Object<br\/>src\/dtos\//.test(label)) {
-                    failures.push(`diagramas ${side}: ${id} no representa ${alias} con nombre de instancia, tipo Object y archivo src/dtos/`);
+                const paths = participantSourceMap.get(alias) ?? [];
+                if (paths.some((sourcePath) => sourcePath.startsWith('src/dtos/')) && label !== 'DTO funcional' && !/^[A-Za-z_$][\w$]*Dto: Object(?:<br\/>src\/dtos\/)?/.test(label)) {
+                    failures.push(`diagramas ${side}: ${id} no representa ${alias} como DTO funcional o instancia de datos identificada y trazable`);
                 }
                 if (!paths.length && !EXTERNAL_SEQUENCE_PARTICIPANTS.has(label)) {
                     failures.push(`diagramas ${side}: ${id} identifica ${alias} sin archivo src/ ni límite externo reconocido (${label})`);
@@ -403,8 +413,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 }
             }
             if (side === 'backend') {
-                const routePath = [...sequence.matchAll(SOURCE_PATH_PATTERN)]
-                    .map((match) => match[0])
+                const routePath = [...participantSourceMap.values()].flat()
                     .find((sourcePath) => sourcePath.startsWith('src/routes/'));
                 const controllerCall = sequence.match(/^\s*(?:Route|Router)->>Controller:\s*([A-Za-z_$][\w$]*)\(/m)?.[1];
                 const routeSource = sourceContents.get(routePath);
@@ -423,7 +432,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 }
             }
             if (side === 'frontend') {
-                const participantSources = participants.flatMap(([, , label]) => label.match(SOURCE_PATH_PATTERN) ?? []);
+                const participantSources = [...participantSourceMap.values()].flat();
                 const ownsFormValidation = participantSources.some((sourcePath) => (
                     sourceContents.get(sourcePath)?.includes('validateFields(')
                 ));

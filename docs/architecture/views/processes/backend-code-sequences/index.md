@@ -16,7 +16,7 @@ las secuencias reutilizan los componentes comunes de cada proceso.
 | Validación | Validator y middleware cuando modifican una alternativa del caso; el DTO sólo normaliza datos aceptados. |
 | Transacción | Límites y propagación de `tx` únicamente cuando participan en el flujo. |
 | Respuesta | Tipo real, resultado HTTP y propagación del error. |
-| Participantes | Archivo concreto de cada responsabilidad; se omiten variables y temporales mecánicos. |
+| Participantes | Nombre visual breve, rol y tabla de archivos por responsabilidad. |
 
 El pipeline común se explica en `DIA-PAT-FRO-001`. Cada secuencia incorpora sólo los middleware y
 colaboradores que cambian o prueban el recorrido del caso.
@@ -24,8 +24,8 @@ colaboradores que cambian o prueban el recorrido del caso.
 ### Relación con la documentación técnica
 
 Esta colección es la fuente canónica del recorrido ruta → controller → servicio → persistencia o
-efecto. Los [diagramas técnicos complementarios](index.md)
-sólo complementan decisiones, transacciones o coordinaciones que requieren otra representación.
+efecto. La [guía visual de secuencias](../index.md#lectura-y-estructura-de-secuencias) define notación,
+activaciones, fragmentos y tabla de trazabilidad.
 
 ### Regla de identificación y lectura
 
@@ -41,7 +41,7 @@ sólo complementan decisiones, transacciones o coordinaciones que requieren otra
 Cada caso conserva una línea **Patrones** con códigos de este índice y enlaza el
 [catálogo canónico](../../development/design-and-construction-patterns/02-confirmed-patterns.md#2-resumen-de-patrones-confirmados).
 La referencia identifica las soluciones aplicadas sin repetirlas dentro de Mermaid. La
-implementación se reconoce directamente por las rutas `src/...`, símbolos y llamadas
+implementación se reconoce en la tabla de trazabilidad y en los símbolos y llamadas
 del recorrido concreto.
 
 | Código | Patrón aplicado | Vista canónica | Elementos que permiten reconocerlo |
@@ -58,9 +58,10 @@ del recorrido concreto.
 ### Cobertura de casos backend
 
 La comparación con el catálogo y la matriz técnica confirma que cada identificador
-aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid.
+aparece una vez, conserva su referencia de patrones y contiene su secuencia Mermaid. Los 16 casos con mayor número de participantes separan
+entrada/coordinación y colaboración interna; en total, 92 casos conservan 108 figuras.
 
-| Grupo propietario | Rango cubierto | Diagramas | Estado |
+| Grupo propietario | Rango cubierto | Casos | Estado |
 | --- | --- | ---: | --- |
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
 | Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |

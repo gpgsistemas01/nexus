@@ -35,21 +35,49 @@ un flujo de control ni inventar paralelismo.
 
 ## Lectura y estructura de secuencias
 
-Los participantes se declaran antes de los mensajes. Las llamadas se muestran con
-flecha continua y los resultados o errores con flecha discontinua; `autonumber` indica
-el orden temporal. Una activación comienza al recibir la llamada y termina al devolver
-el control. Si se omiten activaciones, no se infiere concurrencia.
+Cada caso mantiene nombres visuales breves y una tabla **Participantes y trazabilidad**
+con alias, rol y archivos. La tabla permite mostrar helpers y configuradores agrupados
+sin convertir las rutas del repositorio en cabeceras demasiado anchas. `docs:check`
+comprueba que esos archivos existen y siguen asociados al participante utilizado.
+
+| Elemento visual | Aplicación en el código |
+| --- | --- |
+| Actor | Persona que inicia el caso en frontend; backend empieza en la frontera HTTP. |
+| Frontera (`boundary`) | Pantalla, formulario o adaptador de entrada/salida. |
+| Control (`control`) | Controller, application, servicio o colaborador que coordina comportamiento. |
+| Entidad (`entity`) | Objeto de datos identificado; no representa por sí solo una tabla Prisma ni un servicio. |
+| Persistencia (`database`) | Frontera Prisma/PostgreSQL agrupada; no afirma que Prisma sea un servidor separado. |
+| Barra de activación | Intervalo representado de ejecución/espera de una llamada; no un hilo independiente. |
+| Flecha continua / discontinua | Invocación / resultado o error propagado. |
+
+Los casos con muchas líneas de vida separan entrada/coordinación y colaboración de
+dominio. El segundo nivel amplía la llamada identificada del primero; no es otro caso
+ni repite su pipeline HTTP. Ambos niveles comparten la tabla de fuentes y conservan sus propios fragmentos,
+y reinicia la numeración para permitir lectura independiente.
+
+`autonumber` permite seguir mensajes sin confundir proximidad con dependencia. Los
+retornos tipados explican el resultado de funciones async; el resultado que consume el
+caller se obtiene al resolver la promesa. Los pares de llamada/retorno muestran su
+activación cuando esa frontera es explícita; no se inventa concurrencia para rellenar
+la figura. Las declaraciones `box` agrupan responsabilidades y `rect` destaca un ámbito,
+sin añadir semántica de transacción por el color.
 
 `alt`/`else` separa resultados excluyentes: la respuesta HTTP y su propagación pertenecen
-a la rama que los produce. `break` muestra un rechazo que termina la interacción antes
-de llamar al siguiente middleware o al controller. La continuación posterior al bloque
-sólo ocurre cuando su condición de rechazo no se cumple.
+a la rama que los produce. `break` identifica rechazo y fin de la interacción en esa
+condición. Los mensajes posteriores corresponden al recorrido que superó el rechazo.
+`opt` y `loop` sólo se usan cuando el código ejecuta una condición o iteración relevante.
 
-Una transacción se delimita con una llamada `$transaction`, un área `rect` y una nota
-sobre el mismo `tx`; no se usa `critical` para afirmar exclusión de otras peticiones.
-Los efectos posteriores al commit, como recálculo de costos o publicación, quedan fuera
-del área. Un fallo posterior no deshace el commit ya confirmado.
+Una transacción se delimita con `$transaction`, un área `rect` y una nota sobre el mismo
+`tx`; no se usa `critical` para afirmar exclusión de otras peticiones. Se distingue fallo
+previo, rollback del callback y fallo posterior al commit: un error al actualizar costos
+después de confirmar el documento no revierte esas escrituras. Las respuestas y efectos
+posteriores se contrastan con el controller/servicio del caso.
 
-`npm run docs:check` comprueba participantes, fragmentos y activaciones de las secuencias canónicas, además de cobertura, trazabilidad y contrato. El renderizado y la
-exportación siguen siendo necesarios para revisar legibilidad; esos controles no
-prueban por sí solos todos los flujos de ejecución del código.
+Los formularios distinguen normalización, validación local, prevención de doble envío,
+request, adaptación de respuesta y tratamiento de error. Los listados y reportes tienen
+contratos diferentes: una colección paginada no se rotula como una mutación genérica.
+Sesión y auditoría conservan sus colaboraciones transversales en esta vista.
+
+`npm run docs:check` comprueba cobertura, trazabilidad, participantes, fragmentos,
+activaciones y contrato. El renderizado y la exportación verifican legibilidad; estos
+controles no equivalen a ejecutar todos los caminos del código.

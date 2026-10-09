@@ -3,21 +3,43 @@
 
 **Patrones:** `BE-P01`, `BE-P03`, `BE-P04`, `BE-P05`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`consumableGoodsIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsIssues/consumables/consumableGoodsIssueApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`goodsIssueValidations.js`](../../../../../../src/validators/forms/goodsIssueValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`consumableGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/consumables/consumableGoodsIssueController.js)<br/>[`goodsIssueHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js) |
+| `Facade` | control | [`consumableGoodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js) |
+| `Core` | control | [`goodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js) |
+| `Helpers` | control | [`goodsIssueHelpers.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js) |
+| `DTO` | control | [`goodsIssueDTO.js`](../../../../../../src/dtos/goodsIssueDTO.js) |
+| `Header` | control | [`issueHeaderService.js`](../../../../../../src/services/warehouse/issues/issueHeaderService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/goodsIssues/consumables/consumableGoodsIssueApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/goodsIssueValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsIssues/consumables/consumableGoodsIssueController.js<br/>src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js
-    participant Facade@{ "type": "control" } as src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js
-    participant Core@{ "type": "control" } as src/services/warehouse/goodsIssues/goodsIssueService.js
-    participant Helpers as src/services/warehouse/goodsIssues/goodsIssueHelpers.js
+    participant Route@{ "type": "boundary" } as Router API
+    participant Auth@{ "type": "control" } as Acceso
+    participant Validator@{ "type": "control" } as Validación HTTP
+    participant Controller@{ "type": "control" } as Controller
+    participant Facade@{ "type": "control" } as Adaptador del tipo
+    participant Core@{ "type": "control" } as Núcleo del dominio
+    participant Helpers@{ "type": "control" } as Helpers del dominio
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant DTO@{ "type": "entity" } as goodsIssueDto: Object<br/>src/dtos/goodsIssueDTO.js
-    participant Header as src/services/warehouse/issues/issueHeaderService.js
-    participant ErrorHandler as src/app.js
+    participant DTO@{ "type": "control" } as DTO funcional
+    participant Header@{ "type": "control" } as Encabezado
+    participant ErrorHandler@{ "type": "control" } as Errores Express
 
     Client->>Route: PATCH /api/warehouse/goods-issues/consumables/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -34,7 +56,9 @@ sequenceDiagram
     end
     Route->>Controller: editConsumableGoodsIssue(req, res)
     Controller->>DTO: createGoodsIssueDtoForEdit(req.body)
+    activate DTO
     DTO-->>Controller: createGoodsIssueDtoForEdit(): Object — DTO normalizado
+    deactivate DTO
     Controller->>Controller: sanitizeEmptyStrings(dto)
     Controller->>Facade: updateConsumableGoodsIssue(options con DTO, identificadores y actor cuando corresponde)
     Facade->>Core: updateGoodsIssue({ ...options, type: CONSUMABLE })

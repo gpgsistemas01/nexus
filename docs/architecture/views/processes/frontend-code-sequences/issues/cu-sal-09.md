@@ -3,29 +3,55 @@
 
 **Patrones:** `FE-P05`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `View` | boundary | [`wasteIssueModal.js`](../../../../../../src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js) |
+| `DetailCollection` | control | [`detailCollectionUtils.js`](../../../../../../src/public/js/utils/detailCollectionUtils.js) |
+| `DetailTable` | boundary | [`renderMaterialDatatable.js`](../../../../../../src/public/js/plugins/datatable/shared/inventory/renderMaterialDatatable.js) |
+| `DetailFormUI` | boundary | [`detailFormUI.js`](../../../../../../src/public/js/ui/forms/detailFormUI.js) |
+| `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
+| `InventoryUtils` | control | [`warehouseInventoryUtils.js`](../../../../../../src/public/js/utils/warehouseInventoryUtils.js) |
+| `Application` | control | [`wasteIssues.js`](../../../../../../src/public/js/application/warehouse/wasteIssues/wasteIssues.js) |
+| `Request` | boundary | [`wasteIssueService.js`](../../../../../../src/public/js/services/warehouse/wasteIssueService.js) |
+| `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
+| `Transport` | control | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js)<br/>[`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js<br/>wasteIssueForm.js
-    participant DetailCollection as src/public/js/utils/detailCollectionUtils.js
-    participant DetailTable@{ "type": "boundary" } as src/public/js/plugins/datatable/shared/inventory/renderMaterialDatatable.js
-    participant DetailFormUI@{ "type": "boundary" } as src/public/js/ui/forms/detailFormUI.js
-    participant FormUtils as src/public/js/utils/formUtils.js
-    participant InventoryUtils as src/public/js/utils/warehouseInventoryUtils.js
-    participant Application@{ "type": "control" } as src/public/js/application/warehouse/wasteIssues/wasteIssues.js
-    participant Request as src/public/js/services/warehouse/wasteIssueService.js
-    participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/wasteIssueApiRoute.js<br/>src/controllers/api/warehouse/wasteIssueController.js
+    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant DetailCollection@{ "type": "control" } as Colección de detalles
+    participant DetailTable@{ "type": "boundary" } as Tabla de detalles
+    participant DetailFormUI@{ "type": "boundary" } as UI de detalles
+    participant FormUtils@{ "type": "control" } as Form helpers
+    participant InventoryUtils@{ "type": "control" } as Conversión de inventario
+    participant Application@{ "type": "control" } as Application
+    participant Request@{ "type": "boundary" } as Requests del recurso
+    participant HTTP@{ "type": "boundary" } as Cliente HTTP
+    participant Transport@{ "type": "control" } as Endpoint API
 
     Initiator->>Browser: inicia CU-SAL-09 — Crear salida de merma
     Browser->>View: on(DOM_EVENT_NAMES.CLICK, BUTTON_SELECTORS.ADD_MATERIAL, addWaste)
     View->>FormUtils: validateFields(addWasteIssueDetailValidation, { wasteId, quantity })
+    activate FormUtils
     FormUtils-->>View: validateFields(): Object
+    deactivate FormUtils
     View->>View: normalizeFormErrors({ form, errors })
     View->>FormUtils: hasValidationErrors(errors)
+    activate FormUtils
     FormUtils-->>View: hasValidationErrors(): boolean
+    deactivate FormUtils
     alt El renglón tiene datos inválidos
         View-->>Browser: errores visibles en merma o cantidad
     else Renglón válido
@@ -46,7 +72,9 @@ sequenceDiagram
     end
     View->>View: normalizeWasteIssueData({ form })
     View->>FormUtils: validateFields(wasteIssueValidation, formData)
+    activate FormUtils
     FormUtils-->>View: validateFields(): Object
+    deactivate FormUtils
     alt wasteIssueValidation devuelve errores
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido
@@ -55,7 +83,9 @@ sequenceDiagram
         Application->>Request: registerWasteIssueRequest({ data: formData })
         Request->>HTTP: apiRequest({ method: 'post', url: ROUTE, data: formData })
         HTTP->>Transport: envía POST /api/warehouse/waste-issues
+        activate Transport
         Transport-->>HTTP: HTTP 200 { wasteIssue, code }
+        deactivate Transport
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: registerWasteIssueRequest(): Promise[AxiosResponse]
         alt Respuesta exitosa

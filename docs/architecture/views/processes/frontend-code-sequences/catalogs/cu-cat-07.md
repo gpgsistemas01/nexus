@@ -3,16 +3,33 @@
 
 **Patrones:** `FE-P02`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `View` | boundary | [`clientModal.js`](../../../../../../src/public/js/pages/sales/clients/clientModal.js) |
+| `Application` | control | [`clients.js`](../../../../../../src/public/js/application/sales/clients/clients.js) |
+| `Request` | boundary | [`clientService.js`](../../../../../../src/public/js/services/sales/clientService.js) |
+| `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
+| `Transport` | control | [`clientApiRoute.js`](../../../../../../src/routes/api/sales/clientApiRoute.js)<br/>[`clientController.js`](../../../../../../src/controllers/api/sales/clientController.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as src/public/js/pages/sales/clients/clientModal.js<br/>clientForm.js
-    participant Application@{ "type": "control" } as src/public/js/application/sales/clients/clients.js
-    participant Request as src/public/js/services/sales/clientService.js
-    participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/sales/clientApiRoute.js<br/>src/controllers/api/sales/clientController.js
+    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant Application@{ "type": "control" } as Application
+    participant Request@{ "type": "boundary" } as Requests del recurso
+    participant HTTP@{ "type": "boundary" } as Cliente HTTP
+    participant Transport@{ "type": "control" } as Endpoint API
 
     Initiator->>Browser: inicia CU-CAT-07 — Editar cliente
     Browser->>View: clientModal.js precarga el cliente
@@ -26,7 +43,7 @@ sequenceDiagram
         Request->>HTTP: apiRequest({ method: 'put', url, data })
         HTTP->>Transport: envía PUT /api/sales/clients/:id
         alt Respuesta exitosa
-            Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+            Transport-->>HTTP: HTTP 200 { client, code }
             HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
             Request-->>Application: editClientRequest(): Promise[AxiosResponse]
             Application-->>View: editClient(): Promise[{ message: string, data: Client }]

@@ -53,3 +53,24 @@ export const getSequenceStructureErrors = (source) => {
     }
     return errors;
 };
+
+// Short diagram labels retain source evidence in the adjacent participant table.
+export const getSequenceParticipantSources = (body, sequence) => {
+    const sources = new Map();
+    const sourcePattern = /src\/[\w./-]+\.(?:js|ejs)/g;
+    for (const match of sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)) {
+        sources.set(match[1], [...new Set([
+            ...(sources.get(match[1]) ?? []),
+            ...(match[2].match(sourcePattern) ?? [])
+        ])]);
+    }
+    const table = body.match(/## Participantes y trazabilidad\r?\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? '';
+    for (const match of table.matchAll(/^\| `([^`]+)` \|[^|]+\|([^\n]+)\|$/gm)) {
+        if (!sources.has(match[1])) continue;
+        sources.set(match[1], [...new Set([
+            ...sources.get(match[1]),
+            ...(match[2].match(sourcePattern) ?? [])
+        ])]);
+    }
+    return sources;
+};

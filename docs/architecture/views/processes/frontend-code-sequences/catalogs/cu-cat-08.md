@@ -3,22 +3,42 @@
 
 **Patrones:** `FE-P08`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `View` | boundary | [`clientDatatable.js`](../../../../../../src/public/js/plugins/datatable/sales/clients/clientDatatable.js) |
+| `Dialog` | boundary | [`reportExportDialog.js`](../../../../../../src/public/js/ui/reportExportDialog.js) |
+| `Application` | control | [`report.js`](../../../../../../src/public/js/application/sales/report.js) |
+| `Request` | boundary | [`reportService.js`](../../../../../../src/public/js/services/sales/reportService.js) |
+| `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
+| `Transport` | control | [`reportApiRoute.js`](../../../../../../src/routes/api/sales/reportApiRoute.js)<br/>[`reportController.js`](../../../../../../src/controllers/api/sales/reportController.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as src/public/js/plugins/datatable/sales/clients/clientDatatable.js
-    participant Dialog@{ "type": "boundary" } as src/public/js/ui/reportExportDialog.js
-    participant Application@{ "type": "control" } as src/public/js/application/sales/report.js
-    participant Request as src/public/js/services/sales/reportService.js
-    participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/sales/reportApiRoute.js<br/>src/controllers/api/sales/reportController.js
+    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant Dialog@{ "type": "boundary" } as Diálogo
+    participant Application@{ "type": "control" } as Application
+    participant Request@{ "type": "boundary" } as Requests del recurso
+    participant HTTP@{ "type": "boundary" } as Cliente HTTP
+    participant Transport@{ "type": "control" } as Endpoint API
 
     Initiator->>Browser: inicia CU-CAT-08 — Generar reporte de clientes
     Browser->>View: Botón Excel de clientDatatable.js
     View->>Dialog: showFilteredExportDialog()
+    activate Dialog
     Dialog-->>View: showFilteredExportDialog(): Promise[boolean]
+    deactivate Dialog
     View->>Application: exportClientReport({ params })
     activate Application
     Application->>Request: exportClientReportRequest({ params })

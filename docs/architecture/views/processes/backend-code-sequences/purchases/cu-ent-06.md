@@ -8,20 +8,41 @@
         ErrorHandler-->>Client: HTTP de error { code, message }
         end
     end
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`materialGoodsReceiptReportApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Controller` | control | [`materialGoodsReceiptReportController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js) |
+| `Facade` | control | [`materialGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) |
+| `Core` | control | [`reportController.js`](../../../../../../src/controllers/api/warehouse/reportController.js) |
+| `Query` | control | [`reportService.js`](../../../../../../src/services/warehouse/reportService.js) |
+| `List` | control | [`goodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) |
+| `Excel` | control | [`reportExcelUtils.js`](../../../../../../src/utils/reportExcelUtils.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js
-    participant Facade@{ "type": "control" } as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
-    participant Core@{ "type": "control" } as src/controllers/api/warehouse/reportController.js
-    participant Query as src/services/warehouse/reportService.js
-    participant List as src/services/warehouse/goodsReceipts/goodsReceiptService.js
+    participant Route@{ "type": "boundary" } as Router API
+    participant Auth@{ "type": "control" } as Acceso
+    participant Controller@{ "type": "control" } as Controller
+    participant Facade@{ "type": "control" } as Adaptador del tipo
+    participant Core@{ "type": "control" } as Núcleo del dominio
+    participant Query@{ "type": "control" } as Consulta de dominio
+    participant List@{ "type": "control" } as Listado
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Excel as src/utils/reportExcelUtils.js
-    participant ErrorHandler as src/app.js
+    participant Excel@{ "type": "control" } as Reporte Excel
+    participant ErrorHandler@{ "type": "control" } as Errores Express
 
     Client->>Route: GET /api/warehouse/reports/goods-receipts/materials/excel
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -40,7 +61,9 @@ sequenceDiagram
         Facade->>Query: findGoodsReceiptReportRows({ ...options, type: MATERIAL })
         Query->>List: findAllGoodsReceipts({ ...filtros, type, includeCounts: false, skip: 0, take: 100000 })
         List->>Prisma: goodsReceipt.findMany({ where: contexto y filtros })
+        activate Prisma
         Prisma-->>List: findMany(): Promise[GoodsReceipt[]]
+        deactivate Prisma
         List-->>Query: findAllGoodsReceipts(): Promise[{ data }] — sin conteos
         Query-->>Facade: findGoodsReceiptReportRows(): Promise[Object[]]
         Facade-->>Core: findMaterialGoodsReceiptReportRows(): Promise[Object[]]

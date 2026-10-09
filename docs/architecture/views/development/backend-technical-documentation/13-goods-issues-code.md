@@ -24,8 +24,6 @@ flowchart TB
     X --> P
 ```
 
-Los controllers material/consumable configuran goodsIssueHandlers y servicios por tipo. El núcleo colabora con issues, movimientos y detailReturns; no se confunden devolución y edición de detalle.
-
 | Grupo del mapa | Archivos que lo componen |
 | --- | --- |
 | routes/api · consumableGoodsIssueApiRoute.js · consumableGoodsIssueReportApiRoute.js · y colaboradores | `src/routes/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueApiRoute.js`<br/>`src/routes/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueReportApiRoute.js`<br/>`src/routes/api/warehouse/goodsIssues/`<br/>`materials/materialGoodsIssueApiRoute.js`<br/>`src/routes/api/warehouse/goodsIssues/`<br/>`materials/`<br/>`materialGoodsIssueReportApiRoute.js` |
@@ -36,6 +34,46 @@ Los controllers material/consumable configuran goodsIssueHandlers y servicios po
 | DTO · goodsIssueDTO.js | `src/dtos/goodsIssueDTO.js` |
 | Colaboradores de dominio · referenceNumberService.js · movementService.js · y colaboradores | `src/services/document/`<br/>`referenceNumberService.js`<br/>`src/services/inventory/movementService.js`<br/>`src/services/inventory/stockHelpers.js`<br/>`src/services/warehouse/`<br/>`fulfillmentStatusService.js`<br/>`src/services/warehouse/issues/`<br/>`issueFulfillmentRules.js`<br/>`src/services/warehouse/issues/`<br/>`issueHeaderService.js`<br/>`src/services/warehouse/materials/`<br/>`supplierMaterialService.js` |
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
+
+
+## Contratos de implementación
+
+### Datos, resultados y efectos del módulo
+
+| Capacidad | Entrada y retorno | Reglas, errores y persistencia |
+| --- | --- | --- |
+| Salidas de materiales y consumibles: controllers específicos de `goodsIssues/materials` y `goodsIssues/consumables`, `goodsIssues/goodsIssueService.js`, helpers, select y reglas de cumplimiento | Lista, alta, edición, encabezado y detalles adaptan `id`/DTO; retornan salida actualizada. | Resuelve encabezado, cantidades y estados; el surtimiento aplica movimiento `ISSUE` y actualiza detalles/encabezado en el mismo `tx`. |
+| Devolución de material: `goodsIssueController.registerGoodsIssueDetailReturn` y `detailReturns/goodsIssueReturnService.js` | `id`, `detailId` y cantidad de devolución retornan salida/detalle actualizado. | Comprueba cantidades y estado, devuelve inventario, registra movimiento y recalcula cumplimiento atómicamente. |
+
+
+Los controllers de este módulo exponen estas operaciones. Un export construido por
+un handler conserva su configuración local; no se supone un DTO ni una transacción
+para todas las operaciones. Los datos, resultados y efectos están definidos en la tabla anterior.
+
+| Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
+| --- | --- |
+| `controllers/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueController.js` | `getAllConsumableGoodsIssues`<br/>`registerConsumableGoodsIssue`<br/>`editConsumableGoodsIssue`<br/>`editConsumableGoodsIssueHeader`<br/>`editConsumableGoodsIssueDetails`<br/>`registerConsumableGoodsIssueDetailReturn` |
+| `controllers/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueReportController.js` | `exportConsumableGoodsIssueReportExcel` |
+| `controllers/api/warehouse/goodsIssues/`<br/>`materials/materialGoodsIssueController.js` | `getAllMaterialGoodsIssues`<br/>`registerMaterialGoodsIssue`<br/>`editMaterialGoodsIssue`<br/>`editMaterialGoodsIssueHeader`<br/>`editMaterialGoodsIssueDetails`<br/>`registerMaterialGoodsIssueDetailReturn` |
+| `controllers/api/warehouse/goodsIssues/`<br/>`materials/`<br/>`materialGoodsIssueReportController.js` | `exportMaterialGoodsIssueReportExcel` |
+| `controllers/api/warehouse/goodsIssues/`<br/>`shared/goodsIssueHandlers.js` | `buildListHandler`<br/>`buildRegisterHandler`<br/>`buildEditHandler`<br/>`buildHeaderHandler`<br/>`buildDetailsHandler`<br/>`buildReturnHandler` |
+
+### Normalización de datos
+
+| Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
+| --- | --- |
+| `dtos/goodsIssueDTO.js` | `createGoodsIssueDtoForRegister`<br/>`createGoodsIssueDtoForEdit`<br/>`createGoodsIssueDetailsDtoForEdit`<br/>`createGoodsIssueHeaderDtoForEdit`<br/>`createGoodsIssueDtoForReturn` |
+
+## Variantes y límites de reutilización
+
+Los controllers material/consumable configuran goodsIssueHandlers y servicios por tipo. El núcleo colabora con issues, movimientos y detailReturns; no se confunden devolución y edición de detalle.
+
+Los grupos del mapa representan imports seleccionados. Los permisos y middleware
+se comprueban en cada router; los servicios conservan validaciones, errores y
+persistencia propios. Compartir `getDb(tx)` no implica que toda operación abra una
+transacción. La integración de [Prisma](../code-structure/06-prisma-and-persistence.md)
+y los [mecanismos backend reutilizables](../reuse-and-refactoring/01-backend-handlers-and-services.md)
+tienen una fuente de detalle común.
 
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en

@@ -3,22 +3,42 @@
 
 **Patrones:** `FE-P08`.
 
+## Participantes y trazabilidad
+
+Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
+La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
+puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
+proceso independiente. Los retornos representan el resultado o error propagado.
+
+| Alias | Rol visual | Archivos de implementación |
+| --- | --- | --- |
+| `View` | boundary | [`materialDatatable.js`](../../../../../../src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js) |
+| `Dialog` | boundary | [`reportExportDialog.js`](../../../../../../src/public/js/ui/reportExportDialog.js) |
+| `Application` | control | [`report.js`](../../../../../../src/public/js/application/warehouse/report.js) |
+| `Request` | boundary | [`reportService.js`](../../../../../../src/public/js/services/warehouse/reportService.js) |
+| `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
+| `Transport` | control | [`reportApiRoute.js`](../../../../../../src/routes/api/warehouse/reportApiRoute.js)<br/>[`reportController.js`](../../../../../../src/controllers/api/warehouse/reportController.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as src/public/js/plugins/datatable/warehouse/materials/materialDatatable.js
-    participant Dialog@{ "type": "boundary" } as src/public/js/ui/reportExportDialog.js
-    participant Application@{ "type": "control" } as src/public/js/application/warehouse/report.js
-    participant Request as src/public/js/services/warehouse/reportService.js
-    participant HTTP as src/public/js/services/axiosInstanceApi.js
-    participant Transport@{ "type": "control" } as src/routes/api/warehouse/reportApiRoute.js<br/>src/controllers/api/warehouse/reportController.js
+    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant Dialog@{ "type": "boundary" } as Diálogo
+    participant Application@{ "type": "control" } as Application
+    participant Request@{ "type": "boundary" } as Requests del recurso
+    participant HTTP@{ "type": "boundary" } as Cliente HTTP
+    participant Transport@{ "type": "control" } as Endpoint API
 
     Initiator->>Browser: inicia CU-ALM-06 — Generar reporte de inventario de materiales
     Browser->>View: Botón Excel de materialDatatable.js
     View->>Dialog: showInventoryExportDialog()
+    activate Dialog
     Dialog-->>View: showInventoryExportDialog(): Promise['active' | 'stock']
+    deactivate Dialog
     View->>Application: exportWarehouseReport({ params })
     activate Application
     Application->>Request: exportWarehouseReportRequest({ params })
