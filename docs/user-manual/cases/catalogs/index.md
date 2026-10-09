@@ -8,7 +8,9 @@ Empiece en **Almacén → Materiales**, **Consumibles** o **Mermas**, según el 
 
 Antes de registrar un artículo, búsquelo para evitar duplicados. Después de guardar, compruebe sus datos en el listado. Una compra registra lo recibido; una salida registra lo solicitado y descuenta al surtir. No use un ajuste de existencia como sustituto de esas operaciones.
 
-El administrador encuentra las opciones de apoyo en **Catálogos**, y los listados independientes de **Clientes** y **Proveedores** en el menú. El personal de almacén selecciona clientes y proveedores desde sus formularios de operación.
+El administrador encuentra las opciones de apoyo en **Catálogos**, y los listados independientes de **Clientes** y **Proveedores** en el menú. El personal de almacén consulta y registra altas de clientes y proveedores desde sus
+listados o formularios de operación; la edición, cambio de estado y exportación se
+reservan al administrador.
 
 ## Capítulos
 

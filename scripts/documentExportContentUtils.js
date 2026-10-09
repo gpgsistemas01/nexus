@@ -110,3 +110,16 @@ export const externalDocumentLinkLabel = ({ linkedOutput, fragment, targetConten
     const sectionTitle = fragment ? getHeadingTitle(targetContent, fragment) : null;
     return sectionTitle ? `${sectionTitle} — ${documentTitle}` : documentTitle;
 };
+
+export const prepareManualImages = (content, directory) => {
+    const actor = directory.split(path.sep).at(-1);
+    if (!directory.startsWith(`manuales${path.sep}`)) return content;
+    const area = actor === 'administrador' ? 'sistemas' : actor === 'almacen' ? 'almacen' : null;
+    if (!area) throw new Error(`Actor del manual sin área de capturas: ${actor}.`);
+
+    return content.replace(/(!\[[^\]]*\]\()(\.\.\/)*images\/(?:areas\/[^/]+\/)?([^) ]+)/g,
+        (reference, prefix) => {
+            const imagePath = reference.slice(prefix.length).replace(/^((?:\.\.\/)*images\/)(?:areas\/[^/]+\/)?/, `$1areas/${area}/`);
+            return `${prefix}${imagePath}`;
+        });
+};

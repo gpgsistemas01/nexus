@@ -22,10 +22,11 @@ Una misma imagen sólo se reutiliza dentro del área cuando la interfaz es realm
 pantalla accesible desde Almacén y Sistemas tiene dos capturas aunque comparta ruta: cada una se
 genera con las credenciales de su área y puede mostrar botones distintos. No se crean imágenes de
 un archivo Excel descargado.
-Los módulos independientes de **Clientes** y **Proveedores** se capturan únicamente con la sesión de
-Sistemas. La sesión de Almacén utiliza registros autorizados de esos catálogos dentro de sus
-operaciones y puede abrir sus modales de alta desde los selectores de compras y salidas, pero no
-puede abrir ni administrar sus listados independientes.
+Los listados de consulta y alta de **Clientes** y **Proveedores** se capturan en ambas
+áreas conforme al menú y servidor actuales. Edición, estado y exportación corresponden
+a Sistemas; las altas contextuales de Almacén también se muestran dentro de compras y
+salidas. Registre el rol usado: Almacenista en Almacén y Proveduría y Administrador del
+sistema en Sistemas son las cuentas de referencia de estos manuales.
 Cuando un listado dispone de un panel **Filtros**, su captura inicial lo muestra desplegado para
 que el usuario pueda ubicar los campos y las acciones descritas en el procedimiento.
 Cuando un procedimiento requiere sustituir un filtro predeterminado, se incluye además una captura
@@ -373,8 +374,10 @@ que no aparezcan contraseñas, cookies ni datos personales, que los textos sean 
 estado visible coincida con los casos de uso asignados en la tabla. Cada imagen debe corresponder
 al área visible de 1440 × 1000 píxeles, sin agregar el contenido que queda debajo de la pantalla.
 En los pasos con modal se conserva el contexto visible que lo rodea; no se recorta sólo el modal.
-Sólo entonces las imágenes revisadas se referencian desde el recorrido correspondiente del
-manual. Al completar todo el
+Sólo entonces se publican bajo `docs/user-manual/images/areas/<área>/`, conservando
+módulo y nombre. El exportador elige exclusivamente las imágenes de ese actor;
+las rutas comunes de los procedimientos son referencias lógicas y no autorizan
+a reutilizar una captura de otra área. Al completar todo el
 inventario, si se proporcionaron archivos mediante `DOCS_ALMACEN_STORAGE_STATE` o
 `DOCS_SISTEMAS_STORAGE_STATE`, el script elimina automáticamente cada archivo utilizado;
 si la ejecución falla, los conserva para permitir un reintento y deben eliminarse manualmente

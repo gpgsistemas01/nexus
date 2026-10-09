@@ -5,7 +5,8 @@ import {
     externalDocumentAnchorFragment,
     externalDocumentLinkLabel,
     getHeadingTitle,
-    prepareManualEntry
+    prepareManualEntry,
+    prepareManualImages
 } from '../../../scripts/documentExportContentUtils.js';
 
 describe('documentExportContentUtils', () => {
@@ -106,4 +107,28 @@ describe('documentExportContentUtils', () => {
             targetContent
         })).toBe('Compras');
     });
+});
+
+describe('prepareManualImages', () => {
+  it('mantiene separadas las capturas de actores que comparten un procedimiento', () => {
+    const content = '![Listado](../../images/materials/01-list-inventory.png)';
+
+    expect(prepareManualImages(content, 'manuales/almacen'))
+      .toBe('![Listado](../../images/areas/almacen/materials/01-list-inventory.png)');
+    expect(prepareManualImages(content, 'manuales/administrador'))
+      .toBe('![Listado](../../images/areas/sistemas/materials/01-list-inventory.png)');
+  });
+
+  it('corrige una referencia de otra área sin recurrir a una captura común', () => {
+    const content = '![Menú](../../images/areas/sistemas/access/02-menu-main.png)';
+
+    expect(prepareManualImages(content, 'manuales/almacen'))
+      .toBe('![Menú](../../images/areas/almacen/access/02-menu-main.png)');
+    expect(prepareManualImages(content, 'arquitectura')).toBe(content);
+  });
+
+  it('rechaza un actor sin selección explícita de capturas', () => {
+    expect(() => prepareManualImages('![Menú](../images/menu.png)', 'manuales/desconocido'))
+      .toThrow('Actor del manual sin área de capturas');
+  });
 });

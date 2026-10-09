@@ -1,5 +1,9 @@
 # Primeros pasos en Nexus
 
+**Objetivo de esta sesión:** entrar con su cuenta, reconocer las opciones de su actor,
+realizar una consulta y cerrar sesión. Su instructor le proporcionará la dirección,
+una cuenta de capacitación y un artículo de práctica.
+
 ## Antes de entrar
 
 Tenga a la mano la dirección de Nexus y su cuenta asignada. Abra esa dirección
@@ -64,3 +68,10 @@ ayuda a resolver los rechazos habituales.
 
 Use **Menú principal → Cerrar sesión** cuando termine. No comparta su cuenta
 ni incluya contraseñas o datos personales en capturas de soporte.
+
+## Práctica y comprobación
+
+Con su instructor, busque el artículo asignado sin modificarlo. Señale su proveedor,
+unidad y existencia; limpie los filtros y vuelva a localizarlo. Explique qué botones
+puede usar con su cuenta y cierre sesión. Si no puede abrir Almacén, practique la
+navegación en una opción que sí tenga disponible y solicite su recorrido de inducción.

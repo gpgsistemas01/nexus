@@ -3,7 +3,7 @@
 La exportación de los manuales y la generación de capturas son procesos separados:
 
 - `npm run docs:export -- todos <formato>` genera los dos manuales y el resto de la documentación
-  exportable. Usa las imágenes ya versionadas y referenciadas bajo `docs/user-manual/images/`; no
+  exportable. Usa las imágenes ya versionadas y referenciadas bajo `docs/user-manual/images/areas/<área>/`; no
   abre Nexus ni toma capturas nuevas.
 - `npm run docs:screenshots -- --area <área>` genera PNG revisables bajo
   `build/docs/screenshots/areas/<área>/`. No genera DOCX o PDF y no modifica las imágenes
@@ -122,8 +122,8 @@ Cada comando genera únicamente el inventario del área indicada. `DOCS_CAPTURE_
 como alternativa a `--area` para CI. Para regenerar capturas concretas use
 `DOCS_ALMACEN_CAPTURE_IDS` o `DOCS_SISTEMAS_CAPTURE_IDS`; para continuar desde un punto use la
 variable `DOCS_<AREA>_CAPTURE_FROM`. No combine esos mecanismos con `--missing` o `--fresh`.
-Los listados independientes de clientes y proveedores pertenecen al inventario de Sistemas: no se
-solicitan durante la ejecución de Almacén porque esa cuenta no tiene acceso a sus rutas web. Las
+Los listados de consulta y alta de clientes y proveedores se capturan para ambas áreas
+con sus permisos actuales; edición, cambios de estado y exportación se capturan en Sistemas. Las
 capturas de alta de Almacén sí abren los mismos modales reutilizados desde **Nueva compra** y
 **Nueva salida**, mediante las opciones **Nuevo proveedor** y **Nuevo cliente** de sus selectores.
 
@@ -169,3 +169,12 @@ conserva el área completa de 1440 × 1000 para mostrar el control, el modal o l
 contexto. Las pantallas previas a la autenticación también se guardan dentro de la carpeta del área
 seleccionada. Cada ejecución usa un contexto independiente y nunca escribe imágenes en la carpeta
 de otra área.
+
+## Incorporar las capturas revisadas
+
+Después de la revisión, copie cada PNG a `docs/user-manual/images/areas/<área>/`
+conservando su módulo y nombre. Registre el área y rol de la cuenta utilizada en la
+revisión. Las cuentas de referencia son Almacenista en Almacén y Proveduría y
+Administrador del sistema en Sistemas; valide cualquier otra combinación de permisos
+antes de reutilizar sus imágenes. No publique una imagen de otro actor como sustituto.
+Ejecute `npm run docs:export -- manuales --check` antes de generar los entregables.

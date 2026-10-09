@@ -11,7 +11,8 @@ import {
     documentExportAnchor,
     externalDocumentAnchorFragment,
     externalDocumentLinkLabel,
-    prepareManualEntry
+    prepareManualEntry,
+    prepareManualImages
 } from './documentExportContentUtils.js';
 import { removeDocumentOutput } from './documentOutputUtils.js';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
@@ -75,13 +76,78 @@ const consumableIssueManualCases = [
 ];
 const administrator = 'docs/user-manual/actors/administrator.md';
 const warehouse = 'docs/user-manual/actors/warehouse.md';
+const getOperationalManualParts = (actor) => ({
+    'almacen-materiales': manualPart(actor, manualCaseFiles('catalogs', [
+        '02-cap-cat-mat-01-list.md',
+        '03-cap-cat-mat-02-create.md',
+        '04-cap-cat-mat-03-edit.md',
+        '05-cap-cat-mat-04-stock.md',
+        '06-cap-rep-mat-05-export.md'
+    ])),
+    'almacen-consumibles': manualPart(actor, manualCaseFiles('catalogs', [
+        '19-cap-cat-con-01-list.md',
+        '20-cap-cat-con-02-create.md',
+        '21-cap-cat-con-03-edit.md',
+        '22-cap-cat-con-04-remove.md',
+        '23-cap-cat-con-05-stock.md',
+        '24-cap-rep-con-06-export.md'
+    ])),
+    'almacen-mermas': manualPart(actor, manualCaseFiles('catalogs', [
+        '13-cap-cat-was-01-list.md',
+        '14-cap-cat-was-02-create.md',
+        '15-cap-cat-was-03-edit.md',
+        '16-cap-cat-was-04-stock.md',
+        '17-cap-cat-was-05-add-stock.md',
+        '18-cap-rep-was-05-export.md'
+    ])),
+    compras: manualPart(actor, [
+        ...manualCases.purchases,
+        ...manualCaseFiles('catalogs', ['08-cap-cat-sup-02-create.md'])
+    ]),
+    'salidas-materiales': manualPart(actor, [
+        ...manualCaseFiles('issues', [
+            '01-cap-sal-mat-01-list.md',
+            '02-cap-sal-mat-02-create.md',
+            '03-cap-sal-mat-03-edit.md',
+            '04-cap-sal-mat-04-supply.md',
+            '05-cap-sal-mat-05-return.md',
+            '06-cap-rep-sal-mat-06-export.md',
+            '07-cap-sal-mat-08-view.md'
+        ]),
+        ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
+    ]),
+    'salidas-consumibles': manualPart(actor, consumableIssueManualCases),
+    'salidas-mermas': manualPart(actor, [
+        ...manualCaseFiles('issues', [
+            '08-cap-sal-was-01-list.md',
+            '09-cap-sal-was-02-create.md',
+            '10-cap-sal-was-03-edit.md',
+            '11-cap-sal-was-04-supply.md',
+            '12-cap-sal-was-05-return.md',
+            '13-cap-rep-sal-was-06-export.md',
+            '14-cap-sal-was-08-view.md'
+        ]),
+        ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
+    ])
+});
+const administratorOnlyCases = new Set([
+    '05-cap-cat-mat-04-stock.md',
+    '16-cap-cat-was-04-stock.md',
+    '23-cap-cat-con-05-stock.md'
+]);
+const warehouseOperationalParts = Object.fromEntries(
+    Object.entries(getOperationalManualParts(warehouse)).map(([part, sources]) => [
+        part,
+        sources.filter((source) => !administratorOnlyCases.has(path.basename(source)))
+    ])
+);
 const MANUALS = Object.freeze({
     'manual-administrador': {
         directory: 'manuales/administrador',
         parts: {
             'informacion-general-y-anexos': manualAdditionalPart(administrator),
             autenticacion: manualPart(administrator, manualCases.authentication),
-            'salidas-consumibles': manualPart(administrator, consumableIssueManualCases),
+            ...getOperationalManualParts(administrator),
             'movimientos-materiales': manualPart(administrator, manualCaseFiles('reports', [
                 '01-cap-rep-mov-mat-01-list.md',
                 '02-cap-rep-mov-mat-02-export.md'
@@ -136,58 +202,20 @@ const MANUALS = Object.freeze({
         parts: {
             'informacion-general-y-anexos': manualAdditionalPart(warehouse),
             autenticacion: manualPart(warehouse, manualCases.authentication),
-            'almacen-materiales': manualPart(warehouse, manualCaseFiles('catalogs', [
-                '02-cap-cat-mat-01-list.md',
-                '03-cap-cat-mat-02-create.md',
-                '04-cap-cat-mat-03-edit.md',
-                '05-cap-cat-mat-04-stock.md',
-                '06-cap-rep-mat-05-export.md'
+            ...warehouseOperationalParts,
+            personas: manualPart(warehouse, manualCaseFiles('identity-access', [
+                '01-cap-ida-per-01-list.md',
+                '02-cap-ida-per-02-create.md',
+                '03-cap-ida-per-03-edit.md'
             ])),
-            'almacen-consumibles': manualPart(warehouse, manualCaseFiles('catalogs', [
-                '19-cap-cat-con-01-list.md',
-                '20-cap-cat-con-02-create.md',
-                '21-cap-cat-con-03-edit.md',
-                '22-cap-cat-con-04-remove.md',
-                '23-cap-cat-con-05-stock.md',
-                '24-cap-rep-con-06-export.md'
+            clientes: manualPart(warehouse, manualCaseFiles('catalogs', [
+                '10-cap-cat-cli-01-list.md',
+                '11-cap-cat-cli-02-create.md'
             ])),
-            'almacen-mermas': manualPart(warehouse, manualCaseFiles('catalogs', [
-                '13-cap-cat-was-01-list.md',
-                '14-cap-cat-was-02-create.md',
-                '15-cap-cat-was-03-edit.md',
-                '16-cap-cat-was-04-stock.md',
-                '17-cap-cat-was-05-add-stock.md',
-                '18-cap-rep-was-05-export.md'
-            ])),
-            compras: manualPart(warehouse, [
-                ...manualCases.purchases,
-                ...manualCaseFiles('catalogs', ['08-cap-cat-sup-02-create.md'])
-            ]),
-            'salidas-materiales': manualPart(warehouse, [
-                ...manualCaseFiles('issues', [
-                    '01-cap-sal-mat-01-list.md',
-                    '02-cap-sal-mat-02-create.md',
-                    '03-cap-sal-mat-03-edit.md',
-                    '04-cap-sal-mat-04-supply.md',
-                    '05-cap-sal-mat-05-return.md',
-                    '06-cap-rep-sal-mat-06-export.md',
-                    '07-cap-sal-mat-08-view.md'
-                ]),
-                ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
-            ]),
-            'salidas-consumibles': manualPart(warehouse, consumableIssueManualCases),
-            'salidas-mermas': manualPart(warehouse, [
-                ...manualCaseFiles('issues', [
-                    '08-cap-sal-was-01-list.md',
-                    '09-cap-sal-was-02-create.md',
-                    '10-cap-sal-was-03-edit.md',
-                    '11-cap-sal-was-04-supply.md',
-                    '12-cap-sal-was-05-return.md',
-                    '13-cap-rep-sal-was-06-export.md',
-                    '14-cap-sal-was-08-view.md'
-                ]),
-                ...manualCaseFiles('catalogs', ['11-cap-cat-cli-02-create.md'])
-            ])
+            proveedores: manualPart(warehouse, manualCaseFiles('catalogs', [
+                '07-cap-cat-sup-01-list.md',
+                '08-cap-cat-sup-02-create.md'
+            ]))
         }
     }
 });
@@ -491,7 +519,7 @@ const publications = await Promise.all(publicationParts.map(async ({ publication
     await Promise.all(sources.map((source) => access(path.join(ROOT, source))));
     const sourceContents = await Promise.all(sources.map(async (source) => ({
         source,
-        content: await readFile(path.join(ROOT, source), 'utf8')
+        content: prepareManualImages(await readFile(path.join(ROOT, source), 'utf8'), directory)
     })));
     const [entry, ...chapters] = sourceContents;
     if (!documentDataAtStart.test(entry.content)) {
@@ -523,9 +551,13 @@ const publications = await Promise.all(publicationParts.map(async ({ publication
             throw new Error(`La imagen ${image} de ${source} debe usar una ruta relativa.`);
         }
     }
-    await Promise.all(imageReferences.map(({ source, image }) => (
-        access(path.resolve(ROOT, path.dirname(source), image))
-    )));
+    await Promise.all(imageReferences.map(async ({ source, image }) => {
+        try {
+            await access(path.resolve(ROOT, path.dirname(source), image));
+        } catch {
+            throw new Error(`Falta la captura ${image} para ${publication}/${document}. Revise y publique la imagen del actor correspondiente; no reutilice la de otra área.`);
+        }
+    }));
     await Promise.all(linkReferences.map(({ source, link }) => {
         if (link.startsWith('#') || externalLink.test(link)) return null;
         if (path.isAbsolute(link)) throw new Error(`El enlace local ${link} de ${source} debe usar una ruta relativa.`);
@@ -609,7 +641,10 @@ await writeFile(mermaidConfigFile, JSON.stringify(MERMAID_EXPORT_CONFIG));
 let mermaidPrepared = false;
 
 const prepareSource = async (source, publicationSources, firstFigureNumber, currentOutput, outputFormat) => {
-    const sourceContent = await readFile(path.join(ROOT, source), 'utf8');
+    const sourceContent = prepareManualImages(
+        await readFile(path.join(ROOT, source), 'utf8'),
+        path.dirname(currentOutput)
+    );
     const content = source.startsWith('docs/user-manual/actors/')
         ? prepareManualEntry(sourceContent, currentOutput)
         : sourceContent;

@@ -13,7 +13,8 @@
 
 2. Escriba un término en el buscador **Buscar por Material** o elija una opción en el filtro **Proveedor**.
 3. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
-4. En la tabla, seleccione **Nuevo material**, **Exportar Excel**, **Editar registro** o **Ajustar stock**, según la operación requerida.
+4. En la tabla, seleccione **Nuevo material**, **Exportar Excel**, **Editar registro** o **Ajustar stock**, según la operación requerida y los permisos de su cuenta.
+   **Ajustar stock** es exclusivo del administrador; el personal de almacén no debe buscarlo.
 
 La columna **Activo**, ubicada antes de **Acciones**, se muestra en la tabla únicamente al
 administrador del sistema; los demás usuarios autorizados consultan el inventario sin esa columna.

@@ -17,8 +17,10 @@ real y haya confirmado con la persona que le capacita qué debe registrar.
 
 Abra el procedimiento en la misma pantalla donde va a trabajar. En los recorridos guiados, revise
 **Antes de empezar**, siga los pasos y termine con **Compruebe el resultado**.
-Los nombres en negritas corresponden a controles de Nexus. Las capturas disponibles
-sirven para ubicarlos; su cuenta puede mostrar menos acciones.
+Los nombres en negritas corresponden a controles de Nexus. Cada manual usa las capturas
+de su área y actor. Compare los controles con su propia sesión: una cuenta con varias
+asignaciones puede mostrar acciones adicionales. Si falta un botón requerido, detenga
+ese paso y solicite revisar su acceso; no use la cuenta de un compañero.
 
 Si un campo está bloqueado, revise el estado del documento antes de buscar otra
 forma de editarlo. Si Nexus señala un dato, corrija ese campo. Para dudas específicas
@@ -40,3 +42,22 @@ Los reportes de compras, salidas e inventario se descargan desde su propio
 listado con **Exportar Excel**. Para usar los filtros de la pantalla, seleccione
 **Personalizado: usar filtros aplicados**; para un periodo mensual, elija
 **Mes actual** u **Otro mes** y compruebe el periodo antes de descargar.
+
+## Dinámica de cada sesión de inducción
+
+1. **Conozca el objetivo.** Lea con su instructor la sesión de su manual y explique
+   para qué sirve la tarea y qué resultado espera obtener.
+2. **Prepare la práctica.** Use la cuenta, los documentos ficticios y los registros que
+   le asigne el instructor en el entorno de capacitación. Confirme su área y rol antes
+   de comparar la pantalla con las capturas.
+3. **Observe una demostración.** El instructor muestra el recorrido, señala los botones
+   disponibles para su actor y explica qué acciones guardan datos o afectan existencias.
+4. **Realice la tarea.** Siga el procedimiento paso a paso. Antes de confirmar una
+   escritura, revise los datos y explique su efecto. No practique altas, surtidos,
+   devoluciones ni ajustes con datos reales.
+5. **Compruebe lo aprendido.** Localice el registro, folio, estado o reporte resultante;
+   cuando corresponda, compruebe artículo, proveedor y existencia. Explique al instructor
+   qué cambió y qué haría si apareciera un error o faltara un control.
+
+Avance a la siguiente sesión cuando pueda repetir la tarea y explicar su resultado.
+En la operación diaria, siga las mismas comprobaciones con documentos reales autorizados.
