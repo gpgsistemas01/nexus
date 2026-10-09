@@ -15,7 +15,7 @@ forma del contrato HTTP, que pertenece a OpenAPI.
 
 ## Capítulos
 
-1. [1. Catálogo de componentes](01-catalog-complete-of-records-frontend.md):
+1. [1. Responsabilidades y contratos](01-catalog-complete-of-records-frontend.md):
    responsabilidades y mecanismos reutilizables por flujo.
 2. [2. Diagramas técnicos complementarios](02-views-technical-applied-by-flow-frontend.md): sólo
    dinámicas o estados de interfaz que agregan información no expresada por las

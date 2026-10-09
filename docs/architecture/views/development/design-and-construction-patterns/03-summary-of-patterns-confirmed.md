@@ -13,6 +13,8 @@
 | Integración | Publicación de eventos de actualización | `emitInventoryUpdated` traduce un contexto de inventario en eventos Socket.IO. |
 | Auditoría | Audit Trail transversal posterior a la respuesta | `auditWrites`, `persistWriteAudit` y `CriticalWriteAudit` registran escrituras API exitosas y sanitizan campos sensibles. |
 | Presentación | Composición de componentes y ownership por recurso | `src/views/shared`, `src/public/js/ui`, `plugins` y componentes que permanecen en la carpeta de su recurso. |
+| Registro | Configuración por lista blanca | `MANAGED_CATALOGS`, `catalogService` y CRUD auxiliar compartido. |
+| Transporte del navegador | Renovación coordinada y reintento acotado | `axiosInstanceApi.js`, `refreshRequest` y `_retry`. |
 | Pruebas | Test harness configurable | `createControllerTestApp` registra sólo las rutas necesarias para probar controllers con Supertest. |
 
 Las constantes compartidas forman parte de estas fronteras de construcción: modos de

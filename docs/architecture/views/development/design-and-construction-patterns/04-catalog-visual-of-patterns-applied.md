@@ -1,108 +1,104 @@
 # 4. Catálogo visual de patrones aplicados
 
-Estos diagramas representan únicamente patrones con implementación y consumidores
-verificables. En los diagramas estructurales, una caja nombra el patrón o estrategia, el
-nodo siguiente identifica el símbolo o carpeta que lo implementa y el último nodo
-muestra consumidores reales. Las flechas no significan herencia salvo
-que se indique expresamente.
-Los diagramas estructurales localizan implementaciones y consumidores; las secuencias
-de frontera y dinámica muestran orden, alternativas y límites temporales. En estas
-últimas, los participantes nombran el archivo o símbolo ejecutable y los mensajes
-conservan las llamadas y datos que pueden seguirse en el código. El código del patrón
-en la línea **Patrones** sirve sólo como índice: no sustituye esta traza de construcción.
-Así el catálogo representa tanto la forma del patrón como su colaboración sin cargar
-los diagramas de cada caso con infraestructura repetida.
+El catálogo conecta las responsabilidades compartidas con sus implementaciones y
+consumidores. Las figuras estructurales localizan dependencias y configuración; las
+secuencias explican construcción, controles y límites temporales. Cada mecanismo tiene
+un contrato y variantes que permanecen en el recurso. Los símbolos y archivos permiten
+contrastar el dibujo con código y pruebas, sin atribuirle cobertura adicional.
+
+Los capítulos de detalle completan [políticas y adaptación de datos](07-dto-functional-and-policies-declarative.md),
+[publicador y suscriptores](10-publication-of-events-of-inventory.md),
+[ownership visual](12-composition-and-ownership-of-components-visual.md) y
+[refactorización](16-refactoring-and-extension.md). Los códigos **Patrones** de los casos
+son enlaces a estas colaboraciones; no sustituyen su evidencia de aplicación.
 
 ### Estructura por dominio, capas y fronteras
 
-**Identificador:** `DIA-PAT-EST-001`. **Pregunta:** ¿cómo se separan dominio,
-transporte y reglas sin declarar un MVC estricto?
+**Identificador:** `DIA-PAT-EST-001`. **Pregunta:** ¿dónde se materializa la separación
+por capa y qué soluciones compartidas consumen los recursos? **Alcance:** dependencias
+de módulos ES; las flechas apuntan del consumidor a la pieza utilizada.
 
 ```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    direction LR
-    namespace Backend {
-        class Routes { <<boundary>> }
-        class Controllers { <<control>> }
-        class DTO { <<entity>> }
-        class DomainServices { <<control>> }
-        class Persistence { <<component>> }
-    }
-    namespace Frontend {
-        class Pages { <<boundary>> }
-        class Applications { <<control>> }
-        class HttpServices { <<component>> }
-    }
-    Routes ..> Controllers : delega
-    Controllers ..> DTO : normaliza
-    Controllers ..> DomainServices : coordina
-    DomainServices ..> Persistence : accede con getDb
-    Pages ..> Applications : usa
-    Applications ..> HttpServices : requiere requests
-    HttpServices ..> Routes : HTTP
+flowchart TB
+    subgraph resources["Módulos propietarios por dominio"]
+        admin["admin<br/>usuarios · personas · catálogos"]
+        sales["sales<br/>clientes"]
+        warehouse["warehouse<br/>inventario · compras · salidas"]
+    end
+    admin --> transport["routes + controllers<br/>frontera HTTP y respuesta"]
+    sales --> transport
+    warehouse --> transport
+    transport --> rules["services + dtos + validators<br/>reglas y contratos por recurso"]
+    rules --> persistence["repository/baseRepository.getDb(tx)<br/>lib/prisma.js"]
+    pages["public/js/pages<br/>pantalla del recurso"] --> application["public/js/application<br/>operaciones y configuración de factories"]
+    application --> requests["public/js/services<br/>requests HTTP"]
+    pages --> visual["public/js/ui + plugins<br/>composición visual compartida"]
+    requests -->|HTTP| transport
 ```
+
+Las cajas de dominio localizan familias repartidas entre capas; no son clases ni
+servicios desplegables. El [corte de materiales](../code-diagrams/04-view-structural-domains-and-collaborations.md)
+permite seguir archivos concretos. La referencia backend explica el contrato de cada
+capacidad y la frontend explica qué se configura y qué estado conserva la pantalla.
 
 ### Pipeline, DTO y políticas declarativas
 
-**Identificador:** `DIA-PAT-FRO-001`. **Pregunta:** ¿qué mecanismos reutiliza una ruta
-antes de entregar datos normalizados al caso de uso?
+**Identificador:** `DIA-PAT-FRO-001`. **Pregunta:** ¿cómo aplica una escritura de
+materiales el pipeline y el DTO antes de ejecutar reglas? **Fuente:**
+`materialApiRoute.js`, `materialController.js`, `materialDTO.js` y `authMiddleware.js`.
+**Alcance:** alta de material; no impone su orden a todos los routers.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Client as Cliente HTTP
-    participant Route@{ "type": "boundary" } as routes/api/*ApiRoute.js
-    participant Auth@{ "type": "control" } as middleware/authMiddleware.js
-    participant Validation@{ "type": "control" } as validators/forms/* + validatorMiddleware.validate
-    participant Controller@{ "type": "control" } as controllers/api/*Controller.js
-    participant Dto@{ "type": "entity" } as resourceDto: Object<br/>dtos/*DTO.js
-    participant Service@{ "type": "control" } as services/*Service.js
+    participant Route@{ "type": "boundary" } as materialApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant Validation@{ "type": "control" } as materialValidation + validate
+    participant Controller@{ "type": "control" } as materialController.js
+    participant Dto@{ "type": "entity" } as materialDTO.js
+    participant Service@{ "type": "control" } as materialService.js
 
-    Client->>Route: enviar petición
+    Client->>Route: POST /api/warehouse/materials
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    alt token inválido o ausente
-        Auth-->>Client: responder rechazo de autenticación
-    else sesión autenticada
-        Route->>Validation: ejecutar validaciones declaradas por la ruta
-        Validation->>Validation: validate(req, res, next) consolida errores
+    alt token ausente o inválido
+        Auth-->>Client: 401 INVALID_AUTH
+    else token aceptado
+        Auth->>Validation: materialValidation[] y validate(req, res, next)
         alt entrada inválida
-            Validation-->>Client: responder error de validación
+            Validation-->>Client: respuesta de validación sin invocar el servicio
         else entrada aceptada
-            Route->>Auth: authorizeUserApi
-            Auth->>Auth: evaluar PERMISSIONS y AUTHORIZATION_POLICIES
-            alt permiso denegado
-                Auth-->>Client: responder rechazo de autorización
-            else permiso concedido
-                Route->>Controller: controller(req, res) con req.user
-                opt el endpoint acepta un DTO
-                    Controller->>Dto: create*Dto(req.body)
-                    Dto-->>Controller: resourceDto normalizado
-                end
-                Controller->>Service: invocar función importada con resourceDto, params y userId
-                Service-->>Controller: devolver resultado o error de dominio
-                Controller-->>Client: emitir respuesta HTTP
+            Validation->>Auth: authorizeUserApi(MATERIALS_WRITE)
+            Auth->>Auth: cargar usuario y comprobar política vigente
+            alt usuario inválido o permiso insuficiente
+                Auth-->>Client: 401 INVALID_AUTH o 403 FORBIDDEN
+            else acceso permitido
+                Auth->>Controller: registerMaterial(req, res)
+                Controller->>Dto: createMaterialDtoForRegister(req.body)
+                Dto-->>Controller: campos normalizados
+                Controller->>Controller: materialDto = sanitizeEmptyStrings(materialDto)
+                Controller->>Service: createMaterial({ materialDto, userId })
+                Service-->>Controller: material creado o error de dominio
+                Controller-->>Client: respuesta del controller
             end
         end
     end
 ```
 
-La construcción se comprueba desde la declaración ordenada de middleware en
-[`src/routes/api`](../../../../../src/routes/api), las funciones de
-[`authMiddleware.js`](../../../../../src/middleware/authMiddleware.js) y
-[`validatorMiddleware.js`](../../../../../src/middleware/validatorMiddleware.js), y la adaptación
-de entrada en [`src/controllers/api`](../../../../../src/controllers/api) y
-[`src/dtos`](../../../../../src/dtos). Las etiquetas genéricas `*` agrupan archivos equivalentes;
-el diagrama de cada caso las reemplaza por su ruta, controller, DTO y servicio concretos.
-Las figuras `boundary` y `control`, el actor y la línea de vida del objeto son parte de
-la lectura visual; los textos de la cabecera no funcionan como estereotipos sustitutos.
-La validación mostrada es la autoritativa del backend. Una validación frontend se traza
-por separado como auto-mensaje del formulario o módulo UI y como alternativa previa al
-request, sin omitir que el servidor vuelve a validar la entrada.
+El DTO selecciona y normaliza campos; la autorización y las reglas conservan sus
+propietarios. El contrato exacto del servicio se comprueba en el controller: la secuencia
+es una colaboración del alta, no una firma común para todos los recursos.
+
+| Variante real | Orden declarado | Fuente |
+| --- | --- | --- |
+| Alta/edición de material | Token → validators → validate → autorización → controller. | `src/routes/api/warehouse/materialApiRoute.js`. |
+| Consulta de materiales | Token → autorización → controller, sin validator de formulario. | El mismo router, `GET /`. |
+| Catálogos administrables | `router.use` instala token y autorización; luego la operación valida y delega. | `src/routes/api/admin/catalogApiRoute.js`. |
+
+La construcción de permisos se explica en
+[políticas declarativas](07-dto-functional-and-policies-declarative.md#aplicación-de-políticas-declarativas).
+El middleware global de auditoría se monta antes de los routers y observa la respuesta;
+no constituye otra etapa local entre DTO y servicio.
 
 ### Factories y composición sobre herencia
 
@@ -192,23 +188,22 @@ de cada mutación sustituyen los comodines por los servicios y escrituras exacto
 
 ### Test harness configurable
 
-**Identificador:** `DIA-PAT-TST-001`. **Pregunta:** ¿cómo reutilizan las pruebas el
-montaje HTTP sin ocultar las rutas y efectos propios de cada contexto?
+**Identificador:** `DIA-PAT-TST-001`. **Pregunta:** ¿cómo se reutiliza el montaje HTTP
+sin ocultar las rutas y efectos del contexto? **Fuente:**
+`tests/helpers/controllerTestHarness.js` y sus tests consumidores.
 
 ```mermaid
-flowchart LR
-    harness["createControllerTestApp"] -. configuración .-> register["registerRoutes del contexto"]
-    register --> app["Express mínimo + JSON"]
-    app --> unit["Pruebas unitarias de borde"]
-    app --> integration["Integraciones de cliente, proveedor,<br/>catálogos y salida de merma"]
-    integration --> evidence["Router · permiso · persistencia · rollback"]
+flowchart TB
+    client["clientControllerDbTest.js<br/>configura registerRoutes"] --> harness["createControllerTestApp<br/>Express + JSON + errores"]
+    supplier["supplierControllerDbTest.js<br/>configura registerRoutes"] --> harness
+    waste["wasteIssueControllerDbTest.js<br/>configura registerRoutes"] --> harness
+    harness --> app["App del contexto<br/>rutas registradas por el callback"]
+    app --> requests["Supertest<br/>requests y aserciones del caso"]
+    requests --> checks["Respuesta HTTP + estado Prisma<br/>según cada prueba"]
 ```
 
-Cada diagrama específico declara una línea **Patrones** con los códigos resueltos por el
-índice rápido de frontend o backend. Así se identifica la solución aplicada sin repetir
-su explicación ni añadir diagramas intermedios en los 73 casos de cada perspectiva. La
-cadena de lectura es **patrón aplicado → recorrido concreto del caso**: una
-refactorización cambia primero este catálogo y sus implementaciones, y los códigos
-permiten localizar después todos los casos afectados. `DIA-PAT-TST-001` representa
-por separado la reutilización del montaje de pruebas, porque no participa en el flujo
-de ejecución de un caso en producción.
+Los consumidores nombrados están en `tests/integration/controllers`. El helper sólo
+construye el entorno y traduce errores; permisos, persistencia y rollback deben
+comprobarse en las pruebas que corresponden, no se deducen del montaje Express.
+Los códigos **Patrones** de las secuencias enlazan estas colaboraciones canónicas;
+la presencia de un código no sustituye la evidencia del consumidor ni de sus pruebas.

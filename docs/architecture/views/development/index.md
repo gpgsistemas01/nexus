@@ -1,19 +1,39 @@
 # Vista de desarrollo
 
-## Contenido
+## Propósito y alcance
 
-La vista de desarrollo responde cómo se organiza, implementa y reutiliza el código:
+Esta vista explica **cómo se organiza y construye el software de Nexus**: módulos,
+responsabilidades, dependencias, contratos internos y mecanismos que permiten extender
+un recurso sin duplicar su implementación. La unidad de explicación es una colaboración
+cohesiva, no una ficha por cada archivo.
 
-1. [Referencia técnica de backend](backend-technical-documentation/index.md): capacidades
-   del servidor y trazabilidad caso–código.
-2. [Referencia técnica de frontend](frontend-technical-documentation/index.md):
-   componentes del navegador y trazabilidad caso–código.
-3. [Diagramas vigentes del código](code-diagrams/index.md): superficie HTTP, dominios,
-   colaboraciones y reutilización.
-4. [Patrones de diseño y construcción](design-and-construction-patterns/index.md):
-   soluciones compartidas y evidencia de aplicación.
-5. [Mapa generado del código](code-map.md): rutas, dependencias entre áreas y símbolos
-   exportados detectados desde `src`.
+Se lee desde la estructura hasta la evidencia: primero se localiza el módulo, después
+se identifica la solución compartida y finalmente se revisan su configuración, sus
+consumidores y sus pruebas. Los recorridos temporales de cada `CU-*` pertenecen a la
+[vista de procesos](../processes/index.md); el contexto y despliegue, a la
+[vista física](../physical/index.md); las capacidades y su trazabilidad, a la
+[vista lógica](../logical/index.md).
 
-El mapa es evidencia generada y conserva un nombre sin prefijo numérico; las demás
-colecciones son explicaciones curadas.
+## Contenido y recorrido de lectura
+
+| Pregunta de desarrollo | Fuente propietaria | Qué aporta |
+| --- | --- | --- |
+| ¿Dónde está una responsabilidad y de qué depende? | [Diagramas vigentes del código](code-diagrams/index.md) | Organización por dominio y capa, fronteras HTTP y dependencias internas. |
+| ¿Qué solución compartida se aplica y cómo se configura? | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | Implementación, consumidores concretos, contratos, variantes y límites de cada mecanismo. |
+| ¿Qué se reutiliza y cómo se revisa una extracción? | [Reutilización](code-diagrams/06-view-of-reuse-crud-and-interface.md) y [refactorización](design-and-construction-patterns/16-refactoring-and-extension.md) | Puntos de extensión, ownership e impacto de cambios sobre piezas comunes y consumidores. |
+| ¿Qué reglas, efectos y errores conserva el servidor? | [Referencia técnica de backend](backend-technical-documentation/index.md) | Contratos y colaboraciones por capacidad; límites transaccionales. |
+| ¿Cómo se compone la pantalla y se adapta su contrato? | [Referencia técnica de frontend](frontend-technical-documentation/index.md) | Composición, estado local, callbacks, adaptación de datos y transporte HTTP. |
+| ¿Qué rutas, imports y símbolos existen? | [Mapa generado del código](code-map.md) | Inventario enumerable desde `src`; evidencia para contrastar la explicación curada. |
+
+## Forma de leer los diagramas
+
+Los mapas estructurales muestran dependencia o configuración; las secuencias muestran
+orden temporal; los flujos de datos muestran transformación. Cada figura declara su
+pregunta, alcance y fuente técnica. Una flecha de dependencia no significa que dos
+módulos se ejecuten en ese orden, ni que sean unidades desplegables independientes.
+
+Para revisar un cambio se sigue **responsabilidad → pieza compartida → configurador del
+recurso → contrato observable → pruebas**. Una operación nueva que conserva el contrato
+se configura en el mecanismo existente; una regla exclusiva permanece en su dominio.
+El historial de una refactorización se consulta en Git, mientras esta vista describe
+el resultado vigente y los criterios para mantenerlo.

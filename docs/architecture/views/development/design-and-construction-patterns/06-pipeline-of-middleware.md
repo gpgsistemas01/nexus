@@ -1,8 +1,10 @@
 # 6. Pipeline de middleware
 
 Express construye cada endpoint como una secuencia de funciones. Nexus reutiliza esa
-capacidad como pipeline: autenticación, validación de campos, consolidación de errores,
-autorización y controller se ejecutan en el orden declarado por la ruta.
+capacidad como pipeline: autenticación, autorización, validación y controller se componen en el orden declarado
+por cada router. Ese orden es parte del contrato: materiales valida ciertas escrituras
+antes de autorizar, mientras catálogos instala autorización en `router.use` antes de
+la validación de cada operación.
 
 No se denomina automáticamente *Chain of Responsibility*: los middleware no eligen
 libremente otro manejador; forman una tubería definida por Express. La propiedad que se
@@ -12,7 +14,7 @@ servidor antes de la mutación.
 **Pruebas:** los casos negativos verifican que una entrada o sesión inválida no alcance
 el servicio ni escriba datos; la integración CRUD atraviesa el pipeline real.
 
-La vista canónica `DIA-PAT-FRO-001` presenta el pipeline completo. Las secuencias de
+La vista canónica `DIA-PAT-FRO-001` presenta una escritura concreta de materiales y explica sus variantes. Las secuencias de
 caso no lo copian mecánicamente: muestran un middleware como participante visual sólo
 si su decisión forma parte del recorrido explicado, y conservan la ruta concreta para
 auditar el orden restante. La validación backend pertenece a este pipeline, mediante el

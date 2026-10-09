@@ -1,80 +1,62 @@
-# 5. Diagramas dinámicos de implementación
+# 5. Fronteras y colaboraciones de implementación
 
-### 5.1 Recorrido real de una petición
+### 5.1 Fronteras y contratos de implementación
 
-Este diagrama responde dónde se ejecuta cada responsabilidad. No todas las consultas crean
-un DTO ni todas las operaciones abren una transacción; los nodos discontinuos indican
-puntos reutilizados sólo cuando el router o servicio los configura. El recorrido aplica
-**Pipeline** en middleware, **DTO** en la frontera y **Transaction Script** con contexto
-`tx` en las escrituras coordinadas; las notificaciones son **Publish/Subscribe** no
-durable después de una mutación exitosa.
+**Identificador:** `DIA-COD-FRO-001`. **Pregunta:** ¿qué responsabilidad adapta cada
+frontera de una petición? **Alcance:** composición general; las flechas continuas
+muestran delegación y las discontinuas, colaboraciones condicionales. El orden exacto
+del middleware y de cada operación se consulta en su router y secuencia `CU-*`.
 
 ```mermaid
 flowchart TB
-    browser["Navegador"] --> webRoute["Ruta web"]
-    webRoute --> ejs["Página EJS y componentes shared"]
-    ejs --> client["Aplicación y plugins del navegador"]
-    client --> apiRoute["Ruta API"]
-
-    apiRoute --> auth["Middleware de autenticación y autorización"]
-    auth --> validation["Validadores y middleware validate"]
-    validation --> controller["Controller"]
-    controller -.-> dto["DTO cuando aplica"]
-    controller --> service["Servicio de dominio"]
-    service -.-> transaction["Transacción Prisma cuando coordina escrituras"]
-    service --> repository["getDb / contexto tx"]
-    transaction --> repository
-    repository --> prisma["Prisma"]
-    prisma --> postgres[("PostgreSQL")]
-    controller -.->|"mutación exitosa"| socket["Publicación Socket.IO"]
-    apiRoute -.-> audit["Middleware de auditoría"]
-    service -.-> log["Log estructurado"]
+    web["Router web<br/>middleware de sesión y permiso cuando aplica"] --> webController["Controller web<br/>prepara res.render"]
+    webController --> ejs["EJS + parciales compartidos"]
+    ejs --> page["Página del navegador<br/>UI y callbacks"]
+    page --> application["Application<br/>operaciones del recurso"]
+    application --> http["Servicio HTTP<br/>request + apiRequest"]
+    http --> api["Router API<br/>pipeline declarado por operación"]
+    api --> controller["Controller API<br/>params · body · respuesta"]
+    controller -.-> dto["DTO cuando aplica<br/>campos aceptados y normalización"]
+    controller --> service["Servicio de dominio<br/>reglas y efectos"]
+    service -.-> tx["Una transacción para escrituras compuestas<br/>helpers reciben tx"]
+    service --> persistence["getDb(tx) / Prisma"]
+    tx --> persistence
+    controller -.-> events["Publicación de inventario<br/>después del resultado exitoso"]
 ```
 
-La evidencia principal está en `src/routes`, `src/middleware`, `src/controllers`,
-`src/dtos`, `src/services`, `src/repository/baseRepository.js` y `src/lib/prisma.js`.
+Las páginas EJS y los endpoints de lectura no ejecutan necesariamente un DTO o una
+transacción. `materialApiRoute.js` valida determinadas escrituras antes de autorizar;
+`catalogApiRoute.js` instala autenticación y autorización a nivel de router antes de
+validar. El login tiene su propio contrato de acceso. Ninguna cadena genérica sustituye
+estos órdenes concretos.
 
-### 5.2 Operaciones que requieren representaciones adicionales
+`auditWrites` se monta en `src/app.js`: registra la observación de `finish` antes de
+delegar y persiste posteriormente, fuera de la transacción funcional. Su colaboración
+se mantiene en la [secuencia canónica de auditoría](../backend-technical-documentation/02-views-technical-applied.md#secuencia-transversal-de-auditoría-de-escrituras).
+Las fuentes de esta figura son `src/routes`, `src/controllers`, `src/dtos`,
+`src/services`, `src/public/js` y `src/repository/baseRepository.js`.
 
-El código confirma varias coordinaciones que no se entienden sólo con el diagrama de capas:
+### 5.2 Colaboraciones que requieren detalle temporal
 
-| Operación | Evidencia del código | Artefacto que explica el comportamiento |
+| Colaboración | Por qué necesita otra representación | Fuente propietaria |
 | --- | --- | --- |
-| Crear/editar usuario, acceso o contraseña | `src/services/admin/userService.js`, hash de contraseñas y asignaciones `UserRoleDepartment`. | Secuencias backend de [`CU-IDA-06`](../../processes/backend-code-sequences/identity-access/cu-ida-06.md), [`CU-IDA-07`](../../processes/backend-code-sequences/identity-access/cu-ida-07.md) y [`CU-IDA-08`](../../processes/backend-code-sequences/identity-access/cu-ida-08.md). |
-| Eliminar material o relación de proveedor | `materialService.deleteMaterial` y relaciones de uso en `supplierMaterialService.js`. | [Secuencia backend de `CU-ALM-04`](../../processes/backend-code-sequences/catalogs/cu-alm-04.md). |
-| Registrar una entrada | `goodsReceiptService.createGoodsReceipt`, referencias y servicios de inventario/costo. | [Secuencia backend de `CU-ENT-02`](../../processes/backend-code-sequences/purchases/cu-ent-02.md). |
-| Corregir o cancelar detalle de entrada | `src/services/warehouse/goodsReceipts/detailChanges` y servicios de inventario. | Secuencias backend de [`CU-ENT-04`](../../processes/backend-code-sequences/purchases/cu-ent-04.md) y [`CU-ENT-05`](../../processes/backend-code-sequences/purchases/cu-ent-05.md), complementadas por la [actividad de cancelación](../backend-technical-documentation/02-views-technical-applied.md#actividad-de-cancelación-de-un-detalle-de-entrada). |
-| Surtir o devolver detalle de salida | Servicios de salidas de material/merma, reglas de cumplimiento y movimientos. | [Estados normativos](../../../../requirements/domain-and-use-cases/03-states-and-data-changed-by-action.md) y secuencias backend del grupo [SAL](../../processes/backend-code-sequences/issues/index.md). |
-| Generar reporte Excel | Controllers de reporte, servicios de consulta y `reportExcelUtils.js`. | Secuencias backend de los casos propietarios, localizadas desde el [índice por grupos](../../processes/backend-code-sequences/index.md). |
+| Pipeline y normalización | Orden explícito de controles y adaptación de entrada. | [Aplicación concreta del pipeline](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#pipeline-dto-y-políticas-declarativas). |
+| Escrituras coordinadas | Límite de `tx`, rollback y efectos posteriores al commit. | [Transacción, eventos y auditoría](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#transacción-eventos-y-auditoría), con servicios concretos en las secuencias backend. |
+| Construcción de aplicaciones | Configuración al cargar el módulo y uso posterior de closures. | [Factory CRUD aplicada](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia). |
+| Actualización de tablas por eventos | Publicación, puente del navegador y nueva consulta. | [Publicador y consumidores](../design-and-construction-patterns/10-publication-of-events-of-inventory.md#aplicación-entre-publicador-y-consumidores). |
+| Sesión en el transporte compartido | Varias solicitudes esperan la renovación pendiente; reintento acotado. | [Renovación coordinada](../frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#renovación-coordinada-del-transporte-http). |
 
-No se duplican aquí esas representaciones. Los estados y reglas observables permanecen en
-requisitos; la coordinación entre capas se mantiene en las secuencias y actividades de
-arquitectura.
+### 5.3 Relación con las otras vistas
 
-### 5.3 Resultado de la revisión de trazabilidad diagrama–código
+La realización de cada operación se consulta en los índices de
+[secuencias backend](../../processes/backend-code-sequences/index.md) y
+[frontend](../../processes/frontend-code-sequences/index.md). Los estados de negocio y
+los datos que cambia una acción permanecen en
+[modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md).
+La matriz requisito–caso–código–prueba pertenece a
+[componentes y reutilización](../../logical/01-components-and-reuse.md).
 
-La revisión del código no justifica crear otra familia de diagramas: contexto,
-estructura, interacción, reutilización, casos de uso, actividades, secuencias, estados y
-datos ya tienen una vista canónica. Sí requiere conservar los siguientes enlaces y
-aclaraciones técnicas para que una etiqueta funcional no se confunda con una ruta, una
-función o un estado persistido:
-
-| Diagrama o casos | Entrada HTTP verificable | Coordinación que sustenta el diagrama | Aclaración técnica |
-| --- | --- | --- | --- |
-| `CU-AUT-01` a `CU-AUT-02` | `src/routes/api/authApiRoute.js` y `src/routes/web/auth/logoutWebRoute.js` | `src/services/authService.js` y utilidades de cookies | Iniciar y cerrar sesión son objetivos visibles; consultar o renovar la sesión son mecanismos técnicos y no casos independientes. |
-| `CU-IDA-01` a `CU-IDA-09` | `src/routes/api/admin/personApiRoute.js`, `userApiRoute.js`, `roleApiRoute.js` y `departmentApiRoute.js` | `src/services/admin/person/personService.js` y `src/services/admin/userService.js` | Crear usuario, editar acceso y cambiar contraseña son casos de uso independientes; la transacción y el cálculo del hash pertenecen al servicio, no al actor del diagrama. |
-| `CU-ALM-01` a `CU-CAT-26` | Routers de cliente bajo `sales`; proveedor, material, merma y lecturas operativas bajo `warehouse`; administración de catálogos auxiliares bajo `admin` | Servicios homónimos, `src/services/warehouse/materials/supplierMaterialService.js` y el registro seguro `src/services/admin/catalogService.js` | El grupo funcional reúne recursos con el patrón CRUD, pero no implica que todos admitan `DELETE` o cambio de estado. |
-| `CU-ENT-01` a `CU-ENT-06` | `src/routes/api/warehouse/goodsReceipts/materials/materialGoodsReceiptApiRoute.js` | `goodsReceiptService.js` y `goodsReceipts/detailChanges/*Service.js` | Corrección y cancelación son rutas `PATCH` distintas; el recálculo de costo posterior al commit queda fuera de la transacción mostrada. |
-| `CU-SAL-01` a `CU-SAL-21` | `goodsIssues/materials/materialGoodsIssueApiRoute.js`, `goodsIssues/consumables/consumableGoodsIssueApiRoute.js` y `wasteIssueApiRoute.js` | Servicios de `goodsIssues`, `wasteIssues`, sus `detailReturns` y `issueFulfillmentRules.js` | **Surtir no tiene un endpoint `/supply`:** se confirma mediante `PATCH /:id/details`; devolver usa `PATCH /:id/details/:detailId/returns`. La acción funcional y la URL no deben igualarse por nombre. |
-| Estados de salidas | Las mismas rutas de detalle y devolución | `src/constants/warehouseStatuses.js`, `issueFulfillmentRules.js` y reglas específicas | Los valores persistidos son `Pendiente`, `Surtido parcial`, `Surtido` y `Cancelado`; crear/editar/surtir/devolver son operaciones, no estados. |
-| `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-CAT-04`, `CU-CAT-08`, `CU-ALM-14`, `CU-ALM-16`, `CU-ENT-06`, `CU-SAL-07`, `CU-SAL-14` y `CU-SAL-21` | Routers de reporte de `admin`, `sales` y `warehouse` | Servicios de reporte y `src/utils/reportExcelUtils.js` | Consultar y exportar reutilizan filtros, pero cada reporte conserva permiso, columnas y transformación propios. |
-| Entidades y cardinalidades | No aplica a una ruta individual | `prisma/schema.prisma` | El ER y el diccionario son generados; una relación Prisma no prueba que exista un flujo HTTP completo. |
-
-Para seguir una fila hasta método y URL exactos se usa el
-[mapa generado](../code-map.md); para seguirla hasta permiso y estado de
-implementación se usa la
-[modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md). Las pruebas
-no se inventan a partir del dibujo: la cobertura existente y sus faltantes se mantienen
-en el [plan de pruebas](../../../../testing/test-plan.md). Así, cada enlace tiene una sola fuente
-de verdad y una brecha de cobertura permanece visible en vez de presentarse como
-evidencia inexistente.
+Esta colección conserva el mapa de fronteras y las colaboraciones compartidas; no
+mantiene otra matriz de casos ni duplica secuencias. Para un cambio de implementación
+se revisa la frontera afectada aquí y el recorrido exacto en procesos. El código y las
+pruebas sustentan el dibujo; la figura no amplía su cobertura por sí misma.

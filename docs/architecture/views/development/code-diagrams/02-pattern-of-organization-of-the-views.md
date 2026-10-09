@@ -1,32 +1,32 @@
-# 2. Patrón de organización de los diagramas
+# 2. Organización de las representaciones de desarrollo
 
-Dentro de la vista de desarrollo, los diagramas se organizan con **revelado progresivo**
-y niveles de abstracción inspirados en C4, sin declarar conformidad C4. Cada nivel
-responde una pregunta y remite al siguiente sólo cuando hace falta más detalle. Esta
-organización interna no agrega vistas al modelo 4+1 definido en el
-[índice de vistas](../../index.md):
+Los diagramas de esta colección responden preguntas sobre la construcción del código.
+Los niveles de contexto y contenedores se consultan en la vista física; aquí se parte
+de los módulos y sus fronteras. No se agregan niveles de despliegue ni otra adaptación
+4+1 al [modelo de vistas](../../index.md).
+
+**Identificador:** `DIA-COD-ORG-001`. **Pregunta:** ¿cómo pasar de una responsabilidad
+a su implementación y a los puntos que cambiarían al extenderla?
+**Alcance:** recorrido de lectura; las flechas son referencias documentales.
 
 ```mermaid
-flowchart LR
-    context["1 · Contexto\nactores y sistemas externos"] --> containers["2 · Contenedores\nnavegador · aplicación · datos"]
-    containers --> structure["3 · Estructura interna\nsuperficie · dominios · capas"]
-    structure --> dynamics["4 · Dinámica\npetición · transacciones"]
-    structure --> reuse["5 · Reutilización\nfábricas · composición · interfaz"]
-
-    context -.-> canonical["Vista canónica en la vista física"]
-    containers -.-> canonical
+flowchart TB
+    structure["Organización del código<br/>dominio · capa · frontera"] --> contract["Responsabilidad y contrato<br/>entradas · resultados · efectos"]
+    contract --> reuse["Solución compartida<br/>implementación + configuradores"]
+    reuse --> extension["Extensión y refactorización<br/>variación local · impacto común"]
+    extension --> evidence["Evidencia<br/>imports · rutas · pruebas"]
 ```
 
-| Nivel | Pregunta | Representación canónica | Patrón del código que hace visible |
-| --- | --- | --- | --- |
-| Contexto | ¿Quién usa Nexus y de qué sistemas externos depende? | `views/physical/01-system-runtime-and-deployment.md#diagrama-de-contexto-del-sistema` | Límite del sistema; no describe un patrón de implementación. |
-| Contenedores | ¿Dónde se ejecutan interfaz, servidor y persistencia? | `views/physical/01-system-runtime-and-deployment.md#contenedores-y-capas` | Aplicación web monolítica desplegable y separación cliente/servidor. |
-| Estructura | ¿Qué superficie y dominios internos existen? | Diagramas de los capítulos 3 y 4 de este documento. | **Monolito modular** y **arquitectura por capas**. |
-| Dinámica | ¿Cómo atraviesa las capas una petición o transacción? | Diagrama general del capítulo 5 y secuencias de la vista de procesos. | **Pipeline de middleware**, **Transaction Script** y publicación de eventos. |
-| Reutilización | ¿Qué se configura o compone y en qué módulos se aplica actualmente? | Diagramas del capítulo 6 de este documento. | **Factory functions**, composición de objetos y componentes compartidos. |
+| Representación | Pregunta y alcance | Fuente |
+| --- | --- | --- |
+| Superficie HTTP | ¿Qué módulos se montan como API o páginas? No es un catálogo funcional. | [Capítulo 3](03-view-structural-surface-http-registered.md); registros de rutas. |
+| Dominios y capas | ¿Dónde se ubica cada responsabilidad y qué colaboradores utiliza? | [Capítulo 4](04-view-structural-domains-and-collaborations.md); imports y módulos. |
+| Fronteras de implementación | ¿Qué adapta cada capa y qué colaboraciones son condicionales? | [Capítulo 5](05-views-dynamic.md); contratos y secuencias propietarias. |
+| Reutilización | ¿Qué núcleo comparten consumidores concretos y dónde difieren? | [Capítulo 6](06-view-of-reuse-crud-and-interface.md); factories, handlers y configuradores. |
+| Aplicación de patrones | ¿Qué problema resuelve el mecanismo y cómo se materializa? | [Catálogo visual](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md) y capítulos propietarios. |
+| Refactorización | ¿Qué fronteras preserva una extracción y qué consumidores hay que revisar? | [Refactorización y extensión](../design-and-construction-patterns/16-refactoring-and-extension.md). |
 
-Contexto y contenedores no se dibujan otra vez aquí: se reutilizan las representaciones canónicas.
-Esto aplica **Single Source of Truth** como criterio documental y evita que dos diagramas
-que responden la misma pregunta diverjan. Los patrones de implementación se explican en
-[Patrones de diseño y construcción](../design-and-construction-patterns/index.md); estos diagramas
-sólo muestran dónde aparecen.
+Una secuencia adicional sólo se mantiene si explica una colaboración compartida o una
+decisión ausente de los recorridos `CU-*`. Los pasos normativos del actor siguen en
+requisitos. Los diagramas generados completan hechos del código y las figuras curadas
+explican sus responsabilidades y límites.

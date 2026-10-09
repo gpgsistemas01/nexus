@@ -246,14 +246,17 @@ const PUBLICATIONS = Object.freeze({
                 'docs/architecture/views/physical/02-postgresql-runtime-and-migration-roles.md'
             ]),
             'patrones-y-mapa-de-codigo': packagePart(ARCHITECTURE_ENTRY, [
-                ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
+                'docs/architecture/views/development/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/code-diagrams'),
+                ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
                 'docs/architecture/views/development/code-map.md'
             ]),
             backend: packagePart(ARCHITECTURE_ENTRY, [
+                'docs/architecture/views/development/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/backend-technical-documentation')
             ]),
             frontend: packagePart(ARCHITECTURE_ENTRY, [
+                'docs/architecture/views/development/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
             ]),
             'contrato-api': packagePart(ARCHITECTURE_ENTRY, [

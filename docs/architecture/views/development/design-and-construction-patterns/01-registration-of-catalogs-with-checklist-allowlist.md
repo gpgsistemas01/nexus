@@ -1,6 +1,6 @@
 # 1. Registro de catálogos con lista blanca
 
-Los catálogos auxiliares administrables aplican un **Registry/Strategy** acotado:
+Los catálogos auxiliares administrables aplican un **registro de configuración con lista blanca** acotado:
 `catalogService` relaciona cada nombre público con su modelo Prisma, sus campos y sus
 etiquetas. Controller, rutas y plantilla se comparten, mientras cada catálogo conserva
 una URL y una entrada de navegación propias. En frontend, la página sólo compone el
@@ -21,7 +21,7 @@ Catálogos comparte el mismo ciclo observable que Clientes y Proveedores sin dup
 manejo de carga, error o refresco. En backend, el router aplica autenticación y
 `catalogs:manage` antes del controller; el controller conserva el contrato DataTables y
 delega normalización, lista blanca, validación y persistencia al servicio. El registro
-**Registry/Strategy** es la única variación deliberada frente a un servicio por recurso.
+**de configuración con lista blanca** es la única variación deliberada frente a un servicio por recurso.
 Las columnas se entregan directamente a `createDataTable` y se componen desde los
 campos del catálogo activo; no se mantienen seis arreglos equivalentes. La acción
 reutiliza `buildMdbEditActionButton` con la etiqueta **Editar registro**, sin agregar `catalog` a
@@ -29,11 +29,6 @@ los contextos de negocio de `renderActionButtons`.
 Las reglas visibles se crean mediante `createCatalogValidation` en la capa compartida
 `utils/validations`, igual que los demás formularios; `catalogForm` sólo aporta etiqueta
 y límites del recurso actual.
-
-Los controles del formulario mantienen etiquetas de acción formadas únicamente por
-verbos: **Guardar** al crear, **Actualizar** al editar, **Regresar** para salir y
-**Cerrar** como etiqueta accesible del control de cabecera. El título del modal sí
-incluye la entidad para aportar contexto, pero no forma parte de la etiqueta del botón.
 
 El campo **Activo** forma parte del contrato común de los seis catálogos administrables.
 El registro lo declara entre sus campos permitidos, el backend valida que sea booleano,
@@ -47,7 +42,7 @@ un modelo arbitrario aunque el servicio se invoque fuera de la ruta. Como en los
 módulos que reciben `id` en la URL, el servicio resuelve la existencia de la entidad y
 traduce tanto el `P2025` como el `P2023` de Prisma a una entrada no encontrada que
 incluye la etiqueta del catálogo. El validator HTTP se reserva para el contrato del body
-y para `catalog`, que selecciona una estrategia y requiere rechazo antes del controller.
+y para `catalog`, que selecciona una configuración permitida y requiere rechazo antes del controller.
 
 El registro contiene exactamente estos catálogos; ningún otro módulo forma parte de este
 flujo compartido:
@@ -89,58 +84,33 @@ flowchart LR
     operational["Formulario operativo<br/>requiere una opción"] --> read["Lectura propia del dominio<br/>sólo registros activos"]
     read --> prisma
 
-    commercial["Clientes y proveedores<br/>catálogos comerciales"] -.->|"mismo ciclo visible,<br/>módulos propietarios"| page
-    commercial -.->|"fuera de la lista blanca"| registry
 ```
 
 El recorrido superior se reutiliza para Áreas, Roles, Presentaciones, Unidades de medida,
-Motivos de ajuste y Estados de cumplimiento. La línea discontinua documenta semejanza de
-negocio y de experiencia, no dependencia del registro.
+Motivos de ajuste y Estados de cumplimiento. Clientes y proveedores reutilizan otros
+mecanismos CRUD, pero no consumen este registro de modelos permitidos.
 
 ### Diagrama del ciclo CRUD compartido
 
-**Diagrama:** `DIA-ARQ-CAT-002`. Una sola actividad representa el ciclo común porque
-consultar, crear y editar pasan por la misma composición de pantalla, autorización,
-validación, persistencia y refresco. No se mantiene un diagrama por acción ni por catálogo:
-esas copias repetirían el patrón sin aportar decisiones diferentes. Se crea un diagrama
-adicional únicamente cuando una operación incorpore otra coordinación, por ejemplo una
-transacción de inventario o una política de eliminación propia.
-
-La figura usa la [convención de actividades](../../processes/index.md#notación-de-actividades)
-como aproximación a UML mediante Mermaid.
+**Diagrama:** `DIA-ARQ-CAT-002`. **Pregunta:** ¿qué configuración permite reutilizar
+el mismo CRUD sin aceptar modelos o campos arbitrarios? **Alcance:** dependencias de
+construcción; las flechas apuntan desde el consumidor a la configuración o pieza común.
 
 ```mermaid
-flowchart TD
-    initial@{ shape: f-circ } --> open("Abrir un catálogo autorizado")
-    open --> mergeList{" "}
-    mergeList --> list("Consultar y mostrar registros")
-    list --> choice{"¿Qué necesita hacer el actor?"}
-    choice -->|"[consultar]"| review("Revisar, buscar o cambiar de página")
-    review --> mergeList
-    choice -->|"[crear]"| createForm("Abrir formulario con Activo marcado")
-    choice -->|"[editar]"| editForm("Abrir formulario con valores vigentes")
-    choice -->|"[salir]"| final@{ shape: fr-circ }
-    createForm --> mergeCapture{" "}
-    editForm --> mergeCapture
-    mergeCapture --> capture("Capturar o corregir campos del catálogo")
-    capture --> confirm("Confirmar alta o edición")
-    confirm --> authorize("Comprobar autorización y datos permitidos")
-    authorize --> valid{"¿La información es válida?"}
-    valid -->|"[no]"| correction("Mostrar campos por corregir sin guardar cambios")
-    correction --> mergeCapture
-    valid -->|"[sí]"| persist("Crear o actualizar el registro")
-    persist --> refresh("Confirmar la operación")
-    refresh --> mergeList
+flowchart TB
+    service["catalogService.js<br/>getCatalog + normalización + validación"] --> registry["constants/catalogs.js<br/>MANAGED_CATALOGS<br/>modelo · campos · longitudes · etiquetas"]
+    validation["catalogValidations.js<br/>catalog permitido + contrato del body"] --> names["MANAGED_CATALOG_NAMES"]
+    page["catalogsPage + form + modal + DataTable<br/>recurso activo y campos"] --> application["application/admin/catalogs/catalogs.js<br/>requests configurados"]
+    application --> crud["createCrudApplication<br/>lectura y mutaciones comunes"]
+    page --> shared["useForm · handleSubmit · createDataTable<br/>carga · errores · refresco"]
 ```
 
-El final representa que el actor deja el catálogo; no exige una operación de cierre de
-sesión. Esta vista resume el ciclo exitoso y la corrección de datos, sin repetir todas
-las excepciones de autorización o persistencia de las fichas.
-
-La rama **Editar registro** incluye activar o desactivar mediante la casilla **Activo**; no existe
-una acción de eliminación dentro de este patrón. El listado administrativo conserva los
-registros inactivos para que puedan revisarse y reactivarse. Los endpoints operativos de
-cada dominio permanecen fuera de este ciclo y sólo ofrecen opciones activas.
+El registro limita modelo y campos del servidor; el configurador del navegador fija
+URLs, claves y argumentos del catálogo activo. La escritura exige `catalogs:manage`.
+`isActive` es un campo de creación/edición, no una operación DELETE. Las lecturas
+operativas conservan módulos propios y filtran opciones activas. Los pasos del actor y
+sus excepciones se consultan en los casos de uso de catálogos; esta figura muestra
+cómo se comparte su realización técnica.
 
 ### Secuencias técnicas del patrón CRUD en frontend y backend
 

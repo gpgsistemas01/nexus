@@ -1,140 +1,161 @@
 # 6. Diagramas de reutilización: CRUD e interfaz
 
-El primer diagrama evita representar cliente, proveedor, material, consumible o merma como implementaciones
-aisladas cuando el código ya ofrece piezas comunes. Una dependencia UML discontinua apunta desde
-el consumidor hacia la pieza que configura o consume, no que todos tengan idénticas reglas. Se
-aplican **Factory functions** y **composición sobre herencia**: el recurso inyecta su
-configuración y conserva localmente sus reglas de dominio.
+La reutilización se demuestra desde una implementación compartida hasta consumidores
+concretos que la configuran. El núcleo conserva el mecanismo; el módulo propietario
+conserva requests, claves de respuesta, campos y reglas del recurso. Las flechas de
+estas figuras apuntan **del consumidor a la dependencia** y no indican herencia.
 
-**Identificador:** `DIA-COD-REU-001`. **Pregunta:** ¿qué piezas compartidas ya deben
-configurarse o componerse antes de implementar otra variante?
+### Aplicaciones y contratos configurables
 
-```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    direction LR
-    namespace Aplicaciones {
-        class CrudFactory { <<factory>> }
-        class CatalogApplications { <<module>> }
-        class ResourceRules { <<policy>> }
-    }
-    namespace Listados {
-        class ListControllerFactory { <<factory>> }
-        class ListControllers { <<module>> }
-    }
-    namespace Formularios {
-        class SharedForms { <<boundary>> }
-        class CatalogPages { <<boundary>> }
-        class DataTablePlugins { <<component>> }
-        class Select2Plugins { <<component>> }
-    }
-    namespace Inventario {
-        class MaterialFlow { <<module>> }
-        class ConsumableFlow { <<module>> }
-        class WasteFlow { <<module>> }
-        class InventoryUI { <<component>> }
-    }
-
-    CatalogApplications ..> CrudFactory : configura createCrudApplication
-    ListControllers ..> ListControllerFactory : inyecta consulta
-    CatalogPages ..> SharedForms : reutiliza
-    CatalogApplications ..> ResourceRules : conserva reglas del recurso
-    CatalogPages ..> DataTablePlugins : usa
-    CatalogPages ..> Select2Plugins : usa
-    MaterialFlow ..> InventoryUI : usa
-    ConsumableFlow ..> InventoryUI : usa
-    WasteFlow ..> InventoryUI : usa
-```
-
-La diferencia de contexto se conserva en configuraciones, validadores y servicios de
-dominio. Antes de agregar otra aplicación o componente se revisan
-`src/public/js/application/createCrudApplication.js`,
-`src/controllers/api/createDataTableListController.js`, `src/views/shared`,
-`src/public/js/ui` y `src/public/js/plugins`.
-
-La revisión del código confirma cuatro puntos de extensión que no necesitan otra
-abstracción para sus consumidores actuales:
-
-| Necesidad repetida | Pieza que se reutiliza | Variación que permanece en el propietario |
-| --- | --- | --- |
-| Listar y mutar recursos desde el navegador | `createCrudApplication` | Requests, claves de respuesta y mutaciones adicionales. |
-| Extender el CRUD con encabezado, detalles y devolución | `createIssueApplication` | Servicios, cantidades y reglas de salida de material o merma. |
-| Responder catálogos tabulares de sólo lectura | `createDataTableListController` | Función de consulta y mensaje de error del recurso. |
-| Adaptar una exportación a un archivo descargable | `createReportApplication` | Request, endpoint y nombre de reporte de cada dominio. |
-
-### Diagrama de realización de la reutilización
-
-**Identificador:** `DIA-COD-REU-002`. **Pregunta:** ¿cómo llegan las abstracciones
-compartidas a los módulos de dominio que las aplican actualmente?
+**Identificador:** `DIA-COD-REU-001`. **Pregunta:** ¿qué configuradores reutilizan las
+factories y qué variación permanece local? **Alcance:** módulos del navegador bajo
+`src/public/js/application`; se muestran consumidores representativos verificables.
 
 ```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    direction LR
-    namespace Shared {
-        class CrudFactory { <<factory>> }
-        class IssueFactory { <<factory>> }
-        class ListFactory { <<factory>> }
-        class ReportFactory { <<factory>> }
-    }
-    namespace DomainAdapters {
-        class CrudModules { <<module>> }
-        class IssueModules { <<module>> }
-        class ListControllers { <<module>> }
-        class ReportModules { <<module>> }
-    }
-    class CrudOperations { <<interface>> }
-    class IssueOperations { <<interface>> }
-    class TableResponse { <<interface>> }
-    class ReportDownload { <<interface>> }
-
-    CrudModules ..> CrudFactory : configura requests
-    IssueFactory ..> CrudFactory : compone operaciones
-    IssueModules ..> IssueFactory : configura detalles
-    ListControllers ..> ListFactory : inyecta consulta
-    ReportModules ..> ReportFactory : inyecta request
-    CrudOperations <|.. CrudModules : expone
-    IssueOperations <|.. IssueModules : expone
-    TableResponse <|.. ListControllers : expone
-    ReportDownload <|.. ReportModules : expone
+flowchart TB
+    catalogs["materials.js · consumables.js · wastes.js<br/>requests y mutaciones del recurso"] --> crud["createCrudApplication<br/>getAll · register · edit<br/>additionalMutations"]
+    issues["materialGoodsIssues.js<br/>consumableGoodsIssues.js · wasteIssues.js<br/>requests + claves de devolución"] --> issue["createIssueApplication<br/>editHeader · editDetails · returnDetail"]
+    issue --> crud
+    reports["sales/report.js · warehouse/report.js<br/>request del reporte propio"] --> report["createReportApplication<br/>request → response.data"]
 ```
 
-Los espacios de nombres agrupan factories y adaptadores. `..>` apunta del consumidor
-hacia la dependencia; `<|..` expresa realización del contrato expuesto. Los contratos
-son interfaces conceptuales de módulos ES, no declaraciones de clases JavaScript.
-La composición de operaciones se expresa como dependencia: no se agrega un rombo de
-propiedad si el código sólo reutiliza una factory. `«factory»` y `«module»` son
-estereotipos descriptivos locales.
+`createCrudApplication` crea closures y congela el objeto de operaciones. El configurador
+exporta referencias con vocabulario del recurso. `createIssueApplication` añade nombres
+de mutaciones y claves de respuesta mediante configuración del CRUD. La factory de
+reportes devuelve `response.data`; la descarga y la interacción visual continúan en los
+consumidores, no dentro de esa factory.
 
-| Aplicación observada | Cómo se materializa | Evidencia que debe revisarse al cambiarla |
+La [secuencia de construcción](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia)
+explica cuándo se crea la configuración y cuándo se usa. Las diferencias de cantidades,
+autorización y transacción se conservan en cada contrato y servicio propietario.
+
+### Reutilización del transporte backend
+
+**Identificador:** `DIA-COD-REU-002`. **Pregunta:** ¿qué coordinación HTTP se comparte
+sin mezclar los servicios de materiales y consumibles? **Fuente:**
+`src/controllers/api/warehouse/goodsReceipts` y `goodsIssues`.
+
+```mermaid
+flowchart TB
+    receipts["Controllers de entradas<br/>materialGoodsReceiptController<br/>consumableGoodsReceiptController"] --> receiptHandlers["goodsReceiptHandlers<br/>listado · alta · edición<br/>corrección · cancelación"]
+    receipts --> services["Servicios por contexto<br/>material / consumable<br/>reglas y persistencia propias"]
+    issues["Controllers de salidas<br/>materialGoodsIssueController<br/>consumableGoodsIssueController"] --> issueHandlers["goodsIssueHandlers<br/>encabezado · detalles · devolución"]
+    roles["roleController · departmentController<br/>findAll + columns"] --> list["createDataTableListController<br/>paging · search · order · JSON"]
+```
+
+El controller configura funciones de servicio e `inventoryContext` cuando el handler lo
+requiere. El handler compartido adapta HTTP, DTO, respuesta y publicación; el servicio
+específico conserva la variación del dominio y participa en el núcleo transaccional
+correspondiente. La factory tabular concentra parsing y respuesta, y recibe consulta y
+columnas permitidas. Esto evita reconstruir la misma coordinación para cada variante.
+
+### Composición de la interfaz
+
+La reutilización visual no obliga a compartir toda la pantalla. Los parciales EJS, los
+formularios y los plugins mantienen contratos distintos. El [diagrama de ownership](../design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md#composición-de-la-interfaz)
+localiza un ejemplo concreto y separa page, formulario, application, transporte y UI.
+El flujo de [adaptación de detalles](../design-and-construction-patterns/07-dto-functional-and-policies-declarative.md#adaptadores-de-detalles-de-inventario)
+explica las identidades que se conservan entre API, tabla y request.
+
+### Factories de requests por contexto
+
+**Identificador:** `DIA-COD-REU-003`. **Pregunta:** ¿qué transporte comparten compras
+y salidas de materiales/consumibles y qué fija cada adaptador?
+**Fuente:** `src/public/js/services/warehouse/goodsReceipts` y `goodsIssues`.
+Las flechas apuntan del consumidor a la dependencia; el diagrama muestra construcción,
+no el orden de una petición completa.
+
+```mermaid
+flowchart TB
+    receiptAdapters["materialGoodsReceiptService<br/>consumableGoodsReceiptService<br/>apiRoute + reportRoute"] --> receipts["createGoodsReceiptRequests<br/>consulta · alta · encabezado<br/>corrección · cancelación · reporte"]
+    issueAdapters["materialGoodsIssueService<br/>consumableGoodsIssueService<br/>apiRoute + reportRoute"] --> issues["createGoodsIssueRequests<br/>consulta · alta · edición<br/>encabezado · detalles · devolución · reporte"]
+    receipts --> http["axiosInstanceApi.apiRequest<br/>método · URL · params · data<br/>transporte y renovación compartidos"]
+    issues --> http
+```
+
+Los servicios del navegador con nombre de dominio fijan las rutas y exportan las
+referencias producidas por la factory. `apiRequest` conserva el transporte común;
+`createCrudApplication` y `createIssueApplication` consumen después esos requests para
+adaptar operaciones y respuestas. Son dos fronteras reutilizadas distintas:
+**construcción del request** y **construcción de la aplicación**.
+
+La factory de compras mantiene corrección y cancelación; la de salidas mantiene
+encabezado, detalles y devolución. No se fusionan por semejanza de nombres, porque sus
+URLs, argumentos y efectos difieren. Los reportes configuran `responseType: 'blob'`.
+La factory de salidas de esta figura tiene configuradores de materiales y consumibles;
+no se atribuye a merma un consumo que sus imports no demuestran.
+
+### Construcción y ciclo de vida de tablas de detalle
+
+**Identificador:** `DIA-COD-REU-004`. **Pregunta:** ¿qué construcción comparten los
+modales de salidas y quién conserva columnas, ciclo de vida y adaptación responsiva?
+**Fuente:** `src/public/js/pages/warehouse/{goodsIssues,wasteIssues}` y
+`src/public/js/plugins/datatable/{shared/issues,core}`.
+Las flechas indican uso/configuración; los nodos agrupan responsabilidades.
+
+```mermaid
+flowchart TB
+    materialModal["goodsIssueModal<br/>data · mode · context"] --> warehouse["createWarehouseIssueDetailsTable<br/>buildWarehouseIssueDetailsConfig"]
+    wasteModal["wasteIssueModal<br/>detailName: Merma<br/>permiso visual WASTE_ISSUES_SUPPLY"] --> warehouse
+    warehouse --> builders["buildDetailsHeader + buildDetailsColumns<br/>modo · etiqueta · permiso visual"]
+    warehouse --> detail["createIssueDetailDatatable<br/>resetDataTable + encabezado<br/>datos y columnas configurados"]
+    detail --> base["createDataTable<br/>opciones · inicialización · draw"]
+    client["clientDatatable<br/>listado remoto y columnas del cliente"] --> base
+    base --> responsive["detailsRenderer + headerGroups<br/>etiquetas y visibilidad responsiva"]
+    responsive --> grid["headerGrid.buildHeaderGrid<br/>mapa de rowspan / colspan"]
+```
+
+Los modales preparan y adaptan sus detalles; la factory de almacén construye la misma
+estructura con la variación de modo, etiqueta y permiso visual. La tabla de detalle
+reinicia la instancia anterior antes de configurar el encabezado y crear la nueva.
+`createDataTable` también sirve a listados remotos: activa `serverSide`/`processing`
+cuando hay `ajax`, y conserva callbacks específicos del consumidor.
+
+La infraestructura responsiva comparte el mapa del encabezado para etiquetas y grupos,
+en lugar de inferirlos por índices distintos en cada pantalla. El permiso visual sólo
+controla presentación; las escrituras siguen autorizadas por el servidor. Esta figura
+explica la extracción común y su ownership, sin repetir la secuencia del CRUD.
+
+### Servicios y reglas compartidos por salidas
+
+**Identificador:** `DIA-COD-REU-005`. **Pregunta:** ¿qué colaboración reutilizan las
+salidas de materiales y mermas y qué reglas de detalle permanecen específicas?
+**Fuente:** `src/services/warehouse/{goodsIssues,wasteIssues,issues}`.
+Las flechas son dependencias; no representan transiciones normativas de estado.
+
+```mermaid
+flowchart TB
+    goods["goodsIssueService<br/>salida de materiales / consumibles"] --> header["issueHeaderService<br/>resolveIssueHeaderData"]
+    waste["wasteIssueService<br/>salida de merma"] --> header
+    header --> lookups["personService · clientService · departmentService<br/>consultas con tx recibido"]
+    header --> policy["personRules + constants/issueHeaderRules<br/>asesor interno y número de proyecto"]
+    goods --> common["issues/issueFulfillmentRules<br/>resolveIssueFulfillmentStatus"]
+    waste --> common
+    returns["goodsIssueReturnService<br/>devolución de material"] --> common
+    returns --> specific["goodsIssueFulfillmentRules<br/>estado específico del detalle devuelto"]
+    waste --> wasteDetail["issues/issueFulfillmentRules<br/>resolveIssueDetailFulfillmentStatus"]
+```
+
+`resolveIssueHeaderData` recibe identidades, datos, `tx`, clases de error y un estado
+opcional. Valida referencias y reglas comunes y devuelve datos de encabezado; el
+servicio propietario conserva documento, cantidades y límite transaccional. El helper
+usa el contexto que recibe y no abre una transacción por cada consulta.
+
+El cumplimiento del encabezado comparte `resolveIssueFulfillmentStatus`. La resolución
+del detalle no se presenta como un algoritmo único: la devolución de material usa
+`resolveGoodsIssueDetailFulfillmentStatusName`, que considera cantidades devueltas;
+merma usa el resolver común de detalle en su coordinación específica. Las reglas y
+transiciones de negocio se consultan en requisitos y el orden temporal en procesos.
+
+### Impacto de un cambio compartido
+
+| Pieza que cambia | Consumidores a revisar | Contrato que debe conservarse |
 | --- | --- | --- |
-| Configuración de factory CRUD | Cada módulo pasa `requests` y, cuando corresponde, `dataKeys` o mutaciones adicionales; después exporta operaciones con vocabulario del recurso. | Factory, módulo configurador y pruebas de ambos. |
-| Composición de aplicaciones de salida | `createIssueApplication` configura `createCrudApplication` y agrega contratos de encabezado, detalle y devolución para material y merma. | Las dos factories y los módulos `goodsIssues` y `wasteIssues`. |
-| Factory de controller tabular | Cada controller inyecta su consulta en `createDataTableListController`; ruta y servicio permanecen en el dominio. | Factory, controllers configuradores y pruebas HTTP del catálogo. |
-| Adaptador de reportes | Los módulos de cada área entregan su request a `createReportApplication` y conservan exports específicos. | Factory, servicio de transporte y consumidor que inicia la descarga. |
+| Factory CRUD | Configuradores directos y factory de salidas. | Firma de las mutaciones, claves de respuesta y exports de dominio. |
+| Handlers de compras/salidas | Controllers específicos de materiales y consumibles. | DTO, actor, respuesta y contexto de inventario. |
+| Factory tabular | Controllers que inyectan `findAll` y `columns`. | Paginación, búsqueda, orden permitido y respuesta. |
+| UI o parcial compartido | Formularios y páginas que lo incluyen o inicializan. | Selectores, callbacks, modo, ciclo de vida y ownership. |
 
-La concentración de un mecanismo y la existencia de adaptadores pequeños hacen visible
-el **resultado estructural** de una refactorización de extracción. El código vigente no
-demuestra por sí solo cuándo ocurrió esa transformación; para afirmar su evolución se
-necesita además el historial de cambios. Este diagrama documenta cómo queda aplicada hoy,
-no reconstruye un “antes y después” hipotético.
-
-Para analizar el impacto se sigue una columna completa: pieza común, configuradores y
-contrato observable. Las secuencias `DIA-FE-CU-*` y `DIA-BE-CU-*` muestran después el
-recorrido de cada caso y su línea **Patrones** enlaza la colaboración canónica
-`DIA-PAT-*`. Los imports del mapa generado y las pruebas de la pieza y sus consumidores
-aportan la evidencia que el diagrama no sustituye.
-
-Este capítulo resume la aplicación arquitectónica. Cada diagrama `DIA-FE-CU-*` o
-`DIA-BE-CU-*` indica mediante su línea **Patrones** qué pieza compartida consume y
-reserva el bloque Mermaid para el recorrido concreto. Cuando una refactorización
-extrae, sustituye o elimina una pieza común, se actualizan primero estos diagramas y el
-catálogo de patrones, y luego se revisan los casos localizados por esos códigos.
+La [refactorización y extensión](../design-and-construction-patterns/16-refactoring-and-extension.md)
+explica cómo revisar una extracción preservando estas fronteras. El código actual prueba
+la reutilización vigente; una afirmación sobre cuándo se extrajo necesita historial Git.

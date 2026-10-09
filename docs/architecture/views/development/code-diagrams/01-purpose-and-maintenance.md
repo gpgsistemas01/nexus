@@ -1,6 +1,11 @@
 # 1. Propósito y mantenimiento
 
-Estos diagramas representan manualmente la estructura observable del código actual. No los
+Esta colección explica módulos, fronteras, contratos y puntos de extensión del código
+actual. Cada figura parte de una pregunta de desarrollo y declara su alcance, fuentes y
+leyenda. Se elige dependencia para estructura, flujo para transformación/configuración y
+secuencia para una colaboración temporal compartida. No se produce un dibujo por archivo.
+
+Los diagramas se mantienen manualmente. No los
 produce `scripts/generateArchitectureDocs.js`: se revisan en el mismo cambio que modifica
 routers, capas, coordinación de servicios o componentes reutilizables. El
 [mapa generado](../code-map.md) sigue siendo el inventario verificable de rutas

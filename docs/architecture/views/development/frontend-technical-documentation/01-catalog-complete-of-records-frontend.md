@@ -1,15 +1,15 @@
-# 1. Catálogo completo de fichas frontend
+# 1. Responsabilidades y contratos del frontend
 
 La unidad de documentación es el **flujo funcional**, no un archivo aislado. Cada fila
 cubre todos sus módulos propietarios de servicio, aplicación, página y EJS; los símbolos
 compartidos aparecen después en una ficha transversal. De este modo no se presenta
 materiales como si fuera el único flujo documentado ni se repite una ficha idéntica por
 cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../../../openapi/api-contract.md)
-y las páginas publicadas en el [mapa generado](../code-map.md#rutas-web-23).
+y las páginas publicadas en el [mapa generado](../code-map.md).
 
 ### Fichas de flujos funcionales
 
-| Flujo | Vista y composición | Aplicación y transporte | Contrato y comportamiento propio | Diagrama aplicable |
+| Flujo | Vista y composición | Aplicación y transporte | Contrato y comportamiento propio | Representación y frontera de detalle |
 | --- | --- | --- | --- | --- |
 | Inicio de sesión | `loginPage.ejs` y `loginForm.js` recopilan credenciales; `indexPage.js` prepara la portada autenticada. | `application/auth/login.js` coordina `services/authService.js`; sus exports `registerRequest` y `resetPasswordRequest` no tienen consumidor ni ruta vigente y se registran como brecha, no como funcionalidad publicada. | `POST /api/auth/login`; normaliza la respuesta de éxito y deja cookies, tokens y permisos efectivos al servidor. | **Secuencia**, porque cruza formulario, API y establecimiento de sesión; reutilizar el recorrido HTTP de `code-diagrams/index.md` para las capas servidoras. |
 | Personas | `personsPage.ejs`, `personsPage.js`, `personModal.js` y `personForm.js` componen listado, alta y edición. | `application/admin/persons/persons.js` usa `services/admin/personService.js`; consulta departamentos mediante su catálogo. | `GET`, `POST` y `PUT /api/admin/persons`; adapta la persona devuelta y refresca el listado. | **Ciclo CRUD compartido**; no requiere secuencia propia mientras no cambie la coordinación. |
@@ -24,15 +24,15 @@ y las páginas publicadas en el [mapa generado](../code-map.md#rutas-web-23).
 | Salidas de mermas | `wasteIssuesPage.ejs`, página, modal, formulario y `returns/wasteIssueReturn.js`. | `application/warehouse/wasteIssues/wasteIssues.js` reutiliza `createIssueApplication` sobre `wasteIssueService.js`. | Mismas clases de operación bajo `/api/warehouse/waste-issues`, con selección y cantidades propias de merma. | **Secuencia** para surtimiento y devolución; compartir la vista de estados normativa. |
 | Movimientos | `movementsPage.ejs` y `movementsPage.js` eligen inventario de materiales o mermas según contexto de la vista. | `application/admin/movements/movements.js` usa `movementService.js`; `application/admin/report.js` coordina exportaciones. | Lecturas `/api/admin/movements/{materials,wastes}` y reportes correspondientes. | **Flujo de datos/listado**; no secuencia propia mientras sólo consulte y descargue. |
 | Catálogos auxiliares | `catalogsPage.ejs` compone `mainTable` y el modal compartido; cada URL representa un único recurso registrado. | `catalogsPage.js`, `catalogForm.js`, `catalogModal.js` y `catalogDatatable.js` coordinan `application/admin/catalogs/catalogs.js`; los adaptadores operativos de Select2 permanecen separados. | GET, POST y PUT bajo `/api/admin/catalogs/:catalog`, protegidos con `catalogs:manage`; las lecturas operativas conservan sus endpoints y permisos. | **Ciclo CRUD compartido** configurado por lista blanca para `CU-CAT-09` a `CU-CAT-26`. Las lecturas operativas para selectores conservan sus endpoints y permisos, pero no constituyen casos de uso independientes. |
-| Exportaciones dentro de cada módulo | Los botones pertenecen a las páginas de clientes, proveedores, inventarios, compras, salidas, personas, usuarios y movimientos; no existe una página general de reportes. | `createReportApplication.js` centraliza la descarga; `application/{admin,sales,warehouse}/report.js` configura cada `reportService.js` desde la página propietaria. | Cada solicitud `GET .../reports/.../excel` continúa la consulta y los filtros del módulo visible; no decide permisos del servidor. | Se documenta dentro del caso y recorrido del módulo propietario. La factory sólo requiere una vista estructural compartida, no una secuencia transversal de reportes. |
+| Exportaciones dentro de cada módulo | Los botones pertenecen a las páginas de clientes, proveedores, inventarios, compras, salidas, personas, usuarios y movimientos; no existe una página general de reportes. | `createReportApplication.js` adapta el request y devuelve `response.data`; los consumidores coordinan la descarga; `application/{admin,sales,warehouse}/report.js` configura cada `reportService.js` desde la página propietaria. | Cada solicitud `GET .../reports/.../excel` continúa la consulta y los filtros del módulo visible; no decide permisos del servidor. | Se documenta dentro del caso y recorrido del módulo propietario. La factory aparece en la vista de reutilización; la descarga concreta se explica en el recorrido propietario. |
 
 ### Fichas de infraestructura compartida
 
-| Pieza | Contrato documentado | Consumidores y límite | Diagrama aplicable |
+| Pieza | Contrato documentado | Consumidores y límite | Representación y frontera de detalle |
 | --- | --- | --- | --- |
 | `createCrudApplication.js` | Configura lecturas y mutaciones, extrae claves de respuesta y permite mutaciones adicionales. | Personas, usuarios, clientes, proveedores, materiales, consumibles y mermas; no conoce DOM ni reglas de dominio. | Diagrama canónico de **fábrica CRUD** en `code-diagrams/index.md`. |
 | `createIssueApplication.js` e `issueHeaderRules.js` | Especializan el ciclo de documentos con encabezado, detalles y reglas de edición visibles. | Salidas de materiales, consumibles y mermas; las transiciones definitivas siguen en backend. | **Actividad** para bifurcaciones del encabezado y **secuencia** para coordinación asíncrona. |
-| `createReportApplication.js` | Convierte una petición configurada en descarga y nombre de archivo. | Reportes de admin, ventas y almacén. | Normalmente ninguno; secuencia sólo al investigar descarga o error. |
+| `createReportApplication.js` | Devuelve `response.data` de una petición configurada; nombre de archivo y descarga permanecen en el consumidor. | Reportes de admin, ventas y almacén. | Normalmente ninguno; secuencia sólo al investigar descarga o error. |
 | `axiosInstanceApi.js` / `apiRequest` | Cliente HTTP común, tratamiento de sesión y propagación normalizada de errores. | Todos los servicios del navegador. | Participante único en secuencias; nunca un diagrama por llamada. |
 | `ui/forms`, `ui/inventory`, `ui/issues` | Reciben elementos y callbacks; controlan interacción visual y emiten resultados al propietario. | Formularios CRUD, selectores de inventario y documentos de salida. | **Componentes** si cambia la reutilización; **secuencia** si coordina eventos asíncronos. |
 | `plugins/datatable`, `plugins/select2`, `plugins/mdb`, `plugins/flatpickr`, `plugins/swal` | Encapsulan bibliotecas externas y su configuración común. | Páginas, modales, fechas, confirmaciones y catálogos. | Sin vista por adaptador; aparecen en el diagrama de componentes compartidos. |

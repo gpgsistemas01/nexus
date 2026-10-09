@@ -2,7 +2,7 @@
 
 ### Relación con la colección canónica
 
-La columna **Diagrama aplicable** del catálogo de componentes orienta hacia los 92
+La columna **Representación y frontera de detalle** del catálogo de componentes orienta hacia los 92
 recorridos `DIA-FE-CU-*` de `frontend-code-sequences/index.md`. Esa colección es propietaria del orden
 interacción → UI → aplicación → request → endpoint → resultado visible. Este documento
 conserva sólo diagramas que responden una pregunta adicional sobre los límites del
@@ -130,3 +130,45 @@ La evidencia está en `materialModal.js`, `materialForm.js`, `formUI.js`, `formU
 y `api/errorHandler.js`. Ante HTTP 400, 403, 404 y 409, el manejador de errores restablece el estado de envío y
 permite reintentar. Los demás errores de red o servidor siguen el comportamiento
 descrito para el formulario de contraseña.
+
+### Renovación coordinada del transporte HTTP
+
+**Identificador:** `DIA-FE-TEC-SES-001`. **Pregunta:** ¿cómo comparten dos peticiones
+con 401 una renovación de sesión sin crear un refresh por componente?
+**Fuente:** `src/public/js/services/axiosInstanceApi.js`. **Alcance:** ejemplo con dos
+solicitudes cuya renovación coincide en el tiempo; no representa concurrencia de negocio.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant A as Request A del recurso
+    participant B as Request B del recurso
+    participant Api as Interceptor axiosInstanceApi.js
+    participant Refresh as refreshRequest compartida
+    participant Server as API auth/refresh
+    A->>Api: respuesta 401 con original._retry ausente
+    Api->>Api: marcar original A con _retry
+    Api->>Refresh: crear promise si no existe
+    Refresh->>Server: POST /api/auth/refresh
+    B->>Api: respuesta 401 durante renovación pendiente
+    Api->>Api: marcar original B con _retry
+    Api->>Refresh: esperar promise existente
+    alt renovación exitosa
+        Server-->>Refresh: resolver renovación
+        Refresh-->>Api: completar espera de A y B
+        Api->>A: reintentar api(original A)
+        Api->>B: reintentar api(original B)
+    else renovación fallida
+        Server-->>Refresh: rechazar renovación
+        Refresh-->>Api: propagar rechazo
+        Api->>Api: redirigir window.location.href a /
+        Api-->>A: rechazar request
+        Api-->>B: rechazar request
+    end
+    Note over Api,Refresh: finally limpia refreshRequest para una renovación posterior
+```
+
+La coordinación pertenece al transporte común, no al formulario ni al plugin Select2.
+`_retry` impide otra renovación para la misma petición reintentada; `refreshRequest`
+comparte sólo la renovación pendiente y se limpia en `finally`. El error de una nueva
+respuesta 401 del reintento no abre indefinidamente más renovaciones.
