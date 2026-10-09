@@ -1,57 +1,59 @@
 # Vista de desarrollo
 
-## Propósito y alcance
+Esta vista explica la organización del software, la implementación de sus módulos y
+las decisiones que permiten compartir código. Las secuencias y estados pertenecen a
+[procesos](../processes/index.md), el despliegue a [física](../physical/index.md) y las
+capacidades y trazabilidad a [lógica](../logical/index.md).
 
-Esta vista explica **cómo se organiza y construye el software de Nexus**: módulos,
-responsabilidades, dependencias, contratos internos y mecanismos que permiten extender
-un recurso sin duplicar su implementación. La unidad de explicación es una colaboración
-cohesiva, no una ficha por cada archivo.
+## Organización y recorrido de lectura
 
-Se lee desde la estructura hasta la evidencia: primero se localiza el módulo, después
-se identifica la solución compartida y finalmente se revisan su configuración, sus
-consumidores y sus pruebas. Los recorridos temporales de cada `CU-*` pertenecen a la
-[vista de procesos](../processes/index.md); el contexto y despliegue, a la
-[vista física](../physical/index.md); las capacidades y su trazabilidad, a la
-[vista lógica](../logical/index.md).
-
-## Contenido y recorrido de lectura
-
-| Pregunta de desarrollo | Fuente propietaria | Qué aporta |
+| Nivel | Fuente propietaria | Pregunta y contenido |
 | --- | --- | --- |
-| ¿Dónde está una responsabilidad y de qué depende? | [Estructura del código](code-structure/index.md) | Organización por dominio y capa, fronteras HTTP y dependencias internas. |
-| ¿Cómo se integra Prisma y qué cubre una transacción? | [Prisma y persistencia](code-structure/06-prisma-and-persistence.md) | Cliente generado, conexión, consultas en servicios, `tx`, migraciones y errores. |
-| ¿Qué solución compartida se aplica y cómo se configura? | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | Implementación, consumidores concretos, contratos, variantes y límites de cada mecanismo. |
-| ¿Qué se reutiliza y cómo se revisa una extracción? | [Reutilización](reuse-and-refactoring/index.md) y [refactorización](reuse-and-refactoring/04-refactoring-and-extension.md) | Puntos de extensión, ownership e impacto de cambios sobre piezas comunes y consumidores. |
-| ¿Qué reglas, efectos y errores conserva el servidor? | [Referencia técnica de backend](backend-technical-documentation/index.md) | Contratos y mapas de código por cada módulo; dependencias compartidas. |
-| ¿Cómo se compone la pantalla y se adapta su contrato? | [Referencia técnica de frontend](frontend-technical-documentation/index.md) | Mapas de cada módulo, composición, callbacks, adaptación de datos y transporte. |
-| ¿Qué rutas, imports y símbolos existen? | [Mapa generado del código](code-map.md) | Inventario enumerable desde `src`; evidencia para contrastar la explicación curada. |
+| 1. Conjunto del software | [Organización e integración del código](code-structure/index.md) | ¿Cómo se distribuyen servidor, navegador y persistencia? Estructura del repositorio, registros HTTP, fronteras y Prisma. |
+| 2. Implementación de un módulo | Referencias técnicas de [backend](backend-technical-documentation/index.md) y [frontend](frontend-technical-documentation/index.md) | ¿Qué archivos lo implementan? Imports, configuración, contratos y particularidades del recurso. |
+| 3. Decisión compartida | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | ¿Por qué se elige esta solución? Problema, decisión, aplicación, variantes y límites. |
+| 4. Mecanismo reutilizable | [Reutilización y refactorización](reuse-and-refactoring/index.md) | ¿Qué núcleo se comparte y qué configura cada consumidor? Contratos de extensión e impacto de una extracción. |
+| Evidencia técnica | [Mapa generado](code-map.md) | Inventario de rutas, imports y símbolos derivado de `src`. |
 
-## Organización de archivos
+Para conocer el sistema se empieza por el nivel 1. Para cambiar un módulo se entra
+directamente en su referencia backend/frontend y se siguen los enlaces a Prisma,
+patrones o reutilización que expliquen sus dependencias. No es necesario recorrer
+primero todos los patrones para localizar el código de un recurso.
+
+## Propiedad de la información
+
+La carpeta `code-structure` conserva la visión general: sus mapas agrupan áreas y
+fronteras. Las referencias técnicas poseen los mapas detallados por módulo y sus tablas
+de archivos. Los patrones justifican una decisión que aparece en varios módulos y
+referencian esos mapas; reutilización posee las figuras del núcleo y sus configuradores.
+Una misma implementación tiene una fuente de detalle y enlaces desde las demás colecciones.
+
+Por ejemplo, Catálogos se localiza en las referencias de
+[backend](backend-technical-documentation/16-catalogs-code.md) y
+[frontend](frontend-technical-documentation/16-catalogs-code.md). El
+[patrón de registro con lista blanca](design-and-construction-patterns/08-catalog-registry-and-allowlist.md)
+explica por qué comparte configuración, y la
+[factory CRUD](reuse-and-refactoring/02-browser-applications-and-requests.md) explica
+el núcleo reutilizado por su aplicación del navegador.
 
 ```text
 development/
-├── code-structure/                  # Repositorio, backend, frontend y Prisma
-├── reuse-and-refactoring/           # Backend, application/requests, interfaz y extensión
-├── design-and-construction-patterns/# Decisiones y mecanismos, en orden de construcción
-├── backend-technical-documentation/ # Contratos por capacidad y colaboraciones técnicas
-├── frontend-technical-documentation/# Contratos por pantalla y estado local
-└── code-map.md                      # Inventario generado de rutas, imports y símbolos
+├── code-structure/                   # Organización general, fronteras e integración Prisma
+├── backend-technical-documentation/  # Implementación y contratos de módulos del servidor
+├── frontend-technical-documentation/ # Implementación y contratos de módulos del navegador
+├── design-and-construction-patterns/ # Decisiones compartidas y sus límites
+├── reuse-and-refactoring/            # Núcleos, configuradores y contratos de extensión
+└── code-map.md                       # Evidencia generada
 ```
 
-Primero se consulta estructura, después el mecanismo de reutilización o patrón y, para
-un recurso concreto, su referencia técnica. Las referencias agrupan contratos; los
-mapas agrupan módulos. Cada carpeta tiene un `index.md` y capítulos consecutivos.
+## Diagramas de desarrollo
 
-## Forma de leer los diagramas
+Las figuras representan módulos, imports, configuración, composición y contratos.
+Cada una declara pregunta, alcance, leyenda y fuente de código. Las flechas distinguen
+import, uso, agrupación o configuración; no presuponen orden de ejecución ni unidades
+de despliegue independientes. Los recorridos HTTP, reintentos, estados y límites
+temporales se consultan en procesos, sin repetirlos con otras etiquetas.
 
-Esta vista mantiene mapas de módulos, imports, configuración y contratos de código.
-Las secuencias, actividades y máquinas de estado se mantienen en la vista de procesos.
-Los flujos de datos aquí muestran adaptación de representaciones, no pasos del actor. Cada figura declara su
-pregunta, alcance y fuente técnica. Una flecha de dependencia no significa que dos
-módulos se ejecuten en ese orden, ni que sean unidades desplegables independientes.
-
-Para revisar un cambio se sigue **responsabilidad → pieza compartida → configurador del
-recurso → contrato observable → pruebas**. Una operación nueva que conserva el contrato
-se configura en el mecanismo existente; una regla exclusiva permanece en su dominio.
-El historial de una refactorización se consulta en Git, mientras esta vista describe
-el resultado vigente y los criterios para mantenerlo.
+Al cambiar un recurso se revisan sus archivos y contrato; al cambiar una pieza compartida,
+todos sus configuradores y consumidores. El historial de una extracción pertenece a Git;
+esta vista documenta el resultado vigente y su evidencia disponible.

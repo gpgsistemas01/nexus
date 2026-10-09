@@ -1,117 +1,68 @@
 # 8. Registro de catálogos con lista blanca
 
-Los catálogos auxiliares administrables aplican un **registro de configuración con lista blanca** acotado:
-`catalogService` relaciona cada nombre público con su modelo Prisma, sus campos y sus
-etiquetas. Controller, rutas y plantilla se comparten, mientras cada catálogo conserva
-una URL y una entrada de navegación propias. En frontend, la página sólo compone el
-flujo; formulario, modal, aplicación, transporte y DataTable mantienen la misma
-separación utilizada por los demás CRUD. Así se evita duplicar seis implementaciones
-sin permitir que el cliente seleccione modelos o campos arbitrarios. Las lecturas
-operativas de cada dominio permanecen separadas para alimentar sus selectores.
+## Problema y decisión aplicada
 
-La lista blanca es una frontera de seguridad. La página y el API administrativo
-comprueban `catalogs:manage`; ocultar el enlace sólo mejora la navegación y nunca
-reemplaza la autorización del servidor.
+Seis catálogos auxiliares comparten consulta, creación y edición, pero difieren en modelo,
+campos y etiquetas. `constants/catalogs.js` define `MANAGED_CATALOGS` para configurar
+una implementación administrativa común. El servicio resuelve únicamente esas claves;
+el cliente no selecciona modelos Prisma o campos arbitrarios. Es un registro de
+configuración con lista blanca, no un CRUD universal para las entidades del sistema.
 
-El flujo común no termina en los parciales visuales. En frontend, el listado se adapta
-con `createCrudApplication.getAll`, se entrega a `createDataTable` mediante su opción
-`ajax` y las altas o ediciones usan `handleSubmit`, que cierra el modal, presenta el
-mensaje y recarga la DataTable conservando o reiniciando la página según el modo. Así,
-Catálogos comparte el mismo ciclo observable que Clientes y Proveedores sin duplicar el
-manejo de carga, error o refresco. En backend, el router aplica autenticación y
-`catalogs:manage` antes del controller; el controller conserva el contrato DataTables y
-delega normalización, lista blanca, validación y persistencia al servicio. El registro
-**de configuración con lista blanca** es la única variación deliberada frente a un servicio por recurso.
-Las columnas se entregan directamente a `createDataTable` y se componen desde los
-campos del catálogo activo; no se mantienen seis arreglos equivalentes. La acción
-reutiliza `buildMdbEditActionButton` con la etiqueta **Editar registro**, sin agregar `catalog` a
-los contextos de negocio de `renderActionButtons`.
-Las reglas visibles se crean mediante `createCatalogValidation` en la capa compartida
-`utils/validations`, igual que los demás formularios; `catalogForm` sólo aporta etiqueta
-y límites del recurso actual.
-
-El campo **Activo** forma parte del contrato común de los seis catálogos administrables.
-El registro lo declara entre sus campos permitidos, el backend valida que sea booleano,
-la pantalla lo presenta en formulario y listado, y Prisma lo conserva con valor inicial
-activo. Las lecturas operativas sólo ofrecen registros activos; el listado administrativo
-incluye ambos estados para permitir su reactivación.
-
-El parámetro `catalog` se valida en la frontera HTTP contra `MANAGED_CATALOG_NAMES` y
-el servicio vuelve a resolverlo desde `MANAGED_CATALOGS`; así no se puede seleccionar
-un modelo arbitrario aunque el servicio se invoque fuera de la ruta. Como en los demás
-módulos que reciben `id` en la URL, el servicio resuelve la existencia de la entidad y
-traduce tanto el `P2025` como el `P2023` de Prisma a una entrada no encontrada que
-incluye la etiqueta del catálogo. El validator HTTP se reserva para el contrato del body
-y para `catalog`, que selecciona una configuración permitida y requiere rechazo antes del controller.
-
-El registro contiene exactamente estos catálogos; ningún otro módulo forma parte de este
-flujo compartido:
-
-| Catálogo visible | Identificador de URL y API | Modelo Prisma | Campos administrables |
-| --- | --- | --- | --- |
-| Áreas | `departments` | `Department` | `name` (máximo 50), `isActive` booleano |
-| Roles | `roles` | `Role` | `name` (máximo 50), `isActive` booleano |
-| Presentaciones | `presentations` | `Presentation` | `name` (máximo 50), `isActive` booleano |
-| Unidades de medida | `unit-measures` | `UnitMeasure` | `name` (máximo 20), `symbol` (máximo 10), `isActive` booleano |
-| Motivos de ajuste | `reasons` | `StockAdjustmentReason` | `name` (máximo 100), `isActive` booleano |
-| Estados de cumplimiento | `fulfillment-statuses` | `FulfillmentStatus` | `name` (máximo 50), `isActive` booleano |
-
-**Clientes** y **Proveedores** no pertenecen a este registro: conservan sus módulos,
-rutas, permisos, formularios y reglas de negocio propios.
-
-En términos de negocio, clientes y proveedores **sí son catálogos comerciales** porque
-son datos maestros reutilizados por salidas y compras. La distinción anterior es de
-implementación: no son catálogos auxiliares ni deben agregarse al registro compartido.
-Ambos conservan su indicador Activo en base de datos, backend, formulario y listado; sus
-selectores operativos excluyen inactivos, mientras sus pantallas propietarias los mantienen
-visibles para consulta y reactivación.
+Las [referencias backend](../backend-technical-documentation/16-catalogs-code.md) y
+[frontend](../frontend-technical-documentation/16-catalogs-code.md) poseen los mapas de
+archivos, los seis registros, contratos y metadata de pantalla. Las consultas operativas
+y los recursos con reglas propias mantienen sus módulos. Clientes y proveedores son
+datos maestros comerciales, pero no pertenecen al registro auxiliar.
 
 ### Diagrama del patrón de catálogos administrables
 
-**Diagrama:** `DIA-ARQ-CAT-001`. El diagrama muestra la variante permitida por la lista blanca
-y sus módulos consumidores. Las flechas representan imports/uso de configuración,
-no un recorrido HTTP. Fuente: routers, controllers, catalogService y constants/catalogs.
+**Identificador:** `DIA-ARQ-CAT-001`. **Pregunta:** ¿qué configura el registro y qué
+parte recibe cada consumidor? **Fuente:** `constants/catalogs.js`, `catalogService.js`,
+`catalogValidations.js` y controller web. **Leyenda:** flechas = uso de configuración;
+los nodos de función/campo son partes de archivos existentes, no nuevos módulos.
 
 ```mermaid
 flowchart TB
-    route["routes/api/admin/catalogApiRoute.js"] --> controller["controllers/api/admin/catalogController.js"]
-    route --> validation["validators/forms/catalogValidations.js"]
-    controller --> service["services/admin/catalogService.js"]
-    service --> registry["constants/catalogs.js<br/>MANAGED_CATALOGS"]
-    service --> db["repository/baseRepository.js<br/>getDb()[model]"]
-    web["controllers/web/admin/catalogController.js"] --> service
+    registry["constants/catalogs.js<br/>MANAGED_CATALOGS"] -->|deriva claves| names["MANAGED_CATALOG_NAMES"]
+    validator["catalogValidations.js"] -->|claves admitidas| names
+    validator -->|campos y longitudes| registry
+    service["catalogService<br/>getCatalog · normalizeCatalogData<br/>validateCatalogData"] -->|modelo y campos permitidos| registry
+    metadata["catalogService<br/>getManagedCatalog"] -->|etiquetas · campos · longitudes| registry
+    web["controller web<br/>getCatalogsPage"] -->|consume metadata sin model| metadata
+    metadata -.->|configuración de presentación| view["catalogsPage.ejs<br/>catalogContext data-*<br/>formulario y tabla comunes"]
 ```
 
-El registro se reutiliza para Áreas, Roles, Presentaciones, Unidades de medida,
-Motivos de ajuste y Estados de cumplimiento. Clientes y proveedores reutilizan otros
-mecanismos CRUD, pero no consumen este registro de modelos permitidos.
+El servicio conserva la resolución del modelo y la validación incluso si se invoca
+fuera del router. `getManagedCatalog` devuelve metadata de presentación y omite `model`:
+el servidor conserva la decisión de persistencia. EJS la proyecta en atributos que
+configuran formulario, modal y columnas; esa metadata no concede permisos.
 
-### Diagrama del ciclo CRUD compartido
+## Mecanismos reutilizados y fronteras
 
-**Diagrama:** `DIA-ARQ-CAT-002`. **Pregunta:** ¿qué configuración permite reutilizar
-el mismo CRUD sin aceptar modelos o campos arbitrarios? **Alcance:** dependencias de
-construcción; las flechas apuntan desde el consumidor a la configuración o pieza común.
+| Decisión | Aplicación comprobable y fuente de detalle |
+| --- | --- |
+| Lista blanca del servidor | El registro fija modelos, campos y longitudes; el validator rechaza claves desconocidas y el servicio vuelve a resolverlas. [Backend](../backend-technical-documentation/16-catalogs-code.md#contratos-y-límites-implementados). |
+| Configuración de presentación | Un controller web y plantilla publican metadata para una pantalla común. [Frontend](../frontend-technical-documentation/16-catalogs-code.md#configuración-entre-ejs-y-el-navegador). |
+| Composición de aplicación | `catalogs.js` configura `createCrudApplication` con `getAll`, `register` y `edit`, manteniendo el catálogo como argumento del transporte. [Contrato de reutilización](../reuse-and-refactoring/02-browser-applications-and-requests.md). |
+| Contratos de formulario y tabla | Se componen `useForm`, `handleSubmit`, `createDataTable` y `buildMdbEditActionButton`; las columnas derivan de campos, sin seis implementaciones. [Frontend](../frontend-technical-documentation/16-catalogs-code.md). |
+| Separación de lectura operativa | Las opciones activas se consultan con permisos y adaptadores propios; el listado administrativo permite reactivar filas. [Lecturas backend](../backend-technical-documentation/16-catalogs-code.md#lecturas-operativas-de-los-mismos-datos). |
 
-```mermaid
-flowchart TB
-    service["catalogService.js<br/>getCatalog + normalización + validación"] --> registry["constants/catalogs.js<br/>MANAGED_CATALOGS<br/>modelo · campos · longitudes · etiquetas"]
-    validation["catalogValidations.js<br/>catalog permitido + contrato del body"] --> names["MANAGED_CATALOG_NAMES"]
-    page["catalogsPage + form + modal + DataTable<br/>recurso activo y campos"] --> application["application/admin/catalogs/catalogs.js<br/>requests configurados"]
-    application --> crud["createCrudApplication<br/>lectura y mutaciones comunes"]
-    page --> shared["useForm · handleSubmit · createDataTable<br/>carga · errores · refresco"]
-```
+## Límites y extensión
 
-El registro limita modelo y campos del servidor; el configurador del navegador fija
-URLs, claves y argumentos del catálogo activo. La escritura exige `catalogs:manage`.
-`isActive` es un campo de creación/edición, no una operación DELETE. Las lecturas
-operativas conservan módulos propios y filtran opciones activas. Los pasos del actor y
-sus excepciones se consultan en los casos de uso de catálogos; esta figura muestra
-cómo se comparte su realización técnica.
+La vista y el API administrativo requieren `catalogs:manage`. El parámetro `catalog`
+selecciona configuración permitida; ocultar navegación o validar en el navegador no
+reemplaza el control del servidor. Desactivar es editar `isActive`, no eliminar.
+El registro no administra permisos ni define las transiciones de cumplimiento: sus
+nombres tienen consumidores en código que se deben revisar.
 
-### Comportamiento del CRUD compartido
+Agregar un catálogo exige revisar el modelo persistente, registro, campos, validators,
+compatibilidad del formulario/columnas y navegación. Si requiere selectores operativos,
+se conserva también su contrato de lectura y adaptador. Añadir una clave no demuestra
+por sí solo que esos consumidores existen. Un recurso con reglas o campos que no
+caben en el contrato común mantiene un módulo específico.
 
-Los mapas anteriores representan código y configuración. Los pasos de consulta, alta,
-edición y desactivación están en las secuencias canónicas de los
-[catálogos backend](../../processes/backend-code-sequences/catalogs/index.md) y
-[frontend](../../processes/frontend-code-sequences/catalogs/index.md). No se conserva
-otra secuencia general que repita esos recorridos.
+Los pasos y alternativas se consultan en las secuencias de
+[backend](../../processes/backend-code-sequences/catalogs/index.md) y
+[frontend](../../processes/frontend-code-sequences/catalogs/index.md). Aquí se conserva
+la decisión de configuración; los mapas del módulo y de reutilización amplían sus
+colaboradores sin repetirlos como un segundo diagrama del patrón.

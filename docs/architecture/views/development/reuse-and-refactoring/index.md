@@ -1,8 +1,8 @@
 # Reutilización y refactorización
 
 Esta colección demuestra qué implementación comparten consumidores concretos, qué
-configura cada uno y qué comportamiento permanece local. El índice separa las fronteras
-que antes se mezclaban en «CRUD e interfaz».
+configura cada uno y qué comportamiento permanece local. Las referencias técnicas localizan los consumidores por módulo; aquí se documenta
+el contrato de la pieza compartida, sus configuradores y límites.
 
 ## Capítulos
 
@@ -18,7 +18,7 @@ que antes se mezclaban en «CRUD e interfaz».
 | Application del navegador | CRUD, composición de salidas y reportes; configuradores por recurso. | `DIA-COD-REU-001` |
 | Requests del navegador | Factories de compras/salidas configuradas con URL API y reporte para material/consumable. | `DIA-COD-REU-003` |
 | Presentación | EJS, formularios, modales y tablas con contratos distintos. | `DIA-COD-REU-004`, `DIA-PAT-UI-001` |
-| Extracción y mantenimiento | Núcleo común, variación local y revisión de contratos/consumidores. | `DIA-PAT-REF-001..002` |
+| Extracción y mantenimiento | Núcleo común, variación local y revisión de contratos/consumidores. | `DIA-PAT-REF-001` |
 
 Cada capítulo incluye configuración, comportamiento y límites comprobados en el código.
 Las figuras de dependencias muestran la implementación vigente. La refactorización

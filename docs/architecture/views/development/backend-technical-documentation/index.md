@@ -4,6 +4,11 @@ Esta referencia explica la estructura de código de cada módulo: archivos propi
 imports, dependencias compartidas y contratos internos. Los mapas muestran módulos ES;
 las flechas son dependencias entre grupos de archivos, no pasos de un CRUD.
 
+La [organización general](../code-structure/index.md) ubica esta implementación en
+el sistema. Esta referencia posee el detalle de cada módulo; [patrones](../design-and-construction-patterns/index.md)
+explica las decisiones compartidas y [reutilización](../reuse-and-refactoring/index.md)
+los contratos de sus núcleos. No se replican sus diagramas en cada recurso.
+
 ## Capítulos
 
 1. [Responsabilidades y contratos](01-catalog-complete-of-records-backend.md).
@@ -21,7 +26,7 @@ las flechas son dependencias entre grupos de archivos, no pasos de un CRUD.
 13. [Salidas: materiales y consumibles](13-goods-issues-code.md).
 14. [Salidas de mermas](14-waste-issues-code.md).
 15. [Consulta de movimientos](15-movements-code.md).
-16. [Catálogos administrables](16-catalogs-code.md).
+16. [Catálogos: administración y lecturas operativas](16-catalogs-code.md).
 
 Los mecanismos comunes se explican una vez en [reutilización](../reuse-and-refactoring/index.md)
 y [patrones](../design-and-construction-patterns/index.md). Las secuencias, actividades

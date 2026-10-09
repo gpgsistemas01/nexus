@@ -48,7 +48,7 @@ la construcción del cliente se detalla en [Prisma](06-prisma-and-persistence.md
 | `inventory`, `document` | Movimientos de material y consultas/reportes; folios anuales mediante el `tx` recibido directamente. `movementService.js` también importa `warehouse/materials/supplierMaterialService.js`: existe colaboración en ambos sentidos entre esos grupos, no una jerarquía estricta. |
 | `authService`, `jwtService`, `roleService`, `audit` | Sesión/JWT, consulta de accesos y auditoría. `authMiddleware.js` y `auditMiddleware.js` invocan estos servicios desde la entrada HTTP. |
 
-## Mapas completos por módulo
+## Detalle por módulo
 
 La [referencia backend](../backend-technical-documentation/02-module-code-maps.md)
 contiene un mapa de código para cada módulo. Compras y salidas enumeran ambas variantes

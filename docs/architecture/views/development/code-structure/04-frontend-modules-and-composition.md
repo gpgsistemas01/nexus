@@ -37,7 +37,7 @@ está en `application`: son mecanismos diferentes. La actualización de inventar
 el puente de eventos del layout y `configureRealtimeReload` en el núcleo DataTable;
 se describe en [publicación de eventos](../design-and-construction-patterns/10-publication-of-events-of-inventory.md).
 
-## Mapas completos por módulo
+## Detalle por módulo
 
 La [referencia frontend](../frontend-technical-documentation/02-module-code-maps.md)
 contiene un mapa para cada módulo con sus entry points, formulario/modal, application,

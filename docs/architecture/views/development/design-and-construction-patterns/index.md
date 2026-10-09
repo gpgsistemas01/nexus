@@ -1,12 +1,22 @@
 # Patrones de diseño y construcción aplicados
 
-## Recorrido de lectura
+## Propósito y relación con las referencias técnicas
 
-Los capítulos siguen la construcción del software: alcance y resumen, mapa de patrones,
-capas y fronteras, mecanismos compartidos y criterios de mantenimiento. Cada mecanismo
-se vincula con la implementación y los consumidores descritos en
-[estructura del código](../code-structure/index.md) y
-[reutilización y refactorización](../reuse-and-refactoring/index.md).
+Esta colección explica decisiones compartidas: el problema que resuelven, por qué la
+implementación las aplica, sus variantes y sus límites. Los mapas de archivos por
+recurso pertenecen a las referencias técnicas de [backend](../backend-technical-documentation/index.md)
+y [frontend](../frontend-technical-documentation/index.md); los contratos del núcleo y
+configuradores, a [reutilización](../reuse-and-refactoring/index.md).
+
+Los capítulos 1–3 permiten identificar las soluciones confirmadas; 4–12 explican
+arquitectura y mecanismos aplicados. Los capítulos 13–15 son convenciones de lectura,
+verificación y mantenimiento que apoyan su construcción, sin convertir toda regla de
+codificación en un patrón. El [estándar de codificación](../../../coding-standards/index.md)
+conserva las reglas normativas de estilo y organización.
+
+Por cada decisión se mantiene una figura que explique configuración o colaboración.
+Cuando el mapa de un módulo o de reutilización ya responde la pregunta, se enlaza esa
+fuente. Las secuencias de procesos complementan la explicación temporal.
 
 ## Capítulos
 
@@ -34,7 +44,7 @@ la colaboración que ya explica el diagrama enlazado.
 
 | Patrón o preocupación | Diagrama canónico | Capítulo de detalle |
 | --- | --- | --- |
-| Registro seguro de catálogos | [`DIA-ARQ-CAT-001..002`](08-catalog-registry-and-allowlist.md#diagrama-del-patrón-de-catálogos-administrables) | [Registro con lista blanca](08-catalog-registry-and-allowlist.md) |
+| Registro seguro de catálogos | [`DIA-ARQ-CAT-001`](08-catalog-registry-and-allowlist.md#diagrama-del-patrón-de-catálogos-administrables) | [Registro con lista blanca](08-catalog-registry-and-allowlist.md) |
 | Monolito modular y capas | [`DIA-PAT-EST-001`](03-patterns-in-code.md#estructura-por-dominio-capas-y-fronteras) | [Arquitectura por capas](04-modular-monolith-and-layers.md) |
 | Pipeline, DTO y políticas | [`DIA-PAT-FRO-001`](03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas) | [Pipeline](05-middleware-pipeline.md) y [DTO/políticas](06-dtos-adapters-and-policies.md) |
 | Factories y composición | [`DIA-PAT-CON-001`](03-patterns-in-code.md#factories-y-composición-sobre-herencia) | [Factory functions](07-factories-and-application-composition.md) |

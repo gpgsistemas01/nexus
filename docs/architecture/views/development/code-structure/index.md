@@ -1,9 +1,16 @@
-# Estructura del código
+# Organización e integración del código
 
-Esta colección explica dónde vive cada responsabilidad y qué módulos utiliza. Los
-mapas parten de carpetas, imports, registros y funciones existentes. El mapa general
-ubica el sistema completo; los mapas de backend y frontend amplían sus dependencias;
-el capítulo de Prisma explica la persistencia desde el código.
+Esta colección sigue siendo la entrada general de la vista de desarrollo. Describe
+la distribución del repositorio, el registro HTTP, las fronteras entre servidor y
+navegador y la integración con Prisma. La carpeta técnica `code-structure` conserva
+su ubicación; su alcance es el conjunto del software.
+
+Los archivos, imports y particularidades de cada recurso pertenecen a las referencias
+técnicas de [backend](../backend-technical-documentation/02-module-code-maps.md) y
+[frontend](../frontend-technical-documentation/02-module-code-maps.md). Las decisiones
+que se repiten entre recursos se justifican en [patrones](../design-and-construction-patterns/index.md),
+y los contratos de sus núcleos se detallan en [reutilización](../reuse-and-refactoring/index.md).
+Los mapas generales se amplían mediante enlaces, sin reproducir aquí cada módulo.
 
 ## Capítulos
 

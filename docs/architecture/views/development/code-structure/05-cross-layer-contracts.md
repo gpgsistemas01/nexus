@@ -36,15 +36,15 @@ se mantiene en la [secuencia canónica de auditoría](../../processes/shared-run
 Las fuentes de esta figura son `src/routes`, `src/controllers`, `src/dtos`,
 `src/services`, `src/public/js` y `src/repository/baseRepository.js`.
 
-### 5.2 Colaboraciones que requieren detalle temporal
+### 5.2 Dónde ampliar cada frontera
 
-| Colaboración | Por qué necesita otra representación | Fuente propietaria |
-| --- | --- | --- |
-| Pipeline y normalización | Orden explícito de controles y adaptación de entrada. | [Aplicación concreta del pipeline](../design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas). |
-| Escrituras coordinadas | Límite de `tx`, rollback y efectos posteriores al commit. | [Transacción, eventos y auditoría](../design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría), con servicios concretos en las secuencias backend. |
-| Construcción de aplicaciones | Configuración al cargar el módulo y uso posterior de closures. | [Factory CRUD aplicada](../design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia). |
-| Actualización de tablas por eventos | Publicación, puente del navegador y nueva consulta. | [Publicador y consumidores](../design-and-construction-patterns/10-publication-of-events-of-inventory.md#aplicación-entre-publicador-y-consumidores). |
-| Sesión en el transporte compartido | Varias solicitudes esperan la renovación pendiente; reintento acotado. | [Renovación coordinada](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http). |
+| Necesidad | Fuente propietaria |
+| --- | --- |
+| Imports y contrato de una operación del recurso | Referencias técnicas de [backend](../backend-technical-documentation/index.md) y [frontend](../frontend-technical-documentation/index.md). |
+| Decisión de middleware, DTO, permisos o composición | [Patrones aplicados](../design-and-construction-patterns/index.md). |
+| Configuración de factories, handlers, requests o tablas | [Mecanismos reutilizables](../reuse-and-refactoring/index.md). |
+| Cliente generado, conexión y selección de `tx` | [Integración Prisma](06-prisma-and-persistence.md). |
+| Orden de llamadas, rollback, eventos o renovación de sesión | [Vista de procesos](../../processes/index.md). |
 
 ### 5.3 Relación con las otras vistas
 

@@ -248,8 +248,8 @@ const PUBLICATIONS = Object.freeze({
             'patrones-y-mapa-de-codigo': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/code-structure'),
-                ...getDirectoryDocuments('docs/architecture/views/development/reuse-and-refactoring'),
                 ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
+                ...getDirectoryDocuments('docs/architecture/views/development/reuse-and-refactoring'),
                 'docs/architecture/views/development/code-map.md'
             ]),
             backend: packagePart(ARCHITECTURE_ENTRY, [
