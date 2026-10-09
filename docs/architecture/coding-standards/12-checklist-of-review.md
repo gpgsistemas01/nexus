@@ -12,7 +12,12 @@ Antes de confirmar un cambio se verifica:
 5. ¿La escritura compuesta conserva transacción, autorización, auditoría y errores?
 6. ¿Las pruebas están en la ubicación declarada y verifican el CRUD o regla afectada?
 7. ¿Las vistas reutilizan componentes y preservan la última línea EJS?
-8. ¿La documentación curada y generada quedó sincronizada?
+8. ¿La documentación curada y generada quedó sincronizada y los diagramas modificados
+   se renderizaron y revisaron en una exportación?
+9. ¿Los cambios persistentes incluyen migración incremental, conservación de datos
+   históricos y pruebas en una base aislada?
+10. ¿La dependencia nueva actualiza el lockfile y funciona con las versiones soportadas
+    de Node.js?
 
 La revisión mínima ejecuta las pruebas relacionadas, la suite unitaria,
 `npm run docs:check` y `git diff --check`. La integración se ejecuta con la base aislada

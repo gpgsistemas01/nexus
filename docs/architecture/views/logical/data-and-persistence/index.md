@@ -36,6 +36,24 @@ no son columnas adicionales.
 no es una FK ni implica un CRUD de proyectos. `Project.client` también es texto,
 mientras `GoodsIssue.clientId` referencia a `Client`.
 
+## Necesidad de la tabla Project
+
+`Project` no es necesaria para la operación vigente: no tiene rutas, servicios,
+selectores ni uso explícito en los DTO o pruebas actuales. `createIssueHeaderDto`
+captura `projectNumber`; la cantidad de proyecto de un detalle tampoco requiere
+un catálogo. `RF-PRJ-001` y `RF-PRJ-002` permanecen modelados, sin un caso de uso vigente.
+
+Se recomienda retirar `Project`, la FK y `GoodsIssue.projectId` mediante una migración
+incremental una vez revisados sus datos históricos. Antes del retiro se deben contar
+los proyectos y las salidas vinculadas, conciliar cualquier referencia que deba
+conservarse y verificar tanto la actualización de una base existente como la cadena
+de migraciones de una instalación nueva. No se deben modificar las migraciones
+históricas que creaban proyectos o requisiciones.
+
+La conexión configurada no respondió durante esta revisión (`P1001`), por lo que no
+se comprobó si existen registros legados. La recomendación queda documentada sin
+eliminar la tabla ni aplicar una migración; el ER sigue reflejando el esquema vigente.
+
 ## Contextos de inventario compartidos
 
 | Estructura | Separación y reutilización |

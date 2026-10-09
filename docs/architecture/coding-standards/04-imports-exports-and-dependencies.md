@@ -10,7 +10,8 @@
   según el momento en que se añadió una dependencia.
 - Un import nombrado corto permanece en una línea. Si necesita dividirse, cada símbolo
   ocupa su propia línea y la llave de cierre se alinea con `import`.
-- Los imports relativos incluyen la extensión `.js`.
+- Los imports relativos de JavaScript incluyen `.js`. Para un artefacto generado se
+  respeta su extensión real, como el cliente Prisma `.ts` importado por `src/lib/prisma.js`.
 - Se importa desde el módulo propietario. No se atraviesa un barril o wrapper que sólo
   reexporta símbolos para ocultar la dependencia real.
 - No se usan imports dinámicos para evitar un ciclo o esconder una dependencia; primero
@@ -53,27 +54,14 @@
   Si sólo cambia material por merma u otro contexto, se parametriza el proceso común y
   se mantienen separadas únicamente reglas, permisos, persistencia o lenguaje propios.
 
-### 4.4 Ejemplo de contrato entre módulos
+### 4.4 Nombres y contratos compartidos
 
-El consumidor mantiene el nombre del contrato propietario y pasa dependencias
-transaccionales explícitamente:
+Mantener el nombre exportado por el módulo propietario. Un alias se reserva para una
+colisión real o una adaptación a un contrato compartido, conforme a la sección 4.2;
+los controllers y servicios siguen además la sección 5.
 
-```js
-import { updateMaterialStock } from './materialStockService.js';
-
-export const receiveMaterial = async ({ materialId, quantity, tx }) => {
-    return updateMaterialStock({ materialId, quantity, tx });
-};
-```
-
-No se importa `updateMaterialStock as applyStock`, ni se crea un wrapper llamado
-`applyStock` que sólo reenvíe argumentos. Si dos contextos comparten el algoritmo y sólo
-cambia el inventario, se extrae una factory parametrizada; no se copian ambos flujos.
-
-Antes de aplicar la excepción se revisa el módulo propietario. Si todos los consumidores
-usan el mismo contrato compartido, el export debe adoptar directamente su nombre
-canónico. Por ejemplo, los componentes de formularios de documentos reciben la
-colección como `details`, por lo que el modal y la página usan ese nombre sin alias:
+Cuando todos los consumidores usan un contrato común, definir su nombre canónico en
+el propietario. Por ejemplo, los formularios de documentos usan `details`:
 
 ```js
 // wasteIssueModal.js
@@ -89,10 +77,6 @@ upsertIssueDetail({
 });
 ```
 
-Aquí `details` no es un nombre arbitrario: es el término común utilizado por
-`useIssueForm`, `upsertIssueDetail` y la carga enviada al API. La ruta del módulo ya
-aporta el contexto de salida de merma, de modo que repetirlo en `wasteIssueDetails`
-obligaría a adaptar todos los consumidores sin aportar precisión. El alias queda
-reservado para contratos externos o colisiones que el módulo propietario no pueda
-resolver sin perjudicar a otros consumidores. La excepción no aplica a controllers y
-servicios, cuyos contratos de dominio conservan el nombre exportado según la sección 5.
+Un wrapper que sólo reenvía argumentos no aporta una capa. Una fachada que fija el
+contexto de inventario o aplica una política sí tiene responsabilidad propia: evita
+que el cliente determine un discriminador persistido y reutiliza el núcleo común.

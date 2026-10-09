@@ -11,8 +11,10 @@
   transaccional. Los adaptadores de respuestas crean objetos nuevos.
 - Se usa `const` por defecto y `let` sólo cuando existe una reasignación necesaria. No se
   usa `var`.
-- `async` se usa sólo cuando la función espera una promesa o forma parte de un contrato
-  asíncrono. Las promesas se esperan o retornan; no se dejan flotantes.
+- `async` se usa cuando la función espera una promesa o forma parte de un contrato
+  asíncrono. Las promesas se esperan o retornan. Una tarea deliberada en segundo plano
+  declara su responsabilidad y maneja el rechazo, como la auditoría posterior a la
+  respuesta; no debe ser necesaria para confirmar la transacción de negocio.
 - Las operaciones independientes pueden ejecutarse juntas sólo si no alteran el orden,
   transacción, carga o manejo de errores requerido.
 - Un `catch` agrega contexto, traduce a un error de dominio o compensa una operación; no

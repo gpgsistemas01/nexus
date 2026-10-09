@@ -15,3 +15,9 @@
   vista existente en lugar de duplicarla.
 - La documentación usa los términos canónicos del glosario y enlaza la fuente de verdad
   en lugar de copiar extensamente su contenido.
+
+Los diagramas se contrastan con su fuente normativa o técnica. Usar Mermaid y la
+versión configurada por el proyecto; renderizar y revisar una exportación DOCX/PDF
+cuando cambie un diagrama o el exportador. `docs:check` verifica los artefactos
+generados y OpenAPI, pero no sustituye la revisión semántica ni visual. Los criterios
+de publicación se mantienen en la [guía de exportación](../../governance/document-export-guide/index.md).

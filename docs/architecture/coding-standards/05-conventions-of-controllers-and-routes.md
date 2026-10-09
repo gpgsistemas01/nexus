@@ -34,3 +34,15 @@ con el recurso completo, siguiendo los verbos CRUD `get`, `register`, `edit` o `
 Un controller usa `return res...` para hacer explícito el final de la respuesta. El
 código de estado corresponde al resultado HTTP y los errores se entregan al mecanismo
 central existente; no se construye un formato de error paralelo por controlador.
+
+## Registro y autorización de rutas
+
+- Agrupar routers en `src/routes/web` y `src/routes/api` y registrarlos en el `index.js`
+  correspondiente. No añadir registros de dominio directamente a `src/app.js`.
+- Mantener las rutas específicas antes de parámetros generales cuando puedan colisionar.
+  El orden CRUD no debe hacer que `/:id` intercepte un destino estático.
+- Reutilizar los middlewares de autenticación, autorización y validación del recurso.
+  Toda lectura o escritura protegida declara su permiso; el servidor comprueba además
+  el alcance y las relaciones del registro cuando corresponda.
+- Los catálogos auxiliares reutilizan la lista blanca de `admin/catalogs`; su vista y
+  sus escrituras requieren `catalogs:manage`. Conservar las lecturas operativas separadas.

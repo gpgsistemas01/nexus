@@ -27,8 +27,8 @@ La ruta de la prueba reproduce la del módulo, sin crear una carpeta alternativa
 funcionalidad:
 
 ```text
-src/services/warehouse/materials/materialService.js
-tests/unit/services/warehouse/materials/materialServiceTest.js
+src/services/warehouse/materials/supplierMaterialService.js
+tests/unit/services/warehouse/materials/supplierMaterialServiceTest.js
 
 src/controllers/api/warehouse/materialController.js
 tests/unit/controllers/api/warehouse/materialControllerTest.js
@@ -58,3 +58,14 @@ it('actualiza el material y conserva sus relaciones', async () => {
 Para crear, consultar, actualizar y desactivar se reutiliza el mismo harness de la
 suite. Los casos negativos verifican rechazo y ausencia de escritura parcial, no la
 cantidad de llamadas internas a helpers o el orden de imports.
+
+## Ejecución y aislamiento
+
+- Ejecutar las pruebas relacionadas y `npm run test:unit` sin modo watch para la revisión final.
+- Si cambia HTTP, persistencia o transacciones, ejecutar `npm run test:integration` con
+  `DATABASE_TEST_URL` en una base distinta de `DATABASE_URL`. No usar la base de desarrollo
+  o producción para pruebas, aunque cambien el usuario o las credenciales de la URL.
+- `DIRECT_TEST_URL`, cuando se utiliza, también apunta a esa base de pruebas. El comando
+  de integración verifica el entorno y aplica las migraciones antes de ejecutar la suite.
+- Cubrir permisos, estados, límites, separación de contextos y ausencia de efectos
+  parciales cuando sean parte del cambio. No añadir pruebas que sólo repitan la implementación.
