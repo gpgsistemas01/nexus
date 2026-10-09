@@ -1,30 +1,19 @@
-# 1. Responsabilidades y contratos del frontend
+# 1. Responsabilidades y contratos transversales del frontend
 
-La unidad de documentación es el **flujo funcional**, no un archivo aislado. Cada fila
-cubre todos sus módulos propietarios de servicio, aplicación, página y EJS; los símbolos
-compartidos aparecen después en una ficha transversal. De este modo no se presenta
-materiales como si fuera el único flujo documentado ni se repite una ficha idéntica por
-cada operación CRUD. Las rutas concretas se verifican en el [contrato API](../../../openapi/api-contract.md)
-y las páginas publicadas en el [mapa generado](../code-map.md).
+Este capítulo reúne infraestructura, exportación y modos de formulario compartidos.
+Los contratos de pantalla y application particulares se mantienen junto al mapa de
+cada recurso; el [índice de módulos](index.md#módulos) es su única lista de navegación.
 
-### Fichas de flujos funcionales
+### Exportación dentro de las pantallas
 
-| Flujo | Vista y composición | Aplicación y transporte | Contrato y comportamiento propio | Mapa de código propietario |
-| --- | --- | --- | --- | --- |
-| Inicio de sesión | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [authentication](04-authentication-code.md) |
-| Personas | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [persons](05-persons-code.md) |
-| Usuarios | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [users](06-users-code.md) |
-| Clientes | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [clients](07-clients-code.md) |
-| Proveedores | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [suppliers](08-suppliers-code.md) |
-| Materiales | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [materials](09-materials-code.md) |
-| Consumibles | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [consumables](10-consumables-code.md) |
-| Mermas | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [wastes](11-wastes-code.md) |
-| Entradas de almacén | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [goods-receipts](12-goods-receipts-code.md) |
-| Salidas de materiales y consumibles | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [goods-issues](13-goods-issues-code.md) |
-| Salidas de mermas | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [waste-issues](14-waste-issues-code.md) |
-| Movimientos | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [movements](15-movements-code.md) |
-| Catálogos auxiliares | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | Detalle en la referencia del módulo. | [catalogs](16-catalogs-code.md) |
-| Exportaciones dentro de cada módulo | Los botones pertenecen a las páginas de clientes, proveedores, inventarios, compras, salidas, personas, usuarios y movimientos; no existe una página general de reportes. | `createReportApplication.js` adapta el request y devuelve `response.data`; los consumidores coordinan la descarga; `application/{admin,sales,warehouse}/report.js` configura cada `reportService.js` desde la página propietaria. | Cada solicitud `GET .../reports/.../excel` continúa la consulta y los filtros del módulo visible; no decide permisos del servidor. | [Código compartido](03-shared-code-and-coverage.md) |
+Las acciones de exportación pertenecen a las páginas de clientes, proveedores,
+inventarios, compras, salidas, personas, usuarios y movimientos. No existe una página
+general de reportes. `createReportApplication.js` adapta el request y devuelve
+`response.data`; el consumidor coordina la descarga. Los configuradores
+`application/{admin,sales,warehouse}/report.js` usan el servicio HTTP de su área.
+Cada `GET .../reports/.../excel` conserva la consulta y los filtros del módulo visible;
+la autorización sigue en el servidor. Su composición se amplía en
+[código compartido](03-shared-code-and-coverage.md).
 
 ### Fichas de infraestructura compartida
 

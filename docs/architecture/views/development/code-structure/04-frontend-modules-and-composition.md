@@ -39,7 +39,7 @@ se describe en [publicación de eventos](../design-and-construction-patterns/10-
 
 ## Detalle por módulo
 
-La [referencia frontend](../frontend-technical-documentation/02-module-code-maps.md)
+La [referencia frontend](../frontend-technical-documentation/index.md#módulos)
 contiene un mapa para cada módulo con sus entry points, formulario/modal, application,
 requests y dependencias de UI. Las variantes material/consumable aparecen juntas cuando
 comparten pantalla y en módulos separados cuando tienen configuradores propios.

@@ -57,3 +57,12 @@ temporales se consultan en procesos, sin repetirlos con otras etiquetas.
 Al cambiar un recurso se revisan sus archivos y contrato; al cambiar una pieza compartida,
 todos sus configuradores y consumidores. El historial de una extracción pertenece a Git;
 esta vista documenta el resultado vigente y su evidencia disponible.
+
+## Criterio de índices
+
+El índice de esta vista presenta sus colecciones; el `index.md` de cada colección
+localiza sus capítulos o módulos. Un capítulo técnico desarrolla su contrato o decisión,
+sin mantener otra lista equivalente de navegación. Los índices de grupos de secuencias
+sirven para encontrar casos entre muchos archivos y seleccionar su paquete exportable.
+Las tablas de notación, decisiones o cobertura aportan otra pregunta y sólo se conservan
+cuando no reproducen esa misma lista.

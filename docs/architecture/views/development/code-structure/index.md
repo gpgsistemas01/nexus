@@ -6,8 +6,8 @@ navegador y la integración con Prisma. La carpeta técnica `code-structure` con
 su ubicación; su alcance es el conjunto del software.
 
 Los archivos, imports y particularidades de cada recurso pertenecen a las referencias
-técnicas de [backend](../backend-technical-documentation/02-module-code-maps.md) y
-[frontend](../frontend-technical-documentation/02-module-code-maps.md). Las decisiones
+técnicas de [backend](../backend-technical-documentation/index.md#módulos) y
+[frontend](../frontend-technical-documentation/index.md#módulos). Las decisiones
 que se repiten entre recursos se justifican en [patrones](../design-and-construction-patterns/index.md),
 y los contratos de sus núcleos se detallan en [reutilización](../reuse-and-refactoring/index.md).
 Los mapas generales se amplían mediante enlaces, sin reproducir aquí cada módulo.

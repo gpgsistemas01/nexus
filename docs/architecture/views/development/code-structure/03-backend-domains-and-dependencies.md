@@ -50,7 +50,7 @@ la construcción del cliente se detalla en [Prisma](06-prisma-and-persistence.md
 
 ## Detalle por módulo
 
-La [referencia backend](../backend-technical-documentation/02-module-code-maps.md)
+La [referencia backend](../backend-technical-documentation/index.md#módulos)
 contiene un mapa de código para cada módulo. Compras y salidas enumeran ambas variantes
 material/consumable y sus núcleos; el capítulo compartido cubre los 28 routers API,
 transporte web, reportes e infraestructura. Cada figura muestra imports entre archivos,
