@@ -5,16 +5,16 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Router` | boundary | [`wasteApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`wasteController.js`](../../../../../../src/controllers/api/warehouse/wasteController.js) |
 | `StockDto` | control | [`wasteDTO.js`](../../../../../../src/dtos/wasteDTO.js) |
 | `Service` | control | [`wasteService.js`](../../../../../../src/services/warehouse/wastes/wasteService.js) |
@@ -23,6 +23,7 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `Stock` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
 | `Movement` | control | [`wasteMovementService.js`](../../../../../../src/services/warehouse/wastes/wasteMovementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
+| `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
 
 ## Secuencia de implementación
 
@@ -32,6 +33,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Router@{ "type": "boundary" } as Router web
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
     participant StockDto@{ "type": "control" } as DTO funcional
@@ -48,7 +50,8 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Router->>Validator: wasteStockValidation[] y validate(req, res, next)
+    Router->>ValidationRules: wasteStockValidation[] — cadena ejecutada por Express
+    Router->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end

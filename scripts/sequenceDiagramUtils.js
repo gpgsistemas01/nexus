@@ -48,6 +48,9 @@ export const getSequenceStructureErrors = (source) => {
     }
 
     for (const fragment of fragments) errors.push(`fragmento sin cerrar: ${fragment}`);
+    for (const [, fragment] of source.matchAll(/^\s*(alt|opt|loop|par|critical|break|rect|box)\b[^\n]*\n(?:[ \t]*(?:%%[^\n]*)?\n)*[ \t]*end\b/gm)) {
+        errors.push(`fragmento vacío: ${fragment}`);
+    }
     for (const [alias, depth] of activations) {
         if (depth > 0) errors.push(`activación sin cerrar: ${alias}`);
     }
@@ -73,4 +76,25 @@ export const getSequenceParticipantSources = (body, sequence) => {
         ])]);
     }
     return sources;
+};
+
+// Validate one diagram at a time: complementary levels can reuse a source file.
+export const getSequenceLifelineErrors = (body, sequence, externalLabels = new Set()) => {
+    const errors = [];
+    const sources = getSequenceParticipantSources(body, sequence);
+    const owners = new Map();
+    for (const [, alias, label] of sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)) {
+        const paths = sources.get(alias) ?? [];
+        if (!paths.length && externalLabels.has(label)) continue;
+        if (paths.length !== 1) {
+            errors.push(`línea de vida ${alias} debe corresponder a un único archivo (encontrados: ${paths.length})`);
+            continue;
+        }
+        const previous = owners.get(paths[0]);
+        if (previous && previous !== alias) {
+            errors.push(`archivo repetido en líneas de vida ${previous} y ${alias}: ${paths[0]}`);
+        }
+        owners.set(paths[0], alias);
+    }
+    return errors;
 };

@@ -5,20 +5,22 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Router` | boundary | [`authApiRoute.js`](../../../../../../src/routes/api/authApiRoute.js) |
-| `Validator` | control | [`authValidations.js`](../../../../../../src/validators/forms/authValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`authController.js`](../../../../../../src/controllers/api/authController.js) |
 | `Service` | control | [`authService.js`](../../../../../../src/services/authService.js) |
 | `User` | control | [`userService.js`](../../../../../../src/services/admin/userService.js) |
 | `Token` | control | [`jwtService.js`](../../../../../../src/services/jwtService.js) |
 | `Cookies` | boundary | [`cookiesUtils.js`](../../../../../../src/utils/cookiesUtils.js) |
+| `ValidationRules` | control | [`authValidations.js`](../../../../../../src/validators/forms/authValidations.js) |
+| `Password` | control | [`encryptionUtils.js`](../../../../../../src/utils/encryptionUtils.js) |
 
 ## Secuencia de implementación
 
@@ -27,6 +29,7 @@ sequenceDiagram
     autonumber
     participant Browser as Navegador
     participant Router@{ "type": "boundary" } as Router web
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
     participant Service@{ "type": "control" } as Service
@@ -35,8 +38,11 @@ sequenceDiagram
     participant Token@{ "type": "control" } as JWT
     participant Cookies@{ "type": "boundary" } as Cookies
 
+    participant Password@{ "type": "control" } as Contraseña
+
     Browser->>Router: POST /api/auth/login { name, password }
-    Router->>Validator: loginValidation[] y validateLogin(req, res, next)
+    Router->>ValidationRules: loginValidation[] — cadena ejecutada por Express
+    Router->>Validator: validateLogin(req, res, next)
     alt loginValidation rechaza name/password
         Validator-->>Browser: HTTP 400 error { errors }
     else Entrada aceptada
@@ -47,7 +53,8 @@ sequenceDiagram
         activate Prisma
         Prisma-->>User: findUnique(): Promise[User | null]
         deactivate Prisma
-        User->>User: verifyPassword(password, user.password) y validar isActive/accesses
+        User->>Password: verifyPassword(password, user.password) y validar isActive/accesses
+        Password-->>User: verifyPassword(): Promise[boolean]
         User-->>Service: getUserIdByLogin(): Promise[number | null]
         alt Credenciales inválidas o cuenta inactiva
             Service-->>Controller: INVALID_AUTH sin crear tokens ni cookies

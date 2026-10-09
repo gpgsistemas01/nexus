@@ -1,7 +1,7 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import { getSequenceParticipantSources, getSequenceStructureErrors } from './sequenceDiagramUtils.js';
+import { getSequenceLifelineErrors, getSequenceParticipantSources, getSequenceStructureErrors } from './sequenceDiagramUtils.js';
 
 const ROOT = process.cwd();
 const OUTPUTS = {
@@ -104,7 +104,8 @@ const EXTERNAL_SEQUENCE_PARTICIPANTS = new Set([
     'Cliente HTTP / web',
     'Navegador',
     'Prisma / PostgreSQL',
-    'Respuesta Express'
+    'Respuesta Express',
+    'Runtime Express'
 ]);
 const SOURCE_PATH_PATTERN = /src\/[A-Za-z0-9_./-]+\.(?:ejs|js)/g;
 
@@ -274,14 +275,24 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${id} debe contener una secuencia de código o sus niveles complementarios`);
             }
             const sequences = getMermaidBlocks(body);
-            if (sequences.length > 1 && (side !== 'backend' || sequences.length !== 2
-                || !body.includes('## Secuencia de entrada y coordinación')
-                || !body.includes('## Colaboración interna del dominio'))) {
-                failures.push(`diagramas ${side}: ${id} debe identificar los dos niveles complementarios del mismo caso`);
+            const hasComplementaryLevels = side === 'backend'
+                ? sequences.length === 2
+                    && body.includes('## Secuencia de entrada y coordinación')
+                    && body.includes('## Colaboración interna del dominio')
+                : sequences.length === 2
+                    + Number(body.includes('## Preparación de la interfaz'))
+                    + Number(body.includes('## Envío y resultado de la interfaz'))
+                    && body.includes('## Coordinación de la interfaz')
+                    && body.includes('## Colaboración de aplicación y transporte');
+            if (sequences.length > 1 && !hasComplementaryLevels) {
+                failures.push(`diagramas ${side}: ${id} debe identificar los niveles complementarios del mismo caso`);
             }
             const sequence = sequences.join('\n');
             const participantSourceMap = getSequenceParticipantSources(body, sequence);
             for (const error of sequences.flatMap(getSequenceStructureErrors)) {
+                failures.push(`diagramas ${side}: ${id}: ${error}`);
+            }
+            for (const error of sequences.flatMap((block) => getSequenceLifelineErrors(body, block, EXTERNAL_SEQUENCE_PARTICIPANTS))) {
                 failures.push(`diagramas ${side}: ${id}: ${error}`);
             }
             const visualActors = [...sequence.matchAll(/^\s*actor\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
@@ -450,6 +461,18 @@ const validateUseCaseDiagramCoverage = async () => {
         const name = toPosix(path.relative(ROOT, file));
         const source = await readFile(file, 'utf8');
         for (const block of getMermaidBlocks(source).filter((body) => body.startsWith('sequenceDiagram\n'))) {
+            if (name.startsWith('docs/architecture/views/processes/')
+                && !name.includes('-code-sequences/')) {
+                for (const error of [
+                    ...getSequenceStructureErrors(block),
+                    ...getSequenceLifelineErrors(source, block, EXTERNAL_SEQUENCE_PARTICIPANTS)
+                ]) failures.push(`${name}: ${error}`);
+                for (const paths of getSequenceParticipantSources(source, block).values()) {
+                    for (const sourcePath of paths) {
+                        if (!sourceFiles.has(sourcePath)) failures.push(`${name}: archivo inexistente en línea de vida (${sourcePath})`);
+                    }
+                }
+            }
             if (block.split('\n').some((line) => line.includes(';'))) {
                 failures.push(`${name}: una secuencia Mermaid contiene un punto y coma no compatible con GitHub`);
             }

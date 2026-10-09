@@ -5,19 +5,24 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`materialGoodsReceiptApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsReceipts/materials/materialGoodsReceiptApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Controller` | control | [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js)<br/>[`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
+| `Controller` | control | [`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
 | `Facade` | control | [`materialGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) |
 | `Core` | control | [`goodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) |
 | `Helpers` | control | [`goodsReceiptHelpers.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) |
+| `QueryUtils` | control | [`requestQueryUtils.js`](../../../../../../src/utils/requestQueryUtils.js) |
+
+### Configuración y archivos de contexto
+
+El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js).
 
 ## Secuencia de implementación
 
@@ -33,6 +38,10 @@ sequenceDiagram
     participant Helpers@{ "type": "control" } as Helpers del dominio
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
 
+    Note over Controller: Handler generado
+
+    participant QueryUtils@{ "type": "control" } as Consulta HTTP
+
     Client->>Route: GET /api/warehouse/goods-receipts/materials
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
@@ -43,7 +52,8 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Route->>Controller: getAllMaterialGoodsReceipts(req, res)
-    Controller->>Controller: getDataTablePaging(req.query) — filtros, búsqueda y orden de compras
+    Controller->>QueryUtils: getDataTablePaging(req.query) — filtros, búsqueda y orden de compras
+    QueryUtils-->>Controller: getDataTablePaging(): Object
     Controller->>Facade: findAllMaterialGoodsReceipts(query)
     Facade->>Core: findAllGoodsReceipts({ ...options, type: MATERIAL })
     Core->>Helpers: buildGoodsReceiptContextWhere(type)

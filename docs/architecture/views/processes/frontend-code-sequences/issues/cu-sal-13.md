@@ -5,12 +5,12 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Issue` | boundary | [`wasteIssueReturn.js`](../../../../../../src/public/js/pages/warehouse/wasteIssues/returns/wasteIssueReturn.js) |
 | `Return` | boundary | [`issueReturnUI.js`](../../../../../../src/public/js/ui/issues/issueReturnUI.js) |
@@ -18,6 +18,7 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `Request` | boundary | [`wasteIssueService.js`](../../../../../../src/public/js/services/warehouse/wasteIssueService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `API` | control | [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
+| `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
 
 ## Secuencia de implementación
 
@@ -33,12 +34,15 @@ sequenceDiagram
     participant HTTP@{ "type": "boundary" } as Cliente HTTP
     participant API@{ "type": "control" } as Endpoint API
 
+    participant FormUtils@{ "type": "control" } as Form helpers
+
     Initiator->>Browser: inicia CU-SAL-13 — Devolver merma surtida
     Browser->>Issue: selecciona Devolver en un detalle de merma
     Issue->>Issue: initializeWasteIssueReturns({ details, getIssueId })
     Issue->>Return: wasteIssueReturn.open({ issue: { id }, detail })
     Browser->>Return: captura cantidad y confirma
-    Return->>Return: validateFields(issueReturnValidation, formData)
+    Return->>FormUtils: validateFields(issueReturnValidation, formData)
+    FormUtils-->>Return: validateFields(): Object
     Return->>App: returnWasteIssueDetail({ id, detailId, formData })
     App->>Request: returnWasteIssueDetailRequest({ id, detailId, data: formData })
     Request->>HTTP: apiRequest({ method: 'patch', url, data })

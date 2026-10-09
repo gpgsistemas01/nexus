@@ -5,18 +5,24 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `View` | boundary | [`wasteIssuesPage.ejs`](../../../../../../src/views/pages/warehouse/wasteIssues/wasteIssuesPage.ejs) |
-| `Application` | control | [`wasteIssues.js`](../../../../../../src/public/js/application/warehouse/wasteIssues/wasteIssues.js) |
+| `Application` | control | [`createCrudApplication.js`](../../../../../../src/public/js/application/createCrudApplication.js) |
 | `Request` | boundary | [`wasteIssueService.js`](../../../../../../src/public/js/services/warehouse/wasteIssueService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
-| `Transport` | control | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js)<br/>[`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
+| `Transport` | control | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js) |
+
+### Configuración y archivos de contexto
+
+El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-SAL-08`](../../backend-code-sequences/issues/cu-sal-08.md#cu-sal-08): [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js).
+
+La aplicación ejecuta closures de `createCrudApplication.js`, configuradas por [`wasteIssues.js`](../../../../../../src/public/js/application/warehouse/wasteIssues/wasteIssues.js) mediante [`createIssueApplication.js`](../../../../../../src/public/js/application/warehouse/issues/createIssueApplication.js). Estos archivos de construcción no añaden delegaciones por petición.
 
 ## Secuencia de implementación
 
@@ -25,7 +31,7 @@ sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant View@{ "type": "boundary" } as Pantalla JS
     participant Application@{ "type": "control" } as Application
     participant Request@{ "type": "boundary" } as Requests del recurso
     participant HTTP@{ "type": "boundary" } as Cliente HTTP

@@ -5,22 +5,24 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`wasteApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`wasteController.js`](../../../../../../src/controllers/api/warehouse/wasteController.js) |
 | `WasteDto` | control | [`wasteDTO.js`](../../../../../../src/dtos/wasteDTO.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
-| `Domain` | control | [`wasteMaterialService.js`](../../../../../../src/services/warehouse/wastes/wasteMaterialService.js)<br/>[`wasteService.js`](../../../../../../src/services/warehouse/wastes/wasteService.js) |
+| `Domain` | control | [`wasteService.js`](../../../../../../src/services/warehouse/wastes/wasteService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
+| `Templates` | control | [`wasteMaterialService.js`](../../../../../../src/services/warehouse/wastes/wasteMaterialService.js) |
 
 ## Secuencia de implementación
 
@@ -30,11 +32,13 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as Router API
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
     participant WasteDto@{ "type": "control" } as DTO funcional
     participant Formatter@{ "type": "control" } as Formato
     participant Domain@{ "type": "control" } as Servicio de dominio
+    participant Templates@{ "type": "control" } as Plantillas de merma
     participant Socket@{ "type": "control" } as Eventos Socket.IO
     participant ErrorHandler@{ "type": "control" } as Errores Express
 
@@ -48,8 +52,8 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Route->>Controller: getWasteMaterialTemplates(req, res)
-    Controller->>Domain: findWasteMaterialTemplates({ search, skip, take, supplierId })
-    Domain-->>Controller: findWasteMaterialTemplates(): Promise[Object[]]
+    Controller->>Templates: findWasteMaterialTemplates({ search, skip, take, supplierId })
+    Templates-->>Controller: findWasteMaterialTemplates(): Promise[Object[]]
     Controller-->>Client: HTTP 200 { code, data: templates }
 
     Client->>Route: POST /api/warehouse/wastes
@@ -57,7 +61,8 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>Validator: wasteValidation[] y validate(req, res, next)
+    Route->>ValidationRules: wasteValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end

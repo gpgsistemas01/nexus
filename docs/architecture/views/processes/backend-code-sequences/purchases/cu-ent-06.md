@@ -10,12 +10,12 @@
     end
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`materialGoodsReceiptReportApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
@@ -26,6 +26,7 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `List` | control | [`goodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) |
 | `Excel` | control | [`reportExcelUtils.js`](../../../../../../src/utils/reportExcelUtils.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 
 ## Secuencia de implementación
 
@@ -44,6 +45,8 @@ sequenceDiagram
     participant Excel@{ "type": "control" } as Reporte Excel
     participant ErrorHandler@{ "type": "control" } as Errores Express
 
+    participant Formatter@{ "type": "control" } as Formato
+
     Client->>Route: GET /api/warehouse/reports/goods-receipts/materials/excel
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
@@ -56,7 +59,8 @@ sequenceDiagram
     Route->>Controller: exportMaterialGoodsReceiptReportExcel(req, res)
     alt Exportación resuelta
         Controller->>Core: exportGoodsReceiptReportExcel({ req, res, materialType, findGoodsReceiptReportRows })
-        Core->>Core: getReportMonthDateRange(reportMonth) cuando el reporte es mensual
+        Core->>Formatter: getReportMonthDateRange(reportMonth) cuando el reporte es mensual
+        Formatter-->>Core: getReportMonthDateRange(): Object
         Core->>Facade: findMaterialGoodsReceiptReportRows(options)
         Facade->>Query: findGoodsReceiptReportRows({ ...options, type: MATERIAL })
         Query->>List: findAllGoodsReceipts({ ...filtros, type, includeCounts: false, skip: 0, take: 100000 })
@@ -67,7 +71,8 @@ sequenceDiagram
         List-->>Query: findAllGoodsReceipts(): Promise[{ data }] — sin conteos
         Query-->>Facade: findGoodsReceiptReportRows(): Promise[Object[]]
         Facade-->>Core: findMaterialGoodsReceiptReportRows(): Promise[Object[]]
-        Core->>Core: buildMonthlyGoodsReceiptSummary(rows) si se solicita resumen mensual
+        Core->>Query: buildMonthlyGoodsReceiptSummary(rows) si se solicita resumen mensual
+        Query-->>Core: buildMonthlyGoodsReceiptSummary(): Object
         Core->>Excel: sendExcelReport({ res, data, sheetName, filename })
         Excel-->>Client: HTTP 200 archivo XLSX
     else Error de lectura o exportación

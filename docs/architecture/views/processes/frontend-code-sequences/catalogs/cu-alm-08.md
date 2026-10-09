@@ -5,19 +5,25 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `View` | boundary | [`movementDatatable.js`](../../../../../../src/public/js/plugins/datatable/admin/movements/movementDatatable.js) |
 | `Dialog` | boundary | [`reportExportDialog.js`](../../../../../../src/public/js/ui/reportExportDialog.js) |
-| `Application` | control | [`report.js`](../../../../../../src/public/js/application/admin/report.js) |
+| `Application` | control | [`createReportApplication.js`](../../../../../../src/public/js/application/createReportApplication.js) |
 | `Request` | boundary | [`reportService.js`](../../../../../../src/public/js/services/admin/reportService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
-| `Transport` | control | [`reportApiRoute.js`](../../../../../../src/routes/api/admin/reportApiRoute.js)<br/>[`reportController.js`](../../../../../../src/controllers/api/admin/reportController.js) |
+| `Transport` | control | [`reportApiRoute.js`](../../../../../../src/routes/api/admin/reportApiRoute.js) |
+
+### Configuración y archivos de contexto
+
+El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-ALM-08`](../../backend-code-sequences/catalogs/cu-alm-08.md#cu-alm-08): [`reportController.js`](../../../../../../src/controllers/api/admin/reportController.js).
+
+La línea `Application` ejecuta la función generada en `createReportApplication.js`. Su nombre público y la configuración de requests/contratos provienen de [`report.js`](../../../../../../src/public/js/application/admin/report.js); exportar esa función no crea otra llamada durante cada petición.
 
 ## Secuencia de implementación
 
@@ -26,7 +32,7 @@ sequenceDiagram
     autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant View@{ "type": "boundary" } as Pantalla JS
     participant Dialog@{ "type": "boundary" } as Diálogo
     participant Application@{ "type": "control" } as Application
     participant Request@{ "type": "boundary" } as Requests del recurso

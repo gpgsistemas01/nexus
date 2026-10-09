@@ -5,18 +5,25 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `View` | boundary | [`userModal.js`](../../../../../../src/public/js/pages/admin/users/userModal.js) |
-| `Application` | control | [`users.js`](../../../../../../src/public/js/application/admin/users/users.js) |
+| `Application` | control | [`createCrudApplication.js`](../../../../../../src/public/js/application/createCrudApplication.js) |
 | `Request` | boundary | [`userService.js`](../../../../../../src/public/js/services/admin/userService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
-| `Transport` | control | [`userApiRoute.js`](../../../../../../src/routes/api/admin/userApiRoute.js)<br/>[`userController.js`](../../../../../../src/controllers/api/admin/userController.js) |
+| `Transport` | control | [`userApiRoute.js`](../../../../../../src/routes/api/admin/userApiRoute.js) |
+| `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
+
+### Configuración y archivos de contexto
+
+El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-IDA-07`](../../backend-code-sequences/identity-access/cu-ida-07.md#cu-ida-07): [`userController.js`](../../../../../../src/controllers/api/admin/userController.js).
+
+La línea `Application` ejecuta la función generada en `createCrudApplication.js`. Su nombre público y la configuración de requests/contratos provienen de [`users.js`](../../../../../../src/public/js/application/admin/users/users.js); exportar esa función no crea otra llamada durante cada petición.
 
 ## Secuencia de implementación
 
@@ -25,7 +32,8 @@ sequenceDiagram
     autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant View@{ "type": "boundary" } as Pantalla JS
+    participant FormUtils@{ "type": "control" } as Form helpers
     participant Application@{ "type": "control" } as Application
     participant Request@{ "type": "boundary" } as Requests del recurso
     participant HTTP@{ "type": "boundary" } as Cliente HTTP
@@ -33,7 +41,8 @@ sequenceDiagram
 
     Initiator->>Browser: inicia CU-IDA-07 — Editar usuario y acceso
     Browser->>View: userModal.js abre la cuenta y acceso existentes
-    View->>View: validateFields(userEditValidation, formData)
+    View->>FormUtils: validateFields(userEditValidation, formData)
+    FormUtils-->>View: validateFields(): Object — errores por campo
     alt userEditValidation devuelve errores
         View-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido

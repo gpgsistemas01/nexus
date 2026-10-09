@@ -1,28 +1,19 @@
 # 1. Recorrido extremo a extremo de una interacción
 
-Esta secuencia complementa el
-[diagrama de componentes](../logical/01-components-and-reuse.md#componentes-y-conexión-entre-frontend-y-backend):
-aquí las flechas representan orden temporal, no dependencias estructurales. El contrato
-de cada intercambio permanece en el contrato API y en OpenAPI.
+El recorrido se lee enlazando las dos realizaciones del mismo caso. Para consultar
+proveedores, empieza en [frontend `CU-CAT-01`](frontend-code-sequences/catalogs/cu-cat-01.md#cu-cat-01)
+y continúa en [backend `CU-CAT-01`](backend-code-sequences/catalogs/cu-cat-01.md#cu-cat-01).
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as Usuario
-    participant V@{ "type": "boundary" } as Vista EJS + JS
-    participant R@{ "type": "boundary" } as Ruta / middleware
-    participant C@{ "type": "control" } as Controlador
-    participant S@{ "type": "control" } as Servicio
-    participant P@{ "type": "database" } as Prisma / PostgreSQL
+La primera secuencia identifica el módulo de entrada, el adaptador de tabla, el núcleo
+DataTable, la aplicación, el request y el cliente HTTP. La flecha `GET /api/warehouse/suppliers`
+llega al router que constituye la frontera de la segunda secuencia. Desde allí se siguen
+los archivos de autenticación, controller y servicio hasta la persistencia, y después
+la respuesta vuelve al callback AJAX que actualiza la tabla.
 
-    U->>V: abre una pantalla o ejecuta una acción
-    V->>R: petición web o API
-    R->>R: autentica, autoriza y valida
-    R->>C: delega la petición
-    C->>S: coordina el caso de uso
-    S->>P: consulta o modifica datos
-    P-->>S: resultado
-    S-->>C: resultado de dominio
-    C-->>V: HTML o JSON
-    V-->>U: actualiza la interfaz
-```
+Cada participante técnico de esas secuencias corresponde a un archivo. La plantilla
+EJS aporta el HTML antes de ejecutar el módulo JavaScript; no comparte su línea de vida.
+El navegador y la base de datos son límites externos. La estructura general permanece
+en el [diagrama de componentes](../logical/01-components-and-reuse.md#componentes-y-conexión-entre-frontend-y-backend),
+y el contrato de los intercambios permanece en la documentación API y en OpenAPI.
+Así se conserva el recorrido completo mediante referencias a sus fuentes, sin añadir
+una tercera secuencia de capas agrupadas que repita ambos casos.

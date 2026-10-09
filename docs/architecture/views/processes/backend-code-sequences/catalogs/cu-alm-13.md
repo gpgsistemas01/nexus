@@ -5,22 +5,25 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Router` | boundary | [`wasteApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`wasteController.js`](../../../../../../src/controllers/api/warehouse/wasteController.js) |
 | `StockDto` | control | [`wasteDTO.js`](../../../../../../src/dtos/wasteDTO.js) |
 | `Service` | control | [`wasteService.js`](../../../../../../src/services/warehouse/wastes/wasteService.js) |
 | `Entry` | control | [`wasteStockEntryService.js`](../../../../../../src/services/warehouse/wastes/wasteStockEntryService.js) |
 | `Movement` | control | [`wasteMovementService.js`](../../../../../../src/services/warehouse/wastes/wasteMovementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
+| `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
+| `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
+| `Stock` | control | [`wasteInventoryService.js`](../../../../../../src/services/warehouse/wastes/wasteInventoryService.js) |
 
 ## Secuencia de implementación
 
@@ -30,12 +33,15 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Router@{ "type": "boundary" } as Router web
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
     participant StockDto@{ "type": "control" } as DTO funcional
     participant Service@{ "type": "control" } as Service
     participant Entry@{ "type": "control" } as Entrada de stock
     participant Movement@{ "type": "control" } as Movimiento
+    participant Reference@{ "type": "control" } as Folio documental
+    participant Stock@{ "type": "control" } as Stock de merma
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket@{ "type": "control" } as Eventos Socket.IO
 
@@ -44,7 +50,8 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Router->>Validator: wasteStockAdditionValidation[] y validate(req, res, next)
+    Router->>ValidationRules: wasteStockAdditionValidation[] — cadena ejecutada por Express
+    Router->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end
@@ -61,9 +68,14 @@ sequenceDiagram
     Service->>Prisma: getDb().$transaction(async tx => ...)
     Service->>Prisma: tx.waste.findUnique({ where: { id } })
     Service->>Entry: registerWasteStockEntry({ tx, waste, quantity, observations, userId })
-    Entry->>Prisma: generateYearlyReferenceNumber({ type: WASTE_STOCK_ENTRY, tx })
+    Entry->>Reference: generateYearlyReferenceNumber({ type: WASTE_STOCK_ENTRY, tx })
+    Reference->>Prisma: tx.referenceNumberCounter.upsert({ where, update, create })
+    Reference-->>Entry: generateYearlyReferenceNumber(): Promise[string]
     Entry->>Movement: applyWasteMovement({ tx, movementType: ENTRY, details })
-    Movement->>Prisma: applyWasteStockChange({ tx, id, quantityChange, convertedQuantityChange })
+    Movement->>Stock: applyWasteStockChange({ tx, id, quantityChange, convertedQuantityChange })
+    Stock->>Prisma: getDb(tx).waste.findUnique({ where: { id } })
+    Stock->>Prisma: getDb(tx).waste.updateMany({ where, data })
+    Stock-->>Movement: applyWasteStockChange(): Promise[Object]
     Movement->>Movement: createWasteMovement({ tx, movementType: ENTRY, details })
     Movement->>Prisma: tx.wasteMovement.create({ type: ENTRY, details })
     Entry->>Prisma: tx.wasteStockEntry.create({ folio, actor, captura, saldos, movementId })

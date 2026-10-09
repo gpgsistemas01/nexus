@@ -5,20 +5,21 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`materialApiRoute.js`](../../../../../../src/routes/api/warehouse/materialApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`materialValidations.js`](../../../../../../src/validators/forms/materialValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`materialController.js`](../../../../../../src/controllers/api/warehouse/materialController.js) |
 | `MaterialDto` | control | [`materialDTO.js`](../../../../../../src/dtos/materialDTO.js) |
 | `Domain` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ValidationRules` | control | [`materialValidations.js`](../../../../../../src/validators/forms/materialValidations.js) |
 
 ## Secuencia de implementación
 
@@ -28,6 +29,7 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as Router API
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
     participant MaterialDto@{ "type": "control" } as DTO funcional
@@ -39,7 +41,8 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>Validator: materialEditValidation[] y validate(req, res, next)
+    Route->>ValidationRules: materialEditValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end

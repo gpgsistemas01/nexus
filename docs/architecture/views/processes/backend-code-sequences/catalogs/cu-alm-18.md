@@ -5,16 +5,16 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`consumableApiRoute.js`](../../../../../../src/routes/api/warehouse/consumableApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`materialValidations.js`](../../../../../../src/validators/forms/materialValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`consumableController.js`](../../../../../../src/controllers/api/warehouse/consumableController.js) |
 | `MaterialDto` | control | [`materialDTO.js`](../../../../../../src/dtos/materialDTO.js) |
 | `Domain` | control | [`consumableService.js`](../../../../../../src/services/warehouse/consumables/consumableService.js) |
@@ -25,6 +25,8 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
 | `Adjustment` | control | [`adjustmentService.js`](../../../../../../src/services/warehouse/adjustmentService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ValidationRules` | control | [`materialValidations.js`](../../../../../../src/validators/forms/materialValidations.js) |
+| `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 
 ## Secuencia de implementación
 
@@ -34,8 +36,10 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as Router API
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
+    participant Formatter@{ "type": "control" } as Formato
     participant MaterialDto@{ "type": "control" } as DTO funcional
     participant Domain@{ "type": "control" } as Servicio de dominio
     participant MaterialService@{ "type": "control" } as Servicio de material
@@ -52,7 +56,8 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>Validator: materialValidation[] y validate(req, res, next)
+    Route->>ValidationRules: materialValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end
@@ -69,7 +74,7 @@ sequenceDiagram
         activate MaterialDto
         MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
         deactivate MaterialDto
-        Controller->>Controller: sanitizeEmptyStrings(materialDto)
+        Controller->>Formatter: sanitizeEmptyStrings(materialDto)
         Controller->>Domain: createConsumable({ consumableDto, userId })
         Domain->>MaterialService: createMaterial({ materialDto: dimensiones nulas, type: CONSUMABLE, userId })
         activate MaterialService

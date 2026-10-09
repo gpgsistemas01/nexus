@@ -5,20 +5,26 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `View` | boundary | [`wasteIssueDatatable.js`](../../../../../../src/public/js/plugins/datatable/warehouse/wasteIssues/wasteIssueDatatable.js) |
 | `Export` | control | [`tableUI.js`](../../../../../../src/public/js/ui/tableUI.js) |
 | `Dialog` | boundary | [`reportExportDialog.js`](../../../../../../src/public/js/ui/reportExportDialog.js) |
-| `Application` | control | [`report.js`](../../../../../../src/public/js/application/warehouse/report.js)<br/>[`createReportApplication.js`](../../../../../../src/public/js/application/createReportApplication.js) |
+| `Application` | control | [`createReportApplication.js`](../../../../../../src/public/js/application/createReportApplication.js) |
 | `Request` | boundary | [`reportService.js`](../../../../../../src/public/js/services/warehouse/reportService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
-| `Transport` | control | [`reportApiRoute.js`](../../../../../../src/routes/api/warehouse/reportApiRoute.js)<br/>[`reportController.js`](../../../../../../src/controllers/api/warehouse/reportController.js) |
+| `Transport` | control | [`reportApiRoute.js`](../../../../../../src/routes/api/warehouse/reportApiRoute.js) |
+
+### Configuración y archivos de contexto
+
+Estos módulos seleccionan/configuran y exportan la función de aplicación. Su cuerpo se ejecuta en la fábrica de la línea `Application`, sin una llamada intermedia entre reexports: [`report.js`](../../../../../../src/public/js/application/warehouse/report.js).
+
+El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-SAL-14`](../../backend-code-sequences/issues/cu-sal-14.md#cu-sal-14): [`reportController.js`](../../../../../../src/controllers/api/warehouse/reportController.js).
 
 ## Secuencia de implementación
 
@@ -27,13 +33,15 @@ sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant View@{ "type": "boundary" } as Pantalla JS
     participant Export@{ "type": "control" } as Descarga
     participant Dialog@{ "type": "boundary" } as Diálogo
     participant Application@{ "type": "control" } as Application
     participant Request@{ "type": "boundary" } as Requests del recurso
     participant HTTP@{ "type": "boundary" } as Cliente HTTP
     participant Transport@{ "type": "control" } as Endpoint API
+
+    Note over Application: Closure configurada
 
     Initiator->>Browser: inicia CU-SAL-14 — Generar reporte de salidas de merma
     Browser->>Export: buildExcelButton(...).action()

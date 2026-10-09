@@ -76,7 +76,7 @@ de reportes. Los reportes de compras/salidas usan requests específicos por vari
 | Código | Contrato y cobertura |
 | --- | --- |
 | `application/createCrudApplication.js`, `warehouse/issues/createIssueApplication.js` | Closures y adaptación de mutaciones; los configuradores están en los mapas por módulo. |
-| `services/axiosInstanceApi.js`, `api` | Request, sesión y normalización de errores. La [renovación compartida](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http) tiene una sola secuencia en procesos. |
+| `services/axiosInstanceApi.js`, `api` | Request, sesión y normalización de errores. La [renovación compartida](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http) tiene una colaboración canónica, dividida en espera y resolución, en procesos. |
 | `ui/forms`, `ui/inventory`, `ui/issues`, `ui/modalUI.js` | Selectores, callbacks, modo y ownership; los consumidores se muestran en cada módulo y en reutilización. |
 | `plugins/datatable/core`, `shared`, `select2`, `flatpickr`, `swal`, `mdb` | Adaptadores y builders; el código específico de cada recurso conserva su configuración. |
 | `utils`, `constants` | Validaciones del navegador, formato, identidades, selectores y valores compartidos. |

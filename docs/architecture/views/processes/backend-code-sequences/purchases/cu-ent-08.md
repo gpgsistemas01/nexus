@@ -10,20 +10,20 @@ independiente de proveedores.
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`consumableGoodsReceiptApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
-| `Controller` | control | [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js)<br/>[`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
 | `Facade` | control | [`consumableGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js) |
 | `Core` | control | [`goodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) |
-| `Helpers` | control | [`goodsReceiptHelpers.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js)<br/>[`supplierService.js`](../../../../../../src/services/warehouse/supplierService.js)<br/>[`personService.js`](../../../../../../src/services/admin/person/personService.js) |
+| `Helpers` | control | [`goodsReceiptHelpers.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) |
 | `Inventory` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `DTO` | control | [`goodsReceiptDTO.js`](../../../../../../src/dtos/goodsReceiptDTO.js) |
@@ -31,6 +31,14 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Invoice` | control | [`goodsReceiptInvoiceService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
+| `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
+| `Supplier` | control | [`supplierService.js`](../../../../../../src/services/warehouse/supplierService.js) |
+| `Person` | control | [`personService.js`](../../../../../../src/services/admin/person/personService.js) |
+| `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
+
+### Configuración y archivos de contexto
+
+El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js).
 
 ## Secuencia de entrada y coordinación
 
@@ -44,20 +52,25 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as Router API
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
+    participant Formatter@{ "type": "control" } as Formato
     participant Facade@{ "type": "control" } as Adaptador del tipo
     participant Core@{ "type": "control" } as Núcleo del dominio
     participant Socket@{ "type": "control" } as Eventos Socket.IO
     participant DTO@{ "type": "control" } as DTO funcional
     participant ErrorHandler@{ "type": "control" } as Errores Express
 
+    Note over Controller: Handler generado
+
     Client->>Route: POST /api/warehouse/goods-receipts/consumables
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>Validator: goodsReceiptValidation[] y validate(req, res, next)
+    Route->>ValidationRules: goodsReceiptValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end
@@ -70,7 +83,7 @@ sequenceDiagram
     activate DTO
     DTO-->>Controller: createGoodsReceiptDtoForRegister(): Object — DTO normalizado
     deactivate DTO
-    Controller->>Controller: sanitizeEmptyStrings(dto)
+    Controller->>Formatter: sanitizeEmptyStrings(dto)
     Controller->>Facade: createConsumableGoodsReceipt(options con DTO, identificadores y actor cuando corresponde)
     Facade->>Core: createGoodsReceipt({ ...options, type: CONSUMABLE })
     Note over Facade,Core: Realización detallada en la colaboración de dominio
@@ -99,6 +112,8 @@ sequenceDiagram
     participant Facade@{ "type": "control" } as Adaptador del tipo
     participant Core@{ "type": "control" } as Núcleo del dominio
     participant Helpers@{ "type": "control" } as Helpers del dominio
+    participant Supplier@{ "type": "control" } as Proveedor
+    participant Person@{ "type": "control" } as Persona
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Inventory@{ "type": "control" } as Inventario
     participant Costs@{ "type": "control" } as Costo del material
@@ -108,13 +123,13 @@ sequenceDiagram
     Facade->>Core: createGoodsReceipt({ ...options, type: CONSUMABLE })
     activate Core
     alt Servicio resuelto
-        Core->>Helpers: findUniqueSupplier({ id: supplierId })
-        Helpers-->>Core: findUniqueSupplier(): Promise[Supplier]
+        Core->>Supplier: findUniqueSupplier({ id: supplierId })
+        Supplier-->>Core: findUniqueSupplier(): Promise[Supplier]
         Note over Core: SupplierInactiveConflict si el proveedor está inactivo
         Core->>Invoice: assertGoodsReceiptInvoiceAvailable({ supplierId, invoice })
         Invoice-->>Core: assertGoodsReceiptInvoiceAvailable(): Promise[void]
-        Core->>Helpers: findPersonById({ id: receivedById })
-        Helpers-->>Core: findPersonById(): Promise[Person | null]
+        Core->>Person: findPersonById({ id: receivedById })
+        Person-->>Core: findPersonById(): Promise[Person | null]
         Note over Core: PersonReceivedByNotFound si falta el receptor
         Core->>Helpers: buildGoodsReceiptDetails(details, { supplierId, type })
         Helpers-->>Core: buildGoodsReceiptDetails(): Promise[Object[]]
@@ -126,7 +141,8 @@ sequenceDiagram
             Core->>Reference: generateYearlyReferenceNumber({ tx, ... })
             Core->>Prisma: tx.goodsReceipt.create({ data: { type, referenceNumber, ... } })
             Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
-            Inventory->>Prisma: createInventoryMovement({ tx, ... })
+            Inventory->>Inventory: createInventoryMovement({ tx, ... })
+            Inventory->>Prisma: db.inventoryMovement.create({ data, include: { details: true } })
             Note over Inventory,Prisma: applyInventoryMovement también actualiza stock con el mismo tx
         end
         Prisma-->>Core: commit y compra creada

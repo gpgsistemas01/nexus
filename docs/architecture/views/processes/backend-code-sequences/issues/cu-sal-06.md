@@ -5,17 +5,17 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`materialGoodsIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`goodsIssueValidations.js`](../../../../../../src/validators/forms/goodsIssueValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
-| `Controller` | control | [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js)<br/>[`goodsIssueHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`goodsIssueHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js) |
 | `Facade` | control | [`materialGoodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js) |
 | `Core` | control | [`goodsIssueReturnService.js`](../../../../../../src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js) |
 | `Helpers` | control | [`goodsIssueHelpers.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js) |
@@ -26,6 +26,12 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `Fulfillment` | control | [`fulfillmentStatusService.js`](../../../../../../src/services/warehouse/fulfillmentStatusService.js) |
 | `Status` | control | [`issueFulfillmentRules.js`](../../../../../../src/services/warehouse/issues/issueFulfillmentRules.js) |
+| `ValidationRules` | control | [`goodsIssueValidations.js`](../../../../../../src/validators/forms/goodsIssueValidations.js) |
+| `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
+
+### Configuración y archivos de contexto
+
+El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js).
 
 ## Secuencia de entrada y coordinación
 
@@ -39,20 +45,25 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as Router API
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
+    participant Formatter@{ "type": "control" } as Formato
     participant Facade@{ "type": "control" } as Adaptador del tipo
     participant Core@{ "type": "control" } as Núcleo del dominio
     participant Socket@{ "type": "control" } as Eventos Socket.IO
     participant DTO@{ "type": "control" } as DTO funcional
     participant ErrorHandler@{ "type": "control" } as Errores Express
 
+    Note over Controller: Handler generado
+
     Client->>Route: PATCH /api/warehouse/goods-issues/materials/:id/details/:detailId/returns
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>Validator: goodsIssueReturnValidation[] y validate(req, res, next)
+    Route->>ValidationRules: goodsIssueReturnValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end
@@ -65,13 +76,14 @@ sequenceDiagram
     activate DTO
     DTO-->>Controller: createGoodsIssueDtoForReturn(): Object — DTO normalizado
     deactivate DTO
-    Controller->>Controller: sanitizeEmptyStrings(dto)
+    Controller->>Formatter: sanitizeEmptyStrings(dto)
     Controller->>Facade: returnMaterialGoodsIssueDetail(options con DTO, identificadores y actor cuando corresponde)
     Facade->>Core: returnGoodsIssueDetail({ ...options, type: MATERIAL })
     Note over Facade,Core: Realización detallada en la colaboración de dominio
     alt Servicio resuelto
         rect rgb(245, 245, 245)
-            Core->>Core: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
+            Core->>Formatter: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
+            Formatter-->>Core: normalizeDecimal(): number
         end
         Core-->>Facade: returnGoodsIssueDetail(): Promise[{ ...goodsIssueReturn, detail: updatedDetail }]
         Facade-->>Controller: returnMaterialGoodsIssueDetail(): Promise[{ ...goodsIssueReturn, detail: updatedDetail }]
@@ -101,6 +113,8 @@ sequenceDiagram
     participant Fulfillment@{ "type": "control" } as Cumplimiento
     participant Status@{ "type": "control" } as Estado
 
+    participant Formatter@{ "type": "control" } as Formato
+
     Facade->>Core: returnGoodsIssueDetail({ ...options, type: MATERIAL })
     activate Core
     alt Servicio resuelto
@@ -109,7 +123,8 @@ sequenceDiagram
             Note over Core,Prisma: getDb().$transaction(async tx => ...)
             Core->>Fulfillment: findFulfillmentStatusIdsByName({ tx, names })
             Core->>Prisma: tx.goodsIssueDetail.findFirst({ where: { id: detailId, goodsIssueId: id, goodsIssue: contextWhere } })
-            Core->>Core: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
+            Core->>Formatter: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
+            Formatter-->>Core: normalizeDecimal(): number
             Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
             Core->>Prisma: tx.goodsIssueDetail.update({ where: { id: detailId }, data: devolución y cumplimiento })
             Core->>Prisma: tx.goodsIssueDetail.findMany({ where: { goodsIssueId: id } })

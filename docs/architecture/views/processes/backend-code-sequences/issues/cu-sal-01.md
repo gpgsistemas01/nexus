@@ -5,19 +5,24 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`materialGoodsIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Controller` | control | [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js)<br/>[`goodsIssueHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js) |
+| `Controller` | control | [`goodsIssueHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js) |
 | `Facade` | control | [`materialGoodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js) |
 | `Core` | control | [`goodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js) |
 | `Helpers` | control | [`goodsIssueHelpers.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js) |
+| `IssueQueryUtils` | control | [`issueQueryUtils.js`](../../../../../../src/utils/issueQueryUtils.js) |
+
+### Configuración y archivos de contexto
+
+El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js).
 
 ## Secuencia de implementación
 
@@ -33,6 +38,10 @@ sequenceDiagram
     participant Helpers@{ "type": "control" } as Helpers del dominio
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
 
+    Note over Controller: Handler generado
+
+    participant IssueQueryUtils@{ "type": "control" } as issueQueryUtils.js
+
     Client->>Route: GET /api/warehouse/goods-issues/materials
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
@@ -43,7 +52,8 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Route->>Controller: getAllMaterialGoodsIssues(req, res)
-    Controller->>Controller: getIssueDataTableQuery({ query, columns })
+    Controller->>IssueQueryUtils: getIssueDataTableQuery({ query, columns })
+    IssueQueryUtils-->>Controller: getIssueDataTableQuery(): Object
     Controller->>Facade: findAllMaterialGoodsIssues(query)
     Facade->>Core: findAllGoodsIssues({ ...options, type: MATERIAL })
     Core->>Helpers: buildGoodsIssueContextWhere(type)

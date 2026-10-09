@@ -5,17 +5,17 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`consumableGoodsReceiptApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
-| `Controller` | control | [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js)<br/>[`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
 | `Facade` | control | [`consumableGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js) |
 | `Core` | control | [`goodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) |
 | `Helpers` | control | [`goodsReceiptHelpers.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) |
@@ -25,6 +25,12 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Invoice` | control | [`goodsReceiptInvoiceService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) |
+| `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
+| `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
+
+### Configuración y archivos de contexto
+
+El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js).
 
 ## Secuencia de entrada y coordinación
 
@@ -38,20 +44,25 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as Router API
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
+    participant Formatter@{ "type": "control" } as Formato
     participant Facade@{ "type": "control" } as Adaptador del tipo
     participant Core@{ "type": "control" } as Núcleo del dominio
     participant Socket@{ "type": "control" } as Eventos Socket.IO
     participant DTO@{ "type": "control" } as DTO funcional
     participant ErrorHandler@{ "type": "control" } as Errores Express
 
+    Note over Controller: Handler generado
+
     Client->>Route: PATCH /api/warehouse/goods-receipts/consumables/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>Validator: goodsReceiptHeaderValidation[] y validate(req, res, next)
+    Route->>ValidationRules: goodsReceiptHeaderValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end
@@ -64,7 +75,7 @@ sequenceDiagram
     activate DTO
     DTO-->>Controller: createGoodsReceiptDtoForEdit(): Object — DTO normalizado
     deactivate DTO
-    Controller->>Controller: sanitizeEmptyStrings(dto)
+    Controller->>Formatter: sanitizeEmptyStrings(dto)
     Controller->>Facade: updateConsumableGoodsReceipt(options con DTO, identificadores y actor cuando corresponde)
     Facade->>Core: updateGoodsReceipt({ ...options, type: CONSUMABLE })
     Note over Facade,Core: Realización detallada en la colaboración de dominio

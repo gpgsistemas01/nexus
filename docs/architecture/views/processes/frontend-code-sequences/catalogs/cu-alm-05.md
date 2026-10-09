@@ -5,12 +5,12 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `EJS` | boundary | [`materialsPage.ejs`](../../../../../../src/views/pages/warehouse/materials/materialsPage.ejs) |
 | `Form` | boundary | [`materialForm.js`](../../../../../../src/public/js/pages/warehouse/materials/materialForm.js) |
@@ -19,6 +19,7 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `Request` | boundary | [`materialService.js`](../../../../../../src/public/js/services/warehouse/materialService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `API` | control | [`materialController.js`](../../../../../../src/controllers/api/warehouse/materialController.js) |
+| `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
 
 ## Secuencia de implementación
 
@@ -35,9 +36,12 @@ sequenceDiagram
     participant HTTP@{ "type": "boundary" } as Cliente HTTP
     participant API@{ "type": "control" } as Endpoint API
 
+    participant FormUtils@{ "type": "control" } as Form helpers
+
     Initiator->>Browser: inicia CU-ALM-05 — Ajustar existencia de material
     Browser->>Form: confirma ajuste
-    Form->>Form: validateFields(materialStockValidation, formData)
+    Form->>FormUtils: validateFields(materialStockValidation, formData)
+    FormUtils-->>Form: validateFields(): Object
     alt materialStockValidation devuelve errores
         Form-->>Browser: useForm.getErrors() conserva datos y muestra errores por campo
     else Formulario válido

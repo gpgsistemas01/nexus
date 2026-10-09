@@ -5,17 +5,17 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`materialGoodsReceiptApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsReceipts/materials/materialGoodsReceiptApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js)<br/>[`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
-| `Controller` | control | [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js)<br/>[`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
 | `Facade` | control | [`materialGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) |
 | `Core` | control | [`goodsReceiptCorrectionService.js`](../../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js) |
 | `Helpers` | control | [`goodsReceiptHelpers.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) |
@@ -26,6 +26,12 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
 | `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
+| `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
+
+### Configuración y archivos de contexto
+
+El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js).
 
 ## Secuencia de entrada y coordinación
 
@@ -39,20 +45,27 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as Router API
     participant Auth@{ "type": "control" } as Acceso
+    participant ValidationRules@{ "type": "control" } as Reglas de entrada
     participant Validator@{ "type": "control" } as Validación HTTP
     participant Controller@{ "type": "control" } as Controller
+    participant Formatter@{ "type": "control" } as Formato
     participant Facade@{ "type": "control" } as Adaptador del tipo
     participant Core@{ "type": "control" } as Núcleo del dominio
     participant Socket@{ "type": "control" } as Eventos Socket.IO
     participant DTO@{ "type": "control" } as DTO funcional
     participant ErrorHandler@{ "type": "control" } as Errores Express
 
+    Note over Controller: Handler generado
+
+    participant Change@{ "type": "control" } as Change
+
     Client->>Route: PATCH /api/warehouse/goods-receipts/materials/:id/details/:detailId/corrections
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>Validator: goodsReceiptCorrectionValidation[] y validate(req, res, next)
+    Route->>ValidationRules: goodsReceiptCorrectionValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
     end
@@ -65,14 +78,16 @@ sequenceDiagram
     activate DTO
     DTO-->>Controller: createGoodsReceiptDtoForCorrection(): Object — DTO normalizado
     deactivate DTO
-    Controller->>Controller: sanitizeEmptyStrings(dto)
+    Controller->>Formatter: sanitizeEmptyStrings(dto)
     Controller->>Facade: correctMaterialGoodsReceiptDetailLine(options con DTO, identificadores y actor cuando corresponde)
     Facade->>Core: correctGoodsReceiptDetailLine({ ...options, type: MATERIAL })
     Note over Facade,Core: Realización detallada en la colaboración de dominio
     alt Servicio resuelto
         rect rgb(245, 245, 245)
-            Core->>Core: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
-            Core->>Core: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
+            Core->>Change: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
+            Change-->>Core: findReceiptDetailForChange(): Promise[Object]
+            Core->>Formatter: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
+            Formatter-->>Core: normalizeDecimal(): number
         end
         Core-->>Facade: correctGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
         Facade-->>Controller: correctMaterialGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
@@ -104,6 +119,8 @@ sequenceDiagram
     participant Reason@{ "type": "control" } as Motivo de ajuste
     participant Costs@{ "type": "control" } as Costo del material
 
+    participant Formatter@{ "type": "control" } as Formato
+
     Facade->>Core: correctGoodsReceiptDetailLine({ ...options, type: MATERIAL })
     activate Core
     alt Servicio resuelto
@@ -116,9 +133,11 @@ sequenceDiagram
             Prisma-->>Change: findFirst(): Promise[GoodsReceiptDetail|null]
             deactivate Prisma
             Change-->>Core: findReceiptDetailForChange(): Promise[GoodsReceiptDetail|null]
-            Core->>Core: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
+            Core->>Change: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
+            Change-->>Core: findReceiptDetailForChange(): Promise[Object]
             Core->>Helpers: buildGoodsReceiptDetails([{ materialId, quantity, costPerUnitType }], { tx, requireActive: false })
-            Core->>Core: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
+            Core->>Formatter: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
+            Formatter-->>Core: normalizeDecimal(): number
             Core->>Reason: findGoodsReceiptDetailChangeReason({ tx, changeType })
             Core->>Change: createGoodsReceiptDetailChangeMovementAndUpdateStock({ tx, currentDetail, quantityDifference, ... })
             opt Diferencia de cantidad distinta de cero

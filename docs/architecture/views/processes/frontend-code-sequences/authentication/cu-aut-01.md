@@ -5,12 +5,12 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `EJS` | boundary | [`loginPage.ejs`](../../../../../../src/views/pages/home/login/loginPage.ejs) |
 | `Form` | boundary | [`loginForm.js`](../../../../../../src/public/js/pages/home/login/loginForm.js) |
@@ -18,6 +18,7 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `Request` | boundary | [`authService.js`](../../../../../../src/public/js/services/authService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `API` | control | [`authController.js`](../../../../../../src/controllers/api/authController.js) |
+| `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
 
 ## Secuencia de implementación
 
@@ -27,16 +28,19 @@ sequenceDiagram
     actor Initiator as Usuario registrado
     participant Browser as Navegador
     participant EJS@{ "type": "boundary" } as Plantilla EJS
-    participant Form@{ "type": "boundary" } as useForm
+    participant Form@{ "type": "boundary" } as Formulario login
     participant App@{ "type": "control" } as Application
     participant Request@{ "type": "boundary" } as Requests del recurso
     participant HTTP@{ "type": "boundary" } as Cliente HTTP
     participant API@{ "type": "control" } as Endpoint API
 
+    participant FormUtils@{ "type": "control" } as Form helpers
+
     Initiator->>Browser: inicia CU-AUT-01 — Iniciar sesión
     EJS->>Form: import './loginForm.js'
     Browser->>Form: captura y envía credenciales
-    Form->>Form: validateFields(loginValidation, formData)
+    Form->>FormUtils: validateFields(loginValidation, formData)
+    FormUtils-->>Form: validateFields(): Object
     break Validación local rechazada
         Form-->>Browser: mostrar errores sin invocar loginRequest
     end

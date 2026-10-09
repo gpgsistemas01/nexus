@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getSequenceParticipantSources, getSequenceStructureErrors } from '../../../scripts/sequenceDiagramUtils.js';
+import { getSequenceLifelineErrors, getSequenceParticipantSources, getSequenceStructureErrors } from '../../../scripts/sequenceDiagramUtils.js';
 
 describe('estructura de secuencias Mermaid', () => {
     it('acepta salidas anticipadas y resultados alternativos con participantes UML', () => {
@@ -63,6 +63,14 @@ describe('estructura de secuencias Mermaid', () => {
         expect(errors).toContain('deactivate sin activate: App');
         expect(errors).toContain('activación sin cerrar: App');
     });
+    it('rechaza fragmentos vacíos que producen coordenadas NaN al renderizar', () => {
+        const source = `sequenceDiagram
+    participant App as Aplicación
+    loop Cada detalle pendiente
+        %% La validación se desarrolla en otro nivel.
+    end`;
+        expect(getSequenceStructureErrors(source)).toContain('fragmento vacío: loop');
+    });
     it('vincula nombres breves a archivos desde la tabla de participantes', () => {
         const sequence = `sequenceDiagram
     participant View@{ "type": "boundary" } as Formulario
@@ -93,4 +101,50 @@ describe('estructura de secuencias Mermaid', () => {
             .toEqual(['src/services/service.js']);
     });
 
+});
+
+describe('un archivo por línea de vida', () => {
+    const externals = new Set(['Navegador', 'Prisma / PostgreSQL']);
+    const trace = (rows) => `## Participantes y trazabilidad\n\n${rows}\n\n## Secuencia de implementación\n`;
+
+    it('acepta archivos distintos, actor y fronteras externas declaradas', () => {
+        const source = `sequenceDiagram
+    actor User as Usuario
+    participant Browser as Navegador
+    participant App as Aplicación
+    participant Request as Request
+    participant DB@{ "type": "database" } as Prisma / PostgreSQL`;
+        const body = trace('| `App` | control | `src/app.js` |\n| `Request` | boundary | `src/request.js` |');
+        expect(getSequenceLifelineErrors(body, source, externals)).toEqual([]);
+    });
+
+    it('rechaza la agrupación de configurador y cuerpo generado en una línea', () => {
+        const body = trace('| `App` | control | `src/config.js`<br/>`src/factory.js` |');
+        expect(getSequenceLifelineErrors(body, 'participant App as Aplicación', externals))
+            .toContain('línea de vida App debe corresponder a un único archivo (encontrados: 2)');
+    });
+
+    it('rechaza dos líneas para el interceptor y su variable de estado del mismo archivo', () => {
+        const body = trace('| `Api` | control | `src/api.js` |\n| `Refresh` | control | `src/api.js` |');
+        const source = 'participant Api as Interceptor\nparticipant Refresh as Renovación';
+        expect(getSequenceLifelineErrors(body, source, externals))
+            .toContain('archivo repetido en líneas de vida Api y Refresh: src/api.js');
+    });
+
+    it('rechaza participantes sin archivo que no sean límites externos reconocidos', () => {
+        expect(getSequenceLifelineErrors('', 'participant Service as Servicio', externals))
+            .toContain('línea de vida Service debe corresponder a un único archivo (encontrados: 0)');
+    });
+
+    it('permite reutilizar el mismo archivo en dos niveles complementarios', () => {
+        const body = trace('| `Core` | control | `src/core.js` |\n| `Helper` | control | `src/helper.js` |');
+        expect(getSequenceLifelineErrors(body, 'participant Core as Núcleo', externals)).toEqual([]);
+        expect(getSequenceLifelineErrors(body, 'participant Core as Núcleo\nparticipant Helper as Helper', externals)).toEqual([]);
+    });
+
+    it('detecta que un nombre heredado y la tabla apuntan a archivos diferentes', () => {
+        const body = trace('| `App` | control | `src/other.js` |');
+        expect(getSequenceLifelineErrors(body, 'participant App as src/app.js', externals))
+            .toContain('línea de vida App debe corresponder a un único archivo (encontrados: 2)');
+    });
 });

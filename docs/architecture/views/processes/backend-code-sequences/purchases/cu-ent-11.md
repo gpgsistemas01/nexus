@@ -5,16 +5,16 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
 | `Route` | boundary | [`consumableGoodsReceiptApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Controller` | control | [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js)<br/>[`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
+| `Controller` | control | [`goodsReceiptHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) |
 | `Facade` | control | [`consumableGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js) |
 | `Core` | control | [`goodsReceiptCancellationService.js`](../../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js) |
 | `Helpers` | control | [`goodsReceiptHelpers.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) |
@@ -24,6 +24,10 @@ proceso independiente. Los retornos representan el resultado o error propagado.
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
 | `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+
+### Configuración y archivos de contexto
+
+El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js).
 
 ## Secuencia de entrada y coordinación
 
@@ -43,6 +47,10 @@ sequenceDiagram
     participant Socket@{ "type": "control" } as Eventos Socket.IO
     participant ErrorHandler@{ "type": "control" } as Errores Express
 
+    Note over Controller: Handler generado
+
+    participant Change@{ "type": "control" } as Change
+
     Client->>Route: PATCH /api/warehouse/goods-receipts/consumables/:id/details/:detailId/cancel
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
@@ -58,7 +66,8 @@ sequenceDiagram
     Note over Facade,Core: Realización detallada en la colaboración de dominio
     alt Servicio resuelto
         rect rgb(245, 245, 245)
-            Core->>Core: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
+            Core->>Change: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
+            Change-->>Core: findReceiptDetailForChange(): Promise[Object]
         end
         Core-->>Facade: cancelGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
         Facade-->>Controller: cancelConsumableGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
@@ -102,7 +111,8 @@ sequenceDiagram
             Prisma-->>Change: findFirst(): Promise[GoodsReceiptDetail|null]
             deactivate Prisma
             Change-->>Core: findReceiptDetailForChange(): Promise[GoodsReceiptDetail|null]
-            Core->>Core: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
+            Core->>Change: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
+            Change-->>Core: findReceiptDetailForChange(): Promise[Object]
             Core->>Reason: findGoodsReceiptDetailChangeReason({ tx, changeType })
             Core->>Change: createGoodsReceiptDetailChangeMovementAndUpdateStock({ tx, currentDetail, quantityDifference, ... })
             opt Diferencia de cantidad distinta de cero

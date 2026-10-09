@@ -35,10 +35,19 @@ un flujo de control ni inventar paralelismo.
 
 ## Lectura y estructura de secuencias
 
-Cada caso mantiene nombres visuales breves y una tabla **Participantes y trazabilidad**
-con alias, rol y archivos. La tabla permite mostrar helpers y configuradores agrupados
-sin convertir las rutas del repositorio en cabeceras demasiado anchas. `docs:check`
-comprueba que esos archivos existen y siguen asociados al participante utilizado.
+Cada línea de vida técnica identifica un único archivo, enlazado en la tabla
+**Participantes y trazabilidad**. Dentro de una figura, el mismo archivo no puede
+aparecer en dos líneas distintas. Los nombres visibles resumen la responsabilidad del archivo;
+el enlace conserva su nombre y su ruta completa. Los actores, el navegador, el runtime Express
+y la frontera de persistencia no son archivos del repositorio.
+`docs:check` verifica estas excepciones explícitas y la correspondencia única por figura.
+
+Si una fábrica define el cuerpo de un handler, application o request, su archivo es
+el participante de ejecución. Los módulos que la configuran o reexportan se enlazan
+como contexto, indicando el alias público utilizado. Un reexport o la selección de una
+función no añade una llamada de delegación durante la petición. En cambio, helpers,
+validadores, middleware y callbacks de archivos diferentes tienen participantes propios.
+La plantilla EJS y el JavaScript de la pantalla tampoco comparten una línea de vida.
 
 | Elemento visual | Aplicación en el código |
 | --- | --- |
@@ -46,14 +55,18 @@ comprueba que esos archivos existen y siguen asociados al participante utilizado
 | Frontera (`boundary`) | Pantalla, formulario o adaptador de entrada/salida. |
 | Control (`control`) | Controller, application, servicio o colaborador que coordina comportamiento. |
 | Entidad (`entity`) | Objeto de datos identificado; no representa por sí solo una tabla Prisma ni un servicio. |
-| Persistencia (`database`) | Frontera Prisma/PostgreSQL agrupada; no afirma que Prisma sea un servidor separado. |
+| Persistencia (`database`) | Límite externo del cliente Prisma y la base de datos; no representa un archivo de servicio ni un servidor Prisma separado. |
 | Barra de activación | Intervalo representado de ejecución/espera de una llamada; no un hilo independiente. |
 | Flecha continua / discontinua | Invocación / resultado o error propagado. |
 
-Los casos con muchas líneas de vida separan entrada/coordinación y colaboración de
-dominio. El segundo nivel amplía la llamada identificada del primero; no es otro caso
-ni repite su pipeline HTTP. Ambos niveles comparten la tabla de fuentes y conservan sus propios fragmentos,
-y reinicia la numeración para permitir lectura independiente.
+Los casos con muchas líneas de vida se dividen en colaboraciones complementarias.
+En backend se separan entrada/coordinación y dominio; en frontend se separan interfaz
+y aplicación/transporte. Los formularios extensos dividen también validación y envío. Las altas de proveedor y cliente añaden un nivel de preparación
+del modal para distinguir las dos entradas posibles. Cada nivel conserva el archivo del
+caller y del callee que delimitan la llamada ampliada, sin añadir otra operación.
+Las figuras comparten una tabla de fuentes, conservan sus propios fragmentos y reinician
+la numeración para facilitar su lectura. La llamada de frontera y su resultado reaparecen
+para identificar la ampliación; las acciones internas sólo se desarrollan en su nivel.
 
 `autonumber` permite seguir mensajes sin confundir proximidad con dependencia. Los
 retornos tipados explican el resultado de funciones async; el resultado que consume el
@@ -79,5 +92,5 @@ contratos diferentes: una colección paginada no se rotula como una mutación ge
 Sesión y auditoría conservan sus colaboraciones transversales en esta vista.
 
 `npm run docs:check` comprueba cobertura, trazabilidad, participantes, fragmentos,
-activaciones y contrato. El renderizado y la exportación verifican legibilidad; estos
+activaciones, un archivo por línea de vida, ausencia de archivos duplicados y contrato. El renderizado y la exportación verifican legibilidad; estos
 controles no equivalen a ejecutar todos los caminos del código.

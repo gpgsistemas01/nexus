@@ -5,20 +5,28 @@
 
 ## Participantes y trazabilidad
 
-Los nombres breves del diagrama corresponden a los archivos vinculados siguientes.
-La ruta completa se conserva en cada enlace, fuera de la cabecera visual. Un participante
-puede agrupar colaboradores del mismo rol; esa agrupación no implica una clase ni un
-proceso independiente. Los retornos representan el resultado o error propagado.
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
 
-| Alias | Rol visual | Archivos de implementación |
+| Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
-| `View` | boundary | [`usersPage.ejs`](../../../../../../src/views/pages/admin/users/usersPage.ejs)<br/>[`usersPage.js`](../../../../../../src/public/js/pages/admin/users/usersPage.js) |
-| `Application` | control | [`users.js`](../../../../../../src/public/js/application/admin/users/users.js) |
+| `View` | boundary | [`usersPage.js`](../../../../../../src/public/js/pages/admin/users/usersPage.js) |
+| `Application` | control | [`createCrudApplication.js`](../../../../../../src/public/js/application/createCrudApplication.js) |
 | `Request` | boundary | [`userService.js`](../../../../../../src/public/js/services/admin/userService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
-| `Transport` | control | [`userApiRoute.js`](../../../../../../src/routes/api/admin/userApiRoute.js)<br/>[`userController.js`](../../../../../../src/controllers/api/admin/userController.js) |
+| `Transport` | control | [`userApiRoute.js`](../../../../../../src/routes/api/admin/userApiRoute.js) |
+| `Table` | control | [`userDatatable.js`](../../../../../../src/public/js/plugins/datatable/admin/users/userDatatable.js) |
+| `TableCore` | control | [`createDataTable.js`](../../../../../../src/public/js/plugins/datatable/core/base/createDataTable.js) |
 
-| `Table` | control | [`userDatatable.js`](../../../../../../src/public/js/plugins/datatable/admin/users/userDatatable.js)<br/>[`createDataTable.js`](../../../../../../src/public/js/plugins/datatable/core/base/createDataTable.js) |
+### Configuración y archivos de contexto
+
+La plantilla aporta el HTML previo a esta interacción; no ejecuta las llamadas JavaScript de la línea `View`: [`usersPage.ejs`](../../../../../../src/views/pages/admin/users/usersPage.ejs).
+
+El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-IDA-05`](../../backend-code-sequences/identity-access/cu-ida-05.md#cu-ida-05): [`userController.js`](../../../../../../src/controllers/api/admin/userController.js).
+
+La línea `Application` ejecuta la función generada en `createCrudApplication.js`. Su nombre público y la configuración de requests/contratos provienen de [`users.js`](../../../../../../src/public/js/application/admin/users/users.js); exportar esa función no crea otra llamada durante cada petición.
 
 ## Secuencia de implementación
 
@@ -27,20 +35,23 @@ sequenceDiagram
     autonumber
     actor Initiator as Administrador del sistema
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla / formulario
+    participant View@{ "type": "boundary" } as Pantalla JS
     participant Table@{ "type": "control" } as Adaptador DataTable
+    participant TableCore@{ "type": "control" } as Núcleo DataTable
     participant Application@{ "type": "control" } as Application
     participant Request@{ "type": "boundary" } as Requests del recurso
     participant HTTP@{ "type": "boundary" } as Cliente HTTP
     participant Transport@{ "type": "control" } as Endpoint API
 
     Initiator->>Browser: inicia CU-IDA-05 — Consultar usuarios
-    Browser->>View: usersPage.ejs y usersPage.js cargan la tabla
+    Browser->>View: ejecuta el módulo de entrada de la pantalla
     View->>Table: createUserDatatable()
     activate Table
-    Table->>Table: createDataTable({ options: { ajax, columns } })
-    Note over Table: DataTables invoca ajax.get(params) al cargar o filtrar
-    Table->>Application: getAllUsers({ params })
+    Table->>TableCore: createDataTable({ options: { ajax, columns } })
+    TableCore-->>Table: createDataTable(): DataTable.Api
+    Note over TableCore: El callback ajax del núcleo ejecuta options.ajax.get(params)
+    Note over TableCore: DataTables invoca ajax.get(params) al cargar o filtrar
+    TableCore->>Application: getAllUsers({ params })
     activate Application
     Application->>Request: getAllUsersRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
@@ -49,15 +60,15 @@ sequenceDiagram
         Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: getAllUsersRequest(): Promise[AxiosResponse]
-        Application-->>Table: getAllUsers(): Promise[AxiosResponse]
-        Table->>Browser: callback(response.data): filas y conteos
+        Application-->>TableCore: getAllUsers(): Promise[AxiosResponse]
+        TableCore->>Browser: callback(response.data): filas y conteos
     else Respuesta rechazada
         Transport-->>HTTP: HTTP de error — respuesta del endpoint
         HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
         Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
-        Application-->>Table: throw { status: number, data: Object | null, message: string, raw: Error }
-        Table->>Browser: handleDataTableError(error)
-        Table->>Browser: callback({ data: [], recordsTotal: 0, recordsFiltered: 0 })
+        Application-->>TableCore: throw { status: number, data: Object | null, message: string, raw: Error }
+        TableCore->>Browser: handleDataTableError(error)
+        TableCore->>Browser: callback({ data: [], recordsTotal: 0, recordsFiltered: 0 })
     end
     deactivate Application
     deactivate Table
