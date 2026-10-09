@@ -45,19 +45,10 @@ corte concreto anterior demuestra cómo está aplicada la composición hoy.
 
 ### Decisión de propiedad
 
-**Identificador:** `DIA-PAT-OWN-001`. **Pregunta:** ¿cuándo una pieza permanece con el
-recurso y cuándo se extrae como componente compartido?
-
-```mermaid
-flowchart TD
-    candidate["Pieza o comportamiento"] --> boundary{"¿Define una frontera<br/>de capa estable?"}
-    boundary -->|No| local["Permanece en el consumidor"]
-    boundary -->|Sí| consumers{"¿Tiene al menos dos<br/>consumidores reales?"}
-    consumers -->|No| resource["Permanece junto al recurso"]
-    consumers -->|Sí| independent{"¿Su contrato es independiente<br/>de las reglas del recurso?"}
-    independent -->|No| resource
-    independent -->|Sí| shared["Se extrae a shared / ui / utils / core"]
-```
+Una pieza se comparte cuando tiene consumidores reales y un contrato estable que no
+absorbe las reglas del recurso. Si todavía depende de ellas, permanece junto al recurso.
+La tabla describe la ubicación en el código; el mapa de composición anterior muestra
+sus colaboradores concretos, sin repetir una decisión de mantenimiento como proceso.
 
 La ubicación resultante conserva estas fronteras:
 
@@ -99,7 +90,7 @@ permiten agregar, sustituir o eliminar detalles en modo `Pendiente`; la fila con
 mapper de cada formulario envía únicamente los campos admitidos por su contrato.
 
 El estado de surtimiento no se redefine aquí: sus transiciones y datos afectados están
-en la [modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md)
+en [modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md)
 y su representación física en el
 [diccionario generado](../../logical/data-and-persistence/generated/data-dictionary.md).
 

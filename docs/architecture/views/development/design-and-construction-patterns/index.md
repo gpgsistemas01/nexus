@@ -34,22 +34,22 @@ la colaboración que ya explica el diagrama enlazado.
 
 | Patrón o preocupación | Diagrama canónico | Capítulo de detalle |
 | --- | --- | --- |
-| Registro seguro de catálogos | [`DIA-ARQ-CAT-001..004`](08-catalog-registry-and-allowlist.md#diagrama-del-patrón-de-catálogos-administrables) | [Registro con lista blanca](08-catalog-registry-and-allowlist.md) |
+| Registro seguro de catálogos | [`DIA-ARQ-CAT-001..002`](08-catalog-registry-and-allowlist.md#diagrama-del-patrón-de-catálogos-administrables) | [Registro con lista blanca](08-catalog-registry-and-allowlist.md) |
 | Monolito modular y capas | [`DIA-PAT-EST-001`](03-patterns-in-code.md#estructura-por-dominio-capas-y-fronteras) | [Arquitectura por capas](04-modular-monolith-and-layers.md) |
 | Pipeline, DTO y políticas | [`DIA-PAT-FRO-001`](03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas) | [Pipeline](05-middleware-pipeline.md) y [DTO/políticas](06-dtos-adapters-and-policies.md) |
 | Factories y composición | [`DIA-PAT-CON-001`](03-patterns-in-code.md#factories-y-composición-sobre-herencia) | [Factory functions](07-factories-and-application-composition.md) |
 | Transacción, eventos y auditoría | [`DIA-PAT-DIN-001`](03-patterns-in-code.md#transacción-eventos-y-auditoría) | [Transacción](09-context-transactional-and-consistency-atomic.md), [eventos](10-publication-of-events-of-inventory.md) y [auditoría](11-audit-trail-cross-cutting.md) |
-| Composición y ownership visual | [`DIA-PAT-UI-001`, `DIA-PAT-OWN-001`, `DIA-PAT-DET-001` y `DIA-PAT-SEL-001`](12-composition-and-ownership-of-components-visual.md#composición-de-la-interfaz) | [Componentes visuales](12-composition-and-ownership-of-components-visual.md) |
+| Composición y ownership visual | [`DIA-PAT-UI-001`, `DIA-PAT-DET-001` y `DIA-PAT-SEL-001`](12-composition-and-ownership-of-components-visual.md#composición-de-la-interfaz) | [Componentes visuales](12-composition-and-ownership-of-components-visual.md) |
 | Orden de métodos | [`DIA-PAT-ORD-001`](13-order-of-methods-by-behavior.md) | [Orden por comportamiento](13-order-of-methods-by-behavior.md) |
 | Test harness | [`DIA-PAT-TST-001`](03-patterns-in-code.md#test-harness-configurable) | [Construcción de pruebas](14-patterns-of-construction-of-tests.md) |
 | Adaptación de detalles | [`DIA-PAT-DAT-001`](06-dtos-adapters-and-policies.md#diagrama-del-contrato-de-datos-de-los-detalles) | [DTO y adaptadores](06-dtos-adapters-and-policies.md) |
 | Políticas declarativas | [`DIA-PAT-POL-001`](06-dtos-adapters-and-policies.md#aplicación-de-políticas-declarativas) | [Evaluación y consumidores](06-dtos-adapters-and-policies.md#aplicación-de-políticas-declarativas) |
 | Propagación del contexto transaccional | [`DIA-PAT-TX-001`](09-context-transactional-and-consistency-atomic.md#aplicación-del-contexto-en-una-entrada) | [Límite real de una entrada](09-context-transactional-and-consistency-atomic.md) |
 | Publicación y suscriptores | [`DIA-PAT-EVT-001`](10-publication-of-events-of-inventory.md#aplicación-entre-publicador-y-consumidores) | [Eventos de inventario](10-publication-of-events-of-inventory.md) |
-| Audit Trail | [`DIA-BE-SEQ-006`](../backend-technical-documentation/02-views-technical-applied.md#secuencia-transversal-de-auditoría-de-escrituras) | [Auditoría](11-audit-trail-cross-cutting.md) |
+| Audit Trail | [`DIA-BE-SEQ-006`](../../processes/shared-runtime-behavior/01-write-audit.md#secuencia-transversal-de-auditoría-de-escrituras) | [Auditoría](11-audit-trail-cross-cutting.md) |
 | Reutilización de transporte, tablas y servicios | [Requests, interfaz y servicios](../reuse-and-refactoring/index.md) | [Resultado de la revisión](../reuse-and-refactoring/04-refactoring-and-extension.md#resultado-de-la-revisión-de-cobertura-visual) |
-| Refactorización y extracción | [`DIA-PAT-REF-001` y `DIA-PAT-REF-002`](../reuse-and-refactoring/04-refactoring-and-extension.md) | [Resultado vigente y criterios](../reuse-and-refactoring/04-refactoring-and-extension.md) |
-| Renovación coordinada de sesión | [`DIA-FE-TEC-SES-001`](../frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#renovación-coordinada-del-transporte-http) | [Transporte HTTP compartido](../frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#renovación-coordinada-del-transporte-http) |
+| Refactorización y extracción | [`DIA-PAT-REF-001`](../reuse-and-refactoring/04-refactoring-and-extension.md) | [Resultado vigente y criterios](../reuse-and-refactoring/04-refactoring-and-extension.md) |
+| Renovación coordinada de sesión | [`DIA-FE-TEC-SES-001`](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http) | [Transporte HTTP compartido](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http) |
 
 Cada explicación conecta problema, implementación, contrato, configuradores, consumidores
 y límites. La refactorización tiene una representación de extracción y una guía de

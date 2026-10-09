@@ -71,7 +71,7 @@ Los callbacks del consumidor se invocan además del comportamiento común.
 
 En formularios, `useForm` no restaura por sí solo el estado tras cualquier resultado:
 `sendRequest` y los helpers de éxito/error conservan el cierre, recarga y reintento
-según el flujo. El [estado técnico de los formularios](../frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md)
+según el flujo. El [estado técnico de los formularios](../frontend-technical-documentation/02-module-code-maps.md)
 y la [composición visual](../design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md)
 explican esas colaboraciones. Los permisos visuales sólo ocultan/habilitan controles;
 los routers del servidor autorizan las escrituras.

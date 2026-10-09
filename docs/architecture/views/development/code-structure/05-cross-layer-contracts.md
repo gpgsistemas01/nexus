@@ -32,7 +32,7 @@ estos órdenes concretos.
 
 `auditWrites` se monta en `src/app.js`: registra la observación de `finish` antes de
 delegar y persiste posteriormente, fuera de la transacción funcional. Su colaboración
-se mantiene en la [secuencia canónica de auditoría](../backend-technical-documentation/02-views-technical-applied.md#secuencia-transversal-de-auditoría-de-escrituras).
+se mantiene en la [secuencia canónica de auditoría](../../processes/shared-runtime-behavior/01-write-audit.md#secuencia-transversal-de-auditoría-de-escrituras).
 Las fuentes de esta figura son `src/routes`, `src/controllers`, `src/dtos`,
 `src/services`, `src/public/js` y `src/repository/baseRepository.js`.
 
@@ -44,7 +44,7 @@ Las fuentes de esta figura son `src/routes`, `src/controllers`, `src/dtos`,
 | Escrituras coordinadas | Límite de `tx`, rollback y efectos posteriores al commit. | [Transacción, eventos y auditoría](../design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría), con servicios concretos en las secuencias backend. |
 | Construcción de aplicaciones | Configuración al cargar el módulo y uso posterior de closures. | [Factory CRUD aplicada](../design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia). |
 | Actualización de tablas por eventos | Publicación, puente del navegador y nueva consulta. | [Publicador y consumidores](../design-and-construction-patterns/10-publication-of-events-of-inventory.md#aplicación-entre-publicador-y-consumidores). |
-| Sesión en el transporte compartido | Varias solicitudes esperan la renovación pendiente; reintento acotado. | [Renovación coordinada](../frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#renovación-coordinada-del-transporte-http). |
+| Sesión en el transporte compartido | Varias solicitudes esperan la renovación pendiente; reintento acotado. | [Renovación coordinada](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http). |
 
 ### 5.3 Relación con las otras vistas
 

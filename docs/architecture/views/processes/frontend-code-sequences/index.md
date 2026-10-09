@@ -24,7 +24,7 @@ firmas, rutas, datos o efectos.
 ### Relación con la documentación técnica
 
 Esta colección es la fuente canónica del recorrido interacción → UI → aplicación → request →
-endpoint → resultado. Los [diagramas técnicos complementarios](../../development/frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#relación-con-la-colección-canónica)
+endpoint → resultado. Los [diagramas técnicos complementarios](index.md)
 sólo complementan decisiones o modos que requieren otra representación.
 
 ### Regla de identificación y lectura

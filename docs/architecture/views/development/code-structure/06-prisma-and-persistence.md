@@ -51,44 +51,11 @@ Aquí se describe cómo el código selecciona y utiliza esa conexión.
 
 ## Transacción y propagación del contexto
 
-**Identificador:** `DIA-COD-PRISMA-002`. **Pregunta:** ¿qué escribe una entrada dentro de
-la misma transacción y qué permanece fuera? **Fuente:**
-`src/services/warehouse/goodsReceipts/goodsReceiptService.js#createGoodsReceipt`,
-`src/services/document/referenceNumberService.js` e `src/services/inventory/movementService.js`.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Service@{ "type": "control" } as Compras
-    participant Client@{ "type": "control" } as Prisma
-    participant Tx@{ "type": "control" } as tx
-    participant Reference@{ "type": "control" } as Folios
-    participant Movement@{ "type": "control" } as Movimiento
-    participant Cost@{ "type": "control" } as Costo
-    Service->>Service: validar y preparar detalles
-    Service->>Client: getDb().$transaction(callback)
-    Client->>Tx: proporcionar tx
-    Service->>Reference: generar folio con tx
-    Reference->>Tx: upsert del contador
-    Service->>Tx: tx.goodsReceipt.create
-    Tx-->>Service: documento y detalles
-    Service->>Movement: aplicar movimiento con tx
-    Movement->>Tx: getDb(tx): movimiento y stock
-    alt el callback lanza un error
-        Tx-->>Client: rechazar callback
-        Client-->>Service: rollback y error
-    else el callback termina correctamente
-        Tx-->>Client: resolver callback
-        Client-->>Service: commit y resultado
-        Service->>Cost: actualizar costo tras commit
-        Cost->>Client: getDb(): costo fuera de tx
-    end
-```
-
-Compras representa `goodsReceiptService.js`; Folios, `referenceNumberService.js`;
-Movimiento, `movementService.js`; Costo, `supplierMaterialService.js`.
-El callback llama a `generateYearlyReferenceNumber` y `applyInventoryMovement` con
-`tx`; después del commit llama a `updateMaterialUnitCostIfHigher` sin ese contexto.
+La dependencia entre el coordinador, `tx` y sus colaboradores se explica en
+[contexto transaccional](../design-and-construction-patterns/09-context-transactional-and-consistency-atomic.md).
+El orden de generación de folio, documento, movimiento, commit y costo pertenece a la
+[secuencia backend de creación de entrada](../../processes/backend-code-sequences/purchases/cu-ent-02.md).
+El código concreto está en `goodsReceiptService.js#createGoodsReceipt`.
 
 Los colaboradores reciben explícitamente `tx` y usan `getDb(tx)` o sus métodos.
 Prisma confirma o revierte las escrituras del callback; usar `getDb()` sin `tx` dentro

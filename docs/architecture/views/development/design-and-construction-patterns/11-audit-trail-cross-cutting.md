@@ -17,7 +17,7 @@ sanitizado, clasificación y política de fallo, brecha registrada en el plan de
 ## Aplicación y frontera temporal
 
 La colaboración detallada tiene una sola fuente en
-[`DIA-BE-SEQ-006`](../backend-technical-documentation/02-views-technical-applied.md#secuencia-transversal-de-auditoría-de-escrituras).
+[`DIA-BE-SEQ-006`](../../processes/shared-runtime-behavior/01-write-audit.md#secuencia-transversal-de-auditoría-de-escrituras).
 `src/app.js` monta `auditWrites` antes de registrar los routers. El middleware instala
 `res.once('finish')`, llama `next()` y, al terminar la respuesta, decide si delega a
 `persistWriteAudit`. El servicio sanea y persiste; un rechazo no recorre la misma rama

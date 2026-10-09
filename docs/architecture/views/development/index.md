@@ -22,8 +22,8 @@ consumidores y sus pruebas. Los recorridos temporales de cada `CU-*` pertenecen 
 | ¿Cómo se integra Prisma y qué cubre una transacción? | [Prisma y persistencia](code-structure/06-prisma-and-persistence.md) | Cliente generado, conexión, consultas en servicios, `tx`, migraciones y errores. |
 | ¿Qué solución compartida se aplica y cómo se configura? | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | Implementación, consumidores concretos, contratos, variantes y límites de cada mecanismo. |
 | ¿Qué se reutiliza y cómo se revisa una extracción? | [Reutilización](reuse-and-refactoring/index.md) y [refactorización](reuse-and-refactoring/04-refactoring-and-extension.md) | Puntos de extensión, ownership e impacto de cambios sobre piezas comunes y consumidores. |
-| ¿Qué reglas, efectos y errores conserva el servidor? | [Referencia técnica de backend](backend-technical-documentation/index.md) | Contratos y colaboraciones por capacidad; límites transaccionales. |
-| ¿Cómo se compone la pantalla y se adapta su contrato? | [Referencia técnica de frontend](frontend-technical-documentation/index.md) | Composición, estado local, callbacks, adaptación de datos y transporte HTTP. |
+| ¿Qué reglas, efectos y errores conserva el servidor? | [Referencia técnica de backend](backend-technical-documentation/index.md) | Contratos y mapas de código por cada módulo; dependencias compartidas. |
+| ¿Cómo se compone la pantalla y se adapta su contrato? | [Referencia técnica de frontend](frontend-technical-documentation/index.md) | Mapas de cada módulo, composición, callbacks, adaptación de datos y transporte. |
 | ¿Qué rutas, imports y símbolos existen? | [Mapa generado del código](code-map.md) | Inventario enumerable desde `src`; evidencia para contrastar la explicación curada. |
 
 ## Organización de archivos
@@ -44,8 +44,9 @@ mapas agrupan módulos. Cada carpeta tiene un `index.md` y capítulos consecutiv
 
 ## Forma de leer los diagramas
 
-Los mapas estructurales muestran dependencia o configuración; las secuencias muestran
-orden temporal; los flujos de datos muestran transformación. Cada figura declara su
+Esta vista mantiene mapas de módulos, imports, configuración y contratos de código.
+Las secuencias, actividades y máquinas de estado se mantienen en la vista de procesos.
+Los flujos de datos aquí muestran adaptación de representaciones, no pasos del actor. Cada figura declara su
 pregunta, alcance y fuente técnica. Una flecha de dependencia no significa que dos
 módulos se ejecuten en ese orden, ni que sean unidades desplegables independientes.
 

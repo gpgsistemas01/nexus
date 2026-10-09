@@ -24,7 +24,7 @@ colaboradores que cambian o prueban el recorrido del caso.
 ### Relación con la documentación técnica
 
 Esta colección es la fuente canónica del recorrido ruta → controller → servicio → persistencia o
-efecto. Los [diagramas técnicos complementarios](../../development/backend-technical-documentation/02-views-technical-applied.md#relación-con-la-colección-canónica)
+efecto. Los [diagramas técnicos complementarios](index.md)
 sólo complementan decisiones, transacciones o coordinaciones que requieren otra representación.
 
 ### Regla de identificación y lectura

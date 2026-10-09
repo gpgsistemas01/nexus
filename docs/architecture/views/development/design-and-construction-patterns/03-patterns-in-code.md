@@ -1,8 +1,8 @@
 # 3. Catálogo visual de patrones aplicados
 
 El catálogo conecta las responsabilidades compartidas con sus implementaciones y
-consumidores. Las figuras estructurales localizan dependencias y configuración; las
-secuencias explican construcción, controles y límites temporales. Cada mecanismo tiene
+consumidores. Las figuras localizan dependencias, configuración y contratos de implementación.
+Los recorridos temporales se consultan en procesos. Cada mecanismo tiene
 un contrato y variantes que permanecen en el recurso. Los símbolos y archivos permiten
 contrastar el dibujo con código y pruebas, sin atribuirle cobertura adicional.
 
@@ -38,50 +38,21 @@ capacidad y la frontend explica qué se configura y qué estado conserva la pant
 ### Pipeline, DTO y políticas declarativas
 
 **Identificador:** `DIA-PAT-FRO-001`. **Pregunta:** ¿cómo aplica una escritura de
-materiales el pipeline y el DTO antes de ejecutar reglas? **Fuente:**
+materiales el pipeline y el DTO mediante módulos y funciones importadas? **Fuente:**
 `materialApiRoute.js`, `materialController.js`, `materialDTO.js` y `authMiddleware.js`.
 **Alcance:** alta de material; no impone su orden a todos los routers.
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor Client as Cliente HTTP
-    participant Route@{ "type": "boundary" } as materialApiRoute.js
-    participant Auth@{ "type": "control" } as authMiddleware.js
-    participant Validation@{ "type": "control" } as materialValidation + validate
-    participant Controller@{ "type": "control" } as materialController.js
-    participant Dto@{ "type": "entity" } as materialDTO.js
-    participant Service@{ "type": "control" } as materialService.js
-
-    Client->>Route: POST /api/warehouse/materials
-    Route->>Auth: verifyApiTokenRequired(req, res, next)
-    alt token ausente o inválido
-        Auth-->>Client: 401 INVALID_AUTH
-    else token aceptado
-        Auth->>Validation: materialValidation[] y validate(req, res, next)
-        alt entrada inválida
-            Validation-->>Client: respuesta de validación sin invocar el servicio
-        else entrada aceptada
-            Validation->>Auth: authorizeUserApi(MATERIALS_WRITE)
-            Auth->>Auth: cargar usuario y comprobar política vigente
-            alt usuario inválido o permiso insuficiente
-                Auth-->>Client: 401 INVALID_AUTH o 403 FORBIDDEN
-            else acceso permitido
-                Auth->>Controller: registerMaterial(req, res)
-                Controller->>Dto: createMaterialDtoForRegister(req.body)
-                Dto-->>Controller: campos normalizados
-                Controller->>Controller: materialDto = sanitizeEmptyStrings(materialDto)
-                Controller->>Service: createMaterial({ materialDto, userId })
-                Service-->>Controller: material creado o error de dominio
-                Controller-->>Client: respuesta del controller
-            end
-        end
-    end
+flowchart TB
+    route["materialApiRoute.js<br/>declaraciones del router"] --> auth["authMiddleware.js<br/>token y autorización"]
+    route --> validation["materialValidations.js<br/>validatorMiddleware.validate"]
+    route --> controller["materialController.js"]
+    controller --> dto["materialDTO.js<br/>createMaterialDtoForRegister"]
+    controller --> service["materials/materialService.js<br/>createMaterial"]
 ```
 
 El DTO selecciona y normaliza campos; la autorización y las reglas conservan sus
-propietarios. El contrato exacto del servicio se comprueba en el controller: la secuencia
-es una colaboración del alta, no una firma común para todos los recursos.
+propietarios. El contrato exacto del servicio se comprueba en el controller: el mapa muestra dependencias, no una secuencia ejecutada ni una firma común.
 
 | Variante real | Orden declarado | Fuente |
 | --- | --- | --- |
@@ -100,32 +71,17 @@ no constituye otra etapa local entre DTO y servicio.
 variante sin duplicar el flujo común?
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Module as application/warehouse/materials/materials.js
-    participant Factory as application/createCrudApplication.js
-    participant Mutation as createApplicationMutation
-    participant Request@{ "type": "control" } as services/warehouse/materialService.js
-    participant Page as pages/warehouse/materials/materialForm.js
-
-    Module->>Factory: createCrudApplication({ requests, dataKeys, additionalMutations })
-    Factory->>Factory: createApplicationList(requests.getAll)
-    loop register, edit, editStock y remove
-        Factory->>Mutation: createMutation(operation)
-        Mutation-->>Factory: closure que adapta formData, id y opciones
-    end
-    Factory-->>Module: Object.freeze({ getAll, register, edit, editStock, remove })
-    Module->>Module: exportar referencias con nombres de dominio
-    Page->>Module: registerMaterial({ formData, creationContext })
-    Module->>Mutation: materialApplication.register(...)
-    Mutation->>Request: registerMaterialRequest({ data })
-    Request-->>Mutation: response
-    Mutation-->>Module: createSuccessResponseFromRequest({ response, dataKey })
-    Module-->>Page: resultado de registerMaterial()
+flowchart TB
+    configurator["application/warehouse/materials/materials.js<br/>requests · dataKeys · additionalMutations"] --> factory["application/createCrudApplication.js<br/>createCrudApplication"]
+    configurator --> request["services/warehouse/materialService.js"]
+    factory --> list["createApplicationList<br/>closure de consulta"]
+    factory --> mutation["createApplicationMutation<br/>closure de mutación"]
+    mutation --> response["utils/responseUtils.js<br/>createSuccessResponseFromRequest"]
+    page["pages/warehouse/materials/materialForm.js"] --> configurator
 ```
 
-Esta secuencia muestra la construcción en dos momentos que el resumen del patrón no
-expresa: al evaluar el módulo se inyectan requests y se crean *closures* inmutables; al
+El mapa distingue el configurador, las factories, los closures y la adaptación de
+respuesta. La implementación tiene dos momentos: al evaluar el módulo se inyectan requests y se crean *closures* inmutables; al
 interactuar la página se usa una referencia de dominio que conserva esa configuración.
 El ejemplo se puede recorrer en
 [`createCrudApplication.js`](../../../../../src/public/js/application/createCrudApplication.js),
@@ -136,41 +92,20 @@ demás consumidores reutilizan la misma construcción con su propia tabla `reque
 
 ### Transacción, eventos y auditoría
 
-**Identificador:** `DIA-PAT-DIN-001`. **Pregunta:** ¿cómo colaboran consistencia
-atómica, publicación y trazabilidad sin confundir sus límites?
+**Identificador:** `DIA-PAT-DIN-001`. **Pregunta:** ¿qué módulos implementan transacción, eventos y auditoría?
+**Leyenda:** flechas = uso; el handler recibe el servicio por configuración.
+**Fuente:** imports de los archivos nombrados.
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Controller as controllers/api/*Controller.js
-    participant Service@{ "type": "control" } as services/*Service.js (Transaction Script)
-    participant Prisma@{ "type": "database" } as lib/prisma.js $transaction
-    participant Writes as services auxiliares + repository/getDb(tx)
-    participant Events as utils/socketUtils.emitInventoryUpdated
-    participant Response as Respuesta Express
-    participant Audit as middleware/auditMiddleware.auditWrites
-    participant AuditService as services/audit/auditService.persistWriteAudit
-
-    Controller->>Service: función importada({ DTO, id, userId })
-    Service->>Prisma: prisma.$transaction(async tx => ...)
-    Note over Service,Prisma: El callback conserva el mismo tx
-    Service->>Writes: helper({ ..., tx }) usa getDb(tx)
-    Writes->>Writes: escribir documento, detalle, existencia y movimiento
-    alt falla una escritura
-        Writes-->>Service: propagar error del callback
-        Prisma-->>Service: rollback
-        Service-->>Controller: propagar error sin publicar
-    else todas las escrituras terminan
-        Writes-->>Service: resultado del callback
-        Prisma-->>Service: commit
-        Service-->>Controller: devolver resultado confirmado
-        opt mutación de inventario
-            Controller->>Events: publicar actualización no durable
-        end
-        Controller->>Response: emitir respuesta HTTP exitosa
-        Response-->>Audit: evento finish
-        Audit-)AuditService: persistWriteAudit() sin esperar su resultado
-    end
+flowchart TB
+    handler["goodsReceiptHandlers.js"] --> adapter["Funciones de servicio inyectadas<br/>materialGoodsReceiptService.js"]
+    adapter --> service["goodsReceiptService.js"]
+    service --> persistence["baseRepository.getDb<br/>cliente y callback tx"]
+    service --> writes["referenceNumberService<br/>movementService<br/>tx recibido"]
+    handler --> events["utils/socketUtils.js<br/>emitInventoryUpdated"]
+    app["src/app.js"] --> audit["middleware/auditMiddleware.js"]
+    audit --> auditService["services/audit/auditService.js"]
+    auditService --> persistence
 ```
 
 La traza parte del controller propietario y permite distinguir código ejecutado dentro

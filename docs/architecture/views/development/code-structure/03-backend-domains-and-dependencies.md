@@ -48,33 +48,10 @@ la construcción del cliente se detalla en [Prisma](06-prisma-and-persistence.md
 | `inventory`, `document` | Movimientos de material y consultas/reportes; folios anuales mediante el `tx` recibido directamente. `movementService.js` también importa `warehouse/materials/supplierMaterialService.js`: existe colaboración en ambos sentidos entre esos grupos, no una jerarquía estricta. |
 | `authService`, `jwtService`, `roleService`, `audit` | Sesión/JWT, consulta de accesos y auditoría. `authMiddleware.js` y `auditMiddleware.js` invocan estos servicios desde la entrada HTTP. |
 
-## Corte verificable: creación de una entrada
+## Mapas completos por módulo
 
-**Identificador:** `DIA-COD-MOD-002`. **Pregunta:** ¿qué dependencia concreta conecta
-una variante HTTP con el núcleo de compras y sus colaboradores?
-**Fuente:** imports de los archivos nombrados. **Leyenda:** flechas continuas = import;
-la discontinua = función inyectada en el handler, que la invoca durante la petición.
-
-```mermaid
-flowchart TB
-    route["routes/api/warehouse/goodsReceipts/materials/<br/>materialGoodsReceiptApiRoute.js"] --> controller["controllers/api/warehouse/goodsReceipts/materials/<br/>materialGoodsReceiptController.js"]
-    controller --> handlers["controllers/api/warehouse/goodsReceipts/shared/<br/>goodsReceiptHandlers.js"]
-    controller --> adapter["services/warehouse/goodsReceipts/materials/<br/>materialGoodsReceiptService.js"]
-    handlers -.->|createGoodsReceipt inyectada| adapter
-    adapter --> core["services/warehouse/goodsReceipts/<br/>goodsReceiptService.js"]
-    core --> helpers["goodsReceiptHelpers.js<br/>goodsReceiptInvoiceService.js"]
-    core --> lookups["admin/person/personService.js<br/>warehouse/supplierService.js"]
-    core --> reference["document/referenceNumberService.js"]
-    core --> movement["inventory/movementService.js"]
-    core --> supplierMaterial["warehouse/materials/supplierMaterialService.js"]
-    core --> db["repository/baseRepository.js"]
-```
-
-El controller exporta handlers ya configurados. El adaptador fija `type=MATERIAL`;
-`goodsReceiptService.js` abre la transacción, llama a folios y movimientos con `tx` y
-actualiza el costo después del commit. Los permisos/validadores se aplican en el router;
-los DTO y eventos están en el handler. Ese reparto se amplía en
-[reutilización backend](../reuse-and-refactoring/01-backend-handlers-and-services.md) y
-[Prisma](06-prisma-and-persistence.md). Para orden temporal y método/URL exactos se
-consultan [procesos](../../processes/backend-code-sequences/index.md) y el
-[mapa del código](../code-map.md).
+La [referencia backend](../backend-technical-documentation/02-module-code-maps.md)
+contiene un mapa de código para cada módulo. Compras y salidas enumeran ambas variantes
+material/consumable y sus núcleos; el capítulo compartido cubre los 28 routers API,
+transporte web, reportes e infraestructura. Cada figura muestra imports entre archivos,
+sin representar el recorrido de creación, surtimiento o devolución.

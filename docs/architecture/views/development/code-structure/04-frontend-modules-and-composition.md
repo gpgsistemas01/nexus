@@ -37,30 +37,11 @@ está en `application`: son mecanismos diferentes. La actualización de inventar
 el puente de eventos del layout y `configureRealtimeReload` en el núcleo DataTable;
 se describe en [publicación de eventos](../design-and-construction-patterns/10-publication-of-events-of-inventory.md).
 
-## Corte verificable: página de materiales
+## Mapas completos por módulo
 
-**Identificador:** `DIA-COD-FRONT-002`. **Pregunta:** ¿qué módulos concretos inicializan
-la tabla y el formulario de materiales? **Fuente:** imports de los módulos nombrados y
-`src/views/pages/warehouse/materials/materialsPage.ejs`.
-
-```mermaid
-flowchart TB
-    ejs["views/pages/warehouse/materials/<br/>materialsPage.ejs"] -->|incluye| partials["shared/tables<br/>materials/materialModal.ejs<br/>suppliers/supplierModal.ejs"]
-    ejs -->|script module| page["public/js/pages/warehouse/materials/<br/>materialsPage.js"]
-    page -->|inicializa con window.meta| table["plugins/datatable/warehouse/materials/<br/>materialDatatable.js"]
-    page -->|import registra listeners| form["pages/warehouse/materials/<br/>materialForm.js"]
-    page -->|import registra listeners| supplier["pages/warehouse/suppliers/<br/>supplierForm.js"]
-    form --> application["application/warehouse/materials/materials.js"]
-    table -->|getAllMaterials y deleteMaterial| application
-    application --> factory["application/createCrudApplication.js"]
-    application --> requests["services/warehouse/materialService.js"]
-    requests --> http["services/axiosInstanceApi.js"]
-```
-
-La tabla configura `ajax.get` con `getAllMaterials`; `createApplicationList` pasa
-`params` al request y devuelve su respuesta sin extraer una clave de datos. El
-formulario usa mutaciones de la misma application, que sí adaptan la respuesta.
-`window.meta` aporta contexto de presentación; la autorización efectiva se comprueba
-en el servidor. Formulario, modal, callbacks y plugins se amplían en
-[reutilización de interfaz](../reuse-and-refactoring/03-interface-and-table-lifecycle.md)
-y [referencia frontend](../frontend-technical-documentation/index.md).
+La [referencia frontend](../frontend-technical-documentation/02-module-code-maps.md)
+contiene un mapa para cada módulo con sus entry points, formulario/modal, application,
+requests y dependencias de UI. Las variantes material/consumable aparecen juntas cuando
+comparten pantalla y en módulos separados cuando tienen configuradores propios.
+El capítulo compartido completa layout, selects operativos y reportes. Las llamadas,
+reintentos y estados se consultan en procesos.

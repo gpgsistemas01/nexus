@@ -261,6 +261,10 @@ const PUBLICATIONS = Object.freeze({
                 'docs/architecture/views/development/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
             ]),
+            'comportamiento-transversal': packagePart(ARCHITECTURE_ENTRY, [
+                'docs/architecture/views/processes/index.md',
+                ...getDirectoryDocuments('docs/architecture/views/processes/shared-runtime-behavior')
+            ]),
             'contrato-api': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/openapi/api-contract.md'
             ]),

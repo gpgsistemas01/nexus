@@ -42,23 +42,13 @@ conserva un componente junto al recurso cuando su contrato todavía depende de �
 
 ## Procedimiento para revisar una extracción
 
-**Identificador:** `DIA-PAT-REF-002`. **Pregunta:** ¿qué debe comprobarse antes de
-convertir una coincidencia entre archivos en una abstracción compartida?
-**Alcance:** criterio de mantenimiento, no comportamiento ejecutable de producción.
+Estos criterios se expresan como revisión de código, sin otro diagrama de proceso:
 
-```mermaid
-flowchart TB
-    repetition["Identificar coordinación repetida<br/>y consumidores existentes"] --> contract{"¿Comparten contrato y responsabilidad?"}
-    contract -->|No| local["Conservar implementaciones locales<br/>explicar sus diferencias"]
-    contract -->|Sí| separate["Separar mecanismo común<br/>de datos y reglas de dominio"]
-    separate --> existing{"¿Existe una pieza compatible?"}
-    existing -->|Sí| configure["Configurar o componer la pieza existente"]
-    existing -->|No| extract["Extraer núcleo con contrato explícito"]
-    configure --> consumers["Revisar configuradores<br/>imports · exports · callbacks"]
-    extract --> consumers
-    consumers --> verify["Comprobar comportamiento y errores<br/>pruebas de núcleo y consumidores"]
-    verify --> document["Actualizar diagramas propietarios<br/>contratos y referencias"]
-```
+1. Identificar consumidores existentes y comprobar que comparten contrato y responsabilidad.
+2. Separar el mecanismo común de datos y reglas del dominio; conservar implementaciones locales si sus contratos difieren.
+3. Buscar una pieza compatible antes de extraer otra abstracción.
+4. Revisar configuradores, imports, exports y callbacks de todos los consumidores.
+5. Comprobar comportamiento y errores con las pruebas correspondientes y actualizar los mapas afectados.
 
 La semejanza de nombres no basta para fusionar operaciones: corrección/cancelación de
 una compra y devolución de una salida tienen efectos y precondiciones diferentes.
