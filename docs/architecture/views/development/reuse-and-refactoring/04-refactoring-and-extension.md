@@ -1,4 +1,4 @@
-# 16. Refactorización y extensión de mecanismos compartidos
+# 4. Refactorización y extensión de mecanismos compartidos
 
 ## Propósito
 
@@ -36,8 +36,8 @@ puede afectar varios recursos aunque ninguno cambie de endpoint.
 
 En backend, el mismo criterio se materializa con handlers compartidos de compras y
 salidas, configurados por controllers específicos. Sus consumidores y fronteras se
-muestran en [`DIA-COD-REU-002`](../code-diagrams/06-view-of-reuse-crud-and-interface.md#reutilización-del-transporte-backend).
-La [decisión de propiedad visual](12-composition-and-ownership-of-components-visual.md#decisión-de-propiedad)
+muestran en [`DIA-COD-REU-002`](01-backend-handlers-and-services.md#reutilización-del-transporte-backend).
+La [decisión de propiedad visual](../design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md#decisión-de-propiedad)
 conserva un componente junto al recurso cuando su contrato todavía depende de él.
 
 ## Procedimiento para revisar una extracción
@@ -88,12 +88,12 @@ resolver y se mantiene junto al mecanismo propietario.
 
 | Pieza revisada | Representación vigente | Criterio de cobertura |
 | --- | --- | --- |
-| Factories CRUD y salidas; handlers y listado backend | [`DIA-COD-REU-001..002`](../code-diagrams/06-view-of-reuse-crud-and-interface.md) y `DIA-PAT-REF-001`. | Cubiertos: núcleo, configuradores y contrato de cada frontera. |
-| Factories de requests de compras/salidas | [`DIA-COD-REU-003`](../code-diagrams/06-view-of-reuse-crud-and-interface.md#factories-de-requests-por-contexto). | Se añade la frontera de transporte y las variantes de URLs/operaciones. |
-| Tabla de detalle, builders y núcleo responsivo | [`DIA-COD-REU-004`](../code-diagrams/06-view-of-reuse-crud-and-interface.md#construcción-y-ciclo-de-vida-de-tablas-de-detalle). | Se añade configuración, ownership, reinicialización y consumidores reales. |
-| Encabezado y cumplimiento compartido de salidas | [`DIA-COD-REU-005`](../code-diagrams/06-view-of-reuse-crud-and-interface.md#servicios-y-reglas-compartidos-por-salidas). | Se añade la colaboración backend y el límite de reglas específicas del detalle. |
-| DTO/adaptadores, colecciones, UI, permisos, eventos, auditoría y `tx` | [Catálogo visual y capítulos propietarios](index.md#cobertura-visual). | Ya tienen una colaboración o flujo de datos; se actualiza su fuente canónica. |
-| Arreglos compartidos de middleware de compras/salidas | [Pipeline](06-pipeline-of-middleware.md) y routers de cada contexto. | Basta explicar sus consumidores: comparten el orden declarado y permisos por operación; no necesitan otra secuencia equivalente. |
+| Factories CRUD y salidas; handlers y listado backend | [Factories y handlers](index.md) y `DIA-PAT-REF-001`. | Cubiertos: núcleo, configuradores y contrato de cada frontera. |
+| Factories de requests de compras/salidas | [`DIA-COD-REU-003`](02-browser-applications-and-requests.md#factories-de-requests-por-contexto). | Se añade la frontera de transporte y las variantes de URLs/operaciones. |
+| Tabla de detalle, builders y núcleo responsivo | [`DIA-COD-REU-004`](03-interface-and-table-lifecycle.md#construcción-y-ciclo-de-vida-de-tablas-de-detalle). | Se añade configuración, ownership, reinicialización y consumidores reales. |
+| Encabezado y cumplimiento compartido de salidas | [`DIA-COD-REU-005`](01-backend-handlers-and-services.md#servicios-y-reglas-compartidos-por-salidas). | Se añade la colaboración backend y el límite de reglas específicas del detalle. |
+| DTO/adaptadores, colecciones, UI, permisos, eventos, auditoría y `tx` | [Catálogo visual y capítulos propietarios](../design-and-construction-patterns/index.md#cobertura-visual). | Ya tienen una colaboración o flujo de datos; se actualiza su fuente canónica. |
+| Arreglos compartidos de middleware de compras/salidas | [Pipeline](../design-and-construction-patterns/05-middleware-pipeline.md) y routers de cada contexto. | Basta explicar sus consumidores: comparten el orden declarado y permisos por operación; no necesitan otra secuencia equivalente. |
 | Formatos, constantes y helpers simples sin coordinación nueva | Contrato, imports y pruebas disponibles. | No requieren figura individual; se muestran como dependencia cuando explican otro mecanismo. |
 
 Las figuras muestran la concentración y composición comprobables hoy. Un antes/después

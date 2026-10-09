@@ -1,4 +1,4 @@
-# 5. Fronteras y colaboraciones de implementación
+# 5. Contratos entre capas
 
 ### 5.1 Fronteras y contratos de implementación
 
@@ -40,9 +40,9 @@ Las fuentes de esta figura son `src/routes`, `src/controllers`, `src/dtos`,
 
 | Colaboración | Por qué necesita otra representación | Fuente propietaria |
 | --- | --- | --- |
-| Pipeline y normalización | Orden explícito de controles y adaptación de entrada. | [Aplicación concreta del pipeline](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#pipeline-dto-y-políticas-declarativas). |
-| Escrituras coordinadas | Límite de `tx`, rollback y efectos posteriores al commit. | [Transacción, eventos y auditoría](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#transacción-eventos-y-auditoría), con servicios concretos en las secuencias backend. |
-| Construcción de aplicaciones | Configuración al cargar el módulo y uso posterior de closures. | [Factory CRUD aplicada](../design-and-construction-patterns/04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia). |
+| Pipeline y normalización | Orden explícito de controles y adaptación de entrada. | [Aplicación concreta del pipeline](../design-and-construction-patterns/03-patterns-in-code.md#pipeline-dto-y-políticas-declarativas). |
+| Escrituras coordinadas | Límite de `tx`, rollback y efectos posteriores al commit. | [Transacción, eventos y auditoría](../design-and-construction-patterns/03-patterns-in-code.md#transacción-eventos-y-auditoría), con servicios concretos en las secuencias backend. |
+| Construcción de aplicaciones | Configuración al cargar el módulo y uso posterior de closures. | [Factory CRUD aplicada](../design-and-construction-patterns/03-patterns-in-code.md#factories-y-composición-sobre-herencia). |
 | Actualización de tablas por eventos | Publicación, puente del navegador y nueva consulta. | [Publicador y consumidores](../design-and-construction-patterns/10-publication-of-events-of-inventory.md#aplicación-entre-publicador-y-consumidores). |
 | Sesión en el transporte compartido | Varias solicitudes esperan la renovación pendiente; reintento acotado. | [Renovación coordinada](../frontend-technical-documentation/02-views-technical-applied-by-flow-frontend.md#renovación-coordinada-del-transporte-http). |
 

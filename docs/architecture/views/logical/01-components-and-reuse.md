@@ -114,9 +114,9 @@ consulta de datos del listado.
 ## Reutilización y mantenimiento
 
 Las factories y consumidores se detallan en los
-[diagramas de reutilización](../development/code-diagrams/06-view-of-reuse-crud-and-interface.md)
+[diagramas de reutilización](../development/reuse-and-refactoring/index.md)
 y en el [patrón de composición visual](../development/design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md).
-Las [colaboraciones por dominio](../development/code-diagrams/04-view-structural-domains-and-collaborations.md)
+Las [colaboraciones por dominio](../development/code-structure/03-backend-domains-and-dependencies.md)
 amplían las dependencias y [OpenAPI](../../openapi/openapi.json) define los contratos HTTP.
 
 Al extender un componente, reutilizar el flujo compartido y mantener las reglas

@@ -1,43 +1,17 @@
-# 8. Factory functions y composición de aplicaciones
+# 7. Factory functions y composición de aplicaciones
 
 La construcción canónica se muestra en
-[`DIA-PAT-CON-001`](04-catalog-visual-of-patterns-applied.md#factories-y-composición-sobre-herencia)
+[`DIA-PAT-CON-001`](03-patterns-in-code.md#factories-y-composición-sobre-herencia)
 y sus consumidores en los
-[diagramas de reutilización](../code-diagrams/06-view-of-reuse-crud-and-interface.md).
+[diagramas de reutilización](../reuse-and-refactoring/index.md).
 Este capítulo conserva únicamente las variantes y reglas de exposición.
 
-```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    direction LR
-    class CrudFactory {
-        <<factory>>
-        createCrudApplication(config) Object
-    }
-    class IssueFactory {
-        <<factory>>
-        createIssueApplication(config) Object
-    }
-    class ListFactory {
-        <<factory>>
-        createDataTableListController(config) Function
-    }
-    class DomainApplication { <<module>> }
-    class IssueApplication { <<module>> }
-    class ListController { <<module>> }
-    class RequestConfiguration { <<configuration>> }
+La estructura de imports y configuración se consulta en
+[applications y requests](../reuse-and-refactoring/02-browser-applications-and-requests.md)
+y [handlers backend](../reuse-and-refactoring/01-backend-handlers-and-services.md).
+Se representan funciones y módulos existentes; no se atribuyen clases ni herencia a
+las factories ES.
 
-    DomainApplication ..> CrudFactory : configura
-    IssueApplication ..> IssueFactory : configura
-    IssueFactory ..> CrudFactory : compone operaciones
-    ListController ..> ListFactory : inyecta consulta
-    CrudFactory ..> RequestConfiguration : recibe
-    IssueFactory ..> RequestConfiguration : recibe
-```
 
 ### Contratos configurables
 

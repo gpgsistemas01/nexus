@@ -58,7 +58,7 @@ la limitación del renderizador ni se presenta una máquina de estados como sust
 
 | Actividad conservada | Ubicación propietaria | Por qué se requiere |
 | --- | --- | --- |
-| Ciclo compartido de catálogos | [Registro de catálogos](../development/design-and-construction-patterns/01-registration-of-catalogs-with-checklist-allowlist.md#diagrama-del-ciclo-crud-compartido) | Expresa una decisión reutilizable entre consulta, alta, edición y estado activo; evita una actividad repetida por catálogo. |
+| Ciclo compartido de catálogos | [Registro de catálogos](../development/design-and-construction-patterns/08-catalog-registry-and-allowlist.md#diagrama-del-ciclo-crud-compartido) | Expresa una decisión reutilizable entre consulta, alta, edición y estado activo; evita una actividad repetida por catálogo. |
 | Cancelación de detalle de entrada | [Diagramas técnicos backend](../development/backend-technical-documentation/02-views-technical-applied.md#actividad-de-cancelación-de-un-detalle-de-entrada) | Hace visibles las guardas de existencia, motivo y reversión de stock que producen rechazo o rollback. |
 | Surtimiento de materiales | [Diagramas técnicos backend](../development/backend-technical-documentation/02-views-technical-applied.md#actividad-de-decisión-y-surtimiento-de-materiales) | Separa actualización y surtimiento, y muestra las decisiones que derivan movimiento y estado. |
 | Autenticación y autorización API | [Diagramas técnicos backend](../development/backend-technical-documentation/02-views-technical-applied.md#decisiones-de-autenticación-y-autorización-api) | Distingue rechazos de token, identidad y permiso antes de continuar la petición. |

@@ -1,4 +1,4 @@
-# 4. Catálogo visual de patrones aplicados
+# 3. Catálogo visual de patrones aplicados
 
 El catálogo conecta las responsabilidades compartidas con sus implementaciones y
 consumidores. Las figuras estructurales localizan dependencias y configuración; las
@@ -6,38 +6,32 @@ secuencias explican construcción, controles y límites temporales. Cada mecanis
 un contrato y variantes que permanecen en el recurso. Los símbolos y archivos permiten
 contrastar el dibujo con código y pruebas, sin atribuirle cobertura adicional.
 
-Los capítulos de detalle completan [políticas y adaptación de datos](07-dto-functional-and-policies-declarative.md),
+Los capítulos de detalle completan [políticas y adaptación de datos](06-dtos-adapters-and-policies.md),
 [publicador y suscriptores](10-publication-of-events-of-inventory.md),
 [ownership visual](12-composition-and-ownership-of-components-visual.md) y
-[refactorización](16-refactoring-and-extension.md). Los códigos **Patrones** de los casos
+[refactorización](../reuse-and-refactoring/04-refactoring-and-extension.md). Los códigos **Patrones** de los casos
 son enlaces a estas colaboraciones; no sustituyen su evidencia de aplicación.
 
 ### Estructura por dominio, capas y fronteras
 
 **Identificador:** `DIA-PAT-EST-001`. **Pregunta:** ¿dónde se materializa la separación
-por capa y qué soluciones compartidas consumen los recursos? **Alcance:** dependencias
-de módulos ES; las flechas apuntan del consumidor a la pieza utilizada.
+por capa en el recurso materiales? **Fuente:** imports de los módulos nombrados.
+**Alcance:** ejemplo de capas en módulos ES; las flechas apuntan del consumidor a la dependencia.
 
 ```mermaid
 flowchart TB
-    subgraph resources["Módulos propietarios por dominio"]
-        admin["admin<br/>usuarios · personas · catálogos"]
-        sales["sales<br/>clientes"]
-        warehouse["warehouse<br/>inventario · compras · salidas"]
-    end
-    admin --> transport["routes + controllers<br/>frontera HTTP y respuesta"]
-    sales --> transport
-    warehouse --> transport
-    transport --> rules["services + dtos + validators<br/>reglas y contratos por recurso"]
-    rules --> persistence["repository/baseRepository.getDb(tx)<br/>lib/prisma.js"]
-    pages["public/js/pages<br/>pantalla del recurso"] --> application["public/js/application<br/>operaciones y configuración de factories"]
-    application --> requests["public/js/services<br/>requests HTTP"]
-    pages --> visual["public/js/ui + plugins<br/>composición visual compartida"]
-    requests -->|HTTP| transport
+    routes["routes/api/warehouse/materialApiRoute.js"] --> middleware["middleware/authMiddleware.js<br/>validators/forms/materialValidations.js"]
+    routes --> controller["controllers/api/warehouse/materialController.js"]
+    controller --> dto["dtos/materialDTO.js"]
+    controller --> service["services/warehouse/materials/materialService.js"]
+    service --> db["repository/baseRepository.js<br/>lib/prisma.js"]
+    page["public/js/pages/warehouse/materials/materialForm.js"] --> application["application/warehouse/materials/materials.js"]
+    application --> requests["services/warehouse/materialService.js<br/>axiosInstanceApi.js"]
+    page --> visual["ui/forms/formUI.js"]
+    requests -->|HTTP| routes
 ```
 
-Las cajas de dominio localizan familias repartidas entre capas; no son clases ni
-servicios desplegables. El [corte de materiales](../code-diagrams/04-view-structural-domains-and-collaborations.md)
+Los módulos son archivos JavaScript con funciones exportadas. El [mapa completo del backend](../code-structure/03-backend-domains-and-dependencies.md)
 permite seguir archivos concretos. La referencia backend explica el contrato de cada
 capacidad y la frontend explica qué se configura y qué estado conserva la pantalla.
 
@@ -96,7 +90,7 @@ es una colaboración del alta, no una firma común para todos los recursos.
 | Catálogos administrables | `router.use` instala token y autorización; luego la operación valida y delega. | `src/routes/api/admin/catalogApiRoute.js`. |
 
 La construcción de permisos se explica en
-[políticas declarativas](07-dto-functional-and-policies-declarative.md#aplicación-de-políticas-declarativas).
+[políticas declarativas](06-dtos-adapters-and-policies.md#aplicación-de-políticas-declarativas).
 El middleware global de auditoría se monta antes de los routers y observa la respuesta;
 no constituye otra etapa local entre DTO y servicio.
 

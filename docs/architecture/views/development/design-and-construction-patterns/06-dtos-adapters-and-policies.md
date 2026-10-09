@@ -1,4 +1,4 @@
-# 7. DTO funcional y políticas declarativas
+# 6. DTO funcional y políticas declarativas
 
 Los módulos de `src/dtos` aplican el patrón **Data Transfer Object** sin requerir clases:
 seleccionan campos aceptados y normalizan valores de transporte antes de invocar el

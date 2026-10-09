@@ -18,12 +18,29 @@ consumidores y sus pruebas. Los recorridos temporales de cada `CU-*` pertenecen 
 
 | Pregunta de desarrollo | Fuente propietaria | Qué aporta |
 | --- | --- | --- |
-| ¿Dónde está una responsabilidad y de qué depende? | [Diagramas vigentes del código](code-diagrams/index.md) | Organización por dominio y capa, fronteras HTTP y dependencias internas. |
+| ¿Dónde está una responsabilidad y de qué depende? | [Estructura del código](code-structure/index.md) | Organización por dominio y capa, fronteras HTTP y dependencias internas. |
+| ¿Cómo se integra Prisma y qué cubre una transacción? | [Prisma y persistencia](code-structure/06-prisma-and-persistence.md) | Cliente generado, conexión, consultas en servicios, `tx`, migraciones y errores. |
 | ¿Qué solución compartida se aplica y cómo se configura? | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | Implementación, consumidores concretos, contratos, variantes y límites de cada mecanismo. |
-| ¿Qué se reutiliza y cómo se revisa una extracción? | [Reutilización](code-diagrams/06-view-of-reuse-crud-and-interface.md) y [refactorización](design-and-construction-patterns/16-refactoring-and-extension.md) | Puntos de extensión, ownership e impacto de cambios sobre piezas comunes y consumidores. |
+| ¿Qué se reutiliza y cómo se revisa una extracción? | [Reutilización](reuse-and-refactoring/index.md) y [refactorización](reuse-and-refactoring/04-refactoring-and-extension.md) | Puntos de extensión, ownership e impacto de cambios sobre piezas comunes y consumidores. |
 | ¿Qué reglas, efectos y errores conserva el servidor? | [Referencia técnica de backend](backend-technical-documentation/index.md) | Contratos y colaboraciones por capacidad; límites transaccionales. |
 | ¿Cómo se compone la pantalla y se adapta su contrato? | [Referencia técnica de frontend](frontend-technical-documentation/index.md) | Composición, estado local, callbacks, adaptación de datos y transporte HTTP. |
 | ¿Qué rutas, imports y símbolos existen? | [Mapa generado del código](code-map.md) | Inventario enumerable desde `src`; evidencia para contrastar la explicación curada. |
+
+## Organización de archivos
+
+```text
+development/
+├── code-structure/                  # Repositorio, backend, frontend y Prisma
+├── reuse-and-refactoring/           # Backend, application/requests, interfaz y extensión
+├── design-and-construction-patterns/# Decisiones y mecanismos, en orden de construcción
+├── backend-technical-documentation/ # Contratos por capacidad y colaboraciones técnicas
+├── frontend-technical-documentation/# Contratos por pantalla y estado local
+└── code-map.md                      # Inventario generado de rutas, imports y símbolos
+```
+
+Primero se consulta estructura, después el mecanismo de reutilización o patrón y, para
+un recurso concreto, su referencia técnica. Las referencias agrupan contratos; los
+mapas agrupan módulos. Cada carpeta tiene un `index.md` y capítulos consecutivos.
 
 ## Forma de leer los diagramas
 

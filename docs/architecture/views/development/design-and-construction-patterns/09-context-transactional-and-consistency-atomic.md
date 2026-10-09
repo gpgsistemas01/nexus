@@ -45,5 +45,5 @@ todos los efectos. Dentro del callback se usa `tx` directamente o se propaga a h
 que seleccionan ese cliente mediante `getDb(tx)`.
 
 La [secuencia del caso de entrada](../../processes/backend-code-sequences/purchases/cu-ent-02.md)
-completa el recorrido HTTP. [`DIA-PAT-DIN-001`](04-catalog-visual-of-patterns-applied.md#transacción-eventos-y-auditoría)
+completa el recorrido HTTP. [`DIA-PAT-DIN-001`](03-patterns-in-code.md#transacción-eventos-y-auditoría)
 resume la posición de eventos y auditoría respecto del commit.

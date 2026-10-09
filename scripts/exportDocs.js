@@ -247,12 +247,14 @@ const PUBLICATIONS = Object.freeze({
             ]),
             'patrones-y-mapa-de-codigo': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
-                ...getDirectoryDocuments('docs/architecture/views/development/code-diagrams'),
+                ...getDirectoryDocuments('docs/architecture/views/development/code-structure'),
+                ...getDirectoryDocuments('docs/architecture/views/development/reuse-and-refactoring'),
                 ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
                 'docs/architecture/views/development/code-map.md'
             ]),
             backend: packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
+                'docs/architecture/views/development/code-structure/06-prisma-and-persistence.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/backend-technical-documentation')
             ]),
             frontend: packagePart(ARCHITECTURE_ENTRY, [

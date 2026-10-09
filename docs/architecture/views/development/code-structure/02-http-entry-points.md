@@ -1,4 +1,4 @@
-# 3. Diagrama estructural: superficie HTTP registrada
+# 2. Entradas HTTP y registro de routers
 
 La frontera HTTP se organiza mediante dos registros de routers. La agrupación identifica
 módulos de transporte y capacidades expuestas; no convierte una ruta en caso de uso ni
