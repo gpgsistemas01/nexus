@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -26,12 +28,88 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `IssueUI` | control | [`issueFormUI.js`](../../../../../../src/public/js/ui/issues/issueFormUI.js) |
 | `FormErrors` | control | [`formErrorsUI.js`](../../../../../../src/public/js/ui/forms/formErrorsUI.js) |
 | `Decimal` | control | [`formatUtils.js`](../../../../../../src/public/js/utils/formatUtils.js) |
+| `FileSwalComponent` | control | [`swalComponent.js`](../../../../../../src/public/js/plugins/swal/swalComponent.js) |
+| `FileModalUI` | control | [`modalUI.js`](../../../../../../src/public/js/ui/modalUI.js) |
+| `FileTableOperations` | control | [`tableOperations.js`](../../../../../../src/public/js/plugins/datatable/core/base/tableOperations.js) |
+| `FileErrorHandler` | control | [`errorHandler.js`](../../../../../../src/public/js/api/errorHandler.js) |
+| `FileResponseUtils` | control | [`responseUtils.js`](../../../../../../src/public/js/utils/responseUtils.js) |
+| `FileApiMessages` | control | [`apiMessages.js`](../../../../../../src/public/js/constants/apiMessages.js) |
+| `FileWasteIssueController` | control | [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
+| `FileCreateIssueApplication` | control | [`createIssueApplication.js`](../../../../../../src/public/js/application/warehouse/issues/createIssueApplication.js) |
+| `FileWasteIssues` | control | [`wasteIssues.js`](../../../../../../src/public/js/application/warehouse/wasteIssues/wasteIssues.js) |
+| `FileValidators` | control | [`validators.js`](../../../../../../src/public/js/utils/validations/validators.js) |
+| `FileFieldValidations` | control | [`fieldValidations.js`](../../../../../../src/public/js/utils/validations/fieldValidations.js) |
+| `FileBaseValidations` | control | [`baseValidations.js`](../../../../../../src/public/js/utils/validations/baseValidations.js) |
 
-### Configuración y archivos de contexto
+### Configuración y construcción
 
 El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-SAL-09`](../../backend-code-sequences/issues/cu-sal-09.md#cu-sal-09): [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js).
 
 La aplicación ejecuta closures de `createCrudApplication.js`, configuradas por [`wasteIssues.js`](../../../../../../src/public/js/application/warehouse/wasteIssues/wasteIssues.js) mediante [`createIssueApplication.js`](../../../../../../src/public/js/application/warehouse/issues/createIssueApplication.js). Estos archivos de construcción no añaden delegaciones por petición.
+
+Las llamadas internas de los helpers se amplían una vez en las
+[colaboraciones CRUD compartidas](../../shared-runtime-behavior/03-crud-helper-collaborations.md). Sus archivos siguen representados
+por separado en las figuras y la tabla de este caso.
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileWasteIssueController["wasteIssueController.js"]
+        Transport["wasteIssueApiRoute.js"]
+    end
+    subgraph Component1["Interfaz"]
+        FileErrorHandler["errorHandler.js"]
+        FileApiMessages["apiMessages.js"]
+        View["wasteIssueForm.js"]
+        FileTableOperations["tableOperations.js"]
+        DetailTable["renderMaterialDatatable.js"]
+        IssueUI["issueFormUI.js"]
+        FileModalUI["modalUI.js"]
+        FormUtils["formUtils.js"]
+        FileResponseUtils["responseUtils.js"]
+        FileBaseValidations["baseValidations.js"]
+        FileFieldValidations["fieldValidations.js"]
+        FileValidators["validators.js"]
+    end
+    subgraph Component2["Aplicación y requests"]
+        Application["createCrudApplication.js"]
+        FileCreateIssueApplication["createIssueApplication.js"]
+        FileWasteIssues["wasteIssues.js"]
+        Request["wasteIssueService.js"]
+    end
+    FileErrorHandler -->|import| FileApiMessages
+    FileCreateIssueApplication -->|import| Application
+    FileWasteIssues -->|import| Request
+    FileWasteIssues -->|import| FileCreateIssueApplication
+    View -->|import| FileWasteIssues
+    View -->|import| FileValidators
+    DetailTable -->|import| FileTableOperations
+    IssueUI -->|import| FileModalUI
+    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileTableOperations
+    FormUtils -->|import| FileModalUI
+    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileBaseValidations
+    FileValidators -->|import| FileBaseValidations
+    FileValidators -->|import| FileFieldValidations
+    Transport -->|import| FileWasteIssueController
+```
+
+## Construcción de funciones para esta operación
+
+El configurador se ejecuta al evaluar su módulo. Después se invoca la función devuelta
+por la fábrica, usando el nombre público mostrado en la secuencia.
+
+| Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
+| --- | --- | --- |
+| `registerWasteIssue` | `FileWasteIssues` | `FileCreateIssueApplication` · `createIssueApplication(...)` |
 
 ## Coordinación de la interfaz
 
@@ -44,14 +122,16 @@ sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla JS
-    participant DetailCollection@{ "type": "control" } as Colección de detalles
-    participant DetailTable@{ "type": "boundary" } as Tabla de detalles
-    participant DetailFormUI@{ "type": "boundary" } as UI de detalles
-    participant FormUtils@{ "type": "control" } as Form helpers
-    participant FormErrors@{ "type": "control" } as Errores formulario
-    participant Decimal@{ "type": "control" } as Decimales
-    participant InventoryUtils@{ "type": "control" } as Conversión de inventario
+    participant View@{ "type": "boundary" } as wasteIssueForm.js
+    participant DetailCollection@{ "type": "control" } as detailCollectionUtils.js
+    participant DetailTable@{ "type": "boundary" } as renderMaterialDatatable.js
+    participant DetailFormUI@{ "type": "boundary" } as detailFormUI.js
+    participant FormUtils@{ "type": "control" } as formUtils.js
+    participant FormErrors@{ "type": "control" } as formErrorsUI.js
+    participant Decimal@{ "type": "control" } as formatUtils.js
+    participant InventoryUtils@{ "type": "control" } as warehouseInventoryUtils.js
+
+    participant Form@{ "type": "control" } as formUI.js
 
     Initiator->>Browser: inicia CU-SAL-09 — Crear salida de merma
     Browser->>View: on(DOM_EVENT_NAMES.CLICK, BUTTON_SELECTORS.ADD_MATERIAL, addWaste)
@@ -65,6 +145,7 @@ sequenceDiagram
     FormUtils-->>View: hasValidationErrors(): boolean
     deactivate FormUtils
     alt El renglón tiene datos inválidos
+        Form->>FormErrors: scrollToFirstFormError(form)
         View-->>Browser: errores visibles en merma o cantidad
     else Renglón válido
         View->>InventoryUtils: getPresentation({ presentation }), getUnitMeasure({ unitMeasure })
@@ -82,7 +163,6 @@ sequenceDiagram
         View->>DetailTable: refreshMaterialTable(details)
         View->>DetailFormUI: clearAddedItemInput({ itemSelector: SELECT_SELECTORS.WASTE,<br/>quantitySelector: INPUT_SELECTORS.QUANTITY,<br/>presentationSelector: presentationDisplaySelector })
     end
-
 ```
 
 ## Envío y resultado de la interfaz
@@ -96,12 +176,17 @@ línea de vida aunque participen en el mismo submit.
 sequenceDiagram
     autonumber
     participant Browser as Navegador
-    participant Form@{ "type": "control" } as useForm
-    participant View@{ "type": "boundary" } as Callback formulario
-    participant IssueUI@{ "type": "control" } as Formulario de salida
-    participant FormUtils@{ "type": "control" } as Form helpers
-    participant Application@{ "type": "control" } as Application
-    participant DetailTable@{ "type": "boundary" } as Tabla de detalles
+    participant Form@{ "type": "control" } as formUI.js
+    participant View@{ "type": "boundary" } as wasteIssueForm.js
+    participant IssueUI@{ "type": "control" } as issueFormUI.js
+    participant FormUtils@{ "type": "control" } as formUtils.js
+    participant Application@{ "type": "control" } as createCrudApplication.js
+    participant DetailTable@{ "type": "boundary" } as renderMaterialDatatable.js
+
+    participant FileErrorHandler@{ "type": "control" } as errorHandler.js
+    participant FormErrors@{ "type": "control" } as formErrorsUI.js
+
+    participant FileSwalComponent@{ "type": "control" } as swalComponent.js
 
     Browser->>Form: submit del formulario de salida
     Form->>View: normalizeWasteIssueData({ form })
@@ -110,7 +195,12 @@ sequenceDiagram
     View->>FormUtils: validateFields(wasteIssueValidation, formData)
     FormUtils-->>View: validateFields(): Object
     View-->>Form: getErrors(): Object
+    Form->>FormErrors: normalizeFormErrors({ form, errors }) — callback por defecto
+    Form->>FormErrors: toggleErrorMessages(form, errors)
+    Form->>FormUtils: hasValidationErrors(errors)
+    FormUtils-->>Form: hasValidationErrors(): boolean
     alt Datos inválidos
+        Form->>FormErrors: scrollToFirstFormError(form)
         Form-->>Browser: errores por campo, sin request
     else Formulario válido
         break Envío ya en curso
@@ -121,9 +211,8 @@ sequenceDiagram
         FormUtils->>Application: registerWasteIssue({ formData })
         alt Aplicación resuelta
             Application-->>FormUtils: registerWasteIssue(): Promise[{ message, data }]
-            FormUtils->>Browser: notifications.showSuccess(response.message)
-            FormUtils->>Browser: closeModal(form)
-            FormUtils->>Browser: reloadMainTable({ resetPaging: true })
+            FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
+            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
             FormUtils-->>IssueUI: handleSubmit(): Promise[WasteIssue]
             IssueUI->>View: onSaved({ form, formData }) — callback configurado
             Note over View: details.length = 0
@@ -132,7 +221,7 @@ sequenceDiagram
             Application-->>FormUtils: error propagado
             FormUtils-->>IssueUI: error propagado por handleSubmit()
             IssueUI-->>Form: error propagado por sendRequest()
-            Form->>Browser: handleApiError({ err, form })
+            Form->>FileErrorHandler: handleApiError({ err, form })
         end
     end
 ```
@@ -144,11 +233,13 @@ Amplía la llamada a `Application` del nivel anterior: cada request y el cliente
 ```mermaid
 sequenceDiagram
     autonumber
-    participant FormUtils@{ "type": "control" } as Form helpers
-    participant Application@{ "type": "control" } as Application
-    participant Request@{ "type": "boundary" } as Requests del recurso
-    participant HTTP@{ "type": "boundary" } as Cliente HTTP
-    participant Transport@{ "type": "control" } as Endpoint API
+    participant FormUtils@{ "type": "control" } as formUtils.js
+    participant Application@{ "type": "control" } as createCrudApplication.js
+    participant Request@{ "type": "boundary" } as wasteIssueService.js
+    participant HTTP@{ "type": "boundary" } as axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as wasteIssueApiRoute.js
+
+    participant FileResponseUtils@{ "type": "control" } as responseUtils.js
 
         FormUtils->>Application: registerWasteIssue({ formData })
         activate Application
@@ -160,6 +251,8 @@ sequenceDiagram
         deactivate Transport
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: registerWasteIssueRequest(): Promise[AxiosResponse]
+        Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
+        FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
         alt Respuesta exitosa
             Application-->>FormUtils: registerWasteIssue(): Promise[{ message: string, data: WasteIssue }]
         else Respuesta rechazada

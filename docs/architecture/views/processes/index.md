@@ -37,14 +37,16 @@ un flujo de control ni inventar paralelismo.
 
 Cada línea de vida técnica identifica un único archivo, enlazado en la tabla
 **Participantes y trazabilidad**. Dentro de una figura, el mismo archivo no puede
-aparecer en dos líneas distintas. Los nombres visibles resumen la responsabilidad del archivo;
-el enlace conserva su nombre y su ruta completa. Los actores, el navegador, el runtime Express
+aparecer en dos líneas distintas. Los nombres visibles muestran el archivo que ejecuta la llamada;
+el rol visual expresa su responsabilidad y el enlace conserva su ruta completa. Los actores, el navegador, el runtime Express
 y la frontera de persistencia no son archivos del repositorio.
 `docs:check` verifica estas excepciones explícitas y la correspondencia única por figura.
 
 Si una fábrica define el cuerpo de un handler, application o request, su archivo es
-el participante de ejecución. Los módulos que la configuran o reexportan se enlazan
-como contexto, indicando el alias público utilizado. Un reexport o la selección de una
+el participante de ejecución. Los módulos que la configuran o reexportan aparecen
+como componentes separados en la composición de archivos, con sus imports reales y el
+nombre público de la función construida. La composición representa dependencias del
+caso y complementa las secuencias; los mapas generales de módulos siguen en desarrollo. Un reexport o la selección de una
 función no añade una llamada de delegación durante la petición. En cambio, helpers,
 validadores, middleware y callbacks de archivos diferentes tienen participantes propios.
 La plantilla EJS y el JavaScript de la pantalla tampoco comparten una línea de vida.
@@ -64,6 +66,9 @@ En backend se separan entrada/coordinación y dominio; en frontend se separan in
 y aplicación/transporte. Los formularios extensos dividen también validación y envío. Las altas de proveedor y cliente añaden un nivel de preparación
 del modal para distinguir las dos entradas posibles. Cada nivel conserva el archivo del
 caller y del callee que delimitan la llamada ampliada, sin añadir otra operación.
+Las colaboraciones internas extensas se amplían en secciones de detalle, conservando
+el caller y el archivo que ejecuta cada función. No se traslada a un helper importado
+una función local, ni se atribuyen llamadas JavaScript al navegador.
 Las figuras comparten una tabla de fuentes, conservan sus propios fragmentos y reinician
 la numeración para facilitar su lectura. La llamada de frontera y su resultado reaparecen
 para identificar la ampliación; las acciones internas sólo se desarrollan en su nivel.
@@ -92,5 +97,7 @@ contratos diferentes: una colección paginada no se rotula como una mutación ge
 Sesión y auditoría conservan sus colaboraciones transversales en esta vista.
 
 `npm run docs:check` comprueba cobertura, trazabilidad, participantes, fragmentos,
-activaciones, un archivo por línea de vida, ausencia de archivos duplicados y contrato. El renderizado y la exportación verifican legibilidad; estos
+activaciones, un archivo por línea de vida, ausencia de archivos duplicados y contrato.
+También comprueba que todos los archivos de la tabla aparezcan en una figura y que
+las flechas de composición correspondan a imports/reexports existentes en el código. El renderizado y la exportación verifican legibilidad; estos
 controles no equivalen a ejecutar todos los caminos del código.

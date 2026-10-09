@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -25,13 +27,13 @@ sequenceDiagram
     autonumber
     actor Initiator as Usuario registrado
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla JS
-    participant Route@{ "type": "boundary" } as Router API
-    participant Controller@{ "type": "control" } as Controller
+    participant View@{ "type": "boundary" } as logoutForm.ejs
+    participant Route@{ "type": "boundary" } as logoutWebRoute.js
+    participant Controller@{ "type": "control" } as authController.js
 
-    participant Cookies@{ "type": "control" } as Cookies
+    participant Cookies@{ "type": "control" } as cookiesUtils.js
 
-    participant Flash@{ "type": "control" } as Redirección con flash
+    participant Flash@{ "type": "control" } as flashUtils.js
 
     Initiator->>Browser: inicia CU-AUT-02 — Cerrar sesión
     Browser->>View: activar botón Salir

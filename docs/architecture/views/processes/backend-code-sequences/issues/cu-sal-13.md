@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -22,6 +24,27 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `Status` | control | [`wasteIssueFulfillmentService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `ValidationRules` | control | [`issueReturnValidations.js`](../../../../../../src/validators/forms/issueReturnValidations.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+    end
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+```
 
 ## Secuencia de implementación
 
@@ -29,17 +52,11 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Router@{ "type": "boundary" } as Router web
-    participant Auth@{ "type": "control" } as Acceso
-    participant ValidationRules@{ "type": "control" } as Reglas de entrada
-    participant Validator@{ "type": "control" } as Validación HTTP
-    participant Controller@{ "type": "control" } as Controller
-    participant ReturnDto@{ "type": "control" } as DTO funcional
-    participant Service@{ "type": "control" } as Service
-    participant Movement@{ "type": "control" } as Movimiento
-    participant Status@{ "type": "control" } as Estado
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Socket@{ "type": "control" } as Eventos Socket.IO
+    participant Router@{ "type": "boundary" } as wasteIssueApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as issueReturnValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as wasteIssueController.js
 
     Client->>Router: PATCH /api/warehouse/waste-issues/:id/details/:detailId/returns + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
@@ -56,12 +73,37 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Router->>Controller: registerWasteIssueDetailReturn(req, res)
+        Controller-->>Client: 200 { wasteIssueReturn, code }
+```
+
+## Detalle de coordinación del controller
+
+Continúa la colaboración anterior. Conserva el orden de los mensajes del código y
+separa los archivos que ejecutan esta parte del recorrido; los otros detalles del caso
+completan las llamadas a helpers y la propagación del resultado.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Cliente HTTP / web
+    participant Controller@{ "type": "control" } as wasteIssueController.js
+    participant ReturnDto@{ "type": "control" } as DTO funcional<br/>wasteIssueDTO.js
+    participant Service@{ "type": "control" } as wasteIssueReturnService.js
+    participant Movement@{ "type": "control" } as wasteMovementService.js
+    participant Status@{ "type": "control" } as wasteIssueFulfillmentService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant Socket@{ "type": "control" } as socketUtils.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
+
     Controller->>ReturnDto: createWasteIssueDtoForReturn(req.body)
     activate ReturnDto
     ReturnDto-->>Controller: createWasteIssueDtoForReturn(): Object (returnDto)
     deactivate ReturnDto
     Controller->>Service: returnWasteIssueDetail({ id, detailId, returnDto, userId })
-    Service->>Prisma: getDb().$transaction(async tx => ...)
+    Service->>FileBaseRepository: getDb()
+    FileBaseRepository-->>Service: getDb(): PrismaClient | TransactionClient — tx si se recibió
+    Service->>Prisma: db.$transaction(async tx => ...)
     Service->>Prisma: tx.wasteIssueDetail.findFirst({ where: { id: detailId, wasteIssueId: id } })
     Service->>Service: returnWasteIssueDetailTransaction({ id, detailId, returnDto, userId }) valida estado y cantidad
     alt Cantidad de merma no retornable
@@ -72,9 +114,7 @@ sequenceDiagram
         Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
         Service->>Prisma: tx.wasteIssueDetail.update({ where: { id: detailId }, data: devolución y cumplimiento })
         Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
-        alt todos los detalles quedan Cancelado
             Service->>Prisma: tx.wasteIssue.update({ where: { id }, data })
-        end
         Service->>Prisma: tx.wasteIssueReturn.create({ data })
         activate Prisma
         Prisma-->>Service: salida de merma actualizada y commit

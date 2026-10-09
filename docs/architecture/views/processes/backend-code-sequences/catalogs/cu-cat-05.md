@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -17,6 +19,27 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `Domain` | control | [`clientService.js`](../../../../../../src/services/sales/clientService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+    end
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+```
 
 ## Secuencia de implementación
 
@@ -24,12 +47,14 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant Controller@{ "type": "control" } as Controller
-    participant Domain@{ "type": "control" } as Servicio de dominio
+    participant Route@{ "type": "boundary" } as clientApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant Controller@{ "type": "control" } as clientController.js
+    participant Domain@{ "type": "control" } as clientService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler@{ "type": "control" } as Errores Express
+    participant ErrorHandler@{ "type": "control" } as app.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 
     Client->>Route: GET /api/sales/clients
 
@@ -49,6 +74,8 @@ sequenceDiagram
     activate Controller
     Controller->>Domain: clientService.findAllClients({ advisorId, onlyActive, skip, take, search, orderBy, orderDir })
     activate Domain
+    Domain->>FileBaseRepository: getDb(tx)
+    FileBaseRepository-->>Domain: getDb(): PrismaClient | TransactionClient — conserva tx
     Domain->>Prisma: client.findMany({ where, include, skip, take, orderBy })
     activate Prisma
     Prisma-->>Domain: findMany(): Promise[Client[]]

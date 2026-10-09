@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -18,12 +20,50 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `Request` | boundary | [`materialService.js`](../../../../../../src/public/js/services/warehouse/materialService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `Transport` | control | [`materialApiRoute.js`](../../../../../../src/routes/api/warehouse/materialApiRoute.js) |
+| `FileMaterialController` | control | [`materialController.js`](../../../../../../src/controllers/api/warehouse/materialController.js) |
+| `FileMaterials` | control | [`materials.js`](../../../../../../src/public/js/application/warehouse/materials/materials.js) |
 
-### Configuración y archivos de contexto
+### Configuración y construcción
 
 El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-ALM-01`](../../backend-code-sequences/catalogs/cu-alm-01.md#cu-alm-01): [`materialController.js`](../../../../../../src/controllers/api/warehouse/materialController.js).
 
 La línea `Application` ejecuta la función generada en `createCrudApplication.js`. Su nombre público y la configuración de requests/contratos provienen de [`materials.js`](../../../../../../src/public/js/application/warehouse/materials/materials.js); exportar esa función no crea otra llamada durante cada petición.
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileMaterialController["materialController.js"]
+        Transport["materialApiRoute.js"]
+    end
+    subgraph Component1["Aplicación y requests"]
+        Application["createCrudApplication.js"]
+        FileMaterials["materials.js"]
+        Request["materialService.js"]
+    end
+    subgraph Component2["Interfaz"]
+        View["materialDatatable.js"]
+    end
+    FileMaterials -->|import| Request
+    FileMaterials -->|import| Application
+    View -->|import| FileMaterials
+    Transport -->|import| FileMaterialController
+```
+
+## Construcción de funciones para esta operación
+
+El configurador se ejecuta al evaluar su módulo. Después se invoca la función devuelta
+por la fábrica, usando el nombre público mostrado en la secuencia.
+
+| Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
+| --- | --- | --- |
+| `getAllMaterials` | `FileMaterials` | `Application` · `createCrudApplication(...)` |
 
 ## Secuencia de implementación
 
@@ -32,12 +72,12 @@ sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla JS
-    participant RowAdapter@{ "type": "boundary" } as Fila responsiva
-    participant Application@{ "type": "control" } as Application
-    participant Request@{ "type": "boundary" } as Requests del recurso
-    participant HTTP@{ "type": "boundary" } as Cliente HTTP
-    participant Transport@{ "type": "control" } as Endpoint API
+    participant View@{ "type": "boundary" } as materialDatatable.js
+    participant RowAdapter@{ "type": "boundary" } as materialRow.js
+    participant Application@{ "type": "control" } as createCrudApplication.js
+    participant Request@{ "type": "boundary" } as materialService.js
+    participant HTTP@{ "type": "boundary" } as axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as materialApiRoute.js
 
     Initiator->>Browser: inicia CU-ALM-01 — Consultar materiales
     Browser->>View: materialsPage inicializa el DataTable de inventario

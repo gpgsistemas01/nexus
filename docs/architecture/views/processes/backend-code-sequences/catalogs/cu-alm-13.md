@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -24,6 +26,27 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `Stock` | control | [`wasteInventoryService.js`](../../../../../../src/services/warehouse/wastes/wasteInventoryService.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+    end
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+```
 
 ## Secuencia de implementación
 
@@ -31,19 +54,11 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Router@{ "type": "boundary" } as Router web
-    participant Auth@{ "type": "control" } as Acceso
-    participant ValidationRules@{ "type": "control" } as Reglas de entrada
-    participant Validator@{ "type": "control" } as Validación HTTP
-    participant Controller@{ "type": "control" } as Controller
-    participant StockDto@{ "type": "control" } as DTO funcional
-    participant Service@{ "type": "control" } as Service
-    participant Entry@{ "type": "control" } as Entrada de stock
-    participant Movement@{ "type": "control" } as Movimiento
-    participant Reference@{ "type": "control" } as Folio documental
-    participant Stock@{ "type": "control" } as Stock de merma
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Socket@{ "type": "control" } as Eventos Socket.IO
+    participant Router@{ "type": "boundary" } as wasteApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as wasteValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as wasteController.js
 
     Client->>Router: POST /api/warehouse/wastes/:id/stock-additions + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
@@ -60,12 +75,43 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Router->>Controller: registerWasteStockAddition(req, res)
+    alt Commit confirmado
+        Controller-->>Client: 200 { waste, code }
+    else Cantidad o persistencia rechazada
+        Controller-->>Client: status HTTP { code, message }
+    end
+```
+
+## Detalle de coordinación del controller
+
+Continúa la colaboración anterior. Conserva el orden de los mensajes del código y
+separa los archivos que ejecutan esta parte del recorrido; los otros detalles del caso
+completan las llamadas a helpers y la propagación del resultado.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Cliente HTTP / web
+    participant Controller@{ "type": "control" } as wasteController.js
+    participant StockDto@{ "type": "control" } as DTO funcional<br/>wasteDTO.js
+    participant Service@{ "type": "control" } as wasteService.js
+    participant Entry@{ "type": "control" } as wasteStockEntryService.js
+    participant Movement@{ "type": "control" } as wasteMovementService.js
+    participant Reference@{ "type": "control" } as referenceNumberService.js
+    participant Stock@{ "type": "control" } as wasteInventoryService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant Socket@{ "type": "control" } as socketUtils.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
+
     Controller->>StockDto: createWasteDtoForStockAddition(req.body)
     activate StockDto
     StockDto-->>Controller: createWasteDtoForStockAddition(): Object (entryDto)
     deactivate StockDto
     Controller->>Service: addWasteStock({ id, entryDto, userId })
-    Service->>Prisma: getDb().$transaction(async tx => ...)
+    Service->>FileBaseRepository: getDb()
+    FileBaseRepository-->>Service: getDb(): PrismaClient | TransactionClient — tx si se recibió
+    Service->>Prisma: db.$transaction(async tx => ...)
     Service->>Prisma: tx.waste.findUnique({ where: { id } })
     Service->>Entry: registerWasteStockEntry({ tx, waste, quantity, observations, userId })
     Entry->>Reference: generateYearlyReferenceNumber({ type: WASTE_STOCK_ENTRY, tx })
@@ -73,10 +119,16 @@ sequenceDiagram
     Reference-->>Entry: generateYearlyReferenceNumber(): Promise[string]
     Entry->>Movement: applyWasteMovement({ tx, movementType: ENTRY, details })
     Movement->>Stock: applyWasteStockChange({ tx, id, quantityChange, convertedQuantityChange })
-    Stock->>Prisma: getDb(tx).waste.findUnique({ where: { id } })
-    Stock->>Prisma: getDb(tx).waste.updateMany({ where, data })
+    Stock->>FileBaseRepository: getDb(tx)
+    FileBaseRepository-->>Stock: getDb(): PrismaClient | TransactionClient — tx si se recibió
+    Stock->>Prisma: db.waste.findUnique({ where: { id } })
+    Stock->>FileBaseRepository: getDb(tx)
+    FileBaseRepository-->>Stock: getDb(): PrismaClient | TransactionClient — tx si se recibió
+    Stock->>Prisma: db.waste.updateMany({ where, data })
     Stock-->>Movement: applyWasteStockChange(): Promise[Object]
     Movement->>Movement: createWasteMovement({ tx, movementType: ENTRY, details })
+    Movement->>FileBaseRepository: getDb(tx)
+    FileBaseRepository-->>Movement: getDb(): PrismaClient | TransactionClient — conserva tx
     Movement->>Prisma: tx.wasteMovement.create({ type: ENTRY, details })
     Entry->>Prisma: tx.wasteStockEntry.create({ folio, actor, captura, saldos, movementId })
     alt Commit confirmado

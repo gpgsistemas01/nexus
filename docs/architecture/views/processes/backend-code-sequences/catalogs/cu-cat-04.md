@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -25,12 +27,12 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant Controller@{ "type": "control" } as Controller
-    participant Query@{ "type": "control" } as Consulta de dominio
-    participant Excel@{ "type": "control" } as Reporte Excel
-    participant ErrorHandler@{ "type": "control" } as Errores Express
+    participant Route@{ "type": "boundary" } as reportApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant Controller@{ "type": "control" } as reportController.js
+    participant Query@{ "type": "control" } as js
+    participant Excel@{ "type": "control" } as reportExcelUtils.js
+    participant ErrorHandler@{ "type": "control" } as app.js
 
     Client->>Route: GET /api/warehouse/reports/suppliers/excel
 
@@ -48,10 +50,10 @@ sequenceDiagram
     deactivate Auth
     Route->>Controller: exportSupplierReportExcel(req, res)
     activate Controller
-    Controller->>Query: reportService.findSupplierReportRows({ search: getDataTableSearch(req.query), orderBy, orderDir })
+    Controller->>Query: findSupplierReportRows({ search: getDataTableSearch(req.query), orderBy, orderDir })
     activate Query
     alt Servicio resuelto
-        Query-->>Controller: reportService.findSupplierReportRows(): Promise[Object[]]
+        Query-->>Controller: findSupplierReportRows(): Promise[Object[]]
         Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
         Excel-->>Client: HTTP 200 archivo XLSX
     else AppError propagado

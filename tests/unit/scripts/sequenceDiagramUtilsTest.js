@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getSequenceLifelineErrors, getSequenceParticipantSources, getSequenceStructureErrors } from '../../../scripts/sequenceDiagramUtils.js';
+import { getDiagramFileCoverageErrors, getSequenceLifelineErrors, getSequenceParticipantSources, getSequenceStructureErrors } from '../../../scripts/sequenceDiagramUtils.js';
 
 describe('estructura de secuencias Mermaid', () => {
     it('acepta salidas anticipadas y resultados alternativos con participantes UML', () => {
@@ -101,6 +101,70 @@ describe('estructura de secuencias Mermaid', () => {
             .toEqual(['src/services/service.js']);
     });
 
+});
+
+describe('cobertura visual de los archivos y sus imports', () => {
+    const body = `## Participantes y trazabilidad
+| Alias | Rol visual | Archivo de implementación |
+| --- | --- | --- |
+| \`Config\` | control | \`src/config.js\` |
+| \`Factory\` | control | \`src/factory.js\` |
+
+## Composición de archivos
+`;
+    const sources = new Map([
+        ['src/config.js', "import { create } from './factory.js';"],
+        ['src/factory.js', 'export const create = () => {};']
+    ]);
+    const sequence = 'sequenceDiagram\n    participant Factory as factory.js';
+    const composition = 'flowchart TB\n    Config["config.js"]\n    Factory["factory.js"]\n    Config -->|import| Factory';
+
+    it('rechaza un configurador que se menciona sólo como contexto', () => {
+        expect(getDiagramFileCoverageErrors(body, [sequence], sources))
+            .toContain('archivo fuera de los diagramas: Config (src/config.js)');
+    });
+
+    it('acepta configurador y cuerpo generado en componentes separados y trazados', () => {
+        expect(getDiagramFileCoverageErrors(body, [composition, sequence], sources)).toEqual([]);
+    });
+
+    it('rechaza una flecha de import que no existe en el código', () => {
+        const reversed = composition.replace('Config -->|import| Factory', 'Factory -->|import| Config');
+        expect(getDiagramFileCoverageErrors(body, [reversed, sequence], sources))
+            .toContain('dependencia import inexistente: src/factory.js → src/config.js');
+    });
+
+    it('distingue un reexport real de un import o una llamada durante la petición', () => {
+        const reexports = new Map(sources);
+        reexports.set('src/config.js', "export { create } from './factory.js';");
+        const graph = composition.replace('|import|', '|reexport|');
+        expect(getDiagramFileCoverageErrors(body, [graph], reexports)).toEqual([]);
+        expect(getDiagramFileCoverageErrors(body, [composition], reexports))
+            .toContain('dependencia import inexistente: src/config.js → src/factory.js');
+    });
+
+    it('rechaza componentes sin archivo y extremos implícitos de una dependencia', () => {
+        const graph = composition + '\n    Unknown["Otro archivo"]\n    Config -->|import| Missing';
+        const errors = getDiagramFileCoverageErrors(body, [graph], sources);
+        expect(errors).toContain('componente sin archivo: Unknown');
+        expect(errors).toContain('dependencia con componente no declarado: Config → Missing');
+    });
+
+    it('rechaza referencias visuales a archivos eliminados', () => {
+        const removed = new Map(sources);
+        removed.delete('src/factory.js');
+        expect(getDiagramFileCoverageErrors(body, [composition], removed))
+            .toContain('archivo de componente inexistente: src/factory.js');
+    });
+
+    it('rechaza un componente compartido por dos archivos o dos componentes del mismo archivo', () => {
+        const grouped = body.replace('`src/config.js`', '`src/config.js`<br/>`src/factory.js`');
+        expect(getDiagramFileCoverageErrors(grouped, [composition], sources))
+            .toContain('componente Config debe identificar un único archivo');
+        const duplicated = body.replace('`src/factory.js`', '`src/config.js`');
+        expect(getDiagramFileCoverageErrors(duplicated, [composition], sources))
+            .toContain('archivo repetido en componentes Config y Factory: src/config.js');
+    });
 });
 
 describe('un archivo por línea de vida', () => {

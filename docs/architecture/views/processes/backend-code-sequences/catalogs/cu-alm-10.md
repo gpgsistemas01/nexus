@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -30,17 +32,11 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant ValidationRules@{ "type": "control" } as Reglas de entrada
-    participant Validator@{ "type": "control" } as Validación HTTP
-    participant Controller@{ "type": "control" } as Controller
-    participant WasteDto@{ "type": "control" } as DTO funcional
-    participant Formatter@{ "type": "control" } as Formato
-    participant Domain@{ "type": "control" } as Servicio de dominio
-    participant Templates@{ "type": "control" } as Plantillas de merma
-    participant Socket@{ "type": "control" } as Eventos Socket.IO
-    participant ErrorHandler@{ "type": "control" } as Errores Express
+    participant Route@{ "type": "boundary" } as wasteApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as wasteValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as wasteController.js
 
     Client->>Route: GET /api/warehouse/wastes/material-templates
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -52,10 +48,7 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Route->>Controller: getWasteMaterialTemplates(req, res)
-    Controller->>Templates: findWasteMaterialTemplates({ search, skip, take, supplierId })
-    Templates-->>Controller: findWasteMaterialTemplates(): Promise[Object[]]
     Controller-->>Client: HTTP 200 { code, data: templates }
-
     Client->>Route: POST /api/warehouse/wastes
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
@@ -71,6 +64,32 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Route->>Controller: registerWaste(req, res)
+    activate Controller
+        Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
+    deactivate Controller
+```
+
+## Detalle de coordinación del controller
+
+Continúa la colaboración anterior. Conserva el orden de los mensajes del código y
+separa los archivos que ejecutan esta parte del recorrido; los otros detalles del caso
+completan las llamadas a helpers y la propagación del resultado.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Cliente HTTP / web
+    participant Controller@{ "type": "control" } as wasteController.js
+    participant WasteDto@{ "type": "control" } as DTO funcional<br/>wasteDTO.js
+    participant Formatter@{ "type": "control" } as formattersUtils.js
+    participant Domain@{ "type": "control" } as wasteService.js
+    participant Templates@{ "type": "control" } as wasteMaterialService.js
+    participant Socket@{ "type": "control" } as socketUtils.js
+    participant ErrorHandler@{ "type": "control" } as app.js
+
+    Controller->>Templates: findWasteMaterialTemplates({ search, skip, take, supplierId })
+    Templates-->>Controller: findWasteMaterialTemplates(): Promise[Object[]]
+    Controller-->>Client: HTTP 200 { code, data: templates }
     activate Controller
     Controller->>WasteDto: createWasteDtoForRegister(req.body)
     activate WasteDto

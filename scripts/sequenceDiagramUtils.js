@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 const FRAGMENTS = new Set(['alt', 'opt', 'loop', 'par', 'critical', 'break', 'rect', 'box']);
 const BRANCHES = { else: 'alt', and: 'par', option: 'critical' };
 
@@ -95,6 +97,54 @@ export const getSequenceLifelineErrors = (body, sequence, externalLabels = new S
             errors.push(`archivo repetido en líneas de vida ${previous} y ${alias}: ${paths[0]}`);
         }
         owners.set(paths[0], alias);
+    }
+    return errors;
+};
+
+export const getDiagramFileCoverageErrors = (body, blocks, sourceContents) => {
+    const errors = [];
+    const table = body.match(/## Participantes y trazabilidad\r?\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? '';
+    const rows = [...table.matchAll(/^\| `([^`]+)` \|[^|]+\|([^\n]+)\|$/gm)];
+    const files = new Map();
+    for (const [, alias, text] of rows) {
+        const paths = [...new Set(text.match(/src\/[\w./-]+\.(?:js|ejs)/g) ?? [])];
+        if (paths.length !== 1) errors.push(`componente ${alias} debe identificar un único archivo`);
+        else files.set(alias, paths[0]);
+    }
+    const shown = new Set();
+    for (const block of blocks) {
+        for (const [, alias] of block.matchAll(/^\s*participant\s+([^\s@]+)/gm)) {
+            shown.add(alias);
+        }
+        if (!block.startsWith('flowchart ')) continue;
+        for (const [, alias] of block.matchAll(/^\s*(\w+)\["/gm)) shown.add(alias);
+        const declared = new Set();
+        const owners = new Map();
+        for (const [, alias] of block.matchAll(/^\s*(\w+)\["/gm)) {
+            if (declared.has(alias)) errors.push(`componente duplicado: ${alias}`);
+            declared.add(alias);
+            if (!files.has(alias)) errors.push(`componente sin archivo: ${alias}`);
+            const source = files.get(alias);
+            if (source && owners.has(source)) errors.push(`archivo repetido en componentes ${owners.get(source)} y ${alias}: ${source}`);
+            if (source) owners.set(source, alias);
+        }
+        for (const [, caller, operation, callee] of block.matchAll(/^\s*(\w+) -->\|(import|reexport)\| (\w+)$/gm)) {
+            const from = files.get(caller);
+            const to = files.get(callee);
+            const source = sourceContents?.get(from);
+            if (!declared.has(caller) || !declared.has(callee)) errors.push(`dependencia con componente no declarado: ${caller} → ${callee}`);
+            if (!sourceContents || !from || !to) continue;
+            const verb = operation === 'reexport' ? 'export' : 'import';
+            const expressions = new RegExp(`\\b${verb}\\s+(?:[^;]*?\\s+from\\s+)?['"]([^'"]+)['"]`, 'g');
+            const targets = [...(source ?? '').matchAll(expressions)].map((match) => (
+                path.posix.normalize(path.posix.join(path.posix.dirname(from), match[1]))
+            ));
+            if (!targets.includes(to)) errors.push(`dependencia ${operation} inexistente: ${from} → ${to}`);
+        }
+    }
+    for (const [alias, source] of files) {
+        if (!shown.has(alias)) errors.push(`archivo fuera de los diagramas: ${alias} (${source})`);
+        if (sourceContents && !sourceContents.has(source)) errors.push(`archivo de componente inexistente: ${source}`);
     }
     return errors;
 };

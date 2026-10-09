@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -25,6 +27,27 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`wasteIssueValidations.js`](../../../../../../src/validators/forms/wasteIssueValidations.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+    end
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+```
 
 ## Secuencia de implementación
 
@@ -32,20 +55,11 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant ValidationRules@{ "type": "control" } as Reglas de entrada
-    participant Validator@{ "type": "control" } as Validación HTTP
-    participant Controller@{ "type": "control" } as Controller
-    participant Formatter@{ "type": "control" } as Formato
-    participant IssueDto@{ "type": "control" } as DTO funcional
-    participant Domain@{ "type": "control" } as Servicio de dominio
-    participant Operation@{ "type": "control" } as Operación
-    participant Fulfillment@{ "type": "control" } as Cumplimiento
-    participant Header@{ "type": "control" } as Encabezado
-    participant Stock@{ "type": "control" } as Existencias
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler@{ "type": "control" } as Errores Express
+    participant Route@{ "type": "boundary" } as wasteIssueApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as wasteIssueValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as wasteIssueController.js
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -63,6 +77,35 @@ sequenceDiagram
     end
     Route->>Controller: editWasteIssue(req, res)
     activate Controller
+        Controller-->>Client: HTTP 200 { wasteIssue, code: UPDATED_WASTE_ISSUE }
+    deactivate Controller
+```
+
+## Detalle de coordinación del controller
+
+Continúa la colaboración anterior. Conserva el orden de los mensajes del código y
+separa los archivos que ejecutan esta parte del recorrido; los otros detalles del caso
+completan las llamadas a helpers y la propagación del resultado.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Cliente HTTP / web
+    participant Controller@{ "type": "control" } as wasteIssueController.js
+    participant Formatter@{ "type": "control" } as formattersUtils.js
+    participant IssueDto@{ "type": "control" } as DTO funcional<br/>wasteIssueDTO.js
+    participant Domain@{ "type": "control" } as wasteIssueService.js
+    participant Operation@{ "type": "control" } as serviceErrorHandler.js
+    participant Fulfillment@{ "type": "control" } as wasteIssueFulfillmentService.js
+    participant Header@{ "type": "control" } as issueHeaderService.js
+    participant Stock@{ "type": "control" } as stockHelpers.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant ErrorHandler@{ "type": "control" } as app.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
+
+    activate Controller
+
     Controller->>IssueDto: createWasteIssueDtoForEdit(req.body)
     activate IssueDto
     IssueDto-->>Controller: createWasteIssueDtoForEdit(): Object (wasteIssueDto)
@@ -72,7 +115,9 @@ sequenceDiagram
     activate Domain
     Domain->>Operation: executeServiceOperation({ action: updateWasteIssueTransaction, fallbackError })
     Operation->>Domain: updateWasteIssueTransaction({ id, wasteIssueDto })
-    Domain->>Prisma: getDb().$transaction(async tx => ...)
+    Domain->>FileBaseRepository: getDb()
+    FileBaseRepository-->>Domain: getDb(): PrismaClient | TransactionClient — tx si se recibió
+    Domain->>Prisma: db.$transaction(async tx => ...)
     Domain->>Prisma: tx.wasteIssue.findUnique({ id, details })
     activate Prisma
     Prisma-->>Domain: findUnique(): Promise[WasteIssue|null]
@@ -92,7 +137,7 @@ sequenceDiagram
             activate Stock
             Stock-->>Domain: calculateConvertedQuantity(): number
             deactivate Stock
-        end
+    end
         Domain->>Header: resolveIssueHeaderData({ tx, dto: headerDto })
         activate Header
         Header-->>Domain: resolveIssueHeaderData(): Promise[Object]

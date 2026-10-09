@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -18,12 +20,50 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `Request` | boundary | [`consumableService.js`](../../../../../../src/public/js/services/warehouse/consumableService.js) |
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `Transport` | control | [`consumableApiRoute.js`](../../../../../../src/routes/api/warehouse/consumableApiRoute.js) |
+| `FileConsumableController` | control | [`consumableController.js`](../../../../../../src/controllers/api/warehouse/consumableController.js) |
+| `FileConsumables` | control | [`consumables.js`](../../../../../../src/public/js/application/warehouse/consumables/consumables.js) |
 
-### Configuración y archivos de contexto
+### Configuración y construcción
 
 El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-ALM-17`](../../backend-code-sequences/catalogs/cu-alm-17.md#cu-alm-17): [`consumableController.js`](../../../../../../src/controllers/api/warehouse/consumableController.js).
 
 La línea `Application` ejecuta la función generada en `createCrudApplication.js`. Su nombre público y la configuración de requests/contratos provienen de [`consumables.js`](../../../../../../src/public/js/application/warehouse/consumables/consumables.js); exportar esa función no crea otra llamada durante cada petición.
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileConsumableController["consumableController.js"]
+        Transport["consumableApiRoute.js"]
+    end
+    subgraph Component1["Aplicación y requests"]
+        Application["createCrudApplication.js"]
+        FileConsumables["consumables.js"]
+        Request["consumableService.js"]
+    end
+    subgraph Component2["Interfaz"]
+        View["consumableDatatable.js"]
+    end
+    FileConsumables -->|import| Request
+    FileConsumables -->|import| Application
+    View -->|import| FileConsumables
+    Transport -->|import| FileConsumableController
+```
+
+## Construcción de funciones para esta operación
+
+El configurador se ejecuta al evaluar su módulo. Después se invoca la función devuelta
+por la fábrica, usando el nombre público mostrado en la secuencia.
+
+| Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
+| --- | --- | --- |
+| `getAllConsumables` | `FileConsumables` | `Application` · `createCrudApplication(...)` |
 
 ## Secuencia de implementación
 
@@ -32,12 +72,12 @@ sequenceDiagram
     autonumber
     actor Initiator as Personal de almacén
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as Pantalla JS
-    participant RowAdapter@{ "type": "boundary" } as Fila responsiva
-    participant Application@{ "type": "control" } as Application
-    participant Request@{ "type": "boundary" } as Requests del recurso
-    participant HTTP@{ "type": "boundary" } as Cliente HTTP
-    participant Transport@{ "type": "control" } as Endpoint API
+    participant View@{ "type": "boundary" } as consumableDatatable.js
+    participant RowAdapter@{ "type": "boundary" } as materialRow.js
+    participant Application@{ "type": "control" } as createCrudApplication.js
+    participant Request@{ "type": "boundary" } as consumableService.js
+    participant HTTP@{ "type": "boundary" } as axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as consumableApiRoute.js
 
     Initiator->>Browser: inicia CU-ALM-17 — Consultar consumibles
     Browser->>View: createConsumableDatatable(context)

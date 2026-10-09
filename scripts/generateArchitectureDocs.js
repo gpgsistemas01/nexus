@@ -1,7 +1,7 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import { getSequenceLifelineErrors, getSequenceParticipantSources, getSequenceStructureErrors } from './sequenceDiagramUtils.js';
+import { getDiagramFileCoverageErrors, getSequenceLifelineErrors, getSequenceParticipantSources, getSequenceStructureErrors } from './sequenceDiagramUtils.js';
 
 const ROOT = process.cwd();
 const OUTPUTS = {
@@ -274,16 +274,22 @@ const validateUseCaseDiagramCoverage = async () => {
             if (!(body.match(/^sequenceDiagram$/gm) ?? []).length) {
                 failures.push(`diagramas ${side}: ${id} debe contener una secuencia de código o sus niveles complementarios`);
             }
-            const sequences = getMermaidBlocks(body);
-            const hasComplementaryLevels = side === 'backend'
-                ? sequences.length === 2
+            const sequences = getMermaidBlocks(body).filter((block) => block.startsWith('sequenceDiagram\n'));
+            for (const error of getDiagramFileCoverageErrors(body, getMermaidBlocks(body), sourceContents)) {
+                failures.push(`diagramas ${side}: ${id}: ${error}`);
+            }
+            const detailLevels = (body.match(/^## Detalle de /gm) ?? []).length;
+            const hasComplementaryLevels = (body.includes('## Secuencia de implementación')
+                && sequences.length === 1 + detailLevels)
+                || (side === 'backend'
+                ? sequences.length === 2 + detailLevels
                     && body.includes('## Secuencia de entrada y coordinación')
                     && body.includes('## Colaboración interna del dominio')
-                : sequences.length === 2
+                : sequences.length === 2 + detailLevels
                     + Number(body.includes('## Preparación de la interfaz'))
                     + Number(body.includes('## Envío y resultado de la interfaz'))
                     && body.includes('## Coordinación de la interfaz')
-                    && body.includes('## Colaboración de aplicación y transporte');
+                    && body.includes('## Colaboración de aplicación y transporte'));
             if (sequences.length > 1 && !hasComplementaryLevels) {
                 failures.push(`diagramas ${side}: ${id} debe identificar los niveles complementarios del mismo caso`);
             }
@@ -411,7 +417,7 @@ const validateUseCaseDiagramCoverage = async () => {
                     failures.push(`diagramas ${side}: ${id} representa ${alias} sólo con el estereotipo «object» en vez de una instancia visual`);
                 }
                 const paths = participantSourceMap.get(alias) ?? [];
-                if (paths.some((sourcePath) => sourcePath.startsWith('src/dtos/')) && label !== 'DTO funcional' && !/^[A-Za-z_$][\w$]*Dto: Object(?:<br\/>src\/dtos\/)?/.test(label)) {
+                if (paths.some((sourcePath) => sourcePath.startsWith('src/dtos/')) && !label.startsWith('DTO funcional') && !/^[A-Za-z_$][\w$]*Dto: Object(?:<br\/>src\/dtos\/)?/.test(label)) {
                     failures.push(`diagramas ${side}: ${id} no representa ${alias} como DTO funcional o instancia de datos identificada y trazable`);
                 }
                 if (!paths.length && !EXTERNAL_SEQUENCE_PARTICIPANTS.has(label)) {

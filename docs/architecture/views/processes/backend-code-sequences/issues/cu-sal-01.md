@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -19,10 +21,48 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `Core` | control | [`goodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js) |
 | `Helpers` | control | [`goodsIssueHelpers.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueHelpers.js) |
 | `IssueQueryUtils` | control | [`issueQueryUtils.js`](../../../../../../src/utils/issueQueryUtils.js) |
+| `FileMaterialGoodsIssueController` | control | [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 
-### Configuración y archivos de contexto
+### Configuración y construcción
 
 El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js).
+
+## Construcción de funciones para esta operación
+
+El configurador se ejecuta al evaluar su módulo. Después se invoca la función devuelta
+por la fábrica, usando el nombre público mostrado en la secuencia.
+
+| Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
+| --- | --- | --- |
+| `getAllMaterialGoodsIssues` | `FileMaterialGoodsIssueController` | `Controller` · `buildListHandler(...)` |
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileMaterialGoodsIssueController["materialGoodsIssueController.js"]
+        Controller["goodsIssueHandlers.js"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+        Route["materialGoodsIssueApiRoute.js"]
+        Facade["materialGoodsIssueService.js"]
+    end
+    FileMaterialGoodsIssueController -->|import| Facade
+    FileMaterialGoodsIssueController -->|import| Controller
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+    Route -->|import| FileMaterialGoodsIssueController
+```
 
 ## Secuencia de implementación
 
@@ -30,13 +70,15 @@ El módulo específico configura y exporta el handler generado en el archivo de 
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant Controller@{ "type": "control" } as Controller
-    participant Facade@{ "type": "control" } as Adaptador del tipo
-    participant Core@{ "type": "control" } as Núcleo del dominio
-    participant Helpers@{ "type": "control" } as Helpers del dominio
+    participant Route@{ "type": "boundary" } as materialGoodsIssueApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant Controller@{ "type": "control" } as goodsIssueHandlers.js
+    participant Facade@{ "type": "control" } as materialGoodsIssueService.js
+    participant Core@{ "type": "control" } as goodsIssueService.js
+    participant Helpers@{ "type": "control" } as goodsIssueHelpers.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 
     Note over Controller: Handler generado
 
@@ -60,6 +102,8 @@ sequenceDiagram
     activate Helpers
     Helpers-->>Core: buildGoodsIssueContextWhere(): Object
     deactivate Helpers
+    Core->>FileBaseRepository: getDb()
+    FileBaseRepository-->>Core: getDb(): PrismaClient | TransactionClient — conserva tx
     Core->>Prisma: goodsIssue.findMany({ where, skip, take, orderBy, include })
     activate Prisma
     Prisma-->>Core: findMany(): Promise[GoodsIssue[]]

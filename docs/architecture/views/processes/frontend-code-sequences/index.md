@@ -59,9 +59,10 @@ del recorrido concreto.
 ### Cobertura de casos frontend
 
 La comparación con el catálogo y la matriz técnica confirma que cada identificador
-aparece una vez, conserva su referencia de patrones y contiene un bloque Mermaid.
+aparece una vez, conserva su referencia de patrones y contiene sus secuencias Mermaid. Los configuradores, fábricas y requests tienen
+componentes separados; las funciones y callbacks se atribuyen a su archivo real.
 
-| Grupo propietario | Rango cubierto | Diagramas | Estado |
+| Grupo propietario | Rango cubierto | Casos | Estado |
 | --- | --- | ---: | --- |
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
 | Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |

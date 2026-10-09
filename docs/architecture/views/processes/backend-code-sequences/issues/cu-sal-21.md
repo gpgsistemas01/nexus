@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -20,10 +22,48 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `List` | control | [`goodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js) |
 | `Excel` | control | [`reportExcelUtils.js`](../../../../../../src/utils/reportExcelUtils.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `FileConsumableGoodsIssueReportController` | control | [`consumableGoodsIssueReportController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/consumables/consumableGoodsIssueReportController.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 
-### Configuración y archivos de contexto
+### Configuración y construcción
 
 El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`consumableGoodsIssueReportController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/consumables/consumableGoodsIssueReportController.js).
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileConsumableGoodsIssueReportController["consumableGoodsIssueReportController.js"]
+        Controller["reportController.js"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+        Route["consumableGoodsIssueReportApiRoute.js"]
+        Facade["consumableGoodsIssueService.js"]
+    end
+    FileConsumableGoodsIssueReportController -->|import| Facade
+    FileConsumableGoodsIssueReportController -->|import| Controller
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+    Route -->|import| FileConsumableGoodsIssueReportController
+```
+
+## Construcción de funciones para esta operación
+
+El configurador se ejecuta al evaluar su módulo. Después se invoca la función devuelta
+por la fábrica, usando el nombre público mostrado en la secuencia.
+
+| Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
+| --- | --- | --- |
+| `exportConsumableGoodsIssueReportExcel` | `FileConsumableGoodsIssueReportController` | `Controller` · `buildGoodsIssueReportHandler(...)` |
 
 ## Secuencia de implementación
 
@@ -31,18 +71,11 @@ El módulo específico configura y exporta el handler generado en el archivo de 
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant Controller@{ "type": "control" } as Controller
-    participant Facade@{ "type": "control" } as Adaptador del tipo
-    participant Query@{ "type": "control" } as Consulta de dominio
-    participant List@{ "type": "control" } as Listado
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Excel@{ "type": "control" } as Reporte Excel
-    participant ErrorHandler@{ "type": "control" } as Errores Express
+    participant Route@{ "type": "boundary" } as consumableGoodsIssueReportApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant Controller@{ "type": "control" } as reportController.js
 
     Note over Controller: Handler generado
-
     Client->>Route: GET /api/warehouse/reports/goods-issues/consumables/excel
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
@@ -53,11 +86,38 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Route->>Controller: exportConsumableGoodsIssueReportExcel(req, res)
+        Controller->>Controller: buildIssueReportQuery(req) — periodo mensual cuando corresponde
+        Controller->>Controller: buildIssueReportData(rows)
+```
+
+## Detalle de coordinación del controller
+
+Continúa la colaboración anterior. Conserva el orden de los mensajes del código y
+separa los archivos que ejecutan esta parte del recorrido; los otros detalles del caso
+completan las llamadas a helpers y la propagación del resultado.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Cliente HTTP / web
+    participant Controller@{ "type": "control" } as reportController.js
+    participant Facade@{ "type": "control" } as consumableGoodsIssueService.js
+    participant Query@{ "type": "control" } as js
+    participant List@{ "type": "control" } as goodsIssueService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant Excel@{ "type": "control" } as reportExcelUtils.js
+    participant ErrorHandler@{ "type": "control" } as app.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
+
+    Note over Controller: Handler generado
     alt Exportación resuelta
         Controller->>Controller: buildIssueReportQuery(req) — periodo mensual cuando corresponde
         Controller->>Facade: findConsumableGoodsIssueReportRows(options)
         Facade->>Query: findGoodsIssueReportRows({ ...options, type: CONSUMABLE })
         Query->>List: findAllGoodsIssues({ ...filtros, type, includeCounts: false, skip: 0, take: 100000 })
+        List->>FileBaseRepository: getDb()
+        FileBaseRepository-->>List: getDb(): PrismaClient | TransactionClient — conserva tx
         List->>Prisma: goodsIssue.findMany({ where: contexto y filtros })
         activate Prisma
         Prisma-->>List: findMany(): Promise[GoodsIssue[]]

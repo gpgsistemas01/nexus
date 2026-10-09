@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -24,10 +26,48 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
 | `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FileConsumableGoodsReceiptController` | control | [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
 
-### Configuración y archivos de contexto
+### Configuración y construcción
 
 El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js).
+
+## Construcción de funciones para esta operación
+
+El configurador se ejecuta al evaluar su módulo. Después se invoca la función devuelta
+por la fábrica, usando el nombre público mostrado en la secuencia.
+
+| Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
+| --- | --- | --- |
+| `cancelConsumableGoodsReceiptDetail` | `FileConsumableGoodsReceiptController` | `Controller` · `buildCancellationHandler(...)` |
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileConsumableGoodsReceiptController["consumableGoodsReceiptController.js"]
+        Controller["goodsReceiptHandlers.js"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+        Route["consumableGoodsReceiptApiRoute.js"]
+        Facade["consumableGoodsReceiptService.js"]
+    end
+    FileConsumableGoodsReceiptController -->|import| Facade
+    FileConsumableGoodsReceiptController -->|import| Controller
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+    Route -->|import| FileConsumableGoodsReceiptController
+```
 
 ## Secuencia de entrada y coordinación
 
@@ -39,17 +79,17 @@ el segundo nivel; ambas figuras realizan el mismo caso, sin añadir otra operaci
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant Controller@{ "type": "control" } as Controller
-    participant Facade@{ "type": "control" } as Adaptador del tipo
-    participant Core@{ "type": "control" } as Núcleo del dominio
-    participant Socket@{ "type": "control" } as Eventos Socket.IO
-    participant ErrorHandler@{ "type": "control" } as Errores Express
+    participant Route@{ "type": "boundary" } as consumableGoodsReceiptApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant Controller@{ "type": "control" } as goodsReceiptHandlers.js
+    participant Facade@{ "type": "control" } as consumableGoodsReceiptService.js
+    participant Core@{ "type": "control" } as goodsReceiptCancellationService.js
+    participant Socket@{ "type": "control" } as socketUtils.js
+    participant ErrorHandler@{ "type": "control" } as app.js
 
     Note over Controller: Handler generado
 
-    participant Change@{ "type": "control" } as Change
+    participant Change@{ "type": "control" } as goodsReceiptDetailChangeService.js
 
     Client->>Route: PATCH /api/warehouse/goods-receipts/consumables/:id/details/:detailId/cancel
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -90,19 +130,23 @@ la primera figura; los mensajes se numeran de nuevo dentro de esta colaboración
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Facade@{ "type": "control" } as Adaptador del tipo
-    participant Core@{ "type": "control" } as Núcleo del dominio
-    participant Helpers@{ "type": "control" } as Helpers del dominio
+    participant Facade@{ "type": "control" } as consumableGoodsReceiptService.js
+    participant Core@{ "type": "control" } as goodsReceiptCancellationService.js
+    participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Inventory@{ "type": "control" } as Inventario
-    participant Change@{ "type": "control" } as Change
-    participant Reason@{ "type": "control" } as Motivo de ajuste
-    participant Costs@{ "type": "control" } as Costo del material
+    participant Inventory@{ "type": "control" } as movementService.js
+    participant Change@{ "type": "control" } as goodsReceiptDetailChangeService.js
+    participant Reason@{ "type": "control" } as reasonService.js
+    participant Costs@{ "type": "control" } as supplierMaterialService.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 
     Facade->>Core: cancelGoodsReceiptDetailLine({ ...options, type: CONSUMABLE })
     activate Core
     alt Servicio resuelto
-        Core->>Prisma: getDb().$transaction(async tx => ...)
+        Core->>FileBaseRepository: getDb()
+        FileBaseRepository-->>Core: getDb(): PrismaClient | TransactionClient — tx si se recibió
+        Core->>Prisma: db.$transaction(async tx => ...)
         rect rgb(245, 245, 245)
             Note over Core,Prisma: getDb().$transaction(async tx => ...)
             Core->>Change: findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId, type })

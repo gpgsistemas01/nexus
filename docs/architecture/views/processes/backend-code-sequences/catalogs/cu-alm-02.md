@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -26,6 +28,27 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`materialValidations.js`](../../../../../../src/validators/forms/materialValidations.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+    end
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+```
 
 ## Secuencia de implementación
 
@@ -33,21 +56,11 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant ValidationRules@{ "type": "control" } as Reglas de entrada
-    participant Validator@{ "type": "control" } as Validación HTTP
-    participant Controller@{ "type": "control" } as Controller
-    participant Formatter@{ "type": "control" } as Formato
-    participant MaterialDto@{ "type": "control" } as DTO funcional
-    participant Domain@{ "type": "control" } as Servicio de dominio
-    participant Helpers@{ "type": "control" } as Helpers del dominio
-    participant Relations@{ "type": "control" } as Relaciones de acceso
-    participant SupplierMaterial@{ "type": "control" } as Proveedor / material
-    participant Reason@{ "type": "control" } as Motivo de ajuste
-    participant Adjustment@{ "type": "control" } as Ajuste
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant ErrorHandler@{ "type": "control" } as Errores Express
+    participant Route@{ "type": "boundary" } as materialApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as materialValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as materialController.js
 
     Client->>Route: POST /api/warehouse/materials { req.body }
     Route->>Auth: verifyApiTokenRequired(req, res, next)
@@ -64,6 +77,33 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Route->>Controller: registerMaterial(req, res)
+    Controller-->>Client: HTTP 200 { material: supplierMaterial, code }
+```
+
+## Detalle de coordinación del controller
+
+Continúa la colaboración anterior. Conserva el orden de los mensajes del código y
+separa los archivos que ejecutan esta parte del recorrido; los otros detalles del caso
+completan las llamadas a helpers y la propagación del resultado.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Cliente HTTP / web
+    participant Controller@{ "type": "control" } as materialController.js
+    participant Formatter@{ "type": "control" } as formattersUtils.js
+    participant MaterialDto@{ "type": "control" } as DTO funcional<br/>materialDTO.js
+    participant Domain@{ "type": "control" } as materialService.js
+    participant Helpers@{ "type": "control" } as materialHelpers.js
+    participant Relations@{ "type": "control" } as materialRelations.js
+    participant SupplierMaterial@{ "type": "control" } as supplierMaterialService.js
+    participant Reason@{ "type": "control" } as reasonService.js
+    participant Adjustment@{ "type": "control" } as adjustmentService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant ErrorHandler@{ "type": "control" } as app.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
+
     Controller->>MaterialDto: createMaterialDtoForRegister(req.body)
     alt req.body.creationContext es goodsReceipt
         MaterialDto-->>Controller: createMaterialDtoForRegister(): Object (materialDto)
@@ -73,7 +113,9 @@ sequenceDiagram
     Controller->>Formatter: sanitizeEmptyStrings(materialDto)
     Controller->>Domain: createMaterial({ materialDto: sanitizedMaterialDto, userId: req.user.id })
     activate Domain
-    Domain->>Prisma: getDb().$transaction(async tx => ...)
+    Domain->>FileBaseRepository: getDb()
+    FileBaseRepository-->>Domain: getDb(): PrismaClient | TransactionClient — tx si se recibió
+    Domain->>Prisma: db.$transaction(async tx => ...)
     Domain->>Helpers: prepareMaterialData({ tx, materialDto: materialData })
     activate Helpers
     Helpers-->>Domain: prepareMaterialData(): Promise[Object ({ rest, relations })]
@@ -83,7 +125,7 @@ sequenceDiagram
         Domain->>Prisma: tx.supplierMaterial.findUnique({ supplierId_materialId })
         break Relación con el proveedor ya existente
             Domain-->>Controller: throw MaterialAlreadyExists
-        end
+    end
     else Identidad nueva
         Domain->>Prisma: tx.material.create({ data: buildMaterialData(...) })
         activate Prisma

@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -21,6 +23,27 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `Cookies` | boundary | [`cookiesUtils.js`](../../../../../../src/utils/cookiesUtils.js) |
 | `ValidationRules` | control | [`authValidations.js`](../../../../../../src/validators/forms/authValidations.js) |
 | `Password` | control | [`encryptionUtils.js`](../../../../../../src/utils/encryptionUtils.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+    end
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+```
 
 ## Secuencia de implementación
 
@@ -28,17 +51,19 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 sequenceDiagram
     autonumber
     participant Browser as Navegador
-    participant Router@{ "type": "boundary" } as Router web
-    participant ValidationRules@{ "type": "control" } as Reglas de entrada
-    participant Validator@{ "type": "control" } as Validación HTTP
-    participant Controller@{ "type": "control" } as Controller
-    participant Service@{ "type": "control" } as Service
-    participant User@{ "type": "control" } as Usuario
+    participant Router@{ "type": "boundary" } as authApiRoute.js
+    participant ValidationRules@{ "type": "control" } as authValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as authController.js
+    participant Service@{ "type": "control" } as authService.js
+    participant User@{ "type": "control" } as userService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Token@{ "type": "control" } as JWT
-    participant Cookies@{ "type": "boundary" } as Cookies
+    participant Token@{ "type": "control" } as jwtService.js
+    participant Cookies@{ "type": "boundary" } as cookiesUtils.js
 
-    participant Password@{ "type": "control" } as Contraseña
+    participant Password@{ "type": "control" } as encryptionUtils.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 
     Browser->>Router: POST /api/auth/login { name, password }
     Router->>ValidationRules: loginValidation[] — cadena ejecutada por Express
@@ -49,7 +74,9 @@ sequenceDiagram
         Router->>Controller: login(req, res)
         Controller->>Service: loginUser({ name, password })
         Service->>User: getUserIdByLogin(name, password)
-        User->>Prisma: getDb().user.findUnique({ where: { name }, select })
+        User->>FileBaseRepository: getDb()
+        FileBaseRepository-->>User: getDb(): PrismaClient | TransactionClient — tx si se recibió
+        User->>Prisma: db.user.findUnique({ where: { name }, select })
         activate Prisma
         Prisma-->>User: findUnique(): Promise[User | null]
         deactivate Prisma

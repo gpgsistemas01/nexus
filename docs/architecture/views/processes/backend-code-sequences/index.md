@@ -16,7 +16,7 @@ las secuencias reutilizan los componentes comunes de cada proceso.
 | Validación | Validator y middleware cuando modifican una alternativa del caso; el DTO sólo normaliza datos aceptados. |
 | Transacción | Límites y propagación de `tx` únicamente cuando participan en el flujo. |
 | Respuesta | Tipo real, resultado HTTP y propagación del error. |
-| Participantes | Nombre visual breve, rol y tabla de archivos por responsabilidad. |
+| Participantes | Nombre del archivo, rol visual y ruta en la tabla de trazabilidad. |
 
 El pipeline común se explica en `DIA-PAT-FRO-001`. Cada secuencia incorpora sólo los middleware y
 colaboradores que cambian o prueban el recorrido del caso.
@@ -58,8 +58,11 @@ del recorrido concreto.
 ### Cobertura de casos backend
 
 La comparación con el catálogo y la matriz técnica confirma que cada identificador
-aparece una vez, conserva su referencia de patrones y contiene su secuencia Mermaid. Los 16 casos con mayor número de participantes separan
-entrada/coordinación y colaboración interna; en total, 92 casos conservan 108 figuras.
+aparece una vez, conserva su referencia de patrones y contiene su secuencia Mermaid. Los casos extensos separan
+entrada/coordinación y colaboración interna. Las preparaciones de partidas y los
+movimientos de inventario amplían sus llamadas en niveles de detalle. Cada uno de los
+92 casos conserva sus archivos propios y representa también los configuradores que
+construyen handlers, mediante componentes separados de las líneas de ejecución.
 
 | Grupo propietario | Rango cubierto | Casos | Estado |
 | --- | --- | ---: | --- |

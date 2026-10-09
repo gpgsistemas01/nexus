@@ -9,6 +9,8 @@ Cada línea de vida técnica corresponde a un único archivo de implementación,
 por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
 el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
 Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
 
 | Alias | Rol visual | Archivo de implementación |
 | --- | --- | --- |
@@ -28,10 +30,50 @@ Los retornos representan el resultado o error de la función ejecutada en el arc
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
+| `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
+| `FileMaterialGoodsReceiptController` | control | [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js) |
+| `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
+| `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+| `Materials` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
+| `Conversion` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
 
-### Configuración y archivos de contexto
+### Configuración y construcción
 
 El módulo específico configura y exporta el handler generado en el archivo de la línea `Controller`: [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js).
+
+## Composición de archivos
+
+Los archivos que construyen, configuran o reexportan funciones aparecen como componentes
+individuales. Las flechas representan imports reales, resueltos al cargar los módulos;
+las llamadas durante la operación se muestran en las secuencias siguientes. Cada nombre
+identifica un archivo y la tabla conserva su ruta completa.
+
+```mermaid
+flowchart TB
+    subgraph Component0["Backend"]
+        FileMaterialGoodsReceiptController["materialGoodsReceiptController.js"]
+        Controller["goodsReceiptHandlers.js"]
+        FileDatabaseUrl["databaseUrl.js"]
+        FilePrisma["prisma.js"]
+        FileBaseRepository["baseRepository.js"]
+        Route["materialGoodsReceiptApiRoute.js"]
+        Facade["materialGoodsReceiptService.js"]
+    end
+    FileMaterialGoodsReceiptController -->|import| Facade
+    FileMaterialGoodsReceiptController -->|import| Controller
+    FilePrisma -->|import| FileDatabaseUrl
+    FileBaseRepository -->|import| FilePrisma
+    Route -->|import| FileMaterialGoodsReceiptController
+```
+
+## Construcción de funciones para esta operación
+
+El configurador se ejecuta al evaluar su módulo. Después se invoca la función devuelta
+por la fábrica, usando el nombre público mostrado en la secuencia.
+
+| Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
+| --- | --- | --- |
+| `correctMaterialGoodsReceiptDetail` | `FileMaterialGoodsReceiptController` | `Controller` · `buildCorrectionHandler(...)` |
 
 ## Secuencia de entrada y coordinación
 
@@ -43,22 +85,13 @@ el segundo nivel; ambas figuras realizan el mismo caso, sin añadir otra operaci
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as Router API
-    participant Auth@{ "type": "control" } as Acceso
-    participant ValidationRules@{ "type": "control" } as Reglas de entrada
-    participant Validator@{ "type": "control" } as Validación HTTP
-    participant Controller@{ "type": "control" } as Controller
-    participant Formatter@{ "type": "control" } as Formato
-    participant Facade@{ "type": "control" } as Adaptador del tipo
-    participant Core@{ "type": "control" } as Núcleo del dominio
-    participant Socket@{ "type": "control" } as Eventos Socket.IO
-    participant DTO@{ "type": "control" } as DTO funcional
-    participant ErrorHandler@{ "type": "control" } as Errores Express
+    participant Route@{ "type": "boundary" } as materialGoodsReceiptApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as goodsReceiptValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as goodsReceiptHandlers.js
 
     Note over Controller: Handler generado
-
-    participant Change@{ "type": "control" } as Change
-
     Client->>Route: PATCH /api/warehouse/goods-receipts/materials/:id/details/:detailId/corrections
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     break Token ausente o inválido
@@ -74,6 +107,30 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
     Route->>Controller: correctMaterialGoodsReceiptDetail(req, res)
+        Controller-->>Client: HTTP 200 { correction, code }
+```
+
+## Detalle de coordinación del controller
+
+Continúa la colaboración anterior. Conserva el orden de los mensajes del código y
+separa los archivos que ejecutan esta parte del recorrido; los otros detalles del caso
+completan las llamadas a helpers y la propagación del resultado.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Cliente HTTP / web
+    participant Controller@{ "type": "control" } as goodsReceiptHandlers.js
+    participant Formatter@{ "type": "control" } as formattersUtils.js
+    participant Facade@{ "type": "control" } as materialGoodsReceiptService.js
+    participant Core@{ "type": "control" } as goodsReceiptCorrectionService.js
+    participant Socket@{ "type": "control" } as socketUtils.js
+    participant DTO@{ "type": "control" } as DTO funcional<br/>goodsReceiptDTO.js
+    participant ErrorHandler@{ "type": "control" } as app.js
+
+    participant Change@{ "type": "control" } as goodsReceiptDetailChangeService.js
+
+    Note over Controller: Handler generado
     Controller->>DTO: createGoodsReceiptDtoForCorrection(req.body)
     activate DTO
     DTO-->>Controller: createGoodsReceiptDtoForCorrection(): Object — DTO normalizado
@@ -88,7 +145,7 @@ sequenceDiagram
             Change-->>Core: findReceiptDetailForChange(): Promise[Object]
             Core->>Formatter: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
             Formatter-->>Core: normalizeDecimal(): number
-        end
+    end
         Core-->>Facade: correctGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
         Facade-->>Controller: correctMaterialGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
         Controller->>Socket: emitInventoryUpdated({ context: 'material', source: 'goods-receipt-detail-corrected' })
@@ -110,21 +167,25 @@ la primera figura; los mensajes se numeran de nuevo dentro de esta colaboración
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Facade@{ "type": "control" } as Adaptador del tipo
-    participant Core@{ "type": "control" } as Núcleo del dominio
-    participant Helpers@{ "type": "control" } as Helpers del dominio
+    participant Facade@{ "type": "control" } as materialGoodsReceiptService.js
+    participant Core@{ "type": "control" } as goodsReceiptCorrectionService.js
+    participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Inventory@{ "type": "control" } as Inventario
-    participant Change@{ "type": "control" } as Change
-    participant Reason@{ "type": "control" } as Motivo de ajuste
-    participant Costs@{ "type": "control" } as Costo del material
+    participant Inventory@{ "type": "control" } as movementService.js
+    participant Change@{ "type": "control" } as goodsReceiptDetailChangeService.js
+    participant Reason@{ "type": "control" } as reasonService.js
+    participant Costs@{ "type": "control" } as supplierMaterialService.js
 
-    participant Formatter@{ "type": "control" } as Formato
+    participant Formatter@{ "type": "control" } as formattersUtils.js
+
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 
     Facade->>Core: correctGoodsReceiptDetailLine({ ...options, type: MATERIAL })
     activate Core
     alt Servicio resuelto
-        Core->>Prisma: getDb().$transaction(async tx => ...)
+        Core->>FileBaseRepository: getDb()
+        FileBaseRepository-->>Core: getDb(): PrismaClient | TransactionClient — tx si se recibió
+        Core->>Prisma: db.$transaction(async tx => ...)
         rect rgb(245, 245, 245)
             Note over Core,Prisma: getDb().$transaction(async tx => ...)
             Core->>Change: findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId, type })
@@ -154,4 +215,42 @@ sequenceDiagram
         Core-->>Facade: error — rollback si falló la transacción
     end
     deactivate Core
+```
+
+## Detalle de preparación de partidas de compra
+
+Amplía `buildGoodsReceiptDetails`: la consulta usa `tx` cuando se proporciona. En el alta
+la preparación ocurre antes de iniciar la transacción; no se atribuye esa lectura al
+callback transaccional. Los conflictos se propagan al servicio que llamó al helper.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
+    participant Materials@{ "type": "control" } as materialService.js
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant Conversion@{ "type": "control" } as stockHelpers.js
+    participant Formatter@{ "type": "control" } as formattersUtils.js
+
+    Helpers->>Materials: findMaterialsSnapshot({ tx, materialIds, supplierId })
+    Materials->>FileBaseRepository: getDb(tx)
+    FileBaseRepository-->>Materials: getDb(): PrismaClient | TransactionClient
+    Materials->>Prisma: db.material.findMany({ where: { id: { in: materialIds } }, select })
+    Prisma-->>Materials: findMany(): Promise[Object[]]
+    Materials-->>Helpers: findMaterialsSnapshot(): Promise[Object[]]
+    loop Cada partida de compra
+        Helpers->>Helpers: details.map(callback) — material, tipo y estado activo
+        break Material inexistente, tipo incompatible o proveedor-material inactivo
+            Helpers-->>Helpers: throw MaterialNotFound | MaterialInactiveConflict
+        end
+        Helpers->>Formatter: roundTo(quantity * costPerUnitType)
+        Formatter-->>Helpers: roundTo(): number — subtotal sin IVA
+        Helpers->>Formatter: roundTo(netPurchaseAmount * 1.16)
+        Helpers->>Conversion: calculateConvertedQuantity({ quantity, base, height })
+        Conversion-->>Helpers: calculateConvertedQuantity(): number
+        opt convertedQuantity mayor que cero
+            Helpers->>Formatter: roundTo(netPurchaseAmount / convertedQuantity)
+        end
+    end
 ```
