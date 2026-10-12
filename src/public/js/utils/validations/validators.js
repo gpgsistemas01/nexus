@@ -1,3 +1,5 @@
+import { getErrorMessage } from "../../constants/apiMessages.js";
+import { getWasteWeightValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
 import { isEmptyOrNull } from "./baseValidations.js";
 import { validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
 
@@ -92,7 +94,16 @@ export const wasteStockAdditionValidation = {
 };
 
 export const wasteValidation = {
-    weightKg: value => value === undefined || value === null || value === '' ? null : validatePositiveNumber(value, 'El peso en kg'),
+    weightKg: (value, { presentationName } = {}) => {
+        const code = getWasteWeightValidationError(value);
+        if (code) return getErrorMessage({ code });
+
+        if (value !== undefined && value !== null && value !== '' && presentationName !== undefined && !isRollPresentation(presentationName)) {
+            return getErrorMessage({ code: 'WASTE_WEIGHT_INVALID' });
+        }
+
+        return null;
+    },
     name: value => validateName(value, 200),
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),

@@ -124,7 +124,12 @@ se describen en [PostgreSQL y migraciones](../../physical/02-postgresql-runtime-
 El [recorrido de negocio](../../../../requirements/requirements-specification/04-unified-catalog-by-scope/04-queries-reports-and-modeled-functions.md#recorrido-del-peso-de-merma)
 concentra las reglas y el diagrama. `wasteDTO.js` incluye el peso únicamente en el
 alta; `wasteEditValidation` rechaza su envío y `updateWaste` protege llamadas directas.
-`createWasteWithInitialStockAdjustment` valida presentación persistida y precisión.
+`getWasteWeightValidationError` en `warehouseInventoryUtils.js` es una función
+pura compartida por formulario, validación HTTP y servicio: inspecciona el valor
+antes de convertirlo, distingue número inválido de precisión excedida y admite
+peso ausente. Rechaza booleanos, listas, objetos, valores no finitos y cadenas que
+no sean decimales completos. `createWasteWithInitialStockAdjustment` comprueba
+además la presentación persistida, sin confiar en la enviada por el cliente.
 
 `findWasteReportRows` conserva `NULL` en vez de convertirlo a cero.
 `buildWasteReportSummary` calcula `totalWeightKg` por identidad antes de agrupar

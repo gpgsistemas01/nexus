@@ -11,14 +11,13 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { resolveWasteMaterialSnapshot } from './wasteMaterialService.js';
 import { findUniqueSupplier } from '../supplierService.js';
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
-import { isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
+import { getWasteWeightValidationError, isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
 const assertWasteWeight = ({ weightKg, presentation }) => {
     if (weightKg === undefined || weightKg === null) return;
-    const weight = Number(weightKg);
-    if (!isRollPresentation(presentation?.name) || !Number.isFinite(weight) || weight <= 0 || !/^\d{1,8}(\.\d{1,6})?$/.test(String(weight))) throw new WasteWeightInvalid();
+    if (!isRollPresentation(presentation?.name) || getWasteWeightValidationError(weightKg)) throw new WasteWeightInvalid();
 };
 
 const handleWasteServiceError = ({ err, fallbackError }) => {

@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.7 | 1.0.0 | En revisión | 2026-10-12 | Equipo Nexus |
+| 1.8 | 1.0.0 | En revisión | 2026-10-12 | Equipo Nexus |
 
 ## Propósito
 

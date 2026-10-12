@@ -575,11 +575,14 @@
       "weightKg": {
         "type": [
           "number",
+          "string",
           "null"
         ],
         "exclusiveMinimum": 0,
         "maximum": 99999999.999999,
-        "description": "Peso en kg por unidad de merma de Rollo, opcional y capturable únicamente al registrar. Después queda sólo para consulta."
+        "description": "Peso por unidad de merma de Rollo en kg, capturable sólo al registrar: opcional, entre 0.000001 y 99999999.999999, hasta 8 enteros y 6 decimales. Número o cadena decimal completa con punto; vacío o null indican peso desconocido. Rechaza notación científica en cadenas, letras, espacios y otros tipos.",
+        "multipleOf": 1e-06,
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,8}(\\.\\d{1,6})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,

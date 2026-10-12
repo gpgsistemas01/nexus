@@ -11,9 +11,15 @@ flowchart TB
     R["services HTTP<br/>wasteService.js"]
     T["DataTable del recurso<br/>wasteDatatable.js"]
     U["Composición compartida<br/>createCrudApplication.js<br/>warehouseInventoryDatatable.js<br/>y colaboradores"]
+    Validation["validators.js"]
+    WeightRule["warehouseInventoryUtils.js<br/>getWasteWeightValidationError"]
+    Messages["apiMessages.js<br/>getErrorMessage"]
     H["axiosInstanceApi.js<br/>request / apiRequest"]
     A --> R
     A --> U
+    P --> Validation
+    Validation --> WeightRule
+    Validation --> Messages
     P --> A
     P --> T
     P --> U
@@ -29,6 +35,7 @@ flowchart TB
 | services HTTP · wasteService.js | `src/public/js/services/warehouse/`<br/>`wasteService.js` |
 | DataTable del recurso · wasteDatatable.js | `src/public/js/plugins/datatable/warehouse/`<br/>`wastes/wasteDatatable.js` |
 | Composición compartida · createCrudApplication.js · warehouseInventoryDatatable.js · y colaboradores | `src/public/js/application/`<br/>`createCrudApplication.js`<br/>`src/public/js/plugins/datatable/shared/`<br/>`inventory/warehouseInventoryDatatable.js`<br/>`src/public/js/ui/forms/formStateUI.js`<br/>`src/public/js/ui/forms/formUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventoryCrudModalUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventorySelectUI.js`<br/>`src/public/js/ui/modalUI.js`<br/>`src/public/js/ui/tableUI.js` |
+| Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/warehouseInventoryUtils.js`<br/>`src/public/js/constants/apiMessages.js` |
 | axiosInstanceApi.js · request / apiRequest | `src/public/js/services/axiosInstanceApi.js` |
 
 
@@ -73,6 +80,11 @@ Los reportes y la infraestructura transversal se localizan en el
 
 `updateWasteWeightField` habilita la captura únicamente en alta de Rollo y deja
 el valor `readOnly` al editar. `applyWasteMaterialTemplate` limpia el valor al
-cambiar plantilla; `wasteEditFields` no lo envía. La tabla general omite el peso.
+cambiar plantilla y limpia el aviso de validación de ese campo; `wasteEditFields` no lo envía. La tabla general omite el peso.
+`wasteForm.js` aporta a la validación el nombre de presentación mostrado, sin
+incluirlo en la petición. `wasteValidation.weightKg` combina la regla decimal
+compartida con la condición de Rollo y reutiliza los mensajes de la API. El input
+conserva límites HTML `min`, `max` y `step`; la validación JavaScript no depende
+de que el navegador aplique esas restricciones.
 La [vista de datos](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo)
 concentra el contrato y enlaza su recorrido de negocio.

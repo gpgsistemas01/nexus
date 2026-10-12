@@ -13,13 +13,14 @@ flowchart TB
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>materialIdentity.js<br/>y colaboradores"]
     V["Validadores<br/>wasteValidations.js"]
     P["baseRepository.js<br/>getDb(tx)"]
-    PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation"]
+    PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>getWasteWeightValidationError"]
     C --> D
     C --> S
     R --> C
     R --> V
     S --> P
     S --> X
+    V --> PresentationRule
     S --> PresentationRule
     X --> P
 ```

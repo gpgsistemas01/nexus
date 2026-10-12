@@ -12,6 +12,23 @@ export const getPresentation = (item = {}) => (
 );
 
 export const isRollPresentation = name => String(name ?? '').trim().toLocaleUpperCase('es-MX') === 'ROLLO';
+
+// Validate the original value before numeric conversion can discard format or precision.
+export const getWasteWeightValidationError = value => {
+    if (value === undefined || value === null || value === '') return null;
+
+    if (
+        (typeof value !== 'number' && typeof value !== 'string')
+        || !Number.isFinite(Number(value))
+        || Number(value) <= 0
+        || (typeof value === 'string' && (value.trim() !== value || !/^\d+(\.\d+)?$/.test(value)))
+    ) return 'WEIGHT_KG_INVALID_NUMBER';
+
+    if (!/^\d{1,8}(\.\d{1,6})?$/.test(String(value))) return 'WEIGHT_KG_TOO_LONG';
+
+    return null;
+};
+
 export const getPresentationId = (item = {}) => (
     item.presentationId
     ?? item.presentation?.id

@@ -1,3 +1,4 @@
+import { toggleErrorMessages } from '../forms/formErrorsUI.js';
 import { EMPTY_DISPLAY_VALUE } from '../../constants/display.js';
 import { isCreateMode, isStockMode } from '../../constants/formModes.js';
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
@@ -28,7 +29,10 @@ export const displayWasteMaterialTemplate = ({ form, template = {} }) => {
 
 export const applyWasteMaterialTemplate = ({ form, template = {} }) => {
     displayWasteMaterialTemplate({ form, template });
-    if (form.elements?.weightKg) form.elements.weightKg.value = '';
+    if (form.elements?.weightKg) {
+        form.elements.weightKg.value = '';
+        toggleErrorMessages(form, { weightKg: null });
+    }
     updateWasteWeightField({ form, template });
     [
         [INPUT_SELECTORS.WASTE_WIDTH, template.suggestedWidth],

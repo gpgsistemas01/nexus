@@ -174,6 +174,7 @@ conserve la dirección y repórtela. No modifique manualmente la URL para intent
 
 | Mensaje | Qué hacer |
 | --- | --- |
+| El peso por unidad debe ser un decimal mayor que cero en kg. Use punto decimal, sin letras ni notación científica. | Capture un decimal positivo, por ejemplo 0.75; quite letras y separadores. Si desconoce el peso, deje vacío el campo durante el alta. |
 | El peso debe ser positivo y sólo aplica a mermas con presentación Rollo. | Revise la presentación y capture kg por unidad con un valor mayor que cero; deje vacío cuando no se conoce. |
 | No se puede modificar el peso unitario de una merma ya registrada. Este dato sólo está disponible para consulta. | Consulte el peso guardado y actualice únicamente los campos habilitados del formulario. |
 | El peso admite hasta 8 dígitos enteros y 6 decimales. | Corrija la precisión del valor capturado. |

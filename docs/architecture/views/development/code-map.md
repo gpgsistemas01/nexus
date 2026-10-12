@@ -40,6 +40,7 @@ flowchart LR
     utils["utils (11 módulos)"] --> errors["errors (19 módulos)"]
     validators["validators (15 módulos)"] --> constants["constants (10 módulos)"]
     validators["validators (15 módulos)"] --> messages["messages (2 módulos)"]
+    validators["validators (15 módulos)"] --> public["public (209 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. Los recursos EJS, CSS y el esquema Prisma se

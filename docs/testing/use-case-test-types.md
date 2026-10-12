@@ -98,4 +98,8 @@ de cambio.
 rechazada sin cambios parciales, consulta, stock independiente y Excel real con
 pesos de diferentes largos y datos desconocidos. `reportServiceTest.js` comprueba
 la consolidación, el total y las presentaciones excluidas. `wasteWeightFieldTest.js`
-comprueba captura en alta y consulta posterior.
+comprueba captura en alta y consulta posterior. `wasteValidatorsTest.js` y
+`wasteRegistrationBoundaryTest.js` contrastan los límites y formatos en navegador
+y API, incluyendo números no finitos, texto parcial, booleanos, objetos, listas
+y mensajes por causa. La integración comprueba que los rechazos no creen merma,
+ajustes ni movimientos, y que el servicio también rechace llamadas directas inválidas.

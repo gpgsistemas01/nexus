@@ -1,6 +1,7 @@
 import { body } from 'express-validator';
 import { errorMap } from '../../messages/codeMessages.js';
-import { validateName, validateNonNegativeNumber, validatePositiveNumber, validatePositiveNumberOptional, validateUUID } from '../fields/fieldsValidator.js';
+import { getWasteWeightValidationError } from '../../public/js/utils/warehouseInventoryUtils.js';
+import { validateName, validateNonNegativeNumber, validatePositiveNumber, validateUUID } from '../fields/fieldsValidator.js';
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
 const wasteStockDataValidation = [
@@ -30,7 +31,12 @@ export const wasteEditValidation = [
 ];
 
 export const wasteValidation = [
-    validatePositiveNumberOptional('weightKg'),
+    body('weightKg').custom(value => {
+        const error = getWasteWeightValidationError(value);
+        if (error) throw new Error(error);
+
+        return true;
+    }),
     validateName({ maxLength: 200 }),
     validateUUID('materialId'),
     validateUUID('supplierId'),

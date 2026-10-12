@@ -1,6 +1,6 @@
 import { useForm } from '../../../ui/forms/formUI.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
-import { FORM_SELECTORS } from '../../../constants/selectors.js';
+import { INPUT_SELECTORS, FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
 import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../utils/validations/validators.js';
 import { wasteCreateFields, wasteEditFields, wasteStockFields } from './wasteFields.js';
@@ -27,7 +27,10 @@ useForm({
         if (isStockMode(form.dataset.mode)) return validateFields(wasteStockValidation, formData);
         if (isEditMode(form.dataset.mode)) return validateFields(wasteEditValidation, formData);
 
-        return validateFields(wasteValidation, formData);
+        return validateFields(wasteValidation, {
+            ...formData,
+            presentationName: form.querySelector(INPUT_SELECTORS.WASTE_PRESENTATION_DISPLAY).textContent
+        });
     },
     sendRequest: ({ formData, form }) => handleSubmit({
         form,
