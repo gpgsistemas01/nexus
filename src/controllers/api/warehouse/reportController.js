@@ -321,7 +321,8 @@ export const exportWasteReportExcel = async (req, res) => {
             'Ancho',
             'Largo',
             'Total de mermas',
-            'Total m²'
+            'Total m²',
+            'Peso total de rollos (kg)'
         ],
 
         ...summaryRows.map(row => [
@@ -330,7 +331,8 @@ export const exportWasteReportExcel = async (req, res) => {
             row.width,
             row.length,
             row.wasteQuantity,
-            row.squareMeters
+            row.squareMeters,
+            row.weightStatus === 'unknown' ? 'Sin peso capturado' : row.totalWeightKg
         ]),
         [
             'Total',
@@ -338,7 +340,10 @@ export const exportWasteReportExcel = async (req, res) => {
             '',
             '',
             createColumnTotalFormula('E', 2, summaryRows.length, totals.wasteQuantity),
-            createColumnTotalFormula('F', 2, summaryRows.length, totals.squareMeters)
+            createColumnTotalFormula('F', 2, summaryRows.length, totals.squareMeters),
+            totals.weightStatus === 'unknown' ? 'Sin peso capturado' : totals.weightStatus === 'complete'
+                ? createColumnTotalFormula('G', 2, summaryRows.length, totals.totalWeightKg)
+                : null
         ]
     ];
 

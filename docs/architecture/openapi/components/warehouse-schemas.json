@@ -579,7 +579,7 @@
         ],
         "exclusiveMinimum": 0,
         "maximum": 99999999.999999,
-        "description": "Kg por unidad de merma, opcional y sólo para presentación ROLLO. La identidad por proveedor, nombre y medidas permanece única; no modifica stock."
+        "description": "Peso en kg por unidad de merma de Rollo, opcional y capturable únicamente al registrar. Después queda sólo para consulta."
       }
     },
     "additionalProperties": false,
@@ -608,15 +608,6 @@
       },
       "isActive": {
         "type": "boolean"
-      },
-      "weightKg": {
-        "type": [
-          "number",
-          "null"
-        ],
-        "exclusiveMinimum": 0,
-        "maximum": 99999999.999999,
-        "description": "Kg por unidad de merma, opcional y sólo para presentación ROLLO. La identidad por proveedor, nombre y medidas permanece única; no modifica stock."
       }
     },
     "additionalProperties": false,

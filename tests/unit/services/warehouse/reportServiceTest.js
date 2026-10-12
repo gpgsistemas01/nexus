@@ -20,11 +20,11 @@ describe('consulta del reporte de mermas', () => {
     ]);
 
     expect(report.rows).toEqual([
-      { supplier: 'Proveedor A', name: 'Lona', width: 1.5, length: null, wasteQuantity: 5, squareMeters: 28.5 },
-      { supplier: 'Proveedor A', name: 'Lona', width: 2, length: null, wasteQuantity: 1, squareMeters: 4 },
-      { supplier: 'Proveedor B', name: 'Lona', width: 1.5, length: null, wasteQuantity: 1, squareMeters: 3 }
+      { supplier: 'Proveedor A', name: 'Lona', width: 1.5, length: null, wasteQuantity: 5, squareMeters: 28.5, totalWeightKg: null, weightStatus: 'unknown' },
+      { supplier: 'Proveedor A', name: 'Lona', width: 2, length: null, wasteQuantity: 1, squareMeters: 4, totalWeightKg: null, weightStatus: 'unknown' },
+      { supplier: 'Proveedor B', name: 'Lona', width: 1.5, length: null, wasteQuantity: 1, squareMeters: 3, totalWeightKg: null, weightStatus: 'unknown' }
     ]);
-    expect(report.totals).toEqual({ wasteQuantity: 7, squareMeters: 35.5 });
+    expect(report.totals).toEqual({ wasteQuantity: 7, squareMeters: 35.5, totalWeightKg: null, weightStatus: 'unknown' });
   });
 
   it('separa por largo las presentaciones que no son rollo y conserva el grupo sin medidas', () => {
@@ -35,18 +35,35 @@ describe('consulta del reporte de mermas', () => {
     ]);
 
     expect(report.rows).toEqual([
-      { supplier: 'Proveedor A', name: 'Retazo', width: 2, length: 3, wasteQuantity: 2, squareMeters: 12 },
-      { supplier: 'Proveedor A', name: 'Retazo', width: 2, length: 4, wasteQuantity: 1, squareMeters: 8 },
-      { supplier: 'Proveedor A', name: 'Retazo sin medida', width: null, length: null, wasteQuantity: 4, squareMeters: 0 }
+      { supplier: 'Proveedor A', name: 'Retazo', width: 2, length: 3, wasteQuantity: 2, squareMeters: 12, totalWeightKg: null, weightStatus: 'notApplicable' },
+      { supplier: 'Proveedor A', name: 'Retazo', width: 2, length: 4, wasteQuantity: 1, squareMeters: 8, totalWeightKg: null, weightStatus: 'notApplicable' },
+      { supplier: 'Proveedor A', name: 'Retazo sin medida', width: null, length: null, wasteQuantity: 4, squareMeters: 0, totalWeightKg: null, weightStatus: 'notApplicable' }
     ]);
-    expect(report.totals).toEqual({ wasteQuantity: 7, squareMeters: 20 });
+    expect(report.totals).toEqual({ wasteQuantity: 7, squareMeters: 20, totalWeightKg: null, weightStatus: 'notApplicable' });
   });
 
   it('devuelve totales en cero cuando la consulta no contiene mermas', () => {
     expect(buildWasteReportSummary([])).toEqual({
       rows: [],
-      totals: { wasteQuantity: 0, squareMeters: 0 }
+      totals: { wasteQuantity: 0, squareMeters: 0, totalWeightKg: null, weightStatus: 'notApplicable' }
     });
+  });
+
+  it('suma kg por identidad antes de consolidar largos y excluye otras presentaciones', () => {
+    const rows = [
+      { name: 'Lona', presentation: 'ROLLO', base: 1.5, height: 2, currentStock: 3, weightKg: 0.123456 },
+      { name: 'Lona', presentation: 'ROLLO', base: 1.5, height: 4, currentStock: 2, weightKg: 0.5 },
+      { name: 'Pieza', presentation: 'PIEZA', currentStock: 100, weightKg: 50 }
+    ];
+    const report = buildWasteReportSummary(rows);
+    expect(report.rows[0]).toMatchObject({ totalWeightKg: 1.370368, weightStatus: 'complete' });
+    expect(report.rows[1]).toMatchObject({ totalWeightKg: null, weightStatus: 'notApplicable' });
+    expect(report.totals).toMatchObject({ totalWeightKg: 1.370368, weightStatus: 'complete' });
+    const incomplete = buildWasteReportSummary([...rows, { ...rows[0], weightKg: null }]);
+    expect(incomplete.rows[0]).toMatchObject({ totalWeightKg: null, weightStatus: 'unknown' });
+    expect(incomplete.totals).toMatchObject({ totalWeightKg: null, weightStatus: 'unknown' });
+    const emptyStock = buildWasteReportSummary([{ ...rows[0], currentStock: 0, weightKg: null }]);
+    expect(emptyStock.totals).toMatchObject({ totalWeightKg: 0, weightStatus: 'complete' });
   });
 
   it('consulta la identidad directa de la merma sin depender de SupplierMaterial', async () => {
@@ -59,6 +76,7 @@ describe('consulta del reporte de mermas', () => {
       currentStock: 2,
       convertedQuantity: 12.16,
       maxUnitCost: 20,
+      weightKg: '1.234567',
       supplier: { tradeName: 'Proveedor A' },
       presentation: { name: 'ROLLO' },
       unitMeasure: { name: 'Metro cuadrado' }
@@ -71,7 +89,8 @@ describe('consulta del reporte de mermas', () => {
       id: 'waste-1',
       supplierId: 'supplier-1',
       name: 'Lona',
-      supplier: 'Proveedor A'
+      supplier: 'Proveedor A',
+      weightKg: 1.234567
     })]);
     expect(wasteFindMany).toHaveBeenCalledWith(expect.objectContaining({
       where: {

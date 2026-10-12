@@ -71,9 +71,8 @@ Los reportes y la infraestructura transversal se localizan en el
 [procesos](../../processes/frontend-code-sequences/index.md).
 
 
-El formulario muestra **Peso por unidad de merma (kg), sólo Rollo**. La presentación
-se obtiene del material de referencia seleccionado; no hay un selector de
-presentación independiente. `applyWasteMaterialTemplate` limpia cualquier peso
-anterior y habilita el campo sólo para Rollo. Al editar se carga el peso guardado;
-durante un ajuste de stock permanece deshabilitado. La tabla muestra el peso
-unitario y usa `—` cuando no se ha capturado o no aplica.
+`updateWasteWeightField` habilita la captura únicamente en alta de Rollo y deja
+el valor `readOnly` al editar. `applyWasteMaterialTemplate` limpia el valor al
+cambiar plantilla; `wasteEditFields` no lo envía. La tabla general omite el peso.
+La [vista de datos](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo)
+concentra el contrato y enlaza su recorrido de negocio.

@@ -1,5 +1,5 @@
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightInvalid } from '../../../errors/warehouse/wasteError.js';
+import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightInvalid, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
@@ -257,7 +257,7 @@ export const updateWaste = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
-            assertWasteWeight({ weightKg: wasteDto.weightKg, presentation: currentWaste.presentation });
+            if (Object.prototype.hasOwnProperty.call(wasteDto, 'weightKg')) throw new WasteWeightReadOnly();
 
             if (wasteDto.name && wasteDto.name !== currentWaste.name) {
                 const existingWaste = await findWasteByIdentity({

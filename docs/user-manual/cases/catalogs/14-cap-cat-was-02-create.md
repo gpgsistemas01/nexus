@@ -3,13 +3,13 @@
 
 **Casos de uso:** `CU-ALM-10` — Registrar merma.
 
-**Antes de empezar:** Vamos a registrar un merma. Tenga los datos de la operación y confirme con quien le capacita que corresponde darlo de alta; busque primero si ya existe.
+**Antes de empezar:** Vamos a registrar una merma. Tenga los datos de la operación y confirme con quien le capacita que corresponde darlo de alta; busque primero si ya existe.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Campos editables en modo alta:** **Buscar proveedor...**, **Buscar material de referencia...**,
 **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo
-máximo unitario**, **Nuevo stock**, **Observaciones** y **Activo**. El nombre, presentación y unidad
+máximo unitario**, **Nuevo stock**, **Observaciones**, **Activo** y, para Rollo, **Peso por unidad de merma (kg), sólo Rollo**. El nombre, presentación y unidad
 provienen del material de referencia y la razón **Stock inicial** es automática. Use **Nueva merma**
 para abrir el formulario y **Guardar** para confirmarlo.
 
@@ -18,6 +18,7 @@ para abrir el formulario y **Guardar** para confirmarlo.
    ![CAP-CAT-WAS-02-CREATE: formulario de registro](../../images/areas/almacen/waste/02-form-registration.png)
 
 2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock** y **Observaciones**, y revise la casilla **Activo**.
+   Si la presentación es **Rollo**, capture los kg de una unidad con esas medidas si los conoce; después del alta sólo podrá consultar ese peso.
 3. Seleccione el botón **Guardar** para registrar la merma.
 
 Si ya existe una merma con el mismo nombre, proveedor, ancho y largo, Nexus rechaza el alta y no
@@ -27,14 +28,3 @@ incremental. **Ajustar stock** permanece reservado al Administrador del sistema 
 saldo total cuando corrige una diferencia autorizada.
 
 **Compruebe el resultado:** Vuelva al listado y localice el registro guardado. Compruebe sus datos antes de continuar con otra operación.
-
-**Peso de la merma:** Si la presentación mostrada es **Rollo**, puede capturar
-**Peso por unidad de merma (kg), sólo Rollo** con un valor mayor que cero.
-Es el peso de una unidad con ese ancho y largo, no el peso total del stock.
-La presentación proviene del material de referencia; otras presentaciones
-mantienen el campo deshabilitado. Una merma con el mismo nombre, proveedor y
-medidas ya tiene una identidad: actualícela o agregue stock, sin crear otra por
-cambiar el peso. Un valor vacío significa que el peso no se ha capturado.
-
-<a id="CAP-CAT-WAS-07-ROLL-WEIGHT"></a>
-![CAP-CAT-WAS-07-ROLL-WEIGHT: peso unitario habilitado al consultar una merma de Rollo](../../images/areas/almacen/waste/07-roll-unit-weight.png)

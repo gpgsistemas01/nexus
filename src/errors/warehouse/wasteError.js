@@ -1,5 +1,11 @@
 import { AppError } from "../AppError.js";
 
+export class WasteWeightReadOnly extends AppError {
+    constructor() {
+        super('El peso de la merma sólo se captura al registrarla; después es de consulta.', 'WASTE_WEIGHT_READ_ONLY', 400);
+    }
+}
+
 export class WasteWeightInvalid extends AppError {
     constructor() {
         super('El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.', 'WASTE_WEIGHT_INVALID', 400);

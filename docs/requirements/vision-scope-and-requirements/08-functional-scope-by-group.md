@@ -15,5 +15,5 @@ mostrar el alcance y los rangos que deben revisarse juntos.
 | Salidas de material y consumible | `RF-ISS-001` a `RF-ISS-006` | Consultar, crear, editar encabezado, editar detalles, surtir y devolver. |
 | Merma y sus salidas | `RF-WST-001` a `RF-WST-007`; `RF-MER-001` a `RF-MER-011` | Operar inventario y salidas de merma conservando datos históricos, reglas dimensionales y el alta trazable de existencia. |
 | Ajustes | `RF-ADJ-001`, `RF-ADJ-002` | Registrar y aplicar inmediatamente ajustes autorizados de materiales, consumibles o mermas con movimiento y trazabilidad. |
-| Movimientos y reportes | `RF-REP-001` a `RF-REP-011` | Consultar y exportar información autorizada con reglas propias por reporte, incluidos el inventario y los movimientos separados de consumibles. |
+| Movimientos y reportes | `RF-REP-001` a `RF-REP-012` | Consultar y exportar información autorizada con reglas propias por reporte, incluidos el inventario y los movimientos separados de consumibles. |
 | Capacidades no vigentes | `RF-REQ-001`, `RF-PRJ-001`, `RF-PRJ-002` | Requisiciones fuera de alcance y proyectos modelados sin CRUD registrado. |

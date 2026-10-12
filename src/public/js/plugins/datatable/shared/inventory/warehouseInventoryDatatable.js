@@ -1,7 +1,7 @@
 import { formatCurrency, formatDecimal } from "../../../../utils/formatUtils.js";
 import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getIsActive, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure } from "../../../../utils/warehouseInventoryUtils.js";
 
-export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, canSeeCost, canManageItems, showWeight = false }) => {
+export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, canSeeCost, canManageItems }) => {
 
     tableElement.innerHTML = `
         <thead>
@@ -11,7 +11,6 @@ export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, can
                 <th rowspan="2">Existencia</th>
                 <th rowspan="2">Stock Mínimo</th>
                 <th rowspan="2">Presentación</th>
-                ${ showWeight ? '<th rowspan="2">Peso unitario (kg)</th>' : '' }
                 <th colspan="2" data-responsive-group="conversion">Conversión</th>
                 ${ canSeeCost ? '<th rowspan="2">Costo Unitario de Conversión</th>' : '' }
                 ${ canSeeActive ? '<th rowspan="2">Activo</th>' : '' }
@@ -27,7 +26,7 @@ export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, can
     `;
 };
 
-export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canManageItems, renderActions, showWeight = false }) => {
+export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canManageItems, renderActions }) => {
 
     const columns = [
         {
@@ -63,12 +62,6 @@ export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canMa
             render: (_, __, row) => getUnitMeasure(row)
         }
     ];
-
-    if (showWeight) columns.splice(6, 0, {
-        data: 'weightKg',
-        orderable: false,
-        render: value => value === null || value === undefined ? '—' : formatDecimal(value)
-    });
 
     if (canSeeCost) {
         columns.push({ 

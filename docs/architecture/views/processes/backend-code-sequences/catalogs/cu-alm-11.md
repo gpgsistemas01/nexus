@@ -44,6 +44,7 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
     Route->>ValidationRules: wasteEditValidation[] — cadena ejecutada por Express
+    Note over ValidationRules: Rechazar weightKg en edición, incluso vacío o null
     Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
@@ -60,7 +61,7 @@ sequenceDiagram
     deactivate WasteDto
     Controller->>Domain: wasteService.updateWaste({ id: req.params.id, wasteDto }) actualiza datos sin tratar stock como edición
     activate Domain
-    Note over Domain: Validar weightKg positivo sólo para presentación ROLLO persistida
+    Note over Domain: updateWaste rechaza weightKg, el DTO de edición lo excluye
     alt Servicio resuelto
         Domain-->>Controller: wasteService.updateWaste(): Promise[Waste]
         Controller-->>Client: HTTP 200 { waste, code }

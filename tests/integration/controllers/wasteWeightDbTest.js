@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
+import XLSX from 'xlsx';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { wasteValidation, wasteEditValidation, wasteStockAdditionValidation } from '../../../src/validators/forms/wasteValidations.js';
@@ -19,9 +20,11 @@ describe('peso unitario de merma de rollo', () => {
     beforeAll(async () => {
         prisma = (await import('../../../src/lib/prisma.js')).prisma;
         const controller = await import('../../../src/controllers/api/warehouse/wasteController.js');
+        const reportController = await import('../../../src/controllers/api/warehouse/reportController.js');
         app = createControllerTestApp({ registerRoutes: router => {
             router.use((req, _res, next) => { req.user = { id: ids.user, permissions: [] }; next(); });
             router.get('/wastes', controller.getAllWastes);
+            router.get('/waste-report', reportController.exportWasteReportExcel);
             router.post('/wastes', wasteValidation, validate, controller.registerWaste);
             router.patch('/wastes/:id', wasteEditValidation, validate, controller.editWaste);
             router.post('/wastes/:id/stock-entries', wasteStockAdditionValidation, validate, controller.registerWasteStockAddition);
@@ -83,11 +86,18 @@ describe('peso unitario de merma de rollo', () => {
         expect(Number((await prisma.waste.findUnique({ where: { id: roll.id } })).weightKg)).toBe(1.234567);
     });
 
-    it('permite corregir el peso de la identidad y agregar stock sin alterar ese peso', async () => {
-        await request(app).patch(`/wastes/${roll.id}`).send({ name: roll.name, isActive: true, maxUnitCost: 10, weightKg: 2.5 }).expect(200);
+    it('mantiene el peso sólo de consulta y permite editar otros datos y agregar stock', async () => {
+        const before = await prisma.waste.findUnique({ where: { id: roll.id } });
+        for (const weightKg of [2.5, null, '']) {
+            const rejected = await request(app).patch(`/wastes/${roll.id}`).send({ name: 'Cambio rechazado', isActive: true, maxUnitCost: 10, weightKg }).expect(400);
+            expect(rejected.body.errors.weightKg.code).toBe('WASTE_WEIGHT_READ_ONLY');
+            expect(await prisma.waste.findUnique({ where: { id: roll.id } })).toEqual(before);
+        }
+        await request(app).patch(`/wastes/${roll.id}`).send({ name: roll.name, isActive: true, maxUnitCost: 12 }).expect(200);
         await request(app).post(`/wastes/${roll.id}/stock-entries`).send({ quantity: 2, weightKg: 99 }).expect(200);
         const persisted = await prisma.waste.findUnique({ where: { id: roll.id } });
-        expect(Number(persisted.weightKg)).toBe(2.5);
+        expect(Number(persisted.weightKg)).toBe(1.234567);
+        expect(Number(persisted.maxUnitCost)).toBe(12);
         expect(Number(persisted.currentStock)).toBe(5);
     });
 
@@ -99,14 +109,45 @@ describe('peso unitario de merma de rollo', () => {
         expect((await prisma.waste.findUnique({ where: { id: created.body.waste.id } })).weightKg).toBeNull();
     });
 
-    it.each([0, -1, 'abc', '100000000', '0.0000001'])('rechaza peso inválido %s sin cambiar la identidad', async weightKg => {
+    it.each([0, -1, 'abc', '100000000', '0.0000001'])('rechaza peso inválido %s al registrar sin crear datos parciales', async weightKg => {
+        const before = await prisma.waste.count({ where: { supplierId: ids.supplier } });
+        await request(app).post('/wastes').send({ ...createBody('roll'), height: 8, weightKg }).expect(400);
+        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
+    });
+
+    it('rechaza la modificación del peso también al invocar directamente el servicio', async () => {
+        const { updateWaste } = await import('../../../src/services/warehouse/wastes/wasteService.js');
         const before = await prisma.waste.findUnique({ where: { id: roll.id } });
-        await request(app).patch(`/wastes/${roll.id}`).send({ name: roll.name, isActive: true, maxUnitCost: 10, weightKg }).expect(400);
+        await expect(updateWaste({ id: roll.id, wasteDto: { weightKg: 7 } })).rejects.toMatchObject({ code: 'WASTE_WEIGHT_READ_ONLY' });
         expect(await prisma.waste.findUnique({ where: { id: roll.id } })).toEqual(before);
+    });
+
+    it('exporta peso total de rollos con diferentes largos usando el peso de cada identidad', async () => {
+        await request(app).post('/wastes').send({ ...createBody('roll'), height: 6, newStock: 2, weightKg: 3 }).expect(200);
+        const before = await prisma.waste.findMany({ where: { supplierId: ids.supplier }, orderBy: { id: 'asc' } });
+        const response = await request(app).get('/waste-report').query({ supplierId: ids.supplier }).buffer(true).parse((res, callback) => {
+            const chunks = []; res.on('data', chunk => chunks.push(chunk));
+            res.on('end', () => callback(null, Buffer.concat(chunks)));
+        }).expect(200);
+        const workbook = XLSX.read(response.body, { type: 'buffer' });
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets.Mermas, { header: 1 });
+        expect(rows[0][6]).toBe('Peso total de rollos (kg)');
+        const group = rows.find(row => row[1] === roll.name);
+        expect(group[6]).toBe(12.172835);
+        expect(workbook.Sheets.Mermas[`G${rows.length}`].f).toMatch(/^SUM/);
+        expect(await prisma.waste.findMany({ where: { supplierId: ids.supplier }, orderBy: { id: 'asc' } })).toEqual(before);
     });
 
     it('conserva como desconocido el peso no capturado, sin inferirlo de las medidas', async () => {
         const created = await request(app).post('/wastes').send({ ...createBody('roll'), height: 4 }).expect(200);
         expect((await prisma.waste.findUnique({ where: { id: created.body.waste.id } })).weightKg).toBeNull();
+        const response = await request(app).get('/waste-report').query({ supplierId: ids.supplier }).buffer(true).parse((res, callback) => {
+            const chunks = []; res.on('data', chunk => chunks.push(chunk));
+            res.on('end', () => callback(null, Buffer.concat(chunks)));
+        }).expect(200);
+        const workbook = XLSX.read(response.body, { type: 'buffer' });
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets.Mermas, { header: 1 });
+        expect(rows.find(row => row[1] === roll.name)[6]).toBe('Sin peso capturado');
+        expect(rows.at(-1)[6]).toBe('Sin peso capturado');
     });
 });

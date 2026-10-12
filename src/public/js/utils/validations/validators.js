@@ -77,7 +77,6 @@ const wasteSecondaryDataValidation = {
 };
 
 export const wasteEditValidation = {
-    weightKg: value => value === undefined || value === null || value === '' ? null : validatePositiveNumber(value, 'El peso en kg'),
     name: value => validateName(value, 200),
     ...wasteSecondaryDataValidation
 };

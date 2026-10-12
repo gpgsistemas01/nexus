@@ -30,7 +30,7 @@ sequenceDiagram
     participant Route@{ "type": "boundary" } as reportApiRoute.js
     participant Auth@{ "type": "control" } as authMiddleware.js
     participant Controller@{ "type": "control" } as reportController.js
-    participant Query@{ "type": "control" } as js
+    participant Query@{ "type": "control" } as reportService.js
     participant Excel@{ "type": "control" } as reportExcelUtils.js
     participant ErrorHandler@{ "type": "control" } as app.js
 
@@ -54,6 +54,8 @@ sequenceDiagram
     activate Query
     alt Servicio resuelto
         Query-->>Controller: findWasteReportRows(): Promise[Object[]]
+        Controller->>Query: buildWasteReportSummary(rows)
+        Query-->>Controller: buildWasteReportSummary(): Object (rows, totals con weightStatus)
         Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
         Excel-->>Client: HTTP 200 archivo XLSX
     else AppError propagado

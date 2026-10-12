@@ -116,16 +116,19 @@ y el [resumen de Prisma](../../development/code-structure/06-prisma-and-persiste
 
 ## Peso unitario de merma de rollo
 
-`Waste.weightKg` es decimal nullable de hasta seis decimales, positivo si se
-captura. Describe kg por unidad de la merma con sus medidas; no representa el
-peso total disponible ni cambia `currentStock` o la conversión por dimensiones.
-Sólo aplica a la presentación ROLLO resuelta desde el material de referencia.
-No se agrega a la clave única `(supplierId, name, base, height)`: la misma identidad
-no puede duplicarse usando un peso diferente. Corregir el peso actualiza esa identidad.
+`Waste.weightKg` es un decimal nullable (`DECIMAL(18,6)`) capturable sólo al
+registrar la merma. No pertenece a materiales ni consumibles ni modifica la clave
+única `(supplierId, name, base, height)`. La migración y sus restricciones físicas
+se describen en [PostgreSQL y migraciones](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma).
 
-`20261012210000_add_roll_waste_unit_weight` agrega la columna y la comprobación
-de positividad. Los datos anteriores permanecen en `NULL`, sin asignar pesos
-inventados. La aplicabilidad por presentación se valida en el servicio, con la
-presentación persistida; no se confía en una etiqueta enviada por el navegador.
-El reporte consolidado de merma sigue agrupando rollos por ancho; no interpreta
-un peso unitario como el total de un grupo de largos diferentes.
+El [recorrido de negocio](../../../../requirements/requirements-specification/04-unified-catalog-by-scope/04-queries-reports-and-modeled-functions.md#recorrido-del-peso-de-merma)
+concentra las reglas y el diagrama. `wasteDTO.js` incluye el peso únicamente en el
+alta; `wasteEditValidation` rechaza su envío y `updateWaste` protege llamadas directas.
+`createWasteWithInitialStockAdjustment` valida presentación persistida y precisión.
+
+`findWasteReportRows` conserva `NULL` en vez de convertirlo a cero.
+`buildWasteReportSummary` calcula `totalWeightKg` por identidad antes de agrupar
+rollos por ancho. `weightStatus` distingue `complete`, `unknown` y `notApplicable`;
+una existencia cero aporta cero aunque su peso sea desconocido. El Excel conserva
+la fórmula de suma sólo cuando el total es completo. No se infiere peso a partir
+del área ni se altera el saldo al exportar.

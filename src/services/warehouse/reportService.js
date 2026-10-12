@@ -31,6 +31,7 @@ const WASTE_REPORT_SELECT = {
     convertedQuantity: true,
     maxUnitCost: true,
     name: true,
+    weightKg: true,
     supplierId: true,
     supplier: { select: { tradeName: true } },
     presentation: { select: { name: true } },
@@ -60,6 +61,7 @@ const mapWasteRows = (wastes = []) => wastes.map((item) => ({
     base: toNumber(item.base),
     height: toNumber(item.height),
     currentStock: toNumber(item.currentStock),
+    weightKg: item.weightKg == null ? null : toNumber(item.weightKg),
     presentation: item.presentation?.name,
     convertedQuantity: toNumber(item.convertedQuantity),
     unitMeasure: item.unitMeasure?.name,
@@ -195,7 +197,9 @@ export const buildWasteReportSummary = (rows = []) => {
             width,
             length,
             wasteQuantity: 0,
-            squareMeters: 0
+            squareMeters: 0,
+            totalWeightKg: isRoll ? 0 : null,
+            weightStatus: isRoll ? 'complete' : 'notApplicable'
         };
 
         const stock = toNumber(row.currentStock) || 0;
@@ -205,20 +209,36 @@ export const buildWasteReportSummary = (rows = []) => {
 
         group.wasteQuantity += stock;
         group.squareMeters += squareMeters;
+        if (isRoll && stock !== 0) {
+            if (row.weightKg == null) {
+                group.weightStatus = 'unknown';
+                group.totalWeightKg = null;
+            } else if (group.weightStatus === 'complete') {
+                group.totalWeightKg += stock * toNumber(row.weightKg);
+            }
+        }
         groups.set(key, group);
     });
 
     const summaryRows = [...groups.values()].map(row => ({
         ...row,
         wasteQuantity: roundTo(row.wasteQuantity),
-        squareMeters: roundTo(row.squareMeters)
+        squareMeters: roundTo(row.squareMeters),
+        totalWeightKg: row.totalWeightKg === null ? null : roundTo(row.totalWeightKg)
     }));
+
+    const rollRows = summaryRows.filter(row => row.weightStatus !== 'notApplicable');
+    const weightStatus = rollRows.some(row => row.weightStatus === 'unknown')
+        ? 'unknown'
+        : rollRows.length ? 'complete' : 'notApplicable';
 
     return {
         rows: summaryRows,
         totals: {
             wasteQuantity: roundTo(sum(summaryRows, 'wasteQuantity')),
-            squareMeters: roundTo(sum(summaryRows, 'squareMeters'))
+            squareMeters: roundTo(sum(summaryRows, 'squareMeters')),
+            totalWeightKg: weightStatus === 'complete' ? roundTo(sum(rollRows, 'totalWeightKg')) : null,
+            weightStatus
         }
     };
 };

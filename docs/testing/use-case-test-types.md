@@ -94,6 +94,8 @@ cambio la suite y esta matriz; el registro selectivo sólo cambia si el caso cum
 criterios de inclusión. El resultado de la ejecución permanece en CI o en la solicitud
 de cambio.
 
-El peso de merma de rollo se verifica en `wasteWeightDbTest.js`: precisión,
-conservación por identidad, rechazo fuera de Rollo, desconocidos y stock independiente.
-`wasteWeightFieldTest.js` comprueba habilitación, limpieza y deshabilitación en stock.
+`wasteWeightDbTest.js` verifica alta, precisión, identidad única, edición de peso
+rechazada sin cambios parciales, consulta, stock independiente y Excel real con
+pesos de diferentes largos y datos desconocidos. `reportServiceTest.js` comprueba
+la consolidación, el total y las presentaciones excluidas. `wasteWeightFieldTest.js`
+comprueba captura en alta y consulta posterior.

@@ -13,7 +13,4 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta desde una plantilla material-proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-MER-011`, `RF-CAT-015`, `RF-MER-001`, `RF-MER-002`, `RF-MER-004`, `RF-MER-006` a `RF-MER-009`, `RN-020` a `RN-023`. |
 
-Para Rollo, el actor puede capturar o corregir el peso en kg de una unidad con
-esas medidas. Si se captura, debe ser positivo; otras presentaciones lo rechazan.
-La misma identidad no puede duplicarse mediante un peso diferente. Un peso
-histórico ausente permanece desconocido, y la existencia no se calcula con él.
+El alta permite capturar el peso conforme a `RF-MER-011`.

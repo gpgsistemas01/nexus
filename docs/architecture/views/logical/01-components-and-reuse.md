@@ -131,8 +131,5 @@ fijan la clasificación. Merma conserva sus tablas de historial. Los Excel son
 acciones de cada consulta, aunque sus routers estén agrupados por dominio en
 `admin/reports`; no existe un dominio de negocio adicional de reportes.
 
-El peso por unidad de merma pertenece a `Waste`, no al movimiento ni al stock.
-`warehouseInventoryUtils.isRollPresentation` comparte la identificación de Rollo
-entre navegador y servicio. El navegador habilita la captura y el servicio
-verifica la presentación relacionada antes de guardar; el DTO del ajuste de
-stock no admite cambios de peso.
+La persistencia y el recorrido del peso se consultan en
+[datos de merma](data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).

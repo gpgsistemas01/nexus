@@ -51,7 +51,8 @@ con los objetivos vigentes se interpreta así:
 | `RF-WST-001` y `RF-WST-007` | `CU-ALM-09` consulta existencias del catálogo de mermas; `CU-SAL-08` consulta documentos de salida de merma. Los identificadores no se intercambian aunque ambos recorridos sean consultas. |
 | `RF-REP-003`, `RF-REP-006`, `RF-REP-007` y `RF-REP-009` | `CU-ALM-14`, reporte de mermas; complementan sus requisitos relacionados sin crear otra exportación. |
 | `RF-REP-011` | `CU-ALM-07`, `CU-ALM-08`, `CU-ALM-15`, `CU-ALM-16`, `CU-ALM-23` y `CU-ALM-24`: tres consultas y reportes que conservan su contexto. |
-| `RF-MER-011` | `CU-ALM-10` y `CU-ALM-11`: peso unitario de Rollo según sus medidas, conservado al operar stock. |
+| `RF-REP-012` | `CU-ALM-14`: peso total de rollos y aviso cuando falta peso capturado. |
+| `RF-MER-011` | `CU-ALM-10` y `CU-ALM-11`: captura inicial y consulta del peso unitario de Rollo, conservado al editar y operar stock. |
 | `RF-MER-001` a `RF-MER-009` | `CU-ALM-10` a `CU-ALM-12` y, para cantidad convertida, `CU-SAL-12` y `CU-SAL-13`; las fichas enlazan cada restricción que modifica su flujo. |
 | `RF-ADJ-001` y `RF-ADJ-002` | `CU-ALM-05`, `CU-ALM-12` y `CU-ALM-21`, ajustes de material, merma y consumible respectivamente. |
 | `RF-REQ-001`, `RF-PRJ-001` y `RF-PRJ-002` | No se asignan a un `CU-*` vigente mientras permanezcan fuera de alcance o modelados. |

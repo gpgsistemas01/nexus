@@ -1,5 +1,6 @@
 export const errorMap = {
     weightKg: {
+        READ_ONLY: 'WASTE_WEIGHT_READ_ONLY',
         INVALID_NUMBER: 'WEIGHT_KG_INVALID_NUMBER',
         TOO_LONG: 'WEIGHT_KG_TOO_LONG'
     },

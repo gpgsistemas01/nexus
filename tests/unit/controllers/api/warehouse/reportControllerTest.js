@@ -72,14 +72,14 @@ describe('exportación del reporte de mermas', () => {
   it('exporta todos los grupos y el total general en una sola hoja', async () => {
     const res = {};
     const summaryRows = [
-      { supplier: 'Proveedor A', name: 'Lona', width: 1.5, length: null, wasteQuantity: 5, squareMeters: 28.5 },
-      { supplier: 'Proveedor A', name: 'Retazo', width: 2, length: 3, wasteQuantity: 2, squareMeters: 12 }
+      { supplier: 'Proveedor A', name: 'Lona', width: 1.5, length: null, wasteQuantity: 5, squareMeters: 28.5, totalWeightKg: 2.5, weightStatus: 'complete' },
+      { supplier: 'Proveedor A', name: 'Retazo', width: 2, length: 3, wasteQuantity: 2, squareMeters: 12, totalWeightKg: null, weightStatus: 'notApplicable' }
     ];
 
     findWasteReportRows.mockResolvedValue([{ id: 'waste-1' }, { id: 'waste-2' }]);
     buildWasteReportSummary.mockReturnValue({
       rows: summaryRows,
-      totals: { wasteQuantity: 7, squareMeters: 40.5 }
+      totals: { wasteQuantity: 7, squareMeters: 40.5, totalWeightKg: 2.5, weightStatus: 'complete' }
     });
 
     await exportWasteReportExcel({ query: { inventoryScope: 'active' } }, res);
@@ -92,16 +92,17 @@ describe('exportación del reporte de mermas', () => {
       sheetName: 'Mermas',
       filename: 'reporte_mermas',
       data: [
-        ['Proveedor', 'Material', 'Ancho', 'Largo', 'Total de mermas', 'Total m²'],
-        ['Proveedor A', 'Lona', 1.5, null, 5, 28.5],
-        ['Proveedor A', 'Retazo', 2, 3, 2, 12],
+        ['Proveedor', 'Material', 'Ancho', 'Largo', 'Total de mermas', 'Total m²', 'Peso total de rollos (kg)'],
+        ['Proveedor A', 'Lona', 1.5, null, 5, 28.5, 2.5],
+        ['Proveedor A', 'Retazo', 2, 3, 2, 12, null],
         [
           'Total',
           '',
           '',
           '',
           { f: 'SUM(E2:E3)', t: 'n', v: 7 },
-          { f: 'SUM(F2:F3)', t: 'n', v: 40.5 }
+          { f: 'SUM(F2:F3)', t: 'n', v: 40.5 },
+          { f: 'SUM(G2:G3)', t: 'n', v: 2.5 }
         ]
       ]
     });

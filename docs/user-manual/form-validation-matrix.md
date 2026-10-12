@@ -75,10 +75,10 @@ toda su cantidad pendiente; **Cantidad de proyecto** no determina una entrega pa
 
 ### Peso unitario de merma
 
-En registro y edición de merma, **Peso por unidad de merma (kg), sólo Rollo**
-se habilita cuando la presentación del material de referencia es Rollo. Puede
-permanecer vacío si no se conoce; si se captura, debe ser mayor que cero, con
-hasta ocho dígitos enteros y seis decimales. Otras presentaciones deshabilitan
-el campo y el servidor rechaza valores forzados. Ajustar o agregar stock no
-modifica ese peso. Cambiar la plantilla limpia el valor para no arrastrar el
-peso de otra merma.
+| Campo y modo | Validación |
+| --- | --- |
+| Peso por unidad (kg), alta de Rollo | Opcional; positivo; hasta ocho enteros y seis decimales. |
+| Peso en edición | Sólo consulta; el servidor rechaza su envío como cambio. |
+| Otras presentaciones | Campo deshabilitado; un peso forzado se rechaza. |
+
+Véase el [recorrido del peso](../requirements/requirements-specification/04-unified-catalog-by-scope/04-queries-reports-and-modeled-functions.md#recorrido-del-peso-de-merma).

@@ -288,7 +288,7 @@ almacén con la sesión administrativa. La base debe contener, como mínimo:
 5. una compra cancelada y salidas canceladas de material y merma para comprobar el modo de consulta;
 6. al menos una persona, un usuario, un proveedor y un cliente editables;
 7. movimientos de material, consumible y merma para que los historiales no aparezcan vacíos;
-8. una merma de Rollo con peso capturado para mostrar el campo habilitado.
+8. una merma de Rollo con peso capturado para mostrar el campo de consulta.
 
 El script recorre todas las páginas del listado filtrado para localizar cada acción visible; el
 registro requerido no tiene que aparecer en la primera página y una copia oculta del control,

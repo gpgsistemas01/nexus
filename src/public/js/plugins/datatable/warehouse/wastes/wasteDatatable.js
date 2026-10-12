@@ -27,7 +27,6 @@ export const createWasteDatatable = async ({ context, openWasteModal, openWasteS
         tableElement,
         canSeeActive,
         canSeeCost,
-        showWeight: true,
         canManageItems: canManageWastes
     });
 
@@ -36,7 +35,6 @@ export const createWasteDatatable = async ({ context, openWasteModal, openWasteS
     });
 
     const columns = buildWarehouseInventoryColumns({
-        showWeight: true,
         canSeeActive,
         canSeeCost,
         canManageItems: canManageWastes,

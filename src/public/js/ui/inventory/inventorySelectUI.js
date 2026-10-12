@@ -1,5 +1,5 @@
 import { EMPTY_DISPLAY_VALUE } from '../../constants/display.js';
-import { isStockMode } from '../../constants/formModes.js';
+import { isCreateMode, isStockMode } from '../../constants/formModes.js';
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
 import { setMdbWrapperInputValue } from '../../plugins/mdb/baseInstance.js';
 import { getMaterialName, getPresentation, getUnitMeasure, isRollPresentation } from '../../utils/warehouseInventoryUtils.js';
@@ -44,6 +44,7 @@ export const updateWasteWeightField = ({ form, template = {} }) => {
     if (!field) return;
     const applies = isRollPresentation(getPresentation(template));
     field.disabled = !applies || isStockMode(form.dataset.mode);
+    field.readOnly = !isCreateMode(form.dataset.mode);
     if (!applies) field.value = '';
     if (field.id) setMdbWrapperInputValue({ selector: `#${field.id}`, value: field.value });
 };

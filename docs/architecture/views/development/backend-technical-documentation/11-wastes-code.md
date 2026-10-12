@@ -75,9 +75,5 @@ Los reportes y la infraestructura transversal se localizan en el
 [procesos](../../processes/backend-code-sequences/index.md).
 
 
-`createWasteWithInitialStockAdjustment` y `updateWaste` comprueban `weightKg`
-mediante la presentación real del material o de la merma, usando
-`warehouseInventoryUtils.js#isRollPresentation`. Sólo Rollo admite un peso
-positivo, con hasta ocho enteros y seis decimales; vacío se conserva como `null`.
-El listado devuelve el peso sin condicionarlo al permiso de costos. La identidad
-por nombre, proveedor y medidas permanece única, y stock usa DTOs distintos.
+La captura, protección de la edición y cálculo de reportes se describen en
+[datos de merma](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).

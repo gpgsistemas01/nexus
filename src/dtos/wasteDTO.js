@@ -5,7 +5,8 @@ const buildWasteRegistrationDataDto = (body = {}) => ({
     supplierId: body.supplierId,
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
     base: toNumber(body.base),
-    height: toNumber(body.height)
+    height: toNumber(body.height),
+    ...(Object.prototype.hasOwnProperty.call(body, 'weightKg') ? { weightKg: body.weightKg === null || body.weightKg === '' ? null : Number(body.weightKg) } : {})
 });
 
 const buildWasteIdentityDto = (body = {}) => ({
@@ -13,7 +14,6 @@ const buildWasteIdentityDto = (body = {}) => ({
 });
 
 const buildWasteSecondaryDataDto = (body = {}) => ({
-    ...(Object.prototype.hasOwnProperty.call(body, 'weightKg') ? { weightKg: body.weightKg === null || body.weightKg === '' ? null : Number(body.weightKg) } : {}),
     ...Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null ? { minStock: Number(body.minStock) } : {},
     ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {}),
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {})
