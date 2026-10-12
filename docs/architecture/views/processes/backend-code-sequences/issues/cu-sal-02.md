@@ -186,7 +186,8 @@ sequenceDiagram
         Core->>Prisma: db.$transaction(async tx => ...)
         rect rgb(245, 245, 245)
             Note over Core,Prisma: getDb().$transaction(async tx => ...)
-            Core->>Reference: generateYearlyReferenceNumber({ tx, ... })
+            Note over Core: MATERIAL selecciona SAL-MAT
+            Core->>Reference: generateYearlyReferenceNumber({ tx, type: referenceType })
             Core->>Prisma: tx.goodsIssue.create({ data: { type, referenceNumber, ... } })
         end
         Prisma-->>Core: commit de salida pendiente

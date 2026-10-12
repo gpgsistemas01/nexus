@@ -1,9 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { readFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import pg from 'pg';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { ROLE_NAMES } from '../../../src/constants/roles.js';
+import { resolveDatabaseUrl } from '../../../src/lib/databaseUrl.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
 const ids = {};
@@ -20,6 +23,33 @@ const header = () => ({
 });
 const detail = resource => ({ materialId: ids[resource], supplierId: ids.supplier, quantity: 2 });
 const createIssue = resource => request(app).post(issuePath(resource)).send({ ...header(), details: [detail(resource)] });
+const folioMigration = readFileSync(new URL(
+    '../../../prisma/migrations/20261012120000_split_goods_issue_reference_prefixes/migration.sql', import.meta.url
+), 'utf8');
+
+// Temporary tables copy the real PostgreSQL columns, defaults and unique indexes.
+// Migration SQL runs unchanged while permanent fixtures remain untouched.
+const withFolioMigrationTables = async callback => {
+    const connection = new pg.Client({ connectionString: resolveDatabaseUrl({ nodeEnv: 'test', preferDirectUrl: true }) });
+    await connection.connect();
+    try {
+        await connection.query(`
+            CREATE TEMP TABLE "GoodsIssue" (LIKE public."GoodsIssue" INCLUDING ALL);
+            CREATE TEMP TABLE "ReferenceNumberCounter" (LIKE public."ReferenceNumberCounter" INCLUDING ALL);
+        `);
+        await connection.query(
+            'INSERT INTO "GoodsIssue" SELECT * FROM public."GoodsIssue" WHERE "id" = ANY($1::uuid[])',
+            [[issues.material.id, issues.consumable.id]]
+        );
+        await callback(connection);
+    } finally {
+        await connection.end();
+    }
+};
+
+const getIssueCounter = prefix => prisma.referenceNumberCounter.findUnique({
+    where: { prefix_year: { prefix, year: new Date().getFullYear() } }
+});
 
 const cleanCreatedRecords = async () => {
     if (!prisma || !ids.department) return;
@@ -95,6 +125,9 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             const response = await createIssue(resource).expect(200);
             issues[resource] = response.body.goodsIssue;
             expect(issues[resource].type).toBe(resource === 'consumable' ? 'CONSUMABLE' : 'MATERIAL');
+            expect(issues[resource].referenceNumber).toMatch(
+                new RegExp(`^SAL-${resource === 'consumable' ? 'CON' : 'MAT'}-${new Date().getFullYear()}-\\d{6,}$`)
+            );
             expect((await prisma.goodsIssue.findUnique({ where: { id: issues[resource].id } })).type)
                 .toBe(issues[resource].type);
         }
@@ -120,6 +153,82 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect((await prisma.goodsIssue.findUnique({ where: { id: issues.material.id } })).type).toBe('MATERIAL');
         expect((await prisma.goodsIssue.findUnique({ where: { id: issues.consumable.id } })).type).toBe('CONSUMABLE');
         expect((await prisma.goodsIssue.findUnique({ where: { id: issues.mixed.id } })).type).toBe('MATERIAL');
+    });
+
+    it('convierte los folios legados por tipo, conserva sus datos y no disminuye contadores al repetirse', async () => {
+        await withFolioMigrationTables(async connection => {
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2025-000005', issues.material.id]);
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2026-000008', issues.consumable.id]);
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('SAL', 2025, 12), ('SAL', 2026, 20), ('SAL-MAT', 2026, 40), ('SAL-MER', 2026, 9), ('REC', 2026, 6)`);
+            const before = (await connection.query('SELECT * FROM "GoodsIssue" ORDER BY "id"')).rows;
+
+            await connection.query(folioMigration);
+
+            const after = (await connection.query('SELECT * FROM "GoodsIssue" ORDER BY "id"')).rows;
+            expect(after).toEqual(before.map(row => ({
+                ...row, referenceNumber: row.type === 'CONSUMABLE' ? 'SAL-CON-2026-000008' : 'SAL-MAT-2025-000005'
+            })));
+            const counters = (await connection.query('SELECT "prefix", "year", "counter" FROM "ReferenceNumberCounter" ORDER BY "prefix", "year"')).rows;
+            expect(counters).toEqual(expect.arrayContaining([
+                { prefix: 'SAL-MAT', year: 2025, counter: 12 },
+                { prefix: 'SAL-CON', year: 2025, counter: 12 },
+                { prefix: 'SAL-MAT', year: 2026, counter: 40 },
+                { prefix: 'SAL-CON', year: 2026, counter: 20 },
+                { prefix: 'SAL', year: 2026, counter: 20 },
+                { prefix: 'SAL-MER', year: 2026, counter: 9 },
+                { prefix: 'REC', year: 2026, counter: 6 }
+            ]));
+
+            await connection.query(folioMigration);
+            expect((await connection.query('SELECT * FROM "GoodsIssue" ORDER BY "id"')).rows).toEqual(after);
+            expect((await connection.query('SELECT "prefix", "year", "counter" FROM "ReferenceNumberCounter" ORDER BY "prefix", "year"')).rows).toEqual(counters);
+        });
+    });
+
+    it('usa los máximos emitidos cuando no existe el contador anterior y conserva referencias personalizadas', async () => {
+        await withFolioMigrationTables(async connection => {
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2026-1000000', issues.material.id]);
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['IT-CUSTOM-CONSUMABLE', issues.consumable.id]);
+
+            await connection.query(folioMigration);
+
+            const material = (await connection.query('SELECT "referenceNumber" FROM "GoodsIssue" WHERE "id" = $1', [issues.material.id])).rows[0];
+            const consumable = (await connection.query('SELECT "referenceNumber" FROM "GoodsIssue" WHERE "id" = $1', [issues.consumable.id])).rows[0];
+            expect(material.referenceNumber).toBe('SAL-MAT-2026-1000000');
+            expect(consumable.referenceNumber).toBe('IT-CUSTOM-CONSUMABLE');
+            expect((await connection.query('SELECT "prefix", "year", "counter" FROM "ReferenceNumberCounter"')).rows)
+                .toEqual([{ prefix: 'SAL-MAT', year: 2026, counter: 1000000 }]);
+        });
+    });
+
+    it('revierte toda la conversión si el folio destino ya existe', async () => {
+        await withFolioMigrationTables(async connection => {
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2026-000005', issues.material.id]);
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2026-000008', issues.consumable.id]);
+            const original = (await connection.query('SELECT * FROM "GoodsIssue" WHERE "id" = $1', [issues.material.id])).rows[0];
+            await connection.query('INSERT INTO "GoodsIssue" SELECT * FROM jsonb_populate_record(NULL::"GoodsIssue", $1::jsonb)', [
+                JSON.stringify({ ...original, id: randomUUID(), referenceNumber: 'SAL-MAT-2026-000005' })
+            ]);
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES ('SAL', 2026, 20)`);
+            const before = (await connection.query('SELECT * FROM "GoodsIssue" ORDER BY "id"')).rows;
+
+            await expect(connection.query(folioMigration)).rejects.toMatchObject({ code: '23505' });
+            await connection.query('ROLLBACK');
+
+            expect((await connection.query('SELECT * FROM "GoodsIssue" ORDER BY "id"')).rows).toEqual(before);
+            expect((await connection.query('SELECT "prefix", "year", "counter" FROM "ReferenceNumberCounter"')).rows)
+                .toEqual([{ prefix: 'SAL', year: 2026, counter: 20 }]);
+        });
+    });
+
+    it('admite una instalación nueva sin salidas ni contadores', async () => {
+        await withFolioMigrationTables(async connection => {
+            await connection.query('DELETE FROM "GoodsIssue"');
+            await connection.query(folioMigration);
+            expect((await connection.query('SELECT * FROM "GoodsIssue"')).rows).toEqual([]);
+            expect((await connection.query('SELECT * FROM "ReferenceNumberCounter"')).rows).toEqual([]);
+        });
     });
 
     it.each(['material', 'consumable'])('lista y exporta exclusivamente salidas del contexto %s', async inventoryResource => {
@@ -197,4 +306,32 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(Number(persisted.returnedQuantity)).toBe(1);
         expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: issue.id } })).toBe(2);
     });
+    it('genera consecutivos independientes por tipo incluso con altas concurrentes', async () => {
+        const before = { material: await getIssueCounter('SAL-MAT'), consumable: await getIssueCounter('SAL-CON') };
+        const resources = ['material', 'consumable', 'material', 'consumable', 'material', 'consumable'];
+        const results = await Promise.all(resources.map(resource => createIssue(resource).expect(200)));
+        const folios = results.map(result => result.body.goodsIssue.referenceNumber);
+        expect(new Set(folios).size).toBe(6);
+        for (const [resource, prefix] of [['material', 'SAL-MAT'], ['consumable', 'SAL-CON']]) {
+            const emitted = results.filter((_result, index) => resources[index] === resource)
+                .map(result => Number(result.body.goodsIssue.referenceNumber.split('-').at(-1))).sort((a, b) => a - b);
+            expect(emitted).toEqual([before[resource].counter + 1, before[resource].counter + 2, before[resource].counter + 3]);
+            expect((await getIssueCounter(prefix)).counter).toBe(before[resource].counter + 3);
+        }
+    });
+
+    it.each(['material', 'consumable'])('revierte el contador de %s cuando falla la escritura posterior del documento', async resource => {
+        const prefix = resource === 'material' ? 'SAL-MAT' : 'SAL-CON';
+        const beforeCounter = await getIssueCounter(prefix);
+        const beforeIssues = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
+        const beforeStock = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier } });
+
+        await request(app).post(issuePath(resource))
+            .send({ ...header(), projectNumber: 'PROJECT-NUMBER-TOO-LONG', details: [detail(resource)] }).expect(500);
+
+        expect(await getIssueCounter(prefix)).toEqual(beforeCounter);
+        expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(beforeIssues);
+        expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier } })).toEqual(beforeStock);
+    });
+
 });

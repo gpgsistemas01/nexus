@@ -472,6 +472,7 @@ model Client {
   @@index([advisorId])
 }
 
+/// Contadores anuales por prefijo; SAL-MAT y SAL-CON mantienen series independientes.
 model ReferenceNumberCounter {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   prefix  String @db.VarChar(10)
@@ -546,6 +547,7 @@ enum GoodsReceiptDetailStatus {
 model GoodsIssue {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type            MaterialType @default(MATERIAL)
+  /// Folio SAL-MAT-AAAA-consecutivo o SAL-CON-AAAA-consecutivo según type.
   referenceNumber String    @unique @db.VarChar(50)
   approvedDate    DateTime?
   requestDate     DateTime

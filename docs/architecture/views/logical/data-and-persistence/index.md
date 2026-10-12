@@ -82,3 +82,7 @@ explican quién puede operarlos.
 Los diagramas y el diccionario se regeneran con `npm run docs:architecture` y se
 comprueban con `npm run docs:check`. No se editan manualmente. Una restricción de
 columna no sustituye una regla de negocio ni concede permisos a un actor.
+
+## Folios de salidas por contexto
+
+`GoodsIssue.type` distingue `MATERIAL` y `CONSUMABLE`; su `referenceNumber` conserva unicidad global. Cada contexto usa una fila anual distinta de `ReferenceNumberCounter`: `SAL-MAT` o `SAL-CON`. No se agregan columnas para separar los folios. La migración `20261012120000_split_goods_issue_reference_prefixes` convierte los `SAL-AAAA-consecutivo` existentes según su tipo y conserva año y sufijo. Los contadores nuevos mantienen el mayor valor entre los documentos emitidos, el contador genérico anterior y cualquier contador específico ya existente. El contador `SAL` se conserva como evidencia histórica y deja de usarse para nuevas salidas.

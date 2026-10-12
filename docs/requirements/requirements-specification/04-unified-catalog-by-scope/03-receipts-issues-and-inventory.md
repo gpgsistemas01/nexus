@@ -2,7 +2,7 @@
 
 Las recepciones y salidas de artículos se operan en contextos separados de materiales
 y consumibles. Comparten las obligaciones de recepción `RF-REC-001` a `RF-REC-008`
-y de salida `RF-ISS-001` a `RF-ISS-006`; compartir proceso no permite mezclar detalles.
+y de salida `RF-ISS-001` a `RF-ISS-008`; compartir proceso no permite mezclar detalles.
 Las salidas de merma conservan sus recursos y movimientos propios.
 
 | ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
@@ -24,6 +24,8 @@ Las salidas de merma conservan sus recursos y movimientos propios.
 | RF-ISS-004 | Personal de almacén o el Administrador del sistema deben poder crear una salida pendiente de material o consumible con encabezado y detalles válidos del mismo contexto, sin descontar existencias. | Implementado | `src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
 | RF-ISS-005 | Personal de almacén o el Administrador del sistema deben poder actualizar únicamente los campos admitidos del encabezado de una salida cuyo estado permita edición. | Implementado | `src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
 | RF-ISS-006 | Personal de almacén o el Administrador del sistema deben poder agregar o actualizar detalles todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado | `src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js`, `src/views/pages/warehouse/goodsIssues` |
+| RF-ISS-007 | Las salidas de materiales y consumibles deben tener series anuales independientes y folios únicos: `SAL-MAT-AAAA-consecutivo` para materiales y `SAL-CON-AAAA-consecutivo` para consumibles. Crear una salida de un contexto no debe consumir el contador del otro; un fallo al guardar tampoco debe consumir un consecutivo. | Implementado | `src/constants/documentReferenceTypes.js`, `src/services/warehouse/goodsIssues/goodsIssueService.js`, `src/services/document/referenceNumberService.js` |
+| RF-ISS-008 | Las salidas históricas con folio genérico `SAL-AAAA-consecutivo` deben adoptar el prefijo de su clasificación registrada, conservando año, consecutivo, identidad, detalles e inventario. Las nuevas series deben continuar por encima del máximo emitido y del contador anterior; una colisión debe impedir la conversión completa sin cambios parciales. | Implementado | `prisma/migrations/20261012120000_split_goods_issue_reference_prefixes/migration.sql`, integración de salidas |
 | RF-WST-001 | Personal de almacén o el Administrador del sistema deben poder consultar el inventario de mermas y sus existencias; corresponde a la misma consulta de `RF-CAT-004`, no a documentos de salida. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js` |
 | RF-WST-002 | Personal de almacén o el Administrador del sistema deben poder crear una salida de merma pendiente con encabezado y detalles válidos, sin descontar existencias. | Implementado | `src/routes/api/warehouse/wasteIssueApiRoute.js`, `src/public/js/pages/warehouse/wasteIssues/wasteIssueModal.js` |
 | RF-WST-003 | Personal de almacén o el Administrador del sistema deben poder surtir toda la cantidad pendiente de un detalle de merma cuando exista stock suficiente, actualizando documento, existencias y movimiento atómicamente. | Implementado | `src/services/warehouse/wasteIssues/wasteIssueService.js`, `tests/integration/controllers/wasteIssueControllerDbTest.js` |

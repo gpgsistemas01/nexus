@@ -287,3 +287,31 @@ antes de producción o durante la siguiente ventana de infraestructura.
 Si el proveedor solo entrega una cuenta, el sistema puede continuar temporalmente con
 la configuración actual. En ese caso se debe registrar la excepción, restringir la
 red, rotar el secreto y evitar exponer `DIRECT_URL` fuera del proceso de despliegue.
+
+## Migración de folios de salidas por contexto
+
+La migración incremental `20261012120000_split_goods_issue_reference_prefixes` requiere
+la clasificación `GoodsIssue.type` incorporada por `20261007000000_add_goods_issue_type`.
+Convierte únicamente los folios que cumplen `SAL-AAAA-consecutivo` en `SAL-MAT` para
+`MATERIAL` o `SAL-CON` para `CONSUMABLE`. Conserva año, sufijo, UUID, encabezado,
+detalles y relaciones. Referencias personalizadas, compras y salidas de merma conservan
+sus folios; los movimientos y devoluciones mantienen sus referencias propias.
+
+La conversión y el ajuste de contadores son una sola transacción. El bloqueo de ambas
+tablas impide escrituras mientras se concilian los folios. Una colisión contra la
+unicidad de `GoodsIssue.referenceNumber` aborta la transacción completa: debe revisarse
+el documento conflictivo y reintentarse, sin inventar otro número ni eliminarlo.
+
+Cada contador específico queda en el mayor valor de sus folios emitidos, del contador
+`SAL` anterior para ese año y de cualquier contador específico ya existente. Así no se
+reutilizan números consumidos aunque se hayan retirado documentos. Las series avanzan
+independientemente a partir de ese máximo; un año nuevo empieza en uno al crearse su
+contador. El contador genérico queda conservado y retirado de la generación vigente.
+
+Antes del despliegue, respaldar y revisar la clasificación de las salidas existentes y
+cualquier colisión destino. Publicar servicio y migración en la misma versión y detener
+las instancias anteriores durante la conversión: una instancia antigua volvería a emitir
+`SAL`. Aplicar con la cuenta de migraciones y `DIRECT_URL` mediante `npm run db:migrate`,
+y comprobar `npx prisma migrate status`. No ejecutar la conversión contra una base de
+producción durante las pruebas; la integración usa exclusivamente la base aislada y
+comprueba históricos, repetición, colisión con rollback y altas concurrentes.

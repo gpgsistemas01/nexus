@@ -178,10 +178,13 @@ export const createGoodsIssue = async ({ goodsIssueDto, type = MATERIAL_TYPES.MA
             initialFulfillmentStatusId: pendingFulfillmentStatusId,
             type
         });
+        const referenceType = type === MATERIAL_TYPES.CONSUMABLE
+            ? DOCUMENT_REFERENCE_TYPES.CONSUMABLE_GOODS_ISSUE
+            : DOCUMENT_REFERENCE_TYPES.GOODS_ISSUE;
 
         const result = await getDb().$transaction(async (tx) => {
 
-            referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_ISSUE, tx });
+            referenceNumber = await generateYearlyReferenceNumber({ type: referenceType, tx });
 
             const goodsIssue = await tx.goodsIssue.create({
                 data: {

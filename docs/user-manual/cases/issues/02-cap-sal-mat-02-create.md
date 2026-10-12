@@ -22,4 +22,4 @@ Cada combinación de material y proveedor debe aparecer una sola vez. Si vuelve 
 combinación antes de guardar, el formulario reemplaza la cantidad del renglón existente; no crea
 otro renglón ni suma ambas cantidades. Capture en **Cantidad** el total que desea solicitar.
 
-**Compruebe el resultado:** La salida aparece con folio y estado **Pendiente**. Registrar la solicitud todavía no descuenta existencia; la entrega se confirma después con **Surtir detalle**.
+**Compruebe el resultado:** La salida aparece con un folio que comienza con **SAL-MAT** y estado **Pendiente**. Compruebe que ese prefijo corresponde a materiales. Registrar la solicitud todavía no descuenta existencia; la entrega se confirma después con **Surtir detalle**.
