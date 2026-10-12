@@ -2,7 +2,7 @@ import { AppError } from "../AppError.js";
 
 export class WasteWeightReadOnly extends AppError {
     constructor() {
-        super('El peso de la merma sólo se captura al registrarla; después es de consulta.', 'WASTE_WEIGHT_READ_ONLY', 400);
+        super('No se puede modificar el peso unitario de una merma ya registrada. Este dato sólo está disponible para consulta.', 'WASTE_WEIGHT_READ_ONLY', 400);
     }
 }
 
