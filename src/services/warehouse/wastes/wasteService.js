@@ -1,5 +1,5 @@
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../../errors/warehouse/wasteError.js';
+import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightInvalid } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
@@ -11,8 +11,15 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { resolveWasteMaterialSnapshot } from './wasteMaterialService.js';
 import { findUniqueSupplier } from '../supplierService.js';
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
+import { isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
+
+const assertWasteWeight = ({ weightKg, presentation }) => {
+    if (weightKg === undefined || weightKg === null) return;
+    const weight = Number(weightKg);
+    if (!isRollPresentation(presentation?.name) || !Number.isFinite(weight) || weight <= 0 || !/^\d{1,8}(\.\d{1,6})?$/.test(String(weight))) throw new WasteWeightInvalid();
+};
 
 const handleWasteServiceError = ({ err, fallbackError }) => {
 
@@ -123,6 +130,7 @@ export const findAllWastes = async ({
                 name: true,
                 base: true,
                 height: true,
+                weightKg: true,
                 ...(canReadCosts && { maxUnitCost: true }),
                 minStock: true,
                 isActive: true,
@@ -168,6 +176,8 @@ export const createWasteWithInitialStockAdjustment = async ({
 
             if (!material) throw new WasteNotFound();
 
+            assertWasteWeight({ weightKg: wasteDto.weightKg, presentation: material.presentation });
+
             const existingWaste = await findWasteByIdentity({
                 tx,
                 supplierId: wasteDto.supplierId,
@@ -191,6 +201,7 @@ export const createWasteWithInitialStockAdjustment = async ({
                     maxUnitCost: wasteDto.maxUnitCost,
                     base: wasteDto.base,
                     height: wasteDto.height,
+                    weightKg: wasteDto.weightKg ?? null,
                     currentStock: wasteDto.newStock,
                     convertedQuantity: calculateConvertedQuantity({
                         currentStock: wasteDto.newStock,
@@ -245,6 +256,8 @@ export const updateWaste = async ({
         const waste = await getDb().$transaction(async (tx) => {
 
             const currentWaste = await findWasteById({ tx, id });
+
+            assertWasteWeight({ weightKg: wasteDto.weightKg, presentation: currentWaste.presentation });
 
             if (wasteDto.name && wasteDto.name !== currentWaste.name) {
                 const existingWaste = await findWasteByIdentity({

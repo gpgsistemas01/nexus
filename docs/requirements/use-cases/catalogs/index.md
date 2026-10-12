@@ -26,6 +26,9 @@
 | `CU-ALM-20` | Retirar consumible | Retiro condicionado por la historia operativa. |
 | `CU-ALM-21` | Ajustar existencia de consumible | Ajuste trazable de inventario. |
 | `CU-ALM-22` | Generar reporte de inventario de consumibles | Archivo Excel limitado al catálogo de consumibles. |
+| `CU-ALM-23` | Consultar movimientos de consumibles | Consulta contextual del historial, filtros y conteos de consumibles. |
+| `CU-ALM-24` | Generar reporte de movimientos de consumibles | Excel personalizado o mensual exclusivo del contexto de consumibles. |
+
 
 ### Grupo funcional CAT — Catálogos
 
@@ -89,6 +92,8 @@ registro creado al formulario de origen sin abandonar el formulario de origen ni
 - [`CU-ALM-20` — Retirar consumible](cu-alm-20.md)
 - [`CU-ALM-21` — Ajustar existencia de consumible](cu-alm-21.md)
 - [`CU-ALM-22` — Generar reporte de inventario de consumibles](cu-alm-22.md)
+- [`CU-ALM-23` — Consultar movimientos de consumibles](cu-alm-23.md)
+- [`CU-ALM-24` — Generar reporte de movimientos de consumibles](cu-alm-24.md)
 
 ### Grupo funcional CAT — Catálogos
 

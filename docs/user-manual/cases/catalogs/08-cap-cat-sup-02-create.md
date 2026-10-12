@@ -11,7 +11,7 @@
 
 1. Abra **Proveedores** y seleccione **Nuevo proveedor**. Si ya está preparando una compra, también puede escribir el proveedor que no existe en su selector y elegir **Nuevo proveedor**, para volver después a esa operación. Observe los controles que va a usar:
 
-   ![CAP-CAT-SUP-02-CREATE: formulario de alta](../../images/suppliers/02-form-creation.png)
+   ![CAP-CAT-SUP-02-CREATE: formulario de alta](../../images/areas/almacen/suppliers/02-form-creation.png)
 
 2. Complete los campos **Razón social**, **Nombre comercial** y **Teléfono**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar el proveedor.

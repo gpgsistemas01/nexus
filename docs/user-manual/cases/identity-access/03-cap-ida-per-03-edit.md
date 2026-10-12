@@ -11,7 +11,7 @@
 
 1. En la fila de la persona, seleccione **Editar registro**. Observe los controles que va a usar:
 
-   ![CAP-IDA-PER-03-EDIT: formulario de edición](../../images/people/03-form-edit.png)
+   ![CAP-IDA-PER-03-EDIT: formulario de edición](../../images/areas/almacen/people/03-form-edit.png)
 
 2. Modifique **Nombre completo** si corresponde.
 3. Para incorporar un acceso, elija opciones en **Buscar área...** y **Buscar rol...**, seleccione **Agregar** y compruebe que aparezca en la tabla. Para retirar uno, use **Eliminar acceso** en su renglón.

@@ -60,6 +60,8 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 | `CU-ALM-20` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js`. | Retiro con id de oferta simulado; comprueba permiso y delegación de baja limitada a `CONSUMABLE`. | **Unitarias existentes**; falta integración de historia protegida, otras ofertas y ausencia de eliminación parcial. |
 | `CU-ALM-21` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js`. | Ajuste con identidad, proveedor, actor y nueva existencia simulados; comprueba permiso específico y delegación con `CONSUMABLE`. | **Unitarias existentes**; falta integración de saldo, ajuste, movimiento y rollback. |
 | `CU-ALM-22` | Sin prueba funcional directa del filtro de consumibles. | Filtros visibles, tres alcances, ofertas de ambos tipos, conjunto vacío y contenido del archivo limitado a `CONSUMABLE`. | **Brecha**; las pruebas generales de `reportControllerTest.js` y `reportServiceTest.js` no comprueban este caso ni sustituyen la integración del archivo. |
+| `CU-ALM-23` | Integración HTTP/Prisma: contexto, conteos, paginación, filtros cruzados y permisos. | Historial de consumibles separado, con proveedor y selector propios. | `movementContextDbTest.js`. |
+| `CU-ALM-24` | Integración con Excel real personalizado y mensual, contenido y permisos. | Descargar desde la consulta y revisar hoja, folios y saldos. | `movementContextDbTest.js`. |
 | `CU-CAT-01..03` | `supplierControllerDbTest.js`. | Integración de alta, consulta y actualización con fixtures y limpieza en base aislada. | **Integración existente.** |
 | `CU-CAT-04` | Sin prueba funcional directa del reporte. | Proveedores dentro/fuera de filtros, permisos y archivo esperado. | **Brecha.** |
 | `CU-CAT-05..07` | `clientControllerDbTest.js`. | Integración de alta, listado, actualización y error específico con fixtures y limpieza. | **Integración existente.** |
@@ -91,3 +93,7 @@ reglas y fronteras observables. Cuando cambie este criterio, se actualizan en el
 cambio la suite y esta matriz; el registro selectivo sólo cambia si el caso cumple sus
 criterios de inclusión. El resultado de la ejecución permanece en CI o en la solicitud
 de cambio.
+
+El peso de merma de rollo se verifica en `wasteWeightDbTest.js`: precisión,
+conservación por identidad, rechazo fuera de Rollo, desconocidos y stock independiente.
+`wasteWeightFieldTest.js` comprueba habilitación, limpieza y deshabilitación en stock.

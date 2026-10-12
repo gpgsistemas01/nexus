@@ -99,6 +99,7 @@ flowchart LR
     menu --> issues(["Salidas"])
     menu --> movements(["Movimientos"])
     movements -->|"movements:read"| materialMovements["Materiales<br/>/movimientos/materiales"]
+    movements -->|"movements:read"| consumableMovements["Consumibles<br/>/movimientos/consumibles"]
     movements -->|"movements:read"| wasteMovements["Mermas<br/>/movimientos/mermas"]
     menu -->|"users:manage"| users["Usuarios<br/>/usuarios-sistemas"]
     menu -->|"persons:page-view"| persons["Personas<br/>/personas"]

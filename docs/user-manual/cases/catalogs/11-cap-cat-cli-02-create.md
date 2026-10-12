@@ -11,7 +11,7 @@
 
 1. Abra **Clientes** y seleccione **Nuevo cliente**. Si ya está preparando una salida, también puede escribir el cliente que no existe en su selector y elegir **Nuevo cliente**, para volver después a esa operación. Observe los controles que va a usar:
 
-   ![CAP-CAT-CLI-02-CREATE: formulario de alta](../../images/clients/02-form-creation.png)
+   ![CAP-CAT-CLI-02-CREATE: formulario de alta](../../images/areas/almacen/clients/02-form-creation.png)
 
 2. Complete el campo **Nombre**, revise la casilla **Activo** y seleccione el botón **Guardar**.
 

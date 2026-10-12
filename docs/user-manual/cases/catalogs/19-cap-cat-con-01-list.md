@@ -14,7 +14,7 @@ acciones permitidas de cada fila.
 1. Abra **Almacén → Consumibles** y despliegue **Filtros**. Compruebe que la pantalla
    coincida con la captura:
 
-   ![CAP-CAT-CON-01-LIST: inventario separado de consumibles](../../images/consumables/01-list-inventory.png)
+   ![CAP-CAT-CON-01-LIST: inventario separado de consumibles](../../images/areas/almacen/consumables/01-list-inventory.png)
 
 2. Escriba un nombre, seleccione un proveedor o combine ambos criterios.
 3. Seleccione **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para

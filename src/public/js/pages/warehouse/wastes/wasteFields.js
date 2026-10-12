@@ -1,5 +1,5 @@
 export const wasteDataFields = ['materialId', 'supplierId', 'base', 'height'];
-export const wasteSecondaryDataFields = ['minStock', 'maxUnitCost', 'isActive'];
+export const wasteSecondaryDataFields = ['minStock', 'maxUnitCost', 'isActive', 'weightKg'];
 export const wasteEditFields = ['name', ...wasteSecondaryDataFields];
 export const wasteStockFields = ['newStock', 'reasonId', 'observations'];
 export const wasteStockAdditionFields = ['quantity', 'observations'];

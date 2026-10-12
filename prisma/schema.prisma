@@ -215,6 +215,8 @@ model Waste {
   base                   Decimal?                     @db.Decimal(18, 6)
   height                 Decimal?                     @db.Decimal(18, 6)
   maxUnitCost            Decimal?                     @db.Decimal(18, 6)
+  /// Peso en kg por unidad de merma, aplicable únicamente a presentación ROLLO.
+  weightKg               Decimal?                     @db.Decimal(18, 6)
   currentStock           Decimal                      @default(0) @db.Decimal(18, 6)
   convertedQuantity      Decimal                      @default(0) @db.Decimal(18, 6)
   supplier               Supplier                     @relation(fields: [supplierId], references: [id])

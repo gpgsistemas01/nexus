@@ -11,7 +11,7 @@
 
 1. Después de iniciar sesión, seleccione **Menú principal** y compruebe que las opciones autorizadas coincidan con la captura:
 
-   ![CAP-AUT-02-MENU: menú principal](../../images/access/02-menu-main.png)
+   ![CAP-AUT-02-MENU: menú principal](../../images/areas/almacen/access/02-menu-main.png)
 
 2. Seleccione una sección para desplegar sus módulos. Nexus sólo muestra las opciones permitidas por el rol y el área de la cuenta.
 3. Para terminar, use **Salir**; no cierre solamente la pestaña del navegador.

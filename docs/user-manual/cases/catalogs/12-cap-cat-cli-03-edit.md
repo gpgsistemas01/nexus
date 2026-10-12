@@ -11,7 +11,7 @@
 
 1. En la fila del cliente, seleccione la acción **Editar registro**. Observe los controles que va a usar:
 
-   ![CAP-CAT-CLI-03-EDIT: formulario de edición](../../images/clients/03-form-edit.png)
+   ![CAP-CAT-CLI-03-EDIT: formulario de edición](../../images/areas/sistemas/clients/03-form-edit.png)
 
 2. Modifique el campo **Nombre** o la casilla **Activo** y seleccione el botón **Actualizar**.
 

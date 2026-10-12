@@ -169,3 +169,10 @@ Seleccione **Volver**. Con una sesión válida, el botón conduce al inventario 
 sesión, conduce al inicio de sesión. Si el error apareció desde una opción visible de Nexus,
 conserve la dirección y repórtela. No modifique manualmente la URL para intentar acceder a otra
 área.
+
+### Peso de merma de rollo
+
+| Mensaje | Qué hacer |
+| --- | --- |
+| El peso debe ser positivo y sólo aplica a mermas con presentación Rollo. | Revise la presentación y capture kg por unidad con un valor mayor que cero; deje vacío cuando no se conoce. |
+| El peso admite hasta 8 dígitos enteros y 6 decimales. | Corrija la precisión del valor capturado. |

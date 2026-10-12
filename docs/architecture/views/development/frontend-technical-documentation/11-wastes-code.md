@@ -70,3 +70,10 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/frontend-code-sequences/index.md).
 
+
+El formulario muestra **Peso por unidad de merma (kg), sólo Rollo**. La presentación
+se obtiene del material de referencia seleccionado; no hay un selector de
+presentación independiente. `applyWasteMaterialTemplate` limpia cualquier peso
+anterior y habilita el campo sólo para Rollo. Al editar se carga el peso guardado;
+durante un ajuste de stock permanece deshabilitado. La tabla muestra el peso
+unitario y usa `—` cuando no se ha capturado o no aplica.

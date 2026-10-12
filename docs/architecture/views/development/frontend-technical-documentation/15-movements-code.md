@@ -67,3 +67,15 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/frontend-code-sequences/index.md).
 
+
+## Tres accesos y una pantalla compartida
+
+`/movimientos/materiales`, `/movimientos/consumibles` y `/movimientos/mermas`
+reutilizan `movementsPage.ejs`. El controlador fija `movementContext`; la página
+configura selector, título, columnas y endpoints de consulta y exportación.
+Consumibles usa `getAllConsumables` en el filtro dependiente de proveedor y muestra
+**Consumible** en tabla y búsqueda. Cambiar proveedor limpia la selección previa.
+
+Los tres accesos comprueban permisos administrativos. Materiales y consumibles
+escuchan `material-movements:updated`, el evento existente emitido por las
+operaciones compartidas de inventario; merma usa `waste-movements:updated`.

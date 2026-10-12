@@ -1,5 +1,11 @@
 import { AppError } from "../AppError.js";
 
+export class WasteWeightInvalid extends AppError {
+    constructor() {
+        super('El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.', 'WASTE_WEIGHT_INVALID', 400);
+    }
+}
+
 export class WasteNotFound extends AppError {
 
     constructor () {

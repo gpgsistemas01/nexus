@@ -10,7 +10,7 @@
 
 1. En la fila correspondiente seleccione **Editar registro** y compruebe el formulario:
 
-   ![CAP-CAT-CON-03-EDIT: edición de consumible](../../images/consumables/03-form-edit.png)
+   ![CAP-CAT-CON-03-EDIT: edición de consumible](../../images/areas/almacen/consumables/03-form-edit.png)
 
 2. Modifique **Nombre**, **Stock Mínimo**, **Costo Máximo** o **Activo**.
 3. Revise como referencia proveedor, presentación y unidad; no cambie existencia desde

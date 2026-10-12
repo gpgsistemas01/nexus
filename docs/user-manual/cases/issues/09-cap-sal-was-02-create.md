@@ -11,7 +11,7 @@
 
 1. Seleccione **Nueva salida** para abrir el formulario. Observe los controles que va a usar:
 
-   ![CAP-SAL-WAS-02-CREATE: formulario de registro](../../images/waste-issues/02-form-registration.png)
+   ![CAP-SAL-WAS-02-CREATE: formulario de registro](../../images/areas/almacen/waste-issues/02-form-registration.png)
 
 2. Elija opciones en **Buscar cliente...**, **Buscar asesor...**, **Buscar área...** y **Buscar solicitante...**.
 3. Complete **Número de proyecto**, **Fecha y hora de solicitud** y **Observaciones**.

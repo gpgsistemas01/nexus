@@ -13,12 +13,14 @@ flowchart TB
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>materialIdentity.js<br/>y colaboradores"]
     V["Validadores<br/>wasteValidations.js"]
     P["baseRepository.js<br/>getDb(tx)"]
+    PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation"]
     C --> D
     C --> S
     R --> C
     R --> V
     S --> P
     S --> X
+    S --> PresentationRule
     X --> P
 ```
 
@@ -31,6 +33,7 @@ flowchart TB
 | Colaboradores de dominio · referenceNumberService.js · materialIdentity.js · y colaboradores | `src/services/document/`<br/>`referenceNumberService.js`<br/>`src/services/inventory/materialIdentity.js`<br/>`src/services/inventory/stockHelpers.js`<br/>`src/services/warehouse/reasonService.js`<br/>`src/services/warehouse/supplierService.js` |
 | Validadores · wasteValidations.js | `src/validators/forms/wasteValidations.js` |
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
+| Regla de presentación · warehouseInventoryUtils.js | `src/public/js/utils/warehouseInventoryUtils.js` |
 
 
 ## Contratos de implementación
@@ -71,3 +74,10 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/backend-code-sequences/index.md).
 
+
+`createWasteWithInitialStockAdjustment` y `updateWaste` comprueban `weightKg`
+mediante la presentación real del material o de la merma, usando
+`warehouseInventoryUtils.js#isRollPresentation`. Sólo Rollo admite un peso
+positivo, con hasta ocho enteros y seis decimales; vacío se conserva como `null`.
+El listado devuelve el peso sin condicionarlo al permiso de costos. La identidad
+por nombre, proveedor y medidas permanece única, y stock usa DTOs distintos.

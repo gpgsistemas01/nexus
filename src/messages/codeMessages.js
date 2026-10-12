@@ -1,4 +1,8 @@
 export const errorMap = {
+    weightKg: {
+        INVALID_NUMBER: 'WEIGHT_KG_INVALID_NUMBER',
+        TOO_LONG: 'WEIGHT_KG_TOO_LONG'
+    },
     message: {
         LOGIN_ERROR: 'LOGIN_ERROR',
         VALIDATION_ERROR: 'VALIDATION_ERROR',

@@ -113,3 +113,19 @@ correspondientes, sin disminuir valores existentes. Merma no participa en los
 máximos de materiales ni consumibles; los contadores retirados se conservan.
 Véanse el [despliegue y comprobaciones](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-folios-de-salidas-por-contexto)
 y el [resumen de Prisma](../../development/code-structure/06-prisma-and-persistence.md).
+
+## Peso unitario de merma de rollo
+
+`Waste.weightKg` es decimal nullable de hasta seis decimales, positivo si se
+captura. Describe kg por unidad de la merma con sus medidas; no representa el
+peso total disponible ni cambia `currentStock` o la conversión por dimensiones.
+Sólo aplica a la presentación ROLLO resuelta desde el material de referencia.
+No se agrega a la clave única `(supplierId, name, base, height)`: la misma identidad
+no puede duplicarse usando un peso diferente. Corregir el peso actualiza esa identidad.
+
+`20261012210000_add_roll_waste_unit_weight` agrega la columna y la comprobación
+de positividad. Los datos anteriores permanecen en `NULL`, sin asignar pesos
+inventados. La aplicabilidad por presentación se valida en el servicio, con la
+presentación persistida; no se confía en una etiqueta enviada por el navegador.
+El reporte consolidado de merma sigue agrupando rollos por ancho; no interpreta
+un peso unitario como el total de un grupo de largos diferentes.

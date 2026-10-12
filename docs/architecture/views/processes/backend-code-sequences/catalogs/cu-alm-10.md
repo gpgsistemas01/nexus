@@ -101,6 +101,7 @@ sequenceDiagram
     deactivate Formatter
     Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
     activate Domain
+    Note over Domain: Validar weightKg positivo sólo para presentación ROLLO persistida
     Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height })
     alt La merma ya existe
         Domain-->>Controller: WASTE_ALREADY_EXISTS sin incrementar stock

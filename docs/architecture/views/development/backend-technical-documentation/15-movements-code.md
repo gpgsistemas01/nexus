@@ -38,7 +38,7 @@ para todas las operaciones. Los datos, resultados y efectos están definidos en 
 
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
 | --- | --- |
-| `controllers/api/admin/`<br/>`movementController.js` | `getAllMaterialMovements`<br/>`getAllWasteMovements` |
+| `controllers/api/admin/`<br/>`movementController.js` | `getAllMaterialMovements`<br/>`getAllConsumableMovements`<br/>`getAllWasteMovements` |
 
 ## Variantes y límites de reutilización
 
@@ -55,3 +55,19 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/backend-code-sequences/index.md).
 
+
+## Materiales, consumibles y reportes en un módulo
+
+Las tres páginas pertenecen a Movimientos. Materiales y consumibles comparten
+`InventoryMovement`/`MovementDetail`, la vista EJS y `findInventoryMovements`;
+sus fachadas fijan `Material.type` a `MATERIAL` o `CONSUMABLE` antes de ejecutar
+consulta y conteos. `recordsTotal` cuenta sólo el contexto, incluso sin filtros.
+Merma conserva `WasteMovement`/`WasteMovementDetail`. La consulta es de sólo lectura.
+
+Las rutas de Excel permanecen agrupadas bajo `admin/reports`, dentro del dominio
+administrativo, y seleccionan la misma consulta contextual. El prefijo URL no
+crea un módulo funcional separado de reportes ni justifica duplicar servicios.
+Cada endpoint fija el contexto y comprueba su permiso; los filtros del cliente
+no pueden cambiarlo. El Excel mensual conserva el contexto aunque elimine los
+filtros de detalle. Consumibles identifica archivo, hoja y columna de artículo.
+Las fechas ya presentadas por la consulta se conservan; no se formatean otra vez.

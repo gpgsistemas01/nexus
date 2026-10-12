@@ -345,3 +345,11 @@ Antes del despliegue:
 Las pruebas de persistencia usan una base aislada y verifican la cadena histórica,
 conservación de registros, merma separada, máximos de contadores, repetición,
 instalación vacía y colisiones con rollback. Nunca se usa producción para pruebas.
+
+## Migración de peso unitario de merma
+
+`20261012210000_add_roll_waste_unit_weight` agrega `Waste.weightKg` nullable y
+un CHECK de positividad. No transforma pesos históricos ni cambia claves de
+identidad, cantidades o contadores. Publique cliente Prisma, backend y formulario
+junto con la migración; aplíquela con la cuenta de migraciones y regenere el
+cliente. La validación por presentación usa la relación existente en el servicio.

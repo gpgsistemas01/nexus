@@ -1,6 +1,9 @@
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
+    WEIGHT_KG_INVALID_NUMBER: 'El peso en kg debe ser un número mayor que cero.',
+    WEIGHT_KG_TOO_LONG: 'El peso admite hasta 8 dígitos enteros y 6 decimales.',
+    WASTE_WEIGHT_INVALID: 'El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.',
     // 🔐 AUTH / GENERALES
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
     VALIDATION_ERROR: 'Errores de validación.',

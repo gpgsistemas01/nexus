@@ -8,7 +8,7 @@
 1. Aplique en el listado la búsqueda y el proveedor que necesite conservar.
 2. Seleccione **Exportar Excel** y compruebe el diálogo:
 
-   ![CAP-REP-CON-06-EXPORT: alcance del inventario de consumibles](../../images/consumables/06-export-report.png)
+   ![CAP-REP-CON-06-EXPORT: alcance del inventario de consumibles](../../images/areas/almacen/consumables/06-export-report.png)
 
 3. Elija el alcance:
    - **Activos o con existencia:** incluye toda oferta activa y también una oferta

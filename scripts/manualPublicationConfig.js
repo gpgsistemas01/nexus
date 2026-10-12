@@ -30,6 +30,10 @@ const manualDefinitions = {
                 '01-cap-rep-mov-mat-01-list.md',
                 '02-cap-rep-mov-mat-02-export.md'
             ])),
+            'movimientos-consumibles': manualPart(administrator, manualCaseFiles('reports', [
+                '05-cap-rep-mov-con-01-list.md',
+                '06-cap-rep-mov-con-02-export.md'
+            ])),
             'movimientos-mermas': manualPart(administrator, manualCaseFiles('reports', [
                 '03-cap-rep-mov-was-01-list.md',
                 '04-cap-rep-mov-was-02-export.md'

@@ -163,3 +163,11 @@ sin copiar identificadores, claves o estructuras internas de la base de datos.
    diagramas de dominio, contrato API, mensajes visibles y pruebas relacionadas.
 5. El glosario no enumera todos los campos ni valores permitidos. Esos detalles se
    mantienen en el diccionario técnico, Prisma, validadores o catálogos según su fuente.
+
+## Peso unitario de merma de rollo
+
+Peso en kilogramos de una unidad de merma con su ancho y largo registrados.
+Pertenece a la identidad formada por nombre, proveedor y medidas, y se comparte
+al agregar existencias de esa misma identidad. No representa el stock ni el peso
+total disponible. Un valor ausente significa desconocido; otras presentaciones
+no admiten su captura.

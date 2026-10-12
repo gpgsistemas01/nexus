@@ -106,6 +106,7 @@ sequenceDiagram
 
     Initiator->>Browser: inicia CU-ALM-11 — Editar merma
     Browser->>View: wasteModal.js precarga la merma
+    Note over View: Peso unitario kg habilitado sólo para Rollo, deshabilitado en stock
     View->>FormUtils: validateFields(wasteEditValidation, formData)
     FormUtils-->>View: validateFields(): Object — errores por campo
     alt wasteEditValidation devuelve errores

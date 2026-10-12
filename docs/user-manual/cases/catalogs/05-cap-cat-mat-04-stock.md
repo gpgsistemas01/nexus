@@ -16,7 +16,7 @@ fila seleccionada porque la existencia corresponde a esa oferta de material.
 
 1. En la fila del material, seleccione la acción **Ajustar stock**. Observe los controles que va a usar:
 
-   ![CAP-CAT-MAT-04-STOCK: ajuste de existencia](../../images/materials/04-adjustment-stock.png)
+   ![CAP-CAT-MAT-04-STOCK: ajuste de existencia](../../images/areas/sistemas/materials/04-adjustment-stock.png)
 
 2. Elija una opción en **Seleccione una razón...** y complete los campos **Nueva cantidad** y **Observaciones**.
 

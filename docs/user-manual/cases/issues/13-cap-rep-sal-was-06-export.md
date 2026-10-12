@@ -11,7 +11,7 @@
 
 1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Observe los controles que va a usar:
 
-   ![CAP-REP-SAL-WAS-06-EXPORT: exportar reporte](../../images/waste-issues/06-export-report.png)
+   ![CAP-REP-SAL-WAS-06-EXPORT: exportar reporte](../../images/areas/almacen/waste-issues/06-export-report.png)
 
 2. Elija el alcance mensual, otro mes o los filtros aplicados y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.

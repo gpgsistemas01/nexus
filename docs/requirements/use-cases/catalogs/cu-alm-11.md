@@ -11,4 +11,9 @@
 | Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta datos incompletos o que no cumplen las reglas del caso y señala qué debe corregirse, sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal. |
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EOP — Operación no completada (durante el paso 4 del flujo principal):**<br>1. **Nexus:** no puede completar la operación, comunica el fallo y conserva la información anterior sin cambios parciales.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización sin alterar su identidad física.<br>2. **Éxito al desactivar:** la merma no puede agregarse a salidas nuevas; conserva stock e historia y puede completar detalles previamente comprometidos.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
-| Requisitos relacionados | `RF-CAT-016`, `RF-CAT-017`, `RF-MER-003`, `RF-MER-005`, `RF-MER-006`, `RN-021`, `RN-023`. |
+| Requisitos relacionados | `RF-MER-011`, `RF-CAT-016`, `RF-CAT-017`, `RF-MER-003`, `RF-MER-005`, `RF-MER-006`, `RN-021`, `RN-023`. |
+
+Para Rollo, el actor puede capturar o corregir el peso en kg de una unidad con
+esas medidas. Si se captura, debe ser positivo; otras presentaciones lo rechazan.
+La misma identidad no puede duplicarse mediante un peso diferente. Un peso
+histórico ausente permanece desconocido, y la existencia no se calcula con él.

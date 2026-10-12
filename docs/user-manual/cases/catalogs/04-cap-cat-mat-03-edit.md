@@ -13,7 +13,7 @@ este modo. Use la acción **Editar registro** y el botón **Actualizar**.
 
 1. En la fila del material, seleccione la acción **Editar registro** para abrir el formulario. Observe los controles que va a usar:
 
-   ![CAP-CAT-MAT-03-EDIT: formulario de edición](../../images/materials/03-form-edit.png)
+   ![CAP-CAT-MAT-03-EDIT: formulario de edición](../../images/areas/almacen/materials/03-form-edit.png)
 
 2. Modifique **Nombre**, **Stock Mínimo**, **Costo Máximo** o **Activo** según corresponda. Revise los
    demás datos sólo como referencia.

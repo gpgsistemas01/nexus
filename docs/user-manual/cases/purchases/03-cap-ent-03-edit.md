@@ -11,7 +11,7 @@
 
 1. En la fila de la compra, seleccione **Editar registro** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-ENT-03-EDIT: edición de compra](../../images/purchases/03-edit-purchase.png)
+   ![CAP-ENT-03-EDIT: edición de compra](../../images/areas/almacen/purchases/03-edit-purchase.png)
 
 2. Modifique el comprobante, la persona que recibe, la fecha o las observaciones. Para incorporar un detalle nuevo, elija el material, capture **Cantidad** y **Costo por Presentación**, seleccione **Agregar** y compruebe que el renglón aparezca en la tabla. Repita la operación para cada detalle nuevo.
 3. Revise la tabla y seleccione **Actualizar** para guardar o **Regresar** para salir sin confirmar. El proveedor y los renglones ya confirmados permanecen deshabilitados; para cambiar la cantidad o el costo de uno de esos renglones, use **Corregir detalle de compra**.

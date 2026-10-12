@@ -11,7 +11,8 @@ describe('inventario de rutas Express', () => {
 
     expect(routes).toContainEqual({ method: 'GET', route: '/persons/excel' });
     expect(routes).toContainEqual({ method: 'GET', route: '/profiles/excel' });
-    expect(routes).toHaveLength(5);
+    expect(routes).toContainEqual({ method: 'GET', route: '/movements/consumables/excel' });
+    expect(routes).toHaveLength(6);
   });
 
   it('combina métodos y comillas sin colapsar caminos distintos', () => {

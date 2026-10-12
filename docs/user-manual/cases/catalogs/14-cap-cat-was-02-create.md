@@ -15,7 +15,7 @@ para abrir el formulario y **Guardar** para confirmarlo.
 
 1. Seleccione el botón **Nueva merma** para abrir el formulario de registro. Observe los controles que va a usar:
 
-   ![CAP-CAT-WAS-02-CREATE: formulario de registro](../../images/waste/02-form-registration.png)
+   ![CAP-CAT-WAS-02-CREATE: formulario de registro](../../images/areas/almacen/waste/02-form-registration.png)
 
 2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock** y **Observaciones**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar la merma.
@@ -27,3 +27,14 @@ incremental. **Ajustar stock** permanece reservado al Administrador del sistema 
 saldo total cuando corrige una diferencia autorizada.
 
 **Compruebe el resultado:** Vuelva al listado y localice el registro guardado. Compruebe sus datos antes de continuar con otra operación.
+
+**Peso de la merma:** Si la presentación mostrada es **Rollo**, puede capturar
+**Peso por unidad de merma (kg), sólo Rollo** con un valor mayor que cero.
+Es el peso de una unidad con ese ancho y largo, no el peso total del stock.
+La presentación proviene del material de referencia; otras presentaciones
+mantienen el campo deshabilitado. Una merma con el mismo nombre, proveedor y
+medidas ya tiene una identidad: actualícela o agregue stock, sin crear otra por
+cambiar el peso. Un valor vacío significa que el peso no se ha capturado.
+
+<a id="CAP-CAT-WAS-07-ROLL-WEIGHT"></a>
+![CAP-CAT-WAS-07-ROLL-WEIGHT: peso unitario habilitado al consultar una merma de Rollo](../../images/areas/almacen/waste/07-roll-unit-weight.png)

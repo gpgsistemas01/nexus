@@ -52,7 +52,7 @@ sequenceDiagram
     activate Domain
     alt Servicio resuelto
         Domain-->>Controller: findMovementReportRows(): Promise[Object[]]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Controller-->>Client: HTTP 200 archivo Excel
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)

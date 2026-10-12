@@ -11,7 +11,7 @@
 
 1. En la fila de la salida, seleccione **Editar registro**. Observe los controles que va a usar:
 
-   ![CAP-SAL-WAS-03-EDIT: edición de encabezado](../../images/waste-issues/03-edit-header.png)
+   ![CAP-SAL-WAS-03-EDIT: edición de encabezado](../../images/areas/almacen/waste-issues/03-edit-header.png)
 
 2. Modifique los selectores y campos indicados. Mientras la salida esté pendiente, para incorporar
    un detalle elija una opción en **Buscar merma...**, complete **Cantidad**, seleccione **Agregar** y

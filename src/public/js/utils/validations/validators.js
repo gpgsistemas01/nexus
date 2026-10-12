@@ -77,6 +77,7 @@ const wasteSecondaryDataValidation = {
 };
 
 export const wasteEditValidation = {
+    weightKg: value => value === undefined || value === null || value === '' ? null : validatePositiveNumber(value, 'El peso en kg'),
     name: value => validateName(value, 200),
     ...wasteSecondaryDataValidation
 };
@@ -92,6 +93,7 @@ export const wasteStockAdditionValidation = {
 };
 
 export const wasteValidation = {
+    weightKg: value => value === undefined || value === null || value === '' ? null : validatePositiveNumber(value, 'El peso en kg'),
     name: value => validateName(value, 200),
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),

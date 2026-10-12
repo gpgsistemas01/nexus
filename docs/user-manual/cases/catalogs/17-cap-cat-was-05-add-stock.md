@@ -12,7 +12,7 @@ son datos informativos.
 1. En la fila de la merma, seleccione **Agregar stock**. La captura de referencia se genera por
    área. Observe la cantidad actual y el campo donde sumará lo recibido:
 
-   ![CAP-CAT-WAS-06-ADD-STOCK: agregar existencia de merma](../../images/waste/06-add-stock.png)
+   ![CAP-CAT-WAS-06-ADD-STOCK: agregar existencia de merma](../../images/areas/almacen/waste/06-add-stock.png)
 2. En el modal **Agregar stock de merma**, compruebe la merma seleccionada y su **Existencia actual**. Estos valores son informativos y no pueden modificarse desde esta operación.
 3. Capture una **Cantidad a agregar** mayor que cero y compruebe **Existencia resultante** antes de
    confirmar. Si necesita dejar contexto para el historial, capture **Observaciones**; esta nota

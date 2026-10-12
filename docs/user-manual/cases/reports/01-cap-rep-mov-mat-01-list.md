@@ -11,7 +11,7 @@
 
 1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
-   ![CAP-REP-MOV-MAT-01-LIST: historial y filtros](../../images/material-movements/01-history-and-filters.png)
+   ![CAP-REP-MOV-MAT-01-LIST: historial y filtros](../../images/areas/sistemas/material-movements/01-history-and-filters.png)
 
 2. Escriba un término en **Buscar por Material, Proveedor o Folio** o complete **Fecha de inicio:**, **Fecha de fin:**, **Tipo de movimiento:**, **Proveedor:** y **Material:**.
 3. Seleccione **Buscar / filtrar** para actualizar el historial; use **Limpiar filtros** para restablecerlo.

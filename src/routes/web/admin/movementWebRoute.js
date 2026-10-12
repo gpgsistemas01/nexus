@@ -1,9 +1,16 @@
 import express from 'express';
 import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
-import { getMaterialMovementPage, getWasteMovementPage } from '../../../controllers/web/admin/movementController.js';
+import { getMaterialMovementPage, getConsumableMovementPage, getWasteMovementPage } from '../../../controllers/web/admin/movementController.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
+
+router.get(
+    '/consumibles',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserWeb(PERMISSIONS.MOVEMENTS_READ),
+    getConsumableMovementPage
+);
 
 router.get(
     '/materiales',

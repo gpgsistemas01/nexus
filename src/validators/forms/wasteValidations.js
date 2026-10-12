@@ -1,4 +1,4 @@
-import { validateName, validateNonNegativeNumber, validatePositiveNumber, validateUUID } from '../fields/fieldsValidator.js';
+import { validateName, validateNonNegativeNumber, validatePositiveNumber, validatePositiveNumberOptional, validateUUID } from '../fields/fieldsValidator.js';
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
 const wasteStockDataValidation = [
@@ -17,6 +17,7 @@ export const wasteStockAdditionValidation = [
 ];
 
 const wasteSecondaryDataValidation = [
+    validatePositiveNumberOptional('weightKg'),
     ...createInventoryStateValidation(),
     validateNonNegativeNumber('maxUnitCost')
 ];

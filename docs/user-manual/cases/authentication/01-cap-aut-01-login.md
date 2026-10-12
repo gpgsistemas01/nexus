@@ -11,7 +11,7 @@
 
 1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
 
-   ![CAP-AUT-01-LOGIN: inicio de sesión](../../images/access/01-login-session.png)
+   ![CAP-AUT-01-LOGIN: inicio de sesión](../../images/areas/almacen/access/01-login-session.png)
 
 2. Escriba la cuenta asignada en el campo **Nombre de usuario** y la clave en **Contraseña**.
 3. Si corresponde, marque la casilla **Recordar credenciales** y seleccione el botón **Ingresar**.

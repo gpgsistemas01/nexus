@@ -1,7 +1,8 @@
 import { EMPTY_DISPLAY_VALUE } from '../../constants/display.js';
+import { isStockMode } from '../../constants/formModes.js';
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
 import { setMdbWrapperInputValue } from '../../plugins/mdb/baseInstance.js';
-import { getMaterialName, getPresentation, getUnitMeasure } from '../../utils/warehouseInventoryUtils.js';
+import { getMaterialName, getPresentation, getUnitMeasure, isRollPresentation } from '../../utils/warehouseInventoryUtils.js';
 
 export const updatePresentationDisplay = ({ modalSelector, data, presentation, option }) => {
     if (!option) return;
@@ -17,13 +18,18 @@ export const updatePresentationDisplay = ({ modalSelector, data, presentation, o
 };
 
 export const displayWasteMaterialTemplate = ({ form, template = {} }) => {
-    form.querySelector(INPUT_SELECTORS.WASTE_NAME_DISPLAY).value = getMaterialName(template) || '';
+    setMdbWrapperInputValue({
+        selector: INPUT_SELECTORS.WASTE_NAME_DISPLAY,
+        value: getMaterialName(template) || ''
+    });
     form.querySelector(INPUT_SELECTORS.WASTE_PRESENTATION_DISPLAY).textContent = getPresentation(template) || EMPTY_DISPLAY_VALUE;
     form.querySelector(INPUT_SELECTORS.WASTE_UNIT_MEASURE_DISPLAY).textContent = getUnitMeasure(template) || EMPTY_DISPLAY_VALUE;
 };
 
 export const applyWasteMaterialTemplate = ({ form, template = {} }) => {
     displayWasteMaterialTemplate({ form, template });
+    if (form.elements?.weightKg) form.elements.weightKg.value = '';
+    updateWasteWeightField({ form, template });
     [
         [INPUT_SELECTORS.WASTE_WIDTH, template.suggestedWidth],
         [INPUT_SELECTORS.WASTE_MAX_UNIT_COST, template.maxUnitCost]
@@ -31,4 +37,13 @@ export const applyWasteMaterialTemplate = ({ form, template = {} }) => {
         selector,
         value: value ?? ''
     }));
+};
+
+export const updateWasteWeightField = ({ form, template = {} }) => {
+    const field = form.elements?.weightKg;
+    if (!field) return;
+    const applies = isRollPresentation(getPresentation(template));
+    field.disabled = !applies || isStockMode(form.dataset.mode);
+    if (!applies) field.value = '';
+    if (field.id) setMdbWrapperInputValue({ selector: `#${field.id}`, value: field.value });
 };

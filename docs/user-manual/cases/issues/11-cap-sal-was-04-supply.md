@@ -11,7 +11,7 @@
 
 1. En la fila de la salida, seleccione **Surtir detalle** para abrir sus renglones pendientes. Observe los controles que va a usar:
 
-   ![CAP-SAL-WAS-04-SUPPLY: surtir detalles](../../images/waste-issues/04-supply-details.png)
+   ![CAP-SAL-WAS-04-SUPPLY: surtir detalles](../../images/areas/almacen/waste-issues/04-supply-details.png)
 
 2. En los renglones pendientes, marque la casilla **Surtir** y complete **Cantidad de proyecto**. El encabezado y los renglones ya surtidos permanecen deshabilitados como referencia.
 

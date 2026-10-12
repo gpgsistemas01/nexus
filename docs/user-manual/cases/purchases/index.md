@@ -14,7 +14,7 @@ Este recorrido sólo presenta materiales. El flujo de consumibles se documenta p
 separado porque constituye un objetivo visible distinto para almacén.
 
 <a id="CAP-ENT-00-NAVIGATION"></a>
-![CAP-ENT-00-NAVIGATION: acceso a compras desde el menú principal](../../images/purchases/00-access-menu-main.png)
+![CAP-ENT-00-NAVIGATION: acceso a compras desde el menú principal](../../images/areas/almacen/purchases/00-access-menu-main.png)
 
 **Campos por modo del formulario.** En **alta** se editan tipo y número de comprobante, proveedor,
 persona que recibe, fecha de recepción, observaciones y los nuevos renglones de material. En

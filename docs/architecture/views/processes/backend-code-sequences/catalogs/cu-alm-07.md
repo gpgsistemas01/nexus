@@ -51,8 +51,9 @@ sequenceDiagram
     Controller->>Domain: findAllMaterialMovements(getMovementListParams(req))
     activate Domain
     alt Servicio resuelto
+        Note over Domain: findInventoryMovements fija material.type = MATERIAL en consulta y conteos
         Domain-->>Controller: findAllMaterialMovements(): Promise[{ data: MaterialMovement[], recordsTotal: number, recordsFiltered: number }]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)

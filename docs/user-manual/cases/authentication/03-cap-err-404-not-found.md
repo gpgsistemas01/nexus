@@ -11,7 +11,7 @@
 
 1. Observe la pantalla y ubique los controles:
 
-   ![CAP-ERR-404-NOT-FOUND: página no encontrada](../../images/errors/01-page-not-found.png)
+   ![CAP-ERR-404-NOT-FOUND: página no encontrada](../../images/areas/almacen/errors/01-page-not-found.png)
 
 2. En la página de error, seleccione el botón **Volver** para regresar mediante la navegación de Nexus.
 

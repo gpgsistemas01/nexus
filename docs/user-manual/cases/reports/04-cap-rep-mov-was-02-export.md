@@ -11,7 +11,7 @@
 
 1. Seleccione **Exportar Excel** para abrir el modal **Exportar reporte**. Observe los controles que va a usar:
 
-   ![CAP-REP-MOV-WAS-02-EXPORT: exportar reporte](../../images/waste-movements/02-export-report.png)
+   ![CAP-REP-MOV-WAS-02-EXPORT: exportar reporte](../../images/areas/sistemas/waste-movements/02-export-report.png)
 
 2. Elija **Mes actual**, **Otro mes** o **Personalizado: usar filtros aplicados** y complete **Mes del reporte** cuando corresponda.
 3. Seleccione **Descargar** para generar el archivo.

@@ -60,6 +60,7 @@ sequenceDiagram
     deactivate WasteDto
     Controller->>Domain: wasteService.updateWaste({ id: req.params.id, wasteDto }) actualiza datos sin tratar stock como edición
     activate Domain
+    Note over Domain: Validar weightKg positivo sólo para presentación ROLLO persistida
     alt Servicio resuelto
         Domain-->>Controller: wasteService.updateWaste(): Promise[Waste]
         Controller-->>Client: HTTP 200 { waste, code }

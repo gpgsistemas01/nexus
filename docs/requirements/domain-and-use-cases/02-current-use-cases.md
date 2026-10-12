@@ -30,7 +30,7 @@ o altas desde selectores. El administrador hereda las asociaciones de Almacén m
 generalización, sin duplicarlas.
 
 La separación en vistas es una decisión de legibilidad, no una exigencia de UML. Un
-único diagrama con los 92 casos y todas las asociaciones dificultaría su revisión. Las
+único diagrama con los 94 casos y todas las asociaciones dificultaría su revisión. Las
 relaciones se muestran junto al caso base y no en una vista independiente que obligue a
 reconstruirlas entre diagramas. La jerarquía de autenticación enlaza Personal de almacén con Usuario registrado y
 Administrador del sistema con Personal de almacén. La generalización operativa se
@@ -58,9 +58,9 @@ La decisión y las familias resultantes se resumen en el
 
 ### Numeración y orden de lectura
 
-Los 92 casos conservan una secuencia continua dentro de cada grupo propietario:
+Los 94 casos conservan una secuencia continua dentro de cada grupo propietario:
 `AUT` 01–02, `IDA` 01–09, `ALM` 01–22, `CAT` 01–26, `ENT` 01–12 y `SAL` 01–21.
-Las veintiuna figuras no reinician ni cambian esa numeración. Por ejemplo, Materiales
+Las veintidós figuras no reinician ni cambian esa numeración. Por ejemplo, Materiales
 presenta `CU-ALM-01` a `CU-ALM-06`, Movimientos de materiales continúa con
 `CU-ALM-07` y `CU-ALM-08`, y Mermas comienza en `CU-ALM-09`.
 
@@ -277,6 +277,24 @@ direction LR
     ucConsumableQuery -- ucConsumableEdit
     ucConsumableQuery -- ucConsumableRemove
     ucConsumableQuery -- ucConsumableReport
+```
+
+#### Movimientos de consumibles
+
+**Identificador:** `DIA-CU-MOV-CON-001`. Reutiliza el módulo de Movimientos;
+consulta y reporte corresponden sólo al Administrador del sistema de Sistemas.
+
+```mermaid
+usecase-beta
+%%{init: {"layout": "dagre"}}%%
+direction LR
+    actor admin("Administrador del sistema")
+    systemBoundary consumableMovementsPackage["Nexus · Movimientos de consumibles"]
+        query("CU-ALM-23 Consultar movimientos de consumibles")
+        report("CU-ALM-24 Generar reporte de movimientos de consumibles")
+    end
+    admin -- query
+    query -- report
 ```
 
 El grupo de **Almacén** concentra los casos operativos de material, consumible y merma porque comparten

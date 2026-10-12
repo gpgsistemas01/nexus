@@ -12,7 +12,7 @@
 
 1. En la fila del consumible seleccione **Ajustar stock** y compruebe el formulario:
 
-   ![CAP-CAT-CON-05-STOCK: ajuste de existencia](../../images/consumables/05-adjustment-stock.png)
+   ![CAP-CAT-CON-05-STOCK: ajuste de existencia](../../images/areas/sistemas/consumables/05-adjustment-stock.png)
 
 2. Seleccione una razón y capture **Nueva cantidad** y **Observaciones**.
 3. Confirme que **Nueva cantidad** sea el saldo total deseado, no una cantidad para sumar.

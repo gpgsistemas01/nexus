@@ -18,6 +18,7 @@ const documentTitles = new Map([
     ['compras-consumibles', 'Compras de consumibles'],
     ['informacion-general-y-anexos', 'Información general y anexos'],
     ['movimientos-materiales', 'Movimientos de materiales'],
+    ['movimientos-consumibles', 'Movimientos de consumibles'],
     ['movimientos-mermas', 'Movimientos de mermas'],
     ['personas', 'Personas'],
     ['proveedores', 'Proveedores'],

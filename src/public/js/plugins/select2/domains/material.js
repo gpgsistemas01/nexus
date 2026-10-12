@@ -14,15 +14,16 @@ const materialSelector = FILTER_SELECTORS.MATERIAL;
 
 export const initMaterialFilterSelect = ({
     selectedId = null,
-    supplierFilterSelector = null
+    supplierFilterSelector = null,
+    resource = INVENTORY_RESOURCES.MATERIAL
 }) => {
 
     const baseSelector = 'body';
 
     initFilterSelect2({
         selector: materialSelector,
-        getOptions: getAllMaterials,
-        placeholder: 'Filtrar por material',
+        getOptions: resource === INVENTORY_RESOURCES.CONSUMABLE ? getAllConsumables : getAllMaterials,
+        placeholder: resource === INVENTORY_RESOURCES.CONSUMABLE ? 'Filtrar por consumible' : 'Filtrar por material',
         selectedId,
         mapOption: mapSelectMaterialData,
         data: (params) => buildPaginatedSelectParams(params, {

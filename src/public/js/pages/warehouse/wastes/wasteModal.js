@@ -6,7 +6,7 @@ import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { displayWasteMaterialTemplate } from '../../../ui/inventory/inventorySelectUI.js';
+import { displayWasteMaterialTemplate, updateWasteWeightField } from '../../../ui/inventory/inventorySelectUI.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
@@ -31,6 +31,7 @@ export const openWasteModal = ({
     form.elements.base.value = data?.base ?? '';
     form.elements.height.value = data?.height ?? '';
     form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
+    form.elements.weightKg.value = data?.weightKg ?? '';
     displayWasteMaterialTemplate({ form, template: data ?? {} });
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.observations.value = '';
@@ -83,5 +84,6 @@ export const openWasteModal = ({
             ? 'Ajustar'
             : 'Guardar';
 
+    updateWasteWeightField({ form, template: data ?? {} });
     openModal(modalElement);
 };

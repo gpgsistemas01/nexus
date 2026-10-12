@@ -35,7 +35,7 @@ inventario, proveedores y clientes.
 **Ruta en el menú:** **Menú principal → Almacén → Materiales**.
 
 <a id="CAP-CAT-MAT-00-NAVIGATION"></a>
-![CAP-CAT-MAT-00-NAVIGATION: acceso a materiales desde el menú principal](../../images/materials/00-access-menu-main.png)
+![CAP-CAT-MAT-00-NAVIGATION: acceso a materiales desde el menú principal](../../images/areas/almacen/materials/00-access-menu-main.png)
 
 **Qué significa identidad y estado.** La identidad de un material es la combinación de
 **Nombre**, **Presentación**, **Unidad**, **Base** y **Altura** que permite reconocer el mismo
@@ -63,7 +63,7 @@ conserva stock. Volver a marcarla permite usar esa oferta nuevamente en operacio
 **Ruta en el menú:** **Menú principal → Proveedores**.
 
 <a id="CAP-CAT-SUP-00-NAVIGATION"></a>
-![CAP-CAT-SUP-00-NAVIGATION: acceso a proveedores desde el menú principal](../../images/suppliers/00-access-menu-main.png)
+![CAP-CAT-SUP-00-NAVIGATION: acceso a proveedores desde el menú principal](../../images/areas/almacen/suppliers/00-access-menu-main.png)
 
 La casilla **Activo** controla el estado del proveedor dentro del mismo formulario de alta o
 edición. Desmarcarla no elimina el proveedor ni sus materiales o documentos históricos; volver a
@@ -84,7 +84,7 @@ eliminarlo ni perder sus salidas históricas. La pantalla de Clientes sigue most
 para que el administrador pueda revisarlos o reactivarlos.
 
 <a id="CAP-CAT-CLI-00-NAVIGATION"></a>
-![CAP-CAT-CLI-00-NAVIGATION: acceso a clientes desde el menú principal](../../images/clients/00-access-menu-main.png)
+![CAP-CAT-CLI-00-NAVIGATION: acceso a clientes desde el menú principal](../../images/areas/almacen/clients/00-access-menu-main.png)
 
 10. [10. CAP-CAT-CLI-01-LIST — Listado](10-cap-cat-cli-01-list.md)
 11. [11. CAP-CAT-CLI-02-CREATE — Formulario alta](11-cap-cat-cli-02-create.md)
@@ -97,7 +97,7 @@ para que el administrador pueda revisarlos o reactivarlos.
 **Ruta en el menú:** **Menú principal → Almacén → Mermas**.
 
 <a id="CAP-CAT-WAS-00-NAVIGATION"></a>
-![CAP-CAT-WAS-00-NAVIGATION: acceso al inventario de mermas desde el menú principal](../../images/waste/00-access-menu-main.png)
+![CAP-CAT-WAS-00-NAVIGATION: acceso al inventario de mermas desde el menú principal](../../images/areas/almacen/waste/00-access-menu-main.png)
 
 **Qué significa identidad y estado.** La identidad de una merma es la combinación de
 **Proveedor**, **Nombre**, **Ancho/Base** y **Largo/Altura**. La presentación y unidad se conservan
@@ -124,7 +124,7 @@ inventario de materiales.
 **Ruta en el menú:** **Menú principal → Almacén → Consumibles**.
 
 <a id="CAP-CAT-CON-00-NAVIGATION"></a>
-![CAP-CAT-CON-00-NAVIGATION: acceso a consumibles desde el menú principal](../../images/consumables/00-access-menu-main.png)
+![CAP-CAT-CON-00-NAVIGATION: acceso a consumibles desde el menú principal](../../images/areas/almacen/consumables/00-access-menu-main.png)
 
 La identidad del consumible conserva **Nombre**, **Presentación** y **Unidad** y se
 clasifica explícitamente como consumible. No capture **Base** ni **Altura**: que un

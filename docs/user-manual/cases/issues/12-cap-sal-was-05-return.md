@@ -11,7 +11,7 @@
 
 1. En la fila correspondiente, seleccione **Devolver material surtido** y después **Devolver detalle de salida**. Observe los controles que va a usar:
 
-   ![CAP-SAL-WAS-05-RETURN: devolver detalle](../../images/waste-issues/05-return-detail.png)
+   ![CAP-SAL-WAS-05-RETURN: devolver detalle](../../images/areas/almacen/waste-issues/05-return-detail.png)
 
 2. Complete **Cantidad a devolver** y **Observaciones**. El encabezado y los demás datos del detalle permanecen deshabilitados como referencia.
 3. Seleccione **Devolver** para confirmar o **Regresar** para salir sin aplicar la devolución.

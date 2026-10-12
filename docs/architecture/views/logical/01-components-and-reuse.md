@@ -122,3 +122,17 @@ amplían las dependencias y [OpenAPI](../../openapi/openapi.json) define los con
 Al extender un componente, reutilizar el flujo compartido y mantener las reglas
 específicas en su dominio. Actualizar esta vista sólo si cambia la estructura; imports
 y rutas se comprueban en el [mapa generado](../development/code-map.md).
+
+## Movimientos y peso de merma
+
+Movimientos contiene tres accesos con una implementación visual compartida.
+Materiales y consumibles comparten almacenamiento y consulta interna; sus rutas
+fijan la clasificación. Merma conserva sus tablas de historial. Los Excel son
+acciones de cada consulta, aunque sus routers estén agrupados por dominio en
+`admin/reports`; no existe un dominio de negocio adicional de reportes.
+
+El peso por unidad de merma pertenece a `Waste`, no al movimiento ni al stock.
+`warehouseInventoryUtils.isRollPresentation` comparte la identificación de Rollo
+entre navegador y servicio. El navegador habilita la captura y el servicio
+verifica la presentación relacionada antes de guardar; el DTO del ajuste de
+stock no admite cambios de peso.

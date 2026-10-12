@@ -10,6 +10,8 @@ export const getPresentation = (item = {}) => (
     ?? item.supplierMaterial?.material?.presentation?.name
     ?? ''
 );
+
+export const isRollPresentation = name => String(name ?? '').trim().toLocaleUpperCase('es-MX') === 'ROLLO';
 export const getPresentationId = (item = {}) => (
     item.presentationId
     ?? item.presentation?.id

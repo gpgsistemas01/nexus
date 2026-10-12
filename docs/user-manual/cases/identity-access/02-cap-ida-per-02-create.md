@@ -11,7 +11,7 @@
 
 1. Seleccione el botón **Nueva persona** para abrir el formulario. Observe los controles que va a usar:
 
-   ![CAP-IDA-PER-02-CREATE: formulario de alta](../../images/people/02-form-creation.png)
+   ![CAP-IDA-PER-02-CREATE: formulario de alta](../../images/areas/almacen/people/02-form-creation.png)
 
 2. Complete el campo **Nombre completo**.
 3. Elija opciones en **Buscar área...** y **Buscar rol...**, y seleccione **Agregar**. Compruebe que el acceso aparezca como un nuevo renglón de la tabla y repita este paso para cada área requerida.

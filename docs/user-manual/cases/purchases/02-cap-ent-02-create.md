@@ -11,7 +11,7 @@
 
 1. Seleccione **Nueva compra** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-ENT-02-CREATE: formulario de registro](../../images/purchases/02-form-registration.png)
+   ![CAP-ENT-02-CREATE: formulario de registro](../../images/areas/almacen/purchases/02-form-registration.png)
 
 2. Elija la opción **Factura** o **Remisión**. Complete **Número de Factura** cuando corresponda; elija opciones en **Buscar proveedor...** y **Buscar persona que recibe...**; capture **Fecha y hora de recepción:** y **Observaciones**.
 3. Busque el artículo en **Buscar material...** y elija la opción del proveedor correcto.

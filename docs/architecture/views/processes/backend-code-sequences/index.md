@@ -61,7 +61,7 @@ La comparación con el catálogo y la matriz técnica confirma que cada identifi
 aparece una vez, conserva su referencia de patrones y contiene su secuencia Mermaid. Los casos extensos separan
 entrada/coordinación y colaboración interna. Las preparaciones de partidas y los
 movimientos de inventario amplían sus llamadas en niveles de detalle. Cada uno de los
-92 casos conserva sus archivos propios y representa también los configuradores que
+94 casos conserva sus archivos propios y representa también los configuradores que
 construyen handlers, mediante componentes separados de las líneas de ejecución.
 
 | Grupo propietario | Rango cubierto | Casos | Estado |

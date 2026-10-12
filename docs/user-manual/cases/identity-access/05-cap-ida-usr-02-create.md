@@ -11,7 +11,7 @@
 
 1. Seleccione el botón **Nuevo usuario** para abrir el formulario. Observe los controles que va a usar:
 
-   ![CAP-IDA-USR-02-CREATE: formulario de alta](../../images/users/02-form-creation.png)
+   ![CAP-IDA-USR-02-CREATE: formulario de alta](../../images/areas/sistemas/users/02-form-creation.png)
 
 2. Elija opciones en **Buscar área...** y **Buscar rol...**, y complete los campos **Usuario** y **Contraseña**.
 3. Seleccione el botón **Guardar** para crear la cuenta.

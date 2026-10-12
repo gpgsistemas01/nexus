@@ -14,7 +14,7 @@ muestra dimensiones y conserva **Stock inicial** como razón automática.
 
 1. Seleccione **Nuevo consumible** y compruebe el formulario:
 
-   ![CAP-CAT-CON-02-CREATE: alta de consumible sin dimensiones](../../images/consumables/02-form-creation.png)
+   ![CAP-CAT-CON-02-CREATE: alta de consumible sin dimensiones](../../images/areas/almacen/consumables/02-form-creation.png)
 
 2. Capture el nombre; seleccione proveedor, presentación y unidad; complete mínimo,
    costo, existencia inicial y observaciones, y revise **Activo**.

@@ -1,6 +1,6 @@
 ---
 title: Manual del administrador del sistema
-subtitle: "Nexus · Área: Sistemas · Versión documental 0.6 · Sistema 1.0.0 · Estado: En revisión"
+subtitle: "Nexus · Área: Sistemas · Versión documental 0.7 · Sistema 1.0.0 · Estado: En revisión"
 author: Equipo Nexus
 date: 2026-10-12
 ---
@@ -11,7 +11,7 @@ date: 2026-10-12
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 0.6 | 1.0.0 | En revisión | 2026-10-12 | Equipo Nexus |
+| 0.7 | 1.0.0 | En revisión | 2026-10-12 | Equipo Nexus |
 
 Esta guía le ayuda a conocer la operación y preparar los accesos de otras
 personas. Comience por [primeros pasos](../overview.md); después revise personas,
@@ -61,7 +61,7 @@ acompañar la operación y comprobar los cambios de inventario con su historial.
 | 2. Personas y cuentas | Consulte una persona ficticia y su cuenta; prepare un alta autorizada en capacitación. | Comprueba la vinculación, rol, área y estado sin confundir persona con usuario. |
 | 3. Catálogos | Busque y mantenga una opción de apoyo, un cliente y un proveedor de práctica. | Evita duplicados y explica los efectos de desactivar un registro. |
 | 4. Operación | Siga los módulos de Almacén, Compras y Salidas con documentos ficticios. | Distingue recepción, solicitud, surtido y devolución y comprueba sus efectos. |
-| 5. Control de existencia | Revise un ajuste autorizado y los movimientos de materiales y mermas. | Relaciona el cambio de existencia con su motivo e historial. |
+| 5. Control de existencia | Revise un ajuste autorizado y los movimientos de materiales, consumibles y mermas. | Relaciona el cambio de existencia con su motivo e historial. |
 | 6. Reportes y soporte | Descargue un reporte del periodo solicitado y acompañe una cuenta de almacén. | Verifica alcance y permisos y distingue un rechazo de acceso de un error de captura. |
 
 Use los módulos de **Usuarios**, **Personas**, **Catálogos**, **Clientes**,

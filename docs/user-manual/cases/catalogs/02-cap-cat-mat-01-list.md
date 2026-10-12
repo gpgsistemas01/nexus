@@ -11,7 +11,7 @@
 
 1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
-   ![CAP-CAT-MAT-01-LIST: listado inventario](../../images/materials/01-list-inventory.png)
+   ![CAP-CAT-MAT-01-LIST: listado inventario](../../images/areas/almacen/materials/01-list-inventory.png)
 
 2. Escriba un término en el buscador **Buscar por Material** o elija una opción en el filtro **Proveedor**.
 3. Seleccione el botón **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.

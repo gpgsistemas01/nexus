@@ -72,3 +72,13 @@ toda su cantidad pendiente; **Cantidad de proyecto** no determina una entrega pa
 | Cantidad retornable | Parte surtida que todavía puede devolverse; limita el valor aceptado en una devolución. |
 | Nueva existencia total | Resultado que debe quedar después de un ajuste; no representa un incremento. |
 | Sólo lectura | Modo de consulta en el que la información se muestra pero no puede confirmarse como cambio. |
+
+### Peso unitario de merma
+
+En registro y edición de merma, **Peso por unidad de merma (kg), sólo Rollo**
+se habilita cuando la presentación del material de referencia es Rollo. Puede
+permanecer vacío si no se conoce; si se captura, debe ser mayor que cero, con
+hasta ocho dígitos enteros y seis decimales. Otras presentaciones deshabilitan
+el campo y el servidor rechaza valores forzados. Ajustar o agregar stock no
+modifica ese peso. Cambiar la plantilla limpia el valor para no arrastrar el
+peso de otra merma.

@@ -1,4 +1,4 @@
-import { findAllMaterialMovements, findAllWasteMovements } from "../../../services/inventory/movementQueryService.js";
+import { findAllMaterialMovements, findAllConsumableMovements, findAllWasteMovements } from "../../../services/inventory/movementQueryService.js";
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 const MOVEMENT_COLUMNS = ['date', 'type', 'referenceNumber', null, null, null, null, null, null, null];
@@ -35,4 +35,5 @@ const createMovementListHandler = findMovements => async (req, res) => {
 };
 
 export const getAllMaterialMovements = createMovementListHandler(findAllMaterialMovements);
+export const getAllConsumableMovements = createMovementListHandler(findAllConsumableMovements);
 export const getAllWasteMovements = createMovementListHandler(findAllWasteMovements);

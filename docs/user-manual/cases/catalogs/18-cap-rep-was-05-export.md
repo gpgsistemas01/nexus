@@ -6,7 +6,7 @@
 
 1. Seleccione **Exportar Excel** y compruebe el modal:
 
-   ![CAP-REP-WAS-05-EXPORT: alcance del inventario de mermas](../../images/waste/05-export-report.png)
+   ![CAP-REP-WAS-05-EXPORT: alcance del inventario de mermas](../../images/areas/almacen/waste/05-export-report.png)
 
 2. Elija el alcance y seleccione **Descargar**:
    - **Activos o con existencia:** incluye toda merma activa y también una merma

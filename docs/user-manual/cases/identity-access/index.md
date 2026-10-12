@@ -17,7 +17,7 @@ Antes de un alta, busque si el registro ya existe. Al guardar, vuelva al listado
 **Ruta en el menú:** **Menú principal → Personas**.
 
 <a id="CAP-IDA-PER-00-NAVIGATION"></a>
-![CAP-IDA-PER-00-NAVIGATION: acceso a personas desde el menú principal](../../images/people/00-access-menu-main.png)
+![CAP-IDA-PER-00-NAVIGATION: acceso a personas desde el menú principal](../../images/areas/almacen/people/00-access-menu-main.png)
 
 1. [1. CAP-IDA-PER-01-LIST — Listado](01-cap-ida-per-01-list.md)
 2. [2. CAP-IDA-PER-02-CREATE — Formulario de alta](02-cap-ida-per-02-create.md)
@@ -30,7 +30,7 @@ Antes de un alta, busque si el registro ya existe. Al guardar, vuelva al listado
 **Ruta en el menú:** **Menú principal → Usuarios**.
 
 <a id="CAP-IDA-USR-00-NAVIGATION"></a>
-![CAP-IDA-USR-00-NAVIGATION: acceso a usuarios desde el menú principal](../../images/users/00-access-menu-main.png)
+![CAP-IDA-USR-00-NAVIGATION: acceso a usuarios desde el menú principal](../../images/areas/sistemas/users/00-access-menu-main.png)
 
 4. [4. CAP-IDA-USR-01-LIST — Listado](04-cap-ida-usr-01-list.md)
 5. [5. CAP-IDA-USR-02-CREATE — Formulario de alta](05-cap-ida-usr-02-create.md)
