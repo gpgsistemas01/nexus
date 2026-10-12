@@ -86,3 +86,10 @@ columna no sustituye una regla de negocio ni concede permisos a un actor.
 ## Folios de salidas por contexto
 
 `GoodsIssue.type` distingue `MATERIAL` y `CONSUMABLE`; su `referenceNumber` conserva unicidad global. Cada contexto usa una fila anual distinta de `ReferenceNumberCounter`: `SAL-MAT` o `SAL-CON`. No se agregan columnas para separar los folios. La migración `20261012120000_split_goods_issue_reference_prefixes` convierte los `SAL-AAAA-consecutivo` existentes según su tipo y conserva año y sufijo. Los contadores nuevos mantienen el mayor valor entre los documentos emitidos, el contador genérico anterior y cualquier contador específico ya existente. El contador `SAL` se conserva como evidencia histórica y deja de usarse para nuevas salidas.
+
+La merma se conserva en `WasteIssue` con la serie independiente `SAL-MER`.
+`20260814150000_align_waste_reference_prefixes` normalizó sus folios anteriores
+`SM-AAAA-consecutivo` y trasladó su contador. La conversión de `GoodsIssue` no
+modifica esos registros ni utiliza el contador de merma para las otras series.
+La preparación y el uso de Prisma se explican en la
+[guía de implementación](../../development/code-structure/06-prisma-and-persistence.md).

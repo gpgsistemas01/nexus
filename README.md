@@ -109,7 +109,7 @@ forma curada. CI comprueba que el contenido generado esté actualizado.
 1. Instalar dependencias:
 
    ```bash
-   npm install
+   npm ci
    ```
 
 2. Crear el archivo `.env` en la raíz del proyecto con las variables necesarias.
@@ -177,6 +177,7 @@ están definidas. Los comandos de base de datos se encuentran en la tabla de scr
 
 Consulta las guías específicas para evitar duplicar aquí decisiones y procedimientos:
 
+- [Prisma: preparación, consultas, transacciones y creación de migraciones](docs/architecture/views/development/code-structure/06-prisma-and-persistence.md);
 - [roles PostgreSQL de ejecución y migración](docs/architecture/views/physical/02-postgresql-runtime-and-migration-roles.md);
 - [usuarios, personas, auditoría y permisos](docs/architecture/views/logical/02-identity-access-and-audit.md).
 

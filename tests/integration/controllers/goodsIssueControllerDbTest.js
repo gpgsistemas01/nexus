@@ -36,6 +36,8 @@ const withFolioMigrationTables = async callback => {
         await connection.query(`
             CREATE TEMP TABLE "GoodsIssue" (LIKE public."GoodsIssue" INCLUDING ALL);
             CREATE TEMP TABLE "ReferenceNumberCounter" (LIKE public."ReferenceNumberCounter" INCLUDING ALL);
+            CREATE TEMP TABLE "WasteIssue" (LIKE public."WasteIssue" INCLUDING ALL);
+            CREATE TEMP TABLE "WasteStockAdjustment" (LIKE public."WasteStockAdjustment" INCLUDING ALL);
         `);
         await connection.query(
             'INSERT INTO "GoodsIssue" SELECT * FROM public."GoodsIssue" WHERE "id" = ANY($1::uuid[])',
@@ -228,6 +230,56 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             await connection.query(folioMigration);
             expect((await connection.query('SELECT * FROM "GoodsIssue"')).rows).toEqual([]);
             expect((await connection.query('SELECT * FROM "ReferenceNumberCounter"')).rows).toEqual([]);
+        });
+    });
+
+    it('conserva las salidas SAL-MER y su contador sin incorporarlos a las series de artículos', async () => {
+        await withFolioMigrationTables(async connection => {
+            const source = (await connection.query('SELECT * FROM "GoodsIssue" WHERE "id" = $1', [issues.material.id])).rows[0];
+            await connection.query('INSERT INTO "WasteIssue" SELECT * FROM jsonb_populate_record(NULL::"WasteIssue", $1::jsonb)', [
+                JSON.stringify({ ...source, id: randomUUID(), createdById: randomUUID(), referenceNumber: 'SAL-MER-2026-005000' })
+            ]);
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2026-000005', issues.material.id]);
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2026-000008', issues.consumable.id]);
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('SAL', 2026, 10), ('SAL-MER', 2026, 6000)`);
+            const wastes = (await connection.query('SELECT * FROM "WasteIssue"')).rows;
+
+            await connection.query(folioMigration);
+
+            expect((await connection.query('SELECT * FROM "WasteIssue"')).rows).toEqual(wastes);
+            expect((await connection.query('SELECT "prefix", "year", "counter" FROM "ReferenceNumberCounter" WHERE "prefix" = $1', ['SAL-MER'])).rows)
+                .toEqual([{ prefix: 'SAL-MER', year: 2026, counter: 6000 }]);
+            expect((await connection.query('SELECT "prefix", "counter" FROM "ReferenceNumberCounter" WHERE "prefix" IN ($1, $2) ORDER BY "prefix"', ['SAL-MAT', 'SAL-CON'])).rows)
+                .toEqual([{ prefix: 'SAL-CON', counter: 10 }, { prefix: 'SAL-MAT', counter: 10 }]);
+        });
+    });
+
+    it('respeta la distinción de merma después de la migración histórica SM a SAL-MER', async () => {
+        await withFolioMigrationTables(async connection => {
+            const source = (await connection.query('SELECT * FROM "GoodsIssue" WHERE "id" = $1', [issues.material.id])).rows[0];
+            await connection.query('INSERT INTO "WasteIssue" SELECT * FROM jsonb_populate_record(NULL::"WasteIssue", $1::jsonb)', [
+                JSON.stringify({ ...source, id: randomUUID(), createdById: randomUUID(), referenceNumber: 'SM-2026-000007' })
+            ]);
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2026-000007', issues.material.id]);
+            await connection.query('UPDATE "GoodsIssue" SET "referenceNumber" = $1 WHERE "id" = $2', ['SAL-2026-000008', issues.consumable.id]);
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('SM', 2026, 9), ('SAL', 2026, 10)`);
+            const wasteMigration = readFileSync(new URL(
+                '../../../prisma/migrations/20260814150000_align_waste_reference_prefixes/migration.sql', import.meta.url
+            ), 'utf8');
+
+            await connection.query(wasteMigration);
+            const convertedWaste = (await connection.query('SELECT * FROM "WasteIssue"')).rows;
+            await connection.query(folioMigration);
+
+            expect(convertedWaste[0].referenceNumber).toBe('SAL-MER-2026-000007');
+            expect((await connection.query('SELECT * FROM "WasteIssue"')).rows).toEqual(convertedWaste);
+            expect((await connection.query('SELECT "prefix", "year", "counter" FROM "ReferenceNumberCounter" WHERE "prefix" = $1', ['SAL-MER'])).rows)
+                .toEqual([{ prefix: 'SAL-MER', year: 2026, counter: 9 }]);
+            expect((await connection.query('SELECT "prefix" FROM "ReferenceNumberCounter" WHERE "prefix" = $1', ['SM'])).rows).toEqual([]);
+            expect((await connection.query('SELECT "referenceNumber" FROM "GoodsIssue" ORDER BY "referenceNumber"')).rows)
+                .toEqual([{ referenceNumber: 'SAL-CON-2026-000008' }, { referenceNumber: 'SAL-MAT-2026-000007' }]);
         });
     });
 

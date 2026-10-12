@@ -297,6 +297,15 @@ Convierte únicamente los folios que cumplen `SAL-AAAA-consecutivo` en `SAL-MAT`
 detalles y relaciones. Referencias personalizadas, compras y salidas de merma conservan
 sus folios; los movimientos y devoluciones mantienen sus referencias propias.
 
+La distinción de merma ya pertenece a la migración anterior
+`20260814150000_align_waste_reference_prefixes`: convierte `SM-AAAA-consecutivo`
+en `SAL-MER-AAAA-consecutivo` dentro de `WasteIssue` y concilia el contador `SM`
+con `SAL-MER`. La migración de octubre sólo actualiza `GoodsIssue` cuando el
+folio coincide exactamente con `^SAL-[0-9]{4}-[0-9]+$`. No actualiza `WasteIssue`
+ni incluye `SAL-MER` entre los contadores que transforma o usa como origen.
+Así, un sufijo igual en materiales, consumibles y merma conserva tres referencias
+distintas y la numeración de merma mantiene su continuidad.
+
 La conversión y el ajuste de contadores son una sola transacción. El bloqueo de ambas
 tablas impide escrituras mientras se concilian los folios. Una colisión contra la
 unicidad de `GoodsIssue.referenceNumber` aborta la transacción completa: debe revisarse
