@@ -211,13 +211,15 @@ sequenceDiagram
     participant Costs@{ "type": "control" } as supplierMaterialService.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
 
+    Facade->>Core: createGoodsReceipt({ goodsReceiptDto, type: CONSUMABLE })
     activate Core
     alt Servicio resuelto
 
         Core->>Prisma: db.$transaction(async tx => ...)
         rect rgb(245, 245, 245)
             Note over Core,Prisma: getDb().$transaction(async tx => ...)
-            Core->>Reference: generateYearlyReferenceNumber({ tx, ... })
+            Note over Core: CONSUMABLE selecciona CCO
+            Core->>Reference: generateYearlyReferenceNumber({ type: referenceType, tx })
             Core->>Prisma: tx.goodsReceipt.create({ data: { type, referenceNumber, ... } })
             Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
     Note over Inventory: Preparación y escrituras ampliadas en los detalles de inventario

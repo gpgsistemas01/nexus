@@ -179,7 +179,7 @@ sequenceDiagram
         Core->>Prisma: db.$transaction(async tx => ...)
         rect rgb(245, 245, 245)
             Note over Core,Prisma: getDb().$transaction(async tx => ...)
-            Note over Core: CONSUMABLE selecciona SAL-CON
+            Note over Core: CONSUMABLE selecciona SCO
             Core->>Reference: generateYearlyReferenceNumber({ tx, type: referenceType })
             Core->>Prisma: tx.goodsIssue.create({ data: { type, referenceNumber, ... } })
         end

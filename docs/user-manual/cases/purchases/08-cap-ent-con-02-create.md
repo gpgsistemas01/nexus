@@ -12,4 +12,4 @@
 4. Capture cantidad y costo por presentación, seleccione **Agregar** y revise los totales.
 5. Seleccione **Guardar**. Nexus registra la compra, incrementa existencias y genera el movimiento como una sola operación.
 
-**Compruebe el resultado:** Localice el folio en el listado y revise cantidades y total. En **Almacén → Consumibles**, la existencia aumenta por las cantidades registradas.
+**Compruebe el resultado:** Localice en el listado el folio que comienza con **CCO**, correspondiente a consumibles, y revise cantidades y total. En **Almacén → Consumibles**, la existencia aumenta por las cantidades registradas.

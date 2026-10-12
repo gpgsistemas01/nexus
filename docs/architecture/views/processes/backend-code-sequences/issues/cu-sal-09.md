@@ -142,6 +142,7 @@ sequenceDiagram
         activate Header
         Header-->>Domain: resolveIssueHeaderData(): Promise[Object]
         deactivate Header
+        Note over Domain: WASTE_ISSUE corresponde al prefijo SME
         Domain->>Reference: generateYearlyReferenceNumber({ type: WASTE_ISSUE, tx })
         Reference->>Prisma: tx.referenceNumberCounter.upsert(...)
         activate Prisma

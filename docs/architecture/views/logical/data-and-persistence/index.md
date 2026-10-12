@@ -67,8 +67,8 @@ reutilizan el núcleo transaccional. El frontend elige endpoints, selectores y e
 no decide el discriminador persistido. Consultas, escrituras y reportes conservan la
 separación de tipos y rechazan operaciones desde el contexto contrario.
 
-Las compras comparten la serie anual `REC`; los saltos de folio dentro de una pantalla
-pueden corresponder a registros del otro contexto. La reutilización física de tablas
+Las compras de materiales y consumibles tienen series anuales independientes
+`CMA` y `CCO`, respectivamente. La reutilización física de tablas
 no elimina los casos de uso propios de cada tipo de inventario.
 
 ## Trazabilidad y mantenimiento
@@ -85,11 +85,31 @@ columna no sustituye una regla de negocio ni concede permisos a un actor.
 
 ## Folios de salidas por contexto
 
-`GoodsIssue.type` distingue `MATERIAL` y `CONSUMABLE`; su `referenceNumber` conserva unicidad global. Cada contexto usa una fila anual distinta de `ReferenceNumberCounter`: `SAL-MAT` o `SAL-CON`. No se agregan columnas para separar los folios. La migración `20261012120000_split_goods_issue_reference_prefixes` convierte los `SAL-AAAA-consecutivo` existentes según su tipo y conserva año y sufijo. Los contadores nuevos mantienen el mayor valor entre los documentos emitidos, el contador genérico anterior y cualquier contador específico ya existente. El contador `SAL` se conserva como evidencia histórica y deja de usarse para nuevas salidas.
+Cada serie mantiene su contador por prefijo y año en `ReferenceNumberCounter`.
+El formato es `PREFIJO-AAAA-consecutivo`, con seis dígitos como mínimo; por ejemplo,
+`SMA-2026-000001`. Las letras identifican operación y contexto; año y consecutivo
+conservan continuidad sin alargar el prefijo.
 
-La merma se conserva en `WasteIssue` con la serie independiente `SAL-MER`.
-`20260814150000_align_waste_reference_prefixes` normalizó sus folios anteriores
-`SM-AAAA-consecutivo` y trasladó su contador. La conversión de `GoodsIssue` no
-modifica esos registros ni utiliza el contador de merma para las otras series.
-La preparación y el uso de Prisma se explican en la
-[guía de implementación](../../development/code-structure/06-prisma-and-persistence.md).
+| Operación | Modelo y contexto | Prefijo |
+| --- | --- | --- |
+| Salida de materiales | `GoodsIssue`, `MATERIAL` | `SMA` |
+| Salida de consumibles | `GoodsIssue`, `CONSUMABLE` | `SCO` |
+| Salida de merma | `WasteIssue` | `SME` |
+| Compra de materiales | `GoodsReceipt`, `MATERIAL` | `CMA` |
+| Compra de consumibles | `GoodsReceipt`, `CONSUMABLE` | `CCO` |
+
+Las columnas e índices existentes admiten estos folios; no se agregan columnas.
+`20261012180000_shorten_issue_and_purchase_reference_prefixes` normaliza salidas
+`SAL`, `SAL-MAT` y `SAL-CON` según `GoodsIssue.type`, compras `REC` según
+`GoodsReceipt.type` y merma `SAL-MER` o `SM` en su propio modelo. Conserva año,
+sufijo, UUID y relaciones. Si todos los documentos antiguos son materiales,
+resultan `SMA` y `CMA`; la conversión no reclasifica un consumible guardado.
+
+La cadena conserva las migraciones previas: la de agosto convirtió `SM` a
+`SAL-MER` y la primera de octubre dividió `SAL` en `SAL-MAT` y `SAL-CON`.
+La nueva migración continúa esa evolución sin reescribir su SQL. Los contadores
+vigentes toman el máximo de los folios emitidos y los contadores históricos
+correspondientes, sin disminuir valores existentes. Merma no participa en los
+máximos de materiales ni consumibles; los contadores retirados se conservan.
+Véanse el [despliegue y comprobaciones](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-folios-de-salidas-por-contexto)
+y el [resumen de Prisma](../../development/code-structure/06-prisma-and-persistence.md).

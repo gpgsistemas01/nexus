@@ -79,3 +79,8 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/backend-code-sequences/index.md).
 
+
+`createGoodsReceipt` selecciona `CMA` para materiales y `CCO` para consumibles
+según el `type` fijado por su servicio específico. El contador anual y la compra
+se guardan con el mismo `tx`; las series son independientes y un error dentro
+de la transacción revierte también el incremento del contador.

@@ -34,6 +34,24 @@ del valor nuevo ya aplicado y de los resultados que habilitan el paso siguiente.
 
 ## Inventario automatizado
 
+### Actualización pendiente por los folios cortos
+
+Después de aplicar `20261012180000_shorten_issue_and_purchase_reference_prefixes`
+en el entorno de capturas, regenere en **Almacén y Sistemas** las imágenes de
+compras de materiales/consumibles y salidas de materiales/consumibles/merma que
+muestran folios. Los prefijos vigentes son `CMA`, `CCO`, `SMA`, `SCO` y `SME`.
+Se verificó que `images/material-issues/01-list.png` aún muestra `SAL-2026-000382`;
+esa imagen es evidencia anterior a la migración, no del formato vigente.
+
+Conserve los identificadores `CAP-*`: identifican la captura y el procedimiento,
+no la serie del documento. Prepare registros existentes y sesiones autorizadas
+en una base de pruebas migrada, y use el [flujo por área y selección de capturas](../governance/document-export-guide/08-update-the-screenshots-of-the-manual.md#reanudación-y-capturas-selectivas).
+La automatización de capturas no debe crear documentos ni modificar sus folios.
+La revisión visual sigue pendiente hasta disponer de ese entorno y sus sesiones;
+la existencia de un PNG no certifica que sus datos correspondan a la versión actual.
+
+### Tabla de capturas
+
 La siguiente tabla refleja el arreglo `captures` de `scripts/manualScreenshotInventory.js`, utilizado por `scripts/captureManualScreenshots.js`. Para
 comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 `node scripts/captureManualScreenshots.js --list`.

@@ -26,6 +26,7 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
                 const controller = controllers[resource];
                 router.get(path(resource), controller[`getAll${label}GoodsReceipts`]);
+                router.post(path(resource), controller[`register${label}GoodsReceipt`]);
                 router.patch(`${path(resource)}/:id`, controller[`edit${label}GoodsReceipt`]);
                 router.patch(`${path(resource)}/:id/details/:detailId/corrections`, controller[`correct${label}GoodsReceiptDetail`]);
                 router.patch(`${path(resource)}/:id/details/:detailId/cancel`, controller[`cancel${label}GoodsReceiptDetail`]);
@@ -39,6 +40,7 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         } })).id;
         ids.person = (await prisma.person.create({ data: { fullName: `RC person ${suffix}` } })).id;
         ids.status = (await prisma.status.upsert({ where: { name: 'Aprobada' }, update: {}, create: { name: 'Aprobada' } })).id;
+        await prisma.status.upsert({ where: { name: 'Confirmada' }, update: {}, create: { name: 'Confirmada' } });
         for (const [resource, type] of [['material', 'MATERIAL'], ['consumable', 'CONSUMABLE']]) {
             ids[resource] = (await prisma.material.create({ data: {
                 name: `RC ${resource} ${suffix}`, type, unitMeasureId: ids.unit, presentationId: ids.presentation
@@ -66,7 +68,11 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
 
     afterAll(async () => {
         if (!prisma || !ids.supplier) return;
-        const receiptIds = Object.values(receipts).map(receipt => receipt.id);
+        const receiptIds = (await prisma.goodsReceipt.findMany({ where: { supplierId: ids.supplier }, select: { id: true } }))
+            .map(receipt => receipt.id);
+        const movements = await prisma.inventoryMovement.findMany({ where: { goodsReceiptId: { in: receiptIds } }, select: { id: true } });
+        await prisma.movementDetail.deleteMany({ where: { movementId: { in: movements.map(row => row.id) } } });
+        await prisma.inventoryMovement.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
         await prisma.goodsReceiptDetail.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
         await prisma.goodsReceipt.deleteMany({ where: { id: { in: receiptIds } } });
         await prisma.supplierMaterial.deleteMany({ where: { supplierId: ids.supplier } });
@@ -111,5 +117,52 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(await prisma.goodsReceiptDetailChange.count({ where: { goodsReceiptId: receipts.mixed.id } })).toBe(0);
         expect(await prisma.inventoryMovement.count({ where: { goodsReceiptId: receipts.mixed.id } })).toBe(0);
         expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } })).toEqual(before);
+    });
+
+    const purchaseBody = resource => ({
+        supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-12T12:00:00.000Z',
+        details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 10 }]
+    });
+    const getCounter = prefix => prisma.referenceNumberCounter.findUnique({
+        where: { prefix_year: { prefix, year: new Date().getFullYear() } }
+    });
+
+    it('emite CMA y CCO concurrentes con contadores independientes e inventario del contexto correcto', async () => {
+        const before = {
+            material: (await getCounter('CMA'))?.counter ?? 0,
+            consumable: (await getCounter('CCO'))?.counter ?? 0
+        };
+        const stocks = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier } });
+        const resources = ['material', 'consumable', 'material', 'consumable', 'material', 'consumable'];
+        const results = await Promise.all(resources.map(resource => request(app).post(path(resource))
+            .send({ ...purchaseBody(resource), type: resource === 'material' ? 'CONSUMABLE' : 'MATERIAL' }).expect(200)));
+        expect(new Set(results.map(result => result.body.goodsReceipt.referenceNumber)).size).toBe(6);
+        for (const [resource, prefix, type] of [['material', 'CMA', 'MATERIAL'], ['consumable', 'CCO', 'CONSUMABLE']]) {
+            const created = results.filter((_result, index) => resources[index] === resource).map(result => result.body.goodsReceipt);
+            expect(created.map(receipt => Number(receipt.referenceNumber.split('-').at(-1))).sort((a, b) => a - b))
+                .toEqual([before[resource] + 1, before[resource] + 2, before[resource] + 3]);
+            for (const receipt of created) {
+                expect(receipt.referenceNumber).toMatch(new RegExp(`^${prefix}-${new Date().getFullYear()}-\\d{6,}$`));
+                const persisted = await prisma.goodsReceipt.findUnique({ where: { id: receipt.id }, include: { details: true } });
+                expect(persisted.type).toBe(type);
+                expect(persisted.details.map(detail => detail.materialId)).toEqual([ids[resource]]);
+                expect(await prisma.inventoryMovement.count({ where: { goodsReceiptId: receipt.id } })).toBe(1);
+            }
+            expect((await getCounter(prefix)).counter).toBe(before[resource] + 3);
+            const stock = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } } });
+            expect(Number(stock.currentStock)).toBe(Number(stocks.find(row => row.materialId === ids[resource]).currentStock) + 6);
+        }
+    });
+
+    it.each([['material', 'CMA'], ['consumable', 'CCO']])('revierte contador, compra y stock si falla el registro de %s', async (resource, prefix) => {
+        const beforeCounter = await getCounter(prefix);
+        const beforeCount = await prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } });
+        const beforeStocks = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } });
+        const beforeMovements = await prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } });
+        await request(app).post(path(resource)).send({ ...purchaseBody(resource), observations: 'x'.repeat(501) }).expect(500);
+        expect(await getCounter(prefix)).toEqual(beforeCounter);
+        expect(await prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } })).toBe(beforeCount);
+        expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } })).toEqual(beforeStocks);
+        expect(await prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } })).toBe(beforeMovements);
     });
 });

@@ -82,6 +82,6 @@ Los reportes y la infraestructura transversal se localizan en el
 
 ## Series de folios por contexto
 
-`createGoodsIssue` selecciona `SAL-MAT` para materiales y `SAL-CON` para consumibles a partir del `type` fijado por el servicio específico. El contador por prefijo y año se incrementa mediante `upsert` dentro de la misma transacción que inserta la salida. Un fallo revierte ambos cambios; las series no comparten incrementos.
+`createGoodsIssue` selecciona `SMA` para materiales y `SCO` para consumibles a partir del `type` fijado por el servicio específico. El contador por prefijo y año se incrementa mediante `upsert` dentro de la misma transacción que inserta la salida. Un fallo revierte ambos cambios; las series no comparten incrementos.
 
 La [migración de folios históricos](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-folios-de-salidas-por-contexto) normaliza los documentos genéricos y conserva el máximo anterior antes de habilitar esta generación. Detalles y movimientos siguen vinculados por UUID; no se renumeran sus referencias propias.

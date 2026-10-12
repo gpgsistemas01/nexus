@@ -26,7 +26,7 @@
 2. Si el cliente no existe, use **Nuevo cliente** en el selector y siga [crear cliente](../catalogs/11-cap-cat-cli-02-create.md), correspondiente a `CU-CAT-06`. Después seleccione el cliente registrado y continúe la solicitud. Para el Personal de almacén, esta alta se realiza desde la operación; el listado independiente de clientes corresponde al administrador.
 3. Use **Buscar consumible...** para seleccionar el artículo correcto. Revise el proveedor para distinguir artículos con nombres similares.
 4. Capture una cantidad positiva y seleccione **Agregar**. Repita para los otros consumibles y revise los renglones antes de continuar; no mezcle materiales con consumibles.
-5. Seleccione **Guardar**. Compruebe que el folio del listado comience con **SAL-CON**, correspondiente a consumibles, y que el estado sea **Pendiente**. La existencia todavía no disminuye: el descuento ocurre al surtir.
+5. Seleccione **Guardar**. Compruebe que el folio del listado comience con **SCO**, correspondiente a consumibles, y que el estado sea **Pendiente**. La existencia todavía no disminuye: el descuento ocurre al surtir.
 
 <a id="editar-encabezado"></a>
 ## Editar el encabezado — CU-SAL-17

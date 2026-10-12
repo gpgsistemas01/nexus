@@ -128,7 +128,7 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             issues[resource] = response.body.goodsIssue;
             expect(issues[resource].type).toBe(resource === 'consumable' ? 'CONSUMABLE' : 'MATERIAL');
             expect(issues[resource].referenceNumber).toMatch(
-                new RegExp(`^SAL-${resource === 'consumable' ? 'CON' : 'MAT'}-${new Date().getFullYear()}-\\d{6,}$`)
+                new RegExp(`^${resource === 'consumable' ? 'SCO' : 'SMA'}-${new Date().getFullYear()}-\\d{6,}$`)
             );
             expect((await prisma.goodsIssue.findUnique({ where: { id: issues[resource].id } })).type)
                 .toBe(issues[resource].type);
@@ -359,12 +359,12 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: issue.id } })).toBe(2);
     });
     it('genera consecutivos independientes por tipo incluso con altas concurrentes', async () => {
-        const before = { material: await getIssueCounter('SAL-MAT'), consumable: await getIssueCounter('SAL-CON') };
+        const before = { material: await getIssueCounter('SMA'), consumable: await getIssueCounter('SCO') };
         const resources = ['material', 'consumable', 'material', 'consumable', 'material', 'consumable'];
         const results = await Promise.all(resources.map(resource => createIssue(resource).expect(200)));
         const folios = results.map(result => result.body.goodsIssue.referenceNumber);
         expect(new Set(folios).size).toBe(6);
-        for (const [resource, prefix] of [['material', 'SAL-MAT'], ['consumable', 'SAL-CON']]) {
+        for (const [resource, prefix] of [['material', 'SMA'], ['consumable', 'SCO']]) {
             const emitted = results.filter((_result, index) => resources[index] === resource)
                 .map(result => Number(result.body.goodsIssue.referenceNumber.split('-').at(-1))).sort((a, b) => a - b);
             expect(emitted).toEqual([before[resource].counter + 1, before[resource].counter + 2, before[resource].counter + 3]);
@@ -373,7 +373,7 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
     });
 
     it.each(['material', 'consumable'])('revierte el contador de %s cuando falla la escritura posterior del documento', async resource => {
-        const prefix = resource === 'material' ? 'SAL-MAT' : 'SAL-CON';
+        const prefix = resource === 'material' ? 'SMA' : 'SCO';
         const beforeCounter = await getIssueCounter(prefix);
         const beforeIssues = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
         const beforeStock = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier } });

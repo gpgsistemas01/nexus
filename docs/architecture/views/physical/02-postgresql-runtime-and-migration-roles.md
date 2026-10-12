@@ -290,37 +290,58 @@ red, rotar el secreto y evitar exponer `DIRECT_URL` fuera del proceso de desplie
 
 ## Migración de folios de salidas por contexto
 
-La migración incremental `20261012120000_split_goods_issue_reference_prefixes` requiere
-la clasificación `GoodsIssue.type` incorporada por `20261007000000_add_goods_issue_type`.
-Convierte únicamente los folios que cumplen `SAL-AAAA-consecutivo` en `SAL-MAT` para
-`MATERIAL` o `SAL-CON` para `CONSUMABLE`. Conserva año, sufijo, UUID, encabezado,
-detalles y relaciones. Referencias personalizadas, compras y salidas de merma conservan
-sus folios; los movimientos y devoluciones mantienen sus referencias propias.
+La migración incremental
+`20261012180000_shorten_issue_and_purchase_reference_prefixes` establece cinco
+series cortas. Usa las columnas `type` ya incorporadas a compras y salidas; no
+agrega columnas ni modifica migraciones anteriores.
 
-La distinción de merma ya pertenece a la migración anterior
-`20260814150000_align_waste_reference_prefixes`: convierte `SM-AAAA-consecutivo`
-en `SAL-MER-AAAA-consecutivo` dentro de `WasteIssue` y concilia el contador `SM`
-con `SAL-MER`. La migración de octubre sólo actualiza `GoodsIssue` cuando el
-folio coincide exactamente con `^SAL-[0-9]{4}-[0-9]+$`. No actualiza `WasteIssue`
-ni incluye `SAL-MER` entre los contadores que transforma o usa como origen.
-Así, un sufijo igual en materiales, consumibles y merma conserva tres referencias
-distintas y la numeración de merma mantiene su continuidad.
+| Documento y tipo guardado | Folio anterior reconocido | Prefijo vigente |
+| --- | --- | --- |
+| Salida de materiales | `SAL`, `SAL-MAT` o `SAL-CON` | `SMA` |
+| Salida de consumibles | `SAL`, `SAL-MAT` o `SAL-CON` | `SCO` |
+| Salida de merma | `SAL-MER` o `SM`, dentro de `WasteIssue` | `SME` |
+| Compra de materiales | `REC` | `CMA` |
+| Compra de consumibles | `REC` | `CCO` |
 
-La conversión y el ajuste de contadores son una sola transacción. El bloqueo de ambas
-tablas impide escrituras mientras se concilian los folios. Una colisión contra la
-unicidad de `GoodsIssue.referenceNumber` aborta la transacción completa: debe revisarse
-el documento conflictivo y reintentarse, sin inventar otro número ni eliminarlo.
+Sólo se convierten referencias completas `prefijo-AAAA-consecutivo` con año de
+cuatro dígitos y sufijo numérico. La clasificación guardada determina el prefijo;
+si todos los registros anteriores son materiales, sus folios quedan en `SMA` y
+`CMA`. Un folio `SAL` o `REC` por sí solo no prueba el tipo: las migraciones
+`20261005010000_add_goods_receipt_type` y `20261007000000_add_goods_issue_type`
+clasificaron como consumibles los documentos con todos sus detalles de ese tipo.
 
-Cada contador específico queda en el mayor valor de sus folios emitidos, del contador
-`SAL` anterior para ese año y de cualquier contador específico ya existente. Así no se
-reutilizan números consumidos aunque se hayan retirado documentos. Las series avanzan
-independientemente a partir de ese máximo; un año nuevo empieza en uno al crearse su
-contador. El contador genérico queda conservado y retirado de la generación vigente.
+La cadena mantiene `20260814150000_align_waste_reference_prefixes` (`SM` a
+`SAL-MER`) y `20261012120000_split_goods_issue_reference_prefixes` (`SAL` a
+`SAL-MAT`/`SAL-CON`). La nueva migración convierte esos resultados al formato
+vigente, conservando exactamente año, sufijo, UUID, datos y relaciones. Las
+referencias personalizadas y los folios propios de movimientos, devoluciones,
+ajustes y entradas de merma permanecen fuera de la conversión.
 
-Antes del despliegue, respaldar y revisar la clasificación de las salidas existentes y
-cualquier colisión destino. Publicar servicio y migración en la misma versión y detener
-las instancias anteriores durante la conversión: una instancia antigua volvería a emitir
-`SAL`. Aplicar con la cuenta de migraciones y `DIRECT_URL` mediante `npm run db:migrate`,
-y comprobar `npx prisma migrate status`. No ejecutar la conversión contra una base de
-producción durante las pruebas; la integración usa exclusivamente la base aislada y
-comprueba históricos, repetición, colisión con rollback y altas concurrentes.
+La conversión y conciliación de contadores ocurren en una sola transacción que
+bloquea `ReferenceNumberCounter`, `GoodsIssue`, `GoodsReceipt` y `WasteIssue`.
+Una colisión con cualquier folio destino aborta todo: se revisan los documentos
+conflictivos antes de reintentar, sin borrar ni renumerar automáticamente.
+
+Los contadores vigentes conservan el mayor valor entre documentos emitidos,
+contadores propios existentes y contadores anteriores de su serie. El contador
+compartido `REC` alimenta inicialmente `CMA` y `CCO`; `SAL` alimenta `SMA` y `SCO`.
+`SAL-MAT` y `SAL-CON` alimentan sólo su contexto; `SM` y `SAL-MER`, sólo `SME`.
+Los contadores retirados se conservan como historia. Las cinco series avanzan
+independientemente desde ese máximo y un año nuevo empieza en uno.
+
+Antes del despliegue:
+
+1. Respaldar la base y revisar cantidades por tipo, referencias personalizadas y
+   colisiones con destinos ya existentes. La revisión del repositorio no permite
+   certificar la clasificación de una base de producción sin consultarla.
+2. Publicar servicio y migración en la misma versión; detener instancias anteriores
+   durante la conversión para impedir que vuelvan a emitir prefijos retirados.
+3. Aplicar con la cuenta de migraciones y `DIRECT_URL` mediante `npm run db:migrate`;
+   comprobar `npx prisma migrate status` antes de iniciar la nueva versión.
+4. Comprobar los cinco prefijos y la continuidad de contadores en consultas y
+   reportes. Un folio impreso o exportado antes del cambio conserva su texto
+   anterior; localice el documento por su año, sufijo y datos operativos.
+
+Las pruebas de persistencia usan una base aislada y verifican la cadena histórica,
+conservación de registros, merma separada, máximos de contadores, repetición,
+instalación vacía y colisiones con rollback. Nunca se usa producción para pruebas.

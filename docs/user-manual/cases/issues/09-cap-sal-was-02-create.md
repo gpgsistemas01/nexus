@@ -3,7 +3,7 @@
 
 **Casos de uso:** `CU-SAL-09` — Crear salida de merma.
 
-**Antes de empezar:** Vamos a registrar un salida. Tenga los datos de la operación y confirme con quien le capacita que corresponde darlo de alta; busque primero si ya existe.
+**Antes de empezar:** Vamos a registrar una salida de merma. Tenga los datos de la operación y confirme con quien le capacita que corresponde registrarla; busque primero si ya existe.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Salidas de merma](../../error-messages.md#errores-salidas-merma).
 
@@ -23,4 +23,4 @@ reemplaza la cantidad del renglón existente; no crea otro renglón ni suma amba
 en **Cantidad** el total que desea solicitar. Nexus también rechaza una solicitud enviada con la
 misma merma repetida.
 
-**Compruebe el resultado:** Vuelva al listado y localice el registro guardado. Compruebe sus datos antes de continuar con otra operación.
+**Compruebe el resultado:** Vuelva al listado y localice el folio que comienza con **SME**, correspondiente a merma. Compruebe sus datos y el estado **Pendiente**; la existencia se descuenta después, al surtir.

@@ -31,4 +31,4 @@ cantidad incrementa la existencia al confirmar. En cambio, una factura no se reg
 para el mismo proveedor: si Nexus indica el folio donde ya existe, abra esa compra y agregue ahí los
 materiales faltantes.
 
-**Compruebe el resultado:** El listado muestra la compra con su folio. Revise sus renglones y compruebe la existencia del mismo artículo y proveedor en **Almacén → Materiales**.
+**Compruebe el resultado:** El listado muestra la compra con un folio que comienza con **CMA**, correspondiente a materiales. Revise sus renglones y compruebe la existencia del mismo artículo y proveedor en **Almacén → Materiales**.
