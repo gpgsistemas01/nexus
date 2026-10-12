@@ -3,6 +3,8 @@
 
 **Casos de uso:** `CU-ALM-18` — Crear consumible.
 
+**Antes de empezar:** Vamos a registrar un consumible. Tenga los datos de la operación y confirme con quien le capacita que corresponde darlo de alta; busque primero si ya existe.
+
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion),
 [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -20,3 +22,5 @@ muestra dimensiones y conserva **Stock inicial** como razón automática.
 
 Si ya existe la misma oferta, Nexus rechaza el duplicado y no suma existencia. Si la
 identidad existe con otro proveedor, reutiliza el consumible y crea sólo la nueva oferta.
+
+**Compruebe el resultado:** Vuelva al listado y localice el registro guardado. Compruebe sus datos antes de continuar con otra operación.

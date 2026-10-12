@@ -22,3 +22,13 @@ figuras modificadas y se revisa una exportación DOCX/PDF representativa.
 Si cambian rutas, imports entre áreas o Prisma, se ejecuta `npm run docs:architecture`
 para actualizar la evidencia generada. Siempre se ejecuta `npm run docs:check` para
 comprobar sincronización y contratos; la revisión curada explica los hechos verificados.
+
+## Comprobaciones contra código
+
+`npm run docs:check` regenera en memoria rutas, imports y datos para contrastarlos con los archivos versionados. Incluye las alternativas de rutas declaradas en arreglos y comprueba la cobertura de OpenAPI. En secuencias arquitectónicas, verifica que los métodos estén referenciados en los archivos de sus participantes o en una vinculación explícita entre configurador y fábrica y que las peticiones HTTP explícitas coincidan con rutas registradas del router identificado.
+
+Estas comprobaciones son estáticas: no prueban el orden de ejecución, las condiciones de un callback ni el valor que efectivamente retorna una transacción. Esos puntos requieren lectura del código y las pruebas pertinentes. Al revisar un cambio, comprobar también la propiedad de helpers, el payload, el resultado observado, el momento del commit y los efectos posteriores; las figuras deben mostrar la implementación disponible y distinguir cualquier pendiente funcional.
+
+La revisión del 12 de octubre de 2026 corrigió la cobertura de reportes de personas, la navegación por perfil, el límite EJS/API, propietarios y nombres de métodos, payloads de formularios, respuestas binarias, ajustes y auditoría posterior a `finish`. Las vistas de datos siguen generándose desde Prisma. Su paquete de publicación es `datos`; los demás capítulos arquitectónicos se publican en `arquitectura`, incluidos el índice de procesos, el recorrido general y el índice de desarrollo.
+
+Quedan documentados dos pendientes de implementación: `updateWasteStock` guarda el ajuste, pero su callback transaccional no retorna la entidad; por ello la respuesta actual del ajuste sólo contiene `code`. Por otra parte, `getCatalogEntriesRequest` recibe parámetros de consulta, pero sólo utiliza `catalog` para construir la URL y no reenvía los filtros. Las secuencias y el contrato del ajuste describen ese comportamiento actual; esta revisión no modifica la aplicación.

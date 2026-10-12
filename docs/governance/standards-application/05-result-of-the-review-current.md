@@ -25,3 +25,9 @@ La revisión documental encontró y trató estas brechas:
 La revisión no divide listas de atributos inseparables de una misma identidad ni los
 participantes de una misma transacción atómica. Esos detalles permanecen como condición
 o criterio de aceptación del requisito propietario.
+
+### Revisión documental del 10 de octubre de 2026
+
+Se corrigieron las selecciones por perfil, las referencias de capturas por área y las contradicciones de acceso a clientes y proveedores. Se añadió una inducción guiada a los procedimientos, una ruta de incorporación para desarrolladores y la separación entre resultados de negocio y evidencia técnica en los requisitos de datos y calidad. Gobernanza incorpora responsables por función, aceptación, control de cambios y decisiones pendientes.
+
+Los manuales permanecen **En revisión**. La validación de fuentes enumera las capturas de cada perfil que todavía deben generarse y revisarse. Las imágenes históricas comunes no acreditan por sí solas el perfil ni la versión. Los responsables nominales, aceptación de negocio y compromisos de servicio continúan pendientes de designación o acuerdo.

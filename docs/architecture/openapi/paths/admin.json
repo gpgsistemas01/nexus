@@ -968,5 +968,169 @@
         }
       }
     }
+  },
+  "/api/admin/reports/persons/excel": {
+    "get": {
+      "operationId": "getAdminReportsPersonsExcel",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "summary": "Exportar personas y asignaciones de área y rol",
+      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con búsqueda y áreas; no pagina la exportación.",
+      "parameters": [
+        {
+          "name": "department",
+          "in": "query",
+          "required": false,
+          "style": "form",
+          "explode": true,
+          "description": "Identificadores de áreas. También se admite el alias department[].",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        {
+          "name": "search[value]",
+          "in": "query",
+          "required": false,
+          "description": "Búsqueda por nombre de persona.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "required": false,
+          "description": "Índice de columna: 0 corresponde a fullName.",
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        {
+          "name": "order[0][dir]",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "/api/admin/reports/profiles/excel": {
+    "get": {
+      "operationId": "getAdminReportsProfilesExcel",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "summary": "Exportar personas y asignaciones de área y rol",
+      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con búsqueda y áreas; no pagina la exportación. Alias de compatibilidad de /api/admin/reports/persons/excel, registrado con el mismo controlador y permiso.",
+      "parameters": [
+        {
+          "name": "department",
+          "in": "query",
+          "required": false,
+          "style": "form",
+          "explode": true,
+          "description": "Identificadores de áreas. También se admite el alias department[].",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        {
+          "name": "search[value]",
+          "in": "query",
+          "required": false,
+          "description": "Búsqueda por nombre de persona.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "required": false,
+          "description": "Índice de columna: 0 corresponde a fullName.",
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        {
+          "name": "order[0][dir]",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      ]
+    }
   }
 }

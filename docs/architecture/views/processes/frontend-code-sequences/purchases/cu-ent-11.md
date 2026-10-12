@@ -100,6 +100,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `cancelConsumableGoodsReceiptDetailRequest` | `FileConsumableGoodsReceiptService` | `Request` · `createGoodsReceiptRequests(...)` |
+| `cancelConsumableGoodsReceiptDetail` | `FileConsumableGoodsReceiptController` | `Application` · `createCrudApplication(...)` |
 
 ## Secuencia de implementación
 
@@ -133,7 +134,7 @@ sequenceDiagram
     alt Cancelación no confirmada
         View-->>Browser: sin solicitud HTTP
     else Cancelación confirmada
-        View->>Application: cancelGoodsReceiptDetail({ id, detailId })
+        View->>Application: cancelConsumableGoodsReceiptDetail({ id, detailId })
         Application->>Request: cancelConsumableGoodsReceiptDetailRequest({ id, detailId })
         Request->>HTTP: apiRequest({ method: 'patch', url })
         HTTP->>Transport: PATCH /api/warehouse/goods-receipts/consumables/:id/details/:detailId/cancel
@@ -143,7 +144,7 @@ sequenceDiagram
             Request-->>Application: cancelConsumableGoodsReceiptDetailRequest(): Promise[AxiosResponse]
             Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
             FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
-            Application-->>View: cancelGoodsReceiptDetail(): Promise[{ message, data: correction }]
+            Application-->>View: cancelConsumableGoodsReceiptDetail(): Promise[{ message, data: correction }]
             View->>FileSwalComponent: notifications.showSuccess(response.message)
             View->>Browser: dispatchEvent('goods-receipt-correction:applied', response.data)
             View->>FileRenderMaterialDatatable: refreshMaterialTable(details) — o consulta si la compra quedó cancelada

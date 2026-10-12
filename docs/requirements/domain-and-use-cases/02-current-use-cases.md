@@ -291,9 +291,10 @@ grupo usan la familia estable `CU-ALM-*`.
 
 ```mermaid
 usecase-beta
-%%{init: {"layout": "dagre"}}%%
 direction LR
     actor admin("Administrador del sistema")
+    actor warehouse("Personal de almacén")
+    admin --|> warehouse
 
     systemBoundary catalogPackage1["Nexus · Proveedores"]
         ucSupplierQuery("CU-CAT-01 Consultar proveedores")
@@ -302,20 +303,21 @@ direction LR
         ucSupplierReport("CU-CAT-04 Generar reporte de proveedores")
     end
 
-    admin -- ucSupplierQuery
+    warehouse -- ucSupplierQuery
+    warehouse -- ucSupplierCreate
+    admin -- ucSupplierEdit
+    admin -- ucSupplierReport
 
-    ucSupplierQuery -- ucSupplierCreate
-    ucSupplierQuery -- ucSupplierEdit
-    ucSupplierQuery -- ucSupplierReport
 ```
 
 #### Clientes
 
 ```mermaid
 usecase-beta
-%%{init: {"layout": "dagre"}}%%
 direction LR
     actor admin("Administrador del sistema")
+    actor warehouse("Personal de almacén")
+    admin --|> warehouse
 
     systemBoundary catalogPackage2["Nexus · Clientes"]
         ucClientQuery("CU-CAT-05 Consultar clientes")
@@ -324,11 +326,11 @@ direction LR
         ucClientReport("CU-CAT-08 Generar reporte de clientes")
     end
 
-    admin -- ucClientQuery
+    warehouse -- ucClientQuery
+    warehouse -- ucClientCreate
+    admin -- ucClientEdit
+    admin -- ucClientReport
 
-    ucClientQuery -- ucClientCreate
-    ucClientQuery -- ucClientEdit
-    ucClientQuery -- ucClientReport
 ```
 
 #### Áreas

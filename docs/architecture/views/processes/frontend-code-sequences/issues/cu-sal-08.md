@@ -88,6 +88,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `getAllWasteIssues` | `FileWasteIssues` | `FileCreateIssueApplication` · `createIssueApplication(...)` |
+| `getAllWasteIssues` | `FileWasteIssueController` | `Application` · `createCrudApplication(...)` |
 
 ## Preparación de la interfaz
 
@@ -140,7 +141,7 @@ sequenceDiagram
     participant Application@{ "type": "control" } as createCrudApplication.js
     participant Errors@{ "type": "control" } as errorHandler.js
 
-    Browser->>TableCore: callback Ajax de DataTables(data, callback)
+    Browser->>TableCore: callback Ajax de DataTable(data, callback)
     TableCore->>IssueTable: options.ajax.get(data) — closure definido en issueDatatable.js
     IssueTable->>FilterState: filters.getValues()
     FilterState-->>IssueTable: getValues(): Object — filtros aplicados

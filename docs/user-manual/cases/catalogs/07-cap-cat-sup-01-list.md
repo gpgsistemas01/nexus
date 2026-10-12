@@ -1,22 +1,23 @@
 <a id="CAP-CAT-SUP-01-LIST"></a>
-# 7. CAP-CAT-SUP-01-LIST — Listado
+# 7. CAP-CAT-SUP-01-LIST — Consultar proveedores
 
-**Casos de uso:** `CU-CAT-01` — Consultar proveedores; `CU-CAT-04` — Generar reporte de proveedores.
+**Casos de uso:** `CU-CAT-01` — Consultar proveedores.
 
-**Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
+**Antes de empezar:** Tenga el nombre del proveedor que necesita. Vamos a buscarlo antes de registrar otro, para evitar duplicados.
 
-**Controles que debe usar:** Buscador **Buscar por Nombre comercial o Razón social**, botones **Exportar Excel** y **Nuevo proveedor**, y acción **Editar registro** de cada fila.
+1. Abra **Proveedores** desde el menú principal. Observe el buscador y la tabla:
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+   ![CAP-CAT-SUP-01-LIST: consulta de proveedores](../../images/suppliers/01-list.png)
 
-   ![CAP-CAT-SUP-01-LIST: listado](../../images/suppliers/01-list.png)
+2. Escriba un término en **Buscar por Nombre comercial o Razón social** y compruebe los resultados.
+3. Si no existe, siga la guía de alta con **Nuevo proveedor**. Consultar el listado no cambia sus datos ni el inventario.
 
-2. Escriba un término en el buscador **Buscar por Nombre comercial o Razón social** para localizar un proveedor.
-3. En la tabla, seleccione **Nuevo proveedor**, **Exportar Excel** o la acción **Editar registro** de una fila.
-4. Si selecciona **Exportar Excel**, Nexus abre el modal **Exportar reporte**. Confirme que se aplicarán la búsqueda, los filtros y el orden actuales; seleccione **Descargar** para continuar o cierre el modal para cancelar.
+<!-- manual:sistemas -->
+## Editar o descargar información como administrador
 
-   <a id="CAP-CAT-SUP-04-EXPORT"></a>
-   ![CAP-CAT-SUP-04-EXPORT: modal para exportar proveedores](../../images/suppliers/04-export-report.png)
+Seleccione **Editar registro** para modificar un registro autorizado. Para descargar el resultado, pulse **Exportar Excel**. En **Exportar reporte**, revise la búsqueda, los filtros y el orden; después pulse **Descargar** o cierre el diálogo para cancelar.
 
-La columna **Activo**, ubicada antes de **Acciones**, se muestra en el listado únicamente al
-administrador del sistema.
+![CAP-CAT-SUP-04-EXPORT: diálogo de exportación de proveedores](../../images/suppliers/04-export-report.png)
+<!-- /manual:sistemas -->
+
+**Compruebe el resultado:** Confirme que el nombre corresponde a la persona o empresa de la operación. Si no encuentra el registro esperado, revise la búsqueda antes de darlo de alta.

@@ -3,6 +3,8 @@
 
 **Casos de uso:** `CU-ALM-09` — Consultar mermas e inventario; `CU-ALM-14` — Generar reporte de mermas.
 
+**Antes de empezar:** Vamos a localizar un merma y reconocer sus datos. Tenga el nombre, folio o período que necesita consultar.
+
 **Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Controles que debe usar:** Buscador **Buscar por Material o Proveedor**, filtro **Proveedor**, botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nueva merma**, además de las acciones por fila.
@@ -17,3 +19,5 @@
 
 La columna **Activo**, ubicada antes de **Acciones**, se muestra en la tabla únicamente al
 administrador del sistema; **Ajustar stock** también es exclusivo de ese actor. Personal de almacén usa **Agregar stock**, que suma una cantidad sin reemplazar el saldo.
+
+**Compruebe el resultado:** Confirme que la fila corresponde al nombre o folio buscado. Consultar no modifica datos ni existencias.

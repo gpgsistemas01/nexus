@@ -110,6 +110,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `registerWasteIssue` | `FileWasteIssues` | `FileCreateIssueApplication` · `createIssueApplication(...)` |
+| `registerWasteIssue` | `FileWasteIssueController` | `Application` · `createCrudApplication(...)` |
 
 ## Coordinación de la interfaz
 

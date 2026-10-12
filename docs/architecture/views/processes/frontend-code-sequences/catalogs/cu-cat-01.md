@@ -77,7 +77,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Initiator as Administrador del sistema
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View@{ "type": "boundary" } as suppliersPage.js
     participant Table@{ "type": "control" } as supplierDatatable.js
@@ -102,7 +102,7 @@ sequenceDiagram
     TableCore->>Application: getAllSuppliers({ params })
     activate Application
     Application->>Request: getAllSuppliersRequest({ params })
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    Request->>HTTP: apiRequest({ method: 'get', url })
     HTTP->>Transport: consulta GET /api/warehouse/suppliers
     alt Respuesta exitosa
         Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }

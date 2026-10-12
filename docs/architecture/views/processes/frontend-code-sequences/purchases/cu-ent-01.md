@@ -85,6 +85,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `getAllMaterialGoodsReceiptsRequest` | `FileMaterialGoodsReceiptService` | `Request` · `createGoodsReceiptRequests(...)` |
+| `getAllMaterialGoodsReceipts` | `FileMaterialGoodsReceiptController` | `Application` · `createCrudApplication(...)` |
 
 ## Secuencia de implementación
 
@@ -110,10 +111,10 @@ sequenceDiagram
 
     Initiator->>Browser: inicia CU-ENT-01 — Consultar compras de material
     Browser->>View: createGoodsReceiptDatatable(...) y aplicar filtros
-    View->>TableCore: createDataTable({ options: { ajax: { get: getAllGoodsReceipts }, columns } })
+    View->>TableCore: createDataTable({ options: { ajax: { get: getAllMaterialGoodsReceipts }, columns } })
     TableCore-->>View: createDataTable(): DataTable.Api
     Note over TableCore: El callback ajax del núcleo ejecuta options.ajax.get(params)
-    TableCore->>Application: getAllGoodsReceipts(params)
+    TableCore->>Application: getAllMaterialGoodsReceipts(params)
     Application->>Request: getAllMaterialGoodsReceiptsRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: GET /api/warehouse/goods-receipts/materials
@@ -121,7 +122,7 @@ sequenceDiagram
         Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: getAllMaterialGoodsReceiptsRequest(): Promise[AxiosResponse]
-        Application-->>TableCore: getAllGoodsReceipts(): Promise[AxiosResponse]
+        Application-->>TableCore: getAllMaterialGoodsReceipts(): Promise[AxiosResponse]
         TableCore->>Browser: callback(response.data) — filas y conteos de DataTable
     else Error HTTP o de dominio
         Transport-->>HTTP: HTTP de error { code, message }

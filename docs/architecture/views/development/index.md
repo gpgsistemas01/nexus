@@ -66,3 +66,5 @@ sin mantener otra lista equivalente de navegación. Los índices de grupos de se
 sirven para encontrar casos entre muchos archivos y seleccionar su paquete exportable.
 Las tablas de notación, decisiones o cobertura aportan otra pregunta y sólo se conservan
 cuando no reproducen esa misma lista.
+
+Para comenzar a contribuir, consulte la [guía de incorporación](developer-onboarding.md).

@@ -14,6 +14,8 @@ const documentTitles = new Map([
     ['catalogo-unidades-medida', 'Catálogo de unidades de medida'],
     ['clientes', 'Clientes'],
     ['compras', 'Compras'],
+    ['compras-materiales', 'Compras de materiales'],
+    ['compras-consumibles', 'Compras de consumibles'],
     ['informacion-general-y-anexos', 'Información general y anexos'],
     ['movimientos-materiales', 'Movimientos de materiales'],
     ['movimientos-mermas', 'Movimientos de mermas'],
@@ -122,4 +124,18 @@ export const prepareManualImages = (content, directory) => {
             const imagePath = reference.slice(prefix.length).replace(/^((?:\.\.\/)*images\/)(?:areas\/[^/]+\/)?/, `$1areas/${area}/`);
             return `${prefix}${imagePath}`;
         });
+};
+
+const markdownCode = /(^(`{3,}|~{3,})[^\r\n]*\r?\n[\s\S]*?^\2[ \t]*$)|(`+)([\s\S]*?)\3/gm;
+
+export const getMarkdownProse = content => content.replace(markdownCode, '');
+
+export const mapMarkdownProse = (content, transform) => {
+    let offset = 0;
+    let result = '';
+    for (const match of content.matchAll(markdownCode)) {
+        result += transform(content.slice(offset, match.index)) + match[0];
+        offset = match.index + match[0].length;
+    }
+    return result + transform(content.slice(offset));
 };

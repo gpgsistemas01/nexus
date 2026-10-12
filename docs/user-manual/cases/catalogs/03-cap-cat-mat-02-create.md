@@ -1,7 +1,9 @@
 <a id="CAP-CAT-MAT-02-CREATE"></a>
-# 3. CAP-CAT-MAT-02-CREATE — Formulario alta
+# 3. CAP-CAT-MAT-02-CREATE — Formulario de alta
 
 **Casos de uso:** `CU-ALM-02` — Crear material.
+
+**Antes de empezar:** Vamos a registrar un material. Tenga los datos de la operación y confirme con quien le capacita que corresponde darlo de alta; busque primero si ya existe.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -10,9 +12,9 @@
 **Observaciones** y **Activo**. La razón **Stock inicial** es automática. Use **Nuevo material** para
 abrir el formulario y **Guardar** para confirmarlo.
 
-1. Seleccione el botón **Nuevo material** para abrir el formulario de alta. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. Seleccione el botón **Nuevo material** para abrir el formulario de alta. Observe los controles que va a usar:
 
-   ![CAP-CAT-MAT-02-CREATE: formulario alta](../../images/materials/02-form-creation.png)
+   ![CAP-CAT-MAT-02-CREATE: formulario de alta](../../images/materials/02-form-creation.png)
 
 2. Complete **Nombre**; elija opciones en **Buscar proveedor...**, **Buscar presentación...** y **Buscar unidad...**; capture **Stock Mínimo**, **Costo Máximo**, **Base**, **Altura**, **Nueva cantidad** y **Observaciones**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar el material.
@@ -30,3 +32,5 @@ inicial y **Observaciones**. El alta deja la oferta con existencia cero y sin co
 genera un ajuste. Capture la **Cantidad** y el **Costo por Presentación** en el detalle de la compra:
 esos valores se aplican al inventario sólo cuando guarde la compra. Consulte el
 [registro de una compra](../purchases/02-cap-ent-02-create.md) para continuar ese recorrido.
+
+**Compruebe el resultado:** Vuelva al listado y localice el registro guardado. Compruebe sus datos antes de continuar con otra operación.

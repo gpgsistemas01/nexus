@@ -66,7 +66,7 @@ ayuda a resolver los rechazos habituales.
 
 ## Termine la sesión
 
-Use **Menú principal → Cerrar sesión** cuando termine. No comparta su cuenta
+Use **Menú principal → Salir** cuando termine. No comparta su cuenta
 ni incluya contraseñas o datos personales en capturas de soporte.
 
 ## Práctica y comprobación

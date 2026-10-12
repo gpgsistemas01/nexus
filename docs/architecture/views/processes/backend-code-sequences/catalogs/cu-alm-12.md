@@ -76,7 +76,7 @@ sequenceDiagram
     end
     Router->>Controller: editWasteStock(req, res)
     alt Commit confirmado
-        Controller-->>Client: 200 { waste, code }
+        Controller-->>Client: 200 { code }
     else Regla de stock o persistencia rechazada
         Controller-->>Client: status HTTP { code, message }
     end
@@ -123,13 +123,15 @@ sequenceDiagram
     Adjustment->>Prisma: tx.wasteStockAdjustment.update({ where, data: { movement: { connect: { id } } } })
     Adjustment->>Prisma: tx.waste.update({ where, data })
     alt Commit confirmado
-        Prisma-->>Service: $transaction(): Promise[Waste]
-        Service-->>Controller: updateWasteStock(): Promise[Waste]
+        Prisma-->>Service: $transaction(): Promise[undefined]
+        Service-->>Controller: updateWasteStock(): Promise[undefined]
         Controller->>Socket: emitInventoryUpdated()
-        Controller-->>Client: 200 { waste, code }
+        Controller-->>Client: 200 { code }
     else Regla de stock o persistencia rechazada
         Prisma-->>Service: error Prisma
         Service-->>Controller: error de dominio tipado y rollback
         Controller-->>Client: status HTTP { code, message }
     end
 ```
+
+**Pendiente de implementación:** el callback de `updateWasteStock` guarda el ajuste, pero no retorna el resultado de `registerWasteStockAdjustment`. La transacción confirma los cambios y el servicio resuelve `undefined`; por eso JSON omite `waste` y entrega sólo `code`.

@@ -3,6 +3,8 @@
 
 **Casos de uso:** `CU-SAL-08` — Consultar salidas de merma; `CU-SAL-14` — Generar reporte de salidas de merma.
 
+**Antes de empezar:** Vamos a localizar un salida y reconocer sus datos. Tenga el nombre, folio o período que necesita consultar.
+
 **Errores posibles:** [Salidas de merma](../../error-messages.md#errores-salidas-merma).
 
 **Controles que debe usar:** Buscador **Buscar por Folio o Proyecto**; filtros **Fecha de inicio:**, **Fecha de fin:**, **Cliente:**, **Área:**, **Persona:**, **Estado de surtido:** y **Observaciones contiene:**; botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nueva salida**; acciones **Editar registro**, **Surtir detalle** y **Devolver material surtido** por fila.
@@ -20,3 +22,5 @@
    ![CAP-SAL-WAS-07-FILTER: filtro Surtido aplicado](../../images/waste-issues/07-filter-supplied.png)
 
 5. En la tabla, seleccione **Nueva salida**, **Exportar Excel**, **Editar registro**, **Surtir detalle** o **Devolver material surtido**, según la operación requerida.
+
+**Compruebe el resultado:** Confirme que la fila corresponde al nombre o folio buscado. Consultar no modifica datos ni existencias.

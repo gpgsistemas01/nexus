@@ -89,6 +89,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `editWasteIssueDetails` | `FileWasteIssues` | `FileCreateIssueApplication` · `createIssueApplication(...)` |
+| `editWasteIssueDetails` | `FileWasteIssueController` | `Application` · `createCrudApplication(...)` |
 
 ## Secuencia de implementación
 

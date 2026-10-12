@@ -58,12 +58,12 @@ sus responsabilidades, límites ni recorrido recomendado. Ese contenido aparece 
 referenciadas por esos recorridos. Por ejemplo, Almacén no recibe el ajuste absoluto de existencia,
 usuarios, edición de clientes y proveedores, catálogos auxiliares o movimientos; los
 formularios contextuales usados dentro de compras o salidas permanecen en el documento operativo
-que los presenta. Por ello, `compras` incorpora el alta contextual de proveedor y cada documento
+que los presenta. Por ello, `compras-materiales` y `compras-consumibles` incorporan el alta contextual de proveedor y cada documento
 de salidas incorpora el alta contextual de cliente; estos formularios se enseñan en su contexto operativo, además de las consultas y altas
 permitidas desde los listados **Proveedores** y **Clientes**.
 
 Los reportes tampoco producen un documento genérico: el reporte de inventario queda en
-`almacen-materiales`, `almacen-consumibles` o `almacen-mermas`; el de compras en `compras`; los de salidas en su destino;
+`almacen-materiales`, `almacen-consumibles` o `almacen-mermas`; el de compras en `compras-materiales` o `compras-consumibles`; los de salidas en su destino;
 los de personas, usuarios, clientes y proveedores en el documento del mismo módulo; y cada reporte
 de movimientos en `movimientos-materiales` o `movimientos-mermas`. Así, la captura del diálogo de
 exportación permanece junto a la consulta y los filtros cuyo alcance descarga.
@@ -80,3 +80,5 @@ Promueva los PNG revisados desde `build/docs/screenshots/areas/<área>/` a
 `docs/user-manual/images/areas/<área>/`, conservando subcarpetas y nombres. No copie una
 captura de Sistemas a Almacén para completar un faltante. Documente el rol de la cuenta
 ficticia utilizada: compartir área no garantiza que dos usuarios tengan los mismos permisos.
+
+La selección de capítulos por perfil permanece centralizada en `scripts/manualPublicationConfig.js`. `prepareManualSource` selecciona los bloques `manual:almacen` o `manual:sistemas` y vincula cada imagen con su ID del inventario; no publica las acciones exclusivas del otro perfil. Los identificadores `CAP-*` se conservan como anclas y la narración entregada muestra títulos e instrucciones de operación.

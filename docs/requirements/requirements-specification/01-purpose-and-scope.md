@@ -1,5 +1,7 @@
 # 1. Propósito y alcance
 
+Este documento permite a responsables de negocio, personal de almacén, Sistemas y Dirección acordar qué resultados debe ofrecer Nexus y cómo decidir si se cumplen. Los nombres técnicos se mantienen en la evidencia; una implementación existente no equivale a aceptación del negocio.
+
 Este documento, junto con las [fichas de casos de uso](../use-cases/index.md), define una
 propuesta versionada y revisable de capacidades, reglas y atributos de calidad sin
 confundir tres conceptos diferentes:

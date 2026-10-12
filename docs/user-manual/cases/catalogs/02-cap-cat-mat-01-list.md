@@ -3,6 +3,8 @@
 
 **Casos de uso:** `CU-AUT-02` — Cerrar sesión; `CU-ALM-01` — Consultar materiales e inventario; `CU-ALM-06` — Generar reporte de inventario de materiales.
 
+**Antes de empezar:** Vamos a localizar un material y reconocer sus datos. Tenga el nombre, folio o período que necesita consultar.
+
 **Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Controles que debe usar:** Buscador **Buscar por Material**, filtro **Proveedor**, botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nuevo material**, además de las acciones de cada fila.
@@ -18,3 +20,5 @@
 
 La columna **Activo**, ubicada antes de **Acciones**, se muestra en la tabla únicamente al
 administrador del sistema; los demás usuarios autorizados consultan el inventario sin esa columna.
+
+**Compruebe el resultado:** Confirme que la fila corresponde al nombre o folio buscado. Consultar no modifica datos ni existencias.

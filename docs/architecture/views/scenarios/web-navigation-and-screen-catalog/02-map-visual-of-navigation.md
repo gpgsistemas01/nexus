@@ -59,8 +59,7 @@ el cliente HTTP gestiona su propia renovación. Las fuentes son `homeWebRoute.js
 
 **Identificador:** `DIA-ARQ-NAV-001`. El mapa muestra la navegación operativa base del
 actor. Las etiquetas de las flechas indican el permiso que hace visible cada destino.
-Los accesos independientes de administración, movimientos, clientes, proveedores y
-catálogos auxiliares no forman parte de este recorrido.
+Movimientos, Usuarios y catálogos auxiliares son administrativos. Clientes y Proveedores permiten consulta y alta a las cuentas autorizadas de Almacén; edición, estado y reportes comerciales corresponden al administrador.
 
 ```mermaid
 flowchart LR
@@ -77,6 +76,8 @@ flowchart LR
     issues -->|"goods:issues-page-view"| consumableIssues["Consumibles<br/>/salidas/consumibles"]
     issues -->|"waste:issues-page-view"| wasteIssues["Mermas<br/>/salidas/mermas"]
     menu -->|"persons:page-view"| persons["Personas<br/>/personas"]
+    menu -->|"clients:page-view"| clients["Clientes<br/>/clientes"]
+    menu -->|"suppliers:page-view"| suppliers["Proveedores<br/>/proveedores"]
 ```
 
 ## Administrador del sistema

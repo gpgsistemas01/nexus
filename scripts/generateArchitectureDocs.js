@@ -1,6 +1,8 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { getSequenceCodeReferenceFailures } from './architectureDiagramUtils.js';
+import { getExpressRouteDeclarations } from './expressRouteUtils.js';
 import { getDiagramFileCoverageErrors, getSequenceLifelineErrors, getSequenceParticipantSources, getSequenceStructureErrors } from './sequenceDiagramUtils.js';
 
 const ROOT = process.cwd();
@@ -461,12 +463,18 @@ const validateUseCaseDiagramCoverage = async () => {
     }
 
 
+    const registeredApiRoutes = await getRoutes('api');
     const documentationFiles = (await walk(path.join(ROOT, 'docs')))
         .filter((file) => file.endsWith('.md'));
     for (const file of documentationFiles) {
         const name = toPosix(path.relative(ROOT, file));
         const source = await readFile(file, 'utf8');
         for (const block of getMermaidBlocks(source).filter((body) => body.startsWith('sequenceDiagram\n'))) {
+            if (name.startsWith('docs/architecture/')) {
+                failures.push(...getSequenceCodeReferenceFailures({
+                    body: source, sequence: block, sourceContents, routes: registeredApiRoutes
+                }).map(failure => `${name}: ${failure}`));
+            }
             if (name.startsWith('docs/architecture/views/processes/')
                 && !name.includes('-code-sequences/')) {
                 for (const error of [
@@ -518,10 +526,10 @@ const getRoutes = async (kind) => {
     const routes = [];
     for (const { mount, file } of mounts) {
         const source = await readFile(file, 'utf8');
-        for (const match of source.matchAll(/router\.(get|post|put|patch|delete)\(\s*['`]([^'`]+)['`]/g)) {
+        for (const { method, route } of getExpressRouteDeclarations(source)) {
             routes.push({
-                method: match[1].toUpperCase(),
-                route: joinRoute(mount, match[2]),
+                method,
+                route: joinRoute(mount, route),
                 file: toPosix(path.relative(ROOT, file))
             });
         }

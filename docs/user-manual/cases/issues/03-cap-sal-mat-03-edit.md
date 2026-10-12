@@ -1,5 +1,5 @@
 <a id="CAP-SAL-MAT-03-EDIT"></a>
-# 3. CAP-SAL-MAT-03-EDIT — Edicion encabezado
+# 3. CAP-SAL-MAT-03-EDIT — Editar encabezado
 
 **Casos de uso:** `CU-SAL-03` — Editar encabezado de salida de material; `CU-SAL-04` — Editar detalles de material de una salida.
 
@@ -11,7 +11,7 @@
 
 1. En la fila de la salida, seleccione **Editar registro**. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-SAL-MAT-03-EDIT: edicion encabezado](../../images/material-issues/03-edit-header.png)
+   ![CAP-SAL-MAT-03-EDIT: edición de encabezado](../../images/material-issues/03-edit-header.png)
 
 2. Modifique los selectores y campos indicados. Mientras la salida esté pendiente, para incorporar un detalle elija una opción en **Buscar material...**, complete **Cantidad**, seleccione **Agregar** y compruebe que el renglón aparezca en la tabla; repita la operación cuando necesite más detalles. Después del primer surtido, los detalles quedan deshabilitados.
 3. Revise la tabla y seleccione **Actualizar** para guardar o **Regresar** para salir sin confirmar.

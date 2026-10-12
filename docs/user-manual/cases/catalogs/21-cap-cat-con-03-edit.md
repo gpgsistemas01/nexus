@@ -3,6 +3,8 @@
 
 **Casos de uso:** `CU-ALM-19` — Editar consumible.
 
+**Antes de empezar:** Vamos a actualizar un consumible existente. Tenga identificado el registro correcto y los datos que necesita corregir.
+
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion),
 [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -16,3 +18,5 @@
 4. Seleccione **Actualizar**.
 
 La edición no cambia el tipo del registro ni lo traslada al inventario de materiales.
+
+**Compruebe el resultado:** Vuelva a abrir el registro y compruebe los cambios confirmados.

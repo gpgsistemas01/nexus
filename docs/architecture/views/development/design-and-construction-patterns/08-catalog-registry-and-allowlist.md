@@ -66,3 +66,5 @@ Los pasos y alternativas se consultan en las secuencias de
 [frontend](../../processes/frontend-code-sequences/catalogs/index.md). Aquí se conserva
 la decisión de configuración; los mapas del módulo y de reutilización amplían sus
 colaboradores sin repetirlos como un segundo diagrama del patrón.
+
+**Pendiente de implementación:** `getCatalogEntriesRequest({ params })` utiliza `params.catalog` para construir la URL, pero no reenvía los filtros a `apiRequest`. Las secuencias describen esa petición actual; el catálogo genérico no debe documentarse como si enviara esos criterios.

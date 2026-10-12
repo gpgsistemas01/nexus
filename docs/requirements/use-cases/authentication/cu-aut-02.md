@@ -11,3 +11,5 @@
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La sesión queda cerrada en ese navegador; el actor debe volver a iniciar sesión para acceder al contenido protegido.<br>2. **Fallo:** El sistema no debe presentar contenido protegido sin volver a comprobar una sesión válida. |
 | Requisitos relacionados | `RF-AUT-003`, `RN-001`. |
+
+El cierre disponible elimina el acceso conservado por ese navegador. La invalidación central de credenciales previamente emitidas permanece pendiente; por eso `RF-AUT-003` se registra como Parcial. La brecha técnica se mantiene en [acceso y auditoría](../../../architecture/views/logical/02-identity-access-and-audit.md).

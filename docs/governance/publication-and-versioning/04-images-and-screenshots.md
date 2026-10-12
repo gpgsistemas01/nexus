@@ -5,7 +5,7 @@ el orden narrativo, no la identidad del requisito. Toda imagen debe tener texto 
 referencia desde el contenido y resolución legible; no debe contener credenciales ni datos
 personales reales. Requisitos, arquitectura y pruebas usan sus propias carpetas.
 
-El manual usa `docs/user-manual/images/`. `scripts/captureManualScreenshots.js` automatiza
+El manual publica imágenes revisadas bajo `docs/user-manual/images/areas/<área>/`. Las capturas recién generadas permanecen en `build/docs/screenshots/areas/<área>/` hasta su revisión; no se incorporan automáticamente a las fuentes. `scripts/captureManualScreenshots.js` automatiza
 capturas con Playwright a partir de un estado de autenticación de prueba. El script recorre un
 inventario explícito de módulos, espera un elemento estable y sólo después captura. Los modales
 requieren una acción propia; no se debe usar una demora arbitraria. La automatización es
@@ -18,7 +18,7 @@ Playwright es una herramienta opcional de desarrollo y no se incluye en producci
 `DOCS_BASE_URL` y, para páginas protegidas, `DOCS_ALMACEN_STORAGE_STATE` y
 `DOCS_SISTEMAS_STORAGE_STATE` con sesiones ficticias separadas por área. El inventario cubre
 los listados principales; cada modal o paso nuevo agrega al mismo script una acción localizada y
-otra captura numerada. El acceso puede capturarse sin sesión; el resto debe fallar si la cuenta no
+otra captura con ID único y estable. El sufijo de área diferencia interfaces de Almacén y Sistemas; la numeración del archivo sólo expresa el orden. `scripts/manualScreenshotInventory.js` es la fuente compartida del inventario que usan captura y exportación. El acceso puede capturarse sin sesión; el resto debe fallar si la cuenta no
 posee el permiso que el manual pretende demostrar.
 
 Playwright **no se ejecuta junto con Pandoc**. Primero, y sólo cuando cambian las pantallas,

@@ -122,6 +122,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `registerConsumableGoodsReceiptRequest` | `FileConsumableGoodsReceiptService` | `Request` · `createGoodsReceiptRequests(...)` |
+| `registerConsumableGoodsReceipt` | `FileConsumableGoodsReceiptController` | `Application` · `createCrudApplication(...)` |
 
 ## Coordinación de la interfaz
 
@@ -165,10 +166,10 @@ sequenceDiagram
     end
         Note over Form: dataset.submitting = 'true', botón submit deshabilitado
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update: registerGoodsReceipt })
-        FormUtils->>Application: registerGoodsReceipt({ formData })
+        View->>FormUtils: handleSubmit({ form, formData, create, update: registerConsumableGoodsReceipt })
+        FormUtils->>Application: registerConsumableGoodsReceipt({ formData })
         alt Respuesta exitosa
-            Application-->>FormUtils: registerGoodsReceipt(): Promise[{ message }]
+            Application-->>FormUtils: registerConsumableGoodsReceipt(): Promise[{ message }]
         else Error HTTP o de dominio
             Application-->>FormUtils: error propagado
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva el formulario
@@ -197,7 +198,7 @@ sequenceDiagram
     Note over Request: Request configurado
     activate FormUtils
     deactivate FormUtils
-        FormUtils->>Application: registerGoodsReceipt({ formData })
+        FormUtils->>Application: registerConsumableGoodsReceipt({ formData })
         Application->>Request: registerConsumableGoodsReceiptRequest({ data: formData })
         Request->>HTTP: apiRequest({ method: 'post', url, data })
         HTTP->>Transport: POST /api/warehouse/goods-receipts/consumables
@@ -207,7 +208,7 @@ sequenceDiagram
             Request-->>Application: registerConsumableGoodsReceiptRequest(): Promise[AxiosResponse]
             Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
             FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
-            Application-->>FormUtils: registerGoodsReceipt(): Promise[{ message }]
+            Application-->>FormUtils: registerConsumableGoodsReceipt(): Promise[{ message }]
         else Error HTTP o de dominio
             Transport-->>HTTP: HTTP de error { code, message }
             opt No se inicia renovación: status distinto de 401 o request._retry

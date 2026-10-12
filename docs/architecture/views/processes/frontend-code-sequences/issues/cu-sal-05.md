@@ -128,6 +128,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `editMaterialGoodsIssueDetailsRequest` | `FileMaterialGoodsIssueService` | `Request` · `createGoodsIssueRequests(...)` |
+| `editMaterialGoodsIssueDetails` | `FileMaterialGoodsIssueController` | `Application` · `createCrudApplication(...)` |
 
 ## Coordinación de la interfaz
 
@@ -173,10 +174,10 @@ sequenceDiagram
     end
         Note over Form: dataset.submitting = 'true', botón submit deshabilitado
         Form->>IssueUI: sendRequest({ form, formData }) — callback configurado
-        IssueUI->>FormUtils: handleSubmit({ form, formData, create, update: editGoodsIssueDetails })
-        FormUtils->>Application: editGoodsIssueDetails({ id, formData })
+        IssueUI->>FormUtils: handleSubmit({ form, formData, create, update: editMaterialGoodsIssueDetails })
+        FormUtils->>Application: editMaterialGoodsIssueDetails({ id, formData })
         alt Respuesta exitosa
-            Application-->>FormUtils: editGoodsIssueDetails(): Promise[{ message }]
+            Application-->>FormUtils: editMaterialGoodsIssueDetails(): Promise[{ message }]
         else Error HTTP o de dominio
             Application-->>FormUtils: error propagado
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva el formulario
@@ -203,7 +204,7 @@ sequenceDiagram
 
     Note over Application: Closure configurada
     Note over Request: Request configurado
-        FormUtils->>Application: editGoodsIssueDetails({ id, formData })
+        FormUtils->>Application: editMaterialGoodsIssueDetails({ id, formData })
         Application->>Request: editMaterialGoodsIssueDetailsRequest({ id, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: PATCH /api/warehouse/goods-issues/materials/:id/details
@@ -213,7 +214,7 @@ sequenceDiagram
             Request-->>Application: editMaterialGoodsIssueDetailsRequest(): Promise[AxiosResponse]
             Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
             FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
-            Application-->>FormUtils: editGoodsIssueDetails(): Promise[{ message }]
+            Application-->>FormUtils: editMaterialGoodsIssueDetails(): Promise[{ message }]
         else Error HTTP o de dominio
             Transport-->>HTTP: HTTP de error { code, message }
             opt No se inicia renovación: status distinto de 401 o request._retry

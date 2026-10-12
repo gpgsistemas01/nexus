@@ -9,7 +9,7 @@ DOCX y PDF. Se aplican estas reglas:
 | Imagen versionada, incluida una captura | `![texto alternativo](ruta/relativa.png)` dentro de la sección que la explica. | Una ruta absoluta de la estación de trabajo o un enlace a la propia imagen. |
 | Diagrama Mermaid | Un encabezado descriptivo seguido de un bloque cercado `mermaid`. El encabezado es la referencia y se convierte en la leyenda al exportar. | Una ruta hacia el PNG generado: ese archivo no existe en las fuentes versionadas y lo crea el exportador bajo `build/docs/diagrams/`. |
 | Referencia hacia otra sección del mismo archivo | Un enlace Markdown al ancla, por ejemplo `[preparación](#preparar-las-herramientas)`. | Una ruta al archivo fuente. |
-| Referencia hacia otro Markdown incluido en el paquete | Un enlace Markdown relativo, por ejemplo `[casos de uso](requirements/use-cases/index.md)`. El exportador lo convierte en una referencia interna única al ensamblar el paquete. | Un enlace hacia el archivo `.md` dentro del DOCX o PDF. |
+| Referencia hacia otro Markdown incluido en el paquete | Un enlace Markdown relativo, por ejemplo `[casos de uso](../../requirements/use-cases/index.md)`. El exportador lo convierte en una referencia interna única al ensamblar el paquete. | Un enlace hacia el archivo `.md` dentro del DOCX o PDF. |
 | Sitio externo | Una URL absoluta `https://` o un enlace `mailto:`. | Una ruta local o dependiente de la estación de trabajo. |
 | Markdown publicado en otro archivo de la misma ejecución | Un enlace Markdown relativo hacia la fuente. | Una ruta escrita manualmente hacia `build/`. |
 | Código u otro recurso local no incluido en el paquete | Puede conservar el enlace relativo en la fuente para navegar por el repositorio; al exportar se presenta sólo su etiqueta. | Un hipervínculo que el lector del DOCX o PDF no pueda abrir. |
@@ -48,8 +48,7 @@ recursos; esas rutas no se escriben en los Markdown originales. DOCX y PDF incor
 dentro del documento final.
 
 Para los bloques Mermaid, el exportador toma el encabezado Markdown más cercano y lo convierte en
-la leyenda de la figura; para las capturas, el texto alternativo conserva el identificador
-`CAP-*` y la operación mostrada. Pandoc utiliza esas leyendas como figuras en DOCX y PDF. Al
+la leyenda de la figura; para las capturas, la fuente conserva el identificador `CAP-*` y la operación mostrada. El manual publicado presenta una leyenda comprensible y conserva el ID en su ancla interna. Pandoc utiliza esas leyendas como figuras en DOCX y PDF. Al
 generar DOCX, el exportador crea una tabla de contenido y un **Índice de imágenes** estáticos y
 navegables a partir de los títulos y leyendas preparados; no deja campos pendientes de
 actualización al abrir el archivo en Word. Las leyendas se numeran de forma correlativa como

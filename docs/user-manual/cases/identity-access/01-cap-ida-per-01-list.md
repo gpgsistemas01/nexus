@@ -3,6 +3,8 @@
 
 **Casos de uso:** `CU-IDA-01` — Consultar personas; `CU-IDA-04` — Generar reporte de personas.
 
+**Antes de empezar:** Vamos a localizar un persona y reconocer sus datos. Tenga el nombre, folio o período que necesita consultar.
+
 **Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Controles que debe usar:** Buscador **Buscar por Nombre**; filtros **Área** y **Rol**; botones **Buscar / filtrar**, **Limpiar filtros**, **Exportar Excel** y **Nueva persona**, y acción **Editar registro** por fila.
@@ -18,3 +20,5 @@
 
    <a id="CAP-IDA-PER-04-EXPORT"></a>
    ![CAP-IDA-PER-04-EXPORT: modal para exportar personas](../../images/people/04-export-report.png)
+
+**Compruebe el resultado:** Confirme que la fila corresponde al nombre o folio buscado. Consultar no modifica datos ni existencias.

@@ -120,6 +120,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `correctMaterialGoodsReceiptDetailRequest` | `FileMaterialGoodsReceiptService` | `Request` · `createGoodsReceiptRequests(...)` |
+| `correctMaterialGoodsReceiptDetail` | `FileMaterialGoodsReceiptController` | `Application` · `createCrudApplication(...)` |
 
 ## Coordinación de la interfaz
 
@@ -171,9 +172,9 @@ sequenceDiagram
         Form->>View: sendRequest({ form, formData }) — callback configurado
         View->>FileSwalComponent: notifications.showConfirmation(...) sólo si quantity o costPerUnitType cambiaron
         opt Corrección confirmada
-            View->>Application: correctGoodsReceiptDetail({ id, detailId, formData })
+            View->>Application: correctMaterialGoodsReceiptDetail({ id, detailId, formData })
             alt Respuesta exitosa
-                Application-->>View: correctGoodsReceiptDetail(): Promise[{ message, data: correction }]
+                Application-->>View: correctMaterialGoodsReceiptDetail(): Promise[{ message, data: correction }]
                 View->>FileSwalComponent: notifications.showSuccess(response.message)
                 View->>Browser: dispatchEvent(new CustomEvent('goods-receipt-correction:applied', { bubbles: true, detail: response.data }))
                 Browser-)Modal: evento goods-receipt-correction:applied — handler registrado con on(...)
@@ -211,7 +212,7 @@ sequenceDiagram
     activate View
     deactivate View
         opt Corrección confirmada
-            View->>Application: correctGoodsReceiptDetail({ id, detailId, formData })
+            View->>Application: correctMaterialGoodsReceiptDetail({ id, detailId, formData })
             Application->>Request: correctMaterialGoodsReceiptDetailRequest({ id, detailId, data: formData })
             Request->>HTTP: apiRequest({ method: 'patch', url, data })
             HTTP->>Transport: PATCH /api/warehouse/goods-receipts/materials/:id/details/:detailId/corrections
@@ -221,7 +222,7 @@ sequenceDiagram
                 Request-->>Application: correctMaterialGoodsReceiptDetailRequest(): Promise[AxiosResponse]
                 Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
                 FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
-                Application-->>View: correctGoodsReceiptDetail(): Promise[{ message, data: correction }]
+                Application-->>View: correctMaterialGoodsReceiptDetail(): Promise[{ message, data: correction }]
             else Error HTTP o de dominio
                 Transport-->>HTTP: HTTP de error { code, message }
                 opt No se inicia renovación: status distinto de 401 o request._retry

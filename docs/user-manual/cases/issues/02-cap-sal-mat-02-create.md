@@ -1,5 +1,5 @@
 <a id="CAP-SAL-MAT-02-CREATE"></a>
-# 2. CAP-SAL-MAT-02-CREATE — Formulario registro
+# 2. CAP-SAL-MAT-02-CREATE — Formulario de registro
 
 **Casos de uso:** `CU-SAL-02` — Crear salida de material.
 
@@ -11,7 +11,7 @@
 
 1. Seleccione **Nueva salida** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-SAL-MAT-02-CREATE: formulario registro](../../images/material-issues/02-form-registration.png)
+   ![CAP-SAL-MAT-02-CREATE: formulario de registro](../../images/material-issues/02-form-registration.png)
 
 2. Elija opciones en **Buscar cliente...**, **Buscar asesor...**, **Buscar área...** y **Buscar solicitante...**.
 3. Complete **Número de proyecto**, **Fecha y hora de solicitud:** y **Observaciones**.

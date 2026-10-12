@@ -128,6 +128,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `registerMaterialGoodsIssueRequest` | `FileMaterialGoodsIssueService` | `Request` · `createGoodsIssueRequests(...)` |
+| `registerMaterialGoodsIssue` | `FileMaterialGoodsIssueController` | `Application` · `createCrudApplication(...)` |
 
 ## Coordinación de la interfaz
 
@@ -172,10 +173,10 @@ sequenceDiagram
     end
         Note over Form: dataset.submitting = 'true', botón submit deshabilitado
         Form->>IssueUI: sendRequest({ form, formData }) — callback configurado
-        IssueUI->>FormUtils: handleSubmit({ form, formData, create, update: registerGoodsIssue })
-        FormUtils->>Application: registerGoodsIssue({ formData })
+        IssueUI->>FormUtils: handleSubmit({ form, formData, create, update: registerMaterialGoodsIssue })
+        FormUtils->>Application: registerMaterialGoodsIssue({ formData })
         alt Respuesta exitosa
-            Application-->>FormUtils: registerGoodsIssue(): Promise[{ message }]
+            Application-->>FormUtils: registerMaterialGoodsIssue(): Promise[{ message }]
         else Error HTTP o de dominio
             Application-->>FormUtils: error propagado
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva el formulario
@@ -204,7 +205,7 @@ sequenceDiagram
     Note over Request: Request configurado
     activate FormUtils
     deactivate FormUtils
-        FormUtils->>Application: registerGoodsIssue({ formData })
+        FormUtils->>Application: registerMaterialGoodsIssue({ formData })
         Application->>Request: registerMaterialGoodsIssueRequest({ data: formData })
         Request->>HTTP: apiRequest({ method: 'post', url, data })
         HTTP->>Transport: POST /api/warehouse/goods-issues/materials
@@ -214,7 +215,7 @@ sequenceDiagram
             Request-->>Application: registerMaterialGoodsIssueRequest(): Promise[AxiosResponse]
             Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
             FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
-            Application-->>FormUtils: registerGoodsIssue(): Promise[{ message }]
+            Application-->>FormUtils: registerMaterialGoodsIssue(): Promise[{ message }]
         else Error HTTP o de dominio
             Transport-->>HTTP: HTTP de error { code, message }
             opt No se inicia renovación: status distinto de 401 o request._retry

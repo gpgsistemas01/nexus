@@ -146,11 +146,11 @@ sequenceDiagram
         FormUtils->>Application: editWasteStock({ id, formData })
         activate Application
         alt Respuesta exitosa
-            Application-->>FormUtils: editWasteStock(): Promise[{ message: string, data: Waste }]
+            Application-->>FormUtils: editWasteStock(): Promise[{ message: string, data: undefined }]
             FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
             Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
-            View-->>Browser: DOM o DataTable actualizado con response.data
+            FormUtils-->>View: handleSubmit(): Promise[undefined] — cierre y recarga del listado
+            View-->>Browser: listado recargado, no se recibe una entidad actualizada
         else Respuesta rechazada
             Application-->>FormUtils: throw { status: number, data: Object | null, message: string, raw: Error }
             FormUtils-->>View: error propagado por handleSubmit()
@@ -184,12 +184,12 @@ sequenceDiagram
     Request->>HTTP: apiRequest({ method: 'patch', url, data })
     HTTP->>Transport: envía PATCH /api/warehouse/wastes/:id/stock
     alt Respuesta exitosa
-        Transport-->>HTTP: HTTP 2xx — respuesta del endpoint
+        Transport-->>HTTP: HTTP 200 { code }
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: editWasteStockRequest(): Promise[AxiosResponse]
         Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
         FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
-        Application-->>FormUtils: editWasteStock(): Promise[{ message: string, data: Waste }]
+        Application-->>FormUtils: editWasteStock(): Promise[{ message: string, data: undefined }]
     else Respuesta rechazada
         Transport-->>HTTP: HTTP de error — respuesta del endpoint
         opt No se inicia renovación: status distinto de 401 o request._retry
@@ -202,3 +202,5 @@ sequenceDiagram
     end
     deactivate Application
 ```
+
+El ajuste se conserva, pero el endpoint actual no retorna `waste`: el wrapper de éxito contiene `data: undefined`. La recarga del listado permite consultar la existencia guardada. Véase el pendiente de retorno en la secuencia backend `CU-ALM-12`.

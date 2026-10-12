@@ -10,6 +10,8 @@
 <a id="consultar"></a>
 ## Consultar una salida — CU-SAL-15
 
+![CAP-SAL-CON-01-LIST: listado de salidas de consumibles](../../images/consumable-issues/01-list.png)
+
 1. Abra **Salidas → Consumibles**. El listado corresponde a consumibles; los materiales tienen su propia opción en el menú.
 2. Busque un folio conocido o aplique los filtros disponibles con **Buscar / filtrar**.
 3. Abra el registro y revise cliente, proyecto, artículos y estado. Consultarlo no descuenta existencias. Una salida **Cancelada** permanece disponible en consulta, con los campos bloqueados.
@@ -17,6 +19,8 @@
 
 <a id="crear"></a>
 ## Registrar la solicitud — CU-SAL-16
+
+![CAP-SAL-CON-02-CREATE: registro de una solicitud de consumibles](../../images/consumable-issues/02-form-registration.png)
 
 1. Seleccione **Nueva salida** y complete cliente, asesor, área, solicitante, proyecto, fecha y observaciones según la solicitud.
 2. Si el cliente no existe, use **Nuevo cliente** en el selector y siga [crear cliente](../catalogs/11-cap-cat-cli-02-create.md), correspondiente a `CU-CAT-06`. Después seleccione el cliente registrado y continúe la solicitud. Para el Personal de almacén, esta alta se realiza desde la operación; el listado independiente de clientes corresponde al administrador.
@@ -26,6 +30,8 @@
 
 <a id="editar-encabezado"></a>
 ## Editar el encabezado — CU-SAL-17
+
+![CAP-SAL-CON-03-EDIT: edición de una salida de consumibles](../../images/consumable-issues/03-edit-header.png)
 
 1. Localice la salida y abra **Editar registro**. La salida debe admitir edición y no estar cancelada.
 2. Corrija únicamente los datos del encabezado habilitados, como participantes, proyecto, fecha u observaciones. Si ya hubo surtimiento, los detalles quedan en consulta.
@@ -42,6 +48,8 @@
 <a id="surtir"></a>
 ## Surtir consumibles — CU-SAL-19
 
+![CAP-SAL-CON-04-SUPPLY: surtido de consumibles](../../images/consumable-issues/04-supply-details.png)
+
 1. Confirme qué consumibles se entregarán físicamente y revise sus existencias.
 2. Desde el listado, seleccione **Surtir detalle**. Marque **Surtir** en cada renglón pendiente que corresponda y complete **Cantidad de proyecto**.
 3. Revise los renglones y seleccione **Surtir**. Cada casilla entrega toda la cantidad pendiente del renglón; **Cantidad de proyecto** es una referencia de consumo y no reemplaza esa cantidad. Debe existir saldo suficiente para entregar cada renglón seleccionado.
@@ -49,6 +57,8 @@
 
 <a id="devolver"></a>
 ## Registrar un retorno — CU-SAL-20
+
+![CAP-SAL-CON-05-RETURN: devolución de un consumible surtido](../../images/consumable-issues/05-return-detail.png)
 
 Esta operación se realiza cuando la salida completa está **Surtida** y los artículos han regresado físicamente. No está habilitada mientras la salida permanezca **Surtido parcial**.
 
@@ -60,8 +70,16 @@ Esta operación se realiza cuando la salida completa está **Surtida** y los art
 <a id="exportar"></a>
 ## Obtener el reporte — CU-SAL-21
 
+![CAP-REP-SAL-CON-06-EXPORT: reporte de salidas de consumibles](../../images/consumable-issues/06-export-report.png)
+
 1. En **Salidas → Consumibles**, seleccione **Exportar Excel**.
 2. Para conservar los filtros del listado, elija **Personalizado: usar filtros aplicados**. Para un reporte mensual, elija **Mes actual** u **Otro mes** y compruebe el periodo.
 3. Revise el archivo descargado: debe corresponder al alcance elegido y contener salidas de consumibles. La exportación no modifica existencias.
 
 **Compruebe el resultado:** Relacione siempre el folio, el estado y la existencia con lo que acaba de hacer. Si la conexión se interrumpe después de confirmar, vuelva a consultar el documento antes de repetir la operación.
+
+## Consultar una salida cancelada
+
+![CAP-SAL-CON-08-VIEW: consulta de salida cancelada](../../images/consumable-issues/08-query-cancelled.png)
+
+Abra una salida cancelada para revisar sus datos. El formulario permanece en consulta.

@@ -18,7 +18,7 @@ describe('manual screenshot inventory', () => {
     expect(output).toContain('| 1 | almacen | `CAP-AUT-01-LOGIN-ALMACEN` |');
     expect(output).toContain('| 90 | almacen | `CAP-ENT-CON-01-LIST-ALMACEN` |');
     expect(output).toContain('| 101 | sistemas | `CAP-REP-ENT-CON-06-EXPORT-SISTEMAS` |');
-    expect(output).toContain('| 161 | sistemas | `CAP-ERR-404-NOT-FOUND-SISTEMAS` |');
+    expect(output).toContain('| 179 | sistemas | `CAP-ERR-404-NOT-FOUND-SISTEMAS` |');
   });
 
   it.each(['almacen', 'sistemas'])('limits the inventory to the %s area', area => {
@@ -37,6 +37,8 @@ describe('manual screenshot inventory', () => {
     expect(warehouseOutput).toContain('CAP-CAT-CLI-02-CREATE-ALMACEN');
     expect(warehouseOutput).toContain('CAP-IDA-PER-00-NAVIGATION-ALMACEN');
     expect(warehouseOutput).toContain('CAP-CAT-CON-04-REMOVE-ALMACEN');
+    expect(warehouseOutput).toContain('CAP-SAL-CON-05-RETURN-ALMACEN');
+    expect(systemsOutput).toContain('CAP-SAL-CON-05-RETURN-SISTEMAS');
     expect(warehouseOutput).not.toContain('CAP-CAT-CON-05-STOCK-SISTEMAS');
     expect(warehouseOutput).not.toContain('CAP-CAT-SUP-03-EDIT-SISTEMAS');
     expect(warehouseOutput).not.toContain('CAP-CAT-CLI-04-EXPORT-SISTEMAS');

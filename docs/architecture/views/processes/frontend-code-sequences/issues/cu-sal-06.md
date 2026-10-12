@@ -120,6 +120,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `returnMaterialGoodsIssueDetailRequest` | `FileMaterialGoodsIssueService` | `Request` · `createGoodsIssueRequests(...)` |
+| `returnMaterialGoodsIssueDetail` | `FileMaterialGoodsIssues` | `Application` · `createCrudApplication(...)` |
 
 ## Coordinación de la interfaz
 
@@ -165,9 +166,9 @@ sequenceDiagram
     end
         Note over Form: dataset.submitting = 'true', botón submit deshabilitado
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>Application: returnGoodsIssueDetail({ id, detailId, formData })
+        View->>Application: returnMaterialGoodsIssueDetail({ id, detailId, formData })
         alt Respuesta exitosa
-            Application-->>View: returnGoodsIssueDetail(): Promise[{ message, data: goodsIssueReturn }]
+            Application-->>View: returnMaterialGoodsIssueDetail(): Promise[{ message, data: goodsIssueReturn }]
             View->>FileSwalComponent: notifications.showSuccess(response.message)
             View->>FileBaseInstance: initMdbModal(getModal()).hide()
             View->>Browser: window.location.reload()
@@ -199,7 +200,7 @@ sequenceDiagram
     Note over Request: Request configurado
     activate View
     deactivate View
-        View->>Application: returnGoodsIssueDetail({ id, detailId, formData })
+        View->>Application: returnMaterialGoodsIssueDetail({ id, detailId, formData })
         Application->>Request: returnMaterialGoodsIssueDetailRequest({ id, detailId, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: PATCH /api/warehouse/goods-issues/materials/:id/details/:detailId/returns
@@ -209,7 +210,7 @@ sequenceDiagram
             Request-->>Application: returnMaterialGoodsIssueDetailRequest(): Promise[AxiosResponse]
             Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
             FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
-            Application-->>View: returnGoodsIssueDetail(): Promise[{ message, data: goodsIssueReturn }]
+            Application-->>View: returnMaterialGoodsIssueDetail(): Promise[{ message, data: goodsIssueReturn }]
         else Error HTTP o de dominio
             Transport-->>HTTP: HTTP de error { code, message }
             opt No se inicia renovación: status distinto de 401 o request._retry

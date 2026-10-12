@@ -32,9 +32,9 @@ detalle activo, Nexus deriva la compra como cancelada y desde entonces la presen
 consulta. Abrir o editar el encabezado no cambia esos estados.
 
 1. [1. CAP-ENT-01-LIST — Listado](01-cap-ent-01-list.md)
-2. [2. CAP-ENT-02-CREATE — Formulario registro](02-cap-ent-02-create.md)
-3. [3. CAP-ENT-03-EDIT — Edicion compra](03-cap-ent-03-edit.md)
-4. [4. CAP-ENT-04-CORRECT — Correccion detalle](04-cap-ent-04-correct.md)
+2. [2. CAP-ENT-02-CREATE — Formulario de registro](02-cap-ent-02-create.md)
+3. [3. CAP-ENT-03-EDIT — Editar compra](03-cap-ent-03-edit.md)
+4. [4. CAP-ENT-04-CORRECT — Corregir detalle](04-cap-ent-04-correct.md)
 5. [5. CAP-REP-ENT-05-EXPORT — Exportar reporte](05-cap-rep-ent-05-export.md)
 6. [6. CAP-ENT-06-VIEW — Consultar compra cancelada](06-cap-ent-06-view.md)
 

@@ -122,6 +122,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `editMaterialGoodsReceiptHeaderRequest` | `FileMaterialGoodsReceiptService` | `Request` · `createGoodsReceiptRequests(...)` |
+| `editMaterialGoodsReceiptHeader` | `FileMaterialGoodsReceipts` | `Application` · `createCrudApplication(...)` |
 
 ## Coordinación de la interfaz
 
@@ -165,10 +166,10 @@ sequenceDiagram
     end
         Note over Form: dataset.submitting = 'true', botón submit deshabilitado
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update: editGoodsReceiptHeader })
-        FormUtils->>Application: editGoodsReceiptHeader({ id, formData })
+        View->>FormUtils: handleSubmit({ form, formData, create, update: editMaterialGoodsReceiptHeader })
+        FormUtils->>Application: editMaterialGoodsReceiptHeader({ id, formData })
         alt Respuesta exitosa
-            Application-->>FormUtils: editGoodsReceiptHeader(): Promise[{ message }]
+            Application-->>FormUtils: editMaterialGoodsReceiptHeader(): Promise[{ message }]
         else Error HTTP o de dominio
             Application-->>FormUtils: error propagado
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva el formulario
@@ -197,7 +198,7 @@ sequenceDiagram
     Note over Request: Request configurado
     activate FormUtils
     deactivate FormUtils
-        FormUtils->>Application: editGoodsReceiptHeader({ id, formData })
+        FormUtils->>Application: editMaterialGoodsReceiptHeader({ id, formData })
         Application->>Request: editMaterialGoodsReceiptHeaderRequest({ id, data: formData })
         Request->>HTTP: apiRequest({ method: 'patch', url, data })
         HTTP->>Transport: PATCH /api/warehouse/goods-receipts/materials/:id
@@ -207,7 +208,7 @@ sequenceDiagram
             Request-->>Application: editMaterialGoodsReceiptHeaderRequest(): Promise[AxiosResponse]
             Application->>FileResponseUtils: createSuccessResponseFromRequest({ response, dataKey })
             FileResponseUtils-->>Application: createSuccessResponseFromRequest(): Object — detalle transversal CRUD
-            Application-->>FormUtils: editGoodsReceiptHeader(): Promise[{ message }]
+            Application-->>FormUtils: editMaterialGoodsReceiptHeader(): Promise[{ message }]
         else Error HTTP o de dominio
             Transport-->>HTTP: HTTP de error { code, message }
             opt No se inicia renovación: status distinto de 401 o request._retry

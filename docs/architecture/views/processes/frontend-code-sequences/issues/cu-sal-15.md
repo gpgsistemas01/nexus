@@ -90,6 +90,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
 | `getAllConsumableGoodsIssuesRequest` | `FileConsumableGoodsIssueService` | `Request` · `createGoodsIssueRequests(...)` |
+| `getAllConsumableGoodsIssues` | `FileConsumableGoodsIssueController` | `Application` · `createCrudApplication(...)` |
 
 ## Secuencia de implementación
 
@@ -122,7 +123,7 @@ sequenceDiagram
     IssueTable-->>View: createIssueDatatable(): Promise[{ table, filters }]
     Note over TableCore: El callback ajax del núcleo ejecuta options.ajax.get(params)
     TableCore->>IssueTable: options.ajax.get(params) — callback configurado
-    IssueTable->>Application: getAllGoodsIssues({ ...params, ...filters.getValues() })
+    IssueTable->>Application: getAllConsumableGoodsIssues({ ...params, ...filters.getValues() })
     Application->>Request: getAllConsumableGoodsIssuesRequest({ params })
     Request->>HTTP: apiRequest({ method: 'get', url, params })
     HTTP->>Transport: GET /api/warehouse/goods-issues/consumables
@@ -130,7 +131,7 @@ sequenceDiagram
         Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
         Request-->>Application: getAllConsumableGoodsIssuesRequest(): Promise[AxiosResponse]
-        Application-->>IssueTable: getAllGoodsIssues(): Promise[AxiosResponse]
+        Application-->>IssueTable: getAllConsumableGoodsIssues(): Promise[AxiosResponse]
         IssueTable-->>TableCore: options.ajax.get(): Promise[AxiosResponse]
         TableCore->>Browser: callback(response.data) — filas y conteos de DataTable
     else Error HTTP o de dominio

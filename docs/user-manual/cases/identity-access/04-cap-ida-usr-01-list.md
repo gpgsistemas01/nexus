@@ -3,11 +3,13 @@
 
 **Casos de uso:** `CU-IDA-05` — Consultar usuarios; `CU-IDA-09` — Generar reporte de usuarios.
 
+**Antes de empezar:** Vamos a localizar un usuario y reconocer sus datos. Tenga el nombre, folio o período que necesita consultar.
+
 **Errores posibles:** [Acceso y autorización](../../error-messages.md#errores-acceso), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Controles que debe usar:** Buscador **Buscar por Usuario**; botones **Exportar Excel** y **Nuevo usuario**; acciones **Editar registro** y **Cambiar contraseña** de cada fila.
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+1. Observe la pantalla y ubique los controles:
 
    ![CAP-IDA-USR-01-LIST: listado](../../images/users/01-list.png)
 
@@ -17,3 +19,5 @@
 
    <a id="CAP-IDA-USR-05-EXPORT"></a>
    ![CAP-IDA-USR-05-EXPORT: modal para exportar usuarios](../../images/users/05-export-report.png)
+
+**Compruebe el resultado:** Confirme que la fila corresponde al nombre o folio buscado. Consultar no modifica datos ni existencias.

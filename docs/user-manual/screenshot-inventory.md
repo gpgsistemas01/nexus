@@ -34,7 +34,7 @@ del valor nuevo ya aplicado y de los resultados que habilitan el paso siguiente.
 
 ## Inventario automatizado
 
-La siguiente tabla refleja el arreglo `captures` de `scripts/captureManualScreenshots.js`. Para
+La siguiente tabla refleja el arreglo `captures` de `scripts/manualScreenshotInventory.js`, utilizado por `scripts/captureManualScreenshots.js`. Para
 comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 `node scripts/captureManualScreenshots.js --list`.
 

@@ -1,19 +1,23 @@
 <a id="CAP-CAT-CLI-01-LIST"></a>
-# 10. CAP-CAT-CLI-01-LIST — Listado
+# 10. CAP-CAT-CLI-01-LIST — Consultar clientes
 
-**Casos de uso:** `CU-CAT-05` — Consultar clientes; `CU-CAT-08` — Generar reporte de clientes.
+**Casos de uso:** `CU-CAT-05` — Consultar clientes.
 
-**Errores posibles:** [Catálogos e inventario](../../error-messages.md#errores-catalogos).
+**Antes de empezar:** Tenga el nombre del cliente que necesita. Vamos a buscarlo antes de registrar otro, para evitar duplicados.
 
-**Controles que debe usar:** Buscador **Buscar por Nombre**, botones **Exportar Excel** y **Nuevo cliente**, y acción **Editar registro** de cada fila.
+1. Abra **Clientes** desde el menú principal. Observe el buscador y la tabla:
 
-1. Antes de usar los controles, compruebe que la pantalla inicial coincida con la captura:
+   ![CAP-CAT-CLI-01-LIST: consulta de clientes](../../images/clients/01-list.png)
 
-   ![CAP-CAT-CLI-01-LIST: listado](../../images/clients/01-list.png)
+2. Escriba un término en **Buscar por Nombre** y compruebe los resultados.
+3. Si no existe, siga la guía de alta con **Nuevo cliente**. Consultar el listado no cambia sus datos ni el inventario.
 
-2. Escriba un término en el buscador **Buscar por Nombre** para localizar un cliente.
-3. En la tabla, seleccione **Nuevo cliente**, **Exportar Excel** o la acción **Editar registro** de una fila.
-4. Si selecciona **Exportar Excel**, Nexus abre el modal **Exportar reporte**. Confirme que se aplicarán la búsqueda, los filtros y el orden actuales; seleccione **Descargar** para continuar o cierre el modal para cancelar.
+<!-- manual:sistemas -->
+## Editar o descargar información como administrador
 
-   <a id="CAP-CAT-CLI-04-EXPORT"></a>
-   ![CAP-CAT-CLI-04-EXPORT: modal para exportar clientes](../../images/clients/04-export-report.png)
+Seleccione **Editar registro** para modificar un registro autorizado. Para descargar el resultado, pulse **Exportar Excel**. En **Exportar reporte**, revise la búsqueda, los filtros y el orden; después pulse **Descargar** o cierre el diálogo para cancelar.
+
+![CAP-CAT-CLI-04-EXPORT: diálogo de exportación de clientes](../../images/clients/04-export-report.png)
+<!-- /manual:sistemas -->
+
+**Compruebe el resultado:** Confirme que el nombre corresponde a la persona o empresa de la operación. Si no encuentra el registro esperado, revise la búsqueda antes de darlo de alta.

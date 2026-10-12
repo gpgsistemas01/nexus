@@ -77,7 +77,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Initiator as Administrador del sistema
+    actor Initiator as Personal de almacén
     participant Browser as Navegador
     participant View@{ "type": "boundary" } as clientsPage.js
     participant Table@{ "type": "control" } as clientDatatable.js
@@ -102,7 +102,7 @@ sequenceDiagram
     TableCore->>Application: getAllClients({ params })
     activate Application
     Application->>Request: getAllClientsRequest({ params })
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    Request->>HTTP: apiRequest({ method: 'get', url })
     HTTP->>Transport: consulta GET /api/sales/clients
     alt Respuesta exitosa
         Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }

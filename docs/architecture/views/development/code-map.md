@@ -45,7 +45,7 @@ flowchart LR
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (83)
+## Endpoints API (85)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -129,6 +129,8 @@ flowchart LR
 | `GET` | `/api/admin/reports/movements/materials/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../../../src/routes/api/admin/reportApiRoute.js) |
 | `GET` | `/api/admin/reports/movements/wastes/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../../../src/routes/api/admin/reportApiRoute.js) |
 | `GET` | `/api/admin/reports/users/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../../../src/routes/api/admin/reportApiRoute.js) |
+| `GET` | `/api/admin/reports/persons/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../../../src/routes/api/admin/reportApiRoute.js) |
+| `GET` | `/api/admin/reports/profiles/excel` | [`src/routes/api/admin/reportApiRoute.js`](../../../../src/routes/api/admin/reportApiRoute.js) |
 | `GET` | `/api/admin/catalogs/:catalog` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 | `POST` | `/api/admin/catalogs/:catalog` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 | `PUT` | `/api/admin/catalogs/:catalog/:id` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |

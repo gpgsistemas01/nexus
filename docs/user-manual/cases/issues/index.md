@@ -38,8 +38,8 @@ habilita únicamente **Cantidad a devolver** y **Observaciones**. Una salida can
 **consulta**, sin campos editables.
 
 1. [1. CAP-SAL-MAT-01-LIST — Listado](01-cap-sal-mat-01-list.md)
-2. [2. CAP-SAL-MAT-02-CREATE — Formulario registro](02-cap-sal-mat-02-create.md)
-3. [3. CAP-SAL-MAT-03-EDIT — Edicion encabezado](03-cap-sal-mat-03-edit.md)
+2. [2. CAP-SAL-MAT-02-CREATE — Formulario de registro](02-cap-sal-mat-02-create.md)
+3. [3. CAP-SAL-MAT-03-EDIT — Editar encabezado](03-cap-sal-mat-03-edit.md)
 4. [4. CAP-SAL-MAT-04-SUPPLY — Surtir detalles](04-cap-sal-mat-04-supply.md)
 5. [5. CAP-SAL-MAT-05-RETURN — Devolver detalle](05-cap-sal-mat-05-return.md)
 6. [6. CAP-REP-SAL-MAT-06-EXPORT — Exportar reporte](06-cap-rep-sal-mat-06-export.md)
@@ -64,8 +64,8 @@ renglones pendientes. En **devolución** el documento es de sólo lectura y la a
 sin campos editables.
 
 8. [8. CAP-SAL-WAS-01-LIST — Listado](08-cap-sal-was-01-list.md)
-9. [9. CAP-SAL-WAS-02-CREATE — Formulario registro](09-cap-sal-was-02-create.md)
-10. [10. CAP-SAL-WAS-03-EDIT — Edicion encabezado](10-cap-sal-was-03-edit.md)
+9. [9. CAP-SAL-WAS-02-CREATE — Formulario de registro](09-cap-sal-was-02-create.md)
+10. [10. CAP-SAL-WAS-03-EDIT — Editar encabezado](10-cap-sal-was-03-edit.md)
 11. [11. CAP-SAL-WAS-04-SUPPLY — Surtir detalles](11-cap-sal-was-04-supply.md)
 12. [12. CAP-SAL-WAS-05-RETURN — Devolver detalle](12-cap-sal-was-05-return.md)
 13. [13. CAP-REP-SAL-WAS-06-EXPORT — Exportar reporte](13-cap-rep-sal-was-06-export.md)

@@ -85,7 +85,7 @@ sequenceDiagram
     View->>Application: getCatalogEntries({ ...params, catalog })
     activate Application
     Application->>Request: getCatalogEntriesRequest({ params: { ...params, catalog } })
-    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    Request->>HTTP: apiRequest({ method: 'get', url })
     HTTP->>Transport: consume GET /api/admin/catalogs/unit-measures
     alt Respuesta exitosa
         Transport-->>HTTP: HTTP 200 { data, recordsTotal, recordsFiltered }

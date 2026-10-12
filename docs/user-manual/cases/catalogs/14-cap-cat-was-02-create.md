@@ -1,7 +1,9 @@
 <a id="CAP-CAT-WAS-02-CREATE"></a>
-# 14. CAP-CAT-WAS-02-CREATE — Formulario registro
+# 14. CAP-CAT-WAS-02-CREATE — Formulario de registro
 
 **Casos de uso:** `CU-ALM-10` — Registrar merma.
+
+**Antes de empezar:** Vamos a registrar un merma. Tenga los datos de la operación y confirme con quien le capacita que corresponde darlo de alta; busque primero si ya existe.
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
@@ -11,9 +13,9 @@ máximo unitario**, **Nuevo stock**, **Observaciones** y **Activo**. El nombre, 
 provienen del material de referencia y la razón **Stock inicial** es automática. Use **Nueva merma**
 para abrir el formulario y **Guardar** para confirmarlo.
 
-1. Seleccione el botón **Nueva merma** para abrir el formulario de registro. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. Seleccione el botón **Nueva merma** para abrir el formulario de registro. Observe los controles que va a usar:
 
-   ![CAP-CAT-WAS-02-CREATE: formulario registro](../../images/waste/02-form-registration.png)
+   ![CAP-CAT-WAS-02-CREATE: formulario de registro](../../images/waste/02-form-registration.png)
 
 2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock** y **Observaciones**, y revise la casilla **Activo**.
 3. Seleccione el botón **Guardar** para registrar la merma.
@@ -23,3 +25,5 @@ suma la existencia capturada. No registre otra merma para representar una nueva 
 localice el registro existente en el listado y use **Agregar stock**, que solicita una cantidad
 incremental. **Ajustar stock** permanece reservado al Administrador del sistema para reemplazar el
 saldo total cuando corrige una diferencia autorizada.
+
+**Compruebe el resultado:** Vuelva al listado y localice el registro guardado. Compruebe sus datos antes de continuar con otra operación.
