@@ -400,9 +400,10 @@ export const validateWeightCapture = ({
     requireTotal = true
 }) => {
     const getError = (value, { req }) => getWasteWeightCaptureValidationError(value, {
-        fieldName: fieldName === coneFieldName ? 'coneWeightKg' : 'totalWeightKg',
-        coneWeightKg: req.body[coneFieldName],
-        totalWeightKg: req.body[totalFieldName],
+        ...req.body,
+        fieldName,
+        coneFieldName,
+        totalFieldName,
         requireTotal
     });
 

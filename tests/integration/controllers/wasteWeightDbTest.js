@@ -83,6 +83,7 @@ describe('peso unitario de merma de rollo', () => {
         roll = response.body.waste;
         const persisted = await prisma.waste.findUnique({ where: { id: roll.id } });
         expect(Number(persisted.weightKg)).toBe(1.23);
+        expect(Number(roll.weightKg)).toBe(1.23);
         expect(Number(persisted.coneWeightKg)).toBe(0.25);
         expect(Number(persisted.totalWeightKg)).toBe(1.48);
         expect(Number(persisted.currentStock)).toBe(3);

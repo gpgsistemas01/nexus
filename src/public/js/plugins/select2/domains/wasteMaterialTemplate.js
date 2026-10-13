@@ -1,9 +1,9 @@
 import { getWasteMaterialTemplates } from '../../../application/warehouse/wastes/wastes.js';
 import { initDomainSelect2, toggleSelectOption } from '../baseSelect.js';
-import { mapSelectWasteMaterialTemplateData, normalizeInventorySelectRelations } from '../../../utils/warehouseInventoryUtils.js';
+import { mapSelectWasteMaterialTemplateData } from '../../../utils/warehouseInventoryUtils.js';
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { applyWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
+import { getWasteMaterialTemplate, applyWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
 
 const wasteMaterialTemplateChangeEvent = 'change.wasteMaterialTemplate';
 
@@ -22,10 +22,15 @@ export const initWasteMaterialTemplateSelect = ({ modalSelector, baseSelector, s
 
     $(baseSelector)
         .off(`${ SELECT2_EVENT_NAMES.SELECT } ${ SELECT2_EVENT_NAMES.CLEAR } ${ wasteMaterialTemplateChangeEvent }`)
-        .on(SELECT2_EVENT_NAMES.SELECT, ({ params }) => {
+        .on(SELECT2_EVENT_NAMES.SELECT, event => {
+            const option = event.target.querySelector('option:checked');
+            if (!option) return;
+            Object.entries(event.params.data).forEach(([key, value]) => {
+                option.dataset[key] = value;
+            });
             applyWasteMaterialTemplate({
                 form,
-                template: normalizeInventorySelectRelations(params.data)
+                template: getWasteMaterialTemplate({ form })
             });
         })
         .on(`${ SELECT2_EVENT_NAMES.CLEAR } ${ wasteMaterialTemplateChangeEvent }`, () => {

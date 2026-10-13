@@ -73,7 +73,7 @@ useForm({
 
 const form = document.querySelector(FORM_SELECTORS.WASTE);
 form.addEventListener(DOM_EVENT_NAMES.INPUT, event => {
-    if (['coneWeightKg', 'totalWeightKg'].includes(event.target.name)) {
+    if (['coneWeightKg', 'totalWeightKg', 'base', 'height'].includes(event.target.name)) {
         updateWasteRollMeasurement({ form });
     }
 });

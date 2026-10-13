@@ -1387,7 +1387,7 @@
           "null"
         ],
         "maximum": 999.99,
-        "description": "Cono de muestra en kg; obligatorio para modo FIXED o si se registra el total de muestra.",
+        "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al crear una merma de Rollo y puede editarse.",
         "multipleOf": 0.01,
         "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "minimum": 0
@@ -1485,7 +1485,10 @@
         ]
       },
       "rollReference": {
-        "type": "object",
+        "type": [
+          "object",
+          "null"
+        ],
         "properties": {
           "referenceConeWeightKg": {
             "type": [
@@ -1494,7 +1497,7 @@
               "null"
             ],
             "maximum": 999.99,
-            "description": "Cono de muestra en kg; obligatorio para modo FIXED o si se registra el total de muestra.",
+            "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al crear una merma de Rollo y puede editarse.",
             "multipleOf": 0.01,
             "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
             "minimum": 0
@@ -1546,7 +1549,8 @@
             "description": "Orientación de la dimensión longitudinal del material; dato de consulta para la vista previa, no se envía al registrar."
           }
         },
-        "additionalProperties": true
+        "additionalProperties": true,
+        "description": "Referencias para crear una merma de Rollo; null para otras presentaciones."
       }
     },
     "additionalProperties": false

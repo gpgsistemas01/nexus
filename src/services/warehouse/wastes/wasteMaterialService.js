@@ -56,17 +56,17 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
                 ...template,
                 suggestedWidth,
                 maxUnitCost,
-                rollReference: {
+                rollReference: isRoll ? {
                     referenceConeWeightKg: offer?.referenceConeWeightKg ?? null,
                     referenceRollTotalWeightKg: offer?.referenceRollTotalWeightKg ?? null,
-                    referenceRollNetWeightKg: calculateWasteNetWeight({
-                        coneWeightKg: offer?.referenceConeWeightKg,
-                        totalWeightKg: offer?.referenceRollTotalWeightKg
+                    referenceRollNetWeightKg: calculateWasteNetWeight(offer ?? {}, {
+                        coneFieldName: 'referenceConeWeightKg',
+                        totalFieldName: 'referenceRollTotalWeightKg'
                     }),
                     referenceLengthM: getMaterialIdentityLength(material),
                     referenceWidthM: identityWidth,
                     lengthField: getMaterialLengthField(material)
-                }
+                } : null
             });
             return;
         }

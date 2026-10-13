@@ -72,3 +72,11 @@ describe('plantillas de material para el CRUD de mermas', () => {
     });
   });
 });
+
+
+it('no consulta ni calcula referencias de peso para una presentación distinta de Rollo', async () => {
+  const offer = { maxUnitCost: 1, get referenceConeWeightKg() { throw new Error('Referencia de peso no aplicable'); } };
+  materialFindMany.mockResolvedValue([{ id: 'sheet', name: 'Lámina', base: 1, height: 2, presentation: { name: 'LÁMINA' }, supplierMaterials: [offer] }]);
+  const templates = await findWasteMaterialTemplates({ supplierId: 'supplier-1' });
+  expect(templates.data[0].rollReference).toBeNull();
+});

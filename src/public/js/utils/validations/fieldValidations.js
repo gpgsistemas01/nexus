@@ -324,23 +324,24 @@ export const validatePersonAccessesArray = accesses => {
     return null;
 };
 
-export const validateMaterialRollReference = (value, data, field) => {
+export const validateMaterialRollReference = (value, data, fieldName) => {
     const error = getWasteWeightCaptureValidationError(value, {
-        fieldName: field === 'referenceConeWeightKg' ? 'coneWeightKg' : 'totalWeightKg',
-        coneWeightKg: field === 'referenceConeWeightKg' ? value : data.referenceConeWeightKg,
-        totalWeightKg: field === 'referenceRollTotalWeightKg' ? value : data.referenceRollTotalWeightKg,
+        ...data,
+        fieldName,
+        coneFieldName: 'referenceConeWeightKg',
+        totalFieldName: 'referenceRollTotalWeightKg',
         requireTotal: false
     });
     return error ? getErrorMessage({ code: error }) : null;
 };
 
-export const validateWasteDimension = (value, data = {}, field) => {
+export const validateWasteDimension = (value, data = {}, fieldName) => {
     const reference = data.rollReference ?? {};
     if (isRollPresentation(data.presentationName) && reference.lengthField) {
-        if (field !== reference.lengthField) return null;
+        if (fieldName !== reference.lengthField) return null;
         if (calculateWasteNetWeight(data) != null) {
             if (Number(reference.referenceRollNetWeightKg) > 0 && Number(reference.referenceLengthM) > 0) return null;
         }
     }
-    return validatePositiveNumber(value, field === 'base' ? 'La base de la merma' : 'La altura de la merma');
+    return validatePositiveNumber(value, fieldName === 'base' ? 'La base de la merma' : 'La altura de la merma');
 };

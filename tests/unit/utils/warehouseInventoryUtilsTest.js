@@ -15,9 +15,7 @@ import {
   mapIssueDetailToTable,
   mapSelectMaterialData,
   mapSelectWasteData,
-  mapSelectWasteMaterialTemplateData,
-  normalizeInventorySelectRelations,
-  parseInventorySelectJson
+  mapSelectWasteMaterialTemplateData
 } from '../../../src/public/js/utils/warehouseInventoryUtils.js';
 
 describe('select de material reutilizado por el CRUD de merma', () => {
@@ -79,31 +77,6 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     expect(getPresentation({ presentation: 'ROLLO' })).toBe('');
     expect(getPresentation({ presentation: undefined })).toBe('');
     expect(getPresentation()).toBe('');
-  });
-
-  it('reconstruye las relaciones serializadas antes de consumir la opción de inventario', () => {
-    const item = normalizeInventorySelectRelations({
-      id: 'material-1',
-      presentation: '{"id":"presentation-1","name":"ROLLO"}',
-      unitMeasure: '{"id":"unit-1","name":"Metro cuadrado","symbol":"m²"}'
-    });
-
-    expect(item).toEqual({
-      id: 'material-1',
-      presentation: { id: 'presentation-1', name: 'ROLLO' },
-      unitMeasure: { id: 'unit-1', name: 'Metro cuadrado', symbol: 'm²' }
-    });
-    expect(getPresentation(item)).toBe('ROLLO');
-    expect(getUnitMeasure(item)).toBe('m²');
-  });
-
-  it('reutiliza el mismo parser para el objeto material serializado por Select2', () => {
-    const material = parseInventorySelectJson('{"id":"material-1","presentation":{"name":"ROLLO"}}');
-
-    expect(material).toEqual({
-      id: 'material-1',
-      presentation: { name: 'ROLLO' }
-    });
   });
 
   it('serializa presentación y unidad para los atributos de la opción de salida de merma', () => {
@@ -188,10 +161,7 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     }));
     expect(JSON.parse(option.presentation)).toEqual(material.presentation);
     expect(JSON.parse(option.unitMeasure)).toEqual(material.unitMeasure);
-    expect(normalizeInventorySelectRelations(option)).toEqual(expect.objectContaining({
-      presentation: material.presentation,
-      unitMeasure: material.unitMeasure
-    }));
+    expect(JSON.parse(option.rollReference)).toBeNull();
   });
 });
 

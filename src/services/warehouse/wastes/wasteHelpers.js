@@ -17,8 +17,8 @@ export const prepareWasteMeasurements = ({ wasteDto, offer }) => {
         dimensions[widthField] = toNumber(material[widthField]);
         if (weightKg != null) {
             const calculatedLength = calculateWasteRollLength({
-                netWeightKg: weightKg,
-                referenceNetWeightKg: calculateWasteNetWeight({ coneWeightKg: offer.referenceConeWeightKg, totalWeightKg: offer.referenceRollTotalWeightKg }),
+                weightKg: weightKg,
+                referenceRollNetWeightKg: calculateWasteNetWeight(offer, { coneFieldName: 'referenceConeWeightKg', totalFieldName: 'referenceRollTotalWeightKg' }),
                 referenceLengthM: getMaterialIdentityLength(material)
             });
             if (calculatedLength != null) dimensions[lengthField] = calculatedLength;

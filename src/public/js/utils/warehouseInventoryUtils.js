@@ -37,8 +37,12 @@ export const getWasteWeightValidationError = (value, { allowZero = false } = {})
 
 const hasWasteWeight = value => value !== undefined && value !== null && value !== '';
 
-export const getWasteWeightCaptureValidationError = (value, { fieldName, coneWeightKg, totalWeightKg, requireTotal = true }) => {
-    const isCone = fieldName === 'coneWeightKg';
+export const getWasteWeightCaptureValidationError = (value, {
+    fieldName, coneFieldName = 'coneWeightKg', totalFieldName = 'totalWeightKg', requireTotal = true, ...data
+}) => {
+    const isCone = fieldName === coneFieldName;
+    const coneWeightKg = isCone ? value : data[coneFieldName];
+    const totalWeightKg = isCone ? data[totalFieldName] : value;
     const error = getWasteWeightValidationError(value, { allowZero: isCone });
     if (error) return error;
 
@@ -53,14 +57,16 @@ export const getWasteWeightCaptureValidationError = (value, { fieldName, coneWei
     return null;
 };
 
-export const calculateWasteNetWeight = ({ coneWeightKg, totalWeightKg }) => {
+export const calculateWasteNetWeight = (data, { coneFieldName = 'coneWeightKg', totalFieldName = 'totalWeightKg' } = {}) => {
+    const coneWeightKg = data[coneFieldName];
+    const totalWeightKg = data[totalFieldName];
     if (!hasWasteWeight(coneWeightKg) || !hasWasteWeight(totalWeightKg)) return null;
     return roundTo(Number(totalWeightKg) - Number(coneWeightKg), WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS);
 };
 
-export const calculateWasteRollLength = ({ netWeightKg, referenceNetWeightKg, referenceLengthM }) => {
-    if (![netWeightKg, referenceNetWeightKg, referenceLengthM].every(value => Number(value) > 0)) return null;
-    return roundTo(Number(netWeightKg) * Number(referenceLengthM) / Number(referenceNetWeightKg));
+export const calculateWasteRollLength = ({ weightKg, referenceRollNetWeightKg, referenceLengthM }) => {
+    if (![weightKg, referenceRollNetWeightKg, referenceLengthM].every(value => Number(value) > 0)) return null;
+    return roundTo(Number(weightKg) * Number(referenceLengthM) / Number(referenceRollNetWeightKg));
 };
 
 export const getPresentationId = (item = {}) => (
@@ -140,18 +146,8 @@ export const mapSelectWasteMaterialTemplateData = (material = {}) => ({
     ...material,
     text: buildInventorySelectText(material),
     presentation: JSON.stringify(material.presentation ?? {}),
-    unitMeasure: JSON.stringify(material.unitMeasure ?? {})
-});
-
-export const parseInventorySelectJson = (value) => (
-    typeof value === 'string' ? JSON.parse(value || '{}') : value
-);
-
-export const normalizeInventorySelectRelations = (item = {}) => ({
-    ...item,
-    presentation: parseInventorySelectJson(item.presentation),
-    unitMeasure: parseInventorySelectJson(item.unitMeasure),
-    rollReference: parseInventorySelectJson(item.rollReference)
+    unitMeasure: JSON.stringify(material.unitMeasure ?? {}),
+    rollReference: JSON.stringify(material.rollReference ?? null)
 });
 
 const mapIssueQuantities = (detail = {}) => ({

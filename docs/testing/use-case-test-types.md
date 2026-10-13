@@ -110,3 +110,7 @@ La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 frontend y las cadenas Express para pesos opcionales, cero, límite de BD,
 captura incompleta, precisión y total mayor que cono. Las pruebas de registro
 de merma verifican los resultados de `prepareWasteMeasurements` y el rollback.
+
+Las pruebas de UI de merma comprueban lectura de la opción seleccionada,
+recálculo al modificar pesos y limpieza de resultados obsoletos. Las plantillas
+de otras presentaciones omiten las referencias de peso sin consultarlas.

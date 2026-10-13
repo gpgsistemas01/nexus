@@ -4,11 +4,20 @@ import { setFormSectionVisibility, setFormDisabled } from '../forms/formStateUI.
 import { isCreateMode } from '../../constants/formModes.js';
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
 import { setMdbWrapperInputValue } from '../../plugins/mdb/baseInstance.js';
-import { calculateWasteNetWeight, calculateWasteRollLength, getMaterialName, getPresentation, getWasteWeightCaptureValidationError, getUnitMeasure, isRollPresentation, normalizeInventorySelectRelations } from '../../utils/warehouseInventoryUtils.js';
+import { calculateWasteNetWeight, calculateWasteRollLength, getMaterialName, getPresentation, getWasteWeightCaptureValidationError, getUnitMeasure, isRollPresentation } from '../../utils/warehouseInventoryUtils.js';
 
-export const getWasteMaterialTemplate = ({ form }) => normalizeInventorySelectRelations(
-    $(form.elements.materialId).select2('data')[0] ?? {}
-);
+export const getWasteMaterialTemplate = ({ form }) => {
+    const option = form.elements.materialId.selectedOptions[0];
+    if (!option?.value) return {};
+
+    const { presentation, unitMeasure, rollReference, ...data } = option.dataset;
+    return {
+        ...data,
+        presentation: JSON.parse(presentation || '{}'),
+        unitMeasure: JSON.parse(unitMeasure || '{}'),
+        rollReference: JSON.parse(rollReference || 'null')
+    };
+};
 
 export const displayWasteMaterialTemplate = ({ form, template = {} }) => {
     setMdbWrapperInputValue({
@@ -68,10 +77,10 @@ export const updateWasteRollMeasurement = ({ form, template }) => {
     };
     const valid = ['coneWeightKg', 'totalWeightKg'].every(fieldName =>
         !getWasteWeightCaptureValidationError(data[fieldName], { ...data, fieldName }));
-    const value = valid ? calculateWasteNetWeight(data) : null;
+    const weightKg = valid ? calculateWasteNetWeight(data) : null;
     const field = form.elements?.weightKg;
     if (!field) return;
-    field.value = value ?? '';
+    field.value = weightKg ?? '';
     if (field.id) setMdbWrapperInputValue({ selector: `#${field.id}`, value: field.value });
     const reference = template.rollReference ?? {};
     const lengthField = reference.lengthField;
@@ -83,13 +92,14 @@ export const updateWasteRollMeasurement = ({ form, template }) => {
     const widthField = lengthField === 'base' ? 'height' : 'base';
     form.elements[widthField].value = reference.referenceWidthM ?? '';
     setFormDisabled({ form, fields: [widthField], isDisabled: true });
-    const length = value != null ? calculateWasteRollLength({
-        netWeightKg: form.elements.weightKg.value,
-        referenceNetWeightKg: reference.referenceRollNetWeightKg,
+    const length = weightKg != null ? calculateWasteRollLength({
+        weightKg,
+        referenceRollNetWeightKg: reference.referenceRollNetWeightKg,
         referenceLengthM: reference.referenceLengthM
     }) : null;
+    const wasCalculated = form.elements[lengthField].disabled;
     setFormDisabled({ form, fields: [lengthField], isDisabled: length != null });
-    if (length != null) form.elements[lengthField].value = length;
+    if (length != null || wasCalculated) form.elements[lengthField].value = length ?? '';
     ['base', 'height'].forEach(field => {
         if (form.elements[field].id) setMdbWrapperInputValue({ selector: `#${form.elements[field].id}`, value: form.elements[field].value });
     });

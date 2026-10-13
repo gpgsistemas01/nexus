@@ -55,8 +55,9 @@ Ante `WASTE_ALREADY_EXISTS`, `wasteForm.js` ofrece **Agregar stock** si el usuar
 `wastes:addStock`. Abre el modal existente con el registro devuelto y la cantidad
 precargada; el usuario revisa y confirma esa operación por separado.
 
-Las referencias se leen directamente con `select2('data')`; se normalizan los
-objetos o cadenas JSON con el helper existente. No se copia `rollReference` al
+Como en las salidas, el evento de Select2 guarda los datos serializados en
+`option.dataset`. El formulario lee `option:checked` y aplica `JSON.parse` a
+presentación, unidad y referencias; los mappers mantienen ese contrato. No se copia `rollReference` al
 dataset del formulario. El cálculo sólo se ejecuta al crear un Rollo; en los
 demás modos se muestran los valores persistidos. La tabla agrupa Cono, Total con
 cono y Neto por unidad inmediatamente antes de Acciones. El modal reutiliza una
@@ -64,3 +65,8 @@ sección propia y el parcial de pesos para ordenar esos campos.
 
 `openWasteStockAdditionModal` recibe cantidad y observaciones opcionales y
 actualiza la existencia resultante al abrirse, sin emitir un evento sintético.
+
+Los eventos `input` de cono, total, base y altura actualizan la vista previa al
+crear un Rollo. Al borrar o invalidar un peso se limpian neto y longitud calculada;
+la captura manual de longitud se conserva mientras no haya un cálculo disponible.
+Las referencias no se calculan para otras presentaciones.

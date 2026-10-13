@@ -173,3 +173,9 @@ Las migraciones de captura y referencia de rollos aún pendientes se consolidan 
 `20261013160000_add_roll_waste_cone_and_total_weight`: crea directamente los campos
 finales, el vínculo y las restricciones. No incluye campos de método ni copias
 de referencias que luego deban eliminarse.
+
+El campo `weightKg` mantiene el mismo nombre en vista previa, helper de dominio
+y persistencia. El navegador envía cono y total capturados; el servidor calcula
+y guarda `weightKg` y devuelve ese neto en el alta y en el listado. Las reglas de
+validación reciben los nombres originales de campos de material y merma, sin
+renombrar los campos del contrato HTTP.
