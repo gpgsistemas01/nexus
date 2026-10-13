@@ -1,6 +1,6 @@
 ---
 title: Especificación de requisitos de Nexus
-document-version: 1.6
+document-version: 1.7
 system-version: 1.0.0
 status: En revisión
 ---
@@ -11,7 +11,7 @@ status: En revisión
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.6 | 1.0.0 | En revisión | 2026-10-12 | Equipo Nexus |
+| 1.7 | 1.0.0 | En revisión | 2026-10-12 | Equipo Nexus |
 
 Este es el punto de entrada y la portada del paquete exportable de requisitos. La
 [especificación de requisitos](requirements-specification/index.md) conserva la definición
@@ -66,3 +66,4 @@ Las imágenes que se incorporen a estas secciones pertenecen a
 | 1.4 | 2026-10-08 | Revisión de visión, glosario y SRS; incorporación de los siete casos de salida de consumibles, referencias y realizaciones; conserva el alcance del sistema 1.0.0 y los IDs anteriores. |
 | 1.5 | 2026-10-12 | Movimientos por contexto y peso de merma: captura inicial, consulta posterior y cálculo del reporte; recorrido de negocio consolidado en un diagrama. |
 | 1.6 | 2026-10-12 | Criterio de aceptación del peso unitario: límites, precisión y rechazo previo al alta de valores inválidos. |
+| 1.7 | 2026-10-12 | Máximo de 100 kg por unidad de merma de Rollo, validación y migración conservando los datos históricos. |

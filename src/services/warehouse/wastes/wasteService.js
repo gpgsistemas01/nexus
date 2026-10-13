@@ -1,5 +1,5 @@
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightInvalid, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
+import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightInvalid, WasteWeightReadOnly, WasteWeightTooHigh } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
@@ -17,7 +17,9 @@ const serviceLogger = createServiceLogger('warehouse.wasteService');
 
 const assertWasteWeight = ({ weightKg, presentation }) => {
     if (weightKg === undefined || weightKg === null) return;
-    if (!isRollPresentation(presentation?.name) || getWasteWeightValidationError(weightKg)) throw new WasteWeightInvalid();
+    const error = getWasteWeightValidationError(weightKg);
+    if (error === 'WEIGHT_KG_TOO_HIGH') throw new WasteWeightTooHigh();
+    if (!isRollPresentation(presentation?.name) || error) throw new WasteWeightInvalid();
 };
 
 const handleWasteServiceError = ({ err, fallbackError }) => {

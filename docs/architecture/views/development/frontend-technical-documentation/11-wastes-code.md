@@ -12,14 +12,16 @@ flowchart TB
     T["DataTable del recurso<br/>wasteDatatable.js"]
     U["Composición compartida<br/>createCrudApplication.js<br/>warehouseInventoryDatatable.js<br/>y colaboradores"]
     Validation["validators.js"]
+    FieldValidation["fieldValidations.js<br/>validateWasteWeight"]
     WeightRule["warehouseInventoryUtils.js<br/>getWasteWeightValidationError"]
     Messages["apiMessages.js<br/>getErrorMessage"]
     H["axiosInstanceApi.js<br/>request / apiRequest"]
     A --> R
     A --> U
     P --> Validation
-    Validation --> WeightRule
-    Validation --> Messages
+    Validation --> FieldValidation
+    FieldValidation --> WeightRule
+    FieldValidation --> Messages
     P --> A
     P --> T
     P --> U
@@ -35,7 +37,7 @@ flowchart TB
 | services HTTP · wasteService.js | `src/public/js/services/warehouse/`<br/>`wasteService.js` |
 | DataTable del recurso · wasteDatatable.js | `src/public/js/plugins/datatable/warehouse/`<br/>`wastes/wasteDatatable.js` |
 | Composición compartida · createCrudApplication.js · warehouseInventoryDatatable.js · y colaboradores | `src/public/js/application/`<br/>`createCrudApplication.js`<br/>`src/public/js/plugins/datatable/shared/`<br/>`inventory/warehouseInventoryDatatable.js`<br/>`src/public/js/ui/forms/formStateUI.js`<br/>`src/public/js/ui/forms/formUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventoryCrudModalUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventorySelectUI.js`<br/>`src/public/js/ui/modalUI.js`<br/>`src/public/js/ui/tableUI.js` |
-| Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/warehouseInventoryUtils.js`<br/>`src/public/js/constants/apiMessages.js` |
+| Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/warehouseInventoryUtils.js`<br/>`src/public/js/constants/apiMessages.js` |
 | axiosInstanceApi.js · request / apiRequest | `src/public/js/services/axiosInstanceApi.js` |
 
 
@@ -79,11 +81,13 @@ Los reportes y la infraestructura transversal se localizan en el
 
 
 `updateWasteWeightField` habilita la captura únicamente en alta de Rollo y deja
-el valor `readOnly` al editar. `applyWasteMaterialTemplate` limpia el valor al
+el valor deshabilitado para consulta al editar, mediante `setFormDisabled`. `applyWasteMaterialTemplate` limpia el valor al
 cambiar plantilla y limpia el aviso de validación de ese campo; `wasteEditFields` no lo envía. La tabla general omite el peso.
 `wasteForm.js` aporta a la validación el nombre de presentación mostrado, sin
-incluirlo en la petición. `wasteValidation.weightKg` combina la regla decimal
-compartida con la condición de Rollo y reutiliza los mensajes de la API. El input
+incluirlo en la petición. `wasteValidation.weightKg` delega en `fieldValidations.validateWasteWeight`,
+como los demás campos. Ese validador combina la regla decimal compartida con la
+condición de Rollo y reutiliza los mensajes de la API. `useForm`, `validateFields`
+y `normalizeFormErrors` conservan el mismo marcado y presentación de errores. El input
 conserva límites HTML `min`, `max` y `step`; la validación JavaScript no depende
 de que el navegador aplique esas restricciones.
 La [vista de datos](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo)

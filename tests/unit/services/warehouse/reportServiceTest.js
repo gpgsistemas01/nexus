@@ -66,6 +66,12 @@ describe('consulta del reporte de mermas', () => {
     expect(emptyStock.totals).toMatchObject({ totalWeightKg: 0, weightStatus: 'complete' });
   });
 
+  it('el límite de 100 kg corresponde a la unidad y no al peso total del grupo', () => {
+    const report = buildWasteReportSummary([{ name: 'Lona', presentation: 'ROLLO', base: 1.5, height: 2, currentStock: 3, weightKg: 100 }]);
+    expect(report.rows[0].totalWeightKg).toBe(300);
+    expect(report.totals.totalWeightKg).toBe(300);
+  });
+
   it('consulta la identidad directa de la merma sin depender de SupplierMaterial', async () => {
     wasteFindMany.mockResolvedValue([{
       id: 'waste-1',

@@ -77,7 +77,7 @@ toda su cantidad pendiente; **Cantidad de proyecto** no determina una entrega pa
 
 | Campo y modo | Validación |
 | --- | --- |
-| Peso por unidad (kg), alta de Rollo | Opcional; entre 0.000001 y 99999999.999999 kg; hasta ocho enteros y seis decimales. |
+| Peso por unidad (kg), alta de Rollo | Opcional; entre 0.000001 y 100 kg; hasta tres enteros y seis decimales. |
 | Formato del peso | Decimal con punto, por ejemplo 0.75; sin letras, espacios, separadores de miles ni notación científica. |
 | Peso en edición | Sólo consulta; el servidor rechaza su envío como cambio. |
 | Otras presentaciones | Campo deshabilitado; un peso forzado se rechaza. |

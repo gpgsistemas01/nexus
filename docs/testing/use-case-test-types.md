@@ -103,3 +103,8 @@ comprueba captura en alta y consulta posterior. `wasteValidatorsTest.js` y
 y API, incluyendo números no finitos, texto parcial, booleanos, objetos, listas
 y mensajes por causa. La integración comprueba que los rechazos no creen merma,
 ajustes ni movimientos, y que el servicio también rechace llamadas directas inválidas.
+
+`wasteWeightCapDbTest.js` verifica la migración incremental: conserva pesos válidos
+hasta 100 kg y sus decimales, impone el máximo en PostgreSQL y revierte todo si
+encuentra un peso histórico mayor. Los límites frontend/API también comprueban
+100 aceptado y 100.000001 rechazado; el reporte admite totales superiores a 100 kg.

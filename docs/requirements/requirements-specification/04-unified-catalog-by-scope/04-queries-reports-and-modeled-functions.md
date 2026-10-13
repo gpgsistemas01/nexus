@@ -24,7 +24,7 @@
 | RF-MER-008 | El sistema debe calcular la cantidad convertida de una merma como existencia × base × altura en altas, ajustes y salidas, sin solicitar su captura manual. | Implementado | `src/services/inventory/stockHelpers.js`, `src/services/warehouse/wastes/wasteService.js` |
 | RF-MER-009 | El material seleccionado sólo debe servir como plantilla: la merma conserva proveedor, presentación, unidad, dimensiones y costo propios, sin depender posteriormente de cambios en el material u oferta de origen. | Implementado | `prisma/schema.prisma`, `src/services/warehouse/wastes/wasteService.js` |
 | RF-MER-010 | Personal de almacén o el Administrador del sistema deben poder sumar una cantidad positiva a una merma mediante **Agregar stock**, conservando un documento individual con folio, actor, observaciones opcionales, cantidad y saldos, vinculado a un movimiento de entrada. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/services/warehouse/wastes/wasteStockEntryService.js`, `src/services/warehouse/wastes/wasteMovementService.js`, `src/constants/permissions.js` |
-| RF-MER-011 | Al registrar una merma de Rollo, almacén debe poder capturar su peso por unidad en kilogramos, positivo si se conoce. Después del alta debe quedar sólo para consulta. La misma combinación de nombre, proveedor y medidas conserva un único peso; editar datos o mover existencias no lo cambia. Esta captura no aplica a materiales, consumibles ni otras presentaciones de merma. Un peso desconocido debe permanecer sin capturar. | Implementado | formulario de merma, `wasteDTO.js`, `wasteService.js`, `wasteWeightDbTest.js` |
+| RF-MER-011 | Al registrar una merma de Rollo, almacén debe poder capturar su peso por unidad en kilogramos, positivo y no mayor de 100 kg si se conoce. Después del alta debe quedar sólo para consulta. La misma combinación de nombre, proveedor y medidas conserva un único peso; editar datos o mover existencias no lo cambia. Esta captura no aplica a materiales, consumibles ni otras presentaciones de merma. Un peso desconocido debe permanecer sin capturar. | Implementado | formulario de merma, `wasteDTO.js`, `wasteService.js`, `wasteWeightDbTest.js` |
 | RF-REQ-001 | Una reimplementación de requisiciones debe permanecer fuera del alcance vigente hasta definir y aprobar nuevamente su comportamiento, autorización, persistencia y pruebas. | Fuera del alcance actual | `prisma/migrations/20260827000000_remove_purchase_requisitions/migration.sql` |
 | RF-PRJ-001 | El Administrador del sistema deberá poder mantener proyectos si se incorpora y aprueba esa capacidad; sus datos, operaciones y criterios permanecen pendientes de definición. | Modelado | modelo `Project` |
 | RF-PRJ-002 | El personal de almacén deberá poder seleccionar un proyecto registrado como contexto de salida si se define y aprueba ese flujo; capturar el número de proyecto no demuestra esta capacidad. | Modelado | modelo `Project` |
@@ -39,7 +39,7 @@
   «Sólo activos» exige estado activo y «Sólo con existencia» exige saldo positivo.
   La condición elegida se combina con los filtros de consulta aplicables.
 - **CA-RF-MER-011-1:** si se conoce, el peso por unidad debe estar entre
-  0.000001 y 99999999.999999 kg, con hasta ocho dígitos enteros y seis decimales.
+  0.000001 y 100 kg, con hasta tres dígitos enteros y seis decimales.
   La captura debe rechazar cantidades no numéricas, cero, negativas o fuera de
   precisión antes del alta; no debe redondearlas ni interpretar sólo una parte
   del valor. El peso desconocido puede permanecer vacío.

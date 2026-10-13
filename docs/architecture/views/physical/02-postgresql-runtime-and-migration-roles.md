@@ -353,3 +353,20 @@ un CHECK de positividad. No transforma pesos históricos ni cambia claves de
 identidad, cantidades o contadores. Publique cliente Prisma, backend y formulario
 junto con la migración; aplíquela con la cuenta de migraciones y regenere el
 cliente. La validación por presentación usa la relación existente en el servicio.
+
+
+`20261012233000_limit_roll_waste_weight_to_100kg` reduce la precisión a
+`DECIMAL(9,6)` y agrega el límite de 100 kg por unidad. Mantiene los seis decimales,
+los valores desconocidos y los demás datos. Es incremental: no modifica el SQL
+publicado de la migración anterior. El límite no se aplica al total del reporte.
+
+Antes de cambiar el tipo, bloquea la tabla y comprueba los pesos existentes.
+Si encuentra un valor superior a 100 kg, cancela la transacción con un mensaje
+explícito; no recorta, redondea ni elimina el dato. Revise esos registros con
+negocio antes de reintentar. La consulta previa es de sólo lectura:
+
+```sql
+SELECT "id", "name", "weightKg"
+FROM "Waste"
+WHERE "weightKg" > 100;
+```

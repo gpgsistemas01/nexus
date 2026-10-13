@@ -116,7 +116,7 @@ y el [resumen de Prisma](../../development/code-structure/06-prisma-and-persiste
 
 ## Peso unitario de merma de rollo
 
-`Waste.weightKg` es un decimal nullable (`DECIMAL(18,6)`) capturable sólo al
+`Waste.weightKg` es un decimal nullable (`DECIMAL(9,6)`) capturable sólo al
 registrar la merma. No pertenece a materiales ni consumibles ni modifica la clave
 única `(supplierId, name, base, height)`. La migración y sus restricciones físicas
 se describen en [PostgreSQL y migraciones](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma).
@@ -126,7 +126,7 @@ concentra las reglas y el diagrama. `wasteDTO.js` incluye el peso únicamente en
 alta; `wasteEditValidation` rechaza su envío y `updateWaste` protege llamadas directas.
 `getWasteWeightValidationError` en `warehouseInventoryUtils.js` es una función
 pura compartida por formulario, validación HTTP y servicio: inspecciona el valor
-antes de convertirlo, distingue número inválido de precisión excedida y admite
+antes de convertirlo, distingue número inválido, máximo de 100 kg excedido y precisión excedida, y admite
 peso ausente. Rechaza booleanos, listas, objetos, valores no finitos y cadenas que
 no sean decimales completos. `createWasteWithInitialStockAdjustment` comprueba
 además la presentación persistida, sin confiar en la enviada por el cliente.

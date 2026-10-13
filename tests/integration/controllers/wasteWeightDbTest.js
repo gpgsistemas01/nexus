@@ -130,6 +130,18 @@ describe('peso unitario de merma de rollo', () => {
         ])).toEqual(before);
     });
 
+    it.each(['100.000001', 101])('rechaza peso %s mayor de 100 kg sin cambiar persistencia', async weightKg => {
+        const before = await prisma.waste.count({ where: { supplierId: ids.supplier } });
+        const response = await request(app).post('/wastes').send({ ...createBody('roll'), height: 8, weightKg }).expect(400);
+        expect(response.body.errors.weightKg.code).toBe('WEIGHT_KG_TOO_HIGH');
+        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
+        const { createWasteWithInitialStockAdjustment } = await import('../../../src/services/warehouse/wastes/wasteService.js');
+        await expect(createWasteWithInitialStockAdjustment({
+            wasteDto: { ...createBody('roll'), height: 8, weightKg }, userId: ids.user
+        })).rejects.toMatchObject({ code: 'WEIGHT_KG_TOO_HIGH' });
+        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
+    });
+
     it('el servicio protege también las llamadas directas con peso mal formado', async () => {
         const { createWasteWithInitialStockAdjustment } = await import('../../../src/services/warehouse/wastes/wasteService.js');
         const before = await prisma.waste.count({ where: { supplierId: ids.supplier } });
@@ -164,7 +176,7 @@ describe('peso unitario de merma de rollo', () => {
         expect(await prisma.waste.findMany({ where: { supplierId: ids.supplier }, orderBy: { id: 'asc' } })).toEqual(before);
     });
 
-    it.each([0.000001, '99999999.999999'])('persiste exactamente el límite válido de peso %s', async weightKg => {
+    it.each([0.000001, '100'])('persiste exactamente el límite válido de peso %s', async weightKg => {
         const response = await request(app).post('/wastes').send({
             ...createBody('roll'), height: weightKg === 0.000001 ? 10 : 12, newStock: 0, weightKg
         }).expect(200);

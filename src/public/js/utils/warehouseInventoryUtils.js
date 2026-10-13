@@ -1,3 +1,7 @@
+import { WASTE_WEIGHT_LIMITS } from '../constants/inventory.js';
+
+const wasteWeightDecimalPattern = new RegExp(`^\\d{1,${WASTE_WEIGHT_LIMITS.INTEGER_DIGITS}}(\\.\\d{1,${WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS}})?$`);
+
 export const getBase = (item = {}) => (
     item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base ?? null
 );
@@ -24,7 +28,8 @@ export const getWasteWeightValidationError = value => {
         || (typeof value === 'string' && (value.trim() !== value || !/^\d+(\.\d+)?$/.test(value)))
     ) return 'WEIGHT_KG_INVALID_NUMBER';
 
-    if (!/^\d{1,8}(\.\d{1,6})?$/.test(String(value))) return 'WEIGHT_KG_TOO_LONG';
+    if (Number(value) > WASTE_WEIGHT_LIMITS.MAX) return 'WEIGHT_KG_TOO_HIGH';
+    if (!wasteWeightDecimalPattern.test(String(value))) return 'WEIGHT_KG_TOO_LONG';
 
     return null;
 };

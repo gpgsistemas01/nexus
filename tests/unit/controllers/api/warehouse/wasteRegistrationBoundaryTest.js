@@ -68,7 +68,7 @@ describe('wasteController registration boundaries', () => {
         base: '99999999.999999',
         height: '99999999.999999',
         newStock: '99999999.999999',
-        weightKg: '99999999.999999',
+        weightKg: '100',
         observations
       })
       .expect('Content-Type', /json/)
@@ -83,7 +83,7 @@ describe('wasteController registration boundaries', () => {
         base: 99999999.999999,
         height: 99999999.999999,
         newStock: 99999999.999999,
-        weightKg: 99999999.999999,
+        weightKg: 100,
         observations
       }),
       userId
@@ -139,10 +139,12 @@ describe('wasteController registration boundaries', () => {
     ['1 ', 'WEIGHT_KG_INVALID_NUMBER'],
     ['+1', 'WEIGHT_KG_INVALID_NUMBER'],
     ['1.1234567', 'WEIGHT_KG_TOO_LONG'],
-    ['100000000', 'WEIGHT_KG_TOO_LONG'],
+    ['100.000001', 'WEIGHT_KG_TOO_HIGH'],
+    [101, 'WEIGHT_KG_TOO_HIGH'],
+    ['100000000', 'WEIGHT_KG_TOO_HIGH'],
     ['0.0000001', 'WEIGHT_KG_TOO_LONG'],
     [0.0000001, 'WEIGHT_KG_TOO_LONG'],
-    [1e21, 'WEIGHT_KG_TOO_LONG']
+    [1e21, 'WEIGHT_KG_TOO_HIGH']
   ])('rechaza peso %s antes de normalizarlo y devuelve el código correcto', async (weightKg, code) => {
     const response = await request(app).post('/wastes').send({ ...validBody, weightKg }).expect(400);
     expect(response.body.errors.weightKg.code).toBe(code);

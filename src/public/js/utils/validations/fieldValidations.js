@@ -1,3 +1,5 @@
+import { getErrorMessage } from "../../constants/apiMessages.js";
+import { getWasteWeightValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
 import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
@@ -79,6 +81,17 @@ export const validateInvoice = (invoice, { isInvoiced } = {}) => {
 
     return null;
 }
+
+export const validateWasteWeight = (value, { presentationName } = {}) => {
+    const code = getWasteWeightValidationError(value);
+    if (code) return getErrorMessage({ code });
+
+    if (value !== undefined && value !== null && value !== '' && presentationName !== undefined && !isRollPresentation(presentationName)) {
+        return getErrorMessage({ code: 'WASTE_WEIGHT_INVALID' });
+    }
+
+    return null;
+};
 
 export const validateNonNegativeNumber = (number, fieldName) => {
     const result = validateNumber(number, fieldName);
