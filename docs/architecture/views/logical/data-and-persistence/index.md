@@ -116,7 +116,7 @@ y el [resumen de Prisma](../../development/code-structure/06-prisma-and-persiste
 
 ## Peso unitario de merma de rollo
 
-`Waste.weightKg` es un decimal nullable (`DECIMAL(9,6)`) capturable sólo al
+`Waste.weightKg` es un decimal nullable (`DECIMAL(5,2)`) capturable sólo al
 registrar la merma. No pertenece a materiales ni consumibles ni modifica la clave
 única `(supplierId, name, base, height)`. La migración y sus restricciones físicas
 se describen en [PostgreSQL y migraciones](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma).
@@ -125,11 +125,16 @@ El [recorrido de negocio](../../../../requirements/requirements-specification/04
 concentra las reglas y el diagrama. `wasteDTO.js` incluye el peso únicamente en el
 alta; `wasteEditValidation` rechaza su envío y `updateWaste` protege llamadas directas.
 `getWasteWeightValidationError` en `warehouseInventoryUtils.js` es una función
-pura compartida por formulario, validación HTTP y servicio: inspecciona el valor
-antes de convertirlo, distingue número inválido, máximo de 100 kg excedido y precisión excedida, y admite
-peso ausente. Rechaza booleanos, listas, objetos, valores no finitos y cadenas que
-no sean decimales completos. `createWasteWithInitialStockAdjustment` comprueba
-además la presentación persistida, sin confiar en la enviada por el cliente.
+pura compartida por formulario y validación HTTP: inspecciona el valor
+antes de convertirlo, distingue número inválido, máximo de 100 kg excedido y
+precisión excedida, y admite peso ausente. Rechaza booleanos, listas, objetos, valores no finitos y cadenas que
+no sean decimales completos. La longitud y el formato se rechazan antes del DTO y del servicio.
+`createWasteWithInitialStockAdjustment` recibe un DTO numérico validado y comprueba
+las reglas de negocio: presentación persistida de Rollo, peso positivo, máximo
+permitido. `updateWaste` protege la inmutabilidad posterior. Ambas operaciones
+lanzan errores de dominio derivados de `AppError`, que `handleWasteServiceError`
+propaga como en los demás servicios, sin traducir códigos del validador HTTP ni
+repetir la comprobación de longitud.
 
 `findWasteReportRows` conserva `NULL` en vez de convertirlo a cero.
 `buildWasteReportSummary` calcula `totalWeightKg` por identidad antes de agrupar

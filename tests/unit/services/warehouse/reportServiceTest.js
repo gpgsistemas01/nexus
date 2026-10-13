@@ -51,14 +51,14 @@ describe('consulta del reporte de mermas', () => {
 
   it('suma kg por identidad antes de consolidar largos y excluye otras presentaciones', () => {
     const rows = [
-      { name: 'Lona', presentation: 'ROLLO', base: 1.5, height: 2, currentStock: 3, weightKg: 0.123456 },
+      { name: 'Lona', presentation: 'ROLLO', base: 1.5, height: 2, currentStock: 3, weightKg: 0.12 },
       { name: 'Lona', presentation: 'ROLLO', base: 1.5, height: 4, currentStock: 2, weightKg: 0.5 },
       { name: 'Pieza', presentation: 'PIEZA', currentStock: 100, weightKg: 50 }
     ];
     const report = buildWasteReportSummary(rows);
-    expect(report.rows[0]).toMatchObject({ totalWeightKg: 1.370368, weightStatus: 'complete' });
+    expect(report.rows[0]).toMatchObject({ totalWeightKg: 1.36, weightStatus: 'complete' });
     expect(report.rows[1]).toMatchObject({ totalWeightKg: null, weightStatus: 'notApplicable' });
-    expect(report.totals).toMatchObject({ totalWeightKg: 1.370368, weightStatus: 'complete' });
+    expect(report.totals).toMatchObject({ totalWeightKg: 1.36, weightStatus: 'complete' });
     const incomplete = buildWasteReportSummary([...rows, { ...rows[0], weightKg: null }]);
     expect(incomplete.rows[0]).toMatchObject({ totalWeightKg: null, weightStatus: 'unknown' });
     expect(incomplete.totals).toMatchObject({ totalWeightKg: null, weightStatus: 'unknown' });
@@ -82,7 +82,7 @@ describe('consulta del reporte de mermas', () => {
       currentStock: 2,
       convertedQuantity: 12.16,
       maxUnitCost: 20,
-      weightKg: '1.234567',
+      weightKg: '1.23',
       supplier: { tradeName: 'Proveedor A' },
       presentation: { name: 'ROLLO' },
       unitMeasure: { name: 'Metro cuadrado' }
@@ -96,7 +96,7 @@ describe('consulta del reporte de mermas', () => {
       supplierId: 'supplier-1',
       name: 'Lona',
       supplier: 'Proveedor A',
-      weightKg: 1.234567
+      weightKg: 1.23
     })]);
     expect(wasteFindMany).toHaveBeenCalledWith(expect.objectContaining({
       where: {

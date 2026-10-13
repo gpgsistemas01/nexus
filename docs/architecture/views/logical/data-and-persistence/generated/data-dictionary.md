@@ -531,7 +531,7 @@ usuarios y responsables se mantiene en el
 | `base` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `height` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `maxUnitCost` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
-| `weightKg` | `Decimal?` | No | — | — | `@db.Decimal(9, 6)` |
+| `weightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 | `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |

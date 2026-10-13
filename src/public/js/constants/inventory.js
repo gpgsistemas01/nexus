@@ -1,8 +1,8 @@
 export const WASTE_WEIGHT_LIMITS = Object.freeze({
-    MIN: 0.000001,
+    MIN: 0.01,
     MAX: 100,
     INTEGER_DIGITS: 3,
-    DECIMAL_DIGITS: 6
+    DECIMAL_DIGITS: 2
 });
 
 export const INVENTORY_RESOURCES = Object.freeze({

@@ -117,7 +117,7 @@ describe('wasteController registration boundaries', () => {
     });
     expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
   });
-  it.each([undefined, null, '', '0.000001'])('admite peso desconocido o el mínimo positivo: %s', weightKg => {
+  it.each([undefined, null, '', '0.01'])('admite peso desconocido o el mínimo positivo: %s', weightKg => {
     return request(app).post('/wastes').send({ ...validBody, weightKg }).expect(200);
   });
 
@@ -138,12 +138,14 @@ describe('wasteController registration boundaries', () => {
     [' 1', 'WEIGHT_KG_INVALID_NUMBER'],
     ['1 ', 'WEIGHT_KG_INVALID_NUMBER'],
     ['+1', 'WEIGHT_KG_INVALID_NUMBER'],
-    ['1.1234567', 'WEIGHT_KG_TOO_LONG'],
+    ['1.001', 'WEIGHT_KG_TOO_LONG'],
+    ['100.000', 'WEIGHT_KG_TOO_LONG'],
+    ['0001', 'WEIGHT_KG_TOO_LONG'],
     ['100.000001', 'WEIGHT_KG_TOO_HIGH'],
     [101, 'WEIGHT_KG_TOO_HIGH'],
     ['100000000', 'WEIGHT_KG_TOO_HIGH'],
-    ['0.0000001', 'WEIGHT_KG_TOO_LONG'],
-    [0.0000001, 'WEIGHT_KG_TOO_LONG'],
+    ['0.001', 'WEIGHT_KG_TOO_LONG'],
+    [0.001, 'WEIGHT_KG_TOO_LONG'],
     [1e21, 'WEIGHT_KG_TOO_HIGH']
   ])('rechaza peso %s antes de normalizarlo y devuelve el código correcto', async (weightKg, code) => {
     const response = await request(app).post('/wastes').send({ ...validBody, weightKg }).expect(400);

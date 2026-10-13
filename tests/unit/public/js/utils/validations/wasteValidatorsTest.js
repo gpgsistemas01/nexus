@@ -43,7 +43,7 @@ describe('validadores del CRUD de mermas', () => {
   ])('%s', (_, value, expected) => {
     expect(wasteStockValidation.newStock(value)).toEqual(expected);
   });
-  it.each([undefined, null, '', '0.000001', 0.000001, '0.75', '99.999999', 100, '100.000000'])('acepta peso opcional o decimal válido: %s', value => {
+  it.each([undefined, null, '', '0.01', 0.01, '0.75', '99.99', 100, '100.00'])('acepta peso opcional o decimal válido: %s', value => {
     expect(wasteValidation.weightKg(value, { presentationName: 'ROLLO' })).toBeNull();
   });
 
@@ -65,12 +65,14 @@ describe('validadores del CRUD de mermas', () => {
     [' 1', 'WEIGHT_KG_INVALID_NUMBER'],
     ['1 ', 'WEIGHT_KG_INVALID_NUMBER'],
     ['+1', 'WEIGHT_KG_INVALID_NUMBER'],
-    ['1.1234567', 'WEIGHT_KG_TOO_LONG'],
+    ['1.001', 'WEIGHT_KG_TOO_LONG'],
+    ['100.000', 'WEIGHT_KG_TOO_LONG'],
+    ['0001', 'WEIGHT_KG_TOO_LONG'],
     ['100.000001', 'WEIGHT_KG_TOO_HIGH'],
     [101, 'WEIGHT_KG_TOO_HIGH'],
     ['100000000', 'WEIGHT_KG_TOO_HIGH'],
-    ['0.0000001', 'WEIGHT_KG_TOO_LONG'],
-    [0.0000001, 'WEIGHT_KG_TOO_LONG'],
+    ['0.001', 'WEIGHT_KG_TOO_LONG'],
+    [0.001, 'WEIGHT_KG_TOO_LONG'],
     [1e21, 'WEIGHT_KG_TOO_HIGH']
   ])('rechaza peso %s con el mensaje correspondiente', (value, code) => {
     expect(wasteValidation.weightKg(value, { presentationName: 'ROLLO' })).toBe(getErrorMessage({ code }));

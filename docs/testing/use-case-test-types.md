@@ -108,3 +108,11 @@ ajustes ni movimientos, y que el servicio también rechace llamadas directas inv
 hasta 100 kg y sus decimales, impone el máximo en PostgreSQL y revierte todo si
 encuentra un peso histórico mayor. Los límites frontend/API también comprueban
 100 aceptado y 100.000001 rechazado; el reporte admite totales superiores a 100 kg.
+
+
+`wasteWeightScaleDbTest.js` verifica `DECIMAL(5,2)`, conservación de valores
+representables, restricciones de positividad y máximo, y rollback ante pesos
+históricos con decimales significativos adicionales. Las pruebas de frontera
+rechazan `1.001`, `100.000` y cuatro dígitos enteros antes de invocar el servicio.
+El servicio conserva sólo las comprobaciones de negocio del DTO y propaga
+`AppError` con el mismo flujo que las demás operaciones de merma.

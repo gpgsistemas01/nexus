@@ -178,4 +178,4 @@ conserve la dirección y repórtela. No modifique manualmente la URL para intent
 | El peso debe ser positivo y sólo aplica a mermas con presentación Rollo. | Revise la presentación y capture kg por unidad con un valor mayor que cero; deje vacío cuando no se conoce. |
 | No se puede modificar el peso unitario de una merma ya registrada. Este dato sólo está disponible para consulta. | Consulte el peso guardado y actualice únicamente los campos habilitados del formulario. |
 | El peso por unidad no puede superar 100 kg. | Verifique el peso de una unidad de merma; no capture aquí el peso total de todas las existencias. |
-| El peso admite hasta 3 dígitos enteros y 6 decimales. | Corrija la precisión del valor capturado. |
+| El peso admite hasta 3 dígitos enteros y 2 decimales. | Corrija la precisión del valor capturado. |

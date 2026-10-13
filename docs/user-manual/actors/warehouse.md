@@ -1,8 +1,8 @@
 ---
 title: Manual del personal de almacén
-subtitle: "Nexus · Área: Almacén y Proveduría · Versión documental 0.10 · Sistema 1.0.0 · Estado: En revisión"
+subtitle: "Nexus · Área: Almacén y Proveduría · Versión documental 0.11 · Sistema 1.0.0 · Estado: En revisión"
 author: Equipo Nexus
-date: 2026-10-12
+date: 2026-10-13
 ---
 
 # Manual del personal de almacén
@@ -11,7 +11,7 @@ date: 2026-10-12
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 0.10 | 1.0.0 | En revisión | 2026-10-12 | Equipo Nexus |
+| 0.11 | 1.0.0 | En revisión | 2026-10-13 | Equipo Nexus |
 
 Esta guía le acompaña desde la primera consulta hasta la confirmación de una
 compra, salida o devolución. Comience por [primeros pasos](../overview.md) y use

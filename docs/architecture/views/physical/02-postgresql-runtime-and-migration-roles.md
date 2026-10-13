@@ -370,3 +370,22 @@ SELECT "id", "name", "weightKg"
 FROM "Waste"
 WHERE "weightKg" > 100;
 ```
+
+
+`20261013153000_limit_roll_waste_weight_to_two_decimals` establece el tipo vigente
+`DECIMAL(5,2)`: tres enteros y dos decimales. Conserva los CHECK de positividad y
+máximo de 100 kg. Bajo el bloqueo de tabla, comprueba que todos los pesos sean
+representables con dos decimales antes de convertirlos. Los ceros sobrantes no
+cambian el valor; cualquier decimal significativo adicional cancela toda la
+transacción. No redondea ni elimina pesos históricos. Revise antes del despliegue:
+
+```sql
+SELECT "id", "name", "weightKg"
+FROM "Waste"
+WHERE "weightKg" <> ROUND("weightKg", 2);
+```
+
+Si hay resultados, la cuenta de migraciones no debe continuar hasta resolver esos
+registros mediante una decisión de negocio. La captura HTTP rechaza más de dos
+decimales antes de persistir; PostgreSQL convierte escrituras SQL directas a la
+escala de la columna. Las migraciones anteriores se conservan sin modificaciones.

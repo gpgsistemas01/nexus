@@ -194,7 +194,8 @@
         ],
         "exclusiveMinimum": 0,
         "maximum": 100,
-        "description": "Kg por unidad de merma, opcional y sólo para presentación ROLLO. La identidad por proveedor, nombre y medidas permanece única; no modifica stock."
+        "description": "Kg por unidad de merma, opcional y sólo para presentación ROLLO. La identidad por proveedor, nombre y medidas permanece única; no modifica stock.",
+        "multipleOf": 0.01
       }
     },
     "additionalProperties": false,
@@ -580,9 +581,9 @@
         ],
         "exclusiveMinimum": 0,
         "maximum": 100,
-        "description": "Peso por unidad de merma de Rollo en kg, capturable sólo al registrar: opcional, entre 0.000001 y 100, hasta 3 enteros y 6 decimales. Número o cadena decimal completa con punto; vacío o null indican peso desconocido. Rechaza notación científica en cadenas, letras, espacios y otros tipos.",
-        "multipleOf": 1e-06,
-        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,6})?|0\\d{2}(\\.\\d{1,6})?|100(\\.0{1,6})?))(?![\\s\\S])"
+        "description": "Peso por unidad de merma de Rollo en kg, capturable sólo al registrar: opcional, entre 0.01 y 100, hasta 3 enteros y 2 decimales. Número o cadena decimal completa con punto; vacío o null indican peso desconocido. Rechaza notación científica en cadenas, letras, espacios y otros tipos.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
       }
     },
     "additionalProperties": false,

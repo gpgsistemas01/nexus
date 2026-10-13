@@ -39,7 +39,7 @@
   «Sólo activos» exige estado activo y «Sólo con existencia» exige saldo positivo.
   La condición elegida se combina con los filtros de consulta aplicables.
 - **CA-RF-MER-011-1:** si se conoce, el peso por unidad debe estar entre
-  0.000001 y 100 kg, con hasta tres dígitos enteros y seis decimales.
+  0.01 y 100 kg, con hasta tres dígitos enteros y dos decimales.
   La captura debe rechazar cantidades no numéricas, cero, negativas o fuera de
   precisión antes del alta; no debe redondearlas ni interpretar sólo una parte
   del valor. El peso desconocido puede permanecer vacío.

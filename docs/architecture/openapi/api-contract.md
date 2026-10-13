@@ -80,6 +80,11 @@ tablas, resúmenes y cantidades de sólo lectura reutilizan `formatDecimal` o
 `formatCurrency` para mostrar dos decimales. Por tanto, el redondeo es una decisión de
 presentación y nunca debe aplicarse al payload antes de crear o actualizar un recurso.
 
+El peso unitario de merma es una excepción: admite tres enteros y dos decimales,
+con persistencia `DECIMAL(5,2)`. Su validador rechaza precisión adicional antes del
+DTO y del servicio, sin redondear el payload. El detalle vigente está en
+[datos de merma](../views/logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).
+
 Las reglas de negocio permanecen en requisitos, la estructura persistente en Prisma y
 la coordinación interna en las referencias técnicas. Este documento no repite
 tutoriales de JSON, criterios personales para redactar fichas ni detalles de
