@@ -12,6 +12,8 @@ flowchart TB
     D["DTO<br/>wasteDTO.js"]
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>materialIdentity.js<br/>y colaboradores"]
     V["Validadores<br/>wasteValidations.js"]
+    Fields["fieldsValidator.js<br/>validateWeightCapture"]
+    Measurements["wasteHelpers.js<br/>prepareWasteMeasurements"]
     P["baseRepository.js<br/>getDb(tx)"]
     PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>getWasteWeightCaptureValidationError<br/>calculateWasteNetWeight<br/>calculateWasteRollLength"]
     C --> D
@@ -20,8 +22,10 @@ flowchart TB
     R --> V
     S --> P
     S --> X
-    V --> PresentationRule
-    S --> PresentationRule
+    V --> Fields
+    Fields --> PresentationRule
+    S --> Measurements
+    Measurements --> PresentationRule
     X --> P
 ```
 
@@ -34,6 +38,8 @@ flowchart TB
 | Colaboradores de dominio · referenceNumberService.js · materialIdentity.js · y colaboradores | `src/services/document/`<br/>`referenceNumberService.js`<br/>`src/services/inventory/materialIdentity.js`<br/>`src/services/inventory/stockHelpers.js`<br/>`src/services/warehouse/reasonService.js`<br/>`src/services/warehouse/supplierService.js` |
 | Validadores · wasteValidations.js | `src/validators/forms/wasteValidations.js` |
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
+| Preparación de medidas | `src/services/warehouse/wastes/wasteHelpers.js` |
+| Validación de campos | `src/validators/fields/fieldsValidator.js` |
 | Regla de presentación · warehouseInventoryUtils.js | `src/public/js/utils/warehouseInventoryUtils.js` |
 
 
@@ -73,3 +79,9 @@ reutiliza `findSupplierMaterialByIds` dentro de su transacción, calcula el neto
 referencia al consultar y persiste el vínculo, el cono utilizado y los resultados.
 Los validators verifican formato y relaciones numéricas antes del servicio;
 la transacción comprueba presentación, oferta activa y referencia necesaria.
+
+`prepareWasteMeasurements` es un helper de dominio sin consultas ni escrituras.
+Recibe el DTO y la oferta consultada, resuelve la orientación, calcula neto y largo
+y comprueba las dimensiones finales. El servicio conserva consultas, identidad,
+transacción y registro de inventario. Los formularios Express de material y merma
+reutilizan `validateWeightCapture` como validador de campo con `.withMessage`.

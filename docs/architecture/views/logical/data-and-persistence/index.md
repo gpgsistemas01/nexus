@@ -129,7 +129,8 @@ define la captura y consulta. La implementación distribuye sus responsabilidade
 | --- | --- |
 | `getWasteWeightCaptureValidationError` | Valida formato, precisión, rango, captura conjunta y total mayor que cono en formulario y HTTP. |
 | `wasteDTO.js` | Normaliza cono, total y dimensiones manuales para el alta; excluye los pesos del DTO de edición. |
-| `wasteService.js` | Comprueba la presentación persistida, consulta referencias vigentes desde la oferta, calcula neto y longitud y protege pesos y referencias en edición. |
+| `wasteService.js` | Comprueba la presentación persistida, consulta referencias vigentes desde la oferta, delega las medidas a `prepareWasteMeasurements` y protege pesos y referencias en edición. |
+| `wasteHelpers.js` | Prepara neto, dimensión transversal y longitud a partir del DTO y la oferta persistida; comprueba las dimensiones finales sin consultar ni guardar datos. |
 | PostgreSQL | Conserva el tipo decimal y los CHECK de rango, captura conjunta y neto igual a total menos cono. Véase la [migración](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma). |
 | `reportService.js` | Calcula `totalWeightKg` por identidad y luego agrupa los rollos por ancho. `weightStatus` distingue `complete`, `unknown` y `notApplicable`. |
 

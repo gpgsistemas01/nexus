@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import { getWasteWeightCaptureValidationError } from "../../public/js/utils/warehouseInventoryUtils.js";
 import { errorMap } from "../../messages/codeMessages.js";
 
 const numberRegex = /\d/;
@@ -390,3 +391,22 @@ export const validateArrayOfUUIDs = ({ fieldName }) =>
             )
         ).withMessage(errorMap[fieldName].INVALID_FORMAT)
 ;
+
+
+export const validateWeightCapture = ({
+    fieldName,
+    coneFieldName = 'coneWeightKg',
+    totalFieldName = 'totalWeightKg',
+    requireTotal = true
+}) => {
+    const getError = (value, { req }) => getWasteWeightCaptureValidationError(value, {
+        fieldName: fieldName === coneFieldName ? 'coneWeightKg' : 'totalWeightKg',
+        coneWeightKg: req.body[coneFieldName],
+        totalWeightKg: req.body[totalFieldName],
+        requireTotal
+    });
+
+    return body(fieldName)
+        .custom((value, context) => !getError(value, context))
+        .withMessage(getError);
+};

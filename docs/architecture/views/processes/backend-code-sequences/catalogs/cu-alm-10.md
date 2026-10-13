@@ -21,6 +21,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `WasteDto` | control | [`wasteDTO.js`](../../../../../../src/dtos/wasteDTO.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `Domain` | control | [`wasteService.js`](../../../../../../src/services/warehouse/wastes/wasteService.js) |
+| `Measurements` | control | [`wasteHelpers.js`](../../../../../../src/services/warehouse/wastes/wasteHelpers.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
@@ -85,6 +86,7 @@ sequenceDiagram
     participant Formatter@{ "type": "control" } as formattersUtils.js
     participant Domain@{ "type": "control" } as wasteService.js
     participant Templates@{ "type": "control" } as wasteMaterialService.js
+    participant Measurements@{ "type": "control" } as wasteHelpers.js
     participant Socket@{ "type": "control" } as socketUtils.js
     participant ErrorHandler@{ "type": "control" } as app.js
 
@@ -102,7 +104,10 @@ sequenceDiagram
     deactivate Formatter
     Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
     activate Domain
-    Note over Domain: Consultar material y oferta, usar cono capturado<br/>Calcular neto y largo estimado si se solicita<br/>Guardar vínculo y resultados
+    Note over Domain: Consultar material y oferta dentro de la transacción
+    Domain->>Measurements: prepareWasteMeasurements({ wasteDto, offer })
+    Measurements-->>Domain: { base, height, weightKg } o error de dominio
+    Note over Measurements: Sólo Rollo: neto y largo con referencias vigentes<br/>Conservar captura manual si faltan referencias
     Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height, coneWeightKg, totalWeightKg })
     alt La merma ya existe
         Domain-->>Controller: WASTE_ALREADY_EXISTS con meta.waste, sin incrementar stock

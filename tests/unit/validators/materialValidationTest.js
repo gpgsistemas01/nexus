@@ -49,3 +49,29 @@ describe('materialValidation', () => {
     ]));
   });
 });
+
+
+describe('pesos de referencia: mismas reglas en formulario y Express', () => {
+  it.each([
+    {},
+    { referenceConeWeightKg: 0 },
+    { referenceConeWeightKg: 0, referenceRollTotalWeightKg: '999.99' },
+    { referenceRollTotalWeightKg: 1 },
+    { referenceConeWeightKg: -1, referenceRollTotalWeightKg: 2 },
+    { referenceConeWeightKg: 2, referenceRollTotalWeightKg: 2 },
+    { referenceConeWeightKg: 3, referenceRollTotalWeightKg: 2 },
+    { referenceConeWeightKg: '0.001' },
+    { referenceConeWeightKg: '1e2' },
+    { referenceConeWeightKg: true },
+    { referenceConeWeightKg: 1000 },
+    { referenceConeWeightKg: 0, referenceRollTotalWeightKg: '1.001' }
+  ])('mantiene la misma validación por campo: %j', async weights => {
+    const { validateMaterialRollReference } = await import('../../../src/public/js/utils/validations/fieldValidations.js');
+    const { getErrorMessage } = await import('../../../src/public/js/constants/apiMessages.js');
+    const errors = await runValidation({ ...validMaterial, creationContext: 'goodsReceipt', ...weights });
+    for (const field of ['referenceConeWeightKg', 'referenceRollTotalWeightKg']) {
+      const serverError = errors.find(error => error.path === field);
+      expect(validateMaterialRollReference(weights[field], weights, field)).toBe(serverError ? getErrorMessage({ code: serverError.msg }) : null);
+    }
+  });
+});

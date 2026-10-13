@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../constants/apiMessages.js";
-import { getRollReferenceValidationError, calculateWasteNetWeight, getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
+import { calculateWasteNetWeight, getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
 import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
@@ -325,7 +325,12 @@ export const validatePersonAccessesArray = accesses => {
 };
 
 export const validateMaterialRollReference = (value, data, field) => {
-    const error = getRollReferenceValidationError(value, data, field);
+    const error = getWasteWeightCaptureValidationError(value, {
+        fieldName: field === 'referenceConeWeightKg' ? 'coneWeightKg' : 'totalWeightKg',
+        coneWeightKg: field === 'referenceConeWeightKg' ? value : data.referenceConeWeightKg,
+        totalWeightKg: field === 'referenceRollTotalWeightKg' ? value : data.referenceRollTotalWeightKg,
+        requireTotal: false
+    });
     return error ? getErrorMessage({ code: error }) : null;
 };
 

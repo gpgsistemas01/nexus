@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { calculateWasteRollLength, getRollReferenceValidationError } from '../../../../../src/public/js/utils/warehouseInventoryUtils.js';
+import { calculateWasteRollLength } from '../../../../../src/public/js/utils/warehouseInventoryUtils.js';
+import { validateMaterialRollReference } from '../../../../../src/public/js/utils/validations/fieldValidations.js';
+import { getErrorMessage } from '../../../../../src/public/js/constants/apiMessages.js';
 import { getMaterialIdentityLength, getMaterialLengthField } from '../../../../../src/services/inventory/materialIdentity.js';
 
 describe('referencia del cono y longitud de merma', () => {
@@ -14,11 +16,11 @@ describe('referencia del cono y longitud de merma', () => {
         expect(calculateWasteRollLength({ ...reference, referenceNetWeightKg: 0 })).toBeNull();
     });
     it('permite cono desconocido salvo que se capture el peso total del rollo', () => {
-        expect(getRollReferenceValidationError('', {}, 'referenceConeWeightKg')).toBeNull();
-        expect(getRollReferenceValidationError('', { referenceRollTotalWeightKg: 2 }, 'referenceConeWeightKg')).toBe('CONE_WEIGHT_KG_REQUIRED');
+        expect(validateMaterialRollReference('', {}, 'referenceConeWeightKg')).toBeNull();
+        expect(validateMaterialRollReference('', { referenceRollTotalWeightKg: 2 }, 'referenceConeWeightKg')).toBe(getErrorMessage({ code: 'CONE_WEIGHT_KG_REQUIRED' }));
     });
     it('acepta cono cero y exige total de muestra mayor que el cono', () => {
-        expect(getRollReferenceValidationError(0, {}, 'referenceConeWeightKg')).toBeNull();
-        expect(getRollReferenceValidationError(1, { referenceConeWeightKg: 1 }, 'referenceRollTotalWeightKg')).toBe('WASTE_TOTAL_WEIGHT_NOT_GREATER');
+        expect(validateMaterialRollReference(0, {}, 'referenceConeWeightKg')).toBeNull();
+        expect(validateMaterialRollReference(1, { referenceConeWeightKg: 1 }, 'referenceRollTotalWeightKg')).toBe(getErrorMessage({ code: 'WASTE_TOTAL_WEIGHT_NOT_GREATER' }));
     });
 });

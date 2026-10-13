@@ -1,14 +1,12 @@
-import { body } from 'express-validator';
-import { validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { validateWeightCapture, validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
-import { getRollReferenceValidationError } from '../../public/js/utils/warehouseInventoryUtils.js';
-
-const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'].map(field =>
-    body(field).custom((value, { req }) => {
-        const error = getRollReferenceValidationError(value, req.body, field);
-        if (error) throw new Error(error);
-        return true;
+const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'].map(fieldName =>
+    validateWeightCapture({
+        fieldName,
+        coneFieldName: 'referenceConeWeightKg',
+        totalFieldName: 'referenceRollTotalWeightKg',
+        requireTotal: false
     })
 );
 

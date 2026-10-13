@@ -16,26 +16,26 @@ flowchart LR
     controllers["controllers (44 módulos)"] --> constants["constants (10 módulos)"]
     controllers["controllers (44 módulos)"] --> dtos["dtos (10 módulos)"]
     controllers["controllers (44 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (44 módulos)"] --> services["services (57 módulos)"]
+    controllers["controllers (44 módulos)"] --> services["services (58 módulos)"]
     controllers["controllers (44 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
     errors["errors (19 módulos)"] --> messages["messages (2 módulos)"]
     errors["errors (19 módulos)"] --> public["public (210 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (10 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (57 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (58 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
     repository["repository (1 módulos)"] --> lib["lib (2 módulos)"]
     routes["routes (48 módulos)"] --> constants["constants (10 módulos)"]
     routes["routes (48 módulos)"] --> controllers["controllers (44 módulos)"]
     routes["routes (48 módulos)"] --> middleware["middleware (5 módulos)"]
     routes["routes (48 módulos)"] --> validators["validators (15 módulos)"]
-    services["services (57 módulos)"] --> constants["constants (10 módulos)"]
-    services["services (57 módulos)"] --> dtos["dtos (10 módulos)"]
-    services["services (57 módulos)"] --> errors["errors (19 módulos)"]
-    services["services (57 módulos)"] --> public["public (210 módulos)"]
-    services["services (57 módulos)"] --> repository["repository (1 módulos)"]
-    services["services (57 módulos)"] --> utils["utils (11 módulos)"]
+    services["services (58 módulos)"] --> constants["constants (10 módulos)"]
+    services["services (58 módulos)"] --> dtos["dtos (10 módulos)"]
+    services["services (58 módulos)"] --> errors["errors (19 módulos)"]
+    services["services (58 módulos)"] --> public["public (210 módulos)"]
+    services["services (58 módulos)"] --> repository["repository (1 módulos)"]
+    services["services (58 módulos)"] --> utils["utils (11 módulos)"]
     utils["utils (11 módulos)"] --> constants["constants (10 módulos)"]
     utils["utils (11 módulos)"] --> errors["errors (19 módulos)"]
     validators["validators (15 módulos)"] --> constants["constants (10 módulos)"]
@@ -283,6 +283,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js`](../../../../src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js) | `returnWasteIssueDetail` |
 | [`src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js`](../../../../src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js) | `findWasteIssueFulfillmentStatusIds` |
 | [`src/services/warehouse/wasteIssues/wasteIssueService.js`](../../../../src/services/warehouse/wasteIssues/wasteIssueService.js) | `createWasteIssue`, `findAllWasteIssues`, `updateWasteIssue`, `updateWasteIssueDetails`, `updateWasteIssueHeader` |
+| [`src/services/warehouse/wastes/wasteHelpers.js`](../../../../src/services/warehouse/wastes/wasteHelpers.js) | `prepareWasteMeasurements` |
 | [`src/services/warehouse/wastes/wasteInventoryService.js`](../../../../src/services/warehouse/wastes/wasteInventoryService.js) | `applyWasteStockChange` |
 | [`src/services/warehouse/wastes/wasteMaterialService.js`](../../../../src/services/warehouse/wastes/wasteMaterialService.js) | `findWasteMaterialTemplates` |
 | [`src/services/warehouse/wastes/wasteMovementService.js`](../../../../src/services/warehouse/wastes/wasteMovementService.js) | `applyWasteMovement`, `createWasteMovement` |
