@@ -1,0 +1,13 @@
+<% const referenceForm = {
+    id: 'wasteRollReferenceForm',
+    sections: [{ title: 'Referencia del material y proveedor', groups: [
+        { type: 'html', col: 'col-12', content: '<p id="rollReferenceLengthInfo" class="mb-0"></p>' },
+        { type: 'html', col: 'col-12', content: '<label for="coneWeightModeInput" class="form-label">Peso del cono</label><select class="form-select" id="coneWeightModeInput" name="coneWeightMode"><option value="VARIABLE">Variable: medir para cada merma</option><option value="FIXED">Fijo: sugerir el peso de referencia</option></select><div class="invalid-feedback" data-error-for="coneWeightMode"></div>' },
+        { type: 'inputs', items: [
+            { id: 'referenceConeWeightKgInput', name: 'referenceConeWeightKg', type: 'number', label: 'Peso de referencia del cono (kg)', value: '', attrs: { min: '0', max: '100', step: '0.01' }, col: 'col-12 col-md-6' },
+            { id: 'referenceRollTotalWeightKgInput', name: 'referenceRollTotalWeightKg', type: 'number', label: 'Peso total del rollo de referencia con cono (kg)', value: '', attrs: { min: '0.01', max: '100', step: '0.01' }, col: 'col-12 col-md-6' },
+            { id: 'referenceRollNetWeightKgInput', name: 'referenceRollNetWeightKg', type: 'number', label: 'Peso neto del rollo de referencia (kg)', value: '', attrs: { disabled: true }, col: 'col-12' }
+        ] }
+    ] }]
+}; %>
+<%- include('../../../shared/layout/modal', { modalId: 'wasteRollReferenceModal', form: referenceForm }) %>

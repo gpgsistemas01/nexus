@@ -2,11 +2,14 @@ import { toNumber } from '../utils/formattersUtils.js';
 
 const buildWasteRegistrationDataDto = (body = {}) => ({
     materialId: body.materialId,
+    ...(Object.prototype.hasOwnProperty.call(body, 'useConeReference') ? { useConeReference: body.useConeReference === true } : {}),
+    ...(Object.prototype.hasOwnProperty.call(body, 'lengthSource') ? { lengthSource: body.lengthSource } : {}),
     supplierId: body.supplierId,
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
     base: toNumber(body.base),
     height: toNumber(body.height),
-    ...(Object.prototype.hasOwnProperty.call(body, 'weightKg') ? { weightKg: body.weightKg === null || body.weightKg === '' ? null : Number(body.weightKg) } : {})
+    ...Object.fromEntries(['coneWeightKg', 'totalWeightKg'].filter(field => Object.prototype.hasOwnProperty.call(body, field))
+        .map(field => [field, body[field] === null || body[field] === '' ? null : Number(body[field])]))
 });
 
 const buildWasteIdentityDto = (body = {}) => ({
@@ -49,3 +52,12 @@ export const createWasteDtoForStockAddition = (body = {}) => ({
     quantity: Number(body.quantity),
     ...buildWasteObservationsDto(body)
 });
+
+export const createWasteRollReferenceDto = (body = {}) => {
+    const optionalNumber = value => value == null || value === '' ? null : Number(value);
+    return {
+        supplierId: body.supplierId, materialId: body.materialId, coneWeightMode: body.coneWeightMode,
+        referenceConeWeightKg: optionalNumber(body.referenceConeWeightKg),
+        referenceRollTotalWeightKg: optionalNumber(body.referenceRollTotalWeightKg)
+    };
+};

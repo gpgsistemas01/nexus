@@ -494,6 +494,10 @@ erDiagram
         String supplierId FK
         String presentationId FK
         String unitMeasureId FK
+        String sourceMaterialId FK
+    }
+    Material {
+        String id PK
     }
     Supplier {
         String id PK
@@ -504,6 +508,7 @@ erDiagram
     UnitMeasure {
         String id PK
     }
+    Material o|..o{ Waste : "sourceMaterialId = Material.id"
     Supplier ||..o{ Waste : "supplierId = Supplier.id"
     Presentation ||..o{ Waste : "presentationId = Presentation.id"
     UnitMeasure ||..o{ Waste : "unitMeasureId = UnitMeasure.id"
@@ -733,6 +738,7 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `Material.unitMeasureId` | `UnitMeasure.id` | 1 | 0..N |
 | `SupplierMaterial.supplierId` | `Supplier.id` | 1 | 0..N |
 | `SupplierMaterial.materialId` | `Material.id` | 1 | 0..N |
+| `Waste.sourceMaterialId` | `Material.id` | 0..1 | 0..N |
 | `Waste.supplierId` | `Supplier.id` | 1 | 0..N |
 | `Waste.presentationId` | `Presentation.id` | 1 | 0..N |
 | `Waste.unitMeasureId` | `UnitMeasure.id` | 1 | 0..N |

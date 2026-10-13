@@ -44,7 +44,7 @@ describe('validadores del CRUD de mermas', () => {
     expect(wasteStockValidation.newStock(value)).toEqual(expected);
   });
   it.each([undefined, null, '', '0.01', 0.01, '0.75', '99.99', 100, '100.00'])('acepta peso opcional o decimal válido: %s', value => {
-    expect(wasteValidation.weightKg(value, { presentationName: 'ROLLO' })).toBeNull();
+    expect(wasteValidation.totalWeightKg(value, { coneWeightKg: value == null || value === '' ? null : 0, presentationName: 'ROLLO' })).toBeNull();
   });
 
   it.each([
@@ -75,13 +75,26 @@ describe('validadores del CRUD de mermas', () => {
     [0.001, 'WEIGHT_KG_TOO_LONG'],
     [1e21, 'WEIGHT_KG_TOO_HIGH']
   ])('rechaza peso %s con el mensaje correspondiente', (value, code) => {
-    expect(wasteValidation.weightKg(value, { presentationName: 'ROLLO' })).toBe(getErrorMessage({ code }));
+    expect(wasteValidation.totalWeightKg(value, { coneWeightKg: 0, presentationName: 'ROLLO' })).toBe(getErrorMessage({ code }));
   });
 
   it('valida la presentación de la plantilla sin hacer obligatorio el peso', () => {
-    expect(wasteValidation.weightKg('0.75', { presentationName: 'LÁMINA' })).toBe(getErrorMessage({ code: 'WASTE_WEIGHT_INVALID' }));
-    expect(wasteValidation.weightKg('0.75', { presentationName: '' })).toBe(getErrorMessage({ code: 'WASTE_WEIGHT_INVALID' }));
-    expect(wasteValidation.weightKg('', { presentationName: 'LÁMINA' })).toBeNull();
+    expect(wasteValidation.totalWeightKg('0.75', { coneWeightKg: 0, presentationName: 'LÁMINA' })).toBe(getErrorMessage({ code: 'WASTE_WEIGHT_INVALID' }));
+    expect(wasteValidation.totalWeightKg('0.75', { coneWeightKg: 0, presentationName: '' })).toBe(getErrorMessage({ code: 'WASTE_WEIGHT_INVALID' }));
+    expect(wasteValidation.totalWeightKg('', { presentationName: 'LÁMINA' })).toBeNull();
+  });
+
+  it.each([
+    ['coneWeightKg', 0, { totalWeightKg: 1 }, null],
+    ['coneWeightKg', 0, {}, 'TOTAL_WEIGHT_KG_REQUIRED'],
+    ['coneWeightKg', -1, { totalWeightKg: 1 }, 'CONE_WEIGHT_KG_INVALID_NUMBER'],
+    ['totalWeightKg', 1, { coneWeightKg: 1 }, 'WASTE_TOTAL_WEIGHT_NOT_GREATER'],
+    ['totalWeightKg', 1, { coneWeightKg: 2 }, 'WASTE_TOTAL_WEIGHT_NOT_GREATER'],
+    ['coneWeightKg', '', { totalWeightKg: 1 }, 'CONE_WEIGHT_KG_REQUIRED']
+  ])('valida %s y su relación con el otro peso', (field, value, data, code) => {
+    const values = { ...data, [field]: value, presentationName: 'ROLLO' };
+    const errorField = code === 'TOTAL_WEIGHT_KG_REQUIRED' ? 'totalWeightKg' : field;
+    expect(wasteValidation[errorField](values[errorField], values)).toBe(code ? getErrorMessage({ code }) : null);
   });
 
 });

@@ -92,7 +92,7 @@ describe('exportación del reporte de mermas', () => {
       sheetName: 'Mermas',
       filename: 'reporte_mermas',
       data: [
-        ['Proveedor', 'Material', 'Ancho', 'Largo', 'Total de mermas', 'Total m²', 'Peso total de rollos (kg)'],
+        ['Proveedor', 'Material', 'Ancho', 'Largo', 'Total de mermas', 'Total m²', 'Peso neto total de rollos (kg)'],
         ['Proveedor A', 'Lona', 1.5, null, 5, 28.5, 2.5],
         ['Proveedor A', 'Retazo', 2, 3, 2, 12, null],
         [

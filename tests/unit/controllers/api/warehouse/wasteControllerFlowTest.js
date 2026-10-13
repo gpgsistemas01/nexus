@@ -213,9 +213,10 @@ describe('wasteController complete flow', () => {
         name: 'Nombre alterado',
         base: 2,
         height: 3,
+        coneWeightKg: null, totalWeightKg: null,
         NOT: { id: 'waste-1' }
       },
-      select: { id: true }
+      select: expect.objectContaining({ id: true })
     });
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('currentStock');
     expect(wasteUpdate.mock.calls[0][0].data).not.toHaveProperty('newStock');

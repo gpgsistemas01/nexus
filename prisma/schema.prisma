@@ -145,6 +145,7 @@ model Material {
   correctedGoodsReceiptDetailChanges GoodsReceiptDetailChange[] @relation("CorrectedGoodsReceiptDetailChangeMaterial")
   movementDetails                    MovementDetail[]
   supplierMaterials                  SupplierMaterial[]
+  wasteRolls                         Waste[]                    @relation("WasteRollMaterial")
   stockAdjustmentDetails             StockAdjustmentDetail[]
 }
 
@@ -188,16 +189,20 @@ model Supplier {
 }
 
 model SupplierMaterial {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  maxUnitCost       Decimal? @db.Decimal(18, 6)
-  sku               String?  @db.VarChar(50)
-  currentStock      Decimal  @default(0) @db.Decimal(18, 6)
-  convertedQuantity Decimal  @default(0) @db.Decimal(18, 6)
-  isActive          Boolean  @default(true)
-  supplierId        String   @db.Uuid
-  materialId        String   @db.Uuid
-  supplier          Supplier @relation(fields: [supplierId], references: [id])
-  material          Material @relation(fields: [materialId], references: [id])
+  id                         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  maxUnitCost                Decimal? @db.Decimal(18, 6)
+  sku                        String?  @db.VarChar(50)
+  currentStock               Decimal  @default(0) @db.Decimal(18, 6)
+  convertedQuantity          Decimal  @default(0) @db.Decimal(18, 6)
+  isActive                   Boolean  @default(true)
+  supplierId                 String   @db.Uuid
+  materialId                 String   @db.Uuid
+  coneWeightMode             String   @default("VARIABLE") @db.VarChar(8)
+  referenceConeWeightKg      Decimal? @db.Decimal(5, 2)
+  referenceRollTotalWeightKg Decimal? @db.Decimal(5, 2)
+  referenceRollNetWeightKg   Decimal? @db.Decimal(5, 2)
+  supplier                   Supplier @relation(fields: [supplierId], references: [id])
+  material                   Material @relation(fields: [materialId], references: [id])
 
   @@unique([supplierId, materialId])
   @@index([supplierId])
@@ -205,33 +210,45 @@ model SupplierMaterial {
 }
 
 model Waste {
-  id                     String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierId             String                       @db.Uuid
-  presentationId         String                       @db.Uuid
-  unitMeasureId          String                       @db.Uuid
-  name                   String                       @db.VarChar(200)
-  isActive               Boolean                      @default(true)
-  minStock               Decimal                      @default(0) @db.Decimal(18, 6)
-  base                   Decimal?                     @db.Decimal(18, 6)
-  height                 Decimal?                     @db.Decimal(18, 6)
-  maxUnitCost            Decimal?                     @db.Decimal(18, 6)
-  /// Peso en kg por unidad de merma ROLLO: positivo, máximo 100 kg.
-  weightKg               Decimal?                     @db.Decimal(5, 2)
-  currentStock           Decimal                      @default(0) @db.Decimal(18, 6)
-  convertedQuantity      Decimal                      @default(0) @db.Decimal(18, 6)
-  supplier               Supplier                     @relation(fields: [supplierId], references: [id])
-  presentation           Presentation                 @relation(fields: [presentationId], references: [id])
-  unitMeasure            UnitMeasure                  @relation(fields: [unitMeasureId], references: [id])
-  stockAdjustmentDetails WasteStockAdjustmentDetail[]
-  movementDetails        WasteMovementDetail[]
-  wasteIssueDetails      WasteIssueDetail[]
-  wasteIssueReturns      WasteIssueReturn[]
-  stockEntries           WasteStockEntry[]
+  id                      String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supplierId              String                       @db.Uuid
+  presentationId          String                       @db.Uuid
+  unitMeasureId           String                       @db.Uuid
+  name                    String                       @db.VarChar(200)
+  isActive                Boolean                      @default(true)
+  minStock                Decimal                      @default(0) @db.Decimal(18, 6)
+  base                    Decimal?                     @db.Decimal(18, 6)
+  height                  Decimal?                     @db.Decimal(18, 6)
+  maxUnitCost             Decimal?                     @db.Decimal(18, 6)
+  /// Peso neto en kg por unidad de merma ROLLO.
+  weightKg                Decimal?                     @db.Decimal(5, 2)
+  coneWeightKg            Decimal?                     @db.Decimal(5, 2)
+  totalWeightKg           Decimal?                     @db.Decimal(5, 2)
+  sourceMaterialId        String?                      @db.Uuid
+  sourceMaterial          Material?                    @relation("WasteRollMaterial", fields: [sourceMaterialId], references: [id], onDelete: Restrict)
+  referenceConeWeightKg   Decimal?                     @db.Decimal(5, 2)
+  referenceConeWeightMode String?                      @db.VarChar(8)
+  coneWeightSource        String?                      @db.VarChar(24)
+  lengthSource            String                       @default("MEASURED") @db.VarChar(9)
+  referenceNetWeightKg    Decimal?                     @db.Decimal(5, 2)
+  referenceLengthM        Decimal?                     @db.Decimal(18, 6)
+  referenceWidthM         Decimal?                     @db.Decimal(18, 6)
+  currentStock            Decimal                      @default(0) @db.Decimal(18, 6)
+  convertedQuantity       Decimal                      @default(0) @db.Decimal(18, 6)
+  supplier                Supplier                     @relation(fields: [supplierId], references: [id])
+  presentation            Presentation                 @relation(fields: [presentationId], references: [id])
+  unitMeasure             UnitMeasure                  @relation(fields: [unitMeasureId], references: [id])
+  stockAdjustmentDetails  WasteStockAdjustmentDetail[]
+  movementDetails         WasteMovementDetail[]
+  wasteIssueDetails       WasteIssueDetail[]
+  wasteIssueReturns       WasteIssueReturn[]
+  stockEntries            WasteStockEntry[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([supplierId, name, base, height])
+  @@unique([supplierId, name, base, height, coneWeightKg, totalWeightKg])
+  @@index([sourceMaterialId])
   @@index([supplierId])
   @@index([presentationId])
   @@index([unitMeasureId])
@@ -549,19 +566,19 @@ enum GoodsReceiptDetailStatus {
 }
 
 model GoodsIssue {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type            MaterialType @default(MATERIAL)
   /// Folio SMA-AAAA-consecutivo o SCO-AAAA-consecutivo según type.
-  referenceNumber String    @unique @db.VarChar(50)
+  referenceNumber String       @unique @db.VarChar(50)
   approvedDate    DateTime?
   requestDate     DateTime
   deliveryDate    DateTime?
-  observations    String?   @db.VarChar(500)
-  projectNumber   String    @db.VarChar(10)
-  departmentName  String    @db.VarChar(50)
-  requesterName   String    @db.VarChar(255)
-  clientName      String    @db.VarChar(255)
-  advisorName     String    @db.VarChar(255)
+  observations    String?      @db.VarChar(500)
+  projectNumber   String       @db.VarChar(10)
+  departmentName  String       @db.VarChar(50)
+  requesterName   String       @db.VarChar(255)
+  clientName      String       @db.VarChar(255)
+  advisorName     String       @db.VarChar(255)
 
   statusId            String  @db.Uuid
   departmentId        String  @db.Uuid

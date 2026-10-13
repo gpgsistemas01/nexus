@@ -116,21 +116,48 @@ y el [resumen de Prisma](../../development/code-structure/06-prisma-and-persiste
 
 ## Peso unitario de merma de rollo
 
-`Waste.weightKg` almacena los kg por unidad en `DECIMAL(5,2)` y admite `NULL`
-cuando el peso se desconoce. La identidad de la merma permanece definida por
-`(supplierId, name, base, height)`.
+`Waste` conserva `coneWeightKg`, `totalWeightKg` y `weightKg` (neto) por unidad,
+con tipo `DECIMAL(5,2)` nullable. El neto se calcula como total con cono menos cono. La identidad de la merma se define por
+`(supplierId, name, base, height, coneWeightKg, totalWeightKg)`. El neto derivado no
+forma parte de la clave. Los pesos desconocidos conservan la identidad anterior mediante
+un índice parcial; véase la migración física.
 
 El [recorrido de negocio](../../../../requirements/requirements-specification/04-unified-catalog-by-scope/04-queries-reports-and-modeled-functions.md#recorrido-del-peso-de-merma)
 define la captura y consulta. La implementación distribuye sus responsabilidades:
 
 | Componente | Responsabilidad |
 | --- | --- |
-| `getWasteWeightValidationError` | Valida formato, precisión y rango en formulario y HTTP, antes de convertir el valor. |
-| `wasteDTO.js` | Normaliza el peso para el alta y lo excluye del DTO de edición. |
-| `wasteService.js` | Comprueba la presentación persistida de Rollo y el peso positivo; rechaza cambios posteriores mediante errores de dominio. |
-| PostgreSQL | Conserva el tipo decimal y los CHECK de positividad y máximo. Véase la [migración](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma). |
+| `getWasteWeightCaptureValidationError` | Valida formato, precisión, rango, captura conjunta y total mayor que cono en formulario y HTTP. |
+| `wasteDTO.js` | Normaliza cono, total y opciones de referencia/longitud para el alta; excluye los pesos del DTO de edición. |
+| `wasteService.js` | Comprueba la presentación persistida, resuelve el cono autorizado desde la oferta cuando se solicita, calcula neto y longitud y protege pesos y referencias en edición. |
+| PostgreSQL | Conserva el tipo decimal y los CHECK de rango, captura conjunta y neto igual a total menos cono. Véase la [migración](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma). |
 | `reportService.js` | Calcula `totalWeightKg` por identidad y luego agrupa los rollos por ancho. `weightStatus` distingue `complete`, `unknown` y `notApplicable`. |
 
 El reporte conserva el peso desconocido cuando falta en un rollo con existencia;
 una existencia cero aporta cero. El Excel incluye la fórmula de suma cuando el
 total está completo.
+
+Los registros anteriores conservan su peso neto; cono y total permanecen `NULL`.
+
+### Referencia y medida utilizada
+
+| Ubicación | Datos y propósito |
+| --- | --- |
+| `SupplierMaterial` | `coneWeightMode` (`FIXED`/`VARIABLE`), `referenceConeWeightKg`, `referenceRollTotalWeightKg` y `referenceRollNetWeightKg`. Referencia por material–proveedor, editable con `materials:write`. El neto de muestra es derivado. |
+| `Material` | Dimensiones nominales existentes: longitud de muestra = `MAX(base, height)`, ancho = `MIN(base, height)`. No contiene el peso del cono. |
+| `Waste` | Cono y total utilizados; `coneWeightSource` (`MEASURED`, `FIXED_REFERENCE`, `ESTIMATED_REFERENCE`), `lengthSource` (`MEASURED`/`ESTIMATED`), material de origen y copia de modo/cono/neto/longitud/ancho de referencia. Los históricos pueden carecer de esa referencia. |
+
+No se requiere un catálogo de conos para estos datos. `wasteRollReferenceService.js`
+actualiza únicamente la oferta; las copias históricas de `Waste` permanecen iguales.
+
+`calculateWasteRollLength` estima metros lineales mediante:
+
+```text
+largoMerma = netoMerma × largoMuestra × anchoMuestra / (netoMuestra × anchoMerma)
+```
+
+La regla usa seis decimales para longitud y dos para kg. Supone masa por área
+representativa del mismo material; la captura permite elegir largo medido. La longitud
+de merma se guarda en `height`; no se toma la mayor dimensión de la propia merma.
+Un duplicado devuelve `meta.waste` para abrir el formulario de entrada incremental;
+crear nunca incrementa por sí solo una existencia anterior.

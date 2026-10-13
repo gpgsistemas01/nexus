@@ -4,8 +4,13 @@ import { editWaste, editWasteStock, getAllWastes, getWasteMaterialTemplates, reg
 import { wasteEditValidation, wasteStockAdditionValidation, wasteStockValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
+import { getWasteRollReference, updateWasteRollReference } from '../../../controllers/api/warehouse/wasteRollReferenceController.js';
+import { wasteRollReferenceQueryValidation, wasteRollReferenceValidation } from '../../../validators/forms/wasteRollReferenceValidations.js';
 
 const router = express.Router();
+
+router.get('/roll-reference', verifyApiTokenRequired, authorizeUserApi(PERMISSIONS.WASTES_READ), wasteRollReferenceQueryValidation, validate, getWasteRollReference);
+router.patch('/roll-reference', verifyApiTokenRequired, authorizeUserApi(PERMISSIONS.MATERIALS_WRITE), wasteRollReferenceValidation, validate, updateWasteRollReference);
 
 router.get(
     '/material-templates',

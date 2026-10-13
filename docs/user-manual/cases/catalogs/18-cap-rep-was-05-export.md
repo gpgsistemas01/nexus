@@ -15,7 +15,7 @@
    - **Sólo con existencia:** incluye mermas activas o inactivas cuyo saldo sea mayor
      que cero.
 
-En el Excel, revise **Peso total de rollos (kg)**. Suma la existencia por el peso
+En el Excel, revise **Peso neto total de rollos (kg)**. Suma la existencia por el peso neto
 de cada medida; **Sin peso capturado** indica que faltan datos para completar
 el grupo o el total general. Otras presentaciones dejan esa columna vacía.
 

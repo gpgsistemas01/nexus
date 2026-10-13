@@ -1,5 +1,5 @@
-import { addWasteStockRequest, editWasteRequest, editWasteStockRequest, getAllWastesRequest, getWasteMaterialTemplatesRequest, registerWasteRequest } from "../../../services/warehouse/wasteService.js";
-import { createApplicationList, createCrudApplication } from '../../createCrudApplication.js';
+import { getWasteRollReferenceRequest, saveWasteRollReferenceRequest, addWasteStockRequest, editWasteRequest, editWasteStockRequest, getAllWastesRequest, getWasteMaterialTemplatesRequest, registerWasteRequest } from "../../../services/warehouse/wasteService.js";
+import { createApplicationList, createApplicationMutation, createCrudApplication } from '../../createCrudApplication.js';
 
 const wasteApplication = createCrudApplication({
     requests: {
@@ -20,3 +20,6 @@ export const editWaste = wasteApplication.edit;
 
 export const editWasteStock = wasteApplication.editStock;
 export const addWasteStock = wasteApplication.addStock;
+
+export const getWasteRollReference = createApplicationList(getWasteRollReferenceRequest);
+export const saveWasteRollReference = createApplicationMutation({ request: saveWasteRollReferenceRequest, dataKey: 'reference' });

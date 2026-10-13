@@ -166,8 +166,9 @@ sin copiar identificadores, claves o estructuras internas de la base de datos.
 
 ## Peso unitario de merma de rollo
 
-Peso en kilogramos de una unidad de merma con su ancho y largo registrados.
-Pertenece a la identidad formada por nombre, proveedor y medidas, y se comparte
-al agregar existencias de esa misma identidad. No representa el stock ni el peso
-total disponible. Un valor ausente significa desconocido; otras presentaciones
-no admiten su captura.
+Peso neto en kilogramos de una unidad de merma de Rollo con su ancho y largo
+registrados. Se obtiene restando el peso del cono al peso total con cono. Se
+conserva para la identidad por nombre, proveedor, medidas y pesos al agregar existencias.
+Un valor ausente significa desconocido.
+
+El **cono de referencia** es una medida de la oferta del material y proveedor. El **cono utilizado** es el valor guardado en la merma: medido o tomado de esa referencia. La **longitud estimada** resulta de la proporción de peso neto con una muestra del mismo material; se distingue del largo medido.

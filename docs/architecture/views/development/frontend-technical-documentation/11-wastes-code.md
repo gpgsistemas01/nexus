@@ -12,10 +12,19 @@ flowchart TB
     T["DataTable del recurso<br/>wasteDatatable.js"]
     U["Composición compartida<br/>createCrudApplication.js<br/>warehouseInventoryDatatable.js<br/>y colaboradores"]
     Validation["validators.js"]
-    FieldValidation["fieldValidations.js<br/>validateWasteWeight"]
-    WeightRule["warehouseInventoryUtils.js<br/>getWasteWeightValidationError"]
+    FieldValidation["fieldValidations.js<br/>validateWasteWeightCapture"]
+    WeightRule["warehouseInventoryUtils.js<br/>getWasteWeightCaptureValidationError"]
     Messages["apiMessages.js<br/>getErrorMessage"]
     H["axiosInstanceApi.js<br/>request / apiRequest"]
+    ReferenceForm["wasteRollReferenceForm.js"]
+    Roll["wasteRollUtils.js"]
+    InventoryUI["inventorySelectUI.js"]
+    P --> ReferenceForm
+    ReferenceForm --> A
+    ReferenceForm --> Roll
+    ReferenceForm --> InventoryUI
+    FieldValidation --> Roll
+    InventoryUI --> Roll
     A --> R
     A --> U
     P --> Validation
@@ -38,6 +47,7 @@ flowchart TB
 | DataTable del recurso · wasteDatatable.js | `src/public/js/plugins/datatable/warehouse/`<br/>`wastes/wasteDatatable.js` |
 | Composición compartida · createCrudApplication.js · warehouseInventoryDatatable.js · y colaboradores | `src/public/js/application/`<br/>`createCrudApplication.js`<br/>`src/public/js/plugins/datatable/shared/`<br/>`inventory/warehouseInventoryDatatable.js`<br/>`src/public/js/ui/forms/formStateUI.js`<br/>`src/public/js/ui/forms/formUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventoryCrudModalUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventorySelectUI.js`<br/>`src/public/js/ui/modalUI.js`<br/>`src/public/js/ui/tableUI.js` |
 | Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/warehouseInventoryUtils.js`<br/>`src/public/js/constants/apiMessages.js` |
+| Referencia del rollo | `src/public/js/pages/warehouse/wastes/`<br/>`wasteRollReferenceForm.js`<br/>`src/public/js/utils/wasteRollUtils.js` |
 | axiosInstanceApi.js · request / apiRequest | `src/public/js/services/axiosInstanceApi.js` |
 
 
@@ -47,7 +57,7 @@ flowchart TB
 
 | Capacidad | Composición de pantalla | Application y transporte | Contrato y variantes |
 | --- | --- | --- | --- |
-| Mermas | `wastesPage.ejs` incluye ambos parciales y carga únicamente `wastesPage.js`; ese entry point importa los formularios, inyecta las aperturas de modal al DataTable y `wasteFields.js` conserva los contratos del CRUD. | `application/warehouse/wastes/wastes.js` configura la fábrica CRUD y la mutación incremental sobre `wasteService.js`. | CRUD de `/api/warehouse/wastes`, plantillas de material, ajuste `PATCH /:id/stock` y adición `POST /:id/stock-additions`. |
+| Mermas | `wastesPage.ejs` incluye los parciales de merma, entrada de stock y referencia del rollo y carga únicamente `wastesPage.js`; ese entry point importa los formularios, inyecta las aperturas de modal al DataTable y `wasteFields.js` conserva los contratos del CRUD. | `application/warehouse/wastes/wastes.js` configura la fábrica CRUD y la mutación incremental sobre `wasteService.js`. | CRUD de `/api/warehouse/wastes`, plantillas de material, ajuste `PATCH /:id/stock` y adición `POST /:id/stock-additions`. |
 
 
 La application exporta operaciones con vocabulario del recurso; la página/formulario
@@ -80,12 +90,22 @@ Los reportes y la infraestructura transversal se localizan en el
 [procesos](../../processes/frontend-code-sequences/index.md).
 
 
-`updateWasteWeightField` usa `setFormDisabled` para habilitar el peso al registrar
-una merma de Rollo y mostrarlo deshabilitado al editar. `applyWasteMaterialTemplate`
-limpia el valor y su aviso al cambiar de plantilla; `wasteEditFields` excluye el peso
-del envío. La tabla general omite esa columna.
+`updateWasteWeightField` usa `setFormDisabled` para habilitar cono y total al registrar
+una merma de Rollo y mostrar los tres pesos deshabilitados al editar. `applyWasteMaterialTemplate`
+limpia los pesos y sus avisos al cambiar de plantilla; `wasteEditFields` los excluye
+del envío. `updateWasteNetWeightField` muestra el neto calculado al capturar cono y total. La tabla general omite esa columna.
 
-`wasteForm.js` aporta la presentación a `fieldValidations.validateWasteWeight`.
+`wasteForm.js` aporta la presentación a `fieldValidations.validateWasteWeightCapture`.
 La regla decimal se comparte con la validación HTTP. `useForm`, `validateFields`
 y `normalizeFormErrors` muestran los errores mediante el flujo común de formularios.
 El contrato del campo está en la [vista de datos](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).
+
+`wasteRollReferenceForm.js` consulta/configura la oferta del material seleccionado,
+usa `useForm` y los validadores compartidos y actualiza la referencia de la captura.
+`updateWasteRollMeasurement` controla el cono de referencia y el largo estimado con
+`setFormDisabled`. Elegir cono medido o largo medido limpia el valor previo para
+solicitar la medición. El servidor vuelve a resolver y calcular esos datos.
+
+Ante `WASTE_ALREADY_EXISTS`, `wasteForm.js` ofrece **Agregar stock** si el usuario tiene
+`wastes:addStock`. Abre el modal existente con el registro devuelto y la cantidad
+precargada; el usuario revisa y confirma esa operación por separado.

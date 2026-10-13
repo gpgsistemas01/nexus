@@ -174,6 +174,26 @@ const findStatusTriggerAcrossPages = async (page, { status, selector }) => {
 };
 
 const runAction = async (page, action, captureId, step) => {
+    if (action.selectWasteRollTemplate) {
+        const template = await page.locator('#table').evaluate(async tableElement => {
+            const rows = globalThis.$(tableElement).DataTable().rows().data().toArray();
+            const supplierId = rows.find(row => row.presentation?.name === 'ROLLO')?.supplierId;
+            if (!supplierId) return null;
+            const response = await fetch(`/api/warehouse/wastes/material-templates?supplierId=${ supplierId }`);
+            if (!response.ok) throw new Error('No se pudieron consultar las plantillas de merma.');
+            const result = await response.json();
+            const material = result.data.find(row => row.presentation?.name === 'ROLLO');
+            return material ? { supplier: rows.find(row => row.supplierId === supplierId).supplier.tradeName, material: material.name } : null;
+        });
+        if (!template) throw new Error(`${ captureId } requiere un proveedor con material ROLLO activo y una merma existente. La automatización no crea registros.`);
+        for (const [selector, label] of [['#supplierInput', template.supplier], ['#materialInput', template.material]]) {
+            await page.locator(selector).evaluate(select => globalThis.$(select).select2('open'));
+            await page.locator('.select2-container--open .select2-search__field').fill(label);
+            await page.locator('.select2-results__option--selectable').filter({ hasText: label }).first().click();
+        }
+        await page.locator('#wasteRollReferenceButton:visible').waitFor({ state: 'visible' });
+        return;
+    }
     if (action.selectNew) {
         await page.locator(action.selector).evaluate(select => globalThis.$(select).select2('open'));
         await page.locator('.select2-container--open .select2-search__field').fill(action.value);
@@ -238,6 +258,7 @@ const runAction = async (page, action, captureId, step) => {
 };
 
 const capturePage = async (page, capture) => {
+    if (capture.viewport) await page.setViewportSize(capture.viewport);
     const directory = path.join(outputRoot, getCaptureScopePath(capture), capture.module);
     await mkdir(directory, { recursive: true });
     await page.goto(new URL(capture.route, baseURL).href, { waitUntil: 'domcontentloaded' });

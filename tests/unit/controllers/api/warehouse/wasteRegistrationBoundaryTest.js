@@ -68,7 +68,8 @@ describe('wasteController registration boundaries', () => {
         base: '99999999.999999',
         height: '99999999.999999',
         newStock: '99999999.999999',
-        weightKg: '100',
+        coneWeightKg: '0',
+        totalWeightKg: '100',
         observations
       })
       .expect('Content-Type', /json/)
@@ -83,7 +84,8 @@ describe('wasteController registration boundaries', () => {
         base: 99999999.999999,
         height: 99999999.999999,
         newStock: 99999999.999999,
-        weightKg: 100,
+        coneWeightKg: 0,
+        totalWeightKg: 100,
         observations
       }),
       userId
@@ -118,7 +120,7 @@ describe('wasteController registration boundaries', () => {
     expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
   });
   it.each([undefined, null, '', '0.01'])('admite peso desconocido o el mínimo positivo: %s', weightKg => {
-    return request(app).post('/wastes').send({ ...validBody, weightKg }).expect(200);
+    return request(app).post('/wastes').send({ ...validBody, coneWeightKg: weightKg == null || weightKg === '' ? weightKg : 0, totalWeightKg: weightKg }).expect(200);
   });
 
   it.each([
@@ -148,8 +150,21 @@ describe('wasteController registration boundaries', () => {
     [0.001, 'WEIGHT_KG_TOO_LONG'],
     [1e21, 'WEIGHT_KG_TOO_HIGH']
   ])('rechaza peso %s antes de normalizarlo y devuelve el código correcto', async (weightKg, code) => {
-    const response = await request(app).post('/wastes').send({ ...validBody, weightKg }).expect(400);
-    expect(response.body.errors.weightKg.code).toBe(code);
+    const response = await request(app).post('/wastes').send({ ...validBody, coneWeightKg: 0, totalWeightKg: weightKg }).expect(400);
+    expect(response.body.errors.totalWeightKg.code).toBe(code);
+    expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [{ totalWeightKg: 2 }, 'coneWeightKg', 'CONE_WEIGHT_KG_REQUIRED'],
+    [{ coneWeightKg: 0 }, 'totalWeightKg', 'TOTAL_WEIGHT_KG_REQUIRED'],
+    [{ coneWeightKg: -1, totalWeightKg: 2 }, 'coneWeightKg', 'CONE_WEIGHT_KG_INVALID_NUMBER'],
+    [{ coneWeightKg: 2, totalWeightKg: 2 }, 'totalWeightKg', 'WASTE_TOTAL_WEIGHT_NOT_GREATER'],
+    [{ coneWeightKg: 3, totalWeightKg: 2 }, 'totalWeightKg', 'WASTE_TOTAL_WEIGHT_NOT_GREATER'],
+    [{ weightKg: 1 }, 'weightKg', 'WASTE_WEIGHT_CALCULATED']
+  ])('rechaza captura incompleta o incoherente %s antes del servicio', async (weights, field, code) => {
+    const response = await request(app).post('/wastes').send({ ...validBody, ...weights }).expect(400);
+    expect(response.body.errors[field].code).toBe(code);
     expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
   });
 

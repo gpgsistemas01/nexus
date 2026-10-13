@@ -322,7 +322,7 @@ export const exportWasteReportExcel = async (req, res) => {
             'Largo',
             'Total de mermas',
             'Total m²',
-            'Peso total de rollos (kg)'
+            'Peso neto total de rollos (kg)'
         ],
 
         ...summaryRows.map(row => [

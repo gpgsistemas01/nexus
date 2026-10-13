@@ -36,7 +36,7 @@ del valor nuevo ya aplicado y de los resultados que habilitan el paso siguiente.
 
 ### Estado de las capturas por área
 
-Se generó y verificó el inventario completo de **184 capturas** en sesiones
+Se generó y verificó el inventario completo de **186 capturas** en sesiones
 independientes de Almacén y Sistemas, con usuarios y datos ficticios de PostgreSQL
 temporal. Los PNG se publican en `images/areas/<área>/`, con IDs estables `CAP-*`.
 Cada captura recorrió su ruta, controles y estado declarado; el navegador estuvo
@@ -243,8 +243,10 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 180 | sistemas | `CAP-REP-MOV-WAS-02-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-movements/02-export-report.png` | `CU-ALM-16` |
 | 181 | almacen | `CAP-CAT-WAS-07-ROLL-WEIGHT-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/07-roll-unit-weight.png` | `CU-ALM-10`, `CU-ALM-11` |
 | 182 | sistemas | `CAP-CAT-WAS-07-ROLL-WEIGHT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/07-roll-unit-weight.png` | `CU-ALM-10`, `CU-ALM-11` |
-| 183 | almacen | `CAP-ERR-404-NOT-FOUND-ALMACEN` | `build/docs/screenshots/areas/almacen/errors/01-page-not-found.png` | Transversal |
-| 184 | sistemas | `CAP-ERR-404-NOT-FOUND-SISTEMAS` | `build/docs/screenshots/areas/sistemas/errors/01-page-not-found.png` | Transversal |
+| 183 | almacen | `CAP-CAT-WAS-08-REFERENCE-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/08-roll-reference.png` | `CU-ALM-10` |
+| 184 | sistemas | `CAP-CAT-WAS-08-REFERENCE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/08-roll-reference.png` | `CU-ALM-10` |
+| 185 | almacen | `CAP-ERR-404-NOT-FOUND-ALMACEN` | `build/docs/screenshots/areas/almacen/errors/01-page-not-found.png` | Transversal |
+| 186 | sistemas | `CAP-ERR-404-NOT-FOUND-SISTEMAS` | `build/docs/screenshots/areas/sistemas/errors/01-page-not-found.png` | Transversal |
 
 ## Cobertura adicional necesaria
 

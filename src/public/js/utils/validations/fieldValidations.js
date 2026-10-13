@@ -1,5 +1,5 @@
 import { getErrorMessage } from "../../constants/apiMessages.js";
-import { getWasteWeightValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
+import { getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
 import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
@@ -82,14 +82,12 @@ export const validateInvoice = (invoice, { isInvoiced } = {}) => {
     return null;
 }
 
-export const validateWasteWeight = (value, { presentationName } = {}) => {
-    const code = getWasteWeightValidationError(value);
+export const validateWasteWeightCapture = (value, data, fieldName) => {
+    const code = getWasteWeightCaptureValidationError(value, { ...data, fieldName });
     if (code) return getErrorMessage({ code });
-
-    if (value !== undefined && value !== null && value !== '' && presentationName !== undefined && !isRollPresentation(presentationName)) {
+    if (value !== undefined && value !== null && value !== '' && !isRollPresentation(data.presentationName)) {
         return getErrorMessage({ code: 'WASTE_WEIGHT_INVALID' });
     }
-
     return null;
 };
 
@@ -323,5 +321,13 @@ export const validatePersonAccessesArray = accesses => {
         return 'Seleccione un área y un rol, y presione Agregar para incluir el acceso en la tabla';
     }
 
+    return null;
+};
+
+export const validateWasteLengthSource = (value, { rollReference = {}, coneWeightKg, totalWeightKg, presentationName }) => {
+    if (!['MEASURED', 'ESTIMATED'].includes(value)) return getErrorMessage({ code: 'WASTE_LENGTH_SOURCE_INVALID' });
+    if (value === 'MEASURED') return null;
+    if (!isRollPresentation(presentationName) || !(Number(rollReference.referenceRollNetWeightKg) > 0) || !(Number(rollReference.referenceLengthM) > 0)) return getErrorMessage({ code: 'WASTE_ROLL_REFERENCE_MISSING' });
+    if (coneWeightKg === '' || totalWeightKg === '' || coneWeightKg == null || totalWeightKg == null) return getErrorMessage({ code: 'WASTE_ESTIMATED_LENGTH_NEEDS_WEIGHTS' });
     return null;
 };

@@ -22,7 +22,7 @@ describe('plantillas de material para el CRUD de mermas', () => {
     expect(materialFindMany).not.toHaveBeenCalled();
   });
 
-  it('devuelve materiales únicos y sólo sugiere la menor medida como ancho para rollos', async () => {
+  it('conserva cada rollo como referencia y sugiere ancho mínimo sin perder el mayor costo de la familia', async () => {
     materialFindMany.mockResolvedValue([
       { id: 'material-1', name: 'Lona', base: 50, height: 1.52, presentation: { name: 'ROLLO' }, supplierMaterials: [{ maxUnitCost: 20 }] },
       { id: 'material-duplicate', name: 'Lona', base: 1.52, height: 100, presentation: { name: 'ROLLO' }, supplierMaterials: [{ maxUnitCost: 27.5 }] },
@@ -41,14 +41,15 @@ describe('plantillas de material para el CRUD de mermas', () => {
     }));
     expect(materialFindMany.mock.calls[0][0].select.supplierMaterials).toEqual({
       where: { supplierId: 'supplier-1', isActive: true },
-      select: { maxUnitCost: true }
+      select: { maxUnitCost: true, coneWeightMode: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true, referenceRollNetWeightKg: true }
     });
     expect(result.data).toEqual([
       expect.objectContaining({ id: 'material-1', suggestedWidth: 1.52, maxUnitCost: 27.5 }),
+      expect.objectContaining({ id: 'material-duplicate', suggestedWidth: 1.52, maxUnitCost: 27.5, rollReference: expect.objectContaining({ referenceLengthM: 100 }) }),
       expect.objectContaining({ id: 'material-wide', suggestedWidth: 3.2, maxUnitCost: 30 }),
       expect.objectContaining({ id: 'material-2', suggestedWidth: null, maxUnitCost: null })
     ]);
-    expect(result.recordsFiltered).toBe(3);
+    expect(result.recordsFiltered).toBe(4);
   });
 
   it('carga la página solicitada sin perder el total de plantillas disponibles', async () => {

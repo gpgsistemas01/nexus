@@ -77,9 +77,15 @@ toda su cantidad pendiente; **Cantidad de proyecto** no determina una entrega pa
 
 | Campo y modo | Validación |
 | --- | --- |
-| Peso por unidad (kg), alta de Rollo | Opcional; entre 0.01 y 100 kg; hasta tres enteros y dos decimales. |
+| Pesos de Rollo (kg por unidad) | Cono y total se capturan juntos o quedan vacíos; cono ≥ 0, total > cono y ≤ 100. Tres enteros y dos decimales. Neto calculado automáticamente. |
 | Formato del peso | Decimal con punto, por ejemplo 0.75; sin letras, espacios, separadores de miles ni notación científica. |
-| Peso en edición | Sólo consulta; el servidor rechaza su envío como cambio. |
-| Otras presentaciones | Campo deshabilitado; un peso forzado se rechaza. |
+| Pesos en edición | Sólo consulta; el servidor rechaza cambios de los tres pesos. |
+| Otras presentaciones | Campos de peso deshabilitados; su envío se rechaza. |
 
 Véase el [recorrido del peso](../requirements/requirements-specification/04-unified-catalog-by-scope/04-queries-reports-and-modeled-functions.md#recorrido-del-peso-de-merma).
+
+| Referencia y longitud de Rollo | Validación |
+| --- | --- |
+| Cono fijo de referencia | Requiere peso del cono; el total de muestra, si se captura, debe ser mayor. |
+| Cono variable | Permite referencia vacía o medida de muestra; al usarla en merma se identifica como estimación. |
+| Largo estimado | Requiere pesos de merma, neto y dimensiones positivos de muestra. Se calcula; no se captura manualmente. |

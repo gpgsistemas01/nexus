@@ -356,6 +356,8 @@ y CHECK de positividad y máximo de 100 kg:
 | `20261012210000_add_roll_waste_unit_weight` | Agrega el campo y el CHECK de positividad. |
 | `20261012233000_limit_roll_waste_weight_to_100kg` | Establece el máximo de 100 kg. |
 | `20261013153000_limit_roll_waste_weight_to_two_decimals` | Establece tres enteros y dos decimales. |
+| `20261013160000_add_roll_waste_cone_and_total_weight` | Agrega cono y total por unidad, con CHECK de captura conjunta y neto igual a total menos cono. |
+| `20261013170000_add_roll_references_and_weight_identity` | Agrega referencia en oferta, procedencia/copia histórica en merma y clave de identidad con pesos. |
 
 En una base que ya tenga el campo, revise los valores que impedirían aplicar
 estas migraciones:
@@ -370,3 +372,17 @@ Las migraciones bloquean la tabla y cancelan la transacción si encuentran valor
 incompatibles. Resuelva los registros señalados antes de reintentar. Publique el
 formulario y el backend junto con el cliente Prisma regenerado y aplique las
 migraciones con la cuenta destinada a ello.
+
+La migración de cono y total agrega ambos campos nullable sin cambiar los pesos netos
+históricos. Para una captura nueva, el CHECK exige cono no negativo, total mayor
+que cono y hasta 100 kg, y neto igual a la diferencia.
+
+La migración de referencias conserva las filas y pesos previos sin inferir cono,
+material de origen ni muestra. El origen histórico queda `NULL` y el largo existente
+se clasifica como `MEASURED`. Agrega FK `Waste.sourceMaterialId` con `RESTRICT` y
+reemplaza el índice único de cuatro campos por uno que incluye cono y total.
+`Waste_unknown_weights_identity`, definido en SQL porque Prisma no representa este
+índice parcial, impide duplicados cuando ambos pesos son `NULL`. Los CHECK protegen
+modo fijo/variable, neto de referencia y datos necesarios para una longitud estimada.
+Una versión antigua sigue comparando sólo dimensiones: detener esas instancias antes
+de habilitar el registro con pesos distintos.

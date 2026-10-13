@@ -90,7 +90,7 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **El registro de _tipo de catálogo_ no está disponible.** | La entrada fue eliminada o dejó de estar disponible antes de la actualización. Actualice el listado y seleccione otra entrada vigente. |
 | **Complete correctamente los campos del catálogo _tipo de catálogo_.** | Corrija **Nombre**, **Símbolo** o **Activo** según los controles visibles del catálogo nombrado; el rechazo no crea ni actualiza entradas. |
 | **Ya existe un material con el mismo nombre, presentación, unidad de medida y dimensiones.** | Seleccione el inventario existente y use **Ajustar stock** para establecer la nueva existencia total; no repita el alta ni interprete el valor como una cantidad para sumar. |
-| **Ya existe una merma con el nombre, proveedor y dimensiones indicados.** | Seleccione la merma existente y use **Ajustar stock** para establecer el nuevo stock total; el alta rechazada no incrementó su existencia. |
+| **Ya existe una merma con este proveedor, nombre, medidas y pesos. Use Agregar stock para aumentar su existencia.** | Use el acceso a **Agregar stock**, revise la cantidad precargada y confirme la entrada. El alta rechazada no incrementó la existencia. |
 | **La oferta del material está inactiva y no puede utilizarse en una operación nueva.** | No lo agregue a una compra, salida o relación nueva. Reactive la oferta sólo si vuelve a estar autorizada; un detalle registrado antes de desactivarlo puede surtirse desde la salida existente. |
 | **El proveedor está inactivo y no puede utilizarse en una operación nueva.** | Seleccione un proveedor activo o reactive el registro cuando corresponda. Las salidas ya registradas conservan sus detalles y pueden completar el surtido pendiente. |
 | **No se puede cambiar el proveedor del material porque ya tiene historial de compras o salidas.** | Conserve la relación histórica y registre la identidad correcta conforme al flujo de materiales. |
@@ -176,6 +176,17 @@ conserve la dirección y repórtela. No modifique manualmente la URL para intent
 | --- | --- |
 | El peso por unidad debe ser un decimal mayor que cero en kg. Use punto decimal, sin letras ni notación científica. | Capture un decimal positivo, por ejemplo 0.75; quite letras y separadores. Si desconoce el peso, deje vacío el campo durante el alta. |
 | El peso debe ser positivo y sólo aplica a mermas con presentación Rollo. | Revise la presentación y capture kg por unidad con un valor mayor que cero; deje vacío cuando no se conoce. |
-| No se puede modificar el peso unitario de una merma ya registrada. Este dato sólo está disponible para consulta. | Consulte el peso guardado y actualice únicamente los campos habilitados del formulario. |
+| No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta. | Consulte el peso guardado y actualice únicamente los campos habilitados del formulario. |
 | El peso por unidad no puede superar 100 kg. | Verifique el peso de una unidad de merma; no capture aquí el peso total de todas las existencias. |
 | El peso admite hasta 3 dígitos enteros y 2 decimales. | Corrija la precisión del valor capturado. |
+| Capture el peso del cono para calcular el peso neto de la merma. | Complete el peso del cono de una unidad. |
+| Capture el peso total con cono para calcular el peso neto de la merma. | Complete el peso total de la misma unidad, incluyendo el cono. |
+| El peso total con cono debe ser mayor que el peso del cono. | Revise ambas mediciones de la misma unidad. |
+| El peso del cono debe ser un decimal mayor o igual que cero en kg. Use punto decimal, sin letras ni notación científica. | Capture kg del cono; cero es válido. |
+| El peso neto se calcula automáticamente. Capture el peso del cono y el peso total con cono. | Capture los dos pesos habilitados y consulte el neto calculado. |
+
+| Referencia o método del rollo | Recuperación |
+| --- | --- |
+| Seleccione si el cono tiene peso fijo o variable. | Elija el comportamiento del cono de este material y proveedor. |
+| Complete la referencia del cono y del rollo para utilizarla en esta merma. | Verifique cono y muestra de rollo completo o capture el cono y largo medidos. |
+| Capture los pesos de la merma antes de estimar su longitud. | Complete cono y total con cono, o seleccione longitud Medida. |

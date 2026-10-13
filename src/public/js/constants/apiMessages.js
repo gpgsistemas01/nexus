@@ -1,10 +1,21 @@
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
+    WASTE_ESTIMATED_LENGTH_NEEDS_WEIGHTS: 'Capture los pesos de la merma antes de estimar su longitud.',
+    CONE_WEIGHT_MODE_INVALID: 'Seleccione si el cono tiene peso fijo o variable.',
+    WASTE_LENGTH_SOURCE_INVALID: 'Seleccione longitud medida o estimada por peso.',
+    CONE_REFERENCE_CHOICE_INVALID: 'Indique si se utiliza la referencia del cono.',
+    WASTE_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
+    WASTE_ROLL_REFERENCE_MISSING: 'Complete la referencia del cono y del rollo para utilizarla en esta merma.',
+    CONE_WEIGHT_KG_INVALID_NUMBER: 'El peso del cono debe ser un decimal mayor o igual que cero en kg. Use punto decimal, sin letras ni notación científica.',
+    CONE_WEIGHT_KG_REQUIRED: 'Capture el peso del cono para calcular el peso neto de la merma.',
+    TOTAL_WEIGHT_KG_REQUIRED: 'Capture el peso total con cono para calcular el peso neto de la merma.',
+    WASTE_TOTAL_WEIGHT_NOT_GREATER: 'El peso total con cono debe ser mayor que el peso del cono.',
+    WASTE_WEIGHT_CALCULATED: 'El peso neto se calcula automáticamente. Capture el peso del cono y el peso total con cono.',
     WEIGHT_KG_INVALID_NUMBER: 'El peso por unidad debe ser un decimal mayor que cero en kg. Use punto decimal, sin letras ni notación científica.',
     WEIGHT_KG_TOO_LONG: 'El peso admite hasta 3 dígitos enteros y 2 decimales.',
     WEIGHT_KG_TOO_HIGH: 'El peso por unidad no puede superar 100 kg.',
-    WASTE_WEIGHT_READ_ONLY: 'No se puede modificar el peso unitario de una merma ya registrada. Este dato sólo está disponible para consulta.',
+    WASTE_WEIGHT_READ_ONLY: 'No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta.',
     WASTE_WEIGHT_INVALID: 'El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.',
     // 🔐 AUTH / GENERALES
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
@@ -294,6 +305,7 @@ export const errorMessages = {
 };
 
 const successMessages = {
+    UPDATED_WASTE_ROLL_REFERENCE: 'Referencia del rollo actualizada.',
     CREATED_ACCOUNT: '¡Cuenta registrada exitosamente!',
     UPDATED_ACCOUNT: '¡Cuenta actualizada con éxito!',
     SUCCESS_LOGIN: '¡Inicio de sesión exitoso!',

@@ -45,9 +45,9 @@ const captureTemplates = [
 
     { id: 'CAP-CAT-WAS-00-NAVIGATION', module: 'waste', name: '00-access-menu-main.png', route: '/almacen/mermas', ready: '#table', action: openMainMenu, useCases: ['CU-ALM-09'] },
     { id: 'CAP-CAT-WAS-01-LIST', module: 'waste', name: '01-list-inventory.png', route: '/almacen/mermas', ready: '#table', action: openFilters, useCases: ['CU-ALM-09', 'CU-ALM-14'] },
-    { id: 'CAP-CAT-WAS-02-CREATE', module: 'waste', name: '02-form-registration.png', route: '/almacen/mermas', ready: '#table', action: click('button:has-text("Nueva merma")', '#wasteModal.show'), useCases: ['CU-ALM-10'] },
+    { id: 'CAP-CAT-WAS-02-CREATE', viewport: { width: 1440, height: 1400 }, module: 'waste', name: '02-form-registration.png', route: '/almacen/mermas', ready: '#table', action: click('button:has-text("Nueva merma")', '#wasteModal.show'), useCases: ['CU-ALM-10'] },
     { id: 'CAP-CAT-WAS-03-EDIT', module: 'waste', name: '03-form-edit.png', route: '/almacen/mermas', ready: '#table', action: click('#table tbody .btn-edit', '#wasteModal.show'), useCases: ['CU-ALM-11'] },
-    { id: 'CAP-CAT-WAS-04-STOCK', module: 'waste', name: '04-adjustment-stock.png', route: '/almacen/mermas', ready: '#table', action: click('#table tbody .btn-adjust-stock', '#wasteModal.show'), area: 'sistemas', useCases: ['CU-ALM-12'] },
+    { id: 'CAP-CAT-WAS-04-STOCK', viewport: { width: 1440, height: 1400 }, module: 'waste', name: '04-adjustment-stock.png', route: '/almacen/mermas', ready: '#table', action: click('#table tbody .btn-adjust-stock', '#wasteModal.show'), area: 'sistemas', useCases: ['CU-ALM-12'] },
     { id: 'CAP-REP-WAS-05-EXPORT', module: 'waste', name: '05-export-report.png', route: '/almacen/mermas', ready: '#table', action: reportDialog, useCases: ['CU-ALM-14'] },
     { id: 'CAP-CAT-WAS-06-ADD-STOCK', module: 'waste', name: '06-add-stock.png', route: '/almacen/mermas', ready: '#table', actions: [click('#table tbody .btn-add-stock', '#wasteStockAdditionModal.show', 'una merma habilitada'), fill('#wasteStockAdditionQuantityInput', '2.5')], useCases: ['CU-ALM-13'] },
     { id: 'CAP-CAT-AREA-01-LIST', module: 'catalogs/areas', name: '01-list.png', route: '/catalogos/departments', ready: '#table', useCases: ['CU-CAT-09'] },
@@ -137,6 +137,7 @@ const captureTemplates = [
     { id: 'CAP-REP-MOV-WAS-02-EXPORT', module: 'waste-movements', name: '02-export-report.png', route: '/movimientos/mermas', ready: '#wasteMovementTable', action: reportDialog, useCases: ['CU-ALM-16'] },
 
     { id: 'CAP-CAT-WAS-07-ROLL-WEIGHT', module: 'waste', name: '07-roll-unit-weight.png', route: '/almacen/mermas', ready: '#table', action: click('#table tbody tr:has-text("ROLLO") .btn-edit', '#wasteModal.show', 'una merma de Rollo con peso capturado'), useCases: ['CU-ALM-10', 'CU-ALM-11'] },
+    { id: 'CAP-CAT-WAS-08-REFERENCE', viewport: { width: 1000, height: 650 }, module: 'waste', name: '08-roll-reference.png', route: '/almacen/mermas', ready: '#table', actions: [click('button:has-text("Nueva merma")', '#wasteModal.show'), { selectWasteRollTemplate: true }, click('#wasteRollReferenceButton', '#wasteRollReferenceModal.show')], useCases: ['CU-ALM-10'] },
 
     { id: 'CAP-ERR-404-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'almacen', unauthenticated: true, useCases: [] },
     { id: 'CAP-ERR-404-SISTEMAS-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'sistemas', unauthenticated: true, useCases: [] }

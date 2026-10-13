@@ -43,6 +43,6 @@ it('obtiene el costo unitario máximo entre todos los proveedores del material',
   });
   expect(supplierMaterialFindUnique).toHaveBeenCalledWith({
     where: { supplierId_materialId: { supplierId: 'supplier-1', materialId: 'material-1' } },
-    select: { isActive: true }
+    select: { isActive: true, coneWeightMode: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true, referenceRollNetWeightKg: true }
   });
 });

@@ -3,7 +3,7 @@
 
 **Caso de uso:** `CU-ALM-13` — Agregar existencia de merma.
 
-**Antes de empezar:** Vamos a agregar una cantidad recibida de merma. Identifique la merma y la cantidad física que ingresó: esta operación suma al saldo actual.
+**Antes de empezar:** Vamos a agregar una cantidad recibida de merma. Identifique la merma y la cantidad física que ingresó: esta operación suma al saldo actual. Antes de sumar rollos, confirme que nombre, proveedor, medidas y pesos coinciden con el registro; si los pesos cambian, registre otra merma.
 
 **Controles que debe usar:** Acción **Agregar stock**; campo **Cantidad a agregar**; campo
 **Observaciones** y botón **Agregar**. **Merma**, **Existencia actual** y **Existencia resultante**

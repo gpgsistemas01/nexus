@@ -8,7 +8,7 @@
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Campos editables en modo edición:** **Nombre**, **Stock mínimo**, **Costo máximo unitario** y
-**Activo**. **Proveedor**, material de referencia, presentación, unidad, ancho, largo, peso unitario y existencia
+**Activo**. **Proveedor**, material de referencia, presentación, unidad, ancho, largo, pesos del cono, total y neto, y existencia
 quedan sólo para consulta. Use la acción **Editar registro** y el botón **Actualizar**.
 
 1. En la fila de la merma, seleccione la acción **Editar registro**. Observe los controles que va a usar:
@@ -21,7 +21,7 @@ quedan sólo para consulta. Use la acción **Editar registro** y el botón **Act
 
 **Compruebe el resultado:** Vuelva a abrir el registro y compruebe los cambios confirmados.
 
-Al abrir una merma de Rollo, observe el peso registrado: este campo es de consulta.
+Al abrir una merma de Rollo, observe los pesos registrados del cono, total con cono y neto: son datos de consulta.
 
 <a id="CAP-CAT-WAS-07-ROLL-WEIGHT"></a>
-![CAP-CAT-WAS-07-ROLL-WEIGHT: consulta del peso unitario de una merma de Rollo](../../images/areas/almacen/waste/07-roll-unit-weight.png)
+![CAP-CAT-WAS-07-ROLL-WEIGHT: consulta de cono, total y neto de una merma de Rollo](../../images/areas/almacen/waste/07-roll-unit-weight.png)

@@ -1,6 +1,6 @@
 ---
 title: Manual del administrador del sistema
-subtitle: "Nexus · Área: Sistemas · Versión documental 0.11 · Sistema 1.0.0 · Estado: En revisión"
+subtitle: "Nexus · Área: Sistemas · Versión documental 0.12 · Sistema 1.0.0 · Estado: En revisión"
 author: Equipo Nexus
 date: 2026-10-13
 ---
@@ -11,7 +11,7 @@ date: 2026-10-13
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 0.11 | 1.0.0 | En revisión | 2026-10-13 | Equipo Nexus |
+| 0.12 | 1.0.0 | En revisión | 2026-10-13 | Equipo Nexus |
 
 Esta guía le ayuda a conocer la operación y preparar los accesos de otras
 personas. Comience por [primeros pasos](../overview.md); después revise personas,

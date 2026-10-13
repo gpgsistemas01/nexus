@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateWasteWeight, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
+import { validateWasteLengthSource, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
 
 const inventoryStateValidation = {
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
@@ -92,7 +92,9 @@ export const wasteStockAdditionValidation = {
 };
 
 export const wasteValidation = {
-    weightKg: validateWasteWeight,
+    lengthSource: (value, data) => validateWasteLengthSource(value || 'MEASURED', data),
+    coneWeightKg: (value, data) => validateWasteWeightCapture(value, data, 'coneWeightKg'),
+    totalWeightKg: (value, data) => validateWasteWeightCapture(value, data, 'totalWeightKg'),
     name: value => validateName(value, 200),
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),

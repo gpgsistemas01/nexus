@@ -13,4 +13,4 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Actualización sin alterar su identidad física.<br>2. **Éxito al desactivar:** la merma no puede agregarse a salidas nuevas; conserva stock e historia y puede completar detalles previamente comprometidos.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-MER-011`, `RF-CAT-016`, `RF-CAT-017`, `RF-MER-003`, `RF-MER-005`, `RF-MER-006`, `RN-021`, `RN-023`. |
 
-El peso guardado se muestra sólo para consulta; no forma parte de los cambios admitidos (`RF-MER-011`).
+Los pesos del cono, total con cono y neto se muestran para consulta; no forman parte de los cambios admitidos (`RF-MER-011`).

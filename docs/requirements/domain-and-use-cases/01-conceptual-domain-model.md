@@ -84,7 +84,8 @@ classDiagram
     Proveedor "1" -- "0..*" OfertaProveedor : ofrece
     ArticuloCompra "1" -- "0..*" OfertaProveedor : tiene ofertas
     Proveedor "1" -- "0..*" Merma : procede de
-    Merma ..> Material : toma datos de una plantilla
+    Material "0..1" -- "0..*" Merma : referencia de origen
+    Merma ..> OfertaProveedor : copia referencia del rollo
 ```
 
 Cada artículo y cada merma tienen una presentación y una unidad de medida,
@@ -94,8 +95,8 @@ La existencia es una cantidad de la oferta o de la merma, no un saldo único del
 artículo. Un artículo puede ofrecerse por varios proveedores; no puede repetirse la
 misma combinación artículo–proveedor. Los consumibles se clasifican expresamente,
 carecen de dimensiones y se gestionan en consultas y reportes separados de materiales.
-La dependencia de Merma hacia Material expresa el uso de una plantilla, no un vínculo
-que obligue a actualizar la merma cuando cambia el material.
+La merma puede conservar el material de origen y una copia de la referencia de la oferta.
+Cambiar los datos de esa oferta no modifica las medidas ni los pesos de la merma registrada.
 
 ## Compras y salidas
 

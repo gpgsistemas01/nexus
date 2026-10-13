@@ -1,6 +1,6 @@
 ---
 title: Especificación de requisitos de Nexus
-document-version: 1.8
+document-version: 1.9
 system-version: 1.0.0
 status: En revisión
 ---
@@ -11,7 +11,7 @@ status: En revisión
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.8 | 1.0.0 | En revisión | 2026-10-13 | Equipo Nexus |
+| 1.9 | 1.0.0 | En revisión | 2026-10-13 | Equipo Nexus |
 
 Este es el punto de entrada y la portada del paquete exportable de requisitos. La
 [especificación de requisitos](requirements-specification/index.md) conserva la definición
@@ -68,3 +68,4 @@ Las imágenes que se incorporen a estas secciones pertenecen a
 | 1.6 | 2026-10-12 | Criterio de aceptación del peso unitario: límites, precisión y rechazo previo al alta de valores inválidos. |
 | 1.7 | 2026-10-12 | Máximo de 100 kg por unidad de merma de Rollo, validación y migración conservando los datos históricos. |
 | 1.8 | 2026-10-13 | Peso unitario con hasta tres enteros y dos decimales; rechazo de precisión adicional previo al alta. |
+| 1.9 | 2026-10-13 | Cono fijo/variable por material y proveedor, pesos propios de merma, longitud medida o estimada e identidad que distingue pesos; reporte de neto. |

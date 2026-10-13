@@ -1,10 +1,11 @@
 import { getDb } from '../../../repository/baseRepository.js';
-import { getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
+import { getMaterialIdentityLength, getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 
 const WASTE_MATERIAL_SNAPSHOT_SELECT = {
     id: true,
     name: true,
+    type: true,
     base: true,
     height: true,
     presentation: true,
@@ -48,16 +49,18 @@ export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId, supp
             : Math.max(highest ?? candidateCost, candidateCost);
     }, null);
 
+    let rollReference = null;
     if (requireActive && supplierId) {
         const activeOffer = await db.supplierMaterial.findUnique({
             where: { supplierId_materialId: { supplierId, materialId } },
-            select: { isActive: true }
+            select: { isActive: true, coneWeightMode: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true, referenceRollNetWeightKg: true }
         });
 
         if (!activeOffer?.isActive) return null;
+        rollReference = { ...activeOffer, referenceLengthM: getMaterialIdentityLength(material), referenceWidthM: identityWidth };
     }
 
-    return { ...material, maxUnitCost };
+    return { ...material, maxUnitCost, rollReference };
 };
 
 export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take = 20, supplierId = null } = {}) => {
@@ -83,11 +86,12 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
             unitMeasure: { select: { id: true, name: true, symbol: true } },
             supplierMaterials: {
                 where: { supplierId, isActive: true },
-                select: { maxUnitCost: true }
+                select: { maxUnitCost: true, coneWeightMode: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true, referenceRollNetWeightKg: true }
             }
         }
     });
     const uniqueTemplates = new Map();
+    const familyCosts = new Map();
 
     materials.forEach(material => {
         const identityWidth = getMaterialIdentityWidth(material);
@@ -95,11 +99,13 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
         const suggestedWidth = isRoll ? identityWidth : null;
         const key = `${ material.name.trim().toLocaleLowerCase() }|${ identityWidth ?? 'no-width' }`;
         const maxUnitCost = getHighestUnitCost(material.supplierMaterials);
+        familyCosts.set(key, maxUnitCost == null ? familyCosts.get(key) ?? null : Math.max(familyCosts.get(key) ?? maxUnitCost, maxUnitCost));
         const { supplierMaterials, ...template } = material;
 
-        const current = uniqueTemplates.get(key);
+        const templateKey = isRoll ? material.id : key;
+        const current = uniqueTemplates.get(templateKey);
         if (!current) {
-            uniqueTemplates.set(key, { ...template, suggestedWidth, maxUnitCost });
+            uniqueTemplates.set(templateKey, { ...template, suggestedWidth, maxUnitCost, rollReference: { ...supplierMaterials[0], referenceLengthM: getMaterialIdentityLength(material), referenceWidthM: identityWidth } });
             return;
         }
 
@@ -108,7 +114,10 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
             : Math.max(current.maxUnitCost ?? maxUnitCost, maxUnitCost);
     });
 
-    const templates = [...uniqueTemplates.values()];
+    const templates = [...uniqueTemplates.values()].map(template => ({
+        ...template,
+        maxUnitCost: familyCosts.get(`${ template.name.trim().toLocaleLowerCase() }|${ getMaterialIdentityWidth(template) ?? 'no-width' }`)
+    }));
     const data = templates.slice(skip, skip + take);
 
     return {

@@ -1,8 +1,20 @@
 import { AppError } from "../AppError.js";
 
+export class WasteRollReferenceInvalid extends AppError {
+    constructor() {
+        super('La referencia sólo aplica a materiales con presentación Rollo.', 'WASTE_ROLL_REFERENCE_INVALID', 400);
+    }
+}
+
+export class WasteRollReferenceMissing extends AppError {
+    constructor() {
+        super('Complete la referencia del cono y del rollo para utilizarla en esta merma.', 'WASTE_ROLL_REFERENCE_MISSING', 400);
+    }
+}
+
 export class WasteWeightReadOnly extends AppError {
     constructor() {
-        super('No se puede modificar el peso unitario de una merma ya registrada. Este dato sólo está disponible para consulta.', 'WASTE_WEIGHT_READ_ONLY', 400);
+        super('No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta.', 'WASTE_WEIGHT_READ_ONLY', 400);
     }
 }
 
@@ -21,12 +33,13 @@ export class WasteNotFound extends AppError {
 
 export class WasteAlreadyExists extends AppError {
 
-    constructor () {
+    constructor ({ waste = null } = {}) {
         super(
-            'Ya existe una merma con el nombre, proveedor y dimensiones indicados.',
+            'Ya existe una merma con este proveedor, nombre, medidas y pesos. Use Agregar stock para aumentar su existencia.',
             'WASTE_ALREADY_EXISTS',
             409
         );
+        if (waste) this.meta = { waste };
     }
 }
 

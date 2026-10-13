@@ -63,6 +63,7 @@ const SUPPLIER_MATERIAL_STOCK_MOVEMENT_SELECT = {
 };
 
 const MATERIAL_USAGE_RELATIONS = [
+    'wasteRolls',
     'goodsReceiptDetails',
     'goodsIssueDetails',
     'movementDetails',

@@ -16,6 +16,8 @@ const registerWaste = vi.fn();
 const editWaste = vi.fn();
 const editWasteStock = vi.fn();
 const registerWasteStockAddition = vi.fn();
+const getWasteRollReference = vi.fn();
+const updateWasteRollReference = vi.fn();
 
 vi.mock('express', () => ({
   default: {
@@ -46,10 +48,16 @@ vi.mock('../../../../../src/controllers/api/warehouse/wasteController.js', () =>
   registerWasteStockAddition
 }));
 
+vi.mock('../../../../../src/controllers/api/warehouse/wasteRollReferenceController.js', () => ({ getWasteRollReference, updateWasteRollReference }));
+const { wasteRollReferenceQueryValidation, wasteRollReferenceValidation } = await import('../../../../../src/validators/forms/wasteRollReferenceValidations.js');
 const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
 const { default: wasteApiRoutes } = await import('../../../../../src/routes/api/warehouse/wasteApiRoute.js');
 
 describe('wasteApiRoute', () => {
+  it('protege la consulta y la configuración de referencias con sus permisos correspondientes', () => {
+    expect(get).toHaveBeenCalledWith('/roll-reference', verifyApiTokenRequired, `authorize:${ PERMISSIONS.WASTES_READ }`, wasteRollReferenceQueryValidation, validate, getWasteRollReference);
+    expect(patch).toHaveBeenCalledWith('/roll-reference', verifyApiTokenRequired, `authorize:${ PERMISSIONS.MATERIALS_WRITE }`, wasteRollReferenceValidation, validate, updateWasteRollReference);
+  });
   it('asigna a cada escritura del CRUD su validador y permiso específicos', () => {
     expect(wasteApiRoutes).toEqual({ get, post, patch });
     expect(post).toHaveBeenCalledWith(
