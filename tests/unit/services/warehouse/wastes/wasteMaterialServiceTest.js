@@ -41,7 +41,7 @@ describe('plantillas de material para el CRUD de mermas', () => {
     }));
     expect(materialFindMany.mock.calls[0][0].select.supplierMaterials).toEqual({
       where: { supplierId: 'supplier-1', isActive: true },
-      select: { maxUnitCost: true, coneWeightMode: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true, referenceRollNetWeightKg: true }
+      select: { maxUnitCost: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true }
     });
     expect(result.data).toEqual([
       expect.objectContaining({ id: 'material-1', suggestedWidth: 1.52, maxUnitCost: 27.5 }),

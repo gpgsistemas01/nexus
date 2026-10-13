@@ -13,3 +13,7 @@
 | Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EOP — Operación no completada (durante el paso 4 del flujo principal):**<br>1. **Nexus:** no puede completar la operación, comunica el fallo y conserva la información anterior sin cambios parciales.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta con presentación, unidad y relaciones válidas.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-006`, `RF-CAT-012`, `RN-023` a `RN-026`, `RN-030`, `RN-032`. |
+
+Para material de Rollo, el mismo formulario permite mantener el peso predeterminado del
+cono y el peso total del rollo completo por proveedor. Los datos se consultan en altas
+de merma; su modificación no cambia existencias ni mermas ya registradas.

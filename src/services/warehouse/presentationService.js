@@ -45,6 +45,7 @@ export const findAllPresentations = async ({
 
 const DEFAULT_PRESENTATION_SELECT = {
     id: true,
+    name: true,
     isActive: true
 };
 

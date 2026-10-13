@@ -22,11 +22,11 @@
 | RF-MER-006 | El sistema debe impedir dos mermas con la misma combinación normalizada de nombre, proveedor, ancho, largo, peso del cono y peso total. Dos rollos de iguales medidas con pesos distintos deben poder registrarse por separado; una coincidencia completa debe ofrecer Agregar stock sin sumar automáticamente la cantidad. | Implementado | `prisma/schema.prisma`, `src/services/warehouse/wastes/wasteService.js` |
 | RF-MER-007 | Para presentación ROLLO, el sistema debe proponer como base la menor dimensión nominal positiva; para otras presentaciones, el actor debe capturar las dimensiones requeridas. | Implementado | `src/services/inventory/materialIdentity.js`, `src/public/js/pages/warehouse/wastes/wasteModal.js` |
 | RF-MER-008 | El sistema debe calcular la cantidad convertida de una merma como existencia × base × altura en altas, ajustes y salidas, sin solicitar su captura manual. | Implementado | `src/services/inventory/stockHelpers.js`, `src/services/warehouse/wastes/wasteService.js` |
-| RF-MER-009 | El material seleccionado sólo debe servir como plantilla: la merma conserva proveedor, presentación, unidad, dimensiones y costo propios, sin depender posteriormente de cambios en el material u oferta de origen. | Implementado | `prisma/schema.prisma`, `src/services/warehouse/wastes/wasteService.js` |
+| RF-MER-009 | La merma debe vincularse al material de origen, consultar sus referencias por proveedor y conservar dimensiones, pesos y costo propios sin recalcularlos cuando cambien las referencias. | Implementado | `prisma/schema.prisma`, `wasteService.js` |
 | RF-MER-010 | Personal de almacén o el Administrador del sistema deben poder sumar una cantidad positiva a una merma mediante **Agregar stock**, conservando un documento individual con folio, actor, observaciones opcionales, cantidad y saldos, vinculado a un movimiento de entrada. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/services/warehouse/wastes/wasteStockEntryService.js`, `src/services/warehouse/wastes/wasteMovementService.js`, `src/constants/permissions.js` |
 | RF-MER-011 | Al registrar una merma de Rollo, almacén debe poder capturar en kg el peso del cono y el peso total con cono de una unidad. El sistema debe calcular el peso neto como total menos cono. Los tres pesos quedan para consulta después del alta y se conservan al mover existencias de la misma identidad. Si se desconoce el peso, ambos campos pueden quedar vacíos. | Implementado | formulario de merma, `wasteDTO.js`, `wasteService.js`, `wasteWeightDbTest.js` |
-| RF-MER-012 | Almacén debe poder configurar para cada material de Rollo y proveedor si el cono es fijo o variable, su peso de referencia y el peso total de un rollo completo usado como muestra. Una merma puede utilizar esa referencia o registrar su cono medido. Si usa una referencia variable, debe identificarse como estimación; cambiar la referencia sólo afecta registros futuros. | Implementado | referencia de rollo, `wasteRollReferenceService.js`, `wasteWeightDbTest.js` |
-| RF-MER-013 | Almacén debe poder registrar el largo medido de una merma de Rollo o estimarlo con su peso neto y una muestra del mismo material. La longitud de la muestra debe tomarse de la mayor dimensión del material, y su ancho de la menor. La estimación debe considerar el ancho de la merma y conservar la referencia usada; requiere pesos y medidas de referencia completos. | Implementado | `wasteRollUtils.js`, `wasteService.js`, `wasteWeightDbTest.js` |
+| RF-MER-012 | Almacén debe registrar o editar en el formulario de material el peso predeterminado del cono y el peso total del rollo completo por proveedor. Al seleccionar material en merma, el sistema precarga el cono y permite corregirlo en el mismo campo, sin selector fijo/variable ni opción de uso de referencia. | Implementado | formulario de material, `materialService.js`, `wasteWeightDbTest.js` |
+| RF-MER-013 | Almacén debe poder registrar el largo medido de una merma de Rollo o estimarlo con su peso neto y una muestra del mismo material. La longitud de la muestra debe tomarse de la mayor dimensión del material, y su ancho de la menor. La estimación debe considerar el ancho de la merma y conservar el largo calculado y su método; requiere pesos y medidas de referencia completos. | Implementado | `wasteRollUtils.js`, `wasteService.js`, `wasteWeightDbTest.js` |
 | RF-REQ-001 | Una reimplementación de requisiciones debe permanecer fuera del alcance vigente hasta definir y aprobar nuevamente su comportamiento, autorización, persistencia y pruebas. | Fuera del alcance actual | `prisma/migrations/20260827000000_remove_purchase_requisitions/migration.sql` |
 | RF-PRJ-001 | El Administrador del sistema deberá poder mantener proyectos si se incorpora y aprueba esa capacidad; sus datos, operaciones y criterios permanecen pendientes de definición. | Modelado | modelo `Project` |
 | RF-PRJ-002 | El personal de almacén deberá poder seleccionar un proyecto registrado como contexto de salida si se define y aprueba ese flujo; capturar el número de proyecto no demuestra esta capacidad. | Modelado | modelo `Project` |
@@ -55,20 +55,20 @@ existencia de una entidad de datos.
 ### Recorrido del peso de merma
 
 **Identificador:** `DIA-REQ-MER-PESO-001`. Reglas `RF-MER-011` y `RF-REP-012`.
-El peso de referencia sirve para estimar; el registro conserva los valores utilizados.
+El peso de referencia se consulta desde material; la merma guarda el cono utilizado y los resultados.
 La proporcionalidad supone una muestra representativa del mismo material.
 
 ```mermaid
 flowchart TB
-    Oferta["Material y proveedor:<br/>cono fijo o variable y muestra"] --> Pesos
+    Oferta["Material y proveedor:<br/>cono predeterminado y peso del rollo completo"] --> Pesos
     subgraph Pesos["Captura de una unidad de merma"]
         direction LR
-        Captura["Cono medido o de referencia<br/>y total con cono"] --> Neto["Neto = total − cono"]
+        Captura["Cono precargado editable<br/>y total con cono"] --> Neto["Neto = total − cono"]
         Neto --> Largo["Largo medido o estimado<br/>por proporción con la muestra"]
     end
     Pesos --> Identidad{"¿Coinciden proveedor, nombre,<br/>medidas y pesos?"}
     Identidad -->|Sí| Stock["Avisar duplicado<br/>Abrir Agregar stock"]
-    Identidad -->|No| Guardar["Guardar merma y referencia usada<br/>Pesos de consulta"]
+    Identidad -->|No| Guardar["Vincular material y guardar merma<br/>Pesos de consulta"]
     Guardar --> Reporte["Reporte: existencia × neto<br/>Sin peso conocido: indicar ausencia"]
 ```
 

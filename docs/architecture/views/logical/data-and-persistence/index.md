@@ -143,12 +143,13 @@ Los registros anteriores conservan su peso neto; cono y total permanecen `NULL`.
 
 | Ubicación | Datos y propósito |
 | --- | --- |
-| `SupplierMaterial` | `coneWeightMode` (`FIXED`/`VARIABLE`), `referenceConeWeightKg`, `referenceRollTotalWeightKg` y `referenceRollNetWeightKg`. Referencia por material–proveedor, editable con `materials:write`. El neto de muestra es derivado. |
+| `SupplierMaterial` | `referenceConeWeightKg` y `referenceRollTotalWeightKg`, editables desde el CRUD de material con `materials:write`. El neto de referencia se calcula al consultar; no se persiste. |
 | `Material` | Dimensiones nominales existentes: longitud de muestra = `MAX(base, height)`, ancho = `MIN(base, height)`. No contiene el peso del cono. |
-| `Waste` | Cono y total utilizados; `coneWeightSource` (`MEASURED`, `FIXED_REFERENCE`, `ESTIMATED_REFERENCE`), `lengthSource` (`MEASURED`/`ESTIMATED`), material de origen y copia de modo/cono/neto/longitud/ancho de referencia. Los históricos pueden carecer de esa referencia. |
+| `Waste` | `sourceMaterialId` vincula el material; `supplierId` identifica su proveedor. Guarda cono y total utilizados, neto derivado (`weightKg`), largo (`height`) y `lengthSource` (`MEASURED`/`ESTIMATED`). No copia las referencias. Los históricos pueden carecer del vínculo. |
 
-No se requiere un catálogo de conos para estos datos. `wasteRollReferenceService.js`
-actualiza únicamente la oferta; las copias históricas de `Waste` permanecen iguales.
+Las referencias se administran en el formulario existente de material. Cambiarlas afecta
+solo nuevas capturas; la merma conserva pesos y largo registrados. El vínculo permite
+identificar el origen, pero no reconstruir referencias antiguas después de editarlas.
 
 `calculateWasteRollLength` estima metros lineales mediante:
 

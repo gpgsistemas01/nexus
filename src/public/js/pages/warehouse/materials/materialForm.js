@@ -1,6 +1,7 @@
 import { useForm } from "../../../ui/forms/formUI.js";
 import { editMaterial, editMaterialStock, registerMaterial } from "../../../application/warehouse/materials/materials.js";
 import { editConsumable, editConsumableStock, registerConsumable } from '../../../application/warehouse/consumables/consumables.js';
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
 import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";
@@ -8,6 +9,8 @@ import { goodsReceiptMaterialCreateValidation, materialCreateValidation, materia
 import { materialCreateFields, materialSecondaryDataFields, materialStockRequestFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+
+import { updateMaterialRollReferenceFields } from './materialModal.js';
 
 const formId = FORM_SELECTORS.MATERIAL;
 const goodsReceiptCreationContext = 'goodsReceipt';
@@ -79,3 +82,6 @@ useForm({
         form.onSave?.(material);
     },
 });
+
+const form = document.querySelector(formId);
+$(form).on(`${ SELECT2_EVENT_NAMES.CHANGE }.materialRollReference`, '[name="presentationId"]', () => updateMaterialRollReferenceFields({ form }));

@@ -12,12 +12,12 @@ describe('referencia del cono y longitud de merma', () => {
         expect(calculateWasteRollLength({ ...reference, widthM: 0.75 })).toBe(10);
         expect(calculateWasteRollLength({ ...reference, widthM: 0 })).toBeNull();
     });
-    it('exige peso de referencia para cono fijo y permite variable desconocido', () => {
-        expect(getRollReferenceValidationError('', { coneWeightMode: 'FIXED' }, 'referenceConeWeightKg')).toBe('CONE_WEIGHT_KG_REQUIRED');
-        expect(getRollReferenceValidationError('', { coneWeightMode: 'VARIABLE' }, 'referenceConeWeightKg')).toBeNull();
+    it('permite cono desconocido salvo que se capture el peso total del rollo', () => {
+        expect(getRollReferenceValidationError('', {}, 'referenceConeWeightKg')).toBeNull();
+        expect(getRollReferenceValidationError('', { referenceRollTotalWeightKg: 2 }, 'referenceConeWeightKg')).toBe('CONE_WEIGHT_KG_REQUIRED');
     });
-    it('acepta cono fijo cero y exige total de muestra mayor que el cono', () => {
-        expect(getRollReferenceValidationError(0, { coneWeightMode: 'FIXED' }, 'referenceConeWeightKg')).toBeNull();
+    it('acepta cono cero y exige total de muestra mayor que el cono', () => {
+        expect(getRollReferenceValidationError(0, {}, 'referenceConeWeightKg')).toBeNull();
         expect(getRollReferenceValidationError(1, { referenceConeWeightKg: 1 }, 'referenceRollTotalWeightKg')).toBe('WASTE_TOTAL_WEIGHT_NOT_GREATER');
     });
 });

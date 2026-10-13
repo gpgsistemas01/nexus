@@ -2,7 +2,7 @@ import { body } from 'express-validator';
 import { errorMap } from '../../messages/codeMessages.js';
 import { LENGTH_SOURCES } from '../../public/js/utils/wasteRollUtils.js';
 import { calculateWasteNetWeight, getWasteWeightCaptureValidationError } from '../../public/js/utils/warehouseInventoryUtils.js';
-import { validateName, validateNonNegativeNumber, validatePositiveNumber, validateUUID } from '../fields/fieldsValidator.js';
+import { validateName, validateNonNegativeNumber, validatePositiveNumber, validateNumberWhen, validateUUID } from '../fields/fieldsValidator.js';
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
 const wasteStockDataValidation = [
@@ -26,13 +26,12 @@ const wasteSecondaryDataValidation = [
 ];
 
 export const wasteEditValidation = [
-    ...['weightKg', 'coneWeightKg', 'totalWeightKg', 'referenceConeWeightKg', 'referenceConeWeightMode', 'coneWeightSource', 'lengthSource', 'referenceNetWeightKg', 'referenceLengthM', 'referenceWidthM', 'sourceMaterialId'].map(field => body(field).not().exists({ values: 'undefined' }).withMessage(errorMap.weightKg.READ_ONLY)),
+    ...['weightKg', 'coneWeightKg', 'totalWeightKg', 'lengthSource', 'sourceMaterialId'].map(field => body(field).not().exists({ values: 'undefined' }).withMessage(errorMap.weightKg.READ_ONLY)),
     validateName({ maxLength: 200 }),
     ...wasteSecondaryDataValidation
 ];
 
 export const wasteValidation = [
-    body('useConeReference').optional().isBoolean().withMessage(errorMap.useConeReference.INVALID).toBoolean(),
     body('lengthSource').optional().isIn(Object.values(LENGTH_SOURCES)).withMessage(errorMap.lengthSource.INVALID).bail().custom((value, { req }) => {
         if (value === LENGTH_SOURCES.ESTIMATED && calculateWasteNetWeight(req.body) == null) throw new Error(errorMap.lengthSource.WEIGHTS_REQUIRED);
         return true;
@@ -48,7 +47,8 @@ export const wasteValidation = [
     validateUUID('materialId'),
     validateUUID('supplierId'),
     validatePositiveNumber('base'),
-    validatePositiveNumber('height'),
+    validateNumberWhen({ fieldName: 'height', predicate: body => body.lengthSource !== LENGTH_SOURCES.ESTIMATED })
+        .custom(value => value > 0).withMessage(errorMap.height.INVALID_NUMBER),
     ...wasteSecondaryDataValidation,
     ...wasteStockDataValidation
 ];

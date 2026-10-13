@@ -1,11 +1,5 @@
 import { AppError } from "../AppError.js";
 
-export class WasteRollReferenceInvalid extends AppError {
-    constructor() {
-        super('La referencia sólo aplica a materiales con presentación Rollo.', 'WASTE_ROLL_REFERENCE_INVALID', 400);
-    }
-}
-
 export class WasteRollReferenceMissing extends AppError {
     constructor() {
         super('Complete la referencia del cono y del rollo para utilizarla en esta merma.', 'WASTE_ROLL_REFERENCE_MISSING', 400);

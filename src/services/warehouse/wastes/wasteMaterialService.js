@@ -1,67 +1,13 @@
 import { getDb } from '../../../repository/baseRepository.js';
 import { getMaterialIdentityLength, getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
-
-const WASTE_MATERIAL_SNAPSHOT_SELECT = {
-    id: true,
-    name: true,
-    type: true,
-    base: true,
-    height: true,
-    presentation: true,
-    unitMeasure: true
-};
+import { calculateWasteNetWeight, isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 const getHighestUnitCost = (offers = []) => offers.reduce((highest, offer) => {
     const cost = toNumber(offer.maxUnitCost);
 
     return cost == null ? highest : Math.max(highest ?? cost, cost);
 }, null);
-
-export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId, supplierId = null, requireActive = true }) => {
-    const db = getDb(tx);
-    const material = await db.material.findUnique({
-        where: { id: materialId },
-        select: WASTE_MATERIAL_SNAPSHOT_SELECT
-    });
-
-    if (!material) return null;
-
-    const identityWidth = getMaterialIdentityWidth(material);
-    const matchingMaterials = await db.material.findMany({
-        where: { name: { equals: material.name, mode: 'insensitive' } },
-        select: {
-            base: true,
-            height: true,
-            supplierMaterials: {
-                where: { isActive: true },
-                select: { maxUnitCost: true }
-            }
-        }
-    });
-    const maxUnitCost = matchingMaterials.reduce((highest, candidate) => {
-        if (getMaterialIdentityWidth(candidate) !== identityWidth) return highest;
-
-        const candidateCost = getHighestUnitCost(candidate.supplierMaterials);
-
-        return candidateCost == null
-            ? highest
-            : Math.max(highest ?? candidateCost, candidateCost);
-    }, null);
-
-    let rollReference = null;
-    if (requireActive && supplierId) {
-        const activeOffer = await db.supplierMaterial.findUnique({
-            where: { supplierId_materialId: { supplierId, materialId } },
-            select: { isActive: true, coneWeightMode: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true, referenceRollNetWeightKg: true }
-        });
-
-        if (!activeOffer?.isActive) return null;
-        rollReference = { ...activeOffer, referenceLengthM: getMaterialIdentityLength(material), referenceWidthM: identityWidth };
-    }
-
-    return { ...material, maxUnitCost, rollReference };
-};
 
 export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take = 20, supplierId = null } = {}) => {
     if (!supplierId) return {
@@ -86,7 +32,7 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
             unitMeasure: { select: { id: true, name: true, symbol: true } },
             supplierMaterials: {
                 where: { supplierId, isActive: true },
-                select: { maxUnitCost: true, coneWeightMode: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true, referenceRollNetWeightKg: true }
+                select: { maxUnitCost: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true }
             }
         }
     });
@@ -95,7 +41,7 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
 
     materials.forEach(material => {
         const identityWidth = getMaterialIdentityWidth(material);
-        const isRoll = material.presentation.name.toUpperCase() === 'ROLLO';
+        const isRoll = isRollPresentation(material.presentation.name);
         const suggestedWidth = isRoll ? identityWidth : null;
         const key = `${ material.name.trim().toLocaleLowerCase() }|${ identityWidth ?? 'no-width' }`;
         const maxUnitCost = getHighestUnitCost(material.supplierMaterials);
@@ -105,7 +51,22 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
         const templateKey = isRoll ? material.id : key;
         const current = uniqueTemplates.get(templateKey);
         if (!current) {
-            uniqueTemplates.set(templateKey, { ...template, suggestedWidth, maxUnitCost, rollReference: { ...supplierMaterials[0], referenceLengthM: getMaterialIdentityLength(material), referenceWidthM: identityWidth } });
+            const offer = supplierMaterials[0];
+            uniqueTemplates.set(templateKey, {
+                ...template,
+                suggestedWidth,
+                maxUnitCost,
+                rollReference: {
+                    referenceConeWeightKg: offer?.referenceConeWeightKg ?? null,
+                    referenceRollTotalWeightKg: offer?.referenceRollTotalWeightKg ?? null,
+                    referenceRollNetWeightKg: calculateWasteNetWeight({
+                        coneWeightKg: offer?.referenceConeWeightKg,
+                        totalWeightKg: offer?.referenceRollTotalWeightKg
+                    }),
+                    referenceLengthM: getMaterialIdentityLength(material),
+                    referenceWidthM: identityWidth
+                }
+            });
             return;
         }
 

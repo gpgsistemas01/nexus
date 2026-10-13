@@ -62,8 +62,8 @@ fuente de verdad.
 | Existencia | Cantidad disponible de un recurso en un contexto identificable. | `stock` es el nombre técnico aceptado; toda modificación debe quedar explicada por un movimiento o ajuste permitido. |
 | Stock mínimo | Umbral de referencia configurado para señalar que una existencia es baja. | No es stock disponible, reserva ni límite máximo; modificarlo no mueve inventario. La interfaz también lo presenta como **Stock Mínimo**. |
 | Costo unitario máximo | Mayor costo por unidad convertida registrado para la oferta de un material y proveedor; también puede conservarse como dato propio de una merma. | La interfaz también usa **Costo Máximo** o **Costo máximo unitario**. No es el costo por presentación de un renglón ni el importe total de una compra. |
-| Merma | Recurso reutilizable o residual con proveedor, presentación, unidad, dimensiones, costos y existencias propios. | En código aparece como `Waste`. Un material de referencia sirve como plantilla durante el alta, pero no queda como relación persistente; merma tampoco significa eliminación física ni salida de merma. |
-| Identidad de merma | Combinación de proveedor, nombre, base y altura que permite reconocer una merma ya registrada. | Presentación y unidad se copian de la plantilla al crearla y no sustituyen esa combinación. Stock, costo máximo, mínimo y estado activo tampoco forman parte de la identidad. |
+| Merma | Recurso reutilizable o residual con proveedor, presentación, unidad, dimensiones, costos y existencias propios. | En código aparece como `Waste`. El material de origen queda vinculado mediante una relación persistente; merma tampoco significa eliminación física ni salida de merma. |
+| Identidad de merma | Combinación de proveedor, nombre, base, altura y pesos que permite reconocer una merma ya registrada. | Presentación y unidad se copian de la plantilla al crearla y no sustituyen esa combinación. Stock, costo máximo, mínimo y estado activo tampoco forman parte de la identidad. |
 | Cliente | Organización o contexto comercial receptor de una salida. Puede tener un asesor asociado. | No es lo mismo que proyecto. |
 | Proyecto | Contexto de trabajo identificable que puede relacionarse con salidas. | Está modelado, pero su CRUD completo permanece pendiente. |
 
@@ -171,4 +171,4 @@ registrados. Se obtiene restando el peso del cono al peso total con cono. Se
 conserva para la identidad por nombre, proveedor, medidas y pesos al agregar existencias.
 Un valor ausente significa desconocido.
 
-El **cono de referencia** es una medida de la oferta del material y proveedor. El **cono utilizado** es el valor guardado en la merma: medido o tomado de esa referencia. La **longitud estimada** resulta de la proporción de peso neto con una muestra del mismo material; se distingue del largo medido.
+El **cono de referencia** es una medida de la oferta del material y proveedor. El **cono utilizado** es el valor guardado en la merma: precargado desde esa referencia y editable al registrar. La **longitud estimada** resulta de la proporción de peso neto con una muestra del mismo material; se distingue del largo medido.

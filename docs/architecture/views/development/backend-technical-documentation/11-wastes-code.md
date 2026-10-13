@@ -14,18 +14,7 @@ flowchart TB
     V["Validadores<br/>wasteValidations.js"]
     P["baseRepository.js<br/>getDb(tx)"]
     PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>getWasteWeightCaptureValidationError<br/>calculateWasteNetWeight"]
-    RC["wasteRollReferenceController.js"]
-    RS["wasteRollReferenceService.js"]
-    RV["wasteRollReferenceValidations.js"]
     Roll["wasteRollUtils.js<br/>validación de referencia y largo estimado"]
-    R --> RC
-    R --> RV
-    RC --> D
-    RC --> RS
-    RS --> P
-    RS --> PresentationRule
-    RS --> X
-    RV --> Roll
     S --> Roll
     C --> D
     C --> S
@@ -48,7 +37,6 @@ flowchart TB
 | Validadores · wasteValidations.js | `src/validators/forms/wasteValidations.js` |
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
 | Regla de presentación · warehouseInventoryUtils.js | `src/public/js/utils/warehouseInventoryUtils.js` |
-| Referencia del rollo | `src/controllers/api/warehouse/`<br/>`wasteRollReferenceController.js`<br/>`src/services/warehouse/wastes/`<br/>`wasteRollReferenceService.js`<br/>`src/validators/forms/`<br/>`wasteRollReferenceValidations.js` |
 | Validación y cálculo de longitud | `src/public/js/utils/wasteRollUtils.js` |
 
 
@@ -73,7 +61,7 @@ flowchart TB
 
 ## Variantes y límites de reutilización
 
-wasteService utiliza snapshot de material, conversión y servicios de ajuste/entrada de stock de merma. wasteInventoryService y wasteMovementService mantienen su persistencia propia.
+wasteService reutiliza findSupplierMaterialByIds para consultar el material y sus pesos por proveedor, conversión y servicios de ajuste/entrada de stock de merma. wasteInventoryService y wasteMovementService mantienen su persistencia propia.
 
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
@@ -83,9 +71,8 @@ Los reportes y la infraestructura transversal se localizan en el
 La captura, protección de la edición y cálculo de reportes se describen en
 [datos de merma](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).
 
-`GET /api/warehouse/wastes/roll-reference` usa `wastes:read` y UUID de material/proveedor.
-`PATCH` usa `materials:write`, `wasteRollReferenceValidations.js`, el DTO de referencia
-y `wasteRollReferenceService.js`; retorna `{ reference, code }`. La escritura calcula
-el neto de la muestra en la misma transacción y no toca stock ni mermas existentes.
-El [modelo de datos](../../logical/data-and-persistence/index.md#referencia-y-medida-utilizada)
-concentra campos, fórmula y conservación histórica.
+Los pesos de referencia se administran mediante el CRUD de material. La merma
+reutiliza `findSupplierMaterialByIds` dentro de su transacción, calcula el neto de
+referencia al consultar y persiste el vínculo, el cono utilizado y los resultados.
+Los validators verifican formato y relaciones numéricas antes del servicio;
+la transacción comprueba presentación, oferta activa y referencia necesaria.

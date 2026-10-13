@@ -173,6 +173,8 @@ export const findAllSupplierMaterials = async ({
         select: {
             id: true,
             isActive: true,
+            referenceConeWeightKg: true,
+            referenceRollTotalWeightKg: true,
             ...(canReadCosts && { maxUnitCost: true }),
             currentStock: true,
             convertedQuantity: true,
@@ -256,6 +258,8 @@ export const findSupplierMaterialByIds = async ({
             currentStock: true,
             convertedQuantity: true,
             maxUnitCost: true,
+            referenceConeWeightKg: true,
+            referenceRollTotalWeightKg: true,
             material: {
                 select: {
                     id: true,
@@ -297,6 +301,8 @@ export const findSupplierMaterialById = async ({
             currentStock: true,
             convertedQuantity: true,
             maxUnitCost: true,
+            referenceConeWeightKg: true,
+            referenceRollTotalWeightKg: true,
             material: {
                 select: {
                     id: true,
@@ -348,7 +354,9 @@ export const saveSupplierMaterial = async ({
     supplierId,
     materialId,
     maxUnitCost,
-    isActive
+    isActive,
+    referenceConeWeightKg,
+    referenceRollTotalWeightKg
 }) => {
 
     const db = getDb(tx);
@@ -357,6 +365,8 @@ export const saveSupplierMaterial = async ({
         supplierId,
         materialId,
         maxUnitCost,
+        ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
+        ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg }),
         ...(isActive !== undefined && { isActive })
     };
 
@@ -370,6 +380,8 @@ export const saveSupplierMaterial = async ({
         create: data,
         update: {
             maxUnitCost,
+            ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
+            ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg }),
             ...(isActive !== undefined && { isActive })
         }
     });

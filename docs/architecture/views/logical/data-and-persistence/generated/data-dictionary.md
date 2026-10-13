@@ -212,10 +212,8 @@ usuarios y responsables se mantiene en el
 | `isActive` | `Boolean` | Sí | — | `true` | — |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `materialId` | `String` | Sí | FK | — | `@db.Uuid` |
-| `coneWeightMode` | `String` | Sí | — | `"VARIABLE"` | `@db.VarChar(8)` |
 | `referenceConeWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 | `referenceRollTotalWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
-| `referenceRollNetWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |
@@ -539,13 +537,7 @@ usuarios y responsables se mantiene en el
 | `coneWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 | `totalWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 | `sourceMaterialId` | `String?` | No | FK | — | `@db.Uuid` |
-| `referenceConeWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
-| `referenceConeWeightMode` | `String?` | No | — | — | `@db.VarChar(8)` |
-| `coneWeightSource` | `String?` | No | — | — | `@db.VarChar(24)` |
 | `lengthSource` | `String` | Sí | — | `"MEASURED"` | `@db.VarChar(9)` |
-| `referenceNetWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
-| `referenceLengthM` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
-| `referenceWidthM` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |

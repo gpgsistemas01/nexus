@@ -24,10 +24,6 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
-| `ReferenceController` | control | [`wasteRollReferenceController.js`](../../../../../../src/controllers/api/warehouse/wasteRollReferenceController.js) |
-| `ReferenceRules` | control | [`wasteRollReferenceValidations.js`](../../../../../../src/validators/forms/wasteRollReferenceValidations.js) |
-| `ReferenceService` | control | [`wasteRollReferenceService.js`](../../../../../../src/services/warehouse/wastes/wasteRollReferenceService.js) |
-| `Repository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `Templates` | control | [`wasteMaterialService.js`](../../../../../../src/services/warehouse/wastes/wasteMaterialService.js) |
 
 ## Secuencia de implementación
@@ -106,7 +102,7 @@ sequenceDiagram
     deactivate Formatter
     Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
     activate Domain
-    Note over Domain: Resolver cono medido o de oferta persistida<br/>Calcular neto y largo estimado si se solicita<br/>Guardar copia de la referencia usada
+    Note over Domain: Consultar material y oferta, usar cono capturado<br/>Calcular neto y largo estimado si se solicita<br/>Guardar vínculo y resultados
     Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height, coneWeightKg, totalWeightKg })
     alt La merma ya existe
         Domain-->>Controller: WASTE_ALREADY_EXISTS con meta.waste, sin incrementar stock
@@ -126,43 +122,7 @@ sequenceDiagram
     deactivate Controller
 ```
 
-## Detalle de configuración de la muestra del rollo
-
-Los participantes adicionales corresponden a `wasteRollReferenceController.js`,
-`wasteRollReferenceService.js` y `wasteRollReferenceValidations.js`.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as wasteApiRoute.js
-    participant Auth@{ "type": "control" } as authMiddleware.js
-    participant ReferenceRules@{ "type": "control" } as wasteRollReferenceValidations.js
-    participant Validator@{ "type": "control" } as validatorMiddleware.js
-    participant ReferenceController@{ "type": "control" } as wasteRollReferenceController.js
-    participant WasteDto@{ "type": "control" } as DTO funcional<br/>wasteDTO.js
-    participant ReferenceService@{ "type": "control" } as wasteRollReferenceService.js
-    participant Repository@{ "type": "control" } as baseRepository.js
-    participant DB@{ "type": "database" } as Prisma / PostgreSQL
-    Client->>Route: PATCH /api/warehouse/wastes/roll-reference
-    Route->>Auth: verifyApiTokenRequired + authorizeUserApi(MATERIALS_WRITE)
-    Route->>ReferenceRules: wasteRollReferenceValidation[]
-    Route->>Validator: validate(req, res, next)
-    break Entrada inválida
-        Validator-->>Client: HTTP 400 { errors }, sin escritura
-    end
-    Route->>ReferenceController: updateWasteRollReference(req, res)
-    ReferenceController->>WasteDto: createWasteRollReferenceDto(req.body)
-    WasteDto-->>ReferenceController: createWasteRollReferenceDto(): Object (referenceDto)
-    ReferenceController->>ReferenceService: saveWasteRollReference({ referenceDto, userId })
-    ReferenceService->>Repository: getDb()
-    Repository-->>ReferenceService: getDb(): PrismaClient
-    ReferenceService->>DB: db.$transaction(async tx => ...)
-    ReferenceService->>ReferenceService: findOffer({ tx, ...referenceDto })
-    ReferenceService->>DB: tx.supplierMaterial.findUnique({ where, include })
-    ReferenceService->>DB: tx.supplierMaterial.update({ where, data, include })
-    DB-->>ReferenceService: update(): Promise[SupplierMaterial]
-    ReferenceService-->>ReferenceController: saveWasteRollReference(): Promise[Object] (referencia)
-    ReferenceController-->>Client: HTTP 200 { reference, code }
-    Note over ReferenceService,DB: No altera existencias ni copias históricas de Waste
-```
+Los pesos de referencia se administran desde el CRUD de material, descrito en
+[crear material](cu-alm-02.md) y [editar material](cu-alm-03.md). El alta de merma
+consulta la oferta mediante `findSupplierMaterialByIds`, conserva `sourceMaterialId`
+y guarda el cono utilizado, neto y largo calculados sin copiar las referencias.

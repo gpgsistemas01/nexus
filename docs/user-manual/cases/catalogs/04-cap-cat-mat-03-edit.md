@@ -19,4 +19,11 @@ este modo. Use la acción **Editar registro** y el botón **Actualizar**.
    demás datos sólo como referencia.
 3. Seleccione el botón **Actualizar** para guardar los cambios.
 
+Para **Rollo**, la sección **Pesos del rollo** permite registrar o corregir el peso
+predeterminado del cono y el peso total del rollo completo con cono. Estos datos son
+propios del material y proveedor; se consultan al registrar merma. El cono admite
+cero, el total debe ser mayor y ambos admiten hasta dos decimales y 100 kg. Puede
+registrar sólo el cono si desconoce el total, o dejar ambos vacíos. Editar estas
+referencias no cambia existencias ni las mermas ya registradas.
+
 **Compruebe el resultado:** Vuelva a abrir el registro y compruebe los cambios confirmados.

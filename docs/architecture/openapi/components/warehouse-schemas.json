@@ -117,6 +117,30 @@
       },
       "supplier": {
         "$ref": "../openapi.json#/components/schemas/SupplierMaterialSupplier"
+      },
+      "referenceConeWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "maximum": 100,
+        "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al registrar merma y puede editarse.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+        "minimum": 0
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 100,
+        "description": "Peso total con cono de un rollo completo; mayor que el cono. Se usa para estimar la longitud de nuevas mermas.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -230,63 +254,6 @@
         "maximum": 100,
         "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 100 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01
-      },
-      "referenceConeWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "readOnly": true
-      },
-      "referenceNetWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "readOnly": true
-      },
-      "referenceLengthM": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "readOnly": true
-      },
-      "referenceWidthM": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "readOnly": true
-      },
-      "referenceConeWeightMode": {
-        "type": [
-          "string",
-          "null"
-        ],
-        "enum": [
-          "FIXED",
-          "VARIABLE",
-          null
-        ],
-        "readOnly": true
-      },
-      "coneWeightSource": {
-        "type": [
-          "string",
-          "null"
-        ],
-        "enum": [
-          "MEASURED",
-          "FIXED_REFERENCE",
-          "ESTIMATED_REFERENCE",
-          null
-        ],
-        "readOnly": true
       },
       "lengthSource": {
         "type": "string",
@@ -611,6 +578,30 @@
       },
       "observations": {
         "type": "string"
+      },
+      "referenceConeWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "maximum": 100,
+        "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al registrar merma y puede editarse.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+        "minimum": 0
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 100,
+        "description": "Peso total con cono de un rollo completo; mayor que el cono. Se usa para estimar la longitud de nuevas mermas.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -642,6 +633,30 @@
       },
       "isActive": {
         "type": "boolean"
+      },
+      "referenceConeWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "maximum": 100,
+        "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al registrar merma y puede editarse.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+        "minimum": 0
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 100,
+        "description": "Peso total con cono de un rollo completo; mayor que el cono. Se usa para estimar la longitud de nuevas mermas.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -737,11 +752,6 @@
         "multipleOf": 0.01,
         "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
       },
-      "useConeReference": {
-        "type": "boolean",
-        "default": false,
-        "description": "Resuelve el cono desde la oferta persistida; el valor enviado no reemplaza la referencia del servidor."
-      },
       "lengthSource": {
         "type": "string",
         "enum": [
@@ -757,7 +767,6 @@
       "materialId",
       "supplierId",
       "base",
-      "height",
       "maxUnitCost",
       "isActive",
       "newStock"
@@ -765,69 +774,23 @@
     "allOf": [
       {
         "if": {
-          "required": [
-            "coneWeightKg"
-          ],
           "properties": {
-            "coneWeightKg": {
-              "not": {
-                "enum": [
-                  null,
-                  ""
-                ]
-              }
+            "lengthSource": {
+              "const": "ESTIMATED"
             }
-          }
+          },
+          "required": [
+            "lengthSource"
+          ]
         },
-        "then": {
+        "else": {
           "required": [
-            "totalWeightKg"
-          ],
-          "properties": {
-            "totalWeightKg": {
-              "not": {
-                "enum": [
-                  null,
-                  ""
-                ]
-              }
-            }
-          }
-        }
-      },
-      {
-        "if": {
-          "required": [
-            "totalWeightKg"
-          ],
-          "properties": {
-            "totalWeightKg": {
-              "not": {
-                "enum": [
-                  null,
-                  ""
-                ]
-              }
-            }
-          }
-        },
-        "then": {
-          "required": [
-            "coneWeightKg"
-          ],
-          "properties": {
-            "coneWeightKg": {
-              "not": {
-                "enum": [
-                  null,
-                  ""
-                ]
-              }
-            }
-          }
+            "height"
+          ]
         }
       }
-    ]
+    ],
+    "description": "Referencia mediante materialId y supplierId. El cono se precarga en UI y se envía como valor editable; el servidor calcula neto y largo estimado con las referencias vigentes."
   },
   "WasteUpdateRequest": {
     "type": "object",
@@ -1441,56 +1404,6 @@
       "quantity"
     ]
   },
-  "WasteRollReferenceRequest": {
-    "type": "object",
-    "properties": {
-      "materialId": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "supplierId": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "coneWeightMode": {
-        "type": "string",
-        "enum": [
-          "FIXED",
-          "VARIABLE"
-        ]
-      },
-      "referenceConeWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "maximum": 100,
-        "description": "Cono de muestra en kg; obligatorio para modo FIXED o si se registra el total de muestra.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
-        "minimum": 0
-      },
-      "referenceRollTotalWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "exclusiveMinimum": 0,
-        "maximum": 100,
-        "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
-      }
-    },
-    "required": [
-      "materialId",
-      "supplierId",
-      "coneWeightMode"
-    ],
-    "additionalProperties": false
-  },
   "WasteRollReference": {
     "type": "object",
     "properties": {
@@ -1501,13 +1414,6 @@
       "supplierId": {
         "type": "string",
         "format": "uuid"
-      },
-      "coneWeightMode": {
-        "type": "string",
-        "enum": [
-          "FIXED",
-          "VARIABLE"
-        ]
       },
       "referenceConeWeightKg": {
         "type": [
@@ -1557,21 +1463,6 @@
     },
     "additionalProperties": false
   },
-  "WasteRollReferenceResponse": {
-    "type": "object",
-    "properties": {
-      "reference": {
-        "$ref": "../openapi.json#/components/schemas/WasteRollReference"
-      },
-      "code": {
-        "$ref": "../openapi.json#/components/schemas/SuccessCode"
-      }
-    },
-    "required": [
-      "reference"
-    ],
-    "additionalProperties": false
-  },
   "WasteMaterialTemplate": {
     "type": "object",
     "properties": {
@@ -1618,13 +1509,6 @@
       "rollReference": {
         "type": "object",
         "properties": {
-          "coneWeightMode": {
-            "type": "string",
-            "enum": [
-              "FIXED",
-              "VARIABLE"
-            ]
-          },
           "referenceConeWeightKg": {
             "type": [
               "number",

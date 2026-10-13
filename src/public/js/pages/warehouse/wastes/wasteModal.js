@@ -6,7 +6,7 @@ import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { displayWasteMaterialTemplate, updateWasteWeightField, updateWasteRollMeasurement } from '../../../ui/inventory/inventorySelectUI.js';
+import { displayWasteMaterialTemplate, updateWasteWeightField } from '../../../ui/inventory/inventorySelectUI.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
@@ -84,12 +84,10 @@ export const openWasteModal = ({
             ? 'Ajustar'
             : 'Guardar';
 
-    form.dataset.rollReference = JSON.stringify(data ? { referenceConeWeightKg: data.referenceConeWeightKg, referenceRollNetWeightKg: data.referenceNetWeightKg, referenceLengthM: data.referenceLengthM, referenceWidthM: data.referenceWidthM, coneWeightMode: data.referenceConeWeightMode || 'VARIABLE' } : {});
-    form.elements.useConeReference.checked = data?.coneWeightSource === 'FIXED_REFERENCE' || data?.coneWeightSource === 'ESTIMATED_REFERENCE';
+    form.dataset.rollReference = '{}';
     form.elements.lengthSource.value = data?.lengthSource || 'MEASURED';
     form.querySelector('#wasteDuplicateStockButton').classList.add('d-none');
     delete form.dataset.duplicateWaste;
     updateWasteWeightField({ form, template: data ?? {} });
-    updateWasteRollMeasurement({ form });
     openModal(modalElement);
 };

@@ -8,19 +8,14 @@ import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { registerWasteStockEntry } from './wasteStockEntryService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
-import { resolveWasteMaterialSnapshot } from './wasteMaterialService.js';
+import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.js';
+import { getMaterialIdentityLength, getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
 import { findUniqueSupplier } from '../supplierService.js';
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
 import { calculateWasteRollLength, LENGTH_SOURCES } from '../../../public/js/utils/wasteRollUtils.js';
 import { calculateWasteNetWeight, isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
-
-const assertWasteWeight = ({ coneWeightKg, totalWeightKg, presentation }) => {
-    if (coneWeightKg == null && totalWeightKg == null) return;
-    if (!isRollPresentation(presentation?.name) || !Number.isFinite(coneWeightKg)
-        || !Number.isFinite(totalWeightKg) || coneWeightKg < 0 || totalWeightKg <= coneWeightKg) throw new WasteWeightInvalid();
-};
 
 const handleWasteServiceError = ({ err, fallbackError }) => {
 
@@ -134,7 +129,7 @@ export const findAllWastes = async ({
                 weightKg: true,
                 coneWeightKg: true,
                 totalWeightKg: true,
-                referenceConeWeightKg: true, referenceConeWeightMode: true, coneWeightSource: true, lengthSource: true, referenceNetWeightKg: true, referenceLengthM: true, referenceWidthM: true, sourceMaterialId: true,
+                lengthSource: true, sourceMaterialId: true,
                 ...(canReadCosts && { maxUnitCost: true }),
                 minStock: true,
                 isActive: true,
@@ -172,18 +167,26 @@ export const createWasteWithInitialStockAdjustment = async ({
 
             if (supplier?.isActive === false) throw new SupplierInactiveConflict();
 
-            const material = await resolveWasteMaterialSnapshot({
+            const offer = await findSupplierMaterialByIds({
                 tx,
                 materialId: wasteDto.materialId,
                 supplierId: wasteDto.supplierId
             });
 
-            if (!material) throw new WasteNotFound();
+            if (!offer.isActive) throw new WasteNotFound();
 
-            const reference = material.rollReference ?? {};
-            const coneWeightKg = wasteDto.useConeReference ? (reference.referenceConeWeightKg == null ? null : toNumber(reference.referenceConeWeightKg)) : wasteDto.coneWeightKg;
-            if (wasteDto.useConeReference && coneWeightKg == null) throw new WasteRollReferenceMissing();
-            assertWasteWeight({ coneWeightKg, totalWeightKg: wasteDto.totalWeightKg, presentation: material.presentation });
+            const material = offer.material;
+            const coneWeightKg = wasteDto.coneWeightKg;
+            if ((coneWeightKg != null || wasteDto.totalWeightKg != null)
+                && !isRollPresentation(material.presentation.name)) throw new WasteWeightInvalid();
+            const reference = {
+                referenceRollNetWeightKg: calculateWasteNetWeight({
+                    coneWeightKg: offer.referenceConeWeightKg,
+                    totalWeightKg: offer.referenceRollTotalWeightKg
+                }),
+                referenceLengthM: getMaterialIdentityLength(material),
+                referenceWidthM: getMaterialIdentityWidth(material)
+            };
             const weightKg = calculateWasteNetWeight({ coneWeightKg, totalWeightKg: wasteDto.totalWeightKg });
             const lengthSource = wasteDto.lengthSource || LENGTH_SOURCES.MEASURED;
             const height = lengthSource === LENGTH_SOURCES.ESTIMATED ? calculateWasteRollLength({ netWeightKg: weightKg, referenceNetWeightKg: reference.referenceRollNetWeightKg, referenceLengthM: reference.referenceLengthM, referenceWidthM: reference.referenceWidthM, widthM: wasteDto.base }) : wasteDto.height;
@@ -205,13 +208,7 @@ export const createWasteWithInitialStockAdjustment = async ({
                     base: wasteDto.base,
                     height,
                     sourceMaterial: { connect: { id: material.id } },
-                    referenceConeWeightKg: reference.referenceConeWeightKg ?? null,
-                    referenceConeWeightMode: reference.coneWeightMode ?? null,
-                    coneWeightSource: coneWeightKg == null ? null : wasteDto.useConeReference ? (reference.coneWeightMode === 'FIXED' ? 'FIXED_REFERENCE' : 'ESTIMATED_REFERENCE') : 'MEASURED',
                     lengthSource,
-                    referenceNetWeightKg: reference.referenceRollNetWeightKg ?? null,
-                    referenceLengthM: reference.referenceLengthM ?? null,
-                    referenceWidthM: reference.referenceWidthM ?? null,
                     coneWeightKg: coneWeightKg ?? null,
                     totalWeightKg: wasteDto.totalWeightKg ?? null,
                     weightKg,
@@ -270,7 +267,7 @@ export const updateWaste = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
-            if (['weightKg', 'coneWeightKg', 'totalWeightKg', 'referenceConeWeightKg', 'referenceConeWeightMode', 'coneWeightSource', 'lengthSource', 'referenceNetWeightKg', 'referenceLengthM', 'referenceWidthM', 'sourceMaterialId'].some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
+            if (['weightKg', 'coneWeightKg', 'totalWeightKg', 'lengthSource', 'sourceMaterialId'].some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
 
             if (wasteDto.name && wasteDto.name !== currentWaste.name) {
                 const existingWaste = await findWasteByIdentity({

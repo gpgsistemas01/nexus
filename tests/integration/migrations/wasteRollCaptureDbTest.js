@@ -44,9 +44,9 @@ describe('migración de peso del cono y total por unidad de merma', () => {
         try {
             await connection.query('CREATE TEMP TABLE "Material" (LIKE public."Material" INCLUDING ALL)');
             await connection.query('CREATE TEMP TABLE "SupplierMaterial" (LIKE public."SupplierMaterial" INCLUDING DEFAULTS INCLUDING CONSTRAINTS)');
-            await connection.query('ALTER TABLE "SupplierMaterial" DROP COLUMN "coneWeightMode", DROP COLUMN "referenceConeWeightKg", DROP COLUMN "referenceRollTotalWeightKg", DROP COLUMN "referenceRollNetWeightKg"');
+            await connection.query('ALTER TABLE "SupplierMaterial" DROP COLUMN "referenceConeWeightKg", DROP COLUMN "referenceRollTotalWeightKg"');
             await connection.query('CREATE TEMP TABLE "Waste" (LIKE public."Waste" INCLUDING DEFAULTS INCLUDING CONSTRAINTS)');
-            await connection.query('ALTER TABLE "Waste" DROP COLUMN "sourceMaterialId", DROP COLUMN "referenceConeWeightKg", DROP COLUMN "referenceConeWeightMode", DROP COLUMN "coneWeightSource", DROP COLUMN "lengthSource", DROP COLUMN "referenceNetWeightKg", DROP COLUMN "referenceLengthM", DROP COLUMN "referenceWidthM"');
+            await connection.query('ALTER TABLE "Waste" DROP COLUMN "sourceMaterialId", DROP COLUMN "lengthSource"');
             await connection.query('CREATE UNIQUE INDEX "Waste_supplierId_name_base_height_key" ON "Waste" ("supplierId", "name", "base", "height")');
             const supplierId = randomUUID();
             const insert = async (cone, total) => connection.query(`INSERT INTO "Waste" ("id", "supplierId", "presentationId", "unitMeasureId", "name", "base", "height", "weightKg", "coneWeightKg", "totalWeightKg", "updatedAt") VALUES ($1,$2,$2,$2,'Merma histórica',1.5,2,$3,$4,$5,'2026-10-13')`, [randomUUID(), supplierId, cone == null ? '1.23' : Number(total) - Number(cone), cone, total]);
@@ -61,6 +61,18 @@ describe('migración de peso del cono y total por unidad de merma', () => {
             await expect(insert('0.25', '1')).rejects.toMatchObject({ code: '23505' });
             expect((await connection.query('SELECT COUNT(*)::int AS count FROM "Waste"')).rows[0].count).toBe(3);
             await expect(connection.query('INSERT INTO "SupplierMaterial" ("supplierId", "materialId", "coneWeightMode") VALUES ($1,$2,\'FIXED\')', [randomUUID(), randomUUID()])).rejects.toMatchObject({ code: '23514' });
+            await connection.query('INSERT INTO "SupplierMaterial" ("supplierId", "materialId", "referenceConeWeightKg", "referenceRollTotalWeightKg", "referenceRollNetWeightKg") VALUES ($1,$2,0.3,10.3,10)', [randomUUID(), randomUUID()]);
+            const materialId = randomUUID();
+            await connection.query('INSERT INTO "Material" ("id", "name", "presentationId", "unitMeasureId", "base", "height") VALUES ($1,\'Material de origen\',$2,$2,1.5,50)', [materialId, randomUUID()]);
+            await connection.query('UPDATE "Waste" SET "sourceMaterialId"=$1, "lengthSource"=\'ESTIMATED\', "referenceNetWeightKg"=10, "referenceLengthM"=50, "referenceWidthM"=1.5 WHERE "coneWeightKg" IS NOT NULL', [materialId]);
+            const wastesBefore = (await connection.query('SELECT * FROM "Waste" ORDER BY "id"')).rows;
+            const offersBefore = (await connection.query('SELECT * FROM "SupplierMaterial" ORDER BY "id"')).rows;
+            const simplification = readFileSync(new URL('../../../prisma/migrations/20261013190000_simplify_waste_material_reference/migration.sql', import.meta.url), 'utf8');
+            await connection.query(simplification);
+            const removedFields = ['referenceConeWeightKg', 'referenceConeWeightMode', 'coneWeightSource', 'referenceNetWeightKg', 'referenceLengthM', 'referenceWidthM'];
+            expect((await connection.query('SELECT * FROM "Waste" ORDER BY "id"')).rows).toEqual(wastesBefore.map(row => Object.fromEntries(Object.entries(row).filter(([key]) => !removedFields.includes(key)))));
+            expect((await connection.query('SELECT * FROM "SupplierMaterial" ORDER BY "id"')).rows).toEqual(offersBefore.map(({ coneWeightMode, referenceRollNetWeightKg, ...row }) => row));
+
         } finally {
             await connection.end();
         }

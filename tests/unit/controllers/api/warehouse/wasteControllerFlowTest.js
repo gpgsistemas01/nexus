@@ -7,7 +7,7 @@ const wasteFindUnique = vi.fn();
 const wasteUpdate = vi.fn();
 const wasteStockAdjustmentCreate = vi.fn();
 const wasteStockAdjustmentUpdate = vi.fn();
-const resolveWasteMaterialSnapshot = vi.fn();
+const findSupplierMaterialByIds = vi.fn();
 const findInitialStockAdjustmentReason = vi.fn();
 const generateYearlyReferenceNumber = vi.fn();
 const throwIfReferenceNumberAlreadyExists = vi.fn();
@@ -28,8 +28,8 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
   })
 }));
 
-vi.mock('../../../../../src/services/warehouse/wastes/wasteMaterialService.js', () => ({
-  resolveWasteMaterialSnapshot
+vi.mock('../../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
+  findSupplierMaterialByIds
 }));
 
 vi.mock('../../../../../src/services/warehouse/supplierService.js', () => ({
@@ -122,12 +122,15 @@ describe('wasteController complete flow', () => {
     wasteUpdate.mockResolvedValue(createWaste({ currentStock: 7, convertedQuantity: 42 }));
     wasteStockAdjustmentCreate.mockResolvedValue({ id: 'adjustment-1', details: [{ id: 'detail-1' }] });
     wasteStockAdjustmentUpdate.mockResolvedValue({ id: 'adjustment-1', details: [{ id: 'detail-1' }], movement: { id: 'movement-1' } });
-    resolveWasteMaterialSnapshot.mockResolvedValue({
+    findSupplierMaterialByIds.mockResolvedValue({
+      isActive: true,
+      material: {
       id: 'material-1',
       name: 'Lámina',
       presentation: { id: 'presentation-1', name: 'ROLLO' },
       unitMeasure: { id: 'unit-measure-1', name: 'Metro cuadrado', symbol: 'm²' },
       maxUnitCost: 18.5
+      }
     });
     findInitialStockAdjustmentReason.mockResolvedValue({ id: 'initial-reason-1' });
     generateYearlyReferenceNumber.mockResolvedValue('AJU-MER-2026-000001');

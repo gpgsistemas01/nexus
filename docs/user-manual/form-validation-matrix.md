@@ -86,6 +86,6 @@ Véase el [recorrido del peso](../requirements/requirements-specification/04-uni
 
 | Referencia y longitud de Rollo | Validación |
 | --- | --- |
-| Cono fijo de referencia | Requiere peso del cono; el total de muestra, si se captura, debe ser mayor. |
-| Cono variable | Permite referencia vacía o medida de muestra; al usarla en merma se identifica como estimación. |
+| Cono predeterminado en material | Opcional, admite cero. Se precarga en merma como campo editable. |
+| Peso total del rollo en material | Opcional; si se captura, exige cono y debe ser mayor. Se consulta para estimar longitud. |
 | Largo estimado | Requiere pesos de merma, neto y dimensiones positivos de muestra. Se calcula; no se captura manualmente. |

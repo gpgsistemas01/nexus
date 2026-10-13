@@ -1,4 +1,4 @@
-import { ExcededMaxRetriesSkuError } from "../../../errors/warehouse/materialError.js";
+import { ExcededMaxRetriesSkuError, MaterialRollReferenceInvalid } from "../../../errors/warehouse/materialError.js";
 import { findUniquePresentation } from "../presentationService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
@@ -6,20 +6,32 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 
+import { isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
+import { MATERIAL_TYPES } from '../../../constants/inventory.js';
+
 const serviceLogger = createServiceLogger('warehouse.materials.materialHelpers');
 
 
 const MAX_RETRIES = 5;
 
+export const assertMaterialRollReference = ({ material, referenceConeWeightKg, referenceRollTotalWeightKg }) => {
+    if ((referenceConeWeightKg != null || referenceRollTotalWeightKg != null)
+        && (material.type === MATERIAL_TYPES.CONSUMABLE || !isRollPresentation(material.presentation?.name))) {
+        throw new MaterialRollReferenceInvalid();
+    }
+};
+
 export const prepareMaterialData = async ({ tx, materialDto, materialId = null }) => {
 
-    const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, ...rest } = materialDto;
+    const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...rest } = materialDto;
 
-    const [, , supplier] = await Promise.all([
+    const [, presentation, supplier] = await Promise.all([
         findUniqueUnitMeasure({ tx, id: unitMeasureId }),
         findUniquePresentation({ tx, id: presentationId }),
         findUniqueSupplier({ tx, id: supplierId })
     ]);
+
+    assertMaterialRollReference({ material: { ...rest, presentation }, referenceConeWeightKg, referenceRollTotalWeightKg });
 
     if (supplier?.isActive === false) throw new SupplierInactiveConflict();
 
@@ -30,7 +42,9 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null }
             unitMeasureId,
             supplierId,
             maxUnitCost,
-            isActive
+            isActive,
+            ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
+            ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg })
         }
     };
 };

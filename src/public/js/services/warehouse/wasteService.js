@@ -38,6 +38,3 @@ export const addWasteStockRequest = ({ data, id }) => apiRequest({
     url: `${ WASTES_API_ROUTE }/${ id }/stock-additions`,
     data
 });
-
-export const getWasteRollReferenceRequest = ({ params }) => apiRequest({ method: 'get', url: `${WASTES_API_ROUTE}/roll-reference`, params });
-export const saveWasteRollReferenceRequest = ({ data }) => apiRequest({ method: 'patch', url: `${WASTES_API_ROUTE}/roll-reference`, data });

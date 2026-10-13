@@ -2,10 +2,8 @@ import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMess
 
 export const errorMessages = {
     WASTE_ESTIMATED_LENGTH_NEEDS_WEIGHTS: 'Capture los pesos de la merma antes de estimar su longitud.',
-    CONE_WEIGHT_MODE_INVALID: 'Seleccione si el cono tiene peso fijo o variable.',
     WASTE_LENGTH_SOURCE_INVALID: 'Seleccione longitud medida o estimada por peso.',
-    CONE_REFERENCE_CHOICE_INVALID: 'Indique si se utiliza la referencia del cono.',
-    WASTE_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
+    MATERIAL_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
     WASTE_ROLL_REFERENCE_MISSING: 'Complete la referencia del cono y del rollo para utilizarla en esta merma.',
     CONE_WEIGHT_KG_INVALID_NUMBER: 'El peso del cono debe ser un decimal mayor o igual que cero en kg. Use punto decimal, sin letras ni notación científica.',
     CONE_WEIGHT_KG_REQUIRED: 'Capture el peso del cono para calcular el peso neto de la merma.',
@@ -305,7 +303,6 @@ export const errorMessages = {
 };
 
 const successMessages = {
-    UPDATED_WASTE_ROLL_REFERENCE: 'Referencia del rollo actualizada.',
     CREATED_ACCOUNT: '¡Cuenta registrada exitosamente!',
     UPDATED_ACCOUNT: '¡Cuenta actualizada con éxito!',
     SUCCESS_LOGIN: '¡Inicio de sesión exitoso!',

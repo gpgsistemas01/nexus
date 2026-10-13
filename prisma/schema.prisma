@@ -197,10 +197,8 @@ model SupplierMaterial {
   isActive                   Boolean  @default(true)
   supplierId                 String   @db.Uuid
   materialId                 String   @db.Uuid
-  coneWeightMode             String   @default("VARIABLE") @db.VarChar(8)
   referenceConeWeightKg      Decimal? @db.Decimal(5, 2)
   referenceRollTotalWeightKg Decimal? @db.Decimal(5, 2)
-  referenceRollNetWeightKg   Decimal? @db.Decimal(5, 2)
   supplier                   Supplier @relation(fields: [supplierId], references: [id])
   material                   Material @relation(fields: [materialId], references: [id])
 
@@ -226,13 +224,7 @@ model Waste {
   totalWeightKg           Decimal?                     @db.Decimal(5, 2)
   sourceMaterialId        String?                      @db.Uuid
   sourceMaterial          Material?                    @relation("WasteRollMaterial", fields: [sourceMaterialId], references: [id], onDelete: Restrict)
-  referenceConeWeightKg   Decimal?                     @db.Decimal(5, 2)
-  referenceConeWeightMode String?                      @db.VarChar(8)
-  coneWeightSource        String?                      @db.VarChar(24)
   lengthSource            String                       @default("MEASURED") @db.VarChar(9)
-  referenceNetWeightKg    Decimal?                     @db.Decimal(5, 2)
-  referenceLengthM        Decimal?                     @db.Decimal(18, 6)
-  referenceWidthM         Decimal?                     @db.Decimal(18, 6)
   currentStock            Decimal                      @default(0) @db.Decimal(18, 6)
   convertedQuantity       Decimal                      @default(0) @db.Decimal(18, 6)
   supplier                Supplier                     @relation(fields: [supplierId], references: [id])

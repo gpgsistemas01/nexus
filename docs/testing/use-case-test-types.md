@@ -99,9 +99,9 @@ La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 | Pruebas | Comportamiento verificado |
 | --- | --- |
 | `wasteValidatorsTest.js`, `wasteRegistrationBoundaryTest.js` | Formato, precisión y rango; errores de campo antes de invocar el servicio. |
-| `wasteWeightFieldTest.js` | Habilitación del peso en alta de Rollo y consulta posterior. |
-| `wasteWeightDbTest.js` | Captura de cono y total, neto calculado, consulta, identidad por medidas y pesos, referencias fijas/variables, conservación histórica, longitud estimada, edición protegida, stock independiente y Excel con peso neto. |
+| `wasteWeightFieldTest.js` | Precarga del cono editable, limpieza al cambiar de material y consulta posterior. |
+| `wasteWeightDbTest.js` | Captura de cono y total, neto calculado, consulta, identidad por medidas y pesos, pesos predeterminados editados mediante el CRUD de material, conservación histórica, longitud estimada, edición protegida, stock independiente y Excel con peso neto. |
 | `reportServiceTest.js` | Agrupación, peso total y datos desconocidos. |
 | `wasteWeightCapDbTest.js`, `wasteWeightScaleDbTest.js`, `wasteRollCaptureDbTest.js` | Restricciones en PostgreSQL, conservación de valores compatibles y rollback de las migraciones ante valores incompatibles. |
 
-`wasteRollUtilsTest.js` verifica la longitud nominal máxima y la proporcionalidad con cambio de ancho. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos.
+`wasteRollUtilsTest.js` verifica la longitud nominal máxima y la proporcionalidad con cambio de ancho. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos y simplificación incremental que conserva vínculo, neto y largo.

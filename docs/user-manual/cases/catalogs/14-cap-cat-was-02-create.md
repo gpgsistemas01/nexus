@@ -18,8 +18,8 @@ para abrir el formulario y **Guardar** para confirmarlo.
    ![CAP-CAT-WAS-02-CREATE: formulario de registro](../../images/areas/almacen/waste/02-form-registration.png)
 
 2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock** y **Observaciones**, y revise la casilla **Activo**.
-   Si la presentación es **Rollo**, revise la referencia del cono. Para un cono fijo, verá seleccionado **Usar peso de referencia del cono**; si el cono de esta merma cambia, desmarque esa opción y capture su peso medido. Complete el **Peso total por unidad con cono (kg)** y compruebe el neto calculado.
-   En **Longitud de la merma**, elija **Medida** para capturar el largo real o **Estimada por peso** para calcularlo con la muestra. Si desconoce los pesos, desmarque el uso de referencia, deje ambos vacíos y capture el largo medido. Después del alta los pesos y el método serán de consulta.
+   Si la presentación es **Rollo**, revise la referencia del cono. El campo **Peso del cono por unidad (kg)** se precarga desde el material; si el cono de esta merma cambia, edite ese mismo campo. Complete el **Peso total por unidad con cono (kg)** y compruebe el neto calculado.
+   En **Longitud de la merma**, elija **Medida** para capturar el largo real o **Estimada por peso** para calcularlo con la muestra. Si desconoce los pesos, deje ambos pesos vacíos y capture el largo medido. Después del alta los pesos y el método serán de consulta.
 3. Seleccione el botón **Guardar** para registrar la merma.
 
 Si el aviso indica que coinciden proveedor, nombre, medidas y pesos, seleccione
@@ -28,17 +28,16 @@ Si el aviso indica que coinciden proveedor, nombre, medidas y pesos, seleccione
 Con pesos distintos puede registrar otra merma. **Ajustar stock** se usa para corregir
 el saldo total con autorización del Administrador del sistema.
 
-### Prepare la referencia del rollo
+### Prepare los pesos del material
 
-Después de elegir proveedor y material de Rollo, abra **Referencia del rollo**.
-Vamos a guardar una muestra que sirva para futuras capturas: elija cono **Fijo** o
-**Variable**, registre el peso del cono de muestra y, si estimará longitudes, el
-peso total del rollo completo. Observe el neto calculado y la longitud tomada del
-material. Seleccione **Guardar** cuando haya verificado las mediciones con quien
-le capacita. Una referencia variable utilizada sin pesar el cono de la merma
-representa una estimación. Actualizar la muestra conserva las mermas ya guardadas.
+Registre o edite el material de Rollo y su proveedor. En **Pesos del rollo**, capture
+**Peso predeterminado del cono (kg)** y, si estimará longitudes, **Peso total del rollo
+completo con cono (kg)**. La longitud y el ancho se consultan de las dimensiones del
+material. En merma estos datos se consultan automáticamente. Cambiar los pesos del
+material afecta sólo nuevas capturas; no modifica pesos ni largos ya registrados.
 
 <a id="CAP-CAT-WAS-08-REFERENCE"></a>
-![CAP-CAT-WAS-08-REFERENCE: referencia del rollo por material y proveedor](../../images/areas/almacen/waste/08-roll-reference.png)
+La captura de esta preparación corresponde al formulario de material; debe renovarse
+con un material de Rollo existente en el entorno de prueba.
 
 **Compruebe el resultado:** Vuelva al listado y localice el registro guardado. Compruebe sus datos antes de continuar con otra operación.

@@ -4,13 +4,28 @@ import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.j
 import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
-import { materialDataFields, materialEditableDataFields } from './materialFields.js';
+import { materialDataFields, materialEditableDataFields, materialRollReferenceFields } from './materialFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+
+import { isRollPresentation } from '../../../utils/warehouseInventoryUtils.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
+
+export const updateMaterialRollReferenceFields = ({ form }) => {
+    const presentationName = form.elements.presentationId.selectedOptions?.[0]?.textContent;
+    const applies = form.dataset.resource !== INVENTORY_RESOURCES.CONSUMABLE && isRollPresentation(presentationName);
+    setFormSectionVisibility({
+        form,
+        selector: '.roll-reference-section',
+        isVisible: applies,
+        fieldNames: materialRollReferenceFields,
+        clearValues: true
+    });
+    setFormDisabled({ form, fields: materialRollReferenceFields, isDisabled: !applies || (!isCreateMode(form.dataset.mode) && !isEditMode(form.dataset.mode)) });
+};
 
 export const openMaterialModal = ({
     mode = FORM_MODES.CREATE,
@@ -39,6 +54,7 @@ export const openMaterialModal = ({
     form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
     form.elements.base.value = data?.base ?? '';
     form.elements.height.value = data?.height ?? '';
+    materialRollReferenceFields.forEach(field => { form.elements[field].value = data?.[field] ?? ''; });
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.newStock.value = '';
     form.elements.observations.value = '';
@@ -91,6 +107,7 @@ export const openMaterialModal = ({
             ? 'Ajustar'
             : 'Guardar';
 
+    updateMaterialRollReferenceFields({ form });
     form.onSave = onSave;
     openModal(modalElement);
 };

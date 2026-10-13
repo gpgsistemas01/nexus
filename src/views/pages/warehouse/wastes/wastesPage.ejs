@@ -71,18 +71,15 @@
                     type: 'html',
                     col: 'col-12',
                     content: `
+                        <div class="waste-roll-measurement-section">
                         <p id="wasteConeReferenceInfo" class="mb-2"></p>
-                        <button type="button" id="wasteRollReferenceButton" class="btn btn-outline-primary mb-2">Referencia del rollo</button>
-                        <div class="form-check mb-2">
-                            <input type="checkbox" name="useConeReference" id="useConeReferenceInput" class="form-check-input">
-                            <label class="form-check-label" for="useConeReferenceInput">Usar peso de referencia del cono</label>
-                        </div>
                         <label for="lengthSourceInput" class="form-label">Longitud de la merma</label>
                         <select id="lengthSourceInput" name="lengthSource" class="form-select">
                             <option value="MEASURED">Medida</option>
                             <option value="ESTIMATED">Estimada por peso</option>
                         </select>
                         <div class="invalid-feedback" data-error-for="lengthSource"></div>
+                        </div>
                         <button type="button" id="wasteDuplicateStockButton" class="btn btn-primary mt-2 d-none">Agregar esta cantidad al stock existente</button>
                     `
                 },
@@ -252,8 +249,6 @@
 <%- include('../../../shared/layout/modal', { modalId: 'wasteModal', form }) %>
 
 <%- include('wasteStockAdditionModal') %>
-
-<%- include('wasteRollReferenceModal') %>
 
 <script type="module" src="/js/pages/warehouse/wastes/wastesPage.js"></script>
 

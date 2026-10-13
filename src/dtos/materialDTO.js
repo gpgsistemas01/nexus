@@ -10,9 +10,17 @@ const buildMaterialDataDto = (body = {}) => ({
     ...normalizeMaterialDimensions(body)
 });
 
+const buildMaterialRollReferenceDto = (body = {}) => {
+    const fields = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'];
+    if (!fields.some(field => Object.prototype.hasOwnProperty.call(body, field))) return {};
+
+    return Object.fromEntries(fields.map(field => [field, toNumber(body[field])]));
+};
+
 const buildMaterialSecondaryDataDto = (body = {}) => ({
     ...Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null ? { minStock: Number(body.minStock) } : {},
     maxUnitCost: toNumber(body.maxUnitCost),
+    ...buildMaterialRollReferenceDto(body),
     ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
 });
 
@@ -29,6 +37,7 @@ export const createMaterialDtoForRegister = (body = {}) => {
     if (body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT) {
         return {
             ...materialData,
+            ...buildMaterialRollReferenceDto(body),
             ...(Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null
                 ? { minStock: Number(body.minStock) }
                 : {}),

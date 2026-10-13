@@ -226,9 +226,6 @@
     },
     "/api/admin/reports/movements/consumables/excel": {
       "$ref": "./paths/admin.json#/~1api~1admin~1reports~1movements~1consumables~1excel"
-    },
-    "/api/warehouse/wastes/roll-reference": {
-      "$ref": "./paths/warehouse.json#/~1api~1warehouse~1wastes~1roll-reference"
     }
   },
   "components": {
@@ -437,14 +434,8 @@
       "WasteStockAdditionRequest": {
         "$ref": "./components/warehouse-schemas.json#/WasteStockAdditionRequest"
       },
-      "WasteRollReferenceRequest": {
-        "$ref": "./components/warehouse-schemas.json#/WasteRollReferenceRequest"
-      },
       "WasteRollReference": {
         "$ref": "./components/warehouse-schemas.json#/WasteRollReference"
-      },
-      "WasteRollReferenceResponse": {
-        "$ref": "./components/warehouse-schemas.json#/WasteRollReferenceResponse"
       },
       "WasteMaterialTemplate": {
         "$ref": "./components/warehouse-schemas.json#/WasteMaterialTemplate"

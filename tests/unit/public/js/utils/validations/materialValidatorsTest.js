@@ -11,6 +11,8 @@ import {
 describe('validadores del CRUD de materiales', () => {
   it('compone edición y alta reutilizando las reglas comunes', () => {
     expect(Object.keys(materialEditValidation)).toEqual([
+      'referenceConeWeightKg',
+      'referenceRollTotalWeightKg',
       'name',
       'supplierId',
       'minStock',

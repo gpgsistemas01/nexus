@@ -37,12 +37,12 @@ export const getWasteWeightValidationError = (value, { allowZero = false } = {})
 
 const hasWasteWeight = value => value !== undefined && value !== null && value !== '';
 
-export const getWasteWeightCaptureValidationError = (value, { fieldName, coneWeightKg, totalWeightKg }) => {
+export const getWasteWeightCaptureValidationError = (value, { fieldName, coneWeightKg, totalWeightKg, requireTotal = true }) => {
     const isCone = fieldName === 'coneWeightKg';
     const error = getWasteWeightValidationError(value, { allowZero: isCone });
     if (error) return error;
 
-    if (!hasWasteWeight(value) && hasWasteWeight(isCone ? totalWeightKg : coneWeightKg)) {
+    if (!hasWasteWeight(value) && hasWasteWeight(isCone ? totalWeightKg : coneWeightKg) && (isCone || requireTotal)) {
         return isCone ? 'CONE_WEIGHT_KG_REQUIRED' : 'TOTAL_WEIGHT_KG_REQUIRED';
     }
 

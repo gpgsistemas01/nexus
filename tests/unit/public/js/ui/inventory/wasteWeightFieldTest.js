@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({ setMdbWrapperInputValue: vi.fn() }));
-const { updateWasteWeightField, updateWasteNetWeightField } = await import('../../../../../../src/public/js/ui/inventory/inventorySelectUI.js');
+const { applyWasteMaterialTemplate, updateWasteRollMeasurement, updateWasteWeightField, updateWasteNetWeightField } = await import('../../../../../../src/public/js/ui/inventory/inventorySelectUI.js');
 const { FORM_MODES } = await import('../../../../../../src/public/js/constants/formModes.js');
 
 const createForm = mode => {
-    const elements = Object.fromEntries(Object.entries({ weightKg: '2.5', coneWeightKg: '0.5', totalWeightKg: '3' }).map(([name, value]) => [name, { value, disabled: true, classList: { toggle: vi.fn() } }]));
-    return { elements, dataset: { mode }, querySelector: selector => elements[selector.match(/name='([^']+)'/)[1]] };
+    const elements = Object.fromEntries(Object.entries({ weightKg: '2.5', coneWeightKg: '0.5', totalWeightKg: '3', base: '1.5', lengthSource: 'MEASURED', height: '2' }).map(([name, value]) => [name, { value, disabled: true, closest: () => null, classList: { toggle: vi.fn() } }]));
+    return { elements, dataset: { mode }, querySelector: selector => selector === '#wastePresentationDisplayValue' || selector === '#wasteUnitMeasureDisplayValue' ? { textContent: '' } : elements[selector?.match(/name='([^']+)'/)?.[1]] };
 
 };
 
@@ -44,4 +44,21 @@ describe('captura de peso según la presentación real de la merma', () => {
         expect(form.elements.weightKg.value).toBe('');
     });
 
+    it('precarga el cono y permite editarlo; cambiar material borra las mediciones anteriores', () => {
+        const form = createForm(FORM_MODES.CREATE);
+        const template = { presentation: { name: 'ROLLO' }, rollReference: { referenceConeWeightKg: 0.25 } };
+        applyWasteMaterialTemplate({ form, template });
+        expect(form.elements.coneWeightKg.value).toBe(0.25);
+        expect(form.elements.coneWeightKg.disabled).toBe(false);
+        expect(form.elements.totalWeightKg.value).toBe('');
+        form.elements.coneWeightKg.value = '0.4';
+        form.elements.totalWeightKg.value = '1.4';
+        updateWasteRollMeasurement({ form });
+        expect(form.elements.coneWeightKg.value).toBe('0.4');
+        expect(form.elements.weightKg.value).toBe(1);
+        applyWasteMaterialTemplate({ form, template: { ...template, rollReference: { referenceConeWeightKg: 0.3 } } });
+        expect(form.elements.coneWeightKg.value).toBe(0.3);
+        expect(form.elements.totalWeightKg.value).toBe('');
+        expect(form.elements.weightKg.value).toBe('');
+    });
 });

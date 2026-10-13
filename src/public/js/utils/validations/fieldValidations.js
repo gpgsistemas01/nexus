@@ -1,3 +1,4 @@
+import { getRollReferenceValidationError } from '../wasteRollUtils.js';
 import { getErrorMessage } from "../../constants/apiMessages.js";
 import { getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
 import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
@@ -322,6 +323,11 @@ export const validatePersonAccessesArray = accesses => {
     }
 
     return null;
+};
+
+export const validateMaterialRollReference = (value, data, field) => {
+    const error = getRollReferenceValidationError(value, data, field);
+    return error ? getErrorMessage({ code: error }) : null;
 };
 
 export const validateWasteLengthSource = (value, { rollReference = {}, coneWeightKg, totalWeightKg, presentationName }) => {

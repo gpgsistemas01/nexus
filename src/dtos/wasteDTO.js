@@ -2,7 +2,6 @@ import { toNumber } from '../utils/formattersUtils.js';
 
 const buildWasteRegistrationDataDto = (body = {}) => ({
     materialId: body.materialId,
-    ...(Object.prototype.hasOwnProperty.call(body, 'useConeReference') ? { useConeReference: body.useConeReference === true } : {}),
     ...(Object.prototype.hasOwnProperty.call(body, 'lengthSource') ? { lengthSource: body.lengthSource } : {}),
     supplierId: body.supplierId,
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
@@ -52,12 +51,3 @@ export const createWasteDtoForStockAddition = (body = {}) => ({
     quantity: Number(body.quantity),
     ...buildWasteObservationsDto(body)
 });
-
-export const createWasteRollReferenceDto = (body = {}) => {
-    const optionalNumber = value => value == null || value === '' ? null : Number(value);
-    return {
-        supplierId: body.supplierId, materialId: body.materialId, coneWeightMode: body.coneWeightMode,
-        referenceConeWeightKg: optionalNumber(body.referenceConeWeightKg),
-        referenceRollTotalWeightKg: optionalNumber(body.referenceRollTotalWeightKg)
-    };
-};

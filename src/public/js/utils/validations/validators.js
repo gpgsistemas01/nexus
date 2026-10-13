@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateWasteLengthSource, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
+import { validateMaterialRollReference, validateWasteLengthSource, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
 
 const inventoryStateValidation = {
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
@@ -26,6 +26,8 @@ export const supplierValidation = {
 }
 
 export const materialEditValidation = {
+    referenceConeWeightKg: (value, data) => validateMaterialRollReference(value, data, 'referenceConeWeightKg'),
+    referenceRollTotalWeightKg: (value, data) => validateMaterialRollReference(value, data, 'referenceRollTotalWeightKg'),
     name: (value) => validateName(value, 200),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     ...inventoryStateValidation,
@@ -99,7 +101,7 @@ export const wasteValidation = {
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     base: value => validatePositiveNumber(value, 'El ancho de la merma'),
-    height: value => validatePositiveNumber(value, 'El largo de la merma'),
+    height: (value, data = {}) => data.lengthSource === 'ESTIMATED' ? null : validatePositiveNumber(value, 'El largo de la merma'),
     ...wasteSecondaryDataValidation,
     newStock: wasteStockValidation.newStock,
     observations: wasteStockValidation.observations,

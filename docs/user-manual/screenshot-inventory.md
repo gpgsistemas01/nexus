@@ -243,8 +243,8 @@ comprobar el inventario sin iniciar Nexus ni Playwright se ejecuta
 | 180 | sistemas | `CAP-REP-MOV-WAS-02-EXPORT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste-movements/02-export-report.png` | `CU-ALM-16` |
 | 181 | almacen | `CAP-CAT-WAS-07-ROLL-WEIGHT-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/07-roll-unit-weight.png` | `CU-ALM-10`, `CU-ALM-11` |
 | 182 | sistemas | `CAP-CAT-WAS-07-ROLL-WEIGHT-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/07-roll-unit-weight.png` | `CU-ALM-10`, `CU-ALM-11` |
-| 183 | almacen | `CAP-CAT-WAS-08-REFERENCE-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/08-roll-reference.png` | `CU-ALM-10` |
-| 184 | sistemas | `CAP-CAT-WAS-08-REFERENCE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/08-roll-reference.png` | `CU-ALM-10` |
+| 183 | almacen | `CAP-CAT-WAS-08-REFERENCE-ALMACEN` | `build/docs/screenshots/areas/almacen/waste/08-roll-reference.png` | `CU-ALM-03`, `CU-ALM-10` |
+| 184 | sistemas | `CAP-CAT-WAS-08-REFERENCE-SISTEMAS` | `build/docs/screenshots/areas/sistemas/waste/08-roll-reference.png` | `CU-ALM-03`, `CU-ALM-10` |
 | 185 | almacen | `CAP-ERR-404-NOT-FOUND-ALMACEN` | `build/docs/screenshots/areas/almacen/errors/01-page-not-found.png` | Transversal |
 | 186 | sistemas | `CAP-ERR-404-NOT-FOUND-SISTEMAS` | `build/docs/screenshots/areas/sistemas/errors/01-page-not-found.png` | Transversal |
 
@@ -430,3 +430,8 @@ inventario, si se proporcionaron archivos mediante `DOCS_ALMACEN_STORAGE_STATE` 
 si la ejecución falla, los conserva para permitir un reintento y deben eliminarse manualmente
 cuando ya no se vayan a utilizar. Las credenciales automáticas sólo permanecen en las variables del
 proceso y deben retirarse de la terminal después de generar las capturas.
+
+La captura `CAP-CAT-WAS-08-REFERENCE` ahora abre un material de Rollo existente en
+Materiales y muestra su sección de pesos. Debe renovarse junto con las capturas de
+alta y edición de material y merma usando una sesión de prueba autorizada. La
+automatización conserva los identificadores y no crea registros.

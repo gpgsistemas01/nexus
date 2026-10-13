@@ -1,5 +1,16 @@
+import { body } from 'express-validator';
 import { validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
+
+import { getRollReferenceValidationError } from '../../public/js/utils/wasteRollUtils.js';
+
+const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'].map(field =>
+    body(field).custom((value, { req }) => {
+        const error = getRollReferenceValidationError(value, req.body, field);
+        if (error) throw new Error(error);
+        return true;
+    })
+);
 
 export const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
 
@@ -7,6 +18,7 @@ export const isGoodsReceiptMaterialCreation = (body = {}) =>
     body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
 
 export const materialEditValidation = [
+    ...materialRollReferenceValidation,
     validateText({ fieldName: 'name', maxLength: 200 }),
     validateUUID('supplierId'),
     ...createInventoryStateValidation(),
