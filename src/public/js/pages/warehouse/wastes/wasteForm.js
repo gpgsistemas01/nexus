@@ -4,7 +4,7 @@ import { closeModal } from '../../../ui/modalUI.js';
 import { openWasteStockAdditionModal } from './wasteStockAdditionModal.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
-import { updateWasteRollMeasurement } from '../../../ui/inventory/inventorySelectUI.js';
+import { getWasteMaterialTemplate, updateWasteRollMeasurement } from '../../../ui/inventory/wasteFormUI.js';
 import { useForm } from '../../../ui/forms/formUI.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
 import { INPUT_SELECTORS, FORM_SELECTORS } from '../../../constants/selectors.js';
@@ -36,7 +36,7 @@ useForm({
 
         return validateFields(wasteValidation, {
             ...formData,
-            rollReference: JSON.parse(form.dataset.rollReference || '{}'),
+            rollReference: getWasteMaterialTemplate({ form }).rollReference,
             presentationName: form.querySelector(INPUT_SELECTORS.WASTE_PRESENTATION_DISPLAY).textContent
         });
     },
@@ -58,11 +58,11 @@ useForm({
                 });
                 if (isConfirmed) {
                     closeModal(form);
-                    openWasteStockAdditionModal({ data: err.data.meta.waste });
-                    const additionForm = document.querySelector(FORM_SELECTORS.WASTE_STOCK_ADDITION);
-                    additionForm.elements.quantity.value = Number(formData.newStock) > 0 ? formData.newStock : '';
-                    additionForm.elements.quantity.dispatchEvent(new Event(DOM_EVENT_NAMES.INPUT, { bubbles: true }));
-                    additionForm.elements.observations.value = formData.observations || '';
+                    openWasteStockAdditionModal({
+                        data: err.data.meta.waste,
+                        quantity: formData.newStock,
+                        observations: formData.observations
+                    });
                 }
                 return;
             }

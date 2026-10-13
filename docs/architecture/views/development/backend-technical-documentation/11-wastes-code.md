@@ -13,9 +13,7 @@ flowchart TB
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>materialIdentity.js<br/>y colaboradores"]
     V["Validadores<br/>wasteValidations.js"]
     P["baseRepository.js<br/>getDb(tx)"]
-    PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>getWasteWeightCaptureValidationError<br/>calculateWasteNetWeight"]
-    Roll["wasteRollUtils.js<br/>validación de referencia y largo automático"]
-    S --> Roll
+    PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>getWasteWeightCaptureValidationError<br/>calculateWasteNetWeight<br/>calculateWasteRollLength"]
     C --> D
     C --> S
     R --> C
@@ -37,7 +35,6 @@ flowchart TB
 | Validadores · wasteValidations.js | `src/validators/forms/wasteValidations.js` |
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
 | Regla de presentación · warehouseInventoryUtils.js | `src/public/js/utils/warehouseInventoryUtils.js` |
-| Validación y cálculo de longitud | `src/public/js/utils/wasteRollUtils.js` |
 
 
 ## Contratos de implementación

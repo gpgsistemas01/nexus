@@ -58,6 +58,18 @@ export const calculateWasteNetWeight = ({ coneWeightKg, totalWeightKg }) => {
     return roundTo(Number(totalWeightKg) - Number(coneWeightKg), WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS);
 };
 
+export const getRollReferenceValidationError = (value, data, field) => getWasteWeightCaptureValidationError(value, {
+    fieldName: field === 'referenceConeWeightKg' ? 'coneWeightKg' : 'totalWeightKg',
+    coneWeightKg: field === 'referenceConeWeightKg' ? value : data.referenceConeWeightKg,
+    totalWeightKg: field === 'referenceRollTotalWeightKg' ? value : data.referenceRollTotalWeightKg,
+    requireTotal: false
+});
+
+export const calculateWasteRollLength = ({ netWeightKg, referenceNetWeightKg, referenceLengthM }) => {
+    if (![netWeightKg, referenceNetWeightKg, referenceLengthM].every(value => Number(value) > 0)) return null;
+    return roundTo(Number(netWeightKg) * Number(referenceLengthM) / Number(referenceNetWeightKg));
+};
+
 export const getPresentationId = (item = {}) => (
     item.presentationId
     ?? item.presentation?.id
@@ -145,7 +157,8 @@ export const parseInventorySelectJson = (value) => (
 export const normalizeInventorySelectRelations = (item = {}) => ({
     ...item,
     presentation: parseInventorySelectJson(item.presentation),
-    unitMeasure: parseInventorySelectJson(item.unitMeasure)
+    unitMeasure: parseInventorySelectJson(item.unitMeasure),
+    rollReference: parseInventorySelectJson(item.rollReference)
 });
 
 const mapIssueQuantities = (detail = {}) => ({

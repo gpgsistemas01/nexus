@@ -12,8 +12,7 @@ import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.
 import { getMaterialIdentityLength, getMaterialLengthField } from '../../inventory/materialIdentity.js';
 import { findUniqueSupplier } from '../supplierService.js';
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
-import { calculateWasteRollLength } from '../../../public/js/utils/wasteRollUtils.js';
-import { calculateWasteNetWeight, isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
+import { calculateWasteNetWeight, calculateWasteRollLength, isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -180,7 +179,7 @@ export const createWasteWithInitialStockAdjustment = async ({
             const isRoll = isRollPresentation(material.presentation.name);
             if ((coneWeightKg != null || wasteDto.totalWeightKg != null)
                 && !isRoll) throw new WasteWeightInvalid();
-            const weightKg = calculateWasteNetWeight({ coneWeightKg, totalWeightKg: wasteDto.totalWeightKg });
+            const weightKg = isRoll ? calculateWasteNetWeight({ coneWeightKg, totalWeightKg: wasteDto.totalWeightKg }) : null;
             const dimensions = { base: wasteDto.base, height: wasteDto.height };
             const lengthField = isRoll ? getMaterialLengthField(material) : null;
             if (lengthField) {

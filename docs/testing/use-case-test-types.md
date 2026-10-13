@@ -104,4 +104,4 @@ La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 | `reportServiceTest.js` | Agrupación, peso total y datos desconocidos. |
 | `wasteWeightCapDbTest.js`, `wasteWeightScaleDbTest.js`, `wasteRollCaptureDbTest.js` | Restricciones en PostgreSQL, conservación de valores compatibles y rollback de las migraciones ante valores incompatibles. |
 
-`wasteRollUtilsTest.js` verifica la longitud nominal máxima y la proporcionalidad con cambio de ancho. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos y migración consolidada que conserva netos históricos y agrega sólo campos finales.
+`wasteWeightCalculationsTest.js` verifica la longitud nominal máxima y la proporcionalidad por peso neto con el ancho del material. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos y migración consolidada que conserva netos históricos y agrega sólo campos finales.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateWasteRollLength, getRollReferenceValidationError } from '../../../../../src/public/js/utils/wasteRollUtils.js';
+import { calculateWasteRollLength, getRollReferenceValidationError } from '../../../../../src/public/js/utils/warehouseInventoryUtils.js';
 import { getMaterialIdentityLength, getMaterialLengthField } from '../../../../../src/services/inventory/materialIdentity.js';
 
 describe('referencia del cono y longitud de merma', () => {

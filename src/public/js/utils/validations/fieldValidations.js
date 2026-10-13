@@ -1,6 +1,5 @@
-import { getRollReferenceValidationError } from '../wasteRollUtils.js';
 import { getErrorMessage } from "../../constants/apiMessages.js";
-import { calculateWasteNetWeight, getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
+import { getRollReferenceValidationError, calculateWasteNetWeight, getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
 import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
@@ -332,7 +331,7 @@ export const validateMaterialRollReference = (value, data, field) => {
 
 export const validateWasteDimension = (value, data = {}, field) => {
     const reference = data.rollReference ?? {};
-    if (reference.lengthField) {
+    if (isRollPresentation(data.presentationName) && reference.lengthField) {
         if (field !== reference.lengthField) return null;
         if (calculateWasteNetWeight(data) != null) {
             if (Number(reference.referenceRollNetWeightKg) > 0 && Number(reference.referenceLengthM) > 0) return null;

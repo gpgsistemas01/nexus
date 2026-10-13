@@ -6,7 +6,7 @@ import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { displayWasteMaterialTemplate, updateWasteWeightField } from '../../../ui/inventory/inventorySelectUI.js';
+import { displayWasteMaterialTemplate, updateWasteWeightField } from '../../../ui/inventory/wasteFormUI.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
@@ -84,7 +84,6 @@ export const openWasteModal = ({
             ? 'Ajustar'
             : 'Guardar';
 
-    form.dataset.rollReference = '{}';
     updateWasteWeightField({ form, template: data ?? {} });
     openModal(modalElement);
 };

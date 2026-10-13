@@ -12,7 +12,7 @@ vi.mock('../../../../../../../src/public/js/constants/permissions.js', () => ({ 
 vi.mock('../../../../../../../src/public/js/pages/warehouse/wastes/wasteStockAdditionModal.js', () => ({ openWasteStockAdditionModal: state.open }));
 vi.mock('../../../../../../../src/public/js/ui/modalUI.js', () => ({ closeModal: state.close }));
 vi.mock('../../../../../../../src/public/js/ui/forms/formStateUI.js', () => ({ resetFormSubmitState: state.reset }));
-vi.mock('../../../../../../../src/public/js/ui/inventory/inventorySelectUI.js', () => ({ updateWasteRollMeasurement: vi.fn() }));
+vi.mock('../../../../../../../src/public/js/ui/inventory/wasteFormUI.js', () => ({ getWasteMaterialTemplate: vi.fn(), updateWasteRollMeasurement: vi.fn() }));
 vi.mock('../../../../../../../src/public/js/application/warehouse/wastes/wastes.js', () => ({ registerWaste: vi.fn(), editWaste: vi.fn(), editWasteStock: vi.fn() }));
 
 const form = { dataset: { mode: 'create' }, addEventListener: vi.fn() };
@@ -39,10 +39,7 @@ describe('confirmación de merma existente', () => {
         await state.config.sendRequest({ form, formData });
         expect(state.reset).toHaveBeenCalledWith(form);
         expect(state.close).toHaveBeenCalledWith(form);
-        expect(state.open).toHaveBeenCalledWith({ data: waste });
-        expect(additionForm.elements.quantity.value).toBe('3');
-        expect(additionForm.elements.observations.value).toBe('Nueva entrada');
-        expect(additionForm.elements.quantity.dispatchEvent).toHaveBeenCalledOnce();
+        expect(state.open).toHaveBeenCalledWith({ data: waste, quantity: '3', observations: 'Nueva entrada' });
         expect(state.submit).toHaveBeenCalledOnce();
     });
 

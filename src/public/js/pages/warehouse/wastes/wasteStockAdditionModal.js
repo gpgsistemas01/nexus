@@ -5,7 +5,7 @@ import { openModal } from '../../../ui/modalUI.js';
 import { buildInventorySelectText, getCurrentStock } from '../../../utils/warehouseInventoryUtils.js';
 import { formatDecimal } from '../../../utils/formatUtils.js';
 
-export const openWasteStockAdditionModal = ({ data }) => {
+export const openWasteStockAdditionModal = ({ data, quantity = '', observations = '' }) => {
     const form = document.querySelector(FORM_SELECTORS.WASTE_STOCK_ADDITION);
     const modal = document.querySelector(MODAL_SELECTORS.WASTE_STOCK_ADDITION);
 
@@ -17,6 +17,8 @@ export const openWasteStockAdditionModal = ({ data }) => {
     document.querySelector('#wasteStockAdditionName').textContent = buildInventorySelectText(data);
     const currentStock = Number(getCurrentStock(data));
     const quantityInput = document.querySelector('#wasteStockAdditionQuantityInput');
+    quantityInput.value = Number(quantity) > 0 ? quantity : '';
+    form.elements.observations.value = observations || '';
     const resultingStock = document.querySelector('#wasteStockAdditionResultingStock');
     const updateResultingStock = () => {
         const quantity = Number(quantityInput.value);

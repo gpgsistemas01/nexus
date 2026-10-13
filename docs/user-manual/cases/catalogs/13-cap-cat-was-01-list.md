@@ -21,3 +21,11 @@ La columna **Activo**, ubicada antes de **Acciones**, se muestra en la tabla ún
 administrador del sistema; **Ajustar stock** también es exclusivo de ese actor. Personal de almacén usa **Agregar stock**, que suma una cantidad sin reemplazar el saldo.
 
 **Compruebe el resultado:** Confirme que la fila corresponde al nombre o folio buscado. Consultar no modifica datos ni existencias.
+
+Para los Rollos, consulte **Pesos por unidad (kg)** antes de **Acciones**: cono,
+total con cono y neto. Un guion indica un peso desconocido o una presentación
+distinta de Rollo. Al abrir el registro, los pesos se agrupan en su propia
+sección y quedan para consulta después del alta.
+
+La captura del listado y del modal debe renovarse en una sesión del entorno de
+prueba con registros existentes para reflejar esta organización.

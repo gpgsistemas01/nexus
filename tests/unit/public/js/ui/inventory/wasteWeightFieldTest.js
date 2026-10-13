@@ -1,11 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({ setMdbWrapperInputValue: vi.fn() }));
-const { applyWasteMaterialTemplate, updateWasteRollMeasurement, updateWasteWeightField } = await import('../../../../../../src/public/js/ui/inventory/inventorySelectUI.js');
+const { getWasteMaterialTemplate, applyWasteMaterialTemplate, updateWasteRollMeasurement, updateWasteWeightField } = await import('../../../../../../src/public/js/ui/inventory/wasteFormUI.js');
 const { FORM_MODES } = await import('../../../../../../src/public/js/constants/formModes.js');
+
+vi.stubGlobal('$', element => ({ select2: () => [element.selectedMaterial ?? { presentation: { name: 'ROLLO' } }] }));
 
 const createForm = mode => {
     const elements = Object.fromEntries(Object.entries({ weightKg: '2.5', coneWeightKg: '0.5', totalWeightKg: '3', base: '1.5', height: '2' }).map(([name, value]) => [name, { value, disabled: true, closest: () => null, classList: { toggle: vi.fn() } }]));
+    elements.materialId = {};
     return { elements, dataset: { mode }, querySelector: selector => selector === '#wastePresentationDisplayValue' || selector === '#wasteUnitMeasureDisplayValue' ? { textContent: '' } : elements[selector?.match(/name='([^']+)'/)?.[1]] };
 
 };
@@ -47,6 +50,7 @@ describe('captura de peso según la presentación real de la merma', () => {
     it('precarga el cono y permite editarlo; cambiar material borra las mediciones anteriores', () => {
         const form = createForm(FORM_MODES.CREATE);
         const template = { presentation: { name: 'ROLLO' }, rollReference: { referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 2.25, referenceRollNetWeightKg: 2, referenceLengthM: 20, referenceWidthM: 1.5, lengthField: 'height' } };
+        form.elements.materialId.selectedMaterial = template;
         applyWasteMaterialTemplate({ form, template });
         expect(form.elements.coneWeightKg.value).toBe(0.25);
         expect(form.elements.coneWeightKg.disabled).toBe(false);
@@ -64,4 +68,29 @@ describe('captura de peso según la presentación real de la merma', () => {
         expect(form.elements.totalWeightKg.value).toBe('');
         expect(form.elements.weightKg.value).toBe('');
     });
+    it('lee las referencias JSON de Select2 sin copiarlas al formulario', () => {
+        const form = createForm(FORM_MODES.CREATE);
+        form.elements.materialId.selectedMaterial = {
+            presentation: JSON.stringify({ name: 'ROLLO' }),
+            rollReference: JSON.stringify({ referenceConeWeightKg: 0.25 })
+        };
+        expect(getWasteMaterialTemplate({ form }).rollReference.referenceConeWeightKg).toBe(0.25);
+        expect(form.dataset.rollReference).toBeUndefined();
+    });
+
+    it.each([FORM_MODES.EDIT, FORM_MODES.EDIT_STOCK, FORM_MODES.VIEW])('no recalcula al consultar en modo %s', mode => {
+        const form = createForm(mode);
+        updateWasteRollMeasurement({ form });
+        expect(form.elements.weightKg.value).toBe('2.5');
+        expect(form.elements.height.value).toBe('2');
+    });
+
+    it('no calcula pesos ni dimensiones para otras presentaciones', () => {
+        const form = createForm(FORM_MODES.CREATE);
+        form.elements.materialId.selectedMaterial = { presentation: { name: 'LÁMINA' } };
+        updateWasteRollMeasurement({ form });
+        expect(form.elements.weightKg.value).toBe('2.5');
+        expect(form.elements.height.value).toBe('2');
+    });
+
 });

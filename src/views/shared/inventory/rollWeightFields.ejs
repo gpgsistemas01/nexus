@@ -4,7 +4,7 @@
     label: field.label,
     type: 'number',
     value: '',
-    col: 'col-12 col-md-6',
+    col: field.col || 'col-12 col-md-6',
     attrs: {
         min: field.allowZero ? '0' : '0.01',
         max: '999.99',

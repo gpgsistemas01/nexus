@@ -3,7 +3,7 @@ import { initDomainSelect2, toggleSelectOption } from '../baseSelect.js';
 import { mapSelectWasteMaterialTemplateData, normalizeInventorySelectRelations } from '../../../utils/warehouseInventoryUtils.js';
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { applyWasteMaterialTemplate } from '../../../ui/inventory/inventorySelectUI.js';
+import { applyWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
 
 const wasteMaterialTemplateChangeEvent = 'change.wasteMaterialTemplate';
 

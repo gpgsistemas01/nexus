@@ -69,7 +69,7 @@
                 },
                 {
                     type: 'html',
-                    col: 'col-12',
+                    col: 'col-12 waste-roll-reference',
                     content: include('../../../shared/forms/informativeValue', {
                         value: { id: 'wasteConeReferenceInfo', label: 'Datos del material seleccionado' }
                     })
@@ -125,15 +125,6 @@
                     ],
                 },
                 {
-                    type: 'html',
-                    col: 'col-12 waste-weight-fields',
-                    content: include('../../../shared/inventory/rollWeightFields', { fields: [
-                        { id: 'coneWeightKgInput', name: 'coneWeightKg', label: 'Peso del cono por unidad (kg)', allowZero: true },
-                        { id: 'totalWeightKgInput', name: 'totalWeightKg', label: 'Peso total por unidad con cono (kg)' },
-                        { id: 'weightKgInput', name: 'weightKg', label: 'Peso neto por unidad de merma (kg)', readOnly: true }
-                    ] })
-                },
-                {
                     type: 'checkboxes',
                     items: [
                         {
@@ -144,6 +135,21 @@
                             isChecked: true
                         }
                     ]
+                }
+            ]
+        },
+        {
+            title: 'Pesos por unidad (kg)',
+            class: 'waste-weight-fields',
+            groups: [
+                {
+                    type: 'html',
+                    col: 'col-12',
+                    content: include('../../../shared/inventory/rollWeightFields', { fields: [
+                        { col: 'col-12 col-md-4', id: 'coneWeightKgInput', name: 'coneWeightKg', label: 'Peso del cono por unidad (kg)', allowZero: true },
+                        { col: 'col-12 col-md-4', id: 'totalWeightKgInput', name: 'totalWeightKg', label: 'Peso total por unidad con cono (kg)' },
+                        { col: 'col-12 col-md-4', id: 'weightKgInput', name: 'weightKg', label: 'Peso neto por unidad de merma (kg)', readOnly: true }
+                    ] })
                 }
             ]
         },

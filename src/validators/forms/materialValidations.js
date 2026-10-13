@@ -2,7 +2,7 @@ import { body } from 'express-validator';
 import { validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
-import { getRollReferenceValidationError } from '../../public/js/utils/wasteRollUtils.js';
+import { getRollReferenceValidationError } from '../../public/js/utils/warehouseInventoryUtils.js';
 
 const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'].map(field =>
     body(field).custom((value, { req }) => {
