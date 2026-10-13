@@ -68,4 +68,4 @@ Las imágenes que se incorporen a estas secciones pertenecen a
 | 1.6 | 2026-10-12 | Criterio de aceptación del peso unitario: límites, precisión y rechazo previo al alta de valores inválidos. |
 | 1.7 | 2026-10-12 | Máximo de 100 kg por unidad de merma de Rollo, validación y migración conservando los datos históricos. |
 | 1.8 | 2026-10-13 | Peso unitario con hasta tres enteros y dos decimales; rechazo de precisión adicional previo al alta. |
-| 1.9 | 2026-10-13 | Pesos predeterminados en el CRUD de material y proveedor, cono precargado editable en merma, vínculo con material sin copias de referencias, longitud medida o estimada y reporte de neto. |
+| 1.9 | 2026-10-13 | Pesos predeterminados en el CRUD de material y proveedor, cono precargado editable en merma, vínculo con material sin copias de referencias, dimensiones automáticas según orientación y reporte de neto. |

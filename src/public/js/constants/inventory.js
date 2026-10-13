@@ -14,3 +14,5 @@ export const MATERIAL_TYPES = Object.freeze({
     MATERIAL: 'MATERIAL',
     CONSUMABLE: 'CONSUMABLE'
 });
+
+export const MATERIAL_ROLL_REFERENCE_FIELDS = Object.freeze(['referenceConeWeightKg', 'referenceRollTotalWeightKg']);

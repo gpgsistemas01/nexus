@@ -2,6 +2,8 @@ import { initPresentationSelect, togglePresentationOption } from "../domains/pre
 import { initReasonSelect } from "../domains/reason.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { initUnitMeasureSelect, toggleUnitMeasureOption } from "../domains/unitMeasure.js";
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
+import { updateMaterialRollReferenceFields } from '../../../ui/inventory/inventorySelectUI.js';
 import { SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { scopeSelectors } from "../../../utils/domUtils.js";
 
@@ -40,6 +42,12 @@ export const initMaterialFormSelect2 = ({
             allowCreate: false
         }]
     ].forEach(([initialize, options]) => initialize(options));
+
+    $(scoped.presentation)
+        .off(`${ SELECT2_EVENT_NAMES.CHANGE }.materialRollReference`)
+        .on(`${ SELECT2_EVENT_NAMES.CHANGE }.materialRollReference`, () => {
+            updateMaterialRollReferenceFields({ form: document.querySelector(`${ modalSelector } form`) });
+        });
 };
 
 export const setMaterialFormSelectOptions = ({

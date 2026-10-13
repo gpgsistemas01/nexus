@@ -255,14 +255,6 @@
         "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 100 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01
       },
-      "lengthSource": {
-        "type": "string",
-        "enum": [
-          "MEASURED",
-          "ESTIMATED"
-        ],
-        "readOnly": true
-      },
       "sourceMaterialId": {
         "type": [
           "string",
@@ -707,11 +699,12 @@
         "format": "uuid"
       },
       "base": {
-        "type": "number"
+        "type": "number",
+        "description": "Dimensión manual opcional. Para Rollo con pesos se calcula en el backend y no debe enviarse; la dimensión transversal se consulta del material."
       },
       "height": {
         "type": "number",
-        "description": "Largo medido o valor mostrado por la estimación. El servidor recalcula height si lengthSource es ESTIMATED."
+        "description": "Dimensión manual opcional. Para Rollo con pesos se calcula en el backend y no debe enviarse; la dimensión transversal se consulta del material."
       },
       "minStock": {
         "type": "number"
@@ -751,14 +744,6 @@
         "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 100 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
         "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
-      },
-      "lengthSource": {
-        "type": "string",
-        "enum": [
-          "MEASURED",
-          "ESTIMATED"
-        ],
-        "default": "MEASURED"
       }
     },
     "additionalProperties": false,
@@ -766,31 +751,11 @@
       "name",
       "materialId",
       "supplierId",
-      "base",
       "maxUnitCost",
       "isActive",
       "newStock"
     ],
-    "allOf": [
-      {
-        "if": {
-          "properties": {
-            "lengthSource": {
-              "const": "ESTIMATED"
-            }
-          },
-          "required": [
-            "lengthSource"
-          ]
-        },
-        "else": {
-          "required": [
-            "height"
-          ]
-        }
-      }
-    ],
-    "description": "Referencia mediante materialId y supplierId. El cono se precarga en UI y se envía como valor editable; el servidor calcula neto y largo estimado con las referencias vigentes."
+    "description": "Envíe materialId, supplierId y mediciones editables. Con pesos completos, el servidor consulta la muestra de material/proveedor y calcula la dimensión longitudinal en base o height, conservando la otra dimensión del material. Sin pesos, capture la dimensión longitudinal manualmente; otras presentaciones requieren ambas dimensiones."
   },
   "WasteUpdateRequest": {
     "type": "object",
@@ -1459,6 +1424,19 @@
           "string",
           "null"
         ]
+      },
+      "lengthField": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "enum": [
+          "base",
+          "height",
+          null
+        ],
+        "readOnly": true,
+        "description": "Orientación de la dimensión longitudinal del material; dato de consulta para la vista previa, no se envía al registrar."
       }
     },
     "additionalProperties": false
@@ -1553,6 +1531,19 @@
               "string",
               "null"
             ]
+          },
+          "lengthField": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "base",
+              "height",
+              null
+            ],
+            "readOnly": true,
+            "description": "Orientación de la dimensión longitudinal del material; dato de consulta para la vista previa, no se envía al registrar."
           }
         },
         "additionalProperties": true

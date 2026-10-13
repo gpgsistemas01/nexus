@@ -2,7 +2,6 @@ import { toNumber } from '../utils/formattersUtils.js';
 
 const buildWasteRegistrationDataDto = (body = {}) => ({
     materialId: body.materialId,
-    ...(Object.prototype.hasOwnProperty.call(body, 'lengthSource') ? { lengthSource: body.lengthSource } : {}),
     supplierId: body.supplierId,
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
     base: toNumber(body.base),

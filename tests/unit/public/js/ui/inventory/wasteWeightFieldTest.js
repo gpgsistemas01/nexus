@@ -5,7 +5,7 @@ const { applyWasteMaterialTemplate, updateWasteRollMeasurement, updateWasteWeigh
 const { FORM_MODES } = await import('../../../../../../src/public/js/constants/formModes.js');
 
 const createForm = mode => {
-    const elements = Object.fromEntries(Object.entries({ weightKg: '2.5', coneWeightKg: '0.5', totalWeightKg: '3', base: '1.5', lengthSource: 'MEASURED', height: '2' }).map(([name, value]) => [name, { value, disabled: true, closest: () => null, classList: { toggle: vi.fn() } }]));
+    const elements = Object.fromEntries(Object.entries({ weightKg: '2.5', coneWeightKg: '0.5', totalWeightKg: '3', base: '1.5', height: '2' }).map(([name, value]) => [name, { value, disabled: true, closest: () => null, classList: { toggle: vi.fn() } }]));
     return { elements, dataset: { mode }, querySelector: selector => selector === '#wastePresentationDisplayValue' || selector === '#wasteUnitMeasureDisplayValue' ? { textContent: '' } : elements[selector?.match(/name='([^']+)'/)?.[1]] };
 
 };
@@ -46,7 +46,7 @@ describe('captura de peso según la presentación real de la merma', () => {
 
     it('precarga el cono y permite editarlo; cambiar material borra las mediciones anteriores', () => {
         const form = createForm(FORM_MODES.CREATE);
-        const template = { presentation: { name: 'ROLLO' }, rollReference: { referenceConeWeightKg: 0.25 } };
+        const template = { presentation: { name: 'ROLLO' }, rollReference: { referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 2.25, referenceRollNetWeightKg: 2, referenceLengthM: 20, referenceWidthM: 1.5, lengthField: 'height' } };
         applyWasteMaterialTemplate({ form, template });
         expect(form.elements.coneWeightKg.value).toBe(0.25);
         expect(form.elements.coneWeightKg.disabled).toBe(false);
@@ -56,6 +56,9 @@ describe('captura de peso según la presentación real de la merma', () => {
         updateWasteRollMeasurement({ form });
         expect(form.elements.coneWeightKg.value).toBe('0.4');
         expect(form.elements.weightKg.value).toBe(1);
+        expect(form.elements.height.value).toBe(10);
+        expect(form.elements.base.value).toBe(1.5);
+        expect(form.elements.base.disabled).toBe(true);
         applyWasteMaterialTemplate({ form, template: { ...template, rollReference: { referenceConeWeightKg: 0.3 } } });
         expect(form.elements.coneWeightKg.value).toBe(0.3);
         expect(form.elements.totalWeightKg.value).toBe('');

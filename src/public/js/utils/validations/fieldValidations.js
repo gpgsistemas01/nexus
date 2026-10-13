@@ -1,6 +1,6 @@
 import { getRollReferenceValidationError } from '../wasteRollUtils.js';
 import { getErrorMessage } from "../../constants/apiMessages.js";
-import { getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
+import { calculateWasteNetWeight, getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
 import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
@@ -330,10 +330,13 @@ export const validateMaterialRollReference = (value, data, field) => {
     return error ? getErrorMessage({ code: error }) : null;
 };
 
-export const validateWasteLengthSource = (value, { rollReference = {}, coneWeightKg, totalWeightKg, presentationName }) => {
-    if (!['MEASURED', 'ESTIMATED'].includes(value)) return getErrorMessage({ code: 'WASTE_LENGTH_SOURCE_INVALID' });
-    if (value === 'MEASURED') return null;
-    if (!isRollPresentation(presentationName) || !(Number(rollReference.referenceRollNetWeightKg) > 0) || !(Number(rollReference.referenceLengthM) > 0)) return getErrorMessage({ code: 'WASTE_ROLL_REFERENCE_MISSING' });
-    if (coneWeightKg === '' || totalWeightKg === '' || coneWeightKg == null || totalWeightKg == null) return getErrorMessage({ code: 'WASTE_ESTIMATED_LENGTH_NEEDS_WEIGHTS' });
-    return null;
+export const validateWasteDimension = (value, data = {}, field) => {
+    const reference = data.rollReference ?? {};
+    if (reference.lengthField) {
+        if (field !== reference.lengthField) return null;
+        if (calculateWasteNetWeight(data) != null) {
+            if (Number(reference.referenceRollNetWeightKg) > 0 && Number(reference.referenceLengthM) > 0) return null;
+        }
+    }
+    return validatePositiveNumber(value, field === 'base' ? 'La base de la merma' : 'La altura de la merma');
 };

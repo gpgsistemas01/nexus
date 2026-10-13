@@ -1,10 +1,8 @@
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
-    WASTE_ESTIMATED_LENGTH_NEEDS_WEIGHTS: 'Capture los pesos de la merma antes de estimar su longitud.',
-    WASTE_LENGTH_SOURCE_INVALID: 'Seleccione longitud medida o estimada por peso.',
     MATERIAL_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
-    WASTE_ROLL_REFERENCE_MISSING: 'Complete la referencia del cono y del rollo para utilizarla en esta merma.',
+    WASTE_DIMENSIONS_INVALID: 'Complete las dimensiones de la merma o los pesos necesarios para calcularlas.',
     CONE_WEIGHT_KG_INVALID_NUMBER: 'El peso del cono debe ser un decimal mayor o igual que cero en kg. Use punto decimal, sin letras ni notación científica.',
     CONE_WEIGHT_KG_REQUIRED: 'Capture el peso del cono para calcular el peso neto de la merma.',
     TOTAL_WEIGHT_KG_REQUIRED: 'Capture el peso total con cono para calcular el peso neto de la merma.',

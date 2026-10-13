@@ -85,7 +85,6 @@ export const openWasteModal = ({
             : 'Guardar';
 
     form.dataset.rollReference = '{}';
-    form.elements.lengthSource.value = data?.lengthSource || 'MEASURED';
     form.querySelector('#wasteDuplicateStockButton').classList.add('d-none');
     delete form.dataset.duplicateWaste;
     updateWasteWeightField({ form, template: data ?? {} });

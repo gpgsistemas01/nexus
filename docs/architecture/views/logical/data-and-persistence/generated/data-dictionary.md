@@ -537,7 +537,6 @@ usuarios y responsables se mantiene en el
 | `coneWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 | `totalWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 | `sourceMaterialId` | `String?` | No | FK | — | `@db.Uuid` |
-| `lengthSource` | `String` | Sí | — | `"MEASURED"` | `@db.VarChar(9)` |
 | `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |

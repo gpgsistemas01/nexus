@@ -1,5 +1,5 @@
 import { getDb } from '../../../repository/baseRepository.js';
-import { getMaterialIdentityLength, getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
+import { getMaterialIdentityLength, getMaterialIdentityWidth, getMaterialLengthField } from '../../inventory/materialIdentity.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateWasteNetWeight, isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
@@ -64,7 +64,8 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
                         totalWeightKg: offer?.referenceRollTotalWeightKg
                     }),
                     referenceLengthM: getMaterialIdentityLength(material),
-                    referenceWidthM: identityWidth
+                    referenceWidthM: identityWidth,
+                    lengthField: getMaterialLengthField(material)
                 }
             });
             return;

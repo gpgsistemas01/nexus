@@ -88,4 +88,4 @@ Véase el [recorrido del peso](../requirements/requirements-specification/04-uni
 | --- | --- |
 | Cono predeterminado en material | Opcional, admite cero. Se precarga en merma como campo editable. |
 | Peso total del rollo en material | Opcional; si se captura, exige cono y debe ser mayor. Se consulta para estimar longitud. |
-| Largo estimado | Requiere pesos de merma, neto y dimensiones positivos de muestra. Se calcula; no se captura manualmente. |
+| Dimensión longitudinal | Se calcula en base o altura al completar pesos; la dimensión transversal se consulta del material. Sin pesos se captura manualmente el largo. |

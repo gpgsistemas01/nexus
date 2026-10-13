@@ -127,6 +127,8 @@ describe('wasteController complete flow', () => {
       material: {
       id: 'material-1',
       name: 'Lámina',
+      base: 2,
+      height: 3,
       presentation: { id: 'presentation-1', name: 'ROLLO' },
       unitMeasure: { id: 'unit-measure-1', name: 'Metro cuadrado', symbol: 'm²' },
       maxUnitCost: 18.5
@@ -308,7 +310,7 @@ describe('wasteController complete flow', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'UPDATED_WASTE' }));
   });
 
-  it('informa un conflicto cuando ya existe la misma merma sin dimensiones', async () => {
+  it('informa un conflicto cuando ya existe la misma identidad de merma', async () => {
     wasteFindFirst.mockResolvedValue({ id: 'waste-existing' });
 
     const req = {
@@ -316,8 +318,8 @@ describe('wasteController complete flow', () => {
         name: 'Lámina',
         materialId: 'material-1',
         supplierId: 'supplier-1',
-        base: '',
-        height: '',
+        base: '2',
+        height: '3',
         newStock: '0'
       },
       user: { id: 'user-1' }

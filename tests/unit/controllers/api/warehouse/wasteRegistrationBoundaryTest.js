@@ -97,8 +97,6 @@ describe('wasteController registration boundaries', () => {
     ['partición de equivalencia', 'UUID de material inválido', { materialId: 'not-a-uuid' }, 'materialId'],
     ['partición de equivalencia', 'UUID de proveedor inválido', { supplierId: 'not-a-uuid' }, 'supplierId'],
     ['valor límite', 'dimensión en cero', { base: '0' }, 'base'],
-    ['tabla de decisiones', 'medidas ausentes', { base: undefined, height: undefined }, 'base'],
-    ['tabla de decisiones', 'dimensión incompleta', { height: undefined }, 'height'],
     ['partición de equivalencia', 'stock no numérico', { newStock: 'NaN' }, 'newStock'],
     ['valor límite', 'stock negativo', { newStock: '-0.000001' }, 'newStock'],
     ['valor límite', 'costo máximo negativo', { maxUnitCost: '-0.000001' }, 'maxUnitCost'],

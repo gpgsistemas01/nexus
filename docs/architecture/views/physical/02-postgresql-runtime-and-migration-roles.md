@@ -356,8 +356,7 @@ y CHECK de positividad y máximo de 100 kg:
 | `20261012210000_add_roll_waste_unit_weight` | Agrega el campo y el CHECK de positividad. |
 | `20261012233000_limit_roll_waste_weight_to_100kg` | Establece el máximo de 100 kg. |
 | `20261013153000_limit_roll_waste_weight_to_two_decimals` | Establece tres enteros y dos decimales. |
-| `20261013160000_add_roll_waste_cone_and_total_weight` | Agrega cono y total por unidad, con CHECK de captura conjunta y neto igual a total menos cono. |
-| `20261013170000_add_roll_references_and_weight_identity` | Agrega referencia en oferta, procedencia/copia histórica en merma y clave de identidad con pesos. |
+| `20261013160000_add_roll_waste_cone_and_total_weight` | Migración consolidada pendiente: agrega cono y total por unidad, pesos del material/proveedor, vínculo e identidad con pesos; conserva netos históricos. |
 
 En una base que ya tenga el campo, revise los valores que impedirían aplicar
 estas migraciones:

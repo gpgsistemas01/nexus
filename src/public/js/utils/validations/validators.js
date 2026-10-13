@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateMaterialRollReference, validateWasteLengthSource, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
+import { validateMaterialRollReference, validateWasteDimension, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
 
 const inventoryStateValidation = {
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
@@ -94,14 +94,13 @@ export const wasteStockAdditionValidation = {
 };
 
 export const wasteValidation = {
-    lengthSource: (value, data) => validateWasteLengthSource(value || 'MEASURED', data),
     coneWeightKg: (value, data) => validateWasteWeightCapture(value, data, 'coneWeightKg'),
     totalWeightKg: (value, data) => validateWasteWeightCapture(value, data, 'totalWeightKg'),
     name: value => validateName(value, 200),
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
-    base: value => validatePositiveNumber(value, 'El ancho de la merma'),
-    height: (value, data = {}) => data.lengthSource === 'ESTIMATED' ? null : validatePositiveNumber(value, 'El largo de la merma'),
+    base: (value, data) => validateWasteDimension(value, data, 'base'),
+    height: (value, data) => validateWasteDimension(value, data, 'height'),
     ...wasteSecondaryDataValidation,
     newStock: wasteStockValidation.newStock,
     observations: wasteStockValidation.observations,

@@ -47,7 +47,7 @@ describe('peso unitario de merma de rollo', () => {
             ids[resource] = (await prisma.material.create({ data: {
                 name: `IT Weight ${resource} ${suffix}`, presentationId: ids[`${resource}Presentation`], unitMeasureId: ids.unit, base: 1.5, height: 20
             } })).id;
-            await prisma.supplierMaterial.create({ data: { supplierId: ids.supplier, materialId: ids[resource], maxUnitCost: 10 } });
+            await prisma.supplierMaterial.create({ data: { supplierId: ids.supplier, materialId: ids[resource], maxUnitCost: 10, ...(resource === 'roll' ? { referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 12.55 } : {}) } });
         }
     });
 
@@ -224,14 +224,15 @@ describe('peso unitario de merma de rollo', () => {
         ])).toEqual(before);
     });
 
-    it('rechaza estimar longitud sin pesos antes de escribir existencias', async () => {
-        const before = await prisma.waste.count({ where: { supplierId: ids.supplier } });
-        const response = await request(app).post('/wastes').send({ ...createBody('roll'), lengthSource: 'ESTIMATED' }).expect(400);
-        expect(response.body.errors.lengthSource.code).toBe('WASTE_ESTIMATED_LENGTH_NEEDS_WEIGHTS');
-        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
-    });
 
     const materialEditBody = () => ({ supplierId: ids.supplier, name: `IT Weight roll ${suffix}`, maxUnitCost: 10, isActive: true });
+
+    it('rechaza una merma sin pesos ni dimensión longitudinal sin crear registros parciales', async () => {
+        const before = await prisma.waste.count({ where: { supplierId: ids.supplier } });
+        const response = await request(app).post('/wastes').send({ ...createBody('roll'), base: undefined, height: undefined }).expect(400);
+        expect(response.body.code).toBe('WASTE_DIMENSIONS_INVALID');
+        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
+    });
 
     it('registra los pesos por proveedor en el alta de material y permite reemplazar sólo el cono', async () => {
         const created = await request(app).post('/materials').send({
@@ -261,13 +262,13 @@ describe('peso unitario de merma de rollo', () => {
         expect(Number(offer.referenceRollTotalWeightKg)).toBe(2.25);
         expect(await prisma.waste.findUnique({ where: { id: roll.id } })).toEqual(before);
 
-        const created = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Cono predeterminado', newStock: 1, coneWeightKg: 0.25, totalWeightKg: 1.25, lengthSource: 'ESTIMATED', height: undefined }).expect(200);
+        const created = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Cono predeterminado', newStock: 1, coneWeightKg: 0.25, totalWeightKg: 1.25, height: undefined }).expect(200);
         const saved = await prisma.waste.findUnique({ where: { id: created.body.waste.id } });
         expect(Number(saved.coneWeightKg)).toBe(0.25);
         expect(Number(saved.weightKg)).toBe(1);
         expect(Number(saved.height)).toBe(10);
         expect(Number(saved.convertedQuantity)).toBe(15);
-        expect(saved.lengthSource).toBe('ESTIMATED');
+        expect(saved).not.toHaveProperty('lengthSource');
         expect(saved.sourceMaterialId).toBe(ids.roll);
         expect(saved).not.toHaveProperty('referenceConeWeightKg');
         expect(saved).not.toHaveProperty('referenceNetWeightKg');
@@ -275,12 +276,28 @@ describe('peso unitario de merma de rollo', () => {
         expect(await prisma.waste.findUnique({ where: { id: saved.id } })).toEqual(saved);
     });
 
+    it('calcula base cuando el largo nominal está en base y agrupa el reporte por el ancho correcto', async () => {
+        await prisma.material.update({ where: { id: ids.roll }, data: { base: 20, height: 1.5 } });
+        try {
+            const created = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Largo en base', coneWeightKg: 0.4, totalWeightKg: 1.4, base: 999, height: 888, referenceRollNetWeightKg: 999 }).expect(200);
+            const saved = await prisma.waste.findUnique({ where: { id: created.body.waste.id } });
+            expect(Number(saved.base)).toBe(10);
+            expect(Number(saved.height)).toBe(1.5);
+            const { findWasteReportRows, buildWasteReportSummary } = await import('../../../src/services/warehouse/reportService.js');
+            const report = await findWasteReportRows({ supplierId: ids.supplier });
+            expect(buildWasteReportSummary(report).rows).toContainEqual(expect.objectContaining({ name: 'IT Largo en base', width: 1.5 }));
+        } finally {
+            await prisma.material.update({ where: { id: ids.roll }, data: { base: 1.5, height: 20 } });
+        }
+    });
+
     it('conserva un cono editado distinto del predeterminado y estima según el ancho de la merma', async () => {
-        const created = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Cono editado', base: 0.75, newStock: 1, coneWeightKg: 0.4, totalWeightKg: 1.4, lengthSource: 'ESTIMATED', height: 999 }).expect(200);
+        const created = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Cono editado', base: 0.75, newStock: 1, coneWeightKg: 0.4, totalWeightKg: 1.4, height: 999 }).expect(200);
         const saved = await prisma.waste.findUnique({ where: { id: created.body.waste.id } });
         expect(Number(saved.coneWeightKg)).toBe(0.4);
         expect(Number(saved.weightKg)).toBe(1);
-        expect(Number(saved.height)).toBe(20);
+        expect(Number(saved.base)).toBe(1.5);
+        expect(Number(saved.height)).toBe(10);
         expect(Number(saved.convertedQuantity)).toBe(15);
     });
 
@@ -311,7 +328,9 @@ describe('peso unitario de merma de rollo', () => {
         expect(offer.referenceRollTotalWeightKg).toBeNull();
         expect(await prisma.waste.findMany({ where: { supplierId: ids.supplier }, orderBy: { id: 'asc' } })).toEqual(before);
         const count = await prisma.waste.count({ where: { supplierId: ids.supplier } });
-        await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Sin referencia', coneWeightKg: 0.2, totalWeightKg: 1.2, lengthSource: 'ESTIMATED' }).expect(400);
-        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(count);
+        const manual = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Sin referencia', coneWeightKg: 0.2, totalWeightKg: 1.2 }).expect(200);
+        expect(Number(manual.body.waste.height)).toBe(2);
+        expect(Number(manual.body.waste.weightKg)).toBe(1);
+        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(count + 1);
     });
 });

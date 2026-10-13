@@ -145,7 +145,7 @@ Los registros anteriores conservan su peso neto; cono y total permanecen `NULL`.
 | --- | --- |
 | `SupplierMaterial` | `referenceConeWeightKg` y `referenceRollTotalWeightKg`, editables desde el CRUD de material con `materials:write`. El neto de referencia se calcula al consultar; no se persiste. |
 | `Material` | Dimensiones nominales existentes: longitud de muestra = `MAX(base, height)`, ancho = `MIN(base, height)`. No contiene el peso del cono. |
-| `Waste` | `sourceMaterialId` vincula el material; `supplierId` identifica su proveedor. Guarda cono y total utilizados, neto derivado (`weightKg`), largo (`height`) y `lengthSource` (`MEASURED`/`ESTIMATED`). No copia las referencias. Los históricos pueden carecer del vínculo. |
+| `Waste` | `sourceMaterialId` vincula el material; `supplierId` identifica su proveedor. Guarda cono y total utilizados, neto derivado (`weightKg`), dimensiones finales en `base` y `height`. No copia las referencias. Los históricos pueden carecer del vínculo. |
 
 Las referencias se administran en el formulario existente de material. Cambiarlas afecta
 solo nuevas capturas; la merma conserva pesos y largo registrados. El vínculo permite
@@ -158,7 +158,16 @@ largoMerma = netoMerma × largoMuestra × anchoMuestra / (netoMuestra × anchoMe
 ```
 
 La regla usa seis decimales para longitud y dos para kg. Supone masa por área
-representativa del mismo material; la captura permite elegir largo medido. La longitud
-de merma se guarda en `height`; no se toma la mayor dimensión de la propia merma.
+representativa del mismo material. Al completar los pesos, el largo se calcula y
+se guarda en `base` si ésa es la dimensión longitudinal nominal del material, o en
+`height` en el caso contrario. La dimensión transversal se consulta directamente
+del material. Sin pesos o referencias completas se permite capturar manualmente el largo; no se almacena
+un selector de método. Las referencias y resultados de vista previa no se envían
+como datos persistentes desde el navegador.
 Un duplicado devuelve `meta.waste` para abrir el formulario de entrada incremental;
 crear nunca incrementa por sí solo una existencia anterior.
+
+Las migraciones de captura y referencia de rollos aún pendientes se consolidan en
+`20261013160000_add_roll_waste_cone_and_total_weight`: crea directamente los campos
+finales, el vínculo y las restricciones. No incluye campos de método ni copias
+de referencias que luego deban eliminarse.

@@ -14,7 +14,7 @@ flowchart TB
     V["Validadores<br/>wasteValidations.js"]
     P["baseRepository.js<br/>getDb(tx)"]
     PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>getWasteWeightCaptureValidationError<br/>calculateWasteNetWeight"]
-    Roll["wasteRollUtils.js<br/>validación de referencia y largo estimado"]
+    Roll["wasteRollUtils.js<br/>validación de referencia y largo automático"]
     S --> Roll
     C --> D
     C --> S

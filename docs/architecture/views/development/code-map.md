@@ -241,7 +241,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/audit/auditService.js`](../../../../src/services/audit/auditService.js) | `isAuditWriteRequest`, `persistWriteAudit` |
 | [`src/services/authService.js`](../../../../src/services/authService.js) | `getNewRefreshToken`, `loginUser` |
 | [`src/services/document/referenceNumberService.js`](../../../../src/services/document/referenceNumberService.js) | `generateYearlyReferenceNumber`, `incrementNonYearlyReferenceNumberCounter`, `throwIfReferenceNumberAlreadyExists` |
-| [`src/services/inventory/materialIdentity.js`](../../../../src/services/inventory/materialIdentity.js) | `getMaterialIdentityLength`, `getMaterialIdentityWidth` |
+| [`src/services/inventory/materialIdentity.js`](../../../../src/services/inventory/materialIdentity.js) | `getMaterialIdentityLength`, `getMaterialIdentityWidth`, `getMaterialLengthField` |
 | [`src/services/inventory/movementHelpers.js`](../../../../src/services/inventory/movementHelpers.js) | `buildInventoryMovementDetail`, `buildStockUpdateSummary` |
 | [`src/services/inventory/movementQueryService.js`](../../../../src/services/inventory/movementQueryService.js) | `findAllConsumableMovements`, `findAllMaterialMovements`, `findAllWasteMovements` |
 | [`src/services/inventory/movementService.js`](../../../../src/services/inventory/movementService.js) | `applyInventoryMovement`, `createInventoryMovement` |

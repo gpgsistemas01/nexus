@@ -2,7 +2,8 @@ import { toggleErrorMessages } from '../forms/formErrorsUI.js';
 import { calculateWasteRollLength } from '../../utils/wasteRollUtils.js';
 import { EMPTY_DISPLAY_VALUE } from '../../constants/display.js';
 import { setFormSectionVisibility, setFormDisabled } from '../forms/formStateUI.js';
-import { isCreateMode } from '../../constants/formModes.js';
+import { isCreateMode, isEditMode } from '../../constants/formModes.js';
+import { MATERIAL_ROLL_REFERENCE_FIELDS, INVENTORY_RESOURCES } from '../../constants/inventory.js';
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
 import { setMdbWrapperInputValue } from '../../plugins/mdb/baseInstance.js';
 import { calculateWasteNetWeight, getMaterialName, getPresentation, getWasteWeightCaptureValidationError, getUnitMeasure, isRollPresentation } from '../../utils/warehouseInventoryUtils.js';
@@ -40,18 +41,11 @@ export const applyWasteMaterialTemplate = ({ form, template = {} }) => {
     if (isRollPresentation(getPresentation(template)) && form.elements.coneWeightKg) {
         form.elements.coneWeightKg.value = reference.referenceConeWeightKg ?? '';
     }
-    if (form.elements.lengthSource) form.elements.lengthSource.value = 'MEASURED';
     const button = form.querySelector('#wasteDuplicateStockButton');
     button?.classList.add('d-none');
     delete form.dataset.duplicateWaste;
-    [
-        [INPUT_SELECTORS.WASTE_WIDTH, template.suggestedWidth],
-        [INPUT_SELECTORS.WASTE_MAX_UNIT_COST, template.maxUnitCost]
-    ].forEach(([selector, value]) => setMdbWrapperInputValue({
-        selector,
-        value: value ?? ''
-    }));
-    form.elements.height.value = '';
+    setMdbWrapperInputValue({ selector: INPUT_SELECTORS.WASTE_MAX_UNIT_COST, value: template.maxUnitCost ?? '' });
+    ['base', 'height'].forEach(field => { form.elements[field].value = ''; });
     updateWasteWeightField({ form, template });
 };
 
@@ -74,8 +68,8 @@ export const updateWasteWeightField = ({ form, template = {} }) => {
     const applies = isRollPresentation(getPresentation(template));
     const fields = ['coneWeightKg', 'totalWeightKg'];
     setFormSectionVisibility({ form, isVisible: applies, fieldNames: [...fields, 'weightKg'] });
-    setFormSectionVisibility({ form, selector: '.waste-roll-measurement-section', isVisible: applies });
-    setFormDisabled({ form, fields: [...fields, 'lengthSource'], isDisabled: !applies || !isCreateMode(form.dataset.mode) });
+    setFormSectionVisibility({ form, selector: '.waste-weight-fields', isVisible: applies });
+    setFormDisabled({ form, fields: fields, isDisabled: !applies || !isCreateMode(form.dataset.mode) });
     setFormDisabled({ form, fields: ['weightKg'], isDisabled: true });
     [...fields, 'weightKg'].forEach(name => {
         const field = form.elements?.[name];
@@ -96,17 +90,37 @@ export const updateWasteRollMeasurement = ({ form }) => {
 
     updateWasteNetWeightField({ form });
     const reference = JSON.parse(form.dataset.rollReference || '{}');
-    const estimated = form.elements.lengthSource?.value === 'ESTIMATED';
-    setFormDisabled({ form, fields: ['height'], isDisabled: estimated });
-    if (estimated) {
-        const length = calculateWasteRollLength({
-            netWeightKg: form.elements.weightKg.value,
-            referenceNetWeightKg: reference.referenceRollNetWeightKg,
-            referenceLengthM: reference.referenceLengthM,
-            referenceWidthM: reference.referenceWidthM,
-            widthM: form.elements.base.value
-        });
-        form.elements.height.value = length ?? '';
-        setMdbWrapperInputValue({ selector: '#heightInput', value: form.elements.height.value });
-    }
+    const lengthField = reference.lengthField;
+    const hasWeights = form.elements.weightKg.value !== '';
+    setFormDisabled({ form, fields: ['base', 'height'], isDisabled: false });
+    if (!lengthField) return;
+
+    const widthField = lengthField === 'base' ? 'height' : 'base';
+    form.elements[widthField].value = reference.referenceWidthM ?? '';
+    setFormDisabled({ form, fields: [widthField], isDisabled: true });
+    const length = hasWeights ? calculateWasteRollLength({
+        netWeightKg: form.elements.weightKg.value,
+        referenceNetWeightKg: reference.referenceRollNetWeightKg,
+        referenceLengthM: reference.referenceLengthM,
+        referenceWidthM: reference.referenceWidthM,
+        widthM: reference.referenceWidthM
+    }) : null;
+    setFormDisabled({ form, fields: [lengthField], isDisabled: length != null });
+    if (length != null) form.elements[lengthField].value = length;
+    ['base', 'height'].forEach(field => {
+        if (form.elements[field].id) setMdbWrapperInputValue({ selector: `#${form.elements[field].id}`, value: form.elements[field].value });
+    });
+};
+
+export const updateMaterialRollReferenceFields = ({ form }) => {
+    const presentationName = form.elements.presentationId.selectedOptions?.[0]?.textContent;
+    const applies = form.dataset.resource !== INVENTORY_RESOURCES.CONSUMABLE && isRollPresentation(presentationName);
+    setFormSectionVisibility({
+        form,
+        selector: '.roll-reference-section',
+        isVisible: applies,
+        fieldNames: MATERIAL_ROLL_REFERENCE_FIELDS,
+        clearValues: true
+    });
+    setFormDisabled({ form, fields: MATERIAL_ROLL_REFERENCE_FIELDS, isDisabled: !applies || (!isCreateMode(form.dataset.mode) && !isEditMode(form.dataset.mode)) });
 };

@@ -8,24 +8,11 @@ import { materialDataFields, materialEditableDataFields, materialRollReferenceFi
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
 
-import { isRollPresentation } from '../../../utils/warehouseInventoryUtils.js';
+import { updateMaterialRollReferenceFields } from '../../../ui/inventory/inventorySelectUI.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
 const goodsReceiptCreationContext = 'goodsReceipt';
-
-export const updateMaterialRollReferenceFields = ({ form }) => {
-    const presentationName = form.elements.presentationId.selectedOptions?.[0]?.textContent;
-    const applies = form.dataset.resource !== INVENTORY_RESOURCES.CONSUMABLE && isRollPresentation(presentationName);
-    setFormSectionVisibility({
-        form,
-        selector: '.roll-reference-section',
-        isVisible: applies,
-        fieldNames: materialRollReferenceFields,
-        clearValues: true
-    });
-    setFormDisabled({ form, fields: materialRollReferenceFields, isDisabled: !applies || (!isCreateMode(form.dataset.mode) && !isEditMode(form.dataset.mode)) });
-};
 
 export const openMaterialModal = ({
     mode = FORM_MODES.CREATE,
@@ -44,10 +31,11 @@ export const openMaterialModal = ({
     const isConsumable = resource === INVENTORY_RESOURCES.CONSUMABLE;
 
     initializeInventoryCrudModal({ form, mode, data });
-    initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL });
-    setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
     form.dataset.creationContext = creationContext || '';
     form.dataset.resource = resource;
+    initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL });
+    setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
+
 
     form.elements.name.value = data?.name ?? '';
     form.elements.minStock.value = data?.minStock ?? '';

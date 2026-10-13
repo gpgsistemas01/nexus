@@ -45,7 +45,7 @@ flowchart TB
 | Referencia del rollo | `src/public/js/pages/warehouse/wastes/`<br/>El formulario existente de material administra los dos pesos de referencia con
 sus listas de campos, `setFormDisabled` y `setFormSectionVisibility`. La merma consulta
 los valores en la selección de material, mantiene el cono editable y calcula neto
-y largo estimado sin administrar referencias en otro modal. El servidor calcula
+y largo automático sin administrar referencias en otro modal. El servidor calcula
 los resultados con la referencia vigente y conserva los resultados registrados.
 
 Ante `WASTE_ALREADY_EXISTS`, `wasteForm.js` ofrece **Agregar stock** si el usuario tiene

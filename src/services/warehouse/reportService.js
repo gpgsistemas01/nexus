@@ -6,6 +6,8 @@ import { findAllSuppliers } from "./supplierService.js";
 import { FULFILLMENT_STATUS_NAMES, GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
 
+import { getMaterialLengthField } from '../inventory/materialIdentity.js';
+
 const INVENTORY_REPORT_MATERIAL_SELECT = {
     maxUnitCost: true,
     currentStock: true,
@@ -24,6 +26,7 @@ const INVENTORY_REPORT_MATERIAL_SELECT = {
 };
 
 const WASTE_REPORT_SELECT = {
+    sourceMaterial: { select: { base: true, height: true } },
     id: true,
     base: true,
     height: true,
@@ -55,6 +58,7 @@ const mapMaterialRows = (materials = []) => materials.map((item) => ({
 const mapWasteRows = (wastes = []) => wastes.map((item) => ({
     id: item.id,
     materialId: item.materialId,
+    sourceMaterial: item.sourceMaterial,
     supplierId: item.supplierId,
     supplier: item.supplier?.tradeName,
     name: item.name,
@@ -182,8 +186,10 @@ export const buildWasteReportSummary = (rows = []) => {
     rows.forEach((row) => {
         const hasWidth = row.base !== null && row.base !== undefined && row.base !== '';
         const hasLength = row.height !== null && row.height !== undefined && row.height !== '';
-        const width = hasWidth ? toNumber(row.base) : null;
         const isRoll = normalizeReportIdentity(row.presentation) === 'rollo';
+        const widthField = isRoll && getMaterialLengthField(row.sourceMaterial ?? {}) === 'base' ? 'height' : 'base';
+        const hasTransverseDimension = widthField === 'height' ? hasLength : hasWidth;
+        const width = hasTransverseDimension ? toNumber(row[widthField]) : null;
         const length = !isRoll && hasLength ? toNumber(row.height) : null;
         const key = JSON.stringify([
             normalizeReportIdentity(row.name) || 'no-material',

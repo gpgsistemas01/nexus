@@ -70,18 +70,15 @@
                 {
                     type: 'html',
                     col: 'col-12',
-                    content: `
-                        <div class="waste-roll-measurement-section">
-                        <p id="wasteConeReferenceInfo" class="mb-2"></p>
-                        <label for="lengthSourceInput" class="form-label">Longitud de la merma</label>
-                        <select id="lengthSourceInput" name="lengthSource" class="form-select">
-                            <option value="MEASURED">Medida</option>
-                            <option value="ESTIMATED">Estimada por peso</option>
-                        </select>
-                        <div class="invalid-feedback" data-error-for="lengthSource"></div>
-                        </div>
-                        <button type="button" id="wasteDuplicateStockButton" class="btn btn-primary mt-2 d-none">Agregar esta cantidad al stock existente</button>
-                    `
+                    content: include('../../../shared/forms/informativeValue', {
+                        value: { id: 'wasteConeReferenceInfo', label: 'Datos del material seleccionado' }
+                    }) + include('../../../shared/controls/button', {
+                        button: {
+                            id: 'wasteDuplicateStockButton',
+                            class: 'btn btn-primary mt-2 d-none',
+                            content: 'Agregar esta cantidad al stock existente'
+                        }
+                    })
                 },
                 {
                     type: 'inputs',
@@ -90,7 +87,7 @@
                             id: 'baseInput',
                             type: 'number',
                             name: 'base',
-                            label: 'Ancho confirmado de la merma (m)',
+                            label: 'Base de la merma (m)',
                             value: '',
                             attrs: {
                                 min: '0.01'
@@ -101,54 +98,12 @@
                             id: 'heightInput',
                             type: 'number',
                             name: 'height',
-                            label: 'Largo real de la merma (m)',
+                            label: 'Altura de la merma (m)',
                             value: '',
                             attrs: {
                                 min: '0.01'
                             },
                             col: '6'
-                        },
-                        {
-                            id: 'coneWeightKgInput',
-                            type: 'number',
-                            name: 'coneWeightKg',
-                            label: 'Peso del cono por unidad (kg)',
-                            value: '',
-                            attrs: {
-                                min: '0',
-                                max: '100',
-                                step: '0.01',
-                                disabled: true
-                            },
-                            col: 'col-12 col-md-6'
-                        },
-                        {
-                            id: 'totalWeightKgInput',
-                            type: 'number',
-                            name: 'totalWeightKg',
-                            label: 'Peso total por unidad con cono (kg)',
-                            value: '',
-                            attrs: {
-                                min: '0.01',
-                                max: '100',
-                                step: '0.01',
-                                disabled: true
-                            },
-                            col: 'col-12 col-md-6'
-                        },
-                        {
-                            id: 'weightKgInput',
-                            type: 'number',
-                            name: 'weightKg',
-                            label: 'Peso neto por unidad de merma (kg)',
-                            value: '',
-                            attrs: {
-                                min: '0.01',
-                                max: '100',
-                                step: '0.01',
-                                disabled: true
-                            },
-                            col: 'col-12 col-md-6'
                         },
                         {
                             id: 'minStockInput',
@@ -174,6 +129,15 @@
                             col: '6'
                         }
                     ],
+                },
+                {
+                    type: 'html',
+                    col: 'col-12 waste-weight-fields',
+                    content: include('../../../shared/inventory/rollWeightFields', { fields: [
+                        { id: 'coneWeightKgInput', name: 'coneWeightKg', label: 'Peso del cono por unidad (kg)', allowZero: true },
+                        { id: 'totalWeightKgInput', name: 'totalWeightKg', label: 'Peso total por unidad con cono (kg)' },
+                        { id: 'weightKgInput', name: 'weightKg', label: 'Peso neto por unidad de merma (kg)', readOnly: true }
+                    ] })
                 },
                 {
                     type: 'checkboxes',

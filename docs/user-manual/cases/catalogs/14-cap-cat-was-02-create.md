@@ -8,7 +8,7 @@
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Campos editables en modo alta:** **Buscar proveedor...**, **Buscar material de referencia...**,
-**Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo
+**Base de la merma (m)**, **Altura de la merma (m)**, **Stock mínimo**, **Costo
 máximo unitario**, **Nuevo stock**, **Observaciones**, **Activo** y, para Rollo, **Peso del cono por unidad (kg)** y **Peso total por unidad con cono (kg)**. El nombre, presentación y unidad
 provienen del material de referencia y la razón **Stock inicial** es automática. Use **Nueva merma**
 para abrir el formulario y **Guardar** para confirmarlo.
@@ -17,9 +17,9 @@ para abrir el formulario y **Guardar** para confirmarlo.
 
    ![CAP-CAT-WAS-02-CREATE: formulario de registro](../../images/areas/almacen/waste/02-form-registration.png)
 
-2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Ancho confirmado de la merma (m)**, **Largo real de la merma (m)**, **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock** y **Observaciones**, y revise la casilla **Activo**.
+2. Elija opciones en **Buscar proveedor...** y **Buscar material de referencia...**; complete **Base de la merma (m)**, **Altura de la merma (m)**, **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock** y **Observaciones**, y revise la casilla **Activo**.
    Si la presentación es **Rollo**, revise la referencia del cono. El campo **Peso del cono por unidad (kg)** se precarga desde el material; si el cono de esta merma cambia, edite ese mismo campo. Complete el **Peso total por unidad con cono (kg)** y compruebe el neto calculado.
-   En **Longitud de la merma**, elija **Medida** para capturar el largo real o **Estimada por peso** para calcularlo con la muestra. Si desconoce los pesos, deje ambos pesos vacíos y capture el largo medido. Después del alta los pesos y el método serán de consulta.
+   Al completar ambos pesos, Nexus calcula la dimensión longitudinal y la muestra en **Base** o **Altura** según la orientación del material seleccionado. La otra dimensión toma el dato del material. Ambos valores son de consulta mientras se calcula. Si desconoce los pesos o el material todavía no tiene referencias completas, capture la dimensión longitudinal manualmente. Después del alta las dimensiones y los pesos quedan para consulta.
 3. Seleccione el botón **Guardar** para registrar la merma.
 
 Si el aviso indica que coinciden proveedor, nombre, medidas y pesos, seleccione

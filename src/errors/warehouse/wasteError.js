@@ -1,8 +1,8 @@
 import { AppError } from "../AppError.js";
 
-export class WasteRollReferenceMissing extends AppError {
+export class WasteDimensionsInvalid extends AppError {
     constructor() {
-        super('Complete la referencia del cono y del rollo para utilizarla en esta merma.', 'WASTE_ROLL_REFERENCE_MISSING', 400);
+        super('Complete las dimensiones de la merma o los pesos necesarios para calcularlas.', 'WASTE_DIMENSIONS_INVALID', 400);
     }
 }
 
