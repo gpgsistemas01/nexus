@@ -135,14 +135,9 @@ describe('peso unitario de merma de rollo', () => {
         const response = await request(app).post('/wastes').send({ ...createBody('roll'), height: 8, weightKg }).expect(400);
         expect(response.body.errors.weightKg.code).toBe('WEIGHT_KG_TOO_HIGH');
         expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
-        const { createWasteWithInitialStockAdjustment } = await import('../../../src/services/warehouse/wastes/wasteService.js');
-        await expect(createWasteWithInitialStockAdjustment({
-            wasteDto: { ...createBody('roll'), height: 8, weightKg: Number(weightKg) }, userId: ids.user
-        })).rejects.toMatchObject({ code: 'WEIGHT_KG_TOO_HIGH' });
-        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
     });
 
-    it('el servicio rechaza DTOs no numéricos con el error de dominio, sin tratar la longitud HTTP', async () => {
+    it('el servicio rechaza DTOs no numéricos o no positivos con el error de dominio', async () => {
         const { createWasteWithInitialStockAdjustment } = await import('../../../src/services/warehouse/wastes/wasteService.js');
         const before = await prisma.waste.count({ where: { supplierId: ids.supplier } });
         for (const weightKg of [true, [1], '1abc', '1e3', Infinity, NaN, 0, -1]) {

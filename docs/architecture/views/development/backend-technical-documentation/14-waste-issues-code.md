@@ -43,10 +43,6 @@ flowchart TB
 | Devolución de merma: `wasteIssueController.registerWasteIssueDetailReturn` y `detailReturns/wasteIssueReturnService.js` | Identificadores y cantidad retornan la salida de merma actualizada. | Valida devolución, revierte inventario de merma y recalcula cumplimiento de manera atómica. |
 
 
-Los controllers de este módulo exponen estas operaciones. Un export construido por
-un handler conserva su configuración local; no se supone un DTO ni una transacción
-para todas las operaciones. Los datos, resultados y efectos están definidos en la tabla anterior.
-
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
 | --- | --- |
 | `controllers/api/warehouse/`<br/>`wasteIssueController.js` | `getAllWasteIssues`<br/>`registerWasteIssue`<br/>`editWasteIssue`<br/>`editWasteIssueHeader`<br/>`editWasteIssueDetails`<br/>`registerWasteIssueDetailReturn` |
@@ -60,13 +56,6 @@ para todas las operaciones. Los datos, resultados y efectos están definidos en 
 ## Variantes y límites de reutilización
 
 wasteIssueController usa wasteIssueDTO y servicios propios de salida/devolución. Comparte encabezado/cumplimiento con goodsIssues, pero conserva movimientos e inventario de merma.
-
-Los grupos del mapa representan imports seleccionados. Los permisos y middleware
-se comprueban en cada router; los servicios conservan validaciones, errores y
-persistencia propios. Compartir `getDb(tx)` no implica que toda operación abra una
-transacción. La integración de [Prisma](../code-structure/06-prisma-and-persistence.md)
-y los [mecanismos backend reutilizables](../reuse-and-refactoring/01-backend-handlers-and-services.md)
-tienen una fuente de detalle común.
 
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en

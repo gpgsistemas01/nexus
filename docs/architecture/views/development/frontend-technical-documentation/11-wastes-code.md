@@ -80,15 +80,12 @@ Los reportes y la infraestructura transversal se localizan en el
 [procesos](../../processes/frontend-code-sequences/index.md).
 
 
-`updateWasteWeightField` habilita la captura únicamente en alta de Rollo y deja
-el valor deshabilitado para consulta al editar, mediante `setFormDisabled`. `applyWasteMaterialTemplate` limpia el valor al
-cambiar plantilla y limpia el aviso de validación de ese campo; `wasteEditFields` no lo envía. La tabla general omite el peso.
-`wasteForm.js` aporta a la validación el nombre de presentación mostrado, sin
-incluirlo en la petición. `wasteValidation.weightKg` delega en `fieldValidations.validateWasteWeight`,
-como los demás campos. Ese validador combina la regla decimal compartida con la
-condición de Rollo y reutiliza los mensajes de la API. `useForm`, `validateFields`
-y `normalizeFormErrors` conservan el mismo marcado y presentación de errores. El input
-conserva límites HTML `min`, `max` y `step`; la validación JavaScript no depende
-de que el navegador aplique esas restricciones.
-La [vista de datos](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo)
-concentra el contrato y enlaza su recorrido de negocio.
+`updateWasteWeightField` usa `setFormDisabled` para habilitar el peso al registrar
+una merma de Rollo y mostrarlo deshabilitado al editar. `applyWasteMaterialTemplate`
+limpia el valor y su aviso al cambiar de plantilla; `wasteEditFields` excluye el peso
+del envío. La tabla general omite esa columna.
+
+`wasteForm.js` aporta la presentación a `fieldValidations.validateWasteWeight`.
+La regla decimal se comparte con la validación HTTP. `useForm`, `validateFields`
+y `normalizeFormErrors` muestran los errores mediante el flujo común de formularios.
+El contrato del campo está en la [vista de datos](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).

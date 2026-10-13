@@ -46,10 +46,6 @@ flowchart TB
 | Corrección/cancelación de entrada: controladores homónimos y `detailChanges/{goodsReceiptCorrectionService,goodsReceiptCancellationService,goodsReceiptDetailChangeService}.js` | `detailId` y cambio solicitado producen entrada actualizada. | Localiza detalle editable, registra cambio, revierte/aplica movimiento y recalcula existencias/totales en una transacción; los conflictos impiden escritura parcial. |
 
 
-Los controllers de este módulo exponen estas operaciones. Un export construido por
-un handler conserva su configuración local; no se supone un DTO ni una transacción
-para todas las operaciones. Los datos, resultados y efectos están definidos en la tabla anterior.
-
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
 | --- | --- |
 | `controllers/api/warehouse/goodsReceipts/`<br/>`consumables/`<br/>`consumableGoodsReceiptController.js` | `getAllConsumableGoodsReceipts`<br/>`registerConsumableGoodsReceipt`<br/>`editConsumableGoodsReceipt`<br/>`correctConsumableGoodsReceiptDetail`<br/>`cancelConsumableGoodsReceiptDetail` |
@@ -67,13 +63,6 @@ para todas las operaciones. Los datos, resultados y efectos están definidos en 
 ## Variantes y límites de reutilización
 
 Los controllers y adaptadores material/consumable configuran handlers/núcleo compartidos. goodsReceiptService, invoice, helpers y detailChanges mantienen responsabilidades distintas; las variantes fijan type.
-
-Los grupos del mapa representan imports seleccionados. Los permisos y middleware
-se comprueban en cada router; los servicios conservan validaciones, errores y
-persistencia propios. Compartir `getDb(tx)` no implica que toda operación abra una
-transacción. La integración de [Prisma](../code-structure/06-prisma-and-persistence.md)
-y los [mecanismos backend reutilizables](../reuse-and-refactoring/01-backend-handlers-and-services.md)
-tienen una fuente de detalle común.
 
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en

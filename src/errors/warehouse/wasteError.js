@@ -1,11 +1,5 @@
 import { AppError } from "../AppError.js";
 
-export class WasteWeightTooHigh extends AppError {
-    constructor() {
-        super('El peso por unidad no puede superar 100 kg.', 'WEIGHT_KG_TOO_HIGH', 400);
-    }
-}
-
 export class WasteWeightReadOnly extends AppError {
     constructor() {
         super('No se puede modificar el peso unitario de una merma ya registrada. Este dato sólo está disponible para consulta.', 'WASTE_WEIGHT_READ_ONLY', 400);

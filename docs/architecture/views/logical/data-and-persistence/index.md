@@ -116,29 +116,21 @@ y el [resumen de Prisma](../../development/code-structure/06-prisma-and-persiste
 
 ## Peso unitario de merma de rollo
 
-`Waste.weightKg` es un decimal nullable (`DECIMAL(5,2)`) capturable sólo al
-registrar la merma. No pertenece a materiales ni consumibles ni modifica la clave
-única `(supplierId, name, base, height)`. La migración y sus restricciones físicas
-se describen en [PostgreSQL y migraciones](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma).
+`Waste.weightKg` almacena los kg por unidad en `DECIMAL(5,2)` y admite `NULL`
+cuando el peso se desconoce. La identidad de la merma permanece definida por
+`(supplierId, name, base, height)`.
 
 El [recorrido de negocio](../../../../requirements/requirements-specification/04-unified-catalog-by-scope/04-queries-reports-and-modeled-functions.md#recorrido-del-peso-de-merma)
-concentra las reglas y el diagrama. `wasteDTO.js` incluye el peso únicamente en el
-alta; `wasteEditValidation` rechaza su envío y `updateWaste` protege llamadas directas.
-`getWasteWeightValidationError` en `warehouseInventoryUtils.js` es una función
-pura compartida por formulario y validación HTTP: inspecciona el valor
-antes de convertirlo, distingue número inválido, máximo de 100 kg excedido y
-precisión excedida, y admite peso ausente. Rechaza booleanos, listas, objetos, valores no finitos y cadenas que
-no sean decimales completos. La longitud y el formato se rechazan antes del DTO y del servicio.
-`createWasteWithInitialStockAdjustment` recibe un DTO numérico validado y comprueba
-las reglas de negocio: presentación persistida de Rollo, peso positivo, máximo
-permitido. `updateWaste` protege la inmutabilidad posterior. Ambas operaciones
-lanzan errores de dominio derivados de `AppError`, que `handleWasteServiceError`
-propaga como en los demás servicios, sin traducir códigos del validador HTTP ni
-repetir la comprobación de longitud.
+define la captura y consulta. La implementación distribuye sus responsabilidades:
 
-`findWasteReportRows` conserva `NULL` en vez de convertirlo a cero.
-`buildWasteReportSummary` calcula `totalWeightKg` por identidad antes de agrupar
-rollos por ancho. `weightStatus` distingue `complete`, `unknown` y `notApplicable`;
-una existencia cero aporta cero aunque su peso sea desconocido. El Excel conserva
-la fórmula de suma sólo cuando el total es completo. No se infiere peso a partir
-del área ni se altera el saldo al exportar.
+| Componente | Responsabilidad |
+| --- | --- |
+| `getWasteWeightValidationError` | Valida formato, precisión y rango en formulario y HTTP, antes de convertir el valor. |
+| `wasteDTO.js` | Normaliza el peso para el alta y lo excluye del DTO de edición. |
+| `wasteService.js` | Comprueba la presentación persistida de Rollo y el peso positivo; rechaza cambios posteriores mediante errores de dominio. |
+| PostgreSQL | Conserva el tipo decimal y los CHECK de positividad y máximo. Véase la [migración](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma). |
+| `reportService.js` | Calcula `totalWeightKg` por identidad y luego agrupa los rollos por ancho. `weightStatus` distingue `complete`, `unknown` y `notApplicable`. |
+
+El reporte conserva el peso desconocido cuando falta en un rollo con existencia;
+una existencia cero aporta cero. El Excel incluye la fórmula de suma cuando el
+total está completo.

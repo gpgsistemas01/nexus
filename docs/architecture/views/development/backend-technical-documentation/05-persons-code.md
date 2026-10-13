@@ -38,10 +38,6 @@ flowchart TB
 | Personas: `personController.js`, `personService.js`, `personRules.js` | Lista recibe consulta de tabla; alta/edición reciben DTO saneado y retornan persona. | Valida tipo y asesor interno, relaciones y unicidad antes de crear/actualizar `Person`; errores se centralizan. |
 
 
-Los controllers de este módulo exponen estas operaciones. Un export construido por
-un handler conserva su configuración local; no se supone un DTO ni una transacción
-para todas las operaciones. Los datos, resultados y efectos están definidos en la tabla anterior.
-
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
 | --- | --- |
 | `controllers/api/admin/personController.js` | `getAllPersons`<br/>`registerPerson`<br/>`editPerson` |
@@ -55,13 +51,6 @@ para todas las operaciones. Los datos, resultados y efectos están definidos en 
 ## Variantes y límites de reutilización
 
 personController importa personDTO y personService; personRules es un colaborador de validación del dominio utilizado también desde salidas.
-
-Los grupos del mapa representan imports seleccionados. Los permisos y middleware
-se comprueban en cada router; los servicios conservan validaciones, errores y
-persistencia propios. Compartir `getDb(tx)` no implica que toda operación abra una
-transacción. La integración de [Prisma](../code-structure/06-prisma-and-persistence.md)
-y los [mecanismos backend reutilizables](../reuse-and-refactoring/01-backend-handlers-and-services.md)
-tienen una fuente de detalle común.
 
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en

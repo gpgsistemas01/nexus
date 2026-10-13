@@ -55,7 +55,7 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
     Route->>ValidationRules: wasteValidation[] — cadena ejecutada por Express
-    Note over ValidationRules: Validar formato y longitud del peso antes del DTO y del servicio
+    Note over ValidationRules: Validar formato, precisión y rango del peso
     Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
@@ -102,7 +102,7 @@ sequenceDiagram
     deactivate Formatter
     Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
     activate Domain
-    Note over Domain: Comprobar peso positivo y máximo permitido con la presentación ROLLO persistida
+    Note over Domain: Comprobar peso positivo y presentación ROLLO persistida
     Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height })
     alt La merma ya existe
         Domain-->>Controller: WASTE_ALREADY_EXISTS sin incrementar stock

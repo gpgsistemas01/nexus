@@ -46,10 +46,6 @@ flowchart TB
 | Devolución de material: `goodsIssueController.registerGoodsIssueDetailReturn` y `detailReturns/goodsIssueReturnService.js` | `id`, `detailId` y cantidad de devolución retornan salida/detalle actualizado. | Comprueba cantidades y estado, devuelve inventario, registra movimiento y recalcula cumplimiento atómicamente. |
 
 
-Los controllers de este módulo exponen estas operaciones. Un export construido por
-un handler conserva su configuración local; no se supone un DTO ni una transacción
-para todas las operaciones. Los datos, resultados y efectos están definidos en la tabla anterior.
-
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
 | --- | --- |
 | `controllers/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueController.js` | `getAllConsumableGoodsIssues`<br/>`registerConsumableGoodsIssue`<br/>`editConsumableGoodsIssue`<br/>`editConsumableGoodsIssueHeader`<br/>`editConsumableGoodsIssueDetails`<br/>`registerConsumableGoodsIssueDetailReturn` |
@@ -67,13 +63,6 @@ para todas las operaciones. Los datos, resultados y efectos están definidos en 
 ## Variantes y límites de reutilización
 
 Los controllers material/consumable configuran goodsIssueHandlers y servicios por tipo. El núcleo colabora con issues, movimientos y detailReturns; no se confunden devolución y edición de detalle.
-
-Los grupos del mapa representan imports seleccionados. Los permisos y middleware
-se comprueban en cada router; los servicios conservan validaciones, errores y
-persistencia propios. Compartir `getDb(tx)` no implica que toda operación abra una
-transacción. La integración de [Prisma](../code-structure/06-prisma-and-persistence.md)
-y los [mecanismos backend reutilizables](../reuse-and-refactoring/01-backend-handlers-and-services.md)
-tienen una fuente de detalle común.
 
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en

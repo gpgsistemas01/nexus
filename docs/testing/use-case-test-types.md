@@ -94,25 +94,12 @@ cambio la suite y esta matriz; el registro selectivo sólo cambia si el caso cum
 criterios de inclusión. El resultado de la ejecución permanece en CI o en la solicitud
 de cambio.
 
-`wasteWeightDbTest.js` verifica alta, precisión, identidad única, edición de peso
-rechazada sin cambios parciales, consulta, stock independiente y Excel real con
-pesos de diferentes largos y datos desconocidos. `reportServiceTest.js` comprueba
-la consolidación, el total y las presentaciones excluidas. `wasteWeightFieldTest.js`
-comprueba captura en alta y consulta posterior. `wasteValidatorsTest.js` y
-`wasteRegistrationBoundaryTest.js` contrastan los límites y formatos en navegador
-y API, incluyendo números no finitos, texto parcial, booleanos, objetos, listas
-y mensajes por causa. La integración comprueba que los rechazos no creen merma,
-ajustes ni movimientos, y que el servicio también rechace llamadas directas inválidas.
+La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 
-`wasteWeightCapDbTest.js` verifica la migración incremental: conserva pesos válidos
-hasta 100 kg y sus decimales, impone el máximo en PostgreSQL y revierte todo si
-encuentra un peso histórico mayor. Los límites frontend/API también comprueban
-100 aceptado y 100.000001 rechazado; el reporte admite totales superiores a 100 kg.
-
-
-`wasteWeightScaleDbTest.js` verifica `DECIMAL(5,2)`, conservación de valores
-representables, restricciones de positividad y máximo, y rollback ante pesos
-históricos con decimales significativos adicionales. Las pruebas de frontera
-rechazan `1.001`, `100.000` y cuatro dígitos enteros antes de invocar el servicio.
-El servicio conserva sólo las comprobaciones de negocio del DTO y propaga
-`AppError` con el mismo flujo que las demás operaciones de merma.
+| Pruebas | Comportamiento verificado |
+| --- | --- |
+| `wasteValidatorsTest.js`, `wasteRegistrationBoundaryTest.js` | Formato, precisión y rango; errores de campo antes de invocar el servicio. |
+| `wasteWeightFieldTest.js` | Habilitación del peso en alta de Rollo y consulta posterior. |
+| `wasteWeightDbTest.js` | Alta, consulta, identidad por medidas, edición protegida, reglas de presentación, stock independiente y Excel real. |
+| `reportServiceTest.js` | Agrupación, peso total y datos desconocidos. |
+| `wasteWeightCapDbTest.js`, `wasteWeightScaleDbTest.js` | Restricciones en PostgreSQL, conservación de valores compatibles y rollback de las migraciones ante valores incompatibles. |

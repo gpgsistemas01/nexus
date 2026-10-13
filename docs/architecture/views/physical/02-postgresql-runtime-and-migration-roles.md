@@ -348,44 +348,25 @@ instalación vacía y colisiones con rollback. Nunca se usa producción para pru
 
 ## Migración de peso unitario de merma
 
-`20261012210000_add_roll_waste_unit_weight` agrega `Waste.weightKg` nullable y
-un CHECK de positividad. No transforma pesos históricos ni cambia claves de
-identidad, cantidades o contadores. Publique cliente Prisma, backend y formulario
-junto con la migración; aplíquela con la cuenta de migraciones y regenere el
-cliente. La validación por presentación usa la relación existente en el servicio.
+La cadena establece `Waste.weightKg` con el tipo vigente `DECIMAL(5,2)`, nullable,
+y CHECK de positividad y máximo de 100 kg:
 
+| Migración | Cambio |
+| --- | --- |
+| `20261012210000_add_roll_waste_unit_weight` | Agrega el campo y el CHECK de positividad. |
+| `20261012233000_limit_roll_waste_weight_to_100kg` | Establece el máximo de 100 kg. |
+| `20261013153000_limit_roll_waste_weight_to_two_decimals` | Establece tres enteros y dos decimales. |
 
-`20261012233000_limit_roll_waste_weight_to_100kg` reduce la precisión a
-`DECIMAL(9,6)` y agrega el límite de 100 kg por unidad. Mantiene los seis decimales,
-los valores desconocidos y los demás datos. Es incremental: no modifica el SQL
-publicado de la migración anterior. El límite no se aplica al total del reporte.
-
-Antes de cambiar el tipo, bloquea la tabla y comprueba los pesos existentes.
-Si encuentra un valor superior a 100 kg, cancela la transacción con un mensaje
-explícito; no recorta, redondea ni elimina el dato. Revise esos registros con
-negocio antes de reintentar. La consulta previa es de sólo lectura:
+En una base que ya tenga el campo, revise los valores que impedirían aplicar
+estas migraciones:
 
 ```sql
 SELECT "id", "name", "weightKg"
 FROM "Waste"
-WHERE "weightKg" > 100;
+WHERE "weightKg" > 100 OR "weightKg" <> ROUND("weightKg", 2);
 ```
 
-
-`20261013153000_limit_roll_waste_weight_to_two_decimals` establece el tipo vigente
-`DECIMAL(5,2)`: tres enteros y dos decimales. Conserva los CHECK de positividad y
-máximo de 100 kg. Bajo el bloqueo de tabla, comprueba que todos los pesos sean
-representables con dos decimales antes de convertirlos. Los ceros sobrantes no
-cambian el valor; cualquier decimal significativo adicional cancela toda la
-transacción. No redondea ni elimina pesos históricos. Revise antes del despliegue:
-
-```sql
-SELECT "id", "name", "weightKg"
-FROM "Waste"
-WHERE "weightKg" <> ROUND("weightKg", 2);
-```
-
-Si hay resultados, la cuenta de migraciones no debe continuar hasta resolver esos
-registros mediante una decisión de negocio. La captura HTTP rechaza más de dos
-decimales antes de persistir; PostgreSQL convierte escrituras SQL directas a la
-escala de la columna. Las migraciones anteriores se conservan sin modificaciones.
+Las migraciones bloquean la tabla y cancelan la transacción si encuentran valores
+incompatibles. Resuelva los registros señalados antes de reintentar. Publique el
+formulario y el backend junto con el cliente Prisma regenerado y aplique las
+migraciones con la cuenta destinada a ello.
