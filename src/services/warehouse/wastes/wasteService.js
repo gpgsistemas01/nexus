@@ -9,7 +9,7 @@ import { registerWasteStockEntry } from './wasteStockEntryService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.js';
-import { getMaterialIdentityLength, getMaterialIdentityWidth, getMaterialLengthField } from '../../inventory/materialIdentity.js';
+import { getMaterialIdentityLength, getMaterialLengthField } from '../../inventory/materialIdentity.js';
 import { findUniqueSupplier } from '../supplierService.js';
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
 import { calculateWasteRollLength } from '../../../public/js/utils/wasteRollUtils.js';
@@ -177,11 +177,12 @@ export const createWasteWithInitialStockAdjustment = async ({
 
             const material = offer.material;
             const coneWeightKg = wasteDto.coneWeightKg;
+            const isRoll = isRollPresentation(material.presentation.name);
             if ((coneWeightKg != null || wasteDto.totalWeightKg != null)
-                && !isRollPresentation(material.presentation.name)) throw new WasteWeightInvalid();
+                && !isRoll) throw new WasteWeightInvalid();
             const weightKg = calculateWasteNetWeight({ coneWeightKg, totalWeightKg: wasteDto.totalWeightKg });
             const dimensions = { base: wasteDto.base, height: wasteDto.height };
-            const lengthField = isRollPresentation(material.presentation.name) ? getMaterialLengthField(material) : null;
+            const lengthField = isRoll ? getMaterialLengthField(material) : null;
             if (lengthField) {
                 const widthField = lengthField === 'base' ? 'height' : 'base';
                 dimensions[widthField] = toNumber(material[widthField]);
@@ -189,9 +190,7 @@ export const createWasteWithInitialStockAdjustment = async ({
                     const calculatedLength = calculateWasteRollLength({
                         netWeightKg: weightKg,
                         referenceNetWeightKg: calculateWasteNetWeight({ coneWeightKg: offer.referenceConeWeightKg, totalWeightKg: offer.referenceRollTotalWeightKg }),
-                        referenceLengthM: getMaterialIdentityLength(material),
-                        referenceWidthM: getMaterialIdentityWidth(material),
-                        widthM: dimensions[widthField]
+                        referenceLengthM: getMaterialIdentityLength(material)
                     });
                     if (calculatedLength != null) dimensions[lengthField] = calculatedLength;
                 }

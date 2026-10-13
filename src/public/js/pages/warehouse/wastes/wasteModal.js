@@ -85,8 +85,6 @@ export const openWasteModal = ({
             : 'Guardar';
 
     form.dataset.rollReference = '{}';
-    form.querySelector('#wasteDuplicateStockButton').classList.add('d-none');
-    delete form.dataset.duplicateWaste;
     updateWasteWeightField({ form, template: data ?? {} });
     openModal(modalElement);
 };

@@ -124,10 +124,10 @@
           "string",
           "null"
         ],
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al registrar merma y puede editarse.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "minimum": 0
       },
       "referenceRollTotalWeightKg": {
@@ -137,10 +137,10 @@
           "null"
         ],
         "exclusiveMinimum": 0,
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso total con cono de un rollo completo; mayor que el cono. Se usa para estimar la longitud de nuevas mermas.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -228,7 +228,7 @@
           "null"
         ],
         "exclusiveMinimum": 0,
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso neto en kg por unidad de merma de Rollo: total con cono menos cono. Sólo consulta.",
         "multipleOf": 0.01,
         "readOnly": true
@@ -239,7 +239,7 @@
           "string",
           "null"
         ],
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
         "minimum": 0
@@ -251,8 +251,8 @@
           "null"
         ],
         "exclusiveMinimum": 0,
-        "maximum": 100,
-        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 100 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
+        "maximum": 999.99,
+        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01
       },
       "sourceMaterialId": {
@@ -577,10 +577,10 @@
           "string",
           "null"
         ],
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al registrar merma y puede editarse.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "minimum": 0
       },
       "referenceRollTotalWeightKg": {
@@ -590,10 +590,10 @@
           "null"
         ],
         "exclusiveMinimum": 0,
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso total con cono de un rollo completo; mayor que el cono. Se usa para estimar la longitud de nuevas mermas.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -632,10 +632,10 @@
           "string",
           "null"
         ],
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al registrar merma y puede editarse.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "minimum": 0
       },
       "referenceRollTotalWeightKg": {
@@ -645,10 +645,10 @@
           "null"
         ],
         "exclusiveMinimum": 0,
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso total con cono de un rollo completo; mayor que el cono. Se usa para estimar la longitud de nuevas mermas.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -727,10 +727,10 @@
           "string",
           "null"
         ],
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "minimum": 0
       },
       "totalWeightKg": {
@@ -740,10 +740,10 @@
           "null"
         ],
         "exclusiveMinimum": 0,
-        "maximum": 100,
-        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 100 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
+        "maximum": 999.99,
+        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -1386,10 +1386,10 @@
           "string",
           "null"
         ],
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Cono de muestra en kg; obligatorio para modo FIXED o si se registra el total de muestra.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "minimum": 0
       },
       "referenceRollTotalWeightKg": {
@@ -1399,10 +1399,10 @@
           "null"
         ],
         "exclusiveMinimum": 0,
-        "maximum": 100,
+        "maximum": 999.99,
         "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       },
       "referenceRollNetWeightKg": {
         "type": [
@@ -1493,10 +1493,10 @@
               "string",
               "null"
             ],
-            "maximum": 100,
+            "maximum": 999.99,
             "description": "Cono de muestra en kg; obligatorio para modo FIXED o si se registra el total de muestra.",
             "multipleOf": 0.01,
-            "pattern": "^(?:|(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])",
+            "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
             "minimum": 0
           },
           "referenceRollTotalWeightKg": {
@@ -1506,10 +1506,10 @@
               "null"
             ],
             "exclusiveMinimum": 0,
-            "maximum": 100,
+            "maximum": 999.99,
             "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
             "multipleOf": 0.01,
-            "pattern": "^(?:|(?=.*[1-9])(?:\\d{1,2}(\\.\\d{1,2})?|0\\d{2}(\\.\\d{1,2})?|100(\\.0{1,2})?))(?![\\s\\S])"
+            "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
           },
           "referenceRollNetWeightKg": {
             "type": [

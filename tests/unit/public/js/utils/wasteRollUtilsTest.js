@@ -7,11 +7,11 @@ describe('referencia del cono y longitud de merma', () => {
         expect(getMaterialIdentityLength({ base, height })).toBe(length);
         expect(getMaterialLengthField({ base, height })).toBe(base > height ? 'base' : 'height');
     });
-    it('estima longitud por peso neto y ajusta el ancho sin alterar la referencia', () => {
-        const reference = { netWeightKg: 1, referenceNetWeightKg: 10, referenceLengthM: 50, referenceWidthM: 1.5 };
-        expect(calculateWasteRollLength({ ...reference, widthM: 1.5 })).toBe(5);
-        expect(calculateWasteRollLength({ ...reference, widthM: 0.75 })).toBe(10);
-        expect(calculateWasteRollLength({ ...reference, widthM: 0 })).toBeNull();
+    it('estima longitud por peso neto con el ancho del material', () => {
+        const reference = { netWeightKg: 1, referenceNetWeightKg: 10, referenceLengthM: 50 };
+        expect(calculateWasteRollLength(reference)).toBe(5);
+        expect(calculateWasteRollLength({ ...reference, referenceNetWeightKg: 5 })).toBe(10);
+        expect(calculateWasteRollLength({ ...reference, referenceNetWeightKg: 0 })).toBeNull();
     });
     it('permite cono desconocido salvo que se capture el peso total del rollo', () => {
         expect(getRollReferenceValidationError('', {}, 'referenceConeWeightKg')).toBeNull();

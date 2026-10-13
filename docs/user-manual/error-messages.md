@@ -177,7 +177,7 @@ conserve la dirección y repórtela. No modifique manualmente la URL para intent
 | El peso por unidad debe ser un decimal mayor que cero en kg. Use punto decimal, sin letras ni notación científica. | Capture un decimal positivo, por ejemplo 0.75; quite letras y separadores. Si desconoce el peso, deje vacío el campo durante el alta. |
 | El peso debe ser positivo y sólo aplica a mermas con presentación Rollo. | Revise la presentación y capture kg por unidad con un valor mayor que cero; deje vacío cuando no se conoce. |
 | No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta. | Consulte el peso guardado y actualice únicamente los campos habilitados del formulario. |
-| El peso por unidad no puede superar 100 kg. | Verifique el peso de una unidad de merma; no capture aquí el peso total de todas las existencias. |
+| El peso por unidad no puede superar 999.99 kg. | Verifique el peso de una unidad de merma; no capture aquí el peso total de todas las existencias. |
 | El peso admite hasta 3 dígitos enteros y 2 decimales. | Corrija la precisión del valor capturado. |
 | Capture el peso del cono para calcular el peso neto de la merma. | Complete el peso del cono de una unidad. |
 | Capture el peso total con cono para calcular el peso neto de la merma. | Complete el peso total de la misma unidad, incluyendo el cono. |

@@ -41,7 +41,7 @@
   «Sólo activos» exige estado activo y «Sólo con existencia» exige saldo positivo.
   La condición elegida se combina con los filtros de consulta aplicables.
 - **CA-RF-MER-011-1:** el peso del cono admite cero; el total con cono debe ser
-  mayor que el cono y no superar 100 kg. Ambos admiten tres enteros y dos decimales.
+  mayor que el cono y no superar 999.99 kg. Ambos admiten tres enteros y dos decimales.
   Capturar un peso requiere el otro. El sistema calcula el neto por unidad y rechaza
   entradas inválidas antes del alta.
 - **CA-RF-MER-010-1:** agregar una cantidad incrementa el saldo; no sustituye un ajuste

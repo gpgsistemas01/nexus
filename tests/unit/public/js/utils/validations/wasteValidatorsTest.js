@@ -43,7 +43,7 @@ describe('validadores del CRUD de mermas', () => {
   ])('%s', (_, value, expected) => {
     expect(wasteStockValidation.newStock(value)).toEqual(expected);
   });
-  it.each([undefined, null, '', '0.01', 0.01, '0.75', '99.99', 100, '100.00'])('acepta peso opcional o decimal válido: %s', value => {
+  it.each([undefined, null, '', '0.01', 0.01, '0.75', '99.99', 100, '100.00', '999.99'])('acepta peso opcional o decimal válido: %s', value => {
     expect(wasteValidation.totalWeightKg(value, { coneWeightKg: value == null || value === '' ? null : 0, presentationName: 'ROLLO' })).toBeNull();
   });
 
@@ -68,8 +68,8 @@ describe('validadores del CRUD de mermas', () => {
     ['1.001', 'WEIGHT_KG_TOO_LONG'],
     ['100.000', 'WEIGHT_KG_TOO_LONG'],
     ['0001', 'WEIGHT_KG_TOO_LONG'],
-    ['100.000001', 'WEIGHT_KG_TOO_HIGH'],
-    [101, 'WEIGHT_KG_TOO_HIGH'],
+    ['999.990001', 'WEIGHT_KG_TOO_HIGH'],
+    [1000, 'WEIGHT_KG_TOO_HIGH'],
     ['100000000', 'WEIGHT_KG_TOO_HIGH'],
     ['0.001', 'WEIGHT_KG_TOO_LONG'],
     [0.001, 'WEIGHT_KG_TOO_LONG'],

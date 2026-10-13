@@ -77,7 +77,7 @@ toda su cantidad pendiente; **Cantidad de proyecto** no determina una entrega pa
 
 | Campo y modo | Validación |
 | --- | --- |
-| Pesos de Rollo (kg por unidad) | Cono y total se capturan juntos o quedan vacíos; cono ≥ 0, total > cono y ≤ 100. Tres enteros y dos decimales. Neto calculado automáticamente. |
+| Pesos de Rollo (kg por unidad) | Cono y total se capturan juntos o quedan vacíos; cono ≥ 0, total > cono y ≤ 999.99. Tres enteros y dos decimales. Neto calculado automáticamente. |
 | Formato del peso | Decimal con punto, por ejemplo 0.75; sin letras, espacios, separadores de miles ni notación científica. |
 | Pesos en edición | Sólo consulta; el servidor rechaza cambios de los tres pesos. |
 | Otras presentaciones | Campos de peso deshabilitados; su envío se rechaza. |

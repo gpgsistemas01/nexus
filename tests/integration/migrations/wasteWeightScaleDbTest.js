@@ -13,6 +13,9 @@ const withLegacyWaste = async callback => {
     try {
         await connection.query('CREATE TEMP TABLE "Waste" (LIKE public."Waste" INCLUDING ALL)');
         await connection.query('ALTER TABLE "Waste" ALTER COLUMN "weightKg" TYPE DECIMAL(9,6)');
+        // Reconstruct the constraint that existed before this historical migration.
+        await connection.query('ALTER TABLE "Waste" DROP CONSTRAINT "Waste_weightKg_maximum"');
+        await connection.query('ALTER TABLE "Waste" ADD CONSTRAINT "Waste_weightKg_maximum" CHECK ("weightKg" IS NULL OR "weightKg" <= 100)');
         await callback(connection);
     } finally {
         await connection.end();

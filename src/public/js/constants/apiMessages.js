@@ -10,7 +10,7 @@ export const errorMessages = {
     WASTE_WEIGHT_CALCULATED: 'El peso neto se calcula automáticamente. Capture el peso del cono y el peso total con cono.',
     WEIGHT_KG_INVALID_NUMBER: 'El peso por unidad debe ser un decimal mayor que cero en kg. Use punto decimal, sin letras ni notación científica.',
     WEIGHT_KG_TOO_LONG: 'El peso admite hasta 3 dígitos enteros y 2 decimales.',
-    WEIGHT_KG_TOO_HIGH: 'El peso por unidad no puede superar 100 kg.',
+    WEIGHT_KG_TOO_HIGH: 'El peso por unidad no puede superar 999.99 kg.',
     WASTE_WEIGHT_READ_ONLY: 'No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta.',
     WASTE_WEIGHT_INVALID: 'El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.',
     // 🔐 AUTH / GENERALES

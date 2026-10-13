@@ -28,9 +28,11 @@ describe('migración consolidada de pesos y vínculo de merma', () => {
             await insert('Histórica', '0.75', '0.25', '1');
             await insert('Histórica', '0.75', '0.3', '1.05');
             await expect(insert('Histórica', '0.75', '0.25', '1')).rejects.toMatchObject({ code: '23505' });
-            for (const [net, cone, total] of [[1, null, 2], [1, 0, null], [1, -1, 0], [1, 2, 2], [1, 0, 2], [1, 100, 101]]) {
+            for (const [net, cone, total] of [[1, null, 2], [1, 0, null], [1, -1, 0], [1, 2, 2], [1, 0, 2], [1, 100, 102]]) {
                 await expect(insert('Inválida', net, cone, total)).rejects.toMatchObject({ code: '23514' });
             }
+            await insert('Máximo BD', '999.99', 0, '999.99');
+            await expect(insert('Fuera de capacidad', 1000, 0, 1000)).rejects.toMatchObject({ code: '22003' });
             const columns = (await connection.query(`SELECT column_name FROM information_schema.columns WHERE table_schema LIKE 'pg_temp_%' AND table_name='Waste'`)).rows.map(row => row.column_name);
             expect(columns).not.toContain('lengthSource');
             expect(columns).not.toContain('referenceNetWeightKg');

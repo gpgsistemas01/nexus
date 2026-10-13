@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({ setMdbWrapperInputValue: vi.fn() }));
-const { applyWasteMaterialTemplate, updateWasteRollMeasurement, updateWasteWeightField, updateWasteNetWeightField } = await import('../../../../../../src/public/js/ui/inventory/inventorySelectUI.js');
+const { applyWasteMaterialTemplate, updateWasteRollMeasurement, updateWasteWeightField } = await import('../../../../../../src/public/js/ui/inventory/inventorySelectUI.js');
 const { FORM_MODES } = await import('../../../../../../src/public/js/constants/formModes.js');
 
 const createForm = mode => {
@@ -37,10 +37,10 @@ describe('captura de peso según la presentación real de la merma', () => {
         const form = createForm(FORM_MODES.CREATE);
         form.elements.totalWeightKg.value = '0.3';
         form.elements.coneWeightKg.value = '0.1';
-        updateWasteNetWeightField({ form });
+        updateWasteRollMeasurement({ form });
         expect(form.elements.weightKg.value).toBe(0.2);
         form.elements.coneWeightKg.value = '0.4';
-        updateWasteNetWeightField({ form });
+        updateWasteRollMeasurement({ form });
         expect(form.elements.weightKg.value).toBe('');
     });
 

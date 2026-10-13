@@ -1,3 +1,6 @@
+import { notifications } from '../../../plugins/swal/swalComponent.js';
+import { resetFormSubmitState } from '../../../ui/forms/formStateUI.js';
+import { closeModal } from '../../../ui/modalUI.js';
 import { openWasteStockAdditionModal } from './wasteStockAdditionModal.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
@@ -47,8 +50,21 @@ useForm({
             });
         } catch (err) {
             if (err.data?.code === 'WASTE_ALREADY_EXISTS' && err.data.meta?.waste && hasPermission(window.meta || {}, UI_PERMISSIONS.WASTES_ADD_STOCK)) {
-                form.dataset.duplicateWaste = JSON.stringify(err.data.meta.waste);
-                form.querySelector('#wasteDuplicateStockButton').classList.remove('d-none');
+                resetFormSubmitState(form);
+                const { isConfirmed } = await notifications.showConfirmation({
+                    title: 'Esta merma ya existe',
+                    text: '¿Quieres agregar esta cantidad al stock existente?',
+                    confirmButtonText: 'Agregar al stock'
+                });
+                if (isConfirmed) {
+                    closeModal(form);
+                    openWasteStockAdditionModal({ data: err.data.meta.waste });
+                    const additionForm = document.querySelector(FORM_SELECTORS.WASTE_STOCK_ADDITION);
+                    additionForm.elements.quantity.value = Number(formData.newStock) > 0 ? formData.newStock : '';
+                    additionForm.elements.quantity.dispatchEvent(new Event(DOM_EVENT_NAMES.INPUT, { bubbles: true }));
+                    additionForm.elements.observations.value = formData.observations || '';
+                }
+                return;
             }
             throw err;
         }
@@ -57,20 +73,7 @@ useForm({
 
 const form = document.querySelector(FORM_SELECTORS.WASTE);
 form.addEventListener(DOM_EVENT_NAMES.INPUT, event => {
-    if (['coneWeightKg', 'totalWeightKg', 'base'].includes(event.target.name)) {
+    if (['coneWeightKg', 'totalWeightKg'].includes(event.target.name)) {
         updateWasteRollMeasurement({ form });
     }
-    if (['name', 'base', 'height', 'coneWeightKg', 'totalWeightKg'].includes(event.target.name)) {
-        delete form.dataset.duplicateWaste;
-        form.querySelector('#wasteDuplicateStockButton').classList.add('d-none');
-    }
-});
-form.querySelector('#wasteDuplicateStockButton').addEventListener(DOM_EVENT_NAMES.CLICK, () => {
-    if (!form.dataset.duplicateWaste) return;
-    openWasteStockAdditionModal({ data: JSON.parse(form.dataset.duplicateWaste) });
-    const additionForm = document.querySelector(FORM_SELECTORS.WASTE_STOCK_ADDITION);
-    const quantity = additionForm.elements.quantity;
-    quantity.value = Number(form.elements.newStock.value) > 0 ? form.elements.newStock.value : '';
-    quantity.dispatchEvent(new Event(DOM_EVENT_NAMES.INPUT, { bubbles: true }));
-    additionForm.elements.observations.value = form.elements.observations.value;
 });

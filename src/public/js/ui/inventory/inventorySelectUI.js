@@ -41,35 +41,16 @@ export const applyWasteMaterialTemplate = ({ form, template = {} }) => {
     if (isRollPresentation(getPresentation(template)) && form.elements.coneWeightKg) {
         form.elements.coneWeightKg.value = reference.referenceConeWeightKg ?? '';
     }
-    const button = form.querySelector('#wasteDuplicateStockButton');
-    button?.classList.add('d-none');
-    delete form.dataset.duplicateWaste;
     setMdbWrapperInputValue({ selector: INPUT_SELECTORS.WASTE_MAX_UNIT_COST, value: template.maxUnitCost ?? '' });
     ['base', 'height'].forEach(field => { form.elements[field].value = ''; });
     updateWasteWeightField({ form, template });
 };
 
-export const updateWasteNetWeightField = ({ form }) => {
-    if (!isCreateMode(form.dataset.mode)) return;
-    const data = {
-        coneWeightKg: form.elements?.coneWeightKg?.value,
-        totalWeightKg: form.elements?.totalWeightKg?.value
-    };
-    const valid = ['coneWeightKg', 'totalWeightKg'].every(fieldName =>
-        !getWasteWeightCaptureValidationError(data[fieldName], { ...data, fieldName }));
-    const value = valid ? calculateWasteNetWeight(data) : null;
-    const field = form.elements?.weightKg;
-    if (!field) return;
-    field.value = value ?? '';
-    if (field.id) setMdbWrapperInputValue({ selector: `#${field.id}`, value: field.value });
-};
-
 export const updateWasteWeightField = ({ form, template = {} }) => {
     const applies = isRollPresentation(getPresentation(template));
     const fields = ['coneWeightKg', 'totalWeightKg'];
-    setFormSectionVisibility({ form, isVisible: applies, fieldNames: [...fields, 'weightKg'] });
     setFormSectionVisibility({ form, selector: '.waste-weight-fields', isVisible: applies });
-    setFormDisabled({ form, fields: fields, isDisabled: !applies || !isCreateMode(form.dataset.mode) });
+    setFormDisabled({ form, fields, isDisabled: !applies || !isCreateMode(form.dataset.mode) });
     setFormDisabled({ form, fields: ['weightKg'], isDisabled: true });
     [...fields, 'weightKg'].forEach(name => {
         const field = form.elements?.[name];
@@ -88,12 +69,24 @@ export const updateWasteWeightField = ({ form, template = {} }) => {
 export const updateWasteRollMeasurement = ({ form }) => {
     if (!isCreateMode(form.dataset.mode)) return;
 
-    updateWasteNetWeightField({ form });
+    const data = {
+        coneWeightKg: form.elements?.coneWeightKg?.value,
+        totalWeightKg: form.elements?.totalWeightKg?.value
+    };
+    const valid = ['coneWeightKg', 'totalWeightKg'].every(fieldName =>
+        !getWasteWeightCaptureValidationError(data[fieldName], { ...data, fieldName }));
+    const value = valid ? calculateWasteNetWeight(data) : null;
+    const field = form.elements?.weightKg;
+    if (!field) return;
+    field.value = value ?? '';
+    if (field.id) setMdbWrapperInputValue({ selector: `#${field.id}`, value: field.value });
     const reference = JSON.parse(form.dataset.rollReference || '{}');
     const lengthField = reference.lengthField;
     const hasWeights = form.elements.weightKg.value !== '';
-    setFormDisabled({ form, fields: ['base', 'height'], isDisabled: false });
-    if (!lengthField) return;
+    if (!lengthField) {
+        setFormDisabled({ form, fields: ['base', 'height'], isDisabled: false });
+        return;
+    }
 
     const widthField = lengthField === 'base' ? 'height' : 'base';
     form.elements[widthField].value = reference.referenceWidthM ?? '';
@@ -101,9 +94,7 @@ export const updateWasteRollMeasurement = ({ form }) => {
     const length = hasWeights ? calculateWasteRollLength({
         netWeightKg: form.elements.weightKg.value,
         referenceNetWeightKg: reference.referenceRollNetWeightKg,
-        referenceLengthM: reference.referenceLengthM,
-        referenceWidthM: reference.referenceWidthM,
-        widthM: reference.referenceWidthM
+        referenceLengthM: reference.referenceLengthM
     }) : null;
     setFormDisabled({ form, fields: [lengthField], isDisabled: length != null });
     if (length != null) form.elements[lengthField].value = length;

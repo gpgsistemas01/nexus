@@ -128,8 +128,8 @@ define la captura y consulta. La implementación distribuye sus responsabilidade
 | Componente | Responsabilidad |
 | --- | --- |
 | `getWasteWeightCaptureValidationError` | Valida formato, precisión, rango, captura conjunta y total mayor que cono en formulario y HTTP. |
-| `wasteDTO.js` | Normaliza cono, total y opciones de referencia/longitud para el alta; excluye los pesos del DTO de edición. |
-| `wasteService.js` | Comprueba la presentación persistida, resuelve el cono autorizado desde la oferta cuando se solicita, calcula neto y longitud y protege pesos y referencias en edición. |
+| `wasteDTO.js` | Normaliza cono, total y dimensiones manuales para el alta; excluye los pesos del DTO de edición. |
+| `wasteService.js` | Comprueba la presentación persistida, consulta referencias vigentes desde la oferta, calcula neto y longitud y protege pesos y referencias en edición. |
 | PostgreSQL | Conserva el tipo decimal y los CHECK de rango, captura conjunta y neto igual a total menos cono. Véase la [migración](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma). |
 | `reportService.js` | Calcula `totalWeightKg` por identidad y luego agrupa los rollos por ancho. `weightStatus` distingue `complete`, `unknown` y `notApplicable`. |
 
@@ -154,9 +154,10 @@ identificar el origen, pero no reconstruir referencias antiguas después de edit
 `calculateWasteRollLength` estima metros lineales mediante:
 
 ```text
-largoMerma = netoMerma × largoMuestra × anchoMuestra / (netoMuestra × anchoMerma)
+largoMerma = netoMerma × largoMuestra / netoMuestra
 ```
 
+El ancho se conserva del material, por lo que se cancela en la proporción.
 La regla usa seis decimales para longitud y dos para kg. Supone masa por área
 representativa del mismo material. Al completar los pesos, el largo se calcula y
 se guarda en `base` si ésa es la dimensión longitudinal nominal del material, o en
@@ -164,7 +165,7 @@ se guarda en `base` si ésa es la dimensión longitudinal nominal del material, 
 del material. Sin pesos o referencias completas se permite capturar manualmente el largo; no se almacena
 un selector de método. Las referencias y resultados de vista previa no se envían
 como datos persistentes desde el navegador.
-Un duplicado devuelve `meta.waste` para abrir el formulario de entrada incremental;
+Un duplicado devuelve `meta.waste`; una confirmación de Swal permite abrir el formulario de entrada incremental;
 crear nunca incrementa por sí solo una existencia anterior.
 
 Las migraciones de captura y referencia de rollos aún pendientes se consolidan en
