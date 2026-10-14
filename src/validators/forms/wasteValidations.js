@@ -1,4 +1,6 @@
-import { validateName, validateNonNegativeNumber, validatePositiveNumber, validateUUID } from '../fields/fieldsValidator.js';
+import { body } from 'express-validator';
+import { errorMap } from '../../messages/codeMessages.js';
+import { validateWeightCapture, validateName, validateNonNegativeNumber, validatePositiveNumber, validatePositiveNumberOptional, validateUUID } from '../fields/fieldsValidator.js';
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
 const wasteStockDataValidation = [
@@ -22,16 +24,19 @@ const wasteSecondaryDataValidation = [
 ];
 
 export const wasteEditValidation = [
+    ...['weightKg', 'coneWeightKg', 'totalWeightKg', 'sourceMaterialId'].map(field => body(field).not().exists({ values: 'undefined' }).withMessage(errorMap.weightKg.READ_ONLY)),
     validateName({ maxLength: 200 }),
     ...wasteSecondaryDataValidation
 ];
 
 export const wasteValidation = [
+    body('weightKg').not().exists({ values: 'undefined' }).withMessage(errorMap.weightKg.CALCULATED),
+    ...['coneWeightKg', 'totalWeightKg'].map(fieldName => validateWeightCapture({ fieldName })),
     validateName({ maxLength: 200 }),
     validateUUID('materialId'),
     validateUUID('supplierId'),
-    validatePositiveNumber('base'),
-    validatePositiveNumber('height'),
+    validatePositiveNumberOptional('base'),
+    validatePositiveNumberOptional('height'),
     ...wasteSecondaryDataValidation,
     ...wasteStockDataValidation
 ];

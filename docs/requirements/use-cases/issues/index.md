@@ -1,6 +1,6 @@
 # Casos de uso — SAL
 
-### Grupo funcional SAL — Salidas de material y de merma
+### Grupo funcional SAL — Salidas de material, merma y consumible
 
 | Identificador | Caso de uso específico | Evidencia funcional |
 | --- | --- | --- |
@@ -18,18 +18,17 @@
 | `CU-SAL-12` | Surtir merma | Descuento de existencia y registro de movimiento. |
 | `CU-SAL-13` | Devolver merma surtida | Reintegro de existencia y movimiento inverso. |
 | `CU-SAL-14` | Generar reporte de salidas de merma | Archivo Excel con filtros, columnas y cálculos propios del reporte. |
+| `CU-SAL-15` | Consultar salidas de consumible | Consulta sin modificar existencias. |
+| `CU-SAL-16` | Crear salida de consumible | Creación pendiente sin descontar existencias. |
+| `CU-SAL-17` | Editar encabezado de salida de consumible | Edición de los campos admitidos del encabezado. |
+| `CU-SAL-18` | Editar detalles de consumible de una salida | Actualización de detalles todavía modificables. |
+| `CU-SAL-19` | Surtir consumible | Descuento de existencia y registro de movimiento. |
+| `CU-SAL-20` | Devolver consumible surtido | Reintegro de existencia y movimiento inverso. |
+| `CU-SAL-21` | Generar reporte de salidas de consumible | Archivo Excel limitado al contexto de consumibles. |
 
-La evidencia orienta la búsqueda, pero no impone una organización por casos de uso
-dentro de `src`: la aplicación está organizada por capas y dominio. Las pruebas
-unitarias siguen la ubicación paralela al artefacto y las integraciones CRUD permanecen
-bajo `tests/integration/controllers`.
-
-
-## Fichas específicas
-
-### Grupo funcional SAL — Salidas de material y de merma
-
-Cada ficha representa una sola acción sobre una sola entidad. Los elementos compartidos se reutilizan en la implementación, pero no fusionan objetivos del actor.
+Registrar una salida expresa lo solicitado y no descuenta existencias. Surtir registra
+la entrega; devolver repone lo recibido de vuelta y conserva la historia de la salida.
+Los efectos corresponden al recurso y proveedor que identifica cada detalle.
 
 ## Fichas por caso de uso
 
@@ -47,3 +46,10 @@ Cada ficha representa una sola acción sobre una sola entidad. Los elementos com
 - [`CU-SAL-12` — Surtir merma](cu-sal-12.md)
 - [`CU-SAL-13` — Devolver merma surtida](cu-sal-13.md)
 - [`CU-SAL-14` — Generar reporte de salidas de merma](cu-sal-14.md)
+- [`CU-SAL-15` — Consultar salidas de consumible](cu-sal-15.md)
+- [`CU-SAL-16` — Crear salida de consumible](cu-sal-16.md)
+- [`CU-SAL-17` — Editar encabezado de salida de consumible](cu-sal-17.md)
+- [`CU-SAL-18` — Editar detalles de consumible de una salida](cu-sal-18.md)
+- [`CU-SAL-19` — Surtir consumible](cu-sal-19.md)
+- [`CU-SAL-20` — Devolver consumible surtido](cu-sal-20.md)
+- [`CU-SAL-21` — Generar reporte de salidas de consumible](cu-sal-21.md)

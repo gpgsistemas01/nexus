@@ -1,7 +1,9 @@
 # 1. Propósito y alcance
 
+Este documento permite a responsables de negocio, personal de almacén, Sistemas y Dirección acordar qué resultados debe ofrecer Nexus y cómo decidir si se cumplen. Los nombres técnicos se mantienen en la evidencia; una implementación existente no equivale a aceptación del negocio.
+
 Este documento, junto con las [fichas de casos de uso](../use-cases/index.md), define una
-línea base revisable de capacidades, reglas y atributos de calidad sin
+propuesta versionada y revisable de capacidades, reglas y atributos de calidad sin
 confundir tres conceptos diferentes:
 
 - **requisito:** comportamiento o restricción que el producto debe cumplir;
@@ -10,19 +12,21 @@ confundir tres conceptos diferentes:
 
 El alcance actual comprende autenticación, administración de identidades, catálogos,
 compras, inventarios separados de materiales, consumibles y mermas, salidas, devoluciones,
-movimientos y reportes. El contrato OpenAPI de las operaciones registradas forma parte
-de la línea base; una interfaz completa de requisiciones y los objetivos de nivel de
-servicio permanecen fuera de la línea base implementada.
+movimientos y reportes. Las requisiciones permanecen fuera del alcance vigente; la administración de proyectos
+está modelada y los objetivos de nivel de servicio siguen propuestos, sin valores acordados.
 
 Este documento no sustituye historias de usuario, diseños de pantalla ni el contrato
-HTTP. El [contrato API](../../architecture/openapi/api-contract.md), el
-[mapa generado](../../architecture/views/development/code-map.md) y el esquema Prisma aportan esos otros niveles
-de detalle. Su estructura adopta selectivamente las prácticas de ingeniería de
+HTTP. El [contrato API](../../architecture/openapi/api-contract.md) describe los intercambios; el
+[mapa generado](../../architecture/views/development/code-map.md) localiza realizaciones técnicas
+y Prisma representa los datos. Ninguno de ellos sustituye el acuerdo del requisito. Su estructura adopta selectivamente las prácticas de ingeniería de
 requisitos descritas en el [criterio sobre normas documentales](../../governance/documentation-standards/index.md),
 sin declarar conformidad o certificación ISO.
 
 Los objetivos de actor, con participantes, precondiciones, garantías, pasos, flujos
 alternativos y excepciones, se describen por familias en el
 [catálogo de casos de uso](../use-cases/index.md). Los
-requisitos de este archivo conservan los criterios verificables y la evidencia sin
+requisitos de esta colección conservan los criterios verificables y la evidencia sin
 duplicar allí la narrativa de interacción.
+
+El paquete está **En revisión**. Su contenido no constituye una línea base aprobada
+hasta registrar la aceptación funcional conforme al gobierno de versionado.

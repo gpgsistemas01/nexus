@@ -1,6 +1,9 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { getSequenceCodeReferenceFailures } from './architectureDiagramUtils.js';
+import { getExpressRouteDeclarations } from './expressRouteUtils.js';
+import { getDiagramFileCoverageErrors, getSequenceLifelineErrors, getSequenceParticipantSources, getSequenceStructureErrors } from './sequenceDiagramUtils.js';
 
 const ROOT = process.cwd();
 const OUTPUTS = {
@@ -103,7 +106,8 @@ const EXTERNAL_SEQUENCE_PARTICIPANTS = new Set([
     'Cliente HTTP / web',
     'Navegador',
     'Prisma / PostgreSQL',
-    'Respuesta Express'
+    'Respuesta Express',
+    'Runtime Express'
 ]);
 const SOURCE_PATH_PATTERN = /src\/[A-Za-z0-9_./-]+\.(?:ejs|js)/g;
 
@@ -119,15 +123,19 @@ const validateUseCaseDiagramCoverage = async () => {
         [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
             .map((match) => [match[1], match[2]])
     );
+    const permittedActors = new Map();
     const expectedActors = new Map(
         [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — .+\r?\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)]
             .map(([, id, body]) => {
                 const declaredActor = body.match(/^\| Actor \| (.*?) \|$/m)?.[1] ?? '';
-                const actor = declaredActor.startsWith('Usuario registrado')
-                    ? 'Usuario registrado'
-                    : declaredActor.includes('Personal de almacén')
-                        ? 'Personal de almacén'
-                        : 'Administrador del sistema';
+                const actors = [
+                    ['Usuario registrado', 'user'],
+                    ['Personal de almacén', 'warehouse'],
+                    ['Administrador del sistema', 'admin']
+                ].filter(([label]) => declaredActor.includes(label)).map(([, alias]) => alias);
+                permittedActors.set(id, actors);
+                const actor = actors[0] === 'user' ? 'Usuario registrado'
+                    : actors[0] === 'warehouse' ? 'Personal de almacén' : 'Administrador del sistema';
                 return [id, actor];
             })
     );
@@ -164,21 +172,72 @@ const validateUseCaseDiagramCoverage = async () => {
         }
         const actors = new Set([...diagram.matchAll(/^\s*actor\s+(\w+)\(/gm)].map(match => match[1]));
         const cases = [...diagram.matchAll(/^\s*(\w+)\("(CU-[A-Z]+-\d+) (.+)"\)/gm)];
-        diagramCaseIds.push(...cases.filter(([, , , title]) => !title.includes(' · referencia a '))
+        // Los casos que extienden otro objetivo se definen en su grupo propietario;
+        // aquí se reconocen por la relación, sin añadir metadatos a su nombre visible.
+        const extensionAliases = new Set([...diagram.matchAll(/^\s*(\w+) \.\.>:extend \w+$/gm)]
+            .map(([, alias]) => alias));
+        diagramCaseIds.push(...cases.filter(([, alias]) => !extensionAliases.has(alias))
             .map(([, , id]) => id));
-        for (const [, alias, id, title] of cases) {
-            const normalizedTitle = title.replace(/ · referencia a (?:CAT|ALM)$/, '');
-            if (normalizedTitle !== expectedTitles.get(id)) {
-                failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
-            }
-            const actor = expectedActors.get(id) === 'Usuario registrado' ? 'user'
-                : expectedActors.get(id) === 'Personal de almacén' ? 'warehouse' : 'admin';
-            if (!actors.has(actor) || !new RegExp(`^\\s*${actor} -- ${alias}$`, 'm').test(diagram)) {
-                failures.push(`casos de uso: ${id} no se asocia con su actor normativo`);
+        const caseAliases = new Set(cases.map(([, alias]) => alias));
+        const queryAliases = new Set(cases.filter(([, , , title]) => title.startsWith('Consultar '))
+            .map(([, alias]) => alias));
+        const associations = [...diagram.matchAll(/^\s*(\w+) -{2,} (\w+)$/gm)]
+            .map(([, from, to]) => [from, to]);
+        for (const [from, to] of associations) {
+            if (!caseAliases.has(to) || (!actors.has(from) && !queryAliases.has(from))) {
+                failures.push(`casos de uso: enlace ${from} -- ${to} sin actor o consulta de origen válidos`);
             }
         }
-        if (/^\s*uc\w+\s+--\s+uc\w+/m.test(diagram)) {
-            failures.push('casos de uso: la navegación entre objetivos no es una asociación UML');
+        const generalizations = [...diagram.matchAll(/^\s*(\w+) --\|> (\w+)$/gm)]
+            .map(([, specialized, general]) => [specialized, general]);
+        for (const [specialized, general] of generalizations) {
+            if (!actors.has(specialized) || !actors.has(general) || specialized === general) {
+                failures.push(`casos de uso: generalización ${specialized} --|> ${general} entre actores inválidos`);
+            }
+        }
+        // Los enlaces desde Consulta organizan operaciones; no conceden permisos.
+        // La participación normativa se comprueba desde el actor de cada ficha.
+        const reachableByActor = new Map([...actors].map((actor) => {
+            const reachable = new Set([actor]);
+            const pending = [actor];
+            for (let index = 0; index < pending.length; index += 1) {
+                for (const [from, to] of [...associations, ...generalizations]) {
+                    if (from !== pending[index] || reachable.has(to)) continue;
+                    reachable.add(to);
+                    pending.push(to);
+                }
+            }
+            return [actor, reachable];
+        }));
+        for (const [specialized, general] of generalizations) {
+            for (const [from, to] of associations) {
+                if (from === specialized && reachableByActor.get(general)?.has(to)) {
+                    failures.push(`casos de uso: ${specialized} repite el enlace a ${to} que ya hereda de ${general}`);
+                }
+            }
+        }
+        for (const [, alias, id, title] of cases) {
+            if (/^(?:Crear|Registrar) /.test(title)) {
+                for (const [actor, target] of associations.filter(([from]) => actors.has(from))) {
+                    if (target === alias && associations.some(([from, to]) => (
+                        queryAliases.has(from) && to === alias && !extensionAliases.has(alias)
+                    ))) {
+                        failures.push(`casos de uso: ${id} repite la asociación de ${actor} que en esta vista ya se muestra desde Consulta`);
+                    }
+                }
+            }
+            if (title !== expectedTitles.get(id)) {
+                failures.push(`casos de uso: ${id} no conserva su nombre normativo`);
+            }
+            const normativeActors = permittedActors.get(id) ?? [];
+            const visibleActors = normativeActors.filter(actor => actors.has(actor));
+            if (!visibleActors.length || visibleActors.some(actor => !reachableByActor.get(actor)?.has(alias))) {
+                failures.push(`casos de uso: ${id} no se asocia con su actor normativo directamente, por herencia o desde Consulta`);
+            }
+            if (normativeActors.length === 1 && normativeActors[0] === 'admin'
+                && reachableByActor.get('warehouse')?.has(alias)) {
+                failures.push(`casos de uso: ${id} es exclusivo del administrador y no debe enlazarse desde Personal de almacén ni sus consultas`);
+            }
         }
     }
     validateIds('diagramas de casos de uso', diagramCaseIds);
@@ -208,16 +267,42 @@ const validateUseCaseDiagramCoverage = async () => {
             if (title !== expectedTitles.get(id)) {
                 failures.push(`diagramas ${side}: ${id} no conserva el nombre normativo (${expectedTitles.get(id)})`);
             }
-            if ((body.match(/^```mermaid$/gm) ?? []).length !== 1) {
-                failures.push(`diagramas ${side}: ${id} debe contener exactamente un bloque Mermaid`);
+            if (!(body.match(/^```mermaid$/gm) ?? []).length) {
+                failures.push(`diagramas ${side}: ${id} debe contener al menos un bloque Mermaid`);
             }
             if (!body.includes('**Patrones:**')) {
                 failures.push(`diagramas ${side}: ${id} no referencia sus patrones aplicados`);
             }
-            if ((body.match(/^sequenceDiagram$/gm) ?? []).length !== 1) {
-                failures.push(`diagramas ${side}: ${id} debe contener exactamente una secuencia de código`);
+            if (!(body.match(/^sequenceDiagram$/gm) ?? []).length) {
+                failures.push(`diagramas ${side}: ${id} debe contener una secuencia de código o sus niveles complementarios`);
             }
-            const sequence = getMermaidBlocks(body)[0] ?? '';
+            const sequences = getMermaidBlocks(body).filter((block) => block.startsWith('sequenceDiagram\n'));
+            for (const error of getDiagramFileCoverageErrors(body, getMermaidBlocks(body), sourceContents)) {
+                failures.push(`diagramas ${side}: ${id}: ${error}`);
+            }
+            const detailLevels = (body.match(/^## Detalle de /gm) ?? []).length;
+            const hasComplementaryLevels = (body.includes('## Secuencia de implementación')
+                && sequences.length === 1 + detailLevels)
+                || (side === 'backend'
+                ? sequences.length === 2 + detailLevels
+                    && body.includes('## Secuencia de entrada y coordinación')
+                    && body.includes('## Colaboración interna del dominio')
+                : sequences.length === 2 + detailLevels
+                    + Number(body.includes('## Preparación de la interfaz'))
+                    + Number(body.includes('## Envío y resultado de la interfaz'))
+                    && body.includes('## Coordinación de la interfaz')
+                    && body.includes('## Colaboración de aplicación y transporte'));
+            if (sequences.length > 1 && !hasComplementaryLevels) {
+                failures.push(`diagramas ${side}: ${id} debe identificar los niveles complementarios del mismo caso`);
+            }
+            const sequence = sequences.join('\n');
+            const participantSourceMap = getSequenceParticipantSources(body, sequence);
+            for (const error of sequences.flatMap(getSequenceStructureErrors)) {
+                failures.push(`diagramas ${side}: ${id}: ${error}`);
+            }
+            for (const error of sequences.flatMap((block) => getSequenceLifelineErrors(body, block, EXTERNAL_SEQUENCE_PARTICIPANTS))) {
+                failures.push(`diagramas ${side}: ${id}: ${error}`);
+            }
             const visualActors = [...sequence.matchAll(/^\s*actor\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
             if (side === 'frontend') {
                 if (visualActors.length !== 1 || visualActors[0]?.[2] !== expectedActors.get(id)) {
@@ -258,19 +343,22 @@ const validateUseCaseDiagramCoverage = async () => {
             if (sequence.includes('Variables de frontera:')) {
                 failures.push(`diagramas ${side}: ${id} transcribe variables de frontera que pertenecen al código enlazado`);
             }
-            if (!/^\s*alt\s+/m.test(sequence)
-                || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback)\b/i.test(sequence)) {
-                failures.push(`diagramas ${side}: ${id} no representa el error devuelto con una respuesta discontinua dentro de alt/else`);
+            if (!/^\s*(?:alt|break)\s+/m.test(sequence)
+                || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback|INVALID_AUTH|FORBIDDEN)\b/i.test(sequence)) {
+                failures.push(`diagramas ${side}: ${id} no representa el error devuelto con una respuesta discontinua dentro de alt/else o break`);
             }
-            const tracedParticipants = sequence.match(/participant .* as .*src\//g) ?? [];
+            const tracedParticipants = [...participantSourceMap.values()].filter((paths) => paths.length);
             if (tracedParticipants.length < 2) {
                 failures.push(`diagramas ${side}: ${id} no traza al menos dos participantes a archivos src/`);
             }
             if (side === 'frontend' && sequence.includes('/api/')
-                && !sequence.includes('participant HTTP as src/public/js/services/axiosInstanceApi.js')) {
+                && !participantSourceMap.get('HTTP')?.includes('src/public/js/services/axiosInstanceApi.js')) {
                 failures.push(`diagramas frontend: ${id} no identifica el cliente HTTP compartido axiosInstanceApi.js`);
             }
-            if (side === 'frontend' && /^\s*participant .*src\/public\/js\/application\/.*<br\/>src\/public\/js\/services\//m.test(sequence)) {
+            if (side === 'frontend' && [...participantSourceMap.values()].some((paths) => (
+                paths.some((sourcePath) => sourcePath.startsWith('src/public/js/application/'))
+                && paths.some((sourcePath) => sourcePath.startsWith('src/public/js/services/'))
+            ))) {
                 failures.push(`diagramas frontend: ${id} agrupa aplicación y request sin identificar sus archivos como participantes separados`);
             }
             if (new RegExp(`(?:BE|FE)-P\\d{2}`).test(sequence)) {
@@ -290,7 +378,7 @@ const validateUseCaseDiagramCoverage = async () => {
             }
             const technicalAliases = new Set(
                 [...sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)]
-                    .filter(([, , label]) => label.includes('src/') || label === 'Prisma / PostgreSQL')
+                    .filter(([, alias, label]) => participantSourceMap.get(alias)?.length || label === 'Prisma / PostgreSQL')
                     .map(([, alias]) => alias)
             );
             const untypedMethodResponses = messages.filter((line) => {
@@ -330,9 +418,9 @@ const validateUseCaseDiagramCoverage = async () => {
                 if (label.includes('«object»')) {
                     failures.push(`diagramas ${side}: ${id} representa ${alias} sólo con el estereotipo «object» en vez de una instancia visual`);
                 }
-                const paths = label.match(SOURCE_PATH_PATTERN) ?? [];
-                if (label.includes('src/dtos/') && !/^[A-Za-z_$][\w$]*Dto: Object<br\/>src\/dtos\//.test(label)) {
-                    failures.push(`diagramas ${side}: ${id} no representa ${alias} con nombre de instancia, tipo Object y archivo src/dtos/`);
+                const paths = participantSourceMap.get(alias) ?? [];
+                if (paths.some((sourcePath) => sourcePath.startsWith('src/dtos/')) && !label.startsWith('DTO funcional') && !/^[A-Za-z_$][\w$]*Dto: Object(?:<br\/>src\/dtos\/)?/.test(label)) {
+                    failures.push(`diagramas ${side}: ${id} no representa ${alias} como DTO funcional o instancia de datos identificada y trazable`);
                 }
                 if (!paths.length && !EXTERNAL_SEQUENCE_PARTICIPANTS.has(label)) {
                     failures.push(`diagramas ${side}: ${id} identifica ${alias} sin archivo src/ ni límite externo reconocido (${label})`);
@@ -344,8 +432,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 }
             }
             if (side === 'backend') {
-                const routePath = [...sequence.matchAll(SOURCE_PATH_PATTERN)]
-                    .map((match) => match[0])
+                const routePath = [...participantSourceMap.values()].flat()
                     .find((sourcePath) => sourcePath.startsWith('src/routes/'));
                 const controllerCall = sequence.match(/^\s*(?:Route|Router)->>Controller:\s*([A-Za-z_$][\w$]*)\(/m)?.[1];
                 const routeSource = sourceContents.get(routePath);
@@ -364,7 +451,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 }
             }
             if (side === 'frontend') {
-                const participantSources = participants.flatMap(([, , label]) => label.match(SOURCE_PATH_PATTERN) ?? []);
+                const participantSources = [...participantSourceMap.values()].flat();
                 const ownsFormValidation = participantSources.some((sourcePath) => (
                     sourceContents.get(sourcePath)?.includes('validateFields(')
                 ));
@@ -376,12 +463,30 @@ const validateUseCaseDiagramCoverage = async () => {
     }
 
 
+    const registeredApiRoutes = await getRoutes('api');
     const documentationFiles = (await walk(path.join(ROOT, 'docs')))
         .filter((file) => file.endsWith('.md'));
     for (const file of documentationFiles) {
         const name = toPosix(path.relative(ROOT, file));
         const source = await readFile(file, 'utf8');
         for (const block of getMermaidBlocks(source).filter((body) => body.startsWith('sequenceDiagram\n'))) {
+            if (name.startsWith('docs/architecture/')) {
+                failures.push(...getSequenceCodeReferenceFailures({
+                    body: source, sequence: block, sourceContents, routes: registeredApiRoutes
+                }).map(failure => `${name}: ${failure}`));
+            }
+            if (name.startsWith('docs/architecture/views/processes/')
+                && !name.includes('-code-sequences/')) {
+                for (const error of [
+                    ...getSequenceStructureErrors(block),
+                    ...getSequenceLifelineErrors(source, block, EXTERNAL_SEQUENCE_PARTICIPANTS)
+                ]) failures.push(`${name}: ${error}`);
+                for (const paths of getSequenceParticipantSources(source, block).values()) {
+                    for (const sourcePath of paths) {
+                        if (!sourceFiles.has(sourcePath)) failures.push(`${name}: archivo inexistente en línea de vida (${sourcePath})`);
+                    }
+                }
+            }
             if (block.split('\n').some((line) => line.includes(';'))) {
                 failures.push(`${name}: una secuencia Mermaid contiene un punto y coma no compatible con GitHub`);
             }
@@ -421,10 +526,10 @@ const getRoutes = async (kind) => {
     const routes = [];
     for (const { mount, file } of mounts) {
         const source = await readFile(file, 'utf8');
-        for (const match of source.matchAll(/router\.(get|post|put|patch|delete)\(\s*['`]([^'`]+)['`]/g)) {
+        for (const { method, route } of getExpressRouteDeclarations(source)) {
             routes.push({
-                method: match[1].toUpperCase(),
-                route: joinRoute(mount, match[2]),
+                method,
+                route: joinRoute(mount, route),
                 file: toPosix(path.relative(ROOT, file))
             });
         }
@@ -617,7 +722,7 @@ const renderEntity = (name, model) => [
 
 const renderDatabaseRelation = (source, relation) => {
     const { target, optional, unique, identifying, foreignKeys, references } = relation;
-    const mapping = foreignKeys.map((key, index) => `${key} = ${references[index]}`).join(', ');
+    const mapping = foreignKeys.map((key, index) => `${key} = ${target}.${references[index]}`).join(', ');
     return `    ${target} ${optional ? 'o|' : '||'}${identifying ? '--' : '..'}${unique ? 'o|' : 'o{'} ${source} : "${mapping}"`;
 };
 
@@ -694,12 +799,27 @@ const generateDatabaseSchema = async () => {
     ));
     const diagrams = DATABASE_AREAS.flatMap(([title, names]) => {
         const sections = [];
-        for (let offset = 0; offset < names.length; offset += 3) {
-            const subset = names.slice(offset, offset + 3);
+        const groups = [];
+        let subset = [];
+        let relationCount = 0;
+        for (const name of names) {
+            const count = models.get(name).relations.length;
+            if (subset.length && (subset.length === 3 || relationCount + count > 6)) {
+                groups.push(subset);
+                subset = [];
+                relationCount = 0;
+            }
+            subset.push(name);
+            relationCount += count;
+        }
+        if (subset.length) groups.push(subset);
+        for (const subset of groups) {
             const selected = new Set(subset);
-            const entities = subset.map((name) => renderEntity(name, models.get(name))).join('\n');
+            const entities = subset.map((name) => renderEntity(name, {
+                fields: models.get(name).fields.filter((field) => field.keys)
+            })).join('\n');
             const visibleRelations = allRelations
-                .filter(({ source, target }) => selected.has(source) || selected.has(target));
+                .filter(({ source }) => selected.has(source));
             const externalNames = [...new Set(visibleRelations.flatMap(({ source, target }) => [source, target]))]
                 .filter((name) => !selected.has(name));
             const externalEntities = externalNames.map((name) => {
@@ -708,7 +828,7 @@ const generateDatabaseSchema = async () => {
                     ...(relation.target === name ? relation.references : [])
                 ]));
                 const model = models.get(name);
-                return renderEntity(name, { fields: model.fields.filter((field) => keys.has(field.name)) });
+                return renderEntity(name, { fields: model.fields.filter((field) => keys.has(field.name) || field.keys.split(',').includes('PK')) });
             }).join('\n');
             const relations = visibleRelations.map(renderRelation);
             sections.push(`### ${subset.join(' · ')}\n\n\`\`\`mermaid\nerDiagram\n    direction LR\n${entities}\n${externalEntities}\n${relations.join('\n')}\n\`\`\``);
@@ -723,27 +843,21 @@ const generateDatabaseSchema = async () => {
     return `<!-- Archivo generado por scripts/generateArchitectureDocs.js. No editar manualmente. -->
 # Diagramas de la base de datos
 
-Estos diagramas representan el modelo relacional persistente con notación ER de pata
-de cuervo. Se generan desde los modelos y relaciones de
-\`prisma/schema.prisma\`. Se separan por área para que puedan leerse y revisarse en
-GitHub. Los atributos se distribuyen en figuras de hasta tres modelos. Cada figura
-incluye sus relaciones entrantes y salientes; los modelos externos muestran sólo las
-claves que intervienen en esas conexiones y conservan sus atributos completos en su
-figura propietaria. Cada conexión expresa FK = clave referenciada entre los modelos de sus extremos; la
-tabla final detalla los nombres completos. Los nombres de
-relación del ORM no son columnas adicionales. Todas las correspondencias de claves se
-reúnen en una tabla final para evitar otra colección de diagramas sin atributos.
+Estos diagramas ER de pata de cuervo se generan desde \`prisma/schema.prisma\`.
+Cada figura muestra las claves de hasta tres modelos y sus relaciones salientes.
+Cada FK aparece una vez, en la figura de su tabla dependiente; la tabla final permite
+consultar también las relaciones entrantes. Los modelos referenciados conservan su
+PK completa y las columnas utilizadas en esas conexiones. El [diccionario](data-dictionary.md) contiene
+los demás atributos, tipos y valores predeterminados.
 
-La marca \`PK\` identifica claves primarias, \`FK\` claves foráneas y \`UK\` campos
-únicos. Los campos compuestos y demás restricciones siguen teniendo como fuente de
-verdad el esquema Prisma y sus migraciones. Para consultar obligatoriedad, valores
-predeterminados y tipos de cada campo, usa el
-[diccionario técnico](data-dictionary.md).
+Las líneas unen tablas, no filas de atributos. La etiqueta identifica
+\`FK = TablaReferenciada.clave\`; la tabla final muestra ambos nombres completos.
+\`PK\` es clave primaria, \`FK\` clave foránea y \`UK\` unicidad individual. Las claves
+compuestas y demás restricciones se comprueban en Prisma y sus migraciones.
 
-Las cardinalidades distinguen relaciones uno a muchos de relaciones uno a uno cuando
-la FK es única. El extremo del destino indica si la referencia es obligatoria
-(\`||\`) u opcional (\`o|\`); el extremo del modelo que contiene la FK indica cero o
-muchos (\`o{\`) o cero o uno (\`o|\`).
+En el extremo referenciado, \`||\` indica uno obligatorio y \`o|\` cero o uno.
+En el dependiente, \`o{\` indica cero o muchos y \`o|\` cero o uno cuando la FK es
+única. Las propiedades de relación del ORM no son columnas adicionales.
 
 Modelos sin relaciones FK entrantes ni salientes en Prisma: ${isolatedModels.map((name) => `\`${name}\``).join(', ') || 'ninguno'}.
 
@@ -760,10 +874,9 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | --- | --- | --- | --- |
 ${crossAreaRelations.join('\n')}
 
-Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Cada asociación
-usa el nombre del campo que declara la FK en Prisma; las colecciones inversas no
-generan una segunda asociación. La dirección de lectura no implica propiedad del
-proceso de negocio.
+Consulta el esquema Prisma para las reglas \`onDelete\`/\`onUpdate\`. Las etiquetas muestran los campos FK y su destino; las colecciones inversas no
+generan una segunda asociación. La posición de una línea no cambia la
+correspondencia de claves.
 `;
 };
 

@@ -8,6 +8,9 @@ La revisión documental encontró y trató estas brechas:
 | Requisitos extensos que mezclan obligación, diseño y numerosos escenarios. | Se adoptó una obligación por operación observable en todos los paquetes; los criterios `CA-*` conservan variantes del mismo resultado. | Revisar la granularidad con la misma regla cuando cambie cualquier requisito, sin crear una obligación por campo. |
 | Evidencia mezclada con la formulación normativa. | La evidencia permanece en columna propia y el mapa generado conserva rutas/importaciones. | Rechazar nuevas filas que describan archivos dentro de la obligación. |
 | Calidad sin valores medidos. | Rendimiento y disponibilidad permanecen propuestos. | Definir propietario, línea base, umbral y prueba antes de marcarlos implementados. |
+| Visión con exclusiones obsoletas y detalle de implementación. | Se alineó el alcance de los seis catálogos auxiliares; se expresaron objetivos, interesados, dependencias y calidad desde el negocio. | Resolver las decisiones pendientes de visión sin atribuir aceptación ni certificación ISO. |
+| Vocabulario incompleto o confundido entre persona y cuenta. | Se distinguieron responsabilidad y acceso; se incorporaron conceptos del dominio, estados, trazabilidad y alcance. | Revisar términos al cambiar una regla; no duplicar el diccionario de campos técnicos. |
+| Efectos extensos o dependientes de implementación. | Se resumieron con nombres de negocio y cambios de cantidad en una tabla compartida por las máquinas de estado. | Conservar guardas y enlaces a las reglas normativas sin introducir código en el diagrama. |
 | Ausencia de responsable formal de aprobación. | El estado refleja evidencia técnica, no aceptación funcional. | Registrar responsable y aprobación en la incidencia o solicitud de cambio. |
 
 ### Auditoría de granularidad por tipo
@@ -22,3 +25,9 @@ La revisión documental encontró y trató estas brechas:
 La revisión no divide listas de atributos inseparables de una misma identidad ni los
 participantes de una misma transacción atómica. Esos detalles permanecen como condición
 o criterio de aceptación del requisito propietario.
+
+### Revisión documental del 10 de octubre de 2026
+
+Se corrigieron las selecciones por perfil, las referencias de capturas por área y las contradicciones de acceso a clientes y proveedores. Se añadió una inducción guiada a los procedimientos, una ruta de incorporación para desarrolladores y la separación entre resultados de negocio y evidencia técnica en los requisitos de datos y calidad. Gobernanza incorpora responsables por función, aceptación, control de cambios y decisiones pendientes.
+
+Los manuales permanecen **En revisión**. La validación de fuentes enumera las capturas de cada perfil que todavía deben generarse y revisarse. Las imágenes históricas comunes no acreditan por sí solas el perfil ni la versión. Los responsables nominales, aceptación de negocio y compromisos de servicio continúan pendientes de designación o acuerdo.

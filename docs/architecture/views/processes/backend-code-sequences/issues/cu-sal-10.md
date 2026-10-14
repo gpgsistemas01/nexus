@@ -3,45 +3,72 @@
 
 **Patrones:** `BE-P01`, `BE-P04`.
 
+## Participantes y trazabilidad
+
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
+
+| Alias | Rol visual | Archivo de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
+| `IssueDto` | control | [`wasteIssueDTO.js`](../../../../../../src/dtos/wasteIssueDTO.js) |
+| `Domain` | control | [`wasteIssueService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ValidationRules` | control | [`wasteIssueValidations.js`](../../../../../../src/validators/forms/wasteIssueValidations.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/warehouse/wasteIssueApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/wasteIssueValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/warehouse/wasteIssueController.js
-    participant IssueDto@{ "type": "entity" } as wasteIssueDto: Object<br/>src/dtos/wasteIssueDTO.js
-    participant Domain@{ "type": "control" } as src/services/warehouse/wasteIssues/wasteIssueService.js
-    participant ErrorHandler as src/app.js
+    participant Route@{ "type": "boundary" } as wasteIssueApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as wasteIssueValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as wasteIssueController.js
+    participant IssueDto@{ "type": "control" } as DTO funcional<br/>wasteIssueDTO.js
+    participant Domain@{ "type": "control" } as wasteIssueService.js
+    participant ErrorHandler@{ "type": "control" } as app.js
 
     Client->>Route: PATCH /api/warehouse/waste-issues/:id/header
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: wasteIssueHeaderValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_MANAGE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else wasteIssueHeaderValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.WASTE_ISSUES_MANAGE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: editWasteIssueHeader(req, res)
-        activate Controller
-        Controller->>IssueDto: createWasteIssueHeaderDtoForEdit(req.body)
-        IssueDto-->>Controller: createWasteIssueHeaderDtoForEdit(): Object (wasteIssueDto)
-        Controller->>Domain: wasteIssueService.updateWasteIssueHeader({ id: req.params.id, wasteIssueDto }) aplica reglas del encabezado
-        activate Domain
-        alt Servicio resuelto
-            Domain-->>Controller: wasteIssueService.updateWasteIssueHeader(): Promise[WasteIssue]
-            Controller-->>Client: HTTP 200 { wasteIssue, code }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>ValidationRules: wasteIssueHeaderValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.WASTE_ISSUES_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: editWasteIssueHeader(req, res)
+    activate Controller
+    Controller->>IssueDto: createWasteIssueHeaderDtoForEdit(req.body)
+    activate IssueDto
+    IssueDto-->>Controller: createWasteIssueHeaderDtoForEdit(): Object (wasteIssueDto)
+    deactivate IssueDto
+    Controller->>Domain: wasteIssueService.updateWasteIssueHeader({ id: req.params.id, wasteIssueDto }) aplica reglas del encabezado
+    activate Domain
+    alt Servicio resuelto
+        Domain-->>Controller: wasteIssueService.updateWasteIssueHeader(): Promise[WasteIssue]
+        Controller-->>Client: HTTP 200 { wasteIssue, code }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```
 

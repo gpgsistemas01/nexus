@@ -1,20 +1,46 @@
 # Documentación técnica del backend
 
-Referencia del servidor organizada por responsabilidades de diseño implementadas. Su
-propósito es explicar límites, contratos internos, reglas, transacciones, errores y
-colaboraciones que no se comprenden con una lista de archivos.
+Esta referencia explica la estructura de código de cada módulo: archivos propietarios,
+imports, dependencias compartidas y contratos internos. Los mapas muestran módulos ES;
+las flechas son dependencias entre grupos de archivos, no pasos de un CRUD.
 
-Esta sección **no mantiene otra matriz de trazabilidad por caso**. La correspondencia
-entre requisito, caso, evidencia técnica y prueba pertenece a la
-[vista de componentes](../../logical/01-components-and-reuse.md); la ruta y los símbolos se
-consultan en el [mapa generado](../code-map.md), y el recorrido concreto de cada `CU-*`
-en las [secuencias backend](../../processes/backend-code-sequences/index.md). Tampoco
-repite el contrato HTTP procesable, que pertenece a OpenAPI.
+La [organización general](../code-structure/index.md) ubica esta implementación en
+el sistema. Esta referencia posee el detalle de cada módulo; [patrones](../design-and-construction-patterns/index.md)
+explica las decisiones compartidas y [reutilización](../reuse-and-refactoring/index.md)
+los contratos de sus núcleos. No se replican sus diagramas en cada recurso.
 
-## Capítulos
+## Referencias transversales
 
-1. [1. Catálogo de componentes](01-catalog-complete-of-records-backend.md):
-   responsabilidades, entradas, efectos y límites transaccionales por capacidad.
-2. [2. Diagramas técnicos complementarios](02-views-technical-applied.md): sólo actividades,
-   estados o coordinaciones que agregan una decisión no visible en el mapa o las
-   secuencias por caso.
+1. [Responsabilidades y contratos transversales](01-catalog-complete-of-records-backend.md).
+2. [Convenciones para leer los mapas](02-code-map-reading-guide.md).
+3. [Código compartido y cobertura del transporte](03-shared-code-and-coverage.md).
+
+## Módulos
+
+Esta es la única lista de navegación de módulos de la colección. Cada enlace lleva
+al mapa, los archivos, operaciones, contratos y variantes del recurso.
+
+| Módulo | Figura |
+| --- | --- |
+| [Autenticación](04-authentication-code.md) | `DIA-BE-MOD-AUT-001` |
+| [Personas](05-persons-code.md) | `DIA-BE-MOD-PER-001` |
+| [Usuarios](06-users-code.md) | `DIA-BE-MOD-USR-001` |
+| [Clientes](07-clients-code.md) | `DIA-BE-MOD-CLI-001` |
+| [Proveedores](08-suppliers-code.md) | `DIA-BE-MOD-SUP-001` |
+| [Materiales](09-materials-code.md) | `DIA-BE-MOD-MAT-001` |
+| [Consumibles](10-consumables-code.md) | `DIA-BE-MOD-CON-001` |
+| [Mermas](11-wastes-code.md) | `DIA-BE-MOD-WAS-001` |
+| [Entradas: materiales y consumibles](12-goods-receipts-code.md) | `DIA-BE-MOD-REC-001` |
+| [Salidas: materiales y consumibles](13-goods-issues-code.md) | `DIA-BE-MOD-ISS-001` |
+| [Salidas de mermas](14-waste-issues-code.md) | `DIA-BE-MOD-WIS-001` |
+| [Consulta de movimientos](15-movements-code.md) | `DIA-BE-MOD-MOV-001` |
+| [Catálogos: administración y lecturas operativas](16-catalogs-code.md) | `DIA-BE-MOD-CAT-001` |
+
+Entradas y salidas incluyen las variantes material/consumable cuando comparten núcleo.
+Las lecturas operativas, reportes e infraestructura se amplían en el capítulo 3.
+
+Los mecanismos comunes se explican una vez en [reutilización](../reuse-and-refactoring/index.md)
+y [patrones](../design-and-construction-patterns/index.md). Las secuencias, actividades
+y estados pertenecen a [procesos](../../processes/index.md); el contrato HTTP está en
+OpenAPI y la trazabilidad requisito–caso–prueba en la vista lógica. El
+[mapa generado](../code-map.md) conserva el inventario exacto de rutas e imports.

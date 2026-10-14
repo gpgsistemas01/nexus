@@ -1,4 +1,19 @@
 export const errorMap = {
+    coneWeightKg: {
+        REQUIRED: 'CONE_WEIGHT_KG_REQUIRED',
+        INVALID_NUMBER: 'CONE_WEIGHT_KG_INVALID_NUMBER'
+    },
+    totalWeightKg: {
+        REQUIRED: 'TOTAL_WEIGHT_KG_REQUIRED',
+        NOT_GREATER: 'WASTE_TOTAL_WEIGHT_NOT_GREATER'
+    },
+    weightKg: {
+        CALCULATED: 'WASTE_WEIGHT_CALCULATED',
+        TOO_HIGH: 'WEIGHT_KG_TOO_HIGH',
+        READ_ONLY: 'WASTE_WEIGHT_READ_ONLY',
+        INVALID_NUMBER: 'WEIGHT_KG_INVALID_NUMBER',
+        TOO_LONG: 'WEIGHT_KG_TOO_LONG'
+    },
     message: {
         LOGIN_ERROR: 'LOGIN_ERROR',
         VALIDATION_ERROR: 'VALIDATION_ERROR',

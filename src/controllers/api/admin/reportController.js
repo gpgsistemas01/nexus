@@ -11,6 +11,8 @@ const PERSON_SHEET_NAME = 'Personas';
 const FILENAME = 'informe_movimientos';
 const WASTE_MOVEMENT_SHEET_NAME = 'Movimientos de merma';
 const WASTE_MOVEMENT_FILENAME = 'informe_movimientos_merma';
+const CONSUMABLE_MOVEMENT_SHEET_NAME = 'Movimientos de consumibles';
+const CONSUMABLE_MOVEMENT_FILENAME = 'informe_movimientos_consumibles';
 const USER_FILENAME = 'informe_usuarios';
 const PERSON_FILENAME = 'informe_personas';
 
@@ -70,7 +72,7 @@ const sendMovementReport = async ({ req, res, context, sheetName, filename, addi
 
     return sendExcelReport({
         res,
-        data: [MOVEMENT_REPORT_COLUMNS, ...rows.map(mapMovementReportRow)],
+        data: [MOVEMENT_REPORT_COLUMNS.map(column => column === 'Material' && context === 'consumables' ? 'Consumible' : column), ...rows.map(mapMovementReportRow)],
         sheetName,
         filename,
         filenameOptions: { separator: '-', order: 'year-month' }
@@ -100,6 +102,14 @@ export const exportWasteMovementReport = async (req, res) => sendMovementReport(
     context: 'wastes',
     sheetName: WASTE_MOVEMENT_SHEET_NAME,
     filename: WASTE_MOVEMENT_FILENAME
+});
+
+export const exportConsumableMovementReport = async (req, res) => sendMovementReport({
+    req,
+    res,
+    context: 'consumables',
+    sheetName: CONSUMABLE_MOVEMENT_SHEET_NAME,
+    filename: CONSUMABLE_MOVEMENT_FILENAME
 });
 
 export const exportUserReport = async (req, res) => {

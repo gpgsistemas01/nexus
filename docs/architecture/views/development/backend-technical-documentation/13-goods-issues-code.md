@@ -1,0 +1,76 @@
+# 13. Salidas: materiales y consumibles: estructura de código
+
+**Identificador:** `DIA-BE-MOD-ISS-001`.
+**Alcance:** grupos de implementación del módulo y sus dependencias directas.
+**Fuente:** imports de los archivos de la tabla.
+
+```mermaid
+flowchart TB
+    R["routes/api<br/>consumableGoodsIssueApiRoute.js<br/>consumableGoodsIssueReportApiRoute.js<br/>y colaboradores"]
+    C["Controllers de salida<br/>material / consumable<br/>y reportes"]
+    H["Handlers compartidos<br/>goodsIssueHandlers.js"]
+    A["Adaptadores por tipo<br/>material / consumable"]
+    S["services<br/>goodsIssueService.js<br/>detailReturns/"]
+    D["DTO<br/>goodsIssueDTO.js"]
+    X["Colaboradores de dominio<br/>referenceNumberService.js<br/>movementService.js<br/>y colaboradores"]
+    P["baseRepository.js<br/>getDb(tx)"]
+    A --> S
+    C --> A
+    C --> H
+    H --> D
+    R --> C
+    S --> P
+    S --> X
+    X --> P
+```
+
+| Grupo del mapa | Archivos que lo componen |
+| --- | --- |
+| routes/api · consumableGoodsIssueApiRoute.js · consumableGoodsIssueReportApiRoute.js · y colaboradores | `src/routes/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueApiRoute.js`<br/>`src/routes/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueReportApiRoute.js`<br/>`src/routes/api/warehouse/goodsIssues/`<br/>`materials/materialGoodsIssueApiRoute.js`<br/>`src/routes/api/warehouse/goodsIssues/`<br/>`materials/`<br/>`materialGoodsIssueReportApiRoute.js` |
+| controllers/api · consumableGoodsIssueController.js · consumableGoodsIssueReportController.js · y colaboradores | `src/controllers/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueController.js`<br/>`src/controllers/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueReportController.js`<br/>`src/controllers/api/warehouse/goodsIssues/`<br/>`materials/materialGoodsIssueController.js`<br/>`src/controllers/api/warehouse/goodsIssues/`<br/>`materials/`<br/>`materialGoodsIssueReportController.js` |
+| Handlers compartidos · goodsIssueHandlers.js | `src/controllers/api/warehouse/goodsIssues/`<br/>`shared/goodsIssueHandlers.js` |
+| Adaptadores por tipo · material / consumable | `src/services/warehouse/goodsIssues/`<br/>`consumables/consumableGoodsIssueService.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`materials/materialGoodsIssueService.js` |
+| services · goodsIssueReturnService.js · goodsIssueDetailSelect.js · y colaboradores | `src/services/warehouse/goodsIssues/`<br/>`detailReturns/goodsIssueReturnService.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`goodsIssueDetailSelect.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`goodsIssueFulfillmentRules.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`goodsIssueHelpers.js`<br/>`src/services/warehouse/goodsIssues/`<br/>`goodsIssueService.js` |
+| DTO · goodsIssueDTO.js | `src/dtos/goodsIssueDTO.js` |
+| Colaboradores de dominio · referenceNumberService.js · movementService.js · y colaboradores | `src/services/document/`<br/>`referenceNumberService.js`<br/>`src/services/inventory/movementService.js`<br/>`src/services/inventory/stockHelpers.js`<br/>`src/services/warehouse/`<br/>`fulfillmentStatusService.js`<br/>`src/services/warehouse/issues/`<br/>`issueFulfillmentRules.js`<br/>`src/services/warehouse/issues/`<br/>`issueHeaderService.js`<br/>`src/services/warehouse/materials/`<br/>`supplierMaterialService.js` |
+| baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
+
+
+## Contratos de implementación
+
+### Datos, resultados y efectos del módulo
+
+| Capacidad | Entrada y retorno | Reglas, errores y persistencia |
+| --- | --- | --- |
+| Salidas de materiales y consumibles: controllers específicos de `goodsIssues/materials` y `goodsIssues/consumables`, `goodsIssues/goodsIssueService.js`, helpers, select y reglas de cumplimiento | Lista, alta, edición, encabezado y detalles adaptan `id`/DTO; retornan salida actualizada. | Resuelve encabezado, cantidades y estados; el surtimiento aplica movimiento `ISSUE` y actualiza detalles/encabezado en el mismo `tx`. |
+| Devolución de material: `goodsIssueController.registerGoodsIssueDetailReturn` y `detailReturns/goodsIssueReturnService.js` | `id`, `detailId` y cantidad de devolución retornan salida/detalle actualizado. | Comprueba cantidades y estado, devuelve inventario, registra movimiento y recalcula cumplimiento atómicamente. |
+
+
+| Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
+| --- | --- |
+| `controllers/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueController.js` | `getAllConsumableGoodsIssues`<br/>`registerConsumableGoodsIssue`<br/>`editConsumableGoodsIssue`<br/>`editConsumableGoodsIssueHeader`<br/>`editConsumableGoodsIssueDetails`<br/>`registerConsumableGoodsIssueDetailReturn` |
+| `controllers/api/warehouse/goodsIssues/`<br/>`consumables/`<br/>`consumableGoodsIssueReportController.js` | `exportConsumableGoodsIssueReportExcel` |
+| `controllers/api/warehouse/goodsIssues/`<br/>`materials/materialGoodsIssueController.js` | `getAllMaterialGoodsIssues`<br/>`registerMaterialGoodsIssue`<br/>`editMaterialGoodsIssue`<br/>`editMaterialGoodsIssueHeader`<br/>`editMaterialGoodsIssueDetails`<br/>`registerMaterialGoodsIssueDetailReturn` |
+| `controllers/api/warehouse/goodsIssues/`<br/>`materials/`<br/>`materialGoodsIssueReportController.js` | `exportMaterialGoodsIssueReportExcel` |
+| `controllers/api/warehouse/goodsIssues/`<br/>`shared/goodsIssueHandlers.js` | `buildListHandler`<br/>`buildRegisterHandler`<br/>`buildEditHandler`<br/>`buildHeaderHandler`<br/>`buildDetailsHandler`<br/>`buildReturnHandler` |
+
+### Normalización de datos
+
+| Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
+| --- | --- |
+| `dtos/goodsIssueDTO.js` | `createGoodsIssueDtoForRegister`<br/>`createGoodsIssueDtoForEdit`<br/>`createGoodsIssueDetailsDtoForEdit`<br/>`createGoodsIssueHeaderDtoForEdit`<br/>`createGoodsIssueDtoForReturn` |
+
+## Variantes y límites de reutilización
+
+Los controllers material/consumable configuran goodsIssueHandlers y servicios por tipo. El núcleo colabora con issues, movimientos y detailReturns; no se confunden devolución y edición de detalle.
+
+Los reportes y la infraestructura transversal se localizan en el
+[capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
+[procesos](../../processes/backend-code-sequences/index.md).
+
+
+## Series de folios por contexto
+
+`createGoodsIssue` selecciona `SMA` para materiales y `SCO` para consumibles a partir del `type` fijado por el servicio específico. El contador por prefijo y año se incrementa mediante `upsert` dentro de la misma transacción que inserta la salida. Un fallo revierte ambos cambios; las series no comparten incrementos.
+
+La [migración de folios históricos](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-folios-de-salidas-por-contexto) normaliza los documentos genéricos y conserva el máximo anterior antes de habilitar esta generación. Detalles y movimientos siguen vinculados por UUID; no se renumeran sus referencias propias.

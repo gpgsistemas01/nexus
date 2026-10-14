@@ -7,7 +7,7 @@
 
 1. Abra la compra desde **Compras → Consumibles**.
 2. En el detalle activo, abra la acción de corrección del renglón.
-   ![CAP-ENT-CON-04-CORRECT: corrección de consumible](../../images/purchases/10-consumables-correction-detail.png)
+   ![CAP-ENT-CON-04-CORRECT: corrección de consumible](../../images/areas/almacen/purchases/10-consumables-correction-detail.png)
 3. Capture la cantidad o el costo correctos. La cantidad debe ser mayor que cero y no superar la registrada. Seleccione **Corregir detalle** y acepte la confirmación con **Corregir detalle**.
 4. Revise los totales y el efecto de inventario actualizado.
 

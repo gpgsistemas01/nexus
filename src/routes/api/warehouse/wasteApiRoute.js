@@ -7,6 +7,7 @@ import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
 
+
 router.get(
     '/material-templates',
     verifyApiTokenRequired,

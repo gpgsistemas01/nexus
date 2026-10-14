@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.1 | 1.0.0 | En revisión | 2026-09-17 | Equipo Nexus |
+| 1.12 | 1.0.0 | En revisión | 2026-10-13 | Equipo Nexus |
 
 ## Propósito
 
@@ -69,6 +69,10 @@ architecture/
 Los índices de cada vista conducen a sus colecciones sin duplicar contenido. Los casos
 de uso continúan en requisitos: la vista de escenarios los referencia, pero no adquiere
 su propiedad normativa.
+
+## Incorporación al equipo de desarrollo
+
+Comience con la [guía de incorporación](views/development/developer-onboarding.md), que explica responsabilidades, recorridos de código y comprobaciones para contribuir al sistema.
 
 ## Recorridos de lectura
 

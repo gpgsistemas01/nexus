@@ -1,5 +1,14 @@
-import { validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { validateWeightCapture, validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
+
+const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'].map(fieldName =>
+    validateWeightCapture({
+        fieldName,
+        coneFieldName: 'referenceConeWeightKg',
+        totalFieldName: 'referenceRollTotalWeightKg',
+        requireTotal: false
+    })
+);
 
 export const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
 
@@ -7,6 +16,7 @@ export const isGoodsReceiptMaterialCreation = (body = {}) =>
     body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
 
 export const materialEditValidation = [
+    ...materialRollReferenceValidation,
     validateText({ fieldName: 'name', maxLength: 200 }),
     validateUUID('supplierId'),
     ...createInventoryStateValidation(),

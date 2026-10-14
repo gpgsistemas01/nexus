@@ -15,7 +15,7 @@
                             type: 'text',
                             name: 'name',
                             label: 'Nombre',
-                            col: '6'
+                            col: '12'
                         }
                     ]
                 },
@@ -26,47 +26,31 @@
                             id: 'materialSupplierInput',
                             name: 'supplierId',
                             class: 'supplier-select',
-                            col: 'col-6'
+                            col: 'col-12'
                         },
                         {
                             id: 'presentationInput',
                             name: 'presentationId',
                             class: 'presentation-select',
-                            col: 'col-6'
+                            col: 'col-12 col-md-6'
                         },
                         {
                             id: 'unitMeasureInput',
                             name: 'unitMeasureId',
                             class: 'unit-measure-select',
-                            col: 'col-6'
+                            col: 'col-12 col-md-6'
                         }
                     ]
-                },
+                }
+            ]
+        },
+        {
+            title: 'Medidas del material',
+            class: 'material-measurements-section',
+            groups: [
                 {
                     type: 'inputs',
                     items: [
-                        {
-                            id: 'minStockInput',
-                            type: 'number',
-                            name: 'minStock',
-                            label: 'Stock Mínimo',
-                            attrs: {
-                                'min': '0'
-                            },
-                            col: '3'
-                        },
-                        {
-                            id: 'maxUnitCostInput',
-                            type: 'number',
-                            name: 'maxUnitCost',
-                            label: 'Costo Máximo',
-                            attrs: {
-                                'min': '0',
-                                'step': 'any',
-                                'required': true
-                            },
-                            col: '3'
-                        },
                         {
                             id: 'baseInput',
                             type: 'number',
@@ -75,7 +59,7 @@
                             attrs: {
                                 'min': '0.01'
                             },
-                            col: '3'
+                            col: '6'
                         },
                         {
                             id: 'heightInput',
@@ -85,26 +69,57 @@
                             attrs: {
                                 'min': '0.01'
                             },
-                            col: '3'
-                        }
-                    ]
-                },
-                {
-                    type: 'checkboxes',
-                    items: [
-                        {
-                            id: 'isActiveInput',
-                            type: 'checkbox',
-                            name: 'isActive',
-                            label: 'Activo',
-                            isChecked: true
+                            col: '6'
                         }
                     ]
                 }
             ]
         },
         {
-            title: 'Datos de ajuste',
+            title: 'Pesos del rollo completo',
+            description: 'Opcionales. Una vez guardados, no se pueden cambiar.',
+            class: 'roll-reference-section d-none',
+            groups: [{
+                type: 'html',
+                col: 'col-12',
+                content: include('../../../shared/inventory/rollWeightFields', { fields: [
+                    { col: 'col-12 col-lg-6', id: 'materialConeWeightInput', name: 'referenceConeWeightKg', label: 'Peso del cono del rollo completo (kg)', allowZero: true },
+                    { col: 'col-12 col-lg-6', id: 'materialRollTotalWeightInput', name: 'referenceRollTotalWeightKg', label: 'Peso total del rollo completo con cono (kg)' }
+                ] })
+            }]
+        },
+        {
+            title: 'Inventario del material',
+            groups: [
+                {
+                    type: 'inputs',
+                    items: [
+                        {
+                            id: 'minStockInput',
+                            type: 'number',
+                            name: 'minStock',
+                            label: 'Stock mínimo',
+                            attrs: { min: '0' },
+                            col: '6'
+                        },
+                        {
+                            id: 'maxUnitCostInput',
+                            type: 'number',
+                            name: 'maxUnitCost',
+                            label: 'Costo máximo',
+                            attrs: { min: '0', step: 'any', required: true },
+                            col: '6'
+                        }
+                    ]
+                },
+                {
+                    type: 'checkboxes',
+                    items: [{ id: 'isActiveInput', type: 'checkbox', name: 'isActive', label: 'Activo', isChecked: true }]
+                }
+            ]
+        },
+        {
+            title: 'Existencias y observaciones',
             class: 'stock-data-section',
             groups: [
                 {

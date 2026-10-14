@@ -20,7 +20,7 @@ publicar, todavía se debe revisar lo siguiente:
   geometría si Mermaid la reporta, en vez de incorporar una imagen dañada. Cada imagen reutilizable
   conserva una marca de validación; una imagen de una ejecución anterior que no tenga esa marca se
   vuelve a generar y no puede ocultar el error en una exportación posterior;
-- una captura generada sólo se referencia después de ser revisada y existir en la estación
+- una captura generada sólo se incorpora a la carpeta de publicación después de ser revisada y existir en la estación
   que ensambla el documento.
 
 Las imágenes siguen el mismo criterio de pertenencia que los documentos y se organizan
@@ -36,8 +36,10 @@ docs/
 ├── testing/
 │   └── images/evidencias/
 └── user-manual/
-    ├── index.md
-    └── images/entradas/
+    ├── actors/
+    │   ├── administrator.md
+    │   └── warehouse.md
+    └── images/areas/
 ```
 
 Las carpetas de imágenes se crean al incorporar la primera imagen real. No se agregan

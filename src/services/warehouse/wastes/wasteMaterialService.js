@@ -1,64 +1,7 @@
 import { getDb } from '../../../repository/baseRepository.js';
 import { getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
-
-const WASTE_MATERIAL_SNAPSHOT_SELECT = {
-    id: true,
-    name: true,
-    base: true,
-    height: true,
-    presentation: true,
-    unitMeasure: true
-};
-
-const getHighestUnitCost = (offers = []) => offers.reduce((highest, offer) => {
-    const cost = toNumber(offer.maxUnitCost);
-
-    return cost == null ? highest : Math.max(highest ?? cost, cost);
-}, null);
-
-export const resolveWasteMaterialSnapshot = async ({ tx = null, materialId, supplierId = null, requireActive = true }) => {
-    const db = getDb(tx);
-    const material = await db.material.findUnique({
-        where: { id: materialId },
-        select: WASTE_MATERIAL_SNAPSHOT_SELECT
-    });
-
-    if (!material) return null;
-
-    const identityWidth = getMaterialIdentityWidth(material);
-    const matchingMaterials = await db.material.findMany({
-        where: { name: { equals: material.name, mode: 'insensitive' } },
-        select: {
-            base: true,
-            height: true,
-            supplierMaterials: {
-                where: { isActive: true },
-                select: { maxUnitCost: true }
-            }
-        }
-    });
-    const maxUnitCost = matchingMaterials.reduce((highest, candidate) => {
-        if (getMaterialIdentityWidth(candidate) !== identityWidth) return highest;
-
-        const candidateCost = getHighestUnitCost(candidate.supplierMaterials);
-
-        return candidateCost == null
-            ? highest
-            : Math.max(highest ?? candidateCost, candidateCost);
-    }, null);
-
-    if (requireActive && supplierId) {
-        const activeOffer = await db.supplierMaterial.findUnique({
-            where: { supplierId_materialId: { supplierId, materialId } },
-            select: { isActive: true }
-        });
-
-        if (!activeOffer?.isActive) return null;
-    }
-
-    return { ...material, maxUnitCost };
-};
+import { isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take = 20, supplierId = null } = {}) => {
     if (!supplierId) return {
@@ -83,32 +26,28 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
             unitMeasure: { select: { id: true, name: true, symbol: true } },
             supplierMaterials: {
                 where: { supplierId, isActive: true },
-                select: { maxUnitCost: true }
+                select: { maxUnitCost: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true }
             }
         }
     });
     const uniqueTemplates = new Map();
+    const familyCosts = new Map();
 
     materials.forEach(material => {
-        const identityWidth = getMaterialIdentityWidth(material);
-        const isRoll = material.presentation.name.toUpperCase() === 'ROLLO';
-        const suggestedWidth = isRoll ? identityWidth : null;
-        const key = `${ material.name.trim().toLocaleLowerCase() }|${ identityWidth ?? 'no-width' }`;
-        const maxUnitCost = getHighestUnitCost(material.supplierMaterials);
-        const { supplierMaterials, ...template } = material;
+        const width = getMaterialIdentityWidth(material);
+        const key = `${ material.name.trim().toLocaleLowerCase() }|${ width ?? 'no-width' }`;
+        const cost = toNumber(material.supplierMaterials[0]?.maxUnitCost);
+        const highest = familyCosts.get(key) ?? null;
+        familyCosts.set(key, cost == null ? highest : Math.max(highest ?? cost, cost));
 
-        const current = uniqueTemplates.get(key);
-        if (!current) {
-            uniqueTemplates.set(key, { ...template, suggestedWidth, maxUnitCost });
-            return;
-        }
-
-        current.maxUnitCost = maxUnitCost == null
-            ? current.maxUnitCost
-            : Math.max(current.maxUnitCost ?? maxUnitCost, maxUnitCost);
+        const templateKey = isRollPresentation(material.presentation.name) ? material.id : key;
+        if (!uniqueTemplates.has(templateKey)) uniqueTemplates.set(templateKey, { material, key });
     });
 
-    const templates = [...uniqueTemplates.values()];
+    const templates = Array.from(uniqueTemplates.values(), ({ material, key }) => ({
+        ...material,
+        maxUnitCost: familyCosts.get(key)
+    }));
     const data = templates.slice(skip, skip + take);
 
     return {

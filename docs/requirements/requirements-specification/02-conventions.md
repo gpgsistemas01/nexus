@@ -35,13 +35,21 @@ obligación.
 | Implementado | Existe un flujo registrado y evidencia suficiente en el código. |
 | Parcial | Existe parte del flujo, pero falta una operación, interfaz o evidencia relevante. |
 | Modelado | Existen entidades o piezas aisladas, pero no un flujo web/API registrado. |
+| Fuera del alcance actual | Capacidad excluida del producto vigente; requiere un nuevo acuerdo de alcance. |
 | Propuesto | Requiere decisión o implementación futura; no debe anunciarse como disponible. |
+| Fuera del alcance actual | Capacidad excluida del producto vigente, conservada como referencia histórica de alcance; no se ofrece ni se verifica como capacidad disponible. |
 
 El estado describe la evidencia del repositorio, no la aprobación del producto por un
 usuario responsable. Esa aprobación debe registrarse en la historia o incidencia que
 originó el cambio.
 
-### 2.3 Terminología y operaciones
+### 2.3 Lectura y aceptación entre partes interesadas
+
+El responsable funcional revisa la necesidad, el actor, las reglas y el resultado observable. Desarrollo y pruebas revisan factibilidad y evidencia; el estado técnico no sustituye la decisión de aceptación. La [gobernanza documental](../../governance/documentation-standards/06-responsibilities-and-change-control.md) define dónde registrar esa decisión y sus pendientes.
+
+Por ejemplo, para una recepción: **dado** un proveedor y artículos válidos, **cuando** Almacén confirme lo recibido, **Nexus debe** registrar el folio e incrementar la existencia de esos artículos; si la operación falla, no debe quedar una recepción parcial. El negocio puede revisar esa garantía sin conocer nombres de tablas ni rutas HTTP.
+
+### 2.4 Terminología y operaciones
 
 Los requisitos usan los términos canónicos del
 [glosario del negocio](../business-glossary.md). El glosario define significado compartido
@@ -53,3 +61,19 @@ contrato funcional de las operaciones. La composición técnica se consulta en e
 [diagrama de componentes](../../architecture/views/logical/01-components-and-reuse.md),
 los métodos y rutas en [OpenAPI](../../architecture/openapi/openapi.json) y la
 autorización efectiva en la política del servidor.
+
+### 2.4 Condiciones y comprobación
+
+La obligación y sus criterios expresan resultados del negocio. Los nombres de rutas,
+modelos, campos y herramientas se conservan en la evidencia, salvo que constituyan una
+restricción técnica explícita de datos, seguridad u operación. No se eliminan esas
+restricciones de `RD-*` o `RC-*` para hacerlas parecer funciones de un actor.
+
+Cada criterio `CA-<ID>-<n>` pertenece al requisito indicado y conserva numeración local.
+Las condiciones transversales se enlazan mediante `RN-*`, sin copiar su definición.
+Una operación rechazada conserva los datos e inventario anteriores y no deja cambios
+parciales; una consulta o reporte no modifica los datos consultados.
+
+Los IDs son referencias estables, no pasos de un flujo. El orden de interacción se lee
+en las fichas de casos de uso; corregir redacción o alcance no renumera requisitos ni
+asigna un ID existente a una capacidad distinta.

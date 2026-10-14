@@ -14,8 +14,11 @@ const documentTitles = new Map([
     ['catalogo-unidades-medida', 'Catálogo de unidades de medida'],
     ['clientes', 'Clientes'],
     ['compras', 'Compras'],
+    ['compras-materiales', 'Compras de materiales'],
+    ['compras-consumibles', 'Compras de consumibles'],
     ['informacion-general-y-anexos', 'Información general y anexos'],
     ['movimientos-materiales', 'Movimientos de materiales'],
+    ['movimientos-consumibles', 'Movimientos de consumibles'],
     ['movimientos-mermas', 'Movimientos de mermas'],
     ['personas', 'Personas'],
     ['proveedores', 'Proveedores'],
@@ -109,4 +112,31 @@ export const externalDocumentLinkLabel = ({ linkedOutput, fragment, targetConten
     const documentTitle = exportedDocumentTitle(linkedOutput);
     const sectionTitle = fragment ? getHeadingTitle(targetContent, fragment) : null;
     return sectionTitle ? `${sectionTitle} — ${documentTitle}` : documentTitle;
+};
+
+export const prepareManualImages = (content, directory) => {
+    const actor = directory.split(path.sep).at(-1);
+    if (!directory.startsWith(`manuales${path.sep}`)) return content;
+    const area = actor === 'administrador' ? 'sistemas' : actor === 'almacen' ? 'almacen' : null;
+    if (!area) throw new Error(`Actor del manual sin área de capturas: ${actor}.`);
+
+    return content.replace(/(!\[[^\]]*\]\()(\.\.\/)*images\/(?:areas\/[^/]+\/)?([^) ]+)/g,
+        (reference, prefix) => {
+            const imagePath = reference.slice(prefix.length).replace(/^((?:\.\.\/)*images\/)(?:areas\/[^/]+\/)?/, `$1areas/${area}/`);
+            return `${prefix}${imagePath}`;
+        });
+};
+
+const markdownCode = /(^(`{3,}|~{3,})[^\r\n]*\r?\n[\s\S]*?^\2[ \t]*$)|(`+)([\s\S]*?)\3/gm;
+
+export const getMarkdownProse = content => content.replace(markdownCode, '');
+
+export const mapMarkdownProse = (content, transform) => {
+    let offset = 0;
+    let result = '';
+    for (const match of content.matchAll(markdownCode)) {
+        result += transform(content.slice(offset, match.index)) + match[0];
+        offset = match.index + match[0].length;
+    }
+    return result + transform(content.slice(offset));
 };

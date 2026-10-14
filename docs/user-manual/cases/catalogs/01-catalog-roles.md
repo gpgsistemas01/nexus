@@ -10,17 +10,17 @@
 
 1. Abra **Roles** y compruebe que el encabezado y la tabla correspondan al catálogo que desea modificar:
 
-   ![CAP-CAT-ROLE-01-LIST: consulta de roles](../../images/catalogs/roles/01-list.png)
+   ![CAP-CAT-ROLE-01-LIST: consulta de roles](../../images/areas/sistemas/catalogs/roles/01-list.png)
 
 2. Seleccione **Nuevo rol** y compruebe que se abra el formulario de alta:
 
-   ![CAP-CAT-ROLE-02-CREATE: alta de rol](../../images/catalogs/roles/02-form-creation.png)
+   ![CAP-CAT-ROLE-02-CREATE: alta de rol](../../images/areas/sistemas/catalogs/roles/02-form-creation.png)
 
    Complete **Nombre** —máximo 50 caracteres—. Revise la casilla **Activo** y seleccione **Guardar**.
 
 3. Seleccione **Editar registro** en la fila requerida y compruebe que se abra el formulario de edición:
 
-   ![CAP-CAT-ROLE-03-EDIT: edición de rol](../../images/catalogs/roles/03-form-edit.png)
+   ![CAP-CAT-ROLE-03-EDIT: edición de rol](../../images/areas/sistemas/catalogs/roles/03-form-edit.png)
 
    Cambie únicamente los campos habilitados —incluido **Activo**— y seleccione **Actualizar**.
 

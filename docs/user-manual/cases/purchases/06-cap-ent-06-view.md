@@ -3,10 +3,14 @@
 
 **Caso de uso:** `CU-ENT-01` — Consultar compras de material.
 
+**Antes de empezar:** Vamos a consultar un documento cancelado. Tenga el folio; observe sus datos sin intentar modificarlo.
+
 1. Localice una compra con estado **Cancelada** y seleccione **Editar registro**.
 2. Compruebe que el formulario, sus detalles y sus acciones permanezcan en modo consulta, como en
    la captura:
 
-   ![CAP-ENT-06-VIEW: consulta de compra cancelada](../../images/purchases/06-query-cancelled.png)
+   ![CAP-ENT-06-VIEW: consulta de compra cancelada](../../images/areas/almacen/purchases/06-query-cancelled.png)
 
 3. Use **Regresar** para cerrar el formulario; una compra cancelada no admite nuevos cambios.
+
+**Compruebe el resultado:** Confirme el folio y el estado cancelado; los datos deben permanecer en consulta.

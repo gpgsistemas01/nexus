@@ -4,7 +4,7 @@ import { getAllMaterials } from '../../../application/warehouse/materials/materi
 import { getAllConsumables } from '../../../application/warehouse/consumables/consumables.js';
 import { buildPaginatedSelectParams, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { setMdbWrapperInputValue } from '../../mdb/baseInstance.js';
-import { mapSelectMaterialData, parseInventorySelectJson } from "../../../utils/warehouseInventoryUtils.js";
+import { mapSelectMaterialData, normalizeInventorySelectRelations } from "../../../utils/warehouseInventoryUtils.js";
 import { FILTER_SELECTORS, INPUT_SELECTORS } from "../../../constants/selectors.js";
 import { updatePresentationDisplay } from '../../../ui/inventory/inventorySelectUI.js';
 import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
@@ -14,15 +14,16 @@ const materialSelector = FILTER_SELECTORS.MATERIAL;
 
 export const initMaterialFilterSelect = ({
     selectedId = null,
-    supplierFilterSelector = null
+    supplierFilterSelector = null,
+    resource = INVENTORY_RESOURCES.MATERIAL
 }) => {
 
     const baseSelector = 'body';
 
     initFilterSelect2({
         selector: materialSelector,
-        getOptions: getAllMaterials,
-        placeholder: 'Filtrar por material',
+        getOptions: resource === INVENTORY_RESOURCES.CONSUMABLE ? getAllConsumables : getAllMaterials,
+        placeholder: resource === INVENTORY_RESOURCES.CONSUMABLE ? 'Filtrar por consumible' : 'Filtrar por material',
         selectedId,
         mapOption: mapSelectMaterialData,
         data: (params) => buildPaginatedSelectParams(params, {
@@ -109,7 +110,7 @@ const attachMaterialHandler = ({
             return;
         }
 
-        const material = parseInventorySelectJson(data.material);
+        const { material } = normalizeInventorySelectRelations(data);
 
         updatePresentationDisplay({
             modalSelector,

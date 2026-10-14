@@ -8,3 +8,5 @@
 3. [3. Aplicación por tipo de documento](03-application-by-type-of-document.md)
 4. [4. Convenciones mínimas adoptadas](04-conventions-minimum-adopted.md)
 5. [5. Cuándo reevaluar](05-when-reevaluate.md)
+6. [6. Responsabilidades, aceptación y control de cambios](06-responsibilities-and-change-control.md)
+7. [7. Redacción según la audiencia](07-writing-for-each-audience.md)

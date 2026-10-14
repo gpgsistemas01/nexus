@@ -8,10 +8,11 @@
   parcial nuevo debe representar una unidad configurable, no una copia con otro nombre.
 - Los atributos `id`, `name` y `data-*` expresan recurso y propósito. JavaScript consulta
   primero los selectores compartidos del flujo.
-- Se evita insertar HTML construido con datos no confiables. Se usan APIs de texto,
-  plantillas y escape EJS según el contrato existente.
-- Al tocar una vista EJS se preserva en su posición la última línea de `contentFor`; no
-  se elimina y vuelve a agregar como efecto del formato.
+- Mostrar datos no confiables mediante `textContent` o `<%=`. Reservar `<%-` para
+  parciales y HTML de confianza; no usarlo para imprimir entrada del usuario.
+- Al tocar una vista EJS se preservan la última línea, los cierres y las llamadas a
+  `contentFor`, salvo cambios funcionales necesarios. Conservar exactamente el fin
+  de archivo original: no añadir ni quitar su salto final.
 - Una refactorización no reindenta toda la vista si sólo cambia un bloque. Esto reduce
   ruido y permite revisar que las etiquetas continúen balanceadas.
 
@@ -30,3 +31,9 @@ Si el cambio afecta el include, las dos últimas líneas permanecen exactamente 
 posición: no se eliminan para volver a agregarlas al final. Un nuevo parcial sólo se
 justifica si requiere un contrato visual reutilizable que el parcial vigente no puede
 expresar mediante configuración.
+
+Al reinicializar un componente, evitar listeners duplicados y reutilizar su mecanismo
+de registro o limpieza. Las escrituras usan el manejo compartido del formulario para
+evitar envíos simultáneos y recuperar controles ante errores admitidos por el flujo.
+Una modificación visible revisa permisos, comportamiento responsivo, manual y capturas
+relacionadas; la captura automática no crea datos de operación.

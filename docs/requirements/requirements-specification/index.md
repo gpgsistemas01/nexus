@@ -15,3 +15,9 @@ cómo la solución realiza y evidencia estas obligaciones sin redefinirlas.
 4. [4. Catálogo unificado por ámbito](04-unified-catalog-by-scope/index.md)
 5. [5. Reglas de trazabilidad de requisitos](05-requirement-traceability-rules.md)
 6. [6. Modos, precondiciones y efectos de las operaciones](06-operation-modes-and-effects.md)
+
+El vocabulario se mantiene en el [glosario](../business-glossary.md). Los requisitos
+funcionales se encuentran en los capítulos 4.1 a 4.4; las reglas transversales, los datos
+y la calidad se revisan junto a ellos, sin transformar restricciones técnicas en
+acciones de usuario. Los criterios `CA-*` amplían una obligación y los IDs existentes
+se conservan para no romper sus referencias.

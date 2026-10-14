@@ -7,61 +7,48 @@ al menos dos consumidores y un contrato independiente del contexto.
 
 ### Composición de la interfaz
 
-**Identificador:** `DIA-PAT-UI-001`. **Pregunta:** ¿cómo se compone una pantalla sin
-mezclar transporte, caso de uso, plugins y reglas visuales?
+**Identificador:** `DIA-PAT-UI-001`. **Pregunta:** ¿cómo conserva materiales la
+propiedad de sus reglas al consumir componentes compartidos? **Alcance:** dependencias
+actuales del navegador y EJS; las flechas apuntan hacia la pieza consumida.
 
 ```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    direction LR
-    class PageEntry { <<boundary>> }
-    class Application { <<control>> }
-    class HttpTransport { <<component>> }
-    class ResourceUI { <<boundary>> }
-    class SharedUI { <<component>> }
-    class Plugins { <<component>> }
-    class PageEJS { <<artifact>> }
-    class SharedEJS { <<artifact>> }
-    PageEntry ..> Application : usa operaciones
-    Application ..> HttpTransport : requiere requests
-    PageEntry ..> ResourceUI : coordina campos y efectos
-    ResourceUI ..> SharedUI : reutiliza contrato visual
-    ResourceUI ..> Plugins : adapta DataTable y Select2
-    PageEJS ..> PageEntry : carga entry point
-    PageEJS ..> SharedEJS : incluye parciales
+flowchart TB
+    ejs["materialsPage.ejs<br/>entrada propietaria"] --> entry["materialsPage.js<br/>inicializa tabla e importa formulario"]
+    ejs --> partial["materialModal.ejs<br/>parcial reutilizado por consumibles"]
+    entry --> table["materialDatatable.js<br/>acciones del listado"]
+    entry --> form["materialForm.js<br/>normalización y validación del recurso"]
+    table --> modal["materialModal.js<br/>contexto y apertura"]
+    modal --> modalUI["inventoryCrudModalUI.js<br/>modo e identidad comunes"]
+    form["materialForm.js<br/>normalización y validación del recurso"] --> formUI["ui/forms/formUI.js<br/>useForm + callbacks"]
+    form --> app["application/warehouse/materials/materials.js<br/>operaciones nombradas del recurso"]
+    form --> fields["materialFields.js<br/>grupos de campos por modo"]
+    modal --> fields
+    app --> requests["services/warehouse/materialService.js<br/>HTTP sin ownership visual"]
 ```
+
+**Fuentes:** `src/views/pages/warehouse/materials`, `src/views/shared`,
+`src/public/js/pages/warehouse/materials`, `src/public/js/ui/inventory` y `ui/forms`.
+El formulario configura `useForm`; la pieza común coordina interacción mediante
+callbacks. La normalización, validación, campos y contexto permanecen con materiales.
+Consumibles reutiliza formulario y modal con otro contexto; no copia el ciclo visual.
 
 | Pieza compartida | Contrato común | Variación que permanece en el recurso |
 | --- | --- | --- |
-| `inventoryCrudModal.ejs` e `inventoryCrudModalUI.js` | modo, identidad, errores y estado habilitado | campos, encabezados, detalles y selects |
-| `materialSelect.ejs` | control de material con marcado y ancho estables | activación sólo en contextos de material |
-| `baseSwal.js` y `swalComponent.js` | apariencia, variantes, botones y toast | contenido interactivo y validación del diálogo |
-| `shared/layout/header.ejs` y `openModal` | título semántico, pila y backdrop | texto del título y operación del formulario |
+| `inventoryCrudModalUI.js` | modo, identidad y estado habilitado | campos, encabezados, detalles y selects |
+| `materialSelect.ejs` | control de material con marcado estable | activación en contextos de material |
+| `baseSwal.js` y `swalComponent.js` | apariencia, variantes, botones y toast | contenido y validación del diálogo |
+| `shared/layout/header.ejs` y `openModal` | título, pila y backdrop | texto y operación del formulario |
 | `bindDisabledSelectDependency` y `scopeSelectors` | dependencia y alcance de controles | selectores y mensajes del dominio |
 
-Ningún consumidor llama directamente `Swal.fire`, administra backdrops o redefine el
-marcado compartido. Al editar un EJS se conserva exactamente su cierre final de
-`contentFor` y su estado de fin de archivo.
+El criterio de extracción siguiente pertenece al mantenimiento de componentes; el
+corte concreto anterior demuestra cómo está aplicada la composición hoy.
 
 ### Decisión de propiedad
 
-**Identificador:** `DIA-PAT-OWN-001`. **Pregunta:** ¿cuándo una pieza permanece con el
-recurso y cuándo se extrae como componente compartido?
-
-```mermaid
-flowchart TD
-    candidate["Pieza o comportamiento"] --> boundary{"¿Define una frontera<br/>de capa estable?"}
-    boundary -->|No| local["Permanece en el consumidor"]
-    boundary -->|Sí| consumers{"¿Tiene al menos dos<br/>consumidores reales?"}
-    consumers -->|No| resource["Permanece junto al recurso"]
-    consumers -->|Sí| independent{"¿Su contrato es independiente<br/>de las reglas del recurso?"}
-    independent -->|No| resource
-    independent -->|Sí| shared["Se extrae a shared / ui / utils / core"]
-```
+Una pieza se comparte cuando tiene consumidores reales y un contrato estable que no
+absorbe las reglas del recurso. Si todavía depende de ellas, permanece junto al recurso.
+La tabla describe la ubicación en el código; el mapa de composición anterior muestra
+sus colaboradores concretos, sin repetir una decisión de mantenimiento como proceso.
 
 La ubicación resultante conserva estas fronteras:
 
@@ -103,7 +90,7 @@ permiten agregar, sustituir o eliminar detalles en modo `Pendiente`; la fila con
 mapper de cada formulario envía únicamente los campos admitidos por su contrato.
 
 El estado de surtimiento no se redefine aquí: sus transiciones y datos afectados están
-en la [modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md)
+en [modos, precondiciones y efectos](../../../../requirements/requirements-specification/06-operation-modes-and-effects.md)
 y su representación física en el
 [diccionario generado](../../logical/data-and-persistence/generated/data-dictionary.md).
 

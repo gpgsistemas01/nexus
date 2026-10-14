@@ -214,6 +214,18 @@
     },
     "/api/warehouse/reports/goods-receipts/consumables/excel": {
       "$ref": "./paths/warehouse.json#/~1api~1warehouse~1reports~1goods-receipts~1consumables~1excel"
+    },
+    "/api/admin/reports/persons/excel": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1reports~1persons~1excel"
+    },
+    "/api/admin/reports/profiles/excel": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1reports~1profiles~1excel"
+    },
+    "/api/admin/movements/consumables": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1movements~1consumables"
+    },
+    "/api/admin/reports/movements/consumables/excel": {
+      "$ref": "./paths/admin.json#/~1api~1admin~1reports~1movements~1consumables~1excel"
     }
   },
   "components": {
@@ -421,6 +433,12 @@
       },
       "WasteStockAdditionRequest": {
         "$ref": "./components/warehouse-schemas.json#/WasteStockAdditionRequest"
+      },
+      "WasteMaterialTemplate": {
+        "$ref": "./components/warehouse-schemas.json#/WasteMaterialTemplate"
+      },
+      "WasteMaterialTemplateList": {
+        "$ref": "./components/warehouse-schemas.json#/WasteMaterialTemplateList"
       }
     }
   }

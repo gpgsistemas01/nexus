@@ -25,7 +25,8 @@ estos valores cuando no necesite la entrega completa:
 | `datos` | Mapa de datos, decisiones de acceso, esquema y diccionario técnico generados. | Para revisar persistencia y acceso a los datos. |
 | `arquitectura` | Diseño, documentación técnica y contrato API con estructuras JSON y validaciones. | Para revisión técnica y de integraciones HTTP. |
 | `pruebas` | Plan, registro selectivo de casos automatizados y cobertura relevante por caso de uso. | Para estrategia y trazabilidad basada en riesgo, sin duplicar la suite ni los resultados de CI. |
-| `todos` | Los dos manuales por conjuntos y los cuatro documentos técnicos anteriores. | Para preparar una entrega documental completa con un solo comando. |
+| `gobernanza` | Normas, responsabilidades, aceptación, versionado y guía de publicación. | Para mantener y revisar el gobierno documental. |
+| `todos` | Todos los paquetes anteriores. | Para preparar una entrega documental completa con un solo comando. |
 
 Al indicar sólo un paquete técnico se reconstruyen todos sus documentos. Para regenerar uno solo,
 agregue el nombre de la sección mostrado en la salida, por ejemplo
@@ -35,16 +36,14 @@ se exportan completos para ambos actores.
 
 Los paquetes por actor reutilizan las secciones comunes y omiten las que
 no corresponden a ese recorrido. En particular, los reportes de movimientos se exportan sólo en
-el manual de administrador; las compras y salidas se exportan sólo en el manual de almacén. Los
+el manual de administrador; las compras y salidas se exportan en ambos perfiles, con imágenes y acciones del área correspondiente. Los
 formatos
 admitidos son `docx`, `pdf` y `ambos`; `pdf` y
 `ambos` conservan el DOCX intermedio además del PDF, mientras que `ambos` permite expresar esa
 intención de forma explícita. Markdown permanece como fuente navegable y por eso no se genera una
 copia HTML equivalente.
 
-Los nombres de los archivos siguen los mismos grupos funcionales que las fichas `CU-*`:
-autenticación, identidad y acceso, catálogos y compras de materiales y consumibles. Las salidas son la excepción:
-material y merma se entregan en archivos distintos. Las
+Los manuales se dividen por los destinos visibles del menú: cada inventario, compra y salida conserva su contexto de materiales, consumibles o mermas. Las colecciones técnicas conservan su organización por grupo funcional. Las
 capturas de consultas y exportaciones se incluyen en el grupo del caso de uso al que dan evidencia;
 no se genera un grupo genérico de reportes.
 

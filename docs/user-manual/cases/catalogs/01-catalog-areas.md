@@ -10,17 +10,17 @@
 
 1. Abra **Áreas** y compruebe que el encabezado y la tabla correspondan al catálogo que desea modificar:
 
-   ![CAP-CAT-AREA-01-LIST: consulta de áreas](../../images/catalogs/areas/01-list.png)
+   ![CAP-CAT-AREA-01-LIST: consulta de áreas](../../images/areas/sistemas/catalogs/areas/01-list.png)
 
 2. Seleccione **Nueva área** y compruebe que se abra el formulario de alta:
 
-   ![CAP-CAT-AREA-02-CREATE: alta de área](../../images/catalogs/areas/02-form-creation.png)
+   ![CAP-CAT-AREA-02-CREATE: alta de área](../../images/areas/sistemas/catalogs/areas/02-form-creation.png)
 
    Complete **Nombre** —máximo 50 caracteres—. Revise la casilla **Activo** y seleccione **Guardar**.
 
 3. Seleccione **Editar registro** en la fila requerida y compruebe que se abra el formulario de edición:
 
-   ![CAP-CAT-AREA-03-EDIT: edición de área](../../images/catalogs/areas/03-form-edit.png)
+   ![CAP-CAT-AREA-03-EDIT: edición de área](../../images/areas/sistemas/catalogs/areas/03-form-edit.png)
 
    Cambie únicamente los campos habilitados —incluido **Activo**— y seleccione **Actualizar**.
 

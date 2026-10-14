@@ -1,15 +1,14 @@
-import { formatDateLongWithTime, toNumber } from "../../utils/formattersUtils.js";
-import { findAllMaterialMovements, findAllWasteMovements } from "./movementQueryService.js";
+import { toNumber } from "../../utils/formattersUtils.js";
+import { findAllMaterialMovements, findAllConsumableMovements, findAllWasteMovements } from "./movementQueryService.js";
 
 const MOVEMENT_REPORT_QUERIES = Object.freeze({
     materials: findAllMaterialMovements,
+    consumables: findAllConsumableMovements,
     wastes: findAllWasteMovements
 });
 
 const mapMovementReportRows = (movements) => movements.map((movement) => ({
     ...movement,
-    date: formatDateLongWithTime(movement.date),
-    createdAt: formatDateLongWithTime(movement.createdAt),
     previousStock: toNumber(movement.previousStock),
     quantity: toNumber(movement.quantity),
     newStock: toNumber(movement.newStock),

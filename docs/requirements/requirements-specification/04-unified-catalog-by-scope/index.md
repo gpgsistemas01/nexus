@@ -15,3 +15,8 @@ acceso, inventario o plataforma encuentra juntas las obligaciones relacionadas d
 5. [4.5 Políticas transversales del negocio](05-cross-cutting-business-policies.md)
 6. [4.6 Persistencia e integridad de información](06-information-persistence-and-integrity.md)
 7. [4.7 Operación y calidad del producto](07-product-operation-and-quality.md)
+
+Los capítulos 4.1 a 4.4 expresan capacidades observables y criterios particulares;
+4.5 conserva reglas compartidas, 4.6 garantías de datos y 4.7 calidad y operación.
+El [contrato de operaciones](../06-operation-modes-and-effects.md) y las
+[reglas de trazabilidad](../05-requirement-traceability-rules.md) completan su lectura.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createMaterialDtoForRegister } from '../../../src/dtos/materialDTO.js';
+import { createMaterialDtoForEdit, createMaterialDtoForRegister } from '../../../src/dtos/materialDTO.js';
 
 const materialBody = {
   name: '  Lámina  ',
@@ -44,5 +44,13 @@ describe('materialDTO', () => {
       newStock: 4,
       observations: 'Inventario inicial'
     }));
+  });
+  it('normaliza los pesos como pareja opcional y mantiene intactas referencias omitidas en edición', () => {
+    const dto = createMaterialDtoForRegister({ ...materialBody, referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' });
+    expect(dto).toMatchObject({ referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 2.25 });
+    expect(createMaterialDtoForEdit(materialBody)).not.toHaveProperty('referenceConeWeightKg');
+    const partial = createMaterialDtoForEdit({ ...materialBody, referenceConeWeightKg: '0.3' });
+    expect(partial.referenceConeWeightKg).toBe(0.3);
+    expect(partial).not.toHaveProperty('referenceRollTotalWeightKg');
   });
 });

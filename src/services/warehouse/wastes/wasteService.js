@@ -1,5 +1,5 @@
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError } from '../../../errors/warehouse/wasteError.js';
+import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
@@ -8,9 +8,9 @@ import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { registerWasteStockEntry } from './wasteStockEntryService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
-import { resolveWasteMaterialSnapshot } from './wasteMaterialService.js';
-import { findUniqueSupplier } from '../supplierService.js';
+import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.js';
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
+import { prepareWasteMeasurements } from './wasteHelpers.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -35,7 +35,7 @@ const WASTE_INCLUDE = {
     unitMeasure: { select: { id: true, name: true, symbol: true } }
 };
 
-const findWasteByIdentity = async ({ tx, supplierId, name, base, height, excludeId = null }) => {
+const findWasteByIdentity = async ({ tx, supplierId, name, base, height, coneWeightKg = null, totalWeightKg = null, excludeId = null }) => {
     const db = getDb(tx);
 
     const where = excludeId
@@ -43,19 +43,19 @@ const findWasteByIdentity = async ({ tx, supplierId, name, base, height, exclude
             supplierId,
             name,
             base,
-            height,
+            height, coneWeightKg, totalWeightKg,
             NOT: { id: excludeId }
         }
         : {
             supplierId,
             name,
             base,
-            height
+            height, coneWeightKg, totalWeightKg
         };
 
     return db.waste.findFirst({
         where,
-        select: { id: true }
+        select: { id: true, name: true, supplierId: true, base: true, height: true, coneWeightKg: true, totalWeightKg: true, weightKg: true, currentStock: true, presentation: true, unitMeasure: true, supplier: { select: { tradeName: true } } }
     });
 };
 
@@ -123,6 +123,10 @@ export const findAllWastes = async ({
                 name: true,
                 base: true,
                 height: true,
+                weightKg: true,
+                coneWeightKg: true,
+                totalWeightKg: true,
+                sourceMaterialId: true,
                 ...(canReadCosts && { maxUnitCost: true }),
                 minStock: true,
                 isActive: true,
@@ -156,27 +160,20 @@ export const createWasteWithInitialStockAdjustment = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
-            const supplier = await findUniqueSupplier({ tx, id: wasteDto.supplierId });
-
-            if (supplier?.isActive === false) throw new SupplierInactiveConflict();
-
-            const material = await resolveWasteMaterialSnapshot({
+            const offer = await findSupplierMaterialByIds({
                 tx,
                 materialId: wasteDto.materialId,
                 supplierId: wasteDto.supplierId
             });
 
-            if (!material) throw new WasteNotFound();
+            if (offer.supplier?.isActive === false) throw new SupplierInactiveConflict();
+            if (!offer.isActive) throw new WasteNotFound();
 
-            const existingWaste = await findWasteByIdentity({
-                tx,
-                supplierId: wasteDto.supplierId,
-                name: wasteDto.name,
-                base: wasteDto.base,
-                height: wasteDto.height
-            });
-
-            if (existingWaste) throw new WasteAlreadyExists();
+            const material = offer.material;
+            const coneWeightKg = wasteDto.coneWeightKg;
+            const { base, height, weightKg } = prepareWasteMeasurements({ wasteDto, offer });
+            const existingWaste = await findWasteByIdentity({ tx, supplierId: wasteDto.supplierId, name: wasteDto.name, base, height, coneWeightKg: coneWeightKg ?? null, totalWeightKg: wasteDto.totalWeightKg ?? null });
+            if (existingWaste) throw new WasteAlreadyExists({ waste: existingWaste });
 
             const initialStockReason = await findInitialStockAdjustmentReason({ tx });
 
@@ -189,13 +186,17 @@ export const createWasteWithInitialStockAdjustment = async ({
                     presentation: { connect: { id: material.presentation.id } },
                     unitMeasure: { connect: { id: material.unitMeasure.id } },
                     maxUnitCost: wasteDto.maxUnitCost,
-                    base: wasteDto.base,
-                    height: wasteDto.height,
+                    base,
+                    height,
+                    sourceMaterial: { connect: { id: material.id } },
+                    coneWeightKg: coneWeightKg ?? null,
+                    totalWeightKg: wasteDto.totalWeightKg ?? null,
+                    weightKg,
                     currentStock: wasteDto.newStock,
                     convertedQuantity: calculateConvertedQuantity({
                         currentStock: wasteDto.newStock,
-                        base: wasteDto.base,
-                        height: wasteDto.height
+                        base,
+                        height
                     })
                 }
             });
@@ -246,13 +247,15 @@ export const updateWaste = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
+            if (['weightKg', 'coneWeightKg', 'totalWeightKg', 'sourceMaterialId'].some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
+
             if (wasteDto.name && wasteDto.name !== currentWaste.name) {
                 const existingWaste = await findWasteByIdentity({
                     tx,
                     supplierId: currentWaste.supplierId,
                     name: wasteDto.name,
                     base: currentWaste.base,
-                    height: currentWaste.height,
+                    height: currentWaste.height, coneWeightKg: currentWaste.coneWeightKg ?? null, totalWeightKg: currentWaste.totalWeightKg ?? null,
                     excludeId: id
                 });
 

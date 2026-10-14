@@ -3,13 +3,15 @@
 
 **Casos de uso:** `CU-SAL-12` — Surtir merma.
 
+**Antes de empezar:** Vamos a confirmar una entrega. Tenga identificada la salida autorizada, la existencia disponible y los artículos que se entregarán físicamente.
+
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Salidas de merma](../../error-messages.md#errores-salidas-merma).
 
 **Controles que debe usar:** Acción **Surtir detalle**; casilla de la columna **Surtir** y campo de la columna **Cantidad de proyecto** de cada renglón pendiente; botón **Surtir**.
 
-1. En la fila de la salida, seleccione **Surtir detalle** para abrir sus renglones pendientes. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
+1. En la fila de la salida, seleccione **Surtir detalle** para abrir sus renglones pendientes. Observe los controles que va a usar:
 
-   ![CAP-SAL-WAS-04-SUPPLY: surtir detalles](../../images/waste-issues/04-supply-details.png)
+   ![CAP-SAL-WAS-04-SUPPLY: surtir detalles](../../images/areas/almacen/waste-issues/04-supply-details.png)
 
 2. En los renglones pendientes, marque la casilla **Surtir** y complete **Cantidad de proyecto**. El encabezado y los renglones ya surtidos permanecen deshabilitados como referencia.
 
@@ -20,3 +22,5 @@
 
 Después de confirmar, compruebe cuáles renglones quedaron surtidos y la existencia mostrada. Si el
 resultado es incierto, actualice la salida antes de intentar surtir nuevamente.
+
+**Compruebe el resultado:** Consulte la salida y compruebe los detalles surtidos, su estado y la existencia restante.

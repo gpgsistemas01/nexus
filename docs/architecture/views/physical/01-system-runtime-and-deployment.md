@@ -1,138 +1,171 @@
-# 1. Arquitectura del sistema
+# 1. Distribución y despliegue de Nexus
 
-### Diagrama de contexto del sistema
+## Alcance y fuentes
 
-Esta vista responde **quién utiliza Nexus y para qué se relaciona con él**. Su límite
-es el sistema completo: las personas se muestran fuera y Nexus como una única caja;
-el navegador, Express y Prisma son detalles internos y, por tanto, no forman parte de
-este nivel. Supabase sí aparece porque es un sistema externo administrado del que
-Nexus depende para persistir sus datos. Las flechas expresan interacción, no permisos
-individuales ni una secuencia técnica.
+Esta vista explica dónde se ejecuta cada parte de Nexus, cómo se comunica y qué
+necesita para arrancar. El contexto y los contenedores introducen los límites del
+sistema; la topología de despliegue muestra su distribución en infraestructura.
+Las capas de código se mantienen en la [vista lógica](../logical/01-components-and-reuse.md).
+
+| Aspecto | Fuente | Qué permite afirmar |
+| --- | --- | --- |
+| Render y Supabase | Decisión operativa registrada en el `README.md` | Es la topología vigente documentada; el repositorio no verifica la configuración activa del proveedor. |
+| Imagen de aplicación | `Dockerfile` | Node.js 22, generación de Prisma durante la construcción y ejecución con el usuario `node`. |
+| Arranque del contenedor | `docker-entrypoint.sh` | Fuerza producción y, por defecto, aplica migraciones antes de iniciar la aplicación. |
+| Servidor y puerto | `src/app.js` | Express y Socket.IO comparten un servidor HTTP que escucha en `0.0.0.0`, con `PORT` o 3000 por defecto. |
+| Conexiones a PostgreSQL | `src/lib/prisma.js`, `src/lib/databaseUrl.js` y `prisma.config.ts` | La aplicación usa `DATABASE_URL`; el CLI prefiere `DIRECT_URL`. |
+| Ejecución en un host | `docker-compose.yml` | Reproduce el contenedor de aplicación; no crea PostgreSQL ni configura Render. |
+
+## Contexto del sistema
+
+Las personas están fuera del límite de Nexus. Las flechas resumen interacciones de
+negocio, sin representar permisos individuales, herencia entre actores ni pasos de
+un caso de uso. Supabase aparece como dependencia externa de persistencia; Render
+se incorpora después como alojamiento de la aplicación.
 
 ```mermaid
-flowchart LR
-    warehouse["Personal de almacén y proveduría<br/>Actor operativo"]
-    systems["Área Sistemas<br/>Administrador del sistema"]
-    management["Coordinación y dirección<br/>Parte interesada de supervisión"]
-    nexus["Nexus<br/>Sistema de control operativo"]
-    supabase[("Supabase<br/>Servicio externo de PostgreSQL")]
-
-    warehouse -->|"Registra y consulta la operación<br/>de inventario"| nexus
-    systems -->|"Administra accesos, personas,<br/>catálogos y ajustes protegidos"| nexus
-    management -.->|"Alcance de supervisión<br/>pendiente de definición"| nexus
-    nexus -->|"Persiste y consulta<br/>datos operativos"| supabase
+flowchart TB
+    warehouse["Personal de almacén"]
+    administrator["Administrador del sistema"]
+    nexus["Nexus<br/>Control operativo de inventario"]
+    supabase[("Supabase<br/>PostgreSQL administrado")]
+    warehouse -->|"Consulta y registra<br/>compras, salidas y devoluciones"| nexus
+    administrator -->|"Operación y administración<br/>de accesos, catálogos y ajustes"| nexus
+    nexus -->|"Consulta y persiste<br/>datos operativos"| supabase
 ```
 
-Supabase es una dependencia de infraestructura, no una integración funcional pública
-como ERP, CRM o transportistas, que permanecen fuera del alcance. Render se muestra en
-la vista de despliegue y no aquí porque aloja Nexus sin ser un sistema con el que los
-actores intercambien información de negocio.
+Estos son los dos actores con acceso vigente. La supervisión por coordinación y
+dirección permanece como alcance pendiente en requisitos, sin un acceso adicional
+implementado. ERP, CRM y transportistas tampoco son integraciones vigentes.
 
-### Contenedores y capas
+## Contenedores de ejecución
+
+«Contenedor» identifica aquí una unidad que ejecuta o almacena información. Sólo la
+aplicación se empaqueta como imagen Docker; el navegador y PostgreSQL son unidades
+externas a esa imagen. Express, EJS, Socket.IO y Prisma colaboran en la misma
+aplicación y no son servicios desplegados por separado.
 
 ```mermaid
-flowchart LR
-    subgraph client["Navegador"]
-        pages["Vistas EJS renderizadas"]
-        scripts["JavaScript de páginas, módulos y servicios"]
-        pages --> scripts
-    end
-
-    subgraph server["Aplicación Node.js / Express"]
-        middleware["Middleware<br/>autenticación · autorización · validación"]
-        webRoutes["Rutas y controladores web"]
-        apiRoutes["Rutas y controladores API REST"]
-        services["Servicios de dominio"]
-        realtime["Socket.IO"]
-        prisma["Prisma Client"]
-
-        middleware --> webRoutes
-        middleware --> apiRoutes
-        webRoutes --> services
-        apiRoutes --> services
-        services --> prisma
-        services --> realtime
-    end
-
-    database[("PostgreSQL")]
-    pages <-->|"HTML"| webRoutes
-    scripts <-->|"JSON"| apiRoutes
-    scripts <-->|"eventos"| realtime
-    prisma <-->|"SQL"| database
+flowchart TB
+    browser["Navegador<br/>HTML y JavaScript"]
+    application["Aplicación Node.js<br/>Express · EJS · Socket.IO · Prisma"]
+    database[("PostgreSQL<br/>Datos operativos")]
+    browser -->|"Páginas y API<br/>HTTP(S)"| application
+    application -->|"HTML, JSON y archivos"| browser
+    application -->|"Eventos Socket.IO"| browser
+    application -->|"Consultas y transacciones<br/>protocolo PostgreSQL"| database
 ```
 
-### Despliegue actual: Render y Supabase
+| Unidad | Responsabilidad y límite |
+| --- | --- |
+| Navegador | Presenta el HTML recibido, ejecuta JavaScript, envía solicitudes y recibe avisos de actualización. No ejecuta EJS ni se conecta directamente a PostgreSQL. |
+| Aplicación | Renderiza las plantillas EJS, autentica y autoriza las peticiones y ejecuta las reglas y transacciones mediante Prisma. Los controladores notifican cambios por Socket.IO después de completar la operación correspondiente. |
+| Base de datos | Conserva documentos, detalles, existencias e historia. Las cuentas PostgreSQL son identidades de infraestructura, distintas de los usuarios y roles funcionales de Nexus. |
 
-La instancia vigente aloja la aplicación en Render y utiliza PostgreSQL administrado
-por Supabase. Esa asignación es una decisión operativa curada; el contenido del
-contenedor y su arranque sí se verifican en `Dockerfile` y `docker-entrypoint.sh`. Los
-rectángulos anidados son nodos o entornos de ejecución; el cilindro representa la base
-de datos y las flechas indican comunicación o secuencia de arranque. Las credenciales
-se inyectan como variables de entorno en Render y no forman parte de la imagen.
+Socket.IO usa el mismo servidor que Express. Los avisos permiten actualizar los
+listados; la consulta API sigue siendo la fuente de datos de la pantalla. La figura
+no presupone un servicio de mensajería ni una segunda aplicación de tiempo real.
+
+## Despliegue actual: Render y Supabase
+
+Render publica el servicio web y aloja el contenedor de Nexus. Supabase administra
+PostgreSQL. Las flechas de esta figura son canales de comunicación; el orden de
+arranque se representa por separado. Las credenciales se suministran como variables
+de entorno, sin mostrarlas en los diagramas.
 
 ```mermaid
-flowchart LR
+flowchart TB
     browser["Navegador del usuario"]
-
-    subgraph render["«node» Render · servicio web administrado"]
-        publicEndpoint["Endpoint público de Render"]
-        subgraph appContainer["«executionEnvironment» Contenedor app · Nexus"]
-            entrypoint["«artifact» docker-entrypoint.sh<br/>NODE_ENV=production"]
-            migrations["«artifact» Prisma CLI<br/>migrate deploy"]
-            nodeApp["«executionEnvironment» Node.js<br/>Express / Socket.IO · puerto 3000"]
-
-            entrypoint -->|"RUN_MIGRATIONS=true"| migrations
-            migrations -->|"migración correcta"| nodeApp
-            entrypoint -->|"RUN_MIGRATIONS=false"| nodeApp
+    subgraph render["«node» Render · servicio web"]
+        endpoint["Acceso público HTTPS"]
+        subgraph container["«executionEnvironment» Contenedor Nexus"]
+            application["Node.js 22<br/>Express y Socket.IO<br/>PORT o 3000"]
         end
-
-        publicEndpoint --> nodeApp
+        endpoint -->|"Tráfico al puerto de la aplicación"| application
     end
-
     subgraph supabase["«node» Supabase · servicio administrado"]
-        runtimeEndpoint["Endpoint de ejecución<br/>DATABASE_URL · directo o pooler"]
-        database[("PostgreSQL<br/>base Nexus")]
-        runtimeEndpoint --> database
+        database[("PostgreSQL<br/>Acceso directo o pooler")]
     end
-
-    browser -->|"HTTPS"| publicEndpoint
-    nodeApp -->|"consultas de aplicación"| runtimeEndpoint
-    migrations -->|"conexión directa · DIRECT_URL"| database
+    browser -->|"HTTPS · páginas, API y Socket.IO"| endpoint
+    application -->|"DATABASE_URL<br/>protocolo PostgreSQL"| database
 ```
 
-La aplicación usa `DATABASE_URL` durante la ejecución y Prisma CLI usa `DIRECT_URL`
-durante las migraciones. Si las migraciones están activadas, un fallo o la ausencia de
-la URL directa detiene el contenedor antes de iniciar Node.js. `docker-compose.yml`
-conserva el mismo contenedor como alternativa reproducible para ejecución en un host,
-pero no describe el entorno de producción actual ni levanta PostgreSQL localmente.
+`PORT` determina el puerto real; `EXPOSE 3000` declara el valor convencional de la
+imagen y no configura por sí solo el enrutamiento de Render. HTTPS representa el
+acceso público documentado. Las opciones de cifrado, pooler y red de la conexión a
+PostgreSQL dependen de las URLs y de la configuración del proveedor, que debe
+comprobarse en el entorno desplegado.
 
-### Despliegue objetivo: aplicación en un VPS
+## Arranque y migraciones
 
-La dirección prevista es trasladar el contenedor de la aplicación desde Render a un
-VPS. Esta es una vista objetivo, no implementada: las líneas discontinuas distinguen
-la intención de la topología actual. Antes de considerarla vigente deben versionarse
-la terminación TLS, el proxy inverso, la automatización del despliegue, respaldos y
-monitoreo. También queda por decidir si la persistencia continuará en Supabase o se
-operará PostgreSQL en infraestructura propia.
+El contenedor ejecuta `docker-entrypoint.sh` con `NODE_ENV=production`. Si
+`RUN_MIGRATIONS` no se indica, adopta `true`. Migrar y atender solicitudes son fases
+del mismo contenedor, no dos servicios permanentes.
 
 ```mermaid
-flowchart LR
-    browserTarget["Navegador del usuario"]
-
-    subgraph vps["«device» VPS · objetivo"]
-        ingress["Proxy inverso y TLS<br/>por definir"]
-        nexusContainer["«executionEnvironment» Contenedor Nexus<br/>Node.js · puerto interno 3000"]
-        ingress -.-> nexusContainer
-    end
-
-    targetDatabase[("Persistencia objetivo<br/>Supabase o PostgreSQL propio<br/>decisión pendiente")]
-
-    browserTarget -.->|"HTTPS"| ingress
-    nexusContainer -.->|"DATABASE_URL / DIRECT_URL"| targetDatabase
+flowchart TB
+    start["Iniciar contenedor<br/>NODE_ENV=production"] --> mode{"RUN_MIGRATIONS"}
+    mode -->|"true · valor predeterminado"| direct{"¿DIRECT_URL disponible?"}
+    mode -->|"false"| application["Ejecutar npm start<br/>Node.js atiende solicitudes"]
+    mode -->|"Otro valor"| stop["Terminar con error<br/>Aplicación sin iniciar"]
+    direct -->|"No"| stop
+    direct -->|"Sí"| migrations["Prisma migrate deploy<br/>Conexión DIRECT_URL"]
+    migrations -->|"Éxito"| application
+    migrations -->|"Fallo"| stop
 ```
 
-Esta vista de despliegue usa `flowchart` con estereotipos UML explícitos;
-no representa puertos ni conectores UML nativos. Las flechas de arranque del
-contenedor expresan control de ejecución y se distinguen de los canales HTTPS/SQL
-etiquetados. La topología objetivo conserva líneas discontinuas porque no está
-implementada.
+La fase de migración conecta con la misma base objetivo mediante `DIRECT_URL`; la
+fase de aplicación usa `DATABASE_URL`. Un fallo no inicia Node.js y debe revisarse
+en los registros de despliegue. Desactivar las migraciones sólo omite esa fase:
+no garantiza que el esquema ya sea compatible con la versión que se inicia.
+
+Con la configuración predeterminada, el contenedor recibe ambas URLs. Separarlas
+permite usar cuentas con distintos privilegios, pero no elimina la credencial de
+migración del contenedor. Para aislarla se necesita un proceso de despliegue separado
+que migre antes de arrancar la aplicación con `RUN_MIGRATIONS=false`; esa alternativa
+y su aprovisionamiento se explican en el [capítulo de cuentas PostgreSQL](02-postgresql-runtime-and-migration-roles.md).
+
+## Alternativa reproducible en un host
+
+`docker-compose.yml` construye la imagen, carga `.env`, activa migraciones y publica
+`3000:3000`. Declara el usuario `node`, el sistema de archivos de sólo lectura, un
+espacio temporal en `/tmp` y restricciones de capacidades. Esas opciones pertenecen
+a Compose; no se deben atribuir automáticamente al servicio administrado de Render.
+Si se cambia el puerto interno, también debe revisarse el mapeo de Compose.
+
+Este archivo no crea una base local, no termina TLS y no configura copias de
+seguridad. La persistencia debe estar disponible mediante las URLs suministradas.
+
+## Despliegue objetivo: aplicación en un VPS
+
+El traslado de la aplicación a un VPS es una propuesta. Las líneas discontinuas
+indican conexiones previstas; no evidencian infraestructura ya instalada. Se mantiene
+separada la conexión de aplicación de la ruta que emplearía el proceso de migración.
+
+```mermaid
+flowchart TB
+    browser["Navegador del usuario"]
+    subgraph vps["«node» VPS · propuesto"]
+        proxy["Proxy inverso y TLS<br/>Por definir"]
+        application["«executionEnvironment» Contenedor Nexus<br/>Puerto interno configurado"]
+        proxy -.->|"HTTP interno y Socket.IO"| application
+    end
+    migrator["Proceso de migración<br/>Ubicación por decidir"]
+    database[("Persistencia por decidir<br/>Supabase o PostgreSQL propio")]
+    browser -.->|"HTTPS"| proxy
+    application -.->|"DATABASE_URL"| database
+    migrator -.->|"DIRECT_URL"| database
+```
+
+| Decisión pendiente | Qué debe quedar definido antes del traslado |
+| --- | --- |
+| Publicación del servicio | Dominio, certificados, proxy inverso, puerto interno y soporte de Socket.IO. |
+| Persistencia | Continuidad en Supabase o administración propia de PostgreSQL, conectividad y cifrado. |
+| Despliegue y migraciones | Construcción de la imagen, suministro de secretos, orden de migración y arranque, y recuperación ante fallos. |
+| Operación | Copias de seguridad y restauración comprobada, registros, monitoreo y recuperación del servicio. |
+
+Las figuras de despliegue son aproximaciones con `flowchart` y estereotipos UML;
+Mermaid no representa aquí conectores y puertos UML nativos. No especifican cantidad
+de réplicas, alta disponibilidad, redes privadas ni un mecanismo de despliegue que
+no esté documentado. Una configuración versionada o una verificación del proveedor
+es necesaria para convertir la topología objetivo en vigente.

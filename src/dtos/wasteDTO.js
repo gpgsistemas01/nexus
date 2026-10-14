@@ -5,7 +5,9 @@ const buildWasteRegistrationDataDto = (body = {}) => ({
     supplierId: body.supplierId,
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
     base: toNumber(body.base),
-    height: toNumber(body.height)
+    height: toNumber(body.height),
+    ...Object.fromEntries(['coneWeightKg', 'totalWeightKg'].filter(field => Object.prototype.hasOwnProperty.call(body, field))
+        .map(field => [field, toNumber(body[field])]))
 });
 
 const buildWasteIdentityDto = (body = {}) => ({

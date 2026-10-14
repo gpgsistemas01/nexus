@@ -3,42 +3,66 @@
 
 **Patrones:** `BE-P02`.
 
+## Participantes y trazabilidad
+
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
+
+| Alias | Rol visual | Archivo de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`catalogApiRoute.js`](../../../../../../src/routes/api/admin/catalogApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`catalogController.js`](../../../../../../src/controllers/api/admin/catalogController.js) |
+| `Domain` | control | [`catalogService.js`](../../../../../../src/services/admin/catalogService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ValidationRules` | control | [`catalogValidations.js`](../../../../../../src/validators/forms/catalogValidations.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/admin/catalogApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/catalogValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/admin/catalogController.js
-    participant Domain@{ "type": "control" } as src/services/admin/catalogService.js
-    participant ErrorHandler as src/app.js
+    participant Route@{ "type": "boundary" } as catalogApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as catalogValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as catalogController.js
+    participant Domain@{ "type": "control" } as catalogService.js
+    participant ErrorHandler@{ "type": "control" } as app.js
 
     Client->>Route: PUT /api/admin/catalogs/presentations/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Auth: authorizeUserApi(PERMISSIONS.CATALOGS_MANAGE)(req, res, next)
-    Auth->>Validator: catalogEntryEditValidation[] y validate(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else PERMISSIONS.CATALOGS_MANAGE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else catalogEntryEditValidation rechaza req.body/req.params
-        Validator-->>Client: HTTP 400 { errors }
-    else Pipeline aceptado
-        Route->>Controller: editCatalogEntry(req, res)
-        activate Controller
-        Controller->>Domain: updateCatalogEntry(req.params.catalog, req.params.id, req.body) normaliza y actualiza únicamente los campos permitidos
-        activate Domain
-        alt Servicio resuelto
-            Domain-->>Controller: updateCatalogEntry(): Promise[Object]
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.CATALOGS_MANAGE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>ValidationRules: catalogEntryEditValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Controller: editCatalogEntry(req, res)
+    activate Controller
+    Controller->>Domain: updateCatalogEntry(req.params.catalog, req.params.id, req.body) normaliza y actualiza únicamente los campos permitidos
+    activate Domain
+    alt Servicio resuelto
+        Domain-->>Controller: updateCatalogEntry(): Promise[Object]
+        Controller-->>Client: HTTP 200 { data, code }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```
 

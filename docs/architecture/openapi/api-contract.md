@@ -70,20 +70,14 @@ del modal sin introducir una variante de estilo exclusiva para la exportación.
 
 ### Precisión de valores decimales
 
-Los payloads de creación y edición aceptan hasta **8 dígitos enteros y 6 decimales**
-para precios, existencias, cantidades y medidas. La API conserva esos seis decimales y
-la persistencia usa `DECIMAL(18,6)`; no debe interpretarse una representación visual de
-dos decimales como el valor contractual almacenado.
+Precios, existencias, cantidades y medidas aceptan hasta **8 dígitos enteros y
+6 decimales**, con persistencia `DECIMAL(18,6)`. El peso unitario de merma admite
+**3 enteros y 2 decimales**, con persistencia `DECIMAL(5,2)`. Las propiedades de
+cada payload y sus límites se definen en OpenAPI.
 
-El navegador mantiene hasta seis decimales durante captura, cálculos y envío. Las
-tablas, resúmenes y cantidades de sólo lectura reutilizan `formatDecimal` o
-`formatCurrency` para mostrar dos decimales. Por tanto, el redondeo es una decisión de
-presentación y nunca debe aplicarse al payload antes de crear o actualizar un recurso.
-
-Las reglas de negocio permanecen en requisitos, la estructura persistente en Prisma y
-la coordinación interna en las referencias técnicas. Este documento no repite
-tutoriales de JSON, criterios personales para redactar fichas ni detalles de
-presentación del cliente web.
+Los validadores comprueban la entrada antes de normalizarla. El frontend conserva
+la precisión del payload durante la captura y usa `formatDecimal` o
+`formatCurrency` para presentar los valores de consulta con dos decimales.
 
 Al cambiar una ruta, un payload, una respuesta o su seguridad, se actualiza la fuente
 OpenAPI del área correspondiente. Este documento se actualiza únicamente cuando cambia

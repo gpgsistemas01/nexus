@@ -3,23 +3,57 @@
 
 **Patrones:** `BE-P06`.
 
+## Participantes y trazabilidad
+
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
+
+| Alias | Rol visual | Archivo de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`movementApiRoute.js`](../../../../../../src/routes/api/admin/movementApiRoute.js) |
+| `Controller` | control | [`movementController.js`](../../../../../../src/controllers/api/admin/movementController.js) |
+| `Domain` | control | [`movementQueryService.js`](../../../../../../src/services/inventory/movementQueryService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/admin/movementApiRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/api/admin/movementController.js
-    participant Domain@{ "type": "control" } as src/services/inventory/movementQueryService.js
-    participant ErrorHandler as src/app.js
+    participant Route@{ "type": "boundary" } as movementApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant Controller@{ "type": "control" } as movementController.js
+    participant Domain@{ "type": "control" } as movementQueryService.js
+    participant ErrorHandler@{ "type": "control" } as app.js
 
     Client->>Route: GET /api/admin/movements/materials
+
+    Route->>Auth: verifyApiTokenRequired(req, res, next)
+    activate Auth
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
+    end
+    deactivate Auth
+    Route->>Auth: authorizeUserApi(PERMISSIONS.MOVEMENTS_READ)(req, res, next)
+    activate Auth
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    deactivate Auth
     Route->>Controller: getAllMaterialMovements(req, res)
     activate Controller
     Controller->>Domain: findAllMaterialMovements(getMovementListParams(req))
     activate Domain
     alt Servicio resuelto
+        Note over Domain: findInventoryMovements fija material.type = MATERIAL en consulta y conteos
         Domain-->>Controller: findAllMaterialMovements(): Promise[{ data: MaterialMovement[], recordsTotal: number, recordsFiltered: number }]
-        Controller-->>Client: HTTP 2xx { code, data }
+        Controller-->>Client: HTTP 200 { data, recordsTotal, recordsFiltered }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)

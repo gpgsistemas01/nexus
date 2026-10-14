@@ -23,3 +23,10 @@ export const getWasteMovementPage = async (req, res) => renderMovementPage({
     context: 'mermas',
     title: 'Movimientos de merma'
 });
+
+export const getConsumableMovementPage = async (req, res) => renderMovementPage({
+    req,
+    res,
+    context: 'consumibles',
+    title: 'Movimientos de consumibles'
+});

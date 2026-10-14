@@ -17,8 +17,9 @@
 
 ### 2.2 Líneas, espacios y fin de archivo
 
-- Cada archivo de texto termina con una sola nueva línea. No se agregan líneas vacías
-  adicionales al final.
+- Los archivos nuevos de texto terminan con una sola nueva línea, sin líneas vacías
+  adicionales. Al editar un EJS existente se conserva exactamente su terminación,
+  incluido si carece de salto final, conforme a la sección 8.
 - No quedan espacios al final de una línea ni líneas que sólo contengan espacios.
 - Se usa una línea vacía entre imports y declaraciones de módulo, entre funciones de
   nivel de módulo y entre fases semánticas de una función.

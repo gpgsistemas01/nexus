@@ -1,12 +1,27 @@
 # 1. Modelo de dominio conceptual
 
-Se usa `classDiagram`, notación UML soportada por Mermaid. Las clases no representan
-clases JavaScript ni copian tablas: son conceptos del negocio. La multiplicidad indica
-la relación conceptual vigente; una relación pendiente se omite para no presentar una
-intención como parte del dominio operativo. Los nombres sobre asociaciones de clases
-describen su significado y son válidos en UML; no se aplica aquí la convención de dejar
-sin frase las asociaciones actor–caso. El triángulo de generalización apunta a `Material`
-y los rombos de composición están en el documento que contiene los detalles.
+El modelo representa conceptos y relaciones del negocio vigente. Se divide en cuatro
+vistas del mismo dominio para facilitar la lectura; un concepto repetido conserva el
+mismo significado. Los nombres y las multiplicidades describen reglas funcionales,
+sin reproducir tablas, campos internos ni componentes de software. Esta vista muestra
+únicamente conceptos y relaciones: omitir atributos no significa que una entidad carezca
+de datos. Sus características se definen en el [glosario](../business-glossary.md) y en los
+requisitos correspondientes. En estas cuatro vistas no se necesitan compartimentos de
+atributos para entender las relaciones. Si otra vista necesita explicar una identidad o
+un cálculo, puede mostrar sólo los atributos de negocio relevantes; UML no obliga a
+listar todos los campos ni a convertir el dominio en el modelo de base de datos.
+
+Las figuras usan clases UML en Mermaid. Las asociaciones indican vínculos entre
+conceptos; la generalización agrupa variantes de un concepto y apunta al general.
+La composición señala que un detalle pertenece a un único documento o movimiento.
+Las clases abstractas sirven para expresar reglas comunes y no se registran por sí solas.
+
+## Personas y responsabilidades
+
+Una persona puede participar en el negocio sin disponer de una cuenta. Una cuenta
+puede vincularse con una persona; la persona puede tener varias cuentas. Las
+responsabilidades de una persona y los accesos de una cuenta se describen mediante
+un rol y un área, pero asignar una responsabilidad a la persona no le concede acceso.
 
 ```mermaid
 ---
@@ -15,69 +30,162 @@ config:
     hideEmptyMembersBox: true
 ---
 classDiagram
-    direction LR
+    direction TB
     class Usuario
     class Persona
-    class AsignacionAcceso {
+    class Asignacion["Asignación<br/>organizacional"] {
         <<abstract>>
     }
-    class AsignacionUsuario
-    class AsignacionPersona
-    class Cliente
-    class Proveedor
-    class Material
-    class Consumible {
-        <<classification>>
-    }
-    class Merma
-    class OfertaProveedorMaterial
-    class EntradaCompra
-    class SalidaMaterial
-    class SalidaMerma
-    class DetalleEntrada
-    class DetalleSalidaMaterial
-    class DetalleSalidaMerma
-    class Movimiento
-    class Existencia
+    class AccesoUsuario["Acceso de usuario"]
+    class ResponsabilidadPersona["Responsabilidad<br/>de persona"]
+    class Rol
+    class Area["Área"]
 
-    AsignacionAcceso <|-- AsignacionUsuario
-    AsignacionAcceso <|-- AsignacionPersona
-    Usuario "1" -- "0..*" AsignacionUsuario : posee
-    Persona "1" -- "0..*" AsignacionPersona : desempeña
-    Proveedor "1" -- "0..*" OfertaProveedorMaterial : ofrece
-    Material "1" -- "0..*" OfertaProveedorMaterial : cotizado como
-    Material <|-- Consumible
-    note for Consumible "Restricción: type = CONSUMABLE. Se persiste en Material."
-    Merma ..> Material : usa como plantilla y conserva snapshots
-    Proveedor "1" -- "0..*" EntradaCompra : abastece
-    EntradaCompra "1" *-- "1..*" DetalleEntrada : contiene
-    SalidaMaterial "1" *-- "1..*" DetalleSalidaMaterial : contiene
-    SalidaMerma "1" *-- "1..*" DetalleSalidaMerma : contiene
-    DetalleEntrada "0..*" -- "1" Material : recibe
-    DetalleSalidaMaterial "0..*" -- "1" Material : entrega
-    DetalleSalidaMerma "0..*" -- "1" Merma : entrega
-    Cliente "0..1" -- "0..*" SalidaMaterial : contextualiza
-    EntradaCompra "1" -- "0..*" Movimiento : produce
-    SalidaMaterial "1" -- "0..*" Movimiento : produce
-    SalidaMerma "1" -- "0..*" Movimiento : produce
-    Movimiento "0..*" --> "1" Existencia : modifica
+    Asignacion <|-- AccesoUsuario
+    Asignacion <|-- ResponsabilidadPersona
+    Persona "0..1" -- "0..*" Usuario : identifica
+    Usuario "1" -- "0..*" AccesoUsuario : posee
+    Persona "1" -- "0..*" ResponsabilidadPersona : desempeña
+    Rol "1" -- "0..*" Asignacion : define rol
+    Area "1" -- "0..*" Asignacion : define área
 ```
 
-`Consumible` representa la clasificación explícita `CONSUMABLE` de una identidad
-persistida en `Material`; no es otra tabla ni se infiere por unidad o ausencia de
-dimensiones. Reutiliza la oferta, existencia, ajuste y movimiento de material, mientras
-sus consultas y reportes se mantienen separados.
+El solicitante, el asesor y la persona que recibe una compra son participaciones de
+`Persona`, no tipos de usuario. El usuario identifica la cuenta que ejecuta una acción.
+Los actores funcionales Personal de almacén y Administrador del sistema se representan
+en los casos de uso, sin convertirlos en entidades adicionales del dominio.
 
-`AsignacionUsuario` y `AsignacionPersona` especializan el concepto abstracto de
-asignación sin exigir que una misma asignación pertenezca a cuenta y persona a la vez.
+## Artículos, ofertas y existencias
 
-`Persona` puede ser solicitante, receptor o referencia comercial sin que eso convierta
-a esa persona en usuario. En particular, **asesor** es un dato del contexto comercial,
-no un actor con acceso. Los proyectos siguen modelados técnicamente, pero se excluyen de
-esta vista vigente hasta definir su flujo.
+Materiales y consumibles son dos clasificaciones distintas de artículos de compra.
+Cada oferta vincula un artículo con un proveedor y conserva su existencia, costo y
+estado activo. La merma tiene proveedor y existencia propios; toma datos de un material
+como plantilla al registrarse, pero conserva sus propios datos después del alta.
 
-La composición (`*--`) expresa propiedad de los detalles por su documento; las
-asociaciones (`--`) incluyen multiplicidades y no implican llamadas. La dependencia
-de Merma hacia Material describe la selección de una plantilla: no afirma una
-relación persistente. `«classification»` es un estereotipo local que distingue la
-especialización conceptual de una jerarquía de clases o tablas.
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction TB
+    class ArticuloCompra["Artículo<br/>de compra"] {
+        <<abstract>>
+    }
+    class Material
+    class Consumible
+    class Proveedor
+    class OfertaProveedor["Oferta de proveedor"]
+    class Merma
+
+    ArticuloCompra <|-- Material
+    ArticuloCompra <|-- Consumible
+    Proveedor "1" -- "0..*" OfertaProveedor : ofrece
+    ArticuloCompra "1" -- "0..*" OfertaProveedor : tiene ofertas
+    Proveedor "1" -- "0..*" Merma : procede de
+    Material "0..1" -- "0..*" Merma : referencia de origen
+    Merma ..> OfertaProveedor : consulta pesos predeterminados
+```
+
+Cada artículo y cada merma tienen una presentación y una unidad de medida,
+procedentes de los catálogos auxiliares correspondientes.
+
+La existencia es una cantidad de la oferta o de la merma, no un saldo único del
+artículo. Un artículo puede ofrecerse por varios proveedores; no puede repetirse la
+misma combinación artículo–proveedor. Los consumibles se clasifican expresamente,
+carecen de dimensiones y se gestionan en consultas y reportes separados de materiales.
+La merma conserva el vínculo con el material de origen y consulta los pesos de su oferta
+al registrar; guarda el cono utilizado y los resultados sin copiar la referencia.
+Cambiar los datos de esa oferta no modifica las medidas ni los pesos de la merma registrada.
+
+## Compras y salidas
+
+Una compra recibe artículos de un proveedor. Una salida solicita artículos o mermas
+para un cliente. Cada documento contiene al menos un detalle y cada detalle pertenece
+a un solo documento. Los detalles se conservan cuando se corrigen, se cancelan o se
+devuelve lo entregado, para mantener la historia de la operación.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction TB
+    class Proveedor
+    class Cliente
+    class ArticuloCompra["Artículo<br/>de compra"] {
+        <<abstract>>
+    }
+    class OfertaProveedor["Oferta de proveedor"]
+    class Merma
+    class Compra
+    class SalidaArticulo["Salida de artículos"]
+    class SalidaMerma["Salida de merma"]
+    class DetalleCompra["Detalle de compra"]
+    class DetalleSalidaArticulo["Detalle de salida<br/>de artículos"]
+    class DetalleSalidaMerma["Detalle de salida<br/>de merma"]
+
+    Proveedor "1" -- "0..*" Compra : abastece
+    Compra "1" *-- "1..*" DetalleCompra : contiene
+    DetalleCompra "0..*" -- "1" ArticuloCompra : recibe
+    Cliente "1" -- "0..*" SalidaArticulo : recibe
+    Cliente "1" -- "0..*" SalidaMerma : recibe
+    SalidaArticulo "1" *-- "1..*" DetalleSalidaArticulo : contiene
+    SalidaMerma "1" *-- "1..*" DetalleSalidaMerma : contiene
+    DetalleSalidaArticulo "0..*" -- "1" OfertaProveedor : solicita oferta
+    DetalleSalidaMerma "0..*" -- "1" Merma : solicita
+```
+
+Los detalles de una compra pertenecen todos a su clasificación: materiales o
+consumibles. El proveedor de la compra determina la oferta que recibe las cantidades.
+Salida de artículos representa el proceso común a **salidas de materiales y salidas
+de consumibles**, que se gestionan en contextos separados y no se mezclan en un mismo
+documento. Sus detalles identifican el artículo y el proveedor de cuya existencia se
+surtirá; los detalles de una salida de merma identifican la merma correspondiente.
+El solicitante, asesor, área y número de proyecto completan el contexto de una salida;
+la persona receptora completa el de una compra. El mantenimiento de proyectos queda
+fuera del alcance vigente y no se introduce como otro proceso en esta vista.
+
+## Documentos y trazabilidad de inventario
+
+Las compras, salidas, ajustes y entradas adicionales de merma explican los cambios
+de existencia. Cada movimiento corresponde a un único documento de origen y puede
+contener efectos sobre varios recursos. Una devolución o corrección conserva la
+referencia al documento original; no crea una nueva compra o salida.
+
+```mermaid
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+---
+classDiagram
+    direction TB
+    class DocumentoInventario["Documento<br/>de inventario"]
+    class Movimiento
+    class EfectoInventario["Efecto de inventario"]
+    class OfertaProveedor["Oferta de proveedor"]
+    class Merma
+
+    DocumentoInventario "1" -- "0..*" Movimiento : explica
+    Movimiento "1" *-- "1..*" EfectoInventario : registra
+    EfectoInventario "0..*" -- "0..1" OfertaProveedor : cambia existencia
+    EfectoInventario "0..*" -- "0..1" Merma : cambia existencia
+    note for EfectoInventario "Un solo recurso: oferta o merma."
+```
+
+Cada efecto corresponde **exclusivamente a una oferta o a una merma**; las dos
+asociaciones opcionales expresan esa alternativa, no permiten un efecto sin recurso ni
+con ambos recursos. El movimiento puede afectar varias existencias mediante sus efectos;
+no se vincula a un único saldo global. Su documento de origen es una compra, salida
+de material, salida de consumible, salida de merma, ajuste o entrada adicional de merma.
+Crear una salida pendiente no produce movimientos: éstos aparecen al surtir o devolver. Un ajuste y una entrada
+adicional de merma son documentos distintos de una compra.
+
+El [glosario del negocio](../business-glossary.md) define los conceptos y el
+[catálogo de casos de uso](../use-cases/index.md) describe los objetivos que actúan sobre
+ellos. Los estados de documentos y detalles se explican en el
+[capítulo siguiente de estados](03-states-and-data-changed-by-action.md).

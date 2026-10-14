@@ -68,6 +68,8 @@ describe('wasteController registration boundaries', () => {
         base: '99999999.999999',
         height: '99999999.999999',
         newStock: '99999999.999999',
+        coneWeightKg: '0',
+        totalWeightKg: '100',
         observations
       })
       .expect('Content-Type', /json/)
@@ -82,6 +84,8 @@ describe('wasteController registration boundaries', () => {
         base: 99999999.999999,
         height: 99999999.999999,
         newStock: 99999999.999999,
+        coneWeightKg: 0,
+        totalWeightKg: 100,
         observations
       }),
       userId
@@ -93,8 +97,6 @@ describe('wasteController registration boundaries', () => {
     ['partición de equivalencia', 'UUID de material inválido', { materialId: 'not-a-uuid' }, 'materialId'],
     ['partición de equivalencia', 'UUID de proveedor inválido', { supplierId: 'not-a-uuid' }, 'supplierId'],
     ['valor límite', 'dimensión en cero', { base: '0' }, 'base'],
-    ['tabla de decisiones', 'medidas ausentes', { base: undefined, height: undefined }, 'base'],
-    ['tabla de decisiones', 'dimensión incompleta', { height: undefined }, 'height'],
     ['partición de equivalencia', 'stock no numérico', { newStock: 'NaN' }, 'newStock'],
     ['valor límite', 'stock negativo', { newStock: '-0.000001' }, 'newStock'],
     ['valor límite', 'costo máximo negativo', { maxUnitCost: '-0.000001' }, 'maxUnitCost'],
@@ -115,4 +117,53 @@ describe('wasteController registration boundaries', () => {
     });
     expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
   });
+  it.each([undefined, null, '', '0.01'])('admite peso desconocido o el mínimo positivo: %s', weightKg => {
+    return request(app).post('/wastes').send({ ...validBody, coneWeightKg: weightKg == null || weightKg === '' ? weightKg : 0, totalWeightKg: weightKg }).expect(200);
+  });
+
+  it.each([
+    [0, 'WEIGHT_KG_INVALID_NUMBER'],
+    [-1, 'WEIGHT_KG_INVALID_NUMBER'],
+    ['abc', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['0.75abc', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['1e3', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['1,25', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['Infinity', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['NaN', 'WEIGHT_KG_INVALID_NUMBER'],
+    [true, 'WEIGHT_KG_INVALID_NUMBER'],
+    [[1], 'WEIGHT_KG_INVALID_NUMBER'],
+    [{ value: 1 }, 'WEIGHT_KG_INVALID_NUMBER'],
+    [' ', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['1\n', 'WEIGHT_KG_INVALID_NUMBER'],
+    [' 1', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['1 ', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['+1', 'WEIGHT_KG_INVALID_NUMBER'],
+    ['1.001', 'WEIGHT_KG_TOO_LONG'],
+    ['100.000', 'WEIGHT_KG_TOO_LONG'],
+    ['0001', 'WEIGHT_KG_TOO_LONG'],
+    ['999.990001', 'WEIGHT_KG_TOO_HIGH'],
+    [1000, 'WEIGHT_KG_TOO_HIGH'],
+    ['100000000', 'WEIGHT_KG_TOO_HIGH'],
+    ['0.001', 'WEIGHT_KG_TOO_LONG'],
+    [0.001, 'WEIGHT_KG_TOO_LONG'],
+    [1e21, 'WEIGHT_KG_TOO_HIGH']
+  ])('rechaza peso %s antes de normalizarlo y devuelve el código correcto', async (weightKg, code) => {
+    const response = await request(app).post('/wastes').send({ ...validBody, coneWeightKg: 0, totalWeightKg: weightKg }).expect(400);
+    expect(response.body.errors.totalWeightKg.code).toBe(code);
+    expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [{ totalWeightKg: 2 }, 'coneWeightKg', 'CONE_WEIGHT_KG_REQUIRED'],
+    [{ coneWeightKg: 0 }, 'totalWeightKg', 'TOTAL_WEIGHT_KG_REQUIRED'],
+    [{ coneWeightKg: -1, totalWeightKg: 2 }, 'coneWeightKg', 'CONE_WEIGHT_KG_INVALID_NUMBER'],
+    [{ coneWeightKg: 2, totalWeightKg: 2 }, 'totalWeightKg', 'WASTE_TOTAL_WEIGHT_NOT_GREATER'],
+    [{ coneWeightKg: 3, totalWeightKg: 2 }, 'totalWeightKg', 'WASTE_TOTAL_WEIGHT_NOT_GREATER'],
+    [{ weightKg: 1 }, 'weightKg', 'WASTE_WEIGHT_CALCULATED']
+  ])('rechaza captura incompleta o incoherente %s antes del servicio', async (weights, field, code) => {
+    const response = await request(app).post('/wastes').send({ ...validBody, ...weights }).expect(400);
+    expect(response.body.errors[field].code).toBe(code);
+    expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
+  });
+
 });

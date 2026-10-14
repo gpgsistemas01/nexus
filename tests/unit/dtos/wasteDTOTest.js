@@ -13,7 +13,10 @@ describe('wasteDTO', () => {
       name: '  Recorte corregido  ',
       minStock: '2',
       maxUnitCost: '15.5',
-      isActive: true
+      isActive: true,
+      weightKg: 9,
+      coneWeightKg: 1,
+      totalWeightKg: 10
     })).toEqual({
       name: 'Recorte corregido',
       minStock: 2,
@@ -32,8 +35,11 @@ describe('wasteDTO', () => {
       minStock: '1',
       maxUnitCost: '10',
       isActive: true,
-      newStock: '4'
-    })).toMatchObject({ name: 'Recorte confirmado' });
+      newStock: '4',
+      coneWeightKg: '0.25',
+      totalWeightKg: '1.5',
+      weightKg: '999'
+    })).toMatchObject({ name: 'Recorte confirmado', coneWeightKg: 0.25, totalWeightKg: 1.5 });
   });
 
   it('normaliza las observaciones igual en ajustes y adiciones de stock', () => {

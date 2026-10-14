@@ -1,5 +1,17 @@
 import { AppError } from "../AppError.js";
 
+export class MaterialRollReferenceInvalid extends AppError {
+    constructor() {
+        super('Los pesos de referencia sólo aplican a materiales con presentación Rollo.', 'MATERIAL_ROLL_REFERENCE_INVALID', 400);
+    }
+}
+
+export class MaterialRollReferenceReadOnly extends AppError {
+    constructor() {
+        super('Los pesos de referencia registrados no se pueden modificar ni eliminar.', 'MATERIAL_ROLL_REFERENCE_READ_ONLY', 409);
+    }
+}
+
 export class MaterialNotFound extends AppError {
 
     constructor () {

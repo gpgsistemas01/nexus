@@ -8,8 +8,9 @@ casos que comparten tema, actor, ciclo CRUD o efectos de inventario para revisar
 semejanzas sin concentrar recorridos distintos en una sola ficha. Cada `CU-*` conserva
 su propio archivo y los índices de grupo reúnen únicamente navegación y reglas comunes.
 
-Las descripciones expresan comportamiento de negocio, no endpoints ni permisos. La
-[sección de modos y efectos](../requirements-specification/06-operation-modes-and-effects.md)
+Las descripciones expresan comportamiento de negocio y las autorizaciones necesarias.
+La implementación de endpoints y las comprobaciones internas se describen en arquitectura.
+La [sección de modos y efectos](../requirements-specification/06-operation-modes-and-effects.md)
 detalla el contrato funcional; la [especificación de requisitos](../requirements-specification/index.md) contiene
 criterios verificables y reglas. La evidencia técnica pertenece a arquitectura y pruebas,
 enlazadas mediante componentes, secuencias y el catálogo de pruebas. Una capacidad parcial, modelada o
@@ -27,9 +28,10 @@ objetivos de distinta complejidad.
 
 ## Semántica de actores y generalización UML
 
-Las asociaciones directas enlazan al actor con cada caso en el que participa. Las
-fichas nombran a los actores autorizados para iniciar el objetivo; una relación entre
-casos no hereda actores ni concede permisos. Personal de almacén especializa a
+En los diagramas, las asociaciones compartidas enlazan al actor general con la consulta
+del recurso. Las asociaciones directas con otras operaciones corresponden a los casos
+particulares justificados en las fichas. Estas nombran a los actores autorizados para
+iniciar el objetivo; una relación entre casos no hereda actores ni concede permisos. Personal de almacén especializa a
 Usuario registrado; Administrador del sistema especializa a Personal de almacén y
 hereda todas sus asociaciones. Los casos exclusivos del administrador conservan
 asociaciones directas adicionales; no se duplican las funciones heredadas.
@@ -54,12 +56,18 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   cada condición se registra por separado y no se confunde con una acción de validación
   ni con un resultado obtenido durante el flujo.
 - **Flujo principal:** interacción numerada paso a paso; cada paso identifica un solo
-  participante y una acción observable. Los turnos alternan entre actor y Nexus; cuando varias acciones consecutivas corresponden al mismo participante, se integran en un solo paso. Capturar filas de una tabla describe además la acción **Agregar** y la revisión de cada renglón, no sólo la captura genérica. Toda consulta o escritura identifica la interacción con la base de datos y remite a su excepción técnica. Se nombran el botón, enlace o acción que dispara cada transición; el formulario,
-  diálogo o tabla que abre Nexus; los mensajes de confirmación o error; y la validación
-  y conservación del resultado cuando forman parte del caso. Expresiones pasivas como
-  «revisa» o «verifica el resultado» no sustituyen una interacción observable. El paso
-  desde el que se desprende una variante o un rechazo incluye entre paréntesis
-  **(ver A1)** o **(ver E1)**, según el identificador correspondiente.
+  participante y una acción observable. Los turnos alternan entre actor y Nexus; cuando
+  varias acciones consecutivas corresponden al mismo participante, se integran en un
+  solo paso. La captura de filas incluye la acción **Agregar** y la revisión de cada
+  renglón. La consulta describe la información que obtiene el actor; una modificación describe
+  los datos y efectos de negocio que quedan confirmados. El paso remite a una excepción
+  de operación cuando ésta no puede completarse, sin explicar bases de datos,
+  transacciones ni componentes internos. Se nombran los controles que disparan cada acción, el formulario,
+  diálogo o tabla que abre Nexus y los mensajes de confirmación o error. La validación
+  y la conservación del resultado se describen cuando forman parte del caso. Una
+  expresión como «verifica el resultado» debe indicar qué se muestra o qué cambia.
+  El paso que origina una variante o un rechazo incluye la referencia **(ver A1)** o
+  **(ver E1)**, según corresponda.
 - **Flujos alternativos:** título breve seguido de una secuencia propia por variante,
   con numeración reiniciada, la interacción actor–Nexus y un destino explícito. Además
   de las decisiones que cambian el recorrido, incluyen la captura de información
@@ -78,6 +86,10 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   conservan si el caso se rechaza o falla.
 - **Reglas y requisitos relacionados:** referencias a criterios normativos que no se
   duplican dentro de la ficha.
+
+La excepción **EOP — Operación no completada** describe el aviso al actor y los
+efectos de negocio que se conservan ante un fallo; no prescribe cómo se resuelve
+la persistencia o la comunicación interna.
 
 Cada flujo alternativo y cada excepción comienza con un título que permite reconocer
 rápidamente la situación. El flujo alternativo indica el paso del flujo principal
@@ -179,7 +191,7 @@ trazabilidad técnica; un identificador retirado no se reasigna a un objetivo di
 | `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
 | `CAT` | Catálogos | Recursos comerciales y contextuales reutilizados por documentos. |
 | `ENT` | Compras de materiales y consumibles | Consulta, registro, edición, corrección, cancelación y reporte de ambos contextos de compra. |
-| `SAL` | Salidas de material y de merma | Consulta, creación, edición, surtimiento y devolución de materiales o mermas. |
+| `SAL` | Salidas de material, merma y consumible | Consulta, creación, edición, surtimiento y devolución de materiales, consumibles o mermas. |
 
 #### Criterio de agrupación vigente
 
@@ -198,10 +210,10 @@ como listas planas difíciles de revisar.
 | --- | --- | --- |
 | `AUT` | Sesión. | `CU-AUT-01` a `CU-AUT-02` |
 | `IDA` | Personas; usuarios y credenciales; sus consultas y reportes. | `CU-IDA-01` a `CU-IDA-09` |
-| `ALM` | Materiales, consumibles y mermas; inventarios y movimientos del almacén. | `CU-ALM-01` a `CU-ALM-22` |
+| `ALM` | Materiales y sus movimientos; mermas y sus movimientos; consumibles. | `CU-ALM-01` a `CU-ALM-24` |
 | `CAT` | Proveedores; clientes; catálogos auxiliares y reportes complementarios. | `CU-CAT-01` a `CU-CAT-26` |
 | `ENT` | Compras de materiales, consumibles y sus reportes. | `CU-ENT-01` a `CU-ENT-12` |
-| `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
+| `SAL` | Salidas de material, merma y consumible con sus reportes. | `CU-SAL-01` a `CU-SAL-21` |
 
 Las familias internas son ayudas visuales, no nuevos grupos funcionales, permisos ni
 módulos de código. Un caso conserva un único identificador y una única entidad aunque su
@@ -210,8 +222,10 @@ implementación reutilice validaciones, formularios, servicios o exportadores.
 El orden anterior determina la lectura dentro de cada grupo. La numeración sigue el
 orden de lectura del catálogo dentro de cada grupo propietario. El catálogo y las fichas
 se presentan después en esa misma secuencia. No se conserva al final del grupo una
-operación especial que pertenece a una familia anterior. Las seis vistas funcionales
-se conservan para facilitar la lectura de los 85 casos, no por una exigencia de UML.
+operación especial que pertenece a una familia anterior. Los seis grupos funcionales
+se presentan en veintidós figuras de detalle para facilitar la lectura de los 94 casos,
+no por una exigencia de UML. La numeración continúa dentro del mismo grupo y no se
+reinicia por figura; separar inventarios y movimientos no crea una familia nueva.
 Las extensiones de otros grupos se representan junto al caso base, reutilizando el
 identificador del caso y sin duplicar su ficha. La jerarquía de actores se muestra en
 AUT y la generalización operativa se conserva donde aparecen ambos actores. Las
@@ -230,21 +244,20 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 - [ALM — Almacén](catalogs/index.md)
 - [CAT — Catálogos](catalogs/index.md)
 - [ENT — Compras de materiales y consumibles](purchases/index.md)
-- [SAL — Salidas de material y de merma](issues/index.md)
+- [SAL — Salidas de material, merma y consumible](issues/index.md)
 
-## Relación entre familias y reutilización
+## Reglas compartidas entre familias
 
-| Tema compartido | Casos | Elementos reutilizables que deben evaluarse primero | Diferencia que debe conservarse |
-| --- | --- | --- | --- |
-| CRUD de identidades y catálogos | `CU-IDA-01` a `CU-IDA-09`; `CU-ALM-01` a `CU-ALM-06`; `CU-ALM-09` a `CU-ALM-13`; `CU-ALM-17` a `CU-ALM-21`; `CU-CAT-01` a `CU-CAT-26` | Fábricas CRUD, listados, formularios, validación y refresco de tabla. | Permisos, identidad del recurso, relaciones y política de eliminación. |
-| Documentos con detalles | `CU-ENT-02`, `CU-ENT-03`, `CU-SAL-02` a `CU-SAL-04` y `CU-SAL-09` a `CU-SAL-11` | Encabezado, modal/formulario, tabla de detalles, DTO y transacción coordinadora. | La entrada incrementa stock al confirmarse; la salida no lo descuenta hasta surtir. |
-| Operación de salidas | `CU-SAL-02` a `CU-SAL-06` y `CU-SAL-09` a `CU-SAL-13` | Proceso de material replicable para merma, componentes informativos y coordinación de movimientos. | Inventario, conversión, permisos, estados y cantidades acumuladas del contexto. |
-| Consulta y exportación | `CU-IDA-04`, `CU-IDA-09`, `CU-ALM-06`, `CU-ALM-08`, `CU-ALM-14`, `CU-ALM-16`, `CU-ALM-22`, `CU-CAT-04`, `CU-CAT-08`, `CU-ENT-06`, `CU-SAL-07` y `CU-SAL-14` y casos de consulta de cada familia | Filtros, paginación, dependencias entre selects y utilidades Excel. | Columnas, agrupaciones, fórmulas y permiso de cada reporte. |
+| Tema | Información o regla compartida | Diferencia que debe conservarse |
+| --- | --- | --- |
+| Identidades y catálogos | Nombre, clasificación, estado activo y datos que identifican cada registro. | La autorización, la identidad del recurso y las condiciones para retirarlo. |
+| Documentos con detalles | Folio, participantes, fechas, recursos, cantidades y confirmación del documento completo. | La compra incorpora existencias al registrarse; la salida las descuenta al surtir. |
+| Entregas y devoluciones | Cantidades solicitadas, surtidas y devueltas, y su historia. | La existencia de material por proveedor y la existencia propia de merma. |
+| Consultas y reportes | Criterios de búsqueda, alcance y orden de la información. | Los datos, agrupaciones, cálculos y autorizaciones propios de cada reporte. |
 
-Reutilizar no significa fusionar reglas de negocio. Antes de crear otro flujo se revisan
-los [patrones de diseño y construcción](../../architecture/views/development/design-and-construction-patterns/index.md), se replica
-el proceso existente sólo cuando cambia el contexto, y se mantienen explícitas sus
-validaciones, transacciones y pruebas CRUD.
+Compartir información o reglas no fusiona objetivos del actor ni convierte una
+operación en otra. La realización técnica y su reutilización se describen en los
+[patrones de diseño y construcción](../../architecture/views/development/design-and-construction-patterns/index.md).
 
 ## Trazabilidad y mantenimiento
 
@@ -252,14 +265,14 @@ validaciones, transacciones y pruebas CRUD.
    diagrama de casos de uso en el mismo cambio.
 2. Si cambia una operación, se revisan también la especificación, la matriz de
    operaciones y el plan de pruebas.
-3. Las pruebas unitarias conservan la ruta paralela al código; las integraciones CRUD
-   atraviesan HTTP y Prisma en `tests/integration/controllers/*DbTest.js`, conforme a
-   el [plan de pruebas](../../testing/test-plan.md).
+3. La evidencia de verificación se mantiene en el
+   [plan de pruebas](../../testing/test-plan.md), sin introducir su implementación en
+   los pasos que realiza el actor.
 4. Un caso nuevo debe completar identificador, nombre, actor y disparador,
    participación de actores y sistema, precondiciones, pasos granulares del flujo
    principal, secuencias actor–Nexus y destino para cada alternativa, excepciones,
    resultado y reglas o requisitos relacionados antes de considerarse documentado.
-5. Proyectos, requisiciones y ajustes sin flujo HTTP completo permanecen en la
-   especificación con su estado correspondiente; se incorporarán aquí sólo al pasar a
-   alcance vigente.
+5. Los objetivos fuera del alcance vigente, como el mantenimiento de proyectos o
+   las requisiciones, permanecen en la especificación con su estado correspondiente;
+   sólo se incorporan al catálogo cuando su recorrido esté disponible.
 

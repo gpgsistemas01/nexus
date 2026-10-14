@@ -90,7 +90,7 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **El registro de _tipo de catálogo_ no está disponible.** | La entrada fue eliminada o dejó de estar disponible antes de la actualización. Actualice el listado y seleccione otra entrada vigente. |
 | **Complete correctamente los campos del catálogo _tipo de catálogo_.** | Corrija **Nombre**, **Símbolo** o **Activo** según los controles visibles del catálogo nombrado; el rechazo no crea ni actualiza entradas. |
 | **Ya existe un material con el mismo nombre, presentación, unidad de medida y dimensiones.** | Seleccione el inventario existente y use **Ajustar stock** para establecer la nueva existencia total; no repita el alta ni interprete el valor como una cantidad para sumar. |
-| **Ya existe una merma con el nombre, proveedor y dimensiones indicados.** | Seleccione la merma existente y use **Ajustar stock** para establecer el nuevo stock total; el alta rechazada no incrementó su existencia. |
+| **Ya existe una merma con este proveedor, nombre, medidas y pesos. Use Agregar stock para aumentar su existencia.** | Use el acceso a **Agregar stock**, revise la cantidad precargada y confirme la entrada. El alta rechazada no incrementó la existencia. |
 | **La oferta del material está inactiva y no puede utilizarse en una operación nueva.** | No lo agregue a una compra, salida o relación nueva. Reactive la oferta sólo si vuelve a estar autorizada; un detalle registrado antes de desactivarlo puede surtirse desde la salida existente. |
 | **El proveedor está inactivo y no puede utilizarse en una operación nueva.** | Seleccione un proveedor activo o reactive el registro cuando corresponda. Las salidas ya registradas conservan sus detalles y pueden completar el surtido pendiente. |
 | **No se puede cambiar el proveedor del material porque ya tiene historial de compras o salidas.** | Conserve la relación histórica y registre la identidad correcta conforme al flujo de materiales. |
@@ -112,13 +112,18 @@ formulario, sin abrir otra cuenta ni crear un registro duplicado.
 | **Razón para modificar el detalle de compra no encontrada.** | Solicite revisar el catálogo de motivos antes de continuar. |
 
 <a id="errores-salidas-material"></a>
-## Salidas de material
+<a id="errores-salidas-consumibles"></a>
+## Salidas de material y consumible
+
+Las salidas de consumibles comparten estos mensajes con las de material; algunos avisos
+conservan la palabra «material». Compruebe siempre el artículo y la existencia en
+**Almacén → Consumibles** cuando la operación provenga de **Salidas → Consumibles**.
 
 | Mensaje visible | Recuperación |
 |---|---|
 | **Salida de almacén no encontrada.** o **Detalle de salida de almacén no encontrado.** | Actualice el listado y vuelva a seleccionar la salida o el detalle. |
 | **Stock inexistente para realizar la salida...** | Verifique material, proveedor y dimensiones; no confirme la salida. |
-| **Stock insuficiente para realizar la salida...** | Reduzca la cantidad o espere a que exista disponibilidad confirmada. |
+| **Stock insuficiente para realizar la salida...** | Confirme disponibilidad antes de surtir; la entrega de un renglón consume toda su cantidad pendiente. |
 | **No se puede realizar la salida porque el material no tiene costo unitario máximo configurado...** | Solicite configurar el costo máximo del material antes de surtir. |
 | **La salida solo puede editarse cuando está pendiente.** | Actualice la salida y use únicamente la acción disponible para su estado. |
 | **La salida ya tiene materiales surtidos y no puede editarse en general.** | Edite sólo el encabezado o use devolución, según las acciones disponibles. |
@@ -164,3 +169,24 @@ Seleccione **Volver**. Con una sesión válida, el botón conduce al inventario 
 sesión, conduce al inicio de sesión. Si el error apareció desde una opción visible de Nexus,
 conserve la dirección y repórtela. No modifique manualmente la URL para intentar acceder a otra
 área.
+
+### Peso de merma de rollo
+
+| Mensaje | Qué hacer |
+| --- | --- |
+| El peso por unidad debe ser un decimal mayor que cero en kg. Use punto decimal, sin letras ni notación científica. | Capture un decimal positivo, por ejemplo 0.75; quite letras y separadores. Si desconoce el peso, deje vacío el campo durante el alta. |
+| El peso debe ser positivo y sólo aplica a mermas con presentación Rollo. | Revise la presentación y capture kg por unidad con un valor mayor que cero; deje vacío cuando no se conoce. |
+| No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta. | Consulte el peso guardado y actualice únicamente los campos habilitados del formulario. |
+| El peso por unidad no puede superar 999.99 kg. | Verifique el peso de una unidad de merma; no capture aquí el peso total de todas las existencias. |
+| El peso admite hasta 3 dígitos enteros y 2 decimales. | Corrija la precisión del valor capturado. |
+| Capture el peso del cono para calcular el peso neto de la merma. | Complete el peso del cono de una unidad. |
+| Capture el peso total con cono para calcular el peso neto de la merma. | Complete el peso total de la misma unidad, incluyendo el cono. |
+| El peso total con cono debe ser mayor que el peso del cono. | Revise ambas mediciones de la misma unidad. |
+| El peso del cono debe ser un decimal mayor o igual que cero en kg. Use punto decimal, sin letras ni notación científica. | Capture kg del cono; cero es válido. |
+| El peso neto se calcula automáticamente. Capture el peso del cono y el peso total con cono. | Capture los dos pesos habilitados y consulte el neto calculado. |
+
+| Referencia o método del rollo | Recuperación |
+| --- | --- |
+| Seleccione si el cono tiene peso fijo o variable. | Elija el comportamiento del cono de este material y proveedor. |
+| Complete la referencia del cono y del rollo para utilizarla en esta merma. | Verifique cono y muestra de rollo completo o capture el cono y largo medidos. |
+| Capture los pesos de la merma antes de estimar su longitud. | Complete cono y total con cono, o seleccione longitud Medida. |

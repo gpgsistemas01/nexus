@@ -4,15 +4,17 @@ Este documento contiene una **decisión operativa de infraestructura**. No defin
 permisos funcionales de Nexus ni la estructura del modelo persistente; esas fuentes y su
 relación se localizan desde el [modelo persistente](../logical/data-and-persistence/index.md).
 
-## ¿Ya está resuelto?
+## Estado de implementación
 
 Está resuelto **el enrutamiento de las conexiones**, pero no la creación ni los
 privilegios de las cuentas:
 
 - La aplicación obtiene su conexión de `DATABASE_URL`.
-- Prisma CLI obtiene su conexión de `DIRECT_URL` al ejecutar migraciones.
-- El entrypoint exige `DIRECT_URL`, ejecuta `prisma migrate deploy` y después inicia la
-  aplicación, que vuelve a usar `DATABASE_URL`.
+- Prisma CLI prefiere `DIRECT_URL`; fuera del entrypoint, la configuración puede
+  recurrir a `DATABASE_URL` si la URL directa no está definida.
+- Con `RUN_MIGRATIONS=true` (valor predeterminado), el entrypoint exige `DIRECT_URL`,
+  ejecuta `prisma migrate deploy` y después inicia la aplicación con `DATABASE_URL`.
+  Con `false`, omite las migraciones; otro valor impide el arranque.
 
 Esto permite colocar credenciales distintas en ambas URLs, pero PostgreSQL o el
 proveedor administrado todavía debe crear esas cuentas y conceder sus privilegios.
@@ -137,7 +139,8 @@ DIRECT_URL="postgresql://nexus_migrator:<secret-migrator>@db.example.com:5432/ne
 La imagen actual puede seguir ejecutando migraciones y aplicación en el mismo
 contenedor porque cada fase resuelve una variable distinta. Para una separación más
 estricta, el pipeline de despliegue puede ejecutar `npm run db:migrate` como un job con
-solo `DIRECT_URL`, y arrancar el contenedor de aplicación con:
+`DIRECT_URL` y `NODE_ENV=production`, sin `DATABASE_URL`. Después puede arrancar
+el contenedor de aplicación con:
 
 ```env
 RUN_MIGRATIONS=false
@@ -145,7 +148,10 @@ DATABASE_URL="postgresql://nexus_app:<secret-app>@pooler.example.com:6543/nexus"
 ```
 
 En ese modo el proceso de aplicación nunca recibe el secreto de migración. El job debe
-terminar correctamente antes de desplegar la nueva versión.
+terminar correctamente antes de desplegar la nueva versión. Esta separación es una
+alternativa de infraestructura; el repositorio no contiene un job de despliegue que
+la implemente. Los workflows de CI verifican documentación y pruebas, sin demostrar
+por sí solos que las cuentas del proveedor ya estén separadas.
 
 ## Verificación
 
@@ -271,7 +277,7 @@ en el esquema Prisma. Tras el despliegue, las facturas que incluyan el marcador
 `[DUPLICADO:` deben compararse con sus documentos fuente y corregirse mediante el
 flujo normal del CRUD de entradas de compra.
 
-## ¿Es obligatorio hacerlo ahora?
+## Adopción de cuentas separadas
 
 No requiere cambios al esquema Prisma y no bloquea el funcionamiento actual. Es una
 medida de defensa en profundidad que limita el impacto de una inyección SQL, una
@@ -281,3 +287,101 @@ antes de producción o durante la siguiente ventana de infraestructura.
 Si el proveedor solo entrega una cuenta, el sistema puede continuar temporalmente con
 la configuración actual. En ese caso se debe registrar la excepción, restringir la
 red, rotar el secreto y evitar exponer `DIRECT_URL` fuera del proceso de despliegue.
+
+## Migración de folios de salidas por contexto
+
+La migración incremental
+`20261012180000_shorten_issue_and_purchase_reference_prefixes` establece cinco
+series cortas. Usa las columnas `type` ya incorporadas a compras y salidas; no
+agrega columnas ni modifica migraciones anteriores.
+
+| Documento y tipo guardado | Folio anterior reconocido | Prefijo vigente |
+| --- | --- | --- |
+| Salida de materiales | `SAL`, `SAL-MAT` o `SAL-CON` | `SMA` |
+| Salida de consumibles | `SAL`, `SAL-MAT` o `SAL-CON` | `SCO` |
+| Salida de merma | `SAL-MER` o `SM`, dentro de `WasteIssue` | `SME` |
+| Compra de materiales | `REC` | `CMA` |
+| Compra de consumibles | `REC` | `CCO` |
+
+Sólo se convierten referencias completas `prefijo-AAAA-consecutivo` con año de
+cuatro dígitos y sufijo numérico. La clasificación guardada determina el prefijo;
+si todos los registros anteriores son materiales, sus folios quedan en `SMA` y
+`CMA`. Un folio `SAL` o `REC` por sí solo no prueba el tipo: las migraciones
+`20261005010000_add_goods_receipt_type` y `20261007000000_add_goods_issue_type`
+clasificaron como consumibles los documentos con todos sus detalles de ese tipo.
+
+La cadena mantiene `20260814150000_align_waste_reference_prefixes` (`SM` a
+`SAL-MER`) y `20261012120000_split_goods_issue_reference_prefixes` (`SAL` a
+`SAL-MAT`/`SAL-CON`). La nueva migración convierte esos resultados al formato
+vigente, conservando exactamente año, sufijo, UUID, datos y relaciones. Las
+referencias personalizadas y los folios propios de movimientos, devoluciones,
+ajustes y entradas de merma permanecen fuera de la conversión.
+
+La conversión y conciliación de contadores ocurren en una sola transacción que
+bloquea `ReferenceNumberCounter`, `GoodsIssue`, `GoodsReceipt` y `WasteIssue`.
+Una colisión con cualquier folio destino aborta todo: se revisan los documentos
+conflictivos antes de reintentar, sin borrar ni renumerar automáticamente.
+
+Los contadores vigentes conservan el mayor valor entre documentos emitidos,
+contadores propios existentes y contadores anteriores de su serie. El contador
+compartido `REC` alimenta inicialmente `CMA` y `CCO`; `SAL` alimenta `SMA` y `SCO`.
+`SAL-MAT` y `SAL-CON` alimentan sólo su contexto; `SM` y `SAL-MER`, sólo `SME`.
+Los contadores retirados se conservan como historia. Las cinco series avanzan
+independientemente desde ese máximo y un año nuevo empieza en uno.
+
+Antes del despliegue:
+
+1. Respaldar la base y revisar cantidades por tipo, referencias personalizadas y
+   colisiones con destinos ya existentes. La revisión del repositorio no permite
+   certificar la clasificación de una base de producción sin consultarla.
+2. Publicar servicio y migración en la misma versión; detener instancias anteriores
+   durante la conversión para impedir que vuelvan a emitir prefijos retirados.
+3. Aplicar con la cuenta de migraciones y `DIRECT_URL` mediante `npm run db:migrate`;
+   comprobar `npx prisma migrate status` antes de iniciar la nueva versión.
+4. Comprobar los cinco prefijos y la continuidad de contadores en consultas y
+   reportes. Un folio impreso o exportado antes del cambio conserva su texto
+   anterior; localice el documento por su año, sufijo y datos operativos.
+
+Las pruebas de persistencia usan una base aislada y verifican la cadena histórica,
+conservación de registros, merma separada, máximos de contadores, repetición,
+instalación vacía y colisiones con rollback. Nunca se usa producción para pruebas.
+
+## Migración de peso unitario de merma
+
+La cadena establece `Waste.weightKg` con el tipo vigente `DECIMAL(5,2)`, nullable,
+y CHECK de positividad y máximo de 999.99 kg:
+
+| Migración | Cambio |
+| --- | --- |
+| `20261012210000_add_roll_waste_unit_weight` | Agrega el campo y el CHECK de positividad. |
+| `20261012233000_limit_roll_waste_weight_to_100kg` | Establece el máximo de 100 kg. |
+| `20261013153000_limit_roll_waste_weight_to_two_decimals` | Establece tres enteros y dos decimales. |
+| `20261013160000_add_roll_waste_cone_and_total_weight` | Migración consolidada pendiente: amplía el máximo a 999.99 kg según `DECIMAL(5,2)` y agrega cono y total por unidad, pesos del material/proveedor, vínculo e identidad con pesos; conserva netos históricos. |
+
+En una base que ya tenga el campo, revise los valores que impedirían aplicar
+estas migraciones:
+
+```sql
+SELECT "id", "name", "weightKg"
+FROM "Waste"
+WHERE "weightKg" > 100 OR "weightKg" <> ROUND("weightKg", 2);
+```
+
+Las migraciones bloquean la tabla y cancelan la transacción si encuentran valores
+incompatibles. Resuelva los registros señalados antes de reintentar. Publique el
+formulario y el backend junto con el cliente Prisma regenerado y aplique las
+migraciones con la cuenta destinada a ello.
+
+La migración de cono y total agrega ambos campos nullable sin cambiar los pesos netos
+históricos. Para una captura nueva, el CHECK exige cono no negativo, total mayor
+que cono y hasta 999.99 kg, y neto igual a la diferencia.
+
+La migración de referencias conserva las filas y pesos previos sin inferir cono,
+material de origen ni muestra. El origen histórico queda `NULL` y el largo existente
+se clasifica como `MEASURED`. Agrega FK `Waste.sourceMaterialId` con `RESTRICT` y
+reemplaza el índice único de cuatro campos por uno que incluye cono y total.
+`Waste_unknown_weights_identity`, definido en SQL porque Prisma no representa este
+índice parcial, impide duplicados cuando ambos pesos son `NULL`. Los CHECK protegen
+modo fijo/variable, neto de referencia y datos necesarios para una longitud estimada.
+Una versión antigua sigue comparando sólo dimensiones: detener esas instancias antes
+de habilitar el registro con pesos distintos.

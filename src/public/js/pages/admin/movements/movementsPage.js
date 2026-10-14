@@ -2,6 +2,8 @@ import { createMovementDatatable } from "../../../plugins/datatable/admin/moveme
 import { setupTableFilters } from "../../../plugins/datatable/core/filters/tableFilter.js";
 import { FILTER_SELECTORS } from '../../../constants/selectors.js';
 import { setupWasteSelect } from '../../../plugins/select2/domains/waste.js';
+import { initMaterialFilterSelect } from '../../../plugins/select2/domains/material.js';
+import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
 
 const movementContext = document.querySelector('#movementPage')?.dataset.movementContext;
 if (movementContext) {
@@ -17,7 +19,17 @@ if (movementContext) {
                 wasteSelector: FILTER_SELECTORS.MATERIAL
             })
         }
-        : 'material';
+        : {
+            key: 'materialId',
+            selector: FILTER_SELECTORS.MATERIAL,
+            dependsOn: 'supplierId',
+            isSelected: false,
+            initSelect: ({ selectedId }) => initMaterialFilterSelect({
+                selectedId,
+                supplierFilterSelector: FILTER_SELECTORS.SUPPLIER,
+                resource: movementContext === 'consumable' ? INVENTORY_RESOURCES.CONSUMABLE : INVENTORY_RESOURCES.MATERIAL
+            })
+        };
     const filters = await setupTableFilters({
         fields: ['date', 'movementType', 'supplier', inventoryFilter],
         selector: `#${ movementContext }MovementTable`

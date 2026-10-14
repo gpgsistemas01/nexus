@@ -7,44 +7,71 @@ El listado de Sistemas y el selector de una salida reutilizan el mismo `POST`. E
 `clients:create` autoriza el alta contextual de Almacén; `clients:page-view` continúa siendo un
 permiso distinto exigido sólo por la ruta web independiente `/clientes`.
 
+## Participantes y trazabilidad
+
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
+
+| Alias | Rol visual | Archivo de implementación |
+| --- | --- | --- |
+| `Route` | boundary | [`clientApiRoute.js`](../../../../../../src/routes/api/sales/clientApiRoute.js) |
+| `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
+| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
+| `Controller` | control | [`clientController.js`](../../../../../../src/controllers/api/sales/clientController.js) |
+| `ClientDto` | control | [`clientDTO.js`](../../../../../../src/dtos/clientDTO.js) |
+| `Domain` | control | [`clientService.js`](../../../../../../src/services/sales/clientService.js) |
+| `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
+| `ValidationRules` | control | [`clientValidations.js`](../../../../../../src/validators/forms/clientValidations.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
-    participant Route@{ "type": "boundary" } as src/routes/api/sales/clientApiRoute.js
-    participant Auth@{ "type": "control" } as src/middleware/authMiddleware.js
-    participant Validator@{ "type": "control" } as src/validators/forms/clientValidations.js<br/>src/middleware/validatorMiddleware.js
-    participant Controller@{ "type": "control" } as src/controllers/api/sales/clientController.js
-    participant ClientDto@{ "type": "entity" } as clientDto: Object<br/>src/dtos/clientDTO.js
-    participant Domain@{ "type": "control" } as src/services/sales/clientService.js
-    participant ErrorHandler as src/app.js
+    participant Route@{ "type": "boundary" } as clientApiRoute.js
+    participant Auth@{ "type": "control" } as authMiddleware.js
+    participant ValidationRules@{ "type": "control" } as clientValidations.js
+    participant Validator@{ "type": "control" } as validatorMiddleware.js
+    participant Controller@{ "type": "control" } as clientController.js
+    participant ClientDto@{ "type": "control" } as DTO funcional<br/>clientDTO.js
+    participant Domain@{ "type": "control" } as clientService.js
+    participant ErrorHandler@{ "type": "control" } as app.js
 
     Client->>Route: POST /api/sales/clients
     Route->>Auth: verifyApiTokenRequired(req, res, next)
-    Auth->>Validator: clientValidation[] y validate(req, res, next)
-    Validator->>Auth: authorizeUserApi(PERMISSIONS.CLIENTS_CREATE)(req, res, next)
-    alt Token ausente o inválido
-        Auth-->>Client: HTTP 401 { code, message }
-    else clientValidation rechaza req.body
-        Validator-->>Client: HTTP 400 { errors }
-    else PERMISSIONS.CLIENTS_CREATE denegado
-        Auth-->>Client: HTTP 403 { code, message }
-    else Pipeline aceptado
-        Route->>Controller: registerClient(req, res)
-        activate Controller
-        Controller->>ClientDto: createClientDtoForRegister(req.body)
-        ClientDto-->>Controller: createClientDtoForRegister(): Object (clientDto)
-        Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
-        activate Domain
-        alt Servicio resuelto
-            Domain-->>Controller: clientService.createClient(): Promise[Client]
-            Controller-->>Client: HTTP 2xx { code, data }
-        else AppError propagado
-            Domain-->>Controller: throw AppError { code, message, meta, statusCode }
-            Controller->>ErrorHandler: next(error)
-            ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
-        end
-        deactivate Domain
-        deactivate Controller
+    break Token ausente o inválido
+        Auth-->>Client: HTTP 401 INVALID_AUTH
     end
+    Route->>ValidationRules: clientValidation[] — cadena ejecutada por Express
+    Route->>Validator: validate(req, res, next)
+    break Validación rechazada
+        Validator-->>Client: HTTP 400 { errors }
+    end
+    Route->>Auth: authorizeUserApi(PERMISSIONS.CLIENTS_CREATE)(req, res, next)
+    break Identidad no vigente o permiso denegado
+        Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
+    end
+    Route->>Controller: registerClient(req, res)
+    activate Controller
+    Controller->>ClientDto: createClientDtoForRegister(req.body)
+    activate ClientDto
+    ClientDto-->>Controller: createClientDtoForRegister(): Object (clientDto)
+    deactivate ClientDto
+    Controller->>Domain: clientService.createClient({ clientDto }) persiste Client
+    activate Domain
+    alt Servicio resuelto
+        Domain-->>Controller: clientService.createClient(): Promise[Client]
+        Controller-->>Client: HTTP 200 { client, code }
+    else AppError propagado
+        Domain-->>Controller: throw AppError { code, message, meta, statusCode }
+        Controller->>ErrorHandler: next(error)
+        ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
+    end
+    deactivate Domain
+    deactivate Controller
 ```

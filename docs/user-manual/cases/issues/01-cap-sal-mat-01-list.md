@@ -11,7 +11,7 @@
 
 1. Abra **Filtros** y compruebe que los controles desplegados coincidan con la captura:
 
-   ![CAP-SAL-MAT-01-LIST: listado](../../images/material-issues/01-list.png)
+   ![CAP-SAL-MAT-01-LIST: listado](../../images/areas/almacen/material-issues/01-list.png)
 
 2. Escriba un término en **Buscar por Folio o Proyecto** o complete **Fecha de inicio:**, **Fecha de fin:**, **Cliente:**, **Área:**, **Persona:**, **Estado de surtido:** y **Observaciones contiene:**.
 3. Seleccione **Buscar / filtrar** para actualizar la tabla; use **Limpiar filtros** para restablecerla.
@@ -19,7 +19,7 @@
    seleccione **Buscar / filtrar**. Compruebe el filtro aplicado y el resultado:
 
    <a id="CAP-SAL-MAT-07-FILTER"></a>
-   ![CAP-SAL-MAT-07-FILTER: filtro Surtido aplicado](../../images/material-issues/07-filter-supplied.png)
+   ![CAP-SAL-MAT-07-FILTER: filtro Surtido aplicado](../../images/areas/almacen/material-issues/07-filter-supplied.png)
 
 5. En la tabla, seleccione **Nueva salida**, **Exportar Excel**, **Editar registro**, **Surtir detalle** o **Devolver material surtido**, según la operación requerida.
 

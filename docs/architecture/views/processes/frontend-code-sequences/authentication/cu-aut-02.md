@@ -3,14 +3,37 @@
 
 **Patrones:** `FE-P09`.
 
+## Participantes y trazabilidad
+
+Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
+por su alias en la tabla. Dos archivos distintos usan participantes distintos. Los actores,
+el navegador y la frontera de persistencia son elementos externos, no archivos del proyecto.
+Los retornos representan el resultado o error de la función ejecutada en el archivo indicado.
+La composición incluye también los archivos de configuración, construcción y reexport: cada
+uno tiene un nodo propio, aunque no ejecute una delegación durante la petición.
+
+| Alias | Rol visual | Archivo de implementación |
+| --- | --- | --- |
+| `View` | boundary | [`logoutForm.ejs`](../../../../../../src/views/layout/ui/logoutForm.ejs) |
+| `Route` | boundary | [`logoutWebRoute.js`](../../../../../../src/routes/web/auth/logoutWebRoute.js) |
+| `Controller` | control | [`authController.js`](../../../../../../src/controllers/web/authController.js) |
+| `Cookies` | control | [`cookiesUtils.js`](../../../../../../src/utils/cookiesUtils.js) |
+| `Flash` | control | [`flashUtils.js`](../../../../../../src/utils/flashUtils.js) |
+
+## Secuencia de implementación
+
 ```mermaid
 sequenceDiagram
     autonumber
     actor Initiator as Usuario registrado
     participant Browser as Navegador
-    participant View@{ "type": "boundary" } as src/views/layout/ui/logoutForm.ejs
-    participant Route@{ "type": "boundary" } as src/routes/web/auth/logoutWebRoute.js
-    participant Controller@{ "type": "control" } as src/controllers/web/authController.js
+    participant View@{ "type": "boundary" } as logoutForm.ejs
+    participant Route@{ "type": "boundary" } as logoutWebRoute.js
+    participant Controller@{ "type": "control" } as authController.js
+
+    participant Cookies@{ "type": "control" } as cookiesUtils.js
+
+    participant Flash@{ "type": "control" } as flashUtils.js
 
     Initiator->>Browser: inicia CU-AUT-02 — Cerrar sesión
     Browser->>View: activar botón Salir
@@ -19,12 +42,15 @@ sequenceDiagram
     activate Route
     Route->>Controller: logout(req, res)
     activate Controller
-    Controller->>Controller: clearAuthCookies(res)
+    Controller->>Cookies: clearAuthCookies(res)
+    Cookies-->>Controller: clearAuthCookies(): void
     alt req.error recibido desde refresh
-        Controller->>Controller: redirectWithFlash(res, INVALID_AUTH, req.error, 'error')
+        Controller->>Flash: redirectWithFlash(res, INVALID_AUTH, req.error, 'error')
+        Flash-->>Controller: redirectWithFlash(): void
         Controller-->>Browser: redirect 302 con flash de error
     else Cierre solicitado
-        Controller->>Controller: redirectWithFlash(res, SUCCESS_LOGOUT, code, 'info')
+        Controller->>Flash: redirectWithFlash(res, SUCCESS_LOGOUT, code, 'info')
+        Flash-->>Controller: redirectWithFlash(): void
         Controller-->>Browser: redirect 302 con flash informativo
     end
     Browser->>Browser: GET /inicio-sesion

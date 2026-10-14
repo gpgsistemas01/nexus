@@ -21,17 +21,17 @@ Los avisos se distinguen mediante una marca y una etiqueta textual:
 | Personas, clientes y proveedores | Nombre e identificadores requeridos; formato y longitud; relaciones vigentes | En alta y edición | Conserve el formulario abierto y corrija sólo los campos marcados. |
 | Usuarios y acceso | Persona, usuario, rol y departamento vigentes; usuario sin espacios; contraseña con longitud, mayúscula, número y carácter especial | En alta, edición de acceso o cambio de contraseña | No comparta la contraseña ni la incluya en evidencia; corrija la regla indicada. |
 | Catálogos auxiliares | **Nombre** requerido y sin caracteres no admitidos; máximo 50 para Áreas, Roles, Presentaciones y Estados de cumplimiento, 20 para Unidades de medida y 100 para Motivos de ajuste; **Símbolo** requerido y máximo 10 sólo en Unidades de medida; **Activo** booleano requerido en todos los catálogos auxiliares | Al seleccionar **Guardar** o **Actualizar** | El formulario permanece abierto y señala el campo; una solicitud rechazada no modifica el catálogo. |
-| Material / alta directa | Identidad, proveedor, unidad, presentación y dimensiones válidas; estado requerido; stock mínimo opcional numérico; existencia inicial y costo máximo obligatorios y numéricos | Al seleccionar **Guardar** desde **Almacén → Materiales** | Una identidad repetida no suma existencia: abra el registro vigente y use **Ajustar stock**. |
+| Material / alta directa | Identidad, proveedor, unidad, presentación y dimensiones válidas; estado requerido; stock mínimo opcional numérico; existencia inicial y costo máximo obligatorios y numéricos | Al seleccionar **Guardar** desde **Almacén → Materiales** | Una identidad repetida no suma existencia: solicite al administrador revisar el registro y el ajuste autorizado. |
 | Material / alta desde compra | Identidad, proveedor, unidad, presentación y dimensiones válidas; stock mínimo y estado admitidos. No se solicitan costo máximo, existencia inicial, razón ni observaciones de ajuste; costo máximo y existencia inicial dejan de ser obligatorios | Al seleccionar **Guardar** en **Nuevo material** abierto desde una compra | El material vuelve seleccionado con existencia cero y sin costo máximo; capture **Cantidad** y **Costo por Presentación** en el detalle y confirme la compra para afectar inventario. |
 | Consumible / alta directa | Nombre, proveedor, presentación y unidad explícita válidos; sin dimensiones; estado requerido; stock mínimo opcional numérico; existencia inicial, costo máximo, motivo y observaciones según las reglas del ajuste inicial | Al seleccionar **Guardar** desde **Almacén → Consumibles** | Una oferta repetida no suma existencia ni se convierte en material: abra el consumible vigente y use **Ajustar stock** si cuenta con permiso. |
-| Merma / alta directa | Nombre, proveedor, material de referencia, dimensiones positivas, estado, existencia inicial y costo máximo válidos; stock mínimo opcional numérico | Al seleccionar **Guardar** desde **Almacén → Mermas** | Una identidad repetida no suma existencia: abra el registro vigente y use **Ajustar stock**. |
+| Merma / alta directa | Nombre, proveedor, material de referencia, dimensiones positivas, estado, existencia inicial y costo máximo válidos; stock mínimo opcional numérico | Al seleccionar **Guardar** desde **Almacén → Mermas** | Una identidad repetida no suma existencia: solicite al administrador revisar el registro y el ajuste autorizado. |
 | Material, consumible o merma / edición | Identidad y datos secundarios admitidos para el recurso; sólo se validan los campos habilitados y la existencia no cambia | Al seleccionar **Actualizar** | Conserve el formulario y corrija el campo señalado; use **Agregar stock** para incrementar una merma o, si es Administrador, **Ajustar stock** para reemplazar la existencia del recurso abierto. |
 | Agregar existencia de merma | Modal específico con identidad y existencia actual informativas; cantidad positiva que se suma al saldo actual y observaciones opcionales de hasta 500 caracteres | Al confirmar **Agregar** | La cantidad es incremental; genera un registro en el historial de movimientos y no captura un nuevo total ni un motivo de ajuste. |
-| Ajuste de existencia | El proveedor asociado se conserva automáticamente como contexto requerido; motivo vigente, nueva existencia numérica y observaciones admitidas | Al confirmar **Ajustar stock** | No seleccione otro proveedor: ajuste la oferta abierta desde el listado. La nueva cantidad es el total resultante, no una cantidad que se agrega. |
+| Ajuste de existencia (administrador) | El proveedor asociado se conserva automáticamente como contexto requerido; motivo vigente, nueva existencia numérica y observaciones admitidas | Al confirmar **Ajustar stock** | No seleccione otro proveedor: ajuste la oferta abierta desde el listado. La nueva cantidad es el total resultante, no una cantidad que se agrega. |
 | Compra | Comprobante, factura cuando aplica, proveedor, receptor, fecha y al menos un detalle con material, cantidad y costo | En alta o actualización; la corrección valida además estado, motivo y límites | Una partida persistida se corrige con su acción especializada; no se sobrescribe como detalle nuevo. |
-| Salida de material o merma | Participantes y relaciones vigentes, fecha, proyecto cuando aplica y al menos un detalle con cantidad positiva | En alta o edición permitida por el estado | Actualice el registro si cambió su estado y use solamente la acción que continúe visible. |
-| Surtimiento | Detalle pendiente o parcial, cantidad positiva y existencia suficiente | Después de elegir **Surtir detalle** | Reduzca la cantidad o confirme disponibilidad; no modifique el encabezado desde este modo. |
-| Devolución | Detalle surtido, cantidad positiva no mayor a la retornable y observaciones admitidas | Después de elegir **Devolver detalle** | Capture como máximo la cantidad retornable mostrada; los datos originales permanecen bloqueados. |
+| Salida de material, consumible o merma | Participantes y relaciones vigentes, fecha, proyecto cuando aplica y al menos un detalle con cantidad positiva | En alta o edición permitida por el estado | Actualice el registro si cambió su estado y use solamente la acción que continúe visible. |
+| Surtimiento | Detalle pendiente, selección de surtido, cantidad de proyecto admitida y existencia suficiente para lo solicitado | Después de elegir **Surtir detalle** | Confirme disponibilidad; en materiales y consumibles se surte toda la cantidad pendiente de cada renglón seleccionado. No modifique el encabezado desde este modo. |
+| Devolución | Salida completamente surtida, detalle con saldo retornable y cantidad positiva no mayor a ese saldo y observaciones admitidas | Después de elegir **Devolver detalle** | Capture como máximo la cantidad retornable mostrada; los datos originales permanecen bloqueados. |
 | Exportación | Alcance, filtros o periodo admitidos | Antes de generar el archivo | Conserve filtros; si la conexión falla, compruebe el listado antes de repetir. |
 
 🟥 **DATO SENSIBLE:** no copie usuarios, contraseñas, cookies, tokens ni datos personales en
@@ -58,13 +58,34 @@ flowchart TD
 **Corregir detalle**; en salidas, un detalle procesado cambia mediante **Surtir** o **Devolver**.
 Estas acciones conservan historia y efectos de inventario, por lo que no siguen la edición general.
 
+En salidas de materiales y consumibles, **Surtir** selecciona renglones para entregar
+toda su cantidad pendiente; **Cantidad de proyecto** no determina una entrega parcial.
+**Devolver** sólo está disponible cuando la salida completa está **Surtida**.
+
 ## Conceptos necesarios para el manual
 
 | Concepto | Significado para el operador |
 | --- | --- |
 | Modo de formulario | Configuración de controles habilitados según la acción y el estado; no es un estado guardado. |
 | Encabezado | Datos contextuales del documento, como participantes, fecha, proyecto u observaciones. |
-| Detalle | Renglón de material o merma con su cantidad y datos operativos. |
+| Detalle | Renglón de material, consumible o merma con su cantidad y datos operativos. |
 | Cantidad retornable | Parte surtida que todavía puede devolverse; limita el valor aceptado en una devolución. |
 | Nueva existencia total | Resultado que debe quedar después de un ajuste; no representa un incremento. |
 | Sólo lectura | Modo de consulta en el que la información se muestra pero no puede confirmarse como cambio. |
+
+### Peso unitario de merma
+
+| Campo y modo | Validación |
+| --- | --- |
+| Pesos de Rollo (kg por unidad) | Cono y total se capturan juntos o quedan vacíos; cono ≥ 0, total > cono y ≤ 999.99. Tres enteros y dos decimales. Neto calculado automáticamente. |
+| Formato del peso | Decimal con punto, por ejemplo 0.75; sin letras, espacios, separadores de miles ni notación científica. |
+| Pesos en edición | Sólo consulta; el servidor rechaza cambios de los tres pesos. |
+| Otras presentaciones | Campos de peso deshabilitados; su envío se rechaza. |
+
+Véase el [recorrido del peso](../requirements/requirements-specification/04-unified-catalog-by-scope/04-queries-reports-and-modeled-functions.md#recorrido-del-peso-de-merma).
+
+| Referencia y longitud de Rollo | Validación |
+| --- | --- |
+| Cono predeterminado en material | Admite cero. Una vez registrado queda bloqueado. Su copia en merma es editable. |
+| Peso total del rollo en material | Exige cono y debe ser mayor. Puede completarse si falta; una vez guardado no cambia ni se borra. Es distinto del peso del sobrante. |
+| Dimensiones de merma de Rollo | Ambos campos están deshabilitados. La dimensión menor procede del material y la otra se calcula por peso. Si faltan datos, complete las referencias y pesos antes de guardar. |

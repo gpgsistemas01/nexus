@@ -16,3 +16,11 @@
 - Una auditoría se registra después de confirmar el efecto que describe o dentro de la
   misma transacción cuando su atomicidad sea parte del contrato.
 - Las consultas usan Prisma o parámetros; nunca interpolan entrada del usuario en SQL.
+
+Las notificaciones de inventario se emiten después de completar la operación
+correspondiente. Un error posterior al commit no debe presentarse como un rollback
+de datos ya confirmados; los contratos y pruebas distinguen ambos resultados.
+
+La auditoría actual posterior a la respuesta no garantiza atomicidad con la escritura.
+Si el caso exige esa garantía, su registro debe incorporarse a la transacción; las
+limitaciones vigentes se mantienen en [Identidad, acceso y auditoría](../views/logical/02-identity-access-and-audit.md).

@@ -22,7 +22,7 @@ describe('plantillas de material para el CRUD de mermas', () => {
     expect(materialFindMany).not.toHaveBeenCalled();
   });
 
-  it('devuelve materiales únicos y sólo sugiere la menor medida como ancho para rollos', async () => {
+  it('conserva cada rollo como referencia y sugiere ancho mínimo sin perder el mayor costo de la familia', async () => {
     materialFindMany.mockResolvedValue([
       { id: 'material-1', name: 'Lona', base: 50, height: 1.52, presentation: { name: 'ROLLO' }, supplierMaterials: [{ maxUnitCost: 20 }] },
       { id: 'material-duplicate', name: 'Lona', base: 1.52, height: 100, presentation: { name: 'ROLLO' }, supplierMaterials: [{ maxUnitCost: 27.5 }] },
@@ -41,14 +41,15 @@ describe('plantillas de material para el CRUD de mermas', () => {
     }));
     expect(materialFindMany.mock.calls[0][0].select.supplierMaterials).toEqual({
       where: { supplierId: 'supplier-1', isActive: true },
-      select: { maxUnitCost: true }
+      select: { maxUnitCost: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true }
     });
     expect(result.data).toEqual([
-      expect.objectContaining({ id: 'material-1', suggestedWidth: 1.52, maxUnitCost: 27.5 }),
-      expect.objectContaining({ id: 'material-wide', suggestedWidth: 3.2, maxUnitCost: 30 }),
-      expect.objectContaining({ id: 'material-2', suggestedWidth: null, maxUnitCost: null })
+      expect.objectContaining({ id: 'material-1', maxUnitCost: 27.5 }),
+      expect.objectContaining({ id: 'material-duplicate', maxUnitCost: 27.5, height: 100, supplierMaterials: [{ maxUnitCost: 27.5 }] }),
+      expect.objectContaining({ id: 'material-wide', maxUnitCost: 30 }),
+      expect.objectContaining({ id: 'material-2', maxUnitCost: null })
     ]);
-    expect(result.recordsFiltered).toBe(3);
+    expect(result.recordsFiltered).toBe(4);
   });
 
   it('carga la página solicitada sin perder el total de plantillas disponibles', async () => {
@@ -70,4 +71,13 @@ describe('plantillas de material para el CRUD de mermas', () => {
       recordsFiltered: 3
     });
   });
+});
+
+
+it('no consulta ni calcula referencias de peso para una presentación distinta de Rollo', async () => {
+  const offer = { maxUnitCost: 1, get referenceConeWeightKg() { throw new Error('Referencia de peso no aplicable'); } };
+  materialFindMany.mockResolvedValue([{ id: 'sheet', name: 'Lámina', base: 1, height: 2, presentation: { name: 'LÁMINA' }, supplierMaterials: [offer] }]);
+  const templates = await findWasteMaterialTemplates({ supplierId: 'supplier-1' });
+  expect(templates.data[0].supplierMaterials[0]).toBe(offer);
+  expect(templates.data[0]).not.toHaveProperty('referenceConeWeightKg');
 });

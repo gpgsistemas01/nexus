@@ -25,6 +25,11 @@ const MOVEMENT_CONTEXTS = Object.freeze({
         filename: 'reporte_movimientos',
         updateEvent: 'material-movements:updated'
     },
+    consumable: {
+        api: 'consumables',
+        filename: 'reporte_movimientos_consumibles',
+        updateEvent: 'material-movements:updated'
+    },
     waste: {
         api: 'wastes',
         filename: 'reporte_movimientos_merma',
@@ -48,8 +53,10 @@ export const createMovementDatatable = ({ context, filters, selector }) => {
                 })
             },
             order: [[0, 'desc']],
-            searchPlaceholder: 'Buscar por Material, Proveedor o Folio',
-            columns: movementColumns,
+            searchPlaceholder: context === 'consumable' ? 'Buscar por Consumible, Proveedor o Folio' : 'Buscar por Material, Proveedor o Folio',
+            columns: movementColumns.map(column => column.data === 'materialName' && context === 'consumable'
+                ? { ...column, title: 'Consumible' }
+                : column),
             buttons: [buildExcelButton({
                 filename: formatFileName(config.filename),
                 request: ({ monthlyReport = false, reportMonth = '' } = {}) => exportMovementReport({

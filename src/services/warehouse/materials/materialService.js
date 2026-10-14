@@ -1,7 +1,7 @@
-import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
+import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialRollReferenceReadOnly, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { existsMaterialUsage, findAllSupplierMaterials, findSupplierMaterialByIds } from "./supplierMaterialService.js";
-import { prepareMaterialData } from "./materialHelpers.js";
+import { assertMaterialRollReference, prepareMaterialData } from "./materialHelpers.js";
 import { syncSupplierMaterial } from "./materialRelations.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
@@ -177,7 +177,9 @@ export const createMaterial = async ({
                 supplierId: relations.supplierId,
                 materialId,
                 maxUnitCost: relations.maxUnitCost,
-                isActive: relations.isActive
+                isActive: relations.isActive,
+                ...(relations.referenceConeWeightKg !== undefined && { referenceConeWeightKg: relations.referenceConeWeightKg }),
+                ...(relations.referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg: relations.referenceRollTotalWeightKg })
             });
 
             if (newStock !== undefined) {
@@ -230,19 +232,29 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
         const material = await getDb().$transaction(async (tx) => {
 
             await existsMaterial({ tx, id, type });
-            const { supplierId, maxUnitCost, isActive, ...materialData } = materialDto;
+            const { supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...materialData } = materialDto;
 
             const currentMaterial = await tx.material.findUnique({
                 where: { id },
                 select: {
                     id: true,
                     presentationId: true,
+                    presentation: { select: { name: true } },
                     unitMeasureId: true,
                     base: true,
                     height: true,
-                    type: true
+                    type: true,
+                    supplierMaterials: {
+                        where: { supplierId },
+                        select: { referenceConeWeightKg: true, referenceRollTotalWeightKg: true }
+                    }
                 }
             });
+
+            const savedReference = currentMaterial.supplierMaterials[0];
+            if (!savedReference) throw new MaterialNotFound();
+            assertMaterialRollReference({ material: currentMaterial, referenceConeWeightKg, referenceRollTotalWeightKg, savedReference });
+            const hasReferenceCapture = referenceConeWeightKg !== undefined || referenceRollTotalWeightKg !== undefined;
 
             const existingMaterial = await tx.material.findFirst({
                 where: {
@@ -266,15 +278,27 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
                 data: materialData
             });
 
-            await tx.supplierMaterial.update({
+            const updatedOffer = await tx.supplierMaterial.updateMany({
                 where: {
-                    supplierId_materialId: {
-                        materialId: updatedMaterial.id,
-                        supplierId
-                    }
+                    materialId: updatedMaterial.id,
+                    supplierId,
+                    ...(hasReferenceCapture && {
+                        referenceConeWeightKg: savedReference.referenceConeWeightKg,
+                        referenceRollTotalWeightKg: savedReference.referenceRollTotalWeightKg
+                    })
                 },
-                data: { maxUnitCost, isActive }
+                data: {
+                    maxUnitCost,
+                    isActive,
+                    ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
+                    ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg })
+                }
             });
+            // La oferta es única; cero filas indica que dejó de coincidir con los datos consultados.
+            if (updatedOffer.count === 0) {
+                if (hasReferenceCapture) throw new MaterialRollReferenceReadOnly();
+                throw new MaterialNotFound();
+            }
 
             return findSupplierMaterialByIds({
                 tx,

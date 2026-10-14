@@ -1,13 +1,15 @@
 # Casos: Salidas de materiales, consumibles y mermas
 
-Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
+Cada procedimiento identifica sus casos de uso, controles y errores posibles; los capítulos con capturas las incluyen como referencia.
 
 ## Capítulos
 
 **Cómo cambia el estado.** El estado no es un campo editable. Al registrar una salida y sus
 detalles, Nexus los deja **Pendientes**. Al confirmar un surtido, el sistema calcula
-automáticamente **Surtido parcial** o **Surtido** según la cantidad acumulada. La devolución sólo
-está disponible sobre un detalle surtido: una devolución parcial conserva el detalle como
+automáticamente **Surtido parcial** si quedan otros detalles pendientes o **Surtido** al completarlos
+todos. En materiales y consumibles se entrega toda la cantidad pendiente de cada renglón
+seleccionado. La devolución requiere que la salida completa esté **Surtida** y se realiza
+sobre un detalle con saldo retornable: una devolución parcial conserva el detalle como
 **Surtido** y devolver toda la cantidad lo deja **Cancelado**. Si todos los detalles quedan
 cancelados, Nexus también cancela la salida. Estos cambios actualizan documento, detalle,
 existencia y movimiento como una sola operación; abrir el formulario o cambiar de modo no altera
@@ -24,7 +26,7 @@ cancelados.
 **Ruta en el menú:** **Menú principal → Salidas → Materiales**.
 
 <a id="CAP-SAL-MAT-00-NAVIGATION"></a>
-![CAP-SAL-MAT-00-NAVIGATION: acceso a salidas de material desde el menú principal](../../images/material-issues/00-access-menu-main.png)
+![CAP-SAL-MAT-00-NAVIGATION: acceso a salidas de material desde el menú principal](../../images/areas/almacen/material-issues/00-access-menu-main.png)
 
 **Campos por modo del formulario.** En **alta** se editan cliente, asesor, área, solicitante, número
 de proyecto, fecha de solicitud, observaciones y los materiales solicitados. En **edición completa**
@@ -36,8 +38,8 @@ habilita únicamente **Cantidad a devolver** y **Observaciones**. Una salida can
 **consulta**, sin campos editables.
 
 1. [1. CAP-SAL-MAT-01-LIST — Listado](01-cap-sal-mat-01-list.md)
-2. [2. CAP-SAL-MAT-02-CREATE — Formulario registro](02-cap-sal-mat-02-create.md)
-3. [3. CAP-SAL-MAT-03-EDIT — Edicion encabezado](03-cap-sal-mat-03-edit.md)
+2. [2. CAP-SAL-MAT-02-CREATE — Formulario de registro](02-cap-sal-mat-02-create.md)
+3. [3. CAP-SAL-MAT-03-EDIT — Editar encabezado](03-cap-sal-mat-03-edit.md)
 4. [4. CAP-SAL-MAT-04-SUPPLY — Surtir detalles](04-cap-sal-mat-04-supply.md)
 5. [5. CAP-SAL-MAT-05-RETURN — Devolver detalle](05-cap-sal-mat-05-return.md)
 6. [6. CAP-REP-SAL-MAT-06-EXPORT — Exportar reporte](06-cap-rep-sal-mat-06-export.md)
@@ -50,7 +52,7 @@ habilita únicamente **Cantidad a devolver** y **Observaciones**. Una salida can
 **Ruta en el menú:** **Menú principal → Salidas → Mermas**.
 
 <a id="CAP-SAL-WAS-00-NAVIGATION"></a>
-![CAP-SAL-WAS-00-NAVIGATION: acceso a salidas de merma desde el menú principal](../../images/waste-issues/00-access-menu-main.png)
+![CAP-SAL-WAS-00-NAVIGATION: acceso a salidas de merma desde el menú principal](../../images/areas/almacen/waste-issues/00-access-menu-main.png)
 
 **Campos por modo del formulario.** En **alta** se editan cliente, asesor, área, solicitante, número
 de proyecto, fecha de solicitud, observaciones y las mermas solicitadas. En **edición completa** se
@@ -62,8 +64,8 @@ renglones pendientes. En **devolución** el documento es de sólo lectura y la a
 sin campos editables.
 
 8. [8. CAP-SAL-WAS-01-LIST — Listado](08-cap-sal-was-01-list.md)
-9. [9. CAP-SAL-WAS-02-CREATE — Formulario registro](09-cap-sal-was-02-create.md)
-10. [10. CAP-SAL-WAS-03-EDIT — Edicion encabezado](10-cap-sal-was-03-edit.md)
+9. [9. CAP-SAL-WAS-02-CREATE — Formulario de registro](09-cap-sal-was-02-create.md)
+10. [10. CAP-SAL-WAS-03-EDIT — Editar encabezado](10-cap-sal-was-03-edit.md)
 11. [11. CAP-SAL-WAS-04-SUPPLY — Surtir detalles](11-cap-sal-was-04-supply.md)
 12. [12. CAP-SAL-WAS-05-RETURN — Devolver detalle](12-cap-sal-was-05-return.md)
 13. [13. CAP-REP-SAL-WAS-06-EXPORT — Exportar reporte](13-cap-rep-sal-was-06-export.md)
@@ -73,6 +75,16 @@ sin campos editables.
 
 **Ruta en el menú:** **Menú principal → Salidas → Consumibles**.
 
-Consulte el recorrido propio de consumibles para registrar la solicitud, surtir, devolver y comprobar existencias.
+Consulte el recorrido propio de consumibles, compartido por Personal de almacén y Administrador del sistema. Incluye los siete casos de uso y la comprobación de existencias.
 
 15. [15. CAP-SAL-CON-01-WALKTHROUGH — Recorrido de salidas de consumibles](15-cap-sal-con-01-walkthrough.md)
+
+| Caso de uso | Procedimiento |
+| --- | --- |
+| `CU-SAL-15` | [Consultar](15-cap-sal-con-01-walkthrough.md#consultar) |
+| `CU-SAL-16` | [Registrar](15-cap-sal-con-01-walkthrough.md#crear) |
+| `CU-SAL-17` | [Editar encabezado](15-cap-sal-con-01-walkthrough.md#editar-encabezado) |
+| `CU-SAL-18` | [Editar detalles](15-cap-sal-con-01-walkthrough.md#editar-detalles) |
+| `CU-SAL-19` | [Surtir](15-cap-sal-con-01-walkthrough.md#surtir) |
+| `CU-SAL-20` | [Devolver](15-cap-sal-con-01-walkthrough.md#devolver) |
+| `CU-SAL-21` | [Exportar Excel](15-cap-sal-con-01-walkthrough.md#exportar) |

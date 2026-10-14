@@ -60,6 +60,8 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 | `CU-ALM-20` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js`. | Retiro con id de oferta simulado; comprueba permiso y delegación de baja limitada a `CONSUMABLE`. | **Unitarias existentes**; falta integración de historia protegida, otras ofertas y ausencia de eliminación parcial. |
 | `CU-ALM-21` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js`. | Ajuste con identidad, proveedor, actor y nueva existencia simulados; comprueba permiso específico y delegación con `CONSUMABLE`. | **Unitarias existentes**; falta integración de saldo, ajuste, movimiento y rollback. |
 | `CU-ALM-22` | Sin prueba funcional directa del filtro de consumibles. | Filtros visibles, tres alcances, ofertas de ambos tipos, conjunto vacío y contenido del archivo limitado a `CONSUMABLE`. | **Brecha**; las pruebas generales de `reportControllerTest.js` y `reportServiceTest.js` no comprueban este caso ni sustituyen la integración del archivo. |
+| `CU-ALM-23` | Integración HTTP/Prisma: contexto, conteos, paginación, filtros cruzados y permisos. | Historial de consumibles separado, con proveedor y selector propios. | `movementContextDbTest.js`. |
+| `CU-ALM-24` | Integración con Excel real personalizado y mensual, contenido y permisos. | Descargar desde la consulta y revisar hoja, folios y saldos. | `movementContextDbTest.js`. |
 | `CU-CAT-01..03` | `supplierControllerDbTest.js`. | Integración de alta, consulta y actualización con fixtures y limpieza en base aislada. | **Integración existente.** |
 | `CU-CAT-04` | Sin prueba funcional directa del reporte. | Proveedores dentro/fuera de filtros, permisos y archivo esperado. | **Brecha.** |
 | `CU-CAT-05..07` | `clientControllerDbTest.js`. | Integración de alta, listado, actualización y error específico con fixtures y limpieza. | **Integración existente.** |
@@ -68,12 +70,14 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 | `CU-IDA-01` | Sin prueba funcional directa. | Actor autorizado/no autorizado, filtros, paginación y conjunto vacío. | **Brecha.** |
 | `CU-IDA-02..03` | `personApiRouteTest.js`. | Unitaria de orden validación–autorización–handler para escrituras. | **Unitaria existente**, limitada al contrato de ruta; falta persistencia. |
 | `CU-IDA-04..09` | Sin prueba de servidor o integración directa. | Reportes/usuarios requieren permisos, payloads, relaciones, credenciales, filtros y persistencia según el caso. | **Brecha**; los requests simulados de frontend no prueban el flujo completo. |
-| `CU-SAL-01..05` | Sin prueba de servidor o integración directa del flujo. | Documento/estado, detalles, stock suficiente/insuficiente, permisos y rollback. | **Brecha**; la fábrica frontend compartida no es evidencia funcional suficiente. |
-| `CU-SAL-06` | `goodsIssueControllerTest.js`. | Unitaria de devolución con datos sanitizados, usuario y servicio simulado. | **Unitaria existente**; falta integración de stock/movimiento. |
+| `CU-SAL-01..05` | `goodsIssueContextServicesTest.js`, `goodsIssueContextRoutesTest.js`, `goodsIssueControllerDbTest.js`. | Tipo fijo, rutas y validadores; integración de alta, consultas, edición y surtimiento, con rechazo de operaciones cruzadas y conservación de datos. | **Unitarias e integración existentes**; faltan fronteras de cantidad y existencia, errores de persistencia y rollback del flujo material. |
+| `CU-SAL-06` | `goodsIssueControllerTest.js`, `goodsIssueControllerDbTest.js`. | Delegación unitaria e integración de devolución parcial con existencia, acumulados y movimiento. | **Unitarias e integración existentes**; faltan devolución total, cantidad excesiva y rollback. |
 | `CU-SAL-07` | `reportControllerTest.js`. | Unitaria de fórmulas del reporte de salida; cantidades convertidas y escritor simulado. | **Unitaria existente**; falta integración del archivo. |
 | `CU-SAL-08..12` | `wasteIssueControllerTest.js`, `wasteIssueControllerDbTest.js`. | Unitarias de consulta/DTO/edición/surtido e integración de documento, stock, movimiento, parcial y rollback con fixtures reales. | **Unitarias e integración existentes.** |
 | `CU-SAL-13` | `wasteIssueControllerTest.js`. | Unitaria de devolución con cantidad, observación, usuario y servicio simulado. | **Unitaria existente**; falta integración. |
 | `CU-SAL-14` | `reportControllerTest.js`. | Unitaria de fórmula/contenido operativo del reporte con escritor simulado. | **Unitaria existente**; falta integración del archivo. |
+| `CU-SAL-15..20` | `goodsIssueContextServicesTest.js`, `goodsIssueContextRoutesTest.js`, `goodsIssueControllerDbTest.js`. | Tipo fijo, rutas, permisos y validadores; integración de alta, consultas, edición, surtimiento y devolución parcial, con saldos y movimientos, además del rechazo de operaciones cruzadas. | **Unitarias e integración existentes**; faltan fronteras de cantidad y existencia, devolución total y rollback de fallos operativos. |
+| `CU-SAL-21` | `goodsIssueContextServicesTest.js`, `goodsIssueControllerDbTest.js`. | Delegación de consulta de reporte con tipo fijo e integración de filas limitadas al contexto. | **Evidencia de aislamiento existente**; falta integración del archivo Excel, fórmulas y resultado vacío de consumibles. |
 | `CU-ENT-01..02`, `CU-ENT-07..08` | `goodsReceiptContextServicesTest.js` cubre la delimitación de tipo; sin integración directa de consulta/alta. | Consulta/alta con proveedor, receptor, detalles, costos, permisos, tipo y persistencia. | **Unitaria parcial**; falta integración. |
 | `CU-ENT-03..04`, `CU-ENT-09..10` | `goodsReceiptControllerTest.js` y `goodsReceiptContextServicesTest.js`. | Unitaria de edición/corrección con DTO, IDs, cantidades/costos, tipo y evento posterior. | **Unitaria existente**; falta integración. |
 | `CU-ENT-05`, `CU-ENT-11` | Sin prueba funcional directa de cancelación. | Compra/detalle existente, contexto, estado cancelable, stock/movimiento y ausencia de efectos parciales. | **Brecha.** |
@@ -89,3 +93,40 @@ reglas y fronteras observables. Cuando cambie este criterio, se actualizan en el
 cambio la suite y esta matriz; el registro selectivo sólo cambia si el caso cumple sus
 criterios de inclusión. El resultado de la ejecución permanece en CI o en la solicitud
 de cambio.
+
+La cobertura del peso unitario de merma se distribuye entre estas pruebas:
+
+| Pruebas | Comportamiento verificado |
+| --- | --- |
+| `wasteValidatorsTest.js`, `wasteRegistrationBoundaryTest.js` | Formato, precisión y rango; errores de campo antes de invocar el servicio. |
+| `wasteWeightFieldTest.js` | Precarga del cono editable, limpieza al cambiar de material y consulta posterior. |
+| `wasteWeightDbTest.js` | Captura de cono y total, neto calculado, consulta, identidad por medidas y pesos, pesos predeterminados editados mediante el CRUD de material, conservación histórica, cálculo automático en base o altura, edición protegida, stock independiente y Excel con peso neto. |
+| `reportServiceTest.js` | Agrupación, peso total y datos desconocidos. |
+| `wasteWeightCapDbTest.js`, `wasteWeightScaleDbTest.js`, `wasteRollCaptureDbTest.js` | Restricciones en PostgreSQL, conservación de valores compatibles y rollback de las migraciones ante valores incompatibles. |
+
+`wasteWeightCalculationsTest.js` verifica la longitud nominal máxima y la proporcionalidad por peso neto con el ancho del material. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos y migración consolidada que conserva netos históricos y agrega sólo campos finales.
+
+`materialValidationTest.js` compara por campo los resultados del validador de
+frontend y las cadenas Express para pesos opcionales, cero, límite de BD,
+captura incompleta, precisión y total mayor que cono. Las pruebas de registro
+de merma verifican los resultados de `prepareWasteMeasurements` y el rollback.
+`weightCaptureValidationTest.js` comprueba los códigos de `errorMap` recibidos
+por el middleware HTTP y que la cadena evalúa cada regla una vez hasta el primer error.
+
+Las pruebas de UI de merma comprueban selección recibida desde Select2,
+recálculo al modificar pesos y limpieza de resultados obsoletos. Las plantillas
+de otras presentaciones omiten las referencias de peso sin consultarlas.
+
+La recuperación de una merma existente comprueba confirmación y apertura del modal
+de Agregar stock con cantidad y observaciones precargadas, sin registrar entradas
+desde el Swal. También cubre cancelación, cantidad inicial cero y separación de
+permisos y modos. `wasteStockAdditionModalTest.js` comprueba la precarga, la cantidad
+vacía cuando se recibe cero y el saldo resultante al editar.
+`wasteMaterialTemplateTest.js` cubre selección, cálculo con datos de la oferta y
+limpieza programática sin reconstruir la selección desde el DOM.
+
+`materialRollReferenceFieldTest.js` comprueba captura inicial, cono cero bloqueado,
+referencias faltantes y modos de consulta. `materialFormTest.js` y `wasteFormTest.js`
+comprueban que los valores deshabilitados necesarios se incluyan en el envío.
+`wasteWeightDbTest.js` verifica referencias inmutables, rechazo de borrados y rollback,
+edición de otros datos y dos capturas simultáneas sin reemplazo de referencias.

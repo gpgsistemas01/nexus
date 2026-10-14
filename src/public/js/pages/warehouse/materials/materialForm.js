@@ -5,9 +5,10 @@ import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
 import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";
 import { goodsReceiptMaterialCreateValidation, materialCreateValidation, materialEditValidation, materialStockValidation } from "../../../utils/validations/validators.js";
-import { materialCreateFields, materialSecondaryDataFields, materialStockRequestFields } from './materialFields.js';
+import { materialCreateFields, materialRollReferenceFields, materialSecondaryDataFields, materialStockRequestFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
 import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+
 
 const formId = FORM_SELECTORS.MATERIAL;
 const goodsReceiptCreationContext = 'goodsReceipt';
@@ -48,6 +49,12 @@ useForm({
 
         if (isStockMode(form.dataset.mode) || isEditMode(form.dataset.mode)) {
             formData.supplierId = form.elements.supplierId.value;
+        }
+
+        if (isEditMode(form.dataset.mode)) {
+            materialRollReferenceFields.forEach(field => {
+                if (form.materialRollReference?.[field] != null) formData[field] = form.materialRollReference[field];
+            });
         }
 
         if (!isStockMode(form.dataset.mode)) {

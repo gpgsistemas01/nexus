@@ -3,8 +3,9 @@
 ### 3.1 Reglas generales
 
 - Nombres de variables, funciones y propiedades JavaScript usan `camelCase`.
-- Clases y tipos conceptuales usan `PascalCase`; las clases de error mantienen el
-  sufijo `Error`.
+- Clases y tipos conceptuales usan `PascalCase`. Los errores nuevos adoptan un nombre
+  de dominio con sufijo `Error`; se conservan los nombres públicos de errores existentes
+  para evitar renombrados ajenos al cambio.
 - Constantes inmutables que representan catálogos, configuración global o valores
   compartidos usan `UPPER_SNAKE_CASE`. Una referencia `const` local a un objeto o
   servicio conserva `camelCase` si su identidad no es una constante de dominio.

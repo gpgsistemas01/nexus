@@ -300,7 +300,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "../openapi.json#/components/schemas/WasteList"
+                "$ref": "../openapi.json#/components/schemas/WasteMaterialTemplateList"
               }
             }
           }
@@ -449,11 +449,20 @@
       ],
       "responses": {
         "200": {
-          "description": "Respuesta correcta.",
+          "description": "Ajuste guardado. La implementación actual devuelve únicamente el código de éxito: el callback transaccional de updateWasteStock no retorna la entidad. El pendiente está descrito en CU-ALM-12.",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "../openapi.json#/components/schemas/WasteResponse"
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "$ref": "../openapi.json#/components/schemas/SuccessCode"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "code"
+                ]
               }
             }
           }

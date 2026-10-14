@@ -1,6 +1,19 @@
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
+    MATERIAL_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
+    MATERIAL_ROLL_REFERENCE_READ_ONLY: 'Los pesos de referencia registrados no se pueden modificar ni eliminar. Puede completar los que todavía no estén registrados.',
+    WASTE_DIMENSIONS_INVALID: 'Complete las dimensiones de la merma o los pesos necesarios para calcularlas.',
+    CONE_WEIGHT_KG_INVALID_NUMBER: 'El peso del cono debe ser un decimal mayor o igual que cero en kg. Use punto decimal, sin letras ni notación científica.',
+    CONE_WEIGHT_KG_REQUIRED: 'Capture el peso del cono para calcular el peso neto de la merma.',
+    TOTAL_WEIGHT_KG_REQUIRED: 'Capture el peso total con cono para calcular el peso neto de la merma.',
+    WASTE_TOTAL_WEIGHT_NOT_GREATER: 'El peso total con cono debe ser mayor que el peso del cono.',
+    WASTE_WEIGHT_CALCULATED: 'El peso neto se calcula automáticamente. Capture el peso del cono y el peso total con cono.',
+    WEIGHT_KG_INVALID_NUMBER: 'El peso por unidad debe ser un decimal mayor que cero en kg. Use punto decimal, sin letras ni notación científica.',
+    WEIGHT_KG_TOO_LONG: 'El peso admite hasta 3 dígitos enteros y 2 decimales.',
+    WEIGHT_KG_TOO_HIGH: 'El peso por unidad no puede superar 999.99 kg.',
+    WASTE_WEIGHT_READ_ONLY: 'No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta.',
+    WASTE_WEIGHT_INVALID: 'El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.',
     // 🔐 AUTH / GENERALES
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
     VALIDATION_ERROR: 'Errores de validación.',

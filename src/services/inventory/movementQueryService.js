@@ -2,6 +2,7 @@ import { MovementFindDatabaseError } from "../../errors/inventory/movementError.
 import { getDb } from "../../repository/baseRepository.js";
 import { buildDateRangeFilter } from "../../utils/requestQueryUtils.js";
 import { formatDateLongWithTime } from "../../utils/formattersUtils.js";
+import { MATERIAL_TYPES } from "../../constants/inventory.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('inventory.movementQueryService');
@@ -256,7 +257,8 @@ const getWasteMovementSearchFilter = (search) => !search ? {} : ({
     ]
 });
 
-export const findAllMaterialMovements = async ({
+const findInventoryMovements = async ({
+    type,
     skip = 0,
     take = 10,
     startDate = '',
@@ -289,6 +291,8 @@ export const findAllMaterialMovements = async ({
         };
 
         const where = {
+
+            material: { type },
 
             ...(materialId && {
                 materialId
@@ -329,7 +333,7 @@ export const findAllMaterialMovements = async ({
             select: MOVEMENT_DETAIL_SELECT
         });
 
-        const total = await db.movementDetail.count();
+        const total = await db.movementDetail.count({ where: { material: { type } } });
         const filtered = await db.movementDetail.count({ where });
 
         return {
@@ -339,11 +343,14 @@ export const findAllMaterialMovements = async ({
         };
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'inventory.findAllMaterialMovements' });
+        logServiceError(serviceLogger, err, { operation: 'inventory.findInventoryMovements', inventoryType: type });
 
         throw new MovementFindDatabaseError();
     }
 }
+
+export const findAllMaterialMovements = (options = {}) => findInventoryMovements({ ...options, type: MATERIAL_TYPES.MATERIAL });
+export const findAllConsumableMovements = (options = {}) => findInventoryMovements({ ...options, type: MATERIAL_TYPES.CONSUMABLE });
 
 export const findAllWasteMovements = async ({
     skip = 0,

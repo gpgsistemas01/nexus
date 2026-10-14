@@ -1,5 +1,23 @@
 import { AppError } from "../AppError.js";
 
+export class WasteDimensionsInvalid extends AppError {
+    constructor() {
+        super('Complete las dimensiones de la merma o los pesos necesarios para calcularlas.', 'WASTE_DIMENSIONS_INVALID', 400);
+    }
+}
+
+export class WasteWeightReadOnly extends AppError {
+    constructor() {
+        super('No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta.', 'WASTE_WEIGHT_READ_ONLY', 400);
+    }
+}
+
+export class WasteWeightInvalid extends AppError {
+    constructor() {
+        super('El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.', 'WASTE_WEIGHT_INVALID', 400);
+    }
+}
+
 export class WasteNotFound extends AppError {
 
     constructor () {
@@ -9,12 +27,13 @@ export class WasteNotFound extends AppError {
 
 export class WasteAlreadyExists extends AppError {
 
-    constructor () {
+    constructor ({ waste = null } = {}) {
         super(
-            'Ya existe una merma con el nombre, proveedor y dimensiones indicados.',
+            'Ya existe una merma con este proveedor, nombre, medidas y pesos. Use Agregar stock para aumentar su existencia.',
             'WASTE_ALREADY_EXISTS',
             409
         );
+        if (waste) this.meta = { waste };
     }
 }
 

@@ -22,7 +22,7 @@ import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialSer
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
-import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
+import { INVENTORY_MOVEMENT_TYPES, MATERIAL_TYPES } from "../../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { assertGoodsReceiptInvoiceAvailable } from "./goodsReceiptInvoiceService.js";
@@ -163,9 +163,13 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
 
         const totals = calculateGoodsReceiptTotals(processedDetails);
 
+        const referenceType = type === MATERIAL_TYPES.CONSUMABLE
+            ? DOCUMENT_REFERENCE_TYPES.CONSUMABLE_GOODS_RECEIPT
+            : DOCUMENT_REFERENCE_TYPES.GOODS_RECEIPT;
+
         const result = await getDb().$transaction(async (tx) => {
 
-            referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.GOODS_RECEIPT, tx });
+            referenceNumber = await generateYearlyReferenceNumber({ type: referenceType, tx });
 
             const goodsReceipt = await tx.goodsReceipt.create({
                 data: {

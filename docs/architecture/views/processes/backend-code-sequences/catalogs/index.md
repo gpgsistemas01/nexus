@@ -35,6 +35,8 @@ Este capítulo forma parte del [catálogo de secuencias del código backend](../
 - [`CU-ALM-20` — Retirar consumible](cu-alm-20.md)
 - [`CU-ALM-21` — Ajustar existencia de consumible](cu-alm-21.md)
 - [`CU-ALM-22` — Generar reporte de inventario de consumibles](cu-alm-22.md)
+- [`CU-ALM-23` — Consultar movimientos de consumibles](cu-alm-23.md)
+- [`CU-ALM-24` — Generar reporte de movimientos de consumibles](cu-alm-24.md)
 - [`CU-CAT-09` — Consultar área](cu-cat-09.md)
 - [`CU-CAT-10` — Crear área](cu-cat-10.md)
 - [`CU-CAT-11` — Editar área](cu-cat-11.md)

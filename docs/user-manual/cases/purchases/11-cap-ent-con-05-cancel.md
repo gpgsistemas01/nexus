@@ -7,7 +7,7 @@
 
 1. Abra la compra desde **Compras → Consumibles**.
 2. En el detalle activo, abra la acción de cancelación del renglón y revise la advertencia antes de confirmar **Cancelar detalle**.
-   ![CAP-ENT-CON-05-CANCEL: cancelación de consumible](../../images/purchases/11-consumables-cancel-detail.png)
+   ![CAP-ENT-CON-05-CANCEL: cancelación de consumible](../../images/areas/almacen/purchases/11-consumables-cancel-detail.png)
 3. Nexus marca el detalle como cancelado, revierte su existencia y conserva el historial.
 
 Si era el último detalle activo, la compra completa pasa a estado cancelado y queda disponible sólo para consulta.

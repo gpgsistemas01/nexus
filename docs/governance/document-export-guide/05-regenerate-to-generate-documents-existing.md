@@ -13,8 +13,8 @@ No es necesario eliminar manualmente un resultado antes de ejecutar nuevamente l
   inventario parcial, reanuda desde la primera captura ausente.
 
 Una exportación no elimina otros paquetes o formatos de `build/docs/`. Por ejemplo, volver a
-generar `pdf/manuales/almacen/compras-de-material.pdf` no borra
-`docx/manuales/almacen/compras-de-material.docx`. Separar las carpetas evita
+generar `pdf/manuales/almacen/compras-materiales.pdf` no borra
+`docx/manuales/almacen/compras-materiales.docx`. Separar las carpetas evita
 mezclar entregables editables y finales y permite conservar ambos durante la revisión. Antes de
 entregar, seleccione el archivo recién generado y, si va a compartir la carpeta completa, retire de
 ella los resultados antiguos que no formen parte de la entrega. Nunca elimine los Markdown fuente
@@ -32,7 +32,7 @@ sección, se reconstruyen todos los documentos del paquete. Los manuales son una
 admite seleccionar un actor o una sección.
 
 Para generar todos los documentos al mismo tiempo, use `todos`. El comando valida primero las
-fuentes e imágenes de los seis paquetes y después crea cada archivo técnico o conjunto funcional:
+fuentes e imágenes de los paquetes seleccionados y después crea cada archivo técnico o conjunto funcional:
 
 ```bash
 npm run docs:export -- todos docx
@@ -41,7 +41,6 @@ npm run docs:export -- todos docx
 El resultado no es un único documento combinado: los manuales se organizan en las carpetas
 `manuales/administrador/` y `manuales/almacen/`; dentro de ellas se separan según los módulos y
 destinos visibles de la navegación para cada área. Requisitos y arquitectura se organizan también
-en sus carpetas y se dividen por sección o grupo funcional; datos y pruebas permanecen como
-documentos independientes en `build/docs/docx/`.
+en sus carpetas y se dividen por sección o grupo funcional; gobernanza tiene su carpeta y datos y pruebas permanecen como documentos independientes en `build/docs/docx/`.
 Para generar los dos formatos, use `npm run docs:export -- todos ambos`; los PDF quedan en
 `build/docs/pdf/` y los DOCX en `build/docs/docx/`, con la misma organización.

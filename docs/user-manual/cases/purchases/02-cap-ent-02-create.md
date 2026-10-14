@@ -1,5 +1,5 @@
 <a id="CAP-ENT-02-CREATE"></a>
-# 2. CAP-ENT-02-CREATE — Formulario registro
+# 2. CAP-ENT-02-CREATE — Formulario de registro
 
 **Casos de uso:** `CU-ENT-02` — Crear compra de material.
 
@@ -11,7 +11,7 @@
 
 1. Seleccione **Nueva compra** para abrir el formulario. Antes de continuar, compruebe que la pantalla mostrada coincida con la captura:
 
-   ![CAP-ENT-02-CREATE: formulario registro](../../images/purchases/02-form-registration.png)
+   ![CAP-ENT-02-CREATE: formulario de registro](../../images/areas/almacen/purchases/02-form-registration.png)
 
 2. Elija la opción **Factura** o **Remisión**. Complete **Número de Factura** cuando corresponda; elija opciones en **Buscar proveedor...** y **Buscar persona que recibe...**; capture **Fecha y hora de recepción:** y **Observaciones**.
 3. Busque el artículo en **Buscar material...** y elija la opción del proveedor correcto.
@@ -31,4 +31,4 @@ cantidad incrementa la existencia al confirmar. En cambio, una factura no se reg
 para el mismo proveedor: si Nexus indica el folio donde ya existe, abra esa compra y agregue ahí los
 materiales faltantes.
 
-**Compruebe el resultado:** El listado muestra la compra con su folio. Revise sus renglones y compruebe la existencia del mismo artículo y proveedor en **Almacén → Materiales**.
+**Compruebe el resultado:** El listado muestra la compra con un folio que comienza con **CMA**, correspondiente a materiales. Revise sus renglones y compruebe la existencia del mismo artículo y proveedor en **Almacén → Materiales**.

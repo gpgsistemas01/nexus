@@ -1,7 +1,7 @@
 import { formatCurrency, formatDecimal } from "../../../../utils/formatUtils.js";
-import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getIsActive, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure } from "../../../../utils/warehouseInventoryUtils.js";
+import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getIsActive, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure, isRollPresentation } from "../../../../utils/warehouseInventoryUtils.js";
 
-export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, canSeeCost, canManageItems }) => {
+export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, canSeeCost, canManageItems, showRollWeights = false }) => {
 
     tableElement.innerHTML = `
         <thead>
@@ -14,6 +14,7 @@ export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, can
                 <th colspan="2" data-responsive-group="conversion">Conversión</th>
                 ${ canSeeCost ? '<th rowspan="2">Costo Unitario de Conversión</th>' : '' }
                 ${ canSeeActive ? '<th rowspan="2">Activo</th>' : '' }
+                ${ showRollWeights ? '<th colspan="3" data-responsive-group="weights">Pesos por unidad (kg)</th>' : '' }
                 ${ canManageItems ? '<th rowspan="2">Acciones</th>' : '' }
             </tr>
             <tr>
@@ -21,12 +22,13 @@ export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, can
                 <th data-responsive-parent="measures">Altura</th>
                 <th data-responsive-parent="conversion">Cantidad</th>
                 <th data-responsive-parent="conversion">Unidad</th>
+                ${ showRollWeights ? '<th data-responsive-parent="weights">Cono</th><th data-responsive-parent="weights">Total con cono</th><th data-responsive-parent="weights">Neto</th>' : '' }
             </tr>
         </thead>
     `;
 };
 
-export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canManageItems, renderActions }) => {
+export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canManageItems, renderActions, showRollWeights = false }) => {
 
     const columns = [
         {
@@ -75,6 +77,15 @@ export const buildWarehouseInventoryColumns = ({ canSeeActive, canSeeCost, canMa
             data: null,
             render: (_, __, row) => getIsActive(row) ? 'Sí' : 'No'
         });
+    }
+
+    if (showRollWeights) {
+        columns.push(...['coneWeightKg', 'totalWeightKg', 'weightKg'].map(field => ({
+            data: field,
+            orderable: false,
+            render: (value, _, row) => isRollPresentation(getPresentation(row)) && value != null
+                ? formatDecimal(value) : '—'
+        })));
     }
 
     if (canManageItems) {

@@ -1,3 +1,7 @@
+import { WASTE_WEIGHT_LIMITS } from '../constants/inventory.js';
+import { formatDecimal, roundTo } from './formatUtils.js';
+import { getWasteWeightValidationError } from './validations/weightValidations.js';
+
 export const getBase = (item = {}) => (
     item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base ?? null
 );
@@ -10,6 +14,51 @@ export const getPresentation = (item = {}) => (
     ?? item.supplierMaterial?.material?.presentation?.name
     ?? ''
 );
+
+export const isRollPresentation = name => String(name ?? '').trim().toLocaleUpperCase('es-MX') === 'ROLLO';
+
+export const calculateWasteNetWeight = (data, { coneFieldName = 'coneWeightKg', totalFieldName = 'totalWeightKg' } = {}) => {
+    const coneWeightKg = data[coneFieldName];
+    const totalWeightKg = data[totalFieldName];
+    if (coneWeightKg == null || coneWeightKg === '' || totalWeightKg == null || totalWeightKg === '') return null;
+    if (getWasteWeightValidationError(coneWeightKg, { allowZero: true })
+        || getWasteWeightValidationError(totalWeightKg)
+        || Number(totalWeightKg) <= Number(coneWeightKg)) return null;
+    return roundTo(Number(totalWeightKg) - Number(coneWeightKg), WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS);
+};
+
+export const calculateWasteRollLength = ({ weightKg, referenceRollNetWeightKg, referenceLengthM }) => {
+    if (![weightKg, referenceRollNetWeightKg, referenceLengthM].every(value => Number(value) > 0)) return null;
+    return roundTo(Number(weightKg) * Number(referenceLengthM) / Number(referenceRollNetWeightKg));
+};
+
+export const getMaterialLengthField = ({ base, height } = {}) => {
+    if (!(Number(base) > 0 && Number(height) > 0)) return null;
+    return Number(base) > Number(height) ? 'base' : 'height';
+};
+
+export const prepareWasteRollReference = (offer) => {
+    const { material } = offer;
+    if (!isRollPresentation(getPresentation(material))) return null;
+
+    const lengthField = getMaterialLengthField(material);
+    if (!lengthField) return null;
+
+    const widthField = lengthField === 'base' ? 'height' : 'base';
+    const referenceConeWeightKg = offer.referenceConeWeightKg;
+    const referenceRollTotalWeightKg = offer.referenceRollTotalWeightKg;
+    return {
+        lengthField,
+        widthField,
+        widthM: Number(material[widthField]),
+        referenceLengthM: Number(material[lengthField]),
+        referenceRollNetWeightKg: calculateWasteNetWeight({
+            coneWeightKg: referenceConeWeightKg == null || referenceConeWeightKg === '' ? null : Number(referenceConeWeightKg),
+            totalWeightKg: referenceRollTotalWeightKg == null || referenceRollTotalWeightKg === '' ? null : Number(referenceRollTotalWeightKg)
+        })
+    };
+};
+
 export const getPresentationId = (item = {}) => (
     item.presentationId
     ?? item.presentation?.id
@@ -60,7 +109,8 @@ export const buildInventorySelectText = (item = {}) => {
     const dimensions = base == null || height == null
         ? 'Sin medidas'
         : `${ base } × ${ height }`;
-    const itemIdentity = `${ name } (${ dimensions })`;
+    const weights = item.coneWeightKg == null || item.totalWeightKg == null ? '' : ` · Neto ${formatDecimal(item.weightKg)} kg, cono ${formatDecimal(item.coneWeightKg)} kg`;
+    const itemIdentity = `${ name } (${ dimensions })${weights}`;
 
     return supplierName
         ? `${ itemIdentity } · ${ supplierName }`
@@ -89,15 +139,13 @@ export const mapSelectWasteMaterialTemplateData = (material = {}) => ({
     unitMeasure: JSON.stringify(material.unitMeasure ?? {})
 });
 
-export const parseInventorySelectJson = (value) => (
-    typeof value === 'string' ? JSON.parse(value || '{}') : value
-);
-
-export const normalizeInventorySelectRelations = (item = {}) => ({
-    ...item,
-    presentation: parseInventorySelectJson(item.presentation),
-    unitMeasure: parseInventorySelectJson(item.unitMeasure)
-});
+export const normalizeInventorySelectRelations = (item = {}) => {
+    const data = { ...item };
+    ['material', 'supplier', 'presentation', 'unitMeasure'].forEach(field => {
+        if (typeof data[field] === 'string') data[field] = JSON.parse(data[field] || '{}');
+    });
+    return data;
+};
 
 const mapIssueQuantities = (detail = {}) => ({
     quantity: detail.quantity,

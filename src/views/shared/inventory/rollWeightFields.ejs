@@ -1,0 +1,17 @@
+<% const inputs = fields.map(field => ({
+    id: field.id,
+    name: field.name,
+    label: field.label,
+    type: 'number',
+    value: '',
+    col: field.col || 'col-12 col-md-6',
+    attrs: {
+        min: field.allowZero ? '0' : '0.01',
+        max: '999.99',
+        step: '0.01',
+        ...(field.readOnly ? { disabled: true } : {})
+    }
+})); %>
+<div class="row g-3">
+    <%- include('../forms/outlineInputList', { inputs }) %>
+</div>
