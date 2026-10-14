@@ -36,7 +36,7 @@ useForm({
 
         return validateFields(wasteValidation, {
             ...formData,
-            rollReference: getWasteMaterialTemplate({ form }).rollReference,
+            material: getWasteMaterialTemplate({ form }),
             presentationName: form.querySelector(INPUT_SELECTORS.WASTE_PRESENTATION_DISPLAY).textContent
         });
     },

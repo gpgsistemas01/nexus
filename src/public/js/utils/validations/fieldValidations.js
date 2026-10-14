@@ -1,5 +1,6 @@
+import { getWasteWeightCaptureValidationError } from './weightValidations.js';
 import { getErrorMessage } from "../../constants/apiMessages.js";
-import { calculateWasteNetWeight, getWasteWeightCaptureValidationError, isRollPresentation } from "../warehouseInventoryUtils.js";
+import { calculateWasteNetWeight, getMaterialLengthField, isRollPresentation } from "../warehouseInventoryUtils.js";
 import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
@@ -336,12 +337,12 @@ export const validateMaterialRollReference = (value, data, fieldName) => {
 };
 
 export const validateWasteDimension = (value, data = {}, fieldName) => {
-    const reference = data.rollReference ?? {};
-    if (isRollPresentation(data.presentationName) && reference.lengthField) {
-        if (fieldName !== reference.lengthField) return null;
-        if (calculateWasteNetWeight(data) != null) {
-            if (Number(reference.referenceRollNetWeightKg) > 0 && Number(reference.referenceLengthM) > 0) return null;
-        }
+    if (isRollPresentation(data.presentationName)) {
+        const material = data.material ?? {};
+        const lengthField = getMaterialLengthField(material);
+        if (lengthField && fieldName !== lengthField) return null;
+        if (lengthField && calculateWasteNetWeight(data) != null
+            && calculateWasteNetWeight(material, { coneFieldName: 'referenceConeWeightKg', totalFieldName: 'referenceRollTotalWeightKg' }) > 0) return null;
     }
     return validatePositiveNumber(value, fieldName === 'base' ? 'La base de la merma' : 'La altura de la merma');
 };

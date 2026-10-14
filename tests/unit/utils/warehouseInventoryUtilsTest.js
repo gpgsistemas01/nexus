@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  normalizeInventorySelectRelations,
   getBase,
   getHeight,
   getIsActive,
@@ -161,7 +162,7 @@ describe('select de material reutilizado por el CRUD de merma', () => {
     }));
     expect(JSON.parse(option.presentation)).toEqual(material.presentation);
     expect(JSON.parse(option.unitMeasure)).toEqual(material.unitMeasure);
-    expect(JSON.parse(option.rollReference)).toBeNull();
+    expect(option).not.toHaveProperty('rollReference');
   });
 });
 
@@ -275,4 +276,18 @@ describe('contrato de detalles de salidas de almacén y merma', () => {
       quantity: 2
     }]);
   });
+});
+
+
+it('normaliza relaciones y pesos del material sin cambiar los nombres del contrato', () => {
+  const selected = normalizeInventorySelectRelations({
+    material: '{"name":"Lona"}', presentation: '{"name":"ROLLO"}', unitMeasure: '{"symbol":"m²"}',
+    referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25'
+  });
+  expect(selected.material.name).toBe('Lona');
+  expect(selected.presentation.name).toBe('ROLLO');
+  expect(selected.referenceConeWeightKg).toBe(0.25);
+  expect(selected.referenceRollTotalWeightKg).toBe(2.25);
+  expect(normalizeInventorySelectRelations({ referenceConeWeightKg: 'null' }).referenceConeWeightKg).toBeNull();
+  expect(selected).not.toHaveProperty('rollReference');
 });

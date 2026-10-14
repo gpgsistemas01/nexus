@@ -1369,78 +1369,6 @@
       "quantity"
     ]
   },
-  "WasteRollReference": {
-    "type": "object",
-    "properties": {
-      "materialId": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "supplierId": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "referenceConeWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "maximum": 999.99,
-        "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al crear una merma de Rollo y puede editarse.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
-        "minimum": 0
-      },
-      "referenceRollTotalWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "exclusiveMinimum": 0,
-        "maximum": 999.99,
-        "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
-      },
-      "referenceRollNetWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ]
-      },
-      "referenceLengthM": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ]
-      },
-      "referenceWidthM": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ]
-      },
-      "lengthField": {
-        "type": [
-          "string",
-          "null"
-        ],
-        "enum": [
-          "base",
-          "height",
-          null
-        ],
-        "readOnly": true,
-        "description": "Orientación de la dimensión longitudinal del material; dato de consulta para la vista previa, no se envía al registrar."
-      }
-    },
-    "additionalProperties": false
-  },
   "WasteMaterialTemplate": {
     "type": "object",
     "properties": {
@@ -1471,12 +1399,6 @@
       "unitMeasure": {
         "type": "object"
       },
-      "suggestedWidth": {
-        "type": [
-          "number",
-          "null"
-        ]
-      },
       "maxUnitCost": {
         "type": [
           "number",
@@ -1484,73 +1406,29 @@
           "null"
         ]
       },
-      "rollReference": {
+      "referenceConeWeightKg": {
         "type": [
-          "object",
+          "number",
+          "string",
           "null"
         ],
-        "properties": {
-          "referenceConeWeightKg": {
-            "type": [
-              "number",
-              "string",
-              "null"
-            ],
-            "maximum": 999.99,
-            "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al crear una merma de Rollo y puede editarse.",
-            "multipleOf": 0.01,
-            "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
-            "minimum": 0
-          },
-          "referenceRollTotalWeightKg": {
-            "type": [
-              "number",
-              "string",
-              "null"
-            ],
-            "exclusiveMinimum": 0,
-            "maximum": 999.99,
-            "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
-            "multipleOf": 0.01,
-            "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
-          },
-          "referenceRollNetWeightKg": {
-            "type": [
-              "number",
-              "string",
-              "null"
-            ]
-          },
-          "referenceLengthM": {
-            "type": [
-              "number",
-              "string",
-              "null"
-            ]
-          },
-          "referenceWidthM": {
-            "type": [
-              "number",
-              "string",
-              "null"
-            ]
-          },
-          "lengthField": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "enum": [
-              "base",
-              "height",
-              null
-            ],
-            "readOnly": true,
-            "description": "Orientación de la dimensión longitudinal del material; dato de consulta para la vista previa, no se envía al registrar."
-          }
-        },
-        "additionalProperties": true,
-        "description": "Referencias para crear una merma de Rollo; null para otras presentaciones."
+        "maximum": 999.99,
+        "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al crear una merma de Rollo y puede editarse.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
+        "minimum": 0
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false

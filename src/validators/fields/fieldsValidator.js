@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { getWasteWeightCaptureValidationError } from "../../public/js/utils/warehouseInventoryUtils.js";
+import { getWasteWeightCaptureValidationError } from "../../public/js/utils/validations/weightValidations.js";
 import { errorMap } from "../../messages/codeMessages.js";
 
 const numberRegex = /\d/;

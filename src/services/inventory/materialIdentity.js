@@ -13,8 +13,4 @@ export const getMaterialIdentityLength = ({ base = null, height = null } = {}) =
     return dimensions.length ? Math.max(...dimensions) : null;
 };
 
-export const getMaterialLengthField = ({ base, height } = {}) => {
-    if (!(toNumber(base) > 0 && toNumber(height) > 0)) return null;
-
-    return toNumber(base) > toNumber(height) ? 'base' : 'height';
-};
+export { getMaterialLengthField } from '../../public/js/utils/warehouseInventoryUtils.js';

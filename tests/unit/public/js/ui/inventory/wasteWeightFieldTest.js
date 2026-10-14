@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({ setMdbWrapperInputValue: vi.fn() }));
-const { getWasteMaterialTemplate, applyWasteMaterialTemplate, updateWasteRollMeasurement, updateWasteWeightField } = await import('../../../../../../src/public/js/ui/inventory/wasteFormUI.js');
+const { getWasteMaterialTemplate, applyWasteMaterialTemplate, updateWasteRollMeasurement, displayWasteMaterialTemplate } = await import('../../../../../../src/public/js/ui/inventory/wasteFormUI.js');
 const { FORM_MODES } = await import('../../../../../../src/public/js/constants/formModes.js');
 
 const { mapSelectWasteMaterialTemplateData } = await import('../../../../../../src/public/js/utils/warehouseInventoryUtils.js');
@@ -20,12 +20,12 @@ const createForm = mode => {
 describe('captura de peso según la presentación real de la merma', () => {
     it('habilita kg para Rollo y limpia y deshabilita al cambiar a otra presentación', () => {
         const form = createForm(FORM_MODES.CREATE);
-        updateWasteWeightField({ form, template: { presentation: { name: ' Rollo ' } } });
+        displayWasteMaterialTemplate({ form, template: { presentation: { name: ' Rollo ' } } });
         expect(form.elements.coneWeightKg.disabled).toBe(false);
         expect(form.elements.totalWeightKg.disabled).toBe(false);
         expect(form.elements.weightKg.disabled).toBe(true);
         expect(form.elements.weightKg.value).toBe(2.5);
-        updateWasteWeightField({ form, template: { presentation: { name: 'Lámina' } } });
+        displayWasteMaterialTemplate({ form, template: { presentation: { name: 'Lámina' } } });
         expect(form.elements.weightKg.disabled).toBe(true);
         expect(form.elements.weightKg.value).toBe('');
         expect(form.elements.coneWeightKg.value).toBe('');
@@ -34,7 +34,7 @@ describe('captura de peso según la presentación real de la merma', () => {
 
     it.each([FORM_MODES.EDIT, FORM_MODES.EDIT_STOCK, FORM_MODES.VIEW])('conserva el peso de consulta y lo deshabilita en modo %s', mode => {
         const form = createForm(mode);
-        updateWasteWeightField({ form, template: { presentation: { name: 'ROLLO' } } });
+        displayWasteMaterialTemplate({ form, template: { presentation: { name: 'ROLLO' } } });
         expect(form.elements.weightKg.disabled).toBe(true);
         expect(form.elements.weightKg.value).toBe('2.5');
         expect(form.elements.coneWeightKg.disabled).toBe(true);
@@ -53,7 +53,7 @@ describe('captura de peso según la presentación real de la merma', () => {
 
     it('precarga el cono y permite editarlo; cambiar material borra las mediciones anteriores', () => {
         const form = createForm(FORM_MODES.CREATE);
-        const template = { presentation: { name: 'ROLLO' }, rollReference: { referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 2.25, referenceRollNetWeightKg: 2, referenceLengthM: 20, referenceWidthM: 1.5, lengthField: 'height' } };
+        const template = { presentation: { name: 'ROLLO' }, base: 1.5, height: 20, referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 2.25 };
         setSelectedTemplate(form, template);
         applyWasteMaterialTemplate({ form, template });
         expect(form.elements.coneWeightKg.value).toBe(0.25);
@@ -67,15 +67,15 @@ describe('captura de peso según la presentación real de la merma', () => {
         expect(form.elements.height.value).toBe(10);
         expect(form.elements.base.value).toBe(1.5);
         expect(form.elements.base.disabled).toBe(true);
-        applyWasteMaterialTemplate({ form, template: { ...template, rollReference: { referenceConeWeightKg: 0.3 } } });
+        applyWasteMaterialTemplate({ form, template: { ...template, referenceConeWeightKg: 0.3, referenceRollTotalWeightKg: null } });
         expect(form.elements.coneWeightKg.value).toBe(0.3);
         expect(form.elements.totalWeightKg.value).toBe('');
         expect(form.elements.weightKg.value).toBe('');
     });
     it('lee las referencias JSON de Select2 sin copiarlas al formulario', () => {
         const form = createForm(FORM_MODES.CREATE);
-        setSelectedTemplate(form, { presentation: { name: 'ROLLO' }, rollReference: { referenceConeWeightKg: 0.25 } });
-        expect(getWasteMaterialTemplate({ form }).rollReference.referenceConeWeightKg).toBe(0.25);
+        setSelectedTemplate(form, { presentation: { name: 'ROLLO' }, referenceConeWeightKg: 0.25 });
+        expect(getWasteMaterialTemplate({ form }).referenceConeWeightKg).toBe(0.25);
         expect(form.dataset.rollReference).toBeUndefined();
     });
 
@@ -99,7 +99,7 @@ describe('captura de peso según la presentación real de la merma', () => {
 
 it('actualiza resultados al corregir pesos y limpia el largo calculado cuando falta un dato', () => {
     const form = createForm(FORM_MODES.CREATE);
-    const template = { presentation: { name: 'ROLLO' }, rollReference: { referenceConeWeightKg: 0.25, referenceRollNetWeightKg: 2, referenceLengthM: 20, referenceWidthM: 1.5, lengthField: 'height' } };
+    const template = { presentation: { name: 'ROLLO' }, base: 1.5, height: 20, referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 2.25 };
     setSelectedTemplate(form, template);
     applyWasteMaterialTemplate({ form, template });
     form.elements.totalWeightKg.value = '1.25';

@@ -20,7 +20,7 @@ flowchart LR
     controllers["controllers (44 módulos)"] --> utils["utils (11 módulos)"]
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
     errors["errors (19 módulos)"] --> messages["messages (2 módulos)"]
-    errors["errors (19 módulos)"] --> public["public (210 módulos)"]
+    errors["errors (19 módulos)"] --> public["public (211 módulos)"]
     middleware["middleware (5 módulos)"] --> constants["constants (10 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
     middleware["middleware (5 módulos)"] --> services["services (58 módulos)"]
@@ -33,14 +33,14 @@ flowchart LR
     services["services (58 módulos)"] --> constants["constants (10 módulos)"]
     services["services (58 módulos)"] --> dtos["dtos (10 módulos)"]
     services["services (58 módulos)"] --> errors["errors (19 módulos)"]
-    services["services (58 módulos)"] --> public["public (210 módulos)"]
+    services["services (58 módulos)"] --> public["public (211 módulos)"]
     services["services (58 módulos)"] --> repository["repository (1 módulos)"]
     services["services (58 módulos)"] --> utils["utils (11 módulos)"]
     utils["utils (11 módulos)"] --> constants["constants (10 módulos)"]
     utils["utils (11 módulos)"] --> errors["errors (19 módulos)"]
     validators["validators (15 módulos)"] --> constants["constants (10 módulos)"]
     validators["validators (15 módulos)"] --> messages["messages (2 módulos)"]
-    validators["validators (15 módulos)"] --> public["public (210 módulos)"]
+    validators["validators (15 módulos)"] --> public["public (211 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. Los recursos EJS, CSS y el esquema Prisma se
@@ -241,7 +241,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/audit/auditService.js`](../../../../src/services/audit/auditService.js) | `isAuditWriteRequest`, `persistWriteAudit` |
 | [`src/services/authService.js`](../../../../src/services/authService.js) | `getNewRefreshToken`, `loginUser` |
 | [`src/services/document/referenceNumberService.js`](../../../../src/services/document/referenceNumberService.js) | `generateYearlyReferenceNumber`, `incrementNonYearlyReferenceNumberCounter`, `throwIfReferenceNumberAlreadyExists` |
-| [`src/services/inventory/materialIdentity.js`](../../../../src/services/inventory/materialIdentity.js) | `getMaterialIdentityLength`, `getMaterialIdentityWidth`, `getMaterialLengthField` |
+| [`src/services/inventory/materialIdentity.js`](../../../../src/services/inventory/materialIdentity.js) | `getMaterialIdentityLength`, `getMaterialIdentityWidth` |
 | [`src/services/inventory/movementHelpers.js`](../../../../src/services/inventory/movementHelpers.js) | `buildInventoryMovementDetail`, `buildStockUpdateSummary` |
 | [`src/services/inventory/movementQueryService.js`](../../../../src/services/inventory/movementQueryService.js) | `findAllConsumableMovements`, `findAllMaterialMovements`, `findAllWasteMovements` |
 | [`src/services/inventory/movementService.js`](../../../../src/services/inventory/movementService.js) | `applyInventoryMovement`, `createInventoryMovement` |

@@ -1,7 +1,7 @@
 import { getDb } from '../../../repository/baseRepository.js';
-import { getMaterialIdentityLength, getMaterialIdentityWidth, getMaterialLengthField } from '../../inventory/materialIdentity.js';
+import { getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
-import { calculateWasteNetWeight, isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
+import { isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 const getHighestUnitCost = (offers = []) => offers.reduce((highest, offer) => {
     const cost = toNumber(offer.maxUnitCost);
@@ -42,7 +42,6 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
     materials.forEach(material => {
         const identityWidth = getMaterialIdentityWidth(material);
         const isRoll = isRollPresentation(material.presentation.name);
-        const suggestedWidth = isRoll ? identityWidth : null;
         const key = `${ material.name.trim().toLocaleLowerCase() }|${ identityWidth ?? 'no-width' }`;
         const maxUnitCost = getHighestUnitCost(material.supplierMaterials);
         familyCosts.set(key, maxUnitCost == null ? familyCosts.get(key) ?? null : Math.max(familyCosts.get(key) ?? maxUnitCost, maxUnitCost));
@@ -54,19 +53,9 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
             const offer = supplierMaterials[0];
             uniqueTemplates.set(templateKey, {
                 ...template,
-                suggestedWidth,
                 maxUnitCost,
-                rollReference: isRoll ? {
-                    referenceConeWeightKg: offer?.referenceConeWeightKg ?? null,
-                    referenceRollTotalWeightKg: offer?.referenceRollTotalWeightKg ?? null,
-                    referenceRollNetWeightKg: calculateWasteNetWeight(offer ?? {}, {
-                        coneFieldName: 'referenceConeWeightKg',
-                        totalFieldName: 'referenceRollTotalWeightKg'
-                    }),
-                    referenceLengthM: getMaterialIdentityLength(material),
-                    referenceWidthM: identityWidth,
-                    lengthField: getMaterialLengthField(material)
-                } : null
+                referenceConeWeightKg: isRoll ? offer?.referenceConeWeightKg ?? null : null,
+                referenceRollTotalWeightKg: isRoll ? offer?.referenceRollTotalWeightKg ?? null : null
             });
             return;
         }

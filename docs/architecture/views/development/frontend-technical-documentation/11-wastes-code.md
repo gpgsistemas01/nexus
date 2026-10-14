@@ -13,12 +13,15 @@ flowchart TB
     U["Composición compartida<br/>createCrudApplication.js<br/>warehouseInventoryDatatable.js<br/>y colaboradores"]
     Validation["validators.js"]
     FieldValidation["fieldValidations.js<br/>validateWasteWeightCapture"]
-    WeightRule["warehouseInventoryUtils.js<br/>getWasteWeightCaptureValidationError"]
+    WeightRule["validations/weightValidations.js<br/>getWasteWeightCaptureValidationError"]
     Messages["apiMessages.js<br/>getErrorMessage"]
     H["axiosInstanceApi.js<br/>request / apiRequest"]
     InventoryUI["wasteFormUI.js"]
     Select["Select2<br/>wasteMaterialTemplate.js"]
-    InventoryUI --> WeightRule
+    InventoryUI --> FieldValidation
+    InventoryUtils["warehouseInventoryUtils.js<br/>normalización y cálculos"]
+    InventoryUI --> InventoryUtils
+    Select --> InventoryUtils
     Select --> InventoryUI
     P --> InventoryUI
     A --> R
@@ -42,7 +45,7 @@ flowchart TB
 | services HTTP · wasteService.js | `src/public/js/services/warehouse/`<br/>`wasteService.js` |
 | DataTable del recurso · wasteDatatable.js | `src/public/js/plugins/datatable/warehouse/`<br/>`wastes/wasteDatatable.js` |
 | Composición compartida · createCrudApplication.js · warehouseInventoryDatatable.js · y colaboradores | `src/public/js/application/`<br/>`createCrudApplication.js`<br/>`src/public/js/plugins/datatable/shared/`<br/>`inventory/warehouseInventoryDatatable.js`<br/>`src/public/js/ui/forms/formStateUI.js`<br/>`src/public/js/ui/forms/formUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventoryCrudModalUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventorySelectUI.js`<br/>`src/public/js/ui/modalUI.js`<br/>`src/public/js/ui/tableUI.js` |
-| Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/warehouseInventoryUtils.js`<br/>`src/public/js/constants/apiMessages.js` |
+| Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/validations/weightValidations.js`<br/>`src/public/js/constants/apiMessages.js` |
 | Selección y pesos de merma | `src/public/js/ui/inventory/wasteFormUI.js` y `src/public/js/plugins/select2/domains/wasteMaterialTemplate.js` |
 
 El formulario existente de material administra los dos pesos de referencia con
@@ -55,10 +58,13 @@ Ante `WASTE_ALREADY_EXISTS`, `wasteForm.js` ofrece **Agregar stock** si el usuar
 `wastes:addStock`. Abre el modal existente con el registro devuelto y la cantidad
 precargada; el usuario revisa y confirma esa operación por separado.
 
-Como en las salidas, el evento de Select2 guarda los datos serializados en
-`option.dataset`. El formulario lee `option:checked` y aplica `JSON.parse` a
-presentación, unidad y referencias; los mappers mantienen ese contrato. No se copia `rollReference` al
-dataset del formulario. El cálculo sólo se ejecuta al crear un Rollo; en los
+Como en las salidas, Select2 conserva datos en `option.dataset`. La función
+`normalizeInventorySelectRelations` compartida reconstruye material, proveedor,
+presentación y unidad, y convierte los pesos opcionales. La respuesta de material
+incluye directamente `referenceConeWeightKg` y `referenceRollTotalWeightKg`, con
+los nombres de `SupplierMaterial`, además de `base` y `height`. No hay bloque
+`rollReference` ni neto, largo u orientación precalculados en esa respuesta.
+El cálculo sólo se ejecuta al crear un Rollo; en los
 demás modos se muestran los valores persistidos. La tabla agrupa Cono, Total con
 cono y Neto por unidad inmediatamente antes de Acciones. El modal reutiliza una
 sección propia y el parcial de pesos para ordenar esos campos.
@@ -70,3 +76,11 @@ Los eventos `input` de cono, total, base y altura actualizan la vista previa al
 crear un Rollo. Al borrar o invalidar un peso se limpian neto y longitud calculada;
 la captura manual de longitud se conserva mientras no haya un cálculo disponible.
 Las referencias no se calculan para otras presentaciones.
+
+El formulario registra un listener `input` para cono, total, base y altura; cubre
+escritura, pegado, borrado y controles numéricos. La selección llama a
+`applyWasteMaterialTemplate` para limpiar y precargar. Al abrir el modal se usa
+`displayWasteMaterialTemplate` para presentación y estado de los pesos. Ambos
+reutilizan `updateWasteRollMeasurement`, que el listener vuelve a ejecutar al
+editar los datos. Las reglas están en `validations/weightValidations.js`; los
+mensajes se resuelven en `fieldValidations.js` con el catálogo `apiMessages.js`.

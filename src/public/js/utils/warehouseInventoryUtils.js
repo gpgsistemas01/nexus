@@ -1,7 +1,5 @@
-import { WASTE_WEIGHT_LIMITS } from '../constants/inventory.js';
+import { MATERIAL_ROLL_REFERENCE_FIELDS, WASTE_WEIGHT_LIMITS } from '../constants/inventory.js';
 import { formatDecimal, roundTo } from './formatUtils.js';
-
-const wasteWeightDecimalPattern = new RegExp(`^\\d{1,${WASTE_WEIGHT_LIMITS.INTEGER_DIGITS}}(\\.\\d{1,${WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS}})?$`);
 
 export const getBase = (item = {}) => (
     item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base ?? null
@@ -18,55 +16,21 @@ export const getPresentation = (item = {}) => (
 
 export const isRollPresentation = name => String(name ?? '').trim().toLocaleUpperCase('es-MX') === 'ROLLO';
 
-// Validate the original value before numeric conversion can discard format or precision.
-export const getWasteWeightValidationError = (value, { allowZero = false } = {}) => {
-    if (value === undefined || value === null || value === '') return null;
-
-    if (
-        (typeof value !== 'number' && typeof value !== 'string')
-        || !Number.isFinite(Number(value))
-        || (allowZero ? Number(value) < 0 : Number(value) <= 0)
-        || (typeof value === 'string' && (value.trim() !== value || !/^\d+(\.\d+)?$/.test(value)))
-    ) return allowZero ? 'CONE_WEIGHT_KG_INVALID_NUMBER' : 'WEIGHT_KG_INVALID_NUMBER';
-
-    if (Number(value) > WASTE_WEIGHT_LIMITS.MAX) return 'WEIGHT_KG_TOO_HIGH';
-    if (!wasteWeightDecimalPattern.test(String(value))) return 'WEIGHT_KG_TOO_LONG';
-
-    return null;
-};
-
-const hasWasteWeight = value => value !== undefined && value !== null && value !== '';
-
-export const getWasteWeightCaptureValidationError = (value, {
-    fieldName, coneFieldName = 'coneWeightKg', totalFieldName = 'totalWeightKg', requireTotal = true, ...data
-}) => {
-    const isCone = fieldName === coneFieldName;
-    const coneWeightKg = isCone ? value : data[coneFieldName];
-    const totalWeightKg = isCone ? data[totalFieldName] : value;
-    const error = getWasteWeightValidationError(value, { allowZero: isCone });
-    if (error) return error;
-
-    if (!hasWasteWeight(value) && hasWasteWeight(isCone ? totalWeightKg : coneWeightKg) && (isCone || requireTotal)) {
-        return isCone ? 'CONE_WEIGHT_KG_REQUIRED' : 'TOTAL_WEIGHT_KG_REQUIRED';
-    }
-
-    if (!isCone && hasWasteWeight(totalWeightKg) && hasWasteWeight(coneWeightKg)
-        && !getWasteWeightValidationError(coneWeightKg, { allowZero: true })
-        && Number(totalWeightKg) <= Number(coneWeightKg)) return 'WASTE_TOTAL_WEIGHT_NOT_GREATER';
-
-    return null;
-};
-
 export const calculateWasteNetWeight = (data, { coneFieldName = 'coneWeightKg', totalFieldName = 'totalWeightKg' } = {}) => {
     const coneWeightKg = data[coneFieldName];
     const totalWeightKg = data[totalFieldName];
-    if (!hasWasteWeight(coneWeightKg) || !hasWasteWeight(totalWeightKg)) return null;
+    if ([coneWeightKg, totalWeightKg].some(value => value == null || value === '')) return null;
     return roundTo(Number(totalWeightKg) - Number(coneWeightKg), WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS);
 };
 
 export const calculateWasteRollLength = ({ weightKg, referenceRollNetWeightKg, referenceLengthM }) => {
     if (![weightKg, referenceRollNetWeightKg, referenceLengthM].every(value => Number(value) > 0)) return null;
     return roundTo(Number(weightKg) * Number(referenceLengthM) / Number(referenceRollNetWeightKg));
+};
+
+export const getMaterialLengthField = ({ base, height } = {}) => {
+    if (!(Number(base) > 0 && Number(height) > 0)) return null;
+    return Number(base) > Number(height) ? 'base' : 'height';
 };
 
 export const getPresentationId = (item = {}) => (
@@ -146,9 +110,19 @@ export const mapSelectWasteMaterialTemplateData = (material = {}) => ({
     ...material,
     text: buildInventorySelectText(material),
     presentation: JSON.stringify(material.presentation ?? {}),
-    unitMeasure: JSON.stringify(material.unitMeasure ?? {}),
-    rollReference: JSON.stringify(material.rollReference ?? null)
+    unitMeasure: JSON.stringify(material.unitMeasure ?? {})
 });
+
+export const normalizeInventorySelectRelations = (item = {}) => {
+    const data = { ...item };
+    ['material', 'supplier', 'presentation', 'unitMeasure'].forEach(field => {
+        if (typeof data[field] === 'string') data[field] = JSON.parse(data[field] || '{}');
+    });
+    MATERIAL_ROLL_REFERENCE_FIELDS.forEach(field => {
+        if (field in data) data[field] = data[field] == null || data[field] === 'null' || data[field] === '' ? null : Number(data[field]);
+    });
+    return data;
+};
 
 const mapIssueQuantities = (detail = {}) => ({
     quantity: detail.quantity,

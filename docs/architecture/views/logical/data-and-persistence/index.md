@@ -127,7 +127,7 @@ define la captura y consulta. La implementación distribuye sus responsabilidade
 
 | Componente | Responsabilidad |
 | --- | --- |
-| `getWasteWeightCaptureValidationError` | Valida formato, precisión, rango, captura conjunta y total mayor que cono en formulario y HTTP. |
+| `weightValidations.js` · `getWasteWeightCaptureValidationError` | Valida formato, precisión, rango, captura conjunta y total mayor que cono en formulario y HTTP. |
 | `wasteDTO.js` | Normaliza cono, total y dimensiones manuales para el alta; excluye los pesos del DTO de edición. |
 | `wasteService.js` | Comprueba la presentación persistida, consulta referencias vigentes desde la oferta, delega las medidas a `prepareWasteMeasurements` y protege pesos y referencias en edición. |
 | `wasteHelpers.js` | Prepara neto, dimensión transversal y longitud a partir del DTO y la oferta persistida; comprueba las dimensiones finales sin consultar ni guardar datos. |
@@ -179,3 +179,7 @@ y persistencia. El navegador envía cono y total capturados; el servidor calcula
 y guarda `weightKg` y devuelve ese neto en el alta y en el listado. Las reglas de
 validación reciben los nombres originales de campos de material y merma, sin
 renombrar los campos del contrato HTTP.
+
+El contrato de selección de material conserva `base`, `height`,
+`referenceConeWeightKg` y `referenceRollTotalWeightKg` directamente. Neto de muestra,
+orientación y largo se obtienen al calcular; no forman otro bloque de referencia.

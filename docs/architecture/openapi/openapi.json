@@ -434,9 +434,6 @@
       "WasteStockAdditionRequest": {
         "$ref": "./components/warehouse-schemas.json#/WasteStockAdditionRequest"
       },
-      "WasteRollReference": {
-        "$ref": "./components/warehouse-schemas.json#/WasteRollReference"
-      },
       "WasteMaterialTemplate": {
         "$ref": "./components/warehouse-schemas.json#/WasteMaterialTemplate"
       },

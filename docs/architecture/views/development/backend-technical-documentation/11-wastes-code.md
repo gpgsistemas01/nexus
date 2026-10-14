@@ -13,9 +13,10 @@ flowchart TB
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>materialIdentity.js<br/>y colaboradores"]
     V["Validadores<br/>wasteValidations.js"]
     Fields["fieldsValidator.js<br/>validateWeightCapture"]
+    WeightValidation["validations/weightValidations.js<br/>getWasteWeightCaptureValidationError"]
     Measurements["wasteHelpers.js<br/>prepareWasteMeasurements"]
     P["baseRepository.js<br/>getDb(tx)"]
-    PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>getWasteWeightCaptureValidationError<br/>calculateWasteNetWeight<br/>calculateWasteRollLength"]
+    PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>calculateWasteNetWeight<br/>calculateWasteRollLength"]
     C --> D
     C --> S
     R --> C
@@ -23,7 +24,7 @@ flowchart TB
     S --> P
     S --> X
     V --> Fields
-    Fields --> PresentationRule
+    Fields --> WeightValidation
     S --> Measurements
     Measurements --> PresentationRule
     X --> P
@@ -85,3 +86,8 @@ Recibe el DTO y la oferta consultada, resuelve la orientación, calcula neto y l
 y comprueba las dimensiones finales. El servicio conserva consultas, identidad,
 transacción y registro de inventario. Los formularios Express de material y merma
 reutilizan `validateWeightCapture` como validador de campo con `.withMessage`.
+
+La selección de material devuelve los dos pesos de la oferta en el nivel principal,
+sin `rollReference` ni resultados precalculados. Las reglas Express reutilizan
+`public/js/utils/validations/weightValidations.js`; la utilidad de inventario sólo
+conserva acceso a datos, normalización y cálculos sin mensajes de validación.
