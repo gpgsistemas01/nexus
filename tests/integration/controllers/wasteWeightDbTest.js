@@ -72,7 +72,7 @@ describe('peso unitario de merma de rollo', () => {
         await prisma.stockAdjustmentDetail.deleteMany({ where: { stockAdjustmentId: { in: materialAdjustmentIds } } });
         await prisma.stockAdjustment.deleteMany({ where: { id: { in: materialAdjustmentIds } } });
         await prisma.supplierMaterial.deleteMany({ where: { supplierId: ids.supplier } });
-        await prisma.material.deleteMany({ where: { id: { in: [ids.roll, ids.sheet, ids.extraRoll].filter(Boolean) } } });
+        await prisma.material.deleteMany({ where: { id: { in: [ids.roll, ids.sheet, ids.extraRoll, ids.referenceRoll, ids.concurrentRoll].filter(Boolean) } } });
         await prisma.supplier.delete({ where: { id: ids.supplier } });
         await prisma.user.delete({ where: { id: ids.user } });
         await prisma.unitMeasure.delete({ where: { id: ids.unit } });
@@ -242,7 +242,7 @@ describe('peso unitario de merma de rollo', () => {
     });
 
 
-    const materialEditBody = () => ({ supplierId: ids.supplier, name: `IT Weight roll ${suffix}`, maxUnitCost: 10, isActive: true });
+    const materialEditBody = (resource = 'roll') => ({ supplierId: ids.supplier, name: `IT Weight ${resource} ${suffix}`, maxUnitCost: 10, isActive: true });
 
     it('rechaza una merma sin pesos ni dimensión longitudinal sin crear registros parciales', async () => {
         const before = await prisma.waste.count({ where: { supplierId: ids.supplier } });
@@ -251,7 +251,7 @@ describe('peso unitario de merma de rollo', () => {
         expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
     });
 
-    it('registra los pesos por proveedor en el alta de material y permite reemplazar sólo el cono', async () => {
+    it('registra los pesos por proveedor en el alta y rechaza cambios posteriores, incluido cono cero', async () => {
         const created = await request(app).post('/materials').send({
             name: `IT Roll Reference ${suffix}`, supplierId: ids.supplier,
             presentationId: ids.rollPresentation, unitMeasureId: ids.unit,
@@ -264,39 +264,73 @@ describe('peso unitario de merma de rollo', () => {
         expect(Number(offer.referenceRollTotalWeightKg)).toBe(10);
         expect(Number(offer.currentStock)).toBe(0);
         expect(Number(created.body.material.referenceRollTotalWeightKg)).toBe(10);
-        await request(app).patch(`/materials/${ids.extraRoll}`).send({ ...materialEditBody(), name: created.body.material.material.name, referenceConeWeightKg: 0.2 }).expect(200);
+        const clearedCone = await request(app).patch(`/materials/${ids.extraRoll}`).send({ ...materialEditBody(), name: 'Cambio rechazado', referenceConeWeightKg: null }).expect(409);
+        expect(clearedCone.body.code).toBe('MATERIAL_ROLL_REFERENCE_READ_ONLY');
+        const rejected = await request(app).patch(`/materials/${ids.extraRoll}`).send({ ...materialEditBody(), name: 'Cambio rechazado', referenceConeWeightKg: 0.2 }).expect(409);
+        expect(rejected.body.code).toBe('MATERIAL_ROLL_REFERENCE_READ_ONLY');
         const updated = await prisma.supplierMaterial.findUnique({ where: { id: offer.id } });
-        expect(Number(updated.referenceConeWeightKg)).toBe(0.2);
-        expect(updated.referenceRollTotalWeightKg).toBeNull();
-        expect(Number(updated.currentStock)).toBe(0);
+        expect(updated).toEqual(offer);
+        expect((await prisma.material.findUnique({ where: { id: ids.extraRoll } })).name).toBe(created.body.material.material.name);
+        await request(app).patch(`/materials/${ids.extraRoll}`).send({ ...materialEditBody(), name: 'Cambio rechazado', referenceConeWeightKg: 0, referenceRollTotalWeightKg: 11 }).expect(409);
+        expect(await prisma.supplierMaterial.findUnique({ where: { id: offer.id } })).toEqual(offer);
     });
 
-    it('guarda los pesos en material y usa el cono editable sin copiar referencias a la merma', async () => {
+    it('completa un peso faltante una sola vez y usa el cono de merma sin modificar la referencia', async () => {
         const before = await prisma.waste.findUnique({ where: { id: roll.id } });
-        await request(app).patch(`/materials/${ids.roll}`).send({ ...materialEditBody(), referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' }).expect(200);
-        const offer = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: ids.roll } } });
+        const material = await request(app).post('/materials').send({
+            ...materialEditBody('referenceRoll'), presentationId: ids.rollPresentation, unitMeasureId: ids.unit,
+            base: 1.5, height: 20, newStock: 0, referenceConeWeightKg: 0.25
+        }).expect(200);
+        ids.referenceRoll = material.body.material.material.id;
+        await request(app).patch(`/materials/${ids.referenceRoll}`).send({ ...materialEditBody('referenceRoll'), referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' }).expect(200);
+        const offer = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: ids.referenceRoll } } });
         expect(Number(offer.referenceConeWeightKg)).toBe(0.25);
         expect(Number(offer.referenceRollTotalWeightKg)).toBe(2.25);
         expect(await prisma.waste.findUnique({ where: { id: roll.id } })).toEqual(before);
 
-        const created = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Cono predeterminado', newStock: 1, coneWeightKg: 0.25, totalWeightKg: 1.25, height: undefined }).expect(200);
+        const created = await request(app).post('/wastes').send({ ...createBody('referenceRoll'), name: 'IT Cono predeterminado', newStock: 1, coneWeightKg: 0.25, totalWeightKg: 1.25, height: undefined }).expect(200);
         const saved = await prisma.waste.findUnique({ where: { id: created.body.waste.id } });
         expect(Number(saved.coneWeightKg)).toBe(0.25);
         expect(Number(saved.weightKg)).toBe(1);
         expect(Number(saved.height)).toBe(10);
         expect(Number(saved.convertedQuantity)).toBe(15);
         expect(saved).not.toHaveProperty('lengthSource');
-        expect(saved.sourceMaterialId).toBe(ids.roll);
+        expect(saved.sourceMaterialId).toBe(ids.referenceRoll);
         expect(saved).not.toHaveProperty('referenceConeWeightKg');
         expect(saved).not.toHaveProperty('referenceNetWeightKg');
-        await request(app).patch(`/materials/${ids.roll}`).send({ ...materialEditBody(), referenceConeWeightKg: '0.3', referenceRollTotalWeightKg: '2.3' }).expect(200);
+        await request(app).patch(`/materials/${ids.referenceRoll}`).send({ ...materialEditBody('referenceRoll'), referenceConeWeightKg: '0.3', referenceRollTotalWeightKg: '2.3' }).expect(409);
+        expect(await prisma.supplierMaterial.findUnique({ where: { id: offer.id } })).toEqual(offer);
         expect(await prisma.waste.findUnique({ where: { id: saved.id } })).toEqual(saved);
     });
 
+    it('una edición de costo sin pesos conserva las referencias ya registradas', async () => {
+        const before = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: ids.referenceRoll } } });
+        await request(app).patch(`/materials/${ids.referenceRoll}`).send({ ...materialEditBody('referenceRoll'), maxUnitCost: 12 }).expect(200);
+        const after = await prisma.supplierMaterial.findUnique({ where: { id: before.id } });
+        expect(after.referenceConeWeightKg).toEqual(before.referenceConeWeightKg);
+        expect(after.referenceRollTotalWeightKg).toEqual(before.referenceRollTotalWeightKg);
+        expect(Number(after.maxUnitCost)).toBe(12);
+    });
+
+    it('dos capturas iniciales simultáneas no pueden reemplazar las referencias de la otra', async () => {
+        const material = await request(app).post('/materials').send({
+            ...materialEditBody('concurrentRoll'), presentationId: ids.rollPresentation,
+            unitMeasureId: ids.unit, base: 1.5, height: 20, newStock: 0
+        }).expect(200);
+        ids.concurrentRoll = material.body.material.material.id;
+        const captures = [{ referenceConeWeightKg: 0, referenceRollTotalWeightKg: 2 }, { referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 3 }];
+        const responses = await Promise.all(captures.map(capture => request(app).patch(`/materials/${ids.concurrentRoll}`).send({ ...materialEditBody('concurrentRoll'), ...capture })));
+        expect(responses.map(response => response.status).sort()).toEqual([200, 409]);
+        const winner = captures[responses.findIndex(response => response.status === 200)];
+        const offer = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: ids.concurrentRoll } } });
+        expect(Number(offer.referenceConeWeightKg)).toBe(winner.referenceConeWeightKg);
+        expect(Number(offer.referenceRollTotalWeightKg)).toBe(winner.referenceRollTotalWeightKg);
+    });
+
     it('calcula base cuando el largo nominal está en base y agrupa el reporte por el ancho correcto', async () => {
-        await prisma.material.update({ where: { id: ids.roll }, data: { base: 20, height: 1.5 } });
+        await prisma.material.update({ where: { id: ids.referenceRoll }, data: { base: 20, height: 1.5 } });
         try {
-            const created = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Largo en base', coneWeightKg: 0.4, totalWeightKg: 1.4, base: 999, height: 888, referenceRollNetWeightKg: 999 }).expect(200);
+            const created = await request(app).post('/wastes').send({ ...createBody('referenceRoll'), name: 'IT Largo en base', coneWeightKg: 0.4, totalWeightKg: 1.4, base: 999, height: 888, referenceRollNetWeightKg: 999 }).expect(200);
             const saved = await prisma.waste.findUnique({ where: { id: created.body.waste.id } });
             expect(Number(saved.base)).toBe(10);
             expect(Number(saved.height)).toBe(1.5);
@@ -304,12 +338,12 @@ describe('peso unitario de merma de rollo', () => {
             const report = await findWasteReportRows({ supplierId: ids.supplier });
             expect(buildWasteReportSummary(report).rows).toContainEqual(expect.objectContaining({ name: 'IT Largo en base', width: 1.5 }));
         } finally {
-            await prisma.material.update({ where: { id: ids.roll }, data: { base: 1.5, height: 20 } });
+            await prisma.material.update({ where: { id: ids.referenceRoll }, data: { base: 1.5, height: 20 } });
         }
     });
 
     it('conserva un cono editado distinto del predeterminado y estima según el ancho de la merma', async () => {
-        const created = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Cono editado', base: 0.75, newStock: 1, coneWeightKg: 0.4, totalWeightKg: 1.4, height: 999 }).expect(200);
+        const created = await request(app).post('/wastes').send({ ...createBody('referenceRoll'), name: 'IT Cono editado', base: 0.75, newStock: 1, coneWeightKg: 0.4, totalWeightKg: 1.4, height: 999 }).expect(200);
         const saved = await prisma.waste.findUnique({ where: { id: created.body.waste.id } });
         expect(Number(saved.coneWeightKg)).toBe(0.4);
         expect(Number(saved.weightKg)).toBe(1);
@@ -337,19 +371,19 @@ describe('peso unitario de merma de rollo', () => {
         expect(await prisma.material.findUnique({ where: { id: ids.sheet } })).toEqual(before);
     });
 
-    it('permite borrar las referencias de material sin alterar pesos ni largos de mermas existentes', async () => {
+    it('rechaza borrar las referencias de material y conserva el material y las mermas existentes', async () => {
         const before = await prisma.waste.findMany({ where: { supplierId: ids.supplier }, orderBy: { id: 'asc' } });
-        await request(app).patch(`/materials/${ids.roll}`).send({ ...materialEditBody(), referenceConeWeightKg: null, referenceRollTotalWeightKg: null }).expect(200);
+        const rejected = await request(app).patch(`/materials/${ids.roll}`).send({ ...materialEditBody(), referenceConeWeightKg: null, referenceRollTotalWeightKg: null }).expect(409);
+        expect(rejected.body.code).toBe('MATERIAL_ROLL_REFERENCE_READ_ONLY');
         const offer = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: ids.roll } } });
-        expect(offer.referenceConeWeightKg).toBeNull();
-        expect(offer.referenceRollTotalWeightKg).toBeNull();
+        expect(Number(offer.referenceConeWeightKg)).toBe(0.25);
+        expect(Number(offer.referenceRollTotalWeightKg)).toBe(12.55);
         expect(await prisma.waste.findMany({ where: { supplierId: ids.supplier }, orderBy: { id: 'asc' } })).toEqual(before);
         const count = await prisma.waste.count({ where: { supplierId: ids.supplier } });
         const previous = await prisma.waste.findUnique({ where: { id: roll.id } });
         const movements = await prisma.wasteMovementDetail.count({ where: { wasteId: roll.id } });
-        const manual = await request(app).post('/wastes').send({ ...createBody('roll'), name: 'IT Sin referencia', coneWeightKg: 0.2, totalWeightKg: 1.2 }).expect(200);
-        expect(Number(manual.body.waste.height)).toBe(2);
-        expect(Number(manual.body.waste.weightKg)).toBe(1);
-        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(count + 1);
+        expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(count);
+        expect(await prisma.waste.findUnique({ where: { id: roll.id } })).toEqual(previous);
+        expect(await prisma.wasteMovementDetail.count({ where: { wasteId: roll.id } })).toBe(movements);
     });
 });

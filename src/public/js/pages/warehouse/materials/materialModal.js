@@ -33,6 +33,7 @@ export const openMaterialModal = ({
     initializeInventoryCrudModal({ form, mode, data });
     form.dataset.creationContext = creationContext || '';
     form.dataset.resource = resource;
+    form.materialRollReference = Object.fromEntries(materialRollReferenceFields.map(field => [field, data?.[field] ?? null]));
     initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL });
     setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
 
@@ -54,6 +55,7 @@ export const openMaterialModal = ({
     });
     setFormSectionVisibility({
         form,
+        selector: '.material-measurements-section',
         isVisible: !isConsumable,
         fieldNames: ['base', 'height']
     });

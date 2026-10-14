@@ -3,7 +3,7 @@ import { resetFormSubmitState } from '../../../ui/forms/formStateUI.js';
 import { closeModal } from '../../../ui/modalUI.js';
 import { openWasteStockAdditionModal } from './wasteStockAdditionModal.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
-import { getPresentation } from '../../../utils/warehouseInventoryUtils.js';
+import { getPresentation, isRollPresentation } from '../../../utils/warehouseInventoryUtils.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { updateWasteRollMeasurement } from '../../../ui/inventory/wasteFormUI.js';
 import { useForm } from '../../../ui/forms/formUI.js';
@@ -20,6 +20,11 @@ useForm({
 
         const fields = isStockMode(form.dataset.mode) ? wasteStockFields
             : isEditMode(form.dataset.mode) ? wasteEditFields : wasteCreateFields;
+
+        if (isCreateMode(form.dataset.mode) && isRollPresentation(getPresentation(form.wasteMaterialTemplate ?? {}))) {
+            formData.base = form.elements.base.value;
+            formData.height = form.elements.height.value;
+        }
 
         if (!isStockMode(form.dataset.mode)) {
             

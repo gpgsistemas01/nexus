@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({ setMdbWrapperInputValue: vi.fn() }));
 const { applyWasteMaterialTemplate, configureWasteWeightFields, updateWasteRollMeasurement, displayWasteMaterialTemplate } = await import('../../../../../../src/public/js/ui/inventory/wasteFormUI.js');
 const { FORM_MODES } = await import('../../../../../../src/public/js/constants/formModes.js');
+const { setMdbWrapperInputValue } = await import('../../../../../../src/public/js/plugins/mdb/baseInstance.js');
 
 const createForm = (mode = FORM_MODES.CREATE) => {
     const elements = Object.fromEntries(Object.entries({ weightKg: '2.5', coneWeightKg: '0.5', totalWeightKg: '3', base: '1.5', height: '2' })
@@ -32,7 +33,7 @@ describe('mediciones del registro de merma', () => {
     it('mostrar una merma conserva las mediciones sin recalcularlas', () => {
         const form = createForm();
         displayWasteMaterialTemplate({ form, template: roll() });
-        expect(form.querySelector('#wastePresentationDisplayValue').textContent).toBe('ROLLO');
+        expect(setMdbWrapperInputValue).toHaveBeenCalledWith({ selector: '#wastePresentationDisplayValue', value: 'ROLLO' });
         expect(form.elements.weightKg.value).toBe('2.5');
         expect(form.elements.height.value).toBe('2');
     });
@@ -54,15 +55,14 @@ describe('mediciones del registro de merma', () => {
         expect(form.wasteMaterialTemplate).toBe(template);
         expect(form.elements.coneWeightKg.value).toBe(0.25);
         expect(form.elements[fixedField].value).toBe(1.5);
-        expect(form.elements[fixedField].readOnly).toBe(true);
-        expect(form.elements[fixedField].disabled).toBe(false);
+        expect(form.elements[fixedField].disabled).toBe(true);
+        expect(form.elements[calculatedField].disabled).toBe(true);
 
         form.elements.totalWeightKg.value = '1.25';
         updateWasteRollMeasurement({ form });
         expect(form.elements.weightKg.value).toBe(1);
         expect(form.elements[calculatedField].value).toBe(10);
-        expect(form.elements[calculatedField].readOnly).toBe(true);
-        expect(form.elements[calculatedField].disabled).toBe(false);
+        expect(form.elements[calculatedField].disabled).toBe(true);
     });
 
     it('actualiza los resultados al corregir pesos y los limpia si la captura queda incompleta o inválida', () => {
@@ -79,10 +79,7 @@ describe('mediciones del registro de merma', () => {
         updateWasteRollMeasurement({ form });
         expect(form.elements.weightKg.value).toBe('');
         expect(form.elements.height.value).toBe('');
-        expect(form.elements.height.readOnly).toBe(false);
-        form.elements.height.value = '3';
-        updateWasteRollMeasurement({ form });
-        expect(form.elements.height.value).toBe('3');
+        expect(form.elements.height.disabled).toBe(true);
 
         form.elements.totalWeightKg.value = '0.4';
         updateWasteRollMeasurement({ form });
@@ -104,17 +101,17 @@ describe('mediciones del registro de merma', () => {
         expect(form.wasteRollReference).toBeNull();
         expect(form.elements.coneWeightKg.disabled).toBe(true);
         expect(form.elements.base.value).toBe('');
-        expect(form.elements.base.readOnly).toBe(false);
+        expect(form.elements.base.disabled).toBe(false);
     });
 
-    it('permite longitud manual si faltan referencias, sin perder la dimensión fija', () => {
+    it('mantiene ambas medidas bloqueadas y el largo vacío si faltan referencias', () => {
         const form = createForm();
         applyWasteMaterialTemplate({ form, template: roll({ supplierMaterials: [{ referenceConeWeightKg: 0.25 }] }) });
         form.elements.totalWeightKg.value = '1.25';
-        form.elements.height.value = '4';
         updateWasteRollMeasurement({ form });
-        expect(form.elements.height.value).toBe('4');
-        expect(form.elements.height.readOnly).toBe(false);
+        expect(form.elements.height.value).toBe('');
+        expect(form.elements.height.disabled).toBe(true);
+        expect(form.elements.base.disabled).toBe(true);
         expect(form.elements.base.value).toBe(1.5);
         expect(form.elements.weightKg.value).toBe(1);
     });

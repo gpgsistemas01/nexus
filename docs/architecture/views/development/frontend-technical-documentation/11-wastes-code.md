@@ -48,11 +48,19 @@ flowchart TB
 | Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/validations/weightValidations.js`<br/>`src/public/js/constants/apiMessages.js` |
 | Selección y pesos de merma | `src/public/js/ui/inventory/wasteFormUI.js` y `src/public/js/plugins/select2/domains/wasteMaterialTemplate.js` |
 
-El formulario existente de material administra los dos pesos de referencia con
-sus listas de campos, `setFormDisabled` y `setFormSectionVisibility`. La merma consulta
+El formulario existente de material captura los dos pesos de referencia con
+sus listas de campos, `setFormDisabled` y `setFormSectionVisibility`. Guarda los valores
+originales al abrirlo y bloquea por campo cada peso ya registrado, incluido el cono cero;
+permite completar sólo referencias nulas. El normalizador recupera la referencia
+bloqueada para validar y enviar la pareja cuando se completa el otro peso. La merma consulta
 los valores en la selección de material, mantiene el cono editable y calcula neto
 y largo automático sin administrar referencias en otro modal. El servidor calcula
 los resultados con la referencia vigente y conserva los resultados registrados.
+
+Las referencias son opcionales y sólo se muestran para materiales Rollo. La sección
+se oculta en consumibles, otras presentaciones y ajustes de stock; en consulta sólo
+se muestra si tiene valores. En alta o edición los campos faltantes se habilitan,
+sin `required`, y los ya registrados permanecen visibles y deshabilitados.
 
 Ante `WASTE_ALREADY_EXISTS`, el alta ofrece **Abrir Agregar stock** si el usuario
 tiene `wastes:add-stock`. Confirmar el Swal cierra el alta y abre el modal existente
@@ -75,14 +83,16 @@ neto del rollo completo. `displayWasteMaterialTemplate` sólo muestra informaci�
 La limpieza del proveedor se registra en la dependencia compartida, por lo que
 funciona también con cambios programáticos. La primera limpieza descarta la
 selección y sus cálculos; las notificaciones posteriores del estado del selector
-no repiten esa preparación. Al abrir el formulario se restablece `readOnly` de
-las dimensiones. Abrir el selector no borra la selección.
+no repiten esa preparación. Abrir el selector no borra la selección.
 
 Sólo los eventos `input` de cono y total actualizan neto y longitud. La UI consume
 las fórmulas compartidas y la referencia preparada sin reconstruir la selección ni
 llamar a validadores del formulario. Al borrar o invalidar un peso se limpia la
-longitud calculada; si faltan referencias se permite captura manual. Las dimensiones
-fijas y calculadas usan `readOnly` durante el alta y se incluyen en `FormData`;
+longitud calculada. Ambas dimensiones de Rollo permanecen deshabilitadas desde la
+selección, incluso si faltan pesos o referencias; no se permite captura manual en el
+formulario. `normalizeData` incorpora sus valores a la solicitud porque `FormData`
+omite controles deshabilitados. Nombre, presentación, unidad y cono se precargan en
+sus inputs, sin el resumen de datos del material seleccionado;
 `wasteCreateFields` excluye el neto y las referencias del payload. La validación del
 envío comprueba las dimensiones finales con los validadores positivos existentes.
 
@@ -90,3 +100,9 @@ La apertura de edición, ajuste o consulta configura los pesos y muestra los dat
 persistidos sin recalcular. Las reglas de entrada permanecen en
 `validations/weightValidations.js` y `fieldValidations.js`; el servidor comprueba
 la oferta y obtiene sus propios resultados dentro de la transacción.
+
+El orden visible de merma es origen, datos de merma, pesos, medidas, inventario y
+existencias/observaciones. Material conserva datos de identificación, medidas,
+pesos del rollo completo, inventario y existencias/observaciones. Los pesos del
+rollo completo se capturan al registrar material, también desde compras; los pesos
+de merma corresponden al sobrante y no actualizan las referencias.

@@ -86,6 +86,6 @@ Véase el [recorrido del peso](../requirements/requirements-specification/04-uni
 
 | Referencia y longitud de Rollo | Validación |
 | --- | --- |
-| Cono predeterminado en material | Opcional, admite cero. Se precarga en merma como campo editable. |
-| Peso total del rollo en material | Opcional; si se captura, exige cono y debe ser mayor. Se consulta para estimar longitud. |
-| Dimensión longitudinal | Se calcula en base o altura al completar pesos; la dimensión transversal se consulta del material. Sin pesos se captura manualmente el largo. |
+| Cono predeterminado en material | Admite cero. Una vez registrado queda bloqueado. Su copia en merma es editable. |
+| Peso total del rollo en material | Exige cono y debe ser mayor. Puede completarse si falta; una vez guardado no cambia ni se borra. Es distinto del peso del sobrante. |
+| Dimensiones de merma de Rollo | Ambos campos están deshabilitados. La dimensión menor procede del material y la otra se calcula por peso. Si faltan datos, complete las referencias y pesos antes de guardar. |

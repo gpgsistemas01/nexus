@@ -2,6 +2,7 @@ import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMess
 
 export const errorMessages = {
     MATERIAL_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
+    MATERIAL_ROLL_REFERENCE_READ_ONLY: 'Los pesos de referencia registrados no se pueden modificar ni eliminar. Puede completar los que todavía no estén registrados.',
     WASTE_DIMENSIONS_INVALID: 'Complete las dimensiones de la merma o los pesos necesarios para calcularlas.',
     CONE_WEIGHT_KG_INVALID_NUMBER: 'El peso del cono debe ser un decimal mayor o igual que cero en kg. Use punto decimal, sin letras ni notación científica.',
     CONE_WEIGHT_KG_REQUIRED: 'Capture el peso del cono para calcular el peso neto de la merma.',

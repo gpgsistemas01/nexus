@@ -75,11 +75,33 @@ Los reportes y la infraestructura transversal se localizan en el
 La captura, protección de la edición y cálculo de reportes se describen en
 [datos de merma](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).
 
-Los pesos de referencia se administran mediante el CRUD de material. La merma
+Los pesos de referencia se capturan mediante el CRUD de material. Una vez registrados,
+no se cambian ni eliminan; se permite completar sólo valores todavía nulos.
+`assertMaterialRollReference` comprueba esta regla antes de escribir y la actualización
+de la oferta incluye los valores consultados como condición para proteger capturas
+simultáneas. Un conflicto devuelve `MATERIAL_ROLL_REFERENCE_READ_ONLY` y revierte la
+transacción. El DTO no convierte en nulo un campo omitido. La merma
 reutiliza `findSupplierMaterialByIds` dentro de su transacción, prepara el neto de
 referencia al registrar y persiste el vínculo, el cono utilizado y los resultados.
 Los validators verifican formato y relaciones numéricas antes del servicio;
 la transacción comprueba presentación, oferta activa y referencia necesaria.
+
+Las condiciones de negocio de esta captura corresponden a `RF-MER-012` y sus criterios
+de aceptación. Los controles de existencia y concurrencia hacen cumplir ese contrato:
+
+| Condición | Propósito |
+| --- | --- |
+| Hay pesos y el recurso no es material Rollo | Rechazar referencias que no aplican. Ambos pesos pueden omitirse. |
+| Falta una referencia guardada | Permitir su captura inicial. |
+| El campo no viene en la solicitud | Conservar el valor almacenado. |
+| Se borra o cambia un valor registrado | Rechazar con `MATERIAL_ROLL_REFERENCE_READ_ONLY`; cero cuenta como registrado. |
+| Falta la oferta del proveedor | Rechazar con `MATERIAL_NOT_FOUND`. |
+| La actualización condicionada afecta cero filas | Revertir la transacción: las referencias ya no coinciden o la oferta dejó de existir desde la consulta. |
+
+`supplierMaterials` se filtra por `supplierId`; la restricción única de material y
+proveedor garantiza como máximo una oferta. El servicio obtiene esa oferta una vez y
+pasa `savedReference` explícitamente al helper. El conteo de la escritura es un control
+de concurrencia, no una segunda validación numérica ni un requisito de captura.
 
 `prepareWasteMeasurements` es un helper de dominio sin consultas ni escrituras.
 Recibe el DTO y la oferta consultada, resuelve la orientación, calcula neto y largo

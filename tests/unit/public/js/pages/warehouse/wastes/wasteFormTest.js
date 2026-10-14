@@ -27,6 +27,8 @@ await import('../../../../../../../src/public/js/pages/warehouse/wastes/wasteFor
 beforeEach(() => {
     vi.clearAllMocks();
     form.dataset.mode = 'create';
+    form.wasteMaterialTemplate = null;
+    form.elements = { base: { value: '' }, height: { value: '' } };
     state.permission.mockReturnValue(true);
 });
 
@@ -104,5 +106,15 @@ describe('confirmación de merma existente', () => {
         expect(payload).toMatchObject({ base: '1.5', height: '10', coneWeightKg: '0.25', totalWeightKg: '1.25' });
         expect(payload).not.toHaveProperty('weightKg');
         expect(payload).not.toHaveProperty('referenceRollTotalWeightKg');
+    });
+
+    it('incluye las medidas calculadas del rollo aunque los inputs deshabilitados no estén en FormData', () => {
+        form.wasteMaterialTemplate = { presentation: { name: 'ROLLO' } };
+        form.elements.base = { value: '1.5', disabled: true };
+        form.elements.height = { value: '10', disabled: true };
+        const payload = state.config.normalizeData({ form, formData: { name: 'Lona', coneWeightKg: '0.25', totalWeightKg: '1.25' } });
+        expect(payload).toMatchObject({ base: '1.5', height: '10', coneWeightKg: '0.25', totalWeightKg: '1.25' });
+        expect(form.elements.base.disabled).toBe(true);
+        expect(form.elements.height.disabled).toBe(true);
     });
 });

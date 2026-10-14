@@ -49,6 +49,8 @@ describe('materialDTO', () => {
     const dto = createMaterialDtoForRegister({ ...materialBody, referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' });
     expect(dto).toMatchObject({ referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 2.25 });
     expect(createMaterialDtoForEdit(materialBody)).not.toHaveProperty('referenceConeWeightKg');
-    expect(createMaterialDtoForEdit({ ...materialBody, referenceConeWeightKg: '0.3' })).toMatchObject({ referenceConeWeightKg: 0.3, referenceRollTotalWeightKg: null });
+    const partial = createMaterialDtoForEdit({ ...materialBody, referenceConeWeightKg: '0.3' });
+    expect(partial.referenceConeWeightKg).toBe(0.3);
+    expect(partial).not.toHaveProperty('referenceRollTotalWeightKg');
   });
 });

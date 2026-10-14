@@ -1,4 +1,4 @@
-import { ExcededMaxRetriesSkuError, MaterialRollReferenceInvalid } from "../../../errors/warehouse/materialError.js";
+import { ExcededMaxRetriesSkuError, MaterialRollReferenceInvalid, MaterialRollReferenceReadOnly } from "../../../errors/warehouse/materialError.js";
 import { findUniquePresentation } from "../presentationService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
@@ -14,10 +14,22 @@ const serviceLogger = createServiceLogger('warehouse.materials.materialHelpers')
 
 const MAX_RETRIES = 5;
 
-export const assertMaterialRollReference = ({ material, referenceConeWeightKg, referenceRollTotalWeightKg }) => {
+export const assertMaterialRollReference = ({ material, referenceConeWeightKg, referenceRollTotalWeightKg, savedReference = null }) => {
     if ((referenceConeWeightKg != null || referenceRollTotalWeightKg != null)
         && (material.type === MATERIAL_TYPES.CONSUMABLE || !isRollPresentation(material.presentation?.name))) {
         throw new MaterialRollReferenceInvalid();
+    }
+
+    if (!savedReference) return;
+
+    // RF-MER-012: se pueden completar pesos ausentes, pero no cambiar ni borrar los registrados.
+    for (const [field, nextWeight] of Object.entries({ referenceConeWeightKg, referenceRollTotalWeightKg })) {
+        const registeredWeight = savedReference[field];
+        if (nextWeight === undefined || registeredWeight == null) continue;
+
+        const removesWeight = nextWeight === null;
+        const changesWeight = Number(nextWeight) !== Number(registeredWeight);
+        if (removesWeight || changesWeight) throw new MaterialRollReferenceReadOnly();
     }
 };
 

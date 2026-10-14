@@ -144,13 +144,15 @@ Los registros anteriores conservan su peso neto; cono y total permanecen `NULL`.
 
 | Ubicación | Datos y propósito |
 | --- | --- |
-| `SupplierMaterial` | `referenceConeWeightKg` y `referenceRollTotalWeightKg`, editables desde el CRUD de material con `materials:write`. El neto de referencia se calcula al consultar; no se persiste. |
+| `SupplierMaterial` | `referenceConeWeightKg` y `referenceRollTotalWeightKg`, capturados desde el CRUD de material con `materials:write`. Un peso no nulo es inmutable; sólo se pueden completar los campos que aún sean nulos. El neto de referencia se calcula al consultar; no se persiste. |
 | `Material` | Dimensiones nominales existentes: longitud de muestra = `MAX(base, height)`, ancho = `MIN(base, height)`. No contiene el peso del cono. |
 | `Waste` | `sourceMaterialId` vincula el material; `supplierId` identifica su proveedor. Guarda cono y total utilizados, neto derivado (`weightKg`), dimensiones finales en `base` y `height`. No copia las referencias. Los históricos pueden carecer del vínculo. |
 
-Las referencias se administran en el formulario existente de material. Cambiarlas afecta
-solo nuevas capturas; la merma conserva pesos y largo registrados. El vínculo permite
-identificar el origen, pero no reconstruir referencias antiguas después de editarlas.
+Las referencias se registran en el formulario existente de material, incluido el alta
+desde una compra. El servidor rechaza cambiar o borrar valores registrados y protege
+las capturas simultáneas con una escritura condicionada a las referencias consultadas.
+El cono precargado en merma es una copia editable para el sobrante; no actualiza la
+referencia. La merma conserva sus pesos y largo propios.
 
 `calculateWasteRollLength` estima metros lineales mediante:
 
@@ -163,9 +165,13 @@ La regla usa seis decimales para longitud y dos para kg. Supone masa por área
 representativa del mismo material. Al completar los pesos, el largo se calcula y
 se guarda en `base` si ésa es la dimensión longitudinal nominal del material, o en
 `height` en el caso contrario. La dimensión transversal se consulta directamente
-del material. Sin pesos o referencias completas se permite capturar manualmente el largo; no se almacena
-un selector de método. Las referencias y resultados de vista previa no se envían
-como datos persistentes desde el navegador.
+del material. En el formulario, ambas medidas de Rollo permanecen deshabilitadas;
+sin pesos o referencias completas, el largo queda vacío y no permite guardar.
+El normalizador incluye las dimensiones calculadas en el envío; el servidor obtiene
+sus propios resultados. Las referencias y el neto de vista previa no se envían como
+valores persistentes. El servicio conserva la compatibilidad con solicitudes que
+aportan dimensiones cuando faltan datos para el cálculo; el formulario actual no
+ofrece esa captura manual para Rollo.
 Un duplicado devuelve `meta.waste`; una confirmación de Swal permite abrir el formulario de entrada incremental;
 crear nunca incrementa por sí solo una existencia anterior.
 

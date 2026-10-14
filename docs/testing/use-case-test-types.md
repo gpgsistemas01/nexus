@@ -124,3 +124,9 @@ permisos y modos. `wasteStockAdditionModalTest.js` comprueba la precarga, la can
 vacía cuando se recibe cero y el saldo resultante al editar.
 `wasteMaterialTemplateTest.js` cubre selección, cálculo con datos de la oferta y
 limpieza programática sin reconstruir la selección desde el DOM.
+
+`materialRollReferenceFieldTest.js` comprueba captura inicial, cono cero bloqueado,
+referencias faltantes y modos de consulta. `materialFormTest.js` y `wasteFormTest.js`
+comprueban que los valores deshabilitados necesarios se incluyan en el envío.
+`wasteWeightDbTest.js` verifica referencias inmutables, rechazo de borrados y rollback,
+edición de otros datos y dos capturas simultáneas sin reemplazo de referencias.

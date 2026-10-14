@@ -12,9 +12,8 @@ const buildMaterialDataDto = (body = {}) => ({
 
 const buildMaterialRollReferenceDto = (body = {}) => {
     const fields = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'];
-    if (!fields.some(field => Object.prototype.hasOwnProperty.call(body, field))) return {};
-
-    return Object.fromEntries(fields.map(field => [field, toNumber(body[field])]));
+    return Object.fromEntries(fields.filter(field => Object.prototype.hasOwnProperty.call(body, field))
+        .map(field => [field, toNumber(body[field])]));
 };
 
 const buildMaterialSecondaryDataDto = (body = {}) => ({
