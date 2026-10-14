@@ -17,6 +17,7 @@ export const useForm = async ({
     on(DOM_EVENT_NAMES.SUBMIT, selector, async (e, form) => {
 
         e.preventDefault();
+        if (form.dataset.submitting === 'true') return false;
 
         let formData = Object.fromEntries(new FormData(form));
 
@@ -32,8 +33,6 @@ export const useForm = async ({
             scrollToFirstFormError(form);
             return;
         }
-
-        if (form.dataset.submitting === 'true') return false;
 
         form.dataset.submitting = 'true';
 

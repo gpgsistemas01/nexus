@@ -6,7 +6,7 @@ import { findAllSuppliers } from "./supplierService.js";
 import { FULFILLMENT_STATUS_NAMES, GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
 
-import { getMaterialLengthField } from '../inventory/materialIdentity.js';
+import { getMaterialLengthField } from '../../public/js/utils/warehouseInventoryUtils.js';
 
 const INVENTORY_REPORT_MATERIAL_SELECT = {
     maxUnitCost: true,

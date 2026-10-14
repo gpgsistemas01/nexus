@@ -1,5 +1,6 @@
-import { MATERIAL_ROLL_REFERENCE_FIELDS, WASTE_WEIGHT_LIMITS } from '../constants/inventory.js';
+import { WASTE_WEIGHT_LIMITS } from '../constants/inventory.js';
 import { formatDecimal, roundTo } from './formatUtils.js';
+import { getWasteWeightValidationError } from './validations/weightValidations.js';
 
 export const getBase = (item = {}) => (
     item.base ?? item.material?.base ?? item.supplierMaterial?.material?.base ?? null
@@ -19,7 +20,10 @@ export const isRollPresentation = name => String(name ?? '').trim().toLocaleUppe
 export const calculateWasteNetWeight = (data, { coneFieldName = 'coneWeightKg', totalFieldName = 'totalWeightKg' } = {}) => {
     const coneWeightKg = data[coneFieldName];
     const totalWeightKg = data[totalFieldName];
-    if ([coneWeightKg, totalWeightKg].some(value => value == null || value === '')) return null;
+    if (coneWeightKg == null || coneWeightKg === '' || totalWeightKg == null || totalWeightKg === '') return null;
+    if (getWasteWeightValidationError(coneWeightKg, { allowZero: true })
+        || getWasteWeightValidationError(totalWeightKg)
+        || Number(totalWeightKg) <= Number(coneWeightKg)) return null;
     return roundTo(Number(totalWeightKg) - Number(coneWeightKg), WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS);
 };
 
@@ -31,6 +35,28 @@ export const calculateWasteRollLength = ({ weightKg, referenceRollNetWeightKg, r
 export const getMaterialLengthField = ({ base, height } = {}) => {
     if (!(Number(base) > 0 && Number(height) > 0)) return null;
     return Number(base) > Number(height) ? 'base' : 'height';
+};
+
+export const prepareWasteRollReference = (offer) => {
+    const { material } = offer;
+    if (!isRollPresentation(getPresentation(material))) return null;
+
+    const lengthField = getMaterialLengthField(material);
+    if (!lengthField) return null;
+
+    const widthField = lengthField === 'base' ? 'height' : 'base';
+    const referenceConeWeightKg = offer.referenceConeWeightKg;
+    const referenceRollTotalWeightKg = offer.referenceRollTotalWeightKg;
+    return {
+        lengthField,
+        widthField,
+        widthM: Number(material[widthField]),
+        referenceLengthM: Number(material[lengthField]),
+        referenceRollNetWeightKg: calculateWasteNetWeight({
+            coneWeightKg: referenceConeWeightKg == null || referenceConeWeightKg === '' ? null : Number(referenceConeWeightKg),
+            totalWeightKg: referenceRollTotalWeightKg == null || referenceRollTotalWeightKg === '' ? null : Number(referenceRollTotalWeightKg)
+        })
+    };
 };
 
 export const getPresentationId = (item = {}) => (
@@ -117,9 +143,6 @@ export const normalizeInventorySelectRelations = (item = {}) => {
     const data = { ...item };
     ['material', 'supplier', 'presentation', 'unitMeasure'].forEach(field => {
         if (typeof data[field] === 'string') data[field] = JSON.parse(data[field] || '{}');
-    });
-    MATERIAL_ROLL_REFERENCE_FIELDS.forEach(field => {
-        if (field in data) data[field] = data[field] == null || data[field] === 'null' || data[field] === '' ? null : Number(data[field]);
     });
     return data;
 };

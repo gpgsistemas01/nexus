@@ -13,7 +13,7 @@ flowchart TB
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>materialIdentity.js<br/>y colaboradores"]
     V["Validadores<br/>wasteValidations.js"]
     Fields["fieldsValidator.js<br/>validateWeightCapture"]
-    WeightValidation["validations/weightValidations.js<br/>getWasteWeightCaptureValidationError"]
+    WeightValidation["validations/weightValidations.js<br/>wasteWeightRules"]
     Measurements["wasteHelpers.js<br/>prepareWasteMeasurements"]
     P["baseRepository.js<br/>getDb(tx)"]
     PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>calculateWasteNetWeight<br/>calculateWasteRollLength"]
@@ -76,8 +76,8 @@ La captura, protección de la edición y cálculo de reportes se describen en
 [datos de merma](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).
 
 Los pesos de referencia se administran mediante el CRUD de material. La merma
-reutiliza `findSupplierMaterialByIds` dentro de su transacción, calcula el neto de
-referencia al consultar y persiste el vínculo, el cono utilizado y los resultados.
+reutiliza `findSupplierMaterialByIds` dentro de su transacción, prepara el neto de
+referencia al registrar y persiste el vínculo, el cono utilizado y los resultados.
 Los validators verifican formato y relaciones numéricas antes del servicio;
 la transacción comprueba presentación, oferta activa y referencia necesaria.
 
@@ -85,9 +85,14 @@ la transacción comprueba presentación, oferta activa y referencia necesaria.
 Recibe el DTO y la oferta consultada, resuelve la orientación, calcula neto y largo
 y comprueba las dimensiones finales. El servicio conserva consultas, identidad,
 transacción y registro de inventario. Los formularios Express de material y merma
-reutilizan `validateWeightCapture` como validador de campo con `.withMessage`.
+reutilizan `validateWeightCapture`: cada predicado compartido se evalúa una vez,
+`withMessage` asigna el código declarado en `errorMap` y `bail` detiene la cadena
+en el primer fallo. El adaptador Express no lanza códigos como excepciones ni
+vuelve a validar para resolver el mensaje.
 
-La selección de material devuelve los dos pesos de la oferta en el nivel principal,
-sin `rollReference` ni resultados precalculados. Las reglas Express reutilizan
+La selección conserva los pesos en la oferta de `supplierMaterials`, sin aplanarlos
+en el material ni devolver resultados precalculados. `prepareWasteRollReference`
+comparte la preparación de orientación y referencias entre servidor y navegador;
+la dimensión menor conserva su campo y la mayor recibe la longitud calculada. Las reglas Express reutilizan
 `public/js/utils/validations/weightValidations.js`; la utilidad de inventario sólo
 conserva acceso a datos, normalización y cálculos sin mensajes de validación.

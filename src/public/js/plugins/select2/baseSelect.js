@@ -147,7 +147,8 @@ export const initbaseSelect2 = ({
         isDisabled: Boolean(baseElement?.disabled)
     });
 
-    if (clearOnOpen) $(baseSelector).on(SELECT2_EVENT_NAMES.OPEN, () => {
+    $(baseSelector).off(`${ SELECT2_EVENT_NAMES.OPEN }.baseSelect`);
+    if (clearOnOpen) $(baseSelector).on(`${ SELECT2_EVENT_NAMES.OPEN }.baseSelect`, () => {
 
         setTimeout(() => {
 

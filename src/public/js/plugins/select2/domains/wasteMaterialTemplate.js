@@ -1,13 +1,13 @@
 import { getWasteMaterialTemplates } from '../../../application/warehouse/wastes/wastes.js';
 import { initDomainSelect2, toggleSelectOption } from '../baseSelect.js';
-import { mapSelectWasteMaterialTemplateData } from '../../../utils/warehouseInventoryUtils.js';
+import { mapSelectWasteMaterialTemplateData, normalizeInventorySelectRelations } from '../../../utils/warehouseInventoryUtils.js';
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { getWasteMaterialTemplate, applyWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
+import { applyWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
 
 const wasteMaterialTemplateChangeEvent = 'change.wasteMaterialTemplate';
 
-export const initWasteMaterialTemplateSelect = ({ modalSelector, baseSelector, supplierSelector, data }) => {
+export const initWasteMaterialTemplateSelect = ({ modalSelector, baseSelector, data }) => {
     const form = document.querySelector(FORM_SELECTORS.WASTE);
 
     initDomainSelect2({
@@ -17,30 +17,20 @@ export const initWasteMaterialTemplateSelect = ({ modalSelector, baseSelector, s
         placeholder: 'Buscar material de referencia...',
         mapOption: mapSelectWasteMaterialTemplateData,
         allowCreate: false,
+        clearOnOpen: false,
         data
     });
 
     $(baseSelector)
         .off(`${ SELECT2_EVENT_NAMES.SELECT } ${ SELECT2_EVENT_NAMES.CLEAR } ${ wasteMaterialTemplateChangeEvent }`)
-        .on(SELECT2_EVENT_NAMES.SELECT, event => {
-            const option = event.target.querySelector('option:checked');
-            if (!option) return;
-            Object.entries(event.params.data).forEach(([key, value]) => {
-                option.dataset[key] = value;
-            });
+        .on(SELECT2_EVENT_NAMES.SELECT, ({ params }) => {
             applyWasteMaterialTemplate({
                 form,
-                template: getWasteMaterialTemplate({ form })
+                template: normalizeInventorySelectRelations(params.data)
             });
         })
-        .on(`${ SELECT2_EVENT_NAMES.CLEAR } ${ wasteMaterialTemplateChangeEvent }`, () => {
-            if (!$(baseSelector).val()) applyWasteMaterialTemplate({ form });
-        });
-
-    if (supplierSelector) $(supplierSelector)
-        .off(`${ SELECT2_EVENT_NAMES.SELECT }.wasteMaterialDependency ${ SELECT2_EVENT_NAMES.CLEAR }.wasteMaterialDependency`)
-        .on(`${ SELECT2_EVENT_NAMES.SELECT }.wasteMaterialDependency ${ SELECT2_EVENT_NAMES.CLEAR }.wasteMaterialDependency`, () => {
-            toggleSelectOption({ selector: baseSelector, data: null });
+        .on(wasteMaterialTemplateChangeEvent, () => {
+            if (!$(baseSelector).val() && form.wasteMaterialTemplate) applyWasteMaterialTemplate({ form });
         });
 };
 

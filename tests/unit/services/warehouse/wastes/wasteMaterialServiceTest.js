@@ -45,7 +45,7 @@ describe('plantillas de material para el CRUD de mermas', () => {
     });
     expect(result.data).toEqual([
       expect.objectContaining({ id: 'material-1', maxUnitCost: 27.5 }),
-      expect.objectContaining({ id: 'material-duplicate', maxUnitCost: 27.5, height: 100, referenceConeWeightKg: null, referenceRollTotalWeightKg: null }),
+      expect.objectContaining({ id: 'material-duplicate', maxUnitCost: 27.5, height: 100, supplierMaterials: [{ maxUnitCost: 27.5 }] }),
       expect.objectContaining({ id: 'material-wide', maxUnitCost: 30 }),
       expect.objectContaining({ id: 'material-2', maxUnitCost: null })
     ]);
@@ -78,6 +78,6 @@ it('no consulta ni calcula referencias de peso para una presentación distinta d
   const offer = { maxUnitCost: 1, get referenceConeWeightKg() { throw new Error('Referencia de peso no aplicable'); } };
   materialFindMany.mockResolvedValue([{ id: 'sheet', name: 'Lámina', base: 1, height: 2, presentation: { name: 'LÁMINA' }, supplierMaterials: [offer] }]);
   const templates = await findWasteMaterialTemplates({ supplierId: 'supplier-1' });
-  expect(templates.data[0].referenceConeWeightKg).toBeNull();
-  expect(templates.data[0].referenceRollTotalWeightKg).toBeNull();
+  expect(templates.data[0].supplierMaterials[0]).toBe(offer);
+  expect(templates.data[0]).not.toHaveProperty('referenceConeWeightKg');
 });

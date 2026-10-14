@@ -1406,29 +1406,47 @@
           "null"
         ]
       },
-      "referenceConeWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "maximum": 999.99,
-        "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al crear una merma de Rollo y puede editarse.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
-        "minimum": 0
-      },
-      "referenceRollTotalWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "exclusiveMinimum": 0,
-        "maximum": 999.99,
-        "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
+      "supplierMaterials": {
+        "type": "array",
+        "description": "Oferta activa del proveedor seleccionado; conserva sus referencias de peso sin trasladarlas al material.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "maxUnitCost": {
+              "type": [
+                "number",
+                "string",
+                "null"
+              ]
+            },
+            "referenceConeWeightKg": {
+              "type": [
+                "number",
+                "string",
+                "null"
+              ],
+              "maximum": 999.99,
+              "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al crear una merma de Rollo y puede editarse.",
+              "multipleOf": 0.01,
+              "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
+              "minimum": 0
+            },
+            "referenceRollTotalWeightKg": {
+              "type": [
+                "number",
+                "string",
+                "null"
+              ],
+              "exclusiveMinimum": 0,
+              "maximum": 999.99,
+              "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
+              "multipleOf": 0.01,
+              "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
+            }
+          },
+          "additionalProperties": false
+        },
+        "maxItems": 1
       }
     },
     "additionalProperties": false

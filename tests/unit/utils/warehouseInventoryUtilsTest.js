@@ -279,15 +279,14 @@ describe('contrato de detalles de salidas de almacén y merma', () => {
 });
 
 
-it('normaliza relaciones y pesos del material sin cambiar los nombres del contrato', () => {
+it('reconstruye sólo las relaciones JSON y conserva los datos propios del proveedor', () => {
+  const offers = [{ referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' }];
   const selected = normalizeInventorySelectRelations({
     material: '{"name":"Lona"}', presentation: '{"name":"ROLLO"}', unitMeasure: '{"symbol":"m²"}',
-    referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25'
+    supplierMaterials: offers
   });
   expect(selected.material.name).toBe('Lona');
   expect(selected.presentation.name).toBe('ROLLO');
-  expect(selected.referenceConeWeightKg).toBe(0.25);
-  expect(selected.referenceRollTotalWeightKg).toBe(2.25);
-  expect(normalizeInventorySelectRelations({ referenceConeWeightKg: 'null' }).referenceConeWeightKg).toBeNull();
-  expect(selected).not.toHaveProperty('rollReference');
+  expect(selected.supplierMaterials).toBe(offers);
+  expect(selected).not.toHaveProperty('referenceConeWeightKg');
 });

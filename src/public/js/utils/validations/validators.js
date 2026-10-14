@@ -1,5 +1,5 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateMaterialRollReference, validateWasteDimension, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
+import { validateMaterialRollReference, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
 
 const inventoryStateValidation = {
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
@@ -99,8 +99,8 @@ export const wasteValidation = {
     name: value => validateName(value, 200),
     materialId: (value) => isEmptyOrNull(value, 'El material'),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
-    base: (value, data) => validateWasteDimension(value, data, 'base'),
-    height: (value, data) => validateWasteDimension(value, data, 'height'),
+    base: value => validatePositiveNumber(value, 'La base de la merma'),
+    height: value => validatePositiveNumber(value, 'La altura de la merma'),
     ...wasteSecondaryDataValidation,
     newStock: wasteStockValidation.newStock,
     observations: wasteStockValidation.observations,

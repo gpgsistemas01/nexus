@@ -1,7 +1,5 @@
 import { WasteWeightInvalid, WasteDimensionsInvalid } from '../../../errors/warehouse/wasteError.js';
-import { toNumber } from '../../../utils/formattersUtils.js';
-import { getMaterialIdentityLength, getMaterialLengthField } from '../../inventory/materialIdentity.js';
-import { calculateWasteNetWeight, calculateWasteRollLength, isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
+import { calculateWasteNetWeight, calculateWasteRollLength, isRollPresentation, prepareWasteRollReference } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 export const prepareWasteMeasurements = ({ wasteDto, offer }) => {
     const material = offer.material;
@@ -10,18 +8,14 @@ export const prepareWasteMeasurements = ({ wasteDto, offer }) => {
     if ((coneWeightKg != null || wasteDto.totalWeightKg != null)
         && !isRoll) throw new WasteWeightInvalid();
     const weightKg = isRoll ? calculateWasteNetWeight({ coneWeightKg, totalWeightKg: wasteDto.totalWeightKg }) : null;
+    if (isRoll && (coneWeightKg != null || wasteDto.totalWeightKg != null) && weightKg == null) throw new WasteWeightInvalid();
     const dimensions = { base: wasteDto.base, height: wasteDto.height };
-    const lengthField = isRoll ? getMaterialLengthField(material) : null;
-    if (lengthField) {
-        const widthField = lengthField === 'base' ? 'height' : 'base';
-        dimensions[widthField] = toNumber(material[widthField]);
+    const reference = prepareWasteRollReference(offer);
+    if (reference) {
+        dimensions[reference.widthField] = reference.widthM;
         if (weightKg != null) {
-            const calculatedLength = calculateWasteRollLength({
-                weightKg,
-                referenceRollNetWeightKg: calculateWasteNetWeight(offer, { coneFieldName: 'referenceConeWeightKg', totalFieldName: 'referenceRollTotalWeightKg' }),
-                referenceLengthM: getMaterialIdentityLength(material)
-            });
-            if (calculatedLength != null) dimensions[lengthField] = calculatedLength;
+            const calculatedLength = calculateWasteRollLength({ weightKg, ...reference });
+            if (calculatedLength != null) dimensions[reference.lengthField] = calculatedLength;
         }
     }
 

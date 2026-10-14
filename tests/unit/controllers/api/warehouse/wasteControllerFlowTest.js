@@ -13,7 +13,6 @@ const generateYearlyReferenceNumber = vi.fn();
 const throwIfReferenceNumberAlreadyExists = vi.fn();
 const createWasteMovement = vi.fn();
 const applyWasteMovement = vi.fn();
-const findUniqueSupplier = vi.fn();
 
 vi.mock('../../../../../src/utils/logger.js', () => ({
   createServiceLogger: () => ({}),
@@ -30,10 +29,6 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
 
 vi.mock('../../../../../src/services/warehouse/materials/supplierMaterialService.js', () => ({
   findSupplierMaterialByIds
-}));
-
-vi.mock('../../../../../src/services/warehouse/supplierService.js', () => ({
-  findUniqueSupplier
 }));
 
 vi.mock('../../../../../src/services/warehouse/reasonService.js', () => ({
@@ -103,7 +98,6 @@ const createWaste = (overrides = {}) => ({
 describe('wasteController complete flow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    findUniqueSupplier.mockResolvedValue({ id: 'supplier-1', isActive: true });
     transaction.mockImplementation((callback) => callback({
       waste: {
         create: wasteCreate,
@@ -187,6 +181,16 @@ describe('wasteController complete flow', () => {
       })
     }));
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'CREATED_WASTE' }));
+  });
+
+  it('rechaza un proveedor inactivo obtenido con la oferta sin crear registros', async () => {
+    findSupplierMaterialByIds.mockResolvedValueOnce({ isActive: true, supplier: { isActive: false } });
+    await expect(registerWaste({
+      body: { name: 'Recorte', materialId: 'material-1', supplierId: 'supplier-1', base: 2, height: 3, newStock: 1 },
+      user: { id: 'user-1' }
+    }, createResponse())).rejects.toMatchObject({ code: 'SUPPLIER_INACTIVE_CONFLICT', statusCode: 409 });
+    expect(wasteCreate).not.toHaveBeenCalled();
+    expect(wasteStockAdjustmentCreate).not.toHaveBeenCalled();
   });
 
   it('permite corregir el nombre sin cambiar los demás campos de identidad ni las existencias', async () => {

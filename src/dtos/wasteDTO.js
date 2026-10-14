@@ -7,7 +7,7 @@ const buildWasteRegistrationDataDto = (body = {}) => ({
     base: toNumber(body.base),
     height: toNumber(body.height),
     ...Object.fromEntries(['coneWeightKg', 'totalWeightKg'].filter(field => Object.prototype.hasOwnProperty.call(body, field))
-        .map(field => [field, body[field] === null || body[field] === '' ? null : Number(body[field])]))
+        .map(field => [field, toNumber(body[field])]))
 });
 
 const buildWasteIdentityDto = (body = {}) => ({

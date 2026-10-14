@@ -23,8 +23,12 @@ para abrir el formulario y **Guardar** para confirmarlo.
 3. Seleccione el botón **Guardar** para registrar la merma.
 
 Si el aviso indica que coinciden proveedor, nombre, medidas y pesos, seleccione
-**Agregar al stock** en la confirmación. Revise la cantidad precargada y confirme
-**Agregar stock** para registrar la entrada; el intento de alta no sumó existencias.
+**Abrir Agregar stock** en el aviso para revisar el formulario de entrada. Se
+precargan la merma existente, la cantidad y las observaciones; si la cantidad inicial
+era cero, capture una cantidad positiva. Revise el saldo actual y el resultante,
+y seleccione **Agregar** para guardar. El intento de alta y la confirmación del
+aviso no suman existencias. Cancelar el aviso conserva el formulario de alta;
+un error al guardar la entrada conserva los datos del modal de Agregar stock.
 Con pesos distintos puede registrar otra merma. **Ajustar stock** se usa para corregir
 el saldo total con autorización del Administrador del sistema.
 

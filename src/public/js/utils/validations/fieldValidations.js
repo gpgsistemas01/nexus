@@ -1,6 +1,6 @@
 import { getWasteWeightCaptureValidationError } from './weightValidations.js';
 import { getErrorMessage } from "../../constants/apiMessages.js";
-import { calculateWasteNetWeight, getMaterialLengthField, isRollPresentation } from "../warehouseInventoryUtils.js";
+import { isRollPresentation } from "../warehouseInventoryUtils.js";
 import { includeSpace, includeUppercase, isDateTime, isEmptyOrNull, isLengthInRangeMax, isLengthInRangeMin, isNegative, isNumber, isPositive, isString } from "./baseValidations.js";
 
 export const validatePassword = (password) => {
@@ -334,15 +334,4 @@ export const validateMaterialRollReference = (value, data, fieldName) => {
         requireTotal: false
     });
     return error ? getErrorMessage({ code: error }) : null;
-};
-
-export const validateWasteDimension = (value, data = {}, fieldName) => {
-    if (isRollPresentation(data.presentationName)) {
-        const material = data.material ?? {};
-        const lengthField = getMaterialLengthField(material);
-        if (lengthField && fieldName !== lengthField) return null;
-        if (lengthField && calculateWasteNetWeight(data) != null
-            && calculateWasteNetWeight(material, { coneFieldName: 'referenceConeWeightKg', totalFieldName: 'referenceRollTotalWeightKg' }) > 0) return null;
-    }
-    return validatePositiveNumber(value, fieldName === 'base' ? 'La base de la merma' : 'La altura de la merma');
 };

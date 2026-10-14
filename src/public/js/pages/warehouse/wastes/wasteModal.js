@@ -6,7 +6,7 @@ import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { displayWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
+import { configureWasteWeightFields, displayWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
 
 const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
@@ -24,12 +24,16 @@ export const openWasteModal = ({
     const isAdjustingStock = isStockMode(mode);
 
     initializeInventoryCrudModal({ form, mode, data: isCreating ? null : data });
+    form.wasteMaterialTemplate = null;
+    form.wasteRollReference = null;
     initWasteSelect2({ modalSelector: MODAL_SELECTORS.WASTE });
     setWasteSelectOptions({ modalSelector: MODAL_SELECTORS.WASTE, data });
 
     form.elements.minStock.value = data?.minStock ?? '';
-    form.elements.base.value = data?.base ?? '';
-    form.elements.height.value = data?.height ?? '';
+    ['base', 'height'].forEach(field => {
+        form.elements[field].value = data?.[field] ?? '';
+        form.elements[field].readOnly = false;
+    });
     form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
     ['coneWeightKg', 'totalWeightKg', 'weightKg'].forEach(field => { form.elements[field].value = data?.[field] ?? ''; });
     form.elements.isActive.checked = data?.isActive ?? true;
@@ -84,5 +88,6 @@ export const openWasteModal = ({
             : 'Guardar';
 
     displayWasteMaterialTemplate({ form, template: data ?? {} });
+    configureWasteWeightFields({ form, template: data ?? {} });
     openModal(modalElement);
 };

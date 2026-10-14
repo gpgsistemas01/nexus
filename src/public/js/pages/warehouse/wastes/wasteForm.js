@@ -3,15 +3,16 @@ import { resetFormSubmitState } from '../../../ui/forms/formStateUI.js';
 import { closeModal } from '../../../ui/modalUI.js';
 import { openWasteStockAdditionModal } from './wasteStockAdditionModal.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
+import { getPresentation } from '../../../utils/warehouseInventoryUtils.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
-import { getWasteMaterialTemplate, updateWasteRollMeasurement } from '../../../ui/inventory/wasteFormUI.js';
+import { updateWasteRollMeasurement } from '../../../ui/inventory/wasteFormUI.js';
 import { useForm } from '../../../ui/forms/formUI.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
-import { INPUT_SELECTORS, FORM_SELECTORS } from '../../../constants/selectors.js';
+import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
 import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../utils/validations/validators.js';
 import { wasteCreateFields, wasteEditFields, wasteStockFields } from './wasteFields.js';
-import { isEditMode, isStockMode } from '../../../constants/formModes.js';
+import { isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 useForm({
     selector: FORM_SELECTORS.WASTE,
@@ -36,8 +37,7 @@ useForm({
 
         return validateFields(wasteValidation, {
             ...formData,
-            material: getWasteMaterialTemplate({ form }),
-            presentationName: form.querySelector(INPUT_SELECTORS.WASTE_PRESENTATION_DISPLAY).textContent
+            presentationName: getPresentation(form.wasteMaterialTemplate ?? {})
         });
     },
     sendRequest: async ({ formData, form }) => {
@@ -49,31 +49,33 @@ useForm({
                 update: isStockMode(form.dataset.mode) ? editWasteStock : editWaste
             });
         } catch (err) {
-            if (err.data?.code === 'WASTE_ALREADY_EXISTS' && err.data.meta?.waste && hasPermission(window.meta || {}, UI_PERMISSIONS.WASTES_ADD_STOCK)) {
+            const existingWaste = err.data?.meta?.waste;
+            if (!isCreateMode(form.dataset.mode) || err.data?.code !== 'WASTE_ALREADY_EXISTS'
+                || !existingWaste?.id || !hasPermission(window.meta || {}, UI_PERMISSIONS.WASTES_ADD_STOCK)) throw err;
+
+            const { isConfirmed } = await notifications.showConfirmation({
+                title: 'Esta merma ya existe',
+                text: `¿Abrir Agregar stock para revisar la cantidad y las observaciones de ${existingWaste.name || 'esta merma'}?`,
+                confirmButtonText: 'Abrir Agregar stock'
+            });
+            if (!isConfirmed) {
                 resetFormSubmitState(form);
-                const { isConfirmed } = await notifications.showConfirmation({
-                    title: 'Esta merma ya existe',
-                    text: '¿Quieres agregar esta cantidad al stock existente?',
-                    confirmButtonText: 'Agregar al stock'
-                });
-                if (isConfirmed) {
-                    closeModal(form);
-                    openWasteStockAdditionModal({
-                        data: err.data.meta.waste,
-                        quantity: formData.newStock,
-                        observations: formData.observations
-                    });
-                }
                 return;
             }
-            throw err;
+
+            closeModal(form);
+            openWasteStockAdditionModal({
+                data: existingWaste,
+                quantity: formData.newStock,
+                observations: formData.observations
+            });
         }
     }
 });
 
 const form = document.querySelector(FORM_SELECTORS.WASTE);
 form.addEventListener(DOM_EVENT_NAMES.INPUT, event => {
-    if (['coneWeightKg', 'totalWeightKg', 'base', 'height'].includes(event.target.name)) {
+    if (['coneWeightKg', 'totalWeightKg'].includes(event.target.name)) {
         updateWasteRollMeasurement({ form });
     }
 });

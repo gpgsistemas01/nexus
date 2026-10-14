@@ -19,14 +19,14 @@ export const initWasteSelect2 = ({ modalSelector }) => {
     bindDisabledSelectDependency({
         sourceSelector: scoped.supplier,
         targetSelector: scoped.material,
-        disabledMessage: 'Seleccione un proveedor antes de buscar material.'
+        disabledMessage: 'Seleccione un proveedor antes de buscar material.',
+        clearTarget: () => toggleWasteMaterialTemplateOption({ selector: scoped.material, data: null })
     });
 
     [
         [initWasteMaterialTemplateSelect, {
             modalSelector,
             baseSelector: scoped.material,
-            supplierSelector: scoped.supplier,
             data: () => ({ supplierId: $(scoped.supplier).val() })
         }],
         [setupSupplierSelect, {
@@ -46,10 +46,6 @@ export const initWasteSelect2 = ({ modalSelector }) => {
 export const setWasteSelectOptions = ({ modalSelector, data = null }) => {
 
     [
-        [toggleWasteMaterialTemplateOption, {
-            selector: scoped.material,
-            data: null
-        }],
         [toggleSupplierOption, {
             selector: scoped.supplier,
             id: data?.supplier?.id,

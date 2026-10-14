@@ -274,7 +274,8 @@ export const findSupplierMaterialByIds = async ({
             supplier: {
                 select: {
                     id: true,
-                    tradeName: true
+                    tradeName: true,
+                    isActive: true
                 }
             }
         }

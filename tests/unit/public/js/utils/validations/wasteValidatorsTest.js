@@ -100,8 +100,9 @@ describe('validadores del CRUD de mermas', () => {
 });
 
 
-it('sólo omite la dimensión calculada cuando la presentación es Rollo', () => {
-  const data = { coneWeightKg: 0, totalWeightKg: 1, material: { base: 50, height: 1.5, referenceConeWeightKg: 0, referenceRollTotalWeightKg: 10 } };
-  expect(wasteValidation.base('', { ...data, presentationName: 'ROLLO' })).toBeNull();
-  expect(wasteValidation.base('', { ...data, presentationName: 'LÁMINA' })).not.toBeNull();
+it('valida las dimensiones finales sin reconstruir el material ni calcular pesos', () => {
+  const data = { presentationName: 'ROLLO', material: { base: 50, height: 1.5 } };
+  expect(wasteValidation.base('', data)).not.toBeNull();
+  expect(wasteValidation.base('5', data)).toBeNull();
+  expect(wasteValidation.height('1.5', data)).toBeNull();
 });

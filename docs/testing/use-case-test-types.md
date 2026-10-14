@@ -110,7 +110,17 @@ La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 frontend y las cadenas Express para pesos opcionales, cero, límite de BD,
 captura incompleta, precisión y total mayor que cono. Las pruebas de registro
 de merma verifican los resultados de `prepareWasteMeasurements` y el rollback.
+`weightCaptureValidationTest.js` comprueba los códigos de `errorMap` recibidos
+por el middleware HTTP y que la cadena evalúa cada regla una vez hasta el primer error.
 
-Las pruebas de UI de merma comprueban lectura de la opción seleccionada,
+Las pruebas de UI de merma comprueban selección recibida desde Select2,
 recálculo al modificar pesos y limpieza de resultados obsoletos. Las plantillas
 de otras presentaciones omiten las referencias de peso sin consultarlas.
+
+La recuperación de una merma existente comprueba confirmación y apertura del modal
+de Agregar stock con cantidad y observaciones precargadas, sin registrar entradas
+desde el Swal. También cubre cancelación, cantidad inicial cero y separación de
+permisos y modos. `wasteStockAdditionModalTest.js` comprueba la precarga, la cantidad
+vacía cuando se recibe cero y el saldo resultante al editar.
+`wasteMaterialTemplateTest.js` cubre selección, cálculo con datos de la oferta y
+limpieza programática sin reconstruir la selección desde el DOM.

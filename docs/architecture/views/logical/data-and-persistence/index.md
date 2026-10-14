@@ -180,6 +180,7 @@ y guarda `weightKg` y devuelve ese neto en el alta y en el listado. Las reglas d
 validación reciben los nombres originales de campos de material y merma, sin
 renombrar los campos del contrato HTTP.
 
-El contrato de selección de material conserva `base`, `height`,
-`referenceConeWeightKg` y `referenceRollTotalWeightKg` directamente. Neto de muestra,
+El contrato de selección conserva `base` y `height` en el material, y los pesos
+`referenceConeWeightKg` y `referenceRollTotalWeightKg` en la oferta de
+`supplierMaterials`, respetando la estructura de la relación. Neto de muestra,
 orientación y largo se obtienen al calcular; no forman otro bloque de referencia.

@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { getWasteWeightCaptureValidationError } from "../../public/js/utils/validations/weightValidations.js";
+import { wasteWeightRules } from "../../public/js/utils/validations/weightValidations.js";
 import { errorMap } from "../../messages/codeMessages.js";
 
 const numberRegex = /\d/;
@@ -399,15 +399,20 @@ export const validateWeightCapture = ({
     totalFieldName = 'totalWeightKg',
     requireTotal = true
 }) => {
-    const getError = (value, { req }) => getWasteWeightCaptureValidationError(value, {
-        ...req.body,
-        fieldName,
-        coneFieldName,
-        totalFieldName,
-        requireTotal
-    });
+    const isCone = fieldName === coneFieldName;
 
     return body(fieldName)
-        .custom((value, context) => !getError(value, context))
-        .withMessage(getError);
+        .custom(value => wasteWeightRules.isNumber(value, { allowZero: isCone }))
+        .withMessage(isCone ? errorMap.coneWeightKg.INVALID_NUMBER : errorMap.weightKg.INVALID_NUMBER).bail()
+        .custom(wasteWeightRules.isWithinLimit)
+        .withMessage(errorMap.weightKg.TOO_HIGH).bail()
+        .custom(wasteWeightRules.hasValidPrecision)
+        .withMessage(errorMap.weightKg.TOO_LONG).bail()
+        .custom((value, { req }) => wasteWeightRules.hasRequiredPair(value, {
+            pairedValue: req.body[isCone ? totalFieldName : coneFieldName],
+            required: isCone || requireTotal
+        }))
+        .withMessage(isCone ? errorMap.coneWeightKg.REQUIRED : errorMap.totalWeightKg.REQUIRED).bail()
+        .custom((value, { req }) => isCone || wasteWeightRules.isTotalGreaterThanCone(value, req.body[coneFieldName]))
+        .withMessage(errorMap.totalWeightKg.NOT_GREATER);
 };

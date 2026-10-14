@@ -18,9 +18,9 @@ flowchart TB
     H["axiosInstanceApi.js<br/>request / apiRequest"]
     InventoryUI["wasteFormUI.js"]
     Select["Select2<br/>wasteMaterialTemplate.js"]
-    InventoryUI --> FieldValidation
     InventoryUtils["warehouseInventoryUtils.js<br/>normalización y cálculos"]
     InventoryUI --> InventoryUtils
+    InventoryUtils --> WeightRule
     Select --> InventoryUtils
     Select --> InventoryUI
     P --> InventoryUI
@@ -54,33 +54,39 @@ los valores en la selección de material, mantiene el cono editable y calcula ne
 y largo automático sin administrar referencias en otro modal. El servidor calcula
 los resultados con la referencia vigente y conserva los resultados registrados.
 
-Ante `WASTE_ALREADY_EXISTS`, `wasteForm.js` ofrece **Agregar stock** si el usuario tiene
-`wastes:addStock`. Abre el modal existente con el registro devuelto y la cantidad
-precargada; el usuario revisa y confirma esa operación por separado.
+Ante `WASTE_ALREADY_EXISTS`, el alta ofrece **Abrir Agregar stock** si el usuario
+tiene `wastes:add-stock`. Confirmar el Swal cierra el alta y abre el modal existente
+con la merma devuelta por el servidor, la cantidad y las observaciones capturadas;
+cancelar conserva el alta. Una cantidad inicial de cero deja vacío el campo del modal
+para capturar una cantidad positiva. El Swal no registra entradas ni recarga la tabla.
+Sólo guardar el modal ejecuta `wasteStockAdditionForm`, que reutiliza `useForm`,
+su validación y `handleSubmit` con `addWasteStock`. El listado usa el mismo modal.
 
-Como en las salidas, Select2 conserva datos en `option.dataset`. La función
-`normalizeInventorySelectRelations` compartida reconstruye material, proveedor,
-presentación y unidad, y convierte los pesos opcionales. La respuesta de material
-incluye directamente `referenceConeWeightKg` y `referenceRollTotalWeightKg`, con
-los nombres de `SupplierMaterial`, además de `base` y `height`. No hay bloque
-`rollReference` ni neto, largo u orientación precalculados en esa respuesta.
-El cálculo sólo se ejecuta al crear un Rollo; en los
-demás modos se muestran los valores persistidos. La tabla agrupa Cono, Total con
-cono y Neto por unidad inmediatamente antes de Acciones. El modal reutiliza una
-sección propia y el parcial de pesos para ordenar esos campos.
+Select2 entrega los datos del evento a `applyWasteMaterialTemplate`. La normalización
+reconstruye únicamente las relaciones JSON que requiere el selector; no convierte
+pesos ni traslada campos de proveedor a material. La respuesta conserva
+`supplierMaterials`, con la oferta activa y sus referencias. Cada rollo sigue siendo
+una opción independiente, aunque comparta el costo máximo de su familia.
 
-`openWasteStockAdditionModal` recibe cantidad y observaciones opcionales y
-actualiza la existencia resultante al abrirse, sin emitir un evento sintético.
+Al seleccionar, la UI conserva el objeto y prepara una vez la referencia mediante
+`prepareWasteRollReference`: orientación, dimensión menor fija, longitud nominal y
+neto del rollo completo. `displayWasteMaterialTemplate` sólo muestra información;
+`configureWasteWeightFields` configura los controles según presentación y modo.
+La limpieza del proveedor se registra en la dependencia compartida, por lo que
+funciona también con cambios programáticos. La primera limpieza descarta la
+selección y sus cálculos; las notificaciones posteriores del estado del selector
+no repiten esa preparación. Al abrir el formulario se restablece `readOnly` de
+las dimensiones. Abrir el selector no borra la selección.
 
-Los eventos `input` de cono, total, base y altura actualizan la vista previa al
-crear un Rollo. Al borrar o invalidar un peso se limpian neto y longitud calculada;
-la captura manual de longitud se conserva mientras no haya un cálculo disponible.
-Las referencias no se calculan para otras presentaciones.
+Sólo los eventos `input` de cono y total actualizan neto y longitud. La UI consume
+las fórmulas compartidas y la referencia preparada sin reconstruir la selección ni
+llamar a validadores del formulario. Al borrar o invalidar un peso se limpia la
+longitud calculada; si faltan referencias se permite captura manual. Las dimensiones
+fijas y calculadas usan `readOnly` durante el alta y se incluyen en `FormData`;
+`wasteCreateFields` excluye el neto y las referencias del payload. La validación del
+envío comprueba las dimensiones finales con los validadores positivos existentes.
 
-El formulario registra un listener `input` para cono, total, base y altura; cubre
-escritura, pegado, borrado y controles numéricos. La selección llama a
-`applyWasteMaterialTemplate` para limpiar y precargar. Al abrir el modal se usa
-`displayWasteMaterialTemplate` para presentación y estado de los pesos. Ambos
-reutilizan `updateWasteRollMeasurement`, que el listener vuelve a ejecutar al
-editar los datos. Las reglas están en `validations/weightValidations.js`; los
-mensajes se resuelven en `fieldValidations.js` con el catálogo `apiMessages.js`.
+La apertura de edición, ajuste o consulta configura los pesos y muestra los datos
+persistidos sin recalcular. Las reglas de entrada permanecen en
+`validations/weightValidations.js` y `fieldValidations.js`; el servidor comprueba
+la oferta y obtiene sus propios resultados dentro de la transacción.

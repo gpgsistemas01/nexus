@@ -31,4 +31,11 @@ describe('precarga de entrada de stock', () => {
         expect(form.elements.observations.value).toBe('');
         expect(elements['#wasteStockAdditionResultingStock'].textContent).toBe(formatDecimal(4));
     });
+
+    it('al recuperar un alta con stock cero solicita una cantidad positiva y conserva las observaciones', () => {
+        openWasteStockAdditionModal({ data: { currentStock: 4 }, quantity: '0', observations: 'Nueva entrada' });
+        expect(elements['#wasteStockAdditionQuantityInput'].value).toBe('');
+        expect(form.elements.observations.value).toBe('Nueva entrada');
+        expect(elements['#wasteStockAdditionResultingStock'].textContent).toBe(formatDecimal(4));
+    });
 });
