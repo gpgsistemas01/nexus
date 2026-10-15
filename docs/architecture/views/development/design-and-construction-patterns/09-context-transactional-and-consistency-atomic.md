@@ -86,7 +86,10 @@ depende del orden del resultado ni se repite una consulta por existencia.
 
 Para reducir latencia se leen únicamente campos necesarios, se escriben detalles por
 lote y se mantiene una instancia de Prisma. Las operaciones dentro de una transacción
-usan una conexión y no se aceleran con `Promise.all`. Los descuentos por existencia
+usan una conexión y no se aceleran con `Promise.all`. `QueuedPrismaPg` ordena los
+métodos de consulta de cada transacción para cubrir también la carga de relaciones
+que Prisma ejecuta internamente en paralelo. La cola no bloquea el pool ni otras
+transacciones y propaga el error original para permitir el rollback. Los descuentos por existencia
 conservan su condición de saldo y orden de adquisición de bloqueos. La
 [medición del backend](../../../../testing/backend-performance.md) distingue
 consultas, recorridos de memoria, red, espera de conexión y contención.

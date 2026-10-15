@@ -1,5 +1,6 @@
 import { isEmptyOrNull } from "./baseValidations.js";
-import { validateMaterialRollReference, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
+import { isRollPresentation } from '../warehouseInventoryUtils.js';
+import { validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validateNonNegativeNumber, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
 
 const inventoryStateValidation = {
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo'),
@@ -26,8 +27,6 @@ export const supplierValidation = {
 }
 
 export const materialEditValidation = {
-    referenceConeWeightKg: (value, data) => validateMaterialRollReference(value, data, 'referenceConeWeightKg'),
-    referenceRollTotalWeightKg: (value, data) => validateMaterialRollReference(value, data, 'referenceRollTotalWeightKg'),
     name: (value) => validateName(value, 200),
     supplierId: (value) => isEmptyOrNull(value, 'El proveedor'),
     ...inventoryStateValidation,
@@ -94,6 +93,8 @@ export const wasteStockAdditionValidation = {
 };
 
 export const wasteValidation = {
+    sampleLengthM: (value, data) => isRollPresentation(data.presentationName) ? validatePositiveNumber(value, 'El largo de la muestra') : null,
+    sampleNetWeightKg: (value, data) => isRollPresentation(data.presentationName) ? validatePositiveNumber(value, 'El peso neto de la muestra') : null,
     coneWeightKg: (value, data) => validateWasteWeightCapture(value, data, 'coneWeightKg'),
     totalWeightKg: (value, data) => validateWasteWeightCapture(value, data, 'totalWeightKg'),
     name: value => validateName(value, 200),

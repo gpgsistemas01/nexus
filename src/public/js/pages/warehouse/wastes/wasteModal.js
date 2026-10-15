@@ -35,7 +35,7 @@ export const openWasteModal = ({
         form.elements[field].readOnly = false;
     });
     form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
-    ['coneWeightKg', 'totalWeightKg', 'weightKg'].forEach(field => { form.elements[field].value = data?.[field] ?? ''; });
+    ['coneWeightKg', 'totalWeightKg', 'weightKg', 'sampleLengthM', 'sampleNetWeightKg'].forEach(field => { form.elements[field].value = data?.[field] ?? ''; });
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.observations.value = '';
     form.elements.newStock.value = '';

@@ -146,13 +146,14 @@ const findTriggerAcrossPages = async (page, selector) => {
     }
 };
 
-const findStatusTriggerAcrossPages = async (page, { status, selector }) => {
+const findRowTriggerAcrossPages = async (page, { status, selector, hasFields = [] }) => {
     while (true) {
-        const rowIndex = await page.locator('#table').evaluate((tableElement, expectedStatus) => {
+        const rowIndex = await page.locator('#table').evaluate((tableElement, { expectedStatus, requiredFields }) => {
             const table = globalThis.$(tableElement).DataTable();
             return table.rows({ page: 'current' }).data().toArray()
-                .findIndex(row => row.status?.name === expectedStatus);
-        }, status);
+                .findIndex(row => (!expectedStatus || row.status?.name === expectedStatus)
+                    && requiredFields.every(field => Number(row[field]) > 0));
+        }, { expectedStatus: status, requiredFields: hasFields });
         if (rowIndex >= 0) {
             const trigger = page.locator('#table tbody tr').nth(rowIndex).locator(`${ selector }:visible`).first();
             if (await trigger.count()) return trigger;
@@ -206,8 +207,8 @@ const runAction = async (page, action, captureId, step) => {
         return;
     }
 
-    const trigger = action.status
-        ? await findStatusTriggerAcrossPages(page, action)
+    const trigger = action.status || action.hasFields
+        ? await findRowTriggerAcrossPages(page, action)
         : action.selector.startsWith('#table tbody ')
             ? await findTriggerAcrossPages(page, action.selector)
             : page.locator(action.selector).first();

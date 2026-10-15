@@ -2,6 +2,8 @@ import { getDb } from '../../../repository/baseRepository.js';
 import { getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
+import { MATERIAL_TYPES } from '../../../constants/inventory.js';
+import { SQUARE_METER_UNIT_NAMES, SQUARE_METER_UNIT_SYMBOLS } from '../../../public/js/constants/inventory.js';
 
 export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take = 20, supplierId = null } = {}) => {
     if (!supplierId) return {
@@ -11,6 +13,13 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
     };
 
     const where = {
+        type: MATERIAL_TYPES.MATERIAL,
+        unitMeasure: {
+            OR: [
+                { symbol: { in: [...SQUARE_METER_UNIT_SYMBOLS], mode: 'insensitive' } },
+                { name: { in: [...SQUARE_METER_UNIT_NAMES], mode: 'insensitive' } }
+            ]
+        },
         ...(search && { name: { contains: search, mode: 'insensitive' } }),
         supplierMaterials: { some: { supplierId, isActive: true } }
     };
@@ -26,7 +35,7 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
             unitMeasure: { select: { id: true, name: true, symbol: true } },
             supplierMaterials: {
                 where: { supplierId, isActive: true },
-                select: { maxUnitCost: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true }
+                select: { maxUnitCost: true }
             }
         }
     });

@@ -110,19 +110,17 @@ La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 | Pruebas | Comportamiento verificado |
 | --- | --- |
 | `wasteValidatorsTest.js`, `wasteRegistrationBoundaryTest.js` | Formato, precisión y rango; errores de campo antes de invocar el servicio. |
-| `wasteWeightFieldTest.js` | Precarga del cono editable, limpieza al cambiar de material y consulta posterior. |
-| `wasteWeightDbTest.js` | Captura de cono y total, neto calculado, consulta, identidad por medidas y pesos, pesos predeterminados editados mediante el CRUD de material, conservación histórica, cálculo automático en base o altura, edición protegida, stock independiente y Excel con peso neto. |
+| `wasteWeightFieldTest.js` | Captura de muestra y pesos, cálculo automático, limpieza y consulta posterior. |
+| `wasteWeightDbTest.js` | Captura de cono y total, neto calculado, consulta, identidad por medidas y pesos, muestra capturada desde merma sin referencias de material, conservación histórica, cálculo automático en base o altura, edición protegida, stock independiente y Excel con peso neto. |
 | `reportServiceTest.js` | Agrupación, peso total y datos desconocidos. |
 | `wasteWeightCapDbTest.js`, `wasteWeightScaleDbTest.js`, `wasteRollCaptureDbTest.js` | Restricciones en PostgreSQL, conservación de valores compatibles y rollback de las migraciones ante valores incompatibles. |
 
-`wasteWeightCalculationsTest.js` verifica la longitud nominal máxima y la proporcionalidad por peso neto con el ancho del material. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos y migración consolidada que conserva netos históricos y agrega sólo campos finales.
+`wasteWeightCalculationsTest.js` verifica la orientación del ancho menor y la proporcionalidad por largo y peso de muestra. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos y migración consolidada que conserva netos históricos y agrega sólo campos finales.
 
-`materialValidationTest.js` compara por campo los resultados del validador de
-frontend y las cadenas Express para pesos opcionales, cero, límite de BD,
-captura incompleta, precisión y total mayor que cono. Las pruebas de registro
-de merma verifican los resultados de `prepareWasteMeasurements` y el rollback.
-`weightCaptureValidationTest.js` comprueba los códigos de `errorMap` recibidos
-por el middleware HTTP y que la cadena evalúa cada regla una vez hasta el primer error.
+`materialValidationTest.js` verifica la pareja opcional de medidas, consumibles sin
+medidas y rechazo de referencias históricas. `wasteRegistrationBoundaryTest.js` cubre
+muestra positiva, precisión y códigos de `errorMap` antes de ejecutar el servicio.
+`wasteSampleReferenceDbTest.js` prueba conservación histórica y el CHECK de muestra completa.
 
 Las pruebas de UI de merma comprueban selección recibida desde Select2,
 recálculo al modificar pesos y limpieza de resultados obsoletos. Las plantillas
@@ -133,11 +131,12 @@ de Agregar stock con cantidad y observaciones precargadas, sin registrar entrada
 desde el Swal. También cubre cancelación, cantidad inicial cero y separación de
 permisos y modos. `wasteStockAdditionModalTest.js` comprueba la precarga, la cantidad
 vacía cuando se recibe cero y el saldo resultante al editar.
-`wasteMaterialTemplateTest.js` cubre selección, cálculo con datos de la oferta y
+`wasteMaterialTemplateTest.js` cubre selección, cálculo con los datos de muestra capturados y
 limpieza programática sin reconstruir la selección desde el DOM.
 
-`materialRollReferenceFieldTest.js` comprueba captura inicial, cono cero bloqueado,
-referencias faltantes y modos de consulta. `materialFormTest.js` y `wasteFormTest.js`
-comprueban que los valores deshabilitados necesarios se incluyan en el envío.
-`wasteWeightDbTest.js` verifica referencias inmutables, rechazo de borrados y rollback,
-edición de otros datos y dos capturas simultáneas sin reemplazo de referencias.
+`materialMeasurementFieldTest.js` comprueba medidas según unidad y consumibles siempre
+sin medidas. `materialFormTest.js` omite las referencias históricas del payload.
+`materialControllerDbTest.js` verifica altas directas y desde compra, conversión,
+consumibles sin dimensiones y origen de merma limitado a materiales en m². El rechazo
+de identificadores forzados demuestra que el filtro de Select2 no sustituye el control
+al guardar. `wasteWeightDbTest.js` verifica muestras independientes y su inmutabilidad.

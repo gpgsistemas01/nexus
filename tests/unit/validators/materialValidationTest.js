@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { validationResult } from 'express-validator';
 
-import { materialStockValidation, materialValidation } from '../../../src/validators/forms/materialValidations.js';
+import { consumableValidation, materialStockValidation, materialValidation } from '../../../src/validators/forms/materialValidations.js';
 
 const validMaterial = {
   name: 'Lámina',
@@ -29,6 +29,14 @@ describe('materialValidation', () => {
     expect(errors).toEqual([]);
   });
 
+  it('acepta el alta directa sin medidas y mantiene los códigos de error para una pareja incompleta', async () => {
+    const body = { ...validMaterial, maxUnitCost: 10, newStock: 5 };
+    expect(await runValidation({ ...body })).toEqual([]);
+    expect(await runValidation({ ...body, base: 2 })).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'height', msg: 'HEIGHT_REQUIRED' })
+    ]));
+  });
+
   it('mantiene obligatorios costo máximo y stock nuevo en el alta directa', async () => {
     const errors = await runValidation(validMaterial);
 
@@ -51,27 +59,13 @@ describe('materialValidation', () => {
 });
 
 
-describe('pesos de referencia: mismas reglas en formulario y Express', () => {
-  it.each([
-    {},
-    { referenceConeWeightKg: 0 },
-    { referenceConeWeightKg: 0, referenceRollTotalWeightKg: '999.99' },
-    { referenceRollTotalWeightKg: 1 },
-    { referenceConeWeightKg: -1, referenceRollTotalWeightKg: 2 },
-    { referenceConeWeightKg: 2, referenceRollTotalWeightKg: 2 },
-    { referenceConeWeightKg: 3, referenceRollTotalWeightKg: 2 },
-    { referenceConeWeightKg: '0.001' },
-    { referenceConeWeightKg: '1e2' },
-    { referenceConeWeightKg: true },
-    { referenceConeWeightKg: 1000 },
-    { referenceConeWeightKg: 0, referenceRollTotalWeightKg: '1.001' }
-  ])('mantiene la misma validación por campo: %j', async weights => {
-    const { validateMaterialRollReference } = await import('../../../src/public/js/utils/validations/fieldValidations.js');
-    const { getErrorMessage } = await import('../../../src/public/js/constants/apiMessages.js');
-    const errors = await runValidation({ ...validMaterial, creationContext: 'goodsReceipt', ...weights });
-    for (const field of ['referenceConeWeightKg', 'referenceRollTotalWeightKg']) {
-      const serverError = errors.find(error => error.path === field);
-      expect(validateMaterialRollReference(weights[field], weights, field)).toBe(serverError ? getErrorMessage({ code: serverError.msg }) : null);
-    }
+describe('consumibles y referencias históricas', () => {
+  it.each([{ base: 2 }, { height: -1 }, { base: 'ignorado', height: 'ignorado' }])('no pide ni valida dimensiones de consumibles: %j', async dimensions => {
+    const errors = await runValidation({ ...validMaterial, creationContext: 'goodsReceipt', ...dimensions }, consumableValidation);
+    expect(errors).toEqual([]);
+  });
+  it.each(['referenceConeWeightKg', 'referenceRollTotalWeightKg'])('rechaza capturar o modificar %s con el código de error establecido', async field => {
+    const errors = await runValidation({ ...validMaterial, creationContext: 'goodsReceipt', [field]: 1 });
+    expect(errors).toContainEqual(expect.objectContaining({ path: field, msg: 'MATERIAL_ROLL_REFERENCE_READ_ONLY' }));
   });
 });

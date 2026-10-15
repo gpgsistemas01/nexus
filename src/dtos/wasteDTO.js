@@ -1,4 +1,5 @@
 import { toNumber } from '../utils/formattersUtils.js';
+import { WASTE_SAMPLE_FIELDS } from '../public/js/constants/inventory.js';
 
 const buildWasteRegistrationDataDto = (body = {}) => ({
     materialId: body.materialId,
@@ -6,7 +7,7 @@ const buildWasteRegistrationDataDto = (body = {}) => ({
     ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
     base: toNumber(body.base),
     height: toNumber(body.height),
-    ...Object.fromEntries(['coneWeightKg', 'totalWeightKg'].filter(field => Object.prototype.hasOwnProperty.call(body, field))
+    ...Object.fromEntries(['coneWeightKg', 'totalWeightKg', ...WASTE_SAMPLE_FIELDS].filter(field => Object.prototype.hasOwnProperty.call(body, field))
         .map(field => [field, toNumber(body[field])]))
 });
 

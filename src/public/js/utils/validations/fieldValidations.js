@@ -324,14 +324,3 @@ export const validatePersonAccessesArray = accesses => {
 
     return null;
 };
-
-export const validateMaterialRollReference = (value, data, fieldName) => {
-    const error = getWasteWeightCaptureValidationError(value, {
-        ...data,
-        fieldName,
-        coneFieldName: 'referenceConeWeightKg',
-        totalFieldName: 'referenceRollTotalWeightKg',
-        requireTotal: false
-    });
-    return error ? getErrorMessage({ code: error }) : null;
-};

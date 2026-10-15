@@ -194,6 +194,7 @@ export const findSupplierMaterialByIds = async ({
             material: {
                 select: {
                     id: true,
+                    type: true,
                     name: true,
                     minStock: true,
                     base: true,
@@ -282,9 +283,7 @@ export const saveSupplierMaterial = async ({
     supplierId,
     materialId,
     maxUnitCost,
-    isActive,
-    referenceConeWeightKg,
-    referenceRollTotalWeightKg
+    isActive
 }) => {
 
     const db = getDb(tx);
@@ -293,8 +292,6 @@ export const saveSupplierMaterial = async ({
         supplierId,
         materialId,
         maxUnitCost,
-        ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
-        ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg }),
         ...(isActive !== undefined && { isActive })
     };
 
@@ -308,8 +305,6 @@ export const saveSupplierMaterial = async ({
         create: data,
         update: {
             maxUnitCost,
-            ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
-            ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg }),
             ...(isActive !== undefined && { isActive })
         }
     });

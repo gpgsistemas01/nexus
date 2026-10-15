@@ -79,6 +79,7 @@ const createWaste = (overrides = {}) => ({
     currentStock: 100,
     convertedQuantity: 600,
     material: {
+      type: 'MATERIAL',
       id: 'material-1',
       name: 'Lámina',
       isActive: true,
@@ -120,6 +121,7 @@ describe('wasteController complete flow', () => {
     findSupplierMaterialByIds.mockResolvedValue({
       isActive: true,
       material: {
+      type: 'MATERIAL',
       id: 'material-1',
       name: 'Lámina',
       base: 2,

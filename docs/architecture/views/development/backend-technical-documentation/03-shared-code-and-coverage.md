@@ -42,6 +42,16 @@ operativas no se confunden con la administración genérica de catálogos.
 | `warehouse/wasteApiRoute.js` | `warehouse/wasteController.js` | [Módulo](11-wastes-code.md) |
 | `warehouse/wasteIssueApiRoute.js` | `warehouse/wasteIssueController.js` | [Módulo](14-waste-issues-code.md) |
 
+## Conexión PostgreSQL y consultas transaccionales
+
+`lib/prisma.js` conserva una sola instancia de Prisma y configura `QueuedPrismaPg`,
+una adaptación de `PrismaPg` limitada a los objetos de transacción. Su cola local
+coordina `queryRaw` y `executeRaw`, incluyendo las consultas de relaciones que Prisma
+puede lanzar internamente en paralelo sobre la misma conexión. Propaga los resultados
+y errores originales; Prisma conserva commit y rollback. El pool y otras transacciones
+pueden avanzar independientemente. La [guía de rendimiento](../../../../testing/backend-performance.md#compatibilidad-de-consultas-transaccionales-con-pg)
+detalla la limitación de la biblioteca y la revisión necesaria al actualizarla.
+
 ## Lecturas operativas y reportes
 
 Los routers `role`, `department`, `unitMeasure`, `presentation`, `reason` y

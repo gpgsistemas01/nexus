@@ -65,7 +65,7 @@ flowchart TB
 
 ## Variantes y límites de reutilización
 
-wasteService reutiliza findSupplierMaterialByIds para consultar el material y sus pesos por proveedor, conversión y servicios de ajuste/entrada de stock de merma. wasteInventoryService y wasteMovementService mantienen su persistencia propia.
+wasteService reutiliza findSupplierMaterialByIds para consultar el material y su oferta por proveedor, conversión y servicios de ajuste/entrada de stock de merma. wasteInventoryService y wasteMovementService mantienen su persistencia propia.
 
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
@@ -75,46 +75,24 @@ Los reportes y la infraestructura transversal se localizan en el
 La captura, protección de la edición y cálculo de reportes se describen en
 [datos de merma](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).
 
-Los pesos de referencia se capturan mediante el CRUD de material. Una vez registrados,
-no se cambian ni eliminan; se permite completar sólo valores todavía nulos.
-`assertMaterialRollReference` comprueba esta regla antes de escribir y la actualización
-de la oferta incluye los valores consultados como condición para proteger capturas
-simultáneas. Un conflicto devuelve `MATERIAL_ROLL_REFERENCE_READ_ONLY` y revierte la
-transacción. El DTO no convierte en nulo un campo omitido. La merma
-reutiliza `findSupplierMaterialByIds` dentro de su transacción, prepara el neto de
-referencia al registrar y persiste el vínculo, el cono utilizado y los resultados.
-Los validators verifican formato y relaciones numéricas antes del servicio;
-la transacción comprueba presentación, oferta activa y referencia necesaria.
+El origen de una merma debe ser un `Material` de tipo `MATERIAL` con unidad m²,
+reconocida por símbolo o nombre «metro cuadrado». El selector filtra en SQL y el alta
+comprueba la oferta consultada dentro de su transacción; forzar otro origen devuelve
+`WASTE_MATERIAL_INVALID`. No se añaden consultas para esa comprobación.
 
-Las condiciones de negocio de esta captura corresponden a `RF-MER-012` y sus criterios
-de aceptación. Los controles de existencia y concurrencia hacen cumplir ese contrato:
+Para Rollo, la muestra se captura desde merma: `sampleLengthM` y `sampleNetWeightKg`,
+sin cono y del mismo ancho. Se persiste junto con el cono, total del sobrante y neto,
+sin actualizar `SupplierMaterial`. Los pesos antiguos del rollo completo permanecen
+históricos y sus intentos de captura o cambio reciben `MATERIAL_ROLL_REFERENCE_READ_ONLY`.
 
-| Condición | Propósito |
-| --- | --- |
-| Hay pesos y el recurso no es material Rollo | Rechazar referencias que no aplican. Ambos pesos pueden omitirse. |
-| Falta una referencia guardada | Permitir su captura inicial. |
-| El campo no viene en la solicitud | Conservar el valor almacenado. |
-| Se borra o cambia un valor registrado | Rechazar con `MATERIAL_ROLL_REFERENCE_READ_ONLY`; cero cuenta como registrado. |
-| Falta la oferta del proveedor | Rechazar con `MATERIAL_NOT_FOUND`. |
-| La actualización condicionada afecta cero filas | Revertir la transacción: las referencias ya no coinciden o la oferta dejó de existir desde la consulta. |
+`prepareWasteMeasurements` recibe el DTO y la oferta ya consultada, fija la menor
+dimensión y calcula el largo como `netoMerma × largoMuestra / netoMuestra`. Ignora los
+resultados enviados por el cliente y rechaza un cálculo sin muestra completa. No hace
+consultas ni escrituras; el servicio conserva identidad, transacción e inventario.
+Los validators verifican forma y precisión una vez por campo; `withMessage` entrega
+códigos declarados en `errorMap`. Muestra y pesos se protegen en edición.
 
-`supplierMaterials` se filtra por `supplierId`; la restricción única de material y
-proveedor garantiza como máximo una oferta. El servicio obtiene esa oferta una vez y
-pasa `savedReference` explícitamente al helper. El conteo de la escritura es un control
-de concurrencia, no una segunda validación numérica ni un requisito de captura.
-
-`prepareWasteMeasurements` es un helper de dominio sin consultas ni escrituras.
-Recibe el DTO y la oferta consultada, resuelve la orientación, calcula neto y largo
-y comprueba las dimensiones finales. El servicio conserva consultas, identidad,
-transacción y registro de inventario. Los formularios Express de material y merma
-reutilizan `validateWeightCapture`: cada predicado compartido se evalúa una vez,
-`withMessage` asigna el código declarado en `errorMap` y `bail` detiene la cadena
-en el primer fallo. El adaptador Express no lanza códigos como excepciones ni
-vuelve a validar para resolver el mensaje.
-
-La selección conserva los pesos en la oferta de `supplierMaterials`, sin aplanarlos
-en el material ni devolver resultados precalculados. `prepareWasteRollReference`
-comparte la preparación de orientación y referencias entre servidor y navegador;
-la dimensión menor conserva su campo y la mayor recibe la longitud calculada. Las reglas Express reutilizan
-`public/js/utils/validations/weightValidations.js`; la utilidad de inventario sólo
-conserva acceso a datos, normalización y cálculos sin mensajes de validación.
+La muestra usa `Decimal(18,6)`, lo que permite capturar, por ejemplo, 0.057 kg; los
+pesos del sobrante conservan el límite y precisión vigentes. La migración incremental
+agrega campos nulos para históricos y un CHECK de pareja positiva. No estima valores
+antiguos ni altera dimensiones, pesos o saldos existentes.

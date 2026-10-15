@@ -162,15 +162,17 @@ export const validateNonNegativeNumber = (fieldName) => {
         .toFloat()
 }
 
-export const validatePositiveNumber = (fieldName) => {
+export const validatePositiveNumberWhen = ({ fieldName, predicate }) => {
 
     const errors = errorMap[fieldName];
 
-    return requireValue(body(fieldName), errors.REQUIRED)
+    return requireValue(body(fieldName).if((value, { req }) => predicate(req.body, value, req)), errors.REQUIRED)
         .isFloat({ gt: 0 }).withMessage(errors.INVALID_NUMBER)
         .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
+
+export const validatePositiveNumber = fieldName => validatePositiveNumberWhen({ fieldName, predicate: () => true });
 
 export const validateNumberWhen = ({ fieldName, predicate }) => {
 

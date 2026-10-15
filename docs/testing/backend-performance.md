@@ -54,6 +54,7 @@ representativos del despliegue.
 | Área | Decisión y motivo |
 | --- | --- |
 | Listados de administración, ventas y almacén | `paginationRepository.findPage` ejecuta filas y conteos independientes conjuntamente; comparte el conteo cuando filtro y alcance coinciden. Conserva el total distinto del filtrado cuando corresponde. |
+| Consultas transaccionales | `materialHelpers` espera sus lecturas en orden. `lib/queuedPrismaPg.js` comparte una cola entre `queryRaw` y `executeRaw` de cada transacción; evita que la carga interna de relaciones de Prisma envíe consultas simultáneas a su conexión. El pool y las demás transacciones conservan su concurrencia. |
 | Exportaciones | Omiten conteos que no consumen. Usan un escritor XLSX progresivo sobre un temporal privado. Inventario lee por cursor en bloques de 5.000; los demás conservan sus consultas actuales. |
 | Stock de materiales y mermas | Agrupa los cambios por identidad y ejecuta una actualización parametrizada por lote. El repositorio bloquea filas en orden común, aplica la condición de saldo y devuelve los saldos de la escritura. Cualquier fila ausente provoca rollback desde el servicio. |
 | Preparación del movimiento | Valida relaciones mientras agrupa cantidades. Tras recibir saldos, recorre los detalles originales para construir su historial; esta segunda etapa depende del resultado de la escritura. |
@@ -181,3 +182,27 @@ de estas métricas. Compara revisiones por separado, con el mismo runtime, volum
 rondas y concurrencia; conserva también tiempos de descarga, consultas completadas y
 memoria para no atribuir toda diferencia al costo del XLSX. Una reducción de memoria de las filas no implica por sí sola una reducción equivalente
 del RSS de todo el proceso.
+
+## Compatibilidad de consultas transaccionales con pg
+
+`pg` avisa que dejar consultas en espera sobre un mismo cliente dejará de estar
+admitido en su siguiente versión mayor. Puede aparecer incluso usando `await` en el
+servicio: Prisma 7 carga relaciones hermanas en paralelo dentro de su intérprete.
+El caso se sigue en [Prisma #29407](https://github.com/prisma/orm/issues/29407) y la
+[propuesta #29979](https://github.com/prisma/orm/pull/29979).
+
+`QueuedPrismaPg` mantiene la configuración y el cliente compartido existentes y
+adapta los métodos públicos del objeto devuelto por `startTransaction`. La cola es
+local a la transacción, abarca lecturas y escrituras y avanza también tras un rechazo;
+el error original llega a Prisma, que conserva la responsabilidad del rollback.
+No se añade una consulta, no se cambia el esquema ni se editan dependencias instaladas.
+Los métodos del pool y las consultas de otras transacciones no pasan por esa cola.
+La adaptación se revisa al actualizar Prisma para retirarla cuando la biblioteca
+resuelva la serialización por conexión; no constituye una garantía de compatibilidad
+con todas las interfaces de una versión futura de `pg`.
+
+La verificación combina orden de lectura/escritura, propagación de errores,
+independencia de transacciones y concurrencia del pool, junto con integración HTTP
+que comprueba altas, rollback y operaciones concurrentes reales. Se usa
+`NODE_OPTIONS=--trace-deprecation` durante la integración para identificar y comprobar
+la ausencia del aviso; no se desactivan las advertencias del proceso.

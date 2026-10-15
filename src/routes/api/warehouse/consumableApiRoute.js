@@ -2,7 +2,7 @@ import express from 'express';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 import { editConsumable, editConsumableStock, getAllConsumables, registerConsumable, removeConsumable } from '../../../controllers/api/warehouse/consumableController.js';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { materialEditValidation, materialStockValidation, materialValidation } from '../../../validators/forms/materialValidations.js';
+import { materialEditValidation, materialStockValidation, consumableValidation } from '../../../validators/forms/materialValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.get(
 router.post(
     '/',
     verifyApiTokenRequired,
-    materialValidation,
+    consumableValidation,
     validate,
     authorizeUserApi(PERMISSIONS.MATERIALS_WRITE),
     registerConsumable

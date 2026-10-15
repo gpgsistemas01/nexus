@@ -1,4 +1,4 @@
-import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialRollReferenceReadOnly, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
+import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { existsMaterialUsage, findAllSupplierMaterials, findSupplierMaterialByIds } from "./supplierMaterialService.js";
 import { assertMaterialRollReference, prepareMaterialData } from "./materialHelpers.js";
@@ -175,9 +175,7 @@ export const createMaterial = async ({
                 supplierId: relations.supplierId,
                 materialId,
                 maxUnitCost: relations.maxUnitCost,
-                isActive: relations.isActive,
-                ...(relations.referenceConeWeightKg !== undefined && { referenceConeWeightKg: relations.referenceConeWeightKg }),
-                ...(relations.referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg: relations.referenceRollTotalWeightKg })
+                isActive: relations.isActive
             });
 
             if (newStock !== undefined) {
@@ -237,22 +235,14 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
                 select: {
                     id: true,
                     presentationId: true,
-                    presentation: { select: { name: true } },
                     unitMeasureId: true,
                     base: true,
                     height: true,
-                    type: true,
-                    supplierMaterials: {
-                        where: { supplierId },
-                        select: { referenceConeWeightKg: true, referenceRollTotalWeightKg: true }
-                    }
+                    type: true
                 }
             });
 
-            const savedReference = currentMaterial.supplierMaterials[0];
-            if (!savedReference) throw new MaterialNotFound();
-            assertMaterialRollReference({ material: currentMaterial, referenceConeWeightKg, referenceRollTotalWeightKg, savedReference });
-            const hasReferenceCapture = referenceConeWeightKg !== undefined || referenceRollTotalWeightKg !== undefined;
+            assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 
             const existingMaterial = await tx.material.findFirst({
                 where: {
@@ -279,22 +269,15 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
             const updatedOffer = await tx.supplierMaterial.updateMany({
                 where: {
                     materialId: updatedMaterial.id,
-                    supplierId,
-                    ...(hasReferenceCapture && {
-                        referenceConeWeightKg: savedReference.referenceConeWeightKg,
-                        referenceRollTotalWeightKg: savedReference.referenceRollTotalWeightKg
-                    })
+                    supplierId
                 },
                 data: {
                     maxUnitCost,
-                    isActive,
-                    ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
-                    ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg })
+                    isActive
                 }
             });
             // La oferta es única; cero filas indica que dejó de coincidir con los datos consultados.
             if (updatedOffer.count === 0) {
-                if (hasReferenceCapture) throw new MaterialRollReferenceReadOnly();
                 throw new MaterialNotFound();
             }
 

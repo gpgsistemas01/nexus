@@ -70,6 +70,7 @@ describe('wasteController registration boundaries', () => {
         newStock: '99999999.999999',
         coneWeightKg: '0',
         totalWeightKg: '100',
+        sampleLengthM: 2, sampleNetWeightKg: 0.2,
         observations
       })
       .expect('Content-Type', /json/)
@@ -118,7 +119,7 @@ describe('wasteController registration boundaries', () => {
     expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
   });
   it.each([undefined, null, '', '0.01'])('admite peso desconocido o el mínimo positivo: %s', weightKg => {
-    return request(app).post('/wastes').send({ ...validBody, coneWeightKg: weightKg == null || weightKg === '' ? weightKg : 0, totalWeightKg: weightKg }).expect(200);
+    return request(app).post('/wastes').send({ ...validBody, ...(weightKg ? { sampleLengthM: 2, sampleNetWeightKg: 0.2 } : {}), coneWeightKg: weightKg == null || weightKg === '' ? weightKg : 0, totalWeightKg: weightKg }).expect(200);
   });
 
   it.each([
@@ -162,6 +163,17 @@ describe('wasteController registration boundaries', () => {
     [{ weightKg: 1 }, 'weightKg', 'WASTE_WEIGHT_CALCULATED']
   ])('rechaza captura incompleta o incoherente %s antes del servicio', async (weights, field, code) => {
     const response = await request(app).post('/wastes').send({ ...validBody, ...weights }).expect(400);
+    expect(response.body.errors[field].code).toBe(code);
+    expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [{ sampleLengthM: undefined, sampleNetWeightKg: 0.057 }, 'sampleLengthM', 'SAMPLE_LENGTH_REQUIRED'],
+    [{ sampleLengthM: 1, sampleNetWeightKg: undefined }, 'sampleNetWeightKg', 'SAMPLE_WEIGHT_REQUIRED'],
+    [{ sampleLengthM: 0, sampleNetWeightKg: 0.057 }, 'sampleLengthM', 'SAMPLE_LENGTH_INVALID_NUMBER'],
+    [{ sampleLengthM: 1, sampleNetWeightKg: '0.1234567' }, 'sampleNetWeightKg', 'SAMPLE_WEIGHT_TOO_LONG']
+  ])('valida la muestra con códigos por campo y no ejecuta el servicio: %j', async (sample, field, code) => {
+    const response = await request(app).post('/wastes').send({ ...validBody, coneWeightKg: 0, totalWeightKg: 1, ...sample }).expect(400);
     expect(response.body.errors[field].code).toBe(code);
     expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
   });

@@ -48,61 +48,29 @@ flowchart TB
 | Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/validations/weightValidations.js`<br/>`src/public/js/constants/apiMessages.js` |
 | Selección y pesos de merma | `src/public/js/ui/inventory/wasteFormUI.js` y `src/public/js/plugins/select2/domains/wasteMaterialTemplate.js` |
 
-El formulario existente de material captura los dos pesos de referencia con
-sus listas de campos, `setFormDisabled` y `setFormSectionVisibility`. Guarda los valores
-originales al abrirlo y bloquea por campo cada peso ya registrado, incluido el cono cero;
-permite completar sólo referencias nulas. El normalizador recupera la referencia
-bloqueada para validar y enviar la pareja cuando se completa el otro peso. La merma consulta
-los valores en la selección de material, mantiene el cono editable y calcula neto
-y largo automático sin administrar referencias en otro modal. El servidor calcula
-los resultados con la referencia vigente y conserva los resultados registrados.
+La muestra se captura desde merma de Rollo: **Largo de muestra (m)** y **Peso neto de
+muestra (kg)**, sin cono y del mismo ancho. La sección del rollo completo se retira de
+material; sus valores anteriores permanecen históricos y no intervienen en cálculos nuevos.
 
-Las referencias son opcionales y sólo se muestran para materiales Rollo. La sección
-se oculta en consumibles, otras presentaciones y ajustes de stock; en consulta sólo
-se muestra si tiene valores. En alta o edición los campos faltantes se habilitan,
-sin `required`, y los ya registrados permanecen visibles y deshabilitados.
+Select2 entrega el objeto recibido a `applyWasteMaterialTemplate`. La UI prepara una
+vez la orientación y el ancho menor con `prepareWasteRollReference`, precarga nombre,
+presentación y unidad y limpia pesos y muestra. El selector ofrece sólo materiales en
+m² con oferta activa; excluye consumibles y las demás unidades.
 
-Ante `WASTE_ALREADY_EXISTS`, el alta ofrece **Abrir Agregar stock** si el usuario
-tiene `wastes:add-stock`. Confirmar el Swal cierra el alta y abre el modal existente
-con la merma devuelta por el servidor, la cantidad y las observaciones capturadas;
-cancelar conserva el alta. Una cantidad inicial de cero deja vacío el campo del modal
-para capturar una cantidad positiva. El Swal no registra entradas ni recarga la tabla.
-Sólo guardar el modal ejecuta `wasteStockAdditionForm`, que reutiliza `useForm`,
-su validación y `handleSubmit` con `addWasteStock`. El listado usa el mismo modal.
+Los eventos `input` de cono, total, largo de muestra y peso neto de muestra actualizan
+neto y longitud con las utilidades compartidas. No reconstruyen la selección, consultan
+la BD ni invocan la validación del envío. El neto puede mostrarse aunque falte la muestra;
+el largo queda vacío hasta completar los datos. El servidor calcula sus propios resultados.
 
-Select2 entrega los datos del evento a `applyWasteMaterialTemplate`. La normalización
-reconstruye únicamente las relaciones JSON que requiere el selector; no convierte
-pesos ni traslada campos de proveedor a material. La respuesta conserva
-`supplierMaterials`, con la oferta activa y sus referencias. Cada rollo sigue siendo
-una opción independiente, aunque comparta el costo máximo de su familia.
+Ambas medidas de Rollo permanecen deshabilitadas; el normalizador incorpora sus valores
+al payload. La muestra sí se envía y persiste. En otras presentaciones en m² se capturan
+medidas manuales y se ocultan muestra y pesos. Edición, ajuste y consulta no recalculan
+la identidad. Los históricos sin muestra no reciben valores inventados.
 
-Al seleccionar, la UI conserva el objeto y prepara una vez la referencia mediante
-`prepareWasteRollReference`: orientación, dimensión menor fija, longitud nominal y
-neto del rollo completo. `displayWasteMaterialTemplate` sólo muestra información;
-`configureWasteWeightFields` configura los controles según presentación y modo.
-La limpieza del proveedor se registra en la dependencia compartida, por lo que
-funciona también con cambios programáticos. La primera limpieza descarta la
-selección y sus cálculos; las notificaciones posteriores del estado del selector
-no repiten esa preparación. Abrir el selector no borra la selección.
+Ante `WASTE_ALREADY_EXISTS`, confirmar el Swal abre Agregar stock con cantidad y
+observaciones, sujeto a `wastes:add-stock`. Sólo guardar ese modal registra la entrada;
+cancelar conserva el alta. Este recorrido no se modifica.
 
-Sólo los eventos `input` de cono y total actualizan neto y longitud. La UI consume
-las fórmulas compartidas y la referencia preparada sin reconstruir la selección ni
-llamar a validadores del formulario. Al borrar o invalidar un peso se limpia la
-longitud calculada. Ambas dimensiones de Rollo permanecen deshabilitadas desde la
-selección, incluso si faltan pesos o referencias; no se permite captura manual en el
-formulario. `normalizeData` incorpora sus valores a la solicitud porque `FormData`
-omite controles deshabilitados. Nombre, presentación, unidad y cono se precargan en
-sus inputs, sin el resumen de datos del material seleccionado;
-`wasteCreateFields` excluye el neto y las referencias del payload. La validación del
-envío comprueba las dimensiones finales con los validadores positivos existentes.
-
-La apertura de edición, ajuste o consulta configura los pesos y muestra los datos
-persistidos sin recalcular. Las reglas de entrada permanecen en
-`validations/weightValidations.js` y `fieldValidations.js`; el servidor comprueba
-la oferta y obtiene sus propios resultados dentro de la transacción.
-
-El orden visible de merma es origen, datos de merma, pesos, medidas, inventario y
-existencias/observaciones. Material conserva datos de identificación, medidas,
-pesos del rollo completo, inventario y existencias/observaciones. Los pesos del
-rollo completo se capturan al registrar material, también desde compras; los pesos
-de merma corresponden al sobrante y no actualizan las referencias.
+El orden visible es origen, datos de merma, muestra, pesos del sobrante, medidas,
+inventario y existencias/observaciones. Material conserva identificación, medidas según
+unidad e inventario; consumible mantiene las medidas ocultas con cualquier unidad.

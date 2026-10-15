@@ -1,5 +1,11 @@
 import { AppError } from "../AppError.js";
 
+export class WasteMaterialInvalid extends AppError {
+    constructor() {
+        super('Seleccione un material con unidad de metro cuadrado (m²) para registrar merma.', 'WASTE_MATERIAL_INVALID', 400);
+    }
+}
+
 export class WasteDimensionsInvalid extends AppError {
     constructor() {
         super('Complete las dimensiones de la merma o los pesos necesarios para calcularlas.', 'WASTE_DIMENSIONS_INVALID', 400);

@@ -1,6 +1,6 @@
 import { findPage } from '../../../repository/paginationRepository.js';
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
+import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteMaterialInvalid, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
@@ -13,6 +13,8 @@ import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
 import { prepareWasteMeasurements } from './wasteHelpers.js';
 import { lockWasteStock } from '../../../repository/warehouse/stockLockRepository.js';
+import { MATERIAL_TYPES } from '../../../constants/inventory.js';
+import { isSquareMeterUnitMeasure } from '../../../public/js/utils/warehouseInventoryUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -130,6 +132,8 @@ export const findAllWastes = async ({
                 weightKg: true,
                 coneWeightKg: true,
                 totalWeightKg: true,
+                sampleLengthM: true,
+                sampleNetWeightKg: true,
                 sourceMaterialId: true,
                 ...(canReadCosts && { maxUnitCost: true }),
                 minStock: true,
@@ -166,6 +170,10 @@ export const createWasteWithInitialStockAdjustment = async ({
             if (!offer.isActive) throw new WasteNotFound();
 
             const material = offer.material;
+            // El origen de una merma es un material de superficie, no un consumible.
+            if (material.type !== MATERIAL_TYPES.MATERIAL || !isSquareMeterUnitMeasure(material.unitMeasure)) {
+                throw new WasteMaterialInvalid();
+            }
             const coneWeightKg = wasteDto.coneWeightKg;
             const { base, height, weightKg } = prepareWasteMeasurements({ wasteDto, offer });
             const existingWaste = await findWasteByIdentity({ tx, supplierId: wasteDto.supplierId, name: wasteDto.name, base, height, coneWeightKg: coneWeightKg ?? null, totalWeightKg: wasteDto.totalWeightKg ?? null });
@@ -187,6 +195,8 @@ export const createWasteWithInitialStockAdjustment = async ({
                     sourceMaterial: { connect: { id: material.id } },
                     coneWeightKg: coneWeightKg ?? null,
                     totalWeightKg: wasteDto.totalWeightKg ?? null,
+                    sampleLengthM: wasteDto.sampleLengthM ?? null,
+                    sampleNetWeightKg: wasteDto.sampleNetWeightKg ?? null,
                     weightKg,
                     currentStock: wasteDto.newStock,
                     convertedQuantity: calculateConvertedQuantity({
@@ -243,7 +253,7 @@ export const updateWaste = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
-            if (['weightKg', 'coneWeightKg', 'totalWeightKg', 'sourceMaterialId'].some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
+            if (['weightKg', 'coneWeightKg', 'totalWeightKg', 'sampleLengthM', 'sampleNetWeightKg', 'sourceMaterialId'].some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
 
             if (wasteDto.name && wasteDto.name !== currentWaste.name) {
                 const existingWaste = await findWasteByIdentity({
