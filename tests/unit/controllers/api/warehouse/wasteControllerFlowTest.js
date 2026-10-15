@@ -79,6 +79,7 @@ const createWaste = (overrides = {}) => ({
     currentStock: 100,
     convertedQuantity: 600,
     material: {
+      type: 'MATERIAL',
       id: 'material-1',
       name: 'Lámina',
       isActive: true,
@@ -99,6 +100,7 @@ describe('wasteController complete flow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     transaction.mockImplementation((callback) => callback({
+      $queryRaw: vi.fn().mockResolvedValue([]),
       waste: {
         create: wasteCreate,
         findFirst: wasteFindFirst,
@@ -119,6 +121,7 @@ describe('wasteController complete flow', () => {
     findSupplierMaterialByIds.mockResolvedValue({
       isActive: true,
       material: {
+      type: 'MATERIAL',
       id: 'material-1',
       name: 'Lámina',
       base: 2,
@@ -137,6 +140,9 @@ describe('wasteController complete flow', () => {
     const req = {
       body: {
         name: 'Recorte confirmado',
+        coneWeightKg: '0.25',
+        totalWeightKg: '1.25',
+        referenceRollTotalWeightKg: '1.25',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: '2',
@@ -320,6 +326,9 @@ describe('wasteController complete flow', () => {
     const req = {
       body: {
         name: 'Lámina',
+        coneWeightKg: '0.25',
+        totalWeightKg: '1.25',
+        referenceRollTotalWeightKg: '1.25',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: '2',

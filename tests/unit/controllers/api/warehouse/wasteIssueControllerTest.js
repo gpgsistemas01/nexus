@@ -7,6 +7,8 @@ const updateWasteIssue = vi.fn();
 const updateWasteIssueHeader = vi.fn();
 const returnWasteIssueDetailService = vi.fn();
 
+vi.mock('../../../../../src/services/warehouse/wasteIssues/wasteIssueDetailService.js', () => ({ updateWasteIssueDetails }));
+
 vi.mock('../../../../../src/services/warehouse/wasteIssues/wasteIssueService.js', () => ({
   createWasteIssue,
   findAllWasteIssues,

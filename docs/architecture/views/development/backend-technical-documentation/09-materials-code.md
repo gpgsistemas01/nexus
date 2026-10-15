@@ -36,11 +36,28 @@ flowchart TB
 
 ## Contratos de implementación
 
+`supplierMaterialStockService.js` concentra las consultas operativas y escrituras de
+existencias que antes estaban en `supplierMaterialService.js`. Este último conserva
+administración de la oferta y costos. Las variaciones de stock son atómicas y devuelven
+el saldo utilizado en el historial; los ajustes absolutos consultan después de obtener
+el bloqueo de la oferta. Los pesos de referencia anteriores se conservan como históricos;
+el API rechaza su captura o modificación con el código de campo de `errorMap`.
+La nueva muestra se registra exclusivamente desde merma.
+
+Las validaciones de alta permiten omitir ambas medidas; si se informa una, exigen la
+pareja positiva y responden con los códigos de campo de `errorMap`. El DTO normaliza
+las medidas omitidas como `null`; la conversión sin dimensiones conserva la cantidad.
+El formulario reutiliza `updateMaterialMeasurementFields` al abrir el modal y cambiar
+la unidad con Select2: sólo habilita medidas para metros y litros durante el alta,
+oculta y limpia la sección en pieza y otras unidades, y conserva la identidad bloqueada
+en edición y ajustes. Abrir el selector de unidad no descarta su selección. No se añade
+una consulta de unidad ni una validación duplicada en el servicio.
+
 ### Datos, resultados y efectos del módulo
 
 | Capacidad | Entrada y retorno | Reglas, errores y persistencia |
 | --- | --- | --- |
-| Materiales: `materialController.js`, `materials/materialService.js`, `materialHelpers.js`, `materialRelations.js`, `supplierMaterialService.js`, `adjustmentService.js` | El listado retorna relaciones `SupplierMaterial` con `material` y `supplier` anidados; alta, edición y consultas operativas conservan ese contrato. El retiro recibe el `id` de la relación y las mutaciones retornan material o confirmación. | Prepara identidad, sincroniza proveedor, protege referencias y usa ajuste/movimiento para cambiar existencias; las escrituras relacionadas comparten `tx`. |
+| Materiales: `materialController.js`, `materials/materialService.js`, `materialHelpers.js`, `materialRelations.js`, `supplierMaterialService.js`, `adjustmentService.js` | El listado retorna relaciones `SupplierMaterial` con `material` y `supplier` anidados; alta, edición y consultas operativas conservan ese contrato. El retiro recibe el `id` de la relación y las mutaciones retornan material o confirmación. | Prepara identidad, sincroniza proveedor, rechaza la captura de referencias históricas y usa ajuste/movimiento para cambiar existencias; las escrituras relacionadas comparten `tx`. |
 
 
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |

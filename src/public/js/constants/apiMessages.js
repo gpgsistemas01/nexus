@@ -1,9 +1,22 @@
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
+    WASTE_ISSUE_STATE_CONFLICT: 'La salida de merma no tiene detalles pendientes por surtir. Actualice la información.',
+    WASTE_ISSUE_DUPLICATE_WASTE: 'No se puede repetir la misma merma en una salida.',
+    WASTE_ISSUE_WASTE_UNAVAILABLE: 'Una o más mermas no existen o están inactivas. Actualice la selección.',
+    WASTE_ISSUE_FULFILLMENT_STATUS_NOT_FOUND: 'No están configurados los estados de surtido. Contacte al administrador.',
     MATERIAL_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
-    MATERIAL_ROLL_REFERENCE_READ_ONLY: 'Los pesos de referencia registrados no se pueden modificar ni eliminar. Puede completar los que todavía no estén registrados.',
+    MATERIAL_ROLL_REFERENCE_READ_ONLY: 'Los pesos del rollo completo son históricos. Capture el peso del rollo completo al registrar merma.',
     WASTE_DIMENSIONS_INVALID: 'Complete las dimensiones de la merma o los pesos necesarios para calcularlas.',
+    WASTE_MATERIAL_INVALID: 'Seleccione un material con unidad de metro cuadrado (m²) para registrar merma.',
+    REFERENCE_ROLL_TOTAL_WEIGHT_REQUIRED: 'Capture el peso del rollo completo con cono.',
+    REFERENCE_ROLL_TOTAL_WEIGHT_NOT_GREATER: 'El peso del rollo completo debe ser mayor que el peso del cono.',
+    SAMPLE_LENGTH_REQUIRED: 'Capture el largo de la muestra.',
+    SAMPLE_LENGTH_INVALID_NUMBER: 'El largo de la muestra debe ser mayor que cero.',
+    SAMPLE_LENGTH_TOO_LONG: 'El largo de la muestra admite hasta 8 enteros y 6 decimales.',
+    SAMPLE_WEIGHT_REQUIRED: 'Capture el peso neto de la muestra.',
+    SAMPLE_WEIGHT_INVALID_NUMBER: 'El peso neto de la muestra debe ser mayor que cero.',
+    SAMPLE_WEIGHT_TOO_LONG: 'El peso neto de la muestra admite hasta 8 enteros y 6 decimales.',
     CONE_WEIGHT_KG_INVALID_NUMBER: 'El peso del cono debe ser un decimal mayor o igual que cero en kg. Use punto decimal, sin letras ni notación científica.',
     CONE_WEIGHT_KG_REQUIRED: 'Capture el peso del cono para calcular el peso neto de la merma.',
     TOTAL_WEIGHT_KG_REQUIRED: 'Capture el peso total con cono para calcular el peso neto de la merma.',
@@ -13,7 +26,7 @@ export const errorMessages = {
     WEIGHT_KG_TOO_LONG: 'El peso admite hasta 3 dígitos enteros y 2 decimales.',
     WEIGHT_KG_TOO_HIGH: 'El peso por unidad no puede superar 999.99 kg.',
     WASTE_WEIGHT_READ_ONLY: 'No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta.',
-    WASTE_WEIGHT_INVALID: 'El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.',
+    WASTE_WEIGHT_INVALID: 'Capture pesos válidos de cono, merma y rollo completo; sólo aplican a Rollo.',
     // 🔐 AUTH / GENERALES
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
     VALIDATION_ERROR: 'Errores de validación.',

@@ -1,3 +1,4 @@
+import { findPage } from "../../repository/paginationRepository.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { getGoodsReceiptDetailChangeReasonName } from "../../constants/goodsReceiptDetailChanges.js";
 
@@ -48,26 +49,20 @@ export const findAllReasons = async ({
         })
     };
 
-    const reasons = await getDb().stockAdjustmentReason.findMany({
-        skip,
-        take,
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: {
-            id: true,
-            name: true,
-            isActive: true
+    return findPage({
+        model: getDb().stockAdjustmentReason,
+        query: {
+            skip,
+            take,
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            select: {
+                id: true,
+                name: true,
+                isActive: true
+            }
         }
     });
-
-    const total = await getDb().stockAdjustmentReason.count();
-    const filtered = await getDb().stockAdjustmentReason.count({ where });
-
-    return {
-        data: reasons,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 }

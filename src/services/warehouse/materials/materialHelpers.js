@@ -1,4 +1,4 @@
-import { ExcededMaxRetriesSkuError, MaterialRollReferenceInvalid, MaterialRollReferenceReadOnly } from "../../../errors/warehouse/materialError.js";
+import { ExcededMaxRetriesSkuError, MaterialRollReferenceReadOnly } from "../../../errors/warehouse/materialError.js";
 import { findUniquePresentation } from "../presentationService.js";
 import { findUniqueUnitMeasure } from "../unitMeasureService.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
@@ -6,30 +6,15 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 
-import { isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
-import { MATERIAL_TYPES } from '../../../constants/inventory.js';
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialHelpers');
 
 
 const MAX_RETRIES = 5;
 
-export const assertMaterialRollReference = ({ material, referenceConeWeightKg, referenceRollTotalWeightKg, savedReference = null }) => {
-    if ((referenceConeWeightKg != null || referenceRollTotalWeightKg != null)
-        && (material.type === MATERIAL_TYPES.CONSUMABLE || !isRollPresentation(material.presentation?.name))) {
-        throw new MaterialRollReferenceInvalid();
-    }
-
-    if (!savedReference) return;
-
-    // RF-MER-012: se pueden completar pesos ausentes, pero no cambiar ni borrar los registrados.
-    for (const [field, nextWeight] of Object.entries({ referenceConeWeightKg, referenceRollTotalWeightKg })) {
-        const registeredWeight = savedReference[field];
-        if (nextWeight === undefined || registeredWeight == null) continue;
-
-        const removesWeight = nextWeight === null;
-        const changesWeight = Number(nextWeight) !== Number(registeredWeight);
-        if (removesWeight || changesWeight) throw new MaterialRollReferenceReadOnly();
+export const assertMaterialRollReference = ({ referenceConeWeightKg, referenceRollTotalWeightKg }) => {
+    if (referenceConeWeightKg !== undefined || referenceRollTotalWeightKg !== undefined) {
+        throw new MaterialRollReferenceReadOnly();
     }
 };
 
@@ -37,13 +22,12 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null }
 
     const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...rest } = materialDto;
 
-    const [, presentation, supplier] = await Promise.all([
-        findUniqueUnitMeasure({ tx, id: unitMeasureId }),
-        findUniquePresentation({ tx, id: presentationId }),
-        findUniqueSupplier({ tx, id: supplierId })
-    ]);
+    // La transacción comparte una conexión: cada consulta debe terminar antes de enviar la siguiente.
+    await findUniqueUnitMeasure({ tx, id: unitMeasureId });
+    await findUniquePresentation({ tx, id: presentationId });
+    const supplier = await findUniqueSupplier({ tx, id: supplierId });
 
-    assertMaterialRollReference({ material: { ...rest, presentation }, referenceConeWeightKg, referenceRollTotalWeightKg });
+    assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 
     if (supplier?.isActive === false) throw new SupplierInactiveConflict();
 
@@ -54,9 +38,7 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null }
             unitMeasureId,
             supplierId,
             maxUnitCost,
-            isActive,
-            ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
-            ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg })
+            isActive
         }
     };
 };

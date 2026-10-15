@@ -11,22 +11,14 @@ vi.mock('../../../../../../../src/public/js/utils/formUtils.js', () => ({
 vi.stubGlobal('document', { querySelector: () => ({ checked: true }) });
 await import('../../../../../../../src/public/js/pages/warehouse/materials/materialForm.js');
 
-describe('envío de referencias de material bloqueadas', () => {
-    it('incluye el cono guardado cuando se completa el total, aunque el cono no esté en FormData', () => {
-        const form = {
-            dataset: { mode: 'edit' }, elements: { supplierId: { value: 'supplier-1' } },
-            materialRollReference: { referenceConeWeightKg: 0, referenceRollTotalWeightKg: null }
-        };
-        const data = state.config.normalizeData({ form, formData: { name: 'Lona', referenceRollTotalWeightKg: '2.25', maxUnitCost: '10' } });
-        expect(data).toMatchObject({ referenceConeWeightKg: 0, referenceRollTotalWeightKg: '2.25', supplierId: 'supplier-1' });
-    });
-
-    it('conserva la pareja registrada al editar otros datos', () => {
-        const form = {
-            dataset: { mode: 'edit' }, elements: { supplierId: { value: 'supplier-1' } },
-            materialRollReference: { referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' }
-        };
-        const data = state.config.normalizeData({ form, formData: { name: 'Lona', maxUnitCost: '12' } });
-        expect(data).toMatchObject({ referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25', maxUnitCost: '12' });
+describe('materiales sin captura de referencias de rollo', () => {
+    it.each(['create', 'edit'])('omite referencias históricas del payload en %s', mode => {
+        const form = { dataset: { mode }, elements: { supplierId: { value: 'supplier-1' } } };
+        const data = state.config.normalizeData({ form, formData: {
+            name: 'Lona', maxUnitCost: '12', referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25'
+        } });
+        expect(data).not.toHaveProperty('referenceConeWeightKg');
+        expect(data).not.toHaveProperty('referenceRollTotalWeightKg');
+        expect(data).toMatchObject({ name: 'Lona', maxUnitCost: '12' });
     });
 });

@@ -20,6 +20,7 @@ export const buildGoodsIssueContextWhere = (type = MATERIAL_TYPES.MATERIAL) => {
 };
 
 export const buildGoodsIssueDetails = async ({
+    tx,
     details,
     initialFulfillmentStatusId = null,
     type = MATERIAL_TYPES.MATERIAL
@@ -37,7 +38,7 @@ export const buildGoodsIssueDetails = async ({
         ).values()
     ];
 
-    const supplierMaterials = await findSupplierMaterialsSnapshot({ pairs });
+    const supplierMaterials = await findSupplierMaterialsSnapshot({ tx, pairs });
 
     const spMap = new Map(
         supplierMaterials.map(sp => [

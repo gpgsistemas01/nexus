@@ -12,7 +12,7 @@ const editConsumable = vi.fn();
 const editConsumableStock = vi.fn();
 const removeConsumable = vi.fn();
 const validate = vi.fn();
-const materialValidation = [vi.fn()];
+const consumableValidation = [vi.fn()];
 const materialEditValidation = [vi.fn()];
 const materialStockValidation = [vi.fn()];
 
@@ -37,7 +37,7 @@ vi.mock('../../../../../src/middleware/validatorMiddleware.js', () => ({ validat
 vi.mock('../../../../../src/validators/forms/materialValidations.js', () => ({
   materialEditValidation,
   materialStockValidation,
-  materialValidation
+  consumableValidation
 }));
 
 const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
@@ -55,7 +55,7 @@ describe('consumableApiRoute', () => {
   });
 
   it('reutiliza validaciones y permisos de las escrituras de materiales', () => {
-    expect(post).toHaveBeenCalledWith('/', verifyApiTokenRequired, materialValidation, validate, `authorize:${ PERMISSIONS.MATERIALS_WRITE }`, registerConsumable);
+    expect(post).toHaveBeenCalledWith('/', verifyApiTokenRequired, consumableValidation, validate, `authorize:${ PERMISSIONS.MATERIALS_WRITE }`, registerConsumable);
     expect(patch).toHaveBeenCalledWith('/:id', verifyApiTokenRequired, materialEditValidation, validate, `authorize:${ PERMISSIONS.MATERIALS_WRITE }`, editConsumable);
     expect(patch).toHaveBeenCalledWith('/:id/stock', verifyApiTokenRequired, materialStockValidation, validate, `authorize:${ PERMISSIONS.MATERIALS_ADJUST_STOCK }`, editConsumableStock);
     expect(remove).toHaveBeenCalledWith('/:id', verifyApiTokenRequired, `authorize:${ PERMISSIONS.MATERIALS_WRITE }`, removeConsumable);

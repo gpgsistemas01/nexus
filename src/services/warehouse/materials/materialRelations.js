@@ -7,9 +7,7 @@ export const syncSupplierMaterial = async ({
     previousSupplierId = null,
     materialId,
     maxUnitCost,
-    isActive,
-    referenceConeWeightKg,
-    referenceRollTotalWeightKg
+    isActive
 }) => {
 
     if (previousSupplierId && previousSupplierId !== supplierId) {
@@ -25,8 +23,6 @@ export const syncSupplierMaterial = async ({
         supplierId,
         materialId,
         maxUnitCost,
-        isActive,
-        ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
-        ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg })
+        isActive
     });
 };

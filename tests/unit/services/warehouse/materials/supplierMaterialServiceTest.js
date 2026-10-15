@@ -5,7 +5,6 @@ const materialFindFirst = vi.fn();
 const supplierMaterialFindMany = vi.fn();
 const supplierMaterialFindUnique = vi.fn();
 const supplierMaterialCount = vi.fn();
-const supplierMaterialUpdateMany = vi.fn();
 
 vi.mock('../../../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({
@@ -13,8 +12,7 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
     supplierMaterial: {
       findMany: supplierMaterialFindMany,
       findUnique: supplierMaterialFindUnique,
-      count: supplierMaterialCount,
-      updateMany: supplierMaterialUpdateMany
+      count: supplierMaterialCount
     }
   })
 }));
@@ -24,8 +22,7 @@ const {
   findAllSupplierMaterials,
   findSupplierMaterialById,
   findSupplierMaterialByIds,
-  findSupplierMaterialsSnapshot,
-  updateSupplierMaterialStock
+  findSupplierMaterialsSnapshot
 } = await import('../../../../../src/services/warehouse/materials/supplierMaterialService.js');
 
 describe('listado del CRUD de materiales', () => {
@@ -196,32 +193,4 @@ describe('listado del CRUD de materiales', () => {
     );
   });
 
-  it('sincroniza en cero el stock y la cantidad convertida al surtir la última pieza', async () => {
-    supplierMaterialUpdateMany.mockResolvedValue({ count: 1 });
-
-    await updateSupplierMaterialStock({
-      grouped: new Map([['material-1:supplier-1', 1]]),
-      movementType: 'ISSUE',
-      supplierMaterials: [{
-        materialId: 'material-1',
-        supplierId: 'supplier-1',
-        currentStock: 0,
-        convertedQuantity: 0,
-        material: { name: 'Lona', base: null, height: null },
-        supplier: { tradeName: 'Proveedor' }
-      }]
-    });
-
-    expect(supplierMaterialUpdateMany).toHaveBeenCalledWith({
-      where: {
-        supplierId: 'supplier-1',
-        materialId: 'material-1',
-        currentStock: { gte: 1 }
-      },
-      data: {
-        currentStock: { decrement: 1 },
-        convertedQuantity: 0
-      }
-    });
-  });
 });

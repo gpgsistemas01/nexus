@@ -44,6 +44,9 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Materials` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `Conversion` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
 | `MovementHelpers` | control | [`movementHelpers.js`](../../../../../../src/services/inventory/movementHelpers.js) |
+| `StockChecks` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `StockBalance` | control | [`supplierMaterialStockService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialStockService.js) |
+| `StockUpdateRepo` | control | [`stockUpdateRepository.js`](../../../../../../src/repository/warehouse/stockUpdateRepository.js) |
 
 ### Configuración y construcción
 
@@ -224,12 +227,12 @@ sequenceDiagram
             Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
     Note over Inventory: Preparación y escrituras ampliadas en los detalles de inventario
             Note over Inventory,Prisma: applyInventoryMovement también actualiza stock con el mismo tx
+            Core->>Costs: updateMaterialUnitCostIfHigher({ tx, supplierId, details })
     end
         Prisma-->>Core: commit y compra creada
-        Core->>Costs: updateMaterialUnitCostIfHigher({ supplierId: result.supplierId, details: result.details }) tras commit
         Core-->>Facade: createGoodsReceipt(): Promise[GoodsReceipt]
     else Error de dominio o persistencia
-        Note over Core,Prisma: Un error al actualizar costo después del commit no revierte la compra
+        Note over Core,Prisma: Documento, existencias, movimiento y costos comparten rollback
         Core-->>Facade: error — rollback si falló el callback transaccional
     end
     deactivate Core
@@ -275,78 +278,54 @@ sequenceDiagram
 
 ## Detalle de preparación del movimiento de inventario
 
-Amplía `applyInventoryMovement`. La búsqueda de relaciones se omite cuando el caller
-ya proporciona `supplierMaterials`. Las salidas comprueban suficiencia; las entradas
-usan cantidades positivas. Todos los colaboradores reciben el mismo `tx`.
+Todos los colaboradores conservan el mismo `tx` de la operación.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Inventory@{ "type": "control" } as movementService.js
     participant MovementHelpers@{ "type": "control" } as movementHelpers.js
-    participant Costs@{ "type": "control" } as supplierMaterialService.js
-    participant Formatter@{ "type": "control" } as formattersUtils.js
-    participant Conversion@{ "type": "control" } as stockHelpers.js
-
-    Note over Inventory: Recorre details y comprueba materialId y supplierId antes de agrupar
+    participant StockBalance@{ "type": "control" } as supplierMaterialStockService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     Inventory->>MovementHelpers: buildStockUpdateSummary({ details })
-    MovementHelpers->>Formatter: buildStockKey(materialId, supplierId)
-    MovementHelpers->>Formatter: normalizeDecimal(quantity)
-    MovementHelpers-->>Inventory: buildStockUpdateSummary(): Object — stockKeys y grouped
-    opt supplierMaterials no proporcionado
-        Inventory->>Costs: findSupplierMaterialsForStockMovement({ tx, where })
-        Costs-->>Inventory: findSupplierMaterialsForStockMovement(): Promise[SupplierMaterial[]]
+    MovementHelpers-->>Inventory: buildStockUpdateSummary(): Object — grouped
+    opt El caller no proporcionó las ofertas
+        Inventory->>StockBalance: findSupplierMaterialsForStockMovement({ tx, where })
+        StockBalance->>Prisma: tx.supplierMaterial.findMany({ where, select })
+        Prisma-->>StockBalance: findMany(): Promise[SupplierMaterial[]]
+        StockBalance-->>Inventory: findSupplierMaterialsForStockMovement(): Promise[SupplierMaterial[]]
     end
-    loop Cada detalle del movimiento
-        Inventory->>Formatter: buildStockKey(detail.materialId, detail.supplierId)
-        break Relación proveedor-material no encontrada
-            Inventory-->>Inventory: throw GoodsIssueInexistentStock
-        end
-        Inventory->>Formatter: hasMaterialDimensions(ps.material)
-        Inventory->>Formatter: normalizeDecimal(detail.quantity)
-        Inventory->>Conversion: calculateConvertedQuantity({ quantity, base, height })
-        Conversion-->>Inventory: calculateConvertedQuantity(): number
-        opt movementType es ISSUE
-            Inventory->>Conversion: assertSufficientStock({ material, newStock, requestedQuantity })
-        end
-        Inventory->>MovementHelpers: buildInventoryMovementDetail({ quantity: signedQuantity, previousStock, newStock, materialId, supplierId })
-        MovementHelpers-->>Inventory: buildInventoryMovementDetail(): Object
-    end
+    Inventory->>Inventory: Map(offers) — indexar identidades
 ```
 
 ## Detalle de escritura del movimiento y las existencias
 
-Continúa con `movementDetails` y el resumen anterior. Primero se registra el movimiento;
-después se actualizan las existencias agrupadas. Un fallo revierte ambas escrituras
-cuando el caller las ejecuta dentro de su transacción.
+Todos los colaboradores conservan el mismo `tx` de la operación.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Inventory@{ "type": "control" } as movementService.js
-    participant Costs@{ "type": "control" } as supplierMaterialService.js
-    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
+    participant StockUpdateRepo@{ "type": "control" } as stockUpdateRepository.js
+    participant StockBalance@{ "type": "control" } as supplierMaterialStockService.js
+    participant MovementHelpers@{ "type": "control" } as movementHelpers.js
+    participant StockChecks@{ "type": "control" } as stockHelpers.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Conversion@{ "type": "control" } as stockHelpers.js
-
-    Inventory->>Inventory: createInventoryMovement({ tx, reference, details: movementDetails, movementType })
-    Inventory->>FileBaseRepository: getDb(tx)
-    FileBaseRepository-->>Inventory: getDb(): TransactionClient — tx del caller
-    Inventory->>Prisma: db.inventoryMovement.create({ data, include: { details: true } })
-    Prisma-->>Inventory: create(): Promise[InventoryMovement]
-    Inventory->>Costs: updateSupplierMaterialStock({ tx, grouped, movementType, supplierMaterials })
-    Costs->>FileBaseRepository: getDb(tx)
-    FileBaseRepository-->>Costs: getDb(): TransactionClient — mismo tx
-    loop Cada relación agrupada material-proveedor
-        Costs->>Conversion: calculateConvertedQuantity({ quantity, base, height })
-        alt movementType es ENTRY
-            Costs->>Prisma: db.supplierMaterial.update({ where, data: { currentStock: { increment: quantity } } })
-        else Movimiento de salida
-            Costs->>Prisma: db.supplierMaterial.updateMany({ where: { currentStock: { gte: quantity } }, data })
-            break result.count menor que 1
-                Costs-->>Inventory: throw GoodsIssueInsufficientStock
-            end
-        end
+    Inventory->>StockBalance: updateSupplierMaterialStock({ tx, grouped, movementType, supplierMaterialsByKey })
+    loop Preparar cambios por identidad
+        StockBalance->>StockChecks: calculateConvertedQuantity({ quantity, base, height })
+        StockChecks-->>StockBalance: calculateConvertedQuantity(): number
     end
-    Costs-->>Inventory: updateSupplierMaterialStock(): Promise[void]
+    StockBalance->>StockUpdateRepo: updateSupplierMaterialStocks({ tx, changes })
+    StockUpdateRepo->>Prisma: tx.$queryRaw(CTE de bloqueo ordenado y UPDATE RETURNING)
+    Prisma-->>StockUpdateRepo: $queryRaw(): Promise[SupplierMaterial[]]
+    StockUpdateRepo-->>StockBalance: updateSupplierMaterialStocks(): Promise[SupplierMaterial[]]
+    StockBalance-->>Inventory: updateSupplierMaterialStock(): Promise[Map]
+    loop Cada detalle conserva su relación e historial
+        Inventory->>MovementHelpers: buildInventoryMovementDetail({ previousStock, newStock, quantity, ... })
+        MovementHelpers-->>Inventory: buildInventoryMovementDetail(): Object
+    end
+    Inventory->>Inventory: createInventoryMovement({ tx, reference, details, movementType })
+    Inventory->>Prisma: tx.inventoryMovement.create({ data, include })
+    Prisma-->>Inventory: create(): Promise[InventoryMovement]
 ```

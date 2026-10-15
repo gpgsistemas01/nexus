@@ -65,7 +65,7 @@ flowchart TB
 
 ## Variantes y límites de reutilización
 
-wasteService reutiliza findSupplierMaterialByIds para consultar el material y sus pesos por proveedor, conversión y servicios de ajuste/entrada de stock de merma. wasteInventoryService y wasteMovementService mantienen su persistencia propia.
+wasteService reutiliza findSupplierMaterialByIds para consultar el material y su oferta por proveedor, conversión y servicios de ajuste/entrada de stock de merma. wasteInventoryService y wasteMovementService mantienen su persistencia propia.
 
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
@@ -75,46 +75,33 @@ Los reportes y la infraestructura transversal se localizan en el
 La captura, protección de la edición y cálculo de reportes se describen en
 [datos de merma](../../logical/data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).
 
-Los pesos de referencia se capturan mediante el CRUD de material. Una vez registrados,
-no se cambian ni eliminan; se permite completar sólo valores todavía nulos.
-`assertMaterialRollReference` comprueba esta regla antes de escribir y la actualización
-de la oferta incluye los valores consultados como condición para proteger capturas
-simultáneas. Un conflicto devuelve `MATERIAL_ROLL_REFERENCE_READ_ONLY` y revierte la
-transacción. El DTO no convierte en nulo un campo omitido. La merma
-reutiliza `findSupplierMaterialByIds` dentro de su transacción, prepara el neto de
-referencia al registrar y persiste el vínculo, el cono utilizado y los resultados.
-Los validators verifican formato y relaciones numéricas antes del servicio;
-la transacción comprueba presentación, oferta activa y referencia necesaria.
+El origen de una merma debe ser un `Material` de tipo `MATERIAL` con unidad m²,
+reconocida por símbolo o nombre «metro cuadrado». El selector filtra en SQL y el alta
+comprueba la oferta consultada dentro de su transacción; forzar otro origen devuelve
+`WASTE_MATERIAL_INVALID`. No se añaden consultas para esa comprobación.
 
-Las condiciones de negocio de esta captura corresponden a `RF-MER-012` y sus criterios
-de aceptación. Los controles de existencia y concurrencia hacen cumplir ese contrato:
+Para Rollo, la muestra es un rollo completo: el alta recibe únicamente su peso total
+con cono en `referenceRollTotalWeightKg`, además del cono y el total del sobrante.
+`prepareWasteMeasurements` reutiliza la oferta consultada, fija el ancho menor y toma
+el largo de la otra dimensión nominal. Descuenta el mismo cono de ambos totales y
+calcula `netoMerma × largoRollo / netoRollo`. No consulta ni guarda datos.
 
-| Condición | Propósito |
-| --- | --- |
-| Hay pesos y el recurso no es material Rollo | Rechazar referencias que no aplican. Ambos pesos pueden omitirse. |
-| Falta una referencia guardada | Permitir su captura inicial. |
-| El campo no viene en la solicitud | Conservar el valor almacenado. |
-| Se borra o cambia un valor registrado | Rechazar con `MATERIAL_ROLL_REFERENCE_READ_ONLY`; cero cuenta como registrado. |
-| Falta la oferta del proveedor | Rechazar con `MATERIAL_NOT_FOUND`. |
-| La actualización condicionada afecta cero filas | Revertir la transacción: las referencias ya no coinciden o la oferta dejó de existir desde la consulta. |
+El servicio guarda el total del rollo completo, el cono, el total y neto del sobrante,
+las medidas finales y `sourceMaterialId`. El largo y neto de muestra sólo son valores
+intermedios; `sampleLengthM` y `sampleNetWeightKg` quedan nulos en altas nuevas y se
+conservan exclusivamente para consultar históricos. El DTO no acepta estos campos. No actualiza `SupplierMaterial`; sus referencias previas
+siguen históricas. Los validators comprueban cada peso con las reglas compartidas y
+entregan códigos de `errorMap` mediante `withMessage`. El servicio comprueba la
+presentación persistida y rechaza con `WASTE_WEIGHT_INVALID` un alta de Rollo sin
+pesos, aunque se intenten enviar medidas manuales. Se reutiliza la oferta ya consultada;
+esta regla no agrega consultas. Los históricos sin pesos permanecen de consulta.
 
-`supplierMaterials` se filtra por `supplierId`; la restricción única de material y
-proveedor garantiza como máximo una oferta. El servicio obtiene esa oferta una vez y
-pasa `savedReference` explícitamente al helper. El conteo de la escritura es un control
-de concurrencia, no una segunda validación numérica ni un requisito de captura.
+La migración `20261015210000_add_waste_full_roll_reference` agrega un campo nullable
+y exige que el neto de referencia corresponda al total menos el mismo cono. No cambia
+las muestras anteriores ni sus resultados. Los tres pesos capturados admiten hasta
+999.99 kg y dos decimales; referencia, medidas y pesos siguen protegidos en edición.
 
-`prepareWasteMeasurements` es un helper de dominio sin consultas ni escrituras.
-Recibe el DTO y la oferta consultada, resuelve la orientación, calcula neto y largo
-y comprueba las dimensiones finales. El servicio conserva consultas, identidad,
-transacción y registro de inventario. Los formularios Express de material y merma
-reutilizan `validateWeightCapture`: cada predicado compartido se evalúa una vez,
-`withMessage` asigna el código declarado en `errorMap` y `bail` detiene la cadena
-en el primer fallo. El adaptador Express no lanza códigos como excepciones ni
-vuelve a validar para resolver el mensaje.
-
-La selección conserva los pesos en la oferta de `supplierMaterials`, sin aplanarlos
-en el material ni devolver resultados precalculados. `prepareWasteRollReference`
-comparte la preparación de orientación y referencias entre servidor y navegador;
-la dimensión menor conserva su campo y la mayor recibe la longitud calculada. Las reglas Express reutilizan
-`public/js/utils/validations/weightValidations.js`; la utilidad de inventario sólo
-conserva acceso a datos, normalización y cálculos sin mensajes de validación.
+`20261015230000_stop_persisting_waste_sample_values` permite omitir esos valores
+derivados sin borrar referencias anteriores. Las medidas del material son inmutables
+y el neto de la muestra se obtiene del total guardado menos el cono. La migración se
+aplica antes de iniciar el backend actualizado con `npm run db:migrate`.

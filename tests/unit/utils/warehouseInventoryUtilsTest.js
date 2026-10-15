@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   normalizeInventorySelectRelations,
+  isSquareMeterUnitMeasure,
   getBase,
   getHeight,
   getIsActive,
@@ -289,4 +290,14 @@ it('reconstruye sólo las relaciones JSON y conserva los datos propios del prove
   expect(selected.presentation.name).toBe('ROLLO');
   expect(selected.supplierMaterials).toBe(offers);
   expect(selected).not.toHaveProperty('referenceConeWeightKg');
+});
+
+
+describe('unidad de origen de merma', () => {
+  it.each([{ symbol: 'm²' }, { symbol: 'M2' }, { symbol: 'm^2' }, { name: 'metro cuadrado' }, { name: 'METROS CUADRADOS' }])('reconoce metro cuadrado por símbolo o nombre: %j', unit => {
+    expect(isSquareMeterUnitMeasure(unit)).toBe(true);
+  });
+  it.each([{ symbol: 'm', name: 'Metro lineal' }, { symbol: 'l', name: 'Litro' }, { symbol: 'pza', name: 'Pieza' }, { symbol: 'm³' }])('excluye unidades distintas de superficie: %j', unit => {
+    expect(isSquareMeterUnitMeasure(unit)).toBe(false);
+  });
 });

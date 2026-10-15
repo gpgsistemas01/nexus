@@ -1,3 +1,4 @@
+import { findPage } from "../../repository/paginationRepository.js";
 import { PresentationNotFound } from "../../errors/warehouse/presentationError.js";
 import { getDb } from "../../repository/baseRepository.js";
 
@@ -19,28 +20,22 @@ export const findAllPresentations = async ({
         })
     };
 
-    const presentations = await getDb().presentation.findMany({
-        skip,
-        take,
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: {
-            id: true,
-            name: true,
-            isActive: true
+    return findPage({
+        model: getDb().presentation,
+        query: {
+            skip,
+            take,
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            select: {
+                id: true,
+                name: true,
+                isActive: true
+            }
         }
     });
-
-    const total = await getDb().presentation.count();
-    const filtered = await getDb().presentation.count({ where });
-
-    return {
-        data: presentations,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 }
 
 const DEFAULT_PRESENTATION_SELECT = {

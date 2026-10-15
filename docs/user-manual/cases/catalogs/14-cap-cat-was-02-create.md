@@ -9,7 +9,7 @@
 
 **Campos editables en modo alta:** **Buscar proveedor...**, **Buscar material de referencia...**,
 **Stock mínimo**, **Costo máximo unitario**, **Nuevo stock**, **Observaciones**,
-**Activo** y, para Rollo, **Peso del cono de la merma (kg)** y **Peso de la merma con cono (kg)**. El nombre, presentación y unidad
+**Activo** y, para Rollo, **Peso del cono de la merma (kg)** y **Peso de la merma con cono (kg)**, **Peso del rollo completo con cono (kg)**. El nombre, presentación y unidad
 provienen del material de referencia y la razón **Stock inicial** es automática. Use **Nueva merma**
 para abrir el formulario y **Guardar** para confirmarlo.
 
@@ -18,12 +18,12 @@ para abrir el formulario y **Guardar** para confirmarlo.
    ![CAP-CAT-WAS-02-CREATE: formulario de registro](../../images/areas/almacen/waste/02-form-registration.png)
 
    La captura debe renovarse para mostrar el orden actual y las medidas bloqueadas
-   de Rollo en una sesión del entorno de prueba.
+   de Rollo, junto con el peso del rollo completo capturado desde merma, en una sesión del entorno de prueba.
 
-2. En **Material de origen**, elija proveedor y material. **Datos de la merma** muestra el nombre precargado, la presentación y la unidad en sus inputs; puede corregir el nombre. No hay un resumen adicional de datos del material.
-   Para **Rollo**, continúe en **Pesos de la merma**: el cono se precarga desde el proveedor y puede corregirse para esta captura. Complete **Peso de la merma con cono (kg)**; este peso corresponde al sobrante, no al rollo completo.
-   En **Medidas de la merma**, ambos inputs permanecen deshabilitados. La dimensión menor se toma del material y la otra se calcula al capturar pesos válidos, conservando su orientación en **Base** o **Altura**. Ambos resultados se guardan. Si faltan referencias, complete los datos todavía no registrados en Materiales antes de continuar; no se habilita un largo manual para Rollo. En otras presentaciones capture ambas medidas.
-   Complete después **Inventario de la merma** y **Existencias y observaciones**. Al borrar o invalidar pesos se limpian los resultados calculados. Después del alta las dimensiones y los pesos quedan para consulta.
+2. En **Material de origen**, elija proveedor y un material en **m²**; los consumibles y las demás unidades no aparecen. Revise nombre, presentación y unidad precargados.
+   Para **Rollo**, complete **Rollo completo (muestra)** con su peso total incluyendo el cono. Capture el peso del cono una sola vez (cero si no tiene) y el peso del sobrante con cono. El sistema descuenta el mismo cono de ambos totales y obtiene el largo original del material; no necesita capturar metros ni un neto de muestra.
+   Ambas medidas permanecen deshabilitadas: el ancho menor procede del material y la otra medida se calcula con la proporción de la muestra. Para **Hoja** u otras presentaciones en m², capture las dos medidas manualmente.
+   Complete inventario, existencia y observaciones. Borrar un peso o el peso del rollo completo limpia el largo calculado. Después del alta, muestra, medidas y pesos quedan para consulta.
 3. Seleccione el botón **Guardar** para registrar la merma.
 
 Si el aviso indica que coinciden proveedor, nombre, medidas y pesos, seleccione
@@ -36,18 +36,15 @@ un error al guardar la entrada conserva los datos del modal de Agregar stock.
 Con pesos distintos puede registrar otra merma. **Ajustar stock** se usa para corregir
 el saldo total con autorización del Administrador del sistema.
 
-### Prepare los pesos del material
+### Rollo completo como muestra
 
-Al dar de alta el material de Rollo y su proveedor, capture en **Pesos del rollo completo**
-el peso del cono y el peso total del rollo nuevo con cono. Esta captura también está
-disponible al crear un material desde una compra. Los pesos quedan para consulta
-una vez guardados; sólo se pueden completar campos que todavía no estén registrados.
-La longitud y el ancho proceden de las dimensiones del material. Registrar una merma
-consulta estas referencias y conserva sus propios pesos; editar el cono de la merma
-no modifica el peso de referencia del proveedor.
+Por ejemplo: rollo de **20 m**, peso completo **2.25 kg**, cono **0.25 kg** y sobrante
+con cono **1.25 kg**. El neto del rollo es **2 kg**, el de la merma **1 kg** y su largo
+calculado **10 m**. El ancho se conserva del material. Estos pesos no se guardan en
+Materiales ni se cambian después del alta de la merma.
 
 <a id="CAP-CAT-WAS-08-REFERENCE"></a>
-La captura de esta preparación corresponde al formulario de material; debe renovarse
-con un material de Rollo existente en el entorno de prueba.
+La captura de muestra debe renovarse con una merma de Rollo que ya tenga esos datos
+en el entorno de prueba. La automatización abre esa merma y no crea registros.
 
 **Compruebe el resultado:** Vuelva al listado y localice el registro guardado. Compruebe sus datos antes de continuar con otra operación.

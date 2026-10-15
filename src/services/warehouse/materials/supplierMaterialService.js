@@ -1,25 +1,7 @@
-import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from "../../../errors/inventory/stockError.js";
+import { findPage } from '../../../repository/paginationRepository.js';
 import { MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
-import { buildStockKey, hasMaterialDimensions, normalizeDecimal, parseStockKey } from "../../../utils/formattersUtils.js";
-import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
-import { INVENTORY_MOVEMENT_TYPES } from "../../../constants/inventory.js";
 
-
-const buildStockErrorMeta = (ps, requestedQuantity = null) => {
-
-    const hasDimensions = hasMaterialDimensions(ps?.material);
-
-    return {
-        materialName: ps?.material?.name ?? 'Material desconocido',
-        materialId: ps?.materialId,
-        supplierId: ps?.supplierId,
-        height: hasDimensions ? ps.material.height : null,
-        base: hasDimensions ? ps.material.base : null,
-        supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido',
-        requestedQuantity
-    };
-};
 
 const SUPPLIER_MATERIAL_SNAPSHOT_INCLUDE = {
     material: {
@@ -42,26 +24,6 @@ const SUPPLIER_MATERIAL_SNAPSHOT_INCLUDE = {
     }
 };
 
-const SUPPLIER_MATERIAL_STOCK_MOVEMENT_SELECT = {
-    id: true,
-    materialId: true,
-    supplierId: true,
-    currentStock: true,
-    convertedQuantity: true,
-    material: {
-        select: {
-            base: true,
-            height: true,
-            name: true
-        }
-    },
-    supplier: {
-        select: {
-            tradeName: true
-        }
-    }
-};
-
 const MATERIAL_USAGE_RELATIONS = [
     'wasteRolls',
     'goodsReceiptDetails',
@@ -79,34 +41,6 @@ const buildMaterialUsageFilters = () => MATERIAL_USAGE_RELATIONS.map(relation =>
 const buildUnusedMaterialFilters = () => MATERIAL_USAGE_RELATIONS.map(relation => ({
     [relation]: { none: {} }
 }));
-
-export const findSupplierMaterialsForStockMovement = async ({
-    tx,
-    where
-}) => {
-
-    const db = getDb(tx);
-
-    return db.supplierMaterial.findMany({
-        where,
-        select: SUPPLIER_MATERIAL_STOCK_MOVEMENT_SELECT
-    });
-};
-
-export const findCurrentSupplierMaterialByMaterialId = async ({
-    tx,
-    materialId
-}) => {
-
-    const db = getDb(tx);
-
-    const currentSupplierMaterial = await db.supplierMaterial.findFirst({
-        where: { materialId },
-        select: { supplierId: true }
-    });
-
-    return currentSupplierMaterial;
-};
 
 const findDeletableMaterialIds = async ({ db, materialIds }) => {
 
@@ -166,43 +100,49 @@ export const findAllSupplierMaterials = async ({
     if (where.AND.length === 0) delete where.AND;
 
     const db = getDb();
-    const supplierMaterials = await db.supplierMaterial.findMany({
-        skip,
-        take,
-        where,
-        select: {
-            id: true,
-            isActive: true,
-            referenceConeWeightKg: true,
-            referenceRollTotalWeightKg: true,
-            ...(canReadCosts && { maxUnitCost: true }),
-            currentStock: true,
-            convertedQuantity: true,
-            material: {
-                select: {
-                    id: true,
-                    name: true,
-                    minStock: true,
-                    base: true,
-                    height: true,
-                    presentation: true,
-                    unitMeasure: true
+    const page = await findPage({
+        model: db.supplierMaterial,
+        totalWhere: type ? { material: { type } } : undefined,
+        hasFilters: Boolean(search || supplierId),
+        query: {
+            skip,
+            take,
+            where,
+            select: {
+                id: true,
+                isActive: true,
+                referenceConeWeightKg: true,
+                referenceRollTotalWeightKg: true,
+                ...(canReadCosts && { maxUnitCost: true }),
+                currentStock: true,
+                convertedQuantity: true,
+                material: {
+                    select: {
+                        id: true,
+                        name: true,
+                        minStock: true,
+                        base: true,
+                        height: true,
+                        presentation: true,
+                        unitMeasure: true
+                    }
+                },
+
+                supplier: {
+                    select: {
+                        id: true,
+                        tradeName: true
+                    }
                 }
             },
-
-            supplier: {
-                select: {
-                    id: true,
-                    tradeName: true
+            orderBy: {
+                material: {
+                    [orderBy]: orderDir
                 }
-            }
-        },
-        orderBy: {
-            material: {
-                [orderBy]: orderDir
             }
         }
     });
+    const supplierMaterials = page.data;
 
     const sorted = supplierMaterials.sort((a, b) => {
 
@@ -214,26 +154,17 @@ export const findAllSupplierMaterials = async ({
         return 0;
     });
 
-    const totalPromise = countTotalSupplierMaterials({
-        ...(type && { where: { material: { type } } })
+    const deletableMaterialIds = await findDeletableMaterialIds({
+        db,
+        materialIds: [...new Set(supplierMaterials.map(({ material }) => material.id))]
     });
-    const hasFilters = Object.keys(where).length > 0;
-    const [deletableMaterialIds, total, filtered] = await Promise.all([
-        findDeletableMaterialIds({
-            db,
-            materialIds: [...new Set(supplierMaterials.map(({ material }) => material.id))]
-        }),
-        totalPromise,
-        hasFilters ? countTotalSupplierMaterials({ where }) : totalPromise
-    ]);
 
     return {
+        ...page,
         data: sorted.map(supplierMaterial => ({
             ...supplierMaterial,
-            ...(deletableMaterialIds.has(supplierMaterial.material.id) ? { canDelete: true } : { canDelete: false })
-        })),
-        recordsTotal: total,
-        recordsFiltered: filtered
+            canDelete: deletableMaterialIds.has(supplierMaterial.material.id)
+        }))
     };
 }
 
@@ -263,6 +194,7 @@ export const findSupplierMaterialByIds = async ({
             material: {
                 select: {
                     id: true,
+                    type: true,
                     name: true,
                     minStock: true,
                     base: true,
@@ -346,18 +278,12 @@ export const findSupplierMaterialsSnapshot = async ({
     return materials;
 }
 
-export const countTotalSupplierMaterials = async ({
-    where
-} = {}) => await getDb().supplierMaterial.count({ where });
-
 export const saveSupplierMaterial = async ({
     tx,
     supplierId,
     materialId,
     maxUnitCost,
-    isActive,
-    referenceConeWeightKg,
-    referenceRollTotalWeightKg
+    isActive
 }) => {
 
     const db = getDb(tx);
@@ -366,8 +292,6 @@ export const saveSupplierMaterial = async ({
         supplierId,
         materialId,
         maxUnitCost,
-        ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
-        ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg }),
         ...(isActive !== undefined && { isActive })
     };
 
@@ -381,41 +305,19 @@ export const saveSupplierMaterial = async ({
         create: data,
         update: {
             maxUnitCost,
-            ...(referenceConeWeightKg !== undefined && { referenceConeWeightKg }),
-            ...(referenceRollTotalWeightKg !== undefined && { referenceRollTotalWeightKg }),
             ...(isActive !== undefined && { isActive })
         }
     });
 };
 
 
-export const recalculateConvertedQuantityByMaterial = async ({
-    tx,
-    materialId,
-    base = null,
-    height = null
-}) => {
-
-    const db = getDb(tx);
-
-    const query = `
-        UPDATE "SupplierMaterial"
-        SET "convertedQuantity" = CASE
-            WHEN $1::numeric > 0 AND $2::numeric > 0
-                THEN ROUND("currentStock" * $1::numeric * $2::numeric, 2)
-            ELSE "currentStock"
-        END
-        WHERE "materialId" = $3::uuid
-    `;
-
-    return db.$executeRawUnsafe(query, base, height, materialId);
-};
 export const updateMaterialUnitCostIfHigher = async ({
+    tx,
     supplierId,
     details
 }) => {
 
-    const db = getDb();
+    const db = getDb(tx);
 
     const maxCostByMaterial = new Map();
 
@@ -463,7 +365,7 @@ export const updateMaterialUnitCostIfHigher = async ({
     return db.$executeRawUnsafe(query, ...params);
 };
 
-export const recalculateMaterialUnitCosts = async ({ supplierId, materialIds }) => {
+export const recalculateMaterialUnitCosts = async ({ tx, supplierId, materialIds }) => {
     const uniqueMaterialIds = [...new Set(materialIds)];
 
     if (uniqueMaterialIds.length === 0) return { count: 0 };
@@ -483,91 +385,7 @@ export const recalculateMaterialUnitCosts = async ({ supplierId, materialIds }) 
           AND sp."materialId" IN (${placeholders})
     `;
 
-    return getDb().$executeRawUnsafe(query, supplierId, ...uniqueMaterialIds);
-};
-
-export const updateSupplierMaterialStock = async ({
-    tx,
-    grouped,
-    movementType,
-    supplierMaterials
-}) => {
-
-    const db = getDb(tx);
-
-    const psMap = new Map(supplierMaterials.map(ps => [buildStockKey(ps.materialId, ps.supplierId), ps]));
-
-    for (const [key, quantity] of grouped.entries()) {
-
-        const { materialId, supplierId } = parseStockKey(key);
-
-        const ps = psMap.get(key);
-
-        if (!ps) throw new GoodsIssueInexistentStock(buildStockErrorMeta(ps));
-
-        const convertedQuantity = calculateConvertedQuantity({
-            quantity,
-            base: ps.material.base,
-            height: ps.material.height
-        });
-
-        if (movementType !== INVENTORY_MOVEMENT_TYPES.ENTRY) {
-
-            const remainingStock = normalizeDecimal(Number(ps.currentStock ?? 0));
-            const hasDimensions = hasMaterialDimensions(ps.material);
-
-            const result = await db.supplierMaterial.updateMany({
-                where: {
-                    supplierId,
-                    materialId,
-                    currentStock: { gte: quantity }
-                },
-                data: {
-                    currentStock: { decrement: quantity },
-                    convertedQuantity: !hasDimensions || remainingStock === 0
-                        ? remainingStock
-                        : { decrement: convertedQuantity }
-                }
-            });
-
-            if (result.count < 1) {
-                throw new GoodsIssueInsufficientStock(buildStockErrorMeta(ps, quantity));
-            }
-
-        } else {
-
-            await db.supplierMaterial.update({
-                where: {
-                    supplierId_materialId: { supplierId, materialId }
-                },
-                data: {
-                    currentStock: { increment: quantity },
-                    convertedQuantity: { increment: convertedQuantity }
-                }
-            });
-        }
-    }
-}
-
-export const adjustSupplierMaterialStock = async ({
-    tx,
-    materialId,
-    supplierId,
-    newStock,
-    newConvertedQuantity
-}) => {
-
-    const db = getDb(tx);
-
-    return await db.supplierMaterial.update({
-        where: {
-            supplierId_materialId: { materialId, supplierId }
-        },
-        data: {
-            currentStock: newStock,
-            convertedQuantity: newConvertedQuantity
-        }
-    });
+    return getDb(tx).$executeRawUnsafe(query, supplierId, ...uniqueMaterialIds);
 };
 
 export const deleteSupplierMaterial = async ({

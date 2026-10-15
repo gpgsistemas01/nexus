@@ -1,3 +1,5 @@
+import { lockSupplierMaterialStock } from '../../../../repository/warehouse/stockLockRepository.js';
+import { lockGoodsReceipt } from '../../../../repository/warehouse/documentLockRepository.js';
 import { isAppError } from '../../../../errors/AppError.js';
 import { GOODS_RECEIPT_DETAIL_CHANGE_TYPES } from '../../../../constants/goodsReceiptDetailChanges.js';
 import { GoodsIssueInsufficientStock } from '../../../../errors/inventory/stockError.js';
@@ -14,7 +16,8 @@ import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
 import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
 import { recalculateMaterialUnitCosts } from '../../materials/supplierMaterialService.js';
-import { buildGoodsReceiptDetails, correctGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
+import { calculateGoodsReceiptDetail } from '../goodsReceiptHelpers.js';
+import { correctGoodsReceiptDetailAndTotals } from '../goodsReceiptTotalsService.js';
 import {
     createGoodsReceiptDetailChange,
     createGoodsReceiptDetailChangeMovementAndUpdateStock,
@@ -36,17 +39,22 @@ export const correctGoodsReceiptDetailLine = async ({
 
     try {
         const result = await getDb().$transaction(async (tx) => {
+            await lockGoodsReceipt({ tx, id });
             const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId, type });
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
             if (currentDetail.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED) {
                 throw new GoodsReceiptDetailAlreadyCanceled();
             }
-            const [correctedDetail] = await buildGoodsReceiptDetails([{
+            await lockSupplierMaterialStock({
+                tx,
                 materialId: currentDetail.materialId,
-                quantity,
-                costPerUnitType
-            }], { tx, requireActive: false });
+                supplierId: currentDetail.goodsReceipt.supplierId
+            });
+            const correctedDetail = calculateGoodsReceiptDetail({
+                material: currentDetail.material,
+                detail: { quantity, costPerUnitType }
+            });
             const correctedQuantity = normalizeDecimal(correctedDetail.quantity);
             const currentQuantity = normalizeDecimal(currentDetail.quantity);
             const quantityDifference = normalizeDecimal(correctedQuantity - currentQuantity);
@@ -96,17 +104,18 @@ export const correctGoodsReceiptDetailLine = async ({
                 changedById: userId
             });
 
+            await recalculateMaterialUnitCosts({
+                tx,
+                supplierId: updatedReceipt.supplierId,
+                materialIds: [updatedDetail.materialId]
+            });
+
             return {
                 updatedDetail,
                 updatedReceipt,
                 detailChange,
                 movement
             };
-        });
-
-        await recalculateMaterialUnitCosts({
-            supplierId: result.updatedReceipt.supplierId,
-            materialIds: [result.updatedDetail.materialId]
         });
 
         return result;

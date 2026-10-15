@@ -19,11 +19,13 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
 | `IssueDto` | control | [`wasteIssueDTO.js`](../../../../../../src/dtos/wasteIssueDTO.js) |
-| `Service` | control | [`wasteIssueService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueService.js) |
+| `Service` | control | [`wasteIssueDetailService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueDetailService.js) |
+| `DetailRepository` | control | [`issueDetailRepository.js`](../../../../../../src/repository/warehouse/issueDetailRepository.js) |
+| `Status` | control | [`wasteIssueFulfillmentService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js) |
 | `Rules` | control | [`issueFulfillmentRules.js`](../../../../../../src/services/warehouse/issues/issueFulfillmentRules.js) |
 | `Movement` | control | [`wasteMovementService.js`](../../../../../../src/services/warehouse/wastes/wasteMovementService.js) |
 | `Stock` | control | [`wasteInventoryService.js`](../../../../../../src/services/warehouse/wastes/wasteInventoryService.js) |
-| `Status` | control | [`wasteIssueFulfillmentService.js`](../../../../../../src/services/warehouse/wasteIssues/wasteIssueFulfillmentService.js) |
+| `StockUpdateRepo` | control | [`stockUpdateRepository.js`](../../../../../../src/repository/warehouse/stockUpdateRepository.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `ValidationRules` | control | [`wasteIssueValidations.js`](../../../../../../src/validators/forms/wasteIssueValidations.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
@@ -94,11 +96,13 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Controller@{ "type": "control" } as wasteIssueController.js
     participant IssueDto@{ "type": "control" } as DTO funcional<br/>wasteIssueDTO.js
-    participant Service@{ "type": "control" } as wasteIssueService.js
+    participant Service@{ "type": "control" } as wasteIssueDetailService.js
+    participant Status@{ "type": "control" } as wasteIssueFulfillmentService.js
+    participant DetailRepository@{ "type": "control" } as issueDetailRepository.js
     participant Rules@{ "type": "control" } as issueFulfillmentRules.js
     participant Movement@{ "type": "control" } as wasteMovementService.js
+    participant StockUpdateRepo@{ "type": "control" } as stockUpdateRepository.js
     participant Stock@{ "type": "control" } as wasteInventoryService.js
-    participant Status@{ "type": "control" } as wasteIssueFulfillmentService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket@{ "type": "control" } as socketUtils.js
 
@@ -117,17 +121,21 @@ sequenceDiagram
     Service->>Status: findWasteIssueFulfillmentStatusIds(tx)
     loop Cada detalle nuevo con isSupplied
         Service->>Rules: resolveIssueDetailFulfillmentStatus(detail)
-        Service->>Prisma: tx.wasteIssueDetail.update({ where, data })
         Service->>Service: supplyDetails.push({ wasteIssueDetailId, quantity })
     end
+    Service->>DetailRepository: updateWasteIssueDetails({ tx, id, details: updates })
+    DetailRepository->>Prisma: tx.$executeRaw(UPDATE WasteIssueDetail FROM VALUES)
+    DetailRepository-->>Service: updateWasteIssueDetails(): Promise[number]
     Service->>Movement: applyWasteMovement({ tx, reference: { wasteIssueId }, movementType: ISSUE, details })
-    Movement->>Stock: applyWasteStockChange({ tx, id: wasteId, quantityChange, convertedQuantityChange })
+    Movement->>Stock: applyWasteStockChanges({ tx, changes: cambios agrupados })
+    Stock->>StockUpdateRepo: updateWasteStocks({ tx, changes })
+    StockUpdateRepo->>Prisma: tx.$queryRaw(CTE de bloqueo ordenado y UPDATE RETURNING)
+    StockUpdateRepo-->>Stock: updateWasteStocks(): Promise[Waste[]]
     Movement->>Movement: createWasteMovement({ tx, reference, movementType: ISSUE, details })
     Movement->>FileBaseRepository: getDb(tx)
     FileBaseRepository-->>Movement: getDb(): PrismaClient | TransactionClient — conserva tx
     Movement->>Prisma: db.wasteMovement.create({ data, include: { details: true } })
-    Service->>Prisma: tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } })
-    Service->>Rules: resolveIssueFulfillmentStatus(details)
+    Service->>Rules: resolveIssueFulfillmentStatus(issue.details)
     Service->>Prisma: tx.wasteIssue.update({ where, data })
     alt Commit confirmado
         Service-->>Controller: updateWasteIssueDetails(): Promise[WasteIssue]

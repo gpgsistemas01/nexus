@@ -1,13 +1,7 @@
 import { buildGoodsReceiptContextWhere } from '../goodsReceiptHelpers.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
-import { createInventoryMovement } from '../../../inventory/movementService.js';
-import { buildInventoryMovementDetail } from '../../../inventory/movementHelpers.js';
-import { assertSufficientStock, calculateConvertedQuantity } from '../../../inventory/stockHelpers.js';
+import { applyInventoryMovement } from '../../../inventory/movementService.js';
 import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
-import {
-    adjustSupplierMaterialStock,
-    findSupplierMaterialByIds
-} from '../../materials/supplierMaterialService.js';
 
 export const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     ACTIVE: 'ACTIVE',
@@ -39,54 +33,17 @@ export const createGoodsReceiptDetailChangeMovementAndUpdateStock = async ({
 
     if (normalizedQuantityDifference === 0) return null;
 
-    const supplierId = currentDetail.goodsReceipt.supplierId;
-    const supplierMaterial = await findSupplierMaterialByIds({
-        tx,
-        materialId: currentDetail.materialId,
-        supplierId
-    });
-    const previousStock = normalizeDecimal(supplierMaterial.currentStock ?? 0);
-    const previousConvertedQuantity = normalizeDecimal(supplierMaterial.convertedQuantity ?? 0);
-    const convertedDifference = calculateConvertedQuantity({
-        quantity: normalizedQuantityDifference,
-        base: currentDetail.material.base,
-        height: currentDetail.material.height
-    });
-    const newStock = normalizeDecimal(previousStock + normalizedQuantityDifference);
-    const newConvertedQuantity = normalizeDecimal(previousConvertedQuantity + convertedDifference);
-
-    assertSufficientStock({
-        material: supplierMaterial,
-        newStock,
-        newConvertedQuantity,
-        requestedQuantity: Math.abs(normalizedQuantityDifference)
-    });
-
-    const movement = await createInventoryMovement({
+    return applyInventoryMovement({
         tx,
         movementType: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT,
         reference: { goodsReceiptId },
-        details: [buildInventoryMovementDetail({
+        details: [{
             materialId: currentDetail.materialId,
-            supplierId,
+            supplierId: currentDetail.goodsReceipt.supplierId,
             quantity: normalizedQuantityDifference,
-            previousStock,
-            newStock,
-            materialBase: currentDetail.material.base,
-            materialHeight: currentDetail.material.height,
             goodsReceiptDetailId
-        })]
+        }]
     });
-
-    await adjustSupplierMaterialStock({
-        tx,
-        materialId: currentDetail.materialId,
-        supplierId,
-        newStock,
-        newConvertedQuantity
-    });
-
-    return movement;
 };
 
 export const createGoodsReceiptDetailChange = async ({
@@ -105,9 +62,7 @@ export const createGoodsReceiptDetailChange = async ({
         data: {
             goodsReceiptId,
             goodsReceiptDetailId,
-            changedBy: {
-                connect: { id: changedById }
-            },
+            changedById,
             reasonId,
             inventoryMovementId,
             previousMaterialId: currentDetail.materialId,

@@ -48,61 +48,27 @@ flowchart TB
 | Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/validations/weightValidations.js`<br/>`src/public/js/constants/apiMessages.js` |
 | Selección y pesos de merma | `src/public/js/ui/inventory/wasteFormUI.js` y `src/public/js/plugins/select2/domains/wasteMaterialTemplate.js` |
 
-El formulario existente de material captura los dos pesos de referencia con
-sus listas de campos, `setFormDisabled` y `setFormSectionVisibility`. Guarda los valores
-originales al abrirlo y bloquea por campo cada peso ya registrado, incluido el cono cero;
-permite completar sólo referencias nulas. El normalizador recupera la referencia
-bloqueada para validar y enviar la pareja cuando se completa el otro peso. La merma consulta
-los valores en la selección de material, mantiene el cono editable y calcula neto
-y largo automático sin administrar referencias en otro modal. El servidor calcula
-los resultados con la referencia vigente y conserva los resultados registrados.
+La muestra es el rollo completo. El formulario pide **Peso del rollo completo con
+cono (kg)**, además del cono y el total del sobrante. No pide largo ni peso neto de
+muestra; el largo ya existe en el material seleccionado y el mismo cono se resta de
+ambos totales. Los datos anteriores de material/proveedor no se modifican.
 
-Las referencias son opcionales y sólo se muestran para materiales Rollo. La sección
-se oculta en consumibles, otras presentaciones y ajustes de stock; en consulta sólo
-se muestra si tiene valores. En alta o edición los campos faltantes se habilitan,
-sin `required`, y los ya registrados permanecen visibles y deshabilitados.
+Select2 entrega el objeto a `applyWasteMaterialTemplate`. La UI prepara una vez ancho,
+orientación y largo nominal con `prepareWasteRollReference`, precarga identificación
+y limpia los pesos. Los eventos `input` de los tres pesos actualizan neto y largo con
+las utilidades compartidas, sin consultas ni reconstrucciones de la selección.
+El neto del sobrante funciona aunque falte el peso del rollo completo.
 
-Ante `WASTE_ALREADY_EXISTS`, el alta ofrece **Abrir Agregar stock** si el usuario
-tiene `wastes:add-stock`. Confirmar el Swal cierra el alta y abre el modal existente
-con la merma devuelta por el servidor, la cantidad y las observaciones capturadas;
-cancelar conserva el alta. Una cantidad inicial de cero deja vacío el campo del modal
-para capturar una cantidad positiva. El Swal no registra entradas ni recarga la tabla.
-Sólo guardar el modal ejecuta `wasteStockAdditionForm`, que reutiliza `useForm`,
-su validación y `handleSubmit` con `addWasteStock`. El listado usa el mismo modal.
+Ambas medidas de Rollo siguen deshabilitadas; el normalizador las incorpora al payload
+junto a los tres pesos capturados. El servidor guarda el total del rollo completo y los resultados finales; el largo y
+neto de muestra se calculan sin persistirlos en registros nuevos. Las muestras de registros anteriores se muestran en **Referencia histórica**,
+sólo para consulta; no se recalculan ni se convierten en pesos de rollo completo.
+En otras presentaciones en m² se capturan medidas manuales y se ocultan los pesos.
 
-Select2 entrega los datos del evento a `applyWasteMaterialTemplate`. La normalización
-reconstruye únicamente las relaciones JSON que requiere el selector; no convierte
-pesos ni traslada campos de proveedor a material. La respuesta conserva
-`supplierMaterials`, con la oferta activa y sus referencias. Cada rollo sigue siendo
-una opción independiente, aunque comparta el costo máximo de su familia.
+Ante `WASTE_ALREADY_EXISTS`, confirmar el Swal abre Agregar stock con cantidad y
+observaciones, sujeto a `wastes:add-stock`. Sólo guardar ese modal registra la entrada;
+cancelar conserva el alta. Este recorrido no se modifica.
 
-Al seleccionar, la UI conserva el objeto y prepara una vez la referencia mediante
-`prepareWasteRollReference`: orientación, dimensión menor fija, longitud nominal y
-neto del rollo completo. `displayWasteMaterialTemplate` sólo muestra información;
-`configureWasteWeightFields` configura los controles según presentación y modo.
-La limpieza del proveedor se registra en la dependencia compartida, por lo que
-funciona también con cambios programáticos. La primera limpieza descarta la
-selección y sus cálculos; las notificaciones posteriores del estado del selector
-no repiten esa preparación. Abrir el selector no borra la selección.
-
-Sólo los eventos `input` de cono y total actualizan neto y longitud. La UI consume
-las fórmulas compartidas y la referencia preparada sin reconstruir la selección ni
-llamar a validadores del formulario. Al borrar o invalidar un peso se limpia la
-longitud calculada. Ambas dimensiones de Rollo permanecen deshabilitadas desde la
-selección, incluso si faltan pesos o referencias; no se permite captura manual en el
-formulario. `normalizeData` incorpora sus valores a la solicitud porque `FormData`
-omite controles deshabilitados. Nombre, presentación, unidad y cono se precargan en
-sus inputs, sin el resumen de datos del material seleccionado;
-`wasteCreateFields` excluye el neto y las referencias del payload. La validación del
-envío comprueba las dimensiones finales con los validadores positivos existentes.
-
-La apertura de edición, ajuste o consulta configura los pesos y muestra los datos
-persistidos sin recalcular. Las reglas de entrada permanecen en
-`validations/weightValidations.js` y `fieldValidations.js`; el servidor comprueba
-la oferta y obtiene sus propios resultados dentro de la transacción.
-
-El orden visible de merma es origen, datos de merma, pesos, medidas, inventario y
-existencias/observaciones. Material conserva datos de identificación, medidas,
-pesos del rollo completo, inventario y existencias/observaciones. Los pesos del
-rollo completo se capturan al registrar material, también desde compras; los pesos
-de merma corresponden al sobrante y no actualizan las referencias.
+El orden visible es origen, datos de merma, rollo completo, pesos del sobrante,
+medidas, inventario y existencias/observaciones. Material y consumible mantienen su
+comportamiento de dimensiones por unidad.

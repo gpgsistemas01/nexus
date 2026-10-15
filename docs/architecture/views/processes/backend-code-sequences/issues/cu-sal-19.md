@@ -19,7 +19,8 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`goodsIssueHandlers.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/shared/goodsIssueHandlers.js) |
 | `Facade` | control | [`consumableGoodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js) |
-| `Core` | control | [`goodsIssueService.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js) |
+| `Core` | control | [`goodsIssueDetailService.js`](../../../../../../src/services/warehouse/goodsIssues/goodsIssueDetailService.js) |
+| `DetailRepository` | control | [`issueDetailRepository.js`](../../../../../../src/repository/warehouse/issueDetailRepository.js) |
 | `Inventory` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `DTO` | control | [`goodsIssueDTO.js`](../../../../../../src/dtos/goodsIssueDTO.js) |
@@ -32,8 +33,10 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
 | `MovementHelpers` | control | [`movementHelpers.js`](../../../../../../src/services/inventory/movementHelpers.js) |
-| `SupplierMaterial` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `StockChecks` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `DocumentLock` | control | [`documentLockRepository.js`](../../../../../../src/repository/warehouse/documentLockRepository.js) |
+| `StockBalance` | control | [`supplierMaterialStockService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialStockService.js) |
+| `StockUpdateRepo` | control | [`stockUpdateRepository.js`](../../../../../../src/repository/warehouse/stockUpdateRepository.js) |
 
 ### Configuración y construcción
 
@@ -121,7 +124,7 @@ sequenceDiagram
     participant Controller@{ "type": "control" } as goodsIssueHandlers.js
     participant Formatter@{ "type": "control" } as formattersUtils.js
     participant Facade@{ "type": "control" } as consumableGoodsIssueService.js
-    participant Core@{ "type": "control" } as goodsIssueService.js
+    participant Core@{ "type": "control" } as goodsIssueDetailService.js
     participant Socket@{ "type": "control" } as socketUtils.js
     participant DTO@{ "type": "control" } as DTO funcional<br/>goodsIssueDTO.js
     participant ErrorHandler@{ "type": "control" } as app.js
@@ -151,122 +154,90 @@ sequenceDiagram
 
 ## Colaboración interna del dominio
 
-Este nivel amplía la invocación `Facade → Core` anterior. Conserva consultas, reglas,
-helpers y contexto de persistencia. Su error retorna al adaptador y se propaga según
-la primera figura; los mensajes se numeran de nuevo dentro de esta colaboración.
+El surtido consulta cantidades y estados después de bloquear la salida. El mismo tx
+protege las líneas, existencias, movimiento y estado final.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Facade@{ "type": "control" } as consumableGoodsIssueService.js
-    participant Core@{ "type": "control" } as goodsIssueService.js
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Inventory@{ "type": "control" } as movementService.js
+    participant Core@{ "type": "control" } as goodsIssueDetailService.js
+    participant DetailRepository@{ "type": "control" } as issueDetailRepository.js
+    participant DocumentLock@{ "type": "control" } as documentLockRepository.js
     participant Fulfillment@{ "type": "control" } as fulfillmentStatusService.js
-
-    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
-
-    Facade->>Core: updateGoodsIssueDetails({ ...options, type: CONSUMABLE })
-    activate Core
-    alt Servicio resuelto
-        Core->>Prisma: goodsIssue.findUnique({ where: { id, ...contextWhere }, include: detalles })
-        Core->>Core: updateGoodsIssueDetails() — calcular cantidades pendientes tras validar estado
-        Core->>FileBaseRepository: getDb()
-        FileBaseRepository-->>Core: getDb(): PrismaClient | TransactionClient — tx si se recibió
-        Core->>Prisma: db.$transaction(async tx => ...)
-        rect rgb(245, 245, 245)
-            Note over Core,Prisma: getDb().$transaction(async tx => ...)
-            Core->>Prisma: tx.goodsIssue.findUnique({ where: { id, ...contextWhere }, select: { id: true } })
-            Core->>Fulfillment: findFulfillmentStatusIdsByName({ tx, names })
-            opt Hay cantidades pendientes por surtir
-                Core->>Inventory: applyInventoryMovement({ tx, movementType: ISSUE, details })
-            end
-            Core->>Prisma: tx.goodsIssueDetail.update({ where: { id: detailId }, data: cantidades y cumplimiento })
-            Core->>Prisma: tx.goodsIssueDetail.findMany({ where: { goodsIssueId: id } })
-            Core->>Prisma: tx.goodsIssue.update({ where: { id, ...contextWhere }, data: cumplimiento })
-        end
-        Prisma-->>Core: commit de surtido
-        Core-->>Facade: updateGoodsIssueDetails(): Promise[GoodsIssue]
-    else Error de dominio o persistencia
-        Core-->>Facade: error — rollback si falló la transacción
+    participant Inventory@{ "type": "control" } as movementService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    Facade->>Core: updateGoodsIssueDetails({ id, goodsIssueDto, type })
+    Core->>Prisma: getDb().$transaction(async tx)
+    Core->>DocumentLock: lockGoodsIssue({ tx, id })
+    DocumentLock->>Prisma: tx.$queryRaw(SELECT GoodsIssue FOR UPDATE)
+    Prisma-->>DocumentLock: bloqueo hasta commit o rollback
+    Core->>Prisma: tx.goodsIssue.findUnique({ where, select })
+    Prisma-->>Core: findUnique(): Promise[GoodsIssue]
+    Core->>Fulfillment: findFulfillmentStatusIdsByName({ tx, names })
+    Note over Core: Validar ids, preparar cambios y actualizar snapshot en un recorrido
+    Core->>DetailRepository: updateGoodsIssueDetails({ tx, id, details: updates })
+    DetailRepository->>Prisma: tx.$executeRaw(UPDATE GoodsIssueDetail FROM VALUES)
+    Prisma-->>DetailRepository: $executeRaw(): Promise[number]
+    DetailRepository-->>Core: updateGoodsIssueDetails(): Promise[number]
+    opt Hay pendiente por surtir
+        Core->>Inventory: applyInventoryMovement({ tx, reference, details, movementType })
     end
-    deactivate Core
+    Core->>Prisma: tx.goodsIssue.update({ where, data, select })
+    Prisma-->>Core: commit y salida actualizada
+    Core-->>Facade: updateGoodsIssueDetails(): Promise[GoodsIssue]
 ```
 
 ## Detalle de preparación del movimiento de inventario
 
-Amplía `applyInventoryMovement`. La búsqueda de relaciones se omite cuando el caller
-ya proporciona `supplierMaterials`. Las salidas comprueban suficiencia; las entradas
-usan cantidades positivas. Todos los colaboradores reciben el mismo `tx`.
+Todos los colaboradores conservan el mismo `tx` de la operación.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Inventory@{ "type": "control" } as movementService.js
     participant MovementHelpers@{ "type": "control" } as movementHelpers.js
-    participant SupplierMaterial@{ "type": "control" } as supplierMaterialService.js
-    participant Formatter@{ "type": "control" } as formattersUtils.js
-    participant StockChecks@{ "type": "control" } as stockHelpers.js
-
-    Note over Inventory: Recorre details y comprueba materialId y supplierId antes de agrupar
+    participant StockBalance@{ "type": "control" } as supplierMaterialStockService.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     Inventory->>MovementHelpers: buildStockUpdateSummary({ details })
-    MovementHelpers->>Formatter: buildStockKey(materialId, supplierId)
-    MovementHelpers->>Formatter: normalizeDecimal(quantity)
-    MovementHelpers-->>Inventory: buildStockUpdateSummary(): Object — stockKeys y grouped
-    opt supplierMaterials no proporcionado
-        Inventory->>SupplierMaterial: findSupplierMaterialsForStockMovement({ tx, where })
-        SupplierMaterial-->>Inventory: findSupplierMaterialsForStockMovement(): Promise[SupplierMaterial[]]
+    MovementHelpers-->>Inventory: buildStockUpdateSummary(): Object — grouped
+    opt El caller no proporcionó las ofertas
+        Inventory->>StockBalance: findSupplierMaterialsForStockMovement({ tx, where })
+        StockBalance->>Prisma: tx.supplierMaterial.findMany({ where, select })
+        Prisma-->>StockBalance: findMany(): Promise[SupplierMaterial[]]
+        StockBalance-->>Inventory: findSupplierMaterialsForStockMovement(): Promise[SupplierMaterial[]]
     end
-    loop Cada detalle del movimiento
-        Inventory->>Formatter: buildStockKey(detail.materialId, detail.supplierId)
-        break Relación proveedor-material no encontrada
-            Inventory-->>Inventory: throw GoodsIssueInexistentStock
-        end
-        Inventory->>Formatter: hasMaterialDimensions(ps.material)
-        Inventory->>Formatter: normalizeDecimal(detail.quantity)
-        Inventory->>StockChecks: calculateConvertedQuantity({ quantity, base, height })
-        StockChecks-->>Inventory: calculateConvertedQuantity(): number
-        opt movementType es ISSUE
-            Inventory->>StockChecks: assertSufficientStock({ material, newStock, requestedQuantity })
-        end
-        Inventory->>MovementHelpers: buildInventoryMovementDetail({ quantity: signedQuantity, previousStock, newStock, materialId, supplierId })
-        MovementHelpers-->>Inventory: buildInventoryMovementDetail(): Object
-    end
+    Inventory->>Inventory: Map(offers) — indexar identidades
 ```
 
 ## Detalle de escritura del movimiento y las existencias
 
-Continúa con `movementDetails` y el resumen anterior. Primero se registra el movimiento;
-después se actualizan las existencias agrupadas. Un fallo revierte ambas escrituras
-cuando el caller las ejecuta dentro de su transacción.
+Todos los colaboradores conservan el mismo `tx` de la operación.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Inventory@{ "type": "control" } as movementService.js
-    participant SupplierMaterial@{ "type": "control" } as supplierMaterialService.js
-    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant StockUpdateRepo@{ "type": "control" } as stockUpdateRepository.js
+    participant StockBalance@{ "type": "control" } as supplierMaterialStockService.js
+    participant MovementHelpers@{ "type": "control" } as movementHelpers.js
     participant StockChecks@{ "type": "control" } as stockHelpers.js
-
-    Inventory->>Inventory: createInventoryMovement({ tx, reference, details: movementDetails, movementType })
-    Inventory->>FileBaseRepository: getDb(tx)
-    FileBaseRepository-->>Inventory: getDb(): TransactionClient — tx del caller
-    Inventory->>Prisma: db.inventoryMovement.create({ data, include: { details: true } })
-    Prisma-->>Inventory: create(): Promise[InventoryMovement]
-    Inventory->>SupplierMaterial: updateSupplierMaterialStock({ tx, grouped, movementType, supplierMaterials })
-    SupplierMaterial->>FileBaseRepository: getDb(tx)
-    FileBaseRepository-->>SupplierMaterial: getDb(): TransactionClient — mismo tx
-    loop Cada relación agrupada material-proveedor
-        SupplierMaterial->>StockChecks: calculateConvertedQuantity({ quantity, base, height })
-        alt movementType es ENTRY
-            SupplierMaterial->>Prisma: db.supplierMaterial.update({ where, data: { currentStock: { increment: quantity } } })
-        else Movimiento de salida
-            SupplierMaterial->>Prisma: db.supplierMaterial.updateMany({ where: { currentStock: { gte: quantity } }, data })
-            break result.count menor que 1
-                SupplierMaterial-->>Inventory: throw GoodsIssueInsufficientStock
-            end
-        end
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    Inventory->>StockBalance: updateSupplierMaterialStock({ tx, grouped, movementType, supplierMaterialsByKey })
+    loop Preparar cambios por identidad
+        StockBalance->>StockChecks: calculateConvertedQuantity({ quantity, base, height })
+        StockChecks-->>StockBalance: calculateConvertedQuantity(): number
     end
-    SupplierMaterial-->>Inventory: updateSupplierMaterialStock(): Promise[void]
+    StockBalance->>StockUpdateRepo: updateSupplierMaterialStocks({ tx, changes })
+    StockUpdateRepo->>Prisma: tx.$queryRaw(CTE de bloqueo ordenado y UPDATE RETURNING)
+    Prisma-->>StockUpdateRepo: $queryRaw(): Promise[SupplierMaterial[]]
+    StockUpdateRepo-->>StockBalance: updateSupplierMaterialStocks(): Promise[SupplierMaterial[]]
+    StockBalance-->>Inventory: updateSupplierMaterialStock(): Promise[Map]
+    loop Cada detalle conserva su relación e historial
+        Inventory->>MovementHelpers: buildInventoryMovementDetail({ previousStock, newStock, quantity, ... })
+        MovementHelpers-->>Inventory: buildInventoryMovementDetail(): Object
+    end
+    Inventory->>Inventory: createInventoryMovement({ tx, reference, details, movementType })
+    Inventory->>Prisma: tx.inventoryMovement.create({ data, include })
+    Prisma-->>Inventory: create(): Promise[InventoryMovement]
 ```

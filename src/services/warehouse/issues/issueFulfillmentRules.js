@@ -19,8 +19,13 @@ export const resolveIssueDetailFulfillmentStatus = detail => {
 };
 
 export const resolveIssueFulfillmentStatus = details => {
-    if (details.every(isDetailComplete)) return FULFILLMENT_STATUS_NAMES.COMPLETE;
-    if (details.some(isDetailPartiallySupplied)) return FULFILLMENT_STATUS_NAMES.PARTIAL;
+    let allComplete = true;
+    let hasSuppliedQuantity = false;
+    for (const detail of details) {
+        allComplete &&= isDetailComplete(detail);
+        hasSuppliedQuantity ||= isDetailPartiallySupplied(detail);
+        if (!allComplete && hasSuppliedQuantity) return FULFILLMENT_STATUS_NAMES.PARTIAL;
+    }
 
-    return FULFILLMENT_STATUS_NAMES.PENDING;
+    return allComplete ? FULFILLMENT_STATUS_NAMES.COMPLETE : FULFILLMENT_STATUS_NAMES.PENDING;
 };

@@ -5,6 +5,7 @@ import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
 import { findAllSuppliers } from "./supplierService.js";
 import { FULFILLMENT_STATUS_NAMES, GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
+import { findBatches } from '../../repository/paginationRepository.js';
 
 import { getMaterialLengthField } from '../../public/js/utils/warehouseInventoryUtils.js';
 
@@ -43,14 +44,14 @@ const WASTE_REPORT_SELECT = {
 
 const mapMaterialRows = (materials = []) => materials.map((item) => ({
     supplier: item.supplier?.tradeName,
-    name: item.name,
-    base: toNumber(item.base),
-    height: toNumber(item.height),
+    name: item.material.name,
+    base: toNumber(item.material.base),
+    height: toNumber(item.material.height),
     currentStock: toNumber(item.currentStock),
-    minStock: toNumber(item.minStock),
-    presentation: item.presentation?.name,
+    minStock: toNumber(item.material.minStock),
+    presentation: item.material.presentation?.name,
     convertedQuantity: toNumber(item.convertedQuantity),
-    unitMeasure: item.unitMeasure?.name,
+    unitMeasure: item.material.unitMeasure?.name,
     maxUnitCost: toNumber(item.maxUnitCost)
 }));
 
@@ -72,15 +73,9 @@ const mapWasteRows = (wastes = []) => wastes.map((item) => ({
     maxUnitCost: toNumber(item.maxUnitCost)
 }));
 
-const mapInventoryReportMaterial = ({ material, supplier, ...stock }) => ({
-    ...material,
-    ...stock,
-    supplier
-});
-
-const mapIssueDetailRow = ({ issue, detail, material, supplier }) => ({
+const mapIssueDetailRow = ({ issue, detail, material, supplier, requestDate }) => ({
     referenceNumber: issue.referenceNumber,
-    requestDate: formatDateLongWithTime(issue.requestDate),
+    requestDate,
     departmentName: issue.departmentName,
     requesterName: issue.requesterName,
     clientName: issue.clientName,
@@ -100,74 +95,72 @@ const mapIssueDetailRow = ({ issue, detail, material, supplier }) => ({
     detailFulfillmentStatusName: detail.fulfillmentStatus?.name
 });
 
-const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId = '' } = {}) => goodsIssues.flatMap((goodsIssue) => {
+const mapGoodsIssueDetailRows = (goodsIssues = [], { supplierId = '', materialId = '' } = {}) => {
+    const rows = [];
+    for (const issue of goodsIssues) {
+        const requestDate = formatDateLongWithTime(issue.requestDate);
+        for (const detail of issue.details || []) {
+            if (detail.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED
+                || (supplierId && detail.supplierId !== supplierId)
+                || (materialId && detail.materialId !== materialId)) continue;
 
-    const details = (goodsIssue.details || []).filter((detail) => {
-        const isCanceledDetail = detail.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED;
+            rows.push(mapIssueDetailRow({ issue, detail, material: detail.material, supplier: detail.supplier, requestDate }));
+        }
+    }
+    return rows;
+};
 
-        return (
-            !isCanceledDetail &&
-            (!supplierId || detail.supplierId === supplierId) &&
-            (!materialId || detail.materialId === materialId)
-        );
-    });
+const mapWasteIssueDetailRows = (wasteIssues = []) => {
+    const rows = [];
+    for (const issue of wasteIssues) {
+        const requestDate = formatDateLongWithTime(issue.requestDate);
+        for (const detail of issue.details || []) {
+            if (detail.fulfillmentStatus?.name === FULFILLMENT_STATUS_NAMES.CANCELED) continue;
 
-    return details.map(detail => mapIssueDetailRow({
-        issue: goodsIssue,
-        detail,
-        material: detail.material,
-        supplier: detail.supplier
-    }));
-});
+            rows.push(mapIssueDetailRow({
+                issue,
+                detail,
+                material: { name: detail.waste?.name, base: detail.waste?.base, height: detail.waste?.height },
+                supplier: detail.waste?.supplier,
+                requestDate
+            }));
+        }
+    }
+    return rows;
+};
 
-const mapWasteIssueDetailRows = (wasteIssues = []) => wasteIssues.flatMap((wasteIssue) => (
-    (wasteIssue.details || [])
-        .filter(detail => detail.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.CANCELED)
-        .map(detail => mapIssueDetailRow({
-            issue: wasteIssue,
-            detail,
-            material: {
-                name: detail.waste?.name,
-                base: detail.waste?.base,
-                height: detail.waste?.height
-            },
-            supplier: detail.waste?.supplier
-        }))
-));
+const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {}) => {
+    const rows = [];
+    for (const goodsReceipt of goodsReceipts) {
+        if (goodsReceipt.status?.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) continue;
 
-const mapGoodsReceiptDetailRows = (goodsReceipts = [], { materialId = '' } = {}) => goodsReceipts.flatMap((goodsReceipt) => {
+        const receptionDate = formatDateLongWithTime(goodsReceipt.receptionDate);
+        for (const detail of goodsReceipt.details || []) {
+            if (detail.status === 'CANCELED' || (materialId && detail.materialId !== materialId)) continue;
 
-    if (goodsReceipt.status?.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) return [];
-
-    const details = (goodsReceipt.details || []).filter((detail) => {
-        const isCanceledDetail = detail.status === 'CANCELED';
-
-        return (
-            !isCanceledDetail &&
-            (!materialId || detail.materialId === materialId)
-        );
-    });
-
-    return details.map((detail) => ({
-        referenceNumber: goodsReceipt.referenceNumber,
-        receptionDate: formatDateLongWithTime(goodsReceipt.receptionDate),
-        receivedByName: goodsReceipt.receivedByName,
-        supplierName: goodsReceipt.supplierName,
-        invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',
-        materialId: detail.materialId,
-        materialName: detail.materialName,
-        materialBase: toNumber(detail.material?.base),
-        materialHeight: toNumber(detail.material?.height),
-        quantity: toNumber(detail.quantity),
-        presentationName: detail.material?.presentation?.name,
-        convertedQuantity: toNumber(detail.convertedQuantity),
-        unitMeasureName: detail.material?.unitMeasure?.symbol || detail.material?.unitMeasure?.name,
-        conversionUnitCost: toNumber(detail.conversionUnitCost),
-        costPerUnitType: toNumber(detail.costPerUnitType),
-        netPurchaseAmount: toNumber(detail.netPurchaseAmount),
-        grossPurchaseAmount: toNumber(detail.grossPurchaseAmount)
-    }));
-});
+            rows.push({
+                referenceNumber: goodsReceipt.referenceNumber,
+                receptionDate,
+                receivedByName: goodsReceipt.receivedByName,
+                supplierName: goodsReceipt.supplierName,
+                invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',
+                materialId: detail.materialId,
+                materialName: detail.materialName,
+                materialBase: toNumber(detail.material?.base),
+                materialHeight: toNumber(detail.material?.height),
+                quantity: toNumber(detail.quantity),
+                presentationName: detail.material?.presentation?.name,
+                convertedQuantity: toNumber(detail.convertedQuantity),
+                unitMeasureName: detail.material?.unitMeasure?.symbol || detail.material?.unitMeasure?.name,
+                conversionUnitCost: toNumber(detail.conversionUnitCost),
+                costPerUnitType: toNumber(detail.costPerUnitType),
+                netPurchaseAmount: toNumber(detail.netPurchaseAmount),
+                grossPurchaseAmount: toNumber(detail.grossPurchaseAmount)
+            });
+        }
+    }
+    return rows;
+};
 
 const sum = (rows, field) => rows.reduce((total, row) => total + toNumber(row[field]), 0);
 const divideOrZero = (dividend, divisor) => divisor ? dividend / divisor : 0;
@@ -226,24 +219,32 @@ export const buildWasteReportSummary = (rows = []) => {
         groups.set(key, group);
     });
 
-    const summaryRows = [...groups.values()].map(row => ({
-        ...row,
-        wasteQuantity: roundTo(row.wasteQuantity),
-        squareMeters: roundTo(row.squareMeters),
-        totalWeightKg: row.totalWeightKg === null ? null : roundTo(row.totalWeightKg)
-    }));
-
-    const rollRows = summaryRows.filter(row => row.weightStatus !== 'notApplicable');
-    const weightStatus = rollRows.some(row => row.weightStatus === 'unknown')
-        ? 'unknown'
-        : rollRows.length ? 'complete' : 'notApplicable';
+    const summaryRows = [];
+    let wasteQuantity = 0;
+    let squareMeters = 0;
+    let totalWeightKg = 0;
+    let weightStatus = 'notApplicable';
+    for (const group of groups.values()) {
+        const row = {
+            ...group,
+            wasteQuantity: roundTo(group.wasteQuantity),
+            squareMeters: roundTo(group.squareMeters),
+            totalWeightKg: group.totalWeightKg === null ? null : roundTo(group.totalWeightKg)
+        };
+        summaryRows.push(row);
+        wasteQuantity += row.wasteQuantity;
+        squareMeters += row.squareMeters;
+        totalWeightKg += row.totalWeightKg ?? 0;
+        if (row.weightStatus === 'unknown') weightStatus = 'unknown';
+        else if (row.weightStatus === 'complete' && weightStatus !== 'unknown') weightStatus = 'complete';
+    }
 
     return {
         rows: summaryRows,
         totals: {
-            wasteQuantity: roundTo(sum(summaryRows, 'wasteQuantity')),
-            squareMeters: roundTo(sum(summaryRows, 'squareMeters')),
-            totalWeightKg: weightStatus === 'complete' ? roundTo(sum(rollRows, 'totalWeightKg')) : null,
+            wasteQuantity: roundTo(wasteQuantity),
+            squareMeters: roundTo(squareMeters),
+            totalWeightKg: weightStatus === 'complete' ? roundTo(totalWeightKg) : null,
             weightStatus
         }
     };
@@ -255,7 +256,7 @@ export const buildWasteReportSummary = (rows = []) => {
  * always reconciles with the detailed table, regardless of the report scope.
  */
 export const buildMonthlyGoodsReceiptSummary = (rows = []) => {
-    const monthlyNetPurchaseAmount = sum(rows, 'netPurchaseAmount');
+    let monthlyNetPurchaseAmount = 0;
     const suppliers = new Map();
     const materials = new Map();
 
@@ -268,6 +269,7 @@ export const buildMonthlyGoodsReceiptSummary = (rows = []) => {
         };
 
         const netPurchaseAmount = toNumber(row.netPurchaseAmount);
+        monthlyNetPurchaseAmount += netPurchaseAmount;
 
         supplier.netPurchaseAmount += netPurchaseAmount;
         suppliers.set(supplierName, supplier);
@@ -322,13 +324,13 @@ export const buildMonthlyGoodsReceiptSummary = (rows = []) => {
     };
 };
 
-export const findWarehouseReportRows = async ({
+export const findWarehouseReportRows = async function* ({
     search = '',
     inventoryScope = 'activeOrStock',
     type = null,
     orderBy = 'name',
     orderDir = 'asc'
-} = {}) => {
+} = {}) {
     const scopeFilter = {
         active: { isActive: true },
         inStock: { currentStock: { not: 0 } },
@@ -342,13 +344,16 @@ export const findWarehouseReportRows = async ({
         material: { name: { contains: search, mode: 'insensitive' } }
     });
 
-    const materials = await getDb().supplierMaterial.findMany({
-        where,
-        select: INVENTORY_REPORT_MATERIAL_SELECT,
-        orderBy: { material: { [orderBy]: orderDir } }
-    });
-
-    return mapMaterialRows(materials.map(mapInventoryReportMaterial));
+    for await (const materials of findBatches({
+        model: getDb().supplierMaterial,
+        query: {
+            where,
+            select: { id: true, ...INVENTORY_REPORT_MATERIAL_SELECT },
+            orderBy: [{ material: { [orderBy]: orderDir } }, { id: 'asc' }]
+        }
+    })) {
+        yield* mapMaterialRows(materials);
+    }
 };
 
 export const findGoodsIssueReportRows = async ({
@@ -399,6 +404,7 @@ export const findWasteIssueReportRows = async ({
     orderDir = 'desc'
 } = {}) => {
     const wasteIssuesResult = await findAllWasteIssues({
+        includeCounts: false,
         skip: 0,
         take: 100000,
         search,
@@ -454,6 +460,7 @@ export const findSupplierReportRows = async ({
 } = {}) => {
 
     const suppliersResult = await findAllSuppliers({
+        includeCounts: false,
         skip: 0,
         take: 0,
         search,

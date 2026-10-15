@@ -64,7 +64,6 @@ flowchart TB
     Route -->|import| FileMaterialGoodsIssueController
     Inventory -->|import| FileBaseRepository
     Inventory -->|import| Formatter
-    Core -->|import| Inventory
 ```
 
 ## Construcción de funciones para esta operación

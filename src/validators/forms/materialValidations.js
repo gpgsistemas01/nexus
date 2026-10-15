@@ -1,13 +1,10 @@
-import { validateWeightCapture, validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import { body } from 'express-validator';
+import { errorMap } from '../../messages/codeMessages.js';
+import { validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
 const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'].map(fieldName =>
-    validateWeightCapture({
-        fieldName,
-        coneFieldName: 'referenceConeWeightKg',
-        totalFieldName: 'referenceRollTotalWeightKg',
-        requireTotal: false
-    })
+    body(fieldName).not().exists({ values: 'undefined' }).withMessage(errorMap.materialRollReference.READ_ONLY)
 );
 
 export const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
@@ -34,13 +31,17 @@ export const materialStockValidation = [
     validateUUIDWhen({ fieldName: 'reasonId', predicate: () => true }),
 ];
 
-export const materialValidation = [
+export const consumableValidation = [
     validateUUID('presentationId'),
     validateUUID('unitMeasureId'),
+    ...materialEditValidation,
+    ...materialStockDataValidation
+];
+
+export const materialValidation = [
+    ...consumableValidation,
     validateNumberRequiredWhenOtherPresent({ fieldName: 'base', pairedFieldName: 'height' }),
     validateNumberRequiredWhenOtherPresent({ fieldName: 'height', pairedFieldName: 'base' }),
     validatePositiveNumberOptional('base'),
-    validatePositiveNumberOptional('height'),
-    ...materialEditValidation,
-    ...materialStockDataValidation
+    validatePositiveNumberOptional('height')
 ];

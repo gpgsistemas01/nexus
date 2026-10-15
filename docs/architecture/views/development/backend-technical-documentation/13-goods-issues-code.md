@@ -38,6 +38,15 @@ flowchart TB
 
 ## Contratos de implementación
 
+El surtido reside en `goodsIssueDetailService.js`; los adaptadores de materiales
+y consumibles lo importan directamente. `goodsIssueService.js` conserva consultas,
+alta y edición. Edición, surtido y devolución adquieren el mismo bloqueo de documento
+antes de leer cantidades y estados. El servicio de surtido mantiene los detalles
+consultados para calcular el estado final, sin volver a consultar el mismo conjunto.
+`issueDetailRepository.js` escribe las cantidades y estados de todas las líneas
+solicitadas en una consulta parametrizada; las reglas y la transacción permanecen en
+el servicio. Los descuentos de stock siguen ordenados por relación material–proveedor.
+
 ### Datos, resultados y efectos del módulo
 
 | Capacidad | Entrada y retorno | Reglas, errores y persistencia |

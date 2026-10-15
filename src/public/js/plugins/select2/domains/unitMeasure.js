@@ -10,6 +10,7 @@ export const initUnitMeasureSelect = ({
     initbaseSelect2({
         baseSelector,
         containerSelector: modalSelector,
+        clearOnOpen: false,
         get: getAllUnitMeasures,
         placeholder: 'Buscar unidad...',
         processResults: (data, params) => buildPaginatedSelectResults(data, params, {

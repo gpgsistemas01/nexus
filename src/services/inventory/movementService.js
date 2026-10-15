@@ -1,10 +1,10 @@
-import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
-import { GoodsIssueInexistentStock } from "../../errors/inventory/stockError.js";
 import { getDb } from "../../repository/baseRepository.js";
-import { buildStockKey, hasMaterialDimensions, normalizeDecimal, parseStockKey } from "../../utils/formattersUtils.js";
-import { assertSufficientStock, calculateConvertedQuantity } from "./stockHelpers.js";
+import { buildStockKey, normalizeDecimal, parseStockKey } from "../../utils/formattersUtils.js";
 import { buildInventoryMovementDetail, buildStockUpdateSummary } from "./movementHelpers.js";
-import { findSupplierMaterialsForStockMovement, updateSupplierMaterialStock } from "../warehouse/materials/supplierMaterialService.js";
+import {
+    findSupplierMaterialsForStockMovement,
+    updateSupplierMaterialStock
+} from "../warehouse/materials/supplierMaterialStockService.js";
 import { INVENTORY_MOVEMENT_TYPES } from "../../constants/inventory.js";
 
 export const createInventoryMovement = ({
@@ -33,132 +33,32 @@ export const applyInventoryMovement = async ({
     movementType,
     supplierMaterials
 }) => {
-
-    for (const detail of details) {
-
-        if (!detail.materialId || !detail.supplierId) {
-            throw new MovementDetailRelationConflict();
-        }
-    }
-
-    const stockUpdateSummary = buildStockUpdateSummary({ details });
-
-    const movementSupplierMaterials = supplierMaterials ?? await findSupplierMaterialsForStockMovement({
+    const { grouped } = buildStockUpdateSummary({ details });
+    const offers = supplierMaterials ?? await findSupplierMaterialsForStockMovement({
         tx,
-        where: {
-            OR: Array.from(stockUpdateSummary.stockKeys).map(parseStockKey)
-        }
+        where: { OR: [...grouped.keys()].map(parseStockKey) }
     });
-
-    const psMap = new Map(
-        movementSupplierMaterials.map(ps => [
-            buildStockKey(ps.materialId, ps.supplierId),
-            ps
-        ])
-    );
-
+    const supplierMaterialsByKey = new Map(offers.map(offer => [
+        buildStockKey(offer.materialId, offer.supplierId),
+        offer
+    ]));
+    const balances = await updateSupplierMaterialStock({ tx, grouped, movementType, supplierMaterialsByKey });
+    const isIssue = movementType === INVENTORY_MOVEMENT_TYPES.ISSUE;
     const movementDetails = details.map(detail => {
-
         const key = buildStockKey(detail.materialId, detail.supplierId);
-
-        const ps = psMap.get(key);
-
-        if (!ps) {
-
-            throw new GoodsIssueInexistentStock({
-                materialName: ps?.material?.name ?? 'Material desconocido',
-                height: ps?.material?.height ?? 'Desconocido',
-                base: ps?.material?.base ?? 'Desconocido',
-                supplierName: ps?.supplier?.tradeName ?? 'Proveedor desconocido'
-            });
-        }
-
-        const base = Number(ps.material.base || 0);
-
-        const height = Number(ps.material.height || 0);
-
-        const hasDimensions = hasMaterialDimensions(ps.material);
-
-        const quantity = normalizeDecimal(detail.quantity);
-
-        const convertedQuantity = calculateConvertedQuantity({
-            quantity,
-            base,
-            height
-        });
-
-        const previousStock = normalizeDecimal(ps.currentStock || 0);
-
-        const previousConvertedQuantity = normalizeDecimal(
-            ps.convertedQuantity || 0
-        );
-
-        const isOut = movementType === INVENTORY_MOVEMENT_TYPES.ISSUE;
-
-        const signedQuantity = normalizeDecimal(
-            isOut
-                ? -quantity
-                : quantity
-        );
-
-        const signedConvertedQuantity = normalizeDecimal(
-            isOut
-                ? -convertedQuantity
-                : convertedQuantity
-        );
-
-        const newStock = normalizeDecimal(
-            previousStock + signedQuantity
-        );
-
-        const newConverted = normalizeDecimal(
-            previousConvertedQuantity + signedConvertedQuantity
-        );
-
-        if (isOut) {
-            assertSufficientStock({
-                material: {
-                    ...ps.material,
-                    base: hasDimensions ? ps.material.base : null,
-                    height: hasDimensions ? ps.material.height : null,
-                    supplier: ps.supplier
-                },
-                newStock,
-                requestedQuantity: quantity
-            });
-        }
-
-        ps.currentStock = newStock;
-
-        ps.convertedQuantity = newConverted;
+        const balance = balances.get(key);
+        const quantity = normalizeDecimal(isIssue ? -detail.quantity : detail.quantity);
+        const previousStock = balance.previousStock;
+        const newStock = normalizeDecimal(previousStock + quantity);
+        balance.previousStock = newStock;
 
         return buildInventoryMovementDetail({
-            materialId: detail.materialId,
-            supplierId: detail.supplierId,
-            quantity: signedQuantity,
+            ...detail,
+            quantity,
             previousStock,
-            newStock,
-            materialBase: hasDimensions ? base : null,
-            materialHeight: hasDimensions ? height : null,
-            goodsReceiptDetailId: detail.goodsReceiptDetailId,
-            goodsIssueDetailId: detail.goodsIssueDetailId,
-            stockAdjustmentDetailId: detail.stockAdjustmentDetailId
+            newStock
         });
     });
 
-    const movement = await createInventoryMovement({
-        tx,
-        reference,
-        details: movementDetails,
-        movementType
-    });
-
-    await updateSupplierMaterialStock({
-        tx,
-        grouped: stockUpdateSummary.grouped,
-        movementType,
-        supplierMaterials: movementSupplierMaterials
-    });
-
-    return movement;
+    return createInventoryMovement({ tx, reference, details: movementDetails, movementType });
 };

@@ -8,7 +8,7 @@ vi.mock('../../../../../../src/public/js/pages/warehouse/goodsIssues/goodsIssueC
     goodsIssueContext: { resource: 'material' }
 }));
 
-describe('rutas de salidas según el contexto de la página', () => {
+describe('rutas de entradas según el contexto de la página', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.resetModules();
@@ -22,7 +22,7 @@ describe('rutas de salidas según el contexto de la página', () => {
             service.correctGoodsReceiptDetailRequest, service.cancelGoodsReceiptDetailRequest
         ];
         for (const request of requests) {
-            request({ data: { observations: 'Salida' }, id: 'issue-1', detailId: 'detail-1', params: { start: 0 } });
+            request({ data: { observations: 'Entrada' }, id: 'receipt-1', detailId: 'detail-1', params: { start: 0 } });
         }
         const path = `/api/warehouse/goods-receipts/${resource === 'consumable' ? 'consumables' : 'materials'}`;
         expect(apiRequest).toHaveBeenCalledTimes(requests.length);

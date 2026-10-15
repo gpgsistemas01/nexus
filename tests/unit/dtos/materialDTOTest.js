@@ -45,12 +45,11 @@ describe('materialDTO', () => {
       observations: 'Inventario inicial'
     }));
   });
-  it('normaliza los pesos como pareja opcional y mantiene intactas referencias omitidas en edición', () => {
-    const dto = createMaterialDtoForRegister({ ...materialBody, referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' });
-    expect(dto).toMatchObject({ referenceConeWeightKg: 0.25, referenceRollTotalWeightKg: 2.25 });
-    expect(createMaterialDtoForEdit(materialBody)).not.toHaveProperty('referenceConeWeightKg');
-    const partial = createMaterialDtoForEdit({ ...materialBody, referenceConeWeightKg: '0.3' });
-    expect(partial.referenceConeWeightKg).toBe(0.3);
-    expect(partial).not.toHaveProperty('referenceRollTotalWeightKg');
+  it('descarta referencias históricas del rollo en alta y edición', () => {
+    const body = { ...materialBody, referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' };
+    for (const dto of [createMaterialDtoForRegister(body), createMaterialDtoForEdit(body)]) {
+      expect(dto).not.toHaveProperty('referenceConeWeightKg');
+      expect(dto).not.toHaveProperty('referenceRollTotalWeightKg');
+    }
   });
 });

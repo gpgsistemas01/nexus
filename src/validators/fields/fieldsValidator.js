@@ -162,15 +162,17 @@ export const validateNonNegativeNumber = (fieldName) => {
         .toFloat()
 }
 
-export const validatePositiveNumber = (fieldName) => {
+export const validatePositiveNumberWhen = ({ fieldName, predicate }) => {
 
     const errors = errorMap[fieldName];
 
-    return requireValue(body(fieldName), errors.REQUIRED)
+    return requireValue(body(fieldName).if((value, { req }) => predicate(req.body, value, req)), errors.REQUIRED)
         .isFloat({ gt: 0 }).withMessage(errors.INVALID_NUMBER)
         .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
         .toFloat()
 }
+
+export const validatePositiveNumber = fieldName => validatePositiveNumberWhen({ fieldName, predicate: () => true });
 
 export const validateNumberWhen = ({ fieldName, predicate }) => {
 
@@ -397,11 +399,15 @@ export const validateWeightCapture = ({
     fieldName,
     coneFieldName = 'coneWeightKg',
     totalFieldName = 'totalWeightKg',
-    requireTotal = true
+    requireTotal = true,
+    requiredWhen = () => false
 }) => {
     const isCone = fieldName === coneFieldName;
+    const totalErrors = errorMap[totalFieldName] ?? errorMap.totalWeightKg;
 
     return body(fieldName)
+        .custom((value, { req }) => !requiredWhen(req.body) || hasValue(value))
+        .withMessage(isCone ? errorMap.coneWeightKg.REQUIRED : totalErrors.REQUIRED).bail()
         .custom(value => wasteWeightRules.isNumber(value, { allowZero: isCone }))
         .withMessage(isCone ? errorMap.coneWeightKg.INVALID_NUMBER : errorMap.weightKg.INVALID_NUMBER).bail()
         .custom(wasteWeightRules.isWithinLimit)
@@ -412,7 +418,7 @@ export const validateWeightCapture = ({
             pairedValue: req.body[isCone ? totalFieldName : coneFieldName],
             required: isCone || requireTotal
         }))
-        .withMessage(isCone ? errorMap.coneWeightKg.REQUIRED : errorMap.totalWeightKg.REQUIRED).bail()
+        .withMessage(isCone ? errorMap.coneWeightKg.REQUIRED : totalErrors.REQUIRED).bail()
         .custom((value, { req }) => isCone || wasteWeightRules.isTotalGreaterThanCone(value, req.body[coneFieldName]))
-        .withMessage(errorMap.totalWeightKg.NOT_GREATER);
+        .withMessage(totalErrors.NOT_GREATER);
 };

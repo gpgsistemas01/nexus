@@ -2,7 +2,9 @@ import { getDb } from "../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../document/referenceNumberService.js";
 import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
 import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
-import { adjustSupplierMaterialStock, findSupplierMaterialByIds } from "./materials/supplierMaterialService.js";
+import { findSupplierMaterialByIds } from "./materials/supplierMaterialService.js";
+import { adjustSupplierMaterialStock } from "./materials/supplierMaterialStockService.js";
+import { lockSupplierMaterialStock } from "../../repository/warehouse/stockLockRepository.js";
 import { INVENTORY_MOVEMENT_TYPES, STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTMENT_TYPES } from "../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
 import { createInventoryMovement } from "../inventory/movementService.js";
@@ -106,17 +108,17 @@ export const createStockAdjustment = async ({
     goodsIssueDetailId = null,
     goodsReceiptId = null,
     goodsReceiptDetailId = null,
-    returnAdjustment = false
+    returnAdjustment = false,
+    supplierMaterial: protectedSupplierMaterial = null
 }) => {
 
     let referenceNumber = null;
 
     const execute = async (transaction) => {
 
-        const supplierMaterial = await findSupplierMaterialByIds({
-            tx: transaction,
-            materialId,
-            supplierId
+        if (!protectedSupplierMaterial) await lockSupplierMaterialStock({ tx: transaction, materialId, supplierId });
+        const supplierMaterial = protectedSupplierMaterial ?? await findSupplierMaterialByIds({
+            tx: transaction, materialId, supplierId
         });
 
         referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
@@ -237,6 +239,7 @@ export const createStockAdjustmentByQuantityChange = async ({
 }) => {
 
     const execute = async (transaction) => {
+        await lockSupplierMaterialStock({ tx: transaction, materialId, supplierId });
         const supplierMaterial = await findSupplierMaterialByIds({
             tx: transaction,
             materialId,
@@ -258,7 +261,8 @@ export const createStockAdjustmentByQuantityChange = async ({
             goodsIssueDetailId,
             goodsReceiptId,
             goodsReceiptDetailId,
-            returnAdjustment
+            returnAdjustment,
+            supplierMaterial
         });
     };
 

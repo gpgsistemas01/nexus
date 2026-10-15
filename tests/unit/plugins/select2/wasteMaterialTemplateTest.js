@@ -6,15 +6,14 @@ vi.mock('../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({ setMdb
 vi.mock('../../../../src/public/js/application/warehouse/wastes/wastes.js', () => ({ getWasteMaterialTemplates: vi.fn() }));
 const { initWasteMaterialTemplateSelect } = await import('../../../../src/public/js/plugins/select2/domains/wasteMaterialTemplate.js');
 const { updateWasteRollMeasurement } = await import('../../../../src/public/js/ui/inventory/wasteFormUI.js');
-const inventoryUtils = await import('../../../../src/public/js/utils/warehouseInventoryUtils.js');
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => vi.unstubAllGlobals());
 
 beforeEach(() => {
     vi.clearAllMocks();
     state.handlers.clear();
     state.value = null;
-    const fields = ['base', 'height', 'weightKg', 'coneWeightKg', 'totalWeightKg'];
+    const fields = ['base', 'height', 'weightKg', 'coneWeightKg', 'totalWeightKg', 'sampleLengthM', 'sampleNetWeightKg', 'referenceRollTotalWeightKg'];
     const elements = Object.fromEntries(fields.map(field => [field, { value: '', disabled: false, readOnly: false, classList: { toggle: vi.fn() } }]));
     state.form = {
         dataset: { mode: 'create' }, elements,
@@ -41,22 +40,21 @@ describe('selección de material y captura de merma', () => {
         state.handlers.get('select2:select')({ params: { data }, target: { get dataset() { throw new Error('No se debe reconstruir la selección desde el DOM'); } } });
         expect(state.form.wasteMaterialTemplate.supplierMaterials[0]).toBe(offer);
         expect(state.form.elements.height.value).toBe(1.5);
+        state.form.elements.coneWeightKg.value = '0.25';
+        state.form.elements.referenceRollTotalWeightKg.value = '5.25';
         state.form.elements.totalWeightKg.value = '1.25';
         updateWasteRollMeasurement({ form: state.form });
-        expect(state.form.elements.base.value).toBe(25);
+        expect(state.form.elements.base.value).toBe(10);
         expect(state.form.elements.weightKg.value).toBe(1);
         expect(state.init).toHaveBeenCalledWith(expect.objectContaining({ clearOnOpen: false }));
     });
 
     it('una limpieza programática descarta la selección y sus resultados', () => {
-        const prepareReference = vi.spyOn(inventoryUtils, 'prepareWasteRollReference');
         initWasteMaterialTemplateSelect({ modalSelector: '#wasteModal', baseSelector: '#materialInput' });
         state.handlers.get('select2:select')({ params: { data: { id: 'material-1', base: 1.5, height: 50, presentation: { name: 'ROLLO' } } } });
-        prepareReference.mockClear();
         state.value = null;
         state.handlers.get('change.wasteMaterialTemplate')();
         state.handlers.get('change.wasteMaterialTemplate')();
-        expect(prepareReference).toHaveBeenCalledOnce();
         expect(state.form.wasteMaterialTemplate).toBeNull();
         expect(state.form.wasteRollReference).toBeNull();
         expect(state.form.elements.base.value).toBe('');

@@ -346,7 +346,7 @@ describe('waste issue controller database integration', () => {
         details: [{ wasteId: ids.secondWaste, quantity: 1 }]
       }).expect(409);
 
-      expect(rejectedNewIssue.body.code).toBe('WASTE_ISSUE_STATE_CONFLICT');
+      expect(rejectedNewIssue.body.code).toBe('WASTE_ISSUE_WASTE_UNAVAILABLE');
 
       const completed = await request(app).patch(`/waste-issues/${ issueId }/details`).send({
         details: [{ id: secondDetail.id, isSupplied: true, projectConvertedQuantity: 1 }]

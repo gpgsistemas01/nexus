@@ -1,3 +1,4 @@
+import { lockWasteIssue } from '../../../../repository/warehouse/documentLockRepository.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../constants/warehouseStatuses.js';
 import {
     WasteIssueDetailNotFound,
@@ -15,6 +16,7 @@ import { findWasteIssueFulfillmentStatusIds } from '../wasteIssueFulfillmentServ
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueReturnService');
 
 const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) => getDb().$transaction(async tx => {
+    await lockWasteIssue({ tx, id });
     const detail = await tx.wasteIssueDetail.findFirst({
         where: { id: detailId, wasteIssueId: id },
         include: { wasteIssue: { include: { fulfillmentStatus: true } } }

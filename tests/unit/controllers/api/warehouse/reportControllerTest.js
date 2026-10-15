@@ -17,7 +17,7 @@ const {
   findMaterialGoodsReceiptReportRows: vi.fn(),
   findWasteReportRows: vi.fn(),
   buildWasteReportSummary: vi.fn(),
-  createFormulaCell: vi.fn((formula, value) => ({ f: formula, t: 'n', v: value })),
+  createFormulaCell: vi.fn((formula, value) => ({ formula: formula, result: value })),
   sendExcelReport: vi.fn(),
   getReportMonthDateRange: vi.fn()
 }));
@@ -100,9 +100,9 @@ describe('exportación del reporte de mermas', () => {
           '',
           '',
           '',
-          { f: 'SUM(E2:E3)', t: 'n', v: 7 },
-          { f: 'SUM(F2:F3)', t: 'n', v: 40.5 },
-          { f: 'SUM(G2:G3)', t: 'n', v: 2.5 }
+          { formula: 'SUM(E2:E3)', result: 7 },
+          { formula: 'SUM(F2:F3)', result: 40.5 },
+          { formula: 'SUM(G2:G3)', result: 2.5 }
         ]
       ]
     });
@@ -122,7 +122,7 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
     await exportMaterialGoodsIssueReportExcel({ query: {}, user: { accesses: [] } }, {});
 
     const { data } = sendExcelReport.mock.calls[0][0];
-    expect(data[1][17]).toEqual({ f: 'O2-Q2', t: 'n', v: 2 });
+    expect(data[1][17]).toEqual({ formula: 'O2-Q2', result: 2 });
   });
 
   it('exporta importes de compra y sus resúmenes como fórmulas', async () => {
@@ -157,17 +157,17 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
 
     const { data } = sendExcelReport.mock.calls[0][0];
     expect(data[1].slice(12)).toEqual([
-      { f: 'IFERROR(O2/K2,0)', t: 'n', v: 25 },
+      { formula: 'IFERROR(O2/K2,0)', result: 25 },
       50,
-      { f: 'I2*N2', t: 'n', v: 100 },
-      { f: 'O2*1.16', t: 'n', v: 116 }
+      { formula: 'I2*N2', result: 100 },
+      { formula: 'O2*1.16', result: 116 }
     ]);
     expect(data[5].slice(2)).toEqual([
-      { f: 'B6*0.16', t: 'n', v: 16 },
-      { f: 'B6+C6', t: 'n', v: 116 },
-      { f: 'IFERROR(B6/B7*100,0)', t: 'n', v: 100 }
+      { formula: 'B6*0.16', result: 16 },
+      { formula: 'B6+C6', result: 116 },
+      { formula: 'IFERROR(B6/B7*100,0)', result: 100 }
     ]);
-    expect(data[10][2]).toEqual({ f: 'IFERROR(D11/B11,0)', t: 'n', v: 25 });
+    expect(data[10][2]).toEqual({ formula: 'IFERROR(D11/B11,0)', result: 25 });
   });
 
   it('delimita y rotula el reporte de compras de consumibles', async () => {

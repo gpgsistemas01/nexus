@@ -7,6 +7,8 @@ const updateGoodsIssue = vi.fn();
 const updateGoodsIssueDetails = vi.fn();
 const updateGoodsIssueHeader = vi.fn();
 
+vi.mock('../../../../../src/services/warehouse/goodsIssues/goodsIssueDetailService.js', () => ({ updateGoodsIssueDetails }));
+
 vi.mock('../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js', () => ({
     createGoodsIssue,
     findAllGoodsIssues,

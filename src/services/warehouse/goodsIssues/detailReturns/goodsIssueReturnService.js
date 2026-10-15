@@ -1,3 +1,4 @@
+import { lockGoodsIssue } from '../../../../repository/warehouse/documentLockRepository.js';
 import {
     GoodsIssueDetailNotFound,
     GoodsIssueReturnDatabaseError,
@@ -25,6 +26,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, 
 
     try {
         return await getDb().$transaction(async tx => {
+            await lockGoodsIssue({ tx, id });
             const statusIdsByName = await findFulfillmentStatusIdsByName({
                 tx,
                 names: Object.values(FULFILLMENT_STATUS_NAMES)

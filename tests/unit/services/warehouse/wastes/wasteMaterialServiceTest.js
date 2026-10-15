@@ -33,15 +33,17 @@ describe('plantillas de material para el CRUD de mermas', () => {
     const result = await findWasteMaterialTemplates({ search: 'lo', take: 20, supplierId: 'supplier-1' });
 
     expect(materialFindMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: {
+      where: expect.objectContaining({
+        type: 'MATERIAL',
+        unitMeasure: expect.any(Object),
         name: { contains: 'lo', mode: 'insensitive' },
         supplierMaterials: { some: { supplierId: 'supplier-1', isActive: true } }
-      },
+      }),
       orderBy: { name: 'asc' }
     }));
     expect(materialFindMany.mock.calls[0][0].select.supplierMaterials).toEqual({
       where: { supplierId: 'supplier-1', isActive: true },
-      select: { maxUnitCost: true, referenceConeWeightKg: true, referenceRollTotalWeightKg: true }
+      select: { maxUnitCost: true }
     });
     expect(result.data).toEqual([
       expect.objectContaining({ id: 'material-1', maxUnitCost: 27.5 }),

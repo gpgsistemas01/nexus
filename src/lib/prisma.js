@@ -1,8 +1,8 @@
 import { PrismaClient } from "../../generated/prisma/client.ts";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { QueuedPrismaPg } from "./queuedPrismaPg.js";
 import { getDatabaseUrl } from "./databaseUrl.js";
 
-const adapter = new PrismaPg({
+const adapter = new QueuedPrismaPg({
     connectionString: getDatabaseUrl(),
 });
 

@@ -1,3 +1,4 @@
+import { findPage } from '../../../repository/paginationRepository.js';
 import {
     GoodsIssueNotFound,
     GoodsIssueRequesterPersonNotFound,
@@ -7,30 +8,26 @@ import {
     GoodsIssueCreateDatabaseError,
     GoodsIssueInternalClientAdvisorDepartmentConflict,
     GoodsIssueInternalClientProjectNumberConflict,
-    GoodsIssueSuppliedConflict,
-    GoodsIssueDetailNotFound
+    GoodsIssueSuppliedConflict
 } from "../../../errors/warehouse/goodsIssueError.js";
 import { createServiceLogger, getModelLogContext, logServiceInfo } from "../../../utils/logger.js";
 
-const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
-
 import { getDb } from "../../../repository/baseRepository.js";
+import { lockGoodsIssue } from "../../../repository/warehouse/documentLockRepository.js";
 import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
-import { findFulfillmentStatusIdByName, findFulfillmentStatusIdsByName } from "../fulfillmentStatusService.js";
+import { findFulfillmentStatusIdByName } from "../fulfillmentStatusService.js";
 import { buildGoodsIssueContextWhere, buildGoodsIssueDetails } from "./goodsIssueHelpers.js";
-import { applyInventoryMovement } from "../../inventory/movementService.js";
-import { normalizeDecimal } from "../../../utils/formattersUtils.js";
 import { handleServiceError } from "../../serviceErrorHandler.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { ROLE_NAMES } from "../../../constants/roles.js";
 import { DEPARTMENT_NAMES } from "../../../constants/departments.js";
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
-import { INVENTORY_MOVEMENT_TYPES, MATERIAL_TYPES } from "../../../constants/inventory.js";
+import { MATERIAL_TYPES } from "../../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { resolveIssueHeaderData } from "../issues/issueHeaderService.js";
-import { resolveIssueFulfillmentStatus } from "../issues/issueFulfillmentRules.js";
-import { GOODS_ISSUE_DETAIL_SELECT } from './goodsIssueDetailSelect.js';
-import { resolveGoodsIssueDetailFulfillmentStatusName } from './goodsIssueFulfillmentRules.js';
+import { GOODS_ISSUE_DETAIL_SELECT } from "./goodsIssueDetailSelect.js";
+
+const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
 
 const FLOAT_EPSILON = 0.000001;
 
@@ -110,48 +107,43 @@ export const findAllGoodsIssues = async ({
         })
     };
 
-    const goodsIssues = await db.goodsIssue.findMany({
-        skip,
-        take,
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        include: {
-            status: true,
-            fulfillmentStatus: true,
-            details: {
-                where: {
-                    OR: [
-                        {
-                            fulfillmentStatus: {
-                                is: { name: { not: FULFILLMENT_STATUS_NAMES.CANCELED } }
-                            }
-                        },
-                        {
-                            goodsIssue: {
+    return findPage({
+        model: db.goodsIssue,
+        totalWhere: where,
+        hasFilters: false,
+        includeCounts,
+        query: {
+            skip,
+            take,
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            include: {
+                status: true,
+                fulfillmentStatus: true,
+                details: {
+                    where: {
+                        OR: [
+                            {
                                 fulfillmentStatus: {
-                                    is: { name: FULFILLMENT_STATUS_NAMES.CANCELED }
+                                    is: { name: { not: FULFILLMENT_STATUS_NAMES.CANCELED } }
+                                }
+                            },
+                            {
+                                goodsIssue: {
+                                    fulfillmentStatus: {
+                                        is: { name: FULFILLMENT_STATUS_NAMES.CANCELED }
+                                    }
                                 }
                             }
-                        }
-                    ]
-                },
-                select: GOODS_ISSUE_DETAIL_SELECT
+                        ]
+                    },
+                    select: GOODS_ISSUE_DETAIL_SELECT
+                }
             }
         }
     });
-
-    if (!includeCounts) return { data: goodsIssues };
-
-    const total = await db.goodsIssue.count({ where });
-    const filtered = total;
-
-    return {
-        data: goodsIssues,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 };
 
 export const createGoodsIssue = async ({ goodsIssueDto, type = MATERIAL_TYPES.MATERIAL }) => {
@@ -243,59 +235,55 @@ export const updateGoodsIssue = async ({ id, goodsIssueDto, type = MATERIAL_TYPE
 
         const { requesterId, advisorId, departmentId, clientId, details, ...goodsIssueData } = goodsIssueDto;
 
-        const goodsIssue = await getDb().goodsIssue.findUnique({
-            where: { id, ...buildGoodsIssueContextWhere(type) },
-            select: {
-                id: true,
-                status: true,
-                fulfillmentStatus: true,
-                details: {
-                    select: {
-                        id: true,
-                        materialId: true,
-                        supplierId: true,
-                        quantity: true,
-                        suppliedQuantity: true,
-                        isSupplied: true
+        const updatedGoodsIssue = await getDb().$transaction(async tx => {
+            await lockGoodsIssue({ tx, id });
+            const goodsIssue = await tx.goodsIssue.findUnique({
+                where: { id, ...buildGoodsIssueContextWhere(type) },
+                select: {
+                    id: true,
+                    status: true,
+                    fulfillmentStatus: true,
+                    details: {
+                        select: {
+                            id: true,
+                            materialId: true,
+                            supplierId: true,
+                            quantity: true,
+                            suppliedQuantity: true,
+                            isSupplied: true
+                        }
                     }
                 }
-            }
-        });
-
-        if (!goodsIssue) throw new GoodsIssueNotFound();
-
-        if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.PENDING) throw new GoodsIssueNotPendingConflict();
-
-        const hasSuppliedInAnyDetail = goodsIssue.details.some(
-            detail => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied
-        );
-
-        if (hasSuppliedInAnyDetail) throw new GoodsIssueSuppliedConflict();
-
-        const headerData = await resolveIssueHeaderData({
-            requesterId,
-            advisorId,
-            departmentId,
-            clientId,
-            issueData: goodsIssueData,
-            errorTypes: GOODS_ISSUE_HEADER_ERROR_TYPES,
-            statusName: GOODS_ISSUE_STATUS_NAMES.APPROVED
-        });
-
-        const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ name: FULFILLMENT_STATUS_NAMES.PENDING });
-        const processedDetails = await buildGoodsIssueDetails({
-            details,
-            initialFulfillmentStatusId: pendingFulfillmentStatusId,
-            type
-        });
-
-        const updatedGoodsIssue = await getDb().$transaction(async (tx) => {
-
-            const currentIssue = await tx.goodsIssue.findUnique({
-                where: { id, ...buildGoodsIssueContextWhere(type) },
-                select: { id: true }
             });
-            if (!currentIssue) throw new GoodsIssueNotFound();
+
+            if (!goodsIssue) throw new GoodsIssueNotFound();
+
+            if (goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.PENDING) throw new GoodsIssueNotPendingConflict();
+
+            const hasSuppliedInAnyDetail = goodsIssue.details.some(
+                detail => Number(detail.suppliedQuantity ?? 0) > FLOAT_EPSILON || detail.isSupplied
+            );
+
+            if (hasSuppliedInAnyDetail) throw new GoodsIssueSuppliedConflict();
+
+            const headerData = await resolveIssueHeaderData({
+                tx,
+                requesterId,
+                advisorId,
+                departmentId,
+                clientId,
+                issueData: goodsIssueData,
+                errorTypes: GOODS_ISSUE_HEADER_ERROR_TYPES,
+                statusName: GOODS_ISSUE_STATUS_NAMES.APPROVED
+            });
+
+            const pendingFulfillmentStatusId = await findFulfillmentStatusIdByName({ tx, name: FULFILLMENT_STATUS_NAMES.PENDING });
+            const processedDetails = await buildGoodsIssueDetails({
+                tx,
+                details,
+                initialFulfillmentStatusId: pendingFulfillmentStatusId,
+                type
+            });
 
             await tx.goodsIssueDetail.deleteMany({
                 where: { goodsIssueId: id }
@@ -358,35 +346,40 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto, type = MATERIA
 
         const { requesterId, advisorId, departmentId, clientId, ...goodsIssueData } = goodsIssueDto;
 
-        const goodsIssue = await getDb().goodsIssue.findUnique({
-            where: { id, ...buildGoodsIssueContextWhere(type) },
-            select: { id: true }
-        });
+        const updatedGoodsIssue = await getDb().$transaction(async tx => {
+            await lockGoodsIssue({ tx, id });
+            const goodsIssue = await tx.goodsIssue.findUnique({
+                where: { id, ...buildGoodsIssueContextWhere(type) },
+                select: { id: true }
+            });
 
-        if (!goodsIssue) throw new GoodsIssueNotFound();
+            if (!goodsIssue) throw new GoodsIssueNotFound();
 
-        const headerData = await resolveIssueHeaderData({
-            requesterId,
-            advisorId,
-            departmentId,
-            clientId,
-            issueData: goodsIssueData,
-            errorTypes: GOODS_ISSUE_HEADER_ERROR_TYPES,
-            statusName: GOODS_ISSUE_STATUS_NAMES.APPROVED
-        });
+            const headerData = await resolveIssueHeaderData({
+                tx,
+                requesterId,
+                advisorId,
+                departmentId,
+                clientId,
+                issueData: goodsIssueData,
+                errorTypes: GOODS_ISSUE_HEADER_ERROR_TYPES,
+                statusName: GOODS_ISSUE_STATUS_NAMES.APPROVED
+            });
 
-        const updatedGoodsIssue = await getDb().goodsIssue.update({
-            where: { id, ...buildGoodsIssueContextWhere(type) },
-            data: {
-                ...headerData
-            },
-            include: {
-                details: {
-                    select: GOODS_ISSUE_DETAIL_SELECT
+            return tx.goodsIssue.update({
+                where: { id, ...buildGoodsIssueContextWhere(type) },
+                data: {
+                    ...headerData
                 },
-                status: true,
-                fulfillmentStatus: true
-            }
+                include: {
+                    details: {
+                        select: GOODS_ISSUE_DETAIL_SELECT
+                    },
+                    status: true,
+                    fulfillmentStatus: true
+                }
+            });
+
         });
 
         logServiceInfo(serviceLogger, {
@@ -407,184 +400,6 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto, type = MATERIA
             operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueHeader',
             model: 'goodsIssue',
             data: { id, ...goodsIssueDto },
-            fallbackError: new GoodsIssueUpdateDatabaseError()
-        });
-    }
-};
-
-export const updateGoodsIssueDetails = async ({ id, goodsIssueDto, type = MATERIAL_TYPES.MATERIAL }) => {
-
-    const { details = [] } = goodsIssueDto;
-    const detailIds = details.map(detail => detail.id);
-
-    try {
-
-        const goodsIssue = await getDb().goodsIssue.findUnique({
-            where: { id, ...buildGoodsIssueContextWhere(type) },
-            select: {
-                id: true,
-                status: true,
-                fulfillmentStatus: true,
-                details: {
-                    where: { id: { in: detailIds } },
-                    select: {
-                        id: true,
-                        materialId: true,
-                        supplierId: true,
-                        quantity: true,
-                        suppliedQuantity: true,
-                        returnedQuantity: true,
-                        convertedQuantity: true,
-                        projectConvertedQuantity: true,
-                        materialName: true,
-                    }
-                }
-            }
-        });
-
-        if (!goodsIssue) throw new GoodsIssueNotFound();
-
-        if (![FULFILLMENT_STATUS_NAMES.PENDING, FULFILLMENT_STATUS_NAMES.PARTIAL].includes(goodsIssue.fulfillmentStatus?.name)) {
-            throw new GoodsIssueNotPendingConflict();
-        }
-        const currentById = new Map(goodsIssue.details.map(d => [d.id, d]));
-        const updates = [];
-        const supplyRequests = [];
-        for (const detail of details) {
-
-            const current = currentById.get(detail.id);
-            if (!current) throw new GoodsIssueDetailNotFound();
-
-            const currentQuantity = normalizeDecimal(current.quantity ?? 0);
-            const currentSupplied = normalizeDecimal(current.suppliedQuantity ?? 0);
-            const pending = normalizeDecimal(currentQuantity - currentSupplied);
-            const projectConvertedQuantity = detail.projectConvertedQuantity;
-            const convertedQuantityDifference = normalizeDecimal(
-                normalizeDecimal(current.convertedQuantity ?? 0) - normalizeDecimal(projectConvertedQuantity ?? 0)
-            );
-
-            const baseUpdate = {
-                projectConvertedQuantity,
-                convertedQuantityDifference
-            };
-
-            if (!detail.isSupplied || pending <= FLOAT_EPSILON) {
-                updates.push({
-                    id: current.id,
-                    data: baseUpdate
-                });
-                continue;
-            }
-
-            const quantityToSupply = pending;
-
-            supplyRequests.push({
-                current,
-                currentQuantity,
-                quantityToSupply,
-                baseUpdate
-            });
-        }
-
-        return await getDb().$transaction(async (tx) => {
-
-            const currentIssue = await tx.goodsIssue.findUnique({
-                where: { id, ...buildGoodsIssueContextWhere(type) },
-                select: { id: true }
-            });
-            if (!currentIssue) throw new GoodsIssueNotFound();
-
-            const statusIdsByName = await findFulfillmentStatusIdsByName({ tx, names: Object.values(FULFILLMENT_STATUS_NAMES) });
-
-            if (supplyRequests.length) {
-
-                const detailSupplyMovements = supplyRequests.map(({ current, quantityToSupply }) => ({
-                    materialId: current.materialId,
-                    supplierId: current.supplierId,
-                    goodsIssueDetailId: current.id,
-                    quantity: quantityToSupply
-                }));
-
-                await applyInventoryMovement({
-                    tx,
-                    reference: { goodsIssueId: goodsIssue.id },
-                    details: detailSupplyMovements,
-                    movementType: INVENTORY_MOVEMENT_TYPES.ISSUE
-                });
-
-                for (const { current, currentQuantity, quantityToSupply, baseUpdate } of supplyRequests) {
-
-                    const newSupplied = normalizeDecimal(
-                        normalizeDecimal(current.suppliedQuantity ?? 0) + quantityToSupply
-                    );
-
-                    const isSupplied = newSupplied >= normalizeDecimal(currentQuantity - FLOAT_EPSILON);
-
-                    updates.push({
-                        id: current.id,
-                        data: {
-                            ...baseUpdate,
-                            suppliedQuantity: newSupplied,
-                            isSupplied,
-                            fulfillmentStatusId: statusIdsByName.get(resolveGoodsIssueDetailFulfillmentStatusName({
-                                ...current,
-                                suppliedQuantity: newSupplied,
-                                isSupplied
-                            }))
-                        }
-                    });
-                }
-            }
-
-            for (const u of updates) {
-                await tx.goodsIssueDetail.update({
-                    where: { id: u.id },
-                    data: u.data
-                });
-            }
-
-            const refreshed = await tx.goodsIssueDetail.findMany({
-                where: { goodsIssueId: id },
-                select: {
-                    isSupplied: true,
-                    quantity: true,
-                    suppliedQuantity: true,
-                    returnedQuantity: true
-                }
-            });
-
-            const fulfillmentName = resolveIssueFulfillmentStatus(refreshed);
-
-            return await tx.goodsIssue.update({
-                where: { id, ...buildGoodsIssueContextWhere(type) },
-                data: {
-                    fulfillmentStatus: {
-                        connect: { name: fulfillmentName }
-                    },
-                    status: {
-                        connect: { name: GOODS_ISSUE_STATUS_NAMES.APPROVED }
-                    }
-                },
-                select: {
-                    id: true,
-                    type: true,
-                    status: true,
-                    fulfillmentStatus: true,
-                    details: {
-                        select: GOODS_ISSUE_DETAIL_SELECT
-                    }
-                }
-            });
-
-        });
-
-    } catch (err) {
-        handleServiceError({
-            logger: serviceLogger,
-            error: err,
-            operation: 'warehouse.goodsIssues.goodsIssueService.updateGoodsIssueDetails',
-            model: 'goodsIssue',
-            data: { id, details },
             fallbackError: new GoodsIssueUpdateDatabaseError()
         });
     }

@@ -1,3 +1,4 @@
+import { findPage } from '../../repository/paginationRepository.js';
 import { MovementFindDatabaseError } from "../../errors/inventory/movementError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { buildDateRangeFilter } from "../../utils/requestQueryUtils.js";
@@ -259,6 +260,7 @@ const getWasteMovementSearchFilter = (search) => !search ? {} : ({
 
 const findInventoryMovements = async ({
     type,
+    includeCounts = true,
     skip = 0,
     take = 10,
     startDate = '',
@@ -321,26 +323,25 @@ const findInventoryMovements = async ({
             })
         };
 
-        const movements = await db.movementDetail.findMany({
-            skip,
-            take,
-            orderBy: {
-                movement: {
-                    [orderBy]: orderDir
-                }
-            },
-            where,
-            select: MOVEMENT_DETAIL_SELECT
+        const page = await findPage({
+            model: db.movementDetail,
+            totalWhere: { material: { type } },
+            hasFilters: Boolean(search || materialId || supplierId || Object.keys(movementFilters).length),
+            includeCounts,
+            query: {
+                skip,
+                take,
+                orderBy: {
+                    movement: {
+                        [orderBy]: orderDir
+                    }
+                },
+                where,
+                select: MOVEMENT_DETAIL_SELECT
+            }
         });
 
-        const total = await db.movementDetail.count({ where: { material: { type } } });
-        const filtered = await db.movementDetail.count({ where });
-
-        return {
-            data: movements.map(mapMovementDetail),
-            recordsTotal: total,
-            recordsFiltered: filtered
-        };
+        return { ...page, data: page.data.map(mapMovementDetail) };
 
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'inventory.findInventoryMovements', inventoryType: type });
@@ -353,6 +354,7 @@ export const findAllMaterialMovements = (options = {}) => findInventoryMovements
 export const findAllConsumableMovements = (options = {}) => findInventoryMovements({ ...options, type: MATERIAL_TYPES.CONSUMABLE });
 
 export const findAllWasteMovements = async ({
+    includeCounts = true,
     skip = 0,
     take = 10,
     startDate = '',
@@ -379,23 +381,20 @@ export const findAllWasteMovements = async ({
                 ...getMovementDateFilter({ startDate, endDate })
             }
         };
-        const [movements, total, filtered] = await Promise.all([
-            db.wasteMovementDetail.findMany({
+        const page = await findPage({
+            model: db.wasteMovementDetail,
+            hasFilters: Boolean(search || wasteId || supplierId || movementType || startDate || endDate),
+            includeCounts,
+            query: {
                 skip,
                 take,
                 orderBy: { movement: { [orderBy]: orderDir } },
                 where,
                 select: WASTE_MOVEMENT_DETAIL_SELECT
-            }),
-            db.wasteMovementDetail.count(),
-            db.wasteMovementDetail.count({ where })
-        ]);
+            }
+        });
 
-        return {
-            data: movements.map(mapWasteMovementDetail),
-            recordsTotal: total,
-            recordsFiltered: filtered
-        };
+        return { ...page, data: page.data.map(mapWasteMovementDetail) };
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'inventory.findAllWasteMovements' });
         throw new MovementFindDatabaseError();

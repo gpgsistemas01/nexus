@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
     returnGoodsIssueDetail: vi.fn(), findGoodsIssueReportRows: vi.fn()
 }));
 vi.mock('../../../../../src/services/warehouse/goodsIssues/goodsIssueService.js', () => mocks);
+vi.mock('../../../../../src/services/warehouse/goodsIssues/goodsIssueDetailService.js', () => mocks);
 vi.mock('../../../../../src/services/warehouse/goodsIssues/detailReturns/goodsIssueReturnService.js', () => ({
     returnGoodsIssueDetail: mocks.returnGoodsIssueDetail
 }));

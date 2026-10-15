@@ -31,18 +31,73 @@ flowchart TB
     subgraph transaction["Mismo tx · escrituras coordinadas"]
         reference["generateYearlyReferenceNumber<br/>recibe tx"] --> document["tx.goodsReceipt.create<br/>encabezado + createMany de detalles"]
         document --> movement["applyInventoryMovement<br/>recibe tx y detalles<br/>existencias + movimiento"]
+        movement --> costs["updateMaterialUnitCostIfHigher<br/>recibe el mismo tx"]
     end
-    movement --> commit["Resolver callback<br/>commit confirmado"]
+    costs --> commit["Resolver callback<br/>commit confirmado"]
     transaction -. error propagado .-> rollback["Rollback de escrituras<br/>sin resultado exitoso"]
-    commit --> costs["updateMaterialUnitCostIfHigher<br/>fuera de la transacción"]
-    costs --> result["Devolver entrada al controller<br/>publicación posterior al éxito del servicio"]
+    commit --> result["Devolver entrada al controller<br/>publicación posterior al éxito del servicio"]
 ```
 
 Las comprobaciones y la preparación anteriores a `$transaction` no quedan protegidas
-por su rollback. El recálculo posterior de costos tampoco revierte la entrada ya
-confirmada si falla. El contrato documenta este límite real y no promete atomicidad de
-todos los efectos. Dentro del callback se usa `tx` directamente o se propaga a helpers
-que seleccionan ese cliente mediante `getDb(tx)`.
+por su rollback. Las escrituras de costos de la compra sí participan en el mismo
+callback que documento, existencias y movimiento. Si fallan, se revierte la operación.
+Dentro del callback se usa `tx` directamente o se propaga a sus colaboradores.
+
+## Protección de escrituras concurrentes
+
+`repository/warehouse/documentLockRepository.js` concentra los bloqueos de fila de
+salidas y compras. Edición, surtido y devolución adquieren el bloqueo del documento
+antes de consultar sus cantidades y estados. Las operaciones de documentos distintos
+pueden continuar independientemente; si comparten artículos, sus actualizaciones de
+stock se ordenan por identidad para reducir bloqueos cruzados.
+
+`supplierMaterialStockService.js` y `wasteInventoryService.js` preparan cambios por
+identidad. `stockUpdateRepository.js` bloquea las existencias en orden común y las
+actualiza por lote con SQL parametrizado, condición de saldo y `RETURNING`.
+El historial obtiene el saldo anterior desde el saldo
+resultante y la cantidad aplicada, evitando que una lectura previa produzca dos
+movimientos con el mismo saldo inicial. Los detalles de un movimiento se conservan
+aunque la escritura de existencia agrupe varias líneas del mismo artículo.
+
+Los ajustes absolutos usan `stockLockRepository.js` antes de consultar la existencia.
+La diferencia se calcula desde ese saldo protegido. Las correcciones de compras
+reutilizan el movimiento por diferencia y mantienen costos y auditoría en el mismo
+`tx`. Los conflictos de estado y cantidad conservan sus errores de dominio y HTTP 409.
+
+La separación mantiene una transacción por caso de uso: surtido en servicios de
+detalle, consultas de estados en servicios de cumplimiento, cálculos de compras en
+`goodsReceiptHelpers.js` y escrituras de totales
+en `goodsReceiptTotalsService.js`. No se reserva un documento durante la captura en
+pantalla ni se deduplican entradas independientes; esos contratos necesitarían una
+versión de formulario o una clave de idempotencia adicional.
+
+Los servicios de detalle validan pertenencia y duplicados en un recorrido del lote;
+`issueDetailRepository.js` ejecuta una actualización parametrizada para sus distintos
+valores. Conserva el filtro por documento y actualiza `updatedAt`, ya que SQL directo
+no ejecuta `@updatedAt` de Prisma. La consulta no calcula reglas ni abre transacciones.
+
+`updateManyAndReturn` está soportado para PostgreSQL en Prisma 7 y se conserva al
+modificar una partida de compra condicionada a estado activo. En stock, cada identidad
+requiere una cantidad distinta: se envían todas en `VALUES`, una CTE materializada
+bloquea las filas en orden y `UPDATE ... RETURNING` devuelve sus saldos reales. El
+servicio verifica el conjunto completo y lanza el error de dominio si falta una fila;
+el rollback revierte también las filas del lote que sí pudieron modificarse. No se
+depende del orden del resultado ni se repite una consulta por existencia.
+
+Para reducir latencia se leen únicamente campos necesarios, se escriben detalles por
+lote y se mantiene una instancia de Prisma. Las operaciones dentro de una transacción
+usan una conexión y no se aceleran con `Promise.all`. `QueuedPrismaPg` ordena los
+métodos de consulta de cada transacción para cubrir también la carga de relaciones
+que Prisma ejecuta internamente en paralelo. La cola no bloquea el pool ni otras
+transacciones y propaga el error original para permitir el rollback. Los descuentos por existencia
+conservan su condición de saldo y orden de adquisición de bloqueos. La
+[medición del backend](../../../../testing/backend-performance.md) distingue
+consultas, recorridos de memoria, red, espera de conexión y contención.
+
+Referencias: [API de Prisma 7](https://www.prisma.io/docs/orm/v7/reference/prisma-client-reference#updatemanyandreturn),
+[transacciones](https://www.prisma.io/docs/orm/v7/prisma-client/queries/transactions#using-transaction-within-promiseall),
+[optimización](https://www.prisma.io/docs/orm/v7/prisma-client/queries/advanced/query-optimization-performance)
+y [discusión de la comunidad sobre valores distintos por fila](https://github.com/prisma/prisma/discussions/12389).
 
 La [secuencia del caso de entrada](../../processes/backend-code-sequences/purchases/cu-ent-02.md)
 completa el recorrido HTTP. [`DIA-PAT-DIN-001`](03-patterns-in-code.md#transacción-eventos-y-auditoría)

@@ -356,7 +356,7 @@ y CHECK de positividad y máximo de 999.99 kg:
 | `20261012210000_add_roll_waste_unit_weight` | Agrega el campo y el CHECK de positividad. |
 | `20261012233000_limit_roll_waste_weight_to_100kg` | Establece el máximo de 100 kg. |
 | `20261013153000_limit_roll_waste_weight_to_two_decimals` | Establece tres enteros y dos decimales. |
-| `20261013160000_add_roll_waste_cone_and_total_weight` | Migración consolidada pendiente: amplía el máximo a 999.99 kg según `DECIMAL(5,2)` y agrega cono y total por unidad, pesos del material/proveedor, vínculo e identidad con pesos; conserva netos históricos. |
+| `20261013160000_add_roll_waste_cone_and_total_weight` | Amplía el máximo a 999.99 kg según `DECIMAL(5,2)` y agrega cono y total por unidad, pesos del material/proveedor, vínculo e identidad con pesos; conserva netos históricos. |
 
 En una base que ya tenga el campo, revise los valores que impedirían aplicar
 estas migraciones:
@@ -377,11 +377,37 @@ históricos. Para una captura nueva, el CHECK exige cono no negativo, total mayo
 que cono y hasta 999.99 kg, y neto igual a la diferencia.
 
 La migración de referencias conserva las filas y pesos previos sin inferir cono,
-material de origen ni muestra. El origen histórico queda `NULL` y el largo existente
-se clasifica como `MEASURED`. Agrega FK `Waste.sourceMaterialId` con `RESTRICT` y
+material de origen ni muestra. El origen histórico queda `NULL` y las dimensiones existentes se conservan. Agrega FK `Waste.sourceMaterialId` con `RESTRICT` y
 reemplaza el índice único de cuatro campos por uno que incluye cono y total.
 `Waste_unknown_weights_identity`, definido en SQL porque Prisma no representa este
-índice parcial, impide duplicados cuando ambos pesos son `NULL`. Los CHECK protegen
-modo fijo/variable, neto de referencia y datos necesarios para una longitud estimada.
+índice parcial, impide duplicados cuando ambos pesos son `NULL`. Los CHECK protegen la captura conjunta de cono y total, su diferencia neta y
+los rangos de las referencias históricas.
 Una versión antigua sigue comparando sólo dimensiones: detener esas instancias antes
 de habilitar el registro con pesos distintos.
+
+### Muestra capturada desde merma
+
+`20261015190000_add_waste_sample_reference` agrega `Waste.sampleLengthM` y
+`Waste.sampleNetWeightKg` como `DECIMAL(18,6)` nullable. El CHECK admite ambos nulos
+o ambos positivos. No modifica los pesos de `SupplierMaterial` ni infiere referencias
+para históricos. Se aplica con `npm run db:migrate` antes de iniciar el backend nuevo;
+las migraciones históricas ya aplicadas permanecen intactas. El formulario de material
+ya no captura los pesos antiguos del rollo completo.
+
+### Rollo completo con cono como referencia de merma
+
+`20261015210000_add_waste_full_roll_reference` agrega el total del rollo completo en
+`Waste.referenceRollTotalWeightKg`, nullable `DECIMAL(5,2)`. Su CHECK exige que el neto
+de referencia sea total menos el mismo cono del sobrante. Los registros anteriores
+mantienen el nuevo campo nulo y conservan muestras y resultados sin reinterpretación.
+Aplicar `npm run db:migrate` antes de iniciar el backend nuevo. No editar migraciones
+aplicadas ni completar automáticamente los datos anteriores.
+
+### Valores de muestra conservados sólo como históricos
+
+`20261015230000_stop_persisting_waste_sample_values` adapta el CHECK de la referencia
+para admitir altas nuevas con `sampleLengthM` y `sampleNetWeightKg` nulos. El peso total
+del rollo completo sigue guardándose y debe ser mayor que el cono. Cuando un histórico
+conserva un neto de referencia, se sigue comprobando su diferencia con el total y cono.
+No elimina columnas ni actualiza datos anteriores. Aplicar `npm run db:migrate` antes
+de iniciar el backend nuevo; las migraciones previas no se modifican.

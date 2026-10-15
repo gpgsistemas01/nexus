@@ -125,10 +125,12 @@
           "null"
         ],
         "maximum": 999.99,
-        "description": "Peso del cono de referencia en kg; admite cero. Una vez registrado no se modifica ni elimina. Su copia en una nueva merma sí es editable.",
+        "description": "Referencia histórica del rollo completo; ya no se captura ni modifica.",
         "multipleOf": 0.01,
         "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
-        "minimum": 0
+        "minimum": 0,
+        "readOnly": true,
+        "deprecated": true
       },
       "referenceRollTotalWeightKg": {
         "type": [
@@ -138,9 +140,11 @@
         ],
         "exclusiveMinimum": 0,
         "maximum": 999.99,
-        "description": "Peso total con cono de un rollo completo; mayor que el cono. Se captura una vez o se completa si falta; después es inmutable. Se usa para estimar la longitud de nuevas mermas.",
+        "description": "Referencia histórica del rollo completo; ya no se captura ni modifica.",
         "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
+        "readOnly": true,
+        "deprecated": true
       }
     },
     "additionalProperties": false,
@@ -242,7 +246,8 @@
         "maximum": 999.99,
         "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
-        "minimum": 0
+        "minimum": 0,
+        "readOnly": true
       },
       "totalWeightKg": {
         "type": [
@@ -253,7 +258,8 @@
         "exclusiveMinimum": 0,
         "maximum": 999.99,
         "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
-        "multipleOf": 0.01
+        "multipleOf": 0.01,
+        "readOnly": true
       },
       "sourceMaterialId": {
         "type": [
@@ -293,6 +299,45 @@
       "updatedAt": {
         "type": "string",
         "format": "date-time",
+        "readOnly": true
+      },
+      "sampleLengthM": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 99999999.999999,
+        "multipleOf": 1e-06,
+        "description": "Largo de muestra histórico. Las altas nuevas lo dejan nulo y obtienen el largo del material de origen.",
+        "readOnly": true,
+        "deprecated": true
+      },
+      "sampleNetWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 99999999.999999,
+        "multipleOf": 1e-06,
+        "description": "Peso neto de muestra histórico. Las altas nuevas lo dejan nulo y calculan el neto con el total del rollo completo menos el cono.",
+        "readOnly": true,
+        "deprecated": true
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "multipleOf": 0.01,
+        "description": "Peso del rollo completo con cono, capturado desde merma. Se descuenta el mismo cono del sobrante; el largo procede del material.",
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "readOnly": true
       }
     },
@@ -570,30 +615,6 @@
       },
       "observations": {
         "type": "string"
-      },
-      "referenceConeWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "maximum": 999.99,
-        "description": "Peso del cono de referencia en kg; admite cero. Una vez registrado no se modifica ni elimina. Su copia en una nueva merma sí es editable.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
-        "minimum": 0
-      },
-      "referenceRollTotalWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "exclusiveMinimum": 0,
-        "maximum": 999.99,
-        "description": "Peso total con cono de un rollo completo; mayor que el cono. Se captura una vez o se completa si falta; después es inmutable. Se usa para estimar la longitud de nuevas mermas.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -625,30 +646,6 @@
       },
       "isActive": {
         "type": "boolean"
-      },
-      "referenceConeWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "maximum": 999.99,
-        "description": "Peso del cono de referencia en kg; admite cero. Una vez registrado no se modifica ni elimina. Su copia en una nueva merma sí es editable.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
-        "minimum": 0
-      },
-      "referenceRollTotalWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "exclusiveMinimum": 0,
-        "maximum": 999.99,
-        "description": "Peso total con cono de un rollo completo; mayor que el cono. Se captura una vez o se completa si falta; después es inmutable. Se usa para estimar la longitud de nuevas mermas.",
-        "multipleOf": 0.01,
-        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -692,7 +689,8 @@
       },
       "materialId": {
         "type": "string",
-        "format": "uuid"
+        "format": "uuid",
+        "description": "Material de origen con unidad m² (por símbolo o nombre metro cuadrado), excluyendo consumibles."
       },
       "supplierId": {
         "type": "string",
@@ -744,6 +742,18 @@
         "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vacíos; hasta tres enteros y dos decimales.",
         "multipleOf": 0.01,
         "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "multipleOf": 0.01,
+        "description": "Peso del rollo completo con cono, capturado desde merma. Se descuenta el mismo cono del sobrante; el largo procede del material.",
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -755,7 +765,7 @@
       "isActive",
       "newStock"
     ],
-    "description": "Envíe materialId, supplierId, pesos de merma y dimensiones finales. El formulario incorpora las medidas de Rollo aunque sus inputs estén deshabilitados; el servidor calcula la longitud con las referencias del material/proveedor y conserva la otra dimensión del material. El neto y las referencias no se envían como resultados persistentes. Otras presentaciones requieren ambas dimensiones capturadas."
+    "description": "Origen MATERIAL en m². No se permite crear Rollo sin pesos ni sustituir el cálculo con medidas manuales. Para Rollo capture coneWeightKg, totalWeightKg del sobrante y referenceRollTotalWeightKg del rollo completo con cono. El servidor descuenta el mismo cono de ambos pesos, toma el largo del material y calcula la longitud proporcional. No envíe netos ni sampleLengthM/sampleNetWeightKg. El largo y neto de muestra se calculan sin persistirlos; esos dos campos quedan reservados a históricos. Medidas, pesos y referencia quedan inmutables. Otras presentaciones en m² usan medidas manuales sin pesos."
   },
   "WasteUpdateRequest": {
     "type": "object",
@@ -1408,7 +1418,7 @@
       },
       "supplierMaterials": {
         "type": "array",
-        "description": "Oferta activa del proveedor seleccionado; conserva sus referencias de peso sin trasladarlas al material.",
+        "description": "Oferta activa del proveedor seleccionado; aporta el costo, sin referencias de peso del rollo completo.",
         "items": {
           "type": "object",
           "properties": {
@@ -1418,30 +1428,6 @@
                 "string",
                 "null"
               ]
-            },
-            "referenceConeWeightKg": {
-              "type": [
-                "number",
-                "string",
-                "null"
-              ],
-              "maximum": 999.99,
-              "description": "Peso predeterminado del cono en kg; admite cero. Se precarga al crear una merma de Rollo y puede editarse.",
-              "multipleOf": 0.01,
-              "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
-              "minimum": 0
-            },
-            "referenceRollTotalWeightKg": {
-              "type": [
-                "number",
-                "string",
-                "null"
-              ],
-              "exclusiveMinimum": 0,
-              "maximum": 999.99,
-              "description": "Total con cono de un rollo completo de muestra, mayor que el cono de muestra.",
-              "multipleOf": 0.01,
-              "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
             }
           },
           "additionalProperties": false
