@@ -139,7 +139,11 @@ sin medidas. `materialFormTest.js` omite las referencias históricas del payload
 `materialControllerDbTest.js` verifica altas directas y desde compra, conversión,
 consumibles sin dimensiones y origen de merma limitado a materiales en m². El rechazo
 de identificadores forzados demuestra que el filtro de Select2 no sustituye el control
-al guardar. `wasteWeightDbTest.js` verifica el cono compartido, las referencias calculadas y su inmutabilidad.
+al guardar. `wasteWeightDbTest.js` verifica el cono compartido, el guardado del total de muestra, la ausencia de valores derivados nuevos y la conservación de históricos.
 
 `wasteFullRollReferenceDbTest.js` prueba que la migración conserva referencias anteriores
 y exige que el neto del rollo completo corresponda al total menos el mismo cono.
+
+`wasteSampleHistoryDbTest.js` prueba la transición desde el CHECK anterior: admite
+altas sin persistir largo ni neto de muestra y conserva valores históricos y sus
+restricciones. Las migraciones aplicadas no se alteran.

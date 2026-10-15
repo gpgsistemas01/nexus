@@ -20,7 +20,7 @@ export class WasteWeightReadOnly extends AppError {
 
 export class WasteWeightInvalid extends AppError {
     constructor() {
-        super('El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.', 'WASTE_WEIGHT_INVALID', 400);
+        super('Capture pesos válidos de cono, merma y rollo completo; sólo aplican a Rollo.', 'WASTE_WEIGHT_INVALID', 400);
     }
 }
 

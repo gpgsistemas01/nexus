@@ -402,3 +402,12 @@ de referencia sea total menos el mismo cono del sobrante. Los registros anterior
 mantienen el nuevo campo nulo y conservan muestras y resultados sin reinterpretación.
 Aplicar `npm run db:migrate` antes de iniciar el backend nuevo. No editar migraciones
 aplicadas ni completar automáticamente los datos anteriores.
+
+### Valores de muestra conservados sólo como históricos
+
+`20261015230000_stop_persisting_waste_sample_values` adapta el CHECK de la referencia
+para admitir altas nuevas con `sampleLengthM` y `sampleNetWeightKg` nulos. El peso total
+del rollo completo sigue guardándose y debe ser mayor que el cono. Cuando un histórico
+conserva un neto de referencia, se sigue comprobando su diferencia con el total y cono.
+No elimina columnas ni actualiza datos anteriores. Aplicar `npm run db:migrate` antes
+de iniciar el backend nuevo; las migraciones previas no se modifican.

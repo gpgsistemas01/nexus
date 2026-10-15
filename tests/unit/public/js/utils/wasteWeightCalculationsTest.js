@@ -13,17 +13,25 @@ describe('longitud de merma a partir del rollo completo con cono', () => {
     expect(calculateWasteRollLength({ weightKg: 1, referenceLengthM: 20, referenceNetWeightKg: 2 })).toBe(10);
     expect(calculateWasteRollLength({ weightKg: 1, referenceLengthM: 20, referenceNetWeightKg: 0 })).toBeNull();
   });
-  it('descuenta una sola vez el mismo cono a ambos totales y guarda las referencias calculadas', () => {
+  it('descuenta una sola vez el mismo cono a ambos totales sin devolver valores intermedios para persistir', () => {
     const offer = { material, get referenceConeWeightKg() { throw new Error('Histórico de proveedor no aplicable'); } };
     expect(prepareWasteMeasurements({ offer, wasteDto: { referenceRollTotalWeightKg: 2.25, coneWeightKg: 0.25, totalWeightKg: 1.25, base: 999, height: 999, sampleLengthM: 999, sampleNetWeightKg: 999 } }))
-      .toEqual({ base: 1.5, height: 10, weightKg: 1, sampleLengthM: 20, sampleNetWeightKg: 2 });
+      .toEqual({ base: 1.5, height: 10, weightKg: 1 });
   });
   it.each([undefined, 0.25, 0.1])('rechaza un rollo completo sin peso neto válido: %s', referenceRollTotalWeightKg => {
     expect(() => prepareWasteMeasurements({ offer: { material }, wasteDto: { referenceRollTotalWeightKg, coneWeightKg: 0.25, totalWeightKg: 1.25, base: 1.5, height: 10 } }))
       .toThrow(expect.objectContaining({ code: 'WASTE_DIMENSIONS_INVALID' }));
   });
+  it('rechaza un alta de Rollo sin pesos aunque el cliente envíe medidas manuales', () => {
+    expect(() => prepareWasteMeasurements({ offer: { material }, wasteDto: { base: 1.5, height: 10 } }))
+      .toThrow(expect.objectContaining({ code: 'WASTE_WEIGHT_INVALID' }));
+  });
+  it('rechaza un Rollo sin largo nominal aunque el cliente envíe dimensiones', () => {
+    expect(() => prepareWasteMeasurements({ offer: { material: { ...material, height: null } }, wasteDto: { coneWeightKg: 0.25, totalWeightKg: 1.25, referenceRollTotalWeightKg: 2.25, base: 1.5, height: 10 } }))
+      .toThrow(expect.objectContaining({ code: 'WASTE_DIMENSIONS_INVALID' }));
+  });
   it('conserva medidas manuales y ausencia de pesos para Hoja', () => {
     expect(prepareWasteMeasurements({ offer: { material: { presentation: { name: 'HOJA' } } }, wasteDto: { base: 1, height: 2 } }))
-      .toEqual({ base: 1, height: 2, weightKg: null, sampleLengthM: null, sampleNetWeightKg: null });
+      .toEqual({ base: 1, height: 2, weightKg: null });
   });
 });

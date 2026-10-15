@@ -106,7 +106,7 @@ sequenceDiagram
     activate Domain
     Note over Domain: Consultar material y oferta dentro de la transacción<br/>Exigir tipo MATERIAL y unidad m²
     Domain->>Measurements: prepareWasteMeasurements({ wasteDto, offer })
-    Measurements-->>Domain: { base, height, weightKg, sampleLengthM, sampleNetWeightKg } o error de dominio
+    Measurements-->>Domain: { base, height, weightKg } o error de dominio
     Note over Measurements: Sólo Rollo: neto = total menos cono<br/>Largo = neto merma por largo del material entre neto rollo completo
     Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height, coneWeightKg, totalWeightKg })
     alt La merma ya existe
@@ -131,6 +131,7 @@ El selector sólo ofrece materiales de tipo MATERIAL con unidad m². El alta com
 la misma regla sobre la oferta consultada mediante `findSupplierMaterialByIds`, dentro
 de la transacción y sin otra consulta. Para Rollo, recibe el peso total con cono del
 rollo completo. Descuenta el mismo cono de ambos totales y toma el largo del material;
-guarda la referencia calculada, `sourceMaterialId`, pesos y dimensiones finales. No modifica la oferta.
+guarda `sourceMaterialId`, el total del rollo completo, pesos de merma y dimensiones finales.
+El largo y neto de muestra se usan sin persistirlos; sus columnas conservan sólo históricos. No modifica la oferta.
 Los pesos antiguos de material/proveedor se conservan como históricos y ya no se capturan
 desde el CRUD de material.

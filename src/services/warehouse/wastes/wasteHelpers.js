@@ -7,28 +7,23 @@ export const prepareWasteMeasurements = ({ wasteDto, offer }) => {
     const isRoll = isRollPresentation(material.presentation.name);
     const hasWeightCapture = coneWeightKg != null || wasteDto.totalWeightKg != null
         || wasteDto.referenceRollTotalWeightKg != null;
-    if (hasWeightCapture
-        && !isRoll) throw new WasteWeightInvalid();
+    if (!isRoll && hasWeightCapture) throw new WasteWeightInvalid();
     const weightKg = isRoll ? calculateWasteNetWeight({ coneWeightKg, totalWeightKg: wasteDto.totalWeightKg }) : null;
-    if (isRoll && hasWeightCapture && weightKg == null) throw new WasteWeightInvalid();
-    const dimensions = { base: wasteDto.base, height: wasteDto.height };
-    let sampleLengthM = null;
-    let sampleNetWeightKg = null;
+    // RF-MER-011/012: un alta de Rollo exige pesos; las medidas manuales no sustituyen la referencia.
+    if (isRoll && weightKg == null) throw new WasteWeightInvalid();
     const reference = prepareWasteRollReference(offer);
+    if (isRoll && !reference) throw new WasteDimensionsInvalid();
+    const dimensions = { base: wasteDto.base, height: wasteDto.height };
     if (reference) {
         dimensions[reference.widthField] = reference.widthM;
-        if (weightKg != null) {
-            // La muestra es el rollo completo y comparte el mismo cono con el sobrante.
-            sampleLengthM = reference.lengthM;
-            sampleNetWeightKg = calculateWasteNetWeight({ coneWeightKg, totalWeightKg: wasteDto.referenceRollTotalWeightKg });
-            const calculatedLength = calculateWasteRollLength({ weightKg, referenceLengthM: sampleLengthM, referenceNetWeightKg: sampleNetWeightKg });
-            if (calculatedLength == null) throw new WasteDimensionsInvalid();
-            dimensions[reference.lengthField] = calculatedLength;
-        }
+        // La muestra es el rollo completo y comparte el mismo cono con el sobrante.
+        const referenceNetWeightKg = calculateWasteNetWeight({ coneWeightKg, totalWeightKg: wasteDto.referenceRollTotalWeightKg });
+        const calculatedLength = calculateWasteRollLength({ weightKg, referenceLengthM: reference.lengthM, referenceNetWeightKg });
+        if (calculatedLength == null) throw new WasteDimensionsInvalid();
+        dimensions[reference.lengthField] = calculatedLength;
     }
-    if (weightKg != null && !reference) throw new WasteDimensionsInvalid();
 
     const { base, height } = dimensions;
     if (![base, height].every(value => Number.isFinite(value) && value > 0)) throw new WasteDimensionsInvalid();
-    return { base, height, weightKg, sampleLengthM, sampleNetWeightKg };
+    return { base, height, weightKg };
 };

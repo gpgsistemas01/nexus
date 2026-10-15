@@ -176,7 +176,7 @@ export const createWasteWithInitialStockAdjustment = async ({
                 throw new WasteMaterialInvalid();
             }
             const coneWeightKg = wasteDto.coneWeightKg;
-            const { base, height, weightKg, sampleLengthM, sampleNetWeightKg } = prepareWasteMeasurements({ wasteDto, offer });
+            const { base, height, weightKg } = prepareWasteMeasurements({ wasteDto, offer });
             const existingWaste = await findWasteByIdentity({ tx, supplierId: wasteDto.supplierId, name: wasteDto.name, base, height, coneWeightKg: coneWeightKg ?? null, totalWeightKg: wasteDto.totalWeightKg ?? null });
             if (existingWaste) throw new WasteAlreadyExists({ waste: existingWaste });
 
@@ -196,8 +196,6 @@ export const createWasteWithInitialStockAdjustment = async ({
                     sourceMaterial: { connect: { id: material.id } },
                     coneWeightKg: coneWeightKg ?? null,
                     totalWeightKg: wasteDto.totalWeightKg ?? null,
-                    sampleLengthM,
-                    sampleNetWeightKg,
                     referenceRollTotalWeightKg: wasteDto.referenceRollTotalWeightKg ?? null,
                     weightKg,
                     currentStock: wasteDto.newStock,

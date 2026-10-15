@@ -146,7 +146,7 @@ Los registros anteriores conservan su peso neto; cono y total permanecen `NULL`.
 | --- | --- |
 | `SupplierMaterial` | Sus pesos anteriores son históricos y no se capturan ni modifican desde material. |
 | `Material` | Tipo MATERIAL, unidad m². Para Rollo aporta ancho menor, orientación y largo del rollo completo. |
-| `Waste` | Conserva `sourceMaterialId`, dimensiones, cono, total y neto del sobrante, total del rollo completo y la referencia calculada (`sampleLengthM`, `sampleNetWeightKg`). Son inmutables tras el alta. |
+| `Waste` | Conserva `sourceMaterialId`, dimensiones, cono, total y neto del sobrante, total del rollo completo. Los valores derivados `sampleLengthM` y `sampleNetWeightKg` sólo conservan datos históricos. Pesos y dimensiones son inmutables tras el alta. |
 
 La muestra es el rollo completo, incluyendo el mismo cono de la merma:
 
@@ -157,14 +157,18 @@ largoMerma = netoMerma × largoRolloCompleto / netoRollo
 ```
 
 Sólo se captura como referencia adicional `referenceRollTotalWeightKg`. El servidor
-obtiene el largo del material y guarda ambos valores netos calculados; no confía en
-resultados del navegador. Los pesos capturados usan `Decimal(5,2)`, hasta 999.99 kg.
+obtiene el largo del material y calcula ambos netos. Guarda el neto del sobrante y
+sus medidas finales; el neto y largo de muestra se utilizan sin persistirlos. No confía
+en resultados del navegador. Los pesos capturados usan `Decimal(5,2)`, hasta 999.99 kg.
 Los campos de referencia anteriores conservan su precisión `Decimal(18,6)` y sus
 valores históricos, sin convertirlos a un rollo completo.
 
 La migración incremental `20261015210000_add_waste_full_roll_reference` añade el total
 del rollo completo nullable y un CHECK que exige descontar el mismo cono. Mantiene las
 muestras anteriores y los registros sin referencia. No altera medidas, pesos ni saldos.
+La migración `20261015230000_stop_persisting_waste_sample_values` permite las altas
+nuevas con ambos valores derivados nulos. Si un histórico ya tiene neto de referencia,
+se conserva su consistencia con el total y el cono. No se borran ni recalculan datos.
 Las migraciones aplicadas permanecen intactas.
 
 La identidad conserva proveedor, nombre, medidas y pesos. Una referencia distinta que

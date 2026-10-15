@@ -60,8 +60,8 @@ las utilidades compartidas, sin consultas ni reconstrucciones de la selección.
 El neto del sobrante funciona aunque falte el peso del rollo completo.
 
 Ambas medidas de Rollo siguen deshabilitadas; el normalizador las incorpora al payload
-junto a los tres pesos capturados. El servidor calcula sus resultados y conserva las
-referencias. Las muestras de registros anteriores se muestran en **Referencia histórica**,
+junto a los tres pesos capturados. El servidor guarda el total del rollo completo y los resultados finales; el largo y
+neto de muestra se calculan sin persistirlos en registros nuevos. Las muestras de registros anteriores se muestran en **Referencia histórica**,
 sólo para consulta; no se recalculan ni se convierten en pesos de rollo completo.
 En otras presentaciones en m² se capturan medidas manuales y se ocultan los pesos.
 

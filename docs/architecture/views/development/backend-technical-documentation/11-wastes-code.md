@@ -86,13 +86,22 @@ con cono en `referenceRollTotalWeightKg`, además del cono y el total del sobran
 el largo de la otra dimensión nominal. Descuenta el mismo cono de ambos totales y
 calcula `netoMerma × largoRollo / netoRollo`. No consulta ni guarda datos.
 
-El servicio guarda el peso del rollo completo y conserva como referencia del cálculo
-`sampleLengthM` y `sampleNetWeightKg`, calculados por el servidor. El DTO no acepta
-estos resultados del cliente. No actualiza `SupplierMaterial`; sus referencias previas
+El servicio guarda el total del rollo completo, el cono, el total y neto del sobrante,
+las medidas finales y `sourceMaterialId`. El largo y neto de muestra sólo son valores
+intermedios; `sampleLengthM` y `sampleNetWeightKg` quedan nulos en altas nuevas y se
+conservan exclusivamente para consultar históricos. El DTO no acepta estos campos. No actualiza `SupplierMaterial`; sus referencias previas
 siguen históricas. Los validators comprueban cada peso con las reglas compartidas y
-entregan códigos de `errorMap` mediante `withMessage`.
+entregan códigos de `errorMap` mediante `withMessage`. El servicio comprueba la
+presentación persistida y rechaza con `WASTE_WEIGHT_INVALID` un alta de Rollo sin
+pesos, aunque se intenten enviar medidas manuales. Se reutiliza la oferta ya consultada;
+esta regla no agrega consultas. Los históricos sin pesos permanecen de consulta.
 
 La migración `20261015210000_add_waste_full_roll_reference` agrega un campo nullable
 y exige que el neto de referencia corresponda al total menos el mismo cono. No cambia
 las muestras anteriores ni sus resultados. Los tres pesos capturados admiten hasta
 999.99 kg y dos decimales; referencia, medidas y pesos siguen protegidos en edición.
+
+`20261015230000_stop_persisting_waste_sample_values` permite omitir esos valores
+derivados sin borrar referencias anteriores. Las medidas del material son inmutables
+y el neto de la muestra se obtiene del total guardado menos el cono. La migración se
+aplica antes de iniciar el backend actualizado con `npm run db:migrate`.

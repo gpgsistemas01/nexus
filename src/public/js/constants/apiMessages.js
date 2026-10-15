@@ -26,7 +26,7 @@ export const errorMessages = {
     WEIGHT_KG_TOO_LONG: 'El peso admite hasta 3 dígitos enteros y 2 decimales.',
     WEIGHT_KG_TOO_HIGH: 'El peso por unidad no puede superar 999.99 kg.',
     WASTE_WEIGHT_READ_ONLY: 'No se pueden modificar los pesos de una merma ya registrada. Estos datos sólo están disponibles para consulta.',
-    WASTE_WEIGHT_INVALID: 'El peso debe ser positivo y sólo aplica a mermas con presentación Rollo.',
+    WASTE_WEIGHT_INVALID: 'Capture pesos válidos de cono, merma y rollo completo; sólo aplican a Rollo.',
     // 🔐 AUTH / GENERALES
     LOGIN_ERROR: 'Usuario o contraseña incorrectos.',
     VALIDATION_ERROR: 'Errores de validación.',

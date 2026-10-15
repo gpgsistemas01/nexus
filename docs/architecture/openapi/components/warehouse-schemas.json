@@ -310,8 +310,9 @@
         "exclusiveMinimum": 0,
         "maximum": 99999999.999999,
         "multipleOf": 1e-06,
-        "description": "Largo de referencia conservado al registrar; para nuevas mermas procede del rollo completo seleccionado. No se captura.",
-        "readOnly": true
+        "description": "Largo de muestra histórico. Las altas nuevas lo dejan nulo y obtienen el largo del material de origen.",
+        "readOnly": true,
+        "deprecated": true
       },
       "sampleNetWeightKg": {
         "type": [
@@ -322,8 +323,9 @@
         "exclusiveMinimum": 0,
         "maximum": 99999999.999999,
         "multipleOf": 1e-06,
-        "description": "Peso neto de referencia conservado al registrar; para nuevas mermas es el peso del rollo completo menos el mismo cono del sobrante. No se captura.",
-        "readOnly": true
+        "description": "Peso neto de muestra histórico. Las altas nuevas lo dejan nulo y calculan el neto con el total del rollo completo menos el cono.",
+        "readOnly": true,
+        "deprecated": true
       },
       "referenceRollTotalWeightKg": {
         "type": [
@@ -763,7 +765,7 @@
       "isActive",
       "newStock"
     ],
-    "description": "Origen MATERIAL en m². Para Rollo capture coneWeightKg, totalWeightKg del sobrante y referenceRollTotalWeightKg del rollo completo con cono. El servidor descuenta el mismo cono de ambos pesos, toma el largo del material y calcula la longitud proporcional. No envíe netos ni sampleLengthM/sampleNetWeightKg: son resultados del servidor. Medidas, pesos y referencia quedan inmutables. Otras presentaciones en m² usan medidas manuales sin pesos."
+    "description": "Origen MATERIAL en m². No se permite crear Rollo sin pesos ni sustituir el cálculo con medidas manuales. Para Rollo capture coneWeightKg, totalWeightKg del sobrante y referenceRollTotalWeightKg del rollo completo con cono. El servidor descuenta el mismo cono de ambos pesos, toma el largo del material y calcula la longitud proporcional. No envíe netos ni sampleLengthM/sampleNetWeightKg. El largo y neto de muestra se calculan sin persistirlos; esos dos campos quedan reservados a históricos. Medidas, pesos y referencia quedan inmutables. Otras presentaciones en m² usan medidas manuales sin pesos."
   },
   "WasteUpdateRequest": {
     "type": "object",

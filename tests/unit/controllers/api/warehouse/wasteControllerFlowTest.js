@@ -140,6 +140,9 @@ describe('wasteController complete flow', () => {
     const req = {
       body: {
         name: 'Recorte confirmado',
+        coneWeightKg: '0.25',
+        totalWeightKg: '1.25',
+        referenceRollTotalWeightKg: '1.25',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: '2',
@@ -323,6 +326,9 @@ describe('wasteController complete flow', () => {
     const req = {
       body: {
         name: 'Lámina',
+        coneWeightKg: '0.25',
+        totalWeightKg: '1.25',
+        referenceRollTotalWeightKg: '1.25',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: '2',

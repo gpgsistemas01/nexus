@@ -22,7 +22,7 @@
 | RF-MER-006 | El sistema debe impedir dos mermas con la misma combinación normalizada de nombre, proveedor, ancho, largo, peso del cono y peso total. Dos rollos de iguales medidas con pesos distintos deben poder registrarse por separado; una coincidencia completa durante el alta debe ofrecer abrir el modal existente de Agregar stock mediante Swal, precargando cantidad y observaciones. Sólo guardar ese modal debe registrar la entrada. | Implementado | `prisma/schema.prisma`, `src/services/warehouse/wastes/wasteService.js`, `src/public/js/pages/warehouse/wastes/wasteForm.js` |
 | RF-MER-007 | Para presentación ROLLO, el formulario debe mantener ambas medidas deshabilitadas, fijar la menor dimensión nominal positiva en su campo original y calcular la otra con los pesos netos de la merma y el rollo completo. El envío debe incluir ambos valores. Para otras presentaciones, el actor debe capturar las dimensiones requeridas. | Implementado | `src/public/js/utils/warehouseInventoryUtils.js`, `src/public/js/ui/inventory/wasteFormUI.js`, `src/services/warehouse/wastes/wasteHelpers.js` |
 | RF-MER-008 | El sistema debe calcular la cantidad convertida de una merma como existencia × base × altura en altas, ajustes y salidas, sin solicitar su captura manual. | Implementado | `src/services/inventory/stockHelpers.js`, `src/services/warehouse/wastes/wasteService.js` |
-| RF-MER-009 | La merma debe vincularse al material de origen y conservar dimensiones, pesos, muestra y costo propios sin modificar la oferta ni recalcular registros anteriores. | Implementado | `prisma/schema.prisma`, `wasteService.js` |
+| RF-MER-009 | La merma debe vincularse al material de origen y conservar dimensiones, pesos de la merma, total de muestra y costo propios sin modificar la oferta ni recalcular registros anteriores. | Implementado | `prisma/schema.prisma`, `wasteService.js` |
 | RF-MER-010 | Personal de almacén o el Administrador del sistema deben poder sumar una cantidad positiva a una merma mediante **Agregar stock**, conservando un documento individual con folio, actor, observaciones opcionales, cantidad y saldos, vinculado a un movimiento de entrada. | Implementado | `src/routes/api/warehouse/wasteApiRoute.js`, `src/services/warehouse/wastes/wasteStockEntryService.js`, `src/services/warehouse/wastes/wasteMovementService.js`, `src/constants/permissions.js` |
 | RF-MER-011 | Al registrar una merma de Rollo, almacén debe capturar en kg el peso del cono y el peso de una unidad de merma con cono, distintos del peso del rollo completo. El sistema debe calcular el neto como total menos cono. Los tres pesos quedan para consulta después del alta y se conservan al mover existencias de la misma identidad. Los históricos sin peso conservan su valor desconocido. | Implementado | formulario de merma, `wasteDTO.js`, `wasteService.js`, `wasteWeightDbTest.js` |
 | RF-MER-012 | Al registrar merma de Rollo, la muestra es un rollo completo con cono. Almacén sólo captura su peso total como referencia adicional en Merma; el largo procede del material. El mismo cono se descuenta de la referencia y del sobrante. Los valores quedan inmutables con la merma y no modifican material/proveedor. | Implementado | formulario de merma, `wasteDTO.js`, `wasteService.js`, `wasteWeightDbTest.js` |
@@ -49,9 +49,12 @@
   exclusivo del Administrador conforme a `RF-CAT-018` y `RF-ADJ-001`.
 - **CA-RF-MER-012-1:** el peso del rollo completo con cono debe ser mayor que el
   cono, hasta 999.99 kg y con dos decimales. El largo se toma del material; no se
-  capturan largo ni neto de muestra. El mismo cono se resta a ambos totales.
-- **CA-RF-MER-012-2:** la merma guarda la referencia calculada y sus resultados,
-  inmutables tras el alta. No actualiza pesos ni existencias de material/proveedor.
+  capturan largo ni neto de muestra. El mismo cono se resta a ambos totales. Un alta
+  de Rollo sin pesos se rechaza aunque se envíen dimensiones manuales.
+- **CA-RF-MER-012-2:** la merma guarda el total de muestra, cono, total y neto de merma,
+  dimensiones finales y material de origen, inmutables tras el alta. El largo y neto de
+  muestra sólo se calculan; sus campos anteriores quedan reservados a históricos.
+  No actualiza pesos ni existencias de material/proveedor.
 - **CA-RF-MER-012-3:** las referencias históricas permanecen intactas, sin inferir un
   peso del rollo completo ni recalcular medidas anteriores.
 
