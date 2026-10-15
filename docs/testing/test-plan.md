@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.0 | 1.0.0 | En revisión | 2026-09-10 | Equipo Nexus |
+| 1.1 | 1.0.0 | En revisión | 2026-10-15 | Equipo Nexus |
 
 ## Objetivo y alcance
 
@@ -21,6 +21,37 @@ detalles de HTML, estilos, selectores, eventos o estructura de archivos.
 
 Nexus usa de forma selectiva ISO/IEC/IEEE 29119-2 para el proceso, 29119-3 para
 los artefactos y 29119-4 para las técnicas de diseño, sin declarar conformidad.
+Las tablas siguientes son una adaptación local; no se presentan como formularios
+literales ni como cumplimiento completo de esas normas. La
+[revisión de la suite](suite-review.md) registra las decisiones de conservación,
+consolidación y retiro por archivo del inventario revisado.
+
+## Selección por riesgo y mantenimiento
+
+La prioridad considera impacto, probabilidad y defectos observados. Un cambio de stock,
+permisos, atomicidad o historia tiene prioridad sobre un detalle de presentación. Los
+defectos recientes de piezas, cálculo automático y confirmación de merma justifican
+mantener pruebas de estado y payload del formulario además de las reglas del servidor.
+
+Antes de agregar, cambiar o retirar una prueba:
+
+1. Identificar requisito o riesgo, condición observable y resultado que decide si pasa
+   (oráculo); enlazar un identificador existente cuando corresponda, sin inventar requisitos.
+2. Elegir nivel y técnica; enumerar particiones, fronteras, combinaciones o transiciones
+   relevantes. `it.each` y los mocks son mecanismos de automatización.
+3. Buscar evidencia equivalente por condición y oráculo. Una fórmula pura, el payload
+   enviado y el estado en PostgreSQL protegen contratos diferentes aunque usen los mismos datos.
+4. Mantener matrices extensas en el nivel más pequeño que las demuestra. Integración
+   añade representantes de rechazo, códigos, persistencia y ausencia de efectos parciales;
+   no necesita repetir cada formato inválido ya demostrado de forma aislada.
+5. Registrar la decisión en la revisión del cambio. Para reglas críticas o integraciones,
+   actualizar diseño, ficha y matriz funcional afectada. Retirar sólo si la regla quedó
+   obsoleta, existe evidencia equivalente o el aporte adicional no justifica el mantenimiento;
+   indicar siempre qué riesgo queda cubierto y qué limitación se acepta.
+
+No se retiran pruebas de migración por el cambio de un formulario: los estados de partida
+históricos siguen siendo necesarios para comprobar una actualización sin pérdida de datos.
+Los conteos de casos aprobados no expresan porcentaje de cobertura ni cumplimiento del plan.
 
 ## Forma de documentar diseño, casos y ejecución
 
@@ -41,7 +72,11 @@ resultados independientes.
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
-| `DP-<DOM>-NNN` | `RF-*`, `RN-*`, `CU-*` o riesgo identificado | Unitario, integración, esquema o manual; técnica de 29119-4 aplicada | Regla, frontera, combinación o transición observable | `CP-<DOM>-NNN-*` o ruta/grupo automatizado |
+| `DP-<DOM>-NNN` | `RF-*`, `RN-*`, `CU-*` o riesgo identificado | Unitario, integración, sistema o aceptación; técnica elegida | Particiones y representantes, fronteras, combinaciones factibles o transiciones y su oráculo | `CP-*` o ruta/grupo automatizado |
+
+El esquema SQL es un objeto de prueba y manual/automatizada es una forma de ejecución;
+ninguno constituye por sí mismo un nivel. Un diseño puede repartir condiciones entre
+niveles si cada uno aporta evidencia diferente.
 
 ### 2. Especificación del caso y datos
 
@@ -109,14 +144,20 @@ stock, movimientos, detalles y rollback cuando esos efectos formen parte del flu
 | Unitario | `tests/unit/<ruta paralela al código>` | Una regla, función o colaboración aislada; sustituye dependencias cuando corresponde. | Persistencia real ni el flujo completo entre capas. |
 | Integración | `tests/integration/controllers` | Request HTTP, controller, servicios y Prisma contra una base aislada. | Recorrido de navegador ni aceptación del usuario. |
 
-No se crea un nivel unitario para componentes visuales o infraestructura incidental.
-Si un helper compartido coordina datos CRUD, se prueba una vez en la ruta paralela a su
-módulo y los contextos reutilizan ese contrato.
+Las unitarias de UI se limitan a estados y datos con riesgo funcional: descartar medidas
+para piezas, actualizar el neto y la longitud, incluir inputs deshabilitados en el payload
+o impedir una escritura antes de confirmar en el modal. No fijan HTML, CSS, orden de
+columnas ni detalles privados del plugin. Las colaboraciones sólo justifican aserciones
+de llamadas cuando representan un efecto contractual, como impedir un doble envío.
+Si un helper compartido coordina datos CRUD, su regla se prueba en la ruta paralela a su
+módulo; los contextos añaden evidencia sólo cuando tienen decisiones o contratos propios.
 
-Las migraciones aplicadas sobre `DATABASE_TEST_URL` preparan el esquema para
-integración; `npm run docs:check` valida documentación. Son comprobaciones de soporte,
-no niveles adicionales de prueba funcional. Actualmente no existe una suite automatizada
-de sistema, navegador o aceptación; cuando se requiera, se registra de forma separada.
+Las pruebas de `tests/integration/migrations` verifican restricciones, conservación
+histórica y rollback en PostgreSQL; no se confunden con preparar el esquema de las
+integraciones HTTP. Las unitarias de herramientas y del adaptador transaccional protegen
+sus contratos de soporte; `npm run docs:check` valida documentación. No constituyen
+niveles funcionales nuevos. Actualmente no existe una suite automatizada de sistema,
+navegador o aceptación; cuando se requiera, se registra de forma separada.
 
 ### Técnicas de diseño
 
@@ -125,11 +166,16 @@ crea otro inventario paralelo al índice de casos:
 
 | Técnica | Aplicación |
 | --- | --- |
-| Particiones de equivalencia | Entradas válidas, inválidas o ausentes y decisiones de autorización. |
-| Valores frontera | Cero, negativos, máximos, precisión decimal, fechas, páginas y colecciones vacías. |
-| Tablas de decisión | Combinaciones de rol, departamento, operación o estado; pueden materializarse con `it.each`. |
-| Transiciones y atomicidad | Cambios de estado, duplicidad, movimientos y rollback sin efectos parciales. |
-| Interacción y fallos | Contratos entre capas y detención de colaboradores posteriores ante un error. |
+| Particiones de equivalencia | Identificar clases con el mismo tratamiento: válido, ausente, formato incorrecto o tipo JSON incompatible. Elegir representantes por clase. |
+| Valores frontera | Precisar el límite y sus vecinos según la resolución admitida; para peso con dos decimales, `0`, `0.01`, `999.99` y `1000`. La precisión excesiva es además una clase inválida. |
+| Tablas de decisión | Enumerar condiciones, combinaciones factibles y acciones esperadas, por ejemplo conflicto, modo, permiso, identidad y confirmación. Parametrizar datos no basta para afirmar esta técnica. |
+| Transiciones de estado | Identificar estado inicial, evento y estado final; probar transiciones permitidas y rechazos relevantes, como pendiente → surtido o captura → modal de stock. |
+
+Atomicidad, concurrencia, aislamiento de contextos y fallos de persistencia son riesgos
+y escenarios que estas técnicas ayudan a diseñar; no técnicas adicionales. La inyección
+de fallos y el bloqueo de filas son medios de ejecución. Si se necesita cobertura de
+sentencias o ramas, debe medirse con instrumentación; no se deduce de las tablas ni de
+la cantidad de pruebas.
 
 ### Ambiente de pruebas e integración con base de datos
 
@@ -158,9 +204,9 @@ Vitest.
 | --- | --- |
 | Catálogos, clientes y proveedores | Mantener integraciones de alta y consulta; ampliar actualización o baja sólo al modificar esos flujos. |
 | Salidas de merma | Mantener registro, persistencia, movimiento y rollback existentes. |
-| Consumibles | Mantener la cobertura unitaria por operación e incorporar integración HTTP/Prisma de consulta, alta, edición, retiro y ajuste; comprobar además que reporte y selectores no mezclen tipos. |
-| Salidas de material | Incorporar integración HTTP de registro, entrega/devolución, stock y rollback. |
-| Entradas de compra | Incorporar integración HTTP de registro, corrección, costo, movimiento y rollback. |
+| Consumibles | Mantener unitarias por operación y altas sin medidas integradas en `materialControllerDbTest.js`; completar consulta, edición, retiro y ajuste HTTP de su propio inventario. |
+| Salidas de material | Mantener `goodsIssueControllerDbTest.js` y `warehouseConcurrencyControllerDbTest.js`: contexto, surtido, devolución parcial, concurrencia y rollback; completar fronteras de devolución. |
+| Entradas de compra | Mantener `goodsReceiptContextDbTest.js` y `warehouseConcurrencyControllerDbTest.js`: aislamiento, alta, edición, corrección, cancelación, folios y fallos; ampliar sólo la regla afectada. |
 | Personas y usuarios | Incorporar persistencia de relaciones de rol y departamento. |
 | Autorización por contexto | Mantener casos unitarios positivos y negativos por combinación rol/departamento; ventas permanece sin permisos del sistema. |
 | Auditoría de escrituras | Incorporar unitarias de clasificación/sanitizado y middleware, más integración que distinga respuesta exitosa, fallida y persistencia best effort. |
@@ -176,9 +222,24 @@ aislado si se usa Prisma. Para aceptar el cambio:
 - cada escritura integrada se consulta con Prisma;
 - los errores de operaciones compuestas no dejan registros parciales;
 - no hay pruebas deshabilitadas ni duplicación del mismo camino feliz;
+- cada retiro conserva la cobertura identificada o documenta la limitación aceptada;
 - `npm run docs:check` confirma la documentación generada.
 
 En desarrollo se ejecutan primero las unitarias e integraciones del área. En el pull
 request se ejecutan `npm run test:unit`, `npm run test:integration` con base aislada y
 `npm run docs:check`. La evidencia indica comando, resultado y commit; una captura no
 sustituye aserciones HTTP o Prisma.
+
+CI ejecuta unitarias e integración en pasos distintos y conserva `unit.xml` e
+`integration.xml` como artefacto `test-results`, incluso si una suite falla. Los reportes
+JUnit complementan el log y los metadatos de la ejecución (commit, ambiente y fecha);
+no sustituyen la trazabilidad de diseño ni constituyen una certificación ISO. Si una
+suite no llega a ejecutarse, se registra como no ejecutada o bloqueada, no como aprobada.
+No se versionan esos reportes en `docs`.
+
+## Referencias
+
+- [ISO/IEC/IEEE 29119-3:2021](https://www.iso.org/standard/79429.html): documentación de pruebas; adaptación selectiva a diseño, caso y ejecución.
+- [ISO/IEC/IEEE 29119-4:2021](https://www.iso.org/standard/79430.html): técnicas de diseño.
+- [ISTQB CTFL 4.0.1](https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf), apartados 1.4, 4.2 y 5.2: trazabilidad, técnicas y priorización por riesgo.
+- [Reporters de Vitest](https://vitest.dev/guide/reporters.html) y [artefactos de GitHub Actions](https://docs.github.com/en/actions/tutorials/store-and-share-data): evidencia automatizada de ejecución.

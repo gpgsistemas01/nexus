@@ -3,6 +3,9 @@
 Las pruebas demuestran comportamiento y reglas del CRUD; no fijan formato, orden de
 imports, nombres privados ni estructura incidental sólo para comprobar este estándar.
 
+- Antes de modificar la suite, aplicar el [plan de pruebas](../../testing/test-plan.md):
+  requisito o riesgo, condición, nivel, técnica y oráculo. Las fichas `DP-*` y `CP-*`
+  son selectivas; los resultados de cada ejecución permanecen en CI o en la revisión.
 - Unitarias replican la ruta del módulo bajo `tests/unit`.
 - Controllers unitarios viven en `tests/unit/controllers/<tipo>/<dominio>`.
 - Rutas unitarias viven en `tests/unit/routes/<tipo>/<dominio>`.
@@ -18,8 +21,11 @@ imports, nombres privados ni estructura incidental sólo para comprobar este est
   compuesto demuestra ausencia de escrituras parciales.
 - Se reutilizan harness, factories y fixtures; cada contexto conserva la integración que
   demuestra su router, configuración, persistencia y efectos propios.
-- No se agregan pruebas de HTML, selectores o implementación interna cuando el plan de
-  pruebas declara que ese nivel no aporta evidencia CRUD.
+- Conservar estados y payloads de UI con riesgo funcional; no comprobar clases CSS,
+  orden de columnas ni llamadas privadas como sustituto del resultado observable.
+  Un plugin simulado no demuestra integración con el navegador.
+- Antes de retirar un caso, justificar su aporte marginal y la cobertura que permanece
+  según el plan. Compartir datos entre niveles no vuelve equivalentes sus oráculos.
 
 ### 11.1 Ejemplos de ubicación y evidencia CRUD
 

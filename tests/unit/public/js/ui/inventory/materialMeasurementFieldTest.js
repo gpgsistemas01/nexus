@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-import { materialCreateValidation } from '../../../../../../src/public/js/utils/validations/validators.js';
 
 vi.mock('../../../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({ setMdbWrapperInputValue: vi.fn() }));
 const { updateMaterialMeasurementFields } = await import('../../../../../../src/public/js/ui/inventory/inventorySelectUI.js');
@@ -23,7 +22,7 @@ const createForm = ({ unit = 'pza - PIEZA', mode = 'create', resource = 'materia
 };
 
 describe('medidas de material según la unidad seleccionada', () => {
-  it('oculta, deshabilita y limpia medidas y errores al cambiar de metros a pieza', () => {
+  it('deshabilita y limpia medidas y errores al cambiar de metros a pieza', () => {
     const form = createForm({ unit: 'm² - METRO CUADRADO' });
     updateMaterialMeasurementFields({ form });
     expect(form.elements.base.disabled).toBe(false);
@@ -31,11 +30,9 @@ describe('medidas de material según la unidad seleccionada', () => {
     form.elements.unitMeasureId.selectedOptions[0].textContent = 'pza - PIEZA';
     updateMaterialMeasurementFields({ form });
 
-    expect(form.section.classList.toggle).toHaveBeenLastCalledWith('d-none', true);
     for (const field of ['base', 'height']) {
       expect(form.elements[field]).toMatchObject({ value: '', disabled: true, required: false });
       expect(form.feedback[field].textContent).toBe('');
-      expect(materialCreateValidation[field](undefined, {})).toBeNull();
     }
   });
 
@@ -45,18 +42,14 @@ describe('medidas de material según la unidad seleccionada', () => {
     form.elements.unitMeasureId.selectedOptions[0].textContent = unit;
     updateMaterialMeasurementFields({ form });
 
-    expect(form.section.classList.toggle).toHaveBeenLastCalledWith('d-none', false);
     expect(form.elements.base).toMatchObject({ disabled: false, required: false });
     expect(form.elements.height.disabled).toBe(false);
-    expect(materialCreateValidation.height(undefined, { base: 2 })).toEqual(expect.any(String));
-    expect(materialCreateValidation.height(3, { base: 2, height: 3 })).toBeNull();
   });
 
-  it.each(['', 'kg - KILOGRAMO'])('oculta las medidas cuando la selección no las utiliza: %s', unit => {
+  it.each(['', 'kg - KILOGRAMO'])('descarta las medidas cuando la selección no las utiliza: %s', unit => {
     const form = createForm({ unit });
     updateMaterialMeasurementFields({ form });
     expect(form.elements.base).toMatchObject({ value: '', disabled: true });
-    expect(form.section.classList.toggle).toHaveBeenCalledWith('d-none', true);
   });
 
   it.each(['edit', 'edit-stock', 'view'])('mantiene las medidas guardadas e inmutables en modo %s', mode => {
@@ -69,7 +62,6 @@ describe('medidas de material según la unidad seleccionada', () => {
   it('conserva los consumibles sin medidas aunque su unidad sea metro', () => {
     const form = createForm({ resource: 'consumable', unit: 'm - METRO' });
     updateMaterialMeasurementFields({ form });
-    expect(form.section.classList.toggle).toHaveBeenCalledWith('d-none', true);
     expect(form.elements.base).toMatchObject({ value: '', disabled: true });
   });
 });

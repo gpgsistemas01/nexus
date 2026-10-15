@@ -38,8 +38,14 @@
 
 ## Pruebas
 
+- Antes de agregar, cambiar o retirar pruebas, consulta `docs/testing/test-plan.md` y el registro selectivo de casos. Identifica requisito o riesgo, condición observable, nivel, técnica de diseño y resultado esperado.
 - Antes de crear una prueba, identifica una equivalente y conserva su ubicación, *setup* y convenciones.
 - Separa pruebas unitarias, de integración y de base de datos conforme a `docs/testing/`.
+- Aplica particiones, fronteras, decisiones o transiciones según el riesgo. `it.each`, mocks, concurrencia y rollback no son por sí mismos técnicas de diseño.
+- Conserva cobertura independiente cuando cambie el contrato observado, como cálculo puro, payload del formulario y persistencia. Concentra matrices extensas en unitarias y usa representantes en integración sin perder rechazos ni ausencia de efectos parciales.
+- Justifica retiros por regla obsoleta, duplicidad demostrada o bajo riesgo sin evidencia adicional; registra qué cobertura permanece y qué limitación se acepta. No retires migraciones históricas sólo porque el alta actual cambió.
+- Documenta selectivamente integraciones y reglas críticas con los formatos `DP-*` y `CP-*` del plan; actualiza la matriz funcional afectada. Guarda resultados `EP-*` en CI o en la revisión del cambio, sin duplicar cada `it` ni versionar resultados de corridas.
+- Prueba estados y datos relevantes del formulario; evita fijar HTML, clases CSS, llamadas privadas o delegaciones triviales. Los dobles de Select2/MDB no demuestran un recorrido de navegador.
 - En CRUD, valida el comportamiento CRUD correspondiente y reutiliza *factories*, *fixtures*, *helpers* y *mocks* existentes.
 - Usa `npm run test:unit` para la suite sin base de datos y `npm run test:integration` para integración HTTP/Prisma; no uses `test:watch` en validaciones no interactivas.
 - En pruebas de integración, comprueba tanto la respuesta HTTP como el estado persistido mediante Prisma, incluidos rollback y ausencia de efectos parciales cuando apliquen.
@@ -76,6 +82,7 @@
 
 ## Integración continua
 
+- Conserva la ejecución de unitarias e integración como comprobaciones distintas y sus reportes de ejecución; una no sustituye a la otra.
 - Consulta `.github/workflows/ci.yml` como fuente de los disparadores y comprobaciones. Conserva la ejecución en los pushes a `features` y en los pull requests al modificar CI.
 - La comprobación de documentación fuera de `main` debe validar los archivos versionados; conserva la regeneración y el commit automáticos restringidos al push a `main`.
 

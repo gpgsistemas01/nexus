@@ -6,9 +6,8 @@ vi.mock('../../../../src/public/js/plugins/mdb/baseInstance.js', () => ({ setMdb
 vi.mock('../../../../src/public/js/application/warehouse/wastes/wastes.js', () => ({ getWasteMaterialTemplates: vi.fn() }));
 const { initWasteMaterialTemplateSelect } = await import('../../../../src/public/js/plugins/select2/domains/wasteMaterialTemplate.js');
 const { updateWasteRollMeasurement } = await import('../../../../src/public/js/ui/inventory/wasteFormUI.js');
-const inventoryUtils = await import('../../../../src/public/js/utils/warehouseInventoryUtils.js');
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => vi.unstubAllGlobals());
 
 beforeEach(() => {
     vi.clearAllMocks();
@@ -51,14 +50,11 @@ describe('selección de material y captura de merma', () => {
     });
 
     it('una limpieza programática descarta la selección y sus resultados', () => {
-        const prepareReference = vi.spyOn(inventoryUtils, 'prepareWasteRollReference');
         initWasteMaterialTemplateSelect({ modalSelector: '#wasteModal', baseSelector: '#materialInput' });
         state.handlers.get('select2:select')({ params: { data: { id: 'material-1', base: 1.5, height: 50, presentation: { name: 'ROLLO' } } } });
-        prepareReference.mockClear();
         state.value = null;
         state.handlers.get('change.wasteMaterialTemplate')();
         state.handlers.get('change.wasteMaterialTemplate')();
-        expect(prepareReference).toHaveBeenCalledOnce();
         expect(state.form.wasteMaterialTemplate).toBeNull();
         expect(state.form.wasteRollReference).toBeNull();
         expect(state.form.elements.base.value).toBe('');

@@ -1,9 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { validationResult } from 'express-validator';
 
 import { errorMap } from '../../../src/messages/codeMessages.js';
 import { validate } from '../../../src/middleware/validatorMiddleware.js';
-import { wasteWeightRules } from '../../../src/public/js/utils/validations/weightValidations.js';
 import { validateWeightCapture } from '../../../src/validators/fields/fieldsValidator.js';
 
 const runValidation = async (body, options = {}) => {
@@ -11,8 +10,6 @@ const runValidation = async (body, options = {}) => {
     await validateWeightCapture(options).run(req);
     return req;
 };
-
-afterEach(() => vi.restoreAllMocks());
 
 describe('validateWeightCapture: códigos de error y reglas compartidas', () => {
     it.each([
@@ -60,23 +57,11 @@ describe('validateWeightCapture: códigos de error y reglas compartidas', () => 
         expect(validationResult(req).array()).toEqual([]);
     });
 
-    it('permite guardar sólo el cono de referencia de un proveedor', async () => {
+    it('permite omitir el total cuando la captura se configura como opcional', async () => {
         const req = await runValidation({ referenceConeWeightKg: 0 }, {
             fieldName: 'referenceRollTotalWeightKg', coneFieldName: 'referenceConeWeightKg',
             totalFieldName: 'referenceRollTotalWeightKg', requireTotal: false
         });
         expect(validationResult(req).array()).toEqual([]);
-    });
-
-    it('evalúa cada regla una vez y detiene la cadena al primer error', async () => {
-        const number = vi.spyOn(wasteWeightRules, 'isNumber');
-        const limit = vi.spyOn(wasteWeightRules, 'isWithinLimit');
-        const precision = vi.spyOn(wasteWeightRules, 'hasValidPrecision');
-        const required = vi.spyOn(wasteWeightRules, 'hasRequiredPair');
-        await runValidation({ totalWeightKg: '0.001' }, { fieldName: 'totalWeightKg' });
-        expect(number).toHaveBeenCalledOnce();
-        expect(limit).toHaveBeenCalledOnce();
-        expect(precision).toHaveBeenCalledOnce();
-        expect(required).not.toHaveBeenCalled();
     });
 });

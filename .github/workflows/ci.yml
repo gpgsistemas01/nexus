@@ -102,7 +102,17 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
-      # Para CI usamos test:db (no solo npm test) porque este script valida
-      # DATABASE_TEST_URL, aplica migraciones y luego ejecuta Vitest.
-      - name: Run database migrations and tests
-        run: npm run test:db
+      - name: Run unit tests
+        run: npm run test:unit -- --reporter=default --reporter=junit --outputFile=build/test-results/unit.xml
+
+      # Integración valida DATABASE_TEST_URL y aplica migraciones antes de Vitest.
+      - name: Run database migrations and integration tests
+        run: npm run test:integration -- --reporter=default --reporter=junit --outputFile=build/test-results/integration.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/test-results/*.xml
+          if-no-files-found: warn

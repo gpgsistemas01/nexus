@@ -8,9 +8,15 @@ criterios de aceptación que requieran trazabilidad estable. Las variaciones de 
 regla pueden agruparse en una ficha.
 
 La revisión actual seleccionó los casos de permisos y rutas protegidas, límites y flujo
-de mermas, stock y movimientos, surtido/devolución, y todas las integraciones. Las demás
+de mermas, stock y movimientos, surtido/devolución e integraciones relevantes. Las demás
 unitarias permanecen en la suite y en la matriz por caso de uso cuando aportan evidencia
 funcional, sin transcribir cada `it`.
+
+La [revisión de la suite](suite-review.md) justifica las decisiones y limita su alcance.
+Las fichas antiguas que sólo remiten al `it` conservan esa referencia ejecutable, pero
+requieren concretar datos y oráculos documentales al revisar su regla. Las fichas nuevas
+de esta revisión sí incluyen esos datos. No se declara completa la documentación de
+todas las integraciones.
 
 ## Ambiente de pruebas
 
@@ -22,6 +28,28 @@ funcional, sin transcribir cada `it`.
 Los resultados de cada ejecución se conservan en CI o en la solicitud de cambio. La
 configuración y limpieza del ambiente de integración siguen el [plan de
 pruebas](test-plan.md).
+
+## Diseño y trazabilidad revisados
+
+| ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
+| --- | --- | --- | --- | --- |
+| `DP-MER-001` | `CU-ALM-10`: metros o stock incorrectos por confundir peso bruto/neto o ancho/largo. | Unitario e integración; equivalencia por orientación y referencia válida/inválida. | Rollo `1.5 × 20`, cono `0.25`, total de referencia `2.25`, sobrante `1.25`: neto `1`, largo `10`; invertir base/altura conserva ancho menor. UI asigna resultados y servidor recalcula sin aceptar dimensiones forzadas. | `wasteWeightCalculationsTest.js`, `wasteWeightFieldTest.js`, `CP-INT-MER-001`. |
+| `DP-MER-002` | `CU-ALM-10`: peso inválido provoca escritura parcial o código incorrecto. | Unitario e integración; particiones y valores frontera. | Unitarias cubren tipos/formatos; HTTP representa mínimo inválido `0`, formato `1e3`, booleano `true`, precisión `0.001` y máximo inválido `1000`; límites válidos `0.01` y `999.99` persisten. | `CP-UNIT-ALM-002`, `weightCaptureValidationTest.js`, `CP-INT-MER-002`. |
+| `DP-MER-003` | `CU-ALM-10`, `CU-ALM-13`: duplicado crea stock antes de revisar captura. | Unitario; decisiones y transiciones según tabla siguiente. | Crear + duplicado identificado + permiso permite confirmar/cancelar; edición, falta de permiso o identidad no se convierte en entrada de stock. | `CP-UNIT-ALM-009`, `wasteStockAdditionModalTest.js`. |
+| `DP-MER-004` | `CU-ALM-10`: FormData pierde medidas deshabilitadas o envía derivados como autoridad. | Unitario; particiones de campos permitidos/excluidos. | Incluir dimensiones y pesos capturados, excluir `weightKg`, `sampleLengthM` y `sampleNetWeightKg`; persistencia vuelve a calcular. | `CP-UNIT-ALM-010`, `CP-INT-MER-001`. |
+| `DP-HIS-001` | `CU-ALM-11`: edición o actualización del esquema destruye registros anteriores. | Integración; particiones de estados históricos. | Nuevas filas sin derivados de muestra, legado con muestra `1 m / 0.057 kg` sin referencia total y registros sin peso; una edición de costo conserva datos. Las migraciones verifican también sus CHECK y rollback. | `CP-INT-MER-003`, `tests/integration/migrations`. |
+| `DP-CAP-001` | `CU-ALM-02`, `CU-ALM-18`: exigir medidas a piezas o consumibles altera cantidades. | Unitario e integración; equivalencia y decisiones por unidad/tipo/contexto. | Pieza y consumible sin dimensiones; metros/litros con pareja `2 × 3` convierten stock `7` a `42`; alta desde compra deja stock `0`. | `materialMeasurementFieldTest.js`, `materialValidationTest.js`, `CP-INT-ALM-001`. |
+| `DP-CTX-001` | Compras/salidas cruzan materiales y consumibles. | Unitario e integración; decisiones por contexto fijo y tipo solicitado. | Aplicación específica conserva recurso aunque página/parámetro indique el contrario; escritura cruzada responde `404` sin cambios. | `goodsReceiptServiceTest.js` y `goodsIssueServiceTest.js` de frontend, `CP-INT-COM-001`, `CP-INT-SAL-005`. |
+
+Decisiones relevantes de `DP-MER-003` (todas parten de `WASTE_ALREADY_EXISTS`):
+
+| Modo | Permiso de agregar | Identidad del servidor | Confirmación | Acción esperada |
+| --- | --- | --- | --- | --- |
+| Crear | Sí | Presente | Sí | Cerrar captura y abrir Agregar stock con cantidad/observaciones; ninguna escritura directa. |
+| Crear | Sí | Presente | No | Conservar formulario sin abrir modal ni escribir. |
+| Crear | No | Presente | No se solicita | Propagar conflicto sin abrir modal ni escribir. |
+| Editar | Sí | Presente | No se solicita | Propagar conflicto sin convertir edición en entrada. |
+| Crear | Sí | Ausente | No se solicita | Propagar conflicto sin abrir modal ni escribir. |
 
 ## Casos unitarios seleccionados
 
@@ -40,7 +68,8 @@ movimientos tabulados: se documenta la regla, no una ficha repetida por dato.
 | `CP-UNIT-ALM-005` | Edición aislada con `updateMaterial` simulado y oferta identificada. | `material-1`, nombre `Guantes` y `supplier-1`. | Ejecutar el caso `actualiza los datos generales dentro del contexto de consumibles` y la verificación de `PATCH /:id` en `consumableApiRouteTest.js`. | El servicio conserva el DTO y delega con `{ type: 'CONSUMABLE' }`; la ruta exige token, validación de edición y `materials:write`. | Mocks restaurados por hooks. |
 | `CP-UNIT-ALM-006` | Retiro aislado con `deleteMaterial` simulado y oferta identificada. | `supplier-material-1`. | Ejecutar el caso `retira únicamente una oferta clasificada como consumible` y la verificación de `DELETE /:id` en `consumableApiRouteTest.js`. | La baja se delega con contexto `CONSUMABLE` y la ruta exige token y `materials:write`; la prueba no afirma persistencia ni historia protegida real. | Mocks restaurados por hooks. |
 | `CP-UNIT-ALM-007` | Ajuste aislado con `updateMaterialStock` simulado y actor autenticado. | `material-1`, `supplier-1`, nueva existencia `10` y `user-1`. | Ejecutar el caso `ajusta el stock dentro del contexto de consumibles` y la verificación de `PATCH /:id/stock` en `consumableApiRouteTest.js`. | La delegación incluye identidad, actor, DTO y `type = CONSUMABLE`; la ruta exige token, validación de stock y `materials:adjust-stock`. | Mocks restaurados por hooks. |
-| `CP-UNIT-ALM-008` | Cliente HTTP de consumibles aislado con `apiRequest` simulado. | Búsqueda `guantes`, payloads de alta/edición/ajuste y los ids `consumable-1` y `supplier-consumable-1`. | Ejecutar `tests/unit/public/js/services/warehouse/consumableServiceTest.js`. | Consulta y alta usan exactamente `/api/warehouse/consumables`; edición, ajuste y retiro construyen los métodos y rutas con id esperados. | Mocks restaurados por hooks. |
+| `CP-UNIT-ALM-009` | Formulario en creación; servicio devuelve duplicado identificado; dependencias de UI simuladas. | Merma `existing-waste`, cantidad `3` (variante `0`), observaciones `Nueva entrada`; variantes de la tabla `DP-MER-003`. | Ejecutar `tests/unit/public/js/pages/warehouse/wastes/wasteFormTest.js` › `confirmación de merma existente`. | Confirmar abre modal con captura, sin llamar a agregar stock; cancelar conserva formulario. Sin permiso, identidad o modo correcto se propaga el conflicto. | Mocks reiniciados por hooks. |
+| `CP-UNIT-ALM-010` | Formulario de rollo; dimensiones deshabilitadas fuera de FormData. | Base `1.5`, altura `10`, cono `0.25`, total merma `1.25`, total referencia `2.25`; derivados forzados `999`. | Ejecutar los dos casos de payload de `wasteFormTest.js`. | Payload incluye medidas finales, pesos brutos y cono; excluye neto y campos históricos de muestra. Los inputs siguen deshabilitados. | Mocks reiniciados por hooks. |
 | `CP-UNIT-INV-001` | Helpers y servicio de inventario aislados. | Cantidades con/sin dimensiones, saldo cero o negativo, contratos planos/anidados y surtido de la última pieza. | Ejecutar `tests/unit/inventory/stockHelpersTest.js` › `stockHelpers` y el caso `sincroniza en cero...` de `tests/unit/services/warehouse/materials/supplierMaterialServiceTest.js`. | La conversión se normaliza, el saldo cero sincroniza ambas cantidades y cualquier saldo negativo produce el error de negocio con metadatos identificables. | Mocks restaurados por hooks. |
 | `CP-UNIT-INV-002` | Helpers y servicio de movimientos con una transacción simulada. | Detalles repetidos para resumen; entrada y salida con cantidades convertidas. | Ejecutar `tests/unit/inventory/movementHelpersTest.js` y `tests/unit/services/warehouse/wastes/wasteMovementServiceTest.js`. | El resumen agrupa stock sin fusionar la evidencia de detalles; la entrada usa signo positivo, la salida negativo y cada detalle conserva sus saldos. | Mocks restaurados por hooks. |
 | `CP-UNIT-INV-003` | Servicio de entrada con generador de folio y movimiento simulados. | Merma, cantidad, observación y actor autenticado. | Ejecutar `tests/unit/services/warehouse/wastes/wasteStockEntryServiceTest.js` › `documento de entrada de existencia de merma`. | El documento conserva folio, actor, captura, saldos y vínculo con el movimiento que incrementó la existencia. | Mocks restaurados por hooks. |
@@ -66,7 +95,19 @@ y Prisma, y limpieza están en el bloque `it` enlazado.
 | `CP-INT-SAL-003` | `DATABASE_TEST_URL` aislada, migrada; fixtures y actor del bloque preparados. | Payload HTTP y registros iniciales concretos declarados en el `it`; prefijo exclusivo de la suite. | Ejecutar `tests/integration/controllers/wasteIssueControllerDbTest.js` › `waste issue controller database integration` › `permite completar una salida parcial aunque la merma se desactive después de solicitarla`. | Se obtiene el resultado verificable descrito por el caso: «permite completar una salida parcial aunque la merma se desactive después de solicitarla»; las aserciones del `it` fijan valor, error, respuesta o ausencia de efectos. | El `afterAll` elimina fixtures de la suite; el teardown global actúa como respaldo. |
 | `CP-INT-SAL-004` | `DATABASE_TEST_URL` aislada, migrada; fixtures y actor del bloque preparados. | Payload HTTP y registros iniciales concretos declarados en el `it`; prefijo exclusivo de la suite. | Ejecutar `tests/integration/controllers/wasteIssueControllerDbTest.js` › `waste issue controller database integration` › `rechaza stock insuficiente y revierte toda la transacción`. | Se obtiene el resultado verificable descrito por el caso: «rechaza stock insuficiente y revierte toda la transacción»; las aserciones del `it` fijan valor, error, respuesta o ausencia de efectos. | El `afterAll` elimina fixtures de la suite; el teardown global actúa como respaldo. |
 
+| ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- | --- |
 | `CP-INT-SAL-005` | `DATABASE_TEST_URL` aislada y migrada; fixtures de materiales y consumibles preparados. | Salida del contexto contrario y solicitudes HTTP de edición, encabezado, surtido y devolución. | Ejecutar `tests/integration/controllers/goodsIssueControllerDbTest.js` › `bloquea edición, encabezado, surtido y devolución cruzados desde %s`, para ambos contextos. | Cada solicitud responde `404`; salida, detalles y stock permanecen iguales y no se crean movimientos ni devoluciones. | `afterAll` elimina los fixtures y sus registros operativos. |
 | `CP-INT-COM-001` | `DATABASE_TEST_URL` aislada y migrada; fixtures de compras homogéneas, mixtas y vacías. | Cabeceras y detalles de materiales y consumibles, HTTP de edición, corrección y cancelación. | Ejecutar `tests/integration/controllers/goodsReceiptContextDbTest.js`. | Listados y reportes excluyen compras mixtas o vacías; edición homogénea responde `200`; operaciones cruzadas responden `404` sin cambios de cabecera, stock, movimientos ni cambios de detalle. | `afterAll` elimina los fixtures. |
 
-**Total documentado:** 14 casos unitarios agrupados y 11 casos de integración.
+## Integraciones añadidas a la trazabilidad
+
+| ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- | --- |
+| `CP-INT-MER-001` | BD aislada y migrada, actor/proveedor/material Rollo `1.5 × 20`, m², oferta sin pesos. | Cono `0.25 kg`, rollo completo `2.25 kg`, merma `1.25 kg`, stock `1`, altura enviada `999`; variante material `20 × 1.5`, cono `0.4`, referencia `2.4`, merma `1.4` y medidas forzadas `999/888`. | `wasteWeightDbTest.js` › `registra el peso del rollo completo desde merma y obtiene sus metros del material`; variante `calcula base cuando el largo nominal está en base...`. | HTTP `200`; Prisma guarda referencia `2.25`, neto `1`, largo `10`, ancho `1.5`, convertido `15` y origen correcto; derivados de muestra `null`, oferta sin cambio. La orientación invertida conserva referencia `2.4` y calcula base `10`, altura `1.5`. Editar referencias responde `400`, código `WASTE_WEIGHT_READ_ONLY`, sin cambiar fila. | `afterAll` elimina fixtures y efectos; teardown global como respaldo. |
+| `CP-INT-MER-002` | BD aislada; fixture Rollo, cono `0`; tomar conteos de merma, ajuste y movimiento antes de cada request. | `totalWeightKg`: `0`, `1e3`, `true`, `0.001`, `1000`; límites válidos `0.01` y `999.99`. | `wasteWeightDbTest.js` › `rechaza peso %s sin persistir merma, ajustes ni movimientos` y `persiste exactamente el límite válido de peso %s`. | Inválidos: HTTP `400`; primeros tres `WEIGHT_KG_INVALID_NUMBER`, precisión `WEIGHT_KG_TOO_LONG`, máximo `WEIGHT_KG_TOO_HIGH`; tres conteos sin cambio. Válidos: HTTP `200` y neto persistido igual al valor de entrada, con stock y convertido `0`. | Hooks eliminan exclusivamente fixtures y efectos propios. |
+| `CP-INT-MER-003` | BD aislada; merma histórica con largo `17.54386`, muestra `1 m`, neto muestra `0.057 kg`, referencia total ausente; otra fila sin pesos. | Edición de nombre/costo permitido; fila de peso desconocido para reporte. | `wasteWeightDbTest.js` › `conserva las muestras anteriores sin inferir un peso del rollo completo` y `conserva y reporta el peso desconocido de registros históricos`. | Edición `200`, muestra y largo conservados, referencia total sigue `null`; reporte devuelve `Sin peso capturado`, sin inferir cero. | Hooks eliminan fixtures y efectos propios. |
+| `CP-INT-ALM-001` | BD aislada, fixtures de proveedor, actor, unidades y presentación; contextos directo/compra. | Pieza con stock `7`; consumible con medidas sobrantes `2`/`ignorado`; material de metros/litros con `2 × 3`, stock `7`; variantes con pareja incompleta. | `materialControllerDbTest.js`: altas de piezas/consumibles, conversión y rechazo de pareja incompleta. | HTTP `200`: pieza/consumible con dimensiones `null`; stock/convertido `7` directo o `0` desde compra; metros/litros convertido `42`. Pareja incompleta: `400`, `BASE_REQUIRED` o `HEIGHT_REQUIRED`, sin material ni oferta. | `afterAll` elimina fixtures y efectos; teardown como respaldo. |
+
+`CP-UNIT-ALM-008` está retirado según la [revisión de la suite](suite-review.md).
+Los identificadores se mantienen estables y no representan el número de `it` ejecutados.
