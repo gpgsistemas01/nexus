@@ -99,6 +99,7 @@ describe('wasteController complete flow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     transaction.mockImplementation((callback) => callback({
+      $queryRaw: vi.fn().mockResolvedValue([]),
       waste: {
         create: wasteCreate,
         findFirst: wasteFindFirst,

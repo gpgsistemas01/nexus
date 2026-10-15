@@ -77,9 +77,7 @@ const DEFAULT_MATERIAL_SNAPSHOT_SELECT = {
     name: true,
     minStock: true,
     base: true,
-    height: true,
-    presentation: true,
-    unitMeasure: true
+    height: true
 };
 
 export const findMaterialsSnapshot = async ({

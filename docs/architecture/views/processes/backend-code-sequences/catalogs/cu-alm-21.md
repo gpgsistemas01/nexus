@@ -24,7 +24,8 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `Stock` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
 | `Movement` | control | [`movementService.js`](../../../../../../src/services/inventory/movementService.js) |
-| `SupplierMaterial` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
+| `Offers` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
+| `SupplierMaterial` | control | [`supplierMaterialStockService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialStockService.js) |
 | `MaterialService` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `ValidationRules` | control | [`materialValidations.js`](../../../../../../src/validators/forms/materialValidations.js) |
@@ -93,6 +94,7 @@ completan las llamadas a helpers y la propagación del resultado.
 ```mermaid
 sequenceDiagram
     autonumber
+    participant Offers@{ "type": "control" } as supplierMaterialService.js
     participant Client as Cliente HTTP / web
     participant Controller@{ "type": "control" } as consumableController.js
     participant StockDto@{ "type": "control" } as DTO funcional<br/>materialDTO.js
@@ -101,7 +103,7 @@ sequenceDiagram
     participant Reference@{ "type": "control" } as referenceNumberService.js
     participant Stock@{ "type": "control" } as stockHelpers.js
     participant Movement@{ "type": "control" } as movementService.js
-    participant SupplierMaterial@{ "type": "control" } as supplierMaterialService.js
+    participant SupplierMaterial@{ "type": "control" } as supplierMaterialStockService.js
     participant MaterialService@{ "type": "control" } as materialService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket@{ "type": "control" } as socketUtils.js
@@ -119,7 +121,7 @@ sequenceDiagram
     Adjustment->>FileBaseRepository: getDb()
     FileBaseRepository-->>Adjustment: getDb(): PrismaClient | TransactionClient — tx si se recibió
     Adjustment->>Prisma: db.$transaction(async tx => ...)
-    Adjustment->>SupplierMaterial: findSupplierMaterialByIds({ tx, materialId, supplierId })
+    Adjustment->>Offers: findSupplierMaterialByIds({ tx, materialId, supplierId })
     Adjustment->>Reference: generateYearlyReferenceNumber({ type, tx })
     Adjustment->>Stock: calculateConvertedQuantity({ quantity: newStock, unitMeasure, presentation, base, height })
     Adjustment->>Prisma: tx.stockAdjustment.create({ data })

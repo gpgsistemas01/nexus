@@ -83,6 +83,11 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
 
+    if (res.headersSent || res.destroyed) {
+        logger.error({ err, ...getRequestLogContext(req) }, 'La respuesta se interrumpió');
+        return next(err);
+    }
+
     const responseError = normalizeDatabaseError(err);
 
     if (isAppError(responseError)) {

@@ -30,6 +30,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `FileMaterialGoodsReceiptController` | control | [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js) |
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
+| `Totals` | control | [`goodsReceiptTotalsService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js) |
 
 ### Configuración y construcción
 
@@ -130,6 +131,7 @@ la primera figura; los mensajes se numeran de nuevo dentro de esta colaboración
 ```mermaid
 sequenceDiagram
     autonumber
+    participant Totals@{ "type": "control" } as goodsReceiptTotalsService.js
     participant Facade@{ "type": "control" } as materialGoodsReceiptService.js
     participant Core@{ "type": "control" } as goodsReceiptCancellationService.js
     participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
@@ -160,14 +162,13 @@ sequenceDiagram
             Core->>Reason: findGoodsReceiptDetailChangeReason({ tx, changeType })
             Core->>Change: createGoodsReceiptDetailChangeMovementAndUpdateStock({ tx, currentDetail, quantityDifference, ... })
             opt Diferencia de cantidad distinta de cero
-                Change->>Inventory: createInventoryMovement({ tx, movementType: ADJUSTMENT, ... })
-                Change->>Costs: adjustSupplierMaterialStock({ tx, ... })
+                Change->>Inventory: applyInventoryMovement({ tx, movementType: ADJUSTMENT, ... })
             end
-            Core->>Helpers: cancelGoodsReceiptDetailAndTotals({ tx, goodsReceiptId: id, detailId, ... })
+            Core->>Totals: cancelGoodsReceiptDetailAndTotals({ tx, goodsReceiptId: id, detailId, ... })
             Core->>Change: createGoodsReceiptDetailChange({ tx, changedById: userId, ... })
+            Core->>Costs: recalculateMaterialUnitCosts({ tx, supplierId, materialIds })
         end
         Prisma-->>Core: commit de detalle, totales, trazabilidad y stock
-        Core->>Costs: recalculateMaterialUnitCosts({ supplierId, materialIds })
         Core-->>Facade: cancelGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
     else Error de dominio o persistencia
         Core-->>Facade: error — rollback si falló la transacción

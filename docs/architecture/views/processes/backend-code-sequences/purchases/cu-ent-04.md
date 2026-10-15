@@ -34,8 +34,8 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `FileMaterialGoodsReceiptController` | control | [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js) |
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
-| `Materials` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `Conversion` | control | [`stockHelpers.js`](../../../../../../src/services/inventory/stockHelpers.js) |
+| `Totals` | control | [`goodsReceiptTotalsService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js) |
 
 ### Configuración y construcción
 
@@ -167,6 +167,7 @@ la primera figura; los mensajes se numeran de nuevo dentro de esta colaboración
 ```mermaid
 sequenceDiagram
     autonumber
+    participant Totals@{ "type": "control" } as goodsReceiptTotalsService.js
     participant Facade@{ "type": "control" } as materialGoodsReceiptService.js
     participant Core@{ "type": "control" } as goodsReceiptCorrectionService.js
     participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
@@ -196,20 +197,19 @@ sequenceDiagram
             Change-->>Core: findReceiptDetailForChange(): Promise[GoodsReceiptDetail|null]
             Core->>Change: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
             Change-->>Core: findReceiptDetailForChange(): Promise[Object]
-            Core->>Helpers: buildGoodsReceiptDetails([{ materialId, quantity, costPerUnitType }], { tx, requireActive: false })
+            Core->>Helpers: calculateGoodsReceiptDetail({ material: currentDetail.material, detail: { quantity, costPerUnitType } })
             Core->>Formatter: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
             Formatter-->>Core: normalizeDecimal(): number
             Core->>Reason: findGoodsReceiptDetailChangeReason({ tx, changeType })
             Core->>Change: createGoodsReceiptDetailChangeMovementAndUpdateStock({ tx, currentDetail, quantityDifference, ... })
             opt Diferencia de cantidad distinta de cero
-                Change->>Inventory: createInventoryMovement({ tx, movementType: ADJUSTMENT, ... })
-                Change->>Costs: adjustSupplierMaterialStock({ tx, ... })
+                Change->>Inventory: applyInventoryMovement({ tx, movementType: ADJUSTMENT, ... })
             end
-            Core->>Helpers: correctGoodsReceiptDetailAndTotals({ tx, goodsReceiptId: id, detailId, ... })
+            Core->>Totals: correctGoodsReceiptDetailAndTotals({ tx, goodsReceiptId: id, detailId, ... })
             Core->>Change: createGoodsReceiptDetailChange({ tx, changedById: userId, ... })
+            Core->>Costs: recalculateMaterialUnitCosts({ tx, supplierId, materialIds })
         end
         Prisma-->>Core: commit de detalle, totales, trazabilidad y stock
-        Core->>Costs: recalculateMaterialUnitCosts({ supplierId, materialIds })
         Core-->>Facade: correctGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
     else Error de dominio o persistencia
         Core-->>Facade: error — rollback si falló la transacción
@@ -217,40 +217,26 @@ sequenceDiagram
     deactivate Core
 ```
 
-## Detalle de preparación de partidas de compra
+## Detalle de cálculo de la partida corregida
 
-Amplía `buildGoodsReceiptDetails`: la consulta usa `tx` cuando se proporciona. En el alta
-la preparación ocurre antes de iniciar la transacción; no se atribuye esa lectura al
-callback transaccional. Los conflictos se propagan al servicio que llamó al helper.
+La corrección usa el material de `findReceiptDetailForChange`. El cálculo puro se
+comparte con `buildGoodsReceiptDetails` y no vuelve a consultar la base de datos.
 
 ```mermaid
 sequenceDiagram
     autonumber
+    participant Core@{ "type": "control" } as goodsReceiptCorrectionService.js
     participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
-    participant Materials@{ "type": "control" } as materialService.js
-    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Conversion@{ "type": "control" } as stockHelpers.js
     participant Formatter@{ "type": "control" } as formattersUtils.js
-
-    Helpers->>Materials: findMaterialsSnapshot({ tx, materialIds, supplierId })
-    Materials->>FileBaseRepository: getDb(tx)
-    FileBaseRepository-->>Materials: getDb(): PrismaClient | TransactionClient
-    Materials->>Prisma: db.material.findMany({ where: { id: { in: materialIds } }, select })
-    Prisma-->>Materials: findMany(): Promise[Object[]]
-    Materials-->>Helpers: findMaterialsSnapshot(): Promise[Object[]]
-    loop Cada partida de compra
-        Helpers->>Helpers: details.map(callback) — material, tipo y estado activo
-        break Material inexistente, tipo incompatible o proveedor-material inactivo
-            Helpers-->>Helpers: throw MaterialNotFound | MaterialInactiveConflict
-        end
-        Helpers->>Formatter: roundTo(quantity * costPerUnitType)
-        Formatter-->>Helpers: roundTo(): number — subtotal sin IVA
-        Helpers->>Formatter: roundTo(netPurchaseAmount * 1.16)
-        Helpers->>Conversion: calculateConvertedQuantity({ quantity, base, height })
-        Conversion-->>Helpers: calculateConvertedQuantity(): number
-        opt convertedQuantity mayor que cero
-            Helpers->>Formatter: roundTo(netPurchaseAmount / convertedQuantity)
-        end
+    Core->>Helpers: calculateGoodsReceiptDetail({ material, detail })
+    Helpers->>Formatter: roundTo(quantity * costPerUnitType)
+    Formatter-->>Helpers: roundTo(): number
+    Helpers->>Conversion: calculateConvertedQuantity({ quantity, base, height })
+    Conversion-->>Helpers: calculateConvertedQuantity(): number
+    opt Cantidad convertida positiva
+        Helpers->>Formatter: roundTo(netPurchaseAmount / convertedQuantity)
     end
+    Helpers->>Formatter: roundTo(netPurchaseAmount * 1.16)
+    Helpers-->>Core: calculateGoodsReceiptDetail(): Object
 ```

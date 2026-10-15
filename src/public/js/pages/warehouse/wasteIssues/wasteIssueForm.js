@@ -72,7 +72,7 @@ useIssueForm({
     normalizeData: normalizeWasteIssueData,
     getErrors: ({ form, formData }) => {
         if (form.dataset.mode === FORM_MODES.EDIT_DETAIL) {
-            const detailsToSupply = mapIssueDetailsToSupplyRequest(details);
+            const detailsToSupply = formData.details;
 
             return detailsToSupply.length
                 ? validateDetailsFields(issueProjectQuantityDetailsValidation, detailsToSupply)

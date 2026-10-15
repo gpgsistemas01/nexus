@@ -10,6 +10,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.0",
     "ejs": "^3.1.10",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "express-ejs-layouts": "^2.5.1",
     "express-rate-limit": "^8.1.0",
@@ -21,8 +22,7 @@
     "pino-http": "^11.0.0",
     "prisma": "^7.5.0",
     "rate-limit-redis": "^4.2.2",
-    "socket.io": "^4.8.3",
-    "xlsx": "^0.18.5"
+    "socket.io": "^4.8.3"
   },
   "scripts": {
     "start": "node src/app.js",
@@ -32,6 +32,8 @@
     "test:watch": "vitest watch --config vitestConfig.js",
     "test:db:migrate": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy && NODE_ENV=test prisma generate",
     "test:integration": "npm run test:db:verify && NODE_ENV=test prisma migrate deploy && NODE_ENV=test prisma generate && vitest run --config vitestIntegrationConfig.js",
+    "test:performance": "npm run test:db:migrate && NODE_ENV=test node --import=dotenv/config tests/performance/backendBenchmark.js",
+    "test:performance:mixed": "npm run test:db:migrate && NODE_ENV=test node --import=dotenv/config tests/performance/backendMixedBenchmark.js",
     "test:db": "npm run test:integration",
     "test:db:verify": "node scripts/verifyTestDatabaseEnv.js",
     "docs:architecture": "node scripts/generateArchitectureDocs.js",
@@ -56,7 +58,8 @@
   "devDependencies": {
     "nodemon": "^3.1.14",
     "supertest": "^7.2.2",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "xlsx": "^0.18.5"
   },
   "engines": {
     "node": ">=22 <25"

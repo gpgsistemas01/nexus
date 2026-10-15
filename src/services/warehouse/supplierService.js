@@ -1,3 +1,4 @@
+import { findPage } from "../../repository/paginationRepository.js";
 import { isAppError } from "../../errors/AppError.js";
 import { SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
@@ -25,14 +26,13 @@ const numberToSupplierCode = (number) => {
 
 export const findAllSuppliers = async ({
     onlyActive = false,
+    includeCounts = true,
     skip = 0,
     take = 10,
     search = '',
     orderBy = 'legalName',
     orderDir = 'asc'
 }) => {
-
-    const db = getDb();
 
     const where = {
         ...(onlyActive && { isActive: true }),
@@ -54,28 +54,24 @@ export const findAllSuppliers = async ({
         })
     };
 
-    const suppliers = await db.supplier.findMany({
-        ...(take > 0 && { skip, take }),
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: {
-            id: true,
-            tradeName: true,
-            legalName: true,
-            isActive: true
+    return findPage({
+        model: getDb().supplier,
+        hasFilters: Boolean(onlyActive || search),
+        includeCounts,
+        query: {
+            ...(take > 0 && { skip, take }),
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            select: {
+                id: true,
+                tradeName: true,
+                legalName: true,
+                isActive: true
+            }
         }
     });
-
-    const total = await db.supplier.count();
-    const filtered = await db.supplier.count({ where });
-
-    return {
-        data: suppliers,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 };
 
 const DEFAULT_SUPPLIER_SELECT = {

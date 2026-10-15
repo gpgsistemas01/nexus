@@ -6,19 +6,18 @@ vi.mock('../../../src/services/warehouse/materials/materialService.js', () => ({
     }))
 }));
 
+import { buildGoodsReceiptDetails } from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
 import {
-    buildGoodsReceiptDetails,
     cancelGoodsReceiptDetailAndTotals,
     createGoodsReceiptDetailsAndUpdateTotals
-} from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
+} from '../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js';
 
 describe('cancelGoodsReceiptDetailAndTotals', () => {
     it('devuelve material y catálogos anidados para refrescar la tabla de compras', async () => {
         const update = vi.fn().mockResolvedValue({ id: 'receipt-id' });
         const tx = {
             goodsReceiptDetail: {
-                updateMany: vi.fn().mockResolvedValue({ count: 1 }),
-                findUnique: vi.fn().mockResolvedValue({ id: 'detail-id' }),
+                updateManyAndReturn: vi.fn().mockResolvedValue([{ id: 'detail-id' }]),
                 findMany: vi.fn().mockResolvedValue([{
                     quantity: 1,
                     netPurchaseAmount: 10,

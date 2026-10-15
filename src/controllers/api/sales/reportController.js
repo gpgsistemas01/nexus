@@ -14,6 +14,7 @@ export const exportClientReport = async (req, res) => {
     });
 
     const { data: rows } = await findAllClients({
+        includeCounts: false,
         advisorId: req.query.advisorId || null,
         skip: 0,
         take: 0,

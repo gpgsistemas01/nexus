@@ -1,10 +1,9 @@
 import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { roundTo } from "../../../utils/formattersUtils.js";
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
-import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { findMaterialsSnapshot } from "../materials/materialService.js";
 import { MATERIAL_TYPES } from "../../../constants/inventory.js";
-import { GoodsReceiptDetailAlreadyCanceled, GoodsReceiptNotFound } from "../../../errors/warehouse/goodsReceiptError.js";
+import { GoodsReceiptNotFound } from "../../../errors/warehouse/goodsReceiptError.js";
 
 const IVA_RATE = 1.16;
 
@@ -36,45 +35,39 @@ export const GOODS_RECEIPT_DETAIL_INCLUDE = Object.freeze({
 });
 
 export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId = null, type = null, requireActive = true } = {}) => {
-
     const materialIds = details.map(d => d.materialId);
 
     const materials = await findMaterialsSnapshot({ tx, materialIds, supplierId });
 
     const materialMap = new Map(materials.map(p => [p.id, p]));
 
-    return details.map(({ materialId, quantity, costPerUnitType }) => {
-
+    return details.map(detail => {
+        const { materialId } = detail;
         const material = materialMap.get(materialId);
 
         if (!material) throw new MaterialNotFound();
         if (type && material.type !== type) throw new MaterialNotFound();
         if (requireActive && !material.isActive) throw new MaterialInactiveConflict();
 
-        const { name, base, height } = material;
-        const netPurchaseAmount = roundTo(quantity * costPerUnitType);
-        const grossPurchaseAmount = roundTo(netPurchaseAmount * IVA_RATE);
-        const convertedQuantity = calculateConvertedQuantity({
-            quantity,
-            base,
-            height
-        });
-        let conversionUnitCost = 0;
-
-        if (convertedQuantity) conversionUnitCost = convertedQuantity > 0 ? roundTo(netPurchaseAmount / convertedQuantity) : 0;
-
-        return {
-            materialId,
-            quantity,
-            convertedQuantity,
-            costPerUnitType,
-            conversionUnitCost,
-            netPurchaseAmount,
-            grossPurchaseAmount,
-            materialName: name
-        };
+        return calculateGoodsReceiptDetail({ material, detail });
     });
-}
+};
+
+export const calculateGoodsReceiptDetail = ({ material, detail: { quantity, costPerUnitType } }) => {
+    const netPurchaseAmount = roundTo(quantity * costPerUnitType);
+    const convertedQuantity = calculateConvertedQuantity({ quantity, base: material.base, height: material.height });
+
+    return {
+        materialId: material.id,
+        materialName: material.name,
+        quantity,
+        convertedQuantity,
+        costPerUnitType,
+        conversionUnitCost: convertedQuantity > 0 ? roundTo(netPurchaseAmount / convertedQuantity) : 0,
+        netPurchaseAmount,
+        grossPurchaseAmount: roundTo(netPurchaseAmount * IVA_RATE)
+    };
+};
 
 export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = false } = {}) => details.reduce((acc, detail) => {
     if (!includeCanceled && detail.status === 'CANCELED') return acc;
@@ -89,132 +82,3 @@ export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = fa
     totalNetPurchaseAmount: 0,
     totalGrossPurchaseAmount: 0
 });
-
-const updateActiveGoodsReceiptDetailAndTotals = async ({ tx, goodsReceiptId, detailId, detailData }) => {
-    const { count: updatedDetailsCount } = await tx.goodsReceiptDetail.updateMany({
-        where: {
-            id: detailId,
-            goodsReceiptId,
-            status: 'ACTIVE'
-        },
-        data: detailData
-    });
-
-    // The header and totals must never change unless this receipt's detail was
-    // still active. This also makes concurrent cancellation attempts safe.
-    if (updatedDetailsCount !== 1) throw new GoodsReceiptDetailAlreadyCanceled();
-
-    const updatedDetail = await tx.goodsReceiptDetail.findUnique({
-        where: { id: detailId }
-    });
-
-    const activeReceiptDetails = await tx.goodsReceiptDetail.findMany({
-        where: {
-            goodsReceiptId,
-            status: 'ACTIVE'
-        },
-        select: {
-            quantity: true,
-            netPurchaseAmount: true,
-            grossPurchaseAmount: true
-        }
-    });
-    const allDetailsCanceled = activeReceiptDetails.length === 0;
-    const historicalReceiptDetails = allDetailsCanceled
-        ? await tx.goodsReceiptDetail.findMany({
-            where: { goodsReceiptId },
-            select: {
-                quantity: true,
-                netPurchaseAmount: true,
-                grossPurchaseAmount: true,
-                status: true
-            }
-        })
-        : [];
-    const detailsForTotals = allDetailsCanceled
-        ? historicalReceiptDetails
-        : activeReceiptDetails;
-    const totals = calculateGoodsReceiptTotals(detailsForTotals, {
-        includeCanceled: allDetailsCanceled
-    });
-
-    const updatedReceipt = await tx.goodsReceipt.update({
-        where: { id: goodsReceiptId },
-        data: {
-            ...totals,
-            ...(allDetailsCanceled && {
-                status: {
-                    connect: {
-                        name: GOODS_RECEIPT_STATUS_NAMES.CANCELED
-                    }
-                }
-            })
-        },
-        include: {
-            details: {
-                include: GOODS_RECEIPT_DETAIL_INCLUDE
-            },
-            supplier: true,
-            status: true
-        }
-    });
-
-    return {
-        updatedDetail,
-        updatedReceipt
-    };
-};
-
-export const correctGoodsReceiptDetailAndTotals = ({ tx, goodsReceiptId, detailId, correctedDetail }) => (
-    updateActiveGoodsReceiptDetailAndTotals({
-        tx,
-        goodsReceiptId,
-        detailId,
-        detailData: correctedDetail
-    })
-);
-
-export const cancelGoodsReceiptDetailAndTotals = ({ tx, goodsReceiptId, detailId }) => (
-    updateActiveGoodsReceiptDetailAndTotals({
-        tx,
-        goodsReceiptId,
-        detailId,
-        detailData: { status: 'CANCELED' }
-    })
-);
-
-export const createGoodsReceiptDetailsAndUpdateTotals = async ({ tx, goodsReceiptId, supplierId, details, type = null }) => {
-    const processedDetails = await buildGoodsReceiptDetails(details, { tx, supplierId, type });
-    const createdDetails = await tx.goodsReceiptDetail.createManyAndReturn({
-        data: processedDetails.map(detail => ({
-            ...detail,
-            goodsReceiptId
-        }))
-    });
-
-    const receiptDetails = await tx.goodsReceiptDetail.findMany({
-        where: { goodsReceiptId },
-        select: {
-            quantity: true,
-            netPurchaseAmount: true,
-            grossPurchaseAmount: true
-        }
-    });
-
-    const updatedReceipt = await tx.goodsReceipt.update({
-        where: { id: goodsReceiptId },
-        data: calculateGoodsReceiptTotals(receiptDetails),
-        include: {
-            details: {
-                include: GOODS_RECEIPT_DETAIL_INCLUDE
-            },
-            supplier: true,
-            status: true
-        }
-    });
-
-    return {
-        createdDetails,
-        updatedReceipt
-    };
-};

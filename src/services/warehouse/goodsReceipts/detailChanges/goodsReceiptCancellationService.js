@@ -1,3 +1,5 @@
+import { lockSupplierMaterialStock } from '../../../../repository/warehouse/stockLockRepository.js';
+import { lockGoodsReceipt } from '../../../../repository/warehouse/documentLockRepository.js';
 import { isAppError } from '../../../../errors/AppError.js';
 import { GOODS_RECEIPT_DETAIL_CHANGE_TYPES } from '../../../../constants/goodsReceiptDetailChanges.js';
 import { GoodsIssueInsufficientStock } from '../../../../errors/inventory/stockError.js';
@@ -11,7 +13,7 @@ import {
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
 import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
-import { cancelGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
+import { cancelGoodsReceiptDetailAndTotals } from '../goodsReceiptTotalsService.js';
 import {
     createGoodsReceiptDetailChange,
     createGoodsReceiptDetailChangeMovementAndUpdateStock,
@@ -26,12 +28,18 @@ const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges
 export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId, type = null }) => {
     try {
         const result = await getDb().$transaction(async (tx) => {
+            await lockGoodsReceipt({ tx, id });
             const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId, type });
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
             if (currentDetail.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED) {
                 throw new GoodsReceiptDetailAlreadyCanceled();
             }
+            await lockSupplierMaterialStock({
+                tx,
+                materialId: currentDetail.materialId,
+                supplierId: currentDetail.goodsReceipt.supplierId
+            });
             const changeType = GOODS_RECEIPT_DETAIL_CHANGE_TYPES.CANCELLATION;
             const cancellationReason = await findGoodsReceiptDetailChangeReason({ tx, changeType });
             if (!cancellationReason) throw new GoodsReceiptDetailChangeReasonNotFound();
@@ -70,17 +78,18 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId, type 
                 quantityDifference
             });
 
+            await recalculateMaterialUnitCosts({
+                tx,
+                supplierId: updatedReceipt.supplierId,
+                materialIds: [updatedDetail.materialId]
+            });
+
             return {
                 updatedDetail,
                 updatedReceipt,
                 detailChange,
                 movement
             };
-        });
-
-        await recalculateMaterialUnitCosts({
-            supplierId: result.updatedReceipt.supplierId,
-            materialIds: [result.updatedDetail.materialId]
         });
 
         return result;

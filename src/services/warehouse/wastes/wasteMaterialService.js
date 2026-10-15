@@ -44,15 +44,14 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
         if (!uniqueTemplates.has(templateKey)) uniqueTemplates.set(templateKey, { material, key });
     });
 
-    const templates = Array.from(uniqueTemplates.values(), ({ material, key }) => ({
+    const data = Array.from(uniqueTemplates.values()).slice(skip, skip + take).map(({ material, key }) => ({
         ...material,
         maxUnitCost: familyCosts.get(key)
     }));
-    const data = templates.slice(skip, skip + take);
 
     return {
         data,
-        recordsTotal: templates.length,
-        recordsFiltered: templates.length
+        recordsTotal: uniqueTemplates.size,
+        recordsFiltered: uniqueTemplates.size
     };
 };

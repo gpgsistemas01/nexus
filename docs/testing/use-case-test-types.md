@@ -83,6 +83,17 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 | `CU-ENT-05`, `CU-ENT-11` | Sin prueba funcional directa de cancelación. | Compra/detalle existente, contexto, estado cancelable, stock/movimiento y ausencia de efectos parciales. | **Brecha.** |
 | `CU-ENT-06`, `CU-ENT-12` | `reportControllerTest.js` y `goodsReceiptContextServicesTest.js`. | Unitaria de delimitación, fórmulas, importes y resúmenes con escritor simulado. | **Unitaria existente**; falta integración del archivo. |
 
+## Escrituras concurrentes de almacén
+
+`warehouseConcurrencyControllerDbTest.js` complementa las pruebas CRUD de salidas,
+devoluciones, ajustes y compras. Retiene una fila en PostgreSQL mientras las peticiones
+coinciden y verifica tanto HTTP como existencias, cantidades convertidas, estados,
+totales, historial y ausencia de efectos parciales. Incluye surtidos y devoluciones
+duplicadas, edición durante surtido, detalles distintos de un mismo documento,
+cancelaciones concurrentes y rollback de una corrección cuyo registro histórico falla.
+Los casos de movimiento y ajuste de materiales ejercitan directamente sus servicios
+transaccionales; no se presentan como cobertura HTTP de esos endpoints.
+
 ## Regla de mantenimiento
 
 Las pruebas de frontend que sólo comprobaban DOM simulado, plugins, selectores,

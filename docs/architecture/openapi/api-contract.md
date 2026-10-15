@@ -52,7 +52,26 @@ Los errores operativos de dominio pueden aportar otros códigos para `401`, `403
 `404`, `409` o `500`; cada operación referencia la respuesta correspondiente y el
 cliente debe tratar el código como identificador, no el texto como contrato.
 
+En salidas de merma, HTTP 409 distingue `WASTE_ISSUE_STATE_CONFLICT` (ya no hay
+detalles pendientes), `WASTE_ISSUE_DUPLICATE_WASTE` (merma repetida en el documento) y
+`WASTE_ISSUE_WASTE_UNAVAILABLE` (merma inexistente o inactiva). La ausencia de estados
+requeridos es una configuración incompleta: devuelve HTTP 500 con
+`WASTE_ISSUE_FULFILLMENT_STATUS_NOT_FOUND`. Estos códigos se declaran en
+`errorMap.wasteIssue` y tienen traducción en `apiMessages.js`; los servicios no reciben
+mensajes visibles para decidir qué conflicto comunicar.
+
 ### Exportación mensual de reportes
+
+Las exportaciones conservan sus columnas, fórmulas, permisos y descarga HTTP. El
+transporte del navegador interpreta los errores JSON incluso cuando la petición usa
+`responseType: blob`, conservando código, estado y mensaje. El detalle de recursos y
+medición vive en la [guía de rendimiento](../../testing/backend-performance.md).
+
+El XLSX se escribe progresivamente en un temporal privado y se descarga al terminar.
+Un fallo durante la generación conserva la respuesta JSON habitual porque todavía
+no se han enviado encabezados del archivo. El temporal se elimina después de la
+descarga, de un error o de una cancelación. Si la transferencia ya comenzó y falla,
+se interrumpe la conexión; no se intenta escribir JSON dentro de un XLSX parcial.
 
 Los endpoints de exportación de compras, salidas y movimientos aceptan
 `monthlyReport=true`. En ese modo ignoran los filtros aplicados al listado y consultan

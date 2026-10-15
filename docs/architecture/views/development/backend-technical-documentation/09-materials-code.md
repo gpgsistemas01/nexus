@@ -36,6 +36,13 @@ flowchart TB
 
 ## Contratos de implementación
 
+`supplierMaterialStockService.js` concentra las consultas operativas y escrituras de
+existencias que antes estaban en `supplierMaterialService.js`. Este último conserva
+administración de la oferta y costos. Las variaciones de stock son atómicas y devuelven
+el saldo utilizado en el historial; los ajustes absolutos consultan después de obtener
+el bloqueo de la oferta. Las capturas de pesos de referencia mantienen su comparación
+al guardar y no permiten reemplazar valores previamente registrados.
+
 ### Datos, resultados y efectos del módulo
 
 | Capacidad | Entrada y retorno | Reglas, errores y persistencia |

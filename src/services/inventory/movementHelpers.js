@@ -1,4 +1,5 @@
 import { buildStockKey, normalizeDecimal } from "../../utils/formattersUtils.js";
+import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
 
 const resolveValue = (item, resolver) => (
     typeof resolver === 'function'
@@ -33,17 +34,15 @@ export const buildStockUpdateSummary = ({
     quantity = 'quantity'
 }) => {
 
-    const stockKeys = new Set();
     const grouped = new Map();
 
     for (const detail of details) {
 
-        const key = buildStockKey(
-            resolveValue(detail, materialId),
-            resolveValue(detail, supplierId)
-        );
+        const resolvedMaterialId = resolveValue(detail, materialId);
+        const resolvedSupplierId = resolveValue(detail, supplierId);
+        if (!resolvedMaterialId || !resolvedSupplierId) throw new MovementDetailRelationConflict();
 
-        stockKeys.add(key);
+        const key = buildStockKey(resolvedMaterialId, resolvedSupplierId);
 
         grouped.set(
             key,
@@ -54,7 +53,6 @@ export const buildStockUpdateSummary = ({
     }
 
     return {
-        stockKeys,
         grouped
     };
 };

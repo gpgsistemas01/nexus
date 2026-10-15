@@ -79,6 +79,13 @@ autorización o integridad crítica y los criterios de aceptación que necesiten
 identificador estable. Las variaciones de una misma regla pueden compartir ficha; las
 demás pruebas permanecen descritas por su nombre y aserciones ejecutables.
 
+La [medición del backend](backend-performance.md) añade escenarios HTTP con consultas
+SQL, planes de ejecución, percentiles y concurrencia. Se ejecuta aparte de las suites
+funcionales con `npm run test:performance` y una base desechable.
+`npm run test:performance:mixed` separa el cliente en otro proceso y comprueba consultas
+concurrentes con descargas Excel, CPU, event loop y memoria; sus resultados se
+conservan en la evidencia de la entrega o CI, sin fijar un SLA a partir de una corrida local.
+
 ## Cobertura CRUD mínima
 
 Sólo se cubren operaciones disponibles en el producto. Una eliminación puede ser una

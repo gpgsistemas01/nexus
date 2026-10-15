@@ -1,3 +1,4 @@
+import { findPage } from '../../repository/paginationRepository.js';
 import { getDb } from '../../repository/baseRepository.js';
 
 export const findAllRoles = async ({
@@ -7,8 +8,6 @@ export const findAllRoles = async ({
     orderBy = 'name',
     orderDir = 'asc'
 }) => {
-
-    const db = getDb();
 
     const where = {
         isActive: true,
@@ -20,26 +19,20 @@ export const findAllRoles = async ({
         })
     };
 
-    const roles = await db.role.findMany({
-        skip,
-        take,
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: {
-            id: true,
-            name: true,
-            isActive: true
+    return findPage({
+        model: getDb().role,
+        query: {
+            skip,
+            take,
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            select: {
+                id: true,
+                name: true,
+                isActive: true
+            }
         }
     });
-
-    const total = await db.role.count();
-    const filtered = await db.role.count({ where });
-
-    return {
-        data: roles,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 };

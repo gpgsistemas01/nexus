@@ -1,3 +1,4 @@
+import { findPage } from '../../../repository/paginationRepository.js';
 import { PersonCreateDatabaseError, PersonUpdateDatabaseError } from "../../../errors/admin/personError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
@@ -9,6 +10,7 @@ export const findAllPersons = async ({
     departments = [],
     roles = [],
     includeAccesses = false,
+    includeCounts = true,
     skip = 0,
     take = 10,
     search = '',
@@ -48,8 +50,10 @@ export const findAllPersons = async ({
         })
     };
 
-    const [foundPersons, total, filtered] = await Promise.all([
-        db.person.findMany({
+    return findPage({
+        model: db.person,
+        includeCounts,
+        query: {
             ...(take > 0 && { skip, take }),
             where,
             orderBy: {
@@ -67,16 +71,8 @@ export const findAllPersons = async ({
                     }
                 })
             }
-        }),
-        db.person.count(),
-        db.person.count({ where })
-    ]);
-
-    return {
-        data: foundPersons,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
+        }
+    });
 };
 
 const DEFAULT_PERSON_SELECT = {

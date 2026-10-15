@@ -1,3 +1,4 @@
+import { findPage } from "../../repository/paginationRepository.js";
 import { ClientCreateDatabaseError, ClientFindDatabaseError, ClientNotFound } from "../../errors/sales/clientError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
@@ -13,6 +14,7 @@ const CLIENT_SELECT = {
 
 export const findAllClients = async ({
     advisorId,
+    includeCounts = true,
     onlyActive = false,
     skip = 0,
     take = 10,
@@ -32,23 +34,19 @@ export const findAllClients = async ({
         })
     };
 
-    const clients = await getDb().client.findMany({
-        ...(take > 0 && { skip, take }),
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: CLIENT_SELECT
+    return findPage({
+        model: getDb().client,
+        includeCounts,
+        hasFilters: Boolean(advisorId || onlyActive || search),
+        query: {
+            ...(take > 0 && { skip, take }),
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            select: CLIENT_SELECT
+        }
     });
-
-    const total = await getDb().client.count();
-    const filtered = await getDb().client.count({ where });
-
-    return {
-        data: clients,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 }
 
 export const findClientById = async ({ tx = null, id }) => {

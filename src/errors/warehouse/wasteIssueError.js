@@ -1,4 +1,5 @@
 import { AppError } from '../AppError.js';
+import { errorMap } from '../../messages/codeMessages.js';
 
 export class WasteIssueNotFound extends AppError {
 
@@ -14,8 +15,26 @@ export class WasteIssueStockConflict extends AppError {
 }
 
 export class WasteIssueStateConflict extends AppError {
-    constructor(message = 'La salida de merma no puede modificarse en su estado actual.') {
-        super(message, 'WASTE_ISSUE_STATE_CONFLICT', 409);
+    constructor() {
+        super('La salida de merma no tiene detalles pendientes por surtir.', errorMap.wasteIssue.STATE_CONFLICT, 409);
+    }
+}
+
+export class WasteIssueDuplicateWasteConflict extends AppError {
+    constructor() {
+        super('No se puede repetir la misma merma en una salida.', errorMap.wasteIssue.DUPLICATE_WASTE, 409);
+    }
+}
+
+export class WasteIssueWasteUnavailableConflict extends AppError {
+    constructor() {
+        super('Una o más mermas no existen o están inactivas.', errorMap.wasteIssue.WASTE_UNAVAILABLE, 409);
+    }
+}
+
+export class WasteIssueFulfillmentStatusNotFound extends AppError {
+    constructor() {
+        super('No se encontraron los estados de surtido requeridos.', errorMap.wasteIssue.FULFILLMENT_STATUS_NOT_FOUND, 500);
     }
 }
 

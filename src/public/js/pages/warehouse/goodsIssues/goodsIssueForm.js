@@ -73,7 +73,7 @@ useIssueForm({
         const { mode } = form.dataset;
 
         if (mode === FORM_MODES.EDIT_DETAIL) {
-            const detailsToSupply = mapIssueDetailsToSupplyRequest(goodsIssueDetails);
+            const detailsToSupply = formData.details;
 
             return detailsToSupply.length
                 ? validateDetailsFields(issueProjectQuantityDetailsValidation, detailsToSupply)

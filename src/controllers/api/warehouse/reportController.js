@@ -98,7 +98,7 @@ export const exportWarehouseReportExcel = async (req, res) => {
         columns
     });
 
-    const rows = await findWarehouseReportRows({
+    const rows = findWarehouseReportRows({
         search: getDataTableSearch(req.query),
         inventoryScope: req.query.inventoryScope,
         type: Object.values(MATERIAL_TYPES).includes(req.query.type) ? req.query.type : null,
@@ -106,8 +106,8 @@ export const exportWarehouseReportExcel = async (req, res) => {
         orderDir
     });
 
-    const data = [
-        [
+    const data = async function* () {
+        yield [
             'Proveedor',
             'Material',
             'Base',
@@ -118,9 +118,9 @@ export const exportWarehouseReportExcel = async (req, res) => {
             'Conversión',
             'Unidad',
             'Costo unitario'
-        ],
+        ];
 
-        ...rows.map(row => [
+        for await (const row of rows) yield [
             row.supplier,
             row.name,
             row.base,
@@ -131,12 +131,12 @@ export const exportWarehouseReportExcel = async (req, res) => {
             row.convertedQuantity,
             row.unitMeasure,
             row.maxUnitCost
-        ])
-    ];
+        ];
+    };
 
     return sendExcelReport({
         res,
-        data,
+        data: data(),
         sheetName: SHEET_NAME,
         filename: FILENAME
     });

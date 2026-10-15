@@ -35,6 +35,7 @@ export const findMovementReportRows = async ({
     if (!findMovements) return [];
 
     const movementsResult = await findMovements({
+        includeCounts: false,
         skip: 0,
         take: 100000,
         startDate,

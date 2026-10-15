@@ -15,7 +15,7 @@ describe('movementHelpers', () => {
       quantity: 'quantityToSupply'
     });
 
-    expect([...summary.stockKeys]).toEqual([
+    expect([...summary.grouped.keys()]).toEqual([
       'material-1:supplier-1',
       'material-2:supplier-1'
     ]);

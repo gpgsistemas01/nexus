@@ -1,6 +1,10 @@
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
+    WASTE_ISSUE_STATE_CONFLICT: 'La salida de merma no tiene detalles pendientes por surtir. Actualice la información.',
+    WASTE_ISSUE_DUPLICATE_WASTE: 'No se puede repetir la misma merma en una salida.',
+    WASTE_ISSUE_WASTE_UNAVAILABLE: 'Una o más mermas no existen o están inactivas. Actualice la selección.',
+    WASTE_ISSUE_FULFILLMENT_STATUS_NOT_FOUND: 'No están configurados los estados de surtido. Contacte al administrador.',
     MATERIAL_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
     MATERIAL_ROLL_REFERENCE_READ_ONLY: 'Los pesos de referencia registrados no se pueden modificar ni eliminar. Puede completar los que todavía no estén registrados.',
     WASTE_DIMENSIONS_INVALID: 'Complete las dimensiones de la merma o los pesos necesarios para calcularlas.',

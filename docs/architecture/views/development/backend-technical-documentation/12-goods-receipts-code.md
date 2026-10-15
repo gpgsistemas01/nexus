@@ -38,6 +38,17 @@ flowchart TB
 
 ## Contratos de implementación
 
+`goodsReceiptHelpers.js` conserva preparación y cálculos; `goodsReceiptTotalsService.js`
+concentra las escrituras de detalles y totales. Edición, corrección y cancelación
+bloquean la compra antes de consultar su estado. Los movimientos por diferencia y las
+actualizaciones de costos reciben el mismo `tx`; un fallo de auditoría o costo revierte
+también los efectos de inventario. Agregar detalles suma sólo líneas activas.
+La corrección reutiliza el material ya consultado para calcular importes, sin cargarlo
+otra vez. `updateManyAndReturn` entrega el detalle actualizado y una sola lectura de
+cantidades, importes y estados permite calcular los totales, incluso al cancelar la
+última línea. Al agregar detalles, las relaciones de respuesta se consultan una vez,
+después de actualizar los totales.
+
 ### Datos, resultados y efectos del módulo
 
 | Capacidad | Entrada y retorno | Reglas, errores y persistencia |

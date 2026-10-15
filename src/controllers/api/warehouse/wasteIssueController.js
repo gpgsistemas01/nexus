@@ -1,3 +1,4 @@
+import { updateWasteIssueDetails } from '../../../services/warehouse/wasteIssues/wasteIssueDetailService.js';
 import {
     createWasteIssueDetailsDtoForEdit,
     createWasteIssueDtoForEdit,
@@ -9,7 +10,6 @@ import {
     createWasteIssue,
     findAllWasteIssues,
     updateWasteIssue,
-    updateWasteIssueDetails,
     updateWasteIssueHeader
 } from '../../../services/warehouse/wasteIssues/wasteIssueService.js';
 import { returnWasteIssueDetail } from '../../../services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js';

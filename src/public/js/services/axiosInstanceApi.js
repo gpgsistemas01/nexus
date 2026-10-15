@@ -36,7 +36,7 @@ api.interceptors.response.use(
             }
         }
 
-        return Promise.reject(normalizeHttpError(err));
+        return Promise.reject(await normalizeHttpError(err));
     }
 );
 

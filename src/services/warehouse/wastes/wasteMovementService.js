@@ -1,7 +1,7 @@
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import { getDb } from '../../../repository/baseRepository.js';
-import { WasteIssueStockConflict } from '../../../errors/warehouse/wasteIssueError.js';
-import { applyWasteStockChange } from './wasteInventoryService.js';
+import { normalizeDecimal } from '../../../utils/formattersUtils.js';
+import { applyWasteStockChanges } from './wasteInventoryService.js';
 
 export const createWasteMovement = ({
     tx = null,
@@ -27,35 +27,42 @@ export const applyWasteMovement = async ({
     details,
     movementType
 }) => {
-    const movementDetails = [];
-    const isIssue = movementType === INVENTORY_MOVEMENT_TYPES.ISSUE;
+    if (!details.length) return null;
 
+    const isIssue = movementType === INVENTORY_MOVEMENT_TYPES.ISSUE;
+    const grouped = new Map();
     for (const detail of details) {
         const signedQuantity = isIssue ? -detail.quantity : detail.quantity;
         const signedConvertedQuantity = isIssue
             ? -detail.convertedQuantity
             : detail.convertedQuantity;
-        const stockChange = await applyWasteStockChange({
-            tx,
+        const change = grouped.get(detail.wasteId) ?? {
             id: detail.wasteId,
-            quantityChange: signedQuantity,
-            convertedQuantityChange: signedConvertedQuantity
-        });
-
-        if (!stockChange.updated) {
-            throw new WasteIssueStockConflict({ materialName: detail.materialName });
-        }
-
-        movementDetails.push({
-            wasteId: detail.wasteId,
-            ...(detail.wasteIssueDetailId && { wasteIssueDetailId: detail.wasteIssueDetailId }),
-            quantity: signedQuantity,
-            previousStock: stockChange.previousStock,
-            newStock: stockChange.newStock
-        });
+            materialName: detail.materialName,
+            quantityChange: 0,
+            convertedQuantityChange: 0
+        };
+        change.quantityChange = normalizeDecimal(change.quantityChange + signedQuantity);
+        change.convertedQuantityChange = normalizeDecimal(change.convertedQuantityChange + signedConvertedQuantity);
+        grouped.set(detail.wasteId, change);
     }
 
-    if (!movementDetails.length) return null;
+    const balances = await applyWasteStockChanges({ tx, changes: [...grouped.values()] });
+    const movementDetails = details.map(detail => {
+        const quantity = isIssue ? -detail.quantity : detail.quantity;
+        const balance = balances.get(detail.wasteId);
+        const previousStock = balance.previousStock;
+        const newStock = normalizeDecimal(previousStock + quantity);
+        balance.previousStock = newStock;
+
+        return {
+            wasteId: detail.wasteId,
+            ...(detail.wasteIssueDetailId && { wasteIssueDetailId: detail.wasteIssueDetailId }),
+            quantity,
+            previousStock,
+            newStock
+        };
+    });
 
     return createWasteMovement({
         tx,

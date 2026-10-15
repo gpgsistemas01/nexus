@@ -1,3 +1,4 @@
+import { findPage } from '../../repository/paginationRepository.js';
 import { MANAGED_CATALOGS } from '../../constants/catalogs.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
 import {
@@ -35,18 +36,16 @@ export const findAllCatalogEntries = async (catalogName, { skip = 0, take = 10, 
     const catalog = getCatalog(catalogName);
     const model = getDb()[catalog.model];
     const where = search ? { name: { contains: search, mode: 'insensitive' } } : {};
-    const [data, recordsTotal, recordsFiltered] = await Promise.all([
-        model.findMany({
+    return findPage({
+        model: model,
+        hasFilters: Boolean(search),
+        query: {
             where,
             skip,
             take,
             orderBy: { name: 'asc' }
-        }),
-        model.count(),
-        model.count({ where })
-    ]);
-
-    return { data, recordsTotal, recordsFiltered };
+        }
+    });
 };
 
 export const createCatalogEntry = async (catalogName, input) => {

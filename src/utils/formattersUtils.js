@@ -1,5 +1,20 @@
 export const MEXICO_TIME_ZONE = 'America/Mexico_City';
 
+const dateTimeFormatter = new Intl.DateTimeFormat('es-MX', {
+    timeZone: MEXICO_TIME_ZONE,
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+});
+
+const monthYearFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: MEXICO_TIME_ZONE,
+    month: '2-digit',
+    year: 'numeric'
+});
+
 export const sanitizeEmptyStrings = (obj) => {
   return Object.fromEntries(
     Object.entries(obj).map(([key, value]) => [
@@ -14,24 +29,13 @@ export const formatDateLongWithTime = (dateTime) => {
     if (!dateTime) return '';
 
     const date = new Date(dateTime);
-    return new Intl.DateTimeFormat('es-MX', {
-        timeZone: MEXICO_TIME_ZONE,
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    }).format(date);
+    return dateTimeFormatter.format(date);
 }
 
 
 export const getMexicoMonthYearParts = (dateTime = new Date()) => {
 
-    const parts = new Intl.DateTimeFormat('en-US', {
-        timeZone: MEXICO_TIME_ZONE,
-        month: '2-digit',
-        year: 'numeric'
-    }).formatToParts(dateTime).reduce((acc, part) => {
+    const parts = monthYearFormatter.formatToParts(dateTime).reduce((acc, part) => {
         if (part.type !== 'literal') acc[part.type] = part.value;
         return acc;
     }, {});

@@ -1,3 +1,4 @@
+import { findPage } from '../../../repository/paginationRepository.js';
 import { isAppError } from '../../../errors/AppError.js';
 import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
@@ -11,6 +12,7 @@ import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.js';
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
 import { prepareWasteMeasurements } from './wasteHelpers.js';
+import { lockWasteStock } from '../../../repository/warehouse/stockLockRepository.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -112,8 +114,10 @@ export const findAllWastes = async ({
 
     const db = getDb();
 
-    const [wastes, total, filtered] = await Promise.all([
-        db.waste.findMany({
+    return findPage({
+        model: db.waste,
+        hasFilters: Boolean(search || supplierId),
+        query: {
             skip,
             take,
             where,
@@ -139,16 +143,8 @@ export const findAllWastes = async ({
                 unitMeasure: WASTE_INCLUDE.unitMeasure
             },
             orderBy: orderMap[orderBy] || orderMap.name
-        }),
-        db.waste.count(),
-        db.waste.count({ where })
-    ]);
-
-    return {
-        data: wastes,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
+        }
+    });
 };
 
 export const createWasteWithInitialStockAdjustment = async ({
@@ -298,9 +294,10 @@ export const updateWasteStock = async ({
 
         const waste = await getDb().$transaction(async (tx) => {
 
+            await lockWasteStock({ tx, id });
             const currentWaste = await findWasteById({ tx, id });
 
-            await registerWasteStockAdjustment({
+            return registerWasteStockAdjustment({
                 tx,
                 waste: currentWaste,
                 reasonId: wasteStockDto.reasonId,

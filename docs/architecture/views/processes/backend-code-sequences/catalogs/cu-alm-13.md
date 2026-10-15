@@ -26,6 +26,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `Stock` | control | [`wasteInventoryService.js`](../../../../../../src/services/warehouse/wastes/wasteInventoryService.js) |
+| `StockUpdateRepo` | control | [`stockUpdateRepository.js`](../../../../../../src/repository/warehouse/stockUpdateRepository.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
@@ -98,6 +99,7 @@ sequenceDiagram
     participant Entry@{ "type": "control" } as wasteStockEntryService.js
     participant Movement@{ "type": "control" } as wasteMovementService.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
+    participant StockUpdateRepo@{ "type": "control" } as stockUpdateRepository.js
     participant Stock@{ "type": "control" } as wasteInventoryService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket@{ "type": "control" } as socketUtils.js
@@ -118,14 +120,11 @@ sequenceDiagram
     Reference->>Prisma: tx.referenceNumberCounter.upsert({ where, update, create })
     Reference-->>Entry: generateYearlyReferenceNumber(): Promise[string]
     Entry->>Movement: applyWasteMovement({ tx, movementType: ENTRY, details })
-    Movement->>Stock: applyWasteStockChange({ tx, id, quantityChange, convertedQuantityChange })
-    Stock->>FileBaseRepository: getDb(tx)
-    FileBaseRepository-->>Stock: getDb(): PrismaClient | TransactionClient — tx si se recibió
-    Stock->>Prisma: db.waste.findUnique({ where: { id } })
-    Stock->>FileBaseRepository: getDb(tx)
-    FileBaseRepository-->>Stock: getDb(): PrismaClient | TransactionClient — tx si se recibió
-    Stock->>Prisma: db.waste.updateMany({ where, data })
-    Stock-->>Movement: applyWasteStockChange(): Promise[Object]
+    Movement->>Stock: applyWasteStockChanges({ tx, changes: cambios agrupados })
+    Stock->>StockUpdateRepo: updateWasteStocks({ tx, changes })
+    StockUpdateRepo->>Prisma: tx.$queryRaw(CTE de bloqueo ordenado y UPDATE RETURNING)
+    StockUpdateRepo-->>Stock: updateWasteStocks(): Promise[Waste[]]
+    Stock-->>Movement: applyWasteStockChanges(): Promise[Map]
     Movement->>Movement: createWasteMovement({ tx, movementType: ENTRY, details })
     Movement->>FileBaseRepository: getDb(tx)
     FileBaseRepository-->>Movement: getDb(): PrismaClient | TransactionClient — conserva tx

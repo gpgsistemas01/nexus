@@ -12,6 +12,7 @@
 | RD-008 | Las referencias documentales y las identidades de catálogo marcadas como únicas no deben duplicarse. | Implementado |
 | RD-009 | Las fechas del negocio deben conservarse separadas de las marcas técnicas de creación y actualización. | Implementado |
 | RD-010 | Los documentos y detalles deben persistir estados explícitos del proceso en lugar de inferirlos desde marcas temporales. | Implementado |
+| RD-011 | Las escrituras simultáneas de una salida o compra deben conservar cantidades, estados y totales coherentes. Surtido y devolución consultan el pendiente después de bloquear el documento; los movimientos guardan los saldos reales de cada actualización y los ajustes absolutos calculan su diferencia desde el saldo protegido. Un fallo revierte documento, detalles, existencias, movimientos y costos que participan en la operación. | Implementado |
 
 ### Comprobación de datos
 
@@ -27,3 +28,8 @@ y mediante [pruebas de persistencia aisladas](../../../testing/test-plan.md).
   duplicados, tanto después de una operación válida como después de un rechazo.
 - Para `RD-009` y `RD-010`, comprobar fechas y estados explícitos del proceso;
   una marca técnica de creación no reemplaza la fecha del negocio ni prueba surtimiento.
+- Para `RD-011`, ejecutar solicitudes coincidentes sobre la misma fila en PostgreSQL
+  aislado y comprobar respuestas HTTP, persistencia, historial y rollback con
+  `warehouseConcurrencyControllerDbTest.js`. El bloqueo se aplica al guardar; no reserva
+  el documento mientras el usuario mantiene abierto un formulario ni identifica
+  reenvíos de entradas independientes como una misma operación.

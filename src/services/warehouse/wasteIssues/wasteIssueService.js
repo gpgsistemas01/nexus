@@ -1,138 +1,28 @@
+import { findPage } from '../../../repository/paginationRepository.js';
 import { DOCUMENT_REFERENCE_TYPES } from '../../../constants/documentReferenceTypes.js';
-import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
-import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
+import { FULFILLMENT_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
 import {
-    WasteIssueAdvisorNotFound,
     WasteIssueAlreadySuppliedConflict,
-    WasteIssueClientAdvisorConflict,
-    WasteIssueDetailNotFound,
     WasteIssueNotFound,
-    WasteIssueProjectNumberConflict,
-    WasteIssueRequesterNotFound,
     WasteIssueCreateDatabaseError,
     WasteIssueUpdateDatabaseError,
-    WasteIssueStateConflict
 } from '../../../errors/warehouse/wasteIssueError.js';
 import { getDb } from '../../../repository/baseRepository.js';
-import { generateYearlyReferenceNumber } from '../../document/referenceNumberService.js';
-import { resolveIssueHeaderData } from '../issues/issueHeaderService.js';
+import { lockWasteIssue } from '../../../repository/warehouse/documentLockRepository.js';
 import {
-    resolveIssueDetailFulfillmentStatus,
-    resolveIssueFulfillmentStatus
-} from '../issues/issueFulfillmentRules.js';
-import { applyWasteMovement } from '../wastes/wasteMovementService.js';
-import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+    buildWasteIssueDetails,
+    normalizeWasteIssueResponse,
+    resolveWasteIssueHeaderData,
+    WASTE_ISSUE_INCLUDE
+} from './wasteIssueHelpers.js';
+import { generateYearlyReferenceNumber } from '../../document/referenceNumberService.js';
 import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
 import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
-
-const normalizeWasteIssueDetailResponse = detail => ({
-    ...detail,
-    maxUnitCost: detail.maxUnitCost ?? detail.waste?.maxUnitCost ?? null,
-    projectConvertedQuantity: detail.projectConvertedQuantity ?? null,
-    convertedQuantityDifference: detail.convertedQuantityDifference ?? null
-});
-
-const normalizeWasteIssueResponse = issue => issue && ({
-    ...issue,
-    details: issue.details?.map(normalizeWasteIssueDetailResponse) ?? []
-});
-
-const WASTE_ISSUE_INCLUDE = {
-    createdBy: { select: { id: true, name: true } },
-    status: { select: { id: true, name: true } },
-    fulfillmentStatus: { select: { id: true, name: true } },
-    department: { select: { id: true, name: true } },
-    requester: { select: { id: true, fullName: true } },
-    client: { select: { id: true, name: true } },
-    advisor: { select: { id: true, fullName: true } },
-    details: {
-        orderBy: { createdAt: 'asc' },
-        include: {
-            fulfillmentStatus: { select: { id: true, name: true } },
-            waste: {
-                include: {
-                    supplier: true,
-                    presentation: true,
-                    unitMeasure: true
-                }
-            }
-        }
-    }
-};
-
-const WASTE_ISSUE_HEADER_ERROR_TYPES = {
-    RequesterNotFound: WasteIssueRequesterNotFound,
-    AdvisorNotFound: WasteIssueAdvisorNotFound,
-    ClientAdvisorConflict: WasteIssueClientAdvisorConflict,
-    ProjectNumberConflict: WasteIssueProjectNumberConflict
-};
-
-const resolveWasteIssueHeaderData = async ({ tx, dto }) => {
-
-    const { requesterId, advisorId, departmentId, clientId, ...issueData } = dto;
-
-    return resolveIssueHeaderData({
-        tx,
-        requesterId,
-        advisorId,
-        departmentId,
-        clientId,
-        issueData,
-        statusName: GOODS_ISSUE_STATUS_NAMES.APPROVED,
-        errorTypes: WASTE_ISSUE_HEADER_ERROR_TYPES
-    });
-};
-
-const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) => ({
-    materialName: waste.name,
-    quantity: detail.quantity,
-    convertedQuantity: calculateConvertedQuantity({
-        quantity: detail.quantity,
-        base: waste.base,
-        height: waste.height
-    }),
-    waste: {
-        connect: { id: waste.id }
-    },
-    fulfillmentStatus: {
-        connect: { id: fulfillmentStatusId }
-    }
-});
-
-const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId }) => {
-
-    const uniqueIds = new Set(details.map(detail => detail.wasteId));
-
-    if (uniqueIds.size !== details.length) {
-        throw new WasteIssueStateConflict('No se puede repetir la misma merma en una salida.');
-    }
-
-    const wastes = await tx.waste.findMany({
-        where: { id: { in: [...uniqueIds] }, isActive: true },
-        include: {
-            supplier: true,
-            presentation: true,
-            unitMeasure: true
-        }
-    });
-
-    if (wastes.length !== uniqueIds.size) {
-        throw new WasteIssueStateConflict('Una o más mermas no existen o están inactivas.');
-    }
-
-    const byId = new Map(wastes.map(waste => [waste.id, waste]));
-
-    return details.map(detail => createWasteIssueDetailSnapshot({
-        waste: byId.get(detail.wasteId),
-        detail,
-        fulfillmentStatusId
-    }));
-};
 
 export const findAllWasteIssues = async ({
     skip = 0,
@@ -145,6 +35,7 @@ export const findAllWasteIssues = async ({
     personId = '',
     fulfillmentStatusId = '',
     observationsSearch = '',
+    includeCounts = true,
     orderBy = 'requestDate',
     orderDir = 'desc'
 }) => {
@@ -175,23 +66,20 @@ export const findAllWasteIssues = async ({
         })
     };
 
-    const [data, recordsTotal, recordsFiltered] = await Promise.all([
-        db.wasteIssue.findMany({
+    const page = await findPage({
+        model: db.wasteIssue,
+        hasFilters: Object.keys(where).length > 0,
+        includeCounts,
+        query: {
             skip,
             take,
             where,
             include: WASTE_ISSUE_INCLUDE,
             orderBy: { [sortableFields.has(orderBy) ? orderBy : 'requestDate']: orderDir }
-        }),
-        db.wasteIssue.count(),
-        db.wasteIssue.count({ where })
-    ]);
+        }
+    });
 
-    return {
-        data: data.map(normalizeWasteIssueResponse),
-        recordsTotal,
-        recordsFiltered
-    };
+    return { ...page, data: page.data.map(normalizeWasteIssueResponse) };
 };
 
 const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb().$transaction(async tx => {
@@ -231,6 +119,7 @@ export const createWasteIssue = async ({ wasteIssueDto, userId }) => executeServ
 });
 
 const updateWasteIssueTransaction = async ({ id, wasteIssueDto }) => getDb().$transaction(async tx => {
+    await lockWasteIssue({ tx, id });
 
     const current = await tx.wasteIssue.findUnique({ where: { id }, include: { details: true } });
 
@@ -279,11 +168,12 @@ export const updateWasteIssueHeader = async ({ id, wasteIssueDto }) => {
         model: 'wasteIssue',
         data: { id, ...wasteIssueDto },
         fallbackError: new WasteIssueUpdateDatabaseError(),
-        action: async () => {
-            const headerData = await resolveWasteIssueHeaderData({ dto: wasteIssueDto });
+        action: () => getDb().$transaction(async tx => {
+            await lockWasteIssue({ tx, id });
+            const headerData = await resolveWasteIssueHeaderData({ tx, dto: wasteIssueDto });
 
             try {
-                const issue = await getDb().wasteIssue.update({
+                const issue = await tx.wasteIssue.update({
                     where: { id },
                     data: headerData,
                     include: WASTE_ISSUE_INCLUDE
@@ -297,98 +187,6 @@ export const updateWasteIssueHeader = async ({ id, wasteIssueDto }) => {
 
                 throw error;
             }
-        }
+        })
     });
 };
-
-const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getDb().$transaction(async tx => {
-
-    const issue = await tx.wasteIssue.findUnique({
-        where: { id },
-        include: { details: true, fulfillmentStatus: { select: { name: true } } }
-    });
-
-    if (!issue) throw new WasteIssueNotFound();
-    if ([
-        FULFILLMENT_STATUS_NAMES.COMPLETE,
-        FULFILLMENT_STATUS_NAMES.CANCELED
-    ].includes(issue.fulfillmentStatus?.name)) {
-        throw new WasteIssueStateConflict('La salida ya no tiene detalles pendientes por surtir.');
-    }
-
-    const statusIds = await findWasteIssueFulfillmentStatusIds(tx);
-
-    const requested = new Map(wasteIssueDto.details.map(detail => [detail.id, detail]));
-    const hasInvalidDetail = wasteIssueDto.details.some(
-        detail => !issue.details.some(current => current.id === detail.id)
-    );
-
-    if (requested.size !== wasteIssueDto.details.length || hasInvalidDetail) {
-        throw new WasteIssueDetailNotFound();
-    }
-
-    const supplyDetails = [];
-
-    for (const detail of issue.details) {
-
-        if (!requested.has(detail.id)) continue;
-
-        const current = Number(detail.suppliedQuantity);
-        const maximum = Number(detail.quantity);
-        const projectConvertedQuantity = requested.get(detail.id).projectConvertedQuantity;
-        const convertedQuantityDifference = Number(detail.convertedQuantity) - projectConvertedQuantity;
-
-        if (!requested.get(detail.id).isSupplied || detail.isSupplied) continue;
-
-        const delta = maximum - current;
-
-        const detailStatusName = resolveIssueDetailFulfillmentStatus({
-            quantity: maximum,
-            suppliedQuantity: maximum
-        });
-        await tx.wasteIssueDetail.update({
-            where: { id: detail.id },
-            data: {
-                suppliedQuantity: maximum,
-                isSupplied: true,
-                projectConvertedQuantity,
-                convertedQuantityDifference,
-                fulfillmentStatus: { connect: { id: statusIds.get(detailStatusName) } }
-            }
-        });
-        supplyDetails.push({
-            wasteId: detail.wasteId,
-            wasteIssueDetailId: detail.id,
-            materialName: detail.materialName,
-            quantity: delta,
-            convertedQuantity: Number(detail.convertedQuantity) * delta / maximum
-        });
-    }
-
-    await applyWasteMovement({
-        tx,
-        reference: { wasteIssueId: issue.id },
-        details: supplyDetails,
-        movementType: INVENTORY_MOVEMENT_TYPES.ISSUE
-    });
-
-    const details = await tx.wasteIssueDetail.findMany({ where: { wasteIssueId: id } });
-    const statusName = resolveIssueFulfillmentStatus(details);
-
-    const updatedIssue = await tx.wasteIssue.update({
-        where: { id },
-        data: { fulfillmentStatus: { connect: { id: statusIds.get(statusName) } } },
-        include: WASTE_ISSUE_INCLUDE
-    });
-
-    return normalizeWasteIssueResponse(updatedIssue);
-});
-
-export const updateWasteIssueDetails = async ({ id, wasteIssueDto }) => executeServiceOperation({
-    logger: serviceLogger,
-    operation: 'warehouse.wasteIssues.wasteIssueService.updateWasteIssueDetails',
-    model: 'wasteIssue',
-    data: { id, ...wasteIssueDto },
-    fallbackError: new WasteIssueUpdateDatabaseError(),
-    action: () => updateWasteIssueDetailsTransaction({ id, wasteIssueDto })
-});

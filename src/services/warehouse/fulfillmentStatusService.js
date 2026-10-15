@@ -1,3 +1,4 @@
+import { findPage } from "../../repository/paginationRepository.js";
 import { getDb } from "../../repository/baseRepository.js";
 
 export const findAllFulfillmentStatuses = async ({
@@ -7,8 +8,6 @@ export const findAllFulfillmentStatuses = async ({
     orderBy = 'name',
     orderDir = 'asc'
 }) => {
-    const db = getDb();
-
     const where = {
         isActive: true,
         ...(search && {
@@ -19,28 +18,22 @@ export const findAllFulfillmentStatuses = async ({
         })
     };
 
-    const statuses = await db.fulfillmentStatus.findMany({
-        skip,
-        take,
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: {
-            id: true,
-            name: true,
-            isActive: true
+    return findPage({
+        model: getDb().fulfillmentStatus,
+        query: {
+            skip,
+            take,
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            select: {
+                id: true,
+                name: true,
+                isActive: true
+            }
         }
     });
-
-    const total = await db.fulfillmentStatus.count();
-    const filtered = await db.fulfillmentStatus.count({ where });
-
-    return {
-        data: statuses,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 };
 
 export const findFulfillmentStatusIdsByName = async ({

@@ -1,3 +1,6 @@
+import { findPage } from '../../../repository/paginationRepository.js';
+import { createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptTotalsService.js";
+import { lockGoodsReceipt } from "../../../repository/warehouse/documentLockRepository.js";
 import {
     GoodsReceiptCreateDatabaseError,
     GoodsReceiptInvoiceAlreadyExists,
@@ -9,15 +12,13 @@ import {
 } from "../../../errors/warehouse/goodsReceiptError.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
-const serviceLogger = createServiceLogger('warehouse.goodsReceipts.goodsReceiptService');
-
 import { getDb } from "../../../repository/baseRepository.js";
 import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
 import { findPersonById } from "../../admin/person/personService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
-import { buildGoodsReceiptContextWhere, buildGoodsReceiptDetails, calculateGoodsReceiptTotals, createGoodsReceiptDetailsAndUpdateTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from "./goodsReceiptHelpers.js";
+import { buildGoodsReceiptContextWhere, buildGoodsReceiptDetails, calculateGoodsReceiptTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from "./goodsReceiptHelpers.js";
 import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
@@ -26,6 +27,8 @@ import { INVENTORY_MOVEMENT_TYPES, MATERIAL_TYPES } from "../../../constants/inv
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { assertGoodsReceiptInvoiceAvailable } from "./goodsReceiptInvoiceService.js";
+
+const serviceLogger = createServiceLogger('warehouse.goodsReceipts.goodsReceiptService');
 
 const throwIfInvoiceAlreadyExists = (err) => {
     if (err?.code !== PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) return;
@@ -87,55 +90,45 @@ export const findAllGoodsReceipts = async ({
         })
     };
 
-    const goodsReceipts = await getDb().goodsReceipt.findMany({
-        skip,
-        take,
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: {
-            referenceNumber: true,
-            invoice: true,
-            isInvoiced: true,
-            receivedById: true,
-            receivedByName: true,
-            supplierId: true,
-            supplierName: true,
-            supplier: true,
-            totalGrossPurchaseAmount: true,
-            totalNetPurchaseAmount: true,
-            totalQuantity: true,
-            receptionDate: true,
-            type: true,
-            id: true,
-            status: {
-                select: {
-                    name: true
-                }
+    return findPage({
+        model: getDb().goodsReceipt,
+        totalWhere: contextWhere,
+        hasFilters: Boolean(search || startDate || endDate || supplierId || personId || excludeCanceled),
+        includeCounts,
+        query: {
+            skip,
+            take,
+            where,
+            orderBy: {
+                [orderBy]: orderDir
             },
-            details: {
-                ...(activeDetailsOnly && { where: { status: 'ACTIVE' } }),
-                include: GOODS_RECEIPT_DETAIL_INCLUDE
+            select: {
+                referenceNumber: true,
+                invoice: true,
+                isInvoiced: true,
+                receivedById: true,
+                receivedByName: true,
+                supplierId: true,
+                supplierName: true,
+                supplier: true,
+                totalGrossPurchaseAmount: true,
+                totalNetPurchaseAmount: true,
+                totalQuantity: true,
+                receptionDate: true,
+                type: true,
+                id: true,
+                status: {
+                    select: {
+                        name: true
+                    }
+                },
+                details: {
+                    ...(activeDetailsOnly && { where: { status: 'ACTIVE' } }),
+                    include: GOODS_RECEIPT_DETAIL_INCLUDE
+                }
             }
         }
     });
-
-    if (!includeCounts) return { data: goodsReceipts };
-
-    const total = await getDb().goodsReceipt.count({
-        where: type ? contextWhere : undefined
-    });
-    const hasAdditionalFilters = Object.keys(where).some(key => !Object.hasOwn(contextWhere, key));
-    const filtered = hasAdditionalFilters
-        ? await getDb().goodsReceipt.count({ where })
-        : total;
-
-    return {
-        data: goodsReceipts,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 };
 
 export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
@@ -221,12 +214,8 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
                 movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
             });
 
+            await updateMaterialUnitCostIfHigher({ tx, supplierId: goodsReceipt.supplierId, details: goodsReceipt.details });
             return goodsReceipt;
-        });
-
-        await updateMaterialUnitCostIfHigher({
-            supplierId: result.supplierId,
-            details: result.details
         });
 
 
@@ -262,8 +251,9 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
         const { receivedById, supplierId, details = [], userId, ...goodsReceiptData } = goodsReceiptDto;
         const newDetails = details.filter(detail => !detail.id);
 
-        const [goodsReceipt, receivedBy] = await Promise.all([
-            getDb().goodsReceipt.findUnique({
+        const updatedGoodsReceipt = await getDb().$transaction(async tx => {
+            await lockGoodsReceipt({ tx, id });
+            const goodsReceipt = await tx.goodsReceipt.findUnique({
                 where: { id, ...buildGoodsReceiptContextWhere(type) },
                 select: {
                     id: true,
@@ -276,41 +266,31 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
                         select: { name: true }
                     }
                 }
-
-            }),
-            findPersonById({ id: receivedById })
-        ]);
-
-        if (!goodsReceipt) throw new GoodsReceiptNotFound();
-
-        if (goodsReceipt.status.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) {
-            throw new GoodsReceiptAlreadyCanceled();
-        }
-
-        if (supplierId !== goodsReceipt.supplierId) {
-            throw new GoodsReceiptSupplierChangeConflict();
-        }
-
-        if (newDetails.length && goodsReceipt.supplier?.isActive === false) {
-            throw new SupplierInactiveConflict();
-        }
-
-        if (!receivedBy) throw new PersonReceivedByNotFound();
-
-        await assertGoodsReceiptInvoiceAvailable({
-            supplierId: goodsReceipt.supplierId,
-            invoice: goodsReceiptData.invoice,
-            excludeGoodsReceiptId: id
-        });
-
-        let addedDetails = [];
-
-        const updatedGoodsReceipt = await getDb().$transaction(async (tx) => {
-            const currentReceipt = await tx.goodsReceipt.findUnique({
-                where: { id, ...buildGoodsReceiptContextWhere(type) },
-                select: { id: true }
             });
-            if (!currentReceipt) throw new GoodsReceiptNotFound();
+
+            if (!goodsReceipt) throw new GoodsReceiptNotFound();
+
+            if (goodsReceipt.status.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) {
+                throw new GoodsReceiptAlreadyCanceled();
+            }
+
+            if (supplierId !== goodsReceipt.supplierId) {
+                throw new GoodsReceiptSupplierChangeConflict();
+            }
+
+            if (newDetails.length && goodsReceipt.supplier?.isActive === false) {
+                throw new SupplierInactiveConflict();
+            }
+
+            const receivedBy = await findPersonById({ tx, id: receivedById });
+            if (!receivedBy) throw new PersonReceivedByNotFound();
+
+            await assertGoodsReceiptInvoiceAvailable({
+                tx,
+                supplierId: goodsReceipt.supplierId,
+                invoice: goodsReceiptData.invoice,
+                excludeGoodsReceiptId: id
+            });
 
             const updatedHeader = await tx.goodsReceipt.update({
                 where: { id, ...buildGoodsReceiptContextWhere(type) },
@@ -321,13 +301,13 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
                         connect: { id: receivedById }
                     }
                 },
-                include: {
-                    details: {
-                        include: GOODS_RECEIPT_DETAIL_INCLUDE
-                    },
-                    supplier: true,
-                    status: true
-                }
+                ...(!newDetails.length && {
+                    include: {
+                        details: { include: GOODS_RECEIPT_DETAIL_INCLUDE },
+                        supplier: true,
+                        status: true
+                    }
+                })
             });
 
             if (!newDetails.length) return updatedHeader;
@@ -346,23 +326,16 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
                 details: createdDetails.map(detail => ({
                     materialId: detail.materialId,
                     goodsReceiptDetailId: detail.id,
-                    supplierId: updatedHeader.supplierId,
+                    supplierId: goodsReceipt.supplierId,
                     quantity: detail.quantity
                 })),
                 movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
             });
 
-            addedDetails = createdDetails;
+            await updateMaterialUnitCostIfHigher({ tx, supplierId: updatedReceipt.supplierId, details: createdDetails });
 
             return updatedReceipt;
         });
-
-        if (newDetails.length) {
-            await updateMaterialUnitCostIfHigher({
-                supplierId: updatedGoodsReceipt.supplierId,
-                details: addedDetails
-            });
-        }
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.goodsReceipts.goodsReceiptService.updateGoodsReceipt',

@@ -121,6 +121,7 @@ export const exportUserReport = async (req, res) => {
     });
 
     const { data: rows } = await findAllUsers({
+        includeCounts: false,
         skip: 0,
         take: 0,
         search: getDataTableSearch(req.query),
@@ -167,6 +168,7 @@ export const exportPersonReport = async (req, res) => {
     });
 
     const { data: rows } = await findAllPersons({
+        includeCounts: false,
         departments,
         includeAccesses: true,
         skip: 0,

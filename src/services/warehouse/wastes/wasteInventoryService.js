@@ -1,38 +1,18 @@
-import { getDb } from '../../../repository/baseRepository.js';
+import { WasteIssueStockConflict } from '../../../errors/warehouse/wasteIssueError.js';
+import { updateWasteStocks } from '../../../repository/warehouse/stockUpdateRepository.js';
+import { normalizeDecimal } from '../../../utils/formattersUtils.js';
 
-export const applyWasteStockChange = async ({
-    tx,
-    id,
-    quantityChange,
-    convertedQuantityChange
-}) => {
-    const db = getDb(tx);
-    const waste = await db.waste.findUnique({
-        where: { id },
-        select: { currentStock: true }
-    });
-    const previousStock = Number(waste?.currentStock || 0);
-    const isDecrease = quantityChange < 0;
-    const quantity = Math.abs(quantityChange);
-    const convertedQuantity = Math.abs(convertedQuantityChange);
-    const updated = await db.waste.updateMany({
-        where: {
-            id,
-            ...(isDecrease && { currentStock: { gte: quantity } })
-        },
-        data: {
-            currentStock: isDecrease
-                ? { decrement: quantity }
-                : { increment: quantity },
-            convertedQuantity: isDecrease
-                ? { decrement: convertedQuantity }
-                : { increment: convertedQuantity }
-        }
-    });
+export const applyWasteStockChanges = async ({ tx, changes }) => {
+    const rows = await updateWasteStocks({ tx, changes });
+    const balances = new Map(rows.map(row => [row.id, row]));
 
-    return {
-        updated: updated.count === 1,
-        previousStock,
-        newStock: previousStock + quantityChange
-    };
+    for (const change of changes) {
+        const updated = balances.get(change.id);
+        if (!updated) throw new WasteIssueStockConflict({ materialName: change.materialName });
+
+        const newStock = normalizeDecimal(updated.currentStock);
+        balances.set(change.id, { previousStock: normalizeDecimal(newStock - change.quantityChange), newStock });
+    }
+
+    return balances;
 };

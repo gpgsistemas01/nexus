@@ -50,6 +50,16 @@ Los routers `role`, `department`, `unitMeasure`, `presentation`, `reason` y
 escrituras administrativas están en `catalogService`, gobernadas por `MANAGED_CATALOGS`.
 No se construyen seis implementaciones nuevas del CRUD administrativo.
 
+Los listados reutilizan `repository/paginationRepository.js`: el servicio conserva
+filtros, proyección y permisos; `findPage` coordina filas y conteos independientes.
+Cuando el alcance total coincide con el filtro se comparte un conteo. Las exportaciones
+pueden solicitar `includeCounts: false` sin alterar los resultados de los listados.
+No se cachean permisos entre peticiones. `getLoggedUser` carga sólo id y nombre de
+cuenta, rol y departamento, evitando leer el hash de contraseña para autorizar.
+
+La [guía de rendimiento](../../../../testing/backend-performance.md) describe la
+medición reproducible, los bucles revisados y los límites de volumen observados.
+
 **Identificador:** `DIA-BE-MOD-OPS-001`. **Fuente:** imports de los seis routers,
 controllers y servicios de lectura. **Leyenda:** flechas = import entre grupos.
 
@@ -85,7 +95,15 @@ flowchart TB
 ```
 
 Los reportes conservan permiso, consulta y columnas propios. `reportExcelUtils` sólo
-construye/envía Excel a partir de la configuración recibida. El mapa cubre tanto
+construye/envía Excel a partir de la configuración recibida. Usa el escritor por
+streaming de ExcelJS: confirma cada fila, escribe un temporal privado y lo descarga
+al completar el archivo. `createFormulaCell` conserva fórmula y resultado calculado;
+el temporal se limpia también ante errores o cancelaciones. No crea otro cliente de
+base de datos ni workers. El inventario se consulta mediante `findBatches` en
+`paginationRepository`, con bloques de 5.000 y orden estable por campo e id; el servicio
+conserva filtros y conversión de cantidades, mientras el controller produce las
+columnas de forma progresiva. Los demás reportes conservan sus consultas y arrays de
+entrada actuales. La guía de rendimiento documenta cómo medir ambas etapas. El mapa cubre tanto
 `reportController.js` de cada área como los controllers específicos de reportes de
 compras y salidas, enumerados en el registro anterior.
 

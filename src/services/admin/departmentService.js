@@ -1,3 +1,4 @@
+import { findPage } from "../../repository/paginationRepository.js";
 import { DepartmentNotFound } from "../../errors/admin/departmentError.js";
 import { getDb } from "../../repository/baseRepository.js";
 
@@ -19,29 +20,21 @@ export const findAllDepartments = async ({
         })
     };
 
-    const db = getDb();
-
-    const departments = await db.department.findMany({
-        skip,
-        take,
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: {
-            id: true,
-            name: true
+    return findPage({
+        model: getDb().department,
+        query: {
+            skip,
+            take,
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            select: {
+                id: true,
+                name: true
+            }
         }
     });
-
-    const total = await db.department.count();
-    const filtered = await db.department.count({ where });
-
-    return {
-        data: departments,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 }
 
 const DEFAULT_DEPARTMENT_SELECT = {

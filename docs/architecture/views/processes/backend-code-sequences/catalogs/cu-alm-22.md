@@ -52,15 +52,16 @@ sequenceDiagram
     activate Controller
     Controller->>Query: findWarehouseReportRows({ search: getDataTableSearch(req.query), inventoryScope: req.query.inventoryScope, type: CONSUMABLE, orderBy, orderDir })
     activate Query
-    alt Servicio resuelto
-        Query-->>Controller: findWarehouseReportRows(): Promise[Object[]]
-        Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
+    Query-->>Controller: findWarehouseReportRows(): AsyncIterable[Object] (consulta diferida)
+    deactivate Query
+    Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
+    Note over Query,Excel: Excel consume las filas por bloques de 5.000. Escribe y limpia un temporal privado.
+    alt Archivo terminado
         Excel-->>Client: HTTP 200 archivo XLSX
     else AppError propagado
-        Query-->>Controller: throw AppError { code, message, meta, statusCode }
+        Excel-->>Controller: throw AppError durante generación { code, message, meta, statusCode }
         Controller->>ErrorHandler: next(error)
         ErrorHandler-->>Client: res.status(error.statusCode).json({ code, message, meta })
     end
-    deactivate Query
     deactivate Controller
 ```

@@ -133,6 +133,13 @@ espacio temporal en `/tmp` y restricciones de capacidades. Esas opciones pertene
 a Compose; no se deben atribuir automáticamente al servicio administrado de Render.
 Si se cambia el puerto interno, también debe revisarse el mapeo de Compose.
 
+Los reportes XLSX usan ese directorio temporal durante la generación y la descarga.
+Compose limita `/tmp` a 64 MB mediante tmpfs; su uso puede contabilizarse como memoria
+del contenedor aunque no aparezca en el RSS de Node.js. Los temporales se eliminan
+al terminar, fallar o cancelar la petición. El dimensionamiento debe considerar el
+tamaño de los archivos y las descargas simultáneas, conforme a la
+[guía de rendimiento](../../../testing/backend-performance.md).
+
 Este archivo no crea una base local, no termina TLS y no configura copias de
 seguridad. La persistencia debe estar disponible mediante las URLs suministradas.
 

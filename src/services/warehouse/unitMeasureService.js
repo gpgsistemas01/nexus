@@ -1,3 +1,4 @@
+import { findPage } from "../../repository/paginationRepository.js";
 import { UnitMeasureNotFound } from "../../errors/warehouse/unitMeasureError.js";
 import { getDb } from "../../repository/baseRepository.js";
 
@@ -19,29 +20,23 @@ export const findAllUnitMeasures = async ({
         })
     };
 
-    const units = await getDb().unitMeasure.findMany({
-        skip,
-        take,
-        where,
-        orderBy: {
-            [orderBy]: orderDir
-        },
-        select: {
-            id: true,
-            name: true,
-            symbol: true,
-            isActive: true
+    return findPage({
+        model: getDb().unitMeasure,
+        query: {
+            skip,
+            take,
+            where,
+            orderBy: {
+                [orderBy]: orderDir
+            },
+            select: {
+                id: true,
+                name: true,
+                symbol: true,
+                isActive: true
+            }
         }
     });
-
-    const total = await getDb().unitMeasure.count();
-    const filtered = await getDb().unitMeasure.count({ where });
-
-    return {
-        data: units,
-        recordsTotal: total,
-        recordsFiltered: filtered
-    };
 }
 
 const DEFAULT_UNIT_MEASURE_SELECT = {

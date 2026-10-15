@@ -7,7 +7,8 @@ export const createControllerTestApp = ({ registerRoutes }) => {
 
   app.use(express.json());
   registerRoutes(app);
-  app.use((error, _request, response, _next) => {
+  app.use((error, _request, response, next) => {
+    if (response.headersSent || response.destroyed) return next(error);
     if (isAppError(error)) {
       return response.status(error.statusCode).json({
         type: error.constructor.name,

@@ -1,3 +1,4 @@
+import { findPage } from '../../repository/paginationRepository.js';
 import { UserCreateDatabaseError, UserFindDatabaseError, UserNotFound, UserUpdateDatabaseError } from "../../errors/admin/userError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { verifyPassword, encryptPassword } from "../../utils/encryptionUtils.js";
@@ -10,6 +11,7 @@ const serviceLogger = createServiceLogger('admin.userService');
 
 
 export const findAllUsers = async ({
+    includeCounts = true,
     skip = 0,
     take = 10,
     search = '',
@@ -31,41 +33,42 @@ export const findAllUsers = async ({
 
         const db = getDb();
 
-        const users = await db.user.findMany({
-            ...(take > 0 && { skip, take }),
-            where,
-            orderBy: {
-                [orderBy]: orderDir
-            },
-            select: {
-                id: true,
-                name: true,
-                personId: true,
-                person: { select: { fullName: true } },
-                accesses: {
-                    select: {
-                        roleId: true,
-                        departmentId: true,
-                        role: {
-                            select: {
-                                name: true
+        const page = await findPage({
+            model: db.user,
+            includeCounts,
+            query: {
+                ...(take > 0 && { skip, take }),
+                where,
+                orderBy: {
+                    [orderBy]: orderDir
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    personId: true,
+                    person: { select: { fullName: true } },
+                    accesses: {
+                        select: {
+                            roleId: true,
+                            departmentId: true,
+                            role: {
+                                select: {
+                                    name: true
+                                }
+                            },
+                            department: {
+                                select: {
+                                    name: true
+                                }
                             }
                         },
-                        department: {
-                            select: {
-                                name: true
-                            }
-                        }
-                    },
-                    take: 1
+                        take: 1
+                    }
                 }
             }
         });
 
-        const total = await db.user.count();
-        const filtered = await db.user.count({ where });
-
-        const data = users.map((user) => ({
+        const data = page.data.map((user) => ({
             ...user,
             roleId: user.accesses?.[0]?.roleId || null,
             roleName: user.accesses?.[0]?.role?.name || null,
@@ -74,9 +77,8 @@ export const findAllUsers = async ({
         }));
 
         return {
-            data,
-            recordsTotal: total,
-            recordsFiltered: filtered
+            ...page,
+            data
         };
 
     } catch (err) {
@@ -131,9 +133,9 @@ export const getLoggedUser = async (userId) => {
             }
         },
         select: {
-            user: true,
-            role: true,
-            department: true
+            user: { select: { id: true, name: true } },
+            role: { select: { id: true, name: true } },
+            department: { select: { id: true, name: true } }
         }
     });
 
