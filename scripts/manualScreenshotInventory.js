@@ -137,7 +137,7 @@ const captureTemplates = [
     { id: 'CAP-REP-MOV-WAS-02-EXPORT', module: 'waste-movements', name: '02-export-report.png', route: '/movimientos/mermas', ready: '#wasteMovementTable', action: reportDialog, useCases: ['CU-ALM-16'] },
 
     { id: 'CAP-CAT-WAS-07-ROLL-WEIGHT', module: 'waste', name: '07-roll-unit-weight.png', route: '/almacen/mermas', ready: '#table', action: click('#table tbody tr:has-text("ROLLO") .btn-edit', '#wasteModal.show', 'una merma de Rollo con peso capturado'), useCases: ['CU-ALM-10', 'CU-ALM-11'] },
-    { id: 'CAP-CAT-WAS-08-REFERENCE', viewport: { width: 1000, height: 650 }, module: 'waste', name: '08-roll-reference.png', route: '/almacen/mermas', ready: '#table', action: { ...click('.btn-edit', '#wasteModal .waste-sample-fields:not(.d-none)', 'una merma de Rollo con muestra registrada'), hasFields: ['sampleLengthM', 'sampleNetWeightKg'] }, useCases: ['CU-ALM-10', 'CU-ALM-11'] },
+    { id: 'CAP-CAT-WAS-08-REFERENCE', viewport: { width: 1000, height: 650 }, module: 'waste', name: '08-roll-reference.png', route: '/almacen/mermas', ready: '#table', action: { ...click('.btn-edit', '#wasteModal .waste-roll-reference-fields:not(.d-none)', 'una merma de Rollo con muestra registrada'), hasFields: ['referenceRollTotalWeightKg'] }, useCases: ['CU-ALM-10', 'CU-ALM-11'] },
 
     { id: 'CAP-ERR-404-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'almacen', unauthenticated: true, useCases: [] },
     { id: 'CAP-ERR-404-SISTEMAS-NOT-FOUND', module: 'errors', name: '01-page-not-found.png', route: '/pagina-no-existente-manual', ready: '.error-card', area: 'sistemas', unauthenticated: true, useCases: [] }

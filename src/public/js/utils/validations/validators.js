@@ -93,8 +93,13 @@ export const wasteStockAdditionValidation = {
 };
 
 export const wasteValidation = {
-    sampleLengthM: (value, data) => isRollPresentation(data.presentationName) ? validatePositiveNumber(value, 'El largo de la muestra') : null,
-    sampleNetWeightKg: (value, data) => isRollPresentation(data.presentationName) ? validatePositiveNumber(value, 'El peso neto de la muestra') : null,
+    referenceRollTotalWeightKg: (value, data) => isRollPresentation(data.presentationName)
+        ? isEmptyOrNull(value, 'El peso del rollo completo con cono') || validateWasteWeightCapture(value, data, 'referenceRollTotalWeightKg', {
+            totalFieldName: 'referenceRollTotalWeightKg',
+            requiredCode: 'REFERENCE_ROLL_TOTAL_WEIGHT_REQUIRED',
+            notGreaterCode: 'REFERENCE_ROLL_TOTAL_WEIGHT_NOT_GREATER'
+        })
+        : null,
     coneWeightKg: (value, data) => validateWasteWeightCapture(value, data, 'coneWeightKg'),
     totalWeightKg: (value, data) => validateWasteWeightCapture(value, data, 'totalWeightKg'),
     name: value => validateName(value, 200),

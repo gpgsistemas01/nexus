@@ -87,5 +87,5 @@ Véase el [recorrido del peso](../requirements/requirements-specification/04-uni
 | Referencia y longitud de Rollo | Validación |
 | --- | --- |
 | Origen de merma | Material en m²; no se admiten consumibles ni otras unidades. |
-| Muestra de Rollo | Largo en metros y peso neto en kg, positivos y con hasta seis decimales. Sin cono y del mismo ancho. Se capturan en merma y después quedan de consulta. |
-| Dimensiones de merma de Rollo | Ambos campos están deshabilitados. La dimensión menor procede del material y la otra se calcula por peso. Si faltan datos, complete la muestra y los pesos del sobrante antes de guardar. |
+| Muestra de Rollo | Peso total del rollo completo con cono, mayor que el cono y hasta 999.99 kg, con dos decimales. El largo procede del material. Se usa el mismo cono para ambos netos. |
+| Dimensiones de merma de Rollo | Ambos campos están deshabilitados. La dimensión menor procede del material y la otra se calcula por peso. Si faltan datos, complete el peso del rollo completo y los pesos del sobrante antes de guardar. |

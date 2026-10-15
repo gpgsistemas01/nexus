@@ -1,4 +1,8 @@
 export const errorMap = {
+    referenceRollTotalWeightKg: {
+        REQUIRED: 'REFERENCE_ROLL_TOTAL_WEIGHT_REQUIRED',
+        NOT_GREATER: 'REFERENCE_ROLL_TOTAL_WEIGHT_NOT_GREATER'
+    },
     sampleLengthM: {
         REQUIRED: 'SAMPLE_LENGTH_REQUIRED',
         INVALID_NUMBER: 'SAMPLE_LENGTH_INVALID_NUMBER',

@@ -393,3 +393,12 @@ o ambos positivos. No modifica los pesos de `SupplierMaterial` ni infiere refere
 para históricos. Se aplica con `npm run db:migrate` antes de iniciar el backend nuevo;
 las migraciones históricas ya aplicadas permanecen intactas. El formulario de material
 ya no captura los pesos antiguos del rollo completo.
+
+### Rollo completo con cono como referencia de merma
+
+`20261015210000_add_waste_full_roll_reference` agrega el total del rollo completo en
+`Waste.referenceRollTotalWeightKg`, nullable `DECIMAL(5,2)`. Su CHECK exige que el neto
+de referencia sea total menos el mismo cono del sobrante. Los registros anteriores
+mantienen el nuevo campo nulo y conservan muestras y resultados sin reinterpretación.
+Aplicar `npm run db:migrate` antes de iniciar el backend nuevo. No editar migraciones
+aplicadas ni completar automáticamente los datos anteriores.

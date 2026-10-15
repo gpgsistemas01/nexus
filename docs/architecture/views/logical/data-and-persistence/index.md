@@ -129,8 +129,8 @@ define la captura y consulta. La implementación distribuye sus responsabilidade
 | --- | --- |
 | `weightValidations.js` · `getWasteWeightCaptureValidationError` | Valida formato, precisión, rango, captura conjunta y total mayor que cono en formulario y HTTP. |
 | `wasteDTO.js` | Normaliza cono, total y dimensiones manuales para el alta; excluye los pesos del DTO de edición. |
-| `wasteService.js` | Comprueba la presentación persistida, consulta la oferta y recibe la muestra capturada, delega las medidas a `prepareWasteMeasurements` y protege pesos y referencias en edición. |
-| `wasteHelpers.js` | Prepara neto, dimensión transversal y longitud a partir del DTO con muestra y la oferta persistida; comprueba las dimensiones finales sin consultar ni guardar datos. |
+| `wasteService.js` | Comprueba la presentación persistida, consulta la oferta y recibe el peso del rollo completo, delega las medidas a `prepareWasteMeasurements` y protege pesos y referencias en edición. |
+| `wasteHelpers.js` | Prepara neto, dimensión transversal y longitud a partir del DTO con pesos y las dimensiones del material persistido; comprueba las dimensiones finales sin consultar ni guardar datos. |
 | PostgreSQL | Conserva el tipo decimal y los CHECK de rango, captura conjunta y neto igual a total menos cono. Véase la [migración](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-peso-unitario-de-merma). |
 | `reportService.js` | Calcula `totalWeightKg` por identidad y luego agrupa los rollos por ancho. `weightStatus` distingue `complete`, `unknown` y `notApplicable`. |
 
@@ -144,26 +144,29 @@ Los registros anteriores conservan su peso neto; cono y total permanecen `NULL`.
 
 | Ubicación | Datos y propósito |
 | --- | --- |
-| `SupplierMaterial` | `referenceConeWeightKg` y `referenceRollTotalWeightKg` se conservan como históricos; el alta y edición ya no los capturan ni modifican. No se usan para estimar nuevas mermas. |
-| `Material` | El tipo debe ser `MATERIAL` y la unidad m². Para Rollo se conserva la dimensión menor como ancho; la otra posición recibe el largo calculado. |
-| `Waste` | Guarda `sourceMaterialId`, cono, total con cono y neto propios, dimensiones finales y la muestra (`sampleLengthM`, `sampleNetWeightKg`). Muestra y pesos quedan inmutables tras el alta. |
+| `SupplierMaterial` | Sus pesos anteriores son históricos y no se capturan ni modifican desde material. |
+| `Material` | Tipo MATERIAL, unidad m². Para Rollo aporta ancho menor, orientación y largo del rollo completo. |
+| `Waste` | Conserva `sourceMaterialId`, dimensiones, cono, total y neto del sobrante, total del rollo completo y la referencia calculada (`sampleLengthM`, `sampleNetWeightKg`). Son inmutables tras el alta. |
 
-La muestra se mide sin cono y debe tener el mismo ancho que la merma:
+La muestra es el rollo completo, incluyendo el mismo cono de la merma:
 
 ```text
-largoMerma = netoMerma × largoMuestra / netoMuestra
+netoMerma = totalMerma − cono
+netoRollo = totalRolloCompleto − cono
+largoMerma = netoMerma × largoRolloCompleto / netoRollo
 ```
 
-Los pesos del sobrante conservan `Decimal(5,2)` y el límite de 999.99 kg. La muestra
-usa `Decimal(18,6)` para largo y peso: 57 g se registran como 0.057 kg. El ancho se
-conserva en su campo original. La UI envía muestra y medidas finales; el servidor
-calcula con el material y la muestra recibidos, sin confiar en los resultados del navegador.
+Sólo se captura como referencia adicional `referenceRollTotalWeightKg`. El servidor
+obtiene el largo del material y guarda ambos valores netos calculados; no confía en
+resultados del navegador. Los pesos capturados usan `Decimal(5,2)`, hasta 999.99 kg.
+Los campos de referencia anteriores conservan su precisión `Decimal(18,6)` y sus
+valores históricos, sin convertirlos a un rollo completo.
 
-`20261015190000_add_waste_sample_reference` agrega dos campos opcionales y un CHECK
-que admite ambos nulos o ambos positivos. Los anteriores mantienen pesos, medidas y
-saldos; no se inventan muestras ni se convierten referencias antiguas. Las migraciones
-aplicadas no se modifican. Consumibles y unidades distintas de m² no originan mermas.
+La migración incremental `20261015210000_add_waste_full_roll_reference` añade el total
+del rollo completo nullable y un CHECK que exige descontar el mismo cono. Mantiene las
+muestras anteriores y los registros sin referencia. No altera medidas, pesos ni saldos.
+Las migraciones aplicadas permanecen intactas.
 
-La identidad conserva proveedor, nombre, medidas y pesos. Una muestra distinta que
-produce la misma identidad no reemplaza la referencia guardada: el alta devuelve
-`meta.waste` y el usuario puede abrir Agregar stock, sin modificar muestra ni pesos.
+La identidad conserva proveedor, nombre, medidas y pesos. Una referencia distinta que
+produce la misma identidad no reemplaza la guardada: devuelve `meta.waste` y permite
+abrir Agregar stock. Consumibles y unidades distintas de m² no originan mermas.

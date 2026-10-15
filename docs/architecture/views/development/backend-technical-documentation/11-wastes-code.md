@@ -80,19 +80,19 @@ reconocida por símbolo o nombre «metro cuadrado». El selector filtra en SQL y
 comprueba la oferta consultada dentro de su transacción; forzar otro origen devuelve
 `WASTE_MATERIAL_INVALID`. No se añaden consultas para esa comprobación.
 
-Para Rollo, la muestra se captura desde merma: `sampleLengthM` y `sampleNetWeightKg`,
-sin cono y del mismo ancho. Se persiste junto con el cono, total del sobrante y neto,
-sin actualizar `SupplierMaterial`. Los pesos antiguos del rollo completo permanecen
-históricos y sus intentos de captura o cambio reciben `MATERIAL_ROLL_REFERENCE_READ_ONLY`.
+Para Rollo, la muestra es un rollo completo: el alta recibe únicamente su peso total
+con cono en `referenceRollTotalWeightKg`, además del cono y el total del sobrante.
+`prepareWasteMeasurements` reutiliza la oferta consultada, fija el ancho menor y toma
+el largo de la otra dimensión nominal. Descuenta el mismo cono de ambos totales y
+calcula `netoMerma × largoRollo / netoRollo`. No consulta ni guarda datos.
 
-`prepareWasteMeasurements` recibe el DTO y la oferta ya consultada, fija la menor
-dimensión y calcula el largo como `netoMerma × largoMuestra / netoMuestra`. Ignora los
-resultados enviados por el cliente y rechaza un cálculo sin muestra completa. No hace
-consultas ni escrituras; el servicio conserva identidad, transacción e inventario.
-Los validators verifican forma y precisión una vez por campo; `withMessage` entrega
-códigos declarados en `errorMap`. Muestra y pesos se protegen en edición.
+El servicio guarda el peso del rollo completo y conserva como referencia del cálculo
+`sampleLengthM` y `sampleNetWeightKg`, calculados por el servidor. El DTO no acepta
+estos resultados del cliente. No actualiza `SupplierMaterial`; sus referencias previas
+siguen históricas. Los validators comprueban cada peso con las reglas compartidas y
+entregan códigos de `errorMap` mediante `withMessage`.
 
-La muestra usa `Decimal(18,6)`, lo que permite capturar, por ejemplo, 0.057 kg; los
-pesos del sobrante conservan el límite y precisión vigentes. La migración incremental
-agrega campos nulos para históricos y un CHECK de pareja positiva. No estima valores
-antiguos ni altera dimensiones, pesos o saldos existentes.
+La migración `20261015210000_add_waste_full_roll_reference` agrega un campo nullable
+y exige que el neto de referencia corresponda al total menos el mismo cono. No cambia
+las muestras anteriores ni sus resultados. Los tres pesos capturados admiten hasta
+999.99 kg y dos decimales; referencia, medidas y pesos siguen protegidos en edición.

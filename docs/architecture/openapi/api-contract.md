@@ -92,9 +92,9 @@ del modal sin introducir una variante de estilo exclusiva para la exportación.
 Precios, existencias, cantidades y medidas aceptan hasta **8 dígitos enteros y
 6 decimales**, con persistencia `DECIMAL(18,6)`. El peso unitario de merma admite
 **3 enteros y 2 decimales**, con persistencia `DECIMAL(5,2)`. Las propiedades de
-cada payload y sus límites se definen en OpenAPI. El largo y el peso neto de muestra
-de merma usan seis decimales para admitir fracciones de kg; se capturan en el alta
-y permanecen inmutables junto con la merma. Sólo materiales en m² pueden ser su origen.
+cada payload y sus límites se definen en OpenAPI. La referencia de merma conserva seis decimales como resultado calculado del servidor.
+El alta sólo recibe el total del rollo completo con cono, el total del sobrante y el
+cono compartido, con dos decimales; largo y netos se calculan y quedan inmutables. Sólo materiales en m² pueden ser su origen.
 
 Los validadores comprueban la entrada antes de normalizarla. El frontend conserva
 la precisión del payload durante la captura y usa `formatDecimal` o

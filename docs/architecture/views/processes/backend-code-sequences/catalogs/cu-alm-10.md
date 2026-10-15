@@ -56,7 +56,7 @@ sequenceDiagram
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
     Route->>ValidationRules: wasteValidation[] — cadena ejecutada por Express
-    Note over ValidationRules: Validar cono, total y muestra: formato, precisión, rango y captura conjunta
+    Note over ValidationRules: Validar cono, total de sobrante y total de rollo completo: formato, precisión, rango y captura conjunta
     Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
@@ -106,8 +106,8 @@ sequenceDiagram
     activate Domain
     Note over Domain: Consultar material y oferta dentro de la transacción<br/>Exigir tipo MATERIAL y unidad m²
     Domain->>Measurements: prepareWasteMeasurements({ wasteDto, offer })
-    Measurements-->>Domain: { base, height, weightKg } o error de dominio
-    Note over Measurements: Sólo Rollo: neto = total menos cono<br/>Largo = neto por metros de muestra entre peso neto de muestra
+    Measurements-->>Domain: { base, height, weightKg, sampleLengthM, sampleNetWeightKg } o error de dominio
+    Note over Measurements: Sólo Rollo: neto = total menos cono<br/>Largo = neto merma por largo del material entre neto rollo completo
     Domain->>Domain: findWasteByIdentity({ tx, supplierId, name, base, height, coneWeightKg, totalWeightKg })
     alt La merma ya existe
         Domain-->>Controller: WASTE_ALREADY_EXISTS con meta.waste, sin incrementar stock
@@ -129,8 +129,8 @@ sequenceDiagram
 
 El selector sólo ofrece materiales de tipo MATERIAL con unidad m². El alta comprueba
 la misma regla sobre la oferta consultada mediante `findSupplierMaterialByIds`, dentro
-de la transacción y sin otra consulta. Para Rollo, recibe metros y peso neto de una
-muestra sin cono y del mismo ancho; guarda esa muestra con la merma, `sourceMaterialId`,
-cono y total utilizados, neto y dimensiones calculadas. No modifica la oferta.
+de la transacción y sin otra consulta. Para Rollo, recibe el peso total con cono del
+rollo completo. Descuenta el mismo cono de ambos totales y toma el largo del material;
+guarda la referencia calculada, `sourceMaterialId`, pesos y dimensiones finales. No modifica la oferta.
 Los pesos antiguos de material/proveedor se conservan como históricos y ya no se capturan
 desde el CRUD de material.

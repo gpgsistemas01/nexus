@@ -38,8 +38,11 @@ describe('wasteDTO', () => {
       newStock: '4',
       coneWeightKg: '0.25',
       totalWeightKg: '1.5',
+      referenceRollTotalWeightKg: '2.25',
+      sampleLengthM: '999',
+      sampleNetWeightKg: '999',
       weightKg: '999'
-    })).toMatchObject({ name: 'Recorte confirmado', coneWeightKg: 0.25, totalWeightKg: 1.5 });
+    })).toMatchObject({ name: 'Recorte confirmado', coneWeightKg: 0.25, totalWeightKg: 1.5, referenceRollTotalWeightKg: 2.25 });
   });
 
   it('normaliza las observaciones igual en ajustes y adiciones de stock', () => {

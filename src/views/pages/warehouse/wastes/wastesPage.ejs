@@ -73,15 +73,27 @@
             ]
         },
         {
-            title: 'Muestra de referencia',
-            description: 'Sin cono y del mismo ancho que la merma.',
+            title: 'Referencia histórica',
+            description: 'Datos conservados del registro anterior.',
             class: 'waste-sample-fields d-none',
             groups: [{
                 type: 'inputs',
                 items: [
-                    { id: 'sampleLengthInput', name: 'sampleLengthM', type: 'number', label: 'Largo de muestra (m)', value: '', attrs: { min: '0.000001', step: 'any' }, col: '6' },
-                    { id: 'sampleNetWeightInput', name: 'sampleNetWeightKg', type: 'number', label: 'Peso neto de muestra (kg)', value: '', attrs: { min: '0.000001', step: 'any' }, col: '6' }
+                    { id: 'sampleLengthInput', name: 'sampleLengthM', type: 'number', label: 'Largo de referencia (m)', value: '', attrs: { min: '0.000001', step: 'any' }, col: '6' },
+                    { id: 'sampleNetWeightInput', name: 'sampleNetWeightKg', type: 'number', label: 'Peso neto de referencia (kg)', value: '', attrs: { min: '0.000001', step: 'any' }, col: '6' }
                 ]
+            }]
+        },
+        {
+            title: 'Rollo completo (muestra)',
+            description: 'El largo proviene del material. Se utiliza el mismo cono de la merma.',
+            class: 'waste-roll-reference-fields d-none',
+            groups: [{
+                type: 'html',
+                col: 'col-12',
+                content: include('../../../shared/inventory/rollWeightFields', { fields: [
+                    { col: 'col-12', id: 'referenceRollTotalWeightKgInput', name: 'referenceRollTotalWeightKg', label: 'Peso del rollo completo con cono (kg)' }
+                ] })
             }]
         },
         {

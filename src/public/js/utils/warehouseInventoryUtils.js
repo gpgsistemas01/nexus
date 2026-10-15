@@ -31,9 +31,9 @@ export const calculateWasteNetWeight = (data, { coneFieldName = 'coneWeightKg', 
     return roundTo(Number(totalWeightKg) - Number(coneWeightKg), WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS);
 };
 
-export const calculateWasteRollLength = ({ weightKg, sampleNetWeightKg, sampleLengthM }) => {
-    if (![weightKg, sampleNetWeightKg, sampleLengthM].every(value => Number.isFinite(Number(value)) && Number(value) > 0)) return null;
-    return roundTo(Number(weightKg) * Number(sampleLengthM) / Number(sampleNetWeightKg));
+export const calculateWasteRollLength = ({ weightKg, referenceNetWeightKg, referenceLengthM }) => {
+    if (![weightKg, referenceNetWeightKg, referenceLengthM].every(value => Number.isFinite(Number(value)) && Number(value) > 0)) return null;
+    return roundTo(Number(weightKg) * Number(referenceLengthM) / Number(referenceNetWeightKg));
 };
 
 export const getMaterialLengthField = ({ base, height } = {}) => {
@@ -51,7 +51,8 @@ export const prepareWasteRollReference = ({ material }) => {
     return {
         lengthField,
         widthField,
-        widthM: Number(material[widthField])
+        widthM: Number(material[widthField]),
+        lengthM: Number(material[lengthField])
     };
 };
 

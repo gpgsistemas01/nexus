@@ -21,9 +21,11 @@ export const configureWasteWeightFields = ({ form, template = {} }) => {
     const applies = isRollPresentation(getPresentation(template));
     const isCreating = isCreateMode(form.dataset.mode);
     setFormSectionVisibility({ form, selector: '.waste-weight-fields', isVisible: applies });
-    setFormSectionVisibility({ form, selector: '.waste-sample-fields', isVisible: applies && (isCreating || WASTE_SAMPLE_FIELDS.some(field => template[field] != null)) });
-    setFormDisabled({ form, fields: ['coneWeightKg', 'totalWeightKg'], isDisabled: !applies || !isCreating });
-    setFormDisabled({ form, fields: WASTE_SAMPLE_FIELDS, isDisabled: !applies || !isCreating });
+    const hasFullRollReference = template.referenceRollTotalWeightKg != null;
+    setFormSectionVisibility({ form, selector: '.waste-roll-reference-fields', isVisible: applies && (isCreating || hasFullRollReference) });
+    setFormSectionVisibility({ form, selector: '.waste-sample-fields', isVisible: applies && !isCreating && !hasFullRollReference && WASTE_SAMPLE_FIELDS.some(field => template[field] != null) });
+    setFormDisabled({ form, fields: ['coneWeightKg', 'totalWeightKg', 'referenceRollTotalWeightKg'], isDisabled: !applies || !isCreating });
+    setFormDisabled({ form, fields: WASTE_SAMPLE_FIELDS, isDisabled: true });
     setFormDisabled({ form, fields: ['weightKg'], isDisabled: true });
     setFormDisabled({ form, fields: ['base', 'height'], isDisabled: applies || !isCreating });
 };
@@ -36,7 +38,7 @@ export const applyWasteMaterialTemplate = ({ form, template = null }) => {
     const reference = prepareWasteRollReference({ material: template });
     form.wasteRollReference = reference;
 
-    toggleErrorMessages(form, { coneWeightKg: null, totalWeightKg: null, sampleLengthM: null, sampleNetWeightKg: null, base: null, height: null });
+    toggleErrorMessages(form, { coneWeightKg: null, totalWeightKg: null, referenceRollTotalWeightKg: null, base: null, height: null });
     displayWasteMaterialTemplate({ form, template });
     configureWasteWeightFields({ form, template });
     setMdbWrapperInputValue({ selector: INPUT_SELECTORS.WASTE_MAX_UNIT_COST, value: template.maxUnitCost ?? '' });
@@ -44,6 +46,7 @@ export const applyWasteMaterialTemplate = ({ form, template = null }) => {
     const values = {
         coneWeightKg: null,
         totalWeightKg: null,
+        referenceRollTotalWeightKg: null,
         sampleLengthM: null,
         sampleNetWeightKg: null,
         weightKg: null,
@@ -74,8 +77,11 @@ export const updateWasteRollMeasurement = ({ form }) => {
 
     const length = weightKg == null ? null : calculateWasteRollLength({
         weightKg,
-        sampleLengthM: form.elements.sampleLengthM.value,
-        sampleNetWeightKg: form.elements.sampleNetWeightKg.value
+        referenceLengthM: reference.lengthM,
+        referenceNetWeightKg: calculateWasteNetWeight({
+            coneWeightKg: form.elements.coneWeightKg.value,
+            totalWeightKg: form.elements.referenceRollTotalWeightKg.value
+        })
     });
     const lengthField = form.elements[reference.lengthField];
     lengthField.value = length ?? '';

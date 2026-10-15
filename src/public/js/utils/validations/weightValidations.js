@@ -32,7 +32,8 @@ export const getWasteWeightValidationError = (value, { allowZero = false } = {})
 };
 
 export const getWasteWeightCaptureValidationError = (value, {
-    fieldName, coneFieldName = 'coneWeightKg', totalFieldName = 'totalWeightKg', requireTotal = true, ...data
+    fieldName, coneFieldName = 'coneWeightKg', totalFieldName = 'totalWeightKg', requireTotal = true,
+    requiredCode = 'TOTAL_WEIGHT_KG_REQUIRED', notGreaterCode = 'WASTE_TOTAL_WEIGHT_NOT_GREATER', ...data
 }) => {
     const isCone = fieldName === coneFieldName;
     const coneWeightKg = isCone ? value : data[coneFieldName];
@@ -44,10 +45,10 @@ export const getWasteWeightCaptureValidationError = (value, {
         pairedValue: isCone ? totalWeightKg : coneWeightKg,
         required: isCone || requireTotal
     })) {
-        return isCone ? 'CONE_WEIGHT_KG_REQUIRED' : 'TOTAL_WEIGHT_KG_REQUIRED';
+        return isCone ? 'CONE_WEIGHT_KG_REQUIRED' : requiredCode;
     }
 
-    if (!isCone && !wasteWeightRules.isTotalGreaterThanCone(totalWeightKg, coneWeightKg)) return 'WASTE_TOTAL_WEIGHT_NOT_GREATER';
+    if (!isCone && !wasteWeightRules.isTotalGreaterThanCone(totalWeightKg, coneWeightKg)) return notGreaterCode;
 
     return null;
 };

@@ -538,6 +538,7 @@ usuarios y responsables se mantiene en el
 | `totalWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 | `sampleLengthM` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `sampleNetWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
+| `referenceRollTotalWeightKg` | `Decimal?` | No | — | — | `@db.Decimal(5, 2)` |
 | `sourceMaterialId` | `String?` | No | FK | — | `@db.Uuid` |
 | `currentStock` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |
 | `convertedQuantity` | `Decimal` | Sí | — | `0` | `@db.Decimal(18, 6)` |

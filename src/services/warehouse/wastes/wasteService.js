@@ -134,6 +134,7 @@ export const findAllWastes = async ({
                 totalWeightKg: true,
                 sampleLengthM: true,
                 sampleNetWeightKg: true,
+                referenceRollTotalWeightKg: true,
                 sourceMaterialId: true,
                 ...(canReadCosts && { maxUnitCost: true }),
                 minStock: true,
@@ -175,7 +176,7 @@ export const createWasteWithInitialStockAdjustment = async ({
                 throw new WasteMaterialInvalid();
             }
             const coneWeightKg = wasteDto.coneWeightKg;
-            const { base, height, weightKg } = prepareWasteMeasurements({ wasteDto, offer });
+            const { base, height, weightKg, sampleLengthM, sampleNetWeightKg } = prepareWasteMeasurements({ wasteDto, offer });
             const existingWaste = await findWasteByIdentity({ tx, supplierId: wasteDto.supplierId, name: wasteDto.name, base, height, coneWeightKg: coneWeightKg ?? null, totalWeightKg: wasteDto.totalWeightKg ?? null });
             if (existingWaste) throw new WasteAlreadyExists({ waste: existingWaste });
 
@@ -195,8 +196,9 @@ export const createWasteWithInitialStockAdjustment = async ({
                     sourceMaterial: { connect: { id: material.id } },
                     coneWeightKg: coneWeightKg ?? null,
                     totalWeightKg: wasteDto.totalWeightKg ?? null,
-                    sampleLengthM: wasteDto.sampleLengthM ?? null,
-                    sampleNetWeightKg: wasteDto.sampleNetWeightKg ?? null,
+                    sampleLengthM,
+                    sampleNetWeightKg,
+                    referenceRollTotalWeightKg: wasteDto.referenceRollTotalWeightKg ?? null,
                     weightKg,
                     currentStock: wasteDto.newStock,
                     convertedQuantity: calculateConvertedQuantity({
@@ -253,7 +255,7 @@ export const updateWaste = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
-            if (['weightKg', 'coneWeightKg', 'totalWeightKg', 'sampleLengthM', 'sampleNetWeightKg', 'sourceMaterialId'].some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
+            if (['weightKg', 'coneWeightKg', 'totalWeightKg', 'sampleLengthM', 'sampleNetWeightKg', 'referenceRollTotalWeightKg', 'sourceMaterialId'].some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
 
             if (wasteDto.name && wasteDto.name !== currentWaste.name) {
                 const existingWaste = await findWasteByIdentity({

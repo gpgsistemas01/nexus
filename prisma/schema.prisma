@@ -208,35 +208,37 @@ model SupplierMaterial {
 }
 
 model Waste {
-  id                      String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierId              String                       @db.Uuid
-  presentationId          String                       @db.Uuid
-  unitMeasureId           String                       @db.Uuid
-  name                    String                       @db.VarChar(200)
-  isActive                Boolean                      @default(true)
-  minStock                Decimal                      @default(0) @db.Decimal(18, 6)
-  base                    Decimal?                     @db.Decimal(18, 6)
-  height                  Decimal?                     @db.Decimal(18, 6)
-  maxUnitCost             Decimal?                     @db.Decimal(18, 6)
+  id                         String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supplierId                 String                       @db.Uuid
+  presentationId             String                       @db.Uuid
+  unitMeasureId              String                       @db.Uuid
+  name                       String                       @db.VarChar(200)
+  isActive                   Boolean                      @default(true)
+  minStock                   Decimal                      @default(0) @db.Decimal(18, 6)
+  base                       Decimal?                     @db.Decimal(18, 6)
+  height                     Decimal?                     @db.Decimal(18, 6)
+  maxUnitCost                Decimal?                     @db.Decimal(18, 6)
   /// Peso neto en kg por unidad de merma ROLLO.
-  weightKg                Decimal?                     @db.Decimal(5, 2)
-  coneWeightKg            Decimal?                     @db.Decimal(5, 2)
-  totalWeightKg           Decimal?                     @db.Decimal(5, 2)
-  /// Muestra sin cono y del mismo ancho, capturada al registrar esta merma.
-  sampleLengthM           Decimal?                     @db.Decimal(18, 6)
-  sampleNetWeightKg       Decimal?                     @db.Decimal(18, 6)
-  sourceMaterialId        String?                      @db.Uuid
-  sourceMaterial          Material?                    @relation("WasteRollMaterial", fields: [sourceMaterialId], references: [id], onDelete: Restrict)
-  currentStock            Decimal                      @default(0) @db.Decimal(18, 6)
-  convertedQuantity       Decimal                      @default(0) @db.Decimal(18, 6)
-  supplier                Supplier                     @relation(fields: [supplierId], references: [id])
-  presentation            Presentation                 @relation(fields: [presentationId], references: [id])
-  unitMeasure             UnitMeasure                  @relation(fields: [unitMeasureId], references: [id])
-  stockAdjustmentDetails  WasteStockAdjustmentDetail[]
-  movementDetails         WasteMovementDetail[]
-  wasteIssueDetails       WasteIssueDetail[]
-  wasteIssueReturns       WasteIssueReturn[]
-  stockEntries            WasteStockEntry[]
+  weightKg                   Decimal?                     @db.Decimal(5, 2)
+  coneWeightKg               Decimal?                     @db.Decimal(5, 2)
+  totalWeightKg              Decimal?                     @db.Decimal(5, 2)
+  /// Referencia utilizada: largo conocido y peso neto calculado, conservados al registrar.
+  sampleLengthM              Decimal?                     @db.Decimal(18, 6)
+  sampleNetWeightKg          Decimal?                     @db.Decimal(18, 6)
+  /// Peso del rollo completo con el mismo cono de la merma.
+  referenceRollTotalWeightKg Decimal?                     @db.Decimal(5, 2)
+  sourceMaterialId           String?                      @db.Uuid
+  sourceMaterial             Material?                    @relation("WasteRollMaterial", fields: [sourceMaterialId], references: [id], onDelete: Restrict)
+  currentStock               Decimal                      @default(0) @db.Decimal(18, 6)
+  convertedQuantity          Decimal                      @default(0) @db.Decimal(18, 6)
+  supplier                   Supplier                     @relation(fields: [supplierId], references: [id])
+  presentation               Presentation                 @relation(fields: [presentationId], references: [id])
+  unitMeasure                UnitMeasure                  @relation(fields: [unitMeasureId], references: [id])
+  stockAdjustmentDetails     WasteStockAdjustmentDetail[]
+  movementDetails            WasteMovementDetail[]
+  wasteIssueDetails          WasteIssueDetail[]
+  wasteIssueReturns          WasteIssueReturn[]
+  stockEntries               WasteStockEntry[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

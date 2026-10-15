@@ -14,7 +14,7 @@ beforeEach(() => {
     vi.clearAllMocks();
     state.handlers.clear();
     state.value = null;
-    const fields = ['base', 'height', 'weightKg', 'coneWeightKg', 'totalWeightKg', 'sampleLengthM', 'sampleNetWeightKg'];
+    const fields = ['base', 'height', 'weightKg', 'coneWeightKg', 'totalWeightKg', 'sampleLengthM', 'sampleNetWeightKg', 'referenceRollTotalWeightKg'];
     const elements = Object.fromEntries(fields.map(field => [field, { value: '', disabled: false, readOnly: false, classList: { toggle: vi.fn() } }]));
     state.form = {
         dataset: { mode: 'create' }, elements,
@@ -42,8 +42,7 @@ describe('selección de material y captura de merma', () => {
         expect(state.form.wasteMaterialTemplate.supplierMaterials[0]).toBe(offer);
         expect(state.form.elements.height.value).toBe(1.5);
         state.form.elements.coneWeightKg.value = '0.25';
-        state.form.elements.sampleLengthM.value = '20';
-        state.form.elements.sampleNetWeightKg.value = '2';
+        state.form.elements.referenceRollTotalWeightKg.value = '5.25';
         state.form.elements.totalWeightKg.value = '1.25';
         updateWasteRollMeasurement({ form: state.form });
         expect(state.form.elements.base.value).toBe(10);

@@ -83,8 +83,8 @@ export const validateInvoice = (invoice, { isInvoiced } = {}) => {
     return null;
 }
 
-export const validateWasteWeightCapture = (value, data, fieldName) => {
-    const code = getWasteWeightCaptureValidationError(value, { ...data, fieldName });
+export const validateWasteWeightCapture = (value, data, fieldName, options = {}) => {
+    const code = getWasteWeightCaptureValidationError(value, { ...data, fieldName, ...options });
     if (code) return getErrorMessage({ code });
     if (value !== undefined && value !== null && value !== '' && !isRollPresentation(data.presentationName)) {
         return getErrorMessage({ code: 'WASTE_WEIGHT_INVALID' });

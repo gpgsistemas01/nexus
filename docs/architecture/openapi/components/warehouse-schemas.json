@@ -310,7 +310,7 @@
         "exclusiveMinimum": 0,
         "maximum": 99999999.999999,
         "multipleOf": 1e-06,
-        "description": "Largo de la muestra del mismo ancho, en metros lineales. Hasta seis decimales; se conserva con la merma.",
+        "description": "Largo de referencia conservado al registrar; para nuevas mermas procede del rollo completo seleccionado. No se captura.",
         "readOnly": true
       },
       "sampleNetWeightKg": {
@@ -322,7 +322,20 @@
         "exclusiveMinimum": 0,
         "maximum": 99999999.999999,
         "multipleOf": 1e-06,
-        "description": "Peso neto de la muestra sin cono, en kg. Hasta seis decimales; se conserva con la merma.",
+        "description": "Peso neto de referencia conservado al registrar; para nuevas mermas es el peso del rollo completo menos el mismo cono del sobrante. No se captura.",
+        "readOnly": true
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "multipleOf": 0.01,
+        "description": "Peso del rollo completo con cono, capturado desde merma. Se descuenta el mismo cono del sobrante; el largo procede del material.",
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
         "readOnly": true
       }
     },
@@ -728,27 +741,17 @@
         "multipleOf": 0.01,
         "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       },
-      "sampleLengthM": {
+      "referenceRollTotalWeightKg": {
         "type": [
           "number",
           "string",
           "null"
         ],
         "exclusiveMinimum": 0,
-        "maximum": 99999999.999999,
-        "multipleOf": 1e-06,
-        "description": "Largo de la muestra del mismo ancho, en metros lineales. Hasta seis decimales; se conserva con la merma."
-      },
-      "sampleNetWeightKg": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "exclusiveMinimum": 0,
-        "maximum": 99999999.999999,
-        "multipleOf": 1e-06,
-        "description": "Peso neto de la muestra sin cono, en kg. Hasta seis decimales; se conserva con la merma."
+        "maximum": 999.99,
+        "multipleOf": 0.01,
+        "description": "Peso del rollo completo con cono, capturado desde merma. Se descuenta el mismo cono del sobrante; el largo procede del material.",
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
       }
     },
     "additionalProperties": false,
@@ -760,7 +763,7 @@
       "isActive",
       "newStock"
     ],
-    "description": "El origen debe ser un material en m². Para Rollo capture cono, total con cono, sampleLengthM y sampleNetWeightKg: muestra sin cono del mismo ancho. El servidor calcula neto y largo por proporción con la muestra; no usa pesos del rollo completo. El formulario incluye ambas dimensiones deshabilitadas. Otras presentaciones en m² requieren medidas manuales y no aceptan pesos ni muestra. La muestra y los pesos quedan inmutables después del alta."
+    "description": "Origen MATERIAL en m². Para Rollo capture coneWeightKg, totalWeightKg del sobrante y referenceRollTotalWeightKg del rollo completo con cono. El servidor descuenta el mismo cono de ambos pesos, toma el largo del material y calcula la longitud proporcional. No envíe netos ni sampleLengthM/sampleNetWeightKg: son resultados del servidor. Medidas, pesos y referencia quedan inmutables. Otras presentaciones en m² usan medidas manuales sin pesos."
   },
   "WasteUpdateRequest": {
     "type": "object",

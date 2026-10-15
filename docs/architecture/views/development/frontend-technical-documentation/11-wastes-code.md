@@ -48,29 +48,27 @@ flowchart TB
 | Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/validations/weightValidations.js`<br/>`src/public/js/constants/apiMessages.js` |
 | Selección y pesos de merma | `src/public/js/ui/inventory/wasteFormUI.js` y `src/public/js/plugins/select2/domains/wasteMaterialTemplate.js` |
 
-La muestra se captura desde merma de Rollo: **Largo de muestra (m)** y **Peso neto de
-muestra (kg)**, sin cono y del mismo ancho. La sección del rollo completo se retira de
-material; sus valores anteriores permanecen históricos y no intervienen en cálculos nuevos.
+La muestra es el rollo completo. El formulario pide **Peso del rollo completo con
+cono (kg)**, además del cono y el total del sobrante. No pide largo ni peso neto de
+muestra; el largo ya existe en el material seleccionado y el mismo cono se resta de
+ambos totales. Los datos anteriores de material/proveedor no se modifican.
 
-Select2 entrega el objeto recibido a `applyWasteMaterialTemplate`. La UI prepara una
-vez la orientación y el ancho menor con `prepareWasteRollReference`, precarga nombre,
-presentación y unidad y limpia pesos y muestra. El selector ofrece sólo materiales en
-m² con oferta activa; excluye consumibles y las demás unidades.
+Select2 entrega el objeto a `applyWasteMaterialTemplate`. La UI prepara una vez ancho,
+orientación y largo nominal con `prepareWasteRollReference`, precarga identificación
+y limpia los pesos. Los eventos `input` de los tres pesos actualizan neto y largo con
+las utilidades compartidas, sin consultas ni reconstrucciones de la selección.
+El neto del sobrante funciona aunque falte el peso del rollo completo.
 
-Los eventos `input` de cono, total, largo de muestra y peso neto de muestra actualizan
-neto y longitud con las utilidades compartidas. No reconstruyen la selección, consultan
-la BD ni invocan la validación del envío. El neto puede mostrarse aunque falte la muestra;
-el largo queda vacío hasta completar los datos. El servidor calcula sus propios resultados.
-
-Ambas medidas de Rollo permanecen deshabilitadas; el normalizador incorpora sus valores
-al payload. La muestra sí se envía y persiste. En otras presentaciones en m² se capturan
-medidas manuales y se ocultan muestra y pesos. Edición, ajuste y consulta no recalculan
-la identidad. Los históricos sin muestra no reciben valores inventados.
+Ambas medidas de Rollo siguen deshabilitadas; el normalizador las incorpora al payload
+junto a los tres pesos capturados. El servidor calcula sus resultados y conserva las
+referencias. Las muestras de registros anteriores se muestran en **Referencia histórica**,
+sólo para consulta; no se recalculan ni se convierten en pesos de rollo completo.
+En otras presentaciones en m² se capturan medidas manuales y se ocultan los pesos.
 
 Ante `WASTE_ALREADY_EXISTS`, confirmar el Swal abre Agregar stock con cantidad y
 observaciones, sujeto a `wastes:add-stock`. Sólo guardar ese modal registra la entrada;
 cancelar conserva el alta. Este recorrido no se modifica.
 
-El orden visible es origen, datos de merma, muestra, pesos del sobrante, medidas,
-inventario y existencias/observaciones. Material conserva identificación, medidas según
-unidad e inventario; consumible mantiene las medidas ocultas con cualquier unidad.
+El orden visible es origen, datos de merma, rollo completo, pesos del sobrante,
+medidas, inventario y existencias/observaciones. Material y consumible mantienen su
+comportamiento de dimensiones por unidad.

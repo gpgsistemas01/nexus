@@ -110,16 +110,16 @@ La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 | Pruebas | Comportamiento verificado |
 | --- | --- |
 | `wasteValidatorsTest.js`, `wasteRegistrationBoundaryTest.js` | Formato, precisión y rango; errores de campo antes de invocar el servicio. |
-| `wasteWeightFieldTest.js` | Captura de muestra y pesos, cálculo automático, limpieza y consulta posterior. |
-| `wasteWeightDbTest.js` | Captura de cono y total, neto calculado, consulta, identidad por medidas y pesos, muestra capturada desde merma sin referencias de material, conservación histórica, cálculo automático en base o altura, edición protegida, stock independiente y Excel con peso neto. |
+| `wasteWeightFieldTest.js` | Captura del peso del rollo completo y del sobrante, cálculo automático, limpieza y consulta posterior. |
+| `wasteWeightDbTest.js` | Captura de cono y total, neto calculado, consulta, identidad por medidas y pesos, rollo completo capturado desde merma, largo del material y cono compartido, conservación histórica, cálculo automático en base o altura, edición protegida, stock independiente y Excel con peso neto. |
 | `reportServiceTest.js` | Agrupación, peso total y datos desconocidos. |
 | `wasteWeightCapDbTest.js`, `wasteWeightScaleDbTest.js`, `wasteRollCaptureDbTest.js` | Restricciones en PostgreSQL, conservación de valores compatibles y rollback de las migraciones ante valores incompatibles. |
 
-`wasteWeightCalculationsTest.js` verifica la orientación del ancho menor y la proporcionalidad por largo y peso de muestra. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos y migración consolidada que conserva netos históricos y agrega sólo campos finales.
+`wasteWeightCalculationsTest.js` verifica la orientación del ancho menor y la proporcionalidad por largo nominal y pesos netos del rollo completo y merma. `wasteRollCaptureDbTest.js` también verifica la migración de referencias, conservación de filas, identidad con pesos y protección de duplicados históricos sin pesos y migración consolidada que conserva netos históricos y agrega sólo campos finales.
 
 `materialValidationTest.js` verifica la pareja opcional de medidas, consumibles sin
 medidas y rechazo de referencias históricas. `wasteRegistrationBoundaryTest.js` cubre
-muestra positiva, precisión y códigos de `errorMap` antes de ejecutar el servicio.
+peso del rollo completo, campos calculados, precisión y códigos de `errorMap` antes de ejecutar el servicio.
 `wasteSampleReferenceDbTest.js` prueba conservación histórica y el CHECK de muestra completa.
 
 Las pruebas de UI de merma comprueban selección recibida desde Select2,
@@ -131,7 +131,7 @@ de Agregar stock con cantidad y observaciones precargadas, sin registrar entrada
 desde el Swal. También cubre cancelación, cantidad inicial cero y separación de
 permisos y modos. `wasteStockAdditionModalTest.js` comprueba la precarga, la cantidad
 vacía cuando se recibe cero y el saldo resultante al editar.
-`wasteMaterialTemplateTest.js` cubre selección, cálculo con los datos de muestra capturados y
+`wasteMaterialTemplateTest.js` cubre selección, cálculo con el peso del rollo completo capturado y largo del material y
 limpieza programática sin reconstruir la selección desde el DOM.
 
 `materialMeasurementFieldTest.js` comprueba medidas según unidad y consumibles siempre
@@ -139,4 +139,7 @@ sin medidas. `materialFormTest.js` omite las referencias históricas del payload
 `materialControllerDbTest.js` verifica altas directas y desde compra, conversión,
 consumibles sin dimensiones y origen de merma limitado a materiales en m². El rechazo
 de identificadores forzados demuestra que el filtro de Select2 no sustituye el control
-al guardar. `wasteWeightDbTest.js` verifica muestras independientes y su inmutabilidad.
+al guardar. `wasteWeightDbTest.js` verifica el cono compartido, las referencias calculadas y su inmutabilidad.
+
+`wasteFullRollReferenceDbTest.js` prueba que la migración conserva referencias anteriores
+y exige que el neto del rollo completo corresponda al total menos el mismo cono.
