@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { errorMap } from '../../../src/messages/codeMessages.js';
 import { PERMISSIONS } from '../../../src/constants/permissions.js';
+import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
 
 const { getLoggedUser, verifyAccessToken } = vi.hoisted(() => ({
     getLoggedUser: vi.fn(),
@@ -61,14 +63,20 @@ describe('authMiddleware authorization', () => {
         getLoggedUser.mockResolvedValue({
             id: 'user-1',
             permissions: [],
-            accesses: [{ role: 'Almacenista', department: 'ALMACÉN Y PROVEDURÍA' }]
+            accesses: [{
+                roleKey: ROLE_KEYS.WAREHOUSE_KEEPER,
+                departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+            }]
         });
         const req = {
             userId: 'user-1',
             user: {
                 id: 'user-1',
                 permissions: [],
-                accesses: [{ role: 'Almacenista', department: 'ALMACÉN Y PROVEDURÍA' }]
+                accesses: [{
+                    roleKey: ROLE_KEYS.WAREHOUSE_KEEPER,
+                    departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+                }]
             }
         };
         const res = { status: vi.fn().mockReturnThis(), json: vi.fn() };

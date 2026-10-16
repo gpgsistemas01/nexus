@@ -28,10 +28,12 @@ erDiagram
     direction LR
     Department {
         String id PK
+        String key UK
         String name UK
     }
     Role {
         String id PK
+        String key UK
         String name UK
     }
     User {

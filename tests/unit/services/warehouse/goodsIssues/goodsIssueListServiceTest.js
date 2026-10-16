@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ROLE_KEYS } from '../../../../../src/constants/roles.js';
+import { DEPARTMENT_KEYS } from '../../../../../src/constants/departments.js';
 
 const findMany = vi.fn();
 const count = vi.fn();
@@ -17,12 +19,12 @@ describe('listado de salidas por recurso', () => {
     it.each([
         ['material', 'MATERIAL'], ['consumable', 'CONSUMABLE']
     ])('filtra %s conservando la restricción de área y el mismo conteo', async (inventoryResource, type) => {
-        await findAllGoodsIssues({ type, accesses: [{ department: 'ÁREA' }] });
+        await findAllGoodsIssues({ type, accesses: [{ departmentId: 'department-1' }] });
         const where = findMany.mock.calls[0][0].where;
         expect(where).toMatchObject({
             type,
             details: { some: {}, every: { material: { type } } },
-            department: { name: { in: ['ÁREA'] } }
+            departmentId: { in: ['department-1'] }
         });
         expect(count).toHaveBeenCalledWith({ where });
     });
@@ -36,8 +38,11 @@ describe('listado de salidas por recurso', () => {
     });
 
     it.each([
-        ['administrador del sistema', { role: 'Administrador del sistema', department: 'IMPRESIÓN' }],
-        ['coordinador de almacén', { role: 'Coordinador', department: 'ALMACÉN Y PROVEDURÍA' }]
+        ['administrador del sistema', { roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.PRINTING }],
+        ['coordinador de almacén', {
+            roleKey: ROLE_KEYS.COORDINATOR,
+            departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+        }]
     ])('omite el filtro de área para %s', async (_, access) => {
         await findAllGoodsIssues({ accesses: [access] });
 
@@ -46,22 +51,29 @@ describe('listado de salidas por recurso', () => {
 
     it('conserva el filtro de área para coordinadores de otras áreas', async () => {
         await findAllGoodsIssues({
-            accesses: [{ role: 'Coordinador', department: 'IMPRESIÓN' }]
+            accesses: [{
+                roleKey: ROLE_KEYS.COORDINATOR,
+                departmentKey: DEPARTMENT_KEYS.PRINTING,
+                departmentId: 'printing-id'
+            }]
         });
 
-        expect(findMany.mock.calls[0][0].where.department).toEqual({
-            name: { in: ['IMPRESIÓN'] }
+        expect(findMany.mock.calls[0][0].where.departmentId).toEqual({
+            in: ['printing-id']
         });
     });
 
     it('el reporte omite el conteo y conserva el contexto y el alcance de área', async () => {
         const { findGoodsIssueReportRows } = await import('../../../../../src/services/warehouse/reportService.js');
-        expect(await findGoodsIssueReportRows({ type: 'CONSUMABLE', accesses: [{ department: 'ÁREA' }] })).toEqual([]);
+        expect(await findGoodsIssueReportRows({
+            type: 'CONSUMABLE',
+            accesses: [{ departmentId: 'department-1' }]
+        })).toEqual([]);
         expect(count).not.toHaveBeenCalled();
         expect(findMany.mock.calls[0][0].where).toMatchObject({
             type: 'CONSUMABLE',
             details: { some: {}, every: { material: { type: 'CONSUMABLE' } } },
-            department: { name: { in: ['ÁREA'] } }
+            departmentId: { in: ['department-1'] }
         });
     });
 

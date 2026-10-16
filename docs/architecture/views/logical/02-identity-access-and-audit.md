@@ -36,12 +36,15 @@ asignaciones activas del usuario siguen otorgando sus permisos. El login aplica 
 mismo filtro antes de verificar la contraseña y no emite tokens si no queda una
 asignación activa.
 
-`permissions.js` también define los criterios del alcance de datos y el contexto
-organizativo derivado. El alcance global de lectura se concede por el rol Director o
-por pertenecer a DIRECCIÓN. La consulta de todas las salidas se concede al
-Administrador del sistema o al Coordinador con asignación en ALMACÉN Y PROVEDURÍA;
-las demás asignaciones mantienen el filtro por sus propias áreas. `organization`
-expone indicadores informativos de rol/área y no sustituye los permisos del servidor.
+`Role.key` y `Department.key` son claves persistentes e inmutables para políticas;
+los nombres de ambos catálogos sólo se usan para presentación. La migración asigna
+claves a los registros existentes y las altas de catálogo generan claves nuevas.
+`permissions.js` define las políticas de permisos, alcance de datos y contexto
+organizativo mediante esas claves. La consulta global de lectura se concede por la
+clave de Director o de Dirección. La consulta de todas las salidas se concede por la
+clave de Administrador del sistema o por Coordinador con clave de Almacén y
+Proveeduría; las demás asignaciones limitan la consulta mediante el ID del área.
+`organization` expone indicadores informativos y no sustituye los permisos del servidor.
 
 Las áreas `IMPRESIÓN`, `TALLER 3D`, `PT/TRÁFICO`, `INSTALACIONES` y `ACABADOS`
 comparten el acceso operativo para los roles Administrador del sistema, Coordinador,

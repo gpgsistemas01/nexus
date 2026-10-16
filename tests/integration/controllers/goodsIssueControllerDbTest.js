@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
-import { ROLE_NAMES } from '../../../src/constants/roles.js';
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
 import { resolveDatabaseUrl } from '../../../src/lib/databaseUrl.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
@@ -84,7 +84,7 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         reportFinders.consumable = (await import('../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js')).findConsumableGoodsIssueReportRows;
         app = createControllerTestApp({ registerRoutes: router => {
             router.use((req, _res, next) => {
-                req.user = { accesses: [{ role: ROLE_NAMES.SYSTEM_ADMIN }] };
+                req.user = { accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] };
                 next();
             });
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
@@ -289,7 +289,7 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(response.body.data.map(row => row.id)).toEqual([issues[inventoryResource].id]);
         expect(response.body.recordsTotal).toBe(1);
         const rows = await reportFinders[inventoryResource]({
-            departmentId: ids.department, accesses: [{ role: ROLE_NAMES.SYSTEM_ADMIN }]
+            departmentId: ids.department, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }]
         });
         expect(rows).toHaveLength(1);
         expect(rows[0].referenceNumber).toBe(issues[inventoryResource].referenceNumber);

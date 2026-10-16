@@ -33,8 +33,8 @@ describe('getLoggedUser active access assignments', () => {
     it('queries only active account, person, role, and department assignments', async () => {
         findMany.mockResolvedValue([{
             user: { id: 'user-1', name: 'warehouse-user' },
-            role: { id: 'role-1', name: 'Almacenista' },
-            department: { id: 'department-1', name: 'ALMACÉN Y PROVEDURÍA' }
+            role: { id: 'role-1', key: 'warehouse_keeper', name: 'Etiqueta de rol' },
+            department: { id: 'department-1', key: 'warehouse_and_supply', name: 'Etiqueta de área' }
         }]);
 
         const user = await getLoggedUser('user-1');
@@ -54,15 +54,17 @@ describe('getLoggedUser active access assignments', () => {
             },
             select: {
                 user: { select: { id: true, name: true } },
-                role: { select: { id: true, name: true } },
-                department: { select: { id: true, name: true } }
+                role: { select: { id: true, key: true, name: true } },
+                department: { select: { id: true, key: true, name: true } }
             }
         });
         expect(user.accesses).toEqual([{
             roleId: 'role-1',
-            role: 'Almacenista',
+            roleKey: 'warehouse_keeper',
+            role: 'Etiqueta de rol',
             departmentId: 'department-1',
-            department: 'ALMACÉN Y PROVEDURÍA'
+            departmentKey: 'warehouse_and_supply',
+            department: 'Etiqueta de área'
         }]);
         expect(user.permissions).toContain('materials:write');
         expect(user.scope).toEqual({
@@ -75,6 +77,19 @@ describe('getLoggedUser active access assignments', () => {
             isSystem: false,
             isSales: false
         });
+    });
+
+    it('grants authorization from catalog keys without depending on editable labels', async () => {
+        findMany.mockResolvedValue([{
+            user: { id: 'user-1', name: 'warehouse-user' },
+            role: { id: 'role-1', key: 'warehouse_keeper', name: 'Renamed role' },
+            department: { id: 'department-1', key: 'warehouse_and_supply', name: 'Renamed department' }
+        }]);
+
+        const user = await getLoggedUser('user-1');
+
+        expect(user.permissions).toContain('materials:write');
+        expect(user.organization.isWarehouse).toBe(true);
     });
 
     it('returns no logged user when every assignment has an inactive role or department', async () => {

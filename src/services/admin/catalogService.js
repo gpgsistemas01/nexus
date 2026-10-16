@@ -14,6 +14,14 @@ const getCatalog = (catalogName) => {
     return catalog;
 };
 
+const removeInternalKey = (catalog, entry) => {
+    if (!catalog.hasStableKey || !entry) return entry;
+
+    const publicEntry = { ...entry };
+    delete publicEntry.key;
+    return publicEntry;
+};
+
 const normalizeCatalogData = (catalog, input = {}) => Object.fromEntries(catalog.fields
     .filter(field => input[field] !== undefined)
     .map(field => [field, typeof input[field] === 'string' ? input[field].trim() : input[field]]));
@@ -36,7 +44,7 @@ export const findAllCatalogEntries = async (catalogName, { skip = 0, take = 10, 
     const catalog = getCatalog(catalogName);
     const model = getDb()[catalog.model];
     const where = search ? { name: { contains: search, mode: 'insensitive' } } : {};
-    return findPage({
+    const page = await findPage({
         model: model,
         hasFilters: Boolean(search),
         query: {
@@ -46,13 +54,19 @@ export const findAllCatalogEntries = async (catalogName, { skip = 0, take = 10, 
             orderBy: { name: 'asc' }
         }
     });
+
+    return {
+        ...page,
+        data: page.data.map(entry => removeInternalKey(catalog, entry))
+    };
 };
 
 export const createCatalogEntry = async (catalogName, input) => {
     const catalog = getCatalog(catalogName);
     const data = normalizeCatalogData(catalog, input);
     validateCatalogData(catalog, data);
-    return getDb()[catalog.model].create({ data });
+    const entry = await getDb()[catalog.model].create({ data });
+    return removeInternalKey(catalog, entry);
 };
 
 export const updateCatalogEntry = async (catalogName, id, input) => {
@@ -60,7 +74,8 @@ export const updateCatalogEntry = async (catalogName, id, input) => {
     const data = normalizeCatalogData(catalog, input);
     validateCatalogData(catalog, data);
     try {
-        return await getDb()[catalog.model].update({ where: { id }, data });
+        const entry = await getDb()[catalog.model].update({ where: { id }, data });
+        return removeInternalKey(catalog, entry);
     } catch (error) {
         if ([
             PRISMA_ERROR_CODES.RECORD_NOT_FOUND,

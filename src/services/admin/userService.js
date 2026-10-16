@@ -140,8 +140,8 @@ export const getLoggedUser = async (userId) => {
         },
         select: {
             user: { select: { id: true, name: true } },
-            role: { select: { id: true, name: true } },
-            department: { select: { id: true, name: true } }
+            role: { select: { id: true, key: true, name: true } },
+            department: { select: { id: true, key: true, name: true } }
         }
     });
 
@@ -152,8 +152,10 @@ export const getLoggedUser = async (userId) => {
         name: accesses[0].user.name,
         accesses: accesses.map(a => ({
             roleId: a.role.id,
+            roleKey: a.role.key,
             role: a.role.name,
             departmentId: a.department.id,
+            departmentKey: a.department.key,
             department: a.department.name
         }))
     };

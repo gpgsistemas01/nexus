@@ -6,6 +6,12 @@ const database = {
     create: vi.fn(),
     findMany: vi.fn(),
     update: vi.fn()
+  },
+  role: {
+    create: vi.fn()
+  },
+  department: {
+    create: vi.fn()
   }
 };
 
@@ -67,6 +73,35 @@ describe('catalogService', () => {
 
     expect(database.unitMeasure.create).toHaveBeenCalledWith({
       data: { name: 'Metro', symbol: 'm', isActive: false }
+    });
+  });
+
+  it.each([
+    ['roles', 'role'],
+    ['departments', 'department']
+  ])('keeps the stable key internal when creating %s', async (catalog, model) => {
+    database[model].create.mockResolvedValue({
+      id: `${ model }-1`,
+      key: 'persisted-stable-key',
+      name: 'Nuevo registro',
+      isActive: true
+    });
+
+    await expect(createCatalogEntry(catalog, {
+      name: 'Nuevo registro',
+      isActive: true,
+      key: 'caller-controlled'
+    })).resolves.toEqual({
+      id: `${ model }-1`,
+      name: 'Nuevo registro',
+      isActive: true
+    });
+
+    expect(database[model].create).toHaveBeenCalledWith({
+      data: {
+        name: 'Nuevo registro',
+        isActive: true
+      }
     });
   });
 

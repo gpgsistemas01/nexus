@@ -59,7 +59,7 @@ export const findAllGoodsIssues = async ({
     const db = getDb();
 
     const canViewAll = hasDataScope(accesses, DATA_SCOPES.GOODS_ISSUES_READ_ALL);
-    const userDepartments = accesses.map(a => a.department);
+    const userDepartmentIds = accesses.map(access => access.departmentId).filter(Boolean);
 
     const where = {
         ...buildGoodsIssueContextWhere(type),
@@ -93,10 +93,8 @@ export const findAllGoodsIssues = async ({
             }
         }),
         ...(!canViewAll && {
-            department: {
-                name: {
-                    in: userDepartments
-                }
+            departmentId: {
+                in: userDepartmentIds
             }
         })
     };

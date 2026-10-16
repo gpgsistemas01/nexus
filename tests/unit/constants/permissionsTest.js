@@ -6,15 +6,33 @@ import {
     hasDataScope,
     PERMISSIONS
 } from '../../../src/constants/permissions.js';
+import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
 
 describe('políticas funcionales de acceso', () => {
-    const operationalDepartments = ['IMPRESIÓN', 'TALLER 3D', 'PT/TRÁFICO', 'INSTALACIONES', 'ACABADOS'];
-    const operationalRoles = ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'];
+    const operationalDepartments = [
+        DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.WORKSHOP_3D,
+        DEPARTMENT_KEYS.PT_TRAFFIC,
+        DEPARTMENT_KEYS.INSTALLATIONS,
+        DEPARTMENT_KEYS.FINISHING
+    ];
+    const operationalRoles = [
+        ROLE_KEYS.SYSTEM_ADMIN,
+        ROLE_KEYS.COORDINATOR,
+        ROLE_KEYS.AUXILIARY,
+        ROLE_KEYS.OPERATOR,
+        ROLE_KEYS.INSTALLER,
+        ROLE_KEYS.WAREHOUSE_KEEPER
+    ];
 
     it.each(operationalDepartments.flatMap(department => operationalRoles.map(role => [department, role])))(
         'permite solicitudes y consulta de inventario para %s / %s sin operar existencias',
         (department, role) => {
-            const permissions = getGrantedPermissions([{ department, role }]);
+            const permissions = getGrantedPermissions([{
+                departmentKey: department,
+                roleKey: role
+            }]);
 
             expect(permissions).toEqual(expect.arrayContaining([
                 PERMISSIONS.GOODS_ISSUES_PAGE_VIEW,
@@ -46,8 +64,8 @@ describe('políticas funcionales de acceso', () => {
 
     it('no combina el rol autorizado de una asignación con el área de otra', () => {
         const permissions = getGrantedPermissions([
-            { role: 'Operador', department: 'VENTAS Y PROYECTOS ESPECIALES' },
-            { role: 'Asesor de ventas', department: 'IMPRESIÓN' }
+            { roleKey: ROLE_KEYS.OPERATOR, departmentKey: DEPARTMENT_KEYS.SALES },
+            { roleKey: ROLE_KEYS.SALES_ADVISOR, departmentKey: DEPARTMENT_KEYS.PRINTING }
         ]);
 
         expect(permissions).toEqual([]);
@@ -55,38 +73,41 @@ describe('políticas funcionales de acceso', () => {
 
     describe('políticas de alcance de datos', () => {
         it.each([
-            [{ role: 'Director', department: 'IMPRESIÓN' }],
-            [{ role: 'Operador', department: 'DIRECCIÓN' }]
+            [{ roleKey: ROLE_KEYS.DIRECTOR, departmentKey: DEPARTMENT_KEYS.PRINTING }],
+            [{ roleKey: ROLE_KEYS.OPERATOR, departmentKey: DEPARTMENT_KEYS.MANAGEMENT }]
         ])('concede alcance global de lectura por rol o área: %o', (access) => {
             expect(hasDataScope([access], DATA_SCOPES.SYSTEM_WIDE_READ)).toBe(true);
         });
 
         it('no concede alcance global de lectura a otras asignaciones', () => {
             expect(hasDataScope(
-                [{ role: 'Coordinador', department: 'IMPRESIÓN' }],
+                [{ roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.PRINTING }],
                 DATA_SCOPES.SYSTEM_WIDE_READ
             )).toBe(false);
         });
 
         it.each([
-            [{ role: 'Administrador del sistema', department: 'IMPRESIÓN' }],
-            [{ role: 'Coordinador', department: 'ALMACÉN Y PROVEDURÍA' }]
+            [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.PRINTING }],
+            [{
+                roleKey: ROLE_KEYS.COORDINATOR,
+                departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+            }]
         ])('concede consulta de todas las salidas por política: %o', (access) => {
             expect(hasDataScope([access], DATA_SCOPES.GOODS_ISSUES_READ_ALL)).toBe(true);
         });
 
         it('no amplía la consulta de salidas a coordinadores de otras áreas', () => {
             expect(hasDataScope(
-                [{ role: 'Coordinador', department: 'IMPRESIÓN' }],
+                [{ roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.PRINTING }],
                 DATA_SCOPES.GOODS_ISSUES_READ_ALL
             )).toBe(false);
         });
 
         it('deriva el contexto informativo desde las asignaciones', () => {
             expect(getOrganizationContext([
-                { role: 'Coordinador', department: 'ALMACÉN Y PROVEDURÍA' },
-                { role: 'Operador', department: 'SISTEMAS' },
-                { role: 'Asesor de ventas', department: 'VENTAS Y PROYECTOS ESPECIALES' }
+                { roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY },
+                { roleKey: ROLE_KEYS.OPERATOR, departmentKey: DEPARTMENT_KEYS.SYSTEMS },
+                { roleKey: ROLE_KEYS.SALES_ADVISOR, departmentKey: DEPARTMENT_KEYS.SALES }
             ])).toEqual({
                 isCoordinator: true,
                 isWarehouse: true,
@@ -97,13 +118,13 @@ describe('políticas funcionales de acceso', () => {
     });
 
     it.each([
-        'Asesor de ventas',
-        'Coordinador',
-        'Administrador del sistema'
+        ROLE_KEYS.SALES_ADVISOR,
+        ROLE_KEYS.COORDINATOR,
+        ROLE_KEYS.SYSTEM_ADMIN
     ])('no concede permisos al área de ventas con el rol %s', (role) => {
         const permissions = getGrantedPermissions([{
-            role,
-            department: 'VENTAS Y PROYECTOS ESPECIALES'
+            roleKey: role,
+            departmentKey: DEPARTMENT_KEYS.SALES
         }]);
 
         expect(permissions).toEqual([]);
@@ -111,8 +132,8 @@ describe('políticas funcionales de acceso', () => {
 
     it('no permite que un asesor opere salidas aunque pertenezca a almacén', () => {
         const permissions = getGrantedPermissions([{
-            role: 'Asesor de ventas',
-            department: 'ALMACÉN Y PROVEDURÍA'
+            roleKey: ROLE_KEYS.SALES_ADVISOR,
+            departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
         }]);
 
         expect(permissions).not.toContain(PERMISSIONS.GOODS_ISSUES_MANAGE);
@@ -121,10 +142,18 @@ describe('políticas funcionales de acceso', () => {
         expect(permissions).not.toContain(PERMISSIONS.WASTE_ISSUES_SUPPLY);
     });
 
-    it.each(['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'].flatMap(department =>
-        ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'].map(role => [department, role])
+    it.each([DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS].flatMap(department =>
+        [
+            ROLE_KEYS.WAREHOUSE_KEEPER,
+            ROLE_KEYS.COORDINATOR,
+            ROLE_KEYS.AUXILIARY,
+            ROLE_KEYS.SYSTEM_ADMIN
+        ].map(role => [department, role])
     ))('conserva los permisos de gestión de %s / %s', (department, role) => {
-        const permissions = getGrantedPermissions([{ department, role }]);
+        const permissions = getGrantedPermissions([{
+            departmentKey: department,
+            roleKey: role
+        }]);
 
         expect(permissions).toEqual(expect.arrayContaining([
             PERMISSIONS.MATERIALS_READ, PERMISSIONS.MATERIALS_WRITE,
@@ -139,7 +168,7 @@ describe('políticas funcionales de acceso', () => {
             PERMISSIONS.CLIENTS_CREATE, PERMISSIONS.PERSONS_WRITE
         ]));
 
-        const isSystemAdmin = department === 'SISTEMAS' && role === 'Administrador del sistema';
+        const isSystemAdmin = department === DEPARTMENT_KEYS.SYSTEMS && role === ROLE_KEYS.SYSTEM_ADMIN;
         for (const permission of [
             PERMISSIONS.MATERIALS_ADJUST_STOCK, PERMISSIONS.WASTES_ADJUST_STOCK,
             PERMISSIONS.CATALOGS_MANAGE, PERMISSIONS.USERS_MANAGE,
@@ -151,8 +180,11 @@ describe('políticas funcionales de acceso', () => {
 
     it('conserva la gestión de almacén cuando el usuario también tiene un área operativa', () => {
         const permissions = getGrantedPermissions([
-            { department: 'IMPRESIÓN', role: 'Operador' },
-            { department: 'ALMACÉN Y PROVEDURÍA', role: 'Almacenista' }
+            { departmentKey: DEPARTMENT_KEYS.PRINTING, roleKey: ROLE_KEYS.OPERATOR },
+            {
+                departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
+                roleKey: ROLE_KEYS.WAREHOUSE_KEEPER
+            }
         ]);
 
         expect(permissions).toEqual(expect.arrayContaining([
@@ -167,8 +199,8 @@ describe('políticas funcionales de acceso', () => {
 
     it('permite al personal de almacén abrir las consultas de clientes y proveedores', () => {
         const permissions = getGrantedPermissions([{
-            role: 'Almacenista',
-            department: 'ALMACÉN Y PROVEDURÍA'
+            roleKey: ROLE_KEYS.WAREHOUSE_KEEPER,
+            departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
         }]);
 
         expect(permissions).toEqual(expect.arrayContaining([

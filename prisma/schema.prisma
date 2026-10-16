@@ -9,6 +9,7 @@ datasource db {
 
 model Department {
   id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key            String                 @unique @default(dbgenerated("gen_random_uuid()::text")) @db.VarChar(100)
   name           String                 @unique @db.VarChar(50)
   isActive       Boolean                @default(true)
   personAccesses PersonRoleDepartment[]
@@ -19,6 +20,7 @@ model Department {
 
 model Role {
   id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key            String                 @unique @default(dbgenerated("gen_random_uuid()::text")) @db.VarChar(100)
   name           String                 @unique @db.VarChar(50)
   isActive       Boolean                @default(true)
   accesses       UserRoleDepartment[]

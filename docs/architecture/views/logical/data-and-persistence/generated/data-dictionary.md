@@ -30,6 +30,7 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
+| `key` | `String` | Sí | UK | `dbgenerated("gen_random_uuid()::text")` | `@db.VarChar(100)` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
 
@@ -38,6 +39,7 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
+| `key` | `String` | Sí | UK | `dbgenerated("gen_random_uuid()::text")` | `@db.VarChar(100)` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
 

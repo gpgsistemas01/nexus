@@ -10,11 +10,31 @@
         "type": "string",
         "format": "uuid"
       },
+      "departmentKey": {
+        "type": "string"
+      },
+      "roleKey": {
+        "type": "string"
+      },
       "department": {
-        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+          }
+        ]
       },
       "role": {
-        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+          }
+        ]
       }
     },
     "additionalProperties": false,
@@ -106,6 +126,50 @@
         "items": {
           "type": "string"
         }
+      },
+      "scope": {
+        "type": "object",
+        "properties": {
+          "canReadAll": {
+            "type": "boolean"
+          },
+          "departmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "canReadAll",
+          "departmentIds"
+        ]
+      },
+      "organization": {
+        "type": "object",
+        "properties": {
+          "isCoordinator": {
+            "type": "boolean"
+          },
+          "isWarehouse": {
+            "type": "boolean"
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "isSales": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "isCoordinator",
+          "isWarehouse",
+          "isSystem",
+          "isSales"
+        ]
       }
     },
     "additionalProperties": false,

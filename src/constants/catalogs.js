@@ -1,6 +1,7 @@
 export const MANAGED_CATALOGS = Object.freeze({
     departments: {
         model: 'department',
+        hasStableKey: true,
         fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Áreas',
@@ -9,6 +10,7 @@ export const MANAGED_CATALOGS = Object.freeze({
     },
     roles: {
         model: 'role',
+        hasStableKey: true,
         fields: ['name', 'isActive'],
         maxLengths: { name: 50 },
         label: 'Roles',

@@ -1,5 +1,5 @@
 import { INTERNAL_CLIENT_NAME } from "../../../constants/issueHeaderRules.js";
-import { ROLE_NAMES } from "../../../constants/roles.js";
+import { ROLE_KEYS } from "../../../constants/roles.js";
 import { normalizeText } from "../../../utils/formattersUtils.js";
 
 const isInternalClient = (client) => (
@@ -10,7 +10,5 @@ export const isValidInternalClientAdvisor = ({ client, advisor }) => {
 
     if (!isInternalClient(client)) return true;
 
-    return advisor?.accesses?.some(({ role }) => (
-        normalizeText(role?.name || '') === normalizeText(ROLE_NAMES.COORDINATOR)
-    )) || false;
+    return advisor?.accesses?.some(({ role }) => role?.key === ROLE_KEYS.COORDINATOR) || false;
 };

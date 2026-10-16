@@ -1,5 +1,5 @@
-import { DEPARTMENT_NAMES } from './departments.js';
-import { ROLE_NAMES } from './roles.js';
+import { DEPARTMENT_KEYS } from './departments.js';
+import { ROLE_KEYS } from './roles.js';
 
 export const PERMISSIONS = Object.freeze({
     MATERIALS_READ: 'materials:read',
@@ -52,8 +52,8 @@ export const DATA_SCOPES = Object.freeze({
 });
 
 const createPolicy = ({ roles, departments }) => Object.freeze({
-    roles: Object.freeze([...roles]),
-    departments: Object.freeze([...departments])
+    roleKeys: Object.freeze([...roles]),
+    departmentKeys: Object.freeze([...departments])
 });
 
 const createAccessConditions = (conditions) => Object.freeze(
@@ -62,255 +62,255 @@ const createAccessConditions = (conditions) => Object.freeze(
 
 export const DATA_SCOPE_POLICIES = Object.freeze({
     [DATA_SCOPES.SYSTEM_WIDE_READ]: createAccessConditions([
-        { role: ROLE_NAMES.DIRECTOR },
-        { department: DEPARTMENT_NAMES.MANAGEMENT }
+        { roleKey: ROLE_KEYS.DIRECTOR },
+        { departmentKey: DEPARTMENT_KEYS.MANAGEMENT }
     ]),
     [DATA_SCOPES.GOODS_ISSUES_READ_ALL]: createAccessConditions([
-        { role: ROLE_NAMES.SYSTEM_ADMIN },
+        { roleKey: ROLE_KEYS.SYSTEM_ADMIN },
         {
-            role: ROLE_NAMES.COORDINATOR,
-            department: DEPARTMENT_NAMES.WAREHOUSE_AND_SUPPLY
+            roleKey: ROLE_KEYS.COORDINATOR,
+            departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
         }
     ])
 });
 
 export const ORGANIZATION_CONTEXT_POLICIES = Object.freeze({
-    isCoordinator: createAccessConditions([{ role: ROLE_NAMES.COORDINATOR }]),
-    isWarehouse: createAccessConditions([{ department: DEPARTMENT_NAMES.WAREHOUSE_AND_SUPPLY }]),
-    isSystem: createAccessConditions([{ department: DEPARTMENT_NAMES.SYSTEMS }]),
-    isSales: createAccessConditions([{ department: DEPARTMENT_NAMES.SALES }])
+    isCoordinator: createAccessConditions([{ roleKey: ROLE_KEYS.COORDINATOR }]),
+    isWarehouse: createAccessConditions([{ departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }]),
+    isSystem: createAccessConditions([{ departmentKey: DEPARTMENT_KEYS.SYSTEMS }]),
+    isSales: createAccessConditions([{ departmentKey: DEPARTMENT_KEYS.SALES }])
 });
 
 // Accesos comunes de consulta y solicitudes. Almacén y Sistemas conservan además
 // sus políticas de gestión; el acceso de sólo consulta aplica a las otras cinco áreas.
 const operationalAccessPolicy = createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.OPERATOR, ROLE_KEYS.INSTALLER, ROLE_KEYS.WAREHOUSE_KEEPER],
     departments: [
-        'ALMACÉN Y PROVEDURÍA',
-        'SISTEMAS',
-        'IMPRESIÓN',
-        'TALLER 3D',
-        'PT/TRÁFICO',
-        'INSTALACIONES',
-        'ACABADOS'
+        DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
+        DEPARTMENT_KEYS.SYSTEMS,
+        DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.WORKSHOP_3D,
+        DEPARTMENT_KEYS.PT_TRAFFIC,
+        DEPARTMENT_KEYS.INSTALLATIONS,
+        DEPARTMENT_KEYS.FINISHING
     ]
 });
 
 export const AUTHORIZATION_POLICIES = Object.freeze({
     [PERMISSIONS.CATALOGS_MANAGE]: createPolicy({
-        roles: ['Administrador del sistema'],
-        departments: ['SISTEMAS']
+        roles: [ROLE_KEYS.SYSTEM_ADMIN],
+        departments: [DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.MATERIALS_READ]: operationalAccessPolicy,
     [PERMISSIONS.MATERIALS_WRITE]: createPolicy({
         roles: [
-            'Almacenista',
-            'Coordinador',
-            'Auxiliar',
-            'Administrador del sistema'
+            ROLE_KEYS.WAREHOUSE_KEEPER,
+            ROLE_KEYS.COORDINATOR,
+            ROLE_KEYS.AUXILIARY,
+            ROLE_KEYS.SYSTEM_ADMIN
         ],
-        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+        departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.MATERIALS_ADJUST_STOCK]: createPolicy({
-        roles: ['Administrador del sistema'],
-        departments: ['SISTEMAS']
+        roles: [ROLE_KEYS.SYSTEM_ADMIN],
+        departments: [DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.INVENTORY_COSTS_READ]: createPolicy({
-        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+        roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+        departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.DEPARTMENTS_READ]: createPolicy({
-    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
+    roles: [ ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.OPERATOR, ROLE_KEYS.INSTALLER, ROLE_KEYS.DESIGNER, ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.DISTRIBUTOR, ROLE_KEYS.DIRECTOR, ROLE_KEYS.ADMINISTRATOR, ROLE_KEYS.ACCOUNTANT ],
     departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D'
+        DEPARTMENT_KEYS.MANAGEMENT,
+        DEPARTMENT_KEYS.FINISHING,
+        DEPARTMENT_KEYS.ADMINISTRATIVE,
+        DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
+        DEPARTMENT_KEYS.DESIGN,
+        DEPARTMENT_KEYS.INSTALLATIONS,
+        DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
+        DEPARTMENT_KEYS.PT_TRAFFIC,
+        DEPARTMENT_KEYS.SYSTEMS,
+        DEPARTMENT_KEYS.WORKSHOP_3D
     ]
 }),
     [PERMISSIONS.MOVEMENTS_READ]: createPolicy({
-    roles: [ 'Administrador del sistema' ],
-    departments: [ 'SISTEMAS' ]
+    roles: [ ROLE_KEYS.SYSTEM_ADMIN ],
+    departments: [ DEPARTMENT_KEYS.SYSTEMS ]
 }),
     [PERMISSIONS.PERSONS_READ]: createPolicy({
-    roles: [ 'Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Diseñador', 'Almacenista', 'Repartidor', 'Director', 'Administrador', 'Contador' ],
+    roles: [ ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.OPERATOR, ROLE_KEYS.INSTALLER, ROLE_KEYS.DESIGNER, ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.DISTRIBUTOR, ROLE_KEYS.DIRECTOR, ROLE_KEYS.ADMINISTRATOR, ROLE_KEYS.ACCOUNTANT ],
     departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D'
+        DEPARTMENT_KEYS.MANAGEMENT,
+        DEPARTMENT_KEYS.FINISHING,
+        DEPARTMENT_KEYS.ADMINISTRATIVE,
+        DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
+        DEPARTMENT_KEYS.DESIGN,
+        DEPARTMENT_KEYS.INSTALLATIONS,
+        DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
+        DEPARTMENT_KEYS.PT_TRAFFIC,
+        DEPARTMENT_KEYS.SYSTEMS,
+        DEPARTMENT_KEYS.WORKSHOP_3D
     ]
 }),
     [PERMISSIONS.PERSONS_WRITE]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.WAREHOUSE_KEEPER],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.ADMIN_REPORTS_READ]: createPolicy({
-    roles: ['Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: [ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.PERSON_REPORTS_READ]: createPolicy({
-    roles: ['Coordinador', 'Auxiliar', 'Almacenista', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.ROLES_READ]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.WAREHOUSE_KEEPER],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.USERS_MANAGE]: createPolicy({
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: [ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.CLIENTS_READ]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.OPERATOR, ROLE_KEYS.INSTALLER, ROLE_KEYS.WAREHOUSE_KEEPER],
     departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D'
+        DEPARTMENT_KEYS.MANAGEMENT,
+        DEPARTMENT_KEYS.FINISHING,
+        DEPARTMENT_KEYS.ADMINISTRATIVE,
+        DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
+        DEPARTMENT_KEYS.DESIGN,
+        DEPARTMENT_KEYS.INSTALLATIONS,
+        DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
+        DEPARTMENT_KEYS.PT_TRAFFIC,
+        DEPARTMENT_KEYS.SYSTEMS,
+        DEPARTMENT_KEYS.WORKSHOP_3D
     ]
 }),
     [PERMISSIONS.CLIENTS_CREATE]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.WAREHOUSE_KEEPER],
     departments: [
-        'SISTEMAS',
-        'ALMACÉN Y PROVEDURÍA',
-        'ADMINISTRATIVO'
+        DEPARTMENT_KEYS.SYSTEMS,
+        DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
+        DEPARTMENT_KEYS.ADMINISTRATIVE
     ]
 }),
     [PERMISSIONS.CLIENTS_UPDATE]: createPolicy({
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: [ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.CLIENT_REPORTS_READ]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar'],
-    departments: ['SISTEMAS']
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.FULFILLMENT_STATUSES_READ]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.OPERATOR, ROLE_KEYS.INSTALLER, ROLE_KEYS.WAREHOUSE_KEEPER],
     departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D'
+        DEPARTMENT_KEYS.MANAGEMENT,
+        DEPARTMENT_KEYS.FINISHING,
+        DEPARTMENT_KEYS.ADMINISTRATIVE,
+        DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
+        DEPARTMENT_KEYS.DESIGN,
+        DEPARTMENT_KEYS.INSTALLATIONS,
+        DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
+        DEPARTMENT_KEYS.PT_TRAFFIC,
+        DEPARTMENT_KEYS.SYSTEMS,
+        DEPARTMENT_KEYS.WORKSHOP_3D
     ]
 }),
     [PERMISSIONS.GOODS_ISSUES_MANAGE]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Operador', 'Instalador', 'Almacenista'],
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.OPERATOR, ROLE_KEYS.INSTALLER, ROLE_KEYS.WAREHOUSE_KEEPER],
     departments: [
-        'DIRECCIÓN',
-        'ACABADOS',
-        'ADMINISTRATIVO',
-        'ALMACÉN Y PROVEDURÍA',
-        'DISEÑO',
-        'INSTALACIONES',
-        'IMPRESIÓN',
-        'ROUTER',
-        'PT/TRÁFICO',
-        'SISTEMAS',
-        'TALLER 3D'
+        DEPARTMENT_KEYS.MANAGEMENT,
+        DEPARTMENT_KEYS.FINISHING,
+        DEPARTMENT_KEYS.ADMINISTRATIVE,
+        DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
+        DEPARTMENT_KEYS.DESIGN,
+        DEPARTMENT_KEYS.INSTALLATIONS,
+        DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
+        DEPARTMENT_KEYS.PT_TRAFFIC,
+        DEPARTMENT_KEYS.SYSTEMS,
+        DEPARTMENT_KEYS.WORKSHOP_3D
     ]
 }),
     [PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE]: createPolicy({
-    roles: ['Almacenista', 'Auxiliar', 'Coordinador', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.GOODS_RECEIPTS_MANAGE]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.PRESENTATIONS_READ]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.REASONS_READ]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.WAREHOUSE_REPORTS_READ]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.SUPPLIER_REPORTS_READ]: createPolicy({
-    roles: ['Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: [ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.SUPPLIERS_MANAGE]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.SUPPLIERS_READ]: operationalAccessPolicy,
     [PERMISSIONS.SUPPLIERS_UPDATE]: createPolicy({
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: [ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.UNIT_MEASURES_READ]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.WASTES_READ]: operationalAccessPolicy,
     [PERMISSIONS.WASTES_WRITE]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.WASTES_ADD_STOCK]: createPolicy({
-        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+        roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+        departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.WASTES_ADJUST_STOCK]: createPolicy({
-    roles: ['Administrador del sistema'],
-    departments: ['SISTEMAS']
+    roles: [ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.WASTE_ISSUES_MANAGE]: operationalAccessPolicy,
     [PERMISSIONS.WASTE_ISSUES_SUPPLY]: createPolicy({
-        roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-        departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+        roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+        departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
     }),
     [PERMISSIONS.WASTE_ISSUES_PAGE_VIEW]: operationalAccessPolicy,
     [PERMISSIONS.PERSONS_PAGE_VIEW]: createPolicy({
-    roles: ['Administrador del sistema', 'Coordinador', 'Auxiliar', 'Almacenista'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.WAREHOUSE_KEEPER],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.CLIENTS_PAGE_VIEW]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.GOODS_ISSUES_PAGE_VIEW]: operationalAccessPolicy,
     [PERMISSIONS.GOODS_RECEIPTS_PAGE_VIEW]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.SUPPLIERS_PAGE_VIEW]: createPolicy({
-    roles: ['Almacenista', 'Coordinador', 'Auxiliar', 'Administrador del sistema'],
-    departments: ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS']
+    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.WASTES_PAGE_VIEW]: operationalAccessPolicy
 });
@@ -350,7 +350,7 @@ export const getOrganizationContext = (accesses = []) => Object.fromEntries(
 
 export const getGrantedPermissions = (accesses = []) => Object.entries(AUTHORIZATION_POLICIES)
     .filter(([, policy]) => accesses.some(access => (
-        policy.departments.includes(access.department)
-        && policy.roles.includes(access.role)
+        policy.departmentKeys.includes(access.departmentKey)
+        && policy.roleKeys.includes(access.roleKey)
     )))
     .map(([permission]) => permission);
