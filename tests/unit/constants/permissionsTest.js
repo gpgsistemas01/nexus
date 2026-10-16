@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getGrantedPermissions, PERMISSIONS } from '../../../src/constants/permissions.js';
+import {
+    DATA_SCOPES,
+    getGrantedPermissions,
+    getOrganizationContext,
+    hasDataScope,
+    PERMISSIONS
+} from '../../../src/constants/permissions.js';
 
 describe('políticas funcionales de acceso', () => {
     const operationalDepartments = ['IMPRESIÓN', 'TALLER 3D', 'PT/TRÁFICO', 'INSTALACIONES', 'ACABADOS'];
@@ -45,6 +51,49 @@ describe('políticas funcionales de acceso', () => {
         ]);
 
         expect(permissions).toEqual([]);
+    });
+
+    describe('políticas de alcance de datos', () => {
+        it.each([
+            [{ role: 'Director', department: 'IMPRESIÓN' }],
+            [{ role: 'Operador', department: 'DIRECCIÓN' }]
+        ])('concede alcance global de lectura por rol o área: %o', (access) => {
+            expect(hasDataScope([access], DATA_SCOPES.SYSTEM_WIDE_READ)).toBe(true);
+        });
+
+        it('no concede alcance global de lectura a otras asignaciones', () => {
+            expect(hasDataScope(
+                [{ role: 'Coordinador', department: 'IMPRESIÓN' }],
+                DATA_SCOPES.SYSTEM_WIDE_READ
+            )).toBe(false);
+        });
+
+        it.each([
+            [{ role: 'Administrador del sistema', department: 'IMPRESIÓN' }],
+            [{ role: 'Coordinador', department: 'ALMACÉN Y PROVEDURÍA' }]
+        ])('concede consulta de todas las salidas por política: %o', (access) => {
+            expect(hasDataScope([access], DATA_SCOPES.GOODS_ISSUES_READ_ALL)).toBe(true);
+        });
+
+        it('no amplía la consulta de salidas a coordinadores de otras áreas', () => {
+            expect(hasDataScope(
+                [{ role: 'Coordinador', department: 'IMPRESIÓN' }],
+                DATA_SCOPES.GOODS_ISSUES_READ_ALL
+            )).toBe(false);
+        });
+
+        it('deriva el contexto informativo desde las asignaciones', () => {
+            expect(getOrganizationContext([
+                { role: 'Coordinador', department: 'ALMACÉN Y PROVEDURÍA' },
+                { role: 'Operador', department: 'SISTEMAS' },
+                { role: 'Asesor de ventas', department: 'VENTAS Y PROYECTOS ESPECIALES' }
+            ])).toEqual({
+                isCoordinator: true,
+                isWarehouse: true,
+                isSystem: true,
+                isSales: true
+            });
+        });
     });
 
     it.each([

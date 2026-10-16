@@ -34,6 +34,26 @@ describe('listado de salidas por recurso', () => {
             every: { material: { type: 'MATERIAL' } }
         });
     });
+
+    it.each([
+        ['administrador del sistema', { role: 'Administrador del sistema', department: 'IMPRESIÓN' }],
+        ['coordinador de almacén', { role: 'Coordinador', department: 'ALMACÉN Y PROVEDURÍA' }]
+    ])('omite el filtro de área para %s', async (_, access) => {
+        await findAllGoodsIssues({ accesses: [access] });
+
+        expect(findMany.mock.calls[0][0].where.department).toBeUndefined();
+    });
+
+    it('conserva el filtro de área para coordinadores de otras áreas', async () => {
+        await findAllGoodsIssues({
+            accesses: [{ role: 'Coordinador', department: 'IMPRESIÓN' }]
+        });
+
+        expect(findMany.mock.calls[0][0].where.department).toEqual({
+            name: { in: ['IMPRESIÓN'] }
+        });
+    });
+
     it('el reporte omite el conteo y conserva el contexto y el alcance de área', async () => {
         const { findGoodsIssueReportRows } = await import('../../../../../src/services/warehouse/reportService.js');
         expect(await findGoodsIssueReportRows({ type: 'CONSUMABLE', accesses: [{ department: 'ÁREA' }] })).toEqual([]);

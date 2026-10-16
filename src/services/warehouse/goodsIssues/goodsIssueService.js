@@ -19,8 +19,7 @@ import { findFulfillmentStatusIdByName } from "../fulfillmentStatusService.js";
 import { buildGoodsIssueContextWhere, buildGoodsIssueDetails } from "./goodsIssueHelpers.js";
 import { handleServiceError } from "../../serviceErrorHandler.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
-import { ROLE_NAMES } from "../../../constants/roles.js";
-import { DEPARTMENT_NAMES } from "../../../constants/departments.js";
+import { DATA_SCOPES, hasDataScope } from "../../../constants/permissions.js";
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
 import { MATERIAL_TYPES } from "../../../constants/inventory.js";
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
@@ -59,12 +58,7 @@ export const findAllGoodsIssues = async ({
 
     const db = getDb();
 
-    const isAdmin = accesses.some(access => access.role === ROLE_NAMES.SYSTEM_ADMIN);
-    const isWarehouseCoordinator = accesses.some(access =>
-        access.role === ROLE_NAMES.COORDINATOR &&
-        access.department === DEPARTMENT_NAMES.WAREHOUSE_AND_SUPPLY
-    );
-    const canViewAll = isAdmin || isWarehouseCoordinator;
+    const canViewAll = hasDataScope(accesses, DATA_SCOPES.GOODS_ISSUES_READ_ALL);
     const userDepartments = accesses.map(a => a.department);
 
     const where = {

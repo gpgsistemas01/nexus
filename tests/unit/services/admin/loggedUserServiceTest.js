@@ -65,6 +65,16 @@ describe('getLoggedUser active access assignments', () => {
             department: 'ALMACÉN Y PROVEDURÍA'
         }]);
         expect(user.permissions).toContain('materials:write');
+        expect(user.scope).toEqual({
+            canReadAll: false,
+            departmentIds: ['department-1']
+        });
+        expect(user.organization).toEqual({
+            isCoordinator: false,
+            isWarehouse: true,
+            isSystem: false,
+            isSales: false
+        });
     });
 
     it('returns no logged user when every assignment has an inactive role or department', async () => {

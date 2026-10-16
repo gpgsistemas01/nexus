@@ -1,3 +1,6 @@
+import { DEPARTMENT_NAMES } from './departments.js';
+import { ROLE_NAMES } from './roles.js';
+
 export const PERMISSIONS = Object.freeze({
     MATERIALS_READ: 'materials:read',
     MATERIALS_WRITE: 'materials:write',
@@ -43,9 +46,39 @@ export const PERMISSIONS = Object.freeze({
     WASTES_PAGE_VIEW: 'wastes:page-view'
 });
 
+export const DATA_SCOPES = Object.freeze({
+    SYSTEM_WIDE_READ: 'system-wide-read',
+    GOODS_ISSUES_READ_ALL: 'goods-issues:read-all'
+});
+
 const createPolicy = ({ roles, departments }) => Object.freeze({
     roles: Object.freeze([...roles]),
     departments: Object.freeze([...departments])
+});
+
+const createAccessConditions = (conditions) => Object.freeze(
+    conditions.map(condition => Object.freeze({ ...condition }))
+);
+
+export const DATA_SCOPE_POLICIES = Object.freeze({
+    [DATA_SCOPES.SYSTEM_WIDE_READ]: createAccessConditions([
+        { role: ROLE_NAMES.DIRECTOR },
+        { department: DEPARTMENT_NAMES.MANAGEMENT }
+    ]),
+    [DATA_SCOPES.GOODS_ISSUES_READ_ALL]: createAccessConditions([
+        { role: ROLE_NAMES.SYSTEM_ADMIN },
+        {
+            role: ROLE_NAMES.COORDINATOR,
+            department: DEPARTMENT_NAMES.WAREHOUSE_AND_SUPPLY
+        }
+    ])
+});
+
+export const ORGANIZATION_CONTEXT_POLICIES = Object.freeze({
+    isCoordinator: createAccessConditions([{ role: ROLE_NAMES.COORDINATOR }]),
+    isWarehouse: createAccessConditions([{ department: DEPARTMENT_NAMES.WAREHOUSE_AND_SUPPLY }]),
+    isSystem: createAccessConditions([{ department: DEPARTMENT_NAMES.SYSTEMS }]),
+    isSales: createAccessConditions([{ department: DEPARTMENT_NAMES.SALES }])
 });
 
 // Accesos comunes de consulta y solicitudes. Almacén y Sistemas conservan además
@@ -291,6 +324,29 @@ export const getAuthorizationPolicy = (permission) => {
 
     return policy;
 };
+
+const matchesAccessConditions = (accesses, conditions) => accesses.some(access => (
+    conditions.some(condition => Object.entries(condition).every(([key, value]) => (
+        access[key] === value
+    )))
+));
+
+export const hasDataScope = (accesses = [], scope) => {
+    const conditions = DATA_SCOPE_POLICIES[scope];
+
+    if (!conditions) {
+        throw new Error(`Alcance de datos no configurado: ${scope}`);
+    }
+
+    return matchesAccessConditions(accesses, conditions);
+};
+
+export const getOrganizationContext = (accesses = []) => Object.fromEntries(
+    Object.entries(ORGANIZATION_CONTEXT_POLICIES).map(([context, conditions]) => [
+        context,
+        matchesAccessConditions(accesses, conditions)
+    ])
+);
 
 export const getGrantedPermissions = (accesses = []) => Object.entries(AUTHORIZATION_POLICIES)
     .filter(([, policy]) => accesses.some(access => (

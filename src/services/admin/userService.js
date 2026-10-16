@@ -3,7 +3,7 @@ import { UserCreateDatabaseError, UserFindDatabaseError, UserNotFound, UserUpdat
 import { getDb } from "../../repository/baseRepository.js";
 import { verifyPassword, encryptPassword } from "../../utils/encryptionUtils.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
-import { getGrantedPermissions } from "../../constants/permissions.js";
+import { getGrantedPermissions, getOrganizationContext } from "../../constants/permissions.js";
 import { hasSystemWideReadAccess } from "../../utils/authorizationUtils.js";
 import { findPersonById } from "./person/personService.js";
 
@@ -157,9 +157,6 @@ export const getLoggedUser = async (userId) => {
             department: a.department.name
         }))
     };
-    const roles = new Set(user.accesses.map(access => access.role));
-    const departments = new Set(user.accesses.map(access => access.department));
-
     return {
         ...user,
         permissions: getGrantedPermissions(user.accesses),
@@ -167,12 +164,7 @@ export const getLoggedUser = async (userId) => {
             canReadAll: hasSystemWideReadAccess(user),
             departmentIds: [...new Set(user.accesses.map(access => access.departmentId))]
         },
-        organization: {
-            isCoordinator: roles.has('Coordinador'),
-            isWarehouse: departments.has('ALMACÉN Y PROVEDURÍA'),
-            isSystem: departments.has('SISTEMAS'),
-            isSales: departments.has('VENTAS Y PROYECTOS ESPECIALES')
-        }
+        organization: getOrganizationContext(user.accesses)
     };
 }
 
