@@ -193,7 +193,7 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             const inventoryPayload = {
                 name: `IT Access Rejected ${suffix}`, supplierId: ids.supplier,
                 materialId: ids.materials, presentationId: ids.presentation, unitMeasureId: ids.unit,
-                base: 1, height: 1, maxUnitCost: 1, newStock: 1, isActive: true
+                base: 1, height: 1, maxUnitCost: 1, [resource === 'wastes' ? 'initialQuantity' : 'newStock']: 1, isActive: true
             };
             await request(app).post(`/api/warehouse/${resource}`).set('Cookie', cookie).send(inventoryPayload).expect(403);
             const itemId = resource === 'wastes' ? ids.waste : ids[resource];

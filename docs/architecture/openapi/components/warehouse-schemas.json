@@ -713,8 +713,10 @@
       "isActive": {
         "type": "boolean"
       },
-      "newStock": {
-        "type": "number"
+      "initialQuantity": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Cantidad inicial de unidades de merma. Si es positiva se guarda en WasteStockEntry.quantity y se suma al saldo; cero no genera entrada."
       },
       "observations": {
         "type": "string"
@@ -763,7 +765,7 @@
       "supplierId",
       "maxUnitCost",
       "isActive",
-      "newStock"
+      "initialQuantity"
     ],
     "description": "Origen MATERIAL en m². No se permite crear Rollo sin pesos ni sustituir el cálculo con medidas manuales. Para Rollo capture coneWeightKg, totalWeightKg del sobrante y referenceRollTotalWeightKg del rollo completo con cono. El servidor descuenta el mismo cono de ambos pesos, toma el largo del material y calcula la longitud proporcional. No envíe netos ni sampleLengthM/sampleNetWeightKg. El largo y neto de muestra se calculan sin persistirlos; esos dos campos quedan reservados a históricos. Medidas, pesos y referencia quedan inmutables. Otras presentaciones en m² usan medidas manuales sin pesos."
   },
@@ -794,7 +796,9 @@
     "type": "object",
     "properties": {
       "newStock": {
-        "type": "number"
+        "type": "number",
+        "minimum": 0,
+        "description": "Existencia final deseada tras el ajuste; corresponde a WasteStockAdjustmentDetail.newStock. No es una cantidad a sumar."
       },
       "reasonId": {
         "type": "string",

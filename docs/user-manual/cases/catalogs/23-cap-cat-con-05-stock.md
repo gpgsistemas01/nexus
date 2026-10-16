@@ -14,8 +14,8 @@
 
    ![CAP-CAT-CON-05-STOCK: ajuste de existencia](../../images/areas/sistemas/consumables/05-adjustment-stock.png)
 
-2. Seleccione una razón y capture **Nueva cantidad** y **Observaciones**.
-3. Confirme que **Nueva cantidad** sea el saldo total deseado, no una cantidad para sumar.
+2. Seleccione una razón y capture **Nuevo stock** y **Observaciones**.
+3. Confirme que **Nuevo stock** sea el saldo total deseado, no una cantidad para sumar.
 4. Seleccione **Ajustar** y compruebe el nuevo saldo en el listado antes de repetir la
    operación.
 

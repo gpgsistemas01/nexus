@@ -83,7 +83,7 @@ describe('exportación paginada de inventario', () => {
     const { response, rows } = await readReport({ search: suffix });
     const expected = offers.filter(row => row.isActive || row.currentStock !== 0).sort((a, b) => a.id.localeCompare(b.id));
 
-    expect(rows[0]).toEqual(['Proveedor', 'Material', 'Base', 'Altura', 'Existencia', 'Stock mínimo', 'Presentación', 'Conversión', 'Unidad', 'Costo unitario']);
+    expect(rows[0]).toEqual(['Proveedor', 'Material', 'Base', 'Altura', 'Stock actual', 'Stock mínimo', 'Presentación', 'Conversión', 'Unidad', 'Costo unitario']);
     expect(rows.slice(1).map(row => row[4])).toEqual(expected.map(row => row.currentStock));
     expect(rows.slice(1).map(row => row[2])).toEqual(expected.map(row => row.base));
     expect(rows[1][9]).toBe(1.234567);

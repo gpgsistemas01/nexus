@@ -61,7 +61,37 @@ flowchart TB
 
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
 | --- | --- |
-| `dtos/wasteDTO.js` | `createWasteDtoForRegister`<br/>`createWasteDtoForEdit`<br/>`createWasteDtoForStockUpdate`<br/>`createWasteDtoForStockAddition` |
+| `dtos/wasteDTO.js` | `createWasteDtoForRegister`<br/>`createWasteDtoForEdit`<br/>`createWasteDtoForStockAdjustment`<br/>`createWasteDtoForStockAddition` |
+
+### Nombres del formulario, API y persistencia
+
+El formulario, las validaciones y el DTO usan el mismo nombre para cada entrada.
+El alta requiere `initialQuantity`; `newStock` pertenece exclusivamente al ajuste.
+No hay un alias del nombre anterior en el alta. El frontend y el servidor se
+actualizan juntos. La cantidad inicial es una instrucción de entrada, no una
+columna adicional de `Waste`.
+
+| Campo del contrato | Destino o significado en la base de datos |
+| --- | --- |
+| `initialQuantity` en el alta | Con valor positivo genera `WasteStockEntry.quantity`, desde saldo cero, y actualiza `Waste.currentStock` una sola vez. Cero no genera documento. |
+| `quantity` al agregar stock | `WasteStockEntry.quantity`: unidades que se suman al saldo existente. |
+| `newStock` al ajustar | `WasteStockAdjustmentDetail.newStock`: saldo final, también aplicado a `Waste.currentStock`. |
+| `currentStock`, `previousStock`, `newStock` en respuestas/documentos | Etiquetas Stock actual, Stock anterior y Nuevo stock; conservan los nombres del esquema. |
+| `name`, `supplierId`, `minStock`, `maxUnitCost`, `isActive` | Campos homónimos de `Waste`; el alta respeta también stock mínimo y estado capturados. |
+| `materialId` | Junto con `supplierId` identifica la oferta consultada; el material se conserva como `Waste.sourceMaterialId`. |
+| `base`, `height` | Campos homónimos de `Waste`; el servidor determina las medidas finales del rollo. |
+| `coneWeightKg`, `totalWeightKg`, `referenceRollTotalWeightKg` | Campos homónimos de `Waste`: cono, total del sobrante con cono y total del rollo completo con cono. |
+| `weightKg` | Neto de la merma calculado por el servidor y guardado en `Waste.weightKg`; el cliente sólo lo muestra. |
+| `convertedQuantity` | Superficie calculada según medidas y existencias; el cliente no la fija. |
+| `observations` | Observaciones de la entrada inicial, entrada adicional o ajuste correspondiente. |
+| `reasonId` | Motivo de `WasteStockAdjustment`; sólo lo admite el DTO del ajuste. |
+
+Presentación y unidad se obtienen del material seleccionado. Los campos visuales
+`presentationDisplay` y `unitMeasureDisplay` no se envían ni crean columnas. Las
+referencias históricas `sampleLengthM` y `sampleNetWeightKg` siguen siendo de consulta.
+El DTO de ajuste y su colección de campos se denominan
+`createWasteDtoForStockAdjustment` y `wasteStockAdjustmentFields`. Un fallo de
+persistencia al agregar stock usa `WASTE_STOCK_ENTRY_DB_ERROR`.
 
 ## Variantes y límites de reutilización
 

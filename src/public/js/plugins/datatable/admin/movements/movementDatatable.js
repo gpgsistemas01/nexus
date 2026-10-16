@@ -14,9 +14,9 @@ const movementColumns = [
     { data: 'materialBase', render: formatDecimal, title: 'Base' },
     { data: 'materialHeight', render: formatDecimal, title: 'Altura' },
     { data: 'supplierName', title: 'Proveedor' },
-    { data: 'previousStock', render: formatDecimal, title: 'Stock Anterior' },
+    { data: 'previousStock', render: formatDecimal, title: 'Stock anterior' },
     { data: 'quantity', render: formatDecimal, title: 'Movimiento' },
-    { data: 'newStock', render: formatDecimal, title: 'Stock Nuevo' }
+    { data: 'newStock', render: formatDecimal, title: 'Nuevo stock' }
 ];
 
 const MOVEMENT_CONTEXTS = Object.freeze({

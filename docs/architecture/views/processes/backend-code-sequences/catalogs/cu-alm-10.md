@@ -22,6 +22,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `Domain` | control | [`wasteService.js`](../../../../../../src/services/warehouse/wastes/wasteService.js) |
 | `Measurements` | control | [`wasteHelpers.js`](../../../../../../src/services/warehouse/wastes/wasteHelpers.js) |
+| `Entry` | control | [`wasteStockEntryService.js`](../../../../../../src/services/warehouse/wastes/wasteStockEntryService.js) |
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`wasteValidations.js`](../../../../../../src/validators/forms/wasteValidations.js) |
@@ -44,7 +45,7 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>Auth: authorizeUserApi(PERMISSIONS.WASTES_READ)(req, res, next)
+    Route->>Auth: authorizeUserApi(PERMISSIONS.WASTES_WRITE)(req, res, next)
     break Identidad no vigente o permiso denegado
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
@@ -87,6 +88,7 @@ sequenceDiagram
     participant Domain@{ "type": "control" } as wasteService.js
     participant Templates@{ "type": "control" } as wasteMaterialService.js
     participant Measurements@{ "type": "control" } as wasteHelpers.js
+    participant Entry@{ "type": "control" } as wasteStockEntryService.js
     participant Socket@{ "type": "control" } as socketUtils.js
     participant ErrorHandler@{ "type": "control" } as app.js
 
@@ -102,7 +104,7 @@ sequenceDiagram
     activate Formatter
     Formatter-->>Controller: sanitizeEmptyStrings(): Object (sanitizedWasteDto)
     deactivate Formatter
-    Controller->>Domain: createWasteWithInitialStockAdjustment({ wasteDto: sanitizedWasteDto, userId: req.user.id })
+    Controller->>Domain: createWaste({ wasteDto: sanitizedWasteDto, userId: req.user.id })
     activate Domain
     Note over Domain: Consultar material y oferta dentro de la transacción<br/>Exigir tipo MATERIAL y unidad m²
     Domain->>Measurements: prepareWasteMeasurements({ wasteDto, offer })
@@ -112,10 +114,15 @@ sequenceDiagram
     alt La merma ya existe
         Domain-->>Controller: WASTE_ALREADY_EXISTS con meta.waste, sin incrementar stock
     else La merma no existe
-        Domain->>Domain: createWasteWithInitialStockAdjustment({ wasteDto, userId }) crea merma, ajuste y movimiento inicial
+        Domain->>Domain: tx.waste.create({ currentStock: 0, convertedQuantity: 0 })
+        opt Cantidad inicial positiva
+            Domain->>Entry: registerWasteStockEntry({ tx, waste, quantity: initialQuantity, userId, observations })
+            Entry-->>Domain: registerWasteStockEntry(): Promise[WasteStockEntry] con movimiento ENTRY y saldo actualizado
+            Domain->>Domain: findWasteById({ tx, id: waste.id }) obtiene el saldo final
+        end
     end
     alt Registro confirmado
-        Domain-->>Controller: createWasteWithInitialStockAdjustment(): Promise[Waste]
+        Domain-->>Controller: createWaste(): Promise[Waste]
         Controller->>Socket: emitInventoryUpdated({ context: 'waste', source: 'waste-created' })
         Controller-->>Client: HTTP 200 { waste, code: CREATED_WASTE }
     else AppError propagado
@@ -135,3 +142,7 @@ guarda `sourceMaterialId`, el total del rollo completo, pesos de merma y dimensi
 El largo y neto de muestra se usan sin persistirlos; sus columnas conservan sólo históricos. No modifica la oferta.
 Los pesos antiguos de material/proveedor se conservan como históricos y ya no se capturan
 desde el CRUD de material.
+
+La merma, su entrada EME y el movimiento se confirman en una sola transacción. Con
+cantidad cero no se genera documento, movimiento ni folio. Los ajustes AME quedan
+para la corrección administrativa de saldo.

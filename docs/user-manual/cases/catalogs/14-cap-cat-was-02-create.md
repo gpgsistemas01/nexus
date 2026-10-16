@@ -8,23 +8,25 @@
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Campos editables en modo alta:** **Buscar proveedor...**, **Buscar material de referencia...**,
-**Stock mínimo**, **Costo máximo unitario**, **Nuevo stock**, **Observaciones**,
+**Stock mínimo**, **Costo máximo unitario**, **Cantidad inicial**, **Observaciones**,
 **Activo** y, para Rollo, **Peso del cono de la merma (kg)** y **Peso de la merma con cono (kg)**, **Peso del rollo completo con cono (kg)**. El nombre, presentación y unidad
-provienen del material de referencia y la razón **Stock inicial** es automática. Use **Nueva merma**
+provienen del material de referencia. El alta no solicita un motivo de ajuste. Use **Nueva merma**
 para abrir el formulario y **Guardar** para confirmarlo.
 
 1. Seleccione el botón **Nueva merma** para abrir el formulario de registro. Observe los controles que va a usar:
 
    ![CAP-CAT-WAS-02-CREATE: formulario de registro](../../images/areas/almacen/waste/02-form-registration.png)
 
-   La captura debe renovarse para mostrar el orden actual y las medidas bloqueadas
+   La captura debe renovarse para mostrar **Cantidad inicial**, el motivo de ajuste oculto, el orden actual y las medidas bloqueadas
    de Rollo, junto con el peso del rollo completo capturado desde merma, en una sesión del entorno de prueba.
 
 2. En **Material de origen**, elija proveedor y un material en **m²**; los consumibles y las demás unidades no aparecen. Revise nombre, presentación y unidad precargados.
    Para **Rollo**, complete **Rollo completo (muestra)** con su peso total incluyendo el cono. Capture el peso del cono una sola vez (cero si no tiene) y el peso del sobrante con cono. El sistema descuenta el mismo cono de ambos totales y obtiene el largo original del material; no necesita capturar metros ni un neto de muestra.
    Ambas medidas permanecen deshabilitadas: el ancho menor procede del material y la otra medida se calcula con la proporción de la muestra. Para **Hoja** u otras presentaciones en m², capture las dos medidas manualmente.
-   Complete inventario, existencia y observaciones. Borrar un peso o el peso del rollo completo limpia el largo calculado. Después del alta, muestra, medidas y pesos quedan para consulta.
-3. Seleccione el botón **Guardar** para registrar la merma.
+   Complete inventario, **Cantidad inicial** y observaciones. El stock mínimo y el estado Activo se guardan como se capturen. Borrar un peso o el peso del rollo completo limpia el largo calculado. Después del alta, muestra, medidas y pesos quedan para consulta.
+3. Seleccione el botón **Guardar** para registrar la merma. Una cantidad positiva genera
+   una entrada con folio **EME** y suma esa cantidad una sola vez. Con cantidad cero
+   se guarda únicamente la merma, sin movimiento ni documento de entrada.
 
 Si el aviso indica que coinciden proveedor, nombre, medidas y pesos, seleccione
 **Abrir Agregar stock** en el aviso para revisar el formulario de entrada. Se

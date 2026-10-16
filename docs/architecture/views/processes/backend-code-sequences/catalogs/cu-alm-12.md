@@ -65,7 +65,7 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Router->>ValidationRules: wasteStockValidation[] — cadena ejecutada por Express
+    Router->>ValidationRules: wasteStockAdjustmentValidation[] — cadena ejecutada por Express
     Router->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }
@@ -104,16 +104,16 @@ sequenceDiagram
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 
-    Controller->>StockDto: createWasteDtoForStockUpdate(req.body)
+    Controller->>StockDto: createWasteDtoForStockAdjustment(req.body)
     activate StockDto
-    StockDto-->>Controller: createWasteDtoForStockUpdate(): Object (wasteStockDto)
+    StockDto-->>Controller: createWasteDtoForStockAdjustment(): Object (stockAdjustmentDto)
     deactivate StockDto
-    Controller->>Service: updateWasteStock({ id, wasteStockDto, userId })
+    Controller->>Service: updateWasteStock({ id, stockAdjustmentDto, userId })
     Service->>FileBaseRepository: getDb()
     FileBaseRepository-->>Service: getDb(): PrismaClient | TransactionClient — tx si se recibió
     Service->>Prisma: db.$transaction(async tx => ...)
     Service->>Prisma: tx.waste.findUnique({ where: { id } })
-    Service->>Adjustment: registerWasteStockAdjustment({ tx, waste, ...wasteStockDto, userId, include })
+    Service->>Adjustment: registerWasteStockAdjustment({ tx, waste, ...stockAdjustmentDto, userId, include })
     Adjustment->>Adjustment: calculateWasteStockAdjustmentValues({ waste, newStock })
     Adjustment->>Stock: calculateConvertedQuantity({ currentStock: newStock, base: waste.base, height: waste.height })
     Adjustment->>Stock: assertSufficientStock({ material: waste, newStock, newConvertedQuantity })

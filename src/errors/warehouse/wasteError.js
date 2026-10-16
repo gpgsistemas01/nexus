@@ -57,16 +57,16 @@ export class WasteStockAdjustmentDatabaseError extends AppError {
     }
 }
 
+export class WasteStockEntryDatabaseError extends AppError {
+
+    constructor () {
+        super('Error de base de datos al registrar la entrada de merma.', 'WASTE_STOCK_ENTRY_DB_ERROR', 500);
+    }
+}
+
 export class WasteDeleteDatabaseError extends AppError {
 
     constructor () {
         super('Error de base de datos al eliminar la merma.', 'WASTE_DELETE_DB_ERROR', 500);
-    }
-}
-
-export class WasteInitialStockReasonNotFound extends AppError {
-
-    constructor () {
-        super('Razón de stock inicial no encontrada para registrar la merma.', 'WASTE_INITIAL_STOCK_REASON_NOT_FOUND', 404);
     }
 }

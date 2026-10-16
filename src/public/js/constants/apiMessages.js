@@ -153,10 +153,14 @@ export const errorMessages = {
     MAX_UNIT_COST_INVALID_NUMBER: 'El costo máximo debe ser un número.',
     MAX_UNIT_COST_TOO_LONG: 'El costo máximo es demasiado grande.',
 
+    INITIAL_QUANTITY_REQUIRED: 'La cantidad inicial es requerida.',
+    INITIAL_QUANTITY_INVALID_NUMBER: 'La cantidad inicial debe ser un número mayor o igual que cero.',
+    INITIAL_QUANTITY_TOO_LONG: 'La cantidad inicial es demasiado grande o tiene demasiados decimales.',
+
     // 📈 NEW STOCK
-    NEW_STOCK_REQUIRED: 'El stock nuevo es requerido.',
-    NEW_STOCK_INVALID_NUMBER: 'El stock nuevo debe ser un número.',
-    NEW_STOCK_TOO_LONG: 'El stock nuevo es demasiado grande.',
+    NEW_STOCK_REQUIRED: 'El nuevo stock es requerido.',
+    NEW_STOCK_INVALID_NUMBER: 'El nuevo stock debe ser un número.',
+    NEW_STOCK_TOO_LONG: 'El nuevo stock es demasiado grande.',
 
     REQUIRED_QUANTITY: 'La cantidad es requerido.',
     INVALID_FORMAT_QUANTITY: 'La cantidad debe ser un número mayor a cero.',
@@ -244,6 +248,7 @@ export const errorMessages = {
     MATERIAL_DELETE_DB_ERROR: 'Error de base de datos al eliminar la relación entre el material y el proveedor.',
     MATERIAL_DELETE_RELATION_CONFLICT: 'No se puede eliminar la relación entre el material y el proveedor porque el material tiene historial de compras, salidas, mermas, movimientos o ajustes de stock.',
     WASTE_DELETE_DB_ERROR: 'Error de base de datos al eliminar la merma.',
+    WASTE_STOCK_ENTRY_DB_ERROR: 'Error de base de datos al registrar la entrada de merma.',
     MATERIAL_SNAPSHOT_FIND_DB_ERROR: 'Error de base de datos al buscar los datos históricos del material.',
     MATERIAL_STOCK_UPDATE_DB_ERROR: 'Error de base de datos al editar el stock del material.',
     MATERIAL_UNIT_COST_UPDATE_DB_ERROR: 'Error de base de datos al editar el costo unitario del material.',

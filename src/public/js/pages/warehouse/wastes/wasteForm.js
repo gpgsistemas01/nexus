@@ -10,15 +10,15 @@ import { useForm } from '../../../ui/forms/formUI.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
-import { wasteEditValidation, wasteStockValidation, wasteValidation } from '../../../utils/validations/validators.js';
-import { wasteCreateFields, wasteEditFields, wasteStockFields } from './wasteFields.js';
+import { wasteEditValidation, wasteStockAdjustmentValidation, wasteValidation } from '../../../utils/validations/validators.js';
+import { wasteCreateFields, wasteEditFields, wasteStockAdjustmentFields } from './wasteFields.js';
 import { isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 
 useForm({
     selector: FORM_SELECTORS.WASTE,
     normalizeData: ({ form, formData }) => {
 
-        const fields = isStockMode(form.dataset.mode) ? wasteStockFields
+        const fields = isStockMode(form.dataset.mode) ? wasteStockAdjustmentFields
             : isEditMode(form.dataset.mode) ? wasteEditFields : wasteCreateFields;
 
         if (isCreateMode(form.dataset.mode) && isRollPresentation(getPresentation(form.wasteMaterialTemplate ?? {}))) {
@@ -37,7 +37,7 @@ useForm({
     },
     getErrors: ({ form, formData }) => {
 
-        if (isStockMode(form.dataset.mode)) return validateFields(wasteStockValidation, formData);
+        if (isStockMode(form.dataset.mode)) return validateFields(wasteStockAdjustmentValidation, formData);
         if (isEditMode(form.dataset.mode)) return validateFields(wasteEditValidation, formData);
 
         return validateFields(wasteValidation, {
@@ -71,7 +71,7 @@ useForm({
             closeModal(form);
             openWasteStockAdditionModal({
                 data: existingWaste,
-                quantity: formData.newStock,
+                quantity: formData.initialQuantity,
                 observations: formData.observations
             });
         }

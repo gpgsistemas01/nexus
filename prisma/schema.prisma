@@ -250,6 +250,7 @@ model Waste {
   @@index([unitMeasureId])
 }
 
+/// Corrección de saldo con folio AME-AAAA-consecutivo; conserva ajustes históricos de alta.
 model WasteStockAdjustment {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
@@ -325,7 +326,7 @@ model WasteMovement {
   @@index([wasteIssueId])
 }
 
-/// Documento individual que respalda una entrada incremental de merma.
+/// Entrada inicial o incremental de merma con folio EME-AAAA-consecutivo.
 /// Conserva el folio, actor, captura y saldos; el movimiento relacionado permanece inmutable.
 model WasteStockEntry {
   id              String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid

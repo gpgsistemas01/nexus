@@ -3,7 +3,7 @@ import { getErrorMessage } from '../../../../../../src/public/js/constants/apiMe
 
 import {
   wasteEditValidation,
-  wasteStockValidation,
+  wasteStockAdjustmentValidation,
   wasteValidation
 } from '../../../../../../src/public/js/utils/validations/validators.js';
 
@@ -38,10 +38,19 @@ describe('validadores del CRUD de mermas', () => {
   });
 
   it.each([
+    ['cantidad inicial en cero', 0, null],
+    ['cantidad inicial positiva', 3, null],
+    ['cantidad inicial ausente', undefined, expect.any(String)],
+    ['cantidad inicial negativa', -0.01, expect.any(String)]
+  ])('%s', (_, value, expected) => {
+    expect(wasteValidation.initialQuantity(value)).toEqual(expected);
+  });
+
+  it.each([
     ['stock en cero', 0, null],
     ['stock negativo', -0.01, expect.any(String)]
   ])('%s', (_, value, expected) => {
-    expect(wasteStockValidation.newStock(value)).toEqual(expected);
+    expect(wasteStockAdjustmentValidation.newStock(value)).toEqual(expected);
   });
   it.each([undefined, null, '', '0.01', 0.01, '0.75', '99.99', 100, '100.00', '999.99'])('acepta peso opcional o decimal válido: %s', value => {
     expect(wasteValidation.totalWeightKg(value, { coneWeightKg: value == null || value === '' ? null : 0, presentationName: 'ROLLO' })).toBeNull();

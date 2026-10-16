@@ -5,10 +5,10 @@ import { createControllerTestApp } from '../../../../helpers/controllerTestHarne
 import { validate } from '../../../../../src/middleware/validatorMiddleware.js';
 import { wasteValidation } from '../../../../../src/validators/forms/wasteValidations.js';
 
-const createWasteWithInitialStockAdjustment = vi.fn();
+const createWaste = vi.fn();
 
 vi.mock('../../../../../src/services/warehouse/wastes/wasteService.js', () => ({
-  createWasteWithInitialStockAdjustment,
+  createWaste,
   findAllWastes: vi.fn(),
   updateWaste: vi.fn(),
   updateWasteStock: vi.fn()
@@ -47,7 +47,7 @@ const validBody = {
   height: '1',
   minStock: '0',
   maxUnitCost: '25',
-  newStock: '0',
+  initialQuantity: '0',
   isActive: true,
   observations: 'Registro inicial'
 };
@@ -55,7 +55,7 @@ const validBody = {
 describe('wasteController registration boundaries', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    createWasteWithInitialStockAdjustment.mockResolvedValue({ id: 'waste-1' });
+    createWaste.mockResolvedValue({ id: 'waste-1' });
   });
 
   it('acepta exactamente los máximos numéricos y de texto permitidos', async () => {
@@ -67,7 +67,7 @@ describe('wasteController registration boundaries', () => {
         ...validBody,
         base: '99999999.999999',
         height: '99999999.999999',
-        newStock: '99999999.999999',
+        initialQuantity: '99999999.999999',
         coneWeightKg: '0',
         totalWeightKg: '100',
         referenceRollTotalWeightKg: 120,
@@ -80,11 +80,11 @@ describe('wasteController registration boundaries', () => {
       waste: { id: 'waste-1' },
       code: 'CREATED_WASTE'
     });
-    expect(createWasteWithInitialStockAdjustment).toHaveBeenCalledWith({
+    expect(createWaste).toHaveBeenCalledWith({
       wasteDto: expect.objectContaining({
         base: 99999999.999999,
         height: 99999999.999999,
-        newStock: 99999999.999999,
+        initialQuantity: 99999999.999999,
         coneWeightKg: 0,
         totalWeightKg: 100,
         observations
@@ -94,16 +94,17 @@ describe('wasteController registration boundaries', () => {
   });
 
   it.each([
+    ['partición de equivalencia', 'cantidad inicial ausente aunque se envíe un saldo final', { initialQuantity: undefined, newStock: 3 }, 'initialQuantity'],
     ['partición de equivalencia', 'nombre vacío', { name: '' }, 'name'],
     ['partición de equivalencia', 'UUID de material inválido', { materialId: 'not-a-uuid' }, 'materialId'],
     ['partición de equivalencia', 'UUID de proveedor inválido', { supplierId: 'not-a-uuid' }, 'supplierId'],
     ['valor límite', 'dimensión en cero', { base: '0' }, 'base'],
-    ['partición de equivalencia', 'stock no numérico', { newStock: 'NaN' }, 'newStock'],
-    ['valor límite', 'stock negativo', { newStock: '-0.000001' }, 'newStock'],
+    ['partición de equivalencia', 'stock no numérico', { initialQuantity: 'NaN' }, 'initialQuantity'],
+    ['valor límite', 'stock negativo', { initialQuantity: '-0.000001' }, 'initialQuantity'],
     ['valor límite', 'costo máximo negativo', { maxUnitCost: '-0.000001' }, 'maxUnitCost'],
     ['partición de equivalencia', 'costo máximo nulo', { maxUnitCost: null }, 'maxUnitCost'],
-    ['valor límite', 'primer entero sobre el máximo', { newStock: '100000000' }, 'newStock'],
-    ['valor límite', 'primer decimal sobre el máximo', { newStock: '1.0000001' }, 'newStock'],
+    ['valor límite', 'primer entero sobre el máximo', { initialQuantity: '100000000' }, 'initialQuantity'],
+    ['valor límite', 'primer decimal sobre el máximo', { initialQuantity: '1.0000001' }, 'initialQuantity'],
     ['valor límite', '501 caracteres de observaciones', { observations: 'a'.repeat(501) }, 'observations']
   ])('%s: rechaza %s antes de intentar registrar', async (_strategy, _case, overrides, errorField) => {
     const response = await request(app)
@@ -116,7 +117,7 @@ describe('wasteController registration boundaries', () => {
       code: 'VALIDATION_ERROR',
       errors: { [errorField]: expect.anything() }
     });
-    expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
+    expect(createWaste).not.toHaveBeenCalled();
   });
   it.each([undefined, null, '', '0.01'])('admite peso desconocido o el mínimo positivo: %s', weightKg => {
     return request(app).post('/wastes').send({ ...validBody, ...(weightKg ? { referenceRollTotalWeightKg: 120 } : {}), coneWeightKg: weightKg == null || weightKg === '' ? weightKg : 0, totalWeightKg: weightKg }).expect(200);
@@ -151,7 +152,7 @@ describe('wasteController registration boundaries', () => {
   ])('rechaza peso %s antes de normalizarlo y devuelve el código correcto', async (weightKg, code) => {
     const response = await request(app).post('/wastes').send({ ...validBody, coneWeightKg: 0, totalWeightKg: weightKg }).expect(400);
     expect(response.body.errors.totalWeightKg.code).toBe(code);
-    expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
+    expect(createWaste).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -164,7 +165,7 @@ describe('wasteController registration boundaries', () => {
   ])('rechaza captura incompleta o incoherente %s antes del servicio', async (weights, field, code) => {
     const response = await request(app).post('/wastes').send({ ...validBody, ...weights }).expect(400);
     expect(response.body.errors[field].code).toBe(code);
-    expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
+    expect(createWaste).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -177,7 +178,7 @@ describe('wasteController registration boundaries', () => {
   ])('valida la referencia con códigos por campo sin ejecutar el servicio: %j', async (reference, field, code) => {
     const response = await request(app).post('/wastes').send({ ...validBody, referenceRollTotalWeightKg: 2.25, coneWeightKg: 0.25, totalWeightKg: 1.25, ...reference }).expect(400);
     expect(response.body.errors[field].code).toBe(code);
-    expect(createWasteWithInitialStockAdjustment).not.toHaveBeenCalled();
+    expect(createWaste).not.toHaveBeenCalled();
   });
 
 });

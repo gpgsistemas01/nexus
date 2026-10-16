@@ -151,6 +151,11 @@ export const errorMap = {
         }),
         INVALID_FORMAT: 'INVOICE_INVALID_FORMAT'
     },
+    initialQuantity: {
+        REQUIRED: 'INITIAL_QUANTITY_REQUIRED',
+        INVALID_NUMBER: 'INITIAL_QUANTITY_INVALID_NUMBER',
+        TOO_LONG: 'INITIAL_QUANTITY_TOO_LONG'
+    },
     newStock: {
         REQUIRED: 'NEW_STOCK_REQUIRED',
         INVALID_NUMBER: 'NEW_STOCK_INVALID_NUMBER',

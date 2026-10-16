@@ -20,7 +20,7 @@ const { registerWasteStockEntry } = await import(
 describe('documento de entrada de existencia de merma', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    generateYearlyReferenceNumber.mockResolvedValue('ENT-MER-2026-0001');
+    generateYearlyReferenceNumber.mockResolvedValue('EME-2026-000001');
     applyWasteMovement.mockResolvedValue({
       id: 'movement-1',
       details: [
@@ -50,7 +50,7 @@ describe('documento de entrada de existencia de merma', () => {
     });
     expect(create).toHaveBeenCalledWith({
       data: {
-        referenceNumber: 'ENT-MER-2026-0001',
+        referenceNumber: 'EME-2026-000001',
         waste: { connect: { id: 'waste-1' } },
         createdBy: { connect: { id: 'user-1' } },
         movement: { connect: { id: 'movement-1' } },

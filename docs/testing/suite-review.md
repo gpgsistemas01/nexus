@@ -28,6 +28,15 @@ y 19 de integración); la clasificación del corte original de 113 se conserva a
 
 ## Inventario completo y decisión por archivo
 
+La revisión de altas/folios de merma reutiliza suites existentes: `wasteControllerFlowTest.js`
+mantiene las reglas de creación, edición y ajuste y reemplaza la expectativa obsoleta
+de ajuste inicial por entrada EME, con partición cero/positivo. `wasteWeightDbTest.js`
+añade persistencia del documento, ausencia de efectos con cero y rollback; conserva
+las comprobaciones de pesos y permisos existentes. `referencePrefixesDbTest.js`
+conserva las migraciones previas y añade la nueva conversión con relaciones,
+contadores y colisiones reales. El inventario activo continúa en 114 archivos;
+no se retiran pruebas históricas ni se crea una suite duplicada.
+
 Este inventario corresponde a los 113 archivos activos de la revisión: 95 unitarios
 y 18 de integración. No incluye los dos archivos ya retirados en la primera pasada,
 que se conservan identificados más abajo. Los números describen este corte de revisión,
@@ -212,7 +221,7 @@ Ubicación: `tests/integration/controllers/`.
 | [clientControllerDbTest.js](../../tests/integration/controllers/clientControllerDbTest.js) | **M** | TE / PE | Crear/listar/editar cliente y traducir inexistente a CLIENT_NOT_FOUND. | Mantener HTTP más lectura Prisma; no equivale al test de registro de middleware. |
 | [goodsIssueControllerDbTest.js](../../tests/integration/controllers/goodsIssueControllerDbTest.js) | **D** | TD / TE | Aislamiento de tipos, escrituras permitidas/prohibidas, stock, folios y rollback. | Mantener todos los escenarios; mover pruebas de migración a migrations sin borrarlas y evitar migration.split(';')[1]. Llamar filas de reporte a la consulta que no descarga XLSX. |
 | [goodsReceiptContextDbTest.js](../../tests/integration/controllers/goodsReceiptContextDbTest.js) | **M** | TD / TE | Compras homogéneas frente a mixtas/vacías, tipo fijo, folios concurrentes y fallo atómico. | Mantener; las filas del servicio de reporte no prueban el archivo Excel. |
-| [inventoryReportControllerDbTest.js](../../tests/integration/controllers/inventoryReportControllerDbTest.js) | **M** | VF / PE | XLSX con más de 5000 filas, orden/alcance/tipo, vacío y sin cambios de stock. | Mantener cruce de bloque y nombres iguales. Usa router real/cookie firmada; no reemplazarlo por respuesta mock. |
+| [inventoryReportControllerDbTest.js](../../tests/integration/controllers/inventoryReportControllerDbTest.js) | **M** | VF / PE | XLSX con más de 5000 filas, columna Stock actual, orden/alcance/tipo, vacío y sin cambios de stock. | Mantener cruce de bloque y nombres iguales. Usa router real/cookie firmada; no reemplazarlo por respuesta mock. |
 | [materialControllerDbTest.js](../../tests/integration/controllers/materialControllerDbTest.js) | **M** | TD / PE | Pieza/consumible sin dimensiones, conversión, compra contextual y origen m² de merma. | Mantener guardia del servidor ante ID forzado; el filtro de Select2 no lo sustituye. |
 | [movementContextDbTest.js](../../tests/integration/controllers/movementContextDbTest.js) | **M** | TD / PE | Listado y XLSX por tipo, paginación/filtros y HTTP 401/403. | Mantener: monta routers reales y JWT/cookies; es evidencia adicional a los controllers con actor inyectado. |
 | [supplierControllerDbTest.js](../../tests/integration/controllers/supplierControllerDbTest.js) | **M** | TE | Alta, consulta y edición del proveedor con persistencia real. | Mantener; la normalización genérica de catálogos no sustituye este dominio. |
@@ -351,3 +360,9 @@ La configuración anterior de CI ejecutaba integración mediante `test:db`, sin 
 La configuración actual añade ambas suites y reportes JUnit por separado. El artefacto y el log
 se relacionan con el commit y el ambiente del job conforme al formato `EP-*` del plan.
 Una suite omitida o bloqueada no se declara aprobada. No se versionan los XML de corridas.
+
+La revisión del contrato de merma conserva las suites existentes: el payload separa
+`initialQuantity` (alta), `quantity` (entrada adicional) y `newStock` (saldo de ajuste).
+Se amplían particiones de cantidad ausente/fuera de rango y la lectura persistida de
+`minStock`/`isActive`; no se agregan pruebas de estructura HTML ni otra suite de CRUD.
+La correspondencia entre contrato y persistencia se registra en `DP-MER-005`.

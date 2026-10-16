@@ -1,6 +1,6 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
-import { addWasteStock, createWasteWithInitialStockAdjustment, findAllWastes, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
-import { createWasteDtoForEdit, createWasteDtoForRegister, createWasteDtoForStockAddition, createWasteDtoForStockUpdate } from '../../../dtos/wasteDTO.js';
+import { addWasteStock, createWaste, findAllWastes, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
+import { createWasteDtoForEdit, createWasteDtoForRegister, createWasteDtoForStockAddition, createWasteDtoForStockAdjustment } from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
@@ -49,7 +49,7 @@ export const registerWaste = async (req, res) => {
     const wasteDto = createWasteDtoForRegister(req.body);
     const sanitizedWasteDto = sanitizeEmptyStrings(wasteDto);
 
-    const waste = await createWasteWithInitialStockAdjustment({
+    const waste = await createWaste({
         wasteDto: sanitizedWasteDto,
         userId: req.user.id
     });
@@ -80,12 +80,12 @@ export const editWaste = async (req, res) => {
 
 export const editWasteStock = async (req, res) => {
 
-    const wasteStockDto = createWasteDtoForStockUpdate(req.body);
-    const sanitizedWasteStockDto = sanitizeEmptyStrings(wasteStockDto);
+    const stockAdjustmentDto = createWasteDtoForStockAdjustment(req.body);
+    const sanitizedStockAdjustmentDto = sanitizeEmptyStrings(stockAdjustmentDto);
 
     const waste = await updateWasteStock({
         id: req.params.id,
-        wasteStockDto: sanitizedWasteStockDto,
+        stockAdjustmentDto: sanitizedStockAdjustmentDto,
         userId: req.user.id
     });
 
@@ -98,8 +98,8 @@ export const editWasteStock = async (req, res) => {
 };
 
 export const registerWasteStockAddition = async (req, res) => {
-    const entryDto = createWasteDtoForStockAddition(req.body);
-    const waste = await addWasteStock({ id: req.params.id, entryDto, userId: req.user.id });
+    const stockEntryDto = createWasteDtoForStockAddition(req.body);
+    const waste = await addWasteStock({ id: req.params.id, stockEntryDto, userId: req.user.id });
 
     emitInventoryUpdated({ context: 'waste', source: 'waste-stock-added' });
 

@@ -82,7 +82,7 @@ export const wasteEditValidation = {
     ...wasteSecondaryDataValidation
 };
 
-export const wasteStockValidation = createInventoryStockValidation({
+export const wasteStockAdjustmentValidation = createInventoryStockValidation({
     validateStock: validateNonNegativeNumber,
     stockFieldName: 'El nuevo stock de merma'
 });
@@ -108,8 +108,8 @@ export const wasteValidation = {
     base: value => validatePositiveNumber(value, 'La base de la merma'),
     height: value => validatePositiveNumber(value, 'La altura de la merma'),
     ...wasteSecondaryDataValidation,
-    newStock: wasteStockValidation.newStock,
-    observations: wasteStockValidation.observations,
+    initialQuantity: value => validateNonNegativeNumber(value, 'La cantidad inicial de merma'),
+    observations: wasteStockAdjustmentValidation.observations,
 }
 
 export const loginValidation = {

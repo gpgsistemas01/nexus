@@ -350,6 +350,7 @@
     },
     "post": {
       "operationId": "postWarehouseWastes",
+      "description": "Crea la merma con initialQuantity; con cantidad inicial positiva genera una entrada EME y un movimiento ENTRY en la misma transacción. Cantidad cero no genera documento, movimiento ni folio; no requiere motivo de ajuste. minStock e isActive se conservan según la captura.",
       "security": [
         {
           "cookieAuth": []
@@ -498,7 +499,8 @@
             "format": "uuid"
           }
         }
-      ]
+      ],
+      "description": "Corrige el saldo total mediante newStock, la existencia final deseada, y registra un ajuste AME. No suma una cantidad incremental."
     }
   },
   "/api/warehouse/waste-issues": {
@@ -1866,7 +1868,8 @@
             "format": "uuid"
           }
         }
-      ]
+      ],
+      "description": "Suma quantity al saldo actual mediante una entrada EME; conserva cantidad, saldos, actor y observaciones."
     }
   },
   "/api/warehouse/consumables/{id}": {

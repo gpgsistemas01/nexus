@@ -83,7 +83,7 @@ Los diagramas y el diccionario se regeneran con `npm run docs:architecture` y se
 comprueban con `npm run docs:check`. No se editan manualmente. Una restricción de
 columna no sustituye una regla de negocio ni concede permisos a un actor.
 
-## Folios de salidas por contexto
+## Folios de documentos por contexto
 
 Cada serie mantiene su contador por prefijo y año en `ReferenceNumberCounter`.
 El formato es `PREFIJO-AAAA-consecutivo`, con seis dígitos como mínimo; por ejemplo,
@@ -97,6 +97,19 @@ conservan continuidad sin alargar el prefijo.
 | Salida de merma | `WasteIssue` | `SME` |
 | Compra de materiales | `GoodsReceipt`, `MATERIAL` | `CMA` |
 | Compra de consumibles | `GoodsReceipt`, `CONSUMABLE` | `CCO` |
+| Entrada inicial o adicional de merma | `WasteStockEntry` | `EME` |
+| Corrección de existencia de merma | `WasteStockAdjustment` | `AME` |
+
+El alta de merma crea existencia cero y, si la cantidad capturada es positiva,
+reutiliza el servicio de entrada para aplicar una sola vez la cantidad y generar
+documento y movimiento ENTRY en la misma transacción. Con cantidad cero no genera
+documento, movimiento ni consume folio. El ajuste AME corresponde a corregir un saldo.
+
+`20261016120000_normalize_waste_stock_reference_prefixes` normaliza `AJU-MER` a `AME`
+y `ENT-MER` a `EME`, también en referencias antiguas de movimientos, con un mínimo
+de seis dígitos. Preserva los años, consecutivos, UUID, relaciones, saldos y fechas;
+los ajustes históricos de alta siguen siendo ajustes. Mantiene el mayor contador
+emitido o consumido de cada año/serie y revierte todo ante una colisión.
 
 Las columnas e índices existentes admiten estos folios; no se agregan columnas.
 `20261012180000_shorten_issue_and_purchase_reference_prefixes` normaliza salidas

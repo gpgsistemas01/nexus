@@ -4,7 +4,7 @@ import {
   createWasteDtoForEdit,
   createWasteDtoForRegister,
   createWasteDtoForStockAddition,
-  createWasteDtoForStockUpdate
+  createWasteDtoForStockAdjustment
 } from '../../../src/dtos/wasteDTO.js';
 
 describe('wasteDTO', () => {
@@ -35,18 +35,25 @@ describe('wasteDTO', () => {
       minStock: '1',
       maxUnitCost: '10',
       isActive: true,
-      newStock: '4',
+      initialQuantity: '4',
       coneWeightKg: '0.25',
       totalWeightKg: '1.5',
       referenceRollTotalWeightKg: '2.25',
       sampleLengthM: '999',
       sampleNetWeightKg: '999',
-      weightKg: '999'
-    })).toMatchObject({ name: 'Recorte confirmado', coneWeightKg: 0.25, totalWeightKg: 1.5, referenceRollTotalWeightKg: 2.25 });
+      weightKg: '999',
+      newStock: '999',
+      quantity: '999',
+      reasonId: 'reason-1'
+    })).toEqual({
+      name: 'Recorte confirmado', materialId: 'material-1', supplierId: 'supplier-1',
+      base: 2, height: 3, minStock: 1, maxUnitCost: 10, isActive: true, initialQuantity: 4,
+      coneWeightKg: 0.25, totalWeightKg: 1.5, referenceRollTotalWeightKg: 2.25
+    });
   });
 
   it('normaliza las observaciones igual en ajustes y adiciones de stock', () => {
-    expect(createWasteDtoForStockUpdate({
+    expect(createWasteDtoForStockAdjustment({
       newStock: '8',
       reasonId: 'reason-1',
       observations: '  Conteo físico  '

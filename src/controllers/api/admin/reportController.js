@@ -25,9 +25,9 @@ const MOVEMENT_REPORT_COLUMNS = [
     'Base',
     'Altura',
     'Proveedor',
-    'Stock Anterior',
+    'Stock anterior',
     'Movimiento',
-    'Stock Nuevo'
+    'Nuevo stock'
 ];
 
 const mapMovementReportRow = (row, index) => [

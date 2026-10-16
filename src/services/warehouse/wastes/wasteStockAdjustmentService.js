@@ -8,14 +8,12 @@ import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 
 const calculateWasteStockAdjustmentValues = ({
     waste,
-    newStock,
-    previousStock = toNumber(waste.currentStock) || 0,
-    previousConvertedQuantity = toNumber(waste.convertedQuantity) || 0
+    newStock
 }) => {
-    const adjustedPreviousStock = normalizeDecimal(toNumber(previousStock) || 0);
+    const adjustedPreviousStock = normalizeDecimal(toNumber(waste.currentStock) || 0);
     const adjustedNewStock = normalizeDecimal(toNumber(newStock) || 0);
     const difference = normalizeDecimal(adjustedNewStock - adjustedPreviousStock);
-    const adjustedPreviousConvertedQuantity = normalizeDecimal(toNumber(previousConvertedQuantity) || 0);
+    const adjustedPreviousConvertedQuantity = normalizeDecimal(toNumber(waste.convertedQuantity) || 0);
     const newConvertedQuantity = normalizeDecimal(calculateConvertedQuantity({
         currentStock: adjustedNewStock,
         base: waste.base,
@@ -54,9 +52,6 @@ export const registerWasteStockAdjustment = async ({
     userId,
     observations,
     newStock,
-    previousStock,
-    previousConvertedQuantity,
-    updateStock = true,
     include = undefined
 }) => {
     let referenceNumber = null;
@@ -64,9 +59,7 @@ export const registerWasteStockAdjustment = async ({
     try {
         const values = calculateWasteStockAdjustmentValues({
             waste,
-            newStock,
-            previousStock,
-            previousConvertedQuantity
+            newStock
         });
         const wasteId = waste.id;
         const adjustmentType = values.difference >= 0
@@ -123,8 +116,6 @@ export const registerWasteStockAdjustment = async ({
             data: { movement: { connect: { id: movement.id } } },
             include: { details: true, movement: true }
         });
-
-        if (!updateStock) return waste;
 
         return tx.waste.update({
             where: { id: wasteId },

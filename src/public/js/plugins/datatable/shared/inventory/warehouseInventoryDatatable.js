@@ -8,7 +8,7 @@ export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, can
             <tr>
                 <th rowspan="2">Material</th>
                 <th colspan="2" data-responsive-group="measures">Medidas</th>
-                <th rowspan="2">Existencia</th>
+                <th rowspan="2">Stock actual</th>
                 <th rowspan="2">Stock Mínimo</th>
                 <th rowspan="2">Presentación</th>
                 <th colspan="2" data-responsive-group="conversion">Conversión</th>

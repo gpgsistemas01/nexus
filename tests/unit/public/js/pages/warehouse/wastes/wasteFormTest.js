@@ -35,7 +35,19 @@ beforeEach(() => {
 describe('confirmación de merma existente', () => {
     const waste = { id: 'existing-waste', name: 'Lona' };
     const duplicate = { data: { code: 'WASTE_ALREADY_EXISTS', meta: { waste } } };
-    const formData = { newStock: '3', observations: 'Nueva entrada' };
+    const formData = { initialQuantity: '3', observations: 'Nueva entrada' };
+
+    it.each([
+        ['create', { initialQuantity: '3', observations: 'Captura', isActive: true }],
+        ['edit-stock', { newStock: '8', reasonId: 'reason-1', observations: 'Captura' }],
+        ['edit', { isActive: true }]
+    ])('envía únicamente los campos de cantidad correspondientes al modo %s', (mode, expected) => {
+        form.dataset.mode = mode;
+        const payload = state.config.normalizeData({ form, formData: {
+            initialQuantity: '3', newStock: '8', quantity: '2', reasonId: 'reason-1', observations: 'Captura'
+        } });
+        expect(payload).toEqual(expected);
+    });
 
     it('confirma y abre el modal existente con la captura sin registrar stock', async () => {
         state.submit.mockRejectedValue(duplicate);
@@ -66,7 +78,7 @@ describe('confirmación de merma existente', () => {
     it('con cantidad cero permite abrir el modal para capturar una cantidad positiva', async () => {
         state.submit.mockRejectedValue(duplicate);
         state.confirmation.mockResolvedValue({ isConfirmed: true });
-        await state.config.sendRequest({ form, formData: { ...formData, newStock: '0' } });
+        await state.config.sendRequest({ form, formData: { ...formData, initialQuantity: '0' } });
         expect(state.openAddition).toHaveBeenCalledExactlyOnceWith({ data: waste, quantity: '0', observations: 'Nueva entrada' });
         expect(state.add).not.toHaveBeenCalled();
     });
@@ -100,7 +112,7 @@ describe('confirmación de merma existente', () => {
 
     it('incluye peso del rollo completo y dimensiones finales, excluyendo el neto y los pesos históricos del material', () => {
         const payload = state.config.normalizeData({ form, formData: {
-            name: 'Lona', base: '1.5', height: '10', newStock: '3', coneWeightKg: '0.25', totalWeightKg: '1.25',
+            name: 'Lona', base: '1.5', height: '10', initialQuantity: '3', coneWeightKg: '0.25', totalWeightKg: '1.25',
             referenceRollTotalWeightKg: '2.25', sampleLengthM: '999', sampleNetWeightKg: '999', weightKg: '1', observations: 'Entrada'
         } });
         expect(payload).toMatchObject({ base: '1.5', height: '10', coneWeightKg: '0.25', totalWeightKg: '1.25', referenceRollTotalWeightKg: '2.25' });

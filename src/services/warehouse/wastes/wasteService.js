@@ -1,10 +1,7 @@
 import { findPage } from '../../../repository/paginationRepository.js';
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteAlreadyExists, WasteInitialStockReasonNotFound, WasteMaterialInvalid, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteUpdateDatabaseError, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
+import { WasteAlreadyExists, WasteMaterialInvalid, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteStockEntryDatabaseError, WasteUpdateDatabaseError, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
-import { toNumber } from '../../../utils/formattersUtils.js';
-import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
-import { findInitialStockAdjustmentReason } from '../reasonService.js';
 import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { registerWasteStockEntry } from './wasteStockEntryService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
@@ -152,7 +149,7 @@ export const findAllWastes = async ({
     });
 };
 
-export const createWasteWithInitialStockAdjustment = async ({
+export const createWaste = async ({
     wasteDto,
     userId
 }) => {
@@ -180,10 +177,6 @@ export const createWasteWithInitialStockAdjustment = async ({
             const existingWaste = await findWasteByIdentity({ tx, supplierId: wasteDto.supplierId, name: wasteDto.name, base, height, coneWeightKg: coneWeightKg ?? null, totalWeightKg: wasteDto.totalWeightKg ?? null });
             if (existingWaste) throw new WasteAlreadyExists({ waste: existingWaste });
 
-            const initialStockReason = await findInitialStockAdjustmentReason({ tx });
-
-            if (!initialStockReason) throw new WasteInitialStockReasonNotFound();
-
             const waste = await tx.waste.create({
                 data: {
                     name: wasteDto.name,
@@ -191,6 +184,8 @@ export const createWasteWithInitialStockAdjustment = async ({
                     presentation: { connect: { id: material.presentation.id } },
                     unitMeasure: { connect: { id: material.unitMeasure.id } },
                     maxUnitCost: wasteDto.maxUnitCost,
+                    minStock: wasteDto.minStock,
+                    isActive: wasteDto.isActive,
                     base,
                     height,
                     sourceMaterial: { connect: { id: material.id } },
@@ -198,32 +193,27 @@ export const createWasteWithInitialStockAdjustment = async ({
                     totalWeightKg: wasteDto.totalWeightKg ?? null,
                     referenceRollTotalWeightKg: wasteDto.referenceRollTotalWeightKg ?? null,
                     weightKg,
-                    currentStock: wasteDto.newStock,
-                    convertedQuantity: calculateConvertedQuantity({
-                        currentStock: wasteDto.newStock,
-                        base,
-                        height
-                    })
+                    currentStock: 0,
+                    convertedQuantity: 0
                 }
             });
 
-            await registerWasteStockAdjustment({
+            // Sin existencia no hay entrada ni folio; la cantidad positiva se aplica una sola vez.
+            if (wasteDto.initialQuantity === 0) return waste;
+
+            await registerWasteStockEntry({
                 tx,
                 waste,
-                reasonId: initialStockReason.id,
                 userId,
                 observations: wasteDto.observations,
-                newStock: toNumber(waste.currentStock) || 0,
-                previousStock: 0,
-                previousConvertedQuantity: 0,
-                updateStock: false
+                quantity: wasteDto.initialQuantity
             });
 
-            return waste;
+            return findWasteById({ tx, id: waste.id });
         });
 
         logServiceInfo(serviceLogger, {
-            operation: 'warehouse.wasteService.createWasteWithInitialStockAdjustment',
+            operation: 'warehouse.wasteService.createWaste',
             ...getModelLogContext('waste', { userId, ...wasteDto, id: waste.id })
         }, 'Merma registrada correctamente');
 
@@ -231,7 +221,7 @@ export const createWasteWithInitialStockAdjustment = async ({
 
     } catch (err) {
         logServiceError(serviceLogger, err, {
-            operation: 'warehouse.wasteService.createWasteWithInitialStockAdjustment',
+            operation: 'warehouse.wasteService.createWaste',
             ...getModelLogContext('waste', { userId, ...wasteDto })
         }, 'Error específico al registrar merma en transacción');
 
@@ -296,7 +286,7 @@ export const updateWaste = async ({
 
 export const updateWasteStock = async ({
     id,
-    wasteStockDto,
+    stockAdjustmentDto,
     userId
 }) => {
 
@@ -310,17 +300,17 @@ export const updateWasteStock = async ({
             return registerWasteStockAdjustment({
                 tx,
                 waste: currentWaste,
-                reasonId: wasteStockDto.reasonId,
+                reasonId: stockAdjustmentDto.reasonId,
                 userId,
-                observations: wasteStockDto.observations,
-                newStock: wasteStockDto.newStock,
+                observations: stockAdjustmentDto.observations,
+                newStock: stockAdjustmentDto.newStock,
                 include: WASTE_INCLUDE
             });
         });
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.wasteService.updateWasteStock',
-            ...getModelLogContext('wasteStock', { id, userId, ...wasteStockDto })
+            ...getModelLogContext('wasteStock', { id, userId, ...stockAdjustmentDto })
         }, 'Stock de merma ajustado correctamente');
 
         return waste;
@@ -328,7 +318,7 @@ export const updateWasteStock = async ({
     } catch (err) {
         logServiceError(serviceLogger, err, {
             operation: 'warehouse.wasteService.updateWasteStock',
-            ...getModelLogContext('wasteStock', { id, userId, ...wasteStockDto })
+            ...getModelLogContext('wasteStock', { id, userId, ...stockAdjustmentDto })
         });
 
         handleWasteServiceError({
@@ -338,15 +328,15 @@ export const updateWasteStock = async ({
     }
 };
 
-export const addWasteStock = async ({ id, entryDto, userId }) => {
+export const addWasteStock = async ({ id, stockEntryDto, userId }) => {
     try {
         const waste = await getDb().$transaction(async (tx) => {
             const currentWaste = await findWasteById({ tx, id });
             await registerWasteStockEntry({
                 tx,
                 waste: currentWaste,
-                quantity: entryDto.quantity,
-                observations: entryDto.observations,
+                quantity: stockEntryDto.quantity,
+                observations: stockEntryDto.observations,
                 userId
             });
             return findWasteById({ tx, id });
@@ -354,15 +344,15 @@ export const addWasteStock = async ({ id, entryDto, userId }) => {
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.wasteService.addWasteStock',
-            ...getModelLogContext('wasteStockEntry', { id, userId, ...entryDto })
+            ...getModelLogContext('wasteStockEntry', { id, userId, ...stockEntryDto })
         }, 'Stock de merma agregado correctamente');
 
         return waste;
     } catch (err) {
         logServiceError(serviceLogger, err, {
             operation: 'warehouse.wasteService.addWasteStock',
-            ...getModelLogContext('wasteStockEntry', { id, userId, ...entryDto })
+            ...getModelLogContext('wasteStockEntry', { id, userId, ...stockEntryDto })
         });
-        handleWasteServiceError({ err, fallbackError: new WasteStockAdjustmentDatabaseError() });
+        handleWasteServiceError({ err, fallbackError: new WasteStockEntryDatabaseError() });
     }
 };

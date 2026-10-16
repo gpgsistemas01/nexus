@@ -7,13 +7,9 @@ import { WASTE_SAMPLE_FIELDS } from '../../public/js/constants/inventory.js';
 const hasRollWeightCapture = data => ['coneWeightKg', 'totalWeightKg', 'referenceRollTotalWeightKg']
     .some(field => data[field] !== undefined && data[field] !== null && data[field] !== '');
 
-const wasteStockDataValidation = [
+export const wasteStockAdjustmentValidation = [
     validateNonNegativeNumber('newStock'),
-    createInventoryObservationsValidation()
-];
-
-export const wasteStockValidation = [
-    ...wasteStockDataValidation,
+    createInventoryObservationsValidation(),
     validateUUID('reasonId')
 ];
 
@@ -47,5 +43,6 @@ export const wasteValidation = [
     validatePositiveNumberOptional('base'),
     validatePositiveNumberOptional('height'),
     ...wasteSecondaryDataValidation,
-    ...wasteStockDataValidation
+    validateNonNegativeNumber('initialQuantity'),
+    createInventoryObservationsValidation()
 ];

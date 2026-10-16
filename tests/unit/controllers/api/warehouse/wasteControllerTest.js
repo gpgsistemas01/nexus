@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const createWasteWithInitialStockAdjustment = vi.fn();
+const createWaste = vi.fn();
 const findAllWastes = vi.fn();
 const updateWaste = vi.fn();
 const updateWasteStock = vi.fn();
@@ -8,7 +8,7 @@ const addWasteStock = vi.fn();
 const findWasteMaterialTemplates = vi.fn();
 
 vi.mock('../../../../../src/services/warehouse/wastes/wasteService.js', () => ({
-  createWasteWithInitialStockAdjustment,
+  createWaste,
   addWasteStock,
   findAllWastes,
   updateWaste,
@@ -119,25 +119,25 @@ describe('wasteController', () => {
         base: '1',
         height: '2',
         convertedQuantity: '999',
-        newStock: '3',
+        initialQuantity: '3',
         reasonId: 'client-reason-id',
         observations: '  Registro inicial  '
       },
       user: { id: 'user-1' }
     };
     const res = createResponse();
-    createWasteWithInitialStockAdjustment.mockResolvedValue(waste);
+    createWaste.mockResolvedValue(waste);
 
     await registerWaste(req, res);
 
-    expect(createWasteWithInitialStockAdjustment).toHaveBeenCalledWith({
+    expect(createWaste).toHaveBeenCalledWith({
       wasteDto: {
         name: 'Recorte confirmado',
         materialId: 'material-1',
         supplierId: 'supplier-1',
         base: 1,
         height: 2,
-        newStock: 3,
+        initialQuantity: 3,
         observations: 'Registro inicial'
       },
       userId: 'user-1'
@@ -177,7 +177,7 @@ describe('wasteController', () => {
 
     expect(updateWasteStock).toHaveBeenCalledWith({
       id: 'waste-1',
-      wasteStockDto: { newStock: 4, reasonId: 'reason-1', observations: 'Conteo físico' },
+      stockAdjustmentDto: { newStock: 4, reasonId: 'reason-1', observations: 'Conteo físico' },
       userId: 'user-1'
     });
     expect(res.json).toHaveBeenCalledWith({ waste, code: 'UPDATED_WASTE' });
@@ -197,7 +197,7 @@ describe('wasteController', () => {
 
     expect(addWasteStock).toHaveBeenCalledWith({
       id: 'waste-1',
-      entryDto: { quantity: 2, observations: 'Recortes de producción' },
+      stockEntryDto: { quantity: 2, observations: 'Recortes de producción' },
       userId: 'user-1'
     });
     expect(res.json).toHaveBeenCalledWith({ waste, code: 'UPDATED_WASTE' });

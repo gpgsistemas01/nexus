@@ -8,7 +8,7 @@ const verifyApiTokenRequired = vi.fn();
 const validate = vi.fn();
 const wasteValidation = [vi.fn()];
 const wasteEditValidation = [vi.fn()];
-const wasteStockValidation = [vi.fn()];
+const wasteStockAdjustmentValidation = [vi.fn()];
 const wasteStockAdditionValidation = [vi.fn()];
 const getWasteMaterialTemplates = vi.fn();
 const getAllWastes = vi.fn();
@@ -33,7 +33,7 @@ vi.mock('../../../../../src/middleware/validatorMiddleware.js', () => ({ validat
 vi.mock('../../../../../src/validators/forms/wasteValidations.js', () => ({
   wasteEditValidation,
   wasteStockAdditionValidation,
-  wasteStockValidation,
+  wasteStockAdjustmentValidation,
   wasteValidation
 }));
 
@@ -94,7 +94,7 @@ describe('wasteApiRoute', () => {
     expect(patch).toHaveBeenCalledWith(
       '/:id/stock',
       verifyApiTokenRequired,
-      wasteStockValidation,
+      wasteStockAdjustmentValidation,
       validate,
       `authorize:${ PERMISSIONS.WASTES_ADJUST_STOCK }`,
       editWasteStock

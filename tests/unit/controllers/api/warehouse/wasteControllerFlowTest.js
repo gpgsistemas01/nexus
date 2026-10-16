@@ -7,8 +7,8 @@ const wasteFindUnique = vi.fn();
 const wasteUpdate = vi.fn();
 const wasteStockAdjustmentCreate = vi.fn();
 const wasteStockAdjustmentUpdate = vi.fn();
+const wasteStockEntryCreate = vi.fn();
 const findSupplierMaterialByIds = vi.fn();
-const findInitialStockAdjustmentReason = vi.fn();
 const generateYearlyReferenceNumber = vi.fn();
 const throwIfReferenceNumberAlreadyExists = vi.fn();
 const createWasteMovement = vi.fn();
@@ -31,10 +31,6 @@ vi.mock('../../../../../src/services/warehouse/materials/supplierMaterialService
   findSupplierMaterialByIds
 }));
 
-vi.mock('../../../../../src/services/warehouse/reasonService.js', () => ({
-  findInitialStockAdjustmentReason
-}));
-
 vi.mock('../../../../../src/services/document/referenceNumberService.js', () => ({
   generateYearlyReferenceNumber,
   throwIfReferenceNumberAlreadyExists
@@ -48,7 +44,8 @@ vi.mock('../../../../../src/services/warehouse/wastes/wasteMovementService.js', 
 const {
   editWaste,
   editWasteStock,
-  registerWaste
+  registerWaste,
+  registerWasteStockAddition
 } = await import('../../../../../src/controllers/api/warehouse/wasteController.js');
 
 const createResponse = () => {
@@ -110,14 +107,17 @@ describe('wasteController complete flow', () => {
       wasteStockAdjustment: {
         create: wasteStockAdjustmentCreate,
         update: wasteStockAdjustmentUpdate
-      }
+      },
+      wasteStockEntry: { create: wasteStockEntryCreate }
     }));
-    wasteCreate.mockResolvedValue(createWaste());
+    wasteCreate.mockImplementation(async ({ data }) => createWaste(data));
     wasteFindFirst.mockResolvedValue(null);
     wasteFindUnique.mockResolvedValue(createWaste());
     wasteUpdate.mockResolvedValue(createWaste({ currentStock: 7, convertedQuantity: 42 }));
     wasteStockAdjustmentCreate.mockResolvedValue({ id: 'adjustment-1', details: [{ id: 'detail-1' }] });
     wasteStockAdjustmentUpdate.mockResolvedValue({ id: 'adjustment-1', details: [{ id: 'detail-1' }], movement: { id: 'movement-1' } });
+    wasteStockEntryCreate.mockResolvedValue({ id: 'entry-1' });
+    applyWasteMovement.mockResolvedValue({ id: 'movement-1', details: [{ wasteId: 'waste-1', previousStock: 0, newStock: 5 }] });
     findSupplierMaterialByIds.mockResolvedValue({
       isActive: true,
       material: {
@@ -131,12 +131,11 @@ describe('wasteController complete flow', () => {
       maxUnitCost: 18.5
       }
     });
-    findInitialStockAdjustmentReason.mockResolvedValue({ id: 'initial-reason-1' });
-    generateYearlyReferenceNumber.mockResolvedValue('AJU-MER-2026-000001');
+    generateYearlyReferenceNumber.mockImplementation(async ({ type }) => `${type}-2026-000001`);
     createWasteMovement.mockResolvedValue({ id: 'movement-1' });
   });
 
-  it('crea merma desde controller calculando stock convertido inicial y registrando ajuste inicial', async () => {
+  it('registra una entrada inicial con saldo cero y aplica la cantidad una sola vez', async () => {
     const req = {
       body: {
         name: 'Recorte confirmado',
@@ -148,7 +147,9 @@ describe('wasteController complete flow', () => {
         base: '2',
         height: '3',
         maxUnitCost: '18.5',
-        newStock: '5',
+        initialQuantity: '5',
+        minStock: '2',
+        isActive: false,
         observations: '  Stock inicial  ',
         reasonId: 'client-reason-id'
       },
@@ -159,40 +160,63 @@ describe('wasteController complete flow', () => {
     await registerWaste(req, res);
 
     expect(generateYearlyReferenceNumber).toHaveBeenCalledWith({
-      type: 'AJU-MER',
+      type: 'EME',
       tx: expect.any(Object)
     });
     expect(wasteCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
         name: 'Recorte confirmado',
-        currentStock: 5,
+        currentStock: 0,
         maxUnitCost: 18.5,
+        minStock: 2,
+        isActive: false,
         presentation: { connect: { id: 'presentation-1' } },
         unitMeasure: { connect: { id: 'unit-measure-1' } },
-        convertedQuantity: 30
+        convertedQuantity: 0
       })
     }));
-    expect(wasteStockAdjustmentCreate).toHaveBeenCalledWith(expect.objectContaining({
+    expect(applyWasteMovement).toHaveBeenCalledWith(expect.objectContaining({
+      movementType: 'ENTRY',
+      details: [{ wasteId: 'waste-1', quantity: 5, convertedQuantity: 30 }]
+    }));
+    expect(wasteStockEntryCreate).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({
-        reason: { connect: { id: 'initial-reason-1' } },
-        details: {
-          create: expect.objectContaining({
-            previousStock: 0,
-            newStock: 5,
-            previousConvertedQuantity: 0,
-            newConvertedQuantity: 30,
-            convertedDifference: 30
-          })
-        }
+        referenceNumber: 'EME-2026-000001',
+        createdBy: { connect: { id: 'user-1' } },
+        quantity: 5,
+        previousStock: 0,
+        newStock: 5,
+        observations: 'Stock inicial'
       })
     }));
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'CREATED_WASTE' }));
+    expect(wasteStockAdjustmentCreate).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      code: 'CREATED_WASTE', waste: expect.objectContaining({ currentStock: 5, convertedQuantity: 30 })
+    }));
+  });
+
+  it('crea una merma sin existencia sin documento, movimiento ni consumo de folio', async () => {
+    const res = createResponse();
+    await registerWaste({
+      body: { name: 'Sin existencia', materialId: 'material-1', supplierId: 'supplier-1',
+        base: 2, height: 3, initialQuantity: 0, coneWeightKg: 0.25, totalWeightKg: 1.25, referenceRollTotalWeightKg: 1.25 },
+      user: { id: 'user-1' }
+    }, res);
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      waste: expect.objectContaining({ currentStock: 0, convertedQuantity: 0 })
+    }));
+    expect(generateYearlyReferenceNumber).not.toHaveBeenCalled();
+    expect(wasteStockEntryCreate).not.toHaveBeenCalled();
+    expect(wasteStockAdjustmentCreate).not.toHaveBeenCalled();
+    expect(applyWasteMovement).not.toHaveBeenCalled();
+    expect(createWasteMovement).not.toHaveBeenCalled();
   });
 
   it('rechaza un proveedor inactivo obtenido con la oferta sin crear registros', async () => {
     findSupplierMaterialByIds.mockResolvedValueOnce({ isActive: true, supplier: { isActive: false } });
     await expect(registerWaste({
-      body: { name: 'Recorte', materialId: 'material-1', supplierId: 'supplier-1', base: 2, height: 3, newStock: 1 },
+      body: { name: 'Recorte', materialId: 'material-1', supplierId: 'supplier-1', base: 2, height: 3, initialQuantity: 1 },
       user: { id: 'user-1' }
     }, createResponse())).rejects.toMatchObject({ code: 'SUPPLIER_INACTIVE_CONFLICT', statusCode: 409 });
     expect(wasteCreate).not.toHaveBeenCalled();
@@ -293,7 +317,7 @@ describe('wasteController complete flow', () => {
     await editWasteStock(req, res);
 
     expect(generateYearlyReferenceNumber).toHaveBeenCalledWith({
-      type: 'AJU-MER',
+      type: 'AME',
       tx: expect.any(Object)
     });
     expect(wasteStockAdjustmentCreate).toHaveBeenCalledWith(expect.objectContaining({
@@ -333,7 +357,7 @@ describe('wasteController complete flow', () => {
         supplierId: 'supplier-1',
         base: '2',
         height: '3',
-        newStock: '0'
+        initialQuantity: '0'
       },
       user: { id: 'user-1' }
     };
@@ -342,5 +366,13 @@ describe('wasteController complete flow', () => {
       code: 'WASTE_ALREADY_EXISTS',
       statusCode: 409
     });
+  });
+
+  it('identifica un fallo de persistencia al agregar stock como error de entrada', async () => {
+    wasteStockEntryCreate.mockRejectedValueOnce(new Error('database unavailable'));
+    await expect(registerWasteStockAddition({
+      params: { id: 'waste-1' }, body: { quantity: '2' }, user: { id: 'user-1' }
+    }, createResponse())).rejects.toMatchObject({ code: 'WASTE_STOCK_ENTRY_DB_ERROR', statusCode: 500 });
+    expect(wasteStockAdjustmentCreate).not.toHaveBeenCalled();
   });
 });

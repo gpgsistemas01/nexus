@@ -1,7 +1,7 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { editWaste, editWasteStock, getAllWastes, getWasteMaterialTemplates, registerWaste, registerWasteStockAddition } from '../../../controllers/api/warehouse/wasteController.js';
-import { wasteEditValidation, wasteStockAdditionValidation, wasteStockValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
+import { wasteEditValidation, wasteStockAdditionValidation, wasteStockAdjustmentValidation, wasteValidation } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
@@ -52,7 +52,7 @@ router.post(
 router.patch(
     '/:id/stock',
     verifyApiTokenRequired,
-    wasteStockValidation,
+    wasteStockAdjustmentValidation,
     validate,
     authorizeUserApi(PERMISSIONS.WASTES_ADJUST_STOCK),
     editWasteStock

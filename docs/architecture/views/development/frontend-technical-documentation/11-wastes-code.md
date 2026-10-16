@@ -72,3 +72,20 @@ cancelar conserva el alta. Este recorrido no se modifica.
 El orden visible es origen, datos de merma, rollo completo, pesos del sobrante,
 medidas, inventario y existencias/observaciones. Material y consumible mantienen su
 comportamiento de dimensiones por unidad.
+
+En el alta se muestra **Cantidad inicial** (`initialQuantity`); en el ajuste,
+**Nuevo stock** (`newStock`) y el motivo. El campo de la otra
+operación queda oculto y deshabilitado. El modal de Agregar stock conserva
+`quantity`, que representa unidades adicionales. Las listas de campos y validaciones
+seleccionan un único contrato según el modo; no se cambian nombres de inputs al abrir
+el modal. Al confirmar un duplicado se precarga `quantity` desde `initialQuantity`,
+sin guardar hasta confirmar el modal de entrada. Véase la
+[correspondencia con la base de datos](../backend-technical-documentation/11-wastes-code.md#nombres-del-formulario-api-y-persistencia).
+
+La terminología de stock se comparte con listados e historial: **Stock actual**
+es el saldo guardado (`currentStock`); **Nuevo stock** es el saldo posterior
+(`newStock`), capturado en un ajuste o calculado en Agregar stock; **Stock anterior**
+es el saldo previo de un movimiento (`previousStock`). En Agregar stock ambos
+saldos son informativos y sólo se envía **Cantidad a agregar** (`quantity`). Las
+etiquetas de las tablas y sus exportaciones usan los mismos términos. Véase el
+[glosario](../../../../requirements/business-glossary.md).

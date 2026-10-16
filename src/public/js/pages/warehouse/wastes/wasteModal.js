@@ -1,14 +1,12 @@
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
-import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
 import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { openModal } from "../../../ui/modalUI.js";
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
-import { wasteDataFields, wasteSecondaryDataFields, wasteStockFields } from './wasteFields.js';
+import { wasteDataFields, wasteSecondaryDataFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 import { configureWasteWeightFields, displayWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
 
-const initialStockReasonName = 'Stock inicial';
 const stockDataSectionSelector = '.stock-data-section';
 const materialTemplateFieldSelector = '.waste-material-template-field';
 
@@ -38,6 +36,7 @@ export const openWasteModal = ({
     ['coneWeightKg', 'totalWeightKg', 'weightKg', 'referenceRollTotalWeightKg', 'sampleLengthM', 'sampleNetWeightKg'].forEach(field => { form.elements[field].value = data?.[field] ?? ''; });
     form.elements.isActive.checked = data?.isActive ?? true;
     form.elements.observations.value = '';
+    form.elements.initialQuantity.value = '';
     form.elements.newStock.value = '';
 
     setFormSectionVisibility({
@@ -68,13 +67,29 @@ export const openWasteModal = ({
     });
     setFormDisabled({ 
         form, 
-        fields: wasteStockFields, 
+        fields: ['observations'],
         isDisabled: isEditing
     });
-    setReasonVisualOption({
-        selector: `${ MODAL_SELECTORS.WASTE } ${ SELECT_SELECTORS.REASON }`,
-        name: !isAdjustingStock ? initialStockReasonName : null,
-        isDisabled: !isAdjustingStock
+    setFormSectionVisibility({
+        form,
+        selector: '[name="initialQuantity"]',
+        isVisible: isCreating,
+        fieldNames: ['initialQuantity'],
+        clearValues: true
+    });
+    setFormSectionVisibility({
+        form,
+        selector: '[name="newStock"]',
+        isVisible: isAdjustingStock,
+        fieldNames: ['newStock'],
+        clearValues: true
+    });
+    setFormSectionVisibility({
+        form,
+        selector: SELECT_SELECTORS.REASON,
+        isVisible: isAdjustingStock,
+        fieldNames: ['reasonId'],
+        clearValues: true
     });
     modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = isEditing
         ? 'Editar merma'

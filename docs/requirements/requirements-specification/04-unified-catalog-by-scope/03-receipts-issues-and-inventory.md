@@ -55,6 +55,15 @@ Las salidas de merma conservan sus recursos y movimientos propios.
 
 ### Criterios de salida y ajuste
 
+- **Alta y entradas de merma:** registrar una merma con cantidad positiva genera una
+  entrada `EME-AAAA-consecutivo` y un movimiento ENTRY; se incrementa una sola vez.
+  Con cantidad cero sólo se crea la merma. Agregar stock utiliza la misma serie EME.
+  Una corrección administrativa de saldo genera `AME-AAAA-consecutivo` y movimiento
+  ADJUSTMENT, con motivo. Ambos usan el generador anual y un mínimo de seis dígitos.
+- **Historia de merma:** se normalizan `ENT-MER` → `EME` y `AJU-MER` → `AME` sin
+  reclasificar documentos, modificar saldos o reiniciar consecutivos. Una colisión
+  revierte la normalización completa; los contadores históricos se conservan.
+
 - **Acceso operativo:** Impresión, Taller 3D, PT/Tráfico, Instalaciones y Acabados
   pueden consultar inventario y crear/editar solicitudes de salida con rol autorizado.
   La edición conserva las restricciones por estado; solicitar o editar no descuenta

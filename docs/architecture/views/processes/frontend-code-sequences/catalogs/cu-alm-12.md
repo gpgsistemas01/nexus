@@ -126,14 +126,14 @@ sequenceDiagram
     Form->>View: normalizeData({ form, formData }) — callback configurado
     View-->>Form: normalizeData(): Object — datos normalizados
     Form->>View: getErrors({ form, formData }) — callback configurado
-    View->>FormUtils: validateFields(wasteStockValidation, formData)
+    View->>FormUtils: validateFields(wasteStockAdjustmentValidation, formData)
     FormUtils-->>View: validateFields(): Object — errores por campo
     View-->>Form: getErrors(): Object — errores por campo
     Form->>FileFormErrorsUI: normalizeFormErrors({ form, errors }) — callback por defecto
     Form->>FileFormErrorsUI: toggleErrorMessages(form, errors)
     Form->>FormUtils: hasValidationErrors(errors)
     FormUtils-->>Form: hasValidationErrors(): boolean
-    alt wasteStockValidation devuelve errores
+    alt wasteStockAdjustmentValidation devuelve errores
         Form->>FileFormErrorsUI: scrollToFirstFormError(form)
         Form-->>Browser: conservar datos y errores, no se realiza request
     else Formulario válido

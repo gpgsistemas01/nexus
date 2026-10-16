@@ -112,7 +112,7 @@ export const exportWarehouseReportExcel = async (req, res) => {
             'Material',
             'Base',
             'Altura',
-            'Existencia',
+            'Stock actual',
             'Stock mínimo',
             'Presentación',
             'Conversión',

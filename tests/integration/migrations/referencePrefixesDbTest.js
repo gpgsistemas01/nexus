@@ -10,11 +10,11 @@ const migration = migrationSql('20261012180000_shorten_issue_and_purchase_refere
 const tables = ['GoodsIssue', 'GoodsReceipt', 'WasteIssue', 'ReferenceNumberCounter'];
 
 // Real columns, defaults and unique indexes, isolated from permanent test fixtures.
-const withTables = async callback => {
+const withTables = async (callback, tableNames = [...tables, 'WasteStockAdjustment']) => {
     const connection = new pg.Client({ connectionString: resolveDatabaseUrl({ nodeEnv: 'test', preferDirectUrl: true }) });
     await connection.connect();
     try {
-        for (const table of [...tables, 'WasteStockAdjustment']) {
+        for (const table of tableNames) {
             await connection.query(`CREATE TEMP TABLE "${table}" (LIKE public."${table}" INCLUDING ALL)`);
         }
         await callback(connection);
@@ -46,9 +46,9 @@ const insertReceipt = async (connection, referenceNumber, type = 'MATERIAL') => 
     return id;
 };
 
-const snapshot = async connection => {
+const snapshot = async (connection, tableNames = tables) => {
     const result = {};
-    for (const table of tables) {
+    for (const table of tableNames) {
         result[table] = (await connection.query(`SELECT * FROM "${table}" ORDER BY "id"`)).rows;
     }
     return result;
@@ -149,5 +149,108 @@ describe('migración incremental de cinco series cortas', () => {
             await connection.query(migration);
             expect(await snapshot(connection)).toEqual(before);
         });
+    });
+});
+
+const wasteMigration = migrationSql('20261016120000_normalize_waste_stock_reference_prefixes');
+const wasteTables = ['WasteStockAdjustment', 'WasteStockEntry', 'WasteMovement',
+    'WasteStockAdjustmentDetail', 'WasteMovementDetail', 'ReferenceNumberCounter'];
+
+const insertWasteDocument = async (connection, table, referenceNumber, { movementId = randomUUID(), movementType = 'ENTRY' } = {}) => {
+    const id = randomUUID();
+    const actor = randomUUID();
+    if (table === 'WasteMovement') {
+        await connection.query(`INSERT INTO "WasteMovement" ("id", "referenceNumber", "type", "updatedAt")
+            VALUES ($1, $2, $3, '2026-10-16')`, [id, referenceNumber, movementType]);
+    } else if (table === 'WasteStockAdjustment') {
+        await connection.query(`INSERT INTO "WasteStockAdjustment"
+            ("id", "referenceNumber", "type", "status", "reasonId", "createdById", "approvedById", "wasteMovementId", "updatedAt")
+            VALUES ($1, $2, 'INCREASE', 'APPLIED', $3, $3, $3, $4, '2026-10-16')`, [id, referenceNumber, actor, movementId]);
+    } else {
+        await connection.query(`INSERT INTO "WasteStockEntry"
+            ("id", "referenceNumber", "wasteId", "createdById", "wasteMovementId", "materialName", "quantity", "previousStock", "newStock", "updatedAt")
+            VALUES ($1, $2, $3, $3, $4, 'Merma histórica', 2, 3, 5, '2026-10-16')`, [id, referenceNumber, actor, movementId]);
+    }
+    return id;
+};
+
+describe('migración de entradas y ajustes de merma a EME y AME', () => {
+    it('normaliza folios, conserva naturaleza, relaciones y saldos y continúa cada serie anual', async () => {
+        await withTables(async connection => {
+            const movementId = await insertWasteDocument(connection, 'WasteMovement', null, { movementType: 'ADJUSTMENT' });
+            const adjustmentId = await insertWasteDocument(connection, 'WasteStockAdjustment', 'AJU-MER-2026-0007', { movementId });
+            await insertWasteDocument(connection, 'WasteStockAdjustment', 'AME-2026-000004');
+            await insertWasteDocument(connection, 'WasteStockEntry', 'ENT-MER-2026-1000001');
+            await insertWasteDocument(connection, 'WasteStockEntry', 'REFERENCIA-EXTERNA');
+            await insertWasteDocument(connection, 'WasteMovement', 'ENT-MER-2025-0008');
+            await insertWasteDocument(connection, 'WasteMovement', 'AJU-MER-2026-000120', { movementType: 'ADJUSTMENT' });
+            const detailId = randomUUID();
+            const wasteId = randomUUID();
+            await connection.query(`INSERT INTO "WasteStockAdjustmentDetail"
+                ("id", "wasteStockAdjustmentId", "wasteId", "materialName", "previousStock", "newStock", "difference",
+                 "previousConvertedQuantity", "newConvertedQuantity", "convertedDifference")
+                VALUES ($1, $2, $3, 'Merma histórica', 0, 5, 5, 0, 30, 30)`, [detailId, adjustmentId, wasteId]);
+            await connection.query(`INSERT INTO "WasteMovementDetail"
+                ("id", "wasteId", "movementId", "wasteStockAdjustmentDetailId", "quantity", "previousStock", "newStock", "updatedAt")
+                VALUES ($1, $2, $3, $4, 5, 0, 5, '2026-10-16')`, [randomUUID(), wasteId, movementId, detailId]);
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('AJU-MER', 2026, 80), ('AME', 2026, 100), ('ENT-MER', 2026, 90), ('SME', 2026, 999)`);
+            const before = await snapshot(connection, wasteTables);
+
+            await connection.query(wasteMigration);
+            const after = await snapshot(connection, wasteTables);
+            for (const table of wasteTables.filter(name => name !== 'ReferenceNumberCounter')) {
+                expect(after[table]).toEqual(before[table].map(row => ({ ...row,
+                    ...('referenceNumber' in row && { referenceNumber: row.referenceNumber?.replace(
+                        /^(AJU-MER|ENT-MER)-(\d{4})-(\d+)$/,
+                        (_, prefix, year, number) => `${prefix === 'AJU-MER' ? 'AME' : 'EME'}-${year}-${number.padStart(6, '0')}`
+                    ) ?? null })
+                })));
+            }
+            expect(await counter(connection, 'AME')).toBe(120);
+            expect(await counter(connection, 'EME')).toBe(1000001);
+            expect(await counter(connection, 'EME', 2025)).toBe(8);
+            expect(await counter(connection, 'AJU-MER')).toBe(80);
+            expect(await counter(connection, 'SME')).toBe(999);
+            await connection.query(wasteMigration);
+            expect(await snapshot(connection, wasteTables)).toEqual(after);
+        }, wasteTables);
+    });
+
+    it('conserva contadores mayores y traslada años sin documentos', async () => {
+        await withTables(async connection => {
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('AJU-MER', 2026, 80), ('AME', 2026, 100), ('ENT-MER', 2025, 90), ('EME', 2025, 110),
+                ('ENT-MER', 2027, 50), ('AJU-MER', 2025, 40)`);
+            await connection.query(wasteMigration);
+            expect(await counter(connection, 'AME')).toBe(100);
+            expect(await counter(connection, 'AME', 2025)).toBe(40);
+            expect(await counter(connection, 'EME', 2025)).toBe(110);
+            expect(await counter(connection, 'EME', 2027)).toBe(50);
+        }, wasteTables);
+    });
+
+    it.each(['WasteStockAdjustment', 'WasteStockEntry', 'WasteMovement'])('revierte toda la migración si hay colisión en %s', async table => {
+        await withTables(async connection => {
+            await insertWasteDocument(connection, 'WasteStockAdjustment', 'AJU-MER-2026-000003');
+            await insertWasteDocument(connection, 'WasteStockEntry', 'ENT-MER-2026-000004');
+            const legacy = table === 'WasteStockAdjustment' ? 'AJU-MER' : 'ENT-MER';
+            const current = table === 'WasteStockAdjustment' ? 'AME' : 'EME';
+            await insertWasteDocument(connection, table, `${legacy}-2026-1`);
+            await insertWasteDocument(connection, table, `${current}-2026-000001`);
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES ('ENT-MER', 2026, 80)`);
+            const before = await snapshot(connection, wasteTables);
+            await expect(connection.query(wasteMigration)).rejects.toMatchObject({ code: '23505' });
+            await connection.query('ROLLBACK');
+            expect(await snapshot(connection, wasteTables)).toEqual(before);
+        }, wasteTables);
+    });
+
+    it('no crea documentos ni contadores en una instalación vacía', async () => {
+        await withTables(async connection => {
+            const before = await snapshot(connection, wasteTables);
+            await connection.query(wasteMigration);
+            expect(await snapshot(connection, wasteTables)).toEqual(before);
+        }, wasteTables);
     });
 });

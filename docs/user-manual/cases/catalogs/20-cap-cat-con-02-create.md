@@ -9,7 +9,7 @@
 [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
 **Campos editables:** **Nombre**, proveedor, presentación, unidad, **Stock Mínimo**,
-**Costo Máximo**, **Nueva cantidad**, **Observaciones** y **Activo**. El formulario no
+**Costo Máximo**, **Nuevo stock**, **Observaciones** y **Activo**. El formulario no
 muestra dimensiones y conserva **Stock inicial** como razón automática.
 
 1. Seleccione **Nuevo consumible** y compruebe el formulario:

@@ -16,3 +16,9 @@
 El alta calcula el neto conforme a `RF-MER-011` y el largo proporcional a la muestra
 conforme a `RF-MER-012` y `RF-MER-013`. Guarda la muestra en la merma sin modificar
 los pesos históricos de material/proveedor.
+
+La cantidad inicial positiva se registra mediante un documento de entrada `EME` y
+su movimiento, conservando saldo anterior cero y saldo final igual a lo capturado.
+Todo se confirma en una transacción. Con cantidad cero se crea únicamente la merma,
+sin documento, movimiento ni consumo de folio. El alta no solicita motivo de ajuste;
+las correcciones de saldo corresponden a `CU-ALM-12` y generan `AME`.

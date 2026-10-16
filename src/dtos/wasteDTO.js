@@ -3,7 +3,6 @@ import { toNumber } from '../utils/formattersUtils.js';
 const buildWasteRegistrationDataDto = (body = {}) => ({
     materialId: body.materialId,
     supplierId: body.supplierId,
-    ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {}),
     base: toNumber(body.base),
     height: toNumber(body.height),
     ...Object.fromEntries(['coneWeightKg', 'totalWeightKg', 'referenceRollTotalWeightKg'].filter(field => Object.prototype.hasOwnProperty.call(body, field))
@@ -26,17 +25,12 @@ const buildWasteObservationsDto = (body = {}) => (
         : {}
 );
 
-const buildWasteStockDto = (body = {}, { includeReason = true } = {}) => ({
-    newStock: Number(body.newStock),
-    ...buildWasteObservationsDto(body),
-    ...includeReason && Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {}
-});
-
 export const createWasteDtoForRegister = (body = {}) => ({
     ...buildWasteRegistrationDataDto(body),
     ...buildWasteIdentityDto(body),
     ...buildWasteSecondaryDataDto(body),
-    ...buildWasteStockDto(body, { includeReason: false })
+    initialQuantity: Number(body.initialQuantity),
+    ...buildWasteObservationsDto(body)
 });
 
 export const createWasteDtoForEdit = (body = {}) => ({
@@ -44,7 +38,11 @@ export const createWasteDtoForEdit = (body = {}) => ({
     ...buildWasteSecondaryDataDto(body)
 });
 
-export const createWasteDtoForStockUpdate = (body = {}) => buildWasteStockDto(body);
+export const createWasteDtoForStockAdjustment = (body = {}) => ({
+    newStock: Number(body.newStock),
+    ...buildWasteObservationsDto(body),
+    ...(Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {})
+});
 
 export const createWasteDtoForStockAddition = (body = {}) => ({
     quantity: Number(body.quantity),

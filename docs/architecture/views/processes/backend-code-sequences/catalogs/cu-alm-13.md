@@ -108,9 +108,9 @@ sequenceDiagram
 
     Controller->>StockDto: createWasteDtoForStockAddition(req.body)
     activate StockDto
-    StockDto-->>Controller: createWasteDtoForStockAddition(): Object (entryDto)
+    StockDto-->>Controller: createWasteDtoForStockAddition(): Object (stockEntryDto)
     deactivate StockDto
-    Controller->>Service: addWasteStock({ id, entryDto, userId })
+    Controller->>Service: addWasteStock({ id, stockEntryDto, userId })
     Service->>FileBaseRepository: getDb()
     FileBaseRepository-->>Service: getDb(): PrismaClient | TransactionClient — tx si se recibió
     Service->>Prisma: db.$transaction(async tx => ...)
