@@ -2,7 +2,17 @@ import { verifyAccessToken } from "../services/jwtService.js";
 import { errorMap } from "../messages/codeMessages.js";
 import { clearAccessCookie } from "../utils/cookiesUtils.js";
 import { getLoggedUser } from "../services/admin/userService.js";
-import { getAuthorizationPolicy } from "../constants/permissions.js";
+
+const loadAuthenticatedUser = async (req, userId) => {
+    const user = await getLoggedUser(userId);
+
+    if (user) {
+        req.userId = user.id;
+        req.user = user;
+    }
+
+    return user;
+};
 
 export const getAuthTokenInfo = (req, res) => {
 
@@ -25,7 +35,7 @@ export const getAuthTokenInfo = (req, res) => {
     return tokenInfo;
 }
 
-export const verifyCookiesAuthTokenRequired = (req, res, next) => {
+export const verifyCookiesAuthTokenRequired = async (req, res, next) => {
 
     const tokenInfo = getAuthTokenInfo(req, res);
 
@@ -36,40 +46,37 @@ export const verifyCookiesAuthTokenRequired = (req, res, next) => {
         return res.redirect('/revocar-sesion');
     }
 
-    req.userId = tokenInfo.id;
+    const user = await loadAuthenticatedUser(req, tokenInfo.id);
+
+    if (!user) return res.redirect('/error/404');
 
     next();
 }
 
-export const verifyApiTokenRequired = (req, res, next) => {
+export const verifyApiTokenRequired = async (req, res, next) => {
 
     const tokenInfo = getAuthTokenInfo(req, res);
 
     if (!tokenInfo) return res.status(401).json({ code: errorMap.message.INVALID_AUTH });
 
-    req.userId = tokenInfo.id;
+    const user = await loadAuthenticatedUser(req, tokenInfo.id);
+
+    if (!user) return res.status(401).json({ code: errorMap.message.INVALID_AUTH });
+
     next();
 }
 
 const createAuthorizeMiddleware = (
     forbiddenHandler,
     invalidAuthHandler = forbiddenHandler
-) => (permission) => async (req, res, next) => {
+) => (permission) => (req, res, next) => {
 
-    const user = await getLoggedUser(req.userId);
+    const user = req.user;
 
     if (!user) return invalidAuthHandler(req, res);
 
-    const policy = getAuthorizationPolicy(permission);
+    if (!user.permissions.includes(permission)) return forbiddenHandler(req, res);
 
-    const hasAccess = user.accesses.some(access =>
-        policy.departments.includes(access.department) &&
-        policy.roles.includes(access.role)
-    );
-
-    if (!hasAccess) return forbiddenHandler(req, res);
-
-    req.user = user;
     next();
 };
 

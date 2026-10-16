@@ -68,11 +68,11 @@ construyen handlers, mediante componentes separados de las líneas de ejecución
 | --- | --- | ---: | --- |
 | Autenticación | `CU-AUT-01..02` | 2 | Completo |
 | Identidad y acceso | `CU-IDA-01..09` | 9 | Completo |
-| Almacén | `CU-ALM-01..22` | 22 | Completo |
+| Almacén | `CU-ALM-01..24` | 24 | Completo |
 | Catálogos | `CU-CAT-01..26` | 26 | Completo |
 | Entradas | `CU-ENT-01..12` | 12 | Completo |
 | Salidas | `CU-SAL-01..21` | 21 | Completo |
-| **Total** | Seis grupos propietarios | **92** | **92 de 92** |
+| **Total** | Seis grupos propietarios | **94** | **94 de 94** |
 
 Los casos `CU-AUT-01` y `CU-AUT-02` se conservan aquí porque iniciar y cerrar sesión son
 objetivos funcionales con código propio, no para repetir la autenticación dentro de cada

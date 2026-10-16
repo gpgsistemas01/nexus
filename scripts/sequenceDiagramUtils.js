@@ -2,13 +2,15 @@ import path from 'node:path';
 
 const FRAGMENTS = new Set(['alt', 'opt', 'loop', 'par', 'critical', 'break', 'rect', 'box']);
 const BRANCHES = { else: 'alt', and: 'par', option: 'critical' };
+const normalizeLineEndings = (source) => source.replace(/\r\n/g, '\n');
 
 export const getSequenceStructureErrors = (source) => {
+    const normalizedSource = normalizeLineEndings(source);
     const errors = [];
     const participants = new Set();
     const fragments = [];
     const activations = new Map();
-    const lines = source.split('\n');
+    const lines = normalizedSource.split('\n');
     const updateActivation = (alias, change) => {
         if (!participants.has(alias)) errors.push(`activación de participante no declarado: ${alias}`);
         const depth = (activations.get(alias) ?? 0) + change;
@@ -50,7 +52,7 @@ export const getSequenceStructureErrors = (source) => {
     }
 
     for (const fragment of fragments) errors.push(`fragmento sin cerrar: ${fragment}`);
-    for (const [, fragment] of source.matchAll(/^\s*(alt|opt|loop|par|critical|break|rect|box)\b[^\n]*\n(?:[ \t]*(?:%%[^\n]*)?\n)*[ \t]*end\b/gm)) {
+    for (const [, fragment] of normalizedSource.matchAll(/^\s*(alt|opt|loop|par|critical|break|rect|box)\b[^\n]*\n(?:[ \t]*(?:%%[^\n]*)?\n)*[ \t]*end\b/gm)) {
         errors.push(`fragmento vacío: ${fragment}`);
     }
     for (const [alias, depth] of activations) {
@@ -61,15 +63,17 @@ export const getSequenceStructureErrors = (source) => {
 
 // Short diagram labels retain source evidence in the adjacent participant table.
 export const getSequenceParticipantSources = (body, sequence) => {
+    const normalizedBody = normalizeLineEndings(body);
+    const normalizedSequence = normalizeLineEndings(sequence);
     const sources = new Map();
     const sourcePattern = /src\/[\w./-]+\.(?:js|ejs)/g;
-    for (const match of sequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)) {
+    for (const match of normalizedSequence.matchAll(/^\s*participant\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)) {
         sources.set(match[1], [...new Set([
             ...(sources.get(match[1]) ?? []),
             ...(match[2].match(sourcePattern) ?? [])
         ])]);
     }
-    const table = body.match(/## Participantes y trazabilidad\r?\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? '';
+    const table = normalizedBody.match(/## Participantes y trazabilidad\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? '';
     for (const match of table.matchAll(/^\| `([^`]+)` \|[^|]+\|([^\n]+)\|$/gm)) {
         if (!sources.has(match[1])) continue;
         sources.set(match[1], [...new Set([
@@ -102,8 +106,10 @@ export const getSequenceLifelineErrors = (body, sequence, externalLabels = new S
 };
 
 export const getDiagramFileCoverageErrors = (body, blocks, sourceContents) => {
+    const normalizedBody = normalizeLineEndings(body);
+    const normalizedBlocks = blocks.map(normalizeLineEndings);
     const errors = [];
-    const table = body.match(/## Participantes y trazabilidad\r?\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? '';
+    const table = normalizedBody.match(/## Participantes y trazabilidad\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? '';
     const rows = [...table.matchAll(/^\| `([^`]+)` \|[^|]+\|([^\n]+)\|$/gm)];
     const files = new Map();
     for (const [, alias, text] of rows) {
@@ -112,7 +118,7 @@ export const getDiagramFileCoverageErrors = (body, blocks, sourceContents) => {
         else files.set(alias, paths[0]);
     }
     const shown = new Set();
-    for (const block of blocks) {
+    for (const block of normalizedBlocks) {
         for (const [, alias] of block.matchAll(/^\s*participant\s+([^\s@]+)/gm)) {
             shown.add(alias);
         }

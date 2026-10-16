@@ -64,8 +64,11 @@ Los listados reutilizan `repository/paginationRepository.js`: el servicio conser
 filtros, proyección y permisos; `findPage` coordina filas y conteos independientes.
 Cuando el alcance total coincide con el filtro se comparte un conteo. Las exportaciones
 pueden solicitar `includeCounts: false` sin alterar los resultados de los listados.
-No se cachean permisos entre peticiones. `getLoggedUser` carga sólo id y nombre de
-cuenta, rol y departamento, evitando leer el hash de contraseña para autorizar.
+En cada petición protegida, el middleware de token llama una sola vez a
+`getLoggedUser` y conserva el resultado en `req.user` para autorización y controllers,
+incluido `/api/auth/me`. No se cachean permisos entre peticiones; la consulta carga
+sólo id y nombre de cuenta, rol y departamento, evitando leer el hash de contraseña
+para autorizar.
 
 La [guía de rendimiento](../../../../testing/backend-performance.md) describe la
 medición reproducible, los bucles revisados y los límites de volumen observados.

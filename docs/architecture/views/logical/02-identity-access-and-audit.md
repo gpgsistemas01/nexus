@@ -14,17 +14,27 @@ Las tablas se detallan en el [modelo persistente](data-and-persistence/index.md)
 | Cuenta PostgreSQL | Identidad de infraestructura compartida por la aplicación; no corresponde a cada usuario de Nexus. |
 
 `User.personId` es opcional. Las cuentas humanas requieren una persona activa; las
-cuentas técnicas no requieren una persona ficticia. Una cuenta inactiva o sin
-asignaciones válidas no puede iniciar sesión, renovar ni superar la autorización.
+cuentas técnicas no requieren una persona ficticia. Sólo las asignaciones a roles y
+departamentos activos otorgan permisos. Una cuenta inactiva o sin asignaciones válidas
+no puede iniciar sesión, renovar ni superar la autorización.
 La relación cuenta–persona no es uno a uno: `personId` no tiene una restricción única.
 
 ## Autorización
 
 `getLoggedUser` lee las asignaciones vigentes y deriva `permissions`, `scope` y
-`organization`. Las combinaciones autorizadas se definen en
+`organization`. En una petición protegida, el middleware de token carga ese usuario
+una sola vez y lo asigna a `req.user`; la autorización y los controllers reutilizan
+esa instancia. El middleware de autorización sólo comprueba
+`req.user.permissions`, y `/api/auth/me` responde con `req.user`, sin volver a
+consultar la cuenta. Las combinaciones autorizadas se definen en
 `src/constants/permissions.js`; los permisos derivados no se persisten. Cambiar una
 asignación afecta la siguiente petición autenticada; cambiar la matriz requiere
-actualizar el código.
+actualizar el código. Login y renovación validan la cuenta en sus flujos propios,
+porque no pasan por el middleware de acceso autenticado.
+La consulta excluye asignaciones cuyo rol o departamento esté inactivo; las demás
+asignaciones activas del usuario siguen otorgando sus permisos. El login aplica el
+mismo filtro antes de verificar la contraseña y no emite tokens si no queda una
+asignación activa.
 
 Las áreas `IMPRESIÓN`, `TALLER 3D`, `PT/TRÁFICO`, `INSTALACIONES` y `ACABADOS`
 comparten el acceso operativo para los roles Administrador del sistema, Coordinador,
@@ -57,7 +67,7 @@ La consulta `material-templates` contiene costos para registrar merma y exige
 
 | Comprobación | Resultado ante rechazo |
 | --- | --- |
-| Token y cuenta válidos | La API devuelve `401 INVALID_AUTH`; web intenta renovar cuando falta un token válido. |
+| Token o cuenta inválidos | La API devuelve `401 INVALID_AUTH`; web intenta renovar cuando falta un token válido y redirige a `/error/404` si la cuenta cargada no está activa o no tiene asignaciones válidas. |
 | Permiso en una misma combinación rol/departamento | La API devuelve `403 FORBIDDEN`; la autorización web rechazada redirige a `/error/404`. |
 | Regla del recurso y alcance de datos | El servidor aplica los filtros y restricciones del caso; devuelve el error correspondiente sin conceder acceso adicional. |
 

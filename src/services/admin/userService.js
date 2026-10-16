@@ -102,6 +102,10 @@ export const getUserIdByLogin = async (name, password) => {
                 select: { isActive: true }
             },
             accesses: {
+                where: {
+                    role: { is: { isActive: true } },
+                    department: { is: { isActive: true } }
+                },
                 select: { userId: true },
                 take: 1
             }
@@ -130,7 +134,9 @@ export const getLoggedUser = async (userId) => {
                     { personId: null },
                     { person: { is: { isActive: true } } }
                 ]
-            }
+            },
+            role: { is: { isActive: true } },
+            department: { is: { isActive: true } }
         },
         select: {
             user: { select: { id: true, name: true } },

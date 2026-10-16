@@ -78,6 +78,7 @@ const readDocumentSource = async (documentPath, isNestedCollection = false) => {
 };
 
 const toPosix = (value) => value.split(path.sep).join('/');
+const normalizeLineEndings = (source) => source.replace(/\r\n/g, '\n');
 
 const walk = async (directory) => {
     const entries = await readdir(directory, { withFileTypes: true });
@@ -88,10 +89,12 @@ const walk = async (directory) => {
     return nested.flat().sort();
 };
 
-const getUseCaseTableIds = (source) => [...source.matchAll(/^\| `(CU-[A-Z]+-\d+)` \|/gm)]
+const getUseCaseTableIds = (source) => [...normalizeLineEndings(source)
+    .matchAll(/^\| `(CU-[A-Z]+-\d+)` \|/gm)]
     .map((match) => match[1]);
 
-const getMermaidBlocks = (source) => [...source.matchAll(/^```mermaid\n([\s\S]*?)^```$/gm)]
+const getMermaidBlocks = (source) => [...normalizeLineEndings(source)
+    .matchAll(/^```mermaid\n([\s\S]*?)^```$/gm)]
     .map((match) => match[1]);
 
 // Mermaid treats these sequence keywords case-insensitively, so they cannot be aliases.
@@ -120,12 +123,14 @@ const validateUseCaseDiagramCoverage = async () => {
     ));
     const expectedIds = getUseCaseTableIds(sources.get('catalog'));
     const expectedTitles = new Map(
-        [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
+        [...normalizeLineEndings(sources.get('catalog'))
+            .matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — (.+)$/gm)]
             .map((match) => [match[1], match[2]])
     );
     const permittedActors = new Map();
     const expectedActors = new Map(
-        [...sources.get('catalog').matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — .+\r?\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)]
+        [...normalizeLineEndings(sources.get('catalog'))
+            .matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — .+\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)]
             .map(([, id, body]) => {
                 const declaredActor = body.match(/^\| Actor \| (.*?) \|$/m)?.[1] ?? '';
                 const actors = [

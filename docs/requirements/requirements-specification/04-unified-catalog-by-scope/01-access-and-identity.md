@@ -21,7 +21,9 @@ Consultar un catálogo auxiliar no concede su administración.
 ### Criterios de acceso
 
 - **CA-RF-AUT-001-1:** la cuenta está activa, dispone de una asignación de acceso
-  vigente y, si está vinculada a una persona, esa persona está activa.
+  con rol y departamento activos y, si está vinculada a una persona, esa persona está
+  activa. Las asignaciones con rol o departamento inactivo no otorgan permisos ni
+  permiten iniciar sesión.
 - **CA-RF-AUT-001-2:** credenciales inválidas o una cuenta no habilitada no permiten
   acceso al contenido protegido.
 - **CA-RF-AUT-002-1:** la renovación comprueba su credencial y la habilitación actual

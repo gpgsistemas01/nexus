@@ -31,6 +31,40 @@ describe('estructura de secuencias Mermaid', () => {
         expect(getSequenceStructureErrors(source)).toEqual([]);
     });
 
+    it('valida correctamente diagramas y trazabilidad con finales de línea CRLF', () => {
+        const source = [
+            'sequenceDiagram',
+            '    participant Route as Ruta',
+            '    participant Auth as Autorización',
+            '    Route->>Auth: verificar()',
+            '    activate Auth',
+            '    alt Autorizado',
+            '        Auth-->>Route: next()',
+            '    else Rechazado',
+            '        Auth-->>Route: HTTP 403',
+            '    end',
+            '    deactivate Auth'
+        ].join('\r\n');
+        const body = [
+            '## Participantes y trazabilidad',
+            '| Alias | Rol visual | Archivo de implementación |',
+            '| --- | --- | --- |',
+            '| `Route` | boundary | `src/routes/api/route.js` |',
+            '| `Auth` | control | `src/middleware/auth.js` |',
+            '',
+            '## Secuencia de implementación'
+        ].join('\r\n');
+        const sources = new Map([
+            ['src/routes/api/route.js', 'router.get("/", verify, handler);'],
+            ['src/middleware/auth.js', 'export const verify = () => {};']
+        ]);
+
+        expect(getSequenceStructureErrors(source)).toEqual([]);
+        expect(getSequenceParticipantSources(body, source).get('Auth'))
+            .toEqual(['src/middleware/auth.js']);
+        expect(getDiagramFileCoverageErrors(body, [source], sources)).toEqual([]);
+    });
+
     it('rechaza participantes implícitos y declaraciones duplicadas', () => {
         const errors = getSequenceStructureErrors(`sequenceDiagram
     participant UI as Vista

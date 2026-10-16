@@ -21,7 +21,6 @@ flowchart LR
     dtos["dtos (10 módulos)"] --> utils["utils (11 módulos)"]
     errors["errors (19 módulos)"] --> messages["messages (2 módulos)"]
     errors["errors (19 módulos)"] --> public["public (211 módulos)"]
-    middleware["middleware (5 módulos)"] --> constants["constants (10 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
     middleware["middleware (5 módulos)"] --> services["services (63 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
