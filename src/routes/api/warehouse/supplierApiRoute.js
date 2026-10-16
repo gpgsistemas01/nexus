@@ -11,7 +11,7 @@ const router = express.Router();
 router.get(
     '/',
     verifyApiTokenRequired,
-    authorizeUserApi(PERMISSIONS.SUPPLIERS_MANAGE),
+    authorizeUserApi(PERMISSIONS.SUPPLIERS_READ),
     getAllSuppliers
 );
 

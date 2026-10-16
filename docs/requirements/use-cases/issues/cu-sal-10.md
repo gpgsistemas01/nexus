@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-SAL-10` |
 | Nombre | Editar encabezado de salida de merma. |
-| Actor | Personal de almacén o Administrador del sistema. |
+| Actor | Usuario autorizado de área operativa, Personal de almacén o Administrador del sistema. |
 | Disparador | Detecta datos que debe corregir en el encabezado de una salida de merma y selecciona su acción de edición. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Flujo principal | 1. **Actor:** selecciona una salida de merma y abre la edición de encabezado **(ver E1)**.<br>2. **Nexus:** muestra los datos actuales y habilita sólo los campos permitidos por su estado.<br>3. **Actor:** modifica los datos contextuales y confirma **(ver A1)**.<br>4. **Nexus:** valida el estado, los participantes y las relaciones y actualiza el encabezado; conserva intactas las cantidades y existencias y confirma la actualización **(ver EOP)**. |

@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-SAL-18` |
 | Nombre | Editar detalles de consumible de una salida. |
-| Actor | Personal de almacén o Administrador del sistema. |
+| Actor | Usuario autorizado de área operativa, Personal de almacén o Administrador del sistema. |
 | Disparador | Necesita agregar o corregir los detalles de consumible que todavía pueden modificarse en una salida y abre los detalles. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. La salida existe.<br>4. La salida de consumibles está pendiente y ninguno de sus detalles ha sido surtido. |
 | Flujo principal | 1. **Actor:** abre los detalles de una salida todavía modificable **(ver E1)**.<br>2. **Nexus:** muestra los consumibles actuales, cantidades y acciones permitidas.<br>3. **Actor:** modifica la cantidad de un renglón existente o selecciona consumible, proveedor y cantidad para un detalle nuevo y selecciona «Agregar» **(ver A1)**.<br>4. **Nexus:** valida los datos del renglón y refleja la adición o modificación en la tabla de detalles.<br>5. **Actor:** repite la operación para cada detalle necesario, revisa la tabla y confirma los cambios.<br>6. **Nexus:** valida estado, recursos, cantidades pendientes y acumulados; actualiza los detalles sin descontar existencias y confirma el resultado **(ver EOP)**. |

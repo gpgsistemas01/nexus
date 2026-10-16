@@ -26,6 +26,35 @@ La relación cuenta–persona no es uno a uno: `personId` no tiene una restricci
 asignación afecta la siguiente petición autenticada; cambiar la matriz requiere
 actualizar el código.
 
+Las áreas `IMPRESIÓN`, `TALLER 3D`, `PT/TRÁFICO`, `INSTALACIONES` y `ACABADOS`
+comparten el acceso operativo para los roles Administrador del sistema, Coordinador,
+Auxiliar, Operador, Instalador y Almacenista. El rol y el área deben coincidir en una
+misma asignación; no basta con tenerlos en asignaciones distintas.
+
+La limitación de inventario a sólo consulta corresponde a esas cinco áreas.
+`ALMACÉN Y PROVEDURÍA` y `SISTEMAS` conservan sus permisos adicionales por rol:
+gestión de inventario, compras, costos, reportes, surtidos y devoluciones. Los ajustes
+administrativos y la administración de usuarios/catálogos siguen reservados al
+Administrador del sistema en Sistemas. Los permisos concedidos por varias
+asignaciones se acumulan; pertenecer también a un área operativa no elimina un
+permiso de gestión válido de Almacén o Sistemas.
+
+| Operación de las áreas operativas | Acceso |
+| --- | --- |
+| Abrir, consultar, crear y editar salidas de materiales, consumibles y merma | Permitido, sujeto al estado del documento y al alcance de consulta existente. |
+| Consultar materiales, consumibles y merma | Permitido; sin costos ni acciones de escritura. |
+| Consultar proveedores, clientes, personas, áreas y estados desde filtros/selectores | Permitido; la lectura no concede mantenimiento de catálogos. |
+| Surtir o devolver una salida; crear, editar, eliminar o ajustar inventario; agregar stock de merma | No concedido por el acceso operativo; conserva permisos independientes de Almacén/Sistemas. |
+| Compras, costos, reportes de almacén y administración de catálogos | No concedido por el acceso operativo. |
+
+`suppliers:read` protege la consulta utilizada por el filtro de inventario;
+`suppliers:manage` y `suppliers:update` conservan separadas sus escrituras.
+Las páginas y botones se derivan de los mismos permisos del servidor. Se ocultan las
+exportaciones de almacén y las altas de clientes/personas si falta su permiso propio.
+Las asignaciones adicionales de una cuenta pueden conceder otras capacidades.
+La consulta `material-templates` contiene costos para registrar merma y exige
+`wastes:write`; no forma parte del inventario disponible con acceso de consulta.
+
 | Comprobación | Resultado ante rechazo |
 | --- | --- |
 | Token y cuenta válidos | La API devuelve `401 INVALID_AUTH`; web intenta renovar cuando falta un token válido. |

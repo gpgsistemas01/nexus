@@ -13,6 +13,19 @@ selectivas de diseño/caso o la ejecución de navegador.
 Este documento registra decisiones de diseño; los resultados de corridas pertenecen a
 CI o a la revisión del cambio, según el [plan](test-plan.md).
 
+### Ampliación por acceso operativo (2026-10-16)
+
+Después del corte siguiente se amplía `permissionsTest.js` (**M**, TD) con las cinco
+áreas operativas, sus seis roles admitidos y las operaciones expresamente excluidas.
+La misma matriz conserva los permisos amplios de los cuatro roles de gestión en
+Almacén/Sistemas, sus límites administrativos y la acumulación de asignaciones.
+Se agrega `tests/integration/controllers/operationalAccessDbTest.js` (**M**, TD):
+sesiones y asignaciones reales, acceso web, alta/edición persistida y consulta de
+inventario sin costos; controles negativos de rol/sesión y escrituras sin efecto.
+Complementa los contratos de rutas simulados; no los presenta como ejecución real
+ni demuestra interacción de navegador. El inventario pasa a 114 archivos (95 unitarios
+y 19 de integración); la clasificación del corte original de 113 se conserva abajo.
+
 ## Inventario completo y decisión por archivo
 
 Este inventario corresponde a los 113 archivos activos de la revisión: 95 unitarios

@@ -8,6 +8,7 @@ import { initPersonSelect, togglePersonOption } from '../domains/person.js';
 import { initMdbWrapperInput, updateMdbWrapperInput } from '../../mdb/baseInstance.js';
 import { toggleDisabledElement } from '../../../utils/formUtils.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
+import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
 
 const EDITABLE_MODES = [FORM_MODES.CREATE, FORM_MODES.EDIT, FORM_MODES.EDIT_HEADER];
 
@@ -37,12 +38,14 @@ export const createIssueHeaderSelects = ({ modalSelector, formSelector, selector
             }],
             [setupClientSelect, { 
                 modalSelector, 
-                clientSelector: selectors.client 
+                clientSelector: selectors.client,
+                allowCreate: hasPermission(window.meta, UI_PERMISSIONS.CLIENTS_CREATE)
             }],
             [initPersonSelect, { 
                 modalSelector, 
                 baseSelector: scoped.advisor, 
                 placeholder: 'Buscar asesor...', 
+                allowCreate: hasPermission(window.meta, UI_PERMISSIONS.PERSONS_WRITE),
                 data: params => {
 
                     const clientName = getSelectedOptionText(scoped.client);

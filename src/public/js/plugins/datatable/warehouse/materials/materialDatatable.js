@@ -108,7 +108,7 @@ export const createMaterialDatatable = async (context) => {
                     text: 'Nuevo material',
                     action: () => openMaterialModal({ mode: FORM_MODES.CREATE })
                 }] : []),
-                buildExcelButton({
+                ...(hasPermission(context, UI_PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
                     filename: formatFileName('reporte_inventario_materiales'),
                     allowMonthlyReport: false,
                     allowInventoryScope: true,
@@ -117,7 +117,7 @@ export const createMaterialDatatable = async (context) => {
                         inventoryScope,
                         type: MATERIAL_TYPES.MATERIAL
                     }))
-                })
+                })] : [])
             ]
         }
     });

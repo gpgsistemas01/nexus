@@ -11,7 +11,7 @@ const router = express.Router();
 router.get(
     '/material-templates',
     verifyApiTokenRequired,
-    authorizeUserApi(PERMISSIONS.WASTES_READ),
+    authorizeUserApi(PERMISSIONS.WASTES_WRITE),
     getWasteMaterialTemplates
 );
 

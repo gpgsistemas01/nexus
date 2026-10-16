@@ -6,6 +6,7 @@ import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI.js';
 import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
+import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
 
 const ISSUE_FILTER_FIELDS = [
     'date',
@@ -95,7 +96,8 @@ export const createIssueDatatable = async ({
 
     const filters = await setupIssueTableFilters();
     let table;
-    const exportButton = exportOptions?.report && exportOptions?.filename
+    const exportButton = hasPermission(context, UI_PERMISSIONS.WAREHOUSE_REPORTS_READ)
+        && exportOptions?.report && exportOptions?.filename
         ? buildExcelButton({
             filename: formatFileName(exportOptions.filename),
             request: ({ monthlyReport = false, reportMonth = '' } = {}) => exportOptions.report(buildTableExportParams(table, {

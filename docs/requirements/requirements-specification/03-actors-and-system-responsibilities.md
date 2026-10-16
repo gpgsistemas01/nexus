@@ -3,6 +3,7 @@
 | Participante | Responsabilidad |
 | --- | --- |
 | Personal de almacén (área Almacén y proveduría) | Mantener los catálogos operativos autorizados y ejecutar entradas, salidas y devoluciones. No ajusta existencias mediante la acción administrativa. |
+| Usuario de área operativa (Impresión, Taller 3D, PT/Tráfico, Instalaciones o Acabados) | Consultar inventario y crear o editar solicitudes de salida de materiales, consumibles y merma con un rol autorizado. No modifica inventario ni realiza surtidos o devoluciones por este acceso. |
 | Solicitante o aprobador | Persona que participa como dato del documento cuando corresponde; no implica una cuenta, acceso ni un flujo de aprobación disponible. |
 | Administrador del sistema (área Sistemas) | Ejecutar todas las capacidades vigentes, incluida la administración de clientes, personas, usuarios y accesos, siempre con autorización comprobada en el servidor. Ventas no accede al sistema. |
 | Dirección | Parte interesada de supervisión; sus casos de uso y alcance autorizado permanecen pendientes de definición. |

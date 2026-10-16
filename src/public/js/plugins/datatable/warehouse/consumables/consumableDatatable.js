@@ -106,7 +106,7 @@ export const createConsumableDatatable = async (context) => {
                 text: 'Nuevo consumible',
                 action: () => openMaterialModal({ mode: FORM_MODES.CREATE, resource: INVENTORY_RESOURCES.CONSUMABLE })
                 }] : []),
-                buildExcelButton({
+                ...(hasPermission(context, UI_PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
                     filename: formatFileName('reporte_inventario_consumibles'),
                     allowMonthlyReport: false,
                     allowInventoryScope: true,
@@ -115,7 +115,7 @@ export const createConsumableDatatable = async (context) => {
                         inventoryScope,
                         type: MATERIAL_TYPES.CONSUMABLE
                     }))
-                })
+                })] : [])
             ]
         }
     });

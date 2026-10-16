@@ -63,7 +63,7 @@ export const createWasteDatatable = async ({ context, openWasteModal, openWasteS
                     text: 'Nueva merma',
                     action: () => openWasteModal({ mode: FORM_MODES.CREATE })
                 }] : []),
-                buildExcelButton({
+                ...(hasPermission(context, UI_PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
                     filename: formatFileName('reporte_mermas'),
                     allowMonthlyReport: false,
                     allowInventoryScope: true,
@@ -71,7 +71,7 @@ export const createWasteDatatable = async ({ context, openWasteModal, openWasteS
                         ...filters.getValues(),
                         inventoryScope
                     }))
-                })
+                })] : [])
             ]
         }
     });

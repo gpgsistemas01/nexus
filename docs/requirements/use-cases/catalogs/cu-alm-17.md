@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ALM-17` |
 | Nombre | Consultar consumibles. |
-| Actor | Personal de almacén o Administrador del sistema. |
+| Actor | Usuario autorizado de área operativa, Personal de almacén o Administrador del sistema. |
 | Disparador | Abre el módulo **Consumibles**. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor tiene autorización para consultar consumibles. |
 | Flujo principal | 1. **Actor:** abre **Almacén → Consumibles** **(ver E1)**.<br>2. **Nexus:** comprueba la autorización y muestra las ofertas de consumibles con su proveedor, existencia, stock mínimo, presentación y unidad, sin mezclar materiales **(ver EOP)**.<br>3. **Actor:** captura una búsqueda, elige un proveedor o combina ambos criterios y solicita filtrar.<br>4. **Nexus:** muestra los consumibles que cumplen los criterios, el total y las acciones que el actor está autorizado a realizar **(ver A1)** **(ver A2)** **(ver A3)** **(ver A4)** **(ver A5)** **(ver EOP)**.<br>5. **Actor:** selecciona **Nuevo consumible**; termina la consulta e inicia `CU-ALM-18` Crear consumible. |

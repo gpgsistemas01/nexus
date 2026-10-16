@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-SAL-08` |
 | Nombre | Consultar salidas de merma. |
-| Actor | Personal de almacén o Administrador del sistema. |
+| Actor | Usuario autorizado de área operativa, Personal de almacén o Administrador del sistema. |
 | Disparador | Necesita localizar o revisar salidas de merma y abre la opción de consulta correspondiente. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar salidas de merma **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** obtiene la información disponible **(ver EOP)** y presenta la información autorizada y la acción principal para registrar una salida de merma **(ver A2)** **(ver A3)** **(ver A4)** **(ver A5)** **(ver A6)**.<br>5. **Actor:** selecciona la acción principal; termina `CU-SAL-08` y con esa selección dispara `CU-SAL-09` Crear salida de merma. |

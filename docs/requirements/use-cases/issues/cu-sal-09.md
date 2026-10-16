@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-SAL-09` |
 | Nombre | Crear salida de merma. |
-| Actor | Personal de almacén o Administrador del sistema. |
+| Actor | Usuario autorizado de área operativa, Personal de almacén o Administrador del sistema. |
 | Disparador | Selecciona la acción principal para crear una salida desde `CU-SAL-08` Consultar salidas de merma. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre «Agregar salida de merma» **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga clientes, asesores, áreas, solicitantes y mermas disponibles.<br>3. **Actor:** selecciona cliente, asesor, área y solicitante; captura número de proyecto, fecha y hora de solicitud y observaciones; selecciona una merma, captura su cantidad y selecciona «Agregar» **(ver A1)**.<br>4. **Nexus:** valida los datos del renglón y lo muestra en la tabla de detalles. Si la merma ya estaba agregada, reemplaza su cantidad por la más reciente, sin sumarla.<br>5. **Actor:** repite la adición para cada merma necesaria, revisa los renglones de la tabla y selecciona «Guardar».<br>6. **Nexus:** valida participantes, relaciones, mermas y cantidades y rechaza cualquier carga que todavía contenga una merma repetida **(ver A2)**; crea la salida pendiente sin descontar existencias, actualiza la tabla de salidas y confirma **(ver EOP)**. |

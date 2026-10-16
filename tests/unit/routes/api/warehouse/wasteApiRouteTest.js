@@ -50,6 +50,21 @@ const { PERMISSIONS } = await import('../../../../../src/constants/permissions.j
 const { default: wasteApiRoutes } = await import('../../../../../src/routes/api/warehouse/wasteApiRoute.js');
 
 describe('wasteApiRoute', () => {
+  it('reserva las plantillas con costos al registro de merma', () => {
+    expect(get).toHaveBeenCalledWith(
+      '/material-templates',
+      verifyApiTokenRequired,
+      `authorize:${ PERMISSIONS.WASTES_WRITE }`,
+      getWasteMaterialTemplates
+    );
+    expect(get).toHaveBeenCalledWith(
+      '/',
+      verifyApiTokenRequired,
+      `authorize:${ PERMISSIONS.WASTES_READ }`,
+      getAllWastes
+    );
+  });
+
   it('asigna a cada escritura del CRUD su validador y permiso específicos', () => {
     expect(wasteApiRoutes).toEqual({ get, post, patch });
     expect(post).toHaveBeenCalledWith(

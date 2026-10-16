@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-ALM-01` |
 | Nombre | Consultar materiales. |
-| Actor | Personal de almacén o Administrador del sistema. |
+| Actor | Usuario autorizado de área operativa, Personal de almacén o Administrador del sistema. |
 | Disparador | Necesita localizar o revisar materiales y abre la opción de consulta correspondiente. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar materiales **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** obtiene la información disponible **(ver EOP)** y presenta una fila por relación proveedor-material, con la identidad del material, el proveedor, sus existencias, la acción principal para registrar un material y la opción **Exportar Excel** **(ver A2)** **(ver A3)** **(ver A4)** **(ver A5)**.<br>5. **Actor:** selecciona la acción principal; termina `CU-ALM-01` y con esa selección dispara `CU-ALM-02` Crear material. |
