@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 
 // Retiene la fila mientras ambas peticiones alcanzan la base, sin pausas en código de producción.
 export const runContendedOperations = async ({ prisma, lock, table, actions }) => {
+  const tablePatterns = (Array.isArray(table) ? table : [table]).map(name => `%"${name}"%`);
   const ready = Promise.withResolvers();
   const release = Promise.withResolvers();
   const holder = prisma.$transaction(async tx => {
@@ -23,7 +24,7 @@ export const runContendedOperations = async ({ prisma, lock, table, actions }) =
       const [result] = await prisma.$queryRaw`
         SELECT COUNT(*)::int AS waiting FROM pg_stat_activity
         WHERE datname = current_database() AND wait_event_type = 'Lock'
-         AND query LIKE ${`%"${table}"%`}
+         AND query LIKE ANY(${tablePatterns}::text[])
       `;
       waiting = result.waiting;
       if (waiting < actions.length) await new Promise(resolve => setTimeout(resolve, 10));

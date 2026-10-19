@@ -11,7 +11,7 @@ const catalogFields = new Set(document.querySelector('#catalogContext').dataset.
 export const openCatalogModal = ({ catalog, entityLabel, mode, data = null }) => {
     const isCreating = isCreateMode(mode);
 
-    initForm({ form, mode, id: data?.id });
+    initForm({ form, mode, id: data?.id, version: data?.version });
     clearFormErrors(form);
     form.dataset.catalog = catalog;
     form.elements.name.value = data?.name || '';

@@ -16,7 +16,7 @@ it('un envío pendiente no vuelve a preparar, validar ni enviar la misma captura
     let finish;
     const sendRequest = vi.fn(() => new Promise(resolve => { finish = resolve; }));
     await useForm({ selector: '#form', normalizeData, getErrors, sendRequest });
-    const form = { dataset: {}, querySelector: () => ({ disabled: false }) };
+    const form = { dataset: {}, querySelector: () => ({ disabled: false, removeAttribute: vi.fn() }) };
     const event = { preventDefault: vi.fn() };
     const pending = state.submit(event, form);
     await state.submit(event, form);
@@ -26,4 +26,28 @@ it('un envío pendiente no vuelve a preparar, validar ni enviar la misma captura
     finish();
     await pending;
     vi.unstubAllGlobals();
+});
+
+it('un fallo de red libera el submit para recuperar la captura pendiente', async () => {
+    vi.stubGlobal('FormData', class { *[Symbol.iterator]() {} });
+    const button = { disabled: false, removeAttribute() { this.disabled = false; } };
+    const form = { dataset: {}, querySelector: () => button };
+    await useForm({ selector: '#form', normalizeData: () => ({}), getErrors: () => ({}), sendRequest: async () => { throw { status: 0 }; } });
+    await state.submit({ preventDefault() {} }, form);
+    expect(form.dataset.submitting).toBe('false');
+    expect(button.disabled).toBe(false);
+    vi.unstubAllGlobals();
+});
+
+it('recupera los datos guardados sin depender de los campos vacíos de un modal reabierto', async () => {
+    const pending = { operationId: 'operation-1', quantity: 2 };
+    const normalizeData = vi.fn();
+    const getErrors = vi.fn();
+    const sendRequest = vi.fn();
+    const form = { dataset: {}, querySelector: () => ({ removeAttribute() {} }) };
+    await useForm({ selector: '#form', getPendingData: () => pending, normalizeData, getErrors, sendRequest });
+    await state.submit({ preventDefault() {} }, form);
+    expect(normalizeData).not.toHaveBeenCalled();
+    expect(getErrors).not.toHaveBeenCalled();
+    expect(sendRequest).toHaveBeenCalledWith({ form, formData: pending });
 });

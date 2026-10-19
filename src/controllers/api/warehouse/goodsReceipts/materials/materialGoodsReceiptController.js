@@ -1,6 +1,7 @@
 import { createMaterialGoodsReceipt, findAllMaterialGoodsReceipts, updateMaterialGoodsReceipt, cancelMaterialGoodsReceiptDetailLine, correctMaterialGoodsReceiptDetailLine } from '../../../../../services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js';
-import { buildListHandler, buildRegisterHandler, buildEditHandler, buildCorrectionHandler, buildCancellationHandler } from '../shared/goodsReceiptHandlers.js';
+import { buildReadHandler, buildListHandler, buildRegisterHandler, buildEditHandler, buildCorrectionHandler, buildCancellationHandler } from '../shared/goodsReceiptHandlers.js';
 
+export const getMaterialGoodsReceipt = buildReadHandler(findAllMaterialGoodsReceipts);
 export const getAllMaterialGoodsReceipts = buildListHandler(findAllMaterialGoodsReceipts);
 export const registerMaterialGoodsReceipt = buildRegisterHandler({
     createGoodsReceipt: createMaterialGoodsReceipt,

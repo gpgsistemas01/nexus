@@ -4,7 +4,10 @@ import { validationResult } from 'express-validator';
 import { issueReturnValidation } from '../../../src/validators/forms/issueReturnValidations.js';
 
 const validate = async body => {
-    const req = { body };
+    const req = { body, params: {
+        id: '11111111-1111-4111-8111-111111111111',
+        detailId: '22222222-2222-4222-8222-222222222222'
+    } };
 
     await Promise.all(issueReturnValidation.map(rule => rule.run(req)));
 

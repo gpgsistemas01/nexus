@@ -1,3 +1,4 @@
+import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from '../../repository/paginationRepository.js';
 import { MANAGED_CATALOGS } from '../../constants/catalogs.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
@@ -74,7 +75,12 @@ export const updateCatalogEntry = async (catalogName, id, input) => {
     const data = normalizeCatalogData(catalog, input);
     validateCatalogData(catalog, data);
     try {
-        const entry = await getDb()[catalog.model].update({ where: { id }, data });
+        const entry = await updateVersionedRecord({
+            model: getDb()[catalog.model],
+            where: { id },
+            data,
+            expectedVersion: input.expectedVersion
+        });
         return removeInternalKey(catalog, entry);
     } catch (error) {
         if ([

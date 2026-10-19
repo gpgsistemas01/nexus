@@ -1,6 +1,14 @@
 import { body } from 'express-validator';
 import { errorMap } from '../../messages/codeMessages.js';
-import { validatePositiveNumberOptional, validateNumberRequiredWhenOtherPresent, validateNumberWhen, validateText, validateUUID, validateUUIDWhen } from "../fields/fieldsValidator.js";
+import {
+    validatePositiveNumberOptional,
+    validateNumberRequiredWhenOtherPresent,
+    validateNumberWhen,
+    validateText,
+    validateUUID,
+    validateUUIDWhen
+} from "../fields/fieldsValidator.js";
+import { validateRecordVersion } from '../fields/versionValidator.js';
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
 
 const materialRollReferenceValidation = ['referenceConeWeightKg', 'referenceRollTotalWeightKg'].map(fieldName =>
@@ -12,12 +20,18 @@ export const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
 export const isGoodsReceiptMaterialCreation = (body = {}) =>
     body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT;
 
-export const materialEditValidation = [
+const materialDataValidation = [
     ...materialRollReferenceValidation,
     validateText({ fieldName: 'name', maxLength: 200 }),
     validateUUID('supplierId'),
     ...createInventoryStateValidation(),
     validateNumberWhen({ fieldName: 'maxUnitCost', predicate: (body) => !isGoodsReceiptMaterialCreation(body) }),
+];
+
+export const materialEditValidation = [
+    ...materialDataValidation,
+    validateRecordVersion(),
+    validateRecordVersion('expectedMaterialVersion')
 ];
 
 const materialStockDataValidation = [
@@ -29,12 +43,13 @@ export const materialStockValidation = [
     validateUUID('supplierId'),
     ...materialStockDataValidation,
     validateUUIDWhen({ fieldName: 'reasonId', predicate: () => true }),
+    validateRecordVersion()
 ];
 
 export const consumableValidation = [
     validateUUID('presentationId'),
     validateUUID('unitMeasureId'),
-    ...materialEditValidation,
+    ...materialDataValidation,
     ...materialStockDataValidation
 ];
 

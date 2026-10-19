@@ -154,3 +154,8 @@ y exige que el neto del rollo completo corresponda al total menos el mismo cono.
 `wasteSampleHistoryDbTest.js` prueba la transición desde el CHECK anterior: admite
 altas sin persistir largo ni neto de muestra y conserva valores históricos y sus
 restricciones. Las migraciones aplicadas no se alteran.
+
+Las entradas de merma `CU-ALM-10/13`, altas `CU-ALM-02/18` y consultas operativas
+incorporan `CP-INT-CON-001/002/003` del registro selectivo para idempotencia, versiones,
+alta concurrente y paginación SQL. El bloqueo de submit y la recuperación se verifican
+como estados/payloads unitarios; queda pendiente el recorrido de navegador real.

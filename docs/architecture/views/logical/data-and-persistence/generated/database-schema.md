@@ -655,7 +655,7 @@ erDiagram
     WasteIssueDetail o|..o{ WasteMovementDetail : "wasteIssueDetailId = WasteIssueDetail.id"
 ```
 
-### WasteStockEntry
+### WasteStockEntry · WasteOperation
 
 ```mermaid
 erDiagram
@@ -667,15 +667,20 @@ erDiagram
         String createdById FK
         String wasteMovementId UK,FK
     }
-    Waste {
-        String id PK
+    WasteOperation {
+        String userId PK,FK
+        String operationId PK
     }
     User {
+        String id PK
+    }
+    Waste {
         String id PK
     }
     WasteMovement {
         String id PK
     }
+    User ||--o{ WasteOperation : "userId = User.id"
     Waste ||..o{ WasteStockEntry : "wasteId = Waste.id"
     User ||..o{ WasteStockEntry : "createdById = User.id"
     WasteMovement ||..o| WasteStockEntry : "wasteMovementId = WasteMovement.id"
@@ -751,6 +756,7 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | `WasteStockAdjustmentDetail.wasteStockAdjustmentId` | `WasteStockAdjustment.id` | 1 | 0..N |
 | `WasteStockAdjustmentDetail.wasteId` | `Waste.id` | 1 | 0..N |
 | `WasteMovement.wasteIssueId` | `WasteIssue.id` | 0..1 | 0..N |
+| `WasteOperation.userId` | `User.id` | 1 | 0..N |
 | `WasteStockEntry.wasteId` | `Waste.id` | 1 | 0..N |
 | `WasteStockEntry.createdById` | `User.id` | 1 | 0..N |
 | `WasteStockEntry.wasteMovementId` | `WasteMovement.id` | 1 | 0..1 |

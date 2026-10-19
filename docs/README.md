@@ -116,3 +116,5 @@ el código puede inferir decisiones de arquitectura.
 
 La preparación de herramientas, validación, capturas y comandos de publicación se mantiene en la
 [guía de exportación documental](governance/document-export-guide/index.md).
+
+El [manual operativo de respaldo de Supabase con DBeaver](architecture/views/physical/03-supabase-backup-and-restore.md) pertenece a la vista física e incluye recuperación local/remota y verificación.

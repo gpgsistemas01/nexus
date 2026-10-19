@@ -1,3 +1,4 @@
+import { normalizeDatabaseError } from '../../../../errors/databaseError.js';
 import { lockSupplierMaterialStock } from '../../../../repository/warehouse/stockLockRepository.js';
 import { lockGoodsReceipt } from '../../../../repository/warehouse/documentLockRepository.js';
 import { isAppError } from '../../../../errors/AppError.js';
@@ -102,7 +103,8 @@ export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId, type 
         if (err instanceof GoodsIssueInsufficientStock) {
             throw new GoodsReceiptCorrectionInsufficientStock(err.meta);
         }
-        if (isAppError(err)) throw err;
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
 
         throw new GoodsReceiptUpdateDatabaseError();
     }

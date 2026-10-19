@@ -22,7 +22,6 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Domain` | control | [`consumableService.js`](../../../../../../src/services/warehouse/consumables/consumableService.js) |
 | `MaterialService` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `Helpers` | control | [`materialHelpers.js`](../../../../../../src/services/warehouse/materials/materialHelpers.js) |
-| `Relations` | control | [`materialRelations.js`](../../../../../../src/services/warehouse/materials/materialRelations.js) |
 | `SupplierMaterial` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
 | `Adjustment` | control | [`adjustmentService.js`](../../../../../../src/services/warehouse/adjustmentService.js) |
@@ -102,7 +101,6 @@ sequenceDiagram
     participant Domain@{ "type": "control" } as consumableService.js
     participant MaterialService@{ "type": "control" } as materialService.js
     participant Helpers@{ "type": "control" } as materialHelpers.js
-    participant Relations@{ "type": "control" } as materialRelations.js
     participant SupplierMaterial@{ "type": "control" } as supplierMaterialService.js
     participant Reason@{ "type": "control" } as reasonService.js
     participant Adjustment@{ "type": "control" } as adjustmentService.js
@@ -139,7 +137,7 @@ sequenceDiagram
             Prisma-->>MaterialService: create(): Promise[{ id: string }]
             deactivate Prisma
     end
-        MaterialService->>Relations: syncSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
+        MaterialService->>SupplierMaterial: createSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
         opt [newStock definido]
             MaterialService->>Reason: findInitialStockAdjustmentReason({ tx })
             activate Reason

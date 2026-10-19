@@ -4,6 +4,11 @@ import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../..
 import { emitInventoryUpdated } from '../../../../../utils/socketUtils.js';
 import { sanitizeEmptyStrings } from '../../../../../utils/formattersUtils.js';
 
+import { buildDocumentReadHandler } from '../../documentReadHandler.js';
+import { GoodsReceiptNotFound } from '../../../../../errors/warehouse/goodsReceiptError.js';
+
+export const buildReadHandler = findDocuments => buildDocumentReadHandler({ findDocuments, dataKey: 'goodsReceipt', NotFound: GoodsReceiptNotFound });
+
 export const buildListHandler = findGoodsReceipts => async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const { orderBy, orderDir } = getDataTableOrder({
@@ -12,6 +17,7 @@ export const buildListHandler = findGoodsReceipts => async (req, res) => {
         defaultDirection: 'desc'
     });
     const result = await findGoodsReceipts({
+        includeDetails: false,
         skip,
         take,
         search: getDataTableSearch(req.query),

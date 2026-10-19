@@ -4,6 +4,7 @@ import {
     editWasteIssueHeader,
     editWasteIssueDetails,
     getAllWasteIssues,
+    getWasteIssue,
     registerWasteIssue,
     registerWasteIssueDetailReturn
 } from '../../../controllers/api/warehouse/wasteIssueController.js';
@@ -25,6 +26,13 @@ router.get(
     verifyApiTokenRequired,
     authorizeUserApi(PERMISSIONS.WASTE_ISSUES_MANAGE),
     getAllWasteIssues
+);
+
+router.get(
+    '/:id',
+    verifyApiTokenRequired,
+    authorizeUserApi(PERMISSIONS.WASTE_ISSUES_MANAGE),
+    getWasteIssue
 );
 
 router.post(

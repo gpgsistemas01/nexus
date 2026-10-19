@@ -7,6 +7,7 @@ const authorizeUserApi = vi.fn(permission => `authorize:${ permission }`);
 const verifyApiTokenRequired = vi.fn();
 const validate = vi.fn();
 const personValidation = [vi.fn()];
+const personEditValidation = [vi.fn()];
 const getAllPersons = vi.fn();
 const registerPerson = vi.fn();
 const editPerson = vi.fn();
@@ -24,7 +25,7 @@ vi.mock('../../../../../src/middleware/authMiddleware.js', () => ({
 
 vi.mock('../../../../../src/middleware/validatorMiddleware.js', () => ({ validate }));
 
-vi.mock('../../../../../src/validators/forms/personValidations.js', () => ({ personValidation }));
+vi.mock('../../../../../src/validators/forms/personValidations.js', () => ({ personValidation, personEditValidation }));
 
 vi.mock('../../../../../src/controllers/api/admin/personController.js', () => ({
   editPerson,
@@ -49,7 +50,7 @@ describe('personApiRoute', () => {
     expect(put).toHaveBeenCalledWith(
       '/:id',
       verifyApiTokenRequired,
-      personValidation,
+      personEditValidation,
       validate,
       `authorize:${ PERMISSIONS.PERSONS_WRITE }`,
       editPerson

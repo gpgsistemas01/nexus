@@ -1,6 +1,11 @@
 import { getErrorMessage } from "../constants/apiMessages.js";
 import { notifications } from "../plugins/swal/swalComponent.js";
-import { clearFormErrors, normalizeFormErrors, scrollToFirstFormError } from "../ui/forms/formErrorsUI.js";
+import {
+    clearFormErrors,
+    getUnrenderedFormErrorMessages,
+    normalizeFormErrors,
+    scrollToFirstFormError
+} from "../ui/forms/formErrorsUI.js";
 import { resetFormSubmitState } from "../ui/forms/formStateUI.js";
 import { mapServerErrors } from "../utils/formUtils.js";
 
@@ -38,37 +43,36 @@ export const handleApiError = ({
     rethrow = true
 }) => {
 
-    const { status, data, message } = err;
+    const { status, data } = err;
 
     switch (status) {
 
-        case 400: {
-            const serverErrors = mapServerErrors(data?.errors ?? data);
+        case 400:
+        case 404: {
+            if (status === 400 && data?.errors) {
+                const serverErrors = mapServerErrors(data.errors);
+                const hasFieldErrors = serverErrors && typeof serverErrors === 'object' && Object.keys(serverErrors).length > 0;
 
-            if (form && serverErrors && typeof serverErrors === 'object') {
-                clearFormErrors(form);
-                normalizeServerErrors({ form, errors: serverErrors });
-                scrollToFirstFormError(form);
+                if (form && hasFieldErrors) {
+                    clearFormErrors(form);
+                    normalizeServerErrors({ form, errors: serverErrors });
+                    scrollToFirstFormError(form);
+                }
+
                 resetFormSubmitState(form);
+                const unrenderedMessages = getUnrenderedFormErrorMessages({ form, errors: serverErrors });
+
+                if (!form || !hasFieldErrors || unrenderedMessages.length) {
+                    notifications.showModal({
+                        title: 'Revise la información',
+                        text: [...new Set(unrenderedMessages)].join('\n') || getFallbackMessage(err),
+                        icon: 'warning'
+                    });
+                }
+
                 return;
             }
 
-            resetFormSubmitState(form);
-            notifications.showError(message || 'Errores de validación.');
-            return;
-        }
-
-        case 401:
-            localStorage.setItem('showErrorToast', getFallbackMessage(err));
-            window.location.replace('/');
-            return;
-
-        case 403:
-            resetFormSubmitState(form);
-            notifications.showError(getFallbackMessage(err));
-            return;
-
-        case 404: {
             const modalData = data ?? err?.response?.data ?? null;
             const modalTitle = getErrorMessage(modalData) || 'No se pudo completar la acción';
             const modalMessage = getFallbackMessage(err);
@@ -81,6 +85,16 @@ export const handleApiError = ({
             });
             return;
         }
+
+        case 401:
+            localStorage.setItem('showErrorToast', getFallbackMessage(err));
+            window.location.replace('/');
+            return;
+
+        case 403:
+            resetFormSubmitState(form);
+            notifications.showError(getFallbackMessage(err));
+            return;
 
         case 409: {
             const modalData = data ?? err?.response?.data ?? null;
@@ -105,6 +119,11 @@ export const handleDataTableError = (err, table = null) => {
     const { status, data, message } = err;
 
     switch (status) {
+
+        case 400:
+            handleApiError({ err, rethrow: false });
+            if (table) table.clear().draw();
+            return [];
 
         case 401:
             localStorage.setItem('showErrorToast', getFallbackMessage(err));
@@ -133,5 +152,14 @@ export const handleDataTableError = (err, table = null) => {
             if (table) table.clear().draw();
 
             return [];
+    }
+};
+
+// Frontera de acciones asíncronas del navegador, como consultar y abrir un modal.
+export const runApiAction = async action => {
+    try {
+        return await action();
+    } catch (err) {
+        handleApiError({ err, rethrow: false });
     }
 };

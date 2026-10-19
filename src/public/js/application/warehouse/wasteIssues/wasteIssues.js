@@ -1,4 +1,5 @@
 import {
+    getWasteIssueRequest,
     editWasteIssueHeaderRequest,
     editWasteIssueDetailsRequest,
     editWasteIssueRequest,
@@ -29,3 +30,5 @@ export const editWasteIssue = wasteIssueApplication.edit;
 export const editWasteIssueHeader = wasteIssueApplication.editHeader;
 export const editWasteIssueDetails = wasteIssueApplication.editDetails;
 export const returnWasteIssueDetail = wasteIssueApplication.returnDetail;
+
+export const getWasteIssue = async ({ id }) => (await getWasteIssueRequest({ id })).data.wasteIssue;

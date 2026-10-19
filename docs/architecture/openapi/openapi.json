@@ -3,7 +3,7 @@
   "info": {
     "title": "Nexus API",
     "version": "1.0.0",
-    "description": "Contrato procesable de solicitudes y respuestas implementadas. Los listados reflejan la proyección observable; algunos campos dependen de permisos."
+    "description": "Contrato procesable de solicitudes y respuestas implementadas. Los listados reflejan la proyecci\u00f3n observable; algunos campos dependen de permisos."
   },
   "servers": [
     {
@@ -248,6 +248,26 @@
       },
       "DatabaseSchemaUnavailable": {
         "$ref": "./components/responses.json#/DatabaseSchemaUnavailable"
+      },
+      "WriteConflict": {
+        "$ref": "./components/responses.json#/WriteConflict"
+      },
+      "ValidationError": {
+        "description": "Datos de captura inv\u00e1lidos (VALIDATION_ERROR con errors por campo) o rechazo global de la solicitud (code y message), incluido RECORD_ID_INVALID.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ValidationError"
+                },
+                {
+                  "$ref": "#/components/schemas/Error"
+                }
+              ]
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -439,6 +459,18 @@
       },
       "WasteMaterialTemplateList": {
         "$ref": "./components/warehouse-schemas.json#/WasteMaterialTemplateList"
+      },
+      "SupplierUpdateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/SupplierUpdateRequest"
+      },
+      "PersonUpdateRequest": {
+        "$ref": "./components/admin-schemas.json#/PersonUpdateRequest"
+      },
+      "ClientUpdateRequest": {
+        "$ref": "./components/sales-schemas.json#/ClientUpdateRequest"
+      },
+      "GoodsReceiptHeaderRequest": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsReceiptHeaderRequest"
       }
     }
   }

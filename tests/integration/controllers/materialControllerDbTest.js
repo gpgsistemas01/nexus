@@ -119,7 +119,7 @@ describe('registro de materiales con y sin medidas', () => {
 
   it.each(['piece', 'liters', 'consumable'])('rechaza un origen de merma no admitido aunque se fuerce el id: %s', async kind => {
     const before = await prisma.waste.count({ where: { supplierId: ids.supplier } });
-    const response = await request(app).post('/wastes').send({ name: `IT Rejected ${kind} ${suffix}`, materialId: ids.sources[kind], supplierId: ids.supplier, base: 1, height: 2, maxUnitCost: 10, initialQuantity: 1, isActive: true }).expect(400);
+    const response = await request(app).post('/wastes').send({ operationId: randomUUID(), name: `IT Rejected ${kind} ${suffix}`, materialId: ids.sources[kind], supplierId: ids.supplier, base: 1, height: 2, maxUnitCost: 10, initialQuantity: 1, isActive: true }).expect(400);
     expect(response.body.code).toBe('WASTE_MATERIAL_INVALID');
     expect(await prisma.waste.count({ where: { supplierId: ids.supplier } })).toBe(before);
   });

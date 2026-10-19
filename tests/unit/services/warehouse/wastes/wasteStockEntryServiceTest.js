@@ -59,8 +59,7 @@ describe('documento de entrada de existencia de merma', () => {
         previousStock: 4,
         newStock: 6,
         observations: 'Recuperado de producción'
-      },
-      include: { movement: { include: { details: true } } }
+      }
     });
   });
 });

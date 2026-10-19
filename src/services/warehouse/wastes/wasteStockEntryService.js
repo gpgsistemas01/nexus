@@ -47,8 +47,7 @@ export const registerWasteStockEntry = async ({
                 previousStock: movementDetail.previousStock,
                 newStock: movementDetail.newStock,
                 observations
-            },
-            include: { movement: { include: { details: true } } }
+            }
         });
     } catch (err) {
         throwIfReferenceNumberAlreadyExists({ err, referenceNumber });

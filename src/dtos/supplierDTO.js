@@ -1,3 +1,4 @@
+import { createVersionDto } from './versionDTO.js';
 const buildSupplierDto = (body = {}) => ({
     legalName: body.legalName.trim(),
     tradeName: body.tradeName.trim(),
@@ -6,4 +7,4 @@ const buildSupplierDto = (body = {}) => ({
 
 export const createSupplierDtoForRegister = (body = {}) => buildSupplierDto(body);
 
-export const createSupplierDtoForEdit = (body = {}) => buildSupplierDto(body);
+export const createSupplierDtoForEdit = (body = {}) => ({ ...buildSupplierDto(body), ...createVersionDto(body) });

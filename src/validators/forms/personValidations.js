@@ -1,6 +1,7 @@
 import { body } from "express-validator";
 import { errorMap } from "../../messages/codeMessages.js";
 import { validateName } from "../fields/fieldsValidator.js";
+import { validateRecordVersion } from '../fields/versionValidator.js';
 
 export const personValidation = [
     validateName({ fieldName: 'fullName', maxLength: 255 }),
@@ -13,4 +14,9 @@ export const personValidation = [
         .isUUID('4').withMessage(errorMap.personAccesses.INVALID_DEPARTMENT),
     body('accesses.*.roleId')
         .isUUID('4').withMessage(errorMap.personAccesses.INVALID_ROLE)
+];
+
+export const personEditValidation = [
+    ...personValidation,
+    validateRecordVersion()
 ];

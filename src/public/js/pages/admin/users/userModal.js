@@ -13,7 +13,7 @@ export const openUserModal = ({ mode = FORM_MODES.CREATE, data = null }) => {
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(userModalId);
 
-    initForm({ form, mode, id: data?.id });
+    initForm({ form, mode, id: data?.id, version: data?.version });
     clearFormErrors(form);
     initUserFormSelect2();
     setFormDisabled({

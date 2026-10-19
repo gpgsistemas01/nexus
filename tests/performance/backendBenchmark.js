@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { startQueryProfile, finishQueryProfile, statements } from './queryProfiler.js';
 import { randomUUID } from 'node:crypto';
 import { createBackendFixture } from './backendFixture.js';
@@ -76,6 +77,7 @@ try {
         .send({ details: issue.details.map(detail => ({ id: detail.id, isSupplied: true, projectConvertedQuantity: 4 })) });
       const response = await operation.set('Cookie', cookie);
       if (response.status !== 200) throw new Error(JSON.stringify({ scenario: name, status: response.status, code: response.body?.code }));
+      if (name === 'waste-templates') assert.ok(response.body.recordsFiltered > 0 && response.body.data.length > 0, 'La medición de plantillas debe usar materiales m² elegibles');
       if (index >= 3) metrics.push({ ms: performance.now() - started, bytes: response.headers['content-length'] ? Number(response.headers['content-length']) : 0 });
     };
     for (let index = 0; index < 3; index++) await run(index);

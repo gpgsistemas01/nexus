@@ -18,6 +18,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`materialController.js`](../../../../../../src/controllers/api/warehouse/materialController.js) |
 | `Domain` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `Usage` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
+| `DatabaseErrors` | control | [`databaseError.js`](../../../../../../src/errors/databaseError.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
@@ -54,6 +55,7 @@ sequenceDiagram
     participant Domain@{ "type": "control" } as materialService.js
     participant Usage@{ "type": "control" } as supplierMaterialService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant DatabaseErrors@{ "type": "control" } as databaseError.js
     participant ErrorHandler@{ "type": "control" } as app.js
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
@@ -80,6 +82,14 @@ sequenceDiagram
     FileBaseRepository-->>Domain: getDb(): PrismaClient | TransactionClient — tx si se recibió
     Domain->>Prisma: db.$transaction(async tx => ...)
     Prisma->>Prisma: tx.supplierMaterial.findUnique({ id })
+    break UUID de relación mal formado
+        Prisma-->>Domain: error 22P02 y rollback
+        Domain->>DatabaseErrors: normalizeDatabaseError(error)
+        DatabaseErrors-->>Domain: normalizeDatabaseError(): RecordIdentifierInvalid
+        Domain-->>Controller: throw RecordIdentifierInvalid
+        Controller->>ErrorHandler: next(error) — propagación del rechazo por Express
+        ErrorHandler-->>Client: HTTP 400 { code: RECORD_ID_INVALID, message }
+    end
     alt Relación inexistente
         Prisma-->>Domain: findUnique(): Promise[null]
         Domain-->>Controller: throw MaterialNotFound

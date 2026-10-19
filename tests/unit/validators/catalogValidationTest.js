@@ -78,24 +78,12 @@ describe('validación HTTP de catálogos administrables', () => {
     }));
   });
 
-  it('rechaza un catálogo fuera de la lista blanca', async () => {
-    const { errors } = await runValidation({ catalog: 'users', body: { name: 'No permitido' } });
-
-    expect(errors).toContainEqual(expect.objectContaining({
-      path: 'catalog',
-      msg: {
-        code: errorMap.catalog.NOT_FOUND,
-        meta: { catalogName: 'users' }
-      }
-    }));
-  });
-
-  it('delega al servicio la resolución del identificador de una edición', async () => {
+  it('valida los datos de edición sin asumir la resolución del identificador de ruta', async () => {
     const { errors } = await runValidation({
       rules: catalogEntryEditValidation,
       catalog: 'roles',
       id: 'not-a-uuid',
-      body: { name: 'Operador', isActive: true }
+      body: { name: 'Operador', isActive: true, expectedVersion: 0 }
     });
 
     expect(errors).toEqual([]);

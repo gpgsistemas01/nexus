@@ -88,10 +88,10 @@ describe('consulta del reporte de mermas', () => {
       unitMeasure: { name: 'Metro cuadrado' }
     }]);
 
-    await expect(findWasteReportRows({
+    await expect(Array.fromAsync(findWasteReportRows({
       search: 'lona',
       supplierId: 'supplier-1'
-    })).resolves.toEqual([expect.objectContaining({
+    }))).resolves.toEqual([expect.objectContaining({
       id: 'waste-1',
       supplierId: 'supplier-1',
       name: 'Lona',
@@ -111,7 +111,7 @@ describe('consulta del reporte de mermas', () => {
           { supplierId: 'supplier-1' }
         ]
       },
-      orderBy: { name: 'asc' }
+      orderBy: [{ name: 'asc' }, { id: 'asc' }]
     }));
   });
 
@@ -122,7 +122,7 @@ describe('consulta del reporte de mermas', () => {
   ])('aplica el alcance %s al inventario exportado', async (inventoryScope, expectedFilter) => {
     wasteFindMany.mockResolvedValue([]);
 
-    await findWasteReportRows({ inventoryScope });
+    await Array.fromAsync(findWasteReportRows({ inventoryScope }));
 
     expect(wasteFindMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { AND: [expectedFilter] }

@@ -10,6 +10,11 @@ import { sanitizeEmptyStrings } from "../../../../../utils/formattersUtils.js";
 import { emitInventoryUpdated } from "../../../../../utils/socketUtils.js";
 import { getIssueDataTableQuery } from '../../../../../utils/issueQueryUtils.js';
 
+import { buildDocumentReadHandler } from '../../documentReadHandler.js';
+import { GoodsIssueNotFound } from '../../../../../errors/warehouse/goodsIssueError.js';
+
+export const buildReadHandler = findDocuments => buildDocumentReadHandler({ findDocuments, dataKey: 'goodsIssue', NotFound: GoodsIssueNotFound });
+
 const DATATABLE_COLUMNS = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
 
 export const buildListHandler = findAllGoodsIssues => async (req, res) => {
@@ -20,6 +25,7 @@ export const buildListHandler = findAllGoodsIssues => async (req, res) => {
     });
 
     const result = await findAllGoodsIssues({
+        includeDetails: false,
         ...query,
         accesses: req.user?.accesses
     });

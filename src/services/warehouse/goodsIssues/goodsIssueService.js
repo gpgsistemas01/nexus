@@ -39,6 +39,7 @@ const GOODS_ISSUE_HEADER_ERROR_TYPES = {
 
 
 export const findAllGoodsIssues = async ({
+    cursor,
     skip = 0,
     take = 10,
     search = '',
@@ -53,7 +54,9 @@ export const findAllGoodsIssues = async ({
     orderDir = 'desc',
     type = MATERIAL_TYPES.MATERIAL,
     accesses = [],
-    includeCounts = true
+    includeCounts = true,
+    includeDetails = true,
+    id = null
 }) => {
 
     const db = getDb();
@@ -62,6 +65,7 @@ export const findAllGoodsIssues = async ({
     const userDepartmentIds = accesses.map(access => access.departmentId).filter(Boolean);
 
     const where = {
+        ...(id && { id }),
         ...buildGoodsIssueContextWhere(type),
         ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
         ...(clientId && { clientId }),
@@ -107,14 +111,13 @@ export const findAllGoodsIssues = async ({
         query: {
             skip,
             take,
+            ...(cursor && { cursor }),
             where,
-            orderBy: {
-                [orderBy]: orderDir
-            },
+            orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             include: {
                 status: true,
                 fulfillmentStatus: true,
-                details: {
+                details: includeDetails && {
                     where: {
                         OR: [
                             {

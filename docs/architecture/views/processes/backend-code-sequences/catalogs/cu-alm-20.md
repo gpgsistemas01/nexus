@@ -19,6 +19,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Domain` | control | [`consumableService.js`](../../../../../../src/services/warehouse/consumables/consumableService.js) |
 | `Usage` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `MaterialService` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
+| `DatabaseErrors` | control | [`databaseError.js`](../../../../../../src/errors/databaseError.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
@@ -56,6 +57,7 @@ sequenceDiagram
     participant Usage@{ "type": "control" } as supplierMaterialService.js
     participant MaterialService@{ "type": "control" } as materialService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+    participant DatabaseErrors@{ "type": "control" } as databaseError.js
     participant ErrorHandler@{ "type": "control" } as app.js
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
@@ -83,6 +85,15 @@ sequenceDiagram
     FileBaseRepository-->>MaterialService: getDb(): PrismaClient | TransactionClient — tx si se recibió
     MaterialService->>Prisma: db.$transaction(async tx => ...)
     Prisma->>Prisma: tx.supplierMaterial.findUnique({ id })
+    break UUID de relación mal formado
+        Prisma-->>MaterialService: error 22P02 y rollback
+        MaterialService->>DatabaseErrors: normalizeDatabaseError(error)
+        DatabaseErrors-->>MaterialService: normalizeDatabaseError(): RecordIdentifierInvalid
+        MaterialService-->>Domain: throw RecordIdentifierInvalid
+        Domain-->>Controller: throw RecordIdentifierInvalid
+        Controller->>ErrorHandler: next(error) — propagación del rechazo por Express
+        ErrorHandler-->>Client: HTTP 400 { code: RECORD_ID_INVALID, message }
+    end
     alt [relación inexistente o tipo distinto de CONSUMABLE]
         Prisma-->>MaterialService: findUnique(): Promise[null]
         Domain-->>Controller: throw MaterialNotFound

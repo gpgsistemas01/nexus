@@ -7,7 +7,7 @@ const authorizeUserApi = vi.fn(permission => `authorize:${permission}`);
 const verifyApiTokenRequired = vi.fn();
 const validate = vi.fn();
 const handlers = vi.hoisted(() => Object.fromEntries(['Material', 'Consumable'].flatMap(label => [
-    `getAll${label}GoodsReceipts`, `register${label}GoodsReceipt`, `edit${label}GoodsReceipt`,
+    `get${label}GoodsReceipt`, `getAll${label}GoodsReceipts`, `register${label}GoodsReceipt`, `edit${label}GoodsReceipt`,
     `correct${label}GoodsReceiptDetail`, `cancel${label}GoodsReceiptDetail`
 ].map(name => [name, vi.fn()]))));
 

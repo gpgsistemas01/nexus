@@ -1,3 +1,5 @@
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
+import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
@@ -6,6 +8,7 @@ import { randomUUID } from 'node:crypto';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 
+const areaKeys = { 'IMPRESIÓN': DEPARTMENT_KEYS.PRINTING, 'TALLER 3D': DEPARTMENT_KEYS.WORKSHOP_3D, 'PT/TRÁFICO': DEPARTMENT_KEYS.PT_TRAFFIC, 'INSTALACIONES': DEPARTMENT_KEYS.INSTALLATIONS, 'ACABADOS': DEPARTMENT_KEYS.FINISHING };
 const areas = ['IMPRESIÓN', 'TALLER 3D', 'PT/TRÁFICO', 'INSTALACIONES', 'ACABADOS'];
 const suffix = randomUUID().slice(0, 8);
 const ids = {};
@@ -54,13 +57,13 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
         for (const name of ['Aprobada', 'Cancelada']) {
             await prisma.status.upsert({ where: { name }, update: {}, create: { name } });
         }
-        const operator = await prisma.role.upsert({ where: { name: 'Operador' }, update: {}, create: { name: 'Operador' } });
-        const installer = await prisma.role.upsert({ where: { name: 'Instalador' }, update: {}, create: { name: 'Instalador' } });
-        const deniedRole = await prisma.role.upsert({ where: { name: 'Asesor de ventas' }, update: {}, create: { name: 'Asesor de ventas' } });
+        const operator = await prisma.role.upsert({ where: { name: 'Operador' }, update: {}, create: { name: 'Operador', key: ROLE_KEYS.OPERATOR } });
+        const installer = await prisma.role.upsert({ where: { name: 'Instalador' }, update: {}, create: { name: 'Instalador', key: ROLE_KEYS.INSTALLER } });
+        const deniedRole = await prisma.role.upsert({ where: { name: 'Asesor de ventas' }, update: {}, create: { name: 'Asesor de ventas', key: ROLE_KEYS.SALES_ADVISOR } });
         ids.requester = (await prisma.person.create({ data: { fullName: `IT Access Requester ${suffix}` } })).id;
         ids.advisor = (await prisma.person.create({ data: { fullName: `IT Access Advisor ${suffix}` } })).id;
         for (const area of areas) {
-            const department = await prisma.department.upsert({ where: { name: area }, update: {}, create: { name: area } });
+            const department = await prisma.department.upsert({ where: { name: area }, update: {}, create: { name: area, key: areaKeys[area] } });
             const roleId = area === 'INSTALACIONES' ? installer.id : operator.id;
             const user = await prisma.user.create({ data: {
                 name: `IT Access ${area} ${suffix}`, password: 'integration-only',
@@ -147,6 +150,9 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             expect(saved.details.every(row => !row.isSupplied)).toBe(true);
             const listed = await request(app).get(path).set('Cookie', cookie).query({ search: { value: issue.referenceNumber } }).expect(200);
             expect(listed.body.data.map(row => row.id)).toContain(issue.id);
+            expect(listed.body.data.find(row => row.id === issue.id)).not.toHaveProperty('details');
+            const retrieved = await request(app).get(`${path}/${issue.id}`).set('Cookie', cookie).expect(200);
+            expect(retrieved.body[resource === 'wastes' ? 'wasteIssue' : 'goodsIssue'].details[0].id).toBe(saved.details[0].id);
             expect((await stockSnapshot()).slice(0, 2)).toEqual(before.slice(0, 2));
         }
     });
@@ -191,6 +197,7 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             const saved = await model.findUnique({ where: { id: issue.id }, include: { details: true } });
             expect(saved.details.every(row => !row.isSupplied)).toBe(true);
             const inventoryPayload = {
+                operationId: randomUUID(),
                 name: `IT Access Rejected ${suffix}`, supplierId: ids.supplier,
                 materialId: ids.materials, presentationId: ids.presentation, unitMeasureId: ids.unit,
                 base: 1, height: 1, maxUnitCost: 1, [resource === 'wastes' ? 'initialQuantity' : 'newStock']: 1, isActive: true
@@ -198,14 +205,14 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             await request(app).post(`/api/warehouse/${resource}`).set('Cookie', cookie).send(inventoryPayload).expect(403);
             const itemId = resource === 'wastes' ? ids.waste : ids[resource];
             await request(app).patch(`/api/warehouse/${resource}/${itemId}`).set('Cookie', cookie)
-                .send({ name: inventoryPayload.name, supplierId: ids.supplier, maxUnitCost: 1, isActive: true }).expect(403);
+                .send({ expectedVersion: 0, expectedMaterialVersion: 0, name: inventoryPayload.name, supplierId: ids.supplier, maxUnitCost: 1, isActive: true }).expect(403);
             await request(app).patch(`/api/warehouse/${resource}/${itemId}/stock`).set('Cookie', cookie)
-                .send({ newStock: 1, supplierId: ids.supplier, reasonId: randomUUID() }).expect(403);
+                .send({ expectedVersion: 0, newStock: 1, supplierId: ids.supplier, reasonId: randomUUID() }).expect(403);
         }
         await request(app).get('/api/warehouse/wastes/material-templates').set('Cookie', cookie)
             .query({ supplierId: ids.supplier }).expect(403);
         await request(app).get('/api/warehouse/reports/inventory/excel').set('Cookie', cookie).expect(403);
-        await request(app).post(`/api/warehouse/wastes/${ids.waste}/stock-additions`).set('Cookie', cookie).send({ quantity: 1 }).expect(403);
+        await request(app).post(`/api/warehouse/wastes/${ids.waste}/stock-additions`).set('Cookie', cookie).send({ operationId: randomUUID(), quantity: 1 }).expect(403);
         await request(app).post('/api/warehouse/suppliers').set('Cookie', cookie)
             .send({ legalName: 'Proveedor rechazado', tradeName: 'Proveedor rechazado', isActive: true }).expect(403);
         expect(await stockSnapshot()).toEqual(before);

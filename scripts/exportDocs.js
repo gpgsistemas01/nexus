@@ -104,7 +104,8 @@ const PUBLICATIONS = Object.freeze({
                 'docs/architecture/views/logical/02-identity-access-and-audit.md',
                 'docs/architecture/views/physical/index.md',
                 'docs/architecture/views/physical/01-system-runtime-and-deployment.md',
-                'docs/architecture/views/physical/02-postgresql-runtime-and-migration-roles.md'
+                'docs/architecture/views/physical/02-postgresql-runtime-and-migration-roles.md',
+                'docs/architecture/views/physical/03-supabase-backup-and-restore.md'
             ]),
             'patrones-y-mapa-de-codigo': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',

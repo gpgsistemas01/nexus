@@ -187,3 +187,58 @@ Las migraciones aplicadas permanecen intactas.
 La identidad conserva proveedor, nombre, medidas y pesos. Una referencia distinta que
 produce la misma identidad no reemplaza la guardada: devuelve `meta.waste` y permite
 abrir Agregar stock. Consumibles y unidades distintas de m² no originan mermas.
+
+## Concurrencia y recuperación de escrituras
+
+`WasteOperation` conserva un recibo por `(userId, operationId)`: huella de la captura
+normalizada y resultado confirmado. El INSERT del recibo, la merma, su entrada EME y
+el movimiento pertenecen a la misma transacción. Un reintento del mismo actor espera
+al ganador y devuelve el resultado original; cambiar acción, merma o captura con esa
+clave responde `409 OPERATION_KEY_CONFLICT`. Un rollback no deja recibo. El resultado
+recuperado acredita esa operación y puede mostrar su saldo original; el listado se
+recarga para mostrar el saldo vigente. Los recibos no expiran automáticamente y se
+incluyen en los respaldos; eliminarlos permitiría reutilizar claves antiguas.
+
+Las altas HTTP de merma y entradas adicionales exigen UUID v4 `operationId`, incluso
+si el alta comienza sin stock. Las llamadas internas sin clave sólo conservan la
+transacción: no ofrecen garantía de reintento y no son el contrato HTTP. El navegador
+conserva la captura pendiente por actor/acción/merma antes de enviar. Bloquea submit
+mientras espera y lo libera también ante fallo; ante timeout/5xx mantiene la clave y
+ofrece Recuperar, incluso tras recargar. La recuperación utiliza la captura anterior,
+no los campos nuevos del modal. No se interpreta como otra entrada de stock. Un
+rechazo definitivo del primer intento permite corregir los datos; un reintento sin
+permiso conserva el pendiente porque no demuestra si el intento anterior se guardó.
+Si el servidor confirma que la transacción se revirtió, `meta.operationRejected=true`
+permite descartar el pendiente y corregir su captura. El marcador no se envía para un
+conflicto de clave ni para fallos ambiguos.
+Borrar el almacenamiento del navegador pierde esta recuperación automática: antes de
+crear otra operación debe consultarse la historia. No existe sincronización del
+pendiente entre dispositivos.
+
+`version` es un contador de escritura en Material, SupplierMaterial, Waste, Client,
+Supplier, User, Person y los catálogos administrables (Department, Role, Presentation,
+UnitMeasure, StockAdjustmentReason y FulfillmentStatus). La migración
+`20261016131000_record_versions` instala un trigger BEFORE UPDATE que incrementa el
+contador en PostgreSQL; así también lo hacen las consultas SQL de stock/costos.
+No se incrementa de nuevo en Prisma. Los formularios envían `expectedVersion`;
+la edición de material/consumible envía además `expectedMaterialVersion` porque el
+nombre y mínimo pertenecen al Material compartido, mientras costo/estado pertenecen
+a su oferta. Se condiciona el UPDATE a la versión consultada; un conflicto responde
+`409 RECORD_VERSION_CONFLICT` y revierte toda la operación. Los ajustes de saldo
+comprueban la versión después de bloquear la existencia y antes de generar folio.
+Las entradas aditivas usan idempotencia y sumas atómicas, sin rechazar entradas nuevas
+independientes por una versión anterior.
+
+El alta de SupplierMaterial usa INSERT, nunca upsert: una oferta rival no se modifica
+ni genera otro ajuste inicial. Los bloqueos ordenados y las transacciones existentes
+para surtido, devoluciones y correcciones siguen protegiendo el stock y los documentos.
+Esto no añade versión optimista a todos los cambios de cabecera de compras/salidas;
+los comandos documentales siguen verificando su estado actual bajo bloqueo.
+
+Las plantillas se agrupan/paginan en SQL antes de cargar sus relaciones. Los listados
+HTTP de compras/salidas devuelven cabeceras; GET por id hidrata el documento vigente
+usando los mismos filtros de contexto y área. Los reportes de inventario, compras, salidas y movimientos recorren lotes con cursor
+y desempate por id; las compras/mermas conservan sólo acumuladores de resumen. Una
+exportación operativa no es una instantánea transaccional: si cambian datos mientras
+se recorre, puede reflejar distintos momentos. Para una recuperación consistente se
+utiliza el respaldo nativo descrito en la vista física.

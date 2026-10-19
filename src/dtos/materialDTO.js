@@ -1,3 +1,4 @@
+import { createVersionDto } from './versionDTO.js';
 import { normalizeMaterialDimensions, toNumber } from '../utils/formattersUtils.js';
 
 const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
@@ -44,9 +45,11 @@ export const createMaterialDtoForRegister = (body = {}) => {
 };
 
 export const createMaterialDtoForEdit = (body = {}) => ({
+    ...createVersionDto(body),
+    ...(body.expectedMaterialVersion !== undefined && { expectedMaterialVersion: Number(body.expectedMaterialVersion) }),
     name: body.name.trim(),
     supplierId: body.supplierId,
     ...buildMaterialSecondaryDataDto(body)
 });
 
-export const createMaterialDtoForStockUpdate = (body = {}) => buildMaterialStockDto(body);
+export const createMaterialDtoForStockUpdate = (body = {}) => ({ ...buildMaterialStockDto(body), ...createVersionDto(body) });

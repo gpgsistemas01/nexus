@@ -1,6 +1,7 @@
 import express from 'express';
 
 import { isAppError } from '../../src/errors/AppError.js';
+import { normalizeDatabaseError } from '../../src/errors/databaseError.js';
 
 export const createControllerTestApp = ({ registerRoutes }) => {
   const app = express();
@@ -9,12 +10,14 @@ export const createControllerTestApp = ({ registerRoutes }) => {
   registerRoutes(app);
   app.use((error, _request, response, next) => {
     if (response.headersSent || response.destroyed) return next(error);
-    if (isAppError(error)) {
-      return response.status(error.statusCode).json({
-        type: error.constructor.name,
-        code: error.code,
-        message: error.message,
-        meta: error.meta
+    const responseError = isAppError(error) ? error : normalizeDatabaseError(error);
+
+    if (isAppError(responseError)) {
+      return response.status(responseError.statusCode).json({
+        type: responseError.constructor.name,
+        code: responseError.code,
+        message: responseError.message,
+        meta: responseError.meta
       });
     }
 

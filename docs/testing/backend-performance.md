@@ -125,8 +125,8 @@ un límite arbitrario de filas ni se cambia la configuración de despliegue en e
 Se cede el event loop cada 250 filas y se espera al drenaje del destino cuando está
 saturado. La generación sigue usando el hilo principal; estas pausas no ejecutan el
 cálculo en paralelo. No se incorpora un pool de workers. Los controladores conservan
-las columnas y permisos existentes; la única consulta que cambia a lectura por bloques
-es inventario. SheetJS queda como lector independiente para verificar los archivos en
+las columnas y permisos existentes. Inventario, compras, salidas, movimientos,
+proveedores, usuarios, personas y clientes se consultan por bloques. SheetJS queda como lector independiente para verificar los archivos en
 las pruebas, sin formar parte de las dependencias de producción.
 
 `findWarehouseReportRows` entrega un iterable asíncrono y reutiliza `findBatches` del
@@ -206,3 +206,40 @@ independencia de transacciones y concurrencia del pool, junto con integración H
 que comprueba altas, rollback y operaciones concurrentes reales. Se usa
 `NODE_OPTIONS=--trace-deprecation` durante la integración para identificar y comprobar
 la ausencia del aviso; no se desactivan las advertencias del proceso.
+
+## Escenarios después de las correcciones de concurrencia
+
+La fixture de plantillas debe usar unidad m² y materiales con dimensiones; el benchmark
+rechaza un resultado vacío. No se presenta como mejora una medición que excluya todos
+los candidatos por unidad. Comparar cabeceras de compras/salidas por bytes y consultas;
+el detalle se mide mediante su GET por id. Las exportaciones recorren lotes sin el
+límite anterior de 100 000 filas y producen filas progresivamente, con acumuladores
+para los resúmenes. Para grandes documentos, un lote de cabeceras todavía incluye todos
+los detalles de cada documento; no garantiza memoria constante respecto al tamaño del
+mayor documento ni al número de grupos de resumen.
+
+Conservar percentiles, volumen elegible, concurrencia, SQL y event loop junto con el
+commit y ambiente. Las corridas locales no certifican un máximo de cinco segundos
+para Supabase en producción. Los recibos de idempotencia añaden consultas a escrituras
+nuevas para evitar duplicados; los reintentos confirmados sólo consultan el recibo.
+
+## Lectura progresiva y validación de entradas
+
+`cursor` conserva el ID de la última fila leída; el siguiente bloque omite esa fila
+con `skip: 1`. Se mantiene el orden solicitado y el ID como desempate. El tamaño de
+consulta está en `QUERY_BATCH_SIZES`; es independiente de la página de DataTables.
+`function*` transforma filas bajo demanda y `async function*` espera cada bloque antes
+de entregarlo al escritor. Esos generadores evitan construir un segundo array completo;
+no crean threads ni sustituyen los filtros de SQL. Los resúmenes conservan acumuladores.
+
+Las exportaciones de usuarios, personas y clientes también reutilizan sus consultas
+de dominio sin conteos. La integración atraviesa el límite con 5.001 registros por
+recurso y comprueba orden, contenido y encabezados sin versiones técnicas.
+
+Las validaciones de UUID, cantidades y pesos son locales y no consultan la base. En
+merma se conservan las comprobaciones de presentación, cálculo y estado que requieren
+la oferta vigente, dentro de su servicio. Las pequeñas listas de campos no justifican
+retirar reglas de integridad; su costo se distingue del número y tiempo de consultas.
+El alta/entrada deja de recargar el movimiento desde `WasteStockEntry.create`: el
+servicio ya lo obtuvo al aplicar el movimiento y el consumidor no requiere esa relación.
+La lectura final de merma sí conserva saldos y versión resultantes para la respuesta.

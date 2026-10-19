@@ -88,7 +88,7 @@ app.use((err, req, res, next) => {
         return next(err);
     }
 
-    const responseError = normalizeDatabaseError(err);
+    const responseError = isAppError(err) ? err : normalizeDatabaseError(err);
 
     if (isAppError(responseError)) {
         if (responseError !== err) logger.error(

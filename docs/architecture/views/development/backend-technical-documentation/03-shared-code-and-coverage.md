@@ -115,8 +115,10 @@ el temporal se limpia también ante errores o cancelaciones. No crea otro client
 base de datos ni workers. El inventario se consulta mediante `findBatches` en
 `paginationRepository`, con bloques de 5.000 y orden estable por campo e id; el servicio
 conserva filtros y conversión de cantidades, mientras el controller produce las
-columnas de forma progresiva. Los demás reportes conservan sus consultas y arrays de
-entrada actuales. La guía de rendimiento documenta cómo medir ambas etapas. El mapa cubre tanto
+columnas de forma progresiva. Los servicios de reportes de cada área reutilizan
+`findBatches` y las consultas de dominio, con conteos desactivados y cursores internos.
+Usuarios, personas y clientes también entregan filas progresivamente, manteniendo
+sus filtros y columnas. La guía de rendimiento documenta cómo medir ambas etapas. El mapa cubre tanto
 `reportController.js` de cada área como los controllers específicos de reportes de
 compras y salidas, enumerados en el registro anterior.
 

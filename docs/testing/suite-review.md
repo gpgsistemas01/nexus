@@ -366,3 +366,32 @@ La revisión del contrato de merma conserva las suites existentes: el payload se
 Se amplían particiones de cantidad ausente/fuera de rango y la lectura persistida de
 `minStock`/`isActive`; no se agregan pruebas de estructura HTML ni otra suite de CRUD.
 La correspondencia entre contrato y persistencia se registra en `DP-MER-005`.
+
+## Correcciones de concurrencia y consultas (16 de octubre de 2026)
+
+Se conserva el bloqueo de doble submit y se amplía a fallo/recuperación. Las matrices
+unitarias de agrupación de plantillas que reproducían el algoritmo con mocks se
+sustituyen por `DP-PERF-001` con PostgreSQL real: rollos separados, hojas agrupadas,
+costo máximo, exclusión de consumibles/ofertas inactivas y página fuera del total.
+La unitaria conserva el rechazo de consulta sin proveedor. Se mantienen las pruebas
+puras de resúmenes y fórmulas; los consumidores de reportes ahora recorren iterables.
+`DP-CON-001/002` añaden recibos, rollback, claves distintas, carreras de ofertas y
+formularios desactualizados. No hay prueba automatizada de navegador/DBeaver; las
+pruebas de UI usan dobles, y el respaldo se ensaya con herramientas nativas sobre datos
+sintéticos, sin acreditar conexión con un proyecto Supabase real.
+
+La revisión de separación de responsabilidades conserva `DP-VAL-001`: los validadores
+comprueban inputs y metadatos de la captura; la resolución de `id`, `detailId` y del
+catálogo pertenece al servicio. Se retiran las expectativas unitarias de errores de
+ruta dentro del formulario. `catalogServiceTest.js` conserva el rechazo de catálogo no
+permitido, y `apiWriteValidationDbTest.js` comprueba códigos globales para UUID mal
+formado, 404 para registros inexistentes, prioridad del rechazo de inputs y ausencia de
+escrituras mediante lectura posterior. `databaseErrorTest.js` distingue el UUID inválido
+de errores numéricos o de integridad; `errorHandlerTest.js` usa el código global real y
+conserva el aviso y la ausencia de apertura tras fallar la consulta del modal. Las pruebas
+de detalles siguen distinguiendo alta/edición completa de encabezado. No se afirma un
+recorrido de navegador.
+
+Se amplía la integración de exportaciones existente con `DP-PERF-002`, sin crear una
+suite por recurso ni pruebas que fijen HTML. Las muestras usan 5.001 registros para
+atravesar el bloque de 5.000 y comprobar el archivo final con un lector independiente.

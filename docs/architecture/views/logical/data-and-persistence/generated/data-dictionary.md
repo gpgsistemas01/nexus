@@ -29,6 +29,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `key` | `String` | Sí | UK | `dbgenerated("gen_random_uuid()::text")` | `@db.VarChar(100)` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
@@ -38,6 +39,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `key` | `String` | Sí | UK | `dbgenerated("gen_random_uuid()::text")` | `@db.VarChar(100)` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
@@ -47,6 +49,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `personId` | `String?` | No | FK | — | `@db.Uuid` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
@@ -61,6 +64,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `fullName` | `String` | Sí | — | — | `@db.VarChar(255)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
@@ -128,6 +132,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
@@ -146,6 +151,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | — | — | `@db.VarChar(255)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
@@ -159,6 +165,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `codeNumber` | `Int` | Sí | — | — | — |
 | `code` | `String` | Sí | UK | — | `@db.VarChar(10)` |
@@ -170,6 +177,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | — | — | `@db.VarChar(200)` |
 | `sku` | `String?` | No | UK | — | `@db.VarChar(200)` |
@@ -189,6 +197,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | — | — | `@db.VarChar(20)` |
 | `symbol` | `String` | Sí | — | — | `@db.VarChar(10)` |
@@ -198,6 +207,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
@@ -206,6 +216,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `maxUnitCost` | `Decimal?` | No | — | — | `@db.Decimal(18, 6)` |
 | `sku` | `String?` | No | — | — | `@db.VarChar(50)` |
@@ -513,6 +524,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `name` | `String` | Sí | UK | — | `@db.VarChar(100)` |
 | `isActive` | `Boolean` | Sí | — | `true` | — |
@@ -525,6 +537,7 @@ usuarios y responsables se mantiene en el
 
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
+| `version` | `Int` | Sí | — | `0` | — |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
 | `supplierId` | `String` | Sí | FK | — | `@db.Uuid` |
 | `presentationId` | `String` | Sí | FK | — | `@db.Uuid` |
@@ -697,6 +710,20 @@ usuarios y responsables se mantiene en el
 | `waste` | `Waste` | `wasteId` | Exactamente uno |
 | `createdBy` | `User` | `createdById` | Exactamente uno |
 | `movement` | `WasteMovement` | `wasteMovementId` | Exactamente uno |
+
+### `WasteOperation`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `userId` | `String` | Sí | PK,FK | — | `@db.Uuid` |
+| `operationId` | `String` | Sí | PK | — | `@db.Uuid` |
+| `requestHash` | `String` | Sí | — | — | `@db.VarChar(64)` |
+| `result` | `Json?` | No | — | — | — |
+| `createdAt` | `DateTime` | Sí | — | `now()` | — |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `user` | `User` | `userId` | Exactamente uno |
 
 ### `WasteStockAdjustment`
 

@@ -18,6 +18,11 @@ import { successCodeMessages } from '../../../messages/codeMessages.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
 import { getIssueDataTableQuery } from '../../../utils/issueQueryUtils.js';
 
+import { buildDocumentReadHandler } from './documentReadHandler.js';
+import { WasteIssueNotFound } from '../../../errors/warehouse/wasteIssueError.js';
+
+export const getWasteIssue = buildDocumentReadHandler({ findDocuments: findAllWasteIssues, dataKey: 'wasteIssue', NotFound: WasteIssueNotFound });
+
 const DATATABLE_COLUMNS = [
     'referenceNumber',
     'requestDate',
@@ -36,7 +41,7 @@ export const getAllWasteIssues = async (req, res) => {
         columns: DATATABLE_COLUMNS
     });
 
-    const result = await findAllWasteIssues(query);
+    const result = await findAllWasteIssues({ ...query, includeDetails: false });
 
     return res.status(200).json(result);
 };

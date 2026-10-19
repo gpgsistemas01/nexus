@@ -1,3 +1,4 @@
+import { createVersionDto } from './versionDTO.js';
 export const createUserDtoForRegister = (body) => ({
     name: body.name,
     password: body.password,
@@ -7,6 +8,7 @@ export const createUserDtoForRegister = (body) => ({
 });
 
 export const createUserDtoForEdit = (body) => ({
+    ...createVersionDto(body),
     name: body.name,
     personId: body.personId,
     roleId: body.roleId,
@@ -14,6 +16,7 @@ export const createUserDtoForEdit = (body) => ({
 });
 
 export const createUserPasswordDtoForEdit = (body) => ({
+    ...createVersionDto(body),
     password: body.password,
 });
 

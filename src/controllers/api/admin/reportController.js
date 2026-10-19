@@ -1,6 +1,5 @@
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
-import { findAllPersons } from "../../../services/admin/person/personService.js";
-import { findAllUsers } from "../../../services/admin/userService.js";
+import { findPersonReportRows, findUserReportRows } from "../../../services/admin/reportService.js";
 import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
 import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
@@ -72,7 +71,11 @@ const sendMovementReport = async ({ req, res, context, sheetName, filename, addi
 
     return sendExcelReport({
         res,
-        data: [MOVEMENT_REPORT_COLUMNS.map(column => column === 'Material' && context === 'consumables' ? 'Consumible' : column), ...rows.map(mapMovementReportRow)],
+        data: (async function* () {
+            yield MOVEMENT_REPORT_COLUMNS.map(column => column === 'Material' && context === 'consumables' ? 'Consumible' : column);
+            let index = 0;
+            for await (const row of rows) yield mapMovementReportRow(row, index++);
+        })(),
         sheetName,
         filename,
         filenameOptions: { separator: '-', order: 'year-month' }
@@ -120,33 +123,30 @@ export const exportUserReport = async (req, res) => {
         columns
     });
 
-    const { data: rows } = await findAllUsers({
-        includeCounts: false,
-        skip: 0,
-        take: 0,
+    const rows = findUserReportRows({
         search: getDataTableSearch(req.query),
         orderBy,
         orderDir
     });
 
-    const data = [
-        [
+    const data = async function* () {
+        yield [
             'Usuario',
             'Persona',
             'Rol',
             'Área'
-        ],
-        ...rows.map(row => [
+        ];
+        for await (const row of rows) yield [
             row.name,
             row.person?.fullName || '-',
             row.roleName || '-',
             row.departmentName || '-'
-        ])
-    ];
+        ];
+    };
 
     return sendExcelReport({
         res,
-        data,
+        data: data(),
         sheetName: USER_SHEET_NAME,
         filename: USER_FILENAME,
         filenameOptions: { separator: '-', order: 'year-month' }
@@ -167,36 +167,33 @@ export const exportPersonReport = async (req, res) => {
         columns
     });
 
-    const { data: rows } = await findAllPersons({
-        includeCounts: false,
+    const rows = findPersonReportRows({
         departments,
-        includeAccesses: true,
-        skip: 0,
-        take: 0,
         search: getDataTableSearch(req.query),
         orderBy,
         orderDir
     });
 
-    const data = [
-        [
+    const data = async function* () {
+        yield [
             'Nombre',
             'Área',
             'Rol'
-        ],
-        ...rows.flatMap(row => row.accesses?.length
-            ? row.accesses.map(access => [
-                row.fullName,
-                access.department.name,
-                access.role.name
-            ])
-            : [[row.fullName, '-', '-']]
-        )
-    ];
+        ];
+        for await (const row of rows) {
+            if (!row.accesses?.length) {
+                yield [row.fullName, '-', '-'];
+                continue;
+            }
+            for (const access of row.accesses) {
+                yield [row.fullName, access.department.name, access.role.name];
+            }
+        }
+    };
 
     return sendExcelReport({
         res,
-        data,
+        data: data(),
         sheetName: PERSON_SHEET_NAME,
         filename: PERSON_FILENAME,
         filenameOptions: { separator: '-', order: 'year-month' }

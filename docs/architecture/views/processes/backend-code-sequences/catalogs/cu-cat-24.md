@@ -16,11 +16,9 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | --- | --- | --- |
 | `Route` | boundary | [`catalogApiRoute.js`](../../../../../../src/routes/api/admin/catalogApiRoute.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
-| `Validator` | control | [`validatorMiddleware.js`](../../../../../../src/middleware/validatorMiddleware.js) |
 | `Controller` | control | [`catalogController.js`](../../../../../../src/controllers/api/admin/catalogController.js) |
 | `Domain` | control | [`catalogService.js`](../../../../../../src/services/admin/catalogService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
-| `ValidationRules` | control | [`catalogValidations.js`](../../../../../../src/validators/forms/catalogValidations.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
@@ -51,8 +49,6 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route@{ "type": "boundary" } as catalogApiRoute.js
     participant Auth@{ "type": "control" } as authMiddleware.js
-    participant ValidationRules@{ "type": "control" } as catalogValidations.js
-    participant Validator@{ "type": "control" } as validatorMiddleware.js
     participant Controller@{ "type": "control" } as catalogController.js
     participant Domain@{ "type": "control" } as catalogService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
@@ -69,15 +65,16 @@ sequenceDiagram
     break Identidad no vigente o permiso denegado
         Auth-->>Client: HTTP 401 INVALID_AUTH o HTTP 403 FORBIDDEN
     end
-    Route->>ValidationRules: catalogNameValidation[] — cadena ejecutada por Express
-    Route->>Validator: validate(req, res, next)
-    break Validación rechazada
-        Validator-->>Client: HTTP 400 { errors }
-    end
     Route->>Controller: getAllCatalogEntries(req, res)
     activate Controller
     Controller->>Domain: findAllCatalogEntries(req.params.catalog, { skip, take, search })
     activate Domain
+    Domain->>Domain: getCatalog(catalogName)
+    break Catálogo no permitido
+        Domain-->>Controller: throw CatalogNotFound
+        Controller->>ErrorHandler: next(error) — propagación del rechazo por Express
+        ErrorHandler-->>Client: HTTP 404 { code: CATALOG_NOT_FOUND, message, meta }
+    end
     Domain->>FileBaseRepository: getDb()
     FileBaseRepository-->>Domain: getDb(): PrismaClient | TransactionClient — conserva tx
     Domain->>Prisma: model.findMany({ where, skip, take, orderBy: { name: 'asc' } })

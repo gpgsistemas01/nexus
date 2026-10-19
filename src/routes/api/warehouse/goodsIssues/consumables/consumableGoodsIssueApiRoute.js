@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-    getAllConsumableGoodsIssues,
+    getAllConsumableGoodsIssues, getConsumableGoodsIssue,
     registerConsumableGoodsIssue,
     editConsumableGoodsIssue,
     editConsumableGoodsIssueHeader,
@@ -11,11 +11,46 @@ import { goodsIssueRouteMiddleware } from '../shared/goodsIssueRouteMiddleware.j
 
 const router = express.Router();
 
-router.get('/', ...goodsIssueRouteMiddleware.list, getAllConsumableGoodsIssues);
-router.post('/', ...goodsIssueRouteMiddleware.register, registerConsumableGoodsIssue);
-router.patch('/:id', ...goodsIssueRouteMiddleware.edit, editConsumableGoodsIssue);
-router.patch('/:id/header', ...goodsIssueRouteMiddleware.editHeader, editConsumableGoodsIssueHeader);
-router.patch('/:id/details', ...goodsIssueRouteMiddleware.editDetails, editConsumableGoodsIssueDetails);
-router.patch('/:id/details/:detailId/returns', ...goodsIssueRouteMiddleware.returnDetail, registerConsumableGoodsIssueDetailReturn);
+router.get(
+    '/:id',
+    ...goodsIssueRouteMiddleware.list,
+    getConsumableGoodsIssue
+);
+
+router.get(
+    '/',
+    ...goodsIssueRouteMiddleware.list,
+    getAllConsumableGoodsIssues
+);
+
+router.post(
+    '/',
+    ...goodsIssueRouteMiddleware.register,
+    registerConsumableGoodsIssue
+);
+
+router.patch(
+    '/:id',
+    ...goodsIssueRouteMiddleware.edit,
+    editConsumableGoodsIssue
+);
+
+router.patch(
+    '/:id/header',
+    ...goodsIssueRouteMiddleware.editHeader,
+    editConsumableGoodsIssueHeader
+);
+
+router.patch(
+    '/:id/details',
+    ...goodsIssueRouteMiddleware.editDetails,
+    editConsumableGoodsIssueDetails
+);
+
+router.patch(
+    '/:id/details/:detailId/returns',
+    ...goodsIssueRouteMiddleware.returnDetail,
+    registerConsumableGoodsIssueDetailReturn
+);
 
 export default router;

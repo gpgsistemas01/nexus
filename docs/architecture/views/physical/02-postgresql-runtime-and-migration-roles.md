@@ -411,3 +411,6 @@ del rollo completo sigue guardándose y debe ser mayor que el cono. Cuando un hi
 conserva un neto de referencia, se sigue comprobando su diferencia con el total y cono.
 No elimina columnas ni actualiza datos anteriores. Aplicar `npm run db:migrate` antes
 de iniciar el backend nuevo; las migraciones previas no se modifican.
+
+El [procedimiento de respaldo y restauración](03-supabase-backup-and-restore.md) detalla
+la copia nativa con DBeaver y la preparación de un destino local o remoto.

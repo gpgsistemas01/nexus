@@ -1,12 +1,11 @@
 import express from 'express';
 import { editPerson, getAllPersons, registerPerson } from "../../../controllers/api/admin/personController.js";
 import { authorizeUserApi, verifyApiTokenRequired } from "../../../middleware/authMiddleware.js";
-import { personValidation } from '../../../validators/forms/personValidations.js';
+import { personEditValidation, personValidation } from '../../../validators/forms/personValidations.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();
-
 
 router.get(
     '/',
@@ -27,7 +26,7 @@ router.post(
 router.put(
     '/:id',
     verifyApiTokenRequired,
-    personValidation,
+    personEditValidation,
     validate,
     authorizeUserApi(PERMISSIONS.PERSONS_WRITE),
     editPerson

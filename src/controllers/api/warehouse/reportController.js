@@ -1,4 +1,4 @@
-import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
+import { createMonthlyGoodsReceiptSummary, createWasteReportSummary, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
 import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
 import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
@@ -65,30 +65,34 @@ const buildIssueReportQuery = (req) => {
     };
 };
 
-const buildIssueReportData = (rows, { baseHeader = 'Base', heightHeader = 'Altura' } = {}) => [
-    ISSUE_REPORT_HEADERS.map(header => ({ Base: baseHeader, Altura: heightHeader })[header] || header),
-    ...rows.map((row, index) => [
-        row.referenceNumber,
-        row.requestDate,
-        row.departmentName,
-        row.requesterName,
-        row.clientName,
-        row.projectNumber,
-        row.fulfillmentStatusName,
-        row.materialName,
-        row.supplierName,
-        row.materialBase,
-        row.materialHeight,
-        row.requestedQuantity,
-        row.suppliedQuantity,
-        row.presentationName,
-        row.convertedQuantity,
-        row.convertedUnitMeasureName,
-        row.projectConvertedQuantity,
-        createFormulaCell(`O${ index + 2 }-Q${ index + 2 }`, row.convertedQuantityDifference),
-        row.detailFulfillmentStatusName
-    ])
-];
+const buildIssueReportData = async function* (rows, { baseHeader = 'Base', heightHeader = 'Altura' } = {}) {
+    let index = 0;
+    yield ISSUE_REPORT_HEADERS.map(header => ({ Base: baseHeader, Altura: heightHeader })[header] || header);
+    for await (const row of rows) {
+        yield [
+            row.referenceNumber,
+            row.requestDate,
+            row.departmentName,
+            row.requesterName,
+            row.clientName,
+            row.projectNumber,
+            row.fulfillmentStatusName,
+            row.materialName,
+            row.supplierName,
+            row.materialBase,
+            row.materialHeight,
+            row.requestedQuantity,
+            row.suppliedQuantity,
+            row.presentationName,
+            row.convertedQuantity,
+            row.convertedUnitMeasureName,
+            row.projectConvertedQuantity,
+            createFormulaCell(`O${ index + 2 }-Q${ index + 2 }`, row.convertedQuantityDifference),
+            row.detailFulfillmentStatusName
+        ];
+        index++;
+    }
+};
 
 export const exportWarehouseReportExcel = async (req, res) => {
 
@@ -194,8 +198,10 @@ export const exportGoodsReceiptReportExcel = async ({ req, res, materialType, fi
         orderDir
     });
 
-    const data = [
-        [
+    const data = async function* () {
+        const summary = createMonthlyGoodsReceiptSummary();
+        let index = 0;
+        yield [
             'Folio',
             'Fecha de recepción',
             'Recibió',
@@ -212,12 +218,11 @@ export const exportGoodsReceiptReportExcel = async ({ req, res, materialType, fi
             'Costo por presentación',
             'Monto s/ IVA',
             'Monto c/ IVA'
-        ],
-
-        ...rows.map((row, index) => {
-            const excelRow = index + 2;
-
-            return [
+        ];
+        for await (const row of rows) {
+            summary.add(row);
+            const excelRow = index++ + 2;
+            yield [
                 row.referenceNumber,
                 row.receptionDate,
                 row.receivedByName,
@@ -235,63 +240,63 @@ export const exportGoodsReceiptReportExcel = async ({ req, res, materialType, fi
                 createFormulaCell(`I${ excelRow }*N${ excelRow }`, row.netPurchaseAmount),
                 createFormulaCell(`O${ excelRow }*1.16`, row.grossPurchaseAmount)
             ];
-        })
-    ];
+        }
 
-    const { supplierRows, materialRows, supplierTotals, materialTotals } = buildMonthlyGoodsReceiptSummary(rows);
-    const summaryScope = monthlyReport ? 'mensual' : 'del reporte';
-    const supplierFirstRow = data.length + 4;
-    const supplierTotalRow = supplierFirstRow + supplierRows.length;
-    const materialFirstRow = supplierTotalRow + 4;
+        const { supplierRows, materialRows, supplierTotals, materialTotals } = summary.finish();
+        const summaryScope = monthlyReport ? 'mensual' : 'del reporte';
+        const supplierFirstRow = index + 5;
+        const supplierTotalRow = supplierFirstRow + supplierRows.length;
+        const materialFirstRow = supplierTotalRow + 4;
 
-    data.push(
-        [],
-        [`Resumen ${ summaryScope } por proveedor`],
-        ['Proveedor', 'Subtotal s/ IVA', 'IVA', 'Total c/ IVA', `% del subtotal ${ summaryScope }`],
-        ...supplierRows.map((row, index) => {
-            const excelRow = supplierFirstRow + index;
+        yield* [
+            [],
+            [`Resumen ${ summaryScope } por proveedor`],
+            ['Proveedor', 'Subtotal s/ IVA', 'IVA', 'Total c/ IVA', `% del subtotal ${ summaryScope }`],
+            ...supplierRows.map((row, index) => {
+                const excelRow = supplierFirstRow + index;
 
-            return [
-                row.supplierName,
-                row.netPurchaseAmount,
-                createFormulaCell(`B${ excelRow }*0.16`, row.vatAmount),
-                createFormulaCell(`B${ excelRow }+C${ excelRow }`, row.grossPurchaseAmount),
-                createFormulaCell(`IFERROR(B${ excelRow }/B${ supplierTotalRow }*100,0)`, row.monthlyPercentage)
-            ];
-        }),
-        [
-            'Total',
-            supplierTotals.netPurchaseAmount,
-            createColumnTotalFormula('C', supplierFirstRow, supplierRows.length, supplierTotals.vatAmount),
-            createColumnTotalFormula('D', supplierFirstRow, supplierRows.length, supplierTotals.grossPurchaseAmount),
-            createColumnTotalFormula('E', supplierFirstRow, supplierRows.length, supplierTotals.monthlyPercentage)
-        ],
-        [],
-        [`Resumen ${ summaryScope } por ${ isConsumableReport ? 'consumible' : 'material' }`],
-        [inventoryLabel, 'Cantidad convertida', 'Costo unitario de conversión', 'Costo total s/ IVA', `Cantidad total de ${ isConsumableReport ? 'consumible' : 'material' }`],
-        ...materialRows.map((row, index) => {
-            const excelRow = materialFirstRow + index;
+                return [
+                    row.supplierName,
+                    row.netPurchaseAmount,
+                    createFormulaCell(`B${ excelRow }*0.16`, row.vatAmount),
+                    createFormulaCell(`B${ excelRow }+C${ excelRow }`, row.grossPurchaseAmount),
+                    createFormulaCell(`IFERROR(B${ excelRow }/B${ supplierTotalRow }*100,0)`, row.monthlyPercentage)
+                ];
+            }),
+            [
+                'Total',
+                supplierTotals.netPurchaseAmount,
+                createColumnTotalFormula('C', supplierFirstRow, supplierRows.length, supplierTotals.vatAmount),
+                createColumnTotalFormula('D', supplierFirstRow, supplierRows.length, supplierTotals.grossPurchaseAmount),
+                createColumnTotalFormula('E', supplierFirstRow, supplierRows.length, supplierTotals.monthlyPercentage)
+            ],
+            [],
+            [`Resumen ${ summaryScope } por ${ isConsumableReport ? 'consumible' : 'material' }`],
+            [inventoryLabel, 'Cantidad convertida', 'Costo unitario de conversión', 'Costo total s/ IVA', `Cantidad total de ${ isConsumableReport ? 'consumible' : 'material' }`],
+            ...materialRows.map((row, index) => {
+                const excelRow = materialFirstRow + index;
 
-            return [
-                row.materialName,
-                row.squareMeters,
-                createFormulaCell(`IFERROR(D${ excelRow }/B${ excelRow },0)`, row.costPerSquareMeter),
-                row.netPurchaseAmount,
-                row.quantity
-            ];
-        }),
-        [
-            'Total',
-            materialTotals.squareMeters,
-            createColumnTotalFormula('C', materialFirstRow, materialRows.length, materialTotals.costPerSquareMeter),
-            materialTotals.netPurchaseAmount,
-            materialTotals.quantity
-        ]
-    );
+                return [
+                    row.materialName,
+                    row.squareMeters,
+                    createFormulaCell(`IFERROR(D${ excelRow }/B${ excelRow },0)`, row.costPerSquareMeter),
+                    row.netPurchaseAmount,
+                    row.quantity
+                ];
+            }),
+            [
+                'Total',
+                materialTotals.squareMeters,
+                createColumnTotalFormula('C', materialFirstRow, materialRows.length, materialTotals.costPerSquareMeter),
+                materialTotals.netPurchaseAmount,
+                materialTotals.quantity
+            ]
+        ];
+    };
 
     return sendExcelReport({
         res,
-        data,
+        data: data(),
         sheetName: `${ GOODS_RECEIPT_SHEET_NAME } ${ isConsumableReport ? 'consumibles' : 'materiales' }`,
         filename: `${ GOODS_RECEIPT_FILENAME }_${ isConsumableReport ? 'consumibles' : 'materiales' }`
     });
@@ -312,7 +317,9 @@ export const exportWasteReportExcel = async (req, res) => {
         orderBy,
         orderDir
     });
-    const { rows: summaryRows, totals } = buildWasteReportSummary(rows);
+    const summary = createWasteReportSummary();
+    for await (const row of rows) summary.add(row);
+    const { rows: summaryRows, totals } = summary.finish();
 
     const data = [
         [
@@ -370,22 +377,14 @@ export const exportSupplierReportExcel = async (req, res) => {
         orderDir
     });
 
-    const data = [
-        [
-            'Nombre comercial',
-            'Razón social',
-            'Estatus'
-        ],
-        ...rows.map(row => [
-            row.tradeName,
-            row.legalName,
-            row.isActive ? 'Activo' : 'Inactivo'
-        ])
-    ];
+    const data = async function* () {
+        yield ['Nombre comercial', 'Razón social', 'Estatus'];
+        for await (const row of rows) yield [row.tradeName, row.legalName, row.isActive ? 'Activo' : 'Inactivo'];
+    };
 
     return sendExcelReport({
         res,
-        data,
+        data: data(),
         sheetName: SUPPLIER_SHEET_NAME,
         filename: SUPPLIER_FILENAME
     });

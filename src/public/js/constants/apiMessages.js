@@ -1,6 +1,12 @@
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
+    RECORD_ID_INVALID: 'El identificador del registro no es válido.',
+    OPERATION_ID_REQUIRED: 'Falta la clave de la operación.',
+    OPERATION_ID_INVALID: 'La clave de la operación no es válida.',
+    RECORD_VERSION_REQUIRED: 'Actualice la información antes de guardar.',
+    OPERATION_KEY_CONFLICT: 'La clave corresponde a otra captura. Recupere la operación pendiente.',
+    RECORD_VERSION_CONFLICT: 'El registro cambió. Actualice la información y revise la captura.',
     WASTE_ISSUE_STATE_CONFLICT: 'La salida de merma no tiene detalles pendientes por surtir. Actualice la información.',
     WASTE_ISSUE_DUPLICATE_WASTE: 'No se puede repetir la misma merma en una salida.',
     WASTE_ISSUE_WASTE_UNAVAILABLE: 'Una o más mermas no existen o están inactivas. Actualice la selección.',

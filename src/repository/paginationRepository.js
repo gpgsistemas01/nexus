@@ -1,3 +1,5 @@
+import { QUERY_BATCH_SIZES } from '../constants/pagination.js';
+
 // Recibe el modelo del cliente elegido por el servicio; no crea otro cliente ni transacción.
 export const findPage = async ({ model, query, totalWhere, hasFilters = true, includeCounts = true }) => {
     const dataQuery = model.findMany(query);
@@ -14,11 +16,17 @@ export const findPage = async ({ model, query, totalWhere, hasFilters = true, in
     return { data, recordsTotal, recordsFiltered };
 };
 
+// El cursor conserva el último id leído. skip: 1 evita repetirlo en el siguiente bloque.
 // La consulta debe seleccionar id y ordenar con id como desempate estable.
-export const findBatches = async function* ({ model, query, batchSize = 5000 }) {
+export const findBatches = async function* ({
+    model,
+    query,
+    batchSize = QUERY_BATCH_SIZES.ROWS,
+    fetchPage = query => model.findMany(query)
+}) {
     let cursor;
     while (true) {
-        const data = await model.findMany({
+        const data = await fetchPage({
             ...query,
             take: batchSize,
             ...(cursor && { cursor: { id: cursor }, skip: 1 })

@@ -1,5 +1,14 @@
+import { normalizeDatabaseError } from '../../errors/databaseError.js';
+import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
+import { isAppError } from '../../errors/AppError.js';
+import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from '../../repository/paginationRepository.js';
-import { UserCreateDatabaseError, UserFindDatabaseError, UserNotFound, UserUpdateDatabaseError } from "../../errors/admin/userError.js";
+import {
+    UserCreateDatabaseError,
+    UserFindDatabaseError,
+    UserNotFound,
+    UserUpdateDatabaseError
+} from "../../errors/admin/userError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { verifyPassword, encryptPassword } from "../../utils/encryptionUtils.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
@@ -11,6 +20,7 @@ const serviceLogger = createServiceLogger('admin.userService');
 
 
 export const findAllUsers = async ({
+    cursor,
     includeCounts = true,
     skip = 0,
     take = 10,
@@ -38,12 +48,12 @@ export const findAllUsers = async ({
             includeCounts,
             query: {
                 ...(take > 0 && { skip, take }),
+                ...(cursor && { cursor }),
                 where,
-                orderBy: {
-                    [orderBy]: orderDir
-                },
+                orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
                 select: {
                     id: true,
+                    version: true,
                     name: true,
                     personId: true,
                     person: { select: { fullName: true } },
@@ -225,22 +235,9 @@ export const createUser = async ({ userDto }) => {
     }
 };
 
-const assertUserExists = async ({ id }) => {
-
-    const db = getDb();
-    const user = await db.user.findUnique({
-        where: { id },
-        select: { id: true }
-    });
-
-    if (!user) throw new UserNotFound();
-};
-
 export const updateUser = async ({ id, userDto }) => {
 
     try {
-        await assertUserExists({ id });
-
         const db = getDb();
 
         return await db.$transaction(async (tx) => {
@@ -252,7 +249,8 @@ export const updateUser = async ({ id, userDto }) => {
                 if (!person) throw new UserUpdateDatabaseError();
             }
 
-            const updated = await tx.user.update({
+            const updated = await updateVersionedRecord({
+                model: tx.user, expectedVersion: userDto.expectedVersion,
                 where: { id },
                 data: {
                     name,
@@ -260,6 +258,7 @@ export const updateUser = async ({ id, userDto }) => {
                 },
                 select: {
                     id: true,
+                    version: true,
                     name: true,
                     personId: true
                 }
@@ -284,7 +283,9 @@ export const updateUser = async ({ id, userDto }) => {
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'admin.userService' });
 
-        if (err instanceof UserNotFound) throw err;
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new UserNotFound();
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
 
         throw new UserUpdateDatabaseError();
     }
@@ -293,13 +294,12 @@ export const updateUser = async ({ id, userDto }) => {
 export const updateUserPassword = async ({ id, userDto }) => {
 
     try {
-        await assertUserExists({ id });
-
         const db = getDb();
 
         const hashedPassword = await encryptPassword(userDto.password);
 
-        return await db.user.update({
+        return await updateVersionedRecord({
+            model: db.user, expectedVersion: userDto.expectedVersion,
             where: { id },
             data: { password: hashedPassword },
             select: { id: true }
@@ -308,7 +308,9 @@ export const updateUserPassword = async ({ id, userDto }) => {
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'admin.userService' });
 
-        if (err instanceof UserNotFound) throw err;
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new UserNotFound();
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
 
         throw new UserUpdateDatabaseError();
     }

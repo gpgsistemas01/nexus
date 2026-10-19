@@ -1,3 +1,5 @@
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
+import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import cookieParser from 'cookie-parser';
@@ -17,15 +19,15 @@ let adminCookie;
 let deniedCookie;
 let previousSecret;
 
-const readReport = async query => {
-  const response = await request(app).get('/reports/inventory/excel').set('Cookie', adminCookie).query(query)
+const readReport = async (query, { path = '/reports/inventory/excel', sheet = 'Inventario' } = {}) => {
+  const response = await request(app).get(path).set('Cookie', adminCookie).query(query)
     .buffer(true).parse((res, callback) => {
       const chunks = [];
       res.on('data', chunk => chunks.push(chunk));
       res.on('end', () => callback(null, Buffer.concat(chunks)));
     }).expect(200);
   const workbook = XLSX.read(response.body, { type: 'buffer' });
-  return { response, rows: XLSX.utils.sheet_to_json(workbook.Sheets.Inventario, { header: 1, defval: null }) };
+  return { response, rows: XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { header: 1, defval: null }) };
 };
 
 describe('exportación paginada de inventario', () => {
@@ -34,12 +36,16 @@ describe('exportación paginada de inventario', () => {
     process.env.JWT_SECRET_ACCESS = randomUUID();
     prisma = (await import('../../../src/lib/prisma.js')).prisma;
     const router = (await import('../../../src/routes/api/warehouse/reportApiRoute.js')).default;
+    const adminReports = (await import('../../../src/routes/api/admin/reportApiRoute.js')).default;
+    const salesReports = (await import('../../../src/routes/api/sales/reportApiRoute.js')).default;
     app = createControllerTestApp({ registerRoutes: app => {
       app.use(cookieParser());
       app.use('/reports', router);
+      app.use('/admin-reports', adminReports);
+      app.use('/sales-reports', salesReports);
     } });
-    const role = await prisma.role.upsert({ where: { name: 'Administrador del sistema' }, update: {}, create: { name: 'Administrador del sistema' } });
-    const department = await prisma.department.upsert({ where: { name: 'SISTEMAS' }, update: {}, create: { name: 'SISTEMAS' } });
+    const role = await prisma.role.upsert({ where: { name: 'Administrador del sistema' }, update: {}, create: { name: 'Administrador del sistema', key: ROLE_KEYS.SYSTEM_ADMIN } });
+    const department = await prisma.department.upsert({ where: { name: 'SISTEMAS' }, update: {}, create: { name: 'SISTEMAS', key: DEPARTMENT_KEYS.SYSTEMS } });
     ids.admin = (await prisma.user.create({ data: { name: `IT STREAM A ${suffix}`, password: 'integration-only',
       accesses: { create: { roleId: role.id, departmentId: department.id } } } })).id;
     ids.deniedRole = (await prisma.role.create({ data: { name: `IT STREAM Denied ${suffix}` } })).id;
@@ -108,5 +114,30 @@ describe('exportación paginada de inventario', () => {
   it('mantiene autenticación y autorización antes de generar un archivo', async () => {
     await request(app).get('/reports/inventory/excel').expect(401);
     await request(app).get('/reports/inventory/excel').set('Cookie', deniedCookie).expect(403);
+  });
+
+  it.each([
+    ['user', '/admin-reports/users/excel', 'Usuarios', 'name', ['Usuario', 'Persona', 'Rol', 'Área']],
+    ['person', '/admin-reports/persons/excel', 'Personas', 'fullName', ['Nombre', 'Área', 'Rol']],
+    ['client', '/sales-reports/clients/excel', 'Clientes', 'name', ['Nombre']]
+  ])('exporta %s cruzando el límite de bloque sin versiones ni pérdida de filas', async (model, path, sheet, nameField, headers) => {
+    const prefix = `IT Catalog Export ${model} ${suffix}`;
+    const data = Array.from({ length: 5001 }, (_, index) => ({
+      id: randomUUID(),
+      [nameField]: `${prefix} ${String(index).padStart(5, '0')}`,
+      ...(model === 'user' && { password: 'integration-only' })
+    }));
+    const where = { [nameField]: { startsWith: prefix } };
+    try {
+      await prisma[model].createMany({ data });
+      const { rows } = await readReport({ search: prefix }, { path, sheet });
+
+      expect(rows[0]).toEqual(headers);
+      expect(rows.slice(1).map(row => row[0])).toEqual(data.map(row => row[nameField]));
+      expect(rows.every(row => row.length === headers.length)).toBe(true);
+      expect(await prisma[model].count({ where })).toBe(data.length);
+    } finally {
+      await prisma[model].deleteMany({ where });
+    }
   });
 });

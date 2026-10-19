@@ -90,6 +90,7 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
                 const path = issuePath(resource);
                 const controller = controllers[resource];
+                router.get(`${path}/:id`, controller[`get${label}GoodsIssue`]);
                 router.get(path, controller[`getAll${label}GoodsIssues`]);
                 router.post(path, controller[`register${label}GoodsIssue`]);
                 router.patch(`${path}/:id`, controller[`edit${label}GoodsIssue`]);
@@ -288,9 +289,14 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             .query({ departmentId: ids.department }).expect(200);
         expect(response.body.data.map(row => row.id)).toEqual([issues[inventoryResource].id]);
         expect(response.body.recordsTotal).toBe(1);
-        const rows = await reportFinders[inventoryResource]({
+        expect(response.body.data[0]).not.toHaveProperty('details');
+        const detail = await request(app).get(`${issuePath(inventoryResource)}/${issues[inventoryResource].id}`).expect(200);
+        expect(detail.body.goodsIssue.details).toHaveLength(1);
+        const other = inventoryResource === 'material' ? 'consumable' : 'material';
+        await request(app).get(`${issuePath(inventoryResource)}/${issues[other].id}`).expect(404);
+        const rows = await Array.fromAsync(reportFinders[inventoryResource]({
             departmentId: ids.department, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }]
-        });
+        }));
         expect(rows).toHaveLength(1);
         expect(rows[0].referenceNumber).toBe(issues[inventoryResource].referenceNumber);
     });

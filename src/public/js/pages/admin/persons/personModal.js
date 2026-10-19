@@ -22,7 +22,7 @@ export const openPersonModal = ({ mode, data = null }) => {
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(modalId);
 
-    initForm({ form, mode, id: data?.id || '' });
+    initForm({ form, mode, id: data?.id || '', version: data?.version });
     clearFormErrors(form);
     initPersonFormSelect2({ modalSelector: modalId });
     initPersonAccessTable(data?.accesses || []);

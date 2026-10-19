@@ -7,6 +7,7 @@ const SUPPLIER_MATERIAL_SNAPSHOT_INCLUDE = {
     material: {
         select: {
             id: true,
+            version: true,
             type: true,
             name: true,
             base: true,
@@ -110,6 +111,7 @@ export const findAllSupplierMaterials = async ({
             where,
             select: {
                 id: true,
+                version: true,
                 isActive: true,
                 referenceConeWeightKg: true,
                 referenceRollTotalWeightKg: true,
@@ -119,6 +121,7 @@ export const findAllSupplierMaterials = async ({
                 material: {
                     select: {
                         id: true,
+                        version: true,
                         name: true,
                         minStock: true,
                         base: true,
@@ -185,6 +188,7 @@ export const findSupplierMaterialByIds = async ({
         },
         select: {
             id: true,
+            version: true,
             isActive: true,
             currentStock: true,
             convertedQuantity: true,
@@ -194,6 +198,7 @@ export const findSupplierMaterialByIds = async ({
             material: {
                 select: {
                     id: true,
+                    version: true,
                     type: true,
                     name: true,
                     minStock: true,
@@ -230,6 +235,7 @@ export const findSupplierMaterialById = async ({
         where: { id },
         select: {
             id: true,
+            version: true,
             isActive: true,
             currentStock: true,
             convertedQuantity: true,
@@ -239,6 +245,7 @@ export const findSupplierMaterialById = async ({
             material: {
                 select: {
                     id: true,
+                    version: true,
                     name: true,
                     minStock: true,
                     base: true,
@@ -278,7 +285,7 @@ export const findSupplierMaterialsSnapshot = async ({
     return materials;
 }
 
-export const saveSupplierMaterial = async ({
+export const createSupplierMaterial = async ({
     tx,
     supplierId,
     materialId,
@@ -295,19 +302,8 @@ export const saveSupplierMaterial = async ({
         ...(isActive !== undefined && { isActive })
     };
 
-    return db.supplierMaterial.upsert({
-        where: {
-            supplierId_materialId: {
-                supplierId,
-                materialId
-            }
-        },
-        create: data,
-        update: {
-            maxUnitCost,
-            ...(isActive !== undefined && { isActive })
-        }
-    });
+    // El alta no puede actualizar una oferta que ganó una carrera concurrente.
+    return db.supplierMaterial.create({ data });
 };
 
 
@@ -387,18 +383,3 @@ export const recalculateMaterialUnitCosts = async ({ tx, supplierId, materialIds
 
     return getDb(tx).$executeRawUnsafe(query, supplierId, ...uniqueMaterialIds);
 };
-
-export const deleteSupplierMaterial = async ({
-    tx,
-    materialId,
-    supplierId
-}) => {
-
-    const db = getDb(tx);
-
-    return await db.supplierMaterial.delete({
-        where: {
-            supplierId_materialId: {materialId, supplierId }
-        }
-    });
-}

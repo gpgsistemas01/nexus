@@ -1,4 +1,4 @@
-import { findAllClients } from "../../../services/sales/clientService.js";
+import { findClientReportRows } from "../../../services/sales/reportService.js";
 import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
@@ -13,24 +13,21 @@ export const exportClientReport = async (req, res) => {
         columns
     });
 
-    const { data: rows } = await findAllClients({
-        includeCounts: false,
+    const rows = findClientReportRows({
         advisorId: req.query.advisorId || null,
-        skip: 0,
-        take: 0,
         search: getDataTableSearch(req.query),
         orderBy,
         orderDir
     });
 
-    const data = [
-        ['Nombre'],
-        ...rows.map(row => [row.name])
-    ];
+    const data = async function* () {
+        yield ['Nombre'];
+        for await (const row of rows) yield [row.name];
+    };
 
     return sendExcelReport({
         res,
-        data,
+        data: data(),
         sheetName: CLIENT_SHEET_NAME,
         filename: CLIENT_FILENAME
     });

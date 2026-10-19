@@ -62,5 +62,15 @@
         }
       }
     }
+  },
+  "WriteConflict": {
+    "description": "Conflicto de identidad, versión o clave de operación. Una merma duplicada incluye meta.waste.",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "../openapi.json#/components/schemas/Error"
+        }
+      }
+    }
   }
 }

@@ -2,6 +2,8 @@ import * as materialRequests from './materials/materialGoodsReceiptService.js';
 import * as consumableRequests from './consumables/consumableGoodsReceiptService.js';
 import { goodsReceiptContext } from '../../../pages/warehouse/goodsReceipts/goodsReceiptContext.js';
 
+import { apiRequest } from '../../axiosInstanceApi.js';
+
 const consumable = goodsReceiptContext.resource === 'consumable';
 export const GOODS_RECEIPTS_API_ROUTE = consumable ? consumableRequests.CONSUMABLE_GOODS_RECEIPTS_API_ROUTE : materialRequests.MATERIAL_GOODS_RECEIPTS_API_ROUTE;
 export const getAllGoodsReceiptsRequest = consumable ? consumableRequests.getAllConsumableGoodsReceiptsRequest : materialRequests.getAllMaterialGoodsReceiptsRequest;
@@ -10,3 +12,5 @@ export const editGoodsReceiptHeaderRequest = consumable ? consumableRequests.edi
 export const correctGoodsReceiptDetailRequest = consumable ? consumableRequests.correctConsumableGoodsReceiptDetailRequest : materialRequests.correctMaterialGoodsReceiptDetailRequest;
 export const cancelGoodsReceiptDetailRequest = consumable ? consumableRequests.cancelConsumableGoodsReceiptDetailRequest : materialRequests.cancelMaterialGoodsReceiptDetailRequest;
 export const exportGoodsReceiptReportRequest = consumable ? consumableRequests.exportConsumableGoodsReceiptReportRequest : materialRequests.exportMaterialGoodsReceiptReportRequest;
+
+export const getGoodsReceiptRequest = ({ id }) => apiRequest({ method: 'get', url: `${ GOODS_RECEIPTS_API_ROUTE }/${ id }` });

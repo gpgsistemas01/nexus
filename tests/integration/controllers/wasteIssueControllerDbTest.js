@@ -41,6 +41,7 @@ describe('waste issue controller database integration', () => {
     app = createControllerTestApp({
       registerRoutes: router => {
         router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
+        router.get('/waste-issues/:id', controller.getWasteIssue);
         router.get('/waste-issues', controller.getAllWasteIssues);
         router.get('/waste-movements', movementController.getAllWasteMovements);
         router.post('/waste-issues', controller.registerWasteIssue);
@@ -153,7 +154,9 @@ describe('waste issue controller database integration', () => {
     const listed = await request(app).get('/waste-issues').query({ start: 0, length: 10 }).expect(200);
     const listedIssue = listed.body.data.find(issue => issue.id === issueId);
 
-    expect(listedIssue.details[0]).toMatchObject({
+    expect(listedIssue).not.toHaveProperty('details');
+    const retrieved = await request(app).get(`/waste-issues/${issueId}`).expect(200);
+    expect(retrieved.body.wasteIssue.details[0]).toMatchObject({
       maxUnitCost: '25',
       projectConvertedQuantity: null,
       convertedQuantityDifference: null

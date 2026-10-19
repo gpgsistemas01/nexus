@@ -18,13 +18,15 @@ const {
   findWasteReportRows: vi.fn(),
   buildWasteReportSummary: vi.fn(),
   createFormulaCell: vi.fn((formula, value) => ({ formula: formula, result: value })),
-  sendExcelReport: vi.fn(),
+  sendExcelReport: vi.fn(async options => {
+    if (options.data?.[Symbol.asyncIterator]) options.data = await Array.fromAsync(options.data);
+  }),
   getReportMonthDateRange: vi.fn()
 }));
 
 vi.mock('../../../../../src/services/warehouse/reportService.js', () => ({
-  buildMonthlyGoodsReceiptSummary,
-  buildWasteReportSummary,
+  createMonthlyGoodsReceiptSummary: () => { const rows = []; return { add: row => rows.push(row), finish: () => buildMonthlyGoodsReceiptSummary(rows) }; },
+  createWasteReportSummary: () => { const rows = []; return { add: row => rows.push(row), finish: () => buildWasteReportSummary(rows) }; },
   findGoodsIssueReportRows,
   findSupplierReportRows: vi.fn(),
   findWarehouseReportRows: vi.fn(),

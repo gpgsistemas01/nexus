@@ -71,8 +71,6 @@ describe('catalog controllers database integration', () => {
         router.get('/reasons', reason.getAllReasons);
         router.get(
           '/managed/:catalog',
-          catalogValidations.catalogNameValidation,
-          validatorMiddleware.validate,
           catalog.getAllCatalogEntries
         );
         router.post(
@@ -166,7 +164,7 @@ describe('catalog controllers database integration', () => {
     const updatedName = `${ names.managedUnit } v2`;
     await request(app)
       .put(`/managed/unit-measures/${ created.body.data.id }`)
-      .send({ name: updatedName, symbol: names.unitSymbol, isActive: false })
+      .send({ name: updatedName, symbol: names.unitSymbol, isActive: false, expectedVersion: listed.body.data[0].version })
       .expect('Content-Type', /json/)
       .expect(200)
       .expect(response => {

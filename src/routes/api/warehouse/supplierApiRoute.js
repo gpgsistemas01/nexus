@@ -1,12 +1,15 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { editSupplier, getAllSuppliers, registerSupplier } from '../../../controllers/api/warehouse/supplierController.js';
-import { supplierValidation } from '../../../validators/forms/supplierValidations.js';
+import {
+    editSupplier,
+    getAllSuppliers,
+    registerSupplier
+} from '../../../controllers/api/warehouse/supplierController.js';
+import { supplierEditValidation, supplierValidation } from '../../../validators/forms/supplierValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import { PERMISSIONS } from '../../../constants/permissions.js';
 
 const router = express.Router();
-
 
 router.get(
     '/',
@@ -27,7 +30,7 @@ router.post(
 router.put(
     '/:id',
     verifyApiTokenRequired,
-    supplierValidation,
+    supplierEditValidation,
     validate,
     authorizeUserApi(PERMISSIONS.SUPPLIERS_UPDATE),
     editSupplier

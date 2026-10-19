@@ -10,6 +10,8 @@ import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes
 import { createInventoryMovement } from "../inventory/movementService.js";
 import { buildInventoryMovementDetail } from "../inventory/movementHelpers.js";
 
+import { assertRecordVersion } from '../../repository/versionRepository.js';
+
 const createStockAdjustmentMovement = async ({
     tx,
     adjustment,
@@ -109,6 +111,7 @@ export const createStockAdjustment = async ({
     goodsReceiptId = null,
     goodsReceiptDetailId = null,
     returnAdjustment = false,
+    expectedVersion,
     supplierMaterial: protectedSupplierMaterial = null
 }) => {
 
@@ -121,6 +124,7 @@ export const createStockAdjustment = async ({
             tx: transaction, materialId, supplierId
         });
 
+        assertRecordVersion(supplierMaterial, expectedVersion);
         referenceNumber = await generateYearlyReferenceNumber({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx: transaction });
 
         const materialName = supplierMaterial.material.name;

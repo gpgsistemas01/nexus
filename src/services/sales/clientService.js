@@ -1,3 +1,7 @@
+import { normalizeDatabaseError } from '../../errors/databaseError.js';
+import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
+import { isAppError } from '../../errors/AppError.js';
+import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from "../../repository/paginationRepository.js";
 import { ClientCreateDatabaseError, ClientFindDatabaseError, ClientNotFound } from "../../errors/sales/clientError.js";
 import { getDb } from "../../repository/baseRepository.js";
@@ -8,11 +12,13 @@ const serviceLogger = createServiceLogger('sales.clientService');
 
 const CLIENT_SELECT = {
     id: true,
+    version: true,
     name: true,
     isActive: true
 };
 
 export const findAllClients = async ({
+    cursor,
     advisorId,
     includeCounts = true,
     onlyActive = false,
@@ -40,10 +46,9 @@ export const findAllClients = async ({
         hasFilters: Boolean(advisorId || onlyActive || search),
         query: {
             ...(take > 0 && { skip, take }),
+            ...(cursor && { cursor }),
             where,
-            orderBy: {
-                [orderBy]: orderDir
-            },
+            orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             select: CLIENT_SELECT
         }
     });
@@ -94,15 +99,15 @@ export const updateClient = async ({
 
     try {
 
-        return await db.client.update({
-            where: { id },
-            data: { ...clientDto }
-        });
+        const { expectedVersion, ...data } = clientDto;
+        return await updateVersionedRecord({ model: db.client, where: { id }, expectedVersion, data });
 
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'sales.clientService' });
 
-        if (err.code === 'P2025') throw new ClientNotFound();
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new ClientNotFound();
         throw new ClientFindDatabaseError();
     }
 }

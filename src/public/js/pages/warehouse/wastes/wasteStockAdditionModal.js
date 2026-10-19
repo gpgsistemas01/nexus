@@ -1,9 +1,12 @@
+import { WASTE_OPERATION_ACTIONS } from '../../../constants/inventory.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { BUTTON_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { openModal } from '../../../ui/modalUI.js';
 import { buildInventorySelectText, getCurrentStock } from '../../../utils/warehouseInventoryUtils.js';
 import { formatDecimal } from '../../../utils/formatUtils.js';
+
+import { showPendingWasteOperation } from '../../../ui/inventory/wasteOperationUI.js';
 
 export const openWasteStockAdditionModal = ({ data, quantity = '', observations = '' }) => {
     const form = document.querySelector(FORM_SELECTORS.WASTE_STOCK_ADDITION);
@@ -30,5 +33,6 @@ export const openWasteStockAdditionModal = ({ data, quantity = '', observations 
     updateResultingStock();
     form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = 'Agregar';
 
+    showPendingWasteOperation({ form, action: WASTE_OPERATION_ACTIONS.ADD_STOCK, id: data.id });
     openModal(modal);
 };

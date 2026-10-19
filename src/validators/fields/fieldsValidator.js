@@ -109,6 +109,7 @@ export const validateUUID = (fieldName) => {
     return requireValue(body(fieldName), errors.REQUIRED)
         .isUUID('4').withMessage(errors.INVALID_UUID)
 }
+
 export const validateTextOptionalWhen = ({ fieldName, maxLength, predicate }) => {
 
     const errors = errorMap[fieldName];
@@ -269,6 +270,10 @@ export const validateIssueDetailsArray = ({
 
         details.forEach(detail => {
 
+            if (!detail || typeof detail !== 'object' || Array.isArray(detail)) {
+                throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
+            }
+
             if (detail.id) {
                 if (!allowDetailId || !uuidV4Regex.test(detail.id)) {
                     throw new Error(errorMap['details'].INVALID_FORMAT_ID);
@@ -323,6 +328,7 @@ export const validateGoodsIssueDetailsArray = ({ allowDetailId = false } = {}) =
 export const validateIssueProjectQuantityDetailsEdition =
     body('details')
         .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+        .bail()
         .custom((details) => {
 
             const errors = {};

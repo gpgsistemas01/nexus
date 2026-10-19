@@ -34,7 +34,7 @@ describe('conteos de compras sin consultas redundantes', () => {
     });
 
     it('el reporte conserva filtros de contexto y estado sin ejecutar conteos', async () => {
-        expect(await findGoodsReceiptReportRows({ type: 'CONSUMABLE', supplierId: 'supplier-1' })).toEqual([]);
+        expect(await Array.fromAsync(findGoodsReceiptReportRows({ type: 'CONSUMABLE', supplierId: 'supplier-1' }))).toEqual([]);
         expect(count).not.toHaveBeenCalled();
         expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({
             type: 'CONSUMABLE', supplierId: 'supplier-1',

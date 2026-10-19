@@ -1,5 +1,11 @@
 import { AppError } from "../AppError.js";
 
+export class PersonNotFound extends AppError {
+    constructor() {
+        super('Persona no encontrada.', 'PERSON_NOT_FOUND', 404);
+    }
+}
+
 export class PersonFindDatabaseError extends AppError {
 
     constructor () {

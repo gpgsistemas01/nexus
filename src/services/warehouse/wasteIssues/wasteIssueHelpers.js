@@ -19,7 +19,7 @@ const normalizeWasteIssueDetailResponse = detail => ({
 
 export const normalizeWasteIssueResponse = issue => issue && ({
     ...issue,
-    details: issue.details?.map(normalizeWasteIssueDetailResponse) ?? []
+    ...(issue.details && { details: issue.details.map(normalizeWasteIssueDetailResponse) })
 });
 
 export const WASTE_ISSUE_INCLUDE = {

@@ -7,6 +7,8 @@ import { setImmediate } from 'node:timers/promises';
 import ExcelJS from 'exceljs';
 import { getMexicoMonthYearParts } from './formattersUtils.js';
 
+const ROW_YIELD_INTERVAL = 250;
+
 export const buildReportFilename = ({ filename, separator = '_', order = 'month-year' } = {}) => {
     const { month, year } = getMexicoMonthYearParts();
     const dateParts = order === 'year-month' ? [year, month] : [month, year];
@@ -44,7 +46,7 @@ const writeWorkbookFile = async ({ filePath, sheetName, data, abortController })
             signal.throwIfAborted();
             worksheet.addRow(row).commit();
             // Ceder el loop permite vaciar las colas de escritura sin retener todas las filas.
-            if (++rowCount % 250 === 0) {
+            if (++rowCount % ROW_YIELD_INTERVAL === 0) {
                 await setImmediate(undefined, { signal });
                 if (workbook.stream.writableNeedDrain) await once(workbook.stream, 'drain', { signal });
             }

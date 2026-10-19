@@ -51,7 +51,8 @@ export const registerWaste = async (req, res) => {
 
     const waste = await createWaste({
         wasteDto: sanitizedWasteDto,
-        userId: req.user.id
+        userId: req.user.id,
+        operationId: req.body.operationId
     });
 
     emitInventoryUpdated({ context: 'waste', source: 'waste-created' });
@@ -99,7 +100,7 @@ export const editWasteStock = async (req, res) => {
 
 export const registerWasteStockAddition = async (req, res) => {
     const stockEntryDto = createWasteDtoForStockAddition(req.body);
-    const waste = await addWasteStock({ id: req.params.id, stockEntryDto, userId: req.user.id });
+    const waste = await addWasteStock({ id: req.params.id, stockEntryDto, userId: req.user.id, operationId: req.body.operationId });
 
     emitInventoryUpdated({ context: 'waste', source: 'waste-stock-added' });
 

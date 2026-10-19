@@ -16,7 +16,7 @@ export const openClientModal = ({
     const form = document.querySelector(formId);
     const modalElement = document.querySelector(clientModalId);
 
-    initForm({ form, mode, id: data?.id });
+    initForm({ form, mode, id: data?.id, version: data?.version });
     clearFormErrors(form);
 
     form.reset();

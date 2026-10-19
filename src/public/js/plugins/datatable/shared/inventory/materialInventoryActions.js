@@ -1,4 +1,4 @@
-import { handleApiError } from '../../../../api/errorHandler.js';
+import { runApiAction } from '../../../../api/errorHandler.js';
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
@@ -48,13 +48,11 @@ export const bindMaterialInventoryActions = ({
 
         if (!result.isConfirmed) return;
 
-        try {
+        await runApiAction(async () => {
             const response = await remove({ id: data.id });
 
             notifications.showSuccess(response.message || deleteSuccessMessage);
             table.ajax.reload(null, false);
-        } catch (err) {
-            handleApiError({ err, rethrow: false });
-        }
+        });
     });
 };

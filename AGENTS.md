@@ -16,6 +16,7 @@
 
 - Mantén las rutas agrupadas por dominio en `src/routes/web` y `src/routes/api`; registra routers nuevos en el `index.js` correspondiente, no directamente en `src/app.js`.
 - Los controllers traducen HTTP y delegan; los servicios concentran reglas de negocio y transacciones; los repositories encapsulan consultas reutilizables; los DTOs normalizan contratos y los validators validan entradas.
+- Los validadores del formulario comprueban los campos y metadatos enviados en `body`, y pasan por `validate` antes del controller. Los identificadores de ruta se pasan al servicio, que resuelve el registro, su pertenencia y su estado; no se mezclan `param()` ni comprobaciones de existencia en los validadores del formulario. Eliminaciones y cancelaciones sin datos de captura no requieren un validador vacío. Reutiliza la traducción compartida de errores de base de datos para un UUID mal formado.
 - Reutiliza `AppError`, los errores de dominio, los mensajes y las constantes existentes. No inventes formatos de respuesta o manejo de errores por endpoint.
 - En escrituras compuestas, usa una sola transacción y propaga `tx` a todas las operaciones relacionadas; no mezcles el cliente Prisma global con el transaccional.
 - Mantén autenticación y autorización en el servidor, evita registrar secretos o datos sensibles y usa el logger del proyecto en lugar de `console.log` en código de aplicación.
@@ -25,6 +26,8 @@
 - Usa el cliente Prisma compartido de `src/lib/prisma.js`; no crees clientes adicionales por módulo.
 - Todo cambio persistente requiere actualizar `prisma/schema.prisma`, agregar una migración en `prisma/migrations` y cubrir el comportamiento afectado con pruebas.
 - Nunca uses la base de desarrollo para pruebas. Las pruebas con persistencia requieren `DATABASE_TEST_URL`, diferente de `DATABASE_URL`; usa `DIRECT_TEST_URL` sólo cuando corresponda al flujo existente de migraciones.
+- Para ajustes que reemplazan un saldo y ediciones de recursos versionados, conserva `expectedVersion` desde la lectura hasta la escritura condicionada; no uses una versión consultada de nuevo para aceptar una captura vieja. Los triggers de versión también cubren los UPDATE SQL.
+- Las altas y entradas HTTP de merma conservan `operationId` en los reintentos; recibo, stock y documentos se confirman en una sola transacción. Deshabilitar submit no sustituye esa garantía.
 - No modifiques migraciones ya aplicadas para representar un cambio nuevo; agrega una migración incremental.
 
 ## EJS

@@ -1,3 +1,5 @@
+import { ROLE_KEYS } from '../../src/constants/roles.js';
+import { DEPARTMENT_KEYS } from '../../src/constants/departments.js';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 
@@ -13,17 +15,17 @@ export const createBackendFixture = async ({ prisma, count }) => {
   }
   const approved = await prisma.status.upsert({ where: { name: 'Aprobada' }, update: {}, create: { name: 'Aprobada' } });
   const confirmed = await prisma.status.upsert({ where: { name: 'Confirmada' }, update: {}, create: { name: 'Confirmada' } });
-  const system = await prisma.department.upsert({ where: { name: 'SISTEMAS' }, update: {}, create: { name: 'SISTEMAS' } });
-  const role = await prisma.role.upsert({ where: { name: 'Administrador del sistema' }, update: {}, create: { name: 'Administrador del sistema' } });
+  const system = await prisma.department.upsert({ where: { name: 'SISTEMAS' }, update: {}, create: { name: 'SISTEMAS', key: DEPARTMENT_KEYS.SYSTEMS } });
+  const role = await prisma.role.upsert({ where: { name: 'Administrador del sistema' }, update: {}, create: { name: 'Administrador del sistema', key: ROLE_KEYS.SYSTEM_ADMIN } });
   const user = await prisma.user.create({ data: { name: `Perf${suffix}`, password: 'test-fixture', accesses: { create: { roleId: role.id, departmentId: system.id } } } });
-  const unit = await prisma.unitMeasure.create({ data: { name: `Perf${suffix}`, symbol: suffix } });
+  const unit = await prisma.unitMeasure.create({ data: { name: 'METRO CUADRADO', symbol: suffix } });
   const presentation = await prisma.presentation.create({ data: { name: `Perf${suffix}` } });
   const supplier = await prisma.supplier.create({ data: { codeNumber: Date.now() % 100000000, code: suffix, legalName: suffix, tradeName: suffix } });
   const person = await prisma.person.create({ data: { fullName: suffix } });
   const department = await prisma.department.create({ data: { name: suffix } });
   const client = await prisma.client.create({ data: { name: suffix, advisorId: person.id } });
   const initialStock = 100000;
-  const materialData = Array.from({ length: count }, (_, index) => ({ id: randomUUID(), name: `Perf ${String(index).padStart(6, '0')} ${suffix}`, presentationId: presentation.id, unitMeasureId: unit.id, type: index % 2 ? 'CONSUMABLE' : 'MATERIAL' }));
+  const materialData = Array.from({ length: count }, (_, index) => ({ id: randomUUID(), name: `Perf ${String(index).padStart(6, '0')} ${suffix}`, presentationId: presentation.id, unitMeasureId: unit.id, ...(index % 2 ? {} : { base: 1, height: 1 }), type: index % 2 ? 'CONSUMABLE' : 'MATERIAL' }));
   await chunk(materialData, prisma.material);
   await chunk(materialData.map(item => ({ materialId: item.id, supplierId: supplier.id, currentStock: initialStock, convertedQuantity: initialStock, maxUnitCost: 10 })), prisma.supplierMaterial);
   const wasteData = materialData.map(({ id, type, ...item }) => ({ ...item, id: randomUUID(), supplierId: supplier.id, base: 1, height: 1, currentStock: initialStock, convertedQuantity: initialStock }));

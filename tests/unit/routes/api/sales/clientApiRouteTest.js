@@ -7,6 +7,7 @@ const authorizeUserApi = vi.fn(permission => `authorize:${ permission }`);
 const verifyApiTokenRequired = vi.fn();
 const validate = vi.fn();
 const clientValidation = [vi.fn()];
+const clientEditValidation = [vi.fn()];
 const getAllClients = vi.fn();
 const registerClient = vi.fn();
 const editClient = vi.fn();
@@ -24,7 +25,7 @@ vi.mock('../../../../../src/middleware/authMiddleware.js', () => ({
 
 vi.mock('../../../../../src/middleware/validatorMiddleware.js', () => ({ validate }));
 
-vi.mock('../../../../../src/validators/forms/clientValidations.js', () => ({ clientValidation }));
+vi.mock('../../../../../src/validators/forms/clientValidations.js', () => ({ clientValidation, clientEditValidation }));
 
 vi.mock('../../../../../src/controllers/api/sales/clientController.js', () => ({
   editClient,
@@ -49,7 +50,7 @@ describe('clientApiRoute', () => {
     expect(put).toHaveBeenCalledWith(
       '/:id',
       verifyApiTokenRequired,
-      clientValidation,
+      clientEditValidation,
       validate,
       `authorize:${ PERMISSIONS.CLIENTS_UPDATE }`,
       editClient

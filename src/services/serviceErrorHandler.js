@@ -1,3 +1,4 @@
+import { normalizeDatabaseError } from '../errors/databaseError.js';
 import { isAppError } from '../errors/AppError.js';
 import { getModelLogContext, logServiceError } from '../utils/logger.js';
 
@@ -14,7 +15,8 @@ export const handleServiceError = ({
         ...getModelLogContext(model, data)
     });
 
-    if (isAppError(error)) throw error;
+    const normalizedError = normalizeDatabaseError(error);
+    if (isAppError(normalizedError)) throw normalizedError;
 
     throw fallbackError;
 };

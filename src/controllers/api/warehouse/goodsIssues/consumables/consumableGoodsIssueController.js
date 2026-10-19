@@ -6,8 +6,9 @@ import {
     updateConsumableGoodsIssueHeader,
     returnConsumableGoodsIssueDetail
 } from '../../../../../services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js';
-import { buildListHandler, buildRegisterHandler, buildEditHandler, buildHeaderHandler, buildDetailsHandler, buildReturnHandler } from '../shared/goodsIssueHandlers.js';
+import { buildReadHandler, buildListHandler, buildRegisterHandler, buildEditHandler, buildHeaderHandler, buildDetailsHandler, buildReturnHandler } from '../shared/goodsIssueHandlers.js';
 
+export const getConsumableGoodsIssue = buildReadHandler(findAllConsumableGoodsIssues);
 export const getAllConsumableGoodsIssues = buildListHandler(findAllConsumableGoodsIssues);
 export const registerConsumableGoodsIssue = buildRegisterHandler(createConsumableGoodsIssue);
 export const editConsumableGoodsIssue = buildEditHandler(updateConsumableGoodsIssue);

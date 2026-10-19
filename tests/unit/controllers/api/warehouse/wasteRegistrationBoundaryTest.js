@@ -40,6 +40,7 @@ const app = createControllerTestApp({
 });
 
 const validBody = {
+  operationId: '00000000-0000-4000-8000-000000000004',
   name: 'Recorte de prueba',
   materialId,
   supplierId,
@@ -89,7 +90,8 @@ describe('wasteController registration boundaries', () => {
         totalWeightKg: 100,
         observations
       }),
-      userId
+      userId,
+      operationId: validBody.operationId
     });
   });
 

@@ -261,6 +261,7 @@ const getWasteMovementSearchFilter = (search) => !search ? {} : ({
 const findInventoryMovements = async ({
     type,
     includeCounts = true,
+    cursor,
     skip = 0,
     take = 10,
     startDate = '',
@@ -331,11 +332,8 @@ const findInventoryMovements = async ({
             query: {
                 skip,
                 take,
-                orderBy: {
-                    movement: {
-                        [orderBy]: orderDir
-                    }
-                },
+                ...(cursor && { cursor }),
+                orderBy: [{ movement: { [orderBy]: orderDir } }, { id: 'asc' }],
                 where,
                 select: MOVEMENT_DETAIL_SELECT
             }
@@ -355,6 +353,7 @@ export const findAllConsumableMovements = (options = {}) => findInventoryMovemen
 
 export const findAllWasteMovements = async ({
     includeCounts = true,
+    cursor,
     skip = 0,
     take = 10,
     startDate = '',
@@ -388,7 +387,8 @@ export const findAllWasteMovements = async ({
             query: {
                 skip,
                 take,
-                orderBy: { movement: { [orderBy]: orderDir } },
+                ...(cursor && { cursor }),
+                orderBy: [{ movement: { [orderBy]: orderDir } }, { id: 'asc' }],
                 where,
                 select: WASTE_MOVEMENT_DETAIL_SELECT
             }

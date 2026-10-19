@@ -1,3 +1,4 @@
+import { WASTE_OPERATION_ACTIONS, WASTE_ROLL_WEIGHT_FIELDS } from '../../../constants/inventory.js';
 import { notifications } from '../../../plugins/swal/swalComponent.js';
 import { resetFormSubmitState } from '../../../ui/forms/formStateUI.js';
 import { closeModal } from '../../../ui/modalUI.js';
@@ -10,12 +11,19 @@ import { useForm } from '../../../ui/forms/formUI.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
-import { wasteEditValidation, wasteStockAdjustmentValidation, wasteValidation } from '../../../utils/validations/validators.js';
+import {
+    wasteEditValidation,
+    wasteStockAdjustmentValidation,
+    wasteValidation
+} from '../../../utils/validations/validators.js';
 import { wasteCreateFields, wasteEditFields, wasteStockAdjustmentFields } from './wasteFields.js';
 import { isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 
+import { getPendingWasteOperation, submitWasteOperation } from '../../../ui/inventory/wasteOperationUI.js';
+
 useForm({
     selector: FORM_SELECTORS.WASTE,
+    getPendingData: ({ form }) => isCreateMode(form.dataset.mode) ? getPendingWasteOperation({ action: WASTE_OPERATION_ACTIONS.CREATE }) : null,
     normalizeData: ({ form, formData }) => {
 
         const fields = isStockMode(form.dataset.mode) ? wasteStockAdjustmentFields
@@ -27,9 +35,9 @@ useForm({
         }
 
         if (!isStockMode(form.dataset.mode)) {
-            
+
             if (!formData.minStock) delete formData.minStock;
-            
+
             formData.isActive = document.querySelector(`${ FORM_SELECTORS.WASTE } #isActiveInput`).checked;
         }
 
@@ -47,12 +55,15 @@ useForm({
     },
     sendRequest: async ({ formData, form }) => {
         try {
-            return await handleSubmit({
+            const submit = data => handleSubmit({
                 form,
-                formData,
+                formData: data,
                 create: registerWaste,
                 update: isStockMode(form.dataset.mode) ? editWasteStock : editWaste
             });
+            return isCreateMode(form.dataset.mode)
+                ? await submitWasteOperation({ action: WASTE_OPERATION_ACTIONS.CREATE, form, formData, submit })
+                : await submit(formData);
         } catch (err) {
             const existingWaste = err.data?.meta?.waste;
             if (!isCreateMode(form.dataset.mode) || err.data?.code !== 'WASTE_ALREADY_EXISTS'
@@ -80,7 +91,7 @@ useForm({
 
 const form = document.querySelector(FORM_SELECTORS.WASTE);
 form.addEventListener(DOM_EVENT_NAMES.INPUT, event => {
-    if (['coneWeightKg', 'totalWeightKg', 'referenceRollTotalWeightKg'].includes(event.target.name)) {
+    if (WASTE_ROLL_WEIGHT_FIELDS.includes(event.target.name)) {
         updateWasteRollMeasurement({ form });
     }
 });

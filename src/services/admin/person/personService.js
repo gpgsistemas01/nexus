@@ -1,5 +1,9 @@
+import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
+import { normalizeDatabaseError } from '../../../errors/databaseError.js';
+import { isAppError } from '../../../errors/AppError.js';
+import { updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { findPage } from '../../../repository/paginationRepository.js';
-import { PersonCreateDatabaseError, PersonUpdateDatabaseError } from "../../../errors/admin/personError.js";
+import { PersonCreateDatabaseError, PersonNotFound, PersonUpdateDatabaseError } from "../../../errors/admin/personError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
 
@@ -7,6 +11,7 @@ const serviceLogger = createServiceLogger('admin.personService');
 
 
 export const findAllPersons = async ({
+    cursor,
     departments = [],
     roles = [],
     includeAccesses = false,
@@ -55,12 +60,12 @@ export const findAllPersons = async ({
         includeCounts,
         query: {
             ...(take > 0 && { skip, take }),
+            ...(cursor && { cursor }),
             where,
-            orderBy: {
-                [orderBy]: orderDir
-            },
+            orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             select: {
                 id: true,
+                version: true,
                 fullName: true,
                 ...(includeAccesses && {
                     accesses: {
@@ -77,6 +82,7 @@ export const findAllPersons = async ({
 
 const DEFAULT_PERSON_SELECT = {
     id: true,
+    version: true,
     fullName: true
 };
 
@@ -143,7 +149,8 @@ export const updatePerson = async ({ personDto, id }) => {
     try {
         const accesses = buildAccessData(personDto);
 
-        return await db.person.update({
+        return await updateVersionedRecord({
+            model: db.person, expectedVersion: personDto.expectedVersion,
             where: { id },
             data: {
                 fullName: personDto.fullName,
@@ -160,6 +167,10 @@ export const updatePerson = async ({ personDto, id }) => {
     } catch (err) {
         logServiceError(serviceLogger, err, { operation: 'admin.personService' });
 
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new PersonNotFound();
+
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
         throw new PersonUpdateDatabaseError();
     }
 }

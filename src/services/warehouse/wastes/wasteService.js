@@ -1,6 +1,15 @@
+import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import { findPage } from '../../../repository/paginationRepository.js';
 import { isAppError } from '../../../errors/AppError.js';
-import { WasteAlreadyExists, WasteMaterialInvalid, WasteNotFound, WasteStockAdjustmentDatabaseError, WasteStockEntryDatabaseError, WasteUpdateDatabaseError, WasteWeightReadOnly } from '../../../errors/warehouse/wasteError.js';
+import {
+    WasteAlreadyExists,
+    WasteMaterialInvalid,
+    WasteNotFound,
+    WasteStockAdjustmentDatabaseError,
+    WasteStockEntryDatabaseError,
+    WasteUpdateDatabaseError,
+    WasteWeightReadOnly
+} from '../../../errors/warehouse/wasteError.js';
 import { getDb } from '../../../repository/baseRepository.js';
 import { registerWasteStockAdjustment } from './wasteStockAdjustmentService.js';
 import { registerWasteStockEntry } from './wasteStockEntryService.js';
@@ -11,23 +20,20 @@ import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierErro
 import { prepareWasteMeasurements } from './wasteHelpers.js';
 import { lockWasteStock } from '../../../repository/warehouse/stockLockRepository.js';
 import { MATERIAL_TYPES } from '../../../constants/inventory.js';
+import { WASTE_IMMUTABLE_FIELDS, WASTE_OPERATION_ACTIONS } from '../../../public/js/constants/inventory.js';
 import { isSquareMeterUnitMeasure } from '../../../public/js/utils/warehouseInventoryUtils.js';
+
+import { assertRecordVersion, updateVersionedRecord } from '../../../repository/versionRepository.js';
+import { executeWasteOperation, markWasteOperationRejected } from './wasteOperationService.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
-const handleWasteServiceError = ({ err, fallbackError }) => {
-
-    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {
-        throw new WasteNotFound();
-    }
-
-    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) {
-        throw new WasteAlreadyExists();
-    }
-
-    if (isAppError(err)) throw err;
-
-    throw fallbackError;
+const handleWasteServiceError = ({ err, fallbackError, operationId }) => {
+    const normalizedError = normalizeDatabaseError(err);
+    let error = isAppError(normalizedError) ? normalizedError : fallbackError;
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) error = new WasteNotFound();
+    if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE) error = new WasteAlreadyExists();
+    throw markWasteOperationRejected({ err: error, operationId });
 };
 
 const WASTE_INCLUDE = {
@@ -122,6 +128,7 @@ export const findAllWastes = async ({
             where,
             select: {
                 id: true,
+                version: true,
                 supplierId: true,
                 name: true,
                 base: true,
@@ -151,65 +158,70 @@ export const findAllWastes = async ({
 
 export const createWaste = async ({
     wasteDto,
-    userId
+    userId,
+    operationId
 }) => {
 
+    let identity;
     try {
 
-        const waste = await getDb().$transaction(async (tx) => {
+        const waste = await executeWasteOperation({
+            operationId, userId, command: { action: WASTE_OPERATION_ACTIONS.CREATE, ...wasteDto },
+            execute: async tx => {
+                const offer = await findSupplierMaterialByIds({
+                    tx,
+                    materialId: wasteDto.materialId,
+                    supplierId: wasteDto.supplierId
+                });
 
-            const offer = await findSupplierMaterialByIds({
-                tx,
-                materialId: wasteDto.materialId,
-                supplierId: wasteDto.supplierId
-            });
+                if (offer.supplier?.isActive === false) throw new SupplierInactiveConflict();
+                if (!offer.isActive) throw new WasteNotFound();
 
-            if (offer.supplier?.isActive === false) throw new SupplierInactiveConflict();
-            if (!offer.isActive) throw new WasteNotFound();
-
-            const material = offer.material;
-            // El origen de una merma es un material de superficie, no un consumible.
-            if (material.type !== MATERIAL_TYPES.MATERIAL || !isSquareMeterUnitMeasure(material.unitMeasure)) {
-                throw new WasteMaterialInvalid();
-            }
-            const coneWeightKg = wasteDto.coneWeightKg;
-            const { base, height, weightKg } = prepareWasteMeasurements({ wasteDto, offer });
-            const existingWaste = await findWasteByIdentity({ tx, supplierId: wasteDto.supplierId, name: wasteDto.name, base, height, coneWeightKg: coneWeightKg ?? null, totalWeightKg: wasteDto.totalWeightKg ?? null });
-            if (existingWaste) throw new WasteAlreadyExists({ waste: existingWaste });
-
-            const waste = await tx.waste.create({
-                data: {
-                    name: wasteDto.name,
-                    supplier: { connect: { id: wasteDto.supplierId } },
-                    presentation: { connect: { id: material.presentation.id } },
-                    unitMeasure: { connect: { id: material.unitMeasure.id } },
-                    maxUnitCost: wasteDto.maxUnitCost,
-                    minStock: wasteDto.minStock,
-                    isActive: wasteDto.isActive,
-                    base,
-                    height,
-                    sourceMaterial: { connect: { id: material.id } },
-                    coneWeightKg: coneWeightKg ?? null,
-                    totalWeightKg: wasteDto.totalWeightKg ?? null,
-                    referenceRollTotalWeightKg: wasteDto.referenceRollTotalWeightKg ?? null,
-                    weightKg,
-                    currentStock: 0,
-                    convertedQuantity: 0
+                const material = offer.material;
+                // El origen de una merma es un material de superficie, no un consumible.
+                if (material.type !== MATERIAL_TYPES.MATERIAL || !isSquareMeterUnitMeasure(material.unitMeasure)) {
+                    throw new WasteMaterialInvalid();
                 }
-            });
+                const coneWeightKg = wasteDto.coneWeightKg;
+                const { base, height, weightKg } = prepareWasteMeasurements({ wasteDto, offer });
+                identity = { supplierId: wasteDto.supplierId, name: wasteDto.name, base, height, coneWeightKg: coneWeightKg ?? null, totalWeightKg: wasteDto.totalWeightKg ?? null };
+                const existingWaste = await findWasteByIdentity({ tx, ...identity });
+                if (existingWaste) throw new WasteAlreadyExists({ waste: existingWaste });
 
-            // Sin existencia no hay entrada ni folio; la cantidad positiva se aplica una sola vez.
-            if (wasteDto.initialQuantity === 0) return waste;
+                const waste = await tx.waste.create({
+                    data: {
+                        name: wasteDto.name,
+                        supplier: { connect: { id: wasteDto.supplierId } },
+                        presentation: { connect: { id: material.presentation.id } },
+                        unitMeasure: { connect: { id: material.unitMeasure.id } },
+                        maxUnitCost: wasteDto.maxUnitCost,
+                        minStock: wasteDto.minStock,
+                        isActive: wasteDto.isActive,
+                        base,
+                        height,
+                        sourceMaterial: { connect: { id: material.id } },
+                        coneWeightKg: coneWeightKg ?? null,
+                        totalWeightKg: wasteDto.totalWeightKg ?? null,
+                        referenceRollTotalWeightKg: wasteDto.referenceRollTotalWeightKg ?? null,
+                        weightKg,
+                        currentStock: 0,
+                        convertedQuantity: 0
+                    }
+                });
 
-            await registerWasteStockEntry({
-                tx,
-                waste,
-                userId,
-                observations: wasteDto.observations,
-                quantity: wasteDto.initialQuantity
-            });
+                // Sin existencia no hay entrada ni folio; la cantidad positiva se aplica una sola vez.
+                if (wasteDto.initialQuantity === 0) return waste;
 
-            return findWasteById({ tx, id: waste.id });
+                await registerWasteStockEntry({
+                    tx,
+                    waste,
+                    userId,
+                    observations: wasteDto.observations,
+                    quantity: wasteDto.initialQuantity
+                });
+
+                return findWasteById({ tx, id: waste.id });
+            }
         });
 
         logServiceInfo(serviceLogger, {
@@ -225,8 +237,14 @@ export const createWaste = async ({
             ...getModelLogContext('waste', { userId, ...wasteDto })
         }, 'Error específico al registrar merma en transacción');
 
+        // Después del rollback se puede consultar al ganador de una identidad única.
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_UNIQUE && identity) {
+            const existingWaste = await findWasteByIdentity(identity);
+            if (existingWaste) throw markWasteOperationRejected({ err: new WasteAlreadyExists({ waste: existingWaste }), operationId });
+        }
+
         handleWasteServiceError({
-            err,
+            err, operationId,
             fallbackError: new WasteUpdateDatabaseError()
         });
     }
@@ -243,7 +261,7 @@ export const updateWaste = async ({
 
             const currentWaste = await findWasteById({ tx, id });
 
-            if (['weightKg', 'coneWeightKg', 'totalWeightKg', 'sampleLengthM', 'sampleNetWeightKg', 'referenceRollTotalWeightKg', 'sourceMaterialId'].some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
+            if (WASTE_IMMUTABLE_FIELDS.some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
 
             if (wasteDto.name && wasteDto.name !== currentWaste.name) {
                 const existingWaste = await findWasteByIdentity({
@@ -258,10 +276,8 @@ export const updateWaste = async ({
                 if (existingWaste) throw new WasteAlreadyExists();
             }
 
-            return await tx.waste.update({
-                where: { id },
-                data: wasteDto
-            });
+            const { expectedVersion, ...data } = wasteDto;
+            return updateVersionedRecord({ model: tx.waste, where: { id }, expectedVersion, data });
         });
 
         logServiceInfo(serviceLogger, {
@@ -296,6 +312,7 @@ export const updateWasteStock = async ({
 
             await lockWasteStock({ tx, id });
             const currentWaste = await findWasteById({ tx, id });
+            assertRecordVersion(currentWaste, stockAdjustmentDto.expectedVersion);
 
             return registerWasteStockAdjustment({
                 tx,
@@ -328,18 +345,21 @@ export const updateWasteStock = async ({
     }
 };
 
-export const addWasteStock = async ({ id, stockEntryDto, userId }) => {
+export const addWasteStock = async ({ id, stockEntryDto, userId, operationId }) => {
     try {
-        const waste = await getDb().$transaction(async (tx) => {
-            const currentWaste = await findWasteById({ tx, id });
-            await registerWasteStockEntry({
-                tx,
-                waste: currentWaste,
-                quantity: stockEntryDto.quantity,
-                observations: stockEntryDto.observations,
-                userId
-            });
-            return findWasteById({ tx, id });
+        const waste = await executeWasteOperation({
+            operationId, userId, command: { action: WASTE_OPERATION_ACTIONS.ADD_STOCK, id, ...stockEntryDto },
+            execute: async tx => {
+                const currentWaste = await findWasteById({ tx, id });
+                await registerWasteStockEntry({
+                    tx,
+                    waste: currentWaste,
+                    quantity: stockEntryDto.quantity,
+                    observations: stockEntryDto.observations,
+                    userId
+                });
+                return findWasteById({ tx, id });
+            }
         });
 
         logServiceInfo(serviceLogger, {
@@ -353,6 +373,6 @@ export const addWasteStock = async ({ id, stockEntryDto, userId }) => {
             operation: 'warehouse.wasteService.addWasteStock',
             ...getModelLogContext('wasteStockEntry', { id, userId, ...stockEntryDto })
         });
-        handleWasteServiceError({ err, fallbackError: new WasteStockEntryDatabaseError() });
+        handleWasteServiceError({ err, operationId, fallbackError: new WasteStockEntryDatabaseError() });
     }
 };

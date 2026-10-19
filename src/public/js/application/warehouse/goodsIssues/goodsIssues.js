@@ -1,3 +1,4 @@
+import { getGoodsIssueRequest } from '../../../services/warehouse/goodsIssues/goodsIssueService.js';
 import * as materialApplication from './materials/materialGoodsIssues.js';
 import * as consumableApplication from './consumables/consumableGoodsIssues.js';
 import { goodsIssueContext } from '../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
@@ -9,3 +10,5 @@ export const editGoodsIssue = consumable ? consumableApplication.editConsumableG
 export const editGoodsIssueHeader = consumable ? consumableApplication.editConsumableGoodsIssueHeader : materialApplication.editMaterialGoodsIssueHeader;
 export const editGoodsIssueDetails = consumable ? consumableApplication.editConsumableGoodsIssueDetails : materialApplication.editMaterialGoodsIssueDetails;
 export const returnGoodsIssueDetail = consumable ? consumableApplication.returnConsumableGoodsIssueDetail : materialApplication.returnMaterialGoodsIssueDetail;
+
+export const getGoodsIssue = async ({ id }) => (await getGoodsIssueRequest({ id })).data.goodsIssue;

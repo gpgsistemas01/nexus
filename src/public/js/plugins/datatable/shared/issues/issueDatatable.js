@@ -8,6 +8,8 @@ import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI
 import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
 
+import { runApiAction } from '../../../../api/errorHandler.js';
+
 const ISSUE_FILTER_FIELDS = [
     'date',
     'client',
@@ -49,7 +51,7 @@ export const buildIssueTrackingColumns = () => [
 
 export const bindIssueTableAction = ({ table, tableSelector, buttonSelector, callback }) => {
     $(`${ tableSelector } tbody`).on(DOM_EVENT_NAMES.CLICK, buttonSelector, function () {
-        callback(getResponsiveRowData(table, this));
+        return runApiAction(() => callback(getResponsiveRowData(table, this)));
     });
 };
 
@@ -69,6 +71,7 @@ export const bindIssueTableActions = ({ table, tableSelector, onEdit, onEditDeta
 export const createIssueDatatable = async ({
     context,
     getIssues,
+    getIssue,
     actionContext,
     permissions: { canManage, canSupply },
     tableOptions: { searchPlaceholder, order },
@@ -122,7 +125,10 @@ export const createIssueDatatable = async ({
     bindIssueTableActions({
         table,
         tableSelector: DATATABLE_SELECTORS.MAIN,
-        ...actions
+        ...Object.fromEntries(Object.entries(actions).map(([name, callback]) => [
+            name,
+            async row => callback(await getIssue({ id: row.id }))
+        ]))
     });
 
     return { table, filters };

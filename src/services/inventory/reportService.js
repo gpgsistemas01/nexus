@@ -1,3 +1,5 @@
+import { QUERY_BATCH_SIZES } from '../../constants/pagination.js';
+import { findBatches } from '../../repository/paginationRepository.js';
 import { toNumber } from "../../utils/formattersUtils.js";
 import { findAllMaterialMovements, findAllConsumableMovements, findAllWasteMovements } from "./movementQueryService.js";
 
@@ -16,7 +18,7 @@ const mapMovementReportRows = (movements) => movements.map((movement) => ({
     materialHeight: toNumber(movement.materialHeight),
 }));
 
-export const findMovementReportRows = async ({
+export const findMovementReportRows = async function* ({
     context = 'materials',
     startDate = '',
     endDate = '',
@@ -30,27 +32,26 @@ export const findMovementReportRows = async ({
     stockAdjustmentId = '',
     orderBy = 'date',
     orderDir = 'desc'
-} = {}) => {
+} = {}) {
     const findMovements = MOVEMENT_REPORT_QUERIES[context];
-    if (!findMovements) return [];
+    if (!findMovements) return;
 
-    const movementsResult = await findMovements({
-        includeCounts: false,
-        skip: 0,
-        take: 100000,
-        startDate,
-        endDate,
-        movementType,
-        search,
-        materialId,
-        wasteId,
-        supplierId,
-        goodsIssueId,
-        goodsReceiptId,
-        stockAdjustmentId,
-        orderBy,
-        orderDir,
-    });
-
-    return mapMovementReportRows(movementsResult.data);
+    for await (const page of findBatches({
+        batchSize: QUERY_BATCH_SIZES.MOVEMENTS,
+        fetchPage: async query => (await findMovements({ ...query, includeCounts: false })).data,
+        query: {
+            startDate,
+            endDate,
+            movementType,
+            search,
+            materialId,
+            wasteId,
+            supplierId,
+            goodsIssueId,
+            goodsReceiptId,
+            stockAdjustmentId,
+            orderBy,
+            orderDir,
+        }
+    })) yield* mapMovementReportRows(page);
 };

@@ -8,6 +8,12 @@ corregirse. Los errores que no corresponden a un campo aparecen como notificaci�
 se debe repetir una operación que modifica datos hasta comprobar si el registro, el documento o
 la existencia cambiaron.
 
+Si el formulario no puede mostrar un error junto al campo, Nexus muestra
+**Revise la información** con la explicación del rechazo. Los errores del registro
+aparecen con su mensaje correspondiente, por ejemplo **El identificador del registro no
+es válido.** Ante ese aviso, actualice el listado y vuelva a abrir la acción. Los demás
+campos señalados permanecen en el formulario para corregirlos.
+
 ### Secuencia breve de recuperación
 
 Ante un mensaje, siga siempre este orden y después consulte la fila específica del catálogo:

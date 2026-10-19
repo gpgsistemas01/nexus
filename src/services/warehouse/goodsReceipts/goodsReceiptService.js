@@ -1,3 +1,4 @@
+import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import { findPage } from '../../../repository/paginationRepository.js';
 import { createGoodsReceiptDetailsAndUpdateTotals } from "./goodsReceiptTotalsService.js";
 import { lockGoodsReceipt } from "../../../repository/warehouse/documentLockRepository.js";
@@ -46,6 +47,7 @@ const throwIfInvoiceAlreadyExists = (err) => {
 
 
 export const findAllGoodsReceipts = async ({
+    cursor,
     skip = 0,
     take = 10,
     search = '',
@@ -58,11 +60,14 @@ export const findAllGoodsReceipts = async ({
     activeDetailsOnly = false,
     orderBy = 'referenceNumber',
     orderDir = 'desc',
-    includeCounts = true
+    includeCounts = true,
+    includeDetails = true,
+    id = null
 }) => {
 
     const contextWhere = buildGoodsReceiptContextWhere(type);
     const where = {
+        ...(id && { id }),
         ...(supplierId && { supplierId }),
         ...(personId && { receivedById: personId }),
         ...contextWhere,
@@ -98,10 +103,9 @@ export const findAllGoodsReceipts = async ({
         query: {
             skip,
             take,
+            ...(cursor && { cursor }),
             where,
-            orderBy: {
-                [orderBy]: orderDir
-            },
+            orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             select: {
                 referenceNumber: true,
                 invoice: true,
@@ -122,10 +126,10 @@ export const findAllGoodsReceipts = async ({
                         name: true
                     }
                 },
-                details: {
+                details: includeDetails ? {
                     ...(activeDetailsOnly && { where: { status: 'ACTIVE' } }),
                     include: GOODS_RECEIPT_DETAIL_INCLUDE
-                }
+                } : false
             }
         }
     });
@@ -236,7 +240,8 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
             ...getModelLogContext('goodsReceipt', goodsReceiptDto)
         });
 
-        if (isAppError(err)) throw err;
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
         throwIfInvoiceAlreadyExists(err);
         throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
 
@@ -354,7 +359,8 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
             ...getModelLogContext('goodsReceipt', { id, ...goodsReceiptDto })
         });
 
-        if (isAppError(err)) throw err;
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
 
         throwIfInvoiceAlreadyExists(err);
 

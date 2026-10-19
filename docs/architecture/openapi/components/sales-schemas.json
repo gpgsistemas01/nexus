@@ -15,6 +15,11 @@
           "null"
         ],
         "format": "uuid"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
       }
     },
     "additionalProperties": false,
@@ -72,6 +77,25 @@
     "required": [
       "client",
       "code"
+    ]
+  },
+  "ClientUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "expectedVersion"
     ]
   }
 }

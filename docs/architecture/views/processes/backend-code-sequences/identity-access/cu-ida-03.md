@@ -43,7 +43,7 @@ sequenceDiagram
     break Token ausente o inválido
         Auth-->>Client: HTTP 401 INVALID_AUTH
     end
-    Route->>ValidationRules: personValidation[] — cadena ejecutada por Express
+    Route->>ValidationRules: personEditValidation[] — cadena ejecutada por Express
     Route->>Validator: validate(req, res, next)
     break Validación rechazada
         Validator-->>Client: HTTP 400 { errors }

@@ -1,9 +1,10 @@
+import { getGoodsReceipt, getAllGoodsReceipts } from '../../../../application/warehouse/goodsReceipts/goodsReceipts.js';
+import { runApiAction } from '../../../../api/errorHandler.js';
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { resetDataTable } from '../../core/base/tableOperations.js';
-import { getAllGoodsReceipts } from '../../../../application/warehouse/goodsReceipts/goodsReceipts.js';
 import { exportGoodsReceiptReport } from '../../../../application/warehouse/report.js';
 import { buildDetailsColumns } from '../../shared/issues/detailBuilder/detailColumns.js';
 import { buildDetailsHeader } from '../../shared/issues/detailBuilder/detailHeader.js';
@@ -88,15 +89,16 @@ export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal, resou
         }
     });
 
-    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function() {
-
-        const data = getResponsiveRowData(table, this);
-
-        openGoodsReceiptModal({
-            mode: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
-                ? FORM_MODES.VIEW
-                : FORM_MODES.EDIT,
-            data
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function () {
+        return runApiAction(async () => {
+            const row = getResponsiveRowData(table, this);
+            const data = await getGoodsReceipt({ id: row.id });
+            await openGoodsReceiptModal({
+                mode: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
+                    ? FORM_MODES.VIEW
+                    : FORM_MODES.EDIT,
+                data
+            });
         });
     });
 }

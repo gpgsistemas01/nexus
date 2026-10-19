@@ -7,7 +7,7 @@ export const initializeInventoryCrudModal = ({
     data = null,
     isDisabled = false
 }) => {
-    initForm({ form, mode, id: data?.id || '' });
+    initForm({ form, mode, id: data?.id || '', version: data?.version, materialVersion: data?.material?.version });
     clearFormErrors(form);
     setFormDisabled({ form, isDisabled });
 };

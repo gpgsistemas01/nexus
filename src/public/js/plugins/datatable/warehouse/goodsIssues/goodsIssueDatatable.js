@@ -1,4 +1,4 @@
-import { getAllGoodsIssues } from "../../../../application/warehouse/goodsIssues/goodsIssues.js";
+import { getAllGoodsIssues, getGoodsIssue } from "../../../../application/warehouse/goodsIssues/goodsIssues.js";
 import { exportGoodsIssueReport } from "../../../../application/warehouse/report.js";
 import { createIssueDatatable } from '../../shared/issues/issueDatatable.js';
 import { goodsIssueContext } from '../../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
@@ -11,6 +11,7 @@ export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onE
     await createIssueDatatable({
         context,
         getIssues: getAllGoodsIssues,
+        getIssue: getGoodsIssue,
         actionContext: 'goodsIssue',
         permissions: { canManage, canSupply },
         tableOptions: {

@@ -35,6 +35,11 @@ Un controller usa `return res...` para hacer explícito el final de la respuesta
 código de estado corresponde al resultado HTTP y los errores se entregan al mecanismo
 central existente; no se construye un formato de error paralelo por controlador.
 
+Los validadores de formulario comprueban campos y metadatos de `body`. El controller
+pasa los identificadores de ruta al servicio, que resuelve el registro y sus relaciones
+con las consultas del proceso. Los errores de identificador se entregan al manejo
+compartido, sin mezclarlos con los errores por campo del formulario.
+
 ## Registro y autorización de rutas
 
 - Agrupar routers en `src/routes/web` y `src/routes/api` y registrarlos en el `index.js`

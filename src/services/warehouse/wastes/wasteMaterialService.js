@@ -1,31 +1,18 @@
 import { getDb } from '../../../repository/baseRepository.js';
-import { getMaterialIdentityWidth } from '../../inventory/materialIdentity.js';
+import { findWasteTemplatePage } from '../../../repository/warehouse/wasteTemplateRepository.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
-import { isRollPresentation } from '../../../public/js/utils/warehouseInventoryUtils.js';
-import { MATERIAL_TYPES } from '../../../constants/inventory.js';
-import { SQUARE_METER_UNIT_NAMES, SQUARE_METER_UNIT_SYMBOLS } from '../../../public/js/constants/inventory.js';
 
 export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take = 20, supplierId = null } = {}) => {
-    if (!supplierId) return {
-        data: [],
-        recordsTotal: 0,
-        recordsFiltered: 0
-    };
+    if (!supplierId) return { data: [], recordsTotal: 0, recordsFiltered: 0 };
 
-    const where = {
-        type: MATERIAL_TYPES.MATERIAL,
-        unitMeasure: {
-            OR: [
-                { symbol: { in: [...SQUARE_METER_UNIT_SYMBOLS], mode: 'insensitive' } },
-                { name: { in: [...SQUARE_METER_UNIT_NAMES], mode: 'insensitive' } }
-            ]
-        },
-        ...(search && { name: { contains: search, mode: 'insensitive' } }),
-        supplierMaterials: { some: { supplierId, isActive: true } }
-    };
+    const page = await findWasteTemplatePage({ supplierId, search, skip, take });
+    const ids = page.filter(row => row.id).map(row => row.id);
+    const total = Number(page[0]?.total ?? 0);
+    if (!ids.length) return { data: [], recordsTotal: total, recordsFiltered: total };
+
+    // Sólo se hidratan las relaciones de la página; se conserva el objeto Material.
     const materials = await getDb().material.findMany({
-        where,
-        orderBy: { name: 'asc' },
+        where: { id: { in: ids } },
         select: {
             id: true,
             name: true,
@@ -39,28 +26,12 @@ export const findWasteMaterialTemplates = async ({ search = '', skip = 0, take =
             }
         }
     });
-    const uniqueTemplates = new Map();
-    const familyCosts = new Map();
-
-    materials.forEach(material => {
-        const width = getMaterialIdentityWidth(material);
-        const key = `${ material.name.trim().toLocaleLowerCase() }|${ width ?? 'no-width' }`;
-        const cost = toNumber(material.supplierMaterials[0]?.maxUnitCost);
-        const highest = familyCosts.get(key) ?? null;
-        familyCosts.set(key, cost == null ? highest : Math.max(highest ?? cost, cost));
-
-        const templateKey = isRollPresentation(material.presentation.name) ? material.id : key;
-        if (!uniqueTemplates.has(templateKey)) uniqueTemplates.set(templateKey, { material, key });
-    });
-
-    const data = Array.from(uniqueTemplates.values()).slice(skip, skip + take).map(({ material, key }) => ({
-        ...material,
-        maxUnitCost: familyCosts.get(key)
-    }));
-
+    const byId = new Map(materials.map(material => [material.id, material]));
     return {
-        data,
-        recordsTotal: uniqueTemplates.size,
-        recordsFiltered: uniqueTemplates.size
+        data: page.filter(row => byId.has(row.id)).map(row => ({
+            ...byId.get(row.id), maxUnitCost: toNumber(row.maxUnitCost)
+        })),
+        recordsTotal: total,
+        recordsFiltered: total
     };
 };

@@ -10,11 +10,15 @@ export const resetFormSubmitState = (form) => {
     form.querySelector(BUTTON_SELECTORS.SUBMIT)?.removeAttribute('disabled');
 };
 
-export const initForm = ({ form, mode, id = '' }) => {
+export const initForm = ({ form, mode, id = '', version, materialVersion }) => {
     form.reset();
     form.querySelectorAll('.js-flatpickr-datetime').forEach(input => setDateTimePickerValue(input, input.value));
     form.dataset.id = id;
     form.dataset.mode = mode;
+    delete form.dataset.version;
+    delete form.dataset.materialVersion;
+    if (version !== undefined) form.dataset.version = version;
+    if (materialVersion !== undefined) form.dataset.materialVersion = materialVersion;
     resetFormSubmitState(form);
 };
 

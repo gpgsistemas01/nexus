@@ -21,7 +21,6 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `MaterialDto` | control | [`materialDTO.js`](../../../../../../src/dtos/materialDTO.js) |
 | `Domain` | control | [`materialService.js`](../../../../../../src/services/warehouse/materials/materialService.js) |
 | `Helpers` | control | [`materialHelpers.js`](../../../../../../src/services/warehouse/materials/materialHelpers.js) |
-| `Relations` | control | [`materialRelations.js`](../../../../../../src/services/warehouse/materials/materialRelations.js) |
 | `SupplierMaterial` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
 | `Adjustment` | control | [`adjustmentService.js`](../../../../../../src/services/warehouse/adjustmentService.js) |
@@ -95,7 +94,6 @@ sequenceDiagram
     participant MaterialDto@{ "type": "control" } as DTO funcional<br/>materialDTO.js
     participant Domain@{ "type": "control" } as materialService.js
     participant Helpers@{ "type": "control" } as materialHelpers.js
-    participant Relations@{ "type": "control" } as materialRelations.js
     participant SupplierMaterial@{ "type": "control" } as supplierMaterialService.js
     participant Reason@{ "type": "control" } as reasonService.js
     participant Adjustment@{ "type": "control" } as adjustmentService.js
@@ -132,7 +130,7 @@ sequenceDiagram
         Prisma-->>Domain: create(): Promise[{ id: number }]
         deactivate Prisma
     end
-    Domain->>Relations: syncSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
+    Domain->>SupplierMaterial: createSupplierMaterial({ tx, supplierId, materialId, maxUnitCost, isActive })
     opt Alta directa con newStock
         Domain->>Reason: findInitialStockAdjustmentReason({ tx })
         activate Reason

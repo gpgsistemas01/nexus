@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('../../../../../../../src/public/js/ui/inventory/wasteOperationUI.js', () => ({
+    getPendingWasteOperation: () => null, showPendingWasteOperation: vi.fn(),
+    submitWasteOperation: ({ formData, submit }) => submit(formData)
+}));
+
 const state = vi.hoisted(() => ({
     config: null, submit: vi.fn(), confirmation: vi.fn(), permission: vi.fn(),
     close: vi.fn(), reset: vi.fn(), openAddition: vi.fn(), add: vi.fn(), success: vi.fn(), reload: vi.fn(), validate: vi.fn()

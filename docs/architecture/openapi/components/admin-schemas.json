@@ -61,6 +61,11 @@
         "items": {
           "$ref": "../openapi.json#/components/schemas/Access"
         }
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
       }
     },
     "additionalProperties": false,
@@ -170,6 +175,11 @@
           "isSystem",
           "isSales"
         ]
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
       }
     },
     "additionalProperties": false,
@@ -294,6 +304,12 @@
       "departmentId": {
         "type": "string",
         "format": "uuid"
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
       }
     },
     "additionalProperties": false,
@@ -301,7 +317,8 @@
       "name",
       "personId",
       "roleId",
-      "departmentId"
+      "departmentId",
+      "expectedVersion"
     ]
   },
   "PasswordRequest": {
@@ -309,11 +326,18 @@
     "properties": {
       "password": {
         "type": "string"
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
       }
     },
     "additionalProperties": false,
     "required": [
-      "password"
+      "password",
+      "expectedVersion"
     ]
   },
   "PersonList": {
@@ -415,6 +439,47 @@
     "required": [
       "user",
       "code"
+    ]
+  },
+  "PersonUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "fullName": {
+        "type": "string"
+      },
+      "accesses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "departmentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "roleId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "departmentId",
+            "roleId"
+          ]
+        }
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "fullName",
+      "accesses",
+      "expectedVersion"
     ]
   }
 }

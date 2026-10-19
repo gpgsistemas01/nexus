@@ -1,14 +1,21 @@
+import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
-import { existsMaterialUsage, findAllSupplierMaterials, findSupplierMaterialByIds } from "./supplierMaterialService.js";
+import {
+    existsMaterialUsage,
+    findAllSupplierMaterials,
+    findSupplierMaterialByIds,
+    createSupplierMaterial
+} from "./supplierMaterialService.js";
 import { assertMaterialRollReference, prepareMaterialData } from "./materialHelpers.js";
-import { syncSupplierMaterial } from "./materialRelations.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findInitialStockAdjustmentReason } from "../reasonService.js";
 import { MATERIAL_TYPES } from "../../../constants/inventory.js";
+
+import { updateVersionedRecord } from '../../../repository/versionRepository.js';
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
 
@@ -22,7 +29,8 @@ const throwMaterialWriteError = ({ err, fallbackError }) => {
         throw new MaterialAlreadyExists();
     }
 
-    if (isAppError(err)) throw err;
+    const normalizedError = normalizeDatabaseError(err);
+    if (isAppError(normalizedError)) throw normalizedError;
 
     throw fallbackError;
 };
@@ -170,7 +178,7 @@ export const createMaterial = async ({
                 materialId = createdMaterial.id;
             }
 
-            await syncSupplierMaterial({
+            await createSupplierMaterial({
                 tx,
                 supplierId: relations.supplierId,
                 materialId,
@@ -227,11 +235,10 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
 
         const material = await getDb().$transaction(async (tx) => {
 
-            await existsMaterial({ tx, id, type });
-            const { supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...materialData } = materialDto;
+            const { supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, expectedVersion, expectedMaterialVersion, ...materialData } = materialDto;
 
             const currentMaterial = await tx.material.findUnique({
-                where: { id },
+                where: { id, ...(type && { type }) },
                 select: {
                     id: true,
                     presentationId: true,
@@ -242,6 +249,7 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
                 }
             });
 
+            if (!currentMaterial) throw new MaterialNotFound();
             assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 
             const existingMaterial = await tx.material.findFirst({
@@ -261,25 +269,17 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
                 throw new MaterialAlreadyExists();
             }
 
-            const updatedMaterial = await tx.material.update({
+            const updatedMaterial = await updateVersionedRecord({
+                model: tx.material, expectedVersion: expectedMaterialVersion,
                 where: { id },
                 data: materialData
             });
 
-            const updatedOffer = await tx.supplierMaterial.updateMany({
-                where: {
-                    materialId: updatedMaterial.id,
-                    supplierId
-                },
-                data: {
-                    maxUnitCost,
-                    isActive
-                }
+            await updateVersionedRecord({
+                model: tx.supplierMaterial, expectedVersion,
+                where: { supplierId_materialId: { materialId: updatedMaterial.id, supplierId } },
+                data: { maxUnitCost, isActive }
             });
-            // La oferta es única; cero filas indica que dejó de coincidir con los datos consultados.
-            if (updatedOffer.count === 0) {
-                throw new MaterialNotFound();
-            }
 
             return findSupplierMaterialByIds({
                 tx,
@@ -325,6 +325,7 @@ export const updateMaterialStock = async ({
             reasonId: materialDto.reasonId,
             observations: materialDto.observations,
             newStock: materialDto.newStock,
+            expectedVersion: materialDto.expectedVersion,
             userId
         });
 
@@ -345,7 +346,8 @@ export const updateMaterialStock = async ({
             throw new MaterialNotFound();
         }
 
-        if (isAppError(err)) throw err;
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
 
         throw new MaterialStockAdjustmentDatabaseError();
     }
@@ -395,7 +397,8 @@ export const deleteMaterial = async (supplierMaterialId, { type = null } = {}) =
 
         if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new MaterialNotFound();
         if (err.code === PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT) throw new MaterialDeleteRelationConflict();
-        if (isAppError(err)) throw err;
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
 
         throw new MaterialDeleteDatabaseError();
     }

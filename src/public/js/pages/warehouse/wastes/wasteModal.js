@@ -1,11 +1,20 @@
+import { WASTE_OPERATION_ACTIONS } from '../../../constants/inventory.js';
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
 import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { openModal } from "../../../ui/modalUI.js";
-import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import {
+    BUTTON_SELECTORS,
+    FORM_SELECTORS,
+    HEADING_SELECTORS,
+    MODAL_SELECTORS,
+    SELECT_SELECTORS
+} from "../../../constants/selectors.js";
 import { wasteDataFields, wasteSecondaryDataFields } from './wasteFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
 import { configureWasteWeightFields, displayWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';
+
+import { showPendingWasteOperation } from '../../../ui/inventory/wasteOperationUI.js';
 
 const stockDataSectionSelector = '.stock-data-section';
 const materialTemplateFieldSelector = '.waste-material-template-field';
@@ -104,5 +113,7 @@ export const openWasteModal = ({
 
     displayWasteMaterialTemplate({ form, template: data ?? {} });
     configureWasteWeightFields({ form, template: data ?? {} });
+    if (isCreating) showPendingWasteOperation({ form, action: WASTE_OPERATION_ACTIONS.CREATE });
+    else form.querySelector('[data-pending-waste-operation]')?.remove();
     openModal(modalElement);
 };

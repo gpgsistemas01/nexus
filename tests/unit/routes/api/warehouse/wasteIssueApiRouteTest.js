@@ -47,6 +47,7 @@ vi.mock('../../../../../src/controllers/api/warehouse/wasteIssueController.js', 
   editWasteIssueDetails,
   editWasteIssueHeader,
   getAllWasteIssues,
+  getWasteIssue: vi.fn(),
   registerWasteIssue,
   registerWasteIssueDetailReturn
 }));

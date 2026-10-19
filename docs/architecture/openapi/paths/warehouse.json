@@ -169,6 +169,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -219,6 +235,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "parameters": [
@@ -261,6 +290,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -350,7 +395,7 @@
     },
     "post": {
       "operationId": "postWarehouseWastes",
-      "description": "Crea la merma con initialQuantity; con cantidad inicial positiva genera una entrada EME y un movimiento ENTRY en la misma transacción. Cantidad cero no genera documento, movimiento ni folio; no requiere motivo de ajuste. minStock e isActive se conservan según la captura.",
+      "description": "Crea la merma con initialQuantity; con cantidad inicial positiva genera una entrada EME y un movimiento ENTRY en la misma transacci\u00f3n. Cantidad cero no genera documento, movimiento ni folio; no requiere motivo de ajuste. minStock e isActive se conservan seg\u00fan la captura. Exige operationId; el recibo, la merma, la entrada y sus movimientos se confirman juntos. Repetir clave/captura recupera la respuesta original; otra captura con esa clave responde 409.",
       "security": [
         {
           "cookieAuth": []
@@ -375,6 +420,9 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
         }
       },
       "requestBody": {
@@ -416,6 +464,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -451,7 +515,7 @@
       ],
       "responses": {
         "200": {
-          "description": "Ajuste guardado. La implementación actual devuelve únicamente el código de éxito: el callback transaccional de updateWasteStock no retorna la entidad. El pendiente está descrito en CU-ALM-12.",
+          "description": "Ajuste guardado. La implementaci\u00f3n actual devuelve \u00fanicamente el c\u00f3digo de \u00e9xito: el callback transaccional de updateWasteStock no retorna la entidad. El pendiente est\u00e1 descrito en CU-ALM-12.",
           "content": {
             "application/json": {
               "schema": {
@@ -477,6 +541,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -531,7 +611,8 @@
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
-      }
+      },
+      "description": " Devuelve cabeceras sin details; los modales consultan GET /{id}."
     },
     "post": {
       "operationId": "postWarehouseWasteIssues",
@@ -600,6 +681,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -623,6 +717,58 @@
           }
         }
       ]
+    },
+    "get": {
+      "operationId": "getWarehouseWasteIssue",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "responses": {
+        "200": {
+          "description": "Documento completo.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "wasteIssue"
+                ],
+                "properties": {
+                  "wasteIssue": {
+                    "$ref": "../openapi.json#/components/schemas/Issue"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Documento inexistente o fuera del contexto autorizado."
+        }
+      }
     }
   },
   "/api/warehouse/waste-issues/{id}/header": {
@@ -652,6 +798,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -704,6 +863,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -756,6 +928,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -887,6 +1072,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -894,7 +1095,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "../openapi.json#/components/schemas/SupplierRequest"
+              "$ref": "../openapi.json#/components/schemas/SupplierUpdateRequest"
             }
           }
         }
@@ -941,7 +1142,7 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; los modales consultan GET /{id}."
     },
     "post": {
       "operationId": "postWarehouseMaterialGoodsIssues",
@@ -981,7 +1182,7 @@
           }
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/goods-issues/consumables": {
@@ -1013,7 +1214,7 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; los modales consultan GET /{id}."
     },
     "post": {
       "operationId": "postWarehouseConsumableGoodsIssues",
@@ -1053,7 +1254,7 @@
           }
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/goods-issues/materials/{id}": {
@@ -1083,6 +1284,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1106,7 +1320,59 @@
           }
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    },
+    "get": {
+      "operationId": "getApiWarehouseGoodsIssuesMaterialsDetail",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "responses": {
+        "200": {
+          "description": "Documento completo.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "goodsIssue"
+                ],
+                "properties": {
+                  "goodsIssue": {
+                    "$ref": "../openapi.json#/components/schemas/Issue"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Documento inexistente o fuera del contexto autorizado."
+        }
+      }
     }
   },
   "/api/warehouse/goods-issues/consumables/{id}": {
@@ -1136,6 +1402,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1159,7 +1438,59 @@
           }
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+    },
+    "get": {
+      "operationId": "getApiWarehouseGoodsIssuesConsumablesDetail",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "responses": {
+        "200": {
+          "description": "Documento completo.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "goodsIssue"
+                ],
+                "properties": {
+                  "goodsIssue": {
+                    "$ref": "../openapi.json#/components/schemas/Issue"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Documento inexistente o fuera del contexto autorizado."
+        }
+      }
     }
   },
   "/api/warehouse/goods-issues/materials/{id}/header": {
@@ -1189,6 +1520,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1212,7 +1556,7 @@
           }
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/goods-issues/consumables/{id}/header": {
@@ -1242,6 +1586,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1265,7 +1622,7 @@
           }
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/goods-issues/materials/{id}/details": {
@@ -1295,6 +1652,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1318,7 +1688,7 @@
           }
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/goods-issues/consumables/{id}/details": {
@@ -1348,6 +1718,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1371,7 +1754,7 @@
           }
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/goods-issues/materials/{id}/details/{detailId}/returns": {
@@ -1401,6 +1784,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1433,7 +1829,7 @@
           }
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/goods-issues/consumables/{id}/details/{detailId}/returns": {
@@ -1463,6 +1859,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1495,7 +1904,7 @@
           }
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/reports/inventory/excel": {
@@ -1560,7 +1969,7 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/reports/goods-issues/consumables/excel": {
@@ -1593,7 +2002,7 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los parámetros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
     }
   },
   "/api/warehouse/reports/waste-issues/excel": {
@@ -1846,6 +2255,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1869,7 +2291,7 @@
           }
         }
       ],
-      "description": "Suma quantity al saldo actual mediante una entrada EME; conserva cantidad, saldos, actor y observaciones."
+      "description": "Suma quantity al saldo actual mediante una entrada EME; conserva cantidad, saldos, actor y observaciones. Exige operationId; el recibo, la merma, la entrada y sus movimientos se confirman juntos. Repetir clave/captura recupera la respuesta original; otra captura con esa clave responde 409."
     }
   },
   "/api/warehouse/consumables/{id}": {
@@ -1899,6 +2321,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -1949,6 +2387,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "parameters": [
@@ -1991,6 +2442,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -2044,7 +2511,8 @@
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
-      }
+      },
+      "description": " Devuelve cabeceras sin details; los modales consultan GET /{id}."
     },
     "post": {
       "operationId": "postWarehouseGoodsReceiptsMaterials",
@@ -2114,7 +2582,8 @@
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
-      }
+      },
+      "description": " Devuelve cabeceras sin details; los modales consultan GET /{id}."
     },
     "post": {
       "operationId": "postWarehouseGoodsReceiptsConsumables",
@@ -2183,6 +2652,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -2190,7 +2672,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "../openapi.json#/components/schemas/GoodsReceiptRequest"
+              "$ref": "../openapi.json#/components/schemas/GoodsReceiptHeaderRequest"
             }
           }
         }
@@ -2206,6 +2688,58 @@
           }
         }
       ]
+    },
+    "get": {
+      "operationId": "getApiWarehouseGoodsReceiptsMaterialsDetail",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "responses": {
+        "200": {
+          "description": "Documento completo.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "goodsReceipt"
+                ],
+                "properties": {
+                  "goodsReceipt": {
+                    "$ref": "../openapi.json#/components/schemas/GoodsReceipt"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Documento inexistente o fuera del contexto autorizado."
+        }
+      }
     }
   },
   "/api/warehouse/goods-receipts/consumables/{id}": {
@@ -2235,6 +2769,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -2242,7 +2789,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "../openapi.json#/components/schemas/GoodsReceiptRequest"
+              "$ref": "../openapi.json#/components/schemas/GoodsReceiptHeaderRequest"
             }
           }
         }
@@ -2258,6 +2805,58 @@
           }
         }
       ]
+    },
+    "get": {
+      "operationId": "getApiWarehouseGoodsReceiptsConsumablesDetail",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
+      "responses": {
+        "200": {
+          "description": "Documento completo.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "goodsReceipt"
+                ],
+                "properties": {
+                  "goodsReceipt": {
+                    "$ref": "../openapi.json#/components/schemas/GoodsReceipt"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "404": {
+          "description": "Documento inexistente o fuera del contexto autorizado."
+        }
+      }
     }
   },
   "/api/warehouse/goods-receipts/materials/{id}/details/{detailId}/corrections": {
@@ -2287,6 +2886,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -2348,6 +2960,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -2409,6 +3034,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "parameters": [
@@ -2460,6 +3098,19 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "parameters": [

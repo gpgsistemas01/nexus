@@ -1,4 +1,4 @@
-import { getAllWasteIssues } from '../../../../application/warehouse/wasteIssues/wasteIssues.js';
+import { getAllWasteIssues, getWasteIssue } from '../../../../application/warehouse/wasteIssues/wasteIssues.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
 import { createIssueDatatable } from '../../shared/issues/issueDatatable.js';
 import { exportWasteIssueReport } from '../../../../application/warehouse/report.js';
@@ -9,6 +9,7 @@ export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onE
     const issueDatatable = await createIssueDatatable({
         context,
         getIssues: getAllWasteIssues,
+        getIssue: getWasteIssue,
         actionContext: 'wasteIssue',
         permissions: { canManage, canSupply },
         tableOptions: {

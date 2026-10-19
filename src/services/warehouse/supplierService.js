@@ -1,6 +1,14 @@
+import { normalizeDatabaseError } from '../../errors/databaseError.js';
+import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
+import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from "../../repository/paginationRepository.js";
 import { isAppError } from "../../errors/AppError.js";
-import { SupplierCodeNotFound, SupplierCreateDatabaseError, SupplierNotFound, SupplierUpdateDatabaseError } from "../../errors/warehouse/supplierError.js";
+import {
+    SupplierCodeNotFound,
+    SupplierCreateDatabaseError,
+    SupplierNotFound,
+    SupplierUpdateDatabaseError
+} from "../../errors/warehouse/supplierError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
@@ -27,6 +35,7 @@ const numberToSupplierCode = (number) => {
 export const findAllSuppliers = async ({
     onlyActive = false,
     includeCounts = true,
+    cursor,
     skip = 0,
     take = 10,
     search = '',
@@ -60,12 +69,12 @@ export const findAllSuppliers = async ({
         includeCounts,
         query: {
             ...(take > 0 && { skip, take }),
+            ...(cursor && { cursor }),
             where,
-            orderBy: {
-                [orderBy]: orderDir
-            },
+            orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             select: {
                 id: true,
+                version: true,
                 tradeName: true,
                 legalName: true,
                 isActive: true
@@ -154,19 +163,10 @@ export const updateSupplier = async (supplierDto, id) => {
 
     const db = getDb();
 
-    const supplierExists = await db.supplier.findUnique({
-        where: { id },
-        select: { id: true }
-    });
-
-    if (!supplierExists) throw new SupplierNotFound();
-
     try {
 
-        const supplier = await db.supplier.update({
-            data: { ...supplierDto },
-            where: { id }
-        });
+        const { expectedVersion, ...data } = supplierDto;
+        const supplier = await updateVersionedRecord({ model: db.supplier, where: { id }, expectedVersion, data });
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.supplierService.updateSupplier',
@@ -181,7 +181,9 @@ export const updateSupplier = async (supplierDto, id) => {
             ...getModelLogContext('supplier', { id, ...supplierDto })
         });
 
-        if (isAppError(err)) throw err;
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new SupplierNotFound();
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
 
         throw new SupplierUpdateDatabaseError();
     }

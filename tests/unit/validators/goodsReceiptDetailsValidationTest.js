@@ -27,11 +27,21 @@ describe('validación de detalles de compra', () => {
   });
 
   it.each([
+    [],
+    'invalid',
+    [null],
     [{ quantity: 1, costPerUnitType: 10 }],
     [{ materialId: 'material-1', quantity: 0, costPerUnitType: 10 }],
     [{ materialId: 'material-1', quantity: 1, costPerUnitType: 0 }]
   ])('rechaza con ambos contratos detalles incompletos o fuera de rango', async details => {
     await expect(runDetailsValidation(goodsReceiptValidation, details)).resolves.not.toEqual([]);
     await expect(runDetailsValidation(goodsReceiptHeaderValidation, details)).resolves.not.toEqual([]);
+  });
+
+  it('exige detalles en el alta y permite omitirlos al editar sólo el encabezado', async () => {
+    expect(await runDetailsValidation(goodsReceiptValidation, undefined)).toContainEqual(
+      expect.objectContaining({ path: 'details', msg: 'DETAILS_REQUIRED' })
+    );
+    expect(await runDetailsValidation(goodsReceiptHeaderValidation, undefined)).toEqual([]);
   });
 });

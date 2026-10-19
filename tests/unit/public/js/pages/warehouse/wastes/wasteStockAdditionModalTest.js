@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../../../../../src/public/js/ui/inventory/inventoryCrudModalUI.js', () => ({ initializeInventoryCrudModal: vi.fn() }));
 vi.mock('../../../../../../../src/public/js/ui/modalUI.js', () => ({ openModal: vi.fn() }));
+vi.mock('../../../../../../../src/public/js/ui/inventory/wasteOperationUI.js', () => ({ showPendingWasteOperation: vi.fn() }));
 const elements = Object.fromEntries([
     '#wasteStockAdditionName', '#wasteStockAdditionCurrentStock',
     '#wasteStockAdditionResultingStock', '#wasteStockAdditionQuantityInput', '#wasteStockAdditionModal'

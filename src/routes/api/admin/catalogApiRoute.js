@@ -9,8 +9,7 @@ import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/au
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import {
     catalogEntryEditValidation,
-    catalogEntryValidation,
-    catalogNameValidation
+    catalogEntryValidation
 } from '../../../validators/forms/catalogValidations.js';
 
 const router = express.Router();
@@ -19,8 +18,6 @@ router.use(verifyApiTokenRequired, authorizeUserApi(PERMISSIONS.CATALOGS_MANAGE)
 
 router.get(
     '/:catalog',
-    catalogNameValidation,
-    validate,
     getAllCatalogEntries
 );
 

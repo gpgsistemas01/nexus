@@ -1,10 +1,19 @@
 import { body } from "express-validator";
 import { errorMap } from "../../messages/codeMessages.js";
-import { validateBoolean, validateDate, validateInvoice, validateNonNegativeNumber, validatePositiveNumber, validateTextOptional, validateUUID } from "../fields/fieldsValidator.js";
+import {
+    validateBoolean,
+    validateDate,
+    validateInvoice,
+    validateNonNegativeNumber,
+    validatePositiveNumber,
+    validateTextOptional,
+    validateUUID
+} from "../fields/fieldsValidator.js";
 
 const validateGoodsReceiptDetails = details => {
     details.forEach(detail => {
-        if (!detail.materialId || !detail.quantity || !detail.costPerUnitType) {
+        if (!detail || typeof detail !== 'object' || Array.isArray(detail)
+            || !detail.materialId || !detail.quantity || !detail.costPerUnitType) {
             throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
         }
 
@@ -20,11 +29,13 @@ const validateGoodsReceiptDetails = details => {
 
 const validateDetailsArray = body('details')
     .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+    .bail()
     .custom(validateGoodsReceiptDetails);
 
 const validateOptionalGoodsReceiptDetails = body('details')
     .optional({ values: 'undefined' })
-    .isArray().withMessage(errorMap['details'].REQUIRED)
+    .isArray({ min: 1 }).withMessage(errorMap['details'].REQUIRED)
+    .bail()
     .custom(validateGoodsReceiptDetails);
 
 export const goodsReceiptValidation = [
@@ -34,8 +45,9 @@ export const goodsReceiptValidation = [
     validateInvoice(),
     validateDate('receptionDate'),
     validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
+    body('details.*.materialId').isUUID('4').withMessage(errorMap.details.INVALID_FORMAT_REQUIRED),
     validateDetailsArray
-]
+];
 
 
 export const goodsReceiptHeaderValidation = [
@@ -45,6 +57,7 @@ export const goodsReceiptHeaderValidation = [
     validateInvoice(),
     validateDate('receptionDate'),
     validateTextOptional({ fieldName: 'observations', maxLength: 500 }),
+    body('details.*.materialId').isUUID('4').withMessage(errorMap.details.INVALID_FORMAT_REQUIRED),
     validateOptionalGoodsReceiptDetails
 ];
 

@@ -25,6 +25,7 @@ import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
 
 export const findAllWasteIssues = async ({
+    cursor,
     skip = 0,
     take = 10,
     search = '',
@@ -36,6 +37,8 @@ export const findAllWasteIssues = async ({
     fulfillmentStatusId = '',
     observationsSearch = '',
     includeCounts = true,
+    includeDetails = true,
+    id = null,
     orderBy = 'requestDate',
     orderDir = 'desc'
 }) => {
@@ -50,6 +53,7 @@ export const findAllWasteIssues = async ({
         'observations'
     ]);
     const where = {
+        ...(id && { id }),
         ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
         ...(clientId && { clientId }),
         ...(departmentId && { departmentId }),
@@ -73,9 +77,10 @@ export const findAllWasteIssues = async ({
         query: {
             skip,
             take,
+            ...(cursor && { cursor }),
             where,
-            include: WASTE_ISSUE_INCLUDE,
-            orderBy: { [sortableFields.has(orderBy) ? orderBy : 'requestDate']: orderDir }
+            include: { ...WASTE_ISSUE_INCLUDE, details: includeDetails ? WASTE_ISSUE_INCLUDE.details : false },
+            orderBy: [{ [sortableFields.has(orderBy) ? orderBy : 'requestDate']: orderDir }, { id: 'asc' }]
         }
     });
 

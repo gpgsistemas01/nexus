@@ -86,6 +86,8 @@ const toggleTableErrors = (form, errors, fields = null) => {
             feedback.classList.add('d-none');
         });
         Object.entries(errors).forEach(([id, detailFields]) => {
+            if (!detailFields || typeof detailFields !== 'object') return;
+
             Object.entries(detailFields).forEach(([field, message]) => {
                 const input = form.querySelector(`[data-detail-id="${ id }"][name="${ field }"]`);
                 const feedback = form.querySelector(`[data-error-for="${ field }-${ id }"]`);
@@ -111,6 +113,25 @@ export const normalizeFormErrors = ({ form, errors, fields = Object.keys(errors)
     toggleTableErrors(form, errors, fields);
     toggleInputSelectErrors(form, errors, fields);
     return errors;
+};
+
+export const getUnrenderedFormErrorMessages = ({ form = null, errors, detailId = null }) => {
+    if (typeof errors === 'string') return errors ? [errors] : [];
+    if (!errors || typeof errors !== 'object') return [];
+
+    return Object.entries(errors).flatMap(([field, error]) => {
+        if (typeof error !== 'string') {
+            return getUnrenderedFormErrorMessages({ form, errors: error, detailId: field });
+        }
+
+        if (!error) return [];
+
+        const feedbackKey = detailId ? `${ field }-${ detailId }` : field;
+        const feedback = form?.querySelector(`[data-error-for="${ feedbackKey }"]`);
+        const isDisplayed = feedback?.textContent === error && !feedback.closest('.d-none, [hidden]');
+
+        return isDisplayed ? [] : [error];
+    });
 };
 
 export const clearFormErrors = (form) => {

@@ -61,6 +61,7 @@ describe('wasteIssueController', () => {
     }, response);
 
     expect(findAllWasteIssues).toHaveBeenCalledWith({
+      includeDetails: false,
       skip: 10,
       take: 5,
       search: 'SAL-MER-2026',

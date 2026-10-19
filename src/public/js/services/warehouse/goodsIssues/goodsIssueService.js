@@ -3,6 +3,8 @@ import * as consumableRequests from './consumables/consumableGoodsIssueService.j
 import { goodsIssueContext } from '../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
 import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
 
+import { apiRequest } from '../../axiosInstanceApi.js';
+
 const isConsumable = goodsIssueContext.resource === INVENTORY_RESOURCES.CONSUMABLE;
 
 export const GOODS_ISSUES_API_ROUTE = isConsumable ? consumableRequests.CONSUMABLE_GOODS_ISSUES_API_ROUTE : materialRequests.MATERIAL_GOODS_ISSUES_API_ROUTE;
@@ -13,3 +15,5 @@ export const editGoodsIssueHeaderRequest = isConsumable ? consumableRequests.edi
 export const editGoodsIssueDetailsRequest = isConsumable ? consumableRequests.editConsumableGoodsIssueDetailsRequest : materialRequests.editMaterialGoodsIssueDetailsRequest;
 export const returnGoodsIssueDetailRequest = isConsumable ? consumableRequests.returnConsumableGoodsIssueDetailRequest : materialRequests.returnMaterialGoodsIssueDetailRequest;
 export const exportGoodsIssueReportRequest = isConsumable ? consumableRequests.exportConsumableGoodsIssueReportRequest : materialRequests.exportMaterialGoodsIssueReportRequest;
+
+export const getGoodsIssueRequest = ({ id }) => apiRequest({ method: 'get', url: `${ GOODS_ISSUES_API_ROUTE }/${ id }` });

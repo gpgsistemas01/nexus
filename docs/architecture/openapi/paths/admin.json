@@ -96,6 +96,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -148,6 +164,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -332,6 +364,22 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       },
       "requestBody": {
@@ -339,7 +387,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "../openapi.json#/components/schemas/PersonRequest"
+              "$ref": "../openapi.json#/components/schemas/PersonUpdateRequest"
             }
           }
         }
@@ -643,7 +691,7 @@
             "schema": {
               "oneOf": [
                 {
-                  "title": "Áreas",
+                  "title": "\u00c1reas",
                   "type": "object",
                   "properties": {
                     "name": {
@@ -827,17 +875,24 @@
             "schema": {
               "oneOf": [
                 {
-                  "title": "Áreas",
+                  "title": "\u00c1reas",
                   "type": "object",
                   "properties": {
                     "name": {
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 50
+                    },
+                    "expectedVersion": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647,
+                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
                     }
                   },
                   "required": [
-                    "name"
+                    "name",
+                    "expectedVersion"
                   ],
                   "additionalProperties": false
                 },
@@ -849,10 +904,17 @@
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 50
+                    },
+                    "expectedVersion": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647,
+                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
                     }
                   },
                   "required": [
-                    "name"
+                    "name",
+                    "expectedVersion"
                   ],
                   "additionalProperties": false
                 },
@@ -864,10 +926,17 @@
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 50
+                    },
+                    "expectedVersion": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647,
+                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
                     }
                   },
                   "required": [
-                    "name"
+                    "name",
+                    "expectedVersion"
                   ],
                   "additionalProperties": false
                 },
@@ -884,11 +953,18 @@
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 10
+                    },
+                    "expectedVersion": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647,
+                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
                     }
                   },
                   "required": [
                     "name",
-                    "symbol"
+                    "symbol",
+                    "expectedVersion"
                   ],
                   "additionalProperties": false
                 },
@@ -903,11 +979,18 @@
                     },
                     "isActive": {
                       "type": "boolean"
+                    },
+                    "expectedVersion": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647,
+                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
                     }
                   },
                   "required": [
                     "name",
-                    "isActive"
+                    "isActive",
+                    "expectedVersion"
                   ],
                   "additionalProperties": false
                 },
@@ -919,10 +1002,17 @@
                       "type": "string",
                       "minLength": 1,
                       "maxLength": 50
+                    },
+                    "expectedVersion": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 2147483647,
+                      "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
                     }
                   },
                   "required": [
-                    "name"
+                    "name",
+                    "expectedVersion"
                   ],
                   "additionalProperties": false
                 }
@@ -965,6 +1055,19 @@
         },
         "400": {
           "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "409": {
+          "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "404": {
+          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
         }
       }
     }
@@ -999,8 +1102,8 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       },
-      "summary": "Exportar personas y asignaciones de área y rol",
-      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con búsqueda y áreas; no pagina la exportación.",
+      "summary": "Exportar personas y asignaciones de \u00e1rea y rol",
+      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con b\u00fasqueda y \u00e1reas; no pagina la exportaci\u00f3n.",
       "parameters": [
         {
           "name": "department",
@@ -1008,7 +1111,7 @@
           "required": false,
           "style": "form",
           "explode": true,
-          "description": "Identificadores de áreas. También se admite el alias department[].",
+          "description": "Identificadores de \u00e1reas. Tambi\u00e9n se admite el alias department[].",
           "schema": {
             "type": "array",
             "items": {
@@ -1021,7 +1124,7 @@
           "name": "search[value]",
           "in": "query",
           "required": false,
-          "description": "Búsqueda por nombre de persona.",
+          "description": "B\u00fasqueda por nombre de persona.",
           "schema": {
             "type": "string"
           }
@@ -1030,7 +1133,7 @@
           "name": "order[0][column]",
           "in": "query",
           "required": false,
-          "description": "Índice de columna: 0 corresponde a fullName.",
+          "description": "\u00cdndice de columna: 0 corresponde a fullName.",
           "schema": {
             "type": "integer",
             "minimum": 0
@@ -1081,8 +1184,8 @@
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
       },
-      "summary": "Exportar personas y asignaciones de área y rol",
-      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con búsqueda y áreas; no pagina la exportación. Alias de compatibilidad de /api/admin/reports/persons/excel, registrado con el mismo controlador y permiso.",
+      "summary": "Exportar personas y asignaciones de \u00e1rea y rol",
+      "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con b\u00fasqueda y \u00e1reas; no pagina la exportaci\u00f3n. Alias de compatibilidad de /api/admin/reports/persons/excel, registrado con el mismo controlador y permiso.",
       "parameters": [
         {
           "name": "department",
@@ -1090,7 +1193,7 @@
           "required": false,
           "style": "form",
           "explode": true,
-          "description": "Identificadores de áreas. También se admite el alias department[].",
+          "description": "Identificadores de \u00e1reas. Tambi\u00e9n se admite el alias department[].",
           "schema": {
             "type": "array",
             "items": {
@@ -1103,7 +1206,7 @@
           "name": "search[value]",
           "in": "query",
           "required": false,
-          "description": "Búsqueda por nombre de persona.",
+          "description": "B\u00fasqueda por nombre de persona.",
           "schema": {
             "type": "string"
           }
@@ -1112,7 +1215,7 @@
           "name": "order[0][column]",
           "in": "query",
           "required": false,
-          "description": "Índice de columna: 0 corresponde a fullName.",
+          "description": "\u00cdndice de columna: 0 corresponde a fullName.",
           "schema": {
             "type": "integer",
             "minimum": 0

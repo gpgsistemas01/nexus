@@ -65,10 +65,10 @@ describe('listado de salidas por recurso', () => {
 
     it('el reporte omite el conteo y conserva el contexto y el alcance de área', async () => {
         const { findGoodsIssueReportRows } = await import('../../../../../src/services/warehouse/reportService.js');
-        expect(await findGoodsIssueReportRows({
+        expect(await Array.fromAsync(findGoodsIssueReportRows({
             type: 'CONSUMABLE',
             accesses: [{ departmentId: 'department-1' }]
-        })).toEqual([]);
+        }))).toEqual([]);
         expect(count).not.toHaveBeenCalled();
         expect(findMany.mock.calls[0][0].where).toMatchObject({
             type: 'CONSUMABLE',

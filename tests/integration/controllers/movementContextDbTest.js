@@ -1,3 +1,5 @@
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
+import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
@@ -35,11 +37,12 @@ describe('movimientos por contexto, permisos y reportes', () => {
             router.use('/movements', movementRouter);
             router.use('/reports', reportRouter);
         } });
-        for (const [resource, roleName, departmentName] of [
-            ['admin', 'Administrador del sistema', 'SISTEMAS'], ['warehouse', 'Almacenista', 'ALMACÉN Y PROVEDURÍA']
+        for (const [resource, roleName, departmentName, roleKey, departmentKey] of [
+            ['admin', 'Administrador del sistema', 'SISTEMAS', ROLE_KEYS.SYSTEM_ADMIN, DEPARTMENT_KEYS.SYSTEMS],
+            ['warehouse', 'Almacenista', 'ALMACÉN Y PROVEDURÍA', ROLE_KEYS.WAREHOUSE_KEEPER, DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY]
         ]) {
-            const role = await prisma.role.upsert({ where: { name: roleName }, update: {}, create: { name: roleName } });
-            const department = await prisma.department.upsert({ where: { name: departmentName }, update: {}, create: { name: departmentName } });
+            const role = await prisma.role.upsert({ where: { name: roleName }, update: {}, create: { name: roleName, key: roleKey } });
+            const department = await prisma.department.upsert({ where: { name: departmentName }, update: {}, create: { name: departmentName, key: departmentKey } });
             const user = await prisma.user.create({ data: {
                 name: `IT MOV ${resource} ${suffix}`, password: 'integration-only',
                 accesses: { create: { roleId: role.id, departmentId: department.id } }

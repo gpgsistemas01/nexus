@@ -37,3 +37,5 @@ export const returnWasteIssueDetailRequest = ({ id, detailId, data }) => apiRequ
     url: `${ ROUTE }/${ id }/details/${ detailId }/returns`,
     data
 });
+
+export const getWasteIssueRequest = ({ id }) => apiRequest({ method: 'get', url: `${ ROUTE }/${ id }` });

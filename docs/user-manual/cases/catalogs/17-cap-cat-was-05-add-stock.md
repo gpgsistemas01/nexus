@@ -27,3 +27,12 @@ ajuste. Sólo el Administrador del sistema puede usar **Ajustar stock**, cuyo va
 total existente.
 
 **Compruebe el resultado:** Compruebe que la existencia aumentó por la cantidad recibida y que se conservó el folio de la entrada.
+
+**Si no se confirma el resultado:** Durante el envío, el botón permanece deshabilitado.
+Si hay un error de conexión, se habilita la recuperación de esa captura. Al reabrir
+el formulario, pulse **Recuperar** y confirme la consulta de la cantidad anterior.
+Si el servidor ya la guardó, recuperará su resultado sin volver a aumentar stock.
+Después de confirmar podrá capturar otra entrada. Si el servidor confirma que la
+captura fue rechazada sin guardarse, podrá corregirla antes de enviar de nuevo. No borre los datos del navegador
+ni use otra cuenta/dispositivo para repetir una captura pendiente: consulte antes la
+historia para comprobar si se registró.

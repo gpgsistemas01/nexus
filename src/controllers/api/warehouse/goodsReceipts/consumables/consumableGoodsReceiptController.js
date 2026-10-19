@@ -1,6 +1,7 @@
 import { createConsumableGoodsReceipt, findAllConsumableGoodsReceipts, updateConsumableGoodsReceipt, cancelConsumableGoodsReceiptDetailLine, correctConsumableGoodsReceiptDetailLine } from '../../../../../services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js';
-import { buildListHandler, buildRegisterHandler, buildEditHandler, buildCorrectionHandler, buildCancellationHandler } from '../shared/goodsReceiptHandlers.js';
+import { buildReadHandler, buildListHandler, buildRegisterHandler, buildEditHandler, buildCorrectionHandler, buildCancellationHandler } from '../shared/goodsReceiptHandlers.js';
 
+export const getConsumableGoodsReceipt = buildReadHandler(findAllConsumableGoodsReceipts);
 export const getAllConsumableGoodsReceipts = buildListHandler(findAllConsumableGoodsReceipts);
 export const registerConsumableGoodsReceipt = buildRegisterHandler({
     createGoodsReceipt: createConsumableGoodsReceipt,

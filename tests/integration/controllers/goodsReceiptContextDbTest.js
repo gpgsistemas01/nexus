@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+import XLSX from 'xlsx';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
@@ -21,10 +23,13 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
             material: await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js'),
             consumable: await import('../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js')
         };
+        const report = await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js');
         app = createControllerTestApp({ registerRoutes: router => {
             router.use((req, _res, next) => { req.user = { id: null }; next(); });
+            router.get('/purchase-report', report.exportMaterialGoodsReceiptReportExcel);
             for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
                 const controller = controllers[resource];
+                router.get(`${path(resource)}/:id`, controller[`get${label}GoodsReceipt`]);
                 router.get(path(resource), controller[`getAll${label}GoodsReceipts`]);
                 router.post(path(resource), controller[`register${label}GoodsReceipt`]);
                 router.patch(`${path(resource)}/:id`, controller[`edit${label}GoodsReceipt`]);
@@ -87,7 +92,13 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         const response = await request(app).get(path(resource)).query({ supplierId: ids.supplier }).expect(200);
         expect(response.body.data.map(receipt => receipt.id)).toEqual([receipts[resource].id]);
         expect(response.body.recordsFiltered).toBe(1);
-        const rows = await services[resource][`find${label}GoodsReceiptReportRows`]({ supplierId: ids.supplier });
+        expect(response.body.data[0]).not.toHaveProperty('details');
+        const detail = await request(app).get(`${path(resource)}/${receipts[resource].id}`).expect(200);
+        expect(detail.body.goodsReceipt.details.map(row => row.materialId)).toEqual([ids[resource]]);
+        const other = resource === 'material' ? 'consumable' : 'material';
+        await request(app).get(`${path(resource)}/${receipts[other].id}`).expect(404);
+        await request(app).get(`${path(resource)}/${receipts.mixed.id}`).expect(404);
+        const rows = await Array.fromAsync(services[resource][`find${label}GoodsReceiptReportRows`]({ supplierId: ids.supplier }));
         expect(rows.map(row => row.referenceNumber)).toEqual([receipts[resource].referenceNumber]);
     });
 
@@ -165,4 +176,38 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } })).toEqual(beforeStocks);
         expect(await prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } })).toBe(beforeMovements);
     });
+
+    it('exporta compras a través del límite de lote y conserva fórmulas y resúmenes reales', async () => {
+        const prefix = `RCB-${suffix}`;
+        const rows = Array.from({ length: 251 }, (_, index) => ({
+            id: randomUUID(), referenceNumber: `${prefix}-${String(index).padStart(3, '0')}`,
+            supplierId: ids.supplier, supplierName: 'Proveedor de lotes', receivedById: ids.person,
+            receivedByName: 'Receptor de lotes', receptionDate: new Date('2026-10-16T12:00:00Z'),
+            statusId: ids.status, type: 'MATERIAL', totalQuantity: 1,
+            totalNetPurchaseAmount: 10, totalGrossPurchaseAmount: 11.6
+        }));
+        await prisma.goodsReceipt.createMany({ data: rows });
+        await prisma.goodsReceiptDetail.createMany({ data: rows.map(row => ({
+            goodsReceiptId: row.id, materialId: ids.material, materialName: 'Material por lotes',
+            quantity: 1, convertedQuantity: 1, costPerUnitType: 10, conversionUnitCost: 10,
+            netPurchaseAmount: 10, grossPurchaseAmount: 11.6
+        })) });
+        const response = await request(app).get('/purchase-report').query({ search: prefix })
+            .buffer(true).parse((res, callback) => {
+                const chunks = [];
+                res.on('data', chunk => chunks.push(chunk));
+                res.on('end', () => callback(null, Buffer.concat(chunks)));
+            }).expect(200);
+        const workbook = XLSX.read(response.body, { type: 'buffer' });
+        const sheet = workbook.Sheets['Compras materiales'];
+        const values = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        expect(values.filter(row => String(row[0]).startsWith(prefix))).toHaveLength(251);
+        expect(new Set(values.filter(row => String(row[0]).startsWith(prefix)).map(row => row[0])).size).toBe(251);
+        expect(sheet.O252).toMatchObject({ f: 'I252*N252', v: 10 });
+        expect(sheet.P252).toMatchObject({ f: 'O252*1.16', v: 11.6 });
+        expect(sheet.B257.v).toBe(2510);
+        expect(sheet.D262.v).toBe(2510);
+        expect(sheet.E262.v).toBe(251);
+    });
+
 });

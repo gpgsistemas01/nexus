@@ -89,3 +89,11 @@ Véase el [recorrido del peso](../requirements/requirements-specification/04-uni
 | Origen de merma | Material en m²; no se admiten consumibles ni otras unidades. |
 | Muestra de Rollo | Peso total del rollo completo con cono, mayor que el cono y hasta 999.99 kg, con dos decimales. El largo procede del material. Se usa el mismo cono para ambos netos. |
 | Dimensiones de merma de Rollo | Ambos campos están deshabilitados. La dimensión menor procede del material y la otra se calcula por peso. Si faltan datos, complete el peso del rollo completo y los pesos del sobrante antes de guardar. |
+
+### Capturas pendientes y versiones
+
+Alta/entrada de merma conserva una clave de operación hasta confirmar su resultado.
+Durante el envío se bloquea submit; ante un fallo ambiguo se habilita Recuperar con la
+captura anterior, incluso tras recargar. Un rechazo confirmado sin escritura permite
+corregir la captura. Las ediciones y ajustes versionados rechazan datos desactualizados
+con `RECORD_VERSION_CONFLICT`; actualizar el listado y revisar antes de volver a enviar.

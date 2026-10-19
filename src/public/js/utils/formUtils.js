@@ -26,7 +26,14 @@ export const handleSubmit = async ({ form, formData, create, update, reloadTable
             return;
         }
 
-        response = await update({ formData, id });
+        response = await update({
+            formData: {
+                ...formData,
+                ...(mode !== FORM_MODES.ADD_STOCK && form.dataset.version !== undefined && { expectedVersion: Number(form.dataset.version) }),
+                ...(form.dataset.materialVersion !== undefined && { expectedMaterialVersion: Number(form.dataset.materialVersion) })
+            },
+            id
+        });
     }
 
     notifications.showSuccess(response.message);
@@ -198,7 +205,9 @@ const mergeServerErrorList = (errors) => errors.reduce((result, error) => {
 
 export const mapServerErrors = (errors) => {
 
-    if (Array.isArray(errors)) return mergeServerErrorsList(errors);
+    if (Array.isArray(errors)) return mergeServerErrorList(errors);
+
+    if (typeof errors === 'string') return getErrorMessage({ code: errors });
 
     if (isObject(errors)) {
 
