@@ -5,7 +5,8 @@ const route = '/api/auth';
 export const loginRequest = ({ data }) => apiRequest({ 
     method: 'post', 
     url: `${ route }/login`, 
-    data 
+    data,
+    requiresAuth: false
 });
 
 export const registerRequest = ({ data }) => apiRequest({ 

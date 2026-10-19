@@ -3,7 +3,7 @@ import { AppError } from "./AppError.js";
 export class loginError extends AppError {
 
     constructor() {
-        super('Sesion no valida', 'LOGIN_ERROR', 401);
+        super('Usuario o contraseña incorrectos.', 'LOGIN_ERROR', 401);
     }
 }
 

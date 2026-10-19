@@ -174,10 +174,7 @@ on(DOM_EVENT_NAMES.CLICK, '#materialTable .cancel-receipt-detail-btn', async (ev
             detail: response.data
         }));
     } catch (err) {
-        handleApiError({
-            err,
-            rethrow: false
-        });
+        handleApiError({ err });
     }
 });
 

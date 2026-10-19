@@ -90,6 +90,7 @@ flowchart TB
         FileMaterialGoodsIssueService["materialGoodsIssueService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileConsumableGoodsIssues -->|import| FileConsumableGoodsIssueService
     FileConsumableGoodsIssues -->|import| FileCreateIssueApplication
@@ -104,7 +105,7 @@ flowchart TB
     FileConsumableGoodsIssueService -->|import| Request
     FileMaterialGoodsIssueService -->|import| Request
     View -->|import| FileValidators
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FileResponseUtils -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
     FileValidators -->|import| FileBaseValidations

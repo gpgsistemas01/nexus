@@ -133,7 +133,7 @@ sequenceDiagram
         HTTP-->>Request: error normalizado
         Request-->>Application: error propagado
         Application-->>TableCore: error propagado
-        TableCore->>FileErrorHandler: handleDataTableError(error)
+        TableCore->>FileErrorHandler: handleApiError({ err: error })
         TableCore->>Browser: callback({ data: [], recordsTotal: 0, recordsFiltered: 0 })
     end
 ```

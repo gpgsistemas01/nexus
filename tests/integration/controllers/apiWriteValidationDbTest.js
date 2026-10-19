@@ -147,4 +147,14 @@ describe('identificadores de ruta resueltos por el servicio y errores de captura
     expect(response.body.code).toBe('CATALOG_NOT_FOUND');
     expect(await readState()).toEqual(initialState);
   });
+
+  it.each(['goods-issues/materials', 'goods-issues/consumables', 'waste-issues'])(
+    '%s conserva el 400 por campo para reglas personalizadas antes de resolver la salida', async resource => {
+      const response = await request(app).patch(`/api/warehouse/${resource}/${parentId}/details`)
+        .set('Cookie', cookie).send({ details: [{ id: relationId, projectConvertedQuantity: 2.5, isSupplied: 'invalid' }] }).expect(400);
+
+      expect(response.body).toMatchObject({ code: 'VALIDATION_ERROR', errors: { [relationId]: { isSupplied: { code: 'SUPPLIED_INVALID_BOOLEAN' } } } });
+      expect(await readState()).toEqual(initialState);
+    }
+  );
 });

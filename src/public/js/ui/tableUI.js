@@ -1,4 +1,5 @@
 import { DOM_EVENT_NAMES } from '../constants/events.js';
+import { handleApiError } from '../api/errorHandler.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { getTimeZoneDateTimeParts } from '../utils/timeZone.js';
 import {
@@ -80,8 +81,7 @@ export const buildExcelButton = ({
 
         } catch (err) {
 
-            const message = err?.message || 'No se pudo exportar el archivo. Verifica tu conexión e inténtalo de nuevo.';
-            notifications.showError(message);
+            handleApiError({ err });
         }
     }
 });

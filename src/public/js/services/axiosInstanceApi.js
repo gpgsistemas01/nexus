@@ -13,7 +13,7 @@ api.interceptors.response.use(
 
         const original = err.config;
 
-        if (err.response?.status === 401 && original && !original._retry) {
+        if (err.response?.status === 401 && original && original.requiresAuth !== false && !original._retry) {
 
             original._retry = true;
 
@@ -31,8 +31,7 @@ api.interceptors.response.use(
 
             } catch (refreshErr) {
 
-                window.location.href = '/';
-                return Promise.reject(refreshErr);
+                return Promise.reject(await normalizeHttpError(refreshErr));
             }
         }
 
@@ -40,4 +39,5 @@ api.interceptors.response.use(
     }
 );
 
-export const apiRequest = async ({ method, url, params, data, responseType }) => await api({ method, url, params, data, responseType });
+export const apiRequest = async ({ method, url, params, data, responseType, requiresAuth = true }) =>
+    await api({ method, url, params, data, responseType, requiresAuth });

@@ -91,6 +91,7 @@ flowchart TB
         FileMaterialGoodsReceiptService["materialGoodsReceiptService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
     FileConsumableGoodsReceipts -->|import| Application
@@ -104,7 +105,7 @@ flowchart TB
     Modal -->|import| FileGoodsReceipts
     FileConsumableGoodsReceiptService -->|import| Request
     FileMaterialGoodsReceiptService -->|import| Request
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FileResponseUtils -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
     FileValidators -->|import| FileBaseValidations

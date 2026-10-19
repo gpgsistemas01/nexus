@@ -20,7 +20,7 @@ export const createGoodsIssueDtoForEdit = (body = {}) => buildGoodsIssueDto(body
 export const createGoodsIssueDetailsDtoForEdit = (body = {}) => ({
     details: (body.details).map(d => ({
         id: d.id,
-        isSupplied: Boolean(d.isSupplied),
+        isSupplied: d.isSupplied === true || d.isSupplied === 'true',
         projectConvertedQuantity: Number(d.projectConvertedQuantity)
     }))
 });

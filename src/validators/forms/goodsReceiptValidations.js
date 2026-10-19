@@ -13,15 +13,18 @@ import {
 const validateGoodsReceiptDetails = details => {
     details.forEach(detail => {
         if (!detail || typeof detail !== 'object' || Array.isArray(detail)
-            || !detail.materialId || !detail.quantity || !detail.costPerUnitType) {
+            || !detail.materialId || detail.quantity == null || detail.quantity === ''
+            || detail.costPerUnitType == null || detail.costPerUnitType === '') {
             throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
         }
 
-        const qty = Number(detail.quantity);
-        const costPerUnitType = Number(detail.costPerUnitType);
+        const qty = typeof detail.quantity === 'number' || typeof detail.quantity === 'string'
+            ? Number(detail.quantity) : NaN;
+        const costPerUnitType = typeof detail.costPerUnitType === 'number' || typeof detail.costPerUnitType === 'string'
+            ? Number(detail.costPerUnitType) : NaN;
 
         if (!Number.isFinite(qty) || qty < 1) throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
-        if (!Number.isFinite(costPerUnitType) || costPerUnitType <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_UNIT_COST_BY_QUANTITY);
+        if (!Number.isFinite(costPerUnitType) || costPerUnitType <= 0) throw new Error(errorMap['details'].INVALID_FORMAT_COST_PER_UNIT_TYPE);
     });
 
     return true;

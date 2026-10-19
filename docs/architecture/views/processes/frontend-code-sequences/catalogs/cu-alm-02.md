@@ -75,10 +75,11 @@ flowchart TB
         FileValidators["validators.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     View -->|import| FileValidators
     Modal -->|import| FileModalUI
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

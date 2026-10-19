@@ -75,13 +75,14 @@ flowchart TB
         Request["materialService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     App -->|import| Request
     App -->|import| Factory
     Form -->|import| App
     Form -->|import| FileValidators
     Form -->|import| FileMaterialFields
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages
@@ -126,7 +127,6 @@ sequenceDiagram
     FormUtils-->>Form: validateFields(): Object
     Form-->>FormCore: getErrors(): Object
     FormCore->>FileFormErrorsUI: normalizeFormErrors({ form, errors })
-    FormCore->>FileFormErrorsUI: toggleErrorMessages(form, errors)
     FormCore->>FormUtils: hasValidationErrors(errors)
     FormUtils-->>FormCore: hasValidationErrors(): boolean
     alt Datos inválidos
@@ -169,7 +169,7 @@ sequenceDiagram
         Factory-->>FormUtils: error propagado
         FormUtils-->>Form: error propagado por handleSubmit()
         Form-->>FormCore: error propagado por sendRequest()
-        FormCore->>FileErrorHandler: handleApiError({ err, form, normalizeServerErrors })
+        FormCore->>FileErrorHandler: handleApiError({ err, form })
     end
 ```
 

@@ -275,7 +275,7 @@ export const validateIssueDetailsArray = ({
             }
 
             if (detail.id) {
-                if (!allowDetailId || !uuidV4Regex.test(detail.id)) {
+                if (!allowDetailId || typeof detail.id !== 'string' || !uuidV4Regex.test(detail.id)) {
                     throw new Error(errorMap['details'].INVALID_FORMAT_ID);
                 }
 
@@ -286,15 +286,16 @@ export const validateIssueDetailsArray = ({
                 ids.add(detail.id);
             }
 
-            if (!detail[itemIdField] || !uuidV4Regex.test(detail[itemIdField])) {
+            if (typeof detail[itemIdField] !== 'string' || !uuidV4Regex.test(detail[itemIdField])) {
                 throw new Error(errorMap['details'].INVALID_FORMAT_REQUIRED);
             }
 
-            if (requireSupplier && (!detail.supplierId || !uuidV4Regex.test(detail.supplierId))) {
+            if (requireSupplier && (typeof detail.supplierId !== 'string' || !uuidV4Regex.test(detail.supplierId))) {
                 throw new Error(errorMap['details'].INVALID_FORMAT_SUPPLIER);
             }
 
-            const quantity = Number(detail.quantity);
+            const quantity = typeof detail.quantity === 'number' || typeof detail.quantity === 'string'
+                ? Number(detail.quantity) : NaN;
             const hasInvalidQuantity = exclusiveMinimum
                 ? quantity <= minimumQuantity
                 : quantity < minimumQuantity;
@@ -337,19 +338,17 @@ export const validateIssueProjectQuantityDetailsEdition =
 
                 const detailId = detail?.id;
 
-                if (!detailId || !uuidV4Regex.test(detailId)) {
-
-                    if (!errors[detailId || 'details']) errors[detailId || 'details'] = {};
-
-                    errors[detailId || 'details'].id = errorMap['details'].INVALID_FORMAT_ID;
+                if (typeof detailId !== 'string' || !uuidV4Regex.test(detailId)) {
+                    errors.details = errorMap['details'].INVALID_FORMAT_ID;
                     return;
                 }
 
-                const quantity = Number(detail?.projectConvertedQuantity);
+                const rawQuantity = detail?.projectConvertedQuantity;
+                const quantity = typeof rawQuantity === 'number' || typeof rawQuantity === 'string'
+                    ? Number(rawQuantity) : NaN;
                 const isSuppliedRaw = detail?.isSupplied;
-                const isSupplied = typeof isSuppliedRaw === 'string'
-                    ? isSuppliedRaw.toLowerCase() === 'true'
-                    : isSuppliedRaw;
+                const isSupplied = isSuppliedRaw === 'true' ? true
+                    : isSuppliedRaw === 'false' ? false : isSuppliedRaw;
 
                 if (!quantity) {
 
@@ -370,9 +369,7 @@ export const validateIssueProjectQuantityDetailsEdition =
                     if (!errors[detailId]) errors[detailId] = {};
 
                     errors[detailId].isSupplied = errorMap['isSupplied'].REQUIRED;
-                }
-
-                if (typeof isSupplied !== 'boolean') {
+                } else if (typeof isSupplied !== 'boolean') {
 
                     if (!errors[detailId]) errors[detailId] = {};
 

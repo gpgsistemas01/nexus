@@ -73,13 +73,14 @@ flowchart TB
         Request["wasteIssueService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileCreateIssueApplication -->|import| Application
     App -->|import| Request
     App -->|import| FileCreateIssueApplication
     Issue -->|import| App
     Return -->|import| FileValidators
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FileResponseUtils -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
     FileValidators -->|import| FileBaseValidations
@@ -155,7 +156,7 @@ sequenceDiagram
         else Error HTTP o de dominio
             Application-->>Return: error propagado
             Return-->>Form: error propagado por sendRequest()
-            Form->>FileErrorHandler: handleApiError({ err, form, normalizeServerErrors })
+            Form->>FileErrorHandler: handleApiError({ err, form })
         end
     end
 ```

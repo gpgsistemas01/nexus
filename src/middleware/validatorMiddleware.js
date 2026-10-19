@@ -59,12 +59,3 @@ export const validate = (req, res, next) => {
 
     next();
 }
-
-export const validateLogin = (req, res, next) => {
-
-    const errorsArray = validationResult(req).array();
-
-    if (errorsArray.length > 0) return res.status(401).json({ code: errorMap.message.LOGIN_ERROR });
-
-    next();
-}

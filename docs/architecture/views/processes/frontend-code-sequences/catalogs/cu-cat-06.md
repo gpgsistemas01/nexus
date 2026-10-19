@@ -92,6 +92,7 @@ flowchart TB
         Request["clientService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileClients -->|import| Request
     FileClients -->|import| Application
@@ -104,7 +105,7 @@ flowchart TB
     FileGoodsIssueModal -->|import| FileGoodsIssueContext
     Origin -->|import| FileClients
     Select -->|import| FileClients
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

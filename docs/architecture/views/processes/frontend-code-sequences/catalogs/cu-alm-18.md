@@ -80,13 +80,14 @@ flowchart TB
         Request["consumableService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileConsumables -->|import| Request
     FileConsumables -->|import| Application
     View -->|import| FileConsumables
     View -->|import| FileValidators
     Modal -->|import| FileModalUI
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

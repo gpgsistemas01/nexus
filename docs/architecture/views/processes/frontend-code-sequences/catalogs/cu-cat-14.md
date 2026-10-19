@@ -77,12 +77,13 @@ flowchart TB
         Request["catalogService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileCatalogs -->|import| Request
     FileCatalogs -->|import| Application
     View -->|import| FileCatalogs
     View -->|import| FileValidators
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

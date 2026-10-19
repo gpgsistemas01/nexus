@@ -79,6 +79,7 @@ flowchart TB
         Request["personService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FilePersons -->|import| Request
     FilePersons -->|import| Application
@@ -86,7 +87,7 @@ flowchart TB
     View -->|import| FileValidators
     Modal -->|import| FileModalUI
     Modal -->|import| FileValidators
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

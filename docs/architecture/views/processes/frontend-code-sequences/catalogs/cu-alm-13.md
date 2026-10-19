@@ -87,6 +87,7 @@ flowchart TB
         Request["wasteService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileWastes -->|import| Request
     FileWastes -->|import| Application
@@ -99,7 +100,7 @@ flowchart TB
     Page -->|import| Form
     Table -->|import| FileTableOperations
     Table -->|import| FileWastes
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages
@@ -144,7 +145,6 @@ sequenceDiagram
     FormUtils-->>Form: validateFields(): Object
     Form-->>FormCore: getErrors(): Object
     FormCore->>FileFormErrorsUI: normalizeFormErrors({ form, errors })
-    FormCore->>FileFormErrorsUI: toggleErrorMessages(form, errors)
     FormCore->>FormUtils: hasValidationErrors(errors)
     FormUtils-->>FormCore: hasValidationErrors(): boolean
     alt Datos inválidos
@@ -186,7 +186,7 @@ sequenceDiagram
         Application-->>FormUtils: error propagado
         FormUtils-->>Form: error propagado por handleSubmit()
         Form-->>FormCore: error propagado por sendRequest()
-        FormCore->>FileErrorHandler: handleApiError({ err, form, normalizeServerErrors })
+        FormCore->>FileErrorHandler: handleApiError({ err, form })
     end
 ```
 

@@ -14,6 +14,7 @@ describe('errores HTTP en descargas', () => {
 
     expect(await normalizeHttpError(error)).toEqual({
       status: 503,
+      requiresAuth: true,
       data,
       message: data.message,
       raw: error

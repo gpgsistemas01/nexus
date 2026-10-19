@@ -151,6 +151,25 @@ pasan al servicio, que resuelve el registro, su pertenencia y el estado vigente 
 consultas del proceso. No se agregan validadores de formulario a una eliminación o
 cancelación sin datos de captura.
 
+El acceso también utiliza `validate`: una captura inválida devuelve `400` con códigos
+por campo. Si la captura es válida y las credenciales se rechazan, `loginUser` devuelve
+`401` con `LOGIN_ERROR`, igual para usuario inexistente o contraseña incorrecta. Ese
+rechazo no dispara una renovación de sesión en el navegador.
+`authService.js` declara el login como petición pública con `requiresAuth: false`.
+El cliente HTTP usa ese contexto para omitir refresh y el presentador conserva el
+formulario ante el `401`. Es una opción local de Axios, no se envía en el body ni
+concede permisos. `LOGIN_ERROR` sólo se traduce a «Usuario o contraseña incorrectos»
+en el catálogo de mensajes; la decisión sobre credenciales permanece en `loginUser`.
+
+Las reglas `.custom()` forman parte de las cadenas de Express, igual que `.isUUID()`
+o `.isBoolean()`; no sustituyen al middleware `validate` ni envían respuestas propias.
+Se usan para relaciones entre inputs y listas de partidas, sin consultas a la BD.
+Sus rechazos conservan códigos de `errorMap` y el mismo `400 VALIDATION_ERROR`. En
+detalles de surtido se admiten booleanos o los textos `true`/`false`; los DTOs de
+materiales, consumibles y merma conservan `false`, en lugar de aplicar `Boolean()` a
+un texto. Un identificador de partida con formato inválido se informa en `details`;
+la existencia y pertenencia de un identificador válido se resuelven en el servicio.
+
 Un UUID bien formado que no identifica un registro disponible conserva el `404` y el
 código de dominio, como `WASTE_NOT_FOUND` o `PERSON_NOT_FOUND`. Cuando el adaptador de
 PostgreSQL informa un UUID mal formado (`22P02`), `normalizeDatabaseError` lo traduce a
@@ -165,6 +184,17 @@ no decide cómo mostrar el aviso. Los errores globales `400` y `404` reutilizan 
 presentación existente de `handleApiError`: mensaje traducido como título y contexto
 adicional sólo si difiere del título. No hay un tratamiento visual por proceder de la
 URL; la respuesta indica si el error es global o corresponde a campos de captura.
+Los mensajes de campos se normalizan una vez y se delegan a los controles existentes,
+incluidas las partidas. Si un campo o metadato directo no tiene feedback visible, su
+primer mensaje usa ese mismo Swal; no se recorre recursivamente el DOM para reunir
+todos los rechazos ni se duplican los errores ya visibles del formulario.
+Si ninguna partida tiene un control visible para mostrar su rechazo, se conserva el
+aviso general de validación; no se descarta silenciosamente el error anidado.
+`handleApiError` concentra la presentación por estado HTTP para todas las entradas de
+UI; el transporte sólo normaliza la respuesta, incluido JSON recibido como Blob y los
+fallos de renovación. Si falta una traducción local, un error de dominio conserva su
+mensaje público del servicio. El presentador no vuelve a lanzar un error ya mostrado
+ni restablece el submit: `useForm` realiza esa limpieza una vez en `finally`.
 
 La base incrementa `version`. El modal conserva la versión recibida en su lectura y
 la envía como `expectedVersion`, sin generarla ni reemplazarla justo antes de guardar.

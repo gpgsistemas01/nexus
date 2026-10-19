@@ -127,10 +127,7 @@ export const initbaseSelect2 = ({
 
                     if (err.name === 'AbortError') return;
 
-                    handleApiError({
-                        err,
-                        rethrow: false
-                    });
+                    handleApiError({ err });
 
                     failure(err);
                 }

@@ -1,4 +1,4 @@
-import { getErrorMessage } from "../constants/apiMessages.js";
+import { handleApiError } from '../api/errorHandler.js';
 import { reloadMainTable } from '../plugins/datatable/core/base/tableOperations.js';
 import { notifications } from "../plugins/swal/swalComponent.js";
 import { closeModal } from "../ui/modalUI.js";
@@ -64,7 +64,7 @@ export const handleAction = async ({ action, formId }) => {
 
     } catch (err) {
 
-        notifications.showError(err.message);
+        handleApiError({ err });
     }
 }
 
@@ -181,46 +181,3 @@ export const validateDetailsFields = (validators, details) => {
 
     return errors;
 }
-
-const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
-const isObject = (value) => typeof value === 'object' && value !== null;
-const isErrorCodeObject = (error) => isObject(error) && hasOwn(error, 'code');
-const isPathErrorObject = (error) => isObject(error) && hasOwn(error, 'path') && hasOwn(error, 'msg');
-
-const mergeServerErrorList = (errors) => errors.reduce((result, error) => {
-
-    if (isPathErrorObject(error)) {
-
-        result[error.path] = mapServerErrors(error.msg);
-
-        return result;
-    }
-
-    const mappedError = mapServerErrors(error);
-
-    if (isObject(mappedError)) Object.assign(result, mappedError);
-
-    return result;
-}, {});
-
-export const mapServerErrors = (errors) => {
-
-    if (Array.isArray(errors)) return mergeServerErrorList(errors);
-
-    if (typeof errors === 'string') return getErrorMessage({ code: errors });
-
-    if (isObject(errors)) {
-
-        if (isErrorCodeObject(errors)) return getErrorMessage(errors) ?? errors;
-
-        const result = {};
-
-        for (const key in errors) {
-            result[key] = mapServerErrors(errors[key]);
-        }
-
-        return result;
-    }
-
-    return null;
-};

@@ -40,6 +40,21 @@ reinicia la instancia anterior antes de configurar el encabezado y crear la nuev
 `createDataTable` también sirve a listados remotos: activa `serverSide`/`processing`
 cuando hay `ajax`, y conserva callbacks específicos del consumidor.
 
+Las lecturas AJAX de los listados admiten un solo reintento tras 500 ms para errores de
+red (`status=0`) o HTTP `408/502/503/504`. Un `500` o los
+rechazos de datos, sesión y permisos no se reintentan. El fallo definitivo se presenta
+mediante `handleApiError`, igual que formularios, Select2, descargas y acciones; los fallos de servidor o conexión abren un Swal de
+error. El callback recibe una página vacía y el `draw` solicitado para terminar la
+carga, sin llamar a `draw()` o `reload()` desde el manejador de errores.
+
+Cada consulta nueva invalida las respuestas y reintentos de la anterior; una tabla
+destruida tampoco reintenta ni presenta avisos pendientes. La recuperación sólo rodea
+la lectura, de modo que un fallo al renderizar no provoca otra consulta. Las tablas de
+detalle con datos locales y las escrituras conservan su flujo.
+La tabla no clasifica errores de Prisma ni de esquema: un `503` recibe el mismo
+tratamiento cualquiera que sea su código. Ese código sólo sirve para presentar el
+mensaje público mediante el manejador compartido.
+
 La infraestructura responsiva comparte el mapa del encabezado para etiquetas y grupos,
 en lugar de inferirlos por índices distintos en cada pantalla. El permiso visual sólo
 controla presentación; las escrituras siguen autorizadas por el servidor. Esta figura

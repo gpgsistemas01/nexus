@@ -2,6 +2,10 @@ import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMess
 
 export const errorMessages = {
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',
+    DATABASE_TABLE_MISSING: 'Falta una tabla requerida en la base de datos. Contacta a soporte.',
+    DATABASE_COLUMN_MISSING: 'Falta una columna requerida en la base de datos. Contacta a soporte.',
+    PRISMA_CLIENT_OUT_OF_SYNC: 'El cliente de base de datos no está actualizado. Contacta a soporte.',
+    WASTE_NOT_FOUND: 'La merma no existe.',
     OPERATION_ID_REQUIRED: 'Falta la clave de la operación.',
     OPERATION_ID_INVALID: 'La clave de la operación no es válida.',
     RECORD_VERSION_REQUIRED: 'Actualice la información antes de guardar.',
@@ -362,7 +366,7 @@ export const getErrorMessage = (data = {}) => {
 
     if (typeof message === 'function') return message(meta ?? {});
 
-    if (code) return message ?? code;
+    if (code) return message ?? data.message ?? code;
 
     return null;
 }

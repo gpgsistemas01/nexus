@@ -20,6 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `Transport` | control | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js) |
 | `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
+| `FileErrorHandler` | control | [`errorHandler.js`](../../../../../../src/public/js/api/errorHandler.js) |
 | `WarehouseInventoryUtils` | control | [`warehouseInventoryUtils.js`](../../../../../../src/public/js/utils/warehouseInventoryUtils.js) |
 | `FileResponseUtils` | control | [`responseUtils.js`](../../../../../../src/public/js/utils/responseUtils.js) |
 | `FileApiMessages` | control | [`apiMessages.js`](../../../../../../src/public/js/constants/apiMessages.js) |
@@ -63,6 +64,7 @@ flowchart TB
         FileApiMessages["apiMessages.js"]
         View["wasteIssueForm.js"]
         FormUtils["formUtils.js"]
+        FileErrorHandler["errorHandler.js"]
         FileResponseUtils["responseUtils.js"]
         FileBaseValidations["baseValidations.js"]
         FileFieldValidations["fieldValidations.js"]
@@ -73,7 +75,8 @@ flowchart TB
     FileWasteIssues -->|import| FileCreateIssueApplication
     View -->|import| FileWasteIssues
     View -->|import| FileValidators
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
+    FileErrorHandler -->|import| FileApiMessages
     FileResponseUtils -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
     FileValidators -->|import| FileBaseValidations

@@ -44,4 +44,18 @@ describe('validación de detalles de compra', () => {
     );
     expect(await runDetailsValidation(goodsReceiptHeaderValidation, undefined)).toEqual([]);
   });
+
+  it.each([
+    ['quantity', true, 'DETAILS_INVALID_FORMAT_QUANTITY'],
+    ['quantity', [2], 'DETAILS_INVALID_FORMAT_QUANTITY'],
+    ['quantity', { toString: null, valueOf: null }, 'DETAILS_INVALID_FORMAT_QUANTITY'],
+    ['costPerUnitType', true, 'DETAILS_INVALID_FORMAT_COST_PER_UNIT_TYPE'],
+    ['costPerUnitType', { toString: null, valueOf: null }, 'DETAILS_INVALID_FORMAT_COST_PER_UNIT_TYPE']
+  ])('rechaza el tipo de %s con un código de errorMap: %s', async (field, value, code) => {
+    const details = [{ materialId: 'material-1', quantity: 2, costPerUnitType: 10, [field]: value }];
+
+    for (const rules of [goodsReceiptValidation, goodsReceiptHeaderValidation]) {
+      expect(await runDetailsValidation(rules, details)).toContainEqual(expect.objectContaining({ path: 'details', msg: code }));
+    }
+  });
 });

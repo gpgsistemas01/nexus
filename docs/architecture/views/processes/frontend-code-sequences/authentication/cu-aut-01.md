@@ -89,9 +89,9 @@ sequenceDiagram
     Form->>FormUtils: validateFields(loginValidation, formData)
     FormUtils-->>Form: validateFields(): Object
     Form-->>FormCore: getErrors(): Object
-    FormCore->>Form: normalizeErrors({ errors }) — callback específico de login
+    FormCore->>Form: normalizeErrors({ form, errors }) — callback específico de login
+    Form->>FileFormErrorsUI: normalizeFormErrors({ form, errors })
     Form-->>FormCore: normalizeErrors(): Object — mensajes de usuario y contraseña
-    FormCore->>FileFormErrorsUI: toggleErrorMessages(form, errors)
     FormCore->>FormUtils: hasValidationErrors(errors)
     break Validación local rechazada
         FormCore->>FileFormErrorsUI: scrollToFirstFormError(form)
@@ -104,7 +104,7 @@ sequenceDiagram
     FormCore->>Form: sendRequest({ formData })
     Form->>App: login({ formData })
     App->>Request: loginRequest({ data: formData })
-    Request->>HTTP: apiRequest({ method: 'post', url, data })
+    Request->>HTTP: apiRequest({ method: 'post', url, data, requiresAuth: false })
     HTTP->>Transport: POST /api/auth/login
     alt Credenciales aceptadas
         Transport-->>HTTP: 200 y cookies de sesión
@@ -115,18 +115,18 @@ sequenceDiagram
         Form->>Form: updateRememberedCredentials(formData)
         Form->>Browser: localStorage.setItem(showSuccessToast, response.message)
         Form->>Browser: window.location.replace('/almacen/materiales')
-    else Credenciales rechazadas
-        Transport-->>HTTP: 401 { code, message }
-        opt No se inicia renovación: status distinto de 401 o request._retry
-            HTTP->>FileUtils: normalizeHttpError(err)
-            FileUtils-->>HTTP: normalizeHttpError(): Object — status, data, message, raw
-        end
-        HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
-        Request-->>App: loginRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
-        App-->>Form: login(): throw { status: number, data: Object | null, message: string, raw: Error }, sin navegación
+    else Captura o credenciales rechazadas
+        Transport-->>HTTP: 400 { code, errors } o 401 { code, message }
+        Note over Request,HTTP: requiresAuth false omite refresh sin interpretar el código del backend
+        HTTP->>FileUtils: normalizeHttpError(err)
+        FileUtils-->>HTTP: normalizeHttpError(): Object — status, data, message, raw y requiresAuth false
+        HTTP-->>Request: apiRequest(): throw { status: number, data: Object, message: string, requiresAuth: false }
+        Request-->>App: loginRequest(): throw { status: number, data: Object, message: string, requiresAuth: false }
+        App-->>Form: login(): throw { status: number, data: Object, message: string, requiresAuth: false }, sin navegación
         Form-->>FormCore: error propagado por sendRequest()
-        FormCore->>FileErrorHandler: handleApiError({ err, form, normalizeServerErrors })
+        FormCore->>FileErrorHandler: handleApiError({ err, form })
     end
+    Note over FormCore,Form: finally de useForm libera submitting y submit
 ```
 
 ## Detalle de adaptación de respuesta

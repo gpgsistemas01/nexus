@@ -82,7 +82,7 @@ flowchart TB
     View -->|import| FileConsumables
     View -->|import| FileValidators
     Modal -->|import| FileModalUI
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

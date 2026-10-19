@@ -153,7 +153,7 @@ sequenceDiagram
     else Respuesta rechazada
         Application-->>IssueTable: error propagado
         IssueTable-->>TableCore: error propagado
-        TableCore->>Errors: handleDataTableError(error)
+        TableCore->>Errors: handleApiError({ err: error })
         Errors-->>TableCore: void — tratamiento visual del error
         TableCore-->>Browser: callback({ data: [], recordsTotal: 0, recordsFiltered: 0 })
     end

@@ -92,6 +92,7 @@ Ubicación: `tests/unit/validators/`.
 | [catalogValidationTest.js](../../tests/unit/validators/catalogValidationTest.js) | **M** | PE / VF | Lista blanca, campos por catálogo, límites y códigos de rechazo. | Mantener configuraciones distintas y resolución de ID delegada al servicio. |
 | [decimalPrecisionValidationTest.js](../../tests/unit/validators/decimalPrecisionValidationTest.js) | **D** | VF | Seis decimales y capacidad numérica admitida/rechazada. | Conservar datos; verificar campo/código del rechazo, no sólo una colección de errores no vacía. |
 | [goodsReceiptDetailsValidationTest.js](../../tests/unit/validators/goodsReceiptDetailsValidationTest.js) | **D** | PE / VF | Detalles válidos y rechazos en alta y encabezado. | Conservar ambos contratos; comprobar campo/código por dato inválido en lugar de sólo errores no vacíos. |
+| [issueDetailsValidationTest.js](../../tests/unit/validators/issueDetailsValidationTest.js) | **M** | PE | Reglas nativas y personalizadas devuelven el mismo 400 antes del controller; DTOs conservan false y códigos de captura. | `DP-VAL-003`: mantener las tres familias, tipos inválidos y asociación segura de errores de partidas. |
 | [issueReturnValidationTest.js](../../tests/unit/validators/issueReturnValidationTest.js) | **M** | PE / VF | Cantidad positiva, cero/negativo y observaciones mayores de 500. | Mantener entrada válida y las tres clases de rechazo. |
 | [materialValidationTest.js](../../tests/unit/validators/materialValidationTest.js) | **M** | TD / PE | Compra/directo, pareja opcional, proveedor, consumibles sin medidas y referencias prohibidas. | Mantener; integra reglas comunes en contratos distintos del servidor. |
 | [requiredFieldValidationTest.js](../../tests/unit/validators/requiredFieldValidationTest.js) | **D** | PE | Ausente, nulo, valor presente inválido y códigos de campos anidados. | Mantener datos y códigos; corregir la etiqueta valor límite para null: ausencia y nulidad son particiones, no una frontera numérica. |
@@ -177,6 +178,9 @@ Ubicación: `tests/unit/`.
 | --- | --- | --- | --- | --- |
 | [plugins/select2/wasteMaterialTemplateTest.js](../../tests/unit/plugins/select2/wasteMaterialTemplateTest.js) | **D** | TE / PE | Objeto seleccionado/relaciones conservados, cálculo y limpieza repetida segura. | Mantener; quitar el check de configuración `clearOnOpen` si no añade condición observable. No sustituye el plugin real. |
 | [public/js/api/errorHandlerTest.js](../../tests/unit/public/js/api/errorHandlerTest.js) | **M** | PE | Error conocido presenta mensaje y código identificable al usuario. | Mantener código visible; no afirmar sanitización de mensajes arbitrarios sólo por esta entrada conocida. |
+| [public/js/services/axiosInstanceApiTest.js](../../tests/unit/public/js/services/axiosInstanceApiTest.js) | **M** | PE, TE | Credenciales rechazadas no disparan refresh; solicitudes con sesión vencida comparten renovación y propagan un rechazo normalizado. | `DP-VAL-002`: conservar estados y respuestas observables del transporte, sin atribuirle notificaciones ni navegación. |
+| [public/js/ui/tableUITest.js](../../tests/unit/public/js/ui/tableUITest.js) | **M** | PE | Descarga rechazada no crea archivo parcial; eliminación rechazada conserva formulario/listado y ambas muestran el aviso compartido. | Conservar los contratos de recuperación; no comprobar markup del diálogo. |
+| [public/js/plugins/datatable/core/base/createDataTableTest.js](../../tests/unit/public/js/plugins/datatable/core/base/createDataTableTest.js) | **M** | PE, TE | Lecturas transitorias se recuperan una vez; fallos definitivos terminan la carga y consultas anteriores no sustituyen filtros vigentes. | `DP-UI-001`: conservar límite, aviso ante 500, política por HTTP independiente del código y respuestas tardías; los dobles no acreditan un navegador real. |
 | [public/js/api/utilsTest.js](../../tests/unit/public/js/api/utilsTest.js) | **M** | PE | JSON en Blob, códigos sin mensaje, fallo de red y contenido inválido. | Mantener normalización de errores de descargas y estado HTTP. |
 | [public/js/pages/warehouse/materials/materialFormTest.js](../../tests/unit/public/js/pages/warehouse/materials/materialFormTest.js) | **M** | PE | Crear/editar no envían referencias históricas del rollo. | Mantener lista de campos del navegador; DTO del servidor no prueba ese payload. |
 | [public/js/pages/warehouse/wastes/wasteFormTest.js](../../tests/unit/public/js/pages/warehouse/wastes/wasteFormTest.js) | **M** | TD / TE | Confirmar/cancelar duplicado, permiso/modo/ID y payload con medidas deshabilitadas. | Mantener todas las condiciones de negocio; abrir modal no debe escribir stock. |
@@ -395,3 +399,28 @@ recorrido de navegador.
 Se amplía la integración de exportaciones existente con `DP-PERF-002`, sin crear una
 suite por recurso ni pruebas que fijen HTML. Las muestras usan 5.001 registros para
 atravesar el bloque de 5.000 y comprobar el archivo final con un lector independiente.
+
+La simplificación de mensajes conserva los escenarios de `errorHandlerTest.js`: campos
+y partidas muestran sus errores existentes; metadatos sin campo y rechazos globales
+usan el mismo diálogo de advertencia con el primer mensaje aplicable. Se elimina la
+recopilación recursiva de mensajes; no se fija su algoritmo como contrato de prueba.
+`DP-UI-001` añade la recuperación compartida de listados con reloj controlado y el
+Swal de error definitivo. No repite matrices por módulo ni afirma cobertura de
+DataTables, Select2 o Swal en un navegador real.
+
+La revisión del manejo compartido elimina `handleDataTableError`, el adaptador jQuery
+sin consumidores y las opciones de relanzamiento/normalización sin variaciones reales.
+`errorHandlerTest.js` mantiene particiones por estado, errores de campos/partidas y
+metadatos, y distingue credenciales rechazadas de sesión vencida. Los casos de
+`axiosInstanceApiTest.js` y `authControllerDbTest.js` cubren `DP-VAL-002` sin repetir el
+CRUD. La liberación del submit permanece cubierta en `formUITest.js`, en la frontera
+propietaria del `finally`; el caso de cancelar un duplicado de merma conserva los
+oráculos de formulario abierto y ausencia de escrituras, sin fijar una limpieza duplicada.
+
+La revisión de responsabilidades conserva `LOGIN_ERROR` sólo como traducción; la
+petición de login declara el contexto público. Se retira la excepción por códigos de
+esquema de la tabla: HTTP 503 mantiene un único reintento con cualquier código.
+`DP-VAL-003` conserva la misma frontera de validación para reglas nativas y `.custom()`,
+y añade representantes que preservan `false`, rechazan tipos no numéricos y devuelven
+el código de costo declarado en errorMap. Los casos HTTP/Prisma comprueban el rechazo
+y la ausencia de cambios; no se duplican consultas de existencia en los validadores.

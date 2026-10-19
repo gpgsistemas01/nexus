@@ -91,6 +91,7 @@ flowchart TB
         Request["supplierService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileSuppliers -->|import| Request
     FileSuppliers -->|import| Application
@@ -105,7 +106,7 @@ flowchart TB
     FileSuppliersPage -->|import| View
     Origin -->|import| FileSuppliers
     Select -->|import| FileSuppliers
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

@@ -102,6 +102,19 @@ transaccionales; no se presentan como cobertura HTTP de esos endpoints.
 
 ## Regla de mantenimiento
 
+`DP-VAL-003` cubre la captura de detalles de salidas de material, consumible y merma:
+booleanos/textos válidos conservan `false`; tipos incorrectos se rechazan con códigos
+por campo antes del controller. La integración comprueba que no cambian documentos,
+saldos ni movimientos ante esos rechazos.
+
+La recuperación compartida de lecturas de listados se verifica en `DP-UI-001` con
+`createDataTableTest.js` y `errorHandlerTest.js`: reintento limitado, Swal ante error
+definitivo y ausencia de resultados tardíos. Esta evidencia transversal no sustituye
+los filtros, permisos o consultas de cada caso ni un recorrido real de navegador.
+`DP-VAL-002` añade el contrato de acceso (`CU-AUT-01`) con router y servicio reales:
+captura inválida, rechazo genérico de credenciales y acceso válido. La renovación
+coordinada se cubre de forma unitaria; los dobles no acreditan cookies en un navegador.
+
 La decisión de conservar, consolidar o retirar depende de la condición y del oráculo,
 no de que el archivo pertenezca a frontend o backend. Se conservan cálculo, asignación
 de resultados, serialización, permisos y estados críticos. Se retiran aserciones sobre

@@ -7,7 +7,7 @@ vi.mock('../../../../../../../src/public/js/ui/inventory/wasteOperationUI.js', (
 
 const state = vi.hoisted(() => ({
     config: null, submit: vi.fn(), confirmation: vi.fn(), permission: vi.fn(),
-    close: vi.fn(), reset: vi.fn(), openAddition: vi.fn(), add: vi.fn(), success: vi.fn(), reload: vi.fn(), validate: vi.fn()
+    close: vi.fn(), openAddition: vi.fn(), add: vi.fn(), success: vi.fn(), reload: vi.fn(), validate: vi.fn()
 }));
 vi.mock('../../../../../../../src/public/js/ui/forms/formUI.js', () => ({ useForm: config => { state.config = config; } }));
 vi.mock('../../../../../../../src/public/js/utils/formUtils.js', () => ({
@@ -19,7 +19,6 @@ vi.mock('../../../../../../../src/public/js/plugins/swal/swalComponent.js', () =
 vi.mock('../../../../../../../src/public/js/pages/warehouse/wastes/wasteStockAdditionModal.js', () => ({ openWasteStockAdditionModal: state.openAddition }));
 vi.mock('../../../../../../../src/public/js/constants/permissions.js', () => ({ hasPermission: state.permission, UI_PERMISSIONS: { WASTES_ADD_STOCK: 'wastes:add-stock' } }));
 vi.mock('../../../../../../../src/public/js/ui/modalUI.js', () => ({ closeModal: state.close }));
-vi.mock('../../../../../../../src/public/js/ui/forms/formStateUI.js', () => ({ resetFormSubmitState: state.reset }));
 vi.mock('../../../../../../../src/public/js/ui/inventory/wasteFormUI.js', () => ({ updateWasteRollMeasurement: vi.fn() }));
 vi.mock('../../../../../../../src/public/js/application/warehouse/wastes/wastes.js', () => ({ registerWaste: vi.fn(), editWaste: vi.fn(), editWasteStock: vi.fn(), addWasteStock: state.add }));
 vi.mock('../../../../../../../src/public/js/plugins/datatable/core/base/tableOperations.js', () => ({ reloadMainTable: state.reload }));
@@ -57,7 +56,6 @@ describe('confirmación de merma existente', () => {
     it('confirma y abre el modal existente con la captura sin registrar stock', async () => {
         state.submit.mockRejectedValue(duplicate);
         state.confirmation.mockImplementation(async () => {
-            expect(state.reset).not.toHaveBeenCalled();
             return { isConfirmed: true };
         });
         await state.config.sendRequest({ form, formData });
@@ -77,7 +75,6 @@ describe('confirmación de merma existente', () => {
         expect(state.add).not.toHaveBeenCalled();
         expect(state.close).not.toHaveBeenCalled();
         expect(state.openAddition).not.toHaveBeenCalled();
-        expect(state.reset).toHaveBeenCalledExactlyOnceWith(form);
     });
 
     it('con cantidad cero permite abrir el modal para capturar una cantidad positiva', async () => {

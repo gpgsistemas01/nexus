@@ -79,13 +79,14 @@ flowchart TB
         Request["userService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileUsers -->|import| Request
     FileUsers -->|import| Application
     View -->|import| FileUsers
     View -->|import| FileValidators
     Modal -->|import| FileModalUI
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

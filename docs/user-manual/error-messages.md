@@ -8,8 +8,8 @@ corregirse. Los errores que no corresponden a un campo aparecen como notificaci�
 se debe repetir una operación que modifica datos hasta comprobar si el registro, el documento o
 la existencia cambiaron.
 
-Si el formulario no puede mostrar un error junto al campo, Nexus muestra
-**Revise la información** con la explicación del rechazo. Los errores del registro
+Si un campo o metadato no tiene un mensaje visible en el formulario, Nexus muestra
+la primera explicación del rechazo en un diálogo de advertencia. Los errores del registro
 aparecen con su mensaje correspondiente, por ejemplo **El identificador del registro no
 es válido.** Ante ese aviso, actualice el listado y vuelva a abrir la acción. Los demás
 campos señalados permanecen en el formulario para corregirlos.
@@ -35,11 +35,12 @@ Las tablas siguientes agrupan los mensajes por operación y muestran la recupera
 | Permiso insuficiente | Mensaje **No tienes permisos para realizar esta acción.** | Solicite que se revisen el rol, el área y el permiso asignado. |
 | Registro relacionado no encontrado | Diálogo de advertencia con el nombre del elemento que no se encontró. | Actualice el listado y seleccione un registro vigente. |
 | Conflicto con el estado o las reglas del proceso | Diálogo de advertencia que explica la regla incumplida. | Revise el estado actual y siga la alternativa indicada en este catálogo. |
-| Error del servidor o de base de datos | Notificación **Error del servidor.**, **Error interno del servidor.** o un mensaje que comienza con **Error de base de datos...** | Conserve el mensaje y el folio visible, deje de repetir la escritura y contacte a soporte. |
+| Error del servidor o de base de datos | Diálogo **No se pudo completar la acción** con la explicación y el código, cuando está disponible. | Conserve el mensaje y el folio visible, deje de repetir la escritura y contacte a soporte. |
 | Tabla de base de datos ausente | Notificación **Falta una tabla requerida en la base de datos. Contacta a soporte.** (`DATABASE_TABLE_MISSING`) | No repita la operación. Informe a soporte el código para que revise las migraciones pendientes. |
 | Columna de base de datos ausente | Notificación **Falta una columna requerida en la base de datos. Contacta a soporte.** (`DATABASE_COLUMN_MISSING`) | No repita la operación. Informe a soporte el código para que revise las migraciones pendientes. |
 | Cliente Prisma desactualizado | Notificación **El cliente de base de datos no está actualizado. Contacta a soporte.** (`PRISMA_CLIENT_OUT_OF_SYNC`) | No repita la operación. Informe a soporte el código para que regenere el cliente Prisma del despliegue. |
 | Problema de conexión | Mensaje **No fue posible conectar con el servidor.** u **Ocurrió un error inesperado.** | Verifique la conexión; antes de repetir una escritura, actualice el listado para confirmar su estado. |
+| Fallo al cargar un listado | La tabla reintenta una vez tras medio segundo ante un fallo de conexión o disponibilidad, incluido `503`. Un error `500` abre el diálogo de inmediato; los demás fallos definitivos muestran el mismo aviso **No se pudo completar la acción** usado en formularios y descargas. | Conserve el mensaje. Si fue un problema de conexión, restablézcala y actualice el listado; si persiste o indica un error del servidor, contacte a soporte. |
 
 Los textos pueden incluir el nombre de un material, proveedor, área, proyecto o folio ficticio del
 registro involucrado. Esos valores dan contexto al mensaje y no representan otro tipo de error.
@@ -161,7 +162,7 @@ conservan la palabra «material». Compruebe siempre el artículo y la existenci
 |---|---|
 | **No se pudo exportar el archivo. Inténtalo nuevamente.** | Conserve los filtros, verifique la conexión y vuelva a solicitar el archivo una sola vez. |
 | **No se pudo exportar el archivo. Verifica tu conexión e inténtalo de nuevo.** | Verifique la conexión. Si persiste, conserve el módulo, los filtros y el periodo seleccionados para soporte. |
-| Un mensaje específico devuelto por el servidor durante la descarga. | No se genera un archivo válido. Conserve el texto y los filtros; no publique un archivo parcial. |
+| **No se pudo completar la acción** y un mensaje específico del servidor durante la descarga. | No se genera un archivo válido. Conserve el texto, el código y los filtros; no publique un archivo parcial. |
 
 <a id="error-404"></a>
 ## Error 404 — Página no encontrada

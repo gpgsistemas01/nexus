@@ -1,6 +1,5 @@
 import { WASTE_OPERATION_ACTIONS, WASTE_ROLL_WEIGHT_FIELDS } from '../../../constants/inventory.js';
 import { notifications } from '../../../plugins/swal/swalComponent.js';
-import { resetFormSubmitState } from '../../../ui/forms/formStateUI.js';
 import { closeModal } from '../../../ui/modalUI.js';
 import { openWasteStockAdditionModal } from './wasteStockAdditionModal.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
@@ -74,10 +73,7 @@ useForm({
                 text: `¿Abrir Agregar stock para revisar la cantidad y las observaciones de ${existingWaste.name || 'esta merma'}?`,
                 confirmButtonText: 'Abrir Agregar stock'
             });
-            if (!isConfirmed) {
-                resetFormSubmitState(form);
-                return;
-            }
+            if (!isConfirmed) return;
 
             closeModal(form);
             openWasteStockAdditionModal({

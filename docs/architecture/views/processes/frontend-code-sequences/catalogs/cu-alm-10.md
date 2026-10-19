@@ -79,13 +79,14 @@ flowchart TB
         Request["wasteService.js"]
     end
     FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
     FileUtils -->|import| FileApiMessages
     FileWastes -->|import| Request
     FileWastes -->|import| Application
     View -->|import| FileWastes
     View -->|import| FileValidators
     Modal -->|import| FileModalUI
-    FormUtils -->|import| FileApiMessages
+    FormUtils -->|import| FileErrorHandler
     FormUtils -->|import| FileTableOperations
     FormUtils -->|import| FileModalUI
     FileResponseUtils -->|import| FileApiMessages

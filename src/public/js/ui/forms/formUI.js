@@ -4,7 +4,7 @@ import { BUTTON_SELECTORS } from '../../constants/selectors.js';
 import { on } from "../../utils/domUtils.js";
 import { hasValidationErrors } from "../../utils/formUtils.js";
 import { resetFormSubmitState } from "./formStateUI.js";
-import { toggleErrorMessages, normalizeFormErrors, scrollToFirstFormError } from "./formErrorsUI.js";
+import { normalizeFormErrors, scrollToFirstFormError } from "./formErrorsUI.js";
 
 export const useForm = async ({ 
     selector,
@@ -12,8 +12,7 @@ export const useForm = async ({
     getPendingData = () => null,
     normalizeErrors = normalizeFormErrors,
     getErrors = () => {},
-    sendRequest,
-    normalizeServerErrors = normalizeFormErrors,
+    sendRequest
 }) => {
 
     on(DOM_EVENT_NAMES.SUBMIT, selector, async (e, form) => {
@@ -33,7 +32,6 @@ export const useForm = async ({
             const errors = pendingData ? {} : getErrors({ form, formData });
 
             normalizeErrors({ form, errors });
-            toggleErrorMessages(form, errors);
 
             if (hasValidationErrors(errors)) {
 
@@ -44,12 +42,7 @@ export const useForm = async ({
 
         } catch (err) {
 
-            handleApiError({
-                err,
-                form,
-                normalizeServerErrors,
-                rethrow: false
-            });
+            handleApiError({ err, form });
         } finally {
             resetFormSubmitState(form);
         }
