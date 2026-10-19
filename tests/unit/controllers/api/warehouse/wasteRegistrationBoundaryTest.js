@@ -66,9 +66,9 @@ describe('wasteController registration boundaries', () => {
       .post('/wastes')
       .send({
         ...validBody,
-        base: '99999999.999999',
-        height: '99999999.999999',
-        initialQuantity: '99999999.999999',
+        base: '99999999.99',
+        height: '99999999.99',
+        initialQuantity: '99999999.99',
         coneWeightKg: '0',
         totalWeightKg: '100',
         referenceRollTotalWeightKg: 120,
@@ -83,9 +83,9 @@ describe('wasteController registration boundaries', () => {
     });
     expect(createWaste).toHaveBeenCalledWith({
       wasteDto: expect.objectContaining({
-        base: 99999999.999999,
-        height: 99999999.999999,
-        initialQuantity: 99999999.999999,
+        base: 99999999.99,
+        height: 99999999.99,
+        initialQuantity: 99999999.99,
         coneWeightKg: 0,
         totalWeightKg: 100,
         observations

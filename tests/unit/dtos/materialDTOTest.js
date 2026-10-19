@@ -7,7 +7,7 @@ const materialBody = {
   supplierId: 'supplier-1',
   presentationId: 'presentation-1',
   unitMeasureId: 'unit-1',
-  minStock: '2',
+  minStock: 2,
   isActive: true
 };
 
@@ -16,8 +16,8 @@ describe('materialDTO', () => {
     const dto = createMaterialDtoForRegister({
       ...materialBody,
       creationContext: 'goodsReceipt',
-      maxUnitCost: '999',
-      newStock: '50',
+      maxUnitCost: 999,
+      newStock: 50,
       observations: 'No debe generar un ajuste'
     });
 
@@ -36,8 +36,8 @@ describe('materialDTO', () => {
   it('conserva costo, stock y observaciones en el alta directa de materiales', () => {
     expect(createMaterialDtoForRegister({
       ...materialBody,
-      maxUnitCost: '25.5',
-      newStock: '4',
+      maxUnitCost: 25.5,
+      newStock: 4,
       observations: '  Inventario inicial  '
     })).toEqual(expect.objectContaining({
       maxUnitCost: 25.5,
@@ -46,7 +46,7 @@ describe('materialDTO', () => {
     }));
   });
   it('descarta referencias históricas del rollo en alta y edición', () => {
-    const body = { ...materialBody, referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: '2.25' };
+    const body = { ...materialBody, referenceConeWeightKg: '0.25', referenceRollTotalWeightKg: 2.25 };
     for (const dto of [createMaterialDtoForRegister(body), createMaterialDtoForEdit(body)]) {
       expect(dto).not.toHaveProperty('referenceConeWeightKg');
       expect(dto).not.toHaveProperty('referenceRollTotalWeightKg');

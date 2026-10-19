@@ -1,4 +1,6 @@
 import { body } from "express-validator";
+import { BOOLEAN_INPUT_VALUES, DECIMAL_INPUT_FORMAT, FORM_FIELD_LIMITS, ISO_DATE_TIME_PATTERN, PERSON_NAME_PATTERN, TEXT_INPUT_PATTERN, UUID_V4_PATTERN } from '../../public/js/constants/inputValidation.js';
+import { AUTH_FIELD_LIMITS } from '../../public/js/constants/auth.js';
 import { wasteWeightRules } from "../../public/js/utils/validations/weightValidations.js";
 import { errorMap } from "../../messages/codeMessages.js";
 
@@ -8,42 +10,39 @@ const whitespaceRegex = /^\S+$/;
 const usernameRegex = /^[a-zA-Z0-9_]+$/;
 const invoiceRegex = /^[a-zA-Z0-9\-]+$/;
 const passwordRegex = /^[A-Za-z0-9!@#\$%\^&\*]+$/;
-const nameRegex = /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u;
-const genericRegex = /^[^<>\\{}[\]]+$/u;
-const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const nameRegex = PERSON_NAME_PATTERN;
+const genericRegex = TEXT_INPUT_PATTERN;
+const uuidV4Regex = UUID_V4_PATTERN;
 
 const requireValue = (validationChain, requiredError) =>
     validationChain
         .exists({ values: 'null' }).withMessage(requiredError).bail()
-        .notEmpty().withMessage(requiredError).bail()
+        .notEmpty({ ignore_whitespace: true }).withMessage(requiredError).bail()
 ;
 
 export const validateUsername =
-    requireValue(body('name').trim(), errorMap['username'].REQUIRED)
-        .isString().withMessage(errorMap['username'].INVALID_TYPE)
-        .isLength({ max: 50 }).withMessage(errorMap['username'].TOO_LONG)
+    requireValue(body('name'), errorMap['username'].REQUIRED)
+        .isString().withMessage(errorMap['username'].INVALID_TYPE).bail()
+        .trim()
+        .isLength({ max: AUTH_FIELD_LIMITS.USERNAME_MAX_LENGTH }).withMessage(errorMap['username'].TOO_LONG)
         .matches(whitespaceRegex).withMessage(errorMap['username'].NO_SPACES)
         .matches(usernameRegex).withMessage(errorMap['username'].INVALID_FORMAT)
 ;
 
 export const validatePassword =
     requireValue(body('password'), errorMap['password'].REQUIRED)
-        .isString().withMessage(errorMap['password'].INVALID_TYPE)
-        .isLength({ min: 6 }).withMessage(errorMap['password'].TOO_SHORT)
-        .isLength({ max: 50 }).withMessage(errorMap['password'].TOO_LONG)
-        .matches(UppercaseRegex).withMessage(errorMap['password'].NEEDS_UPPERCASE)
-        .matches(numberRegex).withMessage(errorMap['password'].NEEDS_NUMBER)
-        .matches(passwordRegex).withMessage(errorMap['password'].INVALID_FORMAT)
+        .isString().withMessage(errorMap['password'].INVALID_TYPE).bail()
+        .isLength({ min: AUTH_FIELD_LIMITS.PASSWORD_MIN_LENGTH }).withMessage(errorMap['password'].TOO_SHORT).bail()
+        .isLength({ max: AUTH_FIELD_LIMITS.PASSWORD_MAX_LENGTH }).withMessage(errorMap['password'].TOO_LONG).bail()
+        .matches(UppercaseRegex).withMessage(errorMap['password'].NEEDS_UPPERCASE).bail()
+        .matches(numberRegex).withMessage(errorMap['password'].NEEDS_NUMBER).bail()
+        .matches(passwordRegex).withMessage(errorMap['password'].INVALID_FORMAT).bail()
 ;
 
 export const validateName = ({ fieldName = 'name', maxLength = 50 }) =>
-    requireValue(body(fieldName).trim(), errorMap['name'].REQUIRED)
-        .isString().withMessage(errorMap['name'].INVALID_TYPE)
-        .isLength({ max: maxLength }).withMessage(errorMap['name'].TOO_LONG(maxLength))
-        .matches(nameRegex).withMessage(errorMap['name'].INVALID_FORMAT)
-;
+    validateText({ fieldName, maxLength, pattern: nameRegex });
 
-export const validateInvoice = (maxLength = 50) =>
+export const validateInvoice = (maxLength = FORM_FIELD_LIMITS.INVOICE) =>
     requireValue(
         body('invoice').if((value, { req }) => {
             const val = req.body.isInvoiced;
@@ -51,54 +50,43 @@ export const validateInvoice = (maxLength = 50) =>
         }),
         errorMap['invoice'].REQUIRED
     )
-        .isString().withMessage(errorMap['invoice'].INVALID_TYPE)
+        .isString().withMessage(errorMap['invoice'].INVALID_TYPE).bail()
+        .trim()
         .isLength({ max: maxLength }).withMessage(errorMap['invoice'].TOO_LONG(maxLength))
         .matches(invoiceRegex).withMessage(errorMap['invoice'].INVALID_FORMAT)
 ;
 
-export const validateText = ({ fieldName, maxLength }) =>
-    requireValue(body(fieldName).trim(), errorMap['name'].REQUIRED)
-        .isString().withMessage(errorMap['name'].INVALID_TYPE)
-        .isLength({ max: maxLength }).withMessage(errorMap['name'].TOO_LONG(maxLength))
-        .matches(genericRegex).withMessage(errorMap['name'].INVALID_FORMAT)
-;
+export const validateText = ({
+    fieldName,
+    maxLength,
+    optional = false,
+    condition = () => true,
+    pattern = genericRegex
+}) => {
+    const errors = optional ? errorMap[fieldName] : errorMap.name;
+    const getMaxLength = typeof maxLength === 'function' ? maxLength : () => maxLength;
+    let chain = body(fieldName).if(condition);
 
-export const validateTextWhen = ({ fieldName, maxLength, predicate }) =>
-    requireValue(body(fieldName).if((value, { req }) => predicate(req, value)).trim(), errorMap['name'].REQUIRED)
-        .isString().withMessage(errorMap['name'].INVALID_TYPE)
-        .isLength({ max: maxLength }).withMessage(errorMap['name'].TOO_LONG(maxLength))
-        .matches(genericRegex).withMessage(errorMap['name'].INVALID_FORMAT)
-;
+    if (optional) {
+        chain = chain.customSanitizer(value => value === undefined || value === null ? '' : value);
+    } else {
+        chain = requireValue(chain, errors.REQUIRED);
+    }
 
-export const validateTextWithDynamicMaxLength = ({ fieldName, getMaxLength, predicate = () => true }) =>
-    requireValue(body(fieldName).if((value, { req }) => predicate(req, value)).trim(), errorMap['name'].REQUIRED)
-        .isString().withMessage(errorMap['name'].INVALID_TYPE)
-        .custom((value, { req }) => value.length <= getMaxLength(req))
-        .withMessage((_, { req }) => errorMap['name'].TOO_LONG(getMaxLength(req)))
-        .matches(genericRegex).withMessage(errorMap['name'].INVALID_FORMAT)
-;
+    chain = chain.isString().withMessage(errors.INVALID_TYPE).bail().trim();
+    if (optional) chain = chain.if(body(fieldName).notEmpty());
 
-export const validateTextOptional = ({ fieldName, maxLength }) => {
+    return chain
+        .custom((value, { req }) => Array.from(value).length <= getMaxLength(req))
+        .withMessage((_, { req }) => errors.TOO_LONG(getMaxLength(req)))
+        .matches(pattern).withMessage(errors.INVALID_FORMAT);
+};
 
-    const errors = errorMap[fieldName];
+export const validateTextOptional = options => validateText({ ...options, optional: true });
 
-    return body(fieldName)
-        .trim()
-        .if(body(fieldName).notEmpty())
-        .isString().withMessage(errors.INVALID_TYPE)
-        .isLength({ max: maxLength }).withMessage(errors.TOO_LONG(maxLength))
-        .matches(genericRegex).withMessage(errors.INVALID_FORMAT)
-}
-
-export const validateBoolean = (fieldName) =>
-    requireValue(body(fieldName), errorMap[fieldName].REQUIRED)
-        .isBoolean().withMessage(errorMap[fieldName].INVALID_BOOLEAN)
-        .toBoolean()
-;
-
-export const validateBooleanWhen = ({ fieldName, predicate }) =>
-    requireValue(body(fieldName).if((value, { req }) => predicate(req, value)), errorMap[fieldName].REQUIRED)
-        .isBoolean().withMessage(errorMap[fieldName].INVALID_BOOLEAN)
+export const validateBoolean = (fieldName, { condition = () => true } = {}) =>
+    requireValue(body(fieldName).if(condition), errorMap[fieldName].REQUIRED)
+        .custom(value => BOOLEAN_INPUT_VALUES.includes(value)).withMessage(errorMap[fieldName].INVALID_BOOLEAN).bail()
         .toBoolean()
 ;
 
@@ -107,131 +95,53 @@ export const validateUUID = (fieldName) => {
     const errors = errorMap[fieldName];
 
     return requireValue(body(fieldName), errors.REQUIRED)
+        .isString().withMessage(errors.INVALID_UUID).bail()
         .isUUID('4').withMessage(errors.INVALID_UUID)
 }
-
-export const validateTextOptionalWhen = ({ fieldName, maxLength, predicate }) => {
-
-    const errors = errorMap[fieldName];
-
-    return body(fieldName)
-        .if((value, { req }) => predicate(req.body, value, req) && value)
-        .trim()
-        .isString().withMessage(errors.INVALID_TYPE)
-        .isLength({ max: maxLength }).withMessage(errors.TOO_LONG(maxLength))
-        .matches(genericRegex).withMessage(errors.INVALID_FORMAT)
-}
-
-export const validateUUIDWhen = ({ fieldName, predicate }) => {
-
-    const errors = errorMap[fieldName];
-
-    return requireValue(
-        body(fieldName).if((value, { req }) => predicate(req.body, value, req)),
-        errors.REQUIRED
-    )
-        .isUUID('4').withMessage(errors.INVALID_UUID)
-}
-
 
 export const validateProjectNumber = (fieldName) => {
 
     const errors = errorMap[fieldName];
 
-    return requireValue(body(fieldName).trim(), errors.REQUIRED)
-        .isString().withMessage(errors.INVALID_TYPE)
-        .isLength({ max: 10 }).withMessage(errors.TOO_LONG)
-}
-
-export const validateNumber = (fieldName) => {
-
-    const errors = errorMap[fieldName];
-
     return requireValue(body(fieldName), errors.REQUIRED)
-        .isFloat().withMessage(errors.INVALID_NUMBER)
-        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
-        .toFloat()
+        .isString().withMessage(errors.INVALID_TYPE).bail()
+        .trim()
+        .isLength({ max: FORM_FIELD_LIMITS.PROJECT_NUMBER }).withMessage(errors.TOO_LONG)
 }
 
-export const validateNonNegativeNumber = (fieldName) => {
+const hasValue = value => value !== undefined && value !== null && value !== '';
 
+const validateNumericInput = ({
+    fieldName,
+    optional = false,
+    positive = false,
+    condition = () => true,
+    format = DECIMAL_INPUT_FORMAT
+}) => {
     const errors = errorMap[fieldName];
+    let chain = body(fieldName).if(condition);
+    if (optional) chain = chain.customSanitizer(value => hasValue(value) ? value : undefined).if(hasValue);
 
-    return requireValue(body(fieldName), errors.REQUIRED)
-        .isFloat({ min: 0 }).withMessage(errors.INVALID_NUMBER)
-        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
-        .toFloat()
-}
+    if (!optional) chain = requireValue(chain, errors.REQUIRED);
 
-export const validatePositiveNumberWhen = ({ fieldName, predicate }) => {
+    return chain
+        .custom(value => typeof value === 'number' || typeof value === 'string')
+        .withMessage(errors.INVALID_NUMBER).bail()
+        .isFloat(positive ? { gt: 0 } : { min: 0 }).withMessage(errors.INVALID_NUMBER).bail()
+        .custom(value => format.pattern.test(String(value)) && format.pattern.test(String(Number(value))))
+        .withMessage(errors.TOO_LONG).bail()
+        .toFloat();
+};
 
-    const errors = errorMap[fieldName];
+export const validateNumber = (fieldName, options = {}) => validateNumericInput({ ...options, fieldName });
+export const validatePositiveNumber = (fieldName, options = {}) => validateNumericInput({ ...options, fieldName, positive: true });
+export const validateNumberOptional = (fieldName, options = {}) => validateNumericInput({ ...options, fieldName, optional: true });
+export const validatePositiveNumberOptional = (fieldName, options = {}) => validateNumericInput({ ...options, fieldName, optional: true, positive: true });
 
-    return requireValue(body(fieldName).if((value, { req }) => predicate(req.body, value, req)), errors.REQUIRED)
-        .isFloat({ gt: 0 }).withMessage(errors.INVALID_NUMBER)
-        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
-        .toFloat()
-}
-
-export const validatePositiveNumber = fieldName => validatePositiveNumberWhen({ fieldName, predicate: () => true });
-
-export const validateNumberWhen = ({ fieldName, predicate }) => {
-
-    const errors = errorMap[fieldName];
-
-    return requireValue(
-        body(fieldName).if((value, { req }) => predicate(req.body, value, req)),
-        errors.REQUIRED
-    )
-        .isFloat().withMessage(errors.INVALID_NUMBER).bail()
-        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
-        .toFloat()
-}
-
-const hasValue = (value) => value !== undefined && value !== null && value !== '';
-
-export const validateNumberRequiredWhenOtherPresent = ({ fieldName, pairedFieldName }) => {
-
-    const errors = errorMap[fieldName];
-
-    return requireValue(
-        body(fieldName).if((value, { req }) => hasValue(req.body[pairedFieldName])),
-        errors.REQUIRED
-    )
-}
-
-const validateOptionalNumberChain = ({ fieldName, disableTooLong = false, predicate = () => true }) => {
-
-    const errors = errorMap[fieldName];
-
-    return body(fieldName)
-        .if((value, { req }) => predicate(req.body, value, req) && hasValue(value))
-        .isFloat().withMessage(errors.INVALID_NUMBER)
-        .if(() => !disableTooLong)
-        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
-        .toFloat()
-}
-
-export const validateNumberOptional = (fieldName, { disableTooLong = false } = {}) =>
-    validateOptionalNumberChain({ fieldName, disableTooLong })
-;
-
-export const validateNumberOptionalWhen = ({ fieldName, predicate, disableTooLong = false }) =>
-    validateOptionalNumberChain({ fieldName, disableTooLong, predicate })
-;
-
-
-export const validatePositiveNumberOptional = (fieldName, { disableTooLong = false } = {}) => {
-
-    const errors = errorMap[fieldName];
-
-    return body(fieldName)
-        .if((value) => hasValue(value))
-        .isFloat({ gt: 0 }).withMessage(errors.INVALID_NUMBER)
-        .if(() => !disableTooLong)
-        .matches(/^\d{1,8}(\.\d{1,6})?$/).withMessage(errors.TOO_LONG)
-        .toFloat()
-}
+export const validateNumberRequiredWhenOtherPresent = ({ fieldName, pairedFieldName }) => requireValue(
+    body(fieldName).if((value, { req }) => hasValue(req.body[pairedFieldName])),
+    errorMap[fieldName].REQUIRED
+);
 
 
 export const validateDate = (fieldName) => {
@@ -239,18 +149,9 @@ export const validateDate = (fieldName) => {
     const errors = errorMap[fieldName];
 
     return requireValue(body(fieldName), errors.REQUIRED)
-        .isISO8601().withMessage(errors.INVALID_FORMAT)
-        .custom(value => !isNaN(new Date(value))).withMessage(errors.INVALID_FORMAT)
-        .toDate()
-}
-
-export const validateDateOptional = (fieldName) => {
-
-    const errors = errorMap[fieldName];
-
-    return body(fieldName)
-        .if(body(fieldName).notEmpty())
-        .isISO8601().withMessage(errors.INVALID_FORMAT)
+        .isString().withMessage(errors.INVALID_FORMAT).bail()
+        .matches(ISO_DATE_TIME_PATTERN).withMessage(errors.INVALID_FORMAT).bail()
+        .isISO8601({ strict: true }).withMessage(errors.INVALID_FORMAT).bail()
         .custom(value => !isNaN(new Date(value))).withMessage(errors.INVALID_FORMAT)
         .toDate()
 }
@@ -306,14 +207,15 @@ export const validateIssueDetailsArray = ({
                 || detail.quantity === undefined
                 || !Number.isFinite(quantity)
                 || hasInvalidQuantity
-                || !/^\d{1,8}(\.\d{1,6})?$/.test(String(detail.quantity))
+                || !DECIMAL_INPUT_FORMAT.pattern.test(String(detail.quantity))
             ) {
                 throw new Error(errorMap['details'].INVALID_FORMAT_QUANTITY);
             }
         });
 
         return true;
-    })
+    }).bail()
+    .customSanitizer(details => details.map(detail => ({ ...detail, quantity: Number(detail.quantity) })))
 ;
 
 export const validateGoodsIssueDetailsArray = ({ allowDetailId = false } = {}) =>
@@ -350,14 +252,13 @@ export const validateIssueProjectQuantityDetailsEdition =
                 const isSupplied = isSuppliedRaw === 'true' ? true
                     : isSuppliedRaw === 'false' ? false : isSuppliedRaw;
 
-                if (!quantity) {
+                if (rawQuantity === undefined || rawQuantity === null || rawQuantity === '') {
 
                     if (!errors[detailId]) errors[detailId] = {};
 
                     errors[detailId].projectConvertedQuantity = errorMap['details'].REQUIRED_QUANTITY;
-                }
-
-                if (!Number.isFinite(quantity) || quantity < 0) {
+                } else if (!Number.isFinite(quantity) || quantity <= 0
+                    || !DECIMAL_INPUT_FORMAT.pattern.test(String(rawQuantity))) {
 
                     if (!errors[detailId]) errors[detailId] = {};
 
@@ -383,7 +284,12 @@ export const validateIssueProjectQuantityDetailsEdition =
             }
 
             return true;
-        })
+        }).bail()
+        .customSanitizer(details => details.map(detail => ({
+            ...detail,
+            projectConvertedQuantity: Number(detail.projectConvertedQuantity),
+            isSupplied: detail.isSupplied === true || detail.isSupplied === 'true'
+        })))
 ;
 
 
@@ -423,5 +329,6 @@ export const validateWeightCapture = ({
         }))
         .withMessage(isCone ? errorMap.coneWeightKg.REQUIRED : totalErrors.REQUIRED).bail()
         .custom((value, { req }) => isCone || wasteWeightRules.isTotalGreaterThanCone(value, req.body[coneFieldName]))
-        .withMessage(totalErrors.NOT_GREATER);
+        .withMessage(totalErrors.NOT_GREATER).bail()
+        .customSanitizer(value => value === undefined ? undefined : hasValue(value) ? Number(value) : null);
 };

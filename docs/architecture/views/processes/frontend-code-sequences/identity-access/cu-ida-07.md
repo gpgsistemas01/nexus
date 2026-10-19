@@ -68,14 +68,15 @@ flowchart TB
         Application["createCrudApplication.js"]
         Request["userService.js"]
     end
-    FileUtils -->|import| FileApiMessages
-    FileUsers -->|import| Request
-    FileUsers -->|import| Application
-    FormUtils -->|import| FileErrorHandler
+    Application -->|import| FileResponseUtils
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileUtils
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUsers -->|import| Application
+    FileUsers -->|import| Request
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
     Transport -->|import| FileUserController

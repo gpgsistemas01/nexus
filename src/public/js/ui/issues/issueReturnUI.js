@@ -15,7 +15,7 @@ export const createIssueReturn = ({ sendReturn }) => {
     const getModal = () => document.querySelector(modalSelector);
     const initialize = () => useForm({
         selector: formSelector,
-        normalizeData: ({ formData }) => ({ ...formData, returnQuantity: Number(formData.returnQuantity) }),
+        normalizeData: ({ formData }) => formData,
         getErrors: ({ form, formData }) => {
             const errors = validateFields(issueReturnValidation, formData);
             const available = Number(form.dataset.availableQuantity || 0);

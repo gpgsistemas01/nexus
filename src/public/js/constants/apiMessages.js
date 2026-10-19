@@ -1,3 +1,4 @@
+import { AUTH_FIELD_LIMITS } from './auth.js';
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 
 export const errorMessages = {
@@ -55,10 +56,16 @@ export const errorMessages = {
     SUPPLIER_MATERIAL_ID_INVALID_UUID: 'El material no es válido.',
     QUANTITY_REQUIRED: 'La cantidad es requerida.',
     QUANTITY_INVALID_NUMBER: 'La cantidad debe ser un número.',
-    QUANTITY_TOO_LONG: 'La cantidad es demasiado grande.',
+    QUANTITY_TOO_LONG: 'La cantidad admite hasta 8 enteros y 2 decimales.',
+    RETURN_QUANTITY_REQUIRED: 'La cantidad a devolver es requerida.',
+    RETURN_QUANTITY_INVALID_NUMBER: 'La cantidad a devolver debe ser mayor a cero.',
+    RETURN_QUANTITY_TOO_LONG: 'La cantidad a devolver admite hasta 8 enteros y 2 decimales.',
+    COST_PER_UNIT_REQUIRED: 'El costo por presentación es requerido.',
+    COST_PER_UNIT_INVALID_NUMBER: 'El costo por presentación debe ser mayor a cero.',
+    COST_PER_UNIT_TOO_LONG: 'El costo por presentación admite hasta 8 enteros y 6 decimales.',
     CURRENT_STOCK_REQUIRED: 'El stock es requerido.',
     CURRENT_STOCK_INVALID_NUMBER: 'El stock debe ser un número.',
-    CURRENT_STOCK_TOO_LONG: 'El stock es demasiado grande.',
+    CURRENT_STOCK_TOO_LONG: 'El stock admite hasta 8 enteros y 2 decimales.',
     SUPPLIER_NOT_FOUND: 'Proveedor no encontrado.',
     SUPPLIER_CODE_NOT_FOUND: 'Código del proveedor no encontrado.',
     SUPPLIER_FIND_DB_ERROR: 'Error de base de datos al buscar el proveedor',
@@ -121,6 +128,9 @@ export const errorMessages = {
     CATALOG_NOT_FOUND: meta => `El catálogo ${ meta.catalogName || 'solicitado' } no está disponible.`,
     CATALOG_ENTRY_NOT_FOUND: meta => `El registro de ${ meta.catalogLabel || 'Catálogos' } no está disponible.`,
     CATALOG_VALIDATION_ERROR: meta => `Revise los campos obligatorios de ${ meta.catalogLabel || 'Catálogos' }.`,
+    PERSON_ACCESSES_INVALID_FORMAT: 'Cada acceso debe contener un área y un rol válidos.',
+    MIN_STOCK_TOO_LONG: 'El stock mínimo admite hasta 12 enteros y 2 decimales.',
+    MIN_STOCK_INVALID_NUMBER: 'El stock mínimo debe ser un número mayor o igual a cero.',
     PERSON_ACCESSES_REQUIRED: 'Seleccione un área y un rol, y agréguelos a la tabla antes de guardar.',
     PERSON_ACCESSES_DUPLICATE_DEPARTMENT: 'Elimine el área repetida; cada área sólo puede tener un rol para la persona.',
     PERSON_ACCESSES_INVALID_DEPARTMENT: 'Revise los accesos y vuelva a seleccionar el área que ya no sea válida.',
@@ -136,10 +146,10 @@ export const errorMessages = {
     // 🔑 PASSWORD
     PASSWORD_REQUIRED: 'La contraseña es requerida.',
     PASSWORD_INVALID_TYPE: 'La contraseña debe ser texto.',
-    PASSWORD_NEEDS_NUMBER: 'La contrañse debe contener al menos un número.',
+    PASSWORD_NEEDS_NUMBER: 'La contraseña debe contener al menos un número.',
     PASSWORD_NEEDS_UPPERCASE: 'La contraseña debe contener al menos una mayúscula.',
-    PASSWORD_INVALID_FORMAT: 'La contraseña debe contener al menos un carácter especial.',
-    PASSWORD_TOO_SHORT: 'La contraseña debe tener al menos 8 caracteres.',
+    PASSWORD_INVALID_FORMAT: 'La contraseña contiene caracteres no permitidos.',
+    PASSWORD_TOO_SHORT: `La contraseña debe tener al menos ${ AUTH_FIELD_LIMITS.PASSWORD_MIN_LENGTH } caracteres.`,
     PASSWORD_TOO_LONG: 'La contraseña no debe exceder 50 caracteres.',
 
     // 🧑 NAME
@@ -165,12 +175,12 @@ export const errorMessages = {
 
     INITIAL_QUANTITY_REQUIRED: 'La cantidad inicial es requerida.',
     INITIAL_QUANTITY_INVALID_NUMBER: 'La cantidad inicial debe ser un número mayor o igual que cero.',
-    INITIAL_QUANTITY_TOO_LONG: 'La cantidad inicial es demasiado grande o tiene demasiados decimales.',
+    INITIAL_QUANTITY_TOO_LONG: 'La cantidad inicial admite hasta 8 enteros y 2 decimales.',
 
     // 📈 NEW STOCK
     NEW_STOCK_REQUIRED: 'El nuevo stock es requerido.',
     NEW_STOCK_INVALID_NUMBER: 'El nuevo stock debe ser un número.',
-    NEW_STOCK_TOO_LONG: 'El nuevo stock es demasiado grande.',
+    NEW_STOCK_TOO_LONG: 'El nuevo stock admite hasta 8 enteros y 2 decimales.',
 
     REQUIRED_QUANTITY: 'La cantidad es requerido.',
     INVALID_FORMAT_QUANTITY: 'La cantidad debe ser un número mayor a cero.',
@@ -182,12 +192,12 @@ export const errorMessages = {
     // 📐 BASE
     BASE_REQUIRED: 'La base es requerida.',
     BASE_INVALID_NUMBER: 'Debe ser un número.',
-    BASE_TOO_LONG: 'El valor es demasiado grande.',
+    BASE_TOO_LONG: 'La base admite hasta 8 enteros y 2 decimales.',
 
     // 📏 HEIGHT
     HEIGHT_REQUIRED: 'La altura es requerida.',
     HEIGHT_INVALID_NUMBER: 'Debe ser un número.',
-    HEIGHT_TOO_LONG: 'El valor es demasiado grande.',
+    HEIGHT_TOO_LONG: 'La altura admite hasta 8 enteros y 2 decimales.',
 
     // OBSERVATIONS
     OBSERVATIONS_INVALID_TYPE: 'Las observaciones deben ser texto.',

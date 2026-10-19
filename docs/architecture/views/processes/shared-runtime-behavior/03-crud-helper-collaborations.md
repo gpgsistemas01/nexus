@@ -11,11 +11,11 @@ el proceso de una operación ni se usan participantes que agrupen archivos difer
 | `Application` | control | [`createCrudApplication.js`](../../../../../src/public/js/application/createCrudApplication.js) |
 | `Response` | control | [`responseUtils.js`](../../../../../src/public/js/utils/responseUtils.js) |
 | `Messages` | control | [`apiMessages.js`](../../../../../src/public/js/constants/apiMessages.js) |
-| `FormUtils` | control | [`formUtils.js`](../../../../../src/public/js/utils/formUtils.js) |
 | `Notifications` | control | [`swalComponent.js`](../../../../../src/public/js/plugins/swal/swalComponent.js) |
 | `Modal` | control | [`modalUI.js`](../../../../../src/public/js/ui/modalUI.js) |
 | `Mdb` | control | [`baseInstance.js`](../../../../../src/public/js/plugins/mdb/baseInstance.js) |
 | `Table` | control | [`tableOperations.js`](../../../../../src/public/js/plugins/datatable/core/base/tableOperations.js) |
+| `FormActions` | control | [`formUI.js`](../../../../../src/public/js/ui/forms/formUI.js) |
 
 ## Adaptación de la respuesta CRUD
 
@@ -49,25 +49,25 @@ El orden es notificar, cerrar y recargar si `reloadTable` es true. La función r
 ```mermaid
 sequenceDiagram
     autonumber
-    participant FormUtils@{ "type": "control" } as formUtils.js
+    participant FormActions@{ "type": "control" } as formUI.js
     participant Notifications@{ "type": "control" } as swalComponent.js
     participant Modal@{ "type": "control" } as modalUI.js
     participant Mdb@{ "type": "control" } as baseInstance.js
     participant Table@{ "type": "control" } as tableOperations.js
     participant Browser as Navegador
 
-    Note over FormUtils,Notifications: La promesa de create/update ya se resolvió
-    FormUtils->>Notifications: notifications.showSuccess(response.message)
-    FormUtils->>Modal: closeModal(form)
+    Note over FormActions,Notifications: La promesa de create/update ya se resolvió
+    FormActions->>Notifications: notifications.showSuccess(response.message)
+    FormActions->>Modal: closeModal(form)
     opt form.closest(.modal) devuelve un elemento
         Modal->>Mdb: initMdbModal(currentEl)
         Mdb-->>Modal: initMdbModal(): ModalInstance
         Modal->>Mdb: hideModal({ el: currentEl, instance, form })
     end
     opt reloadTable es true
-        FormUtils->>Table: reloadMainTable({ resetPaging: mode === CREATE })
+        FormActions->>Table: reloadMainTable({ resetPaging: mode === CREATE })
         Table->>Browser: $(DATATABLE_SELECTORS.MAIN).DataTable()
         Table->>Browser: table.ajax.reload(null, resetPaging)
     end
-    Note over FormUtils,Table: Retorna response.data al callback del caso
+    Note over FormActions,Table: Retorna response.data al callback del caso
 ```

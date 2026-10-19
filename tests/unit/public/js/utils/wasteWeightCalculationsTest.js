@@ -13,6 +13,12 @@ describe('longitud de merma a partir del rollo completo con cono', () => {
     expect(calculateWasteRollLength({ weightKg: 1, referenceLengthM: 20, referenceNetWeightKg: 2 })).toBe(10);
     expect(calculateWasteRollLength({ weightKg: 1, referenceLengthM: 20, referenceNetWeightKg: 0 })).toBeNull();
   });
+  it('incorpora al formulario y al servicio la misma longitud con dos decimales', () => {
+    expect(calculateWasteRollLength({ weightKg: 1, referenceLengthM: 20, referenceNetWeightKg: 3 })).toBe(6.67);
+    expect(prepareWasteMeasurements({ offer: { material }, wasteDto: {
+      coneWeightKg: 0.25, totalWeightKg: 1.25, referenceRollTotalWeightKg: 3.25
+    } })).toEqual({ base: 1.5, height: 6.67, weightKg: 1 });
+  });
   it('descuenta una sola vez el mismo cono a ambos totales sin devolver valores intermedios para persistir', () => {
     const offer = { material, get referenceConeWeightKg() { throw new Error('Histórico de proveedor no aplicable'); } };
     expect(prepareWasteMeasurements({ offer, wasteDto: { referenceRollTotalWeightKg: 2.25, coneWeightKg: 0.25, totalWeightKg: 1.25, base: 999, height: 999, sampleLengthM: 999, sampleNetWeightKg: 999 } }))

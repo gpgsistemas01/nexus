@@ -45,7 +45,7 @@ describe('goodsIssueController', () => {
         const req = {
             params: { id: 'goods-issue-1', detailId: 'detail-1' },
             query: { inventoryResource },
-            body: { returnQuantity: '2.5', observations: '  Material no utilizado  ' },
+            body: { returnQuantity: 2.5, observations: '  Material no utilizado  ' },
             user: { id: 'user-1' }
         };
         const res = createResponse();

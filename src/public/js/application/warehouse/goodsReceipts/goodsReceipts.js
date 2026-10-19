@@ -1,13 +1,21 @@
 import { getGoodsReceiptRequest } from '../../../services/warehouse/goodsReceipts/goodsReceiptService.js';
 import * as materialApplication from './materials/materialGoodsReceipts.js';
 import * as consumableApplication from './consumables/consumableGoodsReceipts.js';
-import { goodsReceiptContext } from '../../../pages/warehouse/goodsReceipts/goodsReceiptContext.js';
+import { exportMaterialGoodsReceiptReportRequest } from '../../../services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js';
+import { exportConsumableGoodsReceiptReportRequest } from '../../../services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js';
+import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { createReportApplication } from '../../createReportApplication.js';
 
-const consumable = goodsReceiptContext.resource === 'consumable';
-export const getAllGoodsReceipts = consumable ? consumableApplication.getAllConsumableGoodsReceipts : materialApplication.getAllMaterialGoodsReceipts;
-export const registerGoodsReceipt = consumable ? consumableApplication.registerConsumableGoodsReceipt : materialApplication.registerMaterialGoodsReceipt;
-export const editGoodsReceiptHeader = consumable ? consumableApplication.editConsumableGoodsReceiptHeader : materialApplication.editMaterialGoodsReceiptHeader;
-export const correctGoodsReceiptDetail = consumable ? consumableApplication.correctConsumableGoodsReceiptDetail : materialApplication.correctMaterialGoodsReceiptDetail;
-export const cancelGoodsReceiptDetail = consumable ? consumableApplication.cancelConsumableGoodsReceiptDetail : materialApplication.cancelMaterialGoodsReceiptDetail;
+export const createGoodsReceiptApplication = ({ resource }) => {
+    const consumable = resource === INVENTORY_RESOURCES.CONSUMABLE;
 
-export const getGoodsReceipt = async ({ id }) => (await getGoodsReceiptRequest({ id })).data.goodsReceipt;
+    return Object.freeze({
+        getAll: consumable ? consumableApplication.getAllConsumableGoodsReceipts : materialApplication.getAllMaterialGoodsReceipts,
+        register: consumable ? consumableApplication.registerConsumableGoodsReceipt : materialApplication.registerMaterialGoodsReceipt,
+        editHeader: consumable ? consumableApplication.editConsumableGoodsReceiptHeader : materialApplication.editMaterialGoodsReceiptHeader,
+        correctDetail: consumable ? consumableApplication.correctConsumableGoodsReceiptDetail : materialApplication.correctMaterialGoodsReceiptDetail,
+        cancelDetail: consumable ? consumableApplication.cancelConsumableGoodsReceiptDetail : materialApplication.cancelMaterialGoodsReceiptDetail,
+        get: async ({ id }) => (await getGoodsReceiptRequest({ id, resource })).data.goodsReceipt,
+        exportReport: createReportApplication(consumable ? exportConsumableGoodsReceiptReportRequest : exportMaterialGoodsReceiptReportRequest)
+    });
+};

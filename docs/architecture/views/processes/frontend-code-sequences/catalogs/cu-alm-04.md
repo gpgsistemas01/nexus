@@ -59,12 +59,13 @@ flowchart TB
         FileMaterials["materials.js"]
         Request["materialService.js"]
     end
-    FileUtils -->|import| FileApiMessages
-    FileMaterials -->|import| Request
+    Application -->|import| FileResponseUtils
     FileMaterials -->|import| Application
-    View -->|import| FileMaterials
+    FileMaterials -->|import| Request
     FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     Transport -->|import| FileMaterialController
+    View -->|import| FileMaterials
 ```
 
 ## Construcción de funciones para esta operación

@@ -9,9 +9,8 @@ const state = vi.hoisted(() => ({
     config: null, submit: vi.fn(), confirmation: vi.fn(), permission: vi.fn(),
     close: vi.fn(), openAddition: vi.fn(), add: vi.fn(), success: vi.fn(), reload: vi.fn(), validate: vi.fn()
 }));
-vi.mock('../../../../../../../src/public/js/ui/forms/formUI.js', () => ({ useForm: config => { state.config = config; } }));
+vi.mock('../../../../../../../src/public/js/ui/forms/formUI.js', () => ({ handleSubmit: state.submit, useForm: config => { state.config = config; } }));
 vi.mock('../../../../../../../src/public/js/utils/formUtils.js', () => ({
-    handleSubmit: state.submit,
     pickFormFields: (data, fields) => Object.fromEntries(fields.filter(field => field in data).map(field => [field, data[field]])),
     validateFields: state.validate
 }));

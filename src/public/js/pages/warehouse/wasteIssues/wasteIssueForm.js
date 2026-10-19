@@ -31,6 +31,7 @@ import { roundTo } from '../../../utils/formatUtils.js';
 import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
 import {
     addWasteIssueDetailValidation,
+    issueHeaderValidation,
     issueProjectQuantityDetailsValidation,
     wasteIssueValidation
 } from '../../../utils/validations/validators.js';
@@ -79,11 +80,7 @@ useIssueForm({
                 : { details: 'Seleccione al menos una merma pendiente por surtir.' };
         }
 
-        const errors = validateFields(wasteIssueValidation, formData);
-
-        if (form.dataset.mode === FORM_MODES.EDIT_HEADER) errors.details = null;
-
-        return errors;
+        return validateFields(form.dataset.mode === FORM_MODES.EDIT_HEADER ? issueHeaderValidation : wasteIssueValidation, formData);
     },
     register: registerWasteIssue,
     edit: editWasteIssue,
@@ -105,17 +102,18 @@ const addWaste = () => {
     presentation = JSON.parse(presentation || '{}');
     unitMeasure = JSON.parse(unitMeasure || '{}');
     const wasteId = option.value || id;
-    const quantity = Number(document.querySelector(INPUT_SELECTORS.QUANTITY).value);
+    const capturedQuantity = document.querySelector(INPUT_SELECTORS.QUANTITY).value;
 
     const errors = validateFields(addWasteIssueDetailValidation, {
         wasteId,
-        quantity
+        quantity: capturedQuantity
     });
 
     normalizeFormErrors({ form, errors });
 
     if (hasValidationErrors(errors)) return;
 
+    const quantity = Number(capturedQuantity);
     const waste = {
         wasteId,
         name: text,

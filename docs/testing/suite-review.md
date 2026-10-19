@@ -90,8 +90,10 @@ Ubicación: `tests/unit/validators/`.
 | Archivo | Decisión | Técnica | Condición y oráculo relevante | Qué mantener o modificar |
 | --- | --- | --- | --- | --- |
 | [catalogValidationTest.js](../../tests/unit/validators/catalogValidationTest.js) | **M** | PE / VF | Lista blanca, campos por catálogo, límites y códigos de rechazo. | Mantener configuraciones distintas y resolución de ID delegada al servicio. |
-| [decimalPrecisionValidationTest.js](../../tests/unit/validators/decimalPrecisionValidationTest.js) | **D** | VF | Seis decimales y capacidad numérica admitida/rechazada. | Conservar datos; verificar campo/código del rechazo, no sólo una colección de errores no vacía. |
+| [decimalPrecisionValidationTest.js](../../tests/unit/validators/decimalPrecisionValidationTest.js) | **M** | PE / VF | Dos decimales en captura, seis en costos; cero/no negativo/positivo, vacío opcional y conversión tipada. | `DP-VAL-005`: conservar fronteras y códigos; la precisión persistente histórica no define la captura actual. |
 | [goodsReceiptDetailsValidationTest.js](../../tests/unit/validators/goodsReceiptDetailsValidationTest.js) | **D** | PE / VF | Detalles válidos y rechazos en alta y encabezado. | Conservar ambos contratos; comprobar campo/código por dato inválido en lugar de sólo errores no vacíos. |
+| [authValidationTest.js](../../tests/unit/validators/authValidationTest.js) | **M** | PE / VF | Captura de login coherente entre front/back, minúsculas y claves históricas, presencia/tipo y frontera 50/51. | `DP-VAL-002`: política de creación independiente; integración conserva bcrypt, cookies y cuenta. |
+| [formValidationParityTest.js](../../tests/unit/validators/formValidationParityTest.js) | **M** | PE / VF / TD | Captura válida/inválida coincide entre ambas capas: tipos, límites, UUID, precisión, fechas y accesos. | `DP-VAL-004`: matriz extensa sin BD y representantes HTTP con códigos/snapshot; no sustituye estado de negocio ni navegador. |
 | [issueDetailsValidationTest.js](../../tests/unit/validators/issueDetailsValidationTest.js) | **M** | PE | Reglas nativas y personalizadas devuelven el mismo 400 antes del controller; DTOs conservan false y códigos de captura. | `DP-VAL-003`: mantener las tres familias, tipos inválidos y asociación segura de errores de partidas. |
 | [issueReturnValidationTest.js](../../tests/unit/validators/issueReturnValidationTest.js) | **M** | PE / VF | Cantidad positiva, cero/negativo y observaciones mayores de 500. | Mantener entrada válida y las tres clases de rechazo. |
 | [materialValidationTest.js](../../tests/unit/validators/materialValidationTest.js) | **M** | TD / PE | Compra/directo, pareja opcional, proveedor, consumibles sin medidas y referencias prohibidas. | Mantener; integra reglas comunes en contratos distintos del servidor. |
@@ -185,8 +187,8 @@ Ubicación: `tests/unit/`.
 | [public/js/pages/warehouse/materials/materialFormTest.js](../../tests/unit/public/js/pages/warehouse/materials/materialFormTest.js) | **M** | PE | Crear/editar no envían referencias históricas del rollo. | Mantener lista de campos del navegador; DTO del servidor no prueba ese payload. |
 | [public/js/pages/warehouse/wastes/wasteFormTest.js](../../tests/unit/public/js/pages/warehouse/wastes/wasteFormTest.js) | **M** | TD / TE | Confirmar/cancelar duplicado, permiso/modo/ID y payload con medidas deshabilitadas. | Mantener todas las condiciones de negocio; abrir modal no debe escribir stock. |
 | [public/js/pages/warehouse/wastes/wasteStockAdditionModalTest.js](../../tests/unit/public/js/pages/warehouse/wastes/wasteStockAdditionModalTest.js) | **M** | TE / VF | Precarga, resultado al editar y cero convertido en cantidad pendiente. | Mantener cantidad/observaciones y saldo calculado; no afirma renderizado real de MDB. |
-| [public/js/services/warehouse/goodsIssueServiceTest.js](../../tests/unit/public/js/services/warehouse/goodsIssueServiceTest.js) | **M** | TD | Contexto de página/aplicación dirige solicitudes y reporte al recurso correcto. | Mantener: contiene decisiones de contexto, a diferencia de la delegación trivial retirada. |
-| [public/js/services/warehouse/goodsReceiptServiceTest.js](../../tests/unit/public/js/services/warehouse/goodsReceiptServiceTest.js) | **M** | TD | Entradas conservan contexto fijo frente a página/parametrización contraria. | Mantener ambos contextos y sus operaciones. |
+| [public/js/application/warehouse/goodsIssues/goodsIssueApplicationTest.js](../../tests/unit/public/js/application/warehouse/goodsIssues/goodsIssueApplicationTest.js) | **M** | TD | La application configurada conserva rutas, datos, lectura por id y reporte del recurso aunque se configure otra variante. | Mantener: contiene decisiones de contexto, a diferencia de la delegación trivial retirada. |
+| [public/js/application/warehouse/goodsReceipts/goodsReceiptApplicationTest.js](../../tests/unit/public/js/application/warehouse/goodsReceipts/goodsReceiptApplicationTest.js) | **M** | TD | Entradas conservan contexto fijo y datos entre configuraciones independientes, sin DOM. | Mantener ambos contextos y sus operaciones. |
 | [public/js/ui/forms/formUITest.js](../../tests/unit/public/js/ui/forms/formUITest.js) | **M** | TE | Un envío pendiente no repite preparación/validación/escritura. | Mantener: aquí contar llamadas protege contra doble envío, no sólo contra cambios de implementación. |
 | [public/js/ui/inventory/materialMeasurementFieldTest.js](../../tests/unit/public/js/ui/inventory/materialMeasurementFieldTest.js) | **M** | TD / TE | Unidad y modo habilitan/descartan/conservan medidas; consumibles sin dimensiones. | Mantener por la regresión de piezas; pruebas puras de validación no asignan esos estados al formulario. |
 | [public/js/ui/inventory/warehouseInventoryColumnsTest.js](../../tests/unit/public/js/ui/inventory/warehouseInventoryColumnsTest.js) | **M** | PE | Cero de cono se diferencia de peso desconocido y de no aplicable. | Mantener este caso semántico ya depurado; no restaurar orden/HTML exactos. |
@@ -291,7 +293,7 @@ críticos se enlazan en el [registro selectivo](automated-test-case-index.md).
 | `wasteWeightDbTest.js`, rechazo de referencias | Retirar lecturas finales que se comparaban consigo mismas después del rechazo, sin acción entre ellas. | Permanecen instantáneas anteriores al request, rechazo HTTP, referencias de proveedor y filas de merma sin cambios. |
 | `wasteWeightCalculationsTest.js`, `wasteWeightFieldTest.js`, `wasteFormTest.js` | Conservar: cálculo puro, asignación de campos y payload son contratos diferentes. | Se cubren orientación por medida menor, proporcionalidad, recálculo, limpieza, inputs deshabilitados y exclusión de valores derivados. No sustituyen persistencia ni navegador completo. |
 | `wasteFormTest.js`, `wasteStockAdditionModalTest.js`, `formUITest.js` | Conservar por regresiones de captura y riesgo de escritura duplicada. | Confirmar el Swal abre Agregar stock sin guardar; cancelar conserva captura; cero exige nueva cantidad; un envío pendiente no se duplica. |
-| `goodsReceiptServiceTest.js`, `goodsIssueServiceTest.js` de frontend | Conservar: seleccionan contexto y aplicaciones específicas, no son sólo delegación. Corregir nombre de suite de entradas. | Material/consumible se dirige al contexto correcto incluso si página o parámetros indican el opuesto. No demuestra autorización del servidor. |
+| `goodsReceiptApplicationTest.js`, `goodsIssueApplicationTest.js` de frontend | Reubicar en application: la decisión de contexto ya no depende de la página al importar services; se conservan ambas variantes, sus datos y reporte. | Material/consumible conserva sus rutas al configurar la otra variante. No demuestra autorización del servidor. |
 | `tests/unit/routes`, `tests/unit/constants/permissionsTest.js` | Conservar: política de acceso y registro de middlewares. | El harness HTTP de controllers monta rutas de prueba e inyecta actor; no ejecuta necesariamente routers reales ni JWT. Integración de persistencia no sustituye esos contratos de autorización. |
 | `warehouseConcurrencyControllerDbTest.js`, `queuedPrismaPgTest.js` | Conservar por integridad transaccional. | Surtidos/devoluciones coincidentes, saldos e historial, rollback y serialización del cliente transaccional; no fijan tiempos de respuesta. |
 | `tests/integration/migrations` | Conservar todos los escenarios históricos. | Actualizaciones desde CHECK anteriores, referencias, netos históricos y rollback siguen siendo necesarias aunque el alta nueva no guarde `sampleLengthM` ni `sampleNetWeightKg`. No modificar migraciones aplicadas. |
@@ -424,3 +426,46 @@ esquema de la tabla: HTTP 503 mantiene un único reintento con cualquier código
 y añade representantes que preservan `false`, rechazan tipos no numéricos y devuelven
 el código de costo declarado en errorMap. Los casos HTTP/Prisma comprueban el rechazo
 y la ausencia de cambios; no se duplican consultas de existencia en los validadores.
+
+La revisión de dependencias mueve los tests de selección de contexto a `public/js/application/warehouse/{goodsIssues,goodsReceipts}` y conserva su contrato observable: rutas, datos, lectura y reporte en ambas variantes. Los tests de formulario/versiones mantienen las mismas aserciones y sólo importan el nuevo propietario de las funciones. `validators/authValidationTest.js` aplica particiones de presencia/tipo y fronteras 50/51 para front/back, acepta credenciales históricas y comprueba que la creación conserva su política; `authControllerDbTest.js` demuestra esa distinción con bcrypt y cookies reales. Se consolidan las particiones antiguas de selección por página y módulo específico en un caso por variante: configura también la variante opuesta y comprueba las mismas operaciones, datos, lectura y reporte. El mock de página se retira porque esa dependencia ya no existe. No se añaden pruebas de nombres de archivos ni de delegaciones triviales.
+
+
+La revisión de captura `DP-VAL-004` conserva la separación entre reglas puras y estado
+de negocio. `formValidationParityTest.js` compara resultados de front/back sin duplicar
+consultas. `apiWriteValidationDbTest.js` añade representantes de tipos y fronteras con
+lectura posterior intacta. La fixture de proveedor de `materialValidatorsTest.js` usa
+un UUID v4 realista porque un identificador arbitrario ya no pasa la captura.
+
+| Archivo añadido | Decisión y técnica | Evidencia y límite |
+| --- | --- | --- |
+| `public/js/plugins/datatable/admin/persons/personAccessDatatableTest.js` | **M**, TE | Carga de accesos, retiro de una fila y reinicio conservan IDs, nombres y el arreglo usado por el formulario. Usa dobles del plugin; falta recorrido visual real. |
+| `public/js/pages/warehouse/goodsReceipts/goodsReceiptFormTest.js` | **M**, TD | Edición sin nuevas filas omite details; edición incremental envía sólo filas nuevas; creación conserva la lista para validar su obligatoriedad. No demuestra transacción de compra. |
+
+La revisión no declara completos los controles de existencia/estado de accesos:
+`personService` y `userService` mantienen claves foráneas, pero falta resolver de forma
+específica el rol/área no disponible antes de guardar y traducir su rechazo de dominio.
+Esa brecha corresponde al servicio, no a repetir consultas en validators o frontend.
+
+
+Al consolidar las reglas condicionales se mantiene `DP-VAL-004` con tabla de decisiones:
+condición verdadera/falsa, texto presente/ausente y límite fijo/dinámico.
+`formValidationParityTest.js` conserva normalización a texto vacío para los DTOs;
+`catalogValidationTest.js` cubre símbolo 10/11, campos ajenos sin sanitizar y resolución
+del catálogo por el servicio. `materialValidationTest.js` comprueba que la excepción
+por compra sólo afecta al alta; `CP-INT-VAL-004` representa edición de consumible y
+ajuste de material con contexto forzado y snapshot intacto. El costo opcional del
+formulario usa la regla numérica existente: cero es válido, false y arrays no son
+valores ausentes. No se añaden tests para fijar nombres de helpers retirados.
+
+
+La revisión `DP-VAL-005` mantiene las dos reglas de signo con un mismo comprobador:
+`validateNumber` permite cero; `validatePositiveNumber` lo rechaza. Las fronteras de
+captura cambian de seis a dos decimales para cantidades/medidas/stock; las monetarias
+conservan seis. Las pruebas históricas de migraciones no cambian ni se retiran.
+`goodsReceiptDetailsValidationTest.js` observa el body tipado (números, false y Date)
+y las pruebas de surtido mantienen false en las tres familias. Los tests puros de
+DTO y controllers usan fixtures ya tipadas; no vuelven a atribuirles conversiones que
+pertenecen al validator. Conservan selección de campos, contexto, observaciones,
+notificación y delegación. `CP-INT-VAL-005` comprueba persistencia exacta de mínimo/costo
+y rechazo sin efectos. La longitud calculada para el formulario se verifica con el
+mismo helper del servidor; no cambia la precisión interna de áreas o históricos.

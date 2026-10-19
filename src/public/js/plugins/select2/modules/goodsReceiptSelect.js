@@ -1,5 +1,5 @@
 import { updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
-import { toggleContainerElements } from "../../../utils/formUtils.js";
+import { toggleContainerElements } from '../../../ui/forms/formStateUI.js';
 import { refreshMaterialTable } from "../../datatable/shared/inventory/renderMaterialDatatable.js";
 import { details } from "../../datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
@@ -8,7 +8,6 @@ import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.j
 import { initPersonSelect, togglePersonOption } from "../domains/person.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
-import { goodsReceiptContext } from '../../../pages/warehouse/goodsReceipts/goodsReceiptContext.js';
 
 const modalSelector = MODAL_SELECTORS.GOODS_RECEIPT;
 const materialSelector = SELECT_SELECTORS.MATERIAL;
@@ -31,7 +30,7 @@ const clearMaterialSelection = () => {
     });
 };
 
-export const initGoodsReceiptFormSelect2 = () => {
+export const initGoodsReceiptFormSelect2 = ({ resource }) => {
 
     const modal = document.querySelector(modalSelector);
 
@@ -59,7 +58,7 @@ export const initGoodsReceiptFormSelect2 = () => {
             });
             refreshMaterialTable(details);
             updateTotals();
-            
+
             const instance = initMdbWrapperInput({
                 selector: presentationDisplayScopedSelector,
                 value: ''
@@ -80,7 +79,7 @@ export const initGoodsReceiptFormSelect2 = () => {
             baseSelector: receivedByScopedSelector,
             placeholder: 'Buscar persona que recibe...',
             data: (params) => {
-                
+
                 return {
                     search: params.term,
                     department: 'ALMACÉN Y PROVEDURÍA',
@@ -96,7 +95,7 @@ export const initGoodsReceiptFormSelect2 = () => {
         supplierSelector,
         materialSelector,
         creationContext: 'goodsReceipt',
-        resource: goodsReceiptContext.resource
+        resource
     });
 };
 

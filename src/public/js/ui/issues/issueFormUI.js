@@ -1,12 +1,13 @@
 import { DOM_EVENT_NAMES } from '../../constants/events.js';
 import { BUTTON_SELECTORS, HEADING_SELECTORS } from '../../constants/selectors.js';
-import { useForm } from '../forms/formUI.js';
+import { useForm, handleSubmit } from '../forms/formUI.js';
 import { FORM_MODES, ISSUE_HEADER_ENABLED_MODES } from '../../constants/formModes.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../constants/fulfillmentStatuses.js';
-import { handleSubmit, syncCheckboxControlledInputs, toggleDisabledElement } from '../../utils/formUtils.js';
+
+import { syncCheckboxControlledInputs, toggleDisabledElement, setFormDisabled } from '../forms/formStateUI.js';
 import { on } from '../../utils/domUtils.js';
 import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
-import { setFormDisabled } from '../forms/formStateUI.js';
+
 import { toggleDetailFormActions } from '../forms/detailFormUI.js';
 import { initializeInventoryCrudModal } from '../inventory/inventoryCrudModalUI.js';
 import { buildModalTitle } from '../modalUI.js';
@@ -93,8 +94,8 @@ export const bindIssueProjectQuantityControls = ({
 
         if (!detail) return;
 
-        detail.projectConvertedQuantity = Number(input.value);
-        detail.convertedQuantityDifference = roundTo(
+        detail.projectConvertedQuantity = input.value === '' ? null : input.value;
+        detail.convertedQuantityDifference = input.value === '' ? 0 : roundTo(
             detail.convertedQuantity - detail.projectConvertedQuantity
         );
 

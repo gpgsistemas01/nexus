@@ -84,22 +84,24 @@ flowchart TB
         FileWasteIssues["wasteIssues.js"]
         Request["wasteIssueService.js"]
     end
-    FileErrorHandler -->|import| FileApiMessages
-    FileCreateIssueApplication -->|import| Application
-    FileWasteIssues -->|import| Request
-    FileWasteIssues -->|import| FileCreateIssueApplication
-    View -->|import| FileWasteIssues
-    View -->|import| FileValidators
+    Application -->|import| FileResponseUtils
     DetailTable -->|import| FileTableOperations
-    IssueUI -->|import| FileModalUI
-    FormUtils -->|import| FileErrorHandler
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileCreateIssueApplication -->|import| Application
+    FileErrorHandler -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    FileWasteIssues -->|import| FileCreateIssueApplication
+    FileWasteIssues -->|import| Request
+    IssueUI -->|import| FileModalUI
     Transport -->|import| FileWasteIssueController
+    View -->|import| DetailTable
+    View -->|import| FileValidators
+    View -->|import| FileWasteIssues
+    View -->|import| FormUtils
+    View -->|import| IssueUI
 ```
 
 ## Construcción de funciones para esta operación
@@ -208,19 +210,19 @@ sequenceDiagram
             Form-->>Browser: envío duplicado rechazado
         end
         Form->>IssueUI: sendRequest({ formData, form }) — callback de useIssueForm
-        IssueUI->>FormUtils: handleSubmit({ form, formData, create: register, update })
+        IssueUI->>Form: handleSubmit({ form, formData, create: register, update })
         FormUtils->>Application: registerWasteIssue({ formData })
         alt Aplicación resuelta
             Application-->>FormUtils: registerWasteIssue(): Promise[{ message, data }]
             FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>IssueUI: handleSubmit(): Promise[WasteIssue]
+            Note over Form: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+            Form-->>IssueUI: handleSubmit(): Promise[WasteIssue]
             IssueUI->>View: onSaved({ form, formData }) — callback configurado
             Note over View: details.length = 0
             View->>DetailTable: refreshMaterialTable(details)
         else Aplicación rechazada
             Application-->>FormUtils: error propagado
-            FormUtils-->>IssueUI: error propagado por handleSubmit()
+            Form-->>IssueUI: error propagado por handleSubmit()
             IssueUI-->>Form: error propagado por sendRequest()
             Form->>FileErrorHandler: handleApiError({ err, form })
         end

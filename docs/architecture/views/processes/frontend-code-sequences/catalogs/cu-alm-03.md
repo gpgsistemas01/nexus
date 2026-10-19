@@ -68,14 +68,15 @@ flowchart TB
         FileMaterials["materials.js"]
         Request["materialService.js"]
     end
-    FileUtils -->|import| FileApiMessages
-    FileMaterials -->|import| Request
-    FileMaterials -->|import| Application
-    FormUtils -->|import| FileErrorHandler
+    Application -->|import| FileResponseUtils
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileUtils
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileMaterials -->|import| Application
+    FileMaterials -->|import| Request
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
     Transport -->|import| FileMaterialController

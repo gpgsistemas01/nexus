@@ -59,7 +59,7 @@ loadRememberedCredentials();
 
 useForm({
     selector: formId,
-    normalizeData: ({ formData }) => formData,
+    normalizeData: ({ formData }) => ({ ...formData, name: formData.name.trim() }),
     getErrors: ({ formData }) => validateFields(loginValidation, formData),
     normalizeErrors: ({ form, errors }) => {
 

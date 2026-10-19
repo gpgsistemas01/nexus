@@ -67,18 +67,18 @@ flowchart TB
         FileGoodsIssueContext["goodsIssueContext.js"]
         View["goodsIssueDatatable.js"]
     end
+    FileConsumableGoodsIssueService -->|import| Request
     FileConsumableGoodsIssues -->|import| FileConsumableGoodsIssueService
     FileConsumableGoodsIssues -->|import| FileCreateIssueApplication
-    FileGoodsIssues -->|import| FileMaterialGoodsIssues
-    FileGoodsIssues -->|import| FileConsumableGoodsIssues
-    FileGoodsIssues -->|import| FileGoodsIssueContext
-    FileMaterialGoodsIssues -->|import| FileMaterialGoodsIssueService
-    FileMaterialGoodsIssues -->|import| FileCreateIssueApplication
     FileCreateIssueApplication -->|import| Application
-    View -->|import| FileGoodsIssues
-    View -->|import| FileGoodsIssueContext
-    FileConsumableGoodsIssueService -->|import| Request
+    FileGoodsIssueContext -->|import| FileGoodsIssues
+    FileGoodsIssues -->|import| FileConsumableGoodsIssueService
+    FileGoodsIssues -->|import| FileConsumableGoodsIssues
+    FileGoodsIssues -->|import| FileMaterialGoodsIssueService
+    FileGoodsIssues -->|import| FileMaterialGoodsIssues
     FileMaterialGoodsIssueService -->|import| Request
+    FileMaterialGoodsIssues -->|import| FileCreateIssueApplication
+    FileMaterialGoodsIssues -->|import| FileMaterialGoodsIssueService
     Transport -->|import| FileMaterialGoodsIssueController
 ```
 

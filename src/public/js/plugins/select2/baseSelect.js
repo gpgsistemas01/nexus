@@ -2,7 +2,7 @@ import { DOM_EVENT_NAMES, SELECT2_EVENT_NAMES } from '../../constants/events.js'
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
 import { handleApiError } from "../../api/errorHandler.js";
 import { initMdbWrapperInput, setMdbWrapperInputValue, updateMdbWrapperInput } from "../mdb/baseInstance.js";
-import { toggleDisabledElement } from "../../utils/formUtils.js";
+import { toggleDisabledElement } from '../../ui/forms/formStateUI.js';
 import { bindDisabledControlWarning, setDisabledControlWarning } from "../../ui/disabledControlWarning.js";
 
 const wrapperSelector = INPUT_SELECTORS.PRESENTATION_DISPLAY;
@@ -76,11 +76,11 @@ export const runAfterSelect2Close = ({ selector, action }) => {
 
 export const clearSelectValue = selector => $(selector).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
 
-export const initbaseSelect2 = ({ 
-    baseSelector, 
+export const initbaseSelect2 = ({
+    baseSelector,
     containerSelector,
     multiple = false,
-    get, 
+    get,
     clearOnOpen = true,
     searchDelay = 1000,
     placeholder,
@@ -103,16 +103,16 @@ export const initbaseSelect2 = ({
         ...data(params)
     });
 
-    $(baseSelector).select2({ 
+    $(baseSelector).select2({
         language: 'es',
         multiple,
-        placeholder: placeholder, 
+        placeholder: placeholder,
         width: '100%',
         dropdownParent: $(containerSelector),
-        minimumInputLength: 0, 
-        ajax: {  
-            dataType: 'json', 
-            delay: searchDelay, 
+        minimumInputLength: 0,
+        ajax: {
+            dataType: 'json',
+            delay: searchDelay,
             data: resolveRequestData,
             processResults,
             transport: async (params, success, failure) => {
@@ -263,7 +263,7 @@ export const initDomainSelect2 = ({
 };
 
 export const toggleSelectOption = ({ selector, data = null }) => {
-    
+
     $(selector).val(null).trigger(DOM_EVENT_NAMES.CHANGE);
 
     const { id, text } = data || {};

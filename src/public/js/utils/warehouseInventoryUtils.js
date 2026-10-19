@@ -1,5 +1,6 @@
 import { SQUARE_METER_UNIT_NAMES, SQUARE_METER_UNIT_SYMBOLS, WASTE_WEIGHT_LIMITS } from '../constants/inventory.js';
 import { formatDecimal, roundTo } from './formatUtils.js';
+import { DECIMAL_INPUT_FORMAT } from '../constants/inputValidation.js';
 import { getWasteWeightValidationError } from './validations/weightValidations.js';
 
 export const getBase = (item = {}) => (
@@ -33,7 +34,8 @@ export const calculateWasteNetWeight = (data, { coneFieldName = 'coneWeightKg', 
 
 export const calculateWasteRollLength = ({ weightKg, referenceNetWeightKg, referenceLengthM }) => {
     if (![weightKg, referenceNetWeightKg, referenceLengthM].every(value => Number.isFinite(Number(value)) && Number(value) > 0)) return null;
-    return roundTo(Number(weightKg) * Number(referenceLengthM) / Number(referenceNetWeightKg));
+    const length = roundTo(Number(weightKg) * Number(referenceLengthM) / Number(referenceNetWeightKg), DECIMAL_INPUT_FORMAT.decimalDigits);
+    return length > 0 ? length : null;
 };
 
 export const getMaterialLengthField = ({ base, height } = {}) => {
@@ -51,7 +53,7 @@ export const prepareWasteRollReference = ({ material }) => {
     return {
         lengthField,
         widthField,
-        widthM: Number(material[widthField]),
+        widthM: roundTo(Number(material[widthField]), DECIMAL_INPUT_FORMAT.decimalDigits),
         lengthM: Number(material[lengthField])
     };
 };

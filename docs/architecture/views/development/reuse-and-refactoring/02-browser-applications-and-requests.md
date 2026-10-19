@@ -97,3 +97,17 @@ conserva la respuesta de `apiRequest`; no aplica `dataKey` ni decide permisos.
 Los requests de reporte usan `responseType: 'blob'`. Las factories de compras y salidas
 son distintas por sus firmas y URLs. `wasteIssueService.js` define sus requests propios,
 aunque `wasteIssues.js` sí reutiliza `createIssueApplication` en la frontera de application.
+
+## Contexto compuesto por la página
+
+`goodsIssueContext.js` y `goodsReceiptContext.js` son puntos de composición: leen la metadata renderizada y llaman a la factory de application una vez. Las factories seleccionan funciones ya existentes de material o consumible y fijan la lectura y exportación correspondientes. Los formularios usan esas referencias; las tablas reciben el objeto por configuración y Select2 recibe `resource` por argumento. No hay imports desde services/application hacia pages ni selección global condicionada por el DOM al importar un servicio. Los reportes de otros módulos conservan su configuración independiente.
+
+| Antes | Responsabilidad conservada |
+| --- | --- |
+| Servicios genéricos reexportaban funciones elegidas mediante el contexto de la página. | Los servicios de material/consumible siguen exportando las mismas peticiones HTTP; application selecciona sus referencias una vez. |
+| El reporte genérico volvía a delegar en el reporte específico. | El contexto recibe `exportReport` configurado con el request específico; Blob, descarga y mensajes siguen en UI. |
+| El servicio obtenía implícitamente el recurso desde pages. | La lectura por ID recibe `resource`; las escrituras siguen usando las rutas específicas. |
+
+Se retiran aliases y reexports duplicados, no operaciones de alta, consulta, edición,
+devolución, corrección, cancelación o reporte. Las pruebas de selección del recurso
+se ubican en application porque ésa es ahora la frontera que toma la decisión.

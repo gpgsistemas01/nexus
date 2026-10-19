@@ -32,7 +32,7 @@ let currentGoodsIssue = null;
 
 const issueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
-    selects: getGoodsIssueHeaderSelects()
+    selects: getGoodsIssueHeaderSelects({ resource: goodsIssueContext.resource })
 });
 initializeGoodsIssueReturns({
     details,

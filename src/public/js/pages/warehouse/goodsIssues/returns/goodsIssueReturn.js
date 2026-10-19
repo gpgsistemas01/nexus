@@ -1,10 +1,10 @@
-import { returnGoodsIssueDetail } from '../../../../application/warehouse/goodsIssues/goodsIssues.js';
+import { goodsIssueContext } from '../goodsIssueContext.js';
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { createIssueReturn } from '../../../../ui/issues/issueReturnUI.js';
 import { on } from '../../../../utils/domUtils.js';
 
 const goodsIssueReturn = createIssueReturn({
-    sendReturn: returnGoodsIssueDetail
+    sendReturn: goodsIssueContext.returnDetail
 });
 
 export const initializeGoodsIssueReturns = ({ details, getCurrentIssue }) => {

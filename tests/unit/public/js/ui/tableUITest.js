@@ -13,7 +13,7 @@ vi.mock('../../../../../src/public/js/ui/modalUI.js', () => ({ closeModal: vi.fn
 
 const { notifications } = await import('../../../../../src/public/js/plugins/swal/swalComponent.js');
 const { buildExcelButton } = await import('../../../../../src/public/js/ui/tableUI.js');
-const { handleAction } = await import('../../../../../src/public/js/utils/formUtils.js');
+const { handleAction } = await import('../../../../../src/public/js/ui/forms/formUI.js');
 const { reloadMainTable } = await import('../../../../../src/public/js/plugins/datatable/core/base/tableOperations.js');
 const { closeModal } = await import('../../../../../src/public/js/ui/modalUI.js');
 

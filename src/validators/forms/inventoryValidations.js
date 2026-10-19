@@ -1,11 +1,12 @@
+import { FORM_FIELD_LIMITS, MIN_STOCK_INPUT_FORMAT } from '../../public/js/constants/inputValidation.js';
 import { validateBoolean, validateNumberOptional, validateTextOptional } from '../fields/fieldsValidator.js';
 
 export const createInventoryStateValidation = () => [
-    validateNumberOptional('minStock', { disableTooLong: true }),
+    validateNumberOptional('minStock', { format: MIN_STOCK_INPUT_FORMAT }),
     validateBoolean('isActive')
 ];
 
 export const createInventoryObservationsValidation = () => validateTextOptional({
     fieldName: 'observations',
-    maxLength: 500
+    maxLength: FORM_FIELD_LIMITS.OBSERVATIONS
 });

@@ -90,17 +90,33 @@ del modal sin introducir una variante de estilo exclusiva para la exportación.
 
 ### Precisión de valores decimales
 
-Precios, existencias, cantidades y medidas aceptan hasta **8 dígitos enteros y
-6 decimales**, con persistencia `DECIMAL(18,6)`. El peso unitario de merma admite
+La captura de existencias, cantidades y medidas acepta hasta **8 dígitos enteros y
+2 decimales**. El stock mínimo opcional acepta **12 enteros y 2 decimales**. Los
+costos monetarios conservan **8 enteros y 6 decimales**. Se mantiene la persistencia
+`DECIMAL(18,6)` para históricos y conversiones internas de inventario, sin redondear
+esos saldos mediante una migración. La longitud calculada que se incorpora al
+formulario de merma se redondea a dos decimales con la misma función en front/back.
+El peso unitario de merma admite
 **3 enteros y 2 decimales**, con persistencia `DECIMAL(5,2)`. Las propiedades de
 cada payload y sus límites se definen en OpenAPI. Los campos históricos de largo y neto de muestra conservan seis decimales; las altas nuevas los dejan nulos.
 El alta sólo recibe el total del rollo completo con cono, el total del sobrante y el
 cono compartido, con dos decimales. Se guardan el neto de merma y sus medidas finales;
 el neto y largo de muestra sólo se utilizan en el cálculo. Sólo materiales en m² pueden ser su origen.
 
-Los validadores comprueban la entrada antes de normalizarla. El frontend conserva
-la precisión del payload durante la captura y usa `formatDecimal` o
+Los validadores comprueban el valor original y luego lo convierten a su tipo:
+`toFloat`, `toBoolean`, `toDate` o el sanitizer de la lista de detalles. El controller
+recibe el body tipado; los DTOs seleccionan y adaptan campos sin repetir conversiones
+numéricas, booleanas o de fecha. Un tercer decimal en una cantidad no se redondea
+silenciosamente para aceptarlo. El stock mínimo vacío/nulo se omite; cero se conserva.
+El frontend conserva la precisión permitida del payload durante la captura y usa `formatDecimal` o
 `formatCurrency` para presentar los valores de consulta con dos decimales.
+
+`validateNumber` tiene mínimo cero; `validatePositiveNumber` exige mayor que cero.
+Comparten el comprobador numérico y no necesitan dos implementaciones independientes.
+Stock inicial, stock mínimo, saldo de ajuste y costo máximo permiten cero; entradas,
+devoluciones y medidas son positivas. La cantidad por presentación de una partida
+de compra/salida de material mantiene su mínimo de uno. El cono permite cero, pero
+los pesos totales deben superar al cono.
 
 Al cambiar una ruta, un payload, una respuesta o su seguridad, se actualiza la fuente
 OpenAPI del área correspondiente. Este documento se actualiza únicamente cuando cambia
@@ -151,8 +167,40 @@ pasan al servicio, que resuelve el registro, su pertenencia y el estado vigente 
 consultas del proceso. No se agregan validadores de formulario a una eliminación o
 cancelación sin datos de captura.
 
-El acceso también utiliza `validate`: una captura inválida devuelve `400` con códigos
-por campo. Si la captura es válida y las credenciales se rechazan, `loginUser` devuelve
+Las condiciones de aplicación no crean otra implementación del campo: `validateText`,
+`validateBoolean` y `validateNumber` reciben `condition(value, { req })`, compatible con
+`.if()` de Express Validator. Primero se decide si corresponde validar; después se
+comprueba presencia, tipo, límites/formato y se normaliza según el campo. Texto normal,
+opcional y de catálogo reutilizan la misma cadena; `maxLength` puede ser un número o
+una función de la petición. La obligatoriedad conserva su significado: un campo
+opcional presente con tipo incorrecto no se trata como ausente. Alta y edición de
+compras comparten campos y reglas de partidas; sólo la edición admite omitir la lista.
+En materiales/consumibles, `creationContext=goodsReceipt` sólo permite omitir costo y
+stock inicial en el alta; edición y ajuste validan sus valores obligatorios aunque
+reciban ese contexto en el body.
+
+Las reglas de captura del navegador y del servidor comparten límites y formatos puros
+en `public/js/constants/inputValidation.js`; no comparten Express, DOM ni consultas.
+Ambas comprueban el tipo original antes de convertir: un array no es un identificador,
+un booleano no es un nombre y `2abc` no es una cantidad. Los textos se recortan después
+de comprobar su tipo; las observaciones ausentes o nulas se normalizan a texto vacío.
+Nombres de personas/clientes admiten 255 caracteres; materiales/mermas y razón social,
+200; nombre comercial, 100; observaciones, 500. Las fechas deben existir en el calendario,
+no sólo coincidir con la forma ISO. Los accesos requieren al menos una fila con UUID v4
+de área y rol, sin repetir área aunque cambie la capitalización del UUID.
+
+Las cantidades de partidas de compra/salida de material son al menos uno; las de
+merma, devolución y surtido son positivas según su proceso. El navegador conserva
+el texto numérico hasta validarlo y luego prepara el payload. Al editar una compra
+sin partidas nuevas omite `details`; si envía la lista, debe contener al menos una.
+El formulario de encabezado de salida valida sólo el encabezado. Existencia,
+pertenencia, disponibilidad, stock y concurrencia siguen siendo reglas del servicio;
+esta revisión de captura no añade consultas de BD ni recorridos de existencia por fila.
+
+El acceso también utiliza `validate`: presencia, tipo texto y máximo de 50 caracteres
+por credencial; una captura inválida devuelve `400` con códigos por campo. El usuario
+se recorta en sus extremos; la contraseña conserva todos sus caracteres. La política
+de creación/cambio de contraseña no se exige al iniciar sesión. Si la captura es válida y las credenciales se rechazan, `loginUser` devuelve
 `401` con `LOGIN_ERROR`, igual para usuario inexistente o contraseña incorrecta. Ese
 rechazo no dispara una renovación de sesión en el navegador.
 `authService.js` declara el login como petición pública con `requiresAuth: false`.

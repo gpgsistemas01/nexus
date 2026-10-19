@@ -89,28 +89,32 @@ flowchart TB
         Request["createGoodsIssueRequests.js"]
         FileMaterialGoodsIssueService["materialGoodsIssueService.js"]
     end
-    FileErrorHandler -->|import| FileApiMessages
-    FileErrorHandler -->|import| FileUtils
-    FileUtils -->|import| FileApiMessages
+    Application -->|import| FileResponseUtils
+    FileConsumableGoodsIssueService -->|import| Request
     FileConsumableGoodsIssues -->|import| FileConsumableGoodsIssueService
     FileConsumableGoodsIssues -->|import| FileCreateIssueApplication
-    FileGoodsIssues -->|import| FileMaterialGoodsIssues
-    FileGoodsIssues -->|import| FileConsumableGoodsIssues
-    FileGoodsIssues -->|import| FileGoodsIssueContext
-    FileMaterialGoodsIssues -->|import| FileMaterialGoodsIssueService
-    FileMaterialGoodsIssues -->|import| FileCreateIssueApplication
     FileCreateIssueApplication -->|import| Application
-    FileGoodsIssueReturn -->|import| FileGoodsIssues
-    FileGoodsIssueReturn -->|import| View
-    FileConsumableGoodsIssueService -->|import| Request
-    FileMaterialGoodsIssueService -->|import| Request
-    View -->|import| FileValidators
-    FormUtils -->|import| FileErrorHandler
-    FileResponseUtils -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileGoodsIssueContext -->|import| FileGoodsIssues
+    FileGoodsIssueReturn -->|import| FileGoodsIssueContext
+    FileGoodsIssueReturn -->|import| View
+    FileGoodsIssues -->|import| FileConsumableGoodsIssueService
+    FileGoodsIssues -->|import| FileConsumableGoodsIssues
+    FileGoodsIssues -->|import| FileMaterialGoodsIssueService
+    FileGoodsIssues -->|import| FileMaterialGoodsIssues
+    FileMaterialGoodsIssueService -->|import| Request
+    FileMaterialGoodsIssues -->|import| FileCreateIssueApplication
+    FileMaterialGoodsIssues -->|import| FileMaterialGoodsIssueService
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
     Transport -->|import| FileMaterialGoodsIssueController
+    View -->|import| FileValidators
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación

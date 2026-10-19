@@ -1,9 +1,4 @@
-import {
-    editGoodsIssue,
-    editGoodsIssueHeader,
-    editGoodsIssueDetails,
-    registerGoodsIssue
-} from '../../../application/warehouse/goodsIssues/goodsIssues.js';
+import { goodsIssueContext } from './goodsIssueContext.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import {
@@ -32,6 +27,7 @@ import { goodsIssueDetails } from './goodsIssueModal.js';
 import {
     addGoodsIssueMaterialValidation,
     goodsIssueValidation,
+    issueHeaderValidation,
     issueProjectQuantityDetailsValidation
 } from '../../../utils/validations/validators.js';
 import {
@@ -80,16 +76,12 @@ useIssueForm({
                 : { details: 'Seleccione al menos un material pendiente por surtir.' };
         }
 
-        const errors = validateFields(goodsIssueValidation, formData);
-
-        if (mode === FORM_MODES.EDIT_HEADER) errors.details = null;
-
-        return errors;
+        return validateFields(mode === FORM_MODES.EDIT_HEADER ? issueHeaderValidation : goodsIssueValidation, formData);
     },
-    register: registerGoodsIssue,
-    edit: editGoodsIssue,
-    editHeader: editGoodsIssueHeader,
-    editDetails: editGoodsIssueDetails
+    register: goodsIssueContext.register,
+    edit: goodsIssueContext.edit,
+    editHeader: goodsIssueContext.editHeader,
+    editDetails: goodsIssueContext.editDetails
 });
 
 const addGoodsIssueMaterial = () => {
@@ -100,18 +92,19 @@ const addGoodsIssueMaterial = () => {
     let { text, material, supplier, maxUnitCost } = option.dataset || {};
     material = JSON.parse(material);
     supplier = JSON.parse(supplier);
-    const quantity = Number(document.querySelector(INPUT_SELECTORS.QUANTITY).value);
+    const capturedQuantity = document.querySelector(INPUT_SELECTORS.QUANTITY).value;
 
     const errors = validateFields(addGoodsIssueMaterialValidation, {
         materialId: material.id,
         supplierId: supplier.id,
-        quantity
+        quantity: capturedQuantity
     });
 
     normalizeFormErrors({ form: document.querySelector(formId), errors });
 
     if (hasValidationErrors(errors)) return;
 
+    const quantity = Number(capturedQuantity);
     const newMaterial = {
         materialId: material.id,
         name: text,

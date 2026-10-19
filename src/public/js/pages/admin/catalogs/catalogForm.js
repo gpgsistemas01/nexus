@@ -2,8 +2,9 @@ import {
     editCatalogEntry,
     registerCatalogEntry
 } from '../../../application/admin/catalogs/catalogs.js';
-import { useForm } from '../../../ui/forms/formUI.js';
-import { handleSubmit, validateFields } from '../../../utils/formUtils.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
+import { validateFields } from '../../../utils/formUtils.js';
+
 import { createCatalogValidation } from '../../../utils/validations/validators.js';
 
 const catalogContext = document.querySelector('#catalogContext');

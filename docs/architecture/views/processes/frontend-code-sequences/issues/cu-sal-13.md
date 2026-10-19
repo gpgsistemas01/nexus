@@ -72,19 +72,22 @@ flowchart TB
         App["wasteIssues.js"]
         Request["wasteIssueService.js"]
     end
+    App -->|import| FileCreateIssueApplication
+    App -->|import| Request
+    Application -->|import| FileResponseUtils
+    FileCreateIssueApplication -->|import| Application
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileUtils
-    FileUtils -->|import| FileApiMessages
-    FileCreateIssueApplication -->|import| Application
-    App -->|import| Request
-    App -->|import| FileCreateIssueApplication
-    Issue -->|import| App
-    Return -->|import| FileValidators
-    FormUtils -->|import| FileErrorHandler
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    Issue -->|import| App
+    Issue -->|import| Return
+    Return -->|import| FileValidators
+    Return -->|import| FormUtils
     Transport -->|import| API
 ```
 

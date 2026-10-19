@@ -1,11 +1,9 @@
-import { getGoodsReceipt, getAllGoodsReceipts } from '../../../../application/warehouse/goodsReceipts/goodsReceipts.js';
 import { runApiAction } from '../../../../api/errorHandler.js';
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { resetDataTable } from '../../core/base/tableOperations.js';
-import { exportGoodsReceiptReport } from '../../../../application/warehouse/report.js';
 import { buildDetailsColumns } from '../../shared/issues/detailBuilder/detailColumns.js';
 import { buildDetailsHeader } from '../../shared/issues/detailBuilder/detailHeader.js';
 import { matchesDetailIdentifier, removeDetail } from '../../../../utils/detailCollectionUtils.js';
@@ -26,7 +24,7 @@ let filters = {
 const selectorMaterialTable = DATATABLE_SELECTORS.MATERIAL;
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 
-export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal, resource }) => {
+export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal, goodsReceipts }) => {
 
     let table;
     filters = await setupTableFilters({
@@ -36,7 +34,7 @@ export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal, resou
     table = createDataTable({
         options: {
             ajax: {
-                get: (params) => getAllGoodsReceipts({
+                get: (params) => goodsReceipts.getAll({
                     ...params,
                     ...filters.getValues()
                 })
@@ -78,8 +76,8 @@ export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal, resou
                     action: () => openGoodsReceiptModal({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
-                    filename: formatFileName(`reporte_compras_${ resource === INVENTORY_RESOURCES.CONSUMABLE ? 'consumibles' : 'materiales' }`),
-                    request: ({ monthlyReport = false, reportMonth = '' } = {}) => exportGoodsReceiptReport(buildTableExportParams(table, {
+                    filename: formatFileName(`reporte_compras_${ goodsReceipts.resource === INVENTORY_RESOURCES.CONSUMABLE ? 'consumibles' : 'materiales' }`),
+                    request: ({ monthlyReport = false, reportMonth = '' } = {}) => goodsReceipts.exportReport(buildTableExportParams(table, {
                         ...filters.getValues(),
                         monthlyReport,
                         reportMonth
@@ -92,7 +90,7 @@ export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal, resou
     $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function () {
         return runApiAction(async () => {
             const row = getResponsiveRowData(table, this);
-            const data = await getGoodsReceipt({ id: row.id });
+            const data = await goodsReceipts.get({ id: row.id });
             await openGoodsReceiptModal({
                 mode: data.status?.name === GOODS_RECEIPT_STATUS_LABELS.CANCELED
                     ? FORM_MODES.VIEW

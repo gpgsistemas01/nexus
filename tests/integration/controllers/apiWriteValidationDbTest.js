@@ -141,6 +141,33 @@ describe('identificadores de ruta resueltos por el servicio y errores de captura
     expect(await readState()).toEqual(initialState);
   });
 
+  it.each([
+    ['put', '/sales/clients', () => ({ ...editData, name: 123 }), 'name', 'NAME_INVALID_TYPE'],
+    ['put', '/sales/clients', () => ({ ...editData, isActive: [true] }), 'isActive', 'ACTIVE_INVALID_BOOLEAN'],
+    ['put', '/admin/persons', () => ({ ...personData, accesses: [null] }), 'accesses', 'PERSON_ACCESSES_INVALID_FORMAT'],
+    ['put', '/admin/persons', () => ({ ...personData, accesses: [{ ...personData.accesses[0], roleId: [relationId] }] }), 'accesses[0].roleId', 'PERSON_ACCESSES_INVALID_ROLE'],
+    ['patch', '/warehouse/materials', () => ({ ...stockData, newStock: [2] }), 'newStock', 'NEW_STOCK_INVALID_NUMBER'],
+    ['patch', '/warehouse/materials', () => ({ ...stockData, newStock: '1.001' }), 'newStock', 'NEW_STOCK_TOO_LONG'],
+    ['patch', '/warehouse/materials', () => ({ ...stockData, creationContext: 'goodsReceipt', newStock: 'valor-ignorado' }), 'newStock', 'NEW_STOCK_INVALID_NUMBER'],
+    ['patch', '/warehouse/consumables', () => ({ ...materialData, creationContext: 'goodsReceipt', maxUnitCost: 'valor-ignorado' }), 'maxUnitCost', 'MAX_UNIT_COST_INVALID_NUMBER'],
+    ['patch', '/warehouse/wastes', () => ({ ...editData, maxUnitCost: 10, minStock: '1.001' }), 'minStock', 'MIN_STOCK_TOO_LONG'],
+    ['put', '/sales/clients', () => ({ ...editData, expectedVersion: [0] }), 'expectedVersion', 'RECORD_VERSION_REQUIRED']
+  ])('%s %s rechaza tipos o precisión inválidos sin modificar datos (DP-VAL-004)', async (method, path, data, field, code) => {
+    const suffix = path === '/warehouse/materials' ? `/${parentId}/stock` : `/${parentId}`;
+    const response = await request(app)[method](`/api${path}${suffix}`).set('Cookie', cookie).send(data()).expect(400);
+    expect(response.body).toMatchObject({ code: 'VALIDATION_ERROR', errors: { [field]: { code } } });
+    expect(await readState()).toEqual(initialState);
+  });
+
+  it('rechaza una fecha imposible de recepción antes de resolver personas o proveedor (DP-VAL-004)', async () => {
+    const response = await request(app).post('/api/warehouse/goods-receipts/materials').set('Cookie', cookie).send({
+      supplierId: relationId, receivedById: relationId, isInvoiced: false,
+      receptionDate: '2026-02-30T12:00:00Z', details: [{ materialId: relationId, quantity: 1, costPerUnitType: 1 }]
+    }).expect(400);
+    expect(response.body).toMatchObject({ code: 'VALIDATION_ERROR', errors: { receptionDate: { code: 'RECEPTION_DATE_INVALID_FORMAT' } } });
+    expect(await readState()).toEqual(initialState);
+  });
+
   it('resuelve el catálogo permitido en el servicio y rechaza el resto sin escribir', async () => {
     const response = await request(app).put(`/api/admin/catalogs/users/${parentId}`).set('Cookie', cookie).send(editData).expect(404);
 

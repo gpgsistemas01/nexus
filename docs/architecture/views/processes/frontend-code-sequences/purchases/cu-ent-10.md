@@ -90,27 +90,32 @@ flowchart TB
         Request["createGoodsReceiptRequests.js"]
         FileMaterialGoodsReceiptService["materialGoodsReceiptService.js"]
     end
+    Application -->|import| FileResponseUtils
+    FileConsumableGoodsReceiptService -->|import| Request
+    FileConsumableGoodsReceipts -->|import| Application
+    FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileUtils
-    FileUtils -->|import| FileApiMessages
-    FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
-    FileConsumableGoodsReceipts -->|import| Application
-    FileGoodsReceipts -->|import| FileMaterialGoodsReceipts
-    FileGoodsReceipts -->|import| FileConsumableGoodsReceipts
-    FileGoodsReceipts -->|import| FileGoodsReceiptContext
-    FileMaterialGoodsReceipts -->|import| FileMaterialGoodsReceiptService
-    FileMaterialGoodsReceipts -->|import| Application
-    View -->|import| FileGoodsReceipts
-    View -->|import| FileValidators
-    Modal -->|import| FileGoodsReceipts
-    FileConsumableGoodsReceiptService -->|import| Request
-    FileMaterialGoodsReceiptService -->|import| Request
-    FormUtils -->|import| FileErrorHandler
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileGoodsReceiptContext -->|import| FileGoodsReceipts
+    FileGoodsReceipts -->|import| FileConsumableGoodsReceiptService
+    FileGoodsReceipts -->|import| FileConsumableGoodsReceipts
+    FileGoodsReceipts -->|import| FileMaterialGoodsReceiptService
+    FileGoodsReceipts -->|import| FileMaterialGoodsReceipts
+    FileMaterialGoodsReceiptService -->|import| Request
+    FileMaterialGoodsReceipts -->|import| Application
+    FileMaterialGoodsReceipts -->|import| FileMaterialGoodsReceiptService
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    Modal -->|import| FileErrorHandler
+    Modal -->|import| FileGoodsReceiptContext
     Transport -->|import| FileConsumableGoodsReceiptController
+    View -->|import| FileGoodsReceiptContext
+    View -->|import| FileValidators
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación

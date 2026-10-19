@@ -68,16 +68,17 @@ flowchart TB
         FileWastes["wastes.js"]
         Request["wasteService.js"]
     end
-    FileUtils -->|import| FileApiMessages
-    FileWastes -->|import| Request
-    FileWastes -->|import| Application
-    FormUtils -->|import| FileErrorHandler
+    Application -->|import| FileResponseUtils
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileUtils
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    FileWastes -->|import| Application
+    FileWastes -->|import| Request
     Transport -->|import| FileWasteController
 ```
 

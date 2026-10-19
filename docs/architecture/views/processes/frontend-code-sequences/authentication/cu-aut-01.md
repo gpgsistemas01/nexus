@@ -84,7 +84,8 @@ sequenceDiagram
     EJS->>Form: import './loginForm.js'
     Browser->>FormCore: captura y envía credenciales — submit
     FormCore->>Form: normalizeData({ formData })
-    Form-->>FormCore: normalizeData(): Object
+    Form-->>FormCore: normalizeData(): Object — nombre recortado, contraseña sin cambios
+    Note over Form: Login comprueba presencia, tipo y máximo, no aplica la política de creación
     FormCore->>Form: getErrors({ formData })
     Form->>FormUtils: validateFields(loginValidation, formData)
     FormUtils-->>Form: validateFields(): Object

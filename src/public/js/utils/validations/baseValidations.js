@@ -1,3 +1,5 @@
+import { ISO_DATE_TIME_PATTERN } from '../../constants/inputValidation.js';
+
 export const isEmptyOrNull = (value, fieldName) => {
     
     if (value === null || 
@@ -20,7 +22,7 @@ export const isString = (value, fieldName) => {
 
 export const isNumber = (value, fieldName) => {
     
-    if (typeof value === 'number' && !isNaN(value)) return null;
+    if (typeof value === 'number' && Number.isFinite(value)) return null;
 
     return `${ fieldName } no es un número válido`;
 };
@@ -41,7 +43,9 @@ export const isPositive = (value, fieldName) => {
 
 const isValidDateTimeParts = ({ year, month, day, hour, minute, second }) => {
 
-    const date = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+    const date = new Date(0);
+    date.setUTCFullYear(year, month - 1, day);
+    date.setUTCHours(hour, minute, second, 0);
 
     return date.getUTCFullYear() === year
         && date.getUTCMonth() === month - 1
@@ -53,13 +57,11 @@ const isValidDateTimeParts = ({ year, month, day, hour, minute, second }) => {
 
 const parseDateTimeParts = (value) => {
 
-    const match = String(value).match(
-        /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d{3})?)?(?:Z)?$/
-    );
+    const match = typeof value === 'string' ? value.match(ISO_DATE_TIME_PATTERN) : null;
 
     if (!match) return null;
 
-    const [, year, month, day, hour, minute, second = '0'] = match;
+    const [, year, month, day, hour = '0', minute = '0', second = '0'] = match;
 
     return {
         year: Number(year),
@@ -79,14 +81,14 @@ export const isDateTime = (value, fieldName) => {
 
     if (!parts) return `${ fieldName } no tiene un formato válido`;
 
-    if (!isValidDateTimeParts(parts)) return `${ fieldName } no es una fecha válida`;
+    if (!isValidDateTimeParts(parts) || Number.isNaN(new Date(value).getTime())) return `${ fieldName } no es una fecha válida`;
 
     return null;
 }
 
 export const isLengthInRangeMin = (value, min, fieldName) => {
 
-    const length = value.length;
+    const length = Array.from(value).length;
 
     if (length < min) return `${ fieldName } debe tener al menos ${ min } caracteres`;
 
@@ -95,7 +97,7 @@ export const isLengthInRangeMin = (value, min, fieldName) => {
 
 export const isLengthInRangeMax = (value, max, fieldName) => {
 
-    const length = value.length;
+    const length = Array.from(value).length;
 
     if (length > max) return `${ fieldName } no debe exceder los ${ max } caracteres`;
     

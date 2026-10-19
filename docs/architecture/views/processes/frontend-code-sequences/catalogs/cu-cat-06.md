@@ -91,28 +91,30 @@ flowchart TB
         FileClients["clients.js"]
         Request["clientService.js"]
     end
-    FileErrorHandler -->|import| FileApiMessages
-    FileErrorHandler -->|import| FileUtils
-    FileUtils -->|import| FileApiMessages
-    FileClients -->|import| Request
+    Application -->|import| FileResponseUtils
     FileClients -->|import| Application
-    View -->|import| FileClients
-    View -->|import| FileValidators
-    Modal -->|import| FileModalUI
+    FileClients -->|import| Request
     FileClientsPage -->|import| Origin
     FileClientsPage -->|import| View
-    FileGoodsIssueModal -->|import| FileModalUI
-    FileGoodsIssueModal -->|import| FileGoodsIssueContext
-    Origin -->|import| FileClients
-    Select -->|import| FileClients
-    FormUtils -->|import| FileErrorHandler
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileGoodsIssueModal -->|import| FileGoodsIssueContext
+    FileGoodsIssueModal -->|import| FileModalUI
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    Modal -->|import| FileModalUI
+    Origin -->|import| FileClients
+    Origin -->|import| Modal
+    Select -->|import| FileClients
+    Select -->|import| Modal
     Transport -->|import| FileClientController
+    View -->|import| FileClients
+    View -->|import| FileValidators
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación
@@ -203,7 +205,6 @@ sequenceDiagram
     participant Select@{ "type": "boundary" } as client.js
     participant Form@{ "type": "control" } as formUI.js
     participant View@{ "type": "boundary" } as clientForm.js
-    participant FormUtils@{ "type": "control" } as formUtils.js
     participant Application@{ "type": "control" } as createCrudApplication.js
 
     participant FileErrorHandler@{ "type": "control" } as errorHandler.js
@@ -211,21 +212,21 @@ sequenceDiagram
     participant FileSwalComponent@{ "type": "control" } as swalComponent.js
 
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update })
-        FormUtils->>Application: registerClient({ formData })
+        View->>Form: handleSubmit({ form, formData, create, update })
+        Form->>Application: registerClient({ formData })
         alt Alta resuelta
-            Application-->>FormUtils: registerClient(): Promise[{ message: string, data: Client }]
-            FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>View: handleSubmit(): Promise[Object] — entidad creada
+            Application-->>Form: registerClient(): Promise[{ message: string, data: Client }]
+            Form->>FileSwalComponent: notifications.showSuccess(response.message)
+            Note over Form: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+            Form-->>View: handleSubmit(): Promise[Object] — entidad creada
             opt form.onSave definido por el selector de salida
                 View->>Select: form.onSave(client)
                 Select->>Select: toggleClientOption({ selector: baseSelector,<br/>id: client.id, name: client.name })
                 Select-->>Browser: continuar en la salida sin abrir /clientes
     end
         else Alta rechazada
-            Application-->>FormUtils: registerClient(): throw { status: number, data: Object | null, message: string, raw: Error }
-            FormUtils-->>View: error propagado por handleSubmit()
+            Application-->>Form: registerClient(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Form-->>View: error propagado por handleSubmit()
             View-->>Form: error propagado por sendRequest()
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva los datos
     end

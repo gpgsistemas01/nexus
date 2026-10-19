@@ -1,3 +1,4 @@
+import { FORM_FIELD_LIMITS } from '../../public/js/constants/inputValidation.js';
 import {
     validateDate,
     validateProjectNumber,
@@ -12,5 +13,5 @@ export const issueHeaderValidation = [
     validateUUID('requesterId'),
     validateProjectNumber('projectNumber'),
     validateDate('requestDate'),
-    validateTextOptional({ fieldName: 'observations', maxLength: 500 })
+    validateTextOptional({ fieldName: 'observations', maxLength: FORM_FIELD_LIMITS.OBSERVATIONS })
 ];

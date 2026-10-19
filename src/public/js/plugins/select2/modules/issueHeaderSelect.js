@@ -6,7 +6,7 @@ import { setupClientSelect, toggleClientOption } from '../domains/client.js';
 import { initDepartmentSelect, toggleDepartmentOption } from '../domains/department.js';
 import { initPersonSelect, togglePersonOption } from '../domains/person.js';
 import { initMdbWrapperInput, updateMdbWrapperInput } from '../../mdb/baseInstance.js';
-import { toggleDisabledElement } from '../../../utils/formUtils.js';
+import { toggleDisabledElement } from '../../../ui/forms/formStateUI.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
 
@@ -31,20 +31,20 @@ export const createIssueHeaderSelects = ({ modalSelector, formSelector, selector
     const init = () => {
 
         [
-            [initDepartmentSelect, { 
-                modalSelector, 
-                baseSelector: scoped.department, 
-                allowCreate: false 
+            [initDepartmentSelect, {
+                modalSelector,
+                baseSelector: scoped.department,
+                allowCreate: false
             }],
-            [setupClientSelect, { 
-                modalSelector, 
+            [setupClientSelect, {
+                modalSelector,
                 clientSelector: selectors.client,
                 allowCreate: hasPermission(window.meta, UI_PERMISSIONS.CLIENTS_CREATE)
             }],
-            [initPersonSelect, { 
-                modalSelector, 
-                baseSelector: scoped.advisor, 
-                placeholder: 'Buscar asesor...', 
+            [initPersonSelect, {
+                modalSelector,
+                baseSelector: scoped.advisor,
+                placeholder: 'Buscar asesor...',
                 allowCreate: hasPermission(window.meta, UI_PERMISSIONS.PERSONS_WRITE),
                 data: params => {
 

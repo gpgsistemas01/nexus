@@ -1,6 +1,6 @@
 import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../../constants/selectors.js';
 import { useForm } from "../../../../ui/forms/formUI.js";
-import { correctGoodsReceiptDetail } from "../../../../application/warehouse/goodsReceipts/goodsReceipts.js";
+import { goodsReceiptContext } from '../goodsReceiptContext.js';
 import { initMdbModal } from "../../../../plugins/mdb/baseInstance.js";
 import { reloadMainTable } from '../../../../plugins/datatable/core/base/tableOperations.js';
 import { notifications } from "../../../../plugins/swal/swalComponent.js";
@@ -43,7 +43,7 @@ export const initGoodsReceiptCorrectionForm = () => {
                 return;
             }
 
-            const response = await correctGoodsReceiptDetail({
+            const response = await goodsReceiptContext.correctDetail({
                 id: form.dataset.id,
                 detailId: form.dataset.detailId,
                 formData: {

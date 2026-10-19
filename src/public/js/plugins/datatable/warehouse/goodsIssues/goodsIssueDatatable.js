@@ -1,17 +1,15 @@
-import { getAllGoodsIssues, getGoodsIssue } from "../../../../application/warehouse/goodsIssues/goodsIssues.js";
-import { exportGoodsIssueReport } from "../../../../application/warehouse/report.js";
+import { INVENTORY_RESOURCES } from '../../../../constants/inventory.js';
 import { createIssueDatatable } from '../../shared/issues/issueDatatable.js';
-import { goodsIssueContext } from '../../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
 import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
 
-export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
+export const createGoodsIssueDatatable = async ({ context, goodsIssues, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
 
     const canManage = hasPermission(context, UI_PERMISSIONS.GOODS_ISSUES_MANAGE);
     const canSupply = hasPermission(context, UI_PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE);
     await createIssueDatatable({
         context,
-        getIssues: getAllGoodsIssues,
-        getIssue: getGoodsIssue,
+        getIssues: goodsIssues.getAll,
+        getIssue: goodsIssues.get,
         actionContext: 'goodsIssue',
         permissions: { canManage, canSupply },
         tableOptions: {
@@ -20,8 +18,8 @@ export const createGoodsIssueDatatable = async ({ context, onCreate, onEdit, onE
         },
         buttons: canManage ? [{ text: 'Nueva salida', action: onCreate }] : [],
         exportOptions: {
-            report: exportGoodsIssueReport,
-            filename: `reporte_salidas_${ goodsIssueContext.resource === 'consumable' ? 'consumibles' : 'materiales' }`
+            report: goodsIssues.exportReport,
+            filename: `reporte_salidas_${ goodsIssues.resource === INVENTORY_RESOURCES.CONSUMABLE ? 'consumibles' : 'materiales' }`
         },
         actions: { onEdit, onEditDetails, onReturnDetails }
     });

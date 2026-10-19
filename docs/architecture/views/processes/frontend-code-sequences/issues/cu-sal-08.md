@@ -68,14 +68,16 @@ flowchart TB
         View["wasteIssuesPage.ejs"]
     end
     FileCreateIssueApplication -->|import| Application
-    FileWasteIssues -->|import| Request
-    FileWasteIssues -->|import| FileCreateIssueApplication
+    FileWasteIssueForm -->|import| FileWasteIssueModal
     FileWasteIssueForm -->|import| FileWasteIssues
     FileWasteIssueForm -->|import| IssueUI
-    FileWasteIssueForm -->|import| FileWasteIssueModal
     FileWasteIssueModal -->|import| IssueUI
-    Page -->|import| FileWasteIssueModal
+    FileWasteIssues -->|import| FileCreateIssueApplication
+    FileWasteIssues -->|import| Request
     Page -->|import| FileWasteIssueForm
+    Page -->|import| FileWasteIssueModal
+    Page -->|import| IssueUI
+    Page -->|import| Table
     Table -->|import| FileWasteIssues
     Transport -->|import| FileWasteIssueController
 ```

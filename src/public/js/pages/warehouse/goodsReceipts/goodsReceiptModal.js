@@ -1,16 +1,16 @@
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
-import { cancelGoodsReceiptDetail } from '../../../application/warehouse/goodsReceipts/goodsReceipts.js';
+import { goodsReceiptContext } from './goodsReceiptContext.js';
 import { handleApiError } from '../../../api/errorHandler.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
 import { details, initDetailsGoodsReceiptTable } from '../../../plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js';
 import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from '../../../plugins/select2/modules/goodsReceiptSelect.js';
-import { setFormDisabled } from '../../../ui/forms/formStateUI.js';
+import { setFormDisabled, toggleContainerElements, toggleDisabledElement } from '../../../ui/forms/formStateUI.js';
 import { toggleDetailFormActions } from '../../../ui/forms/detailFormUI.js';
 import { setTotals, updateTotals } from '../../../ui/forms/totalsSummaryUI.js';
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { on } from '../../../utils/domUtils.js';
 import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
-import { toggleContainerElements, toggleDisabledElement } from '../../../utils/formUtils.js';
+
 import { buildModalTitle, openModal } from '../../../ui/modalUI.js';
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from '../../../constants/selectors.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
@@ -68,7 +68,7 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
     details.length = 0;
 
     initDetailsGoodsReceiptTable(mode);
-    initGoodsReceiptFormSelect2();
+    initGoodsReceiptFormSelect2({ resource: goodsReceiptContext.resource });
     setGoodsReceiptFormSelectOptions(data);
 
     if (mode === FORM_MODES.CREATE) {
@@ -163,7 +163,7 @@ on(DOM_EVENT_NAMES.CLICK, '#materialTable .cancel-receipt-detail-btn', async (ev
     if (!confirmation.isConfirmed) return;
 
     try {
-        const response = await cancelGoodsReceiptDetail({
+        const response = await goodsReceiptContext.cancelDetail({
             id: currentGoodsReceipt.id,
             detailId: detail.id
         });

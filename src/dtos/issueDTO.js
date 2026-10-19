@@ -4,7 +4,7 @@ export const createIssueHeaderDto = (body = {}) => ({
     clientId: body.clientId.trim(),
     departmentId: body.departmentId.trim(),
     projectNumber: body.projectNumber.trim(),
-    requestDate: new Date(body.requestDate),
+    requestDate: body.requestDate,
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') && {
         observations: typeof body.observations === 'string'
             ? body.observations.trim()
@@ -17,6 +17,6 @@ export const createIssueDetailsDto = (
     { itemIdField, mapAdditionalFields = () => ({}) }
 ) => details.map(detail => ({
     [itemIdField]: detail[itemIdField].trim(),
-    quantity: Number(detail.quantity),
+    quantity: detail.quantity,
     ...mapAdditionalFields(detail)
 }));

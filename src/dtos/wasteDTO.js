@@ -1,14 +1,13 @@
 import { createVersionDto } from './versionDTO.js';
-import { toNumber } from '../utils/formattersUtils.js';
 import { WASTE_ROLL_WEIGHT_FIELDS } from '../public/js/constants/inventory.js';
 
 const buildWasteRegistrationDataDto = (body = {}) => ({
     materialId: body.materialId,
     supplierId: body.supplierId,
-    base: toNumber(body.base),
-    height: toNumber(body.height),
-    ...Object.fromEntries(WASTE_ROLL_WEIGHT_FIELDS.filter(field => Object.prototype.hasOwnProperty.call(body, field))
-        .map(field => [field, toNumber(body[field])]))
+    base: body.base ?? null,
+    height: body.height ?? null,
+    ...Object.fromEntries(WASTE_ROLL_WEIGHT_FIELDS.filter(field => body[field] !== undefined)
+        .map(field => [field, body[field]]))
 });
 
 const buildWasteIdentityDto = (body = {}) => ({
@@ -16,9 +15,9 @@ const buildWasteIdentityDto = (body = {}) => ({
 });
 
 const buildWasteSecondaryDataDto = (body = {}) => ({
-    ...Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null ? { minStock: Number(body.minStock) } : {},
-    ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {}),
-    ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: toNumber(body.maxUnitCost) } : {})
+    ...body.minStock !== undefined && body.minStock !== null ? { minStock: body.minStock } : {},
+    ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: body.isActive } : {}),
+    ...(Object.prototype.hasOwnProperty.call(body, 'maxUnitCost') ? { maxUnitCost: body.maxUnitCost } : {})
 });
 
 const buildWasteObservationsDto = (body = {}) => (
@@ -31,7 +30,7 @@ export const createWasteDtoForRegister = (body = {}) => ({
     ...buildWasteRegistrationDataDto(body),
     ...buildWasteIdentityDto(body),
     ...buildWasteSecondaryDataDto(body),
-    initialQuantity: Number(body.initialQuantity),
+    initialQuantity: body.initialQuantity,
     ...buildWasteObservationsDto(body)
 });
 
@@ -43,12 +42,12 @@ export const createWasteDtoForEdit = (body = {}) => ({
 
 export const createWasteDtoForStockAdjustment = (body = {}) => ({
     ...createVersionDto(body),
-    newStock: Number(body.newStock),
+    newStock: body.newStock,
     ...buildWasteObservationsDto(body),
     ...(Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {})
 });
 
 export const createWasteDtoForStockAddition = (body = {}) => ({
-    quantity: Number(body.quantity),
+    quantity: body.quantity,
     ...buildWasteObservationsDto(body)
 });

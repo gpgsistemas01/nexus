@@ -63,10 +63,11 @@ flowchart TB
         FileConsumableDatatable["consumableDatatable.js"]
         FileResponseUtils["responseUtils.js"]
     end
-    FileConsumables -->|import| Request
-    FileConsumables -->|import| Application
+    Application -->|import| FileResponseUtils
     FileConsumableDatatable -->|import| FileConsumables
     FileConsumableDatatable -->|import| View
+    FileConsumables -->|import| Application
+    FileConsumables -->|import| Request
     FileResponseUtils -->|import| FileApiMessages
     Transport -->|import| FileConsumableController
 ```

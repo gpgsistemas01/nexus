@@ -23,11 +23,10 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Transport` | control | [`consumableGoodsReceiptReportApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptReportApiRoute.js) |
 | `FileSwalComponent` | control | [`swalComponent.js`](../../../../../../src/public/js/plugins/swal/swalComponent.js) |
 | `FileConsumableGoodsReceiptReportController` | control | [`consumableGoodsReceiptReportController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptReportController.js) |
-| `FileReport` | control | [`report.js`](../../../../../../src/public/js/application/warehouse/report.js) |
+| `FileReport` | control | [`goodsReceipts.js`](../../../../../../src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js) |
 | `FileConsumableGoodsReceiptService` | control | [`consumableGoodsReceiptService.js`](../../../../../../src/public/js/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js) |
 | `FileGoodsReceiptService` | control | [`goodsReceiptService.js`](../../../../../../src/public/js/services/warehouse/goodsReceipts/goodsReceiptService.js) |
 | `FileMaterialGoodsReceiptService` | control | [`materialGoodsReceiptService.js`](../../../../../../src/public/js/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) |
-| `FileReportService` | control | [`reportService.js`](../../../../../../src/public/js/services/warehouse/reportService.js) |
 | `FileUtils` | control | [`utils.js`](../../../../../../src/public/js/api/utils.js) |
 | `FileGoodsReceiptContext` | control | [`goodsReceiptContext.js`](../../../../../../src/public/js/pages/warehouse/goodsReceipts/goodsReceiptContext.js) |
 | `TimeZone` | control | [`timeZone.js`](../../../../../../src/public/js/utils/timeZone.js) |
@@ -35,9 +34,9 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 
 ### Configuración y construcción
 
-Estos módulos seleccionan/configuran y exportan la función de aplicación. Su cuerpo se ejecuta en la fábrica de la línea `Application`, sin una llamada intermedia entre reexports: [`report.js`](../../../../../../src/public/js/application/warehouse/report.js).
+Estos módulos seleccionan/configuran y exportan la función de aplicación. Su cuerpo se ejecuta en la fábrica de la línea `Application`, sin una llamada intermedia entre reexports: [`goodsReceipts.js`](../../../../../../src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js).
 
-Estos módulos configuran o reexportan el request. La función que llama a `apiRequest` está definida en el archivo de la línea `Request`: [`reportService.js`](../../../../../../src/public/js/services/warehouse/reportService.js), [`consumableGoodsReceiptService.js`](../../../../../../src/public/js/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js).
+Estos módulos configuran o reexportan el request. La función que llama a `apiRequest` está definida en el archivo de la línea `Request`: [`consumableGoodsReceiptService.js`](../../../../../../src/public/js/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js).
 
 El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-ENT-12`](../../backend-code-sequences/purchases/cu-ent-12.md#cu-ent-12): [`consumableGoodsReceiptReportController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptReportController.js).
 
@@ -56,28 +55,27 @@ flowchart TB
     end
     subgraph Component1["Aplicación y requests"]
         Application["createReportApplication.js"]
-        FileReport["report.js"]
+        FileReport["goodsReceipts.js"]
         HTTP["axiosInstanceApi.js"]
         FileConsumableGoodsReceiptService["consumableGoodsReceiptService.js"]
         Request["createGoodsReceiptRequests.js"]
         FileGoodsReceiptService["goodsReceiptService.js"]
         FileMaterialGoodsReceiptService["materialGoodsReceiptService.js"]
-        FileReportService["reportService.js"]
     end
     subgraph Component2["Interfaz"]
         FileGoodsReceiptContext["goodsReceiptContext.js"]
         View["goodsReceiptDatatable.js"]
     end
-    FileReport -->|import| FileReportService
-    FileReport -->|import| Application
-    View -->|import| FileReport
     FileConsumableGoodsReceiptService -->|import| Request
-    FileGoodsReceiptService -->|import| FileMaterialGoodsReceiptService
     FileGoodsReceiptService -->|import| FileConsumableGoodsReceiptService
-    FileGoodsReceiptService -->|import| FileGoodsReceiptContext
+    FileGoodsReceiptService -->|import| FileMaterialGoodsReceiptService
+    FileGoodsReceiptService -->|import| HTTP
     FileMaterialGoodsReceiptService -->|import| Request
-    FileReportService -->|import| HTTP
-    FileReportService -->|reexport| FileGoodsReceiptService
+    FileReport -->|import| Application
+    FileReport -->|import| FileMaterialGoodsReceiptService
+    FileReport -->|import| FileConsumableGoodsReceiptService
+    FileGoodsReceiptContext -->|import| FileReport
+    Request -->|import| HTTP
     Transport -->|import| FileConsumableGoodsReceiptReportController
 ```
 
@@ -88,7 +86,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
-| `exportGoodsReceiptReport` | `FileReport` | `Application` · `createReportApplication(...)` |
+| `exportReport` | `FileReport` | `Application` · `createReportApplication(...)` |
 | `exportConsumableGoodsReceiptReportRequest` | `FileConsumableGoodsReceiptService` | `Request` · `createGoodsReceiptRequests(...)` |
 
 ## Coordinación de la interfaz
@@ -120,9 +118,9 @@ sequenceDiagram
         Export->>View: request({ monthlyReport, reportMonth, inventoryScope }) — callback del archivo View
         View->>Export: buildTableExportParams(table, paramsDelRecurso)
         Export-->>View: buildTableExportParams(): Object — búsqueda, orden y filtros
-        View->>Application: exportGoodsReceiptReport(params)
+        View->>Application: exportReport(params)
         alt Reporte obtenido
-            Application-->>View: exportGoodsReceiptReport(): Promise[Blob]
+            Application-->>View: exportReport(): Promise[Blob]
             View-->>Export: request(): Promise[Blob]
             Export->>Browser: URL.createObjectURL(blob)
             Export->>Browser: document.createElement(a)
@@ -154,7 +152,7 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as consumableGoodsReceiptReportApiRoute.js
     participant FileUtils@{ "type": "control" } as utils.js
 
-    View->>Application: exportGoodsReceiptReport(params)
+    View->>Application: exportReport(params)
     Application->>Request: exportConsumableGoodsReceiptReportRequest(params)
     Request->>HTTP: apiRequest({ method: 'get', url, params, responseType: 'blob' })
     HTTP->>Transport: GET /api/warehouse/reports/goods-receipts/consumables/excel
@@ -162,7 +160,7 @@ sequenceDiagram
         Transport-->>HTTP: HTTP 200 archivo XLSX
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse] — data Blob
         Request-->>Application: exportConsumableGoodsReceiptReportRequest(): Promise[AxiosResponse]
-        Application-->>View: exportGoodsReceiptReport(): Promise[Blob] — response.data
+        Application-->>View: exportReport(): Promise[Blob] — response.data
     else Error HTTP o de reporte
         Transport-->>HTTP: HTTP error
         opt No se inicia renovación: status distinto de 401 o request._retry

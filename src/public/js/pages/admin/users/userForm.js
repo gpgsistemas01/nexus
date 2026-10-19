@@ -1,8 +1,9 @@
 import { editUser, editUserPassword, registerUser } from '../../../application/admin/users/users.js';
-import { useForm } from '../../../ui/forms/formUI.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { handleSubmit, validateFields } from '../../../utils/formUtils.js';
+import { validateFields } from '../../../utils/formUtils.js';
+
 import { userEditValidation, userPasswordValidation, userValidation } from '../../../utils/validations/validators.js';
 
 const formId = FORM_SELECTORS.USER;

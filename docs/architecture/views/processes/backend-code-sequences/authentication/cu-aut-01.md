@@ -67,6 +67,7 @@ sequenceDiagram
 
     Browser->>Router: POST /api/auth/login { name, password }
     Router->>ValidationRules: loginValidation[] — cadena ejecutada por Express
+    Note over ValidationRules: Presencia, texto y máximo de 50, recortar sólo name, conservar password
     Router->>Validator: validate(req, res, next)
     alt loginValidation rechaza name/password
         Validator-->>Browser: HTTP 400 error { errors }

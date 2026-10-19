@@ -64,16 +64,17 @@ flowchart TB
         FileGoodsReceiptContext["goodsReceiptContext.js"]
         View["goodsReceiptDatatable.js"]
     end
-    FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
-    FileConsumableGoodsReceipts -->|import| Application
-    FileGoodsReceipts -->|import| FileMaterialGoodsReceipts
-    FileGoodsReceipts -->|import| FileConsumableGoodsReceipts
-    FileGoodsReceipts -->|import| FileGoodsReceiptContext
-    FileMaterialGoodsReceipts -->|import| FileMaterialGoodsReceiptService
-    FileMaterialGoodsReceipts -->|import| Application
-    View -->|import| FileGoodsReceipts
     FileConsumableGoodsReceiptService -->|import| Request
+    FileConsumableGoodsReceipts -->|import| Application
+    FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
+    FileGoodsReceiptContext -->|import| FileGoodsReceipts
+    FileGoodsReceipts -->|import| FileConsumableGoodsReceiptService
+    FileGoodsReceipts -->|import| FileConsumableGoodsReceipts
+    FileGoodsReceipts -->|import| FileMaterialGoodsReceiptService
+    FileGoodsReceipts -->|import| FileMaterialGoodsReceipts
     FileMaterialGoodsReceiptService -->|import| Request
+    FileMaterialGoodsReceipts -->|import| Application
+    FileMaterialGoodsReceipts -->|import| FileMaterialGoodsReceiptService
     Transport -->|import| FileConsumableGoodsReceiptController
 ```
 

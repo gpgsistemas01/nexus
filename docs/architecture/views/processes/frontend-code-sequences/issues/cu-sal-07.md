@@ -23,11 +23,10 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Transport` | control | [`materialGoodsIssueReportApiRoute.js`](../../../../../../src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueReportApiRoute.js) |
 | `FileSwalComponent` | control | [`swalComponent.js`](../../../../../../src/public/js/plugins/swal/swalComponent.js) |
 | `FileMaterialGoodsIssueReportController` | control | [`materialGoodsIssueReportController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueReportController.js) |
-| `FileReport` | control | [`report.js`](../../../../../../src/public/js/application/warehouse/report.js) |
+| `FileReport` | control | [`goodsIssues.js`](../../../../../../src/public/js/application/warehouse/goodsIssues/goodsIssues.js) |
 | `FileConsumableGoodsIssueService` | control | [`consumableGoodsIssueService.js`](../../../../../../src/public/js/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js) |
 | `FileGoodsIssueService` | control | [`goodsIssueService.js`](../../../../../../src/public/js/services/warehouse/goodsIssues/goodsIssueService.js) |
 | `FileMaterialGoodsIssueService` | control | [`materialGoodsIssueService.js`](../../../../../../src/public/js/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js) |
-| `FileReportService` | control | [`reportService.js`](../../../../../../src/public/js/services/warehouse/reportService.js) |
 | `FileUtils` | control | [`utils.js`](../../../../../../src/public/js/api/utils.js) |
 | `FileGoodsIssueContext` | control | [`goodsIssueContext.js`](../../../../../../src/public/js/pages/warehouse/goodsIssues/goodsIssueContext.js) |
 | `TimeZone` | control | [`timeZone.js`](../../../../../../src/public/js/utils/timeZone.js) |
@@ -36,9 +35,9 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 
 ### Configuración y construcción
 
-Estos módulos seleccionan/configuran y exportan la función de aplicación. Su cuerpo se ejecuta en la fábrica de la línea `Application`, sin una llamada intermedia entre reexports: [`report.js`](../../../../../../src/public/js/application/warehouse/report.js).
+Estos módulos seleccionan/configuran y exportan la función de aplicación. Su cuerpo se ejecuta en la fábrica de la línea `Application`, sin una llamada intermedia entre reexports: [`goodsIssues.js`](../../../../../../src/public/js/application/warehouse/goodsIssues/goodsIssues.js).
 
-Estos módulos configuran o reexportan el request. La función que llama a `apiRequest` está definida en el archivo de la línea `Request`: [`reportService.js`](../../../../../../src/public/js/services/warehouse/reportService.js), [`materialGoodsIssueService.js`](../../../../../../src/public/js/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js).
+Estos módulos configuran o reexportan el request. La función que llama a `apiRequest` está definida en el archivo de la línea `Request`: [`materialGoodsIssueService.js`](../../../../../../src/public/js/services/warehouse/goodsIssues/materials/materialGoodsIssueService.js).
 
 El endpoint queda representado por su router. El controller asociado se desarrolla en la [secuencia backend `CU-SAL-07`](../../backend-code-sequences/issues/cu-sal-07.md#cu-sal-07): [`materialGoodsIssueReportController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueReportController.js).
 
@@ -57,31 +56,29 @@ flowchart TB
     end
     subgraph Component1["Aplicación y requests"]
         Application["createReportApplication.js"]
-        FileReport["report.js"]
+        FileReport["goodsIssues.js"]
         HTTP["axiosInstanceApi.js"]
         FileConsumableGoodsIssueService["consumableGoodsIssueService.js"]
         Request["createGoodsIssueRequests.js"]
         FileGoodsIssueService["goodsIssueService.js"]
         FileMaterialGoodsIssueService["materialGoodsIssueService.js"]
-        FileReportService["reportService.js"]
     end
     subgraph Component2["Interfaz"]
         FileGoodsIssueContext["goodsIssueContext.js"]
         View["issueDatatable.js"]
         FileGoodsIssueDatatable["goodsIssueDatatable.js"]
     end
-    FileReport -->|import| FileReportService
-    FileReport -->|import| Application
-    FileGoodsIssueDatatable -->|import| FileReport
-    FileGoodsIssueDatatable -->|import| View
-    FileGoodsIssueDatatable -->|import| FileGoodsIssueContext
     FileConsumableGoodsIssueService -->|import| Request
-    FileGoodsIssueService -->|import| FileMaterialGoodsIssueService
+    FileGoodsIssueDatatable -->|import| View
     FileGoodsIssueService -->|import| FileConsumableGoodsIssueService
-    FileGoodsIssueService -->|import| FileGoodsIssueContext
+    FileGoodsIssueService -->|import| FileMaterialGoodsIssueService
+    FileGoodsIssueService -->|import| HTTP
     FileMaterialGoodsIssueService -->|import| Request
-    FileReportService -->|import| HTTP
-    FileReportService -->|reexport| FileGoodsIssueService
+    FileReport -->|import| Application
+    FileReport -->|import| FileMaterialGoodsIssueService
+    FileReport -->|import| FileConsumableGoodsIssueService
+    FileGoodsIssueContext -->|import| FileReport
+    Request -->|import| HTTP
     Transport -->|import| FileMaterialGoodsIssueReportController
 ```
 
@@ -92,7 +89,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 
 | Nombre público | Archivo configurador (alias) | Archivo que construye el cuerpo (alias) |
 | --- | --- | --- |
-| `exportGoodsIssueReport` | `FileReport` | `Application` · `createReportApplication(...)` |
+| `exportReport` | `FileReport` | `Application` · `createReportApplication(...)` |
 | `exportMaterialGoodsIssueReportRequest` | `FileMaterialGoodsIssueService` | `Request` · `createGoodsIssueRequests(...)` |
 
 ## Coordinación de la interfaz
@@ -124,9 +121,9 @@ sequenceDiagram
         Export->>View: request({ monthlyReport, reportMonth, inventoryScope }) — callback del archivo View
         View->>Export: buildTableExportParams(table, paramsDelRecurso)
         Export-->>View: buildTableExportParams(): Object — búsqueda, orden y filtros
-        View->>Application: exportGoodsIssueReport(params)
+        View->>Application: exportReport(params)
         alt Reporte obtenido
-            Application-->>View: exportGoodsIssueReport(): Promise[Blob]
+            Application-->>View: exportReport(): Promise[Blob]
             View-->>Export: request(): Promise[Blob]
             Export->>Browser: URL.createObjectURL(blob)
             Export->>Browser: document.createElement(a)
@@ -158,7 +155,7 @@ sequenceDiagram
     participant Transport@{ "type": "control" } as materialGoodsIssueReportApiRoute.js
     participant FileUtils@{ "type": "control" } as utils.js
 
-    View->>Application: exportGoodsIssueReport(params)
+    View->>Application: exportReport(params)
     Application->>Request: exportMaterialGoodsIssueReportRequest(params)
     Request->>HTTP: apiRequest({ method: 'get', url, params, responseType: 'blob' })
     HTTP->>Transport: GET /api/warehouse/reports/goods-issues/materials/excel
@@ -166,7 +163,7 @@ sequenceDiagram
         Transport-->>HTTP: HTTP 200 archivo XLSX
         HTTP-->>Request: apiRequest(): Promise[AxiosResponse] — data Blob
         Request-->>Application: exportMaterialGoodsIssueReportRequest(): Promise[AxiosResponse]
-        Application-->>View: exportGoodsIssueReport(): Promise[Blob] — response.data
+        Application-->>View: exportReport(): Promise[Blob] — response.data
     else Error HTTP o de reporte
         Transport-->>HTTP: HTTP error
         opt No se inicia renovación: status distinto de 401 o request._retry

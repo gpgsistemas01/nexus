@@ -13,7 +13,8 @@ let previousAccessSecret;
 let previousRefreshSecret;
 const suffix = randomUUID().slice(0, 8);
 const name = `itlogin${suffix}`;
-const password = 'AccessTest1';
+// Cuenta histórica: el acceso compara el valor completo, sin imponer la política de altas.
+const password = ' legado ';
 
 describe('captura de acceso separada del rechazo de credenciales', () => {
   beforeAll(async () => {
@@ -58,9 +59,11 @@ describe('captura de acceso separada del rechazo de credenciales', () => {
 
   it('el servicio responde el mismo 401 para usuario inexistente y contraseña incorrecta', async () => {
     const unknown = await request(app).post('/api/auth/login').send({ name: `missing${suffix}`, password }).expect(401);
-    const wrong = await request(app).post('/api/auth/login').send({ name, password: 'WrongPass1' }).expect(401);
+    const wrong = await request(app).post('/api/auth/login').send({ name, password: 'incorrecta' }).expect(401);
+    const trimmed = await request(app).post('/api/auth/login').send({ name, password: password.trim() }).expect(401);
 
     expect(unknown.body).toEqual(wrong.body);
+    expect(trimmed.body).toEqual(wrong.body);
     expect(wrong.body).toMatchObject({ code: 'LOGIN_ERROR', message: 'Usuario o contraseña incorrectos.' });
     expect(wrong.body).not.toHaveProperty('errors');
     expect(wrong.headers['set-cookie']).toBeUndefined();
@@ -68,7 +71,7 @@ describe('captura de acceso separada del rechazo de credenciales', () => {
     expect(await prisma.user.findUnique({ where: { id: user.id } })).toEqual(user);
   });
 
-  it('conserva el acceso válido y sus cookies sin modificar la cuenta', async () => {
+  it('acepta credenciales históricas y conserva la contraseña exacta, las cookies y la cuenta', async () => {
     const response = await request(app).post('/api/auth/login').send({ name, password }).expect(200);
 
     expect(response.body).toMatchObject({ code: 'SUCCESS_LOGIN' });

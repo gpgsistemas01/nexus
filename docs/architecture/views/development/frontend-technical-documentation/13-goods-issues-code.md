@@ -13,7 +13,6 @@ flowchart TB
     L["UI de otro recurso<br/>clientForm.js"]
     U["Composición compartida<br/>createIssueApplication.js<br/>renderMaterialDatatable.js<br/>y colaboradores"]
     H["axiosInstanceApi.js<br/>request / apiRequest"]
-    A --> P
     A --> R
     A --> U
     P --> A
@@ -21,9 +20,6 @@ flowchart TB
     P --> T
     P --> U
     R --> H
-    R --> P
-    T --> A
-    T --> P
     T --> U
 ```
 
@@ -44,7 +40,7 @@ flowchart TB
 
 | Capacidad | Composición de pantalla | Application y transporte | Contrato y variantes |
 | --- | --- | --- | --- |
-| Salidas de materiales y consumibles | `goodsIssuesPage.ejs`, página, modal y formulario coordinan encabezado y detalles; `returns/goodsIssueReturn.js` gestiona devoluciones. | Los módulos `goodsIssues/materials` y `goodsIssues/consumables` componen `createIssueApplication` sobre sus solicitudes específicas; `goodsIssues.js` selecciona referencias para la UI compartida. | Lista, alta, edición, encabezado, surtimiento y devolución bajo `/api/warehouse/goods-issues/materials` o `/api/warehouse/goods-issues/consumables`. |
+| Salidas de materiales y consumibles | `goodsIssuesPage.ejs`, página, modal y formulario coordinan encabezado y detalles; `returns/goodsIssueReturn.js` gestiona devoluciones. | Los módulos `goodsIssues/materials` y `goodsIssues/consumables` componen `createIssueApplication` sobre sus solicitudes específicas; `createGoodsIssueApplication({ resource })` selecciona las referencias una vez para la UI compartida. | Lista, alta, edición, encabezado, surtimiento y devolución bajo `/api/warehouse/goods-issues/materials` o `/api/warehouse/goods-issues/consumables`. |
 
 
 La application exporta operaciones con vocabulario del recurso; la página/formulario
@@ -54,7 +50,7 @@ se consultan en el [contrato de formularios](01-catalog-complete-of-records-fron
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
 | --- | --- |
 | `public/js/application/warehouse/`<br/>`goodsIssues/consumables/`<br/>`consumableGoodsIssues.js` | `getAllConsumableGoodsIssues`<br/>`registerConsumableGoodsIssue`<br/>`editConsumableGoodsIssue`<br/>`editConsumableGoodsIssueHeader`<br/>`editConsumableGoodsIssueDetails`<br/>`returnConsumableGoodsIssueDetail` |
-| `public/js/application/warehouse/`<br/>`goodsIssues/goodsIssues.js` | `getAllGoodsIssues`<br/>`registerGoodsIssue`<br/>`editGoodsIssue`<br/>`editGoodsIssueHeader`<br/>`editGoodsIssueDetails`<br/>`returnGoodsIssueDetail` |
+| `public/js/application/warehouse/`<br/>`goodsIssues/goodsIssues.js` | `createGoodsIssueApplication({ resource })` → objeto con `getAll · get · register · edit · editHeader · editDetails · returnDetail · exportReport` |
 | `public/js/application/warehouse/`<br/>`goodsIssues/materials/`<br/>`materialGoodsIssues.js` | `getAllMaterialGoodsIssues`<br/>`registerMaterialGoodsIssue`<br/>`editMaterialGoodsIssue`<br/>`editMaterialGoodsIssueHeader`<br/>`editMaterialGoodsIssueDetails`<br/>`returnMaterialGoodsIssueDetail` |
 
 ### Adaptadores de transporte
@@ -81,3 +77,4 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/frontend-code-sequences/index.md).
 
+`goodsIssueContext.js` lee la metadata de la página y compone `createGoodsIssueApplication({ resource })` una vez. La página entrega el objeto configurado a la tabla; el modal pasa `resource` al inicializador de Select2. Application y services no importan páginas ni consultan el DOM. `get` conserva la lectura por id y `exportReport` fija el reporte de la misma variante, sin reexports de transporte a través del módulo general de reportes.

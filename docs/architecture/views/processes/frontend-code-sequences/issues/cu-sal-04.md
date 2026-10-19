@@ -93,32 +93,34 @@ flowchart TB
         Request["createGoodsIssueRequests.js"]
         FileMaterialGoodsIssueService["materialGoodsIssueService.js"]
     end
-    FileErrorHandler -->|import| FileApiMessages
-    FileErrorHandler -->|import| FileUtils
-    FileErrorHandler -->|import| FileSwalComponent
-    FileUtils -->|import| FileApiMessages
+    Application -->|import| FileResponseUtils
+    FileConsumableGoodsIssueService -->|import| Request
     FileConsumableGoodsIssues -->|import| FileConsumableGoodsIssueService
     FileConsumableGoodsIssues -->|import| FileCreateIssueApplication
-    FileGoodsIssues -->|import| FileMaterialGoodsIssues
-    FileGoodsIssues -->|import| FileConsumableGoodsIssues
-    FileGoodsIssues -->|import| FileGoodsIssueContext
-    FileMaterialGoodsIssues -->|import| FileMaterialGoodsIssueService
-    FileMaterialGoodsIssues -->|import| FileCreateIssueApplication
     FileCreateIssueApplication -->|import| Application
-    View -->|import| FileGoodsIssues
-    View -->|import| FileValidators
-    FileConsumableGoodsIssueService -->|import| Request
-    FileMaterialGoodsIssueService -->|import| Request
-    IssueUI -->|import| FileModalUI
-    FormUtils -->|import| FileErrorHandler
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileSwalComponent
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileSwalComponent
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileGoodsIssueContext -->|import| FileGoodsIssues
+    FileGoodsIssues -->|import| FileConsumableGoodsIssueService
+    FileGoodsIssues -->|import| FileConsumableGoodsIssues
+    FileGoodsIssues -->|import| FileMaterialGoodsIssueService
+    FileGoodsIssues -->|import| FileMaterialGoodsIssues
+    FileMaterialGoodsIssueService -->|import| Request
+    FileMaterialGoodsIssues -->|import| FileCreateIssueApplication
+    FileMaterialGoodsIssues -->|import| FileMaterialGoodsIssueService
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    IssueUI -->|import| FileModalUI
     Transport -->|import| FileMaterialGoodsIssueController
+    View -->|import| FileGoodsIssueContext
+    View -->|import| FileValidators
+    View -->|import| FormUtils
+    View -->|import| IssueUI
 ```
 
 ## Construcción de funciones para esta operación
@@ -174,7 +176,7 @@ sequenceDiagram
     end
         Note over Form: dataset.submitting = 'true', botón submit deshabilitado
         Form->>IssueUI: sendRequest({ form, formData }) — callback configurado
-        IssueUI->>FormUtils: handleSubmit({ form, formData, create, update: editMaterialGoodsIssue })
+        IssueUI->>Form: handleSubmit({ form, formData, create, update: editMaterialGoodsIssue })
         FormUtils->>Application: editMaterialGoodsIssue({ id, formData })
         alt Respuesta exitosa
             Application-->>FormUtils: editMaterialGoodsIssue(): Promise[{ message }]

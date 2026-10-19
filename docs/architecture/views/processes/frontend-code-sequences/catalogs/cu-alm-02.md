@@ -76,17 +76,16 @@ flowchart TB
     end
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileUtils
-    FileUtils -->|import| FileApiMessages
-    View -->|import| FileValidators
-    Modal -->|import| FileModalUI
-    FormUtils -->|import| FileErrorHandler
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    Modal -->|import| FileModalUI
     Transport -->|import| FileMaterialController
+    View -->|import| FileValidators
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación
@@ -159,7 +158,6 @@ sequenceDiagram
     participant Browser as Navegador
     participant Form@{ "type": "control" } as formUI.js
     participant View@{ "type": "boundary" } as materialForm.js
-    participant FormUtils@{ "type": "control" } as formUtils.js
     participant Application@{ "type": "control" } as createCrudApplication.js
 
         alt creationContext es goodsReceipt
@@ -168,27 +166,27 @@ sequenceDiagram
     participant FileSwalComponent@{ "type": "control" } as swalComponent.js
 
             Form->>View: sendRequest({ form, formData }) — callback configurado
-            View->>FormUtils: handleSubmit({ form, formData, create, update })
-            FormUtils->>View: create({ formData }) — callback definido en materialForm.js
+            View->>Form: handleSubmit({ form, formData, create, update })
+            Form->>View: create({ formData }) — callback definido en materialForm.js
             View->>Application: registerMaterial({ formData, creationContext: 'goodsReceipt' })
         else Alta directa
             Form->>View: sendRequest({ form, formData }) — callback configurado
-            View->>FormUtils: handleSubmit({ form, formData, create, update })
-            FormUtils->>View: create({ formData }) — callback definido en materialForm.js
+            View->>Form: handleSubmit({ form, formData, create, update })
+            Form->>View: create({ formData }) — callback definido en materialForm.js
             View->>Application: registerMaterial({ formData, creationContext: null })
     end
         activate Application
         alt HTTP 200
             Application-->>View: registerMaterial(): Promise[{ message: string, data: SupplierMaterial }]
-            View-->>FormUtils: create(): Promise[{ message: string, data: SupplierMaterial }]
-            FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
+            View-->>Form: create(): Promise[{ message: string, data: SupplierMaterial }]
+            Form->>FileSwalComponent: notifications.showSuccess(response.message)
+            Note over Form: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+            Form-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
             View-->>Browser: onSave(supplierMaterial) y cierre del modal
         else HTTP 4xx/5xx
             Application-->>View: registerMaterial(): throw { status: number, data: Object | null, message: string, raw: Error }
-            View-->>FormUtils: create(): throw { status: number, data: Object | null, message: string, raw: Error }
-            FormUtils-->>View: error propagado por handleSubmit()
+            View-->>Form: create(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Form-->>View: error propagado por handleSubmit()
             View-->>Form: error propagado por sendRequest()
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva los datos
     end

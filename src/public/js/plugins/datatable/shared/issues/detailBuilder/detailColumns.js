@@ -1,3 +1,4 @@
+import { DECIMAL_INPUT_FORMAT } from '../../../../../constants/inputValidation.js';
 import { FORM_MODES } from '../../../../../constants/formModes.js';
 import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from '../../../../../constants/goodsReceiptStatuses.js';
 import {
@@ -84,7 +85,8 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
                             detailId,
                             disabled: isProjectQuantityDisabled,
                             disabledWarning: DISABLED_PROJECT_QUANTITY_MESSAGE,
-                            min: '0'
+                            min: DECIMAL_INPUT_FORMAT.minimumPositive,
+                            step: DECIMAL_INPUT_FORMAT.minimumPositive
                         }) }
                         <div data-error-for="projectConvertedQuantity-${ detailId }" class="invalid-feedback d-none"></div>
                     `;

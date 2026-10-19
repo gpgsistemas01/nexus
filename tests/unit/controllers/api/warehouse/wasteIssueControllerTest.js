@@ -92,10 +92,10 @@ describe('wasteIssueController', () => {
         clientId: ' client-1 ',
         departmentId: ' department-1 ',
         projectNumber: ' PR-100 ',
-        requestDate: '2026-08-11T12:30:00.000Z',
+        requestDate: new Date('2026-08-11T12:30:00.000Z'),
         observations: '  Entrega al taller  ',
         status: 'COMPLETE',
-        details: [{ wasteId: '  waste-1  ', quantity: '2.5', suppliedQuantity: 99 }]
+        details: [{ wasteId: '  waste-1  ', quantity: 2.5, suppliedQuantity: 99 }]
       }
     }, response);
 
@@ -116,7 +116,7 @@ describe('wasteIssueController', () => {
     expect(response.json).toHaveBeenCalledWith({ wasteIssue, code: 'CREATED_WASTE_ISSUE' });
   });
 
-  it('convierte cantidades de surtido y no acepta campos de estado enviados por el cliente', async () => {
+  it('conserva cantidades ya validadas y no acepta campos de estado enviados por el cliente', async () => {
     const wasteIssue = { id: 'issue-1', fulfillmentStatus: { name: 'Surtido' } };
     const response = createResponse();
     updateWasteIssueDetails.mockResolvedValue(wasteIssue);
@@ -127,7 +127,7 @@ describe('wasteIssueController', () => {
         details: [{
           id: 'detail-1',
           isSupplied: true,
-          projectConvertedQuantity: '2.25',
+          projectConvertedQuantity: 2.25,
           fulfillmentStatusId: 'client-status'
         }]
       }
@@ -155,9 +155,9 @@ describe('wasteIssueController', () => {
         clientId: ' client-2 ',
         departmentId: ' department-2 ',
         projectNumber: ' PR-200 ',
-        requestDate: '2026-08-12T08:00:00.000Z',
+        requestDate: new Date('2026-08-12T08:00:00.000Z'),
         observations: '  Cambio completo  ',
-        details: [{ wasteId: ' waste-1 ', quantity: '5' }]
+        details: [{ wasteId: ' waste-1 ', quantity: 5 }]
       }
     }, response);
 
@@ -189,7 +189,7 @@ describe('wasteIssueController', () => {
         clientId: ' client-3 ',
         departmentId: ' department-3 ',
         projectNumber: ' PR-300 ',
-        requestDate: '2026-08-12T09:00:00.000Z',
+        requestDate: new Date('2026-08-12T09:00:00.000Z'),
         details: [{ quantity: 99 }]
       }
     }, response);
@@ -214,7 +214,7 @@ describe('wasteIssueController', () => {
     await registerWasteIssueDetailReturn({
       params: { id: 'issue-1', detailId: 'detail-1' },
       user: { id: 'user-1' },
-      body: { returnQuantity: '1.5', observations: ' Devolución parcial ' }
+      body: { returnQuantity: 1.5, observations: ' Devolución parcial ' }
     }, response);
 
     expect(returnWasteIssueDetailService).toHaveBeenCalledWith({

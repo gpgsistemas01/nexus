@@ -78,22 +78,23 @@ flowchart TB
         FileWastes["wastes.js"]
         Request["wasteService.js"]
     end
+    Application -->|import| FileResponseUtils
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileUtils
-    FileUtils -->|import| FileApiMessages
-    FileWastes -->|import| Request
-    FileWastes -->|import| Application
-    View -->|import| FileWastes
-    View -->|import| FileValidators
-    Modal -->|import| FileModalUI
-    FormUtils -->|import| FileErrorHandler
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    FileWastes -->|import| Application
+    FileWastes -->|import| Request
+    Modal -->|import| FileModalUI
     Transport -->|import| FileWasteController
+    View -->|import| FileModalUI
+    View -->|import| FileValidators
+    View -->|import| FileWastes
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación
@@ -147,18 +148,18 @@ sequenceDiagram
         end
         Note over Form: Marca dataset.submitting y deshabilita submit antes del callback
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update })
+        View->>Form: handleSubmit({ form, formData, create, update })
         FormUtils->>Application: registerWaste({ formData })
         activate Application
         alt Respuesta exitosa
             Application-->>FormUtils: registerWaste(): Promise[{ message: string, data: Waste }]
             FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
+            Note over Form: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+            Form-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
             View-->>Browser: modal cerrado y #table recargada
         else Respuesta rechazada
             Application-->>FormUtils: throw { status: number, data: Object | null, message: string, raw: Error }
-            FormUtils-->>View: error propagado por handleSubmit()
+            Form-->>View: error propagado por handleSubmit()
             View-->>Form: error propagado por sendRequest()
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva los datos
         end

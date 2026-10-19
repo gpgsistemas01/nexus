@@ -1,6 +1,5 @@
 import { FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from '../../../constants/selectors.js';
 import { setupMaterialSelect, toggleMaterialOption } from '../domains/material.js';
-import { goodsIssueContext } from '../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
 import { createIssueHeaderSelects } from './issueHeaderSelect.js';
 
 const modalSelector = MODAL_SELECTORS.GOODS_ISSUE;
@@ -16,7 +15,7 @@ const headerSelects = createIssueHeaderSelects({
     }
 });
 
-export const getGoodsIssueHeaderSelects = () => ({
+export const getGoodsIssueHeaderSelects = ({ resource }) => ({
     init: () => {
 
         headerSelects.init();
@@ -24,7 +23,7 @@ export const getGoodsIssueHeaderSelects = () => ({
             modalSelector,
             materialSelector: SELECT_SELECTORS.MATERIAL,
             allowCreate: false,
-            resource: goodsIssueContext.resource
+            resource
         });
     },
     setOptions: (data) => {

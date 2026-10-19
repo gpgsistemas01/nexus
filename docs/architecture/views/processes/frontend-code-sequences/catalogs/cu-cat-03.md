@@ -68,14 +68,15 @@ flowchart TB
         FileSuppliers["suppliers.js"]
         Request["supplierService.js"]
     end
-    FileUtils -->|import| FileApiMessages
-    FileSuppliers -->|import| Request
-    FileSuppliers -->|import| Application
-    FormUtils -->|import| FileErrorHandler
+    Application -->|import| FileResponseUtils
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileUtils
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileSuppliers -->|import| Application
+    FileSuppliers -->|import| Request
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
     Transport -->|import| FileSupplierController

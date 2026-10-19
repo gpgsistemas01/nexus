@@ -70,18 +70,20 @@ flowchart TB
         FileFieldValidations["fieldValidations.js"]
         FileValidators["validators.js"]
     end
+    Application -->|import| FileResponseUtils
     FileCreateIssueApplication -->|import| Application
-    FileWasteIssues -->|import| Request
-    FileWasteIssues -->|import| FileCreateIssueApplication
-    View -->|import| FileWasteIssues
-    View -->|import| FileValidators
-    FormUtils -->|import| FileErrorHandler
     FileErrorHandler -->|import| FileApiMessages
-    FileResponseUtils -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    FileWasteIssues -->|import| FileCreateIssueApplication
+    FileWasteIssues -->|import| Request
     Transport -->|import| FileWasteIssueController
+    View -->|import| FileValidators
+    View -->|import| FileWasteIssues
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación

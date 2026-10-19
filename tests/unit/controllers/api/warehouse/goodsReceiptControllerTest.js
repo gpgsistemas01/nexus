@@ -37,8 +37,8 @@ describe('actualización CRUD de entradas de compra', () => {
         supplierId: ' supplier-1 ',
         receivedById: ' person-1 ',
         isInvoiced: false,
-        receptionDate: '2026-08-27T12:00:00.000Z',
-        details: [{ materialId: ' material-2 ', quantity: '2', costPerUnitType: '50' }]
+        receptionDate: new Date('2026-08-27T12:00:00.000Z'),
+        details: [{ materialId: ' material-2 ', quantity: 2, costPerUnitType: 50 }]
       }
     };
     const res = {

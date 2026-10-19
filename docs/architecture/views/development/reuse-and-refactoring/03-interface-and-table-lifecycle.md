@@ -84,9 +84,22 @@ se instala el nuevo encabezado y se construye la tabla. `createDataTable` activa
 `serverSide`/`processing` si existe `ajax`; las tablas de detalle usan datos locales.
 Los callbacks del consumidor se invocan además del comportamiento común.
 
-En formularios, `useForm` no restaura por sí solo el estado tras cualquier resultado:
-`sendRequest` y los helpers de éxito/error conservan el cierre, recarga y reintento
-según el flujo. El [estado técnico de los formularios](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md)
+En formularios, `useForm` libera el bloqueo de envío una vez en `finally`.
+`handleSubmit` y `handleAction` conservan notificación, cierre y recarga; la
+recuperación de una operación pendiente sigue el flujo propio de merma. El [estado técnico de los formularios](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md)
 y la [composición visual](../design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md)
 explican esas colaboraciones. Los permisos visuales sólo ocultan/habilitan controles;
 los routers del servidor autorizan las escrituras.
+
+## Propietarios de las funciones de formulario
+
+`utils/formUtils.js` conserva `pickFormFields`, `validateFields`, `validateDetailsFields` y `hasValidationErrors`: no importa UI ni plugins. `ui/forms/formUI.js` posee `useForm`, `handleSubmit` y `handleAction`, que coordinan envío, notificación, cierre y recarga. `formStateUI.js` posee habilitación de controles y contenedores, incluida la adaptación de Select2 y Flatpickr. Son movimientos a módulos existentes, sin wrappers que reexporten las funciones anteriores.
+
+El adaptador Ajax permanece privado en `plugins/datatable/core/base/createDataTable.js`: traduce la consulta inyectada a `callback`, conserva `draw` y descarta respuestas de una tabla destruida o de una búsqueda anterior. Esos conceptos pertenecen a DataTable. La URL y la petición HTTP siguen en services y Axios; mover el adaptador a esa capa introduciría dependencia del plugin. No se agrega otra factory de Ajax ni un segundo mecanismo de reintentos.
+
+`constants/inputValidation.js` contiene sólo formatos y límites de captura; el backend
+y los validadores puros del navegador los importan sin dependencias de UI. Los helpers
+validan el valor original antes de convertirlo. Los formularios conservan ese valor al
+agregar partidas, surtir o devolver, y normalizan después de validar. La existencia y
+el estado de registros siguen comprobándose en el servidor; no se agregan requests
+de validación por cada control o fila.

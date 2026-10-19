@@ -6,10 +6,11 @@ import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js
 import { getPresentation, isRollPresentation } from '../../../utils/warehouseInventoryUtils.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { updateWasteRollMeasurement } from '../../../ui/inventory/wasteFormUI.js';
-import { useForm } from '../../../ui/forms/formUI.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
+import { pickFormFields, validateFields } from '../../../utils/formUtils.js';
+
 import {
     wasteEditValidation,
     wasteStockAdjustmentValidation,

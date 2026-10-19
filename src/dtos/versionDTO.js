@@ -1,4 +1,4 @@
 export const createVersionDto = (body = {}) => (
     Object.prototype.hasOwnProperty.call(body, 'expectedVersion')
-        ? { expectedVersion: Number(body.expectedVersion) } : {}
+        ? { expectedVersion: body.expectedVersion } : {}
 );
