@@ -1,5 +1,9 @@
 # 4. Comandos
 
+Ejecuta todos los comandos de esta sección desde `back/`. Si la terminal está
+en la raíz del repositorio, ejecuta primero `cd back`. Los argumentos y nombres
+de scripts se mantienen; las salidas se crean dentro de `back/`.
+
 Esta sección es la referencia de sintaxis para los comandos de exportación y capturas. Los
 capítulos posteriores describen el orden de ejecución y los requisitos de cada flujo sin cambiar
 esta interfaz.

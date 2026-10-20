@@ -1,5 +1,10 @@
 # Reglas generales del proyecto
 
+La aplicación existente vive en `back/`. Las rutas `src/`, `prisma/`, `scripts/`,
+`tests/`, `docs/` y los comandos npm de esta guía se interpretan desde `back/`.
+La automatización `.github/workflows/ci.yml`, Dockerfile y Docker Compose viven
+en la raíz del repositorio.
+
 - Antes de implementar un cambio, revisa el código relacionado y las implementaciones similares existentes.
 - Prioriza reutilizar componentes, *helpers*, servicios y flujos existentes. No dupliques reglas de negocio.
 - No realices refactorizaciones ni cambios fuera del alcance solicitado.

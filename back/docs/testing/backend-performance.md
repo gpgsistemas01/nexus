@@ -1,5 +1,8 @@
 # Medición de rendimiento del backend
 
+Ejecuta estos comandos desde `back/` (`cd back` desde la raíz del repositorio);
+las rutas de scripts y resultados son relativas a esa carpeta.
+
 Este procedimiento complementa las pruebas funcionales. Mide rutas API reales con
 cookies, JWT, permisos vigentes, validadores, servicios, Prisma, serialización y
 auditoría posterior a la respuesta. No carga vistas ni simula la red de producción.

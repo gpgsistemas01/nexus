@@ -6,6 +6,11 @@ servicios construyen requests HTTP. Los servicios bajo `src/services` ejecutan r
 y consultas en el servidor. La coincidencia del nombre `services` no significa que
 ambas carpetas tengan acceso a la base de datos.
 
+Las rutas de código de esta documentación son relativas a `back/`. La aplicación,
+Prisma, pruebas, scripts y documentación se mantienen juntos en esa carpeta.
+`.github/workflows/`, `Dockerfile` y `docker-compose.yml` permanecen en la raíz
+del repositorio y apuntan al backend. Los comandos npm se ejecutan desde `back/`.
+
 ## Mapa general de implementación
 
 **Identificador:** `DIA-COD-ORG-001`. **Pregunta:** ¿cómo se distribuye la implementación
@@ -44,7 +49,7 @@ amplían en [backend](03-backend-domains-and-dependencies.md) y
 | `src/views`, `src/public` | Plantillas y activos servidos. `pages` compone; `application` adapta operaciones; `services` transporta; `ui` y `plugins` gestionan presentación. |
 | `prisma/schema.prisma`, `prisma/migrations`, `prisma.config.ts` | Modelo técnico, SQL de evolución y configuración de CLI. |
 | `generated/prisma` | Salida de `prisma generate`; se regenera, no se modifica como código de dominio. |
-| `tests`, `scripts`, `.github/workflows` | Verificación, generación/exportación documental y automatización. No son módulos funcionales de la API. |
+| `tests`, `scripts`, `../.github/workflows` | Verificación, generación/exportación documental y automatización. No son módulos funcionales de la API. |
 | `docs` | Arquitectura y referencias curadas/generadas; mantiene enlaces a código, contratos y pruebas. |
 
 Para modificar un recurso se localizan sus archivos en rutas, controllers, servicios

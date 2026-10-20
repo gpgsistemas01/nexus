@@ -1,5 +1,8 @@
 # 2. Separación de cuentas PostgreSQL para migraciones y aplicación
 
+Los comandos npm y Prisma de esta guía se ejecutan desde `back/` en el host
+(`cd back` desde la raíz), o desde `/app` si se ejecutan dentro del contenedor.
+
 Este documento contiene una **decisión operativa de infraestructura**. No define los
 permisos funcionales de Nexus ni la estructura del modelo persistente; esas fuentes y su
 relación se localizan desde el [modelo persistente](../logical/data-and-persistence/index.md).

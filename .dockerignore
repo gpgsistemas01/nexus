@@ -3,7 +3,7 @@
 .gitignore
 
 # Dependencies and local package manager output
-node_modules
+**/node_modules
 npm-debug.log*
 
 # Docker-only files are not needed inside the runtime image
@@ -12,18 +12,25 @@ docker-compose*.yml
 .dockerignore
 
 # Keep every .env file out of the Docker build context
-.env
-.env.*
+**/.env
+**/.env.*
 
 # Test sources/configuration and generated test artifacts are not needed in production images
-tests
-vitestConfig.js
-coverage
-.vitest
+back/tests
+back/vitest*Config.js
+**/coverage
+**/.vitest
 
 # Keep documentation in Git while excluding it only from the Docker build context
-README.md
-docs
+**/README.md
+back/docs
 
 # Local OS files
 .DS_Store
+
+# Other applications and local artifacts
+front/
+frontend/
+back/.cache/
+back/build/
+back/generated/

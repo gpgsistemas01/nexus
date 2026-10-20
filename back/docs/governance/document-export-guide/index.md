@@ -1,5 +1,8 @@
 # Guía de exportación documental
 
+Esta guía usa `back/` como directorio de trabajo para npm, Node y las rutas
+relativas. Desde la raíz del repositorio, ejecuta primero `cd back`.
+
 Este documento concentra la preparación, validación y generación de los paquetes documentales.
 La organización y las fuentes de verdad permanecen en el [índice de documentación](../../README.md).
 

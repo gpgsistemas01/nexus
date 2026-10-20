@@ -1,5 +1,8 @@
 # Registro selectivo de casos de prueba automatizados
 
+Ejecuta los comandos npm desde `back/`. Las rutas de pruebas y evidencias de
+esta guía son relativas a esa carpeta.
+
 ## Alcance
 
 Los archivos de `tests` son la especificación ejecutable. Este registro añade una ficha

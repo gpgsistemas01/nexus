@@ -1,5 +1,9 @@
 # 1. Distribución y despliegue de Nexus
 
+Ejecuta `docker compose` desde la raíz del repositorio. El contexto de construcción
+es esa raíz y el Dockerfile copia la aplicación de `back/` a `/app`. En el host,
+los comandos npm y Prisma se ejecutan desde `back/`; dentro de la imagen, desde `/app`.
+
 ## Alcance y fuentes
 
 Esta vista explica dónde se ejecuta cada parte de Nexus, cómo se comunica y qué
@@ -10,11 +14,11 @@ Las capas de código se mantienen en la [vista lógica](../logical/01-components
 | Aspecto | Fuente | Qué permite afirmar |
 | --- | --- | --- |
 | Render y Supabase | Decisión operativa registrada en el `README.md` | Es la topología vigente documentada; el repositorio no verifica la configuración activa del proveedor. |
-| Imagen de aplicación | `Dockerfile` | Node.js 22, generación de Prisma durante la construcción y ejecución con el usuario `node`. |
+| Imagen de aplicación | `../Dockerfile` (raíz del repositorio) | Node.js 22, generación de Prisma durante la construcción y ejecución con el usuario `node`. |
 | Arranque del contenedor | `docker-entrypoint.sh` | Fuerza producción y, por defecto, aplica migraciones antes de iniciar la aplicación. |
 | Servidor y puerto | `src/app.js` | Express y Socket.IO comparten un servidor HTTP que escucha en `0.0.0.0`, con `PORT` o 3000 por defecto. |
 | Conexiones a PostgreSQL | `src/lib/prisma.js`, `src/lib/databaseUrl.js` y `prisma.config.ts` | La aplicación usa `DATABASE_URL`; el CLI prefiere `DIRECT_URL`. |
-| Ejecución en un host | `docker-compose.yml` | Reproduce el contenedor de aplicación; no crea PostgreSQL ni configura Render. |
+| Ejecución en un host | `../docker-compose.yml` (raíz del repositorio) | Reproduce el contenedor de aplicación; no crea PostgreSQL ni configura Render. |
 
 ## Contexto del sistema
 
@@ -127,7 +131,7 @@ y su aprovisionamiento se explican en el [capítulo de cuentas PostgreSQL](02-po
 
 ## Alternativa reproducible en un host
 
-`docker-compose.yml` construye la imagen, carga `.env`, activa migraciones y publica
+`docker-compose.yml`, en la raíz del repositorio, construye la imagen, carga `back/.env`, activa migraciones y publica
 `3000:3000`. Declara el usuario `node`, el sistema de archivos de sólo lectura, un
 espacio temporal en `/tmp` y restricciones de capacidades. Esas opciones pertenecen
 a Compose; no se deben atribuir automáticamente al servicio administrado de Render.

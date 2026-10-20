@@ -1,5 +1,8 @@
 # Inventario de capturas del manual de usuario
 
+Ejecuta los comandos de captura desde `back/` (`cd back` desde la raíz del
+repositorio). Las rutas relativas y los archivos PNG se resuelven dentro de `back/`.
+
 ## Criterio de identificación y orden
 
 Cada captura tiene un identificador estable `CAP-<grupo>-<ámbito>-<paso>-<estado>-<área>`. El

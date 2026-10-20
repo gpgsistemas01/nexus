@@ -44,7 +44,7 @@ Los detalles se explican en [contexto transaccional](../design-and-construction-
 
 ## Comandos habituales
 
-Desde la raíz, use Node.js 24 y `npm ci` para instalar las versiones del lockfile.
+Desde `back/`, use Node.js 24 y `npm ci` para instalar las versiones del lockfile.
 Configure las [variables del README](../../../../../README.md#variables-de-entorno):
 la aplicación usa `DATABASE_URL`; el CLI prefiere `DIRECT_URL`. Ambas deben
 apuntar a la misma base del entorno. En pruebas se seleccionan

@@ -1,5 +1,8 @@
 # Incorporación de desarrolladores a Nexus
 
+La aplicación está en `back/`. Ejecuta `cd back` desde la raíz antes de usar
+npm, Prisma o los scripts; las rutas de código de esta guía son relativas a esa carpeta.
+
 Nexus es una aplicación web de control operativo de materiales, consumibles y mermas. Para modificarla, primero identifique el resultado de negocio afectado y después siga la petición desde la pantalla hasta el servicio que conserva sus reglas. Esta guía orienta el primer recorrido; los contratos y decisiones detallados permanecen en sus documentos propietarios.
 
 ## Entender las responsabilidades

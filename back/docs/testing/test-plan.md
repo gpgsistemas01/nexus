@@ -1,5 +1,8 @@
 # Plan de pruebas
 
+Los comandos de validación se ejecutan desde `back/` (`cd back` desde la raíz).
+Las rutas `tests/`, `src/` y `docs/` son relativas a esa carpeta.
+
 ## Datos generales del documento
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |

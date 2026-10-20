@@ -278,7 +278,7 @@ instrucciones operativas ni se exige una ficha documental por cada `it`.
 Esta sección registra los cambios ya aplicados. La clasificación individual anterior
 refina las decisiones generales, especialmente para las herramientas de documentación.
 
-Las rutas de esta tabla son relativas a la raíz del repositorio. Los diseños y casos
+Las rutas de esta tabla son relativas a la carpeta `back/`. Los diseños y casos
 críticos se enlazan en el [registro selectivo](automated-test-case-index.md).
 
 | Área / archivos | Decisión y motivo | Evidencia conservada y límite |

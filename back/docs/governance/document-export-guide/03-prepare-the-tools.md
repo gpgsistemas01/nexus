@@ -1,7 +1,7 @@
 # 3. Preparar las herramientas
 
 Estos comandos pueden ejecutarse desde la terminal integrada de Visual Studio Code
-(`Terminal` > `New Terminal`), abierta en la raíz del repositorio. Visual Studio Code no instala
+(`Terminal` > `New Terminal`), abierta en la carpeta `back/`. Visual Studio Code no instala
 Pandoc por sí mismo: la instalación se realiza en el mismo sistema, contenedor o entorno remoto
 donde se ejecutará `npm run docs:export`.
 
@@ -15,7 +15,7 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
 `pandoc` directamente, por lo que el ejecutable debe estar disponible en la terminal mediante
 `PATH`; una extensión sólo puede usarse como complemento para trabajar desde el editor.
 
-1. Desde la raíz del repositorio, instala la versión de Node.js indicada en `package.json`
+1. Desde la carpeta `back/`, instala la versión de Node.js indicada en `package.json`
    y ejecuta `npm ci`.
 2. Instala [Pandoc](https://pandoc.org/installing.html) en el sistema donde está abierta la
    terminal de Visual Studio Code y comprueba `pandoc --version`:

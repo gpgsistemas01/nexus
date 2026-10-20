@@ -27,7 +27,7 @@ Antes de comenzar:
    [Datos de prueba requeridos](../../user-manual/screenshot-inventory.md#datos-de-prueba-requeridos) y
    complete la [configuración inicial de Nexus](../../../README.md#configuración-inicial). No utilice
    producción ni datos personales reales.
-2. Desde la raíz del repositorio, inicie Nexus en una primera terminal y déjela abierta durante la
+2. Desde la carpeta `back/`, inicie Nexus en una primera terminal y déjela abierta durante la
    preparación de las dos sesiones y las dos ejecuciones de capturas:
 
    ```powershell

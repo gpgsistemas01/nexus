@@ -1,7 +1,18 @@
 # Documentación de Nexus
 
-Usa este índice para localizar la fuente de verdad de cada tema. El `README.md` de la
-raíz se limita a instalación y operación básica.
+Usa este índice para localizar la fuente de verdad de cada tema. El `back/README.md` describe la instalación y operación del backend; el
+`README.md` de la raíz presenta la estructura del repositorio.
+
+## Directorio de ejecución
+
+Los comandos `npm`, `npx prisma` y `node scripts/...` de esta documentación
+se ejecutan desde `back/`. Desde la raíz del repositorio, entra primero con
+`cd back`. Las rutas `src/`, `prisma/`, `tests/`, `scripts/`, `docs/`, `generated/`
+y `.env` son relativas a `back/`. Los archivos exportados y las capturas
+conservan sus rutas relativas dentro de esa carpeta.
+
+Los comandos `docker compose` se ejecutan desde la raíz del repositorio, donde
+están `Dockerfile` y `docker-compose.yml`; Compose carga `back/.env`.
 
 ## Organización de los artefactos
 
