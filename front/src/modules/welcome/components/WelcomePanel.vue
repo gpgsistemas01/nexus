@@ -1,10 +1,11 @@
-<script setup>
-import { ref } from 'vue'
-import heroImg from '../assets/hero.png'
-import viteLogo from '../assets/vite.svg'
-import vueLogo from '../assets/vue.svg'
+<script setup lang="ts">
+import heroImg from '../../../assets/hero.png'
+import viteLogo from '../../../assets/vite.svg'
+import vueLogo from '../../../assets/vue.svg'
 
-const count = ref(0)
+defineProps<{ count: number }>()
+
+const emit = defineEmits<{ increment: [] }>()
 </script>
 
 <template>
@@ -18,7 +19,7 @@ const count = ref(0)
       <h1>Get started</h1>
       <p>Edit <code>src/App.vue</code> and save to test <code>HMR</code></p>
     </div>
-    <button type="button" class="counter" @click="count++">
+    <button type="button" class="counter" @click="emit('increment')">
       Count is {{ count }}
     </button>
   </section>

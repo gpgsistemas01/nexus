@@ -14,6 +14,9 @@ conservan sus rutas relativas dentro de esa carpeta.
 Los comandos `docker compose` se ejecutan desde la raíz del repositorio, donde
 están `Dockerfile` y `docker-compose.yml`; Compose carga `back/.env`.
 
+La arquitectura y herramientas específicas de Vue se mantienen en
+[la documentación del frontend](../../front/docs/architecture.md), junto a sus fuentes.
+
 ## Organización de los artefactos
 
 La documentación se organiza por **familias**. Cada familia tiene un artefacto principal,

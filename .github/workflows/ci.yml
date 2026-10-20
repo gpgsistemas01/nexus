@@ -154,5 +154,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build frontend
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Test frontend components and navigation
+        run: npm run test:unit -- --reporter=default --reporter=junit --outputFile=build/test-results/unit.xml
+
+      - name: Type-check and build frontend
         run: npm run build
+
+      - name: Install browser for UI comparison tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Test UI comparison in browser
+        run: npm run test:e2e
+
+      - name: Upload frontend test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: front/build/test-results/*.xml
+          if-no-files-found: warn

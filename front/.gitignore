@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Type-check and test artifacts
+*.tsbuildinfo
+build/
+coverage/
+
+# Browser test artifacts
+test-results/
+playwright-report/

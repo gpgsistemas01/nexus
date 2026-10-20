@@ -1,0 +1,24 @@
+node_modules
+dist
+dist-ssr
+.git
+.gitignore
+.env
+.env.*
+*.local
+*.log
+coverage
+.vite
+README.md
+Dockerfile
+.dockerignore
+
+# Development-only files
+tests
+docs
+build
+*.tsbuildinfo
+eslint.config.js
+
+test-results
+playwright-report

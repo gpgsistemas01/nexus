@@ -3,6 +3,11 @@
 Los comandos de validación se ejecutan desde `back/` (`cd back` desde la raíz).
 Las rutas `tests/`, `src/` y `docs/` son relativas a esa carpeta.
 
+La suite del frontend Vue se mantiene en `front/tests/` y se ejecuta desde `front/`,
+con Vitest y Vue Test Utils. Su alcance y diseño de casos están en la
+[guía de herramientas del frontend](../../../front/docs/tooling.md). Las rutas y
+comandos del resto de este documento corresponden al backend salvo indicación expresa.
+
 ## Datos generales del documento
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
