@@ -8,7 +8,12 @@ El preset de Vue es `essential`, orientado a errores, sin imponer formato cosmé
 Una regla de imports impide dependencias directas de HTTP, stores o páginas dentro
 de componentes de presentación. No sustituye la revisión de dependencias indirectas.
 
-Se admiten Node.js `^22.22.2 || ^24.15.0`, por los requisitos de jsdom.
+Se admiten Node.js `^22.13.0 || ^24.14.1`. Para mantener compatibilidad con Node
+24.14.1 se fijan jsdom 29.1.1 y Vue Test Utils 2.4.6: las ramas posteriores agregaban
+requisitos más altos de Node mediante dependencias de pruebas. No basta con bajar
+`engines`; se verifica la compatibilidad de todo el lockfile y la instalación con
+`npm ci --include=dev --engine-strict`, además de lint, pruebas y build.
+CI comprueba el frontend con Node 24.14.1 para detectar regresiones de ese mínimo.
 El backend conserva sus herramientas y versiones de Node documentadas por separado.
 Las versiones exactas se registran en `package-lock.json` y se instalan con `npm ci`.
 

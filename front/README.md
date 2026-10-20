@@ -26,8 +26,9 @@ y herramientas previos no cambiaban la apariencia de la plantilla.
 
 ## Desarrollo
 
-Usa Node.js 24.15 o superior de la rama 24, o Node.js 22.22.2 o superior de la rama 22.
-Las herramientas de pruebas del frontend necesitan estas revisiones.
+Usa Node.js 24.14.1 o superior de la rama 24, o Node.js 22.13 o superior de la rama 22.
+Las herramientas de pruebas están fijadas a versiones compatibles; instala con `npm ci`
+para conservar esa combinación.
 Desde la raíz del repositorio:
 
 ```bash

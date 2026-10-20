@@ -49,7 +49,7 @@ con tres botones y formularios reales. Es una demostración visual sin autentica
 Si tienes una copia anterior, actualiza `features`, instala con `npm ci` en `front/`
 y reinicia Vite. La plantilla del contador se conserva en `/ejemplo`.
 
-Usa Node.js 24.15+ de la rama 24 o 22.22.2+ de la rama 22 para el frontend.
+Usa Node.js 24.14.1+ de la rama 24 o 22.13+ de la rama 22 para el frontend.
 
 En otra terminal, desde la raíz del repositorio:
 
