@@ -1,0 +1,1882 @@
+{
+  "Supplier": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "legalName": {
+        "type": "string"
+      },
+      "tradeName": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "legalName",
+      "tradeName",
+      "isActive"
+    ]
+  },
+  "Material": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "presentationId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "unitMeasureId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "height": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "currentStock": {
+        "type": "number"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "supplier": {
+        "$ref": "../openapi.json#/components/schemas/Supplier"
+      },
+      "presentation": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "unitMeasure": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "SupplierMaterial": {
+    "type": "object",
+    "description": "Relaci\u00f3n proveedor-material. El identificador de nivel superior corresponde a SupplierMaterial; la identidad y los datos descriptivos del material permanecen anidados en material.",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "maxUnitCost": {
+        "type": "number"
+      },
+      "currentStock": {
+        "type": "number"
+      },
+      "convertedQuantity": {
+        "type": "number"
+      },
+      "canDelete": {
+        "type": "boolean"
+      },
+      "material": {
+        "$ref": "../openapi.json#/components/schemas/Material"
+      },
+      "supplier": {
+        "$ref": "../openapi.json#/components/schemas/SupplierMaterialSupplier"
+      },
+      "referenceConeWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "maximum": 999.99,
+        "description": "Referencia hist\u00f3rica del rollo completo; ya no se captura ni modifica.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
+        "minimum": 0,
+        "readOnly": true,
+        "deprecated": true
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "description": "Referencia hist\u00f3rica del rollo completo; ya no se captura ni modifica.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
+        "readOnly": true,
+        "deprecated": true
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id"
+    ]
+  },
+  "SupplierMaterialSupplier": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "tradeName": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "tradeName"
+    ]
+  },
+  "Waste": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      },
+      "height": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      },
+      "currentStock": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "supplier": {
+        "$ref": "../openapi.json#/components/schemas/Supplier"
+      },
+      "weightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "description": "Peso neto en kg por unidad de merma de Rollo: total con cono menos cono. S\u00f3lo consulta.",
+        "multipleOf": 0.01,
+        "readOnly": true
+      },
+      "coneWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "maximum": 999.99,
+        "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vac\u00edos; hasta tres enteros y dos decimales.",
+        "multipleOf": 0.01,
+        "minimum": 0,
+        "readOnly": true
+      },
+      "totalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vac\u00edos; hasta tres enteros y dos decimales.",
+        "multipleOf": 0.01,
+        "readOnly": true
+      },
+      "sourceMaterialId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid",
+        "readOnly": true
+      },
+      "presentationId": {
+        "type": "string",
+        "format": "uuid",
+        "readOnly": true
+      },
+      "unitMeasureId": {
+        "type": "string",
+        "format": "uuid",
+        "readOnly": true
+      },
+      "presentation": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "unitMeasure": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "convertedQuantity": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "createdAt": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "updatedAt": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "sampleLengthM": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 99999999.999999,
+        "multipleOf": 1e-06,
+        "description": "Largo de muestra hist\u00f3rico. Las altas nuevas lo dejan nulo y obtienen el largo del material de origen.",
+        "readOnly": true,
+        "deprecated": true
+      },
+      "sampleNetWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 99999999.999999,
+        "multipleOf": 1e-06,
+        "description": "Peso neto de muestra hist\u00f3rico. Las altas nuevas lo dejan nulo y calculan el neto con el total del rollo completo menos el cono.",
+        "readOnly": true,
+        "deprecated": true
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "multipleOf": 0.01,
+        "description": "Peso del rollo completo con cono, capturado desde merma. Se descuenta el mismo cono del sobrante; el largo procede del material.",
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
+        "readOnly": true
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "Issue": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "referenceNumber": {
+        "type": "string"
+      },
+      "requestDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "requesterId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "advisorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "clientId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "projectNumber": {
+        "type": "string"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/IssueDetail"
+        }
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "MATERIAL",
+          "CONSUMABLE"
+        ],
+        "description": "Tipo persistido de las salidas de materiales y consumibles; no aplica a salidas de merma."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "referenceNumber"
+    ]
+  },
+  "IssueDetail": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "quantity": {
+        "type": "number"
+      },
+      "isSupplied": {
+        "type": "boolean"
+      },
+      "projectConvertedQuantity": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "materialId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      },
+      "wasteId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "quantity"
+    ]
+  },
+  "GoodsReceipt": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "referenceNumber": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "MATERIAL",
+          "CONSUMABLE"
+        ]
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "receivedById": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "isInvoiced": {
+        "type": "boolean"
+      },
+      "invoice": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "receptionDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/GoodsReceiptDetail"
+        }
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "referenceNumber",
+      "type"
+    ]
+  },
+  "GoodsReceiptDetail": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "materialId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "quantity": {
+        "type": "number"
+      },
+      "costPerUnitType": {
+        "type": "number"
+      },
+      "isCancelled": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "materialId",
+      "quantity",
+      "costPerUnitType"
+    ]
+  },
+  "Return": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "returnQuantity": {
+        "type": "number"
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "returnQuantity"
+    ]
+  },
+  "SupplierRequest": {
+    "type": "object",
+    "properties": {
+      "legalName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "tradeName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "isActive": {
+        "type": "boolean"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "legalName",
+      "tradeName",
+      "isActive"
+    ]
+  },
+  "MaterialCreateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "presentationId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "unitMeasureId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "exclusiveMinimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+      },
+      "height": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "exclusiveMinimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "minimum": 0,
+        "exclusiveMaximum": 1000000000000,
+        "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number.",
+        "multipleOf": 0.01
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+        "multipleOf": 1e-06,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "newStock": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "supplierId",
+      "presentationId",
+      "unitMeasureId",
+      "maxUnitCost",
+      "isActive",
+      "newStock"
+    ]
+  },
+  "MaterialUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "minimum": 0,
+        "exclusiveMaximum": 1000000000000,
+        "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number.",
+        "multipleOf": 0.01
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+        "multipleOf": 1e-06,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+      },
+      "expectedMaterialVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "supplierId",
+      "maxUnitCost",
+      "isActive",
+      "expectedVersion",
+      "expectedMaterialVersion"
+    ]
+  },
+  "MaterialStockRequest": {
+    "type": "object",
+    "properties": {
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "newStock": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+      },
+      "reasonId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "supplierId",
+      "newStock",
+      "reasonId",
+      "expectedVersion"
+    ]
+  },
+  "WasteCreateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "materialId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "Material de origen con unidad m\u00b2 (por s\u00edmbolo o nombre metro cuadrado), excluyendo consumibles."
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "description": "Dimensión final de la merma. El formulario incluye su valor aunque el input esté deshabilitado. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensión transversal del material.",
+        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "exclusiveMinimum": 0
+      },
+      "height": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "description": "Dimensión final de la merma. El formulario incluye su valor aunque el input esté deshabilitado. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensión transversal del material.",
+        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "exclusiveMinimum": 0
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "minimum": 0,
+        "exclusiveMaximum": 1000000000000,
+        "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number.",
+        "multipleOf": 0.01
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+        "multipleOf": 1e-06,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "initialQuantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "minimum": 0,
+        "description": "Cantidad inicial de unidades de merma. Si es positiva se guarda en WasteStockEntry.quantity y se suma al saldo; cero no genera entrada.",
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "coneWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "maximum": 999.99,
+        "description": "Peso del cono en kg por unidad de merma de Rollo, mayor o igual que cero. Capturar ambos pesos o dejar ambos vac\u00edos; hasta tres enteros y dos decimales.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])",
+        "minimum": 0
+      },
+      "totalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "description": "Peso total con cono en kg por unidad de merma de Rollo, mayor que el cono y hasta 999.99 kg. Capturar ambos pesos o dejar ambos vac\u00edos; hasta tres enteros y dos decimales.",
+        "multipleOf": 0.01,
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
+      },
+      "referenceRollTotalWeightKg": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "exclusiveMinimum": 0,
+        "maximum": 999.99,
+        "multipleOf": 0.01,
+        "description": "Peso del rollo completo con cono, capturado desde merma. Se descuenta el mismo cono del sobrante; el largo procede del material.",
+        "pattern": "^(?:|(?=.*[1-9])\\d{1,3}(\\.\\d{1,2})?)(?![\\s\\S])"
+      },
+      "operationId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "UUID v4 persistido antes de enviar. Un reintento del mismo actor conserva clave y captura; devuelve el resultado original sin nuevos efectos. No expira autom\u00e1ticamente."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "materialId",
+      "supplierId",
+      "maxUnitCost",
+      "isActive",
+      "initialQuantity",
+      "operationId"
+    ],
+    "description": "Origen MATERIAL en m\u00b2. No se permite crear Rollo sin pesos ni sustituir el c\u00e1lculo con medidas manuales. Para Rollo capture coneWeightKg, totalWeightKg del sobrante y referenceRollTotalWeightKg del rollo completo con cono. El servidor descuenta el mismo cono de ambos pesos, toma el largo del material y calcula la longitud proporcional. No env\u00ede netos ni sampleLengthM/sampleNetWeightKg. El largo y neto de muestra se calculan sin persistirlos; esos dos campos quedan reservados a hist\u00f3ricos. Medidas, pesos y referencia quedan inmutables. Otras presentaciones en m\u00b2 usan medidas manuales sin pesos."
+  },
+  "WasteUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "minimum": 0,
+        "exclusiveMaximum": 1000000000000,
+        "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number.",
+        "multipleOf": 0.01
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+        "multipleOf": 1e-06,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "maxUnitCost",
+      "isActive",
+      "expectedVersion"
+    ]
+  },
+  "WasteStockRequest": {
+    "type": "object",
+    "properties": {
+      "newStock": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "minimum": 0,
+        "description": "Existencia final deseada tras el ajuste; corresponde a WasteStockAdjustmentDetail.newStock. No es una cantidad a sumar.",
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000
+      },
+      "reasonId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "newStock",
+      "reasonId",
+      "expectedVersion"
+    ]
+  },
+  "IssueHeaderRequest": {
+    "type": "object",
+    "properties": {
+      "advisorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "clientId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "requesterId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "projectNumber": {
+        "type": "string",
+        "maxLength": 10
+      },
+      "requestDate": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 500
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "advisorId",
+      "clientId",
+      "departmentId",
+      "requesterId",
+      "projectNumber",
+      "requestDate"
+    ]
+  },
+  "GoodsIssueRequest": {
+    "type": "object",
+    "properties": {
+      "advisorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "clientId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "requesterId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "projectNumber": {
+        "type": "string",
+        "maxLength": 10
+      },
+      "requestDate": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 500
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "materialId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "supplierId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "presentationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "quantity": {
+              "type": [
+                "number",
+                "string"
+              ],
+              "minimum": 1,
+              "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+              "multipleOf": 0.01,
+              "exclusiveMaximum": 100000000,
+              "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "materialId",
+            "supplierId",
+            "quantity"
+          ]
+        },
+        "minItems": 1
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "advisorId",
+      "clientId",
+      "departmentId",
+      "requesterId",
+      "projectNumber",
+      "requestDate",
+      "details"
+    ]
+  },
+  "WasteIssueRequest": {
+    "type": "object",
+    "properties": {
+      "advisorId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "clientId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "requesterId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "projectNumber": {
+        "type": "string",
+        "maxLength": 10
+      },
+      "requestDate": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+      },
+      "observations": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 500
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "wasteId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "quantity": {
+              "type": [
+                "number",
+                "string"
+              ],
+              "exclusiveMinimum": 0,
+              "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+              "multipleOf": 0.01,
+              "exclusiveMaximum": 100000000,
+              "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "wasteId",
+            "quantity"
+          ]
+        },
+        "minItems": 1
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "advisorId",
+      "clientId",
+      "departmentId",
+      "requesterId",
+      "projectNumber",
+      "requestDate",
+      "details"
+    ]
+  },
+  "IssueDetailsUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "isSupplied": {
+              "type": "boolean"
+            },
+            "projectConvertedQuantity": {
+              "type": [
+                "number",
+                "string"
+              ],
+              "exclusiveMinimum": 0,
+              "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+              "multipleOf": 0.01,
+              "exclusiveMaximum": 100000000,
+              "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "isSupplied",
+            "projectConvertedQuantity"
+          ]
+        },
+        "minItems": 1
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "details"
+    ]
+  },
+  "ReturnRequest": {
+    "type": "object",
+    "properties": {
+      "returnQuantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "exclusiveMinimum": 0,
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "returnQuantity"
+    ]
+  },
+  "GoodsReceiptRequest": {
+    "type": "object",
+    "properties": {
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "receivedById": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "isInvoiced": {
+        "type": "boolean"
+      },
+      "invoice": {
+        "type": "string",
+        "maxLength": 50
+      },
+      "receptionDate": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "materialId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "quantity": {
+              "type": [
+                "number",
+                "string"
+              ],
+              "minimum": 1,
+              "description": "Cantidad por presentación, al menos uno; hasta 8 enteros y 2 decimales.",
+              "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+              "multipleOf": 0.01,
+              "exclusiveMaximum": 100000000
+            },
+            "costPerUnitType": {
+              "type": [
+                "number",
+                "string"
+              ],
+              "exclusiveMinimum": 0,
+              "description": "Costo positivo; hasta 8 enteros y 6 decimales.",
+              "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+              "multipleOf": 1e-06,
+              "exclusiveMaximum": 100000000
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "materialId",
+            "quantity",
+            "costPerUnitType"
+          ]
+        },
+        "minItems": 1
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "supplierId",
+      "receivedById",
+      "receptionDate",
+      "details"
+    ]
+  },
+  "GoodsReceiptCorrectionRequest": {
+    "type": "object",
+    "properties": {
+      "quantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "exclusiveMinimum": 0,
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+      },
+      "costPerUnitType": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "exclusiveMinimum": 0,
+        "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+        "multipleOf": 1e-06,
+        "exclusiveMaximum": 100000000,
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "quantity",
+      "costPerUnitType"
+    ]
+  },
+  "SupplierList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Supplier"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "MaterialList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/SupplierMaterial"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "WasteList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Waste"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "IssueList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Issue"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ],
+    "description": "Listado de cabeceras sin details; usar GET /{id} para cargar los detalles actuales."
+  },
+  "GoodsReceiptList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/GoodsReceipt"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ],
+    "description": "Listado de cabeceras sin details; usar GET /{id} para cargar los detalles actuales."
+  },
+  "SupplierResponse": {
+    "type": "object",
+    "properties": {
+      "supplier": {
+        "$ref": "../openapi.json#/components/schemas/Supplier"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "supplier",
+      "code"
+    ]
+  },
+  "MaterialResponse": {
+    "type": "object",
+    "properties": {
+      "material": {
+        "$ref": "../openapi.json#/components/schemas/SupplierMaterial"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "material",
+      "code"
+    ]
+  },
+  "WasteResponse": {
+    "type": "object",
+    "properties": {
+      "waste": {
+        "$ref": "../openapi.json#/components/schemas/Waste"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "waste",
+      "code"
+    ]
+  },
+  "GoodsIssueResponse": {
+    "type": "object",
+    "properties": {
+      "goodsIssue": {
+        "$ref": "../openapi.json#/components/schemas/Issue"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "goodsIssue",
+      "code"
+    ]
+  },
+  "WasteIssueResponse": {
+    "type": "object",
+    "properties": {
+      "wasteIssue": {
+        "$ref": "../openapi.json#/components/schemas/Issue"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "wasteIssue",
+      "code"
+    ]
+  },
+  "GoodsReceiptResponse": {
+    "type": "object",
+    "properties": {
+      "goodsReceipt": {
+        "$ref": "../openapi.json#/components/schemas/GoodsReceipt"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "goodsReceipt",
+      "code"
+    ]
+  },
+  "GoodsIssueReturnResponse": {
+    "type": "object",
+    "properties": {
+      "goodsIssueReturn": {
+        "$ref": "../openapi.json#/components/schemas/Return"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "goodsIssueReturn",
+      "code"
+    ]
+  },
+  "WasteIssueReturnResponse": {
+    "type": "object",
+    "properties": {
+      "wasteIssueReturn": {
+        "$ref": "../openapi.json#/components/schemas/Return"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "wasteIssueReturn",
+      "code"
+    ]
+  },
+  "WasteStockAdditionRequest": {
+    "type": "object",
+    "properties": {
+      "quantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "exclusiveMinimum": 0,
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+      },
+      "observations": {
+        "description": "Nota opcional del documento individual de entrada de merma vinculado al movimiento ENTRY.",
+        "type": [
+          "string",
+          "null"
+        ],
+        "maxLength": 500
+      },
+      "operationId": {
+        "type": "string",
+        "format": "uuid",
+        "description": "UUID v4 persistido antes de enviar. Un reintento del mismo actor conserva clave y captura; devuelve el resultado original sin nuevos efectos. No expira autom\u00e1ticamente."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "quantity",
+      "operationId"
+    ]
+  },
+  "WasteMaterialTemplate": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "base": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      },
+      "height": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      },
+      "presentation": {
+        "type": "object"
+      },
+      "unitMeasure": {
+        "type": "object"
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ]
+      },
+      "supplierMaterials": {
+        "type": "array",
+        "description": "Oferta activa del proveedor seleccionado; aporta el costo, sin referencias de peso del rollo completo.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "maxUnitCost": {
+              "type": [
+                "number",
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "maxItems": 1
+      }
+    },
+    "additionalProperties": false
+  },
+  "WasteMaterialTemplateList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/WasteMaterialTemplate"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ],
+    "additionalProperties": false
+  },
+  "SupplierUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "legalName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "tradeName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "legalName",
+      "tradeName",
+      "isActive",
+      "expectedVersion"
+    ]
+  },
+  "GoodsReceiptHeaderRequest": {
+    "type": "object",
+    "properties": {
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "receivedById": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "isInvoiced": {
+        "type": "boolean"
+      },
+      "invoice": {
+        "type": "string",
+        "maxLength": 50
+      },
+      "receptionDate": {
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
+        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "details": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "materialId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "quantity": {
+              "type": [
+                "number",
+                "string"
+              ],
+              "minimum": 1,
+              "description": "Cantidad por presentación, al menos uno; hasta 8 enteros y 2 decimales.",
+              "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+              "multipleOf": 0.01,
+              "exclusiveMaximum": 100000000
+            },
+            "costPerUnitType": {
+              "type": [
+                "number",
+                "string"
+              ],
+              "exclusiveMinimum": 0,
+              "description": "Costo positivo; hasta 8 enteros y 6 decimales.",
+              "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+              "multipleOf": 1e-06,
+              "exclusiveMaximum": 100000000
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "materialId",
+            "quantity",
+            "costPerUnitType"
+          ]
+        },
+        "minItems": 1,
+        "description": "Sólo partidas nuevas. Omitir el campo cuando no se agreguen partidas; una lista explícita vacía es inválida."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "supplierId",
+      "receivedById",
+      "receptionDate"
+    ]
+  }
+}

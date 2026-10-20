@@ -1,0 +1,26 @@
+import { getAllWasteIssues, getWasteIssue } from '../../../../application/warehouse/wasteIssues/wasteIssues.js';
+import { hasPermission, PERMISSIONS } from '../../../../../../shared/constants/permissions.js';
+import { createIssueDatatable } from '../../shared/issues/issueDatatable.js';
+import { exportWasteIssueReport } from '../../../../application/warehouse/report.js';
+
+export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
+    const canManage = hasPermission(context, PERMISSIONS.WASTE_ISSUES_MANAGE);
+    const canSupply = hasPermission(context, PERMISSIONS.WASTE_ISSUES_SUPPLY);
+    const issueDatatable = await createIssueDatatable({
+        context,
+        getIssues: getAllWasteIssues,
+        getIssue: getWasteIssue,
+        actionContext: 'wasteIssue',
+        permissions: { canManage, canSupply },
+        tableOptions: {
+            searchPlaceholder: 'Buscar por Folio o Proyecto',
+            order: [[1, 'desc']]
+        },
+        buttons: canManage ? [{ text: 'Nueva salida', action: onCreate }] : [],
+        exportOptions: {
+            report: exportWasteIssueReport,
+            filename: 'reporte_salidas_merma'
+        },
+        actions: { onEdit, onEditDetails, onReturnDetails }
+    });
+};

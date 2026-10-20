@@ -1,0 +1,100 @@
+import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
+import { getAllClients } from "../../../application/sales/clients/clients.js";
+import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
+import { FILTER_SELECTORS } from "../../../constants/selectors.js";
+
+const clientFilterSelector = FILTER_SELECTORS.CLIENT;
+
+export const initClientFilterSelect = ({
+    selectedId = null
+} = {}) => initFilterSelect2({
+    selector: clientFilterSelector,
+    getOptions: getAllClients,
+    placeholder: 'Filtrar por cliente',
+    selectedId,
+    data: () => ({ onlyActive: true }),
+    mapOption: (client) => ({ id: client.id, text: client.name })
+});
+
+export const initClientSelect = ({ 
+    modalSelector, 
+    advisorSelector = null,
+    baseSelector, 
+    allowCreate = true
+}) => initDomainSelect2({
+    selector: baseSelector,
+    containerSelector: modalSelector,
+    get: getAllClients,
+    placeholder: 'Buscar cliente...',
+    data: () => ({ onlyActive: true }),
+    mapOption: (client) => ({
+        id: client.id,
+        text: client.name,
+    }),
+    allowCreate,
+    newTagLabel: 'Nuevo cliente'
+});
+
+const attachClientHandler = ({
+    onCreate,
+    baseSelector
+}) => {
+
+    $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
+
+        const data = e.params.data;
+
+        if (data.newTag) {
+
+            const name = data.id.replace('new:', '');
+            
+            runAfterSelect2Close({
+                selector: baseSelector,
+                action: () => onCreate({
+                    data: { name },
+                    onSave: (createdClient) => {
+
+                        toggleClientOption({
+                            selector: baseSelector,
+                            id: createdClient.id,
+                            name: createdClient.name
+                        });
+                    }
+                })
+            });
+
+            return;
+        }
+    });
+};
+
+export const toggleClientOption = ({ 
+    selector, 
+    id = null, 
+    name = null
+}) => toggleSelectOption({
+    selector,
+    data: {
+        id,
+        text: name
+    }
+});
+
+export const setupClientSelect = ({ 
+    modalSelector, 
+    clientSelector,
+    allowCreate = true,
+    onCreate
+}) => {
+
+    initClientSelect({
+        modalSelector,
+        baseSelector: `${ modalSelector } ${ clientSelector }`,
+        allowCreate: allowCreate && typeof onCreate === 'function'
+    });
+
+    attachClientHandler({
+        onCreate,
+        baseSelector: `${ modalSelector } ${ clientSelector }`,
+    });
+};

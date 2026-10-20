@@ -1,0 +1,95 @@
+import { WASTE_OPERATION_ACTIONS, WASTE_ROLL_WEIGHT_FIELDS } from '../../../../../shared/constants/inventory.js';
+import { notifications } from '../../../plugins/swal/swalComponent.js';
+import { closeModal } from '../../../ui/modalUI.js';
+import { openWasteStockAdditionModal } from './wasteStockAdditionModal.js';
+import { hasPermission, PERMISSIONS } from '../../../../../shared/constants/permissions.js';
+import { getPresentation } from '../../../utils/warehouseInventoryUtils.js';
+import { isRollPresentation } from '../../../../../shared/inventory/wasteMeasurements.js';
+import { DOM_EVENT_NAMES } from '../../../constants/events.js';
+import { updateWasteRollMeasurement } from '../../../ui/inventory/wasteFormUI.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
+import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
+import { FORM_SELECTORS } from '../../../constants/selectors.js';
+import { pickFormFields, validateFields } from '../../../utils/formUtils.js';
+
+import {
+    wasteEditValidation,
+    wasteStockAdjustmentValidation,
+    wasteValidation
+} from '../../../utils/validations/validators.js';
+import { wasteCreateFields, wasteEditFields, wasteStockAdjustmentFields } from './wasteFields.js';
+import { isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
+
+import { getPendingWasteOperation, submitWasteOperation } from '../../../ui/inventory/wasteOperationUI.js';
+
+useForm({
+    selector: FORM_SELECTORS.WASTE,
+    getPendingData: ({ form }) => isCreateMode(form.dataset.mode) ? getPendingWasteOperation({ action: WASTE_OPERATION_ACTIONS.CREATE }) : null,
+    normalizeData: ({ form, formData }) => {
+
+        const fields = isStockMode(form.dataset.mode) ? wasteStockAdjustmentFields
+            : isEditMode(form.dataset.mode) ? wasteEditFields : wasteCreateFields;
+
+        if (isCreateMode(form.dataset.mode) && isRollPresentation(getPresentation(form.wasteMaterialTemplate ?? {}))) {
+            formData.base = form.elements.base.value;
+            formData.height = form.elements.height.value;
+        }
+
+        if (!isStockMode(form.dataset.mode)) {
+
+            if (!formData.minStock) delete formData.minStock;
+
+            formData.isActive = document.querySelector(`${ FORM_SELECTORS.WASTE } #isActiveInput`).checked;
+        }
+
+        return pickFormFields(formData, fields);
+    },
+    getErrors: ({ form, formData }) => {
+
+        if (isStockMode(form.dataset.mode)) return validateFields(wasteStockAdjustmentValidation, formData);
+        if (isEditMode(form.dataset.mode)) return validateFields(wasteEditValidation, formData);
+
+        return validateFields(wasteValidation, {
+            ...formData,
+            presentationName: getPresentation(form.wasteMaterialTemplate ?? {})
+        });
+    },
+    sendRequest: async ({ formData, form }) => {
+        try {
+            const submit = data => handleSubmit({
+                form,
+                formData: data,
+                create: registerWaste,
+                update: isStockMode(form.dataset.mode) ? editWasteStock : editWaste
+            });
+            return isCreateMode(form.dataset.mode)
+                ? await submitWasteOperation({ action: WASTE_OPERATION_ACTIONS.CREATE, form, formData, submit })
+                : await submit(formData);
+        } catch (err) {
+            const existingWaste = err.data?.meta?.waste;
+            if (!isCreateMode(form.dataset.mode) || err.data?.code !== 'WASTE_ALREADY_EXISTS'
+                || !existingWaste?.id || !hasPermission(window.meta || {}, PERMISSIONS.WASTES_ADD_STOCK)) throw err;
+
+            const { isConfirmed } = await notifications.showConfirmation({
+                title: 'Esta merma ya existe',
+                text: `¿Abrir Agregar stock para revisar la cantidad y las observaciones de ${existingWaste.name || 'esta merma'}?`,
+                confirmButtonText: 'Abrir Agregar stock'
+            });
+            if (!isConfirmed) return;
+
+            closeModal(form);
+            openWasteStockAdditionModal({
+                data: existingWaste,
+                quantity: formData.initialQuantity,
+                observations: formData.observations
+            });
+        }
+    }
+});
+
+const form = document.querySelector(FORM_SELECTORS.WASTE);
+form.addEventListener(DOM_EVENT_NAMES.INPUT, event => {
+    if (WASTE_ROLL_WEIGHT_FIELDS.includes(event.target.name)) {
+        updateWasteRollMeasurement({ form });
+    }
+});

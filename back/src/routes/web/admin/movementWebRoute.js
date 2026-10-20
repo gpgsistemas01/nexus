@@ -1,0 +1,35 @@
+import express from 'express';
+import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
+import {
+    getMaterialMovementPage,
+    getConsumableMovementPage,
+    getWasteMovementPage
+} from '../../../controllers/web/admin/movementController.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
+
+const router = express.Router();
+
+router.get(
+    '/consumibles',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserWeb(PERMISSIONS.MOVEMENTS_READ),
+    getConsumableMovementPage
+);
+
+router.get(
+    '/materiales',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserWeb(PERMISSIONS.MOVEMENTS_READ),
+    getMaterialMovementPage
+);
+
+router.get(
+    '/mermas',
+    verifyCookiesAuthTokenRequired,
+    authorizeUserWeb(PERMISSIONS.MOVEMENTS_READ),
+    getWasteMovementPage
+);
+
+router.get('/', (req, res) => res.redirect(308, '/movimientos/materiales'));
+
+export default router;

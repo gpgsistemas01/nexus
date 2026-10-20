@@ -1,0 +1,39 @@
+import express from 'express';
+import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
+import {
+    editSupplier,
+    getAllSuppliers,
+    registerSupplier
+} from '../../../controllers/api/warehouse/supplierController.js';
+import { supplierEditValidation, supplierValidation } from '../../../validators/forms/supplierValidations.js';
+import { validate } from '../../../middleware/validatorMiddleware.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
+
+const router = express.Router();
+
+router.get(
+    '/',
+    verifyApiTokenRequired,
+    authorizeUserApi(PERMISSIONS.SUPPLIERS_READ),
+    getAllSuppliers
+);
+
+router.post(
+    '/',
+    verifyApiTokenRequired,
+    supplierValidation,
+    validate,
+    authorizeUserApi(PERMISSIONS.SUPPLIERS_MANAGE),
+    registerSupplier
+);
+
+router.put(
+    '/:id',
+    verifyApiTokenRequired,
+    supplierEditValidation,
+    validate,
+    authorizeUserApi(PERMISSIONS.SUPPLIERS_UPDATE),
+    editSupplier
+);
+
+export default router;

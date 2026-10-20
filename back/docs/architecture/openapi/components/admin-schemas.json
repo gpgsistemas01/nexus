@@ -1,0 +1,503 @@
+{
+  "Access": {
+    "type": "object",
+    "properties": {
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "roleId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentKey": {
+        "type": "string"
+      },
+      "roleKey": {
+        "type": "string"
+      },
+      "department": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+          }
+        ]
+      },
+      "role": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+          }
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "departmentId",
+      "roleId"
+    ]
+  },
+  "Person": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "fullName": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "accesses": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Access"
+        }
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "fullName"
+    ]
+  },
+  "User": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "personId": {
+        "oneOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "person": {
+        "oneOf": [
+          {
+            "$ref": "../openapi.json#/components/schemas/Person"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "roleName": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "departmentName": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "accesses": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Access"
+        }
+      },
+      "permissions": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "scope": {
+        "type": "object",
+        "properties": {
+          "canReadAll": {
+            "type": "boolean"
+          },
+          "departmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "canReadAll",
+          "departmentIds"
+        ]
+      },
+      "organization": {
+        "type": "object",
+        "properties": {
+          "isCoordinator": {
+            "type": "boolean"
+          },
+          "isWarehouse": {
+            "type": "boolean"
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "isSales": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "isCoordinator",
+          "isWarehouse",
+          "isSystem",
+          "isSales"
+        ]
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0,
+        "readOnly": true
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name"
+    ]
+  },
+  "Movement": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "type": {
+        "type": "string"
+      },
+      "referenceNumber": {
+        "type": "string"
+      },
+      "previousStock": {
+        "type": "number"
+      },
+      "quantity": {
+        "type": "number"
+      },
+      "newStock": {
+        "type": "number"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "date",
+      "type"
+    ]
+  },
+  "PersonRequest": {
+    "type": "object",
+    "properties": {
+      "fullName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "accesses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "departmentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "roleId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "departmentId",
+            "roleId"
+          ]
+        },
+        "minItems": 1,
+        "description": "Cada fila contiene UUID v4 de área y rol. No se permite repetir área, incluso con diferente capitalización del UUID."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "fullName",
+      "accesses"
+    ]
+  },
+  "UserCreateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "password": {
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 50,
+        "description": "Entre 6 y 50 caracteres admitidos, al menos una mayúscula y un número. No requiere un carácter especial. Se conserva el texto exacto."
+      },
+      "personId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "roleId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "password",
+      "personId",
+      "roleId",
+      "departmentId"
+    ]
+  },
+  "UserUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "personId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "roleId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "departmentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "personId",
+      "roleId",
+      "departmentId",
+      "expectedVersion"
+    ]
+  },
+  "PasswordRequest": {
+    "type": "object",
+    "properties": {
+      "password": {
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 50,
+        "description": "Entre 6 y 50 caracteres admitidos, al menos una mayúscula y un número. No requiere un carácter especial. Se conserva el texto exacto."
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "password",
+      "expectedVersion"
+    ]
+  },
+  "PersonList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Person"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "UserList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/User"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "MovementList": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/Movement"
+        }
+      },
+      "recordsTotal": {
+        "type": "integer"
+      },
+      "recordsFiltered": {
+        "type": "integer"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "data",
+      "recordsTotal",
+      "recordsFiltered"
+    ]
+  },
+  "PersonResponse": {
+    "type": "object",
+    "properties": {
+      "person": {
+        "$ref": "../openapi.json#/components/schemas/Person"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "person",
+      "code"
+    ]
+  },
+  "UserResponse": {
+    "type": "object",
+    "properties": {
+      "user": {
+        "$ref": "../openapi.json#/components/schemas/User"
+      },
+      "code": {
+        "$ref": "../openapi.json#/components/schemas/SuccessCode"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "user",
+      "code"
+    ]
+  },
+  "PersonUpdateRequest": {
+    "type": "object",
+    "properties": {
+      "fullName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "accesses": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "departmentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "roleId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "departmentId",
+            "roleId"
+          ]
+        },
+        "minItems": 1,
+        "description": "Cada fila contiene UUID v4 de área y rol. No se permite repetir área, incluso con diferente capitalización del UUID."
+      },
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "fullName",
+      "accesses",
+      "expectedVersion"
+    ]
+  }
+}

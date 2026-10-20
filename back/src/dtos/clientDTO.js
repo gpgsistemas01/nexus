@@ -1,0 +1,9 @@
+import { createVersionDto } from './versionDTO.js';
+const buildClientDto = (body = {}) => ({
+    name: body.name.trim(),
+    isActive: body.isActive
+});
+
+export const createClientDtoForRegister = (body = {}) => buildClientDto(body);
+
+export const createClientDtoForEdit = (body = {}) => ({ ...buildClientDto(body), ...createVersionDto(body) });

@@ -1,0 +1,116 @@
+import { validationResult } from 'express-validator';
+import { describe, expect, it } from 'vitest';
+
+import { errorMap } from '../../../src/messages/codeMessages.js';
+import {
+  catalogEntryEditValidation,
+  catalogEntryValidation
+} from '../../../src/validators/forms/catalogValidations.js';
+
+const runValidation = async ({ rules = catalogEntryValidation, catalog, id, body }) => {
+  const req = { body, params: { catalog, ...(id ? { id } : {}) } };
+
+  for (const rule of rules) await rule.run(req);
+
+  return { errors: validationResult(req).array(), body: req.body };
+};
+
+describe('validación HTTP de catálogos administrables', () => {
+  it.each([
+    [
+      'departments',
+      { name: ' Ventas ', isActive: 'true' },
+      { name: 'Ventas', isActive: true }
+    ],
+    ['roles', { name: ' Operador ', isActive: 'true' }, { name: 'Operador', isActive: true }],
+    [
+      'presentations',
+      { name: ' Caja ', isActive: 'true' },
+      { name: 'Caja', isActive: true }
+    ],
+    [
+      'unit-measures',
+      { name: ' Metro ', symbol: ' m ', isActive: 'true' },
+      { name: 'Metro', symbol: 'm', isActive: true }
+    ],
+    ['reasons', { name: ' Ajuste ', isActive: 'true' }, { name: 'Ajuste', isActive: true }],
+    [
+      'fulfillment-statuses',
+      { name: ' Pendiente ', isActive: 'true' },
+      { name: 'Pendiente', isActive: true }
+    ]
+  ])('acepta y normaliza los campos válidos de %s', async (catalog, body, expected) => {
+    const result = await runValidation({ catalog, body });
+
+    expect(result.errors).toEqual([]);
+    expect(result.body).toMatchObject(expected);
+  });
+
+  it.each([
+    ['unit-measures', { name: 'Metro', isActive: true }, 'symbol', errorMap.name.REQUIRED],
+    ['departments', { name: 'Ventas' }, 'isActive', errorMap.isActive.REQUIRED],
+    ['reasons', { name: 'Ajuste' }, 'isActive', errorMap.isActive.REQUIRED],
+    ['reasons', { name: 'Ajuste', isActive: 'not-boolean' }, 'isActive', errorMap.isActive.INVALID_BOOLEAN]
+  ])('rechaza el contrato inválido de %s', async (catalog, body, path, code) => {
+    const { errors } = await runValidation({ catalog, body });
+
+    expect(errors).toContainEqual(expect.objectContaining({ path, msg: code }));
+  });
+
+  it.each([
+    ['departments', 51],
+    ['roles', 51],
+    ['presentations', 51],
+    ['unit-measures', 21],
+    ['reasons', 101],
+    ['fulfillment-statuses', 51]
+  ])('respeta el límite persistente de nombre para %s', async (catalog, length) => {
+    const body = {
+      name: 'x'.repeat(length),
+      ...(catalog === 'unit-measures' ? { symbol: 'u' } : {}),
+      isActive: true
+    };
+    const { errors } = await runValidation({ catalog, body });
+
+    expect(errors).toContainEqual(expect.objectContaining({
+      path: 'name',
+      msg: errorMap.name.TOO_LONG(length - 1)
+    }));
+  });
+
+  it('valida los datos de edición sin asumir la resolución del identificador de ruta', async () => {
+    const { errors } = await runValidation({
+      rules: catalogEntryEditValidation,
+      catalog: 'roles',
+      id: 'not-a-uuid',
+      body: { name: 'Operador', isActive: true, expectedVersion: 0 }
+    });
+
+    expect(errors).toEqual([]);
+  });
+
+  it('omite campos que no corresponden al catálogo sin normalizarlos', async () => {
+    const result = await runValidation({ catalog: 'roles', body: {
+      name: ' Operador ', isActive: 'false', symbol: ['no corresponde']
+    } });
+
+    expect(result.errors).toEqual([]);
+    expect(result.body).toEqual({ name: 'Operador', isActive: false, symbol: ['no corresponde'] });
+  });
+
+  it('delega al servicio la resolución de un catálogo no administrable', async () => {
+    const body = { name: ['no corresponde'], isActive: ['no corresponde'] };
+    const result = await runValidation({ catalog: 'unknown', body: { ...body } });
+
+    expect(result.errors).toEqual([]);
+    expect(result.body).toEqual(body);
+  });
+
+  it.each([[10, true], [11, false]])('aplica al símbolo el límite dinámico: %s caracteres', async (length, valid) => {
+    const { errors } = await runValidation({ catalog: 'unit-measures', body: {
+      name: 'Metro', symbol: 'm'.repeat(length), isActive: true
+    } });
+
+    expect(errors).toEqual(valid ? [] : [expect.objectContaining({ path: 'symbol', msg: errorMap.name.TOO_LONG(10) })]);
+  });
+});

@@ -51,3 +51,12 @@ coverage/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Backend outputs after moving the application to back/
+/back/generated/prisma/
+/back/dist/
+/back/build/
+/back/public/build/
+/back/data/
+/back/uploads/
+/back/temp/

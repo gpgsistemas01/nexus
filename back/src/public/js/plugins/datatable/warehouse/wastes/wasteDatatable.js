@@ -1,0 +1,107 @@
+import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
+import { FORM_MODES } from '../../../../constants/formModes.js';
+import { configureRealtimeReload } from '../../core/base/tableOperations.js';
+import { createDataTable } from '../../core/base/createDataTable.js';
+import { renderActionButtons } from '../../core/base/actionButtons.js';
+import { setupTableFilters } from "../../core/filters/tableFilter.js";
+import { getAllWastes } from "../../../../application/warehouse/wastes/wastes.js";
+import { getResponsiveRowData } from '../../core/responsive/rowData.js';
+import { hasPermission, PERMISSIONS } from '../../../../../../shared/constants/permissions.js';
+import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
+import {
+    buildWarehouseInventoryColumns,
+    renderWarehouseInventoryHeader
+} from "../../shared/inventory/warehouseInventoryDatatable.js";
+import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
+import { exportWasteReport } from "../../../../application/warehouse/report.js";
+import { formatFileName } from "../../../../utils/formatters.js";
+
+const selectorTable = DATATABLE_SELECTORS.MAIN;
+const tableElement = document.querySelector(selectorTable);
+
+export const createWasteDatatable = async ({ context, openWasteModal, openWasteStockAdditionModal }) => {
+    const canSeeCost = hasPermission(context, PERMISSIONS.INVENTORY_COSTS_READ);
+    const canSeeActive = hasPermission(context, PERMISSIONS.CATALOGS_MANAGE);
+    const canManageWastes = hasPermission(context, PERMISSIONS.WASTES_WRITE);
+    const canAdjustStock = hasPermission(context, PERMISSIONS.WASTES_ADJUST_STOCK);
+    const canAddStock = hasPermission(context, PERMISSIONS.WASTES_ADD_STOCK);
+
+    renderWarehouseInventoryHeader({
+        tableElement,
+        canSeeActive,
+        canSeeCost,
+        showRollWeights: true,
+        canManageItems: canManageWastes
+    });
+
+    const filters = await setupTableFilters({
+        fields: ['supplier']
+    });
+
+    const columns = buildWarehouseInventoryColumns({
+        canSeeActive,
+        canSeeCost,
+        showRollWeights: true,
+        canManageItems: canManageWastes,
+        renderActions: () => renderActionButtons({
+            status: 'Abierta',
+            context: 'waste',
+            canAdjustStock,
+            canAddStock
+        })
+    });
+
+    const table = createDataTable({
+        options: {
+            ajax: {
+                get: (params) => getAllWastes({
+                    ...params,
+                    ...filters.getValues()
+                })
+            },
+            searchPlaceholder: 'Buscar por Material o Proveedor',
+            columns,
+            buttons: [
+                ...(canManageWastes ? [{
+                    text: 'Nueva merma',
+                    action: () => openWasteModal({ mode: FORM_MODES.CREATE })
+                }] : []),
+                ...(hasPermission(context, PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
+                    filename: formatFileName('reporte_mermas'),
+                    allowMonthlyReport: false,
+                    allowInventoryScope: true,
+                    request: ({ inventoryScope } = {}) => exportWasteReport(buildTableExportParams(table, {
+                        ...filters.getValues(),
+                        inventoryScope
+                    }))
+                })] : [])
+            ]
+        }
+    });
+
+    configureRealtimeReload({
+        table,
+        eventName: 'wastes:updated'
+    });
+
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', async function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        await openWasteModal({ mode: FORM_MODES.EDIT, data });
+    });
+
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-adjust-stock', async function() {
+
+        const data = getResponsiveRowData(table, this);
+
+        await openWasteModal({ mode: FORM_MODES.EDIT_STOCK, data });
+    });
+
+    $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-add-stock', async function() {
+        const data = getResponsiveRowData(table, this);
+        openWasteStockAdditionModal({ data });
+    });
+
+    return table;
+};

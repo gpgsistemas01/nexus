@@ -1,0 +1,213 @@
+import { randomUUID } from 'node:crypto';
+import XLSX from 'xlsx';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import request from 'supertest';
+import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+
+const suffix = Math.random().toString(36).slice(2, 8);
+const ids = {};
+const receipts = {};
+let prisma;
+let app;
+let services;
+const path = resource => `/goods-receipts/${resource === 'material' ? 'materials' : 'consumables'}`;
+
+describe('compras con contexto coherente en cabecera y detalles', () => {
+    beforeAll(async () => {
+        prisma = (await import('../../../src/lib/prisma.js')).prisma;
+        services = {
+            material: await import('../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js'),
+            consumable: await import('../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js')
+        };
+        const controllers = {
+            material: await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js'),
+            consumable: await import('../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js')
+        };
+        const report = await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js');
+        app = createControllerTestApp({ registerRoutes: router => {
+            router.use((req, _res, next) => { req.user = { id: null }; next(); });
+            router.get('/purchase-report', report.exportMaterialGoodsReceiptReportExcel);
+            for (const [resource, label] of [['material', 'Material'], ['consumable', 'Consumable']]) {
+                const controller = controllers[resource];
+                router.get(`${path(resource)}/:id`, controller[`get${label}GoodsReceipt`]);
+                router.get(path(resource), controller[`getAll${label}GoodsReceipts`]);
+                router.post(path(resource), controller[`register${label}GoodsReceipt`]);
+                router.patch(`${path(resource)}/:id`, controller[`edit${label}GoodsReceipt`]);
+                router.patch(`${path(resource)}/:id/details/:detailId/corrections`, controller[`correct${label}GoodsReceiptDetail`]);
+                router.patch(`${path(resource)}/:id/details/:detailId/cancel`, controller[`cancel${label}GoodsReceiptDetail`]);
+            }
+        } });
+        ids.unit = (await prisma.unitMeasure.create({ data: { name: `RC unit ${suffix}`, symbol: `r${suffix}` } })).id;
+        ids.presentation = (await prisma.presentation.create({ data: { name: `RC presentation ${suffix}` } })).id;
+        ids.supplier = (await prisma.supplier.create({ data: {
+            codeNumber: Number.parseInt(Date.now().toString().slice(-8)), code: `RC${suffix}`,
+            legalName: `RC legal ${suffix}`, tradeName: `RC supplier ${suffix}`
+        } })).id;
+        ids.person = (await prisma.person.create({ data: { fullName: `RC person ${suffix}` } })).id;
+        ids.status = (await prisma.status.upsert({ where: { name: 'Aprobada' }, update: {}, create: { name: 'Aprobada' } })).id;
+        await prisma.status.upsert({ where: { name: 'Confirmada' }, update: {}, create: { name: 'Confirmada' } });
+        for (const [resource, type] of [['material', 'MATERIAL'], ['consumable', 'CONSUMABLE']]) {
+            ids[resource] = (await prisma.material.create({ data: {
+                name: `RC ${resource} ${suffix}`, type, unitMeasureId: ids.unit, presentationId: ids.presentation
+            } })).id;
+            await prisma.supplierMaterial.create({ data: {
+                materialId: ids[resource], supplierId: ids.supplier, maxUnitCost: 10, currentStock: 10, convertedQuantity: 10
+            } });
+        }
+        for (const [key, type, resources] of [
+            ['material', 'MATERIAL', ['material']], ['consumable', 'CONSUMABLE', ['consumable']],
+            ['mixed', 'MATERIAL', ['material', 'consumable']], ['empty', 'MATERIAL', []]
+        ]) {
+            receipts[key] = await prisma.goodsReceipt.create({ data: {
+                type, referenceNumber: `RC-${key}-${suffix}`, supplierId: ids.supplier, supplierName: `RC supplier ${suffix}`,
+                receivedById: ids.person, receivedByName: `RC person ${suffix}`, statusId: ids.status,
+                receptionDate: new Date('2026-10-07'), totalQuantity: resources.length * 2,
+                totalNetPurchaseAmount: resources.length * 20, totalGrossPurchaseAmount: resources.length * 23.2,
+                details: { create: resources.map(resource => ({
+                    materialId: ids[resource], materialName: `RC ${resource} ${suffix}`, quantity: 2, convertedQuantity: 2,
+                    costPerUnitType: 10, conversionUnitCost: 10, netPurchaseAmount: 20, grossPurchaseAmount: 23.2
+                })) }
+            }, include: { details: true } });
+        }
+    });
+
+    afterAll(async () => {
+        if (!prisma || !ids.supplier) return;
+        const receiptIds = (await prisma.goodsReceipt.findMany({ where: { supplierId: ids.supplier }, select: { id: true } }))
+            .map(receipt => receipt.id);
+        const movements = await prisma.inventoryMovement.findMany({ where: { goodsReceiptId: { in: receiptIds } }, select: { id: true } });
+        await prisma.movementDetail.deleteMany({ where: { movementId: { in: movements.map(row => row.id) } } });
+        await prisma.inventoryMovement.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
+        await prisma.goodsReceiptDetail.deleteMany({ where: { goodsReceiptId: { in: receiptIds } } });
+        await prisma.goodsReceipt.deleteMany({ where: { id: { in: receiptIds } } });
+        await prisma.supplierMaterial.deleteMany({ where: { supplierId: ids.supplier } });
+        await prisma.material.deleteMany({ where: { id: { in: [ids.material, ids.consumable] } } });
+        await prisma.supplier.delete({ where: { id: ids.supplier } });
+        await prisma.person.delete({ where: { id: ids.person } });
+        await prisma.presentation.delete({ where: { id: ids.presentation } });
+        await prisma.unitMeasure.delete({ where: { id: ids.unit } });
+    });
+
+    it.each([['material', 'Material'], ['consumable', 'Consumable']])('lista y reporta solo compras homogéneas de %s', async (resource, label) => {
+        const response = await request(app).get(path(resource)).query({ supplierId: ids.supplier }).expect(200);
+        expect(response.body.data.map(receipt => receipt.id)).toEqual([receipts[resource].id]);
+        expect(response.body.recordsFiltered).toBe(1);
+        expect(response.body.data[0]).not.toHaveProperty('details');
+        const detail = await request(app).get(`${path(resource)}/${receipts[resource].id}`).expect(200);
+        expect(detail.body.goodsReceipt.details.map(row => row.materialId)).toEqual([ids[resource]]);
+        const other = resource === 'material' ? 'consumable' : 'material';
+        await request(app).get(`${path(resource)}/${receipts[other].id}`).expect(404);
+        await request(app).get(`${path(resource)}/${receipts.mixed.id}`).expect(404);
+        const rows = await Array.fromAsync(services[resource][`find${label}GoodsReceiptReportRows`]({ supplierId: ids.supplier }));
+        expect(rows.map(row => row.referenceNumber)).toEqual([receipts[resource].referenceNumber]);
+    });
+
+    it.each(['material', 'consumable'])('permite editar una compra homogénea de %s', async resource => {
+        const receipt = receipts[resource];
+        await request(app).patch(`${path(resource)}/${receipt.id}`).send({
+            supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-07T00:00:00.000Z', observations: 'Contexto correcto', details: []
+        }).expect(200);
+        expect((await prisma.goodsReceipt.findUnique({ where: { id: receipt.id } })).observations).toBe('Contexto correcto');
+    });
+
+    it.each(['mixed', 'empty', 'consumable'])('rechaza editar %s desde materiales y conserva la cabecera', async key => {
+        const receipt = receipts[key];
+        await request(app).patch(`${path('material')}/${receipt.id}`).send({
+            supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-07T00:00:00.000Z', observations: 'No debe persistir', details: []
+        }).expect(404);
+        expect((await prisma.goodsReceipt.findUnique({ where: { id: receipt.id } })).observations)
+            .toBe(key === 'consumable' ? 'Contexto correcto' : null);
+    });
+
+    it.each(['corrections', 'cancel'])('rechaza %s de ambos detalles de una compra mixta sin efectos', async operation => {
+        const before = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } });
+        for (const detail of receipts.mixed.details) {
+            await request(app).patch(`${path('material')}/${receipts.mixed.id}/details/${detail.id}/${operation}`)
+                .send({ quantity: 1, costPerUnitType: 10 }).expect(404);
+        }
+        expect(await prisma.goodsReceiptDetailChange.count({ where: { goodsReceiptId: receipts.mixed.id } })).toBe(0);
+        expect(await prisma.inventoryMovement.count({ where: { goodsReceiptId: receipts.mixed.id } })).toBe(0);
+        expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } })).toEqual(before);
+    });
+
+    const purchaseBody = resource => ({
+        supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-12T12:00:00.000Z',
+        details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 10 }]
+    });
+    const getCounter = prefix => prisma.referenceNumberCounter.findUnique({
+        where: { prefix_year: { prefix, year: new Date().getFullYear() } }
+    });
+
+    it('emite CMA y CCO concurrentes con contadores independientes e inventario del contexto correcto', async () => {
+        const before = {
+            material: (await getCounter('CMA'))?.counter ?? 0,
+            consumable: (await getCounter('CCO'))?.counter ?? 0
+        };
+        const stocks = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier } });
+        const resources = ['material', 'consumable', 'material', 'consumable', 'material', 'consumable'];
+        const results = await Promise.all(resources.map(resource => request(app).post(path(resource))
+            .send({ ...purchaseBody(resource), type: resource === 'material' ? 'CONSUMABLE' : 'MATERIAL' }).expect(200)));
+        expect(new Set(results.map(result => result.body.goodsReceipt.referenceNumber)).size).toBe(6);
+        for (const [resource, prefix, type] of [['material', 'CMA', 'MATERIAL'], ['consumable', 'CCO', 'CONSUMABLE']]) {
+            const created = results.filter((_result, index) => resources[index] === resource).map(result => result.body.goodsReceipt);
+            expect(created.map(receipt => Number(receipt.referenceNumber.split('-').at(-1))).sort((a, b) => a - b))
+                .toEqual([before[resource] + 1, before[resource] + 2, before[resource] + 3]);
+            for (const receipt of created) {
+                expect(receipt.referenceNumber).toMatch(new RegExp(`^${prefix}-${new Date().getFullYear()}-\\d{6,}$`));
+                const persisted = await prisma.goodsReceipt.findUnique({ where: { id: receipt.id }, include: { details: true } });
+                expect(persisted.type).toBe(type);
+                expect(persisted.details.map(detail => detail.materialId)).toEqual([ids[resource]]);
+                expect(await prisma.inventoryMovement.count({ where: { goodsReceiptId: receipt.id } })).toBe(1);
+            }
+            expect((await getCounter(prefix)).counter).toBe(before[resource] + 3);
+            const stock = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } } });
+            expect(Number(stock.currentStock)).toBe(Number(stocks.find(row => row.materialId === ids[resource]).currentStock) + 6);
+        }
+    });
+
+    it.each([['material', 'CMA'], ['consumable', 'CCO']])('revierte contador, compra y stock si falla el registro de %s', async (resource, prefix) => {
+        const beforeCounter = await getCounter(prefix);
+        const beforeCount = await prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } });
+        const beforeStocks = await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } });
+        const beforeMovements = await prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } });
+        await request(app).post(path(resource)).send({ ...purchaseBody(resource), observations: 'x'.repeat(501) }).expect(500);
+        expect(await getCounter(prefix)).toEqual(beforeCounter);
+        expect(await prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } })).toBe(beforeCount);
+        expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } })).toEqual(beforeStocks);
+        expect(await prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } })).toBe(beforeMovements);
+    });
+
+    it('exporta compras a través del límite de lote y conserva fórmulas y resúmenes reales', async () => {
+        const prefix = `RCB-${suffix}`;
+        const rows = Array.from({ length: 251 }, (_, index) => ({
+            id: randomUUID(), referenceNumber: `${prefix}-${String(index).padStart(3, '0')}`,
+            supplierId: ids.supplier, supplierName: 'Proveedor de lotes', receivedById: ids.person,
+            receivedByName: 'Receptor de lotes', receptionDate: new Date('2026-10-16T12:00:00Z'),
+            statusId: ids.status, type: 'MATERIAL', totalQuantity: 1,
+            totalNetPurchaseAmount: 10, totalGrossPurchaseAmount: 11.6
+        }));
+        await prisma.goodsReceipt.createMany({ data: rows });
+        await prisma.goodsReceiptDetail.createMany({ data: rows.map(row => ({
+            goodsReceiptId: row.id, materialId: ids.material, materialName: 'Material por lotes',
+            quantity: 1, convertedQuantity: 1, costPerUnitType: 10, conversionUnitCost: 10,
+            netPurchaseAmount: 10, grossPurchaseAmount: 11.6
+        })) });
+        const response = await request(app).get('/purchase-report').query({ search: prefix })
+            .buffer(true).parse((res, callback) => {
+                const chunks = [];
+                res.on('data', chunk => chunks.push(chunk));
+                res.on('end', () => callback(null, Buffer.concat(chunks)));
+            }).expect(200);
+        const workbook = XLSX.read(response.body, { type: 'buffer' });
+        const sheet = workbook.Sheets['Compras materiales'];
+        const values = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        expect(values.filter(row => String(row[0]).startsWith(prefix))).toHaveLength(251);
+        expect(new Set(values.filter(row => String(row[0]).startsWith(prefix)).map(row => row[0])).size).toBe(251);
+        expect(sheet.O252).toMatchObject({ f: 'I252*N252', v: 10 });
+        expect(sheet.P252).toMatchObject({ f: 'O252*1.16', v: 11.6 });
+        expect(sheet.B257.v).toBe(2510);
+        expect(sheet.D262.v).toBe(2510);
+        expect(sheet.E262.v).toBe(251);
+    });
+
+});

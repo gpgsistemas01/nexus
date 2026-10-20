@@ -1,0 +1,111 @@
+import { normalizeDatabaseError } from '../../../../errors/databaseError.js';
+import { lockSupplierMaterialStock } from '../../../../repository/warehouse/stockLockRepository.js';
+import { lockGoodsReceipt } from '../../../../repository/warehouse/documentLockRepository.js';
+import { isAppError } from '../../../../errors/AppError.js';
+import { GOODS_RECEIPT_DETAIL_CHANGE_TYPES } from '../../../../constants/goodsReceiptDetailChanges.js';
+import { GoodsIssueInsufficientStock } from '../../../../errors/inventory/stockError.js';
+import {
+    GoodsReceiptCorrectionInsufficientStock,
+    GoodsReceiptDetailChangeReasonNotFound,
+    GoodsReceiptDetailAlreadyCanceled,
+    GoodsReceiptNotFound,
+    GoodsReceiptUpdateDatabaseError
+} from '../../../../errors/warehouse/goodsReceiptError.js';
+import { getDb } from '../../../../repository/baseRepository.js';
+import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
+import { normalizeDecimal } from '../../../../shared/utils/numberUtils.js';
+import { cancelGoodsReceiptDetailAndTotals } from '../goodsReceiptTotalsService.js';
+import {
+    createGoodsReceiptDetailChange,
+    createGoodsReceiptDetailChangeMovementAndUpdateStock,
+    findReceiptDetailForChange,
+    GOODS_RECEIPT_DETAIL_STATUS
+} from './goodsReceiptDetailChangeService.js';
+import { findGoodsReceiptDetailChangeReason } from '../../reasonService.js';
+import { recalculateMaterialUnitCosts } from '../../materials/supplierMaterialService.js';
+
+const serviceLogger = createServiceLogger('warehouse.goodsReceipts.detailChanges.goodsReceiptCancellationService');
+
+export const cancelGoodsReceiptDetailLine = async ({ id, detailId, userId, type = null }) => {
+    try {
+        const result = await getDb().$transaction(async (tx) => {
+            await lockGoodsReceipt({ tx, id });
+            const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId, type });
+
+            if (!currentDetail) throw new GoodsReceiptNotFound();
+            if (currentDetail.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED) {
+                throw new GoodsReceiptDetailAlreadyCanceled();
+            }
+            await lockSupplierMaterialStock({
+                tx,
+                materialId: currentDetail.materialId,
+                supplierId: currentDetail.goodsReceipt.supplierId
+            });
+            const changeType = GOODS_RECEIPT_DETAIL_CHANGE_TYPES.CANCELLATION;
+            const cancellationReason = await findGoodsReceiptDetailChangeReason({ tx, changeType });
+            if (!cancellationReason) throw new GoodsReceiptDetailChangeReasonNotFound();
+
+            const canceledDetailSnapshot = {
+                materialId: currentDetail.materialId,
+                materialName: currentDetail.materialName,
+                quantity: currentDetail.quantity,
+                costPerUnitType: currentDetail.costPerUnitType,
+                netPurchaseAmount: currentDetail.netPurchaseAmount,
+                grossPurchaseAmount: currentDetail.grossPurchaseAmount
+            };
+            const quantityDifference = normalizeDecimal(-canceledDetailSnapshot.quantity);
+            const movement = await createGoodsReceiptDetailChangeMovementAndUpdateStock({
+                tx,
+                currentDetail,
+                quantityDifference,
+                goodsReceiptId: id,
+                goodsReceiptDetailId: detailId
+            });
+            const { updatedDetail, updatedReceipt } = await cancelGoodsReceiptDetailAndTotals({
+                tx,
+                goodsReceiptId: id,
+                detailId
+            });
+            const detailChange = await createGoodsReceiptDetailChange({
+                tx,
+                currentDetail,
+                resultingDetail: canceledDetailSnapshot,
+                reasonId: cancellationReason.id,
+                inventoryMovementId: movement.id,
+                changeType,
+                goodsReceiptId: id,
+                goodsReceiptDetailId: detailId,
+                changedById: userId,
+                quantityDifference
+            });
+
+            await recalculateMaterialUnitCosts({
+                tx,
+                supplierId: updatedReceipt.supplierId,
+                materialIds: [updatedDetail.materialId]
+            });
+
+            return {
+                updatedDetail,
+                updatedReceipt,
+                detailChange,
+                movement
+            };
+        });
+
+        return result;
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.goodsReceipts.detailChanges.goodsReceiptCancellationService.cancelGoodsReceiptDetailLine',
+            ...getModelLogContext('goodsReceiptDetailChange', { id, detailId })
+        });
+
+        if (err instanceof GoodsIssueInsufficientStock) {
+            throw new GoodsReceiptCorrectionInsufficientStock(err.meta);
+        }
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
+
+        throw new GoodsReceiptUpdateDatabaseError();
+    }
+};

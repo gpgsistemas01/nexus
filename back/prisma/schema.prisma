@@ -1,0 +1,913 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Department {
+  version        Int                    @default(0)
+  id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key            String                 @unique @default(dbgenerated("gen_random_uuid()::text")) @db.VarChar(100)
+  name           String                 @unique @db.VarChar(50)
+  isActive       Boolean                @default(true)
+  personAccesses PersonRoleDepartment[]
+  accesses       UserRoleDepartment[]
+  goodsIssues    GoodsIssue[]
+  wasteIssues    WasteIssue[]
+}
+
+model Role {
+  version        Int                    @default(0)
+  id             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key            String                 @unique @default(dbgenerated("gen_random_uuid()::text")) @db.VarChar(100)
+  name           String                 @unique @db.VarChar(50)
+  isActive       Boolean                @default(true)
+  accesses       UserRoleDepartment[]
+  personAccesses PersonRoleDepartment[]
+}
+
+model User {
+  version                       Int                        @default(0)
+  id                            String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  personId                      String?                    @db.Uuid
+  name                          String                     @unique @db.VarChar(50)
+  password                      String                     @db.VarChar(100)
+  isActive                      Boolean                    @default(true)
+  person                        Person?                    @relation(fields: [personId], references: [id])
+  accesses                      UserRoleDepartment[]
+  createrStockAdjustment        StockAdjustment[]          @relation("CreatedStockAdjustments")
+  approverStockAdjustment       StockAdjustment[]          @relation("ApprovedStockAdjustments")
+  goodsIssueReturns             GoodsIssueReturn[]
+  wasteIssueReturns             WasteIssueReturn[]
+  goodsReceiptDetailChanges     GoodsReceiptDetailChange[]
+  createdWasteStockAdjustments  WasteStockAdjustment[]     @relation("CreatedWasteStockAdjustments")
+  approvedWasteStockAdjustments WasteStockAdjustment[]     @relation("ApprovedWasteStockAdjustments")
+  wasteOperations               WasteOperation[]
+  wasteStockEntries             WasteStockEntry[]
+  criticalWriteAudits           CriticalWriteAudit[]
+  wasteIssues                   WasteIssue[]
+}
+
+model CriticalWriteAudit {
+  id         String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actorId    String?                  @db.Uuid
+  action     CriticalWriteAuditAction
+  resource   String                   @db.VarChar(100)
+  entityId   String?                  @db.VarChar(100)
+  method     String                   @db.VarChar(10)
+  path       String                   @db.VarChar(500)
+  statusCode Int
+  changes    Json?
+  requestId  String?                  @db.VarChar(100)
+  ipAddress  String?                  @db.VarChar(45)
+  userAgent  String?                  @db.VarChar(500)
+  createdAt  DateTime                 @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([resource, entityId, createdAt])
+  @@index([createdAt])
+}
+
+enum CriticalWriteAuditAction {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+model UserRoleDepartment {
+  userId       String @db.Uuid
+  roleId       String @db.Uuid
+  departmentId String @db.Uuid
+
+  user       User       @relation(fields: [userId], references: [id])
+  role       Role       @relation(fields: [roleId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@id([userId, roleId, departmentId])
+}
+
+/// Persona que participa en los procesos del negocio. `Person` identifica el papel
+/// persistido; la cuenta `User` conserva la trazabilidad del actor que ejecuta acciones.
+/// El UUID y sus claves foráneas mantienen el seguimiento histórico de la persona.
+model Person {
+  version                   Int                    @default(0)
+  id                        String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName                  String                 @db.VarChar(255)
+  isActive                  Boolean                @default(true)
+  goodsReceipts             GoodsReceipt[]
+  accesses                  PersonRoleDepartment[]
+  users                     User[]
+  approverGoodsIssues       GoodsIssue[]           @relation("ApproverGoodsIssueRelation")
+  requesterGoodsIssues      GoodsIssue[]           @relation("RequesterGoodsIssueRelation")
+  requesterWasteIssues      WasteIssue[]           @relation("RequesterWasteIssueRelation")
+  warehouseStaffGoodsIssues GoodsIssue[]           @relation("WarehouseStaffGoodsIssueRelation")
+  clients                   Client[]
+  goodsIssues               GoodsIssue[]
+  advisedWasteIssues        WasteIssue[]           @relation("AdvisorWasteIssueRelation")
+}
+
+/// Accesos por área y rol asignados a una persona del negocio (`Person`).
+model PersonRoleDepartment {
+  departmentId String @db.Uuid
+  personId     String @db.Uuid
+  roleId       String @db.Uuid
+
+  department Department @relation(fields: [departmentId], references: [id])
+  person     Person     @relation(fields: [personId], references: [id])
+  role       Role       @relation(fields: [roleId], references: [id])
+
+  @@id([personId, roleId, departmentId])
+  @@index([roleId])
+  @@index([departmentId])
+}
+
+model Status {
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String         @unique
+  goodsReceipts GoodsReceipt[]
+  goodsIssues   GoodsIssue[]
+  wasteIssues   WasteIssue[]
+}
+
+model Material {
+  version                            Int                        @default(0)
+  id                                 String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                               String                     @db.VarChar(200)
+  sku                                String?                    @unique @db.VarChar(200)
+  presentationId                     String                     @db.Uuid
+  unitMeasureId                      String                     @db.Uuid
+  minStock                           Decimal                    @default(0) @db.Decimal(18, 6)
+  base                               Decimal?                   @db.Decimal(18, 6)
+  height                             Decimal?                   @db.Decimal(18, 6)
+  type                               MaterialType               @default(MATERIAL)
+  presentation                       Presentation               @relation(fields: [presentationId], references: [id])
+  unitMeasure                        UnitMeasure                @relation(fields: [unitMeasureId], references: [id])
+  goodsIssueDetails                  GoodsIssueDetail[]
+  goodsReceiptDetails                GoodsReceiptDetail[]
+  previousGoodsReceiptDetailChanges  GoodsReceiptDetailChange[] @relation("PreviousGoodsReceiptDetailChangeMaterial")
+  correctedGoodsReceiptDetailChanges GoodsReceiptDetailChange[] @relation("CorrectedGoodsReceiptDetailChangeMaterial")
+  movementDetails                    MovementDetail[]
+  supplierMaterials                  SupplierMaterial[]
+  wasteRolls                         Waste[]                    @relation("WasteRollMaterial")
+  stockAdjustmentDetails             StockAdjustmentDetail[]
+}
+
+enum MaterialType {
+  MATERIAL
+  CONSUMABLE
+}
+
+model UnitMeasure {
+  version   Int        @default(0)
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String     @db.VarChar(20)
+  symbol    String     @db.VarChar(10)
+  isActive  Boolean    @default(true)
+  materials Material[]
+  wastes    Waste[]
+
+  @@unique([name, symbol])
+}
+
+model Presentation {
+  version   Int        @default(0)
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String     @unique @db.VarChar(50)
+  isActive  Boolean    @default(true)
+  materials Material[]
+  wastes    Waste[]
+}
+
+model Supplier {
+  version                Int                     @default(0)
+  id                     String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codeNumber             Int
+  code                   String                  @unique @db.VarChar(10)
+  legalName              String                  @db.VarChar(200)
+  tradeName              String                  @db.VarChar(100)
+  isActive               Boolean                 @default(true)
+  goodsReceipts          GoodsReceipt[]
+  goodsIssueDetails      GoodsIssueDetail[]
+  materials              SupplierMaterial[]
+  movementDetails        MovementDetail[]
+  stockAdjustmentDetails StockAdjustmentDetail[]
+  wastes                 Waste[]
+}
+
+model SupplierMaterial {
+  version                    Int      @default(0)
+  id                         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  maxUnitCost                Decimal? @db.Decimal(18, 6)
+  sku                        String?  @db.VarChar(50)
+  currentStock               Decimal  @default(0) @db.Decimal(18, 6)
+  convertedQuantity          Decimal  @default(0) @db.Decimal(18, 6)
+  isActive                   Boolean  @default(true)
+  supplierId                 String   @db.Uuid
+  materialId                 String   @db.Uuid
+  referenceConeWeightKg      Decimal? @db.Decimal(5, 2)
+  referenceRollTotalWeightKg Decimal? @db.Decimal(5, 2)
+  supplier                   Supplier @relation(fields: [supplierId], references: [id])
+  material                   Material @relation(fields: [materialId], references: [id])
+
+  @@unique([supplierId, materialId])
+  @@index([supplierId])
+  @@index([materialId])
+}
+
+model Waste {
+  version                    Int                          @default(0)
+  id                         String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supplierId                 String                       @db.Uuid
+  presentationId             String                       @db.Uuid
+  unitMeasureId              String                       @db.Uuid
+  name                       String                       @db.VarChar(200)
+  isActive                   Boolean                      @default(true)
+  minStock                   Decimal                      @default(0) @db.Decimal(18, 6)
+  base                       Decimal?                     @db.Decimal(18, 6)
+  height                     Decimal?                     @db.Decimal(18, 6)
+  maxUnitCost                Decimal?                     @db.Decimal(18, 6)
+  /// Peso neto en kg por unidad de merma ROLLO.
+  weightKg                   Decimal?                     @db.Decimal(5, 2)
+  coneWeightKg               Decimal?                     @db.Decimal(5, 2)
+  totalWeightKg              Decimal?                     @db.Decimal(5, 2)
+  /// Referencias históricas; las altas nuevas no escriben estos valores derivados.
+  sampleLengthM              Decimal?                     @db.Decimal(18, 6)
+  sampleNetWeightKg          Decimal?                     @db.Decimal(18, 6)
+  /// Peso del rollo completo con el mismo cono de la merma.
+  referenceRollTotalWeightKg Decimal?                     @db.Decimal(5, 2)
+  sourceMaterialId           String?                      @db.Uuid
+  sourceMaterial             Material?                    @relation("WasteRollMaterial", fields: [sourceMaterialId], references: [id], onDelete: Restrict)
+  currentStock               Decimal                      @default(0) @db.Decimal(18, 6)
+  convertedQuantity          Decimal                      @default(0) @db.Decimal(18, 6)
+  supplier                   Supplier                     @relation(fields: [supplierId], references: [id])
+  presentation               Presentation                 @relation(fields: [presentationId], references: [id])
+  unitMeasure                UnitMeasure                  @relation(fields: [unitMeasureId], references: [id])
+  stockAdjustmentDetails     WasteStockAdjustmentDetail[]
+  movementDetails            WasteMovementDetail[]
+  wasteIssueDetails          WasteIssueDetail[]
+  wasteIssueReturns          WasteIssueReturn[]
+  stockEntries               WasteStockEntry[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([supplierId, name, base, height, coneWeightKg, totalWeightKg])
+  @@index([sourceMaterialId])
+  @@index([supplierId])
+  @@index([presentationId])
+  @@index([unitMeasureId])
+}
+
+/// Corrección de saldo con folio AME-AAAA-consecutivo; conserva ajustes históricos de alta.
+model WasteStockAdjustment {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  referenceNumber String @unique @db.VarChar(50)
+
+  type         StockAdjustmentType
+  reasonId     String              @db.Uuid
+  observations String?             @db.VarChar(500)
+
+  status AdjustmentStatus @default(PENDING)
+
+  createdById     String  @db.Uuid
+  approvedById    String? @db.Uuid
+  wasteMovementId String? @unique @db.Uuid
+
+  reason     StockAdjustmentReason @relation(fields: [reasonId], references: [id])
+  createdBy  User                  @relation("CreatedWasteStockAdjustments", fields: [createdById], references: [id])
+  approvedBy User?                 @relation("ApprovedWasteStockAdjustments", fields: [approvedById], references: [id])
+
+  movement WasteMovement?               @relation(fields: [wasteMovementId], references: [id], onDelete: SetNull)
+  details  WasteStockAdjustmentDetail[]
+
+  appliedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reasonId])
+  @@index([createdById])
+  @@index([approvedById])
+}
+
+model WasteStockAdjustmentDetail {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  wasteStockAdjustmentId String @db.Uuid
+  wasteId                String @db.Uuid
+
+  materialName String @db.VarChar(200)
+
+  previousStock Decimal @db.Decimal(18, 6)
+  newStock      Decimal @db.Decimal(18, 6)
+  difference    Decimal @db.Decimal(18, 6)
+
+  previousConvertedQuantity Decimal @db.Decimal(18, 6)
+  newConvertedQuantity      Decimal @db.Decimal(18, 6)
+  convertedDifference       Decimal @db.Decimal(18, 6)
+
+  wasteStockAdjustment WasteStockAdjustment  @relation(fields: [wasteStockAdjustmentId], references: [id], onDelete: Cascade)
+  waste                Waste                 @relation(fields: [wasteId], references: [id])
+  movementDetails      WasteMovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([wasteStockAdjustmentId])
+  @@index([wasteId])
+}
+
+model WasteMovement {
+  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber      String?               @unique @db.VarChar(50)
+  type                 InventoryMovementType
+  details              WasteMovementDetail[]
+  date                 DateTime              @default(now())
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  wasteStockAdjustment WasteStockAdjustment?
+  wasteStockEntry      WasteStockEntry?
+  wasteIssueId         String?               @db.Uuid
+  wasteIssue           WasteIssue?           @relation(fields: [wasteIssueId], references: [id])
+
+  @@index([wasteIssueId])
+}
+
+/// Entrada inicial o incremental de merma con folio EME-AAAA-consecutivo.
+/// Conserva el folio, actor, captura y saldos; el movimiento relacionado permanece inmutable.
+/// Recibo durable de una operación de merma; sobrevive a la pérdida de la respuesta HTTP.
+model WasteOperation {
+  userId      String   @db.Uuid
+  operationId String   @db.Uuid
+  requestHash String   @db.VarChar(64)
+  result      Json?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@id([userId, operationId])
+}
+
+model WasteStockEntry {
+  id              String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber String @unique @db.VarChar(50)
+  wasteId         String @db.Uuid
+  createdById     String @db.Uuid
+  wasteMovementId String @unique @db.Uuid
+
+  materialName  String  @db.VarChar(200)
+  quantity      Decimal @db.Decimal(18, 6)
+  previousStock Decimal @db.Decimal(18, 6)
+  newStock      Decimal @db.Decimal(18, 6)
+  observations  String? @db.VarChar(500)
+
+  waste     Waste         @relation(fields: [wasteId], references: [id])
+  createdBy User          @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  movement  WasteMovement @relation(fields: [wasteMovementId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([wasteId])
+  @@index([createdById])
+}
+
+model WasteMovementDetail {
+  id                           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  quantity                     Decimal  @db.Decimal(18, 6)
+  newStock                     Decimal? @db.Decimal(18, 6)
+  previousStock                Decimal? @db.Decimal(18, 6)
+  wasteId                      String   @db.Uuid
+  wasteStockAdjustmentDetailId String?  @db.Uuid
+  movementId                   String   @db.Uuid
+  wasteIssueDetailId           String?  @db.Uuid
+
+  waste                      Waste                       @relation(fields: [wasteId], references: [id])
+  wasteStockAdjustmentDetail WasteStockAdjustmentDetail? @relation(fields: [wasteStockAdjustmentDetailId], references: [id])
+  movement                   WasteMovement               @relation(fields: [movementId], references: [id], onDelete: Cascade)
+  wasteIssueDetail           WasteIssueDetail?           @relation(fields: [wasteIssueDetailId], references: [id])
+  wasteIssueReturn           WasteIssueReturn?
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+
+  @@index([wasteId])
+  @@index([wasteStockAdjustmentDetailId])
+  @@index([movementId])
+  @@index([wasteIssueDetailId])
+}
+
+model WasteIssue {
+  id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Folio SME-AAAA-consecutivo, independiente de salidas de artículos.
+  referenceNumber     String             @unique @db.VarChar(50)
+  requestDate         DateTime
+  observations        String?            @db.VarChar(500)
+  projectNumber       String             @db.VarChar(10)
+  departmentName      String             @db.VarChar(50)
+  requesterName       String             @db.VarChar(255)
+  clientName          String             @db.VarChar(255)
+  advisorName         String             @db.VarChar(255)
+  createdById         String             @db.Uuid
+  departmentId        String             @db.Uuid
+  requesterId         String             @db.Uuid
+  clientId            String             @db.Uuid
+  advisorId           String             @db.Uuid
+  fulfillmentStatusId String             @db.Uuid
+  statusId            String             @db.Uuid
+  createdBy           User               @relation(fields: [createdById], references: [id])
+  department          Department         @relation(fields: [departmentId], references: [id])
+  requester           Person             @relation("RequesterWasteIssueRelation", fields: [requesterId], references: [id])
+  client              Client             @relation(fields: [clientId], references: [id])
+  advisor             Person             @relation("AdvisorWasteIssueRelation", fields: [advisorId], references: [id])
+  fulfillmentStatus   FulfillmentStatus  @relation(fields: [fulfillmentStatusId], references: [id], onDelete: Restrict)
+  status              Status             @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  details             WasteIssueDetail[]
+  movements           WasteMovement[]
+  returns             WasteIssueReturn[]
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([createdById])
+  @@index([departmentId])
+  @@index([requesterId])
+  @@index([clientId])
+  @@index([advisorId])
+  @@index([fulfillmentStatusId])
+  @@index([statusId])
+  @@index([requestDate])
+}
+
+model WasteIssueDetail {
+  id                          String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  wasteIssueId                String                @db.Uuid
+  wasteId                     String                @db.Uuid
+  materialName                String                @db.VarChar(200)
+  quantity                    Decimal               @db.Decimal(18, 6)
+  convertedQuantity           Decimal               @db.Decimal(18, 6)
+  projectConvertedQuantity    Decimal?              @db.Decimal(18, 6)
+  convertedQuantityDifference Decimal?              @db.Decimal(18, 6)
+  suppliedQuantity            Decimal               @default(0) @db.Decimal(18, 6)
+  returnedQuantity            Decimal               @default(0) @db.Decimal(18, 6)
+  isSupplied                  Boolean               @default(false)
+  fulfillmentStatusId         String                @db.Uuid
+  wasteIssue                  WasteIssue            @relation(fields: [wasteIssueId], references: [id], onDelete: Cascade)
+  waste                       Waste                 @relation(fields: [wasteId], references: [id])
+  fulfillmentStatus           FulfillmentStatus     @relation(fields: [fulfillmentStatusId], references: [id], onDelete: Restrict)
+  movementDetails             WasteMovementDetail[]
+  returns                     WasteIssueReturn[]
+  createdAt                   DateTime              @default(now())
+  updatedAt                   DateTime              @updatedAt
+
+  @@unique([wasteIssueId, wasteId])
+  @@index([wasteId])
+  @@index([fulfillmentStatusId])
+}
+
+model WasteIssueReturn {
+  id                           String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  wasteIssueId                 String               @db.Uuid
+  wasteIssueDetailId           String               @db.Uuid
+  movementDetailId             String?              @unique @db.Uuid
+  returnedById                 String?              @db.Uuid
+  wasteId                      String               @db.Uuid
+  materialName                 String               @db.VarChar(200)
+  currentTotalReturnedQuantity Decimal              @db.Decimal(18, 6)
+  newTotalReturnedQuantity     Decimal              @db.Decimal(18, 6)
+  observations                 String?              @db.VarChar(500)
+  wasteIssue                   WasteIssue           @relation(fields: [wasteIssueId], references: [id], onDelete: Cascade)
+  wasteIssueDetail             WasteIssueDetail     @relation(fields: [wasteIssueDetailId], references: [id], onDelete: Restrict)
+  movementDetail               WasteMovementDetail? @relation(fields: [movementDetailId], references: [id], onDelete: SetNull)
+  returnedBy                   User?                @relation(fields: [returnedById], references: [id], onDelete: SetNull)
+  waste                        Waste                @relation(fields: [wasteId], references: [id], onDelete: Restrict)
+  createdAt                    DateTime             @default(now())
+  updatedAt                    DateTime             @updatedAt
+
+  @@index([wasteIssueId])
+  @@index([wasteIssueDetailId])
+  @@index([returnedById])
+  @@index([wasteId])
+}
+
+model Project {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referenceNumber String       @unique @db.VarChar(50)
+  client          String       @db.VarChar(50)
+  name            String       @db.VarChar(50)
+  date            DateTime
+  goodsIssues     GoodsIssue[]
+}
+
+model Client {
+  version     Int          @default(0)
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String       @db.VarChar(255)
+  isActive    Boolean      @default(true)
+  advisorId   String?      @db.Uuid
+  advisor     Person?      @relation(fields: [advisorId], references: [id])
+  goodsIssues GoodsIssue[]
+  wasteIssues WasteIssue[]
+
+  @@index([advisorId])
+}
+
+/// Contadores anuales independientes por prefijo: SMA, SCO, SME, CMA y CCO, entre otros.
+model ReferenceNumberCounter {
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  prefix  String @db.VarChar(10)
+  counter Int    @default(0)
+  year    Int    @default(0)
+
+  @@unique([prefix, year])
+}
+
+model GoodsReceipt {
+  id                       String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoice                  String?                    @db.VarChar(50)
+  isInvoiced               Boolean                    @default(false)
+  supplierId               String                     @db.Uuid
+  supplierName             String                     @db.VarChar(200)
+  statusId                 String                     @db.Uuid
+  receivedById             String                     @db.Uuid
+  receivedByName           String                     @db.VarChar(255)
+  /// Folio CMA-AAAA-consecutivo o CCO-AAAA-consecutivo según type.
+  referenceNumber          String                     @unique @db.VarChar(50)
+  receptionDate            DateTime
+  observations             String?                    @db.VarChar(500)
+  totalQuantity            Decimal                    @db.Decimal(18, 6)
+  totalNetPurchaseAmount   Decimal                    @db.Decimal(18, 6)
+  totalGrossPurchaseAmount Decimal                    @db.Decimal(18, 6)
+  type                     MaterialType               @default(MATERIAL)
+  receivedBy               Person                     @relation(fields: [receivedById], references: [id])
+  supplier                 Supplier                   @relation(fields: [supplierId], references: [id])
+  status                   Status                     @relation(fields: [statusId], references: [id])
+  movements                InventoryMovement[]
+  details                  GoodsReceiptDetail[]
+  detailChanges            GoodsReceiptDetailChange[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([supplierId, invoice])
+  @@index([supplierId])
+  @@index([statusId])
+  @@index([receivedById])
+  @@index([type])
+}
+
+model GoodsReceiptDetail {
+  id                  String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  materialId          String                     @db.Uuid
+  goodsReceiptId      String                     @db.Uuid
+  quantity            Decimal                    @db.Decimal(18, 6)
+  conversionUnitCost  Decimal                    @db.Decimal(18, 6)
+  costPerUnitType     Decimal                    @db.Decimal(18, 6)
+  convertedQuantity   Decimal                    @db.Decimal(18, 6)
+  netPurchaseAmount   Decimal                    @db.Decimal(18, 6)
+  grossPurchaseAmount Decimal                    @db.Decimal(18, 6)
+  materialName        String                     @db.VarChar(200)
+  status              GoodsReceiptDetailStatus   @default(ACTIVE)
+  goodsReceipt        GoodsReceipt               @relation(fields: [goodsReceiptId], references: [id])
+  material            Material                   @relation(fields: [materialId], references: [id])
+  movementDetails     MovementDetail[]
+  changes             GoodsReceiptDetailChange[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([goodsReceiptId])
+  @@index([materialId])
+}
+
+enum GoodsReceiptDetailStatus {
+  ACTIVE
+  CANCELED
+}
+
+model GoodsIssue {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type            MaterialType @default(MATERIAL)
+  /// Folio SMA-AAAA-consecutivo o SCO-AAAA-consecutivo según type.
+  referenceNumber String       @unique @db.VarChar(50)
+  approvedDate    DateTime?
+  requestDate     DateTime
+  deliveryDate    DateTime?
+  observations    String?      @db.VarChar(500)
+  projectNumber   String       @db.VarChar(10)
+  departmentName  String       @db.VarChar(50)
+  requesterName   String       @db.VarChar(255)
+  clientName      String       @db.VarChar(255)
+  advisorName     String       @db.VarChar(255)
+
+  statusId            String  @db.Uuid
+  departmentId        String  @db.Uuid
+  approverId          String? @db.Uuid
+  requesterId         String  @db.Uuid
+  warehouseStaffId    String? @db.Uuid
+  projectId           String? @db.Uuid
+  clientId            String  @db.Uuid
+  advisorId           String  @db.Uuid
+  fulfillmentStatusId String? @db.Uuid
+
+  department        Department         @relation(fields: [departmentId], references: [id])
+  approver          Person?            @relation("ApproverGoodsIssueRelation", fields: [approverId], references: [id])
+  requester         Person             @relation("RequesterGoodsIssueRelation", fields: [requesterId], references: [id])
+  warehouseStaff    Person?            @relation("WarehouseStaffGoodsIssueRelation", fields: [warehouseStaffId], references: [id])
+  status            Status             @relation(fields: [statusId], references: [id])
+  project           Project?           @relation(fields: [projectId], references: [id])
+  client            Client             @relation(fields: [clientId], references: [id])
+  advisor           Person             @relation(fields: [advisorId], references: [id])
+  fulfillmentStatus FulfillmentStatus? @relation(fields: [fulfillmentStatusId], references: [id])
+
+  details   GoodsIssueDetail[]
+  movements InventoryMovement[]
+  returns   GoodsIssueReturn[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([departmentId])
+  @@index([requesterId])
+  @@index([clientId])
+  @@index([fulfillmentStatusId])
+}
+
+model GoodsIssueDetail {
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  materialId   String @db.Uuid
+  goodsIssueId String @db.Uuid
+  supplierId   String @db.Uuid
+
+  materialName                String   @db.VarChar(200)
+  quantity                    Decimal  @db.Decimal(18, 6)
+  applyWaste                  Boolean  @default(false)
+  convertedQuantity           Decimal  @db.Decimal(18, 6)
+  maxUnitCost                 Decimal  @db.Decimal(18, 6)
+  projectConvertedQuantity    Decimal? @db.Decimal(18, 6)
+  convertedQuantityDifference Decimal? @db.Decimal(18, 6)
+  suppliedQuantity            Decimal? @db.Decimal(18, 6)
+  returnedQuantity            Decimal  @default(0) @db.Decimal(18, 6)
+  isSupplied                  Boolean  @default(false)
+  fulfillmentStatusId         String   @db.Uuid
+
+  material          Material           @relation(fields: [materialId], references: [id])
+  supplier          Supplier           @relation(fields: [supplierId], references: [id])
+  goodsIssue        GoodsIssue         @relation(fields: [goodsIssueId], references: [id])
+  fulfillmentStatus FulfillmentStatus  @relation(fields: [fulfillmentStatusId], references: [id], onDelete: Restrict)
+  movementDetails   MovementDetail[]
+  returns           GoodsIssueReturn[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([materialId])
+  @@index([supplierId])
+  @@index([goodsIssueId, fulfillmentStatusId])
+}
+
+model GoodsIssueReturn {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  goodsIssueId       String  @db.Uuid
+  goodsIssueDetailId String  @db.Uuid
+  movementDetailId   String? @unique @db.Uuid
+  returnedById       String? @db.Uuid
+
+  materialId   String @db.Uuid
+  materialName String @db.VarChar(200)
+  supplierId   String @db.Uuid
+
+  currentTotalReturnedQuantity Decimal @db.Decimal(18, 6)
+  newTotalReturnedQuantity     Decimal @db.Decimal(18, 6)
+  observations                 String? @db.VarChar(500)
+
+  goodsIssue       GoodsIssue       @relation(fields: [goodsIssueId], references: [id])
+  goodsIssueDetail GoodsIssueDetail @relation(fields: [goodsIssueDetailId], references: [id])
+  movementDetail   MovementDetail?  @relation(fields: [movementDetailId], references: [id], onDelete: SetNull)
+  returnedBy       User?            @relation(fields: [returnedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([goodsIssueId])
+  @@index([goodsIssueDetailId])
+  @@index([returnedById])
+}
+
+model FulfillmentStatus {
+  version           Int                @default(0)
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String             @unique @db.VarChar(50)
+  isActive          Boolean            @default(true)
+  goodsIssues       GoodsIssue[]
+  goodsIssueDetails GoodsIssueDetail[]
+  wasteIssues       WasteIssue[]
+  wasteIssueDetails WasteIssueDetail[]
+}
+
+model InventoryMovement {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  referenceNumber String? @unique @db.VarChar(50)
+
+  type InventoryMovementType
+
+  goodsReceiptId    String? @db.Uuid
+  goodsIssueId      String? @db.Uuid
+  stockAdjustmentId String? @unique @db.Uuid
+
+  date DateTime @default(now())
+
+  goodsReceipt             GoodsReceipt?             @relation(fields: [goodsReceiptId], references: [id])
+  goodsIssue               GoodsIssue?               @relation(fields: [goodsIssueId], references: [id])
+  stockAdjustment          StockAdjustment?          @relation(fields: [stockAdjustmentId], references: [id])
+  goodsReceiptDetailChange GoodsReceiptDetailChange?
+  details                  MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([goodsReceiptId])
+  @@index([goodsIssueId])
+}
+
+model MovementDetail {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  quantity Decimal @db.Decimal(18, 6)
+
+  newStock      Decimal? @db.Decimal(18, 6)
+  previousStock Decimal? @db.Decimal(18, 6)
+
+  materialId              String  @db.Uuid
+  supplierId              String  @db.Uuid
+  goodsReceiptDetailId    String? @db.Uuid
+  goodsIssueDetailId      String? @db.Uuid
+  stockAdjustmentDetailId String? @db.Uuid
+  movementId              String  @db.Uuid
+
+  material              Material               @relation(fields: [materialId], references: [id])
+  supplier              Supplier               @relation(fields: [supplierId], references: [id])
+  goodsReceiptDetail    GoodsReceiptDetail?    @relation(fields: [goodsReceiptDetailId], references: [id])
+  goodsIssueDetail      GoodsIssueDetail?      @relation(fields: [goodsIssueDetailId], references: [id])
+  stockAdjustmentDetail StockAdjustmentDetail? @relation(fields: [stockAdjustmentDetailId], references: [id])
+  movement              InventoryMovement      @relation(fields: [movementId], references: [id])
+  goodsIssueReturn      GoodsIssueReturn?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([materialId])
+  @@index([supplierId])
+  @@index([movementId])
+}
+
+model StockAdjustment {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  referenceNumber String @unique @db.VarChar(50)
+
+  type         StockAdjustmentType
+  reasonId     String              @db.Uuid
+  observations String?             @db.VarChar(500)
+
+  status AdjustmentStatus @default(PENDING)
+
+  createdById  String  @db.Uuid
+  approvedById String? @db.Uuid
+
+  reason     StockAdjustmentReason @relation(fields: [reasonId], references: [id])
+  createdBy  User                  @relation("CreatedStockAdjustments", fields: [createdById], references: [id])
+  approvedBy User?                 @relation("ApprovedStockAdjustments", fields: [approvedById], references: [id])
+
+  movement InventoryMovement?
+
+  details StockAdjustmentDetail[]
+
+  appliedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AdjustmentStatus {
+  PENDING
+  APPLIED
+  CANCELLED
+}
+
+enum StockAdjustmentType {
+  INCREASE
+  DECREASE
+}
+
+model StockAdjustmentDetail {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  stockAdjustmentId String @db.Uuid
+
+  materialId   String @db.Uuid
+  supplierId   String @db.Uuid
+  materialName String @db.VarChar(200)
+
+  previousStock Decimal @db.Decimal(18, 6)
+  newStock      Decimal @db.Decimal(18, 6)
+  difference    Decimal @db.Decimal(18, 6)
+
+  previousConvertedQuantity Decimal @db.Decimal(18, 6)
+  newConvertedQuantity      Decimal @db.Decimal(18, 6)
+  convertedDifference       Decimal @db.Decimal(18, 6)
+
+  stockAdjustment StockAdjustment @relation(fields: [stockAdjustmentId], references: [id])
+
+  material Material @relation(fields: [materialId], references: [id])
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+
+  movementDetails MovementDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stockAdjustmentId])
+  @@index([materialId])
+  @@index([supplierId])
+}
+
+enum InventoryMovementType {
+  ENTRY
+  ISSUE
+  ADJUSTMENT
+}
+
+model GoodsReceiptDetailChange {
+  id                          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  goodsReceiptId              String  @db.Uuid
+  goodsReceiptDetailId        String  @db.Uuid
+  reasonId                    String  @db.Uuid
+  changedById                 String  @db.Uuid
+  inventoryMovementId         String? @unique @db.Uuid
+  previousMaterialId          String  @db.Uuid
+  previousMaterialName        String  @db.VarChar(200)
+  previousQuantity            Decimal @db.Decimal(18, 6)
+  previousCostPerUnitType     Decimal @db.Decimal(18, 6)
+  previousNetPurchaseAmount   Decimal @db.Decimal(18, 6)
+  previousGrossPurchaseAmount Decimal @db.Decimal(18, 6)
+
+  correctedMaterialId          String  @db.Uuid
+  correctedMaterialName        String  @db.VarChar(200)
+  correctedQuantity            Decimal @db.Decimal(18, 6)
+  correctedCostPerUnitType     Decimal @db.Decimal(18, 6)
+  correctedNetPurchaseAmount   Decimal @db.Decimal(18, 6)
+  correctedGrossPurchaseAmount Decimal @db.Decimal(18, 6)
+
+  changeType         GoodsReceiptDetailChangeType
+  materialChanged    Boolean                      @default(false)
+  quantityDifference Decimal                      @db.Decimal(18, 6)
+  costDifference     Decimal                      @db.Decimal(18, 6)
+
+  goodsReceipt       GoodsReceipt          @relation(fields: [goodsReceiptId], references: [id])
+  goodsReceiptDetail GoodsReceiptDetail    @relation(fields: [goodsReceiptDetailId], references: [id])
+  reason             StockAdjustmentReason @relation(fields: [reasonId], references: [id])
+  changedBy          User                  @relation(fields: [changedById], references: [id], onDelete: Restrict)
+  previousMaterial   Material              @relation("PreviousGoodsReceiptDetailChangeMaterial", fields: [previousMaterialId], references: [id])
+  correctedMaterial  Material              @relation("CorrectedGoodsReceiptDetailChangeMaterial", fields: [correctedMaterialId], references: [id])
+  inventoryMovement  InventoryMovement?    @relation(fields: [inventoryMovementId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([goodsReceiptId])
+  @@index([goodsReceiptDetailId])
+  @@index([reasonId])
+  @@index([changedById])
+  @@index([previousMaterialId])
+  @@index([correctedMaterialId])
+}
+
+enum GoodsReceiptDetailChangeType {
+  QUANTITY
+  COST
+  QUANTITY_AND_COST
+  CANCELLATION
+}
+
+model StockAdjustmentReason {
+  version Int    @default(0)
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  name String @unique @db.VarChar(100)
+
+  isActive Boolean @default(true)
+
+  stockAdjustments          StockAdjustment[]
+  goodsReceiptDetailChanges GoodsReceiptDetailChange[]
+  wasteStockAdjustments     WasteStockAdjustment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

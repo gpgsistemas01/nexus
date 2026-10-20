@@ -1,0 +1,104 @@
+import { openSupplierModal } from '../suppliers/supplierModal.js';
+import { openModal } from "../../../ui/modalUI.js";
+import {
+    initMaterialFormSelect2,
+    setMaterialFormSelectOptions
+} from "../../../plugins/select2/modules/materialSelect.js";
+import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
+import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
+import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
+import {
+    BUTTON_SELECTORS,
+    FORM_SELECTORS,
+    HEADING_SELECTORS,
+    MODAL_SELECTORS,
+    SELECT_SELECTORS
+} from "../../../constants/selectors.js";
+import { materialDataFields, materialEditableDataFields } from './materialFields.js';
+import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
+
+import { updateMaterialMeasurementFields } from '../../../ui/inventory/inventorySelectUI.js';
+
+const initialStockReasonName = 'Stock inicial';
+const stockDataSectionSelector = '.stock-data-section';
+const goodsReceiptCreationContext = 'goodsReceipt';
+
+export const openMaterialModal = ({
+    mode = FORM_MODES.CREATE,
+    data = null,
+    onSave = null,
+    creationContext = null,
+    resource = INVENTORY_RESOURCES.MATERIAL
+}) => {
+
+    const form = document.querySelector(FORM_SELECTORS.MATERIAL);
+    const modalElement = document.querySelector(MODAL_SELECTORS.MATERIAL);
+    const isCreating = isCreateMode(mode);
+    const isEditing = isEditMode(mode);
+    const isAdjustingStock = isStockMode(mode);
+    const isGoodsReceiptCreation = creationContext === goodsReceiptCreationContext;
+    const isConsumable = resource === INVENTORY_RESOURCES.CONSUMABLE;
+
+    initializeInventoryCrudModal({ form, mode, data });
+    form.dataset.creationContext = creationContext || '';
+    form.dataset.resource = resource;
+    initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL, onCreateSupplier: openSupplierModal });
+    setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
+
+    form.elements.name.value = data?.name ?? '';
+    form.elements.minStock.value = data?.minStock ?? '';
+    form.elements.maxUnitCost.value = data?.maxUnitCost ?? '';
+    form.elements.base.value = data?.base ?? '';
+    form.elements.height.value = data?.height ?? '';
+    form.elements.isActive.checked = data?.isActive ?? true;
+    form.elements.newStock.value = '';
+    form.elements.observations.value = '';
+
+    setFormSectionVisibility({
+        form,
+        selector: stockDataSectionSelector,
+        isVisible: !isEditing && !isGoodsReceiptCreation
+    });
+    setFormSectionVisibility({
+        form,
+        isVisible: !isGoodsReceiptCreation,
+        fieldNames: ['maxUnitCost']
+    });
+    form.elements.maxUnitCost.required = !isGoodsReceiptCreation;
+    setFormDisabled({ 
+        form, 
+        fields: [...materialDataFields, 'minStock', 'maxUnitCost', 'isActive'],
+        isDisabled: !isCreating
+    });
+    setFormDisabled({
+        form,
+        fields: materialEditableDataFields,
+        isDisabled: isAdjustingStock
+    });
+    setFormDisabled({
+        form,
+        fields: ['maxUnitCost'],
+        isDisabled: isAdjustingStock || isGoodsReceiptCreation
+    });
+    setReasonVisualOption({
+        selector: `${ MODAL_SELECTORS.MATERIAL } ${ SELECT_SELECTORS.REASON }`,
+        name: !isAdjustingStock ? initialStockReasonName : null,
+        isDisabled: !isAdjustingStock
+    });
+    const resourceLabel = isConsumable ? 'consumible' : 'material';
+    modalElement.querySelector(HEADING_SELECTORS.MODAL_TITLE).textContent = isEditing
+        ? `Editar ${ resourceLabel }`
+        : isAdjustingStock
+            ? `Ajustar stock de ${ resourceLabel }`
+            : `Registrar ${ resourceLabel }`;
+    form.querySelector(BUTTON_SELECTORS.SUBMIT).textContent = isEditing
+        ? 'Actualizar'
+        : isAdjustingStock
+            ? 'Ajustar'
+            : 'Guardar';
+
+    updateMaterialMeasurementFields({ form });
+    form.onSave = onSave;
+    openModal(modalElement);
+};

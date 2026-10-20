@@ -1,0 +1,120 @@
+import { SELECT2_EVENT_NAMES } from '../../constants/events.js';
+import { BUTTON_SELECTORS } from '../../constants/selectors.js';
+import { FORM_MODES } from '../../constants/formModes.js';
+import { setDateTimePickerValue } from '../../plugins/flatpickr/dateTimePicker.js';
+
+export const resetFormSubmitState = (form) => {
+    if (!form) return;
+    form.dataset.submitting = 'false';
+    form.querySelector(BUTTON_SELECTORS.SUBMIT)?.removeAttribute('disabled');
+};
+
+export const initForm = ({ form, mode, id = '', version, materialVersion }) => {
+    form.reset();
+    form.querySelectorAll('.js-flatpickr-datetime').forEach(input => setDateTimePickerValue(input, input.value));
+    form.dataset.id = id;
+    form.dataset.mode = mode;
+    delete form.dataset.version;
+    delete form.dataset.materialVersion;
+    if (version !== undefined) form.dataset.version = version;
+    if (materialVersion !== undefined) form.dataset.materialVersion = materialVersion;
+    resetFormSubmitState(form);
+};
+
+export const setFormDisabled = ({ form, fields = 'all', isDisabled }) => {
+    const elements = fields === 'all'
+        ? form.querySelectorAll('input, select, textarea')
+        : fields.map(field => form.querySelector(`[name='${ field }']`)).filter(Boolean);
+    elements.forEach(element => toggleDisabledElement({ element, isDisabled }));
+    if (fields === 'all') form.querySelector(BUTTON_SELECTORS.SUBMIT).classList.toggle('d-none', form.dataset.mode === FORM_MODES.VIEW);
+};
+
+export const setFormSectionVisibility = ({ form, selector, isVisible, fieldNames = [], clearValues = false }) => {
+    form.querySelector(selector)?.classList.toggle('d-none', !isVisible);
+    fieldNames.forEach(fieldName => {
+        const field = form.elements[fieldName];
+        if (!field) return;
+        const container = field.closest('[class*="col-"]') || field.closest('.form-outline') || field.parentElement;
+        container?.classList.toggle('d-none', !isVisible);
+        if (clearValues && !isVisible) field.value = '';
+        field.required = false;
+        field.disabled = !isVisible;
+        if (field.tagName === 'SELECT' && typeof window !== 'undefined' && window.$ && window.$(field).hasClass('select2-hidden-accessible')) {
+            window.$(field).prop('disabled', !isVisible).trigger(SELECT2_EVENT_NAMES.CHANGE);
+        }
+    });
+};
+
+export const toggleDisabledElement = ({ element, isDisabled }) => {
+
+    if (!element) return;
+
+    element.classList.toggle('disabled', isDisabled);
+
+    if ('disabled' in element) {
+        element.disabled = isDisabled;
+    }
+
+    const flatpickrAltInput = element._flatpickr?.altInput;
+
+    if (flatpickrAltInput) {
+        flatpickrAltInput.disabled = isDisabled;
+        flatpickrAltInput.classList.toggle('disabled', isDisabled);
+    }
+
+    if (
+        typeof window !== 'undefined'
+        && window.$
+        && element.matches?.('select')
+        && window.$(element).hasClass('select2-hidden-accessible')
+    ) {
+        window.$(element)
+            .prop('disabled', isDisabled)
+            .trigger(SELECT2_EVENT_NAMES.CHANGE)
+            .next('.select2-container')
+            .toggleClass('disabled', isDisabled);
+    }
+};
+
+
+export const syncCheckboxControlledInputs = ({
+    root = document,
+    inputSelector,
+    detailId,
+    isChecked,
+    onSync
+}) => {
+
+    if (!root || !inputSelector || !detailId) return;
+
+    root
+        .querySelectorAll(`${ inputSelector }[data-detail-id="${ detailId }"]`)
+        .forEach(input => {
+            toggleDisabledElement({
+                element: input,
+                isDisabled: !isChecked
+            });
+            onSync?.(input);
+        });
+};
+
+export const toggleContainerElements = ({
+    selector,
+    isDisabled = true,
+    root = document
+}) => {
+
+    const container = root?.querySelector(selector);
+
+    if (!container) return;
+
+    container
+        .querySelectorAll('input, select, textarea, button')
+        .forEach(element => {
+
+            toggleDisabledElement({
+                element,
+                isDisabled
+            });
+        });
+};

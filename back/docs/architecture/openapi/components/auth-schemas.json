@@ -1,0 +1,34 @@
+{
+  "LoginRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "password": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "password"
+    ]
+  },
+  "CurrentUserResponse": {
+    "type": "object",
+    "properties": {
+      "user": {
+        "$ref": "../openapi.json#/components/schemas/User"
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "user"
+    ]
+  }
+}

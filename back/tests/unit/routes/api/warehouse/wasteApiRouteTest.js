@@ -1,0 +1,103 @@
+import { describe, expect, it, vi } from 'vitest';
+
+const get = vi.fn();
+const post = vi.fn();
+const patch = vi.fn();
+const authorizeUserApi = vi.fn(permission => `authorize:${ permission }`);
+const verifyApiTokenRequired = vi.fn();
+const validate = vi.fn();
+const wasteValidation = [vi.fn()];
+const wasteEditValidation = [vi.fn()];
+const wasteStockAdjustmentValidation = [vi.fn()];
+const wasteStockAdditionValidation = [vi.fn()];
+const getWasteMaterialTemplates = vi.fn();
+const getAllWastes = vi.fn();
+const registerWaste = vi.fn();
+const editWaste = vi.fn();
+const editWasteStock = vi.fn();
+const registerWasteStockAddition = vi.fn();
+
+vi.mock('express', () => ({
+  default: {
+    Router: () => ({ get, post, patch })
+  }
+}));
+
+vi.mock('../../../../../src/middleware/authMiddleware.js', () => ({
+  authorizeUserApi,
+  verifyApiTokenRequired
+}));
+
+vi.mock('../../../../../src/middleware/validatorMiddleware.js', () => ({ validate }));
+
+vi.mock('../../../../../src/validators/forms/wasteValidations.js', () => ({
+  wasteEditValidation,
+  wasteStockAdditionValidation,
+  wasteStockAdjustmentValidation,
+  wasteValidation
+}));
+
+vi.mock('../../../../../src/controllers/api/warehouse/wasteController.js', () => ({
+  editWaste,
+  editWasteStock,
+  getAllWastes,
+  getWasteMaterialTemplates,
+  registerWaste,
+  registerWasteStockAddition
+}));
+
+const { PERMISSIONS } = await import('../../../../../src/shared/constants/permissions.js');
+const { default: wasteApiRoutes } = await import('../../../../../src/routes/api/warehouse/wasteApiRoute.js');
+
+describe('wasteApiRoute', () => {
+  it('reserva las plantillas con costos al registro de merma', () => {
+    expect(get).toHaveBeenCalledWith(
+      '/material-templates',
+      verifyApiTokenRequired,
+      `authorize:${ PERMISSIONS.WASTES_WRITE }`,
+      getWasteMaterialTemplates
+    );
+    expect(get).toHaveBeenCalledWith(
+      '/',
+      verifyApiTokenRequired,
+      `authorize:${ PERMISSIONS.WASTES_READ }`,
+      getAllWastes
+    );
+  });
+
+  it('asigna a cada escritura del CRUD su validador y permiso específicos', () => {
+    expect(wasteApiRoutes).toEqual({ get, post, patch });
+    expect(post).toHaveBeenCalledWith(
+      '/',
+      verifyApiTokenRequired,
+      wasteValidation,
+      validate,
+      `authorize:${ PERMISSIONS.WASTES_WRITE }`,
+      registerWaste
+    );
+    expect(patch).toHaveBeenCalledWith(
+      '/:id',
+      verifyApiTokenRequired,
+      wasteEditValidation,
+      validate,
+      `authorize:${ PERMISSIONS.WASTES_WRITE }`,
+      editWaste
+    );
+    expect(post).toHaveBeenCalledWith(
+      '/:id/stock-additions',
+      verifyApiTokenRequired,
+      wasteStockAdditionValidation,
+      validate,
+      `authorize:${ PERMISSIONS.WASTES_ADD_STOCK }`,
+      registerWasteStockAddition
+    );
+    expect(patch).toHaveBeenCalledWith(
+      '/:id/stock',
+      verifyApiTokenRequired,
+      wasteStockAdjustmentValidation,
+      validate,
+      `authorize:${ PERMISSIONS.WASTES_ADJUST_STOCK }`,
+      editWasteStock
+    );
+  });
+});

@@ -1,0 +1,192 @@
+import { handleServiceError } from '../serviceErrorHandler.js';
+import { normalizeDatabaseError } from '../../errors/databaseError.js';
+import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
+import { updateVersionedRecord } from '../../repository/versionRepository.js';
+import { findPage } from "../../repository/paginationRepository.js";
+import { isAppError } from "../../errors/AppError.js";
+import {
+    SupplierCodeNotFound,
+    SupplierCreateDatabaseError,
+    SupplierNotFound,
+    SupplierUpdateDatabaseError
+} from "../../errors/warehouse/supplierError.js";
+import { getDb } from "../../repository/baseRepository.js";
+import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceNumberService.js";
+import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('warehouse.supplierService');
+
+const SUPPLIER_CODE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const SUPPLIER_REFERENCE_PREFIX = 'PRO';
+const numberToSupplierCode = (number) => {
+
+    let current = number + 1;
+    let code = '';
+
+    while (current > 0) {
+        current -= 1;
+        code = SUPPLIER_CODE_ALPHABET[current % 26] + code;
+        current = Math.floor(current / 26);
+    }
+
+    return code;
+};
+
+export const findAllSuppliers = async ({
+    onlyActive = false,
+    includeCounts = true,
+    cursor,
+    skip = 0,
+    take = 10,
+    search = '',
+    orderBy = 'legalName',
+    orderDir = 'asc'
+}) => {
+
+    const where = {
+        ...(onlyActive && { isActive: true }),
+        ...(search && {
+            OR: [
+                {
+                    tradeName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                },
+                {
+                    legalName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            ]
+        })
+    };
+
+    return findPage({
+        model: getDb().supplier,
+        hasFilters: Boolean(onlyActive || search),
+        includeCounts,
+        query: {
+            ...(take > 0 && { skip, take }),
+            ...(cursor && { cursor }),
+            where,
+            orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
+            select: {
+                id: true,
+                version: true,
+                tradeName: true,
+                legalName: true,
+                isActive: true
+            }
+        }
+    });
+};
+
+const DEFAULT_SUPPLIER_SELECT = {
+    id: true,
+    tradeName: true,
+    isActive: true
+};
+
+export const findUniqueSupplier = async ({
+    tx = null,
+    id
+}) => {
+
+    const supplier = await getDb(tx).supplier.findUnique({
+        where: { id },
+        select: DEFAULT_SUPPLIER_SELECT
+    });
+
+    if (!supplier) throw new SupplierNotFound();
+
+    return supplier;
+};
+
+export const findUniqueSupplierCode = async ({
+    tx = null,
+    id
+}) => {
+
+    const supplier = await getDb(tx).supplier.findUnique({
+        where: { id },
+        select: { code: true }
+    });
+
+    if (!supplier) throw new SupplierCodeNotFound();
+
+    return supplier;
+};
+
+export const createSupplier = async (supplierDto) => {
+
+    try {
+
+        const supplier = await getDb().$transaction(async (tx) => {
+
+            const counter = await incrementNonYearlyReferenceNumberCounter({
+                type: SUPPLIER_REFERENCE_PREFIX,
+                tx
+            });
+
+            const codeNumber = counter.counter;
+            const generatedCode = numberToSupplierCode(codeNumber - 1);
+
+            return tx.supplier.create({
+                data: {
+                    ...supplierDto,
+                    codeNumber,
+                    code: generatedCode,
+                }
+            });
+        });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.supplierService.createSupplier',
+            ...getModelLogContext('supplier', supplier)
+        }, 'Proveedor creado correctamente');
+
+        return supplier;
+
+    } catch (err) {
+        handleServiceError({
+            logger: serviceLogger,
+            error: err,
+            operation: 'warehouse.supplierService.createSupplier',
+            model: 'supplier',
+            data: supplierDto,
+            fallbackError: new SupplierCreateDatabaseError()
+        });
+    }
+};
+
+export const updateSupplier = async (supplierDto, id) => {
+
+    const db = getDb();
+
+    try {
+
+        const { expectedVersion, ...data } = supplierDto;
+        const supplier = await updateVersionedRecord({ model: db.supplier, where: { id }, expectedVersion, data });
+
+        logServiceInfo(serviceLogger, {
+            operation: 'warehouse.supplierService.updateSupplier',
+            ...getModelLogContext('supplier', supplier)
+        }, 'Proveedor actualizado correctamente');
+
+        return supplier;
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, {
+            operation: 'warehouse.supplierService.updateSupplier',
+            ...getModelLogContext('supplier', { id, ...supplierDto })
+        });
+
+        if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) throw new SupplierNotFound();
+        const normalizedError = normalizeDatabaseError(err);
+        if (isAppError(normalizedError)) throw normalizedError;
+
+        throw new SupplierUpdateDatabaseError();
+    }
+};

@@ -6,19 +6,19 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates openssl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY package*.json ./
+COPY back/package*.json ./
 RUN npm ci
 
 FROM deps AS build
 
-COPY . .
+COPY back/ .
 RUN npx prisma generate
 
 FROM node:22-bookworm-slim AS prod-deps
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY back/package*.json ./
 RUN npm ci --omit=dev
 
 FROM node:22-bookworm-slim
@@ -39,7 +39,7 @@ COPY --chown=node:node --from=build /app/prisma ./prisma
 COPY --chown=node:node --from=build /app/generated ./generated
 COPY --chown=node:node --from=build /app/prisma.config.ts ./prisma.config.ts
 COPY --chown=node:node --from=build /app/package*.json ./
-COPY --chown=node:node --chmod=755 docker-entrypoint.sh ./docker-entrypoint.sh
+COPY --chown=node:node --chmod=755 back/docker-entrypoint.sh ./docker-entrypoint.sh
 
 USER node
 

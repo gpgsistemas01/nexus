@@ -1,0 +1,115 @@
+export const MEXICO_TIME_ZONE = 'America/Mexico_City';
+
+const dateTimeFormatter = new Intl.DateTimeFormat('es-MX', {
+    timeZone: MEXICO_TIME_ZONE,
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+});
+
+const monthYearFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: MEXICO_TIME_ZONE,
+    month: '2-digit',
+    year: 'numeric'
+});
+
+export const sanitizeEmptyStrings = (obj) => {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [
+      key,
+      value === '' ? null : value
+    ])
+  );
+};
+
+export const formatDateLongWithTime = (dateTime) => {
+
+    if (!dateTime) return '';
+
+    const date = new Date(dateTime);
+    return dateTimeFormatter.format(date);
+}
+
+export const getMexicoMonthYearParts = (dateTime = new Date()) => {
+
+    const parts = monthYearFormatter.formatToParts(dateTime).reduce((acc, part) => {
+        if (part.type !== 'literal') acc[part.type] = part.value;
+        return acc;
+    }, {});
+
+    return {
+        month: parts.month,
+        year: parts.year
+    };
+};
+
+export const getMexicoMonthDateRange = (dateTime = new Date()) => {
+
+    const { month, year } = getMexicoMonthYearParts(dateTime);
+    const monthIndex = Number(month) - 1;
+    const firstDay = new Date(Number(year), monthIndex, 1);
+    const lastDay = new Date(Number(year), monthIndex + 1, 0);
+    const formatDate = (date) => [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0')
+    ].join('-');
+
+    return {
+        startDate: formatDate(firstDay),
+        endDate: formatDate(lastDay),
+        month,
+        year
+    };
+};
+
+export const getReportMonthDateRange = (reportMonth = '') => {
+    const match = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(reportMonth);
+
+    if (!match) return getMexicoMonthDateRange();
+
+    const [, year, month] = match;
+    const lastDay = new Date(Number(year), Number(month), 0).getDate();
+
+    return {
+        startDate: `${ year }-${ month }-01`,
+        endDate: `${ year }-${ month }-${ String(lastDay).padStart(2, '0') }`,
+        month,
+        year
+    };
+};
+
+export const cleanSearchTerm = (search) => {
+
+  const cleaned = search.trim();
+  let codeSearch = search;
+  let nameSearch = search;
+
+  if (cleaned.includes('-')) {
+
+    const parts = cleaned.split('-').map(part => part.trim());
+    codeSearch = parts[0];
+    nameSearch = parts.slice(1).join('-');
+  }
+
+  return { codeSearch, nameSearch };
+};
+
+export const hasMaterialDimensions = (material = {}) => (
+    Number(material.base || 0) > 0 &&
+    Number(material.height || 0) > 0
+);
+
+export const buildStockKey = (materialId, supplierId) =>
+    `${materialId}:${supplierId}`;
+
+export const parseStockKey = (key) => {
+    const [materialId, supplierId] = key.split(':');
+    return { materialId, supplierId };
+};
+
+export const toNumber = value => value == null || value === '' ? null : Number(value);
+
+export const normalizeText = (value = '') => value.trim().toUpperCase();

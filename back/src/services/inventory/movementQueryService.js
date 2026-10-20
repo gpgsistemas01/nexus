@@ -1,0 +1,400 @@
+import { findPage } from '../../repository/paginationRepository.js';
+import { MovementFindDatabaseError } from "../../errors/inventory/movementError.js";
+import { getDb } from "../../repository/baseRepository.js";
+import { buildDateRangeFilter } from "../../utils/requestQueryUtils.js";
+import { formatDateLongWithTime } from '../../utils/formattersUtils.js';
+import { MATERIAL_TYPES } from '../../shared/constants/inventory.js';
+import { createServiceLogger, logServiceError } from "../../utils/logger.js";
+
+const serviceLogger = createServiceLogger('inventory.movementQueryService');
+
+const REFERENCE_NUMBER_SELECT = {
+    referenceNumber: true
+};
+
+const MOVEMENT_TYPE_NAMES = Object.freeze({
+    ENTRY: 'Entrada',
+    ISSUE: 'Salida',
+    ADJUSTMENT: 'Ajuste',
+    RETURN: 'Devolución'
+});
+
+const RETURN_MOVEMENT_TYPE = 'RETURN';
+
+const MOVEMENT_DETAIL_SELECT = {
+    id: true,
+    quantity: true,
+    previousStock: true,
+    newStock: true,
+    material: {
+        select: {
+            name: true,
+            base: true,
+            height: true
+        }
+    },
+    supplier: {
+        select: {
+            tradeName: true
+        }
+    },
+    goodsReceiptDetail: { select: { materialName: true } },
+    goodsIssueDetail: { select: { materialName: true } },
+    stockAdjustmentDetail: {
+        select: {
+            materialName: true,
+        }
+    },
+    goodsIssueReturn: {
+        select: {
+            id: true
+        }
+    },
+    movement: {
+        select: {
+            id: true,
+            type: true,
+            date: true,
+            createdAt: true,
+            referenceNumber: true,
+            goodsIssue: {
+                select: REFERENCE_NUMBER_SELECT
+            },
+            goodsReceipt: {
+                select: REFERENCE_NUMBER_SELECT
+            },
+            stockAdjustment: {
+                select: REFERENCE_NUMBER_SELECT
+            }
+        }
+    }
+};
+
+const WASTE_MOVEMENT_DETAIL_SELECT = {
+    id: true,
+    quantity: true,
+    previousStock: true,
+    newStock: true,
+    waste: {
+        select: {
+            name: true,
+            base: true,
+            height: true,
+            supplier: { select: { tradeName: true } }
+        }
+    },
+    wasteIssueReturn: { select: { id: true } },
+    movement: {
+        select: {
+            type: true,
+            date: true,
+            createdAt: true,
+            referenceNumber: true,
+            wasteIssue: { select: REFERENCE_NUMBER_SELECT },
+            wasteStockAdjustment: { select: REFERENCE_NUMBER_SELECT },
+            wasteStockEntry: { select: REFERENCE_NUMBER_SELECT }
+        }
+    }
+};
+
+const getMovementDateFilter = ({ startDate, endDate }) => buildDateRangeFilter({
+    field: 'date',
+    startDate,
+    endDate
+});
+
+const getMovementSearchFilter = (search) => {
+
+    if (!search) return {};
+
+    return {
+        OR: [
+            {
+                material: {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            },
+            {
+                supplier: {
+                    tradeName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            },
+            {
+                stockAdjustmentDetail: {
+                    materialName: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            },
+            {
+                movement: {
+                    referenceNumber: {
+                        contains: search,
+                        mode: 'insensitive'
+                    }
+                }
+            },
+            {
+                movement: {
+                    goodsIssue: {
+                        referenceNumber: {
+                            contains: search,
+                            mode: 'insensitive'
+                        }
+                    }
+                }
+            },
+            {
+                movement: {
+                    goodsReceipt: {
+                        referenceNumber: {
+                            contains: search,
+                            mode: 'insensitive'
+                        }
+                    }
+                }
+            },
+            {
+                movement: {
+                    stockAdjustment: {
+                        referenceNumber: {
+                            contains: search,
+                            mode: 'insensitive'
+                        }
+                    }
+                }
+            }
+        ]
+    };
+};
+
+const resolveMaterialBase = (detail) => detail.material?.base ?? null;
+
+const resolveMaterialHeight = (detail) => detail.material?.height ?? null;
+
+const resolveMaterialName = (detail) =>
+    detail.stockAdjustmentDetail?.materialName ??
+    detail.goodsReceiptDetail?.materialName ??
+    detail.goodsIssueDetail?.materialName ??
+    detail.material?.name;
+
+const resolveSupplierName = (detail) => detail.supplier?.tradeName;
+
+const resolveMovementTypeName = (detail) => {
+
+    if (detail.goodsIssueReturn) return MOVEMENT_TYPE_NAMES.RETURN;
+
+    return MOVEMENT_TYPE_NAMES[detail.movement.type] ?? detail.movement.type;
+};
+
+const mapMovementDetail = (detail) => ({
+    id: detail.id,
+
+    date: formatDateLongWithTime(detail.movement.date),
+
+    createdAt: formatDateLongWithTime(detail.movement.createdAt),
+
+    type: resolveMovementTypeName(detail),
+
+    materialName: resolveMaterialName(detail),
+
+    materialBase: resolveMaterialBase(detail),
+
+    materialHeight: resolveMaterialHeight(detail),
+
+    supplierName: resolveSupplierName(detail),
+
+    quantity: detail.quantity,
+
+    previousStock: detail.previousStock,
+
+    newStock: detail.newStock,
+
+    referenceNumber:
+        detail.movement.goodsIssue?.referenceNumber ||
+        detail.movement.goodsReceipt?.referenceNumber ||
+        detail.movement.stockAdjustment?.referenceNumber ||
+        detail.movement.referenceNumber
+});
+
+const mapWasteMovementDetail = (detail) => ({
+    id: detail.id,
+    date: formatDateLongWithTime(detail.movement.date),
+    createdAt: formatDateLongWithTime(detail.movement.createdAt),
+    type: detail.wasteIssueReturn
+        ? MOVEMENT_TYPE_NAMES.RETURN
+        : MOVEMENT_TYPE_NAMES[detail.movement.type] ?? detail.movement.type,
+    referenceNumber:
+        detail.movement.wasteIssue?.referenceNumber ||
+        detail.movement.wasteStockAdjustment?.referenceNumber ||
+        detail.movement.wasteStockEntry?.referenceNumber ||
+        detail.movement.referenceNumber,
+    materialName: detail.waste.name,
+    materialBase: detail.waste.base,
+    materialHeight: detail.waste.height,
+    supplierName: detail.waste.supplier.tradeName,
+    previousStock: detail.previousStock,
+    quantity: detail.quantity,
+    newStock: detail.newStock
+});
+
+const getWasteMovementSearchFilter = (search) => !search ? {} : ({
+    OR: [
+        { waste: { name: { contains: search, mode: 'insensitive' } } },
+        { waste: { supplier: { tradeName: { contains: search, mode: 'insensitive' } } } },
+        { movement: { referenceNumber: { contains: search, mode: 'insensitive' } } },
+        { movement: { wasteIssue: { referenceNumber: { contains: search, mode: 'insensitive' } } } },
+        { movement: { wasteStockAdjustment: { referenceNumber: { contains: search, mode: 'insensitive' } } } },
+        { movement: { wasteStockEntry: { referenceNumber: { contains: search, mode: 'insensitive' } } } }
+    ]
+});
+
+const findInventoryMovements = async ({
+    type,
+    includeCounts = true,
+    cursor,
+    skip = 0,
+    take = 10,
+    startDate = '',
+    endDate = '',
+    movementType = '',
+    search = '',
+    materialId = '',
+    supplierId = '',
+    goodsIssueId = '',
+    goodsReceiptId = '',
+    stockAdjustmentId = '',
+    orderBy = 'referenceNumber',
+    orderDir = 'desc',
+}) => {
+
+    const db = getDb();
+
+    try {
+
+        const isReturnMovementFilter = movementType === RETURN_MOVEMENT_TYPE;
+
+        const movementFilters = {
+            ...(movementType && {
+                type: isReturnMovementFilter ? 'ENTRY' : movementType
+            }),
+            ...(goodsIssueId && { goodsIssueId }),
+            ...(goodsReceiptId && { goodsReceiptId }),
+            ...(stockAdjustmentId && { stockAdjustmentId }),
+            ...getMovementDateFilter({ startDate, endDate })
+        };
+
+        const where = {
+
+            material: { type },
+
+            ...(materialId && {
+                materialId
+            }),
+
+            ...(supplierId && {
+                supplierId
+            }),
+
+            ...(isReturnMovementFilter && {
+                goodsIssueReturn: {
+                    isNot: null
+                }
+            }),
+
+            ...(movementType === 'ENTRY' && {
+                goodsIssueReturn: {
+                    is: null
+                }
+            }),
+
+            ...getMovementSearchFilter(search),
+
+            ...(Object.keys(movementFilters).length > 0 && {
+                movement: movementFilters
+            })
+        };
+
+        const page = await findPage({
+            model: db.movementDetail,
+            totalWhere: { material: { type } },
+            hasFilters: Boolean(search || materialId || supplierId || Object.keys(movementFilters).length),
+            includeCounts,
+            query: {
+                skip,
+                take,
+                ...(cursor && { cursor }),
+                orderBy: [{ movement: { [orderBy]: orderDir } }, { id: 'asc' }],
+                where,
+                select: MOVEMENT_DETAIL_SELECT
+            }
+        });
+
+        return { ...page, data: page.data.map(mapMovementDetail) };
+
+    } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'inventory.findInventoryMovements', inventoryType: type });
+
+        throw new MovementFindDatabaseError();
+    }
+}
+
+export const findAllMaterialMovements = (options = {}) => findInventoryMovements({ ...options, type: MATERIAL_TYPES.MATERIAL });
+export const findAllConsumableMovements = (options = {}) => findInventoryMovements({ ...options, type: MATERIAL_TYPES.CONSUMABLE });
+
+export const findAllWasteMovements = async ({
+    includeCounts = true,
+    cursor,
+    skip = 0,
+    take = 10,
+    startDate = '',
+    endDate = '',
+    movementType = '',
+    search = '',
+    wasteId = '',
+    supplierId = '',
+    orderBy = 'date',
+    orderDir = 'desc'
+} = {}) => {
+    const db = getDb();
+
+    try {
+        const isReturnMovementFilter = movementType === RETURN_MOVEMENT_TYPE;
+        const where = {
+            ...(wasteId && { wasteId }),
+            ...(supplierId && { waste: { supplierId } }),
+            ...(isReturnMovementFilter && { wasteIssueReturn: { isNot: null } }),
+            ...(movementType === 'ENTRY' && { wasteIssueReturn: { is: null } }),
+            ...getWasteMovementSearchFilter(search),
+            movement: {
+                ...(movementType && { type: isReturnMovementFilter ? 'ENTRY' : movementType }),
+                ...getMovementDateFilter({ startDate, endDate })
+            }
+        };
+        const page = await findPage({
+            model: db.wasteMovementDetail,
+            hasFilters: Boolean(search || wasteId || supplierId || movementType || startDate || endDate),
+            includeCounts,
+            query: {
+                skip,
+                take,
+                ...(cursor && { cursor }),
+                orderBy: [{ movement: { [orderBy]: orderDir } }, { id: 'asc' }],
+                where,
+                select: WASTE_MOVEMENT_DETAIL_SELECT
+            }
+        });
+
+        return { ...page, data: page.data.map(mapWasteMovementDetail) };
+    } catch (err) {
+        logServiceError(serviceLogger, err, { operation: 'inventory.findAllWasteMovements' });
+        throw new MovementFindDatabaseError();
+    }
+};
