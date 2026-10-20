@@ -1,5 +1,5 @@
 import { apiRequest } from '../../axiosInstanceApi.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 import { MATERIAL_GOODS_RECEIPTS_API_ROUTE } from './materials/materialGoodsReceiptService.js';
 import { CONSUMABLE_GOODS_RECEIPTS_API_ROUTE } from './consumables/consumableGoodsReceiptService.js';
 

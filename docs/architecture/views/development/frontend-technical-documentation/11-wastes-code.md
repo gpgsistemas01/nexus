@@ -13,14 +13,19 @@ flowchart TB
     U["Composición compartida<br/>createCrudApplication.js<br/>warehouseInventoryDatatable.js<br/>y colaboradores"]
     Validation["validators.js"]
     FieldValidation["fieldValidations.js<br/>validateWasteWeightCapture"]
-    WeightRule["validations/weightValidations.js<br/>getWasteWeightCaptureValidationError"]
+    WeightRule["shared/validation/weightValidations.js<br/>getWasteWeightCaptureValidationError"]
     Messages["apiMessages.js<br/>getErrorMessage"]
     H["axiosInstanceApi.js<br/>request / apiRequest"]
     InventoryUI["wasteFormUI.js"]
     Select["Select2<br/>wasteMaterialTemplate.js"]
-    InventoryUtils["warehouseInventoryUtils.js<br/>normalización y cálculos"]
+    InventoryUtils["warehouseInventoryUtils.js<br/>lectura y etiquetas"]
     InventoryUI --> InventoryUtils
-    InventoryUtils --> WeightRule
+    Measurements["shared/inventory/wasteMeasurements.js"]
+    SelectData["Select2 / inventorySelectData.js"]
+    InventoryUI --> Measurements
+    Measurements --> WeightRule
+    SelectData --> InventoryUtils
+    Select --> SelectData
     Select --> InventoryUtils
     Select --> InventoryUI
     P --> InventoryUI
@@ -45,7 +50,7 @@ flowchart TB
 | services HTTP · wasteService.js | `src/public/js/services/warehouse/`<br/>`wasteService.js` |
 | DataTable del recurso · wasteDatatable.js | `src/public/js/plugins/datatable/warehouse/`<br/>`wastes/wasteDatatable.js` |
 | Composición compartida · createCrudApplication.js · warehouseInventoryDatatable.js · y colaboradores | `src/public/js/application/`<br/>`createCrudApplication.js`<br/>`src/public/js/plugins/datatable/shared/`<br/>`inventory/warehouseInventoryDatatable.js`<br/>`src/public/js/ui/forms/formStateUI.js`<br/>`src/public/js/ui/forms/formUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventoryCrudModalUI.js`<br/>`src/public/js/ui/inventory/`<br/>`inventorySelectUI.js`<br/>`src/public/js/ui/modalUI.js`<br/>`src/public/js/ui/tableUI.js` |
-| Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/public/js/utils/validations/weightValidations.js`<br/>`src/public/js/constants/apiMessages.js` |
+| Validación y mensajes del peso | `src/public/js/utils/validations/validators.js`<br/>`src/public/js/utils/validations/fieldValidations.js`<br/>`src/shared/validation/weightValidations.js`<br/>`src/public/js/constants/apiMessages.js` |
 | Selección y pesos de merma | `src/public/js/ui/inventory/wasteFormUI.js` y `src/public/js/plugins/select2/domains/wasteMaterialTemplate.js` |
 
 La muestra es el rollo completo. El formulario pide **Peso del rollo completo con

@@ -1,15 +1,27 @@
 import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
-import { editMaterial, editMaterialStock, registerMaterial } from "../../../application/warehouse/materials/materials.js";
-import { editConsumable, editConsumableStock, registerConsumable } from '../../../application/warehouse/consumables/consumables.js';
+import {
+    editMaterial,
+    editMaterialStock,
+    registerMaterial
+} from "../../../application/warehouse/materials/materials.js";
+import {
+    editConsumable,
+    editConsumableStock,
+    registerConsumable
+} from '../../../application/warehouse/consumables/consumables.js';
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
 import { pickFormFields, validateFields } from '../../../utils/formUtils.js';
 
-import { goodsReceiptMaterialCreateValidation, materialCreateValidation, materialEditValidation, materialStockValidation } from "../../../utils/validations/validators.js";
+import {
+    goodsReceiptMaterialCreateValidation,
+    materialCreateValidation,
+    materialEditValidation,
+    materialStockValidation
+} from "../../../utils/validations/validators.js";
 import { materialCreateFields, materialSecondaryDataFields, materialStockRequestFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
-
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 
 const formId = FORM_SELECTORS.MATERIAL;
 const goodsReceiptCreationContext = 'goodsReceipt';

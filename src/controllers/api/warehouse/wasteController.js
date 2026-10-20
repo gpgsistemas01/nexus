@@ -1,10 +1,21 @@
 import { successCodeMessages } from '../../../messages/codeMessages.js';
-import { addWasteStock, createWaste, findAllWastes, updateWaste, updateWasteStock } from '../../../services/warehouse/wastes/wasteService.js';
-import { createWasteDtoForEdit, createWasteDtoForRegister, createWasteDtoForStockAddition, createWasteDtoForStockAdjustment } from '../../../dtos/wasteDTO.js';
+import {
+    addWasteStock,
+    createWaste,
+    findAllWastes,
+    updateWaste,
+    updateWasteStock
+} from '../../../services/warehouse/wastes/wasteService.js';
+import {
+    createWasteDtoForEdit,
+    createWasteDtoForRegister,
+    createWasteDtoForStockAddition,
+    createWasteDtoForStockAdjustment
+} from '../../../dtos/wasteDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { findWasteMaterialTemplates } from '../../../services/warehouse/wastes/wasteMaterialService.js';
 
 export const getWasteMaterialTemplates = async (req, res) => {

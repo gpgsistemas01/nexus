@@ -1,6 +1,6 @@
 import { WasteIssueStockConflict } from '../../../errors/warehouse/wasteIssueError.js';
 import { updateWasteStocks } from '../../../repository/warehouse/stockUpdateRepository.js';
-import { normalizeDecimal } from '../../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 
 export const applyWasteStockChanges = async ({ tx, changes }) => {
     const rows = await updateWasteStocks({ tx, changes });

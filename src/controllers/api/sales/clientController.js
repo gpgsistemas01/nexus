@@ -1,7 +1,7 @@
 import { createClientDtoForEdit, createClientDtoForRegister } from "../../../dtos/clientDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { createClient, findAllClients, updateClient } from "../../../services/sales/clientService.js";
-import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 export const getAllClients = async (req, res) => {

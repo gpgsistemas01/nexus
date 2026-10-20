@@ -3,7 +3,7 @@ import { validationResult } from 'express-validator';
 import * as fields from '../../../src/validators/fields/fieldsValidator.js';
 import * as front from '../../../src/public/js/utils/validations/validators.js';
 import { validateFields, validateDetailsFields, hasValidationErrors } from '../../../src/public/js/utils/formUtils.js';
-import { MIN_STOCK_INPUT_FORMAT } from '../../../src/public/js/constants/inputValidation.js';
+import { MIN_STOCK_INPUT_FORMAT } from '../../../src/shared/constants/inputValidation.js';
 import { personValidation } from '../../../src/validators/forms/personValidations.js';
 import { clientValidation } from '../../../src/validators/forms/clientValidations.js';
 import { wasteEditValidation } from '../../../src/validators/forms/wasteValidations.js';

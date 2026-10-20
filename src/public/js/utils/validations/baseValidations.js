@@ -1,4 +1,4 @@
-import { ISO_DATE_TIME_PATTERN } from '../../constants/inputValidation.js';
+import { ISO_DATE_TIME_PATTERN } from '../../../../shared/constants/inputValidation.js';
 
 export const isEmptyOrNull = (value, fieldName) => {
     

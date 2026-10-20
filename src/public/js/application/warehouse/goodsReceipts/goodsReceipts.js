@@ -3,7 +3,7 @@ import * as materialApplication from './materials/materialGoodsReceipts.js';
 import * as consumableApplication from './consumables/consumableGoodsReceipts.js';
 import { exportMaterialGoodsReceiptReportRequest } from '../../../services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js';
 import { exportConsumableGoodsReceiptReportRequest } from '../../../services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 import { createReportApplication } from '../../createReportApplication.js';
 
 export const createGoodsReceiptApplication = ({ resource }) => {

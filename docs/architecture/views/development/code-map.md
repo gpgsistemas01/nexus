@@ -13,37 +13,41 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    controllers["controllers (45 módulos)"] --> constants["constants (11 módulos)"]
+    constants["constants (11 módulos)"] --> shared["shared (10 módulos)"]
     controllers["controllers (45 módulos)"] --> dtos["dtos (11 módulos)"]
     controllers["controllers (45 módulos)"] --> errors["errors (20 módulos)"]
     controllers["controllers (45 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (45 módulos)"] --> services["services (65 módulos)"]
-    controllers["controllers (45 módulos)"] --> utils["utils (11 módulos)"]
-    dtos["dtos (11 módulos)"] --> public["public (215 módulos)"]
+    controllers["controllers (45 módulos)"] --> services["services (68 módulos)"]
+    controllers["controllers (45 módulos)"] --> shared["shared (10 módulos)"]
+    controllers["controllers (45 módulos)"] --> utils["utils (12 módulos)"]
+    dtos["dtos (11 módulos)"] --> shared["shared (10 módulos)"]
     errors["errors (20 módulos)"] --> messages["messages (2 módulos)"]
-    errors["errors (20 módulos)"] --> public["public (215 módulos)"]
+    errors["errors (20 módulos)"] --> shared["shared (10 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (65 módulos)"]
-    middleware["middleware (5 módulos)"] --> utils["utils (11 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (68 módulos)"]
+    middleware["middleware (5 módulos)"] --> utils["utils (12 módulos)"]
+    public["public (211 módulos)"] --> shared["shared (10 módulos)"]
     repository["repository (8 módulos)"] --> constants["constants (11 módulos)"]
     repository["repository (8 módulos)"] --> errors["errors (20 módulos)"]
     repository["repository (8 módulos)"] --> lib["lib (3 módulos)"]
-    repository["repository (8 módulos)"] --> public["public (215 módulos)"]
-    routes["routes (48 módulos)"] --> constants["constants (11 módulos)"]
+    repository["repository (8 módulos)"] --> shared["shared (10 módulos)"]
     routes["routes (48 módulos)"] --> controllers["controllers (45 módulos)"]
     routes["routes (48 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (48 módulos)"] --> shared["shared (10 módulos)"]
     routes["routes (48 módulos)"] --> validators["validators (16 módulos)"]
-    services["services (65 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (65 módulos)"] --> dtos["dtos (11 módulos)"]
-    services["services (65 módulos)"] --> errors["errors (20 módulos)"]
-    services["services (65 módulos)"] --> public["public (215 módulos)"]
-    services["services (65 módulos)"] --> repository["repository (8 módulos)"]
-    services["services (65 módulos)"] --> utils["utils (11 módulos)"]
-    utils["utils (11 módulos)"] --> constants["constants (11 módulos)"]
-    utils["utils (11 módulos)"] --> errors["errors (20 módulos)"]
+    services["services (68 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (68 módulos)"] --> dtos["dtos (11 módulos)"]
+    services["services (68 módulos)"] --> errors["errors (20 módulos)"]
+    services["services (68 módulos)"] --> repository["repository (8 módulos)"]
+    services["services (68 módulos)"] --> shared["shared (10 módulos)"]
+    services["services (68 módulos)"] --> utils["utils (12 módulos)"]
+    utils["utils (12 módulos)"] --> constants["constants (11 módulos)"]
+    utils["utils (12 módulos)"] --> errors["errors (20 módulos)"]
+    utils["utils (12 módulos)"] --> services["services (68 módulos)"]
+    utils["utils (12 módulos)"] --> shared["shared (10 módulos)"]
     validators["validators (16 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (16 módulos)"] --> messages["messages (2 módulos)"]
-    validators["validators (16 módulos)"] --> public["public (215 módulos)"]
+    validators["validators (16 módulos)"] --> shared["shared (10 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. Los recursos EJS, CSS y el esquema Prisma se
@@ -279,6 +283,8 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js`](../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js) | `GOODS_RECEIPT_DETAIL_STATUS`, `createGoodsReceiptDetailChange`, `createGoodsReceiptDetailChangeMovementAndUpdateStock`, `findReceiptDetailForChange` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js) | `GOODS_RECEIPT_DETAIL_INCLUDE`, `buildGoodsReceiptContextWhere`, `buildGoodsReceiptDetails`, `calculateGoodsReceiptDetail`, `calculateGoodsReceiptTotals` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) | `assertGoodsReceiptInvoiceAvailable` |
+| [`src/services/warehouse/goodsReceipts/goodsReceiptReportService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportService.js) | `findGoodsReceiptReportRows` |
+| [`src/services/warehouse/goodsReceipts/goodsReceiptReportSummary.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportSummary.js) | `buildMonthlyGoodsReceiptSummary`, `createMonthlyGoodsReceiptSummary` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) | `createGoodsReceipt`, `findAllGoodsReceipts`, `updateGoodsReceipt` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js) | `cancelGoodsReceiptDetailAndTotals`, `correctGoodsReceiptDetailAndTotals`, `createGoodsReceiptDetailsAndUpdateTotals` |
 | [`src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) | `cancelMaterialGoodsReceiptDetailLine`, `correctMaterialGoodsReceiptDetailLine`, `createMaterialGoodsReceipt`, `findAllMaterialGoodsReceipts`, `findMaterialGoodsReceiptReportRows`, `updateMaterialGoodsReceipt` |
@@ -290,7 +296,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/materials/supplierMaterialStockService.js`](../../../../src/services/warehouse/materials/supplierMaterialStockService.js) | `adjustSupplierMaterialStock`, `findSupplierMaterialsForStockMovement`, `updateSupplierMaterialStock` |
 | [`src/services/warehouse/presentationService.js`](../../../../src/services/warehouse/presentationService.js) | `findAllPresentations`, `findUniquePresentation` |
 | [`src/services/warehouse/reasonService.js`](../../../../src/services/warehouse/reasonService.js) | `INITIAL_STOCK_REASON_NAME`, `findAllReasons`, `findGoodsReceiptDetailChangeReason`, `findInitialStockAdjustmentReason` |
-| [`src/services/warehouse/reportService.js`](../../../../src/services/warehouse/reportService.js) | `buildMonthlyGoodsReceiptSummary`, `buildWasteReportSummary`, `createMonthlyGoodsReceiptSummary`, `createWasteReportSummary`, `findGoodsIssueReportRows`, `findGoodsReceiptReportRows`, `findSupplierReportRows`, `findWarehouseReportRows`, `findWasteIssueReportRows`, `findWasteReportRows` |
+| [`src/services/warehouse/reportService.js`](../../../../src/services/warehouse/reportService.js) | `findGoodsIssueReportRows`, `findSupplierReportRows`, `findWarehouseReportRows`, `findWasteIssueReportRows`, `findWasteReportRows` |
 | [`src/services/warehouse/supplierService.js`](../../../../src/services/warehouse/supplierService.js) | `createSupplier`, `findAllSuppliers`, `findUniqueSupplier`, `findUniqueSupplierCode`, `updateSupplier` |
 | [`src/services/warehouse/unitMeasureService.js`](../../../../src/services/warehouse/unitMeasureService.js) | `findAllUnitMeasures`, `findUniqueUnitMeasure` |
 | [`src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js`](../../../../src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js) | `returnWasteIssueDetail` |
@@ -303,6 +309,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/wastes/wasteMaterialService.js`](../../../../src/services/warehouse/wastes/wasteMaterialService.js) | `findWasteMaterialTemplates` |
 | [`src/services/warehouse/wastes/wasteMovementService.js`](../../../../src/services/warehouse/wastes/wasteMovementService.js) | `applyWasteMovement`, `createWasteMovement` |
 | [`src/services/warehouse/wastes/wasteOperationService.js`](../../../../src/services/warehouse/wastes/wasteOperationService.js) | `executeWasteOperation`, `markWasteOperationRejected` |
+| [`src/services/warehouse/wastes/wasteReportSummary.js`](../../../../src/services/warehouse/wastes/wasteReportSummary.js) | `buildWasteReportSummary`, `createWasteReportSummary` |
 | [`src/services/warehouse/wastes/wasteService.js`](../../../../src/services/warehouse/wastes/wasteService.js) | `addWasteStock`, `createWaste`, `findAllWastes`, `updateWaste`, `updateWasteStock` |
 | [`src/services/warehouse/wastes/wasteStockAdjustmentService.js`](../../../../src/services/warehouse/wastes/wasteStockAdjustmentService.js) | `registerWasteStockAdjustment` |
 | [`src/services/warehouse/wastes/wasteStockEntryService.js`](../../../../src/services/warehouse/wastes/wasteStockEntryService.js) | `registerWasteStockEntry` |

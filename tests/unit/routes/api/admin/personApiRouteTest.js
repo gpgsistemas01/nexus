@@ -33,7 +33,7 @@ vi.mock('../../../../../src/controllers/api/admin/personController.js', () => ({
   registerPerson
 }));
 
-const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../src/shared/constants/permissions.js');
 const { default: personApiRoutes } = await import('../../../../../src/routes/api/admin/personApiRoute.js');
 
 describe('personApiRoute', () => {

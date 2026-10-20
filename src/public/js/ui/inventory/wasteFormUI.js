@@ -2,10 +2,16 @@ import { EMPTY_DISPLAY_VALUE } from '../../constants/display.js';
 import { isCreateMode } from '../../constants/formModes.js';
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
 import { setMdbWrapperInputValue } from '../../plugins/mdb/baseInstance.js';
-import { calculateWasteNetWeight, calculateWasteRollLength, getMaterialName, getPresentation, getUnitMeasure, isRollPresentation, prepareWasteRollReference } from '../../utils/warehouseInventoryUtils.js';
+import {
+    calculateWasteNetWeight,
+    calculateWasteRollLength,
+    isRollPresentation,
+    prepareWasteRollReference
+} from '../../../../shared/inventory/wasteMeasurements.js';
+import { getMaterialName, getPresentation, getUnitMeasure } from '../../utils/warehouseInventoryUtils.js';
 import { toggleErrorMessages } from '../forms/formErrorsUI.js';
 import { setFormSectionVisibility, setFormDisabled } from '../forms/formStateUI.js';
-import { WASTE_SAMPLE_FIELDS } from '../../constants/inventory.js';
+import { WASTE_SAMPLE_FIELDS } from '../../../../shared/constants/inventory.js';
 
 export const displayWasteMaterialTemplate = ({ form, template = {} }) => {
     setMdbWrapperInputValue({

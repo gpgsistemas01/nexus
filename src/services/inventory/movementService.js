@@ -1,11 +1,12 @@
 import { getDb } from "../../repository/baseRepository.js";
-import { buildStockKey, normalizeDecimal, parseStockKey } from "../../utils/formattersUtils.js";
+import { buildStockKey, parseStockKey } from '../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
 import { buildInventoryMovementDetail, buildStockUpdateSummary } from "./movementHelpers.js";
 import {
     findSupplierMaterialsForStockMovement,
     updateSupplierMaterialStock
 } from "../warehouse/materials/supplierMaterialStockService.js";
-import { INVENTORY_MOVEMENT_TYPES } from "../../constants/inventory.js";
+import { INVENTORY_MOVEMENT_TYPES } from '../../constants/inventory.js';
 
 export const createInventoryMovement = ({
     tx = null,
@@ -24,7 +25,6 @@ export const createInventoryMovement = ({
         include: { details: true }
     });
 };
-
 
 export const applyInventoryMovement = async ({
     tx,

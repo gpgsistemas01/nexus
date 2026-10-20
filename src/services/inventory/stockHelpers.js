@@ -1,5 +1,6 @@
 import { GoodsIssueInsufficientStock } from '../../errors/inventory/stockError.js';
-import { normalizeDecimal, toNumber } from '../../utils/formattersUtils.js';
+import { toNumber } from '../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
 
 export const hasDimensions = ({ base, height } = {}) => (
     (toNumber(base) || 0) > 0 &&

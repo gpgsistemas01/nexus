@@ -14,7 +14,7 @@ const OUTPUTS = {
 const CHECK = process.argv.includes('--check');
 const SOURCE_AREAS = [
     'config', 'constants', 'controllers', 'dtos', 'errors', 'lib', 'messages',
-    'middleware', 'public', 'repository', 'routes', 'services', 'utils', 'validators', 'views'
+    'middleware', 'public', 'repository', 'routes', 'services', 'shared', 'utils', 'validators', 'views'
 ];
 const DATABASE_AREAS = [
     ['Identidad, acceso y auditoría', ['Department', 'Role', 'User', 'Person', 'UserRoleDepartment', 'PersonRoleDepartment', 'CriticalWriteAudit']],

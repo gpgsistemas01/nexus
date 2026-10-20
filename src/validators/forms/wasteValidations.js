@@ -1,4 +1,4 @@
-import { FORM_FIELD_LIMITS, MONEY_INPUT_FORMAT } from '../../public/js/constants/inputValidation.js';
+import { FORM_FIELD_LIMITS, MONEY_INPUT_FORMAT } from '../../shared/constants/inputValidation.js';
 import { body } from 'express-validator';
 import { errorMap } from '../../messages/codeMessages.js';
 import {
@@ -15,7 +15,7 @@ import {
     WASTE_IMMUTABLE_FIELDS,
     WASTE_ROLL_WEIGHT_FIELDS,
     WASTE_SAMPLE_FIELDS
-} from '../../public/js/constants/inventory.js';
+} from '../../shared/constants/inventory.js';
 
 const hasRollWeightCapture = data => WASTE_ROLL_WEIGHT_FIELDS
     .some(field => data[field] !== undefined && data[field] !== null && data[field] !== '');

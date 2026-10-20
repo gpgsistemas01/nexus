@@ -1,11 +1,11 @@
 import { getAllWasteIssues, getWasteIssue } from '../../../../application/warehouse/wasteIssues/wasteIssues.js';
-import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
+import { hasPermission, PERMISSIONS } from '../../../../../../shared/constants/permissions.js';
 import { createIssueDatatable } from '../../shared/issues/issueDatatable.js';
 import { exportWasteIssueReport } from '../../../../application/warehouse/report.js';
 
 export const createWasteIssueDatatable = async ({ context, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
-    const canManage = hasPermission(context, UI_PERMISSIONS.WASTE_ISSUES_MANAGE);
-    const canSupply = hasPermission(context, UI_PERMISSIONS.WASTE_ISSUES_SUPPLY);
+    const canManage = hasPermission(context, PERMISSIONS.WASTE_ISSUES_MANAGE);
+    const canSupply = hasPermission(context, PERMISSIONS.WASTE_ISSUES_SUPPLY);
     const issueDatatable = await createIssueDatatable({
         context,
         getIssues: getAllWasteIssues,

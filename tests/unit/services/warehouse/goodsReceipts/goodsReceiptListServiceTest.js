@@ -6,7 +6,7 @@ vi.mock('../../../../../src/repository/baseRepository.js', () => ({
     getDb: () => ({ goodsReceipt: { findMany, count } })
 }));
 const { findAllGoodsReceipts } = await import('../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js');
-const { findGoodsReceiptReportRows } = await import('../../../../../src/services/warehouse/reportService.js');
+const { findGoodsReceiptReportRows } = await import('../../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportService.js');
 
 describe('conteos de compras sin consultas redundantes', () => {
     beforeEach(() => {

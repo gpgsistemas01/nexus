@@ -15,9 +15,8 @@ import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
 import { GOODS_RECEIPT_STATUS_LABELS } from '../../../../constants/goodsReceiptStatuses.js';
 import { updateTotals } from '../../../../ui/forms/totalsSummaryUI.js';
 import { refreshMaterialTable } from '../../shared/inventory/renderMaterialDatatable.js';
-import { INVENTORY_RESOURCES } from '../../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../../shared/constants/inventory.js';
 
-export let details = [];
 let filters = {
     getValues: () => ({})
 };
@@ -101,7 +100,8 @@ export const createGoodsReceiptDatatable = async ({ openGoodsReceiptModal, goods
     });
 }
 
-export const initDetailsGoodsReceiptTable = (mode) => {
+export const initDetailsGoodsReceiptTable = ({ mode, details }) => {
+    const selector = selectorMaterialTable;
 
     const table = document.querySelector(selectorMaterialTable);
 
@@ -126,28 +126,28 @@ export const initDetailsGoodsReceiptTable = (mode) => {
             autoWidth: false
         }
     });
+
+    $(selector).off(`${ DOM_EVENT_NAMES.CLICK }.receiptDetails`).on(`${ DOM_EVENT_NAMES.CLICK }.receiptDetails`, '.delete-btn', function () {
+
+        const id = $(this).data('id');
+
+        const material = removeDetail({
+            details,
+            matches: detail => matchesDetailIdentifier({
+                detail,
+                identifier: id,
+                inventoryIdKey: 'clientId'
+            })
+        });
+
+        if (!material) return;
+
+        updateTotals({
+            quantity: material.quantity,
+            net: material.netPurchaseAmount,
+            gross: material.grossPurchaseAmount,
+            operation: 'subtract'
+        });
+        refreshMaterialTable(details);
+    });
 };
-
-$(selectorMaterialTable).on(DOM_EVENT_NAMES.CLICK, '.delete-btn', function () {
-
-    const id = $(this).data('id');
-
-    const material = removeDetail({
-        details,
-        matches: detail => matchesDetailIdentifier({
-            detail,
-            identifier: id,
-            inventoryIdKey: 'clientId'
-        })
-    });
-
-    if (!material) return;
-
-    updateTotals({
-        quantity: material.quantity,
-        net: material.netPurchaseAmount,
-        gross: material.grossPurchaseAmount,
-        operation: 'subtract'
-    });
-    refreshMaterialTable(details);
-});

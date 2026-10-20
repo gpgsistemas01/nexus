@@ -2,7 +2,6 @@ import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllClients } from "../../../../application/sales/clients/clients.js";
 import { exportClientReport } from "../../../../application/sales/report.js";
-import { openClientModal } from "../../../../pages/sales/clients/clientModal.js";
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
@@ -12,7 +11,7 @@ import { formatFileName } from "../../../../utils/formatters.js";
 
 const selector = DATATABLE_SELECTORS.MAIN;
 
-export const createClientDatatable = () => {
+export const createClientDatatable = ({ onOpen }) => {
 
     const table = createDataTable({
         options: {
@@ -36,7 +35,7 @@ export const createClientDatatable = () => {
             buttons: [
                 {
                     text: 'Nuevo cliente',
-                    action: () => openClientModal({ mode: FORM_MODES.CREATE })
+                    action: () => onOpen({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_clientes'),
@@ -51,6 +50,6 @@ export const createClientDatatable = () => {
 
         const data = getResponsiveRowData(table, this);
 
-        openClientModal({ mode: FORM_MODES.EDIT, data });
+        onOpen({ mode: FORM_MODES.EDIT, data });
     });
 }

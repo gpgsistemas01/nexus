@@ -1,4 +1,4 @@
-import { WASTE_OPERATION_ACTIONS } from '../../../constants/inventory.js';
+import { WASTE_OPERATION_ACTIONS } from '../../../../../shared/constants/inventory.js';
 import { initWasteSelect2, setWasteSelectOptions } from "../../../plugins/select2/modules/wasteSelect.js";
 import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';

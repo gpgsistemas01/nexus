@@ -1,4 +1,4 @@
-import { WASTE_OPERATION_ACTIONS } from '../../constants/inventory.js';
+import { WASTE_OPERATION_ACTIONS } from '../../../../shared/constants/inventory.js';
 import { BUTTON_SELECTORS } from '../../constants/selectors.js';
 import { notifications } from '../../plugins/swal/swalComponent.js';
 

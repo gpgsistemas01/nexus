@@ -1,9 +1,10 @@
-import { WASTE_OPERATION_ACTIONS, WASTE_ROLL_WEIGHT_FIELDS } from '../../../constants/inventory.js';
+import { WASTE_OPERATION_ACTIONS, WASTE_ROLL_WEIGHT_FIELDS } from '../../../../../shared/constants/inventory.js';
 import { notifications } from '../../../plugins/swal/swalComponent.js';
 import { closeModal } from '../../../ui/modalUI.js';
 import { openWasteStockAdditionModal } from './wasteStockAdditionModal.js';
-import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
-import { getPresentation, isRollPresentation } from '../../../utils/warehouseInventoryUtils.js';
+import { hasPermission, PERMISSIONS } from '../../../../../shared/constants/permissions.js';
+import { getPresentation } from '../../../utils/warehouseInventoryUtils.js';
+import { isRollPresentation } from '../../../../../shared/inventory/wasteMeasurements.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { updateWasteRollMeasurement } from '../../../ui/inventory/wasteFormUI.js';
 import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
@@ -67,7 +68,7 @@ useForm({
         } catch (err) {
             const existingWaste = err.data?.meta?.waste;
             if (!isCreateMode(form.dataset.mode) || err.data?.code !== 'WASTE_ALREADY_EXISTS'
-                || !existingWaste?.id || !hasPermission(window.meta || {}, UI_PERMISSIONS.WASTES_ADD_STOCK)) throw err;
+                || !existingWaste?.id || !hasPermission(window.meta || {}, PERMISSIONS.WASTES_ADD_STOCK)) throw err;
 
             const { isConfirmed } = await notifications.showConfirmation({
                 title: 'Esta merma ya existe',

@@ -36,19 +36,10 @@ export const validate = (req, res, next) => {
         
         errorsArray.forEach(error => {
 
-            if (error.path === 'details' && error.msg) {
-
-                try {
-
-                    const parsed = JSON.parse(error.msg);
-
-                    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-
-                        Object.assign(errors, normalizeValidationError(parsed));
-                        return;
-                    }
-
-                } catch (_) {}
+            if (error.path === 'details' && isObject(error.msg)
+                && !Array.isArray(error.msg) && !isErrorCodeObject(error.msg)) {
+                Object.assign(errors, normalizeValidationError(error.msg));
+                return;
             }
             
             errors[error.path] = normalizeValidationError(error.msg);

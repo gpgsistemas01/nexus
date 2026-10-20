@@ -1,3 +1,4 @@
+import { handleServiceError } from '../serviceErrorHandler.js';
 import { normalizeDatabaseError } from '../../errors/databaseError.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
 import { isAppError } from '../../errors/AppError.js';
@@ -8,7 +9,6 @@ import { getDb } from "../../repository/baseRepository.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('sales.clientService');
-
 
 const CLIENT_SELECT = {
     id: true,
@@ -83,9 +83,12 @@ export const createClient = async ({
         return createdClient;
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'sales.clientService' });
-
-        throw new ClientCreateDatabaseError();
+        handleServiceError({
+            logger: serviceLogger,
+            error: err,
+            operation: 'sales.clientService',
+            fallbackError: new ClientCreateDatabaseError()
+        });
     }
 };
 

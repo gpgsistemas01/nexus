@@ -32,7 +32,6 @@ export const formatDateLongWithTime = (dateTime) => {
     return dateTimeFormatter.format(date);
 }
 
-
 export const getMexicoMonthYearParts = (dateTime = new Date()) => {
 
     const parts = monthYearFormatter.formatToParts(dateTime).reduce((acc, part) => {
@@ -45,7 +44,6 @@ export const getMexicoMonthYearParts = (dateTime = new Date()) => {
         year: parts.year
     };
 };
-
 
 export const getMexicoMonthDateRange = (dateTime = new Date()) => {
 
@@ -97,23 +95,6 @@ export const cleanSearchTerm = (search) => {
   }
 
   return { codeSearch, nameSearch };
-};
-
-export const roundTo = (value, decimals = 6) => {
-
-    const factor = 10 ** decimals;
-    return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
-};
-
-const FLOAT_EPSILON = 0.000001;
-
-export const normalizeDecimal = (value) => {
-
-    const rounded = roundTo(value);
-
-    return Math.abs(rounded) <= FLOAT_EPSILON
-        ? 0
-        : rounded;
 };
 
 export const hasMaterialDimensions = (material = {}) => (

@@ -29,6 +29,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Fulfillment` | control | [`fulfillmentStatusService.js`](../../../../../../src/services/warehouse/fulfillmentStatusService.js) |
 | `Status` | control | [`issueFulfillmentRules.js`](../../../../../../src/services/warehouse/issues/issueFulfillmentRules.js) |
 | `ValidationRules` | control | [`goodsIssueValidations.js`](../../../../../../src/validators/forms/goodsIssueValidations.js) |
+| `Numbers` | control | [`numberUtils.js`](../../../../../../src/shared/utils/numberUtils.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FileMaterialGoodsIssueController` | control | [`materialGoodsIssueController.js`](../../../../../../src/controllers/api/warehouse/goodsIssues/materials/materialGoodsIssueController.js) |
@@ -133,6 +134,7 @@ completan las llamadas a helpers y la propagación del resultado.
 
 ```mermaid
 sequenceDiagram
+    participant Numbers@{ "type": "control" } as numberUtils.js
     autonumber
     participant Client as Cliente HTTP / web
     participant Controller@{ "type": "control" } as goodsIssueHandlers.js
@@ -154,8 +156,8 @@ sequenceDiagram
     Note over Facade,Core: Realización detallada en la colaboración de dominio
     alt Servicio resuelto
         rect rgb(245, 245, 245)
-            Core->>Formatter: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
-            Formatter-->>Core: normalizeDecimal(): number
+            Core->>Numbers: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
+            Numbers-->>Core: normalizeDecimal(): number
     end
         Core-->>Facade: returnGoodsIssueDetail(): Promise[{ ...goodsIssueReturn, detail: updatedDetail }]
         Facade-->>Controller: returnMaterialGoodsIssueDetail(): Promise[{ ...goodsIssueReturn, detail: updatedDetail }]
@@ -177,6 +179,7 @@ la primera figura; los mensajes se numeran de nuevo dentro de esta colaboración
 
 ```mermaid
 sequenceDiagram
+    participant Numbers@{ "type": "control" } as numberUtils.js
     autonumber
     participant Facade@{ "type": "control" } as materialGoodsIssueService.js
     participant Core@{ "type": "control" } as goodsIssueReturnService.js
@@ -199,8 +202,8 @@ sequenceDiagram
             Note over Core,Prisma: getDb().$transaction(async tx => ...)
             Core->>Fulfillment: findFulfillmentStatusIdsByName({ tx, names })
             Core->>Prisma: tx.goodsIssueDetail.findFirst({ where: { id: detailId, goodsIssueId: id, goodsIssue: contextWhere } })
-            Core->>Formatter: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
-            Formatter-->>Core: normalizeDecimal(): number
+            Core->>Numbers: normalizeDecimal(returnDto.returnQuantity) — validar salida surtida y saldo retornable
+            Numbers-->>Core: normalizeDecimal(): number
             Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
             Core->>Prisma: tx.goodsIssueDetail.update({ where: { id: detailId }, data: devolución y cumplimiento })
             Core->>Prisma: tx.goodsIssueDetail.findMany({ where: { goodsIssueId: id } })

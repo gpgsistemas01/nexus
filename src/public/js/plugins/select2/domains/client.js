@@ -1,5 +1,4 @@
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
-import { openClientModal } from "../../../pages/sales/clients/clientModal.js";
 import { getAllClients } from "../../../application/sales/clients/clients.js";
 import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
@@ -37,6 +36,7 @@ export const initClientSelect = ({
 });
 
 const attachClientHandler = ({
+    onCreate,
     baseSelector
 }) => {
 
@@ -50,7 +50,7 @@ const attachClientHandler = ({
             
             runAfterSelect2Close({
                 selector: baseSelector,
-                action: () => openClientModal({
+                action: () => onCreate({
                     data: { name },
                     onSave: (createdClient) => {
 
@@ -84,15 +84,17 @@ export const setupClientSelect = ({
     modalSelector, 
     clientSelector,
     allowCreate = true,
+    onCreate
 }) => {
 
     initClientSelect({
         modalSelector,
         baseSelector: `${ modalSelector } ${ clientSelector }`,
-        allowCreate
+        allowCreate: allowCreate && typeof onCreate === 'function'
     });
 
     attachClientHandler({
+        onCreate,
         baseSelector: `${ modalSelector } ${ clientSelector }`,
     });
 };

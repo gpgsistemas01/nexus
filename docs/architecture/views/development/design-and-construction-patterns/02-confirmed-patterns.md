@@ -18,8 +18,9 @@
 | Pruebas | Test harness configurable | `createControllerTestApp` registra sólo las rutas necesarias para probar controllers con Supertest. |
 
 Las constantes compartidas forman parte de estas fronteras de construcción: modos de
-formulario, estados, permisos y selectores se importan desde `src/constants` o
-`src/public/js/constants`, según el entorno. Los consumidores no deben volver a
+formulario, estados y selectores se importan desde su módulo propietario. Las reglas
+y los identificadores comunes viven en `src/shared`; los específicos de servidor o
+presentación permanecen en `src/constants` o `src/public/js/constants`. Los consumidores no deben volver a
 declarar sus valores literales; al ampliar un conjunto se actualiza su export y todos
 los imports relacionados para conservar una única fuente de verdad.
 

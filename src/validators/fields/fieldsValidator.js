@@ -1,7 +1,15 @@
 import { body } from "express-validator";
-import { BOOLEAN_INPUT_VALUES, DECIMAL_INPUT_FORMAT, FORM_FIELD_LIMITS, ISO_DATE_TIME_PATTERN, PERSON_NAME_PATTERN, TEXT_INPUT_PATTERN, UUID_V4_PATTERN } from '../../public/js/constants/inputValidation.js';
-import { AUTH_FIELD_LIMITS } from '../../public/js/constants/auth.js';
-import { wasteWeightRules } from "../../public/js/utils/validations/weightValidations.js";
+import {
+    BOOLEAN_INPUT_VALUES,
+    DECIMAL_INPUT_FORMAT,
+    FORM_FIELD_LIMITS,
+    ISO_DATE_TIME_PATTERN,
+    PERSON_NAME_PATTERN,
+    TEXT_INPUT_PATTERN,
+    UUID_V4_PATTERN
+} from '../../shared/constants/inputValidation.js';
+import { AUTH_FIELD_LIMITS } from '../../shared/constants/auth.js';
+import { wasteWeightRules } from '../../shared/validation/weightValidations.js';
 import { errorMap } from "../../messages/codeMessages.js";
 
 const numberRegex = /\d/;
@@ -143,7 +151,6 @@ export const validateNumberRequiredWhenOtherPresent = ({ fieldName, pairedFieldN
     errorMap[fieldName].REQUIRED
 );
 
-
 export const validateDate = (fieldName) => {
 
     const errors = errorMap[fieldName];
@@ -280,7 +287,7 @@ export const validateIssueProjectQuantityDetailsEdition =
             });
 
             if (Object.keys(errors).length) {
-                throw new Error(JSON.stringify(errors));
+                throw errors;
             }
 
             return true;
@@ -292,7 +299,6 @@ export const validateIssueProjectQuantityDetailsEdition =
         })))
 ;
 
-
 export const validateArrayOfUUIDs = ({ fieldName }) =>
     body(fieldName)
         .isArray({ min: 1 }).withMessage(errorMap[fieldName].REQUIRED)
@@ -302,7 +308,6 @@ export const validateArrayOfUUIDs = ({ fieldName }) =>
             )
         ).withMessage(errorMap[fieldName].INVALID_FORMAT)
 ;
-
 
 export const validateWeightCapture = ({
     fieldName,

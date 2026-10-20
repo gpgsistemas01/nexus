@@ -6,7 +6,7 @@ import {
     createGoodsIssueHeaderDtoForEdit
 } from "../../../../../dtos/goodsIssueDTO.js";
 import { successCodeMessages } from "../../../../../messages/codeMessages.js";
-import { sanitizeEmptyStrings } from "../../../../../utils/formattersUtils.js";
+import { sanitizeEmptyStrings } from '../../../../../utils/formattersUtils.js';
 import { emitInventoryUpdated } from "../../../../../utils/socketUtils.js";
 import { getIssueDataTableQuery } from '../../../../../utils/issueQueryUtils.js';
 

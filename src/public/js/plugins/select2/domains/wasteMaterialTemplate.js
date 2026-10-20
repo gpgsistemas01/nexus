@@ -1,6 +1,6 @@
 import { getWasteMaterialTemplates } from '../../../application/warehouse/wastes/wastes.js';
 import { initDomainSelect2, toggleSelectOption } from '../baseSelect.js';
-import { mapSelectWasteMaterialTemplateData, normalizeInventorySelectRelations } from '../../../utils/warehouseInventoryUtils.js';
+import { mapSelectWasteMaterialTemplateData, normalizeInventorySelectRelations } from '../inventorySelectData.js';
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { applyWasteMaterialTemplate } from '../../../ui/inventory/wasteFormUI.js';

@@ -1,3 +1,9 @@
+vi.mock('../../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportSummary.js', () => ({
+  createMonthlyGoodsReceiptSummary: () => { const rows = []; return { add: row => rows.push(row), finish: () => buildMonthlyGoodsReceiptSummary(rows) }; }
+}));
+vi.mock('../../../../../src/services/warehouse/wastes/wasteReportSummary.js', () => ({
+  createWasteReportSummary: () => { const rows = []; return { add: row => rows.push(row), finish: () => buildWasteReportSummary(rows) }; }
+}));
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const {
@@ -25,8 +31,6 @@ const {
 }));
 
 vi.mock('../../../../../src/services/warehouse/reportService.js', () => ({
-  createMonthlyGoodsReceiptSummary: () => { const rows = []; return { add: row => rows.push(row), finish: () => buildMonthlyGoodsReceiptSummary(rows) }; },
-  createWasteReportSummary: () => { const rows = []; return { add: row => rows.push(row), finish: () => buildWasteReportSummary(rows) }; },
   findGoodsIssueReportRows,
   findSupplierReportRows: vi.fn(),
   findWarehouseReportRows: vi.fn(),

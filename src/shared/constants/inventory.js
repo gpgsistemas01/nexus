@@ -15,7 +15,6 @@ export const MATERIAL_TYPES = Object.freeze({
     CONSUMABLE: 'CONSUMABLE'
 });
 
-
 export const SQUARE_METER_UNIT_SYMBOLS = Object.freeze(['M²', 'M2', 'M^2']);
 export const SQUARE_METER_UNIT_NAMES = Object.freeze(['METRO CUADRADO', 'METROS CUADRADOS']);
 export const WASTE_SAMPLE_FIELDS = Object.freeze(['sampleLengthM', 'sampleNetWeightKg']);

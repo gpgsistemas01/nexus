@@ -7,7 +7,7 @@ import {
 } from '../../../controllers/api/warehouse/supplierController.js';
 import { supplierEditValidation, supplierValidation } from '../../../validators/forms/supplierValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 const router = express.Router();
 

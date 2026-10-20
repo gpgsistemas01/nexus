@@ -1,12 +1,22 @@
+import { openSupplierModal } from '../suppliers/supplierModal.js';
 import { openModal } from "../../../ui/modalUI.js";
-import { initMaterialFormSelect2, setMaterialFormSelectOptions } from "../../../plugins/select2/modules/materialSelect.js";
+import {
+    initMaterialFormSelect2,
+    setMaterialFormSelectOptions
+} from "../../../plugins/select2/modules/materialSelect.js";
 import { setReasonVisualOption } from '../../../plugins/select2/domains/reason.js';
 import { setFormDisabled, setFormSectionVisibility } from "../../../ui/forms/formStateUI.js";
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
-import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import {
+    BUTTON_SELECTORS,
+    FORM_SELECTORS,
+    HEADING_SELECTORS,
+    MODAL_SELECTORS,
+    SELECT_SELECTORS
+} from "../../../constants/selectors.js";
 import { materialDataFields, materialEditableDataFields } from './materialFields.js';
 import { FORM_MODES, isCreateMode, isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 
 import { updateMaterialMeasurementFields } from '../../../ui/inventory/inventorySelectUI.js';
 
@@ -33,9 +43,8 @@ export const openMaterialModal = ({
     initializeInventoryCrudModal({ form, mode, data });
     form.dataset.creationContext = creationContext || '';
     form.dataset.resource = resource;
-    initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL });
+    initMaterialFormSelect2({ modalSelector: MODAL_SELECTORS.MATERIAL, onCreateSupplier: openSupplierModal });
     setMaterialFormSelectOptions({ modalSelector: MODAL_SELECTORS.MATERIAL, data });
-
 
     form.elements.name.value = data?.name ?? '';
     form.elements.minStock.value = data?.minStock ?? '';

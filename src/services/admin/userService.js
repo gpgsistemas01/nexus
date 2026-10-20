@@ -1,3 +1,4 @@
+import { handleServiceError } from '../serviceErrorHandler.js';
 import { normalizeDatabaseError } from '../../errors/databaseError.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
 import { isAppError } from '../../errors/AppError.js';
@@ -12,12 +13,11 @@ import {
 import { getDb } from "../../repository/baseRepository.js";
 import { verifyPassword, encryptPassword } from "../../utils/encryptionUtils.js";
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
-import { getGrantedPermissions, getOrganizationContext } from "../../constants/permissions.js";
+import { getGrantedPermissions, getOrganizationContext } from '../../constants/permissions.js';
 import { hasSystemWideReadAccess } from "../../utils/authorizationUtils.js";
 import { findPersonById } from "./person/personService.js";
 
 const serviceLogger = createServiceLogger('admin.userService');
-
 
 export const findAllUsers = async ({
     cursor,
@@ -92,8 +92,12 @@ export const findAllUsers = async ({
         };
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'admin.userService' });
-        throw new UserFindDatabaseError();
+        handleServiceError({
+            logger: serviceLogger,
+            error: err,
+            operation: 'admin.userService',
+            fallbackError: new UserFindDatabaseError()
+        });
     }
 };
 
@@ -229,9 +233,12 @@ export const createUser = async ({ userDto }) => {
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'admin.userService' });
-
-        throw new UserCreateDatabaseError();
+        handleServiceError({
+            logger: serviceLogger,
+            error: err,
+            operation: 'admin.userService',
+            fallbackError: new UserCreateDatabaseError()
+        });
     }
 };
 

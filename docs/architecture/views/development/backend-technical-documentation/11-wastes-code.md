@@ -13,10 +13,10 @@ flowchart TB
     X["Colaboradores de dominio<br/>referenceNumberService.js<br/>materialIdentity.js<br/>y colaboradores"]
     V["Validadores<br/>wasteValidations.js"]
     Fields["fieldsValidator.js<br/>validateWeightCapture"]
-    WeightValidation["validations/weightValidations.js<br/>wasteWeightRules"]
+    WeightValidation["shared/validation/weightValidations.js<br/>wasteWeightRules"]
     Measurements["wasteHelpers.js<br/>prepareWasteMeasurements"]
     P["baseRepository.js<br/>getDb(tx)"]
-    PresentationRule["warehouseInventoryUtils.js<br/>isRollPresentation<br/>calculateWasteNetWeight<br/>calculateWasteRollLength"]
+    PresentationRule["shared/inventory/wasteMeasurements.js<br/>isRollPresentation<br/>calculateWasteNetWeight<br/>calculateWasteRollLength"]
     C --> D
     C --> S
     R --> C
@@ -41,7 +41,7 @@ flowchart TB
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |
 | Preparación de medidas | `src/services/warehouse/wastes/wasteHelpers.js` |
 | Validación de campos | `src/validators/fields/fieldsValidator.js` |
-| Regla de presentación · warehouseInventoryUtils.js | `src/public/js/utils/warehouseInventoryUtils.js` |
+| Cálculos de merma compartidos | `src/shared/inventory/wasteMeasurements.js` |
 
 
 ## Contratos de implementación

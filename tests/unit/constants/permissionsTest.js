@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-    DATA_SCOPES,
-    getGrantedPermissions,
-    getOrganizationContext,
-    hasDataScope,
-    PERMISSIONS
-} from '../../../src/constants/permissions.js';
+import { DATA_SCOPES, getGrantedPermissions, getOrganizationContext, hasDataScope } from '../../../src/constants/permissions.js';
+import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
 import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
 

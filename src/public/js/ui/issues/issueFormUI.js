@@ -6,7 +6,8 @@ import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../consta
 
 import { syncCheckboxControlledInputs, toggleDisabledElement, setFormDisabled } from '../forms/formStateUI.js';
 import { on } from '../../utils/domUtils.js';
-import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
+import { formatDecimal } from '../../utils/formatUtils.js';
+import { roundTo } from '../../../../shared/utils/numberUtils.js';
 
 import { toggleDetailFormActions } from '../forms/detailFormUI.js';
 import { initializeInventoryCrudModal } from '../inventory/inventoryCrudModalUI.js';

@@ -3,36 +3,39 @@ import { setupMaterialSelect, toggleMaterialOption } from '../domains/material.j
 import { createIssueHeaderSelects } from './issueHeaderSelect.js';
 
 const modalSelector = MODAL_SELECTORS.GOODS_ISSUE;
-const headerSelects = createIssueHeaderSelects({
-    modalSelector,
-    formSelector: FORM_SELECTORS.GOODS_ISSUE,
-    selectors: {
-        requester: SELECT_SELECTORS.REQUESTER,
-        client: SELECT_SELECTORS.CLIENT,
-        department: SELECT_SELECTORS.DEPARTMENT,
-        advisor: SELECT_SELECTORS.ADVISOR,
-        projectNumber: INPUT_SELECTORS.PROJECT_NUMBER
-    }
-});
+export const getGoodsIssueHeaderSelects = ({ resource, onCreateClient }) => {
+    const headerSelects = createIssueHeaderSelects({
+        modalSelector,
+        onCreateClient,
+        formSelector: FORM_SELECTORS.GOODS_ISSUE,
+        selectors: {
+            requester: SELECT_SELECTORS.REQUESTER,
+            client: SELECT_SELECTORS.CLIENT,
+            department: SELECT_SELECTORS.DEPARTMENT,
+            advisor: SELECT_SELECTORS.ADVISOR,
+            projectNumber: INPUT_SELECTORS.PROJECT_NUMBER
+        }
+    });
 
-export const getGoodsIssueHeaderSelects = ({ resource }) => ({
-    init: () => {
+    return {
+        init: () => {
 
-        headerSelects.init();
-        setupMaterialSelect({
-            modalSelector,
-            materialSelector: SELECT_SELECTORS.MATERIAL,
-            allowCreate: false,
-            resource
-        });
-    },
-    setOptions: (data) => {
+            headerSelects.init();
+            setupMaterialSelect({
+                modalSelector,
+                materialSelector: SELECT_SELECTORS.MATERIAL,
+                allowCreate: false,
+                resource
+            });
+        },
+        setOptions: (data) => {
 
-        headerSelects.setOptions(data);
-        toggleMaterialOption({
-            selector: `${ modalSelector } ${ SELECT_SELECTORS.MATERIAL }`,
-            data: { id: null, text: null }
-        });
-    },
-    syncState: headerSelects.syncState
-});
+            headerSelects.setOptions(data);
+            toggleMaterialOption({
+                selector: `${ modalSelector } ${ SELECT_SELECTORS.MATERIAL }`,
+                data: { id: null, text: null }
+            });
+        },
+        syncState: headerSelects.syncState
+    };
+};

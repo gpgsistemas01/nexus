@@ -1,4 +1,5 @@
-import { buildStockKey, normalizeDecimal } from "../../utils/formattersUtils.js";
+import { buildStockKey } from '../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
 import { MovementDetailRelationConflict } from "../../errors/inventory/movementError.js";
 
 const resolveValue = (item, resolver) => (

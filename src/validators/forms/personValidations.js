@@ -1,4 +1,4 @@
-import { FORM_FIELD_LIMITS } from '../../public/js/constants/inputValidation.js';
+import { FORM_FIELD_LIMITS } from '../../shared/constants/inputValidation.js';
 import { body } from "express-validator";
 import { errorMap } from "../../messages/codeMessages.js";
 import { validateName } from "../fields/fieldsValidator.js";

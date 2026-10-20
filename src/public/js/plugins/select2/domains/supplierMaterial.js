@@ -1,5 +1,5 @@
 import { getAllMaterials } from '../../../application/warehouse/materials/materials.js';
-import { mapSelectMaterialData } from "../../../utils/warehouseInventoryUtils.js";
+import { mapSelectMaterialData } from '../inventorySelectData.js';
 import { initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
 
 export const initSupplierMaterialSelect = ({

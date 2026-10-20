@@ -17,17 +17,10 @@ import {
 import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
 import { clearAddedItemInput } from '../../../ui/forms/detailFormUI.js';
 import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
-import {
-    bindIssueProjectQuantityControls,
-    useIssueForm
-} from '../../../ui/issues/issueFormUI.js';
-import {
-    matchesDetailIdentifier,
-    removeDetail,
-    upsertIssueDetail
-} from '../../../utils/detailCollectionUtils.js';
+import { bindIssueProjectQuantityControls, useIssueForm } from '../../../ui/issues/issueFormUI.js';
+import { matchesDetailIdentifier, removeDetail, upsertIssueDetail } from '../../../utils/detailCollectionUtils.js';
 import { on } from '../../../utils/domUtils.js';
-import { roundTo } from '../../../utils/formatUtils.js';
+import { roundTo } from '../../../../../shared/utils/numberUtils.js';
 import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
 import {
     addWasteIssueDetailValidation,
@@ -35,11 +28,8 @@ import {
     issueProjectQuantityDetailsValidation,
     wasteIssueValidation
 } from '../../../utils/validations/validators.js';
-import {
-    getPresentation,
-    getUnitMeasure,
-    mapIssueDetailsToSupplyRequest
-} from '../../../utils/warehouseInventoryUtils.js';
+import { getPresentation, getUnitMeasure } from '../../../utils/warehouseInventoryUtils.js';
+import { mapIssueDetailsToSupplyRequest } from '../../../application/warehouse/issues/issueDetails.js';
 import { details, wasteIssueHeaderForm } from './wasteIssueModal.js';
 
 const formId = FORM_SELECTORS.WASTE_ISSUE;

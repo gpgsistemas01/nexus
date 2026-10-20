@@ -16,7 +16,7 @@ vi.mock('../../../../../../../src/public/js/utils/formUtils.js', () => ({
 }));
 vi.mock('../../../../../../../src/public/js/plugins/swal/swalComponent.js', () => ({ notifications: { showConfirmation: state.confirmation, showSuccess: state.success } }));
 vi.mock('../../../../../../../src/public/js/pages/warehouse/wastes/wasteStockAdditionModal.js', () => ({ openWasteStockAdditionModal: state.openAddition }));
-vi.mock('../../../../../../../src/public/js/constants/permissions.js', () => ({ hasPermission: state.permission, UI_PERMISSIONS: { WASTES_ADD_STOCK: 'wastes:add-stock' } }));
+vi.mock('../../../../../../../src/shared/constants/permissions.js', () => ({ hasPermission: state.permission, PERMISSIONS: { WASTES_ADD_STOCK: 'wastes:add-stock' } }));
 vi.mock('../../../../../../../src/public/js/ui/modalUI.js', () => ({ closeModal: state.close }));
 vi.mock('../../../../../../../src/public/js/ui/inventory/wasteFormUI.js', () => ({ updateWasteRollMeasurement: vi.fn() }));
 vi.mock('../../../../../../../src/public/js/application/warehouse/wastes/wastes.js', () => ({ registerWaste: vi.fn(), editWaste: vi.fn(), editWasteStock: vi.fn(), addWasteStock: state.add }));

@@ -3,7 +3,7 @@ import * as materialApplication from './materials/materialGoodsIssues.js';
 import * as consumableApplication from './consumables/consumableGoodsIssues.js';
 import { exportMaterialGoodsIssueReportRequest } from '../../../services/warehouse/goodsIssues/materials/materialGoodsIssueService.js';
 import { exportConsumableGoodsIssueReportRequest } from '../../../services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 import { createReportApplication } from '../../createReportApplication.js';
 
 export const createGoodsIssueApplication = ({ resource }) => {

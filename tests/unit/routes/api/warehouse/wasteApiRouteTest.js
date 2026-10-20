@@ -46,7 +46,7 @@ vi.mock('../../../../../src/controllers/api/warehouse/wasteController.js', () =>
   registerWasteStockAddition
 }));
 
-const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../src/shared/constants/permissions.js');
 const { default: wasteApiRoutes } = await import('../../../../../src/routes/api/warehouse/wasteApiRoute.js');
 
 describe('wasteApiRoute', () => {

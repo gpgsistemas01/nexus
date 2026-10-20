@@ -27,7 +27,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Form` | control | [`formUI.js`](../../../../../../src/public/js/ui/forms/formUI.js) |
 | `IssueUI` | control | [`issueFormUI.js`](../../../../../../src/public/js/ui/issues/issueFormUI.js) |
 | `FormErrors` | control | [`formErrorsUI.js`](../../../../../../src/public/js/ui/forms/formErrorsUI.js) |
-| `Decimal` | control | [`formatUtils.js`](../../../../../../src/public/js/utils/formatUtils.js) |
+| `Decimal` | control | [`numberUtils.js`](../../../../../../src/shared/utils/numberUtils.js) |
 | `FileSwalComponent` | control | [`swalComponent.js`](../../../../../../src/public/js/plugins/swal/swalComponent.js) |
 | `FileModalUI` | control | [`modalUI.js`](../../../../../../src/public/js/ui/modalUI.js) |
 | `FileTableOperations` | control | [`tableOperations.js`](../../../../../../src/public/js/plugins/datatable/core/base/tableOperations.js) |
@@ -131,7 +131,7 @@ sequenceDiagram
     participant DetailFormUI@{ "type": "boundary" } as detailFormUI.js
     participant FormUtils@{ "type": "control" } as formUtils.js
     participant FormErrors@{ "type": "control" } as formErrorsUI.js
-    participant Decimal@{ "type": "control" } as formatUtils.js
+    participant Decimal@{ "type": "control" } as numberUtils.js
     participant InventoryUtils@{ "type": "control" } as warehouseInventoryUtils.js
 
     participant Form@{ "type": "control" } as formUI.js

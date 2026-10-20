@@ -1,7 +1,7 @@
 import { getAllWastes } from "../../../application/warehouse/wastes/wastes.js";
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { updatePresentationDisplay } from '../../../ui/inventory/inventorySelectUI.js';
-import { mapSelectWasteData, normalizeInventorySelectRelations } from "../../../utils/warehouseInventoryUtils.js";
+import { mapSelectWasteData, normalizeInventorySelectRelations } from '../inventorySelectData.js';
 import { buildPaginatedSelectParams, initDomainSelect2, toggleSelectOption } from "../baseSelect.js";
 
 const initWasteSelect = ({

@@ -1,10 +1,20 @@
-import { createMaterialDtoForEdit, createMaterialDtoForRegister, createMaterialDtoForStockUpdate } from "../../../dtos/materialDTO.js";
+import {
+    createMaterialDtoForEdit,
+    createMaterialDtoForRegister,
+    createMaterialDtoForStockUpdate
+} from "../../../dtos/materialDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
-import { findAllMaterials, createMaterial, updateMaterial, updateMaterialStock, deleteMaterial } from "../../../services/warehouse/materials/materialService.js";
-import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import {
+    findAllMaterials,
+    createMaterial,
+    updateMaterial,
+    updateMaterialStock,
+    deleteMaterial
+} from "../../../services/warehouse/materials/materialService.js";
+import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 import { emitInventoryUpdated } from "../../../utils/socketUtils.js";
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 export const getAllMaterials = async (req, res) => {
 

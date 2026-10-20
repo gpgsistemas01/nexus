@@ -14,14 +14,17 @@ import { createServiceLogger, getModelLogContext, logServiceInfo } from "../../.
 
 import { getDb } from "../../../repository/baseRepository.js";
 import { lockGoodsIssue } from "../../../repository/warehouse/documentLockRepository.js";
-import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
+import {
+    generateYearlyReferenceNumber,
+    throwIfReferenceNumberAlreadyExists
+} from "../../document/referenceNumberService.js";
 import { findFulfillmentStatusIdByName } from "../fulfillmentStatusService.js";
 import { buildGoodsIssueContextWhere, buildGoodsIssueDetails } from "./goodsIssueHelpers.js";
 import { handleServiceError } from "../../serviceErrorHandler.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
-import { DATA_SCOPES, hasDataScope } from "../../../constants/permissions.js";
+import { DATA_SCOPES, hasDataScope } from '../../../constants/permissions.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
-import { MATERIAL_TYPES } from "../../../constants/inventory.js";
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { resolveIssueHeaderData } from "../issues/issueHeaderService.js";
 import { GOODS_ISSUE_DETAIL_SELECT } from "./goodsIssueDetailSelect.js";
@@ -36,7 +39,6 @@ const GOODS_ISSUE_HEADER_ERROR_TYPES = {
     ClientAdvisorConflict: GoodsIssueInternalClientAdvisorDepartmentConflict,
     ProjectNumberConflict: GoodsIssueInternalClientProjectNumberConflict
 };
-
 
 export const findAllGoodsIssues = async ({
     cursor,

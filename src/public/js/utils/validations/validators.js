@@ -1,8 +1,32 @@
-import { FORM_FIELD_LIMITS, MIN_STOCK_INPUT_FORMAT, MONEY_INPUT_FORMAT, PERSON_NAME_PATTERN } from '../../constants/inputValidation.js';
-import { AUTH_FIELD_LIMITS } from '../../constants/auth.js';
+import {
+    FORM_FIELD_LIMITS,
+    MIN_STOCK_INPUT_FORMAT,
+    MONEY_INPUT_FORMAT,
+    PERSON_NAME_PATTERN
+} from '../../../../shared/constants/inputValidation.js';
+import { AUTH_FIELD_LIMITS } from '../../../../shared/constants/auth.js';
 import { isEmptyOrNull, isString, isLengthInRangeMax } from "./baseValidations.js";
-import { isRollPresentation } from '../warehouseInventoryUtils.js';
-import { validateUUID, validateBoolean, validateWasteWeightCapture, validateName, validatePassword, validateNumber, validateUsername, validateTextOptional, validateGoodsReceiptDetailsArray, validateDate, validateText, validateNumberOptional, validateGoodsIssueDetailsArray, validatePairedOptionalNumber, validatePositiveNumber, validatePersonAccessesArray, validateWasteIssueDetailsArray, validateInvoice } from "./fieldValidations.js";
+import { isRollPresentation } from '../../../../shared/inventory/wasteMeasurements.js';
+import {
+    validateUUID,
+    validateBoolean,
+    validateWasteWeightCapture,
+    validateName,
+    validatePassword,
+    validateNumber,
+    validateUsername,
+    validateTextOptional,
+    validateGoodsReceiptDetailsArray,
+    validateDate,
+    validateText,
+    validateNumberOptional,
+    validateGoodsIssueDetailsArray,
+    validatePairedOptionalNumber,
+    validatePositiveNumber,
+    validatePersonAccessesArray,
+    validateWasteIssueDetailsArray,
+    validateInvoice
+} from "./fieldValidations.js";
 
 const inventoryStateValidation = {
     minStock: (value) => validateNumberOptional(value, 'El stock mínimo', { format: MIN_STOCK_INPUT_FORMAT }),
@@ -162,7 +186,6 @@ export const goodsReceiptCorrectionValidation = {
     costPerUnitType: (value) => validatePositiveNumber(value, 'El costo por presentación correcto', { format: MONEY_INPUT_FORMAT })
 };
 
-
 export const issueHeaderValidation = {
     projectNumber: (value) => validateText({
         name: value,
@@ -198,7 +221,6 @@ export const issueProjectQuantityDetailsValidation = {
     isSupplied: value => isEmptyOrNull(value, 'El estado de surtido')
         || (typeof value === 'boolean' || value === 'true' || value === 'false' ? null : 'El estado de surtido debe ser verdadero o falso')
 }
-
 
 export const issueReturnValidation = {
     returnQuantity: (value) => validatePositiveNumber(value, 'La cantidad a devolver'),

@@ -109,12 +109,11 @@ flowchart TB
     FileValidators -->|import| FileFieldValidations
     Modal -->|import| FileModalUI
     Origin -->|import| FileSuppliers
-    Origin -->|import| Modal
     Select -->|import| FileSuppliers
-    Select -->|import| Modal
     Transport -->|import| FileSupplierController
     View -->|import| FileSuppliers
     View -->|import| FileValidators
+    FileSuppliersPage -->|import| Modal
     View -->|import| FormUtils
 ```
 
@@ -145,13 +144,13 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-02 — Crear proveedor
     alt Sistemas inicia desde el listado independiente
         Browser->>Origin: seleccionar Nuevo proveedor
-        Origin->>Modal: openSupplierModal({ mode: create })
+        Origin->>Modal: onOpen → openSupplierModal({ mode: create })
     else Almacén inicia desde una compra autorizada
         Browser->>Select: escribir proveedor inexistente y seleccionar Nuevo proveedor
         Select->>SelectBase: runAfterSelect2Close({ selector: supplierSelector, action })
         SelectBase-->>Select: runAfterSelect2Close(): void
         SelectBase-)Select: action() — callback definido en supplier.js
-        Select->>Modal: openSupplierModal({ data: { tradeName }, onSave })
+        Select->>Modal: onCreate → openSupplierModal({ data: { tradeName }, onSave })
     end
 ```
 

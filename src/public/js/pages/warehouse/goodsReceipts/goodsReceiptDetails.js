@@ -1,32 +1,18 @@
-import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from "../../../constants/goodsReceiptStatuses.js";
-import { roundTo } from '../../../utils/formatUtils.js';
-import { buildInventorySelectText, getBase, getHeight, getPresentation, getPresentationId, getUnitMeasure, getUnitMeasureId } from '../../../utils/warehouseInventoryUtils.js';
-
-const IVA_RATE = 1.16;
-
-export const calculateGoodsReceiptDetailAmounts = ({ quantity, costPerUnitType, base, height }) => {
-    const numericQuantity = Number(quantity);
-    const numericCost = Number(costPerUnitType);
-    const convertedQuantity = !base || !height
-        ? numericQuantity
-        : roundTo(Number(base) * Number(height) * numericQuantity);
-    const netPurchaseAmount = roundTo(numericQuantity * numericCost);
-
-    return {
-        quantity: numericQuantity,
-        costPerUnitType: numericCost,
-        convertedQuantity,
-        conversionUnitCost: convertedQuantity > 0
-            ? roundTo(netPurchaseAmount / convertedQuantity)
-            : 0,
-        netPurchaseAmount,
-        grossPurchaseAmount: roundTo(netPurchaseAmount * IVA_RATE)
-    };
-};
+import { calculateGoodsReceiptDetailAmounts } from '../../../../../shared/inventory/goodsReceiptCalculations.js';
+import { GOODS_RECEIPT_DETAIL_STATUSES } from '../../../../../shared/constants/goodsReceiptStatuses.js';
+import { GOODS_RECEIPT_STATUS_LABELS } from '../../../constants/goodsReceiptStatuses.js';
+import {
+    buildInventorySelectText,
+    getBase,
+    getHeight,
+    getPresentation,
+    getPresentationId,
+    getUnitMeasure,
+    getUnitMeasureId
+} from '../../../utils/warehouseInventoryUtils.js';
 
 export const mapGoodsReceiptSelectionToDetail = ({ optionData, quantity, costPerUnitType }) => {
-    const material = JSON.parse(optionData.material);
-    const supplier = JSON.parse(optionData.supplier);
+    const { material, supplier } = optionData;
     const base = getBase(material);
     const height = getHeight(material);
 

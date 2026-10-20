@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateWasteRollLength, prepareWasteRollReference } from '../../../../../src/public/js/utils/warehouseInventoryUtils.js';
+import { calculateWasteRollLength, prepareWasteRollReference } from '../../../../../src/shared/inventory/wasteMeasurements.js';
 import { prepareWasteMeasurements } from '../../../../../src/services/warehouse/wastes/wasteHelpers.js';
 
 const material = { base: 1.5, height: 20, presentation: { name: 'ROLLO' } };

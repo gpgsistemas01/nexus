@@ -1,6 +1,16 @@
-import { PERMISSIONS } from '../../../constants/permissions.js';
-import { createConsumable, deleteConsumable, findAllConsumables, updateConsumable, updateConsumableStock } from '../../../services/warehouse/consumables/consumableService.js';
-import { createMaterialDtoForEdit, createMaterialDtoForRegister, createMaterialDtoForStockUpdate } from '../../../dtos/materialDTO.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
+import {
+    createConsumable,
+    deleteConsumable,
+    findAllConsumables,
+    updateConsumable,
+    updateConsumableStock
+} from '../../../services/warehouse/consumables/consumableService.js';
+import {
+    createMaterialDtoForEdit,
+    createMaterialDtoForRegister,
+    createMaterialDtoForStockUpdate
+} from '../../../dtos/materialDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { successCodeMessages } from '../../../messages/codeMessages.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';

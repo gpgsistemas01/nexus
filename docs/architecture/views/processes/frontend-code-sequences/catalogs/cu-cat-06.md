@@ -108,12 +108,11 @@ flowchart TB
     FileValidators -->|import| FileFieldValidations
     Modal -->|import| FileModalUI
     Origin -->|import| FileClients
-    Origin -->|import| Modal
     Select -->|import| FileClients
-    Select -->|import| Modal
     Transport -->|import| FileClientController
     View -->|import| FileClients
     View -->|import| FileValidators
+    FileClientsPage -->|import| Modal
     View -->|import| FormUtils
 ```
 
@@ -144,13 +143,13 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-06 — Crear cliente
     alt Sistemas inicia desde el listado independiente
         Browser->>Origin: seleccionar Nuevo cliente
-        Origin->>Modal: openClientModal({ mode: create })
+        Origin->>Modal: onOpen → openClientModal({ mode: create })
     else Almacén inicia desde una salida autorizada
         Browser->>Select: escribir cliente inexistente y seleccionar Nuevo cliente
         Select->>SelectBase: runAfterSelect2Close({ selector: baseSelector, action })
         SelectBase-->>Select: runAfterSelect2Close(): void
         SelectBase-)Select: action() — callback definido en client.js
-        Select->>Modal: openClientModal({ data: { name }, onSave })
+        Select->>Modal: onCreate → openClientModal({ data: { name }, onSave })
     end
 ```
 

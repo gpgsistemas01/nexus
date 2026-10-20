@@ -1,19 +1,12 @@
+import { openClientModal } from '../../sales/clients/clientModal.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
-import {
-    FORM_SELECTORS,
-    INPUT_SELECTORS,
-    MODAL_SELECTORS
-} from '../../../constants/selectors.js';
+import { FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
 import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
 import { createWarehouseIssueDetailsTable } from '../../../plugins/datatable/shared/issues/warehouseIssueDetailDatatable.js';
 import { getGoodsIssueHeaderSelects } from '../../../plugins/select2/modules/goodsIssueSelect.js';
-import {
-    applyIssueModalMode,
-    createIssueHeaderForm,
-    initializeIssueModal
-} from '../../../ui/issues/issueFormUI.js';
+import { applyIssueModalMode, createIssueHeaderForm, initializeIssueModal } from '../../../ui/issues/issueFormUI.js';
 import { openModal } from '../../../ui/modalUI.js';
-import { mapIssueDetailToTable } from '../../../utils/warehouseInventoryUtils.js';
+import { mapIssueDetailToTable } from '../../../application/warehouse/issues/issueDetails.js';
 import { goodsIssueContext } from './goodsIssueContext.js';
 import { initializeGoodsIssueReturns } from './returns/goodsIssueReturn.js';
 
@@ -32,7 +25,7 @@ let currentGoodsIssue = null;
 
 const issueHeaderForm = createIssueHeaderForm({
     formSelector: formId,
-    selects: getGoodsIssueHeaderSelects({ resource: goodsIssueContext.resource })
+    selects: getGoodsIssueHeaderSelects({ resource: goodsIssueContext.resource, onCreateClient: openClientModal })
 });
 initializeGoodsIssueReturns({
     details,

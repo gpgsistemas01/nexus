@@ -1,24 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  normalizeInventorySelectRelations,
-  isSquareMeterUnitMeasure,
-  getBase,
-  getHeight,
-  getIsActive,
-  getMaterialName,
-  getPresentation,
-  getPresentationId,
-  getSupplierName,
-  getUnitMeasure,
-  getUnitMeasureId,
-  mapGoodsIssueDetailsToRequest,
-  mapIssueDetailsToSupplyRequest,
-  mapIssueDetailToTable,
-  mapSelectMaterialData,
-  mapSelectWasteData,
-  mapSelectWasteMaterialTemplateData
-} from '../../../src/public/js/utils/warehouseInventoryUtils.js';
+import { normalizeInventorySelectRelations, mapSelectMaterialData, mapSelectWasteData, mapSelectWasteMaterialTemplateData } from '../../../src/public/js/plugins/select2/inventorySelectData.js';
+import { getBase, getHeight, getIsActive, getMaterialName, getPresentation, getPresentationId, getSupplierName, getUnitMeasure, getUnitMeasureId } from '../../../src/public/js/utils/warehouseInventoryUtils.js';
+import { mapGoodsIssueDetailsToRequest, mapIssueDetailsToSupplyRequest, mapIssueDetailToTable } from '../../../src/public/js/application/warehouse/issues/issueDetails.js';
+import { isSquareMeterUnitMeasure } from '../../../src/shared/inventory/wasteMeasurements.js';
 
 describe('select de material reutilizado por el CRUD de merma', () => {
   it('obtiene nombre de material y proveedor desde las formas del contrato', () => {

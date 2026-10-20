@@ -1,10 +1,17 @@
 import { DOCUMENT_REFERENCE_TYPES } from '../../../constants/documentReferenceTypes.js';
-import { STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTMENT_TYPES } from '../../../constants/inventory.js';
-import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from '../../document/referenceNumberService.js';
-import { normalizeDecimal, toNumber } from '../../../utils/formattersUtils.js';
+import {
+    STOCK_ADJUSTMENT_STATUS_NAMES,
+    STOCK_ADJUSTMENT_TYPES,
+    INVENTORY_MOVEMENT_TYPES
+} from '../../../constants/inventory.js';
+import {
+    generateYearlyReferenceNumber,
+    throwIfReferenceNumberAlreadyExists
+} from '../../document/referenceNumberService.js';
+import { toNumber } from '../../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { assertSufficientStock, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { createWasteMovement } from './wasteMovementService.js';
-import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 
 const calculateWasteStockAdjustmentValues = ({
     waste,

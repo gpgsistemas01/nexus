@@ -1,4 +1,4 @@
-import { WASTE_WEIGHT_LIMITS } from '../../constants/inventory.js';
+import { WASTE_WEIGHT_LIMITS } from '../constants/inventory.js';
 
 const wasteWeightDecimalPattern = new RegExp(`^\\d{1,${WASTE_WEIGHT_LIMITS.INTEGER_DIGITS}}(\\.\\d{1,${WASTE_WEIGHT_LIMITS.DECIMAL_DIGITS}})?$`);
 

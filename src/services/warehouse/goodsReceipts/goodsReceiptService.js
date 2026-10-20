@@ -14,17 +14,26 @@ import {
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 
 import { getDb } from "../../../repository/baseRepository.js";
-import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../../document/referenceNumberService.js";
+import {
+    generateYearlyReferenceNumber,
+    throwIfReferenceNumberAlreadyExists
+} from "../../document/referenceNumberService.js";
 import { findPersonById } from "../../admin/person/personService.js";
 import { applyInventoryMovement } from "../../inventory/movementService.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
-import { buildGoodsReceiptContextWhere, buildGoodsReceiptDetails, calculateGoodsReceiptTotals, GOODS_RECEIPT_DETAIL_INCLUDE } from "./goodsReceiptHelpers.js";
+import {
+    buildGoodsReceiptContextWhere,
+    buildGoodsReceiptDetails,
+    calculateGoodsReceiptTotals,
+    GOODS_RECEIPT_DETAIL_INCLUDE
+} from "./goodsReceiptHelpers.js";
 import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
-import { INVENTORY_MOVEMENT_TYPES, MATERIAL_TYPES } from "../../../constants/inventory.js";
+import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { assertGoodsReceiptInvoiceAvailable } from "./goodsReceiptInvoiceService.js";
@@ -44,7 +53,6 @@ const throwIfInvoiceAlreadyExists = (err) => {
         throw new GoodsReceiptInvoiceAlreadyExists();
     }
 };
-
 
 export const findAllGoodsReceipts = async ({
     cursor,
@@ -221,7 +229,6 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
             await updateMaterialUnitCostIfHigher({ tx, supplierId: goodsReceipt.supplierId, details: goodsReceipt.details });
             return goodsReceipt;
         });
-
 
         logServiceInfo(serviceLogger, {
             operation: 'warehouse.goodsReceipts.goodsReceiptService.createGoodsReceipt',

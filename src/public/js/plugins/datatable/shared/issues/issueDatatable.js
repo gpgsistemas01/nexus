@@ -6,7 +6,7 @@ import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI.js';
 import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
-import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
+import { hasPermission, PERMISSIONS } from '../../../../../../shared/constants/permissions.js';
 
 import { runApiAction } from '../../../../api/errorHandler.js';
 
@@ -99,7 +99,7 @@ export const createIssueDatatable = async ({
 
     const filters = await setupIssueTableFilters();
     let table;
-    const exportButton = hasPermission(context, UI_PERMISSIONS.WAREHOUSE_REPORTS_READ)
+    const exportButton = hasPermission(context, PERMISSIONS.WAREHOUSE_REPORTS_READ)
         && exportOptions?.report && exportOptions?.filename
         ? buildExcelButton({
             filename: formatFileName(exportOptions.filename),

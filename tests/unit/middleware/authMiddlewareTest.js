@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { errorMap } from '../../../src/messages/codeMessages.js';
-import { PERMISSIONS } from '../../../src/constants/permissions.js';
+import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
 import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
 

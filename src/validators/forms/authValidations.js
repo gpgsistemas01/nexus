@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 import { errorMap } from '../../messages/codeMessages.js';
-import { AUTH_FIELD_LIMITS } from '../../public/js/constants/auth.js';
+import { AUTH_FIELD_LIMITS } from '../../shared/constants/auth.js';
 import { validatePassword, validateUsername } from "../fields/fieldsValidator.js";
 
 export const loginValidation = [

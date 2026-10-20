@@ -20,7 +20,7 @@ vi.mock('../../../../../../src/controllers/api/warehouse/goodsIssues/consumables
 const validators = await import('../../../../../../src/validators/forms/goodsIssueValidations.js');
 await import('../../../../../../src/routes/api/warehouse/goodsIssues/materials/materialGoodsIssueApiRoute.js');
 await import('../../../../../../src/routes/api/warehouse/goodsIssues/consumables/consumableGoodsIssueApiRoute.js');
-const { PERMISSIONS } = await import('../../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../../src/shared/constants/permissions.js');
 
 describe('rutas de salida separadas por contexto', () => {
     it.each([['materials', 'Material'], ['consumables', 'Consumable']])('registra el flujo completo de %s con permisos y validadores', (path, label) => {

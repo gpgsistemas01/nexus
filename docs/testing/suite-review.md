@@ -469,3 +469,13 @@ pertenecen al validator. Conservan selección de campos, contexto, observaciones
 notificación y delegación. `CP-INT-VAL-005` comprueba persistencia exacta de mínimo/costo
 y rechazo sin efectos. La longitud calculada para el formulario se verifica con el
 mismo helper del servidor; no cambia la precisión interna de áreas o históricos.
+
+## Revisión de responsabilidades y contratos compartidos
+
+Se conserva la cobertura anterior. Las pruebas actualizan imports y dobles al
+propietario real de cada función; no se eliminan casos por mover código.
+`DP-LAY-001` documenta únicamente la evidencia adicional de cálculos, errores y
+callbacks. Las integraciones existentes siguen comprobando stock, atomicidad,
+concurrencia, idempotencia, permisos y contenido de reportes. Los dobles de Select2
+no sustituyen una prueba de navegador. No se agregan pruebas de HTML ni delegaciones
+que sólo repitan la estructura de archivos.

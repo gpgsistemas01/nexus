@@ -1,10 +1,5 @@
-import { FORM_FIELD_LIMITS } from '../../public/js/constants/inputValidation.js';
-import {
-    validateDate,
-    validateProjectNumber,
-    validateTextOptional,
-    validateUUID
-} from '../fields/fieldsValidator.js';
+import { FORM_FIELD_LIMITS } from '../../shared/constants/inputValidation.js';
+import { validateDate, validateProjectNumber, validateTextOptional, validateUUID } from '../fields/fieldsValidator.js';
 
 export const issueHeaderValidation = [
     validateUUID('advisorId'),

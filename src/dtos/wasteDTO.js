@@ -1,5 +1,5 @@
 import { createVersionDto } from './versionDTO.js';
-import { WASTE_ROLL_WEIGHT_FIELDS } from '../public/js/constants/inventory.js';
+import { WASTE_ROLL_WEIGHT_FIELDS } from '../shared/constants/inventory.js';
 
 const buildWasteRegistrationDataDto = (body = {}) => ({
     materialId: body.materialId,

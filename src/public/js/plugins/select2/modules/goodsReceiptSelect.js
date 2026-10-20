@@ -1,7 +1,4 @@
-import { updateTotals } from "../../../ui/forms/totalsSummaryUI.js";
 import { toggleContainerElements } from '../../../ui/forms/formStateUI.js';
-import { refreshMaterialTable } from "../../datatable/shared/inventory/renderMaterialDatatable.js";
-import { details } from "../../datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js";
 import { initMdbWrapperInput, updateMdbWrapperInput } from "../../mdb/baseInstance.js";
 import { bindDisabledSelectDependency } from "../baseSelect.js";
 import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.js";
@@ -30,7 +27,7 @@ const clearMaterialSelection = () => {
     });
 };
 
-export const initGoodsReceiptFormSelect2 = ({ resource }) => {
+export const initGoodsReceiptFormSelect2 = ({ resource, onCreateSupplier, onCreateMaterial }) => {
 
     const modal = document.querySelector(modalSelector);
 
@@ -49,15 +46,11 @@ export const initGoodsReceiptFormSelect2 = ({ resource }) => {
                 root: modal
             });
 
-            details.length = 0;
-
             togglePersonOption({
                 selector: receivedByScopedSelector,
                 id: null,
                 name: null
             });
-            refreshMaterialTable(details);
-            updateTotals();
 
             const instance = initMdbWrapperInput({
                 selector: presentationDisplayScopedSelector,
@@ -72,7 +65,8 @@ export const initGoodsReceiptFormSelect2 = ({ resource }) => {
     [
         [setupSupplierSelect, {
             modalSelector,
-            supplierSelector
+            supplierSelector,
+            onCreate: onCreateSupplier
         }],
         [initPersonSelect, {
             modalSelector,
@@ -95,6 +89,7 @@ export const initGoodsReceiptFormSelect2 = ({ resource }) => {
         supplierSelector,
         materialSelector,
         creationContext: 'goodsReceipt',
+        onCreate: onCreateMaterial,
         resource
     });
 };

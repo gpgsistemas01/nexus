@@ -15,7 +15,7 @@ import {
 } from '../../../../errors/warehouse/goodsReceiptError.js';
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
-import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../../../shared/utils/numberUtils.js';
 import { recalculateMaterialUnitCosts } from '../../materials/supplierMaterialService.js';
 import { calculateGoodsReceiptDetail } from '../goodsReceiptHelpers.js';
 import { correctGoodsReceiptDetailAndTotals } from '../goodsReceiptTotalsService.js';

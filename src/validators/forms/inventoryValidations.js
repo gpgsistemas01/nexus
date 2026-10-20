@@ -1,4 +1,4 @@
-import { FORM_FIELD_LIMITS, MIN_STOCK_INPUT_FORMAT } from '../../public/js/constants/inputValidation.js';
+import { FORM_FIELD_LIMITS, MIN_STOCK_INPUT_FORMAT } from '../../shared/constants/inputValidation.js';
 import { validateBoolean, validateNumberOptional, validateTextOptional } from '../fields/fieldsValidator.js';
 
 export const createInventoryStateValidation = () => [

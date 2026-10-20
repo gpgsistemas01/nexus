@@ -419,7 +419,8 @@ describe('peso unitario de merma de rollo', () => {
             const saved = await prisma.waste.findUnique({ where: { id: created.body.waste.id } });
             expect(Number(saved.base)).toBe(10);
             expect(Number(saved.height)).toBe(1.5);
-            const { findWasteReportRows, buildWasteReportSummary } = await import('../../../src/services/warehouse/reportService.js');
+            const { findWasteReportRows } = await import('../../../src/services/warehouse/reportService.js');
+            const { buildWasteReportSummary } = await import('../../../src/services/warehouse/wastes/wasteReportSummary.js');
             const report = await Array.fromAsync(findWasteReportRows({ supplierId: ids.supplier }));
             expect(buildWasteReportSummary(report).rows).toContainEqual(expect.objectContaining({ name: 'IT Largo en base', width: 1.5 }));
         } finally {

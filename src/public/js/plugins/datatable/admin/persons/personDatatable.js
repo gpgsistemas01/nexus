@@ -2,7 +2,6 @@ import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllPersons } from "../../../../application/admin/persons/persons.js";
 import { exportPersonReport } from "../../../../application/admin/report.js";
-import { openPersonModal } from "../../../../pages/admin/persons/personModal.js";
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
@@ -14,7 +13,7 @@ import { DATATABLE_SELECTORS, FILTER_SELECTORS } from "../../../../constants/sel
 
 const selector = DATATABLE_SELECTORS.MAIN;
 
-export const createPersonsDatatable = async ({ canManagePersons = false } = {}) => {
+export const createPersonsDatatable = async ({ canManagePersons = false, onOpen }) => {
 
     const filters = await setupTableFilters({
         fields: ['department', 'role']
@@ -50,7 +49,7 @@ export const createPersonsDatatable = async ({ canManagePersons = false } = {}) 
             buttons: [
                 ...(canManagePersons ? [{
                     text: 'Nueva persona',
-                    action: () => openPersonModal({ mode: FORM_MODES.CREATE })
+                    action: () => onOpen({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_personas'),
@@ -70,6 +69,6 @@ export const createPersonsDatatable = async ({ canManagePersons = false } = {}) 
 
         const data = getResponsiveRowData(table, this);
 
-        openPersonModal({ mode: FORM_MODES.EDIT, data });
+        onOpen({ mode: FORM_MODES.EDIT, data });
     });
 }

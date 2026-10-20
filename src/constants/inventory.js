@@ -4,16 +4,6 @@ export const INVENTORY_MOVEMENT_TYPES = Object.freeze({
     ADJUSTMENT: 'ADJUSTMENT'
 });
 
-export const MATERIAL_TYPES = Object.freeze({
-    MATERIAL: 'MATERIAL',
-    CONSUMABLE: 'CONSUMABLE'
-});
-
-export const INVENTORY_RESOURCES = Object.freeze({
-    MATERIAL: 'material',
-    CONSUMABLE: 'consumable'
-});
-
 export const INVENTORY_REFERENCE_TYPES = Object.freeze({
     GOODS_RECEIPT: 'GOODS_RECEIPT',
     GOODS_ISSUE: 'GOODS_ISSUE'

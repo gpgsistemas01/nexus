@@ -1,8 +1,8 @@
-import { MATERIAL_TYPES } from '../../../../constants/inventory.js';
+import { MATERIAL_TYPES } from '../../../../shared/constants/inventory.js';
 import { cancelGoodsReceiptDetailLine } from '../detailChanges/goodsReceiptCancellationService.js';
 import { correctGoodsReceiptDetailLine } from '../detailChanges/goodsReceiptCorrectionService.js';
 import { createGoodsReceipt, findAllGoodsReceipts, updateGoodsReceipt } from '../goodsReceiptService.js';
-import { findGoodsReceiptReportRows } from '../../reportService.js';
+import { findGoodsReceiptReportRows } from '../goodsReceiptReportService.js';
 
 const type = MATERIAL_TYPES.CONSUMABLE;
 

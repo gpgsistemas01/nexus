@@ -1,11 +1,11 @@
-import { INVENTORY_RESOURCES } from '../../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../../shared/constants/inventory.js';
 import { createIssueDatatable } from '../../shared/issues/issueDatatable.js';
-import { hasPermission, UI_PERMISSIONS } from '../../../../constants/permissions.js';
+import { hasPermission, PERMISSIONS } from '../../../../../../shared/constants/permissions.js';
 
 export const createGoodsIssueDatatable = async ({ context, goodsIssues, onCreate, onEdit, onEditDetails, onReturnDetails }) => {
 
-    const canManage = hasPermission(context, UI_PERMISSIONS.GOODS_ISSUES_MANAGE);
-    const canSupply = hasPermission(context, UI_PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE);
+    const canManage = hasPermission(context, PERMISSIONS.GOODS_ISSUES_MANAGE);
+    const canSupply = hasPermission(context, PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE);
     await createIssueDatatable({
         context,
         getIssues: goodsIssues.getAll,

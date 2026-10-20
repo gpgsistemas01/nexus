@@ -1,5 +1,5 @@
 import { AppError } from "../AppError.js";
-import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from "../../public/js/constants/goodsReceiptMessages.js";
+import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from '../../shared/messages/goodsReceiptMessages.js';
 
 export class GoodsReceiptNotFound extends AppError {
 
@@ -49,7 +49,6 @@ export class PersonReceivedByNotFound extends AppError {
     }
 }
 
-
 export class GoodsReceiptUpdateDatabaseError extends AppError {
 
     constructor () {
@@ -64,16 +63,12 @@ export class GoodsReceiptAlreadyCanceled extends AppError {
     }
 }
 
-
 export class GoodsReceiptSupplierChangeConflict extends AppError {
 
     constructor () {
         super('No se puede cambiar el proveedor de una compra confirmada porque sus movimientos de inventario ya están asociados al proveedor original', 'GOODS_RECEIPT_SUPPLIER_CHANGE_CONFLICT', 409);
     }
 }
-
-
-
 
 export class GoodsReceiptCorrectionNoChanges extends AppError {
 
@@ -88,7 +83,6 @@ export class GoodsReceiptCorrectionQuantityConflict extends AppError {
         super('La cantidad corregida del detalle debe ser mayor a cero y no exceder la cantidad registrada', 'GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT', 409);
     }
 }
-
 
 export class GoodsReceiptCorrectionInsufficientStock extends AppError {
 
@@ -116,14 +110,12 @@ export class GoodsReceiptCorrectionInsufficientStock extends AppError {
     }
 }
 
-
 export class GoodsReceiptDetailAlreadyCanceled extends AppError {
 
     constructor () {
         super('El detalle de la compra ya está cancelado', 'GOODS_RECEIPT_DETAIL_ALREADY_CANCELED', 409);
     }
 }
-
 
 export class GoodsReceiptDetailChangeReasonNotFound extends AppError {
 

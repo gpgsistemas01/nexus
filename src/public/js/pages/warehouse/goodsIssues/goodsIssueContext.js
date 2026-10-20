@@ -1,4 +1,4 @@
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 import { createGoodsIssueApplication } from '../../../application/warehouse/goodsIssues/goodsIssues.js';
 
 const contextElement = document.getElementById('goodsIssueContext');

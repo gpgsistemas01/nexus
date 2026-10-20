@@ -1,50 +1,6 @@
+import { PERMISSIONS } from '../shared/constants/permissions.js';
 import { DEPARTMENT_KEYS } from './departments.js';
 import { ROLE_KEYS } from './roles.js';
-
-export const PERMISSIONS = Object.freeze({
-    MATERIALS_READ: 'materials:read',
-    MATERIALS_WRITE: 'materials:write',
-    MATERIALS_ADJUST_STOCK: 'materials:adjust-stock',
-    CATALOGS_MANAGE: 'catalogs:manage',
-    INVENTORY_COSTS_READ: 'inventory:costs-read',
-    DEPARTMENTS_READ: 'departments:read',
-    MOVEMENTS_READ: 'movements:read',
-    PERSONS_READ: 'persons:read',
-    PERSONS_WRITE: 'persons:write',
-    ADMIN_REPORTS_READ: 'admin:reports-read',
-    PERSON_REPORTS_READ: 'person:reports-read',
-    ROLES_READ: 'roles:read',
-    USERS_MANAGE: 'users:manage',
-    CLIENTS_READ: 'clients:read',
-    CLIENTS_CREATE: 'clients:create',
-    CLIENTS_UPDATE: 'clients:update',
-    CLIENT_REPORTS_READ: 'client:reports-read',
-    FULFILLMENT_STATUSES_READ: 'fulfillment:statuses-read',
-    GOODS_ISSUES_MANAGE: 'goods:issues-manage',
-    GOODS_ISSUE_DETAILS_MANAGE: 'goods:issue-details-manage',
-    GOODS_RECEIPTS_MANAGE: 'goods:receipts-manage',
-    PRESENTATIONS_READ: 'presentations:read',
-    REASONS_READ: 'reasons:read',
-    WAREHOUSE_REPORTS_READ: 'warehouse:reports-read',
-    SUPPLIER_REPORTS_READ: 'supplier:reports-read',
-    SUPPLIERS_READ: 'suppliers:read',
-    SUPPLIERS_MANAGE: 'suppliers:manage',
-    SUPPLIERS_UPDATE: 'suppliers:update',
-    UNIT_MEASURES_READ: 'unit:measures-read',
-    WASTES_READ: 'wastes:read',
-    WASTES_WRITE: 'wastes:write',
-    WASTES_ADD_STOCK: 'wastes:add-stock',
-    WASTES_ADJUST_STOCK: 'wastes:adjust-stock',
-    WASTE_ISSUES_MANAGE: 'waste:issues-manage',
-    WASTE_ISSUES_SUPPLY: 'waste:issues-supply',
-    WASTE_ISSUES_PAGE_VIEW: 'waste:issues-page-view',
-    PERSONS_PAGE_VIEW: 'persons:page-view',
-    CLIENTS_PAGE_VIEW: 'clients:page-view',
-    GOODS_ISSUES_PAGE_VIEW: 'goods:issues-page-view',
-    GOODS_RECEIPTS_PAGE_VIEW: 'goods:receipts-page-view',
-    SUPPLIERS_PAGE_VIEW: 'suppliers:page-view',
-    WASTES_PAGE_VIEW: 'wastes:page-view'
-});
 
 export const DATA_SCOPES = Object.freeze({
     SYSTEM_WIDE_READ: 'system-wide-read',

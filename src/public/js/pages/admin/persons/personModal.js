@@ -1,8 +1,12 @@
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
-import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
+import { hasPermission, PERMISSIONS } from '../../../../../shared/constants/permissions.js';
 import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
-import { initPersonAccessTable, personAccesses, refreshPersonAccessTable } from '../../../plugins/datatable/admin/persons/personAccessDatatable.js';
+import {
+    initPersonAccessTable,
+    personAccesses,
+    refreshPersonAccessTable
+} from '../../../plugins/datatable/admin/persons/personAccessDatatable.js';
 import { clearSelectValue } from '../../../plugins/select2/baseSelect.js';
 import { initPersonFormSelect2 } from '../../../plugins/select2/modules/personSelect.js';
 import { clearFormErrors, normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
@@ -14,7 +18,7 @@ import { personAccessValidation } from '../../../utils/validations/validators.js
 
 const formId = FORM_SELECTORS.PERSON;
 const modalId = MODAL_SELECTORS.PERSON;
-const canManagePersons = hasPermission(window.meta || {}, UI_PERMISSIONS.PERSONS_WRITE);
+const canManagePersons = hasPermission(window.meta || {}, PERMISSIONS.PERSONS_WRITE);
 
 export const openPersonModal = ({ mode, data = null }) => {
     if (!canManagePersons) return;

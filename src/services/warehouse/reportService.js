@@ -1,15 +1,11 @@
-import { formatDateLongWithTime, roundTo, toNumber } from "../../utils/formattersUtils.js";
+import { formatDateLongWithTime, toNumber } from '../../utils/formattersUtils.js';
 import { findAllGoodsIssues } from "./goodsIssues/goodsIssueService.js";
-import { findAllGoodsReceipts } from "./goodsReceipts/goodsReceiptService.js";
 import { findAllWasteIssues } from "./wasteIssues/wasteIssueService.js";
 import { findAllSuppliers } from "./supplierService.js";
-import { FULFILLMENT_STATUS_NAMES, GOODS_RECEIPT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
+import { FULFILLMENT_STATUS_NAMES } from "../../constants/warehouseStatuses.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { findBatches } from '../../repository/paginationRepository.js';
 import { QUERY_BATCH_SIZES } from '../../constants/pagination.js';
-import { GOODS_RECEIPT_DETAIL_STATUSES } from '../../public/js/constants/goodsReceiptStatuses.js';
-
-import { getMaterialLengthField, isRollPresentation } from '../../public/js/utils/warehouseInventoryUtils.js';
 
 const INVENTORY_REPORT_MATERIAL_SELECT = {
     maxUnitCost: true,
@@ -56,7 +52,6 @@ const mapMaterialRows = (materials = []) => materials.map((item) => ({
     unitMeasure: item.material.unitMeasure?.name,
     maxUnitCost: toNumber(item.maxUnitCost)
 }));
-
 
 const mapWasteRows = (wastes = []) => wastes.map((item) => ({
     id: item.id,
@@ -125,214 +120,6 @@ const mapWasteIssueDetailRows = function* (wasteIssues = []) {
             });
         }
     }
-};
-
-const mapGoodsReceiptDetailRows = function* (goodsReceipts = [], { materialId = '' } = {}) {
-    for (const goodsReceipt of goodsReceipts) {
-        if (goodsReceipt.status?.name === GOODS_RECEIPT_STATUS_NAMES.CANCELED) continue;
-
-        const receptionDate = formatDateLongWithTime(goodsReceipt.receptionDate);
-        for (const detail of goodsReceipt.details || []) {
-            if (detail.status === GOODS_RECEIPT_DETAIL_STATUSES.CANCELED || (materialId && detail.materialId !== materialId)) continue;
-
-            yield {
-                referenceNumber: goodsReceipt.referenceNumber,
-                receptionDate,
-                receivedByName: goodsReceipt.receivedByName,
-                supplierName: goodsReceipt.supplierName,
-                invoice: goodsReceipt.isInvoiced ? goodsReceipt.invoice : 'Sin factura',
-                materialId: detail.materialId,
-                materialName: detail.materialName,
-                materialBase: toNumber(detail.material?.base),
-                materialHeight: toNumber(detail.material?.height),
-                quantity: toNumber(detail.quantity),
-                presentationName: detail.material?.presentation?.name,
-                convertedQuantity: toNumber(detail.convertedQuantity),
-                unitMeasureName: detail.material?.unitMeasure?.symbol || detail.material?.unitMeasure?.name,
-                conversionUnitCost: toNumber(detail.conversionUnitCost),
-                costPerUnitType: toNumber(detail.costPerUnitType),
-                netPurchaseAmount: toNumber(detail.netPurchaseAmount),
-                grossPurchaseAmount: toNumber(detail.grossPurchaseAmount)
-            };
-        }
-    }
-};
-
-const sum = (rows, field) => rows.reduce((total, row) => total + toNumber(row[field]), 0);
-const divideOrZero = (dividend, divisor) => divisor ? dividend / divisor : 0;
-const VAT_RATE = 0.16;
-
-const normalizeReportIdentity = value => String(value || '').trim().toLocaleLowerCase('es-MX');
-
-/**
- * Consolidates waste inventory by name, supplier and dimensions. A roll's
- * length varies per remnant and therefore does not split its group; other
- * presentations retain their length as part of the inventory identity.
- */
-export const createWasteReportSummary = () => {
-    const groups = new Map();
-    const add = row => {
-        const hasWidth = row.base !== null && row.base !== undefined && row.base !== '';
-        const hasLength = row.height !== null && row.height !== undefined && row.height !== '';
-        const isRoll = isRollPresentation(row.presentation);
-        const widthField = isRoll && getMaterialLengthField(row.sourceMaterial ?? {}) === 'base' ? 'height' : 'base';
-        const hasTransverseDimension = widthField === 'height' ? hasLength : hasWidth;
-        const width = hasTransverseDimension ? toNumber(row[widthField]) : null;
-        const length = !isRoll && hasLength ? toNumber(row.height) : null;
-        const key = JSON.stringify([
-            normalizeReportIdentity(row.name) || 'no-material',
-            row.supplierId || normalizeReportIdentity(row.supplier) || 'no-supplier',
-            width,
-            length
-        ]);
-        const group = groups.get(key) || {
-            supplier: row.supplier || 'Sin proveedor',
-            name: row.name || 'Sin material',
-            width,
-            length,
-            wasteQuantity: 0,
-            squareMeters: 0,
-            totalWeightKg: isRoll ? 0 : null,
-            weightStatus: isRoll ? 'complete' : 'notApplicable'
-        };
-
-        const stock = toNumber(row.currentStock) || 0;
-        const squareMeters = hasWidth && hasLength
-            ? stock * toNumber(row.base) * toNumber(row.height)
-            : 0;
-
-        group.wasteQuantity += stock;
-        group.squareMeters += squareMeters;
-        if (isRoll && stock !== 0) {
-            if (row.weightKg == null) {
-                group.weightStatus = 'unknown';
-                group.totalWeightKg = null;
-            } else if (group.weightStatus === 'complete') {
-                group.totalWeightKg += stock * toNumber(row.weightKg);
-            }
-        }
-        groups.set(key, group);
-    };
-    const finish = () => {
-        const summaryRows = [];
-        let wasteQuantity = 0;
-        let squareMeters = 0;
-        let totalWeightKg = 0;
-        let weightStatus = 'notApplicable';
-        for (const group of groups.values()) {
-            const row = {
-                ...group,
-                wasteQuantity: roundTo(group.wasteQuantity),
-                squareMeters: roundTo(group.squareMeters),
-                totalWeightKg: group.totalWeightKg === null ? null : roundTo(group.totalWeightKg)
-            };
-            summaryRows.push(row);
-            wasteQuantity += row.wasteQuantity;
-            squareMeters += row.squareMeters;
-            totalWeightKg += row.totalWeightKg ?? 0;
-            if (row.weightStatus === 'unknown') weightStatus = 'unknown';
-            else if (row.weightStatus === 'complete' && weightStatus !== 'unknown') weightStatus = 'complete';
-        }
-
-        return {
-            rows: summaryRows,
-            totals: {
-                wasteQuantity: roundTo(wasteQuantity),
-                squareMeters: roundTo(squareMeters),
-                totalWeightKg: weightStatus === 'complete' ? roundTo(totalWeightKg) : null,
-                weightStatus
-            }
-        };
-    };
-    return { add, finish };
-};
-
-export const buildWasteReportSummary = (rows = []) => {
-    const summary = createWasteReportSummary();
-    rows.forEach(summary.add);
-    return summary.finish();
-};
-
-/**
- * Builds the supplier and material breakdowns for the purchase report rows.
- * Monetary totals use the amounts recorded on each receipt detail so the summary
- * always reconciles with the detailed table, regardless of the report scope.
- */
-export const createMonthlyGoodsReceiptSummary = () => {
-    let monthlyNetPurchaseAmount = 0;
-    const suppliers = new Map();
-    const materials = new Map();
-
-    const add = row => {
-        const supplierName = row.supplierName || 'Sin proveedor';
-        const supplier = suppliers.get(supplierName) || {
-            supplierName,
-            netPurchaseAmount: 0,
-            monthlyPercentage: 0
-        };
-
-        const netPurchaseAmount = toNumber(row.netPurchaseAmount);
-        monthlyNetPurchaseAmount += netPurchaseAmount;
-
-        supplier.netPurchaseAmount += netPurchaseAmount;
-        suppliers.set(supplierName, supplier);
-
-        const materialKey = row.materialId || row.materialName || 'Sin material';
-        const material = materials.get(materialKey) || {
-            materialName: row.materialName || 'Sin material',
-            squareMeters: 0,
-            costPerSquareMeter: 0,
-            netPurchaseAmount: 0,
-            quantity: 0
-        };
-
-        const convertedQuantity = toNumber(row.convertedQuantity);
-
-        material.squareMeters += convertedQuantity;
-        material.netPurchaseAmount += netPurchaseAmount;
-        material.quantity += toNumber(row.quantity);
-        materials.set(materialKey, material);
-    };
-    const finish = () => {
-        const supplierRows = [...suppliers.values()].map((supplier) => {
-            const vatAmount = roundTo(supplier.netPurchaseAmount * VAT_RATE);
-
-            return {
-                ...supplier,
-                vatAmount,
-                grossPurchaseAmount: roundTo(supplier.netPurchaseAmount + vatAmount),
-                monthlyPercentage: divideOrZero(supplier.netPurchaseAmount * 100, monthlyNetPurchaseAmount)
-            };
-        });
-        const materialRows = [...materials.values()].map((material) => ({
-            ...material,
-            costPerSquareMeter: roundTo(divideOrZero(material.netPurchaseAmount, material.squareMeters))
-        }));
-
-        return {
-            supplierRows,
-            materialRows,
-            supplierTotals: {
-                netPurchaseAmount: monthlyNetPurchaseAmount,
-                vatAmount: sum(supplierRows, 'vatAmount'),
-                grossPurchaseAmount: sum(supplierRows, 'grossPurchaseAmount'),
-                monthlyPercentage: monthlyNetPurchaseAmount ? 100 : 0
-            },
-            materialTotals: {
-                squareMeters: sum(materialRows, 'squareMeters'),
-                costPerSquareMeter: roundTo(sum(materialRows, 'costPerSquareMeter')),
-                netPurchaseAmount: monthlyNetPurchaseAmount,
-                quantity: sum(materialRows, 'quantity')
-            }
-        };
-    };
-    return { add, finish };
-};
-
-export const buildMonthlyGoodsReceiptSummary = (rows = []) => {
-    const summary = createMonthlyGoodsReceiptSummary();
-    rows.forEach(summary.add);
-    return summary.finish();
 };
 
 export const findWarehouseReportRows = async function* ({
@@ -431,36 +218,6 @@ export const findWasteIssueReportRows = async function* ({
     })) yield* mapWasteIssueDetailRows(page);
 };
 
-export const findGoodsReceiptReportRows = async function* ({
-    search = '',
-    startDate = '',
-    endDate = '',
-    supplierId = '',
-    personId = '',
-    type = null,
-    orderBy = 'referenceNumber',
-    orderDir = 'desc'
-} = {}) {
-
-    for await (const page of findBatches({
-        batchSize: QUERY_BATCH_SIZES.DOCUMENTS,
-        fetchPage: async query => (await findAllGoodsReceipts({ ...query, includeCounts: false })).data,
-        query: {
-            search,
-            startDate,
-            endDate,
-            supplierId,
-            personId,
-            type,
-            excludeCanceled: true,
-            activeDetailsOnly: true,
-            orderBy,
-            orderDir
-        }
-    })) yield* mapGoodsReceiptDetailRows(page);
-};
-
-
 export const findSupplierReportRows = async function* ({ search = '', orderBy = 'tradeName', orderDir = 'asc' } = {}) {
     for await (const page of findBatches({
         batchSize: QUERY_BATCH_SIZES.SUPPLIERS,
@@ -468,7 +225,6 @@ export const findSupplierReportRows = async function* ({ search = '', orderBy = 
         fetchPage: async query => (await findAllSuppliers({ ...query, includeCounts: false })).data
     })) yield* page;
 };
-
 
 export const findWasteReportRows = async function* ({
     search = '',

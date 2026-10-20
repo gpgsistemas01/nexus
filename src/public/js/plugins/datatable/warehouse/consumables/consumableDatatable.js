@@ -1,6 +1,6 @@
 import { deleteConsumable, getAllConsumables } from '../../../../application/warehouse/consumables/consumables.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
-import { UI_PERMISSIONS, hasPermission } from '../../../../constants/permissions.js';
+import { PERMISSIONS, hasPermission } from '../../../../../../shared/constants/permissions.js';
 import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
 import { formatCurrency, formatDecimal } from '../../../../utils/formatUtils.js';
 import {
@@ -16,12 +16,11 @@ import {
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { setupTableFilters } from '../../core/filters/tableFilter.js';
-import { openMaterialModal } from '../../../../pages/warehouse/materials/materialModal.js';
 import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI.js';
 import { exportWarehouseReport } from '../../../../application/warehouse/report.js';
 import { formatFileName } from '../../../../utils/formatters.js';
 import { configureRealtimeReload } from '../../core/base/tableOperations.js';
-import { INVENTORY_RESOURCES, MATERIAL_TYPES } from '../../../../constants/inventory.js';
+import { INVENTORY_RESOURCES, MATERIAL_TYPES } from '../../../../../../shared/constants/inventory.js';
 import { bindMaterialInventoryActions } from '../../shared/inventory/materialInventoryActions.js';
 
 const tableElement = document.querySelector(DATATABLE_SELECTORS.MAIN);
@@ -74,7 +73,7 @@ const buildColumns = ({ canSeeActive, canSeeCost, canManageItems, context }) => 
             render: (_, __, row) => renderActionButtons({
                 status: 'Abierta',
                 context: INVENTORY_RESOURCES.MATERIAL,
-                canAdjustStock: hasPermission(context, UI_PERMISSIONS.MATERIALS_ADJUST_STOCK),
+                canAdjustStock: hasPermission(context, PERMISSIONS.MATERIALS_ADJUST_STOCK),
                 canDeleteMaterial: row.canDelete
             })
         });
@@ -83,10 +82,10 @@ const buildColumns = ({ canSeeActive, canSeeCost, canManageItems, context }) => 
     return columns;
 };
 
-export const createConsumableDatatable = async (context) => {
-    const canSeeCost = hasPermission(context, UI_PERMISSIONS.INVENTORY_COSTS_READ);
-    const canSeeActive = hasPermission(context, UI_PERMISSIONS.CATALOGS_MANAGE);
-    const canManageItems = hasPermission(context, UI_PERMISSIONS.MATERIALS_WRITE);
+export const createConsumableDatatable = async ({ context, onOpen }) => {
+    const canSeeCost = hasPermission(context, PERMISSIONS.INVENTORY_COSTS_READ);
+    const canSeeActive = hasPermission(context, PERMISSIONS.CATALOGS_MANAGE);
+    const canManageItems = hasPermission(context, PERMISSIONS.MATERIALS_WRITE);
     const filters = await setupTableFilters({ fields: ['supplier'] });
 
     renderHeader({ canSeeActive, canSeeCost, canManageItems });
@@ -104,9 +103,9 @@ export const createConsumableDatatable = async (context) => {
             buttons: [
                 ...(canManageItems ? [{
                 text: 'Nuevo consumible',
-                action: () => openMaterialModal({ mode: FORM_MODES.CREATE, resource: INVENTORY_RESOURCES.CONSUMABLE })
+                action: () => onOpen({ mode: FORM_MODES.CREATE, resource: INVENTORY_RESOURCES.CONSUMABLE })
                 }] : []),
-                ...(hasPermission(context, UI_PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
+                ...(hasPermission(context, PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
                     filename: formatFileName('reporte_inventario_consumibles'),
                     allowMonthlyReport: false,
                     allowInventoryScope: true,
@@ -123,6 +122,7 @@ export const createConsumableDatatable = async (context) => {
     configureRealtimeReload({ table, eventName: 'materials:updated' });
 
     bindMaterialInventoryActions({
+        onOpen,
         table,
         resource: INVENTORY_RESOURCES.CONSUMABLE,
         remove: deleteConsumable,

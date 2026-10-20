@@ -1,4 +1,4 @@
-import { WASTE_OPERATION_ACTIONS } from '../../../constants/inventory.js';
+import { WASTE_OPERATION_ACTIONS } from '../../../../../shared/constants/inventory.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { BUTTON_SELECTORS, FORM_SELECTORS, MODAL_SELECTORS } from '../../../constants/selectors.js';
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';

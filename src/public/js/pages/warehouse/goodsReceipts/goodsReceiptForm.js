@@ -1,8 +1,15 @@
+import { normalizeInventorySelectRelations } from '../../../plugins/select2/inventorySelectData.js';
 import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
-import { goodsReceiptContext } from './goodsReceiptContext.js';
+import { details, goodsReceiptContext } from './goodsReceiptContext.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
-import { BUTTON_SELECTORS, FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from '../../../constants/selectors.js';
+import {
+    BUTTON_SELECTORS,
+    FORM_SELECTORS,
+    INPUT_SELECTORS,
+    MODAL_SELECTORS,
+    SELECT_SELECTORS
+} from '../../../constants/selectors.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT } from '../../../plugins/select2/modules/goodsReceiptSelect.js';
 import { clearAddedMaterialInput } from '../../../ui/forms/detailFormUI.js';
@@ -12,9 +19,12 @@ import { getNewDetails } from '../../../utils/detailCollectionUtils.js';
 import { on } from '../../../utils/domUtils.js';
 import { hasValidationErrors, validateFields } from '../../../utils/formUtils.js';
 
-import { addGoodsReceiptMaterialValidation, goodsReceiptEditValidation, goodsReceiptValidation } from '../../../utils/validations/validators.js';
+import {
+    addGoodsReceiptMaterialValidation,
+    goodsReceiptEditValidation,
+    goodsReceiptValidation
+} from '../../../utils/validations/validators.js';
 import { mapGoodsReceiptSelectionToDetail } from './goodsReceiptDetails.js';
-import { details } from '../../../plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js';
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
@@ -68,9 +78,8 @@ const addGoodsReceiptMaterial = () => {
     const option = document.querySelector(`${ SELECT_SELECTORS.MATERIAL } option:checked`);
     if (!option) return;
 
-    const { material, supplier } = option.dataset;
-    const selectedMaterial = material ? JSON.parse(material) : {};
-    const materialId = selectedMaterial.id;
+    const optionData = normalizeInventorySelectRelations(option.dataset);
+    const materialId = optionData.material?.id;
 
     const quantity = document.querySelector(INPUT_SELECTORS.QUANTITY).value;
     const costPerUnitType = document.querySelector(INPUT_SELECTORS.COST_PER_UNIT).value;
@@ -86,7 +95,7 @@ const addGoodsReceiptMaterial = () => {
 
     const newDetail = {
         ...mapGoodsReceiptSelectionToDetail({
-            optionData: { material, supplier },
+            optionData,
             quantity: Number(quantity),
             costPerUnitType: Number(costPerUnitType)
         }),

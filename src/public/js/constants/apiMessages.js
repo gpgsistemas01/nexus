@@ -1,5 +1,5 @@
-import { AUTH_FIELD_LIMITS } from './auth.js';
-import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
+import { AUTH_FIELD_LIMITS } from '../../../shared/constants/auth.js';
+import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from '../../../shared/messages/goodsReceiptMessages.js';
 
 export const errorMessages = {
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',

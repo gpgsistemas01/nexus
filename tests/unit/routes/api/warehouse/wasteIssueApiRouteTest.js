@@ -52,7 +52,7 @@ vi.mock('../../../../../src/controllers/api/warehouse/wasteIssueController.js', 
   registerWasteIssueDetailReturn
 }));
 
-const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../src/shared/constants/permissions.js');
 const { default: wasteIssueApiRoutes } = await import('../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js');
 
 describe('wasteIssueApiRoute', () => {

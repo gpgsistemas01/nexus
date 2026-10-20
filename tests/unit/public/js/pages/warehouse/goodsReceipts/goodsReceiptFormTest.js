@@ -4,8 +4,7 @@ const state = vi.hoisted(() => ({ config: null, details: [] }));
 vi.mock('../../../../../../../src/public/js/ui/forms/formUI.js', () => ({
     useForm: config => { state.config = config; }, handleSubmit: vi.fn()
 }));
-vi.mock('../../../../../../../src/public/js/pages/warehouse/goodsReceipts/goodsReceiptContext.js', () => ({ goodsReceiptContext: {} }));
-vi.mock('../../../../../../../src/public/js/plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js', () => ({ details: state.details }));
+vi.mock('../../../../../../../src/public/js/pages/warehouse/goodsReceipts/goodsReceiptContext.js', () => ({ goodsReceiptContext: {}, details: state.details }));
 vi.mock('../../../../../../../src/public/js/plugins/datatable/shared/inventory/renderMaterialDatatable.js', () => ({ refreshMaterialTable: vi.fn() }));
 vi.mock('../../../../../../../src/public/js/plugins/select2/modules/goodsReceiptSelect.js', () => ({ GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT: 'supplier-changed' }));
 vi.mock('../../../../../../../src/public/js/ui/forms/detailFormUI.js', () => ({ clearAddedMaterialInput: vi.fn() }));

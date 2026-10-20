@@ -4,13 +4,10 @@ import {
     getAllCatalogEntries,
     registerCatalogEntry
 } from '../../../controllers/api/admin/catalogController.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
-import {
-    catalogEntryEditValidation,
-    catalogEntryValidation
-} from '../../../validators/forms/catalogValidations.js';
+import { catalogEntryEditValidation, catalogEntryValidation } from '../../../validators/forms/catalogValidations.js';
 
 const router = express.Router();
 

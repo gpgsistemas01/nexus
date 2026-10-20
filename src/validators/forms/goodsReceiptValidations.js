@@ -1,5 +1,9 @@
 import { body } from "express-validator";
-import { DECIMAL_INPUT_FORMAT, FORM_FIELD_LIMITS, MONEY_INPUT_FORMAT } from '../../public/js/constants/inputValidation.js';
+import {
+    DECIMAL_INPUT_FORMAT,
+    FORM_FIELD_LIMITS,
+    MONEY_INPUT_FORMAT
+} from '../../shared/constants/inputValidation.js';
 import { errorMap } from "../../messages/codeMessages.js";
 import {
     validateBoolean,
@@ -58,7 +62,6 @@ const goodsReceiptDataValidation = [
         .isString().withMessage(errorMap.details.INVALID_FORMAT_REQUIRED).bail()
         .isUUID('4').withMessage(errorMap.details.INVALID_FORMAT_REQUIRED)
 ];
-
 
 export const goodsReceiptValidation = [
     ...goodsReceiptDataValidation,

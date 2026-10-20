@@ -36,6 +36,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
 | `Supplier` | control | [`supplierService.js`](../../../../../../src/services/warehouse/supplierService.js) |
 | `Person` | control | [`personService.js`](../../../../../../src/services/admin/person/personService.js) |
+| `Numbers` | control | [`numberUtils.js`](../../../../../../src/shared/utils/numberUtils.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FileMaterialGoodsReceiptController` | control | [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js) |
@@ -246,6 +247,7 @@ callback transaccional. Los conflictos se propagan al servicio que llamó al hel
 
 ```mermaid
 sequenceDiagram
+    participant Numbers@{ "type": "control" } as numberUtils.js
     autonumber
     participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
     participant Materials@{ "type": "control" } as materialService.js
@@ -265,13 +267,13 @@ sequenceDiagram
         break Material inexistente, tipo incompatible o proveedor-material inactivo
             Helpers-->>Helpers: throw MaterialNotFound | MaterialInactiveConflict
         end
-        Helpers->>Formatter: roundTo(quantity * costPerUnitType)
-        Formatter-->>Helpers: roundTo(): number — subtotal sin IVA
-        Helpers->>Formatter: roundTo(netPurchaseAmount * 1.16)
+        Helpers->>Numbers: roundTo(quantity * costPerUnitType)
+        Numbers-->>Helpers: roundTo(): number — subtotal sin IVA
+        Helpers->>Numbers: roundTo(netPurchaseAmount * 1.16)
         Helpers->>Conversion: calculateConvertedQuantity({ quantity, base, height })
         Conversion-->>Helpers: calculateConvertedQuantity(): number
         opt convertedQuantity mayor que cero
-            Helpers->>Formatter: roundTo(netPurchaseAmount / convertedQuantity)
+            Helpers->>Numbers: roundTo(netPurchaseAmount / convertedQuantity)
         end
     end
 ```

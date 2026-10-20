@@ -2,12 +2,11 @@ import { findPage } from '../../repository/paginationRepository.js';
 import { MovementFindDatabaseError } from "../../errors/inventory/movementError.js";
 import { getDb } from "../../repository/baseRepository.js";
 import { buildDateRangeFilter } from "../../utils/requestQueryUtils.js";
-import { formatDateLongWithTime } from "../../utils/formattersUtils.js";
-import { MATERIAL_TYPES } from "../../constants/inventory.js";
+import { formatDateLongWithTime } from '../../utils/formattersUtils.js';
+import { MATERIAL_TYPES } from '../../shared/constants/inventory.js';
 import { createServiceLogger, logServiceError } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('inventory.movementQueryService');
-
 
 const REFERENCE_NUMBER_SELECT = {
     referenceNumber: true
@@ -175,7 +174,6 @@ const getMovementSearchFilter = (search) => {
         ]
     };
 };
-
 
 const resolveMaterialBase = (detail) => detail.material?.base ?? null;
 

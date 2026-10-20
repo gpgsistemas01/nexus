@@ -1,5 +1,14 @@
 import { normalizeDatabaseError } from '../../../errors/databaseError.js';
-import { MaterialAlreadyExists, MaterialCreateDatabaseError, MaterialInitialStockReasonNotFound, MaterialNotFound, MaterialUpdateDatabaseError, MaterialStockAdjustmentDatabaseError, MaterialDeleteDatabaseError, MaterialDeleteRelationConflict } from "../../../errors/warehouse/materialError.js";
+import {
+    MaterialAlreadyExists,
+    MaterialCreateDatabaseError,
+    MaterialInitialStockReasonNotFound,
+    MaterialNotFound,
+    MaterialUpdateDatabaseError,
+    MaterialStockAdjustmentDatabaseError,
+    MaterialDeleteDatabaseError,
+    MaterialDeleteRelationConflict
+} from "../../../errors/warehouse/materialError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import {
     existsMaterialUsage,
@@ -13,12 +22,11 @@ import { createStockAdjustment } from "../adjustmentService.js";
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findInitialStockAdjustmentReason } from "../reasonService.js";
-import { MATERIAL_TYPES } from "../../../constants/inventory.js";
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 
 import { updateVersionedRecord } from '../../../repository/versionRepository.js';
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
-
 
 const throwMaterialWriteError = ({ err, fallbackError }) => {
     if (err.code === PRISMA_ERROR_CODES.RECORD_NOT_FOUND) {

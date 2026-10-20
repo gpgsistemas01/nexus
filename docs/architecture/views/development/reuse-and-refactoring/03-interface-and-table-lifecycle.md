@@ -75,7 +75,7 @@ explica la extracción común y su ownership, sin repetir la secuencia del CRUD.
 `goodsIssueModal.js` vacía y rellena `goodsIssueDetails`, aplica el modo y llama a
 `createWarehouseIssueDetailsTable({ data, mode, context })`. `wasteIssueModal.js` hace
 lo propio con su arreglo y añade `detailName='Merma'` y
-`projectQuantityPermission=UI_PERMISSIONS.WASTE_ISSUES_SUPPLY`. La factory toma por
+`projectQuantityPermission=PERMISSIONS.WASTE_ISSUES_SUPPLY`. La factory toma por
 defecto `GOODS_ISSUE_DETAILS_MANAGE` para salidas de materiales/consumibles.
 
 Los datos pertenecen al modal; la factory no conserva una copia global ni destruye

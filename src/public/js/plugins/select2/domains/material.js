@@ -1,13 +1,18 @@
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
-import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
 import { getAllMaterials } from '../../../application/warehouse/materials/materials.js';
 import { getAllConsumables } from '../../../application/warehouse/consumables/consumables.js';
-import { buildPaginatedSelectParams, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
+import {
+    buildPaginatedSelectParams,
+    initDomainSelect2,
+    initFilterSelect2,
+    runAfterSelect2Close,
+    toggleSelectOption
+} from "../baseSelect.js";
 import { setMdbWrapperInputValue } from '../../mdb/baseInstance.js';
-import { mapSelectMaterialData, normalizeInventorySelectRelations } from "../../../utils/warehouseInventoryUtils.js";
+import { mapSelectMaterialData, normalizeInventorySelectRelations } from '../inventorySelectData.js';
 import { FILTER_SELECTORS, INPUT_SELECTORS } from "../../../constants/selectors.js";
 import { updatePresentationDisplay } from '../../../ui/inventory/inventorySelectUI.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 
 const wrapperSelector = INPUT_SELECTORS.PRESENTATION_DISPLAY;
 const materialSelector = FILTER_SELECTORS.MATERIAL;
@@ -60,6 +65,7 @@ const initMaterialSelect = ({
 });
 
 const attachMaterialHandler = ({
+    onCreate,
     modalSelector,
     baseSelector,
     supplierSelector,
@@ -79,7 +85,7 @@ const attachMaterialHandler = ({
 
             runAfterSelect2Close({
                 selector: baseSelector,
-                action: () => openMaterialModal({
+                action: () => onCreate({
                     creationContext,
                     resource,
                     data: {
@@ -135,6 +141,7 @@ export const setupMaterialSelect = ({
     materialSelector,
     allowCreate = true,
     creationContext = null,
+    onCreate,
     resource = INVENTORY_RESOURCES.MATERIAL
 }) => {
 
@@ -144,11 +151,12 @@ export const setupMaterialSelect = ({
         modalSelector,
         supplierSelector,
         baseSelector,
-        allowCreate,
+        allowCreate: allowCreate && typeof onCreate === 'function',
         resource
     });
 
     attachMaterialHandler({
+        onCreate,
         modalSelector,
         baseSelector,
         supplierSelector,

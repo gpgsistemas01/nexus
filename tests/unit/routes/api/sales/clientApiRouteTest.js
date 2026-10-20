@@ -33,7 +33,7 @@ vi.mock('../../../../../src/controllers/api/sales/clientController.js', () => ({
   registerClient
 }));
 
-const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../src/shared/constants/permissions.js');
 const { default: clientApiRoutes } = await import('../../../../../src/routes/api/sales/clientApiRoute.js');
 
 describe('clientApiRoute', () => {

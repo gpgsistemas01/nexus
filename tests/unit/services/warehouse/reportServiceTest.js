@@ -6,7 +6,8 @@ vi.mock('../../../../src/repository/baseRepository.js', () => ({
   getDb: () => ({ waste: { findMany: wasteFindMany } })
 }));
 
-import { buildWasteReportSummary, findWasteReportRows } from '../../../../src/services/warehouse/reportService.js';
+import { buildWasteReportSummary } from '../../../../src/services/warehouse/wastes/wasteReportSummary.js';
+import { findWasteReportRows } from '../../../../src/services/warehouse/reportService.js';
 
 describe('consulta del reporte de mermas', () => {
   beforeEach(() => vi.clearAllMocks());

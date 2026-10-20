@@ -1,6 +1,6 @@
 import { setFormSectionVisibility, setFormDisabled } from '../forms/formStateUI.js';
 import { isCreateMode } from '../../constants/formModes.js';
-import { INVENTORY_RESOURCES } from '../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../shared/constants/inventory.js';
 import { INPUT_SELECTORS } from '../../constants/selectors.js';
 import { setMdbWrapperInputValue } from '../../plugins/mdb/baseInstance.js';
 import { toggleErrorMessages } from '../forms/formErrorsUI.js';

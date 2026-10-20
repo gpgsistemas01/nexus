@@ -1,4 +1,4 @@
-import { WASTE_OPERATION_ACTIONS } from '../../../constants/inventory.js';
+import { WASTE_OPERATION_ACTIONS } from '../../../../../shared/constants/inventory.js';
 import { addWasteStock } from '../../../application/warehouse/wastes/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
 import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';

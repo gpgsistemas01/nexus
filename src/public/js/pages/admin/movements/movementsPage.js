@@ -3,7 +3,7 @@ import { setupTableFilters } from "../../../plugins/datatable/core/filters/table
 import { FILTER_SELECTORS } from '../../../constants/selectors.js';
 import { setupWasteSelect } from '../../../plugins/select2/domains/waste.js';
 import { initMaterialFilterSelect } from '../../../plugins/select2/domains/material.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 
 const movementContext = document.querySelector('#movementPage')?.dataset.movementContext;
 if (movementContext) {

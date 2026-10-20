@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { validationResult } from 'express-validator';
 import { validateNumber, validateNumberOptional, validatePositiveNumber } from '../../../src/validators/fields/fieldsValidator.js';
-import { MONEY_INPUT_FORMAT, MIN_STOCK_INPUT_FORMAT } from '../../../src/public/js/constants/inputValidation.js';
+import { MONEY_INPUT_FORMAT, MIN_STOCK_INPUT_FORMAT } from '../../../src/shared/constants/inputValidation.js';
 
 const validate = async (rule, body) => {
     const req = { body: structuredClone(body) };

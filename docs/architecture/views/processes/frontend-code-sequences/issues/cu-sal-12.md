@@ -21,7 +21,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Transport` | control | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js) |
 | `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
 | `FileErrorHandler` | control | [`errorHandler.js`](../../../../../../src/public/js/api/errorHandler.js) |
-| `WarehouseInventoryUtils` | control | [`warehouseInventoryUtils.js`](../../../../../../src/public/js/utils/warehouseInventoryUtils.js) |
+| `WarehouseInventoryUtils` | control | [`issueDetails.js`](../../../../../../src/public/js/application/warehouse/issues/issueDetails.js) |
 | `FileResponseUtils` | control | [`responseUtils.js`](../../../../../../src/public/js/utils/responseUtils.js) |
 | `FileApiMessages` | control | [`apiMessages.js`](../../../../../../src/public/js/constants/apiMessages.js) |
 | `FileWasteIssueController` | control | [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
@@ -110,7 +110,7 @@ sequenceDiagram
     participant HTTP@{ "type": "boundary" } as axiosInstanceApi.js
     participant Transport@{ "type": "control" } as wasteIssueApiRoute.js
 
-    participant WarehouseInventoryUtils@{ "type": "control" } as warehouseInventoryUtils.js
+    participant WarehouseInventoryUtils@{ "type": "control" } as issueDetails.js
 
     participant FileResponseUtils@{ "type": "control" } as responseUtils.js
 

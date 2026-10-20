@@ -1,5 +1,4 @@
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
-import { openSupplierModal } from "../../../pages/warehouse/suppliers/supplierModal.js";
 import { getAllSuppliers } from "../../../application/warehouse/suppliers/suppliers.js";
 import { initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { FILTER_SELECTORS } from "../../../constants/selectors.js";
@@ -35,7 +34,7 @@ const initSupplierSelect = ({
     newTagLabel: 'Nuevo proveedor'
 });
 
-const attachSupplierHandler = ({ supplierSelector }) => {
+const attachSupplierHandler = ({ supplierSelector, onCreate }) => {
 
     $(supplierSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
 
@@ -47,7 +46,7 @@ const attachSupplierHandler = ({ supplierSelector }) => {
 
             runAfterSelect2Close({
                 selector: supplierSelector,
-                action: () => openSupplierModal({
+                action: () => onCreate({
                     data: { tradeName },
                     onSave: (createdsupplier) => {
 
@@ -80,16 +79,18 @@ export const toggleSupplierOption = ({
 export const setupSupplierSelect = ({ 
     modalSelector, 
     supplierSelector,
-    allowCreate = true
+    allowCreate = true,
+    onCreate
 }) => {
 
     initSupplierSelect({
         modalSelector,
         baseSelector: `${ modalSelector } ${ supplierSelector }`,
-        allowCreate
+        allowCreate: allowCreate && typeof onCreate === 'function'
     });
 
     attachSupplierHandler({
-        supplierSelector: `${ modalSelector } ${ supplierSelector }`
+        supplierSelector: `${ modalSelector } ${ supplierSelector }`,
+        onCreate
     });
 };
