@@ -1,6 +1,7 @@
 # Reglas generales del proyecto
 
-La aplicación existente vive en `back/`. Las rutas `src/`, `prisma/`, `scripts/`,
+La aplicación existente vive en `back/`; el frontend Vue 3 con Vite vive en `front/`.
+Los comandos npm del frontend se ejecutan desde `front/`. Las rutas `src/`, `prisma/`, `scripts/`,
 `tests/`, `docs/` y los comandos npm de esta guía se interpretan desde `back/`.
 La automatización `.github/workflows/ci.yml`, Dockerfile y Docker Compose viven
 en la raíz del repositorio.

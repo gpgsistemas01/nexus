@@ -1,10 +1,12 @@
 # Nexus
 
 La aplicación actual de Express, Prisma y vistas EJS vive en `back/`.
-Esta organización permite incorporar después un frontend Vue en el mismo repositorio.
+El frontend Vue 3 con Vite está en `front/`, como base inicial para la migración gradual.
+Las pantallas operativas actuales siguen renderizándose con EJS en el backend.
 
 ```text
-back/                 # Aplicación, dependencias, pruebas y documentación
+back/                 # Express, EJS, Prisma, pruebas y documentación
+front/                # Vue 3 + Vite, plantilla inicial
 .github/workflows/    # CI del repositorio
 Dockerfile            # Construye el backend usando el contexto raíz
 docker-compose.yml    # Ejecuta el backend con back/.env
@@ -14,7 +16,8 @@ docker-compose.yml    # Ejecuta el backend con back/.env
 
 | Operación | Desde dónde ejecutarla |
 | --- | --- |
-| npm, Prisma (`npx prisma`) y scripts Node | `back/` |
+| npm del backend, Prisma (`npx prisma`) y scripts Node | `back/` |
+| npm del frontend (dev, build, preview) | `front/` |
 | Docker Compose y construcción con Dockerfile | Raíz del repositorio |
 | Git (commit, pull y push) | Preferentemente raíz del repositorio |
 
@@ -38,6 +41,20 @@ npm run dev
 Consulta [instalación y operación](back/README.md) y el
 [índice de documentación](back/docs/README.md). Las rutas técnicas de esa documentación
 son relativas a `back/`.
+
+## Frontend Vue
+
+En otra terminal, desde la raíz del repositorio:
+
+```bash
+cd front
+npm ci
+npm run dev
+```
+
+Para compilar: `npm run build` desde `front/`, o `npm --prefix front run build` desde
+la raíz. La salida queda en `front/dist/`. Consulta [la guía del frontend](front/README.md).
+Esta plantilla aún no está conectada a las API ni reemplaza las pantallas EJS.
 
 ## Validación
 
