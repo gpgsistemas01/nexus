@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.1 | 1.0.0 | En revisión | 2026-10-15 | Equipo Nexus |
+| 1.2 | 1.0.0 | En revisión | 2026-10-20 | Equipo Nexus |
 
 ## Objetivo y alcance
 
@@ -177,11 +177,44 @@ de fallos y el bloqueo de filas son medios de ejecución. Si se necesita cobertu
 sentencias o ramas, debe medirse con instrumentación; no se deduce de las tablas ni de
 la cantidad de pruebas.
 
+### Medición de cobertura
+
+Vitest usa `@vitest/coverage-v8` de la misma versión para medir líneas, sentencias,
+funciones y ramas. La medición se habilita con `--coverage`; las ejecuciones ordinarias
+mantienen la cobertura desactivada. No se impone un porcentaje mínimo inicial: los
+resultados sirven para identificar brechas y priorizarlas por el riesgo del módulo.
+
+| Suite | Comando | Alcance | Reporte HTML |
+| --- | --- | --- | --- |
+| Unitaria | `npm run test:coverage` | JavaScript de `src`, incluidos frontend y módulos compartidos. | `coverage/unit/index.html` |
+| Integración | `npm run test:coverage:integration` | JavaScript de `src` excepto `src/public`; incluye módulos compartidos usados por el servidor. | `coverage/integration/index.html` |
+
+Ambas configuraciones incluyen archivos no ejecutados dentro de su alcance para no
+limitar el porcentaje a los módulos importados por las pruebas. La exclusión de
+`src/public` en integración corresponde a su contrato HTTP/Prisma: esa suite no ejecuta
+el navegador. Las plantillas EJS, SQL, el cliente Prisma generado y las herramientas de
+`scripts` no forman parte de estos porcentajes de aplicación; conservan las pruebas
+funcionales o auxiliares que correspondan.
+
+Cada ejecución escribe resumen de terminal, HTML, LCOV y `coverage-summary.json` en
+su propio directorio; ejecutar integración no borra el reporte unitario. Los porcentajes
+de suites con distinto alcance no se suman ni promedian para declarar cobertura total.
+Un porcentaje alto demuestra ejecución del código, no suficiencia de las aserciones,
+cumplimiento de requisitos ni funcionamiento en un navegador real.
+
+CI activa la cobertura en los pasos existentes de unitarias e integración y publica
+`coverage-reports`, conservando por separado los reportes JUnit. Se intenta generar y
+conservar la cobertura también ante fallos de pruebas; si la suite no llega a iniciarse,
+no se afirma que exista un reporte válido. Los archivos de `coverage` están ignorados
+por Git y se guardan como evidencia de ejecución, sin versionarlos en `docs`.
+
 ### Ambiente de pruebas e integración con base de datos
 
 Las unitarias se ejecutan con Node.js 22–24 y Vitest, sin una base real. Las integraciones
 usan `NODE_ENV=test`, se ejecutan de forma serial y trabajan contra PostgreSQL mediante
 `DATABASE_TEST_URL`, que debe ser distinta de `DATABASE_URL`.
+Los scripts establecen el entorno con `cross-env` para conservar este flujo en Windows
+y sistemas POSIX, tanto con cobertura como sin ella.
 
 Las integraciones guardan y consultan datos
 reales y limpian únicamente los fixtures identificables de su suite. La limpieza se
@@ -243,3 +276,4 @@ No se versionan esos reportes en `docs`.
 - [ISO/IEC/IEEE 29119-4:2021](https://www.iso.org/standard/79430.html): técnicas de diseño.
 - [ISTQB CTFL 4.0.1](https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf), apartados 1.4, 4.2 y 5.2: trazabilidad, técnicas y priorización por riesgo.
 - [Reporters de Vitest](https://vitest.dev/guide/reporters.html) y [artefactos de GitHub Actions](https://docs.github.com/en/actions/tutorials/store-and-share-data): evidencia automatizada de ejecución.
+- [Cobertura de Vitest](https://vitest.dev/guide/coverage.html): proveedor V8, alcance y formatos de reporte.

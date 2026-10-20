@@ -20,6 +20,8 @@
 - Reutiliza `AppError`, los errores de dominio, los mensajes y las constantes existentes. No inventes formatos de respuesta o manejo de errores por endpoint.
 - En escrituras compuestas, usa una sola transacción y propaga `tx` a todas las operaciones relacionadas; no mezcles el cliente Prisma global con el transaccional.
 - Mantén autenticación y autorización en el servidor, evita registrar secretos o datos sensibles y usa el logger del proyecto en lugar de `console.log` en código de aplicación.
+- Trata `src/public` y `src/shared` servido en `/shared` como código público. Antes de compartir una regla, distingue su confidencialidad de su compatibilidad técnica: ser una función pura no permite publicar fórmulas propietarias, secretos ni políticas internas que deban permanecer privadas. Conserva esas reglas exclusivamente en el backend.
+- Los cálculos del navegador son una vista previa. El backend valida las entradas, resuelve identidad, permisos y estado desde fuentes confiables, y calcula los valores derivados que persiste; no confía en totales, saldos, roles ni resultados calculados enviados por el cliente. Sigue el contrato del recurso para descartar o rechazar esos campos.
 
 ## Base de datos y migraciones
 
@@ -51,7 +53,9 @@
 - Prueba estados y datos relevantes del formulario; evita fijar HTML, clases CSS, llamadas privadas o delegaciones triviales. Los dobles de Select2/MDB no demuestran un recorrido de navegador.
 - En CRUD, valida el comportamiento CRUD correspondiente y reutiliza *factories*, *fixtures*, *helpers* y *mocks* existentes.
 - Usa `npm run test:unit` para la suite sin base de datos y `npm run test:integration` para integración HTTP/Prisma; no uses `test:watch` en validaciones no interactivas.
+- Mide cobertura con `npm run test:coverage` y `npm run test:coverage:integration` cuando se necesite identificar brechas; conserva sus reportes separados y no deduzcas suficiencia de pruebas de un porcentaje. Los reportes se guardan como evidencia, no se versionan.
 - En pruebas de integración, comprueba tanto la respuesta HTTP como el estado persistido mediante Prisma, incluidos rollback y ausencia de efectos parciales cuando apliquen.
+- Cuando cambien cálculos o controles de acceso, comprueba solicitudes directas con resultados derivados o atributos de autorización manipulados; verificar sólo el formulario no demuestra el control del servidor. Reutiliza los casos existentes de ese contrato antes de agregar otros.
 
 ## Reutilización y estándar
 

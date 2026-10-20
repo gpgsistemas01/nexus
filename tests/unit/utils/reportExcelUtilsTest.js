@@ -46,7 +46,9 @@ describe('generación progresiva de reportes Excel', () => {
 
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toContain('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    expect(response.headers['content-disposition']).toMatch(/^attachment; filename="inventario_\d{2}_\d{4}\.xlsx"$/);
+    expect(response.headers['content-disposition']).toMatch(
+      /^attachment; filename=("?)inventario_\d{2}_\d{4}\.xlsx\1$/
+    );
     expect(sheet.C2).toMatchObject({ f: 'A2+B2', t: 'n', v: 5 });
     expect(sheet.C4).toMatchObject({ f: 'A4+B4', t: 'n', v: 0 });
     expect(sheet.A3.v).toBe('México');

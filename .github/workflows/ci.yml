@@ -103,11 +103,11 @@ jobs:
         run: npx prisma generate
 
       - name: Run unit tests
-        run: npm run test:unit -- --reporter=default --reporter=junit --outputFile=build/test-results/unit.xml
+        run: npm run test:unit -- --coverage --reporter=default --reporter=junit --outputFile=build/test-results/unit.xml
 
       # Integración valida DATABASE_TEST_URL y aplica migraciones antes de Vitest.
       - name: Run database migrations and integration tests
-        run: npm run test:integration -- --reporter=default --reporter=junit --outputFile=build/test-results/integration.xml
+        run: npm run test:integration -- --coverage --reporter=default --reporter=junit --outputFile=build/test-results/integration.xml
 
       - name: Upload test results
         if: always()
@@ -115,4 +115,14 @@ jobs:
         with:
           name: test-results
           path: build/test-results/*.xml
+          if-no-files-found: warn
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage/unit/
+            coverage/integration/
           if-no-files-found: warn

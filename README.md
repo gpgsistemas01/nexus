@@ -207,6 +207,8 @@ npm start
 | `npm run db:generate` | Genera el cliente Prisma. |
 | `npm test` | Ejecuta las pruebas unitarias y auxiliares; excluye `tests/integration`. |
 | `npm run test:unit` | Alias explícito de la suite sin integraciones. |
+| `npm run test:coverage` | Ejecuta la suite unitaria con cobertura V8; genera reportes en `coverage/unit`. |
+| `npm run test:coverage:integration` | Ejecuta la integración con base aislada y cobertura V8; genera reportes en `coverage/integration`. |
 | `npm run test:watch` | Ejecuta Vitest en modo observación. |
 | `npm run test:db:verify` | Valida que `DATABASE_TEST_URL` exista y no sea igual a `DATABASE_URL`. |
 | `npm run test:db:migrate` | Verifica variables y aplica migraciones en la base de pruebas; usa `DIRECT_TEST_URL` automáticamente cuando está definida. |
@@ -303,6 +305,22 @@ Para pruebas que no requieren base de datos real, usa:
 ```bash
 npm run test:unit
 ```
+
+Para medir cobertura de la aplicación:
+
+```bash
+npm run test:coverage
+```
+
+Abre `coverage/unit/index.html` en el navegador para consultar archivos, funciones y
+ramas pendientes de ejecutar. Para medir integración, prepara la misma base aislada de
+`test:integration` y ejecuta `npm run test:coverage:integration`; su reporte queda en
+`coverage/integration/index.html`. Los reportes incluyen también archivos no ejecutados
+y no se versionan. El alcance y los límites de estas métricas están en el
+[plan de pruebas](docs/testing/test-plan.md#medición-de-cobertura).
+
+Los comandos que establecen `NODE_ENV=test` usan `cross-env` para funcionar en Windows
+y sistemas POSIX. CI conserva los reportes de cobertura junto con los resultados JUnit.
 
 `npm test` es un alias equivalente para la suite unitaria. Para una entrega ejecute primero
 `npm run test:unit`, después `npm run test:integration` con `DATABASE_TEST_URL` aislada y finalmente
