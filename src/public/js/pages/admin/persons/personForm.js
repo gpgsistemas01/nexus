@@ -1,8 +1,9 @@
 import { registerPerson, updatePerson } from '../../../application/admin/persons/persons.js';
-import { useForm } from '../../../ui/forms/formUI.js';
-import { personAccesses } from '../../../plugins/datatable/admin/persons/personDatatable.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
+import { personAccesses } from '../../../plugins/datatable/admin/persons/personAccessDatatable.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { handleSubmit, validateFields } from '../../../utils/formUtils.js';
+import { validateFields } from '../../../utils/formUtils.js';
+
 import { personValidation } from '../../../utils/validations/validators.js';
 
 useForm({

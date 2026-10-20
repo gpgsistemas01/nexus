@@ -1,7 +1,10 @@
 import express from 'express';
 import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../../middleware/authMiddleware.js';
-import { getConsumableGoodsReceiptsPage, getMaterialGoodsReceiptsPage } from '../../../../controllers/web/warehouse/goodsReceipts/goodsReceiptController.js';
-import { PERMISSIONS } from '../../../../constants/permissions.js';
+import {
+    getConsumableGoodsReceiptsPage,
+    getMaterialGoodsReceiptsPage
+} from '../../../../controllers/web/warehouse/goodsReceipts/goodsReceiptController.js';
+import { PERMISSIONS } from '../../../../shared/constants/permissions.js';
 
 const router = express.Router();
 const goodsReceiptPageMiddleware = [

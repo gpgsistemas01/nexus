@@ -32,7 +32,6 @@ export const formatDateLongWithTime = (dateTime) => {
     return dateTimeFormatter.format(date);
 }
 
-
 export const getMexicoMonthYearParts = (dateTime = new Date()) => {
 
     const parts = monthYearFormatter.formatToParts(dateTime).reduce((acc, part) => {
@@ -45,7 +44,6 @@ export const getMexicoMonthYearParts = (dateTime = new Date()) => {
         year: parts.year
     };
 };
-
 
 export const getMexicoMonthDateRange = (dateTime = new Date()) => {
 
@@ -99,23 +97,6 @@ export const cleanSearchTerm = (search) => {
   return { codeSearch, nameSearch };
 };
 
-export const roundTo = (value, decimals = 6) => {
-
-    const factor = 10 ** decimals;
-    return Math.round((Number(value) + Number.EPSILON) * factor) / factor;
-};
-
-const FLOAT_EPSILON = 0.000001;
-
-export const normalizeDecimal = (value) => {
-
-    const rounded = roundTo(value);
-
-    return Math.abs(rounded) <= FLOAT_EPSILON
-        ? 0
-        : rounded;
-};
-
 export const hasMaterialDimensions = (material = {}) => (
     Number(material.base || 0) > 0 &&
     Number(material.height || 0) > 0
@@ -130,24 +111,5 @@ export const parseStockKey = (key) => {
 };
 
 export const toNumber = value => value == null || value === '' ? null : Number(value);
-
-export const normalizeMaterialDimensions = ({ base, height } = {}) => {
-
-    const parsedBase = toNumber(base);
-    const parsedHeight = toNumber(height);
-
-    if (parsedBase === 0 && parsedHeight === 0) {
-        return {
-            base: null,
-            height: null
-        };
-    }
-
-    return {
-        base: parsedBase,
-        height: parsedHeight
-    };
-};
-
 
 export const normalizeText = (value = '') => value.trim().toUpperCase();

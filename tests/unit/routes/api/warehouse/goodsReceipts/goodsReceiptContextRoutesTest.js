@@ -20,7 +20,7 @@ vi.mock('../../../../../../src/controllers/api/warehouse/goodsReceipts/consumabl
 const validators = await import('../../../../../../src/validators/forms/goodsReceiptValidations.js');
 await import('../../../../../../src/routes/api/warehouse/goodsReceipts/materials/materialGoodsReceiptApiRoute.js');
 await import('../../../../../../src/routes/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptApiRoute.js');
-const { PERMISSIONS } = await import('../../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../../src/shared/constants/permissions.js');
 
 describe('rutas de compra separadas por contexto', () => {
     it.each([['materials', 'Material'], ['consumables', 'Consumable']])('registra el flujo completo de %s con permisos y validadores', (path, label) => {

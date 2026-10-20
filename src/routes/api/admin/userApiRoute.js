@@ -12,7 +12,7 @@ import {
     userValidation
 } from '../../../validators/forms/userValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 const router = express.Router();
 

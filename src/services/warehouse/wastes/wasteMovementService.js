@@ -1,6 +1,6 @@
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import { getDb } from '../../../repository/baseRepository.js';
-import { normalizeDecimal } from '../../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { applyWasteStockChanges } from './wasteInventoryService.js';
 
 export const createWasteMovement = ({

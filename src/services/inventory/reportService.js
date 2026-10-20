@@ -1,7 +1,11 @@
 import { QUERY_BATCH_SIZES } from '../../constants/pagination.js';
 import { findBatches } from '../../repository/paginationRepository.js';
-import { toNumber } from "../../utils/formattersUtils.js";
-import { findAllMaterialMovements, findAllConsumableMovements, findAllWasteMovements } from "./movementQueryService.js";
+import { toNumber } from '../../utils/formattersUtils.js';
+import {
+    findAllMaterialMovements,
+    findAllConsumableMovements,
+    findAllWasteMovements
+} from "./movementQueryService.js";
 
 const MOVEMENT_REPORT_QUERIES = Object.freeze({
     materials: findAllMaterialMovements,

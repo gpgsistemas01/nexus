@@ -3,6 +3,7 @@ import { useForm } from "../../../ui/forms/formUI.js";
 import { validateFields } from "../../../utils/formUtils.js";
 import { loginValidation } from "../../../utils/validations/validators.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
+import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
 
 const formId = FORM_SELECTORS.LOGIN;
 const rememberCredentialsKey = 'loginRememberedCredentials';
@@ -58,14 +59,14 @@ loadRememberedCredentials();
 
 useForm({
     selector: formId,
-    normalizeData: ({ formData }) => formData,
+    normalizeData: ({ formData }) => ({ ...formData, name: formData.name.trim() }),
     getErrors: ({ formData }) => validateFields(loginValidation, formData),
-    normalizeErrors: ({ errors }) => {
+    normalizeErrors: ({ form, errors }) => {
 
         errors.name = errors.name ? 'Usuario incorrecto' : null;
         errors.password = errors.password ? 'Contraseña incorrecta' : null;
 
-        return errors;
+        return normalizeFormErrors({ form, errors });
     },
     sendRequest: async ({ formData }) => {
 

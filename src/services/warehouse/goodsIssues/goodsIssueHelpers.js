@@ -1,9 +1,9 @@
-import { MATERIAL_TYPES } from '../../../constants/inventory.js';
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { GoodsIssueNotFound } from '../../../errors/warehouse/goodsIssueError.js';
 import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/warehouse/materialError.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
-import { buildStockKey } from "../../../utils/formattersUtils.js";
+import { buildStockKey } from '../../../utils/formattersUtils.js';
 import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { findSupplierMaterialsSnapshot } from "../materials/supplierMaterialService.js";
 

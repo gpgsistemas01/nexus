@@ -3,10 +3,11 @@ import { FORM_SELECTORS, MODAL_SELECTORS } from '../../../../constants/selectors
 import { clearFormErrors } from "../../../../ui/forms/formErrorsUI.js";
 import { resetFormSubmitState } from "../../../../ui/forms/formStateUI.js";
 import { openModal } from '../../../../ui/modalUI.js';
-import { formatCurrency, formatDecimal, roundTo } from "../../../../utils/formatUtils.js";
+import { formatCurrency, formatDecimal } from '../../../../utils/formatUtils.js';
+import { roundTo } from '../../../../../../shared/utils/numberUtils.js';
 import { on } from "../../../../utils/domUtils.js";
 import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrectionForm } from "./correctionForm.js";
-import { calculateGoodsReceiptDetailAmounts } from '../goodsReceiptDetails.js';
+import { calculateGoodsReceiptDetailAmounts } from '../../../../../../shared/inventory/goodsReceiptCalculations.js';
 
 export { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT };
 

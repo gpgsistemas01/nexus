@@ -2,7 +2,6 @@ import { SELECT2_EVENT_NAMES } from '../../constants/events.js';
 import { BUTTON_SELECTORS } from '../../constants/selectors.js';
 import { FORM_MODES } from '../../constants/formModes.js';
 import { setDateTimePickerValue } from '../../plugins/flatpickr/dateTimePicker.js';
-import { toggleDisabledElement } from '../../utils/formUtils.js';
 
 export const resetFormSubmitState = (form) => {
     if (!form) return;
@@ -44,4 +43,78 @@ export const setFormSectionVisibility = ({ form, selector, isVisible, fieldNames
             window.$(field).prop('disabled', !isVisible).trigger(SELECT2_EVENT_NAMES.CHANGE);
         }
     });
+};
+
+export const toggleDisabledElement = ({ element, isDisabled }) => {
+
+    if (!element) return;
+
+    element.classList.toggle('disabled', isDisabled);
+
+    if ('disabled' in element) {
+        element.disabled = isDisabled;
+    }
+
+    const flatpickrAltInput = element._flatpickr?.altInput;
+
+    if (flatpickrAltInput) {
+        flatpickrAltInput.disabled = isDisabled;
+        flatpickrAltInput.classList.toggle('disabled', isDisabled);
+    }
+
+    if (
+        typeof window !== 'undefined'
+        && window.$
+        && element.matches?.('select')
+        && window.$(element).hasClass('select2-hidden-accessible')
+    ) {
+        window.$(element)
+            .prop('disabled', isDisabled)
+            .trigger(SELECT2_EVENT_NAMES.CHANGE)
+            .next('.select2-container')
+            .toggleClass('disabled', isDisabled);
+    }
+};
+
+
+export const syncCheckboxControlledInputs = ({
+    root = document,
+    inputSelector,
+    detailId,
+    isChecked,
+    onSync
+}) => {
+
+    if (!root || !inputSelector || !detailId) return;
+
+    root
+        .querySelectorAll(`${ inputSelector }[data-detail-id="${ detailId }"]`)
+        .forEach(input => {
+            toggleDisabledElement({
+                element: input,
+                isDisabled: !isChecked
+            });
+            onSync?.(input);
+        });
+};
+
+export const toggleContainerElements = ({
+    selector,
+    isDisabled = true,
+    root = document
+}) => {
+
+    const container = root?.querySelector(selector);
+
+    if (!container) return;
+
+    container
+        .querySelectorAll('input, select, textarea, button')
+        .forEach(element => {
+
+            toggleDisabledElement({
+                element,
+                isDisabled
+            });
+        });
 };

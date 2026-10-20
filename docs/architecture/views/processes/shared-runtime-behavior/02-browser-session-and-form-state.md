@@ -18,27 +18,24 @@ stateDiagram-v2
     state "Consulta (modal cerrado)" as Consulta
     state "Contraseña abierta (edit-password)" as Password
     state "Enviando contraseña" as Enviando
-    state "Formulario bloqueado tras error" as Bloqueado
     state "Fuera de la página" as Fuera
     [*] --> Consulta: abrir usuarios
     Consulta --> Password: abrir contraseña / deshabilitar campos de identidad
     Password --> Password: validar [datos inválidos] / mostrar errores
     Password --> Enviando: enviar [password válido] / editUserPassword()
     Enviando --> Consulta: resolver [éxito] / cerrar y recargar
-    Enviando --> Password: rechazar [HTTP recuperable] / habilitar reintento
-    Enviando --> Bloqueado: rechazar [otro error sin redirección] / notificar
+    Enviando --> Password: rechazar [sin redirección] / notificar y liberar submit en finally
     Enviando --> Fuera: sesión perdida / redirigir a raíz
     Password --> Consulta: cerrar modal
-    Bloqueado --> Consulta: cerrar modal
     Fuera --> [*]
 ```
 
 La elección del modo ocurre en `userModal.js`; la validación y la mutación se seleccionan
 en `userForm.js`. `handleSubmit` cierra el modal y recarga la tabla sólo tras el éxito.
-`handleApiError` permite reintentar HTTP 400, 403, 404 y 409; la figura los agrupa
-como «HTTP recuperable». Para los demás fallos, la implementación actual notifica sin restablecer `submitting`: cerrar y volver
-a abrir el modal inicializa el formulario. El cliente HTTP intenta renovar una sesión
-ante 401 antes de abandonar la página.
+`handleApiError` presenta el rechazo y `useForm` libera `submitting` y el botón en su
+`finally`, también ante fallos de red o servidor. Esa limpieza no repite la escritura;
+si su resultado es incierto se debe consultar antes de volver a guardar. El cliente HTTP
+intenta renovar una sesión ante 401 antes de delegar el rechazo a la interfaz.
 
 **Estado técnico complementario:** `DIA-FE-TEC-EST-CU-ALM-05`. Modela el modal de ajuste
 abierto desde Materiales. El servidor comprueba el permiso y la existencia disponible antes de aplicar el ajuste;
@@ -49,17 +46,14 @@ stateDiagram-v2
     state "Consulta de materiales (modal cerrado)" as Consulta
     state "Ajuste abierto (edit-stock)" as Ajuste
     state "Enviando ajuste (submitting=true)" as Enviando
-    state "Formulario bloqueado tras error" as Bloqueado
     state "Fuera de la página de materiales" as Fuera
     [*] --> Consulta: abrir la página
     Consulta --> Ajuste: abrir ajuste / openMaterialModal(edit-stock)
     Ajuste --> Ajuste: validar [datos inválidos] / mostrar errores
     Ajuste --> Enviando: enviar [datos válidos] / editMaterialStock()
     Enviando --> Consulta: resolver [éxito] / cerrar, recargar y onSave
-    Enviando --> Ajuste: rechazar [HTTP recuperable] / habilitar reintento
-    Enviando --> Bloqueado: rechazar [otro error sin redirección] / notificar
+    Enviando --> Ajuste: rechazar [sin redirección] / notificar y liberar submit en finally
     Enviando --> Fuera: sesión perdida / redirigir a raíz
-    Bloqueado --> Consulta: cerrar modal
     Ajuste --> Consulta: cerrar el modal
     Fuera --> [*]
     note right of Enviando
@@ -69,9 +63,8 @@ stateDiagram-v2
 ```
 
 La evidencia está en `materialModal.js`, `materialForm.js`, `formUI.js`, `formUtils.js`
-y `api/errorHandler.js`. Ante HTTP 400, 403, 404 y 409, el manejador de errores restablece el estado de envío y
-permite reintentar. Los demás errores de red o servidor siguen el comportamiento
-descrito para el formulario de contraseña.
+y `api/errorHandler.js`. El formulario restablece el estado de envío una vez en
+`finally`; el presentador compartido no altera botones ni repite la operación.
 
 
 ### Renovación coordinada del transporte HTTP
@@ -159,9 +152,10 @@ sequenceDiagram
     else Renovación fallida
         AuthRouter-->>Api: error de renovación
         Api->>Api: refreshRequest = null en finally
-        Note over A,AuthRouter: window.location.href = '/' antes de propagar el rechazo
-        Api-->>A: Promise.reject(refreshErr)
-        Api-->>B: Promise.reject(refreshErr)
+        Api->>Api: normalizeHttpError(refreshErr)
+        Api-->>A: Promise.reject(error normalizado)
+        Api-->>B: Promise.reject(error normalizado)
+        Note over A,B: handleApiError presenta el fallo, sólo una sesión rechazada redirige
     end
 ```
 
@@ -169,3 +163,8 @@ La coordinación pertenece al transporte común, no al formulario ni al plugin S
 `_retry` impide otra renovación para la misma petición reintentada; `refreshRequest`
 comparte sólo la renovación pendiente y se limpia en `finally`. El error de una nueva
 respuesta 401 del reintento no abre indefinidamente más renovaciones.
+El servicio de transporte del login marca `requiresAuth: false`, porque la captura
+no necesita una sesión previa. El interceptor omite refresh para esa petición y
+`normalizeHttpError` conserva el contexto local para presentar su `401` sin abandonar
+el formulario. `LOGIN_ERROR` se usa únicamente para traducir el mensaje; no decide si
+la petición necesita sesión. Las demás solicitudes requieren sesión por defecto.

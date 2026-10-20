@@ -1,4 +1,4 @@
-import { handleDataTableError } from '../../../../api/errorHandler.js';
+import { handleApiError } from '../../../../api/errorHandler.js';
 import { DATATABLE_SELECTORS } from '../../../../constants/selectors.js';
 import { mergeMainTableColumnDefs } from '../responsive/columnDefs.js';
 import { renderResponsiveDetails } from '../responsive/detailsRenderer.js';
@@ -10,15 +10,48 @@ import {
     initDataTableMdbComponents
 } from './tableLifecycle.js';
 
-const getAjaxDataSource = (ajax) => ajax ? async (data, callback) => {
-    try {
-        const response = await ajax.get(data);
-        callback(response.data);
-    } catch (error) {
-        handleDataTableError(error);
-        callback({ data: [], recordsTotal: 0, recordsFiltered: 0 });
-    }
-} : undefined;
+const MAX_AJAX_ATTEMPTS = 2;
+const AJAX_RETRY_DELAY_MS = 500;
+const RETRYABLE_HTTP_STATUSES = new Set([0, 408, 502, 503, 504]);
+
+const getAjaxDataSource = (ajax) => {
+    if (!ajax) return undefined;
+
+    let latestRequest = 0;
+
+    return async (data, callback, settings) => {
+        const request = ++latestRequest;
+
+        for (let attempt = 1; attempt <= MAX_AJAX_ATTEMPTS; attempt++) {
+            if (request !== latestRequest || settings?.bDestroying) return;
+
+            let response;
+
+            try {
+                response = await ajax.get(data);
+            } catch (error) {
+                if (request !== latestRequest || settings?.bDestroying) return;
+
+                // Sólo las lecturas con fallos transitorios se reintentan; un 500 se informa de inmediato.
+                const canRetry = attempt < MAX_AJAX_ATTEMPTS && RETRYABLE_HTTP_STATUSES.has(error.status);
+
+                if (canRetry) {
+                    await new Promise(resolve => setTimeout(resolve, AJAX_RETRY_DELAY_MS));
+                    continue;
+                }
+
+                handleApiError({ err: error });
+                callback({ draw: data.draw, data: [], recordsTotal: 0, recordsFiltered: 0 });
+                return;
+            }
+
+            if (request !== latestRequest || settings?.bDestroying) return;
+
+            callback(response.data);
+            return;
+        }
+    };
+};
 
 export const createDataTable = ({ selector = DATATABLE_SELECTORS.MAIN, options = {} }) => {
     const {

@@ -15,7 +15,7 @@ import {
     wasteValidation
 } from '../../../validators/forms/wasteValidations.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 const router = express.Router();
 

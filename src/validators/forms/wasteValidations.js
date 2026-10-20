@@ -1,9 +1,10 @@
+import { FORM_FIELD_LIMITS, MONEY_INPUT_FORMAT } from '../../shared/constants/inputValidation.js';
 import { body } from 'express-validator';
 import { errorMap } from '../../messages/codeMessages.js';
 import {
     validateWeightCapture,
-    validateName,
-    validateNonNegativeNumber,
+    validateText,
+    validateNumber,
     validatePositiveNumber,
     validatePositiveNumberOptional,
     validateUUID
@@ -14,13 +15,13 @@ import {
     WASTE_IMMUTABLE_FIELDS,
     WASTE_ROLL_WEIGHT_FIELDS,
     WASTE_SAMPLE_FIELDS
-} from '../../public/js/constants/inventory.js';
+} from '../../shared/constants/inventory.js';
 
 const hasRollWeightCapture = data => WASTE_ROLL_WEIGHT_FIELDS
     .some(field => data[field] !== undefined && data[field] !== null && data[field] !== '');
 
 export const wasteStockAdjustmentValidation = [
-    validateNonNegativeNumber('newStock'),
+    validateNumber('newStock'),
     createInventoryObservationsValidation(),
     validateUUID('reasonId'),
     validateRecordVersion()
@@ -34,12 +35,12 @@ export const wasteStockAdditionValidation = [
 
 const wasteSecondaryDataValidation = [
     ...createInventoryStateValidation(),
-    validateNonNegativeNumber('maxUnitCost')
+    validateNumber('maxUnitCost', { format: MONEY_INPUT_FORMAT })
 ];
 
 export const wasteEditValidation = [
     ...WASTE_IMMUTABLE_FIELDS.map(field => body(field).not().exists({ values: 'undefined' }).withMessage(errorMap.weightKg.READ_ONLY)),
-    validateName({ maxLength: 200 }),
+    validateText({ fieldName: 'name', maxLength: FORM_FIELD_LIMITS.MATERIAL_NAME }),
     ...wasteSecondaryDataValidation,
     validateRecordVersion()
 ];
@@ -53,12 +54,12 @@ export const wasteValidation = [
         totalFieldName: fieldName === 'referenceRollTotalWeightKg' ? fieldName : 'totalWeightKg',
         requiredWhen: hasRollWeightCapture
     })),
-    validateName({ maxLength: 200 }),
+    validateText({ fieldName: 'name', maxLength: FORM_FIELD_LIMITS.MATERIAL_NAME }),
     validateUUID('materialId'),
     validateUUID('supplierId'),
     validatePositiveNumberOptional('base'),
     validatePositiveNumberOptional('height'),
     ...wasteSecondaryDataValidation,
-    validateNonNegativeNumber('initialQuantity'),
+    validateNumber('initialQuantity'),
     createInventoryObservationsValidation()
 ];

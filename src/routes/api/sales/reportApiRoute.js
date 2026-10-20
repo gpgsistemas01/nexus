@@ -1,7 +1,7 @@
 import express from 'express';
 import { exportClientReport } from '../../../controllers/api/sales/reportController.js';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 const router = express.Router();
 

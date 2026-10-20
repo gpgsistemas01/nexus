@@ -67,7 +67,8 @@ sequenceDiagram
 
     Browser->>Router: POST /api/auth/login { name, password }
     Router->>ValidationRules: loginValidation[] — cadena ejecutada por Express
-    Router->>Validator: validateLogin(req, res, next)
+    Note over ValidationRules: Presencia, texto y máximo de 50, recortar sólo name, conservar password
+    Router->>Validator: validate(req, res, next)
     alt loginValidation rechaza name/password
         Validator-->>Browser: HTTP 400 error { errors }
     else Entrada aceptada
@@ -84,7 +85,7 @@ sequenceDiagram
         Password-->>User: verifyPassword(): Promise[boolean]
         User-->>Service: getUserIdByLogin(): Promise[number | null]
         alt Credenciales inválidas o cuenta inactiva
-            Service-->>Controller: INVALID_AUTH sin crear tokens ni cookies
+            Service-->>Controller: LOGIN_ERROR sin crear tokens ni cookies
             Controller-->>Browser: HTTP 401 { code, message }
         else Credenciales válidas
             Service->>Token: generateAccessToken(tokenDto)

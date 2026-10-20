@@ -1,7 +1,6 @@
 import { getCatalogEntries } from '../../../../application/admin/catalogs/catalogs.js';
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
-import { openCatalogModal } from '../../../../pages/admin/catalogs/catalogModal.js';
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { buildMdbEditActionButton } from '../../../mdb/actionButton.js';
 import { getResponsiveRowData } from '../../core/responsive/rowData.js';
@@ -13,7 +12,7 @@ const createButtonLabel = page.dataset.createButtonLabel;
 const fields = new Set(page.dataset.fields.split(','));
 const selector = '#table';
 
-export const createCatalogDatatable = () => {
+export const createCatalogDatatable = ({ onOpen }) => {
     const table = createDataTable({
         selector,
         options: {
@@ -40,7 +39,7 @@ export const createCatalogDatatable = () => {
             searchPlaceholder: 'Buscar por nombre',
             buttons: [{
                 text: createButtonLabel,
-                action: () => openCatalogModal({
+                action: () => onOpen({
                     catalog,
                     entityLabel,
                     mode: FORM_MODES.CREATE
@@ -50,7 +49,7 @@ export const createCatalogDatatable = () => {
     });
 
     $(`${ selector } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit', function () {
-        openCatalogModal({
+        onOpen({
             catalog,
             entityLabel,
             mode: FORM_MODES.EDIT,

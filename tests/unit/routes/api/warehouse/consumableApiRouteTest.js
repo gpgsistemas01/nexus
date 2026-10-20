@@ -40,7 +40,7 @@ vi.mock('../../../../../src/validators/forms/materialValidations.js', () => ({
   consumableValidation
 }));
 
-const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../src/shared/constants/permissions.js');
 const { default: consumableApiRoutes } = await import('../../../../../src/routes/api/warehouse/consumableApiRoute.js');
 
 describe('consumableApiRoute', () => {

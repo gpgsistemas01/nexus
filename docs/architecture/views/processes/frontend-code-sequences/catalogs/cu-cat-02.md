@@ -90,29 +90,31 @@ flowchart TB
         FileSuppliers["suppliers.js"]
         Request["supplierService.js"]
     end
+    Application -->|import| FileResponseUtils
     FileErrorHandler -->|import| FileApiMessages
-    FileUtils -->|import| FileApiMessages
-    FileSuppliers -->|import| Request
-    FileSuppliers -->|import| Application
+    FileErrorHandler -->|import| FileSwalComponent
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileBaseValidations
     FileGoodsReceiptModal -->|import| FileErrorHandler
-    FileGoodsReceiptModal -->|import| FormUtils
     FileGoodsReceiptModal -->|import| FileModalUI
     FileGoodsReceiptModal -->|import| FileSwalComponent
-    View -->|import| FileSuppliers
-    View -->|import| FileValidators
-    Modal -->|import| FileModalUI
+    FileResponseUtils -->|import| FileApiMessages
+    FileSuppliers -->|import| Application
+    FileSuppliers -->|import| Request
     FileSuppliersPage -->|import| Origin
     FileSuppliersPage -->|import| View
-    Origin -->|import| FileSuppliers
-    Select -->|import| FileSuppliers
-    FormUtils -->|import| FileApiMessages
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
-    FileFieldValidations -->|import| FileBaseValidations
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    Modal -->|import| FileModalUI
+    Origin -->|import| FileSuppliers
+    Select -->|import| FileSuppliers
     Transport -->|import| FileSupplierController
+    View -->|import| FileSuppliers
+    View -->|import| FileValidators
+    FileSuppliersPage -->|import| Modal
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación
@@ -142,13 +144,13 @@ sequenceDiagram
     Initiator->>Browser: inicia CU-CAT-02 — Crear proveedor
     alt Sistemas inicia desde el listado independiente
         Browser->>Origin: seleccionar Nuevo proveedor
-        Origin->>Modal: openSupplierModal({ mode: create })
+        Origin->>Modal: onOpen → openSupplierModal({ mode: create })
     else Almacén inicia desde una compra autorizada
         Browser->>Select: escribir proveedor inexistente y seleccionar Nuevo proveedor
         Select->>SelectBase: runAfterSelect2Close({ selector: supplierSelector, action })
         SelectBase-->>Select: runAfterSelect2Close(): void
         SelectBase-)Select: action() — callback definido en supplier.js
-        Select->>Modal: openSupplierModal({ data: { tradeName }, onSave })
+        Select->>Modal: onCreate → openSupplierModal({ data: { tradeName }, onSave })
     end
 ```
 
@@ -203,7 +205,6 @@ sequenceDiagram
     participant Select@{ "type": "boundary" } as supplier.js
     participant Form@{ "type": "control" } as formUI.js
     participant View@{ "type": "boundary" } as supplierForm.js
-    participant FormUtils@{ "type": "control" } as formUtils.js
     participant Application@{ "type": "control" } as createCrudApplication.js
 
     participant FileErrorHandler@{ "type": "control" } as errorHandler.js
@@ -211,21 +212,21 @@ sequenceDiagram
     participant FileSwalComponent@{ "type": "control" } as swalComponent.js
 
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update })
-        FormUtils->>Application: registerSupplier({ formData })
+        View->>Form: handleSubmit({ form, formData, create, update })
+        Form->>Application: registerSupplier({ formData })
         alt Alta resuelta
-            Application-->>FormUtils: registerSupplier(): Promise[{ message: string, data: Supplier }]
-            FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>View: handleSubmit(): Promise[Object] — entidad creada
+            Application-->>Form: registerSupplier(): Promise[{ message: string, data: Supplier }]
+            Form->>FileSwalComponent: notifications.showSuccess(response.message)
+            Note over Form: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+            Form-->>View: handleSubmit(): Promise[Object] — entidad creada
             opt form.onSave definido por el selector operativo
                 View->>Select: form.onSave(supplier)
                 Select->>Select: toggleSupplierOption({ selector: supplierSelector,<br/>id: supplier.id, name: supplier.tradeName })
                 Select-->>Browser: continuar en la compra sin abrir /proveedores
     end
         else Alta rechazada
-            Application-->>FormUtils: registerSupplier(): throw { status: number, data: Object | null, message: string, raw: Error }
-            FormUtils-->>View: error propagado por handleSubmit()
+            Application-->>Form: registerSupplier(): throw { status: number, data: Object | null, message: string, raw: Error }
+            Form-->>View: error propagado por handleSubmit()
             View-->>Form: error propagado por sendRequest()
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva los datos
     end

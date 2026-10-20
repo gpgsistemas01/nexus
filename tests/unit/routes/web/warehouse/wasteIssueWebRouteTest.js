@@ -20,7 +20,7 @@ vi.mock('../../../../../src/controllers/web/warehouse/wasteIssueController.js', 
   getWasteIssuesPage
 }));
 
-const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../src/shared/constants/permissions.js');
 const { default: wasteIssueWebRoutes } = await import('../../../../../src/routes/web/warehouse/wasteIssueWebRoute.js');
 
 describe('wasteIssueWebRoute', () => {

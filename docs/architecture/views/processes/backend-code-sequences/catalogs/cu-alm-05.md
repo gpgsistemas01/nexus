@@ -32,7 +32,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `FileDatabaseUrl` | control | [`databaseUrl.js`](../../../../../../src/lib/databaseUrl.js) |
 | `FilePrisma` | control | [`prisma.js`](../../../../../../src/lib/prisma.js) |
 | `FileMovementHelpers` | control | [`movementHelpers.js`](../../../../../../src/services/inventory/movementHelpers.js) |
-| `FileFormattersUtils` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
+| `FileFormattersUtils` | control | [`numberUtils.js`](../../../../../../src/shared/utils/numberUtils.js) |
 
 ## Composición de archivos
 
@@ -110,7 +110,7 @@ sequenceDiagram
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 
-    participant FileFormattersUtils@{ "type": "control" } as formattersUtils.js
+    participant FileFormattersUtils@{ "type": "control" } as numberUtils.js
     participant FileMovementHelpers@{ "type": "control" } as movementHelpers.js
 
     Controller->>StockDto: createMaterialDtoForStockUpdate(req.body)

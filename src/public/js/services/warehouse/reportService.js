@@ -1,6 +1,4 @@
 import { apiRequest } from "../axiosInstanceApi.js";
-export { exportGoodsIssueReportRequest } from './goodsIssues/goodsIssueService.js';
-export { exportGoodsReceiptReportRequest } from './goodsReceipts/goodsReceiptService.js';
 
 export const exportWarehouseReportRequest = async (params = {}) =>
     apiRequest({

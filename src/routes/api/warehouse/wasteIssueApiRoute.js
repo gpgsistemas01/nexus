@@ -8,7 +8,7 @@ import {
     registerWasteIssue,
     registerWasteIssueDetailReturn
 } from '../../../controllers/api/warehouse/wasteIssueController.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../middleware/authMiddleware.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 import {

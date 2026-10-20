@@ -74,20 +74,21 @@ flowchart TB
         App["consumables.js"]
         Request["consumableService.js"]
     end
-    FileErrorHandler -->|import| FileApiMessages
-    FileUtils -->|import| FileApiMessages
-    App -->|import| Request
     App -->|import| Factory
-    Form -->|import| App
-    Form -->|import| FileValidators
-    Form -->|import| FileMaterialFields
-    FormUtils -->|import| FileApiMessages
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    App -->|import| Request
+    Factory -->|import| FileResponseUtils
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    Form -->|import| App
+    Form -->|import| FileMaterialFields
+    Form -->|import| FileValidators
+    Form -->|import| FormUtils
     Transport -->|import| API
 ```
 
@@ -126,7 +127,6 @@ sequenceDiagram
     FormUtils-->>Form: validateFields(): Object
     Form-->>FormCore: getErrors(): Object
     FormCore->>FileFormErrorsUI: normalizeFormErrors({ form, errors })
-    FormCore->>FileFormErrorsUI: toggleErrorMessages(form, errors)
     FormCore->>FormUtils: hasValidationErrors(errors)
     FormUtils-->>FormCore: hasValidationErrors(): boolean
     alt Datos inválidos
@@ -150,26 +150,25 @@ sequenceDiagram
     autonumber
     participant FormCore@{ "type": "control" } as formUI.js
     participant Form@{ "type": "boundary" } as materialForm.js
-    participant FormUtils@{ "type": "control" } as formUtils.js
     participant Factory@{ "type": "control" } as createCrudApplication.js
     participant FileErrorHandler@{ "type": "control" } as errorHandler.js
 
     participant FileSwalComponent@{ "type": "control" } as swalComponent.js
 
     FormCore->>Form: sendRequest({ form, formData })
-    Form->>FormUtils: handleSubmit({ form, formData, update: editConsumableStock })
-    FormUtils->>Factory: editConsumableStock({ formData, id: form.dataset.id })
+    Form->>FormCore: handleSubmit({ form, formData, update: editConsumableStock })
+    FormCore->>Factory: editConsumableStock({ formData, id: form.dataset.id })
     alt Mutación aceptada
-        Factory-->>FormUtils: editConsumableStock(): Promise[{ message }]
-        FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-        Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-        FormUtils-->>Form: handleSubmit(): Promise[undefined]
+        Factory-->>FormCore: editConsumableStock(): Promise[{ message }]
+        FormCore->>FileSwalComponent: notifications.showSuccess(response.message)
+        Note over FormCore: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+        FormCore-->>Form: handleSubmit(): Promise[undefined]
         Form->>Form: form.onSave?.(undefined) — callback opcional
     else Error HTTP o de dominio
-        Factory-->>FormUtils: error propagado
-        FormUtils-->>Form: error propagado por handleSubmit()
+        Factory-->>FormCore: error propagado
+        FormCore-->>Form: error propagado por handleSubmit()
         Form-->>FormCore: error propagado por sendRequest()
-        FormCore->>FileErrorHandler: handleApiError({ err, form, normalizeServerErrors })
+        FormCore->>FileErrorHandler: handleApiError({ err, form })
     end
 ```
 

@@ -1,18 +1,22 @@
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { getSelectedOptionText, scopeSelectors } from '../../../utils/domUtils.js';
-import { isInternalClientName, resolveAdvisorDepartmentByClientName, resolveProjectNumberByClientAndDepartment } from '../../../application/warehouse/issues/issueHeaderRules.js';
+import {
+    isInternalClientName,
+    resolveAdvisorDepartmentByClientName,
+    resolveProjectNumberByClientAndDepartment
+} from '../../../application/warehouse/issues/issueHeaderRules.js';
 import { bindDisabledSelectDependency } from '../baseSelect.js';
 import { setupClientSelect, toggleClientOption } from '../domains/client.js';
 import { initDepartmentSelect, toggleDepartmentOption } from '../domains/department.js';
 import { initPersonSelect, togglePersonOption } from '../domains/person.js';
 import { initMdbWrapperInput, updateMdbWrapperInput } from '../../mdb/baseInstance.js';
-import { toggleDisabledElement } from '../../../utils/formUtils.js';
+import { toggleDisabledElement } from '../../../ui/forms/formStateUI.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
-import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
+import { hasPermission, PERMISSIONS } from '../../../../../shared/constants/permissions.js';
 
 const EDITABLE_MODES = [FORM_MODES.CREATE, FORM_MODES.EDIT, FORM_MODES.EDIT_HEADER];
 
-export const createIssueHeaderSelects = ({ modalSelector, formSelector, selectors }) => {
+export const createIssueHeaderSelects = ({ modalSelector, formSelector, selectors, onCreateClient }) => {
 
     const scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
     const canEdit = () => EDITABLE_MODES.includes(document.querySelector(formSelector)?.dataset.mode);
@@ -31,21 +35,22 @@ export const createIssueHeaderSelects = ({ modalSelector, formSelector, selector
     const init = () => {
 
         [
-            [initDepartmentSelect, { 
-                modalSelector, 
-                baseSelector: scoped.department, 
-                allowCreate: false 
+            [initDepartmentSelect, {
+                modalSelector,
+                baseSelector: scoped.department,
+                allowCreate: false
             }],
-            [setupClientSelect, { 
-                modalSelector, 
+            [setupClientSelect, {
+                modalSelector,
                 clientSelector: selectors.client,
-                allowCreate: hasPermission(window.meta, UI_PERMISSIONS.CLIENTS_CREATE)
+                onCreate: onCreateClient,
+                allowCreate: hasPermission(window.meta, PERMISSIONS.CLIENTS_CREATE)
             }],
-            [initPersonSelect, { 
-                modalSelector, 
-                baseSelector: scoped.advisor, 
-                placeholder: 'Buscar asesor...', 
-                allowCreate: hasPermission(window.meta, UI_PERMISSIONS.PERSONS_WRITE),
+            [initPersonSelect, {
+                modalSelector,
+                baseSelector: scoped.advisor,
+                placeholder: 'Buscar asesor...',
+                allowCreate: hasPermission(window.meta, PERMISSIONS.PERSONS_WRITE),
                 data: params => {
 
                     const clientName = getSelectedOptionText(scoped.client);

@@ -20,7 +20,7 @@ vi.mock('../../../../../src/controllers/web/warehouse/consumableController.js', 
   getConsumablesPage
 }));
 
-const { PERMISSIONS } = await import('../../../../../src/constants/permissions.js');
+const { PERMISSIONS } = await import('../../../../../src/shared/constants/permissions.js');
 const { default: consumableWebRoutes } = await import('../../../../../src/routes/web/warehouse/consumableWebRoute.js');
 
 describe('consumableWebRoute', () => {

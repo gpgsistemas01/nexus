@@ -20,7 +20,7 @@ recibe su propia clave y casos negativos de autorización.
 
 Las respuestas de salidas de material y de merma se consideran objetos de solo
 lectura. Antes de mostrarlas, el adaptador compartido de
-`warehouseInventoryUtils.js` identifica si cada detalle contiene `materialId` o
+`application/warehouse/issues/issueDetails.js` identifica si cada detalle contiene `materialId` o
 `wasteId`, crea una fila nueva y conserva por separado el identificador del detalle
 documental y el del material o merma. El primer identificador se usa al surtir o
 devolver; el segundo,
@@ -40,7 +40,7 @@ aplanados), en lugar de repetir navegación opcional dentro del formateador.
 cada etapa** entre la respuesta HTTP, la tabla y los requests de una salida. Su alcance
 es sólo la adaptación en el navegador; complementa el contrato OpenAPI y el
 diagrama ER. La fuente de verdad son los DTO de salidas y los adaptadores de
-`warehouseInventoryUtils.js`; `issueFormUI.js` conserva únicamente coordinación visual.
+`application/warehouse/issues/issueDetails.js`; `issueFormUI.js` conserva únicamente coordinación visual.
 
 ```mermaid
 flowchart TB

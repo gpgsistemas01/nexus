@@ -76,20 +76,21 @@ flowchart TB
         Application["createCrudApplication.js"]
         Request["catalogService.js"]
     end
-    FileErrorHandler -->|import| FileApiMessages
-    FileUtils -->|import| FileApiMessages
-    FileCatalogs -->|import| Request
+    Application -->|import| FileResponseUtils
     FileCatalogs -->|import| Application
-    View -->|import| FileCatalogs
-    View -->|import| FileValidators
-    FormUtils -->|import| FileApiMessages
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileCatalogs -->|import| Request
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
     Transport -->|import| FileCatalogController
+    View -->|import| FileCatalogs
+    View -->|import| FileValidators
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación
@@ -142,7 +143,7 @@ sequenceDiagram
         end
         Note over Form: Marca dataset.submitting y deshabilita submit antes del callback
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update })
+        View->>Form: handleSubmit({ form, formData, create, update })
         FormUtils->>View: update({ formData, id }) — callback definido en catalogForm.js
         View->>Application: editCatalogEntry({ catalog, id, formData })
         activate Application
@@ -150,13 +151,13 @@ sequenceDiagram
             Application-->>View: editCatalogEntry(): Promise[{ message: string, data: Object }]
             View-->>FormUtils: update(): Promise[{ message: string, data: Object }]
             FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
+            Note over Form: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+            Form-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
             View-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
             Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
             View-->>FormUtils: error propagado por callback
-            FormUtils-->>View: error propagado por handleSubmit()
+            Form-->>View: error propagado por handleSubmit()
             View-->>Form: error propagado por sendRequest()
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva los datos
         end

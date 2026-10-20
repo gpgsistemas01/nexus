@@ -10,6 +10,8 @@ flowchart TB
     A["application<br/>persons.js"]
     R["services HTTP<br/>personService.js"]
     T["DataTable del recurso<br/>personDatatable.js"]
+    D["Tabla de accesos<br/>personAccessDatatable.js"]
+    P --> D
     U["Composición compartida<br/>createCrudApplication.js<br/>formErrorsUI.js<br/>y colaboradores"]
     H["axiosInstanceApi.js<br/>request / apiRequest"]
     A --> R
@@ -29,6 +31,7 @@ flowchart TB
 | application · persons.js | `src/public/js/application/admin/persons/`<br/>`persons.js` |
 | services HTTP · personService.js | `src/public/js/services/admin/`<br/>`personService.js` |
 | DataTable del recurso · personDatatable.js | `src/public/js/plugins/datatable/admin/`<br/>`persons/personDatatable.js` |
+| Tabla de accesos | `src/public/js/plugins/datatable/admin/persons/personAccessDatatable.js` |
 | Composición compartida · createCrudApplication.js · formErrorsUI.js · y colaboradores | `src/public/js/application/`<br/>`createCrudApplication.js`<br/>`src/public/js/ui/forms/formErrorsUI.js`<br/>`src/public/js/ui/forms/formStateUI.js`<br/>`src/public/js/ui/forms/formUI.js`<br/>`src/public/js/ui/modalUI.js`<br/>`src/public/js/ui/tableUI.js` |
 | axiosInstanceApi.js · request / apiRequest | `src/public/js/services/axiosInstanceApi.js` |
 
@@ -71,3 +74,11 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/frontend-code-sequences/index.md).
 
+`personAccessDatatable.js` conserva el arreglo de accesos y la tabla del formulario. `personForm.js` y `personModal.js` lo consumen directamente; el listado principal puede abrir el modal sin que éste importe de vuelta `personDatatable.js`. La separación rompe el ciclo entre archivos sin duplicar el estado.
+
+La tabla EJS `personAccessesTable`, sus columnas Área/Rol/Acciones y las operaciones
+`initPersonAccessTable`, `refreshPersonAccessTable` y eliminación de filas permanecen.
+El cambio traslada el bloque completo a su propietario; no elimina accesos ni cambia
+endpoints. La captura exige filas completas y UUID v4, y rechaza áreas repetidas en
+ambas capas. La prueba del plugin verifica carga, retiro y reinicio de sus datos con
+dobles de DataTable; no sustituye una comprobación visual en navegador.

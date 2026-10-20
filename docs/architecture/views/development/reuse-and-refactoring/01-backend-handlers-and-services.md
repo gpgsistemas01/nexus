@@ -87,6 +87,30 @@ transacciones: ese límite pertenece al servicio coordinador. La publicación de
 de la operación; no se atribuye un evento ni un `userId` común a todos los handlers.
 Las firmas exactas y los endpoints están en el código y el contrato OpenAPI.
 
+## Validadores comunes y condiciones de captura
+
+`fieldsValidator.js` conserva una implementación por comprobación. `validateText`
+atiende texto obligatorio/opcional, patrón y límite fijo o resuelto desde la petición;
+`validateBoolean` y `validateNumber` también admiten `condition(value, { req })`.
+La condición usa la firma nativa de `.if()` y se evalúa antes de validar o sanitizar.
+Los nombres de persona sólo cambian el patrón del texto, y las variantes numéricas
+positivas/opcionales configuran el mismo comprobador de tipo, rango y precisión.
+
+La conversión pertenece al validador: después de verificar el formato original,
+entrega números, booleanos y fechas al controller, también dentro de las listas de
+detalles. Los DTOs conservan esos tipos y su lista de campos permitidos; no vuelven
+a ejecutar `Number`, `Boolean` o `new Date`. Cantidades/medidas usan dos decimales,
+costos usan seis y el stock mínimo conserva doce enteros con dos decimales. La
+variante positiva rechaza cero; el comprobador numérico normal admite cero y rechaza
+negativos. El opcional distingue ausencia de cero y no convierte un vacío en saldo.
+
+La composición del formulario decide cuándo se necesita cada regla. En compras,
+alta y edición comparten encabezado, UUID y comprobación de partidas; sólo la edición
+permite omitirlas. En materiales/consumibles, omitir costo y stock inicial por
+`creationContext='goodsReceipt'` corresponde únicamente al alta: no exime el costo
+de edición ni el saldo de ajuste. Reutilizar el campo no copia la excepción a otra
+operación. No se agregan consultas de BD ni un motor de validación adicional.
+
 ## Reutilización adicional de servicios por tipo
 
 `services/warehouse/consumables/consumableService.js` reutiliza las operaciones de

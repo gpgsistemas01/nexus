@@ -1,6 +1,11 @@
 import { updateGoodsIssueDetails } from '../goodsIssueDetailService.js';
-import { MATERIAL_TYPES } from '../../../../constants/inventory.js';
-import { createGoodsIssue, findAllGoodsIssues, updateGoodsIssue, updateGoodsIssueHeader } from '../goodsIssueService.js';
+import { MATERIAL_TYPES } from '../../../../shared/constants/inventory.js';
+import {
+    createGoodsIssue,
+    findAllGoodsIssues,
+    updateGoodsIssue,
+    updateGoodsIssueHeader
+} from '../goodsIssueService.js';
 import { returnGoodsIssueDetail } from '../detailReturns/goodsIssueReturnService.js';
 import { findGoodsIssueReportRows } from '../../reportService.js';
 

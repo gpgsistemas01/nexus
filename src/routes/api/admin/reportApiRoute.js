@@ -1,7 +1,13 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from "../../../middleware/authMiddleware.js";
-import { exportMovementReport, exportConsumableMovementReport, exportPersonReport, exportUserReport, exportWasteMovementReport } from '../../../controllers/api/admin/reportController.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import {
+    exportMovementReport,
+    exportConsumableMovementReport,
+    exportPersonReport,
+    exportUserReport,
+    exportWasteMovementReport
+} from '../../../controllers/api/admin/reportController.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 const router = express.Router();
 
@@ -11,7 +17,6 @@ router.get(
     authorizeUserApi(PERMISSIONS.ADMIN_REPORTS_READ),
     exportConsumableMovementReport
 );
-
 
 router.get(
     '/movements/materials/excel',

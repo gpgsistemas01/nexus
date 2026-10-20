@@ -1,8 +1,9 @@
-import { WASTE_OPERATION_ACTIONS } from '../../../constants/inventory.js';
+import { WASTE_OPERATION_ACTIONS } from '../../../../../shared/constants/inventory.js';
 import { addWasteStock } from '../../../application/warehouse/wastes/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { useForm } from '../../../ui/forms/formUI.js';
-import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
+import { pickFormFields, validateFields } from '../../../utils/formUtils.js';
+
 import { wasteStockAdditionValidation } from '../../../utils/validations/validators.js';
 import { wasteStockAdditionFields } from './wasteFields.js';
 

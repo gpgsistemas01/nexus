@@ -1,8 +1,19 @@
-import { createMonthlyGoodsReceiptSummary, createWasteReportSummary, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
+import {
+    buildInventoryReportData,
+    buildIssueReportData,
+    buildGoodsReceiptReportData,
+    buildWasteReportData
+} from '../../../utils/reports/warehouseReportExcel.js';
+import {
+    findSupplierReportRows,
+    findWarehouseReportRows,
+    findWasteIssueReportRows,
+    findWasteReportRows
+} from '../../../services/warehouse/reportService.js';
 import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
-import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
-import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
-import { MATERIAL_TYPES } from '../../../constants/inventory.js';
+import { getReportMonthDateRange } from '../../../utils/formattersUtils.js';
+import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 
 const SHEET_NAME = 'Inventario';
 const FILENAME = 'reporte_inventario_materiales';
@@ -15,33 +26,7 @@ const SUPPLIER_SHEET_NAME = 'Proveedores';
 const SUPPLIER_FILENAME = 'reporte_proveedores';
 const WASTE_SHEET_NAME = 'Mermas';
 const WASTE_FILENAME = 'reporte_mermas';
-const createColumnTotalFormula = (column, firstRow, rowCount, value) => createFormulaCell(
-    rowCount ? `SUM(${ column }${ firstRow }:${ column }${ firstRow + rowCount - 1 })` : '0',
-    value
-);
 const ISSUE_REPORT_COLUMNS = ['referenceNumber', 'requestDate', 'departmentName', 'projectNumber', 'clientName', null, null];
-const ISSUE_REPORT_HEADERS = [
-    'Folio',
-    'Fecha de solicitud',
-    'Área',
-    'Solicitante',
-    'Cliente',
-    'Proyecto',
-    'Estado de surtido',
-    'Material',
-    'Proveedor',
-    'Base',
-    'Altura',
-    'Cantidad solicitada',
-    'Cantidad surtida',
-    'Presentación',
-    'Cantidad convertida',
-    'Unidad de conversión',
-    'Cantidad de proyecto',
-    'Diferencia',
-    'Estado del detalle'
-];
-
 const buildIssueReportQuery = (req) => {
     const { orderBy, orderDir } = getDataTableOrder({
         query: req.query,
@@ -65,35 +50,6 @@ const buildIssueReportQuery = (req) => {
     };
 };
 
-const buildIssueReportData = async function* (rows, { baseHeader = 'Base', heightHeader = 'Altura' } = {}) {
-    let index = 0;
-    yield ISSUE_REPORT_HEADERS.map(header => ({ Base: baseHeader, Altura: heightHeader })[header] || header);
-    for await (const row of rows) {
-        yield [
-            row.referenceNumber,
-            row.requestDate,
-            row.departmentName,
-            row.requesterName,
-            row.clientName,
-            row.projectNumber,
-            row.fulfillmentStatusName,
-            row.materialName,
-            row.supplierName,
-            row.materialBase,
-            row.materialHeight,
-            row.requestedQuantity,
-            row.suppliedQuantity,
-            row.presentationName,
-            row.convertedQuantity,
-            row.convertedUnitMeasureName,
-            row.projectConvertedQuantity,
-            createFormulaCell(`O${ index + 2 }-Q${ index + 2 }`, row.convertedQuantityDifference),
-            row.detailFulfillmentStatusName
-        ];
-        index++;
-    }
-};
-
 export const exportWarehouseReportExcel = async (req, res) => {
 
     const columns = ['name', 'base', 'height', null, 'minStock', null, null, null, null, null];
@@ -110,37 +66,9 @@ export const exportWarehouseReportExcel = async (req, res) => {
         orderDir
     });
 
-    const data = async function* () {
-        yield [
-            'Proveedor',
-            'Material',
-            'Base',
-            'Altura',
-            'Stock actual',
-            'Stock mínimo',
-            'Presentación',
-            'Conversión',
-            'Unidad',
-            'Costo unitario'
-        ];
-
-        for await (const row of rows) yield [
-            row.supplier,
-            row.name,
-            row.base,
-            row.height,
-            row.currentStock,
-            row.minStock,
-            row.presentation,
-            row.convertedQuantity,
-            row.unitMeasure,
-            row.maxUnitCost
-        ];
-    };
-
     return sendExcelReport({
         res,
-        data: data(),
+        data: buildInventoryReportData(rows),
         sheetName: SHEET_NAME,
         filename: FILENAME
     });
@@ -186,7 +114,6 @@ export const exportGoodsReceiptReportExcel = async ({ req, res, materialType, fi
     const monthlyReport = isMonthlyReportQuery(req.query);
     const monthDateRange = monthlyReport ? getReportMonthDateRange(req.query.reportMonth) : {};
     const isConsumableReport = materialType === MATERIAL_TYPES.CONSUMABLE;
-    const inventoryLabel = isConsumableReport ? 'Consumible' : 'Material';
 
     const rows = await findGoodsReceiptReportRows({
         search: monthlyReport ? '' : getDataTableSearch(req.query),
@@ -198,105 +125,9 @@ export const exportGoodsReceiptReportExcel = async ({ req, res, materialType, fi
         orderDir
     });
 
-    const data = async function* () {
-        const summary = createMonthlyGoodsReceiptSummary();
-        let index = 0;
-        yield [
-            'Folio',
-            'Fecha de recepción',
-            'Recibió',
-            'Proveedor',
-            'N° Factura',
-            inventoryLabel,
-            'Base',
-            'Altura',
-            'Cantidad de compra',
-            'Presentación',
-            'Cantidad convertida',
-            'Unidad de conversión',
-            'Costo unitario de conversión',
-            'Costo por presentación',
-            'Monto s/ IVA',
-            'Monto c/ IVA'
-        ];
-        for await (const row of rows) {
-            summary.add(row);
-            const excelRow = index++ + 2;
-            yield [
-                row.referenceNumber,
-                row.receptionDate,
-                row.receivedByName,
-                row.supplierName,
-                row.invoice,
-                row.materialName,
-                row.materialBase,
-                row.materialHeight,
-                row.quantity,
-                row.presentationName,
-                row.convertedQuantity,
-                row.unitMeasureName,
-                createFormulaCell(`IFERROR(O${ excelRow }/K${ excelRow },0)`, row.conversionUnitCost),
-                row.costPerUnitType,
-                createFormulaCell(`I${ excelRow }*N${ excelRow }`, row.netPurchaseAmount),
-                createFormulaCell(`O${ excelRow }*1.16`, row.grossPurchaseAmount)
-            ];
-        }
-
-        const { supplierRows, materialRows, supplierTotals, materialTotals } = summary.finish();
-        const summaryScope = monthlyReport ? 'mensual' : 'del reporte';
-        const supplierFirstRow = index + 5;
-        const supplierTotalRow = supplierFirstRow + supplierRows.length;
-        const materialFirstRow = supplierTotalRow + 4;
-
-        yield* [
-            [],
-            [`Resumen ${ summaryScope } por proveedor`],
-            ['Proveedor', 'Subtotal s/ IVA', 'IVA', 'Total c/ IVA', `% del subtotal ${ summaryScope }`],
-            ...supplierRows.map((row, index) => {
-                const excelRow = supplierFirstRow + index;
-
-                return [
-                    row.supplierName,
-                    row.netPurchaseAmount,
-                    createFormulaCell(`B${ excelRow }*0.16`, row.vatAmount),
-                    createFormulaCell(`B${ excelRow }+C${ excelRow }`, row.grossPurchaseAmount),
-                    createFormulaCell(`IFERROR(B${ excelRow }/B${ supplierTotalRow }*100,0)`, row.monthlyPercentage)
-                ];
-            }),
-            [
-                'Total',
-                supplierTotals.netPurchaseAmount,
-                createColumnTotalFormula('C', supplierFirstRow, supplierRows.length, supplierTotals.vatAmount),
-                createColumnTotalFormula('D', supplierFirstRow, supplierRows.length, supplierTotals.grossPurchaseAmount),
-                createColumnTotalFormula('E', supplierFirstRow, supplierRows.length, supplierTotals.monthlyPercentage)
-            ],
-            [],
-            [`Resumen ${ summaryScope } por ${ isConsumableReport ? 'consumible' : 'material' }`],
-            [inventoryLabel, 'Cantidad convertida', 'Costo unitario de conversión', 'Costo total s/ IVA', `Cantidad total de ${ isConsumableReport ? 'consumible' : 'material' }`],
-            ...materialRows.map((row, index) => {
-                const excelRow = materialFirstRow + index;
-
-                return [
-                    row.materialName,
-                    row.squareMeters,
-                    createFormulaCell(`IFERROR(D${ excelRow }/B${ excelRow },0)`, row.costPerSquareMeter),
-                    row.netPurchaseAmount,
-                    row.quantity
-                ];
-            }),
-            [
-                'Total',
-                materialTotals.squareMeters,
-                createColumnTotalFormula('C', materialFirstRow, materialRows.length, materialTotals.costPerSquareMeter),
-                materialTotals.netPurchaseAmount,
-                materialTotals.quantity
-            ]
-        ];
-    };
-
     return sendExcelReport({
         res,
-        data: data(),
+        data: buildGoodsReceiptReportData(rows, { isConsumableReport, monthlyReport }),
         sheetName: `${ GOODS_RECEIPT_SHEET_NAME } ${ isConsumableReport ? 'consumibles' : 'materiales' }`,
         filename: `${ GOODS_RECEIPT_FILENAME }_${ isConsumableReport ? 'consumibles' : 'materiales' }`
     });
@@ -317,51 +148,14 @@ export const exportWasteReportExcel = async (req, res) => {
         orderBy,
         orderDir
     });
-    const summary = createWasteReportSummary();
-    for await (const row of rows) summary.add(row);
-    const { rows: summaryRows, totals } = summary.finish();
-
-    const data = [
-        [
-            'Proveedor',
-            'Material',
-            'Ancho',
-            'Largo',
-            'Total de mermas',
-            'Total m²',
-            'Peso neto total de rollos (kg)'
-        ],
-
-        ...summaryRows.map(row => [
-            row.supplier,
-            row.name,
-            row.width,
-            row.length,
-            row.wasteQuantity,
-            row.squareMeters,
-            row.weightStatus === 'unknown' ? 'Sin peso capturado' : row.totalWeightKg
-        ]),
-        [
-            'Total',
-            '',
-            '',
-            '',
-            createColumnTotalFormula('E', 2, summaryRows.length, totals.wasteQuantity),
-            createColumnTotalFormula('F', 2, summaryRows.length, totals.squareMeters),
-            totals.weightStatus === 'unknown' ? 'Sin peso capturado' : totals.weightStatus === 'complete'
-                ? createColumnTotalFormula('G', 2, summaryRows.length, totals.totalWeightKg)
-                : null
-        ]
-    ];
 
     return sendExcelReport({
         res,
-        data,
+        data: await buildWasteReportData(rows),
         sheetName: WASTE_SHEET_NAME,
         filename: WASTE_FILENAME
     });
 };
-
 
 export const exportSupplierReportExcel = async (req, res) => {
 

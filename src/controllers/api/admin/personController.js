@@ -1,7 +1,7 @@
 import { createPersonDtoForEdit, createPersonDtoForRegister } from "../../../dtos/personDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { createPerson, findAllPersons, updatePerson } from "../../../services/admin/person/personService.js";
-import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 const allowedDepartments = ['ALMACÉN Y PROVEDURÍA', 'SISTEMAS'];

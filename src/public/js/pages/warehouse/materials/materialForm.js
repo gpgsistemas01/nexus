@@ -1,14 +1,27 @@
-import { useForm } from "../../../ui/forms/formUI.js";
-import { editMaterial, editMaterialStock, registerMaterial } from "../../../application/warehouse/materials/materials.js";
-import { editConsumable, editConsumableStock, registerConsumable } from '../../../application/warehouse/consumables/consumables.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
+import {
+    editMaterial,
+    editMaterialStock,
+    registerMaterial
+} from "../../../application/warehouse/materials/materials.js";
+import {
+    editConsumable,
+    editConsumableStock,
+    registerConsumable
+} from '../../../application/warehouse/consumables/consumables.js';
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 
-import { handleSubmit, pickFormFields, validateFields } from "../../../utils/formUtils.js";
-import { goodsReceiptMaterialCreateValidation, materialCreateValidation, materialEditValidation, materialStockValidation } from "../../../utils/validations/validators.js";
+import { pickFormFields, validateFields } from '../../../utils/formUtils.js';
+
+import {
+    goodsReceiptMaterialCreateValidation,
+    materialCreateValidation,
+    materialEditValidation,
+    materialStockValidation
+} from "../../../utils/validations/validators.js";
 import { materialCreateFields, materialSecondaryDataFields, materialStockRequestFields } from './materialFields.js';
 import { isEditMode, isStockMode } from '../../../constants/formModes.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
-
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
 
 const formId = FORM_SELECTORS.MATERIAL;
 const goodsReceiptCreationContext = 'goodsReceipt';
@@ -54,7 +67,7 @@ useForm({
         if (!isStockMode(form.dataset.mode)) {
 
             if (!formData.minStock) delete formData.minStock;
-            
+
             formData.isActive = document.querySelector(`${ formId } #isActiveInput`).checked;
         }
 

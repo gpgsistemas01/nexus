@@ -1,5 +1,10 @@
 import { WasteWeightInvalid, WasteDimensionsInvalid } from '../../../errors/warehouse/wasteError.js';
-import { calculateWasteNetWeight, calculateWasteRollLength, isRollPresentation, prepareWasteRollReference } from '../../../public/js/utils/warehouseInventoryUtils.js';
+import {
+    calculateWasteNetWeight,
+    calculateWasteRollLength,
+    isRollPresentation,
+    prepareWasteRollReference
+} from '../../../shared/inventory/wasteMeasurements.js';
 
 export const prepareWasteMeasurements = ({ wasteDto, offer }) => {
     const material = offer.material;

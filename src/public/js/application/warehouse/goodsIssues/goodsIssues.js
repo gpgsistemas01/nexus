@@ -1,14 +1,22 @@
 import { getGoodsIssueRequest } from '../../../services/warehouse/goodsIssues/goodsIssueService.js';
 import * as materialApplication from './materials/materialGoodsIssues.js';
 import * as consumableApplication from './consumables/consumableGoodsIssues.js';
-import { goodsIssueContext } from '../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
+import { exportMaterialGoodsIssueReportRequest } from '../../../services/warehouse/goodsIssues/materials/materialGoodsIssueService.js';
+import { exportConsumableGoodsIssueReportRequest } from '../../../services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
+import { createReportApplication } from '../../createReportApplication.js';
 
-const consumable = goodsIssueContext.resource === 'consumable';
-export const getAllGoodsIssues = consumable ? consumableApplication.getAllConsumableGoodsIssues : materialApplication.getAllMaterialGoodsIssues;
-export const registerGoodsIssue = consumable ? consumableApplication.registerConsumableGoodsIssue : materialApplication.registerMaterialGoodsIssue;
-export const editGoodsIssue = consumable ? consumableApplication.editConsumableGoodsIssue : materialApplication.editMaterialGoodsIssue;
-export const editGoodsIssueHeader = consumable ? consumableApplication.editConsumableGoodsIssueHeader : materialApplication.editMaterialGoodsIssueHeader;
-export const editGoodsIssueDetails = consumable ? consumableApplication.editConsumableGoodsIssueDetails : materialApplication.editMaterialGoodsIssueDetails;
-export const returnGoodsIssueDetail = consumable ? consumableApplication.returnConsumableGoodsIssueDetail : materialApplication.returnMaterialGoodsIssueDetail;
+export const createGoodsIssueApplication = ({ resource }) => {
+    const consumable = resource === INVENTORY_RESOURCES.CONSUMABLE;
 
-export const getGoodsIssue = async ({ id }) => (await getGoodsIssueRequest({ id })).data.goodsIssue;
+    return Object.freeze({
+        getAll: consumable ? consumableApplication.getAllConsumableGoodsIssues : materialApplication.getAllMaterialGoodsIssues,
+        register: consumable ? consumableApplication.registerConsumableGoodsIssue : materialApplication.registerMaterialGoodsIssue,
+        edit: consumable ? consumableApplication.editConsumableGoodsIssue : materialApplication.editMaterialGoodsIssue,
+        editHeader: consumable ? consumableApplication.editConsumableGoodsIssueHeader : materialApplication.editMaterialGoodsIssueHeader,
+        editDetails: consumable ? consumableApplication.editConsumableGoodsIssueDetails : materialApplication.editMaterialGoodsIssueDetails,
+        returnDetail: consumable ? consumableApplication.returnConsumableGoodsIssueDetail : materialApplication.returnMaterialGoodsIssueDetail,
+        get: async ({ id }) => (await getGoodsIssueRequest({ id, resource })).data.goodsIssue,
+        exportReport: createReportApplication(consumable ? exportConsumableGoodsIssueReportRequest : exportMaterialGoodsIssueReportRequest)
+    });
+};

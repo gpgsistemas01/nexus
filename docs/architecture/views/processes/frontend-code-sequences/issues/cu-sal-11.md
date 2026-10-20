@@ -20,6 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `Transport` | control | [`wasteIssueApiRoute.js`](../../../../../../src/routes/api/warehouse/wasteIssueApiRoute.js) |
 | `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
+| `FileErrorHandler` | control | [`errorHandler.js`](../../../../../../src/public/js/api/errorHandler.js) |
 | `FileResponseUtils` | control | [`responseUtils.js`](../../../../../../src/public/js/utils/responseUtils.js) |
 | `FileApiMessages` | control | [`apiMessages.js`](../../../../../../src/public/js/constants/apiMessages.js) |
 | `FileWasteIssueController` | control | [`wasteIssueController.js`](../../../../../../src/controllers/api/warehouse/wasteIssueController.js) |
@@ -62,22 +63,26 @@ flowchart TB
         FileApiMessages["apiMessages.js"]
         View["wasteIssueForm.js"]
         FormUtils["formUtils.js"]
+        FileErrorHandler["errorHandler.js"]
         FileResponseUtils["responseUtils.js"]
         FileBaseValidations["baseValidations.js"]
         FileFieldValidations["fieldValidations.js"]
         FileValidators["validators.js"]
     end
+    Application -->|import| FileResponseUtils
     FileCreateIssueApplication -->|import| Application
-    FileWasteIssues -->|import| Request
-    FileWasteIssues -->|import| FileCreateIssueApplication
-    View -->|import| FileWasteIssues
-    View -->|import| FileValidators
-    FormUtils -->|import| FileApiMessages
-    FileResponseUtils -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileApiMessages
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    FileWasteIssues -->|import| FileCreateIssueApplication
+    FileWasteIssues -->|import| Request
     Transport -->|import| FileWasteIssueController
+    View -->|import| FileValidators
+    View -->|import| FileWasteIssues
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación

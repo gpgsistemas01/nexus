@@ -20,6 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `Transport` | control | [`clientApiRoute.js`](../../../../../../src/routes/api/sales/clientApiRoute.js) |
 | `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
+| `FileErrorHandler` | control | [`errorHandler.js`](../../../../../../src/public/js/api/errorHandler.js) |
 | `FileResponseUtils` | control | [`responseUtils.js`](../../../../../../src/public/js/utils/responseUtils.js) |
 | `FileApiMessages` | control | [`apiMessages.js`](../../../../../../src/public/js/constants/apiMessages.js) |
 | `FileClientController` | control | [`clientController.js`](../../../../../../src/controllers/api/sales/clientController.js) |
@@ -56,6 +57,7 @@ flowchart TB
         FileUtils["utils.js"]
         FileApiMessages["apiMessages.js"]
         FormUtils["formUtils.js"]
+        FileErrorHandler["errorHandler.js"]
         FileResponseUtils["responseUtils.js"]
         FileBaseValidations["baseValidations.js"]
         FileFieldValidations["fieldValidations.js"]
@@ -66,12 +68,15 @@ flowchart TB
         FileClients["clients.js"]
         Request["clientService.js"]
     end
-    FileUtils -->|import| FileApiMessages
-    FileClients -->|import| Request
+    Application -->|import| FileResponseUtils
     FileClients -->|import| Application
-    FormUtils -->|import| FileApiMessages
-    FileResponseUtils -->|import| FileApiMessages
+    FileClients -->|import| Request
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
     Transport -->|import| FileClientController

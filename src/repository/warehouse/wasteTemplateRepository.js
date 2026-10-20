@@ -1,6 +1,6 @@
 import { Prisma } from '../../../generated/prisma/client.ts';
 import { getDb } from '../baseRepository.js';
-import { SQUARE_METER_UNIT_NAMES, SQUARE_METER_UNIT_SYMBOLS } from '../../public/js/constants/inventory.js';
+import { SQUARE_METER_UNIT_NAMES, SQUARE_METER_UNIT_SYMBOLS } from '../../shared/constants/inventory.js';
 
 export const findWasteTemplatePage = ({ supplierId, search, skip, take }) => getDb().$queryRaw(Prisma.sql`
     WITH candidates AS (

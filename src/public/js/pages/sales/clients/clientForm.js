@@ -1,6 +1,7 @@
-import { useForm } from "../../../ui/forms/formUI.js";
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
 import { editClient, registerClient } from "../../../application/sales/clients/clients.js";
-import { handleSubmit, validateFields } from "../../../utils/formUtils.js";
+import { validateFields } from '../../../utils/formUtils.js';
+
 import { clientValidation } from "../../../utils/validations/validators.js";
 import { FORM_SELECTORS } from "../../../constants/selectors.js";
 

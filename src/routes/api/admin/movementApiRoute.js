@@ -1,7 +1,11 @@
 import express from 'express';
 import { authorizeUserApi, verifyApiTokenRequired } from "../../../middleware/authMiddleware.js";
-import { getAllMaterialMovements, getAllConsumableMovements, getAllWasteMovements } from '../../../controllers/api/admin/movementController.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import {
+    getAllMaterialMovements,
+    getAllConsumableMovements,
+    getAllWasteMovements
+} from '../../../controllers/api/admin/movementController.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 
 const router = express.Router();
 

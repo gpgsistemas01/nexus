@@ -4,7 +4,8 @@ import { notifications } from '../../plugins/swal/swalComponent.js';
 import { clearFormErrors } from '../forms/formErrorsUI.js';
 import { resetFormSubmitState } from '../forms/formStateUI.js';
 import { setSummaryValue } from '../forms/totalsSummaryUI.js';
-import { formatDecimal, roundTo } from '../../utils/formatUtils.js';
+import { formatDecimal } from '../../utils/formatUtils.js';
+import { roundTo } from '../../../../shared/utils/numberUtils.js';
 import { validateFields } from '../../utils/formUtils.js';
 import { issueReturnValidation } from '../../utils/validations/validators.js';
 import { openModal } from '../modalUI.js';
@@ -15,7 +16,7 @@ export const createIssueReturn = ({ sendReturn }) => {
     const getModal = () => document.querySelector(modalSelector);
     const initialize = () => useForm({
         selector: formSelector,
-        normalizeData: ({ formData }) => ({ ...formData, returnQuantity: Number(formData.returnQuantity) }),
+        normalizeData: ({ formData }) => formData,
         getErrors: ({ form, formData }) => {
             const errors = validateFields(issueReturnValidation, formData);
             const available = Number(form.dataset.availableQuantity || 0);

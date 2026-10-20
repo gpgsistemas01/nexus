@@ -12,7 +12,7 @@ describe('goodsReceiptDTO', () => {
       receivedById: ' person-1 ',
       isInvoiced: true,
       invoice: ' fac-001 ',
-      receptionDate: '2026-08-06',
+      receptionDate: new Date('2026-08-06'),
       details: []
     };
 
@@ -25,10 +25,10 @@ describe('goodsReceiptDTO', () => {
       supplierId: ' supplier-1 ',
       receivedById: ' person-1 ',
       isInvoiced: false,
-      receptionDate: '2026-08-27',
+      receptionDate: new Date('2026-08-27'),
       details: [
-        { id: ' detail-1 ', materialId: ' material-1 ', quantity: '2', costPerUnitType: '10' },
-        { materialId: ' material-2 ', quantity: '3', costPerUnitType: '20' }
+        { id: ' detail-1 ', materialId: ' material-1 ', quantity: 2, costPerUnitType: 10 },
+        { materialId: ' material-2 ', quantity: 3, costPerUnitType: 20 }
       ]
     })).toEqual(expect.objectContaining({
       supplierId: 'supplier-1',
@@ -44,10 +44,10 @@ describe('goodsReceiptDTO', () => {
       supplierId: 'supplier-1',
       receivedById: 'person-1',
       isInvoiced: false,
-      receptionDate: '2026-08-28',
+      receptionDate: new Date('2026-08-28'),
       details: [
-        { materialId: 'material-1', quantity: '2', costPerUnitType: '10' },
-        { materialId: 'material-1', quantity: '3', costPerUnitType: '12.50' }
+        { materialId: 'material-1', quantity: 2, costPerUnitType: 10 },
+        { materialId: 'material-1', quantity: 3, costPerUnitType: 12.50 }
       ]
     });
 

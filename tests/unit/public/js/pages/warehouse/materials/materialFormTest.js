@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
 const state = vi.hoisted(() => ({ config: null }));
-vi.mock('../../../../../../../src/public/js/ui/forms/formUI.js', () => ({ useForm: config => { state.config = config; } }));
+vi.mock('../../../../../../../src/public/js/ui/forms/formUI.js', () => ({ handleSubmit: vi.fn(), useForm: config => { state.config = config; } }));
 vi.mock('../../../../../../../src/public/js/application/warehouse/materials/materials.js', () => ({ editMaterial: vi.fn(), editMaterialStock: vi.fn(), registerMaterial: vi.fn() }));
 vi.mock('../../../../../../../src/public/js/application/warehouse/consumables/consumables.js', () => ({ editConsumable: vi.fn(), editConsumableStock: vi.fn(), registerConsumable: vi.fn() }));
 vi.mock('../../../../../../../src/public/js/utils/formUtils.js', () => ({
-    handleSubmit: vi.fn(), validateFields: vi.fn(),
+    validateFields: vi.fn(),
     pickFormFields: (data, fields) => Object.fromEntries(fields.filter(field => field in data).map(field => [field, data[field]]))
 }));
 vi.stubGlobal('document', { querySelector: () => ({ checked: true }) });

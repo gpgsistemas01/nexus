@@ -1,5 +1,5 @@
 import express from 'express';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import {
     editConsumable,
     editConsumableStock,

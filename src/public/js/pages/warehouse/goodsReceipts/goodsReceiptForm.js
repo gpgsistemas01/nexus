@@ -1,8 +1,15 @@
-import { useForm } from '../../../ui/forms/formUI.js';
-import { editGoodsReceiptHeader, registerGoodsReceipt } from '../../../application/warehouse/goodsReceipts/goodsReceipts.js';
+import { normalizeInventorySelectRelations } from '../../../plugins/select2/inventorySelectData.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
+import { details, goodsReceiptContext } from './goodsReceiptContext.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
-import { BUTTON_SELECTORS, FORM_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from '../../../constants/selectors.js';
+import {
+    BUTTON_SELECTORS,
+    FORM_SELECTORS,
+    INPUT_SELECTORS,
+    MODAL_SELECTORS,
+    SELECT_SELECTORS
+} from '../../../constants/selectors.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
 import { GOODS_RECEIPT_SUPPLIER_CHANGED_EVENT } from '../../../plugins/select2/modules/goodsReceiptSelect.js';
 import { clearAddedMaterialInput } from '../../../ui/forms/detailFormUI.js';
@@ -10,10 +17,14 @@ import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
 import { updateTotals } from '../../../ui/forms/totalsSummaryUI.js';
 import { getNewDetails } from '../../../utils/detailCollectionUtils.js';
 import { on } from '../../../utils/domUtils.js';
-import { handleSubmit, hasValidationErrors, validateFields } from '../../../utils/formUtils.js';
-import { addGoodsReceiptMaterialValidation, goodsReceiptEditValidation, goodsReceiptValidation } from '../../../utils/validations/validators.js';
+import { hasValidationErrors, validateFields } from '../../../utils/formUtils.js';
+
+import {
+    addGoodsReceiptMaterialValidation,
+    goodsReceiptEditValidation,
+    goodsReceiptValidation
+} from '../../../utils/validations/validators.js';
 import { mapGoodsReceiptSelectionToDetail } from './goodsReceiptDetails.js';
-import { details } from '../../../plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js';
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
 const formId = FORM_SELECTORS.GOODS_RECEIPT;
@@ -29,12 +40,11 @@ const normalizeGoodsReceiptData = ({ form, formData }) => {
         formData.supplierId = form.elements.supplierId.value;
     }
 
-    return {
-        ...formData,
-        details: mode === FORM_MODES.EDIT
-            ? getNewDetails(details)
-            : details
-    };
+    const newDetails = mode === FORM_MODES.EDIT ? getNewDetails(details) : details;
+    if (mode === FORM_MODES.EDIT && !newDetails.length) delete formData.details;
+    else formData.details = newDetails;
+
+    return formData;
 };
 
 useForm({
@@ -51,8 +61,8 @@ useForm({
         await handleSubmit({
             form,
             formData,
-            create: registerGoodsReceipt,
-            update: editGoodsReceiptHeader
+            create: goodsReceiptContext.register,
+            update: goodsReceiptContext.editHeader
         });
     }
 });
@@ -68,12 +78,11 @@ const addGoodsReceiptMaterial = () => {
     const option = document.querySelector(`${ SELECT_SELECTORS.MATERIAL } option:checked`);
     if (!option) return;
 
-    const { material, supplier } = option.dataset;
-    const selectedMaterial = material ? JSON.parse(material) : {};
-    const materialId = selectedMaterial.id;
+    const optionData = normalizeInventorySelectRelations(option.dataset);
+    const materialId = optionData.material?.id;
 
-    const quantity = Number(document.querySelector(INPUT_SELECTORS.QUANTITY).value);
-    const costPerUnitType = Number(document.querySelector(INPUT_SELECTORS.COST_PER_UNIT).value);
+    const quantity = document.querySelector(INPUT_SELECTORS.QUANTITY).value;
+    const costPerUnitType = document.querySelector(INPUT_SELECTORS.COST_PER_UNIT).value;
     const errors = validateFields(addGoodsReceiptMaterialValidation, {
         materialId,
         quantity,
@@ -86,9 +95,9 @@ const addGoodsReceiptMaterial = () => {
 
     const newDetail = {
         ...mapGoodsReceiptSelectionToDetail({
-            optionData: { material, supplier },
-            quantity,
-            costPerUnitType
+            optionData,
+            quantity: Number(quantity),
+            costPerUnitType: Number(costPerUnitType)
         }),
         clientId: crypto.randomUUID()
     };
@@ -99,7 +108,7 @@ const addGoodsReceiptMaterial = () => {
     clearAddedMaterialInput();
 
     updateTotals({
-        quantity,
+        quantity: newDetail.quantity,
         net: newDetail.netPurchaseAmount,
         gross: newDetail.grossPurchaseAmount,
         operation: 'add'

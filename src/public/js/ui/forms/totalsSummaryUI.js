@@ -1,4 +1,5 @@
-import { formatCurrency, formatDecimal, roundTo } from "../../utils/formatUtils.js";
+import { formatCurrency, formatDecimal } from '../../utils/formatUtils.js';
+import { roundTo } from '../../../../shared/utils/numberUtils.js';
 
 const TOTAL_FIELDS = {
     quantity: '#totalQuantityDisplayValue',

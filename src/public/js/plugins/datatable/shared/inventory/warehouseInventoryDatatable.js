@@ -1,5 +1,16 @@
-import { formatCurrency, formatDecimal } from "../../../../utils/formatUtils.js";
-import { buildInventorySelectText, getBase, getCurrentStock, getHeight, getIsActive, getMaxUnitCost, getMinStock, getPresentation, getUnitMeasure, isRollPresentation } from "../../../../utils/warehouseInventoryUtils.js";
+import { formatCurrency, formatDecimal } from '../../../../utils/formatUtils.js';
+import {
+    buildInventorySelectText,
+    getBase,
+    getCurrentStock,
+    getHeight,
+    getIsActive,
+    getMaxUnitCost,
+    getMinStock,
+    getPresentation,
+    getUnitMeasure
+} from '../../../../utils/warehouseInventoryUtils.js';
+import { isRollPresentation } from '../../../../../../shared/inventory/wasteMeasurements.js';
 
 export const renderWarehouseInventoryHeader = ({ tableElement, canSeeActive, canSeeCost, canManageItems, showRollWeights = false }) => {
 

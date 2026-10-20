@@ -1,5 +1,7 @@
+import { DECIMAL_INPUT_FORMAT } from '../../../../../../../shared/constants/inputValidation.js';
 import { FORM_MODES } from '../../../../../constants/formModes.js';
-import { GOODS_RECEIPT_DETAIL_STATUSES, GOODS_RECEIPT_STATUS_LABELS } from '../../../../../constants/goodsReceiptStatuses.js';
+import { GOODS_RECEIPT_DETAIL_STATUSES } from '../../../../../../../shared/constants/goodsReceiptStatuses.js';
+import { GOODS_RECEIPT_STATUS_LABELS } from '../../../../../constants/goodsReceiptStatuses.js';
 import {
     buildMdbActionButton,
     buildMdbDeleteActionButton,
@@ -8,11 +10,7 @@ import {
 } from '../../../../mdb/actionButton.js';
 import { formatCurrency, formatDecimal } from '../../../../../utils/formatUtils.js';
 import { renderIssueSupplyCheckbox } from '../issueDetailDatatable.js';
-import {
-    bindDetailInputWarnings,
-    buildDetailTableInput,
-    DISABLED_PROJECT_QUANTITY_MESSAGE
-} from './detailInputs.js';
+import { bindDetailInputWarnings, buildDetailTableInput, DISABLED_PROJECT_QUANTITY_MESSAGE } from './detailInputs.js';
 import {
     shouldShowActionsColumn,
     shouldShowDetailActionButtons,
@@ -84,7 +82,8 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
                             detailId,
                             disabled: isProjectQuantityDisabled,
                             disabledWarning: DISABLED_PROJECT_QUANTITY_MESSAGE,
-                            min: '0'
+                            min: DECIMAL_INPUT_FORMAT.minimumPositive,
+                            step: DECIMAL_INPUT_FORMAT.minimumPositive
                         }) }
                         <div data-error-for="projectConvertedQuantity-${ detailId }" class="invalid-feedback d-none"></div>
                     `;
@@ -102,7 +101,6 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
             { data: 'grossPurchaseAmount', render: formatCurrency }
         );
     }
-
 
     if (type === 'issue' && mode === FORM_MODES.EDIT_DETAIL) {
         columns.push({
@@ -122,7 +120,6 @@ export const buildDetailsColumns = ({ type, mode, canManageProjectQuantity = fal
             }
         });
     }
-
 
     if (shouldShowIssueReturnActions({ type, mode })) {
         columns.push({

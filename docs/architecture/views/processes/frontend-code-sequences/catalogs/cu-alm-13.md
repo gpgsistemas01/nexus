@@ -86,26 +86,27 @@ flowchart TB
         FileWastes["wastes.js"]
         Request["wasteService.js"]
     end
+    Application -->|import| FileResponseUtils
     FileErrorHandler -->|import| FileApiMessages
-    FileUtils -->|import| FileApiMessages
-    FileWastes -->|import| Request
-    FileWastes -->|import| Application
-    Form -->|import| FileWastes
-    Form -->|import| FileValidators
-    Form -->|import| FileWasteFields
-    Modal -->|import| FileModalUI
-    Page -->|import| Table
-    Page -->|import| Modal
-    Page -->|import| Form
-    Table -->|import| FileTableOperations
-    Table -->|import| FileWastes
-    FormUtils -->|import| FileApiMessages
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    FileWastes -->|import| Application
+    FileWastes -->|import| Request
+    Form -->|import| FileValidators
+    Form -->|import| FileWasteFields
+    Form -->|import| FileWastes
+    Form -->|import| FormUtils
+    Modal -->|import| FileModalUI
+    Page -->|import| Form
+    Page -->|import| Modal
+    Page -->|import| Table
+    Table -->|import| FileTableOperations
+    Table -->|import| FileWastes
     Transport -->|import| FileWasteController
 ```
 
@@ -144,7 +145,6 @@ sequenceDiagram
     FormUtils-->>Form: validateFields(): Object
     Form-->>FormCore: getErrors(): Object
     FormCore->>FileFormErrorsUI: normalizeFormErrors({ form, errors })
-    FormCore->>FileFormErrorsUI: toggleErrorMessages(form, errors)
     FormCore->>FormUtils: hasValidationErrors(errors)
     FormUtils-->>FormCore: hasValidationErrors(): boolean
     alt Datos inválidos
@@ -168,25 +168,24 @@ sequenceDiagram
     autonumber
     participant FormCore@{ "type": "control" } as formUI.js
     participant Form@{ "type": "boundary" } as wasteStockAdditionForm.js
-    participant FormUtils@{ "type": "control" } as formUtils.js
     participant Application@{ "type": "control" } as createCrudApplication.js
     participant FileErrorHandler@{ "type": "control" } as errorHandler.js
 
     participant FileSwalComponent@{ "type": "control" } as swalComponent.js
 
     FormCore->>Form: sendRequest({ form, formData })
-    Form->>FormUtils: handleSubmit({ form, formData, update: addWasteStock })
-    FormUtils->>Application: addWasteStock({ formData, id: form.dataset.id })
+    Form->>FormCore: handleSubmit({ form, formData, update: addWasteStock })
+    FormCore->>Application: addWasteStock({ formData, id: form.dataset.id })
     alt Mutación aceptada
-        Application-->>FormUtils: addWasteStock(): Promise[{ message, data: Waste }]
-        FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-        Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-        FormUtils-->>Form: handleSubmit(): Promise[Waste]
+        Application-->>FormCore: addWasteStock(): Promise[{ message, data: Waste }]
+        FormCore->>FileSwalComponent: notifications.showSuccess(response.message)
+        Note over FormCore: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+        FormCore-->>Form: handleSubmit(): Promise[Waste]
     else Error HTTP o de dominio
-        Application-->>FormUtils: error propagado
-        FormUtils-->>Form: error propagado por handleSubmit()
+        Application-->>FormCore: error propagado
+        FormCore-->>Form: error propagado por handleSubmit()
         Form-->>FormCore: error propagado por sendRequest()
-        FormCore->>FileErrorHandler: handleApiError({ err, form, normalizeServerErrors })
+        FormCore->>FileErrorHandler: handleApiError({ err, form })
     end
 ```
 

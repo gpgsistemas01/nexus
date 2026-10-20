@@ -16,6 +16,7 @@ const getFirstInvalidControl = (form) => {
 
 const getScrollTarget = (element) => {
     if (!element) return null;
+    if (element.closest('.d-none, [hidden]')) return null;
 
     if (element.tagName === 'SELECT' && typeof window !== 'undefined' && window.jQuery && window.jQuery(element).hasClass('select2-hidden-accessible')) {
         const select2Container = window.jQuery(element).next('.select2-container').get(0);
@@ -29,10 +30,11 @@ export const scrollToFirstFormError = (form) => {
     const invalidElement = getFirstInvalidControl(form);
     const scrollTarget = getScrollTarget(invalidElement);
 
-    if (!scrollTarget) return;
+    if (!scrollTarget) return false;
 
     scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
     if (typeof invalidElement.focus === 'function' && !invalidElement.disabled) invalidElement.focus({ preventScroll: true });
+    return true;
 };
 
 export const toggleErrorMessages = (form, errors) => {
@@ -113,25 +115,6 @@ export const normalizeFormErrors = ({ form, errors, fields = Object.keys(errors)
     toggleTableErrors(form, errors, fields);
     toggleInputSelectErrors(form, errors, fields);
     return errors;
-};
-
-export const getUnrenderedFormErrorMessages = ({ form = null, errors, detailId = null }) => {
-    if (typeof errors === 'string') return errors ? [errors] : [];
-    if (!errors || typeof errors !== 'object') return [];
-
-    return Object.entries(errors).flatMap(([field, error]) => {
-        if (typeof error !== 'string') {
-            return getUnrenderedFormErrorMessages({ form, errors: error, detailId: field });
-        }
-
-        if (!error) return [];
-
-        const feedbackKey = detailId ? `${ field }-${ detailId }` : field;
-        const feedback = form?.querySelector(`[data-error-for="${ feedbackKey }"]`);
-        const isDisplayed = feedback?.textContent === error && !feedback.closest('.d-none, [hidden]');
-
-        return isDisplayed ? [] : [error];
-    });
 };
 
 export const clearFormErrors = (form) => {

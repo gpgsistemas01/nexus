@@ -1,14 +1,18 @@
+import { handleServiceError } from '../../serviceErrorHandler.js';
 import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
 import { normalizeDatabaseError } from '../../../errors/databaseError.js';
 import { isAppError } from '../../../errors/AppError.js';
 import { updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { findPage } from '../../../repository/paginationRepository.js';
-import { PersonCreateDatabaseError, PersonNotFound, PersonUpdateDatabaseError } from "../../../errors/admin/personError.js";
+import {
+    PersonCreateDatabaseError,
+    PersonNotFound,
+    PersonUpdateDatabaseError
+} from "../../../errors/admin/personError.js";
 import { getDb } from "../../../repository/baseRepository.js";
 import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('admin.personService');
-
 
 export const findAllPersons = async ({
     cursor,
@@ -136,9 +140,12 @@ export const createPerson = async ({ personDto }) => {
         });
 
     } catch (err) {
-        logServiceError(serviceLogger, err, { operation: 'admin.personService' });
-
-        throw new PersonCreateDatabaseError();
+        handleServiceError({
+            logger: serviceLogger,
+            error: err,
+            operation: 'admin.personService',
+            fallbackError: new PersonCreateDatabaseError()
+        });
     }
 }
 

@@ -12,13 +12,13 @@ export const createWasteIssueHeaderDtoForEdit = (body = {}) => createIssueHeader
 export const createWasteIssueDetailsDtoForEdit = (body = {}) => ({
     details: body.details.map(detail => ({
         id: detail.id,
-        isSupplied: Boolean(detail.isSupplied),
-        projectConvertedQuantity: Number(detail.projectConvertedQuantity)
+        isSupplied: detail.isSupplied,
+        projectConvertedQuantity: detail.projectConvertedQuantity
     }))
 });
 
 export const createWasteIssueDtoForReturn = (body = {}) => ({
-    returnQuantity: Number(body.returnQuantity),
+    returnQuantity: body.returnQuantity,
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') && {
         observations: body.observations.trim()
     })

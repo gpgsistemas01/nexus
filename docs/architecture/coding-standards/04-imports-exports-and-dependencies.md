@@ -80,3 +80,19 @@ upsertIssueDetail({
 Un wrapper que sólo reenvía argumentos no aporta una capa. Una fachada que fija el
 contexto de inventario o aplica una política sí tiene responsabilidad propia: evita
 que el cliente determine un discriminador persistido y reutiliza el núcleo común.
+
+### 4.5 Reglas compartidas y composición visual
+
+- `src/shared` contiene exclusivamente contratos y funciones puras utilizables por
+  Node.js y el navegador. No importa módulos de front/back, DOM, Prisma ni transporte.
+  Express publica únicamente ese directorio en `/shared`; no publica el resto de `src`.
+- Precisión, identificadores de permisos y cálculos compartidos tienen un propietario
+  único en `shared`. Las políticas de autorización permanecen en el servidor.
+- Las páginas proporcionan callbacks de apertura a DataTables y Select2. Los adaptadores
+  de plugins no importan páginas. El AJAX de cada plugin recibe la consulta del recurso.
+- La captura de detalles pertenece al contexto del formulario; los plugins la reciben
+  para mostrarla o editarla. Una selección se decodifica una vez antes de construir
+  la partida. Los payloads se adaptan en `application/warehouse/issues/issueDetails.js`.
+- Los controllers de reportes adaptan filtros HTTP y envían el archivo. Las consultas y
+  resúmenes pertenecen al dominio; `utils/reports/warehouseReportExcel.js` construye filas
+  y fórmulas sin conocer `req` ni `res`, conservando el consumo por lotes.

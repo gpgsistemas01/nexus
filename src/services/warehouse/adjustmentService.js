@@ -1,11 +1,19 @@
 import { getDb } from "../../repository/baseRepository.js";
-import { generateYearlyReferenceNumber, throwIfReferenceNumberAlreadyExists } from "../document/referenceNumberService.js";
-import { normalizeDecimal, toNumber } from "../../utils/formattersUtils.js";
+import {
+    generateYearlyReferenceNumber,
+    throwIfReferenceNumberAlreadyExists
+} from "../document/referenceNumberService.js";
+import { toNumber } from '../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
 import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { findSupplierMaterialByIds } from "./materials/supplierMaterialService.js";
 import { adjustSupplierMaterialStock } from "./materials/supplierMaterialStockService.js";
 import { lockSupplierMaterialStock } from "../../repository/warehouse/stockLockRepository.js";
-import { INVENTORY_MOVEMENT_TYPES, STOCK_ADJUSTMENT_STATUS_NAMES, STOCK_ADJUSTMENT_TYPES } from "../../constants/inventory.js";
+import {
+    INVENTORY_MOVEMENT_TYPES,
+    STOCK_ADJUSTMENT_STATUS_NAMES,
+    STOCK_ADJUSTMENT_TYPES
+} from '../../constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../constants/documentReferenceTypes.js";
 import { createInventoryMovement } from "../inventory/movementService.js";
 import { buildInventoryMovementDetail } from "../inventory/movementHelpers.js";

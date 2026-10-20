@@ -26,13 +26,16 @@ describe('validadores del CRUD de materiales', () => {
 
   it('requiere el proveedor asociado al ajustar el stock de un material', () => {
     expect(materialStockValidation.supplierId('')).toEqual(expect.any(String));
-    expect(materialStockValidation.supplierId('supplier-1')).toBeNull();
+    expect(materialStockValidation.supplierId('11111111-1111-4111-8111-111111111111')).toBeNull();
   });
 
   it.each([
     ['alta normal', materialCreateValidation, '', expect.any(String)],
     ['alta desde entrada', goodsReceiptMaterialCreateValidation, '', null],
-    ['alta desde entrada con costo', goodsReceiptMaterialCreateValidation, '12.50', null]
+    ['alta desde entrada con costo', goodsReceiptMaterialCreateValidation, '12.50', null],
+    ['alta desde entrada con costo cero', goodsReceiptMaterialCreateValidation, 0, null],
+    ['alta desde entrada con tipo inválido', goodsReceiptMaterialCreateValidation, false, expect.any(String)],
+    ['alta desde entrada con array', goodsReceiptMaterialCreateValidation, [2], expect.any(String)]
   ])('%s decide si el costo máximo es obligatorio', (_, validation, value, expected) => {
     expect(validation.maxUnitCost(value)).toEqual(expected);
   });

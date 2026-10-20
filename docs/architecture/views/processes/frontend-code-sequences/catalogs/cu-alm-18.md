@@ -79,21 +79,22 @@ flowchart TB
         FileConsumables["consumables.js"]
         Request["consumableService.js"]
     end
-    FileErrorHandler -->|import| FileApiMessages
-    FileUtils -->|import| FileApiMessages
-    FileConsumables -->|import| Request
+    Application -->|import| FileResponseUtils
     FileConsumables -->|import| Application
-    View -->|import| FileConsumables
-    View -->|import| FileValidators
-    Modal -->|import| FileModalUI
-    FormUtils -->|import| FileApiMessages
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileConsumables -->|import| Request
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    Modal -->|import| FileModalUI
     Transport -->|import| FileConsumableController
+    View -->|import| FileConsumables
+    View -->|import| FileValidators
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación
@@ -149,19 +150,19 @@ sequenceDiagram
         end
         Note over Form: Marca dataset.submitting y deshabilita submit antes del callback
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update })
+        View->>Form: handleSubmit({ form, formData, create, update })
         FormUtils->>Application: registerConsumable({ formData, creationContext: null })
         activate Application
         alt [HTTP 200]
             Application-->>FormUtils: registerConsumable(): Promise[{ message: string, data: SupplierMaterial }]
             FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
+            Note over Form: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+            Form-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
             View->>View: form.onSave?.(supplierMaterial)
             View-->>Browser: cerrar modal y refrescar listado
         else [HTTP 4xx/5xx]
             Application-->>FormUtils: registerConsumable(): throw { status, data, message, raw }
-            FormUtils-->>View: error propagado por handleSubmit()
+            Form-->>View: error propagado por handleSubmit()
             View-->>Form: error propagado por sendRequest()
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva los datos
         end

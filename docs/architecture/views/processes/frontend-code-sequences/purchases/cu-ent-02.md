@@ -89,29 +89,31 @@ flowchart TB
         Request["createGoodsReceiptRequests.js"]
         FileMaterialGoodsReceiptService["materialGoodsReceiptService.js"]
     end
+    Application -->|import| FileResponseUtils
+    FileConsumableGoodsReceiptService -->|import| Request
+    FileConsumableGoodsReceipts -->|import| Application
+    FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
     FileErrorHandler -->|import| FileApiMessages
     FileErrorHandler -->|import| FileSwalComponent
-    FileUtils -->|import| FileApiMessages
-    FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
-    FileConsumableGoodsReceipts -->|import| Application
-    FileGoodsReceipts -->|import| FileMaterialGoodsReceipts
-    FileGoodsReceipts -->|import| FileConsumableGoodsReceipts
-    FileGoodsReceipts -->|import| FileGoodsReceiptContext
-    FileMaterialGoodsReceipts -->|import| FileMaterialGoodsReceiptService
-    FileMaterialGoodsReceipts -->|import| Application
-    View -->|import| FileGoodsReceipts
-    View -->|import| FileValidators
-    FileConsumableGoodsReceiptService -->|import| Request
-    FileMaterialGoodsReceiptService -->|import| Request
-    FormUtils -->|import| FileApiMessages
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileSwalComponent
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileGoodsReceiptContext -->|import| FileGoodsReceipts
+    FileGoodsReceipts -->|import| FileConsumableGoodsReceiptService
+    FileGoodsReceipts -->|import| FileConsumableGoodsReceipts
+    FileGoodsReceipts -->|import| FileMaterialGoodsReceiptService
+    FileGoodsReceipts -->|import| FileMaterialGoodsReceipts
+    FileMaterialGoodsReceiptService -->|import| Request
+    FileMaterialGoodsReceipts -->|import| Application
+    FileMaterialGoodsReceipts -->|import| FileMaterialGoodsReceiptService
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
     Transport -->|import| FileMaterialGoodsReceiptController
+    View -->|import| FileGoodsReceiptContext
+    View -->|import| FileValidators
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación
@@ -166,7 +168,7 @@ sequenceDiagram
     end
         Note over Form: dataset.submitting = 'true', botón submit deshabilitado
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update: registerMaterialGoodsReceipt })
+        View->>Form: handleSubmit({ form, formData, create, update: registerMaterialGoodsReceipt })
         FormUtils->>Application: registerMaterialGoodsReceipt({ formData })
         alt Respuesta exitosa
             Application-->>FormUtils: registerMaterialGoodsReceipt(): Promise[{ message }]

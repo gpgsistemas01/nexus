@@ -1,5 +1,4 @@
 import { createVersionDto } from './versionDTO.js';
-import { normalizeMaterialDimensions, toNumber } from '../utils/formattersUtils.js';
 
 const MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT = 'goodsReceipt';
 
@@ -8,18 +7,19 @@ const buildMaterialDataDto = (body = {}) => ({
     supplierId: body.supplierId,
     presentationId: body.presentationId,
     unitMeasureId: body.unitMeasureId,
-    ...normalizeMaterialDimensions(body)
+    base: body.base ?? null,
+    height: body.height ?? null
 });
 
 const buildMaterialSecondaryDataDto = (body = {}) => ({
-    ...Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null ? { minStock: Number(body.minStock) } : {},
-    maxUnitCost: toNumber(body.maxUnitCost),
-    ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
+    ...body.minStock !== undefined && body.minStock !== null ? { minStock: body.minStock } : {},
+    maxUnitCost: body.maxUnitCost,
+    ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: body.isActive } : {})
 });
 
 const buildMaterialStockDto = (body = {}, { includeSupplier = true, includeReason = true } = {}) => ({
     ...(includeSupplier ? { supplierId: body.supplierId } : {}),
-    ...Object.prototype.hasOwnProperty.call(body, 'newStock') ? { newStock: Number(body.newStock) } : {},
+    ...Object.prototype.hasOwnProperty.call(body, 'newStock') ? { newStock: body.newStock } : {},
     ...Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations ? body.observations.trim() : null } : {},
     ...includeReason && Object.prototype.hasOwnProperty.call(body, 'reasonId') ? { reasonId: body.reasonId } : {}
 });
@@ -30,10 +30,10 @@ export const createMaterialDtoForRegister = (body = {}) => {
     if (body.creationContext === MATERIAL_CREATION_CONTEXT_GOODS_RECEIPT) {
         return {
             ...materialData,
-            ...(Object.prototype.hasOwnProperty.call(body, 'minStock') && body.minStock !== null
-                ? { minStock: Number(body.minStock) }
+            ...(body.minStock !== undefined && body.minStock !== null
+                ? { minStock: body.minStock }
                 : {}),
-            ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: Boolean(body.isActive) } : {})
+            ...(Object.prototype.hasOwnProperty.call(body, 'isActive') ? { isActive: body.isActive } : {})
         };
     }
 
@@ -46,7 +46,7 @@ export const createMaterialDtoForRegister = (body = {}) => {
 
 export const createMaterialDtoForEdit = (body = {}) => ({
     ...createVersionDto(body),
-    ...(body.expectedMaterialVersion !== undefined && { expectedMaterialVersion: Number(body.expectedMaterialVersion) }),
+    ...(body.expectedMaterialVersion !== undefined && { expectedMaterialVersion: body.expectedMaterialVersion }),
     name: body.name.trim(),
     supplierId: body.supplierId,
     ...buildMaterialSecondaryDataDto(body)

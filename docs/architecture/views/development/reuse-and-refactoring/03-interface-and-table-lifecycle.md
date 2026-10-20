@@ -40,6 +40,21 @@ reinicia la instancia anterior antes de configurar el encabezado y crear la nuev
 `createDataTable` también sirve a listados remotos: activa `serverSide`/`processing`
 cuando hay `ajax`, y conserva callbacks específicos del consumidor.
 
+Las lecturas AJAX de los listados admiten un solo reintento tras 500 ms para errores de
+red (`status=0`) o HTTP `408/502/503/504`. Un `500` o los
+rechazos de datos, sesión y permisos no se reintentan. El fallo definitivo se presenta
+mediante `handleApiError`, igual que formularios, Select2, descargas y acciones; los fallos de servidor o conexión abren un Swal de
+error. El callback recibe una página vacía y el `draw` solicitado para terminar la
+carga, sin llamar a `draw()` o `reload()` desde el manejador de errores.
+
+Cada consulta nueva invalida las respuestas y reintentos de la anterior; una tabla
+destruida tampoco reintenta ni presenta avisos pendientes. La recuperación sólo rodea
+la lectura, de modo que un fallo al renderizar no provoca otra consulta. Las tablas de
+detalle con datos locales y las escrituras conservan su flujo.
+La tabla no clasifica errores de Prisma ni de esquema: un `503` recibe el mismo
+tratamiento cualquiera que sea su código. Ese código sólo sirve para presentar el
+mensaje público mediante el manejador compartido.
+
 La infraestructura responsiva comparte el mapa del encabezado para etiquetas y grupos,
 en lugar de inferirlos por índices distintos en cada pantalla. El permiso visual sólo
 controla presentación; las escrituras siguen autorizadas por el servidor. Esta figura
@@ -60,7 +75,7 @@ explica la extracción común y su ownership, sin repetir la secuencia del CRUD.
 `goodsIssueModal.js` vacía y rellena `goodsIssueDetails`, aplica el modo y llama a
 `createWarehouseIssueDetailsTable({ data, mode, context })`. `wasteIssueModal.js` hace
 lo propio con su arreglo y añade `detailName='Merma'` y
-`projectQuantityPermission=UI_PERMISSIONS.WASTE_ISSUES_SUPPLY`. La factory toma por
+`projectQuantityPermission=PERMISSIONS.WASTE_ISSUES_SUPPLY`. La factory toma por
 defecto `GOODS_ISSUE_DETAILS_MANAGE` para salidas de materiales/consumibles.
 
 Los datos pertenecen al modal; la factory no conserva una copia global ni destruye
@@ -69,9 +84,22 @@ se instala el nuevo encabezado y se construye la tabla. `createDataTable` activa
 `serverSide`/`processing` si existe `ajax`; las tablas de detalle usan datos locales.
 Los callbacks del consumidor se invocan además del comportamiento común.
 
-En formularios, `useForm` no restaura por sí solo el estado tras cualquier resultado:
-`sendRequest` y los helpers de éxito/error conservan el cierre, recarga y reintento
-según el flujo. El [estado técnico de los formularios](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md)
+En formularios, `useForm` libera el bloqueo de envío una vez en `finally`.
+`handleSubmit` y `handleAction` conservan notificación, cierre y recarga; la
+recuperación de una operación pendiente sigue el flujo propio de merma. El [estado técnico de los formularios](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md)
 y la [composición visual](../design-and-construction-patterns/12-composition-and-ownership-of-components-visual.md)
 explican esas colaboraciones. Los permisos visuales sólo ocultan/habilitan controles;
 los routers del servidor autorizan las escrituras.
+
+## Propietarios de las funciones de formulario
+
+`utils/formUtils.js` conserva `pickFormFields`, `validateFields`, `validateDetailsFields` y `hasValidationErrors`: no importa UI ni plugins. `ui/forms/formUI.js` posee `useForm`, `handleSubmit` y `handleAction`, que coordinan envío, notificación, cierre y recarga. `formStateUI.js` posee habilitación de controles y contenedores, incluida la adaptación de Select2 y Flatpickr. Son movimientos a módulos existentes, sin wrappers que reexporten las funciones anteriores.
+
+El adaptador Ajax permanece privado en `plugins/datatable/core/base/createDataTable.js`: traduce la consulta inyectada a `callback`, conserva `draw` y descarta respuestas de una tabla destruida o de una búsqueda anterior. Esos conceptos pertenecen a DataTable. La URL y la petición HTTP siguen en services y Axios; mover el adaptador a esa capa introduciría dependencia del plugin. No se agrega otra factory de Ajax ni un segundo mecanismo de reintentos.
+
+`constants/inputValidation.js` contiene sólo formatos y límites de captura; el backend
+y los validadores puros del navegador los importan sin dependencias de UI. Los helpers
+validan el valor original antes de convertirlo. Los formularios conservan ese valor al
+agregar partidas, surtir o devolver, y normalizan después de validar. La existencia y
+el estado de registros siguen comprobándose en el servidor; no se agregan requests
+de validación por cada control o fila.

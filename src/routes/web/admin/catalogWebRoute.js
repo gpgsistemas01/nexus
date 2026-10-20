@@ -1,6 +1,6 @@
 import express from 'express';
 import { getCatalogsPage } from '../../../controllers/web/admin/catalogController.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../middleware/authMiddleware.js';
 
 const router = express.Router();

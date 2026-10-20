@@ -1,19 +1,9 @@
-import * as materialRequests from './materials/materialGoodsIssueService.js';
-import * as consumableRequests from './consumables/consumableGoodsIssueService.js';
-import { goodsIssueContext } from '../../../pages/warehouse/goodsIssues/goodsIssueContext.js';
-import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
-
 import { apiRequest } from '../../axiosInstanceApi.js';
+import { INVENTORY_RESOURCES } from '../../../../../shared/constants/inventory.js';
+import { MATERIAL_GOODS_ISSUES_API_ROUTE } from './materials/materialGoodsIssueService.js';
+import { CONSUMABLE_GOODS_ISSUES_API_ROUTE } from './consumables/consumableGoodsIssueService.js';
 
-const isConsumable = goodsIssueContext.resource === INVENTORY_RESOURCES.CONSUMABLE;
-
-export const GOODS_ISSUES_API_ROUTE = isConsumable ? consumableRequests.CONSUMABLE_GOODS_ISSUES_API_ROUTE : materialRequests.MATERIAL_GOODS_ISSUES_API_ROUTE;
-export const getAllGoodsIssuesRequest = isConsumable ? consumableRequests.getAllConsumableGoodsIssuesRequest : materialRequests.getAllMaterialGoodsIssuesRequest;
-export const registerGoodsIssueRequest = isConsumable ? consumableRequests.registerConsumableGoodsIssueRequest : materialRequests.registerMaterialGoodsIssueRequest;
-export const editGoodsIssueRequest = isConsumable ? consumableRequests.editConsumableGoodsIssueRequest : materialRequests.editMaterialGoodsIssueRequest;
-export const editGoodsIssueHeaderRequest = isConsumable ? consumableRequests.editConsumableGoodsIssueHeaderRequest : materialRequests.editMaterialGoodsIssueHeaderRequest;
-export const editGoodsIssueDetailsRequest = isConsumable ? consumableRequests.editConsumableGoodsIssueDetailsRequest : materialRequests.editMaterialGoodsIssueDetailsRequest;
-export const returnGoodsIssueDetailRequest = isConsumable ? consumableRequests.returnConsumableGoodsIssueDetailRequest : materialRequests.returnMaterialGoodsIssueDetailRequest;
-export const exportGoodsIssueReportRequest = isConsumable ? consumableRequests.exportConsumableGoodsIssueReportRequest : materialRequests.exportMaterialGoodsIssueReportRequest;
-
-export const getGoodsIssueRequest = ({ id }) => apiRequest({ method: 'get', url: `${ GOODS_ISSUES_API_ROUTE }/${ id }` });
+export const getGoodsIssueRequest = ({ id, resource }) => apiRequest({
+    method: 'get',
+    url: `${ resource === INVENTORY_RESOURCES.CONSUMABLE ? CONSUMABLE_GOODS_ISSUES_API_ROUTE : MATERIAL_GOODS_ISSUES_API_ROUTE }/${ id }`
+});

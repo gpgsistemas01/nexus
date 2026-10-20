@@ -1,5 +1,4 @@
 import { FORM_MODES } from '../../../../constants/formModes.js';
-import { openMaterialModal } from "../../../../pages/warehouse/materials/materialModal.js";
 import { configureRealtimeReload } from '../../core/base/tableOperations.js';
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { renderActionButtons } from '../../core/base/actionButtons.js';
@@ -7,14 +6,16 @@ import { setupTableFilters } from "../../core/filters/tableFilter.js";
 import { notifications } from "../../../swal/swalComponent.js";
 import { deleteMaterial, getAllMaterials } from "../../../../application/warehouse/materials/materials.js";
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
-import { hasPermission, UI_PERMISSIONS } from "../../../../constants/permissions.js";
+import { hasPermission, PERMISSIONS } from '../../../../../../shared/constants/permissions.js';
 import { exportWarehouseReport } from "../../../../application/warehouse/report.js";
 import { formatFileName } from "../../../../utils/formatters.js";
 import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
-import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "../../shared/inventory/warehouseInventoryDatatable.js";
-import { INVENTORY_RESOURCES, MATERIAL_TYPES } from '../../../../constants/inventory.js';
+import {
+    buildWarehouseInventoryColumns,
+    renderWarehouseInventoryHeader
+} from "../../shared/inventory/warehouseInventoryDatatable.js";
+import { INVENTORY_RESOURCES, MATERIAL_TYPES } from '../../../../../../shared/constants/inventory.js';
 import { bindMaterialInventoryActions } from '../../shared/inventory/materialInventoryActions.js';
-
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
@@ -33,11 +34,11 @@ const configureMaterialsRealtime = (table) => {
     });
 };
 
-export const createMaterialDatatable = async (context) => {
+export const createMaterialDatatable = async ({ context, onOpen }) => {
 
-    const canSeeCost = hasPermission(context, UI_PERMISSIONS.INVENTORY_COSTS_READ);
-    const canSeeActive = hasPermission(context, UI_PERMISSIONS.CATALOGS_MANAGE);
-    const canManageMaterials = hasPermission(context, UI_PERMISSIONS.MATERIALS_WRITE);
+    const canSeeCost = hasPermission(context, PERMISSIONS.INVENTORY_COSTS_READ);
+    const canSeeActive = hasPermission(context, PERMISSIONS.CATALOGS_MANAGE);
+    const canManageMaterials = hasPermission(context, PERMISSIONS.MATERIALS_WRITE);
 
     renderWarehouseInventoryHeader({
         tableElement,
@@ -57,7 +58,7 @@ export const createMaterialDatatable = async (context) => {
         renderActions: (_, __, row) => renderActionButtons({
             status: 'Abierta',
             context: INVENTORY_RESOURCES.MATERIAL,
-            canAdjustStock: hasPermission(context, UI_PERMISSIONS.MATERIALS_ADJUST_STOCK),
+            canAdjustStock: hasPermission(context, PERMISSIONS.MATERIALS_ADJUST_STOCK),
             canDeleteMaterial: canManageMaterials && row.canDelete
         })
     });
@@ -106,9 +107,9 @@ export const createMaterialDatatable = async (context) => {
             buttons: [
                 ...(canManageMaterials ? [{
                     text: 'Nuevo material',
-                    action: () => openMaterialModal({ mode: FORM_MODES.CREATE })
+                    action: () => onOpen({ mode: FORM_MODES.CREATE })
                 }] : []),
-                ...(hasPermission(context, UI_PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
+                ...(hasPermission(context, PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
                     filename: formatFileName('reporte_inventario_materiales'),
                     allowMonthlyReport: false,
                     allowInventoryScope: true,
@@ -125,6 +126,7 @@ export const createMaterialDatatable = async (context) => {
     configureMaterialsRealtime(table);
 
     bindMaterialInventoryActions({
+        onOpen,
         table,
         resource: INVENTORY_RESOURCES.MATERIAL,
         remove: deleteMaterial,

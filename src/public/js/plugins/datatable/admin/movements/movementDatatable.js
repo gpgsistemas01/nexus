@@ -4,7 +4,7 @@ import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI
 import { formatFileName } from "../../../../utils/formatters.js";
 import { configureRealtimeReload } from '../../core/base/tableOperations.js';
 import { createDataTable } from '../../core/base/createDataTable.js';
-import { formatDecimal } from "../../../../utils/formatUtils.js";
+import { formatDecimal } from '../../../../utils/formatUtils.js';
 
 const movementColumns = [
     { data: 'date', title: 'Fecha' },

@@ -20,8 +20,8 @@ export const createGoodsIssueDtoForEdit = (body = {}) => buildGoodsIssueDto(body
 export const createGoodsIssueDetailsDtoForEdit = (body = {}) => ({
     details: (body.details).map(d => ({
         id: d.id,
-        isSupplied: Boolean(d.isSupplied),
-        projectConvertedQuantity: Number(d.projectConvertedQuantity)
+        isSupplied: d.isSupplied,
+        projectConvertedQuantity: d.projectConvertedQuantity
     }))
 });
 
@@ -30,6 +30,6 @@ export const createGoodsIssueHeaderDtoForEdit = (body = {}) => createIssueHeader
 
 
 export const createGoodsIssueDtoForReturn = (body = {}) => ({
-    returnQuantity: Number(body.returnQuantity),
+    returnQuantity: body.returnQuantity,
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
 });

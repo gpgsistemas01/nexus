@@ -5,7 +5,7 @@ import {
     goodsReceiptHeaderValidation,
     goodsReceiptValidation
 } from '../../../../../validators/forms/goodsReceiptValidations.js';
-import { PERMISSIONS } from '../../../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../../../shared/constants/permissions.js';
 
 const manage = authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE);
 export const goodsReceiptRouteMiddleware = {

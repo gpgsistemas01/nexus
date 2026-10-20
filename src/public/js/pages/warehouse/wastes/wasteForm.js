@@ -1,16 +1,17 @@
-import { WASTE_OPERATION_ACTIONS, WASTE_ROLL_WEIGHT_FIELDS } from '../../../constants/inventory.js';
+import { WASTE_OPERATION_ACTIONS, WASTE_ROLL_WEIGHT_FIELDS } from '../../../../../shared/constants/inventory.js';
 import { notifications } from '../../../plugins/swal/swalComponent.js';
-import { resetFormSubmitState } from '../../../ui/forms/formStateUI.js';
 import { closeModal } from '../../../ui/modalUI.js';
 import { openWasteStockAdditionModal } from './wasteStockAdditionModal.js';
-import { hasPermission, UI_PERMISSIONS } from '../../../constants/permissions.js';
-import { getPresentation, isRollPresentation } from '../../../utils/warehouseInventoryUtils.js';
+import { hasPermission, PERMISSIONS } from '../../../../../shared/constants/permissions.js';
+import { getPresentation } from '../../../utils/warehouseInventoryUtils.js';
+import { isRollPresentation } from '../../../../../shared/inventory/wasteMeasurements.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { updateWasteRollMeasurement } from '../../../ui/inventory/wasteFormUI.js';
-import { useForm } from '../../../ui/forms/formUI.js';
+import { useForm, handleSubmit } from '../../../ui/forms/formUI.js';
 import { editWaste, editWasteStock, registerWaste } from '../../../application/warehouse/wastes/wastes.js';
 import { FORM_SELECTORS } from '../../../constants/selectors.js';
-import { handleSubmit, pickFormFields, validateFields } from '../../../utils/formUtils.js';
+import { pickFormFields, validateFields } from '../../../utils/formUtils.js';
+
 import {
     wasteEditValidation,
     wasteStockAdjustmentValidation,
@@ -67,17 +68,14 @@ useForm({
         } catch (err) {
             const existingWaste = err.data?.meta?.waste;
             if (!isCreateMode(form.dataset.mode) || err.data?.code !== 'WASTE_ALREADY_EXISTS'
-                || !existingWaste?.id || !hasPermission(window.meta || {}, UI_PERMISSIONS.WASTES_ADD_STOCK)) throw err;
+                || !existingWaste?.id || !hasPermission(window.meta || {}, PERMISSIONS.WASTES_ADD_STOCK)) throw err;
 
             const { isConfirmed } = await notifications.showConfirmation({
                 title: 'Esta merma ya existe',
                 text: `¿Abrir Agregar stock para revisar la cantidad y las observaciones de ${existingWaste.name || 'esta merma'}?`,
                 confirmButtonText: 'Abrir Agregar stock'
             });
-            if (!isConfirmed) {
-                resetFormSubmitState(form);
-                return;
-            }
+            if (!isConfirmed) return;
 
             closeModal(form);
             openWasteStockAdditionModal({

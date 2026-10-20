@@ -1,22 +1,38 @@
+import { openSupplierModal } from '../suppliers/supplierModal.js';
+import { openMaterialModal } from '../materials/materialModal.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
-import { cancelGoodsReceiptDetail } from '../../../application/warehouse/goodsReceipts/goodsReceipts.js';
+import { details, goodsReceiptContext } from './goodsReceiptContext.js';
 import { handleApiError } from '../../../api/errorHandler.js';
 import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
-import { details, initDetailsGoodsReceiptTable } from '../../../plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js';
-import { initGoodsReceiptFormSelect2, setGoodsReceiptFormSelectOptions } from '../../../plugins/select2/modules/goodsReceiptSelect.js';
-import { setFormDisabled } from '../../../ui/forms/formStateUI.js';
+import { initDetailsGoodsReceiptTable } from '../../../plugins/datatable/warehouse/goodsReceipts/goodsReceiptDatatable.js';
+import {
+    initGoodsReceiptFormSelect2,
+    setGoodsReceiptFormSelectOptions
+} from '../../../plugins/select2/modules/goodsReceiptSelect.js';
+import { setFormDisabled, toggleContainerElements, toggleDisabledElement } from '../../../ui/forms/formStateUI.js';
 import { toggleDetailFormActions } from '../../../ui/forms/detailFormUI.js';
-import { setTotals, updateTotals } from '../../../ui/forms/totalsSummaryUI.js';
+import { setTotals } from '../../../ui/forms/totalsSummaryUI.js';
 import { initializeInventoryCrudModal } from '../../../ui/inventory/inventoryCrudModalUI.js';
 import { on } from '../../../utils/domUtils.js';
 import { setDateTimePickerValue } from '../../../plugins/flatpickr/dateTimePicker.js';
-import { toggleContainerElements, toggleDisabledElement } from '../../../utils/formUtils.js';
+
 import { buildModalTitle, openModal } from '../../../ui/modalUI.js';
-import { BUTTON_SELECTORS, FORM_SELECTORS, HEADING_SELECTORS, INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from '../../../constants/selectors.js';
+import {
+    BUTTON_SELECTORS,
+    FORM_SELECTORS,
+    HEADING_SELECTORS,
+    INPUT_SELECTORS,
+    MODAL_SELECTORS,
+    SELECT_SELECTORS
+} from '../../../constants/selectors.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import { GOODS_RECEIPT_STATUS_LABELS } from '../../../constants/goodsReceiptStatuses.js';
 import { notifications } from '../../../plugins/swal/swalComponent.js';
-import { GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, initGoodsReceiptCorrection, openGoodsReceiptCorrectionModal } from './corrections/correctionModal.js';
+import {
+    GOODS_RECEIPT_CORRECTION_APPLIED_EVENT,
+    initGoodsReceiptCorrection,
+    openGoodsReceiptCorrectionModal
+} from './corrections/correctionModal.js';
 import { buildGoodsReceiptModalDetails } from './goodsReceiptDetails.js';
 
 const modalId = MODAL_SELECTORS.GOODS_RECEIPT;
@@ -51,7 +67,6 @@ const setGoodsReceiptViewMode = ({ form, modalElement, receipt }) => {
     });
 };
 
-
 export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     const form = document.querySelector(formId);
@@ -67,8 +82,12 @@ export const openGoodsReceiptModal = ({ mode, data = null }) => {
 
     details.length = 0;
 
-    initDetailsGoodsReceiptTable(mode);
-    initGoodsReceiptFormSelect2();
+    initDetailsGoodsReceiptTable({ mode, details });
+    initGoodsReceiptFormSelect2({
+        resource: goodsReceiptContext.resource,
+        onCreateSupplier: openSupplierModal,
+        onCreateMaterial: openMaterialModal
+    });
     setGoodsReceiptFormSelectOptions(data);
 
     if (mode === FORM_MODES.CREATE) {
@@ -148,7 +167,6 @@ on(DOM_EVENT_NAMES.CLICK, '#materialTable .correct-detail-btn', (event, button) 
     });
 });
 
-
 on(DOM_EVENT_NAMES.CLICK, '#materialTable .cancel-receipt-detail-btn', async (event, button) => {
     const detail = details.find(item => item.id === button.dataset.id);
 
@@ -163,7 +181,7 @@ on(DOM_EVENT_NAMES.CLICK, '#materialTable .cancel-receipt-detail-btn', async (ev
     if (!confirmation.isConfirmed) return;
 
     try {
-        const response = await cancelGoodsReceiptDetail({
+        const response = await goodsReceiptContext.cancelDetail({
             id: currentGoodsReceipt.id,
             detailId: detail.id
         });
@@ -174,10 +192,7 @@ on(DOM_EVENT_NAMES.CLICK, '#materialTable .cancel-receipt-detail-btn', async (ev
             detail: response.data
         }));
     } catch (err) {
-        handleApiError({
-            err,
-            rethrow: false
-        });
+        handleApiError({ err });
     }
 });
 
@@ -200,7 +215,7 @@ on(GOODS_RECEIPT_CORRECTION_APPLIED_EVENT, MODAL_SELECTORS.GOODS_RECEIPT_CORRECT
         const modalElement = document.querySelector(modalId);
 
         setGoodsReceiptViewMode({ form, modalElement, receipt: currentGoodsReceipt });
-        initDetailsGoodsReceiptTable(FORM_MODES.VIEW);
+        initDetailsGoodsReceiptTable({ mode: FORM_MODES.VIEW, details });
     } else {
         refreshMaterialTable(details);
     }

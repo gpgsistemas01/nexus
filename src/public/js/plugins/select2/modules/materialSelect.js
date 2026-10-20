@@ -16,7 +16,8 @@ const selectors = {
 };
 
 export const initMaterialFormSelect2 = ({
-    modalSelector
+    modalSelector,
+    onCreateSupplier
 }) => {
 
     scoped = scopeSelectors({ scopeSelector: modalSelector, selectors });
@@ -25,6 +26,7 @@ export const initMaterialFormSelect2 = ({
         [setupSupplierSelect, {
             modalSelector,
             supplierSelector: selectors.supplier,
+            onCreate: onCreateSupplier,
         }],
         [initUnitMeasureSelect, {
             modalSelector,

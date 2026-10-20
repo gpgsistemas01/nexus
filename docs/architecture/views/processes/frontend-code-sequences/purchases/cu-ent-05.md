@@ -76,20 +76,25 @@ flowchart TB
         Request["createGoodsReceiptRequests.js"]
         FileMaterialGoodsReceiptService["materialGoodsReceiptService.js"]
     end
-    FileErrorHandler -->|import| FileApiMessages
-    FileUtils -->|import| FileApiMessages
-    FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
-    FileConsumableGoodsReceipts -->|import| Application
-    FileGoodsReceipts -->|import| FileMaterialGoodsReceipts
-    FileGoodsReceipts -->|import| FileConsumableGoodsReceipts
-    FileGoodsReceipts -->|import| FileGoodsReceiptContext
-    FileMaterialGoodsReceipts -->|import| FileMaterialGoodsReceiptService
-    FileMaterialGoodsReceipts -->|import| Application
-    View -->|import| FileGoodsReceipts
+    Application -->|import| FileResponseUtils
     FileConsumableGoodsReceiptService -->|import| Request
+    FileConsumableGoodsReceipts -->|import| Application
+    FileConsumableGoodsReceipts -->|import| FileConsumableGoodsReceiptService
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileGoodsReceiptContext -->|import| FileGoodsReceipts
+    FileGoodsReceipts -->|import| FileConsumableGoodsReceiptService
+    FileGoodsReceipts -->|import| FileConsumableGoodsReceipts
+    FileGoodsReceipts -->|import| FileMaterialGoodsReceiptService
+    FileGoodsReceipts -->|import| FileMaterialGoodsReceipts
     FileMaterialGoodsReceiptService -->|import| Request
+    FileMaterialGoodsReceipts -->|import| Application
+    FileMaterialGoodsReceipts -->|import| FileMaterialGoodsReceiptService
     FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     Transport -->|import| FileMaterialGoodsReceiptController
+    View -->|import| FileErrorHandler
+    View -->|import| FileGoodsReceiptContext
 ```
 
 ## Construcción de funciones para esta operación

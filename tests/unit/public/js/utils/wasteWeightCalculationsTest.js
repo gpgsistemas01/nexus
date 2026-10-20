@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateWasteRollLength, prepareWasteRollReference } from '../../../../../src/public/js/utils/warehouseInventoryUtils.js';
+import { calculateWasteRollLength, prepareWasteRollReference } from '../../../../../src/shared/inventory/wasteMeasurements.js';
 import { prepareWasteMeasurements } from '../../../../../src/services/warehouse/wastes/wasteHelpers.js';
 
 const material = { base: 1.5, height: 20, presentation: { name: 'ROLLO' } };
@@ -12,6 +12,12 @@ describe('longitud de merma a partir del rollo completo con cono', () => {
   it('calcula la proporción con pesos netos y rechaza una referencia sin peso', () => {
     expect(calculateWasteRollLength({ weightKg: 1, referenceLengthM: 20, referenceNetWeightKg: 2 })).toBe(10);
     expect(calculateWasteRollLength({ weightKg: 1, referenceLengthM: 20, referenceNetWeightKg: 0 })).toBeNull();
+  });
+  it('incorpora al formulario y al servicio la misma longitud con dos decimales', () => {
+    expect(calculateWasteRollLength({ weightKg: 1, referenceLengthM: 20, referenceNetWeightKg: 3 })).toBe(6.67);
+    expect(prepareWasteMeasurements({ offer: { material }, wasteDto: {
+      coneWeightKg: 0.25, totalWeightKg: 1.25, referenceRollTotalWeightKg: 3.25
+    } })).toEqual({ base: 1.5, height: 6.67, weightKg: 1 });
   });
   it('descuenta una sola vez el mismo cono a ambos totales sin devolver valores intermedios para persistir', () => {
     const offer = { material, get referenceConeWeightKg() { throw new Error('Histórico de proveedor no aplicable'); } };

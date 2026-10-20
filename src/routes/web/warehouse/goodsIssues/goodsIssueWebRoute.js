@@ -1,7 +1,10 @@
 import express from 'express';
 import { authorizeUserWeb, verifyCookiesAuthTokenRequired } from '../../../../middleware/authMiddleware.js';
-import { getConsumableGoodsIssuesPage, getMaterialGoodsIssuesPage } from '../../../../controllers/web/warehouse/goodsIssues/goodsIssueController.js';
-import { PERMISSIONS } from '../../../../constants/permissions.js';
+import {
+    getConsumableGoodsIssuesPage,
+    getMaterialGoodsIssuesPage
+} from '../../../../controllers/web/warehouse/goodsIssues/goodsIssueController.js';
+import { PERMISSIONS } from '../../../../shared/constants/permissions.js';
 
 const router = express.Router();
 const goodsIssuePageMiddleware = [

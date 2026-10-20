@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { validationResult } from 'express-validator';
 
-import { consumableValidation, materialStockValidation, materialValidation } from '../../../src/validators/forms/materialValidations.js';
+import { consumableValidation, materialEditValidation, materialStockValidation, materialValidation } from '../../../src/validators/forms/materialValidations.js';
 
 const validMaterial = {
   name: 'Lámina',
@@ -44,6 +44,23 @@ describe('materialValidation', () => {
       expect.objectContaining({ path: 'maxUnitCost', msg: 'MAX_UNIT_COST_REQUIRED' }),
       expect.objectContaining({ path: 'newStock', msg: 'NEW_STOCK_REQUIRED' })
     ]));
+  });
+
+  it.each([undefined, 'valor-ignorado'])('el contexto de compra no exime el costo %j al editar', async maxUnitCost => {
+    const errors = await runValidation({ ...validMaterial, creationContext: 'goodsReceipt', maxUnitCost,
+      expectedVersion: 0, expectedMaterialVersion: 0 }, materialEditValidation);
+
+    expect(errors).toContainEqual(expect.objectContaining({ path: 'maxUnitCost',
+      msg: maxUnitCost === undefined ? 'MAX_UNIT_COST_REQUIRED' : 'MAX_UNIT_COST_INVALID_NUMBER' }));
+  });
+
+  it.each([undefined, 'valor-ignorado'])('el contexto de compra no exime el stock %j al ajustar', async newStock => {
+    const errors = await runValidation({ supplierId: validMaterial.supplierId, newStock,
+      creationContext: 'goodsReceipt', reasonId: '44444444-4444-4444-8444-444444444444',
+      expectedVersion: 0 }, materialStockValidation);
+
+    expect(errors).toContainEqual(expect.objectContaining({ path: 'newStock',
+      msg: newStock === undefined ? 'NEW_STOCK_REQUIRED' : 'NEW_STOCK_INVALID_NUMBER' }));
   });
 
   it('rechaza un ajuste de material sin proveedor', async () => {

@@ -1,7 +1,6 @@
 import { DOM_EVENT_NAMES } from '../../../../constants/events.js';
 import { FORM_MODES } from '../../../../constants/formModes.js';
 import { getAllUsers } from '../../../../application/admin/users/users.js';
-import { openUserModal } from '../../../../pages/admin/users/userModal.js';
 import { createDataTable } from '../../core/base/createDataTable.js';
 import { exportUserReport } from '../../../../application/admin/report.js';
 import { buildExcelButton, buildTableExportParams } from '../../../../ui/tableUI.js';
@@ -12,7 +11,7 @@ import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
 
 const selectorTable = DATATABLE_SELECTORS.MAIN;
 
-export const createUserDatatable = () => {
+export const createUserDatatable = ({ onOpen }) => {
 
     const table = createDataTable({
         options: {
@@ -45,7 +44,7 @@ export const createUserDatatable = () => {
             buttons: [
                 {
                     text: 'Nuevo usuario',
-                    action: () => openUserModal({ mode: FORM_MODES.CREATE })
+                    action: () => onOpen({ mode: FORM_MODES.CREATE })
                 },
                 buildExcelButton({
                     filename: formatFileName('reporte_usuarios'),
@@ -60,13 +59,13 @@ export const createUserDatatable = () => {
 
         const data = getResponsiveRowData(table, this);
 
-        openUserModal({ mode: FORM_MODES.EDIT, data });
+        onOpen({ mode: FORM_MODES.EDIT, data });
     });
 
     $(`${ selectorTable } tbody`).on(DOM_EVENT_NAMES.CLICK, '.btn-edit-password', function() {
 
         const data = getResponsiveRowData(table, this);
 
-        openUserModal({ mode: FORM_MODES.EDIT_PASSWORD, data });
+        onOpen({ mode: FORM_MODES.EDIT_PASSWORD, data });
     });
 };

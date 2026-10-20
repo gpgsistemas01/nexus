@@ -1,7 +1,7 @@
 import { createSupplierDtoForEdit, createSupplierDtoForRegister } from "../../../dtos/supplierDTO.js";
 import { successCodeMessages } from "../../../messages/codeMessages.js";
 import { findAllSuppliers, createSupplier, updateSupplier } from "../../../services/warehouse/supplierService.js";
-import { sanitizeEmptyStrings } from "../../../utils/formattersUtils.js";
+import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 export const getAllSuppliers = async (req, res) => {

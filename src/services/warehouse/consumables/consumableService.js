@@ -1,4 +1,4 @@
-import { MATERIAL_TYPES } from '../../../constants/inventory.js';
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { findAllSupplierMaterials } from '../materials/supplierMaterialService.js';
 import { createMaterial, deleteMaterial, updateMaterial, updateMaterialStock } from '../materials/materialService.js';
 

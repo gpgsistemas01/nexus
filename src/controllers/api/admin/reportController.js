@@ -1,7 +1,7 @@
 import { findMovementReportRows } from "../../../services/inventory/reportService.js";
 import { findPersonReportRows, findUserReportRows } from "../../../services/admin/reportService.js";
 import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
-import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
+import { getReportMonthDateRange } from '../../../utils/formattersUtils.js';
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
 
 const SHEET_NAME = 'Movimientos';

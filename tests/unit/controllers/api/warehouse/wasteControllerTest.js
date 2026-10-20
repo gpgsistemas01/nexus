@@ -116,10 +116,10 @@ describe('wasteController', () => {
         name: 'Recorte confirmado',
         materialId: 'material-1',
         supplierId: 'supplier-1',
-        base: '1',
-        height: '2',
+        base: 1,
+        height: 2,
         convertedQuantity: '999',
-        initialQuantity: '3',
+        initialQuantity: 3,
         reasonId: 'client-reason-id',
         observations: '  Registro inicial  '
       },
@@ -149,7 +149,7 @@ describe('wasteController', () => {
     const waste = { id: 'waste-1', minStock: 2, isActive: false };
     const req = {
       params: { id: 'waste-1' },
-      body: { minStock: '2', isActive: false, newStock: '99' }
+      body: { minStock: 2, isActive: false, newStock: 99 }
     };
     const res = createResponse();
     updateWaste.mockResolvedValue(waste);
@@ -167,7 +167,7 @@ describe('wasteController', () => {
     const waste = { id: 'waste-1', currentStock: 4 };
     const req = {
       params: { id: 'waste-1' },
-      body: { newStock: '4', reasonId: 'reason-1', observations: '  Conteo físico  ' },
+      body: { newStock: 4, reasonId: 'reason-1', observations: '  Conteo físico  ' },
       user: { id: 'user-1' }
     };
     const res = createResponse();
@@ -187,7 +187,7 @@ describe('wasteController', () => {
     const waste = { id: 'waste-1', currentStock: 6 };
     const req = {
       params: { id: 'waste-1' },
-      body: { quantity: '2', observations: '  Recortes de producción  ' },
+      body: { quantity: 2, observations: '  Recortes de producción  ' },
       user: { id: 'user-1' }
     };
     const res = createResponse();

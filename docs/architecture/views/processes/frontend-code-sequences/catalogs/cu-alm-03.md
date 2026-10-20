@@ -20,6 +20,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `HTTP` | boundary | [`axiosInstanceApi.js`](../../../../../../src/public/js/services/axiosInstanceApi.js) |
 | `Transport` | control | [`materialApiRoute.js`](../../../../../../src/routes/api/warehouse/materialApiRoute.js) |
 | `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
+| `FileErrorHandler` | control | [`errorHandler.js`](../../../../../../src/public/js/api/errorHandler.js) |
 | `FileResponseUtils` | control | [`responseUtils.js`](../../../../../../src/public/js/utils/responseUtils.js) |
 | `FileApiMessages` | control | [`apiMessages.js`](../../../../../../src/public/js/constants/apiMessages.js) |
 | `FileMaterialController` | control | [`materialController.js`](../../../../../../src/controllers/api/warehouse/materialController.js) |
@@ -56,6 +57,7 @@ flowchart TB
         FileUtils["utils.js"]
         FileApiMessages["apiMessages.js"]
         FormUtils["formUtils.js"]
+        FileErrorHandler["errorHandler.js"]
         FileResponseUtils["responseUtils.js"]
         FileBaseValidations["baseValidations.js"]
         FileFieldValidations["fieldValidations.js"]
@@ -66,12 +68,15 @@ flowchart TB
         FileMaterials["materials.js"]
         Request["materialService.js"]
     end
-    FileUtils -->|import| FileApiMessages
-    FileMaterials -->|import| Request
-    FileMaterials -->|import| Application
-    FormUtils -->|import| FileApiMessages
-    FileResponseUtils -->|import| FileApiMessages
+    Application -->|import| FileResponseUtils
+    FileErrorHandler -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FileMaterials -->|import| Application
+    FileMaterials -->|import| Request
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
     Transport -->|import| FileMaterialController

@@ -102,6 +102,19 @@ transaccionales; no se presentan como cobertura HTTP de esos endpoints.
 
 ## Regla de mantenimiento
 
+`DP-VAL-003` cubre la captura de detalles de salidas de material, consumible y merma:
+booleanos/textos válidos conservan `false`; tipos incorrectos se rechazan con códigos
+por campo antes del controller. La integración comprueba que no cambian documentos,
+saldos ni movimientos ante esos rechazos.
+
+La recuperación compartida de lecturas de listados se verifica en `DP-UI-001` con
+`createDataTableTest.js` y `errorHandlerTest.js`: reintento limitado, Swal ante error
+definitivo y ausencia de resultados tardíos. Esta evidencia transversal no sustituye
+los filtros, permisos o consultas de cada caso ni un recorrido real de navegador.
+`DP-VAL-002` añade el contrato de acceso (`CU-AUT-01`) con router y servicio reales:
+captura inválida, rechazo genérico de credenciales y acceso válido. La renovación
+coordinada se cubre de forma unitaria; los dobles no acreditan cookies en un navegador.
+
 La decisión de conservar, consolidar o retirar depende de la condición y del oráculo,
 no de que el archivo pertenezca a frontend o backend. Se conservan cálculo, asignación
 de resultados, serialización, permisos y estados críticos. Se retiran aserciones sobre
@@ -159,3 +172,22 @@ Las entradas de merma `CU-ALM-10/13`, altas `CU-ALM-02/18` y consultas operativa
 incorporan `CP-INT-CON-001/002/003` del registro selectivo para idempotencia, versiones,
 alta concurrente y paginación SQL. El bloqueo de submit y la recuperación se verifican
 como estados/payloads unitarios; queda pendiente el recorrido de navegador real.
+
+En `CU-AUT-01`, `authValidationTest.js` compara presencia/tipo y fronteras de login entre frontend/backend; la integración de acceso utiliza una clave histórica con espacios, comprueba que el valor recortado se rechaza y conserva la cuenta. Los tests de application de entradas/salidas demuestran rutas y datos sin importar páginas; la autorización real permanece cubierta en integración.
+
+
+`DP-VAL-004` añade fronteras y particiones de captura para personas, clientes,
+inventario, catálogos y documentos. `CP-INT-VAL-004` prueba con routers reales los
+rechazos de tipos, precisión y fecha, junto con la ausencia de escrituras. Para
+`CU-IDA-02..03`, la prueba de tabla verifica carga/retiro/reinicio con dobles; para
+edición de compras, `goodsReceiptFormTest.js` verifica la lista incremental omitida o
+presente. No cierra las brechas de persistencia exitosa de personas ni el recorrido
+real de navegador, y no acredita validación de estado de roles/áreas en el servicio.
+
+
+`DP-VAL-005` cubre precisión y signo sin confundir capas: unitarias comparan captura
+front/back y el body tipado, mientras `CP-INT-VAL-005` verifica la escritura real de
+material y los rechazos de inventario. Se conserva la cobertura existente de cantidad
+inicial de merma cero sin entrada y de adición/devolución positiva. Los DTOs y
+controllers reciben los tipos que entregan los validators; sus pruebas no simulan
+una conversión adicional. No se modifica el esquema para redondear históricos.

@@ -1,11 +1,8 @@
 import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/warehouse/materialError.js";
-import { roundTo } from "../../../utils/formattersUtils.js";
-import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
+import { calculateGoodsReceiptDetailAmounts } from '../../../shared/inventory/goodsReceiptCalculations.js';
 import { findMaterialsSnapshot } from "../materials/materialService.js";
-import { MATERIAL_TYPES } from "../../../constants/inventory.js";
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { GoodsReceiptNotFound } from "../../../errors/warehouse/goodsReceiptError.js";
-
-const IVA_RATE = 1.16;
 
 export const buildGoodsReceiptContextWhere = (type = null) => {
     if (type === null) return {};
@@ -53,21 +50,11 @@ export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId 
     });
 };
 
-export const calculateGoodsReceiptDetail = ({ material, detail: { quantity, costPerUnitType } }) => {
-    const netPurchaseAmount = roundTo(quantity * costPerUnitType);
-    const convertedQuantity = calculateConvertedQuantity({ quantity, base: material.base, height: material.height });
-
-    return {
-        materialId: material.id,
-        materialName: material.name,
-        quantity,
-        convertedQuantity,
-        costPerUnitType,
-        conversionUnitCost: convertedQuantity > 0 ? roundTo(netPurchaseAmount / convertedQuantity) : 0,
-        netPurchaseAmount,
-        grossPurchaseAmount: roundTo(netPurchaseAmount * IVA_RATE)
-    };
-};
+export const calculateGoodsReceiptDetail = ({ material, detail }) => ({
+    materialId: material.id,
+    materialName: material.name,
+    ...calculateGoodsReceiptDetailAmounts({ ...detail, base: material.base, height: material.height })
+});
 
 export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = false } = {}) => details.reduce((acc, detail) => {
     if (!includeCanceled && detail.status === 'CANCELED') return acc;

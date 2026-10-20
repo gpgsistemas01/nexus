@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const showError = vi.fn();
 
@@ -10,18 +10,13 @@ vi.mock('../../../../../src/public/js/plugins/swal/swalComponent.js', () => ({
   }
 }));
 
-vi.mock('../../../../../src/public/js/ui/forms/formStateUI.js', () => ({
-  resetFormSubmitState: vi.fn()
-}));
-
 const { notifications } = await import('../../../../../src/public/js/plugins/swal/swalComponent.js');
-const { handleApiError, handleDataTableError, runApiAction } = await import('../../../../../src/public/js/api/errorHandler.js');
-const { resetFormSubmitState } = await import('../../../../../src/public/js/ui/forms/formStateUI.js');
+const { handleApiError, runApiAction } = await import('../../../../../src/public/js/api/errorHandler.js');
 const { getErrorMessage } = await import('../../../../../src/public/js/constants/apiMessages.js');
 
 const createForm = ({ field = null, detailId = null, mode = 'edit', hasInput = true, hidden = false } = {}) => {
-  const createElement = () => {
-    const classes = new Set(['d-none']);
+  const createElement = ({ isFeedback = false } = {}) => {
+    const classes = new Set(isFeedback ? ['d-none'] : []);
     return {
       textContent: '',
       classList: {
@@ -37,7 +32,7 @@ const createForm = ({ field = null, detailId = null, mode = 'edit', hasInput = t
     };
   };
   const input = field && hasInput ? createElement() : null;
-  const feedback = field ? createElement() : null;
+  const feedback = field ? createElement({ isFeedback: true }) : null;
   const feedbackKey = detailId ? `${field}-${detailId}` : field;
   if (feedback) feedback.dataset = { errorFor: feedbackKey };
 
@@ -77,11 +72,10 @@ describe('errores de validación desde la API hasta la notificación', () => {
     handleApiError({ err: validationError({ [field]: { code } }), form });
 
     expect(notifications.showModal).toHaveBeenCalledExactlyOnceWith({
-      title: expect.any(String),
-      text: getErrorMessage({ code }),
+      title: getErrorMessage({ code }),
+      text: null,
       icon: 'warning'
     });
-    expect(resetFormSubmitState).toHaveBeenCalledWith(form);
   });
 
   it.each([
@@ -115,7 +109,6 @@ describe('errores de validación desde la API hasta la notificación', () => {
       text: null,
       icon: 'warning'
     });
-    expect(resetFormSubmitState).toHaveBeenCalledWith(form);
   });
 
   it('conserva el error del campo en el formulario sin duplicarlo en Swal', () => {
@@ -135,7 +128,8 @@ describe('errores de validación desde la API hasta la notificación', () => {
 
     expect(feedback.textContent).toBe(getErrorMessage({ code: 'NAME_REQUIRED' }));
     expect(notifications.showModal).toHaveBeenCalledWith(expect.objectContaining({
-      text: getErrorMessage({ code: 'RECORD_VERSION_REQUIRED' })
+      title: getErrorMessage({ code: 'RECORD_VERSION_REQUIRED' }),
+      text: null
     }));
   });
 
@@ -158,13 +152,22 @@ describe('errores de validación desde la API hasta la notificación', () => {
     expect(notifications.showModal).not.toHaveBeenCalled();
   });
 
+  it('no deja silencioso un error anidado cuando su partida ya no tiene controles visibles', () => {
+    const { form } = createForm({ mode: 'edit-detail' });
+
+    handleApiError({ err: validationError({ missingDetail: { quantity: { code: 'QUANTITY_REQUIRED' } } }), form });
+
+    expect(notifications.showModal).toHaveBeenCalledExactlyOnceWith({ title: 'Errores de validación.', text: null, icon: 'warning' });
+  });
+
   it('muestra un aviso cuando el error pertenece a una sección oculta', () => {
     const { form } = createForm({ field: 'name', hidden: true });
 
     handleApiError({ err: validationError({ name: { code: 'NAME_REQUIRED' } }), form });
 
     expect(notifications.showModal).toHaveBeenCalledWith(expect.objectContaining({
-      text: getErrorMessage({ code: 'NAME_REQUIRED' })
+      title: getErrorMessage({ code: 'NAME_REQUIRED' }),
+      text: null
     }));
   });
 
@@ -172,7 +175,8 @@ describe('errores de validación desde la API hasta la notificación', () => {
     handleApiError({ err: validationError([{ path: 'supplierId', location: 'body', msg: 'SUPPLIER_ID_INVALID_UUID' }]) });
 
     expect(notifications.showModal).toHaveBeenCalledWith(expect.objectContaining({
-      text: getErrorMessage({ code: 'SUPPLIER_ID_INVALID_UUID' })
+      title: getErrorMessage({ code: 'SUPPLIER_ID_INVALID_UUID' }),
+      text: null
     }));
   });
 
@@ -181,29 +185,97 @@ describe('errores de validación desde la API hasta la notificación', () => {
 
     handleApiError({ err: validationError({}), form });
 
-    expect(notifications.showModal).toHaveBeenCalledWith(expect.objectContaining({ text: 'Errores de validación.' }));
+    expect(notifications.showModal).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Errores de validación.',
+      text: null
+    }));
   });
 });
 
-describe('notificaciones de errores de tablas', () => {
+describe('presentación compartida de errores globales', () => {
   beforeEach(() => vi.clearAllMocks());
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('traduce un conflicto del servicio sin usar su código como título', () => {
+    handleApiError({ err: { status: 409, data: { code: 'RECORD_VERSION_CONFLICT' } } });
+
+    expect(notifications.showModal).toHaveBeenCalledExactlyOnceWith({
+      title: getErrorMessage({ code: 'RECORD_VERSION_CONFLICT' }), text: null, icon: 'warning'
+    });
+  });
+
+  it('usa el mensaje público del servicio si el código aún no tiene traducción local', () => {
+    const message = 'Uno o más detalles no pertenecen a la salida de merma.';
+
+    handleApiError({ err: { status: 404, data: { code: 'WASTE_ISSUE_DETAIL_NOT_FOUND', message } } });
+
+    expect(notifications.showModal).toHaveBeenCalledExactlyOnceWith({ title: message, text: null, icon: 'warning' });
+  });
+
+  it('conserva el aviso genérico de credenciales sin redirigir ni tratarlo como sesión vencida', () => {
+    const replace = vi.fn();
+    vi.stubGlobal('window', { location: { replace } });
+
+    handleApiError({ err: { status: 401, requiresAuth: false, data: {
+      code: 'LOGIN_ERROR', message: 'Usuario o contraseña incorrectos.'
+    } } });
+
+    expect(notifications.showModal).toHaveBeenCalledExactlyOnceWith({
+      title: 'Usuario o contraseña incorrectos.', text: null, icon: 'warning'
+    });
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it('redirige por sesión vencida y conserva el aviso para la página de acceso', () => {
+    const replace = vi.fn();
+    const setItem = vi.fn();
+    vi.stubGlobal('window', { location: { replace } });
+    vi.stubGlobal('localStorage', { setItem });
+
+    handleApiError({ err: { status: 401, data: { code: 'INVALID_AUTH' } } });
+
+    expect(replace).toHaveBeenCalledExactlyOnceWith('/');
+    expect(setItem).toHaveBeenCalledExactlyOnceWith('showErrorToast', getErrorMessage({ code: 'INVALID_AUTH' }));
+    expect(notifications.showModal).not.toHaveBeenCalled();
+  });
+
+  it('presenta el permiso insuficiente con el mismo aviso en cualquier componente', () => {
+    handleApiError({ err: { status: 403, data: { code: 'FORBIDDEN' } } });
+
+    expect(showError).toHaveBeenCalledExactlyOnceWith(getErrorMessage({ code: 'FORBIDDEN' }));
+    expect(notifications.showModal).not.toHaveBeenCalled();
+  });
 
   it('muestra el mensaje seguro y el código del error de esquema', () => {
-    handleDataTableError({
+    handleApiError({ err: {
       status: 503,
       data: {
         code: 'PRISMA_CLIENT_OUT_OF_SYNC',
         message: 'El cliente de base de datos no está actualizado. Contacta a soporte.'
       }
-    });
+    } });
 
-    expect(showError).toHaveBeenCalledWith(
-      'El cliente de base de datos no está actualizado. Contacta a soporte. (Código: PRISMA_CLIENT_OUT_OF_SYNC)'
-    );
+    expect(notifications.showModal).toHaveBeenCalledExactlyOnceWith({
+      title: 'No se pudo completar la acción',
+      text: 'El cliente de base de datos no está actualizado. Contacta a soporte. (Código: PRISMA_CLIENT_OUT_OF_SYNC)',
+      icon: 'error'
+    });
+    expect(showError).not.toHaveBeenCalled();
+  });
+
+  it('presenta un 500 en un diálogo con su código en lugar de un toast', () => {
+    handleApiError({ err: { status: 500, data: { code: 'SERVER_ERROR' } } });
+
+    expect(notifications.showModal).toHaveBeenCalledExactlyOnceWith({
+      title: 'No se pudo completar la acción',
+      text: `${getErrorMessage({ code: 'SERVER_ERROR' })} (Código: SERVER_ERROR)`,
+      icon: 'error'
+    });
+    expect(showError).not.toHaveBeenCalled();
   });
 
   it('muestra el error de parámetro específico al fallar la carga de una tabla', () => {
-    expect(handleDataTableError({ status: 400, data: { code: 'RECORD_ID_INVALID' } })).toEqual([]);
+    handleApiError({ err: { status: 400, data: { code: 'RECORD_ID_INVALID' } } });
 
     expect(notifications.showModal).toHaveBeenCalledWith(expect.objectContaining({
       title: getErrorMessage({ code: 'RECORD_ID_INVALID' }),
@@ -233,6 +305,8 @@ describe('acciones de consulta y apertura de modal', () => {
     await expect(runApiAction(async () => open(await read()))).resolves.toBeUndefined();
 
     expect(open).not.toHaveBeenCalled();
-    expect(showError).toHaveBeenCalledExactlyOnceWith('Consulta no disponible');
+    expect(notifications.showModal).toHaveBeenCalledExactlyOnceWith({
+      title: 'No se pudo completar la acción', text: 'Consulta no disponible', icon: 'error'
+    });
   });
 });

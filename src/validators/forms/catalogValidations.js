@@ -1,30 +1,27 @@
 import { MANAGED_CATALOGS } from '../../constants/catalogs.js';
 import { validateRecordVersion } from '../fields/versionValidator.js';
 import {
-    validateBooleanWhen,
-    validateTextWithDynamicMaxLength
+    validateBoolean,
+    validateText
 } from '../fields/fieldsValidator.js';
 
-const isCatalog = catalogName => req => req.params.catalog === catalogName;
-const catalogHasField = fieldName => req => MANAGED_CATALOGS[req.params.catalog]
+const isCatalog = catalogName => (_, { req }) => req.params.catalog === catalogName;
+const catalogHasField = fieldName => (_, { req }) => MANAGED_CATALOGS[req.params.catalog]
     ?.fields.includes(fieldName);
 const getCatalogMaxLength = fieldName => req => MANAGED_CATALOGS[req.params.catalog]?.maxLengths[fieldName];
 
 export const catalogEntryValidation = [
-    validateTextWithDynamicMaxLength({
+    validateText({
         fieldName: 'name',
-        getMaxLength: getCatalogMaxLength('name'),
-        predicate: req => Boolean(MANAGED_CATALOGS[req.params.catalog])
+        maxLength: getCatalogMaxLength('name'),
+        condition: (_, { req }) => Boolean(MANAGED_CATALOGS[req.params.catalog])
     }),
-    validateTextWithDynamicMaxLength({
+    validateText({
         fieldName: 'symbol',
-        getMaxLength: getCatalogMaxLength('symbol'),
-        predicate: isCatalog('unit-measures')
+        maxLength: getCatalogMaxLength('symbol'),
+        condition: isCatalog('unit-measures')
     }),
-    validateBooleanWhen({
-        fieldName: 'isActive',
-        predicate: catalogHasField('isActive')
-    })
+    validateBoolean('isActive', { condition: catalogHasField('isActive') })
 ];
 
 export const catalogEntryEditValidation = [

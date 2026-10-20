@@ -19,9 +19,12 @@ import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.
 import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
 import { prepareWasteMeasurements } from './wasteHelpers.js';
 import { lockWasteStock } from '../../../repository/warehouse/stockLockRepository.js';
-import { MATERIAL_TYPES } from '../../../constants/inventory.js';
-import { WASTE_IMMUTABLE_FIELDS, WASTE_OPERATION_ACTIONS } from '../../../public/js/constants/inventory.js';
-import { isSquareMeterUnitMeasure } from '../../../public/js/utils/warehouseInventoryUtils.js';
+import {
+    MATERIAL_TYPES,
+    WASTE_IMMUTABLE_FIELDS,
+    WASTE_OPERATION_ACTIONS
+} from '../../../shared/constants/inventory.js';
+import { isSquareMeterUnitMeasure } from '../../../shared/inventory/wasteMeasurements.js';
 
 import { assertRecordVersion, updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { executeWasteOperation, markWasteOperationRejected } from './wasteOperationService.js';

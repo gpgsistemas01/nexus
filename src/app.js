@@ -1,18 +1,22 @@
 import 'dotenv/config.js';
 import { getRequestLogContext, logger, pinoLogger } from './utils/logger.js';
-import { hasPermission } from './public/js/constants/permissions.js';
+import { hasPermission } from './shared/constants/permissions.js';
 
 import { registerApiRoutes } from './routes/api/index.js';
 import { registerWebRoutes } from './routes/web/index.js';
 
-import { checkTypeContentJson, checkTypeContentFile, checkContentTypePlainText } from './middleware/contentTypeMiddleware.js';
+import {
+    checkTypeContentJson,
+    checkTypeContentFile,
+    checkContentTypePlainText
+} from './middleware/contentTypeMiddleware.js';
 import cookieParser from 'cookie-parser';
 
 import express from 'express';
 import http from 'node:http';
 import expressEjsLayouts from 'express-ejs-layouts';
 import { Server } from 'socket.io';
-import { publicDir, viewsDir } from './utils/pathsUtils.js';
+import { publicDir, sharedDir, viewsDir } from './utils/pathsUtils.js';
 import { errorMap } from './messages/codeMessages.js';
 import { initSocket } from './utils/socketUtils.js';
 import { isAppError } from './errors/AppError.js';
@@ -40,6 +44,7 @@ app.set('layout extractStyles', true);
 app.set('layout extractScripts', true);
 
 app.use(rootRoute, express.static(publicDir));
+app.use('/shared', express.static(sharedDir));
 
 app.use(apiRoute, express.json());
 app.use(textRoute, express.text({ type: 'text/plain' }));

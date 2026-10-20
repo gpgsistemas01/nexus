@@ -64,3 +64,4 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/frontend-code-sequences/index.md).
 
+El login valida presencia, tipo texto y longitud máxima de usuario/contraseña; no aplica la política de creación de claves. El nombre admite minúsculas, se recortan sólo sus espacios exteriores y la contraseña se conserva exactamente. Backend y frontend comparten `AUTH_FIELD_LIMITS`. La creación/cambio mantiene los requisitos de contraseña existentes. Una captura inválida responde `400` por campo y una credencial no coincidente responde el `401 LOGIN_ERROR` genérico del servicio.

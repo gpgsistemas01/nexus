@@ -18,8 +18,8 @@ Los avisos se distinguen mediante una marca y una etiqueta textual:
 | Formulario o familia | Campos y controles que se validan | Cuándo se comprueba | Recuperación visible |
 | --- | --- | --- | --- |
 | Inicio de sesión | Usuario y contraseña requeridos; coincidencia con una cuenta habilitada | Al seleccionar **Iniciar sesión** | Corrija el campo indicado o solicite restablecimiento; no pruebe cuentas ajenas. |
-| Personas, clientes y proveedores | Nombre e identificadores requeridos; formato y longitud; relaciones vigentes | En alta y edición | Conserve el formulario abierto y corrija sólo los campos marcados. |
-| Usuarios y acceso | Persona, usuario, rol y departamento vigentes; usuario sin espacios; contraseña con longitud, mayúscula, número y carácter especial | En alta, edición de acceso o cambio de contraseña | No comparta la contraseña ni la incluya en evidencia; corrija la regla indicada. |
+| Personas, clientes y proveedores | Nombre requerido: hasta 255 caracteres para personas/clientes, 200 para razón social y 100 para nombre comercial. Personas requieren al menos un acceso con área y rol, sin repetir área | En alta y edición | Conserve el formulario abierto y corrija sólo los campos marcados. |
+| Usuarios y acceso | Usuario sin espacios, rol y departamento requeridos; al crear o cambiar contraseña: de 6 a 50 caracteres, mayúscula, número y caracteres admitidos. El carácter especial no es obligatorio; iniciar sesión conserva la contraseña exacta | En alta, edición de acceso o cambio de contraseña | No comparta la contraseña ni la incluya en evidencia; corrija la regla indicada. |
 | Catálogos auxiliares | **Nombre** requerido y sin caracteres no admitidos; máximo 50 para Áreas, Roles, Presentaciones y Estados de cumplimiento, 20 para Unidades de medida y 100 para Motivos de ajuste; **Símbolo** requerido y máximo 10 sólo en Unidades de medida; **Activo** booleano requerido en todos los catálogos auxiliares | Al seleccionar **Guardar** o **Actualizar** | El formulario permanece abierto y señala el campo; una solicitud rechazada no modifica el catálogo. |
 | Material / alta directa | Identidad, proveedor, unidad y presentación válidos; medidas sólo en metros o litros, ambas o ninguna; pieza sin medidas; estado requerido; stock mínimo opcional numérico; existencia inicial y costo máximo obligatorios y numéricos | Al seleccionar **Guardar** desde **Almacén → Materiales** | Una identidad repetida no suma existencia: confirme el aviso para revisar la cantidad en Agregar stock y guarde ese modal. |
 | Material / alta desde compra | Identidad, proveedor, unidad y presentación válidos; medidas sólo en metros o litros, ambas o ninguna; pieza sin medidas; stock mínimo y estado admitidos. No se solicitan costo máximo, existencia inicial, razón ni observaciones de ajuste; costo máximo y existencia inicial dejan de ser obligatorios | Al seleccionar **Guardar** en **Nuevo material** abierto desde una compra | El material vuelve seleccionado con existencia cero y sin costo máximo; capture **Cantidad** y **Costo por Presentación** en el detalle y confirme la compra para afectar inventario. |
@@ -75,6 +75,13 @@ toda su cantidad pendiente; **Cantidad de proyecto** no determina una entrega pa
 
 ### Peso unitario de merma
 
+La captura de cantidades, medidas y stock admite hasta dos decimales; los costos
+permiten hasta seis. Una cantidad con un tercer decimal se señala para corregirla.
+El stock inicial, mínimo y saldo de ajuste pueden ser cero; las cantidades a agregar
+o devolver y las medidas deben ser mayores que cero. En compras y salidas de material,
+la cantidad por presentación conserva su mínimo de uno. Dejar vacío el stock mínimo
+opcional no equivale a capturar cero.
+
 | Campo y modo | Validación |
 | --- | --- |
 | Pesos de Rollo (kg por unidad) | Al crear Rollo se requieren cono, total del sobrante y total del rollo completo; cono ≥ 0, ambos totales > cono y ≤ 999.99. Dos decimales y netos calculados. Los históricos pueden conservar pesos desconocidos. |
@@ -88,7 +95,7 @@ Véase el [recorrido del peso](../requirements/requirements-specification/04-uni
 | --- | --- |
 | Origen de merma | Material en m²; no se admiten consumibles ni otras unidades. |
 | Muestra de Rollo | Peso total del rollo completo con cono, mayor que el cono y hasta 999.99 kg, con dos decimales. El largo procede del material. Se usa el mismo cono para ambos netos. |
-| Dimensiones de merma de Rollo | Ambos campos están deshabilitados. La dimensión menor procede del material y la otra se calcula por peso. Si faltan datos, complete el peso del rollo completo y los pesos del sobrante antes de guardar. |
+| Dimensiones de merma de Rollo | Ambos campos están deshabilitados. La dimensión menor procede del material y la otra se calcula por peso; los valores incorporados al formulario se expresan con hasta dos decimales. Si faltan datos, complete el peso del rollo completo y los pesos del sobrante antes de guardar. |
 
 ### Capturas pendientes y versiones
 

@@ -21,3 +21,15 @@ clase `Model` ni trasladar reglas a controllers para «completar» MVC.
 
 **Regla de construcción:** un recurso nuevo conserva el mismo dominio y nombre a través
 de sus capas. No se crea una carpeta horizontal nueva sólo para una operación CRUD.
+
+Las reglas puras utilizadas por ambos entornos viven en `src/shared`, servido en
+`/shared`. `public/js/utils` conserva lectura y etiquetas de inventario, Select2 adapta
+sus opciones en `plugins/select2/inventorySelectData.js`, y `application` adapta
+contratos de detalle. Las páginas entregan callbacks a los plugins para componer
+modales sin dependencias inversas. La captura de compra vive en `goodsReceiptContext`.
+
+Las consultas y resúmenes de compra/merma se mantienen junto a su dominio. La
+construcción de filas y fórmulas Excel pertenece al adaptador de salida, separado de
+los controllers y del escritor de archivos. Los validadores devuelven errores de
+detalle estructurados; no serializan JSON dentro de mensajes. Las altas preservan
+`AppError` y normalizan errores de persistencia con `handleServiceError`.

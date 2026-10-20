@@ -119,7 +119,7 @@ sequenceDiagram
         HTTP-->>Request: apiRequest(): throw { status: number, data: Object | null, message: string, raw: Error }
         Request-->>Application: throw { status: number, data: Object | null, message: string, raw: Error }
         Application-->>TableCore: throw { status: number, data: Object | null, message: string, raw: Error }
-        TableCore->>FileErrorHandler: handleDataTableError(error)
+        TableCore->>FileErrorHandler: handleApiError({ err: error })
         TableCore->>Browser: callback({ data: [], recordsTotal: 0, recordsFiltered: 0 })
     end
     deactivate Application

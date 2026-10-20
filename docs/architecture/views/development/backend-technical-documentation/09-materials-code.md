@@ -74,6 +74,12 @@ una consulta de unidad ni una validación duplicada en el servicio.
 
 materialService colabora con materialHelpers, supplierMaterialService y adjustmentService. El selector base no encapsula esas reglas ni sus consultas.
 
+El validador de alta admite omitir costo máximo y existencia inicial si el material o
+consumible se crea desde compra. Esta excepción no se comparte con edición o ajuste:
+`materialEditValidation` siempre valida `maxUnitCost` y `materialStockValidation`,
+`newStock`, aunque el body incluya `creationContext='goodsReceipt'`. Se reutilizan las
+comprobaciones del campo y los códigos de error, conservando la condición de cada operación.
+
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/backend-code-sequences/index.md).

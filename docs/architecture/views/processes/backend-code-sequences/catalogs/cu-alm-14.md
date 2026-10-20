@@ -17,6 +17,8 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Route` | boundary | [`reportApiRoute.js`](../../../../../../src/routes/api/warehouse/reportApiRoute.js) |
 | `Controller` | control | [`reportController.js`](../../../../../../src/controllers/api/warehouse/reportController.js) |
 | `Query` | control | [`reportService.js`](../../../../../../src/services/warehouse/reportService.js) |
+| `Data` | control | [`warehouseReportExcel.js`](../../../../../../src/utils/reports/warehouseReportExcel.js) |
+| `Summary` | control | [`wasteReportSummary.js`](../../../../../../src/services/warehouse/wastes/wasteReportSummary.js) |
 | `Excel` | control | [`reportExcelUtils.js`](../../../../../../src/utils/reportExcelUtils.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `Auth` | control | [`authMiddleware.js`](../../../../../../src/middleware/authMiddleware.js) |
@@ -31,6 +33,8 @@ sequenceDiagram
     participant Auth@{ "type": "control" } as authMiddleware.js
     participant Controller@{ "type": "control" } as reportController.js
     participant Query@{ "type": "control" } as reportService.js
+    participant Data@{ "type": "control" } as warehouseReportExcel.js
+    participant Summary@{ "type": "control" } as wasteReportSummary.js
     participant Excel@{ "type": "control" } as reportExcelUtils.js
     participant ErrorHandler@{ "type": "control" } as app.js
 
@@ -53,9 +57,11 @@ sequenceDiagram
     Controller->>Query: findWasteReportRows({ search: getDataTableSearch(req.query), supplierId: req.query.supplierId || null, inventoryScope: req.query.inventoryScope, orderBy, orderDir })
     activate Query
     alt Servicio resuelto
-        Query-->>Controller: findWasteReportRows(): Promise[Object[]]
-        Controller->>Query: buildWasteReportSummary(rows)
-        Query-->>Controller: buildWasteReportSummary(): Object (rows, totals con weightStatus)
+        Query-->>Controller: findWasteReportRows(): AsyncIterable de filas
+        Controller->>Data: buildWasteReportData(rows)
+        Data->>Summary: createWasteReportSummary()
+        Summary-->>Data: createWasteReportSummary(): { add, finish }
+        Data-->>Controller: buildWasteReportData(): Promise[Array[]] con totales y weightStatus
         Controller->>Excel: sendExcelReport({ res, data, sheetName, filename })
         Excel-->>Client: HTTP 200 archivo XLSX
     else AppError propagado

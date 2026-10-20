@@ -1,12 +1,12 @@
+import { FORM_FIELD_LIMITS, MONEY_INPUT_FORMAT } from '../../shared/constants/inputValidation.js';
 import { body } from 'express-validator';
 import { errorMap } from '../../messages/codeMessages.js';
 import {
     validatePositiveNumberOptional,
     validateNumberRequiredWhenOtherPresent,
-    validateNumberWhen,
+    validateNumber,
     validateText,
-    validateUUID,
-    validateUUIDWhen
+    validateUUID
 } from "../fields/fieldsValidator.js";
 import { validateRecordVersion } from '../fields/versionValidator.js';
 import { createInventoryObservationsValidation, createInventoryStateValidation } from './inventoryValidations.js';
@@ -22,27 +22,23 @@ export const isGoodsReceiptMaterialCreation = (body = {}) =>
 
 const materialDataValidation = [
     ...materialRollReferenceValidation,
-    validateText({ fieldName: 'name', maxLength: 200 }),
+    validateText({ fieldName: 'name', maxLength: FORM_FIELD_LIMITS.MATERIAL_NAME }),
     validateUUID('supplierId'),
-    ...createInventoryStateValidation(),
-    validateNumberWhen({ fieldName: 'maxUnitCost', predicate: (body) => !isGoodsReceiptMaterialCreation(body) }),
+    ...createInventoryStateValidation()
 ];
 
 export const materialEditValidation = [
     ...materialDataValidation,
+    validateNumber('maxUnitCost', { format: MONEY_INPUT_FORMAT }),
     validateRecordVersion(),
     validateRecordVersion('expectedMaterialVersion')
 ];
 
-const materialStockDataValidation = [
-    validateNumberWhen({ fieldName: 'newStock', predicate: (body) => !isGoodsReceiptMaterialCreation(body) }),
-    createInventoryObservationsValidation()
-];
-
 export const materialStockValidation = [
     validateUUID('supplierId'),
-    ...materialStockDataValidation,
-    validateUUIDWhen({ fieldName: 'reasonId', predicate: () => true }),
+    validateNumber('newStock'),
+    createInventoryObservationsValidation(),
+    validateUUID('reasonId'),
     validateRecordVersion()
 ];
 
@@ -50,7 +46,9 @@ export const consumableValidation = [
     validateUUID('presentationId'),
     validateUUID('unitMeasureId'),
     ...materialDataValidation,
-    ...materialStockDataValidation
+    validateNumber('maxUnitCost', { format: MONEY_INPUT_FORMAT, condition: (_, { req }) => !isGoodsReceiptMaterialCreation(req.body) }),
+    validateNumber('newStock', { condition: (_, { req }) => !isGoodsReceiptMaterialCreation(req.body) }),
+    createInventoryObservationsValidation()
 ];
 
 export const materialValidation = [

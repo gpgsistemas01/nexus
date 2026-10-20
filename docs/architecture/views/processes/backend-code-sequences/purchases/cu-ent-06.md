@@ -3,11 +3,6 @@
 
 **Patrones:** `BE-P07`.
 
-    opt Error de lectura o exportación
-        Core-->>ErrorHandler: error propagado por Express
-        ErrorHandler-->>Client: HTTP de error { code, message }
-        end
-    end
 ## Participantes y trazabilidad
 
 Cada línea de vida técnica corresponde a un único archivo de implementación, indicado
@@ -24,8 +19,11 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Controller` | control | [`materialGoodsReceiptReportController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js) |
 | `Facade` | control | [`materialGoodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) |
 | `Core` | control | [`reportController.js`](../../../../../../src/controllers/api/warehouse/reportController.js) |
-| `Query` | control | [`reportService.js`](../../../../../../src/services/warehouse/reportService.js) |
+| `Query` | control | [`goodsReceiptReportService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportService.js) |
+| `Pagination` | control | [`paginationRepository.js`](../../../../../../src/repository/paginationRepository.js) |
 | `List` | control | [`goodsReceiptService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) |
+| `Data` | control | [`warehouseReportExcel.js`](../../../../../../src/utils/reports/warehouseReportExcel.js) |
+| `Summary` | control | [`goodsReceiptReportSummary.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportSummary.js) |
 | `Excel` | control | [`reportExcelUtils.js`](../../../../../../src/utils/reportExcelUtils.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
@@ -84,41 +82,82 @@ sequenceDiagram
     autonumber
     participant Client as Cliente HTTP / web
     participant Controller@{ "type": "control" } as materialGoodsReceiptReportController.js
-    participant Facade@{ "type": "control" } as materialGoodsReceiptService.js
     participant Core@{ "type": "control" } as reportController.js
-    participant Query@{ "type": "control" } as js
-    participant List@{ "type": "control" } as goodsReceiptService.js
-    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
-    participant Excel@{ "type": "control" } as reportExcelUtils.js
-    participant ErrorHandler@{ "type": "control" } as app.js
-
     participant Formatter@{ "type": "control" } as formattersUtils.js
+    participant ErrorHandler@{ "type": "control" } as app.js
+    participant Facade@{ "type": "control" } as materialGoodsReceiptService.js
+    participant Query@{ "type": "control" } as goodsReceiptReportService.js
+    participant Data@{ "type": "control" } as warehouseReportExcel.js
+    participant Excel@{ "type": "control" } as reportExcelUtils.js
 
-    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
-
-    alt Exportación resuelta
-
-        Controller->>Core: exportGoodsReceiptReportExcel({ req, res, materialType, findGoodsReceiptReportRows })
-        Core->>Formatter: getReportMonthDateRange(reportMonth) cuando el reporte es mensual
-        Formatter-->>Core: getReportMonthDateRange(): Object
-        Core->>Facade: findMaterialGoodsReceiptReportRows(options)
-        Facade->>Query: findGoodsReceiptReportRows({ ...options, type: MATERIAL })
-        Query->>List: findAllGoodsReceipts({ ...filtros, type, includeCounts: false, skip: 0, take: 100000 })
-        List->>FileBaseRepository: getDb()
-        FileBaseRepository-->>List: getDb(): PrismaClient | TransactionClient — conserva tx
-        List->>Prisma: goodsReceipt.findMany({ where: contexto y filtros })
-        activate Prisma
-        Prisma-->>List: findMany(): Promise[GoodsReceipt[]]
-        deactivate Prisma
-        List-->>Query: findAllGoodsReceipts(): Promise[{ data }] — sin conteos
-        Query-->>Facade: findGoodsReceiptReportRows(): Promise[Object[]]
-        Facade-->>Core: findMaterialGoodsReceiptReportRows(): Promise[Object[]]
-        Core->>Query: buildMonthlyGoodsReceiptSummary(rows) si se solicita resumen mensual
-        Query-->>Core: buildMonthlyGoodsReceiptSummary(): Object
-        Core->>Excel: sendExcelReport({ res, data, sheetName, filename })
-        Excel-->>Client: HTTP 200 archivo XLSX
-    else Error de lectura o exportación
+    Controller->>Core: exportGoodsReceiptReportExcel(opciones del recurso)
+    Core->>Formatter: getReportMonthDateRange(reportMonth) si aplica
+    Formatter-->>Core: getReportMonthDateRange(): rango de fechas
+    Core->>Facade: findMaterialGoodsReceiptReportRows(filtros)
+    Facade->>Query: findGoodsReceiptReportRows(filtros y tipo)
+    Query-->>Facade: findGoodsReceiptReportRows(): AsyncIterable de filas
+    Facade-->>Core: findMaterialGoodsReceiptReportRows(): AsyncIterable de filas
+    Core->>Data: buildGoodsReceiptReportData(rows, opciones)
+    Data-->>Core: buildGoodsReceiptReportData(): AsyncIterable de filas Excel
+    Core->>Excel: sendExcelReport(opciones y generador)
+    loop Consumo del generador hasta completar detalle y resumen
+        Excel->>Data: buildGoodsReceiptReportData(continuación del generador)
+        Data->>Query: findGoodsReceiptReportRows(continuación del generador)
+        Query-->>Data: findGoodsReceiptReportRows(): siguiente fila del lote
+        Data-->>Excel: buildGoodsReceiptReportData(): siguiente fila Excel
+    end
+    Excel-->>Client: HTTP 200 archivo XLSX
+    opt Error de consulta o exportación
         Core-->>ErrorHandler: error propagado por Express
-        ErrorHandler-->>Client: HTTP de error { code, message }
+        ErrorHandler-->>Client: HTTP de error con código y mensaje
     end
 ```
+
+## Detalle de consulta y proyección por lote
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Query@{ "type": "control" } as goodsReceiptReportService.js
+    participant Pagination@{ "type": "control" } as paginationRepository.js
+    participant List@{ "type": "control" } as goodsReceiptService.js
+    participant FileBaseRepository@{ "type": "control" } as baseRepository.js
+    participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
+
+    Query->>Pagination: findBatches(opciones y fetchPage)
+    loop Lotes de QUERY_BATCH_SIZES.DOCUMENTS
+        Pagination->>List: findAllGoodsReceipts(filtros, tipo y includeCounts false)
+        List->>FileBaseRepository: getDb()
+        FileBaseRepository-->>List: getDb(): PrismaClient
+        List->>Prisma: goodsReceipt.findMany(contexto, filtros y lote)
+        Prisma-->>List: findMany(): Promise[GoodsReceipt[]]
+        List-->>Pagination: findAllGoodsReceipts(): Promise[Page]
+        Pagination-->>Query: findBatches(): siguiente lote
+    end
+```
+
+## Detalle de acumulación del resumen durante la escritura
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Excel@{ "type": "control" } as reportExcelUtils.js
+    participant Data@{ "type": "control" } as warehouseReportExcel.js
+    participant Summary@{ "type": "control" } as goodsReceiptReportSummary.js
+
+    Excel->>Data: buildGoodsReceiptReportData(continuación del generador)
+    Data->>Summary: createMonthlyGoodsReceiptSummary()
+    Summary-->>Data: createMonthlyGoodsReceiptSummary(): acumulador add y finish
+    loop Por cada partida obtenida de la consulta
+        Data->>Summary: add(row)
+        Data-->>Excel: buildGoodsReceiptReportData(): fila de detalle y fórmulas
+    end
+    Data->>Summary: finish()
+    Summary-->>Data: finish(): resúmenes y totales
+    Data-->>Excel: buildGoodsReceiptReportData(): filas de resumen y fórmulas
+```
+
+
+La consulta y el adaptador Excel devuelven generadores. Sus cuerpos se ejecutan al
+consumirlos desde `sendExcelReport`; el listado se recorre por lotes, sin conteos,
+y el resumen acumula las filas del mismo recorrido. No se materializa todo el detalle.

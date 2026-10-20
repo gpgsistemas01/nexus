@@ -2,7 +2,7 @@ import express from 'express';
 import { editPerson, getAllPersons, registerPerson } from "../../../controllers/api/admin/personController.js";
 import { authorizeUserApi, verifyApiTokenRequired } from "../../../middleware/authMiddleware.js";
 import { personEditValidation, personValidation } from '../../../validators/forms/personValidations.js';
-import { PERMISSIONS } from '../../../constants/permissions.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { validate } from '../../../middleware/validatorMiddleware.js';
 
 const router = express.Router();

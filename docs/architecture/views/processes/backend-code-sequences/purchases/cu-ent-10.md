@@ -29,6 +29,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
+| `Numbers` | control | [`numberUtils.js`](../../../../../../src/shared/utils/numberUtils.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FileConsumableGoodsReceiptController` | control | [`consumableGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/consumables/consumableGoodsReceiptController.js) |
@@ -118,6 +119,7 @@ completan las llamadas a helpers y la propagación del resultado.
 
 ```mermaid
 sequenceDiagram
+    participant Numbers@{ "type": "control" } as numberUtils.js
     autonumber
     participant Client as Cliente HTTP / web
     participant Controller@{ "type": "control" } as goodsReceiptHandlers.js
@@ -143,8 +145,8 @@ sequenceDiagram
         rect rgb(245, 245, 245)
             Core->>Change: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
             Change-->>Core: findReceiptDetailForChange(): Promise[Object]
-            Core->>Formatter: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
-            Formatter-->>Core: normalizeDecimal(): number
+            Core->>Numbers: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
+            Numbers-->>Core: normalizeDecimal(): number
     end
         Core-->>Facade: correctGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
         Facade-->>Controller: correctConsumableGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]
@@ -166,6 +168,7 @@ la primera figura; los mensajes se numeran de nuevo dentro de esta colaboración
 
 ```mermaid
 sequenceDiagram
+    participant Numbers@{ "type": "control" } as numberUtils.js
     autonumber
     participant Totals@{ "type": "control" } as goodsReceiptTotalsService.js
     participant Facade@{ "type": "control" } as consumableGoodsReceiptService.js
@@ -198,8 +201,8 @@ sequenceDiagram
             Core->>Change: findReceiptDetailForChange() — comprobar existencia y estado ACTIVE
             Change-->>Core: findReceiptDetailForChange(): Promise[Object]
             Core->>Helpers: calculateGoodsReceiptDetail({ material: currentDetail.material, detail: { quantity, costPerUnitType } })
-            Core->>Formatter: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
-            Formatter-->>Core: normalizeDecimal(): number
+            Core->>Numbers: normalizeDecimal(correctedDetail.quantity) — validar cantidad y cambios
+            Numbers-->>Core: normalizeDecimal(): number
             Core->>Reason: findGoodsReceiptDetailChangeReason({ tx, changeType })
             Core->>Change: createGoodsReceiptDetailChangeMovementAndUpdateStock({ tx, currentDetail, quantityDifference, ... })
             opt Diferencia de cantidad distinta de cero
@@ -224,19 +227,20 @@ comparte con `buildGoodsReceiptDetails` y no vuelve a consultar la base de datos
 
 ```mermaid
 sequenceDiagram
+    participant Numbers@{ "type": "control" } as numberUtils.js
     autonumber
     participant Core@{ "type": "control" } as goodsReceiptCorrectionService.js
     participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
     participant Conversion@{ "type": "control" } as stockHelpers.js
     participant Formatter@{ "type": "control" } as formattersUtils.js
     Core->>Helpers: calculateGoodsReceiptDetail({ material, detail })
-    Helpers->>Formatter: roundTo(quantity * costPerUnitType)
-    Formatter-->>Helpers: roundTo(): number
+    Helpers->>Numbers: roundTo(quantity * costPerUnitType)
+    Numbers-->>Helpers: roundTo(): number
     Helpers->>Conversion: calculateConvertedQuantity({ quantity, base, height })
     Conversion-->>Helpers: calculateConvertedQuantity(): number
     opt Cantidad convertida positiva
-        Helpers->>Formatter: roundTo(netPurchaseAmount / convertedQuantity)
+        Helpers->>Numbers: roundTo(netPurchaseAmount / convertedQuantity)
     end
-    Helpers->>Formatter: roundTo(netPurchaseAmount * 1.16)
+    Helpers->>Numbers: roundTo(netPurchaseAmount * 1.16)
     Helpers-->>Core: calculateGoodsReceiptDetail(): Object
 ```

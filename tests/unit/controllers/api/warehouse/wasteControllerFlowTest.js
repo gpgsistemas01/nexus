@@ -139,16 +139,16 @@ describe('wasteController complete flow', () => {
     const req = {
       body: {
         name: 'Recorte confirmado',
-        coneWeightKg: '0.25',
-        totalWeightKg: '1.25',
-        referenceRollTotalWeightKg: '1.25',
+        coneWeightKg: 0.25,
+        totalWeightKg: 1.25,
+        referenceRollTotalWeightKg: 1.25,
         materialId: 'material-1',
         supplierId: 'supplier-1',
-        base: '2',
-        height: '3',
-        maxUnitCost: '18.5',
-        initialQuantity: '5',
-        minStock: '2',
+        base: 2,
+        height: 3,
+        maxUnitCost: 18.5,
+        initialQuantity: 5,
+        minStock: 2,
         isActive: false,
         observations: '  Stock inicial  ',
         reasonId: 'client-reason-id'
@@ -230,12 +230,12 @@ describe('wasteController complete flow', () => {
         name: 'Nombre alterado',
         materialId: 'material-2',
         supplierId: 'supplier-2',
-        base: '8',
-        height: '9',
-        minStock: '4',
-        maxUnitCost: '22.5',
+        base: 8,
+        height: 9,
+        minStock: 4,
+        maxUnitCost: 22.5,
         isActive: false,
-        newStock: '99'
+        newStock: 99
       }
     };
     const res = createResponse();
@@ -273,8 +273,8 @@ describe('wasteController complete flow', () => {
       params: { id: 'waste-1' },
       body: {
         name: 'Merma repetida',
-        minStock: '4',
-        maxUnitCost: '22.5',
+        minStock: 4,
+        maxUnitCost: 22.5,
         isActive: true
       }
     }, createResponse())).rejects.toMatchObject({
@@ -306,7 +306,7 @@ describe('wasteController complete flow', () => {
     const req = {
       params: { id: 'waste-1' },
       body: {
-        newStock: '7',
+        newStock: 7,
         reasonId: 'reason-1',
         observations: '  Conteo físico  '
       },
@@ -350,14 +350,14 @@ describe('wasteController complete flow', () => {
     const req = {
       body: {
         name: 'Lámina',
-        coneWeightKg: '0.25',
-        totalWeightKg: '1.25',
-        referenceRollTotalWeightKg: '1.25',
+        coneWeightKg: 0.25,
+        totalWeightKg: 1.25,
+        referenceRollTotalWeightKg: 1.25,
         materialId: 'material-1',
         supplierId: 'supplier-1',
-        base: '2',
-        height: '3',
-        initialQuantity: '0'
+        base: 2,
+        height: 3,
+        initialQuantity: 0
       },
       user: { id: 'user-1' }
     };
@@ -371,7 +371,7 @@ describe('wasteController complete flow', () => {
   it('identifica un fallo de persistencia al agregar stock como error de entrada', async () => {
     wasteStockEntryCreate.mockRejectedValueOnce(new Error('database unavailable'));
     await expect(registerWasteStockAddition({
-      params: { id: 'waste-1' }, body: { quantity: '2' }, user: { id: 'user-1' }
+      params: { id: 'waste-1' }, body: { quantity: 2 }, user: { id: 'user-1' }
     }, createResponse())).rejects.toMatchObject({ code: 'WASTE_STOCK_ENTRY_DB_ERROR', statusCode: 500 });
     expect(wasteStockAdjustmentCreate).not.toHaveBeenCalled();
   });

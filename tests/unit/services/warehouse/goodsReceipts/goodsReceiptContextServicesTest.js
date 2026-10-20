@@ -20,7 +20,7 @@ vi.mock('../../../../../src/services/warehouse/goodsReceipts/detailChanges/goods
   correctGoodsReceiptDetailLine
 }));
 
-vi.mock('../../../../../src/services/warehouse/reportService.js', () => ({
+vi.mock('../../../../../src/services/warehouse/goodsReceipts/goodsReceiptReportService.js', () => ({
   findGoodsReceiptReportRows
 }));
 

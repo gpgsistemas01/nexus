@@ -91,6 +91,20 @@ describe('registro de materiales con y sin medidas', () => {
     expect(Number(saved.convertedQuantity)).toBe(42);
   });
 
+  it('convierte la captura y persiste stock cero, dos decimales de mínimo y seis de costo', async () => {
+    const data = { ...body('typed-decimals'), minStock: '999999999999.99', newStock: '0',
+      maxUnitCost: '12.123456', isActive: 'true' };
+    await request(app).post('/materials').send(data).expect(200);
+    const saved = await prisma.supplierMaterial.findFirst({
+      where: { supplierId: ids.supplier, material: { name: data.name } }, include: { material: true }
+    });
+
+    expect(saved.currentStock.toString()).toBe('0');
+    expect(saved.material.minStock.toString()).toBe('999999999999.99');
+    expect(saved.maxUnitCost.toString()).toBe('12.123456');
+    expect(saved.isActive).toBe(true);
+  });
+
   it.each(['base', 'height'])('rechaza una pareja incompleta con código por campo, sin crear material ni oferta: %s', async field => {
     const data = { ...body(`incomplete ${field}`), unitMeasureId: ids.meters, [field]: 2 };
     const missing = field === 'base' ? 'height' : 'base';

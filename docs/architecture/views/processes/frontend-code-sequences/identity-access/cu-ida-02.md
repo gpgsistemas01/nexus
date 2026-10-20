@@ -78,22 +78,24 @@ flowchart TB
         Application["createCrudApplication.js"]
         Request["personService.js"]
     end
+    Application -->|import| FileResponseUtils
     FileErrorHandler -->|import| FileApiMessages
-    FileUtils -->|import| FileApiMessages
-    FilePersons -->|import| Request
-    FilePersons -->|import| Application
-    View -->|import| FilePersons
-    View -->|import| FileValidators
-    Modal -->|import| FileModalUI
-    Modal -->|import| FileValidators
-    FormUtils -->|import| FileApiMessages
-    FormUtils -->|import| FileTableOperations
-    FormUtils -->|import| FileModalUI
-    FileResponseUtils -->|import| FileApiMessages
+    FileErrorHandler -->|import| FileUtils
+    FileFieldValidations -->|import| FileApiMessages
     FileFieldValidations -->|import| FileBaseValidations
+    FilePersons -->|import| Application
+    FilePersons -->|import| Request
+    FileResponseUtils -->|import| FileApiMessages
+    FileUtils -->|import| FileApiMessages
     FileValidators -->|import| FileBaseValidations
     FileValidators -->|import| FileFieldValidations
+    Modal -->|import| FileModalUI
+    Modal -->|import| FileValidators
+    Modal -->|import| FormUtils
     Transport -->|import| FilePersonController
+    View -->|import| FilePersons
+    View -->|import| FileValidators
+    View -->|import| FormUtils
 ```
 
 ## Construcción de funciones para esta operación
@@ -147,18 +149,18 @@ sequenceDiagram
         end
         Note over Form: Marca dataset.submitting y deshabilita submit antes del callback
         Form->>View: sendRequest({ form, formData }) — callback configurado
-        View->>FormUtils: handleSubmit({ form, formData, create, update })
+        View->>Form: handleSubmit({ form, formData, create, update })
         FormUtils->>Application: registerPerson({ formData })
         activate Application
         alt Respuesta exitosa
             Application-->>FormUtils: registerPerson(): Promise[{ message: string, data: Person }]
             FormUtils->>FileSwalComponent: notifications.showSuccess(response.message)
-            Note over FormUtils: Cierre y recarga ampliados en los efectos transversales de handleSubmit
-            FormUtils-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
+            Note over Form: Cierre y recarga ampliados en los efectos transversales de handleSubmit
+            Form-->>View: handleSubmit(): Promise[Object] — entidad guardada, cierre y recarga
             View-->>Browser: DOM o DataTable actualizado con response.data
         else Respuesta rechazada
             Application-->>FormUtils: throw { status: number, data: Object | null, message: string, raw: Error }
-            FormUtils-->>View: error propagado por handleSubmit()
+            Form-->>View: error propagado por handleSubmit()
             View-->>Form: error propagado por sendRequest()
             Form->>FileErrorHandler: handleApiError({ err, form }) conserva los datos
         end

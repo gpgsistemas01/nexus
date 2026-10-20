@@ -13,7 +13,6 @@ flowchart TB
     L["UI de otro recurso<br/>materialForm.js<br/>supplierForm.js"]
     U["Composición compartida<br/>createCrudApplication.js<br/>renderMaterialDatatable.js<br/>y colaboradores"]
     H["axiosInstanceApi.js<br/>request / apiRequest"]
-    A --> P
     A --> R
     A --> U
     L --> U
@@ -22,8 +21,6 @@ flowchart TB
     P --> T
     P --> U
     R --> H
-    R --> P
-    T --> A
     T --> U
 ```
 
@@ -54,7 +51,7 @@ se consultan en el [contrato de formularios](01-catalog-complete-of-records-fron
 | Archivo bajo `src/` | Símbolos públicos y puntos de configuración |
 | --- | --- |
 | `public/js/application/warehouse/`<br/>`goodsReceipts/consumables/`<br/>`consumableGoodsReceipts.js` | `getAllConsumableGoodsReceipts`<br/>`registerConsumableGoodsReceipt`<br/>`editConsumableGoodsReceiptHeader`<br/>`correctConsumableGoodsReceiptDetail`<br/>`cancelConsumableGoodsReceiptDetail` |
-| `public/js/application/warehouse/`<br/>`goodsReceipts/goodsReceipts.js` | `getAllGoodsReceipts`<br/>`registerGoodsReceipt`<br/>`editGoodsReceiptHeader`<br/>`correctGoodsReceiptDetail`<br/>`cancelGoodsReceiptDetail` |
+| `public/js/application/warehouse/`<br/>`goodsReceipts/goodsReceipts.js` | `createGoodsReceiptApplication({ resource })` → objeto con `getAll · get · register · editHeader · correctDetail · cancelDetail · exportReport` |
 | `public/js/application/warehouse/`<br/>`goodsReceipts/materials/`<br/>`materialGoodsReceipts.js` | `getAllMaterialGoodsReceipts`<br/>`registerMaterialGoodsReceipt`<br/>`editMaterialGoodsReceiptHeader`<br/>`correctMaterialGoodsReceiptDetail`<br/>`cancelMaterialGoodsReceiptDetail` |
 
 ### Adaptadores de transporte
@@ -63,7 +60,7 @@ se consultan en el [contrato de formularios](01-catalog-complete-of-records-fron
 | --- | --- |
 | `public/js/services/warehouse/`<br/>`goodsReceipts/consumables/`<br/>`consumableGoodsReceiptService.js` | `CONSUMABLE_GOODS_RECEIPTS_API_ROUTE`<br/>`getAllConsumableGoodsReceiptsRequest`<br/>`registerConsumableGoodsReceiptRequest`<br/>`editConsumableGoodsReceiptHeaderRequest`<br/>`correctConsumableGoodsReceiptDetailRequest`<br/>`cancelConsumableGoodsReceiptDetailRequest`<br/>`exportConsumableGoodsReceiptReportRequest` |
 | `public/js/services/warehouse/`<br/>`goodsReceipts/`<br/>`createGoodsReceiptRequests.js` | `createGoodsReceiptRequests` |
-| `public/js/services/warehouse/`<br/>`goodsReceipts/goodsReceiptService.js` | `GOODS_RECEIPTS_API_ROUTE`<br/>`getAllGoodsReceiptsRequest`<br/>`registerGoodsReceiptRequest`<br/>`editGoodsReceiptHeaderRequest`<br/>`correctGoodsReceiptDetailRequest`<br/>`cancelGoodsReceiptDetailRequest`<br/>`exportGoodsReceiptReportRequest` |
+| `public/js/services/warehouse/`<br/>`goodsReceipts/goodsReceiptService.js` | `getGoodsReceiptRequest({ id, resource })` |
 | `public/js/services/warehouse/`<br/>`goodsReceipts/materials/`<br/>`materialGoodsReceiptService.js` | `MATERIAL_GOODS_RECEIPTS_API_ROUTE`<br/>`getAllMaterialGoodsReceiptsRequest`<br/>`registerMaterialGoodsReceiptRequest`<br/>`editMaterialGoodsReceiptHeaderRequest`<br/>`correctMaterialGoodsReceiptDetailRequest`<br/>`cancelMaterialGoodsReceiptDetailRequest`<br/>`exportMaterialGoodsReceiptReportRequest` |
 
 ## Variantes y límites de reutilización
@@ -81,3 +78,4 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/frontend-code-sequences/index.md).
 
+`goodsReceiptContext.js` lee la metadata de la página y compone `createGoodsReceiptApplication({ resource })` una vez. La página entrega el objeto configurado a la tabla; el modal pasa `resource` al inicializador de Select2. Application y services no importan páginas ni consultan el DOM. `get` conserva la lectura por id y `exportReport` fija el reporte de la misma variante, sin reexports de transporte a través del módulo general de reportes.

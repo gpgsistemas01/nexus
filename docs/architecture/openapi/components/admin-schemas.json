@@ -226,7 +226,9 @@
     "type": "object",
     "properties": {
       "fullName": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
       },
       "accesses": {
         "type": "array",
@@ -247,7 +249,9 @@
             "departmentId",
             "roleId"
           ]
-        }
+        },
+        "minItems": 1,
+        "description": "Cada fila contiene UUID v4 de área y rol. No se permite repetir área, incluso con diferente capitalización del UUID."
       }
     },
     "additionalProperties": false,
@@ -260,10 +264,15 @@
     "type": "object",
     "properties": {
       "name": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
       },
       "password": {
-        "type": "string"
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 50,
+        "description": "Entre 6 y 50 caracteres admitidos, al menos una mayúscula y un número. No requiere un carácter especial. Se conserva el texto exacto."
       },
       "personId": {
         "type": "string",
@@ -291,7 +300,9 @@
     "type": "object",
     "properties": {
       "name": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
       },
       "personId": {
         "type": "string",
@@ -325,7 +336,10 @@
     "type": "object",
     "properties": {
       "password": {
-        "type": "string"
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 50,
+        "description": "Entre 6 y 50 caracteres admitidos, al menos una mayúscula y un número. No requiere un carácter especial. Se conserva el texto exacto."
       },
       "expectedVersion": {
         "type": "integer",
@@ -445,7 +459,9 @@
     "type": "object",
     "properties": {
       "fullName": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
       },
       "accesses": {
         "type": "array",
@@ -466,7 +482,9 @@
             "departmentId",
             "roleId"
           ]
-        }
+        },
+        "minItems": 1,
+        "description": "Cada fila contiene UUID v4 de área y rol. No se permite repetir área, incluso con diferente capitalización del UUID."
       },
       "expectedVersion": {
         "type": "integer",

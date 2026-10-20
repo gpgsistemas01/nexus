@@ -1,6 +1,6 @@
 import { DOM_EVENT_NAMES } from '../../constants/events.js';
 import { INPUT_SELECTORS, SELECT_SELECTORS } from '../../constants/selectors.js';
-import { toggleContainerElements } from '../../utils/formUtils.js';
+import { toggleContainerElements } from './formStateUI.js';
 import { FORM_MODES } from '../../constants/formModes.js';
 import { GOODS_RECEIPT_STATUS_LABELS } from '../../constants/goodsReceiptStatuses.js';
 import { setMdbWrapperInputValue } from '../../plugins/mdb/baseInstance.js';

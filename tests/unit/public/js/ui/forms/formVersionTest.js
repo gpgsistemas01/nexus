@@ -6,7 +6,7 @@ vi.mock('../../../../../../src/public/js/plugins/flatpickr/dateTimePicker.js', (
 vi.mock('../../../../../../src/public/js/ui/forms/formErrorsUI.js', () => ({ clearFormErrors: vi.fn() }));
 const { mapMaterialRowToFormData } = await import('../../../../../../src/public/js/plugins/datatable/warehouse/materials/materialRow.js');
 const { initializeInventoryCrudModal } = await import('../../../../../../src/public/js/ui/inventory/inventoryCrudModalUI.js');
-const { handleSubmit } = await import('../../../../../../src/public/js/utils/formUtils.js');
+const { handleSubmit } = await import('../../../../../../src/public/js/ui/forms/formUI.js');
 const createForm = () => ({
   dataset: {}, reset: vi.fn(), querySelectorAll: () => [],
   querySelector: () => ({ removeAttribute: vi.fn(), classList: { toggle: vi.fn() } })

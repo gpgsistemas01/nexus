@@ -88,4 +88,29 @@ describe('validación HTTP de catálogos administrables', () => {
 
     expect(errors).toEqual([]);
   });
+
+  it('omite campos que no corresponden al catálogo sin normalizarlos', async () => {
+    const result = await runValidation({ catalog: 'roles', body: {
+      name: ' Operador ', isActive: 'false', symbol: ['no corresponde']
+    } });
+
+    expect(result.errors).toEqual([]);
+    expect(result.body).toEqual({ name: 'Operador', isActive: false, symbol: ['no corresponde'] });
+  });
+
+  it('delega al servicio la resolución de un catálogo no administrable', async () => {
+    const body = { name: ['no corresponde'], isActive: ['no corresponde'] };
+    const result = await runValidation({ catalog: 'unknown', body: { ...body } });
+
+    expect(result.errors).toEqual([]);
+    expect(result.body).toEqual(body);
+  });
+
+  it.each([[10, true], [11, false]])('aplica al símbolo el límite dinámico: %s caracteres', async (length, valid) => {
+    const { errors } = await runValidation({ catalog: 'unit-measures', body: {
+      name: 'Metro', symbol: 'm'.repeat(length), isActive: true
+    } });
+
+    expect(errors).toEqual(valid ? [] : [expect.objectContaining({ path: 'symbol', msg: errorMap.name.TOO_LONG(10) })]);
+  });
 });

@@ -1,5 +1,6 @@
 import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from '../../../errors/inventory/stockError.js';
-import { buildStockKey, normalizeDecimal } from '../../../utils/formattersUtils.js';
+import { buildStockKey } from '../../../utils/formattersUtils.js';
+import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { updateSupplierMaterialStocks } from '../../../repository/warehouse/stockUpdateRepository.js';
 import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';

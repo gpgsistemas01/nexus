@@ -1,9 +1,4 @@
-import {
-    editGoodsIssue,
-    editGoodsIssueHeader,
-    editGoodsIssueDetails,
-    registerGoodsIssue
-} from '../../../application/warehouse/goodsIssues/goodsIssues.js';
+import { goodsIssueContext } from './goodsIssueContext.js';
 import { DOM_EVENT_NAMES } from '../../../constants/events.js';
 import { FORM_MODES } from '../../../constants/formModes.js';
 import {
@@ -16,32 +11,23 @@ import {
 import { refreshMaterialTable } from '../../../plugins/datatable/shared/inventory/renderMaterialDatatable.js';
 import { clearAddedMaterialInput } from '../../../ui/forms/detailFormUI.js';
 import { normalizeFormErrors } from '../../../ui/forms/formErrorsUI.js';
-import {
-    bindIssueProjectQuantityControls,
-    useIssueForm
-} from '../../../ui/issues/issueFormUI.js';
-import {
-    matchesDetailIdentifier,
-    removeDetail,
-    upsertIssueDetail
-} from '../../../utils/detailCollectionUtils.js';
+import { bindIssueProjectQuantityControls, useIssueForm } from '../../../ui/issues/issueFormUI.js';
+import { matchesDetailIdentifier, removeDetail, upsertIssueDetail } from '../../../utils/detailCollectionUtils.js';
 import { on } from '../../../utils/domUtils.js';
-import { roundTo } from '../../../utils/formatUtils.js';
+import { roundTo } from '../../../../../shared/utils/numberUtils.js';
 import { hasValidationErrors, validateDetailsFields, validateFields } from '../../../utils/formUtils.js';
 import { goodsIssueDetails } from './goodsIssueModal.js';
 import {
     addGoodsIssueMaterialValidation,
     goodsIssueValidation,
+    issueHeaderValidation,
     issueProjectQuantityDetailsValidation
 } from '../../../utils/validations/validators.js';
+import { getBase, getHeight, getPresentation, getUnitMeasure } from '../../../utils/warehouseInventoryUtils.js';
 import {
-    getBase,
-    getHeight,
-    getPresentation,
-    getUnitMeasure,
     mapGoodsIssueDetailsToRequest,
     mapIssueDetailsToSupplyRequest
-} from '../../../utils/warehouseInventoryUtils.js';
+} from '../../../application/warehouse/issues/issueDetails.js';
 
 const formId = FORM_SELECTORS.GOODS_ISSUE;
 const form = document.querySelector(formId);
@@ -80,16 +66,12 @@ useIssueForm({
                 : { details: 'Seleccione al menos un material pendiente por surtir.' };
         }
 
-        const errors = validateFields(goodsIssueValidation, formData);
-
-        if (mode === FORM_MODES.EDIT_HEADER) errors.details = null;
-
-        return errors;
+        return validateFields(mode === FORM_MODES.EDIT_HEADER ? issueHeaderValidation : goodsIssueValidation, formData);
     },
-    register: registerGoodsIssue,
-    edit: editGoodsIssue,
-    editHeader: editGoodsIssueHeader,
-    editDetails: editGoodsIssueDetails
+    register: goodsIssueContext.register,
+    edit: goodsIssueContext.edit,
+    editHeader: goodsIssueContext.editHeader,
+    editDetails: goodsIssueContext.editDetails
 });
 
 const addGoodsIssueMaterial = () => {
@@ -100,18 +82,19 @@ const addGoodsIssueMaterial = () => {
     let { text, material, supplier, maxUnitCost } = option.dataset || {};
     material = JSON.parse(material);
     supplier = JSON.parse(supplier);
-    const quantity = Number(document.querySelector(INPUT_SELECTORS.QUANTITY).value);
+    const capturedQuantity = document.querySelector(INPUT_SELECTORS.QUANTITY).value;
 
     const errors = validateFields(addGoodsIssueMaterialValidation, {
         materialId: material.id,
         supplierId: supplier.id,
-        quantity
+        quantity: capturedQuantity
     });
 
     normalizeFormErrors({ form: document.querySelector(formId), errors });
 
     if (hasValidationErrors(errors)) return;
 
+    const quantity = Number(capturedQuantity);
     const newMaterial = {
         materialId: material.id,
         name: text,

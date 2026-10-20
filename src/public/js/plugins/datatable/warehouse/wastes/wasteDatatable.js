@@ -6,9 +6,12 @@ import { renderActionButtons } from '../../core/base/actionButtons.js';
 import { setupTableFilters } from "../../core/filters/tableFilter.js";
 import { getAllWastes } from "../../../../application/warehouse/wastes/wastes.js";
 import { getResponsiveRowData } from '../../core/responsive/rowData.js';
-import { hasPermission, UI_PERMISSIONS } from "../../../../constants/permissions.js";
+import { hasPermission, PERMISSIONS } from '../../../../../../shared/constants/permissions.js';
 import { DATATABLE_SELECTORS } from "../../../../constants/selectors.js";
-import { buildWarehouseInventoryColumns, renderWarehouseInventoryHeader } from "../../shared/inventory/warehouseInventoryDatatable.js";
+import {
+    buildWarehouseInventoryColumns,
+    renderWarehouseInventoryHeader
+} from "../../shared/inventory/warehouseInventoryDatatable.js";
 import { buildExcelButton, buildTableExportParams } from "../../../../ui/tableUI.js";
 import { exportWasteReport } from "../../../../application/warehouse/report.js";
 import { formatFileName } from "../../../../utils/formatters.js";
@@ -17,11 +20,11 @@ const selectorTable = DATATABLE_SELECTORS.MAIN;
 const tableElement = document.querySelector(selectorTable);
 
 export const createWasteDatatable = async ({ context, openWasteModal, openWasteStockAdditionModal }) => {
-    const canSeeCost = hasPermission(context, UI_PERMISSIONS.INVENTORY_COSTS_READ);
-    const canSeeActive = hasPermission(context, UI_PERMISSIONS.CATALOGS_MANAGE);
-    const canManageWastes = hasPermission(context, UI_PERMISSIONS.WASTES_WRITE);
-    const canAdjustStock = hasPermission(context, UI_PERMISSIONS.WASTES_ADJUST_STOCK);
-    const canAddStock = hasPermission(context, UI_PERMISSIONS.WASTES_ADD_STOCK);
+    const canSeeCost = hasPermission(context, PERMISSIONS.INVENTORY_COSTS_READ);
+    const canSeeActive = hasPermission(context, PERMISSIONS.CATALOGS_MANAGE);
+    const canManageWastes = hasPermission(context, PERMISSIONS.WASTES_WRITE);
+    const canAdjustStock = hasPermission(context, PERMISSIONS.WASTES_ADJUST_STOCK);
+    const canAddStock = hasPermission(context, PERMISSIONS.WASTES_ADD_STOCK);
 
     renderWarehouseInventoryHeader({
         tableElement,
@@ -63,7 +66,7 @@ export const createWasteDatatable = async ({ context, openWasteModal, openWasteS
                     text: 'Nueva merma',
                     action: () => openWasteModal({ mode: FORM_MODES.CREATE })
                 }] : []),
-                ...(hasPermission(context, UI_PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
+                ...(hasPermission(context, PERMISSIONS.WAREHOUSE_REPORTS_READ) ? [buildExcelButton({
                     filename: formatFileName('reporte_mermas'),
                     allowMonthlyReport: false,
                     allowInventoryScope: true,

@@ -1,7 +1,13 @@
 import { authorizeUserApi, verifyApiTokenRequired } from '../../../../../middleware/authMiddleware.js';
 import { validate } from '../../../../../middleware/validatorMiddleware.js';
-import { goodsIssueValidation, goodsIssueUpdateValidation, goodsIssueHeaderValidation, goodsIssueDetailsValidation, goodsIssueReturnValidation } from '../../../../../validators/forms/goodsIssueValidations.js';
-import { PERMISSIONS } from '../../../../../constants/permissions.js';
+import {
+    goodsIssueValidation,
+    goodsIssueUpdateValidation,
+    goodsIssueHeaderValidation,
+    goodsIssueDetailsValidation,
+    goodsIssueReturnValidation
+} from '../../../../../validators/forms/goodsIssueValidations.js';
+import { PERMISSIONS } from '../../../../../shared/constants/permissions.js';
 
 const manage = authorizeUserApi(PERMISSIONS.GOODS_ISSUES_MANAGE);
 const supply = authorizeUserApi(PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE);

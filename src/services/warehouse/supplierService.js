@@ -1,3 +1,4 @@
+import { handleServiceError } from '../serviceErrorHandler.js';
 import { normalizeDatabaseError } from '../../errors/databaseError.js';
 import { PRISMA_ERROR_CODES } from '../../constants/prisma.js';
 import { updateVersionedRecord } from '../../repository/versionRepository.js';
@@ -14,7 +15,6 @@ import { incrementNonYearlyReferenceNumberCounter } from "../document/referenceN
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../utils/logger.js";
 
 const serviceLogger = createServiceLogger('warehouse.supplierService');
-
 
 const SUPPLIER_CODE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const SUPPLIER_REFERENCE_PREFIX = 'PRO';
@@ -150,12 +150,14 @@ export const createSupplier = async (supplierDto) => {
         return supplier;
 
     } catch (err) {
-        logServiceError(serviceLogger, err, {
+        handleServiceError({
+            logger: serviceLogger,
+            error: err,
             operation: 'warehouse.supplierService.createSupplier',
-            ...getModelLogContext('supplier', supplierDto)
+            model: 'supplier',
+            data: supplierDto,
+            fallbackError: new SupplierCreateDatabaseError()
         });
-
-        throw new SupplierCreateDatabaseError();
     }
 };
 
