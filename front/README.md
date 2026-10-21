@@ -34,7 +34,8 @@ y herramientas previos no cambiaban la apariencia de la plantilla.
 
 ## Desarrollo
 
-Usa Node.js 24.14.1 o superior de la rama 24, o Node.js 22.13 o superior de la rama 22.
+Usa Node.js 24.14.1 o superior de la rama 24, Node.js 22.13 o superior de la rama 22,
+o Node.js 26.12.1 o superior de la rama 26.
 Las herramientas de pruebas están fijadas a versiones compatibles; instala con `npm ci`
 para conservar esa combinación.
 Desde la raíz del repositorio:
@@ -48,6 +49,35 @@ npm run dev
 Abre la URL que muestra Vite en la terminal. Express se inicia por separado desde
 `back/` con `npm run dev`. Para otro destino del proxy define `BACKEND_PROXY_TARGET`
 en `front/.env.local` y reinicia Vite; hay un ejemplo en `.env.example`.
+
+## Dependencias no resueltas en Vite
+
+Si aparece `Failed to resolve import "vee-validate"` o `Failed to run dependency
+scan`, Vite no encuentra una dependencia importada por el login en esa copia
+local. `vee-validate@^4.15.1` está declarado en `front/package.json` y fijado en
+`front/package-lock.json`; la instalación de `back/` no instala lo necesario para
+Vue. Las líneas `dependencies optimized` de otras bibliotecas no corrigen ese fallo.
+
+Detén Vite con Ctrl+C. Desde la raíz del repositorio:
+
+```bash
+npm --prefix front ci --include=dev
+npm --prefix front ls vee-validate --depth=0
+npm --prefix front run dev -- --force
+```
+
+La instalación debe terminar correctamente y `ls` debe mostrar `vee-validate`
+sin errores de dependencia ausente. `--force` rehace la caché de optimización al
+arrancar Vite; no instala paquetes. No basta con recargar la pestaña del navegador.
+
+Si `vee-validate` no aparece en los dos archivos de paquetes, comprueba que estás
+en la rama `features` actualizada y en la misma copia que está ejecutando Vite.
+Si `npm ci` falla o la dependencia sigue ausente, conserva su salida completa
+para diagnosticar la instalación antes de volver a arrancar el servidor. No agregues
+la dependencia al backend ni modifiques su versión para ocultar el error.
+
+La ubicación y preparación de `.env`, dependencias, cachés y cliente Prisma están
+en [archivos locales ignorados](../README.md#archivos-locales-ignorados-y-cambio-de-estructura).
 
 ## Compilación y vista previa
 

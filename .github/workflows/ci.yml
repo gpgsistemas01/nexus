@@ -51,8 +51,11 @@ jobs:
           git push
 
   test:
-    name: Test
+    name: Test (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['24', '26.12.1']
     defaults:
       run:
         working-directory: back
@@ -74,7 +77,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ matrix.node }}
           cache: npm
           cache-dependency-path: back/package-lock.json
 
@@ -120,7 +123,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-node-${{ matrix.node }}
           path: back/build/test-results/*.xml
           if-no-files-found: warn
 
@@ -128,15 +131,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports
+          name: coverage-reports-node-${{ matrix.node }}
           path: |
             back/coverage/unit/
             back/coverage/integration/
           if-no-files-found: warn
 
   frontend-build:
-    name: Build Vue frontend
+    name: Build Vue frontend (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['24.14.1', '26.12.1']
     defaults:
       run:
         working-directory: front
@@ -147,7 +153,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24.14.1'
+          node-version: ${{ matrix.node }}
           cache: npm
           cache-dependency-path: front/package-lock.json
 
@@ -173,6 +179,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-test-results
+          name: frontend-test-results-node-${{ matrix.node }}
           path: front/build/test-results/*.xml
           if-no-files-found: warn
