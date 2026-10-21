@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useForm } from 'vee-validate';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { inventoryService } from '../services/inventoryService.js';
@@ -8,15 +8,16 @@ import {
     inventoryRules,
     buildInventoryPayload,
     previewWaste,
+    unitUsesMeasurements,
 } from '../formModel.js';
 import { useRemoteOptions } from './useRemoteOptions.js';
+import { useSelectedOption } from './useSelectedOption.js';
 import type {
     EditorTarget,
     InventoryField,
     InventoryPayload,
     InventoryResource,
     InventoryValues,
-    LookupItem,
 } from '../inventory.js';
 
 export const useInventoryEditor = (options: {
@@ -110,6 +111,8 @@ export const useInventoryEditor = (options: {
         materialId: templates,
         reasonId: reasons,
     };
+    const lookupByField: Partial<Record<InventoryField, ReturnType<typeof useRemoteOptions>>> =
+        lookupMap;
     const lookups = computed(() =>
         Object.fromEntries(
             Object.entries(lookupMap).map(([key, lookup]) => [
@@ -123,16 +126,32 @@ export const useInventoryEditor = (options: {
             ]),
         ),
     );
-    const cachedTemplate = shallowRef<LookupItem>();
-    const selectedTemplate = computed(
-        () =>
-            templates.items.value.find((item) => item.id === form.values.materialId) ??
-            (cachedTemplate.value?.id === form.values.materialId
-                ? cachedTemplate.value
-                : undefined),
+    const selectedTemplate = useSelectedOption(templates.items, () =>
+        String(form.values.materialId),
     );
-    watch(selectedTemplate, (template) => {
-        cachedTemplate.value = template;
+    const selectedUnit = useSelectedOption(units.items, () => String(form.values.unitMeasureId));
+    const usesMeasurements = computed(
+        () =>
+            resource === 'materials' &&
+            (isCreating.value
+                ? unitUsesMeasurements(selectedUnit.value?.data)
+                : unitUsesMeasurements({
+                      symbol: target.row?.unitMeasure,
+                      name: target.row?.unitMeasure,
+                  })),
+    );
+    watch(selectedUnit, (unit) => {
+        if (
+            resource !== 'materials' ||
+            !isCreating.value ||
+            !unit ||
+            unitUsesMeasurements(unit.data)
+        )
+            return;
+        for (const field of ['base', 'height'] as const) {
+            form.setFieldValue(field, '', false);
+            form.setFieldError(field, undefined);
+        }
     });
     const preview = computed(() =>
         isPending.value && pendingData
@@ -162,9 +181,9 @@ export const useInventoryEditor = (options: {
         () => selectedTemplate.value?.id,
         () => {
             const template = selectedTemplate.value;
-            if (!template || isPending.value) return;
-            form.setFieldValue('name', String(template.data.name ?? ''), false);
-            form.setFieldValue('maxUnitCost', String(template.data.maxUnitCost ?? '0'), false);
+            if (isPending.value) return;
+            form.setFieldValue('name', String(template?.data.name ?? ''), false);
+            form.setFieldValue('maxUnitCost', String(template?.data.maxUnitCost ?? ''), false);
             for (const field of [
                 'coneWeightKg',
                 'totalWeightKg',
@@ -245,12 +264,14 @@ export const useInventoryEditor = (options: {
         isConflicted,
         lookups,
         preview,
+        selectedTemplate,
+        usesMeasurements,
         submit,
         update,
         blur: (field: InventoryField) => form.validateField(field),
-        searchLookup: (field: keyof typeof lookupMap, search: string) =>
-            lookupMap[field].updateSearch(search),
-        loadMore: (field: keyof typeof lookupMap) => lookupMap[field].loadMore(),
-        retryLookup: (field: keyof typeof lookupMap) => lookupMap[field].retry(),
+        searchLookup: (field: InventoryField, search: string) =>
+            lookupByField[field]?.updateSearch(search),
+        loadMore: (field: InventoryField) => lookupByField[field]?.loadMore(),
+        retryLookup: (field: InventoryField) => lookupByField[field]?.retry(),
     };
 };

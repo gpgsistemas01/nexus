@@ -10,11 +10,11 @@ el renderizado, eventos, estado y ciclo de vida de la nueva interfaz.
 | --- | --- | --- |
 | Tabla con búsqueda, paginación, orden y encabezados agrupados | `VDataTableServer`, incluido en Vuetify | Proporciona controles y estados para datos paginados desde Express. [DataTables Vue](https://datatables.net/manual/vue) es una integración oficial válida, con slots y soporte reactivo, y su núcleo 3 ya no requiere jQuery. Mantener dos motores de tabla añadiría adaptadores y estilos para el mismo flujo; Vuetify ya cubre las necesidades actuales. |
 | Selectores remotos | `VAutocomplete` y la directiva `v-intersect` de Vuetify | Cargan la página siguiente al llegar al final, sin un botón obligatorio ni listeners Select2. Un fallo requiere reintento explícito; no genera solicitudes repetidas. |
-| Formularios y confirmaciones | `VDialog` | Controla foco, Escape, fondo y cierre. El estado y el envío pertenecen al contenedor/composable, no al modal visual. |
-| Avisos de éxito | `VSnackbar` | Un aviso breve después de guardar. Los errores de captura siguen junto a los campos; errores recuperables del listado permanecen visibles con reintento. [SweetAlert2](https://sweetalert2.github.io/) puede usarse con Vue, pero no es necesario instalar un segundo sistema de modales para estos casos. |
+| Captura de formularios | `VDialog`, grid Vuetify y VeeValidate | Controlan foco, Escape, scroll, distribución adaptable y errores por campo. El modal presenta secciones; el composable conserva validación y envío. |
+| Confirmar eliminación y avisar resultados | [SweetAlert2](https://sweetalert2.github.io/) | Confirmación con foco inicial en Cancelar, spinner durante el envío, bloqueo de duplicados y reintento explícito; toast al confirmar una operación. Los formularios continúan en Vue y los errores corregibles permanecen junto al campo. |
 | Menú principal | `VNavigationDrawer`, `VAppBar` y `VList` | Menú denso, plegable a una barra en escritorio y temporal con fondo en móvil; gestiona el espacio del contenido. |
 | HTTP y sesión | Axios | Una instancia compartida, timeout, cancelación e [interceptor de renovación](https://axios-http.com/docs/interceptors). Sin token accesible al cliente ni librería HTTP diferente por formulario. |
-| Captura de formularios | VeeValidate y reglas públicas existentes | Se mantiene el contrato de validación sin reescribirlo en otra biblioteca. |
+| Panel de filtros | `VExpansionPanels` | Gestiona apertura y navegación por teclado. Buscar, limpiar y actualizar reutilizan los controles del mismo tema. |
 
 La [tabla de Vuetify](https://vuetifyjs.com/en/components/data-tables/) acepta
 encabezados con `children` y un modo de servidor. La búsqueda, el orden y la
@@ -25,6 +25,73 @@ La [publicación de DataTables 3](https://datatables.net/blog/2026/datatables-3)
 confirma que el núcleo ya no tiene dependencias. La revisión comprobó
 `datatables.net-vue3` 3.0.8 y `datatables.net` 3.1.4; no se extrapola la dependencia
 de jQuery de las versiones antiguas a la versión actual.
+
+## Estilos y controles adaptados a Vue
+
+Vue no prescribe una apariencia visual. Los colores, bordes, jerarquías y grupos
+de MDB se trasladan al tema; los componentes de Vuetify controlan los elementos
+interactivos. Cargar el CSS/JavaScript global de MDB sobre los mismos controles
+introduciría dos conjuntos de reglas y gestión de estado.
+
+Se aplican las [variables de tema de Vuetify](https://vuetifyjs.com/en/features/theme/)
+y sus [defaults por ámbito](https://vuetifyjs.com/en/features/global-configuration/):
+
+- `app/plugins/vuetify.ts`: paleta de Almacén, encabezado verde `#107c41`, filas
+  alternadas, bordes verdes y acciones de filtro azul/gris. El verde con texto
+  blanco mantiene contraste para texto normal.
+- `shared/ui/controlDefaults.ts` y `VDefaultsProvider` del layout y del modal: densidad, variante, redondeo,
+  color y mensajes de los controles. El login conserva sus propios estilos.
+- Los componentes usan [CSS scoped de Vue](https://vuejs.org/api/sfc-css-features.html).
+  `:deep()` se limita a celdas y detalles de los controles que realmente se adaptan;
+  no se agregan resets globales de Bootstrap ni estilos MDB copiados completos.
+- `VRow`/`VCol`, `VDialog` y `VExpansionPanels` resuelven distribución, scroll,
+  foco, Escape y apertura. No se crean gestores manuales de modales ni listeners
+  de Select2 sobre nodos controlados por Vue.
+
+No se añaden Tailwind, otro motor de tabla ni un generador universal de formularios
+para estos flujos. VeeValidate administra validación y errores; Axios administra
+transporte y renovación. La selección dependiente, los payloads versionados y la
+recuperación de operaciones siguen siendo reglas propias del módulo. Un plugin
+visual no conoce esas reglas de la API.
+
+### Campos y modos del modal
+
+`formFields.ts` describe secciones con controles editables y valores de consulta.
+`InventoryEditor` presenta cabecera, cuerpo desplazable y acciones siempre visibles;
+a partir del tamaño móvil de Vuetify ocupa la pantalla. `InventoryFormField`
+concentra la adaptación de inputs, checkbox, textarea y selector remoto.
+
+| Modo | Datos recuperados y comportamiento |
+| --- | --- |
+| Crear material/consumible | Datos, proveedor, presentación, unidad, inventario y existencias/observaciones. Muestra Stock inicial como motivo de consulta. Materiales habilita medidas según la unidad; cambiar a piezas limpia las medidas capturadas. |
+| Editar | Muestra proveedor, presentación, unidad y medidas como consulta; permite nombre, stock mínimo, costo y estado según el contrato existente. No envía identidad, dimensiones ni stock como cambios. |
+| Ajustar stock | Conserva datos, inventario, medidas y pesos visibles como consulta, junto al stock actual. Captura nuevo stock, motivo y observaciones. Conserva la versión original. |
+| Crear merma | Selecciona proveedor/material y muestra presentación/unidad heredadas. El material se habilita después del proveedor; cambiar proveedor limpia la referencia y captura anterior. Rollos capturan muestra, cono y peso total; neto y medidas calculadas son de consulta. |
+| Editar merma / agregar stock | Conserva pesos y medidas. Muestra rollo completo cuando existe; de lo contrario conserva largo/peso de la referencia histórica. Agregar captura cantidad y observaciones. |
+
+El alta de proveedores desde el selector EJS queda fuera de esta migración de
+Materiales, Consumibles y Mermas: requiere un formulario Vue de Proveedores. No se
+abre una pantalla EJS desde el menú ni desde estos controles.
+
+Un costo ausente en la respuesta no se convierte silenciosamente en cero al editar:
+la validación exige una captura explícita. Cero sigue siendo un valor válido.
+Los campos de consulta nunca amplían el payload admitido por el servidor.
+
+### SweetAlert2 y errores
+
+`shared/ui/feedback.ts` concentra configuración y estilo. Se importa SweetAlert2
+directamente con Composition API; no se requiere otro wrapper ni una propiedad
+global de Vue. Su entrada raíz ya incorpora el CSS base. La confirmación de baja
+usa `preConfirm` y `showLoaderOnConfirm`; Cancelar no realiza solicitudes. Un fallo
+conserva el diálogo para reintentar y no dispara otra escritura automáticamente.
+Al desmontar la página se cancela la solicitud y se cierra sólo su confirmación.
+Los nombres y mensajes se pasan mediante `titleText`/`text`, sin interpolar HTML.
+
+`useInventoryRemoval` coordina la operación y conserva el ID de la relación con el
+proveedor. `useInventory` mantiene permisos y coordina actualización/aviso de éxito.
+No se usa el modal de captura como una confirmación vacía de eliminación.
+Los errores de validación, conflicto, carga de catálogos y listado continúan en el
+contexto donde se pueden corregir, mediante mensajes de campo o `VAlert`.
 
 ## Tabla y selectores
 
@@ -59,10 +126,14 @@ cargado y permite repetir la página fallida, sin avanzar ni duplicar las opcion
 | `modules/auth/services/authService.ts` | Credenciales y resultado del login; declara esa operación pública para evitar refresh al rechazarla. |
 | `modules/warehouse/pages/` | Contenedores que conectan componentes y composables. |
 | `modules/warehouse/components/` | Tabla, acciones de fila, captura y selector remoto con props/eventos. |
+| `InventoryFilters.vue` | Panel visual con buscar, limpiar y actualizar; emite intenciones sin consultar la API. |
 | `InventoryReportToolbar.vue` | Presenta alcance, descarga y reintento del reporte; no realiza solicitudes. |
 | `modules/warehouse/composables/useInventory.ts` | Coordina permisos visuales, apertura/cierre del editor y confirmación de operaciones. |
 | `useInventoryList.ts` | Lista, filtros, orden, paginación, actualización y cancelación de consultas. |
 | `useInventoryReport.ts` | Descarga y ciclo de vida del reporte, con error independiente. |
+| `useInventoryRemoval.ts` | Confirmación y escritura de baja, con cancelación al desmontar. |
+| `useSelectedOption.ts` | Conserva la opción elegida al paginar o buscar; se reutiliza en selector, unidad y material de referencia. |
+| `shared/ui/feedback.ts` | SweetAlert2 y su configuración común; sin estado de negocio ni acceso a la API. |
 | `useInventoryEditor.ts` | Captura con VeeValidate, envío versionado y recuperación de merma. |
 | `useRemoteOptions.ts` | Estado de catálogos paginados, sin renderizado. |
 | `modules/warehouse/services/` | Adaptadores separados de inventario, catálogos y reportes; `inventoryPageRequest` conserva el contrato común de paginación. |

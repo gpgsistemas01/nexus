@@ -172,29 +172,40 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
 <style scoped>
 .inventory-table {
     min-width: 0;
-    border: 1px solid #d7e6dc;
-    border-radius: 0.6rem;
+    border: 1px solid rgb(var(--v-theme-table-border));
+    border-radius: 0.75rem;
     background: white;
     overflow: hidden;
 }
 .inventory-table :deep(th) {
-    color: #234d35;
+    color: white;
     font-weight: 700;
     font-size: 0.76rem;
-    border-right: 1px solid #e0eae3;
-    background: #edf5ef;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgb(var(--v-theme-table-header)) !important;
+}
+.inventory-table :deep(th .v-icon) {
+    color: white;
 }
 .inventory-table :deep(td) {
     font-size: 0.8rem;
+    border-right: 1px solid rgba(var(--v-theme-table-border), 0.45);
 }
-.inventory-table :deep(.low-stock) {
+.inventory-table :deep(tbody tr:nth-child(even) td) {
+    background: rgb(var(--v-theme-table-alt));
+}
+.inventory-table :deep(tbody tr:hover td) {
+    background: rgb(var(--v-theme-table-hover));
+}
+.inventory-table :deep(.low-stock td) {
     background: #fff8e5;
 }
 .inventory-table :deep(.v-data-table-footer) {
     flex-wrap: wrap;
     gap: 0.5rem;
-    padding: 0.5rem;
+    padding: 0.65rem;
     font-size: 0.75rem;
+    border-top: 1px solid rgba(var(--v-theme-table-border), 0.6);
 }
 .item-identity {
     min-width: 160px;
@@ -202,11 +213,11 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
 }
 .item-identity span {
     display: block;
-    color: #64796c;
+    color: rgb(var(--v-theme-muted));
     font-size: 0.75rem;
 }
 dt {
-    color: #64796c;
+    color: rgb(var(--v-theme-muted));
     margin-top: 0.7rem;
     font-size: 0.8rem;
 }

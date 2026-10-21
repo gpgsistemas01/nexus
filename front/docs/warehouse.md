@@ -34,7 +34,7 @@ Las [decisiones de arquitectura](architecture.md) aplican a toda la implementaci
 
 - `app/layouts/AppLayout` coordina la sesión y navegación. `InventoryPage` crea el estado
   del recurso y conecta filtros, tabla y editor; `InventoryEditorPage` conecta la captura.
-- `InventoryTable`, `InventoryEditor`, `RemoteSelect`, `InventoryRowActions` y `app/components/AppNavigation` reciben
+- `InventoryTable`, `InventoryFilters`, `InventoryEditor`, `InventoryFormField`, `RemoteSelect`, `InventoryRowActions` y `app/components/AppNavigation` reciben
   props tipadas y emiten intenciones. Sólo mantienen estado visual local, como el
   diálogo de referencias históricas, y no conocen HTTP, almacenamiento ni autenticación.
 - `useInventory` coordina permisos y apertura del editor; `useInventoryList`
@@ -47,12 +47,14 @@ Las [decisiones de arquitectura](architecture.md) aplican a toda la implementaci
   `formFields.ts` reutiliza los controles que realmente comparten los tres módulos.
 
 La adaptación usa estado reactivo, props/eventos, RouterLink y ciclos de vida de
-Vue. No carga DataTables, Select2, Swal ni listeners EJS para administrar los mismos
-controles. La consulta se actualiza manualmente, al recuperar el foco y cada 30 s
+Vue. No carga DataTables, Select2 ni listeners EJS para administrar los mismos
+controles. SweetAlert2 confirma eliminaciones y muestra avisos de éxito; el modal
+de captura pertenece a Vuetify/VeeValidate. La consulta se actualiza manualmente, al recuperar el foco y cada 30 s
 mientras la página está visible y no hay un editor abierto. No suscribe Socket.IO.
 
 La [revisión de interfaz y HTTP](ui-and-http.md) detalla los encabezados originales,
-la carga automática de opciones, las bibliotecas elegidas y los propietarios de código.
+la carga automática de opciones, las secciones y campos recuperados del modal,
+los estilos, las bibliotecas elegidas y los propietarios de código.
 
 ## Reglas y contratos conservados
 

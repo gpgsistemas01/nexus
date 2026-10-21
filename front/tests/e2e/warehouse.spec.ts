@@ -136,6 +136,13 @@ test('materiales: conflicto de stock exige actualizar y no pierde la versión or
   await page.goto('/almacen/materiales');
   await page.getByRole('button', { name: 'Ajustar stock', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Ajustar stock de material', exact: true });
+  await expect(dialog.getByRole('textbox', { name: 'Proveedor', exact: true })).toHaveValue(
+    'Proveedor Central',
+  );
+  await expect(dialog.getByRole('textbox', { name: 'Nombre', exact: true })).not.toBeEditable();
+  await expect(dialog.getByRole('textbox', { name: 'Stock actual', exact: true })).toHaveValue(
+    '10',
+  );
   await dialog.getByRole('spinbutton', { name: 'Nuevo stock' }).fill('8');
   await chooseOption(page, 'Motivo del ajuste', 'Conteo físico');
   await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -202,6 +209,16 @@ test('materiales: alta con medidas, edición versionada y baja de la relación c
   });
   await page.getByRole('button', { name: 'Editar', exact: true }).click();
   dialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
+  await expect(dialog.getByRole('textbox', { name: 'Proveedor', exact: true })).toHaveValue(
+    'Proveedor Central',
+  );
+  await expect(dialog.getByRole('textbox', { name: 'Presentación', exact: true })).toHaveValue(
+    'ROLLO',
+  );
+  await expect(dialog.getByRole('textbox', { name: 'Unidad de medida', exact: true })).toHaveValue(
+    'm²',
+  );
+  await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).not.toBeEditable();
   await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Lona revisada');
   await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
   await expect(dialog).toBeHidden();
@@ -219,7 +236,7 @@ test('materiales: alta con medidas, edición versionada y baja de la relación c
     },
   });
   await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
-  dialog = page.getByRole('dialog', { name: 'Eliminar material', exact: true });
+  dialog = page.getByRole('dialog', { name: 'Eliminar material: Lona', exact: true });
   await dialog.getByRole('button', { name: 'Confirmar eliminación' }).click();
   await expect(dialog).toBeHidden();
   expect(writes[2]).toEqual({
@@ -281,6 +298,9 @@ test('mermas: referencia de rollo, peso calculado y recuperación tras recargar 
   await page.goto('/almacen/mermas');
   await page.getByRole('button', { name: 'Nueva merma' }).click();
   let dialog = page.getByRole('dialog', { name: 'Crear merma', exact: true });
+  await expect(
+    dialog.getByRole('combobox', { name: 'Material de referencia del proveedor', exact: true }),
+  ).toBeDisabled();
   await chooseOption(page, 'Proveedor', 'Proveedor Central');
   await chooseOption(page, 'Material de referencia del proveedor', 'Lona · ROLLO · 2 × 50');
   await dialog.getByRole('textbox', { name: 'Nombre de la merma' }).fill('Sobrante nuevo');
@@ -290,6 +310,15 @@ test('mermas: referencia de rollo, peso calculado y recuperación tras recargar 
   await dialog.getByRole('spinbutton', { name: 'Peso del cono de la merma (kg)' }).fill('0.25');
   await dialog.getByRole('spinbutton', { name: 'Peso de la merma con cono (kg)' }).fill('2.75');
   await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('3');
+  await expect(dialog.getByRole('textbox', { name: 'Presentación', exact: true })).toHaveValue(
+    'ROLLO',
+  );
+  await expect(dialog.getByRole('textbox', { name: 'Unidad de medida', exact: true })).toHaveValue(
+    'm²',
+  );
+  await expect(dialog.getByRole('textbox', { name: 'Peso neto de la merma (kg)' })).toHaveValue(
+    '2.5',
+  );
   await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toHaveValue('2');
   await expect(dialog.getByRole('spinbutton', { name: 'Altura (m)' })).toHaveValue('12.5');
   await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
@@ -449,4 +478,118 @@ test('tabla: orden por medidas se consulta en el servidor', async ({ page }) => 
   expect(queries.at(-1)?.get('order[0][dir]')).toBe('asc');
   await base.click();
   await expect.poll(() => queries.at(-1)?.get('order[0][dir]')).toBe('desc');
+});
+
+test('eliminación: cancelar no escribe; un fallo conserva el diálogo y exige reintento', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  let writes = 0;
+  await page.route(`**/api/warehouse/materials/${ids.offer}`, (route) => {
+    writes += 1;
+    return route.fulfill(
+      writes === 1 ? { status: 503, json: {} } : { json: { code: 'DELETED_MATERIAL' } },
+    );
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
+  let dialog = page.getByRole('dialog', { name: 'Eliminar material: Lona', exact: true });
+  await expect(dialog.getByRole('button', { name: 'Cancelar', exact: true })).toBeFocused();
+  await dialog.getByRole('button', { name: 'Cancelar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes).toBe(0);
+  await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
+  dialog = page.getByRole('dialog', { name: 'Eliminar material: Lona', exact: true });
+  await dialog.getByRole('button', { name: 'Confirmar eliminación' }).click();
+  await expect(
+    dialog.getByText('La eliminación no se confirmó. Puedes reintentar o cancelar.'),
+  ).toBeVisible();
+  expect(writes).toBe(1);
+  await dialog.getByRole('button', { name: 'Confirmar eliminación' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByText('La operación se guardó correctamente.')).toBeVisible();
+  expect(writes).toBe(2);
+});
+
+test('materiales: cambiar a piezas limpia medidas y filtros se pueden restablecer', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const pieceId = '99999999-9999-4999-8999-999999999999';
+  const queries: URLSearchParams[] = [];
+  let payload: Record<string, unknown> | undefined;
+  await page.route('**/api/warehouse/unit-measures?**', (route) =>
+    route.fulfill({
+      json: pageOf([
+        { id: ids.unit, name: 'Metros cuadrados', symbol: 'm²' },
+        { id: pieceId, name: 'Piezas', symbol: 'pz' },
+      ]),
+    }),
+  );
+  await page.route('**/api/warehouse/materials**', (route) => {
+    if (route.request().method() === 'GET') {
+      queries.push(new URL(route.request().url()).searchParams);
+      return route.fulfill({ json: pageOf([material]) });
+    }
+    payload = route.request().postDataJSON();
+    return route.fulfill({ json: { code: 'CREATED_MATERIAL' } });
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('Lona');
+  await chooseOption(page, 'Filtrar por proveedor', 'Proveedor Central');
+  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await expect.poll(() => queries.at(-1)?.get('search')).toBe('Lona');
+  await page.getByRole('button', { name: 'Limpiar filtros' }).click();
+  await expect.poll(() => queries.at(-1)?.get('search')).toBe('');
+  expect(queries.at(-1)?.get('supplierId')).toBe('');
+  expect(queries.at(-1)?.get('start')).toBe('0');
+  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Crear material', exact: true });
+  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Material por pieza');
+  await chooseOption(page, 'Proveedor', 'Proveedor Central');
+  await chooseOption(page, 'Presentación', 'ROLLO');
+  await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
+  await dialog.getByRole('spinbutton', { name: 'Base (m)' }).fill('2');
+  await dialog.getByRole('spinbutton', { name: 'Altura (m)' }).fill('3');
+  await chooseOption(page, 'Unidad de medida', 'Piezas');
+  await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toBeHidden();
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(payload).toMatchObject({ unitMeasureId: pieceId, base: null, height: null });
+});
+
+test('merma histórica: conserva pesos, referencia y medidas como consulta al editar', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const { waste } = await import('../fixtures/inventory.js');
+  await page.route('**/api/warehouse/wastes?**', (route) =>
+    route.fulfill({
+      json: pageOf([
+        { ...waste, sampleLengthM: 10, sampleNetWeightKg: 2, referenceRollTotalWeightKg: null },
+      ]),
+    }),
+  );
+  await page.goto('/almacen/mermas');
+  await page.getByRole('button', { name: 'Editar', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Editar merma', exact: true });
+  await expect(
+    dialog.getByRole('heading', { name: 'Referencia histórica', exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole('textbox', { name: 'Largo de referencia (m)', exact: true }),
+  ).toHaveValue('10');
+  await expect(
+    dialog.getByRole('textbox', { name: 'Peso neto de referencia (kg)', exact: true }),
+  ).toHaveValue('2');
+  await expect(
+    dialog.getByRole('textbox', { name: 'Peso neto de la merma (kg)', exact: true }),
+  ).toHaveValue('2.50');
+  await expect(
+    dialog.getByRole('spinbutton', { name: 'Peso de la merma con cono (kg)', exact: true }),
+  ).not.toBeEditable();
+  await expect(
+    dialog.getByRole('spinbutton', { name: 'Base (m)', exact: true }),
+  ).not.toBeEditable();
+  await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
 });

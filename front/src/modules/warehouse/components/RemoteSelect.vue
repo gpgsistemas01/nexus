@@ -3,7 +3,8 @@ import { VAutocomplete } from 'vuetify/components/VAutocomplete';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VProgressCircular } from 'vuetify/components/VProgressCircular';
 import { Intersect as vIntersect } from 'vuetify/directives/intersect';
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed, ref, toRef } from 'vue';
+import { useSelectedOption } from '../composables/useSelectedOption.js';
 import type { LookupItem } from '../inventory.js';
 
 const props = defineProps<{
@@ -15,6 +16,7 @@ const props = defineProps<{
     loadError?: string;
     hasMore?: boolean;
     isDisabled?: boolean;
+    hint?: string;
 }>();
 const emit = defineEmits<{
     'update:modelValue': [value: string];
@@ -24,16 +26,7 @@ const emit = defineEmits<{
     blur: [];
 }>();
 const isMenuOpen = ref(false);
-const selectedItem = shallowRef<LookupItem>();
-watch(
-    [() => props.modelValue, () => props.items],
-    () => {
-        selectedItem.value =
-            props.items.find((item) => item.id === props.modelValue) ??
-            (selectedItem.value?.id === props.modelValue ? selectedItem.value : undefined);
-    },
-    { immediate: true },
-);
+const selectedItem = useSelectedOption(toRef(props, 'items'), () => props.modelValue);
 const visibleItems = computed(() =>
     selectedItem.value && !props.items.some((item) => item.id === selectedItem.value!.id)
         ? [selectedItem.value, ...props.items]
@@ -69,6 +62,8 @@ const loadWhenVisible = (isVisible: boolean) => {
         item-value="id"
         :loading="isLoading"
         :disabled="isDisabled"
+        :hint="hint"
+        :persistent-hint="!!hint && isDisabled"
         :error-messages="error || loadError"
         :aria-label="label"
         :aria-invalid="!!error || !!loadError"

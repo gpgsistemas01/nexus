@@ -1,27 +1,28 @@
 <script setup lang="ts">
+import { useId } from 'vue';
+import { useDisplay } from 'vuetify';
 import { VDialog } from 'vuetify/components/VDialog';
 import { VCard, VCardTitle, VCardText, VCardActions } from 'vuetify/components/VCard';
+import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
-import { VTextarea } from 'vuetify/components/VTextarea';
-import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VAlert } from 'vuetify/components/VAlert';
-import RemoteSelect from './RemoteSelect.vue';
-import type { InventoryFieldSpec } from '../formFields.js';
+import { VDefaultsProvider } from 'vuetify/components/VDefaultsProvider';
+import { controlDefaults } from '../../../shared/ui/controlDefaults.js';
+import InventoryFormField from './InventoryFormField.vue';
+import type { InventoryFormSection } from '../formFields.js';
 import type { InventoryField, InventoryValues, LookupItem } from '../inventory.js';
 
 defineProps<{
     title: string;
     context?: string;
-    fields: InventoryFieldSpec[];
+    sections: InventoryFormSection[];
     values: InventoryValues;
     errors: Partial<Record<InventoryField, string>>;
     message: string;
     isSubmitting: boolean;
     isPending: boolean;
     isConflicted: boolean;
-    isDelete: boolean;
-    weightPreview?: number | null;
     lookups: Record<
         string,
         { items: LookupItem[]; isLoading: boolean; error: string; hasMore: boolean }
@@ -37,147 +38,135 @@ const emit = defineEmits<{
     close: [];
     reload: [];
 }>();
+const { smAndDown } = useDisplay();
+const formId = useId();
+const titleId = useId();
 </script>
 
 <template>
     <VDialog
         :model-value="true"
-        max-width="760"
+        max-width="1080"
+        :fullscreen="smAndDown"
+        scrollable
         :persistent="isSubmitting"
         @update:model-value="!$event && emit('close')"
     >
-        <VCard
-            class="inventory-editor"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="inventory-editor-title"
-        >
-            <form
-                novalidate
-                :aria-busy="isSubmitting"
-                @submit.prevent="emit('submit')"
+        <VDefaultsProvider :defaults="controlDefaults">
+            <VCard
+                class="inventory-editor"
+                role="dialog"
+                aria-modal="true"
+                :aria-labelledby="titleId"
             >
-                <VCardTitle
-                    id="inventory-editor-title"
-                    class="editor-title"
-                >
-                    {{ title }}
+                <VCardTitle class="editor-title">
+                    <div>
+                        <p>ALMACÉN</p>
+                        <h2 :id="titleId">{{ title }}</h2>
+                    </div>
+                    <VBtn
+                        icon="$close"
+                        variant="text"
+                        aria-label="Cerrar formulario"
+                        :disabled="isSubmitting"
+                        @click="emit('close')"
+                    />
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="editor-body">
                     <p
                         v-if="context"
                         class="editor-context"
                     >
                         {{ context }}
                     </p>
-                    <VAlert
-                        v-if="isDelete"
-                        type="warning"
-                        variant="tonal"
-                        class="mb-4"
+                    <form
+                        :id="formId"
+                        novalidate
+                        :aria-busy="isSubmitting"
+                        @submit.prevent="emit('submit')"
                     >
-                        Se eliminará la relación con este proveedor. Si no quedan otros proveedores,
-                        también se eliminará el material. Confirma únicamente si es el registro
-                        correcto.
-                    </VAlert>
-                    <VAlert
-                        v-if="isPending"
-                        type="info"
-                        variant="tonal"
-                        class="mb-4"
-                    >
-                        Hay una captura pendiente de confirmar. Recuperar enviará exactamente la
-                        captura anterior para comprobar su resultado, sin crear otra operación.
-                        <p>
-                            {{ values.name || context }} · Cantidad:
-                            {{ values.quantity || values.initialQuantity }}
-                        </p>
-                    </VAlert>
-                    <VAlert
-                        v-if="message"
-                        role="alert"
-                        type="error"
-                        variant="tonal"
-                        class="mb-4"
-                    >
-                        {{ message }}
-                    </VAlert>
-                    <p
-                        v-if="weightPreview != null"
-                        class="weight-preview"
-                    >
-                        Peso neto estimado:
-                        <strong>{{ weightPreview }} kg</strong>
-                        . El servidor confirma las medidas al guardar.
-                    </p>
-                    <div
-                        v-if="!isPending"
-                        class="editor-fields"
-                    >
-                        <div
-                            v-for="field in fields"
-                            :key="field.name"
-                            :class="{ 'wide-field': field.type === 'textarea' }"
+                        <VAlert
+                            v-if="isPending"
+                            type="info"
+                            variant="tonal"
+                            class="mb-4"
                         >
-                            <RemoteSelect
-                                v-if="field.type === 'lookup'"
-                                :label="field.label"
-                                :model-value="String(values[field.name])"
-                                :items="lookups[field.name]?.items ?? []"
-                                :is-loading="lookups[field.name]?.isLoading ?? false"
-                                :error="errors[field.name]"
-                                :load-error="lookups[field.name]?.error"
-                                :has-more="lookups[field.name]?.hasMore"
-                                :is-disabled="isSubmitting || isPending"
-                                @update:model-value="emit('update', field.name, $event)"
-                                @search="emit('search', field.name, $event)"
-                                @more="emit('more', field.name)"
-                                @retry="emit('retry', field.name)"
-                                @blur="emit('blur', field.name)"
-                            />
-                            <VCheckbox
-                                v-else-if="field.type === 'checkbox'"
-                                :label="field.label"
-                                :model-value="!!values[field.name]"
-                                :disabled="isSubmitting || isPending"
-                                :error-messages="errors[field.name]"
-                                color="primary"
-                                @update:model-value="emit('update', field.name, $event === true)"
-                            />
-                            <VTextarea
-                                v-else-if="field.type === 'textarea'"
-                                :label="field.label"
-                                :model-value="String(values[field.name])"
-                                :disabled="isSubmitting || isPending"
-                                :error-messages="errors[field.name]"
-                                rows="2"
-                                variant="outlined"
-                                @update:model-value="emit('update', field.name, $event ?? '')"
-                                @blur="emit('blur', field.name)"
-                            />
-                            <VTextField
-                                v-else
-                                :label="field.label"
-                                :aria-label="field.label"
-                                :name="field.name"
-                                :type="field.type === 'number' ? 'number' : 'text'"
-                                :model-value="field.displayValue ?? String(values[field.name])"
-                                :readonly="field.isReadOnly"
-                                :disabled="isSubmitting || isPending"
-                                :error-messages="errors[field.name]"
-                                :hint="field.hint"
-                                :step="field.type === 'number' ? 'any' : undefined"
-                                variant="outlined"
-                                density="comfortable"
-                                @update:model-value="emit('update', field.name, $event ?? '')"
-                                @blur="emit('blur', field.name)"
-                            />
-                        </div>
-                    </div>
+                            Hay una captura pendiente de confirmar. Recuperar enviará exactamente la
+                            captura anterior para comprobar su resultado, sin crear otra operación.
+                            <p>
+                                {{ values.name || context }} · Cantidad:
+                                {{ values.quantity || values.initialQuantity }}
+                            </p>
+                        </VAlert>
+                        <VAlert
+                            v-if="message"
+                            role="alert"
+                            type="error"
+                            variant="tonal"
+                            class="mb-4"
+                        >
+                            {{ message }}
+                        </VAlert>
+                        <template v-if="!isPending">
+                            <section
+                                v-for="section in sections"
+                                :key="section.id"
+                                class="editor-section"
+                                :aria-labelledby="`${formId}-${section.id}`"
+                            >
+                                <header class="section-heading">
+                                    <h3 :id="`${formId}-${section.id}`">{{ section.title }}</h3>
+                                    <p v-if="section.description">{{ section.description }}</p>
+                                </header>
+                                <VRow density="compact">
+                                    <VCol
+                                        v-for="item in section.summary"
+                                        :key="item.label"
+                                        cols="12"
+                                        md="6"
+                                    >
+                                        <VTextField
+                                            :label="item.label"
+                                            :model-value="item.value"
+                                            readonly
+                                            class="consultation-field"
+                                        />
+                                    </VCol>
+                                    <VCol
+                                        v-for="field in section.fields"
+                                        :key="field.name"
+                                        cols="12"
+                                        :md="field.isWide ? 12 : 6"
+                                    >
+                                        <InventoryFormField
+                                            :field="field"
+                                            :value="values[field.name]"
+                                            :error="errors[field.name]"
+                                            :is-disabled="isSubmitting"
+                                            :lookup="lookups[field.name]"
+                                            @update="emit('update', field.name, $event)"
+                                            @blur="emit('blur', field.name)"
+                                            @search="emit('search', field.name, $event)"
+                                            @more="emit('more', field.name)"
+                                            @retry="emit('retry', field.name)"
+                                        />
+                                    </VCol>
+                                </VRow>
+                            </section>
+                        </template>
+                    </form>
                 </VCardText>
                 <VCardActions class="editor-actions">
+                    <span class="editor-note">
+                        {{
+                            isPending
+                                ? 'Captura protegida para recuperación'
+                                : 'Los campos de consulta se conservan sin modificarlos.'
+                        }}
+                    </span>
                     <VBtn
                         :disabled="isSubmitting"
+                        variant="outlined"
                         @click="emit('close')"
                     >
                         Cerrar
@@ -189,61 +178,104 @@ const emit = defineEmits<{
                         Cerrar y actualizar inventario
                     </VBtn>
                     <VBtn
+                        :form="formId"
                         type="submit"
-                        :color="isDelete ? 'error' : 'primary'"
+                        color="primary"
                         variant="flat"
                         :loading="isSubmitting"
                         :disabled="isSubmitting || (isConflicted && !isPending)"
                     >
-                        {{
-                            isPending
-                                ? 'Recuperar captura'
-                                : isDelete
-                                  ? 'Confirmar eliminación'
-                                  : 'Guardar'
-                        }}
+                        {{ isPending ? 'Recuperar captura' : 'Guardar' }}
                     </VBtn>
                 </VCardActions>
-            </form>
-        </VCard>
+            </VCard>
+        </VDefaultsProvider>
     </VDialog>
 </template>
 
 <style scoped>
 .inventory-editor {
-    border-radius: 1.25rem;
+    border-radius: 1rem;
+    background: rgb(var(--v-theme-background));
 }
 .editor-title {
-    padding: 1.5rem 1.5rem 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgb(var(--v-theme-primary));
+    color: white;
     white-space: normal;
-    font-weight: 700;
+}
+.editor-title p {
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    opacity: 0.85;
+    margin-bottom: 0.25rem;
+}
+.editor-title h2 {
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-weight: 800;
+    line-height: 1.25;
+}
+.editor-body {
+    padding: 1.25rem !important;
 }
 .editor-context {
-    margin-bottom: 1.25rem;
-    color: #456354;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: rgb(var(--v-theme-muted));
 }
-.editor-fields {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.25rem 1rem;
+.editor-section {
+    background: rgb(var(--v-theme-surface));
+    border: 1px solid rgba(var(--v-theme-primary), 0.15);
+    border-radius: 0.85rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
 }
-.wide-field {
-    grid-column: 1 / -1;
+.section-heading {
+    border-bottom: 1px solid rgba(var(--v-theme-primary), 0.22);
+    padding-bottom: 0.65rem;
+    margin-bottom: 1rem;
+}
+.section-heading h3 {
+    color: rgb(var(--v-theme-primary));
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+.section-heading p {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: rgb(var(--v-theme-muted));
+}
+.editor-section :deep(.v-col) {
+    padding: 0.45rem;
+}
+.consultation-field :deep(.v-field) {
+    background: rgba(var(--v-theme-on-surface), 0.04);
 }
 .editor-actions {
-    padding: 0 1.5rem 1.5rem;
+    padding: 1rem 1.25rem;
     flex-wrap: wrap;
     gap: 0.5rem;
+    background: rgb(var(--v-theme-surface));
+    border-top: 1px solid rgba(var(--v-theme-primary), 0.15);
 }
-.weight-preview {
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    background: #e8f6ee;
+.editor-note {
+    flex: 1 1 240px;
+    color: rgb(var(--v-theme-muted));
+    font-size: 0.75rem;
 }
 @media (max-width: 600px) {
-    .editor-fields {
-        grid-template-columns: 1fr;
+    .editor-title {
+        padding: 1rem;
+    }
+    .editor-body {
+        padding: 0.75rem !important;
+    }
+    .editor-note {
+        flex-basis: 100%;
     }
 }
 </style>

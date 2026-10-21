@@ -32,7 +32,7 @@ export const initialInventoryValues = (target: EditorTarget): InventoryValues =>
         base: String(row?.base ?? ''),
         height: String(row?.height ?? ''),
         minStock: String(row?.minStock ?? ''),
-        maxUnitCost: String(row?.maxUnitCost ?? '0'),
+        maxUnitCost: String(row ? (row.maxUnitCost ?? '') : '0'),
         isActive: row?.isActive ?? true,
         newStock: String(row?.currentStock ?? '0'),
         initialQuantity: '0',
@@ -44,6 +44,10 @@ export const initialInventoryValues = (target: EditorTarget): InventoryValues =>
         referenceRollTotalWeightKg: '',
     };
 };
+
+export const unitUsesMeasurements = (unit?: Record<string, unknown>) =>
+    /\b(?:metros?|litros?)\b/i.test(String(unit?.name ?? '')) ||
+    /^(?:m[²³23]?|mt|mts|l|lt|lts)$/i.test(String(unit?.symbol ?? ''));
 
 export const previewWaste = (values: InventoryValues, template?: LookupItem) => {
     const isRoll = isRollPresentation(

@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useInventoryEditor } from '../../../../src/modules/warehouse/composables/useInventoryEditor.js';
 import { inventoryService } from '../../../../src/modules/warehouse/services/inventoryService.js';
 import { ApiError } from '../../../../src/shared/http/apiError.js';
-import { ids, material, pageOf, user, waste } from '../../../fixtures/inventory.js';
+import { ids, material, pageOf, template, user, waste } from '../../../fixtures/inventory.js';
 import type {
   EditorTarget,
   InventoryField,
@@ -138,6 +138,57 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     expect(request).toHaveBeenCalledOnce();
     expect(request.mock.calls[0]?.[2]).not.toHaveProperty('base');
     expect(request.mock.calls[0]?.[2]).not.toHaveProperty('height');
+  });
+
+  it.each(['materials', 'wastes'] as const)(
+    'editar %s sin costo recibido exige capturarlo y admite cero explícito',
+    async (resource) => {
+      const data = resource === 'wastes' ? waste : material;
+      const { editor, request } = openEditor(resource, {
+        action: 'edit',
+        row: normalizeInventoryRow({ ...data, maxUnitCost: undefined }),
+      });
+      await editor.submit();
+      expect(request).not.toHaveBeenCalled();
+      expect(editor.errors.value.maxUnitCost).toBeTruthy();
+      editor.update('maxUnitCost', '0');
+      await editor.submit();
+      expect(request).toHaveBeenCalledOnce();
+      expect(request.mock.calls[0]?.[2].maxUnitCost).toBe(0);
+    },
+  );
+
+  it('cambiar proveedor elimina la referencia y la captura heredada de la merma anterior', async () => {
+    const { editor, request } = openEditor('wastes', { action: 'create' });
+    vi.mocked(inventoryCatalogService.lookup).mockImplementation(async (path) =>
+      pageOf(
+        path === 'wastes/material-templates'
+          ? [{ id: ids.material, title: 'Lona', data: template }]
+          : [],
+      ),
+    );
+    editor.update('supplierId', ids.supplier);
+    await flushPromises();
+    editor.update('materialId', ids.material);
+    await flushPromises();
+    expect(editor.values.name).toBe('Lona');
+    editor.update('referenceRollTotalWeightKg', '10.25');
+    editor.update('coneWeightKg', '0.25');
+    editor.update('totalWeightKg', '2.75');
+    editor.update('supplierId', '99999999-9999-4999-8999-999999999999');
+    await flushPromises();
+    for (const field of [
+      'materialId',
+      'name',
+      'maxUnitCost',
+      'referenceRollTotalWeightKg',
+      'coneWeightKg',
+      'totalWeightKg',
+      'base',
+      'height',
+    ] as const)
+      expect(editor.values[field]).toBe('');
+    expect(request).not.toHaveBeenCalled();
   });
 
   it('editar merma envía sólo sus metadatos y la versión, sin pesos ni medidas', async () => {

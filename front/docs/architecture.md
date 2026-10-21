@@ -70,8 +70,8 @@ un contrato explícito.
 
 | Patrón o mecanismo | Decisión |
 | --- | --- |
-| Contenedor/presentación | LoginPage y las páginas de Almacén coordinan; LoginForm, InventoryTable, InventoryEditor y AppNavigation reciben props y emiten eventos. |
-| Composición mediante composables | useInventory coordina permisos/editor; useInventoryList, useInventoryReport, useInventoryEditor y useRemoteOptions mantienen listado, reporte, captura y catálogos por instancia. |
+| Contenedor/presentación | LoginPage y las páginas de Almacén coordinan; LoginForm, InventoryTable, InventoryFilters, InventoryEditor, InventoryFormField y AppNavigation reciben props y emiten eventos. |
+| Composición mediante composables | useInventory coordina permisos/editor; useInventoryList, useInventoryReport, useInventoryEditor, useInventoryRemoval y useRemoteOptions mantienen listado, reporte, captura y catálogos por instancia. |
 | Organización por módulos | auth y warehouse agrupan sus responsabilidades. Materiales y Consumibles reutilizan el mismo flujo parametrizado por recurso; Mermas añade captura y recuperación propias. |
 | Servicios y adaptadores HTTP | authService conserva el login público sin refresh. Los servicios de inventario, catálogos y reportes usan Axios compartido; inventoryMapper adapta DTOs y conserva identificadores/versiones. |
 | Estado compartido | createAuthSession crea una sesión por aplicación; main la proporciona por provide/inject y la guarda usa esa misma instancia. Su usuario es readonly. No se agrega Pinia para este único contrato ni un store por formulario. |
@@ -97,15 +97,17 @@ app/layouts/AppLayout (sesión, navegación y RouterView)
   → InventoryPage (resource: materials | consumables | wastes)
       → useInventory → useInventoryList / useInventoryReport
           → services de inventario / catálogos / reportes → Axios compartido
+      → InventoryFilters → VExpansionPanels (props y eventos)
       → InventoryTable → VDataTableServer / InventoryRowActions (props y eventos)
+      → useInventoryRemoval → shared/ui/feedback → SweetAlert2
       → InventoryReportToolbar (alcance, descarga y reintento mediante eventos)
       → InventoryEditorPage → useInventoryEditor → VeeValidate
-          → InventoryEditor → RemoteSelect (presentación)
+          → InventoryEditor → InventoryFormField → RemoteSelect (presentación)
           → useRemoteOptions (catálogos, búsqueda, paginación y cancelación)
 ```
 
 `inventory.ts` contiene los contratos y la configuración de los tres recursos;
-`formFields.ts` describe únicamente sus controles existentes. `formModel.ts` conecta
+`formFields.ts` describe las secciones y campos editables/de consulta de cada modo. `formModel.ts` conecta
 reglas públicas y construye payloads por operación, sin copiar validadores.
 No se incorpora un generador universal de formularios. Las tres rutas crean estado
 independiente y desmontan consultas, temporizadores y capturas al cambiar de módulo.
@@ -132,6 +134,10 @@ contiene sólo assets y Nginx. El backend continúa construyéndose por separado
 - Las reglas públicas de `back/src/shared` deben conservar un propietario único; no se
   duplican como otra copia en `front/src/shared`. Un paquete común requerirá ajustar
   dependencias y contextos de construcción. No se publica código privado del backend.
+
+El tema y los defaults se centralizan en `app/plugins/vuetify.ts` y `shared/ui/controlDefaults.ts`.
+La [guía de interfaz](ui-and-http.md#estilos-y-controles-adaptados-a-vue) documenta
+la adaptación visual de MDB, los campos recuperados y SweetAlert2.
 
 ## Convenciones y validación
 

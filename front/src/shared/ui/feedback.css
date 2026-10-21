@@ -1,0 +1,43 @@
+.nexus-feedback {
+    border-radius: 1rem;
+    color: rgb(var(--v-theme-on-surface));
+    font-family: inherit;
+}
+.nexus-feedback .swal2-title {
+    font-size: 1.35rem;
+}
+.nexus-feedback .swal2-html-container {
+    font-size: 0.95rem;
+}
+.nexus-feedback .swal2-actions {
+    gap: 0.75rem;
+}
+.nexus-feedback .feedback-confirm,
+.nexus-feedback .feedback-cancel {
+    padding: 0.65rem 1rem;
+    border-radius: 0.65rem;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+.nexus-feedback .feedback-confirm {
+    background: rgb(var(--v-theme-error));
+    color: white;
+}
+.nexus-feedback .feedback-cancel {
+    background: white;
+    color: rgb(var(--v-theme-filter-clear));
+    border-color: rgb(var(--v-theme-filter-clear));
+}
+.nexus-feedback button:focus-visible {
+    outline: 3px solid rgb(var(--v-theme-filter-action));
+    outline-offset: 3px;
+}
+.nexus-feedback button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+.nexus-feedback.swal2-toast .swal2-title {
+    font-size: 0.9rem;
+}
