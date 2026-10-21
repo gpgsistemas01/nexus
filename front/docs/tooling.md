@@ -9,14 +9,38 @@ Las reglas de presentación impiden imports de HTTP, stores, páginas, validador
 y VeeValidate, además de fetch/XMLHttpRequest y almacenamiento local mediante
 globales o window/globalThis. No sustituyen la revisión de dependencias indirectas.
 
-Se admiten Node.js `^22.13.0 || ^24.14.1`. Para mantener compatibilidad con Node
+Se admiten Node.js `^22.13.0 || ^24.14.1 || ^26.12.1`. Para mantener compatibilidad con Node
 24.14.1 se fijan jsdom 29.1.1 y Vue Test Utils 2.4.6: las ramas posteriores agregaban
 requisitos más altos de Node mediante dependencias de pruebas. No basta con bajar
 `engines`; se verifica la compatibilidad de todo el lockfile y la instalación con
 `npm ci --include=dev --engine-strict`, además de lint, pruebas y build.
-CI comprueba el frontend con Node 24.14.1 para detectar regresiones de ese mínimo.
+CI comprueba el frontend con Node 24.14.1 y 26.12.1 para detectar regresiones del
+mínimo existente y de la nueva rama admitida. No se cambian los pins de pruebas
+por el solo hecho de admitir Node 26.
+El setup de pruebas enlaza localStorage/sessionStorage con los objetos reales de
+jsdom antes de cada caso y restaura los globals al terminar. Así Vitest 4 no conserva
+por accidente el Storage nativo de Node 26 en una prueba del navegador. Las pruebas
+de almacenamiento del login conservan sus mismas aserciones y el mismo alcance.
 El backend conserva sus herramientas y versiones de Node documentadas por separado.
 Las versiones exactas se registran en `package-lock.json` y se instalan con `npm ci`.
+
+### Aviso de obsolescencia de glob
+
+La instalación puede mostrar `npm warn deprecated glob@10.5.0`. La cadena actual
+es `@vue/test-utils@2.4.6 → js-beautify@1.15.4 → glob@10.5.0`; pertenece a las
+herramientas de pruebas, no a VeeValidate ni al código del login. Comprueba su
+origen con `npm explain glob` desde `front/`.
+
+El aviso de obsolescencia del mantenedor y `npm audit` son comprobaciones distintas:
+`found 0 vulnerabilities` significa que la auditoría no encontró avisos aplicables
+al árbol instalado en ese momento; no convierte una versión obsoleta en mantenida.
+
+Vue Test Utils 2.5.1 usa js-beautify 2.x y glob 13.x, pero js-beautify 2.0.3 también
+incorpora nopt 10.0.1, que requiere Node `^22.22.2 || ^24.15.0 || >=26.0.0`.
+Esa actualización no es compatible con el mínimo actual de Node 24.14.1. Se conserva
+el pin de Vue Test Utils hasta revisar conjuntamente la versión mínima de Node,
+CI, la instalación con engines estrictos y las pruebas. No se fuerza un glob de
+otra versión mayor sólo para ocultar el aviso ni se agrega como dependencia directa.
 
 ## Tipos y editor
 

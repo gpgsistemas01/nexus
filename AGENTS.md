@@ -9,7 +9,7 @@ en la raíz del repositorio.
 - Antes de implementar un cambio, revisa el código relacionado y las implementaciones similares existentes.
 - Prioriza reutilizar componentes, *helpers*, servicios y flujos existentes. No dupliques reglas de negocio.
 - No realices refactorizaciones ni cambios fuera del alcance solicitado.
-- Usa Node.js 22–24 y módulos ES. Conserva imports relativos con extensión `.js` y el estilo local del archivo.
+- Usa Node.js 22, 24 o 26 según los rangos `engines` de cada aplicación, y módulos ES. Conserva imports relativos con extensión `.js` y el estilo local del archivo.
 
 ## Fuentes de verdad
 

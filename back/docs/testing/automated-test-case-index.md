@@ -25,7 +25,7 @@ todas las integraciones.
 
 | Suite | Ambiente | Comando |
 | --- | --- | --- |
-| Unitaria | Node.js 22–24 y Vitest, sin base de datos real; dependencias externas simuladas cuando corresponde. | `npm run test:unit` |
+| Unitaria | Node.js 22, 24 o 26 según `engines`, y Vitest, sin base de datos real; dependencias externas simuladas cuando corresponde. CI comprueba Node 24 y 26. | `npm run test:unit` |
 | Integración | `NODE_ENV=test`, PostgreSQL aislado en `DATABASE_TEST_URL`, migraciones aplicadas y ejecución serial. La URL debe ser distinta de `DATABASE_URL`. | `npm run test:integration` |
 
 Los resultados de cada ejecución se conservan en CI o en la solicitud de cambio. La

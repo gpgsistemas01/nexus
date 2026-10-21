@@ -30,6 +30,51 @@ Los ejemplos `npx prisma ...` y `node scripts/...` requieren estar dentro de `ba
 Los archivos `.env`, las salidas y las rutas relativas del backend se resuelven allí.
 Dentro del contenedor Docker, la aplicación está en `/app`; no se usa `/app/back`.
 
+## Archivos locales ignorados y cambio de estructura
+
+> **Al actualizar una copia anterior a la separación en `back/` y `front/`, Git
+> no traslada los archivos locales ignorados ni instala dependencias.** Un
+> `git pull` puede actualizar el código mientras `.env`, `node_modules/` o el
+> cliente Prisma anterior permanecen en la raíz.
+
+Las rutas siguientes son relativas a la raíz del repositorio:
+
+| Archivo o carpeta local | Ubicación actual | Cómo se prepara |
+| --- | --- | --- |
+| Variables y secretos de Express/PostgreSQL | `back/.env` | Trasladar el `.env` anterior conservando sus valores. Si ya existe el destino, comparar y combinar sin sobrescribirlo a ciegas. |
+| Configuración opcional de Vite | `front/.env.local` | Crear a partir de `front/.env.example`. No copiar los secretos del backend; las variables `VITE_*` se publican en el navegador. |
+| Dependencias de Express y herramientas del backend | `back/node_modules/` | Ejecutar `npm --prefix back ci`. |
+| Dependencias de Vue y herramientas del frontend | `front/node_modules/` | Ejecutar `npm --prefix front ci --include=dev`. |
+| Cliente generado de Prisma | `back/generated/prisma/` | Ejecutar `npm --prefix back run db:generate`; no se descarga con Git. |
+| Compilación y cachés de Vue/Vite/TypeScript | `front/dist/`, `front/node_modules/.vite/`, `front/node_modules/.tmp/` | Se regeneran con los comandos del frontend. |
+| Exportaciones y resultados de pruebas | `back/build/`, `front/build/` | Los generan las herramientas del módulo correspondiente. |
+
+Detén los servidores antes de reinstalar. Después de colocar `back/.env`, ejecuta
+desde la raíz:
+
+```bash
+npm --prefix back ci
+npm --prefix front ci --include=dev
+npm --prefix back run db:generate
+```
+
+Cada aplicación tiene sus propias dependencias. No muevas `node_modules/` a mano:
+tras completar las instalaciones puedes eliminar el `node_modules/` antiguo de
+la raíz. Conserva la configuración y los datos locales; no uses una limpieza
+global de archivos ignorados para resolver errores de instalación.
+
+Los archivos de dependencias como `jsx-runtime.d.ts` dentro de `node_modules/`
+los administra npm: no se editan ni se versionan. Los `package.json` y
+`package-lock.json` de ambas aplicaciones y `front/.env.example` sí se versionan.
+`.gitignore` determina lo que Git ignora; `.dockerignore` controla el contexto de
+Docker y no sustituye la configuración local.
+
+Para comprobar qué regla ignora un archivo sin mostrar su contenido:
+
+```bash
+git check-ignore -v back/.env front/.env.local back/node_modules front/node_modules back/generated/prisma/client.ts
+```
+
 ## Desarrollo
 
 ```bash
@@ -50,8 +95,13 @@ en el puerto 3000. Al autenticar se abre materiales EJS. `/inicio` conserva el
 comparador de **MDB Vue**, **Vuetify** y **PrimeVue**, una demostración sin autenticación.
 Si tienes una copia anterior, actualiza `features`, instala con `npm ci` en `front/`
 y reinicia Vite. La plantilla del contador se conserva en `/ejemplo`.
+Si el arranque indica que no puede resolver `vee-validate`, consulta la
+[recuperación de dependencias del frontend](front/README.md#dependencias-no-resueltas-en-vite).
 
-Usa Node.js 24.14.1+ de la rama 24 o 22.13+ de la rama 22 para el frontend.
+Usa Node.js 24.14.1+ de la rama 24, 22.13+ de la rama 22 o 26.12.1+ de la rama 26
+para el frontend. CI comprueba las ramas 24 y 26 en ambas aplicaciones. Los
+Dockerfiles conservan sus versiones propias: Node 22 en Express y Node 24 para
+compilar Vue; cambiar Node en tu equipo no actualiza producción.
 
 En otra terminal, desde la raíz del repositorio:
 

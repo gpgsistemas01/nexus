@@ -107,13 +107,16 @@ forma curada. CI comprueba que el contenido generado esté actualizado.
 
 ## Requisitos
 
-- Node.js `>=22 <25`.
+- Node.js `>=22 <25 || ^26.12.1`; Node 26 se comprueba en CI junto con Node 24.
 - npm.
 - PostgreSQL disponible para desarrollo y, opcionalmente, otra base aislada para pruebas.
 
 ## Configuración inicial
 
 Ejecuta los comandos npm desde `back/` (`cd back` desde la raíz del repositorio).
+Si actualizas una copia anterior a la separación de carpetas, revisa primero
+[archivos locales ignorados y cambio de estructura](../README.md#archivos-locales-ignorados-y-cambio-de-estructura):
+Git no mueve el `.env`, las dependencias ni el cliente Prisma generado de tu equipo.
 
 1. Instalar dependencias:
 
@@ -135,6 +138,38 @@ Ejecuta los comandos npm desde `back/` (`cd back` desde la raíz del repositorio
    ```bash
    npm run dev
    ```
+
+### Avisos al actualizar Node y npm
+
+`EBADENGINE` con `package: nexus@1.0.0` y `required: >=22 <25` indica que la copia
+local conserva el contrato anterior a Node 26. La configuración actual admite
+Node 26 desde 26.12.1; sincroniza `package.json` y `package-lock.json` con la rama
+actualizada. El rango declarado no instala Node ni cambia la imagen Docker.
+
+npm 11.20 puede avisar de scripts de instalación aún no registrados en
+`allowScripts`. El proyecto revisó y registró únicamente `bcrypt@6.0.0` (preparación
+del módulo nativo), `prisma@7.10.1` (comprobación de requisitos) y
+`@prisma/engines@7.10.1` (preparación de motores). La advertencia no prueba por sí
+sola que los scripts hayan sido omitidos o que la instalación haya fallado.
+
+Desde `back/`, para revisar la política con una versión de npm que la admita:
+
+```bash
+npm install-scripts ls
+```
+
+En una copia anterior que tenga esas mismas versiones, el registro selectivo se
+realiza con `npm install-scripts approve bcrypt prisma @prisma/engines`. El comando
+guarda las versiones instaladas en `package.json`; no ejecuta los scripts. Después
+de revisar un cambio de versión, actualiza sus entradas con el mismo comando y
+reinstala con `npm ci`, o usa `npm rebuild bcrypt prisma @prisma/engines` para volver
+a ejecutar los scripts sobre una instalación existente. Genera finalmente el
+cliente con `npm run db:generate`. No apruebes paquetes adicionales sin revisar su
+procedencia, versión y scripts.
+
+`npm update` respeta los rangos de versiones declarados y no garantiza corregir
+todos los avisos de seguridad. Consulta `npm audit` para identificar el paquete
+propietario; no uses `npm audit fix --force` como sustituto de una migración revisada.
 
 ## Variables de entorno
 
