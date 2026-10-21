@@ -1,20 +1,65 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { VTable } from 'vuetify/components/VTable';
+import { computed, ref } from 'vue';
+import { VDataTableServer } from 'vuetify/components/VDataTable';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VChip } from 'vuetify/components/VChip';
-import type { EditorTarget, InventoryPermissions, InventoryRow } from '../inventory.js';
+import { VDialog } from 'vuetify/components/VDialog';
+import { VCard, VCardTitle, VCardText, VCardActions } from 'vuetify/components/VCard';
+import type { DataTableSortItem } from 'vuetify';
+import InventoryRowActions from './InventoryRowActions.vue';
+import {
+    currencyText,
+    inventoryHeaders,
+    INVENTORY_SORT_COLUMNS,
+    numberText,
+} from '../inventoryTable.js';
+import type {
+    EditorTarget,
+    InventoryPermissions,
+    InventoryQuery,
+    InventoryResource,
+    InventoryRow,
+} from '../inventory.js';
 
-defineProps<{
+const props = defineProps<{
     rows: InventoryRow[];
     permissions: InventoryPermissions;
-    isWaste: boolean;
+    resource: InventoryResource;
     isLoading: boolean;
+    total: number;
+    query: InventoryQuery;
 }>();
-const emit = defineEmits<{ action: [target: EditorTarget] }>();
-const expanded = ref<string | null>(null);
-const numeric = (value: string | number | null | undefined) =>
-    value == null ? '—' : Number(value).toLocaleString('es-MX', { maximumFractionDigits: 6 });
+const emit = defineEmits<{
+    action: [target: EditorTarget];
+    query: [query: Partial<InventoryQuery>];
+}>();
+const headers = computed(() => inventoryHeaders(props.resource, props.permissions));
+const sortBy = computed<DataTableSortItem[]>(() => [
+    {
+        key:
+            Object.keys(INVENTORY_SORT_COLUMNS).find(
+                (key) => INVENTORY_SORT_COLUMNS[key] === (props.query.orderColumn ?? 0),
+            ) ?? 'name',
+        order: props.query.direction,
+    },
+]);
+const details = ref<InventoryRow | null>(null);
+const updateOptions = (options: {
+    page: number;
+    itemsPerPage: number;
+    sortBy: DataTableSortItem[];
+}) => {
+    const sorting = options.sortBy[0];
+    emit('query', {
+        page: options.page,
+        length: options.itemsPerPage,
+        orderColumn: INVENTORY_SORT_COLUMNS[sorting?.key ?? 'name'] ?? 0,
+        direction: sorting?.order === 'desc' ? 'desc' : 'asc',
+    });
+};
+const rowProps = ({ item }: { item: InventoryRow }) => ({
+    class: Number(item.currentStock) < Number(item.minStock) ? 'low-stock' : '',
+});
 </script>
 
 <template>
@@ -22,188 +67,150 @@ const numeric = (value: string | number | null | undefined) =>
         class="inventory-table"
         :aria-busy="isLoading"
     >
-        <VTable>
-            <thead>
-                <tr>
-                    <th>Material y proveedor</th>
-                    <th>Presentación</th>
-                    <th>Stock actual</th>
-                    <th>Stock mínimo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template
-                    v-for="row in rows"
-                    :key="row.id"
+        <VDataTableServer
+            :headers="headers"
+            :items="rows"
+            :items-length="total"
+            item-value="id"
+            :page="query.page"
+            :items-per-page="query.length"
+            :sort-by="sortBy"
+            :row-props="rowProps"
+            :loading="isLoading"
+            :mobile="false"
+            density="compact"
+            must-sort
+            :items-per-page-options="[10, 20, 50]"
+            items-per-page-text="Registros por página:"
+            page-text="{0}–{1} de {2}"
+            first-page-label="Primera página"
+            prev-page-label="Anterior"
+            next-page-label="Siguiente"
+            last-page-label="Última página"
+            loading-text="Cargando inventario…"
+            no-data-text="No hay registros para estos filtros."
+            @update:options="updateOptions"
+        >
+            <template #[`item.name`]="{ item }">
+                <div class="item-identity">
+                    <strong>{{ item.name }}</strong>
+                    <span>{{ item.supplierName }}</span>
+                </div>
+                <VBtn
+                    v-if="resource === 'wastes'"
+                    size="x-small"
+                    variant="text"
+                    @click="details = item"
                 >
-                    <tr :class="{ 'low-stock': Number(row.currentStock) < Number(row.minStock) }">
-                        <td>
-                            <strong>{{ row.name }}</strong
-                            ><span class="supplier-name">{{ row.supplierName }}</span>
-                        </td>
-                        <td>
-                            {{ row.presentation
-                            }}<span class="supplier-name">{{ row.unitMeasure }}</span>
-                        </td>
-                        <td>
-                            <strong>{{ numeric(row.currentStock) }}</strong
-                            ><VChip
-                                v-if="Number(row.currentStock) < Number(row.minStock)"
-                                size="x-small"
-                                color="warning"
-                                >Stock bajo</VChip
-                            >
-                        </td>
-                        <td>{{ numeric(row.minStock) }}</td>
-                        <td class="row-actions">
-                            <VBtn
-                                size="small"
-                                variant="text"
-                                :aria-expanded="expanded === row.id"
-                                @click="expanded = expanded === row.id ? null : row.id"
-                                >Detalles</VBtn
-                            >
-                            <VBtn
-                                v-if="permissions.canWrite"
-                                size="small"
-                                variant="text"
-                                @click="emit('action', { action: 'edit', row })"
-                                >Editar</VBtn
-                            >
-                            <VBtn
-                                v-if="permissions.canAdjust"
-                                size="small"
-                                variant="text"
-                                @click="emit('action', { action: 'stock', row })"
-                                >Ajustar stock</VBtn
-                            >
-                            <VBtn
-                                v-if="permissions.canAdd"
-                                size="small"
-                                variant="text"
-                                @click="emit('action', { action: 'add-stock', row })"
-                                >Agregar stock</VBtn
-                            >
-                            <VBtn
-                                v-if="!isWaste && permissions.canWrite && row.canDelete"
-                                color="error"
-                                size="small"
-                                variant="text"
-                                @click="emit('action', { action: 'delete', row })"
-                                >Eliminar</VBtn
-                            >
-                        </td>
-                    </tr>
-                    <tr v-if="expanded === row.id">
-                        <td colspan="5">
-                            <dl class="inventory-details">
-                                <div>
-                                    <dt>Base / Altura (m)</dt>
-                                    <dd>{{ numeric(row.base) }} / {{ numeric(row.height) }}</dd>
-                                </div>
-                                <div>
-                                    <dt>Cantidad convertida</dt>
-                                    <dd>
-                                        {{ numeric(row.convertedQuantity) }} {{ row.unitMeasure }}
-                                    </dd>
-                                </div>
-                                <div v-if="permissions.canReadCosts">
-                                    <dt>Costo máximo unitario</dt>
-                                    <dd>
-                                        {{
-                                            row.maxUnitCost == null
-                                                ? '—'
-                                                : Number(row.maxUnitCost).toLocaleString('es-MX', {
-                                                      style: 'currency',
-                                                      currency: 'MXN',
-                                                  })
-                                        }}
-                                    </dd>
-                                </div>
-                                <div v-if="permissions.canReadState">
-                                    <dt>Activo</dt>
-                                    <dd>{{ row.isActive ? 'Sí' : 'No' }}</dd>
-                                </div>
-                                <template v-if="isWaste && row.weightKg != null">
-                                    <div>
-                                        <dt>Cono / Total / Neto (kg)</dt>
-                                        <dd>
-                                            {{ numeric(row.coneWeightKg) }} /
-                                            {{ numeric(row.totalWeightKg) }} /
-                                            {{ numeric(row.weightKg) }}
-                                        </dd>
-                                    </div>
-                                    <div v-if="row.referenceRollTotalWeightKg != null">
-                                        <dt>Rollo completo con cono (kg)</dt>
-                                        <dd>{{ numeric(row.referenceRollTotalWeightKg) }}</dd>
-                                    </div>
-                                    <div v-if="row.sampleLengthM != null">
-                                        <dt>Referencia histórica: largo / peso neto</dt>
-                                        <dd>
-                                            {{ numeric(row.sampleLengthM) }} m /
-                                            {{ numeric(row.sampleNetWeightKg) }} kg
-                                        </dd>
-                                    </div>
-                                </template>
-                            </dl>
-                        </td>
-                    </tr>
-                </template>
-                <tr v-if="!rows.length && !isLoading">
-                    <td
-                        colspan="5"
-                        class="empty-state"
-                    >
-                        No hay registros para estos filtros.
-                    </td>
-                </tr>
-            </tbody>
-        </VTable>
+                    Detalles de peso
+                </VBtn>
+            </template>
+            <template
+                v-for="key in ['base', 'height', 'minStock', 'convertedQuantity'] as const"
+                #[`item.${key}`]="{ item }"
+            >
+                {{ numberText(item[key]) }}
+            </template>
+            <template #[`item.currentStock`]="{ item }">
+                <strong>{{ numberText(item.currentStock) }}</strong>
+                <VChip
+                    v-if="Number(item.currentStock) < Number(item.minStock)"
+                    color="warning"
+                    size="x-small"
+                    class="ms-1"
+                >
+                    Stock bajo
+                </VChip>
+            </template>
+            <template #[`item.maxUnitCost`]="{ item }">
+                {{ currencyText(item.maxUnitCost) }}
+            </template>
+            <template #[`item.isActive`]="{ item }">{{ item.isActive ? 'Sí' : 'No' }}</template>
+            <template
+                v-for="key in ['coneWeightKg', 'totalWeightKg', 'weightKg'] as const"
+                #[`item.${key}`]="{ item }"
+            >
+                {{ item.presentation.toUpperCase() === 'ROLLO' ? numberText(item[key]) : '—' }}
+            </template>
+            <template #[`item.actions`]="{ item }">
+                <InventoryRowActions
+                    :row="item"
+                    :permissions="permissions"
+                    :is-waste="resource === 'wastes'"
+                    @action="emit('action', $event)"
+                />
+            </template>
+        </VDataTableServer>
+        <VDialog
+            :model-value="details !== null"
+            max-width="480"
+            @update:model-value="!$event && (details = null)"
+        >
+            <VCard
+                v-if="details"
+                role="dialog"
+                aria-labelledby="weight-details-title"
+            >
+                <VCardTitle id="weight-details-title">Pesos de {{ details.name }}</VCardTitle>
+                <VCardText>
+                    <dl>
+                        <dt>Rollo completo con cono (kg)</dt>
+                        <dd>{{ numberText(details.referenceRollTotalWeightKg) }}</dd>
+                        <dt>Referencia histórica: largo / peso neto</dt>
+                        <dd>
+                            {{ numberText(details.sampleLengthM) }} m /
+                            {{ numberText(details.sampleNetWeightKg) }} kg
+                        </dd>
+                    </dl>
+                </VCardText>
+                <VCardActions><VBtn @click="details = null">Cerrar detalles</VBtn></VCardActions>
+            </VCard>
+        </VDialog>
     </div>
 </template>
 
 <style scoped>
 .inventory-table {
+    min-width: 0;
     border: 1px solid #d7e6dc;
-    border-radius: 1rem;
-    overflow: hidden;
+    border-radius: 0.6rem;
     background: white;
+    overflow: hidden;
 }
-.supplier-name {
-    display: block;
-    color: #64796c;
-    font-size: 0.85rem;
-    margin-top: 0.2rem;
+.inventory-table :deep(th) {
+    color: #234d35;
+    font-weight: 700;
+    font-size: 0.76rem;
+    border-right: 1px solid #e0eae3;
+    background: #edf5ef;
 }
-.row-actions {
-    min-width: 230px;
+.inventory-table :deep(td) {
+    font-size: 0.8rem;
 }
-.row-actions :deep(.v-btn) {
-    margin: 0.15rem;
-    text-transform: none;
-    letter-spacing: normal;
-}
-.low-stock {
+.inventory-table :deep(.low-stock) {
     background: #fff8e5;
 }
-.empty-state {
-    padding: 2.5rem !important;
-    text-align: center;
-    color: #64796c;
-}
-.inventory-details {
-    display: flex;
+.inventory-table :deep(.v-data-table-footer) {
     flex-wrap: wrap;
-    gap: 1rem 2rem;
-    padding: 1rem 0;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+}
+.item-identity {
+    min-width: 160px;
+    padding: 0.35rem 0;
+}
+.item-identity span {
+    display: block;
+    color: #64796c;
+    font-size: 0.75rem;
 }
 dt {
-    font-size: 0.8rem;
     color: #64796c;
+    margin-top: 0.7rem;
+    font-size: 0.8rem;
 }
 dd {
-    margin: 0.3rem 0 0;
     font-weight: 600;
 }
 </style>

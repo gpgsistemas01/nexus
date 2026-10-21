@@ -32,6 +32,7 @@ const emit = defineEmits<{
     blur: [field: InventoryField];
     search: [field: InventoryField, value: string];
     more: [field: InventoryField];
+    retry: [field: InventoryField];
     submit: [];
     close: [];
     reload: [];
@@ -59,8 +60,9 @@ const emit = defineEmits<{
                 <VCardTitle
                     id="inventory-editor-title"
                     class="editor-title"
-                    >{{ title }}</VCardTitle
                 >
+                    {{ title }}
+                </VCardTitle>
                 <VCardText>
                     <p
                         v-if="context"
@@ -97,14 +99,16 @@ const emit = defineEmits<{
                         type="error"
                         variant="tonal"
                         class="mb-4"
-                        >{{ message }}</VAlert
                     >
+                        {{ message }}
+                    </VAlert>
                     <p
                         v-if="weightPreview != null"
                         class="weight-preview"
                     >
-                        Peso neto estimado: <strong>{{ weightPreview }} kg</strong>. El servidor
-                        confirma las medidas al guardar.
+                        Peso neto estimado:
+                        <strong>{{ weightPreview }} kg</strong>
+                        . El servidor confirma las medidas al guardar.
                     </p>
                     <div
                         v-if="!isPending"
@@ -121,12 +125,14 @@ const emit = defineEmits<{
                                 :model-value="String(values[field.name])"
                                 :items="lookups[field.name]?.items ?? []"
                                 :is-loading="lookups[field.name]?.isLoading ?? false"
-                                :error="errors[field.name] || lookups[field.name]?.error"
+                                :error="errors[field.name]"
+                                :load-error="lookups[field.name]?.error"
                                 :has-more="lookups[field.name]?.hasMore"
                                 :is-disabled="isSubmitting || isPending"
                                 @update:model-value="emit('update', field.name, $event)"
                                 @search="emit('search', field.name, $event)"
                                 @more="emit('more', field.name)"
+                                @retry="emit('retry', field.name)"
                                 @blur="emit('blur', field.name)"
                             />
                             <VCheckbox
@@ -173,13 +179,15 @@ const emit = defineEmits<{
                     <VBtn
                         :disabled="isSubmitting"
                         @click="emit('close')"
-                        >Cerrar</VBtn
                     >
+                        Cerrar
+                    </VBtn>
                     <VBtn
                         v-if="isConflicted && !isPending"
                         @click="emit('reload')"
-                        >Cerrar y actualizar inventario</VBtn
                     >
+                        Cerrar y actualizar inventario
+                    </VBtn>
                     <VBtn
                         type="submit"
                         :color="isDelete ? 'error' : 'primary'"

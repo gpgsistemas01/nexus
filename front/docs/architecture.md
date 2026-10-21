@@ -44,8 +44,12 @@ Una guarda de `/almacen` consulta `/api/auth/me` y comprueba el permiso público
 la ruta; un `401` tras renovar sesión devuelve al login, un rechazo de permiso a
 `/sin-permiso` y un fallo de conexión a `/sesion-no-disponible`, con reintento.
 Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
+La configuración del menú vive en `app/navigation.ts`; sólo contiene rutas Vue de
+Almacén. El proxy conserva la API y la acción de cierre de sesión. Consulta
+[las decisiones de UI, HTTP y pruebas](ui-and-http.md).
 Si falla la carga inicial, StartupErrorPage permite reintentar; no se deja un rechazo
-de bootstrap sin manejar. Las respuestas HTTP se manejan en el módulo auth.
+de bootstrap sin manejar. El transporte y los errores HTTP se centralizan en `shared/http`;
+cada módulo adapta el resultado a su flujo.
 
 ## Organización por módulos
 
@@ -55,8 +59,9 @@ ventas y almacén, con materiales, compras y salidas dentro de almacén.
 `pages/`, `components/` y `composables/` existen cuando hay implementación concreta;
 no se crean árboles vacíos. Una pieza usada sólo en un módulo permanece en él.
 
-`shared/services/apiClient.ts` se comparte entre la consulta de sesión y Almacén:
-normaliza errores y renueva una vez las consultas que responden `401`. No importa
+`shared/http/apiClient.ts` se comparte entre login, consulta de sesión y Almacén:
+centraliza Axios y renueva una vez las consultas que responden `401`; `apiError.ts`
+traduce sus errores. No importa
 módulos de negocio. Un módulo no importa páginas o estado
 privado de otro; la composición entre ellos pertenece a una pantalla contenedora o
 un contrato explícito.
@@ -65,12 +70,12 @@ un contrato explícito.
 
 | Patrón o mecanismo | Decisión |
 | --- | --- |
-| Contenedor/presentación | LoginPage y las páginas de Almacén coordinan; LoginForm, InventoryTable, InventoryEditor y WarehouseNavigation reciben props y emiten eventos. |
-| Composición mediante composables | useInventory, useInventoryEditor y useRemoteOptions mantienen listado, captura y catálogos remotos por instancia. |
+| Contenedor/presentación | LoginPage y las páginas de Almacén coordinan; LoginForm, InventoryTable, InventoryEditor y AppNavigation reciben props y emiten eventos. |
+| Composición mediante composables | useInventory coordina permisos/editor; useInventoryList, useInventoryReport, useInventoryEditor y useRemoteOptions mantienen listado, reporte, captura y catálogos por instancia. |
 | Organización por módulos | auth y warehouse agrupan sus responsabilidades. Materiales y Consumibles reutilizan el mismo flujo parametrizado por recurso; Mermas añade captura y recuperación propias. |
-| Servicios y adaptadores HTTP | authService conserva el login público sin refresh. inventoryService adapta DTOs, métodos y payloads; apiClient maneja el transporte protegido y una renovación compartida. |
+| Servicios y adaptadores HTTP | authService conserva el login público sin refresh. Los servicios de inventario, catálogos y reportes usan Axios compartido; inventoryMapper adapta DTOs y conserva identificadores/versiones. |
 | Estado compartido | createAuthSession crea una sesión por aplicación; main la proporciona por provide/inject y la guarda usa esa misma instancia. Su usuario es readonly. No se agrega Pinia para este único contrato ni un store por formulario. |
-| Slots | RemoteSelect usa append-item de Vuetify para componer la acción de cargar más opciones. |
+| Slots | InventoryTable usa slots de VDataTableServer; RemoteSelect usa append-item y v-intersect para cargar opciones al desplazarse. |
 
 No se impone Atomic Design, una arquitectura hexagonal completa ni un bus global
 de eventos. Agregar carpetas y capas no sustituye responsabilidades claras.
@@ -87,11 +92,13 @@ retorno de Almacén permitida; la guarda selecciona el primer módulo autorizado
 Almacén sigue esta composición:
 
 ```text
-WarehouseLayout (sesión, navegación y RouterView)
-  → WarehouseNavigation (props y enlaces)
+app/layouts/AppLayout (sesión, navegación y RouterView)
+  → app/components/AppNavigation (props y enlaces Vue)
   → InventoryPage (resource: materials | consumables | wastes)
-      → useInventory → inventoryService → apiClient
-      → InventoryTable (filas, permisos visuales y eventos)
+      → useInventory → useInventoryList / useInventoryReport
+          → services de inventario / catálogos / reportes → Axios compartido
+      → InventoryTable → VDataTableServer / InventoryRowActions (props y eventos)
+      → InventoryReportToolbar (alcance, descarga y reintento mediante eventos)
       → InventoryEditorPage → useInventoryEditor → VeeValidate
           → InventoryEditor → RemoteSelect (presentación)
           → useRemoteOptions (catálogos, búsqueda, paginación y cancelación)

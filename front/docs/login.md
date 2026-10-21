@@ -6,7 +6,7 @@
 tarjeta verde oscura y la distribución del EJS y envía las credenciales a Express.
 Al autenticar se abre `/almacen` mediante Vue Router: la guarda selecciona
 Materiales o Mermas según los permisos. Materiales, Consumibles y Mermas son Vue;
-Compras, Salidas, Movimientos y los demás módulos conservan sus pantallas EJS.
+El menú de Vue sólo contempla estos módulos; no enlaza a pantallas EJS.
 
 Desde la raíz, inicia cada aplicación en una terminal:
 
@@ -30,7 +30,7 @@ desarrollo, no una clave pública `VITE_*`.
 - `pages/LoginPage.vue` compone la pantalla y navega después del acceso.
 - `components/LoginForm.vue` usa controles Vuetify y sólo recibe props/emite eventos.
 - `composables/useLoginForm.ts` conecta VeeValidate, captura, envío y errores.
-- `services/authService.ts` adapta el contrato HTTP existente usando `fetch`.
+- `services/authService.ts` adapta el contrato del login usando el cliente Axios compartido, con `requiresAuth: false`.
 
 Los colores, fondo, tarjeta y distribución se adaptaron de `loginPage.ejs` y de
 su sección de `style.css`; no se modifica el EJS ni se carga MDB en este login.
@@ -91,8 +91,8 @@ sus propios resultados de envío.
 
 ## Proxy y despliegue
 
-Vite y Nginx encaminan `/api`, las rutas operativas EJS, recursos `/css`, `/js`,
-`/img`, `/shared`, `/socket.io` y las rutas de renovación/cierre a Express.
+Vite y Nginx encaminan `/api` y el POST `/cerrar-sesion` a Express. Este último
+limpia las cookies y redirige al login Vue, sin montar una vista EJS.
 `/inicio-sesion`, `/almacen` y los assets compilados pertenecen a Vue. Esto permite
 seguir usando el mismo origen y las cookies actuales sin habilitar CORS ni
 trasladar tokens al almacenamiento del navegador. `npm run preview` usa el mismo
@@ -118,7 +118,7 @@ El Dockerfile raíz y Compose continúan construyendo sólo Express.
 
 En Vercel o Render Static Site, el fallback SPA por sí solo no integra el login.
 Hace falta un proxy/rewrite del mismo origen hacia Express **antes** del fallback,
-tanto para `/api` como para los módulos EJS y sus recursos. El hostname de producción
+para `/api` y `/cerrar-sesion`. Las rutas de vistas pertenecen a Vue. El hostname de producción
 no se ha definido ni se ha desplegado esta integración. No basta con usar directamente
 una URL Render desde Vue: el backend actual no configura CORS y sus cookies son
 `SameSite=Lax`. En Vercel permite acceso a archivos fuera de Root Directory `front`

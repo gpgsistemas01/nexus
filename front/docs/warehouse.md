@@ -18,30 +18,31 @@ aplicación. Consulta la [preparación de archivos ignorados](../../README.md#ar
 
 | Ruta | Operaciones implementadas |
 | --- | --- |
-| `/almacen/materiales` | Consulta, filtros, paginación, detalles, alta, edición de metadatos, ajuste de stock y eliminación permitida por el servidor. |
+| `/almacen/materiales` | Consulta, filtros, paginación, columnas originales, alta, edición de metadatos, ajuste de stock y eliminación permitida por el servidor. |
 | `/almacen/consumibles` | El mismo flujo, sin captura de dimensiones. |
 | `/almacen/mermas` | Consulta, filtros, paginación, detalles, alta desde material del proveedor, edición de metadatos, ajuste y entrada de stock. No existe eliminación de mermas en la API. |
 
 El botón Excel utiliza el reporte existente con tipo, búsqueda y alcance
 activos/con stock/activos o con stock. El backend exporta todos los proveedores del
 tipo seleccionado; cuando se filtra un proveedor la interfaz aclara esa diferencia.
-Compras, Salidas, Movimientos y Catálogos continúan como enlaces a Express/EJS.
-No se migran sus formularios ni el módulo de reportes independiente.
+El menú principal sólo enlaza estas vistas Vue. Compras, Salidas, Movimientos y
+Catálogos no se enlazan desde este frontend ni se migran sus formularios.
 
 ## Patrones y propietario del estado
 
 Las [decisiones de arquitectura](architecture.md) aplican a toda la implementación:
 
-- `WarehouseLayout` coordina la sesión y navegación. `InventoryPage` crea el estado
+- `app/layouts/AppLayout` coordina la sesión y navegación. `InventoryPage` crea el estado
   del recurso y conecta filtros, tabla y editor; `InventoryEditorPage` conecta la captura.
-- `InventoryTable`, `InventoryEditor`, `RemoteSelect` y `WarehouseNavigation` reciben
-  props tipadas y emiten intenciones. Sólo mantienen estado visual local, como la
-  fila expandida, y no conocen HTTP, almacenamiento ni autenticación.
-- `useInventory` controla consultas y operaciones del listado; `useInventoryEditor`
+- `InventoryTable`, `InventoryEditor`, `RemoteSelect`, `InventoryRowActions` y `app/components/AppNavigation` reciben
+  props tipadas y emiten intenciones. Sólo mantienen estado visual local, como el
+  diálogo de referencias históricas, y no conocen HTTP, almacenamiento ni autenticación.
+- `useInventory` coordina permisos y apertura del editor; `useInventoryList`
+  controla consultas y `useInventoryReport` la descarga; `useInventoryEditor`
   integra VeeValidate; `useRemoteOptions` comparte catálogos paginados y búsquedas
   con cancelación. Los formularios mantienen estado por instancia, sin stores.
-- `inventoryService` adapta los DTOs anidados a filas de presentación, métodos y
-  códigos de respuesta. `apiClient` centraliza cookies, errores y renovación de sesión.
+- `inventoryService`, `inventoryCatalogService` e `inventoryReportService` separan
+  los contratos HTTP; `mappers/inventoryMapper.ts` adapta DTOs a filas de presentación. `apiClient` centraliza cookies, errores y renovación de sesión.
 - `formModel.ts` conserva listas explícitas de campos enviados por operación;
   `formFields.ts` reutiliza los controles que realmente comparten los tres módulos.
 
@@ -49,6 +50,9 @@ La adaptación usa estado reactivo, props/eventos, RouterLink y ciclos de vida d
 Vue. No carga DataTables, Select2, Swal ni listeners EJS para administrar los mismos
 controles. La consulta se actualiza manualmente, al recuperar el foco y cada 30 s
 mientras la página está visible y no hay un editor abierto. No suscribe Socket.IO.
+
+La [revisión de interfaz y HTTP](ui-and-http.md) detalla los encabezados originales,
+la carga automática de opciones, las bibliotecas elegidas y los propietarios de código.
 
 ## Reglas y contratos conservados
 
@@ -93,9 +97,9 @@ el botón en Vue no sustituye esas garantías.
 
 ## Ejecución y despliegue
 
-Vite y Nginx sirven `/almacen/*` con el fallback de Vue Router. No deben reenviar
-esas rutas al HTML de Express. `/api`, los recursos compartidos y los módulos EJS
-restantes conservan el proxy del mismo origen y las cookies HttpOnly.
+Vite y Nginx sirven las rutas del frontend con el fallback de Vue Router.
+Sólo `/api` y la acción `/cerrar-sesion` conservan el proxy del mismo origen y
+las cookies HttpOnly; no se integran vistas EJS al frontend.
 
 La construcción Docker usa la raíz del repositorio como contexto para incluir
 únicamente los módulos públicos compartidos y sus dependencias explícitas. La

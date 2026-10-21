@@ -26,6 +26,10 @@ const searchLookup = (field: string, search: string) => {
     if (['supplierId', 'presentationId', 'unitMeasureId', 'materialId', 'reasonId'].includes(field))
         editor.searchLookup(field as Parameters<typeof editor.searchLookup>[0], search);
 };
+const retryLookup = (field: string) => {
+    if (['supplierId', 'presentationId', 'unitMeasureId', 'materialId', 'reasonId'].includes(field))
+        void editor.retryLookup(field as Parameters<typeof editor.retryLookup>[0]);
+};
 const loadMore = (field: string) => {
     if (['supplierId', 'presentationId', 'unitMeasureId', 'materialId', 'reasonId'].includes(field))
         void editor.loadMore(field as Parameters<typeof editor.loadMore>[0]);
@@ -52,6 +56,7 @@ const loadMore = (field: string) => {
         @blur="editor.blur"
         @search="searchLookup"
         @more="loadMore"
+        @retry="retryLookup"
         @submit="editor.submit"
         @close="emit('close')"
         @reload="emit('reload')"

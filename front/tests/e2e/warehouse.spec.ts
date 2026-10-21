@@ -2,25 +2,55 @@ import { expect, test } from '@playwright/test';
 import { ids, material, pageOf } from '../fixtures/inventory.js';
 import { chooseOption, mockWarehouse } from './warehouseFixtures.js';
 
-test('almacén: navegación interna, recarga, detalles y móvil', async ({ page }) => {
+test('almacén: encabezados originales, navegación Vue, recarga y móvil', async ({ page }) => {
   await mockWarehouse(page);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/almacen/materiales');
   await expect(page.getByRole('heading', { name: 'Materiales', exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Lona Proveedor Central' })).toBeVisible();
-  await page.getByRole('button', { name: 'Detalles', exact: true }).click();
-  await expect(page.getByText('Cantidad convertida', { exact: true })).toBeVisible();
+  for (const label of [
+    'Medidas',
+    'Base',
+    'Altura',
+    'Conversión',
+    'Cantidad',
+    'Costo Unitario de Conversión',
+  ]) {
+    await expect(page.getByRole('columnheader', { name: label, exact: true })).toBeVisible();
+  }
+  const navigation = page.getByRole('navigation', { name: 'Navegación principal' });
+  const destinations = await navigation
+    .getByRole('link')
+    .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+  expect(destinations.every((to) => to?.startsWith('/almacen'))).toBe(true);
+  await page.getByRole('button', { name: 'Contraer menú', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Expandir menú', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
   await page.getByRole('link', { name: 'Consumibles', exact: true }).click();
   await expect(page).toHaveURL(/\/almacen\/consumibles$/);
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Consumibles', exact: true })).toBeVisible();
+  for (const label of [
+    'Consumible',
+    'Existencia',
+    'Stock Mínimo',
+    'Presentación',
+    'Unidad de medida',
+    'Costo Unitario',
+  ])
+    await expect(page.getByRole('columnheader', { name: label, exact: true })).toBeVisible();
+  await expect(page.getByRole('columnheader', { name: 'Medidas', exact: true })).toBeHidden();
   await page.getByRole('link', { name: 'Mermas', exact: true }).click();
   await expect(
     page.getByRole('cell', { name: 'Sobrante de lona Proveedor Central' }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Detalles', exact: true }).click();
-  await expect(page.getByText('Cono / Total / Neto (kg)', { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('columnheader', { name: 'Pesos por unidad (kg)', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Detalles de peso', exact: true }).click();
+  await expect(page.getByText('Rollo completo con cono (kg)', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Cerrar detalles', exact: true }).click();
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     await expect(page.getByRole('button', { name: 'Nueva merma' })).toBeVisible();
@@ -29,7 +59,7 @@ test('almacén: navegación interna, recarga, detalles y móvil', async ({ page 
     );
     await page.getByRole('button', { name: 'Menú', exact: true }).click();
     await expect(page.getByRole('link', { name: 'Materiales', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Menú', exact: true }).click();
+    await page.getByRole('button', { name: 'Cerrar menú', exact: true }).click();
   }
   expect(errors).toEqual([]);
 });
@@ -42,6 +72,10 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
   await expect(page.getByRole('button', { name: 'Editar', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Descargar Excel' })).toBeHidden();
+  await expect(
+    page.getByRole('columnheader', { name: 'Costo Unitario de Conversión', exact: true }),
+  ).toBeHidden();
+  await expect(page.getByRole('columnheader', { name: 'Activo', exact: true })).toBeHidden();
   await page.goto('/almacen/mermas');
   await expect(page.getByRole('heading', { name: 'Acceso no permitido' })).toBeVisible();
   await page.route('**/api/auth/me', (route) =>
@@ -195,11 +229,19 @@ test('materiales: alta con medidas, edición versionada y baja de la relación c
   });
 });
 
-test('inventario: exportar respeta tipo, búsqueda y alcance', async ({ page }) => {
+test('inventario: exportar respeta filtros y recupera una respuesta que no es Excel', async ({
+  page,
+}) => {
   await mockWarehouse(page);
   let query: URLSearchParams | undefined;
+  let attempts = 0;
+  const downloads: string[] = [];
+  page.on('download', (download) => downloads.push(download.suggestedFilename()));
   await page.route('**/api/warehouse/reports/inventory/excel?**', (route) => {
     query = new URL(route.request().url()).searchParams;
+    attempts += 1;
+    if (attempts === 1)
+      return route.fulfill({ contentType: 'text/html', body: '<h1>Servicio no disponible</h1>' });
     return route.fulfill({
       contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       body: 'archivo de prueba',
@@ -210,13 +252,20 @@ test('inventario: exportar respeta tipo, búsqueda y alcance', async ({ page }) 
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
   await page.getByText('Activos o con stock', { exact: true }).click();
   await page.getByRole('option', { name: 'Con stock', exact: true }).click();
-  const downloading = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Descargar Excel' }).click();
+  await expect(page.getByRole('alert', { name: 'Error de descarga' })).toContainText(
+    'Excel válido',
+  );
+  expect(downloads).toEqual([]);
+  const downloading = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Reintentar descarga' }).click();
   const download = await downloading;
   expect(download.suggestedFilename()).toBe('inventario_consumables.xlsx');
   expect(query?.get('type')).toBe('CONSUMABLE');
   expect(query?.get('search')).toBe('Cinta');
   expect(query?.get('inventoryScope')).toBe('inStock');
+  expect(attempts).toBe(2);
+  await expect(page.getByRole('alert', { name: 'Error de descarga' })).toBeHidden();
 });
 
 test('mermas: referencia de rollo, peso calculado y recuperación tras recargar sin duplicar la captura', async ({
@@ -327,7 +376,7 @@ test('almacén: filtros y paginación se envían al servidor y permiten recupera
   });
   await page.goto('/almacen/materiales');
   await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
-  await expect(page.getByText('Página 2 de 2', { exact: false })).toBeVisible();
+  await expect(page.getByText('11–12 de 12', { exact: true })).toBeVisible();
   expect(queries.at(-1)?.get('start')).toBe('10');
   await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('error');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
@@ -338,4 +387,66 @@ test('almacén: filtros y paginación se envían al servidor y permiten recupera
   await expect(requestError).toBeHidden();
   expect(queries.at(-1)?.get('start')).toBe('0');
   expect(queries.at(-1)?.get('search')).toBe('Lona');
+});
+
+test('selectores: carga automática al final, reintento y selección conservada', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const starts: number[] = [];
+  let hasFailed = false;
+  const suppliers = Array.from({ length: 45 }, (_, index) => ({
+    id: `99999999-9999-4999-8999-${String(index + 1).padStart(12, '0')}`,
+    tradeName: `Proveedor ${String(index + 1).padStart(3, '0')}`,
+  }));
+  await page.route('**/api/warehouse/suppliers?**', async (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    const start = Number(query.get('start'));
+    starts.push(start);
+    if (start === 20 && !hasFailed) {
+      hasFailed = true;
+      return route.fulfill({ status: 503, json: {} });
+    }
+    return route.fulfill({
+      json: { data: suppliers.slice(start, start + 20), recordsFiltered: 45, recordsTotal: 45 },
+    });
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+  const field = page.getByRole('combobox', { name: 'Proveedor', exact: true });
+  await field.click();
+  const list = page.getByRole('listbox');
+  await list.hover();
+  await page.mouse.wheel(0, 1500);
+  await expect(
+    page.getByRole('button', { name: 'Reintentar catálogo', exact: true }),
+  ).toBeVisible();
+  expect(starts.filter((start) => start === 20)).toHaveLength(1);
+  await page.getByRole('button', { name: 'Reintentar catálogo', exact: true }).click();
+  await expect.poll(() => starts.filter((start) => start === 20).length).toBe(2);
+  await list.hover();
+  await page.mouse.wheel(0, 1800);
+  await expect.poll(() => starts.includes(40)).toBe(true);
+  await expect(page.getByText('Desplázate para cargar más opciones', { exact: true })).toBeHidden();
+  await list.hover();
+  await page.mouse.wheel(0, 800);
+  await page.getByRole('option', { name: 'Proveedor 045', exact: true }).click();
+  await expect(field).toHaveValue('Proveedor 045');
+  expect(starts.filter((start) => start === 40)).toHaveLength(1);
+});
+
+test('tabla: orden por medidas se consulta en el servidor', async ({ page }) => {
+  await mockWarehouse(page);
+  const queries: URLSearchParams[] = [];
+  await page.route('**/api/warehouse/materials?**', (route) => {
+    queries.push(new URL(route.request().url()).searchParams);
+    return route.fulfill({ json: pageOf([material]) });
+  });
+  await page.goto('/almacen/materiales');
+  const base = page.getByRole('columnheader', { name: 'Base', exact: true });
+  await base.click();
+  await expect.poll(() => queries.at(-1)?.get('order[0][column]')).toBe('1');
+  expect(queries.at(-1)?.get('order[0][dir]')).toBe('asc');
+  await base.click();
+  await expect.poll(() => queries.at(-1)?.get('order[0][dir]')).toBe('desc');
 });

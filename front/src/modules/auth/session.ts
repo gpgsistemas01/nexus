@@ -1,6 +1,7 @@
 import { inject, readonly, shallowRef } from 'vue';
 import type { InjectionKey } from 'vue';
-import { apiClient, isRecord } from '../../shared/services/apiClient.js';
+import { isRecord } from '../../shared/utils/isRecord.js';
+import { apiClient } from '../../shared/http/apiClient.js';
 
 export interface SessionUser {
     id: string;

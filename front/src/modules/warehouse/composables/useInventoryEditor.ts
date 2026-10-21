@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue';
 import { useForm } from 'vee-validate';
-import { ApiError } from '../../../shared/services/apiClient.js';
+import { ApiError } from '../../../shared/http/apiError.js';
 import { inventoryService } from '../services/inventoryService.js';
 import { createPendingWasteOperation } from '../services/pendingWasteOperation.js';
 import {
@@ -248,12 +248,9 @@ export const useInventoryEditor = (options: {
         submit,
         update,
         blur: (field: InventoryField) => form.validateField(field),
-        searchLookup: (field: keyof typeof lookupMap, search: string) => {
-            const selected = lookupMap[field].items.value.find(
-                (item) => item.id === form.values[field],
-            );
-            if (selected?.title !== search) lookupMap[field].updateSearch(search);
-        },
+        searchLookup: (field: keyof typeof lookupMap, search: string) =>
+            lookupMap[field].updateSearch(search),
         loadMore: (field: keyof typeof lookupMap) => lookupMap[field].loadMore(),
+        retryLookup: (field: keyof typeof lookupMap) => lookupMap[field].retry(),
     };
 };

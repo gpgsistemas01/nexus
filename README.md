@@ -3,7 +3,8 @@
 La aplicación actual de Express, Prisma y vistas EJS vive en `back/`.
 El frontend Vue 3 con TypeScript, Router y Vite está en `front/`, con login conectado
 a Express usando Vuetify y VeeValidate para la migración gradual.
-Las pantallas operativas actuales siguen renderizándose con EJS en el backend.
+Materiales, Consumibles y Mermas ya tienen interfaz Vue; las demás pantallas
+operativas permanecen en el backend y no se enlazan desde el menú de Vue.
 
 ```text
 back/                 # Express, EJS, Prisma, pruebas y documentación
@@ -113,7 +114,8 @@ npm run dev
 Para compilar: `npm run build` desde `front/`, o `npm --prefix front run build` desde
 la raíz. La salida queda en `front/dist/`. Consulta [la guía del frontend](front/README.md).
 El login y Almacén (Materiales, Consumibles y Mermas) integran la API mediante un
-proxy del mismo origen. Los demás módulos conservan sus pantallas EJS.
+proxy del mismo origen. El menú sólo contempla vistas Vue; los demás módulos
+conservan sus pantallas EJS en el backend.
 Consulta [configuración del login](front/docs/login.md) y
 [operaciones y arquitectura de Almacén](front/docs/warehouse.md).
 Desde la raíz, `npm --prefix front run check` ejecuta ESLint, pruebas y build con tipos.

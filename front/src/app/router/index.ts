@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import type { RouterHistory } from 'vue-router';
 import { createAuthSession } from '../../modules/auth/session.js';
 import type { AuthSession } from '../../modules/auth/session.js';
-import { ApiError } from '../../shared/services/apiClient.js';
+import { ApiError } from '../../shared/http/apiError.js';
 
 export const createAppRouter = (
     history: RouterHistory = createWebHistory(import.meta.env.BASE_URL),
@@ -21,7 +21,7 @@ export const createAppRouter = (
             {
                 path: '/almacen',
                 meta: { requiresAuth: true },
-                component: () => import('../../modules/warehouse/pages/WarehouseLayout.vue'),
+                component: () => import('../layouts/AppLayout.vue'),
                 children: [
                     {
                         path: '',

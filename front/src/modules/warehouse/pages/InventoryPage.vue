@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { PERMISSIONS } from '@nexus/permissions';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VTextField } from 'vuetify/components/VTextField';
-import { VSelect } from 'vuetify/components/VSelect';
+import { VSnackbar } from 'vuetify/components/VSnackbar';
 import InventoryTable from '../components/InventoryTable.vue';
+import InventoryReportToolbar from '../components/InventoryReportToolbar.vue';
 import RemoteSelect from '../components/RemoteSelect.vue';
 import InventoryEditorPage from './InventoryEditorPage.vue';
 import { useAuthSession } from '../../auth/session.js';
@@ -20,16 +21,29 @@ const unauthorized = () => {
     void router.replace({ name: 'login' });
 };
 const inventory = useInventory(props.resource, session.user.value!, unauthorized);
-const { config, permissions, query, rows, total, isLoading, isExporting, error, notice, editor } =
-    inventory;
+const {
+    config,
+    permissions,
+    query,
+    rows,
+    total,
+    isLoading,
+    isExporting,
+    error,
+    exportError,
+    notice,
+    editor,
+} = inventory;
 const supplierItems = inventory.suppliers.items;
 const supplierLoading = inventory.suppliers.isLoading;
 const supplierError = inventory.suppliers.error;
 const supplierHasMore = inventory.suppliers.hasMore;
 const search = ref('');
 const reportScope = ref('activeOrStock');
-const pages = computed(() => Math.max(1, Math.ceil(total.value / query.length)));
-const applySearch = () => inventory.applyQuery({ search: search.value });
+const applySearch = () => {
+    if (query.search === search.value && query.page === 1) void inventory.load();
+    else inventory.applyQuery({ search: search.value });
+};
 const reloadEditor = () => {
     editor.value = null;
     void inventory.load();
@@ -52,37 +66,47 @@ onMounted(() => {
                 color="primary"
                 variant="flat"
                 @click="inventory.openEditor({ action: 'create' })"
-                >{{
+            >
+                {{
                     resource === 'wastes'
                         ? 'Nueva merma'
                         : resource === 'consumables'
                           ? 'Nuevo consumible'
                           : 'Nuevo material'
-                }}</VBtn
-            >
+                }}
+            </VBtn>
         </header>
-        <VAlert
-            v-if="notice"
-            type="success"
-            variant="tonal"
-            closable
-            class="mb-4"
-            @click:close="notice = ''"
-            >{{ notice }}</VAlert
+        <VSnackbar
+            :model-value="!!notice"
+            :timeout="4500"
+            color="success"
+            @update:model-value="!$event && (notice = '')"
         >
+            {{ notice }}
+            <template #actions>
+                <VBtn
+                    variant="text"
+                    @click="notice = ''"
+                >
+                    Cerrar aviso
+                </VBtn>
+            </template>
+        </VSnackbar>
         <VAlert
             v-if="error"
             role="alert"
             type="error"
             variant="tonal"
             class="mb-4"
-            >{{ error }}
+        >
+            {{ error }}
             <VBtn
                 variant="text"
                 @click="inventory.load"
-                >Reintentar</VBtn
-            ></VAlert
-        >
+            >
+                Reintentar
+            </VBtn>
+        </VAlert>
         <template v-if="permissions.canRead">
             <form
                 class="inventory-filters"
@@ -92,7 +116,7 @@ onMounted(() => {
                     v-model="search"
                     label="Buscar por nombre"
                     variant="outlined"
-                    density="comfortable"
+                    density="compact"
                     hide-details
                     clearable
                     @click:clear="
@@ -106,54 +130,36 @@ onMounted(() => {
                     :model-value="query.supplierId"
                     :items="supplierItems"
                     :is-loading="supplierLoading"
-                    :error="supplierError"
+                    :load-error="supplierError"
                     :has-more="supplierHasMore"
                     @update:model-value="inventory.applyQuery({ supplierId: $event })"
                     @search="inventory.suppliers.updateSearch"
                     @more="inventory.suppliers.loadMore"
+                    @retry="inventory.suppliers.retry"
                 />
                 <VBtn
                     type="submit"
                     variant="tonal"
                     :loading="isLoading"
-                    >Buscar</VBtn
                 >
+                    Buscar
+                </VBtn>
                 <VBtn
                     variant="text"
                     :disabled="isLoading"
                     @click="inventory.load"
-                    >Actualizar</VBtn
                 >
+                    Actualizar
+                </VBtn>
             </form>
-            <div
+            <InventoryReportToolbar
                 v-if="permissions.canExport"
-                class="inventory-export"
-            >
-                <span
-                    v-if="query.supplierId"
-                    class="report-note"
-                    >El Excel incluye todos los proveedores del tipo seleccionado.</span
-                >
-                <VSelect
-                    v-model="reportScope"
-                    label="Incluir en Excel"
-                    :items="[
-                        { title: 'Activos o con stock', value: 'activeOrStock' },
-                        { title: 'Activos', value: 'active' },
-                        { title: 'Con stock', value: 'inStock' },
-                    ]"
-                    variant="outlined"
-                    density="compact"
-                    hide-details
-                />
-                <VBtn
-                    variant="text"
-                    color="primary"
-                    :loading="isExporting"
-                    @click="inventory.exportReport(reportScope)"
-                    >Descargar Excel</VBtn
-                >
-            </div>
+                v-model:scope="reportScope"
+                :has-supplier-filter="!!query.supplierId"
+                :is-exporting="isExporting"
+                :error="exportError"
+                @export="inventory.exportReport(reportScope)"
+            />
             <p
                 v-if="isLoading"
                 role="status"
@@ -164,43 +170,22 @@ onMounted(() => {
             <InventoryTable
                 :rows="rows"
                 :permissions="permissions"
-                :is-waste="resource === 'wastes'"
+                :resource="resource"
+                :total="total"
+                :query="query"
+                @query="inventory.applyQuery"
                 :is-loading="isLoading"
                 @action="inventory.openEditor"
             />
-            <footer class="inventory-pagination">
-                <span>{{ total }} registros · Página {{ query.page }} de {{ pages }}</span>
-                <div>
-                    <VBtn
-                        variant="text"
-                        :disabled="query.page <= 1 || isLoading"
-                        @click="inventory.applyQuery({ page: query.page - 1 })"
-                        >Anterior</VBtn
-                    ><VBtn
-                        variant="text"
-                        :disabled="query.page >= pages || isLoading"
-                        @click="inventory.applyQuery({ page: query.page + 1 })"
-                        >Siguiente</VBtn
-                    >
-                </div>
-                <VSelect
-                    :model-value="query.length"
-                    label="Registros por página"
-                    :items="[10, 20, 50]"
-                    variant="outlined"
-                    density="compact"
-                    hide-details
-                    @update:model-value="inventory.applyQuery({ length: $event })"
-                />
-            </footer>
         </template>
         <VAlert
             v-else
             type="info"
             variant="tonal"
-            >Tu cuenta puede acceder a este módulo, pero no tiene permiso para consultar sus
-            existencias.</VAlert
         >
+            Tu cuenta puede acceder a este módulo, pero no tiene permiso para consultar sus
+            existencias.
+        </VAlert>
         <InventoryEditorPage
             v-if="editor"
             :key="`${editor.action}:${editor.row?.id ?? 'new'}`"
@@ -222,7 +207,7 @@ onMounted(() => {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 .inventory-heading p {
     color: #14844c;
@@ -232,7 +217,7 @@ onMounted(() => {
     margin-bottom: 0.4rem;
 }
 h1 {
-    font-size: clamp(1.7rem, 3vw, 2.2rem);
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
     color: #173b29;
     font-weight: 800;
     margin-bottom: 0.35rem;
@@ -248,29 +233,6 @@ h1 {
     align-items: start;
     margin-bottom: 1rem;
 }
-.inventory-export {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-.inventory-export :deep(.v-input) {
-    max-width: 230px;
-}
-.inventory-pagination {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.25rem 0;
-    color: #456354;
-    font-size: 0.85rem;
-}
-.inventory-pagination :deep(.v-input) {
-    flex: 0 1 180px;
-}
 .loading-label {
     color: #456354;
     margin-bottom: 0.5rem;
@@ -278,10 +240,6 @@ h1 {
 @media (max-width: 700px) {
     .inventory-filters {
         grid-template-columns: 1fr;
-    }
-    .inventory-export {
-        flex-wrap: wrap;
-        justify-content: flex-start;
     }
 }
 </style>

@@ -48,6 +48,7 @@ export interface InventoryQuery {
     page: number;
     length: number;
     direction: 'asc' | 'desc';
+    orderColumn?: number;
 }
 export interface InventoryPermissions {
     canRead: boolean;

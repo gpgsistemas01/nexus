@@ -1,62 +1,89 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { LoginRequestError, loginRequest } from '../../../../../src/modules/auth/services/authService.js';
+import { AxiosError } from 'axios';
+import { apiClient } from '../../../../../src/shared/http/apiClient.js';
+import {
+  LoginRequestError,
+  loginRequest,
+} from '../../../../../src/modules/auth/services/authService.js';
+import { mockHttpAdapter } from '../../../../helpers/httpAdapter.js';
 
-afterEach(() => vi.unstubAllGlobals());
+const originalAdapter = apiClient.http.defaults.adapter;
+afterEach(() => {
+  apiClient.http.defaults.adapter = originalAdapter;
+});
+const reply = (data: unknown, status = 200) => {
+  const request = vi.fn(() => ({ data, status }));
+  apiClient.http.defaults.adapter = mockHttpAdapter(request);
+  return request;
+};
 
-describe('adaptador HTTP del login', () => {
+describe('adaptador Axios del login público', () => {
   it('envía sólo credenciales, recorta usuario y conserva los espacios de contraseña', async () => {
-    const request = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: 'SUCCESS_LOGIN' }), { status: 200 }));
-    vi.stubGlobal('fetch', request);
+    const request = vi.fn((config) => ({ data: { code: 'SUCCESS_LOGIN' }, sent: config }));
+    apiClient.http.defaults.adapter = mockHttpAdapter(request);
     await loginRequest({ name: ' usuario ', password: ' legado ' });
     expect(request).toHaveBeenCalledOnce();
-    const [url, options] = request.mock.calls[0]!;
-    expect(url).toBe('/api/auth/login');
-    expect(options.credentials).toBe('same-origin');
-    expect(JSON.parse(options.body)).toEqual({ name: 'usuario', password: ' legado ' });
+    const config = request.mock.calls[0]![0];
+    expect(config.url).toBe('/api/auth/login');
+    expect(JSON.parse(config.data)).toEqual({ name: 'usuario', password: ' legado ' });
+    expect(config.headers.has('Authorization')).toBe(false);
   });
 
   it('traduce el contrato 400 por campo usando los mensajes públicos existentes', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      code: 'VALIDATION_ERROR', errors: { name: { code: 'USERNAME_REQUIRED' }, password: { code: 'PASSWORD_TOO_LONG' } },
-    }), { status: 400 })));
+    reply(
+      {
+        code: 'VALIDATION_ERROR',
+        errors: { name: { code: 'USERNAME_REQUIRED' }, password: { code: 'PASSWORD_TOO_LONG' } },
+      },
+      400,
+    );
     await expect(loginRequest({ name: '', password: 'p' })).rejects.toMatchObject({
       fieldErrors: { name: expect.any(String), password: expect.any(String) },
     });
   });
 
-  it.each([401, 429, 500])('un HTTP %s no se interpreta como acceso válido', async status => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status })));
-    await expect(loginRequest({ name: 'usuario', password: 'abc' })).rejects.toBeInstanceOf(LoginRequestError);
+  it.each([401, 429, 500])('HTTP %s no confirma el acceso ni renueva tokens', async (status) => {
+    const request = reply({}, status);
+    await expect(loginRequest({ name: 'usuario', password: 'abc' })).rejects.toBeInstanceOf(
+      LoginRequestError,
+    );
+    expect(request).toHaveBeenCalledOnce();
   });
 
-  it.each(['<html>Frontend en lugar de API</html>', '{"ok":true}'])('rechaza una respuesta inesperada aunque tenga HTTP 200', async body => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(body, { status: 200 })));
-    await expect(loginRequest({ name: 'usuario', password: 'abc' })).rejects.toBeInstanceOf(LoginRequestError);
-  });
+  it.each(['<html>Frontend en lugar de API</html>', { ok: true }])(
+    'rechaza una respuesta inesperada aunque tenga HTTP 200',
+    async (data) => {
+      reply(data);
+      await expect(loginRequest({ name: 'usuario', password: 'abc' })).rejects.toBeInstanceOf(
+        LoginRequestError,
+      );
+    },
+  );
 
-  it('presenta un fallo de conexión sin reintentar el acceso ni renovar tokens', async () => {
-    const request = vi.fn().mockRejectedValue(new TypeError('Network error'));
-    vi.stubGlobal('fetch', request);
-    await expect(loginRequest({ name: 'usuario', password: 'abc' })).rejects.toThrow('No fue posible conectar');
+  it('presenta un fallo de conexión sin reintentar el acceso', async () => {
+    const request = vi.fn(() => {
+      throw new AxiosError('Network error', 'ERR_NETWORK');
+    });
+    apiClient.http.defaults.adapter = mockHttpAdapter(request);
+    await expect(loginRequest({ name: 'usuario', password: 'abc' })).rejects.toThrow(
+      'No fue posible conectar',
+    );
     expect(request).toHaveBeenCalledOnce();
   });
 
   it.each([
     [401, 'Usuario o contraseña incorrectos.'],
     [429, 'Demasiados intentos. Espera un momento e intenta nuevamente.'],
-  ])('conserva el significado de HTTP %s aunque un proxy devuelva HTML', async (status, message) => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<h1>Gateway</h1>', { status })));
-
+  ] as const)('conserva HTTP %s aunque el proxy devuelva HTML', async (status, message) => {
+    reply('<h1>Gateway</h1>', status);
     await expect(loginRequest({ name: 'usuario', password: 'legado' })).rejects.toThrow(message);
   });
 
   it('no muestra códigos desconocidos como mensajes de campo', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      code: 'VALIDATION_ERROR', errors: { name: { code: 'UNKNOWN_INTERNAL_CODE' } },
-    }), { status: 400 })));
-
+    reply({ code: 'VALIDATION_ERROR', errors: { name: { code: 'UNKNOWN_INTERNAL_CODE' } } }, 400);
     await expect(loginRequest({ name: 'usuario', password: 'legado' })).rejects.toMatchObject({
-      message: 'Revisa los datos de acceso.', fieldErrors: {},
+      message: 'Revisa los datos de acceso.',
+      fieldErrors: {},
     });
   });
 });

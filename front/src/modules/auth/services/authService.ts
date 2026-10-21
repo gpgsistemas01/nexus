@@ -1,60 +1,44 @@
-import { errorMessages, getErrorMessage } from '@nexus/api-messages';
+import { errorMessages } from '@nexus/api-messages';
+import { apiClient } from '../../../shared/http/apiClient.js';
+import { ApiError } from '../../../shared/http/apiError.js';
 import { LOGIN_MESSAGES } from '../loginMessages.js';
 import type { LoginCredentials, LoginFieldErrors } from '../login.js';
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const getFieldErrorMessage = (value: unknown): string | undefined => {
-    if (!isRecord(value) || typeof value.code !== 'string' || !Object.hasOwn(errorMessages, value.code)) return;
-
-    const message = getErrorMessage({ code: value.code });
-
-    return typeof message === 'string' ? message : undefined;
-};
-
 export class LoginRequestError extends Error {
-    constructor(message: string, public fieldErrors: LoginFieldErrors = {}) {
+    constructor(
+        message: string,
+        public fieldErrors: LoginFieldErrors = {},
+    ) {
         super(message);
         this.name = 'LoginRequestError';
     }
 }
 
-// Cookies HttpOnly administradas por Express, siempre bajo el mismo origen.
-export const loginRequest = async (credentials: LoginCredentials, signal?: AbortSignal): Promise<void> => {
-    let response: Response;
-
+export const loginRequest = async (
+    credentials: LoginCredentials,
+    signal?: AbortSignal,
+): Promise<void> => {
     try {
-        response = await fetch('/api/auth/login', {
+        const data = await apiClient.request<{ code: string }>('/api/auth/login', {
             method: 'POST',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify({ name: credentials.name.trim(), password: credentials.password }),
-            signal: AbortSignal.any([AbortSignal.timeout(15_000), ...(signal ? [signal] : [])]),
+            data: { name: credentials.name.trim(), password: credentials.password },
+            signal,
+            requiresAuth: false,
         });
-    } catch {
-        throw new LoginRequestError(LOGIN_MESSAGES.CONNECTION_FAILED);
+        if (data.code !== 'SUCCESS_LOGIN')
+            throw new LoginRequestError(LOGIN_MESSAGES.INVALID_RESPONSE);
+    } catch (cause) {
+        if (!(cause instanceof ApiError)) throw cause;
+        if (cause.status === 401) throw new LoginRequestError(errorMessages.LOGIN_ERROR);
+        if (cause.status === 429) throw new LoginRequestError(LOGIN_MESSAGES.TOO_MANY_ATTEMPTS);
+        if (cause.status === 400)
+            throw new LoginRequestError(LOGIN_MESSAGES.INVALID_FIELDS, cause.fieldErrors);
+        throw new LoginRequestError(
+            cause.code === 'NETWORK_ERROR'
+                ? LOGIN_MESSAGES.CONNECTION_FAILED
+                : cause.code === 'INVALID_RESPONSE'
+                  ? LOGIN_MESSAGES.INVALID_RESPONSE
+                  : LOGIN_MESSAGES.REQUEST_FAILED,
+        );
     }
-
-    // Un proxy o limitador puede devolver texto/HTML en lugar del JSON de Express.
-    if (response.status === 401) throw new LoginRequestError(errorMessages.LOGIN_ERROR);
-    if (response.status === 429) throw new LoginRequestError(LOGIN_MESSAGES.TOO_MANY_ATTEMPTS);
-
-    let data: unknown;
-    try {
-        data = await response.json();
-    } catch {
-        throw new LoginRequestError(LOGIN_MESSAGES.INVALID_RESPONSE);
-    }
-
-    if (response.status === 200 && isRecord(data) && data.code === 'SUCCESS_LOGIN') return;
-    if (response.status === 400 && isRecord(data) && isRecord(data.errors)) {
-        const fields: LoginFieldErrors = {};
-        for (const field of ['name', 'password'] as const) {
-            const message = getFieldErrorMessage(data.errors[field]);
-            if (message) fields[field] = message;
-        }
-        throw new LoginRequestError(LOGIN_MESSAGES.INVALID_FIELDS, fields);
-    }
-    throw new LoginRequestError(LOGIN_MESSAGES.REQUEST_FAILED);
 };

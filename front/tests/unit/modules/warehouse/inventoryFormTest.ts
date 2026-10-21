@@ -1,12 +1,11 @@
+import { inventoryCatalogService } from '../../../../src/modules/warehouse/services/inventoryCatalogService.js';
+import { normalizeInventoryRow } from '../../../../src/modules/warehouse/mappers/inventoryMapper.js';
 import { defineComponent, h } from 'vue';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useInventoryEditor } from '../../../../src/modules/warehouse/composables/useInventoryEditor.js';
-import {
-  inventoryService,
-  normalizeInventoryRow,
-} from '../../../../src/modules/warehouse/services/inventoryService.js';
-import { ApiError } from '../../../../src/shared/services/apiClient.js';
+import { inventoryService } from '../../../../src/modules/warehouse/services/inventoryService.js';
+import { ApiError } from '../../../../src/shared/http/apiError.js';
 import { ids, material, pageOf, user, waste } from '../../../fixtures/inventory.js';
 import type {
   EditorTarget,
@@ -17,7 +16,7 @@ import type {
 const openEditor = (resource: InventoryResource, target: EditorTarget) => {
   let editor!: ReturnType<typeof useInventoryEditor>;
   const saved = vi.fn();
-  vi.spyOn(inventoryService, 'lookup').mockResolvedValue(pageOf([]));
+  vi.spyOn(inventoryCatalogService, 'lookup').mockResolvedValue(pageOf([]));
   const request = vi
     .spyOn(inventoryService, 'mutate')
     .mockResolvedValue({ code: 'UPDATED_MATERIAL' });

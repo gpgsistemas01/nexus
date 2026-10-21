@@ -1,4 +1,5 @@
-import { ApiError, isRecord } from '../../../shared/services/apiClient.js';
+import { ApiError } from '../../../shared/http/apiError.js';
+import { isRecord } from '../../../shared/utils/isRecord.js';
 import type { InventoryPayload } from '../inventory.js';
 
 export const createPendingWasteOperation = (

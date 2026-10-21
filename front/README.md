@@ -9,7 +9,8 @@ módulos conservan sus pantallas EJS en `back/`.
 ## Iniciar sesión
 
 Abre `http://localhost:5173/inicio-sesion` con Express ejecutándose en el puerto 3000.
-Vite dirige la API y los módulos EJS al backend mediante un proxy del mismo origen.
+Vite dirige la API y el cierre de sesión al backend mediante un proxy del mismo origen.
+El menú sólo enlaza las vistas Vue de Materiales, Consumibles y Mermas.
 Usa una cuenta existente: al autenticar se abre el primer módulo de Almacén permitido. Consulta
 [diseño, validación, cookies y configuración del proxy](docs/login.md).
 
@@ -110,7 +111,7 @@ al solicitar una ruta de la aplicación:
   `/index.html` y acción **Rewrite**.
 
 La página no encontrada se renderiza en el navegador; el fallback del servidor puede
-responder HTTP 200. El fallback debe ir después de los rewrites de API y EJS para
+responder HTTP 200. El fallback debe ir después de los rewrites de API y cierre de sesión para
 que el login funcione en producción. La autorización definitiva permanece en Express;
 las guardas de Almacén comprueban la sesión y orientan la navegación, sin sustituir
 los controles del servidor. `/almacen` debe resolver a Vue, no al proxy EJS.
@@ -136,7 +137,8 @@ en VS Code y/o `type-check:watch` en otra terminal para obtener los diagnóstico
 Las extensiones recomendadas son **Vue - Official** y **ESLint**. La configuración
 versionada apunta ESLint a `front/` cuando abres el repositorio en VS Code.
 
-Consulta [las herramientas y el alcance de las pruebas](docs/tooling.md).
+Consulta [las herramientas y el alcance de las pruebas](docs/tooling.md) y
+[las decisiones de tablas, selectores, modales y HTTP](docs/ui-and-http.md).
 
 ## Arquitectura
 
@@ -167,7 +169,8 @@ respuestas de API se simulan; no se usa una base de datos real.
 - `src/app/pages/NotFoundPage.vue`: página para direcciones desconocidas.
 - `src/modules/auth/`: login, composable de formulario y adaptador HTTP.
 - `src/modules/warehouse/`: contenedores, componentes, composables y servicios de Almacén.
-- `src/shared/services/`: cliente HTTP protegido, compartido con la consulta de sesión.
+- `src/shared/http/`: Axios e interceptores compartidos por login, sesión y Almacén.
+- `src/app/layouts/` y `src/app/components/`: distribución general y menú de vistas Vue.
 - `src/app/plugins/vuetify.ts`: proveedor visual y temas de login y Almacén.
 - `src/main.ts`: arranque de Vue.
 - `public/`: archivos estáticos sin transformar.

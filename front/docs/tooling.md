@@ -54,6 +54,10 @@ Vite y falla si hay errores. `npm run dev` mantiene el comportamiento rápido de
 no promete comprobar todos los tipos. En desarrollo usa Vue - Official en VS Code
 o `npm run type-check:watch` en una segunda terminal. No se añadió un overlay extra.
 
+`vite.config.ts` incluye los imports profundos de componentes/directivas Vuetify
+en la preparación de dependencias. Así una ruta diferida no provoca una recarga
+completa al descubrir esos controles durante el primer acceso después del login.
+
 El repositorio recomienda Vue - Official y ESLint mediante `.vscode/extensions.json`.
 VS Code solicita instalar las extensiones; el repositorio no las instala automáticamente.
 Si tienes Vetur activo, desactívalo en este proyecto Vue 3 para evitar diagnósticos duplicados.
@@ -109,7 +113,7 @@ Las pruebas de backend siguen comprobando integridad y autorización.
 ### Pruebas de Almacén
 
 Los casos unitarios viven en `tests/unit/modules/warehouse/` y
-`tests/unit/shared/services/apiClientTest.ts`. `tests/e2e/warehouse.spec.ts`
+`tests/unit/shared/http/apiClientTest.ts`. `tests/e2e/warehouse.spec.ts`
 comprueba los componentes reales de Vuetify en Chromium. Comparte fixtures de
 contratos con las unitarias, sin simular el estado reactivo del formulario.
 
@@ -139,12 +143,34 @@ Los casos de prueba se ejecutan en CI antes del despliegue, no en Nginx.
 
 ## Herramientas aplazadas
 
-Vuetify y VeeValidate se usan en login y Almacén. La API usa fetch; no necesita
-Axios. La sesión actual usa provide/inject por aplicación; Pinia se aplaza hasta
+Vuetify y VeeValidate se usan en login y Almacén. Login, sesión, inventario y reportes usan Axios con un único interceptor
+de renovación y errores normalizados. La sesión actual usa provide/inject por aplicación; Pinia se aplaza hasta
 necesitar varios stores y sus herramientas de gestión. Zod/Yup no se agregan para reescribir las
 reglas públicas del login ya existentes. Prettier no se incorpora por anticipado.
 Playwright comprueba los controles reales de Vuetify. Contenedores, presentación y composables
 no requieren esas dependencias adicionales.
+
+## UI, HTTP y pruebas de contrato
+
+La [revisión de interfaz y HTTP](ui-and-http.md) mantiene la comparación de
+DataTables Vue, VDataTableServer, SweetAlert2 y los componentes ya instalados de
+Vuetify, así como el mapa de responsabilidades.
+
+Las pruebas del frontend usan rutas `/api/*` porque comprueban el contrato que
+consume Vue. El adaptador simulado de Axios conserva sus transformaciones e
+interceptores reales sin arrancar Express; Chromium usa componentes reales con
+respuestas de API simuladas. Las pruebas HTTP/Prisma permanecen en `back/tests`.
+No se importa el código privado del backend en la suite de Vue.
+
+| Diseño / casos | Nivel y técnica | Condición y resultado esperado |
+| --- | --- | --- |
+| `DP-VUE-WH-005` / `CP-VUE-WH-005` | Navegador; páginas 1 → 2 fallida → reintento → 3 y selección | Un catálogo de 45 proveedores carga de 20 en 20 al llegar al final, no avanza durante un fallo, reintenta esa página y mantiene el nombre seleccionado sin repetir opciones. |
+| `DP-VUE-WH-006` / `CP-VUE-WH-006` | Navegador; particiones por recurso/permiso y transiciones de orden/dispositivo | Materiales/Mermas mantienen encabezados agrupados y Consumibles sus columnas; costo/estado se ocultan sin permiso; el orden por medidas usa el índice del backend. Menú compacto/móvil sólo contiene rutas Vue. |
+
+Los casos `apiClientTest.ts` mantienen renovación única, límite de un reintento,
+rechazo público sin refresh, errores de red sin repetición de escritura y cancelación.
+`inventoryReportTest.ts` conserva por separado los parámetros del reporte y el
+rechazo de HTML presentado como Excel.
 
 ## Retiro de demostraciones
 

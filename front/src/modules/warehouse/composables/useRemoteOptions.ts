@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import { inventoryService } from '../services/inventoryService.js';
+import { inventoryCatalogService } from '../services/inventoryCatalogService.js';
 import type { LookupItem } from '../inventory.js';
 
 export const useRemoteOptions = (
@@ -17,8 +17,10 @@ export const useRemoteOptions = (
     let controller: AbortController | null = null;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let sequence = 0;
+    let requestedPage = 1;
     const load = async (nextPage = 1) => {
         const requestId = ++sequence;
+        requestedPage = nextPage;
         controller?.abort();
         if (!isEnabled.value || (supplierId && !supplierId.value)) {
             items.value = [];
@@ -30,7 +32,7 @@ export const useRemoteOptions = (
         isLoading.value = true;
         error.value = '';
         try {
-            const result = await inventoryService.lookup(
+            const result = await inventoryCatalogService.lookup(
                 path,
                 search.value,
                 nextPage,
@@ -60,13 +62,21 @@ export const useRemoteOptions = (
     watch(
         [isEnabled, ...(supplierId ? [supplierId] : [])],
         () => {
+            clearTimeout(timer);
             search.value = '';
+            items.value = [];
+            total.value = 0;
+            page.value = 1;
             void load();
         },
         { immediate: true },
     );
     const updateSearch = (value: string) => {
+        if (value === search.value) return;
         search.value = value;
+        items.value = [];
+        total.value = 0;
+        page.value = 1;
         clearTimeout(timer);
         // Invalidar inmediatamente, incluso durante el debounce.
         ++sequence;
@@ -87,6 +97,10 @@ export const useRemoteOptions = (
         search,
         hasMore: computed(() => items.value.length < total.value),
         updateSearch,
-        loadMore: () => load(page.value + 1),
+        loadMore: () => {
+            if (!isLoading.value && !error.value && items.value.length < total.value)
+                return load(page.value + 1);
+        },
+        retry: () => load(requestedPage),
     };
 };

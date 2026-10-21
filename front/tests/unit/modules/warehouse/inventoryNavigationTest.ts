@@ -2,12 +2,12 @@ import { createMemoryHistory } from 'vue-router';
 import { describe, expect, it, vi } from 'vitest';
 import { createAppRouter } from '../../../../src/app/router/index.js';
 import { createAuthSession } from '../../../../src/modules/auth/session.js';
-import { ApiError } from '../../../../src/shared/services/apiClient.js';
+import { ApiError } from '../../../../src/shared/http/apiError.js';
 import type { AuthSession } from '../../../../src/modules/auth/session.js';
 import { user } from '../../../fixtures/inventory.js';
 
 // Estas pruebas comprueban las guardas; Chromium ejecuta los componentes Vuetify reales.
-vi.mock('../../../../src/modules/warehouse/pages/WarehouseLayout.vue', () => ({
+vi.mock('../../../../src/app/layouts/AppLayout.vue', () => ({
   default: { template: '<div />' },
 }));
 vi.mock('../../../../src/modules/warehouse/pages/InventoryPage.vue', () => ({
