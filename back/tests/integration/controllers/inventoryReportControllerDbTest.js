@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import request from 'supertest';
-import XLSX from 'xlsx';
+import { readSheet } from 'read-excel-file/node';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 
@@ -26,8 +26,8 @@ const readReport = async (query, { path = '/reports/inventory/excel', sheet = 'I
       res.on('data', chunk => chunks.push(chunk));
       res.on('end', () => callback(null, Buffer.concat(chunks)));
     }).expect(200);
-  const workbook = XLSX.read(response.body, { type: 'buffer' });
-  return { response, rows: XLSX.utils.sheet_to_json(workbook.Sheets[sheet], { header: 1, defval: null }) };
+  const rows = await readSheet(response.body, sheet);
+  return { response, rows };
 };
 
 describe('exportación paginada de inventario', () => {

@@ -129,7 +129,7 @@ Se cede el event loop cada 250 filas y se espera al drenaje del destino cuando e
 saturado. La generación sigue usando el hilo principal; estas pausas no ejecutan el
 cálculo en paralelo. No se incorpora un pool de workers. Los controladores conservan
 las columnas y permisos existentes. Inventario, compras, salidas, movimientos,
-proveedores, usuarios, personas y clientes se consultan por bloques. SheetJS queda como lector independiente para verificar los archivos en
+proveedores, usuarios, personas y clientes se consultan por bloques. read-excel-file verifica los valores con un lector independiente y ExcelJS inspecciona las fórmulas en
 las pruebas, sin formar parte de las dependencias de producción.
 
 `findWarehouseReportRows` entrega un iterable asíncrono y reutiliza `findBatches` del

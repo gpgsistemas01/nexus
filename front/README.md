@@ -16,7 +16,7 @@ Usa una cuenta existente: al autenticar se abre el primer módulo de Almacén pe
 
 ## Desarrollo
 
-Usa Node.js 24.14.1 o superior de la rama 24, Node.js 22.13 o superior de la rama 22,
+Usa Node.js 24.15.0 o superior de la rama 24, Node.js 22.22.2 o superior de la rama 22,
 o Node.js 26.12.1 o superior de la rama 26.
 Las herramientas de pruebas están fijadas a versiones compatibles; instala con `npm ci`
 para conservar esa combinación.

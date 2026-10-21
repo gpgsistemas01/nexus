@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import XLSX from 'xlsx';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { readExcelReport } from '../../helpers/readExcelReport.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
 const ids = {};
@@ -198,16 +198,14 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
                 res.on('data', chunk => chunks.push(chunk));
                 res.on('end', () => callback(null, Buffer.concat(chunks)));
             }).expect(200);
-        const workbook = XLSX.read(response.body, { type: 'buffer' });
-        const sheet = workbook.Sheets['Compras materiales'];
-        const values = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const { sheet, rows: values } = await readExcelReport(response.body, 'Compras materiales');
         expect(values.filter(row => String(row[0]).startsWith(prefix))).toHaveLength(251);
         expect(new Set(values.filter(row => String(row[0]).startsWith(prefix)).map(row => row[0])).size).toBe(251);
-        expect(sheet.O252).toMatchObject({ f: 'I252*N252', v: 10 });
-        expect(sheet.P252).toMatchObject({ f: 'O252*1.16', v: 11.6 });
-        expect(sheet.B257.v).toBe(2510);
-        expect(sheet.D262.v).toBe(2510);
-        expect(sheet.E262.v).toBe(251);
+        expect(sheet.getCell('O252').value).toEqual({ formula: 'I252*N252', result: 10 });
+        expect(sheet.getCell('P252').value).toEqual({ formula: 'O252*1.16', result: 11.6 });
+        expect(sheet.getCell('B257').value).toBe(2510);
+        expect(sheet.getCell('D262').value).toBe(2510);
+        expect(sheet.getCell('E262').value).toBe(251);
     });
 
 });

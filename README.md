@@ -98,8 +98,8 @@ y reinicia Vite.
 Si el arranque indica que no puede resolver `vee-validate`, consulta la
 [recuperación de dependencias del frontend](front/README.md#dependencias-no-resueltas-en-vite).
 
-Usa Node.js 24.14.1+ de la rama 24, 22.13+ de la rama 22 o 26.12.1+ de la rama 26
-para el frontend. CI comprueba las ramas 24 y 26 en ambas aplicaciones. Los
+Para trabajar con ambas aplicaciones, usa Node.js 24.15.0+ de la rama 24,
+22.22.2+ de la rama 22 o 26.12.1+ de la rama 26. CI comprueba las ramas 24 y 26 en ambas aplicaciones. Los
 Dockerfiles conservan sus versiones propias: Node 22 en Express y Node 24 para
 compilar Vue; cambiar Node en tu equipo no actualiza producción.
 

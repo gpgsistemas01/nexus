@@ -2,45 +2,50 @@
 
 ## Decisiones aplicadas
 
-La base usa Vue 3, Vue Router 4 y Vite, con TypeScript estricto. `vue-tsc` comprueba
+La base usa Vue 3, Vue Router 5 y Vite, con TypeScript estricto. `vue-tsc` comprueba
 componentes y módulos; ESLint analiza errores comunes de JavaScript/TypeScript y Vue.
 El preset de Vue es `essential`, orientado a errores, sin imponer formato cosmético.
 Las reglas de presentación impiden imports de HTTP, stores, páginas, validadores
 y VeeValidate, además de fetch/XMLHttpRequest y almacenamiento local mediante
 globales o window/globalThis. No sustituyen la revisión de dependencias indirectas.
 
-Se admiten Node.js `^22.13.0 || ^24.14.1 || ^26.12.1`. Para mantener compatibilidad con Node
-24.14.1 se fijan jsdom 29.1.1 y Vue Test Utils 2.4.6: las ramas posteriores agregaban
-requisitos más altos de Node mediante dependencias de pruebas. No basta con bajar
-`engines`; se verifica la compatibilidad de todo el lockfile y la instalación con
-`npm ci --include=dev --engine-strict`, además de lint, pruebas y build.
-CI comprueba el frontend con Node 24.14.1 y 26.12.1 para detectar regresiones del
-mínimo existente y de la nueva rama admitida. No se cambian los pins de pruebas
-por el solo hecho de admitir Node 26.
-El setup de pruebas enlaza localStorage/sessionStorage con los objetos reales de
-jsdom antes de cada caso y restaura los globals al terminar. Así Vitest 4 no conserva
-por accidente el Storage nativo de Node 26 en una prueba del navegador. Las pruebas
-de almacenamiento del login conservan sus mismas aserciones y el mismo alcance.
-El backend conserva sus herramientas y versiones de Node documentadas por separado.
+Se admiten Node.js `^22.22.2 || ^24.15.0 || ^26.12.1`. jsdom 30.1.3 y las
+herramientas transitivas de Vue Test Utils 2.5.1 requieren al menos 22.22.2 o
+24.15.0 en esas ramas. Node 26.12.1 sigue siendo válido. CI verifica el frontend
+con Node 24.15.0 y 26.12.1, e instala con `npm ci --include=dev --engine-strict`.
+Cambiar sólo `engines` no actualiza Node en el equipo ni valida sus dependencias.
+
+El setup enlaza localStorage/sessionStorage con los objetos reales de jsdom antes
+de cada caso y restaura los globals al terminar. Así Vitest 5 no conserva por
+accidente el Storage nativo de Node 26. Se mantienen las aserciones y el alcance
+de las pruebas del login.
+
 Las versiones exactas se registran en `package-lock.json` y se instalan con `npm ci`.
+Después de descargar cambios que actualicen dependencias, detén Vite y ejecuta
+desde la raíz `npm --prefix front ci --include=dev`, seguido de
+`npm --prefix front run dev`. Git no actualiza `node_modules`.
 
-### Aviso de obsolescencia de glob
+### Versiones y compatibilidad
 
-La instalación puede mostrar `npm warn deprecated glob@10.5.0`. La cadena actual
-es `@vue/test-utils@2.4.6 → js-beautify@1.15.4 → glob@10.5.0`; pertenece a las
-herramientas de pruebas, no a VeeValidate ni al código del login. Comprueba su
-origen con `npm explain glob` desde `front/`.
+- Vue Router 5.4.0 conserva el router explícito existente, las guardas y la carga
+  diferida; no exige incorporar Pinia ni generación de rutas por archivos.
+- Vitest 5.0.5, jsdom 30.1.3 y Vue Test Utils 2.5.1 actualizan la infraestructura
+  de pruebas; no se cambia el estado aislado por prueba para optimizar tiempos.
+- TypeScript 6.0.3 es compatible con `vue-tsc` y el analizador de ESLint instalado.
+  TypeScript 7 queda pendiente: `@typescript-eslint/typescript-estree` declara
+  soporte `>=4.8.4 <6.1.0`. El aviso de una versión mayor disponible no basta para
+  adoptar un compilador que el conjunto de herramientas todavía no admite.
+- `@types/node` conserva la rama 24 para comprobar las APIs del entorno mínimo
+  compartido; ejecutar Node 26 no exige usar sus tipos en herramientas que también
+  deben funcionar con Node 24.
 
-El aviso de obsolescencia del mantenedor y `npm audit` son comprobaciones distintas:
-`found 0 vulnerabilities` significa que la auditoría no encontró avisos aplicables
-al árbol instalado en ese momento; no convierte una versión obsoleta en mantenida.
+### Avisos de obsolescencia
 
-Vue Test Utils 2.5.1 usa js-beautify 2.x y glob 13.x, pero js-beautify 2.0.3 también
-incorpora nopt 10.0.1, que requiere Node `^22.22.2 || ^24.15.0 || >=26.0.0`.
-Esa actualización no es compatible con el mínimo actual de Node 24.14.1. Se conserva
-el pin de Vue Test Utils hasta revisar conjuntamente la versión mínima de Node,
-CI, la instalación con engines estrictos y las pruebas. No se fuerza un glob de
-otra versión mayor sólo para ocultar el aviso ni se agrega como dependencia directa.
+Vue Test Utils 2.5.1 usa js-beautify 2.x y glob 13.x. La actualización elimina la
+cadena antigua de glob 10.5.0 sin forzar una versión mayor mediante overrides.
+Comprueba el origen de cualquier aviso nuevo con `npm explain <paquete>` desde
+la aplicación afectada. Un aviso de obsolescencia y una vulnerabilidad de
+`npm audit` son comprobaciones distintas.
 
 ## Tipos y editor
 

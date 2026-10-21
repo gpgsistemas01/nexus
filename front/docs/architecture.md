@@ -26,7 +26,7 @@ la sesión es el único contrato compartido por aplicación.
 
 ## Navegación
 
-`main.ts` instala Vue Router 4 mediante `createAppRouter`. El router de
+`main.ts` instala Vue Router 5 mediante `createAppRouter`. El router de
 `src/app/router/index.ts` usa historial HTML5 con la base de Vite. Su fábrica permite
 inyectar historial en memoria para comprobar navegación sin navegador.
 `/` redirige a `/inicio-sesion` (LoginPage). `/almacen` selecciona el primer módulo

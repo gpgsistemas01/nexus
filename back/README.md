@@ -107,7 +107,7 @@ forma curada. CI comprueba que el contenido generado esté actualizado.
 
 ## Requisitos
 
-- Node.js `>=22 <25 || ^26.12.1`; Node 26 se comprueba en CI junto con Node 24.
+- Node.js `^22.13.0 || ^24.14.1 || ^26.12.1`; Node 26 se comprueba en CI junto con Node 24.
 - npm.
 - PostgreSQL disponible para desarrollo y, opcionalmente, otra base aislada para pruebas.
 
@@ -138,6 +138,40 @@ Git no mueve el `.env`, las dependencias ni el cliente Prisma generado de tu equ
    ```bash
    npm run dev
    ```
+
+### Dependencias y actualizaciones
+
+Se actualizan dotenv 18, EJS 7, ioredis 6, rate-limit-redis 6 y Vitest 5 con su
+proveedor V8 de la misma versión. Prisma conserva la versión estable 7.10.1 en
+CLI, cliente y adaptador; una etiqueta `latest` con `8.0.0-rc` no representa una
+versión estable para producción.
+
+`npm run dev` usa el modo watch nativo de Node. Reinicia al cambiar módulos
+importados y conserva la salida. Las vistas EJS se vuelven a leer en desarrollo;
+modificar una plantilla no requiere reiniciar el proceso. Al cambiar el esquema
+Prisma sigue siendo necesario ejecutar `npm run db:generate`. Se retira Nodemon
+y su configuración, cuya cadena Chokidar/braces no tenía una actualización corregida.
+
+ExcelJS conserva su última versión estable oficial, 4.4.0. Un override limitado a
+`exceljs → uuid@11` evita la versión vulnerable 8 manteniendo la API CommonJS `v4`
+que consume ExcelJS. Las pruebas de reportes comprueban las descargas y fórmulas.
+No se aplica un override global de UUID ni `npm audit fix --force`.
+
+El lector SheetJS `xlsx@0.18.5` se retira de las pruebas. `read-excel-file` verifica
+los valores guardados con un lector independiente; ExcelJS permite inspeccionar
+las fórmulas. Se mantienen las comprobaciones de ceros, decimales, filas, orden,
+concurrencia y ausencia de cambios en BD. ExcelJS aún puede traer paquetes con
+avisos de obsolescencia: actualizar las dependencias directas y pasar `npm audit`
+no implica que todas sus dependencias transitivas estén mantenidas.
+
+Vitest 5 limpia mocks por defecto. La configuración unitaria fija `clearMocks: false`
+para conservar las llamadas observadas durante el registro de rutas; las suites
+mantienen su limpieza explícita entre casos. Se conservan las mismas aserciones.
+
+Después de descargar los cambios, detén el servidor y ejecuta desde la raíz
+`npm --prefix back ci --include=dev`, `npm --prefix back run db:generate` y
+`npm --prefix back run dev`. Las dependencias se instalan por aplicación; Git no
+actualiza `node_modules` ni genera el cliente Prisma.
 
 ### Avisos al actualizar Node y npm
 
@@ -235,7 +269,7 @@ npm run dev
 
 El servidor escucha en `PORT` o en `3000` por defecto y se publica en `0.0.0.0`.
 
-### Producción/local sin nodemon
+### Producción/local sin recarga automática
 
 ```bash
 npm start
@@ -246,7 +280,7 @@ npm start
 | Script | Descripción |
 | --- | --- |
 | `npm start` | Ejecuta `node src/app.js`. |
-| `npm run dev` | Ejecuta la aplicación con Nodemon. |
+| `npm run dev` | Ejecuta `node --watch --watch-preserve-output src/app.js`. |
 | `npm run db:migrate` | Aplica migraciones pendientes con Prisma; usa `DIRECT_URL` automáticamente cuando está definida. |
 | `npm run db:generate` | Genera el cliente Prisma. |
 | `npm test` | Ejecuta las pruebas unitarias y auxiliares; excluye `tests/integration`. |
