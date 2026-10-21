@@ -1,11 +1,15 @@
 import { expect, test } from '@playwright/test';
+import { mockWarehouse } from './warehouseFixtures.js';
+import { user } from '../fixtures/inventory.js';
 
 test('login: captura inválida, rechazo genérico y reintento con cookies hacia materiales', async ({ page, context }) => {
+  await mockWarehouse(page);
   const requests: { url: string; data: unknown }[] = [];
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   let attempt = 0;
   await page.route('**/api/auth/**', async route => {
+    if (new URL(route.request().url()).pathname === '/api/auth/me') return route.fulfill({ json: { user } });
     requests.push({ url: new URL(route.request().url()).pathname, data: route.request().postDataJSON() });
     attempt += 1;
     await route.fulfill({ status: attempt === 1 ? 401 : 200, contentType: 'application/json',
@@ -13,9 +17,6 @@ test('login: captura inválida, rechazo genérico y reintento con cookies hacia 
       body: JSON.stringify({ code: attempt === 1 ? 'LOGIN_ERROR' : 'SUCCESS_LOGIN' }),
     });
   });
-  await page.route('**/almacen/materiales', route => route.fulfill({
-    contentType: 'text/html', body: '<h1>Materiales EJS</h1>',
-  }));
   await page.goto('/');
   await page.getByRole('heading', { name: 'Iniciar sesión' }).waitFor();
   await expect(page).toHaveURL(/\/inicio-sesion$/);
@@ -42,7 +43,7 @@ test('login: captura inválida, rechazo genérico y reintento con cookies hacia 
   await password.fill(' válida ');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
   await expect(page).toHaveURL(/\/almacen\/materiales$/);
-  await expect(page.getByRole('heading', { name: 'Materiales EJS' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Materiales', exact: true })).toBeVisible();
   expect(requests).toEqual([
     { url: '/api/auth/login', data: { name: 'usuario', password: ' legado ' } },
     { url: '/api/auth/login', data: { name: 'usuario', password: ' válida ' } },
@@ -126,5 +127,30 @@ test('un fallo al cargar la página muestra recuperación y permite reintentar',
   await page.getByRole('button', { name: 'Volver a intentar' }).click();
 
   await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
+  expect(unhandledErrors).toEqual([]);
+});
+
+test('login confirmado recupera una carga diferida fallida sin repetir credenciales', async ({ page }) => {
+  await mockWarehouse(page);
+  let attempts = 0;
+  let hasFailed = false;
+  const unhandledErrors: string[] = [];
+  page.on('pageerror', error => unhandledErrors.push(error.message));
+  await page.route('**/api/auth/login', route => {
+    attempts += 1;
+    return route.fulfill({ json: { code: 'SUCCESS_LOGIN' } });
+  });
+  await page.route('**/src/modules/warehouse/pages/WarehouseLayout.vue*', route => {
+    if (hasFailed) return route.continue();
+    hasFailed = true;
+    return route.abort('failed');
+  });
+  await page.goto('/inicio-sesion');
+  await page.getByRole('textbox', { name: 'Nombre de usuario', exact: true }).fill('usuario');
+  await page.getByLabel('Contraseña', { exact: true }).fill('legado');
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Materiales', exact: true })).toBeVisible();
+  expect(hasFailed).toBe(true);
+  expect(attempts).toBe(1);
   expect(unhandledErrors).toEqual([]);
 });

@@ -1,0 +1,341 @@
+import { expect, test } from '@playwright/test';
+import { ids, material, pageOf } from '../fixtures/inventory.js';
+import { chooseOption, mockWarehouse } from './warehouseFixtures.js';
+
+test('almacén: navegación interna, recarga, detalles y móvil', async ({ page }) => {
+  await mockWarehouse(page);
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/almacen/materiales');
+  await expect(page.getByRole('heading', { name: 'Materiales', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Lona Proveedor Central' })).toBeVisible();
+  await page.getByRole('button', { name: 'Detalles', exact: true }).click();
+  await expect(page.getByText('Cantidad convertida', { exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Consumibles', exact: true }).click();
+  await expect(page).toHaveURL(/\/almacen\/consumibles$/);
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Consumibles', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Mermas', exact: true }).click();
+  await expect(
+    page.getByRole('cell', { name: 'Sobrante de lona Proveedor Central' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Detalles', exact: true }).click();
+  await expect(page.getByText('Cono / Total / Neto (kg)', { exact: true })).toBeVisible();
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(page.getByRole('button', { name: 'Nueva merma' })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    await page.getByRole('button', { name: 'Menú', exact: true }).click();
+    await expect(page.getByRole('link', { name: 'Materiales', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Menú', exact: true }).click();
+  }
+  expect(errors).toEqual([]);
+});
+
+test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) => {
+  await mockWarehouse(page, ['materials:read']);
+  await page.goto('/almacen/materiales');
+  await expect(page.getByRole('cell', { name: 'Lona Proveedor Central' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Nuevo material' })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Editar', exact: true })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Descargar Excel' })).toBeHidden();
+  await page.goto('/almacen/mermas');
+  await expect(page.getByRole('heading', { name: 'Acceso no permitido' })).toBeVisible();
+  await page.route('**/api/auth/me', (route) =>
+    route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } }),
+  );
+  await page.route('**/api/auth/refresh', (route) =>
+    route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } }),
+  );
+  await page.goto('/almacen/materiales');
+  await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
+  await expect(page).toHaveURL(/inicio-sesion\?returnTo=/);
+});
+
+test('consumibles: alta validada con catálogos y sin medidas', async ({ page }) => {
+  await mockWarehouse(page);
+  const writes: unknown[] = [];
+  await page.route('**/api/warehouse/consumables', async (route) => {
+    writes.push(route.request().postDataJSON());
+    await route.fulfill({ json: { code: 'CREATED_MATERIAL' } });
+  });
+  await page.goto('/almacen/consumibles');
+  await page.getByRole('button', { name: 'Nuevo consumible' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Crear consumible', exact: true });
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  expect(writes).toEqual([]);
+  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Cinta adhesiva');
+  await chooseOption(page, 'Proveedor', 'Proveedor Central');
+  await chooseOption(page, 'Presentación', 'ROLLO');
+  await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
+  await dialog.getByRole('spinbutton', { name: 'Costo máximo unitario' }).fill('12.5');
+  await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('4');
+  await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toBeHidden();
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes).toEqual([
+    {
+      name: 'Cinta adhesiva',
+      supplierId: ids.supplier,
+      presentationId: ids.presentation,
+      unitMeasureId: ids.unit,
+      maxUnitCost: 12.5,
+      newStock: 4,
+      isActive: true,
+      observations: '',
+    },
+  ]);
+});
+
+test('materiales: conflicto de stock exige actualizar y no pierde la versión original', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const writes: Record<string, unknown>[] = [];
+  await page.route(`**/api/warehouse/materials/${ids.material}/stock`, async (route) => {
+    writes.push(route.request().postDataJSON());
+    await route.fulfill({ status: 409, json: { code: 'RECORD_VERSION_CONFLICT' } });
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Ajustar stock', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Ajustar stock de material', exact: true });
+  await dialog.getByRole('spinbutton', { name: 'Nuevo stock' }).fill('8');
+  await chooseOption(page, 'Motivo del ajuste', 'Conteo físico');
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog.getByRole('alert').filter({ hasText: 'El registro cambió' })).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Guardar', exact: true })).toBeDisabled();
+  expect(writes).toEqual([
+    {
+      expectedVersion: 3,
+      supplierId: ids.supplier,
+      newStock: 8,
+      reasonId: ids.reason,
+      observations: '',
+    },
+  ]);
+  await expect(dialog.getByRole('spinbutton', { name: 'Nuevo stock' })).toHaveValue('8');
+  await dialog.getByRole('button', { name: 'Cerrar y actualizar inventario' }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes).toHaveLength(1);
+});
+
+test('materiales: alta con medidas, edición versionada y baja de la relación correcta', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const writes: { url: string; method: string; body: unknown }[] = [];
+  await page.route('**/api/warehouse/materials**', async (route) => {
+    if (route.request().method() === 'GET') return route.fallback();
+    const method = route.request().method();
+    writes.push({
+      url: new URL(route.request().url()).pathname,
+      method,
+      body: method === 'DELETE' ? null : route.request().postDataJSON(),
+    });
+    await route.fulfill({
+      json: {
+        code:
+          method === 'POST'
+            ? 'CREATED_MATERIAL'
+            : method === 'DELETE'
+              ? 'DELETED_MATERIAL'
+              : 'UPDATED_MATERIAL',
+      },
+    });
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Nuevo material', exact: true }).click();
+  let dialog = page.getByRole('dialog', { name: 'Crear material', exact: true });
+  await chooseOption(page, 'Proveedor', 'Proveedor Central');
+  await chooseOption(page, 'Presentación', 'ROLLO');
+  await chooseOption(page, 'Unidad de medida', 'Metros cuadrados');
+  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Lona nueva');
+  await dialog.getByRole('spinbutton', { name: 'Base (m)' }).fill('2');
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(
+    dialog.getByRole('alert').filter({ hasText: 'altura', hasNotText: 'base' }),
+  ).toBeVisible();
+  expect(writes).toHaveLength(0);
+  await dialog.getByRole('spinbutton', { name: 'Altura (m)' }).fill('50');
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes[0]).toMatchObject({
+    method: 'POST',
+    body: { name: 'Lona nueva', base: 2, height: 50, newStock: 0 },
+  });
+  await page.getByRole('button', { name: 'Editar', exact: true }).click();
+  dialog = page.getByRole('dialog', { name: 'Editar material', exact: true });
+  await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Lona revisada');
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes[1]).toEqual({
+    method: 'PATCH',
+    url: `/api/warehouse/materials/${ids.material}`,
+    body: {
+      name: 'Lona revisada',
+      minStock: 5,
+      maxUnitCost: 100,
+      isActive: true,
+      supplierId: ids.supplier,
+      expectedVersion: 3,
+      expectedMaterialVersion: 7,
+    },
+  });
+  await page.getByRole('button', { name: 'Eliminar', exact: true }).click();
+  dialog = page.getByRole('dialog', { name: 'Eliminar material', exact: true });
+  await dialog.getByRole('button', { name: 'Confirmar eliminación' }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes[2]).toEqual({
+    method: 'DELETE',
+    url: `/api/warehouse/materials/${ids.offer}`,
+    body: null,
+  });
+});
+
+test('inventario: exportar respeta tipo, búsqueda y alcance', async ({ page }) => {
+  await mockWarehouse(page);
+  let query: URLSearchParams | undefined;
+  await page.route('**/api/warehouse/reports/inventory/excel?**', (route) => {
+    query = new URL(route.request().url()).searchParams;
+    return route.fulfill({
+      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      body: 'archivo de prueba',
+    });
+  });
+  await page.goto('/almacen/consumibles');
+  await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('Cinta');
+  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await page.getByText('Activos o con stock', { exact: true }).click();
+  await page.getByRole('option', { name: 'Con stock', exact: true }).click();
+  const downloading = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Descargar Excel' }).click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toBe('inventario_consumables.xlsx');
+  expect(query?.get('type')).toBe('CONSUMABLE');
+  expect(query?.get('search')).toBe('Cinta');
+  expect(query?.get('inventoryScope')).toBe('inStock');
+});
+
+test('mermas: referencia de rollo, peso calculado y recuperación tras recargar sin duplicar la captura', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const writes: Record<string, unknown>[] = [];
+  await page.route('**/api/warehouse/wastes', async (route) => {
+    writes.push(route.request().postDataJSON());
+    if (writes.length === 1) return route.abort('failed');
+    return route.fulfill({ json: { code: 'CREATED_WASTE' } });
+  });
+  await page.goto('/almacen/mermas');
+  await page.getByRole('button', { name: 'Nueva merma' }).click();
+  let dialog = page.getByRole('dialog', { name: 'Crear merma', exact: true });
+  await chooseOption(page, 'Proveedor', 'Proveedor Central');
+  await chooseOption(page, 'Material de referencia del proveedor', 'Lona · ROLLO · 2 × 50');
+  await dialog.getByRole('textbox', { name: 'Nombre de la merma' }).fill('Sobrante nuevo');
+  await dialog
+    .getByRole('spinbutton', { name: 'Peso del rollo completo con cono (kg)' })
+    .fill('10.25');
+  await dialog.getByRole('spinbutton', { name: 'Peso del cono de la merma (kg)' }).fill('0.25');
+  await dialog.getByRole('spinbutton', { name: 'Peso de la merma con cono (kg)' }).fill('2.75');
+  await dialog.getByRole('spinbutton', { name: 'Cantidad inicial' }).fill('3');
+  await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toHaveValue('2');
+  await expect(dialog.getByRole('spinbutton', { name: 'Altura (m)' })).toHaveValue('12.5');
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog.getByRole('button', { name: 'Recuperar captura' })).toBeVisible();
+  const sent = writes[0]!;
+  expect(sent).toMatchObject({
+    name: 'Sobrante nuevo',
+    base: 2,
+    height: 12.5,
+    coneWeightKg: 0.25,
+    totalWeightKg: 2.75,
+    referenceRollTotalWeightKg: 10.25,
+    initialQuantity: 3,
+  });
+  expect(sent).not.toHaveProperty('weightKg');
+  expect(sent).not.toHaveProperty('sampleLengthM');
+  expect(sent.operationId).toMatch(/^[\da-f-]{36}$/);
+  await page.reload();
+  await page.getByRole('button', { name: 'Nueva merma' }).click();
+  dialog = page.getByRole('dialog', { name: 'Crear merma', exact: true });
+  await expect(dialog).toContainText('Sobrante nuevo');
+  await dialog.getByRole('button', { name: 'Recuperar captura' }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes).toHaveLength(2);
+  expect(writes[1]).toEqual(sent);
+  expect(
+    await page.evaluate(() =>
+      localStorage.getItem(
+        `nexus:waste-operation:${'88888888-8888-4888-8888-888888888888'}:create:`,
+      ),
+    ),
+  ).toBeNull();
+});
+
+test('mermas: agregar stock y editar datos usan contratos independientes', async ({ page }) => {
+  await mockWarehouse(page);
+  const writes: { method: string; body: Record<string, unknown> }[] = [];
+  await page.route(`**/api/warehouse/wastes/${ids.waste}**`, async (route) => {
+    writes.push({ method: route.request().method(), body: route.request().postDataJSON() });
+    await route.fulfill({ json: { code: 'UPDATED_WASTE' } });
+  });
+  await page.goto('/almacen/mermas');
+  await page.getByRole('button', { name: 'Agregar stock', exact: true }).click();
+  let dialog = page.getByRole('dialog', { name: 'Agregar stock de merma', exact: true });
+  await dialog.getByRole('spinbutton', { name: 'Cantidad a agregar' }).fill('2');
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes[0]?.method).toBe('POST');
+  expect(writes[0]?.body).toMatchObject({ quantity: 2, observations: '' });
+  expect(writes[0]?.body.operationId).toMatch(/^[\da-f-]{36}$/);
+  await page.getByRole('button', { name: 'Editar', exact: true }).click();
+  dialog = page.getByRole('dialog', { name: 'Editar merma', exact: true });
+  await dialog.getByRole('textbox', { name: 'Nombre de la merma' }).fill('Sobrante revisado');
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes[1]).toEqual({
+    method: 'PATCH',
+    body: {
+      name: 'Sobrante revisado',
+      minStock: 1,
+      maxUnitCost: 40,
+      isActive: true,
+      expectedVersion: 2,
+    },
+  });
+});
+
+test('almacén: filtros y paginación se envían al servidor y permiten recuperarse de un fallo', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const queries: URLSearchParams[] = [];
+  await page.route('**/api/warehouse/materials?**', async (route) => {
+    const query = new URL(route.request().url()).searchParams;
+    queries.push(query);
+    if (query.get('search') === 'error') return route.fulfill({ status: 503, json: {} });
+    await route.fulfill({
+      json: {
+        ...pageOf([material]),
+        recordsTotal: 12,
+        recordsFiltered: query.get('search') ? 1 : 12,
+      },
+    });
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+  await expect(page.getByText('Página 2 de 2', { exact: false })).toBeVisible();
+  expect(queries.at(-1)?.get('start')).toBe('10');
+  await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('error');
+  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  const requestError = page.getByRole('alert').filter({ hasText: 'No se pudo completar' });
+  await expect(requestError).toBeVisible();
+  await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('Lona');
+  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await expect(requestError).toBeHidden();
+  expect(queries.at(-1)?.get('start')).toBe('0');
+  expect(queries.at(-1)?.get('search')).toBe('Lona');
+});

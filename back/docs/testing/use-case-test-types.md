@@ -42,6 +42,16 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 
 ## Cobertura vigente
 
+Para la interfaz Vue de `CU-ALM-01..06` y `CU-ALM-09..14`, la evidencia adicional
+está en [DP-VUE-WH-001–004](../../../front/docs/tooling.md#pruebas-de-almacén):
+`inventoryFormTest.ts`, `inventoryNavigationTest.ts`, `apiClientTest.ts` y
+`warehouse.spec.ts`. Cubre permisos visuales, altas, edición, identificador de baja,
+versiones de captura, filtros/paginación, descarga y recuperación de merma tras
+recarga. Chromium usa respuestas HTTP simuladas: no sustituye la evidencia
+persistente ni resuelve las brechas HTTP/Prisma indicadas en la tabla.
+El flujo de duplicado Vue muestra el rechazo y permite localizar la merma para
+Agregar stock; no replica la apertura automática del modal EJS.
+
 | Casos de uso | Evidencia automatizada relevante | Tipo, datos y resultado esperado | Estado de cobertura |
 | --- | --- | --- | --- |
 | `CU-AUT-01..02` | Sin prueba funcional directa. | Sesión limpia/autenticada, credenciales válidas e inválidas; crear o invalidar sesión según corresponda. | **Brecha.** |

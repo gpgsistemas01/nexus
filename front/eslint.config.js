@@ -29,8 +29,8 @@ export default tseslint.config(
                 patterns: [{
                     group: [
                         'axios', 'pinia', 'vee-validate',
-                        '@nexus/login-validation', '@nexus/api-messages',
-                        '**/services/**', '**/http/**', '**/stores/**', '**/pages/**',
+                        '@nexus/login-validation', '@nexus/api-messages', '@nexus/warehouse-validation', '@nexus/waste-measurements',
+                        '**/services/**', '**/http/**', '**/stores/**', '**/pages/**', '**/auth/session.js',
                     ],
                     message: 'La presentación recibe props y emite eventos; el contenedor coordina datos y operaciones.',
                 }],

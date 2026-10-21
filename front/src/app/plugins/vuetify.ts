@@ -5,15 +5,15 @@ import 'vuetify/styles';
 export const vuetify = createVuetify({
     icons: { defaultSet: 'mdi', aliases, sets: { mdi } },
     theme: {
-        defaultTheme: 'preview',
+        defaultTheme: 'warehouse',
         themes: {
             nexus: {
                 dark: true,
                 colors: { primary: '#14a44d', background: '#07110c', surface: '#0b1612', error: '#ffb4ab' },
             },
-            preview: {
+            warehouse: {
                 dark: false,
-                colors: { primary: '#6750a4', background: '#f6f7fb', surface: '#ffffff' },
+                colors: { primary: '#14844c', background: '#f3faf5', surface: '#ffffff', error: '#b3261e' },
             },
         },
     },

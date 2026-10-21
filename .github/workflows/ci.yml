@@ -172,7 +172,7 @@ jobs:
       - name: Install browser for frontend tests
         run: npx playwright install --with-deps chromium
 
-      - name: Test login and UI comparison in browser
+      - name: Test login and warehouse in browser
         run: npm run test:e2e
 
       - name: Upload frontend test results

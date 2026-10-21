@@ -28,3 +28,13 @@
 !back/src/shared/constants/inputValidation.js
 !back/src/shared/messages/
 !back/src/shared/messages/goodsReceiptMessages.js
+!back/src/public/js/utils/validations/validators.js
+!back/src/public/js/utils/validations/fieldValidations.js
+!back/src/shared/constants/inventory.js
+!back/src/shared/constants/permissions.js
+!back/src/shared/inventory/
+!back/src/shared/inventory/wasteMeasurements.js
+!back/src/shared/validation/
+!back/src/shared/validation/weightValidations.js
+!back/src/shared/utils/
+!back/src/shared/utils/numberUtils.js

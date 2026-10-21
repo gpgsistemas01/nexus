@@ -71,16 +71,14 @@ archivos `*Test.ts`. Los componentes se desmontan tras cada caso.
 
 | Riesgo observable | Nivel y técnica | Resultado esperado |
 | --- | --- | --- |
-| Perder el acceso o el laboratorio al entrar directamente | Router en memoria; particiones `/`, `/inicio-sesion` y `/inicio` | Las dos primeras abren login; la tercera conserva el comparador. |
+| Perder el acceso al entrar directamente | Router en memoria; particiones `/` y `/inicio-sesion` | Ambas abren el login operativo. |
 | Quedar atrapado en una dirección inválida | Transición ruta desconocida → enlace de retorno | Se recupera el login. |
-| Desconectar el evento de presentación o compartir estado entre instancias | Componente con composable; transición inicial → dos acciones → nueva instancia | El contador muestra 0, luego 2; una instancia nueva muestra 0. |
+| Mantener accesibles demostraciones retiradas | Router en memoria; particiones `/inicio`, `/comparar/login/vuetify` y `/ejemplo` | Muestran página no encontrada y conservan la recuperación al login. |
 
 Se comprueba comportamiento visible, no clases CSS, funciones privadas ni estructura
-interna de Vue. Estos casos ejercitan la base demostrativa, no certifican los módulos
-operativos de Nexus. No hay HTTP real, base de datos ni navegador real en esta suite unitaria.
-La suite Playwright en `front/tests/e2e/` verifica los tres candidatos en Chromium:
-selección → campos vacíos → captura → visibilidad de contraseña → envío de prueba
-→ recarga. Comprueba además ausencia de llamadas API y desbordamiento en móvil.
+interna de Vue. No hay HTTP real, base de datos ni navegador real en esta suite unitaria.
+La suite Playwright en `front/tests/e2e/` verifica login y Almacén en Chromium,
+incluidos permisos, reintentos y adaptación a móvil.
 Los resultados se generan en `front/build/test-results/` y no se versionan.
 El login operativo tiene pruebas en
 `tests/unit/modules/auth/composables/useLoginFormTest.ts`,
@@ -92,9 +90,10 @@ El login operativo tiene pruebas en
 | `DP-VUE-AUTH-001` / `CP-VUE-AUTH-001` | Unitario; particiones y fronteras de captura | El formulario con VeeValidate bloquea el envío con vacíos o longitud 51 y lo permite con 50 contando caracteres Unicode; contraseña histórica corta admitida y espacios conservados. Se reutiliza la misma regla pública que EJS. |
 | `DP-VUE-AUTH-002` / `CP-VUE-AUTH-002` | Unitario y navegador con API simulada; transiciones | Captura inválida no envía; 400 muestra campo; 401 genérico, 429/red/5xx recuperables; sólo SUCCESS_LOGIN navega. Pendiente bloquea duplicados y el fallo permite reintentar sin refresh. 401/429 conservan su mensaje aunque el proxy devuelva HTML; códigos desconocidos no se muestran como mensajes de campo. |
 | `DP-VUE-AUTH-003` / `CP-VUE-AUTH-003` | Unitario y navegador; decisiones recordar/no recordar y almacenamiento disponible/bloqueado | Sólo se guarda usuario después del éxito; nunca contraseña/tokens; recarga recupera usuario y deja contraseña vacía. Bloqueo no impide acceso. Fallo de navegación posterior no se transforma en credenciales rechazadas. |
-| `DP-VUE-AUTH-004` / `CP-VUE-AUTH-004` | Navegador; entrada directa/recarga y particiones escritorio/móvil | Login visible a 1280/390/320 px sin desbordamiento; regreso desde ruta desconocida instala Vuetify y muestra formulario. |
+| `DP-VUE-AUTH-004` / `CP-VUE-AUTH-004` | Navegador; entrada directa/recarga y particiones escritorio/móvil | Login visible a 1280/390/320 px sin desbordamiento; regreso desde ruta desconocida muestra formulario con el proveedor Vuetify instalado al arrancar. |
 | `DP-VUE-AUTH-005` / `CP-VUE-AUTH-005` | Unitario; transición envío pendiente → desmontaje → respuesta tardía | Se aborta el transporte y no se navega ni persiste una preferencia desde una página destruida. |
 | `DP-VUE-AUTH-006` / `CP-VUE-AUTH-006` | Navegador; fallo al cargar módulo inicial → reintento | Se presenta StartupErrorPage y la recarga recupera el login sin un rechazo de promesa no manejado. |
+| `DP-VUE-AUTH-007` / `CP-VUE-AUTH-007` | Navegador; acceso confirmado → fallo de carga diferida → navegación completa | Un fallo al cargar Almacén tras el login recupera su ruta por el arranque normal, sin volver a enviar credenciales ni dejar un rechazo no manejado. |
 
 Las pruebas de adaptador y composable se ubican conforme a su módulo propietario;
 los límites de captura se prueban mediante el formulario y no vuelven a probar
@@ -105,8 +104,27 @@ demuestran el comportamiento del frontend, no autenticación ni persistencia rea
 `back/tests/unit/validators/authValidationTest.js` conserva paridad de captura y
 `back/tests/integration/controllers/authControllerDbTest.js` conserva el contrato
 HTTP y cookies con base aislada. No se usa la base de desarrollo para verificar Vue.
-Al migrar materiales se definirán casos de campos, errores, permisos y contratos;
-las pruebas de backend seguirán comprobando integridad y autorización.
+Las pruebas de backend siguen comprobando integridad y autorización.
+
+### Pruebas de Almacén
+
+Los casos unitarios viven en `tests/unit/modules/warehouse/` y
+`tests/unit/shared/services/apiClientTest.ts`. `tests/e2e/warehouse.spec.ts`
+comprueba los componentes reales de Vuetify en Chromium. Comparte fixtures de
+contratos con las unitarias, sin simular el estado reactivo del formulario.
+
+| Diseño / casos | Nivel y técnica | Condición y resultado esperado |
+| --- | --- | --- |
+| `DP-VUE-WH-001` / `CP-VUE-WH-001` | Unitario y navegador; particiones de permiso y transiciones de sesión | Entrada directa y navegación entre los tres recursos; sólo lectura oculta escrituras/costos/Excel. Sin permiso rechaza la ruta; 401 vuelve al login tras un refresh fallido; fallo de sesión permite reintentar. Consultas simultáneas comparten una renovación; 403/409/5xx no reenvían escrituras. |
+| `DP-VUE-WH-002` / `CP-VUE-WH-002` | Unitario y navegador; particiones por recurso/operación, fronteras y transición lectura → escritura rival → conflicto | Alta de consumible omite dimensiones; edición omite identidad/stock y conserva ambas versiones; ajuste exige motivo/stock válido y conserva la versión original. Baja usa la relación con el proveedor. Un 409 conserva captura sin reintento automático ni confirmación falsa. |
+| `DP-VUE-WH-003` / `CP-VUE-WH-003` | Unitario y navegador; captura → respuesta incierta → recarga → recuperación | Rollo de 50 m, referencia neta 10 kg y merma neta 2.5 kg muestra/envía 12.5 m; envía pesos capturados sin neto ni muestras derivados. Repetir conserva cuerpo y operationId, confirma una sola captura y limpia el pendiente. Almacenamiento bloqueado impide enviar; desmontaje descarta confirmación tardía. |
+| `DP-VUE-WH-004` / `CP-VUE-WH-004` | Navegador y adaptador unitario; particiones éxito/error y transiciones de filtro/página | Navegar, recargar, ver detalles y usar filtros/páginas conserva consultas al servidor; un fallo permite recuperar el listado. A 390/320 px no desborda el documento y el menú es accesible. HTML recibido como JSON o Excel no se trata como resultado válido. |
+
+Relacionan los riesgos existentes `DP-CON-001`, `DP-CON-002`, `DP-MER-004` y
+los casos `CU-ALM-01..06`, `CU-ALM-09..10`, sin sustituir sus pruebas persistentes.
+`materialControllerDbTest.js`, `inventoryWriteConcurrencyDbTest.js`,
+`wasteWeightDbTest.js` e `inventoryReportControllerDbTest.js` conservan la evidencia
+HTTP/Prisma en una base aislada; no se usa la base de desarrollo.
 
 ## Automatización y Docker
 
@@ -121,10 +139,23 @@ Los casos de prueba se ejecutan en CI antes del despliegue, no en Nginx.
 
 ## Herramientas aplazadas
 
-Vuetify y VeeValidate se usan en el login operativo. La API usa fetch; no necesita
-Axios. Pinia se aplaza hasta necesitar estado compartido real. MDB Vue y PrimeVue
-permanecen sólo en el laboratorio visual. Zod/Yup no se agregan para reescribir las
+Vuetify y VeeValidate se usan en login y Almacén. La API usa fetch; no necesita
+Axios. La sesión actual usa provide/inject por aplicación; Pinia se aplaza hasta
+necesitar varios stores y sus herramientas de gestión. Zod/Yup no se agregan para reescribir las
 reglas públicas del login ya existentes. Prettier no se incorpora por anticipado.
-Playwright sí se usa ahora para comprobar
-los controles reales de tres bibliotecas. Contenedores, presentación y composables
+Playwright comprueba los controles reales de Vuetify. Contenedores, presentación y composables
 no requieren esas dependencias adicionales.
+
+## Retiro de demostraciones
+
+Se retiran las pruebas del contador (`welcomePageTest.ts`) y del comparador
+(`loginComparison.spec.ts`) porque sus pantallas dejaron de formar parte del
+producto. También se reemplaza el caso de navegación al comparador por sus rutas
+retiradas como páginas no encontradas. No se conserva cobertura del incremento
+del contador ni de controles MDB/PrimeVue, funcionalidades eliminadas.
+
+Los contratos vigentes de props/eventos, captura, navegación, sesión y adaptación
+a móvil siguen cubiertos por las pruebas de login y Almacén indicadas arriba.
+El backend conserva su suite sin cambios; este retiro no elimina pruebas de reglas
+de negocio ni persistencia. Las dependencias y recursos exclusivos de las
+demostraciones se eliminan del manifiesto, lockfile y compilación.

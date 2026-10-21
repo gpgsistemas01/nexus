@@ -7,7 +7,7 @@ Las pantallas operativas actuales siguen renderizándose con EJS en el backend.
 
 ```text
 back/                 # Express, EJS, Prisma, pruebas y documentación
-front/                # Vue 3 + Vite, login y laboratorio visual
+front/                # Vue 3 + Vite, login y Almacén
 .github/workflows/    # CI del repositorio
 Dockerfile            # Construye el backend usando el contexto raíz
 docker-compose.yml    # Ejecuta el backend con back/.env
@@ -91,10 +91,9 @@ son relativas a `back/`.
 ## Frontend Vue
 
 Abre `/inicio-sesion` en el puerto 5173 para usar el login Vue con Express ejecutándose
-en el puerto 3000. Al autenticar se abre materiales EJS. `/inicio` conserva el
-comparador de **MDB Vue**, **Vuetify** y **PrimeVue**, una demostración sin autenticación.
+en el puerto 3000. Al autenticar se abre Almacén en Vue según los permisos.
 Si tienes una copia anterior, actualiza `features`, instala con `npm ci` en `front/`
-y reinicia Vite. La plantilla del contador se conserva en `/ejemplo`.
+y reinicia Vite.
 Si el arranque indica que no puede resolver `vee-validate`, consulta la
 [recuperación de dependencias del frontend](front/README.md#dependencias-no-resueltas-en-vite).
 
@@ -113,8 +112,10 @@ npm run dev
 
 Para compilar: `npm run build` desde `front/`, o `npm --prefix front run build` desde
 la raíz. La salida queda en `front/dist/`. Consulta [la guía del frontend](front/README.md).
-El login integra la API mediante un proxy; los demás módulos conservan sus pantallas EJS.
-Consulta [configuración y alcance del login](front/docs/login.md).
+El login y Almacén (Materiales, Consumibles y Mermas) integran la API mediante un
+proxy del mismo origen. Los demás módulos conservan sus pantallas EJS.
+Consulta [configuración del login](front/docs/login.md) y
+[operaciones y arquitectura de Almacén](front/docs/warehouse.md).
 Desde la raíz, `npm --prefix front run check` ejecuta ESLint, pruebas y build con tipos.
 En VS Code instala las extensiones recomendadas Vue - Official y ESLint; para
 comprobar tipos continuamente usa `npm --prefix front run type-check:watch`.

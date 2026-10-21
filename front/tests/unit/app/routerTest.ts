@@ -28,9 +28,9 @@ describe('navegación de la aplicación', () => {
     expect(page.get('h1').text()).toBe('Iniciar sesión');
   });
 
-  it('conserva el comparador en su ruta explícita', async () => {
-    const { page } = await openPage('/inicio');
-    expect(page.get('h1').text()).toContain('Un mismo acceso.');
+  it.each(['/inicio', '/comparar/login/vuetify', '/ejemplo'])('muestra página no encontrada para la demostración retirada %s', async path => {
+    const { page } = await openPage(path);
+    expect(page.get('h1').text()).toBe('Página no encontrada');
   });
 
   it('permite recuperar la navegación desde una dirección inexistente', async () => {

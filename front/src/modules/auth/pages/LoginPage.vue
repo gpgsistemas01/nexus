@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { VApp } from 'vuetify/components/VApp';
 import LoginForm from '../components/LoginForm.vue';
 import { useLoginForm } from '../composables/useLoginForm.js';
 
+const router = useRouter();
+const route = useRoute();
 const {
     name,
     password,
@@ -16,7 +19,16 @@ const {
     blurField,
     submit
 } = useLoginForm({
-    onSuccess: () => window.location.assign('/almacen/materiales')
+    onSuccess: () => {
+        const returnTo = route.query.returnTo;
+        const destination = typeof returnTo === 'string'
+            && /^\/almacen\/(materiales|consumibles|mermas)(\?|$)/.test(returnTo)
+            ? returnTo : '/almacen';
+        void router.replace(destination).catch(() => {
+            // Una carga diferida fallida recupera la ruta con el arranque y su pantalla de reintento.
+            window.location.assign(destination);
+        });
+    }
 });
 const logoUrl = import.meta.env.VITE_LOGIN_LOGO_URL || '';
 const hasLogoFailed = ref(false);

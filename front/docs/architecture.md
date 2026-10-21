@@ -3,11 +3,10 @@
 ## Alcance
 
 Esta decisión aplica a `front/`, con Vue 3, TypeScript, componentes `.vue` y
-Composition API. El módulo `welcome` demuestra las fronteras con la pantalla de
-la plantilla. `uiComparison` compara tres bibliotecas sobre un login de prueba;
-ambos siguen siendo demostraciones. El módulo `auth` incorpora el login operativo
-con Vuetify, VeeValidate y la API de Express; después abre materiales EJS.
-Consulta [el contrato y despliegue del login](login.md).
+Composition API. El módulo `auth` incorpora el login operativo
+con Vuetify, VeeValidate y la API de Express. `warehouse` incorpora Materiales,
+Consumibles y Mermas como rutas Vue protegidas. Consulta [el contrato del login](login.md)
+y [los flujos de Almacén](warehouse.md).
 
 ## Contenedores y presentación
 
@@ -17,60 +16,36 @@ emiten intenciones mediante eventos. Pueden tener estado visual local; no consul
 la API ni conocen la autenticación o la persistencia.
 
 Las props no se mutan. El propietario del estado realiza los cambios. Los eventos
-usan acciones concretas, como `increment`, `save` o `edit`. No se agrega un contenedor
+usan acciones concretas, como `submit`, `close` o `action`. No se agrega un contenedor
 para cada botón: la frontera debe permitir reutilizar, entender o probar una parte.
 
-El ejemplo ejecutable es:
-
-```text
-App.vue (RouterView)
-  → app/router/index.ts
-  → modules/welcome/pages/WelcomePage.vue         (contenedor)
-      → composables/useWelcomeCounter.ts        (estado y acciones)
-      → components/WelcomePanel.vue             (props count; evento increment)
-```
-
-Cada llamada al composable crea su propio estado. El contador es sólo el ejemplo
-de la plantilla; no introduce un almacén global ni representa un flujo de negocio.
+El login operativo aplica estas fronteras: LoginPage compone LoginForm y conecta
+sus eventos con useLoginForm. Almacén las aplica en sus contenedores, tabla y
+editor, descritos más adelante. Cada llamada a sus composables crea estado propio;
+la sesión es el único contrato compartido por aplicación.
 
 ## Navegación
 
 `main.ts` instala Vue Router 4 mediante `createAppRouter`. El router de
 `src/app/router/index.ts` usa historial HTML5 con la base de Vite. Su fábrica permite
 inyectar historial en memoria para comprobar navegación sin navegador.
-`/` redirige a `/inicio-sesion` (LoginPage); `/inicio` conserva UiComparisonPage y
-`/ejemplo` conserva WelcomePage.
-`/comparar/login/:library` admite mdb, vuetify y primevue; el catch-all carga NotFoundPage. Las páginas
-usan imports dinámicos para carga diferida. Esto no modifica la propiedad del estado:
+`/` redirige a `/inicio-sesion` (LoginPage). `/almacen` selecciona el primer módulo
+autorizado y sus rutas hijas abren Materiales, Consumibles y Mermas. El catch-all
+carga NotFoundPage. Las páginas usan imports dinámicos para carga diferida:
 las rutas eligen contenedores y éstos componen presentación y composables.
 
-El enlace al inicio usa RouterLink. Nginx y `front/vercel.json` configuran el fallback
-a index.html; para Render Static Site se documenta el rewrite equivalente en el README.
-Los proveedores están en `app/plugins/uiLibraries.ts` y `vuetify.ts`.
-Una guarda de preparación instala el proveedor visual requerido antes de resolver
-la página, también en navegación interna desde una URL desconocida. No comprueba
-sesión ni permisos: las operaciones protegidas siguen en Express/EJS.
+Los enlaces internos usan RouterLink. Nginx y `front/vercel.json` configuran el
+fallback a index.html; para Render Static Site se documenta el rewrite equivalente
+en el README. `main.ts` carga e instala el proveedor único de
+`app/plugins/vuetify.ts` antes de registrar el router. La carga diferida del
+proveedor está dentro del arranque recuperable. Los temas `nexus` y `warehouse`
+pertenecen a login y Almacén, respectivamente.
+Una guarda de `/almacen` consulta `/api/auth/me` y comprueba el permiso público de
+la ruta; un `401` tras renovar sesión devuelve al login, un rechazo de permiso a
+`/sin-permiso` y un fallo de conexión a `/sesion-no-disponible`, con reintento.
+Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
 Si falla la carga inicial, StartupErrorPage permite reintentar; no se deja un rechazo
 de bootstrap sin manejar. Las respuestas HTTP se manejan en el módulo auth.
-
-## Comparador de candidatos visuales
-
-UiComparisonPage coordina la selección a través del query `ui`, sin capturar credenciales.
-Carga LoginPreviewPage en un iframe con URL propia. Esa página usa useLoginPreview
-para mantener usuario, contraseña, errores y visibilidad en memoria, y conecta props/eventos
-con MdbLogin, VuetifyLogin o PrimeVueLogin. Los tres usan componentes reales de su biblioteca.
-LoginHeading reutiliza presentación común sin conocer el contenedor ni la autenticación.
-
-El aislamiento por documento impide que el CSS global de MDB, Vuetify y PrimeVue se
-mezcle. `main.ts` espera la ruta e instala sólo el proveedor de la variante correspondiente
-antes de montar. Los imports son diferidos. Cambiar de biblioteca reemplaza el iframe y
-reinicia la captura; no se envían ni guardan credenciales. La selección sí sobrevive a la
-recarga mediante la URL. Esta comparación no decide la biblioteca definitiva y no es un
-benchmark de rendimiento: el laboratorio incluye tres candidatos deliberadamente.
-
-El prototipo sólo comprueba campos obligatorios para ejercitar los estados visuales.
-No sustituye los límites ni políticas del login real en Express, ni añade validadores
-paralelos de negocio. Los nombres de usuario y contraseña siguen el flujo EJS existente.
 
 ## Organización por módulos
 
@@ -80,8 +55,9 @@ ventas y almacén, con materiales, compras y salidas dentro de almacén.
 `pages/`, `components/` y `composables/` existen cuando hay implementación concreta;
 no se crean árboles vacíos. Una pieza usada sólo en un módulo permanece en él.
 
-Un `shared/` del frontend se incorpora cuando haya reutilización demostrada entre
-módulos. No debe importar módulos de negocio. Un módulo no importa páginas o estado
+`shared/services/apiClient.ts` se comparte entre la consulta de sesión y Almacén:
+normaliza errores y renueva una vez las consultas que responden `401`. No importa
+módulos de negocio. Un módulo no importa páginas o estado
 privado de otro; la composición entre ellos pertenece a una pantalla contenedora o
 un contrato explícito.
 
@@ -89,12 +65,12 @@ un contrato explícito.
 
 | Patrón o mecanismo | Decisión |
 | --- | --- |
-| Contenedor/presentación | Aplicado en WelcomePage y WelcomePanel. Props hacia abajo y eventos hacia arriba. |
-| Composición mediante composables | Aplicada en useWelcomeCounter. Reutiliza comportamiento reactivo sin acoplarlo al marcado. |
-| Organización por módulos | Aplicada en modules/welcome. Cada dominio agrupa sus responsabilidades. |
-| Servicios y adaptadores HTTP | `auth/services/authService.ts` envía credenciales mediante fetch y traduce el contrato de errores existente. No lee tokens ni renueva sesión al fallar el login. |
-| Estado compartido con Pinia | Pendiente hasta que varias pantallas necesiten un propietario común, como sesión y permisos de presentación. Los formularios mantienen estado local por defecto. |
-| Slots | Se usarán cuando un componente necesite composición de contenido. No se añade una abstracción sin consumidor. |
+| Contenedor/presentación | LoginPage y las páginas de Almacén coordinan; LoginForm, InventoryTable, InventoryEditor y WarehouseNavigation reciben props y emiten eventos. |
+| Composición mediante composables | useInventory, useInventoryEditor y useRemoteOptions mantienen listado, captura y catálogos remotos por instancia. |
+| Organización por módulos | auth y warehouse agrupan sus responsabilidades. Materiales y Consumibles reutilizan el mismo flujo parametrizado por recurso; Mermas añade captura y recuperación propias. |
+| Servicios y adaptadores HTTP | authService conserva el login público sin refresh. inventoryService adapta DTOs, métodos y payloads; apiClient maneja el transporte protegido y una renovación compartida. |
+| Estado compartido | createAuthSession crea una sesión por aplicación; main la proporciona por provide/inject y la guarda usa esa misma instancia. Su usuario es readonly. No se agrega Pinia para este único contrato ni un store por formulario. |
+| Slots | RemoteSelect usa append-item de Vuetify para componer la acción de cargar más opciones. |
 
 No se impone Atomic Design, una arquitectura hexagonal completa ni un bus global
 de eventos. Agregar carpetas y capas no sustituye responsabilidades claras.
@@ -105,7 +81,27 @@ LoginPage conserva fondo, tarjeta y disposición del login EJS. LoginForm presen
 controles Vuetify mediante props/eventos; useLoginForm conecta las reglas públicas
 a VeeValidate y controla estado, errores y envío. “Recordar usuario” nunca persiste
 contraseñas y no cambia la duración de las cookies. No se agrega Pinia para este
-formulario local. La navegación posterior es completa hacia materiales EJS.
+formulario local. Después del acceso, Vue Router abre `/almacen` o una ruta de
+retorno de Almacén permitida; la guarda selecciona el primer módulo autorizado.
+
+Almacén sigue esta composición:
+
+```text
+WarehouseLayout (sesión, navegación y RouterView)
+  → WarehouseNavigation (props y enlaces)
+  → InventoryPage (resource: materials | consumables | wastes)
+      → useInventory → inventoryService → apiClient
+      → InventoryTable (filas, permisos visuales y eventos)
+      → InventoryEditorPage → useInventoryEditor → VeeValidate
+          → InventoryEditor → RemoteSelect (presentación)
+          → useRemoteOptions (catálogos, búsqueda, paginación y cancelación)
+```
+
+`inventory.ts` contiene los contratos y la configuración de los tres recursos;
+`formFields.ts` describe únicamente sus controles existentes. `formModel.ts` conecta
+reglas públicas y construye payloads por operación, sin copiar validadores.
+No se incorpora un generador universal de formularios. Las tres rutas crean estado
+independiente y desmontan consultas, temporizadores y capturas al cambiar de módulo.
 
 Las reglas del login se mantienen en `back/src/public/js/utils/validations/loginValidation.js`,
 importadas directamente por el formulario EJS. Vite y TypeScript las resuelven mediante

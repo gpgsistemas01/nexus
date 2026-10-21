@@ -4,9 +4,9 @@
 
 `/` redirige a `/inicio-sesion`. El login usa Vuetify y VeeValidate, conserva la
 tarjeta verde oscura y la distribución del EJS y envía las credenciales a Express.
-El comparador continúa en `/inicio`; sus formularios siguen siendo demostraciones.
-Al autenticar se abre `/almacen/materiales` con una navegación completa: materiales
-y los demás módulos todavía se sirven en EJS.
+Al autenticar se abre `/almacen` mediante Vue Router: la guarda selecciona
+Materiales o Mermas según los permisos. Materiales, Consumibles y Mermas son Vue;
+Compras, Salidas, Movimientos y los demás módulos conservan sus pantallas EJS.
 
 Desde la raíz, inicia cada aplicación en una terminal:
 
@@ -78,11 +78,14 @@ cuando falla el login.
 | `401` | Mensaje genérico de usuario o contraseña incorrectos. |
 | `429`, incluso con texto/HTML del proxy | Solicita esperar antes de volver a intentar. |
 | `5xx`, respuesta inesperada, red o tiempo de espera de 15 s | Mensaje recuperable y controles habilitados para reintentar. |
-| `200 SUCCESS_LOGIN` | Conserva cookies recibidas y abre materiales EJS. |
+| `200 SUCCESS_LOGIN` | Conserva cookies y navega a Almacén o a su ruta de retorno permitida. |
 
 Express conserva validación definitiva, autenticación, autorización y cookies
-HttpOnly/SameSite=Lax. En `NODE_ENV=production` llevan Secure y requieren HTTPS. Vue no lee ni guarda tokens. No se agregan guardas ni una sesión global
-para módulos Vue protegidos que todavía no existen. Las notificaciones `flash`
+HttpOnly/SameSite=Lax. En `NODE_ENV=production` llevan Secure y requieren HTTPS.
+Vue no lee ni guarda tokens. `createAuthSession` consulta `/api/auth/me`; la guarda
+protege las rutas de Almacén y comparte el usuario readonly mediante provide/inject.
+El cliente de solicitudes protegidas intenta una renovación ante `401`, nunca
+ante `403`, conflictos o errores de conexión. Las notificaciones `flash`
 HttpOnly del flujo EJS no se muestran en la pantalla Vue; el nuevo login muestra
 sus propios resultados de envío.
 
@@ -90,7 +93,7 @@ sus propios resultados de envío.
 
 Vite y Nginx encaminan `/api`, las rutas operativas EJS, recursos `/css`, `/js`,
 `/img`, `/shared`, `/socket.io` y las rutas de renovación/cierre a Express.
-`/inicio-sesion`, `/inicio` y los assets compilados pertenecen a Vue. Esto permite
+`/inicio-sesion`, `/almacen` y los assets compilados pertenecen a Vue. Esto permite
 seguir usando el mismo origen y las cookies actuales sin habilitar CORS ni
 trasladar tokens al almacenamiento del navegador. `npm run preview` usa el mismo
 proxy para comprobar el build localmente.
@@ -129,8 +132,8 @@ propietario, booleanos con prefijo y sentencias y bloques legibles. El formulari
 expresa cambios mediante eventos `update:<prop>`; la página conecta esos eventos
 con el composable, sin mutar props ni introducir un store por formulario.
 
-Los proveedores visuales están en `app/plugins/uiLibraries.ts` y `vuetify.ts` y
-se cargan por ruta. No pertenecen al dominio de autenticación ni al laboratorio.
+El proveedor visual único está en `app/plugins/vuetify.ts` y se carga al arrancar,
+antes de registrar el router. No pertenece al dominio de autenticación.
 Si falla la carga asíncrona de una página o proveedor durante el arranque, se
 muestra StartupErrorPage con una acción de reintento. Esto no sustituye el manejo
 de fallos de API dentro del formulario.
@@ -151,5 +154,6 @@ manual sigue comprobando dependencias indirectas y comportamiento.
 
 `npm run check` valida tipos, lint y pruebas unitarias; `npm run test:e2e` comprueba
 la UI en Chromium. La suite del navegador simula respuestas de API y materiales:
-no comprueba contraseñas reales, firmas de tokens ni PostgreSQL. Esos contratos
+no comprueba contraseñas reales, firmas de tokens ni PostgreSQL. Materiales usa sus
+componentes Vue reales con respuestas HTTP simuladas. Los contratos persistentes
 pertenecen a las pruebas existentes del backend con una base aislada.

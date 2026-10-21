@@ -2,35 +2,16 @@
 
 Base de Vue 3 con TypeScript, componentes `.vue`, Composition API (`<script setup>`)
 y Vite, creada con la plantilla oficial `create-vite`. El login en `/inicio-sesion`
-usa Vuetify y VeeValidate y está conectado a Express. Conserva un comparador visual
-en `/inicio`; los módulos operativos todavía se sirven mediante EJS en `back/`.
+usa Vuetify y VeeValidate y está conectado a Express. Materiales, Consumibles y
+Mermas se sirven en Vue; los demás
+módulos conservan sus pantallas EJS en `back/`.
 
 ## Iniciar sesión
 
 Abre `http://localhost:5173/inicio-sesion` con Express ejecutándose en el puerto 3000.
 Vite dirige la API y los módulos EJS al backend mediante un proxy del mismo origen.
-Usa una cuenta existente: al autenticar se abre materiales EJS. Consulta
+Usa una cuenta existente: al autenticar se abre el primer módulo de Almacén permitido. Consulta
 [diseño, validación, cookies y configuración del proxy](docs/login.md).
-
-## Comparar los tres candidatos
-
-Abre `http://localhost:5173/inicio`. Hay tres botones: **MDB Vue**, **Vuetify** y
-**PrimeVue**. Cada uno muestra componentes reales de esa biblioteca, con el mismo
-formulario de usuario/contraseña. Prueba enviar vacío, escribir, mostrar/ocultar la
-contraseña y enviar los campos completos. No se realiza autenticación, almacenamiento
-ni llamadas a la API. Se conserva el vocabulario del login EJS: nombre de usuario,
-no correo electrónico. Sólo se comprueba captura obligatoria para comparar la UI;
-no se duplican ni sustituyen las reglas definitivas de autenticación del backend.
-
-La selección queda en la URL (`/inicio?ui=vuetify`, por ejemplo). Cada variante se
-carga en un iframe de la misma aplicación para aislar los estilos de las tres
-bibliotecas. Un enlace permite abrirla por separado. Son candidatos en evaluación;
-no se propone mantener las tres bibliotecas en el producto final.
-
-Si ves la plantilla anterior, revisa que estés en `features`, ejecuta `npm ci` en
-`front/` y reinicia `npm run dev`. Vite usa el puerto 5173 con `strictPort`: si está
-ocupado avisa en lugar de abrir silenciosamente otro puerto. Los cambios de estructura
-y herramientas previos no cambiaban la apariencia de la plantilla.
 
 ## Desarrollo
 
@@ -49,6 +30,8 @@ npm run dev
 Abre la URL que muestra Vite en la terminal. Express se inicia por separado desde
 `back/` con `npm run dev`. Para otro destino del proxy define `BACKEND_PROXY_TARGET`
 en `front/.env.local` y reinicia Vite; hay un ejemplo en `.env.example`.
+Vite usa el puerto 5173 con `strictPort`: si está ocupado avisa en lugar de abrir
+silenciosamente otro puerto.
 
 ## Dependencias no resueltas en Vite
 
@@ -106,19 +89,18 @@ Se instaló `vue-router@4` con `npm install vue-router@4` desde `front/`.
 Al clonar el repositorio basta con `npm ci`; la dependencia está en el lockfile.
 
 - `/` redirige a `/inicio-sesion`, el login operativo.
-- `/inicio` muestra el comparador y sus tres botones.
-- `/comparar/login/mdb`, `/comparar/login/vuetify` y `/comparar/login/primevue`
-  muestran las variantes aisladas.
-- `/ejemplo` conserva la demostración inicial del contador.
+- `/almacen` selecciona el primer módulo permitido para la cuenta.
+- `/almacen/materiales`, `/almacen/consumibles` y `/almacen/mermas` son los módulos
+  operativos, con sesión y permisos obtenidos de Express.
 - Una URL desconocida muestra la página no encontrada con un enlace al inicio.
 
-`main.ts` registra el router con `.use(createAppRouter())`. `App.vue` usa
+`main.ts` crea la sesión, la proporciona y registra el router con esa instancia. `App.vue` usa
 `RouterView`, y las páginas se cargan bajo demanda. Para agregar una página, crea
 su contenedor en el módulo correspondiente y registra su ruta en
 `src/app/router/index.ts`. Usa `RouterLink` para enlaces internos o `router.push`
 para navegar desde una operación. Un enlace HTML normal se mantiene para sitios externos.
 
-En desarrollo usa `npm run dev` y abre `/inicio`. También puedes entrar directamente
+En desarrollo usa `npm run dev` y abre `/inicio-sesion`. También puedes entrar directamente
 a esa dirección o recargarla. Para producción, el servidor debe devolver `index.html`
 al solicitar una ruta de la aplicación:
 
@@ -130,7 +112,10 @@ al solicitar una ruta de la aplicación:
 La página no encontrada se renderiza en el navegador; el fallback del servidor puede
 responder HTTP 200. El fallback debe ir después de los rewrites de API y EJS para
 que el login funcione en producción. La autorización definitiva permanece en Express;
-todavía no hay módulos Vue protegidos ni guardas de sesión.
+las guardas de Almacén comprueban la sesión y orientan la navegación, sin sustituir
+los controles del servidor. `/almacen` debe resolver a Vue, no al proxy EJS.
+
+Consulta [operaciones, reutilización y límites de Almacén](docs/warehouse.md).
 
 ## Herramientas y comprobaciones
 
@@ -171,9 +156,9 @@ En Linux, si faltan dependencias del sistema, usa `npx playwright install --with
 Playwright inicia Vite cuando hace falta. El puerto 5173 debe estar libre o servir
 esta misma copia del proyecto. En entornos con Chromium ya instalado puedes definir
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` con la ruta del ejecutable. CI instala su navegador.
-Los casos comprueban cada variante y el login operativo, con validación, errores,
-envío, cookies, reintento, almacenamiento y ancho móvil. Las respuestas del login
-y materiales se simulan; no se usa una base de datos real.
+Los casos comprueban el login y los tres módulos de Almacén, con validación,
+permisos, errores, envío, cookies, reintento, almacenamiento y ancho móvil. Las
+respuestas de API se simulan; no se usa una base de datos real.
 
 ## Estructura
 
@@ -181,13 +166,9 @@ y materiales se simulan; no se usa una base de datos real.
 - `src/app/router/index.ts`: rutas y carga diferida de páginas.
 - `src/app/pages/NotFoundPage.vue`: página para direcciones desconocidas.
 - `src/modules/auth/`: login, composable de formulario y adaptador HTTP.
-- `src/modules/uiComparison/pages/`: contenedores del comparador y de cada variante.
-- `src/modules/uiComparison/components/`: tres formularios y encabezado de presentación.
-- `src/modules/uiComparison/composables/`: estado y comportamiento común del login de prueba.
-- `src/app/plugins/`: proveedores visuales cargados sólo en el documento correspondiente.
-- `src/modules/welcome/pages/`: contenedor del ejemplo del contador.
-- `src/modules/welcome/components/`: presentación con props y eventos.
-- `src/modules/welcome/composables/`: estado y acciones del ejemplo.
+- `src/modules/warehouse/`: contenedores, componentes, composables y servicios de Almacén.
+- `src/shared/services/`: cliente HTTP protegido, compartido con la consulta de sesión.
+- `src/app/plugins/vuetify.ts`: proveedor visual y temas de login y Almacén.
 - `src/main.ts`: arranque de Vue.
 - `public/`: archivos estáticos sin transformar.
 - `vite.config.ts`: integración de Vue con Vite.

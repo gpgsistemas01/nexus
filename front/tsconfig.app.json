@@ -9,7 +9,14 @@
         "../back/src/public/js/constants/apiMessages.js",
         "../back/src/shared/constants/auth.js",
         "../back/src/shared/constants/inputValidation.js",
-        "../back/src/shared/messages/goodsReceiptMessages.js"
+        "../back/src/shared/messages/goodsReceiptMessages.js",
+        "../back/src/public/js/utils/validations/validators.js",
+        "../back/src/public/js/utils/validations/fieldValidations.js",
+        "../back/src/shared/constants/inventory.js",
+        "../back/src/shared/constants/permissions.js",
+        "../back/src/shared/inventory/wasteMeasurements.js",
+        "../back/src/shared/validation/weightValidations.js",
+        "../back/src/shared/utils/numberUtils.js"
     ],
     "compilerOptions": {
         "composite": true,
@@ -23,6 +30,15 @@
             ],
             "@nexus/api-messages": [
                 "../back/src/public/js/constants/apiMessages.js"
+            ],
+            "@nexus/warehouse-validation": [
+                "../back/src/public/js/utils/validations/validators.js"
+            ],
+            "@nexus/waste-measurements": [
+                "../back/src/shared/inventory/wasteMeasurements.js"
+            ],
+            "@nexus/permissions": [
+                "../back/src/shared/constants/permissions.js"
             ]
         },
         "noUnusedLocals": true,
