@@ -1,8 +1,16 @@
 # Nexus · Frontend
 
 Base de Vue 3 con TypeScript, componentes `.vue`, Composition API (`<script setup>`)
-y Vite, creada con la plantilla oficial `create-vite`. Incluye un comparador de login con MDB Vue, Vuetify y PrimeVue. Los módulos
-operativos de Nexus todavía se sirven mediante EJS en `back/`.
+y Vite, creada con la plantilla oficial `create-vite`. El login en `/inicio-sesion`
+usa Vuetify y VeeValidate y está conectado a Express. Conserva un comparador visual
+en `/inicio`; los módulos operativos todavía se sirven mediante EJS en `back/`.
+
+## Iniciar sesión
+
+Abre `http://localhost:5173/inicio-sesion` con Express ejecutándose en el puerto 3000.
+Vite dirige la API y los módulos EJS al backend mediante un proxy del mismo origen.
+Usa una cuenta existente: al autenticar se abre materiales EJS. Consulta
+[diseño, validación, cookies y configuración del proxy](docs/login.md).
 
 ## Comparar los tres candidatos
 
@@ -38,7 +46,8 @@ npm run dev
 ```
 
 Abre la URL que muestra Vite en la terminal. Express se inicia por separado desde
-`back/` con `npm run dev`. Esta base todavía no integra la API ni la autenticación.
+`back/` con `npm run dev`. Para otro destino del proxy define `BACKEND_PROXY_TARGET`
+en `front/.env.local` y reinicia Vite; hay un ejemplo en `.env.example`.
 
 ## Compilación y vista previa
 
@@ -66,7 +75,7 @@ npm --prefix front run build
 Se instaló `vue-router@4` con `npm install vue-router@4` desde `front/`.
 Al clonar el repositorio basta con `npm ci`; la dependencia está en el lockfile.
 
-- `/` redirige a `/inicio`.
+- `/` redirige a `/inicio-sesion`, el login operativo.
 - `/inicio` muestra el comparador y sus tres botones.
 - `/comparar/login/mdb`, `/comparar/login/vuetify` y `/comparar/login/primevue`
   muestran las variantes aisladas.
@@ -89,8 +98,9 @@ al solicitar una ruta de la aplicación:
   `/index.html` y acción **Rewrite**.
 
 La página no encontrada se renderiza en el navegador; el fallback del servidor puede
-responder HTTP 200. No hay autenticación ni guardas de sesión todavía. Cuando se
-integren, la autorización definitiva seguirá en Express.
+responder HTTP 200. El fallback debe ir después de los rewrites de API y EJS para
+que el login funcione en producción. La autorización definitiva permanece en Express;
+todavía no hay módulos Vue protegidos ni guardas de sesión.
 
 ## Herramientas y comprobaciones
 
@@ -131,13 +141,16 @@ En Linux, si faltan dependencias del sistema, usa `npx playwright install --with
 Playwright inicia Vite cuando hace falta. El puerto 5173 debe estar libre o servir
 esta misma copia del proyecto. En entornos con Chromium ya instalado puedes definir
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` con la ruta del ejecutable. CI instala su navegador.
-Los casos comprueban cada variante, la ausencia de llamadas API y el ancho móvil.
+Los casos comprueban cada variante y el login operativo, con validación, errores,
+envío, cookies, reintento, almacenamiento y ancho móvil. Las respuestas del login
+y materiales se simulan; no se usa una base de datos real.
 
 ## Estructura
 
 - `src/App.vue`: muestra la página activa mediante `RouterView`.
 - `src/app/router/index.ts`: rutas y carga diferida de páginas.
 - `src/app/pages/NotFoundPage.vue`: página para direcciones desconocidas.
+- `src/modules/auth/`: login, composable de formulario y adaptador HTTP.
 - `src/modules/uiComparison/pages/`: contenedores del comparador y de cada variante.
 - `src/modules/uiComparison/components/`: tres formularios y encabezado de presentación.
 - `src/modules/uiComparison/composables/`: estado y comportamiento común del login de prueba.
@@ -149,6 +162,10 @@ Los casos comprueban cada variante, la ausencia de llamadas API y el ancho móvi
 - `public/`: archivos estáticos sin transformar.
 - `vite.config.ts`: integración de Vue con Vite.
 
+Los alias `@nexus/login-validation` y `@nexus/api-messages` reutilizan módulos
+públicos de `back/`. Conserva el repositorio completo al compilar; no copies sólo
+`front/` a un directorio aislado. No se importan servicios ni secretos del backend.
+
 Vue gestiona la interfaz; Vite proporciona el servidor de desarrollo y la compilación.
 Vue Router maneja las URLs con historial HTML5. No se añadió un gestor de estado global.
 Las variables `VITE_*` son públicas al compilar: nunca contienen claves privadas ni
@@ -156,30 +173,34 @@ credenciales de PostgreSQL.
 
 El Dockerfile de la raíz sigue construyendo exclusivamente `back/`; `front/` está
 excluido mediante `.dockerignore`. En Vercel, el proyecto de frontend puede usar Root
-Directory `front`, Build Command `npm run build` y Output Directory `dist`.
+Directory `front`, Build Command `npm run build` y Output Directory `dist`,
+permitiendo fuentes fuera de Root Directory. El login también requiere los rewrites
+hacia Express descritos en [la guía del login](docs/login.md#proxy-y-despliegue).
 
 ## Docker para VPS o pruebas locales
 
 Desde la raíz del repositorio:
 
 ```bash
-docker build -t nexus-front ./front
-docker run --rm --name nexus-front -p 8080:80 nexus-front
+docker build -f front/Dockerfile -t nexus-front .
+docker run --rm --name nexus-front --network nexus -p 8080:80 -e BACKEND_UPSTREAM=http://backend:3000 nexus-front
 ```
 
-Abre `http://localhost:8080`. El contexto de construcción es `front/`, no la raíz.
+Abre `http://localhost:8080`. El contexto de construcción es la raíz; la red `nexus`
+debe existir y el contenedor Express debe tener el alias `backend` en ella.
 Docker instala las dependencias del lockfile y ejecuta `npm run build`; no necesitas
 crear `dist/` manualmente. La imagen final contiene Nginx y los archivos compilados,
 sin Node.js ni el servidor de desarrollo de Vite.
 
-`front/.dockerignore` excluye dependencias locales, compilaciones previas y `.env`.
+`front/Dockerfile.dockerignore` permite únicamente el frontend y los módulos públicos
+necesarios, excluyendo dependencias locales, compilaciones previas y `.env`.
 `nginx.conf` permite recargar rutas de la aplicación y devuelve 404 para recursos
-inexistentes bajo `/assets/`. No configura un proxy a Express: la integración con
-la API y su autenticación siguen pendientes.
+inexistentes bajo `/assets/`. El proxy a Express usa `BACKEND_UPSTREAM` al iniciar
+Nginx; consulta los detalles de red y despliegue en [la guía del login](docs/login.md).
 
 Las variables `VITE_*` se incorporan al compilar, no al arrancar Nginx. Pasarlas con
 `docker run -e` no cambia una compilación existente. Este Dockerfile no configura
-variables del API todavía; cuando se conecte el frontend habrá que definir ese contrato.
+credenciales del API. `BACKEND_UPSTREAM` es una variable de Nginx, independiente de Vite.
 
 El Dockerfile de la raíz y Docker Compose siguen construyendo únicamente el backend.
 Vercel utiliza la compilación de Vite directamente, sin este Dockerfile.

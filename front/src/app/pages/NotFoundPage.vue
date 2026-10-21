@@ -6,7 +6,7 @@ import { RouterLink } from 'vue-router';
   <main class="not-found">
     <h1>Página no encontrada</h1>
     <p>La dirección que abriste no corresponde a una página de Nexus.</p>
-    <RouterLink :to="{ name: 'comparison' }">Volver al inicio</RouterLink>
+    <RouterLink :to="{ name: 'login' }">Volver al inicio</RouterLink>
   </main>
 </template>
 

@@ -26,7 +26,7 @@ flowchart LR
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
     middleware["middleware (5 módulos)"] --> services["services (68 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (12 módulos)"]
-    public["public (211 módulos)"] --> shared["shared (10 módulos)"]
+    public["public (212 módulos)"] --> shared["shared (10 módulos)"]
     repository["repository (8 módulos)"] --> constants["constants (11 módulos)"]
     repository["repository (8 módulos)"] --> errors["errors (20 módulos)"]
     repository["repository (8 módulos)"] --> lib["lib (3 módulos)"]

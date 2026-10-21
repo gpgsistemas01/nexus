@@ -1,12 +1,13 @@
 # Nexus
 
 La aplicación actual de Express, Prisma y vistas EJS vive en `back/`.
-El frontend Vue 3 con TypeScript, Router y Vite está en `front/`, con un comparador visual de login para la migración gradual.
+El frontend Vue 3 con TypeScript, Router y Vite está en `front/`, con login conectado
+a Express usando Vuetify y VeeValidate para la migración gradual.
 Las pantallas operativas actuales siguen renderizándose con EJS en el backend.
 
 ```text
 back/                 # Express, EJS, Prisma, pruebas y documentación
-front/                # Vue 3 + Vite, plantilla inicial
+front/                # Vue 3 + Vite, login y laboratorio visual
 .github/workflows/    # CI del repositorio
 Dockerfile            # Construye el backend usando el contexto raíz
 docker-compose.yml    # Ejecuta el backend con back/.env
@@ -44,8 +45,9 @@ son relativas a `back/`.
 
 ## Frontend Vue
 
-Abre `/inicio` en el puerto 5173 para comparar **MDB Vue**, **Vuetify** y **PrimeVue**
-con tres botones y formularios reales. Es una demostración visual sin autenticación.
+Abre `/inicio-sesion` en el puerto 5173 para usar el login Vue con Express ejecutándose
+en el puerto 3000. Al autenticar se abre materiales EJS. `/inicio` conserva el
+comparador de **MDB Vue**, **Vuetify** y **PrimeVue**, una demostración sin autenticación.
 Si tienes una copia anterior, actualiza `features`, instala con `npm ci` en `front/`
 y reinicia Vite. La plantilla del contador se conserva en `/ejemplo`.
 
@@ -61,7 +63,8 @@ npm run dev
 
 Para compilar: `npm run build` desde `front/`, o `npm --prefix front run build` desde
 la raíz. La salida queda en `front/dist/`. Consulta [la guía del frontend](front/README.md).
-Esta plantilla aún no está conectada a las API ni reemplaza las pantallas EJS.
+El login integra la API mediante un proxy; los demás módulos conservan sus pantallas EJS.
+Consulta [configuración y alcance del login](front/docs/login.md).
 Desde la raíz, `npm --prefix front run check` ejecuta ESLint, pruebas y build con tipos.
 En VS Code instala las extensiones recomendadas Vue - Official y ESLint; para
 comprobar tipos continuamente usa `npm --prefix front run type-check:watch`.
@@ -75,8 +78,9 @@ GitHub Actions conserva sus disparadores y ejecuta los comandos desde `back/`.
 ## Docker y Render
 
 El frontend dispone de su propio [Dockerfile y comandos](front/README.md#docker-para-vps-o-pruebas-locales).
-Desde la raíz, `docker build -t nexus-front ./front` compila Vue automáticamente.
-Para probarlo: `docker run --rm -p 8080:80 nexus-front`.
+Desde la raíz, `docker build -f front/Dockerfile -t nexus-front .` compila Vue
+y sus reglas públicas compartidas automáticamente. Para probarlo con Express,
+consulta la red y `BACKEND_UPSTREAM` en [la guía del frontend](front/docs/login.md).
 
 Desde la raíz: `docker compose up --build`. El archivo local de entorno está
 en `back/.env`; nunca se versiona ni se copia a la imagen.

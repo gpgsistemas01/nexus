@@ -1,8 +1,22 @@
 {
-  "extends": "./tsconfig.app.json",
-  "include": ["env.d.ts", "src/**/*.ts", "src/**/*.vue", "tests/**/*.ts"],
-  "compilerOptions": {
-    "types": ["vite/client", "node"],
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo"
-  }
+    "extends": "./tsconfig.app.json",
+    "include": [
+        "env.d.ts",
+        "src/**/*.ts",
+        "src/**/*.vue",
+        "tests/**/*.ts",
+        "../back/src/public/js/utils/validations/loginValidation.js",
+        "../back/src/public/js/utils/validations/baseValidations.js",
+        "../back/src/public/js/constants/apiMessages.js",
+        "../back/src/shared/constants/auth.js",
+        "../back/src/shared/constants/inputValidation.js",
+        "../back/src/shared/messages/goodsReceiptMessages.js"
+    ],
+    "compilerOptions": {
+        "types": [
+            "vite/client",
+            "node"
+        ],
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo"
+    }
 }

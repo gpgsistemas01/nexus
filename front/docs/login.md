@@ -1,0 +1,155 @@
+# Login Vue
+
+## Alcance y ejecución
+
+`/` redirige a `/inicio-sesion`. El login usa Vuetify y VeeValidate, conserva la
+tarjeta verde oscura y la distribución del EJS y envía las credenciales a Express.
+El comparador continúa en `/inicio`; sus formularios siguen siendo demostraciones.
+Al autenticar se abre `/almacen/materiales` con una navegación completa: materiales
+y los demás módulos todavía se sirven en EJS.
+
+Desde la raíz, inicia cada aplicación en una terminal:
+
+```bash
+npm --prefix back run dev
+```
+
+```bash
+npm --prefix front ci --include=dev
+npm --prefix front run dev
+```
+
+Abre `http://localhost:5173/inicio-sesion`. Express debe contar con su configuración
+habitual y una cuenta existente. Vite usa `http://127.0.0.1:3000` como destino del
+proxy. Para cambiarlo, crea `front/.env.local` con `BACKEND_PROXY_TARGET`, tomando
+como referencia `.env.example`, y reinicia Vite. Esta variable es del servidor de
+desarrollo, no una clave pública `VITE_*`.
+
+## Diseño y responsabilidades
+
+- `pages/LoginPage.vue` compone la pantalla y navega después del acceso.
+- `components/LoginForm.vue` usa controles Vuetify y sólo recibe props/emite eventos.
+- `composables/useLoginForm.ts` conecta VeeValidate, captura, envío y errores.
+- `services/authService.ts` adapta el contrato HTTP existente usando `fetch`.
+
+Los colores, fondo, tarjeta y distribución se adaptaron de `loginPage.ejs` y de
+su sección de `style.css`; no se modifica el EJS ni se carga MDB en este login.
+El repositorio no contiene el `/img/logo.png` referenciado por el EJS: se usa una
+N provisional. Coloca una imagen en `front/public/` y define, por ejemplo,
+`VITE_LOGIN_LOGO_URL=/logo.png` antes de arrancar o compilar. Un fallo de carga
+recupera la N. Los valores `VITE_*` son públicos y se incorporan al build.
+En Docker puedes pasar `--build-arg VITE_LOGIN_LOGO_URL=/logo.png`; la imagen debe
+estar en `front/public/` antes de construir.
+
+## Captura y validación
+
+Las reglas públicas del login se extrajeron a
+`back/src/public/js/utils/validations/loginValidation.js` sin cambiar su comportamiento.
+El formulario EJS importa ese módulo directamente. Los alias de
+Vite/TypeScript importan esa misma fuente y los mensajes públicos existentes;
+no hay una copia de las reglas en Vue ni se importa código privado de Express.
+
+VeeValidate comprueba campos obligatorios, tipo y longitudes máximas existentes.
+El login no impone la política de contraseñas de altas: las credenciales históricas
+cortas siguen siendo válidas para captura. Se recorta el usuario, pero se conservan
+exactamente los espacios de la contraseña. Los errores se presentan al salir de un
+campo o enviar; editar limpia el error anterior. Durante el envío se deshabilitan
+los controles y se bloquean solicitudes simultáneas. Zod no se incorpora porque
+las reglas públicas existentes ya resuelven esta primera migración.
+
+“Recordar usuario” guarda únicamente el nombre en `nexus.rememberedUser` después
+de un acceso correcto. Desmarcarlo elimina ese valor al autenticar. Al abrir el
+login se elimina la antigua clave `loginRememberedCredentials` del mismo origen;
+no se recupera ni guarda su contraseña. Si el navegador bloquea el almacenamiento,
+el inicio de sesión sigue funcionando. Las cookies no cambian su duración por
+esta opción; no equivale a mantener la sesión abierta.
+
+## Contrato HTTP y sesión
+
+El frontend hace un único `POST /api/auth/login`, con JSON `{ name, password }` y
+cookies del mismo origen. Sólo `200` con `code: SUCCESS_LOGIN` confirma el acceso;
+una página HTML o un JSON inesperado no lo confirma. Los errores de campo con códigos
+desconocidos no se muestran como mensajes sin traducir. No se intenta renovar tokens
+cuando falla el login.
+
+| Respuesta | Comportamiento de Vue |
+| --- | --- |
+| `400 VALIDATION_ERROR` y `errors.<campo>.code` | Traduce con los mensajes públicos y muestra errores de campo. |
+| `401` | Mensaje genérico de usuario o contraseña incorrectos. |
+| `429`, incluso con texto/HTML del proxy | Solicita esperar antes de volver a intentar. |
+| `5xx`, respuesta inesperada, red o tiempo de espera de 15 s | Mensaje recuperable y controles habilitados para reintentar. |
+| `200 SUCCESS_LOGIN` | Conserva cookies recibidas y abre materiales EJS. |
+
+Express conserva validación definitiva, autenticación, autorización y cookies
+HttpOnly/SameSite=Lax. En `NODE_ENV=production` llevan Secure y requieren HTTPS. Vue no lee ni guarda tokens. No se agregan guardas ni una sesión global
+para módulos Vue protegidos que todavía no existen. Las notificaciones `flash`
+HttpOnly del flujo EJS no se muestran en la pantalla Vue; el nuevo login muestra
+sus propios resultados de envío.
+
+## Proxy y despliegue
+
+Vite y Nginx encaminan `/api`, las rutas operativas EJS, recursos `/css`, `/js`,
+`/img`, `/shared`, `/socket.io` y las rutas de renovación/cierre a Express.
+`/inicio-sesion`, `/inicio` y los assets compilados pertenecen a Vue. Esto permite
+seguir usando el mismo origen y las cookies actuales sin habilitar CORS ni
+trasladar tokens al almacenamiento del navegador. `npm run preview` usa el mismo
+proxy para comprobar el build localmente.
+
+El Dockerfile del frontend usa ahora la raíz del repositorio como contexto para
+compilar las fuentes públicas compartidas:
+
+```bash
+docker build -f front/Dockerfile -t nexus-front .
+docker network create nexus
+docker run --rm --name nexus-front --network nexus -p 8080:80 \
+  -e BACKEND_UPSTREAM=http://backend:3000 nexus-front
+```
+
+El contenedor Express debe estar en esa red con nombre o alias `backend`, escuchando
+en el puerto indicado. `BACKEND_UPSTREAM` se aplica al iniciar Nginx, acepta un
+origen HTTP/HTTPS sin ruta y no se publica en el bundle. Puede cambiarse por el
+origen del backend elegido. El contenedor Vue puede servir la pantalla aunque el
+backend aún no esté disponible; las solicitudes entonces fallarán de forma recuperable.
+El resolver configurado es el DNS de redes Docker. Para otro entorno adapta el proxy.
+El Dockerfile raíz y Compose continúan construyendo sólo Express.
+
+En Vercel o Render Static Site, el fallback SPA por sí solo no integra el login.
+Hace falta un proxy/rewrite del mismo origen hacia Express **antes** del fallback,
+tanto para `/api` como para los módulos EJS y sus recursos. El hostname de producción
+no se ha definido ni se ha desplegado esta integración. No basta con usar directamente
+una URL Render desde Vue: el backend actual no configura CORS y sus cookies son
+`SameSite=Lax`. En Vercel permite acceso a archivos fuera de Root Directory `front`
+para las fuentes públicas compartidas; conserva el repositorio completo al construir.
+
+## Arquitectura y estándares revisados
+
+Se aplica el [estándar de codificación del repositorio](../../back/docs/architecture/coding-standards/index.md):
+cuatro espacios en fuentes/configuración, dos en pruebas, imports desde el módulo
+propietario, booleanos con prefijo y sentencias y bloques legibles. El formulario
+expresa cambios mediante eventos `update:<prop>`; la página conecta esos eventos
+con el composable, sin mutar props ni introducir un store por formulario.
+
+Los proveedores visuales están en `app/plugins/uiLibraries.ts` y `vuetify.ts` y
+se cargan por ruta. No pertenecen al dominio de autenticación ni al laboratorio.
+Si falla la carga asíncrona de una página o proveedor durante el arranque, se
+muestra StartupErrorPage con una acción de reintento. Esto no sustituye el manejo
+de fallos de API dentro del formulario.
+
+`useLoginForm` aborta al desmontar y descarta respuestas tardías. Su captura de
+errores cubre la solicitud HTTP; el almacenamiento opcional y la navegación se
+realizan después de confirmar el acceso, sin presentarlos como credenciales
+rechazadas. Los mensajes nuevos reutilizados por esas capas viven en
+`auth/loginMessages.ts`; LOGIN_ERROR y los códigos de campo conservan la traducción
+pública existente. No se incluye el AppError privado de Express en el navegador.
+
+ESLint rechaza imports directos de HTTP, stores, páginas, validadores y VeeValidate
+en la presentación; también llamadas directas a fetch/XMLHttpRequest y acceso a
+localStorage/sessionStorage, incluidas las formas window/globalThis. La revisión
+manual sigue comprobando dependencias indirectas y comportamiento.
+
+## Verificación
+
+`npm run check` valida tipos, lint y pruebas unitarias; `npm run test:e2e` comprueba
+la UI en Chromium. La suite del navegador simula respuestas de API y materiales:
+no comprueba contraseñas reales, firmas de tokens ni PostgreSQL. Esos contratos
+pertenecen a las pruebas existentes del backend con una base aislada.

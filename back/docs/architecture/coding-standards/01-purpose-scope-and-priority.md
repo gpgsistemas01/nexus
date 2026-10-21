@@ -6,8 +6,8 @@ nombres, formato, imports, exports y organización de un archivo se mantienen aq
 no crear estándares parciales o contradictorios. `AGENTS.md` contiene las instrucciones
 de trabajo del repositorio; ante una discrepancia, prevalecen sus restricciones.
 
-El estándar aplica a JavaScript del servidor y navegador, EJS, pruebas, scripts y
-configuración mantenida por el proyecto. Prisma, SQL y Markdown conservan además las
+El estándar aplica a JavaScript/TypeScript del servidor y navegador, componentes Vue,
+EJS, pruebas, scripts y configuración mantenida por el proyecto. Prisma, SQL y Markdown conservan además las
 convenciones propias de su lenguaje. Se aplica al código nuevo y a las líneas que se
 modifican; no autoriza reformatear módulos ajenos al cambio ni mezclar una corrección
 funcional con una reescritura general.
@@ -30,5 +30,8 @@ Si dos reglas parecen competir, se aplica esta prioridad:
 - Aplicar las reglas al cambio revisado. La existencia de código legado con otro estilo
   no justifica una reescritura general ni implica que todo el repositorio ya cumpla el estándar.
 
-No hay un comando de lint o un formateador configurado en `package.json`. El formato
-se revisa en el diff; las pruebas y `docs:check` no certifican el estilo del código.
+El backend no configura un comando de lint ni un formateador. El frontend tiene
+ESLint y comprobación de tipos mediante `npm run check` desde `front/`; su alcance
+se describe en [herramientas del frontend](../../../../front/docs/tooling.md).
+El formato se revisa también en el diff: pruebas, tipos y `docs:check` no certifican
+por sí mismos el estilo ni la arquitectura.

@@ -5,8 +5,9 @@
 Esta decisión aplica a `front/`, con Vue 3, TypeScript, componentes `.vue` y
 Composition API. El módulo `welcome` demuestra las fronteras con la pantalla de
 la plantilla. `uiComparison` compara tres bibliotecas sobre un login de prueba;
-ninguno es un módulo operativo ni una migración de las pantallas EJS.
-La API, autenticación y módulos operativos aún no se han integrado.
+ambos siguen siendo demostraciones. El módulo `auth` incorpora el login operativo
+con Vuetify, VeeValidate y la API de Express; después abre materiales EJS.
+Consulta [el contrato y despliegue del login](login.md).
 
 ## Contenedores y presentación
 
@@ -37,14 +38,20 @@ de la plantilla; no introduce un almacén global ni representa un flujo de negoc
 `main.ts` instala Vue Router 4 mediante `createAppRouter`. El router de
 `src/app/router/index.ts` usa historial HTML5 con la base de Vite. Su fábrica permite
 inyectar historial en memoria para comprobar navegación sin navegador.
-`/` redirige a `/inicio` (UiComparisonPage); `/ejemplo` conserva WelcomePage.
+`/` redirige a `/inicio-sesion` (LoginPage); `/inicio` conserva UiComparisonPage y
+`/ejemplo` conserva WelcomePage.
 `/comparar/login/:library` admite mdb, vuetify y primevue; el catch-all carga NotFoundPage. Las páginas
 usan imports dinámicos para carga diferida. Esto no modifica la propiedad del estado:
 las rutas eligen contenedores y éstos componen presentación y composables.
 
 El enlace al inicio usa RouterLink. Nginx y `front/vercel.json` configuran el fallback
 a index.html; para Render Static Site se documenta el rewrite equivalente en el README.
-No se implementan guardas ni permisos hasta integrar la autenticación del backend.
+Los proveedores están en `app/plugins/uiLibraries.ts` y `vuetify.ts`.
+Una guarda de preparación instala el proveedor visual requerido antes de resolver
+la página, también en navegación interna desde una URL desconocida. No comprueba
+sesión ni permisos: las operaciones protegidas siguen en Express/EJS.
+Si falla la carga inicial, StartupErrorPage permite reintentar; no se deja un rechazo
+de bootstrap sin manejar. Las respuestas HTTP se manejan en el módulo auth.
 
 ## Comparador de candidatos visuales
 
@@ -85,7 +92,7 @@ un contrato explícito.
 | Contenedor/presentación | Aplicado en WelcomePage y WelcomePanel. Props hacia abajo y eventos hacia arriba. |
 | Composición mediante composables | Aplicada en useWelcomeCounter. Reutiliza comportamiento reactivo sin acoplarlo al marcado. |
 | Organización por módulos | Aplicada en modules/welcome. Cada dominio agrupa sus responsabilidades. |
-| Servicios y adaptadores HTTP | Se incorporarán al conectar la API. El servicio transporta datos; el adaptador normaliza el contrato. No hace falta crear wrappers que sólo reenvían llamadas. |
+| Servicios y adaptadores HTTP | `auth/services/authService.ts` envía credenciales mediante fetch y traduce el contrato de errores existente. No lee tokens ni renueva sesión al fallar el login. |
 | Estado compartido con Pinia | Pendiente hasta que varias pantallas necesiten un propietario común, como sesión y permisos de presentación. Los formularios mantienen estado local por defecto. |
 | Slots | Se usarán cuando un componente necesite composición de contenido. No se añade una abstracción sin consumidor. |
 
@@ -93,6 +100,18 @@ No se impone Atomic Design, una arquitectura hexagonal completa ni un bus global
 de eventos. Agregar carpetas y capas no sustituye responsabilidades claras.
 
 ## Adaptación del frontend EJS
+
+LoginPage conserva fondo, tarjeta y disposición del login EJS. LoginForm presenta
+controles Vuetify mediante props/eventos; useLoginForm conecta las reglas públicas
+a VeeValidate y controla estado, errores y envío. “Recordar usuario” nunca persiste
+contraseñas y no cambia la duración de las cookies. No se agrega Pinia para este
+formulario local. La navegación posterior es completa hacia materiales EJS.
+
+Las reglas del login se mantienen en `back/src/public/js/utils/validations/loginValidation.js`,
+importadas directamente por el formulario EJS. Vite y TypeScript las resuelven mediante
+alias junto con los mensajes públicos. Esto exige conservar las fuentes compartidas
+al compilar y usar la raíz como contexto del Dockerfile frontend. La imagen final
+contiene sólo assets y Nginx. El backend continúa construyéndose por separado.
 
 - `back/src/views/pages` se transforma en páginas y composición Vue; los parciales
   reutilizables de `views/shared` orientan los componentes visuales.
@@ -115,7 +134,9 @@ de eventos. Agregar carpetas y capas no sustituye responsabilidades claras.
 
 Componentes `.vue` en PascalCase, composables `useNombre.ts` y funciones con exports
 nombrados. Imports relativos de módulos con `.js` (resuelto al fuente `.ts` por TypeScript/Vite);
-componentes con `.vue`. Se usa `<script setup lang="ts">` y props/eventos tipados.
+componentes con `.vue`. Se usa `<script setup lang="ts">` y props/eventos tipados. El formato y los nombres se rigen por el
+[estándar de codificación](../../back/docs/architecture/coding-standards/index.md),
+incluida su sección de Vue/TypeScript; no se define un estándar paralelo aquí.
 Los componentes de presentación no importan clientes HTTP ni almacenes de sesión.
 Las suscripciones, temporizadores y plugins se liberan al desmontar cuando corresponda.
 

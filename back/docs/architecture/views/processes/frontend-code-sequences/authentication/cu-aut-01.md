@@ -22,8 +22,7 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `API` | control | [`authController.js`](../../../../../../src/controllers/api/authController.js) |
 | `FormUtils` | control | [`formUtils.js`](../../../../../../src/public/js/utils/formUtils.js) |
 | `FileUtils` | control | [`utils.js`](../../../../../../src/public/js/api/utils.js) |
-| `FileValidators` | control | [`validators.js`](../../../../../../src/public/js/utils/validations/validators.js) |
-| `FileFieldValidations` | control | [`fieldValidations.js`](../../../../../../src/public/js/utils/validations/fieldValidations.js) |
+| `FileValidators` | control | [`loginValidation.js`](../../../../../../src/public/js/utils/validations/loginValidation.js) |
 | `FileBaseValidations` | control | [`baseValidations.js`](../../../../../../src/public/js/utils/validations/baseValidations.js) |
 | `FormCore` | control | [`formUI.js`](../../../../../../src/public/js/ui/forms/formUI.js) |
 | `FileFormErrorsUI` | control | [`formErrorsUI.js`](../../../../../../src/public/js/ui/forms/formErrorsUI.js) |
@@ -48,13 +47,10 @@ flowchart TB
     subgraph Component1["Interfaz"]
         Form["loginForm.js"]
         FileBaseValidations["baseValidations.js"]
-        FileFieldValidations["fieldValidations.js"]
-        FileValidators["validators.js"]
+        FileValidators["loginValidation.js"]
     end
     Form -->|import| FileValidators
-    FileFieldValidations -->|import| FileBaseValidations
     FileValidators -->|import| FileBaseValidations
-    FileValidators -->|import| FileFieldValidations
     Transport -->|import| API
 ```
 

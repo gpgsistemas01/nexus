@@ -19,6 +19,18 @@ departamentos activos otorgan permisos. Una cuenta inactiva o sin asignaciones v
 no puede iniciar sesión, renovar ni superar la autorización.
 La relación cuenta–persona no es uno a uno: `personId` no tiene una restricción única.
 
+## Sesión web y cookies
+
+Express administra las cookies `accessToken` y `refreshToken`; el navegador no
+necesita leer sus valores para iniciar sesión. Se emiten con `HttpOnly` y
+`SameSite=Lax`. `NODE_ENV=production` añade `Secure`, por lo que requieren HTTPS;
+el desarrollo y las pruebas locales admiten HTTP. La renovación y el cierre
+conservan las opciones de seguridad al emitir o eliminar cookies.
+
+El login Vue usa el mismo origen mediante proxy y sólo recuerda el nombre de usuario
+si se solicita. Esa preferencia no modifica la duración de las cookies ni traslada
+contraseñas o tokens a localStorage. El backend mantiene los permisos efectivos.
+
 ## Autorización
 
 `getLoggedUser` lee las asignaciones vigentes y deriva `permissions`, `scope` y

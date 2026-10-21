@@ -37,3 +37,28 @@ de registro o limpieza. Las escrituras usan el manejo compartido del formulario 
 evitar envíos simultáneos y recuperar controles ante errores admitidos por el flujo.
 Una modificación visible revisa permisos, comportamiento responsivo, manual y capturas
 relacionadas; la captura automática no crea datos de operación.
+
+### 8.2 Componentes Vue y TypeScript
+
+- Aplicar la indentación de cuatro espacios de la sección 2 a TypeScript, templates
+  y estilos de componentes nuevos o modificados; conservar dos espacios en pruebas.
+- Componentes `.vue` en PascalCase, con `<script setup lang="ts">`. Composables en
+  `useNombre.ts`, módulos TypeScript en camelCase e imports relativos con `.js`,
+  resueltos por TypeScript/Vite. Las convenciones de nombres y booleanos de la sección
+  3 también aplican a props y estado reactivo.
+- Páginas y composables coordinan valores, validación y operaciones. Los componentes
+  de presentación reciben props tipadas y emiten acciones o `update:<prop>`; no mutan
+  props, consultan HTTP, persisten datos ni deciden autenticación.
+- La biblioteca visual presenta controles; VeeValidate conecta las reglas públicas
+  con el formulario. No copiar los validadores ni trasladar las reglas privadas del
+  servidor al bundle. Importar desde su módulo propietario, sin reexports de comodidad.
+- Liberar operaciones pendientes al desmontar y descartar respuestas tardías.
+  Separar errores HTTP de efectos posteriores a un acceso confirmado, como recordar
+  el usuario o navegar. Un fallo opcional de almacenamiento admite continuar sin esa
+  preferencia; no debe convertir el acceso confirmado en un rechazo de credenciales.
+- La configuración de proveedores pertenece a `app/plugins`; no se mezcla con los
+  módulos de negocio. Un rechazo durante la preparación asíncrona del arranque debe
+  tener una recuperación visible.
+
+Las responsabilidades por módulo se mantienen en la
+[arquitectura del frontend](../../../../front/docs/architecture.md).

@@ -4,8 +4,7 @@ import {
     MONEY_INPUT_FORMAT,
     PERSON_NAME_PATTERN
 } from '../../../../shared/constants/inputValidation.js';
-import { AUTH_FIELD_LIMITS } from '../../../../shared/constants/auth.js';
-import { isEmptyOrNull, isString, isLengthInRangeMax } from "./baseValidations.js";
+import { isEmptyOrNull } from "./baseValidations.js";
 import { isRollPresentation } from '../../../../shared/inventory/wasteMeasurements.js';
 import {
     validateUUID,
@@ -135,15 +134,6 @@ export const wasteValidation = {
     ...wasteSecondaryDataValidation,
     initialQuantity: value => validateNumber(value, 'La cantidad inicial de merma'),
     observations: wasteStockAdjustmentValidation.observations,
-}
-
-export const loginValidation = {
-    name: value => isEmptyOrNull(value, 'El nombre de usuario')
-        || isString(value, 'El nombre de usuario')
-        || isLengthInRangeMax(value.trim(), AUTH_FIELD_LIMITS.USERNAME_MAX_LENGTH, 'El nombre de usuario'),
-    password: value => isEmptyOrNull(value, 'La contraseña')
-        || isString(value, 'La contraseña')
-        || isLengthInRangeMax(value, AUTH_FIELD_LIMITS.PASSWORD_MAX_LENGTH, 'La contraseña')
 }
 
 export const addGoodsReceiptMaterialValidation = {

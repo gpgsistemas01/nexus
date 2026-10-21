@@ -53,7 +53,7 @@ const selectLibrary = (id: LoginLibrary) => router.replace({ name: 'comparison',
             <li><span>03</span>Completa los datos y compara la respuesta.</li>
           </ol>
           <a :href="previewUrl" target="_blank" rel="noopener" class="open-preview">Abrir esta variante <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 12 12 4M4 4h8v8" /></svg></a>
-          <p class="comparison-disclaimer">Prototipo visual. Los datos no se envían ni se guardan. El acceso actual del sistema sigue en EJS.</p>
+          <p class="comparison-disclaimer">Prototipo visual. Los datos no se envían ni se guardan. <a href="/inicio-sesion">Abrir el login del sistema</a>.</p>
         </aside>
       </section>
       <footer class="comparison-footer"><span>Mismo formulario · componentes reales · comportamiento compartido</span><span>NEXUS / UI EXPLORER</span></footer>

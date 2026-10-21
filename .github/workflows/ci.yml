@@ -163,10 +163,10 @@ jobs:
       - name: Type-check and build frontend
         run: npm run build
 
-      - name: Install browser for UI comparison tests
+      - name: Install browser for frontend tests
         run: npx playwright install --with-deps chromium
 
-      - name: Test UI comparison in browser
+      - name: Test login and UI comparison in browser
         run: npm run test:e2e
 
       - name: Upload frontend test results

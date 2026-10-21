@@ -1,19 +1,30 @@
+# syntax=docker/dockerfile:1
 FROM node:24-bookworm-slim AS build
 
-WORKDIR /app
+WORKDIR /app/front
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY front/package.json front/package-lock.json ./
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then \
+      NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca npm ci; \
+    else npm ci; fi
 
-COPY index.html vite.config.ts vitest.config.ts playwright.config.ts env.d.ts tsconfig*.json ./
-COPY public ./public
-COPY src ./src
+COPY front/index.html front/vite.config.ts front/vitest.config.ts front/playwright.config.ts front/env.d.ts front/tsconfig*.json ./
+COPY front/public ./public
+COPY front/src ./src
+# Sólo módulos públicos compartidos; no se copia el código privado de Express.
+COPY back/src/public/js/utils/validations/loginValidation.js back/src/public/js/utils/validations/baseValidations.js /app/back/src/public/js/utils/validations/
+COPY back/src/public/js/constants/apiMessages.js /app/back/src/public/js/constants/
+COPY back/src/shared/constants/auth.js back/src/shared/constants/inputValidation.js /app/back/src/shared/constants/
+COPY back/src/shared/messages/goodsReceiptMessages.js /app/back/src/shared/messages/
+ARG VITE_LOGIN_LOGO_URL=""
 RUN npm run build
 
 FROM nginx:stable-alpine AS runtime
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
+ENV BACKEND_UPSTREAM=http://backend:3000
+COPY front/nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=build /app/front/dist /usr/share/nginx/html
 
 EXPOSE 80
 
