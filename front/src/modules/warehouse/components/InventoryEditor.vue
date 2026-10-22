@@ -197,6 +197,7 @@ const titleId = useId();
 .inventory-editor {
     border-radius: 1rem;
     background: rgb(var(--v-theme-background));
+    box-shadow: 0 1.25rem 3rem rgba(var(--v-theme-on-surface), 0.18);
 }
 .editor-title {
     display: flex;
@@ -204,7 +205,8 @@ const titleId = useId();
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.5rem;
-    background: rgb(var(--v-theme-primary));
+    background: rgb(var(--v-theme-modal-header));
+    border-bottom: 5px solid rgb(var(--v-theme-accent));
     color: white;
     white-space: normal;
 }
@@ -221,6 +223,7 @@ const titleId = useId();
 }
 .editor-body {
     padding: 1.25rem !important;
+    background: linear-gradient(180deg, rgba(var(--v-theme-primary), 0.08), transparent 16rem);
 }
 .editor-context {
     margin-bottom: 1rem;
@@ -233,6 +236,7 @@ const titleId = useId();
     border-radius: 0.85rem;
     padding: 1rem;
     margin-bottom: 1rem;
+    box-shadow: 0 0.2rem 0.65rem rgba(var(--v-theme-on-surface), 0.04);
 }
 .section-heading {
     border-bottom: 1px solid rgba(var(--v-theme-primary), 0.22);

@@ -19,7 +19,8 @@ const emit = defineEmits<LoginFormEmits>();
             id="login-name-label"
             class="login-label"
             for="login-name"
-        >Nombre de usuario</label>
+            >Nombre de usuario</label
+        >
         <VTextField
             id="login-name"
             name="name"
@@ -43,7 +44,8 @@ const emit = defineEmits<LoginFormEmits>();
             id="login-password-label"
             class="login-label"
             for="login-password"
-        >Contraseña</label>
+            >Contraseña</label
+        >
         <VTextField
             id="login-password"
             name="password"
@@ -80,14 +82,18 @@ const emit = defineEmits<LoginFormEmits>();
                 :aria-pressed="isPasswordVisible"
                 :disabled="isSubmitting"
                 @click="emit('togglePassword')"
-            >{{ isPasswordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña' }}</button>
+            >
+                {{ isPasswordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña' }}
+            </button>
         </div>
         <p
             v-if="message"
             class="login-error"
             role="alert"
             aria-label="Error de acceso"
-        >{{ message }}</p>
+        >
+            {{ message }}
+        </p>
         <VBtn
             type="submit"
             color="primary"
@@ -97,7 +103,8 @@ const emit = defineEmits<LoginFormEmits>();
             :loading="isSubmitting"
             :disabled="isSubmitting"
             class="login-submit"
-        >{{ isSubmitting ? 'Ingresando…' : 'Ingresar' }}</VBtn>
+            >{{ isSubmitting ? 'Ingresando…' : 'Ingresar' }}</VBtn
+        >
     </form>
 </template>
 
@@ -105,9 +112,9 @@ const emit = defineEmits<LoginFormEmits>();
 .login-label {
     display: block;
     color: #d7e6dc;
-    font-size: .875rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
 }
 
 .login-form :deep(.v-field__input) {
@@ -123,7 +130,7 @@ const emit = defineEmits<LoginFormEmits>();
 .login-form :deep(.v-input__details) {
     color: #ffb4ab;
     padding-inline: 0;
-    padding-bottom: .5rem;
+    padding-bottom: 0.5rem;
 }
 
 .login-form :deep(.v-messages) {
@@ -135,7 +142,7 @@ const emit = defineEmits<LoginFormEmits>();
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: .5rem 1rem;
+    gap: 0.5rem 1rem;
     margin-bottom: 1.5rem;
 }
 
@@ -149,7 +156,7 @@ const emit = defineEmits<LoginFormEmits>();
 
 .login-options :deep(.v-label) {
     color: #d7e6dc;
-    font-size: .875rem;
+    font-size: 0.875rem;
     opacity: 1;
 }
 
@@ -157,9 +164,9 @@ const emit = defineEmits<LoginFormEmits>();
     background: none;
     border: 0;
     color: #9ce7b5;
-    font-size: .8rem;
+    font-size: 0.8rem;
     cursor: pointer;
-    padding: .5rem 0;
+    padding: 0.5rem 0;
 }
 
 .password-toggle:focus-visible {
@@ -169,25 +176,25 @@ const emit = defineEmits<LoginFormEmits>();
 }
 
 .password-toggle:disabled {
-    opacity: .6;
+    opacity: 0.6;
     cursor: default;
 }
 
 .login-error {
     color: #ffdad6;
     border: 1px solid #9c5852;
-    border-radius: .75rem;
+    border-radius: 0.75rem;
     background: #47201e;
-    padding: .875rem;
+    padding: 0.875rem;
     margin-bottom: 1rem;
-    font-size: .875rem;
+    font-size: 0.875rem;
 }
 
 .login-submit {
     min-height: 3.25rem;
     font-weight: 800;
     text-transform: none;
-    letter-spacing: .01em;
+    letter-spacing: 0.01em;
     background: linear-gradient(180deg, #14a44d, #0f7f3a);
     box-shadow: 0 1rem 1.8rem #14a44d47;
 }

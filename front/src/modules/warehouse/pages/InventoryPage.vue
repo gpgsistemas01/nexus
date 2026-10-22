@@ -26,6 +26,7 @@ const {
     rows,
     total,
     isLoading,
+    isRefreshing,
     isExporting,
     error,
     exportError,
@@ -132,6 +133,7 @@ onMounted(() => {
                         role="status"
                     >
                         {{ isLoading ? 'Cargando inventario…' : `Registros encontrados: ${total}` }}
+                        <span v-if="isRefreshing"> · Actualizando datos…</span>
                     </div>
                     <InventoryTable
                         :rows="rows"

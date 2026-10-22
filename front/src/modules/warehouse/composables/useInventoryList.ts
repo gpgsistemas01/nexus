@@ -5,6 +5,8 @@ import { inventoryService } from '../services/inventoryService.js';
 import { useRemoteOptions } from './useRemoteOptions.js';
 import type { InventoryQuery, InventoryResource, InventoryRow } from '../inventory.js';
 
+const REFRESH_INTERVAL_MS = 30_000;
+
 export const useInventoryList = (options: {
     resource: InventoryResource;
     canRead: boolean;
@@ -24,6 +26,7 @@ export const useInventoryList = (options: {
     const rows = ref<InventoryRow[]>([]);
     const total = ref(0);
     const isLoading = ref(false);
+    const isRefreshing = ref(false);
     const error = ref('');
     const suppliers = useRemoteOptions(
         'suppliers',
@@ -32,31 +35,46 @@ export const useInventoryList = (options: {
     let controller: AbortController | null = null;
     let sequence = 0;
     let interval: ReturnType<typeof setInterval> | undefined;
-    const load = async () => {
-        if (!canRead) return;
+    let lastAttemptAt = -Infinity;
+    let isDisposed = false;
+    const fetchList = async (isBackground: boolean) => {
+        if (!canRead || isDisposed) return;
         const requestId = ++sequence;
         controller?.abort();
-        controller = new AbortController();
-        isLoading.value = true;
+        const requestController = new AbortController();
+        controller = requestController;
+        lastAttemptAt = Date.now();
+        isLoading.value = !isBackground;
+        isRefreshing.value = isBackground;
         error.value = '';
         try {
-            const result = await inventoryService.list(resource, { ...query }, controller.signal);
+            const result = await inventoryService.list(
+                resource,
+                { ...query },
+                requestController.signal,
+            );
             if (requestId !== sequence) return;
-            rows.value = result.data;
+            // Conservar la referencia evita renderizar otra vez una página sin cambios.
+            if (JSON.stringify(rows.value) !== JSON.stringify(result.data))
+                rows.value = result.data;
             total.value = result.recordsFiltered;
             if (query.page > 1 && !result.data.length) {
                 query.page = Math.max(1, query.page - 1);
-                await load();
+                await fetchList(isBackground);
             }
         } catch (cause) {
-            if (requestId !== sequence || controller.signal.aborted) return;
+            if (requestId !== sequence || requestController.signal.aborted) return;
             error.value =
                 cause instanceof Error ? cause.message : 'No se pudo cargar el inventario.';
             if (cause instanceof ApiError && cause.status === 401) onUnauthorized();
         } finally {
-            if (requestId === sequence) isLoading.value = false;
+            if (requestId === sequence) {
+                isLoading.value = false;
+                isRefreshing.value = false;
+            }
         }
     };
+    const load = () => fetchList(false);
     const applyQuery = (changes: Partial<InventoryQuery>) => {
         const next = { ...changes, page: changes.page ?? 1 };
         if (
@@ -69,19 +87,28 @@ export const useInventoryList = (options: {
         void load();
     };
     const refreshVisible = () => {
-        if (document.visibilityState === 'visible' && !isPaused.value && !isLoading.value)
-            void load();
+        if (
+            document.visibilityState === 'visible' &&
+            !isPaused.value &&
+            !isLoading.value &&
+            !isRefreshing.value &&
+            Date.now() - lastAttemptAt >= REFRESH_INTERVAL_MS
+        )
+            void fetchList(true);
     };
     onMounted(() => {
         void load();
         window.addEventListener('focus', refreshVisible);
-        interval = setInterval(refreshVisible, 30_000);
+        document.addEventListener('visibilitychange', refreshVisible);
+        interval = setInterval(refreshVisible, REFRESH_INTERVAL_MS);
     });
     onBeforeUnmount(() => {
         ++sequence;
+        isDisposed = true;
         controller?.abort();
         clearInterval(interval);
         window.removeEventListener('focus', refreshVisible);
+        document.removeEventListener('visibilitychange', refreshVisible);
     });
-    return { query, rows, total, isLoading, error, suppliers, load, applyQuery };
+    return { query, rows, total, isLoading, isRefreshing, error, suppliers, load, applyQuery };
 };

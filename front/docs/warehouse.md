@@ -49,8 +49,19 @@ Las [decisiones de arquitectura](architecture.md) aplican a toda la implementaci
 La adaptación usa estado reactivo, props/eventos, RouterLink y ciclos de vida de
 Vue. No carga DataTables, Select2 ni listeners EJS para administrar los mismos
 controles. SweetAlert2 confirma eliminaciones y muestra avisos de éxito; el modal
-de captura pertenece a Vuetify/VeeValidate. La consulta se actualiza manualmente, al recuperar el foco y cada 30 s
-mientras la página está visible y no hay un editor abierto. No suscribe Socket.IO.
+de captura pertenece a Vuetify/VeeValidate. La consulta se actualiza manualmente y
+se comprueba cada 30 s, al recuperar el foco y al volver a una pestaña visible.
+La recarga automática sólo consulta si han pasado al menos 30 s desde el último
+intento, la página está visible y no hay editor, confirmación ni consulta activa.
+Conserva las filas visibles y muestra «Actualizando datos…» sin activar el estado
+de carga de la tabla; si los datos son iguales conserva su referencia. Un fallo
+conserva la tabla y permite reintentar. La actualización manual y el guardado no
+esperan ese intervalo. No suscribe Socket.IO ni retrasa la primera lectura.
+
+Los campos se registran en VeeValidate. Abrir el modal, recuperar datos y mover el
+foco sin modificar un campo no muestra errores. El blur valida campos modificados
+o una captura ya enviada; Guardar valida el formulario completo. La validación
+definitiva de Express se conserva.
 
 La [revisión de interfaz y HTTP](ui-and-http.md) detalla los encabezados originales,
 la carga automática de opciones, las secciones y campos recuperados del modal,

@@ -33,6 +33,11 @@ test('login: captura inválida, rechazo genérico y reintento con cookies hacia 
   await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
   await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeHidden();
   await expect(page.getByText('La contraseña es un valor requerido')).toBeHidden();
+  await page.getByRole('textbox', { name: 'Nombre de usuario', exact: true }).focus();
+  await page.locator('input[name="password"]').focus();
+  await page.getByRole('button', { name: 'Mostrar contraseña', exact: true }).focus();
+  await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeHidden();
+  await expect(page.getByText('La contraseña es un valor requerido')).toBeHidden();
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
   await expect(page.getByText('El nombre de usuario es un valor requerido')).toBeVisible();
   await expect(page.getByText('La contraseña es un valor requerido')).toBeVisible();

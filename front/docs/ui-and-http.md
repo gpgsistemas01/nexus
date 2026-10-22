@@ -36,11 +36,20 @@ introduciría dos conjuntos de reglas y gestión de estado.
 Se aplican las [variables de tema de Vuetify](https://vuetifyjs.com/en/features/theme/)
 y sus [defaults por ámbito](https://vuetifyjs.com/en/features/global-configuration/):
 
-- `app/plugins/vuetify.ts`: paleta de Almacén, encabezado verde `#107c41`, filas
-  alternadas, bordes verdes y acciones de filtro azul/gris. El verde con texto
-  blanco mantiene contraste para texto normal.
+- `app/plugins/vuetify.ts`: paleta de Almacén, tabla con degradado verde y borde
+  inferior oscuro, filas alternadas y acciones de filtro azul/gris. El modal
+  recupera cabecera oscura y franja ámbar de EJS; el menú compacto usa fondo oscuro
+  y selección celeste. Las acciones distinguen editar, ajustar, agregar y eliminar
+  por color, nombre accesible y tooltip, sin depender sólo del color.
 - `shared/ui/controlDefaults.ts` y `VDefaultsProvider` del layout y del modal: densidad, variante, redondeo,
   color y mensajes de los controles. El login conserva sus propios estilos.
+- `shared/ui/warehouse.css` adapta sólo las clases de esos defaults: contornos,
+  fondo de consulta, foco visible y tooltip. La tabla conserva centrado, bordes,
+  degradados, acciones y controles de paginación; la identidad queda alineada a
+  la izquierda. Los estilos de estado de error de Vuetify permanecen vigentes.
+- Montserrat Variable se sirve desde los assets compilados mediante Fontsource;
+  `style.css` configura `--v-font-body` y `--v-font-heading` para Vuetify. No se
+  consulta Google Fonts durante el uso. La fuente aplica también al login.
 - Los componentes usan [CSS scoped de Vue](https://vuejs.org/api/sfc-css-features.html).
   `:deep()` se limita a celdas y detalles de los controles que realmente se adaptan;
   no se agregan resets globales de Bootstrap ni estilos MDB copiados completos.

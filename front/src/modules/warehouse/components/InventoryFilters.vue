@@ -18,7 +18,6 @@ defineProps<{
     isLoading: boolean;
     suppliers: { items: LookupItem[]; isLoading: boolean; error: string; hasMore: boolean };
 }>();
-const search = defineModel<string>('search', { required: true });
 const emit = defineEmits<{
     supplier: [value: string];
     searchOptions: [value: string];
@@ -28,6 +27,7 @@ const emit = defineEmits<{
     clear: [];
     refresh: [];
 }>();
+const search = defineModel<string>('search', { required: true });
 const expanded = ref(0);
 </script>
 
@@ -101,6 +101,7 @@ const expanded = ref(0);
                         </VBtn>
                         <VBtn
                             type="submit"
+                            class="filter-apply"
                             color="filter-action"
                             variant="flat"
                             :loading="isLoading"
@@ -137,6 +138,10 @@ const expanded = ref(0);
     justify-content: flex-end;
     gap: 0.65rem;
     margin-top: 1rem;
+}
+.filter-apply {
+    background: linear-gradient(180deg, rgb(var(--v-theme-filter-action)), #163a5c);
+    box-shadow: 0 0.35rem 0.75rem rgba(var(--v-theme-filter-action), 0.2);
 }
 @media (max-width: 600px) {
     .filters-hint {

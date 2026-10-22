@@ -163,6 +163,9 @@ jobs:
       - name: Lint frontend
         run: npm run lint
 
+      - name: Check frontend formatting
+        run: npm run format:check
+
       - name: Test frontend components and navigation
         run: npm run test:unit -- --reporter=default --reporter=junit --outputFile=build/test-results/unit.xml
 

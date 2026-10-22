@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+import '@fontsource-variable/montserrat/wght.css';
 import App from './App.vue';
 import StartupErrorPage from './app/pages/StartupErrorPage.vue';
 import { createAppRouter } from './app/router/index.js';

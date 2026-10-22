@@ -28,24 +28,16 @@
             "@nexus/login-validation": [
                 "../back/src/public/js/utils/validations/loginValidation.js"
             ],
-            "@nexus/api-messages": [
-                "../back/src/public/js/constants/apiMessages.js"
-            ],
+            "@nexus/api-messages": ["../back/src/public/js/constants/apiMessages.js"],
             "@nexus/warehouse-validation": [
                 "../back/src/public/js/utils/validations/validators.js"
             ],
-            "@nexus/waste-measurements": [
-                "../back/src/shared/inventory/wasteMeasurements.js"
-            ],
-            "@nexus/permissions": [
-                "../back/src/shared/constants/permissions.js"
-            ]
+            "@nexus/waste-measurements": ["../back/src/shared/inventory/wasteMeasurements.js"],
+            "@nexus/permissions": ["../back/src/shared/constants/permissions.js"]
         },
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "types": [
-            "vite/client"
-        ],
+        "types": ["vite/client"],
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo"
     }
 }

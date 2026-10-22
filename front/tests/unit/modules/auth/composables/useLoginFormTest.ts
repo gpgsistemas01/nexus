@@ -5,12 +5,19 @@ import { useLoginForm } from '../../../../../src/modules/auth/composables/useLog
 import { LoginRequestError } from '../../../../../src/modules/auth/services/authService.js';
 import type { loginRequest } from '../../../../../src/modules/auth/services/authService.js';
 
-const openForm = (request = vi.fn<typeof loginRequest>().mockResolvedValue(), onSuccess = vi.fn()) => {
+const openForm = (
+  request = vi.fn<typeof loginRequest>().mockResolvedValue(),
+  onSuccess = vi.fn(),
+) => {
   let form!: ReturnType<typeof useLoginForm>;
-  const page = mount(defineComponent({ setup() {
-    form = useLoginForm({ onSuccess, request });
-    return () => h('div');
-  } }));
+  const page = mount(
+    defineComponent({
+      setup() {
+        form = useLoginForm({ onSuccess, request });
+        return () => h('div');
+      },
+    }),
+  );
   return { form, request, onSuccess, page };
 };
 
@@ -22,9 +29,15 @@ afterEach(() => {
 
 describe('login Vue: captura y transición de acceso (DP-VAL-002)', () => {
   it('abre la captura sin mostrar errores antes de interactuar y elimina credenciales antiguas', async () => {
-    localStorage.setItem('loginRememberedCredentials', JSON.stringify({ name: 'usuario', password: 'antigua' }));
+    localStorage.setItem(
+      'loginRememberedCredentials',
+      JSON.stringify({ name: 'usuario', password: 'antigua' }),
+    );
     const { form } = openForm();
     await flushPromises();
+    expect(form.errors.value).toEqual({});
+    await form.blurField('name');
+    await form.blurField('password');
     expect(form.errors.value).toEqual({});
     expect(form.values).toEqual({ name: '', password: '' });
     expect(localStorage.getItem('loginRememberedCredentials')).toBeNull();
@@ -59,8 +72,11 @@ describe('login Vue: captura y transición de acceso (DP-VAL-002)', () => {
   });
 
   it('un rechazo mantiene el formulario, muestra errores y permite corregir y reintentar', async () => {
-    const request = vi.fn<typeof loginRequest>()
-      .mockRejectedValueOnce(new LoginRequestError('Revisa los datos de acceso.', { name: 'Nombre inválido.' }))
+    const request = vi
+      .fn<typeof loginRequest>()
+      .mockRejectedValueOnce(
+        new LoginRequestError('Revisa los datos de acceso.', { name: 'Nombre inválido.' }),
+      )
       .mockResolvedValueOnce();
     const { form, onSuccess } = openForm(request);
     form.updateField('name', 'usuario');
@@ -79,7 +95,12 @@ describe('login Vue: captura y transición de acceso (DP-VAL-002)', () => {
 
   it('evita envíos simultáneos y sólo recuerda el usuario después de un acceso válido', async () => {
     let finish!: () => void;
-    const request = vi.fn<typeof loginRequest>(() => new Promise<void>(resolve => { finish = resolve; }));
+    const request = vi.fn<typeof loginRequest>(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
     const { form, onSuccess } = openForm(request);
     form.updateField('name', ' usuario ');
     form.updateField('password', ' legado ');
@@ -107,7 +128,9 @@ describe('login Vue: captura y transición de acceso (DP-VAL-002)', () => {
 
   it('el bloqueo de almacenamiento no impide iniciar sesión', async () => {
     const { form, onSuccess } = openForm();
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(() => { throw new Error('Bloqueado'); });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(() => {
+      throw new Error('Bloqueado');
+    });
     form.updateField('name', 'usuario');
     form.updateField('password', 'abc');
     form.shouldRememberUser.value = true;
@@ -117,7 +140,12 @@ describe('login Vue: captura y transición de acceso (DP-VAL-002)', () => {
 
   it('cancela el envío al desmontar y descarta una respuesta tardía', async () => {
     let finish!: () => void;
-    const request = vi.fn<typeof loginRequest>(() => new Promise<void>(resolve => { finish = resolve; }));
+    const request = vi.fn<typeof loginRequest>(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+    );
     const { form, onSuccess, page } = openForm(request);
     form.updateField('name', 'usuario');
     form.updateField('password', 'legado');
@@ -135,7 +163,9 @@ describe('login Vue: captura y transición de acceso (DP-VAL-002)', () => {
   });
 
   it('no presenta un fallo de navegación como rechazo de un acceso confirmado', async () => {
-    const onSuccess = vi.fn(() => { throw new Error('Navegación bloqueada'); });
+    const onSuccess = vi.fn(() => {
+      throw new Error('Navegación bloqueada');
+    });
     const { form, request } = openForm(undefined, onSuccess);
     form.updateField('name', 'usuario');
     form.updateField('password', 'legado');

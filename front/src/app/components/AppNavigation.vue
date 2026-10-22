@@ -44,6 +44,8 @@ const emit = defineEmits<{ navigate: [] }>();
             Cerrar menú
         </VBtn>
         <VList
+            bg-color="transparent"
+            base-color="menu-text"
             density="compact"
             nav
             slim
@@ -56,13 +58,13 @@ const emit = defineEmits<{ navigate: [] }>();
                 :to="link.to"
                 :title="link.title"
                 :aria-label="link.title"
-                color="primary"
+                color="menu-accent"
                 rounded="lg"
                 @click="emit('navigate')"
             >
                 <template #prepend>
                     <VAvatar
-                        color="primary"
+                        color="menu-accent"
                         variant="tonal"
                         size="24"
                         class="nav-initial"
@@ -103,7 +105,8 @@ const emit = defineEmits<{ navigate: [] }>();
     display: flex;
     flex-direction: column;
     min-height: 100%;
-    background: #fafdfa;
+    background: rgb(var(--v-theme-menu-surface));
+    color: rgb(var(--v-theme-menu-text));
 }
 .brand {
     height: 56px;
@@ -111,7 +114,8 @@ const emit = defineEmits<{ navigate: [] }>();
     align-items: center;
     gap: 0.65rem;
     padding: 0 16px;
-    color: #173b29;
+    color: rgb(var(--v-theme-menu-text));
+    border-bottom: 3px solid rgb(var(--v-theme-accent));
     text-decoration: none;
 }
 .brand strong {
@@ -119,6 +123,9 @@ const emit = defineEmits<{ navigate: [] }>();
 }
 .nav-items {
     padding: 0.35rem 0.5rem;
+}
+.nav-items :deep(.v-list-subheader) {
+    color: rgba(var(--v-theme-menu-text), 0.7);
 }
 .nav-items :deep(.v-list-item) {
     min-height: 36px;
@@ -135,16 +142,12 @@ const emit = defineEmits<{ navigate: [] }>();
 .navigation-account {
     margin-top: auto;
     padding: 0.75rem 0.35rem;
-    border-top: 1px solid #e0eae3;
+    border-top: 1px solid rgba(var(--v-theme-menu-text), 0.15);
 }
 .account-name {
     display: block;
     padding: 0.25rem 0.75rem;
-    color: #54705f;
+    color: rgba(var(--v-theme-menu-text), 0.8);
     font-size: 0.75rem;
-}
-.navigation-account :deep(.v-btn) {
-    text-transform: none;
-    letter-spacing: normal;
 }
 </style>

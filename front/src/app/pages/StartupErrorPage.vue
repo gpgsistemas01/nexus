@@ -3,10 +3,18 @@ const reloadPage = () => window.location.reload();
 </script>
 
 <template>
-    <main class="startup-error" aria-labelledby="startup-error-title">
+    <main
+        class="startup-error"
+        aria-labelledby="startup-error-title"
+    >
         <h1 id="startup-error-title">No se pudo cargar la aplicación</h1>
         <p>Revisa tu conexión e intenta nuevamente.</p>
-        <button type="button" @click="reloadPage">Volver a intentar</button>
+        <button
+            type="button"
+            @click="reloadPage"
+        >
+            Volver a intentar
+        </button>
     </main>
 </template>
 

@@ -21,8 +21,10 @@ export const useLoginForm = ({ onSuccess, request = loginRequest }: LoginFormOpt
         setFieldValue,
         setFieldError,
         validateField,
-        handleSubmit
+        submitCount,
+        handleSubmit,
     } = useForm<LoginCredentials>({
+        validateOnMount: false,
         initialValues: { name: '', password: '' },
         validationSchema: {
             name: (value: unknown) => loginValidation.name(value) || true,
@@ -52,50 +54,63 @@ export const useLoginForm = ({ onSuccess, request = loginRequest }: LoginFormOpt
     });
     onBeforeUnmount(() => controller.abort());
 
+    const editedFields = new Set<LoginField>();
     const updateField = (field: LoginField, value: string) => {
+        if (values[field] === value) return;
+        editedFields.add(field);
         setFieldValue(field, value, false);
         setFieldError(field, undefined);
         message.value = '';
     };
 
-    const blurField = (field: LoginField) => validateField(field);
+    const blurField = (field: LoginField) => {
+        if (editedFields.has(field) || submitCount.value > 0) return validateField(field);
+    };
 
-    const submitValidated = handleSubmit(async credentials => {
-        if (controller.signal.aborted) return;
-
-        message.value = '';
-
-        try {
-            await request(credentials, controller.signal);
-        } catch (error) {
+    const submitValidated = handleSubmit(
+        async (credentials) => {
             if (controller.signal.aborted) return;
 
-            message.value = error instanceof LoginRequestError ? error.message : LOGIN_MESSAGES.REQUEST_FAILED;
+            message.value = '';
 
-            if (error instanceof LoginRequestError) {
-                for (const field of ['name', 'password'] as const) {
-                    if (error.fieldErrors[field]) setFieldError(field, error.fieldErrors[field]);
+            try {
+                await request(credentials, controller.signal);
+            } catch (error) {
+                if (controller.signal.aborted) return;
+
+                message.value =
+                    error instanceof LoginRequestError
+                        ? error.message
+                        : LOGIN_MESSAGES.REQUEST_FAILED;
+
+                if (error instanceof LoginRequestError) {
+                    for (const field of ['name', 'password'] as const) {
+                        if (error.fieldErrors[field])
+                            setFieldError(field, error.fieldErrors[field]);
+                    }
                 }
+
+                return;
             }
 
-            return;
-        }
+            if (controller.signal.aborted) return;
 
-        if (controller.signal.aborted) return;
+            // Recordar el usuario es opcional: Express ya confirmó el acceso.
+            try {
+                if (shouldRememberUser.value)
+                    localStorage.setItem(REMEMBERED_USER_KEY, credentials.name.trim());
+                else localStorage.removeItem(REMEMBERED_USER_KEY);
+            } catch {
+                shouldRememberUser.value = false;
+            }
 
-        // Recordar el usuario es opcional: Express ya confirmó el acceso.
-        try {
-            if (shouldRememberUser.value) localStorage.setItem(REMEMBERED_USER_KEY, credentials.name.trim());
-            else localStorage.removeItem(REMEMBERED_USER_KEY);
-        } catch {
-            shouldRememberUser.value = false;
-        }
-
-        setFieldValue('password', '', false);
-        onSuccess();
-    }, () => {
-        message.value = '';
-    });
+            setFieldValue('password', '', false);
+            onSuccess();
+        },
+        () => {
+            message.value = '';
+        },
+    );
 
     const submit = () => {
         if (isSubmitting.value) return;
@@ -114,6 +129,6 @@ export const useLoginForm = ({ onSuccess, request = loginRequest }: LoginFormOpt
         message,
         updateField,
         blurField,
-        submit
+        submit,
     };
 };

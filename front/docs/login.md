@@ -53,7 +53,8 @@ VeeValidate comprueba campos obligatorios, tipo y longitudes máximas existentes
 El login no impone la política de contraseñas de altas: las credenciales históricas
 cortas siguen siendo válidas para captura. Se recorta el usuario, pero se conservan
 exactamente los espacios de la contraseña. Los errores se presentan al salir de un
-campo o enviar; editar limpia el error anterior. Durante el envío se deshabilitan
+campo modificado o al enviar; el foco automático y salir de campos intactos no
+validan la captura. Editar limpia el error anterior. Durante el envío se deshabilitan
 los controles y se bloquean solicitudes simultáneas. Zod no se incorpora porque
 las reglas públicas existentes ya resuelven esta primera migración.
 

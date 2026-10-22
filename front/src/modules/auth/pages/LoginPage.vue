@@ -17,18 +17,20 @@ const {
     message,
     updateField,
     blurField,
-    submit
+    submit,
 } = useLoginForm({
     onSuccess: () => {
         const returnTo = route.query.returnTo;
-        const destination = typeof returnTo === 'string'
-            && /^\/almacen\/(materiales|consumibles|mermas)(\?|$)/.test(returnTo)
-            ? returnTo : '/almacen';
+        const destination =
+            typeof returnTo === 'string' &&
+            /^\/almacen\/(materiales|consumibles|mermas)(\?|$)/.test(returnTo)
+                ? returnTo
+                : '/almacen';
         void router.replace(destination).catch(() => {
             // Una carga diferida fallida recupera la ruta con el arranque y su pantalla de reintento.
             window.location.assign(destination);
         });
-    }
+    },
 });
 const logoUrl = import.meta.env.VITE_LOGIN_LOGO_URL || '';
 const hasLogoFailed = ref(false);
@@ -55,11 +57,13 @@ onMounted(() => {
                         alt=""
                         class="login-logo"
                         @error="hasLogoFailed = true"
-                    >
+                    />
                     <div
                         v-else
                         class="login-logo login-monogram"
-                    >N</div>
+                    >
+                        N
+                    </div>
                 </div>
                 <div class="login-content">
                     <p class="login-eyebrow">Nexus</p>
@@ -132,7 +136,7 @@ onMounted(() => {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, .85fr) minmax(22rem, 1fr);
+    grid-template-columns: minmax(0, 0.85fr) minmax(22rem, 1fr);
     width: min(100%, 58rem);
     border: 1px solid var(--login-border);
     border-radius: 2rem;
@@ -149,7 +153,9 @@ onMounted(() => {
     position: relative;
     border-right: 1px solid var(--login-border);
     padding: clamp(2rem, 6vw, 4rem);
-    background: radial-gradient(circle at 30% 20%, #ffffff29, transparent 11rem), linear-gradient(160deg, #14a44d3d, #14a44d14);
+    background:
+        radial-gradient(circle at 30% 20%, #ffffff29, transparent 11rem),
+        linear-gradient(160deg, #14a44d3d, #14a44d14);
 }
 
 .login-brand::before {
@@ -192,18 +198,18 @@ onMounted(() => {
 
 .login-eyebrow {
     color: #8fe0ac;
-    font-size: .78rem;
+    font-size: 0.78rem;
     font-weight: 800;
-    letter-spacing: .1em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    margin: 0 0 .45rem;
+    margin: 0 0 0.45rem;
 }
 
 h1 {
     font-size: clamp(2rem, 5vw, 2.75rem);
     font-weight: 800;
     line-height: 1.05;
-    margin: 0 0 .55rem;
+    margin: 0 0 0.55rem;
 }
 
 .login-description {

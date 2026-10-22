@@ -59,6 +59,7 @@ export const useInventoryEditor = (options: {
         (value: unknown, data: Record<string, unknown>) => string | null
     >;
     const form = useForm<InventoryValues>({
+        validateOnMount: false,
         initialValues: initialInventoryValues(target),
         validationSchema: computed(() =>
             Object.fromEntries(
@@ -73,6 +74,11 @@ export const useInventoryEditor = (options: {
             ),
         ),
     });
+    // Registrar los campos permite a VeeValidate distinguir los ya validados.
+    // Sin registro, la validación silenciosa del esquema publica todos los errores.
+    for (const field of Object.keys(rules) as InventoryField[]) {
+        form.defineField(field, { validateOnModelUpdate: false });
+    }
     if (pendingData) {
         for (const field of Object.keys(form.values) as InventoryField[]) {
             if (pendingData[field] !== undefined)
@@ -248,11 +254,17 @@ export const useInventoryEditor = (options: {
         if (pendingData) return execute(pendingData);
         return submitValidated();
     };
+    const editedFields = new Set<InventoryField>();
     const update = (field: InventoryField, value: string | boolean) => {
-        if (isPending.value || isSubmitting.value) return;
+        if (isPending.value || isSubmitting.value || form.values[field] === value) return;
+        editedFields.add(field);
         form.setFieldValue(field, value, false);
         form.setFieldError(field, undefined);
         message.value = '';
+    };
+    const blur = (field: InventoryField) => {
+        // El autofocus y las actualizaciones de catálogos no son captura del usuario.
+        if (editedFields.has(field) || form.submitCount.value > 0) return form.validateField(field);
     };
     onBeforeUnmount(() => controller.abort());
     return {
@@ -268,7 +280,7 @@ export const useInventoryEditor = (options: {
         usesMeasurements,
         submit,
         update,
-        blur: (field: InventoryField) => form.validateField(field),
+        blur,
         searchLookup: (field: InventoryField, search: string) =>
             lookupByField[field]?.updateSearch(search),
         loadMore: (field: InventoryField) => lookupByField[field]?.loadMore(),

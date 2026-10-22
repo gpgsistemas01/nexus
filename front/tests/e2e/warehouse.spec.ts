@@ -2,6 +2,34 @@ import { expect, test } from '@playwright/test';
 import { ids, material, pageOf } from '../fixtures/inventory.js';
 import { chooseOption, mockWarehouse } from './warehouseFixtures.js';
 
+test('formularios: abrir, cargar catálogos y mover foco no muestra errores sin captura', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  for (const [path, button, title] of [
+    ['materiales', 'Nuevo material', 'Crear material'],
+    ['consumibles', 'Nuevo consumible', 'Crear consumible'],
+    ['mermas', 'Nueva merma', 'Crear merma'],
+  ] as const) {
+    await page.goto(`/almacen/${path}`);
+    await page.getByRole('button', { name: button, exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: title, exact: true });
+    const supplier = dialog.getByRole('combobox', { name: 'Proveedor', exact: true });
+    await supplier.focus();
+    await dialog.getByRole('button', { name: 'Cerrar', exact: true }).focus();
+    await expect(dialog.getByText(/es un valor requerido/)).toHaveCount(0);
+    await expect(dialog.locator('[aria-invalid="true"]')).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(
+      dialog.getByText('El proveedor es un valor requerido', { exact: true }),
+    ).toBeVisible();
+    await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
+    await page.getByRole('button', { name: button, exact: true }).click();
+    await expect(dialog.getByText(/es un valor requerido/)).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Cerrar', exact: true }).click();
+  }
+});
+
 test('almacén: encabezados originales, navegación Vue, recarga y móvil', async ({ page }) => {
   await mockWarehouse(page);
   const errors: string[] = [];

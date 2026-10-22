@@ -1,0 +1,42 @@
+/* Sólo controles de operación que reciben los defaults de Almacén. */
+.warehouse-control .v-field {
+    border-radius: 1rem;
+    background: rgb(var(--v-theme-surface));
+    font-size: 0.875rem;
+    transition: box-shadow 0.2s ease;
+}
+
+.warehouse-control .v-field--focused:not(.v-field--error) {
+    box-shadow: 0 0 0 3px rgba(var(--v-theme-primary), 0.12);
+}
+
+.warehouse-control .v-field--disabled,
+.warehouse-control .v-field--readonly {
+    background: rgba(var(--v-theme-on-surface), 0.04);
+}
+
+.warehouse-button {
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.warehouse-button:focus-visible {
+    outline: 3px solid rgb(var(--v-theme-filter-action));
+    outline-offset: 3px;
+}
+
+.warehouse-tooltip {
+    background: rgb(var(--v-theme-modal-header));
+    color: white;
+    border-radius: 0.75rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .warehouse-control .v-field {
+        transition: none;
+    }
+}

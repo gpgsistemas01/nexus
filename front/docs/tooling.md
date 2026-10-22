@@ -4,7 +4,15 @@
 
 La base usa Vue 3, Vue Router 5 y Vite, con TypeScript estricto. `vue-tsc` comprueba
 componentes y módulos; ESLint analiza errores comunes de JavaScript/TypeScript y Vue.
-El preset de Vue es `essential`, orientado a errores, sin imponer formato cosmético.
+El preset de Vue es `recommended`, con Composition API mediante `script setup`,
+orden de macros y convenciones de componentes. Prettier y `.editorconfig` aplican
+cuatro espacios en código Vue/TypeScript/CSS y configuración, dos en
+pruebas y en el manifiesto `package.json`, comillas simples en JavaScript/TypeScript, punto y coma, LF y
+un atributo por línea.
+`eslint-config-prettier` evita reglas de formato que compitan con el formateador.
+Se siguen las reglas de [eslint-plugin-vue](https://eslint.vuejs.org/user-guide/)
+y la [configuración de Prettier](https://prettier.io/docs/configuration), adaptadas
+al estándar local; Vue no impone una indentación universal.
 Las reglas de presentación impiden imports de HTTP, stores, páginas, validadores
 y VeeValidate, además de fetch/XMLHttpRequest y almacenamiento local mediante
 globales o window/globalThis. No sustituyen la revisión de dependencias indirectas.
@@ -70,6 +78,13 @@ Si tienes Vetur activo, desactívalo en este proyecto Vue 3 para evitar diagnós
 TypeScript comprueba contratos estáticos; no valida las respuestas reales de una API
 ni sustituye las reglas de Express. ESLint puede corregir algunos problemas con
 `npm run lint:fix`; no repara automáticamente reglas de negocio ni todos los errores de tipos.
+
+Para el formato usa `npm --prefix front run format` desde la raíz, o
+`npm run format` dentro de `front/`. `npm run format:check` comprueba sin modificar.
+En VS Code se puede elegir la extensión Prettier como formateador de Vue y TypeScript
+y activar «Format on Save»; la configuración versionada determina el resultado.
+No hace falta la extensión para ejecutar los comandos ni para CI. El alcance
+es código, pruebas y configuración del frontend; no reformatea EJS ni el backend.
 
 ## Pruebas y diseño de los casos
 
@@ -137,7 +152,7 @@ HTTP/Prisma en una base aislada; no se usa la base de desarrollo.
 
 ## Automatización y Docker
 
-Desde `front/`, `npm run check` ejecuta lint, pruebas y build con tipos. Desde la raíz
+Desde `front/`, `npm run check` ejecuta formato, lint, pruebas y build con tipos. Desde la raíz
 puedes usar `npm --prefix front run check`. CI ejecuta esos controles en pasos separados
 y conserva el reporte JUnit del frontend como artefacto. No modifica los disparadores
 ni las comprobaciones unitarias e integración del backend.
@@ -151,7 +166,8 @@ Los casos de prueba se ejecutan en CI antes del despliegue, no en Nginx.
 Vuetify y VeeValidate se usan en login y Almacén. Login, sesión, inventario y reportes usan Axios con un único interceptor
 de renovación y errores normalizados. La sesión actual usa provide/inject por aplicación; Pinia se aplaza hasta
 necesitar varios stores y sus herramientas de gestión. Zod/Yup no se agregan para reescribir las
-reglas públicas del login ya existentes. Prettier no se incorpora por anticipado.
+reglas públicas del login ya existentes. Prettier se incorpora para corregir y
+prevenir las inconsistencias de formato observadas.
 Playwright comprueba los controles reales de Vuetify. Contenedores, presentación y composables
 no requieren esas dependencias adicionales.
 
@@ -173,6 +189,8 @@ No se importa el código privado del backend en la suite de Vue.
 | `DP-VUE-WH-006` / `CP-VUE-WH-006` | Navegador; particiones por recurso/permiso y transiciones de orden/dispositivo | Materiales/Mermas mantienen encabezados agrupados y Consumibles sus columnas; costo/estado se ocultan sin permiso; el orden por medidas usa el índice del backend. Menú compacto/móvil sólo contiene rutas Vue. |
 | `DP-VUE-WH-007` / `CP-VUE-WH-007` | Navegador; particiones alta/edición/ajuste y referencia actual/histórica | Proveedor, presentación, unidad, medidas y pesos de consulta siguen visibles sin hacerse editables; la merma mantiene referencia histórica y neto. Cambiar metros a piezas limpia dimensiones; limpiar filtros vuelve a la primera página sin búsqueda/proveedor. |
 | `DP-VUE-WH-008` / `CP-VUE-WH-008` | Unitario y navegador; apertura → desmontaje y cancelar → confirmar → error → reintentar → éxito | Abortar antes de terminar de abrir no deja un popup global pendiente ni envía solicitudes. SweetAlert2 enfoca Cancelar; cancelar no escribe. El primer fallo conserva la confirmación, no repite automáticamente y el reintento confirma la baja por ID de relación y muestra el aviso de éxito. |
+| `DP-VUE-WH-009` / `CP-VUE-WH-009` | Unitario y navegador; apertura → foco sin captura → edición → validación → envío → reapertura | Cargar catálogos o perder foco sin modificar no publica errores. Validar un campo editado no muestra errores de los campos intactos; enviar valida toda la captura. Reabrir no conserva errores anteriores. Login aplica la misma política. |
+| `DP-VUE-WH-010` / `CP-VUE-WH-010` | Unitario; fronteras antes/a los 30 s y transiciones visible/oculta, modal abierto/cerrado, consulta pendiente/fallida y desmontaje | Foco no repite una lectura reciente. La recarga automática no solapa consultas ni activa la carga de la tabla; conserva filas idénticas. Pausa con modal/pestaña oculta, renueva datos vencidos al volver, admite reintento manual y descarta respuestas tras desmontar. |
 
 Los casos `apiClientTest.ts` mantienen renovación única, límite de un reintento,
 rechazo público sin refresh, errores de red sin repetición de escritura y cancelación.

@@ -42,6 +42,23 @@ afterEach(() => {
 });
 
 describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)', () => {
+  it.each(['materials', 'consumables', 'wastes'] as const)(
+    'abrir %s y perder el foco sin capturar no muestra errores; enviar sí valida',
+    async (resource) => {
+      const { editor, request } = openEditor(resource, { action: 'create' });
+      await flushPromises();
+      await editor.blur('name');
+      await editor.blur('supplierId');
+      expect(editor.errors.value).toEqual({});
+      editor.update('name', ' ');
+      await editor.blur('name');
+      expect(editor.errors.value.name).toBeTruthy();
+      expect(editor.errors.value.supplierId).toBeUndefined();
+      await editor.submit();
+      expect(editor.errors.value.supplierId).toBeTruthy();
+      expect(request).not.toHaveBeenCalled();
+    },
+  );
   it.each(['materials', 'consumables'] as const)(
     'eliminar %s usa la relación con el proveedor y no el id del material',
     async (resource) => {

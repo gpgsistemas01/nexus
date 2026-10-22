@@ -182,7 +182,16 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
     font-weight: 700;
     font-size: 0.76rem;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgb(var(--v-theme-table-header)) !important;
+    border-bottom: 2px solid rgb(var(--v-theme-table-header-hover));
+    background: linear-gradient(
+        180deg,
+        rgb(var(--v-theme-table-header-top)),
+        rgb(var(--v-theme-table-header))
+    ) !important;
+    text-align: center;
+}
+.inventory-table :deep(th:hover) {
+    background: rgb(var(--v-theme-table-header-hover)) !important;
 }
 .inventory-table :deep(th .v-icon) {
     color: white;
@@ -190,6 +199,9 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
 .inventory-table :deep(td) {
     font-size: 0.8rem;
     border-right: 1px solid rgba(var(--v-theme-table-border), 0.45);
+    border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.6);
+    text-align: center;
+    padding: 0.65rem 0.75rem;
 }
 .inventory-table :deep(tbody tr:nth-child(even) td) {
     background: rgb(var(--v-theme-table-alt));
@@ -208,8 +220,20 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
     border-top: 1px solid rgba(var(--v-theme-table-border), 0.6);
 }
 .item-identity {
+    text-align: left;
     min-width: 160px;
     padding: 0.35rem 0;
+}
+.inventory-table :deep(.v-data-table-footer__pagination .v-btn) {
+    border: 1px solid rgb(var(--v-theme-table-border));
+    background: rgb(var(--v-theme-surface));
+    color: rgb(var(--v-theme-primary));
+    box-shadow: 0 0.2rem 0.45rem rgba(var(--v-theme-on-surface), 0.08);
+    margin-inline: 0.15rem;
+}
+.inventory-table :deep(.v-data-table-footer__pagination .v-btn:disabled) {
+    opacity: 0.4;
+    box-shadow: none;
 }
 .item-identity span {
     display: block;

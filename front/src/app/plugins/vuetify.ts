@@ -1,6 +1,7 @@
 import { createVuetify } from 'vuetify';
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 import 'vuetify/styles';
+import '../../shared/ui/warehouse.css';
 
 export const vuetify = createVuetify({
     icons: { defaultSet: 'mdi', aliases, sets: { mdi } },
@@ -26,7 +27,15 @@ export const vuetify = createVuetify({
                     'on-surface': '#332d2d',
                     error: '#b3261e',
                     muted: '#59675e',
+                    'modal-header': '#332d2d',
+                    accent: '#fca311',
+                    'on-accent': '#332d2d',
+                    'menu-surface': '#101714',
+                    'menu-text': '#fbfbfb',
+                    'menu-accent': '#38bdf8',
                     'table-header': '#107c41',
+                    'table-header-top': '#16875b',
+                    'table-header-hover': '#0b5f2a',
                     'table-border': '#a9d08e',
                     'table-alt': '#f3fbf6',
                     'table-hover': '#e2f0d9',

@@ -42,6 +42,12 @@ relacionadas; la captura automática no crea datos de operación.
 
 - Aplicar la indentación de cuatro espacios de la sección 2 a TypeScript, templates
   y estilos de componentes nuevos o modificados; conservar dos espacios en pruebas.
+- En `front/`, Prettier y `.editorconfig` aplican ese formato; el manifiesto
+  `package.json` conserva dos espacios. Ejecutar
+  `npm run format` para corregir y `npm run format:check` para comprobar; esta
+  comprobación forma parte de `npm run check` y CI. ESLint usa el preset Vue
+  `recommended` y valida responsabilidades y convenciones; el formateador sólo
+  normaliza sintaxis y no sustituye la revisión de diseño.
 - Componentes `.vue` en PascalCase, con `<script setup lang="ts">`. Composables en
   `useNombre.ts`, módulos TypeScript en camelCase e imports relativos con `.js`,
   resueltos por TypeScript/Vite. Las convenciones de nombres y booleanos de la sección
