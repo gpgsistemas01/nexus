@@ -33,6 +33,13 @@ de MDB se trasladan al tema; los componentes de Vuetify controlan los elementos
 interactivos. Cargar el CSS/JavaScript global de MDB sobre los mismos controles
 introduciría dos conjuntos de reglas y gestión de estado.
 
+Las páginas conservan los títulos de tabla de EJS: «Tabla de Existencias» para
+Materiales, «Tabla de Consumibles», «Tabla de Mermas» y «Tabla de» seguido del
+nombre de cada catálogo. Cada página tiene un único `h1` centrado; no se repiten
+«Almacén» ni «Catálogos» como rótulos sobre él. Esos grupos siguen identificando
+la navegación en el menú y la barra superior. Los enlaces y el título de la pestaña
+conservan el nombre del módulo, por ejemplo, Materiales.
+
 Se aplican las [variables de tema de Vuetify](https://vuetifyjs.com/en/features/theme/)
 y sus [defaults por ámbito](https://vuetifyjs.com/en/features/global-configuration/):
 

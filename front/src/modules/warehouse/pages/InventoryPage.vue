@@ -83,11 +83,7 @@ onMounted(() => {
         <VCard class="inventory-sheet">
             <VCardText>
                 <header class="inventory-heading">
-                    <div>
-                        <p>ALMACÉN</p>
-                        <h1 :id="`inventory-${resource}-title`">{{ config.title }}</h1>
-                        <span>Existencias y movimientos por proveedor.</span>
-                    </div>
+                    <h1 :id="`inventory-${resource}-title`">Tabla de {{ config.tableTitle }}</h1>
                     <VBtn
                         v-if="permissions.canWrite"
                         color="primary"
@@ -188,25 +184,15 @@ onMounted(() => {
     gap: 1rem;
     margin-bottom: 1.25rem;
 }
-.inventory-heading p {
-    color: rgb(var(--v-theme-primary));
-    letter-spacing: 0.15em;
-    font-size: 0.65rem;
-    font-weight: 800;
-    margin-bottom: 0.4rem;
-}
 .inventory-heading h1 {
+    flex: 1 1 15rem;
     font-size: clamp(1.35rem, 2vw, 1.75rem);
     color: rgb(var(--v-theme-on-surface));
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.02em;
     line-height: 1.3;
-    margin-bottom: 0.35rem;
-}
-.inventory-heading span {
-    color: rgb(var(--v-theme-muted));
-    font-size: 0.85rem;
+    text-align: center;
 }
 .inventory-count {
     color: rgb(var(--v-theme-muted));

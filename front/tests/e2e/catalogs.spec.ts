@@ -21,9 +21,9 @@ test('catálogos: navegación Vue, seis rutas y cuenta con acceso exclusivo a ca
     );
   }
   await menu.getByRole('link', { name: 'Roles', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Roles', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Tabla de Roles', exact: true })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Roles', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Tabla de Roles', exact: true })).toBeVisible();
   await page.goto('/catalogos/no-existe');
   await expect(page.getByRole('heading', { name: 'Página no encontrada' })).toBeVisible();
 });
@@ -34,7 +34,9 @@ test('catálogos: alta de los seis recursos con validación, símbolo condiciona
   const { writes } = await mockCatalogs(page);
   for (const catalog of catalogs) {
     await page.goto(`/catalogos/${catalog.name}`);
-    await expect(page.getByRole('heading', { name: catalog.label, exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: `Tabla de ${catalog.label}`, exact: true }),
+    ).toBeVisible();
     await expect(page.getByRole('cell', { name: 'Registro existente', exact: true })).toBeVisible();
     await page.getByRole('button', { name: catalog.create, exact: true }).click();
     const dialog = page.getByRole('dialog', { name: `Registrar ${catalog.entity}`, exact: true });

@@ -60,7 +60,9 @@ test('login: captura inválida, rechazo genérico y reintento con cookies hacia 
   await password.fill(' válida ');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
   await expect(page).toHaveURL(/\/almacen\/materiales$/);
-  await expect(page.getByRole('heading', { name: 'Materiales', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+  ).toBeVisible();
   expect(requests).toEqual([
     { url: '/api/auth/login', data: { name: 'usuario', password: ' legado ' } },
     { url: '/api/auth/login', data: { name: 'usuario', password: ' válida ' } },
@@ -191,7 +193,9 @@ test('login confirmado recupera una carga diferida fallida sin repetir credencia
   await page.getByRole('textbox', { name: 'Nombre de usuario', exact: true }).fill('usuario');
   await page.getByLabel('Contraseña', { exact: true }).fill('legado');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Materiales', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+  ).toBeVisible();
   expect(hasFailed).toBe(true);
   expect(attempts).toBe(1);
   expect(unhandledErrors).toEqual([]);

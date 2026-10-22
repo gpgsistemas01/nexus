@@ -35,7 +35,9 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/almacen/materiales');
-  await expect(page.getByRole('heading', { name: 'Materiales', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Lona Proveedor Central' })).toBeVisible();
   for (const label of [
     'Medidas',
@@ -49,7 +51,7 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
   }
   const navigation = page.getByRole('navigation', { name: 'Navegación principal' });
   const contentX = await page
-    .getByRole('heading', { name: 'Materiales', exact: true })
+    .getByRole('heading', { name: 'Tabla de Existencias', exact: true })
     .evaluate((element) => element.getBoundingClientRect().x);
   await navigation.getByRole('button', { name: 'Almacén', exact: true }).hover();
   await expect(navigation.getByRole('link', { name: 'Materiales', exact: true })).toBeHidden();
@@ -58,7 +60,7 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
   await expect(warehouseGroup).toHaveAttribute('aria-expanded', 'true');
   expect(
     await page
-      .getByRole('heading', { name: 'Materiales', exact: true })
+      .getByRole('heading', { name: 'Tabla de Existencias', exact: true })
       .evaluate((element) => element.getBoundingClientRect().x),
   ).toBe(contentX);
   for (const name of ['Materiales', 'Consumibles', 'Mermas']) {
@@ -84,7 +86,9 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
   await page.getByRole('link', { name: 'Consumibles', exact: true }).click();
   await expect(page).toHaveURL(/\/almacen\/consumibles$/);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Consumibles', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Tabla de Consumibles', exact: true }),
+  ).toBeVisible();
   for (const label of [
     'Consumible',
     'Existencia',

@@ -58,11 +58,7 @@ onMounted(() => {
         <VCard class="catalog-sheet"
             ><VCardText>
                 <header class="catalog-heading">
-                    <div>
-                        <p>CATÁLOGOS</p>
-                        <h1 :id="`catalog-${catalog}-title`">{{ definition.label }}</h1>
-                        <span>Administra los registros y su disponibilidad.</span>
-                    </div>
+                    <h1 :id="`catalog-${catalog}-title`">Tabla de {{ definition.label }}</h1>
                     <VBtn
                         v-if="canManage"
                         color="primary"
@@ -160,17 +156,12 @@ onMounted(() => {
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
-.catalog-heading p {
-    color: rgb(var(--v-theme-primary));
-    letter-spacing: 0.15em;
-    font-size: 0.65rem;
-    font-weight: 800;
-}
 .catalog-heading h1 {
+    flex: 1 1 15rem;
     font-size: clamp(1.35rem, 2vw, 1.75rem);
     font-weight: 800;
+    text-align: center;
 }
-.catalog-heading span,
 .catalog-count {
     color: rgb(var(--v-theme-muted));
     font-size: 0.8rem;

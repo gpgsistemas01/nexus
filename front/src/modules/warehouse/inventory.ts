@@ -62,6 +62,7 @@ export interface EditorTarget {
 export const INVENTORY_CONFIG = {
     materials: {
         title: 'Materiales',
+        tableTitle: 'Existencias',
         singular: 'material',
         read: PERMISSIONS.MATERIALS_READ,
         write: PERMISSIONS.MATERIALS_WRITE,
@@ -69,6 +70,7 @@ export const INVENTORY_CONFIG = {
     },
     consumables: {
         title: 'Consumibles',
+        tableTitle: 'Consumibles',
         singular: 'consumible',
         read: PERMISSIONS.MATERIALS_READ,
         write: PERMISSIONS.MATERIALS_WRITE,
@@ -76,6 +78,7 @@ export const INVENTORY_CONFIG = {
     },
     wastes: {
         title: 'Mermas',
+        tableTitle: 'Mermas',
         singular: 'merma',
         read: PERMISSIONS.WASTES_READ,
         write: PERMISSIONS.WASTES_WRITE,
