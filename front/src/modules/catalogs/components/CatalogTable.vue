@@ -4,6 +4,7 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { VChip } from 'vuetify/components/VChip';
 import ServerTable from '../../../shared/components/ServerTable.vue';
 import type { CatalogEntry, CatalogQuery } from '../catalog.js';
+
 const props = defineProps<{
     rows: CatalogEntry[];
     total: number;
@@ -19,6 +20,7 @@ const headers = computed(() => [
     { title: 'Acciones', key: 'actions', sortable: false },
 ]);
 </script>
+
 <template>
     <ServerTable
         :headers="headers"
@@ -29,24 +31,26 @@ const headers = computed(() => [
         :is-loading="isLoading"
         @options="emit('query', { page: $event.page, length: $event.itemsPerPage })"
     >
-        <template #[`item.isActive`]="{ item }"
-            ><VChip
+        <template #[`item.isActive`]="{ item }">
+            <VChip
                 :color="item.isActive ? 'primary' : 'filter-clear'"
                 size="small"
                 variant="tonal"
-                >{{ item.isActive ? 'Sí' : 'No' }}</VChip
-            ></template
-        >
-        <template #[`item.actions`]="{ item }"
-            ><VBtn
+            >
+                {{ item.isActive ? 'Sí' : 'No' }}
+            </VChip>
+        </template>
+        <template #[`item.actions`]="{ item }">
+            <VBtn
                 color="filter-action"
                 variant="tonal"
                 size="small"
                 prepend-icon="$edit"
                 aria-label="Editar registro"
                 @click="emit('edit', item)"
-                >Editar</VBtn
-            ></template
-        >
+            >
+                Editar
+            </VBtn>
+        </template>
     </ServerTable>
 </template>

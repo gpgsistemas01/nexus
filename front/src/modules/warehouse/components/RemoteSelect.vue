@@ -32,13 +32,16 @@ const visibleItems = computed(() =>
         ? [selectedItem.value, ...props.items]
         : props.items,
 );
+
 const updateValue = (value: string | null) => {
     selectedItem.value = visibleItems.value.find((item) => item.id === value);
     emit('update:modelValue', value ?? '');
 };
+
 const searchOptions = (value: string) => {
     if (value !== selectedItem.value?.title) emit('search', value);
 };
+
 const loadWhenVisible = (isVisible: boolean) => {
     if (
         isVisible &&

@@ -16,6 +16,7 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
         (catalog === 'unit-measures' && typeof value.symbol !== 'string')
     )
         throw new ApiError('El servidor devolvió un registro de catálogo incompleto.');
+
     // La clave estable interna nunca forma parte de la captura ni de la vista.
     return {
         id: value.id,
@@ -25,6 +26,7 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
         version: Number(value.version),
     };
 };
+
 export const catalogService = {
     async list(catalog: CatalogName, query: CatalogQuery, signal?: AbortSignal) {
         const params = new URLSearchParams({
@@ -55,6 +57,7 @@ export const catalogService = {
             throw new ApiError(
                 'No se pudo confirmar la operación. Actualiza el catálogo antes de reintentar.',
             );
+
         return normalizeEntry(result.data, catalog);
     },
 };

@@ -1,5 +1,6 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useForm } from 'vee-validate';
+import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { inventoryService } from '../services/inventoryService.js';
 import { createPendingWasteOperation } from '../services/pendingWasteOperation.js';
@@ -38,6 +39,7 @@ export const useInventoryEditor = (options: {
     const isIdempotent = resource === 'wastes' && ['create', 'add-stock'].includes(target.action);
     let pending: ReturnType<typeof createPendingWasteOperation> | undefined;
     let pendingData: InventoryPayload | null = null;
+
     try {
         if (isIdempotent) {
             pending = createPendingWasteOperation(
@@ -54,6 +56,7 @@ export const useInventoryEditor = (options: {
                 ? cause.message
                 : 'No se pudo preparar la recuperación de la captura.';
     }
+
     const rules = inventoryRules(resource, target.action) as Record<
         string,
         (value: unknown, data: Record<string, unknown>) => string | null
@@ -74,11 +77,13 @@ export const useInventoryEditor = (options: {
             ),
         ),
     });
+
     // Registrar los campos permite a VeeValidate distinguir los ya validados.
     // Sin registro, la validación silenciosa del esquema publica todos los errores.
     for (const field of Object.keys(rules) as InventoryField[]) {
         form.defineField(field, { validateOnModelUpdate: false });
     }
+
     if (pendingData) {
         for (const field of Object.keys(form.values) as InventoryField[]) {
             if (pendingData[field] !== undefined)
@@ -91,6 +96,7 @@ export const useInventoryEditor = (options: {
                 );
         }
     }
+
     const supplierId = computed(() => String(form.values.supplierId));
     const suppliers = useRemoteOptions(
         'suppliers',
@@ -154,6 +160,7 @@ export const useInventoryEditor = (options: {
             unitUsesMeasurements(unit.data)
         )
             return;
+
         for (const field of ['base', 'height'] as const) {
             form.setFieldValue(field, '', false);
             form.setFieldError(field, undefined);
@@ -188,8 +195,10 @@ export const useInventoryEditor = (options: {
         () => {
             const template = selectedTemplate.value;
             if (isPending.value) return;
+
             form.setFieldValue('name', String(template?.data.name ?? ''), false);
             form.setFieldValue('maxUnitCost', String(template?.data.maxUnitCost ?? ''), false);
+
             for (const field of [
                 'coneWeightKg',
                 'totalWeightKg',
@@ -204,19 +213,23 @@ export const useInventoryEditor = (options: {
 
     const execute = async (payload: InventoryPayload) => {
         if (isSubmitting.value || controller.signal.aborted) return;
+
         isSubmitting.value = true;
         message.value = '';
         const wasPending = !!pendingData;
+
         try {
             if (isIdempotent) {
                 if (!pending)
                     throw new Error(
                         'Se necesita almacenamiento local disponible para recuperar esta operación.',
                     );
+
                 pendingData = pending.save(payload);
                 isPending.value = true;
                 payload = pendingData;
             }
+
             const id = target.action === 'delete' ? target.row?.id : target.row?.entityId;
             await inventoryService.mutate(resource, target.action, payload, id, controller.signal);
         } catch (cause) {
@@ -227,46 +240,51 @@ export const useInventoryEditor = (options: {
                 } catch {
                     /* Se conserva la captura si no se puede limpiar. */
                 }
+
                 isPending.value = !!pendingData;
                 message.value = cause instanceof Error ? cause.message : 'No se pudo guardar.';
+
                 if (cause instanceof ApiError) {
                     form.setErrors(cause.fieldErrors);
                     isConflicted.value = cause.code === 'RECORD_VERSION_CONFLICT';
                     if (cause.status === 401) options.onUnauthorized();
                 }
             }
+
             return;
         } finally {
             isSubmitting.value = false;
         }
+
         if (controller.signal.aborted) return;
+
         try {
             pending?.clear();
         } catch {
             /* Repetir el mismo operationId recupera el resultado confirmado. */
         }
+
         options.onSaved();
     };
+
     const submitValidated = form.handleSubmit((values) =>
         execute(buildInventoryPayload(resource, target, values, preview.value)),
     );
+
     const submit = () => {
         if (pendingData) return execute(pendingData);
+
         return submitValidated();
     };
-    const editedFields = new Set<InventoryField>();
-    const update = (field: InventoryField, value: string | boolean) => {
-        if (isPending.value || isSubmitting.value || form.values[field] === value) return;
-        editedFields.add(field);
-        form.setFieldValue(field, value, false);
-        form.setFieldError(field, undefined);
-        message.value = '';
-    };
-    const blur = (field: InventoryField) => {
-        // El autofocus y las actualizaciones de catálogos no son captura del usuario.
-        if (editedFields.has(field) || form.submitCount.value > 0) return form.validateField(field);
-    };
+
+    const { update, blur } = useFormInteraction<InventoryField, string | boolean>(form, {
+        isDisabled: () => isPending.value || isSubmitting.value || controller.signal.aborted,
+        onChange: () => {
+            message.value = '';
+        },
+    });
     onBeforeUnmount(() => controller.abort());
+
     return {
         values: form.values,
         errors: form.errors,

@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="Row extends { id: string }">
 import { VDataTableServer } from 'vuetify/components/VDataTable';
 import type { DataTableHeader, DataTableSortItem } from 'vuetify';
+
 withDefaults(
     defineProps<{
         headers: DataTableHeader<Row>[];
@@ -19,6 +20,7 @@ const emit = defineEmits<{
     options: [options: { page: number; itemsPerPage: number; sortBy: DataTableSortItem[] }];
 }>();
 </script>
+
 <template>
     <div
         class="server-table"
@@ -51,13 +53,16 @@ const emit = defineEmits<{
             <template
                 v-for="(_, name) in $slots"
                 #[name]="slotProps"
-                ><slot
+            >
+                <slot
                     :name="name"
                     v-bind="slotProps"
-            /></template>
+                />
+            </template>
         </VDataTableServer>
     </div>
 </template>
+
 <style scoped>
 .server-table {
     min-width: 0;

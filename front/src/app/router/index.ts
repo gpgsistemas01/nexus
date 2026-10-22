@@ -91,6 +91,7 @@ export const createAppRouter = (
     });
     router.beforeEach(async (to) => {
         if (!to.matched.some((record) => record.meta.requiresAuth)) return;
+
         try {
             const user = await session.load();
             if (to.name === 'warehouse-home')
@@ -103,6 +104,7 @@ export const createAppRouter = (
                             ? 'catalog-departments'
                             : 'forbidden',
                 };
+
             if (
                 typeof to.meta.permission === 'string' &&
                 !user.permissions.includes(to.meta.permission)

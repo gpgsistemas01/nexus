@@ -14,7 +14,9 @@ export const useInventory = (
     onUnauthorized: () => void,
 ) => {
     const config = INVENTORY_CONFIG[resource];
+
     const permits = (permission: string) => user.permissions.includes(permission);
+
     const permissions = {
         canRead: permits(config.read),
         canWrite: permits(config.write),
@@ -39,6 +41,7 @@ export const useInventory = (
         canExport: permissions.canExport,
         onUnauthorized,
     });
+
     const openEditor = (target: EditorTarget) => {
         const allowed =
             target.action === 'stock'
@@ -51,13 +54,16 @@ export const useInventory = (
             (target.action === 'delete' && (!target.row?.canDelete || resource === 'wastes'))
         )
             return;
+
         if (target.action === 'delete') void removal.remove(target.row!);
         else editor.value = target;
     };
+
     const onSaved = () => {
         editor.value = null;
         void showSuccess('La operación se guardó correctamente.');
         void list.load();
     };
+
     return { config, permissions, editor, ...list, ...report, openEditor, onSaved };
 };

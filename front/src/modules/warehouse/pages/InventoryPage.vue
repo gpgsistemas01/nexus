@@ -38,19 +38,23 @@ const supplierError = inventory.suppliers.error;
 const supplierHasMore = inventory.suppliers.hasMore;
 const search = ref('');
 const reportScope = ref('activeOrStock');
+
 const applySearch = () => {
     if (query.search === search.value && query.page === 1) void inventory.load();
     else inventory.applyQuery({ search: search.value });
 };
+
 const clearFilters = () => {
     search.value = '';
     inventory.suppliers.updateSearch('');
     inventory.applyQuery({ search: '', supplierId: '', page: 1 });
 };
+
 const reloadEditor = () => {
     editor.value = null;
     void inventory.load();
 };
+
 onMounted(() => {
     document.title = `Nexus | ${config.title}`;
 });
@@ -129,7 +133,7 @@ onMounted(() => {
                         role="status"
                     >
                         {{ isLoading ? 'Cargando inventario…' : `Registros encontrados: ${total}` }}
-                        <span v-if="isRefreshing"> · Actualizando datos…</span>
+                        <span v-if="isRefreshing">· Actualizando datos…</span>
                     </div>
                     <InventoryTable
                         :rows="rows"

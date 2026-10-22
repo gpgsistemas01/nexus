@@ -11,6 +11,7 @@ const dialog = Swal.mixin({
     buttonsStyling: false,
     reverseButtons: true,
 });
+
 export const showSuccess = (message: string) =>
     dialog.fire({
         titleText: message,
@@ -29,11 +30,15 @@ export const confirmRemoval = async (options: {
     submit: () => Promise<void>;
 }) => {
     if (options.signal.aborted) return false;
+
     let popup: HTMLElement | undefined;
+
     const close = () => {
         if (popup && Swal.getPopup() === popup) Swal.close();
     };
+
     options.signal.addEventListener('abort', close, { once: true });
+
     try {
         const result = await dialog.fire({
             titleText: options.title,
@@ -55,6 +60,7 @@ export const confirmRemoval = async (options: {
                     return !options.signal.aborted;
                 } catch (cause) {
                     if (options.signal.aborted) return false;
+
                     // `text` evita interpretar como HTML nombres o mensajes recibidos.
                     Swal.update({
                         text:

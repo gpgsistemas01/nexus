@@ -17,7 +17,7 @@
     "test:watch": "vitest",
     "check": "npm run format:check && npm run lint && npm run test:unit && npm run build",
     "test:e2e": "playwright test",
-    "format": "prettier --write \"src/**/*.{ts,vue,css}\" \"tests/**/*.ts\" \"*.{js,ts,json}\"",
+    "format": "npm run lint:fix && prettier --write \"src/**/*.{ts,vue,css}\" \"tests/**/*.ts\" \"*.{js,ts,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,vue,css}\" \"tests/**/*.ts\" \"*.{js,ts,json}\""
   },
   "dependencies": {
@@ -33,6 +33,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.1",
+    "@stylistic/eslint-plugin": "5.10.0",
     "@types/node": "^24.19.2",
     "@vitejs/plugin-vue": "^6.0.10",
     "@vue/test-utils": "^2.5.1",

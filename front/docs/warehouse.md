@@ -44,8 +44,10 @@ Las [decisiones de arquitectura](architecture.md) aplican a toda la implementaci
   props tipadas y emiten intenciones. Sólo mantienen estado visual local, como el
   diálogo de referencias históricas, y no conocen HTTP, almacenamiento ni autenticación.
 - `useInventory` coordina permisos y apertura del editor; `useInventoryList`
-  controla consultas y `useInventoryReport` la descarga; `useInventoryEditor`
-  integra VeeValidate; `useRemoteOptions` comparte catálogos paginados y búsquedas
+  configura consultas sobre `shared/composables/usePagedList` y conserva la política
+  de recarga; `useInventoryReport` controla la descarga; `useInventoryEditor`
+  integra VeeValidate y comparte la interacción de campos mediante `useFormInteraction`.
+  `useRemoteOptions` comparte catálogos paginados y búsquedas
   con cancelación. Los formularios mantienen estado por instancia, sin stores.
 - `inventoryService`, `inventoryCatalogService` e `inventoryReportService` separan
   los contratos HTTP; `mappers/inventoryMapper.ts` adapta DTOs a filas de presentación. `apiClient` centraliza cookies, errores y renovación de sesión.

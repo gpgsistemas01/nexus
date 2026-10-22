@@ -24,12 +24,15 @@ watch(
         openedGroups.value = [group];
     },
 );
+
 const updateOpenedGroups = (groups: unknown[]) => {
     if (!props.isCompact)
         openedGroups.value = groups.filter((group): group is string => typeof group === 'string');
 };
+
 const expandNavigation = (group: string) => {
     if (!props.isCompact) return;
+
     openedGroups.value = [group];
     emit('expand');
 };

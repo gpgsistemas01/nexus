@@ -69,12 +69,15 @@ login conservando la ruta interna; un 403 abre la página de acceso no permitido
 | --- | --- |
 | `CatalogPage` / `CatalogEditorPage` | Contenedores: componen presentación, sesión, estado y operaciones. |
 | `CatalogTable` / `CatalogForm` | Presentación tipada: props y eventos; columnas y controles del catálogo. |
-| `useCatalogList` | Búsqueda, paginación, cancelación y descarte de respuestas de consultas anteriores. |
+| `useCatalogList` | Configura la consulta y los errores de acceso del catálogo sobre `shared/composables/usePagedList`. |
 | `useCatalogEditor` | VeeValidate, captura y envío versionado. |
 | `catalogService` / `catalog.ts` | Adaptación de API, lista de campos del payload y contrato tipado. |
 | `shared/components/EditorDialog` | Marco modal, foco/scroll de Vuetify, formulario, pie y acciones mediante slots. También lo usa InventoryEditor. |
 | `shared/components/ServerTable` | Tabla paginada de Vuetify, traducciones y estilos. Cada módulo conserva columnas, celdas y eventos mediante slots. |
 | `shared/http/pageRequest` | Lectura y comprobación del contrato paginado para Catálogos e inventario. |
+| `shared/composables/usePagedList` | Estado de consulta, paginación, cancelación y descarte de respuestas anteriores. |
+| `shared/composables/useFormInteraction` | Captura y validación al perder el foco, compartidas con login e inventario. |
+| `shared/components/FilterActions` | Acciones de filtro con props/eventos; el contenedor procesa la consulta. |
 | `shared/ui/controlDefaults` / `feedback` | Tema de controles y avisos de éxito mediante SweetAlert2. |
 
 Se refactorizan las piezas con consumidores reales. Pesos, motivos, recuperación

@@ -8,11 +8,13 @@ import { VAlert } from 'vuetify/components/VAlert';
 import { VCard, VCardText } from 'vuetify/components/VCard';
 import { useAuthSession } from '../../auth/session.js';
 import { showSuccess } from '../../../shared/ui/feedback.js';
+import FilterActions from '../../../shared/components/FilterActions.vue';
 import CatalogTable from '../components/CatalogTable.vue';
 import CatalogEditorPage from './CatalogEditorPage.vue';
 import { catalogDefinition } from '../catalog.js';
 import { useCatalogList } from '../composables/useCatalogList.js';
 import type { CatalogName, CatalogTarget } from '../catalog.js';
+
 const props = defineProps<{ catalog: CatalogName }>();
 const router = useRouter();
 const session = useAuthSession();
@@ -20,43 +22,52 @@ const canManage = computed(() =>
     session.user.value?.permissions.includes(PERMISSIONS.CATALOGS_MANAGE),
 );
 const definition = catalogDefinition(props.catalog);
+
 const onDenied = (status: number) =>
     void router.replace(
         status === 401
             ? { name: 'login', query: { returnTo: router.currentRoute.value.fullPath } }
             : { name: 'forbidden' },
     );
+
 const list = useCatalogList(props.catalog, onDenied);
 const { query, rows, total, isLoading, error } = list;
 const search = ref('');
 const editor = shallowRef<CatalogTarget | null>(null);
+
 const openEditor = (target: CatalogTarget) => {
     if (canManage.value) editor.value = target;
 };
+
 const applySearch = () => {
     if (query.search === search.value && query.page === 1) void list.load();
     else list.applyQuery({ search: search.value });
 };
+
 const clearSearch = () => {
     search.value = '';
     list.applyQuery({ search: '' });
 };
+
 const reload = () => {
     editor.value = null;
     void list.load();
 };
+
 const onSaved = () => {
     reload();
     void showSuccess('El catálogo se guardó correctamente.');
 };
+
 onMounted(() => {
     document.title = `Nexus | ${definition.label}`;
 });
 </script>
+
 <template>
     <section :aria-labelledby="`catalog-${catalog}-title`">
-        <VCard class="catalog-sheet"
-            ><VCardText>
+        <VCard class="catalog-sheet">
+            <VCardText>
                 <header class="catalog-heading">
                     <h1 :id="`catalog-${catalog}-title`">Tabla de {{ definition.label }}</h1>
                     <VBtn
@@ -65,8 +76,9 @@ onMounted(() => {
                         variant="flat"
                         prepend-icon="$plus"
                         @click="openEditor({ action: 'create' })"
-                        >{{ definition.createButtonLabel }}</VBtn
                     >
+                        {{ definition.createButtonLabel }}
+                    </VBtn>
                 </header>
                 <form
                     class="catalog-search"
@@ -78,26 +90,11 @@ onMounted(() => {
                         clearable
                         @click:clear="clearSearch"
                     />
-                    <VBtn
-                        variant="text"
-                        :disabled="isLoading"
-                        @click="list.load"
-                        >Actualizar</VBtn
-                    >
-                    <VBtn
-                        color="filter-clear"
-                        variant="outlined"
-                        :disabled="isLoading"
-                        @click="clearSearch"
-                        >Limpiar filtros</VBtn
-                    >
-                    <VBtn
-                        type="submit"
-                        color="filter-action"
-                        variant="flat"
-                        :loading="isLoading"
-                        >Buscar</VBtn
-                    >
+                    <FilterActions
+                        :is-loading="isLoading"
+                        @refresh="list.load"
+                        @clear="clearSearch"
+                    />
                 </form>
                 <VAlert
                     v-if="error"
@@ -105,13 +102,15 @@ onMounted(() => {
                     type="error"
                     variant="tonal"
                     class="mb-4"
-                    >{{ error
-                    }}<VBtn
+                >
+                    {{ error }}
+                    <VBtn
                         variant="text"
                         @click="list.load"
-                        >Reintentar</VBtn
-                    ></VAlert
-                >
+                    >
+                        Reintentar
+                    </VBtn>
+                </VAlert>
                 <p
                     class="catalog-count"
                     role="status"
@@ -126,8 +125,9 @@ onMounted(() => {
                     :has-symbol="definition.fields.includes('symbol')"
                     @query="list.applyQuery"
                     @edit="openEditor({ action: 'edit', row: $event })"
-                /> </VCardText
-        ></VCard>
+                />
+            </VCardText>
+        </VCard>
         <CatalogEditorPage
             v-if="editor"
             :catalog="catalog"
@@ -139,6 +139,7 @@ onMounted(() => {
         />
     </section>
 </template>
+
 <style scoped>
 .catalog-sheet {
     border: 1px solid rgba(var(--v-theme-primary), 0.16);
@@ -162,10 +163,6 @@ onMounted(() => {
     font-weight: 800;
     text-align: center;
 }
-.catalog-count {
-    color: rgb(var(--v-theme-muted));
-    font-size: 0.8rem;
-}
 .catalog-search {
     display: flex;
     flex-wrap: wrap;
@@ -177,11 +174,13 @@ onMounted(() => {
     flex: 1 1 240px;
 }
 .catalog-count {
+    color: rgb(var(--v-theme-muted));
+    font-size: 0.8rem;
     margin-bottom: 0.6rem;
 }
 @media (max-width: 600px) {
-    .catalog-search .v-btn {
-        flex: 1 1 120px;
+    .catalog-search :deep(.filter-actions) {
+        flex: 1 1 100%;
     }
 }
 </style>

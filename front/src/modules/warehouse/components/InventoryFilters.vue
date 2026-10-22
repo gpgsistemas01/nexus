@@ -8,7 +8,7 @@ import {
 } from 'vuetify/components/VExpansionPanel';
 import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
-import { VBtn } from 'vuetify/components/VBtn';
+import FilterActions from '../../../shared/components/FilterActions.vue';
 import RemoteSelect from './RemoteSelect.vue';
 import type { LookupItem } from '../inventory.js';
 
@@ -83,32 +83,11 @@ const expanded = ref(0);
                             />
                         </VCol>
                     </VRow>
-                    <div class="filter-actions">
-                        <VBtn
-                            variant="text"
-                            :disabled="isLoading"
-                            @click="emit('refresh')"
-                        >
-                            Actualizar
-                        </VBtn>
-                        <VBtn
-                            color="filter-clear"
-                            variant="outlined"
-                            :disabled="isLoading"
-                            @click="emit('clear')"
-                        >
-                            Limpiar filtros
-                        </VBtn>
-                        <VBtn
-                            type="submit"
-                            class="filter-apply"
-                            color="filter-action"
-                            variant="flat"
-                            :loading="isLoading"
-                        >
-                            Buscar
-                        </VBtn>
-                    </div>
+                    <FilterActions
+                        :is-loading="isLoading"
+                        @refresh="emit('refresh')"
+                        @clear="emit('clear')"
+                    />
                 </form>
             </VExpansionPanelText>
         </VExpansionPanel>
@@ -132,14 +111,10 @@ const expanded = ref(0);
     color: rgb(var(--v-theme-muted));
     font-size: 0.75rem;
 }
-.filter-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 0.65rem;
+.inventory-filters :deep(.filter-actions) {
     margin-top: 1rem;
 }
-.filter-apply {
+.inventory-filters :deep(.filter-apply) {
     background: linear-gradient(180deg, rgb(var(--v-theme-filter-action)), #163a5c);
     box-shadow: 0 0.35rem 0.75rem rgba(var(--v-theme-filter-action), 0.2);
 }
@@ -147,7 +122,7 @@ const expanded = ref(0);
     .filters-hint {
         display: none;
     }
-    .filter-actions .v-btn {
+    .inventory-filters :deep(.filter-actions .v-btn) {
         flex: 1 1 130px;
     }
 }

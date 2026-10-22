@@ -9,7 +9,19 @@ orden de macros y convenciones de componentes. Prettier y `.editorconfig` aplica
 cuatro espacios en código Vue/TypeScript/CSS y configuración, dos en
 pruebas y en el manifiesto `package.json`, comillas simples en JavaScript/TypeScript, punto y coma, LF y
 un atributo por línea.
+Los templates usan `htmlWhitespaceSensitivity: 'ignore'` para separar contenido,
+etiquetas y cierres sin agrupar construcciones como `><VBtn` en la misma línea.
+La separación visual de elementos inline debe expresarse en su texto o estilos;
+no se depende de espacios accidentales del archivo.
 `eslint-config-prettier` evita reglas de formato que compitan con el formateador.
+`@stylistic/eslint-plugin` aplica líneas vacías después de imports, entre funciones
+y bloques, y después de guardas `if`. Vue comprueba la separación entre bloques
+`script`, `template` y `style`. Prettier conserva esas líneas vacías; no las inserta
+por sí solo. La separación de fases semánticas dentro de una función sigue siendo
+parte de la revisión del código.
+`npm run format` ejecuta primero ESLint con corrección y después Prettier;
+`npm run format:check` comprueba Prettier y `npm run lint` comprueba también esas
+reglas de separación. `npm run check` ejecuta ambas comprobaciones.
 Se siguen las reglas de [eslint-plugin-vue](https://eslint.vuejs.org/user-guide/)
 y la [configuración de Prettier](https://prettier.io/docs/configuration), adaptadas
 al estándar local; Vue no impone una indentación universal.
@@ -191,6 +203,15 @@ No se importa el código privado del backend en la suite de Vue.
 | `DP-VUE-WH-008` / `CP-VUE-WH-008` | Unitario y navegador; apertura → desmontaje y cancelar → confirmar → error → reintentar → éxito | Abortar antes de terminar de abrir no deja un popup global pendiente ni envía solicitudes. SweetAlert2 enfoca Cancelar; cancelar no escribe. El primer fallo conserva la confirmación, no repite automáticamente y el reintento confirma la baja por ID de relación y muestra el aviso de éxito. |
 | `DP-VUE-WH-009` / `CP-VUE-WH-009` | Unitario y navegador; apertura → foco sin captura → edición → validación → envío → reapertura | Cargar catálogos o perder foco sin modificar no publica errores. Validar un campo editado no muestra errores de los campos intactos; enviar valida toda la captura. Reabrir no conserva errores anteriores. Login aplica la misma política. |
 | `DP-VUE-WH-010` / `CP-VUE-WH-010` | Unitario; fronteras antes/a los 30 s y transiciones visible/oculta, modal abierto/cerrado, consulta pendiente/fallida y desmontaje | Foco no repite una lectura reciente. La recarga automática no solapa consultas ni activa la carga de la tabla; conserva filas idénticas. Pausa con modal/pestaña oculta, renueva datos vencidos al volver, admite reintento manual y descarta respuestas tras desmontar. |
+
+La extracción de `usePagedList` conserva los casos de catálogo y recarga de
+inventario en sus consumidores. `inventoryListTest.ts` añade las particiones sin
+permiso de lectura (ninguna consulta manual o automática) y página fuera de rango
+(salto directo a la última disponible). Las pruebas existentes de login, inventario
+y catálogos siguen comprobando la política de campos intactos/editados y el envío
+completo tras compartir `useFormInteraction`. Los recorridos de navegador conservan
+los formularios y botones reales; cada catálogo tiene su propio caso de alta y su
+propio límite de ejecución. No se agregan pruebas de clases CSS ni del formato.
 
 Los casos `apiClientTest.ts` mantienen renovación única, límite de un reintento,
 rechazo público sin refresh, errores de red sin repetición de escritura y cancelación.

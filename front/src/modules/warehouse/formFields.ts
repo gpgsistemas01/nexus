@@ -45,6 +45,7 @@ export const inventorySections = (
         : '';
     const sections: InventoryFormSection[] = [];
     if (action === 'delete') return sections;
+
     if (isCreating && isWaste)
         sections.push({
             id: 'origin',
@@ -61,6 +62,7 @@ export const inventorySections = (
                 },
             ],
         });
+
     sections.push({
         id: 'identity',
         title: isWaste
@@ -141,6 +143,7 @@ export const inventorySections = (
                       ]
                     : undefined,
         });
+
     if (isWaste && isRoll)
         sections.push({
             id: 'weights',
@@ -169,6 +172,7 @@ export const inventorySections = (
                 },
             ],
         });
+
     if (
         isWaste &&
         !isCreating &&
@@ -188,6 +192,7 @@ export const inventorySections = (
                 },
             ],
         });
+
     if (isWaste || options.usesMeasurements)
         sections.push({
             id: 'measurements',
@@ -206,6 +211,7 @@ export const inventorySections = (
                     : {}),
             })),
         });
+
     sections.push({
         id: 'inventory',
         title: isWaste
@@ -271,5 +277,6 @@ export const inventorySections = (
                 { name: 'observations', label: 'Observaciones', type: 'textarea', isWide: true },
             ],
         });
+
     return sections;
 };

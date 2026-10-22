@@ -13,6 +13,7 @@ export const requestPage = async (
     signal?: AbortSignal,
 ): Promise<PageResult<Record<string, unknown>>> => {
     const page = await apiClient.request<PageResult<unknown>>(url, { signal });
+
     if (
         !Array.isArray(page.data) ||
         !page.data.every(isRecord) ||
@@ -21,5 +22,6 @@ export const requestPage = async (
     ) {
         throw new ApiError('El servidor devolvió un listado inesperado.');
     }
+
     return page as PageResult<Record<string, unknown>>;
 };

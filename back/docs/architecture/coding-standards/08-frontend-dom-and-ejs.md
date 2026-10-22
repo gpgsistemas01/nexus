@@ -48,6 +48,12 @@ relacionadas; la captura automática no crea datos de operación.
   comprobación forma parte de `npm run check` y CI. ESLint usa el preset Vue
   `recommended` y valida responsabilidades y convenciones; el formateador sólo
   normaliza sintaxis y no sustituye la revisión de diseño.
+- `npm run format` corrige primero las reglas de ESLint y después ejecuta Prettier.
+  `@stylistic/eslint-plugin` comprueba la separación tras imports y guardas, y entre
+  funciones y bloques; Vue comprueba una línea vacía entre `script`, `template`
+  y `style`. Los templates separan contenido y cierres de etiquetas con
+  `htmlWhitespaceSensitivity: 'ignore'`. Las fases semánticas se revisan según
+  la sección 2: no se agrega una línea vacía entre cada sentencia.
 - Componentes `.vue` en PascalCase, con `<script setup lang="ts">`. Composables en
   `useNombre.ts`, módulos TypeScript en camelCase e imports relativos con `.js`,
   resueltos por TypeScript/Vite. Las convenciones de nombres y booleanos de la sección

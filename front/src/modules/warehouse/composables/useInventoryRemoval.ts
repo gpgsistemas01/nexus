@@ -12,9 +12,12 @@ export const useInventoryRemoval = (options: {
 }) => {
     const isConfirming = ref(false);
     const controller = new AbortController();
+
     const remove = async (row: InventoryRow) => {
         if (isConfirming.value || controller.signal.aborted) return;
+
         isConfirming.value = true;
+
         try {
             const confirmed = await confirmRemoval({
                 title: `Eliminar ${INVENTORY_CONFIG[options.resource].singular}: ${row.name}`,
@@ -32,6 +35,7 @@ export const useInventoryRemoval = (options: {
                     } catch (cause) {
                         if (cause instanceof ApiError && cause.status === 401)
                             options.onUnauthorized();
+
                         throw cause;
                     }
                 },
@@ -41,6 +45,7 @@ export const useInventoryRemoval = (options: {
             isConfirming.value = false;
         }
     };
+
     onBeforeUnmount(() => controller.abort());
     return { isConfirming, remove };
 };

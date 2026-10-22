@@ -58,6 +58,7 @@ export const inventoryService = {
             throw new ApiError(
                 'No se pudo confirmar la operación. Revisa el inventario antes de reintentar.',
             );
+
         return result;
     },
 };

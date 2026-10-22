@@ -44,6 +44,7 @@ const sortBy = computed<DataTableSortItem[]>(() => [
     },
 ]);
 const details = ref<InventoryRow | null>(null);
+
 const updateOptions = (options: {
     page: number;
     itemsPerPage: number;
@@ -57,6 +58,7 @@ const updateOptions = (options: {
         direction: sorting?.order === 'desc' ? 'desc' : 'asc',
     });
 };
+
 const rowProps = ({ item }: { item: InventoryRow }) => ({
     class: Number(item.currentStock) < Number(item.minStock) ? 'low-stock' : '',
 });

@@ -22,6 +22,7 @@ const knownMessage = (data: Record<string, unknown>) =>
 
 export const normalizeApiError = async (cause: unknown): Promise<ApiError> => {
     if (cause instanceof ApiError) return cause;
+
     if (!axios.isAxiosError(cause) || !cause.response) {
         return new ApiError(
             'No fue posible conectar. Revisa tu conexión e inténtalo de nuevo.',
@@ -29,8 +30,10 @@ export const normalizeApiError = async (cause: unknown): Promise<ApiError> => {
             'NETWORK_ERROR',
         );
     }
+
     const status = cause.response.status;
     let data: unknown = cause.response.data;
+
     if (data instanceof Blob) {
         try {
             data = JSON.parse(await data.text());
@@ -38,15 +41,19 @@ export const normalizeApiError = async (cause: unknown): Promise<ApiError> => {
             data = null;
         }
     }
+
     const body = isRecord(data) ? data : {};
     const fields: Record<string, string> = {};
+
     if (isRecord(body.errors)) {
         for (const [field, detail] of Object.entries(body.errors)) {
             if (!isRecord(detail)) continue;
+
             const message = knownMessage(detail);
             if (message) fields[field] = message;
         }
     }
+
     const fallback =
         status === 401
             ? 'Tu sesión terminó. Vuelve a iniciar sesión.'

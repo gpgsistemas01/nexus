@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+
 defineProps<{ isUnavailable?: boolean }>();
 </script>
 
@@ -13,8 +14,8 @@ defineProps<{ isUnavailable?: boolean }>();
                     : 'Tu cuenta no tiene permiso para abrir este módulo.'
             }}
         </p>
-        <RouterLink to="/almacen">Volver a comprobar el acceso</RouterLink
-        ><RouterLink to="/inicio-sesion">Iniciar sesión</RouterLink>
+        <RouterLink to="/almacen">Volver a comprobar el acceso</RouterLink>
+        <RouterLink to="/inicio-sesion">Iniciar sesión</RouterLink>
     </main>
 </template>
 

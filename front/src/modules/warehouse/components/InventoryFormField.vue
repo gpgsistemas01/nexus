@@ -20,6 +20,7 @@ const emit = defineEmits<{
     more: [];
     retry: [];
 }>();
+
 const update = (value: string | boolean) => {
     if (!props.field.isReadOnly) emit('update', value);
 };

@@ -18,19 +18,23 @@ export const useRemoteOptions = (
     let timer: ReturnType<typeof setTimeout> | undefined;
     let sequence = 0;
     let requestedPage = 1;
+
     const load = async (nextPage = 1) => {
         const requestId = ++sequence;
         requestedPage = nextPage;
         controller?.abort();
+
         if (!isEnabled.value || (supplierId && !supplierId.value)) {
             items.value = [];
             total.value = 0;
             isLoading.value = false;
             return;
         }
+
         controller = new AbortController();
         isLoading.value = true;
         error.value = '';
+
         try {
             const result = await inventoryCatalogService.lookup(
                 path,
@@ -40,6 +44,7 @@ export const useRemoteOptions = (
                 controller.signal,
             );
             if (requestId !== sequence) return;
+
             items.value =
                 nextPage === 1
                     ? result.data
@@ -59,6 +64,7 @@ export const useRemoteOptions = (
             if (requestId === sequence) isLoading.value = false;
         }
     };
+
     watch(
         [isEnabled, ...(supplierId ? [supplierId] : [])],
         () => {
@@ -71,8 +77,10 @@ export const useRemoteOptions = (
         },
         { immediate: true },
     );
+
     const updateSearch = (value: string) => {
         if (value === search.value) return;
+
         search.value = value;
         items.value = [];
         total.value = 0;
@@ -85,6 +93,7 @@ export const useRemoteOptions = (
             void load();
         }, 250);
     };
+
     onBeforeUnmount(() => {
         ++sequence;
         clearTimeout(timer);

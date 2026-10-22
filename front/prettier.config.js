@@ -6,6 +6,7 @@ export default {
     trailingComma: 'all',
     printWidth: 100,
     singleAttributePerLine: true,
+    htmlWhitespaceSensitivity: 'ignore',
     endOfLine: 'lf',
     overrides: [{ files: ['tests/**/*.ts', 'package.json'], options: { tabWidth: 2 } }],
 };

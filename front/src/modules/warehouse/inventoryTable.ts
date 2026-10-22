@@ -25,6 +25,7 @@ export const inventoryHeaders = (
                 column('Altura', 'height', resource === 'materials'),
             ],
         });
+
     headers.push(
         column(isConsumable ? 'Existencia' : 'Stock actual', 'currentStock'),
         column('Stock Mínimo', 'minStock', resource === 'materials'),
@@ -37,11 +38,14 @@ export const inventoryHeaders = (
             align: 'center',
             children: [column('Cantidad', 'convertedQuantity'), column('Unidad', 'unitMeasure')],
         });
+
     if (permissions.canReadCosts)
         headers.push(
             column(isConsumable ? 'Costo Unitario' : 'Costo Unitario de Conversión', 'maxUnitCost'),
         );
+
     if (permissions.canReadState) headers.push(column('Activo', 'isActive'));
+
     if (resource === 'wastes')
         headers.push({
             title: 'Pesos por unidad (kg)',
@@ -52,8 +56,10 @@ export const inventoryHeaders = (
                 column('Neto', 'weightKg'),
             ],
         });
+
     if (permissions.canWrite || permissions.canAdjust || permissions.canAdd)
         headers.push(column('Acciones', 'actions'));
+
     return headers;
 };
 
@@ -64,8 +70,10 @@ export const INVENTORY_SORT_COLUMNS: Readonly<Record<string, number>> = {
     height: 2,
     minStock: 4,
 };
+
 export const numberText = (value: string | number | null | undefined) =>
     value == null ? '—' : Number(value).toLocaleString('es-MX', { maximumFractionDigits: 6 });
+
 export const currencyText = (value: string | number | null | undefined) =>
     value == null
         ? '—'

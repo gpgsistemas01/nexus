@@ -13,11 +13,14 @@ export const useInventoryReport = (options: {
     const isExporting = ref(false);
     const exportError = ref('');
     let controller: AbortController | null = null;
+
     const exportReport = async (scope: string) => {
         if (!canExport || isExporting.value) return;
+
         controller = new AbortController();
         isExporting.value = true;
         exportError.value = '';
+
         try {
             const file = await inventoryReportService.export(
                 resource,
@@ -26,6 +29,7 @@ export const useInventoryReport = (options: {
                 controller.signal,
             );
             if (controller.signal.aborted) return;
+
             const url = URL.createObjectURL(file);
             const link = document.createElement('a');
             link.href = url;
@@ -34,12 +38,14 @@ export const useInventoryReport = (options: {
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (cause) {
             if (controller.signal.aborted) return;
+
             exportError.value = cause instanceof Error ? cause.message : 'No se pudo exportar.';
             if (cause instanceof ApiError && cause.status === 401) onUnauthorized();
         } finally {
             isExporting.value = false;
         }
     };
+
     onBeforeUnmount(() => controller?.abort());
     return { isExporting, exportError, exportReport };
 };

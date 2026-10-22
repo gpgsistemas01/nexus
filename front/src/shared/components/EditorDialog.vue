@@ -6,6 +6,7 @@ import { VCard, VCardTitle, VCardText, VCardActions } from 'vuetify/components/V
 import { VBtn } from 'vuetify/components/VBtn';
 import { VDefaultsProvider } from 'vuetify/components/VDefaultsProvider';
 import { controlDefaults } from '../ui/controlDefaults.js';
+
 withDefaults(
     defineProps<{
         title: string;
@@ -24,6 +25,7 @@ const { smAndDown } = useDisplay();
 const formId = useId();
 const titleId = useId();
 </script>
+
 <template>
     <VDialog
         :model-value="true"
@@ -73,14 +75,16 @@ const titleId = useId();
                     <span
                         v-if="note"
                         class="editor-note"
-                        >{{ note }}</span
                     >
+                        {{ note }}
+                    </span>
                     <VBtn
                         :disabled="isSubmitting"
                         variant="outlined"
                         @click="emit('close')"
-                        >Cerrar</VBtn
                     >
+                        Cerrar
+                    </VBtn>
                     <slot name="actions" />
                     <VBtn
                         :form="formId"
@@ -89,13 +93,15 @@ const titleId = useId();
                         variant="flat"
                         :loading="isSubmitting"
                         :disabled="isSubmitting || isSubmitDisabled"
-                        >{{ submitLabel }}</VBtn
                     >
+                        {{ submitLabel }}
+                    </VBtn>
                 </VCardActions>
             </VCard>
         </VDefaultsProvider>
     </VDialog>
 </template>
+
 <style scoped>
 .editor-dialog {
     border-radius: 1rem;

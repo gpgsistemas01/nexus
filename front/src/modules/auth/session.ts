@@ -12,6 +12,7 @@ export interface SessionUser {
 export const createAuthSession = (request = apiClient.request) => {
     const user = shallowRef<SessionUser | null>(null);
     let loading: Promise<SessionUser> | null = null;
+
     const load = async () => {
         loading ??= request<{ user: unknown }>('/api/auth/me')
             .then((data) => {
@@ -24,6 +25,7 @@ export const createAuthSession = (request = apiClient.request) => {
                 ) {
                     throw new Error('No fue posible comprobar la sesión.');
                 }
+
                 user.value = {
                     id: data.user.id,
                     name: data.user.name,
@@ -40,13 +42,16 @@ export const createAuthSession = (request = apiClient.request) => {
             });
         return loading;
     };
+
     return { user: readonly(user), load };
 };
 
 export type AuthSession = ReturnType<typeof createAuthSession>;
 export const authSessionKey: InjectionKey<AuthSession> = Symbol('auth-session');
+
 export const useAuthSession = () => {
     const session = inject(authSessionKey);
     if (!session) throw new Error('La sesión no se ha configurado.');
+
     return session;
 };

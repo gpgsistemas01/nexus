@@ -3,6 +3,7 @@ import CatalogForm from '../components/CatalogForm.vue';
 import { catalogDefinition } from '../catalog.js';
 import { useCatalogEditor } from '../composables/useCatalogEditor.js';
 import type { CatalogName, CatalogTarget } from '../catalog.js';
+
 const props = defineProps<{ catalog: CatalogName; target: CatalogTarget }>();
 const emit = defineEmits<{ saved: []; close: []; reload: []; denied: [status: number] }>();
 const definition = catalogDefinition(props.catalog);
@@ -15,6 +16,7 @@ const { values, errors, message, isSubmitting, isConflicted } = editor;
 const isEditing = props.target.action === 'edit';
 const title = `${isEditing ? 'Editar' : 'Registrar'} ${definition.entityLabel}`;
 </script>
+
 <template>
     <CatalogForm
         :title="title"

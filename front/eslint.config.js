@@ -3,6 +3,14 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import vue from 'eslint-plugin-vue';
 import prettier from 'eslint-config-prettier';
+import stylistic from '@stylistic/eslint-plugin';
+
+const functionStatement = {
+    selector: [
+        'VariableDeclaration[declarations.0.init.type="ArrowFunctionExpression"]',
+        'ExportNamedDeclaration[declaration.declarations.0.init.type="ArrowFunctionExpression"]',
+    ].join(', '),
+};
 
 export default tseslint.config(
     { ignores: ['dist/**', 'coverage/**', 'build/**', 'test-results/**', 'node_modules/**'] },
@@ -13,6 +21,25 @@ export default tseslint.config(
     {
         files: ['src/**/*.{ts,vue}'],
         languageOptions: { globals: globals.browser },
+        plugins: { '@stylistic': stylistic },
+        rules: {
+            '@stylistic/padding-line-between-statements': [
+                'error',
+                { blankLine: 'always', prev: 'import', next: '*' },
+                { blankLine: 'any', prev: 'import', next: 'import' },
+                {
+                    blankLine: 'always',
+                    prev: '*',
+                    next: ['function', 'block-like', functionStatement],
+                },
+                {
+                    blankLine: 'always',
+                    prev: ['function', 'block-like', functionStatement],
+                    next: '*',
+                },
+                { blankLine: 'always', prev: 'if', next: '*' },
+            ],
+        },
     },
     {
         files: ['*.{js,ts}', 'tests/**/*.ts'],
@@ -27,6 +54,8 @@ export default tseslint.config(
         files: ['**/*.vue'],
         rules: {
             'vue/component-api-style': ['error', ['script-setup']],
+            'vue/block-tag-newline': ['error', { singleline: 'always', multiline: 'always' }],
+            'vue/padding-line-between-blocks': ['error', 'always'],
             'vue/define-macros-order': [
                 'error',
                 { order: ['defineOptions', 'defineProps', 'defineEmits', 'defineSlots'] },

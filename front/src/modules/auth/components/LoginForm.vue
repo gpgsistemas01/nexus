@@ -19,8 +19,9 @@ const emit = defineEmits<LoginFormEmits>();
             id="login-name-label"
             class="login-label"
             for="login-name"
-            >Nombre de usuario</label
         >
+            Nombre de usuario
+        </label>
         <VTextField
             id="login-name"
             name="name"
@@ -44,8 +45,9 @@ const emit = defineEmits<LoginFormEmits>();
             id="login-password-label"
             class="login-label"
             for="login-password"
-            >Contraseña</label
         >
+            Contraseña
+        </label>
         <VTextField
             id="login-password"
             name="password"
@@ -103,8 +105,9 @@ const emit = defineEmits<LoginFormEmits>();
             :loading="isSubmitting"
             :disabled="isSubmitting"
             class="login-submit"
-            >{{ isSubmitting ? 'Ingresando…' : 'Ingresar' }}</VBtn
         >
+            {{ isSubmitting ? 'Ingresando…' : 'Ingresar' }}
+        </VBtn>
     </form>
 </template>
 

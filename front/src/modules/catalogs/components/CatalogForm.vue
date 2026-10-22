@@ -5,6 +5,7 @@ import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import type { CatalogField, CatalogValues } from '../catalog.js';
+
 defineProps<{
     title: string;
     values: CatalogValues;
@@ -25,6 +26,7 @@ const emit = defineEmits<{
     reload: [];
 }>();
 </script>
+
 <template>
     <EditorDialog
         :title="title"
@@ -43,8 +45,9 @@ const emit = defineEmits<{
             type="error"
             variant="tonal"
             class="mb-4"
-            >{{ message }}</VAlert
         >
+            {{ message }}
+        </VAlert>
         <section class="catalog-fields">
             <VTextField
                 label="Nombre"
@@ -75,15 +78,17 @@ const emit = defineEmits<{
                 @update:model-value="emit('update', 'isActive', $event === true)"
             />
         </section>
-        <template #actions
-            ><VBtn
+        <template #actions>
+            <VBtn
                 v-if="isConflicted"
                 @click="emit('reload')"
-                >Cerrar y actualizar catálogo</VBtn
-            ></template
-        >
+            >
+                Cerrar y actualizar catálogo
+            </VBtn>
+        </template>
     </EditorDialog>
 </template>
+
 <style scoped>
 .catalog-fields {
     display: grid;

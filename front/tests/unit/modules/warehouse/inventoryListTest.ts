@@ -7,7 +7,7 @@ import { normalizeInventoryRow } from '../../../../src/modules/warehouse/mappers
 import { material, pageOf } from '../../../fixtures/inventory.js';
 
 const result = () => pageOf([normalizeInventoryRow(material)]);
-const openList = () => {
+const openList = (canRead = true) => {
   const paused = ref(false);
   let list!: ReturnType<typeof useInventoryList>;
   const request = vi.spyOn(inventoryService, 'list').mockResolvedValue(result());
@@ -16,7 +16,7 @@ const openList = () => {
       setup() {
         list = useInventoryList({
           resource: 'materials',
-          canRead: true,
+          canRead,
           canReadSuppliers: false,
           isPaused: paused,
           onUnauthorized: vi.fn(),
@@ -46,6 +46,34 @@ it('una lectura reciente no se repite al recuperar foco; actualizar manualmente 
   expect(request).toHaveBeenCalledTimes(1);
   await list.load();
   expect(request).toHaveBeenCalledTimes(2);
+});
+
+it('sin permiso de lectura no consulta al abrir, cambiar filtros ni actualizar manual o automáticamente', async () => {
+  const { list, request } = openList(false);
+  await flushPromises();
+  list.applyQuery({ search: 'lona' });
+  await list.load();
+  await vi.advanceTimersByTimeAsync(30_000);
+  window.dispatchEvent(new Event('focus'));
+  await flushPromises();
+  expect(request).not.toHaveBeenCalled();
+  expect(list.rows.value).toEqual([]);
+  expect(list.isLoading.value).toBe(false);
+  expect(list.isRefreshing.value).toBe(false);
+});
+
+it('una página fuera del rango vuelve directamente a la última página disponible', async () => {
+  const { list, request } = openList();
+  await flushPromises();
+  request
+    .mockResolvedValueOnce({ data: [], recordsFiltered: 21, recordsTotal: 21 })
+    .mockResolvedValueOnce({ ...result(), recordsFiltered: 21, recordsTotal: 21 });
+  list.applyQuery({ page: 9 });
+  await flushPromises();
+  expect(list.query.page).toBe(3);
+  expect(list.rows.value).toEqual(result().data);
+  expect(request.mock.calls.map(([, query]) => query.page)).toEqual([1, 9, 3]);
+  expect(list.isLoading.value).toBe(false);
 });
 
 it('la actualización automática conserva la tabla y no solapa consultas ni redibuja datos idénticos', async () => {

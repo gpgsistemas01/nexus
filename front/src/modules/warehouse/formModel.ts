@@ -90,13 +90,16 @@ export const previewWaste = (values: InventoryValues, template?: LookupItem) => 
 
 export const inventoryRules = (resource: InventoryResource, action: EditorTarget['action']) => {
     if (action === 'delete') return {};
+
     if (action === 'add-stock') return wasteStockAdditionValidation;
+
     if (resource === 'wastes')
         return action === 'stock'
             ? wasteStockAdjustmentValidation
             : action === 'edit'
               ? wasteEditValidation
               : wasteValidation;
+
     return action === 'stock'
         ? materialStockValidation
         : action === 'edit'
@@ -113,7 +116,9 @@ export const buildInventoryPayload = (
     const { action, row } = target;
     const observations = String(values.observations).trim();
     if (action === 'delete') return {};
+
     if (action === 'add-stock') return { quantity: Number(values.quantity), observations };
+
     if (action === 'stock')
         return {
             expectedVersion: row!.version,
@@ -122,6 +127,7 @@ export const buildInventoryPayload = (
             observations,
             ...(resource !== 'wastes' ? { supplierId: row!.supplierId } : {}),
         };
+
     const data: InventoryPayload = {
         name: String(values.name).trim(),
         isActive: Boolean(values.isActive),
@@ -136,6 +142,7 @@ export const buildInventoryPayload = (
                 ? { supplierId: row!.supplierId, expectedMaterialVersion: row!.materialVersion! }
                 : {}),
         };
+
     if (resource === 'wastes')
         return {
             ...data,
@@ -153,6 +160,7 @@ export const buildInventoryPayload = (
                   }
                 : {}),
         };
+
     return {
         ...data,
         supplierId: String(values.supplierId),

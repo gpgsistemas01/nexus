@@ -154,6 +154,24 @@ inventario y catálogos, con slots para captura y acciones específicas.
 `shared/components/ServerTable` agrupa Vuetify, paginación y estilos; InventoryTable
 y CatalogTable definen columnas, celdas y acciones de su dominio.
 `shared/http/pageRequest` comprueba el contrato paginado consumido por ambos módulos.
+`shared/composables/usePagedList` concentra el estado y ciclo de vida del listado:
+consulta, paginación, cancelación, descarte de respuestas antiguas y conservación
+de filas sin cambios. Recibe la consulta del servicio como estrategia mediante un
+callback tipado; no conoce endpoints, sesión ni permisos concretos.
+`useInventoryList` aporta filtros, permiso de lectura y recarga automática;
+`useCatalogList` aporta el recurso administrativo y el tratamiento de acceso denegado.
+Si una página queda fuera del rango, el núcleo vuelve directamente a la última
+página disponible, sin recorrer todas las páginas vacías intermedias.
+
+`shared/composables/useFormInteraction` comparte la interacción con VeeValidate
+en login, inventario y catálogos: sólo la captura del usuario marca un campo como
+editado; perder el foco sin capturar no muestra errores y el envío valida todo el
+formulario. Cada consumidor decide cuándo bloquear cambios y conserva sus reglas,
+payloads y operaciones. `shared/components/FilterActions` comparte los botones
+Actualizar/Limpiar/Buscar mediante props y eventos, dentro del formulario propietario.
+
+Se aplica composición y estrategia por callbacks a comportamientos equivalentes.
+No se introduce herencia entre módulos ni un generador de CRUD con reglas mezcladas.
 Se conservan separados los composables de captura y listado cuando cambian sus
 reglas, permisos y recuperación. Consulta [Catálogos](catalogs.md).
 

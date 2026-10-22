@@ -29,10 +29,14 @@ export const loginRequest = async (
             throw new LoginRequestError(LOGIN_MESSAGES.INVALID_RESPONSE);
     } catch (cause) {
         if (!(cause instanceof ApiError)) throw cause;
+
         if (cause.status === 401) throw new LoginRequestError(errorMessages.LOGIN_ERROR);
+
         if (cause.status === 429) throw new LoginRequestError(LOGIN_MESSAGES.TOO_MANY_ATTEMPTS);
+
         if (cause.status === 400)
             throw new LoginRequestError(LOGIN_MESSAGES.INVALID_FIELDS, cause.fieldErrors);
+
         throw new LoginRequestError(
             cause.code === 'NETWORK_ERROR'
                 ? LOGIN_MESSAGES.CONNECTION_FAILED

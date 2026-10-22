@@ -1,6 +1,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { loginValidation } from '@nexus/login-validation';
+import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { LOGIN_MESSAGES } from '../loginMessages.js';
 import { LoginRequestError, loginRequest } from '../services/authService.js';
 import type { LoginCredentials, LoginField } from '../login.js';
@@ -13,17 +14,7 @@ interface LoginFormOptions {
 }
 
 export const useLoginForm = ({ onSuccess, request = loginRequest }: LoginFormOptions) => {
-    const {
-        values,
-        errors,
-        isSubmitting,
-        defineField,
-        setFieldValue,
-        setFieldError,
-        validateField,
-        submitCount,
-        handleSubmit,
-    } = useForm<LoginCredentials>({
+    const form = useForm<LoginCredentials>({
         validateOnMount: false,
         initialValues: { name: '', password: '' },
         validationSchema: {
@@ -31,6 +22,15 @@ export const useLoginForm = ({ onSuccess, request = loginRequest }: LoginFormOpt
             password: (value: unknown) => loginValidation.password(value) || true,
         },
     });
+    const {
+        values,
+        errors,
+        isSubmitting,
+        defineField,
+        setFieldValue,
+        setFieldError,
+        handleSubmit,
+    } = form;
     const [name] = defineField('name', { validateOnModelUpdate: false });
     const [password] = defineField('password', { validateOnModelUpdate: false });
     const isPasswordVisible = ref(false);
@@ -54,18 +54,12 @@ export const useLoginForm = ({ onSuccess, request = loginRequest }: LoginFormOpt
     });
     onBeforeUnmount(() => controller.abort());
 
-    const editedFields = new Set<LoginField>();
-    const updateField = (field: LoginField, value: string) => {
-        if (values[field] === value) return;
-        editedFields.add(field);
-        setFieldValue(field, value, false);
-        setFieldError(field, undefined);
-        message.value = '';
-    };
-
-    const blurField = (field: LoginField) => {
-        if (editedFields.has(field) || submitCount.value > 0) return validateField(field);
-    };
+    const { update, blur } = useFormInteraction<LoginField, string>(form, {
+        isDisabled: () => isSubmitting.value || controller.signal.aborted,
+        onChange: () => {
+            message.value = '';
+        },
+    });
 
     const submitValidated = handleSubmit(
         async (credentials) => {
@@ -127,8 +121,8 @@ export const useLoginForm = ({ onSuccess, request = loginRequest }: LoginFormOpt
         isPasswordVisible,
         shouldRememberUser,
         message,
-        updateField,
-        blurField,
+        updateField: update,
+        blurField: blur,
         submit,
     };
 };

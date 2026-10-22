@@ -7,6 +7,7 @@ import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import InventoryFormField from './InventoryFormField.vue';
 import type { InventoryFormSection } from '../formFields.js';
 import type { InventoryField, InventoryValues, LookupItem } from '../inventory.js';
+
 defineProps<{
     title: string;
     context?: string;
@@ -33,6 +34,7 @@ const emit = defineEmits<{
     reload: [];
 }>();
 </script>
+
 <template>
     <EditorDialog
         :title="title"
@@ -119,15 +121,17 @@ const emit = defineEmits<{
                 </section>
             </template>
         </template>
-        <template #actions
-            ><VBtn
+        <template #actions>
+            <VBtn
                 v-if="isConflicted && !isPending"
                 @click="emit('reload')"
-                >Cerrar y actualizar inventario</VBtn
-            ></template
-        >
+            >
+                Cerrar y actualizar inventario
+            </VBtn>
+        </template>
     </EditorDialog>
 </template>
+
 <style scoped>
 .editor-section {
     background: rgb(var(--v-theme-surface));

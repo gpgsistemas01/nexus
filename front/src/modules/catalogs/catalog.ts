@@ -17,11 +17,13 @@ export interface CatalogQuery {
     length: number;
 }
 export type CatalogTarget = { action: 'create' } | { action: 'edit'; row: CatalogEntry };
+
 export const catalogDefinition = (name: CatalogName) => {
     const definition = PUBLIC_CATALOGS[name];
     const maxLengths: { name: number; symbol?: number } = definition.maxLengths;
     return { ...definition, name, maxLengths };
 };
+
 export const buildCatalogPayload = (
     catalog: CatalogName,
     target: CatalogTarget,

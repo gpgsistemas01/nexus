@@ -4,7 +4,9 @@ import type { InventoryRow, Numeric } from '../inventory.js';
 
 const numberValue = (value: unknown): Numeric =>
     typeof value === 'number' || typeof value === 'string' ? value : null;
+
 const text = (value: unknown) => (typeof value === 'string' ? value : '');
+
 const record = (value: unknown) => (isRecord(value) ? value : {});
 
 export const normalizeInventoryRow = (raw: Record<string, unknown>): InventoryRow => {
@@ -12,6 +14,7 @@ export const normalizeInventoryRow = (raw: Record<string, unknown>): InventoryRo
     const supplier = record(raw.supplier);
     const presentation = record(material.presentation);
     const unit = record(material.unitMeasure);
+
     if (
         typeof raw.id !== 'string' ||
         typeof material.id !== 'string' ||
@@ -20,6 +23,7 @@ export const normalizeInventoryRow = (raw: Record<string, unknown>): InventoryRo
     ) {
         throw new ApiError('El servidor devolvió un registro de inventario inesperado.');
     }
+
     return {
         id: raw.id,
         entityId: material.id,

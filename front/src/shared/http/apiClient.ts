@@ -22,6 +22,7 @@ export const createApiClient = (adapter?: AxiosAdapter) => {
         (response) => response,
         async (cause: unknown) => {
             if (!axios.isAxiosError(cause)) throw cause;
+
             const original = cause.config as RetriableRequest | undefined;
             if (
                 cause.response?.status !== 401 ||
@@ -30,6 +31,7 @@ export const createApiClient = (adapter?: AxiosAdapter) => {
                 original.hasRetried
             )
                 throw cause;
+
             original.hasRetried = true;
             refresh ??= http
                 .post('/api/auth/refresh', {}, { requiresAuth: false } as ApiRequestConfig)
@@ -38,25 +40,31 @@ export const createApiClient = (adapter?: AxiosAdapter) => {
                 });
             await refresh;
             if (original.signal?.aborted) throw new CanceledError();
+
             return http.request(original);
         },
     );
+
     const request = async <T>(url: string, options: ApiRequestConfig = {}): Promise<T> => {
         try {
             const response = await http.request({ ...options, url });
             if (options.responseType === 'blob') return response.data as T;
+
             if (!isRecord(response.data))
                 throw new ApiError(
                     'El servidor devolvió una respuesta inesperada.',
                     response.status,
                     'INVALID_RESPONSE',
                 );
+
             return response.data as T;
         } catch (cause) {
             if (axios.isCancel(cause)) throw cause;
+
             throw await normalizeApiError(cause);
         }
     };
+
     return { request, http };
 };
 

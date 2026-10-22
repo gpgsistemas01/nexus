@@ -28,11 +28,11 @@ test('catálogos: navegación Vue, seis rutas y cuenta con acceso exclusivo a ca
   await expect(page.getByRole('heading', { name: 'Página no encontrada' })).toBeVisible();
 });
 
-test('catálogos: alta de los seis recursos con validación, símbolo condicional y estado inactivo', async ({
-  page,
-}) => {
-  const { writes } = await mockCatalogs(page);
-  for (const catalog of catalogs) {
+for (const catalog of catalogs) {
+  test(`catálogos: alta de ${catalog.label} con validación, campos y estado inactivo`, async ({
+    page,
+  }) => {
+    const { writes } = await mockCatalogs(page);
     await page.goto(`/catalogos/${catalog.name}`);
     await expect(
       page.getByRole('heading', { name: `Tabla de ${catalog.label}`, exact: true }),
@@ -67,8 +67,8 @@ test('catálogos: alta de los seis recursos con validación, símbolo condiciona
       data: { name, isActive: false, ...(catalog.name === 'unit-measures' ? { symbol: 'u' } : {}) },
     });
     await expect(page.getByRole('button', { name: 'Eliminar', exact: true })).toBeHidden();
-  }
-});
+  });
+}
 
 test('catálogos: edición usa PUT con la versión leída y conserva símbolo y estado', async ({
   page,
