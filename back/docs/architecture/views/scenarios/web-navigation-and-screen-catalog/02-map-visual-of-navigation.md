@@ -6,6 +6,12 @@ trabajo. Las categorías redondeadas despliegan opciones y no registran una URL 
 La visibilidad final siempre depende de los permisos calculados para la sesión y las
 rutas vuelven a comprobar la autorización en el servidor.
 
+**Identidad y acceso** reúne Personas y Usuarios. **Directorio comercial** reúne
+Clientes y Proveedores. **Catálogos** conserva los seis auxiliares. Cada opción
+conserva su permiso independiente.
+Un grupo sin opciones autorizadas se oculta. El destino activo abre su grupo en el
+menú con etiquetas; la barra de iconos conserva el despliegue lateral existente.
+
 Los diagramas se contrastan con el partial compartido `src/views/layout/ui/navList.ejs`.
 La definición normativa de los actores permanece en la
 [SRS](../../../../requirements/requirements-specification/03-actors-and-system-responsibilities.md):
@@ -75,9 +81,11 @@ flowchart LR
     issues -->|"goods:issues-page-view"| goodsIssues["Materiales<br/>/salidas/materiales"]
     issues -->|"goods:issues-page-view"| consumableIssues["Consumibles<br/>/salidas/consumibles"]
     issues -->|"waste:issues-page-view"| wasteIssues["Mermas<br/>/salidas/mermas"]
-    menu -->|"persons:page-view"| persons["Personas<br/>/personas"]
-    menu -->|"clients:page-view"| clients["Clientes<br/>/clientes"]
-    menu -->|"suppliers:page-view"| suppliers["Proveedores<br/>/proveedores"]
+    menu --> identity(["Identidad y acceso"])
+    identity -->|"persons:page-view"| persons["Personas<br/>/personas"]
+    menu --> directory(["Directorio comercial"])
+    directory -->|"clients:page-view"| clients["Clientes<br/>/clientes"]
+    directory -->|"suppliers:page-view"| suppliers["Proveedores<br/>/proveedores"]
 ```
 
 ## Administrador del sistema
@@ -101,17 +109,21 @@ flowchart LR
     movements -->|"movements:read"| materialMovements["Materiales<br/>/movimientos/materiales"]
     movements -->|"movements:read"| consumableMovements["Consumibles<br/>/movimientos/consumibles"]
     movements -->|"movements:read"| wasteMovements["Mermas<br/>/movimientos/mermas"]
-    menu -->|"users:manage"| users["Usuarios<br/>/usuarios-sistemas"]
-    menu -->|"persons:page-view"| persons["Personas<br/>/personas"]
-    menu -->|"clients:page-view"| clients["Clientes<br/>/clientes"]
-    menu -->|"suppliers:page-view"| suppliers["Proveedores<br/>/proveedores"]
+    menu --> identity(["Identidad y acceso"])
+    identity -->|"persons:page-view"| persons["Personas<br/>/personas"]
+    identity -->|"users:manage"| users["Usuarios<br/>/usuarios-sistemas"]
+    menu --> directory(["Directorio comercial"])
+    directory -->|"clients:page-view"| clients["Clientes<br/>/clientes"]
+    directory -->|"suppliers:page-view"| suppliers["Proveedores<br/>/proveedores"]
     menu --> catalogs(["Catálogos"])
 ```
 
 ### Catálogos auxiliares del administrador
 
-**Identificador:** `DIA-ARQ-NAV-003`. El submenú se ofrece sólo con
-`catalogs:manage`; cada destino comprueba nuevamente ese permiso en el servidor.
+**Identificador:** `DIA-ARQ-NAV-003`. Estos seis destinos de Catálogos requieren
+`catalogs:manage`, comprobado también por cada ruta del servidor. Clientes y
+Proveedores pertenecen a Directorio comercial, con sus propios permisos; no necesitan
+`catalogs:manage`. Una sección sólo se muestra si tiene opciones autorizadas.
 
 ```mermaid
 flowchart LR

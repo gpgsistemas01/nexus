@@ -47,7 +47,22 @@ const items = [
             createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/movimientos/mermas', permission: 'movements:read' })
         ]
     },
-    createNavLink({ content: 'Usuarios', icon: 'fa-solid fa-users-gear', href: '/usuarios-sistemas', permission: 'users:manage' }),
+    {
+        content: 'Identidad y acceso',
+        icon: 'fa-solid fa-users-gear',
+        children: [
+            createNavLink({ content: 'Personas', icon: 'fa-solid fa-id-badge', href: '/personas', permission: 'persons:page-view' }),
+            createNavLink({ content: 'Usuarios', icon: 'fa-solid fa-user-shield', href: '/usuarios-sistemas', permission: 'users:manage' })
+        ]
+    },
+    {
+        content: 'Directorio comercial',
+        icon: 'fa-solid fa-address-book',
+        children: [
+            createNavLink({ content: 'Clientes', icon: 'fa-solid fa-address-book', href: '/clientes', permission: 'clients:page-view' }),
+            createNavLink({ content: 'Proveedores', icon: 'fa-solid fa-truck-fast', href: '/proveedores', permission: 'suppliers:page-view' })
+        ]
+    },
     {
         content: 'Catálogos',
         icon: 'fa-solid fa-list',
@@ -59,10 +74,7 @@ const items = [
             createNavLink({ content: 'Motivos de ajuste', icon: 'fa-solid fa-clipboard-list', href: '/catalogos/reasons', permission: 'catalogs:manage' }),
             createNavLink({ content: 'Estados de cumplimiento', icon: 'fa-solid fa-list-check', href: '/catalogos/fulfillment-statuses', permission: 'catalogs:manage' })
         ]
-    },
-    createNavLink({ content: 'Personas', icon: 'fa-solid fa-id-badge', href: '/personas', permission: 'persons:page-view' }),
-    createNavLink({ content: 'Clientes', icon: 'fa-solid fa-address-book', href: '/clientes', permission: 'clients:page-view' }),
-    createNavLink({ content: 'Proveedores', icon: 'fa-solid fa-truck-fast', href: '/proveedores', permission: 'suppliers:page-view' })
+    }
 ].map(item => {
     const visibleChildren = (item.children || []).filter(child => child.isVisible);
 

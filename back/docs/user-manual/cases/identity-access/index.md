@@ -14,7 +14,7 @@ Antes de un alta, busque si el registro ya existe. Al guardar, vuelva al listado
 
 **Propósito.** Consultar y mantener las personas que participan en la operación.
 
-**Ruta en el menú:** **Menú principal → Personas**.
+**Ruta en el menú:** **Menú principal → Identidad y acceso → Personas**.
 
 <a id="CAP-IDA-PER-00-NAVIGATION"></a>
 ![CAP-IDA-PER-00-NAVIGATION: acceso a personas desde el menú principal](../../images/areas/almacen/people/00-access-menu-main.png)
@@ -27,7 +27,7 @@ Antes de un alta, busque si el registro ya existe. Al guardar, vuelva al listado
 
 **Propósito.** Administrar cuentas y cambios de contraseña.
 
-**Ruta en el menú:** **Menú principal → Usuarios**.
+**Ruta en el menú:** **Menú principal → Identidad y acceso → Usuarios**.
 
 <a id="CAP-IDA-USR-00-NAVIGATION"></a>
 ![CAP-IDA-USR-00-NAVIGATION: acceso a usuarios desde el menú principal](../../images/areas/sistemas/users/00-access-menu-main.png)

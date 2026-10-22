@@ -26,3 +26,22 @@ catálogo de pantallas, los permisos y el manual del actor, aunque no se agregue
 URL. `docs:check` comprueba artefactos generados y OpenAPI; no sustituye la revisión
 semántica de los escenarios y estados curados. La fuente normativa de los estados
 de negocio permanece en requisitos y se enlaza desde esta vista.
+
+## Grupos del menú y verificación
+
+`tests/unit/views/navListTest.js` comprueba el menú renderizado de `CU-AUT-02`:
+particiones por permiso de Personas, Usuarios, Clientes, Proveedores y auxiliares;
+grupos vacíos ocultos; y destino activo con etiquetas o barra de iconos.
+Las pantallas y rutas conservan su autorización independiente. Esta evidencia de
+visibilidad no sustituye las pruebas de autorización del servidor.
+
+Al reagrupar Identidad y acceso y Directorio comercial, se deben renovar las capturas de acceso
+`CAP-AUT-02-MENU`, `CAP-AUT-02-SISTEMAS-MENU`, `CAP-IDA-PER-00-NAVIGATION`,
+`CAP-IDA-USR-00-NAVIGATION`, `CAP-CAT-CLI-00-NAVIGATION` y `CAP-CAT-SUP-00-NAVIGATION`.
+El inventario existente abre la página de destino y después el menú; el grupo
+activo queda expandido por la vista, sin selectores ni pasos adicionales.
+La actualización requiere una sesión de prueba de cada área, configurada mediante
+`DOCS_ALMACEN_*` y `DOCS_SISTEMAS_*`, y los comandos
+`npm run docs:screenshots -- --area almacen` o
+`npm run docs:screenshots -- --area sistemas`. Sin esa sesión, las imágenes anteriores quedan pendientes de
+renovación; no se crean registros ni se sustituyen por capturas de cuentas ficticias.

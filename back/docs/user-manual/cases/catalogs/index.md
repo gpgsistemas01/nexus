@@ -8,7 +8,9 @@ Empiece en **Almacén → Materiales**, **Consumibles** o **Mermas**, según el 
 
 Antes de registrar un artículo, búsquelo para evitar duplicados. Después de guardar, compruebe sus datos en el listado. Una compra registra lo recibido; una salida registra lo solicitado y descuenta al surtir. No use un ajuste de existencia como sustituto de esas operaciones.
 
-El administrador encuentra las opciones de apoyo en **Catálogos**, y los listados independientes de **Clientes** y **Proveedores** en el menú. El personal de almacén consulta y registra altas de clientes y proveedores desde sus
+La sección **Catálogos** reúne las opciones auxiliares del administrador.
+**Directorio comercial** reúne los listados de **Clientes** y **Proveedores**,
+cada uno según el permiso de la cuenta. El personal de almacén consulta y registra altas de clientes y proveedores desde sus
 listados o formularios de operación; la edición, cambio de estado y exportación se
 reservan al administrador.
 
@@ -60,7 +62,7 @@ conserva stock. Volver a marcarla permite usar esa oferta nuevamente en operacio
 
 **Propósito.** Consultar y mantener el catálogo de proveedores.
 
-**Ruta en el menú:** **Menú principal → Proveedores**.
+**Ruta en el menú:** **Menú principal → Directorio comercial → Proveedores**.
 
 <a id="CAP-CAT-SUP-00-NAVIGATION"></a>
 ![CAP-CAT-SUP-00-NAVIGATION: acceso a proveedores desde el menú principal](../../images/areas/almacen/suppliers/00-access-menu-main.png)
@@ -77,7 +79,7 @@ marcarla lo reactiva. Este cambio no es un ajuste de stock.
 
 **Propósito.** Consultar y mantener el catálogo de clientes.
 
-**Ruta en el menú:** **Menú principal → Clientes**.
+**Ruta en el menú:** **Menú principal → Directorio comercial → Clientes**.
 
 La casilla **Activo** permite retirar un cliente de las selecciones de operaciones nuevas sin
 eliminarlo ni perder sus salidas históricas. La pantalla de Clientes sigue mostrando ambos estados
