@@ -91,7 +91,12 @@ aún no existen en el contrato.
   estrategia la consulta propia de inventario y su dependencia de proveedor.
 - `usePagedList` y `useFormInteraction` conservan consulta y política de validación.
   `useRecordSave` administra sólo el ciclo de envío: bloqueo, cancelación, errores
-  y conflicto. Cada módulo conserva reglas y construcción del payload.
+  y conflicto; también lo usa Catálogos. Cada módulo conserva reglas y construcción del payload.
+- `useListSearch` comparte búsqueda/actualización y recibe los filtros de Personas
+  mediante un callback. `useListEditor` comparte apertura autorizada, cierre,
+  recarga y confirmación de guardado. Cada instancia conserva su propio estado.
+- `app/composables/usePageAccess` centraliza la sesión y la navegación por 401/403,
+  manteniendo esa política fuera de la presentación y los listados compartidos.
 - `requestExcel` y `useFileExport` comparten validación de respuesta, descarga y
   cancelación entre estos módulos y los reportes de Almacén.
 

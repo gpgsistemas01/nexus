@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, shallowRef } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VAlert } from 'vuetify/components/VAlert';
 import { PERMISSIONS } from '@nexus/permissions';
 import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
+import { usePageAccess } from '../../../app/composables/usePageAccess.js';
+import { useListEditor } from '../../../shared/composables/useListEditor.js';
+import { useListSearch } from '../../../shared/composables/useListSearch.js';
 import { usePagedList } from '../../../shared/composables/usePagedList.js';
 import { useOrganizationOptions } from '../../../shared/composables/useOrganizationOptions.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import { useFileExport } from '../../../shared/composables/useFileExport.js';
 import { initialRecordQuery } from '../../../shared/list.js';
-import { ApiError } from '../../../shared/http/apiError.js';
-import { showSuccess } from '../../../shared/ui/feedback.js';
-import { useAuthSession } from '../../auth/session.js';
 import { IDENTITY_CONFIG } from '../identity.js';
 import type { IdentityResource, IdentityEntry, IdentityTarget } from '../identity.js';
 import { identityService } from '../services/identityService.js';
@@ -24,30 +23,18 @@ import UserEditorPage from './UserEditorPage.vue';
 
 const props = defineProps<{ resource: IdentityResource }>();
 const config = IDENTITY_CONFIG[props.resource];
-const session = useAuthSession();
-const router = useRouter();
-
-const has = (permission: string) => !!session.user.value?.permissions.includes(permission);
+const { session, has, onDenied, onError } = usePageAccess();
 
 const canRead = computed(() => has(config.read));
 const canWrite = computed(() => has(config.write));
 const canExport = computed(() => has(config.report));
-
-const onDenied = (status: number) =>
-    void router.replace(
-        status === 401
-            ? { name: 'login', query: { returnTo: router.currentRoute.value.fullPath } }
-            : { name: 'forbidden' },
-    );
 
 const list = usePagedList<IdentityQuery, IdentityEntry>({
     initialQuery: { ...initialRecordQuery(), department: '', role: '' },
     canLoad: () => canRead.value,
     request: (query, signal) => identityService.list(props.resource, query, signal),
     errorMessage: 'No se pudo cargar el listado.',
-    onError: (cause) => {
-        if (cause instanceof ApiError && [401, 403].includes(cause.status)) onDenied(cause.status);
-    },
+    onError,
 });
 const { rows, total, isLoading, error, query } = list;
 const filters = useOrganizationOptions(
@@ -58,8 +45,6 @@ const departmentId = ref('');
 const roleId = ref('');
 const selectedDepartment = useSelectedOption(filters.departments.items, () => departmentId.value);
 const selectedRole = useSelectedOption(filters.roles.items, () => roleId.value);
-const search = ref('');
-const editor = shallowRef<IdentityTarget | null>(null);
 const report = useFileExport<void>({
     canExport: () => canExport.value && !query.role,
     filename: `reporte_${props.resource}.xlsx`,
@@ -68,42 +53,22 @@ const report = useFileExport<void>({
 });
 const { isExporting, exportError } = report;
 
-const applySearch = () => {
-    const changes = {
-        search: search.value,
-        department: selectedDepartment.value?.title ?? '',
-        role: selectedRole.value?.title ?? '',
-    };
-    if (
-        changes.search === query.search &&
-        changes.department === query.department &&
-        changes.role === query.role &&
-        query.page === 1
-    )
-        void list.load();
-    else list.applyQuery(changes);
-};
+const { search, applySearch } = useListSearch(list, () => ({
+    department: selectedDepartment.value?.title ?? '',
+    role: selectedRole.value?.title ?? '',
+}));
+const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor<IdentityTarget>({
+    canOpen: (target) =>
+        canWrite.value && (target.action !== 'password' || props.resource === 'users'),
+    reload: list.load,
+    savedMessage: 'El registro se guardó correctamente.',
+});
 
 const clear = () => {
     search.value = '';
     departmentId.value = '';
     roleId.value = '';
     list.applyQuery({ search: '', department: '', role: '' });
-};
-
-const openEditor = (target: IdentityTarget) => {
-    if (canWrite.value && (target.action !== 'password' || props.resource === 'users'))
-        editor.value = target;
-};
-
-const reload = () => {
-    editor.value = null;
-    void list.load();
-};
-
-const onSaved = () => {
-    reload();
-    void showSuccess('El registro se guardó correctamente.');
 };
 
 onMounted(() => {
@@ -212,8 +177,8 @@ onMounted(() => {
         :target="editor"
         :permissions="session.user.value!.permissions"
         @saved="onSaved"
-        @close="editor = null"
-        @reload="reload"
+        @close="closeEditor"
+        @reload="reloadEditor"
         @denied="onDenied"
     />
     <UserEditorPage
@@ -221,8 +186,8 @@ onMounted(() => {
         :target="editor"
         :permissions="session.user.value!.permissions"
         @saved="onSaved"
-        @close="editor = null"
-        @reload="reload"
+        @close="closeEditor"
+        @reload="reloadEditor"
         @denied="onDenied"
     />
 </template>

@@ -71,8 +71,12 @@ login conservando la ruta interna; un 403 abre la página de acceso no permitido
 | `CatalogTable` / `CatalogForm` | Presentación tipada: props y eventos; columnas y controles del catálogo. |
 | `useCatalogList` | Configura la consulta y los errores de acceso del catálogo sobre `shared/composables/usePagedList`. |
 | `useCatalogEditor` | VeeValidate, captura y envío versionado. |
+| `app/composables/usePageAccess` | Permisos de la sesión y retorno al login o acceso denegado. |
+| `shared/composables/useListSearch` / `useListEditor` | Búsqueda/paginación y apertura, cierre, recarga y aviso del editor; comparten comportamiento con Identidad y Directorio. |
+| `shared/composables/useRecordSave` | Envíos pendientes, errores, conflictos y cancelación; las reglas y el payload permanecen en el módulo. |
 | `catalogService` / `catalog.ts` | Adaptación de API, lista de campos del payload y contrato tipado. |
-| `shared/components/EditorDialog` | Marco modal, foco/scroll de Vuetify, formulario, pie y acciones mediante slots. También lo usa InventoryEditor. |
+| `shared/components/RecordListPanel` | Cabecera, búsqueda, estado y reintento con slots para botones y tabla. |
+| `shared/components/RecordEditorDialog` | Adapta EditorDialog con marco de campos, errores y recuperación de conflictos. Conserva la nota de historial y «Cerrar y actualizar catálogo». |
 | `shared/components/ServerTable` | Tabla paginada de Vuetify, traducciones y estilos. Cada módulo conserva columnas, celdas y eventos mediante slots. |
 | `shared/http/pageRequest` | Lectura y comprobación del contrato paginado para Catálogos e inventario. |
 | `shared/composables/usePagedList` | Estado de consulta, paginación, cancelación y descarte de respuestas anteriores. |

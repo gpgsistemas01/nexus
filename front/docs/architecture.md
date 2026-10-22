@@ -160,6 +160,12 @@ y CatalogTable definen columnas, celdas y acciones de su dominio.
 `useRemoteOptions` aporta la estrategia y dependencia de proveedor de inventario.
 `requestExcel` y `useFileExport` comparten las descargas con Almacén.
 
+Catálogos, Identidad y Directorio usan `RecordListPanel` para la cabecera, búsqueda,
+estado y reintento del listado; los botones, filtros y tablas entran por slots.
+`RecordEditorDialog` comparte los errores, el marco de campos y la recuperación
+de conflictos sobre `EditorDialog`, conservando la nota y el texto de recarga de
+cada formulario. Las columnas, controles y payloads siguen en su dominio.
+
 `shared/http/pageRequest` comprueba el contrato paginado consumido por los módulos.
 `shared/composables/usePagedList` concentra el estado y ciclo de vida del listado:
 consulta, paginación, cancelación, descarte de respuestas antiguas y conservación
@@ -170,12 +176,30 @@ callback tipado; no conoce endpoints, sesión ni permisos concretos.
 Si una página queda fuera del rango, el núcleo vuelve directamente a la última
 página disponible, sin recorrer todas las páginas vacías intermedias.
 
+`useListSearch` coordina el texto de búsqueda con esa consulta en los cuatro módulos:
+una búsqueda nueva vuelve a la primera página; repetir la consulta aplicada en
+esa página actualiza una sola vez. Identidad aporta sus filtros mediante un
+callback. La limpieza de filtros permanece en cada página porque cambia por dominio.
+`useListEditor` comparte apertura condicionada por permisos, cierre, recarga y aviso
+de guardado en Catálogos, Identidad y Directorio. Recibe la política de apertura y
+la función de recarga; no conoce recursos ni endpoints y mantiene estado por instancia.
+Almacén conserva su coordinador porque también pausa la recarga automática y
+orquesta eliminaciones e ingresos de stock.
+
+`app/composables/usePageAccess` adapta la sesión a los permisos de las páginas y
+centraliza la navegación por errores 401/403. Conserva el destino completo al
+volver al login. Vive en `app`, porque conoce sesión y router; los composables
+compartidos de listado y los componentes visuales permanecen independientes de ellos.
+
 `shared/composables/useFormInteraction` comparte la interacción con VeeValidate
 en login y los formularios de los módulos: sólo la captura del usuario marca un campo como
 editado; perder el foco sin capturar no muestra errores y el envío valida todo el
 formulario. Cada consumidor decide cuándo bloquear cambios y conserva sus reglas,
 payloads y operaciones. `shared/components/FilterActions` comparte los botones
 Actualizar/Limpiar/Buscar mediante props y eventos, dentro del formulario propietario.
+Catálogos reutiliza `useRecordSave` con Identidad y Directorio para bloqueo de envíos,
+cancelación al desmontar, errores y conflictos. `useCatalogEditor` conserva su esquema
+VeeValidate, campos y payload con la versión leída; no duplica ese ciclo de transporte.
 
 Se aplica composición y estrategia por callbacks a comportamientos equivalentes.
 No se introduce herencia entre módulos ni un generador de CRUD con reglas mezcladas.

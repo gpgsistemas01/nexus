@@ -5,7 +5,17 @@ import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import FilterActions from './FilterActions.vue';
 
-defineProps<{ title: string; titleId: string; total: number; isLoading: boolean; error: string }>();
+withDefaults(
+    defineProps<{
+        title: string;
+        titleId: string;
+        total: number;
+        isLoading: boolean;
+        error: string;
+        loadingLabel?: string;
+    }>(),
+    { loadingLabel: 'Cargando registros…' },
+);
 const emit = defineEmits<{ search: []; clear: []; refresh: [] }>();
 const search = defineModel<string>('search', { required: true });
 </script>
@@ -58,7 +68,7 @@ const search = defineModel<string>('search', { required: true });
                     class="record-count"
                     role="status"
                 >
-                    {{ isLoading ? 'Cargando registros…' : `Registros encontrados: ${total}` }}
+                    {{ isLoading ? loadingLabel : `Registros encontrados: ${total}` }}
                 </p>
                 <slot />
             </VCardText>

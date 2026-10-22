@@ -10,6 +10,7 @@ import InventoryFilters from '../components/InventoryFilters.vue';
 import InventoryReportToolbar from '../components/InventoryReportToolbar.vue';
 import InventoryEditorPage from './InventoryEditorPage.vue';
 import { useAuthSession } from '../../auth/session.js';
+import { useListSearch } from '../../../shared/composables/useListSearch.js';
 import { useInventory } from '../composables/useInventory.js';
 import type { InventoryResource } from '../inventory.js';
 
@@ -36,13 +37,8 @@ const supplierItems = inventory.suppliers.items;
 const supplierLoading = inventory.suppliers.isLoading;
 const supplierError = inventory.suppliers.error;
 const supplierHasMore = inventory.suppliers.hasMore;
-const search = ref('');
+const { search, applySearch } = useListSearch(inventory);
 const reportScope = ref('activeOrStock');
-
-const applySearch = () => {
-    if (query.search === search.value && query.page === 1) void inventory.load();
-    else inventory.applyQuery({ search: search.value });
-};
 
 const clearFilters = () => {
     search.value = '';

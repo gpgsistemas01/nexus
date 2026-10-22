@@ -5,6 +5,7 @@ export const useRecordSave = (options: {
     setErrors: (errors: Record<string, string>) => void;
     onSaved: () => void;
     onDenied: (status: number) => void;
+    errorMessage?: string;
 }) => {
     const message = ref('');
     const isSubmitting = ref(false);
@@ -22,7 +23,10 @@ export const useRecordSave = (options: {
         } catch (cause) {
             if (controller.signal.aborted) return;
 
-            message.value = cause instanceof Error ? cause.message : 'No se pudo guardar.';
+            message.value =
+                cause instanceof Error
+                    ? cause.message
+                    : (options.errorMessage ?? 'No se pudo guardar.');
 
             if (cause instanceof ApiError) {
                 options.setErrors(cause.fieldErrors);

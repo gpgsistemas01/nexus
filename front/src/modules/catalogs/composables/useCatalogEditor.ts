@@ -1,8 +1,7 @@
-import { onBeforeUnmount, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { createCatalogValidation } from '@nexus/form-validation';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
-import { ApiError } from '../../../shared/http/apiError.js';
+import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
 import { buildCatalogPayload, catalogDefinition } from '../catalog.js';
 import { catalogService } from '../services/catalogService.js';
 import type { CatalogField, CatalogName, CatalogTarget, CatalogValues } from '../catalog.js';
@@ -16,9 +15,6 @@ export const useCatalogEditor = (options: {
     const { catalog, target } = options;
     const definition = catalogDefinition(catalog);
     const row = target.action === 'edit' ? target.row : undefined;
-    const controller = new AbortController();
-    const message = ref('');
-    const isConflicted = ref(false);
     const rules = createCatalogValidation({
         entityLabel: definition.entityLabel,
         nameMaxLength: definition.maxLengths.name,
@@ -43,55 +39,41 @@ export const useCatalogEditor = (options: {
         form.defineField(field, { validateOnModelUpdate: false });
     }
 
+    const save = useRecordSave({
+        ...options,
+        setErrors: form.setErrors,
+        errorMessage: 'No se pudo guardar el catálogo.',
+    });
     const { update, blur } = useFormInteraction<CatalogField, string | boolean>(form, {
         isDisabled: () =>
-            form.isSubmitting.value || isConflicted.value || controller.signal.aborted,
+            form.isSubmitting.value ||
+            save.isSubmitting.value ||
+            save.isConflicted.value ||
+            save.isDisposed(),
         onChange: () => {
-            message.value = '';
+            save.message.value = '';
         },
     });
-    const submitValidated = form.handleSubmit(async (values) => {
-        if (controller.signal.aborted || isConflicted.value) return;
-
-        message.value = '';
-
-        try {
-            await catalogService.save(
+    const submitValidated = form.handleSubmit((values) =>
+        save.execute((signal) =>
+            catalogService.save(
                 catalog,
                 target,
                 buildCatalogPayload(catalog, target, values),
-                controller.signal,
-            );
-        } catch (cause) {
-            if (controller.signal.aborted) return;
-
-            message.value =
-                cause instanceof Error ? cause.message : 'No se pudo guardar el catálogo.';
-
-            if (cause instanceof ApiError) {
-                form.setErrors(cause.fieldErrors);
-                isConflicted.value = cause.code === 'RECORD_VERSION_CONFLICT';
-                if ([401, 403].includes(cause.status)) options.onDenied(cause.status);
-            }
-
-            return;
-        }
-
-        if (!controller.signal.aborted) options.onSaved();
-    });
+                signal,
+            ),
+        ),
+    );
 
     const submit = () => {
-        if (!form.isSubmitting.value && !isConflicted.value) return submitValidated();
+        if (!form.isSubmitting.value && !save.isConflicted.value) return submitValidated();
     };
-
-    onBeforeUnmount(() => controller.abort());
 
     return {
         values: form.values,
         errors: form.errors,
+        ...save,
         isSubmitting: form.isSubmitting,
-        message,
-        isConflicted,
         update,
         blur,
         submit,

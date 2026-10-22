@@ -105,6 +105,16 @@ a `front/tests/` y se ejecuta desde `front/`. Se usa Vitest, Vue Test Utils y js
 Las pruebas importan `describe`, `it` y `expect`, siguiendo la suite existente; usan
 archivos `*Test.ts`. Los componentes se desmontan tras cada caso.
 
+La coordinación compartida de las páginas se comprueba en
+`tests/unit/shared/composables/listInteractionTest.ts` y
+`tests/unit/app/pageAccessTest.ts`, además de los recorridos de navegador existentes.
+No se retiran las pruebas de campos, payloads ni versiones de cada módulo.
+
+| Diseño / riesgo | Nivel y técnica | Resultado observable |
+| --- | --- | --- |
+| `DP-VUE-LIST-001`: búsqueda, filtros y editor compartidos | Unitario con `usePagedList` real; transiciones de página/filtros y decisiones de permiso | Buscar vuelve a página 1; repetir actualiza una sola vez; cambiar sólo área conserva búsqueda/orden/tamaño. Dos páginas no comparten captura. Cerrar no recarga, recuperar un conflicto recarga sin confirmar éxito y guardar cierra/recarga/confirma. Abrir reevalúa permisos. |
+| `DP-VUE-ACCESS-001`: salida de páginas protegidas | Router en memoria y sesión/Axios reales con transporte simulado; particiones 401/403/red/400/500 | Un 401 conserva ruta, query y fragmento para volver tras el login; un 403 abre acceso denegado. Los otros errores conservan la página y los permisos reflejan la sesión vigente. |
+
 | Riesgo observable | Nivel y técnica | Resultado esperado |
 | --- | --- | --- |
 | Perder el acceso al entrar directamente | Router en memoria; particiones `/` y `/inicio-sesion` | Ambas abren el login operativo. |

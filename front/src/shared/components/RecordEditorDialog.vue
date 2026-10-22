@@ -13,8 +13,16 @@ withDefaults(
         submitLabel?: string;
         maxWidth?: number;
         context?: string;
+        note?: string;
+        reloadLabel?: string;
     }>(),
-    { submitLabel: 'Guardar', maxWidth: 720, context: '' },
+    {
+        submitLabel: 'Guardar',
+        maxWidth: 720,
+        context: '',
+        note: '',
+        reloadLabel: 'Cerrar y actualizar listado',
+    },
 );
 const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
 </script>
@@ -24,6 +32,7 @@ const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
         :title="title"
         :eyebrow="eyebrow"
         :context="context"
+        :note="note"
         :max-width="maxWidth"
         :is-submitting="isSubmitting"
         :is-submit-disabled="isConflicted"
@@ -46,7 +55,7 @@ const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
                 v-if="isConflicted"
                 @click="emit('reload')"
             >
-                Cerrar y actualizar listado
+                {{ reloadLabel }}
             </VBtn>
         </template>
     </EditorDialog>
