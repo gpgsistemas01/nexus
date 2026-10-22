@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import ServerTable from '../../../shared/components/ServerTable.vue';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VChip } from 'vuetify/components/VChip';
 import { VDialog } from 'vuetify/components/VDialog';
 import { VCard, VCardTitle, VCardText, VCardActions } from 'vuetify/components/VCard';
-import type { DataTableSortItem } from 'vuetify';
+import ServerTable from '../../../shared/components/ServerTable.vue';
+import { useTableQuery } from '../../../shared/composables/useTableQuery.js';
+import StateBadge from '../../../shared/components/StateBadge.vue';
+import { numberText, currencyText } from '../../../shared/utils/formatNumbers.js';
 import InventoryRowActions from './InventoryRowActions.vue';
-import {
-    currencyText,
-    inventoryHeaders,
-    INVENTORY_SORT_COLUMNS,
-    numberText,
-} from '../inventoryTable.js';
+import { inventoryHeaders, INVENTORY_SORT_COLUMNS } from '../inventoryTable.js';
 import type {
     EditorTarget,
     InventoryPermissions,
@@ -34,30 +31,11 @@ const emit = defineEmits<{
     query: [query: Partial<InventoryQuery>];
 }>();
 const headers = computed(() => inventoryHeaders(props.resource, props.permissions));
-const sortBy = computed<DataTableSortItem[]>(() => [
-    {
-        key:
-            Object.keys(INVENTORY_SORT_COLUMNS).find(
-                (key) => INVENTORY_SORT_COLUMNS[key] === (props.query.orderColumn ?? 0),
-            ) ?? 'name',
-        order: props.query.direction,
-    },
-]);
+const { sortBy, changesFromOptions } = useTableQuery(
+    () => props.query,
+    () => INVENTORY_SORT_COLUMNS,
+);
 const details = ref<InventoryRow | null>(null);
-
-const updateOptions = (options: {
-    page: number;
-    itemsPerPage: number;
-    sortBy: DataTableSortItem[];
-}) => {
-    const sorting = options.sortBy[0];
-    emit('query', {
-        page: options.page,
-        length: options.itemsPerPage,
-        orderColumn: INVENTORY_SORT_COLUMNS[sorting?.key ?? 'name'] ?? 0,
-        direction: sorting?.order === 'desc' ? 'desc' : 'asc',
-    });
-};
 
 const rowProps = ({ item }: { item: InventoryRow }) => ({
     class: Number(item.currentStock) < Number(item.minStock) ? 'low-stock' : '',
@@ -79,7 +57,7 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
             :row-props="rowProps"
             :is-loading="isLoading"
             must-sort
-            @options="updateOptions"
+            @options="emit('query', changesFromOptions($event))"
         >
             <template #[`item.name`]="{ item }">
                 <div class="item-identity">
@@ -115,7 +93,9 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
             <template #[`item.maxUnitCost`]="{ item }">
                 {{ currencyText(item.maxUnitCost) }}
             </template>
-            <template #[`item.isActive`]="{ item }">{{ item.isActive ? 'Sí' : 'No' }}</template>
+            <template #[`item.isActive`]="{ item }">
+                <StateBadge :is-active="item.isActive" />
+            </template>
             <template
                 v-for="key in ['coneWeightKg', 'totalWeightKg', 'weightKg'] as const"
                 #[`item.${key}`]="{ item }"
@@ -163,8 +143,8 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
 .inventory-table {
     min-width: 0;
 }
-.inventory-table :deep(.low-stock td) {
-    background: #fff8e5;
+.inventory-table :deep(.low-stock) {
+    --table-row-highlight: rgb(var(--v-theme-table-stock-warning));
 }
 .item-identity {
     text-align: left;

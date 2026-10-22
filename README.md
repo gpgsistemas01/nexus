@@ -3,13 +3,13 @@
 La aplicación actual de Express, Prisma y vistas EJS vive en `back/`.
 El frontend Vue 3 con TypeScript, Router y Vite está en `front/`, con login conectado
 a Express usando Vuetify y VeeValidate para la migración gradual.
-Materiales, Consumibles, Mermas, Catálogos, Personas, Usuarios, Clientes y Proveedores
-ya tienen interfaz Vue; las demás pantallas
+Materiales, Consumibles, Mermas, Movimientos, Catálogos, Personas, Usuarios, Clientes
+y Proveedores ya tienen interfaz Vue; las demás pantallas
 operativas permanecen en el backend y no se enlazan desde el menú de Vue.
 
 ```text
 back/                 # Express, EJS, Prisma, pruebas y documentación
-front/                # Vue 3 + Vite, login, Almacén, Identidad y Directorio
+front/                # Vue 3 + Vite, login, Almacén, Movimientos, Identidad y Directorio
 .github/workflows/    # CI del repositorio
 Dockerfile            # Construye el backend usando el contexto raíz
 docker-compose.yml    # Ejecuta el backend con back/.env
@@ -114,12 +114,12 @@ npm run dev
 
 Para compilar: `npm run build` desde `front/`, o `npm --prefix front run build` desde
 la raíz. La salida queda en `front/dist/`. Consulta [la guía del frontend](front/README.md).
-El login, Almacén (Materiales, Consumibles y Mermas) y los seis Catálogos integran la API mediante un
-proxy del mismo origen. El menú sólo contempla vistas Vue; los demás módulos
+El login, Almacén (Materiales, Consumibles y Mermas), Movimientos y los seis
+Catálogos integran la API mediante un proxy del mismo origen. El menú sólo contempla vistas Vue; los demás módulos
 conservan sus pantallas EJS en el backend.
-Consulta [configuración del login](front/docs/login.md) y
-[operaciones y arquitectura de Almacén](front/docs/warehouse.md) y
-[Catálogos](front/docs/catalogs.md).
+Consulta [configuración del login](front/docs/login.md),
+[operaciones y arquitectura de Almacén](front/docs/warehouse.md),
+[Catálogos](front/docs/catalogs.md) y [Movimientos](front/docs/movements.md).
 Desde la raíz, `npm --prefix front run check` ejecuta formato, ESLint, pruebas y build con tipos.
 En VS Code instala las extensiones recomendadas Vue - Official y ESLint; para
 comprobar tipos continuamente usa `npm --prefix front run type-check:watch`.

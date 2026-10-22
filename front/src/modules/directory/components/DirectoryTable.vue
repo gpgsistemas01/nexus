@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { VBtn } from 'vuetify/components/VBtn';
-import type { DataTableHeader, DataTableSortItem } from 'vuetify';
+import type { DataTableHeader } from 'vuetify';
+import TableAction from '../../../shared/components/TableAction.vue';
+import StateBadge from '../../../shared/components/StateBadge.vue';
+import { useTableQuery } from '../../../shared/composables/useTableQuery.js';
 import ServerTable from '../../../shared/components/ServerTable.vue';
 import type { RecordQuery } from '../../../shared/list.js';
 import type { DirectoryEntry, DirectoryResource } from '../directory.js';
@@ -26,22 +28,13 @@ const headers = computed<DataTableHeader<DirectoryEntry>[]>(() => [
         ? [{ title: 'Razón social', key: 'legalName', sortable: true }]
         : []),
     ...(props.canSeeState ? [{ title: 'Activo', key: 'isActive', sortable: false }] : []),
-    { title: 'Acciones', key: 'actions', sortable: false },
+    ...(props.canEdit ? [{ title: 'Acciones', key: 'actions', sortable: false }] : []),
 ]);
-const sortBy = computed(() => [
-    {
-        key: props.query.orderColumn === 1 && props.resource === 'suppliers' ? 'legalName' : 'name',
-        order: props.query.direction,
-    },
-]);
-
-const onOptions = (options: { page: number; itemsPerPage: number; sortBy: DataTableSortItem[] }) =>
-    emit('query', {
-        page: options.page,
-        length: options.itemsPerPage,
-        orderColumn: options.sortBy[0]?.key === 'legalName' ? 1 : 0,
-        direction: options.sortBy[0]?.order === 'desc' ? 'desc' : 'asc',
-    });
+const { sortBy, changesFromOptions } = useTableQuery(
+    () => props.query,
+    (): Readonly<Record<string, number>> =>
+        props.resource === 'suppliers' ? { name: 0, legalName: 1 } : { name: 0 },
+);
 </script>
 
 <template>
@@ -54,17 +47,14 @@ const onOptions = (options: { page: number; itemsPerPage: number; sortBy: DataTa
         :sort-by="sortBy"
         must-sort
         :is-loading="isLoading"
-        @options="onOptions"
+        @options="emit('query', changesFromOptions($event))"
     >
-        <template #[`item.isActive`]="{ item }">{{ item.isActive ? 'Sí' : 'No' }}</template>
+        <template #[`item.isActive`]="{ item }"><StateBadge :is-active="item.isActive" /></template>
         <template #[`item.actions`]="{ item }">
-            <VBtn
+            <TableAction
                 v-if="canEdit"
                 icon="$edit"
-                aria-label="Editar registro"
-                size="small"
-                color="primary"
-                variant="text"
+                label="Editar registro"
                 @click="emit('edit', item)"
             />
         </template>

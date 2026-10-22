@@ -155,10 +155,11 @@ cargado y permite repetir la página fallida, sin avanzar ni duplicar las opcion
 | `useRemoteOptions.ts` | Estado de catálogos paginados, sin renderizado. |
 | `modules/warehouse/services/` | Adaptadores separados de inventario, catálogos y reportes; `inventoryPageRequest` conserva los parámetros de inventario y `shared/http/pageRequest` valida el contrato paginado común. |
 | `modules/warehouse/mappers/inventoryMapper.ts` | Convierte DTOs de inventario en filas de presentación, conservando ambas identidades y versiones. |
-| `inventoryTable.ts` | Configuración de columnas y formato visual, sin acceso a API. |
+| `inventoryTable.ts` | Configuración de columnas y orden permitido, sin acceso a API. El formato numérico vive en `shared/utils/formatNumbers`. |
 | `formModel.ts` / `formFields.ts` | Datos permitidos, conexión a validadores públicos y controles de la captura. |
 
-El menú sólo ofrece Materiales, Consumibles y Mermas. No enlaza a vistas EJS.
+El menú ofrece las secciones migradas a Vue y filtra sus enlaces por permiso.
+No enlaza a vistas EJS.
 El proxy del frontend sólo reenvía `/api` y el POST `/cerrar-sesion`, que limpia las
 cookies y redirige a `/inicio-sesion` de Vue. Esta acción de autenticación no monta
 una vista EJS. Las vistas antiguas permanecen disponibles en el servidor Express
@@ -205,3 +206,28 @@ editor y la tabla de inventario. Sus slots conservan los campos y celdas propios
 de cada dominio. Los estilos compartidos pertenecen a esos marcos; las secciones de
 pesos, stock y referencias siguen en los componentes de Almacén. La validación,
 la sesión y HTTP se coordinan fuera de la presentación.
+
+
+## Consistencia de listados y tablas
+
+`RecordListPanel` comparte tarjeta con fondo degradado, título, acciones, errores
+y contador entre todos los listados. `ListFilters` ofrece el acordeón y los botones
+Actualizar/Limpiar/Buscar también en Catálogos, Identidad y Directorio. Los filtros
+por área/rol conservan su lógica y se distribuyen mediante columnas Vuetify.
+
+`TableFrame` es el propietario único de la apariencia de tablas paginadas y locales:
+encabezado verde, subencabezados ámbar de inventario, bordes, filas alternas,
+realce de hover/foco y paginador. `ServerTable` lo compone con `VDataTableServer`;
+PersonForm lo utiliza con `VTable` para las asignaciones aún no guardadas, sin
+introducir paginación ni solicitudes HTTP para esa captura.
+
+Los colores se centralizan en el tema de Vuetify. Las filas con stock bajo definen
+`--table-row-highlight` desde Inventario; el marco conserva ese aviso en filas
+pares, al pasar el cursor y al enfocar una acción. Las reglas comunes tienen
+especificidad suficiente frente a las tablas base de Vuetify, sin copiar estilos
+en cada pantalla.
+
+`TableAction` mantiene nombre accesible, icono, tooltip, color por operación y
+bloqueo durante captura pendiente. `StateBadge` presenta el estado activo de forma
+uniforme. Las tablas de sólo lectura omiten la columna de acciones. Los permisos,
+el stock, las asignaciones y los payloads permanecen en sus módulos.

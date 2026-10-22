@@ -4,14 +4,14 @@ import { VTextarea } from 'vuetify/components/VTextarea';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import type { InventoryFieldSpec } from '../formFields.js';
-import type { LookupItem } from '../../../shared/lookup.js';
+import type { LookupState } from '../../../shared/lookup.js';
 
 const props = defineProps<{
     field: InventoryFieldSpec;
     value: string | boolean;
     error?: string;
     isDisabled: boolean;
-    lookup?: { items: LookupItem[]; isLoading: boolean; error: string; hasMore: boolean };
+    lookup?: LookupState;
 }>();
 const emit = defineEmits<{
     update: [value: string | boolean];

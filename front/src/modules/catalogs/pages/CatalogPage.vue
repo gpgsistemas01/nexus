@@ -18,17 +18,12 @@ const canManage = computed(() => has(PERMISSIONS.CATALOGS_MANAGE));
 const definition = catalogDefinition(props.catalog);
 const list = useCatalogList(props.catalog, onDenied);
 const { query, rows, total, isLoading, error } = list;
-const { search, applySearch } = useListSearch(list);
+const { search, applySearch, clearSearch } = useListSearch(list);
 const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor<CatalogTarget>({
     canOpen: () => canManage.value,
     reload: list.load,
     savedMessage: 'El catálogo se guardó correctamente.',
 });
-
-const clearSearch = () => {
-    search.value = '';
-    list.applyQuery({ search: '' });
-};
 
 onMounted(() => {
     document.title = `Nexus | ${definition.label}`;

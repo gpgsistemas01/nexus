@@ -69,6 +69,30 @@ describe('interacción de listados compartida (DP-VUE-LIST-001)', () => {
     expect(request).toHaveBeenCalledTimes(count + 1);
   });
 
+  it('limpiar reinicia texto, filtros y página conservando tamaño y orden', async () => {
+    const { value } = openList();
+    await flushPromises();
+    value.list.applyQuery({
+      page: 2,
+      length: 1,
+      direction: 'desc',
+      search: 'Ana',
+      department: 'VENTAS',
+    });
+    await flushPromises();
+    value.search.value = 'borrador sin aplicar';
+    value.clearSearch({ department: '' });
+    await flushPromises();
+    expect(value.search.value).toBe('');
+    expect(value.list.query).toMatchObject({
+      page: 1,
+      length: 1,
+      direction: 'desc',
+      search: '',
+      department: '',
+    });
+  });
+
   it('dos páginas mantienen independientes su búsqueda y sus filtros', async () => {
     const first = openList();
     const second = openList();

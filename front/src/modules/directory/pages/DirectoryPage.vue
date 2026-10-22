@@ -47,12 +47,7 @@ const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor
     reload: list.load,
     savedMessage: 'El registro se guardó correctamente.',
 });
-const { search, applySearch } = useListSearch(list);
-
-const clear = () => {
-    search.value = '';
-    list.applyQuery({ search: '' });
-};
+const { search, applySearch, clearSearch } = useListSearch(list);
 
 onMounted(() => {
     document.title = `Nexus | ${config.title}`;
@@ -67,8 +62,9 @@ onMounted(() => {
         :total="total"
         :is-loading="isLoading"
         :error="error"
+        :show-count="canRead"
         @search="applySearch"
-        @clear="clear"
+        @clear="clearSearch"
         @refresh="list.load"
     >
         <template #actions>

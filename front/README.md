@@ -3,15 +3,15 @@
 Base de Vue 3 con TypeScript, componentes `.vue`, Composition API (`<script setup>`)
 y Vite, creada con la plantilla oficial `create-vite`. El login en `/inicio-sesion`
 usa Vuetify y VeeValidate y está conectado a Express. Materiales, Consumibles y
-Mermas, los seis catálogos administrables y Personas, Usuarios, Clientes y
-Proveedores se sirven en Vue; los demás
+Mermas, los seis catálogos administrables, Personas, Usuarios, Clientes,
+Proveedores y los historiales de Movimientos se sirven en Vue; los demás
 módulos conservan sus pantallas EJS en `back/`.
 
 ## Iniciar sesión
 
 Abre `http://localhost:5173/inicio-sesion` con Express ejecutándose en el puerto 3000.
 Vite dirige la API y el cierre de sesión al backend mediante un proxy del mismo origen.
-El menú agrupa Almacén, [Identidad y acceso y Directorio comercial](docs/identity-and-directory.md)
+El menú agrupa Almacén, [Movimientos](docs/movements.md), [Identidad y acceso y Directorio comercial](docs/identity-and-directory.md)
 y los seis [Catálogos](docs/catalogs.md),
 con enlaces filtrados por permiso.
 Usa una cuenta existente: al autenticar se abre el primer módulo permitido; una
@@ -167,7 +167,7 @@ En Linux, si faltan dependencias del sistema, usa `npx playwright install --with
 Playwright inicia Vite cuando hace falta. El puerto 5173 debe estar libre o servir
 esta misma copia del proyecto. En entornos con Chromium ya instalado puedes definir
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` con la ruta del ejecutable. CI instala su navegador.
-Los casos comprueban login, Almacén, Catálogos, Identidad y Directorio, con validación,
+Los casos comprueban login, Almacén, Movimientos, Catálogos, Identidad y Directorio, con validación,
 permisos, errores, envío, cookies, reintento, almacenamiento y ancho móvil. Las
 respuestas de API se simulan; no se usa una base de datos real.
 
@@ -177,6 +177,7 @@ respuestas de API se simulan; no se usa una base de datos real.
 - `src/app/router/index.ts`: rutas y carga diferida de páginas.
 - `src/app/pages/NotFoundPage.vue`: página para direcciones desconocidas.
 - `src/modules/auth/`: login, composable de formulario y adaptador HTTP.
+- `src/modules/movements/`: historiales de materiales, consumibles y mermas, filtros y reportes.
 - `src/modules/warehouse/`: contenedores, componentes, composables y servicios de Almacén.
 - `src/modules/identity/`: Personas y Usuarios, con responsabilidades y credenciales separadas.
 - `src/modules/directory/`: Clientes y Proveedores.

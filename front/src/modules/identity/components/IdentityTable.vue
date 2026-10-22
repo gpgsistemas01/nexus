@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { VBtn } from 'vuetify/components/VBtn';
-import type { DataTableHeader, DataTableSortItem } from 'vuetify';
+import type { DataTableHeader } from 'vuetify';
 import { mdiKeyOutline } from '@mdi/js';
+import TableAction from '../../../shared/components/TableAction.vue';
+import { useTableQuery } from '../../../shared/composables/useTableQuery.js';
 import ServerTable from '../../../shared/components/ServerTable.vue';
 import type { IdentityEntry, IdentityResource } from '../identity.js';
 import type { IdentityQuery } from '../identity.js';
@@ -27,17 +28,12 @@ const headers = computed<DataTableHeader<IdentityEntry>[]>(() => [
         key: props.resource === 'persons' ? 'accesses' : 'personName',
         sortable: false,
     },
-    { title: 'Acciones', key: 'actions', sortable: false },
+    ...(props.canEdit ? [{ title: 'Acciones', key: 'actions', sortable: false }] : []),
 ]);
-const sortBy = computed(() => [{ key: 'name', order: props.query.direction }]);
-
-const onOptions = (options: { page: number; itemsPerPage: number; sortBy: DataTableSortItem[] }) =>
-    emit('query', {
-        page: options.page,
-        length: options.itemsPerPage,
-        orderColumn: 0,
-        direction: options.sortBy[0]?.order === 'desc' ? 'desc' : 'asc',
-    });
+const { sortBy, changesFromOptions } = useTableQuery(
+    () => props.query,
+    () => ({ name: 0 }),
+);
 </script>
 
 <template>
@@ -50,7 +46,7 @@ const onOptions = (options: { page: number; itemsPerPage: number; sortBy: DataTa
         :is-loading="isLoading"
         :sort-by="sortBy"
         must-sort
-        @options="onOptions"
+        @options="emit('query', changesFromOptions($event))"
     >
         <template #[`item.accesses`]="{ item }">
             <p
@@ -62,22 +58,17 @@ const onOptions = (options: { page: number; itemsPerPage: number; sortBy: DataTa
         </template>
         <template #[`item.personName`]="{ item }">{{ item.personName || '—' }}</template>
         <template #[`item.actions`]="{ item }">
-            <VBtn
+            <TableAction
                 v-if="canEdit"
-                aria-label="Editar registro"
+                label="Editar registro"
                 icon="$edit"
-                variant="text"
-                size="small"
-                color="primary"
                 @click="emit('edit', item)"
             />
-            <VBtn
+            <TableAction
                 v-if="canEdit && resource === 'users'"
-                aria-label="Cambiar contraseña"
+                label="Cambiar contraseña"
                 :icon="`svg:${mdiKeyOutline}`"
-                variant="text"
-                size="small"
-                color="warning"
+                color="accent"
                 @click="emit('password', item)"
             />
         </template>

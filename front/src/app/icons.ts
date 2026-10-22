@@ -17,11 +17,13 @@ import {
     mdiCardAccountDetailsOutline,
     mdiAccountTieOutline,
     mdiTruckDeliveryOutline,
+    mdiSwapHorizontalCircleOutline,
 } from '@mdi/js';
 
 // SVG oficiales importados por nombre; Vite conserva los iconos utilizados.
 export const APP_ICONS = {
     warehouse: `svg:${mdiWarehouse}`,
+    movements: `svg:${mdiSwapHorizontalCircleOutline}`,
     materials: `svg:${mdiLayersTripleOutline}`,
     consumables: `svg:${mdiPackageVariantClosed}`,
     wastes: `svg:${mdiRecycleVariant}`,

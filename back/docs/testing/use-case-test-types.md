@@ -210,3 +210,14 @@ Las integraciones existentes de Clientes/Proveedores siguen siendo la evidencia 
 persistencia. Las pruebas Vue no cierran las brechas de servidor de Personas/Usuarios
 ni las de contenido de reportes; el filtro de rol del reporte de Personas no está
 implementado en esa API y Vue impide solicitarlo como si lo estuviera.
+
+
+La migración de Movimientos a Vue añade evidencia para `CU-ALM-07..08`,
+`CU-ALM-15..16` y `CU-ALM-23..24` en
+[`front/tests/unit/modules/movements`](../../../front/tests/unit/modules/movements/)
+y [`movements.spec.ts`](../../../front/tests/e2e/movements.spec.ts): contrato por
+recurso, identidades de selectores, filtros, permisos de navegación, diez columnas
+y descarga en tres modalidades con API simulada. El
+[diseño DP-VUE-MOV-001..004](../../../front/docs/tooling.md) delimita su alcance.
+Esta evidencia del cliente no cierra las brechas de integración ni de contenido
+real del reporte de merma indicadas arriba.

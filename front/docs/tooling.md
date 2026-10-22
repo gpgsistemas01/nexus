@@ -301,3 +301,36 @@ Axios y las opciones/recorridos de navegador existentes. `RemoteSelect`,
 a `shared`; `inventoryReportTest.ts` conserva la validación de Excel y filtros.
 La API simulada no demuestra cambios persistidos, contenido de reportes de servidor
 ni políticas reales de autorización. No se usan datos ni una base de desarrollo.
+
+
+## Movimientos: diseño de comprobación
+
+| ID de diseño | Requisito / riesgo | Nivel y técnica | Condición y oráculo |
+| --- | --- | --- | --- |
+| `DP-VUE-MOV-001` | CU-ALM-07, 15, 23; historial separado e identidad correcta | Unitario/navegador; particiones por recurso, tipo y contrato | Cada vista consulta su endpoint; materiales usan ID del material y merma su ID; conserva fecha, diez columnas, signo, cero y saldos nulos; una cantidad incompleta se rechaza. |
+| `DP-VUE-MOV-002` | RF-REP-001; proveedor primero y filtros | Unitario/navegador; transiciones y fronteras de fechas | Sin proveedor no consulta recursos; al cambiar limpia selección y descarta respuesta tardía. Buscar aplica borrador y reinicia página; limpiar restaura filtros; fechas iguales y bisiestas válidas, inversión y fechas inexistentes rechazadas. |
+| `DP-VUE-MOV-003` | CU-ALM-08, 16, 24; alcance de exportación | Adaptador/navegador; decisiones por modo y fronteras de mes | Mes actual/específico omiten filtros; personalizado usa filtros aplicados, excluye paginación y borrador. Mes inválido no solicita archivo ni muestra error al abrir. Descarga reutiliza validación MIME compartida. |
+| `DP-VUE-MOV-004` | Acceso y navegación Vue | Navegador/composable; particiones por permisos y viewport | Cuenta exclusiva entra al historial, sin permiso se bloquea antes de API; faltando lectura auxiliar no pide opciones, faltando reportes oculta exportar; menú Vue, recarga y 320/390 px sin desbordamiento global. |
+
+Especificación: `tests/unit/modules/movements/`, `tests/e2e/movements.spec.ts` y sus
+fixtures. La extracción de actualización conserva la prueba de pausa, foco y carga
+visible de `inventoryListTest.ts`; la suite de Almacén protege su reutilización.
+La API simulada comprueba la integración del cliente, no la persistencia, autorización
+real ni contenido del Excel del servidor. Las brechas de integración de mermas
+se mantienen en la matriz del backend.
+
+
+## Consistencia y reutilización de tablas
+
+| Diseño | Riesgo y técnica | Condición observable / evidencia |
+| --- | --- | --- |
+| `DP-VUE-TABLE-001` | Orden incorrecto al compartir tablas; particiones por mapa y transición de recurso | `tableQueryTest.ts`: conserva índices discontinuos de inventario, traduce página/tamaño/sentido, descarta una columna exclusiva de proveedor al cambiar a cliente y conserva Fecha descendente del historial. |
+| `DP-VUE-LIST-002` | Limpieza compartida pierde filtros, tamaño u orden; transición aplicada → borrador → limpio | `listInteractionTest.ts`: limpia texto aplicado y borrador, reinicia filtros y página, conserva tamaño y sentido. |
+
+La suite de navegador existente recorre los consumidores reales de `RecordListPanel`,
+`ListFilters`, `TableFrame`, `TableAction` y `StateBadge`, incluidos captura de
+responsabilidades, permisos, conflictos y pantallas móviles. Se conservan los
+casos existentes; no se sustituyen por pruebas que fijen clases CSS o copien los
+colores de la implementación. La revisión visual de escritorio y 320/390 px
+comprueba presentación, subencabezados, filas de stock bajo y ausencia de
+recortes globales. Las respuestas HTTP se simulan y no demuestran persistencia.

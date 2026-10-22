@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { VCol } from 'vuetify/components/VGrid';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VAlert } from 'vuetify/components/VAlert';
 import { PERMISSIONS } from '@nexus/permissions';
@@ -53,7 +54,7 @@ const report = useFileExport<void>({
 });
 const { isExporting, exportError } = report;
 
-const { search, applySearch } = useListSearch(list, () => ({
+const { search, applySearch, clearSearch } = useListSearch(list, () => ({
     department: selectedDepartment.value?.title ?? '',
     role: selectedRole.value?.title ?? '',
 }));
@@ -65,10 +66,9 @@ const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor
 });
 
 const clear = () => {
-    search.value = '';
     departmentId.value = '';
     roleId.value = '';
-    list.applyQuery({ search: '', department: '', role: '' });
+    clearSearch({ department: '', role: '' });
 };
 
 onMounted(() => {
@@ -84,6 +84,8 @@ onMounted(() => {
         :total="total"
         :is-loading="isLoading"
         :error="error"
+        :show-count="canRead"
+        :has-active-filters="!!departmentId || !!roleId"
         @search="applySearch"
         @clear="clear"
         @refresh="list.load"
@@ -108,33 +110,47 @@ onMounted(() => {
             </VBtn>
         </template>
         <template
-            v-if="resource === 'persons' && canRead"
+            v-if="
+                resource === 'persons' &&
+                canRead &&
+                (has(PERMISSIONS.DEPARTMENTS_READ) || has(PERMISSIONS.ROLES_READ))
+            "
             #filters
         >
-            <RemoteSelect
+            <VCol
                 v-if="has(PERMISSIONS.DEPARTMENTS_READ)"
-                v-model="departmentId"
-                label="Filtrar por área"
-                :items="options.departments.items"
-                :is-loading="options.departments.isLoading"
-                :has-more="options.departments.hasMore"
-                :load-error="options.departments.error"
-                @search="filters.departments.updateSearch"
-                @more="filters.departments.loadMore"
-                @retry="filters.departments.retry"
-            />
-            <RemoteSelect
+                cols="12"
+                md="6"
+            >
+                <RemoteSelect
+                    v-model="departmentId"
+                    label="Filtrar por área"
+                    :items="options.departments.items"
+                    :is-loading="options.departments.isLoading"
+                    :has-more="options.departments.hasMore"
+                    :load-error="options.departments.error"
+                    @search="filters.departments.updateSearch"
+                    @more="filters.departments.loadMore"
+                    @retry="filters.departments.retry"
+                />
+            </VCol>
+            <VCol
                 v-if="has(PERMISSIONS.ROLES_READ)"
-                v-model="roleId"
-                label="Filtrar por rol"
-                :items="options.roles.items"
-                :is-loading="options.roles.isLoading"
-                :has-more="options.roles.hasMore"
-                :load-error="options.roles.error"
-                @search="filters.roles.updateSearch"
-                @more="filters.roles.loadMore"
-                @retry="filters.roles.retry"
-            />
+                cols="12"
+                md="6"
+            >
+                <RemoteSelect
+                    v-model="roleId"
+                    label="Filtrar por rol"
+                    :items="options.roles.items"
+                    :is-loading="options.roles.isLoading"
+                    :has-more="options.roles.hasMore"
+                    :load-error="options.roles.error"
+                    @search="filters.roles.updateSearch"
+                    @more="filters.roles.loadMore"
+                    @retry="filters.roles.retry"
+                />
+            </VCol>
         </template>
         <template #messages>
             <VAlert

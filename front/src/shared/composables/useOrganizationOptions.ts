@@ -13,19 +13,9 @@ export const useOrganizationOptions = (permissions: readonly string[]) => {
         (search, page, signal) => organizationService.options('roles', search, page, signal),
         computed(() => permissions.includes(PERMISSIONS.ROLES_READ)),
     );
-    const state = computed(
-        () =>
-            Object.fromEntries(
-                Object.entries({ departments, roles }).map(([key, lookup]) => [
-                    key,
-                    {
-                        items: lookup.items.value,
-                        isLoading: lookup.isLoading.value,
-                        error: lookup.error.value,
-                        hasMore: lookup.hasMore.value,
-                    },
-                ]),
-            ) as OrganizationState,
-    );
+    const state = computed<OrganizationState>(() => ({
+        departments: departments.state.value,
+        roles: roles.state.value,
+    }));
     return { departments, roles, state };
 };

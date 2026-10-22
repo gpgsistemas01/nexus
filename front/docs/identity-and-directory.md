@@ -16,7 +16,8 @@ El menú mantiene el acordeón y la barra de iconos, sin enlaces a pantallas EJS
 Después del login, `/almacen` conserva la entrada compatible y elige el primer
 módulo autorizado entre los grupos disponibles. Una cuenta exclusiva de Clientes
 o Usuarios llega a su pantalla. Cada pantalla conserva el título «Tabla de…» de EJS.
-No se trasladan Compras, Salidas ni Movimientos a Vue con este cambio.
+Compras y Salidas conservan sus pantallas EJS. Los historiales se describen en
+[Movimientos en Vue](movements.md), separados de Identidad y Directorio.
 
 ## Datos y operaciones
 
@@ -83,7 +84,9 @@ aún no existen en el contrato.
 - `PersonForm`, `UserForm`, `DirectoryForm`, `IdentityTable` y `DirectoryTable`
   presentan props y emiten eventos; no conocen HTTP ni sesión.
 - `shared/components/RecordListPanel` compone cabecera, búsqueda y estados;
-  las tablas conservan columnas y celdas de su dominio sobre `ServerTable`.
+  las tablas conservan columnas y celdas de su dominio sobre `ServerTable`. La tabla
+  de responsabilidades del formulario comparte `TableFrame` con los listados;
+  `TableAction` y `StateBadge` unifican acciones y estados.
 - `RecordEditorDialog` adapta `EditorDialog` a formularios con errores y conflictos.
   `OrganizationFields` compone Área/Rol y delega los selectores a `RemoteSelect`.
 - `RemoteSelect`, `useSelectedOption`, tipos de opciones y `useRemoteLookup` viven

@@ -127,15 +127,7 @@ export const useInventoryEditor = (options: {
         lookupMap;
     const lookups = computed(() =>
         Object.fromEntries(
-            Object.entries(lookupMap).map(([key, lookup]) => [
-                key,
-                {
-                    items: lookup.items.value,
-                    isLoading: lookup.isLoading.value,
-                    error: lookup.error.value,
-                    hasMore: lookup.hasMore.value,
-                },
-            ]),
+            Object.entries(lookupMap).map(([key, lookup]) => [key, lookup.state.value]),
         ),
     );
     const selectedTemplate = useSelectedOption(templates.items, () =>

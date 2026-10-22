@@ -7,7 +7,7 @@ import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import InventoryFormField from './InventoryFormField.vue';
 import type { InventoryFormSection } from '../formFields.js';
 import type { InventoryField, InventoryValues } from '../inventory.js';
-import type { LookupItem } from '../../../shared/lookup.js';
+import type { LookupState } from '../../../shared/lookup.js';
 
 defineProps<{
     title: string;
@@ -19,10 +19,7 @@ defineProps<{
     isSubmitting: boolean;
     isPending: boolean;
     isConflicted: boolean;
-    lookups: Record<
-        string,
-        { items: LookupItem[]; isLoading: boolean; error: string; hasMore: boolean }
-    >;
+    lookups: Record<string, LookupState>;
 }>();
 const emit = defineEmits<{
     update: [field: InventoryField, value: string | boolean];

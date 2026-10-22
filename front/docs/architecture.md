@@ -8,6 +8,8 @@ con Vuetify, VeeValidate y la API de Express. `warehouse` incorpora Materiales,
 Consumibles y Mermas como rutas Vue protegidas. Consulta [el contrato del login](login.md)
 y [los flujos de Almacén](warehouse.md). Personas/Usuarios y Clientes/Proveedores
 se describen en [Identidad y Directorio comercial](identity-and-directory.md).
+`movements` incorpora los tres historiales de sólo lectura con filtros y reportes;
+consulta [su contrato y responsabilidades](movements.md).
 
 ## Contenedores y presentación
 
@@ -50,7 +52,7 @@ sesión y permisos. `app/router/protectedDestination` comparte con LoginPage el
 retorno a rutas protegidas registradas y descarta destinos externos o de error.
 Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
 La configuración del menú vive en `app/navigation.ts`; sólo contiene rutas Vue de
-Almacén, Identidad, Directorio comercial y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
+Almacén, Movimientos, Identidad, Directorio comercial y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
 En escritorio se reserva una barra de iconos: al pulsar Almacén o el botón de
 menú se expande el drawer con el acordeón y un fondo modal. Clic fuera, Escape o navegar
 lo cierran y dejan la barra compacta. En móvil sólo se muestra el drawer temporal.
@@ -84,7 +86,7 @@ un contrato explícito.
 | --- | --- |
 | Contenedor/presentación | Las páginas de cada módulo coordinan; los formularios, tablas, filtros y AppNavigation reciben props y emiten eventos. |
 | Composición mediante composables | useInventory coordina permisos/editor; useInventoryList, useInventoryReport, useInventoryEditor, useInventoryRemoval y useRemoteOptions mantienen listado, reporte, captura y catálogos por instancia. |
-| Organización por módulos | auth, warehouse, catalogs, identity y directory agrupan sus responsabilidades. Los recursos equivalentes comparten flujos parametrizados; Mermas y las asignaciones de Personas conservan captura y recuperación propias. |
+| Organización por módulos | auth, warehouse, movements, catalogs, identity y directory agrupan sus responsabilidades. Los recursos equivalentes comparten flujos parametrizados; Mermas y las asignaciones de Personas conservan captura y recuperación propias. |
 | Servicios y adaptadores HTTP | authService conserva el login público sin refresh. Los servicios de los módulos protegidos usan Axios compartido; sus adaptadores comprueban DTOs y conservan identificadores/versiones. |
 | Estado compartido | createAuthSession crea una sesión por aplicación; main la proporciona por provide/inject y la guarda usa esa misma instancia. Su usuario es readonly. No se agrega Pinia para este único contrato ni un store por formulario. |
 | Slots | InventoryTable usa slots de VDataTableServer; RemoteSelect usa append-item y v-intersect para cargar opciones al desplazarse. |
@@ -156,16 +158,30 @@ la adaptación visual de MDB, los campos recuperados y SweetAlert2.
 
 `shared/components/EditorDialog` proporciona el marco de los formularios de
 los módulos, con slots para captura y acciones específicas.
-`shared/components/ServerTable` agrupa Vuetify, paginación y estilos; InventoryTable
-y CatalogTable definen columnas, celdas y acciones de su dominio.
+`shared/components/TableFrame` concentra borde, encabezados, subencabezados,
+franjas, foco/hover y pie de tabla. `ServerTable` lo compone con la paginación de
+Vuetify; la tabla local de responsabilidades de Personas también usa ese marco.
+Las tablas de cada módulo definen sus columnas y celdas. `TableAction` comparte
+botones con icono, nombre accesible, tooltip y estado deshabilitado; `StateBadge`
+presenta Activo con el mismo Sí/No y tratamiento visual.
+`useTableQuery` traduce orden y paginación con el mapa de índices permitido por
+cada dominio, incluido el orden descendente inicial del historial.
 `identity` y `directory` mantienen sus formularios y contratos descritos en
 [Identidad y Directorio](identity-and-directory.md). Los selectores (`RemoteSelect`,
 `useRemoteLookup`, `useSelectedOption`) y tipos de opciones pertenecen a `shared`.
 `useRemoteOptions` aporta la estrategia y dependencia de proveedor de inventario.
+`useRemoteLookup.state` publica el `LookupState` reactivo de presentación, sin que
+los consumidores repitan la conversión de refs; Organización, Inventario y
+Movimientos lo reutilizan.
 `requestExcel` y `useFileExport` comparten las descargas con Almacén.
 
-Catálogos, Identidad y Directorio usan `RecordListPanel` para la cabecera, búsqueda,
-estado y reintento del listado; los botones, filtros y tablas entran por slots.
+Todos los módulos de listado usan `RecordListPanel` para la cabecera, tarjeta,
+contador, error y reintento; botones, mensajes, filtros y tablas entran por slots.
+Catálogos, Identidad y Directorio componen su búsqueda sobre `ListFilters`; Almacén
+y Movimientos aportan sus filtros propios sobre ese mismo acordeón y ocultan el
+buscador interno del panel. Los títulos conservan su texto y reciben la misma
+presentación que el encabezado original de EJS. El contador se omite si no hay
+permiso para consultar el listado.
 `RecordEditorDialog` comparte los errores, el marco de campos y la recuperación
 de conflictos sobre `EditorDialog`, conservando la nota y el texto de recarga de
 cada formulario. Las columnas, controles y payloads siguen en su dominio.
@@ -180,10 +196,11 @@ callback tipado; no conoce endpoints, sesión ni permisos concretos.
 Si una página queda fuera del rango, el núcleo vuelve directamente a la última
 página disponible, sin recorrer todas las páginas vacías intermedias.
 
-`useListSearch` coordina el texto de búsqueda con esa consulta en los cuatro módulos:
+`useListSearch` coordina búsqueda, actualización y limpieza en los módulos:
 una búsqueda nueva vuelve a la primera página; repetir la consulta aplicada en
 esa página actualiza una sola vez. Identidad aporta sus filtros mediante un
-callback. La limpieza de filtros permanece en cada página porque cambia por dominio.
+callback. `clearSearch` reinicia texto y página, acepta el reinicio de filtros del módulo y
+conserva tamaño y orden. Cada página sigue limpiando sus selectores y borradores.
 `useListEditor` comparte apertura condicionada por permisos, cierre, recarga y aviso
 de guardado en Catálogos, Identidad y Directorio. Recibe la política de apertura y
 la función de recarga; no conoce recursos ni endpoints y mantiene estado por instancia.
@@ -236,3 +253,11 @@ en [la guía de herramientas](tooling.md). CI ejecuta ESLint, pruebas y compilac
 - ISO/IEC 25010:2023 sirve para acordar criterios de calidad; ISO/IEC/IEEE 42010:2022,
   para describir decisiones y dependencias. Ninguna exige estas carpetas ni convierte
   su adopción en conformidad automática.
+
+## Consultas de historial
+
+Movimientos compone los flujos compartidos de listado, búsqueda, opciones y descarga.
+`ListFilters` ofrece el acordeón y las acciones tanto a inventario como a historial;
+cada adaptador conserva sus campos y reglas. `useVisibleRefresh` comparte el ciclo
+de actualización visible de 30 segundos sin trasladar listeners a la presentación.
+Los contratos específicos y límites están en [Movimientos](movements.md).

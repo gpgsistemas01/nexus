@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { VBtn } from 'vuetify/components/VBtn';
-import { VChip } from 'vuetify/components/VChip';
+import TableAction from '../../../shared/components/TableAction.vue';
+import StateBadge from '../../../shared/components/StateBadge.vue';
 import ServerTable from '../../../shared/components/ServerTable.vue';
 import type { CatalogEntry, CatalogQuery } from '../catalog.js';
 
@@ -32,25 +32,14 @@ const headers = computed(() => [
         @options="emit('query', { page: $event.page, length: $event.itemsPerPage })"
     >
         <template #[`item.isActive`]="{ item }">
-            <VChip
-                :color="item.isActive ? 'primary' : 'filter-clear'"
-                size="small"
-                variant="tonal"
-            >
-                {{ item.isActive ? 'Sí' : 'No' }}
-            </VChip>
+            <StateBadge :is-active="item.isActive" />
         </template>
         <template #[`item.actions`]="{ item }">
-            <VBtn
-                color="filter-action"
-                variant="tonal"
-                size="small"
-                prepend-icon="$edit"
-                aria-label="Editar registro"
+            <TableAction
+                icon="$edit"
+                label="Editar registro"
                 @click="emit('edit', item)"
-            >
-                Editar
-            </VBtn>
+            />
         </template>
     </ServerTable>
 </template>

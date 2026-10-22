@@ -1,7 +1,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { PageResult } from '../http/pageRequest.js';
-import type { LookupItem } from '../lookup.js';
+import type { LookupItem, LookupState } from '../lookup.js';
 
 export const useRemoteLookup = (
     request: (search: string, page: number, signal: AbortSignal) => Promise<PageResult<LookupItem>>,
@@ -14,6 +14,7 @@ export const useRemoteLookup = (
     const search = ref('');
     const page = ref(1);
     const total = ref(0);
+    const hasMore = computed(() => items.value.length < total.value);
     let controller: AbortController | null = null;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let sequence = 0;
@@ -93,16 +94,22 @@ export const useRemoteLookup = (
         clearTimeout(timer);
         controller?.abort();
     });
+    const state = computed<LookupState>(() => ({
+        items: items.value,
+        isLoading: isLoading.value,
+        error: error.value,
+        hasMore: hasMore.value,
+    }));
     return {
+        state,
         items,
         isLoading,
         error,
         search,
-        hasMore: computed(() => items.value.length < total.value),
+        hasMore,
         updateSearch,
         loadMore: () => {
-            if (!isLoading.value && !error.value && items.value.length < total.value)
-                return load(page.value + 1);
+            if (!isLoading.value && !error.value && hasMore.value) return load(page.value + 1);
         },
         retry: () => load(requestedPage),
     };

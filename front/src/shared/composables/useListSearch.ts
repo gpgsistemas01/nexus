@@ -24,5 +24,10 @@ export const useListSearch = <Query extends SearchQuery>(
         else list.applyQuery(changes);
     };
 
-    return { search, applySearch };
+    const clearSearch = (filters: Partial<Query> = {}) => {
+        search.value = '';
+        list.applyQuery({ ...filters, search: '' });
+    };
+
+    return { search, applySearch, clearSearch };
 };

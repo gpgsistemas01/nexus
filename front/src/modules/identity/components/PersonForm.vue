@@ -3,6 +3,8 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VTable } from 'vuetify/components/VTable';
 import { VAlert } from 'vuetify/components/VAlert';
+import TableFrame from '../../../shared/components/TableFrame.vue';
+import TableAction from '../../../shared/components/TableAction.vue';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import OrganizationFields from '../../../shared/components/OrganizationFields.vue';
 import type { OrganizationState, OrganizationResource } from '../../../shared/lookup.js';
@@ -89,40 +91,40 @@ const emit = defineEmits<{
         >
             {{ accessError || errors.accesses }}
         </VAlert>
-        <VTable
-            density="compact"
-            aria-label="Responsabilidades de la persona"
-        >
-            <thead>
-                <tr>
-                    <th>Área</th>
-                    <th>Rol</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr
-                    v-for="access in values.accesses"
-                    :key="access.departmentId"
-                >
-                    <td>{{ access.departmentName }}</td>
-                    <td>{{ access.roleName }}</td>
-                    <td>
-                        <VBtn
-                            :aria-label="`Quitar asignación de ${access.departmentName}`"
-                            icon="$delete"
-                            color="error"
-                            variant="text"
-                            size="small"
-                            :disabled="isSubmitting || isConflicted"
-                            @click="emit('remove', access.departmentId)"
-                        />
-                    </td>
-                </tr>
-                <tr v-if="!values.accesses.length">
-                    <td colspan="3">Agrega al menos un área y un rol.</td>
-                </tr>
-            </tbody>
-        </VTable>
+        <TableFrame>
+            <VTable
+                density="compact"
+                aria-label="Responsabilidades de la persona"
+            >
+                <thead>
+                    <tr>
+                        <th>Área</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="access in values.accesses"
+                        :key="access.departmentId"
+                    >
+                        <td>{{ access.departmentName }}</td>
+                        <td>{{ access.roleName }}</td>
+                        <td>
+                            <TableAction
+                                :label="`Quitar asignación de ${access.departmentName}`"
+                                icon="$delete"
+                                color="error"
+                                :is-disabled="isSubmitting || isConflicted"
+                                @click="emit('remove', access.departmentId)"
+                            />
+                        </td>
+                    </tr>
+                    <tr v-if="!values.accesses.length">
+                        <td colspan="3">Agrega al menos un área y un rol.</td>
+                    </tr>
+                </tbody>
+            </VTable>
+        </TableFrame>
     </RecordEditorDialog>
 </template>

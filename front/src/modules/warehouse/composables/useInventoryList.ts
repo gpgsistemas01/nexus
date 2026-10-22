@@ -1,12 +1,11 @@
-import { computed, onBeforeUnmount, onMounted } from 'vue';
+import { computed } from 'vue';
 import type { Ref } from 'vue';
+import { useVisibleRefresh } from '../../../shared/composables/useVisibleRefresh.js';
 import { usePagedList } from '../../../shared/composables/usePagedList.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { inventoryService } from '../services/inventoryService.js';
 import { useRemoteOptions } from './useRemoteOptions.js';
 import type { InventoryQuery, InventoryResource, InventoryRow } from '../inventory.js';
-
-const REFRESH_INTERVAL_MS = 30_000;
 
 export const useInventoryList = (options: {
     resource: InventoryResource;
@@ -40,28 +39,11 @@ export const useInventoryList = (options: {
         'suppliers',
         computed(() => canReadSuppliers),
     );
-    let interval: ReturnType<typeof setInterval> | undefined;
-
-    const refreshVisible = () => {
-        if (
-            document.visibilityState === 'visible' &&
-            !isPaused.value &&
-            !list.isLoading.value &&
-            !list.isRefreshing.value &&
-            Date.now() - lastAttemptAt >= REFRESH_INTERVAL_MS
-        )
-            void list.refresh();
-    };
-
-    onMounted(() => {
-        window.addEventListener('focus', refreshVisible);
-        document.addEventListener('visibilitychange', refreshVisible);
-        interval = setInterval(refreshVisible, REFRESH_INTERVAL_MS);
-    });
-    onBeforeUnmount(() => {
-        clearInterval(interval);
-        window.removeEventListener('focus', refreshVisible);
-        document.removeEventListener('visibilitychange', refreshVisible);
+    useVisibleRefresh({
+        refresh: list.refresh,
+        lastAttemptAt: () => lastAttemptAt,
+        canRefresh: () =>
+            canRead && !isPaused.value && !list.isLoading.value && !list.isRefreshing.value,
     });
 
     return { ...list, suppliers };

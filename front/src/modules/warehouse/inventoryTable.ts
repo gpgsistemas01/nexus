@@ -70,11 +70,3 @@ export const INVENTORY_SORT_COLUMNS: Readonly<Record<string, number>> = {
     height: 2,
     minStock: 4,
 };
-
-export const numberText = (value: string | number | null | undefined) =>
-    value == null ? '—' : Number(value).toLocaleString('es-MX', { maximumFractionDigits: 6 });
-
-export const currencyText = (value: string | number | null | undefined) =>
-    value == null
-        ? '—'
-        : Number(value).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });

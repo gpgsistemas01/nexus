@@ -1,6 +1,8 @@
 import { APP_ICONS } from './icons.js';
 import { PUBLIC_CATALOGS } from '@nexus/catalogs';
 import { PERMISSIONS } from '@nexus/permissions';
+import { MOVEMENT_CONFIG } from '../modules/movements/movement.js';
+import type { MovementResource } from '../modules/movements/movement.js';
 
 export const APP_NAVIGATION = [
     {
@@ -41,6 +43,17 @@ export const APP_NAVIGATION_GROUPS: readonly NavigationGroup[] = [
         title: 'Almacén',
         icon: APP_ICONS.warehouse,
         links: APP_NAVIGATION,
+    },
+    {
+        id: 'movements',
+        title: 'Movimientos',
+        icon: APP_ICONS.movements,
+        links: Object.entries(MOVEMENT_CONFIG).map(([resource, config]) => ({
+            title: config.label,
+            to: `/movimientos/${config.path}`,
+            icon: APP_ICONS[resource as MovementResource],
+            permission: PERMISSIONS.MOVEMENTS_READ,
+        })),
     },
     {
         id: 'identity',

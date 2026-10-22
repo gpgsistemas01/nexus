@@ -32,7 +32,8 @@ elegir una ruta lo cierra y conserva la barra compacta sin desplazar la página.
 En móvil el botón abre el panel sobre la página y al cerrarlo queda oculto.
 El acordeón admite teclado, estado expandido accesible y sólo las rutas permitidas.
 El grupo [Catálogos](catalogs.md) agrega las seis vistas administrables para
-`catalogs:manage`. Compras, Salidas y Movimientos permanecen fuera de esta migración.
+`catalogs:manage`. Compras y Salidas permanecen fuera de esta migración.
+Los historiales tienen su propia sección de [Movimientos en Vue](movements.md).
 
 ## Patrones y propietario del estado
 
