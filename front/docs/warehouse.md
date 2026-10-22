@@ -25,8 +25,14 @@ aplicación. Consulta la [preparación de archivos ignorados](../../README.md#ar
 El botón Excel utiliza el reporte existente con tipo, búsqueda y alcance
 activos/con stock/activos o con stock. El backend exporta todos los proveedores del
 tipo seleccionado; cuando se filtra un proveedor la interfaz aclara esa diferencia.
-El menú principal sólo enlaza estas vistas Vue. Compras, Salidas, Movimientos y
-Catálogos no se enlazan desde este frontend ni se migran sus formularios.
+El menú principal agrupa estas vistas Vue en un acordeón «Almacén», con iconos
+para Materiales, Consumibles y Mermas. En escritorio empieza como barra de iconos;
+pulsar Almacén o el botón de menú abre el panel detallado. Clic fuera, Escape o
+elegir una ruta lo cierra y conserva la barra compacta sin desplazar la página.
+En móvil el botón abre el panel sobre la página y al cerrarlo queda oculto.
+El acordeón admite teclado, estado expandido accesible y sólo las rutas permitidas.
+Compras, Salidas, Movimientos y Catálogos no se enlazan desde este frontend ni se
+migran sus formularios.
 
 ## Patrones y propietario del estado
 

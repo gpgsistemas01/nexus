@@ -45,7 +45,12 @@ la ruta; un `401` tras renovar sesión devuelve al login, un rechazo de permiso 
 `/sin-permiso` y un fallo de conexión a `/sesion-no-disponible`, con reintento.
 Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
 La configuración del menú vive en `app/navigation.ts`; sólo contiene rutas Vue de
-Almacén. El proxy conserva la API y la acción de cierre de sesión. Consulta
+Almacén, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
+En escritorio se reserva una barra de iconos: al pulsar Almacén o el botón de
+menú se expande el drawer con el acordeón y un fondo modal. Clic fuera, Escape o navegar
+lo cierran y dejan la barra compacta. En móvil sólo se muestra el drawer temporal.
+El grupo conserva estado visual local y sólo recibe enlaces autorizados.
+El proxy conserva la API y la acción de cierre de sesión. Consulta
 [las decisiones de UI, HTTP y pruebas](ui-and-http.md).
 Si falla la carga inicial, StartupErrorPage permite reintentar; no se deja un rechazo
 de bootstrap sin manejar. El transporte y los errores HTTP se centralizan en `shared/http`;

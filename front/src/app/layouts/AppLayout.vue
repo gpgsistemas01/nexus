@@ -16,14 +16,9 @@ import { useAuthSession } from '../../modules/auth/session.js';
 const session = useAuthSession();
 const { mobile } = useDisplay({ mobileBreakpoint: 900 });
 const isNavigationOpen = ref(false);
-const isCompact = ref(false);
 const links = computed(() =>
     APP_NAVIGATION.filter((link) => session.user.value?.permissions.includes(link.permission)),
 );
-const toggleNavigation = () => {
-    if (mobile.value) isNavigationOpen.value = !isNavigationOpen.value;
-    else isCompact.value = !isCompact.value;
-};
 </script>
 
 <template>
@@ -33,19 +28,23 @@ const toggleNavigation = () => {
             class="app-shell"
         >
             <VNavigationDrawer
+                v-model:expanded="isNavigationOpen"
                 :model-value="mobile ? isNavigationOpen : true"
                 :temporary="mobile"
                 :permanent="!mobile"
-                :rail="!mobile && isCompact"
+                :rail="!mobile"
+                :modal="!mobile"
                 :width="208"
                 :rail-width="64"
-                @update:model-value="isNavigationOpen = !!$event"
+                @update:model-value="isNavigationOpen = $event"
+                @keydown.esc="isNavigationOpen = false"
             >
                 <AppNavigation
                     :user-name="session.user.value?.name ?? ''"
                     :links="links"
-                    :is-compact="!mobile && isCompact"
+                    :is-compact="!mobile && !isNavigationOpen"
                     :is-temporary="mobile"
+                    @expand="isNavigationOpen = true"
                     @navigate="isNavigationOpen = false"
                 />
             </VNavigationDrawer>
@@ -57,9 +56,11 @@ const toggleNavigation = () => {
                 <VBtn
                     icon="$menu"
                     size="small"
-                    :aria-label="mobile ? 'Menú' : isCompact ? 'Expandir menú' : 'Contraer menú'"
-                    :aria-expanded="mobile ? isNavigationOpen : !isCompact"
-                    @click="toggleNavigation"
+                    :aria-label="
+                        mobile ? 'Menú' : isNavigationOpen ? 'Contraer menú' : 'Expandir menú'
+                    "
+                    :aria-expanded="isNavigationOpen"
+                    @click="isNavigationOpen = !isNavigationOpen"
                 />
                 <VAppBarTitle>
                     Nexus

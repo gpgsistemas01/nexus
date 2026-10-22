@@ -48,12 +48,36 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
     await expect(page.getByRole('columnheader', { name: label, exact: true })).toBeVisible();
   }
   const navigation = page.getByRole('navigation', { name: 'Navegación principal' });
+  const contentX = await page
+    .getByRole('heading', { name: 'Materiales', exact: true })
+    .evaluate((element) => element.getBoundingClientRect().x);
+  await navigation.getByRole('button', { name: 'Almacén', exact: true }).hover();
+  await expect(navigation.getByRole('link', { name: 'Materiales', exact: true })).toBeHidden();
+  await navigation.getByRole('button', { name: 'Almacén', exact: true }).click();
+  const warehouseGroup = navigation.getByRole('button', { name: 'Almacén', exact: true });
+  await expect(warehouseGroup).toHaveAttribute('aria-expanded', 'true');
+  expect(
+    await page
+      .getByRole('heading', { name: 'Materiales', exact: true })
+      .evaluate((element) => element.getBoundingClientRect().x),
+  ).toBe(contentX);
+  for (const name of ['Materiales', 'Consumibles', 'Mermas']) {
+    const link = navigation.getByRole('link', { name, exact: true });
+    await expect(link).toBeVisible();
+    await expect(link.locator('svg')).toBeVisible();
+  }
+  await warehouseGroup.click();
+  await expect(warehouseGroup).toHaveAttribute('aria-expanded', 'false');
+  await expect(navigation.getByRole('link', { name: 'Consumibles', exact: true })).toBeHidden();
+  await warehouseGroup.press('Enter');
+  await expect(warehouseGroup).toHaveAttribute('aria-expanded', 'true');
   const destinations = await navigation
     .getByRole('link')
     .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
   expect(destinations.every((to) => to?.startsWith('/almacen'))).toBe(true);
-  await page.getByRole('button', { name: 'Contraer menú', exact: true }).click();
+  await page.mouse.click(page.viewportSize()!.width - 16, 70);
   await expect(page.getByRole('button', { name: 'Expandir menú', exact: true })).toBeVisible();
+  await expect(navigation.getByRole('link', { name: 'Materiales', exact: true })).toBeHidden();
   await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
   await page.getByRole('link', { name: 'Consumibles', exact: true }).click();
   await expect(page).toHaveURL(/\/almacen\/consumibles$/);
@@ -69,6 +93,7 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
   ])
     await expect(page.getByRole('columnheader', { name: label, exact: true })).toBeVisible();
   await expect(page.getByRole('columnheader', { name: 'Medidas', exact: true })).toBeHidden();
+  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
   await page.getByRole('link', { name: 'Mermas', exact: true }).click();
   await expect(
     page.getByRole('cell', { name: 'Sobrante de lona Proveedor Central' }),
@@ -100,6 +125,12 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
   await expect(page.getByRole('button', { name: 'Editar', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Descargar Excel' })).toBeHidden();
+  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  const navigation = page.getByRole('navigation', { name: 'Navegación principal' });
+  await expect(navigation.getByRole('link', { name: 'Materiales', exact: true })).toBeVisible();
+  await expect(navigation.getByRole('link', { name: 'Mermas', exact: true })).toBeHidden();
+  await navigation.getByRole('button', { name: 'Almacén', exact: true }).press('Escape');
+  await expect(page.getByRole('button', { name: 'Expandir menú', exact: true })).toBeVisible();
   await expect(
     page.getByRole('columnheader', { name: 'Costo Unitario de Conversión', exact: true }),
   ).toBeHidden();
