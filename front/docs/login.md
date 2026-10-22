@@ -26,6 +26,35 @@ proxy. Para cambiarlo, crea `front/.env.local` con `BACKEND_PROXY_TARGET`, toman
 como referencia `.env.example`, y reinicia Vite. Esta variable es del servidor de
 desarrollo, no una clave pública `VITE_*`.
 
+### Error 502 al renovar la sesión en local
+
+El proxy de Vite devuelve `502 Bad Gateway` si no logra conectarse a Express.
+Se puede abrir Vue en el puerto 5173 aunque el backend esté detenido: la pantalla
+disponible no garantiza que la API esté escuchando. Ante un 401 de una consulta
+protegida, Axios intenta `POST /api/auth/refresh`; si Express no responde, esa
+renovación también falla a través del proxy.
+
+1. Mantén `npm --prefix back run dev` activo en otra terminal. Comprueba el puerto
+   anunciado y cualquier error que cierre el proceso; `back/.env` configura Express.
+2. El destino predeterminado es `http://127.0.0.1:3000`. Si Express anuncia otro
+   puerto, configura `BACKEND_PROXY_TARGET` en `front/.env.local` con ese origen y
+   reinicia Vite. Las variables `VITE_*` no configuran este proxy.
+3. Comprueba directamente el endpoint desde PowerShell, sin compartir tokens:
+
+   ```powershell
+   curl.exe -i -X POST http://127.0.0.1:3000/api/auth/refresh -H "Content-Type: application/json" -d "{}"
+   ```
+
+   Sin cookie de renovación, la respuesta esperada es `401 INVALID_AUTH`: confirma
+   que la API responde. Una conexión rechazada indica que hay que corregir el
+   arranque o el puerto antes de revisar cookies. Si responde directamente pero
+   falla desde 5173, contrasta el destino configurado y el error de la terminal de Vite.
+
+Un 502 no se trata como sesión vencida ni dispara reenvíos automáticos. Tras recuperar
+el backend, el reintento explícito puede renovar la sesión; un 401 del propio refresh
+sí requiere volver a iniciar sesión. El origen concreto de un incidente se confirma
+con la URL y el error de conexión del proxy, no sólo con el mensaje del navegador.
+
 ## Diseño y responsabilidades
 
 - `pages/LoginPage.vue` compone la pantalla y navega después del acceso.
@@ -90,6 +119,35 @@ El cliente de solicitudes protegidas intenta una renovación ante `401`, nunca
 ante `403`, conflictos o errores de conexión. Las notificaciones `flash`
 HttpOnly del flujo EJS no se muestran en la pantalla Vue; el nuevo login muestra
 sus propios resultados de envío.
+
+### Renovación automática y recuperación del acceso
+
+Cuando vence el access token, `/api/auth/me` puede responder `401 INVALID_AUTH`.
+Axios envía automáticamente `POST /api/auth/refresh`, compartido entre las consultas
+pendientes. Si la cookie HttpOnly de renovación sigue siendo válida, Express
+establece las cookies y devuelve `200 text/plain OK`; Axios repite una vez la
+consulta original. No se requiere pulsar un botón ni capturar credenciales.
+Es la misma API de renovación que consume EJS; no se implementa otra política de tokens.
+
+Si falla la conexión o el refresh devuelve 502, la pantalla de sesión no disponible
+conserva en `returnTo` la ruta solicitada, incluida su consulta y fragmento.
+«Volver a comprobar el acceso» muestra «Comprobando acceso…», evita clics simultáneos
+y vuelve a ejecutar la guarda de esa ruta. Cuando vuelve el backend, la comprobación
+puede renovar automáticamente la sesión y recuperar el módulo original. Si el fallo
+persiste, muestra un aviso y permite otro intento explícito; no oculta el resultado.
+Acceso denegado conserva también la ruta para revalidar permisos sin enviarlo a otro
+módulo. Un refresh rechazado con 401 abre el login y conserva el destino.
+
+`app/router/protectedDestination` comparte entre login y recuperación la resolución
+de `returnTo`: sólo admite rutas internas registradas que requieren sesión. Una URL
+externa, desconocida o de error usa `/almacen` como entrada autorizada, evitando
+redirecciones externas y ciclos de recuperación.
+
+El logger del backend usa `warn` por defecto: registra el 401 de `/me`, pero puede
+omitir un refresh exitoso con 200. Para comprobar la renovación, observa en Network
+la secuencia `/me` → `/refresh` → `/me` y sus estados HTTP, sin compartir cookies
+ni tokens. La ausencia de un mensaje de éxito en la terminal no demuestra por sí
+sola que la renovación no se ejecutó.
 
 ## Proxy y despliegue
 

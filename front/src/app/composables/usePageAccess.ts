@@ -15,7 +15,7 @@ export const usePageAccess = () => {
         void router.replace(
             status === 401
                 ? { name: 'login', query: { returnTo: router.currentRoute.value.fullPath } }
-                : { name: 'forbidden' },
+                : { name: 'forbidden', query: { returnTo: router.currentRoute.value.fullPath } },
         );
     };
 

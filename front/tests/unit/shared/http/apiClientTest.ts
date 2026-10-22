@@ -57,6 +57,44 @@ describe('cliente Axios compartido: sesión y errores', () => {
     expect(respond).toHaveBeenCalledTimes(2);
   });
 
+  it('un 502 al renovar conserva el fallo del proxy y permite reintentar cuando vuelve el backend', async () => {
+    let isAvailable = false;
+    let isRefreshed = false;
+    let refreshCalls = 0;
+    let failRefresh!: (reply: { status: number; data: string }) => void;
+    const pending = new Promise<{ status: number; data: string }>((resolve) => {
+      failRefresh = resolve;
+    });
+    const { request } = createApiClient(
+      mockHttpAdapter(({ url }) => {
+        if (url === '/api/auth/refresh') {
+          refreshCalls++;
+          if (!isAvailable) return pending;
+          isRefreshed = true;
+          // Contrato real de Express: sendStatus(200) devuelve texto, no JSON.
+          return { data: 'OK' };
+        }
+        return isRefreshed
+          ? { data: { user: { id: 'user-1' } } }
+          : { status: 401, data: { code: 'INVALID_AUTH' } };
+      }),
+    );
+    const results = Promise.allSettled([
+      request('/api/auth/me'),
+      request('/api/warehouse/materials'),
+    ]);
+    await vi.waitFor(() => expect(refreshCalls).toBe(1));
+    failRefresh({ status: 502, data: 'Bad Gateway' });
+    for (const result of await results) {
+      expect(result.status).toBe('rejected');
+      if (result.status === 'rejected') expect(result.reason).toMatchObject({ status: 502 });
+    }
+    expect(refreshCalls).toBe(1);
+    isAvailable = true;
+    await expect(request('/api/auth/me')).resolves.toEqual({ user: { id: 'user-1' } });
+    expect(refreshCalls).toBe(2);
+  });
+
   it('un segundo 401 termina el reintento y no genera un bucle de renovación', async () => {
     const respond = vi.fn(({ url }: { url?: string }) => ({
       status: url === '/api/auth/refresh' ? 200 : 401,

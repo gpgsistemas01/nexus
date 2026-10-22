@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { VApp } from 'vuetify/components/VApp';
 import LoginForm from '../components/LoginForm.vue';
 import { useLoginForm } from '../composables/useLoginForm.js';
+import { protectedDestination } from '../../../app/router/protectedDestination.js';
 
 const router = useRouter();
 const route = useRoute();
@@ -20,14 +21,7 @@ const {
     submit,
 } = useLoginForm({
     onSuccess: () => {
-        const returnTo = route.query.returnTo;
-        const resolved =
-            typeof returnTo === 'string' && returnTo.startsWith('/') && !returnTo.startsWith('//')
-                ? router.resolve(returnTo)
-                : null;
-        const destination = resolved?.matched.some((record) => record.meta.requiresAuth)
-            ? resolved.fullPath
-            : '/almacen';
+        const destination = protectedDestination(router, route.query.returnTo);
         void router.replace(destination).catch(() => {
             // Una carga diferida fallida recupera la ruta con el arranque y su pantalla de reintento.
             window.location.assign(destination);

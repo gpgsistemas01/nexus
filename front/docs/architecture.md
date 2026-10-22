@@ -44,6 +44,10 @@ pertenecen a login y Almacén, respectivamente.
 La guarda de las rutas protegidas consulta `/api/auth/me` y comprueba el permiso público de
 la ruta; un `401` tras renovar sesión devuelve al login, un rechazo de permiso a
 `/sin-permiso` y un fallo de conexión a `/sesion-no-disponible`, con reintento.
+Ambas pantallas conservan la ruta original en `returnTo`. AccessErrorPage coordina
+el reintento con estado pendiente y resultado visible; la guarda vuelve a comprobar
+sesión y permisos. `app/router/protectedDestination` comparte con LoginPage el
+retorno a rutas protegidas registradas y descarta destinos externos o de error.
 Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
 La configuración del menú vive en `app/navigation.ts`; sólo contiene rutas Vue de
 Almacén, Identidad, Directorio comercial y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.

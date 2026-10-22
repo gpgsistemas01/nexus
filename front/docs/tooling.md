@@ -110,6 +110,22 @@ La coordinación compartida de las páginas se comprueba en
 `tests/unit/app/pageAccessTest.ts`, además de los recorridos de navegador existentes.
 No se retiran las pruebas de campos, payloads ni versiones de cada módulo.
 
+`tests/unit/shared/http/apiClientTest.ts` comprueba también la transición de
+renovación concurrente → `502 Bad Gateway` → backend disponible → reintento
+explícito. El error conserva su estado 502 y la siguiente renovación acepta el
+`200 text/plain OK` real de Express; no se convierte una caída del proxy en
+credenciales inválidas ni se reenvía una escritura por un fallo de red.
+
+`tests/e2e/sessionRecovery.spec.ts` ejercita el router, Axios y la administración de
+cookies HttpOnly de Chromium con respuestas HTTP simuladas. No demuestra la validez
+criptográfica de JWT ni sustituye las integraciones de Express/Prisma.
+
+| Diseño / riesgo | Nivel y técnica | Resultado observable |
+| --- | --- | --- |
+| `DP-VUE-SESSION-001`: pérdida de renovación automática al migrar de EJS | Navegador; transición access token rechazado → refresh válido/inválido | 401 de `/me` dispara un único refresh; el texto `OK` y Set-Cookie permiten repetir la consulta sin login. Un refresh 401 abre el login con destino y sin bucle. |
+| `DP-VUE-SESSION-002`: reintento sin resultado ni contexto | Navegador; servidor/refresh 502 → reintento fallido/servidor recuperado y decisiones de permiso | Se conserva ruta, query y fragmento incluso al recargar la pantalla de error. El botón informa espera y fallo, evita duplicados y recupera la ruta original. Revalidar permisos vuelve al módulo solicitado. |
+| `DP-VUE-SESSION-003`: retorno externo o cíclico | Unitario, `tests/unit/app/protectedDestinationTest.ts`; particiones de destino | Sólo se conservan rutas protegidas registradas; externos, arrays, rutas desconocidas, login y error vuelven a la entrada autorizada. |
+
 | Diseño / riesgo | Nivel y técnica | Resultado observable |
 | --- | --- | --- |
 | `DP-VUE-LIST-001`: búsqueda, filtros y editor compartidos | Unitario con `usePagedList` real; transiciones de página/filtros y decisiones de permiso | Buscar vuelve a página 1; repetir actualiza una sola vez; cambiar sólo área conserva búsqueda/orden/tamaño. Dos páginas no comparten captura. Cerrar no recarga, recuperar un conflicto recarga sin confirmar éxito y guardar cierra/recarga/confirma. Abrir reevalúa permisos. |

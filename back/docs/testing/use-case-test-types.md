@@ -54,7 +54,8 @@ Agregar stock; no replica la apertura automática del modal EJS.
 
 | Casos de uso | Evidencia automatizada relevante | Tipo, datos y resultado esperado | Estado de cobertura |
 | --- | --- | --- | --- |
-| `CU-AUT-01..02` | Sin prueba funcional directa. | Sesión limpia/autenticada, credenciales válidas e inválidas; crear o invalidar sesión según corresponda. | **Brecha.** |
+| `CU-AUT-01` | `authControllerDbTest.js`; pruebas Vue de login y recuperación de sesión en `front/tests/e2e/`. | Integración HTTP/Prisma de captura inválida, credenciales rechazadas y login válido con cookies; navegador con API simulada para renovar automáticamente y recuperar la ruta tras un fallo del servidor. | **Evidencia parcial.** La simulación Vue no prueba la persistencia ni la verificación criptográfica del refresh. |
+| `CU-AUT-02` | `cookiesUtilsTest.js` comprueba la limpieza de cookies. | Evidencia unitaria del helper; falta el recorrido HTTP de cierre de sesión completo. | **Brecha funcional.** |
 | `CU-ALM-01` | `materialControllerTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Unitaria de permisos e interacción; queries y retorno simulado; oculta costos sin permiso y conserva respuesta autorizada. | **Unitaria existente.** |
 | `CU-ALM-02` | `materialValidationTest.js`, `materialMeasurementFieldTest.js`, `materialControllerDbTest.js`. | Unitarias e integración de piezas sin medidas, pareja opcional completa, conversión y alta contextual desde compra. | **Evidencia parcial existente**; no demuestra todo el CRUD de materiales. |
 | `CU-ALM-03` | `wasteWeightDbTest.js`, `materialDTOTest.js`. | Edición de costo conserva pesos históricos; DTO descarta referencias del material. | **Evidencia parcial existente**; no acredita toda la edición de materiales. |

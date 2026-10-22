@@ -66,6 +66,7 @@ it('403 abre acceso denegado, sin enviar al login', async () => {
   access.onDenied(403);
   await flushPromises();
   expect(router.currentRoute.value.name).toBe('forbidden');
+  expect(router.currentRoute.value.query.returnTo).toBe('/directorio/clientes?search=Ana#listado');
 });
 
 it('un fallo de red o validación conserva la pantalla y sus permisos se leen de la sesión vigente', async () => {

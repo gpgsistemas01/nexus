@@ -51,9 +51,13 @@ describe('sesión y permisos de almacén (DP-VUE-WH-001)', () => {
     expect(route.query.returnTo).toBe('/almacen/consumibles');
   });
   it('un fallo del servidor permite reintentar la sesión sin presentarlo como credenciales inválidas', async () => {
-    expect(
-      (await navigate('/almacen/materiales', user, new ApiError('No disponible', 503))).name,
-    ).toBe('session-unavailable');
+    const route = await navigate(
+      '/almacen/materiales?consulta=Ana#tabla',
+      user,
+      new ApiError('No disponible', 503),
+    );
+    expect(route.name).toBe('session-unavailable');
+    expect(route.query.returnTo).toBe('/almacen/materiales?consulta=Ana#tabla');
   });
   it('rechaza una respuesta de sesión incompleta en lugar de asumir permisos', async () => {
     const request = vi.fn().mockResolvedValue({ user: { id: user.id, name: user.name } });

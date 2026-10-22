@@ -157,18 +157,20 @@ export const createAppRouter = (
                 const first = groups
                     .flatMap((group) => group.links)
                     .find((link) => user.permissions.includes(link.permission));
-                return first ? { path: first.to } : { name: 'forbidden' };
+                return first
+                    ? { path: first.to }
+                    : { name: 'forbidden', query: { returnTo: to.fullPath } };
             }
 
             if (
                 typeof to.meta.permission === 'string' &&
                 !user.permissions.includes(to.meta.permission)
             )
-                return { name: 'forbidden' };
+                return { name: 'forbidden', query: { returnTo: to.fullPath } };
         } catch (cause) {
             return cause instanceof ApiError && cause.status === 401
                 ? { name: 'login', query: { returnTo: to.fullPath } }
-                : { name: 'session-unavailable' };
+                : { name: 'session-unavailable', query: { returnTo: to.fullPath } };
         }
     });
     return router;

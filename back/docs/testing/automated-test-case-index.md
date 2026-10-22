@@ -168,3 +168,9 @@ La interfaz Vue de Personas, Usuarios, Clientes y Proveedores añade sus diseño
 Las capturas de credenciales, asignaciones, payloads versionados y menús se verifican
 con servicios simulados y Chromium; esta evidencia no cierra las brechas HTTP/Prisma
 indicadas en la matriz por caso de uso.
+
+La renovación y recuperación de sesión Vue añaden los diseños
+`DP-VUE-SESSION-001–003` en [la guía de herramientas del frontend](../../../front/docs/tooling.md#pruebas-y-diseño-de-los-casos).
+Chromium administra cookies HttpOnly de prueba y recorre 401 → refresh → reintento,
+502 → recuperación y cambios de permisos. Las respuestas de API son simuladas;
+esta evidencia no sustituye la validación de JWT ni el cierre de sesión HTTP en Express.
