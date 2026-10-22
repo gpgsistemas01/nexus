@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { RouterView } from 'vue-router';
+import { RouterView, useRoute } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { VApp } from 'vuetify/components/VApp';
 import { VAppBar, VAppBarTitle } from 'vuetify/components/VAppBar';
@@ -10,14 +10,21 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { VDefaultsProvider } from 'vuetify/components/VDefaultsProvider';
 import { controlDefaults } from '../../shared/ui/controlDefaults.js';
 import AppNavigation from '../components/AppNavigation.vue';
-import { APP_NAVIGATION } from '../navigation.js';
+import { APP_NAVIGATION_GROUPS } from '../navigation.js';
 import { useAuthSession } from '../../modules/auth/session.js';
 
 const session = useAuthSession();
 const { mobile } = useDisplay({ mobileBreakpoint: 900 });
 const isNavigationOpen = ref(false);
-const links = computed(() =>
-    APP_NAVIGATION.filter((link) => session.user.value?.permissions.includes(link.permission)),
+const currentRoute = useRoute();
+const activeGroup = computed(() => String(currentRoute.meta.navigationGroup ?? 'warehouse'));
+const groups = computed(() =>
+    APP_NAVIGATION_GROUPS.map((group) => ({
+        ...group,
+        links: group.links.filter((link) =>
+            session.user.value?.permissions.includes(link.permission),
+        ),
+    })).filter((group) => group.links.length),
 );
 </script>
 
@@ -41,7 +48,8 @@ const links = computed(() =>
             >
                 <AppNavigation
                     :user-name="session.user.value?.name ?? ''"
-                    :links="links"
+                    :groups="groups"
+                    :active-group="activeGroup"
                     :is-compact="!mobile && !isNavigationOpen"
                     :is-temporary="mobile"
                     @expand="isNavigationOpen = true"
@@ -64,7 +72,9 @@ const links = computed(() =>
                 />
                 <VAppBarTitle>
                     Nexus
-                    <span class="bar-section">/ Almacén</span>
+                    <span class="bar-section"
+                        >/ {{ activeGroup === 'catalogs' ? 'Catálogos' : 'Almacén' }}</span
+                    >
                 </VAppBarTitle>
             </VAppBar>
             <VMain>

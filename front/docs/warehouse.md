@@ -31,8 +31,8 @@ pulsar Almacén o el botón de menú abre el panel detallado. Clic fuera, Escape
 elegir una ruta lo cierra y conserva la barra compacta sin desplazar la página.
 En móvil el botón abre el panel sobre la página y al cerrarlo queda oculto.
 El acordeón admite teclado, estado expandido accesible y sólo las rutas permitidas.
-Compras, Salidas, Movimientos y Catálogos no se enlazan desde este frontend ni se
-migran sus formularios.
+El grupo [Catálogos](catalogs.md) agrega las seis vistas administrables para
+`catalogs:manage`. Compras, Salidas y Movimientos permanecen fuera de esta migración.
 
 ## Patrones y propietario del estado
 

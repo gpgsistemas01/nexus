@@ -17,7 +17,8 @@
         "../back/src/shared/constants/permissions.js",
         "../back/src/shared/inventory/wasteMeasurements.js",
         "../back/src/shared/validation/weightValidations.js",
-        "../back/src/shared/utils/numberUtils.js"
+        "../back/src/shared/utils/numberUtils.js",
+        "../back/src/shared/constants/catalogs.js"
     ],
     "compilerOptions": {
         "types": ["vite/client", "node"],

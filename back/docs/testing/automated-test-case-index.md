@@ -157,3 +157,8 @@ Los identificadores se mantienen estables y no representan el número de `it` ej
 | `CP-INT-PERF-002` | BD aislada y sesión autorizada; exportador XLSX real. | 5.001 usuarios, personas y clientes por partición, con nombres ordenables y prefijo exclusivo. | `inventoryReportControllerDbTest.js` › `exporta ... cruzando el límite de bloque`; leer valores XLSX mediante read-excel-file. | Encabezados originales, exactamente 5.001 filas en el orden esperado, ninguna columna de versión y mismo conteo en PostgreSQL. | `finally` elimina los registros de cada prefijo. |
 
 | `CP-INT-VAL-005` | PostgreSQL aislado, proveedor/unidad/presentación activos y actor de la fixture. | Alta de material con stock `"0"`, stock mínimo `"999999999999.99"`, costo `"12.123456"` y estado `"true"`; ajustes con stock `"1.001"` y edición de merma con mínimo `"1.001"`. | `materialControllerDbTest.js` › `convierte la captura...`; representantes de `apiWriteValidationDbTest.js`. | Alta 200: saldo cero, mínimo y costo exactos, estado booleano true en BD. Captura con tercer decimal: 400 y código `NEW_STOCK_TOO_LONG`/`MIN_STOCK_TOO_LONG`, sin cambio del snapshot. | Hooks de las suites eliminan sus documentos, movimientos, ofertas y catálogos de prueba. |
+
+La adaptación Vue de los seis catálogos de `CU-CAT-09..26` tiene sus diseños y
+especificaciones en [DP-VUE-CAT-001–004](../../../front/docs/tooling.md#pruebas-de-catálogos).
+Es evidencia adicional de interfaz con API simulada; las comprobaciones HTTP/Prisma
+anteriores siguen siendo responsables de autorización y estado persistido.

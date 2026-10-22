@@ -1,3 +1,4 @@
+import { PUBLIC_CATALOGS } from '@nexus/catalogs';
 import { PERMISSIONS } from '@nexus/permissions';
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouterHistory } from 'vue-router';
@@ -20,7 +21,7 @@ export const createAppRouter = (
             },
             {
                 path: '/almacen',
-                meta: { requiresAuth: true },
+                meta: { requiresAuth: true, navigationGroup: 'warehouse' },
                 component: () => import('../layouts/AppLayout.vue'),
                 children: [
                     {
@@ -53,6 +54,24 @@ export const createAppRouter = (
                 ],
             },
             {
+                path: '/catalogos',
+                meta: {
+                    requiresAuth: true,
+                    permission: PERMISSIONS.CATALOGS_MANAGE,
+                    navigationGroup: 'catalogs',
+                },
+                component: () => import('../layouts/AppLayout.vue'),
+                children: [
+                    { path: '', redirect: { name: 'catalog-departments' } },
+                    ...Object.keys(PUBLIC_CATALOGS).map((catalog) => ({
+                        path: catalog,
+                        name: `catalog-${catalog}`,
+                        component: () => import('../../modules/catalogs/pages/CatalogPage.vue'),
+                        props: { catalog },
+                    })),
+                ],
+            },
+            {
                 path: '/sin-permiso',
                 name: 'forbidden',
                 component: () => import('../pages/AccessErrorPage.vue'),
@@ -80,7 +99,9 @@ export const createAppRouter = (
                         ? 'materials'
                         : user.permissions.includes(PERMISSIONS.WASTES_PAGE_VIEW)
                           ? 'wastes'
-                          : 'forbidden',
+                          : user.permissions.includes(PERMISSIONS.CATALOGS_MANAGE)
+                            ? 'catalog-departments'
+                            : 'forbidden',
                 };
             if (
                 typeof to.meta.permission === 'string' &&

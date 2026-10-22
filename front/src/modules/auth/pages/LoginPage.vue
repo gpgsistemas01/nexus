@@ -21,11 +21,13 @@ const {
 } = useLoginForm({
     onSuccess: () => {
         const returnTo = route.query.returnTo;
-        const destination =
-            typeof returnTo === 'string' &&
-            /^\/almacen\/(materiales|consumibles|mermas)(\?|$)/.test(returnTo)
-                ? returnTo
-                : '/almacen';
+        const resolved =
+            typeof returnTo === 'string' && returnTo.startsWith('/') && !returnTo.startsWith('//')
+                ? router.resolve(returnTo)
+                : null;
+        const destination = resolved?.matched.some((record) => record.meta.requiresAuth)
+            ? resolved.fullPath
+            : '/almacen';
         void router.replace(destination).catch(() => {
             // Una carga diferida fallida recupera la ruta con el arranque y su pantalla de reintento.
             window.location.assign(destination);

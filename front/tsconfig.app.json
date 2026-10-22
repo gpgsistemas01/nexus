@@ -16,7 +16,8 @@
         "../back/src/shared/constants/permissions.js",
         "../back/src/shared/inventory/wasteMeasurements.js",
         "../back/src/shared/validation/weightValidations.js",
-        "../back/src/shared/utils/numberUtils.js"
+        "../back/src/shared/utils/numberUtils.js",
+        "../back/src/shared/constants/catalogs.js"
     ],
     "compilerOptions": {
         "composite": true,
@@ -33,7 +34,9 @@
                 "../back/src/public/js/utils/validations/validators.js"
             ],
             "@nexus/waste-measurements": ["../back/src/shared/inventory/wasteMeasurements.js"],
-            "@nexus/permissions": ["../back/src/shared/constants/permissions.js"]
+            "@nexus/permissions": ["../back/src/shared/constants/permissions.js"],
+            "@nexus/catalogs": ["../back/src/shared/constants/catalogs.js"],
+            "@nexus/catalog-validation": ["../back/src/public/js/utils/validations/validators.js"]
         },
         "noUnusedLocals": true,
         "noUnusedParameters": true,

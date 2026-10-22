@@ -13,6 +13,9 @@ vi.mock('../../../../src/app/layouts/AppLayout.vue', () => ({
 vi.mock('../../../../src/modules/warehouse/pages/InventoryPage.vue', () => ({
   default: { template: '<div />' },
 }));
+vi.mock('../../../../src/modules/catalogs/pages/CatalogPage.vue', () => ({
+  default: { template: '<div />' },
+}));
 vi.mock('../../../../src/modules/auth/pages/LoginPage.vue', () => ({
   default: { template: '<div />' },
 }));
@@ -55,5 +58,31 @@ describe('sesión y permisos de almacén (DP-VUE-WH-001)', () => {
   it('rechaza una respuesta de sesión incompleta en lugar de asumir permisos', async () => {
     const request = vi.fn().mockResolvedValue({ user: { id: user.id, name: user.name } });
     await expect(createAuthSession(request).load()).rejects.toThrow('comprobar la sesión');
+  });
+});
+
+describe('rutas y permisos de catálogos (DP-VUE-CAT-001)', () => {
+  it.each([
+    'departments',
+    'roles',
+    'presentations',
+    'unit-measures',
+    'reasons',
+    'fulfillment-statuses',
+  ])('permite %s a catalogs:manage', async (catalog) => {
+    expect(
+      (await navigate(`/catalogos/${catalog}`, { ...user, permissions: ['catalogs:manage'] })).name,
+    ).toBe(`catalog-${catalog}`);
+  });
+  it('una cuenta sólo de catálogos llega a Áreas después del login', async () => {
+    expect((await navigate('/almacen', { ...user, permissions: ['catalogs:manage'] })).name).toBe(
+      'catalog-departments',
+    );
+  });
+  it('rechaza acceso directo sin permiso y no reconoce catálogos fuera de la lista blanca', async () => {
+    expect(
+      (await navigate('/catalogos/roles', { ...user, permissions: ['materials:read'] })).name,
+    ).toBe('forbidden');
+    expect((await navigate('/catalogos/otro')).name).toBe('not-found');
   });
 });

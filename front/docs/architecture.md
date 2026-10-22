@@ -45,7 +45,7 @@ la ruta; un `401` tras renovar sesión devuelve al login, un rechazo de permiso 
 `/sin-permiso` y un fallo de conexión a `/sesion-no-disponible`, con reintento.
 Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
 La configuración del menú vive en `app/navigation.ts`; sólo contiene rutas Vue de
-Almacén, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
+Almacén y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
 En escritorio se reserva una barra de iconos: al pulsar Almacén o el botón de
 menú se expande el drawer con el acordeón y un fondo modal. Clic fuera, Escape o navegar
 lo cierran y dejan la barra compacta. En móvil sólo se muestra el drawer temporal.
@@ -60,7 +60,9 @@ cada módulo adapta el resultado a su flujo.
 
 `modules/<dominio>/` agrupa páginas, componentes y lógica de la misma capacidad.
 Al migrar operaciones se conservan los dominios actuales: autenticación, administración,
-ventas y almacén, con materiales, compras y salidas dentro de almacén.
+ventas y almacén, con materiales, compras y salidas dentro de almacén. El módulo `catalogs` incorpora
+los seis catálogos administrables de EJS; su [contrato y responsabilidades](catalogs.md)
+se mantienen por separado de inventario.
 `pages/`, `components/` y `composables/` existen cuando hay implementación concreta;
 no se crean árboles vacíos. Una pieza usada sólo en un módulo permanece en él.
 
@@ -91,8 +93,9 @@ LoginPage conserva fondo, tarjeta y disposición del login EJS. LoginForm presen
 controles Vuetify mediante props/eventos; useLoginForm conecta las reglas públicas
 a VeeValidate y controla estado, errores y envío. “Recordar usuario” nunca persiste
 contraseñas y no cambia la duración de las cookies. No se agrega Pinia para este
-formulario local. Después del acceso, Vue Router abre `/almacen` o una ruta de
-retorno de Almacén permitida; la guarda selecciona el primer módulo autorizado.
+formulario local. Después del acceso, Vue Router abre `/almacen` o una ruta interna registrada que requiere sesión; la
+guarda selecciona el primer módulo autorizado, incluidos Catálogos para una cuenta
+con acceso exclusivo a su administración.
 
 Almacén sigue esta composición:
 
@@ -107,7 +110,7 @@ app/layouts/AppLayout (sesión, navegación y RouterView)
       → useInventoryRemoval → shared/ui/feedback → SweetAlert2
       → InventoryReportToolbar (alcance, descarga y reintento mediante eventos)
       → InventoryEditorPage → useInventoryEditor → VeeValidate
-          → InventoryEditor → InventoryFormField → RemoteSelect (presentación)
+          → InventoryEditor → shared/EditorDialog → InventoryFormField → RemoteSelect (presentación)
           → useRemoteOptions (catálogos, búsqueda, paginación y cancelación)
 ```
 
@@ -143,6 +146,16 @@ contiene sólo assets y Nginx. El backend continúa construyéndose por separado
 El tema y los defaults se centralizan en `app/plugins/vuetify.ts` y `shared/ui/controlDefaults.ts`.
 La [guía de interfaz](ui-and-http.md#estilos-y-controles-adaptados-a-vue) documenta
 la adaptación visual de MDB, los campos recuperados y SweetAlert2.
+
+## Reutilización con Catálogos
+
+`shared/components/EditorDialog` proporciona el marco de los formularios de
+inventario y catálogos, con slots para captura y acciones específicas.
+`shared/components/ServerTable` agrupa Vuetify, paginación y estilos; InventoryTable
+y CatalogTable definen columnas, celdas y acciones de su dominio.
+`shared/http/pageRequest` comprueba el contrato paginado consumido por ambos módulos.
+Se conservan separados los composables de captura y listado cuando cambian sus
+reglas, permisos y recuperación. Consulta [Catálogos](catalogs.md).
 
 ## Convenciones y validación
 

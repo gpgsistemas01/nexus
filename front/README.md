@@ -3,15 +3,17 @@
 Base de Vue 3 con TypeScript, componentes `.vue`, Composition API (`<script setup>`)
 y Vite, creada con la plantilla oficial `create-vite`. El login en `/inicio-sesion`
 usa Vuetify y VeeValidate y está conectado a Express. Materiales, Consumibles y
-Mermas se sirven en Vue; los demás
+Mermas y los seis catálogos administrables se sirven en Vue; los demás
 módulos conservan sus pantallas EJS en `back/`.
 
 ## Iniciar sesión
 
 Abre `http://localhost:5173/inicio-sesion` con Express ejecutándose en el puerto 3000.
 Vite dirige la API y el cierre de sesión al backend mediante un proxy del mismo origen.
-El menú sólo enlaza las vistas Vue de Materiales, Consumibles y Mermas.
-Usa una cuenta existente: al autenticar se abre el primer módulo de Almacén permitido. Consulta
+El menú agrupa las vistas Vue de Almacén y los seis [Catálogos](docs/catalogs.md),
+con enlaces filtrados por permiso.
+Usa una cuenta existente: al autenticar se abre el primer módulo permitido; una
+cuenta exclusiva de Catálogos entra a Áreas. Consulta
 [diseño, validación, cookies y configuración del proxy](docs/login.md).
 
 ## Desarrollo
@@ -86,13 +88,15 @@ npm --prefix front run build
 
 ## Navegación con Vue Router
 
-Se instaló `vue-router@4` con `npm install vue-router@4` desde `front/`.
+Vue Router 5 se mantiene en `front/package.json` y `front/package-lock.json`.
 Al clonar el repositorio basta con `npm ci`; la dependencia está en el lockfile.
 
 - `/` redirige a `/inicio-sesion`, el login operativo.
 - `/almacen` selecciona el primer módulo permitido para la cuenta.
 - `/almacen/materiales`, `/almacen/consumibles` y `/almacen/mermas` son los módulos
   operativos, con sesión y permisos obtenidos de Express.
+- `/catalogos` abre Áreas; sus seis rutas requieren `catalogs:manage`. Consulta
+  [campos, endpoints y arquitectura](docs/catalogs.md).
 - Una URL desconocida muestra la página no encontrada con un enlace al inicio.
 
 `main.ts` crea la sesión, la proporciona y registra el router con esa instancia. `App.vue` usa
@@ -113,7 +117,7 @@ al solicitar una ruta de la aplicación:
 La página no encontrada se renderiza en el navegador; el fallback del servidor puede
 responder HTTP 200. El fallback debe ir después de los rewrites de API y cierre de sesión para
 que el login funcione en producción. La autorización definitiva permanece en Express;
-las guardas de Almacén comprueban la sesión y orientan la navegación, sin sustituir
+las guardas de Almacén y Catálogos comprueban la sesión y orientan la navegación, sin sustituir
 los controles del servidor. `/almacen` debe resolver a Vue, no al proxy EJS.
 
 Consulta [operaciones, reutilización y límites de Almacén](docs/warehouse.md).

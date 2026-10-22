@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { VDataTableServer } from 'vuetify/components/VDataTable';
+import ServerTable from '../../../shared/components/ServerTable.vue';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VChip } from 'vuetify/components/VChip';
 import { VDialog } from 'vuetify/components/VDialog';
@@ -67,29 +67,17 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
         class="inventory-table"
         :aria-busy="isLoading"
     >
-        <VDataTableServer
+        <ServerTable
             :headers="headers"
-            :items="rows"
-            :items-length="total"
-            item-value="id"
+            :rows="rows"
+            :total="total"
             :page="query.page"
-            :items-per-page="query.length"
+            :page-size="query.length"
             :sort-by="sortBy"
             :row-props="rowProps"
-            :loading="isLoading"
-            :mobile="false"
-            density="compact"
+            :is-loading="isLoading"
             must-sort
-            :items-per-page-options="[10, 20, 50]"
-            items-per-page-text="Registros por página:"
-            page-text="{0}–{1} de {2}"
-            first-page-label="Primera página"
-            prev-page-label="Anterior"
-            next-page-label="Siguiente"
-            last-page-label="Última página"
-            loading-text="Cargando inventario…"
-            no-data-text="No hay registros para estos filtros."
-            @update:options="updateOptions"
+            @options="updateOptions"
         >
             <template #[`item.name`]="{ item }">
                 <div class="item-identity">
@@ -140,7 +128,7 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
                     @action="emit('action', $event)"
                 />
             </template>
-        </VDataTableServer>
+        </ServerTable>
         <VDialog
             :model-value="details !== null"
             max-width="480"
@@ -172,68 +160,14 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
 <style scoped>
 .inventory-table {
     min-width: 0;
-    border: 1px solid rgb(var(--v-theme-table-border));
-    border-radius: 0.75rem;
-    background: white;
-    overflow: hidden;
-}
-.inventory-table :deep(th) {
-    color: white;
-    font-weight: 700;
-    font-size: 0.76rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-    border-bottom: 2px solid rgb(var(--v-theme-table-header-hover));
-    background: linear-gradient(
-        180deg,
-        rgb(var(--v-theme-table-header-top)),
-        rgb(var(--v-theme-table-header))
-    ) !important;
-    text-align: center;
-}
-.inventory-table :deep(th:hover) {
-    background: rgb(var(--v-theme-table-header-hover)) !important;
-}
-.inventory-table :deep(th .v-icon) {
-    color: white;
-}
-.inventory-table :deep(td) {
-    font-size: 0.8rem;
-    border-right: 1px solid rgba(var(--v-theme-table-border), 0.45);
-    border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.6);
-    text-align: center;
-    padding: 0.65rem 0.75rem;
-}
-.inventory-table :deep(tbody tr:nth-child(even) td) {
-    background: rgb(var(--v-theme-table-alt));
-}
-.inventory-table :deep(tbody tr:hover td) {
-    background: rgb(var(--v-theme-table-hover));
 }
 .inventory-table :deep(.low-stock td) {
     background: #fff8e5;
-}
-.inventory-table :deep(.v-data-table-footer) {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0.65rem;
-    font-size: 0.75rem;
-    border-top: 1px solid rgba(var(--v-theme-table-border), 0.6);
 }
 .item-identity {
     text-align: left;
     min-width: 160px;
     padding: 0.35rem 0;
-}
-.inventory-table :deep(.v-data-table-footer__pagination .v-btn) {
-    border: 1px solid rgb(var(--v-theme-table-border));
-    background: rgb(var(--v-theme-surface));
-    color: rgb(var(--v-theme-primary));
-    box-shadow: 0 0.2rem 0.45rem rgba(var(--v-theme-on-surface), 0.08);
-    margin-inline: 0.15rem;
-}
-.inventory-table :deep(.v-data-table-footer__pagination .v-btn:disabled) {
-    opacity: 0.4;
-    box-shadow: none;
 }
 .item-identity span {
     display: block;

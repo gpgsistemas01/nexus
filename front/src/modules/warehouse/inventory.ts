@@ -32,11 +32,6 @@ export interface InventoryRow {
     sampleNetWeightKg: Numeric;
 }
 
-export interface PageResult<T> {
-    data: T[];
-    recordsTotal: number;
-    recordsFiltered: number;
-}
 export interface LookupItem {
     id: string;
     title: string;

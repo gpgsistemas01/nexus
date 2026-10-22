@@ -1,34 +1,38 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 import { VList, VListGroup, VListItem } from 'vuetify/components/VList';
 import { VAvatar } from 'vuetify/components/VAvatar';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VIcon } from 'vuetify/components/VIcon';
 import { VTooltip } from 'vuetify/components/VTooltip';
-import type { NavigationLink } from '../navigation.js';
+import { APP_ICONS } from '../icons.js';
+import type { NavigationGroup } from '../navigation.js';
 
 const props = defineProps<{
     userName: string;
-    links: readonly NavigationLink[];
+    groups: readonly NavigationGroup[];
+    activeGroup: string;
     isCompact: boolean;
     isTemporary: boolean;
 }>();
 const emit = defineEmits<{ navigate: []; expand: [] }>();
-const openedGroups = ref(['warehouse']);
+const openedGroups = ref([props.activeGroup]);
+watch(
+    () => props.activeGroup,
+    (group) => {
+        openedGroups.value = [group];
+    },
+);
 const updateOpenedGroups = (groups: unknown[]) => {
     if (!props.isCompact)
         openedGroups.value = groups.filter((group): group is string => typeof group === 'string');
 };
-const expandNavigation = () => {
+const expandNavigation = (group: string) => {
     if (!props.isCompact) return;
-    openedGroups.value = ['warehouse'];
+    openedGroups.value = [group];
     emit('expand');
 };
-const warehouseIcon =
-    'svg:M22 21H2V7L12 3L22 7V21M4 9V19H6V11H18V19H20V9L12 5.2L4 9M8 13V15H10V13H8M8 17V19H10V17H8M12 13V15H14V13H12M12 17V19H14V17H12M16 13V15H18V13H16M16 17V19H18V17H16Z';
-const logoutIcon =
-    'svg:M16 17L21 12L16 7V10H9V14H16V17M5 3H13V5H5V19H13V21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3Z';
 </script>
 
 <template>
@@ -61,8 +65,9 @@ const logoutIcon =
             Cerrar menú
         </VBtn>
         <VList
-            v-if="links.length"
+            v-if="groups.length"
             :opened="isCompact ? [] : openedGroups"
+            open-strategy="single"
             bg-color="transparent"
             base-color="menu-text"
             density="compact"
@@ -73,33 +78,35 @@ const logoutIcon =
             @update:opened="updateOpenedGroups"
         >
             <VListGroup
-                value="warehouse"
+                v-for="group in groups"
+                :key="group.id"
+                :value="group.id"
                 fluid
             >
                 <template #activator="{ props: activatorProps, isOpen }">
                     <VListItem
                         v-bind="activatorProps"
-                        title="Almacén"
-                        :prepend-icon="warehouseIcon"
+                        :title="group.title"
+                        :prepend-icon="group.icon"
                         :append-icon="isCompact ? '' : undefined"
                         role="button"
-                        aria-label="Almacén"
+                        :aria-label="group.title"
                         :aria-expanded="isOpen"
                         rounded="lg"
                         class="nav-group-heading"
-                        @click="expandNavigation"
+                        @click="expandNavigation(group.id)"
                     >
                         <VTooltip
                             v-if="isCompact"
                             activator="parent"
                             location="end"
                         >
-                            Almacén
+                            {{ group.title }}
                         </VTooltip>
                     </VListItem>
                 </template>
                 <VListItem
-                    v-for="link in links"
+                    v-for="link in group.links"
                     :key="link.to"
                     :to="link.to"
                     :title="link.title"
@@ -132,7 +139,7 @@ const logoutIcon =
                 >
                     <VIcon
                         v-if="isCompact"
-                        :icon="logoutIcon"
+                        :icon="APP_ICONS.logout"
                     />
                     <span v-else>Cerrar sesión</span>
                     <VTooltip
@@ -179,6 +186,10 @@ const logoutIcon =
 }
 .nav-items :deep(.v-list-item__spacer) {
     width: 10px;
+}
+.nav-items:not(.nav-items--compact) :deep(.v-list-item-title) {
+    white-space: normal;
+    line-height: 1.3;
 }
 .nav-group-heading {
     color: rgb(var(--v-theme-menu-text));

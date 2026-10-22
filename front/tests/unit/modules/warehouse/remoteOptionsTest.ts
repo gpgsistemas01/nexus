@@ -1,9 +1,10 @@
+import type { PageResult } from '../../../../src/shared/http/pageRequest.js';
 import { defineComponent, h, nextTick, ref } from 'vue';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, expect, it, vi } from 'vitest';
 import { useRemoteOptions } from '../../../../src/modules/warehouse/composables/useRemoteOptions.js';
 import { inventoryCatalogService } from '../../../../src/modules/warehouse/services/inventoryCatalogService.js';
-import type { LookupItem, PageResult } from '../../../../src/modules/warehouse/inventory.js';
+import type { LookupItem } from '../../../../src/modules/warehouse/inventory.js';
 
 const option = (id: string): LookupItem => ({ id, title: id, data: {} });
 const page = (id: string): PageResult<LookupItem> => ({

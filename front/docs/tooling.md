@@ -210,3 +210,26 @@ a móvil siguen cubiertos por las pruebas de login y Almacén indicadas arriba.
 El backend conserva su suite sin cambios; este retiro no elimina pruebas de reglas
 de negocio ni persistencia. Las dependencias y recursos exclusivos de las
 demostraciones se eliminan del manifiesto, lockfile y compilación.
+
+## Pruebas de Catálogos
+
+El plan y registro general del backend siguen siendo propietarios de las pruebas
+HTTP/Prisma. Estas pruebas Vue usan adaptadores Axios y API simulada en Chromium;
+no ejecutan Express ni acceden a la base de datos de desarrollo.
+
+| Diseño / casos | Nivel y técnica | Condición observable |
+| --- | --- | --- |
+| `DP-VUE-CAT-001` / `CP-VUE-CAT-001` | Unitario y navegador; particiones de permiso/ruta y transiciones de sesión | Las seis rutas requieren catalogs:manage. Una cuenta exclusiva llega a Áreas. Sin permiso no consulta la API administrativa; catálogo desconocido es 404. Revocar acceso durante una escritura termina en login o acceso denegado. |
+| `DP-VUE-CAT-002` / `CP-VUE-CAT-002` | Unitario y navegador; fronteras vacío/máximo/máximo+1 y decisiones por campo/estado | Alta de los seis catálogos con campos permitidos, símbolo sólo en unidades y estado inactivo. Abrir/mover foco no muestra errores. PUT conserva expectedVersion; 409 conserva captura y bloquea reenvío hasta nueva lectura. No se solapan envíos ni se confirman tras desmontar. |
+| `DP-VUE-CAT-003` / `CP-VUE-CAT-003` | Navegador; error → reintento → página → búsqueda → limpiar, escritorio/móvil | Búsqueda reinicia paginación, la API recibe start/length/search y un fallo permite recuperar el listado. El modal es utilizable a 390/320 px. El menú agrupa los seis enlaces y conserva apertura por clic y cierre fuera. |
+| `DP-VUE-CAT-004` / `CP-VUE-CAT-004` | Adaptador unitario; particiones de respuesta válida/HTML/incompleta/código inesperado | El frontend rechaza contratos incompletos, omite claves internas y no confirma códigos inesperados. Las pruebas existentes de Almacén ejercitan los marcos compartidos tras la extracción. |
+
+`catalogEditorTest.ts`, `catalogServiceTest.ts`, `inventoryNavigationTest.ts` y
+`catalogs.spec.ts` son la especificación ejecutable. Las suites de Almacén siguen
+cubriendo cabeceras agrupadas, modales, selección, filtros, versiones y recuperación
+de merma; no se sustituye esa evidencia por la del formulario de Catálogos.
+
+Los iconos del menú se importan desde `@mdi/js` en `app/icons.ts` y se renderizan
+con el proveedor SVG de Vuetify. Al incorporar esta actualización se ejecuta
+`npm ci --include=dev` en `front/`; no se carga una fuente de iconos por CDN.
+ESLint excluye `test-results/`, una salida temporal regenerada por Playwright.

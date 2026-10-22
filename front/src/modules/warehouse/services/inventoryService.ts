@@ -1,7 +1,8 @@
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { normalizeInventoryRow } from '../mappers/inventoryMapper.js';
-import { inventoryParams, requestInventoryPage } from './inventoryPageRequest.js';
+import { inventoryParams } from './inventoryPageRequest.js';
+import { requestPage } from '../../../shared/http/pageRequest.js';
 import type {
     InventoryAction,
     InventoryPayload,
@@ -11,7 +12,7 @@ import type {
 
 export const inventoryService = {
     async list(resource: InventoryResource, query: InventoryQuery, signal?: AbortSignal) {
-        const page = await requestInventoryPage(
+        const page = await requestPage(
             `/api/warehouse/${resource}?${inventoryParams(query)}`,
             signal,
         );

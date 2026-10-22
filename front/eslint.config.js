@@ -5,7 +5,7 @@ import vue from 'eslint-plugin-vue';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
-    { ignores: ['dist/**', 'coverage/**', 'build/**', 'node_modules/**'] },
+    { ignores: ['dist/**', 'coverage/**', 'build/**', 'test-results/**', 'node_modules/**'] },
     js.configs.recommended,
     ...tseslint.configs.recommended,
     ...vue.configs['flat/recommended'],
@@ -48,6 +48,7 @@ export default tseslint.config(
                                 'axios',
                                 'pinia',
                                 'vee-validate',
+                                '@nexus/catalog-validation',
                                 '@nexus/login-validation',
                                 '@nexus/api-messages',
                                 '@nexus/warehouse-validation',

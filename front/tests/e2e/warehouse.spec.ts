@@ -74,7 +74,9 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
   const destinations = await navigation
     .getByRole('link')
     .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
-  expect(destinations.every((to) => to?.startsWith('/almacen'))).toBe(true);
+  expect(
+    destinations.every((to) => to?.startsWith('/almacen') || to?.startsWith('/catalogos')),
+  ).toBe(true);
   await page.mouse.click(page.viewportSize()!.width - 16, 70);
   await expect(page.getByRole('button', { name: 'Expandir menú', exact: true })).toBeVisible();
   await expect(navigation.getByRole('link', { name: 'Materiales', exact: true })).toBeHidden();

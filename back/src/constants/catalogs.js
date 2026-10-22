@@ -1,54 +1,16 @@
-export const MANAGED_CATALOGS = Object.freeze({
-    departments: {
-        model: 'department',
-        hasStableKey: true,
-        fields: ['name', 'isActive'],
-        maxLengths: { name: 50 },
-        label: 'Áreas',
-        entityLabel: 'área',
-        createButtonLabel: 'Nueva área'
-    },
-    roles: {
-        model: 'role',
-        hasStableKey: true,
-        fields: ['name', 'isActive'],
-        maxLengths: { name: 50 },
-        label: 'Roles',
-        entityLabel: 'rol',
-        createButtonLabel: 'Nuevo rol'
-    },
-    presentations: {
-        model: 'presentation',
-        fields: ['name', 'isActive'],
-        maxLengths: { name: 50 },
-        label: 'Presentaciones',
-        entityLabel: 'presentación',
-        createButtonLabel: 'Nueva presentación'
-    },
-    'unit-measures': {
-        model: 'unitMeasure',
-        fields: ['name', 'symbol', 'isActive'],
-        maxLengths: { name: 20, symbol: 10 },
-        label: 'Unidades de medida',
-        entityLabel: 'unidad de medida',
-        createButtonLabel: 'Nueva unidad de medida'
-    },
-    reasons: {
-        model: 'stockAdjustmentReason',
-        fields: ['name', 'isActive'],
-        maxLengths: { name: 100 },
-        label: 'Motivos de ajuste',
-        entityLabel: 'motivo de ajuste',
-        createButtonLabel: 'Nuevo motivo de ajuste'
-    },
-    'fulfillment-statuses': {
-        model: 'fulfillmentStatus',
-        fields: ['name', 'isActive'],
-        maxLengths: { name: 50 },
-        label: 'Estados de cumplimiento',
-        entityLabel: 'estado de cumplimiento',
-        createButtonLabel: 'Nuevo estado de cumplimiento'
-    }
-});
+import { PUBLIC_CATALOGS } from '../shared/constants/catalogs.js';
+
+const storage = {
+    departments: { model: 'department', hasStableKey: true },
+    roles: { model: 'role', hasStableKey: true },
+    presentations: { model: 'presentation' },
+    'unit-measures': { model: 'unitMeasure' },
+    reasons: { model: 'stockAdjustmentReason' },
+    'fulfillment-statuses': { model: 'fulfillmentStatus' }
+};
+
+export const MANAGED_CATALOGS = Object.freeze(Object.fromEntries(
+    Object.entries(storage).map(([name, internal]) => [name, { ...PUBLIC_CATALOGS[name], ...internal }])
+));
 
 export const MANAGED_CATALOG_NAMES = Object.freeze(Object.keys(MANAGED_CATALOGS));

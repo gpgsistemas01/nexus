@@ -8,7 +8,7 @@ el renderizado, eventos, estado y ciclo de vida de la nueva interfaz.
 
 | Necesidad | Herramienta aplicada | Motivo y alternativa revisada |
 | --- | --- | --- |
-| Tabla con búsqueda, paginación, orden y encabezados agrupados | `VDataTableServer`, incluido en Vuetify | Proporciona controles y estados para datos paginados desde Express. [DataTables Vue](https://datatables.net/manual/vue) es una integración oficial válida, con slots y soporte reactivo, y su núcleo 3 ya no requiere jQuery. Mantener dos motores de tabla añadiría adaptadores y estilos para el mismo flujo; Vuetify ya cubre las necesidades actuales. |
+| Tabla con búsqueda, paginación, orden y encabezados agrupados | `ServerTable` sobre `VDataTableServer`, incluido en Vuetify | Proporciona controles y estados para datos paginados desde Express. [DataTables Vue](https://datatables.net/manual/vue) es una integración oficial válida, con slots y soporte reactivo, y su núcleo 3 ya no requiere jQuery. Mantener dos motores de tabla añadiría adaptadores y estilos para el mismo flujo; Vuetify ya cubre las necesidades actuales. |
 | Selectores remotos | `VAutocomplete` y la directiva `v-intersect` de Vuetify | Cargan la página siguiente al llegar al final, sin un botón obligatorio ni listeners Select2. Un fallo requiere reintento explícito; no genera solicitudes repetidas. |
 | Captura de formularios | `VDialog`, grid Vuetify y VeeValidate | Controlan foco, Escape, scroll, distribución adaptable y errores por campo. El modal presenta secciones; el composable conserva validación y envío. |
 | Confirmar eliminación y avisar resultados | [SweetAlert2](https://sweetalert2.github.io/) | Confirmación con foco inicial en Cancelar, spinner durante el envío, bloqueo de duplicados y reintento explícito; toast al confirmar una operación. Los formularios continúan en Vue y los errores corregibles permanecen junto al campo. |
@@ -66,7 +66,8 @@ visual no conoce esas reglas de la API.
 ### Campos y modos del modal
 
 `formFields.ts` describe secciones con controles editables y valores de consulta.
-`InventoryEditor` presenta cabecera, cuerpo desplazable y acciones siempre visibles;
+`InventoryEditor` compone el marco compartido `EditorDialog`, con cabecera, cuerpo
+desplazable y acciones siempre visibles;
 a partir del tamaño móvil de Vuetify ocupa la pantalla. `InventoryFormField`
 concentra la adaptación de inputs, checkbox, textarea y selector remoto.
 
@@ -145,7 +146,7 @@ cargado y permite repetir la página fallida, sin avanzar ni duplicar las opcion
 | `shared/ui/feedback.ts` | SweetAlert2 y su configuración común; sin estado de negocio ni acceso a la API. |
 | `useInventoryEditor.ts` | Captura con VeeValidate, envío versionado y recuperación de merma. |
 | `useRemoteOptions.ts` | Estado de catálogos paginados, sin renderizado. |
-| `modules/warehouse/services/` | Adaptadores separados de inventario, catálogos y reportes; `inventoryPageRequest` conserva el contrato común de paginación. |
+| `modules/warehouse/services/` | Adaptadores separados de inventario, catálogos y reportes; `inventoryPageRequest` conserva los parámetros de inventario y `shared/http/pageRequest` valida el contrato paginado común. |
 | `modules/warehouse/mappers/inventoryMapper.ts` | Convierte DTOs de inventario en filas de presentación, conservando ambas identidades y versiones. |
 | `inventoryTable.ts` | Configuración de columnas y formato visual, sin acceso a API. |
 | `formModel.ts` / `formFields.ts` | Datos permitidos, conexión a validadores públicos y controles de la captura. |
@@ -189,3 +190,11 @@ La importación de validadores públicos por sus alias reutiliza una fuente de
 reglas; no ejecuta el backend dentro del frontend.
 
 La estrategia y sus condiciones observables están en [tooling.md](tooling.md).
+
+## Reutilización con Catálogos
+
+El [módulo de Catálogos](catalogs.md) usa EditorDialog y ServerTable, extraídos del
+editor y la tabla de inventario. Sus slots conservan los campos y celdas propios
+de cada dominio. Los estilos compartidos pertenecen a esos marcos; las secciones de
+pesos, stock y referencias siguen en los componentes de Almacén. La validación,
+la sesión y HTTP se coordinan fuera de la presentación.

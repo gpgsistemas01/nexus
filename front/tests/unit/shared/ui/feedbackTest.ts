@@ -1,9 +1,12 @@
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import Swal from 'sweetalert2';
 import { confirmRemoval } from '../../../../src/shared/ui/feedback.js';
 
-afterEach(() => {
+beforeEach(() => vi.useFakeTimers());
+afterEach(async () => {
   Swal.close();
+  await vi.runOnlyPendingTimersAsync();
+  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
@@ -32,6 +35,7 @@ it('cancelar al desmontar antes de terminar de abrir no deja una confirmación g
   });
   expect(Swal.getPopup()).not.toBeNull();
   controller.abort();
+  await vi.runOnlyPendingTimersAsync();
   await expect(confirming).resolves.toBe(false);
   expect(Swal.getPopup()).toBeNull();
   expect(submit).not.toHaveBeenCalled();

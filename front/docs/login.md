@@ -6,7 +6,8 @@
 tarjeta verde oscura y la distribución del EJS y envía las credenciales a Express.
 Al autenticar se abre `/almacen` mediante Vue Router: la guarda selecciona
 Materiales o Mermas según los permisos. Materiales, Consumibles y Mermas son Vue;
-El menú de Vue sólo contempla estos módulos; no enlaza a pantallas EJS.
+El menú Vue incorpora también los [seis catálogos administrables](catalogs.md)
+para `catalogs:manage`, con acceso directo a Áreas si es el único permiso de entrada.
 
 Desde la raíz, inicia cada aplicación en una terminal:
 
@@ -79,12 +80,12 @@ cuando falla el login.
 | `401` | Mensaje genérico de usuario o contraseña incorrectos. |
 | `429`, incluso con texto/HTML del proxy | Solicita esperar antes de volver a intentar. |
 | `5xx`, respuesta inesperada, red o tiempo de espera de 15 s | Mensaje recuperable y controles habilitados para reintentar. |
-| `200 SUCCESS_LOGIN` | Conserva cookies y navega a Almacén o a su ruta de retorno permitida. |
+| `200 SUCCESS_LOGIN` | Conserva cookies y navega al módulo permitido o a una ruta interna protegida registrada. |
 
 Express conserva validación definitiva, autenticación, autorización y cookies
 HttpOnly/SameSite=Lax. En `NODE_ENV=production` llevan Secure y requieren HTTPS.
 Vue no lee ni guarda tokens. `createAuthSession` consulta `/api/auth/me`; la guarda
-protege las rutas de Almacén y comparte el usuario readonly mediante provide/inject.
+protege las rutas de Almacén y Catálogos y comparte el usuario readonly mediante provide/inject.
 El cliente de solicitudes protegidas intenta una renovación ante `401`, nunca
 ante `403`, conflictos o errores de conexión. Las notificaciones `flash`
 HttpOnly del flujo EJS no se muestran en la pantalla Vue; el nuevo login muestra

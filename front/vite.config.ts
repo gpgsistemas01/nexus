@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
         // Prepara también los controles de las rutas diferidas para evitar que
         // Vite recargue la página al descubrirlos durante el primer login.
         optimizeDeps: {
-            include: ['vuetify/components/*', 'vuetify/directives/*'],
+            include: ['@mdi/js', 'vuetify/components/*', 'vuetify/directives/*'],
         },
         resolve: {
             alias: {
@@ -36,6 +36,15 @@ export default defineConfig(({ mode }) => {
                 ),
                 '@nexus/waste-measurements': fileURLToPath(
                     new URL('../back/src/shared/inventory/wasteMeasurements.js', import.meta.url),
+                ),
+                '@nexus/catalogs': fileURLToPath(
+                    new URL('../back/src/shared/constants/catalogs.js', import.meta.url),
+                ),
+                '@nexus/catalog-validation': fileURLToPath(
+                    new URL(
+                        '../back/src/public/js/utils/validations/validators.js',
+                        import.meta.url,
+                    ),
                 ),
                 '@nexus/permissions': fileURLToPath(
                     new URL('../back/src/shared/constants/permissions.js', import.meta.url),
