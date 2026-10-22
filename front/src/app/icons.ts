@@ -11,6 +11,12 @@ import {
     mdiClipboardEditOutline,
     mdiListStatus,
     mdiLogout,
+    mdiAccountGroupOutline,
+    mdiAccountOutline,
+    mdiAccountCogOutline,
+    mdiCardAccountDetailsOutline,
+    mdiAccountTieOutline,
+    mdiTruckDeliveryOutline,
 } from '@mdi/js';
 
 // SVG oficiales importados por nombre; Vite conserva los iconos utilizados.
@@ -26,5 +32,11 @@ export const APP_ICONS = {
     'unit-measures': `svg:${mdiRulerSquare}`,
     reasons: `svg:${mdiClipboardEditOutline}`,
     'fulfillment-statuses': `svg:${mdiListStatus}`,
+    identity: `svg:${mdiAccountGroupOutline}`,
+    persons: `svg:${mdiAccountOutline}`,
+    users: `svg:${mdiAccountCogOutline}`,
+    directory: `svg:${mdiCardAccountDetailsOutline}`,
+    clients: `svg:${mdiAccountTieOutline}`,
+    suppliers: `svg:${mdiTruckDeliveryOutline}`,
     logout: `svg:${mdiLogout}`,
 };

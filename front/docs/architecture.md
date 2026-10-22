@@ -6,7 +6,8 @@ Esta decisión aplica a `front/`, con Vue 3, TypeScript, componentes `.vue` y
 Composition API. El módulo `auth` incorpora el login operativo
 con Vuetify, VeeValidate y la API de Express. `warehouse` incorpora Materiales,
 Consumibles y Mermas como rutas Vue protegidas. Consulta [el contrato del login](login.md)
-y [los flujos de Almacén](warehouse.md).
+y [los flujos de Almacén](warehouse.md). Personas/Usuarios y Clientes/Proveedores
+se describen en [Identidad y Directorio comercial](identity-and-directory.md).
 
 ## Contenedores y presentación
 
@@ -40,12 +41,12 @@ en el README. `main.ts` carga e instala el proveedor único de
 `app/plugins/vuetify.ts` antes de registrar el router. La carga diferida del
 proveedor está dentro del arranque recuperable. Los temas `nexus` y `warehouse`
 pertenecen a login y Almacén, respectivamente.
-Una guarda de `/almacen` consulta `/api/auth/me` y comprueba el permiso público de
+La guarda de las rutas protegidas consulta `/api/auth/me` y comprueba el permiso público de
 la ruta; un `401` tras renovar sesión devuelve al login, un rechazo de permiso a
 `/sin-permiso` y un fallo de conexión a `/sesion-no-disponible`, con reintento.
 Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
 La configuración del menú vive en `app/navigation.ts`; sólo contiene rutas Vue de
-Almacén y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
+Almacén, Identidad, Directorio comercial y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
 En escritorio se reserva una barra de iconos: al pulsar Almacén o el botón de
 menú se expande el drawer con el acordeón y un fondo modal. Clic fuera, Escape o navegar
 lo cierran y dejan la barra compacta. En móvil sólo se muestra el drawer temporal.
@@ -66,7 +67,7 @@ se mantienen por separado de inventario.
 `pages/`, `components/` y `composables/` existen cuando hay implementación concreta;
 no se crean árboles vacíos. Una pieza usada sólo en un módulo permanece en él.
 
-`shared/http/apiClient.ts` se comparte entre login, consulta de sesión y Almacén:
+`shared/http/apiClient.ts` se comparte entre login, consulta de sesión y los módulos protegidos:
 centraliza Axios y renueva una vez las consultas que responden `401`; `apiError.ts`
 traduce sus errores. No importa
 módulos de negocio. Un módulo no importa páginas o estado
@@ -77,10 +78,10 @@ un contrato explícito.
 
 | Patrón o mecanismo | Decisión |
 | --- | --- |
-| Contenedor/presentación | LoginPage y las páginas de Almacén coordinan; LoginForm, InventoryTable, InventoryFilters, InventoryEditor, InventoryFormField y AppNavigation reciben props y emiten eventos. |
+| Contenedor/presentación | Las páginas de cada módulo coordinan; los formularios, tablas, filtros y AppNavigation reciben props y emiten eventos. |
 | Composición mediante composables | useInventory coordina permisos/editor; useInventoryList, useInventoryReport, useInventoryEditor, useInventoryRemoval y useRemoteOptions mantienen listado, reporte, captura y catálogos por instancia. |
-| Organización por módulos | auth y warehouse agrupan sus responsabilidades. Materiales y Consumibles reutilizan el mismo flujo parametrizado por recurso; Mermas añade captura y recuperación propias. |
-| Servicios y adaptadores HTTP | authService conserva el login público sin refresh. Los servicios de inventario, catálogos y reportes usan Axios compartido; inventoryMapper adapta DTOs y conserva identificadores/versiones. |
+| Organización por módulos | auth, warehouse, catalogs, identity y directory agrupan sus responsabilidades. Los recursos equivalentes comparten flujos parametrizados; Mermas y las asignaciones de Personas conservan captura y recuperación propias. |
+| Servicios y adaptadores HTTP | authService conserva el login público sin refresh. Los servicios de los módulos protegidos usan Axios compartido; sus adaptadores comprueban DTOs y conservan identificadores/versiones. |
 | Estado compartido | createAuthSession crea una sesión por aplicación; main la proporciona por provide/inject y la guarda usa esa misma instancia. Su usuario es readonly. No se agrega Pinia para este único contrato ni un store por formulario. |
 | Slots | InventoryTable usa slots de VDataTableServer; RemoteSelect usa append-item y v-intersect para cargar opciones al desplazarse. |
 
@@ -147,13 +148,19 @@ El tema y los defaults se centralizan en `app/plugins/vuetify.ts` y `shared/ui/c
 La [guía de interfaz](ui-and-http.md#estilos-y-controles-adaptados-a-vue) documenta
 la adaptación visual de MDB, los campos recuperados y SweetAlert2.
 
-## Reutilización con Catálogos
+## Reutilización entre módulos
 
 `shared/components/EditorDialog` proporciona el marco de los formularios de
-inventario y catálogos, con slots para captura y acciones específicas.
+los módulos, con slots para captura y acciones específicas.
 `shared/components/ServerTable` agrupa Vuetify, paginación y estilos; InventoryTable
 y CatalogTable definen columnas, celdas y acciones de su dominio.
-`shared/http/pageRequest` comprueba el contrato paginado consumido por ambos módulos.
+`identity` y `directory` mantienen sus formularios y contratos descritos en
+[Identidad y Directorio](identity-and-directory.md). Los selectores (`RemoteSelect`,
+`useRemoteLookup`, `useSelectedOption`) y tipos de opciones pertenecen a `shared`.
+`useRemoteOptions` aporta la estrategia y dependencia de proveedor de inventario.
+`requestExcel` y `useFileExport` comparten las descargas con Almacén.
+
+`shared/http/pageRequest` comprueba el contrato paginado consumido por los módulos.
 `shared/composables/usePagedList` concentra el estado y ciclo de vida del listado:
 consulta, paginación, cancelación, descarte de respuestas antiguas y conservación
 de filas sin cambios. Recibe la consulta del servicio como estrategia mediante un
@@ -164,7 +171,7 @@ Si una página queda fuera del rango, el núcleo vuelve directamente a la últim
 página disponible, sin recorrer todas las páginas vacías intermedias.
 
 `shared/composables/useFormInteraction` comparte la interacción con VeeValidate
-en login, inventario y catálogos: sólo la captura del usuario marca un campo como
+en login y los formularios de los módulos: sólo la captura del usuario marca un campo como
 editado; perder el foco sin capturar no muestra errores y el envío valida todo el
 formulario. Cada consumidor decide cuándo bloquear cambios y conserva sus reglas,
 payloads y operaciones. `shared/components/FilterActions` comparte los botones

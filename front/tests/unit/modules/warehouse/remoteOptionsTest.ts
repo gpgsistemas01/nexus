@@ -4,7 +4,7 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, expect, it, vi } from 'vitest';
 import { useRemoteOptions } from '../../../../src/modules/warehouse/composables/useRemoteOptions.js';
 import { inventoryCatalogService } from '../../../../src/modules/warehouse/services/inventoryCatalogService.js';
-import type { LookupItem } from '../../../../src/modules/warehouse/inventory.js';
+import type { LookupItem } from '../../../../src/shared/lookup.js';
 
 const option = (id: string): LookupItem => ({ id, title: id, data: {} });
 const page = (id: string): PageResult<LookupItem> => ({

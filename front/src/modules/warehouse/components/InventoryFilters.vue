@@ -9,8 +9,8 @@ import {
 import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
 import FilterActions from '../../../shared/components/FilterActions.vue';
-import RemoteSelect from './RemoteSelect.vue';
-import type { LookupItem } from '../inventory.js';
+import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
+import type { LookupItem } from '../../../shared/lookup.js';
 
 defineProps<{
     supplierId: string;

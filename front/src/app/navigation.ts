@@ -43,6 +43,44 @@ export const APP_NAVIGATION_GROUPS: readonly NavigationGroup[] = [
         links: APP_NAVIGATION,
     },
     {
+        id: 'identity',
+        title: 'Identidad y acceso',
+        icon: APP_ICONS.identity,
+        links: [
+            {
+                title: 'Personas',
+                to: '/identidad/personas',
+                icon: APP_ICONS.persons,
+                permission: PERMISSIONS.PERSONS_PAGE_VIEW,
+            },
+            {
+                title: 'Usuarios',
+                to: '/identidad/usuarios',
+                icon: APP_ICONS.users,
+                permission: PERMISSIONS.USERS_MANAGE,
+            },
+        ],
+    },
+    {
+        id: 'directory',
+        title: 'Directorio comercial',
+        icon: APP_ICONS.directory,
+        links: [
+            {
+                title: 'Clientes',
+                to: '/directorio/clientes',
+                icon: APP_ICONS.clients,
+                permission: PERMISSIONS.CLIENTS_PAGE_VIEW,
+            },
+            {
+                title: 'Proveedores',
+                to: '/directorio/proveedores',
+                icon: APP_ICONS.suppliers,
+                permission: PERMISSIONS.SUPPLIERS_PAGE_VIEW,
+            },
+        ],
+    },
+    {
         id: 'catalogs',
         title: 'Catálogos',
         icon: APP_ICONS.catalogs,

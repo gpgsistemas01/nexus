@@ -25,7 +25,6 @@ export const openSupplierModal = ({
     
     form.elements.tradeName.value = data?.tradeName || '';
     form.elements.legalName.value = data?.legalName || '';
-    form.elements.numberphone.value = data?.numberphone || '';
 
     if (mode === FORM_MODES.CREATE) {
 

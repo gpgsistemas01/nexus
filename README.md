@@ -3,12 +3,13 @@
 La aplicación actual de Express, Prisma y vistas EJS vive en `back/`.
 El frontend Vue 3 con TypeScript, Router y Vite está en `front/`, con login conectado
 a Express usando Vuetify y VeeValidate para la migración gradual.
-Materiales, Consumibles y Mermas ya tienen interfaz Vue; las demás pantallas
+Materiales, Consumibles, Mermas, Catálogos, Personas, Usuarios, Clientes y Proveedores
+ya tienen interfaz Vue; las demás pantallas
 operativas permanecen en el backend y no se enlazan desde el menú de Vue.
 
 ```text
 back/                 # Express, EJS, Prisma, pruebas y documentación
-front/                # Vue 3 + Vite, login y Almacén
+front/                # Vue 3 + Vite, login, Almacén, Identidad y Directorio
 .github/workflows/    # CI del repositorio
 Dockerfile            # Construye el backend usando el contexto raíz
 docker-compose.yml    # Ejecuta el backend con back/.env

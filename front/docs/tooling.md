@@ -254,3 +254,24 @@ Los iconos del menú se importan desde `@mdi/js` en `app/icons.ts` y se renderiz
 con el proveedor SVG de Vuetify. Al incorporar esta actualización se ejecuta
 `npm ci --include=dev` en `front/`; no se carga una fuente de iconos por CDN.
 ESLint excluye `test-results/`, una salida temporal regenerada por Playwright.
+
+## Pruebas de Identidad y Directorio comercial
+
+Los requisitos y operaciones siguen en `CU-IDA-01..09` y `CU-CAT-01..08`;
+esta adaptación añade evidencia de interfaz, no reemplaza las pruebas de servidor.
+
+| Diseño | Nivel y técnica | Condición observable |
+| --- | --- | --- |
+| `DP-VUE-IDA-001` | Unitario/navegador; captura vacía/válida, asignación única/duplicada y edición/remoción | Abrir no muestra errores; guardar requiere nombre y responsabilidades. Una segunda asignación de la misma área se rechaza; editar conserva las demás áreas y la versión original. Payload sin etiquetas ni datos de cuenta. |
+| `DP-VUE-IDA-002` | Unitario/navegador; modos alta/edición/contraseña y estados pendiente/conflicto/revocación | Alta envía clave válida; editar omite clave y personId; cambiar contraseña usa PATCH con clave/expectedVersion. No se repiten envíos pendientes ni versiones en conflicto; 401/403 abandona acceso protegido. |
+| `DP-VUE-DIR-001` | Unitario/navegador; recursos Clientes/Proveedores, fronteras máximas de nombre y estados activo/inactivo | Cada recurso envía sólo sus campos. Alta y edición usan sus permisos y métodos; conflicto conserva captura, recarga exige otra versión; red fallida requiere reintento y desmontar descarta confirmaciones tardías. |
+| `DP-VUE-REC-001` | Unitario/navegador; particiones por permiso y entrada exclusiva de módulo | Cada ruta/directorio se permite o rechaza por su permiso; las entradas de grupo y login resuelven al primer enlace autorizado. Sólo lectura oculta escritura/exportación; el menú usa rutas Vue. |
+| `DP-VUE-REC-002` | Adaptador/navegador; filtros y archivo válido/HTML, escritorio/móvil | Consultas usan paginación/orden y Personas incluye responsabilidades. Reporte por área descarga Excel; filtro de rol no admitido se bloquea antes de solicitar archivo. Formularios a 320 px conservan acciones visibles y no desbordan la página. |
+
+`identityTest.ts`, `recordNavigationTest.ts`, `directoryTest.ts` y `records.spec.ts`
+son la especificación ejecutable. Reutilizan fixtures de registros, el adaptador
+Axios y las opciones/recorridos de navegador existentes. `RemoteSelect`,
+`useSelectedOption` y `useRemoteLookup` se prueban también desde Almacén tras moverlos
+a `shared`; `inventoryReportTest.ts` conserva la validación de Excel y filtros.
+La API simulada no demuestra cambios persistidos, contenido de reportes de servidor
+ni políticas reales de autorización. No se usan datos ni una base de desarrollo.

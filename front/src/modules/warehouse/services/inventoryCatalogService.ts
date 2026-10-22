@@ -1,7 +1,7 @@
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { inventoryParams } from './inventoryPageRequest.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
-import type { LookupItem } from '../inventory.js';
+import type { LookupItem } from '../../../shared/lookup.js';
 
 const text = (value: unknown) => (typeof value === 'string' ? value : '');
 

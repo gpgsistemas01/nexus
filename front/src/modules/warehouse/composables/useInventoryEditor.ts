@@ -12,7 +12,7 @@ import {
     unitUsesMeasurements,
 } from '../formModel.js';
 import { useRemoteOptions } from './useRemoteOptions.js';
-import { useSelectedOption } from './useSelectedOption.js';
+import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import type {
     EditorTarget,
     InventoryField,

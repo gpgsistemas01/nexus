@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
                         import.meta.url,
                     ),
                 ),
-                '@nexus/warehouse-validation': fileURLToPath(
+                '@nexus/form-validation': fileURLToPath(
                     new URL(
                         '../back/src/public/js/utils/validations/validators.js',
                         import.meta.url,
@@ -39,12 +39,6 @@ export default defineConfig(({ mode }) => {
                 ),
                 '@nexus/catalogs': fileURLToPath(
                     new URL('../back/src/shared/constants/catalogs.js', import.meta.url),
-                ),
-                '@nexus/catalog-validation': fileURLToPath(
-                    new URL(
-                        '../back/src/public/js/utils/validations/validators.js',
-                        import.meta.url,
-                    ),
                 ),
                 '@nexus/permissions': fileURLToPath(
                     new URL('../back/src/shared/constants/permissions.js', import.meta.url),

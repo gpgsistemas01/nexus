@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import type { RouterHistory } from 'vue-router';
 import { createAuthSession } from '../../modules/auth/session.js';
 import type { AuthSession } from '../../modules/auth/session.js';
+import { APP_NAVIGATION_GROUPS } from '../navigation.js';
 import { ApiError } from '../../shared/http/apiError.js';
 
 export const createAppRouter = (
@@ -54,6 +55,60 @@ export const createAppRouter = (
                 ],
             },
             {
+                path: '/identidad',
+                meta: { requiresAuth: true, navigationGroup: 'identity' },
+                component: () => import('../layouts/AppLayout.vue'),
+                children: [
+                    {
+                        path: '',
+                        name: 'identity-home',
+                        component: () => import('../../modules/identity/pages/IdentityPage.vue'),
+                        props: { resource: 'persons' },
+                    },
+                    {
+                        path: 'personas',
+                        name: 'persons',
+                        meta: { permission: PERMISSIONS.PERSONS_PAGE_VIEW },
+                        component: () => import('../../modules/identity/pages/IdentityPage.vue'),
+                        props: { resource: 'persons' },
+                    },
+                    {
+                        path: 'usuarios',
+                        name: 'users',
+                        meta: { permission: PERMISSIONS.USERS_MANAGE },
+                        component: () => import('../../modules/identity/pages/IdentityPage.vue'),
+                        props: { resource: 'users' },
+                    },
+                ],
+            },
+            {
+                path: '/directorio',
+                meta: { requiresAuth: true, navigationGroup: 'directory' },
+                component: () => import('../layouts/AppLayout.vue'),
+                children: [
+                    {
+                        path: '',
+                        name: 'directory-home',
+                        component: () => import('../../modules/directory/pages/DirectoryPage.vue'),
+                        props: { resource: 'clients' },
+                    },
+                    {
+                        path: 'clientes',
+                        name: 'clients',
+                        meta: { permission: PERMISSIONS.CLIENTS_PAGE_VIEW },
+                        component: () => import('../../modules/directory/pages/DirectoryPage.vue'),
+                        props: { resource: 'clients' },
+                    },
+                    {
+                        path: 'proveedores',
+                        name: 'suppliers',
+                        meta: { permission: PERMISSIONS.SUPPLIERS_PAGE_VIEW },
+                        component: () => import('../../modules/directory/pages/DirectoryPage.vue'),
+                        props: { resource: 'suppliers' },
+                    },
+                ],
+            },
+            {
                 path: '/catalogos',
                 meta: {
                     requiresAuth: true,
@@ -94,16 +149,16 @@ export const createAppRouter = (
 
         try {
             const user = await session.load();
-            if (to.name === 'warehouse-home')
-                return {
-                    name: user.permissions.includes(PERMISSIONS.MATERIALS_READ)
-                        ? 'materials'
-                        : user.permissions.includes(PERMISSIONS.WASTES_PAGE_VIEW)
-                          ? 'wastes'
-                          : user.permissions.includes(PERMISSIONS.CATALOGS_MANAGE)
-                            ? 'catalog-departments'
-                            : 'forbidden',
-                };
+
+            if (['warehouse-home', 'identity-home', 'directory-home'].includes(String(to.name))) {
+                const groups = APP_NAVIGATION_GROUPS.filter(
+                    (group) => to.name === 'warehouse-home' || group.id === to.meta.navigationGroup,
+                );
+                const first = groups
+                    .flatMap((group) => group.links)
+                    .find((link) => user.permissions.includes(link.permission));
+                return first ? { path: first.to } : { name: 'forbidden' };
+            }
 
             if (
                 typeof to.meta.permission === 'string' &&

@@ -46,7 +46,7 @@ const expandNavigation = (group: string) => {
         <RouterLink
             to="/almacen"
             class="brand"
-            aria-label="Nexus, Almacén"
+            aria-label="Nexus, inicio"
             @click="emit('navigate')"
         >
             <VAvatar

@@ -3,14 +3,16 @@
 Base de Vue 3 con TypeScript, componentes `.vue`, Composition API (`<script setup>`)
 y Vite, creada con la plantilla oficial `create-vite`. El login en `/inicio-sesion`
 usa Vuetify y VeeValidate y está conectado a Express. Materiales, Consumibles y
-Mermas y los seis catálogos administrables se sirven en Vue; los demás
+Mermas, los seis catálogos administrables y Personas, Usuarios, Clientes y
+Proveedores se sirven en Vue; los demás
 módulos conservan sus pantallas EJS en `back/`.
 
 ## Iniciar sesión
 
 Abre `http://localhost:5173/inicio-sesion` con Express ejecutándose en el puerto 3000.
 Vite dirige la API y el cierre de sesión al backend mediante un proxy del mismo origen.
-El menú agrupa las vistas Vue de Almacén y los seis [Catálogos](docs/catalogs.md),
+El menú agrupa Almacén, [Identidad y acceso y Directorio comercial](docs/identity-and-directory.md)
+y los seis [Catálogos](docs/catalogs.md),
 con enlaces filtrados por permiso.
 Usa una cuenta existente: al autenticar se abre el primer módulo permitido; una
 cuenta exclusiva de Catálogos entra a Áreas. Consulta
@@ -97,6 +99,9 @@ Al clonar el repositorio basta con `npm ci`; la dependencia está en el lockfile
   operativos, con sesión y permisos obtenidos de Express.
 - `/catalogos` abre Áreas; sus seis rutas requieren `catalogs:manage`. Consulta
   [campos, endpoints y arquitectura](docs/catalogs.md).
+- `/identidad/personas` y `/identidad/usuarios` mantienen formularios distintos.
+- `/directorio/clientes` y `/directorio/proveedores` mantienen los registros comerciales.
+- `/identidad` y `/directorio` seleccionan el primer módulo permitido de su sección.
 - Una URL desconocida muestra la página no encontrada con un enlace al inicio.
 
 `main.ts` crea la sesión, la proporciona y registra el router con esa instancia. `App.vue` usa
@@ -117,7 +122,7 @@ al solicitar una ruta de la aplicación:
 La página no encontrada se renderiza en el navegador; el fallback del servidor puede
 responder HTTP 200. El fallback debe ir después de los rewrites de API y cierre de sesión para
 que el login funcione en producción. La autorización definitiva permanece en Express;
-las guardas de Almacén y Catálogos comprueban la sesión y orientan la navegación, sin sustituir
+las guardas de las rutas protegidas comprueban la sesión y orientan la navegación, sin sustituir
 los controles del servidor. `/almacen` debe resolver a Vue, no al proxy EJS.
 
 Consulta [operaciones, reutilización y límites de Almacén](docs/warehouse.md).
@@ -162,7 +167,7 @@ En Linux, si faltan dependencias del sistema, usa `npx playwright install --with
 Playwright inicia Vite cuando hace falta. El puerto 5173 debe estar libre o servir
 esta misma copia del proyecto. En entornos con Chromium ya instalado puedes definir
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` con la ruta del ejecutable. CI instala su navegador.
-Los casos comprueban el login y los tres módulos de Almacén, con validación,
+Los casos comprueban login, Almacén, Catálogos, Identidad y Directorio, con validación,
 permisos, errores, envío, cookies, reintento, almacenamiento y ancho móvil. Las
 respuestas de API se simulan; no se usa una base de datos real.
 
@@ -173,14 +178,18 @@ respuestas de API se simulan; no se usa una base de datos real.
 - `src/app/pages/NotFoundPage.vue`: página para direcciones desconocidas.
 - `src/modules/auth/`: login, composable de formulario y adaptador HTTP.
 - `src/modules/warehouse/`: contenedores, componentes, composables y servicios de Almacén.
-- `src/shared/http/`: Axios e interceptores compartidos por login, sesión y Almacén.
+- `src/modules/identity/`: Personas y Usuarios, con responsabilidades y credenciales separadas.
+- `src/modules/directory/`: Clientes y Proveedores.
+- `src/shared/components/`: tablas, diálogos y selectores remotos de los módulos.
+- `src/shared/composables/`: paginación, captura, consultas de opciones y exportación.
+- `src/shared/http/`: Axios, interceptores y contratos de transporte compartidos por los módulos.
 - `src/app/layouts/` y `src/app/components/`: distribución general y menú de vistas Vue.
 - `src/app/plugins/vuetify.ts`: proveedor visual y temas de login y Almacén.
 - `src/main.ts`: arranque de Vue.
 - `public/`: archivos estáticos sin transformar.
 - `vite.config.ts`: integración de Vue con Vite.
 
-Los alias `@nexus/login-validation` y `@nexus/api-messages` reutilizan módulos
+Los alias `@nexus/login-validation`, `@nexus/form-validation` y `@nexus/api-messages` reutilizan módulos
 públicos de `back/`. Conserva el repositorio completo al compilar; no copies sólo
 `front/` a un directorio aislado. No se importan servicios ni secretos del backend.
 

@@ -85,7 +85,7 @@ Agregar stock; no replica la apertura automática del modal EJS.
 | `CU-CAT-09..26` | `catalogServiceTest.js`, `catalogControllersDbTest.js`; Vue: [DP-VUE-CAT-001–004](../../../front/docs/tooling.md#pruebas-de-catálogos). | Unitaria del servicio compartido e integración CRUD/validación con catálogo permitido, payload válido/inválido y lectura Prisma. | **Unitaria e integración existentes.** |
 | `CU-IDA-01` | Sin prueba funcional directa. | Actor autorizado/no autorizado, filtros, paginación y conjunto vacío. | **Brecha.** |
 | `CU-IDA-02..03` | `personApiRouteTest.js`. | Unitaria de orden validación–autorización–handler para escrituras. | **Unitaria existente**, limitada al contrato de ruta; falta persistencia. |
-| `CU-IDA-04..09` | Sin prueba de servidor o integración directa. | Reportes/usuarios requieren permisos, payloads, relaciones, credenciales, filtros y persistencia según el caso. | **Brecha**; los requests simulados de frontend no prueban el flujo completo. |
+| `CU-IDA-04..09` | Vue: [DP-VUE-IDA-002 y REC](../../../front/docs/tooling.md#pruebas-de-identidad-y-directorio-comercial). Sin prueba de servidor o integración directa. | Reportes/usuarios requieren permisos, payloads, relaciones, credenciales, filtros y persistencia según el caso. | **Brecha**; los requests simulados de frontend no prueban el flujo completo. |
 | `CU-SAL-01..05` | `goodsIssueContextServicesTest.js`, `goodsIssueContextRoutesTest.js`, `goodsIssueControllerDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Contexto fijo, rutas y validadores; alta/edición/surtido, rechazo cruzado, surtido coincidente, stock insuficiente y rollback con saldos/movimientos. | **Unitarias e integración existentes**; completar otras fronteras de cantidades según el cambio. |
 | `CU-SAL-06` | `goodsIssueControllerTest.js`, `goodsIssueControllerDbTest.js`. | Delegación unitaria e integración de devolución parcial con existencia, acumulados y movimiento. | **Unitarias e integración existentes**; faltan devolución total, cantidad excesiva y rollback. |
 | `CU-SAL-07` | `reportControllerTest.js`. | Unitaria de fórmulas del reporte de salida; cantidades convertidas y escritor simulado. | **Unitaria existente**; falta integración del archivo. |
@@ -201,3 +201,11 @@ material y los rechazos de inventario. Se conserva la cobertura existente de can
 inicial de merma cero sin entrada y de adición/devolución positiva. Los DTOs y
 controllers reciben los tipos que entregan los validators; sus pruebas no simulan
 una conversión adicional. No se modifica el esquema para redondear históricos.
+
+La adaptación Vue de Personas y del directorio comercial se comprueba adicionalmente
+en [DP-VUE-IDA-001 y DP-VUE-DIR-001](../../../front/docs/tooling.md#pruebas-de-identidad-y-directorio-comercial):
+responsabilidades, validación de captura, permisos de interfaz, alta/edición y versiones.
+Las integraciones existentes de Clientes/Proveedores siguen siendo la evidencia de
+persistencia. Las pruebas Vue no cierran las brechas de servidor de Personas/Usuarios
+ni las de contenido de reportes; el filtro de rol del reporte de Personas no está
+implementado en esa API y Vue impide solicitarlo como si lo estuviera.

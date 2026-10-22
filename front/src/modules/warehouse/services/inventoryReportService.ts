@@ -1,4 +1,4 @@
-import { apiClient } from '../../../shared/http/apiClient.js';
+import { requestExcel } from '../../../shared/http/requestExcel.js';
 import { inventoryParams } from './inventoryPageRequest.js';
 import type { InventoryQuery, InventoryResource } from '../inventory.js';
 
@@ -14,15 +14,9 @@ export const inventoryReportService = {
         if (resource !== 'wastes')
             params.set('type', resource === 'consumables' ? 'CONSUMABLE' : 'MATERIAL');
 
-        const file = await apiClient.request<Blob>(
+        return requestExcel(
             `/api/warehouse/reports/${resource === 'wastes' ? 'wastes' : 'inventory'}/excel?${params}`,
-            { signal, responseType: 'blob' },
+            signal,
         );
-        if (
-            !file.type.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        )
-            throw new Error('El servidor no devolvió un archivo Excel válido.');
-
-        return file;
     },
 };

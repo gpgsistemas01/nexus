@@ -73,7 +73,11 @@ const groups = computed(() =>
                 <VAppBarTitle>
                     Nexus
                     <span class="bar-section">
-                        / {{ activeGroup === 'catalogs' ? 'Catálogos' : 'Almacén' }}
+                        /
+                        {{
+                            APP_NAVIGATION_GROUPS.find((group) => group.id === activeGroup)
+                                ?.title ?? 'Nexus'
+                        }}
                     </span>
                 </VAppBarTitle>
             </VAppBar>

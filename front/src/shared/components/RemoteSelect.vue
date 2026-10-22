@@ -5,7 +5,7 @@ import { VProgressCircular } from 'vuetify/components/VProgressCircular';
 import { Intersect as vIntersect } from 'vuetify/directives/intersect';
 import { computed, ref, toRef } from 'vue';
 import { useSelectedOption } from '../composables/useSelectedOption.js';
-import type { LookupItem } from '../inventory.js';
+import type { LookupItem } from '../lookup.js';
 
 const props = defineProps<{
     label: string;
@@ -17,6 +17,7 @@ const props = defineProps<{
     hasMore?: boolean;
     isDisabled?: boolean;
     hint?: string;
+    initialOption?: LookupItem;
 }>();
 const emit = defineEmits<{
     'update:modelValue': [value: string];
@@ -27,9 +28,14 @@ const emit = defineEmits<{
 }>();
 const isMenuOpen = ref(false);
 const selectedItem = useSelectedOption(toRef(props, 'items'), () => props.modelValue);
+const currentItem = computed(
+    () =>
+        selectedItem.value ??
+        (props.initialOption?.id === props.modelValue ? props.initialOption : undefined),
+);
 const visibleItems = computed(() =>
-    selectedItem.value && !props.items.some((item) => item.id === selectedItem.value!.id)
-        ? [selectedItem.value, ...props.items]
+    currentItem.value && !props.items.some((item) => item.id === currentItem.value!.id)
+        ? [currentItem.value, ...props.items]
         : props.items,
 );
 
@@ -39,7 +45,7 @@ const updateValue = (value: string | null) => {
 };
 
 const searchOptions = (value: string) => {
-    if (value !== selectedItem.value?.title) emit('search', value);
+    if (value !== currentItem.value?.title) emit('search', value);
 };
 
 const loadWhenVisible = (isVisible: boolean) => {

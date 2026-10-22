@@ -1,6 +1,6 @@
 import { onBeforeUnmount, ref } from 'vue';
 import { useForm } from 'vee-validate';
-import { createCatalogValidation } from '@nexus/catalog-validation';
+import { createCatalogValidation } from '@nexus/form-validation';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { buildCatalogPayload, catalogDefinition } from '../catalog.js';

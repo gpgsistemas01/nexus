@@ -1,0 +1,64 @@
+<script setup lang="ts">
+import { VAlert } from 'vuetify/components/VAlert';
+import { VBtn } from 'vuetify/components/VBtn';
+import EditorDialog from './EditorDialog.vue';
+
+withDefaults(
+    defineProps<{
+        title: string;
+        eyebrow: string;
+        message: string;
+        isSubmitting: boolean;
+        isConflicted: boolean;
+        submitLabel?: string;
+        maxWidth?: number;
+        context?: string;
+    }>(),
+    { submitLabel: 'Guardar', maxWidth: 720, context: '' },
+);
+const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
+</script>
+
+<template>
+    <EditorDialog
+        :title="title"
+        :eyebrow="eyebrow"
+        :context="context"
+        :max-width="maxWidth"
+        :is-submitting="isSubmitting"
+        :is-submit-disabled="isConflicted"
+        :submit-label="submitLabel"
+        @close="emit('close')"
+        @submit="emit('submit')"
+    >
+        <VAlert
+            v-if="message"
+            role="alert"
+            type="error"
+            variant="tonal"
+            class="mb-4"
+        >
+            {{ message }}
+        </VAlert>
+        <div class="record-fields"><slot /></div>
+        <template #actions>
+            <VBtn
+                v-if="isConflicted"
+                @click="emit('reload')"
+            >
+                Cerrar y actualizar listado
+            </VBtn>
+        </template>
+    </EditorDialog>
+</template>
+
+<style scoped>
+.record-fields {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1rem;
+    background: rgb(var(--v-theme-surface));
+    border: 1px solid rgba(var(--v-theme-primary), 0.15);
+    border-radius: 0.85rem;
+}
+</style>

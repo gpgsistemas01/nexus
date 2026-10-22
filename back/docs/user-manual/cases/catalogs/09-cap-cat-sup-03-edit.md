@@ -6,13 +6,13 @@
 
 **Errores posibles:** [Validación de formularios](../../error-messages.md#errores-validacion), [Catálogos e inventario](../../error-messages.md#errores-catalogos).
 
-**Controles que debe usar:** Acción **Editar registro**; campos **Razón social**, **Nombre comercial** y **Teléfono**; casilla **Activo** y botón **Actualizar**.
+**Controles que debe usar:** Acción **Editar registro**; campos **Razón social** y **Nombre comercial**; casilla **Activo** y botón **Actualizar**.
 
 1. En la fila del proveedor, seleccione la acción **Editar registro**. Observe los controles que va a usar:
 
-   ![CAP-CAT-SUP-03-EDIT: formulario de edición y estado](../../images/areas/sistemas/suppliers/03-form-edit-and-state.png)
+   **Captura pendiente de actualización (`CAP-CAT-SUP-03-EDIT`):** se retiró el teléfono. La captura anterior ya no representa los campos vigentes; use los controles descritos en este procedimiento.
 
-2. Modifique los campos **Razón social**, **Nombre comercial** o **Teléfono** necesarios y revise la casilla **Activo**.
+2. Modifique la **Razón social** o el **Nombre comercial** cuando sea necesario y revise la casilla **Activo**.
 3. Seleccione el botón **Actualizar** para guardar los cambios.
 
 **Compruebe el resultado:** Vuelva a abrir el registro y compruebe los cambios confirmados.

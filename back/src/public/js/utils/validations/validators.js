@@ -272,6 +272,7 @@ export const personValidation = {
 }
 
 export const personAccessValidation = {
+    /** @param {unknown} value @param {{ accesses?: Array<{ departmentId: string }> }} context */
     departmentId: (value, { accesses = [] } = {}) => {
         const requiredError = validateUUID(value, 'El área');
 

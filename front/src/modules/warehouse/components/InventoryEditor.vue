@@ -6,7 +6,8 @@ import { VAlert } from 'vuetify/components/VAlert';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import InventoryFormField from './InventoryFormField.vue';
 import type { InventoryFormSection } from '../formFields.js';
-import type { InventoryField, InventoryValues, LookupItem } from '../inventory.js';
+import type { InventoryField, InventoryValues } from '../inventory.js';
+import type { LookupItem } from '../../../shared/lookup.js';
 
 defineProps<{
     title: string;

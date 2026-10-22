@@ -47,7 +47,7 @@ Las [decisiones de arquitectura](architecture.md) aplican a toda la implementaci
   configura consultas sobre `shared/composables/usePagedList` y conserva la política
   de recarga; `useInventoryReport` controla la descarga; `useInventoryEditor`
   integra VeeValidate y comparte la interacción de campos mediante `useFormInteraction`.
-  `useRemoteOptions` comparte catálogos paginados y búsquedas
+  `useRemoteOptions` adapta `shared/composables/useRemoteLookup` a los catálogos paginados y búsquedas
   con cancelación. Los formularios mantienen estado por instancia, sin stores.
 - `inventoryService`, `inventoryCatalogService` e `inventoryReportService` separan
   los contratos HTTP; `mappers/inventoryMapper.ts` adapta DTOs a filas de presentación. `apiClient` centraliza cookies, errores y renovación de sesión.
@@ -136,3 +136,8 @@ simulada: permisos, altas, edición, conflictos, navegación y recuperación.
 El [diseño selectivo de casos](tooling.md#pruebas-de-almacén) conserva sus riesgos y
 oráculos. Esas pruebas no afirman persistencia: los contratos HTTP/Prisma se
 comprueban separadamente con las pruebas existentes del backend y PostgreSQL aislado.
+
+Los selectores `RemoteSelect` y `useSelectedOption` pertenecen a `shared` y se
+reutilizan en Identidad. Los reportes comparten `requestExcel` y `useFileExport` con
+[Identidad y Directorio comercial](identity-and-directory.md), conservando sus
+filtros y alcances de inventario.

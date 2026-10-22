@@ -162,3 +162,9 @@ La adaptación Vue de los seis catálogos de `CU-CAT-09..26` tiene sus diseños 
 especificaciones en [DP-VUE-CAT-001–004](../../../front/docs/tooling.md#pruebas-de-catálogos).
 Es evidencia adicional de interfaz con API simulada; las comprobaciones HTTP/Prisma
 anteriores siguen siendo responsables de autorización y estado persistido.
+
+La interfaz Vue de Personas, Usuarios, Clientes y Proveedores añade sus diseños en
+[Identidad y Directorio](../../../front/docs/tooling.md#pruebas-de-identidad-y-directorio-comercial).
+Las capturas de credenciales, asignaciones, payloads versionados y menús se verifican
+con servicios simulados y Chromium; esta evidencia no cierra las brechas HTTP/Prisma
+indicadas en la matriz por caso de uso.

@@ -45,6 +45,14 @@ temporal. Los PNG se publican en `images/areas/<área>/`, con IDs estables `CAP-
 Cada captura recorrió su ruta, controles y estado declarado; el navegador estuvo
 limitado a lecturas y no confirmó altas, retiros ni cambios de stock.
 
+Tras retirar el teléfono de Proveedores, quedan pendientes de regenerar
+`CAP-CAT-SUP-02-CREATE-ALMACEN`, `CAP-CAT-SUP-02-CREATE-SISTEMAS` y
+`CAP-CAT-SUP-03-EDIT-SISTEMAS`. Sus PNG anteriores se conservan como referencia,
+pero no representan los campos actuales ni se incluyen en los procedimientos de
+alta/edición hasta reemplazarlos. La actualización requiere sesiones autorizadas
+de ambas áreas y un proveedor ficticio existente para edición, conforme al
+[flujo de capturas](../governance/document-export-guide/08-update-the-screenshots-of-the-manual.md).
+
 Movimientos de consumibles incluye menú, consulta y exportación exclusivos de
 Sistemas. `CAP-CAT-WAS-07-ROLL-WEIGHT` muestra el peso de Rollo en ambos actores.
 Las compras y salidas muestran los prefijos vigentes cuando aparecen documentos;

@@ -40,7 +40,7 @@ importar el registro privado del servidor. El Dockerfile frontend copia ese arch
 público junto con las reglas ya compartidas.
 
 `createCatalogValidation` sigue siendo la función propietaria en los validadores
-públicos existentes. El alias `@nexus/catalog-validation` la conecta con VeeValidate.
+públicos existentes. El alias `@nexus/form-validation` la conecta con VeeValidate.
 Todos los campos se registran; abrir el modal, cargar datos o mover foco sin capturar
 no muestra errores. La salida de un campo modificado valida ese campo y enviar
 valida el formulario completo. Express conserva su validación definitiva.

@@ -6,7 +6,7 @@ import {
     wasteEditValidation,
     wasteStockAdjustmentValidation,
     wasteStockAdditionValidation,
-} from '@nexus/warehouse-validation';
+} from '@nexus/form-validation';
 import {
     calculateWasteNetWeight,
     calculateWasteRollLength,
@@ -18,8 +18,8 @@ import type {
     InventoryPayload,
     InventoryResource,
     InventoryValues,
-    LookupItem,
 } from './inventory.js';
+import type { LookupItem } from '../../shared/lookup.js';
 
 export const initialInventoryValues = (target: EditorTarget): InventoryValues => {
     const row = target.row;

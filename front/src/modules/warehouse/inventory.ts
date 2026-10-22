@@ -32,11 +32,6 @@ export interface InventoryRow {
     sampleNetWeightKg: Numeric;
 }
 
-export interface LookupItem {
-    id: string;
-    title: string;
-    data: Record<string, unknown>;
-}
 export interface InventoryQuery {
     search: string;
     supplierId: string;

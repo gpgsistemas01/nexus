@@ -1,6 +1,7 @@
 import { isRollPresentation } from '@nexus/waste-measurements';
 import { isRecord } from '../../shared/utils/isRecord.js';
-import type { EditorTarget, InventoryField, InventoryResource, LookupItem } from './inventory.js';
+import type { EditorTarget, InventoryField, InventoryResource } from './inventory.js';
+import type { LookupItem } from '../../shared/lookup.js';
 import type { previewWaste } from './formModel.js';
 
 export interface InventoryFieldSpec {
