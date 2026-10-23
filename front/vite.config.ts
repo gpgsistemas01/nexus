@@ -52,6 +52,9 @@ export default defineConfig(({ mode }) => {
                 '@nexus/permissions': fileURLToPath(
                     new URL('../back/src/shared/constants/permissions.js', import.meta.url),
                 ),
+                '@nexus/api-success-codes': fileURLToPath(
+                    new URL('../back/src/shared/constants/apiSuccessCodes.js', import.meta.url),
+                ),
                 '@nexus/api-messages': fileURLToPath(
                     new URL('../back/src/public/js/constants/apiMessages.js', import.meta.url),
                 ),

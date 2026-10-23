@@ -13,6 +13,7 @@ import type {
     CreatedOption,
     ItemCreation,
 } from '../purchase.js';
+import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
 
 const props = defineProps<{
     resource: PurchaseResource;
@@ -22,7 +23,7 @@ const props = defineProps<{
     readError: string;
 }>();
 const emit = defineEmits<{
-    saved: [];
+    saved: [confirmation: MutationConfirmation];
     close: [];
     reload: [];
     correct: [detail: PurchaseDetail];
@@ -31,7 +32,12 @@ const emit = defineEmits<{
     createItem: [request: ItemCreation];
 }>();
 const { has, onDenied } = usePageAccess();
-const editor = usePurchaseEditor({ ...props, has, onSaved: () => emit('saved'), onDenied });
+const editor = usePurchaseEditor({
+    ...props,
+    has,
+    onSaved: (confirmation) => emit('saved', confirmation),
+    onDenied,
+});
 const {
     values,
     errors,
@@ -54,18 +60,14 @@ const canCreateItem = computed(
         has(PERMISSIONS.PRESENTATIONS_READ) &&
         has(PERMISSIONS.UNIT_MEASURES_READ),
 );
-const title =
-    props.target.action === 'create'
-        ? 'Registrar compra'
-        : props.target.action === 'edit'
-          ? 'Editar compra'
-          : 'Consultar compra';
+const title = document
+    ? `${props.target.action === 'edit' ? 'Editar' : 'Ver'} compra - Folio ${document.referenceNumber}`
+    : 'Registrar compra';
 </script>
 
 <template>
     <PurchaseEditor
         :title="title"
-        :context="document?.referenceNumber ?? ''"
         :values="values"
         :errors="errors"
         :message="message || readError"

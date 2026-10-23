@@ -17,12 +17,13 @@ import type {
     PurchaseResource,
     PurchaseDetail,
 } from '../purchase.js';
+import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
 
 export const usePurchaseEditor = (options: {
     resource: PurchaseResource;
     target: PurchaseTarget;
     has: (permission: string) => boolean;
-    onSaved: () => void;
+    onSaved: (confirmation: MutationConfirmation) => void;
     onDenied: (status: number) => void;
 }) => {
     const document = options.target.action === 'create' ? undefined : options.target.document;

@@ -376,3 +376,15 @@ El cambio de lectura de observaciones se cubre en la integración HTTP/Prisma
 `back/tests/integration/controllers/goodsReceiptContextDbTest.js`: nulo o texto
 en listado y por id, conservación después de editar y omisión de detalles en listado,
 en ambas variantes.
+
+## Respuestas confirmadas y corrección de compras
+
+| Diseño | Riesgo y técnica | Condición y evidencia |
+| --- | --- | --- |
+| `DP-VUE-MSG-001` | Código ausente o de otra operación tratado como éxito; particiones de respuesta | `recordContractTest.ts` rechaza código omitido, genérico o de otra operación; conserva el código recibido y traduce el mismo texto de EJS sin usar un mensaje HTML ajeno. |
+| `DP-VUE-COM-003` | Corrección sin confirmar, pérdida de captura o totales incompletos; transiciones y particiones | `purchaseTest.ts` cubre sin cambios, cancelación, confirmación, cantidades positivas y resumen sin detalles cancelados. `purchases.spec.ts` comprueba estimación visible, cancelar sin request y confirmar una sola escritura. |
+| `DP-VUE-REP-001` | Reporte inválido o denegado y cierre silencioso tras un error; decisiones por alcance y permiso | `reportScopeTest.ts` valida mes antes del request, impide exportar sin permiso y conserva el diálogo tras un fallo. Compras y Movimientos conservan recorridos de descarga en navegador. |
+
+La extracción de `successCodeMessages` mueve sus valores existentes a un módulo
+público compartido. Los tests HTTP/controladores conservan sus códigos y rutas
+previas; no cambia el contrato de autenticación, permisos ni persistencia.

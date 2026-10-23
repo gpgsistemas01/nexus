@@ -24,11 +24,11 @@ export const showSuccess = (message: string) =>
         timerProgressBar: true,
     });
 
-export const confirmRemoval = async (options: {
+export const confirmAction = async (options: {
     title: string;
     description: string;
     signal: AbortSignal;
-    submit: () => Promise<void>;
+    submit?: () => Promise<void>;
     confirmLabel?: string;
     failureMessage?: string;
 }) => {
@@ -51,7 +51,7 @@ export const confirmRemoval = async (options: {
             cancelButtonText: 'Cancelar',
             focusCancel: true,
             confirmButtonText: options.confirmLabel ?? 'Confirmar eliminación',
-            showLoaderOnConfirm: true,
+            showLoaderOnConfirm: !!options.submit,
             allowOutsideClick: () => !Swal.isLoading(),
             allowEscapeKey: () => !Swal.isLoading(),
             willOpen: (element) => {
@@ -59,7 +59,7 @@ export const confirmRemoval = async (options: {
             },
             preConfirm: async () => {
                 try {
-                    await options.submit();
+                    await options.submit?.();
                     return !options.signal.aborted;
                 } catch (cause) {
                     if (options.signal.aborted) return false;

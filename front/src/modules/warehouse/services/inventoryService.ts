@@ -1,5 +1,7 @@
+import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { ApiError } from '../../../shared/http/apiError.js';
+import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { normalizeInventoryRow } from '../mappers/inventoryMapper.js';
 import { inventoryParams } from './inventoryPageRequest.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
@@ -49,17 +51,18 @@ export const inventoryService = {
         const expected =
             action === 'create'
                 ? resource === 'wastes'
-                    ? 'CREATED_WASTE'
-                    : 'CREATED_MATERIAL'
+                    ? successCodeMessages.CREATED_WASTE
+                    : successCodeMessages.CREATED_MATERIAL
                 : action === 'delete'
-                  ? 'DELETED_MATERIAL'
+                  ? successCodeMessages.DELETED_MATERIAL
                   : resource === 'wastes'
-                    ? 'UPDATED_WASTE'
-                    : 'UPDATED_MATERIAL';
-        if (result.code !== expected)
-            throw new ApiError(
-                'No se pudo confirmar la operación. Revisa el inventario antes de reintentar.',
-            );
+                    ? successCodeMessages.UPDATED_WASTE
+                    : successCodeMessages.UPDATED_MATERIAL;
+        confirmMutation(
+            result,
+            expected,
+            'No se pudo confirmar la operación. Revisa el inventario antes de reintentar.',
+        );
 
         return result;
     },

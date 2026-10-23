@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import Swal from 'sweetalert2';
 import { flushPromises } from '@vue/test-utils';
-import { confirmRemoval, showSuccess } from '../../../../src/shared/ui/feedback.js';
+import { confirmAction, showSuccess } from '../../../../src/shared/ui/feedback.js';
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -31,7 +31,7 @@ it('cancelar al desmontar antes de terminar de abrir no deja una confirmación g
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
   const controller = new AbortController();
   const submit = vi.fn();
-  const confirming = confirmRemoval({
+  const confirming = confirmAction({
     title: 'Eliminar material',
     description: 'Proveedor de prueba',
     signal: controller.signal,
@@ -63,7 +63,7 @@ it('la confirmación y el error del servidor no interpretan HTML', async () => {
   const submit = vi.fn(async () => {
     throw new Error(errorText);
   });
-  const confirming = confirmRemoval({
+  const confirming = confirmAction({
     title: hostileText,
     description: hostileText,
     signal: controller.signal,

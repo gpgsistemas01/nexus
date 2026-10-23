@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { VBtn } from 'vuetify/components/VBtn';
 import { PERMISSIONS } from '@nexus/permissions';
 import { usePageAccess } from '../../../app/composables/usePageAccess.js';
 import { usePagedList } from '../../../shared/composables/usePagedList.js';
 import { useListSearch } from '../../../shared/composables/useListSearch.js';
 import { useVisibleRefresh } from '../../../shared/composables/useVisibleRefresh.js';
-import { useFileExport } from '../../../shared/composables/useFileExport.js';
+import { useReportScope } from '../../../shared/composables/useReportScope.js';
 import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
 import { initialRecordQuery } from '../../../shared/list.js';
-import { dateRangeError, reportScopeError } from '../../../shared/report.js';
-import type { ReportScope } from '../../../shared/report.js';
+import { dateRangeError } from '../../../shared/report.js';
 import { useMovementFilters } from '../composables/useMovementFilters.js';
 import { movementService } from '../services/movementService.js';
 import { emptyMovementFilters, MOVEMENT_CONFIG } from '../movement.js';
@@ -39,16 +38,23 @@ const { query, rows, total, isLoading, isRefreshing, error } = list;
 const searchForm = useListSearch(list, () => ({ ...filters.values }));
 const { search, clearSearch } = searchForm;
 const filterError = ref('');
-const isReportOpen = ref(false);
-const reportValues = reactive<ReportScope>({ mode: 'current-month', month: '' });
-const reportFormError = ref('');
-const report = useFileExport<ReportScope>({
+const report = useReportScope({
     canExport: () => canExport.value,
     filename: `reporte_movimientos_${props.resource}.xlsx`,
     request: (scope, signal) => movementService.export(props.resource, { ...query }, scope, signal),
     onDenied,
 });
-const { isExporting, exportError } = report;
+const {
+    isExporting,
+    exportError,
+    isReportOpen,
+    reportValues,
+    reportFormError,
+    openReport,
+    exportReport,
+    setReportMode,
+    setReportMonth,
+} = report;
 
 const applySearch = () => {
     filterError.value = dateRangeError(filters.values);
@@ -59,22 +65,6 @@ const clear = () => {
     filters.clear();
     filterError.value = '';
     clearSearch(emptyMovementFilters());
-};
-
-const openReport = () => {
-    if (!canExport.value) return;
-
-    exportError.value = '';
-    reportFormError.value = '';
-    isReportOpen.value = true;
-};
-
-const exportReport = async () => {
-    reportFormError.value = reportScopeError(reportValues);
-    if (reportFormError.value) return;
-
-    await report.exportReport({ ...reportValues });
-    if (!exportError.value) isReportOpen.value = false;
 };
 
 useVisibleRefresh({
@@ -150,16 +140,8 @@ onMounted(() => {
         :values="reportValues"
         :is-submitting="isExporting"
         :error="reportFormError || exportError"
-        @mode="
-            reportValues.mode = $event;
-            reportFormError = '';
-            exportError = '';
-        "
-        @month="
-            reportValues.month = $event;
-            reportFormError = '';
-            exportError = '';
-        "
+        @mode="setReportMode"
+        @month="setReportMonth"
         @submit="exportReport"
         @close="isReportOpen = false"
     />

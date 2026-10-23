@@ -1,5 +1,5 @@
 import { createGoodsReceiptDtoForCorrection, createGoodsReceiptDtoForEdit, createGoodsReceiptDtoForRegister } from '../../../../../dtos/goodsReceiptDTO.js';
-import { successCodeMessages } from '../../../../../messages/codeMessages.js';
+import { successCodeMessages } from '../../../../../shared/constants/apiSuccessCodes.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../../../utils/requestQueryUtils.js';
 import { emitInventoryUpdated } from '../../../../../utils/socketUtils.js';
 import { sanitizeEmptyStrings } from '../../../../../utils/formattersUtils.js';

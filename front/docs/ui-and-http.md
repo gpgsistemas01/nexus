@@ -97,7 +97,7 @@ Los campos de consulta nunca amplían el payload admitido por el servidor.
 
 ### SweetAlert2 y errores
 
-`shared/ui/feedback.ts` concentra configuración y estilo. Se importa SweetAlert2
+`shared/ui/feedback.ts` concentra configuración y estilo con `confirmAction`. Se importa SweetAlert2
 directamente con Composition API; no se requiere otro wrapper ni una propiedad
 global de Vue. Su entrada raíz ya incorpora el CSS base. La confirmación de baja
 usa `preConfirm` y `showLoaderOnConfirm`; Cancelar no realiza solicitudes. Un fallo
@@ -258,3 +258,10 @@ en cada pantalla.
 bloqueo durante captura pendiente. `StateBadge` presenta el estado activo de forma
 uniforme. Las tablas de sólo lectura omiten la columna de acciones. Los permisos,
 el stock, las asignaciones y los payloads permanecen en sus módulos.
+
+En Compras, `PurchaseTotals` reutiliza el resumen visual del encabezado y de
+corrección, con las etiquetas originales de EJS. La corrección conserva su
+confirmación explícita antes del request. Los avisos de éxito usan el mensaje
+traducido del código realmente confirmado por el servicio mediante el catálogo
+público `getSuccessMessage`, compartido con EJS. `confirmMutation` sólo valida
+el contrato y devuelve datos; no presenta avisos ni fabrica un código.

@@ -69,7 +69,7 @@ const displayDate = (value: string) =>
         </template>
         <template #[`item.actions`]="{ item }">
             <TableAction
-                label="Consultar compra"
+                label="Ver compra"
                 :icon="`svg:${mdiEyeOutline}`"
                 :is-disabled="isReading"
                 @click="emit('open', item, 'view')"

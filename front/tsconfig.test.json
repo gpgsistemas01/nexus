@@ -20,7 +20,8 @@
         "../back/src/shared/utils/numberUtils.js",
         "../back/src/shared/constants/catalogs.js",
         "../back/src/shared/inventory/goodsReceiptCalculations.js",
-        "../back/src/public/js/utils/timeZone.js"
+        "../back/src/public/js/utils/timeZone.js",
+        "../back/src/shared/constants/apiSuccessCodes.js"
     ],
     "compilerOptions": {
         "types": ["vite/client", "node"],

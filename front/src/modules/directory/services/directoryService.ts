@@ -1,3 +1,4 @@
+import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { recordParams } from '../../../shared/http/recordParams.js';
@@ -12,6 +13,17 @@ import { requestExcel } from '../../../shared/http/requestExcel.js';
 import { DIRECTORY_CONFIG } from '../directory.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import type { DirectoryEntry, DirectoryResource, DirectoryTarget } from '../directory.js';
+
+const mutationCodes = {
+    clients: {
+        create: successCodeMessages.CREATED_CLIENT,
+        edit: successCodeMessages.UPDATED_CLIENT,
+    },
+    suppliers: {
+        create: successCodeMessages.CREATED_SUPPLIER,
+        edit: successCodeMessages.UPDATED_SUPPLIER,
+    },
+} as const;
 
 const normalizeEntry = (resource: DirectoryResource, value: unknown): DirectoryEntry => {
     const row = readRecord(value);
@@ -47,10 +59,7 @@ export const directoryService = {
                 signal,
             },
         );
-        confirmMutation(
-            result,
-            `${target.action === 'create' ? 'CREATED' : 'UPDATED'}_${resource === 'clients' ? 'CLIENT' : 'SUPPLIER'}`,
-        );
+        confirmMutation(result, mutationCodes[resource][target.action]);
         return normalizeEntry(
             resource,
             isRecord(result) ? result[resource === 'clients' ? 'client' : 'supplier'] : undefined,

@@ -1,6 +1,7 @@
 import { defineComponent, h } from 'vue';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { confirmAction } from '../../../../src/shared/ui/feedback.js';
 import { apiClient } from '../../../../src/shared/http/apiClient.js';
 import { mockHttpAdapter } from '../../../helpers/httpAdapter.js';
 import { ids, pageOf } from '../../../fixtures/inventory.js';
@@ -14,6 +15,7 @@ import {
   initialPurchaseValues,
   purchasePayload,
   purchaseTotals,
+  purchaseCorrectionTotals,
 } from '../../../../src/modules/purchases/purchaseForm.js';
 import { emptyPurchaseFilters } from '../../../../src/modules/purchases/purchase.js';
 import { purchaseService } from '../../../../src/modules/purchases/services/purchaseService.js';
@@ -24,10 +26,64 @@ import { usePurchaseDocument } from '../../../../src/modules/purchases/composabl
 import { usePurchaseCorrection } from '../../../../src/modules/purchases/composables/usePurchaseCorrection.js';
 import type { PurchaseTarget } from '../../../../src/modules/purchases/purchase.js';
 
+vi.mock('../../../../src/shared/ui/feedback.js', () => ({
+  confirmAction: vi.fn().mockResolvedValue(true),
+}));
+const confirmation = {
+  code: 'UPDATED_GOODS_RECEIPT',
+  message: '¡Compra actualizada exitosamente!',
+};
 const original = apiClient.http.defaults.adapter;
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.mocked(confirmAction).mockReset().mockResolvedValue(true);
   apiClient.http.defaults.adapter = original;
+});
+
+it('corregir conserva los otros detalles y excluye cancelados de la vista previa', () => {
+  const receipt = document();
+  const detail = receipt.details[0]!;
+  receipt.details.push({
+    ...detail,
+    id: 'otro',
+    quantity: 1,
+    netPurchaseAmount: 20,
+    grossPurchaseAmount: 23.2,
+  });
+  receipt.details.push({ ...detail, id: 'cancelado', status: 'CANCELED' });
+  expect(
+    purchaseCorrectionTotals(receipt, detail, { quantity: '1', costPerUnitType: '50' }),
+  ).toEqual({ quantity: 2, net: 70, gross: 81.2 });
+  expect(detail.quantity).toBe('2');
+  expect(
+    purchaseCorrectionTotals(receipt, detail, { quantity: '', costPerUnitType: '50' }),
+  ).toBeNull();
+});
+
+it('una corrección sin cambios no pide confirmación ni escribe; cancelar conserva la captura', async () => {
+  const request = vi.spyOn(purchaseService, 'changeDetail').mockResolvedValue(confirmation);
+  const saved = vi.fn();
+  const { state } = harness(() =>
+    usePurchaseCorrection({
+      resource: 'materials',
+      document: document(),
+      detail: document().details[0]!,
+      onSaved: saved,
+      onDenied: vi.fn(),
+    }),
+  );
+  await state.submit();
+  expect(confirmAction).not.toHaveBeenCalled();
+  expect(state.message.value).toContain('Debe modificar');
+  state.update('quantity', '1');
+  vi.mocked(confirmAction).mockResolvedValueOnce(false);
+  await state.submit();
+  expect(request).not.toHaveBeenCalled();
+  expect(state.values.quantity).toBe('1');
+  expect(saved).not.toHaveBeenCalled();
+  await state.submit();
+  expect(request).toHaveBeenCalledOnce();
+  expect(saved).toHaveBeenCalledWith(confirmation);
 });
 const document = () => normalizePurchaseDocument(purchase, 'materials');
 const signal = () => new AbortController().signal;
@@ -53,7 +109,7 @@ const harness = <T>(setup: () => T) => {
 };
 const editor = (target: PurchaseTarget = { action: 'create' }) => {
   const saved = vi.fn();
-  const request = vi.spyOn(purchaseService, 'save').mockResolvedValue(undefined);
+  const request = vi.spyOn(purchaseService, 'save').mockResolvedValue(confirmation);
   const { state, wrapper } = harness(() =>
     usePurchaseEditor({
       resource: 'materials',
@@ -163,11 +219,11 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     },
   );
   it('corregir admite una cantidad positiva menor a uno y sólo envía cantidad/costo', async () => {
-    const request = vi.spyOn(purchaseService, 'changeDetail').mockResolvedValue(undefined);
+    const request = vi.spyOn(purchaseService, 'changeDetail').mockResolvedValue(confirmation);
     const { state } = harness(() =>
       usePurchaseCorrection({
         resource: 'materials',
-        documentId: purchase.id,
+        document: document(),
         detail: document().details[0]!,
         onSaved: vi.fn(),
         onDenied: vi.fn(),

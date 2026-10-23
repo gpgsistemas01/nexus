@@ -41,3 +41,4 @@
 !back/src/shared/validation/weightValidations.js
 !back/src/shared/utils/
 !back/src/shared/utils/numberUtils.js
+!back/src/shared/constants/apiSuccessCodes.js

@@ -1,3 +1,4 @@
+import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { recordParams } from '../../../shared/http/recordParams.js';
@@ -43,7 +44,12 @@ export const purchaseService = {
             `${endpoint(resource)}${id ? `/${encodeURIComponent(id)}` : ''}`,
             { method: id ? 'PATCH' : 'POST', data: payload, signal },
         );
-        confirmMutation(result, id ? 'UPDATED_GOODS_RECEIPT' : 'CREATED_GOODS_RECEIPT');
+        return confirmMutation(
+            result,
+            id
+                ? successCodeMessages.UPDATED_GOODS_RECEIPT
+                : successCodeMessages.CREATED_GOODS_RECEIPT,
+        );
     },
     async changeDetail(
         resource: PurchaseResource,
@@ -57,7 +63,7 @@ export const purchaseService = {
             `${endpoint(resource)}/${encodeURIComponent(id)}/details/${encodeURIComponent(detailId)}/${action}`,
             { method: 'PATCH', ...(data ? { data } : {}), signal },
         );
-        confirmMutation(result, 'UPDATED_GOODS_RECEIPT');
+        return confirmMutation(result, successCodeMessages.UPDATED_GOODS_RECEIPT);
     },
     export(
         resource: PurchaseResource,

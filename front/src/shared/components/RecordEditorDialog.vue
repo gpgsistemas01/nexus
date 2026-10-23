@@ -16,6 +16,7 @@ withDefaults(
         note?: string;
         reloadLabel?: string;
         showSubmit?: boolean;
+        closeLabel?: string;
         retainFocus?: boolean;
     }>(),
     {
@@ -25,6 +26,7 @@ withDefaults(
         note: '',
         reloadLabel: 'Cerrar y actualizar listado',
         showSubmit: true,
+        closeLabel: 'Cerrar',
         retainFocus: true,
     },
 );
@@ -42,6 +44,7 @@ const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
         :is-submit-disabled="isConflicted"
         :submit-label="submitLabel"
         :show-submit="showSubmit"
+        :close-label="closeLabel"
         :retain-focus="retainFocus"
         @close="emit('close')"
         @submit="emit('submit')"

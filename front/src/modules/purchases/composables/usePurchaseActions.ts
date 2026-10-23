@@ -1,10 +1,11 @@
 import { onBeforeUnmount, ref, shallowRef } from 'vue';
 import { useListEditor } from '../../../shared/composables/useListEditor.js';
-import { confirmRemoval, showSuccess } from '../../../shared/ui/feedback.js';
+import { confirmAction, showSuccess } from '../../../shared/ui/feedback.js';
 import { usePurchaseDocument } from './usePurchaseDocument.js';
 import { purchaseService } from '../services/purchaseService.js';
 import { canEditPurchase } from '../purchase.js';
 import type { PurchaseResource, PurchaseRow, PurchaseTarget, PurchaseDetail } from '../purchase.js';
+import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
 
 export const usePurchaseActions = (options: {
     resource: PurchaseResource;
@@ -22,7 +23,6 @@ export const usePurchaseActions = (options: {
     const state = useListEditor<PurchaseTarget>({
         canOpen: () => options.canManage(),
         reload: options.reload,
-        savedMessage: 'La compra se guardó correctamente.',
     });
 
     const close = () => {
@@ -64,36 +64,21 @@ export const usePurchaseActions = (options: {
         if (target && target.action !== 'create') return open(target.document, target.action);
     };
 
-    const saved = () => {
+    const saved = (confirmation: MutationConfirmation) => {
         close();
         state.onSaved();
+        void showSuccess(confirmation.message);
     };
 
-    const detailSaved = async () => {
+    const detailSaved = async (confirmation: MutationConfirmation) => {
         correction.value = undefined;
         needsReload.value = true;
         void options.reload();
-        void showSuccess('La partida se actualizó correctamente.');
+        void showSuccess(confirmation.message);
         await reload();
     };
 
-    const correct = (line: PurchaseDetail) => {
-        const target = state.editor.value;
-        if (
-            target?.action === 'view' &&
-            canEditPurchase(target.document) &&
-            !line.isNew &&
-            line.status === 'ACTIVE' &&
-            !needsReload.value &&
-            !isChanging.value &&
-            !reader.isReading.value &&
-            !controller.signal.aborted &&
-            options.canManage()
-        )
-            correction.value = line;
-    };
-
-    const cancel = async (line: PurchaseDetail) => {
+    const editableDetailDocument = (line: PurchaseDetail) => {
         const target = state.editor.value;
         if (
             target?.action !== 'view' ||
@@ -102,27 +87,40 @@ export const usePurchaseActions = (options: {
             line.status !== 'ACTIVE' ||
             needsReload.value ||
             isChanging.value ||
-            !options.canManage() ||
             reader.isReading.value ||
-            controller.signal.aborted
+            controller.signal.aborted ||
+            !options.canManage()
         )
             return;
 
+        return target.document;
+    };
+
+    const correct = (line: PurchaseDetail) => {
+        if (editableDetailDocument(line)) correction.value = line;
+    };
+
+    const cancel = async (line: PurchaseDetail) => {
+        const document = editableDetailDocument(line);
+        if (!document) return;
+
         isChanging.value = true;
+        let confirmation: MutationConfirmation | undefined;
 
         try {
-            const confirmed = await confirmRemoval({
-                title: 'Cancelar partida',
-                description: `${line.name}. Se revertirá la entrada correspondiente a esta partida.`,
-                confirmLabel: 'Cancelar partida',
+            const confirmed = await confirmAction({
+                title: '¿Cancelar detalle de compra?',
+                description:
+                    'Se marcará el detalle como cancelado, se descontará de los totales y se generará el ajuste de inventario correspondiente.',
+                confirmLabel: 'Cancelar detalle',
                 failureMessage:
                     'La cancelación no se confirmó. Puedes reintentar o cerrar este aviso.',
                 signal: controller.signal,
                 submit: async () => {
                     try {
-                        await purchaseService.changeDetail(
+                        confirmation = await purchaseService.changeDetail(
                             options.resource,
-                            target.document.id,
+                            document.id,
                             line.id,
                             'cancel',
                             controller.signal,
@@ -134,7 +132,8 @@ export const usePurchaseActions = (options: {
                 },
             });
             isChanging.value = false;
-            if (confirmed && !controller.signal.aborted) await detailSaved();
+            if (confirmed && confirmation && !controller.signal.aborted)
+                await detailSaved(confirmation);
         } finally {
             isChanging.value = false;
         }

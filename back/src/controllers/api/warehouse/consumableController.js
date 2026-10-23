@@ -12,7 +12,7 @@ import {
     createMaterialDtoForStockUpdate
 } from '../../../dtos/materialDTO.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
-import { successCodeMessages } from '../../../messages/codeMessages.js';
+import { successCodeMessages } from '../../../shared/constants/apiSuccessCodes.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
 import { getDataTableOrder, getDataTablePaging, getDataTableSearch } from '../../../utils/requestQueryUtils.js';
 

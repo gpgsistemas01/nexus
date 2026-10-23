@@ -1,5 +1,5 @@
 import { onBeforeUnmount, ref } from 'vue';
-import { confirmRemoval } from '../../../shared/ui/feedback.js';
+import { confirmAction } from '../../../shared/ui/feedback.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { inventoryService } from '../services/inventoryService.js';
 import { INVENTORY_CONFIG } from '../inventory.js';
@@ -19,7 +19,7 @@ export const useInventoryRemoval = (options: {
         isConfirming.value = true;
 
         try {
-            const confirmed = await confirmRemoval({
+            const confirmed = await confirmAction({
                 title: `Eliminar ${INVENTORY_CONFIG[options.resource].singular}: ${row.name}`,
                 description: `Se eliminará la relación con ${row.supplierName}. Si no quedan otros proveedores, también se eliminará el material.`,
                 signal: controller.signal,

@@ -1,5 +1,7 @@
+import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { ApiError } from '../../../shared/http/apiError.js';
+import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import type { CatalogEntry, CatalogName, CatalogQuery, CatalogTarget } from '../catalog.js';
@@ -52,11 +54,14 @@ export const catalogService = {
             },
         );
         const expected =
-            target.action === 'edit' ? 'UPDATED_CATALOG_ENTRY' : 'CREATED_CATALOG_ENTRY';
-        if (result.code !== expected)
-            throw new ApiError(
-                'No se pudo confirmar la operación. Actualiza el catálogo antes de reintentar.',
-            );
+            target.action === 'edit'
+                ? successCodeMessages.UPDATED_CATALOG_ENTRY
+                : successCodeMessages.CREATED_CATALOG_ENTRY;
+        confirmMutation(
+            result,
+            expected,
+            'No se pudo confirmar la operación. Actualiza el catálogo antes de reintentar.',
+        );
 
         return normalizeEntry(result.data, catalog);
     },

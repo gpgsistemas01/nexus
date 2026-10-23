@@ -18,6 +18,7 @@ withDefaults(
         submitLabel?: string;
         note?: string;
         showSubmit?: boolean;
+        closeLabel?: string;
         retainFocus?: boolean;
     }>(),
     {
@@ -27,6 +28,7 @@ withDefaults(
         submitLabel: 'Guardar',
         note: '',
         showSubmit: true,
+        closeLabel: 'Cerrar',
         retainFocus: true,
     },
 );
@@ -94,7 +96,7 @@ const titleId = useId();
                         variant="outlined"
                         @click="emit('close')"
                     >
-                        Cerrar
+                        {{ closeLabel }}
                     </VBtn>
                     <slot name="actions" />
                     <VBtn

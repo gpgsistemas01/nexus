@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VAlert } from 'vuetify/components/VAlert';
 import { PERMISSIONS } from '@nexus/permissions';
 import { usePageAccess } from '../../../app/composables/usePageAccess.js';
 import { usePagedList } from '../../../shared/composables/usePagedList.js';
 import { useListSearch } from '../../../shared/composables/useListSearch.js';
-import { useFileExport } from '../../../shared/composables/useFileExport.js';
+import { useReportScope } from '../../../shared/composables/useReportScope.js';
 import { useVisibleRefresh } from '../../../shared/composables/useVisibleRefresh.js';
 import { initialRecordQuery } from '../../../shared/list.js';
-import { dateRangeError, reportScopeError } from '../../../shared/report.js';
-import type { ReportScope } from '../../../shared/report.js';
+import { dateRangeError } from '../../../shared/report.js';
 import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
 import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue';
 import { purchaseService } from '../services/purchaseService.js';
@@ -73,32 +72,23 @@ const actions = usePurchaseActions({
     onError,
 });
 const { editor, editorKey, isReading, readError, correction } = actions;
-const isReportOpen = ref(false);
-const reportValues = reactive<ReportScope>({ mode: 'current-month', month: '' });
-const reportFormError = ref('');
-const report = useFileExport<ReportScope>({
+const report = useReportScope({
     canExport: () => canExport.value,
     filename: `reporte_compras_${config.path}.xlsx`,
     request: (scope, signal) => purchaseService.export(props.resource, { ...query }, scope, signal),
     onDenied,
 });
-const { isExporting, exportError } = report;
-
-const openReport = () => {
-    if (canExport.value) {
-        exportError.value = '';
-        reportFormError.value = '';
-        isReportOpen.value = true;
-    }
-};
-
-const exportReport = async () => {
-    reportFormError.value = reportScopeError(reportValues);
-    if (reportFormError.value) return;
-
-    await report.exportReport({ ...reportValues });
-    if (!exportError.value) isReportOpen.value = false;
-};
+const {
+    isExporting,
+    exportError,
+    isReportOpen,
+    reportValues,
+    reportFormError,
+    openReport,
+    exportReport,
+    setReportMode,
+    setReportMonth,
+} = report;
 
 useVisibleRefresh({
     refresh: list.refresh,
@@ -229,7 +219,7 @@ onMounted(() => {
     <PurchaseCorrectionPage
         v-if="correction && editor && editor.action !== 'create'"
         :resource="resource"
-        :document-id="editor.document.id"
+        :document="editor.document"
         :detail="correction"
         @saved="actions.detailSaved"
         @close="correction = undefined"
@@ -245,16 +235,8 @@ onMounted(() => {
         :values="reportValues"
         :is-submitting="isExporting"
         :error="reportFormError || exportError"
-        @mode="
-            reportValues.mode = $event;
-            reportFormError = '';
-            exportError = '';
-        "
-        @month="
-            reportValues.month = $event;
-            reportFormError = '';
-            exportError = '';
-        "
+        @mode="setReportMode"
+        @month="setReportMonth"
         @submit="exportReport"
         @close="isReportOpen = false"
     />

@@ -1,4 +1,4 @@
-import { successCodeMessages } from "../../messages/codeMessages.js";
+import { successCodeMessages } from "../../shared/constants/apiSuccessCodes.js";
 import { setAuthCookies } from "../../utils/cookiesUtils.js";
 import { getNewRefreshToken, loginUser } from "../../services/authService.js";
 import { errorMap } from "../../messages/codeMessages.js";

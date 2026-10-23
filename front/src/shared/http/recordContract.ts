@@ -1,3 +1,4 @@
+import { getSuccessMessage } from '@nexus/api-messages';
 import { ApiError } from './apiError.js';
 import { isRecord } from '../utils/isRecord.js';
 
@@ -31,10 +32,19 @@ export const readState = (record: Record<string, unknown>): boolean => {
     return record.isActive;
 };
 
-export const confirmMutation = (value: unknown, expected: string) => {
+export interface MutationConfirmation {
+    code: string;
+    message: string;
+}
+
+export const confirmMutation = (
+    value: unknown,
+    expected: string,
+    errorMessage = 'No se pudo confirmar la operación. Actualiza el listado antes de reintentar.',
+): MutationConfirmation => {
     if (!isRecord(value) || value.code !== expected) {
-        throw new ApiError(
-            'No se pudo confirmar la operación. Actualiza el listado antes de reintentar.',
-        );
+        throw new ApiError(errorMessage);
     }
+
+    return { code: value.code, message: getSuccessMessage(value.code) };
 };

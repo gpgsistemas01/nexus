@@ -4,7 +4,7 @@ import { showSuccess } from '../ui/feedback.js';
 export const useListEditor = <Target>(options: {
     canOpen: (target: Target) => boolean;
     reload: () => unknown;
-    savedMessage: string;
+    savedMessage?: string;
 }) => {
     const editor = shallowRef<Target | null>(null);
 
@@ -23,7 +23,7 @@ export const useListEditor = <Target>(options: {
 
     const onSaved = () => {
         reloadEditor();
-        void showSuccess(options.savedMessage);
+        if (options.savedMessage) void showSuccess(options.savedMessage);
     };
 
     return { editor, openEditor, closeEditor, reloadEditor, onSaved };

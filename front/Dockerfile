@@ -16,7 +16,7 @@ COPY front/src ./src
 COPY back/src/public/js/utils/validations/loginValidation.js back/src/public/js/utils/validations/baseValidations.js back/src/public/js/utils/validations/validators.js back/src/public/js/utils/validations/fieldValidations.js /app/back/src/public/js/utils/validations/
 COPY back/src/public/js/utils/timeZone.js /app/back/src/public/js/utils/
 COPY back/src/public/js/constants/apiMessages.js /app/back/src/public/js/constants/
-COPY back/src/shared/constants/catalogs.js back/src/shared/constants/auth.js back/src/shared/constants/inputValidation.js back/src/shared/constants/inventory.js back/src/shared/constants/permissions.js /app/back/src/shared/constants/
+COPY back/src/shared/constants/apiSuccessCodes.js back/src/shared/constants/catalogs.js back/src/shared/constants/auth.js back/src/shared/constants/inputValidation.js back/src/shared/constants/inventory.js back/src/shared/constants/permissions.js /app/back/src/shared/constants/
 COPY back/src/shared/messages/goodsReceiptMessages.js /app/back/src/shared/messages/
 COPY back/src/shared/inventory/wasteMeasurements.js back/src/shared/inventory/goodsReceiptCalculations.js /app/back/src/shared/inventory/
 COPY back/src/shared/validation/weightValidations.js /app/back/src/shared/validation/

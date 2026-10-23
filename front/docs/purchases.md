@@ -121,3 +121,29 @@ de variantes, y en las pruebas existentes de concurrencia de almacén.
 
 Consulta [arquitectura](architecture.md), [estándar y herramientas](tooling.md)
 y la [referencia técnica de compras](../../back/docs/architecture/views/development/frontend-technical-documentation/12-goods-receipts-code.md).
+
+## Paridad con EJS y revisión de reutilización
+
+Los botones Guardar, Actualizar, Agregar y Regresar, el título de corrección,
+los encabezados agrupados Medidas/Conversión y los textos de importes conservan
+el vocabulario de EJS. Editar y Ver incluyen el folio en el título del modal.
+La corrección muestra Nuevos totales estimados y pide confirmación antes de
+escribir. Sin cambios, informa que se debe modificar cantidad o costo; cancelar
+conserva la captura sin pedir una escritura. Los cálculos siguen siendo una
+vista previa y Express conserva la validación y los importes persistidos.
+
+`PurchaseTotals` presenta los resúmenes del documento y de la corrección.
+`useReportScope` coordina apertura, validación del mes, errores y descarga
+tanto en Compras como en Movimientos, sobre `useFileExport`. La política de
+detalles editables se comparte entre corregir y cancelar dentro de Compras.
+`confirmAction` concentra la confirmación SweetAlert2 con o sin escritura en
+`preConfirm`, y cancela su diálogo al desmontar.
+
+Los códigos de éxito pertenecen a
+`back/src/shared/constants/apiSuccessCodes.js`: controllers, EJS y Vue importan
+`successCodeMessages` desde ese propietario público. Vue usa el alias
+`@nexus/api-success-codes`. `confirmMutation` comprueba el código real recibido
+contra la constante esperada; no crea códigos ni deduce éxito de un prefijo.
+Su resultado conserva ese código y traduce el texto mediante `getSuccessMessage`,
+el mismo catálogo público de EJS. Los avisos de Compras usan ese resultado
+confirmado. El servicio no importa SweetAlert2 ni presenta avisos.

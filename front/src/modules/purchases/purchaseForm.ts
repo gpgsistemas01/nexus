@@ -78,3 +78,29 @@ export const purchaseTotals = (details: PurchaseDetail[]) =>
             }),
             { quantity: 0, net: 0, gross: 0 },
         );
+
+export const purchaseCorrectionTotals = (
+    document: PurchaseDocument,
+    detail: PurchaseDetail,
+    values: { quantity: string; costPerUnitType: string },
+) => {
+    const quantity = Number(values.quantity);
+    const costPerUnitType = Number(values.costPerUnitType);
+    if (
+        !Number.isFinite(quantity) ||
+        quantity <= 0 ||
+        !Number.isFinite(costPerUnitType) ||
+        costPerUnitType <= 0
+    )
+        return null;
+
+    const corrected = calculateGoodsReceiptDetailAmounts({
+        quantity,
+        costPerUnitType,
+        base: detail.base,
+        height: detail.height,
+    });
+    return purchaseTotals(
+        document.details.map((row) => (row.id === detail.id ? { ...row, ...corrected } : row)),
+    );
+};

@@ -1,3 +1,4 @@
+import { successCodeMessages } from '@nexus/api-success-codes';
 import { errorMessages } from '@nexus/api-messages';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { ApiError } from '../../../shared/http/apiError.js';
@@ -25,7 +26,7 @@ export const loginRequest = async (
             signal,
             requiresAuth: false,
         });
-        if (data.code !== 'SUCCESS_LOGIN')
+        if (data.code !== successCodeMessages.SUCCESS_LOGIN)
             throw new LoginRequestError(LOGIN_MESSAGES.INVALID_RESPONSE);
     } catch (cause) {
         if (!(cause instanceof ApiError)) throw cause;

@@ -27,13 +27,16 @@ for (const [path, title, item] of [
     await dialog.getByRole('combobox', { name: item, exact: true }).click();
     await page.getByRole('option', { name: 'Lona · 2 × 50 · ROLLO', exact: true }).click();
     await dialog.getByLabel('Cantidad', { exact: true }).fill('2');
-    await dialog.getByLabel('Costo por presentación', { exact: true }).fill('100');
-    await dialog.getByRole('button', { name: 'Agregar partida', exact: true }).click();
+    await dialog.getByLabel('Costo por Presentación', { exact: true }).fill('100');
+    await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     await expect(dialog.getByRole('cell', { name: 'Lona', exact: true })).toBeVisible();
     await expect(dialog.getByLabel('Totales de compra')).toContainText('$232');
     expect(writes).toHaveLength(0);
-    await dialog.getByRole('button', { name: 'Guardar compra', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(dialog).toBeHidden();
+    await expect(
+      page.getByText('¡Entrada de mercancía creada exitosamente!', { exact: true }),
+    ).toBeVisible();
     expect(writes).toHaveLength(1);
     expect(writes[0]!.data).toMatchObject({
       supplierId: ids.supplier,
@@ -52,16 +55,16 @@ test('compras: edición de encabezado conserva proveedor, observaciones y partid
   const { writes } = await mockPurchases(page);
   await page.goto('/compras/materiales');
   await page.getByRole('button', { name: 'Editar compra', exact: true }).first().click();
-  const dialog = page.getByRole('dialog', { name: 'Editar compra', exact: true });
+  const dialog = page.getByRole('dialog', { name: 'Editar compra - Folio COM-001', exact: true });
   await expect(dialog.getByLabel('Proveedor', { exact: true })).toHaveAttribute('readonly', '');
   await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue(
     'Conservar esta observación',
   );
-  await expect(dialog.getByLabel('Fecha y hora de recepción', { exact: true })).toHaveValue(
+  await expect(dialog.getByLabel('Fecha y hora de recepción:', { exact: true })).toHaveValue(
     '2026-10-22T12:30',
   );
   await dialog.getByLabel('Observaciones', { exact: true }).fill('Encabezado actualizado');
-  await dialog.getByRole('button', { name: 'Actualizar compra', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
   await expect(dialog).toBeHidden();
   expect(writes).toHaveLength(1);
   expect(writes[0]!.method).toBe('PATCH');
@@ -85,9 +88,9 @@ test('compras: rechazar una edición conserva captura y exige otro envío explí
   });
   await page.goto('/compras/materiales');
   await page.getByRole('button', { name: 'Editar compra', exact: true }).first().click();
-  const dialog = page.getByRole('dialog', { name: 'Editar compra', exact: true });
+  const dialog = page.getByRole('dialog', { name: 'Editar compra - Folio COM-001', exact: true });
   await dialog.getByLabel('Observaciones', { exact: true }).fill('Conservar mi captura');
-  await dialog.getByRole('button', { name: 'Actualizar compra', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
   await expect(dialog.getByRole('alert').filter({ hasText: /factura/i })).toBeVisible();
   await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue(
     'Conservar mi captura',
@@ -95,8 +98,8 @@ test('compras: rechazar una edición conserva captura y exige otro envío explí
   await expect(dialog.getByRole('cell', { name: 'Lona', exact: true })).toBeVisible();
   expect(attempts).toBe(1);
   expect(writes).toHaveLength(0);
-  await dialog.getByLabel('Número de factura', { exact: true }).fill('FAC-OTRA');
-  await dialog.getByRole('button', { name: 'Actualizar compra', exact: true }).click();
+  await dialog.getByLabel('Número de Factura', { exact: true }).fill('FAC-OTRA');
+  await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
   await expect(dialog).toBeHidden();
   expect(attempts).toBe(2);
   expect(writes).toHaveLength(1);
@@ -108,29 +111,41 @@ test('compras: consulta, corrección y cancelación explícita conservan el hist
 }) => {
   const { writes, reads } = await mockPurchases(page);
   await page.goto('/compras/materiales');
-  await page.getByRole('button', { name: 'Consultar compra', exact: true }).first().click();
-  const dialog = page.getByRole('dialog', { name: 'Consultar compra', exact: true });
-  await expect(dialog.getByRole('button', { name: 'Guardar compra', exact: true })).toHaveCount(0);
-  await dialog.getByRole('button', { name: 'Corregir partida', exact: true }).click();
-  const correction = page.getByRole('dialog', { name: 'Corregir partida', exact: true });
+  await page.getByRole('button', { name: 'Ver compra', exact: true }).first().click();
+  const dialog = page.getByRole('dialog', { name: 'Ver compra - Folio COM-001', exact: true });
+  await expect(dialog.getByRole('button', { name: 'Guardar', exact: true })).toHaveCount(0);
+  await dialog.getByRole('button', { name: 'Corregir detalle', exact: true }).click();
+  const correction = page.getByRole('dialog', { name: 'Corregir detalle de compra', exact: true });
   await expect(correction.getByRole('alert')).toHaveCount(0);
   await correction.getByLabel('Cantidad correcta', { exact: true }).fill('1');
-  await correction.getByRole('button', { name: 'Guardar corrección', exact: true }).click();
+  await expect(correction.getByLabel('Nuevos totales estimados')).toContainText('$116');
+  await correction.getByRole('button', { name: 'Corregir detalle', exact: true }).click();
+  const confirmation = page.getByRole('dialog', {
+    name: '¿Corregir detalle de compra?',
+    exact: true,
+  });
+  expect(writes).toHaveLength(0);
+  await confirmation.getByRole('button', { name: 'Cancelar', exact: true }).click();
+  await expect(correction).toBeVisible();
+  expect(writes).toHaveLength(0);
+  await correction.getByRole('button', { name: 'Corregir detalle', exact: true }).click();
+  await confirmation.getByRole('button', { name: 'Corregir detalle', exact: true }).click();
   await expect(correction).toBeHidden();
+  await expect(page.getByText('¡Compra actualizada exitosamente!', { exact: true })).toBeVisible();
   await expect(dialog).toBeVisible();
   expect(writes[0]!.url.pathname).toMatch(/\/details\/.*\/corrections$/);
   expect(writes[0]!.data).toEqual({ quantity: 1, costPerUnitType: 100 });
-  await dialog.getByRole('button', { name: 'Cancelar partida', exact: true }).click();
-  const confirm = page.getByRole('dialog', { name: 'Cancelar partida', exact: true });
+  await dialog.getByRole('button', { name: 'Cancelar detalle', exact: true }).click();
+  const confirm = page.getByRole('dialog', { name: '¿Cancelar detalle de compra?', exact: true });
   expect(writes).toHaveLength(1);
   await confirm.getByRole('button', { name: 'Cancelar', exact: true }).click();
   expect(writes).toHaveLength(1);
-  await dialog.getByRole('button', { name: 'Cancelar partida', exact: true }).click();
-  await confirm.getByRole('button', { name: 'Cancelar partida', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Cancelar detalle', exact: true }).click();
+  await confirm.getByRole('button', { name: 'Cancelar detalle', exact: true }).click();
   await expect(dialog.getByRole('cell', { name: 'Cancelada', exact: true })).toBeVisible();
   expect(writes).toHaveLength(2);
   expect(writes[1]!.data).toBeNull();
-  await expect(dialog.getByRole('button', { name: 'Corregir partida', exact: true })).toHaveCount(
+  await expect(dialog.getByRole('button', { name: 'Corregir detalle', exact: true })).toHaveCount(
     0,
   );
   expect(reads.filter((url) => !url.search)).toHaveLength(3);

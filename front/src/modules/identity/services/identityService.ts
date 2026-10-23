@@ -1,3 +1,4 @@
+import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
@@ -12,6 +13,14 @@ import type {
     PersonAccess,
     IdentityQuery,
 } from '../identity.js';
+
+const mutationCodes = {
+    persons: {
+        create: successCodeMessages.CREATED_PERSON,
+        edit: successCodeMessages.UPDATED_PERSON,
+    },
+    users: { create: successCodeMessages.CREATED_USER, edit: successCodeMessages.UPDATED_USER },
+} as const;
 
 const readAccesses = (value: unknown): PersonAccess[] => {
     if (!Array.isArray(value))
@@ -86,8 +95,8 @@ export const identityService = {
         });
         const expected =
             target.action === 'password'
-                ? 'UPDATED_USER_PASSWORD'
-                : `${target.action === 'create' ? 'CREATED' : 'UPDATED'}_${resource === 'persons' ? 'PERSON' : 'USER'}`;
+                ? successCodeMessages.UPDATED_USER_PASSWORD
+                : mutationCodes[resource][target.action];
         confirmMutation(result, expected);
     },
     async export(resource: IdentityResource, query: IdentityQuery, signal: AbortSignal) {

@@ -73,7 +73,7 @@ No equivale a las notificaciones instantáneas de la vista EJS.
   eventos; no conocen Axios, sesión ni persistencia.
 - `movementService` adapta los contratos existentes de Express, las identidades de
   opciones y las tres modalidades de exportación mediante el cliente Axios compartido.
-- `usePagedList`, `useListSearch`, `useFileExport`, `ListFilters`, `ServerTable` y
+- `usePagedList`, `useListSearch`, `useReportScope` sobre `useFileExport`, `ListFilters`, `ServerTable` y
   `useVisibleRefresh` se reutilizan con otros módulos. Los formatos numéricos de
   inventario e historial comparten `shared/utils/formatNumbers`.
 

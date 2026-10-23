@@ -290,3 +290,12 @@ principal sea nuevo. Extender la recuperación a estos procesos requiere un cont
 de clave conservada por captura, rechazo de otra captura con la misma clave y recibo
 en la misma transacción de sus efectos. La tabla `WasteOperation` no acredita esa
 cobertura para otros módulos.
+
+### Propietario de códigos de éxito
+
+`src/shared/constants/apiSuccessCodes.js` define `successCodeMessages` con los
+códigos existentes de las respuestas. Controllers y navegadores importan esas
+constantes desde el propietario público; `messages/codeMessages.js` conserva
+el mapa de errores. El cliente selecciona la constante esperada por operación
+y comprueba el código recibido; no lo construye por prefijos. El catálogo
+público `getSuccessMessage` conserva los textos de EJS para las notificaciones.

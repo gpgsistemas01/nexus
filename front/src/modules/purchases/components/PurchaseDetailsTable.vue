@@ -25,17 +25,27 @@ const money = [
     'grossPurchaseAmount',
 ] as const;
 const headers: DataTableHeader<PurchaseDetail>[] = [
-    { title: 'Artículo', key: 'name', nowrap: true },
-    { title: 'Base', key: 'base' },
-    { title: 'Altura', key: 'height' },
-    { title: 'Cantidad', key: 'quantity' },
+    { title: 'Material', key: 'name', nowrap: true },
+    {
+        title: 'Medidas',
+        children: [
+            { title: 'Base', key: 'base' },
+            { title: 'Altura', key: 'height' },
+        ],
+    },
+    { title: 'Compra', key: 'quantity' },
     { title: 'Presentación', key: 'presentation' },
-    { title: 'Cantidad convertida', key: 'convertedQuantity' },
-    { title: 'Unidad', key: 'unitMeasure' },
-    { title: 'Costo por conversión', key: 'conversionUnitCost' },
-    { title: 'Costo por presentación', key: 'costPerUnitType' },
-    { title: 'Importe neto', key: 'netPurchaseAmount' },
-    { title: 'Importe con IVA', key: 'grossPurchaseAmount' },
+    {
+        title: 'Conversión',
+        children: [
+            { title: 'Cantidad', key: 'convertedQuantity' },
+            { title: 'Unidad', key: 'unitMeasure' },
+        ],
+    },
+    { title: 'Costo Unitario de Conversión', key: 'conversionUnitCost' },
+    { title: 'Costo por Presentación', key: 'costPerUnitType' },
+    { title: 'Monto s/ IVA', key: 'netPurchaseAmount' },
+    { title: 'Monto c/ IVA', key: 'grossPurchaseAmount' },
     { title: 'Estado', key: 'status' },
     { title: 'Acciones', key: 'actions', sortable: false },
 ];
@@ -75,20 +85,20 @@ const headers: DataTableHeader<PurchaseDetail>[] = [
             <template #[`item.actions`]="{ item }">
                 <TableAction
                     v-if="item.isNew && canRemove"
-                    label="Quitar partida nueva"
+                    label="Quitar detalle nuevo"
                     icon="$delete"
                     :is-disabled="isDisabled"
                     @click="emit('remove', item.id)"
                 />
                 <template v-if="canChange && !item.isNew && item.status === 'ACTIVE'">
                     <TableAction
-                        label="Corregir partida"
+                        label="Corregir detalle"
                         icon="$edit"
                         :is-disabled="isDisabled"
                         @click="emit('correct', item)"
                     />
                     <TableAction
-                        label="Cancelar partida"
+                        label="Cancelar detalle"
                         icon="$delete"
                         color="error"
                         :is-disabled="isDisabled"

@@ -1,12 +1,14 @@
 import { onBeforeUnmount, ref } from 'vue';
 import { ApiError } from '../http/apiError.js';
 
-export const useFileExport = <Scope>(options: {
+export interface FileExportOptions<Scope> {
     canExport: () => boolean;
     request: (scope: Scope, signal: AbortSignal) => Promise<Blob>;
     filename: string;
     onDenied: (status: number) => void;
-}) => {
+}
+
+export const useFileExport = <Scope>(options: FileExportOptions<Scope>) => {
     const isExporting = ref(false);
     const exportError = ref('');
     let controller: AbortController | undefined;

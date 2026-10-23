@@ -14,7 +14,7 @@ import {
 } from '../../../services/warehouse/wasteIssues/wasteIssueService.js';
 import { returnWasteIssueDetail } from '../../../services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js';
 import { sanitizeEmptyStrings } from '../../../utils/formattersUtils.js';
-import { successCodeMessages } from '../../../messages/codeMessages.js';
+import { successCodeMessages } from '../../../shared/constants/apiSuccessCodes.js';
 import { emitInventoryUpdated } from '../../../utils/socketUtils.js';
 import { getIssueDataTableQuery } from '../../../utils/issueQueryUtils.js';
 

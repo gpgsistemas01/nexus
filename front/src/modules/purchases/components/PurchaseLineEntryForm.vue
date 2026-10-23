@@ -86,7 +86,7 @@ const emit = defineEmits<{
                 md="3"
             >
                 <VTextField
-                    label="Costo por presentación"
+                    label="Costo por Presentación"
                     type="number"
                     min="0"
                     step="0.000001"
@@ -104,7 +104,7 @@ const emit = defineEmits<{
             :disabled="isDisabled || !canRead"
             @click="emit('add')"
         >
-            Agregar partida
+            Agregar
         </VBtn>
     </section>
 </template>

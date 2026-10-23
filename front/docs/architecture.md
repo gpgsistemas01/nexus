@@ -321,3 +321,11 @@ transiciones conservan un coordinador propio. `app/pages/PurchaseWorkspace`
 compone las altas rápidas de proveedores y artículos mediante callbacks;
 Compras no importa las páginas privadas de esos módulos. La vista previa usa
 únicamente las reglas públicas; Express conserva stock y totales definitivos.
+
+La coordinación de reporte mensual/filtrado de Compras y Movimientos pertenece a
+`useReportScope`, que compone `useFileExport`; sus páginas conservan permisos,
+filtros y endpoints. Los códigos de éxito tienen un propietario público único
+en `shared/constants/apiSuccessCodes.js` del backend. Los adaptadores HTTP
+validan esos códigos mediante `confirmMutation`, sin construirlos con cadenas.
+`useRecordSave` propaga el resultado tipado confirmado al contenedor tras el
+guardado y conserva cancelación, errores y conflicto.

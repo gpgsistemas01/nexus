@@ -1,9 +1,9 @@
 import { onBeforeUnmount, ref } from 'vue';
 import { ApiError } from '../http/apiError.js';
 
-export const useRecordSave = (options: {
+export const useRecordSave = <Result = unknown>(options: {
     setErrors: (errors: Record<string, string>) => void;
-    onSaved: () => void;
+    onSaved: (result: Result) => void;
     onDenied: (status: number) => void;
     errorMessage?: string;
 }) => {
@@ -12,14 +12,16 @@ export const useRecordSave = (options: {
     const isConflicted = ref(false);
     const controller = new AbortController();
 
-    const execute = async (operation: (signal: AbortSignal) => Promise<unknown>) => {
+    const execute = async (operation: (signal: AbortSignal) => Promise<Result>) => {
         if (isSubmitting.value || isConflicted.value || controller.signal.aborted) return;
 
         isSubmitting.value = true;
         message.value = '';
 
+        let result: Result;
+
         try {
-            await operation(controller.signal);
+            result = await operation(controller.signal);
         } catch (cause) {
             if (controller.signal.aborted) return;
 
@@ -39,7 +41,7 @@ export const useRecordSave = (options: {
             isSubmitting.value = false;
         }
 
-        if (!controller.signal.aborted) options.onSaved();
+        if (!controller.signal.aborted) options.onSaved(result);
     };
 
     onBeforeUnmount(() => controller.abort());
@@ -48,6 +50,7 @@ export const useRecordSave = (options: {
         isSubmitting,
         isConflicted,
         execute,
+        signal: controller.signal,
         isDisposed: () => controller.signal.aborted,
     };
 };
