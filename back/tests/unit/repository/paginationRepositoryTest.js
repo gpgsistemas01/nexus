@@ -35,6 +35,28 @@ describe('lectura por bloques de exportación', () => {
     expect(model.count).not.toHaveBeenCalled();
   });
 
+  it.each([0, -1, 1.5, Infinity, '2'])('rechaza un tamaño de bloque inválido antes de consultar: %s', async (batchSize) => {
+    const fetchPage = vi.fn();
+    const iterator = findBatches({ query: {}, batchSize, fetchPage });
+    await expect(iterator.next()).rejects.toThrow('entero positivo');
+    expect(fetchPage).not.toHaveBeenCalled();
+  });
+
+  it('rechaza una consulta que omite el id requerido para avanzar', async () => {
+    const fetchPage = vi.fn().mockResolvedValue([{ name: 'Sin identidad' }]);
+    const iterator = findBatches({ query: {}, batchSize: 1, fetchPage });
+    await expect(iterator.next()).rejects.toThrow('seleccionar id');
+    expect(fetchPage).toHaveBeenCalledTimes(1);
+  });
+
+  it('interrumpe el reporte si el último id no avanza y no solicita un tercer bloque', async () => {
+    const fetchPage = vi.fn().mockResolvedValue([{ id: 'a' }]);
+    const iterator = findBatches({ query: {}, batchSize: 1, fetchPage });
+    expect((await iterator.next()).value).toEqual([{ id: 'a' }]);
+    await expect(iterator.next()).rejects.toThrow('avanzar el cursor');
+    expect(fetchPage).toHaveBeenCalledTimes(2);
+  });
+
   it('no consulta otro bloque si el consumidor cancela', async () => {
     const model = { findMany: vi.fn().mockResolvedValue([{ id: 'a' }]) };
     for await (const _batch of findBatches({ model, query: {}, batchSize: 1 })) break;

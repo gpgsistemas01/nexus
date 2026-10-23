@@ -130,6 +130,11 @@ Cambiar proveedor o búsqueda limpia la página anterior; la opción seleccionad
 mantiene su etiqueta visual aunque deje de estar en el resultado de búsqueda.
 Llegar al final dispara una sola solicitud pendiente. Un fallo conserva el catálogo
 cargado y permite repetir la página fallida, sin avanzar ni duplicar las opciones.
+El núcleo compartido elimina IDs repetidos dentro y entre páginas con un `Set`.
+La paginación cuenta las filas recibidas, no las opciones únicas; una respuesta
+vacía termina la carga aunque el servidor conserve un conteo antiguo. Cambiar
+búsqueda reinicia el reintento y cancela la consulta anterior; reintentar cancela
+el debounce para no duplicar solicitudes. Desmontar bloquea nuevas consultas.
 
 ## Propietarios y responsabilidades
 
@@ -197,9 +202,22 @@ No se importan controllers, servicios privados ni Prisma en las pruebas de Vue.
 La importación de validadores públicos por sus alias reutiliza una fuente de
 reglas; no ejecuta el backend dentro del frontend.
 
+Las reglas de texto plano compartidas rechazan marcado y controles no imprimibles,
+incluido NUL, y conservan saltos de línea y tabulaciones en observaciones. Vue muestra
+nombres y errores mediante interpolación; no se usa `v-html` ni se almacenan entidades
+HTML para sustituir el escape de salida. La validación del navegador ayuda a capturar;
+Express vuelve a validar tipos, límites y permisos antes de persistir. Las contraseñas
+no se recortan. El contrato de entrada y salida del servidor se mantiene en
+[el estándar de seguridad](../../back/docs/architecture/coding-standards/09-errors-security-audit-and-logging.md#entradas-normalización-y-salida).
+
 La estrategia y sus condiciones observables están en [tooling.md](tooling.md).
 
 ## Reutilización con Catálogos
+
+La [guía de entradas y salida segura](input-security.md) distingue normalización,
+validación y escape, documenta SweetAlert2 como texto y enlaza los controles del
+servidor. Los patrones de composición y la evaluación SOLID están en
+[patrones Vue](patterns.md).
 
 El [módulo de Catálogos](catalogs.md) usa EditorDialog y ServerTable, extraídos del
 editor y la tabla de inventario. Sus slots conservan los campos y celdas propios

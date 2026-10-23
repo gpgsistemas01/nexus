@@ -53,5 +53,5 @@ const menuButton = {
 </div>
 
 <script>
-    window.meta = <%- JSON.stringify(user || {}) %>;
+    window.meta = <%- serializeScriptData(user || {}) %>;
 </script>

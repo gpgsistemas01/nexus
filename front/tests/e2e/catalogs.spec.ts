@@ -1,6 +1,19 @@
 import { expect, test } from '@playwright/test';
 import { catalogs, entryId, mockCatalogs } from './catalogFixtures.js';
 
+test('catálogos: los nombres recibidos se muestran como texto sin crear HTML', async ({ page }) => {
+  const { store } = await mockCatalogs(page);
+  const name = '<img data-injected src=x onerror="window.__nexusInjected=true">';
+  store.set('roles', [{ id: entryId, name, isActive: true, version: 7 }]);
+  await page.goto('/catalogos/roles');
+  await expect(page.getByRole('cell', { name, exact: true })).toBeVisible();
+  await expect(page.locator('[data-injected]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Editar registro', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Nombre', exact: true })).toHaveValue(name);
+  await expect(page.locator('[data-injected]')).toHaveCount(0);
+  expect(await page.evaluate(() => Reflect.get(window, '__nexusInjected'))).toBeUndefined();
+});
+
 test('catálogos: navegación Vue, seis rutas y cuenta con acceso exclusivo a catálogos', async ({
   page,
 }) => {

@@ -19,7 +19,10 @@ export const MIN_STOCK_INPUT_FORMAT = Object.freeze({
 
 export const UUID_V4_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export const PERSON_NAME_PATTERN = /^[\p{L}0-9]+(?:[ '\-.,:;()¿?¡!][\p{L}0-9]+)*[.,:;()¿?¡!]*$/u;
-export const TEXT_INPUT_PATTERN = /^[^<>\\{}[\]]+$/u;
+// Texto plano: conservar tabulaciones/saltos de línea, rechazar controles no imprimibles.
+export const TEXT_INPUT_PATTERN = /^[^<>\\{}[\]\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]+$/u;
+// Código de una sola línea: no restringe sus signos, pero no admite controles.
+export const PROJECT_NUMBER_PATTERN = /^[^\u0000-\u001F\u007F]+$/u;
 export const ISO_DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(Z|[+-]\d{2}:\d{2})?)?$/;
 export const BOOLEAN_INPUT_VALUES = Object.freeze([true, false, 1, 0, 'true', 'false', '1', '0']);
 

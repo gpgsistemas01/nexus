@@ -17,6 +17,12 @@
 | Transporte del navegador | Renovación coordinada y reintento acotado | `axiosInstanceApi.js`, `refreshRequest` y `_retry`. |
 | Pruebas | Test harness configurable | `createControllerTestApp` registra sólo las rutas necesarias para probar controllers con Supertest. |
 
+La [evaluación SOLID](16-solid-principles.md) distingue principios de estos patrones,
+con evidencia y límites por letra. Los patrones del frontend Vue y su diagrama
+pertenecen a [su guía de diseño](../../../../../../front/docs/patterns.md); esta
+colección también conserva mecanismos del navegador EJS y no los presenta como
+composables Vue.
+
 Las constantes compartidas forman parte de estas fronteras de construcción: modos de
 formulario, estados y selectores se importan desde su módulo propietario. Las reglas
 y los identificadores comunes viven en `src/shared`; los específicos de servidor o

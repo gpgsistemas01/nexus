@@ -2,7 +2,8 @@ import {
     FORM_FIELD_LIMITS,
     MIN_STOCK_INPUT_FORMAT,
     MONEY_INPUT_FORMAT,
-    PERSON_NAME_PATTERN
+    PERSON_NAME_PATTERN,
+    PROJECT_NUMBER_PATTERN
 } from '../../../../shared/constants/inputValidation.js';
 import { isEmptyOrNull } from "./baseValidations.js";
 import { isRollPresentation } from '../../../../shared/inventory/wasteMeasurements.js';
@@ -181,7 +182,7 @@ export const issueHeaderValidation = {
         name: value,
         length: FORM_FIELD_LIMITS.PROJECT_NUMBER,
         fieldName: 'El número de proyecto',
-        regex: /^[\s\S]+$/u
+        regex: PROJECT_NUMBER_PATTERN
     }),
     advisorId: (value) => validateUUID(value, 'El asesor'),
     clientId: (value) => validateUUID(value, 'El cliente'),

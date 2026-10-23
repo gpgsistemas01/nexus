@@ -1,11 +1,16 @@
-const DEFAULT_PAGE_LENGTH = 10;
+import { DATA_TABLE_PAGING } from '../constants/pagination.js';
+
 const ORDER_DIRECTIONS = new Set(['asc', 'desc']);
 
 const parseInteger = (value, fallback) => {
 
-    const parsed = Number.parseInt(value, 10);
+    if (typeof value !== 'string' && typeof value !== 'number') return fallback;
 
-    return Number.isNaN(parsed) ? fallback : parsed;
+    if (typeof value === 'string' && !/^-?\d+$/.test(value.trim())) return fallback;
+
+    const parsed = Number(value);
+
+    return Number.isSafeInteger(parsed) ? parsed : fallback;
 };
 
 const getFirstOrder = (query = {}) => {
@@ -19,10 +24,15 @@ const getFirstOrder = (query = {}) => {
 
 const resolveFallbackColumn = (columns = []) => columns.find(Boolean);
 
-export const getDataTablePaging = (query = {}) => ({
-    skip: Math.max(parseInteger(query.start, 0), 0),
-    take: Math.max(parseInteger(query.length, DEFAULT_PAGE_LENGTH), 0)
-});
+export const getDataTablePaging = (query = {}) => {
+    const start = parseInteger(query.start, 0);
+    const length = parseInteger(query.length, DATA_TABLE_PAGING.DEFAULT_LENGTH);
+
+    return {
+        skip: start >= 0 && start <= DATA_TABLE_PAGING.MAX_START ? start : 0,
+        take: Math.min(Math.max(length, 0), DATA_TABLE_PAGING.MAX_LENGTH)
+    };
+};
 
 export const getDataTableSearch = (query = {}) => {
 

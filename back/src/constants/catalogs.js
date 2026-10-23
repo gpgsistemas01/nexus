@@ -14,3 +14,6 @@ export const MANAGED_CATALOGS = Object.freeze(Object.fromEntries(
 ));
 
 export const MANAGED_CATALOG_NAMES = Object.freeze(Object.keys(MANAGED_CATALOGS));
+
+export const findManagedCatalog = name => Object.hasOwn(MANAGED_CATALOGS, name)
+    ? MANAGED_CATALOGS[name] : undefined;

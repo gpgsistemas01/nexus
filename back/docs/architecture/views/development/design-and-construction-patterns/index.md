@@ -35,6 +35,7 @@ fuente. Las secuencias de procesos complementan la explicación temporal.
 13. [13. Orden de métodos por comportamiento](13-order-of-methods-by-behavior.md)
 14. [14. Patrones de construcción de pruebas](14-patterns-of-construction-of-tests.md)
 15. [15. Mantenimiento](15-maintenance.md)
+16. [16. Principios SOLID en funciones y módulos](16-solid-principles.md)
 
 ## Cobertura visual
 
@@ -60,6 +61,8 @@ la colaboración que ya explica el diagrama enlazado.
 | Reutilización de transporte, tablas y servicios | [Requests, interfaz y servicios](../reuse-and-refactoring/index.md) | [Resultado de la revisión](../reuse-and-refactoring/04-refactoring-and-extension.md#resultado-de-la-revisión-de-cobertura-visual) |
 | Refactorización y extracción | [`DIA-PAT-REF-001`](../reuse-and-refactoring/04-refactoring-and-extension.md) | [Resultado vigente y criterios](../reuse-and-refactoring/04-refactoring-and-extension.md) |
 | Renovación coordinada de sesión | [`DIA-FE-TEC-SES-001`](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http) | [Transporte HTTP compartido](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http) |
+| Responsabilidades y sustitución funcional | [`DIA-SOLID-LECT-001`](16-solid-principles.md#colaboradores-de-lectura-y-contrato-de-sustitución) | [Evaluación SOLID](16-solid-principles.md); son principios, no otro patrón. |
+| Entradas y salida segura | [`DIA-SEC-FRO-001`](../../../coding-standards/09-errors-security-audit-and-logging.md#fronteras-de-una-escritura-de-formulario) | [Estándar de seguridad](../../../coding-standards/09-errors-security-audit-and-logging.md) y [patrones Vue](../../../../../../front/docs/patterns.md). |
 
 Cada explicación conecta problema, implementación, contrato, configuradores, consumidores
 y límites. La refactorización tiene una representación de extracción y una guía de

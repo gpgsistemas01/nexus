@@ -74,14 +74,11 @@ consultar la base por cada elemento ni alterar el orden del historial.
 
 ## Límites que siguen necesitando diseño o carga representativa
 
-- El selector de plantillas aún lee la familia completa antes de paginar. Llevar esa
-  agrupación a SQL exige conservar las reglas de identidad y costo máximo.
-- Los listados de documentos incluyen detalles para el contrato actual del navegador.
-  Una compra grande genera una respuesta grande; cargar el detalle al abrir el modal
-  requiere modificar ese contrato y su consumidor.
-- Las exportaciones consultan hasta 100.000 documentos o movimientos. El escritor libera las
-  filas conforme las confirma, pero los reportes distintos de inventario todavía
-  consultan y preparan sus filas completas. La generación de XML sigue usando CPU
+- La agrupación de plantillas se pagina en SQL y los documentos consultan detalles
+  mediante su GET por id, como se describe en las correcciones posteriores. Una
+  compra individual grande todavía puede generar una respuesta de detalle grande.
+- Las exportaciones recorren lotes sin el límite anterior de 100.000 filas; cada
+  lote de documentos carga sus detalles. La generación de XML sigue usando CPU
   del hilo principal, con pausas periódicas para permitir I/O; no equivale a un worker.
   Los temporales requieren espacio escribible en el directorio temporal del sistema.
   No se truncan resultados ni se cambia el contrato

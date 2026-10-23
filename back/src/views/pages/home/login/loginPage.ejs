@@ -52,7 +52,7 @@
 </section>
 
 <script>
-    window.FLASH_MESSAGE = <%- JSON.stringify(flash) %>;
+    window.FLASH_MESSAGE = <%- serializeScriptData(flash) %>;
 </script>
 <script type="module" src="/js/pages/home/login/loginForm.js"></script>
 

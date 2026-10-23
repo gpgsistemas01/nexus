@@ -60,3 +60,23 @@ Esta colección conserva el mapa de fronteras y las colaboraciones compartidas; 
 mantiene otra matriz de casos ni duplica secuencias. Para un cambio de implementación
 se revisa la frontera afectada aquí y el recorrido exacto en procesos. El código y las
 pruebas sustentan el dibujo; la figura no amplía su cobertura por sí misma.
+
+### 5.4 Responsabilidad y organización
+
+La separación de responsabilidades es parte de la arquitectura. Crear carpetas no
+garantiza esa separación: cada módulo debe tener un motivo concreto para cambiar.
+
+| Pieza | Responsabilidad y límite |
+| --- | --- |
+| Router y middleware | Declarar endpoints y aplicar autenticación, permisos y validación. |
+| Validator | Verificar captura y normalizar su tipo antes del controller; no consultar existencia o estado del registro. |
+| DTO | Seleccionar y adaptar campos permitidos; no acceder a HTTP ni a la base. `catalogDTO.js` recibe la configuración confiable y normaliza las capturas de los seis catálogos. |
+| Controller | Adaptar petición/respuesta y delegar; no calcular reglas ni construir consultas. |
+| Servicio | Resolver el caso, invariantes y transacciones. Puede comprobar invariantes ante llamadas internas y usar `getDb(tx)`; una consulta específica no exige crear un repository que sólo la reenvíe. |
+| Repository | Encapsular consultas reutilizables, versiones y paginación; no decidir mensajes HTTP. |
+| Vista y serializador de salida | Escapar según HTML, atributo o JSON en script, sin modificar los datos persistidos. |
+
+En Vue, la page coordina el caso, el composable conserva comportamiento reactivo,
+el servicio adapta HTTP y los componentes reciben props y emiten eventos. Los
+límites verificados con ESLint y los criterios para compartir código se mantienen en
+[la arquitectura del frontend](../../../../../../front/docs/architecture.md).

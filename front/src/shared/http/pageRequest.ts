@@ -17,8 +17,10 @@ export const requestPage = async (
     if (
         !Array.isArray(page.data) ||
         !page.data.every(isRecord) ||
-        !Number.isFinite(page.recordsFiltered) ||
-        !Number.isFinite(page.recordsTotal)
+        !Number.isSafeInteger(page.recordsFiltered) ||
+        page.recordsFiltered < 0 ||
+        !Number.isSafeInteger(page.recordsTotal) ||
+        page.recordsTotal < 0
     ) {
         throw new ApiError('El servidor devolvió un listado inesperado.');
     }

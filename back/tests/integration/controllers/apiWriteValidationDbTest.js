@@ -159,6 +159,22 @@ describe('identificadores de ruta resueltos por el servicio y errores de captura
     expect(await readState()).toEqual(initialState);
   });
 
+  it.each(['goods-issues/materials', 'goods-issues/consumables', 'waste-issues'])(
+    '%s rechaza controles en el número de proyecto sin escribir (CP-INT-VAL-007)', async resource => {
+      const response = await request(app).post(`/api/warehouse/${resource}`).set('Cookie', cookie).send({
+        advisorId: relationId, clientId: relationId, departmentId: relationId, requesterId: relationId,
+        projectNumber: 'A\u0000B', requestDate: '2026-10-23T12:00:00Z',
+        details: [resource === 'waste-issues'
+          ? { wasteId: relationId, quantity: 1 }
+          : { materialId: relationId, supplierId: relationId, quantity: 1 }]
+      }).expect(400);
+      expect(response.body).toMatchObject({
+        code: 'VALIDATION_ERROR', errors: { projectNumber: { code: 'PROJECT_NUMBER_INVALID_FORMAT' } }
+      });
+      expect(await readState()).toEqual(initialState);
+    }
+  );
+
   it('rechaza una fecha imposible de recepción antes de resolver personas o proveedor (DP-VAL-004)', async () => {
     const response = await request(app).post('/api/warehouse/goods-receipts/materials').set('Cookie', cookie).send({
       supplierId: relationId, receivedById: relationId, isInvoiced: false,

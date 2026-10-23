@@ -5,6 +5,7 @@ import {
     FORM_FIELD_LIMITS,
     ISO_DATE_TIME_PATTERN,
     PERSON_NAME_PATTERN,
+    PROJECT_NUMBER_PATTERN,
     TEXT_INPUT_PATTERN,
     UUID_V4_PATTERN
 } from '../../shared/constants/inputValidation.js';
@@ -114,7 +115,8 @@ export const validateProjectNumber = (fieldName) => {
     return requireValue(body(fieldName), errors.REQUIRED)
         .isString().withMessage(errors.INVALID_TYPE).bail()
         .trim()
-        .isLength({ max: FORM_FIELD_LIMITS.PROJECT_NUMBER }).withMessage(errors.TOO_LONG)
+        .isLength({ max: FORM_FIELD_LIMITS.PROJECT_NUMBER }).withMessage(errors.TOO_LONG).bail()
+        .matches(PROJECT_NUMBER_PATTERN).withMessage(errors.INVALID_FORMAT)
 }
 
 const hasValue = value => value !== undefined && value !== null && value !== '';

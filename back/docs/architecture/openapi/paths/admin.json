@@ -592,18 +592,23 @@
           "name": "start",
           "in": "query",
           "required": false,
+          "description": "Desplazamiento entero. Inválido o fuera de rango se normaliza a 0.",
           "schema": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": 0
           }
         },
         {
           "name": "length",
           "in": "query",
           "required": false,
+          "description": "Tamaño de página; valores superiores se limitan a 100. Cero devuelve sólo conteos. Inválido usa 10; negativo se normaliza a 0.",
           "schema": {
             "type": "integer",
             "minimum": 0,
+            "maximum": 100,
             "default": 10
           }
         },

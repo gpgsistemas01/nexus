@@ -6,6 +6,12 @@ servicio. Un DTO no contiene autorización ni reemplaza validadores o reglas de 
 Se reutiliza uno existente cuando dos endpoints aceptan el mismo contrato; no se fuerza
 si una mutación especializada necesita campos o semántica diferentes.
 
+En catálogos, el servicio resuelve primero la configuración confiable y llama al
+DTO puro `createCatalogEntryDto` para seleccionar y normalizar campos propios;
+el DTO no conoce HTTP ni Prisma. La normalización no sustituye la validación del
+middleware ni las invariantes del servicio. El [estándar de seguridad](../../../coding-standards/09-errors-security-audit-and-logging.md#qué-significa-sanitizar-en-este-proyecto)
+distingue además el escape de salida y la sanitización de contenido HTML.
+
 La autorización se construye como una tabla inmutable: una clave de `PERMISSIONS` apunta
 a roles y departamentos en `AUTHORIZATION_POLICIES`. `createPolicy` congela la
 configuración y `getGrantedPermissions` la evalúa para los accesos de la sesión. Es una

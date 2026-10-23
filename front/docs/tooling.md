@@ -334,3 +334,33 @@ casos existentes; no se sustituyen por pruebas que fijen clases CSS o copien los
 colores de la implementación. La revisión visual de escritorio y 320/390 px
 comprueba presentación, subencabezados, filas de stock bajo y ausencia de
 recortes globales. Las respuestas HTTP se simulan y no demuestran persistencia.
+
+
+## Crecimiento de catálogos y fronteras arquitectónicas
+
+| Diseño | Riesgo / técnica | Condición y oráculo |
+| --- | --- | --- |
+| `DP-VUE-LOOKUP-001` | Cargas interminables y opciones duplicadas al cambiar un catálogo; transiciones entre páginas | `remoteLookupTest.ts`: páginas con IDs repetidos avanzan por filas recibidas; una página vacía con conteo antiguo desactiva más carga; un error se reintenta en la misma página y no adelanta el contador. `warehouse.spec.ts` verifica en navegador tres solicitudes (0/20/40), opciones únicas, selección conservada y fin del indicador con conteo antiguo. |
+| `DP-VUE-LOOKUP-002` | Consultas fuera de contexto; transiciones búsqueda/reintento, permiso y desmontaje | `remoteLookupTest.ts`: buscar reinicia reintento a página 1, reintentar cancela debounce, deshabilitar limpia el error y desmontar cancela/bloquea callbacks posteriores. Las pruebas existentes de proveedor y respuestas tardías siguen en `remoteOptionsTest.ts` y `movementFiltersTest.ts`. |
+| `DP-VUE-PAGE-001` | Conteos inválidos usados en paginación; fronteras cero/negativo/fraccionario/entero no seguro | `pageRequestTest.ts`: cero conserva un listado vacío válido; los conteos inválidos rechazan el contrato en el adaptador HTTP y no se presentan como páginas válidas. |
+
+`npm run lint` mantiene las fronteras de imports estáticos de `shared`, presentación,
+servicios y mappers. La revisión comprueba también ejemplos permitidos (contratos
+públicos y transporte compartido) y rechazados (estado de módulos en shared,
+Vue/Router/componentes en servicios y mappers) con la configuración real de ESLint.
+No se añaden pruebas de tiempo con umbrales de rendimiento ni se atribuye a estos
+casos una capacidad de usuarios concurrentes. Las pruebas de navegador simulan la API.
+
+## Seguridad de texto y avisos
+
+| Diseño | Riesgo / técnica | Condición y oráculo |
+| --- | --- | --- |
+| `DP-VUE-SEC-001` | Un aviso interpreta el nombre/error como HTML; particiones título/descripción/error | `feedbackTest.ts` usa SweetAlert2 real en jsdom con `<img data-injected ...>`: conserva título y texto, no crea el nodo, un error no confirma la eliminación y se cierra al cancelar. El aviso de éxito también conserva el mensaje como texto. |
+| `DP-VUE-SEC-002` | Datos antiguos/externos ejecutan marcado pese a validar el alta actual; particiones salida de tabla/valor de formulario | `catalogs.spec.ts` recibe un nombre con `img` y `onerror`; Chromium muestra el texto exacto, precarga el mismo valor al editar, no crea el elemento y no asigna la variable del manejador. API simulada, sin escritura. |
+
+Las reglas de proyecto compartidas se verifican en `formValidationParityTest.js` y
+los tres endpoints reales de salidas se cubren con `CP-INT-VAL-007`. El navegador no
+decide que una captura sea segura para persistir. El contrato y los patrones están
+en [entradas y salida segura](input-security.md) y [patrones/SOLID](patterns.md).
+ESLint mantiene `vue/no-v-html` como error; esta regla no certifica ausencia de todos
+los posibles usos inseguros del DOM ni sustituye revisar las opciones de un plugin.

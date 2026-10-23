@@ -105,14 +105,21 @@ describe('catalogService', () => {
     });
   });
 
-  it('rejects unknown catalogs before accessing Prisma', async () => {
-    await expect(updateCatalogEntry('users', 'user-1', { name: 'No permitido' }))
+  it.each(['users', '__proto__', 'constructor', 'toString'])('rejects unknown catalog %s before accessing Prisma', async catalog => {
+    await expect(updateCatalogEntry(catalog, 'user-1', { name: 'No permitido' }))
       .rejects.toMatchObject({
         code: 'CATALOG_NOT_FOUND',
         statusCode: 404,
-        message: 'El catálogo users no está disponible',
-        meta: { catalogName: 'users' }
+        message: `El catálogo ${catalog} no está disponible`,
+        meta: { catalogName: catalog }
       });
+  });
+
+  it('counts Unicode characters consistently with HTTP validation and PostgreSQL', async () => {
+    const data = { name: '🙂'.repeat(20), symbol: 'm', isActive: true };
+    database.unitMeasure.create.mockResolvedValue({ id: 'unit-1', ...data });
+    await expect(createCatalogEntry('unit-measures', data)).resolves.toMatchObject(data);
+    expect(database.unitMeasure.create).toHaveBeenCalledWith({ data });
   });
 
   it('rejects values with a type outside the catalog contract', async () => {

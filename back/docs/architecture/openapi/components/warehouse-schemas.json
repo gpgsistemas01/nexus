@@ -1042,7 +1042,10 @@
       },
       "projectNumber": {
         "type": "string",
-        "maxLength": 10
+        "minLength": 1,
+        "maxLength": 10,
+        "pattern": "^[^\\u0000-\\u001F\\u007F]+$",
+        "description": "Texto de proyecto tras recortar extremos; admite signos, sin caracteres de control internos. No se eliminan controles para aceptar la captura."
       },
       "requestDate": {
         "type": "string",
@@ -1088,7 +1091,10 @@
       },
       "projectNumber": {
         "type": "string",
-        "maxLength": 10
+        "minLength": 1,
+        "maxLength": 10,
+        "pattern": "^[^\\u0000-\\u001F\\u007F]+$",
+        "description": "Texto de proyecto tras recortar extremos; admite signos, sin caracteres de control internos. No se eliminan controles para aceptar la captura."
       },
       "requestDate": {
         "type": "string",
@@ -1173,7 +1179,10 @@
       },
       "projectNumber": {
         "type": "string",
-        "maxLength": 10
+        "minLength": 1,
+        "maxLength": 10,
+        "pattern": "^[^\\u0000-\\u001F\\u007F]+$",
+        "description": "Texto de proyecto tras recortar extremos; admite signos, sin caracteres de control internos. No se eliminan controles para aceptar la captura."
       },
       "requestDate": {
         "type": "string",

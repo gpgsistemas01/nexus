@@ -12,6 +12,8 @@ const functionStatement = {
     ].join(', '),
 };
 
+const applicationImportPaths = ['**/modules/**', '**/app/**'];
+
 export default tseslint.config(
     { ignores: ['dist/**', 'coverage/**', 'build/**', 'test-results/**', 'node_modules/**'] },
     js.configs.recommended,
@@ -53,6 +55,7 @@ export default tseslint.config(
     {
         files: ['**/*.vue'],
         rules: {
+            'vue/no-v-html': 'error',
             'vue/component-api-style': ['error', ['script-setup']],
             'vue/block-tag-newline': ['error', { singleline: 'always', multiline: 'always' }],
             'vue/padding-line-between-blocks': ['error', 'always'],
@@ -66,6 +69,50 @@ export default tseslint.config(
         },
     },
     {
+        files: ['src/shared/**/*.{ts,vue}'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: applicationImportPaths,
+                            message:
+                                'shared no depende de módulos ni de app; recibe contratos y callbacks desde el consumidor.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ['src/modules/**/services/**/*.ts', 'src/modules/**/mappers/**/*.ts'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: [
+                                'vue',
+                                'vue-router',
+                                'vuetify',
+                                'vuetify/**',
+                                '**/pages/**',
+                                '**/components/**',
+                                '**/composables/**',
+                                '**/app/**',
+                                '**/auth/session.js',
+                            ],
+                            message:
+                                'Servicios y mappers adaptan datos; no dependen del renderizado, navegación ni estado de componentes.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
         files: ['src/**/components/**/*.vue'],
         rules: {
             'no-restricted-imports': [
@@ -74,6 +121,7 @@ export default tseslint.config(
                     patterns: [
                         {
                             group: [
+                                ...applicationImportPaths,
                                 'axios',
                                 'pinia',
                                 'vee-validate',

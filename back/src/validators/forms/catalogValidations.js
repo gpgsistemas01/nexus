@@ -1,4 +1,4 @@
-import { MANAGED_CATALOGS } from '../../constants/catalogs.js';
+import { findManagedCatalog } from '../../constants/catalogs.js';
 import { validateRecordVersion } from '../fields/versionValidator.js';
 import {
     validateBoolean,
@@ -6,15 +6,15 @@ import {
 } from '../fields/fieldsValidator.js';
 
 const isCatalog = catalogName => (_, { req }) => req.params.catalog === catalogName;
-const catalogHasField = fieldName => (_, { req }) => MANAGED_CATALOGS[req.params.catalog]
+const catalogHasField = fieldName => (_, { req }) => findManagedCatalog(req.params.catalog)
     ?.fields.includes(fieldName);
-const getCatalogMaxLength = fieldName => req => MANAGED_CATALOGS[req.params.catalog]?.maxLengths[fieldName];
+const getCatalogMaxLength = fieldName => req => findManagedCatalog(req.params.catalog)?.maxLengths[fieldName];
 
 export const catalogEntryValidation = [
     validateText({
         fieldName: 'name',
         maxLength: getCatalogMaxLength('name'),
-        condition: (_, { req }) => Boolean(MANAGED_CATALOGS[req.params.catalog])
+        condition: (_, { req }) => Boolean(findManagedCatalog(req.params.catalog))
     }),
     validateText({
         fieldName: 'symbol',

@@ -98,9 +98,9 @@ describe('validación HTTP de catálogos administrables', () => {
     expect(result.body).toEqual({ name: 'Operador', isActive: false, symbol: ['no corresponde'] });
   });
 
-  it('delega al servicio la resolución de un catálogo no administrable', async () => {
+  it.each(['unknown', '__proto__', 'constructor', 'toString'])('delega al servicio la resolución del catálogo no administrable %s', async catalog => {
     const body = { name: ['no corresponde'], isActive: ['no corresponde'] };
-    const result = await runValidation({ catalog: 'unknown', body: { ...body } });
+    const result = await runValidation({ catalog, body: { ...body } });
 
     expect(result.errors).toEqual([]);
     expect(result.body).toEqual(body);

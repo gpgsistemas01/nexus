@@ -13,46 +13,62 @@ export const useRemoteLookup = (
     const error = ref('');
     const search = ref('');
     const page = ref(1);
-    const total = ref(0);
-    const hasMore = computed(() => items.value.length < total.value);
+    const hasMore = ref(false);
+    let recordsRead = 0;
     let controller: AbortController | null = null;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let sequence = 0;
     let requestedPage = 1;
+    let isDisposed = false;
+
+    const resetOptions = () => {
+        items.value = [];
+        recordsRead = 0;
+        hasMore.value = false;
+        error.value = '';
+        page.value = 1;
+        requestedPage = 1;
+    };
 
     const load = async (nextPage = 1) => {
+        if (isDisposed) return;
+
+        clearTimeout(timer);
         const requestId = ++sequence;
         requestedPage = nextPage;
         controller?.abort();
 
         if (!isEnabled.value) {
-            items.value = [];
-            total.value = 0;
+            resetOptions();
             isLoading.value = false;
             return;
         }
 
-        controller = new AbortController();
+        const requestController = new AbortController();
+        controller = requestController;
         isLoading.value = true;
         error.value = '';
 
         try {
-            const result = await request(search.value, nextPage, controller.signal);
+            const result = await request(search.value, nextPage, requestController.signal);
             if (requestId !== sequence) return;
 
-            items.value =
-                nextPage === 1
-                    ? result.data
-                    : [
-                          ...items.value,
-                          ...result.data.filter(
-                              (item) => !items.value.some((old) => old.id === item.id),
-                          ),
-                      ];
+            const previous = nextPage === 1 ? [] : items.value;
+            const seen = new Set(previous.map((item) => item.id));
+            const additions = result.data.filter((item) => {
+                if (seen.has(item.id)) return false;
+
+                seen.add(item.id);
+                return true;
+            });
+            items.value = [...previous, ...additions];
+            recordsRead = (nextPage === 1 ? 0 : recordsRead) + result.data.length;
             page.value = nextPage;
-            total.value = result.recordsFiltered;
+            // El avance depende de las filas recibidas, aunque se repitan IDs.
+            // Una página vacía termina la carga incluso si el conteo quedó desactualizado.
+            hasMore.value = result.data.length > 0 && recordsRead < result.recordsFiltered;
         } catch (cause) {
-            if (requestId === sequence && !controller.signal.aborted)
+            if (requestId === sequence && !requestController.signal.aborted)
                 error.value =
                     cause instanceof Error ? cause.message : 'No se pudo cargar el catálogo.';
         } finally {
@@ -63,23 +79,19 @@ export const useRemoteLookup = (
     watch(
         [isEnabled, ...(dependency ? [dependency] : [])],
         () => {
-            clearTimeout(timer);
             search.value = '';
-            items.value = [];
-            total.value = 0;
-            page.value = 1;
+            resetOptions();
             void load();
         },
         { immediate: true },
     );
 
     const updateSearch = (value: string) => {
-        if (value === search.value) return;
+        if (isDisposed || value === search.value) return;
 
         search.value = value;
-        items.value = [];
-        total.value = 0;
-        page.value = 1;
+        resetOptions();
+        isLoading.value = false;
         clearTimeout(timer);
         // Invalidar inmediatamente, incluso durante el debounce.
         ++sequence;
@@ -90,9 +102,11 @@ export const useRemoteLookup = (
     };
 
     onBeforeUnmount(() => {
+        isDisposed = true;
         ++sequence;
         clearTimeout(timer);
         controller?.abort();
+        isLoading.value = false;
     });
     const state = computed<LookupState>(() => ({
         items: items.value,

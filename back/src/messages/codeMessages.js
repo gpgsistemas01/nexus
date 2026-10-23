@@ -86,6 +86,7 @@ export const errorMap = {
     projectNumber: {
         REQUIRED: 'PROJECT_NUMBER_REQUIRED',
         INVALID_TYPE: 'PROJECT_NUMBER_INVALID_TYPE',
+        INVALID_FORMAT: 'PROJECT_NUMBER_INVALID_FORMAT',
         TOO_LONG: 'PROJECT_NUMBER_TOO_LONG'
     },
     advisorId: {

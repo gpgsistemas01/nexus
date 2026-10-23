@@ -35,6 +35,19 @@ cubiertas y detecta tanto rutas ausentes como definiciones obsoletas.
 
 ## Reglas contractuales complementarias
 
+### Paginación de listados
+
+Los listados y selectores que usan `getDataTablePaging` admiten `start` entero entre
+`0` y `2147483647`, y `length` entero entre `0` y `100`, con longitud predeterminada
+`10`. Un tamaño superior se limita a `100`; uno negativo se normaliza a `0`.
+`length=0` conserva los conteos sin consultar filas. Arrays, objetos, fracciones,
+sufijos como `25abc` y enteros no representables con seguridad usan el valor por
+defecto; un desplazamiento fuera de rango vuelve a `0`.
+
+El consumidor avanza con el tamaño realmente recibido. Este límite no se aplica a
+las exportaciones XLSX: sus repositorios recorren lotes internos, sin truncar el
+reporte a la longitud de una página HTTP.
+
 ### Errores globales y códigos públicos
 
 Los errores globales conservan un `code` estable para que la interfaz y soporte
@@ -87,6 +100,16 @@ aplicados al listado; así no se mezclan un periodo calendario completo y un rep
 filtrado. El selector reutiliza los mismos tokens visuales y estados habilitado, enfocado
 y deshabilitado de los campos de formulario; así el periodo permanece legible dentro
 del modal sin introducir una variante de estilo exclusiva para la exportación.
+
+### Captura del número de proyecto
+
+Las reglas de captura y de salida segura se mantienen en
+[el estándar de seguridad](../coding-standards/09-errors-security-audit-and-logging.md#qué-significa-sanitizar-en-este-proyecto).
+El número de proyecto es texto de hasta 10 caracteres, recortado en los extremos y
+sin caracteres de control internos; conserva sus signos permitidos. Un control
+inválido devuelve `PROJECT_NUMBER_INVALID_FORMAT` por campo, sin eliminarlo para
+aceptar otra referencia. Sus tres contratos de escritura se definen en
+`components/warehouse-schemas.json`.
 
 ### Precisión de valores decimales
 

@@ -94,6 +94,10 @@ un contrato explícito.
 No se impone Atomic Design, una arquitectura hexagonal completa ni un bus global
 de eventos. Agregar carpetas y capas no sustituye responsabilidades claras.
 
+La [guía de patrones y SOLID](patterns.md) documenta los consumidores reales,
+el diagrama de dependencias y los límites de cada principio. El tratamiento de
+capturas, mensajes y datos recibidos pertenece a [entradas y salida segura](input-security.md).
+
 ## Adaptación del frontend EJS
 
 LoginPage conserva fondo, tarjeta y disposición del login EJS. LoginForm presenta
@@ -261,3 +265,50 @@ Movimientos compone los flujos compartidos de listado, búsqueda, opciones y des
 cada adaptador conserva sus campos y reglas. `useVisibleRefresh` comparte el ciclo
 de actualización visible de 30 segundos sin trasladar listeners a la presentación.
 Los contratos específicos y límites están en [Movimientos](movements.md).
+
+
+## Crecimiento y mantenimiento
+
+La revisión del frontend conserva módulos por capacidad, páginas diferidas por
+Vue Router, TypeScript estricto y estado local por instancia. Los componentes
+visuales comparten marcos y controles; los servicios adaptan contratos de Express.
+La sesión compartida y Axios concentran autenticación, renovación y errores.
+Los listados se consultan y ordenan en el servidor; el navegador presenta páginas
+de 10, 20 o 50 registros. Los selectores solicitan opciones en páginas de 20,
+con búsqueda diferida y cancelación al cambiar de contexto o desmontar.
+
+Se corrigen dos riesgos del núcleo de consulta:
+
+- `useRemoteLookup` usa un `Set` para eliminar IDs repetidos dentro y entre páginas.
+  Cada carga compara los IDs existentes y recibidos una vez, en lugar de buscar
+  cada opción nueva dentro del conjunto acumulado. El avance cuenta las filas
+  recibidas del servidor; no depende del número de opciones únicas. Una página
+  vacía termina la carga aunque el conteo sea antiguo, evitando solicitudes sin
+  fin al cambiar el catálogo durante la consulta.
+- El cambio de búsqueda reinicia opciones, errores y página de reintento. Reintentar
+  cancela el debounce pendiente; desmontar bloquea también callbacks conservados
+  por el consumidor. `requestPage` rechaza conteos negativos, fraccionarios o fuera
+  del rango entero seguro antes de usarlos en la paginación.
+
+ESLint comprueba imports estáticos de estas fronteras además de los controles de
+presentación existentes: `shared` no importa `app` ni módulos de negocio; servicios
+y mappers no importan Vue, Router, Vuetify, páginas, componentes, composables ni
+el estado de sesión. Los contratos públicos `@nexus/*` y la inyección de callbacks
+conservan la dirección de dependencias. Estas reglas forman parte del lint que CI
+ya ejecuta; no sustituyen revisar ciclos ni la responsabilidad de un contrato nuevo.
+
+Para agregar otra capacidad, se conserva el listado/consulta en el módulo y se
+componen los contratos de `shared`; se extrae una pieza cuando tiene consumidores
+con la misma responsabilidad. Las reglas, payloads y permisos específicos siguen
+en su dominio. La recuperación de merma continúa separada del guardado genérico
+porque conserva `operationId` y captura pendiente.
+
+El router central y `useInventoryEditor` todavía tienen responsabilidades acotadas.
+Separar registros de rutas por dominio o extraer otra estrategia del editor debe
+responder a nuevas responsabilidades o cambios independientes, con los recorridos
+actuales como protección; su tamaño por sí solo no justifica más capas.
+
+La evidencia se detalla en [herramientas y pruebas](tooling.md). Esta revisión evalúa
+estructura, contratos y recursos del cliente; no estima usuarios concurrentes ni
+capacidad de Express/PostgreSQL. Para esa estimación se requieren cargas y medidas
+de latencia, consultas, tamaño de reportes y consumo del entorno de despliegue.

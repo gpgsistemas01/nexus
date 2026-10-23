@@ -24,9 +24,11 @@ los nodos de función/campo son partes de archivos existentes, no nuevos módulo
 ```mermaid
 flowchart TB
     registry["constants/catalogs.js<br/>MANAGED_CATALOGS"] -->|deriva claves| names["MANAGED_CATALOG_NAMES"]
-    validator["catalogValidations.js"] -->|claves admitidas| names
-    validator -->|campos y longitudes| registry
-    service["catalogService<br/>getCatalog · normalizeCatalogData<br/>validateCatalogData"] -->|modelo y campos permitidos| registry
+    lookup["findManagedCatalog<br/>sólo propiedades propias"] --> registry
+    validator["catalogValidations.js"] -->|campos y longitudes| lookup
+    service["catalogService<br/>getCatalog · validateCatalogData"] -->|resuelve modelo permitido| lookup
+    service --> dto["catalogDTO<br/>campos propios y trim"]
+    registry -.->|configuración resuelta por servicio| dto
     metadata["catalogService<br/>getManagedCatalog"] -->|etiquetas · campos · longitudes| registry
     web["controller web<br/>getCatalogsPage"] -->|consume metadata sin model| metadata
     metadata -.->|configuración de presentación| view["catalogsPage.ejs<br/>catalogContext data-*<br/>formulario y tabla comunes"]
@@ -41,7 +43,7 @@ configuran formulario, modal y columnas; esa metadata no concede permisos.
 
 | Decisión | Aplicación comprobable y fuente de detalle |
 | --- | --- |
-| Lista blanca del servidor | El registro fija modelos, campos y longitudes; el validator rechaza claves desconocidas y el servicio vuelve a resolverlas. [Backend](../backend-technical-documentation/16-catalogs-code.md#contratos-y-límites-implementados). |
+| Lista blanca del servidor | El registro fija modelos, campos y longitudes. Validator y servicio usan `findManagedCatalog`; el validator omite un catálogo desconocido y el servicio devuelve `CATALOG_NOT_FOUND`. Nombres heredados como `constructor` no son entradas del registro. [Backend](../backend-technical-documentation/16-catalogs-code.md#contratos-y-límites-implementados). |
 | Configuración de presentación | Un controller web y plantilla publican metadata para una pantalla común. [Frontend](../frontend-technical-documentation/16-catalogs-code.md#configuración-entre-ejs-y-el-navegador). |
 | Composición de aplicación | `catalogs.js` configura `createCrudApplication` con `getAll`, `register` y `edit`, manteniendo el catálogo como argumento del transporte. [Contrato de reutilización](../reuse-and-refactoring/02-browser-applications-and-requests.md). |
 | Contratos de formulario y tabla | Se componen `useForm`, `handleSubmit`, `createDataTable` y `buildMdbEditActionButton`; las columnas derivan de campos, sin seis implementaciones. [Frontend](../frontend-technical-documentation/16-catalogs-code.md). |

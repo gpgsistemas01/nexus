@@ -529,6 +529,40 @@ test('selectores: carga automática al final, reintento y selección conservada'
   expect(starts.filter((start) => start === 40)).toHaveLength(1);
 });
 
+test('selectores: páginas repetidas y conteo desactualizado no duplican opciones ni prolongan las consultas', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const starts: number[] = [];
+  const suppliers = Array.from({ length: 30 }, (_, index) => ({
+    id: `supplier-${index + 1}`,
+    tradeName: `Proveedor ${String(index + 1).padStart(3, '0')}`,
+  }));
+  await page.route('**/api/warehouse/suppliers?**', (route) => {
+    const start = Number(new URL(route.request().url()).searchParams.get('start'));
+    starts.push(start);
+    const data = start === 0 ? suppliers.slice(0, 20) : start === 20 ? suppliers.slice(10) : [];
+    return route.fulfill({ json: { data, recordsTotal: 45, recordsFiltered: 45 } });
+  });
+  await page.goto('/almacen/materiales');
+  const field = page.getByRole('combobox', { name: 'Filtrar por proveedor', exact: true });
+  await field.click();
+  const list = page.getByRole('listbox');
+  await list.hover();
+  await page.mouse.wheel(0, 1500);
+  await expect.poll(() => starts.includes(20)).toBe(true);
+  await list.hover();
+  await page.mouse.wheel(0, 1800);
+  await expect.poll(() => starts.includes(40)).toBe(true);
+  await expect(page.getByText('Desplázate para cargar más opciones', { exact: true })).toBeHidden();
+  await list.hover();
+  await page.mouse.wheel(0, 800);
+  await expect(page.getByRole('option', { name: 'Proveedor 030', exact: true })).toHaveCount(1);
+  await page.getByRole('option', { name: 'Proveedor 030', exact: true }).click();
+  await expect(field).toHaveValue('Proveedor 030');
+  expect(starts).toEqual([0, 20, 40]);
+});
+
 test('tabla: orden por medidas se consulta en el servidor', async ({ page }) => {
   await mockWarehouse(page);
   const queries: URLSearchParams[] = [];

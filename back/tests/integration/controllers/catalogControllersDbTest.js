@@ -183,6 +183,94 @@ describe('catalog controllers database integration', () => {
     });
   });
 
+  it('acota páginas HTTP y conserva el resto de registros para la página siguiente (CP-INT-PAG-001)', async () => {
+    const prefix = `IT Page ${testSuffix} `;
+    const rows = Array.from({ length: 101 }, (_, index) => ({ name: `${prefix}${String(index).padStart(3, '0')}` }));
+    try {
+      await prisma.presentation.createMany({ data: rows });
+      const before = await prisma.presentation.findMany({ where: { name: { startsWith: prefix } }, orderBy: { name: 'asc' } });
+      const first = await request(app).get('/managed/presentations')
+        .query({ start: 0, length: 1000000, search: prefix }).expect(200);
+      expect(first.body.recordsFiltered).toBe(101);
+      expect(first.body.data.map(row => row.name)).toEqual(rows.slice(0, 100).map(row => row.name));
+      const next = await request(app).get('/managed/presentations')
+        .query({ start: 100, length: 1000000, search: prefix }).expect(200);
+      expect(next.body.data.map(row => row.name)).toEqual([rows[100].name]);
+      const countsOnly = await request(app).get('/managed/presentations')
+        .query({ length: 0, search: prefix }).expect(200);
+      expect(countsOnly.body).toMatchObject({ data: [], recordsFiltered: 101 });
+      const after = await prisma.presentation.findMany({ where: { name: { startsWith: prefix } }, orderBy: { name: 'asc' } });
+      expect(after).toEqual(before);
+    } finally {
+      await prisma.presentation.deleteMany({ where: { name: { startsWith: prefix } } });
+    }
+  });
+
+  it('normaliza texto plano y descarta campos ajenos en alta y edición (CP-INT-VAL-006)', async () => {
+    const name = `IT Presentation O'Brien & ${testSuffix}`;
+    const created = await request(app).post('/managed/presentations').send({
+      name: `  ${name}  `, isActive: 'true', id: 'caller-id', version: 999,
+      key: 'caller-key', roleId: 'caller-role', unexpected: { nested: true }
+    }).expect(201);
+    const id = created.body.data.id;
+    const before = await prisma.presentation.findUniqueOrThrow({ where: { id } });
+    expect(before).toMatchObject({ name, isActive: true, version: 0 });
+    expect(id).not.toBe('caller-id');
+    expect(before.name).not.toContain('&#');
+
+    await request(app).put(`/managed/presentations/${id}`).send({
+      name: ` ${name} v2 `, isActive: 'false', expectedVersion: before.version,
+      id: 'replacement-id', version: 999, key: 'changed-key'
+    }).expect(200);
+    const after = await prisma.presentation.findUniqueOrThrow({ where: { id } });
+    expect(after).toMatchObject({ id, name: `${name} v2`, isActive: false, version: 1 });
+
+    const searched = await request(app).get('/managed/presentations')
+      .query({ search: "' OR 1=1 --" }).expect(200);
+    expect(searched.body).toMatchObject({ data: [], recordsFiltered: 0 });
+    expect(await prisma.presentation.findUniqueOrThrow({ where: { id } })).toEqual(after);
+  });
+
+  it.each(['__proto__', 'constructor', 'toString'])('rechaza catálogo heredado %s sin acceder a otro modelo (CP-INT-VAL-006)', async catalog => {
+    const before = await prisma.presentation.findMany({ orderBy: { id: 'asc' } });
+    await request(app).post(`/managed/${catalog}`).send({ name: 'No permitido', isActive: true })
+      .expect(404).expect(response => expect(response.body.code).toBe('CATALOG_NOT_FOUND'));
+    expect(await prisma.presentation.findMany({ orderBy: { id: 'asc' } })).toEqual(before);
+  });
+
+  it('conserva el límite de caracteres Unicode sin medir unidades UTF-16 (CP-INT-VAL-006)', async () => {
+    const name = '🙂'.repeat(50);
+    let id;
+    try {
+      const response = await request(app).post('/managed/presentations').send({ name, isActive: true }).expect(201);
+      id = response.body.data.id;
+      expect(await prisma.presentation.findUniqueOrThrow({ where: { id } })).toMatchObject({ name });
+    } finally {
+      if (id) await prisma.presentation.delete({ where: { id } });
+    }
+  });
+
+  it.each([
+    ['<script>alert(1)</script>', 'NAME_INVALID_FORMAT'],
+    ['Texto\u0000oculto', 'NAME_INVALID_FORMAT'],
+    [{ name: 'Objeto inesperado' }, 'NAME_INVALID_TYPE']
+  ])('rechaza nombre %j sin persistir en alta ni edición (CP-INT-VAL-006)', async (name, code) => {
+    const entry = await prisma.presentation.create({ data: { name: `${names.presentation} security` } });
+    try {
+      const before = await prisma.presentation.findMany({ orderBy: { id: 'asc' } });
+      for (const method of ['post', 'put']) {
+        const path = `/managed/presentations${method === 'put' ? `/${entry.id}` : ''}`;
+        const response = await request(app)[method](path).send({
+          name, isActive: true, expectedVersion: entry.version
+        }).expect(400);
+        expect(response.body).toMatchObject({ code: 'VALIDATION_ERROR', errors: { name: { code } } });
+        expect(await prisma.presentation.findMany({ orderBy: { id: 'asc' } })).toEqual(before);
+      }
+    } finally {
+      await prisma.presentation.delete({ where: { id: entry.id } });
+    }
+  });
+
   it('rechaza el payload antes de persistir cuando excede el límite del catálogo', async () => {
     await request(app)
       .post('/managed/unit-measures')

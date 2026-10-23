@@ -1,4 +1,5 @@
 import { AUTH_FIELD_LIMITS } from '../../../shared/constants/auth.js';
+import { FORM_FIELD_LIMITS } from '../../../shared/constants/inputValidation.js';
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from '../../../shared/messages/goodsReceiptMessages.js';
 
 export const errorMessages = {
@@ -91,7 +92,8 @@ export const errorMessages = {
 
     PROJECT_NUMBER_REQUIRED: 'El número de proyecto es requerido.',
     PROJECT_NUMBER_INVALID_TYPE: 'El número de proyecto debe ser texto.',
-    PROJECT_NUMBER_TOO_LONG: 'El número de proyecto no debe exceder 50 caracteres.',
+    PROJECT_NUMBER_TOO_LONG: `El número de proyecto no debe exceder ${FORM_FIELD_LIMITS.PROJECT_NUMBER} caracteres.`,
+    PROJECT_NUMBER_INVALID_FORMAT: 'El número de proyecto no debe contener caracteres de control.',
 
     CLIENT_ID_REQUIRED: 'El cliente es requerido.',
     CLIENT_ID_INVALID_UUID: 'El cliente no es válido.',
