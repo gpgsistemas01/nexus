@@ -114,11 +114,12 @@ npm run dev
 
 Para compilar: `npm run build` desde `front/`, o `npm --prefix front run build` desde
 la raíz. La salida queda en `front/dist/`. Consulta [la guía del frontend](front/README.md).
-El login, Almacén (Materiales, Consumibles y Mermas), Movimientos y los seis
+El login, Almacén (Materiales, Consumibles y Mermas), Compras, Salidas, Movimientos y los seis
 Catálogos integran la API mediante un proxy del mismo origen. El menú sólo contempla vistas Vue; los demás módulos
 conservan sus pantallas EJS en el backend.
 Consulta [configuración del login](front/docs/login.md),
 [operaciones y arquitectura de Almacén](front/docs/warehouse.md),
+[Compras](front/docs/purchases.md), [Salidas](front/docs/issues.md),
 [Catálogos](front/docs/catalogs.md) y [Movimientos](front/docs/movements.md).
 Desde la raíz, `npm --prefix front run check` ejecuta formato, ESLint, pruebas y build con tipos.
 En VS Code instala las extensiones recomendadas Vue - Official y ESLint; para

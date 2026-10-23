@@ -6,7 +6,7 @@ import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js'
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 import { purchaseLookupService } from '../services/purchaseLookupService.js';
-import { draftPurchaseDetail } from '../purchaseForm.js';
+import { createPurchaseDetailDraft } from '../purchaseDetails.js';
 import type { PurchaseResource, PurchaseDetail } from '../purchase.js';
 
 export const usePurchaseLineEntry = (options: {
@@ -53,7 +53,7 @@ export const usePurchaseLineEntry = (options: {
         onChange: () => {},
     });
 
-    const selectCreated = (created: LookupItem) => {
+    const selectCreatedItem = (created: LookupItem) => {
         if (options.isDisabled() || isDisposed) return;
 
         if (created.isDisabled) {
@@ -75,7 +75,7 @@ export const usePurchaseLineEntry = (options: {
         if (options.isDisabled() || isDisposed || !item.value || item.value.isDisabled) return;
 
         options.onAdded(
-            draftPurchaseDetail(
+            createPurchaseDetailDraft(
                 item.value,
                 Number(values.quantity),
                 Number(values.costPerUnitType),
@@ -96,7 +96,7 @@ export const usePurchaseLineEntry = (options: {
         errors: form.errors,
         items,
         item,
-        selectCreated,
+        selectCreatedItem,
         add,
     };
 };

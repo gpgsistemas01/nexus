@@ -52,7 +52,7 @@ sesión y permisos. `app/router/protectedDestination` comparte con LoginPage el
 retorno a rutas protegidas registradas y descarta destinos externos o de error.
 Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
 La configuración del menú vive en `app/navigation.ts`; sólo contiene rutas Vue de
-Almacén, Compras, Movimientos, Identidad, Directorio comercial y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
+Almacén, Compras, Salidas, Movimientos, Identidad, Directorio comercial y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
 En escritorio se reserva una barra de iconos: al pulsar Almacén o el botón de
 menú se expande el drawer con el acordeón y un fondo modal. Clic fuera, Escape o navegar
 lo cierran y dejan la barra compacta. En móvil sólo se muestra el drawer temporal.
@@ -329,3 +329,21 @@ en `shared/constants/apiSuccessCodes.js` del backend. Los adaptadores HTTP
 validan esos códigos mediante `confirmMutation`, sin construirlos con cadenas.
 `useRecordSave` propaga el resultado tipado confirmado al contenedor tras el
 guardado y conserva cancelación, errores y conflicto.
+
+## Documentos de salida
+
+[Salidas](issues.md) integra Materiales, Consumibles y Mermas. Conserva un módulo
+propio para solicitud, edición de encabezado, surtido y devolución; reutiliza los
+contratos de listas, formularios, lookup y reportes de `shared`. `IssueWorkspace`
+compone el alta rápida de clientes. `useDocumentRead`, extraído del lector de
+Compras, centraliza cancelación y descarte de respuestas tardías para ambos
+dominios. Los formularios no trasladan transacciones ni stock al cliente.
+
+## Propiedad de tipos, formularios y adaptadores
+
+La [revisión de Salidas y Compras](document-responsibilities.md) concreta el patrón
+contenedor/presentación y la composición existente: contratos tipados, configuración,
+reglas, captura, borradores, cálculos, mappers de request/respuesta y transporte
+tienen motivos de cambio distintos. Las operaciones discriminadas impiden combinar
+consulta con escritura o una cancelación con datos de corrección. La revisión no
+agrega un CRUD universal ni clases de estrategia sin una necesidad concreta.

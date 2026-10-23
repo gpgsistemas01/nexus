@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePurchaseLineEntry } from '../composables/usePurchaseLineEntry.js';
-import { PURCHASE_CONFIG } from '../purchase.js';
+import { PURCHASE_CONFIG } from '../purchaseConfig.js';
 import type { PurchaseResource, PurchaseDetail, ItemCreation } from '../purchase.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 import PurchaseLineEntryForm from '../components/PurchaseLineEntryForm.vue';
@@ -37,6 +37,6 @@ const { values, errors, items, item } = line;
         @more="items.loadMore"
         @retry="items.retry"
         @add="line.add"
-        @create="emit('create', { supplier, onCreated: line.selectCreated })"
+        @create="emit('create', { supplier, onCreated: line.selectCreatedItem })"
     />
 </template>

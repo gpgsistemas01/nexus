@@ -1,9 +1,9 @@
 import { onBeforeUnmount, ref, shallowRef } from 'vue';
 import { useListEditor } from '../../../shared/composables/useListEditor.js';
 import { confirmAction, showSuccess } from '../../../shared/ui/feedback.js';
-import { usePurchaseDocument } from './usePurchaseDocument.js';
+import { useDocumentRead } from '../../../shared/composables/useDocumentRead.js';
 import { purchaseService } from '../services/purchaseService.js';
-import { canEditPurchase } from '../purchase.js';
+import { canEditPurchase } from '../purchaseRules.js';
 import type { PurchaseResource, PurchaseRow, PurchaseTarget, PurchaseDetail } from '../purchase.js';
 import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
 
@@ -13,14 +13,18 @@ export const usePurchaseActions = (options: {
     reload: () => unknown;
     onError: (cause: unknown) => void;
 }) => {
-    const reader = usePurchaseDocument(options.resource, options.onError);
+    const reader = useDocumentRead({
+        request: (id, signal) => purchaseService.get(options.resource, id, signal),
+        onError: options.onError,
+        errorMessage: 'No se pudo abrir la compra.',
+    });
     const editorKey = ref(0);
     const correction = shallowRef<PurchaseDetail>();
     const isChanging = ref(false);
     const needsReload = ref(false);
     const controller = new AbortController();
     let lastOpen: { row: PurchaseRow; action: 'view' | 'edit' } | undefined;
-    const state = useListEditor<PurchaseTarget>({
+    const editorState = useListEditor<PurchaseTarget>({
         canOpen: () => options.canManage(),
         reload: options.reload,
     });
@@ -30,7 +34,7 @@ export const usePurchaseActions = (options: {
 
         reader.close();
         lastOpen = undefined;
-        state.closeEditor();
+        editorState.closeEditor();
         correction.value = undefined;
         needsReload.value = false;
     };
@@ -41,7 +45,7 @@ export const usePurchaseActions = (options: {
         reader.close();
         lastOpen = undefined;
         ++editorKey.value;
-        state.openEditor({ action: 'create' });
+        editorState.openEditor({ action: 'create' });
     };
 
     const open = async (row: PurchaseRow, action: 'view' | 'edit') => {
@@ -52,7 +56,7 @@ export const usePurchaseActions = (options: {
         if (!document) return;
 
         ++editorKey.value;
-        state.openEditor({
+        editorState.openEditor({
             action: action === 'edit' && canEditPurchase(document) ? 'edit' : 'view',
             document,
         });
@@ -60,17 +64,17 @@ export const usePurchaseActions = (options: {
     };
 
     const reload = () => {
-        const target = state.editor.value;
+        const target = editorState.editor.value;
         if (target && target.action !== 'create') return open(target.document, target.action);
     };
 
-    const saved = (confirmation: MutationConfirmation) => {
+    const handleSaved = (confirmation: MutationConfirmation) => {
         close();
-        state.onSaved();
+        editorState.onSaved();
         void showSuccess(confirmation.message);
     };
 
-    const detailSaved = async (confirmation: MutationConfirmation) => {
+    const handleDetailSaved = async (confirmation: MutationConfirmation) => {
         correction.value = undefined;
         needsReload.value = true;
         void options.reload();
@@ -79,7 +83,7 @@ export const usePurchaseActions = (options: {
     };
 
     const editableDetailDocument = (line: PurchaseDetail) => {
-        const target = state.editor.value;
+        const target = editorState.editor.value;
         if (
             target?.action !== 'view' ||
             !canEditPurchase(target.document) ||
@@ -118,13 +122,13 @@ export const usePurchaseActions = (options: {
                 signal: controller.signal,
                 submit: async () => {
                     try {
-                        confirmation = await purchaseService.changeDetail(
-                            options.resource,
-                            document.id,
-                            line.id,
-                            'cancel',
-                            controller.signal,
-                        );
+                        confirmation = await purchaseService.changeDetail({
+                            resource: options.resource,
+                            documentId: document.id,
+                            detailId: line.id,
+                            change: { action: 'cancel' },
+                            signal: controller.signal,
+                        });
                     } catch (cause) {
                         options.onError(cause);
                         throw cause;
@@ -133,7 +137,7 @@ export const usePurchaseActions = (options: {
             });
             isChanging.value = false;
             if (confirmed && confirmation && !controller.signal.aborted)
-                await detailSaved(confirmation);
+                await handleDetailSaved(confirmation);
         } finally {
             isChanging.value = false;
         }
@@ -145,7 +149,7 @@ export const usePurchaseActions = (options: {
 
     return {
         ...reader,
-        editor: state.editor,
+        editor: editorState.editor,
         editorKey,
         correction,
         isChanging,
@@ -155,9 +159,9 @@ export const usePurchaseActions = (options: {
         close,
         reload,
         retry,
-        saved,
+        handleSaved,
         correct,
         cancel,
-        detailSaved,
+        handleDetailSaved,
     };
 };

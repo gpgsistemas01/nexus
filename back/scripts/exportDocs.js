@@ -112,6 +112,8 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/views/development/code-structure'),
                 ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
                 ...getDirectoryDocuments('docs/architecture/views/development/reuse-and-refactoring'),
+                '../front/docs/patterns.md',
+                '../front/docs/document-responsibilities.md',
                 'docs/architecture/views/development/code-map.md'
             ]),
             'incorporacion-desarrolladores': packagePart(ARCHITECTURE_ENTRY, [

@@ -7,7 +7,8 @@ import type { AuthSession } from '../../modules/auth/session.js';
 import { APP_NAVIGATION_GROUPS } from '../navigation.js';
 import { ApiError } from '../../shared/http/apiError.js';
 import { MOVEMENT_CONFIG } from '../../modules/movements/movement.js';
-import { PURCHASE_CONFIG } from '../../modules/purchases/purchase.js';
+import { ISSUE_CONFIG } from '../../modules/issues/issueConfig.js';
+import { PURCHASE_CONFIG } from '../../modules/purchases/purchaseConfig.js';
 
 export const createAppRouter = (
     history: RouterHistory = createWebHistory(import.meta.env.BASE_URL),
@@ -75,6 +76,26 @@ export const createAppRouter = (
                         path: config.path,
                         name: `purchases-${resource}`,
                         component: () => import('../pages/PurchaseWorkspace.vue'),
+                        props: { resource },
+                    })),
+                ],
+            },
+            {
+                path: '/salidas',
+                meta: { requiresAuth: true, navigationGroup: 'issues' },
+                component: () => import('../layouts/AppLayout.vue'),
+                children: [
+                    {
+                        path: '',
+                        name: 'issues-home',
+                        component: () => import('../pages/IssueWorkspace.vue'),
+                        props: { resource: 'materials' },
+                    },
+                    ...Object.entries(ISSUE_CONFIG).map(([resource, config]) => ({
+                        path: config.path,
+                        name: `issues-${resource}`,
+                        meta: { permission: config.pagePermission },
+                        component: () => import('../pages/IssueWorkspace.vue'),
                         props: { resource },
                     })),
                 ],
@@ -205,6 +226,7 @@ export const createAppRouter = (
                     'directory-home',
                     'movements-home',
                     'purchases-home',
+                    'issues-home',
                 ].includes(String(to.name))
             ) {
                 const groups = APP_NAVIGATION_GROUPS.filter(

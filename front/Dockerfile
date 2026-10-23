@@ -21,6 +21,9 @@ COPY back/src/shared/messages/goodsReceiptMessages.js /app/back/src/shared/messa
 COPY back/src/shared/inventory/wasteMeasurements.js back/src/shared/inventory/goodsReceiptCalculations.js /app/back/src/shared/inventory/
 COPY back/src/shared/validation/weightValidations.js /app/back/src/shared/validation/
 COPY back/src/shared/utils/numberUtils.js /app/back/src/shared/utils/
+COPY back/src/public/js/application/warehouse/issues/issueHeaderRules.js /app/back/src/public/js/application/warehouse/issues/
+COPY back/src/public/js/utils/formatters.js /app/back/src/public/js/utils/
+COPY back/src/public/js/constants/fulfillmentStatuses.js /app/back/src/public/js/constants/
 ARG VITE_LOGIN_LOGO_URL=""
 RUN npm run build
 

@@ -4,14 +4,14 @@ Base de Vue 3 con TypeScript, componentes `.vue`, Composition API (`<script setu
 y Vite, creada con la plantilla oficial `create-vite`. El login en `/inicio-sesion`
 usa Vuetify y VeeValidate y está conectado a Express. Materiales, Consumibles y
 Mermas, los seis catálogos administrables, Personas, Usuarios, Clientes,
-Proveedores y los historiales de Movimientos se sirven en Vue; los demás
+Proveedores, Compras, Salidas y los historiales de Movimientos se sirven en Vue; los demás
 módulos conservan sus pantallas EJS en `back/`.
 
 ## Iniciar sesión
 
 Abre `http://localhost:5173/inicio-sesion` con Express ejecutándose en el puerto 3000.
 Vite dirige la API y el cierre de sesión al backend mediante un proxy del mismo origen.
-El menú agrupa Almacén, [Movimientos](docs/movements.md), [Identidad y acceso y Directorio comercial](docs/identity-and-directory.md)
+El menú agrupa Almacén, [Compras](docs/purchases.md), [Salidas](docs/issues.md), [Movimientos](docs/movements.md), [Identidad y acceso y Directorio comercial](docs/identity-and-directory.md)
 y los seis [Catálogos](docs/catalogs.md),
 con enlaces filtrados por permiso.
 Usa una cuenta existente: al autenticar se abre el primer módulo permitido; una
@@ -97,6 +97,7 @@ Al clonar el repositorio basta con `npm ci`; la dependencia está en el lockfile
 - `/almacen` selecciona el primer módulo permitido para la cuenta.
 - `/almacen/materiales`, `/almacen/consumibles` y `/almacen/mermas` son los módulos
   operativos, con sesión y permisos obtenidos de Express.
+- `/salidas/materiales`, `/salidas/consumibles` y `/salidas/mermas` permiten solicitar, surtir y devolver; `/salidas` abre la primera variante autorizada. Consulta [modos y contratos](docs/issues.md).
 - `/compras/materiales` y `/compras/consumibles` permiten gestionar compras; `/compras` abre la primera variante autorizada. Consulta [campos y contratos](docs/purchases.md).
 - `/catalogos` abre Áreas; sus seis rutas requieren `catalogs:manage`. Consulta
   [campos, endpoints y arquitectura](docs/catalogs.md).
@@ -168,7 +169,7 @@ En Linux, si faltan dependencias del sistema, usa `npx playwright install --with
 Playwright inicia Vite cuando hace falta. El puerto 5173 debe estar libre o servir
 esta misma copia del proyecto. En entornos con Chromium ya instalado puedes definir
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` con la ruta del ejecutable. CI instala su navegador.
-Los casos comprueban login, Almacén, Movimientos, Catálogos, Identidad y Directorio, con validación,
+Los casos comprueban login, Almacén, Compras, Salidas, Movimientos, Catálogos, Identidad y Directorio, con validación,
 permisos, errores, envío, cookies, reintento, almacenamiento y ancho móvil. Las
 respuestas de API se simulan; no se usa una base de datos real.
 

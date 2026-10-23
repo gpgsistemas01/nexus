@@ -1,6 +1,6 @@
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { readText } from '../../../shared/http/recordContract.js';
-import { purchaseItemOption } from '../mappers/purchaseMapper.js';
+import { mapPurchaseItemOption } from '../mappers/purchaseResponseMapper.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 import type { PurchaseResource } from '../purchase.js';
 
@@ -36,7 +36,7 @@ export const purchaseLookupService = {
             ...result,
             data: result.data.map((row): LookupItem =>
                 kind === 'items'
-                    ? purchaseItemOption(row, resource)
+                    ? mapPurchaseItemOption(row, resource)
                     : {
                           id: readText(row, 'id'),
                           title: readText(row, kind === 'persons' ? 'fullName' : 'tradeName'),

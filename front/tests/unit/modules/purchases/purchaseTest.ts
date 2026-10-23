@@ -4,25 +4,27 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { confirmAction } from '../../../../src/shared/ui/feedback.js';
 import { apiClient } from '../../../../src/shared/http/apiClient.js';
 import { mockHttpAdapter } from '../../../helpers/httpAdapter.js';
-import { ids, pageOf } from '../../../fixtures/inventory.js';
+import { ids, pageOf, material } from '../../../fixtures/inventory.js';
 import { purchase, purchaseItem } from '../../../fixtures/purchases.js';
 import {
   normalizePurchaseDocument,
-  purchaseItemOption,
-} from '../../../../src/modules/purchases/mappers/purchaseMapper.js';
+  mapPurchaseItemOption,
+} from '../../../../src/modules/purchases/mappers/purchaseResponseMapper.js';
+import { createPurchaseDetailDraft } from '../../../../src/modules/purchases/purchaseDetails.js';
 import {
-  draftPurchaseDetail,
-  initialPurchaseValues,
-  purchasePayload,
-  purchaseTotals,
-  purchaseCorrectionTotals,
+  createInitialPurchaseValues,
+  emptyPurchaseFilters,
 } from '../../../../src/modules/purchases/purchaseForm.js';
-import { emptyPurchaseFilters } from '../../../../src/modules/purchases/purchase.js';
+import { mapPurchaseFormToRequest } from '../../../../src/modules/purchases/mappers/purchaseRequestMapper.js';
+import {
+  calculatePurchaseTotals,
+  calculatePurchaseCorrectionTotals,
+} from '../../../../src/modules/purchases/purchaseCalculations.js';
 import { purchaseService } from '../../../../src/modules/purchases/services/purchaseService.js';
 import { purchaseLookupService } from '../../../../src/modules/purchases/services/purchaseLookupService.js';
 import { usePurchaseEditor } from '../../../../src/modules/purchases/composables/usePurchaseEditor.js';
 import { usePurchaseLineEntry } from '../../../../src/modules/purchases/composables/usePurchaseLineEntry.js';
-import { usePurchaseDocument } from '../../../../src/modules/purchases/composables/usePurchaseDocument.js';
+import { useDocumentRead } from '../../../../src/shared/composables/useDocumentRead.js';
 import { usePurchaseCorrection } from '../../../../src/modules/purchases/composables/usePurchaseCorrection.js';
 import type { PurchaseTarget } from '../../../../src/modules/purchases/purchase.js';
 
@@ -52,11 +54,11 @@ it('corregir conserva los otros detalles y excluye cancelados de la vista previa
   });
   receipt.details.push({ ...detail, id: 'cancelado', status: 'CANCELED' });
   expect(
-    purchaseCorrectionTotals(receipt, detail, { quantity: '1', costPerUnitType: '50' }),
+    calculatePurchaseCorrectionTotals(receipt, detail, { quantity: '1', costPerUnitType: '50' }),
   ).toEqual({ quantity: 2, net: 70, gross: 81.2 });
   expect(detail.quantity).toBe('2');
   expect(
-    purchaseCorrectionTotals(receipt, detail, { quantity: '', costPerUnitType: '50' }),
+    calculatePurchaseCorrectionTotals(receipt, detail, { quantity: '', costPerUnitType: '50' }),
   ).toBeNull();
 });
 
@@ -152,10 +154,10 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     expect(() => normalizePurchaseDocument({ ...purchase, ...changes }, 'materials')).toThrow();
   });
   it('la edición conserva proveedor y hora de México; omite partidas guardadas y valores derivados', () => {
-    const values = initialPurchaseValues(document());
+    const values = createInitialPurchaseValues(document());
     expect(values.receptionDate).toBe('2026-10-22T12:30');
     values.supplierId = 'otro';
-    const payload = purchasePayload(values, document());
+    const payload = mapPurchaseFormToRequest(values, document());
     expect(payload).toMatchObject({
       supplierId: ids.supplier,
       receptionDate: purchase.receptionDate,
@@ -163,16 +165,21 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     });
     expect(payload).not.toHaveProperty('details');
     expect(payload).not.toHaveProperty('expectedVersion');
-    values.details = [draftPurchaseDetail(purchaseItemOption(purchaseItem, 'materials'), 3, 100)];
+    values.details = [
+      createPurchaseDetailDraft(mapPurchaseItemOption(purchaseItem, 'materials'), 3, 100),
+    ];
     values.details.push(document().details[0]!);
-    expect(purchasePayload(values, document()).details).toEqual([
+    expect(mapPurchaseFormToRequest(values, document()).details).toEqual([
       { materialId: ids.material, quantity: 3, costPerUnitType: 100 },
     ]);
     expect(
-      purchaseTotals([...document().details, { ...values.details[0]!, status: 'CANCELED' }]),
+      calculatePurchaseTotals([
+        ...document().details,
+        { ...values.details[0]!, status: 'CANCELED' },
+      ]),
     ).toEqual({ quantity: 2, net: 200, gross: 232 });
     values.isInvoiced = false;
-    expect(purchasePayload(values)).not.toHaveProperty('invoice');
+    expect(mapPurchaseFormToRequest(values)).not.toHaveProperty('invoice');
   });
   it('abrir y perder foco sin captura no publica errores; enviar valida sin escribir', async () => {
     const { state, request } = editor();
@@ -193,14 +200,16 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     expect(state.values.observations).toBe(' Mi captura ');
     await state.submit();
     expect(request).toHaveBeenCalledTimes(2);
-    expect(request.mock.calls[1]![1]).not.toHaveProperty('details');
+    expect(request.mock.calls[1]![0].payload).not.toHaveProperty('details');
     expect(saved).toHaveBeenCalledOnce();
   });
   it('cambiar proveedor limpia las partidas nuevas y receptor; la consulta no escribe', async () => {
     const { state } = editor();
     state.update('supplierId', ids.supplier);
     state.update('receivedById', purchase.receivedById);
-    state.addLine(draftPurchaseDetail(purchaseItemOption(purchaseItem, 'materials'), 2, 100));
+    state.addDetail(
+      createPurchaseDetailDraft(mapPurchaseItemOption(purchaseItem, 'materials'), 2, 100),
+    );
     state.update('supplierId', 'otro');
     expect(state.values.details).toEqual([]);
     expect(state.values.receivedById).toBe('');
@@ -234,14 +243,13 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     expect(request).not.toHaveBeenCalled();
     state.update('quantity', '0.5');
     await state.submit();
-    expect(request).toHaveBeenCalledWith(
-      'materials',
-      purchase.id,
-      purchase.details[0]!.id,
-      'corrections',
-      expect.any(AbortSignal),
-      { quantity: 0.5, costPerUnitType: 100 },
-    );
+    expect(request).toHaveBeenCalledWith({
+      resource: 'materials',
+      documentId: purchase.id,
+      detailId: purchase.details[0]!.id,
+      change: { action: 'correct', quantity: 0.5, costPerUnitType: 100 },
+      signal: expect.any(AbortSignal),
+    });
   });
   it('agregar partida valida el mínimo uno y selecciona altas recientes aunque no estén en la página', async () => {
     vi.spyOn(purchaseLookupService, 'list').mockResolvedValue(pageOf([]));
@@ -255,7 +263,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
         onAdded: added,
       }),
     );
-    state.selectCreated(purchaseItemOption(purchaseItem, 'materials'));
+    state.selectCreatedItem(mapPurchaseItemOption(purchaseItem, 'materials'));
     state.update('quantity', '0.5');
     state.update('costPerUnitType', '100');
     await state.add();
@@ -284,7 +292,13 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
           resolve = finish;
         }),
     );
-    const { state, wrapper } = harness(() => usePurchaseDocument('materials', vi.fn()));
+    const { state, wrapper } = harness(() =>
+      useDocumentRead({
+        request: (id, signal) => purchaseService.get('materials', id, signal),
+        onError: vi.fn(),
+        errorMessage: 'No se pudo abrir la compra.',
+      }),
+    );
     const pending = state.load(purchase.id);
     wrapper.unmount();
     expect(request.mock.calls[0]![2].aborted).toBe(true);
@@ -310,4 +324,14 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
       await purchaseService.export('materials', query, { mode, month: '2026-09' }, signal());
     },
   );
+});
+
+it('selector de compras admite el contrato de inventario sin type y rechaza un tipo explícito ajeno', () => {
+  expect(mapPurchaseItemOption(material, 'materials').id).toBe(ids.material);
+  expect(() =>
+    mapPurchaseItemOption(
+      { ...material, material: { ...material.material, type: 'CONSUMABLE' } },
+      'materials',
+    ),
+  ).toThrow();
 });

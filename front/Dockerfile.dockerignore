@@ -42,3 +42,9 @@
 !back/src/shared/utils/
 !back/src/shared/utils/numberUtils.js
 !back/src/shared/constants/apiSuccessCodes.js
+!back/src/public/js/application/
+!back/src/public/js/application/warehouse/
+!back/src/public/js/application/warehouse/issues/
+!back/src/public/js/application/warehouse/issues/issueHeaderRules.js
+!back/src/public/js/utils/formatters.js
+!back/src/public/js/constants/fulfillmentStatuses.js

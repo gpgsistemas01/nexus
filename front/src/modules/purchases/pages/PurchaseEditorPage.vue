@@ -5,7 +5,7 @@ import { usePageAccess } from '../../../app/composables/usePageAccess.js';
 import { usePurchaseEditor } from '../composables/usePurchaseEditor.js';
 import PurchaseEditor from '../components/PurchaseEditor.vue';
 import PurchaseLineEntryPage from './PurchaseLineEntryPage.vue';
-import { canEditPurchase } from '../purchase.js';
+import { canEditPurchase } from '../purchaseRules.js';
 import type {
     PurchaseResource,
     PurchaseTarget,
@@ -96,7 +96,7 @@ const title = document
         @submit="editor.submit"
         @close="emit('close')"
         @reload="emit('reload')"
-        @remove="editor.removeLine"
+        @remove="editor.removeDetail"
         @correct="emit('correct', $event)"
         @cancel="emit('cancel', $event)"
         @create-supplier="emit('createSupplier', editor.selectCreatedSupplier)"
@@ -110,7 +110,7 @@ const title = document
                 :is-disabled="isSubmitting"
                 :can-read="canReadItems"
                 :can-create="canCreateItem"
-                @add="editor.addLine"
+                @add="editor.addDetail"
                 @create="emit('createItem', $event)"
             />
         </template>

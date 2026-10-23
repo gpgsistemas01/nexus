@@ -68,7 +68,8 @@ una regla explícita del backend además del campo de sólo lectura en Vue.
 | `modules/purchases/pages` | Coordinar acceso, listado, formularios y acciones de cada documento. |
 | `composables` | Estado y ciclo de vida de consulta, captura, filtros, nuevas partidas y corrección; cancelar al desmontar y descartar respuestas antiguas. |
 | `components` | Presentación con props/eventos; tablas Vuetify sobre `TableFrame`/`ServerTable`, selectores `RemoteSelect` y modales `RecordEditorDialog`. |
-| `services`, `mappers`, `purchaseForm` | Adaptar HTTP mediante Axios compartido, comprobar respuestas y preparar payloads/cálculos públicos sin dependencias de UI. |
+| `services` y mappers de request/respuesta | Adaptar HTTP mediante Axios compartido y comprobar contratos. |
+| `purchaseForm`, `purchaseDetails`, `purchaseCalculations` | Inicialización/validación, borradores locales y totales visibles, respectivamente. |
 
 Las reglas de formulario pertenecen a `@nexus/form-validation`. La vista previa de
 partidas reutiliza `@nexus/purchase-calculations`, ya público en el backend;
@@ -147,3 +148,15 @@ contra la constante esperada; no crea códigos ni deduce éxito de un prefijo.
 Su resultado conserva ese código y traduce el texto mediante `getSuccessMessage`,
 el mismo catálogo público de EJS. Los avisos de Compras usan ese resultado
 confirmado. El servicio no importa SweetAlert2 ni presenta avisos.
+
+El lector de documentos ahora pertenece a `shared/composables/useDocumentRead`;
+Compras inyecta su solicitud y mensaje de error. Salidas reutiliza el mismo ciclo
+de cancelación y descarte de respuestas tardías.
+
+El selector de artículos admite también el listado real de inventario, que omite
+`material.type`; el endpoint ya separa materiales y consumibles. Un tipo explícito
+contradictorio se rechaza y los documentos conservan la comprobación estricta.
+
+`purchase.ts` conserva tipos; `purchaseConfig` y `purchaseRules` son los propietarios
+de configuración y modos. Las escrituras reciben opciones con destino y cambio
+tipados. Consulta la [revisión de responsabilidades y nombres](document-responsibilities.md).

@@ -20,6 +20,10 @@ vi.mock('../../../../src/modules/auth/pages/LoginPage.vue', () => ({
   default: { template: '<div />' },
 }));
 
+vi.mock('../../../../src/app/pages/IssueWorkspace.vue', () => ({
+  default: { template: '<div />' },
+}));
+
 const navigate = async (path: string, sessionUser = user, error?: Error) => {
   const session = {
     load: error ? vi.fn().mockRejectedValue(error) : vi.fn().mockResolvedValue(sessionUser),
@@ -88,5 +92,25 @@ describe('rutas y permisos de catálogos (DP-VUE-CAT-001)', () => {
       (await navigate('/catalogos/roles', { ...user, permissions: ['materials:read'] })).name,
     ).toBe('forbidden');
     expect((await navigate('/catalogos/otro')).name).toBe('not-found');
+  });
+});
+
+describe('rutas de salidas (DP-VUE-ISS-001)', () => {
+  it.each([
+    ['materiales', 'goods:issues-page-view'],
+    ['consumibles', 'goods:issues-page-view'],
+    ['mermas', 'waste:issues-page-view'],
+  ])('abre %s con su permiso y rechaza otro permiso', async (resource, permission) => {
+    expect(
+      (await navigate(`/salidas/${resource}`, { ...user, permissions: [permission!] })).path,
+    ).toBe(`/salidas/${resource}`);
+    expect(
+      (await navigate(`/salidas/${resource}`, { ...user, permissions: ['materials:read'] })).name,
+    ).toBe('forbidden');
+  });
+  it('selecciona merma al entrar a Salidas y al volver del login si es la única autorizada', async () => {
+    const account = { ...user, permissions: ['waste:issues-page-view'] };
+    expect((await navigate('/salidas', account)).path).toBe('/salidas/mermas');
+    expect((await navigate('/almacen', account)).path).toBe('/salidas/mermas');
   });
 });

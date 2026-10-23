@@ -1,12 +1,11 @@
 import { onBeforeUnmount, ref, shallowRef } from 'vue';
-import { purchaseService } from '../services/purchaseService.js';
-import type { PurchaseDocument, PurchaseResource } from '../purchase.js';
 
-export const usePurchaseDocument = (
-    resource: PurchaseResource,
-    onError: (cause: unknown) => void,
-) => {
-    const document = shallowRef<PurchaseDocument>();
+export const useDocumentRead = <Document>(options: {
+    request: (id: string, signal: AbortSignal) => Promise<Document>;
+    onError: (cause: unknown) => void;
+    errorMessage: string;
+}) => {
+    const document = shallowRef<Document>();
     const isReading = ref(false);
     const readError = ref('');
     let controller: AbortController | undefined;
@@ -26,7 +25,7 @@ export const usePurchaseDocument = (
         readError.value = '';
 
         try {
-            const result = await purchaseService.get(resource, id, current.signal);
+            const result = await options.request(id, current.signal);
             if (attempt !== sequence || current.signal.aborted) return;
 
             document.value = result;
@@ -34,9 +33,8 @@ export const usePurchaseDocument = (
         } catch (cause) {
             if (attempt !== sequence || current.signal.aborted) return;
 
-            readError.value =
-                cause instanceof Error ? cause.message : 'No se pudo abrir la compra.';
-            onError(cause);
+            readError.value = cause instanceof Error ? cause.message : options.errorMessage;
+            options.onError(cause);
         } finally {
             if (attempt === sequence) isReading.value = false;
         }

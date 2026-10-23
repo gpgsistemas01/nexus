@@ -2,7 +2,7 @@ import { computed, reactive } from 'vue';
 import { PERMISSIONS } from '@nexus/permissions';
 import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
 import { purchaseLookupService } from '../services/purchaseLookupService.js';
-import { emptyPurchaseFilters } from '../purchase.js';
+import { emptyPurchaseFilters } from '../purchaseForm.js';
 import type { PurchaseResource } from '../purchase.js';
 
 export const usePurchaseFilters = (

@@ -388,3 +388,28 @@ en ambas variantes.
 La extracción de `successCodeMessages` mueve sus valores existentes a un módulo
 público compartido. Los tests HTTP/controladores conservan sus códigos y rutas
 previas; no cambia el contrato de autenticación, permisos ni persistencia.
+
+## Salidas de Materiales, Consumibles y Mermas
+
+| Diseño / caso | Nivel y técnica | Resultado esperado |
+| --- | --- | --- |
+| `DP-VUE-ISS-001` / `CP-VUE-ISS-001` | Unitario y navegador; particiones por recurso y permiso | Rutas Vue y menú protegido, API de cada recurso, rechazo de tipos cruzados y éxito de otro recurso. Sin permiso no accede ni muestra surtido. |
+| `DP-VUE-ISS-002` / `CP-VUE-ISS-002` | Unitario y navegador; transición pendiente → surtido → devolución y fronteras de cantidad | Pendiente permite partidas; después sólo encabezado. Surtido exige selección y cantidad de proyecto. Devolución bloquea mayor al saldo leído, permite saldo exacto y conserva captura tras rechazo. |
+| `DP-VUE-ISS-003` / `CP-VUE-ISS-003` | Unitario y navegador; decisiones de payload y selección | El alta distingue proveedor/material y agrupa sólo el mismo par. El surtido envía IDs de detalle; las escrituras no envían saldos derivados. Abrir/mover foco no valida sin captura. |
+| `DP-VUE-ISS-004` / `CP-VUE-ISS-004` | Unitario y navegador; filtros aplicados, exportación y escritorio/móvil | Excel conserva filtros sin paginación. Cliente/área limpian dependencias y conservan filtros operativos de personas y proyecto interno. El modal mantiene sus acciones en móvil. |
+
+La cobertura de cliente vive en `tests/unit/modules/issues/issueTest.ts` y
+`tests/e2e/issues.spec.ts`. Reutiliza fixtures y el transporte de prueba existentes;
+los dobles HTTP no demuestran persistencia. El backend mantiene las integraciones
+de salidas, devoluciones y concurrencia con base aislada.
+
+## Responsabilidades de documentos
+
+| Diseño / caso | Nivel y técnica | Resultado esperado |
+| --- | --- | --- |
+| `DP-VUE-DOC-001` / `CP-VUE-DOC-001` | Unitario y navegador; regresión por modo y particiones de estado | Requests y mensajes de alta, edición, surtido, corrección, cancelación y devolución conservan sus contratos después de separar propietarios. Consulta/devolución no guardan el documento; selección de surtido protege detalles persistidos/cancelados y no muta el documento leído. |
+
+La cobertura permanece en las suites de Compras y Salidas. Los tipos de escritura
+se comprueban con `npm run check`; no se fijan rutas internas ni llamadas privadas
+como criterio de arquitectura. La [tabla de propietarios](document-responsibilities.md)
+es la referencia curada de esta revisión.

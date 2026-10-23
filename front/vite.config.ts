@@ -22,6 +22,22 @@ export default defineConfig(({ mode }) => {
         },
         resolve: {
             alias: {
+                '@nexus/numbers': fileURLToPath(
+                    new URL('../back/src/shared/utils/numberUtils.js', import.meta.url),
+                ),
+                '@nexus/issue-header-rules': fileURLToPath(
+                    new URL(
+                        '../back/src/public/js/application/warehouse/issues/issueHeaderRules.js',
+                        import.meta.url,
+                    ),
+                ),
+                '@nexus/issue-statuses': fileURLToPath(
+                    new URL(
+                        '../back/src/public/js/constants/fulfillmentStatuses.js',
+                        import.meta.url,
+                    ),
+                ),
+
                 '@nexus/login-validation': fileURLToPath(
                     new URL(
                         '../back/src/public/js/utils/validations/loginValidation.js',

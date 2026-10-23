@@ -1,6 +1,5 @@
 import { computed, shallowRef, watch } from 'vue';
 import { useForm } from 'vee-validate';
-import { goodsReceiptValidation, goodsReceiptEditValidation } from '@nexus/form-validation';
 import { PERMISSIONS } from '@nexus/permissions';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
@@ -9,7 +8,9 @@ import { useSelectedOption } from '../../../shared/composables/useSelectedOption
 import type { LookupItem } from '../../../shared/lookup.js';
 import { purchaseService } from '../services/purchaseService.js';
 import { purchaseLookupService } from '../services/purchaseLookupService.js';
-import { initialPurchaseValues, purchasePayload, purchaseTotals } from '../purchaseForm.js';
+import { createInitialPurchaseValues, createPurchaseValidationSchema } from '../purchaseForm.js';
+import { mapPurchaseFormToRequest } from '../mappers/purchaseRequestMapper.js';
+import { calculatePurchaseTotals } from '../purchaseCalculations.js';
 import type {
     PurchaseTarget,
     PurchaseField,
@@ -28,33 +29,13 @@ export const usePurchaseEditor = (options: {
 }) => {
     const document = options.target.action === 'create' ? undefined : options.target.document;
     const isReadOnly = options.target.action === 'view';
-    const rules = (document ? goodsReceiptEditValidation : goodsReceiptValidation) as Record<
-        string,
-        (value: unknown, data: Record<string, unknown>) => string | null
-    >;
+    const validationSchema = createPurchaseValidationSchema(() => form.values, document);
     const form = useForm<PurchaseValues>({
-        initialValues: initialPurchaseValues(document),
+        initialValues: createInitialPurchaseValues(document),
         validateOnMount: false,
-        validationSchema: computed(() =>
-            Object.fromEntries(
-                Object.entries(rules).map(([field, rule]) => [
-                    field,
-                    () => {
-                        const payload = purchasePayload(form.values, document);
-                        return (
-                            rule(
-                                field === 'receptionDate'
-                                    ? form.values.receptionDate
-                                    : payload[field],
-                                payload,
-                            ) || true
-                        );
-                    },
-                ]),
-            ),
-        ),
+        validationSchema,
     });
-    for (const field of Object.keys(rules) as PurchaseField[])
+    for (const field of Object.keys(validationSchema) as PurchaseField[])
         form.defineField(field, { validateOnModelUpdate: false });
     const save = useRecordSave({
         setErrors: form.setErrors,
@@ -126,28 +107,31 @@ export const usePurchaseEditor = (options: {
         void suppliers.refresh();
     };
 
-    const addLine = (line: PurchaseDetail) =>
+    const addDetail = (line: PurchaseDetail) =>
         interaction.update('details', [...form.values.details, line]);
 
-    const removeLine = (id: string) =>
+    const removeDetail = (id: string) =>
         interaction.update(
             'details',
             form.values.details.filter((row) => row.id !== id),
         );
 
     const totals = computed(() =>
-        purchaseTotals([...(document?.details ?? []), ...form.values.details]),
+        calculatePurchaseTotals([...(document?.details ?? []), ...form.values.details]),
     );
-    const submitValidated = form.handleSubmit((values) =>
-        save.execute((signal) =>
-            purchaseService.save(
-                options.resource,
-                purchasePayload(values, document),
+    const submitValidated = form.handleSubmit((values) => {
+        const target = options.target;
+        if (target.action === 'view') return;
+
+        return save.execute((signal) =>
+            purchaseService.save({
+                resource: options.resource,
+                target,
+                payload: mapPurchaseFormToRequest(values, document),
                 signal,
-                document?.id,
-            ),
-        ),
-    );
+            }),
+        );
+    });
 
     const submit = () => {
         if (!isReadOnly && !isSubmitting.value && !save.isConflicted.value && !save.isDisposed())
@@ -168,8 +152,8 @@ export const usePurchaseEditor = (options: {
         canSuppliers,
         canPersons,
         selectCreatedSupplier,
-        addLine,
-        removeLine,
+        addDetail,
+        removeDetail,
         totals,
         submit,
     };

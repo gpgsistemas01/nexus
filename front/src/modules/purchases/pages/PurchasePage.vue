@@ -15,7 +15,8 @@ import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue'
 import { purchaseService } from '../services/purchaseService.js';
 import { usePurchaseFilters } from '../composables/usePurchaseFilters.js';
 import { usePurchaseActions } from '../composables/usePurchaseActions.js';
-import { emptyPurchaseFilters, PURCHASE_CONFIG } from '../purchase.js';
+import { emptyPurchaseFilters } from '../purchaseForm.js';
+import { PURCHASE_CONFIG } from '../purchaseConfig.js';
 import type {
     PurchaseResource,
     PurchaseQuery,
@@ -208,7 +209,7 @@ onMounted(() => {
         :is-changing="actions.isChanging.value"
         :read-error="readError"
         :can-change-details="!isReading && !actions.isChanging.value && !actions.needsReload.value"
-        @saved="actions.saved"
+        @saved="actions.handleSaved"
         @close="actions.close"
         @reload="actions.reload"
         @correct="actions.correct"
@@ -221,7 +222,7 @@ onMounted(() => {
         :resource="resource"
         :document="editor.document"
         :detail="correction"
-        @saved="actions.detailSaved"
+        @saved="actions.handleDetailSaved"
         @close="correction = undefined"
         @reload="
             correction = undefined;

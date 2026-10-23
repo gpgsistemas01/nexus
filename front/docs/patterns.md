@@ -14,6 +14,25 @@ documento conecta los patrones existentes con sus responsabilidades y límites; 
 | Adaptador HTTP y de datos | Servicios de módulos, `apiClient`, `requestPage` y mappers. | Traducir parámetros y validar la respuesta; conservar id, versión y códigos, sin renderizar. |
 | Slots y composición visual | `ServerTable`, `RecordListPanel`, `EditorDialog` y `RecordEditorDialog`. | Compartir estructura sin convertir todos los formularios en un CRUD universal. |
 | Provisión de sesión | `createAuthSession`, `provide/inject` y guarda de Router. | Una instancia por aplicación; la autorización definitiva sigue en Express. |
+| Fábrica de esquemas | `createIssueValidationSchema` y `createPurchaseValidationSchema`. | Adaptar reglas públicas al modo de captura y a VeeValidate; no decidir stock ni persistencia. |
+
+Los callbacks son una estrategia funcional; las uniones discriminadas de TypeScript
+son un mecanismo para expresar operaciones válidas. SOLID aporta principios de
+evaluación. No se presentan como patrones GoF adicionales ni como una certificación.
+
+## Mapa de diagramas y código
+
+| Pregunta | Figura propietaria | Código representativo |
+| --- | --- | --- |
+| ¿Quién configura el listado compartido? | [DIA-VUE-PAT-001](#dependencias-y-composición-de-un-listado) | [CatalogPage](../src/modules/catalogs/pages/CatalogPage.vue), [useCatalogList](../src/modules/catalogs/composables/useCatalogList.ts), [usePagedList](../src/shared/composables/usePagedList.ts). |
+| ¿Quién presenta, valida y guarda un documento? | [DIA-VUE-DOC-001](document-responsibilities.md#composición-del-editor-y-adaptadores) | [useIssueEditor](../src/modules/issues/composables/useIssueEditor.ts) y [usePurchaseEditor](../src/modules/purchases/composables/usePurchaseEditor.ts). |
+| ¿Cuándo se confirma una escritura y se recarga? | [DIA-VUE-DOC-002](document-responsibilities.md#secuencia-de-guardado-confirmado) | [useRecordSave](../src/shared/composables/useRecordSave.ts), [issueService](../src/modules/issues/services/issueService.ts), [confirmMutation](../src/shared/http/recordContract.ts). |
+| ¿Cómo se integra un alta de otro dominio? | [DIA-VUE-DOC-003](document-responsibilities.md#composición-entre-dominios-para-altas-rápidas) | [IssueWorkspace](../src/app/pages/IssueWorkspace.vue) y [PurchaseWorkspace](../src/app/pages/PurchaseWorkspace.vue). |
+
+Los diagramas detallados y su tabla de responsabilidades viven junto a la revisión
+de Salidas/Compras; no se duplica su contenido en la guía general. La sesión y la
+seguridad conservan sus figuras en [renovación coordinada](../../back/docs/architecture/views/processes/shared-runtime-behavior/02-browser-session-and-form-state.md#renovación-coordinada-del-transporte-http)
+y [fronteras de escritura](../../back/docs/architecture/coding-standards/09-errors-security-audit-and-logging.md#fronteras-de-una-escritura-de-formulario).
 
 ## Dependencias y composición de un listado
 

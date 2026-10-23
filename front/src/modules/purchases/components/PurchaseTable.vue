@@ -5,7 +5,7 @@ import type { DataTableHeader } from 'vuetify';
 import ServerTable from '../../../shared/components/ServerTable.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
 import { useTableQuery } from '../../../shared/composables/useTableQuery.js';
-import { canEditPurchase } from '../purchase.js';
+import { canEditPurchase } from '../purchaseRules.js';
 import type { PurchaseRow, PurchaseQuery } from '../purchase.js';
 
 const props = defineProps<{

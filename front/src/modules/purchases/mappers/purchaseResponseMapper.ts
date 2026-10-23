@@ -1,7 +1,7 @@
 import { ApiError } from '../../../shared/http/apiError.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
-import { PURCHASE_CONFIG } from '../purchase.js';
+import { PURCHASE_CONFIG } from '../purchaseConfig.js';
 import type {
     Decimal,
     PurchaseResource,
@@ -11,10 +11,10 @@ import type {
 } from '../purchase.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 
-const invalid = () =>
+const createInvalidResponseError = () =>
     new ApiError('El servidor devolvió una compra incompleta. Actualiza la consulta.');
 
-export const purchaseDecimal = (value: unknown): Decimal => {
+const readPurchaseDecimal = (value: unknown): Decimal => {
     if (
         (typeof value === 'number' || (typeof value === 'string' && value.trim() !== '')) &&
         Number.isFinite(Number(value)) &&
@@ -22,12 +22,12 @@ export const purchaseDecimal = (value: unknown): Decimal => {
     )
         return value;
 
-    throw invalid();
+    throw createInvalidResponseError();
 };
 
-const text = (value: unknown) => (typeof value === 'string' ? value : '');
+const readOptionalText = (value: unknown) => (typeof value === 'string' ? value : '');
 
-const relation = (value: unknown) => (isRecord(value) ? value : {});
+const readOptionalRelation = (value: unknown) => (isRecord(value) ? value : {});
 
 export const normalizePurchaseRow = (value: unknown, resource: PurchaseResource): PurchaseRow => {
     if (
@@ -38,10 +38,10 @@ export const normalizePurchaseRow = (value: unknown, resource: PurchaseResource)
         typeof value.isInvoiced !== 'boolean' ||
         !isRecord(value.status)
     )
-        throw invalid();
+        throw createInvalidResponseError();
 
     const receptionDate = readText(value, 'receptionDate');
-    if (!Number.isFinite(Date.parse(receptionDate))) throw invalid();
+    if (!Number.isFinite(Date.parse(receptionDate))) throw createInvalidResponseError();
 
     return {
         id: value.id,
@@ -54,16 +54,13 @@ export const normalizePurchaseRow = (value: unknown, resource: PurchaseResource)
         isInvoiced: value.isInvoiced,
         invoice: value.isInvoiced ? readText(value, 'invoice') : '',
         status: readText(value.status, 'name'),
-        totalQuantity: purchaseDecimal(value.totalQuantity),
-        totalNetPurchaseAmount: purchaseDecimal(value.totalNetPurchaseAmount),
-        totalGrossPurchaseAmount: purchaseDecimal(value.totalGrossPurchaseAmount),
+        totalQuantity: readPurchaseDecimal(value.totalQuantity),
+        totalNetPurchaseAmount: readPurchaseDecimal(value.totalNetPurchaseAmount),
+        totalGrossPurchaseAmount: readPurchaseDecimal(value.totalGrossPurchaseAmount),
     };
 };
 
-export const normalizePurchaseDetail = (
-    value: unknown,
-    resource: PurchaseResource,
-): PurchaseDetail => {
+const normalizePurchaseDetail = (value: unknown, resource: PurchaseResource): PurchaseDetail => {
     if (
         !isRecord(value) ||
         typeof value.id !== 'string' ||
@@ -72,25 +69,25 @@ export const normalizePurchaseDetail = (
         value.material.type !== PURCHASE_CONFIG[resource].type ||
         !['ACTIVE', 'CANCELED'].includes(String(value.status))
     )
-        throw invalid();
+        throw createInvalidResponseError();
 
     const material = value.material;
     return {
         id: value.id,
         materialId: readText(value, 'materialId'),
         name: readText(value, 'materialName'),
-        base: material.base == null ? null : purchaseDecimal(material.base),
-        height: material.height == null ? null : purchaseDecimal(material.height),
-        presentation: readText(relation(material.presentation), 'name'),
+        base: material.base == null ? null : readPurchaseDecimal(material.base),
+        height: material.height == null ? null : readPurchaseDecimal(material.height),
+        presentation: readText(readOptionalRelation(material.presentation), 'name'),
         unitMeasure:
-            text(relation(material.unitMeasure).symbol) ||
-            readText(relation(material.unitMeasure), 'name'),
-        quantity: purchaseDecimal(value.quantity),
-        convertedQuantity: purchaseDecimal(value.convertedQuantity),
-        costPerUnitType: purchaseDecimal(value.costPerUnitType),
-        conversionUnitCost: purchaseDecimal(value.conversionUnitCost),
-        netPurchaseAmount: purchaseDecimal(value.netPurchaseAmount),
-        grossPurchaseAmount: purchaseDecimal(value.grossPurchaseAmount),
+            readOptionalText(readOptionalRelation(material.unitMeasure).symbol) ||
+            readText(readOptionalRelation(material.unitMeasure), 'name'),
+        quantity: readPurchaseDecimal(value.quantity),
+        convertedQuantity: readPurchaseDecimal(value.convertedQuantity),
+        costPerUnitType: readPurchaseDecimal(value.costPerUnitType),
+        conversionUnitCost: readPurchaseDecimal(value.conversionUnitCost),
+        netPurchaseAmount: readPurchaseDecimal(value.netPurchaseAmount),
+        grossPurchaseAmount: readPurchaseDecimal(value.grossPurchaseAmount),
         status: value.status as PurchaseDetail['status'],
         isNew: false,
     };
@@ -106,10 +103,11 @@ export const normalizePurchaseDocument = (
         !Object.hasOwn(value, 'observations') ||
         (value.observations !== null && typeof value.observations !== 'string')
     )
-        throw invalid();
+        throw createInvalidResponseError();
 
     const details = value.details.map((row) => normalizePurchaseDetail(row, resource));
-    if (new Set(details.map((row) => row.id)).size !== details.length) throw invalid();
+    if (new Set(details.map((row) => row.id)).size !== details.length)
+        throw createInvalidResponseError();
 
     return {
         ...normalizePurchaseRow(value, resource),
@@ -118,16 +116,18 @@ export const normalizePurchaseDocument = (
     };
 };
 
-export const purchaseItemOption = (
+export const mapPurchaseItemOption = (
     value: Record<string, unknown>,
     resource: PurchaseResource,
 ): LookupItem => {
-    const material = relation(value.material);
-    if (material.type !== PURCHASE_CONFIG[resource].type) throw invalid();
+    const material = readOptionalRelation(value.material);
+    // El listado de inventario se filtra por endpoint y no incluye `type`.
+    if (material.type !== undefined && material.type !== PURCHASE_CONFIG[resource].type)
+        throw createInvalidResponseError();
 
     const id = readText(material, 'id');
     const name = readText(material, 'name');
-    const presentation = readText(relation(material.presentation), 'name');
+    const presentation = readText(readOptionalRelation(material.presentation), 'name');
     return {
         id,
         title: [

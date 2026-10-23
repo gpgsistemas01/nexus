@@ -34,7 +34,7 @@ const createItem = (request: ItemCreation) => {
         auxiliary.value = { kind: 'item', ...request };
 };
 
-const supplierSaved = (entry?: DirectoryEntry) => {
+const handleSupplierSaved = (entry?: DirectoryEntry) => {
     if (auxiliary.value?.kind !== 'supplier' || !entry) return;
 
     auxiliary.value.onCreated({
@@ -46,7 +46,7 @@ const supplierSaved = (entry?: DirectoryEntry) => {
     auxiliary.value = undefined;
 };
 
-const itemSaved = (item?: LookupItem) => {
+const handleItemSaved = (item?: LookupItem) => {
     if (auxiliary.value?.kind !== 'item' || !item) return;
 
     auxiliary.value.onCreated(item);
@@ -64,7 +64,7 @@ const itemSaved = (item?: LookupItem) => {
         v-if="auxiliary?.kind === 'supplier'"
         resource="suppliers"
         :target="{ action: 'create' }"
-        @saved="supplierSaved"
+        @saved="handleSupplierSaved"
         @close="auxiliary = undefined"
         @reload="auxiliary = undefined"
         @denied="onDenied"
@@ -76,7 +76,7 @@ const itemSaved = (item?: LookupItem) => {
         :user-id="session.user.value!.id"
         creation-context="goodsReceipt"
         :initial-supplier="auxiliary.supplier"
-        @saved="itemSaved"
+        @saved="handleItemSaved"
         @close="auxiliary = undefined"
         @reload="auxiliary = undefined"
         @unauthorized="onDenied(401)"

@@ -19,10 +19,12 @@ import {
     mdiTruckDeliveryOutline,
     mdiSwapHorizontalCircleOutline,
     mdiCartArrowDown,
+    mdiPackageUp,
 } from '@mdi/js';
 
 // SVG oficiales importados por nombre; Vite conserva los iconos utilizados.
 export const APP_ICONS = {
+    issues: `svg:${mdiPackageUp}`,
     warehouse: `svg:${mdiWarehouse}`,
     purchases: `svg:${mdiCartArrowDown}`,
     movements: `svg:${mdiSwapHorizontalCircleOutline}`,

@@ -5,6 +5,12 @@ componentes compartidos resuelven un contrato visual estable y cada recurso cons
 reglas, selectores y efectos propios. Compartir no significa mover todo a `shared`; exige
 al menos dos consumidores y un contrato independiente del contexto.
 
+Los ejemplos de este capítulo corresponden al frontend EJS. Vue conserva su
+documentación propietaria junto a sus fuentes: [patrones y diagrama de listados](../../../../../../front/docs/patterns.md)
+y [composición de editores, guardado y altas rápidas](../../../../../../front/docs/document-responsibilities.md).
+Allí se representan props/eventos, composables, VeeValidate y Axios; los diagramas
+de Select2, MDB y manipulación del DOM de este capítulo no describen la solución Vue.
+
 ### Composición de la interfaz
 
 **Identificador:** `DIA-PAT-UI-001`. **Pregunta:** ¿cómo conserva materiales la

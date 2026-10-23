@@ -57,35 +57,14 @@ export interface PurchaseValues {
 }
 export type PurchaseField = keyof PurchaseValues;
 export type PurchaseTarget =
-    { action: 'create' } | { action: 'edit' | 'view'; document: PurchaseDocument };
+    | { action: 'create' }
+    | { action: 'edit'; document: PurchaseDocument }
+    | { action: 'view'; document: PurchaseDocument };
+export type PurchaseWriteTarget = Exclude<PurchaseTarget, { action: 'view' }>;
+export type PurchaseDetailChange =
+    { action: 'correct'; quantity: number; costPerUnitType: number } | { action: 'cancel' };
 export type CreatedOption = (item: LookupItem) => void;
 export interface ItemCreation {
     supplier: LookupItem;
     onCreated: CreatedOption;
 }
-export const PURCHASE_CONFIG = {
-    materials: {
-        title: 'Compras de Materiales',
-        label: 'Materiales',
-        item: 'Material',
-        path: 'materiales',
-        type: 'MATERIAL',
-    },
-    consumables: {
-        title: 'Compras de Consumibles',
-        label: 'Consumibles',
-        item: 'Consumible',
-        path: 'consumibles',
-        type: 'CONSUMABLE',
-    },
-} as const;
-
-export const emptyPurchaseFilters = (): PurchaseFilters => ({
-    startDate: '',
-    endDate: '',
-    supplierId: '',
-    personId: '',
-});
-
-export const canEditPurchase = (row: PurchaseRow) =>
-    row.status === 'Confirmada' || row.status === 'Abierta';

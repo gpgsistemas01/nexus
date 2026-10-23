@@ -4,7 +4,7 @@ import { goodsReceiptCorrectionValidation } from '@nexus/form-validation';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
 import { confirmAction } from '../../../shared/ui/feedback.js';
-import { purchaseCorrectionTotals } from '../purchaseForm.js';
+import { calculatePurchaseCorrectionTotals } from '../purchaseCalculations.js';
 import { purchaseService } from '../services/purchaseService.js';
 import type { PurchaseResource, PurchaseDetail, PurchaseDocument } from '../purchase.js';
 import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
@@ -45,7 +45,7 @@ export const usePurchaseCorrection = (options: {
         },
     });
     const totals = computed(() =>
-        purchaseCorrectionTotals(options.document, options.detail, form.values),
+        calculatePurchaseCorrectionTotals(options.document, options.detail, form.values),
     );
     const validated = form.handleSubmit(async (values) => {
         if (
@@ -66,17 +66,17 @@ export const usePurchaseCorrection = (options: {
         if (!confirmed || save.isDisposed()) return;
 
         return save.execute((signal) =>
-            purchaseService.changeDetail(
-                options.resource,
-                options.document.id,
-                options.detail.id,
-                'corrections',
-                signal,
-                {
+            purchaseService.changeDetail({
+                resource: options.resource,
+                documentId: options.document.id,
+                detailId: options.detail.id,
+                change: {
+                    action: 'correct',
                     quantity: Number(values.quantity),
                     costPerUnitType: Number(values.costPerUnitType),
                 },
-            ),
+                signal,
+            }),
         );
     });
 
