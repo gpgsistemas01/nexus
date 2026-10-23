@@ -10,6 +10,7 @@ import {
 } from '../../../shared/http/recordContract.js';
 import { requestExcel } from '../../../shared/http/requestExcel.js';
 import { DIRECTORY_CONFIG } from '../directory.js';
+import { isRecord } from '../../../shared/utils/isRecord.js';
 import type { DirectoryEntry, DirectoryResource, DirectoryTarget } from '../directory.js';
 
 const normalizeEntry = (resource: DirectoryResource, value: unknown): DirectoryEntry => {
@@ -49,6 +50,10 @@ export const directoryService = {
         confirmMutation(
             result,
             `${target.action === 'create' ? 'CREATED' : 'UPDATED'}_${resource === 'clients' ? 'CLIENT' : 'SUPPLIER'}`,
+        );
+        return normalizeEntry(
+            resource,
+            isRecord(result) ? result[resource === 'clients' ? 'client' : 'supplier'] : undefined,
         );
     },
     export(resource: DirectoryResource, query: RecordQuery, signal: AbortSignal) {

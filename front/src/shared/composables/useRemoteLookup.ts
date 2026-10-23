@@ -122,6 +122,7 @@ export const useRemoteLookup = (
         search,
         hasMore,
         updateSearch,
+        refresh: () => load(1),
         loadMore: () => {
             if (!isLoading.value && !error.value && hasMore.value) return load(page.value + 1);
         },

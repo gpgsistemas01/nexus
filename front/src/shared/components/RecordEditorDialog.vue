@@ -15,6 +15,8 @@ withDefaults(
         context?: string;
         note?: string;
         reloadLabel?: string;
+        showSubmit?: boolean;
+        retainFocus?: boolean;
     }>(),
     {
         submitLabel: 'Guardar',
@@ -22,6 +24,8 @@ withDefaults(
         context: '',
         note: '',
         reloadLabel: 'Cerrar y actualizar listado',
+        showSubmit: true,
+        retainFocus: true,
     },
 );
 const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
@@ -37,6 +41,8 @@ const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
         :is-submitting="isSubmitting"
         :is-submit-disabled="isConflicted"
         :submit-label="submitLabel"
+        :show-submit="showSubmit"
+        :retain-focus="retainFocus"
         @close="emit('close')"
         @submit="emit('submit')"
     >
@@ -64,6 +70,8 @@ const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
 <style scoped>
 .record-fields {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
     gap: 1.25rem;
     padding: 1rem;
     background: rgb(var(--v-theme-surface));

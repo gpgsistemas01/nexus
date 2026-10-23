@@ -30,10 +30,17 @@ export const inventorySections = (
     resource: InventoryResource,
     target: EditorTarget,
     preview: ReturnType<typeof previewWaste>,
-    options: { template?: LookupItem; usesMeasurements: boolean; hasSupplier: boolean },
+    options: {
+        template?: LookupItem;
+        usesMeasurements: boolean;
+        hasSupplier: boolean;
+        creationContext?: 'goodsReceipt';
+        supplier?: LookupItem;
+    },
 ): InventoryFormSection[] => {
     const { action, row } = target;
     const isCreating = action === 'create';
+    const fromPurchase = isCreating && options.creationContext === 'goodsReceipt';
     const isWaste = resource === 'wastes';
     const isStock = action === 'stock' || action === 'add-stock';
     const isRoll = isCreating ? preview.isRoll : isRollPresentation(row?.presentation);
@@ -86,9 +93,11 @@ export const inventorySections = (
                       {
                           name: 'supplierId' as const,
                           label: 'Proveedor',
-                          type: isCreating ? ('lookup' as const) : undefined,
-                          isReadOnly: !isCreating,
-                          displayValue: isCreating ? undefined : row?.supplierName,
+                          type: isCreating && !options.supplier ? ('lookup' as const) : undefined,
+                          isReadOnly: !isCreating || !!options.supplier,
+                          displayValue:
+                              options.supplier?.title ??
+                              (isCreating ? undefined : row?.supplierName),
                           isWide: true,
                       },
                   ]
@@ -222,7 +231,7 @@ export const inventorySections = (
               : 'Inventario del material',
         fields: [
             { name: 'minStock', label: 'Stock mínimo', type: 'number', isReadOnly: isStock },
-            ...(!isStock || row?.maxUnitCost !== undefined
+            ...(!fromPurchase && (!isStock || row?.maxUnitCost !== undefined)
                 ? [
                       {
                           name: 'maxUnitCost' as const,
@@ -235,7 +244,7 @@ export const inventorySections = (
             { name: 'isActive', label: 'Activo', type: 'checkbox', isReadOnly: isStock },
         ],
     });
-    if (isCreating || isStock)
+    if ((isCreating || isStock) && !fromPurchase)
         sections.push({
             id: 'stock',
             title: 'Existencias y observaciones',

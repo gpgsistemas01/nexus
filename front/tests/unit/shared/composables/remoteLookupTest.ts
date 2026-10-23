@@ -116,6 +116,7 @@ it('desmontar cancela la petición y el debounce y bloquea callbacks conservados
   wrapper.unmount();
   value.updateSearch('después de desmontar');
   await value.retry();
+  await value.refresh();
   await value.loadMore();
   finish(result(['tardío']));
   await vi.advanceTimersByTimeAsync(300);
@@ -123,4 +124,19 @@ it('desmontar cancela la petición y el debounce y bloquea callbacks conservados
   expect(signal.aborted).toBe(true);
   expect(request).toHaveBeenCalledTimes(1);
   expect(value.state.value).toEqual({ items: [], isLoading: false, error: '', hasMore: false });
+});
+
+it('refrescar un catálogo vuelve a la primera página y sustituye opciones tras una alta', async () => {
+  const request = vi
+    .fn()
+    .mockResolvedValueOnce(result(['uno'], 2))
+    .mockResolvedValueOnce(result(['dos'], 2))
+    .mockResolvedValueOnce(result(['nuevo', 'uno'], 3));
+  const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  await flushPromises();
+  await value.loadMore();
+  await value.refresh();
+  expect(request.mock.calls.map((call) => call[1])).toEqual([1, 2, 1]);
+  expect(value.items.value.map((item) => item.id)).toEqual(['nuevo', 'uno']);
+  expect(value.hasMore.value).toBe(true);
 });

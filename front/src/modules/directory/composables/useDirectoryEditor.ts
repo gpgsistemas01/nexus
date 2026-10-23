@@ -9,12 +9,13 @@ import type {
     DirectoryTarget,
     DirectoryField,
     DirectoryValues,
+    DirectoryEntry,
 } from '../directory.js';
 
 export const useDirectoryEditor = (options: {
     resource: DirectoryResource;
     target: DirectoryTarget;
-    onSaved: () => void;
+    onSaved: (entry?: DirectoryEntry) => void;
     onDenied: (status: number) => void;
 }) => {
     const row = options.target.action === 'edit' ? options.target.row : undefined;
@@ -36,7 +37,12 @@ export const useDirectoryEditor = (options: {
     });
     for (const field of Object.keys(rules) as DirectoryField[])
         form.defineField(field, { validateOnModelUpdate: false });
-    const save = useRecordSave({ ...options, setErrors: form.setErrors });
+    let savedEntry: DirectoryEntry | undefined;
+    const save = useRecordSave({
+        ...options,
+        onSaved: () => options.onSaved(savedEntry),
+        setErrors: form.setErrors,
+    });
     const interaction = useFormInteraction<DirectoryField, string | boolean>(form, {
         isDisabled: () =>
             form.isSubmitting.value ||
@@ -48,14 +54,14 @@ export const useDirectoryEditor = (options: {
         },
     });
     const submitValidated = form.handleSubmit((values) =>
-        save.execute((signal) =>
-            directoryService.save(
+        save.execute(async (signal) => {
+            savedEntry = await directoryService.save(
                 options.resource,
                 options.target,
                 directoryPayload(options.resource, options.target, values),
                 signal,
-            ),
-        ),
+            );
+        }),
     );
 
     const submit = () => {

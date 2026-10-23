@@ -17,7 +17,9 @@
         "../back/src/shared/inventory/wasteMeasurements.js",
         "../back/src/shared/validation/weightValidations.js",
         "../back/src/shared/utils/numberUtils.js",
-        "../back/src/shared/constants/catalogs.js"
+        "../back/src/shared/constants/catalogs.js",
+        "../back/src/shared/inventory/goodsReceiptCalculations.js",
+        "../back/src/public/js/utils/timeZone.js"
     ],
     "compilerOptions": {
         "composite": true,
@@ -33,7 +35,11 @@
             "@nexus/waste-measurements": ["../back/src/shared/inventory/wasteMeasurements.js"],
             "@nexus/permissions": ["../back/src/shared/constants/permissions.js"],
             "@nexus/catalogs": ["../back/src/shared/constants/catalogs.js"],
-            "@nexus/form-validation": ["../back/src/public/js/utils/validations/validators.js"]
+            "@nexus/form-validation": ["../back/src/public/js/utils/validations/validators.js"],
+            "@nexus/purchase-calculations": [
+                "../back/src/shared/inventory/goodsReceiptCalculations.js"
+            ],
+            "@nexus/date-time": ["../back/src/public/js/utils/timeZone.js"]
         },
         "noUnusedLocals": true,
         "noUnusedParameters": true,

@@ -97,6 +97,7 @@ Al clonar el repositorio basta con `npm ci`; la dependencia está en el lockfile
 - `/almacen` selecciona el primer módulo permitido para la cuenta.
 - `/almacen/materiales`, `/almacen/consumibles` y `/almacen/mermas` son los módulos
   operativos, con sesión y permisos obtenidos de Express.
+- `/compras/materiales` y `/compras/consumibles` permiten gestionar compras; `/compras` abre la primera variante autorizada. Consulta [campos y contratos](docs/purchases.md).
 - `/catalogos` abre Áreas; sus seis rutas requieren `catalogs:manage`. Consulta
   [campos, endpoints y arquitectura](docs/catalogs.md).
 - `/identidad/personas` y `/identidad/usuarios` mantienen formularios distintos.

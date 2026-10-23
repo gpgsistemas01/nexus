@@ -5,6 +5,7 @@ import './feedback.css';
 const dialog = Swal.mixin({
     customClass: {
         popup: 'nexus-feedback v-theme--warehouse',
+        container: 'nexus-feedback-container',
         confirmButton: 'feedback-confirm',
         cancelButton: 'feedback-cancel',
     },
@@ -28,6 +29,8 @@ export const confirmRemoval = async (options: {
     description: string;
     signal: AbortSignal;
     submit: () => Promise<void>;
+    confirmLabel?: string;
+    failureMessage?: string;
 }) => {
     if (options.signal.aborted) return false;
 
@@ -47,7 +50,7 @@ export const confirmRemoval = async (options: {
             showCancelButton: true,
             cancelButtonText: 'Cancelar',
             focusCancel: true,
-            confirmButtonText: 'Confirmar eliminación',
+            confirmButtonText: options.confirmLabel ?? 'Confirmar eliminación',
             showLoaderOnConfirm: true,
             allowOutsideClick: () => !Swal.isLoading(),
             allowEscapeKey: () => !Swal.isLoading(),
@@ -69,7 +72,8 @@ export const confirmRemoval = async (options: {
                                 : 'No se pudo eliminar el registro.',
                     });
                     Swal.showValidationMessage(
-                        'La eliminación no se confirmó. Puedes reintentar o cancelar.',
+                        options.failureMessage ??
+                            'La eliminación no se confirmó. Puedes reintentar o cancelar.',
                     );
                     return false;
                 }

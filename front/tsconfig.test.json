@@ -18,7 +18,9 @@
         "../back/src/shared/inventory/wasteMeasurements.js",
         "../back/src/shared/validation/weightValidations.js",
         "../back/src/shared/utils/numberUtils.js",
-        "../back/src/shared/constants/catalogs.js"
+        "../back/src/shared/constants/catalogs.js",
+        "../back/src/shared/inventory/goodsReceiptCalculations.js",
+        "../back/src/public/js/utils/timeZone.js"
     ],
     "compilerOptions": {
         "types": ["vite/client", "node"],

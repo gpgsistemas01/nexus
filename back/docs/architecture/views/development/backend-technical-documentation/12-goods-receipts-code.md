@@ -84,3 +84,11 @@ Los reportes y la infraestructura transversal se localizan en el
 según el `type` fijado por su servicio específico. El contador anual y la compra
 se guardan con el mismo `tx`; las series son independientes y un error dentro
 de la transacción revierte también el incremento del contador.
+
+### Lectura para edición en Vue
+
+`goodsReceiptService` devuelve `observations` como campo del encabezado tanto
+en listado como por id, incluido `null` cuando no hay texto. `includeDetails`
+sólo controla la relación de partidas; no altera los campos del encabezado.
+La consulta por id recupera además los detalles para editar y conservar el
+documento completo, sin cambiar las reglas de escritura.

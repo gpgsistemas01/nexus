@@ -28,6 +28,15 @@ export default defineConfig(({ mode }) => {
                         import.meta.url,
                     ),
                 ),
+                '@nexus/purchase-calculations': fileURLToPath(
+                    new URL(
+                        '../back/src/shared/inventory/goodsReceiptCalculations.js',
+                        import.meta.url,
+                    ),
+                ),
+                '@nexus/date-time': fileURLToPath(
+                    new URL('../back/src/public/js/utils/timeZone.js', import.meta.url),
+                ),
                 '@nexus/form-validation': fileURLToPath(
                     new URL(
                         '../back/src/public/js/utils/validations/validators.js',

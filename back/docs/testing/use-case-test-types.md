@@ -221,3 +221,15 @@ y descarga en tres modalidades con API simulada. El
 [diseño DP-VUE-MOV-001..004](../../../front/docs/tooling.md) delimita su alcance.
 Esta evidencia del cliente no cierra las brechas de integración ni de contenido
 real del reporte de merma indicadas arriba.
+
+### Compras desde Vue
+
+Para `CU-ENT-01..12`, la migración conserva las integraciones de compras y añade
+`front/tests/unit/modules/purchases/purchaseTest.ts` y
+`front/tests/e2e/purchases.spec.ts` (diseños `DP-VUE-COM-001/002` en la guía de
+herramientas Vue). Cubren consulta, captura, edición incremental, corrección,
+cancelación confirmada y exportación en navegador con respuestas simuladas.
+La consulta HTTP por id de ambas variantes conserva observaciones después
+de editar, verificada con Prisma en `goodsReceiptContextDbTest.js`; el listado
+conserva esas observaciones, incluidas las nulas, y omite sólo los detalles. El navegador simulado no sustituye esa
+integración ni demuestra autorización o stock persistido.

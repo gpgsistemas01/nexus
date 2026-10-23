@@ -86,9 +86,10 @@ concentra la adaptación de inputs, checkbox, textarea y selector remoto.
 | Crear merma | Selecciona proveedor/material y muestra presentación/unidad heredadas. El material se habilita después del proveedor; cambiar proveedor limpia la referencia y captura anterior. Rollos capturan muestra, cono y peso total; neto y medidas calculadas son de consulta. |
 | Editar merma / agregar stock | Conserva pesos y medidas. Muestra rollo completo cuando existe; de lo contrario conserva largo/peso de la referencia histórica. Agregar captura cantidad y observaciones. |
 
-El alta de proveedores desde el selector EJS queda fuera de esta migración de
-Materiales, Consumibles y Mermas: requiere un formulario Vue de Proveedores. No se
-abre una pantalla EJS desde el menú ni desde estos controles.
+Los selectores de Inventario conservan la consulta de opciones.
+[Compras](purchases.md) compone las altas rápidas con los editores Vue existentes
+de Proveedores e Inventario mediante `PurchaseWorkspace`; no abre pantallas EJS.
+Su alta de artículo fija proveedor y omite stock/costo inicial capturado.
 
 Un costo ausente en la respuesta no se convierte silenciosamente en cero al editar:
 la validación exige una captura explícita. Cero sigue siendo un valor válido.
@@ -103,6 +104,14 @@ usa `preConfirm` y `showLoaderOnConfirm`; Cancelar no realiza solicitudes. Un fa
 conserva el diálogo para reintentar y no dispara otra escritura automáticamente.
 Al desmontar la página se cancela la solicitud y se cierra sólo su confirmación.
 Los nombres y mensajes se pasan mediante `titleText`/`text`, sin interpolar HTML.
+La capa `nexus-feedback-container` queda por encima de los overlays Vuetify.
+Cuando Compras confirma una cancelación desde su diálogo de consulta, ese diálogo
+pausa su retención de foco mediante `retainFocus=false` y bloquea cierre/acciones
+hasta resolver la confirmación; SweetAlert2 controla el foco mientras está abierto.
+Los otros modales conservan `retainFocus=true`. `showSubmit=false` permite
+reutilizar el marco para consulta sin presentar una acción de guardado.
+`RecordEditorDialog` limita la columna de captura con `minmax(0, 1fr)` para que
+una tabla ancha se desplace dentro de su wrapper sin estirar los campos.
 
 `useInventoryRemoval` coordina la operación y conserva el ID de la relación con el
 proveedor. `useInventory` mantiene permisos y coordina actualización/aviso de éxito.

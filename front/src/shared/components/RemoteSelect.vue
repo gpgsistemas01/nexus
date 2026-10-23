@@ -69,6 +69,7 @@ const loadWhenVisible = (isVisible: boolean) => {
         :items="visibleItems"
         item-title="title"
         item-value="id"
+        :item-props="(item) => ({ disabled: item.isDisabled === true })"
         :loading="isLoading"
         :disabled="isDisabled"
         :hint="hint"

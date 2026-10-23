@@ -1,11 +1,8 @@
 import { afterEach, expect, it, vi } from 'vitest';
+import { dateRangeError, reportScopeError } from '../../../../src/shared/report.js';
 import { apiClient } from '../../../../src/shared/http/apiClient.js';
 import { movementService } from '../../../../src/modules/movements/services/movementService.js';
-import {
-  emptyMovementFilters,
-  movementFilterError,
-  movementReportError,
-} from '../../../../src/modules/movements/movement.js';
+import { emptyMovementFilters } from '../../../../src/modules/movements/movement.js';
 import type {
   MovementQuery,
   MovementResource,
@@ -144,7 +141,7 @@ it.each([
   ['22/10/2026', '', false],
 ])('fechas %s a %s: válido=%s', (startDate, endDate, valid) => {
   expect(
-    !movementFilterError({
+    !dateRangeError({
       ...emptyMovementFilters(),
       startDate: String(startDate),
       endDate: String(endDate),
@@ -156,7 +153,7 @@ it.each(['', '2026-00', '2026-13', '0000-01', '2026-1'])(
   async (month) => {
     const request = vi.fn();
     apiClient.http.defaults.adapter = mockHttpAdapter(request);
-    expect(movementReportError({ mode: 'specific-month', month })).not.toBe('');
+    expect(reportScopeError({ mode: 'specific-month', month })).not.toBe('');
     await expect(
       movementService.export('materials', query, { mode: 'specific-month', month }, signal()),
     ).rejects.toThrow('mes válido');

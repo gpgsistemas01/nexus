@@ -5,12 +5,24 @@ import { useInventoryEditor } from '../composables/useInventoryEditor.js';
 import { inventorySections } from '../formFields.js';
 import { INVENTORY_CONFIG } from '../inventory.js';
 import type { EditorTarget, InventoryResource } from '../inventory.js';
+import type { LookupItem } from '../../../shared/lookup.js';
 
-const props = defineProps<{ resource: InventoryResource; target: EditorTarget; userId: string }>();
-const emit = defineEmits<{ saved: []; close: []; reload: []; unauthorized: [] }>();
+const props = defineProps<{
+    resource: InventoryResource;
+    target: EditorTarget;
+    userId: string;
+    creationContext?: 'goodsReceipt';
+    initialSupplier?: LookupItem;
+}>();
+const emit = defineEmits<{
+    saved: [created?: LookupItem];
+    close: [];
+    reload: [];
+    unauthorized: [];
+}>();
 const editor = useInventoryEditor({
     ...props,
-    onSaved: () => emit('saved'),
+    onSaved: (created) => emit('saved', created),
     onUnauthorized: () => emit('unauthorized'),
 });
 const { values, errors, message, isSubmitting, isPending, isConflicted, lookups, preview } = editor;
@@ -19,6 +31,8 @@ const sections = computed(() =>
         template: editor.selectedTemplate.value,
         usesMeasurements: editor.usesMeasurements.value,
         hasSupplier: !!values.supplierId,
+        creationContext: props.creationContext,
+        supplier: props.initialSupplier,
     }),
 );
 const title = computed(

@@ -69,7 +69,7 @@ No equivale a las notificaciones instantáneas de la vista EJS.
 
 - `MovementPage` coordina permisos, filtros aplicados, listado y reporte por instancia.
 - `useMovementFilters` mantiene el borrador y la dependencia proveedor/recurso.
-- `MovementFilters`, `MovementTable` y `MovementReportDialog` reciben props y emiten
+- `MovementFilters`, `MovementTable` y `ReportScopeDialog` reciben props y emiten
   eventos; no conocen Axios, sesión ni persistencia.
 - `movementService` adapta los contratos existentes de Express, las identidades de
   opciones y las tres modalidades de exportación mediante el cliente Axios compartido.

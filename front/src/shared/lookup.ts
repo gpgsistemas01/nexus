@@ -2,6 +2,7 @@ export interface LookupItem {
     id: string;
     title: string;
     data: Record<string, unknown>;
+    isDisabled?: boolean;
 }
 
 export interface LookupState {

@@ -1,3 +1,5 @@
+import { reportScopeError } from '../../../shared/report.js';
+import type { ReportScope } from '../../../shared/report.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { recordParams } from '../../../shared/http/recordParams.js';
@@ -6,8 +8,7 @@ import { requestExcel } from '../../../shared/http/requestExcel.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
-import { movementReportError } from '../movement.js';
-import type { MovementQuery, MovementResource, MovementRow, MovementReport } from '../movement.js';
+import type { MovementQuery, MovementResource, MovementRow } from '../movement.js';
 
 const decimal = (value: unknown): string | number | null => {
     if (value == null) return null;
@@ -67,10 +68,10 @@ export const movementService = {
     async export(
         resource: MovementResource,
         query: MovementQuery,
-        report: MovementReport,
+        report: ReportScope,
         signal: AbortSignal,
     ) {
-        const error = movementReportError(report);
+        const error = reportScopeError(report);
         if (error) throw new Error(error);
 
         const params =

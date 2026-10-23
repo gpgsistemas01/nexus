@@ -93,8 +93,10 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(response.body.data.map(receipt => receipt.id)).toEqual([receipts[resource].id]);
         expect(response.body.recordsFiltered).toBe(1);
         expect(response.body.data[0]).not.toHaveProperty('details');
+        expect(response.body.data[0].observations).toBeNull();
         const detail = await request(app).get(`${path(resource)}/${receipts[resource].id}`).expect(200);
         expect(detail.body.goodsReceipt.details.map(row => row.materialId)).toEqual([ids[resource]]);
+        expect(detail.body.goodsReceipt.observations).toBeNull();
         const other = resource === 'material' ? 'consumable' : 'material';
         await request(app).get(`${path(resource)}/${receipts[other].id}`).expect(404);
         await request(app).get(`${path(resource)}/${receipts.mixed.id}`).expect(404);
@@ -108,6 +110,12 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
             supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-07T00:00:00.000Z', observations: 'Contexto correcto', details: []
         }).expect(200);
         expect((await prisma.goodsReceipt.findUnique({ where: { id: receipt.id } })).observations).toBe('Contexto correcto');
+        const detail = await request(app).get(`${path(resource)}/${receipt.id}`).expect(200);
+        expect(detail.body.goodsReceipt.observations).toBe('Contexto correcto');
+        const list = await request(app).get(path(resource)).query({ supplierId: ids.supplier }).expect(200);
+        const row = list.body.data.find(item => item.id === receipt.id);
+        expect(row.observations).toBe('Contexto correcto');
+        expect(row).not.toHaveProperty('details');
     });
 
     it.each(['mixed', 'empty', 'consumable'])('rechaza editar %s desde materiales y conserva la cabecera', async key => {

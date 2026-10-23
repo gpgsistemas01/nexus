@@ -7,6 +7,7 @@ import type { AuthSession } from '../../modules/auth/session.js';
 import { APP_NAVIGATION_GROUPS } from '../navigation.js';
 import { ApiError } from '../../shared/http/apiError.js';
 import { MOVEMENT_CONFIG } from '../../modules/movements/movement.js';
+import { PURCHASE_CONFIG } from '../../modules/purchases/purchase.js';
 
 export const createAppRouter = (
     history: RouterHistory = createWebHistory(import.meta.env.BASE_URL),
@@ -53,6 +54,29 @@ export const createAppRouter = (
                         component: () => import('../../modules/warehouse/pages/InventoryPage.vue'),
                         props: { resource: 'wastes' },
                     },
+                ],
+            },
+            {
+                path: '/compras',
+                meta: {
+                    requiresAuth: true,
+                    permission: PERMISSIONS.GOODS_RECEIPTS_PAGE_VIEW,
+                    navigationGroup: 'purchases',
+                },
+                component: () => import('../layouts/AppLayout.vue'),
+                children: [
+                    {
+                        path: '',
+                        name: 'purchases-home',
+                        component: () => import('../pages/PurchaseWorkspace.vue'),
+                        props: { resource: 'materials' },
+                    },
+                    ...Object.entries(PURCHASE_CONFIG).map(([resource, config]) => ({
+                        path: config.path,
+                        name: `purchases-${resource}`,
+                        component: () => import('../pages/PurchaseWorkspace.vue'),
+                        props: { resource },
+                    })),
                 ],
             },
             {
@@ -175,9 +199,13 @@ export const createAppRouter = (
             const user = await session.load();
 
             if (
-                ['warehouse-home', 'identity-home', 'directory-home', 'movements-home'].includes(
-                    String(to.name),
-                )
+                [
+                    'warehouse-home',
+                    'identity-home',
+                    'directory-home',
+                    'movements-home',
+                    'purchases-home',
+                ].includes(String(to.name))
             ) {
                 const groups = APP_NAVIGATION_GROUPS.filter(
                     (group) => to.name === 'warehouse-home' || group.id === to.meta.navigationGroup,

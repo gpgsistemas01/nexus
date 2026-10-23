@@ -13,6 +13,7 @@ import {
 } from '../formModel.js';
 import { useRemoteOptions } from './useRemoteOptions.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
+import type { LookupItem } from '../../../shared/lookup.js';
 import type {
     EditorTarget,
     InventoryField,
@@ -25,8 +26,10 @@ export const useInventoryEditor = (options: {
     resource: InventoryResource;
     target: EditorTarget;
     userId: string;
-    onSaved: () => void;
+    onSaved: (created?: LookupItem) => void;
     onUnauthorized: () => void;
+    creationContext?: 'goodsReceipt';
+    initialSupplier?: LookupItem;
 }) => {
     const { resource, target } = options;
     const message = ref('');
@@ -57,13 +60,16 @@ export const useInventoryEditor = (options: {
                 : 'No se pudo preparar la recuperación de la captura.';
     }
 
-    const rules = inventoryRules(resource, target.action) as Record<
+    const rules = inventoryRules(resource, target.action, options.creationContext) as Record<
         string,
         (value: unknown, data: Record<string, unknown>) => string | null
     >;
     const form = useForm<InventoryValues>({
         validateOnMount: false,
-        initialValues: initialInventoryValues(target),
+        initialValues: {
+            ...initialInventoryValues(target),
+            ...(options.initialSupplier ? { supplierId: options.initialSupplier.id } : {}),
+        },
         validationSchema: computed(() =>
             Object.fromEntries(
                 Object.entries(rules).map(([field, rule]) => [
@@ -100,7 +106,7 @@ export const useInventoryEditor = (options: {
     const supplierId = computed(() => String(form.values.supplierId));
     const suppliers = useRemoteOptions(
         'suppliers',
-        computed(() => isCreating.value && !isPending.value),
+        computed(() => isCreating.value && !isPending.value && !options.initialSupplier),
     );
     const presentations = useRemoteOptions(
         'presentations',
@@ -210,6 +216,8 @@ export const useInventoryEditor = (options: {
         message.value = '';
         const wasPending = !!pendingData;
 
+        let created: LookupItem | undefined;
+
         try {
             if (isIdempotent) {
                 if (!pending)
@@ -223,7 +231,24 @@ export const useInventoryEditor = (options: {
             }
 
             const id = target.action === 'delete' ? target.row?.id : target.row?.entityId;
-            await inventoryService.mutate(resource, target.action, payload, id, controller.signal);
+            if (
+                options.creationContext === 'goodsReceipt' &&
+                resource !== 'wastes' &&
+                isCreating.value
+            )
+                created = await inventoryService.createForPurchase(
+                    resource,
+                    payload,
+                    controller.signal,
+                );
+            else
+                await inventoryService.mutate(
+                    resource,
+                    target.action,
+                    payload,
+                    id,
+                    controller.signal,
+                );
         } catch (cause) {
             if (!controller.signal.aborted) {
                 try {
@@ -256,11 +281,13 @@ export const useInventoryEditor = (options: {
             /* Repetir el mismo operationId recupera el resultado confirmado. */
         }
 
-        options.onSaved();
+        options.onSaved(created);
     };
 
     const submitValidated = form.handleSubmit((values) =>
-        execute(buildInventoryPayload(resource, target, values, preview.value)),
+        execute(
+            buildInventoryPayload(resource, target, values, preview.value, options.creationContext),
+        ),
     );
 
     const submit = () => {

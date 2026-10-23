@@ -16,7 +16,7 @@ El menú mantiene el acordeón y la barra de iconos, sin enlaces a pantallas EJS
 Después del login, `/almacen` conserva la entrada compatible y elige el primer
 módulo autorizado entre los grupos disponibles. Una cuenta exclusiva de Clientes
 o Usuarios llega a su pantalla. Cada pantalla conserva el título «Tabla de…» de EJS.
-Compras y Salidas conservan sus pantallas EJS. Los historiales se describen en
+[Compras](purchases.md) reutiliza el editor de proveedores para altas rápidas. Salidas conserva sus pantallas EJS. Los historiales se describen en
 [Movimientos en Vue](movements.md), separados de Identidad y Directorio.
 
 ## Datos y operaciones

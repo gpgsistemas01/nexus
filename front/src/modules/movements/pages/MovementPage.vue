@@ -9,18 +9,15 @@ import { useVisibleRefresh } from '../../../shared/composables/useVisibleRefresh
 import { useFileExport } from '../../../shared/composables/useFileExport.js';
 import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
 import { initialRecordQuery } from '../../../shared/list.js';
+import { dateRangeError, reportScopeError } from '../../../shared/report.js';
+import type { ReportScope } from '../../../shared/report.js';
 import { useMovementFilters } from '../composables/useMovementFilters.js';
 import { movementService } from '../services/movementService.js';
-import {
-    emptyMovementFilters,
-    movementFilterError,
-    movementReportError,
-    MOVEMENT_CONFIG,
-} from '../movement.js';
-import type { MovementQuery, MovementRow, MovementResource, MovementReport } from '../movement.js';
+import { emptyMovementFilters, MOVEMENT_CONFIG } from '../movement.js';
+import type { MovementQuery, MovementRow, MovementResource } from '../movement.js';
 import MovementFilters from '../components/MovementFilters.vue';
 import MovementTable from '../components/MovementTable.vue';
-import MovementReportDialog from '../components/MovementReportDialog.vue';
+import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue';
 
 const props = defineProps<{ resource: MovementResource }>();
 const config = MOVEMENT_CONFIG[props.resource];
@@ -43,9 +40,9 @@ const searchForm = useListSearch(list, () => ({ ...filters.values }));
 const { search, clearSearch } = searchForm;
 const filterError = ref('');
 const isReportOpen = ref(false);
-const reportValues = reactive<MovementReport>({ mode: 'current-month', month: '' });
+const reportValues = reactive<ReportScope>({ mode: 'current-month', month: '' });
 const reportFormError = ref('');
-const report = useFileExport<MovementReport>({
+const report = useFileExport<ReportScope>({
     canExport: () => canExport.value,
     filename: `reporte_movimientos_${props.resource}.xlsx`,
     request: (scope, signal) => movementService.export(props.resource, { ...query }, scope, signal),
@@ -54,7 +51,7 @@ const report = useFileExport<MovementReport>({
 const { isExporting, exportError } = report;
 
 const applySearch = () => {
-    filterError.value = movementFilterError(filters.values);
+    filterError.value = dateRangeError(filters.values);
     if (!filterError.value) searchForm.applySearch();
 };
 
@@ -73,7 +70,7 @@ const openReport = () => {
 };
 
 const exportReport = async () => {
-    reportFormError.value = movementReportError(reportValues);
+    reportFormError.value = reportScopeError(reportValues);
     if (reportFormError.value) return;
 
     await report.exportReport({ ...reportValues });
@@ -146,8 +143,10 @@ onMounted(() => {
             @query="list.applyQuery"
         />
     </RecordListPanel>
-    <MovementReportDialog
+    <ReportScopeDialog
         v-if="isReportOpen"
+        eyebrow="MOVIMIENTOS"
+        subject="movimientos"
         :values="reportValues"
         :is-submitting="isExporting"
         :error="reportFormError || exportError"

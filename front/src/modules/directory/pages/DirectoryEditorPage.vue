@@ -2,13 +2,18 @@
 import DirectoryForm from '../components/DirectoryForm.vue';
 import { useDirectoryEditor } from '../composables/useDirectoryEditor.js';
 import { DIRECTORY_CONFIG } from '../directory.js';
-import type { DirectoryResource, DirectoryTarget } from '../directory.js';
+import type { DirectoryResource, DirectoryTarget, DirectoryEntry } from '../directory.js';
 
 const props = defineProps<{ resource: DirectoryResource; target: DirectoryTarget }>();
-const emit = defineEmits<{ saved: []; close: []; reload: []; denied: [status: number] }>();
+const emit = defineEmits<{
+    saved: [entry?: DirectoryEntry];
+    close: [];
+    reload: [];
+    denied: [status: number];
+}>();
 const editor = useDirectoryEditor({
     ...props,
-    onSaved: () => emit('saved'),
+    onSaved: (entry) => emit('saved', entry),
     onDenied: (status) => emit('denied', status),
 });
 const { values, errors, message, isSubmitting, isConflicted } = editor;

@@ -174,7 +174,10 @@ Un `WASTE_ALREADY_EXISTS` por identidad, incluso en carrera concurrente, incluye
 `meta.waste` para ofrecer el modal Agregar stock. Recuperar una creación propia ya
 confirmada responde éxito y no utiliza ese conflicto para generar otra entrada.
 
-Los GET de listados de compras/salidas omiten `details`. Antes de editar, surtir o devolver,
+Los GET de listados de compras/salidas omiten `details`. En compras, el campo
+`observations` pertenece al encabezado y se devuelve tanto en listado como
+por id, incluido `null` cuando no hay texto; no depende de `includeDetails`.
+Antes de editar, surtir o devolver,
 la interfaz consulta GET por id con la misma autorización y contexto del listado.
 Omitir la relación en un listado no permite guardar un documento vacío: las altas y
 ediciones completas exigen al menos una partida. Editar sólo el encabezado conserva

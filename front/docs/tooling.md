@@ -364,3 +364,15 @@ decide que una captura sea segura para persistir. El contrato y los patrones est
 en [entradas y salida segura](input-security.md) y [patrones/SOLID](patterns.md).
 ESLint mantiene `vue/no-v-html` como error; esta regla no certifica ausencia de todos
 los posibles usos inseguros del DOM ni sustituye revisar las opciones de un plugin.
+
+## Pruebas de Compras
+
+| Diseño | Riesgo y técnica | Condición y evidencia |
+| --- | --- | --- |
+| `DP-VUE-COM-001` | Particiones de contexto y formato, fronteras numéricas, transiciones de captura/consulta | `purchaseTest.ts`: distingue material/consumible, rechaza documentos incompletos, conserva hora de México/proveedor/observaciones, omite partidas existentes y valores derivados, valida alta y corrección sin publicar errores al abrir; cerrar invalida lecturas tardías. |
+| `DP-VUE-COM-002` | Transiciones de documento y decisiones de permisos/confirmación | `purchases.spec.ts`: alta en ambas variantes, edición incremental, consulta/corrección/cancelación explícita, filtros y reporte aplicados, acceso y móvil en Chromium con HTTP simulado. No demuestra persistencia ni autorización del servidor. |
+
+El cambio de lectura de observaciones se cubre en la integración HTTP/Prisma
+`back/tests/integration/controllers/goodsReceiptContextDbTest.js`: nulo o texto
+en listado y por id, conservación después de editar y omisión de detalles en listado,
+en ambas variantes.

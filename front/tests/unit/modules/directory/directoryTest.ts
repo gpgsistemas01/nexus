@@ -23,7 +23,9 @@ const openEditor = (
   let editor!: ReturnType<typeof useDirectoryEditor>;
   const saved = vi.fn();
   const denied = vi.fn();
-  const request = vi.spyOn(directoryService, 'save').mockResolvedValue(undefined);
+  const request = vi
+    .spyOn(directoryService, 'save')
+    .mockResolvedValue(resource === 'clients' ? clientEntry : supplierEntry);
   const wrapper = mount(
     defineComponent({
       setup() {
@@ -111,10 +113,10 @@ describe('directorio Vue: captura y contratos (DP-VUE-DIR-001)', () => {
       action: 'edit',
       row: clientEntry,
     });
-    let finish!: () => void;
+    let finish!: (entry: typeof clientEntry) => void;
     request.mockImplementationOnce(
       () =>
-        new Promise<void>((resolve) => {
+        new Promise<typeof clientEntry>((resolve) => {
           finish = resolve;
         }),
     );
@@ -123,7 +125,7 @@ describe('directorio Vue: captura y contratos (DP-VUE-DIR-001)', () => {
     const signal = request.mock.calls[0]![3]!;
     wrapper.unmount();
     expect(signal.aborted).toBe(true);
-    finish();
+    finish(clientEntry);
     await submit;
     expect(saved).not.toHaveBeenCalled();
   });

@@ -2,12 +2,21 @@
 import { VSelect } from 'vuetify/components/VSelect';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VAlert } from 'vuetify/components/VAlert';
-import EditorDialog from '../../../shared/components/EditorDialog.vue';
-import type { MovementReport } from '../movement.js';
+import EditorDialog from './EditorDialog.vue';
+import type { ReportScope } from '../report.js';
 
-defineProps<{ values: MovementReport; isSubmitting: boolean; error: string }>();
+withDefaults(
+    defineProps<{
+        values: ReportScope;
+        isSubmitting: boolean;
+        error: string;
+        eyebrow?: string;
+        subject?: string;
+    }>(),
+    { eyebrow: 'REPORTES', subject: 'registros' },
+);
 const emit = defineEmits<{
-    mode: [value: MovementReport['mode']];
+    mode: [value: ReportScope['mode']];
     month: [value: string];
     submit: [];
     close: [];
@@ -22,7 +31,7 @@ const modes = [
 <template>
     <EditorDialog
         title="Exportar reporte"
-        eyebrow="MOVIMIENTOS"
+        :eyebrow="eyebrow"
         :max-width="600"
         :is-submitting="isSubmitting"
         submit-label="Descargar Excel"
@@ -49,7 +58,7 @@ const modes = [
             {{
                 values.mode === 'filtered'
                     ? 'Se exportan todos los registros que coincidan con los filtros aplicados, sin limitarse a la página visible.'
-                    : 'El reporte mensual incluye todos los movimientos de ese mes, sin los filtros de la tabla. El servidor determina el mes actual en la zona horaria de Ciudad de México.'
+                    : `El reporte mensual incluye la totalidad de ${subject} de ese mes, sin los filtros de la tabla. El servidor determina el mes actual en la zona horaria de Ciudad de México.`
             }}
         </p>
         <VAlert

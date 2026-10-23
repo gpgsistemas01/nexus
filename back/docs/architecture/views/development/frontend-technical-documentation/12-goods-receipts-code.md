@@ -79,3 +79,20 @@ Los reportes y la infraestructura transversal se localizan en el
 [procesos](../../processes/frontend-code-sequences/index.md).
 
 `goodsReceiptContext.js` lee la metadata de la página y compone `createGoodsReceiptApplication({ resource })` una vez. La página entrega el objeto configurado a la tabla; el modal pasa `resource` al inicializador de Select2. Application y services no importan páginas ni consultan el DOM. `get` conserva la lectura por id y `exportReport` fija el reporte de la misma variante, sin reexports de transporte a través del módulo general de reportes.
+
+## Implementación Vue
+
+`front/src/modules/purchases` incorpora las dos variantes en `/compras`.
+Las páginas coordinan listado, consulta fresca por id, captura incremental,
+corrección y cancelación. Los componentes visuales reciben props y emiten
+eventos; servicios y mappers adaptan el contrato existente mediante Axios.
+`app/pages/PurchaseWorkspace` compone las altas rápidas de proveedores y artículos
+sin que Compras importe páginas privadas de Directorio o Inventario.
+
+Se reutilizan los marcos de tabla/modal, VeeValidate, selectores paginados,
+confirmación SweetAlert2 y reportes compartidos. El alta de artículo usa
+`creationContext=goodsReceipt` y no introduce stock inicial. La interfaz conserva
+proveedor al editar y envía sólo las partidas nuevas; los importes definitivos
+y movimientos pertenecen a Express. Listado y consulta por id incluyen observaciones del
+encabezado; sólo el listado omite los detalles. Los contratos, permisos y
+responsabilidades están en la [guía Vue de compras](../../../../../../front/docs/purchases.md).

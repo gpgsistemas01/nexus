@@ -116,6 +116,7 @@ export const findAllGoodsReceipts = async ({
             orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             select: {
                 referenceNumber: true,
+                observations: true,
                 invoice: true,
                 isInvoiced: true,
                 receivedById: true,

@@ -52,7 +52,7 @@ sesión y permisos. `app/router/protectedDestination` comparte con LoginPage el
 retorno a rutas protegidas registradas y descarta destinos externos o de error.
 Las guardas sólo orientan la navegación; Express autoriza cada solicitud.
 La configuración del menú vive en `app/navigation.ts`; sólo contiene rutas Vue de
-Almacén, Movimientos, Identidad, Directorio comercial y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
+Almacén, Compras, Movimientos, Identidad, Directorio comercial y Catálogos, agrupadas por `VListGroup` con iconos SVG del proveedor existente.
 En escritorio se reserva una barra de iconos: al pulsar Almacén o el botón de
 menú se expande el drawer con el acordeón y un fondo modal. Clic fuera, Escape o navegar
 lo cierran y dejan la barra compacta. En móvil sólo se muestra el drawer temporal.
@@ -312,3 +312,12 @@ La evidencia se detalla en [herramientas y pruebas](tooling.md). Esta revisión 
 estructura, contratos y recursos del cliente; no estima usuarios concurrentes ni
 capacidad de Express/PostgreSQL. Para esa estimación se requieren cargas y medidas
 de latencia, consultas, tamaño de reportes y consumo del entorno de despliegue.
+
+## Documentos de compra
+
+[Compras](purchases.md) comparte listado, interacción de formulario, selectores,
+marcos de tabla/modal y reportes con los módulos existentes. Sus partidas y
+transiciones conservan un coordinador propio. `app/pages/PurchaseWorkspace`
+compone las altas rápidas de proveedores y artículos mediante callbacks;
+Compras no importa las páginas privadas de esos módulos. La vista previa usa
+únicamente las reglas públicas; Express conserva stock y totales definitivos.

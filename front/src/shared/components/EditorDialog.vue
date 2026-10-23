@@ -17,8 +17,18 @@ withDefaults(
         isSubmitDisabled?: boolean;
         submitLabel?: string;
         note?: string;
+        showSubmit?: boolean;
+        retainFocus?: boolean;
     }>(),
-    { eyebrow: 'ALMACÉN', context: '', maxWidth: 1080, submitLabel: 'Guardar', note: '' },
+    {
+        eyebrow: 'ALMACÉN',
+        context: '',
+        maxWidth: 1080,
+        submitLabel: 'Guardar',
+        note: '',
+        showSubmit: true,
+        retainFocus: true,
+    },
 );
 const emit = defineEmits<{ close: []; submit: [] }>();
 const { smAndDown } = useDisplay();
@@ -33,6 +43,7 @@ const titleId = useId();
         :fullscreen="smAndDown"
         scrollable
         :persistent="isSubmitting"
+        :retain-focus="retainFocus"
         @update:model-value="!$event && emit('close')"
     >
         <VDefaultsProvider :defaults="controlDefaults">
@@ -87,6 +98,7 @@ const titleId = useId();
                     </VBtn>
                     <slot name="actions" />
                     <VBtn
+                        v-if="showSubmit"
                         :form="formId"
                         type="submit"
                         color="primary"

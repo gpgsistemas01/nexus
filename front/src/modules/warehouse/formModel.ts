@@ -1,5 +1,6 @@
 import {
     materialCreateValidation,
+    goodsReceiptMaterialCreateValidation,
     materialEditValidation,
     materialStockValidation,
     wasteValidation,
@@ -88,7 +89,14 @@ export const previewWaste = (values: InventoryValues, template?: LookupItem) => 
     };
 };
 
-export const inventoryRules = (resource: InventoryResource, action: EditorTarget['action']) => {
+export const inventoryRules = (
+    resource: InventoryResource,
+    action: EditorTarget['action'],
+    creationContext?: 'goodsReceipt',
+) => {
+    if (resource !== 'wastes' && action === 'create' && creationContext === 'goodsReceipt')
+        return goodsReceiptMaterialCreateValidation;
+
     if (action === 'delete') return {};
 
     if (action === 'add-stock') return wasteStockAdditionValidation;
@@ -112,8 +120,26 @@ export const buildInventoryPayload = (
     target: EditorTarget,
     values: InventoryValues,
     preview: ReturnType<typeof previewWaste>,
+    creationContext?: 'goodsReceipt',
 ): InventoryPayload => {
     const { action, row } = target;
+    if (resource !== 'wastes' && action === 'create' && creationContext === 'goodsReceipt')
+        return {
+            creationContext,
+            name: String(values.name).trim(),
+            supplierId: String(values.supplierId),
+            presentationId: String(values.presentationId),
+            unitMeasureId: String(values.unitMeasureId),
+            ...(resource === 'materials'
+                ? {
+                      base: values.base === '' ? null : Number(values.base),
+                      height: values.height === '' ? null : Number(values.height),
+                  }
+                : {}),
+            ...(values.minStock === '' ? {} : { minStock: Number(values.minStock) }),
+            isActive: values.isActive,
+        };
+
     const observations = String(values.observations).trim();
     if (action === 'delete') return {};
 

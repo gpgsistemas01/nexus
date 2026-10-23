@@ -3,6 +3,8 @@ import { PUBLIC_CATALOGS } from '@nexus/catalogs';
 import { PERMISSIONS } from '@nexus/permissions';
 import { MOVEMENT_CONFIG } from '../modules/movements/movement.js';
 import type { MovementResource } from '../modules/movements/movement.js';
+import { PURCHASE_CONFIG } from '../modules/purchases/purchase.js';
+import type { PurchaseResource } from '../modules/purchases/purchase.js';
 
 export const APP_NAVIGATION = [
     {
@@ -43,6 +45,17 @@ export const APP_NAVIGATION_GROUPS: readonly NavigationGroup[] = [
         title: 'Almacén',
         icon: APP_ICONS.warehouse,
         links: APP_NAVIGATION,
+    },
+    {
+        id: 'purchases',
+        title: 'Compras',
+        icon: APP_ICONS.purchases,
+        links: Object.entries(PURCHASE_CONFIG).map(([resource, config]) => ({
+            title: config.label,
+            to: `/compras/${config.path}`,
+            icon: APP_ICONS[resource as PurchaseResource],
+            permission: PERMISSIONS.GOODS_RECEIPTS_PAGE_VIEW,
+        })),
     },
     {
         id: 'movements',

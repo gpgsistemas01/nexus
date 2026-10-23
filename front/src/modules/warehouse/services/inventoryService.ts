@@ -9,6 +9,8 @@ import type {
     InventoryQuery,
     InventoryResource,
 } from '../inventory.js';
+import type { LookupItem } from '../../../shared/lookup.js';
+import { isRecord } from '../../../shared/utils/isRecord.js';
 
 export const inventoryService = {
     async list(resource: InventoryResource, query: InventoryQuery, signal?: AbortSignal) {
@@ -35,7 +37,7 @@ export const inventoryService = {
                 : action === 'create' || action === 'add-stock'
                   ? 'POST'
                   : 'PATCH';
-        const result = await apiClient.request<{ code: string }>(
+        const result = await apiClient.request<{ code: string; material?: unknown }>(
             `/api/warehouse/${resource}${suffix}`,
             {
                 method,
@@ -60,5 +62,36 @@ export const inventoryService = {
             );
 
         return result;
+    },
+    async createForPurchase(
+        resource: 'materials' | 'consumables',
+        payload: InventoryPayload,
+        signal: AbortSignal,
+    ): Promise<LookupItem> {
+        const result = await inventoryService.mutate(
+            resource,
+            'create',
+            { ...payload, creationContext: 'goodsReceipt' },
+            undefined,
+            signal,
+        );
+        if (!isRecord(result.material))
+            throw new ApiError(
+                'No se pudo identificar el artículo registrado. Actualiza las opciones antes de continuar.',
+            );
+
+        const row = normalizeInventoryRow(result.material);
+        return {
+            id: row.entityId,
+            title: [
+                row.name,
+                row.base != null && row.height != null ? `${row.base} × ${row.height}` : '',
+                row.presentation,
+            ]
+                .filter(Boolean)
+                .join(' · '),
+            data: result.material,
+            isDisabled: !row.isActive,
+        };
     },
 };

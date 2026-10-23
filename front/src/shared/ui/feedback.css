@@ -1,3 +1,6 @@
+.nexus-feedback-container {
+    z-index: 10000;
+}
 .nexus-feedback {
     border-radius: 1rem;
     color: rgb(var(--v-theme-on-surface));
