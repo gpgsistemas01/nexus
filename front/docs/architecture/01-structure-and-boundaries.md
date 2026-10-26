@@ -1,15 +1,23 @@
-# Arquitectura del frontend Vue
+# 1. Arquitectura del frontend Vue
+
+El [índice documental Vue](../index.md) declara audiencia, fuentes propietarias,
+correspondencia con requisitos y criterios adoptados para describir el diseño.
+Esta guía conserva las decisiones de organización e integración del cliente.
+La [adaptación documental a Vue](../index.md#diferencias-que-deben-conservarse-frente-a-ejs-y-express)
+distingue qué conceptos se conservan y cuáles cambian respecto de EJS/Express.
+El [modelo documental web](02-web-views.md) justifica el uso selectivo de C4
+dentro de 4+1 y lo distingue de SPA, cliente-servidor, MVC/MVVM y arc42.
 
 ## Alcance
 
 Esta decisión aplica a `front/`, con Vue 3, TypeScript, componentes `.vue` y
 Composition API. El módulo `auth` incorpora el login operativo
 con Vuetify, VeeValidate y la API de Express. `warehouse` incorpora Materiales,
-Consumibles y Mermas como rutas Vue protegidas. Consulta [el contrato del login](login.md)
-y [los flujos de Almacén](warehouse.md). Personas/Usuarios y Clientes/Proveedores
-se describen en [Identidad y Directorio comercial](identity-and-directory.md).
+Consumibles y Mermas como rutas Vue protegidas. Consulta [el contrato del login](../modules/01-authentication.md)
+y [los flujos de Almacén](../modules/02-warehouse.md). Personas/Usuarios y Clientes/Proveedores
+se describen en [Identidad y Directorio comercial](../modules/04-identity-and-directory.md).
 `movements` incorpora los tres historiales de sólo lectura con filtros y reportes;
-consulta [su contrato y responsabilidades](movements.md).
+consulta [su contrato y responsabilidades](../modules/05-movements.md).
 
 ## Contenedores y presentación
 
@@ -58,7 +66,7 @@ menú se expande el drawer con el acordeón y un fondo modal. Clic fuera, Escape
 lo cierran y dejan la barra compacta. En móvil sólo se muestra el drawer temporal.
 El grupo conserva estado visual local y sólo recibe enlaces autorizados.
 El proxy conserva la API y la acción de cierre de sesión. Consulta
-[las decisiones de UI, HTTP y pruebas](ui-and-http.md).
+[las decisiones de UI, HTTP y pruebas](03-ui-and-http.md).
 Si falla la carga inicial, StartupErrorPage permite reintentar; no se deja un rechazo
 de bootstrap sin manejar. El transporte y los errores HTTP se centralizan en `shared/http`;
 cada módulo adapta el resultado a su flujo.
@@ -68,7 +76,7 @@ cada módulo adapta el resultado a su flujo.
 `modules/<dominio>/` agrupa páginas, componentes y lógica de la misma capacidad.
 Al migrar operaciones se conservan los dominios actuales: autenticación, administración,
 ventas y almacén, con materiales, compras y salidas dentro de almacén. El módulo `catalogs` incorpora
-los seis catálogos administrables de EJS; su [contrato y responsabilidades](catalogs.md)
+los seis catálogos administrables de EJS; su [contrato y responsabilidades](../modules/03-catalogs.md)
 se mantienen por separado de inventario.
 `pages/`, `components/` y `composables/` existen cuando hay implementación concreta;
 no se crean árboles vacíos. Una pieza usada sólo en un módulo permanece en él.
@@ -94,9 +102,9 @@ un contrato explícito.
 No se impone Atomic Design, una arquitectura hexagonal completa ni un bus global
 de eventos. Agregar carpetas y capas no sustituye responsabilidades claras.
 
-La [guía de patrones y SOLID](patterns.md) documenta los consumidores reales,
+La [guía de patrones y SOLID](../patterns/01-applicability-and-principles.md) documenta los consumidores reales,
 el diagrama de dependencias y los límites de cada principio. El tratamiento de
-capturas, mensajes y datos recibidos pertenece a [entradas y salida segura](input-security.md).
+capturas, mensajes y datos recibidos pertenece a [entradas y salida segura](04-input-security.md).
 
 ## Adaptación del frontend EJS
 
@@ -155,7 +163,7 @@ contiene sólo assets y Nginx. El backend continúa construyéndose por separado
   dependencias y contextos de construcción. No se publica código privado del backend.
 
 El tema y los defaults se centralizan en `app/plugins/vuetify.ts` y `shared/ui/controlDefaults.ts`.
-La [guía de interfaz](ui-and-http.md#estilos-y-controles-adaptados-a-vue) documenta
+La [guía de interfaz](03-ui-and-http.md#estilos-y-controles-adaptados-a-vue) documenta
 la adaptación visual de MDB, los campos recuperados y SweetAlert2.
 
 ## Reutilización entre módulos
@@ -171,7 +179,7 @@ presenta Activo con el mismo Sí/No y tratamiento visual.
 `useTableQuery` traduce orden y paginación con el mapa de índices permitido por
 cada dominio, incluido el orden descendente inicial del historial.
 `identity` y `directory` mantienen sus formularios y contratos descritos en
-[Identidad y Directorio](identity-and-directory.md). Los selectores (`RemoteSelect`,
+[Identidad y Directorio](../modules/04-identity-and-directory.md). Los selectores (`RemoteSelect`,
 `useRemoteLookup`, `useSelectedOption`) y tipos de opciones pertenecen a `shared`.
 `useRemoteOptions` aporta la estrategia y dependencia de proveedor de inventario.
 `useRemoteLookup.state` publica el `LookupState` reactivo de presentación, sin que
@@ -229,14 +237,14 @@ VeeValidate, campos y payload con la versión leída; no duplica ese ciclo de tr
 Se aplica composición y estrategia por callbacks a comportamientos equivalentes.
 No se introduce herencia entre módulos ni un generador de CRUD con reglas mezcladas.
 Se conservan separados los composables de captura y listado cuando cambian sus
-reglas, permisos y recuperación. Consulta [Catálogos](catalogs.md).
+reglas, permisos y recuperación. Consulta [Catálogos](../modules/03-catalogs.md).
 
 ## Convenciones y validación
 
 Componentes `.vue` en PascalCase, composables `useNombre.ts` y funciones con exports
 nombrados. Imports relativos de módulos con `.js` (resuelto al fuente `.ts` por TypeScript/Vite);
 componentes con `.vue`. Se usa `<script setup lang="ts">` y props/eventos tipados. El formato y los nombres se rigen por el
-[estándar de codificación](../../back/docs/architecture/coding-standards/index.md),
+[estándar de codificación](../../../back/docs/architecture/coding-standards/index.md),
 incluida su sección de Vue/TypeScript; no se define un estándar paralelo aquí.
 Los componentes de presentación no importan clientes HTTP ni almacenes de sesión.
 Las suscripciones, temporizadores y plugins se liberan al desmontar cuando corresponda.
@@ -247,7 +255,7 @@ observan props, eventos y comportamiento; una prueba de navegador valida recorri
 representativos. Vitest y Vue Test Utils ejecutan los casos de navegación y estado visible en
 `front/tests/`, con jsdom y limpieza al terminar cada prueba. No constituyen una
 prueba de navegador real. Los comandos y la selección de herramientas se mantienen
-en [la guía de herramientas](tooling.md). CI ejecuta ESLint, pruebas y compilación con tipos.
+en [la guía de herramientas](../development/02-tooling.md). CI ejecuta ESLint, pruebas y compilación con tipos.
 
 ## Referencias
 
@@ -264,7 +272,7 @@ Movimientos compone los flujos compartidos de listado, búsqueda, opciones y des
 `ListFilters` ofrece el acordeón y las acciones tanto a inventario como a historial;
 cada adaptador conserva sus campos y reglas. `useVisibleRefresh` comparte el ciclo
 de actualización visible de 30 segundos sin trasladar listeners a la presentación.
-Los contratos específicos y límites están en [Movimientos](movements.md).
+Los contratos específicos y límites están en [Movimientos](../modules/05-movements.md).
 
 
 ## Crecimiento y mantenimiento
@@ -308,14 +316,14 @@ Separar registros de rutas por dominio o extraer otra estrategia del editor debe
 responder a nuevas responsabilidades o cambios independientes, con los recorridos
 actuales como protección; su tamaño por sí solo no justifica más capas.
 
-La evidencia se detalla en [herramientas y pruebas](tooling.md). Esta revisión evalúa
+La evidencia se detalla en [diseño de pruebas](../testing/01-test-design.md). Esta revisión evalúa
 estructura, contratos y recursos del cliente; no estima usuarios concurrentes ni
 capacidad de Express/PostgreSQL. Para esa estimación se requieren cargas y medidas
 de latencia, consultas, tamaño de reportes y consumo del entorno de despliegue.
 
 ## Documentos de compra
 
-[Compras](purchases.md) comparte listado, interacción de formulario, selectores,
+[Compras](../modules/06-purchases.md) comparte listado, interacción de formulario, selectores,
 marcos de tabla/modal y reportes con los módulos existentes. Sus partidas y
 transiciones conservan un coordinador propio. `app/pages/PurchaseWorkspace`
 compone las altas rápidas de proveedores y artículos mediante callbacks;
@@ -332,7 +340,7 @@ guardado y conserva cancelación, errores y conflicto.
 
 ## Documentos de salida
 
-[Salidas](issues.md) integra Materiales, Consumibles y Mermas. Conserva un módulo
+[Salidas](../modules/07-issues.md) integra Materiales, Consumibles y Mermas. Conserva un módulo
 propio para solicitud, edición de encabezado, surtido y devolución; reutiliza los
 contratos de listas, formularios, lookup y reportes de `shared`. `IssueWorkspace`
 compone el alta rápida de clientes. `useDocumentRead`, extraído del lector de
@@ -341,7 +349,7 @@ dominios. Los formularios no trasladan transacciones ni stock al cliente.
 
 ## Propiedad de tipos, formularios y adaptadores
 
-La [revisión de Salidas y Compras](document-responsibilities.md) concreta el patrón
+La [revisión de Salidas y Compras](../patterns/08-document-responsibilities.md) concreta el patrón
 contenedor/presentación y la composición existente: contratos tipados, configuración,
 reglas, captura, borradores, cálculos, mappers de request/respuesta y transporte
 tienen motivos de cambio distintos. Las operaciones discriminadas impiden combinar

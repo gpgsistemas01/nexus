@@ -1,4 +1,12 @@
-# Movimientos en Vue
+# 5. Movimientos en Vue
+
+## Propósito y fuentes
+
+Describe para desarrollo las consultas de [movements](../../src/modules/movements),
+relacionadas con `CU-ALM-07..08`, `15..16` y `23..24` del
+[catálogo normativo](../../../back/docs/requirements/use-cases/catalogs/index.md).
+La evidencia del cliente está en [movements.spec.ts](../../tests/e2e/movements.spec.ts).
+El [índice Vue](../index.md) conserva los criterios de esta descripción técnica.
 
 ## Alcance y permisos
 
@@ -78,4 +86,4 @@ No equivale a las notificaciones instantáneas de la vista EJS.
   inventario e historial comparten `shared/utils/formatNumbers`.
 
 No se agrega una dependencia, store global ni generador de CRUD para estas consultas.
-Consulta [arquitectura](architecture.md) y [diseño de pruebas](tooling.md).
+Consulta [arquitectura](../architecture/01-structure-and-boundaries.md) y [diseño de pruebas](../testing/01-test-design.md#movimientos-diseño-de-comprobación).

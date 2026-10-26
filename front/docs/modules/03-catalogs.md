@@ -1,4 +1,11 @@
-# Catálogos en Vue
+# 3. Catálogos en Vue
+
+## Propósito y fuentes
+
+Describe para desarrollo la configuración de [catalogs](../../src/modules/catalogs)
+para `CU-CAT-09..26` del [catálogo normativo](../../../back/docs/requirements/use-cases/catalogs/index.md).
+La evidencia del cliente está en [catalogs.spec.ts](../../tests/e2e/catalogs.spec.ts).
+El [índice Vue](../index.md) conserva audiencia, fuentes y criterios de mantenimiento.
 
 ## Alcance y acceso
 
@@ -26,7 +33,7 @@ ambos estados. El orden por nombre lo establece la API; la tabla no ofrece órde
 que el endpoint no implementa. `/catalogos` selecciona Áreas y una ruta desconocida
 muestra la página no encontrada sin consultar un recurso arbitrario.
 
-Se ejecuta con los comandos de [Almacén](warehouse.md#acceso-y-alcance): Express
+Se ejecuta con los comandos de [Almacén](02-warehouse.md#acceso-y-alcance): Express
 sirve la API y Vite las vistas Vue. El proxy sólo deriva `/api` y cierre de sesión;
 no se navega hacia vistas EJS desde estos enlaces.
 
@@ -89,4 +96,4 @@ de mermas y permisos por operación permanecen en Almacén; los catálogos tiene
 formulario pequeño explícito. No se fuerza InventoryFormField ni sus campos de
 dominio como generador universal. No se agrega un store para estado local.
 
-Las pruebas y sus condiciones observables se mantienen en [tooling.md](tooling.md#pruebas-de-catálogos).
+Las pruebas y sus condiciones observables se mantienen en [tooling.md](../testing/01-test-design.md#pruebas-de-catálogos).

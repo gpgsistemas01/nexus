@@ -1,6 +1,7 @@
 # Reglas del frontend Vue
 
-Consulta `docs/architecture.md` desde esta carpeta para las responsabilidades,
+Consulta `docs/index.md` para las fuentes y criterios documentales, y
+`docs/architecture/01-structure-and-boundaries.md` desde esta carpeta para las responsabilidades,
 convenciones y criterios de migración. Los comandos npm se ejecutan en `front/`.
 
 - Organiza las capacidades en `src/modules/<dominio>/`; crea sólo carpetas con consumidores.

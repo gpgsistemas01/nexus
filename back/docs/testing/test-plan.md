@@ -1,18 +1,18 @@
 # Plan de pruebas
 
-Los comandos de validación se ejecutan desde `back/` (`cd back` desde la raíz).
-Las rutas `tests/`, `src/` y `docs/` son relativas a esa carpeta.
-
-La suite del frontend Vue se mantiene en `front/tests/` y se ejecuta desde `front/`,
-con Vitest y Vue Test Utils. Su alcance y diseño de casos están en la
-[guía de herramientas del frontend](../../../front/docs/tooling.md). Las rutas y
-comandos del resto de este documento corresponden al backend salvo indicación expresa.
-
 ## Datos generales del documento
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.2 | 1.0.0 | En revisión | 2026-10-20 | Equipo Nexus |
+| 1.3 | 1.0.0 | En revisión | 2026-10-26 | Equipo Nexus |
+
+Los comandos de validación se ejecutan desde `back/` (`cd back` desde la raíz).
+Las rutas `tests/`, `src/` y `docs/` son relativas a esa carpeta.
+
+La suite del frontend Vue se mantiene en `front/tests/` y se ejecuta desde `front/`,
+con Vitest, Vue Test Utils y Playwright/Chromium. Su alcance y diseño de casos están en la
+[documentación de pruebas del frontend](../../../front/docs/testing/index.md). Las rutas y
+comandos del resto de este documento corresponden al backend salvo indicación expresa.
 
 ## Objetivo y alcance
 
@@ -164,8 +164,12 @@ Las pruebas de `tests/integration/migrations` verifican restricciones, conservac
 histórica y rollback en PostgreSQL; no se confunden con preparar el esquema de las
 integraciones HTTP. Las unitarias de herramientas y del adaptador transaccional protegen
 sus contratos de soporte; `npm run docs:check` valida documentación. No constituyen
-niveles funcionales nuevos. Actualmente no existe una suite automatizada de sistema,
-navegador o aceptación; cuando se requiera, se registra de forma separada.
+niveles funcionales nuevos. El backend no tiene una suite propia de navegador.
+Vue conserva sus recorridos Playwright en `front/tests/e2e`, con diseño, fichas y
+límites en la [colección de pruebas del cliente](../../../front/docs/testing/index.md).
+Ejecutan Chromium contra Vite e interceptan la API; no equivalen a una suite de
+sistema contra Express/PostgreSQL real ni a aceptación del usuario. Cuando se
+requiera esa evidencia, se registra de forma separada.
 
 ### Técnicas de diseño
 
@@ -280,6 +284,7 @@ No se versionan esos reportes en `docs`.
 
 ## Referencias
 
+- [ISO/IEC/IEEE 29119-2:2021](https://www.iso.org/standard/79428.html): procesos de pruebas; adaptación selectiva del plan.
 - [ISO/IEC/IEEE 29119-3:2021](https://www.iso.org/standard/79429.html): documentación de pruebas; adaptación selectiva a diseño, caso y ejecución.
 - [ISO/IEC/IEEE 29119-4:2021](https://www.iso.org/standard/79430.html): técnicas de diseño.
 - [ISTQB CTFL 4.0.1](https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf), apartados 1.4, 4.2 y 5.2: trazabilidad, técnicas y priorización por riesgo.

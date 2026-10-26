@@ -1,4 +1,12 @@
-# Login Vue
+# 1. Login Vue
+
+## Propósito y fuentes
+
+Describe para desarrollo el acceso y la sesión de [auth](../../src/modules/auth).
+Realiza los [casos AUT](../../../back/docs/requirements/use-cases/authentication/index.md)
+y conserva la evidencia del cliente en [login.spec.ts](../../tests/e2e/login.spec.ts)
+y [sessionRecovery.spec.ts](../../tests/e2e/sessionRecovery.spec.ts). Los criterios y
+la propiedad documental se mantienen en el [índice Vue](../index.md).
 
 ## Alcance y ejecución
 
@@ -6,7 +14,7 @@
 tarjeta verde oscura y la distribución del EJS y envía las credenciales a Express.
 Al autenticar se abre `/almacen` mediante Vue Router: la guarda selecciona
 Materiales o Mermas según los permisos. Materiales, Consumibles y Mermas son Vue;
-El menú Vue incorpora también los [seis catálogos administrables](catalogs.md)
+El menú Vue incorpora también los [seis catálogos administrables](03-catalogs.md)
 para `catalogs:manage`, con acceso directo a Áreas si es el único permiso de entrada.
 
 Desde la raíz, inicia cada aplicación en una terminal:
@@ -186,7 +194,7 @@ para las fuentes públicas compartidas; conserva el repositorio completo al cons
 
 ## Arquitectura y estándares revisados
 
-Se aplica el [estándar de codificación del repositorio](../../back/docs/architecture/coding-standards/index.md):
+Se aplica el [estándar de codificación del repositorio](../../../back/docs/architecture/coding-standards/index.md):
 cuatro espacios en fuentes/configuración, dos en pruebas, imports desde el módulo
 propietario, booleanos con prefijo y sentencias y bloques legibles. El formulario
 expresa cambios mediante eventos `update:<prop>`; la página conecta esos eventos

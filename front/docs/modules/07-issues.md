@@ -1,4 +1,12 @@
-# Salidas en Vue
+# 7. Salidas en Vue
+
+## Propósito y fuentes
+
+Describe para desarrollo la realización de `CU-SAL-01..21` de
+[Salidas](../../../back/docs/requirements/use-cases/issues/index.md) en
+[issues](../../src/modules/issues). La evidencia del cliente está en
+[issues.spec.ts](../../tests/e2e/issues.spec.ts); los criterios y límites de la
+documentación se mantienen en el [índice Vue](../index.md).
 
 ## Alcance y navegación
 
@@ -87,6 +95,6 @@ Los selectores de inventario admiten el contrato del listado sin `material.type`
 endpoint ya está separado por recurso. Si el campo está presente se comprueba su
 compatibilidad; los documentos completos siguen exigiendo el tipo esperado.
 
-La [revisión de responsabilidades y nombres](document-responsibilities.md) explica
+La [revisión de responsabilidades y nombres](../patterns/08-document-responsibilities.md) explica
 los propietarios, patrones y contratos tipados de escritura. Las selecciones
 dependientes pertenecen a `useIssueHeaderSelection`.

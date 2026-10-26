@@ -4,6 +4,11 @@ Esta referencia explica la estructura de código de cada módulo: archivos propi
 imports, dependencias compartidas y contratos internos. Los mapas muestran módulos ES;
 las flechas son dependencias entre grupos de archivos, no pasos de un CRUD.
 
+Los capítulos de esta colección describen EJS y sus módulos de navegador en
+`back/src/public`. La implementación Vue conserva su
+[colección técnica en front/docs](../../../../../../front/docs/index.md), con los
+mismos criterios documentales y sus propios componentes, contratos y evidencia.
+
 La [organización general](../code-structure/index.md) ubica esta implementación en
 el sistema. Esta referencia posee el detalle de cada módulo; [patrones](../design-and-construction-patterns/index.md)
 explica las decisiones compartidas y [reutilización](../reuse-and-refactoring/index.md)

@@ -48,3 +48,6 @@
 !back/src/public/js/application/warehouse/issues/issueHeaderRules.js
 !back/src/public/js/utils/formatters.js
 !back/src/public/js/constants/fulfillmentStatuses.js
+
+# Las guías permanecen en Git; tampoco se envían al contexto de construcción.
+front/docs/

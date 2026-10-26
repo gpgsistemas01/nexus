@@ -14,6 +14,8 @@ esta interfaz.
 | --- | --- |
 | Validar todos los paquetes sin generar archivos | `npm run docs:export -- --check` |
 | Validar un paquete | `npm run docs:export -- <paquete> --check` |
+| Validar sólo la documentación Vue | `npm run docs:export -- arquitectura frontend-vue --check` |
+| Publicar las fuentes Vue en DOCX y PDF | `npm run docs:export -- arquitectura frontend-vue ambos` |
 | Generar toda la entrega en DOCX y PDF | `npm run docs:export` |
 | Generar un paquete y formato concretos | `npm run docs:export -- <paquete> <docx\|pdf\|ambos>` |
 

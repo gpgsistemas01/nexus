@@ -15,7 +15,9 @@ Los comandos `docker compose` se ejecutan desde la raíz del repositorio, donde
 están `Dockerfile` y `docker-compose.yml`; Compose carga `back/.env`.
 
 La arquitectura y herramientas específicas de Vue se mantienen en
-[la documentación del frontend](../../front/docs/architecture.md), junto a sus fuentes.
+[la documentación del frontend](../../front/docs/index.md), junto a sus fuentes y
+con los mismos criterios de gobierno documental. No se incluyen en los contenedores
+de producción.
 
 ## Organización de los artefactos
 

@@ -1,6 +1,20 @@
-# Almacén en Vue
+# 2. Almacén en Vue
+
+## Propósito y fuentes
+
+Describe para desarrollo la realización de inventarios en
+[warehouse](../../src/modules/warehouse), vinculada con los
+[casos ALM](../../../back/docs/requirements/use-cases/catalogs/index.md).
+La evidencia del cliente está en [warehouse.spec.ts](../../tests/e2e/warehouse.spec.ts)
+y las pruebas unitarias del módulo. El [índice Vue](../index.md) distingue esta guía
+de los requisitos normativos y las garantías del servidor.
 
 ## Acceso y alcance
+
+La alternativa de duplicado de `CU-ALM-10` conserva una diferencia funcional:
+Vue no abre automáticamente Agregar stock trasladando la captura. Se registra
+como [BRE-VUE-001](../testing/03-use-case-coverage.md#brechas-y-decisiones-pendientes),
+sin declarar que el recorrido completo de la ficha ya se cumple en el cliente.
 
 Inicia Express y Vite en terminales separadas desde la raíz:
 
@@ -14,7 +28,7 @@ npm --prefix front run dev
 
 Abre `http://localhost:5173/inicio-sesion` y usa una cuenta existente. La configuración
 local de Express permanece en `back/.env`; las dependencias se instalan en cada
-aplicación. Consulta la [preparación de archivos ignorados](../../README.md#archivos-locales-ignorados-y-cambio-de-estructura).
+aplicación. Consulta la [preparación de archivos ignorados](../../../README.md#archivos-locales-ignorados-y-cambio-de-estructura).
 
 | Ruta | Operaciones implementadas |
 | --- | --- |
@@ -31,13 +45,15 @@ pulsar Almacén o el botón de menú abre el panel detallado. Clic fuera, Escape
 elegir una ruta lo cierra y conserva la barra compacta sin desplazar la página.
 En móvil el botón abre el panel sobre la página y al cerrarlo queda oculto.
 El acordeón admite teclado, estado expandido accesible y sólo las rutas permitidas.
-El grupo [Catálogos](catalogs.md) agrega las seis vistas administrables para
-`catalogs:manage`. [Compras](purchases.md) se implementa como documento separado y reutiliza el alta de artículos sin stock inicial. Salidas conserva sus pantallas EJS.
-Los historiales tienen su propia sección de [Movimientos en Vue](movements.md).
+El grupo [Catálogos](03-catalogs.md) agrega las seis vistas administrables para
+`catalogs:manage`. [Compras](06-purchases.md) se implementa como documento separado
+y reutiliza el alta de artículos sin stock inicial. [Salidas](07-issues.md) tiene
+sus propias pantallas Vue; el menú del cliente no enlaza sus vistas EJS.
+Los historiales tienen su propia sección de [Movimientos en Vue](05-movements.md).
 
 ## Patrones y propietario del estado
 
-Las [decisiones de arquitectura](architecture.md) aplican a toda la implementación:
+Las [decisiones de arquitectura](../architecture/01-structure-and-boundaries.md) aplican a toda la implementación:
 
 - `app/layouts/AppLayout` coordina la sesión y navegación. `InventoryPage` crea el estado
   del recurso y conecta filtros, tabla y editor; `InventoryEditorPage` conecta la captura.
@@ -72,7 +88,7 @@ foco sin modificar un campo no muestra errores. El blur valida campos modificado
 o una captura ya enviada; Guardar valida el formulario completo. La validación
 definitiva de Express se conserva.
 
-La [revisión de interfaz y HTTP](ui-and-http.md) detalla los encabezados originales,
+La [revisión de interfaz y HTTP](../architecture/03-ui-and-http.md) detalla los encabezados originales,
 la carga automática de opciones, las secciones y campos recuperados del modal,
 los estilos, las bibliotecas elegidas y los propietarios de código.
 
@@ -127,18 +143,18 @@ La construcción Docker usa la raíz del repositorio como contexto para incluir
 únicamente los módulos públicos compartidos y sus dependencias explícitas. La
 imagen final contiene Nginx y assets; no contiene el backend. Para Vercel/Render
 estático deben configurarse los proxies antes del fallback y permitir esas fuentes
-fuera de `front/`, conforme a [la guía de despliegue](login.md#proxy-y-despliegue).
+fuera de `front/`, conforme a [la guía de despliegue](01-authentication.md#proxy-y-despliegue).
 
 ## Verificación
 
 `npm --prefix front run check` comprueba lint, tipos, unitarias y build.
 `npm --prefix front run test:e2e` recorre controles reales en Chromium con API
 simulada: permisos, altas, edición, conflictos, navegación y recuperación.
-El [diseño selectivo de casos](tooling.md#pruebas-de-almacén) conserva sus riesgos y
+El [diseño selectivo de casos](../testing/01-test-design.md#pruebas-de-almacén) conserva sus riesgos y
 oráculos. Esas pruebas no afirman persistencia: los contratos HTTP/Prisma se
 comprueban separadamente con las pruebas existentes del backend y PostgreSQL aislado.
 
 Los selectores `RemoteSelect` y `useSelectedOption` pertenecen a `shared` y se
 reutilizan en Identidad. Los reportes comparten `requestExcel` y `useFileExport` con
-[Identidad y Directorio comercial](identity-and-directory.md), conservando sus
+[Identidad y Directorio comercial](04-identity-and-directory.md), conservando sus
 filtros y alcances de inventario.

@@ -1,4 +1,8 @@
-# Interfaz Vue, HTTP y ubicación de las pruebas
+# 3. Interfaz Vue, HTTP y ubicación de las pruebas
+
+Esta guía explica para desarrollo los contratos de presentación y transporte
+del cliente. El [índice Vue](../index.md) identifica sus fuentes, audiencia y límites;
+el contrato HTTP normativo permanece en OpenAPI.
 
 ## Decisiones aplicadas
 
@@ -87,7 +91,7 @@ concentra la adaptación de inputs, checkbox, textarea y selector remoto.
 | Editar merma / agregar stock | Conserva pesos y medidas. Muestra rollo completo cuando existe; de lo contrario conserva largo/peso de la referencia histórica. Agregar captura cantidad y observaciones. |
 
 Los selectores de Inventario conservan la consulta de opciones.
-[Compras](purchases.md) compone las altas rápidas con los editores Vue existentes
+[Compras](../modules/06-purchases.md) compone las altas rápidas con los editores Vue existentes
 de Proveedores e Inventario mediante `PurchaseWorkspace`; no abre pantallas EJS.
 Su alta de artículo fija proveedor y omite stock/costo inicial capturado.
 
@@ -217,18 +221,18 @@ nombres y errores mediante interpolación; no se usa `v-html` ni se almacenan en
 HTML para sustituir el escape de salida. La validación del navegador ayuda a capturar;
 Express vuelve a validar tipos, límites y permisos antes de persistir. Las contraseñas
 no se recortan. El contrato de entrada y salida del servidor se mantiene en
-[el estándar de seguridad](../../back/docs/architecture/coding-standards/09-errors-security-audit-and-logging.md#entradas-normalización-y-salida).
+[el estándar de seguridad](../../../back/docs/architecture/coding-standards/09-errors-security-audit-and-logging.md#entradas-normalización-y-salida).
 
-La estrategia y sus condiciones observables están en [tooling.md](tooling.md).
+La estrategia y sus condiciones observables están en [tooling.md](../development/02-tooling.md).
 
 ## Reutilización con Catálogos
 
-La [guía de entradas y salida segura](input-security.md) distingue normalización,
+La [guía de entradas y salida segura](04-input-security.md) distingue normalización,
 validación y escape, documenta SweetAlert2 como texto y enlaza los controles del
 servidor. Los patrones de composición y la evaluación SOLID están en
-[patrones Vue](patterns.md).
+[patrones Vue](../patterns/01-applicability-and-principles.md).
 
-El [módulo de Catálogos](catalogs.md) usa EditorDialog y ServerTable, extraídos del
+El [módulo de Catálogos](../modules/03-catalogs.md) usa EditorDialog y ServerTable, extraídos del
 editor y la tabla de inventario. Sus slots conservan los campos y celdas propios
 de cada dominio. Los estilos compartidos pertenecen a esos marcos; las secciones de
 pesos, stock y referencias siguen en los componentes de Almacén. La validación,

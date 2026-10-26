@@ -32,6 +32,6 @@ Si dos reglas parecen competir, se aplica esta prioridad:
 
 El backend no configura un comando de lint ni un formateador. El frontend tiene
 ESLint y comprobación de tipos mediante `npm run check` desde `front/`; su alcance
-se describe en [herramientas del frontend](../../../../front/docs/tooling.md).
+se describe en [herramientas del frontend](../../../../front/docs/development/02-tooling.md).
 El formato se revisa también en el diff: pruebas, tipos y `docs:check` no certifican
 por sí mismos el estilo ni la arquitectura.

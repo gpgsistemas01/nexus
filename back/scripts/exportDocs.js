@@ -112,8 +112,8 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/views/development/code-structure'),
                 ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
                 ...getDirectoryDocuments('docs/architecture/views/development/reuse-and-refactoring'),
-                '../front/docs/patterns.md',
-                '../front/docs/document-responsibilities.md',
+                '../front/docs/architecture/02-web-views.md',
+                ...getDirectoryDocuments('../front/docs/patterns'),
                 'docs/architecture/views/development/code-map.md'
             ]),
             'incorporacion-desarrolladores': packagePart(ARCHITECTURE_ENTRY, [
@@ -127,6 +127,14 @@ const PUBLICATIONS = Object.freeze({
             frontend: packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
+            ]),
+            'frontend-vue': packagePart('../front/docs/index.md', [
+                ...getDirectoryDocuments('../front/docs/architecture'),
+                ...getDirectoryDocuments('../front/docs/patterns'),
+                ...getDirectoryDocuments('../front/docs/modules'),
+                ...getDirectoryDocuments('../front/docs/development'),
+                ...getDirectoryDocuments('../front/docs/requirements'),
+                ...getDirectoryDocuments('../front/docs/testing')
             ]),
             'comportamiento-transversal': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/processes/index.md',

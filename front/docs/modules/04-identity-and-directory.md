@@ -1,4 +1,13 @@
-# Identidad y directorio comercial en Vue
+# 4. Identidad y directorio comercial en Vue
+
+## Propósito y fuentes
+
+Describe para desarrollo la separación entre [identity](../../src/modules/identity)
+y [directory](../../src/modules/directory), relacionada con
+[IDA](../../../back/docs/requirements/use-cases/identity-access/index.md) y
+[CAT](../../../back/docs/requirements/use-cases/catalogs/index.md).
+El alcance de la evidencia está en [pruebas de Identidad y Directorio](../testing/01-test-design.md#pruebas-de-identidad-y-directorio-comercial);
+la propiedad y los criterios documentales, en el [índice Vue](../index.md).
 
 ## Alcance y navegación
 
@@ -16,8 +25,9 @@ El menú mantiene el acordeón y la barra de iconos, sin enlaces a pantallas EJS
 Después del login, `/almacen` conserva la entrada compatible y elige el primer
 módulo autorizado entre los grupos disponibles. Una cuenta exclusiva de Clientes
 o Usuarios llega a su pantalla. Cada pantalla conserva el título «Tabla de…» de EJS.
-[Compras](purchases.md) reutiliza el editor de proveedores para altas rápidas. Salidas conserva sus pantallas EJS. Los historiales se describen en
-[Movimientos en Vue](movements.md), separados de Identidad y Directorio.
+[Compras](06-purchases.md) reutiliza el editor de proveedores para altas rápidas.
+[Salidas](07-issues.md) conserva su módulo Vue separado. Los historiales se describen en
+[Movimientos en Vue](05-movements.md), separados de Identidad y Directorio.
 
 ## Datos y operaciones
 
@@ -115,6 +125,6 @@ reenvíos hasta cerrar/recargar; un fallo de red requiere reintento explícito. 
 aborta y descarta respuestas tardías. Un 401 lleva al login conservando destino;
 un 403 abre acceso no permitido. Express conserva la autorización y validación definitivas.
 
-Las [pruebas y su diseño](tooling.md#pruebas-de-identidad-y-directorio-comercial)
+Las [pruebas y su diseño](../testing/01-test-design.md#pruebas-de-identidad-y-directorio-comercial)
 usan Axios y componentes reales con API simulada; no prueban persistencia ni sustituyen
 las integraciones de Express/Prisma.

@@ -95,4 +95,4 @@ confirmación SweetAlert2 y reportes compartidos. El alta de artículo usa
 proveedor al editar y envía sólo las partidas nuevas; los importes definitivos
 y movimientos pertenecen a Express. Listado y consulta por id incluyen observaciones del
 encabezado; sólo el listado omite los detalles. Los contratos, permisos y
-responsabilidades están en la [guía Vue de compras](../../../../../../front/docs/purchases.md).
+responsabilidades están en la [guía Vue de compras](../../../../../../front/docs/modules/06-purchases.md).

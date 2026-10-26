@@ -1,11 +1,14 @@
-# Responsabilidades y nombres de Salidas y Compras
+# 8. Responsabilidades y nombres de Salidas y Compras
+
+El [índice Vue](../index.md) conserva audiencia, correspondencia funcional y criterios
+de descripción de diseño aplicables a esta revisión.
 
 La revisión se concentra en `modules/issues`, `modules/purchases`, sus pantallas
 contenedoras en `app` y sus consumidores de `shared`. La estructura sigue la
 arquitectura existente de Vue; una carpeta o un nombre de patrón por sí solos no
 establecen una separación de responsabilidades.
 
-El catálogo general de [patrones y principios](patterns.md) conserva los mecanismos
+El catálogo general de [patrones y principios](01-applicability-and-principles.md) conserva los mecanismos
 comunes. Aquí se documentan sus colaboradores concretos, con enlaces al código;
 los diagramas describen la implementación actual, no una arquitectura propuesta.
 
@@ -87,27 +90,27 @@ centrarse en esa frontera, sin atribuir sus tareas al editor visual.
 
 | Frontera / mecanismo | Fuente en Salidas | Consumidor equivalente en Compras |
 | --- | --- | --- |
-| Contenedor/presentación | [IssueEditorPage](../src/modules/issues/pages/IssueEditorPage.vue) y [IssueEditor](../src/modules/issues/components/IssueEditor.vue). | [PurchaseEditorPage](../src/modules/purchases/pages/PurchaseEditorPage.vue) y [PurchaseEditor](../src/modules/purchases/components/PurchaseEditor.vue). |
-| Composición del formulario | [useIssueEditor](../src/modules/issues/composables/useIssueEditor.ts). | [usePurchaseEditor](../src/modules/purchases/composables/usePurchaseEditor.ts). |
-| Fábrica de esquemas | [createIssueValidationSchema](../src/modules/issues/issueForm.ts). | [createPurchaseValidationSchema](../src/modules/purchases/purchaseForm.ts). |
-| Adaptación de request | [mapIssueFormToRequest](../src/modules/issues/mappers/issueRequestMapper.ts). | [mapPurchaseFormToRequest](../src/modules/purchases/mappers/purchaseRequestMapper.ts). |
-| Adaptación de respuesta | [issueResponseMapper](../src/modules/issues/mappers/issueResponseMapper.ts), consumido por [issueService](../src/modules/issues/services/issueService.ts). | [purchaseResponseMapper](../src/modules/purchases/mappers/purchaseResponseMapper.ts), consumido por [purchaseService](../src/modules/purchases/services/purchaseService.ts). |
-| Lectura por callback | [useIssueActions](../src/modules/issues/composables/useIssueActions.ts) configura [useDocumentRead](../src/shared/composables/useDocumentRead.ts) con `issueService.get`. | [usePurchaseActions](../src/modules/purchases/composables/usePurchaseActions.ts) configura el mismo lector con `purchaseService.get`. |
-| Guardado por callback | Ambos editores configuran [useRecordSave](../src/shared/composables/useRecordSave.ts). | El mismo contrato conserva `AbortSignal`, errores y confirmación sin conocer el dominio. |
+| Contenedor/presentación | [IssueEditorPage](../../src/modules/issues/pages/IssueEditorPage.vue) y [IssueEditor](../../src/modules/issues/components/IssueEditor.vue). | [PurchaseEditorPage](../../src/modules/purchases/pages/PurchaseEditorPage.vue) y [PurchaseEditor](../../src/modules/purchases/components/PurchaseEditor.vue). |
+| Composición del formulario | [useIssueEditor](../../src/modules/issues/composables/useIssueEditor.ts). | [usePurchaseEditor](../../src/modules/purchases/composables/usePurchaseEditor.ts). |
+| Fábrica de esquemas | [createIssueValidationSchema](../../src/modules/issues/issueForm.ts). | [createPurchaseValidationSchema](../../src/modules/purchases/purchaseForm.ts). |
+| Adaptación de request | [mapIssueFormToRequest](../../src/modules/issues/mappers/issueRequestMapper.ts). | [mapPurchaseFormToRequest](../../src/modules/purchases/mappers/purchaseRequestMapper.ts). |
+| Adaptación de respuesta | [issueResponseMapper](../../src/modules/issues/mappers/issueResponseMapper.ts), consumido por [issueService](../../src/modules/issues/services/issueService.ts). | [purchaseResponseMapper](../../src/modules/purchases/mappers/purchaseResponseMapper.ts), consumido por [purchaseService](../../src/modules/purchases/services/purchaseService.ts). |
+| Lectura por callback | [useIssueActions](../../src/modules/issues/composables/useIssueActions.ts) configura [useDocumentRead](../../src/shared/composables/useDocumentRead.ts) con `issueService.get`. | [usePurchaseActions](../../src/modules/purchases/composables/usePurchaseActions.ts) configura el mismo lector con `purchaseService.get`. |
+| Guardado por callback | Ambos editores configuran [useRecordSave](../../src/shared/composables/useRecordSave.ts). | El mismo contrato conserva `AbortSignal`, errores y confirmación sin conocer el dominio. |
 
 La fábrica selecciona funciones de validación; no es una jerarquía Abstract Factory.
 Las reglas públicas siguen en `back/src/public` y sólo orientan la captura. Las
-uniones de [issue.ts](../src/modules/issues/issue.ts) y
-[purchase.ts](../src/modules/purchases/purchase.ts) expresan estas diferencias:
+uniones de [issue.ts](../../src/modules/issues/issue.ts) y
+[purchase.ts](../../src/modules/purchases/purchase.ts) expresan estas diferencias:
 
 | Captura | Esquema y operación admitida |
 | --- | --- |
 | Salida `create` / `edit` | Documento completo según recurso; editar requiere documento leído. |
 | Salida `header` | Sólo encabezado, sin volver a enviar sus detalles. |
 | Salida `supply` | Selección de pendientes y cantidad de proyecto; no edición del encabezado. |
-| Salida `view` / `return` | Esquema vacío en el editor principal y sin llamada a `save`. La devolución usa [useIssueReturn](../src/modules/issues/composables/useIssueReturn.ts) y `returnDetail`, con su captura propia. |
+| Salida `view` / `return` | Esquema vacío en el editor principal y sin llamada a `save`. La devolución usa [useIssueReturn](../../src/modules/issues/composables/useIssueReturn.ts) y `returnDetail`, con su captura propia. |
 | Compra `create` / `edit` | Reglas públicas de alta/edición; `PurchaseWriteTarget` excluye `view`. |
-| Corrección / cancelación de partida | `PurchaseDetailChange` distingue datos de corrección y cancelación; [usePurchaseCorrection](../src/modules/purchases/composables/usePurchaseCorrection.ts) coordina el flujo. |
+| Corrección / cancelación de partida | `PurchaseDetailChange` distingue datos de corrección y cancelación; [usePurchaseCorrection](../../src/modules/purchases/composables/usePurchaseCorrection.ts) coordina el flujo. |
 
 Estas opciones son modos de interacción y contratos de tipos; no constituyen un
 patrón State ni una máquina de estados persistente. El servidor vuelve a comprobar
@@ -179,17 +182,17 @@ flowchart TB
     issues --> selection
 ```
 
-El [workspace](../src/app/pages/IssueWorkspace.vue) comprueba permisos de crear y
-leer clientes antes de abrir [DirectoryEditorPage](../src/modules/directory/pages/DirectoryEditorPage.vue).
+El [workspace](../../src/app/pages/IssueWorkspace.vue) comprueba permisos de crear y
+leer clientes antes de abrir [DirectoryEditorPage](../../src/modules/directory/pages/DirectoryEditorPage.vue).
 Tras el alta convierte `DirectoryEntry` en `LookupItem` y ejecuta el callback
-recibido. [useIssueHeaderSelection](../src/modules/issues/composables/useIssueHeaderSelection.ts)
+recibido. [useIssueHeaderSelection](../../src/modules/issues/composables/useIssueHeaderSelection.ts)
 conserva la opción creada, selecciona su id y refresca opciones; no selecciona una
 opción inactiva. El guardado permanece en Directorio y la autorización definitiva
 en Express. Cerrar el diálogo elimina el callback pendiente.
 
-[PurchaseWorkspace](../src/app/pages/PurchaseWorkspace.vue) aplica la misma composición
+[PurchaseWorkspace](../../src/app/pages/PurchaseWorkspace.vue) aplica la misma composición
 para proveedores y artículos con sus contratos de callback. No hay un bus global
-ni una importación de pantallas entre los módulos. La [sesión proporcionada](patterns.md)
+ni una importación de pantallas entre los módulos. La [sesión proporcionada](01-applicability-and-principles.md)
 es compartida por la aplicación; estas capturas conservan estado por instancia.
 
 ## Convenciones de nombres comprobadas

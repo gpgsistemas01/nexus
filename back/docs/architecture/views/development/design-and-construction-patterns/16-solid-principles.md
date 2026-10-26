@@ -15,7 +15,7 @@ introducir clases, herencia, un contenedor de inyección o un repository por ent
 | D — Inversión de dependencias | La factory recibe la operación; `findPage` recibe un modelo; `findBatches` recibe `fetchPage` y permite su implementación predeterminada. | Aplicación parcial: se inyectan colaboradores donde existe variación real. Los servicios todavía usan Prisma mediante `getDb(tx)`; no hay independencia completa de persistencia ni arquitectura hexagonal implementada. |
 
 En Vue, páginas y composables componen contratos de props, eventos y callbacks;
-la evidencia y figura propietarias están en [patrones del frontend](../../../../../../front/docs/patterns.md).
+la evidencia y figura propietarias están en [patrones del frontend](../../../../../../front/docs/patterns/01-applicability-and-principles.md).
 
 ## Colaboradores de lectura y contrato de sustitución
 

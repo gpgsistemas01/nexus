@@ -1,4 +1,12 @@
-# Compras en Vue
+# 6. Compras en Vue
+
+## Propósito y fuentes
+
+Describe para desarrollo la realización de `CU-ENT-01..12` de
+[Compras](../../../back/docs/requirements/use-cases/purchases/index.md) en
+[purchases](../../src/modules/purchases). La evidencia del cliente está en
+[purchases.spec.ts](../../tests/e2e/purchases.spec.ts); las responsabilidades y
+diagramas propietarios se enlazan desde el [índice Vue](../index.md).
 
 Las rutas `/compras/materiales` y `/compras/consumibles` incorporan el módulo
 de compras existente en Express. `/compras` abre la primera variante autorizada.
@@ -120,8 +128,8 @@ no demuestra persistencia. La integración HTTP/PostgreSQL del backend se conser
 en `goodsReceiptContextDbTest.js`, incluida lectura de observaciones y aislamiento
 de variantes, y en las pruebas existentes de concurrencia de almacén.
 
-Consulta [arquitectura](architecture.md), [estándar y herramientas](tooling.md)
-y la [referencia técnica de compras](../../back/docs/architecture/views/development/frontend-technical-documentation/12-goods-receipts-code.md).
+Consulta [arquitectura](../architecture/01-structure-and-boundaries.md), [estándar y herramientas](../development/02-tooling.md)
+y la [referencia técnica de compras](../../../back/docs/architecture/views/development/frontend-technical-documentation/12-goods-receipts-code.md).
 
 ## Paridad con EJS y revisión de reutilización
 
@@ -159,4 +167,4 @@ contradictorio se rechaza y los documentos conservan la comprobación estricta.
 
 `purchase.ts` conserva tipos; `purchaseConfig` y `purchaseRules` son los propietarios
 de configuración y modos. Las escrituras reciben opciones con destino y cambio
-tipados. Consulta la [revisión de responsabilidades y nombres](document-responsibilities.md).
+tipados. Consulta la [revisión de responsabilidades y nombres](../patterns/08-document-responsibilities.md).
