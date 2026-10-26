@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.3 | 1.0.0 | En revisión | 2026-10-26 | Equipo Nexus |
+| 1.4 | 1.0.0 | En revisión | 2026-10-26 | Equipo Nexus |
 
 Los comandos de validación se ejecutan desde `back/` (`cd back` desde la raíz).
 Las rutas `tests/`, `src/` y `docs/` son relativas a esa carpeta.
@@ -168,8 +168,12 @@ niveles funcionales nuevos. El backend no tiene una suite propia de navegador.
 Vue conserva sus recorridos Playwright en `front/tests/e2e`, con diseño, fichas y
 límites en la [colección de pruebas del cliente](../../../front/docs/testing/index.md).
 Ejecutan Chromium contra Vite e interceptan la API; no equivalen a una suite de
-sistema contra Express/PostgreSQL real ni a aceptación del usuario. Cuando se
-requiera esa evidencia, se registra de forma separada.
+sistema contra Express/PostgreSQL real ni a aceptación del usuario. Por separado,
+`front/tests/system` ejecuta un representante con los routers reales, JWT y base
+aislada: login, alta persistida de cliente, tres reportes XLSX, renovación y cierre.
+Su [preparación y limpieza](../../../front/docs/testing/04-system-tests.md) no cambia
+la base habitual. `CP-VUE-SYS-001-01` complementa las integraciones backend y no
+acredita todos los CU ni la aceptación del usuario.
 
 ### Técnicas de diseño
 

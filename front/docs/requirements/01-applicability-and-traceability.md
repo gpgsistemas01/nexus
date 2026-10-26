@@ -52,14 +52,16 @@ modal de confirmación o un componente reutilizado no crea un `CU-*` independien
 
 ## Diferencias y aceptación
 
-La revisión encontró una diferencia concreta en
+La revisión inicial encontró una diferencia concreta en
 [`CU-ALM-10`, alternativa A2](../../../back/docs/requirements/use-cases/catalogs/cu-alm-10.md):
 la ficha permite abrir Agregar stock desde el rechazo de duplicado, trasladando
-merma, cantidad y observaciones. Vue conserva el rechazo y permite localizar el
-registro para agregar existencia, pero no realiza ese traspaso automático.
-Se registra como **BRE-VUE-001** en [cobertura](../testing/03-use-case-coverage.md#brechas-y-decisiones-pendientes).
-No se modifica la ficha para ocultar la diferencia ni se declara aceptada.
+merma, cantidad y observaciones. Vue ahora ofrece esa transición tras un rechazo
+definitivo y con permiso de entrada. Cancelar conserva el alta; confirmar abre
+Agregar stock sin escribir, y una cantidad inicial cero deja la cantidad vacía.
+El composable y el contenedor realizan el flujo original, sin redefinir el CU.
+**BRE-VUE-001** conserva su seguimiento y evidencia en
+[cobertura](../testing/03-use-case-coverage.md#brechas-y-decisiones-pendientes).
 
-Desarrollo verifica código y pruebas; el responsable funcional determina si debe
-adaptarse el cliente o aprobarse una variante del requisito. Hasta esa decisión,
-la documentación conserva el alcance parcial y el estado de revisión.
+Desarrollo verifica código y pruebas; el responsable funcional acepta el resultado
+conforme a gobernanza. Una brecha atendida no convierte toda la colección en aprobada:
+la documentación conserva sus límites y el estado de revisión.

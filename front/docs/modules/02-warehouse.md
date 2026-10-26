@@ -11,10 +11,15 @@ de los requisitos normativos y las garantías del servidor.
 
 ## Acceso y alcance
 
-La alternativa de duplicado de `CU-ALM-10` conserva una diferencia funcional:
-Vue no abre automáticamente Agregar stock trasladando la captura. Se registra
-como [BRE-VUE-001](../testing/03-use-case-coverage.md#brechas-y-decisiones-pendientes),
-sin declarar que el recorrido completo de la ficha ya se cumple en el cliente.
+La alternativa de duplicado de `CU-ALM-10` permite confirmar **Abrir Agregar stock**
+después de un `WASTE_ALREADY_EXISTS` con rechazo definitivo de operación y permiso
+`wastes:add-stock`. Cancelar conserva el alta; confirmar reemplaza el editor con
+la identidad devuelta y traslada cantidad/observaciones, sin escribir todavía.
+Cantidad inicial cero deja el campo vacío. La entrada posterior conserva su propio
+`operationId`, distinto del alta rechazada. No se usa el ajuste absoluto ni se
+inventa una versión de edición para el contexto reducido del conflicto.
+[BRE-VUE-001](../testing/03-use-case-coverage.md#brechas-y-decisiones-pendientes)
+enlaza las pruebas y los límites de la evidencia.
 
 Inicia Express y Vite en terminales separadas desde la raíz:
 

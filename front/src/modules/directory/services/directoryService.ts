@@ -67,7 +67,7 @@ export const directoryService = {
     },
     export(resource: DirectoryResource, query: RecordQuery, signal: AbortSignal) {
         return requestExcel(
-            `${DIRECTORY_CONFIG[resource].reportPath}?${recordParams(query)}`,
+            `${DIRECTORY_CONFIG[resource].reportPath}?${recordParams(query, { paginate: false })}`,
             signal,
         );
     },

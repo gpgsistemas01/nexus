@@ -19,6 +19,7 @@ defineProps<{
     isSubmitting: boolean;
     isPending: boolean;
     isConflicted: boolean;
+    isConfirmingDuplicate?: boolean;
     lookups: Record<string, LookupState>;
 }>();
 const emit = defineEmits<{
@@ -38,6 +39,7 @@ const emit = defineEmits<{
         :title="title"
         :context="context"
         :is-submitting="isSubmitting"
+        :retain-focus="!isConfirmingDuplicate"
         :is-submit-disabled="isConflicted && !isPending"
         :submit-label="isPending ? 'Recuperar captura' : 'Guardar'"
         :note="

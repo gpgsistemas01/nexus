@@ -57,6 +57,7 @@ for (const [path, resource, title, label] of [
 
 for (const [path, label, name] of [
   ['materiales', 'Material', 'Lona'],
+  ['consumibles', 'Consumible', 'Lona'],
   ['mermas', 'Merma', 'Sobrante de lona'],
 ] as const) {
   test(`salidas ${path}: edición pendiente, surtido y devolución`, async ({ page }) => {

@@ -180,6 +180,15 @@ Los casos comprueban login, Almacén, Compras, Salidas, Movimientos, Catálogos,
 permisos, errores, envío, cookies, reintento, almacenamiento y ancho móvil. Las
 respuestas de API se simulan; no se usa una base de datos real.
 
+## Pruebas de sistema
+
+Las pruebas de sistema se ejecutan con `npm run test:e2e:system` desde `front/`
+o `npm --prefix front run test:e2e:system` desde la raíz. Requieren las dependencias
+de ambas aplicaciones y PostgreSQL aislado/migrado: sigue la
+[preparación y limpieza](docs/testing/04-system-tests.md). Este comando inicia
+Express en 3107 y Vite en 5175; no reutiliza los procesos normales de desarrollo.
+La suite `test:e2e` conserva sus respuestas API simuladas y no requiere una base.
+
 ## Estructura
 
 - `docs/index.md`: entrada a las guías técnicas de Vue, con sus fuentes y criterios documentales.

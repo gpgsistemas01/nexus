@@ -10,8 +10,9 @@ condiciones con oráculos independientes.
 
 Los datos son fixtures públicas, no cuentas ni credenciales reales. Cada ejecutable
 prepara su escenario; estas fichas no requieren ejecutar antes otra ficha. En Playwright
-cada test dispone de contexto/página aislados, rutas simuladas y estado nuevo del
-harness. Se destruyen al terminar; no hay limpieza SQL. En las unitarias se
+los tests de `tests/e2e` disponen de contexto/página aislados, rutas simuladas y estado
+nuevo del harness. Se destruyen al terminar; no hay limpieza SQL en esos casos.
+El caso de sistema prepara y limpia fixtures reales según su ficha y procedimiento. En las unitarias se
 desmontan componentes y restauran dobles según `tests/setup.ts` y los hooks del caso.
 Los resultados esperados siguientes **no** son resultados de ejecución `EP-*`.
 
@@ -83,11 +84,11 @@ Los resultados esperados siguientes **no** son resultados de ejecución `EP-*`.
 
 | Campo | Especificación |
 | --- | --- |
-| Requisito y diseño | `RF-ISS-002` / `RF-WST-003`, `CU-SAL-05` / `CU-SAL-12`; `DP-VUE-ISS-002`. Selección pendiente y cantidad de proyecto ausente/válida. |
-| Precondiciones y datos | `mockIssues`, salida aprobada pendiente con detalle de cantidad 2 y permiso de surtido. Variantes navegador: Materiales/Lona y Mermas/Sobrante de lona. Cantidad de proyecto 180. |
+| Requisito y diseño | `RF-ISS-002` / `RF-WST-003`, `CU-SAL-05` / `CU-SAL-19` / `CU-SAL-12`; `DP-VUE-ISS-002`. Selección pendiente y cantidad de proyecto ausente/válida. |
+| Precondiciones y datos | `mockIssues`, salida aprobada pendiente con detalle de cantidad 2 y permiso de surtido. Variantes navegador: Materiales/Lona, Consumibles/Lona y Mermas/Sobrante de lona. Cantidad de proyecto 180. |
 | Acción | Abrir Surtir detalle; seleccionar el detalle; enviar sin cantidad de proyecto; capturar 180 y reenviar. |
 | Resultado esperado | Encabezado bloqueado. El primer intento no genera escritura. El segundo envía sólo `details: [{ id: issueDetailId, isSupplied: true, projectConvertedQuantity: 180 }]` a `/details`; se cierra el diálogo. |
-| Fuente y limpieza | [issues.spec.ts](../../tests/e2e/issues.spec.ts), tramo de surtido de `salidas materiales: edición pendiente, surtido y devolución` y `salidas mermas: edición pendiente, surtido y devolución`. Aislamiento Playwright. No demuestra descuento real ni falta de stock. |
+| Fuente y limpieza | [issues.spec.ts](../../tests/e2e/issues.spec.ts), tramo de surtido de `salidas materiales: edición pendiente, surtido y devolución` , `salidas consumibles: edición pendiente, surtido y devolución` y `salidas mermas: edición pendiente, surtido y devolución`. Aislamiento Playwright. No demuestra descuento real ni falta de stock. |
 
 <a id="cp-vue-iss-002-02"></a>
 
@@ -95,7 +96,7 @@ Los resultados esperados siguientes **no** son resultados de ejecución `EP-*`.
 
 | Campo | Especificación |
 | --- | --- |
-| Requisito y diseño | `RF-ISS-003` / `RF-WST-006`, `RN-014`, `CU-SAL-06` / `CU-SAL-13`; `DP-VUE-ISS-002`. Frontera superior de cantidad sobre saldo leído. |
+| Requisito y diseño | `RF-ISS-003` / `RF-WST-006`, `RN-014`, `CU-SAL-06` / `CU-SAL-20` / `CU-SAL-13`; `DP-VUE-ISS-002`. Frontera superior de cantidad sobre saldo leído. |
 | Precondiciones y datos | Continuación del harness de salida ya surtida: cantidad entregada 2, devuelta 0. Dos escrituras previas: surtido y actualización de encabezado. Intentos de devolución 3 y 1. |
 | Acción | Abrir devolución; enviar 3; corregir a 1 y enviar. |
 | Resultado esperado | Abrir no muestra errores. Con 3 el contador permanece en dos solicitudes; con 1 se envía a `/returns` `{ returnQuantity: 1, observations: '' }` y se cierra el diálogo. |
@@ -112,6 +113,66 @@ Los resultados esperados siguientes **no** son resultados de ejecución `EP-*`.
 | Acción | Enviar 1.03; enviar 1.02; repetir explícitamente; desmontar e intentar otro envío. |
 | Resultado esperado | 1.03 no llama al servicio. 1.02 conserva captura y mensaje ante rechazo; el siguiente intento notifica la confirmación. Tras desmontar no hay una tercera llamada. |
 | Fuente y limpieza | [issueTest.ts](../../tests/unit/modules/issues/issueTest.ts), `devolución limita por el saldo leído, conserva precisión y exige reintento explícito`, con `resource: materials`. Se desmonta el wrapper; los hooks restauran dobles. No es navegador ni persistencia, ni demuestra por sí solo las variantes merma/consumible. |
+
+<a id="cp-vue-wh-011-01"></a>
+
+## CP-VUE-WH-011-01: trasladar un duplicado con cantidad positiva
+
+| Campo | Especificación |
+| --- | --- |
+| Requisito y diseño | `CU-ALM-10` A2, `CU-ALM-13`, `DP-VUE-WH-011`. Transición alta rechazada → cancelar → confirmar → entrada revisada. |
+| Precondiciones y datos | `mockWarehouse`, permiso de agregar stock. Alta de merma con plantilla Lona/ROLLO 2 × 50; referencia 10.25 kg, cono 0.25 kg y sobrante 2.75 kg; cantidad inicial 3 y observaciones `Conservar esta captura`. API responde 409 `WASTE_ALREADY_EXISTS`, `operationRejected=true` y contexto de merma sin versión. |
+| Acción | Guardar alta, cancelar el aviso; comprobar captura; volver a guardar y confirmar Abrir Agregar stock. Revisar el nuevo editor y después Guardar. |
+| Resultado esperado | Cancelar conserva cantidad/observaciones y no registra entrada. Confirmar reemplaza el editor con la identidad recibida y cantidad 3, sin errores iniciales ni escritura automática. Guardar envía una entrada con cantidad 3, observaciones y `operationId` distinto del alta rechazada. No fabrica `expectedVersion`. |
+| Fuente y limpieza | [warehouse.spec.ts](../../tests/e2e/warehouse.spec.ts), `mermas: duplicado traslada cantidad 3 y observaciones sólo después de confirmar`. Contexto aislado; APIs simuladas. Unitarias de [recuperación](../../tests/unit/modules/warehouse/wasteDuplicateRecoveryTest.ts) añaden rechazos por permiso, incertidumbre, metadatos y desmontaje. No acredita stock SQL. |
+
+<a id="cp-vue-wh-011-02"></a>
+
+## CP-VUE-WH-011-02: trasladar un duplicado con cantidad cero
+
+| Campo | Especificación |
+| --- | --- |
+| Requisito y diseño | `CU-ALM-10` A2, `CU-ALM-13`, `DP-VUE-WH-011`. Frontera cero/positivo del campo de entrada. |
+| Precondiciones y datos | Harness nuevo de `mockWarehouse`, con permiso de entrada y respuesta de duplicado definitivo. La misma plantilla/pesos de la variante positiva; cantidad inicial 0 y observaciones `Conservar esta captura`. No depende de ejecutar otra ficha. |
+| Acción | Guardar, cancelar y confirmar un nuevo intento; en Agregar stock enviar vacío; capturar 4 y Guardar. |
+| Resultado esperado | La transición conserva las observaciones y deja cantidad vacía, sin errores al abrir. El envío vacío no genera entrada; con 4 se envía una sola entrada, con su propio `operationId`. |
+| Fuente y limpieza | [warehouse.spec.ts](../../tests/e2e/warehouse.spec.ts), `mermas: duplicado traslada cantidad 0 y observaciones sólo después de confirmar`. Contexto aislado de navegador con API simulada; no hay limpieza SQL. |
+
+<a id="cp-vue-session-004-01"></a>
+
+## CP-VUE-SESSION-004-01: cierre y rechazo posterior
+
+| Campo | Especificación |
+| --- | --- |
+| Requisito y diseño | `RF-AUT-003`, `CU-AUT-02`, `DP-VUE-SESSION-004`. Transición sesión válida → cierre → acceso protegido. |
+| Precondiciones y datos | `sessionScenario` nuevo, cookies HttpOnly de fixture y destino Clientes. El handler de cierre simula redirección y eliminación de ambas cookies; después `/me`/refresh rechazan acceso. |
+| Acción | Abrir Clientes, pulsar Cerrar sesión y volver a abrir el destino protegido. |
+| Resultado esperado | Un POST a `/cerrar-sesion`; login visible; no quedan cookies access/refresh. El acceso directo vuelve al login con destino conservado. El contador de refresh es dos: recuperación inicial y rechazo posterior al cierre. |
+| Fuente y limpieza | [sessionRecovery.spec.ts](../../tests/e2e/sessionRecovery.spec.ts), `sesión: cerrar elimina cookies y el acceso directo posterior vuelve al login`. Aislamiento Playwright. El caso de sistema siguiente comprueba además el router real. |
+
+<a id="cp-vue-rec-003-01"></a>
+
+## CP-VUE-REC-003-01: reportes por recurso con recuperación
+
+| Campo | Especificación |
+| --- | --- |
+| Requisito y diseño | `CU-IDA-09`, `CU-CAT-08/04`, `DP-VUE-REC-003`. Misma condición parametrizada por reporte y transición 503 → reintento. |
+| Precondiciones y datos | `mockRecords` nuevo por variante: Usuarios con búsqueda `ana`, Clientes/Proveedores con `Central`. Primer reporte responde 503; el siguiente ofrece un blob de fixture con MIME XLSX. |
+| Acción | Abrir módulo, aplicar búsqueda, exportar, observar error y volver a pulsar Exportar Excel. |
+| Resultado esperado | El fallo muestra Error de descarga y rehabilita el botón. El reintento descarga `.xlsx` del endpoint correspondiente, conserva `search` y omite `start`, `length` y `draw`. Se limpia el error; no hay reintento automático. |
+| Fuente y limpieza | [records.spec.ts](../../tests/e2e/records.spec.ts), `reportes Usuarios: exporta filtros sin paginación y recupera una descarga fallida` y variantes `Clientes`/`Proveedores`. Aislamiento Playwright; esta ficha no comprueba filas del archivo simulado. |
+
+<a id="cp-vue-sys-001-01"></a>
+
+## CP-VUE-SYS-001-01: recorrido cliente, servidor y persistencia
+
+| Campo | Especificación |
+| --- | --- |
+| Requisito y diseño | `CU-AUT-01/02`, `CU-CAT-06/08/04`, `CU-IDA-09`, `DP-VUE-SYS-001`. Representante de unión entre capas, filtros y transiciones de sesión. |
+| Precondiciones y datos | Base dedicada y migrada según [preparación](04-system-tests.md). `setup.ts` genera sufijo, cuenta de administrador y contraseña de fixture, cuentas/registros excluidos y nombres de cliente/proveedor. El manifiesto temporal identifica los valores exactos de la corrida. Chromium, Vue y Express propios; sin rutas API interceptadas. |
+| Acción | Login desde Vue; crear cliente; consultar Prisma y recargar. Filtrar/exportar Usuarios, Clientes y Proveedores; abrir XLSX con ExcelJS. Retirar sólo accessToken, recargar y observar refresh. Cerrar sesión; solicitar `/me`, refresh y una URL protegida. |
+| Resultado esperado | Una fila activa de cliente, visible tras recarga. Cada XLSX real tiene encabezado/filas, contiene el representante y excluye la otra fixture. Refresh real 200 restablece cookies HttpOnly. Cierre elimina ambas cookies; `/me` y refresh responden 401 y la URL protegida abre login. El cliente persistido permanece una sola vez. |
+| Fuente y limpieza | [application.spec.ts](../../tests/system/application.spec.ts), `sistema: login, alta persistida, reportes reales, renovación y cierre con rutas protegidas`. `setup.ts` limpia sus filas, asignaciones, auditoría y catálogos creados y elimina el manifiesto. No prueba todos los roles, fórmulas o transacciones de inventario. |
 
 ## Reproducción y resultado real
 

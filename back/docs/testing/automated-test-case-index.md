@@ -8,7 +8,9 @@ esta guía son relativas a esa carpeta.
 Las fichas selectivas del cliente Vue se mantienen en su
 [registro de casos](../../../front/docs/testing/02-test-cases.md), con la
 [trazabilidad y brechas](../../../front/docs/testing/03-use-case-coverage.md) propias
-de esa interfaz. No se duplican aquí ni se presentan como pruebas HTTP/Prisma.
+de esa interfaz. Incluyen `CP-VUE-SYS-001-01`: navegador con la aplicación y
+PostgreSQL reales, preparado y limpiado según su ficha. No se duplican aquí
+ni se confunde el navegador con API simulada con esa evidencia de sistema.
 
 Los archivos de `tests` son la especificación ejecutable. Este registro añade una ficha
 sólo para integraciones HTTP/Prisma, autorización, invariantes críticas de integridad o

@@ -135,9 +135,11 @@ onMounted(() => {
         :resource="resource"
         :target="editor"
         :user-id="session.user.value!.id"
+        :can-add-stock="permissions.canAdd"
         @saved="inventory.onSaved"
         @close="editor = null"
         @reload="reloadEditor"
         @unauthorized="router.replace({ name: 'login' })"
+        @add-stock="inventory.openEditor"
     />
 </template>

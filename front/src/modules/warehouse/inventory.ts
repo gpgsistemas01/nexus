@@ -49,10 +49,15 @@ export interface InventoryPermissions {
     canReadState: boolean;
     canExport: boolean;
 }
-export interface EditorTarget {
-    action: InventoryAction;
-    row?: InventoryRow;
+export interface StockAdditionTarget {
+    action: 'add-stock';
+    row: Partial<InventoryRow> &
+        Pick<InventoryRow, 'id' | 'entityId' | 'name' | 'supplierName' | 'currentStock'>;
+    quantity?: string;
+    observations?: string;
 }
+export type EditorTarget =
+    { action: Exclude<InventoryAction, 'add-stock'>; row?: InventoryRow } | StockAdditionTarget;
 
 export const INVENTORY_CONFIG = {
     materials: {

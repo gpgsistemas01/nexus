@@ -12,6 +12,7 @@ import {
     unitUsesMeasurements,
 } from '../formModel.js';
 import { useRemoteOptions } from './useRemoteOptions.js';
+import { useWasteDuplicateRecovery } from './useWasteDuplicateRecovery.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 import type {
@@ -20,6 +21,7 @@ import type {
     InventoryPayload,
     InventoryResource,
     InventoryValues,
+    StockAdditionTarget,
 } from '../inventory.js';
 
 export const useInventoryEditor = (options: {
@@ -30,6 +32,8 @@ export const useInventoryEditor = (options: {
     onUnauthorized: () => void;
     creationContext?: 'goodsReceipt';
     initialSupplier?: LookupItem;
+    canAddStock?: boolean;
+    onAddStock?: (target: StockAdditionTarget) => void;
 }) => {
     const { resource, target } = options;
     const message = ref('');
@@ -37,6 +41,11 @@ export const useInventoryEditor = (options: {
     const isSubmitting = ref(false);
     const isConflicted = ref(false);
     const controller = new AbortController();
+    const duplicateRecovery = useWasteDuplicateRecovery({
+        canAddStock: options.canAddStock === true,
+        signal: controller.signal,
+        onAddStock: options.onAddStock,
+    });
     const isCreating = computed(() => target.action === 'create');
     const isStock = computed(() => target.action === 'stock');
     const isIdempotent = resource === 'wastes' && ['create', 'add-stock'].includes(target.action);
@@ -266,6 +275,9 @@ export const useInventoryEditor = (options: {
                     isConflicted.value = cause.code === 'RECORD_VERSION_CONFLICT';
                     if (cause.status === 401) options.onUnauthorized();
                 }
+
+                if (resource === 'wastes' && isCreating.value && !isPending.value)
+                    await duplicateRecovery.recover(cause, payload);
             }
 
             return;
@@ -311,6 +323,7 @@ export const useInventoryEditor = (options: {
         isSubmitting,
         isPending,
         isConflicted,
+        isConfirmingDuplicate: duplicateRecovery.isConfirming,
         lookups,
         preview,
         selectedTemplate,

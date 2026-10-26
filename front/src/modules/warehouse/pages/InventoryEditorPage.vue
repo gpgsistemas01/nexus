@@ -4,7 +4,7 @@ import InventoryEditor from '../components/InventoryEditor.vue';
 import { useInventoryEditor } from '../composables/useInventoryEditor.js';
 import { inventorySections } from '../formFields.js';
 import { INVENTORY_CONFIG } from '../inventory.js';
-import type { EditorTarget, InventoryResource } from '../inventory.js';
+import type { EditorTarget, InventoryResource, StockAdditionTarget } from '../inventory.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 
 const props = defineProps<{
@@ -13,17 +13,20 @@ const props = defineProps<{
     userId: string;
     creationContext?: 'goodsReceipt';
     initialSupplier?: LookupItem;
+    canAddStock?: boolean;
 }>();
 const emit = defineEmits<{
     saved: [created?: LookupItem];
     close: [];
     reload: [];
     unauthorized: [];
+    addStock: [target: StockAdditionTarget];
 }>();
 const editor = useInventoryEditor({
     ...props,
     onSaved: (created) => emit('saved', created),
     onUnauthorized: () => emit('unauthorized'),
+    onAddStock: (target) => emit('addStock', target),
 });
 const { values, errors, message, isSubmitting, isPending, isConflicted, lookups, preview } = editor;
 const sections = computed(() =>
@@ -56,6 +59,7 @@ const context = props.target.row
         :is-submitting="isSubmitting"
         :is-pending="isPending"
         :is-conflicted="isConflicted"
+        :is-confirming-duplicate="editor.isConfirmingDuplicate.value"
         @update="editor.update"
         @blur="editor.blur"
         @search="editor.searchLookup"

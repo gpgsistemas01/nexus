@@ -57,8 +57,8 @@ const normalizeEntry = (resource: IdentityResource, value: unknown): IdentityEnt
     };
 };
 
-const paramsFor = (resource: IdentityResource, query: IdentityQuery) => {
-    const params = recordParams(query);
+const paramsFor = (resource: IdentityResource, query: IdentityQuery, paginate = true) => {
+    const params = recordParams(query, { paginate });
 
     if (resource === 'persons') {
         params.set('includeAccesses', 'true');
@@ -107,7 +107,7 @@ export const identityService = {
         }
 
         return requestExcel(
-            `/api/admin/reports/${resource}/excel?${paramsFor(resource, query)}`,
+            `/api/admin/reports/${resource}/excel?${paramsFor(resource, query, false)}`,
             signal,
         );
     },

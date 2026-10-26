@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ids, material, pageOf } from '../fixtures/inventory.js';
+import { ids, material, pageOf, waste } from '../fixtures/inventory.js';
 import { chooseOption, mockWarehouse } from './warehouseFixtures.js';
 
 test('formularios: abrir, cargar catálogos y mover foco no muestra errores sin captura', async ({
@@ -349,6 +349,81 @@ test('inventario: exportar respeta filtros y recupera una respuesta que no es Ex
   expect(attempts).toBe(2);
   await expect(page.getByRole('alert', { name: 'Error de descarga' })).toBeHidden();
 });
+
+for (const initialQuantity of ['3', '0']) {
+  test(`mermas: duplicado traslada cantidad ${initialQuantity} y observaciones sólo después de confirmar`, async ({
+    page,
+  }) => {
+    await mockWarehouse(page);
+    const creates: Record<string, unknown>[] = [];
+    const entries: Record<string, unknown>[] = [];
+    await page.route('**/api/warehouse/wastes', (route) => {
+      creates.push(route.request().postDataJSON());
+      return route.fulfill({
+        status: 409,
+        json: {
+          code: 'WASTE_ALREADY_EXISTS',
+          meta: { operationRejected: true, waste: { ...waste, version: undefined } },
+        },
+      });
+    });
+    await page.route(`**/api/warehouse/wastes/${ids.waste}/stock-additions`, (route) => {
+      entries.push(route.request().postDataJSON());
+      return route.fulfill({ json: { code: 'UPDATED_WASTE' } });
+    });
+    await page.goto('/almacen/mermas');
+    await page.getByRole('button', { name: 'Nueva merma', exact: true }).click();
+    const creating = page.getByRole('dialog', { name: 'Crear merma', exact: true });
+    await chooseOption(page, 'Proveedor', 'Proveedor Central');
+    await chooseOption(page, 'Material de referencia del proveedor', 'Lona · ROLLO · 2 × 50');
+    await creating
+      .getByRole('textbox', { name: 'Nombre de la merma', exact: true })
+      .fill(waste.name);
+    await creating
+      .getByLabel('Peso del rollo completo con cono (kg)', { exact: true })
+      .fill('10.25');
+    await creating.getByLabel('Peso del cono de la merma (kg)', { exact: true }).fill('0.25');
+    await creating.getByLabel('Peso de la merma con cono (kg)', { exact: true }).fill('2.75');
+    await creating.getByLabel('Cantidad inicial', { exact: true }).fill(initialQuantity);
+    await creating.getByLabel('Observaciones', { exact: true }).fill('Conservar esta captura');
+    await creating.getByRole('button', { name: 'Guardar', exact: true }).click();
+    const confirmation = page.getByRole('dialog', { name: 'Esta merma ya existe', exact: true });
+    await expect(confirmation).toBeVisible();
+    expect(entries).toHaveLength(0);
+    await confirmation.getByRole('button', { name: 'Cancelar', exact: true }).click();
+    await expect(creating.getByLabel('Observaciones', { exact: true })).toHaveValue(
+      'Conservar esta captura',
+    );
+    await expect(creating.getByLabel('Cantidad inicial', { exact: true })).toHaveValue(
+      initialQuantity,
+    );
+    await creating.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await confirmation.getByRole('button', { name: 'Abrir Agregar stock', exact: true }).click();
+    const adding = page.getByRole('dialog', { name: 'Agregar stock de merma', exact: true });
+    await expect(creating).toHaveCount(0);
+    await expect(adding.locator('[aria-invalid="true"]')).toHaveCount(0);
+    await expect(adding.getByLabel('Cantidad a agregar', { exact: true })).toHaveValue(
+      initialQuantity === '0' ? '' : initialQuantity,
+    );
+    await expect(adding.getByLabel('Observaciones', { exact: true })).toHaveValue(
+      'Conservar esta captura',
+    );
+    expect(entries).toHaveLength(0);
+    if (initialQuantity === '0') {
+      await adding.getByRole('button', { name: 'Guardar', exact: true }).click();
+      expect(entries).toHaveLength(0);
+      await adding.getByLabel('Cantidad a agregar', { exact: true }).fill('4');
+    }
+    await adding.getByRole('button', { name: 'Guardar', exact: true }).click();
+    await expect(adding).toBeHidden();
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      quantity: initialQuantity === '0' ? 4 : 3,
+      observations: 'Conservar esta captura',
+    });
+    expect(entries[0]!.operationId).not.toBe(creates.at(-1)!.operationId);
+  });
+}
 
 test('mermas: referencia de rollo, peso calculado y recuperación tras recargar sin duplicar la captura', async ({
   page,

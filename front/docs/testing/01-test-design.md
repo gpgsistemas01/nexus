@@ -301,3 +301,17 @@ La cobertura permanece en las suites de Compras y Salidas. Los tipos de escritur
 se comprueban con `npm run check`; no se fijan rutas internas ni llamadas privadas
 como criterio de arquitectura. La [tabla de propietarios](../patterns/08-document-responsibilities.md)
 es la referencia curada de esta revisión.
+
+## Atención de brechas de la migración
+
+| Diseño | Requisito/riesgo, nivel y técnica | Condición y evidencia |
+| --- | --- | --- |
+| `DP-VUE-WH-011` | `CU-ALM-10` A2 y `CU-ALM-13`; unitario y navegador. Decisiones permiso/metadatos/rechazo definitivo/confirmación y fronteras cero/positivo. | `wasteDuplicateRecoveryTest.ts` impide transición sin permiso, con contexto inválido, resultado incierto o desmontaje. `warehouse.spec.ts` comprueba cancelar/conservar, confirmar/trasladar y Guardar separado; fichas `CP-VUE-WH-011-01/02`. |
+| `DP-VUE-SESSION-004` | `RF-AUT-003`, `CU-AUT-02`; navegador simulado y sistema. Transición autenticado → cierre → acceso rechazado. | `sessionRecovery.spec.ts` comprueba POST, eliminación de cookies y vuelta al login; `application.spec.ts` ejecuta el router real y comprueba también `/me`/refresh 401. Ficha `CP-VUE-SESSION-004-01`. |
+| `DP-VUE-REC-003` | `CU-IDA-09`, `CU-CAT-04/08`; navegador y sistema. Particiones por recurso/filtro y fallo → reintento. | `records.spec.ts` parametriza los tres reportes, conserva búsqueda, omite paginación y recupera 503 sin repetir automáticamente. El caso de sistema abre los XLSX y verifica inclusión/exclusión. Ficha `CP-VUE-REC-003-01`. |
+| `DP-VUE-SYS-001` | `CU-AUT-01/02`, `CU-CAT-06/08/04`, `CU-IDA-09`; sistema. Recorrido entre capas y transiciones de sesión. | Un login real permite crear cliente; Prisma y recarga confirman la fila. Los XLSX respetan búsqueda, el refresh emite cookies y el cierre impide acceder. Ficha `CP-VUE-SYS-001-01`; no se atribuyen todos los CU a ese recorrido. |
+| `DP-VUE-SYS-002` | Riesgo de preparar fixtures en la base habitual; unitario, particiones de configuración y equivalencia de destinos. | `systemEnvironmentTest.ts` admite test explícita y rechaza ausencia, nombre no test, protocolo ajeno, misma base con credenciales/query/alias loopback diferentes y destino directo distinto. La configuración comprueba esto antes de arrancar servidores. |
+
+Las fichas se encuentran en el [registro selectivo](02-test-cases.md). El diseño
+añade evidencia sobre condiciones identificadas; no altera requisitos ni reemplaza
+las integraciones de inventario que permanecen en el backend.

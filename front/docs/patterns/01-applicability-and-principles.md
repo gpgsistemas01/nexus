@@ -35,7 +35,7 @@ letras de SOLID.
 | Decisión | Modelo general | Aplicación existente |
 | --- | --- | --- |
 | Contenedor/presentación | [DIA-VUE-GEN-001](02-container-and-presentation.md#modelo-general-de-contenedor-y-presentación) | [DIA-VUE-APL-001: Catálogos](02-container-and-presentation.md#aplicación-en-la-página-de-catálogos). |
-| Composables/callbacks | [DIA-VUE-GEN-002](03-composables-and-callbacks.md#modelo-general-de-composición-por-callback) | [DIA-VUE-PAT-001: listado](03-composables-and-callbacks.md#dependencias-y-composición-de-un-listado). |
+| Composables/callbacks | [DIA-VUE-GEN-002](03-composables-and-callbacks.md#modelo-general-de-composición-por-callback) | [DIA-VUE-PAT-001: listado](03-composables-and-callbacks.md#dependencias-y-composición-de-un-listado) y [DIA-VUE-PAT-002: transición de merma](03-composables-and-callbacks.md#coordinación-de-la-alternativa-de-merma-duplicada). |
 | Adaptadores | [DIA-VUE-GEN-003](04-http-and-data-adapters.md#modelo-general-de-adaptación-de-una-lectura) | [DIA-VUE-APL-003: lectura de Compra](04-http-and-data-adapters.md#aplicación-al-consultar-una-compra). |
 | Slots | [DIA-VUE-GEN-004](05-slots-and-visual-composition.md#modelo-general-de-composición-por-slots) | [DIA-VUE-APL-004: celdas de Catálogos](05-slots-and-visual-composition.md#aplicación-a-las-celdas-de-catálogos). |
 | Provisión de sesión | [DIA-VUE-GEN-005](06-session-provision.md#modelo-general-de-provisión-de-estado-de-aplicación) | [DIA-VUE-APL-005: arranque y consumidores](06-session-provision.md#aplicación-en-el-arranque-de-vue). |

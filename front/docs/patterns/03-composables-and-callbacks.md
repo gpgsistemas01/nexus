@@ -63,3 +63,48 @@ de TypeScript no demuestra sustitución de comportamiento.
 [remoteLookupTest](../../tests/unit/shared/composables/remoteLookupTest.ts)
 comprueban estado, paginación y respuestas tardías según sus contratos.
 Referencia: [composables de Vue](https://vuejs.org/guide/reusability/composables.html).
+
+## Coordinación de la alternativa de merma duplicada
+
+[useWasteDuplicateRecovery](../../src/modules/warehouse/composables/useWasteDuplicateRecovery.ts)
+decide si puede ofrecer la transición: permiso, rechazo definitivo, identidad
+recibida y confirmación. [mapWasteStockAddition](../../src/modules/warehouse/mappers/wasteStockAdditionMapper.ts)
+adapta el contexto reducido del error a `StockAdditionTarget`; no fabrica la versión
+que necesitarían Editar o Ajustar. `useInventoryEditor` conserva validación, captura
+e idempotencia; la página propietaria sustituye el editor mediante el evento tipado
+`addStock`. La presentación no navega ni escribe por su cuenta.
+
+**Identificador:** `DIA-VUE-PAT-002`. **Pregunta:** ¿cómo realiza Vue `CU-ALM-10` A2
+sin acoplar dos modales ni escribir al aceptar el aviso? **Fuente:** `useInventoryEditor`,
+`useWasteDuplicateRecovery`, `InventoryEditorPage`, `InventoryPage` y `useInventory`.
+Secuencia del camino de confirmación; los participantes representan roles de
+interacción y módulos funcionales, no clases. Cancelar conserva el alta;
+un desmontaje impide la transición tardía.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuario autorizado
+    participant E as Alta y entrada<br/>useInventory<br/>Editor
+    participant A as Express API
+    participant R as useWaste<br/>Duplicate<br/>Recovery
+    participant P as Contenedor<br/>InventoryPage
+    U->>E: Guardar alta
+    E->>A: POST de alta con operationId
+    A-->>E: 409, rechazo definitivo y merma existente
+    E->>R: recover(error, captura)
+    R->>U: Ofrecer Abrir Agregar stock
+    U-->>R: Confirmar
+    R->>P: callback y evento addStock(target)
+    P->>E: Abrir entrada con la captura
+    Note over P,A: Abrir el editor no registra entrada
+    U->>E: Revisar y Guardar
+    E->>A: POST stock-additions
+```
+
+Se aplican los patrones ya adoptados: contenedor/presentación, composición por
+callback y adaptador de datos. La transición es un flujo local con una unión
+discriminada de TypeScript; no constituye State de GoF ni requiere un almacén global.
+Las pruebas de [recuperación](../../tests/unit/modules/warehouse/wasteDuplicateRecoveryTest.ts)
+y [navegador](../../tests/e2e/warehouse.spec.ts) protegen cancelación, cero/positivo,
+permiso, incertidumbre y confirmación separada de la escritura.

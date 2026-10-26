@@ -163,6 +163,11 @@ npm --prefix front run preview
 `build` genera `front/dist`; `preview` anuncia su URL en la terminal y conserva
 el proxy configurado. Vite `dev`/`preview` son herramientas locales. La publicación
 mediante Nginx se explica en [Docker para VPS](../../README.md#docker-para-vps-o-pruebas-locales).
+
+El [recorrido de sistema](../testing/04-system-tests.md) complementa esas pruebas
+con Express y PostgreSQL reales, base aislada y procesos propios. Se ejecuta con
+`npm --prefix front run test:e2e:system` después de su preparación, sin usar la
+base ni los servidores habituales de desarrollo.
 Los contenedores de frontend y backend pueden ser diferentes; sólo la construcción
 de Vue necesita las fuentes públicas compartidas. `front/docs` permanece fuera del
 contexto frontend y de la imagen final.

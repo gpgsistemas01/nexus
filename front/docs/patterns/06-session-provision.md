@@ -61,3 +61,25 @@ de sesión y la renovación coordinada son mecanismos diferentes.
 [sessionRecovery.spec.ts](../../tests/e2e/sessionRecovery.spec.ts) ejercitan estos
 consumidores. La API del navegador se simula; no se acredita la firma real de JWT.
 Referencia: [provide/inject](https://vuejs.org/guide/components/provide-inject.html).
+
+## Decisión sobre Pinia
+
+[Vue](https://vuejs.org/guide/scaling-up/state-management.html) recomienda Pinia
+para necesidades de gestión compartida más amplias; [Pinia](https://pinia.vuejs.org/introduction.html)
+añade stores, acciones, integración con Devtools y herramientas de prueba. Es una
+opción válida, no un requisito de Router, VeeValidate ni de la composición de Vue.
+
+En este código la sesión tiene un propietario por aplicación y consumidores
+inyectados; listados, filtros y capturas viven por pantalla. El traspaso de merma
+duplicada ocurre entre editores del mismo contenedor y no necesita sobrevivir al
+cambio de ruta. Se mantienen esos propietarios y no se instala Pinia por este flujo.
+
+Se reconsiderará cuando varias rutas necesiten modificar un mismo borrador de
+negocio, conservarlo al navegar o coordinar varios stores y sus acciones con Devtools.
+Entonces se migrará el contrato compartido, sin duplicar la sesión entre un store
+y `createAuthSession`, ni convertir cada formulario en estado global. Tokens y
+autorización seguirán en cookies HttpOnly y Express; Pinia no sustituye esos controles.
+
+La evidencia de sesión tiene dos propietarios de prueba: `tests/e2e` simula API;
+[tests/system](../../tests/system/application.spec.ts) añade login/refresh/cierre reales.
+Un store nuevo no sería evidencia adicional de seguridad ni de persistencia.

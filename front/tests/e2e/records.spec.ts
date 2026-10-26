@@ -281,6 +281,42 @@ test('identidad: filtros de personas y reporte por área; vista móvil sin desbo
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
+for (const [path, title, reportPath, search] of [
+  ['/identidad/usuarios', 'Usuarios', '/api/admin/reports/users/excel', 'ana'],
+  ['/directorio/clientes', 'Clientes', '/api/sales/reports/clients/excel', 'Central'],
+  ['/directorio/proveedores', 'Proveedores', '/api/warehouse/reports/suppliers/excel', 'Central'],
+] as const) {
+  test(`reportes ${title}: exporta filtros sin paginación y recupera una descarga fallida`, async ({
+    page,
+  }) => {
+    const { reads, reports } = await mockRecords(page);
+    await page.goto(path);
+    await page.getByRole('textbox', { name: 'Buscar por nombre', exact: true }).fill(search);
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    await expect.poll(() => reads.at(-1)?.searchParams.get('search')).toBe(search);
+    await page.route(
+      `**${reportPath}?**`,
+      (route) => route.fulfill({ status: 503, json: { code: 'SERVER_ERROR' } }),
+      { times: 1 },
+    );
+    const exportButton = page.getByRole('button', { name: 'Exportar Excel', exact: true });
+    await exportButton.click();
+    await expect(page.getByRole('alert', { name: 'Error de descarga', exact: true })).toBeVisible();
+    await expect(exportButton).toBeEnabled();
+    const download = page.waitForEvent('download');
+    await exportButton.click();
+    expect((await download).suggestedFilename()).toMatch(/\.xlsx$/);
+    expect(reports).toHaveLength(1);
+    expect(reports[0]!.pathname).toBe(reportPath);
+    expect(reports[0]!.searchParams.get('search')).toBe(search);
+    for (const parameter of ['start', 'length', 'draw'])
+      expect(reports[0]!.searchParams.has(parameter)).toBe(false);
+    await expect(page.getByRole('alert', { name: 'Error de descarga', exact: true })).toHaveCount(
+      0,
+    );
+  });
+}
+
 for (const status of [401, 403]) {
   test(`directorio: revocación ${status} durante la escritura abandona la pantalla protegida`, async ({
     page,

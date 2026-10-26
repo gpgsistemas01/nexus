@@ -156,6 +156,7 @@ onMounted(() => {
             <VAlert
                 v-if="exportError"
                 role="alert"
+                aria-label="Error de descarga"
                 type="error"
                 class="mb-4"
             >

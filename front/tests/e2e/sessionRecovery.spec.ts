@@ -9,6 +9,7 @@ const sessionScenario = async (page: Page) => {
   await mockRecords(page);
   const state = {
     isAvailable: true,
+    isAuthenticated: true,
     refreshStatus: 200,
     refreshCalls: 0,
     meCalls: 0,
@@ -27,7 +28,10 @@ const sessionScenario = async (page: Page) => {
     state.meCalls++;
     if (!state.isAvailable)
       return route.fulfill({ status: 502, contentType: 'text/plain', body: 'Bad Gateway' });
-    if (!(route.request().headers().cookie ?? '').includes('accessToken=renewed-fixture'))
+    if (
+      !state.isAuthenticated ||
+      !(route.request().headers().cookie ?? '').includes('accessToken=renewed-fixture')
+    )
       return route.fulfill({
         status: 401,
         headers: { 'set-cookie': 'accessToken=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax' },
@@ -38,6 +42,8 @@ const sessionScenario = async (page: Page) => {
   await page.route('**/api/auth/refresh', (route) => {
     state.refreshCalls++;
     expect(route.request().method()).toBe('POST');
+    if (!state.isAuthenticated)
+      return route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } });
     expect(route.request().headers().cookie).toContain('refreshToken=refresh-fixture');
     if (state.refreshStatus !== 200)
       return route.fulfill({
@@ -54,6 +60,42 @@ const sessionScenario = async (page: Page) => {
 };
 
 const target = '/directorio/clientes?consulta=Ana#tabla';
+
+test('sesión: cerrar elimina cookies y el acceso directo posterior vuelve al login', async ({
+  page,
+}) => {
+  const state = await sessionScenario(page);
+  let logoutCalls = 0;
+  await page.route('**/cerrar-sesion', (route) => {
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().headers().cookie).toContain('refreshToken=refresh-fixture');
+    logoutCalls++;
+    state.isAuthenticated = false;
+    return route.fulfill({
+      status: 303,
+      headers: {
+        location: '/inicio-sesion',
+        'set-cookie': ['accessToken', 'refreshToken']
+          .map((name) => `${name}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`)
+          .join('\n'),
+      },
+    });
+  });
+  await page.goto(target);
+  await expect(page.getByRole('heading', { name: 'Tabla de Clientes', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Iniciar sesión', exact: true })).toBeVisible();
+  expect(logoutCalls).toBe(1);
+  expect(
+    (await page.context().cookies()).filter((cookie) =>
+      ['accessToken', 'refreshToken'].includes(cookie.name),
+    ),
+  ).toEqual([]);
+  await page.goto(target);
+  await expect(page).toHaveURL(/inicio-sesion\?returnTo=/);
+  await expect(page.getByRole('heading', { name: 'Iniciar sesión', exact: true })).toBeVisible();
+  expect(state.refreshCalls).toBe(2);
+});
 
 test('sesión: un access token vencido se renueva automáticamente mediante la cookie HttpOnly', async ({
   page,

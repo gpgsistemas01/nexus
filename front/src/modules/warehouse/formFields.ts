@@ -230,7 +230,16 @@ export const inventorySections = (
               ? 'Inventario del consumible'
               : 'Inventario del material',
         fields: [
-            { name: 'minStock', label: 'Stock mínimo', type: 'number', isReadOnly: isStock },
+            ...(!isStock || row?.minStock !== undefined
+                ? [
+                      {
+                          name: 'minStock' as const,
+                          label: 'Stock mínimo',
+                          type: 'number' as const,
+                          isReadOnly: isStock,
+                      },
+                  ]
+                : []),
             ...(!fromPurchase && (!isStock || row?.maxUnitCost !== undefined)
                 ? [
                       {
@@ -241,7 +250,16 @@ export const inventorySections = (
                       },
                   ]
                 : []),
-            { name: 'isActive', label: 'Activo', type: 'checkbox', isReadOnly: isStock },
+            ...(!isStock || row?.isActive !== undefined
+                ? [
+                      {
+                          name: 'isActive' as const,
+                          label: 'Activo',
+                          type: 'checkbox' as const,
+                          isReadOnly: isStock,
+                      },
+                  ]
+                : []),
         ],
     });
     if ((isCreating || isStock) && !fromPurchase)

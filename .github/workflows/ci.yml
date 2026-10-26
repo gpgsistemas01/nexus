@@ -178,6 +178,39 @@ jobs:
       - name: Test login and warehouse in browser
         run: npm run test:e2e
 
+      - name: Install backend for the system browser test
+        if: matrix.node == '24.15.0'
+        run: npm --prefix ../back ci --include=dev
+
+      - name: Prepare isolated PostgreSQL for the system browser test
+        if: matrix.node == '24.15.0'
+        env:
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql --set=ON_ERROR_STOP=1 <<SQL
+          ALTER USER postgres WITH PASSWORD 'postgres';
+          CREATE DATABASE nexus_vue_test;
+          SQL
+          DATABASE_URL="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/nexus_unused"
+          DATABASE_TEST_URL="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/nexus_vue_test"
+          echo "::add-mask::${DATABASE_URL}"
+          echo "::add-mask::${DATABASE_TEST_URL}"
+          echo "DATABASE_URL=${DATABASE_URL}" >> "$GITHUB_ENV"
+          echo "DATABASE_TEST_URL=${DATABASE_TEST_URL}" >> "$GITHUB_ENV"
+          echo "DIRECT_TEST_URL=${DATABASE_TEST_URL}" >> "$GITHUB_ENV"
+
+      - name: Apply migrations to the system test database
+        if: matrix.node == '24.15.0'
+        run: npm --prefix ../back run test:db:migrate
+
+      - name: Test Vue with real Express and PostgreSQL
+        if: matrix.node == '24.15.0'
+        run: npm run test:e2e:system
+
       - name: Upload frontend test results
         if: always()
         uses: actions/upload-artifact@v4
