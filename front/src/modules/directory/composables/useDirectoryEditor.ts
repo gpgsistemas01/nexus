@@ -19,12 +19,14 @@ export const useDirectoryEditor = (options: {
     onDenied: (status: number) => void;
 }) => {
     const row = options.target.action === 'edit' ? options.target.row : undefined;
+    const initialName =
+        options.target.action === 'create' ? (options.target.initialName ?? '') : '';
     const rules = options.resource === 'clients' ? clientValidation : supplierValidation;
     const form = useForm<DirectoryValues>({
         initialValues: {
-            name: row?.name ?? '',
+            name: row?.name ?? (options.resource === 'clients' ? initialName : ''),
             legalName: row?.legalName ?? '',
-            tradeName: row?.tradeName ?? '',
+            tradeName: row?.tradeName ?? (options.resource === 'suppliers' ? initialName : ''),
             isActive: row?.isActive ?? true,
         },
         validateOnMount: false,

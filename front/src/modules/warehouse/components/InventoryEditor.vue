@@ -7,7 +7,7 @@ import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import InventoryFormField from './InventoryFormField.vue';
 import type { InventoryFormSection } from '../formFields.js';
 import type { InventoryField, InventoryValues } from '../inventory.js';
-import type { LookupState } from '../../../shared/lookup.js';
+import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
 defineProps<{
     title: string;
@@ -21,6 +21,8 @@ defineProps<{
     isConflicted: boolean;
     isConfirmingDuplicate?: boolean;
     lookups: Record<string, LookupState>;
+    supplier?: LookupItem;
+    canCreateSupplier?: boolean;
 }>();
 const emit = defineEmits<{
     update: [field: InventoryField, value: string | boolean];
@@ -31,6 +33,7 @@ const emit = defineEmits<{
     submit: [];
     close: [];
     reload: [];
+    createSupplier: [search: string];
 }>();
 </script>
 
@@ -110,6 +113,15 @@ const emit = defineEmits<{
                                 :error="errors[field.name]"
                                 :is-disabled="isSubmitting"
                                 :lookup="lookups[field.name]"
+                                :initial-option="field.name === 'supplierId' ? supplier : undefined"
+                                :create-label="
+                                    field.name === 'supplierId' && canCreateSupplier
+                                        ? 'Registrar proveedor'
+                                        : undefined
+                                "
+                                @create="
+                                    field.name === 'supplierId' && emit('createSupplier', $event)
+                                "
                                 @update="emit('update', field.name, $event)"
                                 @blur="emit('blur', field.name)"
                                 @search="emit('search', field.name, $event)"

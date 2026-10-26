@@ -5,7 +5,7 @@ import { useInventoryEditor } from '../composables/useInventoryEditor.js';
 import { inventorySections } from '../formFields.js';
 import { INVENTORY_CONFIG } from '../inventory.js';
 import type { EditorTarget, InventoryResource, StockAdditionTarget } from '../inventory.js';
-import type { LookupItem } from '../../../shared/lookup.js';
+import type { LookupCreation, LookupItem } from '../../../shared/lookup.js';
 
 const props = defineProps<{
     resource: InventoryResource;
@@ -14,6 +14,7 @@ const props = defineProps<{
     creationContext?: 'goodsReceipt';
     initialSupplier?: LookupItem;
     canAddStock?: boolean;
+    canCreateSupplier?: boolean;
 }>();
 const emit = defineEmits<{
     saved: [created?: LookupItem];
@@ -21,6 +22,7 @@ const emit = defineEmits<{
     reload: [];
     unauthorized: [];
     addStock: [target: StockAdditionTarget];
+    createSupplier: [request: LookupCreation];
 }>();
 const editor = useInventoryEditor({
     ...props,
@@ -60,6 +62,17 @@ const context = props.target.row
         :is-pending="isPending"
         :is-conflicted="isConflicted"
         :is-confirming-duplicate="editor.isConfirmingDuplicate.value"
+        :supplier="editor.selectedSupplier.value"
+        :can-create-supplier="
+            canCreateSupplier &&
+            target.action === 'create' &&
+            resource !== 'wastes' &&
+            !initialSupplier &&
+            !isPending
+        "
+        @create-supplier="
+            emit('createSupplier', { search: $event, onCreated: editor.selectCreatedSupplier })
+        "
         @update="editor.update"
         @blur="editor.blur"
         @search="editor.searchLookup"

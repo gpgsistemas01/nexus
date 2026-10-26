@@ -86,6 +86,11 @@ capturado. Los totales y costos derivados de la pantalla no se persisten desde
 el navegador. No se duplica la fórmula ni se publica código privado del servidor.
 
 Las altas rápidas reutilizan `DirectoryEditorPage` e `InventoryEditorPage`.
+La acción Registrar del desplegable traslada el texto buscado al campo de nombre;
+los botones externos conservan el acceso a una captura vacía. `DirectoryCreationPage`
+comparte la composición de Proveedor/Cliente sin duplicar formularios. La
+[comparación de componentes](../architecture/03-ui-and-http.md#alta-contextual-desde-un-selector)
+documenta por qué se conserva `VAutocomplete` de Vuetify.
 El artículo se crea con `creationContext=goodsReceipt`, sin stock ni costo inicial
 capturado: su existencia entra al guardar la compra. El proveedor se fija al de
 la captura. Tras guardar se selecciona el registro devuelto y se refresca la

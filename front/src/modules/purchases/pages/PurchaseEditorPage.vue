@@ -10,10 +10,10 @@ import type {
     PurchaseResource,
     PurchaseTarget,
     PurchaseDetail,
-    CreatedOption,
     ItemCreation,
 } from '../purchase.js';
 import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
+import type { LookupCreation } from '../../../shared/lookup.js';
 
 const props = defineProps<{
     resource: PurchaseResource;
@@ -28,7 +28,7 @@ const emit = defineEmits<{
     reload: [];
     correct: [detail: PurchaseDetail];
     cancel: [detail: PurchaseDetail];
-    createSupplier: [onCreated: CreatedOption];
+    createSupplier: [request: LookupCreation];
     createItem: [request: ItemCreation];
 }>();
 const { has, onDenied } = usePageAccess();
@@ -99,7 +99,9 @@ const title = document
         @remove="editor.removeDetail"
         @correct="emit('correct', $event)"
         @cancel="emit('cancel', $event)"
-        @create-supplier="emit('createSupplier', editor.selectCreatedSupplier)"
+        @create-supplier="
+            emit('createSupplier', { search: $event, onCreated: editor.selectCreatedSupplier })
+        "
     >
         <template #entry>
             <PurchaseLineEntryPage

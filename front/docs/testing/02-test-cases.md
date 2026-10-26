@@ -174,6 +174,42 @@ Los resultados esperados siguientes **no** son resultados de ejecución `EP-*`.
 | Resultado esperado | Una fila activa de cliente, visible tras recarga. Cada XLSX real tiene encabezado/filas, contiene el representante y excluye la otra fixture. Refresh real 200 restablece cookies HttpOnly. Cierre elimina ambas cookies; `/me` y refresh responden 401 y la URL protegida abre login. El cliente persistido permanece una sola vez. |
 | Fuente y limpieza | [application.spec.ts](../../tests/system/application.spec.ts), `sistema: login, alta persistida, reportes reales, renovación y cierre con rutas protegidas`. `setup.ts` limpia sus filas, asignaciones, auditoría y catálogos creados y elimina el manifiesto. No prueba todos los roles, fórmulas o transacciones de inventario. |
 
+<a id="cp-vue-sel-001-01"></a>
+
+## CP-VUE-SEL-001-01: proveedor desde la captura de inventario
+
+| Campo | Especificación |
+| --- | --- |
+| Requisito y diseño | `CU-CAT-02`, soporte de `CU-ALM-02/18`; `DP-VUE-SEL-001`. Variantes Materiales y Consumibles; cancelar → error → confirmar. |
+| Precondiciones y datos | `mockWarehouse`, permisos de consulta y alta de proveedor. Artículo `Captura del artículo`, cantidad inicial 5; búsqueda `Proveedor nuevo materials` o `Proveedor nuevo consumables`. Razón social `Empresa nueva`; primer POST de proveedor responde 503, siguiente devuelve registro activo/versionado. |
+| Acción | Buscar en Proveedor, elegir Registrar, comprobar precarga y cancelar. Volver a abrir, completar razón social, guardar y observar error; reenviar explícitamente. |
+| Resultado esperado | Cancelar no envía POST de proveedor. El error conserva el modal y el nombre comercial. El segundo POST confirma el registro y cierra el auxiliar; el origen conserva nombre/cantidad y muestra el proveedor nuevo aunque la respuesta de opciones siga sin contenerlo. |
+| Fuente y limpieza | [selectCreation.spec.ts](../../tests/e2e/selectCreation.spec.ts), `select materials: proveedor precargado, cancelar, error y selección tras guardar` y variante `consumables`. Contexto Playwright aislado; API simulada, sin limpieza SQL. `inventoryFormTest.ts` comprueba rechazo de inactivos y callback tras desmontaje. |
+
+<a id="cp-vue-sel-001-02"></a>
+
+## CP-VUE-SEL-001-02: proveedor y artículo desde una compra
+
+| Campo | Especificación |
+| --- | --- |
+| Requisito y diseño | `CU-CAT-02`, `CU-ALM-02/18`, soporte de `CU-ENT-02/08`; `DP-VUE-SEL-001`. Variantes por recurso con el mismo oráculo de contexto. |
+| Precondiciones y datos | `mockPurchases` nuevo por variante. Observaciones `Compra sin guardar`; búsquedas `Proveedor compra materials/consumables` y `Artículo nuevo materials/consumables`. Presentación ROLLO y unidad Metros cuadrados; sólo Materiales captura 2 × 50. |
+| Acción | Registrar proveedor desde su desplegable y guardarlo. Desde Material/Consumible abrir Registrar, comprobar nombre y proveedor fijado, completar datos y guardar. |
+| Resultado esperado | Ambos registros quedan seleccionados con los IDs de respuesta. Alta del artículo envía el proveedor creado y `creationContext=goodsReceipt`, omite `newStock` y no registra la compra. La captura de observaciones del origen permanece. |
+| Fuente y limpieza | [selectCreation.spec.ts](../../tests/e2e/selectCreation.spec.ts), `select compras materials: crea proveedor y artículo desde el desplegable con contexto de compra` y variante `consumables`. Contextos aislados y API simulada. No demuestra alta o stock persistidos. |
+
+<a id="cp-vue-sel-001-03"></a>
+
+## CP-VUE-SEL-001-03: cliente desde una salida
+
+| Campo | Especificación |
+| --- | --- |
+| Requisito y diseño | `CU-CAT-06`, soporte de las capturas de Salidas; `DP-VUE-SEL-001`. Mismo contrato parametrizado en Materiales, Consumibles y Mermas. |
+| Precondiciones y datos | `mockIssues`, consulta/alta de clientes y gestión de salida. Observaciones `Salida sin guardar`; búsqueda `Cliente nuevo materiales`, `Cliente nuevo consumibles` o `Cliente nuevo mermas`. POST devuelve cliente activo con ID/version de fixture. |
+| Acción | Buscar en Cliente, elegir Registrar cliente, comprobar nombre precargado y Guardar. |
+| Resultado esperado | El auxiliar se cierra después de confirmar el alta. El selector muestra el cliente de respuesta; las observaciones del origen permanecen y no hay solicitud de guardar la salida. |
+| Fuente y limpieza | [selectCreation.spec.ts](../../tests/e2e/selectCreation.spec.ts), `select salidas materiales: cliente nuevo precargado y elegido sin guardar la salida` y variantes `consumibles`/`mermas`. Aislamiento Playwright; API simulada. Los casos adicionales del archivo comprueban teclado, permisos y consumidores sin alta. |
+
 ## Reproducción y resultado real
 
 Los comandos y el ambiente se definen en [el índice de pruebas](index.md#ejecución-y-resultado).

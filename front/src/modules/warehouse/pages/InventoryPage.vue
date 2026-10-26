@@ -13,8 +13,10 @@ import { useAuthSession } from '../../auth/session.js';
 import { useListSearch } from '../../../shared/composables/useListSearch.js';
 import { useInventory } from '../composables/useInventory.js';
 import type { InventoryResource } from '../inventory.js';
+import type { LookupCreation } from '../../../shared/lookup.js';
 
 const props = defineProps<{ resource: InventoryResource }>();
+const emit = defineEmits<{ createSupplier: [request: LookupCreation] }>();
 const router = useRouter();
 const session = useAuthSession();
 const inventory = useInventory(props.resource, session.user.value!, () => {
@@ -136,6 +138,11 @@ onMounted(() => {
         :target="editor"
         :user-id="session.user.value!.id"
         :can-add-stock="permissions.canAdd"
+        :can-create-supplier="
+            session.user.value!.permissions.includes(PERMISSIONS.SUPPLIERS_MANAGE) &&
+            session.user.value!.permissions.includes(PERMISSIONS.SUPPLIERS_READ)
+        "
+        @create-supplier="emit('createSupplier', $event)"
         @saved="inventory.onSaved"
         @close="editor = null"
         @reload="reloadEditor"

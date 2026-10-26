@@ -17,21 +17,16 @@ import { usePurchaseFilters } from '../composables/usePurchaseFilters.js';
 import { usePurchaseActions } from '../composables/usePurchaseActions.js';
 import { emptyPurchaseFilters } from '../purchaseForm.js';
 import { PURCHASE_CONFIG } from '../purchaseConfig.js';
-import type {
-    PurchaseResource,
-    PurchaseQuery,
-    PurchaseRow,
-    CreatedOption,
-    ItemCreation,
-} from '../purchase.js';
+import type { PurchaseResource, PurchaseQuery, PurchaseRow, ItemCreation } from '../purchase.js';
 import PurchaseTable from '../components/PurchaseTable.vue';
 import PurchaseFilters from '../components/PurchaseFilters.vue';
 import PurchaseEditorPage from './PurchaseEditorPage.vue';
 import PurchaseCorrectionPage from './PurchaseCorrectionPage.vue';
+import type { LookupCreation } from '../../../shared/lookup.js';
 
 const props = defineProps<{ resource: PurchaseResource }>();
 const emit = defineEmits<{
-    createSupplier: [onCreated: CreatedOption];
+    createSupplier: [request: LookupCreation];
     createItem: [request: ItemCreation];
 }>();
 const config = PURCHASE_CONFIG[props.resource];

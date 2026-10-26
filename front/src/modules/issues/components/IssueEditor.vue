@@ -26,6 +26,7 @@ defineProps<{
     mode: IssueMode;
     itemLabel: string;
     selects: IssueHeaderSelect[];
+    canCreateClient: boolean;
 }>();
 const emit = defineEmits<{
     update: [field: IssueField, value: string | IssueDetail[]];
@@ -42,6 +43,7 @@ const emit = defineEmits<{
     submit: [];
     close: [];
     reload: [];
+    createClient: [search: string];
 }>();
 </script>
 
@@ -79,6 +81,12 @@ const emit = defineEmits<{
                     :initial-option="select.initialOption"
                     :is-disabled="!canEditHeader || isSubmitting || select.isDisabled"
                     :hint="select.hint"
+                    :create-label="
+                        select.field === 'clientId' && canCreateClient
+                            ? 'Registrar cliente'
+                            : undefined
+                    "
+                    @create="select.field === 'clientId' && emit('createClient', $event)"
                     @update:model-value="emit('update', select.field, $event)"
                     @blur="emit('blur', select.field)"
                     @search="emit('search', select.kind, $event)"

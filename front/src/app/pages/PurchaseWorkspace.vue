@@ -3,25 +3,20 @@ import { shallowRef } from 'vue';
 import { PERMISSIONS } from '@nexus/permissions';
 import { usePageAccess } from '../composables/usePageAccess.js';
 import PurchasePage from '../../modules/purchases/pages/PurchasePage.vue';
-import DirectoryEditorPage from '../../modules/directory/pages/DirectoryEditorPage.vue';
+import DirectoryCreationPage from './DirectoryCreationPage.vue';
 import InventoryEditorPage from '../../modules/warehouse/pages/InventoryEditorPage.vue';
-import type {
-    PurchaseResource,
-    CreatedOption,
-    ItemCreation,
-} from '../../modules/purchases/purchase.js';
-import type { DirectoryEntry } from '../../modules/directory/directory.js';
-import type { LookupItem } from '../../shared/lookup.js';
+import type { PurchaseResource, ItemCreation } from '../../modules/purchases/purchase.js';
+import type { LookupCreation, LookupItem } from '../../shared/lookup.js';
 
 const props = defineProps<{ resource: PurchaseResource }>();
 const { session, has, onDenied } = usePageAccess();
 const auxiliary = shallowRef<
-    { kind: 'supplier'; onCreated: CreatedOption } | ({ kind: 'item' } & ItemCreation)
+    ({ kind: 'supplier' } & LookupCreation) | ({ kind: 'item' } & ItemCreation)
 >();
 
-const createSupplier = (onCreated: CreatedOption) => {
+const createSupplier = (request: LookupCreation) => {
     if (has(PERMISSIONS.SUPPLIERS_MANAGE) && has(PERMISSIONS.SUPPLIERS_READ))
-        auxiliary.value = { kind: 'supplier', onCreated };
+        auxiliary.value = { kind: 'supplier', ...request };
 };
 
 const createItem = (request: ItemCreation) => {
@@ -32,18 +27,6 @@ const createItem = (request: ItemCreation) => {
         has(PERMISSIONS.UNIT_MEASURES_READ)
     )
         auxiliary.value = { kind: 'item', ...request };
-};
-
-const handleSupplierSaved = (entry?: DirectoryEntry) => {
-    if (auxiliary.value?.kind !== 'supplier' || !entry) return;
-
-    auxiliary.value.onCreated({
-        id: entry.id,
-        title: entry.tradeName,
-        data: { ...entry },
-        isDisabled: !entry.isActive,
-    });
-    auxiliary.value = undefined;
 };
 
 const handleItemSaved = (item?: LookupItem) => {
@@ -60,19 +43,16 @@ const handleItemSaved = (item?: LookupItem) => {
         @create-supplier="createSupplier"
         @create-item="createItem"
     />
-    <DirectoryEditorPage
+    <DirectoryCreationPage
         v-if="auxiliary?.kind === 'supplier'"
         resource="suppliers"
-        :target="{ action: 'create' }"
-        @saved="handleSupplierSaved"
+        :request="auxiliary"
         @close="auxiliary = undefined"
-        @reload="auxiliary = undefined"
-        @denied="onDenied"
     />
     <InventoryEditorPage
         v-if="auxiliary?.kind === 'item'"
         :resource="props.resource"
-        :target="{ action: 'create' }"
+        :target="{ action: 'create', initialName: auxiliary.search }"
         :user-id="session.user.value!.id"
         creation-context="goodsReceipt"
         :initial-supplier="auxiliary.supplier"

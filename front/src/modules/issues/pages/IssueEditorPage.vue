@@ -8,7 +8,7 @@ import { ISSUE_CONFIG } from '../issueConfig.js';
 import { getIssueReturnableQuantity } from '../issueRules.js';
 import type { IssueResource, IssueTarget, IssueHeaderSelect, IssueDetail } from '../issue.js';
 import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
-import type { LookupItem } from '../../../shared/lookup.js';
+import type { LookupCreation } from '../../../shared/lookup.js';
 import IssueEditor from '../components/IssueEditor.vue';
 import IssueLineEntryPage from './IssueLineEntryPage.vue';
 import IssueReturnPage from './IssueReturnPage.vue';
@@ -18,7 +18,7 @@ const emit = defineEmits<{
     saved: [result: MutationConfirmation];
     close: [];
     reload: [];
-    createClient: [onCreated: (item: LookupItem) => void];
+    createClient: [request: LookupCreation];
 }>();
 const { has, onDenied } = usePageAccess();
 const editor = useIssueEditor({
@@ -29,6 +29,9 @@ const editor = useIssueEditor({
 });
 const returnDetail = shallowRef<IssueDetail>();
 const { headerSelection } = editor;
+const canCreateClient = computed(
+    () => editor.canEditHeader && has(PERMISSIONS.CLIENTS_CREATE) && has(PERMISSIONS.CLIENTS_READ),
+);
 const selects = computed<IssueHeaderSelect[]>(() => [
     {
         field: 'clientId',
@@ -108,6 +111,10 @@ const openReturnDialog = (line: IssueDetail) => {
         :mode="mode"
         :item-label="ISSUE_CONFIG[resource].item"
         :selects="selects"
+        :can-create-client="canCreateClient"
+        @create-client="
+            emit('createClient', { search: $event, onCreated: headerSelection.selectCreatedClient })
+        "
         @update="editor.update"
         @blur="editor.blur"
         @search="(kind, value) => headerSelection[kind].updateSearch(value)"
@@ -130,7 +137,12 @@ const openReturnDialog = (line: IssueDetail) => {
                 size="small"
                 variant="text"
                 :disabled="editor.isSubmitting.value"
-                @click="emit('createClient', headerSelection.selectCreatedClient)"
+                @click="
+                    emit('createClient', {
+                        search: '',
+                        onCreated: headerSelection.selectCreatedClient,
+                    })
+                "
             >
                 Registrar cliente
             </VBtn>

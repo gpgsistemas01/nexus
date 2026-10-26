@@ -90,7 +90,8 @@ concentra la adaptación de inputs, checkbox, textarea y selector remoto.
 | Crear merma | Selecciona proveedor/material y muestra presentación/unidad heredadas. El material se habilita después del proveedor; cambiar proveedor limpia la referencia y captura anterior. Rollos capturan muestra, cono y peso total; neto y medidas calculadas son de consulta. |
 | Editar merma / agregar stock | Conserva pesos y medidas. Muestra rollo completo cuando existe; de lo contrario conserva largo/peso de la referencia histórica. Agregar captura cantidad y observaciones. |
 
-Los selectores de Inventario conservan la consulta de opciones.
+Los selectores de Inventario conservan la consulta de opciones y el alta contextual
+de proveedor en Materiales/Consumibles mediante `InventoryWorkspace`.
 [Compras](../modules/06-purchases.md) compone las altas rápidas con los editores Vue existentes
 de Proveedores e Inventario mediante `PurchaseWorkspace`; no abre pantallas EJS.
 Su alta de artículo fija proveedor y omite stock/costo inicial capturado.
@@ -149,6 +150,57 @@ vacía termina la carga aunque el servidor conserve un conteo antiguo. Cambiar
 búsqueda reinicia el reintento y cancela la consulta anterior; reintentar cancela
 el debounce para no duplicar solicitudes. Desmontar bloquea nuevas consultas.
 
+## Alta contextual desde un selector
+
+Se conserva `VAutocomplete` de Vuetify dentro de
+[RemoteSelect](../../src/shared/components/RemoteSelect.vue). El slot `append-item`
+presenta **Registrar…** para una búsqueda no vacía sin coincidencia exacta en las
+opciones visibles, cuando el flujo lo autoriza y el control está disponible.
+La comparación visual no garantiza unicidad en la base: Express conserva ese control.
+El widget emite `create(search)`; no fabrica un ID ni registra el texto como entidad.
+Las acciones también funcionan con teclado y los textos largos pueden ocupar varias líneas.
+
+### Componentes revisados y decisión
+
+| Alternativa | Capacidad y límite para este caso | Decisión |
+| --- | --- | --- |
+| [VAutocomplete de Vuetify](https://vuetifyjs.com/en/api/v-autocomplete/) | Selector de la biblioteca instalada, con búsqueda, menús y slots. El [código oficial](https://github.com/vuetifyjs/vuetify/blob/master/packages/vuetify/src/components/VAutocomplete/VAutocomplete.tsx) expone `append-item` y `no-data`. | Reutilizarlo con una extensión pequeña en `RemoteSelect`, manteniendo apariencia y controles del proyecto. |
+| [VCombobox de Vuetify](https://vuetifyjs.com/en/components/combobox/) | Permite valores que no estaban en la lista. Eso no demuestra un alta validada ni devuelve por sí mismo el UUID persistido. | No sustituir estos selectores: su valor debe identificar un registro confirmado por el servidor. |
+| [Vue Multiselect](https://vue-multiselect.js.org/#sub-tagging) | `taggable` y `@tag` notifican la intención de añadir una opción. La aplicación debe construirla y completar el guardado. | Alternativa de comunidad válida; no se añade otra biblioteca para un evento cubierto por el selector actual. |
+| [Vueform Multiselect](https://github.com/vueform/multiselect) | `createOption` y `onCreate` permiten aceptar, transformar o rechazar la nueva opción, incluso de forma asíncrona. | También requiere integrar el formulario y la API de Nexus; no justifica cambiar todos los controles existentes para este flujo. |
+
+El código propio se limita al contrato, los permisos y la coordinación del formulario.
+Se reutilizan `DirectoryEditorPage`, `InventoryEditorPage` y sus servicios/validadores.
+No se programa un selector completo ni se crea un modal distinto para cada consumidor.
+
+### Correspondencia comprobada con EJS
+
+| Contexto | Alta por modal existente en EJS | Realización Vue |
+| --- | --- | --- |
+| Materiales / Consumibles | Proveedor; `materialSelect.js` conecta `onCreateSupplier`. | `InventoryWorkspace` y `DirectoryCreationPage`; preserva captura del artículo y selecciona el proveedor activo confirmado. |
+| Compras de Materiales / Consumibles | Proveedor y artículo; `goodsReceiptSelect.js` conecta ambos callbacks. | `PurchaseWorkspace`; precarga el texto y fija proveedor/`creationContext=goodsReceipt` para el artículo. |
+| Salidas de Materiales / Consumibles / Mermas | Cliente; `issueHeaderSelect.js` conecta `onCreateClient`. | `IssueWorkspace` y `DirectoryCreationPage`; el cliente se selecciona sólo después de guardar. |
+| Merma: proveedor y plantilla; Presentación, Unidad, Motivo y filtros | Alta deshabilitada en esos consumidores. | Conservan consulta, sin una acción genérica de crear. |
+| Asesor de Salidas | `allowCreate` puede ofrecer «Nueva persona», pero `person.js` no conecta un callback/modal de alta. | No se replica una etiqueta sin resolución a entidad persistida. Crear Personas conserva su pantalla y formulario propios. |
+
+Fuentes EJS: [materialSelect](../../../back/src/public/js/plugins/select2/modules/materialSelect.js),
+[goodsReceiptSelect](../../../back/src/public/js/plugins/select2/modules/goodsReceiptSelect.js),
+[issueHeaderSelect](../../../back/src/public/js/plugins/select2/modules/issueHeaderSelect.js),
+[wasteSelect](../../../back/src/public/js/plugins/select2/modules/wasteSelect.js) y
+[person](../../../back/src/public/js/plugins/select2/domains/person.js).
+
+`LookupCreation` lleva texto y callback del consumidor vivo. Los Workspaces componen
+módulos y vuelven a comprobar permisos; `DirectoryCreationPage` concentra el alta
+de Proveedor/Cliente y la adaptación a `LookupItem`. `initialName` sólo precarga el
+campo adecuado al crear. Cancelar no cambia la selección; un error mantiene el modal.
+La selección confirmada conserva su etiqueta aunque la primera página remota aún
+no contenga el ID. Los callbacks del formulario descartan respuestas tras desmontar;
+un registro inactivo no queda seleccionado para una operación activa.
+
+El [modelo aplicado](../patterns/03-composables-and-callbacks.md#altas-contextuales-mediante-eventos-y-callbacks)
+y [selectCreation.spec.ts](../../tests/e2e/selectCreation.spec.ts) documentan la
+coordinación y su evidencia de navegador con API simulada.
+
 ## Propietarios y responsabilidades
 
 | Ubicación | Responsabilidad |
@@ -156,6 +208,8 @@ el debounce para no duplicar solicitudes. Desmontar bloquea nuevas consultas.
 | `app/layouts/AppLayout.vue` | Coordina sesión y distribución general; compone barra, drawer, navegación y ruta activa. |
 | `app/components/AppNavigation.vue` | Presenta enlaces Vue ya autorizados y la acción de cerrar sesión; no obtiene permisos ni datos. |
 | `app/navigation.ts` | Catálogo de rutas Vue del menú y permiso de cada entrada. |
+| `app/pages/*Workspace.vue` | Composición entre módulos y apertura del alta auxiliar con callback del formulario de origen. |
+| `app/pages/DirectoryCreationPage.vue` | Contenedor compartido de alta contextual de Proveedor/Cliente, permisos y adaptación del resultado a opción. |
 | `shared/http/apiClient.ts` | Instancia Axios, transporte e interceptor de sesión. |
 | `shared/http/apiError.ts` | Traduce el contrato público de errores, incluidos JSON recibidos como Blob. |
 | `modules/auth/services/authService.ts` | Credenciales y resultado del login; declara esa operación pública para evitar refresh al rechazarla. |

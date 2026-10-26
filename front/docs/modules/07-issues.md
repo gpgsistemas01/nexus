@@ -42,6 +42,11 @@ la sugerencia de proyecto por área y el filtro de coordinador; para clientes
 externos se filtra asesor por Ventas/Dirección. Cambiar cliente o área limpia la
 selección dependiente. El alta rápida de clientes se compone desde
 `app/pages/IssueWorkspace`, sin importar páginas privadas de Directorio en Salidas.
+Registrar cliente aparece también dentro del selector: precarga la búsqueda y
+devuelve una opción activa confirmada mediante `DirectoryCreationPage`. Cancelar
+conserva la captura de salida; no se ofrece alta desde los demás selectores.
+El flag de «Nueva persona» de Asesor en EJS no tiene conectado un modal y no se
+traslada como un ID artificial al formulario Vue.
 
 Las partidas distinguen material y proveedor; repetir el mismo par acumula su
 cantidad, mientras otro proveedor conserva otra partida. Las mermas se agrupan

@@ -21,7 +21,7 @@ const emit = defineEmits<{
     search: [value: string];
     more: [];
     retry: [];
-    create: [];
+    create: [search: string];
     add: [];
 }>();
 </script>
@@ -49,6 +49,8 @@ const emit = defineEmits<{
                     :initial-option="selected"
                     :is-disabled="isDisabled || !canRead"
                     :hint="!canRead ? 'Sin permiso para consultar este inventario.' : ''"
+                    :create-label="canCreate ? `Registrar ${itemLabel.toLowerCase()}` : undefined"
+                    @create="emit('create', $event)"
                     @update:model-value="emit('update', 'materialId', $event)"
                     @blur="emit('blur', 'materialId')"
                     @search="emit('search', $event)"
@@ -60,7 +62,7 @@ const emit = defineEmits<{
                     size="small"
                     variant="text"
                     :disabled="isDisabled"
-                    @click="emit('create')"
+                    @click="emit('create', '')"
                 >
                     Registrar {{ itemLabel.toLowerCase() }}
                 </VBtn>

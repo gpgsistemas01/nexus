@@ -10,7 +10,7 @@ import { user } from '../../../fixtures/inventory.js';
 vi.mock('../../../../src/app/layouts/AppLayout.vue', () => ({
   default: { template: '<div />' },
 }));
-vi.mock('../../../../src/modules/warehouse/pages/InventoryPage.vue', () => ({
+vi.mock('../../../../src/app/pages/InventoryWorkspace.vue', () => ({
   default: { template: '<div />' },
 }));
 vi.mock('../../../../src/modules/catalogs/pages/CatalogPage.vue', () => ({

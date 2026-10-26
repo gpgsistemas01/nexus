@@ -11,5 +11,9 @@ export interface LookupState {
     error: string;
     hasMore: boolean;
 }
+export interface LookupCreation {
+    search: string;
+    onCreated: (item: LookupItem) => void;
+}
 export type OrganizationResource = 'departments' | 'roles';
 export type OrganizationState = Record<OrganizationResource, LookupState>;

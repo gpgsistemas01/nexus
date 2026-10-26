@@ -315,3 +315,14 @@ es la referencia curada de esta revisión.
 Las fichas se encuentran en el [registro selectivo](02-test-cases.md). El diseño
 añade evidencia sobre condiciones identificadas; no altera requisitos ni reemplaza
 las integraciones de inventario que permanecen en el backend.
+
+## Altas contextuales desde selectores
+
+| Diseño | Requisito/riesgo, nivel y técnica | Condición y evidencia |
+| --- | --- | --- |
+| `DP-VUE-SEL-001` | `CU-CAT-02/06`, `CU-ALM-02/18`, soporte de `CU-ENT-02/08` y Salidas; navegador y unitario. Particiones por consumidor/permiso, coincidencia/ausencia y transiciones abrir → cancelar/error/reintentar/guardar. | `selectCreation.spec.ts` representa proveedor en Materiales/Consumibles y Compras, artículo en ambas Compras y cliente en las tres Salidas. Comprueba precarga, retorno, captura conservada, contratos de compra, teclado y exclusión de alta en filtros/catálogos/merma o sin permiso. `inventoryFormTest.ts` añade proveedor inactivo, selección fuera de la página remota y respuesta tras desmontaje. Fichas `CP-VUE-SEL-001-01/02/03`. |
+
+Los casos de navegador usan los componentes Vuetify reales con API simulada.
+No sustituyen integraciones de persistencia ni declaran probado cada modo de edición.
+Las guardas de rutas permanecen aisladas de los controles visuales en unitarias;
+su doble apunta al contenedor `InventoryWorkspace`, que ahora compone los módulos.

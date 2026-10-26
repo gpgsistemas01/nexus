@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.1 | 1.0.0 | En revisión | 2026-10-26 | Equipo de desarrollo |
+| 1.2 | 1.0.0 | En revisión | 2026-10-26 | Equipo de desarrollo |
 
 La versión del sistema corresponde a Nexus; el manifiesto npm del frontend conserva
 su versión técnica propia. La aceptación técnica sigue pendiente de la función

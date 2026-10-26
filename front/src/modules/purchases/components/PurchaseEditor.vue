@@ -40,7 +40,7 @@ const emit = defineEmits<{
     search: [kind: 'suppliers' | 'persons', value: string];
     more: [kind: 'suppliers' | 'persons'];
     retry: [kind: 'suppliers' | 'persons'];
-    createSupplier: [];
+    createSupplier: [search: string];
     remove: [id: string];
     correct: [detail: PurchaseDetail];
     cancel: [detail: PurchaseDetail];
@@ -91,6 +91,8 @@ const emit = defineEmits<{
                             :initial-option="supplier"
                             :is-disabled="isSubmitting || !canSuppliers"
                             :hint="!canSuppliers ? 'Sin permiso para consultar proveedores.' : ''"
+                            :create-label="canCreateSupplier ? 'Registrar proveedor' : undefined"
+                            @create="emit('createSupplier', $event)"
                             @update:model-value="emit('update', 'supplierId', $event)"
                             @blur="emit('blur', 'supplierId')"
                             @search="emit('search', 'suppliers', $event)"
@@ -102,7 +104,7 @@ const emit = defineEmits<{
                             variant="text"
                             size="small"
                             :disabled="isSubmitting"
-                            @click="emit('createSupplier')"
+                            @click="emit('createSupplier', '')"
                         >
                             Registrar proveedor
                         </VBtn>

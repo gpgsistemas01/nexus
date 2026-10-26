@@ -131,6 +131,9 @@ export const useInventoryEditor = (options: {
         supplierId,
     );
     const reasons = useRemoteOptions('reasons', isStock);
+    const selectedSupplier = useSelectedOption(suppliers.items, () =>
+        String(form.values.supplierId),
+    );
     const lookupMap = {
         supplierId: suppliers,
         presentationId: presentations,
@@ -316,6 +319,29 @@ export const useInventoryEditor = (options: {
     });
     onBeforeUnmount(() => controller.abort());
 
+    const selectCreatedSupplier = (created: LookupItem) => {
+        if (
+            !isCreating.value ||
+            resource === 'wastes' ||
+            options.initialSupplier ||
+            isPending.value ||
+            isSubmitting.value ||
+            controller.signal.aborted
+        )
+            return;
+
+        if (created.isDisabled) {
+            message.value =
+                'El proveedor se registró como inactivo. Actívalo antes de seleccionarlo.';
+            return;
+        }
+
+        selectedSupplier.value = created;
+        update('supplierId', created.id);
+        suppliers.updateSearch('');
+        void suppliers.refresh();
+    };
+
     return {
         values: form.values,
         errors: form.errors,
@@ -327,6 +353,8 @@ export const useInventoryEditor = (options: {
         lookups,
         preview,
         selectedTemplate,
+        selectedSupplier,
+        selectCreatedSupplier,
         usesMeasurements,
         submit,
         update,

@@ -37,6 +37,6 @@ const { values, errors, items, item } = line;
         @more="items.loadMore"
         @retry="items.retry"
         @add="line.add"
-        @create="emit('create', { supplier, onCreated: line.selectCreatedItem })"
+        @create="emit('create', { supplier, search: $event, onCreated: line.selectCreatedItem })"
     />
 </template>

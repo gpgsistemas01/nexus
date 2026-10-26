@@ -108,3 +108,37 @@ discriminada de TypeScript; no constituye State de GoF ni requiere un almacén g
 Las pruebas de [recuperación](../../tests/unit/modules/warehouse/wasteDuplicateRecoveryTest.ts)
 y [navegador](../../tests/e2e/warehouse.spec.ts) protegen cancelación, cero/positivo,
 permiso, incertidumbre y confirmación separada de la escritura.
+
+## Altas contextuales mediante eventos y callbacks
+
+**Identificador:** `DIA-VUE-PAT-003`. **Pregunta:** ¿cómo abre un selector el
+formulario de otro módulo sin consultar su API ni perder la captura de origen?
+**Fuente:** `RemoteSelect`, `LookupCreation`, `InventoryWorkspace`, `PurchaseWorkspace`,
+`IssueWorkspace`, `DirectoryCreationPage` e `InventoryEditorPage`.
+Flujo de composición del cliente: las flechas representan eventos/callbacks y
+responsabilidades; no son relaciones de clases ni una transacción de base de datos.
+
+```mermaid
+flowchart TB
+    select["RemoteSelect<br/>VAutocomplete"] -->|create con búsqueda| origin["Formulario origen<br/>LookupCreation"]
+    origin -->|solicitud tipada| workspace["Workspace<br/>composición"]
+    workspace --> directory["DirectoryCreationPage<br/>Proveedor / Cliente"]
+    workspace --> inventory["InventoryEditorPage<br/>Artículo"]
+    directory --> save["Editor y servicio<br/>guardar en API"]
+    inventory --> save
+    save -->|registro confirmado| callback["onCreated<br/>ID del servidor"]
+    callback -->|seleccionar y renovar catálogo| origin
+```
+
+Se reutiliza contenedor/presentación y composición por callbacks. `RemoteSelect`
+no importa módulos de negocio; cada Workspace importa los contenedores necesarios.
+No se implementa un bus de eventos global ni un store para estas capturas locales.
+Cancelar no invoca `onCreated`; los formularios vivos admiten sólo la selección
+compatible con su modo y disponibilidad. El alta desde Compras conserva el proveedor
+fijado y su contrato de artículo sin existencia inicial capturada.
+
+La [comparación de bibliotecas y correspondencia EJS](../architecture/03-ui-and-http.md#alta-contextual-desde-un-selector)
+justifica extender el control Vuetify instalado. Las pruebas de
+[navegador](../../tests/e2e/selectCreation.spec.ts) y
+[captura de inventario](../../tests/unit/modules/warehouse/inventoryFormTest.ts)
+comprueban los efectos observables, no las llamadas privadas entre componentes.

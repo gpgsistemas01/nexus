@@ -18,13 +18,13 @@ import { useIssueActions } from '../composables/useIssueActions.js';
 import { emptyIssueFilters } from '../issueForm.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
 import type { IssueResource, IssueQuery, IssueRow } from '../issue.js';
-import type { LookupItem } from '../../../shared/lookup.js';
+import type { LookupCreation } from '../../../shared/lookup.js';
 import IssueTable from '../components/IssueTable.vue';
 import IssueFilters from '../components/IssueFilters.vue';
 import IssueEditorPage from './IssueEditorPage.vue';
 
 const props = defineProps<{ resource: IssueResource }>();
-const emit = defineEmits<{ createClient: [onCreated: (item: LookupItem) => void] }>();
+const emit = defineEmits<{ createClient: [request: LookupCreation] }>();
 const config = ISSUE_CONFIG[props.resource];
 const { has, onDenied, onError } = usePageAccess();
 const canManage = computed(() => has(config.managePermission));

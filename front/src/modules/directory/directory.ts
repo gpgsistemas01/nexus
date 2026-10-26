@@ -11,7 +11,8 @@ export interface DirectoryEntry extends DirectoryValues {
     id: string;
     version: number;
 }
-export type DirectoryTarget = { action: 'create' } | { action: 'edit'; row: DirectoryEntry };
+export type DirectoryTarget =
+    { action: 'create'; initialName?: string } | { action: 'edit'; row: DirectoryEntry };
 export type DirectoryField = keyof DirectoryValues;
 
 export const DIRECTORY_CONFIG = {

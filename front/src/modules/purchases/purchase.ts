@@ -1,5 +1,5 @@
 import type { RecordQuery } from '../../shared/list.js';
-import type { LookupItem } from '../../shared/lookup.js';
+import type { LookupCreation, LookupItem } from '../../shared/lookup.js';
 
 export type PurchaseResource = 'materials' | 'consumables';
 export type Decimal = string | number;
@@ -63,8 +63,6 @@ export type PurchaseTarget =
 export type PurchaseWriteTarget = Exclude<PurchaseTarget, { action: 'view' }>;
 export type PurchaseDetailChange =
     { action: 'correct'; quantity: number; costPerUnitType: number } | { action: 'cancel' };
-export type CreatedOption = (item: LookupItem) => void;
-export interface ItemCreation {
+export interface ItemCreation extends LookupCreation {
     supplier: LookupItem;
-    onCreated: CreatedOption;
 }

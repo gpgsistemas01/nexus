@@ -4,7 +4,7 @@ import { VTextarea } from 'vuetify/components/VTextarea';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import type { InventoryFieldSpec } from '../formFields.js';
-import type { LookupState } from '../../../shared/lookup.js';
+import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
 const props = defineProps<{
     field: InventoryFieldSpec;
@@ -12,6 +12,8 @@ const props = defineProps<{
     error?: string;
     isDisabled: boolean;
     lookup?: LookupState;
+    initialOption?: LookupItem;
+    createLabel?: string;
 }>();
 const emit = defineEmits<{
     update: [value: string | boolean];
@@ -19,6 +21,7 @@ const emit = defineEmits<{
     search: [value: string];
     more: [];
     retry: [];
+    create: [search: string];
 }>();
 
 const update = (value: string | boolean) => {
@@ -38,6 +41,9 @@ const update = (value: string | boolean) => {
         :has-more="lookup?.hasMore"
         :is-disabled="isDisabled || field.isDisabled"
         :hint="field.hint"
+        :initial-option="initialOption"
+        :create-label="createLabel"
+        @create="emit('create', $event)"
         @update:model-value="update"
         @search="emit('search', $event)"
         @more="emit('more')"

@@ -11,6 +11,13 @@ de los requisitos normativos y las garantías del servidor.
 
 ## Acceso y alcance
 
+En el alta de Materiales y Consumibles, el selector Proveedor permite Registrar
+con el texto buscado cuando existen permisos de consulta/alta. `InventoryWorkspace`
+compone `DirectoryCreationPage`; guardar selecciona el proveedor activo confirmado
+sin perder la captura del artículo. Presentación, Unidad, Motivo, filtros y los
+selectores del alta de Merma conservan consulta, conforme a
+[la correspondencia EJS](../architecture/03-ui-and-http.md#correspondencia-comprobada-con-ejs).
+
 La alternativa de duplicado de `CU-ALM-10` permite confirmar **Abrir Agregar stock**
 después de un `WASTE_ALREADY_EXISTS` con rechazo definitivo de operación y permiso
 `wastes:add-stock`. Cancelar conserva el alta; confirmar reemplaza el editor con

@@ -25,7 +25,7 @@ import type { LookupItem } from '../../shared/lookup.js';
 export const initialInventoryValues = (target: EditorTarget): InventoryValues => {
     const row = target.row;
     return {
-        name: row?.name ?? '',
+        name: row?.name ?? (target.action === 'create' ? (target.initialName ?? '') : ''),
         supplierId: row?.supplierId ?? '',
         presentationId: row?.presentationId ?? '',
         unitMeasureId: row?.unitMeasureId ?? '',

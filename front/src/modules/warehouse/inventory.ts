@@ -57,7 +57,8 @@ export interface StockAdditionTarget {
     observations?: string;
 }
 export type EditorTarget =
-    { action: Exclude<InventoryAction, 'add-stock'>; row?: InventoryRow } | StockAdditionTarget;
+    | { action: Exclude<InventoryAction, 'add-stock'>; row?: InventoryRow; initialName?: string }
+    | StockAdditionTarget;
 
 export const INVENTORY_CONFIG = {
     materials: {

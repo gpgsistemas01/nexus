@@ -18,6 +18,7 @@ const props = defineProps<{
     isDisabled?: boolean;
     hint?: string;
     initialOption?: LookupItem;
+    createLabel?: string;
 }>();
 const emit = defineEmits<{
     'update:modelValue': [value: string];
@@ -25,8 +26,10 @@ const emit = defineEmits<{
     more: [];
     retry: [];
     blur: [];
+    create: [search: string];
 }>();
 const isMenuOpen = ref(false);
+const search = ref('');
 const selectedItem = useSelectedOption(toRef(props, 'items'), () => props.modelValue);
 const currentItem = computed(
     () =>
@@ -38,6 +41,25 @@ const visibleItems = computed(() =>
         ? [currentItem.value, ...props.items]
         : props.items,
 );
+const canCreate = computed(
+    () =>
+        !!props.createLabel &&
+        !!search.value.trim() &&
+        !props.isDisabled &&
+        !props.isLoading &&
+        !props.loadError &&
+        !visibleItems.value.some(
+            (item) =>
+                item.title.trim().toLocaleLowerCase() === search.value.trim().toLocaleLowerCase(),
+        ),
+);
+
+const createRecord = () => {
+    if (!canCreate.value) return;
+
+    isMenuOpen.value = false;
+    emit('create', search.value.trim());
+};
 
 const updateValue = (value: string | null) => {
     selectedItem.value = visibleItems.value.find((item) => item.id === value);
@@ -45,6 +67,7 @@ const updateValue = (value: string | null) => {
 };
 
 const searchOptions = (value: string) => {
+    search.value = value;
     if (value !== currentItem.value?.title) emit('search', value);
 };
 
@@ -111,6 +134,18 @@ const loadWhenVisible = (isVisible: boolean) => {
             </div>
         </template>
         <template #append-item>
+            <VBtn
+                v-if="canCreate"
+                variant="text"
+                size="small"
+                block
+                prepend-icon="$plus"
+                class="create-option"
+                @click.stop="createRecord"
+                @keydown.enter.stop
+            >
+                {{ createLabel }} «{{ search.trim() }}»
+            </VBtn>
             <div
                 v-if="hasMore"
                 :key="items.length"
@@ -146,5 +181,15 @@ const loadWhenVisible = (isVisible: boolean) => {
     padding: 0.75rem;
     color: #54705f;
     font-size: 0.8rem;
+}
+.create-option {
+    height: auto;
+    min-height: 36px;
+    padding-block: 0.5rem;
+}
+.create-option :deep(.v-btn__content) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
 }
 </style>
