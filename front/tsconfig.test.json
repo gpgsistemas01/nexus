@@ -5,6 +5,7 @@
         "src/**/*.ts",
         "src/**/*.vue",
         "tests/**/*.ts",
+        "scripts/**/*.mjs",
         "../back/src/public/js/utils/validations/loginValidation.js",
         "../back/src/public/js/utils/validations/baseValidations.js",
         "../back/src/public/js/constants/apiMessages.js",

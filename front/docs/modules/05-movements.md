@@ -4,13 +4,13 @@
 
 Describe para desarrollo las consultas de [movements](../../src/modules/movements),
 relacionadas con `CU-ALM-07..08`, `15..16` y `23..24` del
-[catálogo normativo](../../../back/docs/requirements/use-cases/catalogs/index.md).
+[caso Vue de movimientos/reportes](../requirements/04-inventory-and-document-use-cases.md#cu-vue-013).
 La evidencia del cliente está en [movements.spec.ts](../../tests/e2e/movements.spec.ts).
 El [índice Vue](../index.md) conserva los criterios de esta descripción técnica.
 
 ## Alcance y permisos
 
-Las tres consultas del menú EJS tienen rutas propias en Vue:
+Las tres consultas tienen estas rutas Vue:
 
 | Vista | Ruta Vue | API de consulta |
 | --- | --- | --- |
@@ -71,7 +71,6 @@ La actualización reutiliza la estrategia Vue de Almacén: consulta en segundo p
 cada 30 segundos cuando la pestaña está visible y al recuperar foco si pasó ese
 intervalo. No añade Socket.IO al navegador. Se pausa durante cargas y mientras el
 reporte está abierto o descargándose; conserva los datos visibles durante refresh.
-No equivale a las notificaciones instantáneas de la vista EJS.
 
 ## Responsabilidades y reutilización
 

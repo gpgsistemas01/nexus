@@ -6,9 +6,9 @@ el contrato HTTP normativo permanece en OpenAPI.
 
 ## Decisiones aplicadas
 
-Se conserva la organización y la información de las tablas existentes en EJS.
-Sus plugins orientan el comportamiento esperado; los componentes Vue gestionan
-el renderizado, eventos, estado y ciclo de vida de la nueva interfaz.
+Las tablas presentan la información y agrupaciones definidas para cada recurso.
+Los componentes Vue gestionan renderizado, eventos, estado y ciclo de vida;
+Vuetify aporta los controles y sus estados de interacción.
 
 | Necesidad | Herramienta aplicada | Motivo y alternativa revisada |
 | --- | --- | --- |
@@ -37,7 +37,7 @@ de MDB se trasladan al tema; los componentes de Vuetify controlan los elementos
 interactivos. Cargar el CSS/JavaScript global de MDB sobre los mismos controles
 introduciría dos conjuntos de reglas y gestión de estado.
 
-Las páginas conservan los títulos de tabla de EJS: «Tabla de Existencias» para
+Las páginas usan estos títulos de tabla: «Tabla de Existencias» para
 Materiales, «Tabla de Consumibles», «Tabla de Mermas» y «Tabla de» seguido del
 nombre de cada catálogo. Cada página tiene un único `h1` centrado; no se repiten
 «Almacén» ni «Catálogos» como rótulos sobre él. Esos grupos siguen identificando
@@ -49,7 +49,7 @@ y sus [defaults por ámbito](https://vuetifyjs.com/en/features/global-configurat
 
 - `app/plugins/vuetify.ts`: paleta de Almacén, tabla con degradado verde y borde
   inferior oscuro, filas alternadas y acciones de filtro azul/gris. El modal
-  recupera cabecera oscura y franja ámbar de EJS; el menú compacto usa fondo oscuro
+  presenta cabecera oscura y franja ámbar; el menú compacto usa fondo oscuro
   y selección celeste. Las acciones distinguen editar, ajustar, agregar y eliminar
   por color, nombre accesible y tooltip, sin depender sólo del color.
 - `shared/ui/controlDefaults.ts` y `VDefaultsProvider` del layout y del modal: densidad, variante, redondeo,
@@ -93,7 +93,7 @@ concentra la adaptación de inputs, checkbox, textarea y selector remoto.
 Los selectores de Inventario conservan la consulta de opciones y el alta contextual
 de proveedor en Materiales/Consumibles mediante `InventoryWorkspace`.
 [Compras](../modules/06-purchases.md) compone las altas rápidas con los editores Vue existentes
-de Proveedores e Inventario mediante `PurchaseWorkspace`; no abre pantallas EJS.
+de Proveedores e Inventario mediante `PurchaseWorkspace`.
 Su alta de artículo fija proveedor y omite stock/costo inicial capturado.
 
 Un costo ausente en la respuesta no se convierte silenciosamente en cero al editar:
@@ -173,21 +173,23 @@ El código propio se limita al contrato, los permisos y la coordinación del for
 Se reutilizan `DirectoryEditorPage`, `InventoryEditorPage` y sus servicios/validadores.
 No se programa un selector completo ni se crea un modal distinto para cada consumidor.
 
-### Correspondencia comprobada con EJS
+### Casos de alta contextual en Vue
 
-| Contexto | Alta por modal existente en EJS | Realización Vue |
+| Contexto | Comportamiento del selector | Contenedor y retorno |
 | --- | --- | --- |
-| Materiales / Consumibles | Proveedor; `materialSelect.js` conecta `onCreateSupplier`. | `InventoryWorkspace` y `DirectoryCreationPage`; preserva captura del artículo y selecciona el proveedor activo confirmado. |
-| Compras de Materiales / Consumibles | Proveedor y artículo; `goodsReceiptSelect.js` conecta ambos callbacks. | `PurchaseWorkspace`; precarga el texto y fija proveedor/`creationContext=goodsReceipt` para el artículo. |
-| Salidas de Materiales / Consumibles / Mermas | Cliente; `issueHeaderSelect.js` conecta `onCreateClient`. | `IssueWorkspace` y `DirectoryCreationPage`; el cliente se selecciona sólo después de guardar. |
-| Merma: proveedor y plantilla; Presentación, Unidad, Motivo y filtros | Alta deshabilitada en esos consumidores. | Conservan consulta, sin una acción genérica de crear. |
-| Asesor de Salidas | `allowCreate` puede ofrecer «Nueva persona», pero `person.js` no conecta un callback/modal de alta. | No se replica una etiqueta sin resolución a entidad persistida. Crear Personas conserva su pantalla y formulario propios. |
+| Materiales / Consumibles | Registrar proveedor con lectura/alta autorizadas; precarga el texto buscado. | `InventoryWorkspace` y `DirectoryCreationPage`; conserva la captura del artículo y selecciona el proveedor activo confirmado. |
+| Compras de Materiales / Consumibles | Registrar proveedor o artículo. | `PurchaseWorkspace`; proveedor usa Directorio y artículo fija proveedor/`creationContext=goodsReceipt` mediante Inventario. |
+| Salidas de Materiales / Consumibles / Mermas | Registrar cliente cuando el encabezado es editable y hay permisos. | `IssueWorkspace` y `DirectoryCreationPage`; el cliente vuelve mediante callback tras guardar. |
+| Merma: proveedor y plantilla; Presentación, Unidad, Motivo y filtros | Consulta de entidades existentes, sin alta contextual. | Los componentes mantienen búsqueda, paginación y selección del recurso. |
+| Asesor y Solicitante de Salidas | Consulta de Personas según dependencias del encabezado. | `useIssueHeaderSelection` aplica filtros y limpieza de selecciones dependientes. |
 
-Fuentes EJS: [materialSelect](../../../back/src/public/js/plugins/select2/modules/materialSelect.js),
-[goodsReceiptSelect](../../../back/src/public/js/plugins/select2/modules/goodsReceiptSelect.js),
-[issueHeaderSelect](../../../back/src/public/js/plugins/select2/modules/issueHeaderSelect.js),
-[wasteSelect](../../../back/src/public/js/plugins/select2/modules/wasteSelect.js) y
-[person](../../../back/src/public/js/plugins/select2/domains/person.js).
+Las fuentes de esta coordinación son [InventoryWorkspace](../../src/app/pages/InventoryWorkspace.vue),
+[PurchaseWorkspace](../../src/app/pages/PurchaseWorkspace.vue),
+[IssueWorkspace](../../src/app/pages/IssueWorkspace.vue),
+[DirectoryCreationPage](../../src/app/pages/DirectoryCreationPage.vue) y
+[RemoteSelect](../../src/shared/components/RemoteSelect.vue). Los
+[modelos general y específicos](../patterns/09-contextual-creation.md) explican
+los eventos, contratos y propietarios de cada caso.
 
 `LookupCreation` lleva texto y callback del consumidor vivo. Los Workspaces componen
 módulos y vuelven a comprobar permisos; `DirectoryCreationPage` concentra el alta
@@ -231,12 +233,10 @@ coordinación y su evidencia de navegador con API simulada.
 | `inventoryTable.ts` | Configuración de columnas y orden permitido, sin acceso a API. El formato numérico vive en `shared/utils/formatNumbers`. |
 | `formModel.ts` / `formFields.ts` | Datos permitidos, conexión a validadores públicos y controles de la captura. |
 
-El menú ofrece las secciones migradas a Vue y filtra sus enlaces por permiso.
-No enlaza a vistas EJS.
-El proxy del frontend sólo reenvía `/api` y el POST `/cerrar-sesion`, que limpia las
-cookies y redirige a `/inicio-sesion` de Vue. Esta acción de autenticación no monta
-una vista EJS. Las vistas antiguas permanecen disponibles en el servidor Express
-para sus consumidores existentes; no forman parte de la navegación Vue.
+El menú ofrece las secciones implementadas en Vue y filtra enlaces por permiso.
+El proxy reenvía `/api` y el POST `/cerrar-sesion`; las rutas de página pertenecen
+a Vue Router. El cierre procesa las cookies de respuesta y vuelve a
+`/inicio-sesion` del cliente.
 
 ## Axios y sesión
 
@@ -319,8 +319,8 @@ uniforme. Las tablas de sólo lectura omiten la columna de acciones. Los permiso
 el stock, las asignaciones y los payloads permanecen en sus módulos.
 
 En Compras, `PurchaseTotals` reutiliza el resumen visual del encabezado y de
-corrección, con las etiquetas originales de EJS. La corrección conserva su
+corrección, con las etiquetas del módulo. La corrección conserva su
 confirmación explícita antes del request. Los avisos de éxito usan el mensaje
 traducido del código realmente confirmado por el servicio mediante el catálogo
-público `getSuccessMessage`, compartido con EJS. `confirmMutation` sólo valida
+público `getSuccessMessage` del contrato de respuestas. `confirmMutation` sólo valida
 el contrato y devuelve datos; no presenta avisos ni fabrica un código.

@@ -137,7 +137,7 @@ Cancelar no invoca `onCreated`; los formularios vivos admiten sólo la selecció
 compatible con su modo y disponibilidad. El alta desde Compras conserva el proveedor
 fijado y su contrato de artículo sin existencia inicial capturada.
 
-La [comparación de bibliotecas y correspondencia EJS](../architecture/03-ui-and-http.md#alta-contextual-desde-un-selector)
+La [comparación de bibliotecas y flujos Vue](../architecture/03-ui-and-http.md#alta-contextual-desde-un-selector)
 justifica extender el control Vuetify instalado. Las pruebas de
 [navegador](../../tests/e2e/selectCreation.spec.ts) y
 [captura de inventario](../../tests/unit/modules/warehouse/inventoryFormTest.ts)

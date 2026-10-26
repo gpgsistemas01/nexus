@@ -9,9 +9,9 @@ desde **la raíz que contiene `front/` y `back/`**, usando `--prefix`; no existe
 `package.json` en esa raíz para ejecutar `npm run dev` sin seleccionar aplicación.
 
 Se necesita Git, npm, Node compatible y PostgreSQL disponible para desarrollo.
-El frontend no conecta directamente a PostgreSQL. La configuración, roles y
-operación del servidor pertenecen al [README backend](../../../back/README.md), que
-sigue siendo la fuente de esas instrucciones. No es necesario Docker para el
+El frontend no conecta directamente a PostgreSQL. La preparación mínima de la API se explica también aquí para que esta guía
+sea ejecutable por sí misma. La administración avanzada de PostgreSQL pertenece
+a la operación del servidor. No es necesario Docker para el
 desarrollo local con Vite.
 
 ## 1. Comprobar la copia y Node
@@ -61,10 +61,32 @@ la instalación del proyecto.
 | `front/.env.local` | Opcional si se usan los valores predeterminados. Copiar [front/.env.example](../../.env.example) para cambiar `BACKEND_PROXY_TARGET` o el logo público. Reiniciar Vite tras modificarlo. |
 
 El repositorio no contiene `back/.env.example`; no se indica copiar un archivo
-inexistente. Crea `back/.env` siguiendo la sección del servidor y usa valores
+inexistente. Crea `back/.env` con la configuración mínima siguiente y usa valores
 propios del entorno de desarrollo. No copies secretos de PostgreSQL/JWT a Vue
 ni a variables `VITE_*`, porque estas últimas se incluyen en el cliente compilado.
 Los archivos `.env` permanecen ignorados por Git y por el contexto Docker.
+
+### Configuración mínima de la API de desarrollo
+
+Ejemplo de estructura para `back/.env`; sustituir todos los valores de demostración
+por los del entorno local. No es un archivo de credenciales listo para producción.
+
+```dotenv
+NODE_ENV=development
+PORT=3000
+DATABASE_URL="postgresql://usuario_local:clave_local@127.0.0.1:5432/nexus_dev"
+JWT_SECRET_ACCESS="reemplazar-por-secreto-local-independiente"
+JWT_SECRET_REFRESH="reemplazar-por-otro-secreto-local-independiente"
+JWT_SECRET_ONE_TIME="reemplazar-por-otro-secreto-local-independiente"
+```
+
+`DATABASE_URL` pertenece al proceso Express; PostgreSQL debe existir y aceptar esa
+cuenta. Si las migraciones requieren otra conexión directa, definir `DIRECT_URL`
+con la cuenta de migración del mismo ambiente. Los tres secretos JWT se configuran
+en el servidor, no en Vue. `DATABASE_TEST_URL`/`DIRECT_TEST_URL` sólo se preparan
+para pruebas aisladas, conforme a [la guía de sistema](../testing/04-system-tests.md).
+La aplicación necesita una cuenta activa y permisos existentes; esta guía no
+inventa una cuenta o contraseña inicial.
 
 Para crear el archivo opcional del frontend en **PowerShell**, si aún no existe:
 
@@ -86,7 +108,7 @@ predeterminado es `http://127.0.0.1:3000`; esta variable configura Vite, no el n
 
 Si se prepara una base de desarrollo nueva o faltan migraciones por aplicar,
 comprueba primero que las URLs locales apuntan a **esa base** y sigue el
-[procedimiento del backend](../../../back/README.md#configuración-inicial):
+procedimiento local:
 
 ```bash
 npm --prefix back run db:migrate
@@ -126,8 +148,8 @@ npm --prefix front run dev
 Vite usa `5173` con `strictPort`; si está ocupado informa del conflicto. Abre
 `http://localhost:5173/inicio-sesion` con la cuenta del entorno. Para conservar
 un origen consistente durante la sesión, usa el mismo host en las páginas Vue.
-Vite deriva `/api` y `/cerrar-sesion` al backend; no hay que abrir la vista EJS
-para usar Vue.
+Vite deriva `/api` y `/cerrar-sesion` al backend; las páginas se abren desde
+el origen del frontend.
 
 ## 6. Comprobar el resultado
 
@@ -184,5 +206,18 @@ contexto frontend y de la imagen final.
 | `401` o `403` con Express respondiendo | Revisar sesión, credenciales y permisos. Son rechazos HTTP diferentes de un fallo de conexión. |
 | `EBADENGINE` | Comparar Node con ambos `engines`; actualizar Node dentro de una rama admitida antes de reinstalar dependencias. |
 
-Las ubicaciones de archivos ignorados y dependencias se mantienen en
-[la guía de la raíz](../../../README.md#archivos-locales-ignorados-y-cambio-de-estructura).
+## Archivos locales ignorados y su ubicación
+
+| Archivo/directorio | Ubicación y recuperación |
+| --- | --- |
+| Variables de API | `back/.env`; Git no lo mueve ni recupera al cambiar estructura. Mantenerlo junto al manifiesto backend. |
+| Variables de Vite | `front/.env.local`; opcional y público sólo en las variables `VITE_*`. |
+| Dependencias | `back/node_modules` y `front/node_modules`, instaladas por separado. Una carpeta antigua en la raíz no sustituye ninguna de ellas. |
+| Cliente Prisma | `back/generated/prisma`, generado con `npm --prefix back run db:generate`; no se edita ni se obtiene del frontend. |
+| Assets compilados | `front/dist`, producidos por build. No contienen las fuentes documentales. |
+| Documentación exportada y pruebas | `front/build/docs` y `front/build/test-results`; artefactos locales/CI, ignorados en Git. |
+
+Después de descargar cambios que alteran dependencias, detener el proceso afectado,
+completar su `npm ci --include=dev` y reiniciar. No editar declaraciones dentro de
+`node_modules`; esos archivos pertenecen a paquetes instalados. Los errores se
+corrigen en la fuente/configuración y se comprueban de nuevo.

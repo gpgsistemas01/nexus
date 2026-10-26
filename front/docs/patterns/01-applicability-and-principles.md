@@ -40,6 +40,12 @@ letras de SOLID.
 | Slots | [DIA-VUE-GEN-004](05-slots-and-visual-composition.md#modelo-general-de-composición-por-slots) | [DIA-VUE-APL-004: celdas de Catálogos](05-slots-and-visual-composition.md#aplicación-a-las-celdas-de-catálogos). |
 | Provisión de sesión | [DIA-VUE-GEN-005](06-session-provision.md#modelo-general-de-provisión-de-estado-de-aplicación) | [DIA-VUE-APL-005: arranque y consumidores](06-session-provision.md#aplicación-en-el-arranque-de-vue). |
 | Fábricas de esquemas | [DIA-VUE-GEN-006](07-schema-factories.md#modelo-general-de-construcción-de-un-esquema) | [DIA-VUE-APL-006: validación de Salidas](07-schema-factories.md#aplicación-al-esquema-del-editor-de-salidas). |
+| Selección dependiente | [DIA-VUE-GEN-002](03-composables-and-callbacks.md#modelo-general-de-composición-por-callback) | [DIA-VUE-PAT-004: selección de Inventario](03-composables-and-callbacks.md#selección-dependiente-de-inventario). |
+| Alta contextual de proveedor en Inventario | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-007](09-contextual-creation.md#caso-1-proveedor-desde-inventario). |
+| Alta de proveedor/artículo en Compras | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-008](09-contextual-creation.md#proveedor-desde-el-encabezado) y [010](09-contextual-creation.md#artículo-desde-una-partida). |
+| Alta de cliente en Salidas | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-009](09-contextual-creation.md#caso-3-cliente-desde-salidas). |
+
+La [composición de altas contextuales](09-contextual-creation.md) conserva otro par completo: `DIA-VUE-GEN-007` explica el modelo; `DIA-VUE-APL-007`, `008`, `009` y `010` concretan Inventario, Compras y Salidas con sus eventos, callbacks y propietarios reales. La selección dependiente y el guardado mantienen su separación en `DIA-VUE-PAT-004`.
 
 ## Colaboraciones que combinan mecanismos
 
@@ -52,8 +58,8 @@ preguntas, sin repetir los diagramas generales:
 | ¿Cuándo se confirma la escritura y se recarga? | [DIA-VUE-DOC-002](08-document-responsibilities.md#secuencia-de-guardado-confirmado). |
 | ¿Cómo se compone un alta de otro dominio? | [DIA-VUE-DOC-003](08-document-responsibilities.md#composición-entre-dominios-para-altas-rápidas). |
 
-La sesión Vue tiene sus propios colaboradores; la secuencia HTTP del frontend
-EJS no se utiliza como prueba de que Vue ejecuta esos mismos módulos. La frontera
+La sesión Vue tiene sus propios colaboradores y secuencia HTTP,
+documentados mediante sus componentes, estado y transporte reales. La frontera
 compartida de seguridad se explica en [entradas y salida segura](../architecture/04-input-security.md).
 
 ## Dependencias y composición de un listado

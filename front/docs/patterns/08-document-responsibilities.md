@@ -50,7 +50,7 @@ porque asignar una identidad local no corresponde al mapper de respuestas HTTP.
 - **Fábrica de esquemas por modo:** `createIssueValidationSchema` elige la
   validación de encabezado, documento o surtido y no valida capturas en consulta
   o devolución. `createPurchaseValidationSchema` adapta alta y edición sin copiar
-  las reglas públicas de EJS.
+  las reglas públicas de captura.
 - **Uniones discriminadas de TypeScript:** crear no exige documento; editar,
   surtir y devolver sí lo exigen. `IssueWriteTarget` y `PurchaseWriteTarget`
   excluyen la consulta. Corregir una compra exige cantidad/costo; cancelar no

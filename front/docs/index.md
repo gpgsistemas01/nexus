@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.2 | 1.0.0 | En revisión | 2026-10-26 | Equipo de desarrollo |
+| 1.3 | 1.0.0 | En revisión | 2026-10-26 | Equipo de desarrollo |
 
 La versión del sistema corresponde a Nexus; el manifiesto npm del frontend conserva
 su versión técnica propia. La aceptación técnica sigue pendiente de la función
@@ -12,26 +12,34 @@ responsable definida por gobernanza. Git conserva el historial; no acredita apro
 
 ## Propósito, audiencia y alcance
 
-Esta colección explica a desarrollo y revisión técnica cómo está implementado el
-frontend de `front/src`, dónde cambiar una capacidad y qué contratos debe preservar.
-Mantiene diseño, responsabilidades, decisiones y evidencia del cliente Vue. Su
-mantenimiento corresponde al equipo de desarrollo; la revisión y aceptación siguen
-el [gobierno documental](../../back/docs/governance/documentation-standards/06-responsibilities-and-change-control.md).
-La colección permanece en revisión y Git conserva el historial de sus cambios.
+Esta colección documenta la aplicación Vue de `front/src` para desarrollo, revisión
+y pruebas. Contiene explicación propia de requisitos, casos de uso, arquitectura,
+patrones, módulos, código, pruebas, instalación y publicación. El lector puede
+comprender esos temas sin abrir documentos de Express. Se repiten conceptos del
+producto cuando son necesarios y se explican conforme a los contratos del cliente.
 
-Los requisitos y reglas de negocio normativas pertenecen a la
-[SRS](../../back/docs/requirements/requirements-specification/index.md) y sus casos
-de uso. El contrato HTTP procesable permanece en
-[OpenAPI](../../back/docs/architecture/openapi/api-contract.md). Estas guías
-documentan su realización en Vue; no sustituyen esas fuentes ni la validación de
-Express. La [referencia EJS](../../back/docs/architecture/views/development/frontend-technical-documentation/index.md)
-describe otra implementación del navegador, no una plantilla que Vue deba copiar.
+El equipo de desarrollo mantiene las guías y la revisión técnica contrasta su
+contenido con fuentes y evidencia. El [gobierno local](governance/index.md) define
+responsables, criterios y publicación; la aceptación permanece En revisión.
+La [especificación Vue](requirements/02-client-specification.md) y sus fichas
+`CU-VUE-*` contienen comportamientos y resultados propios. Los IDs del producto
+se conservan como correspondencia, sin confundir una interacción Vue con una
+transacción o una autorización definitiva de Express.
+
+Las fuentes públicas compartidas pueden residir en `back/src` y el motor común
+de exportación en `back/scripts`; esto no convierte sus documentos en el contenido
+de esta colección. Los enlaces al servidor sirven como referencia complementaria.
+Las decisiones de interfaz, reactividad, responsabilidades y pruebas se describen aquí.
 
 ## Criterios documentales adaptados a Vue
 
+La [revisión específica de estándares](governance/03-standard-applicability.md)
+distingue referencias que se conservan, adaptaciones por artefacto y convenciones
+propias de Vue, con fuentes primarias de ISO, IEEE y el framework.
+
 La tecnología cambia los elementos que describimos, no la necesidad de explicar
 propósito, responsabilidad, contratos y evidencia. Se seleccionan conceptos del
-[criterio documental del proyecto](../../back/docs/governance/documentation-standards/03-application-by-type-of-document.md);
+[criterio documental del proyecto](governance/01-documentation-rules.md);
 no se traslada completa una plantilla de backend ni se exige cumplir una ISO para
 crear un componente. La estructura Markdown de estas guías es una convención local.
 
@@ -41,22 +49,22 @@ crear un componente. La estructura Markdown de estas guías es una convención l
 | IEEE 1016-2009 | Describir responsabilidades, interfaces, relaciones y decisiones de componentes, composables, servicios y mappers. | Referencia histórica de diseño, en estado Inactive-Reserved según IEEE. Se adopta selectivamente; no prescribe carpetas Vue, clases ni una ficha por método. |
 | ISO/IEC/IEEE 42010:2022 | Explicar preocupaciones de organización, estado, dependencias, transporte y despliegue con vistas útiles. | Se aplica al conjunto o colaboración relevante, no como plantilla obligatoria de cada función. Los diagramas distinguen modelo general y aplicación. |
 | ISO/IEC/IEEE 15289:2019 | Conservar propósito, audiencia, fuentes, mantenimiento y relaciones entre guías. | Gobierna información del proyecto; no define cómo implementar reactividad o formularios. |
-| ISO/IEC/IEEE 29148:2018 | Enlazar la realización Vue con requisitos y casos de uso existentes. | La SRS sigue siendo propietaria de las obligaciones. Estas guías no vuelven a especificar el comportamiento del negocio. |
+| ISO/IEC/IEEE 29148:2018 | Especificar obligaciones del cliente, fichas de interacción y correspondencia con el producto. | La especificación local explica el contrato del cliente; no atribuye a Vue transacciones o autorizaciones del servidor. |
 | ISO/IEC/IEEE 29119-2, -3 y -4 | Diseñar condiciones y oráculos, separar caso y resultado, seleccionar técnicas según el riesgo. | Unitarias/composables y jsdom comprueban el cliente; Playwright comprueba navegador. API simulada no sustituye integraciones HTTP/Prisma del backend. |
 | ISO/IEC 25010:2023 | Usar el vocabulario de calidad cuando se revisan mantenibilidad, interacción, seguridad o desempeño. | No se inventan tiempos, cobertura mínima ni conformidad sin requisitos y mediciones acordadas. |
 
 No se declara conformidad integral ni certificación. Los enlaces de referencia y
-la decisión de adopción permanecen en [gobernanza](../../back/docs/governance/documentation-standards/index.md).
-Las [reglas de codificación](../../back/docs/architecture/coding-standards/index.md)
+la decisión de adopción permanecen en [gobernanza](governance/01-documentation-rules.md).
+Las [reglas de codificación](development/03-coding-standards.md)
 conservan el formato local; la documentación explica cómo aplicarlo a Vue.
 
-## Diferencias que deben conservarse frente a EJS y Express
+## Criterios de la implementación Vue
 
 | Tema | Descripción apropiada para este cliente |
 | --- | --- |
-| Navegación y renderizado | SPA con Vue Router, componentes y rutas diferidas. No atribuir al cliente el renderizado EJS ni controladores HTTP. |
+| Navegación y renderizado | SPA con Vue Router, componentes y rutas diferidas; Express proporciona la API. |
 | Estado y responsabilidades | Páginas contenedoras, props/eventos y composables por instancia; sesión proporcionada desde el arranque. No crear repositories ni stores sólo para imitar capas del servidor. |
-| Interacción y bibliotecas | Controles gestionados por Vue/Vuetify, slots y ciclo de vida. No trasladar listeners, Select2/MDB o manipulación del DOM de EJS como patrón de Vue. |
+| Interacción y bibliotecas | Controles gestionados por Vue/Vuetify, slots y ciclo de vida; el estado reactivo gobierna el DOM de los componentes. |
 | Validación | Reglas públicas y adaptación a VeeValidate; momento de error y captura en el cliente. Credenciales, permisos y validación definitiva en Express. |
 | Operaciones asíncronas | AbortSignal, invalidación de respuestas antiguas, estados de carga/error y desmontaje. Cancelar el cliente no revierte una transacción. |
 | SOLID y patrones | Evaluar contratos y dependencias funcionales. No afirmar Abstract Factory, State o Liskov de clases donde sólo hay funciones y uniones de TypeScript. |
@@ -75,8 +83,9 @@ front/docs/
 ├── patterns/      # Aplicabilidad, modelos generales y aplicaciones en código
 ├── modules/       # Realización de capacidades y contratos del cliente
 ├── development/   # Inicio local y herramientas
-├── requirements/  # Aplicación de la SRS y casos de uso canónicos
-└── testing/       # Diseños, fichas críticas, cobertura y brechas
+├── requirements/  # Especificación y fichas de interacción Vue
+├── testing/       # Plan, diseños, fichas, cobertura y brechas
+└── governance/    # Reglas y publicación propias del cliente
 ```
 
 Cada colección conserva un `index.md` y capítulos `01-`, `02-`, etc. Los títulos
@@ -90,7 +99,8 @@ convención de Nexus, no una estructura que ISO imponga a Vue.
 | [Patrones](patterns/index.md) | ¿Qué decisiones tienen consumidores reales y cómo colaboran? Aplicabilidad, principios, diagramas generales/específicos y responsabilidades de documentos. | Símbolos y archivos enlazados por cada capítulo. |
 | [Módulos](modules/index.md) | ¿Cómo realiza Vue las capacidades existentes? Rutas, modos, permisos de interfaz, contratos y límites del cliente. | Módulo correspondiente, Router, API y pruebas. |
 | [Desarrollo](development/index.md) | ¿Cómo preparar y arrancar la copia? Instalación, entorno y herramientas. | Manifiestos npm, archivos de ejemplo y configuraciones. |
-| [Requisitos y casos de uso](requirements/index.md) | ¿Qué obligaciones y objetivos debe realizar el cliente? Aplicación y trazabilidad hacia las fuentes normativas. | SRS y fichas canónicas, sin duplicarlas. |
+| [Requisitos y casos de uso](requirements/index.md) | ¿Qué obligaciones y objetivos debe realizar el cliente? Especificación, flujos completos y trazabilidad. | Contratos observables del cliente, fichas CU-VUE y correspondencias del producto. |
+| [Gobierno](governance/index.md) | ¿Cómo redactar, mantener y publicar esta colección? | Reglas locales, índices, scripts y motor de publicación compartido. |
 | [Pruebas](testing/index.md) | ¿Qué condiciones comprueba cada nivel y qué falta acreditar? Diseños, fichas selectivas y cobertura del cliente. | [tests](../tests), fixtures y evidencia de ejecución de cada revisión. |
 
 El primer recorrido es [iniciar el proyecto](development/01-getting-started.md),
@@ -120,7 +130,7 @@ su propietario y se enlazan desde las otras vistas, sin otra copia editable.
 ## Correspondencia con requisitos y casos de uso
 
 La [aplicación de requisitos](requirements/01-applicability-and-traceability.md)
-conserva el criterio para usar las fichas canónicas. La
+define las fichas locales y la relación con los identificadores del producto. La
 [cobertura por caso de uso](testing/03-use-case-coverage.md) es propietaria de la
 relación entre requisito, CU, diseño y evidencia del cliente, con sus límites y
 brechas. Esta entrada no mantiene otra matriz de los mismos resultados.
@@ -131,38 +141,30 @@ aprobado; las ejecuciones `EP-*` permanecen en CI o en la revisión del cambio.
 
 ## Mantenimiento y publicación
 
-El equipo de desarrollo prepara y sincroniza estas fuentes; la revisión técnica
-contrasta código, contratos y evidencia. La aceptación corresponde al responsable
-técnico por designar según gobernanza; hasta registrarla se conserva **En revisión**.
-Un cambio editorial no eleva la versión del sistema. La versión documental sigue
-[el criterio común](../../back/docs/governance/publication-and-versioning/05-versioning.md).
+El [procedimiento propio](governance/02-generation-and-publication.md) distingue
+fuentes curadas, referencia generada y artefactos. La versión del documento y su
+estado se mantienen en este índice; Git conserva historial, sin acreditar aceptación.
+El estándar de código está en [Desarrollo](development/03-coding-standards.md) y el
+plan de pruebas en [Pruebas](testing/05-test-plan.md), con contenido local completo.
 
-La solicitud de cambio identifica motivo, guías/IDs afectados, comprobaciones,
-resultado y pendientes. No se mantiene un registro paralelo de cada commit.
-Al cambiar una guía se comprueban propósito y audiencia, propiedad del contenido,
-correspondencia con código/contrato, enlaces y anclas, jerarquía de títulos y
-evidencia disponible. Las decisiones pendientes se presentan como propuestas;
-mediciones y aprobaciones sólo se registran cuando existen. Un cambio de flujo
-obliga a revisar su guía, requisitos afectados y diseño de pruebas.
-
-`npm --prefix back run docs:check` valida inventarios generados y OpenAPI; no revisa
-automáticamente toda la prosa ni acredita adopción de normas. Esta colección se
-valida y publica desde la raíz del repositorio con:
+Desde la raíz del repositorio:
 
 ```bash
-npm --prefix back run docs:export -- arquitectura frontend-vue --check
-npm --prefix back run docs:export -- arquitectura frontend-vue ambos
+npm --prefix front run docs:generate
+npm --prefix front run docs:check
+npm --prefix front run docs:export -- ambos
 ```
 
-La entrada y la versión documental pertenecen a este índice. El paquete incluye
-las seis colecciones mediante sus fuentes de `front/docs`, sin copiarlas a
-`back/docs`. El DOCX/PDF se genera bajo `back/build/docs`, que no forma parte de
-la imagen de producción. Los cambios de figuras
-o exportador requieren además renderizado y revisión DOCX/PDF según la
-[guía de publicación](../../back/docs/governance/document-export-guide/index.md).
+`docs:generate` actualiza la referencia técnica desde SFC/TypeScript. `docs:check`
+comprueba que corresponda al código y valida las fuentes/enlaces del paquete.
+No certifica la prosa, los patrones o todos los requisitos; requiere revisión.
+`docs:export` publica DOCX y PDF dentro de `front/build/docs`, con fuentes completas
+de las siete colecciones. La herramienta de renderizado se comparte, sin copiar
+los documentos backend como una publicación Vue ni modificar su documentación.
 
-Estas fuentes permanecen en Git, fuera de `front/public` y `front/dist`.
-[Dockerfile.dockerignore](../Dockerfile.dockerignore) excluye `front/docs` del
-contexto frontend; el [Dockerfile](../Dockerfile) sólo lleva `dist` a Nginx.
-El Dockerfile del backend excluye `front/` mediante el `.dockerignore` de la raíz.
-La exportación documental es una tarea de desarrollo/CI, no del contenedor de producción.
+Los cambios de figuras requieren renderizado y revisión representativa DOCX/PDF.
+Las fuentes están en Git fuera de `public` y `dist`; los artefactos `build/` son
+locales/CI. [Dockerfile.dockerignore](../Dockerfile.dockerignore) excluye guías,
+herramientas documentales y resultados del contexto frontend. El [Dockerfile](../Dockerfile)
+lleva sólo los assets compilados a Nginx. Ningún proceso de documentación se ejecuta
+al servir la aplicación en producción.

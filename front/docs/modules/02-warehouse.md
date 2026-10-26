@@ -4,7 +4,7 @@
 
 Describe para desarrollo la realización de inventarios en
 [warehouse](../../src/modules/warehouse), vinculada con los
-[casos ALM](../../../back/docs/requirements/use-cases/catalogs/index.md).
+[casos Vue de inventario](../requirements/04-inventory-and-document-use-cases.md).
 La evidencia del cliente está en [warehouse.spec.ts](../../tests/e2e/warehouse.spec.ts)
 y las pruebas unitarias del módulo. El [índice Vue](../index.md) distingue esta guía
 de los requisitos normativos y las garantías del servidor.
@@ -16,7 +16,7 @@ con el texto buscado cuando existen permisos de consulta/alta. `InventoryWorkspa
 compone `DirectoryCreationPage`; guardar selecciona el proveedor activo confirmado
 sin perder la captura del artículo. Presentación, Unidad, Motivo, filtros y los
 selectores del alta de Merma conservan consulta, conforme a
-[la correspondencia EJS](../architecture/03-ui-and-http.md#correspondencia-comprobada-con-ejs).
+[los casos de alta contextual](../architecture/03-ui-and-http.md#casos-de-alta-contextual-en-vue).
 
 La alternativa de duplicado de `CU-ALM-10` permite confirmar **Abrir Agregar stock**
 después de un `WASTE_ALREADY_EXISTS` con rechazo definitivo de operación y permiso
@@ -60,7 +60,7 @@ El acordeón admite teclado, estado expandido accesible y sólo las rutas permit
 El grupo [Catálogos](03-catalogs.md) agrega las seis vistas administrables para
 `catalogs:manage`. [Compras](06-purchases.md) se implementa como documento separado
 y reutiliza el alta de artículos sin stock inicial. [Salidas](07-issues.md) tiene
-sus propias pantallas Vue; el menú del cliente no enlaza sus vistas EJS.
+sus propias pantallas Vue dentro del menú del cliente.
 Los historiales tienen su propia sección de [Movimientos en Vue](05-movements.md).
 
 ## Patrones y propietario del estado
@@ -87,8 +87,7 @@ Las [decisiones de arquitectura](../architecture/01-structure-and-boundaries.md)
   `formFields.ts` reutiliza los controles que realmente comparten los tres módulos.
 
 La adaptación usa estado reactivo, props/eventos, RouterLink y ciclos de vida de
-Vue. No carga DataTables, Select2 ni listeners EJS para administrar los mismos
-controles. SweetAlert2 confirma eliminaciones y muestra avisos de éxito; el modal
+Vue. Los componentes gestionan sus controles y liberan sus recursos al desmontar. SweetAlert2 confirma eliminaciones y muestra avisos de éxito; el modal
 de captura pertenece a Vuetify/VeeValidate. La consulta se actualiza manualmente y
 se comprueba cada 30 s, al recuperar el foco y al volver a una pestaña visible.
 La recarga automática sólo consulta si han pasado al menos 30 s desde el último
@@ -112,7 +111,7 @@ los estilos, las bibliotecas elegidas y los propietarios de código.
 Los alias de Vite y TypeScript importan validadores desde
 `back/src/public/js/utils/validations/validators.js`, cálculos de vista previa desde
 `back/src/shared/inventory/wasteMeasurements.js` y permisos desde su constante pública.
-Son fuentes ya públicas para EJS; no se copian reglas ni se importa código privado
+Son fuentes públicas compilables; no se copian reglas ni se importa código privado
 de servicios, repositorios, Prisma o Express en el navegador.
 
 El frontend comprueba captura para dar respuesta inmediata. Express vuelve a validar
@@ -137,8 +136,8 @@ Agregar stock: cierra el alta, localiza la merma y revisa su entrada de stock.
 ## Recuperación de capturas de merma
 
 Alta y entrada de stock guardan el cuerpo y `operationId` antes de enviarlos, bajo
-`nexus:waste-operation:<usuario>:<acción>:<merma>`, la misma clave que usa EJS en el
-mismo origen. Una respuesta incierta conserva esa captura y bloquea modificaciones.
+`nexus:waste-operation:<usuario>:<acción>:<merma>` en el almacenamiento local del
+origen de la aplicación. Una respuesta incierta conserva esa captura y bloquea modificaciones.
 **Recuperar captura** vuelve a enviar exactamente el mismo cuerpo e identificador,
 incluso después de cerrar el editor o recargar. No crea una operación nueva.
 
@@ -152,7 +151,7 @@ el botón en Vue no sustituye esas garantías.
 
 Vite y Nginx sirven las rutas del frontend con el fallback de Vue Router.
 Sólo `/api` y la acción `/cerrar-sesion` conservan el proxy del mismo origen y
-las cookies HttpOnly; no se integran vistas EJS al frontend.
+las cookies HttpOnly de las solicitudes del cliente.
 
 La construcción Docker usa la raíz del repositorio como contexto para incluir
 únicamente los módulos públicos compartidos y sus dependencias explícitas. La

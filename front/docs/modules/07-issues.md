@@ -3,7 +3,7 @@
 ## Propósito y fuentes
 
 Describe para desarrollo la realización de `CU-SAL-01..21` de
-[Salidas](../../../back/docs/requirements/use-cases/issues/index.md) en
+[las fichas Vue de Salidas](../requirements/04-inventory-and-document-use-cases.md#cu-vue-010) en
 [issues](../../src/modules/issues). La evidencia del cliente está en
 [issues.spec.ts](../../tests/e2e/issues.spec.ts); los criterios y límites de la
 documentación se mantienen en el [índice Vue](../index.md).
@@ -11,8 +11,7 @@ documentación se mantienen en el [índice Vue](../index.md).
 ## Alcance y navegación
 
 `/salidas/materiales`, `/salidas/consumibles` y `/salidas/mermas` son rutas Vue
-protegidas, agrupadas en Salidas dentro del menú. Conservan los títulos de EJS;
-no abren vistas EJS. `/salidas` selecciona el primer recurso autorizado.
+protegidas, agrupadas en Salidas dentro del menú. `/salidas` selecciona el primer recurso autorizado.
 
 Las guardas y el menú usan `goods:issues-page-view` o `waste:issues-page-view`.
 Los listados y las consultas requieren además el permiso de gestión que exige
@@ -37,7 +36,7 @@ el surtido usa `PATCH /:id/details`; la devolución usa
 
 El encabezado conserva cliente, asesor, área, solicitante, número de proyecto,
 fecha de solicitud y observaciones. Las dependencias de cliente/asesor y
-área/solicitante reutilizan las reglas públicas de EJS. El cliente interno conserva
+área/solicitante utilizan las reglas públicas del dominio. El cliente interno conserva
 la sugerencia de proyecto por área y el filtro de coordinador; para clientes
 externos se filtra asesor por Ventas/Dirección. Cambiar cliente o área limpia la
 selección dependiente. El alta rápida de clientes se compone desde
@@ -45,8 +44,7 @@ selección dependiente. El alta rápida de clientes se compone desde
 Registrar cliente aparece también dentro del selector: precarga la búsqueda y
 devuelve una opción activa confirmada mediante `DirectoryCreationPage`. Cancelar
 conserva la captura de salida; no se ofrece alta desde los demás selectores.
-El flag de «Nueva persona» de Asesor en EJS no tiene conectado un modal y no se
-traslada como un ID artificial al formulario Vue.
+Asesor y Solicitante consultan las personas existentes; no ofrecen alta auxiliar.
 
 Las partidas distinguen material y proveedor; repetir el mismo par acumula su
 cantidad, mientras otro proveedor conserva otra partida. Las mermas se agrupan
@@ -59,7 +57,7 @@ seleccionados con su ID y cantidad de proyecto. Devolver envía cantidad y
 observaciones propias. El navegador no envía saldos, estados ni costos derivados
 como autoridad: Express valida pertenencia, estado, stock y concurrencia en sus
 transacciones existentes. Los códigos de éxito se comprueban con
-`confirmMutation` y las constantes compartidas; el aviso conserva el mensaje EJS.
+`confirmMutation` y las constantes compartidas; el aviso presenta el mensaje del contrato.
 
 ## Responsabilidades y reutilización
 

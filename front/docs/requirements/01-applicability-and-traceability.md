@@ -1,67 +1,45 @@
 # 1. Aplicación y trazabilidad de requisitos y casos de uso
 
-## Fuente normativa y alcance
+## Alcance y propiedad
 
-La [SRS](../../../back/docs/requirements/requirements-specification/index.md), sus
-[reglas de trazabilidad](../../../back/docs/requirements/requirements-specification/05-requirement-traceability-rules.md)
-y las [fichas CU](../../../back/docs/requirements/use-cases/index.md) conservan
-qué debe hacer Nexus. Vue realiza esos objetivos con otros componentes. Migrar
-tecnología no crea otro actor ni otro caso de uso por cada componente o URL.
+El frontend tiene [especificación propia](02-client-specification.md) y fichas completas de interacción. Se puede entender la captura y el resultado de un caso Vue con sus fichas y documentos locales. La repetición de conceptos necesarios entre aplicaciones es admisible; cada descripción explica la responsabilidad y realización de su aplicación.
 
-Se aplica 29148 selectivamente para identificar, enlazar y revisar obligaciones.
-La estructura de las fichas es una convención del proyecto; no se atribuye a ISO
-la tabla de dos columnas ni se declara conformidad integral.
+Se aplica 29148 selectivamente para identificar obligaciones observables y conservar trazabilidad. Las tablas y numeración son convenciones del proyecto, no una plantilla impuesta por ISO. Los requisitos locales describen el cliente implementado y permanecen En revisión hasta la aceptación correspondiente.
 
-## Cadena que debe poder recorrerse
+## Identificadores y cadena de evidencia
 
-La revisión conserva `requisito → CU → realización Vue → DP → CP/prueba → EP`:
+La cadena es `requisito Vue → CU-VUE → módulo/código → DP → CP/prueba → EP`.
 
-| Elemento | Propietario y contenido |
+| Elemento | Contenido y propietario |
 | --- | --- |
-| `RF-*`, `RN-*`, `RD-*`, `RC-*` | Catálogo normativo de la SRS. No se cambian sus estados sólo porque compile Vue o pase una prueba simulada. |
-| `CU-*` | Ficha canónica: actor, disparador, precondiciones, flujo, alternativas/excepciones, postcondiciones y requisitos. |
-| Realización Vue | Guía del módulo y archivos del contenedor, composable, mapper y servicio. Describe cómo realiza el objetivo, sin convertir esos archivos en acciones del actor. |
-| `DP-*` | [Diseño de pruebas](../testing/01-test-design.md): riesgo/requisito, nivel, técnica, condición y oráculo. |
-| `CP-*` o caso ejecutable | [Fichas críticas](../testing/02-test-cases.md), archivo/fixture y nombre exacto del caso. Las fichas selectivas añaden datos y pasos reproducibles. |
-| `EP-*` | Evidencia de una ejecución en CI o en la revisión: revisión de código, ambiente, fecha, resultado real, estado y defecto cuando exista. No se registra como aprobación permanente en estas guías. |
+| `RF-VUE-*` | Comportamiento funcional observable de la SPA. |
+| `RD-VUE-*` | Datos, identidad, versiones y contratos que conserva el cliente. |
+| `RN-VUE-*` | Interacción, seguridad, mantenibilidad y comportamiento asíncrono verificable. |
+| `RC-VUE-*` | Restricciones de tecnología, construcción, origen y publicación. |
+| `CU-VUE-*` | Actor, objetivo, datos, precondiciones, flujo, alternativas/excepciones y postcondiciones de una interacción. |
+| Realización | Páginas, componentes, composables, mappers y servicios del módulo. Los nombres de archivo no son pasos del actor. |
+| `DP-*` | Riesgo/requisito, técnica, nivel, condición y oráculo de prueba. |
+| `CP-*` / prueba ejecutable | Datos/fixture, pasos, resultado esperado y limpieza. El registro añade fichas a casos críticos sin transcribir cada `it`. |
+| `EP-*` | Ejecución: commit/estado local, ambiente, fecha, comando, resultado real y discrepancias. Vive en CI o revisión, no como aprobación perpetua de la ficha. |
 
-La [vista de cobertura](../testing/03-use-case-coverage.md) enlaza los IDs revisados
-con el cliente y declara límites. No replica el catálogo completo de obligaciones.
-Las demás pruebas permanecen especificadas por sus nombres, datos y aserciones.
+La [matriz de cobertura](../testing/03-use-case-coverage.md) permite recorrer la cadena local. Conserva además la relación con IDs existentes del producto (`CU-AUT-*`, `CU-ALM-*`, `CU-ENT-*`, `CU-SAL-*`, `CU-IDA-*`, `CU-CAT-*`) cuando aplica. Se explican los efectos compartidos en ambas aplicaciones; esos IDs no se renumeran por cambiar el renderizado.
 
-## Cómo aplicar las fichas de caso de uso
+## Cómo redactar y revisar un caso Vue
 
-Antes de modificar un flujo se revisan estos elementos del `CU-*` existente:
+1. Identificar actor, permiso y disparador. Sesión/permisos recibidos orientan la UI; la API autoriza cada petición.
+2. Describir qué captura y observa el actor. Separar esos pasos de props, callbacks, endpoints o métodos que los realizan.
+3. Especificar modo y campos editables/de consulta. Crear, editar, ajustar, surtir o devolver no son una única operación con campos opcionales arbitrarios.
+4. Indicar alternativas: cancelar, validación, conflicto, falla de conexión, rechazo de sesión y respuesta tardía, cuando correspondan al flujo.
+5. Declarar postcondición y ausencia de efectos: abrir un auxiliar o una confirmación no guarda el formulario principal.
+6. Enlazar implementación y pruebas locales; distinguir cliente simulado, navegador real y sistema con persistencia real.
+7. Revisar el requisito y sus consumidores si cambia el contrato; mantener IDs estables y registrar la diferencia en la matriz.
 
-1. **Actor y precondiciones:** sesión y permisos reales del servidor; el cliente
-   sólo decide navegación y presentación con el usuario recibido.
-2. **Flujo principal:** acciones y resultados visibles que deben conservarse.
-   Props, endpoints o callbacks son realización técnica, no pasos nuevos del actor.
-3. **Alternativas y excepciones:** datos inválidos, conflicto, fallo o rechazo
-   deben conservar sus efectos. Un comportamiento distinto de Vue se registra
-   como diferencia pendiente, no como equivalencia automática.
-4. **Postcondiciones:** una respuesta simulada demuestra el comportamiento del
-   cliente. Stock, auditoría, transacción y ausencia de escrituras parciales
-   necesitan evidencia del servidor y persistencia real cuando corresponda.
-5. **Requisitos relacionados:** conservar los IDs y añadir evidencia del cliente
-   sin sustituir la evidencia backend de la misma obligación.
+La renovación automática es soporte de los casos protegidos, no un objetivo nuevo por cada request. Un componente o modal reutilizado tampoco crea por sí mismo un caso de negocio distinto; `CU-VUE-012` documenta la colaboración visible de alta auxiliar y sus consumidores.
 
-Por ejemplo, `RF-AUT-002` es soporte interno de los casos protegidos; la renovación
-automática no requiere inventar otro objetivo del usuario. Del mismo modo, un
-modal de confirmación o un componente reutilizado no crea un `CU-*` independiente.
+## Aceptación y discrepancias
 
-## Diferencias y aceptación
+Una coincidencia de interfaces o un build correcto no demuestra equivalencia funcional. La API simulada comprueba la captura y respuesta del cliente; stock, auditoría, atomicidad y revocación real requieren evidencia de sistema/servidor.
 
-La revisión inicial encontró una diferencia concreta en
-[`CU-ALM-10`, alternativa A2](../../../back/docs/requirements/use-cases/catalogs/cu-alm-10.md):
-la ficha permite abrir Agregar stock desde el rechazo de duplicado, trasladando
-merma, cantidad y observaciones. Vue ahora ofrece esa transición tras un rechazo
-definitivo y con permiso de entrada. Cancelar conserva el alta; confirmar abre
-Agregar stock sin escribir, y una cantidad inicial cero deja la cantidad vacía.
-El composable y el contenedor realizan el flujo original, sin redefinir el CU.
-**BRE-VUE-001** conserva su seguimiento y evidencia en
-[cobertura](../testing/03-use-case-coverage.md#brechas-y-decisiones-pendientes).
+La transición de merma duplicada se describe íntegramente en `CU-VUE-007`: tras rechazo definitivo, cancelar conserva el alta; confirmar abre entrada con referencia/cantidad/observaciones y exige otro Guardar. Su seguimiento conserva `BRE-VUE-001` y las pruebas asociadas; no basta con enlazar la ficha del backend para afirmar que Vue lo realiza.
 
-Desarrollo verifica código y pruebas; el responsable funcional acepta el resultado
-conforme a gobernanza. Una brecha atendida no convierte toda la colección en aprobada:
-la documentación conserva sus límites y el estado de revisión.
+Desarrollo contrasta código y pruebas; la aceptación funcional/técnica registra responsable y evidencia. Atender una brecha no aprueba toda la colección. Las correspondencias generales del producto pueden consultarse como referencia complementaria en su documentación, sin sustituir estas fichas.

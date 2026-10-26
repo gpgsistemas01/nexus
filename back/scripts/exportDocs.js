@@ -134,7 +134,8 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('../front/docs/modules'),
                 ...getDirectoryDocuments('../front/docs/development'),
                 ...getDirectoryDocuments('../front/docs/requirements'),
-                ...getDirectoryDocuments('../front/docs/testing')
+                ...getDirectoryDocuments('../front/docs/testing'),
+                ...getDirectoryDocuments('../front/docs/governance')
             ]),
             'comportamiento-transversal': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/processes/index.md',
@@ -478,7 +479,8 @@ if (outputPlan.generatePdf) {
     }
 }
 
-const outputDirectory = path.join(ROOT, 'build/docs');
+const frontendOnly = publications.every(({ sources }) => sources.every((source) => source.startsWith('../front/docs/')));
+const outputDirectory = path.resolve(ROOT, frontendOnly ? '../front/build/docs' : 'build/docs');
 const documentOutputDirectories = {
     docx: path.join(outputDirectory, 'docx'),
     pdf: path.join(outputDirectory, 'pdf')

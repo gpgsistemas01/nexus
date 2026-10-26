@@ -4,15 +4,14 @@
 
 Describe para desarrollo la separación entre [identity](../../src/modules/identity)
 y [directory](../../src/modules/directory), relacionada con
-[IDA](../../../back/docs/requirements/use-cases/identity-access/index.md) y
-[CAT](../../../back/docs/requirements/use-cases/catalogs/index.md).
+los [casos Vue de registros e identidad](../requirements/03-access-and-record-use-cases.md#cu-vue-003).
 El alcance de la evidencia está en [pruebas de Identidad y Directorio](../testing/01-test-design.md#pruebas-de-identidad-y-directorio-comercial);
 la propiedad y los criterios documentales, en el [índice Vue](../index.md).
 
 ## Alcance y navegación
 
 Las cuatro pantallas usan rutas Vue, sesión de Express y permisos por operación.
-El menú mantiene el acordeón y la barra de iconos, sin enlaces a pantallas EJS.
+El menú presenta el acordeón y la barra de iconos con enlaces a las rutas Vue.
 
 | Grupo | Pantalla Vue | Acceso a la página |
 | --- | --- | --- |
@@ -24,7 +23,7 @@ El menú mantiene el acordeón y la barra de iconos, sin enlaces a pantallas EJS
 `/identidad` y `/directorio` seleccionan el primer enlace autorizado del grupo.
 Después del login, `/almacen` conserva la entrada compatible y elige el primer
 módulo autorizado entre los grupos disponibles. Una cuenta exclusiva de Clientes
-o Usuarios llega a su pantalla. Cada pantalla conserva el título «Tabla de…» de EJS.
+o Usuarios llega a su pantalla. Cada pantalla presenta el título «Tabla de…» del recurso.
 [Compras](06-purchases.md) reutiliza el editor de proveedores para altas rápidas.
 [Salidas](07-issues.md) conserva su módulo Vue separado. Los historiales se describen en
 [Movimientos en Vue](05-movements.md), separados de Identidad y Directorio.
@@ -36,14 +35,14 @@ o Usuarios llega a su pantalla. Cada pantalla conserva el título «Tabla de…�
 | Personas | Nombre completo y responsabilidades por área/rol. Filtros por nombre, área y rol. Una sola responsabilidad por área; requiere al menos una. | `persons:read`, `persons:write`, `person:reports-read`. |
 | Usuarios | Usuario, contraseña sólo al crear/cambiarla, y una asignación de área/rol. Muestra la persona vinculada como consulta. | `users:manage`; exportación: `admin:reports-read`. |
 | Clientes | Nombre y estado activo. Búsqueda, paginación, alta y edición. | `clients:read`, `clients:create`, `clients:update`, `client:reports-read`. |
-| Proveedores | Razón social, nombre comercial y estado activo. Búsqueda por cualquiera de los nombres, paginación, alta y edición. La columna Activo sigue la visibilidad de EJS (`catalogs:manage`). | `suppliers:read`, `suppliers:manage` para alta, `suppliers:update`, `supplier:reports-read`. |
+| Proveedores | Razón social, nombre comercial y estado activo. Búsqueda por cualquiera de los nombres, paginación, alta y edición. La columna Activo requiere `catalogs:manage`. | `suppliers:read`, `suppliers:manage` para alta, `suppliers:update`, `supplier:reports-read`. |
 
 Personas y Usuarios comparten grupo, pero mantienen formularios y contratos distintos.
 Una responsabilidad de persona no concede permisos a una cuenta. Editar un usuario
 omite `personId` y contraseña, conservando la vinculación existente; cambiar contraseña
 sólo envía la clave nueva y la versión original. No se guardan contraseñas en Storage.
-La vinculación de cuentas con personas permanece como dato de consulta, como en el
-formulario EJS vigente; no se incorpora otro proceso de vinculación.
+La vinculación de cuentas con personas se presenta como dato de consulta;
+la edición de cuenta conserva esa relación.
 
 Los selectores organizacionales usan `/api/admin/departments` y `/api/admin/roles`,
 con `departments:read` y `roles:read`. Buscan en servidor, paginan al desplazarse,
@@ -80,9 +79,8 @@ limpiarlo antes de exportar y el servicio también rechaza ese alcance, evitando
 presentar un archivo como si respetara un filtro que el servidor ignora.
 
 Proveedores captura razón social, nombre comercial y estado, conforme a `RF-CAT-010`.
-Se retiró el teléfono del formulario EJS y de sus instrucciones: no pertenece al
-contrato persistente ni es obligatorio para las operaciones actuales. Vue conserva
-los mismos campos admitidos. Clientes tampoco añade contactos o facturación que
+El teléfono no forma parte del formulario ni del contrato persistente.
+Vue captura los campos admitidos del recurso. Clientes tampoco añade contactos o facturación que
 aún no existen en el contrato.
 
 ## Arquitectura y reutilización

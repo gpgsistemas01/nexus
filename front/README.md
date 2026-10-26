@@ -4,8 +4,7 @@ Base de Vue 3 con TypeScript, componentes `.vue`, Composition API (`<script setu
 y Vite, creada con la plantilla oficial `create-vite`. El login en `/inicio-sesion`
 usa Vuetify y VeeValidate y está conectado a Express. Materiales, Consumibles y
 Mermas, los seis catálogos administrables, Personas, Usuarios, Clientes,
-Proveedores, Compras, Salidas y los historiales de Movimientos se sirven en Vue; los demás
-módulos conservan sus pantallas EJS en `back/`.
+Proveedores, Compras, Salidas y los historiales de Movimientos se sirven en Vue.
 
 ## Iniciar sesión
 
@@ -131,7 +130,7 @@ La página no encontrada se renderiza en el navegador; el fallback del servidor 
 responder HTTP 200. El fallback debe ir después de los rewrites de API y cierre de sesión para
 que el login funcione en producción. La autorización definitiva permanece en Express;
 las guardas de las rutas protegidas comprueban la sesión y orientan la navegación, sin sustituir
-los controles del servidor. `/almacen` debe resolver a Vue, no al proxy EJS.
+los controles del servidor. `/almacen` resuelve al cliente mediante Vue Router.
 
 Consulta [operaciones, reutilización y límites de Almacén](docs/modules/02-warehouse.md).
 
@@ -161,7 +160,7 @@ Consulta [las herramientas](docs/development/02-tooling.md),
 ## Arquitectura
 
 Se aplica contenedor/presentación, composición con composables y organización por
-módulos. Consulta [decisiones, límites y migración de EJS](docs/architecture/01-structure-and-boundaries.md).
+módulos. Consulta [decisiones y responsabilidades de Vue](docs/architecture/01-structure-and-boundaries.md).
 
 ## Pruebas de navegador
 
@@ -189,10 +188,31 @@ de ambas aplicaciones y PostgreSQL aislado/migrado: sigue la
 Express en 3107 y Vite en 5175; no reutiliza los procesos normales de desarrollo.
 La suite `test:e2e` conserva sus respuestas API simuladas y no requiere una base.
 
+## Documentación propia y publicación
+
+`front/docs` contiene especificación, casos de uso Vue, arquitectura, patrones con
+modelos generales y casos aplicados, módulos, estándar de código, plan/casos de
+prueba, inicio y despliegue. Las referencias al servidor complementan ese contenido.
+
+Desde la raíz:
+
+```bash
+npm --prefix front run docs:generate
+npm --prefix front run docs:check
+npm --prefix front run docs:export -- ambos
+```
+
+La referencia de código se genera desde SFC/TypeScript. El DOCX se guarda en
+`front/build/docs/docx/arquitectura/frontend-vue.docx` y el PDF en
+`front/build/docs/pdf/arquitectura/frontend-vue.pdf`. El motor común de publicación
+requiere Pandoc/LibreOffice para exportar, no para validar fuentes. Consulta la
+[preparación y límites](docs/governance/02-generation-and-publication.md).
+Estas fuentes, herramientas y artefactos permanecen fuera del contenedor de producción.
+
 ## Estructura
 
 - `docs/index.md`: entrada a las guías técnicas de Vue, con sus fuentes y criterios documentales.
-- `docs/architecture/`, `docs/patterns/`, `docs/modules/`, `docs/development/`, `docs/requirements/` y `docs/testing/`: colecciones con índice y capítulos propios. El paquete `arquitectura frontend-vue` publica estas mismas fuentes en DOCX/PDF; consulta [su validación](docs/index.md#mantenimiento-y-publicación).
+- `docs/architecture/`, `docs/patterns/`, `docs/modules/`, `docs/development/`, `docs/requirements/`, `docs/testing/` y `docs/governance/`: colecciones con índice y capítulos propios. El paquete `arquitectura frontend-vue` publica estas mismas fuentes en DOCX/PDF; consulta [su validación](docs/index.md#mantenimiento-y-publicación).
 - `src/App.vue`: muestra la página activa mediante `RouterView`.
 - `src/app/router/index.ts`: rutas y carga diferida de páginas.
 - `src/app/pages/NotFoundPage.vue`: página para direcciones desconocidas.

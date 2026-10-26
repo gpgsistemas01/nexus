@@ -81,3 +81,16 @@ desde un punto y la preparación de las sesiones se detallan en
 [Actualizar las capturas del manual](08-update-the-screenshots-of-the-manual.md#reanudación-y-capturas-selectivas).
 `--missing`, `--fresh`, la selección por identificador y la reanudación desde un punto son
 alternativas excluyentes.
+
+## Fuentes y publicación propias de Vue
+
+El frontend conserva documentación completa en `front/docs`, incluida su
+especificación, casos, estándar, plan de pruebas y modelos generales/aplicados de
+patrones. Desde la raíz se valida con `npm --prefix front run docs:check` y se
+publica con `npm --prefix front run docs:export -- ambos`.
+Una selección exclusiva `arquitectura frontend-vue` escribe DOCX/PDF y caché en
+`front/build/docs`. Las demás selecciones y publicaciones combinadas conservan
+`back/build/docs`. Compartir el motor no mueve ni elimina fuentes del backend.
+Los comandos frontend comprueban además que la referencia generada corresponda
+al código; su [guía propia](../../../../front/docs/governance/02-generation-and-publication.md)
+explica herramientas, formatos y exclusión de producción.

@@ -1,9 +1,9 @@
 # Pruebas del frontend Vue
 
 Esta colección documenta diseño, casos críticos y evidencia funcional del cliente.
-Aplica el [plan del sistema](../../../back/docs/testing/test-plan.md), que adapta
-29119-2, -3 y -4 sin declarar conformidad. Requisitos y casos de uso mantienen su
-[fuente normativa](../requirements/index.md).
+Aplica el [plan propio de Vue](05-test-plan.md), que adapta 29119-2, -3 y -4 sin
+declarar conformidad. Los [requisitos y casos de uso locales](../requirements/index.md)
+contienen su especificación y flujos completos.
 
 ## Capítulos
 
@@ -11,6 +11,7 @@ Aplica el [plan del sistema](../../../back/docs/testing/test-plan.md), que adapt
 2. [Registro selectivo de casos de prueba Vue](02-test-cases.md).
 3. [Cobertura Vue por caso de uso y brechas](03-use-case-coverage.md).
 4. [Preparar y ejecutar pruebas de sistema](04-system-tests.md).
+5. [Plan de pruebas del frontend Vue](05-test-plan.md).
 
 ## Niveles y oráculos
 

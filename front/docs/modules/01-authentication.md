@@ -3,7 +3,7 @@
 ## Propósito y fuentes
 
 Describe para desarrollo el acceso y la sesión de [auth](../../src/modules/auth).
-Realiza los [casos AUT](../../../back/docs/requirements/use-cases/authentication/index.md)
+Realiza los [casos Vue de acceso y sesión](../requirements/03-access-and-record-use-cases.md)
 y conserva la evidencia del cliente en [login.spec.ts](../../tests/e2e/login.spec.ts)
 y [sessionRecovery.spec.ts](../../tests/e2e/sessionRecovery.spec.ts). Los criterios y
 la propiedad documental se mantienen en el [índice Vue](../index.md).
@@ -11,7 +11,7 @@ la propiedad documental se mantienen en el [índice Vue](../index.md).
 ## Alcance y ejecución
 
 `/` redirige a `/inicio-sesion`. El login usa Vuetify y VeeValidate, conserva la
-tarjeta verde oscura y la distribución del EJS y envía las credenciales a Express.
+tarjeta verde oscura y envía las credenciales a Express.
 Al autenticar se abre `/almacen` mediante Vue Router: la guarda selecciona
 Materiales o Mermas según los permisos. Materiales, Consumibles y Mermas son Vue;
 El menú Vue incorpora también los [seis catálogos administrables](03-catalogs.md)
@@ -70,10 +70,9 @@ con la URL y el error de conexión del proxy, no sólo con el mensaje del navega
 - `composables/useLoginForm.ts` conecta VeeValidate, captura, envío y errores.
 - `services/authService.ts` adapta el contrato del login usando el cliente Axios compartido, con `requiresAuth: false`.
 
-Los colores, fondo, tarjeta y distribución se adaptaron de `loginPage.ejs` y de
-su sección de `style.css`; no se modifica el EJS ni se carga MDB en este login.
-El repositorio no contiene el `/img/logo.png` referenciado por el EJS: se usa una
-N provisional. Coloca una imagen en `front/public/` y define, por ejemplo,
+Los colores, fondo, tarjeta y distribución se definen en `LoginPage.vue`, el tema
+Vuetify y los estilos del cliente. Sin una imagen configurada se presenta una N.
+Coloca una imagen en `front/public/` y define, por ejemplo,
 `VITE_LOGIN_LOGO_URL=/logo.png` antes de arrancar o compilar. Un fallo de carga
 recupera la N. Los valores `VITE_*` son públicos y se incorporan al build.
 En Docker puedes pasar `--build-arg VITE_LOGIN_LOGO_URL=/logo.png`; la imagen debe
@@ -83,8 +82,7 @@ estar en `front/public/` antes de construir.
 
 Las reglas públicas del login se extrajeron a
 `back/src/public/js/utils/validations/loginValidation.js` sin cambiar su comportamiento.
-El formulario EJS importa ese módulo directamente. Los alias de
-Vite/TypeScript importan esa misma fuente y los mensajes públicos existentes;
+Los alias de Vite/TypeScript importan esa fuente y los mensajes públicos existentes;
 no hay una copia de las reglas en Vue ni se importa código privado de Express.
 
 VeeValidate comprueba campos obligatorios, tipo y longitudes máximas existentes.
@@ -124,9 +122,8 @@ HttpOnly/SameSite=Lax. En `NODE_ENV=production` llevan Secure y requieren HTTPS.
 Vue no lee ni guarda tokens. `createAuthSession` consulta `/api/auth/me`; la guarda
 protege las rutas de Almacén y Catálogos y comparte el usuario readonly mediante provide/inject.
 El cliente de solicitudes protegidas intenta una renovación ante `401`, nunca
-ante `403`, conflictos o errores de conexión. Las notificaciones `flash`
-HttpOnly del flujo EJS no se muestran en la pantalla Vue; el nuevo login muestra
-sus propios resultados de envío.
+ante `403`, conflictos o errores de conexión. El formulario muestra sus propios resultados de envío mediante
+el estado y los mensajes del cliente.
 
 ### Renovación automática y recuperación del acceso
 
@@ -135,7 +132,7 @@ Axios envía automáticamente `POST /api/auth/refresh`, compartido entre las con
 pendientes. Si la cookie HttpOnly de renovación sigue siendo válida, Express
 establece las cookies y devuelve `200 text/plain OK`; Axios repite una vez la
 consulta original. No se requiere pulsar un botón ni capturar credenciales.
-Es la misma API de renovación que consume EJS; no se implementa otra política de tokens.
+La renovación utiliza la política de tokens que administra Express.
 
 Si falla la conexión o el refresh devuelve 502, la pantalla de sesión no disponible
 conserva en `returnTo` la ruta solicitada, incluida su consulta y fragmento.
@@ -160,7 +157,7 @@ sola que la renovación no se ejecutó.
 ## Proxy y despliegue
 
 Vite y Nginx encaminan `/api` y el POST `/cerrar-sesion` a Express. Este último
-limpia las cookies y redirige al login Vue, sin montar una vista EJS.
+limpia las cookies y redirige al login Vue.
 `/inicio-sesion`, `/almacen` y los assets compilados pertenecen a Vue. Esto permite
 seguir usando el mismo origen y las cookies actuales sin habilitar CORS ni
 trasladar tokens al almacenamiento del navegador. `npm run preview` usa el mismo
@@ -194,7 +191,7 @@ para las fuentes públicas compartidas; conserva el repositorio completo al cons
 
 ## Arquitectura y estándares revisados
 
-Se aplica el [estándar de codificación del repositorio](../../../back/docs/architecture/coding-standards/index.md):
+Se aplica el [estándar de codificación del repositorio](../development/03-coding-standards.md):
 cuatro espacios en fuentes/configuración, dos en pruebas, imports desde el módulo
 propietario, booleanos con prefijo y sentencias y bloques legibles. El formulario
 expresa cambios mediante eventos `update:<prop>`; la página conecta esos eventos

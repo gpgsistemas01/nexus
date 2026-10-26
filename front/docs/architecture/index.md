@@ -11,6 +11,8 @@ responsabilidades propias de Vue, no una copia de capas de Express.
 2. [Modelo para documentar la arquitectura web de Vue](02-web-views.md).
 3. [Interfaz Vue, HTTP y ubicación de las pruebas](03-ui-and-http.md).
 4. [Entradas, normalización y salida segura en Vue](04-input-security.md).
+5. [Referencia técnica generada del código Vue](05-code-reference.md).
+6. [Contratos consumidos por Vue](06-client-contracts.md).
 
 ## Relación con otras fuentes
 

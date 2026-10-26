@@ -166,6 +166,9 @@ jobs:
       - name: Check frontend formatting
         run: npm run format:check
 
+      - name: Verify Vue documentation and generated reference
+        run: npm run docs:check
+
       - name: Test frontend components and navigation
         run: npm run test:unit -- --reporter=default --reporter=junit --outputFile=build/test-results/unit.xml
 

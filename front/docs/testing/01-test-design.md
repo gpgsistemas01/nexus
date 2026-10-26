@@ -4,8 +4,9 @@ Estos diseños selectivos conservan los IDs `DP-*` y grupos `CP-*` existentes.
 No equivalen a fichas completas de cada caso automatizado. Las
 [fichas críticas](02-test-cases.md) añaden estado inicial, datos, pasos, resultado
 y limpieza; la [cobertura por caso de uso](03-use-case-coverage.md) distingue
-regla del cliente, persistencia y brechas. El plan normativo del sistema está en
-[back/docs/testing](../../../back/docs/testing/test-plan.md).
+regla del cliente, persistencia y brechas. El [plan propio del frontend](05-test-plan.md) define alcance, niveles, técnicas,
+preparación, criterios y evidencia. La [especificación local](../requirements/02-client-specification.md)
+y las fichas `CU-VUE-*` contienen las obligaciones observables del cliente.
 
 ## Fichas selectivas vinculadas
 
@@ -45,7 +46,7 @@ criptográfica de JWT ni sustituye las integraciones de Express/Prisma.
 
 | Diseño / riesgo | Nivel y técnica | Resultado observable |
 | --- | --- | --- |
-| `DP-VUE-SESSION-001`: pérdida de renovación automática al migrar de EJS | Navegador; transición access token rechazado → refresh válido/inválido | 401 de `/me` dispara un único refresh; el texto `OK` y Set-Cookie permiten repetir la consulta sin login. Un refresh 401 abre el login con destino y sin bucle. |
+| `DP-VUE-SESSION-001`: pérdida de renovación automática de sesión | Navegador; transición access token rechazado → refresh válido/inválido | 401 de `/me` dispara un único refresh; el texto `OK` y Set-Cookie permiten repetir la consulta sin login. Un refresh 401 abre el login con destino y sin bucle. |
 | `DP-VUE-SESSION-002`: reintento sin resultado ni contexto | Navegador; servidor/refresh 502 → reintento fallido/servidor recuperado y decisiones de permiso | Se conserva ruta, query y fragmento incluso al recargar la pantalla de error. El botón informa espera y fallo, evita duplicados y recupera la ruta original. Revalidar permisos vuelve al módulo solicitado. |
 | `DP-VUE-SESSION-003`: retorno externo o cíclico | Unitario, `tests/unit/app/protectedDestinationTest.ts`; particiones de destino | Sólo se conservan rutas protegidas registradas; externos, arrays, rutas desconocidas, login y error vuelven a la entrada autorizada. |
 
@@ -72,7 +73,7 @@ El login operativo tiene pruebas en
 
 | ID de diseño / casos | Nivel y técnica | Condición y resultado esperado |
 | --- | --- | --- |
-| `DP-VUE-AUTH-001` / `CP-VUE-AUTH-001` | Unitario; particiones y fronteras de captura | El formulario con VeeValidate bloquea el envío con vacíos o longitud 51 y lo permite con 50 contando caracteres Unicode; contraseña histórica corta admitida y espacios conservados. Se reutiliza la misma regla pública que EJS. |
+| `DP-VUE-AUTH-001` / `CP-VUE-AUTH-001` | Unitario; particiones y fronteras de captura | El formulario con VeeValidate bloquea el envío con vacíos o longitud 51 y lo permite con 50 contando caracteres Unicode; contraseña histórica corta admitida y espacios conservados. Se aplica la regla pública del login. |
 | `DP-VUE-AUTH-002` / `CP-VUE-AUTH-002` | Unitario y navegador con API simulada; transiciones | Captura inválida no envía; 400 muestra campo; 401 genérico, 429/red/5xx recuperables; sólo SUCCESS_LOGIN navega. Pendiente bloquea duplicados y el fallo permite reintentar sin refresh. 401/429 conservan su mensaje aunque el proxy devuelva HTML; códigos desconocidos no se muestran como mensajes de campo. |
 | `DP-VUE-AUTH-003` / `CP-VUE-AUTH-003` | Unitario y navegador; decisiones recordar/no recordar y almacenamiento disponible/bloqueado | Sólo se guarda usuario después del éxito; nunca contraseña/tokens; recarga recupera usuario y deja contraseña vacía. Bloqueo no impide acceso. Fallo de navegación posterior no se transforma en credenciales rechazadas. |
 | `DP-VUE-AUTH-004` / `CP-VUE-AUTH-004` | Navegador; entrada directa/recarga y particiones escritorio/móvil | Login visible a 1280/390/320 px sin desbordamiento; regreso desde ruta desconocida muestra formulario con el proveedor Vuetify instalado al arrancar. |
@@ -269,7 +270,7 @@ en ambas variantes.
 
 | Diseño | Riesgo y técnica | Condición y evidencia |
 | --- | --- | --- |
-| `DP-VUE-MSG-001` | Código ausente o de otra operación tratado como éxito; particiones de respuesta | `recordContractTest.ts` rechaza código omitido, genérico o de otra operación; conserva el código recibido y traduce el mismo texto de EJS sin usar un mensaje HTML ajeno. |
+| `DP-VUE-MSG-001` | Código ausente o de otra operación tratado como éxito; particiones de respuesta | `recordContractTest.ts` rechaza código omitido, genérico o de otra operación; conserva el código recibido y traduce el texto del catálogo público sin usar un mensaje HTML ajeno. |
 | `DP-VUE-COM-003` | Corrección sin confirmar, pérdida de captura o totales incompletos; transiciones y particiones | `purchaseTest.ts` cubre sin cambios, cancelación, confirmación, cantidades positivas y resumen sin detalles cancelados. `purchases.spec.ts` comprueba estimación visible, cancelar sin request y confirmar una sola escritura. |
 | `DP-VUE-REP-001` | Reporte inválido o denegado y cierre silencioso tras un error; decisiones por alcance y permiso | `reportScopeTest.ts` valida mes antes del request, impide exportar sin permiso y conserva el diálogo tras un fallo. Compras y Movimientos conservan recorridos de descarga en navegador. |
 

@@ -15,4 +15,24 @@ convenciones y criterios de migración. Los comandos npm se ejecutan en `front/`
 - Componentes PascalCase `.vue`, composables `useNombre.ts` y `<script setup lang="ts">`.
   Los imports relativos de módulos TypeScript conservan `.js`, resuelto al `.ts`
   por TypeScript/Vite; los componentes se importan con `.vue`.
-- Ejecuta `npm run check` (ESLint, pruebas y compilación con tipos) y el flujo afectado; no modifiques EJS para una tarea sólo Vue.
+- Ejecuta `npm run check` (ESLint, pruebas y compilación con tipos) y el flujo afectado; limita una tarea Vue a su ámbito de código y documentación.
+
+## Documentación propia
+
+- Describe directamente la implementación Vue; evita comparaciones con otras
+  tecnologías de presentación y referencias a pantallas que no pertenecen al cliente.
+
+- `docs/requirements` contiene especificación y casos Vue completos; los enlaces a
+  documentos backend son complementarios. Repetir conceptos necesarios es válido,
+  adaptándolos a responsabilidades, captura y contratos del cliente.
+- Consulta `docs/development/03-coding-standards.md` y `docs/testing/05-test-plan.md`
+  para el estándar y la estrategia específicos de Vue.
+- No edites manualmente `docs/architecture/05-code-reference.md`: regenera con
+  `npm run docs:generate` al cambiar archivos/imports/contratos de `src`.
+- Ejecuta `npm run docs:check`. Publica con `npm run docs:export -- ambos`; las
+  fuentes y resultados pertenecen a `front/docs` y `front/build/docs`.
+- Cada patrón aplicado conserva modelo general y diagrama específico con fuentes,
+  contratos y pruebas. Revisa las figuras de cada consumidor afectado, sin copiar
+  patrones de Express que no existan en Vue.
+- Conserva el motor Mermaid común y valida figuras/exportación representativa al
+  cambiarlas. La documentación y herramientas no se incluyen en producción.

@@ -3,8 +3,8 @@
 El [índice documental Vue](../index.md) declara audiencia, fuentes propietarias,
 correspondencia con requisitos y criterios adoptados para describir el diseño.
 Esta guía conserva las decisiones de organización e integración del cliente.
-La [adaptación documental a Vue](../index.md#diferencias-que-deben-conservarse-frente-a-ejs-y-express)
-distingue qué conceptos se conservan y cuáles cambian respecto de EJS/Express.
+La [adaptación documental a Vue](../index.md#criterios-de-la-implementación-vue)
+explica los criterios propios de componentes, estado y contratos del cliente.
 El [modelo documental web](02-web-views.md) justifica el uso selectivo de C4
 dentro de 4+1 y lo distingue de SPA, cliente-servidor, MVC/MVVM y arc42.
 
@@ -76,7 +76,7 @@ cada módulo adapta el resultado a su flujo.
 `modules/<dominio>/` agrupa páginas, componentes y lógica de la misma capacidad.
 Al migrar operaciones se conservan los dominios actuales: autenticación, administración,
 ventas y almacén, con materiales, compras y salidas dentro de almacén. El módulo `catalogs` incorpora
-los seis catálogos administrables de EJS; su [contrato y responsabilidades](../modules/03-catalogs.md)
+los seis catálogos administrables; su [contrato y responsabilidades](../modules/03-catalogs.md)
 se mantienen por separado de inventario.
 `pages/`, `components/` y `composables/` existen cuando hay implementación concreta;
 no se crean árboles vacíos. Una pieza usada sólo en un módulo permanece en él.
@@ -106,9 +106,9 @@ La [guía de patrones y SOLID](../patterns/01-applicability-and-principles.md) d
 el diagrama de dependencias y los límites de cada principio. El tratamiento de
 capturas, mensajes y datos recibidos pertenece a [entradas y salida segura](04-input-security.md).
 
-## Adaptación del frontend EJS
+## Realización del cliente Vue
 
-LoginPage conserva fondo, tarjeta y disposición del login EJS. LoginForm presenta
+LoginPage compone el fondo, la tarjeta y la disposición del acceso. LoginForm presenta
 controles Vuetify mediante props/eventos; useLoginForm conecta las reglas públicas
 a VeeValidate y controla estado, errores y envío. “Recordar usuario” nunca persiste
 contraseñas y no cambia la duración de las cookies. No se agrega Pinia para este
@@ -144,27 +144,21 @@ No se incorpora un generador universal de formularios. Las tres rutas crean esta
 independiente y desmontan consultas, temporizadores y capturas al cambiar de módulo.
 
 Las reglas del login se mantienen en `back/src/public/js/utils/validations/loginValidation.js`,
-importadas directamente por el formulario EJS. Vite y TypeScript las resuelven mediante
+que Vite y TypeScript resuelven mediante
 alias junto con los mensajes públicos. Esto exige conservar las fuentes compartidas
 al compilar y usar la raíz como contexto del Dockerfile frontend. La imagen final
 contiene sólo assets y Nginx. El backend continúa construyéndose por separado.
 
-- `back/src/views/pages` se transforma en páginas y composición Vue; los parciales
-  reutilizables de `views/shared` orientan los componentes visuales.
-- `public/js/pages`, formularios y modales se adaptan al estado reactivo y al ciclo
-  de vida de Vue. No se copia el control manual del mismo DOM junto al renderizado Vue.
-- `public/js/application` puede conservar adaptadores puros y coordinación independientes
-  del DOM. Los servicios HTTP requieren importar sus dependencias y configurar el origen
-  de la API, incluyendo la renovación de sesión.
-- `public/js/ui/forms/formUI.js` usa eventos, selectores y plugins: su `useForm` no
-  es un composable Vue y necesita adaptación, no sólo un cambio de carpeta.
-- Las dependencias de DataTables y Select2 se sustituyen o encapsulan controlando montaje,
-  actualización y limpieza. Un plugin y Vue no deben administrar simultáneamente el mismo DOM.
-- Se conservan los contratos de errores, expectedVersion y operationId cuando correspondan.
-  El backend valida permisos, reglas y valores derivados aunque la interfaz los anticipe.
-- Las reglas públicas de `back/src/shared` deben conservar un propietario único; no se
-  duplican como otra copia en `front/src/shared`. Un paquete común requerirá ajustar
-  dependencias y contextos de construcción. No se publica código privado del backend.
+Los formularios y diálogos pertenecen a las páginas y componentes del módulo.
+Los composables coordinan captura, selección y operaciones asíncronas; las
+funciones puras construyen valores/payloads y los servicios adaptan el transporte.
+Vue gestiona el DOM, y cada instancia libera sus consultas y temporizadores al
+desmontar. Los contratos de errores, `expectedVersion` y `operationId` conservan
+su significado cuando corresponden a la operación.
+
+Las reglas públicas de `back/src/shared` conservan un propietario de código único.
+Sus consumidores Vue se explican en estas guías y se compilan mediante alias; no
+se publica código privado del servidor. La API valida permisos y valores derivados.
 
 El tema y los defaults se centralizan en `app/plugins/vuetify.ts` y `shared/ui/controlDefaults.ts`.
 La [guía de interfaz](03-ui-and-http.md#estilos-y-controles-adaptados-a-vue) documenta
@@ -196,7 +190,7 @@ contador, error y reintento; botones, mensajes, filtros y tablas entran por slot
 Catálogos, Identidad y Directorio componen su búsqueda sobre `ListFilters`; Almacén
 y Movimientos aportan sus filtros propios sobre ese mismo acordeón y ocultan el
 buscador interno del panel. Los títulos conservan su texto y reciben la misma
-presentación que el encabezado original de EJS. El contador se omite si no hay
+presentación de encabezado del tema del cliente. El contador se omite si no hay
 permiso para consultar el listado.
 `RecordEditorDialog` comparte los errores, el marco de campos y la recuperación
 de conflictos sobre `EditorDialog`, conservando la nota y el texto de recarga de
@@ -248,7 +242,7 @@ reglas, permisos y recuperación. Consulta [Catálogos](../modules/03-catalogs.m
 Componentes `.vue` en PascalCase, composables `useNombre.ts` y funciones con exports
 nombrados. Imports relativos de módulos con `.js` (resuelto al fuente `.ts` por TypeScript/Vite);
 componentes con `.vue`. Se usa `<script setup lang="ts">` y props/eventos tipados. El formato y los nombres se rigen por el
-[estándar de codificación](../../../back/docs/architecture/coding-standards/index.md),
+[estándar de codificación](../development/03-coding-standards.md),
 incluida su sección de Vue/TypeScript; no se define un estándar paralelo aquí.
 Los componentes de presentación no importan clientes HTTP ni almacenes de sesión.
 Las suscripciones, temporizadores y plugins se liberan al desmontar cuando corresponda.

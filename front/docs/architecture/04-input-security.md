@@ -13,11 +13,13 @@ el significado de la captura y tratarla como dato en todo el recorrido.
 | --- | --- | --- |
 | Normalización | El modelo del formulario recorta texto cuando su contrato lo indica y construye el payload permitido. | Validators y DTOs vuelven a normalizar el contrato antes de usarlo. |
 | Validación | VeeValidate ejecuta reglas públicas para orientar la captura y presentar errores. | Express valida incluso si se omite Vue y resuelve permisos, relaciones, versiones y estado. |
-| Escape de salida | Interpolación/props de texto y SweetAlert2 `titleText`/`text`. | JSON con tipo de respuesta correcto; EJS usa escape HTML o serializador específico para JSON en scripts. |
+| Escape de salida | Interpolación/props de texto y SweetAlert2 `titleText`/`text`. | JSON con tipo de respuesta correcto; la API devuelve datos, sin construir el DOM del cliente. |
 | Sanitización HTML | No hay consumidor que la necesite. No se usa `v-html`. | Tampoco se transforman nombres en HTML “limpio”. Un futuro editor enriquecido necesita contrato propio. |
 
-La fuente normativa y el diagrama de las fronteras están en
-[el estándar del servidor](../../../back/docs/architecture/coding-standards/09-errors-security-audit-and-logging.md#fronteras-de-una-escritura-de-formulario).
+El [estándar Vue](../development/03-coding-standards.md) y los
+[contratos del cliente](06-client-contracts.md) describen estas fronteras desde la
+captura, construcción de payloads y presentación del resultado. Las reglas y sus
+límites se explican aquí aunque los predicados públicos vivan junto al servidor.
 La separación de estas operaciones sigue [OWASP: prevención de XSS](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html).
 
 ## Captura y transporte existentes
@@ -25,7 +27,7 @@ La separación de estas operaciones sigue [OWASP: prevención de XSS](https://ch
 ### Qué reglas se pueden compartir
 
 La revisión parte de los alias de [Vite](../../vite.config.ts), sus imports transitivos
-y los consumidores de Vue/EJS. Los módulos alcanzados están en `back/src/public`
+y los consumidores del cliente. Los módulos alcanzados están en `back/src/public`
 o `back/src/shared`; no importan servicios privados, Prisma, middleware Express
 ni bibliotecas de Node. Esa compatibilidad permite compilarlos para el navegador,
 pero no convierte cualquier regla de negocio en información pública.
@@ -67,7 +69,7 @@ de validación termine absorbiendo toda la aplicación:
 
 Los [cálculos de Compras](../../../back/src/shared/inventory/goodsReceiptCalculations.js)
 y [Mermas](../../../back/src/shared/inventory/wasteMeasurements.js) ya son públicos
-y se usan en EJS/Vue. Para persistir, [goodsReceiptHelpers](../../../back/src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js)
+y se usan para la vista previa de Vue. Para persistir, [goodsReceiptHelpers](../../../back/src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js)
 resuelve el material desde la BD y vuelve a calcular importes;
 [wasteHelpers](../../../back/src/services/warehouse/wastes/wasteHelpers.js) resuelve
 pesos/medidas usando la oferta y su material. No se deben agregar fórmulas que
@@ -106,7 +108,7 @@ adaptación a `express-validator` permanece en Express. Metadatos, cálculos y
 configuración de Salidas conservan exports o módulos propios.
 
 La ubicación actual funciona durante la compilación: Vite incorpora esos módulos
-en `dist`. Una extracción debe actualizar imports de EJS, Vue y servidor,
+en `dist`. Una extracción debe actualizar imports de los consumidores, Vue y API,
 TypeScript/Vite, pruebas, Docker y configuración de compilación de las plataformas.
 Los contenedores de ejecución pueden seguir separados. Esta clasificación no
 convierte la propuesta de paquete en una dependencia ya implementada.

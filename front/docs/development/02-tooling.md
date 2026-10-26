@@ -102,7 +102,7 @@ Para el formato usa `npm --prefix front run format` desde la raíz, o
 En VS Code se puede elegir la extensión Prettier como formateador de Vue y TypeScript
 y activar «Format on Save»; la configuración versionada determina el resultado.
 No hace falta la extensión para ejecutar los comandos ni para CI. El alcance
-es código, pruebas y configuración del frontend; no reformatea EJS ni el backend.
+es código, pruebas, herramientas y configuración del frontend.
 
 ## Automatización y Docker
 

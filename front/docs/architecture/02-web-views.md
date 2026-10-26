@@ -42,7 +42,7 @@ Las flechas representan interacción o comunicación, no orden de arranque.
 flowchart TB
     user["Usuario autorizado"]
     user -->|interactúa| spa
-    spa["Frontend Vue<br/>SPA en el navegador"] -->|API mediante proxy HTTP| api["Express<br/>API y vistas EJS existentes"]
+    spa["Frontend Vue<br/>SPA en el navegador"] -->|API mediante proxy HTTP| api["Express<br/>API de la aplicación"]
     api -->|consultas y transacciones| db[("PostgreSQL")]
 ```
 

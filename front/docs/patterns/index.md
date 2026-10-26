@@ -15,6 +15,7 @@ La [evaluación de aplicabilidad](01-applicability-and-principles.md) conserva l
 6. [Provisión de sesión e inyección](06-session-provision.md).
 7. [Fábricas funcionales de esquemas](07-schema-factories.md).
 8. [Responsabilidades y nombres de Salidas y Compras](08-document-responsibilities.md).
+9. [Altas contextuales: modelo y casos de Inventario, Compras y Salidas](09-contextual-creation.md).
 
 ## Notación y mantenimiento
 

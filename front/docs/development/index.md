@@ -9,12 +9,14 @@ de pruebas no sustituya un procedimiento ejecutable.
 
 1. [Preparar e iniciar el proyecto Vue](01-getting-started.md).
 2. [Herramientas del frontend](02-tooling.md).
+3. [Estándar de codificación Vue y TypeScript](03-coding-standards.md).
+4. [Compilación y despliegue](04-build-and-deployment.md).
 
 ## Contratos de estas guías
 
 El inicio declara requisitos, directorios, variables locales, comandos y resultados
 esperados; no ejecuta migraciones ni configura cuentas al leerlo. El
-[diseño y las fichas](../testing/index.md) aplican el plan del sistema
+[diseño y las fichas](../testing/index.md) aplican el [plan local](../testing/05-test-plan.md)
 para separar diseño, caso y resultado. Las fuentes ejecutables permanecen en
 [tests](../../tests), los resultados de ejecución en CI o en la revisión del cambio.
 Los manifiestos y configuraciones conservan versiones y comandos reales.

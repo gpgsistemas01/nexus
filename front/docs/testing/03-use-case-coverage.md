@@ -2,17 +2,39 @@
 
 ## Alcance y lectura
 
-Esta vista resume la evidencia **del cliente** y enlaza requisitos, casos de uso,
-diseños y pruebas. Complementa la [cobertura HTTP/Prisma](../../../back/docs/testing/use-case-test-types.md)
-sin cambiar sus estados ni repetir la SRS. `RF-*` y `RN-*` se consultan en el
-[catálogo normativo](../../../back/docs/requirements/requirements-specification/04-unified-catalog-by-scope/index.md).
+Esta vista relaciona la [especificación propia](../requirements/02-client-specification.md),
+las fichas locales, realización y evidencia. La correspondencia con requisitos/CU
+del producto es complementaria; no hace falta abrirlos para entender el flujo Vue.
+Las pruebas simuladas no demuestran persistencia o autorización del servidor.
 
 **Evidencia de cliente** significa que existe el archivo con sus aserciones;
 **parcial** indica una condición, recurso o resultado sin evidencia suficiente;
 **brecha** distingue falta de prueba y diferencia funcional. Ninguna etiqueta
 significa aceptación ni una ejecución aprobada; eso corresponde a `EP-*`.
 
-## Correspondencias revisadas
+## Trazabilidad propia del cliente
+
+Los IDs abreviados de la primera columna pertenecen a `RF-VUE-*`; los de la segunda,
+a `CU-VUE-*`. Una fila con varios IDs no declara que una prueba cubra por completo
+cada requisito: la condición exacta y el límite permanecen en DP/CP y sus aserciones.
+Los requisitos de datos, calidad y restricciones se verifican también mediante
+los diseños de selección, contratos, seguridad, recuperación y compilación.
+
+| RF-VUE | CU-VUE | Realización | Evidencia relevante |
+| --- | --- | --- | --- |
+| 001/002 | [001](../requirements/03-access-and-record-use-cases.md#cu-vue-001) | auth, sesión y transporte | login.spec.ts, sessionRecovery.spec.ts; sistema representativo |
+| 003/004 | [002](../requirements/03-access-and-record-use-cases.md#cu-vue-002) | app y listados | navegación, warehouse/catalogs/records y filtros |
+| 005 | [003/004](../requirements/03-access-and-record-use-cases.md#cu-vue-003) | catalogs, directory, identity | catalogs.spec.ts, records.spec.ts y unitarias de editores |
+| 006 | [006/008](../requirements/04-inventory-and-document-use-cases.md#cu-vue-006) | warehouse | inventoryFormTest.ts y warehouse.spec.ts |
+| 007/008 | [007/008](../requirements/04-inventory-and-document-use-cases.md#cu-vue-007) | merma y recuperación | wasteDuplicateRecoveryTest.ts, inventoryFormTest.ts y warehouse.spec.ts |
+| 009 | [009](../requirements/04-inventory-and-document-use-cases.md#cu-vue-009) | purchases | purchaseTest.ts y purchases.spec.ts |
+| 010 | [010/011](../requirements/04-inventory-and-document-use-cases.md#cu-vue-010) | issues | issueTest.ts e issues.spec.ts en los tres recursos |
+| 011/013 | [013](../requirements/04-inventory-and-document-use-cases.md#cu-vue-013) | movements y reportes | movements.spec.ts, reportScopeTest.ts; XLSX reales representativos en sistema |
+| 012 | [012](../requirements/04-inventory-and-document-use-cases.md#cu-vue-012) | Workspaces y selectores | selectCreation.spec.ts, selectedOptionTest.ts y formularios del dominio |
+| 014 | [005](../requirements/03-access-and-record-use-cases.md#cu-vue-005) | sesión y navegación | sessionRecovery.spec.ts; cierre/refresh reales en sistema |
+
+## Correspondencia complementaria con el producto
+
 
 | Objetivo / requisito | Casos canónicos | Realización y evidencia Vue | Alcance y límite |
 | --- | --- | --- | --- |

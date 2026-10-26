@@ -2,15 +2,16 @@
 
 ## Propósito y fuentes
 
-Describe para desarrollo la configuración de [catalogs](../../src/modules/catalogs)
-para `CU-CAT-09..26` del [catálogo normativo](../../../back/docs/requirements/use-cases/catalogs/index.md).
+Describe para desarrollo los seis recursos administrables de [catalogs](../../src/modules/catalogs),
+con el [caso Vue de mantenimiento](../requirements/03-access-and-record-use-cases.md#cu-vue-003).
+`CU-CAT-09..26` conserva la correspondencia del producto; la captura y el flujo del
+cliente se explican en estas guías locales.
 La evidencia del cliente está en [catalogs.spec.ts](../../tests/e2e/catalogs.spec.ts).
 El [índice Vue](../index.md) conserva audiencia, fuentes y criterios de mantenimiento.
 
 ## Alcance y acceso
 
-La sección «Catálogos» del menú Vue agrupa las mismas seis páginas administrables
-que EJS. Se conserva el menú compacto, la apertura por clic, el cierre al pulsar
+La sección «Catálogos» agrupa seis páginas administrables y usa el menú compacto, la apertura por clic, el cierre al pulsar
 fuera y la navegación móvil. Cada enlace y ruta requiere `catalogs:manage`;
 Express verifica ese permiso en todas las lecturas y escrituras administrativas.
 Una cuenta con acceso exclusivo a catálogos llega a Áreas después del login.
@@ -35,12 +36,12 @@ muestra la página no encontrada sin consultar un recurso arbitrario.
 
 Se ejecuta con los comandos de [Almacén](02-warehouse.md#acceso-y-alcance): Express
 sirve la API y Vite las vistas Vue. El proxy sólo deriva `/api` y cierre de sesión;
-no se navega hacia vistas EJS desde estos enlaces.
+las rutas de página se resuelven mediante Vue Router.
 
 ## Contratos y validación
 
 `back/src/shared/constants/catalogs.js` concentra únicamente etiquetas, campos y
-longitudes públicas, antes visibles en el contexto del formulario EJS. Express
+longitudes públicas utilizadas por los formularios. Express
 combina ese contrato con los modelos y claves internas de `back/src/constants/catalogs.js`.
 Vue importa la parte pública mediante `@nexus/catalogs`, sin acceder a Prisma ni
 importar el registro privado del servidor. El Dockerfile frontend copia ese archivo
