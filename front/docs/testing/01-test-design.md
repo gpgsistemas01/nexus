@@ -326,3 +326,16 @@ Los casos de navegador usan los componentes Vuetify reales con API simulada.
 No sustituyen integraciones de persistencia ni declaran probado cada modo de edición.
 Las guardas de rutas permanecen aisladas de los controles visuales en unitarias;
 su doble apunta al contenedor `InventoryWorkspace`, que ahora compone los módulos.
+
+## Selección y separación del editor
+
+| Diseño | Riesgo, nivel y técnica | Condición y evidencia |
+| --- | --- | --- |
+| `DP-VUE-SEL-002` | Mostrar una etiqueta ajena al ID o perder datos al recargar; unitario, transiciones precarga → remoto → página distinta, cambio/limpieza de ID y precarga tardía. | `selectedOptionTest.ts` comprueba actualización de nombre/estado/datos, conservación fuera de página, descarte al limpiar/cambiar y estado independiente por formulario. No autoriza ni persiste registros. |
+
+La extracción de `useInventorySelection` conserva la cobertura de
+`inventoryFormTest.ts` para limpieza de medidas y proveedor/plantilla, bloqueo de
+captura pendiente, reintentos e identidad/versiones. `purchaseTest.ts` e
+`issueTest.ts` conservan precarga de documentos, altas recientes y formularios de
+consulta. Los recorridos de navegador existentes comprueban los consumidores
+reales de `RemoteSelect`, incluidos filtros y altas contextuales con API simulada.

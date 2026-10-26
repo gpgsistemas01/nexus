@@ -1,4 +1,4 @@
-import { computed, shallowRef, onBeforeUnmount } from 'vue';
+import { computed, onBeforeUnmount } from 'vue';
 import { useForm } from 'vee-validate';
 import { addGoodsReceiptMaterialValidation } from '@nexus/form-validation';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
@@ -41,12 +41,7 @@ export const usePurchaseLineEntry = (options: {
             }),
         computed(() => options.canRead),
     );
-    const seed = shallowRef<LookupItem>();
-    const selected = useSelectedOption(items.items, () => form.values.materialId);
-    const item = computed(
-        () =>
-            selected.value ?? (seed.value?.id === form.values.materialId ? seed.value : undefined),
-    );
+    const item = useSelectedOption(items.items, () => form.values.materialId);
     const interaction = useFormInteraction<Field, string>(form, {
         isDisabled: () =>
             !options.canRead || options.isDisabled() || isDisposed || form.isSubmitting.value,
@@ -65,7 +60,7 @@ export const usePurchaseLineEntry = (options: {
             return;
         }
 
-        seed.value = created;
+        item.value = created;
         interaction.update('materialId', created.id);
         items.updateSearch('');
         void items.refresh();

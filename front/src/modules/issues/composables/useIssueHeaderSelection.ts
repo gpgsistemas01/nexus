@@ -1,4 +1,4 @@
-import { computed, watch, shallowRef } from 'vue';
+import { computed, watch } from 'vue';
 import { PERMISSIONS } from '@nexus/permissions';
 import {
     isInternalClientName,
@@ -33,11 +33,6 @@ export const useIssueHeaderSelection = (options: {
             issueLookupService.list('departments', options.resource, search, page, signal),
         computed(() => options.isEnabled() && canReadDepartments.value),
     );
-    const selectedClient = useSelectedOption(clients.items, () => options.values.clientId);
-    const selectedDepartment = useSelectedOption(
-        departments.items,
-        () => options.values.departmentId,
-    );
 
     const createInitialOption = (id: string, title: string): LookupItem => ({
         id,
@@ -46,16 +41,25 @@ export const useIssueHeaderSelection = (options: {
     });
 
     const issueDocument = options.document;
-    const createdClient = shallowRef<LookupItem>();
-    const initialOptions = computed(() => ({
-        clientId:
-            createdClient.value ??
-            (issueDocument
+    const selectedClient = useSelectedOption(
+        clients.items,
+        () => options.values.clientId,
+        () =>
+            issueDocument
                 ? createInitialOption(issueDocument.clientId, issueDocument.clientName)
-                : undefined),
-        departmentId: issueDocument
-            ? createInitialOption(issueDocument.departmentId, issueDocument.departmentName)
-            : undefined,
+                : undefined,
+    );
+    const selectedDepartment = useSelectedOption(
+        departments.items,
+        () => options.values.departmentId,
+        () =>
+            issueDocument
+                ? createInitialOption(issueDocument.departmentId, issueDocument.departmentName)
+                : undefined,
+    );
+    const initialOptions = computed(() => ({
+        clientId: selectedClient.value,
+        departmentId: selectedDepartment.value,
         advisorId: issueDocument
             ? createInitialOption(issueDocument.advisorId, issueDocument.advisorName)
             : undefined,
@@ -63,21 +67,8 @@ export const useIssueHeaderSelection = (options: {
             ? createInitialOption(issueDocument.requesterId, issueDocument.requesterName)
             : undefined,
     }));
-    const clientName = computed(
-        () =>
-            selectedClient.value?.title ??
-            (createdClient.value?.id === options.values.clientId
-                ? createdClient.value.title
-                : undefined) ??
-            (issueDocument?.clientId === options.values.clientId ? issueDocument.clientName : ''),
-    );
-    const departmentName = computed(
-        () =>
-            selectedDepartment.value?.title ??
-            (issueDocument?.departmentId === options.values.departmentId
-                ? issueDocument.departmentName
-                : ''),
-    );
+    const clientName = computed(() => selectedClient.value?.title ?? '');
+    const departmentName = computed(() => selectedDepartment.value?.title ?? '');
     const advisors = useRemoteLookup(
         (search, page, signal) =>
             issueLookupService.list(
@@ -146,7 +137,7 @@ export const useIssueHeaderSelection = (options: {
             return;
         }
 
-        createdClient.value = item;
+        selectedClient.value = item;
         options.selectClient(item.id);
         clients.updateSearch('');
         void clients.refresh();

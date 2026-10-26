@@ -142,3 +142,45 @@ justifica extender el control Vuetify instalado. Las pruebas de
 [navegador](../../tests/e2e/selectCreation.spec.ts) y
 [captura de inventario](../../tests/unit/modules/warehouse/inventoryFormTest.ts)
 comprueban los efectos observables, no las llamadas privadas entre componentes.
+
+## Selección dependiente de inventario
+
+El [modelo general de composición por callback](#modelo-general-de-composición-por-callback)
+se aplica a la selección del formulario sin trasladar a ese colaborador el guardado.
+[useInventoryEditor](../../src/modules/warehouse/composables/useInventoryEditor.ts)
+es propietario de VeeValidate, validación, envío versionado y captura pendiente de
+merma. [useInventorySelection](../../src/modules/warehouse/composables/useInventorySelection.ts)
+compone las consultas y opciones elegidas; los cambios de unidad, proveedor o
+plantilla actualizan sólo sus campos dependientes mediante callbacks del editor.
+Esos cambios programáticos no se confunden con interacción del usuario ni disparan
+validación al abrir el modal.
+
+**Identificador:** `DIA-VUE-PAT-004`. **Pregunta:** ¿cómo separar selección y guardado
+conservando un único propietario de la captura? **Fuente:** `InventoryEditorPage`,
+`useInventoryEditor`, `useInventorySelection`, `useRemoteOptions`, `useRemoteLookup`,
+`useSelectedOption`, `inventoryService` e `inventoryCatalogService`.
+Flechas continuas = composición o consulta; discontinuas = callbacks sobre la captura.
+
+```mermaid
+flowchart TB
+    page["InventoryEditorPage"] --> editor["useInventoryEditor<br/>formulario y guardado"]
+    editor --> selection["useInventorySelection<br/>catálogos y dependencias"]
+    editor --> write["inventoryService<br/>escritura HTTP"]
+    selection -.->|setValue / clearError| editor
+    selection --> lookup["useRemoteOptions<br/>consulta de catálogos"]
+    selection --> selected["useSelectedOption<br/>opción por ID"]
+    lookup --> remote["useRemoteLookup<br/>páginas y cancelación"]
+    lookup --> catalog["inventoryCatalogService<br/>lectura HTTP"]
+```
+
+`useSelectedOption` admite una precarga que debe coincidir con el ID vigente.
+La opción remota actualiza datos; después se conserva aunque cambie la página.
+Limpiar o cambiar el ID invalida la selección anterior. Compras y Salidas usan el
+mismo núcleo para altas recientes y documentos cargados; sus composables conservan
+reglas de inactivos, permisos, captura y renovación del catálogo.
+
+[selectedOptionTest](../../tests/unit/shared/composables/selectedOptionTest.ts)
+comprueba precarga, actualización remota, limpieza e independencia de instancias.
+Las pruebas existentes de Inventario, Compras y Salidas mantienen sus oráculos de
+captura, payloads, dependencias y recuperación; no se sustituyen por aserciones
+sobre el nuevo reparto de archivos.

@@ -1,4 +1,4 @@
-import { computed, shallowRef, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useForm } from 'vee-validate';
 import { PERMISSIONS } from '@nexus/permissions';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
@@ -67,14 +67,13 @@ export const usePurchaseEditor = (options: {
             purchaseLookupService.list('persons', options.resource, search, page, signal),
         computed(() => !isReadOnly && canPersons.value),
     );
-    const supplierSeed = shallowRef<LookupItem | undefined>(
-        document ? { id: document.supplierId, title: document.supplierName, data: {} } : undefined,
-    );
-    const selected = useSelectedOption(suppliers.items, () => form.values.supplierId);
-    const supplier = computed(
+    const supplier = useSelectedOption(
+        suppliers.items,
+        () => form.values.supplierId,
         () =>
-            selected.value ??
-            (supplierSeed.value?.id === form.values.supplierId ? supplierSeed.value : undefined),
+            document
+                ? { id: document.supplierId, title: document.supplierName, data: {} }
+                : undefined,
     );
     const receiverSeed = document
         ? { id: document.receivedById, title: document.receivedByName, data: {} }
@@ -101,7 +100,7 @@ export const usePurchaseEditor = (options: {
             return;
         }
 
-        supplierSeed.value = item;
+        supplier.value = item;
         interaction.update('supplierId', item.id);
         suppliers.updateSearch('');
         void suppliers.refresh();

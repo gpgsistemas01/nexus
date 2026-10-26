@@ -121,16 +121,20 @@ Almacén sigue esta composición:
 ```text
 app/layouts/AppLayout (sesión, navegación y RouterView)
   → app/components/AppNavigation (props y enlaces Vue)
-  → InventoryPage (resource: materials | consumables | wastes)
-      → useInventory → useInventoryList / useInventoryReport
-          → services de inventario / catálogos / reportes → Axios compartido
-      → InventoryFilters → VExpansionPanels (props y eventos)
-      → InventoryTable → VDataTableServer / InventoryRowActions (props y eventos)
-      → useInventoryRemoval → shared/ui/feedback → SweetAlert2
-      → InventoryReportToolbar (alcance, descarga y reintento mediante eventos)
-      → InventoryEditorPage → useInventoryEditor → VeeValidate
-          → InventoryEditor → shared/EditorDialog → InventoryFormField → RemoteSelect (presentación)
-          → useRemoteOptions (catálogos, búsqueda, paginación y cancelación)
+  → app/pages/InventoryWorkspace (alta contextual de proveedor)
+      → DirectoryCreationPage → DirectoryEditorPage (formulario auxiliar)
+      → InventoryPage (resource: materials | consumables | wastes)
+          → useInventory → useInventoryList / useInventoryReport
+              → services de inventario / catálogos / reportes → Axios compartido
+          → InventoryFilters → VExpansionPanels (props y eventos)
+          → InventoryTable → VDataTableServer / InventoryRowActions (props y eventos)
+          → useInventoryRemoval → shared/ui/feedback → SweetAlert2
+          → InventoryReportToolbar (alcance, descarga y reintento mediante eventos)
+          → InventoryEditorPage → useInventoryEditor → VeeValidate
+              → InventoryEditor → EditorDialog → InventoryFormField → RemoteSelect (presentación)
+              → useInventorySelection (catálogos, opciones y campos dependientes)
+                  → useRemoteOptions → useRemoteLookup (consulta y cancelación)
+                  → useSelectedOption (precarga y selección por ID)
 ```
 
 `inventory.ts` contiene los contratos y la configuración de los tres recursos;
@@ -311,10 +315,19 @@ con la misma responsabilidad. Las reglas, payloads y permisos específicos sigue
 en su dominio. La recuperación de merma continúa separada del guardado genérico
 porque conserva `operationId` y captura pendiente.
 
-El router central y `useInventoryEditor` todavía tienen responsabilidades acotadas.
-Separar registros de rutas por dominio o extraer otra estrategia del editor debe
-responder a nuevas responsabilidades o cambios independientes, con los recorridos
-actuales como protección; su tamaño por sí solo no justifica más capas.
+El router central conserva el registro de rutas. `useInventoryEditor` coordina
+captura, validación, envío y recuperación; delega catálogos, selección de unidad/
+plantilla y limpieza de campos dependientes a `useInventorySelection`. Este último
+recibe valores y callbacks de cambios programáticos; no envía escrituras ni abre
+modales. La separación responde al cambio independiente de la selección frente al
+guardado, descrito en [su modelo aplicado](../patterns/03-composables-and-callbacks.md#selección-dependiente-de-inventario).
+El tamaño de un archivo por sí solo no justifica más capas.
+
+`useSelectedOption` concentra la precarga opcional, la actualización desde opciones
+remotas y la conservación de la selección mientras su ID siga vigente. Compras,
+Salidas y `RemoteSelect` reutilizan ese estado, sin otra referencia paralela para
+el mismo proveedor, artículo o cliente. Los permisos, el rechazo de inactivos y
+la selección del ID de captura siguen perteneciendo al consumidor de dominio.
 
 La evidencia se detalla en [diseño de pruebas](../testing/01-test-design.md). Esta revisión evalúa
 estructura, contratos y recursos del cliente; no estima usuarios concurrentes ni

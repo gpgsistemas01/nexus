@@ -76,6 +76,9 @@ Las [decisiones de arquitectura](../architecture/01-structure-and-boundaries.md)
   configura consultas sobre `shared/composables/usePagedList` y conserva la política
   de recarga; `useInventoryReport` controla la descarga; `useInventoryEditor`
   integra VeeValidate y comparte la interacción de campos mediante `useFormInteraction`.
+  `useInventorySelection` compone catálogos y selecciones, determina si la unidad
+  usa medidas y limpia los datos heredados al cambiar proveedor/plantilla o unidad.
+  Recibe callbacks programáticos del formulario; no valida ni guarda por su cuenta.
   `useRemoteOptions` adapta `shared/composables/useRemoteLookup` a los catálogos paginados y búsquedas
   con cancelación. Los formularios mantienen estado por instancia, sin stores.
 - `inventoryService`, `inventoryCatalogService` e `inventoryReportService` separan

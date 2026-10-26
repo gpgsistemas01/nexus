@@ -221,9 +221,10 @@ coordinación y su evidencia de navegador con API simulada.
 | `useInventoryList.ts` | Lista, filtros, orden, paginación, actualización y cancelación de consultas. |
 | `useInventoryReport.ts` | Descarga y ciclo de vida del reporte, con error independiente. |
 | `useInventoryRemoval.ts` | Confirmación y escritura de baja, con cancelación al desmontar. |
-| `useSelectedOption.ts` | Conserva la opción elegida al paginar o buscar; se reutiliza en selector, unidad y material de referencia. |
+| `useSelectedOption.ts` | Precarga una opción del mismo ID, incorpora datos remotos y conserva la selección al paginar; descarta la anterior al cambiar o limpiar el ID. Se reutiliza en controles, Compras, Salidas e Inventario. |
 | `shared/ui/feedback.ts` | SweetAlert2 y su configuración común; sin estado de negocio ni acceso a la API. |
 | `useInventoryEditor.ts` | Captura con VeeValidate, envío versionado y recuperación de merma. |
+| `useInventorySelection.ts` | Consulta catálogos y conserva proveedor, unidad y plantilla; coordina los campos que dependen de esas selecciones. No guarda registros ni abre modales. |
 | `useRemoteOptions.ts` | Estado de catálogos paginados, sin renderizado. |
 | `modules/warehouse/services/` | Adaptadores separados de inventario, catálogos y reportes; `inventoryPageRequest` conserva los parámetros de inventario y `shared/http/pageRequest` valida el contrato paginado común. |
 | `modules/warehouse/mappers/inventoryMapper.ts` | Convierte DTOs de inventario en filas de presentación, conservando ambas identidades y versiones. |

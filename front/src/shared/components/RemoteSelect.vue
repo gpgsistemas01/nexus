@@ -30,11 +30,10 @@ const emit = defineEmits<{
 }>();
 const isMenuOpen = ref(false);
 const search = ref('');
-const selectedItem = useSelectedOption(toRef(props, 'items'), () => props.modelValue);
-const currentItem = computed(
-    () =>
-        selectedItem.value ??
-        (props.initialOption?.id === props.modelValue ? props.initialOption : undefined),
+const currentItem = useSelectedOption(
+    toRef(props, 'items'),
+    () => props.modelValue,
+    () => props.initialOption,
 );
 const visibleItems = computed(() =>
     currentItem.value && !props.items.some((item) => item.id === currentItem.value!.id)
@@ -62,7 +61,7 @@ const createRecord = () => {
 };
 
 const updateValue = (value: string | null) => {
-    selectedItem.value = visibleItems.value.find((item) => item.id === value);
+    currentItem.value = visibleItems.value.find((item) => item.id === value);
     emit('update:modelValue', value ?? '');
 };
 

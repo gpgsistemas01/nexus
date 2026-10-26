@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { ApiError } from '../../../shared/http/apiError.js';
@@ -9,11 +9,9 @@ import {
     inventoryRules,
     buildInventoryPayload,
     previewWaste,
-    unitUsesMeasurements,
 } from '../formModel.js';
-import { useRemoteOptions } from './useRemoteOptions.js';
+import { useInventorySelection } from './useInventorySelection.js';
 import { useWasteDuplicateRecovery } from './useWasteDuplicateRecovery.js';
-import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 import type {
     EditorTarget,
@@ -47,7 +45,6 @@ export const useInventoryEditor = (options: {
         onAddStock: options.onAddStock,
     });
     const isCreating = computed(() => target.action === 'create');
-    const isStock = computed(() => target.action === 'stock');
     const isIdempotent = resource === 'wastes' && ['create', 'add-stock'].includes(target.action);
     let pending: ReturnType<typeof createPendingWasteOperation> | undefined;
     let pendingData: InventoryPayload | null = null;
@@ -112,69 +109,14 @@ export const useInventoryEditor = (options: {
         }
     }
 
-    const supplierId = computed(() => String(form.values.supplierId));
-    const suppliers = useRemoteOptions(
-        'suppliers',
-        computed(() => isCreating.value && !isPending.value && !options.initialSupplier),
-    );
-    const presentations = useRemoteOptions(
-        'presentations',
-        computed(() => isCreating.value && resource !== 'wastes'),
-    );
-    const units = useRemoteOptions(
-        'unit-measures',
-        computed(() => isCreating.value && resource !== 'wastes'),
-    );
-    const templates = useRemoteOptions(
-        'wastes/material-templates',
-        computed(() => isCreating.value && resource === 'wastes' && !isPending.value),
-        supplierId,
-    );
-    const reasons = useRemoteOptions('reasons', isStock);
-    const selectedSupplier = useSelectedOption(suppliers.items, () =>
-        String(form.values.supplierId),
-    );
-    const lookupMap = {
-        supplierId: suppliers,
-        presentationId: presentations,
-        unitMeasureId: units,
-        materialId: templates,
-        reasonId: reasons,
-    };
-    const lookupByField: Partial<Record<InventoryField, ReturnType<typeof useRemoteOptions>>> =
-        lookupMap;
-    const lookups = computed(() =>
-        Object.fromEntries(
-            Object.entries(lookupMap).map(([key, lookup]) => [key, lookup.state.value]),
-        ),
-    );
-    const selectedTemplate = useSelectedOption(templates.items, () =>
-        String(form.values.materialId),
-    );
-    const selectedUnit = useSelectedOption(units.items, () => String(form.values.unitMeasureId));
-    const usesMeasurements = computed(
-        () =>
-            resource === 'materials' &&
-            (isCreating.value
-                ? unitUsesMeasurements(selectedUnit.value?.data)
-                : unitUsesMeasurements({
-                      symbol: target.row?.unitMeasure,
-                      name: target.row?.unitMeasure,
-                  })),
-    );
-    watch(selectedUnit, (unit) => {
-        if (
-            resource !== 'materials' ||
-            !isCreating.value ||
-            !unit ||
-            unitUsesMeasurements(unit.data)
-        )
-            return;
-
-        for (const field of ['base', 'height'] as const) {
-            form.setFieldValue(field, '', false);
-            form.setFieldError(field, undefined);
-        }
+    const selection = useInventorySelection({
+        resource,
+        target,
+        values: form.values,
+        isPending,
+        initialSupplier: options.initialSupplier,
+        setValue: (field, value) => form.setFieldValue(field, value, false),
+        clearError: (field) => form.setFieldError(field, undefined),
     });
     const preview = computed(() =>
         isPending.value && pendingData
@@ -184,7 +126,7 @@ export const useInventoryEditor = (options: {
                   base: form.values.base,
                   height: form.values.height,
               }
-            : previewWaste(form.values, selectedTemplate.value),
+            : previewWaste(form.values, selection.selectedTemplate.value),
     );
     const validationData = computed(() => ({
         ...form.values,
@@ -196,30 +138,6 @@ export const useInventoryEditor = (options: {
               }
             : {}),
     }));
-
-    watch(supplierId, () => {
-        if (resource === 'wastes' && isCreating.value) form.setFieldValue('materialId', '', false);
-    });
-    watch(
-        () => selectedTemplate.value?.id,
-        () => {
-            const template = selectedTemplate.value;
-            if (isPending.value) return;
-
-            form.setFieldValue('name', String(template?.data.name ?? ''), false);
-            form.setFieldValue('maxUnitCost', String(template?.data.maxUnitCost ?? ''), false);
-
-            for (const field of [
-                'coneWeightKg',
-                'totalWeightKg',
-                'referenceRollTotalWeightKg',
-                'base',
-                'height',
-            ] as const) {
-                form.setFieldValue(field, '', false);
-            }
-        },
-    );
 
     const execute = async (payload: InventoryPayload) => {
         if (isSubmitting.value || controller.signal.aborted) return;
@@ -336,10 +254,9 @@ export const useInventoryEditor = (options: {
             return;
         }
 
-        selectedSupplier.value = created;
+        selection.selectedSupplier.value = created;
         update('supplierId', created.id);
-        suppliers.updateSearch('');
-        void suppliers.refresh();
+        void selection.refreshSuppliers();
     };
 
     return {
@@ -350,18 +267,17 @@ export const useInventoryEditor = (options: {
         isPending,
         isConflicted,
         isConfirmingDuplicate: duplicateRecovery.isConfirming,
-        lookups,
+        lookups: selection.lookups,
         preview,
-        selectedTemplate,
-        selectedSupplier,
+        selectedTemplate: selection.selectedTemplate,
+        selectedSupplier: selection.selectedSupplier,
         selectCreatedSupplier,
-        usesMeasurements,
+        usesMeasurements: selection.usesMeasurements,
         submit,
         update,
         blur,
-        searchLookup: (field: InventoryField, search: string) =>
-            lookupByField[field]?.updateSearch(search),
-        loadMore: (field: InventoryField) => lookupByField[field]?.loadMore(),
-        retryLookup: (field: InventoryField) => lookupByField[field]?.retry(),
+        searchLookup: selection.searchLookup,
+        loadMore: selection.loadMore,
+        retryLookup: selection.retryLookup,
     };
 };
