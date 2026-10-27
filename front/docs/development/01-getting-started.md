@@ -84,7 +84,7 @@ JWT_SECRET_ONE_TIME="reemplazar-por-otro-secreto-local-independiente"
 cuenta. Si las migraciones requieren otra conexión directa, definir `DIRECT_URL`
 con la cuenta de migración del mismo ambiente. Los tres secretos JWT se configuran
 en el servidor, no en Vue. `DATABASE_TEST_URL`/`DIRECT_TEST_URL` sólo se preparan
-para pruebas aisladas, conforme a [la guía de sistema](../testing/04-system-tests.md).
+para pruebas aisladas, conforme a [la guía de sistema](../testing/05-system-tests.md).
 La aplicación necesita una cuenta activa y permisos existentes; esta guía no
 inventa una cuenta o contraseña inicial.
 
@@ -161,7 +161,7 @@ el origen del frontend.
 | Cambio de componente en desarrollo | Vite actualiza la vista; los errores de tipos también se revisan con el editor o `type-check`. |
 
 La recuperación de sesión y los estados de rechazo se explican en
-[acceso y sesión](../modules/01-authentication.md). Para detener el desarrollo usa Ctrl+C en cada terminal.
+[acceso y sesión](../architecture/views/development/frontend-technical-documentation/01-authentication.md). Para detener el desarrollo usa Ctrl+C en cada terminal.
 No hace falta eliminar dependencias o la base al terminar.
 
 ## 7. Comprobaciones y compilación
@@ -186,7 +186,7 @@ npm --prefix front run preview
 el proxy configurado. Vite `dev`/`preview` son herramientas locales. La publicación
 mediante Nginx se explica en [Docker para VPS](../../README.md#docker-para-vps-o-pruebas-locales).
 
-El [recorrido de sistema](../testing/04-system-tests.md) complementa esas pruebas
+El [recorrido de sistema](../testing/05-system-tests.md) complementa esas pruebas
 con Express y PostgreSQL reales, base aislada y procesos propios. Se ejecuta con
 `npm --prefix front run test:e2e:system` después de su preparación, sin usar la
 base ni los servidores habituales de desarrollo.

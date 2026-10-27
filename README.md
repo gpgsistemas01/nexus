@@ -119,10 +119,16 @@ Catálogos integran la API mediante un proxy del mismo origen. El menú sólo co
 conservan sus pantallas EJS en el backend.
 Para preparar una copia completa y arrancar Vue y Express, consulta
 [inicio del proyecto](front/docs/development/01-getting-started.md).
-Consulta [configuración del login](front/docs/modules/01-authentication.md),
-[operaciones y arquitectura de Almacén](front/docs/modules/02-warehouse.md),
-[Compras](front/docs/modules/06-purchases.md), [Salidas](front/docs/modules/07-issues.md),
-[Catálogos](front/docs/modules/03-catalogs.md) y [Movimientos](front/docs/modules/05-movements.md).
+Consulta [configuración del login](front/docs/architecture/views/development/frontend-technical-documentation/01-authentication.md),
+[operaciones y arquitectura de Almacén](front/docs/architecture/views/development/frontend-technical-documentation/02-warehouse.md),
+[Compras](front/docs/architecture/views/development/frontend-technical-documentation/06-purchases.md), [Salidas](front/docs/architecture/views/development/frontend-technical-documentation/07-issues.md),
+[Catálogos](front/docs/architecture/views/development/frontend-technical-documentation/03-catalogs.md) y [Movimientos](front/docs/architecture/views/development/frontend-technical-documentation/05-movements.md).
+
+El [manual de usuario Vue](front/docs/user-manual/index.md) reúne los procedimientos
+y capturas de esta interfaz. Se genera desde la raíz con
+`npm --prefix front run docs:manual -- ambos`; sus DOCX/PDF quedan en
+`front/build/docs`, fuera del contenedor. Consulta la
+[preparación y revisión](front/docs/governance/05-user-manual.md).
 Desde la raíz, `npm --prefix front run check` ejecuta formato, ESLint, pruebas y build con tipos.
 En VS Code instala las extensiones recomendadas Vue - Official y ESLint; para
 comprobar tipos continuamente usa `npm --prefix front run type-check:watch`.
@@ -138,7 +144,7 @@ GitHub Actions conserva sus disparadores y ejecuta los comandos desde `back/`.
 El frontend dispone de su propio [Dockerfile y comandos](front/README.md#docker-para-vps-o-pruebas-locales).
 Desde la raíz, `docker build -f front/Dockerfile -t nexus-front .` compila Vue
 y sus reglas públicas compartidas automáticamente. Para probarlo con Express,
-consulta la red y `BACKEND_UPSTREAM` en [la guía del frontend](front/docs/modules/01-authentication.md).
+consulta la red y `BACKEND_UPSTREAM` en [la guía del frontend](front/docs/architecture/views/development/frontend-technical-documentation/01-authentication.md).
 
 Desde la raíz: `docker compose up --build`. El archivo local de entorno está
 en `back/.env`; nunca se versiona ni se copia a la imagen.

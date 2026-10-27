@@ -1,0 +1,27 @@
+# Salidas: casos de uso
+
+Las operaciones tienen fichas independientes. Cada ficha conserva actor, disparador, precondiciones, interacción numerada, alternativas con punto de entrada, excepciones y postcondiciones. El [índice de casos](../index.md) define la plantilla y las reglas de lectura.
+
+| Caso | Objetivo |
+| --- | --- |
+| [CU-SAL-01](cu-sal-01.md) | Consultar salidas de material. |
+| [CU-SAL-02](cu-sal-02.md) | Crear salida de material. |
+| [CU-SAL-03](cu-sal-03.md) | Editar encabezado de salida de material. |
+| [CU-SAL-04](cu-sal-04.md) | Editar detalles de material de una salida. |
+| [CU-SAL-05](cu-sal-05.md) | Surtir material. |
+| [CU-SAL-06](cu-sal-06.md) | Devolver material surtido. |
+| [CU-SAL-07](cu-sal-07.md) | Generar reporte de salidas de material. |
+| [CU-SAL-08](cu-sal-08.md) | Consultar salidas de merma. |
+| [CU-SAL-09](cu-sal-09.md) | Crear salida de merma. |
+| [CU-SAL-10](cu-sal-10.md) | Editar encabezado de salida de merma. |
+| [CU-SAL-11](cu-sal-11.md) | Editar detalles de merma de una salida. |
+| [CU-SAL-12](cu-sal-12.md) | Surtir merma. |
+| [CU-SAL-13](cu-sal-13.md) | Devolver merma surtida. |
+| [CU-SAL-14](cu-sal-14.md) | Generar reporte de salidas de merma. |
+| [CU-SAL-15](cu-sal-15.md) | Consultar salidas de consumible. |
+| [CU-SAL-16](cu-sal-16.md) | Crear salida de consumible. |
+| [CU-SAL-17](cu-sal-17.md) | Editar encabezado de salida de consumible. |
+| [CU-SAL-18](cu-sal-18.md) | Editar detalles de consumible de una salida. |
+| [CU-SAL-19](cu-sal-19.md) | Surtir consumible. |
+| [CU-SAL-20](cu-sal-20.md) | Devolver consumible surtido. |
+| [CU-SAL-21](cu-sal-21.md) | Generar reporte de salidas de consumible. |

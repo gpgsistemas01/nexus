@@ -6,8 +6,8 @@ reglas, selectores y efectos propios. Compartir no significa mover todo a `share
 al menos dos consumidores y un contrato independiente del contexto.
 
 Los ejemplos de este capítulo corresponden al frontend EJS. Vue conserva su
-documentación propietaria junto a sus fuentes: [patrones y diagrama de listados](../../../../../../front/docs/patterns/01-applicability-and-principles.md)
-y [composición de editores, guardado y altas rápidas](../../../../../../front/docs/patterns/08-document-responsibilities.md).
+documentación propietaria junto a sus fuentes: [patrones y diagrama de listados](../../../../../../front/docs/architecture/views/development/design-and-construction-patterns/01-applicability-and-principles.md)
+y [composición de editores, guardado y altas rápidas](../../../../../../front/docs/architecture/views/development/design-and-construction-patterns/08-document-responsibilities.md).
 Allí se representan props/eventos, composables, VeeValidate y Axios; los diagramas
 de Select2, MDB y manipulación del DOM de este capítulo no describen la solución Vue.
 

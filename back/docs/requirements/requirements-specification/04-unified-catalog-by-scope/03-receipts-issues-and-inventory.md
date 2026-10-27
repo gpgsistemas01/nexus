@@ -64,7 +64,7 @@ Las salidas de merma conservan sus recursos y movimientos propios.
   reclasificar documentos, modificar saldos o reiniciar consecutivos. Una colisión
   revierte la normalización completa; los contadores históricos se conservan.
 
-- **Acceso operativo:** Impresión, Taller 3D, PT/Tráfico, Instalaciones y Acabados
+- **Acceso operativo:** Impresión, Taller 3D (Taller/Herrería), Router, PT/Tráfico, Instalaciones y Acabados
   pueden consultar inventario y crear/editar solicitudes de salida con rol autorizado.
   La edición conserva las restricciones por estado; solicitar o editar no descuenta
   existencias. Este acceso no concede surtido, devolución ni escritura de inventario.

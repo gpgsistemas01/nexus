@@ -58,12 +58,12 @@ clave de Administrador del sistema o por Coordinador con clave de Almacén y
 Proveeduría; las demás asignaciones limitan la consulta mediante el ID del área.
 `organization` expone indicadores informativos y no sustituye los permisos del servidor.
 
-Las áreas `IMPRESIÓN`, `TALLER 3D`, `PT/TRÁFICO`, `INSTALACIONES` y `ACABADOS`
+Las áreas `IMPRESIÓN`, `TALLER 3D` (Taller/Herrería), `ROUTER`, `PT/TRÁFICO`, `INSTALACIONES` y `ACABADOS`
 comparten el acceso operativo para los roles Administrador del sistema, Coordinador,
 Auxiliar, Operador, Instalador y Almacenista. El rol y el área deben coincidir en una
 misma asignación; no basta con tenerlos en asignaciones distintas.
 
-La limitación de inventario a sólo consulta corresponde a esas cinco áreas.
+La limitación de inventario a sólo consulta corresponde a esas seis áreas.
 `ALMACÉN Y PROVEDURÍA` y `SISTEMAS` conservan sus permisos adicionales por rol:
 gestión de inventario, compras, costos, reportes, surtidos y devoluciones. Los ajustes
 administrativos y la administración de usuarios/catálogos siguen reservados al

@@ -1,9 +1,9 @@
 # 2. Herramientas del frontend
 
 Esta guía conserva herramientas, versiones, formato y ejecución local. El
-[diseño de pruebas](../testing/01-test-design.md), las
-[fichas de casos](../testing/02-test-cases.md) y la
-[cobertura por caso de uso](../testing/03-use-case-coverage.md) tienen propietarios
+[diseño de pruebas](../testing/02-test-design.md), las
+[fichas de casos](../testing/03-test-cases.md) y la
+[cobertura por caso de uso](../testing/04-use-case-coverage.md) tienen propietarios
 separados. Los resultados de ejecución permanecen en CI o en la revisión del cambio.
 
 ## Decisiones aplicadas
@@ -83,7 +83,7 @@ Las importaciones con `.js` resuelven al fuente `.ts`; los componentes usan `.vu
 `npm run type-check` ejecuta `vue-tsc --build`. `npm run build` lo ejecuta antes de
 Vite y falla si hay errores. `npm run dev` mantiene el comportamiento rápido de Vite:
 no promete comprobar todos los tipos. En desarrollo usa Vue - Official en VS Code
-o `npm run type-check:watch` en una segunda terminal. No se añadió un overlay extra.
+o `npm run type-check:watch` en una segunda terminal. La terminal y las herramientas de TypeScript muestran los errores durante el desarrollo.
 
 `vite.config.ts` incluye los imports profundos de componentes/directivas Vuetify
 en la preparación de dependencias. Así una ruta diferida no provoca una recarga

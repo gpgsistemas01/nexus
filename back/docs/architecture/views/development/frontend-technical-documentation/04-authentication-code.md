@@ -70,9 +70,9 @@ El formulario EJS y Vue importan las reglas públicas desde su propietario
 `public/js/utils/validations/loginValidation.js`; `validators.js` conserva las
 reglas de los demás formularios y no reexporta el login. La implementación Vue,
 con Vuetify y VeeValidate, se describe en
-[la arquitectura de front](../../../../../../front/docs/architecture/01-structure-and-boundaries.md).
+[la arquitectura de front](../../../../../../front/docs/architecture/views/development/code-structure.md).
 Después del login, Vue Router abre Almacén y comprueba `/api/auth/me`; la sesión
 readonly se comparte por provide/inject. Materiales, Consumibles y Mermas ya tienen
 contenedores y componentes Vue. El resto de este capítulo describe el flujo EJS
-conservado; los [contratos de Almacén Vue](../../../../../../front/docs/modules/02-warehouse.md)
+conservado; los [contratos de Almacén Vue](../../../../../../front/docs/architecture/views/development/frontend-technical-documentation/02-warehouse.md)
 son el documento propietario de esa interfaz.

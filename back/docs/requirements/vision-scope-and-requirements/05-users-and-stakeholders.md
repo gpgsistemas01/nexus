@@ -5,7 +5,7 @@ casos de uso. La presencia de un área, cliente o proveedor en los datos no conc
 
 | Parte interesada | Participación o necesidad | Límite vigente |
 | --- | --- | --- |
-| Impresión, Taller 3D, PT/Tráfico, Instalaciones y Acabados | Consultar existencias y registrar o editar solicitudes de salida. | Requiere rol operativo autorizado; no concede cambios de inventario, surtido, devoluciones ni administración de catálogos. |
+| Impresión, Taller 3D (Taller/Herrería), Router, PT/Tráfico, Instalaciones y Acabados | Consultar existencias y registrar o editar solicitudes de salida. | Requiere rol operativo autorizado; no concede cambios de inventario, surtido, devoluciones ni administración de catálogos. |
 | Personal de almacén | Registrar recepciones, operar materiales, consumibles y mermas, surtir y devolver, y consultar existencias autorizadas. | Puede dar de alta clientes y proveedores desde selectores operativos autorizados; no administra sus vistas independientes. Los ajustes conservan autorización propia. |
 | Área Sistemas / Administrador del sistema | Administrar cuentas, personas, asignaciones y catálogos; ejecutar las capacidades operativas autorizadas. | Sus accesos se comprueban para cada operación; la consulta independiente de movimientos y las acciones reservadas al administrador no se extienden al personal de almacén. |
 | Dirección | Supervisar resultados y disponer de información para tomar decisiones. | Sus accesos, indicadores y reportes específicos están pendientes de definición. |

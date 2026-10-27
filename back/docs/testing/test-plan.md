@@ -171,7 +171,7 @@ Ejecutan Chromium contra Vite e interceptan la API; no equivalen a una suite de
 sistema contra Express/PostgreSQL real ni a aceptación del usuario. Por separado,
 `front/tests/system` ejecuta un representante con los routers reales, JWT y base
 aislada: login, alta persistida de cliente, tres reportes XLSX, renovación y cierre.
-Su [preparación y limpieza](../../../front/docs/testing/04-system-tests.md) no cambia
+Su [preparación y limpieza](../../../front/docs/testing/05-system-tests.md) no cambia
 la base habitual. `CP-VUE-SYS-001-01` complementa las integraciones backend y no
 acredita todos los CU ni la aceptación del usuario.
 
@@ -245,7 +245,8 @@ el estado persistido con Prisma, y cubre al menos una regla de rechazo relevante
 flujos entre dominios se demuestran en la integración propietaria en lugar de duplicar
 la misma prueba unitaria. `npm run test:integration` valida que la URL de pruebas sea
 distinta de `DATABASE_URL`, aplica las migraciones y genera el cliente antes de ejecutar
-Vitest.
+Vitest. Migraciones, generación y Vitest reciben explícitamente `NODE_ENV=test`,
+aunque la terminal o el archivo local declaren otro entorno.
 
 ## Cobertura prioritaria
 

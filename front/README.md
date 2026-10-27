@@ -10,12 +10,12 @@ Proveedores, Compras, Salidas y los historiales de Movimientos se sirven en Vue.
 
 Abre `http://localhost:5173/inicio-sesion` con Express ejecutándose en el puerto 3000.
 Vite dirige la API y el cierre de sesión al backend mediante un proxy del mismo origen.
-El menú agrupa Almacén, [Compras](docs/modules/06-purchases.md), [Salidas](docs/modules/07-issues.md), [Movimientos](docs/modules/05-movements.md), [Identidad y acceso y Directorio comercial](docs/modules/04-identity-and-directory.md)
-y los seis [Catálogos](docs/modules/03-catalogs.md),
+El menú agrupa Almacén, [Compras](docs/architecture/views/development/frontend-technical-documentation/06-purchases.md), [Salidas](docs/architecture/views/development/frontend-technical-documentation/07-issues.md), [Movimientos](docs/architecture/views/development/frontend-technical-documentation/05-movements.md), [Identidad y acceso y Directorio comercial](docs/architecture/views/development/frontend-technical-documentation/04-identity-and-directory.md)
+y los seis [Catálogos](docs/architecture/views/development/frontend-technical-documentation/03-catalogs.md),
 con enlaces filtrados por permiso.
 Usa una cuenta existente: al autenticar se abre el primer módulo permitido; una
 cuenta exclusiva de Catálogos entra a Áreas. Consulta
-[diseño, validación, cookies y configuración del proxy](docs/modules/01-authentication.md).
+[diseño, validación y sesión](docs/architecture/views/development/frontend-technical-documentation/01-authentication.md), y [configuración del proxy](docs/development/03-build-and-deployment.md).
 
 ## Desarrollo
 
@@ -102,10 +102,10 @@ Al clonar el repositorio basta con `npm ci`; la dependencia está en el lockfile
 - `/almacen` selecciona el primer módulo permitido para la cuenta.
 - `/almacen/materiales`, `/almacen/consumibles` y `/almacen/mermas` son los módulos
   operativos, con sesión y permisos obtenidos de Express.
-- `/salidas/materiales`, `/salidas/consumibles` y `/salidas/mermas` permiten solicitar, surtir y devolver; `/salidas` abre la primera variante autorizada. Consulta [modos y contratos](docs/modules/07-issues.md).
-- `/compras/materiales` y `/compras/consumibles` permiten gestionar compras; `/compras` abre la primera variante autorizada. Consulta [campos y contratos](docs/modules/06-purchases.md).
+- `/salidas/materiales`, `/salidas/consumibles` y `/salidas/mermas` permiten solicitar, surtir y devolver; `/salidas` abre la primera variante autorizada. Consulta [modos y contratos](docs/architecture/views/development/frontend-technical-documentation/07-issues.md).
+- `/compras/materiales` y `/compras/consumibles` permiten gestionar compras; `/compras` abre la primera variante autorizada. Consulta [campos y contratos](docs/architecture/views/development/frontend-technical-documentation/06-purchases.md).
 - `/catalogos` abre Áreas; sus seis rutas requieren `catalogs:manage`. Consulta
-  [campos, endpoints y arquitectura](docs/modules/03-catalogs.md).
+  [campos, endpoints y arquitectura](docs/architecture/views/development/frontend-technical-documentation/03-catalogs.md).
 - `/identidad/personas` y `/identidad/usuarios` mantienen formularios distintos.
 - `/directorio/clientes` y `/directorio/proveedores` mantienen los registros comerciales.
 - `/identidad` y `/directorio` seleccionan el primer módulo permitido de su sección.
@@ -132,7 +132,7 @@ que el login funcione en producción. La autorización definitiva permanece en E
 las guardas de las rutas protegidas comprueban la sesión y orientan la navegación, sin sustituir
 los controles del servidor. `/almacen` resuelve al cliente mediante Vue Router.
 
-Consulta [operaciones, reutilización y límites de Almacén](docs/modules/02-warehouse.md).
+Consulta [operaciones, reutilización y límites de Almacén](docs/architecture/views/development/frontend-technical-documentation/02-warehouse.md).
 
 ## Herramientas y comprobaciones
 
@@ -155,12 +155,12 @@ versionada apunta ESLint a `front/` cuando abres el repositorio en VS Code.
 
 Consulta [las herramientas](docs/development/02-tooling.md),
 [el diseño y los casos de prueba](docs/testing/index.md) y
-[las decisiones de tablas, selectores, modales y HTTP](docs/architecture/03-ui-and-http.md).
+[las decisiones de tablas, selectores, modales y HTTP](docs/architecture/views/logical/ui-and-http.md).
 
 ## Arquitectura
 
 Se aplica contenedor/presentación, composición con composables y organización por
-módulos. Consulta [decisiones y responsabilidades de Vue](docs/architecture/01-structure-and-boundaries.md).
+módulos. Consulta [decisiones y responsabilidades de Vue](docs/architecture/views/development/code-structure.md).
 
 ## Pruebas de navegador
 
@@ -184,7 +184,7 @@ respuestas de API se simulan; no se usa una base de datos real.
 Las pruebas de sistema se ejecutan con `npm run test:e2e:system` desde `front/`
 o `npm --prefix front run test:e2e:system` desde la raíz. Requieren las dependencias
 de ambas aplicaciones y PostgreSQL aislado/migrado: sigue la
-[preparación y limpieza](docs/testing/04-system-tests.md). Este comando inicia
+[preparación y limpieza](docs/testing/05-system-tests.md). Este comando inicia
 Express en 3107 y Vite en 5175; no reutiliza los procesos normales de desarrollo.
 La suite `test:e2e` conserva sus respuestas API simuladas y no requiere una base.
 
@@ -199,20 +199,55 @@ Desde la raíz:
 ```bash
 npm --prefix front run docs:generate
 npm --prefix front run docs:check
-npm --prefix front run docs:export -- ambos
+npm --prefix front run docs:export -- inicio ambos
+npm --prefix front run docs:export -- completo ambos
 ```
 
-La referencia de código se genera desde SFC/TypeScript. El DOCX se guarda en
-`front/build/docs/docx/arquitectura/frontend-vue.docx` y el PDF en
-`front/build/docs/pdf/arquitectura/frontend-vue.pdf`. El motor común de publicación
-requiere Pandoc/LibreOffice para exportar, no para validar fuentes. Consulta la
-[preparación y límites](docs/governance/02-generation-and-publication.md).
+La referencia se genera desde SFC/TypeScript. Se pueden publicar `inicio`, `requisitos`,
+`casos-de-uso`, `arquitectura`, `estandar`, `referencia`, `pruebas`, `operacion` y
+`gobierno`, por ejemplo `npm --prefix front run docs:export -- pruebas pdf`.
+El [catálogo](docs/publications.json) mantiene el orden; `docs:check` detecta fuentes sin ubicación.
+
+El completo conserva `front/build/docs/docx/arquitectura/frontend-vue.docx` y
+`front/build/docs/pdf/arquitectura/frontend-vue.pdf`; cada tema añade su nombre al
+archivo, por ejemplo `frontend-vue-pruebas.pdf`. El motor requiere Pandoc/LibreOffice
+para exportar. Consulta la [preparación](docs/governance/02-generation-and-publication.md).
 Estas fuentes, herramientas y artefactos permanecen fuera del contenedor de producción.
+
+El [manual de usuario Vue](docs/user-manual/index.md) tiene procedimientos y capturas
+propios. Se publica aparte del libro técnico:
+
+Para los manuales de inducción por cuenta, prepara las referencias y credenciales
+locales siguiendo [esta guía](docs/governance/06-manuals-by-access.md). Desde `front/`:
+
+```bash
+npm run docs:manuals -- --mode demo --all --format ambos
+npm run docs:manuals -- --mode live --profile impresion-operador --format ambos
+```
+
+Cada perfil recibe sus propias capturas y sólo las tareas permitidas. Los archivos
+`manual.accounts.local.json` y `.env.manual.local` están ignorados; no envíes las
+contraseñas por el chat. `--missing` reanuda las capturas pendientes. Los resultados
+quedan bajo `front/build/manuals` y `front/build/docs/{docx,pdf}/manuales-vue`.
+
+Para la fuente completa de referencia, desde la raíz:
+
+```bash
+npm --prefix front run docs:screenshots
+npm --prefix front run docs:check
+npm --prefix front run docs:manual -- ambos
+```
+
+Las capturas requieren Chromium de Playwright y usan datos ficticios, con escrituras
+API bloqueadas. El [procedimiento](docs/governance/05-user-manual.md) explica preparación
+y revisión. El manual queda en `front/build/docs/docx/manuales-vue/manual-usuario.docx`
+y `front/build/docs/pdf/manuales-vue/manual-usuario.pdf`, fuera del despliegue.
 
 ## Estructura
 
 - `docs/index.md`: entrada a las guías técnicas de Vue, con sus fuentes y criterios documentales.
-- `docs/architecture/`, `docs/patterns/`, `docs/modules/`, `docs/development/`, `docs/requirements/`, `docs/testing/` y `docs/governance/`: colecciones con índice y capítulos propios. El paquete `arquitectura frontend-vue` publica estas mismas fuentes en DOCX/PDF; consulta [su validación](docs/index.md#mantenimiento-y-publicación).
+- `docs/user-manual/`: manual de las pantallas Vue para operadores, con procedimientos y capturas; publicación independiente en DOCX/PDF.
+- `docs/requirements/`, `docs/architecture/`, `docs/development/`, `docs/testing/` y `docs/governance/`: colecciones con índice y capítulos propios. El paquete `arquitectura frontend-vue` publica estas mismas fuentes en DOCX/PDF; consulta [su validación](docs/index.md#mantenimiento-y-publicación).
 - `src/App.vue`: muestra la página activa mediante `RouterView`.
 - `src/app/router/index.ts`: rutas y carga diferida de páginas.
 - `src/app/pages/NotFoundPage.vue`: página para direcciones desconocidas.
@@ -235,7 +270,7 @@ públicos de `back/`. Conserva el repositorio completo al compilar; no copies s�
 `front/` a un directorio aislado. No se importan servicios ni secretos del backend.
 
 Vue gestiona la interfaz; Vite proporciona el servidor de desarrollo y la compilación.
-Vue Router maneja las URLs con historial HTML5. No se añadió un gestor de estado global.
+Vue Router maneja las URLs con historial HTML5. La sesión se comparte mediante provide/inject; formularios y listados mantienen estado por instancia.
 Las variables `VITE_*` son públicas al compilar: nunca contienen claves privadas ni
 credenciales de PostgreSQL.
 
@@ -247,7 +282,7 @@ copies las guías a `public/`, porque Vite publicaría esos archivos en `dist`.
 En Vercel, el proyecto de frontend puede usar Root
 Directory `front`, Build Command `npm run build` y Output Directory `dist`,
 permitiendo fuentes fuera de Root Directory. El login también requiere los rewrites
-hacia Express descritos en [la guía del login](docs/modules/01-authentication.md#proxy-y-despliegue).
+hacia Express descritos en [la guía del login](docs/development/03-build-and-deployment.md).
 
 ## Docker para VPS o pruebas locales
 
@@ -268,7 +303,7 @@ sin Node.js ni el servidor de desarrollo de Vite.
 necesarios, excluyendo dependencias locales, compilaciones previas y `.env`.
 `nginx.conf` permite recargar rutas de la aplicación y devuelve 404 para recursos
 inexistentes bajo `/assets/`. El proxy a Express usa `BACKEND_UPSTREAM` al iniciar
-Nginx; consulta los detalles de red y despliegue en [la guía del login](docs/modules/01-authentication.md).
+Nginx; consulta los detalles de red y despliegue en [la guía de construcción](docs/development/03-build-and-deployment.md).
 
 Las variables `VITE_*` se incorporan al compilar, no al arrancar Nginx. Pasarlas con
 `docker run -e` no cambia una compilación existente. Este Dockerfile no configura

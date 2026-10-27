@@ -4,6 +4,8 @@
         "vitest.config.ts",
         "playwright.config.ts",
         "playwright.system.config.ts",
+        "playwright.manual.config.ts",
+        "playwright.manualProfiles.config.ts",
         "tests/system/environment.ts"
     ],
     "compilerOptions": {

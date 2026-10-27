@@ -53,3 +53,5 @@
 front/docs/
 front/scripts/
 front/build/
+front/playwright.manual.config.ts
+front/playwright.manualProfiles.config.ts

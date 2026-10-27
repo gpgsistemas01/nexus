@@ -4,30 +4,66 @@
 
 Las fuentes editables viven en `front/docs`. La referencia de código se genera
 desde `front/src`; las demás guías se redactan y revisan contra la implementación.
-El paquete Vue incorpora estas fuentes completas: arquitectura, patrones, módulos,
-desarrollo, requisitos, pruebas y gobierno documental. No obtiene el contenido
-de las fichas Vue siguiendo enlaces a documentos del servidor.
+El paquete Vue incorpora requisitos, arquitectura, desarrollo, pruebas y gobierno.
+Arquitectura incluye las cinco vistas, patrones y referencias breves por dominio.
+Los casos y contratos se mantienen íntegros en sus fuentes propietarias.
 
-| Operación desde `front/` | Resultado |
+## Documentos y orden de lectura
+
+| Sección de publicación | Contenido |
 | --- | --- |
-| `npm run docs:generate` | Actualiza `docs/architecture/05-code-reference.md` a partir de los SFC y TypeScript actuales. |
-| `npm run docs:check` | Detecta referencia desactualizada y valida las fuentes, enlaces y recursos del paquete Vue. No modifica las guías. |
-| `npm run docs:export -- docx` | Publica `build/docs/docx/arquitectura/frontend-vue.docx`. |
-| `npm run docs:export -- pdf` | Conserva DOCX y publica `build/docs/pdf/arquitectura/frontend-vue.pdf`. |
-| `npm run docs:export -- ambos` | Produce ambos formatos; es también el valor predeterminado de `docs:export`. |
+| `inicio` | Preparación local, incorporación y herramientas. |
+| `requisitos` | Glosario, trazabilidad y especificación. |
+| `casos-de-uso` | Fichas completas agrupadas por objetivo y familia. |
+| `arquitectura` | Contexto, vistas 4+1, decisiones, contratos, patrones y módulos. |
+| `estandar` | Reglas de construcción y revisión del código. |
+| `referencia` | Inventario generado de archivos, exports, contratos SFC e imports. |
+| `pruebas` | Plan, diseño, registro CP, cobertura y preparación de sistema. |
+| `operacion` | Construcción y despliegue. |
+| `gobierno` | Reglas editoriales, referencias, criterios y publicación. |
+| `manual` | Procedimientos de usuario y capturas Vue; libro independiente, excluido del completo técnico. |
 
-Desde la raíz se antepone `npm --prefix front run`, por ejemplo:
+El [catálogo publications.json](../publications.json) declara fuentes y orden de cada
+sección. Un directorio se expande con su índice primero y después sus capítulos
+numerados. Los temas principales se ordenan explícitamente: la vista general precede
+al detalle de arquitectura, el plan precede a los casos de prueba y la referencia
+extensa de código tiene una publicación propia. Una fuente tiene una ubicación en
+el catálogo; el documento completo elimina repeticiones. Una sección con `entry`
+declara su portada propia y con `includeInComplete: false` queda fuera del libro
+técnico, manteniendo la comprobación de sus fuentes. Así se publica el manual.
+
+## Comandos
+
+Desde `front/`:
 
 ```bash
-npm --prefix front run docs:generate
-npm --prefix front run docs:check
-npm --prefix front run docs:export -- ambos
+npm run docs:generate
+npm run docs:check
+npm run docs:export -- inicio ambos
+npm run docs:export -- arquitectura pdf
+npm run docs:export -- pruebas docx
+npm run docs:export -- completo ambos
+npm run docs:manual -- ambos
 ```
 
-La referencia usa TypeScript y `vue/compiler-sfc`, ya instalados con las
-dependencias de desarrollo. No ejecuta la aplicación
-y no infiere reglas de negocio a partir de nombres. Al agregar o mover fuentes se
-regenera y se versiona el Markdown resultante; CI detecta si quedó desactualizado.
+Desde la raíz se usa `npm --prefix front run` antes del nombre del script.
+`docs:generate` actualiza `docs/architecture/views/development/code-reference.md`;
+`docs:check` comprueba frescura, pertenencia de todas las guías al catálogo y fuentes,
+enlaces y recursos de la publicación técnica y del manual. Ninguno exige Pandoc para validar.
+
+`docs:export -- [seccion] [docx|pdf|ambos]` selecciona contenido y formato. Omitir
+la sección o usar `completo` reúne la colección: `docs:export -- ambos` conserva ese
+comportamiento. Una sección/formato desconocidos se rechazan antes de publicar.
+
+| Selección | DOCX | PDF |
+| --- | --- | --- |
+| Completo | `build/docs/docx/arquitectura/frontend-vue.docx` | `build/docs/pdf/arquitectura/frontend-vue.pdf` |
+| Tema, por ejemplo Pruebas | `build/docs/docx/arquitectura/frontend-vue-pruebas.docx` | `build/docs/pdf/arquitectura/frontend-vue-pruebas.pdf` |
+| Manual de usuario | `build/docs/docx/manuales-vue/manual-usuario.docx` | `build/docs/pdf/manuales-vue/manual-usuario.pdf` |
+
+El formato PDF conserva su DOCX intermedio. Los resultados son artefactos ignorados,
+no fuentes del sitio. La referencia se obtiene con TypeScript y `vue/compiler-sfc`;
+las decisiones y casos se mantienen en sus documentos propietarios.
 
 ## Preparación del publicador
 
@@ -61,6 +97,9 @@ Estas variables son de la herramienta local, no son `VITE_*` y no se publican
 en el navegador. Una fuente ausente o enlace roto se corrige antes de exportar.
 Si falla Pandoc, LibreOffice o Chromium, comprobar primero instalación y `PATH`.
 Una generación de PDF fallida no se registra como publicación aprobada.
+
+El [procedimiento del manual](05-user-manual.md) explica la generación reproducible
+de capturas Vue con datos ficticios y sin escrituras, su revisión y publicación.
 
 ## Revisión y distribución
 

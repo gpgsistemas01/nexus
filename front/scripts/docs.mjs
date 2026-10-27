@@ -3,14 +3,24 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import { generateCodeReference } from './documentation.mjs';
+import { loadDocumentationCatalog, parseDocumentationExportArgs } from './documentationCatalog.mjs';
 
 const frontRoot = fileURLToPath(new URL('../', import.meta.url));
 const [command, ...args] = process.argv.slice(2);
 
-const runExport = (exportArgs) => {
+const runExport = (exportArgs, section = null) => {
     const result = spawnSync(
         process.execPath,
-        ['scripts/exportDocs.js', 'arquitectura', 'frontend-vue', ...exportArgs],
+        [
+            'scripts/exportDocs.js',
+            section === 'manual' ? 'manual-vue' : 'arquitectura',
+            section === 'manual'
+                ? 'manual-usuario'
+                : section
+                  ? `frontend-vue-${section}`
+                  : 'frontend-vue',
+            ...exportArgs,
+        ],
         {
             cwd: path.resolve(frontRoot, '../back'),
             stdio: 'inherit',
@@ -26,20 +36,24 @@ const runExport = (exportArgs) => {
 try {
     if (command === 'generate' && !args.length) {
         await generateCodeReference(frontRoot, false);
-        console.log('Referencia Vue generada en front/docs/architecture/05-code-reference.md.');
+        console.log(
+            'Referencia Vue generada en front/docs/architecture/views/development/code-reference.md.',
+        );
     } else if (command === 'check' && !args.length) {
         await generateCodeReference(frontRoot, true);
         runExport(['--check']);
-    } else if (
-        command === 'export' &&
-        args.length <= 1 &&
-        (!args[0] || ['docx', 'pdf', 'ambos'].includes(args[0]))
-    ) {
+        runExport(['--check'], 'manual');
+    } else if (command === 'export') {
+        const catalog = await loadDocumentationCatalog(path.join(frontRoot, 'docs'));
+        const { section, format } = parseDocumentationExportArgs(
+            args,
+            Object.keys(catalog.sections),
+        );
         await generateCodeReference(frontRoot, true);
-        runExport([args[0] ?? 'ambos']);
+        runExport([format], section);
     } else
         throw new Error(
-            'Usa npm run docs:generate, npm run docs:check o npm run docs:export -- [docx|pdf|ambos].',
+            'Usa npm run docs:generate, npm run docs:check o npm run docs:export -- [seccion] [docx|pdf|ambos].',
         );
 } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));

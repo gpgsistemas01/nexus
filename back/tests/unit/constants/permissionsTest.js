@@ -7,6 +7,7 @@ import { ROLE_KEYS } from '../../../src/constants/roles.js';
 describe('políticas funcionales de acceso', () => {
     const operationalDepartments = [
         DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
         DEPARTMENT_KEYS.WORKSHOP_3D,
         DEPARTMENT_KEYS.PT_TRAFFIC,
         DEPARTMENT_KEYS.INSTALLATIONS,

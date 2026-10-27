@@ -73,4 +73,4 @@ relacionadas; la captura automática no crea datos de operación.
   tener una recuperación visible.
 
 Las responsabilidades por módulo se mantienen en la
-[arquitectura del frontend](../../../../front/docs/architecture/01-structure-and-boundaries.md).
+[arquitectura del frontend](../../../../front/docs/architecture/views/development/code-structure.md).

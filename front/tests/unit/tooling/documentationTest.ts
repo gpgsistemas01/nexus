@@ -52,15 +52,18 @@ it('genera una referencia determinista y detecta que quedó desactualizada al ca
   const root = await mkdtemp(path.join(tmpdir(), 'nexus-vue-docs-'));
   roots.push(root);
   await mkdir(path.join(root, 'src'), { recursive: true });
-  await mkdir(path.join(root, 'docs/architecture'), { recursive: true });
+  await mkdir(path.join(root, 'docs/architecture/views/development'), { recursive: true });
   await writeFile(path.join(root, 'src/state.ts'), 'export const create = () => ({});');
   const first = await renderCodeReference(root);
   expect(first).toBe(await renderCodeReference(root));
   await expect(generateCodeReference(root, true)).rejects.toThrow('desactualizada');
   await generateCodeReference(root, false);
-  expect(await readFile(path.join(root, 'docs/architecture/05-code-reference.md'), 'utf8')).toBe(
-    first,
-  );
+  expect(
+    await readFile(
+      path.join(root, 'docs/architecture/views/development/code-reference.md'),
+      'utf8',
+    ),
+  ).toBe(first);
   await expect(generateCodeReference(root, true)).resolves.toBeUndefined();
   await writeFile(path.join(root, 'src/state.ts'), 'export const load = () => ({});');
   await expect(generateCodeReference(root, true)).rejects.toThrow('desactualizada');

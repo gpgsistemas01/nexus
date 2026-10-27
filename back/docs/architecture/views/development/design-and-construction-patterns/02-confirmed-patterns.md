@@ -19,7 +19,7 @@
 
 La [evaluación SOLID](16-solid-principles.md) distingue principios de estos patrones,
 con evidencia y límites por letra. Los patrones del frontend Vue y su diagrama
-pertenecen a [su guía de diseño](../../../../../../front/docs/patterns/01-applicability-and-principles.md); esta
+pertenecen a [su guía de diseño](../../../../../../front/docs/architecture/views/development/design-and-construction-patterns/01-applicability-and-principles.md); esta
 colección también conserva mecanismos del navegador EJS y no los presenta como
 composables Vue.
 

@@ -18,6 +18,8 @@ import {
     prepareManualEntry
 } from './documentExportContentUtils.js';
 import { removeDocumentOutput } from './documentOutputUtils.js';
+import { loadDocumentationCatalog } from '../../front/scripts/documentationCatalog.mjs';
+import { loadManualPublication } from '../../front/scripts/manual/publication.mjs';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
 import { getMermaidImageId, hasInvalidSvgGeometry, MERMAID_EXPORT_CONFIG, normalizeMermaidSource } from './mermaidExportUtils.js';
 import { validatePdfOutput } from './pdfExportUtils.js';
@@ -60,7 +62,40 @@ const sequenceGroups = [
 const packagePart = (entry, sources) => [entry, ...sources.filter((source) => source !== entry)];
 const REQUIREMENT_ENTRY = 'docs/requirements/index.md';
 const ARCHITECTURE_ENTRY = 'docs/architecture/index.md';
+const {
+    publication: requestedPublication,
+    document: requestedDocument,
+    format: requestedFormat,
+    checkOnly
+} = getDocumentExportRequest(process.argv.slice(2));
+const frontendCatalog = await loadDocumentationCatalog(path.resolve(ROOT, '../front/docs'));
+const frontendManualProfile = requestedPublication === 'manual-vue'
+    ? process.env.DOCS_FRONT_MANUAL_PROFILE : undefined;
+const frontendManualSources = frontendManualProfile
+    ? await loadManualPublication(path.resolve(ROOT, '../front'), frontendManualProfile) : null;
+const frontendSource = source => `../front/docs/${source}`;
+const frontendSectionParts = requestedPublication === 'arquitectura'
+    && requestedDocument?.startsWith('frontend-vue-')
+    ? Object.fromEntries(Object.entries(frontendCatalog.sections)
+        .filter(([, definition]) => definition.includeInComplete)
+        .map(([name, definition]) => [
+            `frontend-vue-${name}`,
+            definition.sources.map(frontendSource)
+        ]))
+    : {};
 const PUBLICATIONS = Object.freeze({
+    ...(requestedPublication === 'manual-vue' ? {
+        'manual-vue': {
+            directory: frontendManualProfile ? `manuales-vue/${frontendManualProfile}` : 'manuales-vue',
+            parts: {
+                ...(frontendManualProfile ? {
+                    [`manual-${frontendManualProfile}`]: frontendManualSources
+                } : {
+                    'manual-usuario': frontendCatalog.sections.manual.sources.map(frontendSource)
+                })
+            }
+        }
+    } : {}),
     requisitos: {
         directory: 'requisitos',
         parts: {
@@ -112,8 +147,8 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/views/development/code-structure'),
                 ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
                 ...getDirectoryDocuments('docs/architecture/views/development/reuse-and-refactoring'),
-                '../front/docs/architecture/02-web-views.md',
-                ...getDirectoryDocuments('../front/docs/patterns'),
+                '../front/docs/architecture/views/overview.md',
+                ...getDirectoryDocuments('../front/docs/architecture/views/development/design-and-construction-patterns'),
                 'docs/architecture/views/development/code-map.md'
             ]),
             'incorporacion-desarrolladores': packagePart(ARCHITECTURE_ENTRY, [
@@ -128,15 +163,8 @@ const PUBLICATIONS = Object.freeze({
                 'docs/architecture/views/development/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
             ]),
-            'frontend-vue': packagePart('../front/docs/index.md', [
-                ...getDirectoryDocuments('../front/docs/architecture'),
-                ...getDirectoryDocuments('../front/docs/patterns'),
-                ...getDirectoryDocuments('../front/docs/modules'),
-                ...getDirectoryDocuments('../front/docs/development'),
-                ...getDirectoryDocuments('../front/docs/requirements'),
-                ...getDirectoryDocuments('../front/docs/testing'),
-                ...getDirectoryDocuments('../front/docs/governance')
-            ]),
+            'frontend-vue': frontendCatalog.completeSources.map(frontendSource),
+            ...frontendSectionParts,
             'comportamiento-transversal': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/processes/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/processes/shared-runtime-behavior')
@@ -170,12 +198,6 @@ const PUBLICATIONS = Object.freeze({
         }
     }
 });
-const {
-    publication: requestedPublication,
-    document: requestedDocument,
-    format: requestedFormat,
-    checkOnly
-} = getDocumentExportRequest(process.argv.slice(2));
 const formats = new Set(['docx', 'pdf', 'ambos']);
 const outputPlan = getDocumentOutputPlan(requestedFormat);
 const positionalArgumentCount = process.argv.slice(2)
@@ -338,6 +360,15 @@ const insertAfterDocumentData = (content, insertion) => {
     return `${content.slice(0, insertionIndex)}\n\n${insertion}\n${content.slice(insertionIndex).replace(/^\r?\n+/, '')}`;
 };
 
+const preparePublicationSource = (content, source, output) => {
+    const document = path.basename(output).replace(/\.(?:docx|pdf)$/, '');
+    const section = frontendCatalog.sections[document.replace(/^frontend-vue-/, '')];
+    const titledContent = source === '../front/docs/index.md' && section
+        ? content.replace(/^# [^\r\n]+/, `# ${section.title} del frontend Vue`)
+        : content;
+    return prepareManualSource(titledContent, source, output);
+};
+
 const selectedDefinition = PUBLICATIONS[requestedPublication];
 const invalidDocument = requestedDocument && (
     !selectedDefinition?.parts[requestedDocument]
@@ -371,7 +402,7 @@ const publications = await Promise.all(publicationParts.map(async ({ publication
     await Promise.all(sources.map((source) => access(path.join(ROOT, source))));
     const sourceContents = await Promise.all(sources.map(async (source) => ({
         source,
-        content: prepareManualSource(
+        content: preparePublicationSource(
             await readFile(path.join(ROOT, source), 'utf8'),
             source,
             directory ? `${directory}/${document}.docx` : `${document}.docx`
@@ -479,7 +510,9 @@ if (outputPlan.generatePdf) {
     }
 }
 
-const frontendOnly = publications.every(({ sources }) => sources.every((source) => source.startsWith('../front/docs/')));
+const frontendOnly = publications.every(({ sources }) => sources.every((source) => (
+    source.startsWith('../front/docs/') || source.startsWith('../front/build/manuals/')
+)));
 const outputDirectory = path.resolve(ROOT, frontendOnly ? '../front/build/docs' : 'build/docs');
 const documentOutputDirectories = {
     docx: path.join(outputDirectory, 'docx'),
@@ -502,7 +535,7 @@ await writeFile(mermaidConfigFile, JSON.stringify(MERMAID_EXPORT_CONFIG));
 let mermaidPrepared = false;
 
 const prepareSource = async (source, publicationSources, firstFigureNumber, currentOutput, outputFormat) => {
-    const sourceContent = prepareManualSource(
+    const sourceContent = preparePublicationSource(
         await readFile(path.join(ROOT, source), 'utf8'), source, currentOutput
     );
     const content = source.startsWith('docs/user-manual/actors/')

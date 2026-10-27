@@ -79,4 +79,4 @@ garantiza esa separación: cada módulo debe tener un motivo concreto para cambi
 En Vue, la page coordina el caso, el composable conserva comportamiento reactivo,
 el servicio adapta HTTP y los componentes reciben props y emiten eventos. Los
 límites verificados con ESLint y los criterios para compartir código se mantienen en
-[la arquitectura del frontend](../../../../../../front/docs/architecture/01-structure-and-boundaries.md).
+[la arquitectura del frontend](../../../../../../front/docs/architecture/views/development/code-structure.md).

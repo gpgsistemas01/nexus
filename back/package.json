@@ -33,7 +33,7 @@
     "test:coverage:integration": "npm run test:integration -- --coverage",
     "test:watch": "vitest watch --config vitestConfig.js",
     "test:db:migrate": "npm run test:db:verify && cross-env NODE_ENV=test prisma migrate deploy && cross-env NODE_ENV=test prisma generate",
-    "test:integration": "npm run test:db:verify && cross-env NODE_ENV=test prisma migrate deploy && cross-env NODE_ENV=test prisma generate && vitest run --config vitestIntegrationConfig.js",
+    "test:integration": "npm run test:db:verify && cross-env NODE_ENV=test prisma migrate deploy && cross-env NODE_ENV=test prisma generate && cross-env NODE_ENV=test vitest run --config vitestIntegrationConfig.js",
     "test:performance": "npm run test:db:migrate && cross-env NODE_ENV=test node --import=dotenv/config tests/performance/backendBenchmark.js",
     "test:performance:mixed": "npm run test:db:migrate && cross-env NODE_ENV=test node --import=dotenv/config tests/performance/backendMixedBenchmark.js",
     "test:db": "npm run test:integration",

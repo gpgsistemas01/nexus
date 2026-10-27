@@ -1,12 +1,17 @@
-# Requisitos y casos de uso del cliente Vue
+# Requisitos y casos de uso
 
-Esta colección contiene la especificación y las fichas de interacción propias del frontend. Incluye objetivos, actores, captura, flujos, alternativas, errores y resultados; no es sólo un índice hacia documentos del servidor. Conceptos comunes se explican nuevamente cuando hacen falta para leer el cliente por separado.
+## Control documental
 
-## Capítulos
+Estado: En revisión. Responsable: Equipo Nexus. Versión de la colección: [entrada documental](../index.md).
 
-1. [Aplicación y trazabilidad de requisitos y casos de uso](01-applicability-and-traceability.md).
-2. [Especificación del cliente Vue](02-client-specification.md).
-3. [Acceso, consultas y registros](03-access-and-record-use-cases.md).
-4. [Inventario, Compras, Salidas y reportes](04-inventory-and-document-use-cases.md).
+## Organización
 
-Los IDs `RF/RD/RN/RC-VUE-*` y `CU-VUE-*` identifican el alcance del cliente. Los IDs del producto se mantienen como correspondencia, sin sustituir las obligaciones de Express. La [cobertura local](../testing/03-use-case-coverage.md) relaciona requisitos, fichas y evidencia; los [módulos](../modules/index.md) explican la realización técnica.
+1. [Aplicación y trazabilidad](01-applicability-and-traceability.md): identidad, revisión y cadena de evidencia.
+2. [Especificación de requisitos](requirements-specification/index.md): actores, obligaciones, criterios y estados.
+3. [Catálogo de casos de uso](use-cases/index.md): 94 fichas por operación, agrupadas por tema.
+4. [Glosario de negocio](business-glossary.md): términos necesarios para interpretar los requisitos.
+
+Las fichas describen objetivos observables. La [arquitectura](../architecture/index.md)
+explica su realización y el [plan de pruebas](../testing/01-test-plan.md) define cómo
+seleccionar condiciones y conservar evidencia. La [matriz](../testing/04-use-case-coverage.md)
+permite recorrer cada caso sin confundir implementación, simulación y ejecución real.

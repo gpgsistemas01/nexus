@@ -42,13 +42,13 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 
 ## Cobertura vigente
 
-La [vista de cobertura Vue](../../../front/docs/testing/03-use-case-coverage.md)
+La [vista de cobertura Vue](../../../front/docs/testing/04-use-case-coverage.md)
 conserva la aplicación de requisitos/casos, fichas del cliente y brechas específicas
 de la migración. Complementa esta evidencia del sistema; las respuestas simuladas
 del navegador no cierran las brechas de autorización o persistencia indicadas aquí.
 
 Para la interfaz Vue de `CU-ALM-01..06` y `CU-ALM-09..14`, la evidencia adicional
-está en [DP-VUE-WH-001–010](../../../front/docs/testing/01-test-design.md#pruebas-de-almacén):
+está en [DP-VUE-WH-001–010](../../../front/docs/testing/design/02-inventory.md#pruebas-de-almacén):
 `inventoryFormTest.ts`, `inventoryNavigationTest.ts`, `apiClientTest.ts` y
 `warehouse.spec.ts`. Cubre permisos visuales, altas, edición, identificador de baja,
 versiones de captura, filtros/paginación, descarga y recuperación de merma tras
@@ -91,10 +91,10 @@ no una demostración de todos los CU.
 | `CU-CAT-04` | `records.spec.ts` y `front/tests/system/application.spec.ts`. | Descarga/reintento de interfaz y XLSX real con búsqueda: incluye fixture de proveedor y excluye otra. | **Navegador y sistema representativos.** Faltan otras combinaciones/roles y volúmenes. |
 | `CU-CAT-05..07` | `clientControllerDbTest.js`. | Integración de alta, listado, actualización y error específico con fixtures y limpieza. | **Integración existente.** |
 | `CU-CAT-08` | `records.spec.ts` y `front/tests/system/application.spec.ts`. | Descarga/reintento de interfaz y XLSX real con búsqueda: incluye cliente persistido desde Vue y excluye otro. | **Navegador y sistema representativos.** No afirma todas las columnas/roles o escalas. |
-| `CU-CAT-09..26` | `catalogServiceTest.js`, `catalogControllersDbTest.js` (`CP-INT-PAG-001`, `CP-INT-VAL-006`); Vue: [DP-VUE-CAT-001–004](../../../front/docs/testing/01-test-design.md#pruebas-de-catálogos). | Unitaria e integración CRUD/validación con catálogo permitido, normalización, campos ajenos, marcado/control/tipos inválidos sin efectos, paginación acotada y lectura Prisma. | **Unitaria e integración existentes.** |
+| `CU-CAT-09..26` | `catalogServiceTest.js`, `catalogControllersDbTest.js` (`CP-INT-PAG-001`, `CP-INT-VAL-006`); Vue: [DP-VUE-CAT-001–004](../../../front/docs/testing/design/03-records.md#pruebas-de-catálogos). | Unitaria e integración CRUD/validación con catálogo permitido, normalización, campos ajenos, marcado/control/tipos inválidos sin efectos, paginación acotada y lectura Prisma. | **Unitaria e integración existentes.** |
 | `CU-IDA-01` | Sin prueba funcional directa. | Actor autorizado/no autorizado, filtros, paginación y conjunto vacío. | **Brecha.** |
 | `CU-IDA-02..03` | `personApiRouteTest.js`. | Unitaria de orden validación–autorización–handler para escrituras. | **Unitaria existente**, limitada al contrato de ruta; falta persistencia. |
-| `CU-IDA-04..08` | Vue: [DP-VUE-IDA-002 y REC](../../../front/docs/testing/01-test-design.md#pruebas-de-identidad-y-directorio-comercial). Sin prueba de servidor o integración directa para ese grupo. | Reporte de personas y escrituras de usuarios requieren permisos, payloads, relaciones, credenciales, filtros y persistencia según el caso. | **Brecha**; los requests simulados de frontend no prueban el flujo completo. |
+| `CU-IDA-04..08` | Vue: [DP-VUE-IDA-002 y REC](../../../front/docs/testing/design/03-records.md#pruebas-de-identidad-y-directorio-comercial). Sin prueba de servidor o integración directa para ese grupo. | Reporte de personas y escrituras de usuarios requieren permisos, payloads, relaciones, credenciales, filtros y persistencia según el caso. | **Brecha**; los requests simulados de frontend no prueban el flujo completo. |
 | `CU-IDA-09` | `records.spec.ts` y `front/tests/system/application.spec.ts`. | Descarga/reintento y reporte XLSX real de usuarios por búsqueda, con inclusión/exclusión de fixtures. | **Navegador y sistema representativos.** No cierra brechas de las escrituras de usuarios ni todos los alcances del reporte. |
 | `CU-SAL-01..05` | `goodsIssueContextServicesTest.js`, `goodsIssueContextRoutesTest.js`, `goodsIssueControllerDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Contexto fijo, rutas y validadores; alta/edición/surtido, rechazo cruzado, surtido coincidente, stock insuficiente y rollback con saldos/movimientos. `apiWriteValidationDbTest.js` añade `CP-INT-VAL-007`: proyecto con NUL rechazado sin escritura. | **Unitarias e integración existentes**; completar otras fronteras de cantidades según el cambio. |
 | `CU-SAL-06` | `goodsIssueControllerTest.js`, `goodsIssueControllerDbTest.js`. | Delegación unitaria e integración de devolución parcial con existencia, acumulados y movimiento. | **Unitarias e integración existentes**; faltan devolución total, cantidad excesiva y rollback. |
@@ -213,7 +213,7 @@ controllers reciben los tipos que entregan los validators; sus pruebas no simula
 una conversión adicional. No se modifica el esquema para redondear históricos.
 
 La adaptación Vue de Personas y del directorio comercial se comprueba adicionalmente
-en [DP-VUE-IDA-001 y DP-VUE-DIR-001](../../../front/docs/testing/01-test-design.md#pruebas-de-identidad-y-directorio-comercial):
+en [DP-VUE-IDA-001 y DP-VUE-DIR-001](../../../front/docs/testing/design/03-records.md#pruebas-de-identidad-y-directorio-comercial):
 responsabilidades, validación de captura, permisos de interfaz, alta/edición y versiones.
 Las integraciones existentes de Clientes/Proveedores siguen siendo la evidencia de
 persistencia. Las pruebas Vue no cierran las brechas de servidor de Personas/Usuarios
@@ -227,7 +227,7 @@ La migración de Movimientos a Vue añade evidencia para `CU-ALM-07..08`,
 y [`movements.spec.ts`](../../../front/tests/e2e/movements.spec.ts): contrato por
 recurso, identidades de selectores, filtros, permisos de navegación, diez columnas
 y descarga en tres modalidades con API simulada. El
-[diseño DP-VUE-MOV-001..004](../../../front/docs/testing/01-test-design.md#movimientos-diseño-de-comprobación) delimita su alcance.
+[diseño DP-VUE-MOV-001..004](../../../front/docs/testing/design/04-movements.md#movimientos-diseño-de-comprobación) delimita su alcance.
 Esta evidencia del cliente no cierra las brechas de integración ni de contenido
 real del reporte de merma indicadas arriba.
 

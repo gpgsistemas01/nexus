@@ -31,3 +31,8 @@ coverage/
 # Browser test artifacts
 test-results/
 playwright-report/
+
+# Credenciales y configuración local de los manuales por cuenta
+!.env.manual.example
+.env.manual.local
+manual.accounts.local.json

@@ -38,13 +38,14 @@ export const ORGANIZATION_CONTEXT_POLICIES = Object.freeze({
 });
 
 // Accesos comunes de consulta y solicitudes. Almacén y Sistemas conservan además
-// sus políticas de gestión; el acceso de sólo consulta aplica a las otras cinco áreas.
+// sus políticas de gestión; el acceso de consulta y solicitudes aplica a las áreas operativas.
 const operationalAccessPolicy = createPolicy({
     roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.OPERATOR, ROLE_KEYS.INSTALLER, ROLE_KEYS.WAREHOUSE_KEEPER],
     departments: [
         DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
         DEPARTMENT_KEYS.SYSTEMS,
         DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
         DEPARTMENT_KEYS.WORKSHOP_3D,
         DEPARTMENT_KEYS.PT_TRAFFIC,
         DEPARTMENT_KEYS.INSTALLATIONS,

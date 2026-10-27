@@ -1,0 +1,97 @@
+{
+    "sections": {
+        "inicio": {
+            "title": "Inicio e incorporación",
+            "sources": [
+                "development/index.md",
+                "development/01-getting-started.md",
+                "architecture/views/development/developer-onboarding.md",
+                "development/02-tooling.md"
+            ]
+        },
+        "requisitos": {
+            "title": "Especificación y glosario",
+            "sources": [
+                "requirements/index.md",
+                "requirements/business-glossary.md",
+                "requirements/01-applicability-and-traceability.md",
+                "requirements/requirements-specification/index.md",
+                "requirements/requirements-specification/client-specification.md",
+                "requirements/requirements-specification/catalog/"
+            ]
+        },
+        "casos-de-uso": {
+            "title": "Catálogo de casos de uso",
+            "sources": [
+                "requirements/use-cases/index.md",
+                "requirements/use-cases/authentication/",
+                "requirements/use-cases/identity-access/",
+                "requirements/use-cases/warehouse/",
+                "requirements/use-cases/movements/",
+                "requirements/use-cases/directory/",
+                "requirements/use-cases/catalogs/",
+                "requirements/use-cases/purchases/",
+                "requirements/use-cases/issues/"
+            ]
+        },
+        "arquitectura": {
+            "title": "Arquitectura y diseño",
+            "sources": [
+                "architecture/index.md",
+                "architecture/views/index.md",
+                "architecture/views/overview.md",
+                "architecture/decisions.md",
+                "architecture/views/scenarios/",
+                "architecture/views/logical/index.md",
+                "architecture/views/logical/ui-and-http.md",
+                "architecture/views/logical/components/",
+                "architecture/views/logical/state-and-lifecycle.md",
+                "architecture/views/logical/document-contracts.md",
+                "architecture/views/logical/document-states.md",
+                "architecture/views/logical/input-security.md",
+                "architecture/contracts/",
+                "architecture/views/processes/",
+                "architecture/views/development/index.md",
+                "architecture/views/development/code-structure.md",
+                "architecture/views/development/design-and-construction-patterns/",
+                "architecture/views/development/frontend-technical-documentation/",
+                "architecture/views/physical/"
+            ]
+        },
+        "estandar": {
+            "title": "Estándar de codificación",
+            "sources": ["architecture/coding-standards/"]
+        },
+        "referencia": {
+            "title": "Referencia generada del código",
+            "sources": ["architecture/views/development/code-reference.md"]
+        },
+        "pruebas": {
+            "title": "Plan, diseño y casos de prueba",
+            "sources": [
+                "testing/index.md",
+                "testing/01-test-plan.md",
+                "testing/02-test-design.md",
+                "testing/design/",
+                "testing/03-test-cases.md",
+                "testing/cases/",
+                "testing/04-use-case-coverage.md",
+                "testing/05-system-tests.md"
+            ]
+        },
+        "operacion": {
+            "title": "Construcción y despliegue",
+            "sources": ["development/03-build-and-deployment.md"]
+        },
+        "manual": {
+            "title": "Manual de usuario",
+            "entry": "user-manual/index.md",
+            "includeInComplete": false,
+            "sources": ["user-manual/"]
+        },
+        "gobierno": {
+            "title": "Reglas documentales y publicación",
+            "sources": ["governance/"]
+        }
+    }
+}

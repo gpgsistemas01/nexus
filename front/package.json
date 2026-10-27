@@ -18,11 +18,14 @@
     "check": "npm run format:check && npm run lint && npm run test:unit && npm run build",
     "test:e2e": "playwright test",
     "test:e2e:system": "playwright test --config playwright.system.config.ts",
-    "format": "npm run lint:fix && prettier --write \"src/**/*.{ts,vue,css}\" \"tests/**/*.ts\" \"*.{js,ts,json}\" \"scripts/**/*.mjs\"",
-    "format:check": "prettier --check \"src/**/*.{ts,vue,css}\" \"tests/**/*.ts\" \"*.{js,ts,json}\" \"scripts/**/*.mjs\"",
+    "format": "npm run lint:fix && prettier --write \"src/**/*.{ts,vue,css}\" \"tests/**/*.ts\" \"*.{js,ts,json}\" \"scripts/**/*.mjs\" \"docs/publications.json\"",
+    "format:check": "prettier --check \"src/**/*.{ts,vue,css}\" \"tests/**/*.ts\" \"*.{js,ts,json}\" \"scripts/**/*.mjs\" \"docs/publications.json\"",
     "docs:generate": "node scripts/docs.mjs generate",
     "docs:check": "node scripts/docs.mjs check",
-    "docs:export": "node scripts/docs.mjs export"
+    "docs:export": "node scripts/docs.mjs export",
+    "docs:manual": "node scripts/docs.mjs export manual",
+    "docs:manuals": "node scripts/manuals.mjs",
+    "docs:screenshots": "playwright test --config playwright.manual.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "5.3.0",

@@ -1,17 +1,21 @@
 # Pruebas del frontend Vue
 
 Esta colección documenta diseño, casos críticos y evidencia funcional del cliente.
-Aplica el [plan propio de Vue](05-test-plan.md), que adapta 29119-2, -3 y -4 sin
+Aplica el [plan propio de Vue](01-test-plan.md), que adapta 29119-2, -3 y -4 sin
 declarar conformidad. Los [requisitos y casos de uso locales](../requirements/index.md)
 contienen su especificación y flujos completos.
 
-## Capítulos
+## Orden de lectura
 
-1. [Diseño y contratos de pruebas Vue](01-test-design.md).
-2. [Registro selectivo de casos de prueba Vue](02-test-cases.md).
-3. [Cobertura Vue por caso de uso y brechas](03-use-case-coverage.md).
-4. [Preparar y ejecutar pruebas de sistema](04-system-tests.md).
-5. [Plan de pruebas del frontend Vue](05-test-plan.md).
+1. [Plan de pruebas](01-test-plan.md): alcance, riesgos, niveles, técnicas y criterios de ejecución.
+2. [Diseño y trazabilidad](02-test-design.md): condiciones DP y evidencia asociada, agrupadas en [diseños por ámbito](design/index.md).
+3. [Registro de casos](03-test-cases.md): datos, pasos, resultado esperado y limpieza de las fichas CP.
+4. [Cobertura por caso de uso](04-use-case-coverage.md): objetivos representados y límites de evidencia.
+5. [Preparación de sistema](05-system-tests.md): ambiente aislado, ejecución y limpieza con API/base reales.
+
+El resultado de una corrida se conserva como EP en CI o revisión. El plan precede
+al diseño; el caso concreta sus datos; la cobertura relaciona esa evidencia con los
+objetivos funcionales. La preparación de sistema se consulta al ejecutar ese nivel.
 
 ## Niveles y oráculos
 
@@ -32,7 +36,7 @@ Desde la raíz: `npm --prefix front run test:unit` para unitarias. La preparaci�
 ejecución de Playwright se mantienen en [README](../../README.md#pruebas-de-navegador);
 su configuración fija Chromium, un worker y el servidor Vite local.
 `npm --prefix front run test:e2e:system` es independiente: requiere la base aislada,
-migraciones y dependencias de ambas aplicaciones según [la preparación](04-system-tests.md).
+migraciones y dependencias de ambas aplicaciones según [la preparación](05-system-tests.md).
 
 Para cada revisión se registra en CI o en la solicitud de cambio el comando, commit
 o estado local identificado, Node/herramientas, navegador cuando corresponda, fecha,

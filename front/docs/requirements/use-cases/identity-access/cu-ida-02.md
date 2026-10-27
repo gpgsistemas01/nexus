@@ -1,0 +1,22 @@
+# `CU-IDA-02` — Crear persona
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-IDA-02` |
+| Nombre | Crear persona. |
+| Actor | Personal de almacén o Administrador del sistema. |
+| Disparador | Selecciona la acción principal para crear una persona desde `CU-IDA-01` Consultar personas. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
+| Flujo principal | 1. **Actor:** abre la opción para crear persona **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las áreas y roles disponibles.<br>3. **Actor:** captura el nombre completo; selecciona un área y un rol y selecciona **Agregar** **(ver A1)**.<br>4. **Nexus:** valida que el área y el rol sean válidos y que el área no esté repetida; incorpora el acceso a la tabla.<br>5. **Actor:** repite la adición para cada acceso requerido, revisa los renglones de la tabla y selecciona **Guardar**.<br>6. **Nexus:** valida autorización, obligatoriedad, formato, identidad y todos los accesos **(ver A2)**; registra la persona y sus accesos como una sola operación, actualiza el listado y muestra la confirmación **(ver EOP)**. |
+| Flujos alternativos | **A1 — Acceso inválido o área repetida (después del paso 3):**<br>1. **Nexus:** detecta que falta el área o el rol, que la relación no es válida o que el área ya tiene un acceso en la tabla; señala el problema sin agregar el renglón.<br>2. **Actor:** corrige la selección y vuelve a seleccionar **Agregar**; continúa en el paso 3 del flujo principal.<br>**A2 — Datos finales inválidos (después del paso 6):**<br>1. **Actor:** revisa el nombre o los accesos que Nexus señala.<br>2. **Nexus:** conserva el formulario y la tabla sin guardar cambios.<br>3. **Actor:** corrige la información y continúa en el paso 3 del flujo principal. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EOP — Operación no completada (durante el paso 6 del flujo principal):**<br>1. **Nexus:** no puede completar la operación, comunica el fallo y conserva la información anterior sin cambios parciales.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta de persona sin crear cuenta.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-IAM-007`. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/04-identity-and-directory.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `records.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+
+## Diagramas de realización
+
+- [Personas y responsabilidades](../../../architecture/views/processes/06-person-responsibilities.md).

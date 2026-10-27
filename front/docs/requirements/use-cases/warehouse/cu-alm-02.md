@@ -1,0 +1,31 @@
+# `CU-ALM-02` — Crear material
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-ALM-02` |
+| Nombre | Crear material. |
+| Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ENT-02` en el punto de selección de material (paso 3, A5 de la compra) cuando se elige **Registrar material**; devuelve la oferta con existencia cero y sin costo máximo y reanuda el detalle en el paso 4. Desde `CU-ALM-01` es un objetivo independiente. |
+| Disparador | Selecciona la acción principal para crear un material desde `CU-ALM-01` Consultar materiales o **Registrar material** desde el selector de `CU-ENT-02` Crear compra de material. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
+| Flujo principal | 1. **Actor:** abre la opción para crear material **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las opciones relacionadas que puede utilizar.<br>3. **Actor:** captura nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna cuando la unidad sea metros o litros, stock mínimo, costo máximo, estado, existencia inicial y observaciones; después confirma **(ver A1)** **(ver A3)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones **(ver A2)**; registra la identidad o reutiliza la existente, crea la oferta del proveedor y registra el ajuste de existencia inicial; actualiza el listado y muestra la confirmación **(ver EOP)**. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** valida la información capturada, detecta datos incompletos o que no cumplen las reglas del caso y señala qué debe corregirse, sin registrar cambios.<br>2. **Actor:** corrige la información indicada y vuelve a confirmar; continúa en el paso 4 del flujo principal.<br>**A2 — Identidad ya registrada (después del paso 4):**<br>1. **Actor:** revisa el material coincidente que Nexus presenta.<br>2. **Nexus:** si ya existe la relación con el mismo proveedor, rechaza el alta sin modificar la existencia e indica que debe ajustarse el inventario existente; termina el caso de uso; si la identidad sólo existe para otro proveedor, reutiliza el material y crea la nueva relación proveedor-material; continúa en el paso 4 del flujo principal.<br>**A3 — Alta invocada desde una compra (después del paso 3):**<br>1. **Nexus:** conserva el mismo flujo de alta y marca el contexto de entrada; oculta el costo máximo, la existencia inicial, la razón y las observaciones del ajuste; costo máximo y existencia inicial dejan de ser obligatorios en cliente y servidor.<br>2. **Actor:** confirma los datos de identidad, proveedor, stock mínimo y estado.<br>3. **Nexus:** crea la identidad y la oferta con existencia cero y sin costo máximo; devuelve el material al formulario de compra, donde el actor captura cantidad y costo por presentación. No crea un ajuste inicial; termina este caso y continúa `CU-ENT-02` en la captura del detalle. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso.<br>**EOP — Operación no completada (durante el paso 4 del flujo principal):**<br>1. **Nexus:** no puede completar la operación, comunica el fallo y conserva la información anterior sin cambios parciales.<br>2. **Actor:** recibe el aviso, conserva los datos capturados cuando existe un formulario y decide reintentar más tarde o terminar el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta con presentación, unidad y relaciones válidas.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-CAT-006`, `RF-CAT-012`, `RN-023` a `RN-026`, `RN-030`, `RN-032`. |
+
+El material no requiere capturar pesos del rollo nuevo; la referencia de muestra se
+captura con la merma en `CU-ALM-10`. Los pesos antiguos quedan históricos.
+
+La sección de medidas se oculta y deshabilita para pieza, otras unidades y consumibles.
+Al cambiar a una unidad que no utiliza medidas durante el alta, se borran los valores
+y errores anteriores; los inputs deshabilitados se omiten del envío. El mismo criterio
+se aplica al alta desde compras. La edición y el ajuste no habilitan cambios de identidad.
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+
+## Diagramas de realización
+
+- [Selección dependiente y escritura de inventario](../../../architecture/views/processes/08-inventory-selection-write.md).

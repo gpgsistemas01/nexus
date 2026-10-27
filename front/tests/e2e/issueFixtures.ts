@@ -8,6 +8,7 @@ export const mockIssues = async (
   page: Page,
   permissions = issuePermissions,
   state = 'Pendiente',
+  departmentName = 'SISTEMAS',
 ) => {
   await mockWarehouse(page, permissions);
   const reads: URL[] = [];
@@ -19,6 +20,7 @@ export const mockIssues = async (
     wastes: issueFor('wastes'),
   };
   for (const doc of Object.values(docs)) {
+    doc.departmentName = departmentName;
     doc.fulfillmentStatus.name = state;
     if (state === 'Surtido') {
       doc.details[0]!.isSupplied = true;
@@ -29,7 +31,7 @@ export const mockIssues = async (
     route.fulfill({ json: pageOf([clientData]) }),
   );
   await page.route('**/api/admin/departments?**', (route) =>
-    route.fulfill({ json: pageOf([{ id: departmentId, name: 'SISTEMAS' }]) }),
+    route.fulfill({ json: pageOf([{ id: departmentId, name: departmentName }]) }),
   );
   await page.route('**/api/admin/persons?**', (route) =>
     route.fulfill({ json: pageOf([personData]) }),

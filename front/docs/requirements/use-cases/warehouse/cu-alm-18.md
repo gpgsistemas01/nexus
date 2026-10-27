@@ -1,0 +1,23 @@
+# `CU-ALM-18` — Crear consumible
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-ALM-18` |
+| Nombre | Crear consumible. |
+| Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ENT-08` en el punto de selección de consumible (paso 3, A5 de la compra) cuando se elige **Registrar consumible**; devuelve la oferta con existencia cero y sin costo máximo y reanuda el detalle en el paso 4. Desde `CU-ALM-17` es un objetivo independiente. |
+| Disparador | Selecciona **Nuevo consumible** desde `CU-ALM-17` o **Registrar consumible** desde el selector de `CU-ENT-08`. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor tiene autorización para mantener el catálogo de consumibles.<br>3. Existen proveedor, presentación y unidad disponibles. |
+| Flujo principal | 1. **Actor:** selecciona **Nuevo consumible** desde la consulta, o inicia el alta desde una compra **(ver A3)** **(ver E1)**.<br>2. **Nexus:** muestra proveedor, nombre, presentación, unidad, stock mínimo, costo máximo, estado, existencia inicial, motivo y observaciones; omite base y altura.<br>3. **Actor:** captura una unidad explícita y los demás datos obligatorios y confirma **(ver A1)**.<br>4. **Nexus:** comprueba que el artículo se registre como consumible sin dimensiones, que la presentación y la unidad sean válidas y que la oferta del proveedor no esté repetida; registra el consumible, su oferta y la existencia inicial con su ajuste trazable, sin cambios parciales **(ver A2)** **(ver EOP)**; muestra la confirmación del alta, cierra el formulario y actualiza el listado de consumibles. |
+| Flujos alternativos | **A1 — Datos inválidos (después del paso 3):**<br>1. **Nexus:** señala cada campo inválido y conserva los valores capturados.<br>2. **Actor:** corrige los datos o cancela; no se registra ningún cambio; si corrige, continúa en el paso 3 del flujo principal; si cancela, termina el caso de uso.<br>**A2 — Identidad existente (durante el paso 4):**<br>1. **Nexus:** si falta la oferta del proveedor, reutiliza el consumible ya registrado y continúa con el registro de la oferta en el paso 4 del flujo principal. Si la oferta ya existe, informa el duplicado, conserva el catálogo y las existencias sin cambios y termina el caso de uso.<br>**A3 — Alta desde una compra (después del paso 1):**<br>1. **Nexus:** mantiene la clasificación como consumible y oculta costo máximo, existencia inicial, motivo y observaciones de ajuste; costo máximo y existencia inicial dejan de ser obligatorios.<br>2. **Actor:** confirma los datos que identifican al consumible, proveedor, unidad, presentación, stock mínimo y estado.<br>3. **Nexus:** registra el consumible y su oferta con existencia cero y sin costo máximo, sin generar ajuste inicial; devuelve el consumible al selector de `CU-ENT-08`.<br>4. **Actor:** captura cantidad y costo en el detalle de la compra y continúa en su paso 4. |
+| Excepciones | **E1 — Acceso rechazado:** Nexus no muestra ni procesa el alta.<br>**EOP — Operación no completada:** Nexus conserva sin cambios el catálogo, las ofertas y las existencias; no registra un ajuste parcial. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** el consumible queda sin dimensiones, con unidad explícita y existencia inicial trazable cuando el alta es independiente; en contexto de compra, queda con existencia cero y sin costo máximo, seleccionado en el detalle de `CU-ENT-08`.<br>2. **Fallo:** el inventario permanece sin cambios parciales. |
+| Requisitos relacionados | `RF-CAT-026`, `RN-023` a `RN-026`, `RN-030`, `RN-032`, `RN-034`. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+
+## Diagramas de realización
+
+- [Selección dependiente y escritura de inventario](../../../architecture/views/processes/08-inventory-selection-write.md).

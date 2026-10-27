@@ -17,7 +17,7 @@ El contenido corresponde al código versionado, no al estado supuesto de un desp
 | Responsable funcional/técnico | Aceptar requisitos y recorridos cuando exista una designación y evidencia suficientes. Hasta registrarlo, el estado es En revisión. |
 
 Un commit, compilación o prueba aprobada no acredita aceptación funcional ni una
-certificación. No se solicita autorización por cada edición reversible de una guía.
+certificación.
 
 ## Colecciones y contenido
 
@@ -25,25 +25,22 @@ certificación. No se solicita autorización por cada edición reversible de una
 | --- | --- |
 | `requirements` | Alcance del cliente, obligaciones observables, datos, restricciones, actores y fichas de interacción. |
 | `architecture` | Responsabilidades, estado, dependencias, transporte, entradas y despliegue; inventario técnico generado separado de las decisiones. |
-| `patterns` | Problema, decisión, modelo general, aplicación con nombres reales, límites y evidencia. |
-| `modules` | Rutas, campos, modos, permisos, efectos, errores y propietarios de cada capacidad Vue. |
-| `development` | Instalación, archivos locales, comandos, herramientas, estándar de código, compilación y publicación. |
+| `architecture/views/development/design-and-construction-patterns` | Problema, decisión, modelo general, aplicación con nombres reales, límites y evidencia. |
+| `architecture/views/development/frontend-technical-documentation` | Rutas, campos, modos, permisos, efectos, errores y propietarios de cada capacidad Vue. |
+| `development` | Instalación, archivos locales, comandos, herramientas, compilación y publicación. |
 | `testing` | Plan propio, condiciones, casos, datos, oráculos, cobertura y preparación de ambientes. |
 | `governance` | Reglas editoriales, mantenimiento, generación y publicación. |
+| `user-manual` | Procedimientos, campos, resultados, incidencias y capturas de las pantallas Vue. Publicación independiente. |
 
-Los conceptos compartidos con el servidor pueden explicarse también aquí cuando
-sean necesarios para comprender el cliente. Se adapta la explicación a Vue:
-captura, props/eventos, reactividad, cancelación, navegación y respuesta visible.
-La documentación no traslada al navegador la autorización ni las transacciones.
-Las referencias externas complementan el contenido local; no sustituyen sus pasos
-o condiciones necesarias. Una diferencia contractual se corrige en código y guías,
-sin ocultarla mediante una redirección al documento de otra aplicación.
+Cada documento desarrolla el contenido que le corresponde y enlaza su realización,
+contrato y evidencia local. Las reglas funcionales y los flujos se mantienen completos
+en requisitos; los contratos técnicos y decisiones, en arquitectura.
 
 ## Convenciones editoriales
 
 - Carpetas y nombres de archivos técnicos en inglés; títulos y explicación en español.
-- Cada colección tiene `index.md` y capítulos numerados consecutivamente. El índice
-  conserva el orden de lectura. La referencia generada también tiene un propietario explícito.
+- Cada colección tiene `index.md`; las series de capítulos mantienen numeración
+  consecutiva. El índice conserva el orden de lectura. La referencia generada también tiene un propietario explícito.
 - Un `h1` por archivo y niveles de títulos sin saltos. Una tabla compara elementos;
   una secuencia expresa pasos; la prosa explica propósito, decisiones y límites.
 - Rutas relativas al documento para enlaces. Los comandos indican si se ejecutan
@@ -53,10 +50,50 @@ sin ocultarla mediante una redirección al documento de otra aplicación.
 - No se mantienen secciones vacías para imitar una norma. Tampoco se describen
   herramientas aplazadas como si ya estuvieran instaladas.
 - Los requisitos locales `RF-VUE-*`, `RC-VUE-*`, `RD-VUE-*` y `RN-VUE-*` describen
-  el cliente. `CU-VUE-*` identifica su ficha de interacción; los IDs de producto
+  el cliente. `CU-*` identifica su ficha de interacción; los IDs de producto
   existentes se conservan como correspondencia, sin renombrarlos.
 - `DP-*` expresa diseño de prueba; `CP-*`, un caso; `EP-*`, una ejecución. No se
   copian conteos de una corrida a un requisito como aprobación permanente.
+
+## Ubicación, navegación y publicación
+
+Las cinco colecciones separan requisitos, arquitectura, procedimientos de desarrollo,
+pruebas y gobierno. Las vistas 4+1 describen la arquitectura; el estándar de código y
+los contratos son referencias transversales. La guía de incorporación introduce los
+conceptos y un recorrido del código; la referencia generada permite localizar símbolos.
+El manual de usuario es una colección independiente orientada a las tareas del
+operador, con procedimientos y capturas propios; no se incorpora al libro técnico.
+
+Cada índice enlaza sus capítulos en orden de lectura. El [catálogo de publicaciones](../publications.json)
+refleja ese orden en los documentos exportados y conserva todas las fuentes. Al agregar
+o reubicar una guía, actualizar índice, catálogo y enlaces consumidores. No renumerar
+identificadores CU/DP/CP/DIA por mover archivos. El formato de las fichas funcionales
+y de pruebas se mantiene al reorganizar la colección.
+
+## Unidad documental y granularidad
+
+La unidad de división es un tema que pueda entenderse y mantenerse completo.
+Compartir plantilla y nivel de detalle no obliga a usar el mismo número de archivos
+para requisitos, diagramas, procesos y referencias de código.
+
+| Artefacto | Unidad de división | Contenido que permanece unido |
+| --- | --- | --- |
+| Caso de uso | Un objetivo observable, con su ID estable. | Actor, precondiciones, flujo, alternativas, excepciones y postcondiciones. |
+| Caso de prueba seleccionado | Una condición con preparación, datos y oráculo reproducibles. | Entrada, pasos, resultado esperado y limpieza. No una ficha por cada aserción o `it`. |
+| Diseño de prueba | Dominio o contrato con riesgos y evidencia relacionados. | Condiciones DP, técnicas, casos y límites de ese ámbito. |
+| Modelo de casos de uso | Capacidad funcional del cliente. | Figuras de sus recursos y actores; no un archivo por óvalo o enlace. |
+| Proceso técnico | Operación o colaboración con decisiones propias. | Participantes, mensajes, errores y recuperación; sus fases se explican juntas cuando forman el mismo recorrido. |
+| Componente/patrón | Responsabilidad o mecanismo con consumidores concretos. | Modelo, contrato, aplicación, límites y evidencia; una figura puede ser el contenido principal. |
+| Estándar | Preocupación de construcción. | Reglas relacionadas de formato, nombres, dependencias o errores, con ejemplos. |
+| Referencia generada | Catálogo técnico mantenido por la herramienta. | Fuentes e interpretación de sus tablas; se publica separada de la introducción. |
+| Manual de usuario | Una página o familia de tareas operativas. | Preparación, campos, pasos, resultado e incidencias, con capturas de Vue. |
+
+Separar cuando cambian de forma independiente el dominio, el contrato o la tarea del
+lector y la sección puede conservar su explicación completa. Reunir cuando la división
+obliga a saltar entre fragmentos para comprender un único objetivo, repite la misma
+preparación o sólo crea encabezados sin información propia. El número de líneas o
+páginas sirve para detectar un documento que conviene revisar; no fija por sí solo un
+límite obligatorio. Los índices orientan y enlazan, sin repetir las fichas completas.
 
 ## Figuras y fuentes
 

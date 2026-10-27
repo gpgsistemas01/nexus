@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { ids, material, pageOf, template, user, waste } from '../fixtures/inventory.js';
 
 export const mockWarehouse = async (page: Page, permissions = user.permissions) => {
@@ -28,8 +28,13 @@ export const mockWarehouse = async (page: Page, permissions = user.permissions) 
   });
 };
 
-export const chooseOption = async (page: Page, label: string, option: string) => {
-  const field = page.getByRole('combobox', { name: label, exact: true });
+export const chooseOption = async (
+  page: Page,
+  label: string,
+  option: string,
+  scope: Page | Locator = page,
+) => {
+  const field = scope.getByRole('combobox', { name: label, exact: true });
   await field.click();
   await page.getByRole('option', { name: option, exact: true }).click();
 };

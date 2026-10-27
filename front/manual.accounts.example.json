@@ -1,0 +1,155 @@
+{
+    "baseUrl": "http://127.0.0.1:5173",
+    "accounts": [
+        {
+            "id": "sistemas-admin",
+            "label": "Administración del sistema",
+            "expectedAccess": {
+                "roleKey": "system_admin",
+                "departmentKey": "systems"
+            },
+            "usernameEnv": "DOCS_FRONT_SISTEMAS_ADMIN_USER",
+            "passwordEnv": "DOCS_FRONT_SISTEMAS_ADMIN_PASSWORD"
+        },
+        {
+            "id": "almacen-auxiliar",
+            "label": "Almacén · Auxiliar",
+            "expectedAccess": {
+                "roleKey": "auxiliary",
+                "departmentKey": "warehouse_and_supply"
+            },
+            "usernameEnv": "DOCS_FRONT_ALMACEN_AUXILIAR_USER",
+            "passwordEnv": "DOCS_FRONT_ALMACEN_AUXILIAR_PASSWORD"
+        },
+        {
+            "id": "almacen-coordinador",
+            "label": "Almacén · Coordinador",
+            "expectedAccess": {
+                "roleKey": "coordinator",
+                "departmentKey": "warehouse_and_supply"
+            },
+            "usernameEnv": "DOCS_FRONT_ALMACEN_COORDINADOR_USER",
+            "passwordEnv": "DOCS_FRONT_ALMACEN_COORDINADOR_PASSWORD"
+        },
+        {
+            "id": "impresion-coordinador",
+            "label": "Impresión · Coordinador",
+            "expectedAccess": {
+                "roleKey": "coordinator",
+                "departmentKey": "printing"
+            },
+            "usernameEnv": "DOCS_FRONT_IMPRESION_COORDINADOR_USER",
+            "passwordEnv": "DOCS_FRONT_IMPRESION_COORDINADOR_PASSWORD"
+        },
+        {
+            "id": "impresion-operador",
+            "label": "Impresión · Operador",
+            "expectedAccess": {
+                "roleKey": "operator",
+                "departmentKey": "printing"
+            },
+            "usernameEnv": "DOCS_FRONT_IMPRESION_OPERADOR_USER",
+            "passwordEnv": "DOCS_FRONT_IMPRESION_OPERADOR_PASSWORD"
+        },
+        {
+            "id": "taller-herreria-coordinador",
+            "label": "Taller/Herrería · Coordinador",
+            "expectedAccess": {
+                "roleKey": "coordinator",
+                "departmentKey": "workshop_3d"
+            },
+            "usernameEnv": "DOCS_FRONT_TALLER_HERRERIA_COORDINADOR_USER",
+            "passwordEnv": "DOCS_FRONT_TALLER_HERRERIA_COORDINADOR_PASSWORD"
+        },
+        {
+            "id": "taller-herreria-operador",
+            "label": "Taller/Herrería · Operador",
+            "expectedAccess": {
+                "roleKey": "operator",
+                "departmentKey": "workshop_3d"
+            },
+            "usernameEnv": "DOCS_FRONT_TALLER_HERRERIA_OPERADOR_USER",
+            "passwordEnv": "DOCS_FRONT_TALLER_HERRERIA_OPERADOR_PASSWORD"
+        },
+        {
+            "id": "router-coordinador",
+            "label": "Router · Coordinador",
+            "expectedAccess": {
+                "roleKey": "coordinator",
+                "departmentKey": "router"
+            },
+            "usernameEnv": "DOCS_FRONT_ROUTER_COORDINADOR_USER",
+            "passwordEnv": "DOCS_FRONT_ROUTER_COORDINADOR_PASSWORD"
+        },
+        {
+            "id": "router-operador",
+            "label": "Router · Operador",
+            "expectedAccess": {
+                "roleKey": "operator",
+                "departmentKey": "router"
+            },
+            "usernameEnv": "DOCS_FRONT_ROUTER_OPERADOR_USER",
+            "passwordEnv": "DOCS_FRONT_ROUTER_OPERADOR_PASSWORD"
+        },
+        {
+            "id": "pt-coordinador",
+            "label": "PT · Coordinador",
+            "expectedAccess": {
+                "roleKey": "coordinator",
+                "departmentKey": "pt_traffic"
+            },
+            "usernameEnv": "DOCS_FRONT_PT_COORDINADOR_USER",
+            "passwordEnv": "DOCS_FRONT_PT_COORDINADOR_PASSWORD"
+        },
+        {
+            "id": "pt-operador",
+            "label": "PT · Operador",
+            "expectedAccess": {
+                "roleKey": "operator",
+                "departmentKey": "pt_traffic"
+            },
+            "usernameEnv": "DOCS_FRONT_PT_OPERADOR_USER",
+            "passwordEnv": "DOCS_FRONT_PT_OPERADOR_PASSWORD"
+        },
+        {
+            "id": "instalaciones-coordinador",
+            "label": "Instalaciones · Coordinador",
+            "expectedAccess": {
+                "roleKey": "coordinator",
+                "departmentKey": "installations"
+            },
+            "usernameEnv": "DOCS_FRONT_INSTALACIONES_COORDINADOR_USER",
+            "passwordEnv": "DOCS_FRONT_INSTALACIONES_COORDINADOR_PASSWORD"
+        },
+        {
+            "id": "instalaciones-operador",
+            "label": "Instalaciones · Operador",
+            "expectedAccess": {
+                "roleKey": "operator",
+                "departmentKey": "installations"
+            },
+            "usernameEnv": "DOCS_FRONT_INSTALACIONES_OPERADOR_USER",
+            "passwordEnv": "DOCS_FRONT_INSTALACIONES_OPERADOR_PASSWORD"
+        },
+        {
+            "id": "acabados-coordinador",
+            "label": "Acabados · Coordinador",
+            "expectedAccess": {
+                "roleKey": "coordinator",
+                "departmentKey": "finishing"
+            },
+            "usernameEnv": "DOCS_FRONT_ACABADOS_COORDINADOR_USER",
+            "passwordEnv": "DOCS_FRONT_ACABADOS_COORDINADOR_PASSWORD"
+        },
+        {
+            "id": "acabados-operador",
+            "label": "Acabados · Operador",
+            "expectedAccess": {
+                "roleKey": "operator",
+                "departmentKey": "finishing"
+            },
+            "usernameEnv": "DOCS_FRONT_ACABADOS_OPERADOR_USER",
+            "passwordEnv": "DOCS_FRONT_ACABADOS_OPERADOR_PASSWORD"
+        }
+    ]
+}

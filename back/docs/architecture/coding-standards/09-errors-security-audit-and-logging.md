@@ -68,7 +68,7 @@ Axios que borre etiquetas no sustituye ninguno de esos controles.
 | Identificadores y campos adicionales | El DTO admite sólo los campos del caso. El servicio resuelve existencia, pertenencia, estado y versión; un UUID válido no concede autorización. `findManagedCatalog` sólo resuelve propiedades propias del registro. |
 | SQL | Prisma o parámetros de consulta. Los dos `$executeRawUnsafe` de costos usan SQL fijo con placeholders y valores separados; no se insertan nombres o capturas en el texto SQL. El escape HTML no protege una consulta. |
 | HTML EJS / JSON en script | `<%=` para texto y atributos entre comillas; `<%-` sólo para composición confiable o JSON producido por `serializeScriptData`. Ese helper se limita a datos JSON, no permite insertar funciones ni código. |
-| Vue y avisos | Interpolación y props de texto; SweetAlert2 usa `titleText`/`text`. El frontend no usa `v-html`, `innerHTML` ni HTML procedente de un error. La guía de [seguridad de Vue del proyecto](../../../../front/docs/architecture/04-input-security.md) concreta sus consumidores. |
+| Vue y avisos | Interpolación y props de texto; SweetAlert2 usa `titleText`/`text`. El frontend no usa `v-html`, `innerHTML` ni HTML procedente de un error. La guía de [seguridad de Vue del proyecto](../../../../front/docs/architecture/views/logical/input-security.md) concreta sus consumidores. |
 
 `TEXT_INPUT_PATTERN` conserva restricciones históricas de captura; su exclusión de
 ciertos signos **no es una defensa XSS**. El texto guardado o recibido también se
@@ -116,7 +116,7 @@ una URL completa. El escape de atributos no convierte `javascript:` en un enlace
 
 La evidencia actual está en `formValidationParityTest`, `scriptDataTest`,
 `catalogControllersDbTest` y `apiWriteValidationDbTest`; los recorridos Vue están
-en su [guía de pruebas](../../../../front/docs/testing/01-test-design.md#seguridad-de-texto-y-avisos).
+en su [guía de pruebas](../../../../front/docs/testing/design/07-shared.md#seguridad-de-texto-y-avisos).
 
 Las notificaciones de inventario se emiten después de completar la operación
 correspondiente. Un error posterior al commit no debe presentarse como un rollback

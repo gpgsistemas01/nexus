@@ -104,12 +104,12 @@ export const renderCodeReference = async (frontRoot) => {
         const symbols = inspectSource(relative, await readFile(filename, 'utf8'));
         const rows = sections.get(area) ?? [];
         rows.push(
-            `| [${path.basename(relative)}](../../${relative}) | **Exports:** ${code(symbols.exports)}<br>**Contratos SFC:** ${code(symbols.contracts)}<br>**Imports:** ${code(symbols.imports)} |`,
+            `| [${path.basename(relative)}](../../../../${relative}) | **Exports:** ${code(symbols.exports)}<br>**Contratos SFC:** ${code(symbols.contracts)}<br>**Imports:** ${code(symbols.imports)} |`,
         );
         sections.set(area, rows);
     }
     return [
-        '# 5. Referencia técnica generada del código Vue',
+        '# Referencia técnica generada del código Vue',
         '',
         'Este inventario se genera con `npm run docs:generate` desde `front/`.',
         'No editar manualmente. `npm run docs:check` detecta diferencias con las fuentes.',
@@ -120,7 +120,7 @@ export const renderCodeReference = async (frontRoot) => {
         'Las tablas muestran exports declarados, nombres de props/eventos/slots tipados e imports estáticos o diferidos.',
         'Los contratos referenciados por un tipo conservan su nombre; no se expande el compilador ni se ejecuta la aplicación.',
         'No se infieren responsabilidades, permisos, calidad o cobertura a partir de los nombres.',
-        'Las decisiones pertenecen a [arquitectura](01-structure-and-boundaries.md), [patrones](../patterns/index.md) y [módulos](../modules/index.md).',
+        'Las decisiones pertenecen a [arquitectura](code-structure.md), [patrones](design-and-construction-patterns/index.md) y [módulos](frontend-technical-documentation/index.md).',
         'No incluye secretos, dependencias instaladas, archivos compilados ni código privado del servidor.',
         '',
         ...[...sections].flatMap(([area, rows]) => [
@@ -136,7 +136,7 @@ export const renderCodeReference = async (frontRoot) => {
 
 /** @param {string} frontRoot @param {boolean} checkOnly */
 export const generateCodeReference = async (frontRoot, checkOnly) => {
-    const output = path.join(frontRoot, 'docs/architecture/05-code-reference.md');
+    const output = path.join(frontRoot, 'docs/architecture/views/development/code-reference.md');
     const expected = await renderCodeReference(frontRoot);
     if (checkOnly) {
         const current = await readFile(output, 'utf8').catch(() => '');
