@@ -264,7 +264,21 @@
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
         }
-      }
+      },
+      "parameters": [
+        {
+          "name": "context",
+          "in": "query",
+          "required": false,
+          "description": "issues devuelve s\u00f3lo las \u00e1reas autorizadas para consultar y registrar Salidas. Auxiliar/Coordinador de Almac\u00e9n y Administrador del sistema tienen alcance de todas las \u00e1reas. Sin este contexto se conserva el selector general.",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "issues"
+            ]
+          }
+        }
+      ]
     }
   },
   "/api/admin/persons": {

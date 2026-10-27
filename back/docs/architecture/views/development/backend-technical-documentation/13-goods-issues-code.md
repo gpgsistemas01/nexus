@@ -38,6 +38,14 @@ flowchart TB
 
 ## Contratos de implementación
 
+`issues/issueAccessService.js` concentra el alcance de áreas para Materiales,
+Consumibles y Mermas. Recibe las asignaciones de la sesión cargada por el servidor;
+los controllers no aceptan políticas del body. Listados, conteos, reportes y lectura
+por ID usan el mismo filtro. En ediciones se comprueba el área original al leer bajo
+bloqueo y el destino antes de modificar el encabezado o los detalles. Auxiliar y
+Coordinador de Almacén, y Administrador del sistema, tienen alcance de todas las
+áreas; los demás accesos autorizados se limitan a sus áreas asignadas.
+
 El surtido reside en `goodsIssueDetailService.js`; los adaptadores de materiales
 y consumibles lo importan directamente. `goodsIssueService.js` conserva consultas,
 alta y edición. Edición, surtido y devolución adquieren el mismo bloqueo de documento

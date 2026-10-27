@@ -82,6 +82,25 @@ it('Almacén conserva surtido y devolución, mientras sólo administración reci
   expect(selectedChapters(admin.permissions)).toHaveLength(16);
 });
 
+it.each(['almacen-auxiliar', 'almacen-coordinador', 'impresion-operador'])(
+  'el índice de %s explica el alcance de consulta y registro en Salidas',
+  async (id) => {
+    const root = await tempRoot();
+    const profile = DEMO_PROFILES.find((candidate) => candidate.id === id)!;
+    await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
+      recursive: true,
+    });
+    const manifest = await prepareManual(root, { ...profile, mode: 'demo' }, demoSession(profile));
+    const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
+    expect(index).toContain('Materiales, Consumibles y Mermas');
+    expect(index).toContain(
+      id.startsWith('almacen-')
+        ? 'puede consultar y registrar documentos para todas las áreas'
+        : 'sólo puede consultar y registrar solicitudes para las áreas asignadas',
+    );
+  },
+);
+
 it('evalúa condiciones anidadas y rechaza directivas desconocidas o desbalanceadas', () => {
   const source =
     'base\n<!-- manual:any materials:read -->\nlectura\n<!-- manual:all materials:write -->\nescritura\n<!-- manual:end -->\n<!-- manual:end -->';

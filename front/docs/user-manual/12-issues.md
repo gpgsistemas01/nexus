@@ -7,6 +7,18 @@ proyecto y utilice los filtros disponibles de encabezado, fechas y **Observacion
 contiene:**. Pulse **Buscar**. Cada tabla reúne las solicitudes de su contexto;
 no mezcle una salida de material con una salida de merma del mismo nombre.
 
+Con acceso de Auxiliar o Coordinador de Almacén puede consultar y registrar salidas
+para todas las áreas. Si pertenece a un área operativa, sólo verá sus áreas
+autorizadas y sólo podrá registrar solicitudes para ellas. Por ejemplo, una cuenta
+asignada únicamente a Impresión no puede registrar una solicitud para Router.
+Limpiar los filtros no permite consultar documentos de otras áreas.
+
+Cuando sólo tenga un área disponible, **Área** se selecciona automáticamente y
+permanece visible y bloqueada, tanto en los filtros como en el formulario. No
+necesita seleccionarla ni puede borrarla. **Limpiar filtros** conserva esa área y
+retira los filtros opcionales. Si tiene varias áreas autorizadas, el selector
+permite elegir entre ellas.
+
 ![Listado de salidas con búsqueda, filtros y acciones por documento.](images/22-issues-list.png)
 
 <!-- manual:any goods:issues-manage waste:issues-manage -->
@@ -21,7 +33,10 @@ Almacén y consulte su estado para conocer el avance.
 
 1. Pulse **Nueva salida**.
 2. En **Registrar salida** o **Registrar salida de merma**, seleccione
-   **Cliente**, **Asesor**, **Área** y **Solicitante**.
+   **Cliente** y **Asesor**. Revise **Área**: si está seleccionada y bloqueada,
+   corresponde a su única área disponible. Si puede elegir, seleccione el área que
+   recibirá los artículos. Después seleccione **Solicitante** entre las personas de
+   esa área; sus opciones se cargan automáticamente.
 3. Capture **Número de proyecto**, revise **Fecha y hora de solicitud:** y
    complete **Observaciones** cuando corresponda.
 4. Seleccione **Material**, **Consumible** o **Merma** y capture **Cantidad**.

@@ -35,7 +35,12 @@ const openAction = async (page: Page, name: string) => {
 };
 
 const chooseFirst = async (page: Page, scope: Locator, label: string, matching?: RegExp) => {
-  await scope.getByRole('combobox', { name: label, exact: true }).click();
+  const field = scope.getByRole('combobox', { name: label, exact: true });
+  if (await field.isDisabled()) {
+    await expect(field).not.toHaveValue('');
+    return;
+  }
+  await field.click();
   let options = page.locator('[role="option"]:visible:not([aria-disabled="true"])');
   if (matching) options = options.filter({ hasText: matching });
   await expect(options.first(), `Se necesita una opción disponible para ${label}.`).toBeVisible();
@@ -192,7 +197,12 @@ export const captureRecipe = async (
         .scrollIntoViewIfNeeded();
     } else if (number === 25) {
       await openAction(page, 'Devolver material surtido');
-      await openAction(page, 'Devolver detalle de salida');
+      await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('button', { name: 'Devolver detalle de salida', exact: true })
+        .first()
+        .click();
     }
   } else {
     await go(

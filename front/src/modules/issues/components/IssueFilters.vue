@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { VCol } from 'vuetify/components/VGrid';
+import { computed } from 'vue';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VAlert } from 'vuetify/components/VAlert';
 import ListFilters from '../../../shared/components/ListFilters.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import type { IssueFilters, IssueFilterSelect } from '../issue.js';
 
-defineProps<{
+const props = defineProps<{
     values: IssueFilters;
     selects: IssueFilterSelect[];
     isLoading: boolean;
+    isDepartmentLocked: boolean;
     error: string;
 }>();
 const emit = defineEmits<{
@@ -22,6 +24,13 @@ const emit = defineEmits<{
     retry: [kind: IssueFilterSelect['kind']];
 }>();
 const search = defineModel<string>('search', { required: true });
+const hasActiveFilters = computed(
+    () =>
+        !!search.value ||
+        Object.entries(props.values).some(
+            ([field, value]) => !!value && !(field === 'departmentId' && props.isDepartmentLocked),
+        ),
+);
 </script>
 
 <template>
@@ -29,7 +38,7 @@ const search = defineModel<string>('search', { required: true });
         v-model:search="search"
         :is-loading="isLoading"
         has-extra-filters
-        :has-active-filters="!!search || Object.values(values).some(Boolean)"
+        :has-active-filters="hasActiveFilters"
         search-label="Buscar por Folio o Proyecto"
         @apply="emit('apply')"
         @clear="emit('clear')"
@@ -50,6 +59,7 @@ const search = defineModel<string>('search', { required: true });
                 :has-more="select.state.hasMore"
                 :load-error="select.state.error"
                 :is-disabled="select.isDisabled"
+                :hint="select.hint"
                 @update:model-value="emit('update', select.field, $event)"
                 @search="emit('searchOptions', select.kind, $event)"
                 @more="emit('more', select.kind)"

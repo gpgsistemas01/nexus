@@ -17,14 +17,14 @@ flowchart LR
     controllers["controllers (45 módulos)"] --> dtos["dtos (12 módulos)"]
     controllers["controllers (45 módulos)"] --> errors["errors (20 módulos)"]
     controllers["controllers (45 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (45 módulos)"] --> services["services (68 módulos)"]
+    controllers["controllers (45 módulos)"] --> services["services (69 módulos)"]
     controllers["controllers (45 módulos)"] --> shared["shared (12 módulos)"]
     controllers["controllers (45 módulos)"] --> utils["utils (13 módulos)"]
     dtos["dtos (12 módulos)"] --> shared["shared (12 módulos)"]
     errors["errors (20 módulos)"] --> messages["messages (2 módulos)"]
     errors["errors (20 módulos)"] --> shared["shared (12 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (68 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (69 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (13 módulos)"]
     public["public (212 módulos)"] --> shared["shared (12 módulos)"]
     repository["repository (8 módulos)"] --> constants["constants (11 módulos)"]
@@ -35,15 +35,15 @@ flowchart LR
     routes["routes (48 módulos)"] --> middleware["middleware (5 módulos)"]
     routes["routes (48 módulos)"] --> shared["shared (12 módulos)"]
     routes["routes (48 módulos)"] --> validators["validators (16 módulos)"]
-    services["services (68 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (68 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (68 módulos)"] --> errors["errors (20 módulos)"]
-    services["services (68 módulos)"] --> repository["repository (8 módulos)"]
-    services["services (68 módulos)"] --> shared["shared (12 módulos)"]
-    services["services (68 módulos)"] --> utils["utils (13 módulos)"]
+    services["services (69 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (69 módulos)"] --> dtos["dtos (12 módulos)"]
+    services["services (69 módulos)"] --> errors["errors (20 módulos)"]
+    services["services (69 módulos)"] --> repository["repository (8 módulos)"]
+    services["services (69 módulos)"] --> shared["shared (12 módulos)"]
+    services["services (69 módulos)"] --> utils["utils (13 módulos)"]
     utils["utils (13 módulos)"] --> constants["constants (11 módulos)"]
     utils["utils (13 módulos)"] --> errors["errors (20 módulos)"]
-    utils["utils (13 módulos)"] --> services["services (68 módulos)"]
+    utils["utils (13 módulos)"] --> services["services (69 módulos)"]
     utils["utils (13 módulos)"] --> shared["shared (12 módulos)"]
     validators["validators (16 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (16 módulos)"] --> messages["messages (2 módulos)"]
@@ -288,6 +288,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/goodsReceipts/goodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js) | `createGoodsReceipt`, `findAllGoodsReceipts`, `updateGoodsReceipt` |
 | [`src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js) | `cancelGoodsReceiptDetailAndTotals`, `correctGoodsReceiptDetailAndTotals`, `createGoodsReceiptDetailsAndUpdateTotals` |
 | [`src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) | `cancelMaterialGoodsReceiptDetailLine`, `correctMaterialGoodsReceiptDetailLine`, `createMaterialGoodsReceipt`, `findAllMaterialGoodsReceipts`, `findMaterialGoodsReceiptReportRows`, `updateMaterialGoodsReceipt` |
+| [`src/services/warehouse/issues/issueAccessService.js`](../../../../src/services/warehouse/issues/issueAccessService.js) | `assertIssueDepartmentAccess`, `buildIssueDepartmentWhere` |
 | [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
 | [`src/services/warehouse/issues/issueHeaderService.js`](../../../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
 | [`src/services/warehouse/materials/materialHelpers.js`](../../../../src/services/warehouse/materials/materialHelpers.js) | `assertMaterialRollReference`, `prepareMaterialData`, `withRetry` |

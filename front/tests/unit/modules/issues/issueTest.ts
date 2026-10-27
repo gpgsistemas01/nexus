@@ -35,6 +35,17 @@ const document = () => normalizeIssueDocument(issue, 'materials');
 const confirmation = { code: 'UPDATED_GOODS_ISSUE', message: 'Guardado' };
 afterEach(() => vi.restoreAllMocks());
 describe('salidas Vue: contratos y modos', () => {
+  it('solicita áreas de Salidas filtradas por el servidor para los selectores y filtros', async () => {
+    apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
+      const url = new URL(config.url!, 'http://test');
+      expect(url.pathname).toBe('/api/admin/departments');
+      expect(url.searchParams.get('context')).toBe('issues');
+      expect(url.searchParams.get('search')).toBe('imp');
+      return { data: pageOf([{ id: issue.departmentId, name: 'IMPRESIÓN' }]) };
+    });
+    const result = await issueLookupService.list('departments', 'materials', 'imp', 1, signal());
+    expect(result.data.map(({ title }) => title)).toEqual(['IMPRESIÓN']);
+  });
   it.each(['materials', 'consumables', 'wastes'] as const)(
     'lee y escribe %s con su contrato y código real',
     async (resource) => {

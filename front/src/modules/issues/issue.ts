@@ -85,4 +85,5 @@ export interface IssueFilterSelect {
     label: string;
     state: LookupState;
     isDisabled: boolean;
+    hint: string;
 }

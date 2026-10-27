@@ -2,6 +2,19 @@
 
 Las operaciones tienen fichas independientes. Cada ficha conserva actor, disparador, precondiciones, interacción numerada, alternativas con punto de entrada, excepciones y postcondiciones. El [índice de casos](../index.md) define la plantilla y las reglas de lectura.
 
+## Alcance de áreas
+
+Auxiliar y Coordinador de Almacén, y Administrador del sistema, pueden consultar y
+registrar salidas para todas las áreas. Las cuentas operativas sólo consultan,
+crean y editan solicitudes de sus áreas asignadas y autorizadas. La regla cubre
+Materiales, Consumibles y Mermas. En ediciones se autorizan tanto el área original
+como el destino; no se permite trasladar un documento ajeno al área propia.
+
+En el cliente, una única área disponible se muestra seleccionada y bloqueada en
+formularios y filtros. Con varias opciones autorizadas se puede elegir. La precarga
+del alta no reemplaza el área ni sus datos dependientes al editar un documento.
+
+
 | Caso | Objetivo |
 | --- | --- |
 | [CU-SAL-01](cu-sal-01.md) | Consultar salidas de material. |

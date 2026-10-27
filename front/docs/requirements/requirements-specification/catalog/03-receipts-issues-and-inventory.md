@@ -8,6 +8,29 @@ y consumibles. Comparten las obligaciones de recepción `RF-REC-001` a `RF-REC-0
 y de salida `RF-ISS-001` a `RF-ISS-008`; compartir proceso no permite mezclar detalles.
 Las salidas de merma conservan sus recursos y movimientos propios.
 
+## Alcance de áreas en Salidas
+
+Auxiliar y Coordinador de Almacén, además del Administrador del sistema, pueden
+consultar y registrar salidas para todas las áreas. Los usuarios de áreas operativas
+sólo pueden consultar, crear y editar solicitudes de sus áreas asignadas y autorizadas.
+La regla aplica a Materiales, Consumibles y Mermas, incluidos filtros, conteos,
+lectura por ID y reportes cuando el rol tiene permiso para exportarlos. Un filtro
+reduce el alcance de la sesión; nunca lo amplía.
+
+Si la respuesta completa de áreas disponibles contiene una sola opción, el cliente
+la selecciona automáticamente y mantiene el campo visible y deshabilitado en el
+alta y los filtros. Carga los solicitantes de esa área sin una selección manual.
+Con varias áreas autorizadas permite elegir; una coincidencia de búsqueda no debe
+bloquear el campo. La edición conserva el área registrada y limpiar filtros mantiene
+la única área obligatoria.
+
+En una edición, tanto el área original como la nueva deben estar autorizadas. El
+servidor rechaza un alta o traslado a un área ajena con `403 FORBIDDEN`; una consulta
+o edición por ID fuera del alcance responde `404` sin exponer el documento. No se
+modifican documentos, detalles, existencias ni movimientos ante esos rechazos.
+Los permisos de surtido y devolución se verifican por separado y siguen reservados
+a Almacén y administración.
+
 | ID | Requisito y criterio de aceptación | Estado del requisito de producto |
 | --- | --- | --- |
 | RF-REC-001 | Personal de almacén o el Administrador del sistema deben poder consultar entradas, encabezados, detalles y estados sin modificar inventario; cada consulta presenta únicamente compras del contexto elegido, materiales o consumibles. | Implementado |

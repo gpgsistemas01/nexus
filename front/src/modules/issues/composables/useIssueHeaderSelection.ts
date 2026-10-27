@@ -8,6 +8,7 @@ import {
 import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import { issueLookupService } from '../services/issueLookupService.js';
+import { useIssueDepartments } from './useIssueDepartments.js';
 import type { IssueResource, IssueValues, IssueDocument } from '../issue.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 
@@ -18,7 +19,10 @@ export const useIssueHeaderSelection = (options: {
     isEnabled: () => boolean;
     has: (permission: string) => boolean;
     selectClient: (id: string) => void;
-    setHeaderField: (field: 'advisorId' | 'requesterId' | 'projectNumber', value: string) => void;
+    setHeaderField: (
+        field: 'advisorId' | 'requesterId' | 'projectNumber' | 'departmentId',
+        value: string,
+    ) => void;
 }) => {
     const canReadClients = computed(() => options.has(PERMISSIONS.CLIENTS_READ));
     const canReadDepartments = computed(() => options.has(PERMISSIONS.DEPARTMENTS_READ));
@@ -28,11 +32,14 @@ export const useIssueHeaderSelection = (options: {
             issueLookupService.list('clients', options.resource, search, page, signal),
         computed(() => options.isEnabled() && canReadClients.value),
     );
-    const departments = useRemoteLookup(
-        (search, page, signal) =>
-            issueLookupService.list('departments', options.resource, search, page, signal),
-        computed(() => options.isEnabled() && canReadDepartments.value),
-    );
+    const departments = useIssueDepartments({
+        resource: options.resource,
+        isEnabled: () => options.isEnabled() && canReadDepartments.value,
+        getSelectedId: () => options.values.departmentId,
+        selectDefault: (id) => {
+            if (!options.document) options.setHeaderField('departmentId', id);
+        },
+    });
 
     const createInitialOption = (id: string, title: string): LookupItem => ({
         id,

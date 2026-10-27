@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { randomUUID } from 'node:crypto';
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { runContendedOperations } from '../../helpers/concurrentDatabaseOperations.js';
 import { lockGoodsIssue, lockWasteIssue, lockGoodsReceipt } from '../../../src/repository/warehouse/documentLockRepository.js';
@@ -94,7 +95,7 @@ describe('consistencia de operaciones simultáneas de almacén', () => {
     const receipt = await import('../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js');
     const wasteStock = await import('../../../src/controllers/api/warehouse/wasteController.js');
     app = createControllerTestApp({ registerRoutes: router => {
-      router.use((req, _res, next) => { req.user = { id: req.get('x-actor-id') || ids.user }; next(); });
+      router.use((req, _res, next) => { req.user = { id: req.get('x-actor-id') || ids.user, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] }; next(); });
       router.patch('/goods/:id', goods.editMaterialGoodsIssue);
       router.patch('/goods/:id/details', goods.editMaterialGoodsIssueDetails);
       router.patch('/goods/:id/details/:detailId/returns', goods.registerMaterialGoodsIssueDetailReturn);

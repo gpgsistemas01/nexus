@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { mockIssues } from './issueFixtures.js';
-import { issuePermissions, issueDetailId } from '../fixtures/issues.js';
-import { ids } from '../fixtures/inventory.js';
+import { chooseOption } from './warehouseFixtures.js';
+import { issuePermissions, issueDetailId, departmentId } from '../fixtures/issues.js';
+import { ids, pageOf } from '../fixtures/inventory.js';
 import { clientData, personData } from '../fixtures/records.js';
 
 for (const [path, resource, title, label] of [
@@ -12,25 +13,31 @@ for (const [path, resource, title, label] of [
   test(`salidas ${path}: menú Vue, alta sin errores iniciales y payload de solicitud`, async ({
     page,
   }) => {
-    const { writes } = await mockIssues(page);
+    const { writes, reads } = await mockIssues(page);
     await page.goto(`/salidas/${path}`);
     await expect(
       page.getByRole('heading', { name: `Tabla de ${title}`, exact: true }),
     ).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Área', exact: true })).toHaveValue('SISTEMAS');
+    await expect(page.getByRole('combobox', { name: 'Área', exact: true })).toBeDisabled();
     await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
     const dialog = page.getByRole('dialog', {
       name: resource === 'wastes' ? 'Registrar salida de merma' : 'Registrar salida',
       exact: true,
     });
     await expect(dialog.locator('[aria-invalid="true"]')).toHaveCount(0);
+    await expect(dialog.getByRole('combobox', { name: 'Área', exact: true })).toBeDisabled();
+    await expect(dialog.getByRole('combobox', { name: 'Área', exact: true })).toHaveValue(
+      'SISTEMAS',
+    );
+    await expect(dialog.getByRole('combobox', { name: 'Solicitante', exact: true })).toBeEnabled();
     for (const [field, option] of [
       ['Cliente', clientData.name],
       ['Asesor', personData.fullName],
       ['Área', 'SISTEMAS'],
       ['Solicitante', personData.fullName],
     ]) {
-      await dialog.getByRole('combobox', { name: field, exact: true }).click();
-      await page.getByRole('option', { name: option, exact: true }).click();
+      await chooseOption(page, field!, option!, dialog);
     }
     await dialog.getByLabel('Número de proyecto', { exact: true }).fill('120010');
     await dialog.getByRole('combobox', { name: label, exact: true }).click();
@@ -52,8 +59,45 @@ for (const [path, resource, title, label] of [
         : [{ materialId: ids.material, supplierId: ids.supplier, quantity: 2 }],
     );
     expect(writes[0]!.data).not.toHaveProperty('status');
+    expect(writes[0]!.data.departmentId).toBe(departmentId);
+    await page.getByLabel('Observaciones contiene:', { exact: true }).fill('otro filtro');
+    await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    await expect
+      .poll(() => reads.at(-1)?.searchParams.get('observationsSearch'))
+      .toBe('otro filtro');
+    await page.getByRole('button', { name: 'Limpiar filtros', exact: true }).click();
+    await expect.poll(() => reads.at(-1)?.searchParams.get('departmentId')).toBe(departmentId);
+    await expect(page.getByRole('combobox', { name: 'Área', exact: true })).toBeDisabled();
+    await expect(page.getByRole('combobox', { name: 'Área', exact: true })).toHaveValue('SISTEMAS');
+    await expect(page.getByText('Todos los registros', { exact: true })).toBeVisible();
   });
 }
+
+test('salidas: varias áreas autorizadas conservan la selección y una búsqueda no bloquea el selector', async ({
+  page,
+}) => {
+  await mockIssues(page);
+  await page.route('**/api/admin/departments?**', (route) => {
+    const search = new URL(route.request().url()).searchParams.get('search') ?? '';
+    const areas = [
+      { id: departmentId, name: 'SISTEMAS' },
+      { id: 'router-id', name: 'ROUTER' },
+    ];
+    return route.fulfill({
+      json: pageOf(areas.filter(({ name }) => name.includes(search.toUpperCase()))),
+    });
+  });
+  await page.goto('/salidas/materiales');
+  await page.getByRole('button', { name: 'Nueva salida', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  const area = dialog.getByRole('combobox', { name: 'Área', exact: true });
+  await expect(area).toBeEnabled();
+  await expect(area).toHaveValue('');
+  await area.fill('ROUT');
+  await page.getByRole('option', { name: 'ROUTER', exact: true }).click();
+  await expect(area).toHaveValue('ROUTER');
+  await expect(area).toBeEnabled();
+});
 
 for (const [path, label, name] of [
   ['materiales', 'Material', 'Lona'],

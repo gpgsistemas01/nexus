@@ -41,7 +41,7 @@ export const getAllWasteIssues = async (req, res) => {
         columns: DATATABLE_COLUMNS
     });
 
-    const result = await findAllWasteIssues({ ...query, includeDetails: false });
+    const result = await findAllWasteIssues({ ...query, includeDetails: false, accesses: req.user?.accesses });
 
     return res.status(200).json(result);
 };
@@ -52,6 +52,7 @@ export const registerWasteIssue = async (req, res) => {
     const sanitizedWasteIssueDto = sanitizeEmptyStrings(wasteIssueDto);
 
     const wasteIssue = await createWasteIssue({
+        accesses: req.user?.accesses,
         wasteIssueDto: sanitizedWasteIssueDto,
         userId: req.user.id
     });
@@ -68,6 +69,7 @@ export const editWasteIssue = async (req, res) => {
     const sanitizedWasteIssueDto = sanitizeEmptyStrings(wasteIssueDto);
 
     const wasteIssue = await updateWasteIssue({
+        accesses: req.user?.accesses,
         id: req.params.id,
         wasteIssueDto: sanitizedWasteIssueDto
     });
@@ -84,6 +86,7 @@ export const editWasteIssueHeader = async (req, res) => {
     const sanitizedWasteIssueDto = sanitizeEmptyStrings(wasteIssueDto);
 
     const wasteIssue = await updateWasteIssueHeader({
+        accesses: req.user?.accesses,
         id: req.params.id,
         wasteIssueDto: sanitizedWasteIssueDto
     });

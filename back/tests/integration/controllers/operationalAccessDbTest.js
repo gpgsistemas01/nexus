@@ -73,6 +73,27 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
             sessions[area] = { departmentId: department.id, cookie: `accessToken=${jwt.sign({ id: user.id }, secret, { expiresIn: '10m' })}` };
             await prisma.personRoleDepartment.create({ data: { personId: ids.requester, roleId, departmentId: department.id } });
         }
+        const warehouse = await prisma.department.upsert({
+            where: { key: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }, update: {},
+            create: { name: 'ALMACÉN Y PROVEDURÍA', key: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }
+        });
+        for (const [key, name] of [[ROLE_KEYS.AUXILIARY, 'Auxiliar'], [ROLE_KEYS.COORDINATOR, 'Coordinador']]) {
+            const role = await prisma.role.upsert({ where: { key }, update: {}, create: { name, key } });
+            const user = await prisma.user.create({ data: {
+                name: `IT Access Warehouse ${key} ${suffix}`, password: 'integration-only',
+                accesses: { create: { roleId: role.id, departmentId: warehouse.id } }
+            } });
+            users.push(user.id);
+            sessions[key] = { cookie: `accessToken=${jwt.sign({ id: user.id }, secret, { expiresIn: '10m' })}` };
+            if (key === ROLE_KEYS.COORDINATOR) {
+                const coordinator = await prisma.user.create({ data: {
+                    name: `IT Access Printing Coordinator ${suffix}`, password: 'integration-only',
+                    accesses: { create: { roleId: role.id, departmentId: sessions[areas[0]].departmentId } }
+                } });
+                users.push(coordinator.id);
+                sessions.printingCoordinator = { cookie: `accessToken=${jwt.sign({ id: coordinator.id }, secret, { expiresIn: '10m' })}` };
+            }
+        }
         const denied = await prisma.user.create({ data: {
             name: `IT Access Denied ${suffix}`, password: 'integration-only',
             accesses: { create: { roleId: deniedRole.id, departmentId: sessions[areas[0]].departmentId } }
@@ -173,6 +194,64 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
         expect(persons.body.data.map(row => row.id)).toContain(ids.requester);
         const clients = await request(app).get('/api/sales/clients').set('Cookie', cookie).query({ search: { value: suffix } }).expect(200);
         expect(clients.body.data.map(row => row.id)).toContain(ids.client);
+    });
+
+    it.each(['IMPRESIÓN', 'printingCoordinator'])('%s sólo consulta y registra salidas para su área, incluso con IDs o permisos manipulados', async sessionKey => {
+        const { cookie } = sessions[sessionKey];
+        const ownDepartmentId = sessions[areas[0]].departmentId;
+        const foreignDepartmentId = sessions[areas[1]].departmentId;
+        const before = await stockSnapshot();
+        const departments = await request(app).get('/api/admin/departments').set('Cookie', cookie)
+            .query({ context: 'issues' }).expect(200);
+        expect(departments.body.data.map(row => row.id)).toEqual([ownDepartmentId]);
+        expect(departments.body.recordsTotal).toBe(1);
+        for (const resource of ['materials', 'consumables', 'wastes']) {
+            const path = issuePath(resource);
+            const model = resource === 'wastes' ? prisma.wasteIssue : prisma.goodsIssue;
+            const where = { clientId: ids.client, ...(resource !== 'wastes' && { type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE' }) };
+            const own = await model.findFirst({ where: { ...where, departmentId: ownDepartmentId }, include: { details: true } });
+            const foreign = await model.findFirst({ where: { ...where, departmentId: foreignDepartmentId }, include: { details: true } });
+            const result = await request(app).get(path).set('Cookie', cookie).query({ clientId: ids.client }).expect(200);
+            expect(result.body.data.map(row => row.id)).toEqual([own.id]);
+            expect(result.body.recordsTotal).toBe(1);
+            expect(result.body.recordsFiltered).toBe(1);
+            const outside = await request(app).get(path).set('Cookie', cookie)
+                .query({ clientId: ids.client, departmentId: foreignDepartmentId }).expect(200);
+            expect(outside.body).toMatchObject({ data: [], recordsTotal: 0, recordsFiltered: 0 });
+            await request(app).get(`${path}/${foreign.id}`).set('Cookie', cookie).expect(404);
+            const forged = { ...header(foreignDepartmentId), details: [detail(resource)],
+                accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }], scope: { canReadAll: true } };
+            await request(app).post(path).set('Cookie', cookie).send(forged).expect(403);
+            for (const suffix of ['', '/header']) {
+                await request(app).patch(`${path}/${foreign.id}${suffix}`).set('Cookie', cookie)
+                    .send({ ...header(ownDepartmentId), details: [detail(resource)] }).expect(404);
+                await request(app).patch(`${path}/${own.id}${suffix}`).set('Cookie', cookie).send(forged).expect(403);
+            }
+            expect(await model.findUnique({ where: { id: own.id }, include: { details: true } })).toEqual(own);
+            expect(await model.findUnique({ where: { id: foreign.id }, include: { details: true } })).toEqual(foreign);
+        }
+        expect(await stockSnapshot()).toEqual(before);
+    });
+
+    it.each([ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR])('Almacén / %s consulta todas las áreas y registra solicitudes para otra área', async roleKey => {
+        const { cookie } = sessions[roleKey];
+        const departmentId = sessions[areas[1]].departmentId;
+        const before = await stockSnapshot();
+        const departments = await request(app).get('/api/admin/departments').set('Cookie', cookie)
+            .query({ context: 'issues', length: '100' }).expect(200);
+        expect(departments.body.data.map(row => row.id)).toEqual(expect.arrayContaining(areas.map(area => sessions[area].departmentId)));
+        for (const resource of ['materials', 'consumables', 'wastes']) {
+            const path = issuePath(resource);
+            const result = await request(app).get(path).set('Cookie', cookie)
+                .query({ clientId: ids.client, length: '100' }).expect(200);
+            expect(new Set(result.body.data.map(row => row.departmentId))).toEqual(new Set(areas.map(area => sessions[area].departmentId)));
+            const row = result.body.data.find(row => row.departmentId === departmentId);
+            await request(app).get(`${path}/${row.id}`).set('Cookie', cookie).expect(200);
+            const created = await request(app).post(path).set('Cookie', cookie)
+                .send({ ...header(departmentId), details: [detail(resource)] }).expect(resource === 'wastes' ? 201 : 200);
+            expect(created.body[resource === 'wastes' ? 'wasteIssue' : 'goodsIssue'].departmentId).toBe(departmentId);
+        }
+        expect((await stockSnapshot()).slice(0, 2)).toEqual(before.slice(0, 2));
     });
 
     it('rechaza surtido, devoluciones y cambios de inventario sin efectos persistidos', async () => {

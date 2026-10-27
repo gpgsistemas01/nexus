@@ -29,6 +29,7 @@ son fixtures, no datos de usuarios reales. La limpieza se declara en cada caso.
 | [CP-VUE-ISS-002-01](cases/cp-vue-iss-002-01.md) | surtir un detalle seleccionado. | DP-VUE-ISS-002 |
 | [CP-VUE-ISS-002-02](cases/cp-vue-iss-002-02.md) | devolución por la interfaz. | DP-VUE-ISS-002 |
 | [CP-VUE-ISS-002-03](cases/cp-vue-iss-002-03.md) | precisión y reintento de devolución. | DP-VUE-ISS-002 |
+| [CP-VUE-ISS-005-01](cases/cp-vue-iss-005-01.md) | área automática, bloqueo y conservación de la edición. | DP-VUE-ISS-005 |
 | [CP-VUE-WH-011-01](cases/cp-vue-wh-011-01.md) | trasladar un duplicado con cantidad positiva. | DP-VUE-WH-011 |
 | [CP-VUE-WH-011-02](cases/cp-vue-wh-011-02.md) | trasladar un duplicado con cantidad cero. | DP-VUE-WH-011 |
 | [CP-VUE-SESSION-004-01](cases/cp-vue-session-004-01.md) | cierre y rechazo posterior. | DP-VUE-SESSION-004 |

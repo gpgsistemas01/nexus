@@ -18,6 +18,7 @@ export const issueLookupService = {
             start: String((page - 1) * 20),
             length: '20',
         });
+        if (kind === 'departments') params.set('context', 'issues');
 
         for (const [key, value] of Object.entries(extra)) {
             if (Array.isArray(value)) value.forEach((item) => params.append(key, item));

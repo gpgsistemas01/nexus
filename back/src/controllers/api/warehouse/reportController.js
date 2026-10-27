@@ -89,7 +89,7 @@ export const buildGoodsIssueReportHandler = ({ findGoodsIssueReportRows, filenam
 };
 
 export const exportWasteIssueReportExcel = async (req, res) => {
-    const rows = await findWasteIssueReportRows(buildIssueReportQuery(req));
+    const rows = await findWasteIssueReportRows({ ...buildIssueReportQuery(req), accesses: req.user?.accesses || [] });
 
     return sendExcelReport({
         res,

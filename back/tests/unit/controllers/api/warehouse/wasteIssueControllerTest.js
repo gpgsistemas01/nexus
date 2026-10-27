@@ -61,6 +61,7 @@ describe('wasteIssueController', () => {
     }, response);
 
     expect(findAllWasteIssues).toHaveBeenCalledWith({
+      accesses: undefined,
       includeDetails: false,
       skip: 10,
       take: 5,
@@ -100,6 +101,7 @@ describe('wasteIssueController', () => {
     }, response);
 
     expect(createWasteIssue).toHaveBeenCalledWith({
+      accesses: undefined,
       userId: 'user-1',
       wasteIssueDto: {
         requesterId: 'requester-1',
@@ -162,6 +164,7 @@ describe('wasteIssueController', () => {
     }, response);
 
     expect(updateWasteIssue).toHaveBeenCalledWith({
+      accesses: undefined,
       id: 'issue-1',
       wasteIssueDto: {
         requesterId: 'requester-2',
@@ -195,6 +198,7 @@ describe('wasteIssueController', () => {
     }, response);
 
     expect(updateWasteIssueHeader).toHaveBeenCalledWith({
+      accesses: undefined,
       id: 'issue-1',
       wasteIssueDto: {
         requesterId: 'requester-3',

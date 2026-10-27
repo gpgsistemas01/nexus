@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { ids, material, pageOf, template, user, waste } from '../fixtures/inventory.js';
 
 export const mockWarehouse = async (page: Page, permissions = user.permissions) => {
@@ -35,6 +35,10 @@ export const chooseOption = async (
   scope: Page | Locator = page,
 ) => {
   const field = scope.getByRole('combobox', { name: label, exact: true });
+  if (await field.isDisabled()) {
+    await expect(field).toHaveValue(option);
+    return;
+  }
   await field.click();
   await page.getByRole('option', { name: option, exact: true }).click();
 };

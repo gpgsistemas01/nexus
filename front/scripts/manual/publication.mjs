@@ -56,9 +56,9 @@ export const prepareManual = async (frontRoot, profile, session) => {
         );
         sources.push({ file: chapter.file, content });
     }
-    const scope = hasDataScope(session.accesses ?? [], DATA_SCOPES.GOODS_ISSUES_READ_ALL)
-        ? 'En Salidas de Materiales y Consumibles puede consultar documentos de todas las áreas, según los filtros y el estado de cada documento.'
-        : 'En Salidas de Materiales y Consumibles la consulta está limitada a las áreas autorizadas para su cuenta. Limpiar los filtros no amplía ese acceso.';
+    const scope = hasDataScope(session.accesses ?? [], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)
+        ? 'En Salidas de Materiales, Consumibles y Mermas puede consultar y registrar documentos para todas las áreas, según los permisos y el estado de cada documento.'
+        : 'En Salidas de Materiales, Consumibles y Mermas sólo puede consultar y registrar solicitudes para las áreas asignadas a su cuenta. Limpiar los filtros no amplía ese acceso.';
     const title = `Manual de inducción de Nexus — ${profile.label}`;
     const documentDate = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/Mexico_City',

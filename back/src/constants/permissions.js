@@ -4,7 +4,7 @@ import { ROLE_KEYS } from './roles.js';
 
 export const DATA_SCOPES = Object.freeze({
     SYSTEM_WIDE_READ: 'system-wide-read',
-    GOODS_ISSUES_READ_ALL: 'goods-issues:read-all'
+    ISSUES_ALL_DEPARTMENTS: 'issues:all-departments'
 });
 
 const createPolicy = ({ roles, departments }) => Object.freeze({
@@ -21,10 +21,14 @@ export const DATA_SCOPE_POLICIES = Object.freeze({
         { roleKey: ROLE_KEYS.DIRECTOR },
         { departmentKey: DEPARTMENT_KEYS.MANAGEMENT }
     ]),
-    [DATA_SCOPES.GOODS_ISSUES_READ_ALL]: createAccessConditions([
+    [DATA_SCOPES.ISSUES_ALL_DEPARTMENTS]: createAccessConditions([
         { roleKey: ROLE_KEYS.SYSTEM_ADMIN },
         {
             roleKey: ROLE_KEYS.COORDINATOR,
+            departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+        },
+        {
+            roleKey: ROLE_KEYS.AUXILIARY,
             departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
         }
     ])

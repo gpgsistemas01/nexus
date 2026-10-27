@@ -87,16 +87,29 @@ describe('políticas funcionales de acceso', () => {
             [{
                 roleKey: ROLE_KEYS.COORDINATOR,
                 departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+            }],
+            [{
+                roleKey: ROLE_KEYS.AUXILIARY,
+                departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
             }]
         ])('concede consulta de todas las salidas por política: %o', (access) => {
-            expect(hasDataScope([access], DATA_SCOPES.GOODS_ISSUES_READ_ALL)).toBe(true);
+            expect(hasDataScope([access], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)).toBe(true);
         });
 
-        it('no amplía la consulta de salidas a coordinadores de otras áreas', () => {
-            expect(hasDataScope(
-                [{ roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.PRINTING }],
-                DATA_SCOPES.GOODS_ISSUES_READ_ALL
-            )).toBe(false);
+        it.each(operationalDepartments.flatMap(department => [ROLE_KEYS.COORDINATOR, ROLE_KEYS.OPERATOR, ROLE_KEYS.AUXILIARY].map(role => [department, role])))(
+            'limita las salidas a las áreas asignadas para %s / %s', (departmentKey, roleKey) => {
+                expect(hasDataScope(
+                    [{ roleKey, departmentKey }],
+                    DATA_SCOPES.ISSUES_ALL_DEPARTMENTS
+                )).toBe(false);
+            }
+        );
+
+        it('no combina un auxiliar operativo con una asignación no autorizada de Almacén', () => {
+            expect(hasDataScope([
+                { roleKey: ROLE_KEYS.AUXILIARY, departmentKey: DEPARTMENT_KEYS.PRINTING },
+                { roleKey: ROLE_KEYS.SALES_ADVISOR, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }
+            ], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)).toBe(false);
         });
 
         it('deriva el contexto informativo desde las asignaciones', () => {

@@ -13,7 +13,8 @@ import {
 export const createDataTableListController = ({
     findAll,
     columns,
-    defaultDirection = 'asc'
+    defaultDirection = 'asc',
+    getContext = () => ({})
 }) => async (req, res) => {
     const { skip, take } = getDataTablePaging(req.query);
     const search = getDataTableSearch(req.query);
@@ -24,6 +25,7 @@ export const createDataTableListController = ({
     });
 
     const result = await findAll({
+        ...getContext(req),
         skip,
         take,
         search,

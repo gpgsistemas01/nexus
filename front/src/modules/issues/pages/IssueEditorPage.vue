@@ -57,8 +57,13 @@ const selects = computed<IssueHeaderSelect[]>(() => [
         label: 'Área',
         state: headerSelection.departments.state.value,
         initialOption: headerSelection.initialOptions.value.departmentId,
-        isDisabled: !headerSelection.canReadDepartments.value,
-        hint: !headerSelection.canReadDepartments.value ? 'Sin permiso para consultar áreas.' : '',
+        isDisabled:
+            !headerSelection.canReadDepartments.value || headerSelection.departments.isLocked.value,
+        hint: !headerSelection.canReadDepartments.value
+            ? 'Sin permiso para consultar áreas.'
+            : headerSelection.departments.isLocked.value
+              ? 'Su cuenta utiliza únicamente esta área.'
+              : '',
     },
     {
         field: 'requesterId',

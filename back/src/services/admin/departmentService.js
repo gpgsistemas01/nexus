@@ -1,16 +1,20 @@
 import { findPage } from "../../repository/paginationRepository.js";
 import { DepartmentNotFound } from "../../errors/admin/departmentError.js";
 import { getDb } from "../../repository/baseRepository.js";
+import { buildIssueDepartmentWhere } from '../warehouse/issues/issueAccessService.js';
 
 export const findAllDepartments = async ({
     skip = 0,
     take = 10,
     search = '',
     orderBy = 'name',
-    orderDir = 'asc'
+    orderDir = 'asc',
+    issueAccesses
 }) => {
 
+    const { departmentId } = issueAccesses ? buildIssueDepartmentWhere({ accesses: issueAccesses }) : {};
     const where = {
+        ...(departmentId && { id: departmentId }),
         isActive: true,
         ...(search && {
             name: {
@@ -22,6 +26,7 @@ export const findAllDepartments = async ({
 
     return findPage({
         model: getDb().department,
+        ...(issueAccesses && { totalWhere: where, hasFilters: false }),
         query: {
             skip,
             take,

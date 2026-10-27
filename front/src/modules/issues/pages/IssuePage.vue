@@ -60,7 +60,7 @@ const applySearch = () => {
 const clear = () => {
     filters.clear();
     filterError.value = '';
-    searchForm.clearSearch(emptyIssueFilters());
+    searchForm.clearSearch({ ...filters.values });
 };
 
 const actions = useIssueActions({
@@ -112,6 +112,7 @@ onMounted(() => {
         :values="filters.values"
         :selects="filters.selects.value"
         :is-loading="isLoading"
+        :is-department-locked="filters.isDepartmentLocked.value"
         :error="filterError"
         @update="(field, value) => (filters.values[field] = value)"
         @search-options="(kind, value) => filters.lookups[kind].updateSearch(value)"

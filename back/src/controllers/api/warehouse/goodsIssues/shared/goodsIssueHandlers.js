@@ -39,6 +39,7 @@ export const buildRegisterHandler = createGoodsIssue => async (req, res) => {
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
 
     const goodsIssue = await createGoodsIssue({
+        accesses: req.user?.accesses,
         goodsIssueDto: sanitizedGoodsIssueDto
     });
 
@@ -54,6 +55,7 @@ export const buildEditHandler = updateGoodsIssue => async (req, res) => {
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
 
     const goodsIssue = await updateGoodsIssue({
+        accesses: req.user?.accesses,
         goodsIssueDto: sanitizedGoodsIssueDto,
         id: req.params.id
     });
@@ -70,6 +72,7 @@ export const buildHeaderHandler = updateGoodsIssueHeader => async (req, res) => 
     const sanitizedGoodsIssueDto = sanitizeEmptyStrings(goodsIssueDto);
 
     const goodsIssue = await updateGoodsIssueHeader({
+        accesses: req.user?.accesses,
         goodsIssueDto: sanitizedGoodsIssueDto,
         id: req.params.id
     });

@@ -54,8 +54,12 @@ claves a los registros existentes y las altas de catálogo generan claves nuevas
 `permissions.js` define las políticas de permisos, alcance de datos y contexto
 organizativo mediante esas claves. La consulta global de lectura se concede por la
 clave de Director o de Dirección. La consulta de todas las salidas se concede por la
-clave de Administrador del sistema o por Coordinador con clave de Almacén y
-Proveeduría; las demás asignaciones limitan la consulta mediante el ID del área.
+clave de Administrador del sistema o por Auxiliar o Coordinador con clave de Almacén
+y Proveeduría. El alcance `ISSUES_ALL_DEPARTMENTS` permite consultar y registrar
+salidas de Materiales, Consumibles y Mermas para todas las áreas. Las demás
+asignaciones autorizadas limitan consulta y escritura al ID de sus áreas.
+`issueAccessService` construye el filtro común y comprueba el destino de la captura;
+las ediciones verifican también la pertenencia del documento dentro de la transacción.
 `organization` expone indicadores informativos y no sustituye los permisos del servidor.
 
 Las áreas `IMPRESIÓN`, `TALLER 3D` (Taller/Herrería), `ROUTER`, `PT/TRÁFICO`, `INSTALACIONES` y `ACABADOS`

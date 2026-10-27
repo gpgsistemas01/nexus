@@ -31,10 +31,10 @@ modificar inventario, consultar costos, gestionar compras o administrar registro
 Las restricciones se contrastan con controles reales: se comprueba también una
 salida ya surtida para verificar que el operador no recibe el botón de devolución.
 
-Auxiliar y Coordinador de Almacén tienen los mismos permisos funcionales. Existe
-una diferencia de datos en Materiales y Consumibles: Coordinador de Almacén puede
-consultar todas las salidas; Auxiliar queda limitado a sus áreas. El índice de cada
-manual explica ese alcance. La pertenencia a un perfil no sustituye la autorización
+Auxiliar y Coordinador de Almacén tienen los mismos permisos funcionales y pueden
+consultar y registrar salidas de Materiales, Consumibles y Mermas para todas las
+áreas. Las cuentas operativas sólo consultan y registran solicitudes para sus áreas
+asignadas y autorizadas. El índice de cada manual explica ese alcance. La pertenencia a un perfil no sustituye la autorización
 del servidor ni las restricciones del estado de cada documento.
 
 ## Responsabilidades de la herramienta

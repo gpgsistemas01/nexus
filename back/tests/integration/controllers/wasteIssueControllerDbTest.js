@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
@@ -40,7 +41,7 @@ describe('waste issue controller database integration', () => {
     prisma = prismaModule.prisma;
     app = createControllerTestApp({
       registerRoutes: router => {
-        router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
+        router.use((req, _res, next) => { req.user = { id: ids.user, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] }; next(); });
         router.get('/waste-issues/:id', controller.getWasteIssue);
         router.get('/waste-issues', controller.getAllWasteIssues);
         router.get('/waste-movements', movementController.getAllWasteMovements);

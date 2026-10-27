@@ -183,6 +183,20 @@ Omitir la relación en un listado no permite guardar un documento vacío: las al
 ediciones completas exigen al menos una partida. Editar sólo el encabezado conserva
 las partidas existentes y permite omitir el campo; si se envía, no acepta un array vacío.
 
+### Alcance de áreas de Salidas
+
+`GET /api/admin/departments?context=issues` filtra las opciones según las asignaciones
+vigentes de la sesión. Auxiliar y Coordinador de Almacén, y Administrador del sistema,
+consultan y registran salidas de todas las áreas. Para las demás cuentas autorizadas,
+listado, conteos, reportes y lectura por ID se limitan a sus áreas. Esto aplica por
+igual a Materiales, Consumibles y Mermas.
+
+La API no acepta permisos ni alcances enviados en el payload. Alta o cambio de
+destino a un área no autorizada devuelve `403 FORBIDDEN`; consulta o edición de un
+ID ajeno devuelve `404` sin divulgar su contenido. En edición se comprueba también
+el área original, dentro de la transacción y antes de cambiar datos. Los permisos
+de surtido/devolución permanecen independientes.
+
 ### Validación de rutas y datos del modal
 
 Los validadores de formulario revisan los campos y metadatos de `body`, incluidos

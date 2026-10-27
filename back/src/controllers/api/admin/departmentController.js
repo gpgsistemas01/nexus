@@ -3,5 +3,6 @@ import { createDataTableListController } from "../createDataTableListController.
 
 export const getAllDepartments = createDataTableListController({
     findAll: findAllDepartments,
-    columns: ['name']
+    columns: ['name'],
+    getContext: req => req.query.context === 'issues' ? { issueAccesses: req.user?.accesses ?? [] } : {}
 });

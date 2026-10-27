@@ -6,6 +6,12 @@ Este capítulo describe cómo Vue construye solicitudes, interpreta respuestas y
 
 Los servicios usan `shared/http/apiClient`; no se define un cliente Axios por módulo. Los IDs que forman parte de una ruta se codifican y los filtros se construyen mediante URLSearchParams/adaptadores compartidos. Las rutas de navegador y los endpoints HTTP son conceptos distintos: `/salidas/materiales` abre una página; `/api/warehouse/goods-issues/materials` consulta datos.
 
+Los selectores y filtros de área de Salidas consultan
+`GET /api/admin/departments?context=issues`. La respuesta contiene sólo las áreas
+autorizadas para esa sesión, o todas para Auxiliar/Coordinador de Almacén y
+administración. El servidor aplica el mismo alcance a los documentos; un ID ajeno
+responde `404` y un alta o cambio de destino a un área no autorizada responde `403`.
+
 ## Operaciones y propietarios
 
 | Área | Contrato consumido y datos relevantes |
