@@ -9,19 +9,19 @@ separa patrones, mecanismos del framework, tipos y principios de revisión.
 
 | Decisión aplicada | Clasificación | Consumidores y límite |
 | --- | --- | --- |
-| Contenedor/presentación | Patrón de separación de responsabilidades. | Las páginas coordinan; tablas y formularios reciben props y emiten eventos. No hay controladores Express en Vue. |
+| Contenedor/presentación | Patrón de separación de responsabilidades. | Las páginas coordinan; tablas y formularios reciben props y emiten eventos. |
 | Composables y operaciones por callback | Composición reactiva y estrategia funcional. | `usePagedList`, `useRemoteLookup`, `useDocumentRead` y `useRecordSave` conservan contratos distintos. No necesitan clases Strategy ni un estado global por formulario. |
 | Adaptadores HTTP y de datos | Patrón aplicado a fronteras concretas. | Servicios, mappers, `apiClient`, `requestPage` y `confirmMutation`. No prueban independencia completa de Vue, Axios o la API. |
 | Slots y composición visual | Mecanismo de Vue que permite reutilizar presentación. | `ServerTable`, `RecordListPanel` y diálogos. No es herencia ni un generador universal de CRUD. |
-| Provisión de sesión | Inyección de una instancia mediante Vue y composición del arranque. | `main.ts`, `createAuthSession`, `provide/inject` y guarda de Router. No equivale a un singleton global ni concede autorización en Express. |
+| Provisión de sesión | Inyección de una instancia mediante Vue y composición del arranque. | `main.ts`, `createAuthSession`, `provide/inject` y guarda de Router. No equivale a un singleton global ni concede autorización en el backend. |
 | Fábricas de esquemas | Funciones que construyen validación según contexto. | `createIssueValidationSchema` y `createPurchaseValidationSchema`. No son Abstract Factory ni una máquina de estados. |
 | Uniones discriminadas | Mecanismo del sistema de tipos de TypeScript. | `IssueTarget`, `PurchaseWriteTarget` y `PurchaseDetailChange`. No validan JSON recibido ni sustituyen reglas del servidor. |
 | SOLID | Principios de evaluación, con aplicación parcial. | Se revisan cohesión, contratos y dependencias funcionales. No se inventa herencia para representar Liskov. |
 
 No se documentan como implementados Pinia, Zod, Tailwind, Atomic Design, CQRS,
 Event Sourcing, un bus global de eventos ni una arquitectura hexagonal completa.
-Tampoco se atribuyen al cliente las transacciones, repositories o middleware de
-Express. Vue Router y las bibliotecas instaladas son herramientas: su presencia
+Las transacciones, el acceso a la base de datos y la autorización de cada petición
+pertenecen al backend. Vue Router y las bibliotecas instaladas son herramientas: su presencia
 no constituye por sí sola un patrón de diseño.
 
 ## Modelo general y aplicación en código

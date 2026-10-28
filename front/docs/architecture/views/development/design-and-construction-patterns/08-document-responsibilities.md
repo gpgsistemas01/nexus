@@ -64,7 +64,7 @@ flowchart TB
     save -.->|operation signal| editor
     editor --> service["issueService<br/>ruta y confirmación"]
     service --> http["apiClient<br/>Axios compartido"]
-    http --> api["Express<br/>validación y persistencia"]
+    http --> api["API<br/>confirmación de la operación"]
 ```
 
 El callback que ejecuta `useRecordSave` está definido en `useIssueEditor`: construye
@@ -155,7 +155,7 @@ Tras el alta convierte `DirectoryEntry` en `LookupItem` y ejecuta el callback
 recibido. [useIssueHeaderSelection](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts)
 conserva la opción creada, selecciona su id y refresca opciones; no selecciona una
 opción inactiva. El guardado permanece en Directorio y la autorización definitiva
-en Express. Cerrar el diálogo elimina el callback pendiente.
+en el backend. Cerrar el diálogo elimina el callback pendiente.
 
 [PurchaseWorkspace](../../../../../src/app/pages/PurchaseWorkspace.vue) aplica la misma composición
 para proveedores y artículos con sus contratos de callback. No hay un bus global

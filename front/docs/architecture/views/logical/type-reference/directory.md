@@ -2,11 +2,7 @@
 
 Generado con `npm run docs:generate`. No editar manualmente.
 
-Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.
-Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.
-Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.
-
-[Lectura y cobertura](index.md).
+[Alcance y notación](index.md#alcance-y-notación).
 
 ## DirectoryForm.defineProps
 
@@ -27,15 +23,13 @@ Los objetos inline declarados muestran contexto, línea y columna. Las formas in
 | --- | --- | --- |
 | dependency | [DirectoryResource](../../../../../src/modules/directory/directory.ts) | `resource` |
 | association | [DirectoryValues](../../../../../src/modules/directory/directory.ts) | `values` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 | dependency | [DirectoryField](../../../../../src/modules/directory/directory.ts) | `errors` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-1-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-DIRECTORY-1-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryForm.defineProps"] {
         <<SFC_contract>>
         resource: DirectoryResource
@@ -53,40 +47,12 @@ classDiagram
     class R1["DirectoryValues"] {
         <<reference>>
     }
+    class R2["DirectoryField"] {
+        <<reference>>
+    }
     Subject ..> R0 : resource
     Subject "1" --> "1" R1 : values
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-1-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["DirectoryForm.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-1-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["DirectoryForm.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["DirectoryField"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
+    Subject ..> R2 : errors
 ```
 
 ## DirectoryForm.defineEmits
@@ -106,11 +72,11 @@ classDiagram
 | dependency | [DirectoryField](../../../../../src/modules/directory/directory.ts) | `update` |
 | dependency | [DirectoryField](../../../../../src/modules/directory/directory.ts) | `blur` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-2-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-2-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryForm.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -146,11 +112,11 @@ classDiagram
 | association | [DirectoryEntry](../../../../../src/modules/directory/directory.ts) | `rows` |
 | association | [RecordQuery](../../../../../src/shared/list.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-3-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-DIRECTORY-3-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryTable.defineProps"] {
         <<SFC_contract>>
         resource: DirectoryResource
@@ -167,22 +133,12 @@ classDiagram
     class R1["DirectoryEntry"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject "1" --> "0..*" R1 : rows
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-3-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["DirectoryTable.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["RecordQuery"] {
+    class R2["RecordQuery"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : query
+    Subject ..> R0 : resource
+    Subject "1" --> "0..*" R1 : rows
+    Subject "1" --> "1" R2 : query
 ```
 
 ## DirectoryTable.defineEmits
@@ -197,14 +153,13 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [DirectoryEntry](../../../../../src/modules/directory/directory.ts) | `edit` |
-| dependency | `Partial` | `query` |
 | dependency | [RecordQuery](../../../../../src/shared/list.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-4-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-DIRECTORY-4-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryTable.defineEmits"] {
         <<SFC_contract>>
         edit: tuple
@@ -213,25 +168,11 @@ classDiagram
     class R0["DirectoryEntry"] {
         <<reference>>
     }
-    class R1["Partial"] {
+    class R1["RecordQuery"] {
         <<reference>>
     }
     Subject ..> R0 : edit
     Subject ..> R1 : query
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-4-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["DirectoryTable.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["RecordQuery"] {
-        <<reference>>
-    }
-    Subject ..> R0 : query
 ```
 
 ## useDirectoryEditor.options@15:45
@@ -251,11 +192,11 @@ classDiagram
 | dependency | [DirectoryTarget](../../../../../src/modules/directory/directory.ts) | `target` |
 | dependency | [DirectoryEntry](../../../../../src/modules/directory/directory.ts) | `onSaved` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-5-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-DIRECTORY-5-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useDirectoryEditor.<br/>options@15:45"] {
         <<inline_object>>
         resource: DirectoryResource
@@ -269,22 +210,12 @@ classDiagram
     class R1["DirectoryTarget"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject ..> R1 : target
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-5-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useDirectoryEditor.<br/>options@15:45"] {
-        <<inline_object>>
-    }
-    class R0["DirectoryEntry"] {
+    class R2["DirectoryEntry"] {
         <<reference>>
     }
-    Subject ..> R0 : onSaved
+    Subject ..> R0 : resource
+    Subject ..> R1 : target
+    Subject ..> R2 : onSaved
 ```
 
 ## DirectoryResource
@@ -297,11 +228,11 @@ classDiagram
 'clients' | 'suppliers'
 ```
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-6-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-6-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryResource"] {
         <<type>>
     }
@@ -318,11 +249,11 @@ classDiagram
 | `tradeName` | `tradeName: string;` |
 | `isActive` | `isActive: boolean;` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-7-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-7-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryValues"] {
         <<interface>>
         name: string
@@ -347,11 +278,11 @@ classDiagram
 | --- | --- | --- |
 | inheritance | [DirectoryValues](../../../../../src/modules/directory/directory.ts) | `extends` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-8-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-8-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryEntry"] {
         <<interface>>
         id: string
@@ -378,11 +309,11 @@ classDiagram
 | dependency | [DirectoryTarget@15:5](../../../../../src/modules/directory/directory.ts) | `type` |
 | dependency | [DirectoryTarget@15:50](../../../../../src/modules/directory/directory.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-9-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-9-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryTarget"] {
         <<type>>
     }
@@ -405,11 +336,11 @@ classDiagram
 | `action` | `action: 'create';` |
 | `initialName` | `initialName?: string` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-10-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-10-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryTarget@15:5"] {
         <<inline_object>>
         action: 'create'
@@ -430,11 +361,11 @@ classDiagram
 | --- | --- | --- |
 | association | [DirectoryEntry](../../../../../src/modules/directory/directory.ts) | `row` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-11-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-11-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryTarget@15:50"] {
         <<inline_object>>
         action: 'edit'
@@ -460,11 +391,11 @@ keyof DirectoryValues
 | --- | --- | --- |
 | dependency | [DirectoryValues](../../../../../src/modules/directory/directory.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-12-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-12-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryField"] {
         <<type>>
     }
@@ -488,11 +419,11 @@ classDiagram
 | dependency | [DirectoryResource](../../../../../src/modules/directory/directory.ts) | `resource` |
 | dependency | [DirectoryTarget](../../../../../src/modules/directory/directory.ts) | `target` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-13-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-13-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryEditorPage.<br/>defineProps"] {
         <<SFC_contract>>
         resource: DirectoryResource
@@ -523,11 +454,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [DirectoryEntry](../../../../../src/modules/directory/directory.ts) | `saved` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-14-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-14-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryEditorPage.<br/>defineEmits"] {
         <<SFC_contract>>
         saved: tuple
@@ -553,11 +484,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [DirectoryResource](../../../../../src/modules/directory/directory.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-15-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-15-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryPage.defineProps"] {
         <<SFC_contract>>
         resource: DirectoryResource
@@ -588,26 +519,15 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Promise` | `submit` |
 | dependency | [DirectoryValues](../../../../../src/modules/directory/directory.ts) | `update` |
 | dependency | [DirectoryValues](../../../../../src/modules/directory/directory.ts) | `blur` |
-| dependency | `Promise` | `blur` |
-| dependency | `Ref` | `message` |
-| dependency | `Ref` | `isSubmitting` |
-| dependency | `Ref` | `isConflicted` |
-| dependency | `AbortSignal` | `execute` |
-| dependency | `Promise` | `execute` |
-| dependency | `AbortSignal` | `signal` |
 | association | [DirectoryValues](../../../../../src/modules/directory/directory.ts) | `values` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-16-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-DIRECTORY-16-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useDirectoryEditor.return"] {
         <<inferred_return>>
         submit: callback
@@ -618,24 +538,6 @@ classDiagram
         isConflicted: Ref~boolean, boolean~
         execute: callback
         signal: AbortSignal
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["DirectoryValues"] {
-        <<reference>>
-    }
-    Subject ..> R0 : submit
-    Subject ..> R1 : update
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-16-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useDirectoryEditor.return"] {
-        <<inferred_return>>
         isDisposed: callback
         values: DirectoryValues
         errors: complex
@@ -643,98 +545,9 @@ classDiagram
     class R0["DirectoryValues"] {
         <<reference>>
     }
-    class R1["Promise"] {
-        <<reference>>
-    }
+    Subject ..> R0 : update
     Subject ..> R0 : blur
-    Subject ..> R1 : blur
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-16-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useDirectoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : message
-    Subject ..> R0 : isSubmitting
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-16-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useDirectoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isConflicted
-    Subject ..> R1 : execute
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-16-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useDirectoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : execute
-    Subject ..> R1 : signal
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-16-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useDirectoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["DirectoryValues"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
     Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-16-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useDirectoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
 ```
 
 ## DIRECTORY_CONFIG
@@ -751,11 +564,11 @@ classDiagram
 | association | [DIRECTORY_CONFIG.clients.shape1](../../../../../src/modules/directory/directory.ts) | `clients` |
 | association | [DIRECTORY_CONFIG.suppliers.shape2](../../../../../src/modules/directory/directory.ts) | `suppliers` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-17-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-17-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DIRECTORY_CONFIG"] {
         <<inferred_export>>
         clients: object
@@ -787,11 +600,11 @@ classDiagram
 | `path` | `readonly path: "/api/sales/clients";` |
 | `reportPath` | `readonly reportPath: "/api/sales/reports/clients/excel";` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-18-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-DIRECTORY-18-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DIRECTORY_CONFIG.clients.<br/>shape1"] {
         <<inferred_object>>
         title: "Clientes"
@@ -802,16 +615,6 @@ classDiagram
         update: "clients:update"
         report: "client:reports-read"
         path: "/api/sales/clients"
-    }
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-18-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["DIRECTORY_CONFIG.clients.<br/>shape1"] {
-        <<inferred_object>>
         reportPath: "/api/sales/reports/clients/excel"
     }
 ```
@@ -832,11 +635,11 @@ classDiagram
 | `path` | `readonly path: "/api/warehouse/suppliers";` |
 | `reportPath` | `readonly reportPath: "/api/warehouse/reports/suppliers/excel";` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-19-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-DIRECTORY-19-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DIRECTORY_CONFIG.suppliers.<br/>shape2"] {
         <<inferred_object>>
         title: "Proveedores"
@@ -847,16 +650,6 @@ classDiagram
         update: "suppliers:update"
         report: "supplier:reports-read"
         path: "/api/warehouse/suppliers"
-    }
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-19-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["DIRECTORY_CONFIG.suppliers.<br/>shape2"] {
-        <<inferred_object>>
         reportPath: "/api/warehouse/reports/suppliers/excel"
     }
 ```
@@ -871,11 +664,11 @@ classDiagram
 | `isActive` | `"isActive": boolean;` |
 | `name` | `"name": string;` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-20-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-20-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["directoryPayload.return.<br/>variant1"] {
         <<inferred_return>>
         expectedVersion?: number | undefined
@@ -895,11 +688,11 @@ classDiagram
 | `legalName` | `"legalName": string;` |
 | `tradeName` | `"tradeName": string;` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-21-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-21-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["directoryPayload.return.<br/>variant2"] {
         <<inferred_return>>
         expectedVersion?: number | undefined
@@ -923,26 +716,18 @@ classDiagram
 | --- | --- | --- |
 | dependency | [DirectoryResource](../../../../../src/modules/directory/directory.ts) | `list` |
 | dependency | [RecordQuery](../../../../../src/shared/list.ts) | `list` |
-| dependency | `AbortSignal` | `list` |
-| dependency | `Promise` | `list` |
 | dependency | [directoryService.list.shape1](../../../../../src/modules/directory/services/directoryService.ts) | `list` |
 | dependency | [DirectoryResource](../../../../../src/modules/directory/directory.ts) | `save` |
 | dependency | [DirectoryTarget](../../../../../src/modules/directory/directory.ts) | `save` |
-| dependency | `Record` | `save` |
-| dependency | `AbortSignal` | `save` |
-| dependency | `Promise` | `save` |
 | dependency | [DirectoryEntry](../../../../../src/modules/directory/directory.ts) | `save` |
 | dependency | [DirectoryResource](../../../../../src/modules/directory/directory.ts) | `export` |
 | dependency | [RecordQuery](../../../../../src/shared/list.ts) | `export` |
-| dependency | `AbortSignal` | `export` |
-| dependency | `Promise` | `export` |
-| dependency | `Blob` | `export` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-22-1`. Parte 1/8.
+**Figura:** `DIA-VUE-TS-DIRECTORY-22-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["directoryService"] {
         <<inferred_export>>
         list: callback
@@ -955,134 +740,34 @@ classDiagram
     class R1["RecordQuery"] {
         <<reference>>
     }
-    Subject ..> R0 : list
-    Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-22-2`. Parte 2/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["directoryService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
+    class R2["directoryService.list.shape1"] {
         <<reference>>
     }
-    class R1["Promise"] {
+    class R3["DirectoryTarget"] {
         <<reference>>
     }
     Subject ..> R0 : list
     Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-22-3`. Parte 3/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["directoryService"] {
-        <<inferred_export>>
-    }
-    class R0["directoryService.list.shape1"] {
-        <<reference>>
-    }
-    class R1["DirectoryResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : list
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-22-4`. Parte 4/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["directoryService"] {
-        <<inferred_export>>
-    }
-    class R0["DirectoryTarget"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
+    Subject ..> R2 : list
     Subject ..> R0 : save
-    Subject ..> R1 : save
+    Subject ..> R3 : save
+    Subject ..> R0 : export
+    Subject ..> R1 : export
 ```
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-22-5`. Parte 5/8.
+**Figura:** `DIA-VUE-TS-DIRECTORY-22-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["directoryService"] {
         <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : save
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-22-6`. Parte 6/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["directoryService"] {
-        <<inferred_export>>
+        save: callback
     }
     class R0["DirectoryEntry"] {
         <<reference>>
     }
-    class R1["DirectoryResource"] {
-        <<reference>>
-    }
     Subject ..> R0 : save
-    Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-22-7`. Parte 7/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["directoryService"] {
-        <<inferred_export>>
-    }
-    class R0["RecordQuery"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
-    Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-22-8`. Parte 8/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["directoryService"] {
-        <<inferred_export>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["Blob"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
-    Subject ..> R1 : export
 ```
 
 ## directoryService.list.shape1
@@ -1099,11 +784,11 @@ classDiagram
 | --- | --- | --- |
 | association | [DirectoryEntry](../../../../../src/modules/directory/directory.ts) | `data` |
 
-**Figura:** `DIA-VUE-TS-DIRECTORY-23-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-DIRECTORY-23-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["directoryService.list.shape1"] {
         <<inferred_object>>
         data: DirectoryEntry[]

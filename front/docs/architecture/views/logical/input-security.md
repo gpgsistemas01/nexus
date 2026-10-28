@@ -1,7 +1,7 @@
 # 3. Entradas, normalización y salida segura en Vue
 
-El [índice Vue](../../../index.md) ubica esta guía técnica y sus fuentes normativas;
-no define otra política de seguridad independiente de Express.
+Esta guía describe la captura, la normalización y la presentación segura de datos
+en el cliente. El [índice Vue](../../../index.md) ubica sus fuentes normativas.
 
 Los módulos actuales capturan texto plano, números, fechas, opciones y partidas.
 No admiten contenido HTML escrito por usuarios. La regla general es conservar
@@ -12,7 +12,7 @@ el significado de la captura y tratarla como dato en todo el recorrido.
 | Operación | Frontend | Backend |
 | --- | --- | --- |
 | Normalización | El modelo del formulario recorta texto cuando su contrato lo indica y construye el payload permitido. | Validators y DTOs vuelven a normalizar el contrato antes de usarlo. |
-| Validación | VeeValidate ejecuta reglas públicas para orientar la captura y presentar errores. | Express valida incluso si se omite Vue y resuelve permisos, relaciones, versiones y estado. |
+| Validación | VeeValidate ejecuta reglas públicas para orientar la captura y presentar errores. | La API valida incluso si se omite Vue y resuelve permisos, relaciones, versiones y estado. |
 | Escape de salida | Interpolación/props de texto y SweetAlert2 `titleText`/`text`. | JSON con tipo de respuesta correcto; la API devuelve datos, sin construir el DOM del cliente. |
 | Sanitización HTML | No hay consumidor que la necesite. No se usa `v-html`. | Tampoco se transforman nombres en HTML “limpio”. Un futuro editor enriquecido necesita contrato propio. |
 
@@ -28,7 +28,7 @@ La separación de estas operaciones sigue [OWASP: prevención de XSS](https://ch
 
 La revisión parte de los alias de [Vite](../../../../vite.config.ts), sus imports transitivos
 y los consumidores del cliente. Los módulos alcanzados están en `back/src/public`
-o `back/src/shared`; no importan servicios privados, Prisma, middleware Express
+o `back/src/shared`; no importan servicios privados, Prisma, middleware del servidor
 ni bibliotecas de Node. Esa compatibilidad permite compilarlos para el navegador,
 pero no convierte cualquier regla de negocio en información pública.
 
@@ -39,10 +39,10 @@ pero no convierte cualquier regla de negocio en información pública.
 | Captura de login | [loginValidation](../../../../../back/src/public/js/utils/validations/loginValidation.js). | Compartible: requerido, texto y máximo de 50 caracteres para usuario/contraseña. La contraseña conserva exactamente su contenido; el nombre se recorta. |
 | Alta/cambio de contraseña y nombre de usuario | `userValidation`, `userEditValidation` y `userPasswordValidation` en [validators](../../../../../back/src/public/js/utils/validations/validators.js). | Política pública de captura del dominio Identidad. No aplicar al login los requisitos de alta: impediría usar credenciales históricas válidas. |
 | Campos y colecciones de cada operación | Materiales, Mermas, Directorio, Personas, Catálogos, Compras y Salidas en `validators.js`. | Esquemas públicos por dominio: factura condicional, dimensiones pareadas, pesos, detalles y áreas repetidas. No son todos validadores genéricos. |
-| Reglas de pesos y pares de captura | [weightValidations](../../../../../back/src/shared/validation/weightValidations.js). | Compartibles: precisión, límites y total mayor que cono. La referencia del material y las dimensiones persistidas las resuelve Express. |
+| Reglas de pesos y pares de captura | [weightValidations](../../../../../back/src/shared/validation/weightValidations.js). | Compartibles: precisión, límites y total mayor que cono. La referencia del material y las dimensiones persistidas las resuelve el backend. |
 | Momento y presentación del error | `useFormInteraction`, `useLoginForm`, `createIssueValidationSchema` y `createPurchaseValidationSchema`. | Integración propia de Vue/VeeValidate. Estado touched, submit, modo y ciclo de vida permanecen en `front/`. |
 
-Express mantiene sus adaptadores de `express-validator` en `back/src/validators`.
+Los adaptadores del backend usan `express-validator` y se mantienen en `back/src/validators`.
 También consumen constantes públicas, pero sus cadenas `body(...)`, `req`,
 normalización HTTP y traducción de errores no pertenecen a un paquete del navegador.
 Compartir un predicado no permite omitir su ejecución en el servidor.
@@ -61,7 +61,7 @@ de validación termine absorbiendo toda la aplicación:
 | `@nexus/purchase-calculations` | Cantidad convertida, costo unitario e importes neto/bruto con IVA. | Cálculos públicos de Compras para vista previa, separados de validadores. |
 | `@nexus/waste-measurements` | Peso neto, largo proporcional y orientación de medidas. | Cálculos públicos de Mermas para vista previa, separados de validadores. |
 | `@nexus/issue-header-rules` | Cliente interno, áreas de asesores y proyectos sugeridos por área. | Configuración pública del dominio Salidas; no es validación genérica. |
-| `@nexus/issue-statuses` | Nombres de estados usados para presentar acciones. | Contrato público de Salidas; las transiciones se verifican en Express. |
+| `@nexus/issue-statuses` | Nombres de estados usados para presentar acciones. | Contrato público de Salidas; las transiciones se verifican en el backend. |
 | `@nexus/catalogs` | Recursos administrables, campos, etiquetas y longitudes. | Metadatos públicos de Catálogos. |
 | `@nexus/permissions` | Identificadores de permisos y consulta del usuario recibido. | Contrato público para presentar la interfaz; no concede permisos. |
 | `@nexus/api-success-codes` | Códigos de confirmación. | Contrato público de respuestas. |
@@ -83,7 +83,7 @@ cliente, asesor y área leídos de la BD debe permanecer en
 [issueHeaderService](../../../../../back/src/services/warehouse/issues/issueHeaderService.js).
 La sugerencia de Vue no reemplaza esa comprobación.
 
-### Reglas que permanecen en Express
+### Reglas que permanecen en el backend
 
 - Comparación de contraseña, usuario/persona activos, accesos y emisión o
   verificación de tokens: [authService](../../../../../back/src/services/authService.js) y
@@ -104,7 +104,7 @@ El primer candidato a `packages/validation` son las funciones públicas de captu
 sus constantes y esquemas por dominio. Sus dependencias públicas también deben
 resolverse: `fieldValidations` usa mensajes y pesos; no basta con mover el archivo
 de login o cambiar un alias. La adaptación a VeeValidate permanece en Vue y la
-adaptación a `express-validator` permanece en Express. Metadatos, cálculos y
+adaptación a `express-validator` permanece en el backend. Metadatos, cálculos y
 configuración de Salidas conservan exports o módulos propios.
 
 La ubicación actual funciona durante la compilación: Vite incorpora esos módulos

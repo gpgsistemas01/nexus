@@ -20,7 +20,7 @@ evidencia según [el criterio documental](../../../../index.md#organización-y-f
 
 La [correspondencia funcional](../../../../index.md#trazabilidad)
 conduce a los casos existentes; el alcance de cada cliente se declara en su guía.
-Las guardas y controles orientan la interfaz; Express comprueba cada petición.
+Las guardas y controles orientan la interfaz; la API comprueba cada petición.
 Los archivos y símbolos se consultan desde el capítulo afectado y el código real.
 Una modificación común enlaza [Arquitectura](../../../index.md) o
 [Patrones](../design-and-construction-patterns/index.md), sin copiar sus diagramas a todos los módulos.

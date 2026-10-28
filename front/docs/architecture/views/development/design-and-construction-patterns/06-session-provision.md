@@ -55,7 +55,7 @@ traduce 401/403 a navegación. No expone un método para que un botón conceda p
 
 La renovación de tokens pertenece a [apiClient](../../../../../src/shared/http/apiClient.ts),
 no al mecanismo de inyección. Las credenciales viajan en cookies; los permisos de
-la interfaz no sustituyen la autorización en Express. La agrupación de promesas
+la interfaz no sustituyen la autorización en el backend. La agrupación de promesas
 de sesión y la renovación coordinada son mecanismos diferentes.
 
 [routerTest](../../../../../tests/unit/app/routerTest.ts),
@@ -79,8 +79,9 @@ cambio de ruta. Se mantienen esos propietarios y no se instala Pinia por este fl
 Se reconsiderará cuando varias rutas necesiten modificar un mismo borrador de
 negocio, conservarlo al navegar o coordinar varios stores y sus acciones con Devtools.
 Entonces se migrará el contrato compartido, sin duplicar la sesión entre un store
-y `createAuthSession`, ni convertir cada formulario en estado global. Tokens y
-autorización seguirán en cookies HttpOnly y Express; Pinia no sustituye esos controles.
+y `createAuthSession`, ni convertir cada formulario en estado global. Los tokens
+seguirán en cookies HttpOnly y la autorización se comprobará en el backend;
+Pinia no sustituye esos controles.
 
 La evidencia de sesión tiene dos propietarios de prueba: `tests/e2e` simula API;
 [tests/system](../../../../../tests/system/application.spec.ts) añade login/refresh/cierre reales.

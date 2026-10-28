@@ -2,11 +2,7 @@
 
 Generado con `npm run docs:generate`. No editar manualmente.
 
-Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.
-Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.
-Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.
-
-[Lectura y cobertura](index.md).
+[Alcance y notación](index.md#alcance-y-notación).
 
 ## CatalogName
 
@@ -18,22 +14,14 @@ Los objetos inline declarados muestran contexto, línea y columna. Las formas in
 keyof typeof PUBLIC_CATALOGS
 ```
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `PUBLIC_CATALOGS` | `type typeof` |
-
-**Figura:** `DIA-VUE-TS-CATALOGS-1-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-1-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogName"] {
         <<type>>
     }
-    class R0["PUBLIC_CATALOGS"] {
-        <<reference>>
-    }
-    Subject ..> R0 : type typeof
 ```
 
 ## CatalogField
@@ -46,11 +34,11 @@ classDiagram
 'name' | 'symbol' | 'isActive'
 ```
 
-**Figura:** `DIA-VUE-TS-CATALOGS-2-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-2-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogField"] {
         <<type>>
     }
@@ -66,11 +54,11 @@ classDiagram
 | `symbol` | `symbol: string;` |
 | `isActive` | `isActive: boolean;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-3-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-3-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogValues"] {
         <<interface>>
         name: string
@@ -94,11 +82,11 @@ classDiagram
 | --- | --- | --- |
 | inheritance | [CatalogValues](../../../../../src/modules/catalogs/catalog.ts) | `extends` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-4-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-4-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogEntry"] {
         <<interface>>
         id: string
@@ -120,11 +108,11 @@ classDiagram
 | `page` | `page: number;` |
 | `length` | `length: number;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-5-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-5-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogQuery"] {
         <<interface>>
         search: string
@@ -148,11 +136,11 @@ classDiagram
 | dependency | [CatalogTarget@19:29](../../../../../src/modules/catalogs/catalog.ts) | `type` |
 | dependency | [CatalogTarget@19:52](../../../../../src/modules/catalogs/catalog.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-6-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-6-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogTarget"] {
         <<type>>
     }
@@ -174,11 +162,11 @@ classDiagram
 | --- | --- |
 | `action` | `action: 'create'` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-7-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-7-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogTarget@19:29"] {
         <<inline_object>>
         action: 'create'
@@ -198,11 +186,11 @@ classDiagram
 | --- | --- | --- |
 | association | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `row` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-8-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-8-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogTarget@19:52"] {
         <<inline_object>>
         action: 'edit'
@@ -223,11 +211,11 @@ classDiagram
 | `name` | `name: number;` |
 | `symbol` | `symbol?: number` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-9-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-9-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["maxLengths@23:23"] {
         <<inline_object>>
         name: number
@@ -255,15 +243,13 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [CatalogValues](../../../../../src/modules/catalogs/catalog.ts) | `values` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 | dependency | [CatalogField](../../../../../src/modules/catalogs/catalog.ts) | `errors` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-10-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-CATALOGS-10-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogForm.defineProps"] {
         <<SFC_contract>>
         title: string
@@ -274,34 +260,16 @@ classDiagram
         isConflicted: boolean
         hasSymbol: boolean
         maxNameLength: number
-    }
-    class R0["CatalogValues"] {
-        <<reference>>
-    }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-10-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["CatalogForm.defineProps"] {
-        <<SFC_contract>>
         maxSymbolLength?: number
         isEditing: boolean
     }
-    class R0["Record"] {
+    class R0["CatalogValues"] {
         <<reference>>
     }
     class R1["CatalogField"] {
         <<reference>>
     }
-    Subject ..> R0 : errors
+    Subject "1" --> "1" R0 : values
     Subject ..> R1 : errors
 ```
 
@@ -322,11 +290,11 @@ classDiagram
 | dependency | [CatalogField](../../../../../src/modules/catalogs/catalog.ts) | `update` |
 | dependency | [CatalogField](../../../../../src/modules/catalogs/catalog.ts) | `blur` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-11-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-11-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogForm.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -359,11 +327,11 @@ classDiagram
 | association | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `rows` |
 | association | [CatalogQuery](../../../../../src/modules/catalogs/catalog.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-12-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-12-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogTable.defineProps"] {
         <<SFC_contract>>
         rows: CatalogEntry[]
@@ -394,14 +362,13 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `edit` |
-| dependency | `Partial` | `query` |
 | dependency | [CatalogQuery](../../../../../src/modules/catalogs/catalog.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-13-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-CATALOGS-13-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogTable.defineEmits"] {
         <<SFC_contract>>
         edit: tuple
@@ -410,25 +377,11 @@ classDiagram
     class R0["CatalogEntry"] {
         <<reference>>
     }
-    class R1["Partial"] {
+    class R1["CatalogQuery"] {
         <<reference>>
     }
     Subject ..> R0 : edit
     Subject ..> R1 : query
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-13-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["CatalogTable.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["CatalogQuery"] {
-        <<reference>>
-    }
-    Subject ..> R0 : query
 ```
 
 ## useCatalogEditor.options@9:43
@@ -447,11 +400,11 @@ classDiagram
 | dependency | [CatalogName](../../../../../src/modules/catalogs/catalog.ts) | `catalog` |
 | dependency | [CatalogTarget](../../../../../src/modules/catalogs/catalog.ts) | `target` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-14-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-14-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useCatalogEditor.<br/>options@9:43"] {
         <<inline_object>>
         catalog: CatalogName
@@ -483,11 +436,11 @@ classDiagram
 | dependency | [CatalogName](../../../../../src/modules/catalogs/catalog.ts) | `catalog` |
 | dependency | [CatalogTarget](../../../../../src/modules/catalogs/catalog.ts) | `target` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-15-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-15-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogEditorPage.<br/>defineProps"] {
         <<SFC_contract>>
         catalog: CatalogName
@@ -514,11 +467,11 @@ classDiagram
 | `reload` | `reload: [];` |
 | `denied` | `denied: [status: number]` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-16-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-16-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogEditorPage.<br/>defineEmits"] {
         <<SFC_contract>>
         saved: tuple
@@ -540,11 +493,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [CatalogName](../../../../../src/modules/catalogs/catalog.ts) | `catalog` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-17-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-17-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["CatalogPage.defineProps"] {
         <<SFC_contract>>
         catalog: CatalogName
@@ -564,11 +517,11 @@ classDiagram
 | `code` | `code: string;` |
 | `data` | `data: unknown` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-18-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-18-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["apiClient.request@48:48"] {
         <<inline_object>>
         code: string
@@ -593,11 +546,11 @@ classDiagram
 | --- | --- | --- |
 | association | [catalogDefinition.return.variant1.maxLengths.shape1](../../../../../src/modules/catalogs/catalog.ts) | `maxLengths` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-19-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-19-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant1"] {
         <<inferred_return>>
         name: complex
@@ -622,11 +575,11 @@ classDiagram
 | `name` | `name: number;` |
 | `symbol` | `symbol?: number;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-20-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-20-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant1.maxLengths.shape1"] {
         <<inferred_object>>
         name: number
@@ -651,11 +604,11 @@ classDiagram
 | --- | --- | --- |
 | association | [catalogDefinition.return.variant2.maxLengths.shape1](../../../../../src/modules/catalogs/catalog.ts) | `maxLengths` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-21-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-21-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant2"] {
         <<inferred_return>>
         name: complex
@@ -680,11 +633,11 @@ classDiagram
 | `name` | `name: number;` |
 | `symbol` | `symbol?: number;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-22-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-22-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant2.maxLengths.shape1"] {
         <<inferred_object>>
         name: number
@@ -709,11 +662,11 @@ classDiagram
 | --- | --- | --- |
 | association | [catalogDefinition.return.variant3.maxLengths.shape1](../../../../../src/modules/catalogs/catalog.ts) | `maxLengths` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-23-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-23-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant3"] {
         <<inferred_return>>
         name: complex
@@ -738,11 +691,11 @@ classDiagram
 | `name` | `name: number;` |
 | `symbol` | `symbol?: number;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-24-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-24-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant3.maxLengths.shape1"] {
         <<inferred_object>>
         name: number
@@ -767,11 +720,11 @@ classDiagram
 | --- | --- | --- |
 | association | [catalogDefinition.return.variant4.maxLengths.shape1](../../../../../src/modules/catalogs/catalog.ts) | `maxLengths` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-25-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-25-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant4"] {
         <<inferred_return>>
         name: complex
@@ -796,11 +749,11 @@ classDiagram
 | `name` | `name: number;` |
 | `symbol` | `symbol?: number;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-26-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-26-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant4.maxLengths.shape1"] {
         <<inferred_object>>
         name: number
@@ -825,11 +778,11 @@ classDiagram
 | --- | --- | --- |
 | association | [catalogDefinition.return.variant5.maxLengths.shape1](../../../../../src/modules/catalogs/catalog.ts) | `maxLengths` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-27-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-27-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant5"] {
         <<inferred_return>>
         name: complex
@@ -854,11 +807,11 @@ classDiagram
 | `name` | `name: number;` |
 | `symbol` | `symbol?: number;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-28-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-28-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant5.maxLengths.shape1"] {
         <<inferred_object>>
         name: number
@@ -883,11 +836,11 @@ classDiagram
 | --- | --- | --- |
 | association | [catalogDefinition.return.variant6.maxLengths.shape1](../../../../../src/modules/catalogs/catalog.ts) | `maxLengths` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-29-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-29-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant6"] {
         <<inferred_return>>
         name: complex
@@ -912,11 +865,11 @@ classDiagram
 | `name` | `name: number;` |
 | `symbol` | `symbol?: number;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-30-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-30-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogDefinition.return.<br/>variant6.maxLengths.shape1"] {
         <<inferred_object>>
         name: number
@@ -935,11 +888,11 @@ classDiagram
 | `symbol` | `"symbol"?: string \| undefined;` |
 | `name` | `"name": string;` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-31-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-31-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["buildCatalogPayload.return"] {
         <<inferred_return>>
         expectedVersion?: number | undefined
@@ -969,26 +922,15 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Ref` | `isSubmitting` |
 | dependency | [CatalogField](../../../../../src/modules/catalogs/catalog.ts) | `update` |
 | dependency | [CatalogField](../../../../../src/modules/catalogs/catalog.ts) | `blur` |
-| dependency | `Promise` | `blur` |
-| dependency | `Promise` | `submit` |
-| dependency | `Ref` | `message` |
-| dependency | `Ref` | `isConflicted` |
-| dependency | `AbortSignal` | `execute` |
-| dependency | `Promise` | `execute` |
-| dependency | `AbortSignal` | `signal` |
 | association | [CatalogValues](../../../../../src/modules/catalogs/catalog.ts) | `values` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-32-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-CATALOGS-32-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useCatalogEditor.return"] {
         <<inferred_return>>
         isSubmitting: Ref~boolean, boolean~
@@ -999,24 +941,6 @@ classDiagram
         isConflicted: Ref~boolean, boolean~
         execute: callback
         signal: AbortSignal
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["CatalogField"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isSubmitting
-    Subject ..> R1 : update
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-32-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogEditor.return"] {
-        <<inferred_return>>
         isDisposed: callback
         values: CatalogValues
         errors: complex
@@ -1024,101 +948,12 @@ classDiagram
     class R0["CatalogField"] {
         <<reference>>
     }
-    class R1["Promise"] {
+    class R1["CatalogValues"] {
         <<reference>>
     }
+    Subject ..> R0 : update
     Subject ..> R0 : blur
-    Subject ..> R1 : blur
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-32-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : submit
-    Subject ..> R1 : message
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-32-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isConflicted
-    Subject ..> R1 : execute
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-32-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : execute
-    Subject ..> R1 : signal
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-32-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["CatalogValues"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-32-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
+    Subject "1" --> "1" R1 : values
 ```
 
 ## useCatalogList.return
@@ -1139,24 +974,15 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ShallowReactive` | `query` |
 | dependency | [CatalogQuery](../../../../../src/modules/catalogs/catalog.ts) | `query` |
-| dependency | `ShallowRef` | `rows` |
 | dependency | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `rows` |
-| dependency | `Ref` | `total` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `isRefreshing` |
-| dependency | `Ref` | `error` |
-| dependency | `Promise` | `load` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Partial` | `applyQuery` |
 | dependency | [CatalogQuery](../../../../../src/modules/catalogs/catalog.ts) | `applyQuery` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-33-1`. Parte 1/6.
+**Figura:** `DIA-VUE-TS-CATALOGS-33-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useCatalogList.return"] {
         <<inferred_return>>
         query: ShallowReactive~CatalogQuery~
@@ -1167,97 +993,17 @@ classDiagram
         error: Ref~string, string~
         load: callback
         refresh: callback
-    }
-    class R0["ShallowReactive"] {
-        <<reference>>
-    }
-    class R1["CatalogQuery"] {
-        <<reference>>
-    }
-    Subject ..> R0 : query
-    Subject ..> R1 : query
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-33-2`. Parte 2/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogList.return"] {
-        <<inferred_return>>
         applyQuery: callback
     }
-    class R0["ShallowRef"] {
+    class R0["CatalogQuery"] {
         <<reference>>
     }
     class R1["CatalogEntry"] {
         <<reference>>
     }
-    Subject ..> R0 : rows
+    Subject ..> R0 : query
     Subject ..> R1 : rows
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-33-3`. Parte 3/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogList.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : total
-    Subject ..> R0 : isLoading
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-33-4`. Parte 4/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogList.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isRefreshing
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-33-5`. Parte 5/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogList.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : load
-    Subject ..> R0 : refresh
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-33-6`. Parte 6/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useCatalogList.return"] {
-        <<inferred_return>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["CatalogQuery"] {
-        <<reference>>
-    }
     Subject ..> R0 : applyQuery
-    Subject ..> R1 : applyQuery
 ```
 
 ## catalogService
@@ -1273,21 +1019,16 @@ classDiagram
 | --- | --- | --- |
 | dependency | [CatalogName](../../../../../src/modules/catalogs/catalog.ts) | `list` |
 | dependency | [CatalogQuery](../../../../../src/modules/catalogs/catalog.ts) | `list` |
-| dependency | `AbortSignal` | `list` |
-| dependency | `Promise` | `list` |
 | dependency | [catalogService.list.shape1](../../../../../src/modules/catalogs/services/catalogService.ts) | `list` |
 | dependency | [CatalogName](../../../../../src/modules/catalogs/catalog.ts) | `save` |
 | dependency | [CatalogTarget](../../../../../src/modules/catalogs/catalog.ts) | `save` |
-| dependency | `Record` | `save` |
-| dependency | `AbortSignal` | `save` |
-| dependency | `Promise` | `save` |
 | dependency | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `save` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-34-1`. Parte 1/6.
+**Figura:** `DIA-VUE-TS-CATALOGS-34-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogService"] {
         <<inferred_export>>
         list: callback
@@ -1299,89 +1040,27 @@ classDiagram
     class R1["CatalogQuery"] {
         <<reference>>
     }
-    Subject ..> R0 : list
-    Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-34-2`. Parte 2/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["catalogService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
+    class R2["catalogService.list.shape1"] {
         <<reference>>
     }
-    class R1["Promise"] {
+    class R3["CatalogTarget"] {
         <<reference>>
     }
     Subject ..> R0 : list
     Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-34-3`. Parte 3/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["catalogService"] {
-        <<inferred_export>>
-    }
-    class R0["catalogService.list.shape1"] {
-        <<reference>>
-    }
-    class R1["CatalogName"] {
-        <<reference>>
-    }
-    Subject ..> R0 : list
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-34-4`. Parte 4/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["catalogService"] {
-        <<inferred_export>>
-    }
-    class R0["CatalogTarget"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
+    Subject ..> R2 : list
     Subject ..> R0 : save
-    Subject ..> R1 : save
+    Subject ..> R3 : save
 ```
 
-**Figura:** `DIA-VUE-TS-CATALOGS-34-5`. Parte 5/6.
+**Figura:** `DIA-VUE-TS-CATALOGS-34-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogService"] {
         <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : save
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-34-6`. Parte 6/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["catalogService"] {
-        <<inferred_export>>
+        save: callback
     }
     class R0["CatalogEntry"] {
         <<reference>>
@@ -1403,11 +1082,11 @@ classDiagram
 | --- | --- | --- |
 | association | [CatalogEntry](../../../../../src/modules/catalogs/catalog.ts) | `data` |
 
-**Figura:** `DIA-VUE-TS-CATALOGS-35-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-CATALOGS-35-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["catalogService.list.shape1"] {
         <<inferred_object>>
         data: CatalogEntry[]

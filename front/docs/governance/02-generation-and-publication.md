@@ -130,8 +130,11 @@ libro separado. Los modelos curados enlazan esta referencia; conservan los corte
 que explican responsabilidades. `docs:check` comprueba ambas fuentes generadas.
 
 El catálogo completo de tipos se consulta por separado del libro general para
-mantener legibles las vistas arquitectónicas. Cada campo mantiene su firma completa
-y las figuras se dividen en partes; el índice generado declara los límites de inferencia.
+mantener legibles las vistas arquitectónicas. Sus archivos agrupan los contratos
+por ámbito de `src/`. Las figuras sólo relacionan contratos locales; los tipos de
+dependencias conservan su nombre en las firmas, sin nodos propios. Un contrato se
+divide únicamente al superar el límite de legibilidad descrito en el índice generado;
+las propiedades se presentan junto a sus relaciones y las tablas conservan las firmas completas.
 
 Para publicar un ámbito concreto, use `tipos-identidad`, `tipos-inventario`,
 `tipos-compras`, `tipos-salidas`, `tipos-acceso`, `tipos-catalogos`,

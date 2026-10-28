@@ -2,11 +2,7 @@
 
 Generado con `npm run docs:generate`. No editar manualmente.
 
-Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.
-Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.
-Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.
-
-[Lectura y cobertura](index.md).
+[Alcance y notación](index.md#alcance-y-notación).
 
 ## IdentityTable.defineProps
 
@@ -27,11 +23,11 @@ Los objetos inline declarados muestran contexto, línea y columna. Las formas in
 | association | [IdentityEntry](../../../../../src/modules/identity/identity.ts) | `rows` |
 | association | [IdentityQuery](../../../../../src/modules/identity/identity.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-1-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-IDENTITY-1-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IdentityTable.defineProps"] {
         <<SFC_contract>>
         resource: IdentityResource
@@ -47,22 +43,12 @@ classDiagram
     class R1["IdentityEntry"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject "1" --> "0..*" R1 : rows
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-1-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IdentityTable.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["IdentityQuery"] {
+    class R2["IdentityQuery"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : query
+    Subject ..> R0 : resource
+    Subject "1" --> "0..*" R1 : rows
+    Subject "1" --> "1" R2 : query
 ```
 
 ## IdentityTable.defineEmits
@@ -79,14 +65,13 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IdentityEntry](../../../../../src/modules/identity/identity.ts) | `edit` |
 | dependency | [IdentityEntry](../../../../../src/modules/identity/identity.ts) | `password` |
-| dependency | `Partial` | `query` |
 | dependency | [IdentityQuery](../../../../../src/modules/identity/identity.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-2-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-IDENTITY-2-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IdentityTable.defineEmits"] {
         <<SFC_contract>>
         edit: tuple
@@ -96,25 +81,11 @@ classDiagram
     class R0["IdentityEntry"] {
         <<reference>>
     }
-    Subject ..> R0 : edit
-    Subject ..> R0 : password
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-2-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IdentityTable.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
     class R1["IdentityQuery"] {
         <<reference>>
     }
-    Subject ..> R0 : query
+    Subject ..> R0 : edit
+    Subject ..> R0 : password
     Subject ..> R1 : query
 ```
 
@@ -142,11 +113,11 @@ classDiagram
 | association | [PersonForm.errors@16:13](../../../../../src/modules/identity/components/PersonForm.vue) | `errors` |
 | dependency | [OrganizationState](../../../../../src/shared/lookup.ts) | `options` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-3-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-IDENTITY-3-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonForm.defineProps"] {
         <<SFC_contract>>
         title: string
@@ -157,6 +128,9 @@ classDiagram
         accessError: string
         options: OrganizationState
         message: string
+        isSubmitting: boolean
+        isConflicted: boolean
+        isEditing: boolean
     }
     class R0["PersonValues"] {
         <<reference>>
@@ -164,25 +138,12 @@ classDiagram
     class R1["PersonForm.errors@16:13"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
-    Subject "1" --> "1" R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-3-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["PersonForm.defineProps"] {
-        <<SFC_contract>>
-        isSubmitting: boolean
-        isConflicted: boolean
-        isEditing: boolean
-    }
-    class R0["OrganizationState"] {
+    class R2["OrganizationState"] {
         <<reference>>
     }
-    Subject ..> R0 : options
+    Subject "1" --> "1" R0 : values
+    Subject "1" --> "1" R1 : errors
+    Subject ..> R2 : options
 ```
 
 ## PersonForm.errors@16:13
@@ -194,11 +155,11 @@ classDiagram
 | `fullName` | `fullName?: string;` |
 | `accesses` | `accesses?: string` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-4-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-4-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonForm.errors@16:13"] {
         <<inline_object>>
         fullName?: string
@@ -230,11 +191,11 @@ classDiagram
 | dependency | [OrganizationResource](../../../../../src/shared/lookup.ts) | `more` |
 | dependency | [OrganizationResource](../../../../../src/shared/lookup.ts) | `retry` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-5-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-IDENTITY-5-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonForm.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -245,21 +206,6 @@ classDiagram
         search: tuple
         more: tuple
         retry: tuple
-    }
-    class R0["OrganizationResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : more
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-5-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["PersonForm.defineEmits"] {
-        <<SFC_contract>>
         submit: tuple
         close: tuple
         reload: tuple
@@ -267,6 +213,8 @@ classDiagram
     class R0["OrganizationResource"] {
         <<reference>>
     }
+    Subject ..> R0 : search
+    Subject ..> R0 : more
     Subject ..> R0 : retry
 ```
 
@@ -289,17 +237,15 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [UserValues](../../../../../src/modules/identity/identity.ts) | `values` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 | dependency | [UserField](../../../../../src/modules/identity/identity.ts) | `errors` |
 | dependency | [OrganizationState](../../../../../src/shared/lookup.ts) | `options` |
 | association | [IdentityEntry](../../../../../src/modules/identity/identity.ts) | `row` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-6-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-IDENTITY-6-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["UserForm.defineProps"] {
         <<SFC_contract>>
         action: 'create' | 'edit' | 'password'
@@ -310,52 +256,24 @@ classDiagram
         row?: IdentityEntry
         message: string
         isSubmitting: boolean
-    }
-    class R0["UserValues"] {
-        <<reference>>
-    }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-6-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["UserForm.defineProps"] {
-        <<SFC_contract>>
         isConflicted: boolean
     }
-    class R0["Record"] {
+    class R0["UserValues"] {
         <<reference>>
     }
     class R1["UserField"] {
         <<reference>>
     }
-    Subject ..> R0 : errors
+    class R2["OrganizationState"] {
+        <<reference>>
+    }
+    class R3["IdentityEntry"] {
+        <<reference>>
+    }
+    Subject "1" --> "1" R0 : values
     Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-6-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["UserForm.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["OrganizationState"] {
-        <<reference>>
-    }
-    class R1["IdentityEntry"] {
-        <<reference>>
-    }
-    Subject ..> R0 : options
-    Subject "1" --> "0..1" R1 : row
+    Subject ..> R2 : options
+    Subject "1" --> "0..1" R3 : row
 ```
 
 ## UserForm.defineEmits
@@ -381,11 +299,11 @@ classDiagram
 | dependency | [OrganizationResource](../../../../../src/shared/lookup.ts) | `more` |
 | dependency | [OrganizationResource](../../../../../src/shared/lookup.ts) | `retry` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-7-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-IDENTITY-7-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["UserForm.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -400,37 +318,14 @@ classDiagram
     class R0["UserField"] {
         <<reference>>
     }
+    class R1["OrganizationResource"] {
+        <<reference>>
+    }
     Subject ..> R0 : update
     Subject ..> R0 : blur
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-7-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["UserForm.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["OrganizationResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : more
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-7-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["UserForm.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["OrganizationResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
+    Subject ..> R1 : search
+    Subject ..> R1 : more
+    Subject ..> R1 : retry
 ```
 
 ## usePersonEditor.options@12:42
@@ -448,11 +343,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [PersonTarget](../../../../../src/modules/identity/identity.ts) | `target` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-8-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-8-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.<br/>options@12:42"] {
         <<inline_object>>
         target: PersonTarget
@@ -481,11 +376,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IdentityTarget](../../../../../src/modules/identity/identity.ts) | `target` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-9-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-9-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.options@10:40"] {
         <<inline_object>>
         target: IdentityTarget
@@ -514,11 +409,11 @@ classDiagram
 | --- | --- | --- |
 | inheritance | [RecordQuery](../../../../../src/shared/list.ts) | `extends` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-10-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-10-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IdentityQuery"] {
         <<interface>>
         department: string
@@ -540,11 +435,11 @@ classDiagram
 'persons' | 'users'
 ```
 
-**Figura:** `DIA-VUE-TS-IDENTITY-11-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-11-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IdentityResource"] {
         <<type>>
     }
@@ -561,11 +456,11 @@ classDiagram
 | `departmentName` | `departmentName: string;` |
 | `roleName` | `roleName: string;` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-12-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-12-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonAccess"] {
         <<interface>>
         departmentId: string
@@ -595,11 +490,11 @@ classDiagram
 | --- | --- | --- |
 | association | [PersonAccess](../../../../../src/modules/identity/identity.ts) | `accesses` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-13-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-IDENTITY-13-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IdentityEntry"] {
         <<interface>>
         id: string
@@ -610,22 +505,12 @@ classDiagram
         roleId: string
         departmentName: string
         roleName: string
+        accesses: PersonAccess[]
     }
     class R0["PersonAccess"] {
         <<reference>>
     }
     Subject "1" --> "0..*" R0 : accesses
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-13-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IdentityEntry"] {
-        <<interface>>
-        accesses: PersonAccess[]
-    }
 ```
 
 ## PersonValues
@@ -641,11 +526,11 @@ classDiagram
 | --- | --- | --- |
 | association | [PersonAccess](../../../../../src/modules/identity/identity.ts) | `accesses` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-14-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-14-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonValues"] {
         <<interface>>
         fullName: string
@@ -668,11 +553,11 @@ classDiagram
 | `departmentId` | `departmentId: string;` |
 | `roleId` | `roleId: string;` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-15-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-15-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["UserValues"] {
         <<interface>>
         name: string
@@ -696,11 +581,11 @@ keyof UserValues
 | --- | --- | --- |
 | dependency | [UserValues](../../../../../src/modules/identity/identity.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-16-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-16-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["UserField"] {
         <<type>>
     }
@@ -725,11 +610,11 @@ classDiagram
 | dependency | [PersonTarget@38:28](../../../../../src/modules/identity/identity.ts) | `type` |
 | dependency | [PersonTarget@38:51](../../../../../src/modules/identity/identity.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-17-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-17-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonTarget"] {
         <<type>>
     }
@@ -751,11 +636,11 @@ classDiagram
 | --- | --- |
 | `action` | `action: 'create'` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-18-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-18-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonTarget@38:28"] {
         <<inline_object>>
         action: 'create'
@@ -775,11 +660,11 @@ classDiagram
 | --- | --- | --- |
 | association | [IdentityEntry](../../../../../src/modules/identity/identity.ts) | `row` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-19-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-19-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonTarget@38:51"] {
         <<inline_object>>
         action: 'edit'
@@ -806,11 +691,11 @@ PersonTarget | { action: 'password'; row: IdentityEntry }
 | dependency | [PersonTarget](../../../../../src/modules/identity/identity.ts) | `type` |
 | dependency | [IdentityTarget@39:45](../../../../../src/modules/identity/identity.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-20-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-20-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IdentityTarget"] {
         <<type>>
     }
@@ -837,11 +722,11 @@ classDiagram
 | --- | --- | --- |
 | association | [IdentityEntry](../../../../../src/modules/identity/identity.ts) | `row` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-21-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-21-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IdentityTarget@39:45"] {
         <<inline_object>>
         action: 'password'
@@ -865,11 +750,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IdentityResource](../../../../../src/modules/identity/identity.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-22-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-22-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IdentityPage.defineProps"] {
         <<SFC_contract>>
         resource: IdentityResource
@@ -893,11 +778,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [PersonTarget](../../../../../src/modules/identity/identity.ts) | `target` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-23-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-23-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonEditorPage.defineProps"] {
         <<SFC_contract>>
         target: PersonTarget
@@ -920,11 +805,11 @@ classDiagram
 | `reload` | `reload: [];` |
 | `denied` | `denied: [status: number]` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-24-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-24-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PersonEditorPage.defineEmits"] {
         <<SFC_contract>>
         saved: tuple
@@ -947,11 +832,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IdentityTarget](../../../../../src/modules/identity/identity.ts) | `target` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-25-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-25-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["UserEditorPage.defineProps"] {
         <<SFC_contract>>
         target: IdentityTarget
@@ -974,11 +859,11 @@ classDiagram
 | `reload` | `reload: [];` |
 | `denied` | `denied: [status: number]` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-26-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-26-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["UserEditorPage.defineEmits"] {
         <<SFC_contract>>
         saved: tuple
@@ -1015,29 +900,13 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [usePersonEditor.return.organization.shape1](../../../../../src/modules/identity/composables/usePersonEditor.ts) | `organization` |
-| dependency | `Ref` | `departmentId` |
-| dependency | `Ref` | `roleId` |
-| dependency | `Ref` | `accessError` |
-| dependency | `Promise` | `addAccess` |
-| dependency | `Promise` | `removeAccess` |
-| dependency | `Promise` | `submit` |
-| dependency | `Promise` | `blur` |
-| dependency | `Ref` | `message` |
-| dependency | `Ref` | `isSubmitting` |
-| dependency | `Ref` | `isConflicted` |
-| dependency | `AbortSignal` | `execute` |
-| dependency | `Promise` | `execute` |
-| dependency | `AbortSignal` | `signal` |
 | association | [PersonValues](../../../../../src/modules/identity/identity.ts) | `values` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-27-1`. Parte 1/9.
+**Figura:** `DIA-VUE-TS-IDENTITY-27-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return"] {
         <<inferred_return>>
         organization: callback
@@ -1048,24 +917,6 @@ classDiagram
         removeAccess: callback
         submit: callback
         update: callback
-    }
-    class R0["usePersonEditor.return.<br/>organization.shape1"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : organization
-    Subject ..> R1 : departmentId
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-27-2`. Parte 2/9.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return"] {
-        <<inferred_return>>
         blur: callback
         message: Ref~string, string~
         isSubmitting: Ref~boolean, boolean~
@@ -1075,129 +926,25 @@ classDiagram
         isDisposed: callback
         values: PersonValues
     }
-    class R0["Ref"] {
+    class R0["usePersonEditor.return.<br/>organization.shape1"] {
         <<reference>>
     }
-    Subject ..> R0 : roleId
-    Subject ..> R0 : accessError
+    class R1["PersonValues"] {
+        <<reference>>
+    }
+    Subject ..> R0 : organization
+    Subject "1" --> "1" R1 : values
 ```
 
-**Figura:** `DIA-VUE-TS-IDENTITY-27-3`. Parte 3/9.
+**Figura:** `DIA-VUE-TS-IDENTITY-27-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return"] {
         <<inferred_return>>
         errors: object
     }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : addAccess
-    Subject ..> R0 : removeAccess
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-27-4`. Parte 4/9.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : submit
-    Subject ..> R0 : blur
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-27-5`. Parte 5/9.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : message
-    Subject ..> R0 : isSubmitting
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-27-6`. Parte 6/9.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isConflicted
-    Subject ..> R1 : execute
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-27-7`. Parte 7/9.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : execute
-    Subject ..> R1 : signal
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-27-8`. Parte 8/9.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["PersonValues"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-27-9`. Parte 9/9.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
 ```
 
 ## usePersonEditor.return.organization.shape1
@@ -1214,14 +961,12 @@ classDiagram
 | --- | --- | --- |
 | dependency | [usePersonEditor.return.organization.departments.shape2](../../../../../src/modules/identity/composables/usePersonEditor.ts) | `departments` |
 | dependency | [usePersonEditor.return.organization.roles.shape5](../../../../../src/modules/identity/composables/usePersonEditor.ts) | `roles` |
-| dependency | `ComputedRef` | `state` |
-| dependency | `OrganizationState` | `state` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-28-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-IDENTITY-28-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return.<br/>organization.shape1"] {
         <<inferred_object>>
         departments: callback
@@ -1236,24 +981,6 @@ classDiagram
     }
     Subject ..> R0 : departments
     Subject ..> R1 : roles
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-28-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["OrganizationState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
 ```
 
 ## usePersonEditor.return.organization.departments.shape2
@@ -1275,25 +1002,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [usePersonEditor.return.organization.departments.items.shape3](../../../../../src/modules/identity/composables/usePersonEditor.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [usePersonEditor.return.organization.departments.items.shape4](../../../../../src/modules/identity/composables/usePersonEditor.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-29-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-IDENTITY-29-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return.<br/>organization.departments.<br/>shape2"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -1304,46 +1020,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-29-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["usePersonEditor.return.<br/>organization.departments.<br/>items.shape3"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-29-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["usePersonEditor.return.<br/>organization.departments.<br/>items.shape3"] {
         <<reference>>
     }
     class R1["usePersonEditor.return.<br/>organization.departments.<br/>items.shape4"] {
@@ -1351,65 +1031,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-29-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-29-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-29-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-29-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## usePersonEditor.return.organization.departments.items.shape3
@@ -1423,15 +1044,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-IDENTITY-30-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-30-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return.<br/>organization.departments.<br/>items.shape3"] {
         <<inferred_object>>
         id: string
@@ -1439,10 +1056,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## usePersonEditor.return.organization.departments.items.shape4
@@ -1456,15 +1069,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-IDENTITY-31-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-31-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return.<br/>organization.departments.<br/>items.shape4"] {
         <<inferred_object>>
         id: string
@@ -1472,10 +1081,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## usePersonEditor.return.organization.roles.shape5
@@ -1497,25 +1102,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [usePersonEditor.return.organization.roles.items.shape6](../../../../../src/modules/identity/composables/usePersonEditor.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [usePersonEditor.return.organization.roles.items.shape7](../../../../../src/modules/identity/composables/usePersonEditor.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-32-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-IDENTITY-32-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return.<br/>organization.roles.shape5"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -1526,46 +1120,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-32-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["usePersonEditor.return.<br/>organization.roles.items.<br/>shape6"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-32-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["usePersonEditor.return.<br/>organization.roles.items.<br/>shape6"] {
         <<reference>>
     }
     class R1["usePersonEditor.return.<br/>organization.roles.items.<br/>shape7"] {
@@ -1573,65 +1131,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-32-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-32-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-32-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-32-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePersonEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## usePersonEditor.return.organization.roles.items.shape6
@@ -1645,15 +1144,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-IDENTITY-33-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-33-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return.<br/>organization.roles.items.<br/>shape6"] {
         <<inferred_object>>
         id: string
@@ -1661,10 +1156,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## usePersonEditor.return.organization.roles.items.shape7
@@ -1678,15 +1169,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-IDENTITY-34-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-34-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePersonEditor.return.<br/>organization.roles.items.<br/>shape7"] {
         <<inferred_object>>
         id: string
@@ -1694,10 +1181,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useUserEditor.return
@@ -1722,26 +1205,15 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [useUserEditor.return.organization.shape1](../../../../../src/modules/identity/composables/useUserEditor.ts) | `organization` |
-| dependency | `Promise` | `submit` |
 | dependency | [UserValues](../../../../../src/modules/identity/identity.ts) | `update` |
 | dependency | [UserValues](../../../../../src/modules/identity/identity.ts) | `blur` |
-| dependency | `Promise` | `blur` |
-| dependency | `Ref` | `message` |
-| dependency | `Ref` | `isSubmitting` |
-| dependency | `Ref` | `isConflicted` |
-| dependency | `AbortSignal` | `execute` |
-| dependency | `Promise` | `execute` |
-| dependency | `AbortSignal` | `signal` |
 | association | [UserValues](../../../../../src/modules/identity/identity.ts) | `values` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-35-1`. Parte 1/8.
+**Figura:** `DIA-VUE-TS-IDENTITY-35-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.return"] {
         <<inferred_return>>
         organization: callback
@@ -1752,135 +1224,21 @@ classDiagram
         isSubmitting: Ref~boolean, boolean~
         isConflicted: Ref~boolean, boolean~
         execute: callback
-    }
-    class R0["useUserEditor.return.<br/>organization.shape1"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : organization
-    Subject ..> R1 : submit
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-35-2`. Parte 2/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return"] {
-        <<inferred_return>>
         signal: AbortSignal
         isDisposed: callback
         values: UserValues
         errors: complex
     }
-    class R0["UserValues"] {
-        <<reference>>
-    }
-    Subject ..> R0 : update
-    Subject ..> R0 : blur
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-35-3`. Parte 3/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : blur
-    Subject ..> R1 : message
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-35-4`. Parte 4/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isSubmitting
-    Subject ..> R0 : isConflicted
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-35-5`. Parte 5/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : execute
-    Subject ..> R1 : execute
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-35-6`. Parte 6/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["AbortSignal"] {
+    class R0["useUserEditor.return.<br/>organization.shape1"] {
         <<reference>>
     }
     class R1["UserValues"] {
         <<reference>>
     }
-    Subject ..> R0 : signal
+    Subject ..> R0 : organization
+    Subject ..> R1 : update
+    Subject ..> R1 : blur
     Subject "1" --> "1" R1 : values
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-35-7`. Parte 7/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-35-8`. Parte 8/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
 ```
 
 ## useUserEditor.return.organization.shape1
@@ -1897,14 +1255,12 @@ classDiagram
 | --- | --- | --- |
 | dependency | [useUserEditor.return.organization.departments.shape2](../../../../../src/modules/identity/composables/useUserEditor.ts) | `departments` |
 | dependency | [useUserEditor.return.organization.roles.shape5](../../../../../src/modules/identity/composables/useUserEditor.ts) | `roles` |
-| dependency | `ComputedRef` | `state` |
-| dependency | `OrganizationState` | `state` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-36-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-IDENTITY-36-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.return.<br/>organization.shape1"] {
         <<inferred_object>>
         departments: callback
@@ -1919,24 +1275,6 @@ classDiagram
     }
     Subject ..> R0 : departments
     Subject ..> R1 : roles
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-36-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["OrganizationState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
 ```
 
 ## useUserEditor.return.organization.departments.shape2
@@ -1958,25 +1296,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useUserEditor.return.organization.departments.items.shape3](../../../../../src/modules/identity/composables/useUserEditor.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useUserEditor.return.organization.departments.items.shape4](../../../../../src/modules/identity/composables/useUserEditor.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-37-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-IDENTITY-37-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.return.<br/>organization.departments.<br/>shape2"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -1987,46 +1314,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-37-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useUserEditor.return.<br/>organization.departments.<br/>items.shape3"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-37-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useUserEditor.return.<br/>organization.departments.<br/>items.shape3"] {
         <<reference>>
     }
     class R1["useUserEditor.return.<br/>organization.departments.<br/>items.shape4"] {
@@ -2034,65 +1325,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-37-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-37-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-37-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-37-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.departments.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useUserEditor.return.organization.departments.items.shape3
@@ -2106,15 +1338,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-IDENTITY-38-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-38-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.return.<br/>organization.departments.<br/>items.shape3"] {
         <<inferred_object>>
         id: string
@@ -2122,10 +1350,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useUserEditor.return.organization.departments.items.shape4
@@ -2139,15 +1363,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-IDENTITY-39-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-39-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.return.<br/>organization.departments.<br/>items.shape4"] {
         <<inferred_object>>
         id: string
@@ -2155,10 +1375,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useUserEditor.return.organization.roles.shape5
@@ -2180,25 +1396,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useUserEditor.return.organization.roles.items.shape6](../../../../../src/modules/identity/composables/useUserEditor.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useUserEditor.return.organization.roles.items.shape7](../../../../../src/modules/identity/composables/useUserEditor.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-40-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-IDENTITY-40-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.return.<br/>organization.roles.shape5"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -2209,46 +1414,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-40-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useUserEditor.return.<br/>organization.roles.items.<br/>shape6"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-40-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useUserEditor.return.<br/>organization.roles.items.<br/>shape6"] {
         <<reference>>
     }
     class R1["useUserEditor.return.<br/>organization.roles.items.<br/>shape7"] {
@@ -2256,65 +1425,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-40-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-40-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-40-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-40-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useUserEditor.return.<br/>organization.roles.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useUserEditor.return.organization.roles.items.shape6
@@ -2328,15 +1438,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-IDENTITY-41-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-41-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.return.<br/>organization.roles.items.<br/>shape6"] {
         <<inferred_object>>
         id: string
@@ -2344,10 +1450,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useUserEditor.return.organization.roles.items.shape7
@@ -2361,15 +1463,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-IDENTITY-42-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-42-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useUserEditor.return.<br/>organization.roles.items.<br/>shape7"] {
         <<inferred_object>>
         id: string
@@ -2377,10 +1475,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## IDENTITY_CONFIG
@@ -2397,11 +1491,11 @@ classDiagram
 | association | [IDENTITY_CONFIG.persons.shape1](../../../../../src/modules/identity/identity.ts) | `persons` |
 | association | [IDENTITY_CONFIG.users.shape2](../../../../../src/modules/identity/identity.ts) | `users` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-43-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-43-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IDENTITY_CONFIG"] {
         <<inferred_export>>
         persons: object
@@ -2429,11 +1523,11 @@ classDiagram
 | `write` | `readonly write: "persons:write";` |
 | `report` | `readonly report: "person:reports-read";` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-44-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-44-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IDENTITY_CONFIG.persons.<br/>shape1"] {
         <<inferred_object>>
         title: "Personas"
@@ -2456,11 +1550,11 @@ classDiagram
 | `write` | `readonly write: "users:manage";` |
 | `report` | `readonly report: "admin:reports-read";` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-45-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-45-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IDENTITY_CONFIG.users.shape2"] {
         <<inferred_object>>
         title: "Usuarios"
@@ -2485,11 +1579,11 @@ classDiagram
 | --- | --- | --- |
 | association | [personPayload.return.accesses.shape1](../../../../../src/modules/identity/identity.ts) | `accesses` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-46-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-46-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["personPayload.return"] {
         <<inferred_return>>
         expectedVersion?: number | undefined
@@ -2511,11 +1605,11 @@ classDiagram
 | `departmentId` | `departmentId: string;` |
 | `roleId` | `roleId: string;` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-47-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-47-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["personPayload.return.<br/>accesses.shape1"] {
         <<inferred_object>>
         departmentId: string
@@ -2532,11 +1626,11 @@ classDiagram
 | `password` | `"password": string;` |
 | `expectedVersion` | `"expectedVersion": number;` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-48-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-48-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["userPayload.return.variant1"] {
         <<inferred_return>>
         password: string
@@ -2556,11 +1650,11 @@ classDiagram
 | `roleId` | `"roleId": string;` |
 | `expectedVersion` | `"expectedVersion"?: undefined;` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-49-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-49-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["userPayload.return.variant2"] {
         <<inferred_return>>
         password: string
@@ -2583,11 +1677,11 @@ classDiagram
 | `roleId` | `"roleId": string;` |
 | `password` | `"password"?: undefined;` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-50-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-50-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["userPayload.return.variant3"] {
         <<inferred_return>>
         expectedVersion: number
@@ -2612,25 +1706,17 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IdentityResource](../../../../../src/modules/identity/identity.ts) | `list` |
 | dependency | [IdentityQuery](../../../../../src/modules/identity/identity.ts) | `list` |
-| dependency | `AbortSignal` | `list` |
-| dependency | `Promise` | `list` |
 | dependency | [identityService.list.shape1](../../../../../src/modules/identity/services/identityService.ts) | `list` |
 | dependency | [IdentityResource](../../../../../src/modules/identity/identity.ts) | `save` |
 | dependency | [IdentityTarget](../../../../../src/modules/identity/identity.ts) | `save` |
-| dependency | `Record` | `save` |
-| dependency | `AbortSignal` | `save` |
-| dependency | `Promise` | `save` |
 | dependency | [IdentityResource](../../../../../src/modules/identity/identity.ts) | `export` |
 | dependency | [IdentityQuery](../../../../../src/modules/identity/identity.ts) | `export` |
-| dependency | `AbortSignal` | `export` |
-| dependency | `Promise` | `export` |
-| dependency | `Blob` | `export` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-51-1`. Parte 1/8.
+**Figura:** `DIA-VUE-TS-IDENTITY-51-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["identityService"] {
         <<inferred_export>>
         list: callback
@@ -2643,130 +1729,19 @@ classDiagram
     class R1["IdentityQuery"] {
         <<reference>>
     }
-    Subject ..> R0 : list
-    Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-51-2`. Parte 2/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["identityService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
+    class R2["identityService.list.shape1"] {
         <<reference>>
     }
-    class R1["Promise"] {
+    class R3["IdentityTarget"] {
         <<reference>>
     }
     Subject ..> R0 : list
     Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-51-3`. Parte 3/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["identityService"] {
-        <<inferred_export>>
-    }
-    class R0["identityService.list.shape1"] {
-        <<reference>>
-    }
-    class R1["IdentityResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : list
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-51-4`. Parte 4/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["identityService"] {
-        <<inferred_export>>
-    }
-    class R0["IdentityTarget"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
+    Subject ..> R2 : list
     Subject ..> R0 : save
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-51-5`. Parte 5/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["identityService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : save
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-51-6`. Parte 6/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["identityService"] {
-        <<inferred_export>>
-    }
-    class R0["IdentityResource"] {
-        <<reference>>
-    }
-    class R1["IdentityQuery"] {
-        <<reference>>
-    }
+    Subject ..> R3 : save
     Subject ..> R0 : export
     Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-51-7`. Parte 7/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["identityService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
-    Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-IDENTITY-51-8`. Parte 8/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["identityService"] {
-        <<inferred_export>>
-    }
-    class R0["Blob"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
 ```
 
 ## identityService.list.shape1
@@ -2783,11 +1758,11 @@ classDiagram
 | --- | --- | --- |
 | association | [IdentityEntry](../../../../../src/modules/identity/identity.ts) | `data` |
 
-**Figura:** `DIA-VUE-TS-IDENTITY-52-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-IDENTITY-52-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["identityService.list.shape1"] {
         <<inferred_object>>
         data: IdentityEntry[]

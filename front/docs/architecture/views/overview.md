@@ -54,7 +54,7 @@ flowchart TB
     catalog -->|mediante usePageAccess| session
     catalog --> http["Transporte compartido<br/>apiClient"]
     session --> http
-    http --> api["Express API"]
+    http --> api["API del sistema"]
 ```
 
 La tabla de [fuentes propietarias](../../index.md#organización-y-fuentes-propietarias)

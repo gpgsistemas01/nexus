@@ -2,11 +2,7 @@
 
 Generado con `npm run docs:generate`. No editar manualmente.
 
-Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.
-Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.
-Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.
-
-[Lectura y cobertura](index.md).
+[Alcance y notación](index.md#alcance-y-notación).
 
 ## LoginForm.defineProps
 
@@ -22,11 +18,11 @@ LoginFormProps
 | --- | --- | --- |
 | dependency | [LoginFormProps](../../../../../src/modules/auth/login.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-AUTH-1-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-1-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginForm.defineProps"] {
         <<SFC_contract>>
     }
@@ -50,11 +46,11 @@ LoginFormEmits
 | --- | --- | --- |
 | dependency | [LoginFormEmits](../../../../../src/modules/auth/login.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-AUTH-2-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-2-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginForm.defineEmits"] {
         <<SFC_contract>>
     }
@@ -73,24 +69,16 @@ classDiagram
 | `onSuccess` | `onSuccess: () => void;` |
 | `request` | `request?: typeof loginRequest;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `loginRequest` | `request typeof` |
-
-**Figura:** `DIA-VUE-TS-AUTH-3-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-3-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginFormOptions"] {
         <<interface>>
         onSuccess: callback
         request?: typeof loginRequest
     }
-    class R0["loginRequest"] {
-        <<reference>>
-    }
-    Subject ..> R0 : request typeof
 ```
 
 ## LoginCredentials
@@ -102,11 +90,11 @@ classDiagram
 | `name` | `name: string;` |
 | `password` | `password: string;` |
 
-**Figura:** `DIA-VUE-TS-AUTH-4-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-4-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginCredentials"] {
         <<interface>>
         name: string
@@ -128,11 +116,11 @@ keyof LoginCredentials
 | --- | --- | --- |
 | dependency | [LoginCredentials](../../../../../src/modules/auth/login.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-AUTH-5-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-5-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginField"] {
         <<type>>
     }
@@ -155,43 +143,23 @@ Partial<Record<LoginField, string>>
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [LoginFieldErrors.expanded](../../../../../src/modules/auth/login.ts) | `evaluated structure` |
-| dependency | `Partial` | `type` |
-| dependency | `Record` | `type` |
 | dependency | [LoginField](../../../../../src/modules/auth/login.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-AUTH-6-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-AUTH-6-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginFieldErrors"] {
         <<type>>
     }
     class R0["LoginFieldErrors.expanded"] {
         <<reference>>
     }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject ..> R0 : evaluated structure
-    Subject ..> R1 : type
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-6-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["LoginFieldErrors"] {
-        <<type>>
-    }
-    class R0["Record"] {
-        <<reference>>
-    }
     class R1["LoginField"] {
         <<reference>>
     }
-    Subject ..> R0 : type
+    Subject ..> R0 : evaluated structure
     Subject ..> R1 : type
 ```
 
@@ -214,11 +182,11 @@ classDiagram
 | inheritance | [LoginCredentials](../../../../../src/modules/auth/login.ts) | `extends` |
 | dependency | [LoginFieldErrors](../../../../../src/modules/auth/login.ts) | `errors` |
 
-**Figura:** `DIA-VUE-TS-AUTH-7-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-7-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginFormProps"] {
         <<interface>>
         errors: LoginFieldErrors
@@ -254,11 +222,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [LoginField](../../../../../src/modules/auth/login.ts) | `blur` |
 
-**Figura:** `DIA-VUE-TS-AUTH-8-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-8-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginFormEmits"] {
         <<interface>>
         update:name: tuple
@@ -287,41 +255,23 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| inheritance | `Error` | `extends` |
 | dependency | [LoginFieldErrors](../../../../../src/modules/auth/login.ts) | `constructor.fieldErrors` |
 | dependency | [LoginFieldErrors](../../../../../src/modules/auth/login.ts) | `fieldErrors` |
 
-**Figura:** `DIA-VUE-TS-AUTH-9-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-AUTH-9-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginRequestError"] {
         <<class>>
         constructor(...)
         fieldErrors: LoginFieldErrors
     }
-    class R0["Error"] {
-        <<reference>>
-    }
-    class R1["LoginFieldErrors"] {
-        <<reference>>
-    }
-    R0 <|-- Subject : extends
-    Subject ..> R1 : constructor.fieldErrors
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-9-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["LoginRequestError"] {
-        <<class>>
-    }
     class R0["LoginFieldErrors"] {
         <<reference>>
     }
+    Subject ..> R0 : constructor.fieldErrors
     Subject ..> R0 : fieldErrors
 ```
 
@@ -333,11 +283,11 @@ classDiagram
 | --- | --- |
 | `code` | `code: string` |
 
-**Figura:** `DIA-VUE-TS-AUTH-10-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-10-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["apiClient.request@23:46"] {
         <<inline_object>>
         code: string
@@ -354,11 +304,11 @@ classDiagram
 | `name` | `name: string;` |
 | `permissions` | `permissions: readonly string[];` |
 
-**Figura:** `DIA-VUE-TS-AUTH-11-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-11-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["SessionUser"] {
         <<interface>>
         id: string
@@ -375,11 +325,11 @@ classDiagram
 | --- | --- |
 | `user` | `user: unknown` |
 
-**Figura:** `DIA-VUE-TS-AUTH-12-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-12-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["request@17:29"] {
         <<inline_object>>
         user: unknown
@@ -399,39 +349,19 @@ ReturnType<typeof createAuthSession>
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [AuthSession.expanded](../../../../../src/modules/auth/session.ts) | `evaluated structure` |
-| dependency | `ReturnType` | `type` |
-| dependency | `createAuthSession` | `type typeof` |
 
-**Figura:** `DIA-VUE-TS-AUTH-13-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-AUTH-13-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["AuthSession"] {
         <<type>>
     }
     class R0["AuthSession.expanded"] {
         <<reference>>
     }
-    class R1["ReturnType"] {
-        <<reference>>
-    }
     Subject ..> R0 : evaluated structure
-    Subject ..> R1 : type
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-13-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["AuthSession"] {
-        <<type>>
-    }
-    class R0["createAuthSession"] {
-        <<reference>>
-    }
-    Subject ..> R0 : type typeof
 ```
 
 ## useLoginForm.return
@@ -455,25 +385,14 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [LoginCredentials](../../../../../src/modules/auth/login.ts) | `values` |
-| dependency | `Ref` | `name` |
-| dependency | `Ref` | `password` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
-| dependency | `Ref` | `isSubmitting` |
-| dependency | `Ref` | `isPasswordVisible` |
-| dependency | `Ref` | `shouldRememberUser` |
-| dependency | `Ref` | `message` |
 | dependency | [LoginCredentials](../../../../../src/modules/auth/login.ts) | `updateField` |
 | dependency | [LoginCredentials](../../../../../src/modules/auth/login.ts) | `blurField` |
-| dependency | `Promise` | `blurField` |
-| dependency | `Promise` | `submit` |
 
-**Figura:** `DIA-VUE-TS-AUTH-14-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-AUTH-14-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useLoginForm.return"] {
         <<inferred_return>>
         values: LoginCredentials
@@ -484,114 +403,16 @@ classDiagram
         isPasswordVisible: Ref~boolean, boolean~
         shouldRememberUser: Ref~boolean, boolean~
         message: Ref~string, string~
-    }
-    class R0["LoginCredentials"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : name
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-14-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useLoginForm.return"] {
-        <<inferred_return>>
         updateField: callback
         blurField: callback
         submit: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : password
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-14-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useLoginForm.return"] {
-        <<inferred_return>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-14-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useLoginForm.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isSubmitting
-    Subject ..> R0 : isPasswordVisible
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-14-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useLoginForm.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : shouldRememberUser
-    Subject ..> R0 : message
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-14-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useLoginForm.return"] {
-        <<inferred_return>>
-    }
     class R0["LoginCredentials"] {
         <<reference>>
     }
+    Subject "1" --> "1" R0 : values
     Subject ..> R0 : updateField
     Subject ..> R0 : blurField
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-14-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useLoginForm.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : blurField
-    Subject ..> R0 : submit
 ```
 
 ## LoginFieldErrors.expanded
@@ -603,11 +424,11 @@ classDiagram
 | `name` | `"name"?: string \| undefined;` |
 | `password` | `"password"?: string \| undefined;` |
 
-**Figura:** `DIA-VUE-TS-AUTH-15-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-15-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["LoginFieldErrors.expanded"] {
         <<evaluated_alias>>
         name?: string | undefined
@@ -626,40 +447,19 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Readonly` | `user` |
-| dependency | `Ref` | `user` |
 | dependency | [createAuthSession.return.user.shape1](../../../../../src/modules/auth/session.ts) | `user` |
 | dependency | [createAuthSession.return.user.shape2](../../../../../src/modules/auth/session.ts) | `user` |
-| dependency | `Promise` | `load` |
 | dependency | [SessionUser](../../../../../src/modules/auth/session.ts) | `load` |
 
-**Figura:** `DIA-VUE-TS-AUTH-16-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-AUTH-16-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createAuthSession.return"] {
         <<inferred_return>>
         user: object
         load: callback
-    }
-    class R0["Readonly"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : user
-    Subject ..> R1 : user
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-16-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAuthSession.return"] {
-        <<inferred_return>>
     }
     class R0["createAuthSession.return.<br/>user.shape1"] {
         <<reference>>
@@ -667,26 +467,12 @@ classDiagram
     class R1["createAuthSession.return.<br/>user.shape2"] {
         <<reference>>
     }
+    class R2["SessionUser"] {
+        <<reference>>
+    }
     Subject ..> R0 : user
     Subject ..> R1 : user
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-16-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAuthSession.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["SessionUser"] {
-        <<reference>>
-    }
-    Subject ..> R0 : load
-    Subject ..> R1 : load
+    Subject ..> R2 : load
 ```
 
 ## createAuthSession.return.user.shape1
@@ -699,11 +485,11 @@ classDiagram
 | `name` | `readonly name: string;` |
 | `permissions` | `readonly permissions: readonly string[];` |
 
-**Figura:** `DIA-VUE-TS-AUTH-17-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-17-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createAuthSession.return.<br/>user.shape1"] {
         <<inferred_object>>
         id: string
@@ -722,11 +508,11 @@ classDiagram
 | `name` | `readonly name: string;` |
 | `permissions` | `readonly permissions: readonly string[];` |
 
-**Figura:** `DIA-VUE-TS-AUTH-18-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-18-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createAuthSession.return.<br/>user.shape2"] {
         <<inferred_object>>
         id: string
@@ -746,40 +532,19 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Readonly` | `user` |
-| dependency | `Ref` | `user` |
 | dependency | [AuthSession.expanded.user.shape1](../../../../../src/modules/auth/session.ts) | `user` |
 | dependency | [AuthSession.expanded.user.shape2](../../../../../src/modules/auth/session.ts) | `user` |
-| dependency | `Promise` | `load` |
 | dependency | [SessionUser](../../../../../src/modules/auth/session.ts) | `load` |
 
-**Figura:** `DIA-VUE-TS-AUTH-19-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-AUTH-19-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["AuthSession.expanded"] {
         <<evaluated_alias>>
         user: object
         load: callback
-    }
-    class R0["Readonly"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : user
-    Subject ..> R1 : user
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-19-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["AuthSession.expanded"] {
-        <<evaluated_alias>>
     }
     class R0["AuthSession.expanded.user.<br/>shape1"] {
         <<reference>>
@@ -787,26 +552,12 @@ classDiagram
     class R1["AuthSession.expanded.user.<br/>shape2"] {
         <<reference>>
     }
+    class R2["SessionUser"] {
+        <<reference>>
+    }
     Subject ..> R0 : user
     Subject ..> R1 : user
-```
-
-**Figura:** `DIA-VUE-TS-AUTH-19-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["AuthSession.expanded"] {
-        <<evaluated_alias>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["SessionUser"] {
-        <<reference>>
-    }
-    Subject ..> R0 : load
-    Subject ..> R1 : load
+    Subject ..> R2 : load
 ```
 
 ## AuthSession.expanded.user.shape1
@@ -819,11 +570,11 @@ classDiagram
 | `name` | `readonly name: string;` |
 | `permissions` | `readonly permissions: readonly string[];` |
 
-**Figura:** `DIA-VUE-TS-AUTH-20-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-20-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["AuthSession.expanded.user.<br/>shape1"] {
         <<inferred_object>>
         id: string
@@ -842,11 +593,11 @@ classDiagram
 | `name` | `readonly name: string;` |
 | `permissions` | `readonly permissions: readonly string[];` |
 
-**Figura:** `DIA-VUE-TS-AUTH-21-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-AUTH-21-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["AuthSession.expanded.user.<br/>shape2"] {
         <<inferred_object>>
         id: string

@@ -34,7 +34,7 @@ discontinuas = intención de edición. No describe una secuencia HTTP.
 ```mermaid
 flowchart TB
     table["CatalogTable<br/>columnas y slots de celdas"] --> shared["ServerTable<br/>reenvía slots con sus props"]
-    shared --> vuetify["VDataTableServer<br/>items y paginación"]
+    shared --> vuetify["VDataTableServer de Vuetify<br/>items y paginación"]
     table -->|item.isActive| badge["StateBadge"]
     table -->|item.actions| action["TableAction"]
     action -.->|click convertido en edit| table

@@ -72,7 +72,7 @@ npm run docs:screenshots
 Playwright inicia esta copia de Vite en `http://127.0.0.1:5176`. El puerto debe estar
 libre; la configuración no reutiliza otro servidor. Si Chromium ya está instalado,
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` permite indicar su ejecutable. No necesita
-Express, credenciales de aplicación ni una base de datos.
+el backend, credenciales de aplicación ni una base de datos.
 
 Los recorridos reutilizan fixtures y simuladores de API de las pruebas de navegador.
 Los datos muestran registros ficticios existentes. La ruta de contexto bloquea

@@ -66,7 +66,7 @@ Todas las rutas de esta tabla son relativas a `front/`.
 | [.env.manual.example](../../.env.manual.example) | Plantilla versionada con variables vacías para nombres de usuario y contraseñas. | Se copia; los valores reales se escriben únicamente en la copia local. |
 | `.env.manual.local` | Valores de las credenciales que leerá el proceso de captura. No es un archivo de sesión ni una contraseña generada automáticamente. | Local, ignorado por Git. Predeterminado de `--env-file`. |
 | `.env.local` | Configuración opcional de Vite, por ejemplo `BACKEND_PROXY_TARGET` para conectar la API local. | Su propósito es iniciar Vue; las credenciales de los manuales van en `.env.manual.local`. |
-| `../back/.env` | Configuración del proceso Express y su base de datos. | Se prepara al iniciar la API. No se copia a los archivos de manuales. |
+| `../back/.env` | Configuración del backend y su base de datos. | Se prepara al iniciar la API. No se copia a los archivos de manuales. |
 
 Los nombres `DOCS_FRONT_*` son variables de la herramienta de captura. No llevan
 el prefijo `VITE_` y no se incorporan a los assets compilados del navegador.
@@ -137,7 +137,7 @@ cuenta y ajuste `baseUrl` a la dirección donde abre Vue:
 
 | Campo | Significado y forma de completarlo |
 | --- | --- |
-| `baseUrl` | Origen del frontend que abrirá el navegador, sin ruta, parámetros ni credenciales. Use el origen donde funciona Vue; no el puerto directo de Express. Se admite HTTP en localhost o HTTPS. |
+| `baseUrl` | Origen del frontend que abrirá el navegador, sin ruta, parámetros ni credenciales. Use el origen donde funciona Vue; no el puerto directo de la API. Se admite HTTP en localhost o HTTPS. |
 | `accounts` | Lista de perfiles que se pueden procesar. Conserve sólo las cuentas que va a preparar; cada entrada necesita sus credenciales. |
 | `id` | Identificador del perfil documental, único en la lista. Usa minúsculas, números y guiones; determina `--profile` y las carpetas de resultados. No es el nombre de ingreso ni el identificador de la base de datos. |
 | `label` | Nombre legible para identificar la edición. No configura permisos ni tiene que coincidir con un rol. |

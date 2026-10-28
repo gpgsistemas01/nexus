@@ -7,26 +7,18 @@ cancelación, error HTTP y rechazo de una mutación? **Fuentes:**
 [apiClient.ts](../../../../../src/shared/http/apiClient.ts),
 [apiError.ts](../../../../../src/shared/http/apiError.ts),
 [recordContract.ts](../../../../../src/shared/http/recordContract.ts).
-**Notación:** clase real, interfaces y extensiones declaradas; Axios y Error son externos.
+**Notación:** clase e interfaces del cliente; las bases externas se indican en el texto del contrato.
 
 **Lectura visual:** [cajas, flechas y multiplicidades](../../diagram-reading.md#clases-y-dominio).
 
 ```mermaid
 classDiagram
     direction TB
-    class Error {
-        <<external>>
-        message: string
-        name: string
-    }
     class ApiError {
         status: number
         code: string
         fieldErrors: Record
         meta: Record
-    }
-    class AxiosRequestConfig {
-        <<external interface>>
     }
     class ApiRequestConfig {
         <<interface>>
@@ -37,9 +29,11 @@ classDiagram
         code: string
         message: string
     }
-    Error <|-- ApiError : extends
-    AxiosRequestConfig <|-- ApiRequestConfig : extends
 ```
+
+`ApiError` extiende `Error` del lenguaje. `ApiRequestConfig` extiende
+`AxiosRequestConfig` y añade `requiresAuth`; ambas bases se conservan en las
+declaraciones TypeScript enlazadas.
 
 `normalizeApiError` produce `ApiError`; una cancelación Axios se propaga como
 cancelación y no como fallo de negocio. El código interno `RetriableRequest` añade

@@ -2,7 +2,7 @@
 
 Esta colección define cómo redactar, comprobar y publicar la documentación del
 frontend. Sus reglas se aplican a `front/docs`, con propietarios y procedimientos
-locales. El lector no necesita abrir la documentación de Express para aplicarlas.
+locales. Cada capítulo contiene las instrucciones necesarias para su tarea.
 
 ## Capítulos
 

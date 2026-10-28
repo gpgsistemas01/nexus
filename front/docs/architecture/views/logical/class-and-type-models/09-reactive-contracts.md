@@ -8,8 +8,8 @@ TypeScript. El propietario del estado y el flujo explican su uso durante la inte
 **Identificador:** `DIA-VUE-DAT-013`. **Pregunta:** ¿Cómo se combinan valores de captura
 y referencias reactivas tipadas? **Fuentes:** la interfaz interna
 `InteractiveForm<Field extends string, Value>` de
-[useFormInteraction.ts](../../../../../src/shared/composables/useFormInteraction.ts)
-y `Ref<T>` de Vue. Atributos/operaciones seleccionados y asociación de propiedad.
+[useFormInteraction.ts](../../../../../src/shared/composables/useFormInteraction.ts).
+La figura muestra el contrato propio; los tipos de biblioteca aparecen en sus atributos.
 
 **Lectura visual:** [interfaces y genéricos](../../diagram-reading.md#clases-y-dominio).
 
@@ -18,14 +18,10 @@ classDiagram
     direction LR
     class InteractiveForm {
         <<interface>>
-        values: Record
+        values: Record~Field, Value~
+        submitCount: Ref~number~
         setFieldValue(...) void
     }
-    class Ref~T~ {
-        <<external interface>>
-        value: T
-    }
-    InteractiveForm --> "1" Ref : submitCount, T = number
 ```
 
 | Construcción | Significado |

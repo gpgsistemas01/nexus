@@ -42,7 +42,7 @@ flowchart TB
     list -.->|callback request| service["catalogService.list<br/>parámetros y DTO de respuesta"]
     core -.->|invoca callback configurado| service
     service --> http["requestPage / apiClient<br/>Axios y errores"]
-    http --> api["Express API"]
+    http --> api["API del sistema"]
     core -.->|filas y estado| page
 ```
 
@@ -88,7 +88,7 @@ sequenceDiagram
     autonumber
     actor U as Usuario autorizado
     participant E@{ "type": "control" } as Alta y entrada<br/>useInventory<br/>Editor
-    participant A@{ "type": "boundary" } as Express API
+    participant A@{ "type": "boundary" } as API del sistema
     participant R@{ "type": "control" } as useWaste<br/>Duplicate<br/>Recovery
     participant P@{ "type": "boundary" } as Contenedor<br/>InventoryPage
     U->>E: Guardar alta

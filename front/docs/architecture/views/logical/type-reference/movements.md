@@ -2,11 +2,7 @@
 
 Generado con `npm run docs:generate`. No editar manualmente.
 
-Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.
-Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.
-Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.
-
-[Lectura y cobertura](index.md).
+[Alcance y notación](index.md#alcance-y-notación).
 
 ## MovementFilters.defineProps
 
@@ -29,11 +25,11 @@ Los objetos inline declarados muestran contexto, línea y columna. Las formas in
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `suppliers` |
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `items` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-1-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-1-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementFilters.defineProps"] {
         <<SFC_contract>>
         values: MovementFilters
@@ -53,20 +49,7 @@ classDiagram
     }
     Subject "1" --> "1" R0 : values
     Subject "1" --> "1" R1 : suppliers
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-1-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["MovementFilters.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : items
+    Subject "1" --> "1" R1 : items
 ```
 
 ## MovementFilters.defineEmits
@@ -87,11 +70,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [MovementFilters](../../../../../src/modules/movements/movement.ts) | `update` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-2-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-2-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementFilters.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -126,11 +109,11 @@ classDiagram
 | dependency | [MovementQuery](../../../../../src/modules/movements/movement.ts) | `query` |
 | association | [MovementRow](../../../../../src/modules/movements/movement.ts) | `rows` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-3-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-3-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementTable.defineProps"] {
         <<SFC_contract>>
         resource: MovementResource
@@ -145,22 +128,12 @@ classDiagram
     class R1["MovementQuery"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject ..> R1 : query
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-3-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["MovementTable.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["MovementRow"] {
+    class R2["MovementRow"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : rows
+    Subject ..> R0 : resource
+    Subject ..> R1 : query
+    Subject "1" --> "0..*" R2 : rows
 ```
 
 ## MovementTable.defineEmits
@@ -173,26 +146,21 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Partial` | `query` |
 | dependency | [MovementQuery](../../../../../src/modules/movements/movement.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-4-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-4-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementTable.defineEmits"] {
         <<SFC_contract>>
         query: tuple
     }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["MovementQuery"] {
+    class R0["MovementQuery"] {
         <<reference>>
     }
     Subject ..> R0 : query
-    Subject ..> R1 : query
 ```
 
 ## MovementResource
@@ -205,11 +173,11 @@ classDiagram
 'materials' | 'consumables' | 'wastes'
 ```
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-5-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-5-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementResource"] {
         <<type>>
     }
@@ -225,11 +193,11 @@ classDiagram
 '' | 'ENTRY' | 'ISSUE' | 'ADJUSTMENT' | 'RETURN'
 ```
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-6-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-6-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementType"] {
         <<type>>
     }
@@ -251,11 +219,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [MovementType](../../../../../src/modules/movements/movement.ts) | `movementType` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-7-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-7-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementFilters"] {
         <<interface>>
         startDate: string
@@ -285,11 +253,11 @@ MovementFilters & RecordQuery
 | dependency | [MovementFilters](../../../../../src/modules/movements/movement.ts) | `type` |
 | dependency | [RecordQuery](../../../../../src/shared/list.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-8-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-8-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementQuery"] {
         <<type>>
     }
@@ -321,11 +289,11 @@ classDiagram
 | `quantity` | `quantity: string \| number \| null;` |
 | `newStock` | `newStock: string \| number \| null;` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-9-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-9-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementRow"] {
         <<interface>>
         id: string
@@ -336,16 +304,6 @@ classDiagram
         supplierName: string
         materialBase: string | number | null
         materialHeight: string | number | null
-    }
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-9-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["MovementRow"] {
-        <<interface>>
         previousStock: string | number | null
         quantity: string | number | null
         newStock: string | number | null
@@ -364,11 +322,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [MovementResource](../../../../../src/modules/movements/movement.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-10-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-10-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MovementPage.defineProps"] {
         <<SFC_contract>>
         resource: MovementResource
@@ -401,18 +359,12 @@ classDiagram
 | dependency | [MovementFilters](../../../../../src/modules/movements/movement.ts) | `update` |
 | dependency | [useMovementFilters.return.suppliers.shape2](../../../../../src/modules/movements/composables/useMovementFilters.ts) | `suppliers` |
 | dependency | [useMovementFilters.return.items.shape5](../../../../../src/modules/movements/composables/useMovementFilters.ts) | `items` |
-| dependency | `ComputedRef` | `canSelectSupplier` |
-| dependency | `ComputedRef` | `canSelectItem` |
-| dependency | `ComputedRef` | `supplierState` |
-| dependency | `LookupState` | `supplierState` |
-| dependency | `ComputedRef` | `itemState` |
-| dependency | `LookupState` | `itemState` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-11-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-11-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useMovementFilters.return"] {
         <<inferred_return>>
         values: object
@@ -423,6 +375,7 @@ classDiagram
         canSelectSupplier: ComputedRef~boolean~
         canSelectItem: ComputedRef~boolean~
         supplierState: ComputedRef~LookupState~
+        itemState: ComputedRef~LookupState~
     }
     class R0["useMovementFilters.return.<br/>values.shape1"] {
         <<reference>>
@@ -430,78 +383,16 @@ classDiagram
     class R1["MovementFilters"] {
         <<reference>>
     }
+    class R2["useMovementFilters.return.<br/>suppliers.shape2"] {
+        <<reference>>
+    }
+    class R3["useMovementFilters.return.<br/>items.shape5"] {
+        <<reference>>
+    }
     Subject "1" --> "1" R0 : values
     Subject ..> R1 : update
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-11-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return"] {
-        <<inferred_return>>
-        itemState: ComputedRef~LookupState~
-    }
-    class R0["useMovementFilters.return.<br/>suppliers.shape2"] {
-        <<reference>>
-    }
-    class R1["useMovementFilters.return.<br/>items.shape5"] {
-        <<reference>>
-    }
-    Subject ..> R0 : suppliers
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-11-3`. Parte 3/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return"] {
-        <<inferred_return>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : canSelectSupplier
-    Subject ..> R0 : canSelectItem
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-11-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return"] {
-        <<inferred_return>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : supplierState
-    Subject ..> R1 : supplierState
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-11-5`. Parte 5/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return"] {
-        <<inferred_return>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : itemState
-    Subject ..> R1 : itemState
+    Subject ..> R2 : suppliers
+    Subject ..> R3 : items
 ```
 
 ## useMovementFilters.return.values.shape1
@@ -520,11 +411,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [MovementType](../../../../../src/modules/movements/movement.ts) | `movementType` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-12-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-12-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useMovementFilters.return.<br/>values.shape1"] {
         <<inferred_object>>
         startDate: string
@@ -558,25 +449,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useMovementFilters.return.suppliers.items.shape3](../../../../../src/modules/movements/composables/useMovementFilters.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useMovementFilters.return.suppliers.items.shape4](../../../../../src/modules/movements/composables/useMovementFilters.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-13-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-13-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useMovementFilters.return.<br/>suppliers.shape2"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -587,46 +467,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-13-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>suppliers.shape2"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useMovementFilters.return.<br/>suppliers.items.shape3"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-13-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>suppliers.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useMovementFilters.return.<br/>suppliers.items.shape3"] {
         <<reference>>
     }
     class R1["useMovementFilters.return.<br/>suppliers.items.shape4"] {
@@ -634,65 +478,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-13-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>suppliers.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-13-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>suppliers.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-13-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>suppliers.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-13-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>suppliers.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useMovementFilters.return.suppliers.items.shape3
@@ -706,15 +491,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-14-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-14-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useMovementFilters.return.<br/>suppliers.items.shape3"] {
         <<inferred_object>>
         id: string
@@ -722,10 +503,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useMovementFilters.return.suppliers.items.shape4
@@ -739,15 +516,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-15-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-15-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useMovementFilters.return.<br/>suppliers.items.shape4"] {
         <<inferred_object>>
         id: string
@@ -755,10 +528,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useMovementFilters.return.items.shape5
@@ -780,25 +549,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useMovementFilters.return.items.items.shape6](../../../../../src/modules/movements/composables/useMovementFilters.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useMovementFilters.return.items.items.shape7](../../../../../src/modules/movements/composables/useMovementFilters.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-16-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-16-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useMovementFilters.return.<br/>items.shape5"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -809,46 +567,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-16-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>items.shape5"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useMovementFilters.return.<br/>items.items.shape6"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-16-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>items.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useMovementFilters.return.<br/>items.items.shape6"] {
         <<reference>>
     }
     class R1["useMovementFilters.return.<br/>items.items.shape7"] {
@@ -856,65 +578,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-16-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>items.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-16-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>items.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-16-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>items.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-16-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useMovementFilters.return.<br/>items.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useMovementFilters.return.items.items.shape6
@@ -928,15 +591,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-17-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-17-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useMovementFilters.return.<br/>items.items.shape6"] {
         <<inferred_object>>
         id: string
@@ -944,10 +603,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useMovementFilters.return.items.items.shape7
@@ -961,15 +616,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-18-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-18-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useMovementFilters.return.<br/>items.items.shape7"] {
         <<inferred_object>>
         id: string
@@ -977,10 +628,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## MOVEMENT_CONFIG
@@ -999,11 +646,11 @@ classDiagram
 | association | [MOVEMENT_CONFIG.consumables.shape2](../../../../../src/modules/movements/movement.ts) | `consumables` |
 | association | [MOVEMENT_CONFIG.wastes.shape3](../../../../../src/modules/movements/movement.ts) | `wastes` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-19-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-19-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MOVEMENT_CONFIG"] {
         <<inferred_export>>
         materials: object
@@ -1016,22 +663,12 @@ classDiagram
     class R1["MOVEMENT_CONFIG.consumables.<br/>shape2"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : materials
-    Subject "1" --> "1" R1 : consumables
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-19-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["MOVEMENT_CONFIG"] {
-        <<inferred_export>>
-    }
-    class R0["MOVEMENT_CONFIG.wastes.<br/>shape3"] {
+    class R2["MOVEMENT_CONFIG.wastes.<br/>shape3"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : wastes
+    Subject "1" --> "1" R0 : materials
+    Subject "1" --> "1" R1 : consumables
+    Subject "1" --> "1" R2 : wastes
 ```
 
 ## MOVEMENT_CONFIG.materials.shape1
@@ -1045,11 +682,11 @@ classDiagram
 | `itemLabel` | `readonly itemLabel: "Material";` |
 | `path` | `readonly path: "materiales";` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-20-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-20-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MOVEMENT_CONFIG.materials.<br/>shape1"] {
         <<inferred_object>>
         title: "Movimientos de materiales"
@@ -1070,11 +707,11 @@ classDiagram
 | `itemLabel` | `readonly itemLabel: "Consumible";` |
 | `path` | `readonly path: "consumibles";` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-21-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-21-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MOVEMENT_CONFIG.consumables.<br/>shape2"] {
         <<inferred_object>>
         title: "Movimientos de consumibles"
@@ -1095,11 +732,11 @@ classDiagram
 | `itemLabel` | `readonly itemLabel: "Merma";` |
 | `path` | `readonly path: "mermas";` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-22-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-22-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["MOVEMENT_CONFIG.wastes.<br/>shape3"] {
         <<inferred_object>>
         title: "Movimientos de merma"
@@ -1125,11 +762,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [MovementType](../../../../../src/modules/movements/movement.ts) | `movementType` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-23-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-23-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["emptyMovementFilters.return"] {
         <<inferred_return>>
         startDate: string
@@ -1158,25 +795,18 @@ classDiagram
 | --- | --- | --- |
 | dependency | [MovementResource](../../../../../src/modules/movements/movement.ts) | `list` |
 | dependency | [MovementQuery](../../../../../src/modules/movements/movement.ts) | `list` |
-| dependency | `AbortSignal` | `list` |
-| dependency | `Promise` | `list` |
 | dependency | [movementService.list.shape1](../../../../../src/modules/movements/services/movementService.ts) | `list` |
 | dependency | [MovementResource](../../../../../src/modules/movements/movement.ts) | `export` |
 | dependency | [MovementQuery](../../../../../src/modules/movements/movement.ts) | `export` |
 | dependency | [ReportScope](../../../../../src/shared/report.ts) | `export` |
-| dependency | `AbortSignal` | `export` |
-| dependency | `Promise` | `export` |
-| dependency | `Blob` | `export` |
 | dependency | [MovementResource](../../../../../src/modules/movements/movement.ts) | `lookup` |
-| dependency | `AbortSignal` | `lookup` |
-| dependency | `Promise` | `lookup` |
 | dependency | [movementService.lookup.shape2](../../../../../src/modules/movements/services/movementService.ts) | `lookup` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-24-1`. Parte 1/8.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-24-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["movementService"] {
         <<inferred_export>>
         list: callback
@@ -1189,125 +819,29 @@ classDiagram
     class R1["MovementQuery"] {
         <<reference>>
     }
-    Subject ..> R0 : list
-    Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-24-2`. Parte 2/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["movementService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
+    class R2["movementService.list.shape1"] {
         <<reference>>
     }
-    class R1["Promise"] {
+    class R3["ReportScope"] {
         <<reference>>
     }
     Subject ..> R0 : list
     Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-24-3`. Parte 3/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["movementService"] {
-        <<inferred_export>>
-    }
-    class R0["movementService.list.shape1"] {
-        <<reference>>
-    }
-    class R1["MovementResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : list
-    Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-24-4`. Parte 4/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["movementService"] {
-        <<inferred_export>>
-    }
-    class R0["MovementQuery"] {
-        <<reference>>
-    }
-    class R1["ReportScope"] {
-        <<reference>>
-    }
+    Subject ..> R2 : list
     Subject ..> R0 : export
     Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-24-5`. Parte 5/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["movementService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
-    Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-24-6`. Parte 6/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["movementService"] {
-        <<inferred_export>>
-    }
-    class R0["Blob"] {
-        <<reference>>
-    }
-    class R1["MovementResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
-    Subject ..> R1 : lookup
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-24-7`. Parte 7/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["movementService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
+    Subject ..> R3 : export
     Subject ..> R0 : lookup
-    Subject ..> R1 : lookup
 ```
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-24-8`. Parte 8/8.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-24-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["movementService"] {
         <<inferred_export>>
+        lookup: callback
     }
     class R0["movementService.lookup.<br/>shape2"] {
         <<reference>>
@@ -1329,11 +863,11 @@ classDiagram
 | --- | --- | --- |
 | association | [MovementRow](../../../../../src/modules/movements/movement.ts) | `data` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-25-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-25-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["movementService.list.shape1"] {
         <<inferred_object>>
         data: MovementRow[]
@@ -1360,11 +894,11 @@ classDiagram
 | --- | --- | --- |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `data` |
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-26-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-MOVEMENTS-26-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["movementService.lookup.<br/>shape2"] {
         <<inferred_object>>
         data: LookupItem[]

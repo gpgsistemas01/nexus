@@ -22,7 +22,7 @@ Vuetify aporta los controles y sus estados de interacción.
 
 La [tabla de Vuetify](https://vuetifyjs.com/en/components/data-tables/) acepta
 encabezados con `children` y un modo de servidor. La búsqueda, el orden y la
-paginación se resuelven en Express; no se descargan todas las filas para filtrarlas
+paginación se resuelven en el backend; no se descargan todas las filas para filtrarlas
 en el navegador. Los slots mantienen botones y celdas como componentes Vue.
 
 ## Tema, estilos y controles
@@ -111,7 +111,7 @@ explica la coordinación con `useRemoteLookup`.
 
 `RemoteSelect` compone `VAutocomplete`. Su slot `append-item` ofrece **Registrar…**
 si hay búsqueda no vacía, falta coincidencia exacta visible y el contexto/permiso lo
-admite. Emite `create(search)`; Express comprueba unicidad. Teclado y texto multilínea
+admite. Emite `create(search)`; La API comprueba unicidad. Teclado y texto multilínea
 conservan el comportamiento del control.
 
 ### Componentes revisados y decisión
@@ -185,7 +185,7 @@ las decisiones y la continuación de cada petición.
 
 | Ubicación | Comprueba | Límite |
 | --- | --- | --- |
-| `front/tests/unit` | Captura, navegación, estado, mappers e interceptores. El adaptador simulado permite ejecutar Axios real. | Sin Express ni PostgreSQL. |
+| `front/tests/unit` | Captura, navegación, estado, mappers e interceptores. El adaptador simulado permite ejecutar Axios real. | Sin backend ni PostgreSQL reales. |
 | `front/tests/e2e` | Componentes reales en Chromium: interacción, payload, permisos visibles y recuperación. | `/api/*` simulado; no acredita contraseña válida ni stock persistido. |
 | `back/tests/integration` | HTTP real, autorización y persistencia con base aislada. | Sus garantías requieren el entorno del servidor. |
 

@@ -8,7 +8,7 @@ Los comandos y las rutas de esta guía son relativos a `front/`.
 
 ## Objetivo y alcance
 
-Este plan define la estrategia del cliente: rutas, captura, estado reactivo, contratos, selección, errores, interacción, descargas y compilación. Es suficiente para decidir dónde ubicar y cómo diseñar una prueba Vue sin abrir el plan de Express. Los requisitos están en la [especificación local](../requirements/requirements-specification/client-specification.md) y los recorridos en las fichas `CU-*`.
+Este plan define la estrategia del cliente: rutas, captura, estado reactivo, contratos, selección, errores, interacción, descargas y compilación. Define la ubicación y el diseño de las pruebas Vue. Los requisitos están en la [especificación local](../requirements/requirements-specification/client-specification.md) y los recorridos en las fichas `CU-*`.
 
 La fuente ejecutable son `front/tests`, sus fixtures y aserciones. El [diseño](02-test-design.md) conserva riesgos/condiciones; el [registro](03-test-cases.md) añade fichas selectivas para casos críticos. Este plan adopta conceptos de 29119-2/-3/-4 sin declarar conformidad integral ni un porcentaje mínimo de cobertura.
 

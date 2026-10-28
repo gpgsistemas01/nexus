@@ -2,11 +2,7 @@
 
 Generado con `npm run docs:generate`. No editar manualmente.
 
-Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.
-Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.
-Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.
-
-[Lectura y cobertura](index.md).
+[Alcance y notación](index.md#alcance-y-notación).
 
 ## IssueDetailsTable.defineProps
 
@@ -24,11 +20,11 @@ Los objetos inline declarados muestran contexto, línea y columna. Las formas in
 | association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `rows` |
 | dependency | [IssueMode](../../../../../src/modules/issues/issue.ts) | `mode` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-1-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-1-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueDetailsTable.<br/>defineProps"] {
         <<SFC_contract>>
         rows: IssueDetail[]
@@ -58,39 +54,19 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Partial` | `supply` |
-| dependency | `Pick` | `supply` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `supply` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `return` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-2-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-2-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueDetailsTable.<br/>defineEmits"] {
         <<SFC_contract>>
         remove: tuple
         supply: tuple
         return: tuple
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Pick"] {
-        <<reference>>
-    }
-    Subject ..> R0 : supply
-    Subject ..> R1 : supply
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-2-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueDetailsTable.<br/>defineEmits"] {
-        <<SFC_contract>>
     }
     class R0["IssueDetail"] {
         <<reference>>
@@ -121,17 +97,15 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [IssueValues](../../../../../src/modules/issues/issue.ts) | `values` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 | dependency | [IssueField](../../../../../src/modules/issues/issue.ts) | `errors` |
 | dependency | [IssueMode](../../../../../src/modules/issues/issue.ts) | `mode` |
 | association | [IssueHeaderSelect](../../../../../src/modules/issues/issue.ts) | `selects` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-3-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-ISSUES-3-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueEditor.defineProps"] {
         <<SFC_contract>>
         title: string
@@ -142,55 +116,27 @@ classDiagram
         isConflicted: boolean
         canEditHeader: boolean
         canEditDetails: boolean
-    }
-    class R0["IssueValues"] {
-        <<reference>>
-    }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-3-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueEditor.defineProps"] {
-        <<SFC_contract>>
         mode: IssueMode
         itemLabel: string
         selects: IssueHeaderSelect[]
         canCreateClient: boolean
     }
-    class R0["Record"] {
+    class R0["IssueValues"] {
         <<reference>>
     }
     class R1["IssueField"] {
         <<reference>>
     }
-    Subject ..> R0 : errors
+    class R2["IssueMode"] {
+        <<reference>>
+    }
+    class R3["IssueHeaderSelect"] {
+        <<reference>>
+    }
+    Subject "1" --> "1" R0 : values
     Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-3-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueEditor.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["IssueMode"] {
-        <<reference>>
-    }
-    class R1["IssueHeaderSelect"] {
-        <<reference>>
-    }
-    Subject ..> R0 : mode
-    Subject "1" --> "0..*" R1 : selects
+    Subject ..> R2 : mode
+    Subject "1" --> "0..*" R3 : selects
 ```
 
 ## IssueEditor.defineEmits
@@ -220,16 +166,14 @@ classDiagram
 | dependency | [IssueHeaderSelect](../../../../../src/modules/issues/issue.ts) | `search` |
 | dependency | [IssueHeaderSelect](../../../../../src/modules/issues/issue.ts) | `more` |
 | dependency | [IssueHeaderSelect](../../../../../src/modules/issues/issue.ts) | `retry` |
-| dependency | `Partial` | `supply` |
-| dependency | `Pick` | `supply` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `supply` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `return` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-4-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-ISSUES-4-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueEditor.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -240,24 +184,6 @@ classDiagram
         remove: tuple
         supply: tuple
         return: tuple
-    }
-    class R0["IssueField"] {
-        <<reference>>
-    }
-    class R1["IssueDetail"] {
-        <<reference>>
-    }
-    Subject ..> R0 : update
-    Subject ..> R1 : update
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-4-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueEditor.defineEmits"] {
-        <<SFC_contract>>
         submit: tuple
         close: tuple
         reload: tuple
@@ -266,59 +192,20 @@ classDiagram
     class R0["IssueField"] {
         <<reference>>
     }
-    class R1["IssueHeaderSelect"] {
+    class R1["IssueDetail"] {
         <<reference>>
     }
+    class R2["IssueHeaderSelect"] {
+        <<reference>>
+    }
+    Subject ..> R0 : update
+    Subject ..> R1 : update
     Subject ..> R0 : blur
-    Subject ..> R1 : search
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-4-3`. Parte 3/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueEditor.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["IssueHeaderSelect"] {
-        <<reference>>
-    }
-    Subject ..> R0 : more
-    Subject ..> R0 : retry
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-4-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueEditor.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Pick"] {
-        <<reference>>
-    }
-    Subject ..> R0 : supply
+    Subject ..> R2 : search
+    Subject ..> R2 : more
+    Subject ..> R2 : retry
     Subject ..> R1 : supply
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-4-5`. Parte 5/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueEditor.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["IssueDetail"] {
-        <<reference>>
-    }
-    Subject ..> R0 : supply
-    Subject ..> R0 : return
+    Subject ..> R1 : return
 ```
 
 ## IssueFilters.defineProps
@@ -338,11 +225,11 @@ classDiagram
 | association | [IssueFilters](../../../../../src/modules/issues/issue.ts) | `values` |
 | association | [IssueFilterSelect](../../../../../src/modules/issues/issue.ts) | `selects` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-5-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-5-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueFilters.defineProps"] {
         <<SFC_contract>>
         values: IssueFilters
@@ -382,11 +269,11 @@ classDiagram
 | dependency | [IssueFilterSelect](../../../../../src/modules/issues/issue.ts) | `more` |
 | dependency | [IssueFilterSelect](../../../../../src/modules/issues/issue.ts) | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-6-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-6-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueFilters.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -405,21 +292,8 @@ classDiagram
     }
     Subject ..> R0 : update
     Subject ..> R1 : searchOptions
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-6-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueFilters.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["IssueFilterSelect"] {
-        <<reference>>
-    }
-    Subject ..> R0 : more
-    Subject ..> R0 : retry
+    Subject ..> R1 : more
+    Subject ..> R1 : retry
 ```
 
 ## IssueLineEntryForm.defineProps
@@ -439,16 +313,14 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [IssueLineEntryForm.values@10:13](../../../../../src/modules/issues/components/IssueLineEntryForm.vue) | `values` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `state` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `selected` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-7-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-ISSUES-7-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueLineEntryForm.<br/>defineProps"] {
         <<SFC_contract>>
         label: string
@@ -462,43 +334,15 @@ classDiagram
     class R0["IssueLineEntryForm.<br/>values@10:13"] {
         <<reference>>
     }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-7-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueLineEntryForm.<br/>defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["Record"] {
-        <<reference>>
-    }
     class R1["LookupState"] {
         <<reference>>
     }
-    Subject ..> R0 : errors
-    Subject "1" --> "1" R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-7-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueLineEntryForm.<br/>defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["LookupItem"] {
+    class R2["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : selected
+    Subject "1" --> "1" R0 : values
+    Subject "1" --> "1" R1 : state
+    Subject "1" --> "0..1" R2 : selected
 ```
 
 ## IssueLineEntryForm.values@10:13
@@ -510,11 +354,11 @@ classDiagram
 | `itemId` | `itemId: string;` |
 | `quantity` | `quantity: string` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-8-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-8-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueLineEntryForm.<br/>values@10:13"] {
         <<inline_object>>
         itemId: string
@@ -535,11 +379,11 @@ classDiagram
 | `retry` | `retry: [];` |
 | `add` | `add: [];` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-9-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-9-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueLineEntryForm.<br/>defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -570,14 +414,12 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [IssueReturnForm.values@12:13](../../../../../src/modules/issues/components/IssueReturnForm.vue) | `values` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-10-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-10-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueReturnForm.defineProps"] {
         <<SFC_contract>>
         name: string
@@ -588,30 +430,12 @@ classDiagram
         errors: complex
         message: string
         isSubmitting: boolean
+        isConflicted: boolean
     }
     class R0["IssueReturnForm.values@12:13"] {
         <<reference>>
     }
-    class R1["Partial"] {
-        <<reference>>
-    }
     Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-10-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueReturnForm.defineProps"] {
-        <<SFC_contract>>
-        isConflicted: boolean
-    }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
 ```
 
 ## IssueReturnForm.values@12:13
@@ -623,11 +447,11 @@ classDiagram
 | `returnQuantity` | `returnQuantity: string;` |
 | `observations` | `observations: string` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-11-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-11-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueReturnForm.values@12:13"] {
         <<inline_object>>
         returnQuantity: string
@@ -647,11 +471,11 @@ classDiagram
 | `close` | `close: [];` |
 | `reload` | `reload: [];` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-12-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-12-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueReturnForm.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -682,11 +506,11 @@ classDiagram
 | association | [IssueRow](../../../../../src/modules/issues/issue.ts) | `rows` |
 | dependency | [IssueQuery](../../../../../src/modules/issues/issue.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-13-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-13-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueTable.defineProps"] {
         <<SFC_contract>>
         rows: IssueRow[]
@@ -719,47 +543,32 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Partial` | `query` |
 | dependency | [IssueQuery](../../../../../src/modules/issues/issue.ts) | `query` |
 | dependency | [IssueRow](../../../../../src/modules/issues/issue.ts) | `open` |
 | dependency | [IssueOpenMode](../../../../../src/modules/issues/issue.ts) | `open` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-14-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-14-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueTable.defineEmits"] {
         <<SFC_contract>>
         query: tuple
         open: tuple
     }
-    class R0["Partial"] {
+    class R0["IssueQuery"] {
         <<reference>>
     }
-    class R1["IssueQuery"] {
+    class R1["IssueRow"] {
+        <<reference>>
+    }
+    class R2["IssueOpenMode"] {
         <<reference>>
     }
     Subject ..> R0 : query
-    Subject ..> R1 : query
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-14-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueTable.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["IssueRow"] {
-        <<reference>>
-    }
-    class R1["IssueOpenMode"] {
-        <<reference>>
-    }
-    Subject ..> R0 : open
     Subject ..> R1 : open
+    Subject ..> R2 : open
 ```
 
 ## useIssueActions.options@10:42
@@ -779,11 +588,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-15-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-15-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueActions.<br/>options@10:42"] {
         <<inline_object>>
         resource: IssueResource
@@ -813,11 +622,11 @@ classDiagram
 | association | [IssueRow](../../../../../src/modules/issues/issue.ts) | `row` |
 | dependency | [IssueOpenMode](../../../../../src/modules/issues/issue.ts) | `mode` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-16-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-16-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["lastRequestedEditor@28:30"] {
         <<inline_object>>
         row: IssueRow
@@ -848,11 +657,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-17-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-17-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueDepartments.<br/>options@7:46"] {
         <<inline_object>>
         resource: IssueResource
@@ -884,11 +693,11 @@ classDiagram
 | dependency | [IssueTarget](../../../../../src/modules/issues/issue.ts) | `target` |
 | dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `onSaved` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-18-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-18-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.options@14:41"] {
         <<inline_object>>
         resource: IssueResource
@@ -903,22 +712,12 @@ classDiagram
     class R1["IssueTarget"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject ..> R1 : target
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-18-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.options@14:41"] {
-        <<inline_object>>
-    }
-    class R0["MutationConfirmation"] {
+    class R2["MutationConfirmation"] {
         <<reference>>
     }
-    Subject ..> R0 : onSaved
+    Subject ..> R0 : resource
+    Subject ..> R1 : target
+    Subject ..> R2 : onSaved
 ```
 
 ## useIssueHeaderSelection.options@15:50
@@ -941,11 +740,11 @@ classDiagram
 | association | [IssueValues](../../../../../src/modules/issues/issue.ts) | `values` |
 | association | [IssueDocument](../../../../../src/modules/issues/issue.ts) | `document` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-19-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-19-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>options@15:50"] {
         <<inline_object>>
         resource: IssueResource
@@ -962,22 +761,12 @@ classDiagram
     class R1["IssueValues"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : values
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-19-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>options@15:50"] {
-        <<inline_object>>
-    }
-    class R0["IssueDocument"] {
+    class R2["IssueDocument"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : document
+    Subject ..> R0 : resource
+    Subject "1" --> "1" R1 : values
+    Subject "1" --> "0..1" R2 : document
 ```
 
 ## useIssueLineEntry.options@14:44
@@ -996,11 +785,11 @@ classDiagram
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `onAdd` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-20-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-20-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueLineEntry.<br/>options@14:44"] {
         <<inline_object>>
         resource: IssueResource
@@ -1037,11 +826,11 @@ classDiagram
 | association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `detail` |
 | dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `onSaved` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-21-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-21-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueReturn.options@11:41"] {
         <<inline_object>>
         resource: IssueResource
@@ -1056,26 +845,16 @@ classDiagram
     class R1["IssueDocument"] {
         <<reference>>
     }
+    class R2["IssueDetail"] {
+        <<reference>>
+    }
+    class R3["MutationConfirmation"] {
+        <<reference>>
+    }
     Subject ..> R0 : resource
     Subject "1" --> "1" R1 : document
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-21-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueReturn.options@11:41"] {
-        <<inline_object>>
-    }
-    class R0["IssueDetail"] {
-        <<reference>>
-    }
-    class R1["MutationConfirmation"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : detail
-    Subject ..> R1 : onSaved
+    Subject "1" --> "1" R2 : detail
+    Subject ..> R3 : onSaved
 ```
 
 ## IssueResource
@@ -1088,11 +867,11 @@ classDiagram
 'materials' | 'consumables' | 'wastes'
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-22-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-22-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueResource"] {
         <<type>>
     }
@@ -1108,11 +887,11 @@ classDiagram
 'create' | 'edit' | 'header' | 'view' | 'supply' | 'return'
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-23-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-23-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueMode"] {
         <<type>>
     }
@@ -1140,11 +919,11 @@ classDiagram
 | `status` | `status: string;` |
 | `fulfillmentStatus` | `fulfillmentStatus: string;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-24-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-24-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueRow"] {
         <<interface>>
         id: string
@@ -1155,16 +934,6 @@ classDiagram
         advisorId: string
         advisorName: string
         clientId: string
-    }
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-24-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueRow"] {
-        <<interface>>
         clientName: string
         departmentId: string
         departmentName: string
@@ -1199,11 +968,11 @@ classDiagram
 | `isOriginallySupplied` | `isOriginallySupplied: boolean;` |
 | `isCanceled` | `isCanceled: boolean;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-25-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-ISSUES-25-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueDetail"] {
         <<interface>>
         id: string
@@ -1214,16 +983,6 @@ classDiagram
         height: number | null
         presentation: string
         unitMeasure: string
-    }
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-25-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueDetail"] {
-        <<interface>>
         quantity: number
         convertedQuantity: number
         suppliedQuantity: number
@@ -1235,11 +994,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-25-3`. Parte 3/3.
+**Figura:** `DIA-VUE-TS-ISSUES-25-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueDetail"] {
         <<interface>>
         isCanceled: boolean
@@ -1261,11 +1020,11 @@ classDiagram
 | inheritance | [IssueRow](../../../../../src/modules/issues/issue.ts) | `extends` |
 | association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `details` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-26-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-26-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueDocument"] {
         <<interface>>
         details: IssueDetail[]
@@ -1299,11 +1058,11 @@ classDiagram
 | --- | --- | --- |
 | association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `details` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-27-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-27-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueValues"] {
         <<interface>>
         clientId: string
@@ -1335,11 +1094,11 @@ keyof IssueValues
 | --- | --- | --- |
 | dependency | [IssueValues](../../../../../src/modules/issues/issue.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-28-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-28-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueField"] {
         <<type>>
     }
@@ -1359,11 +1118,11 @@ classDiagram
 'create' | 'edit' | 'header' | 'supply'
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-29-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-29-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueWriteMode"] {
         <<type>>
     }
@@ -1379,11 +1138,11 @@ classDiagram
 'edit' | 'view' | 'supply' | 'return'
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-30-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-30-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueOpenMode"] {
         <<type>>
     }
@@ -1405,11 +1164,11 @@ classDiagram
 | dependency | [IssueWriteTarget@59:7](../../../../../src/modules/issues/issue.ts) | `type` |
 | dependency | [IssueWriteTarget@60:7](../../../../../src/modules/issues/issue.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-31-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-31-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueWriteTarget"] {
         <<type>>
     }
@@ -1432,11 +1191,11 @@ classDiagram
 | `mode` | `mode: 'create';` |
 | `document` | `document?: never` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-32-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-32-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueWriteTarget@59:7"] {
         <<inline_object>>
         mode: 'create'
@@ -1455,42 +1214,27 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Exclude` | `mode` |
 | dependency | [IssueWriteMode](../../../../../src/modules/issues/issue.ts) | `mode` |
 | association | [IssueDocument](../../../../../src/modules/issues/issue.ts) | `document` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-33-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-33-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueWriteTarget@60:7"] {
         <<inline_object>>
         mode: Exclude~IssueWriteMode, 'create'~
         document: IssueDocument
     }
-    class R0["Exclude"] {
+    class R0["IssueWriteMode"] {
         <<reference>>
     }
-    class R1["IssueWriteMode"] {
+    class R1["IssueDocument"] {
         <<reference>>
     }
     Subject ..> R0 : mode
-    Subject ..> R1 : mode
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-33-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueWriteTarget@60:7"] {
-        <<inline_object>>
-    }
-    class R0["IssueDocument"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : document
+    Subject "1" --> "1" R1 : document
 ```
 
 ## IssueTarget
@@ -1508,11 +1252,11 @@ IssueWriteTarget | { mode: 'view' | 'return'; document: IssueDocument }
 | dependency | [IssueWriteTarget](../../../../../src/modules/issues/issue.ts) | `type` |
 | dependency | [IssueTarget@61:46](../../../../../src/modules/issues/issue.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-34-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-34-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueTarget"] {
         <<type>>
     }
@@ -1539,11 +1283,11 @@ classDiagram
 | --- | --- | --- |
 | association | [IssueDocument](../../../../../src/modules/issues/issue.ts) | `document` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-35-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-35-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueTarget@61:46"] {
         <<inline_object>>
         mode: 'view' | 'return'
@@ -1569,11 +1313,11 @@ classDiagram
 | `fulfillmentStatusId` | `fulfillmentStatusId: string;` |
 | `observationsSearch` | `observationsSearch: string;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-36-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-36-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueFilters"] {
         <<interface>>
         startDate: string
@@ -1601,11 +1345,11 @@ RecordQuery & IssueFilters
 | dependency | [RecordQuery](../../../../../src/shared/list.ts) | `type` |
 | dependency | [IssueFilters](../../../../../src/modules/issues/issue.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-37-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-37-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueQuery"] {
         <<type>>
     }
@@ -1629,11 +1373,11 @@ classDiagram
 'clients' | 'departments' | 'persons' | 'statuses' | 'items'
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-38-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-38-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueLookup"] {
         <<type>>
     }
@@ -1658,11 +1402,11 @@ classDiagram
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `state` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `initialOption` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-39-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-39-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueHeaderSelect"] {
         <<interface>>
         field: complex
@@ -1700,11 +1444,11 @@ classDiagram
 | --- | --- | --- |
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `state` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-40-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-40-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueFilterSelect"] {
         <<interface>>
         field: complex
@@ -1736,11 +1480,11 @@ classDiagram
 | dependency | [IssueMode](../../../../../src/modules/issues/issue.ts) | `mode` |
 | dependency | [IssueValues](../../../../../src/modules/issues/issue.ts) | `getValues` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-41-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-41-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createIssueValidationSchema.<br/>options@39:54"] {
         <<inline_object>>
         resource: IssueResource
@@ -1753,22 +1497,12 @@ classDiagram
     class R1["IssueMode"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject ..> R1 : mode
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-41-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createIssueValidationSchema.<br/>options@39:54"] {
-        <<inline_object>>
-    }
-    class R0["IssueValues"] {
+    class R2["IssueValues"] {
         <<reference>>
     }
-    Subject ..> R0 : getValues
+    Subject ..> R0 : resource
+    Subject ..> R1 : mode
+    Subject ..> R2 : getValues
 ```
 
 ## IssueEditorPage.defineProps
@@ -1785,11 +1519,11 @@ classDiagram
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 | dependency | [IssueTarget](../../../../../src/modules/issues/issue.ts) | `target` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-42-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-42-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueEditorPage.defineProps"] {
         <<SFC_contract>>
         resource: IssueResource
@@ -1821,11 +1555,11 @@ classDiagram
 | dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `saved` |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createClient` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-43-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-43-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueEditorPage.defineEmits"] {
         <<SFC_contract>>
         saved: tuple
@@ -1857,11 +1591,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-44-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-44-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueLineEntryPage.<br/>defineProps"] {
         <<SFC_contract>>
         resource: IssueResource
@@ -1886,11 +1620,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `add` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-45-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-45-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueLineEntryPage.<br/>defineEmits"] {
         <<SFC_contract>>
         add: tuple
@@ -1913,11 +1647,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-46-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-46-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssuePage.defineProps"] {
         <<SFC_contract>>
         resource: IssueResource
@@ -1940,11 +1674,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createClient` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-47-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-47-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssuePage.defineEmits"] {
         <<SFC_contract>>
         createClient: tuple
@@ -1971,11 +1705,11 @@ classDiagram
 | association | [IssueDocument](../../../../../src/modules/issues/issue.ts) | `document` |
 | association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `detail` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-48-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-48-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueReturnPage.defineProps"] {
         <<SFC_contract>>
         resource: IssueResource
@@ -1988,22 +1722,12 @@ classDiagram
     class R1["IssueDocument"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : document
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-48-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["IssueReturnPage.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["IssueDetail"] {
+    class R2["IssueDetail"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : detail
+    Subject ..> R0 : resource
+    Subject "1" --> "1" R1 : document
+    Subject "1" --> "1" R2 : detail
 ```
 
 ## IssueReturnPage.defineEmits
@@ -2020,11 +1744,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `saved` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-49-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-49-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueReturnPage.defineEmits"] {
         <<SFC_contract>>
         saved: tuple
@@ -2052,14 +1776,12 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 | dependency | [IssueWriteTarget](../../../../../src/modules/issues/issue.ts) | `target` |
-| dependency | `Record` | `payload` |
-| dependency | `AbortSignal` | `signal` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-50-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-50-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueService.options@64:25"] {
         <<inline_object>>
         resource: IssueResource
@@ -2077,24 +1799,6 @@ classDiagram
     Subject ..> R1 : target
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-50-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService.options@64:25"] {
-        <<inline_object>>
-    }
-    class R0["Record"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : payload
-    Subject ..> R1 : signal
-```
-
 ## issueService.options@86:33
 
 **Fuente:** [src/modules/issues/services/issueService.ts](../../../../../src/modules/issues/services/issueService.ts) · línea 86, columna 33. **Declaración:** inline object.
@@ -2110,14 +1814,12 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
-| dependency | `Record` | `payload` |
-| dependency | `AbortSignal` | `signal` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-51-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-51-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueService.options@86:33"] {
         <<inline_object>>
         resource: IssueResource
@@ -2129,25 +1831,7 @@ classDiagram
     class R0["IssueResource"] {
         <<reference>>
     }
-    class R1["Record"] {
-        <<reference>>
-    }
     Subject ..> R0 : resource
-    Subject ..> R1 : payload
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-51-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService.options@86:33"] {
-        <<inline_object>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signal
 ```
 
 ## useIssueActions.return
@@ -2170,26 +1854,16 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ShallowRef` | `editor` |
 | dependency | [IssueTarget](../../../../../src/modules/issues/issue.ts) | `editor` |
-| dependency | `Ref` | `editorKey` |
 | dependency | [IssueRow](../../../../../src/modules/issues/issue.ts) | `open` |
 | dependency | [IssueOpenMode](../../../../../src/modules/issues/issue.ts) | `open` |
-| dependency | `Promise` | `open` |
-| dependency | `Promise` | `retry` |
 | dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `handleSaved` |
-| dependency | `ShallowRef` | `document` |
-| dependency | `IssueDocument` | `document` |
-| dependency | `Ref` | `isReading` |
-| dependency | `Ref` | `readError` |
-| dependency | `Promise` | `load` |
-| dependency | `IssueDocument` | `load` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-52-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-52-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueActions.return"] {
         <<inferred_return>>
         editor: complex
@@ -2200,123 +1874,26 @@ classDiagram
         retry: callback
         handleSaved: callback
         document: complex
-    }
-    class R0["ShallowRef"] {
-        <<reference>>
-    }
-    class R1["IssueTarget"] {
-        <<reference>>
-    }
-    Subject ..> R0 : editor
-    Subject ..> R1 : editor
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-52-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueActions.return"] {
-        <<inferred_return>>
         isReading: Ref~boolean, boolean~
         readError: Ref~string, string~
         load: callback
     }
-    class R0["Ref"] {
+    class R0["IssueTarget"] {
         <<reference>>
     }
     class R1["IssueRow"] {
         <<reference>>
     }
-    Subject ..> R0 : editorKey
+    class R2["IssueOpenMode"] {
+        <<reference>>
+    }
+    class R3["MutationConfirmation"] {
+        <<reference>>
+    }
+    Subject ..> R0 : editor
     Subject ..> R1 : open
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-52-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueActions.return"] {
-        <<inferred_return>>
-    }
-    class R0["IssueOpenMode"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : open
-    Subject ..> R1 : open
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-52-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueActions.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["MutationConfirmation"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
-    Subject ..> R1 : handleSaved
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-52-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueActions.return"] {
-        <<inferred_return>>
-    }
-    class R0["ShallowRef"] {
-        <<reference>>
-    }
-    class R1["IssueDocument"] {
-        <<reference>>
-    }
-    Subject ..> R0 : document
-    Subject ..> R1 : document
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-52-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueActions.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isReading
-    Subject ..> R0 : readError
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-52-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueActions.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["IssueDocument"] {
-        <<reference>>
-    }
-    Subject ..> R0 : load
-    Subject ..> R1 : load
+    Subject ..> R2 : open
+    Subject ..> R3 : handleSaved
 ```
 
 ## useIssueDepartments.return
@@ -2339,26 +1916,15 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `isLocked` |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueDepartments.return.items.shape1](../../../../../src/modules/issues/composables/useIssueDepartments.ts) | `items` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `items` |
 | dependency | [useIssueDepartments.return.items.shape2](../../../../../src/modules/issues/composables/useIssueDepartments.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-53-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-53-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueDepartments.return"] {
         <<inferred_return>>
         isLocked: ComputedRef~boolean~
@@ -2369,42 +1935,9 @@ classDiagram
         search: Ref~string, string~
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLocked
-    Subject ..> R0 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-53-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueDepartments.return"] {
-        <<inferred_return>>
         refresh: callback
         loadMore: callback
         retry: callback
-    }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-53-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueDepartments.return"] {
-        <<inferred_return>>
     }
     class R0["useIssueDepartments.return.<br/>items.shape1"] {
         <<reference>>
@@ -2412,74 +1945,12 @@ classDiagram
     class R1["LookupItem"] {
         <<reference>>
     }
+    class R2["useIssueDepartments.return.<br/>items.shape2"] {
+        <<reference>>
+    }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-53-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueDepartments.return"] {
-        <<inferred_return>>
-    }
-    class R0["useIssueDepartments.return.<br/>items.shape2"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : isLoading
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-53-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueDepartments.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : error
-    Subject ..> R0 : search
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-53-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueDepartments.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : hasMore
-    Subject ..> R1 : refresh
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-53-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueDepartments.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : loadMore
-    Subject ..> R0 : retry
+    Subject ..> R2 : items
 ```
 
 ## useIssueDepartments.return.items.shape1
@@ -2493,15 +1964,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-54-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-54-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueDepartments.return.<br/>items.shape1"] {
         <<inferred_object>>
         id: string
@@ -2509,10 +1976,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueDepartments.return.items.shape2
@@ -2526,15 +1989,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-55-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-55-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueDepartments.return.<br/>items.shape2"] {
         <<inferred_object>>
         id: string
@@ -2542,10 +2001,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return
@@ -2576,32 +2031,19 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [IssueValues](../../../../../src/modules/issues/issue.ts) | `values` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
-| dependency | `ComputedRef` | `isSubmitting` |
 | dependency | [useIssueEditor.return.headerSelection.shape1](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `headerSelection` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `addDetail` |
-| dependency | `Partial` | `updateDetailSupply` |
-| dependency | `Pick` | `updateDetailSupply` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `updateDetailSupply` |
-| dependency | `Promise` | `submit` |
 | dependency | [IssueValues](../../../../../src/modules/issues/issue.ts) | `update` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `update` |
 | dependency | [IssueValues](../../../../../src/modules/issues/issue.ts) | `blur` |
-| dependency | `Promise` | `blur` |
-| dependency | `Ref` | `message` |
-| dependency | `Ref` | `isConflicted` |
-| dependency | `AbortSignal` | `execute` |
-| dependency | `Promise` | `execute` |
 | dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `execute` |
-| dependency | `AbortSignal` | `signal` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-56-1`. Parte 1/11.
+**Figura:** `DIA-VUE-TS-ISSUES-56-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return"] {
         <<inferred_return>>
         values: IssueValues
@@ -2612,24 +2054,6 @@ classDiagram
         canEditDetails: boolean
         headerSelection: callback
         addDetail: callback
-    }
-    class R0["IssueValues"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-2`. Parte 2/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
         removeDetail: callback
         updateDetailSupply: callback
         submit: callback
@@ -2639,174 +2063,38 @@ classDiagram
         isConflicted: Ref~boolean, boolean~
         execute: callback
     }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-3`. Parte 3/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
-        signal: AbortSignal
-        isDisposed: callback
-    }
-    class R0["ComputedRef"] {
+    class R0["IssueValues"] {
         <<reference>>
     }
     class R1["useIssueEditor.return.<br/>headerSelection.shape1"] {
         <<reference>>
     }
-    Subject ..> R0 : isSubmitting
+    class R2["IssueDetail"] {
+        <<reference>>
+    }
+    class R3["MutationConfirmation"] {
+        <<reference>>
+    }
+    Subject "1" --> "1" R0 : values
     Subject ..> R1 : headerSelection
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-4`. Parte 4/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["IssueDetail"] {
-        <<reference>>
-    }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject ..> R0 : addDetail
-    Subject ..> R1 : updateDetailSupply
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-5`. Parte 5/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Pick"] {
-        <<reference>>
-    }
-    class R1["IssueDetail"] {
-        <<reference>>
-    }
-    Subject ..> R0 : updateDetailSupply
-    Subject ..> R1 : updateDetailSupply
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-6`. Parte 6/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["IssueValues"] {
-        <<reference>>
-    }
-    Subject ..> R0 : submit
-    Subject ..> R1 : update
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-7`. Parte 7/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["IssueDetail"] {
-        <<reference>>
-    }
-    class R1["IssueValues"] {
-        <<reference>>
-    }
+    Subject ..> R2 : addDetail
+    Subject ..> R2 : updateDetailSupply
     Subject ..> R0 : update
-    Subject ..> R1 : blur
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-8`. Parte 8/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
+    Subject ..> R2 : update
     Subject ..> R0 : blur
-    Subject ..> R1 : message
+    Subject ..> R3 : execute
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-56-9`. Parte 9/11.
+**Figura:** `DIA-VUE-TS-ISSUES-56-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return"] {
         <<inferred_return>>
+        signal: AbortSignal
+        isDisposed: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isConflicted
-    Subject ..> R1 : execute
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-10`. Parte 10/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["MutationConfirmation"] {
-        <<reference>>
-    }
-    Subject ..> R0 : execute
-    Subject ..> R1 : execute
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-56-11`. Parte 11/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signal
 ```
 
 ## useIssueEditor.return.headerSelection.shape1
@@ -2827,22 +2115,17 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `LookupItem` | `selectCreatedClient` |
 | dependency | [useIssueEditor.return.headerSelection.clients.shape2](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `clients` |
 | dependency | [useIssueEditor.return.headerSelection.departments.shape5](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `departments` |
 | dependency | [useIssueEditor.return.headerSelection.advisors.shape8](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `advisors` |
 | dependency | [useIssueEditor.return.headerSelection.requesters.shape11](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `requesters` |
-| dependency | `ComputedRef` | `initialOptions` |
 | dependency | [useIssueEditor.return.headerSelection.initialOptions.shape14](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `initialOptions` |
-| dependency | `ComputedRef` | `canReadClients` |
-| dependency | `ComputedRef` | `canReadDepartments` |
-| dependency | `ComputedRef` | `canReadPersons` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-57-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-ISSUES-57-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.shape1"] {
         <<inferred_object>>
         selectCreatedClient: callback
@@ -2850,88 +2133,41 @@ classDiagram
         departments: callback
         advisors: callback
         requesters: callback
-        initialOptions: object
         canReadClients: ComputedRef~boolean~
         canReadDepartments: ComputedRef~boolean~
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    class R1["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
-        <<reference>>
-    }
-    Subject ..> R0 : selectCreatedClient
-    Subject ..> R1 : clients
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-57-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.shape1"] {
-        <<inferred_object>>
         canReadPersons: ComputedRef~boolean~
     }
-    class R0["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
+    class R0["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
         <<reference>>
     }
-    class R1["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
+    class R1["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
         <<reference>>
     }
-    Subject ..> R0 : departments
-    Subject ..> R1 : advisors
+    class R2["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
+        <<reference>>
+    }
+    class R3["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
+        <<reference>>
+    }
+    Subject ..> R0 : clients
+    Subject ..> R1 : departments
+    Subject ..> R2 : advisors
+    Subject ..> R3 : requesters
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-57-3`. Parte 3/5.
+**Figura:** `DIA-VUE-TS-ISSUES-57-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.shape1"] {
         <<inferred_object>>
-    }
-    class R0["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : requesters
-    Subject ..> R1 : initialOptions
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-57-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.shape1"] {
-        <<inferred_object>>
+        initialOptions: object
     }
     class R0["useIssueEditor.return.<br/>headerSelection.<br/>initialOptions.shape14"] {
         <<reference>>
     }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
     Subject ..> R0 : initialOptions
-    Subject ..> R1 : canReadClients
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-57-5`. Parte 5/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : canReadDepartments
-    Subject ..> R0 : canReadPersons
 ```
 
 ## useIssueEditor.return.headerSelection.clients.shape2
@@ -2953,25 +2189,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueEditor.return.headerSelection.clients.items.shape3](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueEditor.return.headerSelection.clients.items.shape4](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-58-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-58-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -2982,46 +2207,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-58-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useIssueEditor.return.<br/>headerSelection.clients.<br/>items.shape3"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-58-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useIssueEditor.return.<br/>headerSelection.clients.<br/>items.shape3"] {
         <<reference>>
     }
     class R1["useIssueEditor.return.<br/>headerSelection.clients.<br/>items.shape4"] {
@@ -3029,65 +2218,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-58-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-58-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-58-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-58-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useIssueEditor.return.headerSelection.clients.items.shape3
@@ -3101,15 +2231,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-59-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-59-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>items.shape3"] {
         <<inferred_object>>
         id: string
@@ -3117,10 +2243,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return.headerSelection.clients.items.shape4
@@ -3134,15 +2256,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-60-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-60-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.clients.<br/>items.shape4"] {
         <<inferred_object>>
         id: string
@@ -3150,10 +2268,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return.headerSelection.departments.shape5
@@ -3176,26 +2290,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `isLocked` |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueEditor.return.headerSelection.departments.items.shape6](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueEditor.return.headerSelection.departments.items.shape7](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-61-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-61-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
         <<inferred_object>>
         isLocked: ComputedRef~boolean~
@@ -3206,117 +2308,18 @@ classDiagram
         search: Ref~string, string~
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLocked
-    Subject ..> R0 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-61-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
-        <<inferred_object>>
         refresh: callback
         loadMore: callback
         retry: callback
     }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-61-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
-        <<inferred_object>>
-    }
     class R0["useIssueEditor.return.<br/>headerSelection.departments.<br/>items.shape6"] {
         <<reference>>
     }
-    class R1["LookupItem"] {
+    class R1["useIssueEditor.return.<br/>headerSelection.departments.<br/>items.shape7"] {
         <<reference>>
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-61-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
-        <<inferred_object>>
-    }
-    class R0["useIssueEditor.return.<br/>headerSelection.departments.<br/>items.shape7"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : isLoading
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-61-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : error
-    Subject ..> R0 : search
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-61-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : hasMore
-    Subject ..> R1 : refresh
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-61-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>shape5"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : loadMore
-    Subject ..> R0 : retry
 ```
 
 ## useIssueEditor.return.headerSelection.departments.items.shape6
@@ -3330,15 +2333,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-62-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-62-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>items.shape6"] {
         <<inferred_object>>
         id: string
@@ -3346,10 +2345,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return.headerSelection.departments.items.shape7
@@ -3363,15 +2358,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-63-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-63-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.departments.<br/>items.shape7"] {
         <<inferred_object>>
         id: string
@@ -3379,10 +2370,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return.headerSelection.advisors.shape8
@@ -3404,25 +2391,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueEditor.return.headerSelection.advisors.items.shape9](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueEditor.return.headerSelection.advisors.items.shape10](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-64-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-64-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -3433,46 +2409,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-64-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useIssueEditor.return.<br/>headerSelection.advisors.<br/>items.shape9"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-64-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useIssueEditor.return.<br/>headerSelection.advisors.<br/>items.shape9"] {
         <<reference>>
     }
     class R1["useIssueEditor.return.<br/>headerSelection.advisors.<br/>items.shape10"] {
@@ -3480,65 +2420,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-64-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-64-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-64-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-64-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>shape8"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useIssueEditor.return.headerSelection.advisors.items.shape9
@@ -3552,15 +2433,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-65-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-65-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>items.shape9"] {
         <<inferred_object>>
         id: string
@@ -3568,10 +2445,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return.headerSelection.advisors.items.shape10
@@ -3585,15 +2458,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-66-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-66-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.advisors.<br/>items.shape10"] {
         <<inferred_object>>
         id: string
@@ -3601,10 +2470,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return.headerSelection.requesters.shape11
@@ -3626,25 +2491,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueEditor.return.headerSelection.requesters.items.shape12](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueEditor.return.headerSelection.requesters.items.shape13](../../../../../src/modules/issues/composables/useIssueEditor.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-67-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-67-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -3655,46 +2509,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-67-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useIssueEditor.return.<br/>headerSelection.requesters.<br/>items.shape12"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-67-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useIssueEditor.return.<br/>headerSelection.requesters.<br/>items.shape12"] {
         <<reference>>
     }
     class R1["useIssueEditor.return.<br/>headerSelection.requesters.<br/>items.shape13"] {
@@ -3702,65 +2520,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-67-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-67-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-67-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-67-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>shape11"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useIssueEditor.return.headerSelection.requesters.items.shape12
@@ -3774,15 +2533,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-68-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-68-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>items.shape12"] {
         <<inferred_object>>
         id: string
@@ -3790,10 +2545,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return.headerSelection.requesters.items.shape13
@@ -3807,15 +2558,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-69-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-69-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.requesters.<br/>items.shape13"] {
         <<inferred_object>>
         id: string
@@ -3823,10 +2570,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueEditor.return.headerSelection.initialOptions.shape14
@@ -3840,18 +2583,11 @@ classDiagram
 | `advisorId` | `advisorId: LookupItem \| undefined;` |
 | `requesterId` | `requesterId: LookupItem \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `LookupItem` | `clientId` |
-| dependency | `LookupItem` | `departmentId` |
-| dependency | `LookupItem` | `advisorId` |
-| dependency | `LookupItem` | `requesterId` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-70-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-70-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueEditor.return.<br/>headerSelection.<br/>initialOptions.shape14"] {
         <<inferred_object>>
         clientId: LookupItem | undefined
@@ -3859,26 +2595,6 @@ classDiagram
         advisorId: LookupItem | undefined
         requesterId: LookupItem | undefined
     }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : clientId
-    Subject ..> R0 : departmentId
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-70-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueEditor.return.<br/>headerSelection.<br/>initialOptions.shape14"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : advisorId
-    Subject ..> R0 : requesterId
 ```
 
 ## useIssueFilters.return
@@ -3897,18 +2613,16 @@ classDiagram
 | --- | --- | --- |
 | association | [useIssueFilters.return.values.shape1](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `values` |
 | dependency | [useIssueFilters.return.lookups.shape2](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `lookups` |
-| dependency | `ComputedRef` | `selects` |
 | dependency | [useIssueFilters.return.selects.shape15](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `selects` |
 | dependency | [useIssueFilters.return.selects.shape16](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `selects` |
 | dependency | [useIssueFilters.return.selects.shape17](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `selects` |
 | dependency | [useIssueFilters.return.selects.shape18](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `selects` |
-| dependency | `ComputedRef` | `isDepartmentLocked` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-71-1`. Parte 1/4.
+**Figura:** `DIA-VUE-TS-ISSUES-71-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return"] {
         <<inferred_return>>
         values: object
@@ -3923,62 +2637,35 @@ classDiagram
     class R1["useIssueFilters.return.<br/>lookups.shape2"] {
         <<reference>>
     }
+    class R2["useIssueFilters.return.<br/>selects.shape15"] {
+        <<reference>>
+    }
+    class R3["useIssueFilters.return.<br/>selects.shape16"] {
+        <<reference>>
+    }
     Subject "1" --> "1" R0 : values
     Subject ..> R1 : lookups
+    Subject ..> R2 : selects
+    Subject ..> R3 : selects
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-71-2`. Parte 2/4.
+**Figura:** `DIA-VUE-TS-ISSUES-71-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return"] {
         <<inferred_return>>
+        selects: object
     }
-    class R0["ComputedRef"] {
+    class R0["useIssueFilters.return.<br/>selects.shape17"] {
         <<reference>>
     }
-    class R1["useIssueFilters.return.<br/>selects.shape15"] {
+    class R1["useIssueFilters.return.<br/>selects.shape18"] {
         <<reference>>
     }
     Subject ..> R0 : selects
     Subject ..> R1 : selects
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-71-3`. Parte 3/4.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return"] {
-        <<inferred_return>>
-    }
-    class R0["useIssueFilters.return.<br/>selects.shape16"] {
-        <<reference>>
-    }
-    class R1["useIssueFilters.return.<br/>selects.shape17"] {
-        <<reference>>
-    }
-    Subject ..> R0 : selects
-    Subject ..> R1 : selects
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-71-4`. Parte 4/4.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return"] {
-        <<inferred_return>>
-    }
-    class R0["useIssueFilters.return.<br/>selects.shape18"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : selects
-    Subject ..> R1 : isDepartmentLocked
 ```
 
 ## useIssueFilters.return.values.shape1
@@ -3995,11 +2682,11 @@ classDiagram
 | `fulfillmentStatusId` | `fulfillmentStatusId: string;` |
 | `observationsSearch` | `observationsSearch: string;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-72-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-72-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>values.shape1"] {
         <<inferred_object>>
         startDate: string
@@ -4030,11 +2717,11 @@ classDiagram
 | dependency | [useIssueFilters.return.lookups.persons.shape9](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `persons` |
 | dependency | [useIssueFilters.return.lookups.statuses.shape12](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `statuses` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-73-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-73-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.shape2"] {
         <<inferred_object>>
         clients: callback
@@ -4048,26 +2735,16 @@ classDiagram
     class R1["useIssueFilters.return.<br/>lookups.departments.shape6"] {
         <<reference>>
     }
+    class R2["useIssueFilters.return.<br/>lookups.persons.shape9"] {
+        <<reference>>
+    }
+    class R3["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
+        <<reference>>
+    }
     Subject ..> R0 : clients
     Subject ..> R1 : departments
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-73-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["useIssueFilters.return.<br/>lookups.persons.shape9"] {
-        <<reference>>
-    }
-    class R1["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
-        <<reference>>
-    }
-    Subject ..> R0 : persons
-    Subject ..> R1 : statuses
+    Subject ..> R2 : persons
+    Subject ..> R3 : statuses
 ```
 
 ## useIssueFilters.return.lookups.clients.shape3
@@ -4089,25 +2766,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueFilters.return.lookups.clients.items.shape4](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueFilters.return.lookups.clients.items.shape5](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-74-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-74-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.clients.shape3"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -4118,46 +2784,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-74-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.clients.shape3"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useIssueFilters.return.<br/>lookups.clients.items.shape4"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-74-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.clients.shape3"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useIssueFilters.return.<br/>lookups.clients.items.shape4"] {
         <<reference>>
     }
     class R1["useIssueFilters.return.<br/>lookups.clients.items.shape5"] {
@@ -4165,65 +2795,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-74-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.clients.shape3"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-74-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.clients.shape3"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-74-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.clients.shape3"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-74-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.clients.shape3"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useIssueFilters.return.lookups.clients.items.shape4
@@ -4237,15 +2808,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-75-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-75-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.clients.items.shape4"] {
         <<inferred_object>>
         id: string
@@ -4253,10 +2820,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueFilters.return.lookups.clients.items.shape5
@@ -4270,15 +2833,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-76-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-76-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.clients.items.shape5"] {
         <<inferred_object>>
         id: string
@@ -4286,10 +2845,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueFilters.return.lookups.departments.shape6
@@ -4312,26 +2867,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `isLocked` |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueFilters.return.lookups.departments.items.shape7](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueFilters.return.lookups.departments.items.shape8](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-77-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-77-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.departments.shape6"] {
         <<inferred_object>>
         isLocked: ComputedRef~boolean~
@@ -4342,117 +2885,18 @@ classDiagram
         search: Ref~string, string~
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLocked
-    Subject ..> R0 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-77-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.departments.shape6"] {
-        <<inferred_object>>
         refresh: callback
         loadMore: callback
         retry: callback
     }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-77-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.departments.shape6"] {
-        <<inferred_object>>
-    }
     class R0["useIssueFilters.return.<br/>lookups.departments.items.<br/>shape7"] {
         <<reference>>
     }
-    class R1["LookupItem"] {
+    class R1["useIssueFilters.return.<br/>lookups.departments.items.<br/>shape8"] {
         <<reference>>
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-77-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.departments.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["useIssueFilters.return.<br/>lookups.departments.items.<br/>shape8"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : isLoading
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-77-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.departments.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : error
-    Subject ..> R0 : search
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-77-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.departments.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : hasMore
-    Subject ..> R1 : refresh
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-77-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.departments.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : loadMore
-    Subject ..> R0 : retry
 ```
 
 ## useIssueFilters.return.lookups.departments.items.shape7
@@ -4466,15 +2910,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-78-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-78-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.departments.items.<br/>shape7"] {
         <<inferred_object>>
         id: string
@@ -4482,10 +2922,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueFilters.return.lookups.departments.items.shape8
@@ -4499,15 +2935,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-79-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-79-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.departments.items.<br/>shape8"] {
         <<inferred_object>>
         id: string
@@ -4515,10 +2947,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueFilters.return.lookups.persons.shape9
@@ -4540,25 +2968,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueFilters.return.lookups.persons.items.shape10](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueFilters.return.lookups.persons.items.shape11](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-80-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-80-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.persons.shape9"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -4569,46 +2986,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-80-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.persons.shape9"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useIssueFilters.return.<br/>lookups.persons.items.<br/>shape10"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-80-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.persons.shape9"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useIssueFilters.return.<br/>lookups.persons.items.<br/>shape10"] {
         <<reference>>
     }
     class R1["useIssueFilters.return.<br/>lookups.persons.items.<br/>shape11"] {
@@ -4616,65 +2997,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-80-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.persons.shape9"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-80-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.persons.shape9"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-80-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.persons.shape9"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-80-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.persons.shape9"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useIssueFilters.return.lookups.persons.items.shape10
@@ -4688,15 +3010,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-81-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-81-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.persons.items.<br/>shape10"] {
         <<inferred_object>>
         id: string
@@ -4704,10 +3022,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueFilters.return.lookups.persons.items.shape11
@@ -4721,15 +3035,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-82-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-82-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.persons.items.<br/>shape11"] {
         <<inferred_object>>
         id: string
@@ -4737,10 +3047,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueFilters.return.lookups.statuses.shape12
@@ -4762,25 +3068,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueFilters.return.lookups.statuses.items.shape13](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueFilters.return.lookups.statuses.items.shape14](../../../../../src/modules/issues/composables/useIssueFilters.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-83-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-83-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -4791,46 +3086,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-83-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useIssueFilters.return.<br/>lookups.statuses.items.<br/>shape13"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-83-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useIssueFilters.return.<br/>lookups.statuses.items.<br/>shape13"] {
         <<reference>>
     }
     class R1["useIssueFilters.return.<br/>lookups.statuses.items.<br/>shape14"] {
@@ -4838,65 +3097,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-83-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-83-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-83-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-83-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueFilters.return.<br/>lookups.statuses.shape12"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useIssueFilters.return.lookups.statuses.items.shape13
@@ -4910,15 +3110,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-84-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-84-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.statuses.items.<br/>shape13"] {
         <<inferred_object>>
         id: string
@@ -4926,10 +3122,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueFilters.return.lookups.statuses.items.shape14
@@ -4943,15 +3135,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-85-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-85-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>lookups.statuses.items.<br/>shape14"] {
         <<inferred_object>>
         id: string
@@ -4959,10 +3147,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueFilters.return.selects.shape15
@@ -4979,15 +3163,11 @@ classDiagram
 | `label` | `label: "Cliente";` |
 | `permission` | `permission: "clients:read";` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `LookupState` | `state` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-86-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-86-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>selects.shape15"] {
         <<inferred_object>>
         state: LookupState
@@ -4998,10 +3178,6 @@ classDiagram
         label: "Cliente"
         permission: "clients:read"
     }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
 ```
 
 ## useIssueFilters.return.selects.shape16
@@ -5018,15 +3194,11 @@ classDiagram
 | `label` | `label: "Área";` |
 | `permission` | `permission: "departments:read";` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `LookupState` | `state` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-87-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-87-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>selects.shape16"] {
         <<inferred_object>>
         state: LookupState
@@ -5037,10 +3209,6 @@ classDiagram
         label: "Área"
         permission: "departments:read"
     }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
 ```
 
 ## useIssueFilters.return.selects.shape17
@@ -5057,15 +3225,11 @@ classDiagram
 | `label` | `label: "Persona";` |
 | `permission` | `permission: "persons:read";` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `LookupState` | `state` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-88-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-88-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>selects.shape17"] {
         <<inferred_object>>
         state: LookupState
@@ -5076,10 +3240,6 @@ classDiagram
         label: "Persona"
         permission: "persons:read"
     }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
 ```
 
 ## useIssueFilters.return.selects.shape18
@@ -5096,15 +3256,11 @@ classDiagram
 | `label` | `label: "Estado de surtido";` |
 | `permission` | `permission: "fulfillment:statuses-read";` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `LookupState` | `state` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-89-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-89-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueFilters.return.<br/>selects.shape18"] {
         <<inferred_object>>
         state: LookupState
@@ -5115,10 +3271,6 @@ classDiagram
         label: "Estado de surtido"
         permission: "fulfillment:statuses-read"
     }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
 ```
 
 ## useIssueHeaderSelection.return
@@ -5144,27 +3296,22 @@ classDiagram
 | dependency | [useIssueHeaderSelection.return.departments.shape4](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `departments` |
 | dependency | [useIssueHeaderSelection.return.advisors.shape7](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `advisors` |
 | dependency | [useIssueHeaderSelection.return.requesters.shape10](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `requesters` |
-| dependency | `ComputedRef` | `initialOptions` |
 | dependency | [useIssueHeaderSelection.return.initialOptions.shape13](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `initialOptions` |
-| dependency | `ComputedRef` | `canReadClients` |
-| dependency | `ComputedRef` | `canReadDepartments` |
-| dependency | `ComputedRef` | `canReadPersons` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-90-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-ISSUES-90-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return"] {
         <<inferred_return>>
         selectCreatedClient: callback
         clients: callback
         departments: callback
         advisors: callback
-        requesters: callback
-        initialOptions: object
         canReadClients: ComputedRef~boolean~
         canReadDepartments: ComputedRef~boolean~
+        canReadPersons: ComputedRef~boolean~
     }
     class R0["LookupItem"] {
         <<reference>>
@@ -5172,78 +3319,36 @@ classDiagram
     class R1["useIssueHeaderSelection.<br/>return.clients.shape1"] {
         <<reference>>
     }
+    class R2["useIssueHeaderSelection.<br/>return.departments.shape4"] {
+        <<reference>>
+    }
+    class R3["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
+        <<reference>>
+    }
     Subject ..> R0 : selectCreatedClient
     Subject ..> R1 : clients
+    Subject ..> R2 : departments
+    Subject ..> R3 : advisors
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-90-2`. Parte 2/5.
+**Figura:** `DIA-VUE-TS-ISSUES-90-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return"] {
         <<inferred_return>>
-        canReadPersons: ComputedRef~boolean~
-    }
-    class R0["useIssueHeaderSelection.<br/>return.departments.shape4"] {
-        <<reference>>
-    }
-    class R1["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
-        <<reference>>
-    }
-    Subject ..> R0 : departments
-    Subject ..> R1 : advisors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-90-3`. Parte 3/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return"] {
-        <<inferred_return>>
+        requesters: callback
+        initialOptions: object
     }
     class R0["useIssueHeaderSelection.<br/>return.requesters.shape10"] {
         <<reference>>
     }
-    class R1["ComputedRef"] {
+    class R1["useIssueHeaderSelection.<br/>return.initialOptions.<br/>shape13"] {
         <<reference>>
     }
     Subject ..> R0 : requesters
     Subject ..> R1 : initialOptions
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-90-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return"] {
-        <<inferred_return>>
-    }
-    class R0["useIssueHeaderSelection.<br/>return.initialOptions.<br/>shape13"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : initialOptions
-    Subject ..> R1 : canReadClients
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-90-5`. Parte 5/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return"] {
-        <<inferred_return>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : canReadDepartments
-    Subject ..> R0 : canReadPersons
 ```
 
 ## useIssueHeaderSelection.return.clients.shape1
@@ -5265,25 +3370,15 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueHeaderSelection.return.clients.items.shape2](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `items` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `items` |
 | dependency | [useIssueHeaderSelection.return.clients.items.shape3](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-91-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-91-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.clients.shape1"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -5294,112 +3389,21 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-91-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.clients.shape1"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
+    class R0["useIssueHeaderSelection.<br/>return.clients.items.shape2"] {
         <<reference>>
     }
-    class R1["useIssueHeaderSelection.<br/>return.clients.items.shape2"] {
+    class R1["LookupItem"] {
         <<reference>>
     }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-91-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.clients.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    class R1["useIssueHeaderSelection.<br/>return.clients.items.shape3"] {
+    class R2["useIssueHeaderSelection.<br/>return.clients.items.shape3"] {
         <<reference>>
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-91-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.clients.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-91-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.clients.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-91-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.clients.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-91-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.clients.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
+    Subject ..> R2 : items
 ```
 
 ## useIssueHeaderSelection.return.clients.items.shape2
@@ -5413,15 +3417,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-92-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-92-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.clients.items.shape2"] {
         <<inferred_object>>
         id: string
@@ -5429,10 +3429,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueHeaderSelection.return.clients.items.shape3
@@ -5446,15 +3442,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-93-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-93-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.clients.items.shape3"] {
         <<inferred_object>>
         id: string
@@ -5462,10 +3454,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueHeaderSelection.return.departments.shape4
@@ -5488,26 +3476,15 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `isLocked` |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueHeaderSelection.return.departments.items.shape5](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `items` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `items` |
 | dependency | [useIssueHeaderSelection.return.departments.items.shape6](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-94-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-94-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.departments.shape4"] {
         <<inferred_object>>
         isLocked: ComputedRef~boolean~
@@ -5518,42 +3495,9 @@ classDiagram
         search: Ref~string, string~
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLocked
-    Subject ..> R0 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-94-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.departments.shape4"] {
-        <<inferred_object>>
         refresh: callback
         loadMore: callback
         retry: callback
-    }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-94-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.departments.shape4"] {
-        <<inferred_object>>
     }
     class R0["useIssueHeaderSelection.<br/>return.departments.items.<br/>shape5"] {
         <<reference>>
@@ -5561,74 +3505,12 @@ classDiagram
     class R1["LookupItem"] {
         <<reference>>
     }
+    class R2["useIssueHeaderSelection.<br/>return.departments.items.<br/>shape6"] {
+        <<reference>>
+    }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-94-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.departments.shape4"] {
-        <<inferred_object>>
-    }
-    class R0["useIssueHeaderSelection.<br/>return.departments.items.<br/>shape6"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : isLoading
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-94-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.departments.shape4"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : error
-    Subject ..> R0 : search
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-94-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.departments.shape4"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : hasMore
-    Subject ..> R1 : refresh
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-94-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.departments.shape4"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : loadMore
-    Subject ..> R0 : retry
+    Subject ..> R2 : items
 ```
 
 ## useIssueHeaderSelection.return.departments.items.shape5
@@ -5642,15 +3524,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-95-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-95-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.departments.items.<br/>shape5"] {
         <<inferred_object>>
         id: string
@@ -5658,10 +3536,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueHeaderSelection.return.departments.items.shape6
@@ -5675,15 +3549,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-96-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-96-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.departments.items.<br/>shape6"] {
         <<inferred_object>>
         id: string
@@ -5691,10 +3561,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueHeaderSelection.return.advisors.shape7
@@ -5716,25 +3582,15 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueHeaderSelection.return.advisors.items.shape8](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `items` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `items` |
 | dependency | [useIssueHeaderSelection.return.advisors.items.shape9](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-97-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-97-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -5745,112 +3601,21 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-97-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
+    class R0["useIssueHeaderSelection.<br/>return.advisors.items.shape8"] {
         <<reference>>
     }
-    class R1["useIssueHeaderSelection.<br/>return.advisors.items.shape8"] {
+    class R1["LookupItem"] {
         <<reference>>
     }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-97-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    class R1["useIssueHeaderSelection.<br/>return.advisors.items.shape9"] {
+    class R2["useIssueHeaderSelection.<br/>return.advisors.items.shape9"] {
         <<reference>>
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-97-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-97-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-97-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-97-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.advisors.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
+    Subject ..> R2 : items
 ```
 
 ## useIssueHeaderSelection.return.advisors.items.shape8
@@ -5864,15 +3629,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-98-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-98-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.advisors.items.shape8"] {
         <<inferred_object>>
         id: string
@@ -5880,10 +3641,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueHeaderSelection.return.advisors.items.shape9
@@ -5897,15 +3654,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-99-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-99-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.advisors.items.shape9"] {
         <<inferred_object>>
         id: string
@@ -5913,10 +3666,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueHeaderSelection.return.requesters.shape10
@@ -5938,25 +3687,15 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueHeaderSelection.return.requesters.items.shape11](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `items` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `items` |
 | dependency | [useIssueHeaderSelection.return.requesters.items.shape12](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-100-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-100-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.requesters.shape10"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -5967,112 +3706,21 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-100-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.requesters.shape10"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
+    class R0["useIssueHeaderSelection.<br/>return.requesters.items.<br/>shape11"] {
         <<reference>>
     }
-    class R1["useIssueHeaderSelection.<br/>return.requesters.items.<br/>shape11"] {
+    class R1["LookupItem"] {
         <<reference>>
     }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-100-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.requesters.shape10"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    class R1["useIssueHeaderSelection.<br/>return.requesters.items.<br/>shape12"] {
+    class R2["useIssueHeaderSelection.<br/>return.requesters.items.<br/>shape12"] {
         <<reference>>
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-100-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.requesters.shape10"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-100-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.requesters.shape10"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-100-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.requesters.shape10"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-100-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.requesters.shape10"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
+    Subject ..> R2 : items
 ```
 
 ## useIssueHeaderSelection.return.requesters.items.shape11
@@ -6086,15 +3734,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-101-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-101-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.requesters.items.<br/>shape11"] {
         <<inferred_object>>
         id: string
@@ -6102,10 +3746,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueHeaderSelection.return.requesters.items.shape12
@@ -6119,15 +3759,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-102-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-102-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.requesters.items.<br/>shape12"] {
         <<inferred_object>>
         id: string
@@ -6135,10 +3771,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueHeaderSelection.return.initialOptions.shape13
@@ -6159,11 +3791,11 @@ classDiagram
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `advisorId` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `requesterId` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-103-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-103-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueHeaderSelection.<br/>return.initialOptions.<br/>shape13"] {
         <<inferred_object>>
         clientId: LookupItem | undefined
@@ -6176,19 +3808,6 @@ classDiagram
     }
     Subject "1" --> "0..1" R0 : clientId
     Subject "1" --> "0..1" R0 : departmentId
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-103-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueHeaderSelection.<br/>return.initialOptions.<br/>shape13"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
     Subject "1" --> "0..1" R0 : advisorId
     Subject "1" --> "0..1" R0 : requesterId
 ```
@@ -6210,20 +3829,13 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [useIssueLineEntry.return.values.shape1](../../../../../src/modules/issues/composables/useIssueLineEntry.ts) | `values` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
-| dependency | `ShallowRef` | `selected` |
-| dependency | `LookupItem` | `selected` |
 | dependency | [useIssueLineEntry.return.items.shape2](../../../../../src/modules/issues/composables/useIssueLineEntry.ts) | `items` |
-| dependency | `Promise` | `add` |
-| dependency | `Promise` | `blur` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-104-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-ISSUES-104-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueLineEntry.return"] {
         <<inferred_return>>
         values: object
@@ -6237,79 +3849,11 @@ classDiagram
     class R0["useIssueLineEntry.return.<br/>values.shape1"] {
         <<reference>>
     }
-    class R1["ComputedRef"] {
+    class R1["useIssueLineEntry.return.<br/>items.shape2"] {
         <<reference>>
     }
     Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-104-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return"] {
-        <<inferred_return>>
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-104-3`. Parte 3/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return"] {
-        <<inferred_return>>
-    }
-    class R0["ShallowRef"] {
-        <<reference>>
-    }
-    class R1["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : selected
-    Subject ..> R1 : selected
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-104-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return"] {
-        <<inferred_return>>
-    }
-    class R0["useIssueLineEntry.return.<br/>items.shape2"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : add
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-104-5`. Parte 5/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : blur
+    Subject ..> R1 : items
 ```
 
 ## useIssueLineEntry.return.values.shape1
@@ -6321,11 +3865,11 @@ classDiagram
 | `itemId` | `itemId: string;` |
 | `quantity` | `quantity: string;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-105-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-105-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueLineEntry.return.<br/>values.shape1"] {
         <<inferred_object>>
         itemId: string
@@ -6352,25 +3896,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useIssueLineEntry.return.items.items.shape3](../../../../../src/modules/issues/composables/useIssueLineEntry.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useIssueLineEntry.return.items.items.shape4](../../../../../src/modules/issues/composables/useIssueLineEntry.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-106-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-106-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueLineEntry.return.<br/>items.shape2"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -6381,46 +3914,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-106-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return.<br/>items.shape2"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useIssueLineEntry.return.<br/>items.items.shape3"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-106-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return.<br/>items.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useIssueLineEntry.return.<br/>items.items.shape3"] {
         <<reference>>
     }
     class R1["useIssueLineEntry.return.<br/>items.items.shape4"] {
@@ -6428,65 +3925,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-106-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return.<br/>items.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-106-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return.<br/>items.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-106-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return.<br/>items.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-106-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueLineEntry.return.<br/>items.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useIssueLineEntry.return.items.items.shape3
@@ -6500,15 +3938,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-107-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-107-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueLineEntry.return.<br/>items.items.shape3"] {
         <<inferred_object>>
         id: string
@@ -6516,10 +3950,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueLineEntry.return.items.items.shape4
@@ -6533,15 +3963,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-108-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-108-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueLineEntry.return.<br/>items.items.shape4"] {
         <<inferred_object>>
         id: string
@@ -6549,10 +3975,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useIssueReturn.return
@@ -6577,24 +3999,13 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [useIssueReturn.return.values.shape1](../../../../../src/modules/issues/composables/useIssueReturn.ts) | `values` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
-| dependency | `ComputedRef` | `isSubmitting` |
-| dependency | `Promise` | `submit` |
-| dependency | `Promise` | `blur` |
-| dependency | `Ref` | `message` |
-| dependency | `Ref` | `isConflicted` |
-| dependency | `AbortSignal` | `execute` |
-| dependency | `Promise` | `execute` |
 | dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `execute` |
-| dependency | `AbortSignal` | `signal` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-109-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-ISSUES-109-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueReturn.return"] {
         <<inferred_return>>
         values: object
@@ -6605,123 +4016,19 @@ classDiagram
         update: callback
         blur: callback
         message: Ref~string, string~
-    }
-    class R0["useIssueReturn.return.values.<br/>shape1"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-109-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueReturn.return"] {
-        <<inferred_return>>
         isConflicted: Ref~boolean, boolean~
         execute: callback
         signal: AbortSignal
         isDisposed: callback
     }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-109-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueReturn.return"] {
-        <<inferred_return>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isSubmitting
-    Subject ..> R1 : submit
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-109-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueReturn.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : blur
-    Subject ..> R1 : message
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-109-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueReturn.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isConflicted
-    Subject ..> R1 : execute
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-109-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueReturn.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
+    class R0["useIssueReturn.return.values.<br/>shape1"] {
         <<reference>>
     }
     class R1["MutationConfirmation"] {
         <<reference>>
     }
-    Subject ..> R0 : execute
+    Subject "1" --> "1" R0 : values
     Subject ..> R1 : execute
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-109-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useIssueReturn.return"] {
-        <<inferred_return>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signal
 ```
 
 ## useIssueReturn.return.values.shape1
@@ -6733,11 +4040,11 @@ classDiagram
 | `returnQuantity` | `returnQuantity: string;` |
 | `observations` | `observations: string;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-110-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-110-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useIssueReturn.return.values.<br/>shape1"] {
         <<inferred_object>>
         returnQuantity: string
@@ -6761,11 +4068,11 @@ classDiagram
 | association | [ISSUE_CONFIG.consumables.shape2](../../../../../src/modules/issues/issueConfig.ts) | `consumables` |
 | association | [ISSUE_CONFIG.wastes.shape3](../../../../../src/modules/issues/issueConfig.ts) | `wastes` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-111-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-111-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["ISSUE_CONFIG"] {
         <<inferred_export>>
         materials: object
@@ -6778,22 +4085,12 @@ classDiagram
     class R1["ISSUE_CONFIG.consumables.<br/>shape2"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : materials
-    Subject "1" --> "1" R1 : consumables
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-111-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["ISSUE_CONFIG"] {
-        <<inferred_export>>
-    }
-    class R0["ISSUE_CONFIG.wastes.shape3"] {
+    class R2["ISSUE_CONFIG.wastes.shape3"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : wastes
+    Subject "1" --> "1" R0 : materials
+    Subject "1" --> "1" R1 : consumables
+    Subject "1" --> "0..1" R2 : wastes
 ```
 
 ## ISSUE_CONFIG.materials.shape1
@@ -6811,11 +4108,11 @@ classDiagram
 | `managePermission` | `readonly managePermission: "goods:issues-manage";` |
 | `supplyPermission` | `readonly supplyPermission: "goods:issue-details-manage";` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-112-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-112-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["ISSUE_CONFIG.materials.<br/>shape1"] {
         <<inferred_object>>
         title: "Salidas de materiales"
@@ -6844,11 +4141,11 @@ classDiagram
 | `managePermission` | `readonly managePermission: "goods:issues-manage";` |
 | `supplyPermission` | `readonly supplyPermission: "goods:issue-details-manage";` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-113-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-113-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["ISSUE_CONFIG.consumables.<br/>shape2"] {
         <<inferred_object>>
         title: "Salidas de consumibles"
@@ -6877,11 +4174,11 @@ classDiagram
 | `managePermission` | `readonly managePermission: "waste:issues-manage";` |
 | `supplyPermission` | `readonly supplyPermission: "waste:issues-supply";` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-114-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-114-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["ISSUE_CONFIG.wastes.shape3"] {
         <<inferred_object>>
         title: "Salidas de merma"
@@ -6919,11 +4216,11 @@ classDiagram
 | `isOriginallySupplied` | `"isOriginallySupplied": boolean;` |
 | `isCanceled` | `"isCanceled": boolean;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-115-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-ISSUES-115-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createIssueDetailDraft.<br/>return"] {
         <<inferred_return>>
         id: string
@@ -6934,16 +4231,6 @@ classDiagram
         height: number | null
         presentation: string
         unitMeasure: string
-    }
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-115-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createIssueDetailDraft.<br/>return"] {
-        <<inferred_return>>
         quantity: number
         convertedQuantity: number
         suppliedQuantity: number
@@ -6955,11 +4242,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-115-3`. Parte 3/3.
+**Figura:** `DIA-VUE-TS-ISSUES-115-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createIssueDetailDraft.<br/>return"] {
         <<inferred_return>>
         isCanceled: boolean
@@ -6981,15 +4268,11 @@ classDiagram
 | `observations` | `"observations": string;` |
 | `details` | `"details": IssueDetail[];` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `IssueDetail` | `details` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-116-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-116-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createInitialIssueValues.<br/>return"] {
         <<inferred_return>>
         clientId: string
@@ -7001,10 +4284,6 @@ classDiagram
         observations: string
         details: IssueDetail[]
     }
-    class R0["IssueDetail"] {
-        <<reference>>
-    }
-    Subject ..> R0 : details
 ```
 
 ## emptyIssueFilters.return
@@ -7021,11 +4300,11 @@ classDiagram
 | `fulfillmentStatusId` | `"fulfillmentStatusId": string;` |
 | `observationsSearch` | `"observationsSearch": string;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-117-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-117-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["emptyIssueFilters.return"] {
         <<inferred_return>>
         startDate: string
@@ -7060,11 +4339,11 @@ classDiagram
 | `status` | `"status": string;` |
 | `fulfillmentStatus` | `"fulfillmentStatus": string;` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-118-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-118-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["normalizeIssueRow.return"] {
         <<inferred_return>>
         id: string
@@ -7075,16 +4354,6 @@ classDiagram
         advisorId: string
         advisorName: string
         clientId: string
-    }
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-118-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["normalizeIssueRow.return"] {
-        <<inferred_return>>
         clientName: string
         departmentId: string
         departmentName: string
@@ -7122,11 +4391,11 @@ classDiagram
 | --- | --- | --- |
 | association | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `details` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-119-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-119-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["normalizeIssueDocument.<br/>return"] {
         <<inferred_return>>
         details: IssueDetail[]
@@ -7137,20 +4406,6 @@ classDiagram
         requesterName: string
         advisorId: string
         advisorName: string
-    }
-    class R0["IssueDetail"] {
-        <<reference>>
-    }
-    Subject "1" --> "0..*" R0 : details
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-119-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["normalizeIssueDocument.<br/>return"] {
-        <<inferred_return>>
         clientId: string
         clientName: string
         departmentId: string
@@ -7160,6 +4415,10 @@ classDiagram
         status: string
         fulfillmentStatus: string
     }
+    class R0["IssueDetail"] {
+        <<reference>>
+    }
+    Subject "1" --> "0..*" R0 : details
 ```
 
 ## mapIssueItemOption.return
@@ -7173,15 +4432,11 @@ classDiagram
 | `data` | `"data": Record<string, unknown>;` |
 | `isDisabled` | `"isDisabled"?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-120-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-120-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["mapIssueItemOption.return"] {
         <<inferred_return>>
         id: string
@@ -7189,10 +4444,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## issueLookupService
@@ -7207,16 +4458,13 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueLookup](../../../../../src/modules/issues/issue.ts) | `list` |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `list` |
-| dependency | `AbortSignal` | `list` |
-| dependency | `Record` | `list` |
-| dependency | `Promise` | `list` |
 | dependency | [issueLookupService.list.shape1](../../../../../src/modules/issues/services/issueLookupService.ts) | `list` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-121-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-ISSUES-121-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueLookupService"] {
         <<inferred_export>>
         list: callback
@@ -7227,44 +4475,12 @@ classDiagram
     class R1["IssueResource"] {
         <<reference>>
     }
-    Subject ..> R0 : list
-    Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-121-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueLookupService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Record"] {
+    class R2["issueLookupService.list.<br/>shape1"] {
         <<reference>>
     }
     Subject ..> R0 : list
     Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-121-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueLookupService"] {
-        <<inferred_export>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["issueLookupService.list.<br/>shape1"] {
-        <<reference>>
-    }
-    Subject ..> R0 : list
-    Subject ..> R1 : list
+    Subject ..> R2 : list
 ```
 
 ## issueLookupService.list.shape1
@@ -7281,11 +4497,11 @@ classDiagram
 | --- | --- | --- |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `data` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-122-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-122-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueLookupService.list.<br/>shape1"] {
         <<inferred_object>>
         data: LookupItem[]
@@ -7314,37 +4530,24 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `list` |
 | dependency | [IssueQuery](../../../../../src/modules/issues/issue.ts) | `list` |
-| dependency | `AbortSignal` | `list` |
-| dependency | `Promise` | `list` |
 | dependency | [issueService.list.shape1](../../../../../src/modules/issues/services/issueService.ts) | `list` |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `get` |
-| dependency | `AbortSignal` | `get` |
-| dependency | `Promise` | `get` |
-| dependency | `IssueDocument` | `get` |
 | dependency | [issueService.save.options.shape2](../../../../../src/modules/issues/services/issueService.ts) | `save` |
-| dependency | `Promise` | `save` |
-| dependency | `MutationConfirmation` | `save` |
 | dependency | [issueService.returnDetail.options.shape3](../../../../../src/modules/issues/services/issueService.ts) | `returnDetail` |
-| dependency | `Promise` | `returnDetail` |
-| dependency | `MutationConfirmation` | `returnDetail` |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `export` |
 | dependency | [IssueQuery](../../../../../src/modules/issues/issue.ts) | `export` |
 | dependency | [ReportScope](../../../../../src/shared/report.ts) | `export` |
-| dependency | `AbortSignal` | `export` |
-| dependency | `Promise` | `export` |
-| dependency | `Blob` | `export` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-123-1`. Parte 1/11.
+**Figura:** `DIA-VUE-TS-ISSUES-123-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueService"] {
         <<inferred_export>>
         list: callback
         get: callback
         save: callback
-        returnDetail: callback
         export: callback
     }
     class R0["IssueResource"] {
@@ -7353,184 +4556,39 @@ classDiagram
     class R1["IssueQuery"] {
         <<reference>>
     }
-    Subject ..> R0 : list
-    Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-2`. Parte 2/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
+    class R2["issueService.list.shape1"] {
         <<reference>>
     }
-    class R1["Promise"] {
+    class R3["issueService.save.options.<br/>shape2"] {
         <<reference>>
     }
     Subject ..> R0 : list
     Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-3`. Parte 3/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["issueService.list.shape1"] {
-        <<reference>>
-    }
-    class R1["IssueResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : list
-    Subject ..> R1 : get
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-4`. Parte 4/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
+    Subject ..> R2 : list
     Subject ..> R0 : get
-    Subject ..> R1 : get
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-5`. Parte 5/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["IssueDocument"] {
-        <<reference>>
-    }
-    class R1["issueService.save.options.<br/>shape2"] {
-        <<reference>>
-    }
-    Subject ..> R0 : get
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-6`. Parte 6/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["MutationConfirmation"] {
-        <<reference>>
-    }
-    Subject ..> R0 : save
-    Subject ..> R1 : save
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-7`. Parte 7/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["issueService.returnDetail.<br/>options.shape3"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : returnDetail
-    Subject ..> R1 : returnDetail
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-8`. Parte 8/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["MutationConfirmation"] {
-        <<reference>>
-    }
-    class R1["IssueResource"] {
-        <<reference>>
-    }
-    Subject ..> R0 : returnDetail
+    Subject ..> R3 : save
+    Subject ..> R0 : export
     Subject ..> R1 : export
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-123-9`. Parte 9/11.
+**Figura:** `DIA-VUE-TS-ISSUES-123-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueService"] {
         <<inferred_export>>
+        returnDetail: callback
+        export: callback
     }
-    class R0["IssueQuery"] {
+    class R0["issueService.returnDetail.<br/>options.shape3"] {
         <<reference>>
     }
     class R1["ReportScope"] {
         <<reference>>
     }
-    Subject ..> R0 : export
+    Subject ..> R0 : returnDetail
     Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-10`. Parte 10/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
-    Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-123-11`. Parte 11/11.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService"] {
-        <<inferred_export>>
-    }
-    class R0["Blob"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
 ```
 
 ## issueService.list.shape1
@@ -7543,25 +4601,17 @@ classDiagram
 | `recordsFiltered` | `recordsFiltered: number;` |
 | `recordsTotal` | `recordsTotal: number;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `IssueRow` | `data` |
-
-**Figura:** `DIA-VUE-TS-ISSUES-124-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-ISSUES-124-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueService.list.shape1"] {
         <<inferred_object>>
         data: IssueRow[]
         recordsFiltered: number
         recordsTotal: number
     }
-    class R0["IssueRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## issueService.save.options.shape2
@@ -7579,14 +4629,12 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 | dependency | [IssueWriteTarget](../../../../../src/modules/issues/issue.ts) | `target` |
-| dependency | `Record` | `payload` |
-| dependency | `AbortSignal` | `signal` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-125-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-125-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueService.save.options.<br/>shape2"] {
         <<inferred_object>>
         resource: IssueResource
@@ -7604,24 +4652,6 @@ classDiagram
     Subject ..> R1 : target
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-125-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService.save.options.<br/>shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Record"] {
-        <<reference>>
-    }
-    class R1["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : payload
-    Subject ..> R1 : signal
-```
-
 ## issueService.returnDetail.options.shape3
 
 **Fuente:** [src/modules/issues/services/issueService.ts](../../../../../src/modules/issues/services/issueService.ts) · línea 42, columna 14. **Declaración:** inferred object.
@@ -7637,14 +4667,12 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
-| dependency | `Record` | `payload` |
-| dependency | `AbortSignal` | `signal` |
 
-**Figura:** `DIA-VUE-TS-ISSUES-126-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-ISSUES-126-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["issueService.returnDetail.<br/>options.shape3"] {
         <<inferred_object>>
         resource: IssueResource
@@ -7656,23 +4684,5 @@ classDiagram
     class R0["IssueResource"] {
         <<reference>>
     }
-    class R1["Record"] {
-        <<reference>>
-    }
     Subject ..> R0 : resource
-    Subject ..> R1 : payload
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-126-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["issueService.returnDetail.<br/>options.shape3"] {
-        <<inferred_object>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signal
 ```

@@ -29,6 +29,8 @@ const namedType = (node) =>
     ts.isClassDeclaration(node) ||
     ts.isEnumDeclaration(node);
 const key = (file, position) => file + ':' + position;
+const diagramMemberLimit = 16;
+const diagramTargetLimit = 4;
 
 /** Inspect declared contracts; never infer business relationships from names or IDs. */
 export const inspectTypeSource = (file, content) => {
@@ -483,13 +485,46 @@ export const buildTypeModel = async (frontRoot) => {
                 ...new Map(edges.map((edge) => [JSON.stringify(edge), edge])).values(),
             ];
         }
+    const localContracts = new Set(contracts.map((contract) => contract.id));
+    for (const contract of contracts)
+        contract.edges = contract.edges.filter((edge) => localContracts.has(edge.target.id));
     return { files: files.length, contracts };
+};
+
+const diagramParts = (contract) => {
+    const parts = [];
+    const refersToMember = (edge, member) =>
+        edge.role === member.name ||
+        edge.role.startsWith(member.name + '.') ||
+        edge.role.startsWith(member.name + ' typeof');
+    for (let start = 0; start < Math.max(1, contract.members.length); start += diagramMemberLimit) {
+        const members = contract.members.slice(start, start + diagramMemberLimit);
+        const edges = contract.edges.filter(
+            (edge) =>
+                members.some((member) => refersToMember(edge, member)) ||
+                (start === 0 && !contract.members.some((member) => refersToMember(edge, member))),
+        );
+        const targets = [...new Set(edges.map((edge) => edge.target.id))];
+        for (let offset = 0; offset < Math.max(1, targets.length); offset += diagramTargetLimit) {
+            const selected = new Set(targets.slice(offset, offset + diagramTargetLimit));
+            const selectedEdges = edges.filter((edge) => selected.has(edge.target.id));
+            parts.push({
+                members: members.filter(
+                    (member) =>
+                        selectedEdges.some((edge) => refersToMember(edge, member)) ||
+                        (offset === 0 && !edges.some((edge) => refersToMember(edge, member))),
+                ),
+                edges: selectedEdges,
+            });
+        }
+    }
+    return parts;
 };
 
 const diagram = (contract, members, edges) => {
     const lines = [
         'classDiagram',
-        '    direction TB',
+        '    direction LR',
         '    class Subject[' + label(contract.name) + '] {',
         '        <<' + contract.kind.replaceAll(' ', '_') + '>>',
     ];
@@ -549,11 +584,7 @@ export const renderTypeReference = async (frontRoot) => {
             '',
             'Generado con `npm run docs:generate`. No editar manualmente.',
             '',
-            'Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.',
-            'Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.',
-            'Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.',
-            '',
-            '[Lectura y cobertura](index.md).',
+            '[Alcance y notación](index.md#alcance-y-notación).',
             '',
         ];
         for (const [number, contract] of contracts.entries()) {
@@ -610,12 +641,8 @@ export const renderTypeReference = async (frontRoot) => {
                 }
                 lines.push('');
             }
-            const parts = Math.max(
-                1,
-                Math.ceil(contract.members.length / 8),
-                Math.ceil(contract.edges.length / 2),
-            );
-            for (let part = 0; part < parts; part++) {
+            const parts = diagramParts(contract);
+            for (const [part, content] of parts.entries()) {
                 lines.push(
                     '**Figura:** `DIA-VUE-TS-' +
                         area.toUpperCase() +
@@ -623,18 +650,11 @@ export const renderTypeReference = async (frontRoot) => {
                         (number + 1) +
                         '-' +
                         (part + 1) +
-                        '`. Parte ' +
-                        (part + 1) +
-                        '/' +
-                        parts +
-                        '.',
+                        '`.' +
+                        (parts.length > 1 ? ' Parte ' + (part + 1) + '/' + parts.length + '.' : ''),
                     '',
                     fence + 'mermaid',
-                    diagram(
-                        contract,
-                        contract.members.slice(part * 8, part * 8 + 8),
-                        contract.edges.slice(part * 2, part * 2 + 2),
-                    ),
+                    diagram(contract, content.members, content.edges),
                     fence,
                     '',
                 );
@@ -673,11 +693,19 @@ export const renderTypeReference = async (frontRoot) => {
             '## Alcance y notación',
             '',
             'Incluye interfaces, aliases, clases, enums, props/eventos/slots tipados y objetos inline declarados en tipos. También inspecciona objetos públicos y retornos públicos de objeto mediante el checker de TypeScript.',
-            'Cada miembro directo conserva su firma completa. Las propiedades heredadas se consultan siguiendo `extends`.',
+            'Cada miembro directo conserva su firma completa. La herencia local se consulta siguiendo extends; las bases externas sólo se nombran en la declaración del contrato.',
             'Los aliases conservan uniones, intersecciones, keyof, Record, Pick, Exclude y ReturnType tal como están declarados.',
             'Las relaciones se obtienen de referencias de tipo y de las cláusulas extends/implements, no de campos cuyo nombre termine en Id.',
             'Asociación: propiedad estructural con multiplicidad. Dependencia discontinua: uso de un tipo, callback, unión o parámetro genérico.',
-            'Un destino sin ficha local es una referencia externa, un valor de typeof o un parámetro genérico; no se expande el código de dependencias. Los saltos de línea de las etiquetas sólo distribuyen su nombre para facilitar lectura.',
+            'Las figuras y las tablas de relaciones sólo incluyen contratos identificados en src/. Incluyen los modelos del negocio y los contratos propios de componentes, transporte y coordinación, que permiten explicar los patrones aplicados.',
+            'Las tecnologías utilizadas son Vue, TypeScript, Axios y VeeValidate. Sus clases externas no se dibujan; sus tipos y utilidades conservan el nombre en las firmas únicamente cuando el contrato lo necesita.',
+            'Los destinos sin atributos remiten a su propia ficha local. Los saltos de línea de las etiquetas sólo distribuyen su nombre para facilitar lectura.',
+            'La división por ámbito sigue las carpetas de src/. Cada contrato se presenta en una figura mientras no supere ' +
+                diagramMemberLimit +
+                ' miembros o ' +
+                diagramTargetLimit +
+                ' destinos distintos por grupo. Los contratos mayores se dividen para mantener legible la exportación; las propiedades se agrupan con sus relaciones. Las partes se numeran únicamente cuando hay varias figuras del mismo contrato.',
+            'Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.',
             'Las formas object/callback/tuple/complex en una figura remiten a la firma completa de su tabla; no se omite ningún miembro.',
             'Las firmas inferidas sin anotación se identifican como inferred/signature; los estados inferidos de funciones se distinguen de las interfaces escritas explícitamente en el código.',
             'Los contratos SFC nombrados por contexto son formas estructurales, no clases de componentes Vue.',

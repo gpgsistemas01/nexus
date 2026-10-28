@@ -54,7 +54,7 @@ conecta el esquema a `useForm`, sin validar al montar.
 para alta/edición. La adaptación `mensaje || true` pertenece a VeeValidate;
 los predicados públicos devuelven mensaje o `null`. `getValues` evita validar una
 instantánea anterior. Los tipos discriminados de `issue.ts`/`purchase.ts` expresan
-operaciones admitidas en TypeScript; la comprobación de HTTP sigue en Express.
+operaciones admitidas en TypeScript; la validación definitiva de cada petición HTTP corresponde a la API.
 
 [issueTest](../../../../../tests/unit/modules/issues/issueTest.ts),
 [purchaseTest](../../../../../tests/unit/modules/purchases/purchaseTest.ts) y las

@@ -2,11 +2,7 @@
 
 Generado con `npm run docs:generate`. No editar manualmente.
 
-Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.
-Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.
-Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.
-
-[Lectura y cobertura](index.md).
+[Alcance y notación](index.md#alcance-y-notación).
 
 ## InventoryEditor.defineProps
 
@@ -32,18 +28,15 @@ Los objetos inline declarados muestran contexto, línea y columna. Las formas in
 | --- | --- | --- |
 | association | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `sections` |
 | dependency | [InventoryValues](../../../../../src/modules/warehouse/inventory.ts) | `values` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `errors` |
-| dependency | `Record` | `lookups` |
 | dependency | [LookupState](../../../../../src/shared/lookup.ts) | `lookups` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `supplier` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-1-1`. Parte 1/4.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-1-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryEditor.defineProps"] {
         <<SFC_contract>>
         title: string
@@ -54,6 +47,10 @@ classDiagram
         message: string
         isSubmitting: boolean
         isPending: boolean
+        isConflicted: boolean
+        isConfirmingDuplicate?: boolean
+        lookups: Record~string, LookupState~
+        canCreateSupplier?: boolean
     }
     class R0["InventoryFormSection"] {
         <<reference>>
@@ -61,67 +58,31 @@ classDiagram
     class R1["InventoryValues"] {
         <<reference>>
     }
+    class R2["InventoryField"] {
+        <<reference>>
+    }
+    class R3["LookupState"] {
+        <<reference>>
+    }
     Subject "1" --> "0..*" R0 : sections
     Subject ..> R1 : values
+    Subject ..> R2 : errors
+    Subject ..> R3 : lookups
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-1-2`. Parte 2/4.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-1-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryEditor.defineProps"] {
         <<SFC_contract>>
-        isConflicted: boolean
-        isConfirmingDuplicate?: boolean
-        lookups: Record~string, LookupState~
         supplier?: LookupItem
-        canCreateSupplier?: boolean
     }
-    class R0["Partial"] {
+    class R0["LookupItem"] {
         <<reference>>
     }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-1-3`. Parte 3/4.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryEditor.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["InventoryField"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : lookups
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-1-4`. Parte 4/4.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryEditor.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    class R1["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : lookups
-    Subject "1" --> "0..1" R1 : supplier
+    Subject "1" --> "0..1" R0 : supplier
 ```
 
 ## InventoryEditor.defineEmits
@@ -148,11 +109,11 @@ classDiagram
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `more` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `retry` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-2-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-2-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryEditor.defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -163,41 +124,15 @@ classDiagram
         submit: tuple
         close: tuple
         reload: tuple
+        createSupplier: tuple
     }
     class R0["InventoryField"] {
         <<reference>>
     }
     Subject ..> R0 : update
     Subject ..> R0 : blur
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-2-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryEditor.defineEmits"] {
-        <<SFC_contract>>
-        createSupplier: tuple
-    }
-    class R0["InventoryField"] {
-        <<reference>>
-    }
     Subject ..> R0 : search
     Subject ..> R0 : more
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-2-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryEditor.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["InventoryField"] {
-        <<reference>>
-    }
     Subject ..> R0 : retry
 ```
 
@@ -216,11 +151,11 @@ classDiagram
 | --- | --- | --- |
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `suppliers` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-3-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-3-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryFilters.defineProps"] {
         <<SFC_contract>>
         supplierId: string
@@ -248,11 +183,11 @@ classDiagram
 | `clear` | `clear: [];` |
 | `refresh` | `refresh: [];` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-4-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-4-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryFilters.defineEmits"] {
         <<SFC_contract>>
         supplier: tuple
@@ -285,11 +220,11 @@ classDiagram
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `lookup` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `initialOption` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-5-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-5-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryFormField.<br/>defineProps"] {
         <<SFC_contract>>
         field: InventoryFieldSpec
@@ -306,22 +241,12 @@ classDiagram
     class R1["LookupState"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : field
-    Subject "1" --> "0..1" R1 : lookup
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-5-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryFormField.<br/>defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["LookupItem"] {
+    class R2["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : initialOption
+    Subject "1" --> "1" R0 : field
+    Subject "1" --> "0..1" R1 : lookup
+    Subject "1" --> "0..1" R2 : initialOption
 ```
 
 ## InventoryFormField.defineEmits
@@ -337,11 +262,11 @@ classDiagram
 | `retry` | `retry: [];` |
 | `create` | `create: [search: string];` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-6-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-6-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryFormField.<br/>defineEmits"] {
         <<SFC_contract>>
         update: tuple
@@ -364,11 +289,11 @@ classDiagram
 | `isExporting` | `isExporting: boolean;` |
 | `error` | `error: string` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-7-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-7-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryReportToolbar.<br/>defineProps"] {
         <<SFC_contract>>
         scope: string
@@ -387,11 +312,11 @@ classDiagram
 | `update:scope` | `'update:scope': [scope: string];` |
 | `export` | `export: []` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-8-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-8-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryReportToolbar.<br/>defineEmits"] {
         <<SFC_contract>>
         update:scope: tuple
@@ -414,11 +339,11 @@ classDiagram
 | association | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `row` |
 | association | [InventoryPermissions](../../../../../src/modules/warehouse/inventory.ts) | `permissions` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-9-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-9-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryRowActions.<br/>defineProps"] {
         <<SFC_contract>>
         row: InventoryRow
@@ -447,11 +372,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [EditorTarget](../../../../../src/modules/warehouse/inventory.ts) | `action` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-10-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-10-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryRowActions.<br/>defineEmits"] {
         <<SFC_contract>>
         action: tuple
@@ -482,11 +407,11 @@ classDiagram
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
 | association | [InventoryQuery](../../../../../src/modules/warehouse/inventory.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-11-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-11-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryTable.defineProps"] {
         <<SFC_contract>>
         rows: InventoryRow[]
@@ -502,26 +427,16 @@ classDiagram
     class R1["InventoryPermissions"] {
         <<reference>>
     }
+    class R2["InventoryResource"] {
+        <<reference>>
+    }
+    class R3["InventoryQuery"] {
+        <<reference>>
+    }
     Subject "1" --> "0..*" R0 : rows
     Subject "1" --> "1" R1 : permissions
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-11-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryTable.defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["InventoryResource"] {
-        <<reference>>
-    }
-    class R1["InventoryQuery"] {
-        <<reference>>
-    }
-    Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : query
+    Subject ..> R2 : resource
+    Subject "1" --> "1" R3 : query
 ```
 
 ## InventoryTable.defineEmits
@@ -536,14 +451,13 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [EditorTarget](../../../../../src/modules/warehouse/inventory.ts) | `action` |
-| dependency | `Partial` | `query` |
 | dependency | [InventoryQuery](../../../../../src/modules/warehouse/inventory.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-12-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-12-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryTable.defineEmits"] {
         <<SFC_contract>>
         action: tuple
@@ -552,25 +466,11 @@ classDiagram
     class R0["EditorTarget"] {
         <<reference>>
     }
-    class R1["Partial"] {
+    class R1["InventoryQuery"] {
         <<reference>>
     }
     Subject ..> R0 : action
     Subject ..> R1 : query
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-12-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryTable.defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["InventoryQuery"] {
-        <<reference>>
-    }
-    Subject ..> R0 : query
 ```
 
 ## rowProps.{ item }@40:29
@@ -585,11 +485,11 @@ classDiagram
 | --- | --- | --- |
 | association | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `item` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-13-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-13-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["rowProps.{ item }@40:29"] {
         <<inline_object>>
         item: InventoryRow
@@ -624,11 +524,11 @@ classDiagram
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `initialSupplier` |
 | dependency | [StockAdditionTarget](../../../../../src/modules/warehouse/inventory.ts) | `onAddStock` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-14-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-14-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryEditor.<br/>options@25:45"] {
         <<inline_object>>
         resource: InventoryResource
@@ -639,6 +539,7 @@ classDiagram
         creationContext?: 'goodsReceipt'
         initialSupplier?: LookupItem
         canAddStock?: boolean
+        onAddStock?: callback
     }
     class R0["InventoryResource"] {
         <<reference>>
@@ -646,38 +547,17 @@ classDiagram
     class R1["EditorTarget"] {
         <<reference>>
     }
+    class R2["LookupItem"] {
+        <<reference>>
+    }
+    class R3["StockAdditionTarget"] {
+        <<reference>>
+    }
     Subject ..> R0 : resource
     Subject ..> R1 : target
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-14-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.<br/>options@25:45"] {
-        <<inline_object>>
-        onAddStock?: callback
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : onSaved
-    Subject "1" --> "0..1" R0 : initialSupplier
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-14-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.<br/>options@25:45"] {
-        <<inline_object>>
-    }
-    class R0["StockAdditionTarget"] {
-        <<reference>>
-    }
-    Subject ..> R0 : onAddStock
+    Subject ..> R2 : onSaved
+    Subject "1" --> "0..1" R2 : initialSupplier
+    Subject ..> R3 : onAddStock
 ```
 
 ## useInventoryList.options@10:43
@@ -695,13 +575,12 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
-| dependency | `Ref` | `isPaused` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-15-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-15-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryList.<br/>options@10:43"] {
         <<inline_object>>
         resource: InventoryResource
@@ -713,11 +592,7 @@ classDiagram
     class R0["InventoryResource"] {
         <<reference>>
     }
-    class R1["Ref"] {
-        <<reference>>
-    }
     Subject ..> R0 : resource
-    Subject ..> R1 : isPaused
 ```
 
 ## useInventoryRemoval.options@8:46
@@ -734,11 +609,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-16-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-16-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryRemoval.<br/>options@8:46"] {
         <<inline_object>>
         resource: InventoryResource
@@ -767,11 +642,11 @@ classDiagram
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
 | association | [InventoryQuery](../../../../../src/modules/warehouse/inventory.ts) | `query` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-17-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-17-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryReport.<br/>options@5:45"] {
         <<inline_object>>
         resource: InventoryResource
@@ -808,16 +683,15 @@ classDiagram
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
 | dependency | [EditorTarget](../../../../../src/modules/warehouse/inventory.ts) | `target` |
 | dependency | [InventoryValues](../../../../../src/modules/warehouse/inventory.ts) | `values` |
-| dependency | `Ref` | `isPending` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `initialSupplier` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `setValue` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `clearError` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-18-1`. Parte 1/4.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-18-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventorySelection.<br/>options@14:48"] {
         <<inline_object>>
         resource: InventoryResource
@@ -825,8 +699,6 @@ classDiagram
         values: InventoryValues
         isPending: Ref~boolean~
         initialSupplier?: LookupItem
-        setValue: callback
-        clearError: callback
     }
     class R0["InventoryResource"] {
         <<reference>>
@@ -834,57 +706,32 @@ classDiagram
     class R1["EditorTarget"] {
         <<reference>>
     }
+    class R2["InventoryValues"] {
+        <<reference>>
+    }
+    class R3["LookupItem"] {
+        <<reference>>
+    }
     Subject ..> R0 : resource
     Subject ..> R1 : target
+    Subject ..> R2 : values
+    Subject "1" --> "0..1" R3 : initialSupplier
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-18-2`. Parte 2/4.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-18-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventorySelection.<br/>options@14:48"] {
         <<inline_object>>
-    }
-    class R0["InventoryValues"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : values
-    Subject ..> R1 : isPending
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-18-3`. Parte 3/4.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventorySelection.<br/>options@14:48"] {
-        <<inline_object>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    class R1["InventoryField"] {
-        <<reference>>
-    }
-    Subject "1" --> "0..1" R0 : initialSupplier
-    Subject ..> R1 : setValue
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-18-4`. Parte 4/4.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventorySelection.<br/>options@14:48"] {
-        <<inline_object>>
+        setValue: callback
+        clearError: callback
     }
     class R0["InventoryField"] {
         <<reference>>
     }
+    Subject ..> R0 : setValue
     Subject ..> R0 : clearError
 ```
 
@@ -900,28 +747,23 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `AbortSignal` | `signal` |
 | dependency | [StockAdditionTarget](../../../../../src/modules/warehouse/inventory.ts) | `onAddStock` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-19-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-19-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useWasteDuplicateRecovery.<br/>options@7:52"] {
         <<inline_object>>
         canAddStock: boolean
         signal: AbortSignal
         onAddStock?: callback
     }
-    class R0["AbortSignal"] {
+    class R0["StockAdditionTarget"] {
         <<reference>>
     }
-    class R1["StockAdditionTarget"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signal
-    Subject ..> R1 : onAddStock
+    Subject ..> R0 : onAddStock
 ```
 
 ## InventoryFieldSpec
@@ -943,11 +785,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `name` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-20-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-20-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryFieldSpec"] {
         <<interface>>
         name: InventoryField
@@ -974,11 +816,11 @@ classDiagram
 | `label` | `label: string;` |
 | `value` | `value: string;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-21-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-21-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventorySummaryItem"] {
         <<interface>>
         label: string
@@ -1003,11 +845,11 @@ classDiagram
 | association | [InventoryFieldSpec](../../../../../src/modules/warehouse/formFields.ts) | `fields` |
 | association | [InventorySummaryItem](../../../../../src/modules/warehouse/formFields.ts) | `summary` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-22-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-22-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryFormSection"] {
         <<interface>>
         id: string
@@ -1043,11 +885,11 @@ classDiagram
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `template` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `supplier` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-23-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-23-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.<br/>options@33:14"] {
         <<inline_object>>
         template?: LookupItem
@@ -1071,11 +913,11 @@ classDiagram
 | --- | --- |
 | `name` | `name?: string` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-24-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-24-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["isRoll@56:46"] {
         <<inline_object>>
         name?: string
@@ -1092,11 +934,11 @@ classDiagram
 'materials' | 'consumables' | 'wastes'
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-25-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-25-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryResource"] {
         <<type>>
     }
@@ -1112,11 +954,11 @@ classDiagram
 'create' | 'edit' | 'stock' | 'add-stock' | 'delete'
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-26-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-26-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryAction"] {
         <<type>>
     }
@@ -1132,11 +974,11 @@ classDiagram
 string | number | null
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-27-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-27-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["Numeric"] {
         <<type>>
     }
@@ -1189,11 +1031,11 @@ classDiagram
 | dependency | [Numeric](../../../../../src/modules/warehouse/inventory.ts) | `sampleLengthM` |
 | dependency | [Numeric](../../../../../src/modules/warehouse/inventory.ts) | `sampleNetWeightKg` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-28-1`. Parte 1/6.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-28-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryRow"] {
         <<interface>>
         id: string
@@ -1204,21 +1046,6 @@ classDiagram
         supplierName: string
         name: string
         presentationId: string
-    }
-    class R0["Numeric"] {
-        <<reference>>
-    }
-    Subject ..> R0 : base
-    Subject ..> R0 : height
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-28-2`. Parte 2/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryRow"] {
-        <<interface>>
         presentation: string
         unitMeasureId: string
         unitMeasure: string
@@ -1231,15 +1058,18 @@ classDiagram
     class R0["Numeric"] {
         <<reference>>
     }
+    Subject ..> R0 : base
+    Subject ..> R0 : height
     Subject ..> R0 : currentStock
     Subject ..> R0 : convertedQuantity
+    Subject ..> R0 : minStock
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-28-3`. Parte 3/6.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-28-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryRow"] {
         <<interface>>
         maxUnitCost?: Numeric
@@ -1250,56 +1080,16 @@ classDiagram
         weightKg: Numeric
         referenceRollTotalWeightKg: Numeric
         sampleLengthM: Numeric
-    }
-    class R0["Numeric"] {
-        <<reference>>
-    }
-    Subject ..> R0 : minStock
-    Subject ..> R0 : maxUnitCost
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-28-4`. Parte 4/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryRow"] {
-        <<interface>>
         sampleNetWeightKg: Numeric
     }
     class R0["Numeric"] {
         <<reference>>
     }
+    Subject ..> R0 : maxUnitCost
     Subject ..> R0 : coneWeightKg
     Subject ..> R0 : totalWeightKg
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-28-5`. Parte 5/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryRow"] {
-        <<interface>>
-    }
-    class R0["Numeric"] {
-        <<reference>>
-    }
     Subject ..> R0 : weightKg
     Subject ..> R0 : referenceRollTotalWeightKg
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-28-6`. Parte 6/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryRow"] {
-        <<interface>>
-    }
-    class R0["Numeric"] {
-        <<reference>>
-    }
     Subject ..> R0 : sampleLengthM
     Subject ..> R0 : sampleNetWeightKg
 ```
@@ -1317,11 +1107,11 @@ classDiagram
 | `direction` | `direction: 'asc' \| 'desc';` |
 | `orderColumn` | `orderColumn?: number;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-29-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-29-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryQuery"] {
         <<interface>>
         search: string
@@ -1347,11 +1137,11 @@ classDiagram
 | `canReadState` | `canReadState: boolean;` |
 | `canExport` | `canExport: boolean;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-30-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-30-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryPermissions"] {
         <<interface>>
         canRead: boolean
@@ -1377,15 +1167,13 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Partial` | `row` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `row` |
-| dependency | `Pick` | `row` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-31-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-31-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["StockAdditionTarget"] {
         <<interface>>
         action: 'add-stock'
@@ -1393,25 +1181,7 @@ classDiagram
         quantity?: string
         observations?: string
     }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : row
-    Subject ..> R1 : row
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-31-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["StockAdditionTarget"] {
-        <<interface>>
-    }
-    class R0["Pick"] {
+    class R0["InventoryRow"] {
         <<reference>>
     }
     Subject ..> R0 : row
@@ -1433,11 +1203,11 @@ classDiagram
 | dependency | [EditorTarget@60:7](../../../../../src/modules/warehouse/inventory.ts) | `type` |
 | dependency | [StockAdditionTarget](../../../../../src/modules/warehouse/inventory.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-32-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-32-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["EditorTarget"] {
         <<type>>
     }
@@ -1463,43 +1233,28 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Exclude` | `action` |
 | dependency | [InventoryAction](../../../../../src/modules/warehouse/inventory.ts) | `action` |
 | association | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `row` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-33-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-33-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["EditorTarget@60:7"] {
         <<inline_object>>
         action: Exclude~InventoryAction, 'add-stock'~
         row?: InventoryRow
         initialName?: string
     }
-    class R0["Exclude"] {
+    class R0["InventoryAction"] {
         <<reference>>
     }
-    class R1["InventoryAction"] {
+    class R1["InventoryRow"] {
         <<reference>>
     }
     Subject ..> R0 : action
-    Subject ..> R1 : action
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-33-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["EditorTarget@60:7"] {
-        <<inline_object>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    Subject "1" --> "0..1" R0 : row
+    Subject "1" --> "0..1" R1 : row
 ```
 
 ## InventoryField
@@ -1529,11 +1284,11 @@ classDiagram
     | 'referenceRollTotalWeightKg'
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-34-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-34-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryField"] {
         <<type>>
     }
@@ -1552,39 +1307,24 @@ Record<InventoryField, string | boolean>
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [InventoryValues.expanded](../../../../../src/modules/warehouse/inventory.ts) | `evaluated structure` |
-| dependency | `Record` | `type` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `type` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-35-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-35-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryValues"] {
         <<type>>
     }
     class R0["InventoryValues.expanded"] {
         <<reference>>
     }
-    class R1["Record"] {
+    class R1["InventoryField"] {
         <<reference>>
     }
     Subject ..> R0 : evaluated structure
     Subject ..> R1 : type
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-35-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryValues"] {
-        <<type>>
-    }
-    class R0["InventoryField"] {
-        <<reference>>
-    }
-    Subject ..> R0 : type
 ```
 
 ## InventoryPayload
@@ -1597,22 +1337,14 @@ classDiagram
 Record<string, string | number | boolean | null>
 ```
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `type` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-36-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-36-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryPayload"] {
         <<type>>
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : type
 ```
 
 ## InventoryEditorPage.defineProps
@@ -1635,11 +1367,11 @@ classDiagram
 | dependency | [EditorTarget](../../../../../src/modules/warehouse/inventory.ts) | `target` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `initialSupplier` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-37-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-37-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryEditorPage.<br/>defineProps"] {
         <<SFC_contract>>
         resource: InventoryResource
@@ -1656,22 +1388,12 @@ classDiagram
     class R1["EditorTarget"] {
         <<reference>>
     }
-    Subject ..> R0 : resource
-    Subject ..> R1 : target
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-37-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryEditorPage.<br/>defineProps"] {
-        <<SFC_contract>>
-    }
-    class R0["LookupItem"] {
+    class R2["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : initialSupplier
+    Subject ..> R0 : resource
+    Subject ..> R1 : target
+    Subject "1" --> "0..1" R2 : initialSupplier
 ```
 
 ## InventoryEditorPage.defineEmits
@@ -1693,11 +1415,11 @@ classDiagram
 | dependency | [StockAdditionTarget](../../../../../src/modules/warehouse/inventory.ts) | `addStock` |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createSupplier` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-38-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-38-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryEditorPage.<br/>defineEmits"] {
         <<SFC_contract>>
         saved: tuple
@@ -1713,22 +1435,12 @@ classDiagram
     class R1["StockAdditionTarget"] {
         <<reference>>
     }
-    Subject ..> R0 : saved
-    Subject ..> R1 : addStock
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-38-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryEditorPage.<br/>defineEmits"] {
-        <<SFC_contract>>
-    }
-    class R0["LookupCreation"] {
+    class R2["LookupCreation"] {
         <<reference>>
     }
-    Subject ..> R0 : createSupplier
+    Subject ..> R0 : saved
+    Subject ..> R1 : addStock
+    Subject ..> R2 : createSupplier
 ```
 
 ## InventoryPage.defineProps
@@ -1743,11 +1455,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-39-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-39-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryPage.defineProps"] {
         <<SFC_contract>>
         resource: InventoryResource
@@ -1770,11 +1482,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createSupplier` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-40-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-40-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryPage.defineEmits"] {
         <<SFC_contract>>
         createSupplier: tuple
@@ -1794,11 +1506,11 @@ classDiagram
 | `code` | `code: string;` |
 | `material` | `material?: unknown` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-41-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-41-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["apiClient.request@42:48"] {
         <<inline_object>>
         code: string
@@ -1834,34 +1546,18 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [EditorTarget](../../../../../src/modules/warehouse/inventory.ts) | `openEditor` |
-| dependency | `Ref` | `isExporting` |
-| dependency | `Ref` | `exportError` |
-| dependency | `Promise` | `exportReport` |
 | dependency | [useInventory.return.suppliers.shape1](../../../../../src/modules/warehouse/composables/useInventory.ts) | `suppliers` |
-| dependency | `ShallowReactive` | `query` |
-| dependency | `InventoryQuery` | `query` |
-| dependency | `ShallowRef` | `rows` |
-| dependency | `InventoryRow` | `rows` |
-| dependency | `Ref` | `total` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `isRefreshing` |
-| dependency | `Ref` | `error` |
-| dependency | `Promise` | `load` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Partial` | `applyQuery` |
-| dependency | `InventoryQuery` | `applyQuery` |
 | association | [useInventory.return.config.shape4](../../../../../src/modules/warehouse/composables/useInventory.ts) | `config` |
 | association | [useInventory.return.config.shape5](../../../../../src/modules/warehouse/composables/useInventory.ts) | `config` |
 | association | [useInventory.return.config.shape6](../../../../../src/modules/warehouse/composables/useInventory.ts) | `config` |
 | association | [useInventory.return.permissions.shape7](../../../../../src/modules/warehouse/composables/useInventory.ts) | `permissions` |
-| dependency | `ShallowRef` | `editor` |
 | dependency | [EditorTarget](../../../../../src/modules/warehouse/inventory.ts) | `editor` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-1`. Parte 1/12.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-42-1`. Parte 1/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventory.return"] {
         <<inferred_return>>
         openEditor: callback
@@ -1872,24 +1568,6 @@ classDiagram
         suppliers: callback
         query: ShallowReactive~InventoryQuery~
         rows: ShallowRef~InventoryRow[], InventoryRow[]~
-    }
-    class R0["EditorTarget"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : openEditor
-    Subject ..> R1 : isExporting
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-2`. Parte 2/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
         total: Ref~number, number~
         isLoading: Ref~boolean, boolean~
         isRefreshing: Ref~boolean, boolean~
@@ -1899,189 +1577,57 @@ classDiagram
         applyQuery: callback
         config: object
     }
-    class R0["Ref"] {
+    class R0["EditorTarget"] {
         <<reference>>
     }
-    class R1["Promise"] {
+    class R1["useInventory.return.<br/>suppliers.shape1"] {
         <<reference>>
     }
-    Subject ..> R0 : exportError
-    Subject ..> R1 : exportReport
+    class R2["useInventory.return.config.<br/>shape4"] {
+        <<reference>>
+    }
+    class R3["useInventory.return.config.<br/>shape5"] {
+        <<reference>>
+    }
+    Subject ..> R0 : openEditor
+    Subject ..> R1 : suppliers
+    Subject "1" --> "0..1" R2 : config
+    Subject "1" --> "0..1" R3 : config
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-3`. Parte 3/12.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-42-2`. Parte 2/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
+    class Subject["useInventory.return"] {
+        <<inferred_return>>
+        config: object
+    }
+    class R0["useInventory.return.config.<br/>shape6"] {
+        <<reference>>
+    }
+    Subject "1" --> "0..1" R0 : config
+```
+
+**Figura:** `DIA-VUE-TS-WAREHOUSE-42-3`. Parte 3/3.
+
+```mermaid
+classDiagram
+    direction LR
     class Subject["useInventory.return"] {
         <<inferred_return>>
         permissions: object
         editor: complex
     }
-    class R0["useInventory.return.<br/>suppliers.shape1"] {
-        <<reference>>
-    }
-    class R1["ShallowReactive"] {
-        <<reference>>
-    }
-    Subject ..> R0 : suppliers
-    Subject ..> R1 : query
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-4`. Parte 4/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryQuery"] {
-        <<reference>>
-    }
-    class R1["ShallowRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : query
-    Subject ..> R1 : rows
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-5`. Parte 5/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : rows
-    Subject ..> R1 : total
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-6`. Parte 6/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : isRefreshing
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-7`. Parte 7/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : error
-    Subject ..> R1 : load
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-8`. Parte 8/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R1 : applyQuery
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-9`. Parte 9/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryQuery"] {
-        <<reference>>
-    }
-    class R1["useInventory.return.config.<br/>shape4"] {
-        <<reference>>
-    }
-    Subject ..> R0 : applyQuery
-    Subject "1" --> "0..1" R1 : config
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-10`. Parte 10/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
-    class R0["useInventory.return.config.<br/>shape5"] {
-        <<reference>>
-    }
-    class R1["useInventory.return.config.<br/>shape6"] {
-        <<reference>>
-    }
-    Subject "1" --> "0..1" R0 : config
-    Subject "1" --> "0..1" R1 : config
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-11`. Parte 11/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
     class R0["useInventory.return.<br/>permissions.shape7"] {
         <<reference>>
     }
-    class R1["ShallowRef"] {
+    class R1["EditorTarget"] {
         <<reference>>
     }
     Subject "1" --> "1" R0 : permissions
     Subject ..> R1 : editor
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-42-12`. Parte 12/12.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return"] {
-        <<inferred_return>>
-    }
-    class R0["EditorTarget"] {
-        <<reference>>
-    }
-    Subject ..> R0 : editor
 ```
 
 ## useInventory.return.suppliers.shape1
@@ -2103,25 +1649,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useInventory.return.suppliers.items.shape2](../../../../../src/modules/warehouse/composables/useInventory.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useInventory.return.suppliers.items.shape3](../../../../../src/modules/warehouse/composables/useInventory.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-43-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-43-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventory.return.<br/>suppliers.shape1"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -2132,46 +1667,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-43-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useInventory.return.<br/>suppliers.items.shape2"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-43-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useInventory.return.<br/>suppliers.items.shape2"] {
         <<reference>>
     }
     class R1["useInventory.return.<br/>suppliers.items.shape3"] {
@@ -2179,65 +1678,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-43-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-43-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-43-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-43-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventory.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useInventory.return.suppliers.items.shape2
@@ -2251,15 +1691,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-44-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-44-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventory.return.<br/>suppliers.items.shape2"] {
         <<inferred_object>>
         id: string
@@ -2267,10 +1703,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useInventory.return.suppliers.items.shape3
@@ -2284,15 +1716,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-45-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-45-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventory.return.<br/>suppliers.items.shape3"] {
         <<inferred_object>>
         id: string
@@ -2300,10 +1728,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useInventory.return.config.shape4
@@ -2319,11 +1743,11 @@ classDiagram
 | `write` | `readonly write: "materials:write";` |
 | `adjust` | `readonly adjust: "materials:adjust-stock";` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-46-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-46-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventory.return.config.<br/>shape4"] {
         <<inferred_object>>
         title: "Materiales"
@@ -2348,11 +1772,11 @@ classDiagram
 | `write` | `readonly write: "materials:write";` |
 | `adjust` | `readonly adjust: "materials:adjust-stock";` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-47-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-47-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventory.return.config.<br/>shape5"] {
         <<inferred_object>>
         title: "Consumibles"
@@ -2377,11 +1801,11 @@ classDiagram
 | `write` | `readonly write: "wastes:write";` |
 | `adjust` | `readonly adjust: "wastes:adjust-stock";` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-48-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-48-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventory.return.config.<br/>shape6"] {
         <<inferred_object>>
         title: "Mermas"
@@ -2407,11 +1831,11 @@ classDiagram
 | `canReadState` | `canReadState: boolean;` |
 | `canExport` | `canExport: boolean;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-49-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-49-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventory.return.<br/>permissions.shape7"] {
         <<inferred_object>>
         canRead: boolean
@@ -2453,39 +1877,22 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [InventoryValues](../../../../../src/modules/warehouse/inventory.ts) | `values` |
-| dependency | `ComputedRef` | `errors` |
-| dependency | `Partial` | `errors` |
-| dependency | `Record` | `errors` |
-| dependency | `Ref` | `message` |
-| dependency | `Ref` | `isSubmitting` |
-| dependency | `Ref` | `isPending` |
-| dependency | `Ref` | `isConflicted` |
-| dependency | `Ref` | `isConfirmingDuplicate` |
-| dependency | `ComputedRef` | `lookups` |
 | dependency | [useInventoryEditor.return.lookups.shape1](../../../../../src/modules/warehouse/composables/useInventoryEditor.ts) | `lookups` |
-| dependency | `ComputedRef` | `preview` |
 | dependency | [useInventoryEditor.return.preview.shape2](../../../../../src/modules/warehouse/composables/useInventoryEditor.ts) | `preview` |
-| dependency | `ShallowRef` | `selectedTemplate` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `selectedTemplate` |
-| dependency | `ShallowRef` | `selectedSupplier` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `selectedSupplier` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `selectCreatedSupplier` |
-| dependency | `ComputedRef` | `usesMeasurements` |
-| dependency | `Promise` | `submit` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `update` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `blur` |
-| dependency | `Promise` | `blur` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `searchLookup` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `loadMore` |
-| dependency | `Promise` | `loadMore` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `retryLookup` |
-| dependency | `Promise` | `retryLookup` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-1`. Parte 1/14.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-50-1`. Parte 1/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryEditor.return"] {
         <<inferred_return>>
         values: InventoryValues
@@ -2496,188 +1903,42 @@ classDiagram
         isConflicted: Ref~boolean, boolean~
         isConfirmingDuplicate: Ref~boolean, boolean~
         lookups: object
-    }
-    class R0["InventoryValues"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : values
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-2`. Parte 2/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
         preview: object
         selectedTemplate: complex
         selectedSupplier: complex
         selectCreatedSupplier: callback
         usesMeasurements: ComputedRef~boolean~
         submit: callback
+    }
+    class R0["InventoryValues"] {
+        <<reference>>
+    }
+    class R1["useInventoryEditor.return.<br/>lookups.shape1"] {
+        <<reference>>
+    }
+    class R2["useInventoryEditor.return.<br/>preview.shape2"] {
+        <<reference>>
+    }
+    class R3["LookupItem"] {
+        <<reference>>
+    }
+    Subject ..> R0 : values
+    Subject ..> R1 : lookups
+    Subject ..> R2 : preview
+    Subject ..> R3 : selectedTemplate
+    Subject ..> R3 : selectedSupplier
+    Subject ..> R3 : selectCreatedSupplier
+```
+
+**Figura:** `DIA-VUE-TS-WAREHOUSE-50-2`. Parte 2/3.
+
+```mermaid
+classDiagram
+    direction LR
+    class Subject["useInventoryEditor.return"] {
+        <<inferred_return>>
         update: callback
         blur: callback
-    }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : errors
-    Subject ..> R1 : errors
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-3`. Parte 3/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-        searchLookup: callback
-        loadMore: callback
-        retryLookup: callback
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : message
-    Subject ..> R0 : isSubmitting
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-4`. Parte 4/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isPending
-    Subject ..> R0 : isConflicted
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-5`. Parte 5/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isConfirmingDuplicate
-    Subject ..> R1 : lookups
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-6`. Parte 6/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["useInventoryEditor.return.<br/>lookups.shape1"] {
-        <<reference>>
-    }
-    class R1["ComputedRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : lookups
-    Subject ..> R1 : preview
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-7`. Parte 7/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["useInventoryEditor.return.<br/>preview.shape2"] {
-        <<reference>>
-    }
-    class R1["ShallowRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : preview
-    Subject ..> R1 : selectedTemplate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-8`. Parte 8/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    class R1["ShallowRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : selectedTemplate
-    Subject ..> R1 : selectedSupplier
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-9`. Parte 9/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : selectedSupplier
-    Subject ..> R0 : selectCreatedSupplier
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-10`. Parte 10/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : usesMeasurements
-    Subject ..> R1 : submit
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-11`. Parte 11/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
     }
     class R0["InventoryField"] {
         <<reference>>
@@ -2686,58 +1947,23 @@ classDiagram
     Subject ..> R0 : blur
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-12`. Parte 12/14.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-50-3`. Parte 3/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryEditor.return"] {
         <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["InventoryField"] {
-        <<reference>>
-    }
-    Subject ..> R0 : blur
-    Subject ..> R1 : searchLookup
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-13`. Parte 13/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
+        searchLookup: callback
+        loadMore: callback
+        retryLookup: callback
     }
     class R0["InventoryField"] {
         <<reference>>
     }
-    class R1["Promise"] {
-        <<reference>>
-    }
+    Subject ..> R0 : searchLookup
     Subject ..> R0 : loadMore
-    Subject ..> R1 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-50-14`. Parte 14/14.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryEditor.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryField"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
     Subject ..> R0 : retryLookup
-    Subject ..> R1 : retryLookup
 ```
 
 ## useInventoryEditor.return.lookups.shape1
@@ -2748,23 +1974,15 @@ classDiagram
 | --- | --- |
 | `signature` | `[k: string]: LookupState;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `LookupState` | `signature` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-51-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-51-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryEditor.return.<br/>lookups.shape1"] {
         <<inferred_object>>
         signature: LookupState
     }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
 ```
 
 ## useInventoryEditor.return.preview.shape2
@@ -2778,11 +1996,11 @@ classDiagram
 | `base` | `base: string \| number \| boolean \| null;` |
 | `height` | `height: string \| number \| boolean \| null;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-52-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-52-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryEditor.return.<br/>preview.shape2"] {
         <<inferred_object>>
         isRoll: boolean
@@ -2812,24 +2030,15 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [useInventoryList.return.suppliers.shape1](../../../../../src/modules/warehouse/composables/useInventoryList.ts) | `suppliers` |
-| dependency | `ShallowReactive` | `query` |
 | dependency | [InventoryQuery](../../../../../src/modules/warehouse/inventory.ts) | `query` |
-| dependency | `ShallowRef` | `rows` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `rows` |
-| dependency | `Ref` | `total` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `isRefreshing` |
-| dependency | `Ref` | `error` |
-| dependency | `Promise` | `load` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Partial` | `applyQuery` |
 | dependency | [InventoryQuery](../../../../../src/modules/warehouse/inventory.ts) | `applyQuery` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-53-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-53-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryList.return"] {
         <<inferred_return>>
         suppliers: callback
@@ -2840,118 +2049,22 @@ classDiagram
         isRefreshing: Ref~boolean, boolean~
         error: Ref~string, string~
         load: callback
+        refresh: callback
+        applyQuery: callback
     }
     class R0["useInventoryList.return.<br/>suppliers.shape1"] {
         <<reference>>
     }
-    class R1["ShallowReactive"] {
+    class R1["InventoryQuery"] {
+        <<reference>>
+    }
+    class R2["InventoryRow"] {
         <<reference>>
     }
     Subject ..> R0 : suppliers
     Subject ..> R1 : query
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-53-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return"] {
-        <<inferred_return>>
-        refresh: callback
-        applyQuery: callback
-    }
-    class R0["InventoryQuery"] {
-        <<reference>>
-    }
-    class R1["ShallowRef"] {
-        <<reference>>
-    }
-    Subject ..> R0 : query
-    Subject ..> R1 : rows
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-53-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : rows
-    Subject ..> R1 : total
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-53-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : isRefreshing
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-53-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return"] {
-        <<inferred_return>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : error
-    Subject ..> R1 : load
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-53-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["Partial"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
+    Subject ..> R2 : rows
     Subject ..> R1 : applyQuery
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-53-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryQuery"] {
-        <<reference>>
-    }
-    Subject ..> R0 : applyQuery
 ```
 
 ## useInventoryList.return.suppliers.shape1
@@ -2973,25 +2086,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `state` |
-| dependency | `LookupState` | `state` |
-| dependency | `Ref` | `items` |
 | dependency | [useInventoryList.return.suppliers.items.shape2](../../../../../src/modules/warehouse/composables/useInventoryList.ts) | `items` |
-| dependency | `LookupItem` | `items` |
 | dependency | [useInventoryList.return.suppliers.items.shape3](../../../../../src/modules/warehouse/composables/useInventoryList.ts) | `items` |
-| dependency | `Ref` | `isLoading` |
-| dependency | `Ref` | `error` |
-| dependency | `Ref` | `search` |
-| dependency | `Ref` | `hasMore` |
-| dependency | `Promise` | `refresh` |
-| dependency | `Promise` | `loadMore` |
-| dependency | `Promise` | `retry` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-54-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-54-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryList.return.<br/>suppliers.shape1"] {
         <<inferred_object>>
         state: ComputedRef~LookupState~
@@ -3002,46 +2104,10 @@ classDiagram
         hasMore: Ref~boolean, boolean~
         updateSearch: callback
         refresh: callback
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : state
-    Subject ..> R1 : state
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-54-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
         loadMore: callback
         retry: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["useInventoryList.return.<br/>suppliers.items.shape2"] {
-        <<reference>>
-    }
-    Subject ..> R0 : items
-    Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-54-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["LookupItem"] {
+    class R0["useInventoryList.return.<br/>suppliers.items.shape2"] {
         <<reference>>
     }
     class R1["useInventoryList.return.<br/>suppliers.items.shape3"] {
@@ -3049,65 +2115,6 @@ classDiagram
     }
     Subject ..> R0 : items
     Subject ..> R1 : items
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-54-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isLoading
-    Subject ..> R0 : error
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-54-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : search
-    Subject ..> R0 : hasMore
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-54-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : refresh
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-54-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryList.return.<br/>suppliers.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retry
 ```
 
 ## useInventoryList.return.suppliers.items.shape2
@@ -3121,15 +2128,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-55-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-55-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryList.return.<br/>suppliers.items.shape2"] {
         <<inferred_object>>
         id: string
@@ -3137,10 +2140,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useInventoryList.return.suppliers.items.shape3
@@ -3154,15 +2153,11 @@ classDiagram
 | `data` | `data: Record<string, unknown>;` |
 | `isDisabled` | `isDisabled?: boolean \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-56-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-56-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryList.return.<br/>suppliers.items.shape3"] {
         <<inferred_object>>
         id: string
@@ -3170,10 +2165,6 @@ classDiagram
         data: Record~string, unknown~
         isDisabled?: boolean | undefined
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## useInventoryRemoval.return
@@ -3187,39 +2178,19 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Ref` | `isConfirming` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `remove` |
-| dependency | `Promise` | `remove` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-57-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-57-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryRemoval.return"] {
         <<inferred_return>>
         isConfirming: Ref~boolean, boolean~
         remove: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isConfirming
-    Subject ..> R1 : remove
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-57-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryRemoval.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
+    class R0["InventoryRow"] {
         <<reference>>
     }
     Subject ..> R0 : remove
@@ -3235,42 +2206,17 @@ classDiagram
 | `exportError` | `"exportError": Ref<string, string>;` |
 | `exportReport` | `"exportReport": (scope: string) => Promise<void>;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Ref` | `isExporting` |
-| dependency | `Ref` | `exportError` |
-| dependency | `Promise` | `exportReport` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-58-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-58-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventoryReport.return"] {
         <<inferred_return>>
         isExporting: Ref~boolean, boolean~
         exportError: Ref~string, string~
         exportReport: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isExporting
-    Subject ..> R0 : exportError
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-58-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventoryReport.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : exportReport
 ```
 
 ## useInventorySelection.return
@@ -3290,25 +2236,18 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `ComputedRef` | `lookups` |
 | dependency | [useInventorySelection.return.lookups.shape1](../../../../../src/modules/warehouse/composables/useInventorySelection.ts) | `lookups` |
-| dependency | `ShallowRef` | `selectedSupplier` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `selectedSupplier` |
-| dependency | `ShallowRef` | `selectedTemplate` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `selectedTemplate` |
-| dependency | `ComputedRef` | `usesMeasurements` |
-| dependency | `Promise` | `refreshSuppliers` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `searchLookup` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `loadMore` |
-| dependency | `Promise` | `loadMore` |
 | dependency | [InventoryField](../../../../../src/modules/warehouse/inventory.ts) | `retryLookup` |
-| dependency | `Promise` | `retryLookup` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-59-1`. Parte 1/7.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-59-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventorySelection.return"] {
         <<inferred_return>>
         lookups: object
@@ -3320,115 +2259,21 @@ classDiagram
         loadMore: callback
         retryLookup: callback
     }
-    class R0["ComputedRef"] {
+    class R0["useInventorySelection.return.<br/>lookups.shape1"] {
         <<reference>>
     }
-    class R1["useInventorySelection.return.<br/>lookups.shape1"] {
+    class R1["LookupItem"] {
+        <<reference>>
+    }
+    class R2["InventoryField"] {
         <<reference>>
     }
     Subject ..> R0 : lookups
-    Subject ..> R1 : lookups
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-59-2`. Parte 2/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventorySelection.return"] {
-        <<inferred_return>>
-    }
-    class R0["ShallowRef"] {
-        <<reference>>
-    }
-    class R1["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : selectedSupplier
     Subject ..> R1 : selectedSupplier
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-59-3`. Parte 3/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventorySelection.return"] {
-        <<inferred_return>>
-    }
-    class R0["ShallowRef"] {
-        <<reference>>
-    }
-    class R1["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : selectedTemplate
     Subject ..> R1 : selectedTemplate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-59-4`. Parte 4/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventorySelection.return"] {
-        <<inferred_return>>
-    }
-    class R0["ComputedRef"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : usesMeasurements
-    Subject ..> R1 : refreshSuppliers
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-59-5`. Parte 5/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventorySelection.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryField"] {
-        <<reference>>
-    }
-    Subject ..> R0 : searchLookup
-    Subject ..> R0 : loadMore
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-59-6`. Parte 6/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventorySelection.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["InventoryField"] {
-        <<reference>>
-    }
-    Subject ..> R0 : loadMore
-    Subject ..> R1 : retryLookup
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-59-7`. Parte 7/7.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useInventorySelection.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : retryLookup
+    Subject ..> R2 : searchLookup
+    Subject ..> R2 : loadMore
+    Subject ..> R2 : retryLookup
 ```
 
 ## useInventorySelection.return.lookups.shape1
@@ -3439,23 +2284,15 @@ classDiagram
 | --- | --- |
 | `signature` | `[k: string]: LookupState;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `LookupState` | `signature` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-60-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-60-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useInventorySelection.return.<br/>lookups.shape1"] {
         <<inferred_object>>
         signature: LookupState
     }
-    class R0["LookupState"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
 ```
 
 ## useWasteDuplicateRecovery.return
@@ -3469,39 +2306,19 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Ref` | `isConfirming` |
 | dependency | [InventoryPayload](../../../../../src/modules/warehouse/inventory.ts) | `recover` |
-| dependency | `Promise` | `recover` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-61-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-61-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["useWasteDuplicateRecovery.<br/>return"] {
         <<inferred_return>>
         isConfirming: Ref~boolean, boolean~
         recover: callback
     }
-    class R0["Ref"] {
-        <<reference>>
-    }
-    class R1["InventoryPayload"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isConfirming
-    Subject ..> R1 : recover
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-61-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["useWasteDuplicateRecovery.<br/>return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
+    class R0["InventoryPayload"] {
         <<reference>>
     }
     Subject ..> R0 : recover
@@ -3567,7 +2384,6 @@ classDiagram
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `some` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `forEach` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `map` |
-| dependency | `U` | `map` |
 | dependency | [inventorySections.return.filter.shape5](../../../../../src/modules/warehouse/formFields.ts) | `filter` |
 | dependency | [inventorySections.return.reduce.shape6](../../../../../src/modules/warehouse/formFields.ts) | `reduce` |
 | dependency | [inventorySections.return.reduceRight.shape7](../../../../../src/modules/warehouse/formFields.ts) | `reduceRight` |
@@ -3575,28 +2391,19 @@ classDiagram
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `findIndex` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `fill` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `copyWithin` |
-| dependency | `ArrayIterator` | `entries` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `entries` |
-| dependency | `ArrayIterator` | `keys` |
-| dependency | `ArrayIterator` | `values` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `values` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `includes` |
-| dependency | `This` | `flatMap` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `flatMap` |
-| dependency | `U` | `flatMap` |
-| dependency | `A` | `flat` |
-| dependency | `D` | `flat` |
-| dependency | `FlatArray` | `flat` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `at` |
-| dependency | `ArrayIterator` | `__@iterator@308` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `__@iterator@308` |
 | association | [inventorySections.return.__@unscopables@432.shape9](../../../../../src/modules/warehouse/formFields.ts) | `__@unscopables@432` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-1`. Parte 1/20.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-62-1`. Parte 1/5.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return"] {
         <<inferred_return>>
         length: number
@@ -3607,24 +2414,6 @@ classDiagram
         concat: object
         join: callback
         reverse: callback
-    }
-    class R0["inventorySections.return.<br/>toLocaleString.shape1"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : toLocaleString
-    Subject ..> R1 : pop
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-2`. Parte 2/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
         shift: callback
         slice: callback
         sort: callback
@@ -3632,23 +2421,53 @@ classDiagram
         unshift: callback
         indexOf: callback
         lastIndexOf: callback
-        every: callback
     }
-    class R0["InventoryFormSection"] {
+    class R0["inventorySections.return.<br/>toLocaleString.shape1"] {
         <<reference>>
     }
-    class R1["inventorySections.return.<br/>concat.shape2"] {
+    class R1["InventoryFormSection"] {
         <<reference>>
     }
-    Subject ..> R0 : push
-    Subject "1" --> "1" R1 : concat
+    class R2["inventorySections.return.<br/>concat.shape2"] {
+        <<reference>>
+    }
+    class R3["inventorySections.return.<br/>splice.shape3"] {
+        <<reference>>
+    }
+    Subject "1" --> "1" R0 : toLocaleString
+    Subject ..> R1 : pop
+    Subject ..> R1 : push
+    Subject "1" --> "1" R2 : concat
+    Subject ..> R1 : reverse
+    Subject ..> R1 : shift
+    Subject ..> R1 : slice
+    Subject ..> R1 : sort
+    Subject "1" --> "1" R3 : splice
+    Subject ..> R1 : unshift
+    Subject ..> R1 : indexOf
+    Subject ..> R1 : lastIndexOf
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-3`. Parte 3/20.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-62-2`. Parte 2/5.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
+    class Subject["inventorySections.return"] {
+        <<inferred_return>>
+        every: callback
+    }
+    class R0["inventorySections.return.<br/>every.shape4"] {
+        <<reference>>
+    }
+    Subject ..> R0 : every
+```
+
+**Figura:** `DIA-VUE-TS-WAREHOUSE-62-3`. Parte 3/5.
+
+```mermaid
+classDiagram
+    direction LR
     class Subject["inventorySections.return"] {
         <<inferred_return>>
         some: callback
@@ -3657,23 +2476,7 @@ classDiagram
         filter: callback
         reduce: callback
         reduceRight: callback
-        find: callback
         findIndex: callback
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : reverse
-    Subject ..> R0 : shift
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-4`. Parte 4/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
         fill: callback
         copyWithin: callback
         entries: callback
@@ -3686,275 +2489,55 @@ classDiagram
     class R0["InventoryFormSection"] {
         <<reference>>
     }
-    Subject ..> R0 : slice
-    Subject ..> R0 : sort
+    class R1["inventorySections.return.<br/>filter.shape5"] {
+        <<reference>>
+    }
+    class R2["inventorySections.return.<br/>reduce.shape6"] {
+        <<reference>>
+    }
+    class R3["inventorySections.return.<br/>reduceRight.shape7"] {
+        <<reference>>
+    }
+    Subject ..> R0 : some
+    Subject ..> R0 : forEach
+    Subject ..> R0 : map
+    Subject ..> R1 : filter
+    Subject ..> R2 : reduce
+    Subject ..> R3 : reduceRight
+    Subject ..> R0 : findIndex
+    Subject ..> R0 : fill
+    Subject ..> R0 : copyWithin
+    Subject ..> R0 : entries
+    Subject ..> R0 : values
+    Subject ..> R0 : includes
+    Subject ..> R0 : flatMap
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-5`. Parte 5/20.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-62-4`. Parte 4/5.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
+    class Subject["inventorySections.return"] {
+        <<inferred_return>>
+        find: callback
+    }
+    class R0["inventorySections.return.<br/>find.shape8"] {
+        <<reference>>
+    }
+    Subject ..> R0 : find
+```
+
+**Figura:** `DIA-VUE-TS-WAREHOUSE-62-5`. Parte 5/5.
+
+```mermaid
+classDiagram
+    direction LR
     class Subject["inventorySections.return"] {
         <<inferred_return>>
         at: callback
         __@iterator@308: callback
         __@unscopables@432: object
-    }
-    class R0["inventorySections.return.<br/>splice.shape3"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : splice
-    Subject ..> R1 : unshift
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-6`. Parte 6/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : indexOf
-    Subject ..> R0 : lastIndexOf
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-7`. Parte 7/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["inventorySections.return.<br/>every.shape4"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : every
-    Subject ..> R1 : some
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-8`. Parte 8/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : forEach
-    Subject ..> R0 : map
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-9`. Parte 9/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["U"] {
-        <<reference>>
-    }
-    class R1["inventorySections.return.<br/>filter.shape5"] {
-        <<reference>>
-    }
-    Subject ..> R0 : map
-    Subject ..> R1 : filter
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-10`. Parte 10/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["inventorySections.return.<br/>reduce.shape6"] {
-        <<reference>>
-    }
-    class R1["inventorySections.return.<br/>reduceRight.shape7"] {
-        <<reference>>
-    }
-    Subject ..> R0 : reduce
-    Subject ..> R1 : reduceRight
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-11`. Parte 11/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["inventorySections.return.<br/>find.shape8"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : find
-    Subject ..> R1 : findIndex
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-12`. Parte 12/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : fill
-    Subject ..> R0 : copyWithin
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-13`. Parte 13/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["ArrayIterator"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : entries
-    Subject ..> R1 : entries
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-14`. Parte 14/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["ArrayIterator"] {
-        <<reference>>
-    }
-    Subject ..> R0 : keys
-    Subject ..> R0 : values
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-15`. Parte 15/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : values
-    Subject ..> R0 : includes
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-16`. Parte 16/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["This"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : flatMap
-    Subject ..> R1 : flatMap
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-17`. Parte 17/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["U"] {
-        <<reference>>
-    }
-    class R1["A"] {
-        <<reference>>
-    }
-    Subject ..> R0 : flatMap
-    Subject ..> R1 : flat
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-18`. Parte 18/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["D"] {
-        <<reference>>
-    }
-    class R1["FlatArray"] {
-        <<reference>>
-    }
-    Subject ..> R0 : flat
-    Subject ..> R1 : flat
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-19`. Parte 19/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    class R1["ArrayIterator"] {
-        <<reference>>
-    }
-    Subject ..> R0 : at
-    Subject ..> R1 : __@iterator@308
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-62-20`. Parte 20/20.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return"] {
-        <<inferred_return>>
     }
     class R0["InventoryFormSection"] {
         <<reference>>
@@ -3962,6 +2545,7 @@ classDiagram
     class R1["inventorySections.return.<br/>__@unscopables@432.shape9"] {
         <<reference>>
     }
+    Subject ..> R0 : at
     Subject ..> R0 : __@iterator@308
     Subject "1" --> "0..1" R1 : __@unscopables@432
 ```
@@ -3975,29 +2559,16 @@ classDiagram
 | `signature` | `(): string;` |
 | `signature` | `(locales: string \| string[], options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions): string;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Intl.NumberFormatOptions` | `signature.options` |
-| dependency | `Intl.DateTimeFormatOptions` | `signature.options` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-63-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-63-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>toLocaleString.shape1"] {
         <<inferred_object>>
         signature: string
         signature: string
     }
-    class R0["Intl.NumberFormatOptions"] {
-        <<reference>>
-    }
-    class R1["Intl.DateTimeFormatOptions"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.options
-    Subject ..> R1 : signature.options
 ```
 
 ## inventorySections.return.concat.shape2
@@ -4012,40 +2583,22 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature` |
-| dependency | `ConcatArray` | `signature.items` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.items` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-64-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-64-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>concat.shape2"] {
         <<inferred_object>>
         signature: InventoryFormSection[]
         signature: InventoryFormSection[]
     }
     class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    class R1["ConcatArray"] {
         <<reference>>
     }
     Subject "1" --> "0..*" R0 : signature
-    Subject ..> R1 : signature.items
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-64-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>concat.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.items
 ```
 
@@ -4063,11 +2616,11 @@ classDiagram
 | association | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.items` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-65-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-65-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>splice.shape3"] {
         <<inferred_object>>
         signature: InventoryFormSection[]
@@ -4091,39 +2644,19 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `S` | `signature` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.predicate` |
-| dependency | `S` | `signature.predicate` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-66-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-66-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>every.shape4"] {
         <<inferred_object>>
         signature: this is S[]
         signature: boolean
     }
-    class R0["S"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature.predicate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-66-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>every.shape4"] {
-        <<inferred_object>>
-    }
-    class R0["S"] {
+    class R0["InventoryFormSection"] {
         <<reference>>
     }
     Subject ..> R0 : signature.predicate
@@ -4140,47 +2673,24 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `S` | `signature` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.predicate` |
-| dependency | `S` | `signature.predicate` |
 | association | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-67-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-67-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>filter.shape5"] {
         <<inferred_object>>
         signature: S[]
         signature: InventoryFormSection[]
     }
-    class R0["S"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature.predicate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-67-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>filter.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["S"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
+    class R0["InventoryFormSection"] {
         <<reference>>
     }
     Subject ..> R0 : signature.predicate
-    Subject "1" --> "0..*" R1 : signature
+    Subject "1" --> "0..*" R0 : signature
 ```
 
 ## inventorySections.return.reduce.shape6
@@ -4198,15 +2708,12 @@ classDiagram
 | association | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.callbackfn` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.initialValue` |
-| dependency | `U` | `signature` |
-| dependency | `U` | `signature.callbackfn` |
-| dependency | `U` | `signature.initialValue` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-68-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-68-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>reduce.shape6"] {
         <<inferred_object>>
         signature: InventoryFormSection
@@ -4217,38 +2724,6 @@ classDiagram
         <<reference>>
     }
     Subject "1" --> "1" R0 : signature
-    Subject ..> R0 : signature.callbackfn
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-68-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>reduce.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    class R1["U"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.initialValue
-    Subject ..> R1 : signature
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-68-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>reduce.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["U"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.callbackfn
     Subject ..> R0 : signature.initialValue
 ```
@@ -4268,15 +2743,12 @@ classDiagram
 | association | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.callbackfn` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.initialValue` |
-| dependency | `U` | `signature` |
-| dependency | `U` | `signature.callbackfn` |
-| dependency | `U` | `signature.initialValue` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-69-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-69-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>reduceRight.shape7"] {
         <<inferred_object>>
         signature: InventoryFormSection
@@ -4287,38 +2759,6 @@ classDiagram
         <<reference>>
     }
     Subject "1" --> "1" R0 : signature
-    Subject ..> R0 : signature.callbackfn
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-69-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>reduceRight.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["InventoryFormSection"] {
-        <<reference>>
-    }
-    class R1["U"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.initialValue
-    Subject ..> R1 : signature
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-69-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>reduceRight.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["U"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.callbackfn
     Subject ..> R0 : signature.initialValue
 ```
@@ -4334,47 +2774,24 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `S` | `signature` |
 | dependency | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature.predicate` |
-| dependency | `S` | `signature.predicate` |
 | association | [InventoryFormSection](../../../../../src/modules/warehouse/formFields.ts) | `signature` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-70-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-70-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>find.shape8"] {
         <<inferred_object>>
         signature: S | undefined
         signature: InventoryFormSection | undefined
     }
-    class R0["S"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature.predicate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-70-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>find.shape8"] {
-        <<inferred_object>>
-    }
-    class R0["S"] {
-        <<reference>>
-    }
-    class R1["InventoryFormSection"] {
+    class R0["InventoryFormSection"] {
         <<reference>>
     }
     Subject ..> R0 : signature.predicate
-    Subject "1" --> "0..1" R1 : signature
+    Subject "1" --> "0..1" R0 : signature
 ```
 
 ## inventorySections.return.__@unscopables@432.shape9
@@ -4420,11 +2837,11 @@ classDiagram
 | `[Symbol.iterator]` | `[Symbol.iterator]?: boolean \| undefined;` |
 | `[Symbol.unscopables]` | `readonly [Symbol.unscopables]?: boolean \| undefined;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-71-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-71-1`. Parte 1/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>__@unscopables@432.shape9"] {
         <<inferred_object>>
         signature: boolean | undefined
@@ -4435,16 +2852,6 @@ classDiagram
         push?: boolean | undefined
         concat?: boolean | undefined
         join?: boolean | undefined
-    }
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-71-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>__@unscopables@432.shape9"] {
-        <<inferred_object>>
         reverse?: boolean | undefined
         shift?: boolean | undefined
         slice?: boolean | undefined
@@ -4456,11 +2863,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-71-3`. Parte 3/5.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-71-2`. Parte 2/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>__@unscopables@432.shape9"] {
         <<inferred_object>>
         every?: boolean | undefined
@@ -4471,16 +2878,6 @@ classDiagram
         reduce?: boolean | undefined
         reduceRight?: boolean | undefined
         find?: boolean | undefined
-    }
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-71-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventorySections.return.<br/>__@unscopables@432.shape9"] {
-        <<inferred_object>>
         findIndex?: boolean | undefined
         fill?: boolean | undefined
         copyWithin?: boolean | undefined
@@ -4492,11 +2889,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-71-5`. Parte 5/5.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-71-3`. Parte 3/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventorySections.return.<br/>__@unscopables@432.shape9"] {
         <<inferred_object>>
         flat?: boolean | undefined
@@ -4531,11 +2928,11 @@ classDiagram
 | `totalWeightKg` | `"totalWeightKg": string \| boolean;` |
 | `referenceRollTotalWeightKg` | `"referenceRollTotalWeightKg": string \| boolean;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-72-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-72-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["initialInventoryValues.<br/>return"] {
         <<inferred_return>>
         name: string | boolean
@@ -4546,16 +2943,6 @@ classDiagram
         height: string | boolean
         quantity: string | boolean
         maxUnitCost: string | boolean
-    }
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-72-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["initialInventoryValues.<br/>return"] {
-        <<inferred_return>>
         materialId: string | boolean
         presentationId: string | boolean
         unitMeasureId: string | boolean
@@ -4567,11 +2954,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-72-3`. Parte 3/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-72-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["initialInventoryValues.<br/>return"] {
         <<inferred_return>>
         totalWeightKg: string | boolean
@@ -4590,11 +2977,11 @@ classDiagram
 | `base` | `"base": string \| number \| boolean \| null;` |
 | `height` | `"height": string \| number \| boolean \| null;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-73-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-73-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["previewWaste.return"] {
         <<inferred_return>>
         isRoll: boolean
@@ -4620,11 +3007,11 @@ classDiagram
 | association | [INVENTORY_CONFIG.consumables.shape2](../../../../../src/modules/warehouse/inventory.ts) | `consumables` |
 | association | [INVENTORY_CONFIG.wastes.shape3](../../../../../src/modules/warehouse/inventory.ts) | `wastes` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-74-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-74-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["INVENTORY_CONFIG"] {
         <<inferred_export>>
         materials: object
@@ -4637,22 +3024,12 @@ classDiagram
     class R1["INVENTORY_CONFIG.consumables.<br/>shape2"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : materials
-    Subject "1" --> "1" R1 : consumables
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-74-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["INVENTORY_CONFIG"] {
-        <<inferred_export>>
-    }
-    class R0["INVENTORY_CONFIG.wastes.<br/>shape3"] {
+    class R2["INVENTORY_CONFIG.wastes.<br/>shape3"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : wastes
+    Subject "1" --> "1" R0 : materials
+    Subject "1" --> "1" R1 : consumables
+    Subject "1" --> "1" R2 : wastes
 ```
 
 ## INVENTORY_CONFIG.materials.shape1
@@ -4668,11 +3045,11 @@ classDiagram
 | `write` | `readonly write: "materials:write";` |
 | `adjust` | `readonly adjust: "materials:adjust-stock";` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-75-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-75-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["INVENTORY_CONFIG.materials.<br/>shape1"] {
         <<inferred_object>>
         title: "Materiales"
@@ -4697,11 +3074,11 @@ classDiagram
 | `write` | `readonly write: "materials:write";` |
 | `adjust` | `readonly adjust: "materials:adjust-stock";` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-76-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-76-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["INVENTORY_CONFIG.consumables.<br/>shape2"] {
         <<inferred_object>>
         title: "Consumibles"
@@ -4726,11 +3103,11 @@ classDiagram
 | `write` | `readonly write: "wastes:write";` |
 | `adjust` | `readonly adjust: "wastes:adjust-stock";` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-77-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-77-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["INVENTORY_CONFIG.wastes.<br/>shape3"] {
         <<inferred_object>>
         title: "Mermas"
@@ -4767,11 +3144,11 @@ classDiagram
 | `totalWeightKg` | `"totalWeightKg": string \| boolean;` |
 | `referenceRollTotalWeightKg` | `"referenceRollTotalWeightKg": string \| boolean;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-78-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-78-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryValues.expanded"] {
         <<evaluated_alias>>
         name: string | boolean
@@ -4782,16 +3159,6 @@ classDiagram
         height: string | boolean
         quantity: string | boolean
         maxUnitCost: string | boolean
-    }
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-78-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["InventoryValues.expanded"] {
-        <<evaluated_alias>>
         materialId: string | boolean
         presentationId: string | boolean
         unitMeasureId: string | boolean
@@ -4803,11 +3170,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-78-3`. Parte 3/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-78-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryValues.expanded"] {
         <<evaluated_alias>>
         totalWeightKg: string | boolean
@@ -4860,72 +3227,41 @@ classDiagram
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [inventoryHeaders.return.toLocaleString.shape1](../../../../../src/modules/warehouse/inventoryTable.ts) | `toLocaleString` |
-| dependency | `DataTableHeader` | `pop` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `pop` |
-| dependency | `DataTableHeader` | `push` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `push` |
 | association | [inventoryHeaders.return.concat.shape2](../../../../../src/modules/warehouse/inventoryTable.ts) | `concat` |
-| dependency | `DataTableHeader` | `reverse` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `reverse` |
-| dependency | `DataTableHeader` | `shift` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `shift` |
-| dependency | `DataTableHeader` | `slice` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `slice` |
-| dependency | `DataTableHeader` | `sort` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `sort` |
 | association | [inventoryHeaders.return.splice.shape3](../../../../../src/modules/warehouse/inventoryTable.ts) | `splice` |
-| dependency | `DataTableHeader` | `unshift` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `unshift` |
-| dependency | `DataTableHeader` | `indexOf` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `indexOf` |
-| dependency | `DataTableHeader` | `lastIndexOf` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `lastIndexOf` |
 | dependency | [inventoryHeaders.return.every.shape4](../../../../../src/modules/warehouse/inventoryTable.ts) | `every` |
-| dependency | `DataTableHeader` | `some` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `some` |
-| dependency | `DataTableHeader` | `forEach` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `forEach` |
-| dependency | `DataTableHeader` | `map` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `map` |
-| dependency | `U` | `map` |
 | dependency | [inventoryHeaders.return.filter.shape5](../../../../../src/modules/warehouse/inventoryTable.ts) | `filter` |
 | dependency | [inventoryHeaders.return.reduce.shape6](../../../../../src/modules/warehouse/inventoryTable.ts) | `reduce` |
 | dependency | [inventoryHeaders.return.reduceRight.shape7](../../../../../src/modules/warehouse/inventoryTable.ts) | `reduceRight` |
 | dependency | [inventoryHeaders.return.find.shape8](../../../../../src/modules/warehouse/inventoryTable.ts) | `find` |
-| dependency | `DataTableHeader` | `findIndex` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `findIndex` |
-| dependency | `DataTableHeader` | `fill` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `fill` |
-| dependency | `DataTableHeader` | `copyWithin` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `copyWithin` |
-| dependency | `ArrayIterator` | `entries` |
-| dependency | `DataTableHeader` | `entries` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `entries` |
-| dependency | `ArrayIterator` | `keys` |
-| dependency | `ArrayIterator` | `values` |
-| dependency | `DataTableHeader` | `values` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `values` |
-| dependency | `DataTableHeader` | `includes` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `includes` |
-| dependency | `This` | `flatMap` |
-| dependency | `DataTableHeader` | `flatMap` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `flatMap` |
-| dependency | `U` | `flatMap` |
-| dependency | `A` | `flat` |
-| dependency | `D` | `flat` |
-| dependency | `FlatArray` | `flat` |
-| dependency | `DataTableHeader` | `at` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `at` |
-| dependency | `ArrayIterator` | `__@iterator@308` |
-| dependency | `DataTableHeader` | `__@iterator@308` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `__@iterator@308` |
 | association | [inventoryHeaders.return.__@unscopables@432.shape9](../../../../../src/modules/warehouse/inventoryTable.ts) | `__@unscopables@432` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-1`. Parte 1/31.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-79-1`. Parte 1/5.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return"] {
         <<inferred_return>>
         length: number
@@ -4936,24 +3272,6 @@ classDiagram
         concat: object
         join: callback
         reverse: callback
-    }
-    class R0["inventoryHeaders.return.<br/>toLocaleString.shape1"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : toLocaleString
-    Subject ..> R1 : pop
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-2`. Parte 2/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
         shift: callback
         slice: callback
         sort: callback
@@ -4961,23 +3279,53 @@ classDiagram
         unshift: callback
         indexOf: callback
         lastIndexOf: callback
-        every: callback
     }
-    class R0["InventoryRow"] {
+    class R0["inventoryHeaders.return.<br/>toLocaleString.shape1"] {
         <<reference>>
     }
-    class R1["DataTableHeader"] {
+    class R1["InventoryRow"] {
         <<reference>>
     }
-    Subject ..> R0 : pop
+    class R2["inventoryHeaders.return.<br/>concat.shape2"] {
+        <<reference>>
+    }
+    class R3["inventoryHeaders.return.<br/>splice.shape3"] {
+        <<reference>>
+    }
+    Subject "1" --> "1" R0 : toLocaleString
+    Subject ..> R1 : pop
     Subject ..> R1 : push
+    Subject "1" --> "1" R2 : concat
+    Subject ..> R1 : reverse
+    Subject ..> R1 : shift
+    Subject ..> R1 : slice
+    Subject ..> R1 : sort
+    Subject "1" --> "1" R3 : splice
+    Subject ..> R1 : unshift
+    Subject ..> R1 : indexOf
+    Subject ..> R1 : lastIndexOf
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-3`. Parte 3/31.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-79-2`. Parte 2/5.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
+    class Subject["inventoryHeaders.return"] {
+        <<inferred_return>>
+        every: callback
+    }
+    class R0["inventoryHeaders.return.<br/>every.shape4"] {
+        <<reference>>
+    }
+    Subject ..> R0 : every
+```
+
+**Figura:** `DIA-VUE-TS-WAREHOUSE-79-3`. Parte 3/5.
+
+```mermaid
+classDiagram
+    direction LR
     class Subject["inventoryHeaders.return"] {
         <<inferred_return>>
         some: callback
@@ -4986,26 +3334,7 @@ classDiagram
         filter: callback
         reduce: callback
         reduceRight: callback
-        find: callback
         findIndex: callback
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["inventoryHeaders.return.<br/>concat.shape2"] {
-        <<reference>>
-    }
-    Subject ..> R0 : push
-    Subject "1" --> "1" R1 : concat
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-4`. Parte 4/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
         fill: callback
         copyWithin: callback
         entries: callback
@@ -5015,496 +3344,68 @@ classDiagram
         flatMap: callback
         flat: callback
     }
-    class R0["DataTableHeader"] {
+    class R0["InventoryRow"] {
         <<reference>>
     }
-    class R1["InventoryRow"] {
+    class R1["inventoryHeaders.return.<br/>filter.shape5"] {
         <<reference>>
     }
-    Subject ..> R0 : reverse
-    Subject ..> R1 : reverse
+    class R2["inventoryHeaders.return.<br/>reduce.shape6"] {
+        <<reference>>
+    }
+    class R3["inventoryHeaders.return.<br/>reduceRight.shape7"] {
+        <<reference>>
+    }
+    Subject ..> R0 : some
+    Subject ..> R0 : forEach
+    Subject ..> R0 : map
+    Subject ..> R1 : filter
+    Subject ..> R2 : reduce
+    Subject ..> R3 : reduceRight
+    Subject ..> R0 : findIndex
+    Subject ..> R0 : fill
+    Subject ..> R0 : copyWithin
+    Subject ..> R0 : entries
+    Subject ..> R0 : values
+    Subject ..> R0 : includes
+    Subject ..> R0 : flatMap
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-5`. Parte 5/31.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-79-4`. Parte 4/5.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
+    class Subject["inventoryHeaders.return"] {
+        <<inferred_return>>
+        find: callback
+    }
+    class R0["inventoryHeaders.return.find.<br/>shape8"] {
+        <<reference>>
+    }
+    Subject ..> R0 : find
+```
+
+**Figura:** `DIA-VUE-TS-WAREHOUSE-79-5`. Parte 5/5.
+
+```mermaid
+classDiagram
+    direction LR
     class Subject["inventoryHeaders.return"] {
         <<inferred_return>>
         at: callback
         __@iterator@308: callback
         __@unscopables@432: object
     }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : shift
-    Subject ..> R1 : shift
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-6`. Parte 6/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : slice
-    Subject ..> R1 : slice
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-7`. Parte 7/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : sort
-    Subject ..> R1 : sort
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-8`. Parte 8/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["inventoryHeaders.return.<br/>splice.shape3"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject "1" --> "1" R0 : splice
-    Subject ..> R1 : unshift
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-9`. Parte 9/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
     class R0["InventoryRow"] {
         <<reference>>
     }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : unshift
-    Subject ..> R1 : indexOf
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-10`. Parte 10/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : indexOf
-    Subject ..> R1 : lastIndexOf
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-11`. Parte 11/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["inventoryHeaders.return.<br/>every.shape4"] {
-        <<reference>>
-    }
-    Subject ..> R0 : lastIndexOf
-    Subject ..> R1 : every
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-12`. Parte 12/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : some
-    Subject ..> R1 : some
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-13`. Parte 13/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : forEach
-    Subject ..> R1 : forEach
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-14`. Parte 14/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : map
-    Subject ..> R1 : map
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-15`. Parte 15/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["U"] {
-        <<reference>>
-    }
-    class R1["inventoryHeaders.return.<br/>filter.shape5"] {
-        <<reference>>
-    }
-    Subject ..> R0 : map
-    Subject ..> R1 : filter
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-16`. Parte 16/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["inventoryHeaders.return.<br/>reduce.shape6"] {
-        <<reference>>
-    }
-    class R1["inventoryHeaders.return.<br/>reduceRight.shape7"] {
-        <<reference>>
-    }
-    Subject ..> R0 : reduce
-    Subject ..> R1 : reduceRight
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-17`. Parte 17/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["inventoryHeaders.return.find.<br/>shape8"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : find
-    Subject ..> R1 : findIndex
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-18`. Parte 18/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : findIndex
-    Subject ..> R1 : fill
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-19`. Parte 19/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : fill
-    Subject ..> R1 : copyWithin
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-20`. Parte 20/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["ArrayIterator"] {
-        <<reference>>
-    }
-    Subject ..> R0 : copyWithin
-    Subject ..> R1 : entries
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-21`. Parte 21/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : entries
-    Subject ..> R1 : entries
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-22`. Parte 22/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["ArrayIterator"] {
-        <<reference>>
-    }
-    Subject ..> R0 : keys
-    Subject ..> R0 : values
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-23`. Parte 23/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : values
-    Subject ..> R1 : values
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-24`. Parte 24/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : includes
-    Subject ..> R1 : includes
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-25`. Parte 25/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["This"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : flatMap
-    Subject ..> R1 : flatMap
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-26`. Parte 26/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["U"] {
-        <<reference>>
-    }
-    Subject ..> R0 : flatMap
-    Subject ..> R1 : flatMap
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-27`. Parte 27/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["A"] {
-        <<reference>>
-    }
-    class R1["D"] {
-        <<reference>>
-    }
-    Subject ..> R0 : flat
-    Subject ..> R1 : flat
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-28`. Parte 28/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["FlatArray"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : flat
-    Subject ..> R1 : at
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-29`. Parte 29/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    class R1["ArrayIterator"] {
+    class R1["inventoryHeaders.return.<br/>__@unscopables@432.shape9"] {
         <<reference>>
     }
     Subject ..> R0 : at
-    Subject ..> R1 : __@iterator@308
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-30`. Parte 30/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
     Subject ..> R0 : __@iterator@308
-    Subject ..> R1 : __@iterator@308
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-79-31`. Parte 31/31.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return"] {
-        <<inferred_return>>
-    }
-    class R0["inventoryHeaders.return.<br/>__@unscopables@432.shape9"] {
-        <<reference>>
-    }
-    Subject "1" --> "0..1" R0 : __@unscopables@432
+    Subject "1" --> "0..1" R1 : __@unscopables@432
 ```
 
 ## inventoryHeaders.return.toLocaleString.shape1
@@ -5516,29 +3417,16 @@ classDiagram
 | `signature` | `(): string;` |
 | `signature` | `(locales: string \| string[], options?: Intl.NumberFormatOptions & Intl.DateTimeFormatOptions): string;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Intl.NumberFormatOptions` | `signature.options` |
-| dependency | `Intl.DateTimeFormatOptions` | `signature.options` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-80-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-80-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>toLocaleString.shape1"] {
         <<inferred_object>>
         signature: string
         signature: string
     }
-    class R0["Intl.NumberFormatOptions"] {
-        <<reference>>
-    }
-    class R1["Intl.DateTimeFormatOptions"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.options
-    Subject ..> R1 : signature.options
 ```
 
 ## inventoryHeaders.return.concat.shape2
@@ -5552,61 +3440,23 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `DataTableHeader` | `signature` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature` |
-| dependency | `ConcatArray` | `signature.items` |
-| dependency | `DataTableHeader` | `signature.items` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.items` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-81-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-81-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>concat.shape2"] {
         <<inferred_object>>
         signature: DataTableHeader~InventoryRow~[]
         signature: DataTableHeader~InventoryRow~[]
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-81-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>concat.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["ConcatArray"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.items
-    Subject ..> R1 : signature.items
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-81-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>concat.shape2"] {
-        <<inferred_object>>
     }
     class R0["InventoryRow"] {
         <<reference>>
     }
+    Subject ..> R0 : signature
     Subject ..> R0 : signature.items
 ```
 
@@ -5621,47 +3471,24 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `DataTableHeader` | `signature` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature` |
-| dependency | `DataTableHeader` | `signature.items` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.items` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-82-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-82-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>splice.shape3"] {
         <<inferred_object>>
         signature: DataTableHeader~InventoryRow~[]
         signature: DataTableHeader~InventoryRow~[]
     }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
+    class R0["InventoryRow"] {
         <<reference>>
     }
     Subject ..> R0 : signature
-    Subject ..> R1 : signature
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-82-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>splice.shape3"] {
-        <<inferred_object>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.items
-    Subject ..> R1 : signature.items
 ```
 
 ## inventoryHeaders.return.every.shape4
@@ -5675,47 +3502,22 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `S` | `signature` |
-| dependency | `DataTableHeader` | `signature.predicate` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.predicate` |
-| dependency | `S` | `signature.predicate` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-83-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-83-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>every.shape4"] {
         <<inferred_object>>
         signature: this is S[]
         signature: boolean
     }
-    class R0["S"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature.predicate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-83-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>every.shape4"] {
-        <<inferred_object>>
-    }
     class R0["InventoryRow"] {
         <<reference>>
     }
-    class R1["S"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.predicate
-    Subject ..> R1 : signature.predicate
 ```
 
 ## inventoryHeaders.return.filter.shape5
@@ -5729,67 +3531,24 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `S` | `signature` |
-| dependency | `DataTableHeader` | `signature.predicate` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.predicate` |
-| dependency | `S` | `signature.predicate` |
-| dependency | `DataTableHeader` | `signature` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-84-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-84-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>filter.shape5"] {
         <<inferred_object>>
         signature: S[]
         signature: DataTableHeader~InventoryRow~[]
     }
-    class R0["S"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature.predicate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-84-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>filter.shape5"] {
-        <<inferred_object>>
-    }
     class R0["InventoryRow"] {
         <<reference>>
     }
-    class R1["S"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.predicate
-    Subject ..> R1 : signature.predicate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-84-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>filter.shape5"] {
-        <<inferred_object>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature
-    Subject ..> R1 : signature
 ```
 
 ## inventoryHeaders.return.reduce.shape6
@@ -5804,99 +3563,26 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `DataTableHeader` | `signature` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature` |
-| dependency | `DataTableHeader` | `signature.callbackfn` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.callbackfn` |
-| dependency | `DataTableHeader` | `signature.initialValue` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.initialValue` |
-| dependency | `U` | `signature` |
-| dependency | `U` | `signature.callbackfn` |
-| dependency | `U` | `signature.initialValue` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-85-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-85-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>reduce.shape6"] {
         <<inferred_object>>
         signature: DataTableHeader~InventoryRow~
         signature: DataTableHeader~InventoryRow~
         signature: U
     }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-85-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>reduce.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.callbackfn
-    Subject ..> R1 : signature.callbackfn
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-85-3`. Parte 3/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>reduce.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.initialValue
-    Subject ..> R1 : signature.initialValue
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-85-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>reduce.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["U"] {
+    class R0["InventoryRow"] {
         <<reference>>
     }
     Subject ..> R0 : signature
     Subject ..> R0 : signature.callbackfn
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-85-5`. Parte 5/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>reduce.shape6"] {
-        <<inferred_object>>
-    }
-    class R0["U"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.initialValue
 ```
 
@@ -5912,99 +3598,26 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `DataTableHeader` | `signature` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature` |
-| dependency | `DataTableHeader` | `signature.callbackfn` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.callbackfn` |
-| dependency | `DataTableHeader` | `signature.initialValue` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.initialValue` |
-| dependency | `U` | `signature` |
-| dependency | `U` | `signature.callbackfn` |
-| dependency | `U` | `signature.initialValue` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-86-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-86-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>reduceRight.shape7"] {
         <<inferred_object>>
         signature: DataTableHeader~InventoryRow~
         signature: DataTableHeader~InventoryRow~
         signature: U
     }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-86-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>reduceRight.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.callbackfn
-    Subject ..> R1 : signature.callbackfn
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-86-3`. Parte 3/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>reduceRight.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.initialValue
-    Subject ..> R1 : signature.initialValue
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-86-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>reduceRight.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["U"] {
+    class R0["InventoryRow"] {
         <<reference>>
     }
     Subject ..> R0 : signature
     Subject ..> R0 : signature.callbackfn
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-86-5`. Parte 5/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>reduceRight.shape7"] {
-        <<inferred_object>>
-    }
-    class R0["U"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.initialValue
 ```
 
@@ -6019,67 +3632,24 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `S` | `signature` |
-| dependency | `DataTableHeader` | `signature.predicate` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature.predicate` |
-| dependency | `S` | `signature.predicate` |
-| dependency | `DataTableHeader` | `signature` |
 | dependency | [InventoryRow](../../../../../src/modules/warehouse/inventory.ts) | `signature` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-87-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-87-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.find.<br/>shape8"] {
         <<inferred_object>>
         signature: S | undefined
         signature: DataTableHeader~InventoryRow~ | undefined
     }
-    class R0["S"] {
-        <<reference>>
-    }
-    class R1["DataTableHeader"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature.predicate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-87-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.find.<br/>shape8"] {
-        <<inferred_object>>
-    }
     class R0["InventoryRow"] {
         <<reference>>
     }
-    class R1["S"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature.predicate
-    Subject ..> R1 : signature.predicate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-87-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.find.<br/>shape8"] {
-        <<inferred_object>>
-    }
-    class R0["DataTableHeader"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
     Subject ..> R0 : signature
-    Subject ..> R1 : signature
 ```
 
 ## inventoryHeaders.return.__@unscopables@432.shape9
@@ -6125,11 +3695,11 @@ classDiagram
 | `[Symbol.iterator]` | `[Symbol.iterator]?: boolean \| undefined;` |
 | `[Symbol.unscopables]` | `readonly [Symbol.unscopables]?: boolean \| undefined;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-88-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-88-1`. Parte 1/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>__@unscopables@432.shape9"] {
         <<inferred_object>>
         signature: boolean | undefined
@@ -6140,16 +3710,6 @@ classDiagram
         push?: boolean | undefined
         concat?: boolean | undefined
         join?: boolean | undefined
-    }
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-88-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>__@unscopables@432.shape9"] {
-        <<inferred_object>>
         reverse?: boolean | undefined
         shift?: boolean | undefined
         slice?: boolean | undefined
@@ -6161,11 +3721,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-88-3`. Parte 3/5.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-88-2`. Parte 2/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>__@unscopables@432.shape9"] {
         <<inferred_object>>
         every?: boolean | undefined
@@ -6176,16 +3736,6 @@ classDiagram
         reduce?: boolean | undefined
         reduceRight?: boolean | undefined
         find?: boolean | undefined
-    }
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-88-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryHeaders.return.<br/>__@unscopables@432.shape9"] {
-        <<inferred_object>>
         findIndex?: boolean | undefined
         fill?: boolean | undefined
         copyWithin?: boolean | undefined
@@ -6197,11 +3747,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-88-5`. Parte 5/5.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-88-3`. Parte 3/3.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryHeaders.return.<br/>__@unscopables@432.shape9"] {
         <<inferred_object>>
         flat?: boolean | undefined
@@ -6258,11 +3808,11 @@ classDiagram
 | dependency | [Numeric](../../../../../src/modules/warehouse/inventory.ts) | `sampleLengthM` |
 | dependency | [Numeric](../../../../../src/modules/warehouse/inventory.ts) | `sampleNetWeightKg` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-89-1`. Parte 1/6.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-89-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["normalizeInventoryRow.return"] {
         <<inferred_return>>
         id: string
@@ -6273,21 +3823,6 @@ classDiagram
         supplierName: string
         name: string
         presentationId: string
-    }
-    class R0["Numeric"] {
-        <<reference>>
-    }
-    Subject ..> R0 : base
-    Subject ..> R0 : height
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-89-2`. Parte 2/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["normalizeInventoryRow.return"] {
-        <<inferred_return>>
         presentation: string
         unitMeasureId: string
         unitMeasure: string
@@ -6300,15 +3835,18 @@ classDiagram
     class R0["Numeric"] {
         <<reference>>
     }
+    Subject ..> R0 : base
+    Subject ..> R0 : height
     Subject ..> R0 : currentStock
     Subject ..> R0 : convertedQuantity
+    Subject ..> R0 : minStock
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-89-3`. Parte 3/6.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-89-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["normalizeInventoryRow.return"] {
         <<inferred_return>>
         maxUnitCost?: Numeric | undefined
@@ -6319,56 +3857,16 @@ classDiagram
         weightKg: Numeric
         referenceRollTotalWeightKg: Numeric
         sampleLengthM: Numeric
-    }
-    class R0["Numeric"] {
-        <<reference>>
-    }
-    Subject ..> R0 : minStock
-    Subject ..> R0 : maxUnitCost
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-89-4`. Parte 4/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["normalizeInventoryRow.return"] {
-        <<inferred_return>>
         sampleNetWeightKg: Numeric
     }
     class R0["Numeric"] {
         <<reference>>
     }
+    Subject ..> R0 : maxUnitCost
     Subject ..> R0 : coneWeightKg
     Subject ..> R0 : totalWeightKg
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-89-5`. Parte 5/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["normalizeInventoryRow.return"] {
-        <<inferred_return>>
-    }
-    class R0["Numeric"] {
-        <<reference>>
-    }
     Subject ..> R0 : weightKg
     Subject ..> R0 : referenceRollTotalWeightKg
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-89-6`. Parte 6/6.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["normalizeInventoryRow.return"] {
-        <<inferred_return>>
-    }
-    class R0["Numeric"] {
-        <<reference>>
-    }
     Subject ..> R0 : sampleLengthM
     Subject ..> R0 : sampleNetWeightKg
 ```
@@ -6384,17 +3882,11 @@ classDiagram
 | `quantity` | `"quantity"?: string \| undefined;` |
 | `observations` | `"observations"?: string \| undefined;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Partial` | `row` |
-| dependency | `InventoryRow` | `row` |
-| dependency | `Pick` | `row` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-90-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-90-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["mapWasteStockAddition.return.<br/>variant2"] {
         <<inferred_return>>
         action: "add-stock"
@@ -6402,28 +3894,6 @@ classDiagram
         quantity?: string | undefined
         observations?: string | undefined
     }
-    class R0["Partial"] {
-        <<reference>>
-    }
-    class R1["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : row
-    Subject ..> R1 : row
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-90-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["mapWasteStockAddition.return.<br/>variant2"] {
-        <<inferred_return>>
-    }
-    class R0["Pick"] {
-        <<reference>>
-    }
-    Subject ..> R0 : row
 ```
 
 ## inventoryCatalogService
@@ -6436,36 +3906,16 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `AbortSignal` | `lookup` |
-| dependency | `Promise` | `lookup` |
 | dependency | [inventoryCatalogService.lookup.shape1](../../../../../src/modules/warehouse/services/inventoryCatalogService.ts) | `lookup` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-91-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-91-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryCatalogService"] {
         <<inferred_export>>
         lookup: callback
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : lookup
-    Subject ..> R1 : lookup
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-91-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryCatalogService"] {
-        <<inferred_export>>
     }
     class R0["inventoryCatalogService.<br/>lookup.shape1"] {
         <<reference>>
@@ -6487,11 +3937,11 @@ classDiagram
 | --- | --- | --- |
 | association | [inventoryCatalogService.lookup.data.shape2](../../../../../src/modules/warehouse/services/inventoryCatalogService.ts) | `data` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-92-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-92-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryCatalogService.<br/>lookup.shape1"] {
         <<inferred_object>>
         data: object
@@ -6514,25 +3964,17 @@ classDiagram
 | `title` | `title: string;` |
 | `data` | `data: Record<string, unknown>;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `Record` | `data` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-93-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-93-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryCatalogService.<br/>lookup.data.shape2"] {
         <<inferred_object>>
         id: string
         title: string
         data: Record~string, unknown~
     }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## inventoryParams.return
@@ -6556,19 +3998,11 @@ classDiagram
 | `values` | `"values": () => URLSearchParamsIterator<string>;` |
 | `__@iterator@308` | `"__@iterator@308": () => URLSearchParamsIterator<[string, string]>;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `URLSearchParams` | `forEach` |
-| dependency | `URLSearchParamsIterator` | `entries` |
-| dependency | `URLSearchParamsIterator` | `keys` |
-| dependency | `URLSearchParamsIterator` | `values` |
-| dependency | `URLSearchParamsIterator` | `__@iterator@308` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-94-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-94-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryParams.return"] {
         <<inferred_return>>
         size: number
@@ -6579,24 +4013,6 @@ classDiagram
         has: callback
         set: callback
         sort: callback
-    }
-    class R0["URLSearchParams"] {
-        <<reference>>
-    }
-    class R1["URLSearchParamsIterator"] {
-        <<reference>>
-    }
-    Subject ..> R0 : forEach
-    Subject ..> R1 : entries
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-94-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryParams.return"] {
-        <<inferred_return>>
         toString: callback
         forEach: callback
         entries: callback
@@ -6604,25 +4020,6 @@ classDiagram
         values: callback
         __@iterator@308: callback
     }
-    class R0["URLSearchParamsIterator"] {
-        <<reference>>
-    }
-    Subject ..> R0 : keys
-    Subject ..> R0 : values
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-94-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryParams.return"] {
-        <<inferred_return>>
-    }
-    class R0["URLSearchParamsIterator"] {
-        <<reference>>
-    }
-    Subject ..> R0 : __@iterator@308
 ```
 
 ## inventoryReportService
@@ -6637,15 +4034,12 @@ classDiagram
 | --- | --- | --- |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `export` |
 | dependency | [InventoryQuery](../../../../../src/modules/warehouse/inventory.ts) | `export` |
-| dependency | `AbortSignal` | `export` |
-| dependency | `Promise` | `export` |
-| dependency | `Blob` | `export` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-95-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-95-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryReportService"] {
         <<inferred_export>>
         export: callback
@@ -6658,38 +4052,6 @@ classDiagram
     }
     Subject ..> R0 : export
     Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-95-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryReportService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
-    Subject ..> R1 : export
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-95-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryReportService"] {
-        <<inferred_export>>
-    }
-    class R0["Blob"] {
-        <<reference>>
-    }
-    Subject ..> R0 : export
 ```
 
 ## inventoryService
@@ -6706,30 +4068,23 @@ classDiagram
 | --- | --- | --- |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `list` |
 | dependency | [InventoryQuery](../../../../../src/modules/warehouse/inventory.ts) | `list` |
-| dependency | `AbortSignal` | `list` |
-| dependency | `Promise` | `list` |
 | dependency | [inventoryService.list.shape1](../../../../../src/modules/warehouse/services/inventoryService.ts) | `list` |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `mutate` |
 | dependency | [InventoryAction](../../../../../src/modules/warehouse/inventory.ts) | `mutate` |
 | dependency | [InventoryPayload](../../../../../src/modules/warehouse/inventory.ts) | `mutate` |
-| dependency | `AbortSignal` | `mutate` |
-| dependency | `Promise` | `mutate` |
 | dependency | [inventoryService.mutate.shape2](../../../../../src/modules/warehouse/services/inventoryService.ts) | `mutate` |
 | dependency | [InventoryPayload](../../../../../src/modules/warehouse/inventory.ts) | `createForPurchase` |
-| dependency | `AbortSignal` | `createForPurchase` |
-| dependency | `Promise` | `createForPurchase` |
 | dependency | [LookupItem](../../../../../src/shared/lookup.ts) | `createForPurchase` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-96-1`. Parte 1/8.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-96-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryService"] {
         <<inferred_export>>
         list: callback
         mutate: callback
-        createForPurchase: callback
     }
     class R0["InventoryResource"] {
         <<reference>>
@@ -6737,130 +4092,42 @@ classDiagram
     class R1["InventoryQuery"] {
         <<reference>>
     }
-    Subject ..> R0 : list
-    Subject ..> R1 : list
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-96-2`. Parte 2/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
+    class R2["inventoryService.list.shape1"] {
         <<reference>>
     }
-    class R1["Promise"] {
+    class R3["InventoryAction"] {
         <<reference>>
     }
     Subject ..> R0 : list
     Subject ..> R1 : list
+    Subject ..> R2 : list
+    Subject ..> R0 : mutate
+    Subject ..> R3 : mutate
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-96-3`. Parte 3/8.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-96-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryService"] {
         <<inferred_export>>
+        mutate: callback
+        createForPurchase: callback
     }
-    class R0["inventoryService.list.shape1"] {
+    class R0["InventoryPayload"] {
         <<reference>>
     }
-    class R1["InventoryResource"] {
+    class R1["inventoryService.mutate.<br/>shape2"] {
         <<reference>>
     }
-    Subject ..> R0 : list
-    Subject ..> R1 : mutate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-96-4`. Parte 4/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryService"] {
-        <<inferred_export>>
-    }
-    class R0["InventoryAction"] {
-        <<reference>>
-    }
-    class R1["InventoryPayload"] {
+    class R2["LookupItem"] {
         <<reference>>
     }
     Subject ..> R0 : mutate
     Subject ..> R1 : mutate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-96-5`. Parte 5/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : mutate
-    Subject ..> R1 : mutate
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-96-6`. Parte 6/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryService"] {
-        <<inferred_export>>
-    }
-    class R0["inventoryService.mutate.<br/>shape2"] {
-        <<reference>>
-    }
-    class R1["InventoryPayload"] {
-        <<reference>>
-    }
-    Subject ..> R0 : mutate
-    Subject ..> R1 : createForPurchase
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-96-7`. Parte 7/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryService"] {
-        <<inferred_export>>
-    }
-    class R0["AbortSignal"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
     Subject ..> R0 : createForPurchase
-    Subject ..> R1 : createForPurchase
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-96-8`. Parte 8/8.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["inventoryService"] {
-        <<inferred_export>>
-    }
-    class R0["LookupItem"] {
-        <<reference>>
-    }
-    Subject ..> R0 : createForPurchase
+    Subject ..> R2 : createForPurchase
 ```
 
 ## inventoryService.list.shape1
@@ -6873,25 +4140,17 @@ classDiagram
 | `recordsFiltered` | `recordsFiltered: number;` |
 | `recordsTotal` | `recordsTotal: number;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `InventoryRow` | `data` |
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-97-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-97-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryService.list.shape1"] {
         <<inferred_object>>
         data: InventoryRow[]
         recordsFiltered: number
         recordsTotal: number
     }
-    class R0["InventoryRow"] {
-        <<reference>>
-    }
-    Subject ..> R0 : data
 ```
 
 ## inventoryService.mutate.shape2
@@ -6903,11 +4162,11 @@ classDiagram
 | `code` | `code: string;` |
 | `material` | `material?: unknown;` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-98-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-98-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["inventoryService.mutate.<br/>shape2"] {
         <<inferred_object>>
         code: string
@@ -6931,11 +4190,11 @@ classDiagram
 | dependency | [InventoryPayload](../../../../../src/modules/warehouse/inventory.ts) | `read` |
 | dependency | [InventoryPayload](../../../../../src/modules/warehouse/inventory.ts) | `save` |
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-99-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-WAREHOUSE-99-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createPendingWasteOperation.<br/>return"] {
         <<inferred_return>>
         read: callback

@@ -94,7 +94,7 @@ VS Code solicita instalar las extensiones; el repositorio no las instala automá
 Si tienes Vetur activo, desactívalo en este proyecto Vue 3 para evitar diagnósticos duplicados.
 
 TypeScript comprueba contratos estáticos; no valida las respuestas reales de una API
-ni sustituye las reglas de Express. ESLint puede corregir algunos problemas con
+ni sustituye las reglas del backend. ESLint puede corregir algunos problemas con
 `npm run lint:fix`; no repara automáticamente reglas de negocio ni todos los errores de tipos.
 
 Para el formato usa `npm --prefix front run format` desde la raíz, o

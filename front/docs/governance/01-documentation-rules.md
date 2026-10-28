@@ -55,6 +55,24 @@ en requisitos; los contratos técnicos y decisiones, en arquitectura.
 - `DP-*` expresa diseño de prueba; `CP-*`, un caso; `EP-*`, una ejecución. No se
   copian conteos de una corrida a un requisito como aprobación permanente.
 
+## Referencias al backend
+
+La documentación del frontend explica sus responsabilidades y los contratos que
+consume. Se identifica la tecnología del servidor cuando ayuda a preparar o
+entender una integración concreta.
+
+| Contexto | Forma de documentarlo |
+| --- | --- |
+| Requisitos, pantallas, permisos y contratos HTTP | Usar «API», «servidor» o «backend» y explicar solicitudes, respuestas y errores que afectan al cliente. |
+| Patrones y componentes Vue | Explicar la colaboración del cliente y su frontera HTTP; evitar comparaciones con controladores o patrones del servidor. |
+| Diagramas de clases y tipos | Conservar contratos del negocio y de infraestructura creados para el sistema, como `ApiError`, `InteractiveForm` y los contratos de props que explican sus patrones. Los tipos externos se conservan en firmas o metadatos cuando son necesarios, sin desarrollar clases de bibliotecas. |
+| Secuencias y composición visual | Mostrar una dependencia cuando participa en las llamadas o la composición explicadas, como `useForm` de VeeValidate o `VDataTableServer` de Vuetify. Identificar su procedencia sin detallar sus tipos internos. |
+| Arranque, despliegue y pruebas de sistema | Nombrar Express cuando identifica el proceso, contenedor o dependencia que se ejecuta realmente. |
+| Módulos compartidos | Conservar nombres, rutas y dependencias exactos para distinguir código público compilable de adaptadores privados del servidor. |
+
+Los servicios, repositorios y transacciones del servidor tienen su documentación
+propia. Aquí se describen sus garantías observables y los límites del cliente.
+
 ## Ubicación, navegación y publicación
 
 Las cinco colecciones separan requisitos, arquitectura, procedimientos de desarrollo,

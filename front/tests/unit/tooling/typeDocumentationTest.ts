@@ -20,6 +20,12 @@ const fixture = async () => {
   return root;
 };
 
+const modelFixture = async (root: string) => {
+  const folder = path.join(root, 'src/modules/purchases');
+  await mkdir(folder, { recursive: true });
+  return path.join(folder, 'purchase.ts');
+};
+
 it('conserva todos los campos, opcionales, genéricos y parámetros propiedad de constructor', () => {
   const result = inspectTypeSource(
     'src/types.ts',
@@ -127,23 +133,99 @@ it('incluye retornos públicos inferidos con spreads y objetos de estado sin con
   ]);
 });
 
+it('dibuja contratos propios del sistema y conserva los tipos externos en las firmas', async () => {
+  const root = await fixture();
+  const modelFile = await modelFixture(root);
+  await writeFile(
+    modelFile,
+    `
+    import type { Ref as Box } from 'vue';
+    export interface PurchaseDetail { id: string; }
+    export interface PurchaseRow<T> {
+      selected: Box<PurchaseDetail>;
+      data: Record<string, PurchaseDetail>;
+      pending: Promise<PurchaseDetail>;
+      cancel: AbortSignal;
+      value: T;
+    }
+    export class ApiError extends Error { code: string; }
+    export interface PurchaseFormProps { row: PurchaseRow<string>; }
+  `,
+  );
+  const { contracts } = await buildTypeModel(root);
+  const row = contracts.find(({ name }) => name === 'PurchaseRow')!;
+  expect(row.edges.map(({ target }: { target: { name: string } }) => target.name)).toEqual([
+    'PurchaseDetail',
+    'PurchaseDetail',
+    'PurchaseDetail',
+  ]);
+  expect(contracts.find(({ name }) => name === 'ApiError')!.edges).toEqual([]);
+  const document = (await renderTypeReference(root)).get('purchases.md')!;
+  expect(document).toContain('Box<PurchaseDetail>');
+  expect(document).toContain('Record<string, PurchaseDetail>');
+  expect(document).toContain('extends Error');
+  expect(document).toContain('## ApiError');
+  expect(document).not.toContain('Parte 1/1');
+  const diagrams = [...document.matchAll(/```mermaid\n([\s\S]*?)```/g)]
+    .map((match) => match[1])
+    .join('\n');
+  expect(diagrams).toContain('Subject["PurchaseRow"]');
+  expect(diagrams).toContain('["PurchaseDetail"]');
+  expect(diagrams).toContain('Subject["ApiError"]');
+  expect(diagrams).toContain('Subject["PurchaseFormProps"]');
+  for (const technical of ['Box', 'Record', 'Promise', 'AbortSignal', 'Error', 'T'])
+    expect(diagrams).not.toContain('["' + technical + '"]');
+});
+
+it('divide contratos con muchos destinos sin separar cada propiedad de su relación', async () => {
+  const root = await fixture();
+  const modelFile = await modelFixture(root);
+  const names = [
+    'PurchaseDetail',
+    'PurchaseDocument',
+    'PurchaseValues',
+    'PurchaseFilters',
+    'PurchaseDetailChange',
+  ];
+  await writeFile(
+    modelFile,
+    names.map((name) => `interface ${name} { id: string }`).join('\n') +
+      '\ninterface PurchaseRow { ' +
+      names.map((name, i) => `row${i}: ${name};`).join(' ') +
+      ' name: string; }',
+  );
+  const document = (await renderTypeReference(root)).get('purchases.md')!;
+  const diagrams = [...document.matchAll(/```mermaid\n([\s\S]*?)```/g)]
+    .map((match) => match[1])
+    .filter((source) => source.includes('Subject["PurchaseRow"]'));
+  expect(diagrams).toHaveLength(2);
+  for (let i = 0; i < names.length; i++) {
+    const withField = diagrams.filter((source) => source.includes(`row${i}: ${names[i]}`));
+    expect(withField).toHaveLength(1);
+    expect(withField[0]).toContain('["' + names[i] + '"]');
+    expect(withField[0]).toContain(': row' + i);
+  }
+  expect(diagrams.filter((source) => source.includes('name: string'))).toHaveLength(1);
+});
+
 it('publica todos los miembros por partes y detecta fuentes cambiadas o retiradas', async () => {
   const root = await fixture();
+  const modelFile = await modelFixture(root);
   await writeFile(
-    path.join(root, 'src/state.ts'),
-    'export interface State { ' +
+    modelFile,
+    'export interface PurchaseRow { ' +
       Array.from({ length: 19 }, (_, i) => `field${i}: string;`).join(' ') +
       ' }',
   );
   const first = await renderTypeReference(root);
   expect([...first]).toEqual([...(await renderTypeReference(root))]);
-  const document = first.get('state.ts.md')!;
+  const document = first.get('purchases.md')!;
   expect(document).toContain('field18: string');
-  expect(document.match(/```mermaid/g)).toHaveLength(3);
+  expect(document.match(/```mermaid/g)).toHaveLength(2);
   await expect(generateTypeReference(root, true)).rejects.toThrow('desactualizados');
   await generateTypeReference(root, false);
   await expect(generateTypeReference(root, true)).resolves.toBeUndefined();
-  await rm(path.join(root, 'src/state.ts'));
+  await rm(modelFile);
   await expect(generateTypeReference(root, true)).rejects.toThrow('obsoletas');
   await generateTypeReference(root, false);
   await expect(generateTypeReference(root, true)).resolves.toBeUndefined();

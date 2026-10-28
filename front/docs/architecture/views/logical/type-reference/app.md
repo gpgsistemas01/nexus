@@ -2,11 +2,7 @@
 
 Generado con `npm run docs:generate`. No editar manualmente.
 
-Cada figura incluye hasta ocho miembros y dos relaciones; las partes reúnen el contrato completo.
-Los destinos sin atributos son referencias: su definición completa aparece en su propia ficha.
-Los objetos inline declarados muestran contexto, línea y columna. Las formas inferidas usan shapeN dentro del contrato padre; su fuente apunta al export o función original. No son clases instanciadas.
-
-[Lectura y cobertura](index.md).
+[Alcance y notación](index.md#alcance-y-notación).
 
 ## AppNavigation.defineProps
 
@@ -24,11 +20,11 @@ Los objetos inline declarados muestran contexto, línea y columna. Las formas in
 | --- | --- | --- |
 | association | [NavigationGroup](../../../../../src/app/navigation.ts) | `groups` |
 
-**Figura:** `DIA-VUE-TS-APP-1-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-1-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["AppNavigation.defineProps"] {
         <<SFC_contract>>
         userName: string
@@ -52,11 +48,11 @@ classDiagram
 | `navigate` | `navigate: [];` |
 | `expand` | `expand: []` |
 
-**Figura:** `DIA-VUE-TS-APP-2-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-2-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["AppNavigation.defineEmits"] {
         <<SFC_contract>>
         navigate: tuple
@@ -74,11 +70,11 @@ classDiagram
 | `to` | `to: string;` |
 | `icon` | `icon: string;` |
 
-**Figura:** `DIA-VUE-TS-APP-3-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-3-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["NavigationLink"] {
         <<interface>>
         title: string
@@ -103,11 +99,11 @@ classDiagram
 | dependency | [NavigationLink](../../../../../src/app/navigation.ts) | `links` |
 | dependency | [NavigationGroup.links@42:39](../../../../../src/app/navigation.ts) | `links` |
 
-**Figura:** `DIA-VUE-TS-APP-4-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-4-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["NavigationGroup"] {
         <<interface>>
         id: string
@@ -133,11 +129,11 @@ classDiagram
 | --- | --- |
 | `permission` | `permission: string` |
 
-**Figura:** `DIA-VUE-TS-APP-5-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-5-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["NavigationGroup.links@42:39"] {
         <<inline_object>>
         permission: string
@@ -152,11 +148,11 @@ classDiagram
 | --- | --- |
 | `isUnavailable` | `isUnavailable?: boolean` |
 
-**Figura:** `DIA-VUE-TS-APP-6-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-6-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["AccessErrorPage.defineProps"] {
         <<SFC_contract>>
         isUnavailable?: boolean
@@ -177,11 +173,11 @@ classDiagram
 | dependency | [DirectoryResource](../../../../../src/modules/directory/directory.ts) | `resource` |
 | association | [LookupCreation](../../../../../src/shared/lookup.ts) | `request` |
 
-**Figura:** `DIA-VUE-TS-APP-7-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-7-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryCreationPage.<br/>defineProps"] {
         <<SFC_contract>>
         resource: DirectoryResource
@@ -205,11 +201,11 @@ classDiagram
 | --- | --- |
 | `close` | `close: []` |
 
-**Figura:** `DIA-VUE-TS-APP-8-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-8-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["DirectoryCreationPage.<br/>defineEmits"] {
         <<SFC_contract>>
         close: tuple
@@ -228,11 +224,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-APP-9-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-9-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["InventoryWorkspace.<br/>defineProps"] {
         <<SFC_contract>>
         resource: InventoryResource
@@ -255,11 +251,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [IssueResource](../../../../../src/modules/issues/issue.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-APP-10-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-10-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["IssueWorkspace.defineProps"] {
         <<SFC_contract>>
         resource: IssueResource
@@ -282,11 +278,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [PurchaseResource](../../../../../src/modules/purchases/purchase.ts) | `resource` |
 
-**Figura:** `DIA-VUE-TS-APP-11-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-11-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["PurchaseWorkspace.<br/>defineProps"] {
         <<SFC_contract>>
         resource: PurchaseResource
@@ -305,11 +301,11 @@ classDiagram
 | --- | --- |
 | `kind` | `kind: 'supplier'` |
 
-**Figura:** `DIA-VUE-TS-APP-12-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-12-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["auxiliary@14:6"] {
         <<inline_object>>
         kind: 'supplier'
@@ -324,11 +320,11 @@ classDiagram
 | --- | --- |
 | `kind` | `kind: 'item'` |
 
-**Figura:** `DIA-VUE-TS-APP-13-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-13-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["auxiliary@14:48"] {
         <<inline_object>>
         kind: 'item'
@@ -350,11 +346,11 @@ classDiagram
 | --- | --- | --- |
 | dependency | [usePageAccess.return.session.shape1](../../../../../src/app/composables/usePageAccess.ts) | `session` |
 
-**Figura:** `DIA-VUE-TS-APP-14-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-14-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePageAccess.return"] {
         <<inferred_return>>
         session: callback
@@ -379,40 +375,18 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `Readonly` | `user` |
-| dependency | `Ref` | `user` |
 | dependency | [usePageAccess.return.session.user.shape2](../../../../../src/app/composables/usePageAccess.ts) | `user` |
 | dependency | [usePageAccess.return.session.user.shape3](../../../../../src/app/composables/usePageAccess.ts) | `user` |
-| dependency | `Promise` | `load` |
-| dependency | `SessionUser` | `load` |
 
-**Figura:** `DIA-VUE-TS-APP-15-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-APP-15-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePageAccess.return.session.<br/>shape1"] {
         <<inferred_object>>
         user: object
         load: callback
-    }
-    class R0["Readonly"] {
-        <<reference>>
-    }
-    class R1["Ref"] {
-        <<reference>>
-    }
-    Subject ..> R0 : user
-    Subject ..> R1 : user
-```
-
-**Figura:** `DIA-VUE-TS-APP-15-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePageAccess.return.session.<br/>shape1"] {
-        <<inferred_object>>
     }
     class R0["usePageAccess.return.session.<br/>user.shape2"] {
         <<reference>>
@@ -422,24 +396,6 @@ classDiagram
     }
     Subject ..> R0 : user
     Subject ..> R1 : user
-```
-
-**Figura:** `DIA-VUE-TS-APP-15-3`. Parte 3/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["usePageAccess.return.session.<br/>shape1"] {
-        <<inferred_object>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["SessionUser"] {
-        <<reference>>
-    }
-    Subject ..> R0 : load
-    Subject ..> R1 : load
 ```
 
 ## usePageAccess.return.session.user.shape2
@@ -452,11 +408,11 @@ classDiagram
 | `name` | `readonly name: string;` |
 | `permissions` | `readonly permissions: readonly string[];` |
 
-**Figura:** `DIA-VUE-TS-APP-16-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-16-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePageAccess.return.session.<br/>user.shape2"] {
         <<inferred_object>>
         id: string
@@ -475,11 +431,11 @@ classDiagram
 | `name` | `readonly name: string;` |
 | `permissions` | `readonly permissions: readonly string[];` |
 
-**Figura:** `DIA-VUE-TS-APP-17-1`. Parte 1/1.
+**Figura:** `DIA-VUE-TS-APP-17-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["usePageAccess.return.session.<br/>user.shape3"] {
         <<inferred_object>>
         id: string
@@ -516,11 +472,11 @@ classDiagram
 | `suppliers` | `"suppliers": string;` |
 | `logout` | `"logout": string;` |
 
-**Figura:** `DIA-VUE-TS-APP-18-1`. Parte 1/3.
+**Figura:** `DIA-VUE-TS-APP-18-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["APP_ICONS"] {
         <<inferred_export>>
         issues: string
@@ -531,16 +487,6 @@ classDiagram
         consumables: string
         wastes: string
         catalogs: string
-    }
-```
-
-**Figura:** `DIA-VUE-TS-APP-18-2`. Parte 2/3.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["APP_ICONS"] {
-        <<inferred_export>>
         departments: string
         roles: string
         presentations: string
@@ -552,11 +498,11 @@ classDiagram
     }
 ```
 
-**Figura:** `DIA-VUE-TS-APP-18-3`. Parte 3/3.
+**Figura:** `DIA-VUE-TS-APP-18-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["APP_ICONS"] {
         <<inferred_export>>
         users: string
@@ -603,41 +549,14 @@ classDiagram
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | `RouterOptions` | `options` |
 | dependency | [createAppRouter.return.addRoute.shape1](../../../../../src/app/router/index.ts) | `addRoute` |
-| dependency | `NonNullable` | `removeRoute` |
-| dependency | `RouteRecordNameGeneric` | `removeRoute` |
-| dependency | `ShallowRef` | `currentRoute` |
-| dependency | `RouteLocationNormalizedLoadedGeneric` | `currentRoute` |
-| dependency | `NonNullable` | `hasRoute` |
-| dependency | `RouteRecordNameGeneric` | `hasRoute` |
-| dependency | `RouteRecordNormalized` | `getRoutes` |
 | association | [createAppRouter.return.resolve.shape2](../../../../../src/app/router/index.ts) | `resolve` |
-| dependency | `RouteLocationRaw` | `push` |
-| dependency | `Promise` | `push` |
-| dependency | `NavigationFailure` | `push` |
-| dependency | `RouteLocationRaw` | `replace` |
-| dependency | `Promise` | `replace` |
-| dependency | `NavigationFailure` | `replace` |
-| dependency | `NavigationGuardWithThis` | `beforeEach` |
-| dependency | `_NavigationGuardResolved` | `beforeResolve` |
-| dependency | `NavigationHookAfter` | `afterEach` |
-| dependency | `_ErrorListener` | `onError` |
-| dependency | `Promise` | `isReady` |
-| dependency | `App` | `install` |
-| dependency | `_DefineLoaderEntryMap` | `__@LOADER_ENTRIES_KEY@8831` |
-| dependency | `DataLoaderEntryBase` | `__@LOADER_ENTRIES_KEY@8831` |
-| dependency | `RouteLocationNormalizedLoadedGeneric` | `__@PENDING_LOCATION_KEY@8833` |
-| dependency | `App` | `__@APP_KEY@8835` |
-| dependency | `EffectScope` | `__@DATA_LOADERS_EFFECT_SCOPE_KEY@8839` |
-| dependency | `Record` | `__@SERVER_INITIAL_DATA_KEY@8841` |
-| dependency | `Record` | `__@INITIAL_DATA_KEY@8843` |
 
-**Figura:** `DIA-VUE-TS-APP-19-1`. Parte 1/15.
+**Figura:** `DIA-VUE-TS-APP-19-1`. Parte 1/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createAppRouter.return"] {
         <<inferred_return>>
         options: RouterOptions
@@ -648,24 +567,6 @@ classDiagram
         listening: boolean
         hasRoute: callback
         getRoutes: callback
-    }
-    class R0["RouterOptions"] {
-        <<reference>>
-    }
-    class R1["createAppRouter.return.<br/>addRoute.shape1"] {
-        <<reference>>
-    }
-    Subject ..> R0 : options
-    Subject ..> R1 : addRoute
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-2`. Parte 2/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
         resolve: object
         push: callback
         replace: callback
@@ -675,21 +576,21 @@ classDiagram
         beforeEach: callback
         beforeResolve: callback
     }
-    class R0["NonNullable"] {
+    class R0["createAppRouter.return.<br/>addRoute.shape1"] {
         <<reference>>
     }
-    class R1["RouteRecordNameGeneric"] {
+    class R1["createAppRouter.return.<br/>resolve.shape2"] {
         <<reference>>
     }
-    Subject ..> R0 : removeRoute
-    Subject ..> R1 : removeRoute
+    Subject ..> R0 : addRoute
+    Subject "1" --> "1" R1 : resolve
 ```
 
-**Figura:** `DIA-VUE-TS-APP-19-3`. Parte 3/15.
+**Figura:** `DIA-VUE-TS-APP-19-2`. Parte 2/2.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createAppRouter.return"] {
         <<inferred_return>>
         afterEach: callback
@@ -700,230 +601,10 @@ classDiagram
         __@PENDING_LOCATION_KEY@8833: RouteLocationNormalizedLoadedGeneric | null
         __@APP_KEY@8835: App~unknown~
         __@IS_SSR_KEY@8837: boolean
-    }
-    class R0["ShallowRef"] {
-        <<reference>>
-    }
-    class R1["RouteLocationNormalizedLoade<br/>dGeneric"] {
-        <<reference>>
-    }
-    Subject ..> R0 : currentRoute
-    Subject ..> R1 : currentRoute
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-4`. Parte 4/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
         __@DATA_LOADERS_EFFECT_SCOPE_KEY@8839: EffectScope
         __@SERVER_INITIAL_DATA_KEY@8841?: false | Record~string, unknown~ | undefined
         __@INITIAL_DATA_KEY@8843?: false | Record~string, unknown~ | undefined
     }
-    class R0["NonNullable"] {
-        <<reference>>
-    }
-    class R1["RouteRecordNameGeneric"] {
-        <<reference>>
-    }
-    Subject ..> R0 : hasRoute
-    Subject ..> R1 : hasRoute
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-5`. Parte 5/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["RouteRecordNormalized"] {
-        <<reference>>
-    }
-    class R1["createAppRouter.return.<br/>resolve.shape2"] {
-        <<reference>>
-    }
-    Subject ..> R0 : getRoutes
-    Subject "1" --> "1" R1 : resolve
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-6`. Parte 6/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["RouteLocationRaw"] {
-        <<reference>>
-    }
-    class R1["Promise"] {
-        <<reference>>
-    }
-    Subject ..> R0 : push
-    Subject ..> R1 : push
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-7`. Parte 7/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["NavigationFailure"] {
-        <<reference>>
-    }
-    class R1["RouteLocationRaw"] {
-        <<reference>>
-    }
-    Subject ..> R0 : push
-    Subject ..> R1 : replace
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-8`. Parte 8/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["NavigationFailure"] {
-        <<reference>>
-    }
-    Subject ..> R0 : replace
-    Subject ..> R1 : replace
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-9`. Parte 9/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["NavigationGuardWithThis"] {
-        <<reference>>
-    }
-    class R1["_NavigationGuardResolved"] {
-        <<reference>>
-    }
-    Subject ..> R0 : beforeEach
-    Subject ..> R1 : beforeResolve
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-10`. Parte 10/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["NavigationHookAfter"] {
-        <<reference>>
-    }
-    class R1["_ErrorListener"] {
-        <<reference>>
-    }
-    Subject ..> R0 : afterEach
-    Subject ..> R1 : onError
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-11`. Parte 11/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["Promise"] {
-        <<reference>>
-    }
-    class R1["App"] {
-        <<reference>>
-    }
-    Subject ..> R0 : isReady
-    Subject ..> R1 : install
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-12`. Parte 12/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["_DefineLoaderEntryMap"] {
-        <<reference>>
-    }
-    class R1["DataLoaderEntryBase"] {
-        <<reference>>
-    }
-    Subject ..> R0 : __@LOADER_ENTRIES_KEY@8831
-    Subject ..> R1 : __@LOADER_ENTRIES_KEY@8831
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-13`. Parte 13/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["RouteLocationNormalizedLoade<br/>dGeneric"] {
-        <<reference>>
-    }
-    class R1["App"] {
-        <<reference>>
-    }
-    Subject ..> R0 : __@PENDING_LOCATION_KEY@8833
-    Subject ..> R1 : __@APP_KEY@8835
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-14`. Parte 14/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["EffectScope"] {
-        <<reference>>
-    }
-    class R1["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : __@DATA_LOADERS_EFFECT_SCOPE_KEY@8839
-    Subject ..> R1 : __@SERVER_INITIAL_DATA_KEY@8841
-```
-
-**Figura:** `DIA-VUE-TS-APP-19-15`. Parte 15/15.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return"] {
-        <<inferred_return>>
-    }
-    class R0["Record"] {
-        <<reference>>
-    }
-    Subject ..> R0 : __@INITIAL_DATA_KEY@8843
 ```
 
 ## createAppRouter.return.addRoute.shape1
@@ -935,44 +616,16 @@ classDiagram
 | `signature` | `(parentName: NonNullable<RouteRecordNameGeneric>, route: RouteRecordRaw): () => void;` |
 | `signature` | `(route: RouteRecordRaw): () => void;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `NonNullable` | `signature.parentName` |
-| dependency | `RouteRecordNameGeneric` | `signature.parentName` |
-| dependency | `RouteRecordRaw` | `signature.route` |
-
-**Figura:** `DIA-VUE-TS-APP-20-1`. Parte 1/2.
+**Figura:** `DIA-VUE-TS-APP-20-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createAppRouter.return.<br/>addRoute.shape1"] {
         <<inferred_object>>
         signature: callback
         signature: callback
     }
-    class R0["NonNullable"] {
-        <<reference>>
-    }
-    class R1["RouteRecordNameGeneric"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.parentName
-    Subject ..> R1 : signature.parentName
-```
-
-**Figura:** `DIA-VUE-TS-APP-20-2`. Parte 2/2.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return.<br/>addRoute.shape1"] {
-        <<inferred_object>>
-    }
-    class R0["RouteRecordRaw"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.route
 ```
 
 ## createAppRouter.return.resolve.shape2
@@ -984,102 +637,14 @@ classDiagram
 | `signature` | `<Name extends keyof RouteMap = string \| symbol>(to: RouteLocationAsRelativeTyped<RouteMap, Name>, currentLocation?: RouteLocationNormalizedLoaded): RouteLocationResolved<Name>;` |
 | `signature` | `(to: RouteLocationAsString \| RouteLocationAsRelative \| RouteLocationAsPath, currentLocation?: RouteLocationNormalizedLoaded): RouteLocationResolved;` |
 
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | `RouteLocationResolved` | `signature` |
-| dependency | `Name` | `signature` |
-| dependency | `RouteLocationAsRelativeTyped` | `signature.to` |
-| dependency | `RouteMap` | `signature.to` |
-| dependency | `Name` | `signature.to` |
-| dependency | `RouteLocationNormalizedLoaded` | `signature.currentLocation` |
-| dependency | `RouteLocationAsString` | `signature.to` |
-| dependency | `RouteLocationAsRelative` | `signature.to` |
-| dependency | `RouteLocationAsPath` | `signature.to` |
-
-**Figura:** `DIA-VUE-TS-APP-21-1`. Parte 1/5.
+**Figura:** `DIA-VUE-TS-APP-21-1`.
 
 ```mermaid
 classDiagram
-    direction TB
+    direction LR
     class Subject["createAppRouter.return.<br/>resolve.shape2"] {
         <<inferred_object>>
         signature: RouteLocationResolved~Name~
         signature: RouteLocationResolved
     }
-    class R0["RouteLocationResolved"] {
-        <<reference>>
-    }
-    class R1["Name"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature
-    Subject ..> R1 : signature
-```
-
-**Figura:** `DIA-VUE-TS-APP-21-2`. Parte 2/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return.<br/>resolve.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["RouteLocationAsRelativeTyped"] {
-        <<reference>>
-    }
-    class R1["RouteMap"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.to
-    Subject ..> R1 : signature.to
-```
-
-**Figura:** `DIA-VUE-TS-APP-21-3`. Parte 3/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return.<br/>resolve.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["Name"] {
-        <<reference>>
-    }
-    class R1["RouteLocationNormalizedLoade<br/>d"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.to
-    Subject ..> R1 : signature.currentLocation
-```
-
-**Figura:** `DIA-VUE-TS-APP-21-4`. Parte 4/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return.<br/>resolve.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["RouteLocationAsString"] {
-        <<reference>>
-    }
-    class R1["RouteLocationAsRelative"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.to
-    Subject ..> R1 : signature.to
-```
-
-**Figura:** `DIA-VUE-TS-APP-21-5`. Parte 5/5.
-
-```mermaid
-classDiagram
-    direction TB
-    class Subject["createAppRouter.return.<br/>resolve.shape2"] {
-        <<inferred_object>>
-    }
-    class R0["RouteLocationAsPath"] {
-        <<reference>>
-    }
-    Subject ..> R0 : signature.to
 ```

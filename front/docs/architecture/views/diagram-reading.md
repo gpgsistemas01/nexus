@@ -39,7 +39,9 @@ classDiagram
 | --- | --- |
 | Rectángulo con compartimentos | Arriba: nombre; después: atributos y, si aparecen, operaciones. `campo: tipo` describe un dato; `nombre()` una operación. Un compartimento vacío no declara ausencia de comportamiento. |
 | `«interface»`, `«type»`, `«abstract»` | Interfaz TypeScript, alias de tipo o concepto abstracto, respectivamente. Son etiquetas de clasificación. |
-| `«external»` / `«external interface»` | Elemento definido por el lenguaje o una dependencia, como Error, Axios o `Ref<T>` de Vue. |
+| `«reference»` | Referencia a un contrato propio cuya definición se consulta en su ficha local. |
+| `«SFC_contract»`, `«inferred_return»`, `«inferred_object»` o `«evaluated_alias»` | Contrato de componente o estructura obtenida del código TypeScript; no implica una clase instanciada. La fuente y la firma completa identifican su origen. |
+| Tipo de biblioteca dentro de una firma, como `Ref<number>` | Anotación de un dato del contrato. No representa una entidad propia ni requiere un nodo de clase separado. |
 | Nombre con parámetro, como `PageResult<T>` | Tipo genérico: `T` identifica el tipo de sus filas, por ejemplo `LookupItem`. |
 | Atributo con `?`, tipo con `null` o `T[]` | Propiedad opcional, valor nulo admitido o colección de elementos, respectivamente. Una abreviación de la figura se desarrolla junto al contrato. |
 | Línea continua sin punta | Asociación: los elementos están vinculados. Su texto nombra el vínculo o un rol. |

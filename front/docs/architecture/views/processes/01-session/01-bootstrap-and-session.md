@@ -23,7 +23,7 @@ sequenceDiagram
     participant Router@{ "type": "control" } as Router
     participant Sesion@{ "type": "control" } as createAuthSession
     participant HTTP@{ "type": "boundary" } as apiClient
-    participant API@{ "type": "boundary" } as API Express
+    participant API@{ "type": "boundary" } as API del sistema
     Usuario->>Router: abrir URL protegida
     Router->>Sesion: load()
     Sesion->>HTTP: GET /api/auth/me

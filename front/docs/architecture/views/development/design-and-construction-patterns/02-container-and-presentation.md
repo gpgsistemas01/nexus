@@ -5,7 +5,7 @@
 Un componente que consulta la API, decide permisos y dibuja controles cambia por
 motivos distintos. El contenedor coordina el caso; la presentación recibe props
 y emite intenciones. En Vue esta separación se implementa con componentes y
-composables; no exige crear un controlador Express dentro del navegador.
+composables, que conservan el estado y coordinan las operaciones de la página.
 
 ## Modelo general de contenedor y presentación
 
@@ -56,6 +56,6 @@ la revisión comprueba también dependencias indirectas.
 
 [catalogs.spec.ts](../../../../../tests/e2e/catalogs.spec.ts) comprueba el flujo con API
 simulada; las [pruebas del editor](../../../../../tests/unit/modules/catalogs/catalogEditorTest.ts)
-observan captura, errores y confirmación. No acreditan autorización en Express.
+observan captura, errores y confirmación. No acreditan autorización en el backend.
 Referencia: [props](https://vuejs.org/guide/components/props.html) y
 [eventos de Vue](https://vuejs.org/guide/components/events.html).
