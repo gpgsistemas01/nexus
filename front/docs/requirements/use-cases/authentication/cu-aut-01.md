@@ -18,4 +18,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Captura, login y navegación](../../../architecture/views/processes/04-login.md).
+- [Captura, login y navegación](../../../architecture/views/processes/01-session/02-login.md).

@@ -101,6 +101,11 @@ Los [contratos HTTP](../../contracts/index.md) describen paginación, errores, m
 y descargas. La [vista física](../physical/index.md) identifica procesos, proxy y
 frontera de build. Los comandos y archivos locales pertenecen a la [guía de inicio](../../../development/01-getting-started.md).
 
+La [matriz de captura y eventos](frontend-technical-documentation/08-form-and-event-contracts.md)
+precisa modos, datos de consulta, payloads y recuperación. Los
+[roles de las secuencias](../processes/00-reading-and-roles.md) identifican la frontera
+visual o de transporte y el coordinador que ejecuta cada operación.
+
 ## Verificación del cambio
 
 Se identifica el contrato afectado, se revisan consumidores y se elige la evidencia

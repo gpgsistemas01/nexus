@@ -16,6 +16,8 @@ Vista inspirada en el nivel de contenedores C4 con cajas Mermaid: es una
 aproximación, no notación C4 completa ni prueba de un proveedor desplegado.
 Las flechas representan interacción o comunicación, no orden de arranque.
 
+**Lectura visual:** [formas, límites y flechas del mapa](diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     user["Usuario autorizado"]
@@ -64,23 +66,11 @@ código de cada página en el diagrama arquitectónico.
 
 ## Cómo documentar una página o flujo web
 
-C4 explica la estructura; una página necesita además su contrato de interacción.
-Las guías de módulos mantienen esta información con el nivel de detalle útil:
-
-| Información | Fuente o forma de comprobarla |
-| --- | --- |
-| Propósito y objetivo del usuario | Caso `CU-*` de la SRS, enlazado desde el módulo. |
-| Ruta, contenedor y permiso de navegación | [Router](../../../src/app/router/index.ts) y configuración del recurso. No mantener otro catálogo manual exhaustivo que pueda divergir. |
-| Estado y operaciones | Composable propietario y contrato de props/eventos; explicar carga, vacío, error, captura y confirmación cuando correspondan. |
-| Entradas, salidas y errores | Esquema público, mapper y servicio del recurso; OpenAPI conserva el contrato HTTP normativo. |
-| Reutilización y decisiones | Enlazar el patrón y su aplicación; justificar las variantes del módulo. |
-| Evidencia y límites | Unitarias/componentes y recorrido Playwright representativo; distinguir API simulada de persistencia real. |
-
-La estructura no exige una ficha ni todos los tipos de diagrama por cada ruta.
-Por ejemplo, [Salidas](development/frontend-technical-documentation/07-issues.md) documenta modos y efectos visibles, mientras
-[responsabilidades de documentos](development/design-and-construction-patterns/08-document-responsibilities.md) documenta la
-colaboración interna. La [guía de inicio](../../development/01-getting-started.md) conserva el proceso
-de preparación; una vista arquitectónica no sustituye instrucciones ejecutables.
+Las [reglas de síntesis](../../governance/01-documentation-rules.md#síntesis-y-lectura-visual)
+indican cuándo usar gráficos, tablas y texto. La
+[referencia por módulo](development/frontend-technical-documentation/index.md)
+relaciona objetivos, contratos, permisos, errores y evidencia con los colaboradores reales.
+El [inicio local](../../development/01-getting-started.md) conserva los comandos de preparación.
 
 ## Referencias
 

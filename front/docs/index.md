@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.6 | 1.0.0 | En revisión | 2026-10-27 | Equipo Nexus |
+| 1.7 | 1.0.0 | En revisión | 2026-10-28 | Equipo Nexus |
 
 ## Propósito y audiencia
 
@@ -26,14 +26,15 @@ front/docs/
 ├── publications.json                # Alcance y orden de los documentos exportados
 ├── requirements/
 │   ├── requirements-specification/   # Reglas del producto y obligaciones del cliente
+│   ├── domain-model/                 # Conceptos, relaciones y multiplicidades
 │   └── use-cases/                    # Fichas por objetivo y familia
 ├── architecture/
 │   ├── coding-standards/             # Reglas de construcción y revisión
 │   ├── contracts/                    # Interfaces consumidas por el cliente
 │   └── views/
 │       ├── scenarios/                # Navegación y objetivos
-│       ├── logical/                  # Componentes, datos y estados
-│       ├── processes/                # Colaboraciones y secuencias
+│       ├── logical/                  # Componentes, modelos de tipos y estados
+│       ├── processes/                # Secuencias agrupadas por responsabilidad
 │       ├── development/              # Estructura, patrones y referencia de código
 │       └── physical/                 # Ejecución y despliegue
 ├── development/                     # Preparación y comandos
@@ -60,6 +61,7 @@ front/docs/
 | Generar la inducción por cuenta | [Perfiles, credenciales locales y capturas](governance/06-manuals-by-access.md) → manual del acceso efectivo. |
 | Incorporarse al proyecto | [Inicio local](development/01-getting-started.md) → [guía del código](architecture/views/development/developer-onboarding.md) → [vista general](architecture/views/overview.md). |
 | Implementar una operación | [Requisito y CU](requirements/index.md) → [secuencia del proceso](architecture/views/processes/index.md) → [responsabilidad del módulo](architecture/views/development/frontend-technical-documentation/index.md) → [estándar](architecture/coding-standards/index.md). |
+| Leer un diagrama | [Guía visual](architecture/views/diagram-reading.md) → leyenda local → fuentes de la figura. |
 | Revisar datos o errores | [Contrato del cliente](architecture/contracts/index.md) → [mappers/servicios](architecture/views/development/code-reference.md) → [pruebas de la condición](testing/02-test-design.md). |
 | Diseñar o ejecutar pruebas | [Plan](testing/01-test-plan.md) → [diseño DP](testing/02-test-design.md) → [caso CP](testing/03-test-cases.md) → evidencia EP de la corrida. |
 | Construir o desplegar | [Guía de operación](development/03-build-and-deployment.md) y [topología](architecture/views/physical/index.md). |

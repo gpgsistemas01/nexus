@@ -30,15 +30,17 @@ Referencia de responsabilidades y contratos del dominio `warehouse`. El [corte d
 | Alta desde compra | Contexto goodsReceipt, proveedor fijado y sin stock inicial; devuelve opción confirmada. |
 | Tabla | Encabezados/columnas por recurso, permiso de costo/estado y filas de stock bajo. |
 
+La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
+
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |
 | --- | --- |
-| Selección y guardado por modo | [Selección y guardado por modo](../../processes/08-inventory-selection-write.md) |
-| Operación incierta y recuperación | [Operación incierta y recuperación](../../processes/09-waste-pending.md) |
-| Duplicado y apertura de entrada | [Duplicado y apertura de entrada](../../processes/10-waste-duplicate.md) |
-| Baja confirmada de relación | [Baja confirmada de relación](../../processes/22-inventory-removal.md) |
-| Recarga visible | [Recarga visible](../../processes/20-visible-refresh.md) |
+| Selección y guardado por modo | [Selección y guardado por modo](../../processes/05-warehouse/01-inventory-selection-write.md) |
+| Operación incierta y recuperación | [Operación incierta y recuperación](../../processes/05-warehouse/02-waste-pending.md) |
+| Duplicado y apertura de entrada | [Duplicado y apertura de entrada](../../processes/05-warehouse/03-waste-duplicate.md) |
+| Baja confirmada de relación | [Baja confirmada de relación](../../processes/05-warehouse/04-inventory-removal.md) |
+| Recarga visible | [Recarga visible](../../processes/02-shared-runtime/04-visible-refresh.md) |
 
 Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
 

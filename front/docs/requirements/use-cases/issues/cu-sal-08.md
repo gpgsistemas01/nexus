@@ -19,5 +19,5 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [2. Consulta y guardado de registros](../../../architecture/views/processes/02-list-and-record-save.md).
-- [Salida: apertura, modos y escritura](../../../architecture/views/processes/16-issue-open-save.md).
+- [2. Consulta y guardado de registros](../../../architecture/views/processes/02-shared-runtime/01-list-and-record-save.md).
+- [Salida: apertura, modos y escritura](../../../architecture/views/processes/07-issues/01-issue-open-save.md).

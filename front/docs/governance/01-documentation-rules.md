@@ -82,6 +82,8 @@ para requisitos, diagramas, procesos y referencias de código.
 | Caso de prueba seleccionado | Una condición con preparación, datos y oráculo reproducibles. | Entrada, pasos, resultado esperado y limpieza. No una ficha por cada aserción o `it`. |
 | Diseño de prueba | Dominio o contrato con riesgos y evidencia relacionados. | Condiciones DP, técnicas, casos y límites de ese ámbito. |
 | Modelo de casos de uso | Capacidad funcional del cliente. | Figuras de sus recursos y actores; no un archivo por óvalo o enlace. |
+| Modelo de dominio | Corte coherente de conceptos de negocio. | Significado, relaciones, multiplicidades y restricciones; sin componentes Vue ni tablas SQL. |
+| Clases/interfaces/tipos | Familia de contratos del cliente. | Extensiones reales, colecciones, aliases, variantes y transformación de escritura. |
 | Proceso técnico | Operación o colaboración con decisiones propias. | Participantes, mensajes, errores y recuperación; sus fases se explican juntas cuando forman el mismo recorrido. |
 | Componente/patrón | Responsabilidad o mecanismo con consumidores concretos. | Modelo, contrato, aplicación, límites y evidencia; una figura puede ser el contenido principal. |
 | Estándar | Preocupación de construcción. | Reglas relacionadas de formato, nombres, dependencias o errores, con ejemplos. |
@@ -104,6 +106,43 @@ Los diagramas de flujo no se presentan como UML de clases. Actores, mensajes y
 límites se usan cuando corresponde, sin inventar relaciones ni concurrencia.
 Los diagramas curados explican decisiones; el generador sólo inventaría elementos
 declarados en las fuentes. Ninguno demuestra por sí mismo calidad o SOLID.
+
+| Familia | Comprobación visual y semántica |
+| --- | --- |
+| Secuencia | Actor humano y participantes `boundary`/`control` según responsabilidad; mensajes numerados y extremos declarados. El callback conserva su propietario de código. |
+| Clases/dominio | Estereotipos, atributos, asociaciones, multiplicidades y generalizaciones correspondientes al modelo. Los eventos tipados se describen como datos/contratos, no métodos inventados. |
+| Casos de uso | Actor fuera del límite, objetivos en óvalos, participación y relaciones funcionales justificadas. |
+| Estados/actividad | Inicio, estados/acciones, transiciones y decisiones del ciclo representado; los finales y alternativas conservan su significado. |
+| Mapas/ejecución | Consumidor hacia colaborador y leyenda de relaciones; construcción, artefactos y procesos en ejecución tienen alcance explícito. |
+
+El dominio se mantiene en `requirements/domain-model`; los contratos estáticos en
+`architecture/views/logical/class-and-type-models`; los estados en `logical/states`.
+Los procesos se agrupan por responsabilidad y conservan un índice por sección. Un
+diagrama de dominio no reemplaza el de tipos y una secuencia no reemplaza el ciclo de
+estados. El [índice de vistas](../architecture/views/index.md) relaciona esos niveles.
+
+## Síntesis y lectura visual
+
+| Información que se explica | Forma de resumirla | Detalle que debe conservarse |
+| --- | --- | --- |
+| Responsabilidades y dependencias | Diagrama de componentes/mapa. | Propietarios, frontera y significado de cada tipo de flecha. |
+| Diferencias entre modos, campos o herramientas | Tabla comparativa. | Condiciones, datos admitidos y excepciones que cambian el resultado. |
+| Orden, rechazo y recuperación | Secuencia. | Participantes, mensajes relevantes y alternativas. |
+| Ciclo de una interacción | Estados. | Evento, guarda y resultado de cada transición relevante. |
+| Justificación o restricción delicada | Párrafo breve junto al modelo. | Motivo y límite que la figura no expresa. |
+| Caso de uso o prueba seleccionado | Ficha establecida. | Preparación, pasos, alternativas y resultado verificable. |
+
+La [guía de lectura](../architecture/views/diagram-reading.md) concentra símbolos,
+multiplicidades, líneas, numeración, marcos y color. Cada documento con figuras enlaza
+su familia; una convención particular se explica junto al diagrama. El texto desarrolla
+motivos, restricciones y recuperación; las comparaciones pertenecen a la tabla y las
+relaciones al gráfico. La revisión elimina la repetición de esa misma información en
+varios formatos y conserva una fuente propietaria por detalle.
+
+La guía de un módulo identifica objetivo/CU, ruta y permiso, estado y operaciones,
+entradas/salidas/errores, mecanismos reutilizados y evidencia. Router y contratos HTTP
+conservan sus fuentes técnicas; el módulo explica las decisiones y condiciones que
+cambian el comportamiento visible.
 
 ## Referencias adoptadas
 

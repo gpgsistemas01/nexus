@@ -4,23 +4,26 @@
 
 **Fuente:** PurchaseWorkspace, PurchasePage, usePurchaseActions, usePurchaseEditor, usePurchaseLineEntry, usePurchaseCorrection y mappers. **Notación y alcance:** Las flechas indican dependencia o consumo; no orden temporal ni herencia.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     workspace["PurchaseWorkspace"] --> page["PurchasePage"]
-    workspace --> auxiliary["Altas de proveedor y artículo"]
+    workspace --> auxiliary["DirectoryCreationPage / InventoryEditorPage"]
     page --> actions["usePurchaseActions · lectura y modos"]
     actions --> read["useDocumentRead"]
-    page --> editor["usePurchaseEditor · encabezado y borrador"]
-    page --> entryPage["PurchaseEditorPage y PurchaseLineEntryPage"]
-    entryPage --> line["usePurchaseLineEntry · partida nueva"]
-    entryPage --> editor
-    page --> correction["usePurchaseCorrection"]
-    editor --> view["PurchaseEditor / DetailsTable / Totals"]
+    page --> editorPage["PurchaseEditorPage"]
+    editorPage --> editor["usePurchaseEditor · captura"]
+    editorPage --> view["PurchaseEditor · presentación"]
+    editorPage --> linePage["PurchaseLineEntryPage"]
+    linePage --> line["usePurchaseLineEntry"]
+    page --> correctionPage["PurchaseCorrectionPage"]
+    correctionPage --> correction["usePurchaseCorrection"]
     editor --> mapper["purchaseRequestMapper"]
-    correction --> service["purchaseService"]
+    editor --> service["purchaseService"]
     actions --> service
-    mapper --> service
-    service --> response["purchaseResponseMapper y confirmMutation"]
+    correction --> service
+    service --> response["purchaseResponseMapper / confirmMutation"]
 ```
 
 El corte representa elementos del cliente, no clases ni procesos desplegados. La [vista de procesos](../../processes/index.md) detalla orden, validación, rechazo y recuperación. Los contratos de props/eventos se localizan en la [referencia generada](../../development/code-reference.md).

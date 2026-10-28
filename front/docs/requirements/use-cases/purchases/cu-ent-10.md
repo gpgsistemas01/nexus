@@ -19,4 +19,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Compra: corrección de un detalle](../../../architecture/views/processes/14-purchase-correction.md).
+- [Compra: corrección de un detalle](../../../architecture/views/processes/06-purchases/03-purchase-correction.md).

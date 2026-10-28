@@ -25,12 +25,14 @@ Referencia de responsabilidades y contratos del dominio `catalogs`. El [corte de
 | Consulta | Búsqueda/paginación remotas, nombre recibido presentado como texto. |
 | Efectos | Alta/edición; no inventar eliminación donde no existe. |
 
+La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
+
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |
 | --- | --- |
-| Consulta compartida | [Consulta compartida](../../processes/02-list-and-record-save.md) |
-| Alta y edición versionadas | [Alta y edición versionadas](../../processes/05-catalog-record-save.md) |
+| Consulta compartida | [Consulta compartida](../../processes/02-shared-runtime/01-list-and-record-save.md) |
+| Alta y edición versionadas | [Alta y edición versionadas](../../processes/03-catalogs-and-directory/01-catalog-record-save.md) |
 
 Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
 

@@ -2,19 +2,22 @@
 
 La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociaciones y límites. Las figuras conservan los IDs de los objetivos; sus pasos completos se encuentran en las fichas de requisitos.
 
+La [jerarquía común de actores](01-access.md#autenticación) conserva la participación heredada del Administrador del sistema.
+
 ## Salidas de materiales
 
 **Identificador:** `DIA-VUE-CU-020`. **Pregunta:** ¿Qué objetivos y actores participan en Salidas de materiales?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
-    actor admin("Administrador del sistema")
-    admin --|> warehouse
 
     systemBoundary issuePackage1["Nexus · Salidas de materiales"]
         ucMaterialIssueQuery("CU-SAL-01 Consultar salidas de material")
@@ -31,13 +34,16 @@ direction LR
 
     warehouse -- ucMaterialIssueQuery
     warehouse -- clientExtension
-
-    ucMaterialIssueQuery -- ucMaterialIssueCreate
-    ucMaterialIssueQuery -- ucMaterialIssueHeader
-    ucMaterialIssueQuery -- ucMaterialIssueDetails
-    ucMaterialIssueQuery -- ucMaterialSupply
-    ucMaterialIssueQuery -- ucMaterialReturn
-    ucMaterialIssueQuery -- ucMaterialIssueReport
+    warehouse -- ucMaterialIssueCreate
+    warehouse -- ucMaterialIssueHeader
+    warehouse -- ucMaterialIssueDetails
+    warehouse -- ucMaterialSupply
+    warehouse -- ucMaterialReturn
+    warehouse -- ucMaterialIssueReport
+    operational -- ucMaterialIssueQuery
+    operational -- ucMaterialIssueCreate
+    operational -- ucMaterialIssueHeader
+    operational -- ucMaterialIssueDetails
 ```
 
 
@@ -45,15 +51,14 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-021`. **Pregunta:** ¿Qué objetivos y actores participan en Salidas de mermas?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
-    actor admin("Administrador del sistema")
-    admin --|> warehouse
 
     systemBoundary issuePackage2["Nexus · Salidas de mermas"]
         ucWasteIssueQuery("CU-SAL-08 Consultar salidas de merma")
@@ -66,13 +71,16 @@ direction LR
     end
 
     warehouse -- ucWasteIssueQuery
-
-    ucWasteIssueQuery -- ucWasteIssueCreate
-    ucWasteIssueQuery -- ucWasteIssueHeader
-    ucWasteIssueQuery -- ucWasteIssueDetails
-    ucWasteIssueQuery -- ucWasteSupply
-    ucWasteIssueQuery -- ucWasteReturn
-    ucWasteIssueQuery -- ucWasteIssueReport
+    warehouse -- ucWasteIssueCreate
+    warehouse -- ucWasteIssueHeader
+    warehouse -- ucWasteIssueDetails
+    warehouse -- ucWasteSupply
+    warehouse -- ucWasteReturn
+    warehouse -- ucWasteIssueReport
+    operational -- ucWasteIssueQuery
+    operational -- ucWasteIssueCreate
+    operational -- ucWasteIssueHeader
+    operational -- ucWasteIssueDetails
 ```
 
 
@@ -80,15 +88,14 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-022`. **Pregunta:** ¿Qué objetivos y actores participan en Salidas de consumibles?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
-    actor admin("Administrador del sistema")
-    admin --|> warehouse
 
     systemBoundary issuePackage3["Nexus · Salidas de consumibles"]
         ucConsumableIssueQuery("CU-SAL-15 Consultar salidas de consumible")
@@ -105,11 +112,14 @@ direction LR
 
     warehouse -- ucConsumableIssueQuery
     warehouse -- clientExtension
-
-    ucConsumableIssueQuery -- ucConsumableIssueCreate
-    ucConsumableIssueQuery -- ucConsumableIssueHeader
-    ucConsumableIssueQuery -- ucConsumableIssueDetails
-    ucConsumableIssueQuery -- ucConsumableSupply
-    ucConsumableIssueQuery -- ucConsumableReturn
-    ucConsumableIssueQuery -- ucConsumableIssueReport
+    warehouse -- ucConsumableIssueCreate
+    warehouse -- ucConsumableIssueHeader
+    warehouse -- ucConsumableIssueDetails
+    warehouse -- ucConsumableSupply
+    warehouse -- ucConsumableReturn
+    warehouse -- ucConsumableIssueReport
+    operational -- ucConsumableIssueQuery
+    operational -- ucConsumableIssueCreate
+    operational -- ucConsumableIssueHeader
+    operational -- ucConsumableIssueDetails
 ```

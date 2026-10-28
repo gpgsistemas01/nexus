@@ -19,4 +19,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Cuenta, edición y contraseña](../../../architecture/views/processes/07-user-account.md).
+- [Cuenta, edición y contraseña](../../../architecture/views/processes/04-identity/02-user-account.md).

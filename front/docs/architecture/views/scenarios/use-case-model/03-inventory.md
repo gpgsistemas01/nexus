@@ -6,12 +6,15 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 **Identificador:** `DIA-VUE-CU-004`. **Pregunta:** ¿Qué objetivos y actores participan en Materiales?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -27,11 +30,11 @@ direction LR
 
     warehouse -- ucMaterialQuery
     admin -- ucMaterialStock
-
-    ucMaterialQuery -- ucMaterialCreate
-    ucMaterialQuery -- ucMaterialEdit
-    ucMaterialQuery -- ucMaterialRemove
-    ucMaterialQuery -- ucMaterialInventoryReport
+    warehouse -- ucMaterialCreate
+    warehouse -- ucMaterialEdit
+    warehouse -- ucMaterialRemove
+    warehouse -- ucMaterialInventoryReport
+    operational -- ucMaterialQuery
 ```
 
 
@@ -39,12 +42,13 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-006`. **Pregunta:** ¿Qué objetivos y actores participan en Mermas?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -60,11 +64,11 @@ direction LR
 
     warehouse -- ucWasteQuery
     admin -- ucWasteStock
-
-    ucWasteQuery -- ucWasteCreate
-    ucWasteQuery -- ucWasteEdit
-    ucWasteQuery -- ucWasteAddStock
-    ucWasteQuery -- ucWasteReport
+    warehouse -- ucWasteCreate
+    warehouse -- ucWasteEdit
+    warehouse -- ucWasteAddStock
+    warehouse -- ucWasteReport
+    operational -- ucWasteQuery
 ```
 
 
@@ -72,12 +76,13 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-008`. **Pregunta:** ¿Qué objetivos y actores participan en Consumibles?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
     admin --|> warehouse
@@ -93,9 +98,9 @@ direction LR
 
     warehouse -- ucConsumableQuery
     admin -- ucConsumableStock
-
-    ucConsumableQuery -- ucConsumableCreate
-    ucConsumableQuery -- ucConsumableEdit
-    ucConsumableQuery -- ucConsumableRemove
-    ucConsumableQuery -- ucConsumableReport
+    warehouse -- ucConsumableCreate
+    warehouse -- ucConsumableEdit
+    warehouse -- ucConsumableRemove
+    warehouse -- ucConsumableReport
+    operational -- ucConsumableQuery
 ```

@@ -4,6 +4,8 @@
 
 **Fuente:** main.ts, LoginPage, useLoginForm, authService, createAuthSession y Router. **Notación y alcance:** Las flechas indican dependencia o consumo; no orden temporal ni herencia.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     page["LoginPage · coordinación"] --> form["LoginForm · props y eventos"]

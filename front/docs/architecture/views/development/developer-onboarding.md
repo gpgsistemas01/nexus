@@ -48,7 +48,7 @@ con terminales y archivos de entorno separados para frontend y API.
 7. Volver a `CatalogPage`: `useListEditor.onSaved` cierra el editor, recarga y presenta
    el aviso. Un 409 mantiene la captura y exige una lectura nueva.
 8. Consultar `catalogEditorTest.ts`, `catalogServiceTest.ts` y `catalogs.spec.ts` para
-   ver datos y aserciones. La [secuencia aplicada](../processes/05-catalog-record-save.md)
+   ver datos y aserciones. La [secuencia aplicada](../processes/03-catalogs-and-directory/01-catalog-record-save.md)
    muestra las decisiones; la [ficha de conflicto](../../../testing/cases/cp-vue-cat-002-01.md)
    concreta los valores del escenario.
 

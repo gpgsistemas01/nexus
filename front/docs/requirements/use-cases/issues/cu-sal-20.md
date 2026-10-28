@@ -19,4 +19,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Salida: devolución por saldo leído](../../../architecture/views/processes/18-issue-return.md).
+- [Salida: devolución por saldo leído](../../../architecture/views/processes/07-issues/03-issue-return.md).

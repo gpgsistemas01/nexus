@@ -13,6 +13,8 @@ Abstract Factory ni una máquina State basada en clases.
 copiar reglas en cada componente? **Fuente:** factories actuales de formularios.
 Flechas continuas = entrada o producto; discontinuas = lectura diferida de captura.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     context["Contexto de captura<br/>recurso y modo"] --> factory["Fábrica funcional"]

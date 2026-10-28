@@ -1,0 +1,11 @@
+# Compras
+
+## Recorrido de lectura
+
+- [Compra: lectura y preparación de partidas](01-purchase-read-lines.md): `DIA-VUE-SEQ-011`.
+- [Compra: alta y edición confirmadas](02-purchase-save.md): `DIA-VUE-SEQ-012/031`.
+- [Compra: corrección de un detalle](03-purchase-correction.md): `DIA-VUE-SEQ-013`.
+- [Compra: cancelación y reintento explícito](04-purchase-cancel.md): `DIA-VUE-SEQ-014`.
+
+Las figuras identifican colaboradores del cliente y tratan la API como frontera externa.
+El [índice de procesos](../index.md) relaciona operaciones, casos de uso y figuras.

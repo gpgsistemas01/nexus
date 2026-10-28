@@ -19,4 +19,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Salida: selección y surtido](../../../architecture/views/processes/17-issue-supply.md).
+- [Salida: selección y surtido](../../../architecture/views/processes/07-issues/02-issue-supply.md).

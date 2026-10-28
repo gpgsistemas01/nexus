@@ -4,26 +4,30 @@
 
 **Fuente:** IssueWorkspace, IssuePage, useIssueActions, useIssueEditor, useIssueHeaderSelection, useIssueFilters, useIssueDepartments, useIssueReturn y mappers. **Notación y alcance:** Las flechas indican dependencia o consumo; no orden temporal ni herencia.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     workspace["IssueWorkspace"] --> page["IssuePage"]
-    workspace --> client["Alta contextual de cliente"]
-    page --> actions["useIssueActions · lectura y modo"]
+    workspace --> client["DirectoryCreationPage"]
+    page --> actions["useIssueActions"]
     actions --> read["useDocumentRead"]
-    page --> editor["useIssueEditor"]
+    page --> editorPage["IssueEditorPage"]
+    editorPage --> editor["useIssueEditor"]
+    editorPage --> view["IssueEditor · presentación"]
+    editorPage --> returnPage["IssueReturnPage"]
+    returnPage --> returns["useIssueReturn"]
     editor --> header["useIssueHeaderSelection"]
     page --> filters["useIssueFilters"]
     header --> departments["useIssueDepartments"]
     filters --> departments
-    departments --> lookup["useRemoteLookup · áreas autorizadas"]
-    editor --> draft["issueDetails · borrador y surtido"]
-    editor --> view["IssueEditor y DetailsTable"]
-    page --> returns["useIssueReturn"]
+    departments --> lookup["useRemoteLookup"]
+    editor --> draft["issueDetails"]
     editor --> mapper["issueRequestMapper"]
-    mapper --> service["issueService"]
+    editor --> service["issueService"]
     returns --> service
     actions --> service
-    service --> response["issueResponseMapper y confirmMutation"]
+    service --> response["issueResponseMapper / confirmMutation"]
 ```
 
 El corte representa elementos del cliente, no clases ni procesos desplegados. La [vista de procesos](../../processes/index.md) detalla orden, validación, rechazo y recuperación. Los contratos de props/eventos se localizan en la [referencia generada](../../development/code-reference.md).

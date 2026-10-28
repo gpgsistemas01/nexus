@@ -31,29 +31,29 @@ Referencia de responsabilidades y contratos del dominio `issues`. El [corte de c
 | Recurso | materials/consumables usan goods-issues; wastes usa waste-issues y sus códigos. |
 | Estado vigente | La apertura relee; la API comprueba de nuevo permiso, pertenencia y saldo en escritura. |
 
-Auxiliar y Coordinador de Almacén pueden consultar y registrar salidas para todas
-las áreas. Los accesos operativos sólo consultan, crean y editan documentos de sus
-áreas autorizadas. El alcance se aplica por igual a Materiales, Consumibles y Mermas.
-El selector de área y el filtro usan el mismo contexto de consulta. Alterar una URL,
-un ID o el payload no sustituye la autorización del servidor.
+| Contexto de área | Comportamiento |
+| --- | --- |
+| Auxiliar/Coordinador de Almacén | Consultan y registran para todas las áreas autorizadas. |
+| Accesos operativos | Consultan, crean y editan sólo dentro de sus áreas; la API verifica consulta y escritura. |
+| Alta con área única | Preselecciona una opción disponible si la captura está vacía y bloquea el campo. |
+| Edición | Conserva área, solicitante y proyecto leídos; solicitantes dependen reactivamente del área. |
+| Limpiar filtros | Conserva el área obligatoria y no la cuenta como filtro opcional activo. |
 
-Una respuesta sin búsqueda, de la primera página y con total filtrado `1`, permite
-precargar y bloquear el área si la opción está disponible. Una búsqueda con un solo
-resultado o una página parcial no permite inferir ese bloqueo. Las respuestas
-canceladas no actualizan la instancia anterior. El alta precarga únicamente una
-selección vacía; la edición conserva el área, solicitante y proyecto originales.
-Los solicitantes se cargan por la dependencia reactiva del área elegida. Limpiar
-filtros mantiene el área obligatoria y no la cuenta como un filtro opcional activo.
+La [secuencia de alcance](../../processes/07-issues/04-department-scope.md) precisa
+conteos, búsqueda, cancelación y bloqueo en los tres recursos.
+
+La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
 
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |
 | --- | --- |
-| Apertura y escritura | [Apertura y escritura](../../processes/16-issue-open-save.md) |
-| Surtido | [Surtido](../../processes/17-issue-supply.md) |
-| Devolución | [Devolución](../../processes/18-issue-return.md) |
-| Alta contextual | [Alta contextual](../../processes/03-documents-and-contextual-creation.md) |
-| Reportes | [Reportes](../../processes/19-reports.md) |
+| Apertura y escritura | [Apertura y escritura](../../processes/07-issues/01-issue-open-save.md) |
+| Surtido | [Surtido](../../processes/07-issues/02-issue-supply.md) |
+| Devolución | [Devolución](../../processes/07-issues/03-issue-return.md) |
+| Alta contextual | [Alta contextual](../../processes/02-shared-runtime/02-documents-and-contextual-creation.md) |
+| Alcance del área | [Selección y bloqueo](../../processes/07-issues/04-department-scope.md) |
+| Reportes | [Reportes](../../processes/08-movements-and-reports/02-reports.md) |
 
 Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
 

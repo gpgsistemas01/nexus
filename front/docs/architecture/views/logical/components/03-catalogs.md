@@ -4,6 +4,8 @@
 
 **Fuente:** CatalogPage, useCatalogList, CatalogEditorPage, useCatalogEditor, catalogDefinition y catalogService. **Notación y alcance:** Las flechas indican dependencia o consumo; no orden temporal ni herencia.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     page["CatalogPage"] --> list["useCatalogList y usePagedList"]
@@ -11,7 +13,7 @@ flowchart TB
     editorPage --> editor["useCatalogEditor"]
     editorPage --> form["CatalogForm"]
     page --> table["CatalogTable y ServerTable"]
-    config["catalogDefinition · campos y límites"] --> editor
+    editor --> config["catalogDefinition · campos y límites"]
     editor --> interaction["VeeValidate y useFormInteraction"]
     editor --> save["useRecordSave · pendiente y conflicto"]
     list --> service["catalogService"]

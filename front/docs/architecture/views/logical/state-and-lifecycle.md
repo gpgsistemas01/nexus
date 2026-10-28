@@ -28,6 +28,8 @@ crea un store por modal o para reemplazar props/eventos.
 cerrada? **Fuente:** `useRecordSave.ts` y editores consumidores. Diagrama de estados
 selectivo del coordinador, no del estado persistido del documento.
 
+**Lectura visual:** [estados, transiciones e inicio/fin](../diagram-reading.md#estados).
+
 ```mermaid
 stateDiagram-v2
     [*] --> Disponible

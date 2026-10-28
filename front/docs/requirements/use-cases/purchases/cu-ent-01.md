@@ -19,4 +19,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Compra: lectura y preparación de partidas](../../../architecture/views/processes/12-purchase-read-lines.md).
+- [Compra: lectura y preparación de partidas](../../../architecture/views/processes/06-purchases/01-purchase-read-lines.md).

@@ -6,7 +6,9 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 **Identificador:** `DIA-VUE-CU-012`. **Pregunta:** ¿Qué objetivos y actores participan en Áreas?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
@@ -21,9 +23,8 @@ direction LR
     end
 
     admin -- ucAreaQuery
-
-    ucAreaQuery -- ucAreaCreate
-    ucAreaQuery -- ucAreaEdit
+    admin -- ucAreaCreate
+    admin -- ucAreaEdit
 ```
 
 
@@ -31,7 +32,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-013`. **Pregunta:** ¿Qué objetivos y actores participan en Roles?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
@@ -46,9 +47,8 @@ direction LR
     end
 
     admin -- ucRoleQuery
-
-    ucRoleQuery -- ucRoleCreate
-    ucRoleQuery -- ucRoleEdit
+    admin -- ucRoleCreate
+    admin -- ucRoleEdit
 ```
 
 
@@ -56,7 +56,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-014`. **Pregunta:** ¿Qué objetivos y actores participan en Presentaciones?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
@@ -71,9 +71,8 @@ direction LR
     end
 
     admin -- ucPresentationQuery
-
-    ucPresentationQuery -- ucPresentationCreate
-    ucPresentationQuery -- ucPresentationEdit
+    admin -- ucPresentationCreate
+    admin -- ucPresentationEdit
 ```
 
 
@@ -81,7 +80,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-015`. **Pregunta:** ¿Qué objetivos y actores participan en Unidades de medida?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
@@ -96,9 +95,8 @@ direction LR
     end
 
     admin -- ucUnitMeasureQuery
-
-    ucUnitMeasureQuery -- ucUnitMeasureCreate
-    ucUnitMeasureQuery -- ucUnitMeasureEdit
+    admin -- ucUnitMeasureCreate
+    admin -- ucUnitMeasureEdit
 ```
 
 
@@ -106,7 +104,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-016`. **Pregunta:** ¿Qué objetivos y actores participan en Motivos de ajuste?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
@@ -121,9 +119,8 @@ direction LR
     end
 
     admin -- ucAdjustmentReasonQuery
-
-    ucAdjustmentReasonQuery -- ucAdjustmentReasonCreate
-    ucAdjustmentReasonQuery -- ucAdjustmentReasonEdit
+    admin -- ucAdjustmentReasonCreate
+    admin -- ucAdjustmentReasonEdit
 ```
 
 
@@ -131,7 +128,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-017`. **Pregunta:** ¿Qué objetivos y actores participan en Estados de cumplimiento?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
@@ -146,7 +143,6 @@ direction LR
     end
 
     admin -- ucFulfillmentStatusQuery
-
-    ucFulfillmentStatusQuery -- ucFulfillmentStatusCreate
-    ucFulfillmentStatusQuery -- ucFulfillmentStatusEdit
+    admin -- ucFulfillmentStatusCreate
+    admin -- ucFulfillmentStatusEdit
 ```

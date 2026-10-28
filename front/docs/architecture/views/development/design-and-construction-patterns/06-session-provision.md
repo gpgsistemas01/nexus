@@ -13,6 +13,8 @@ no hay un singleton global obligatorio ni un store por formulario.
 navegación y sus consumidores? **Fuente:** composición del arranque e inyección
 de Vue. Flechas continuas = configuración; discontinuas = uso de la misma instancia.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     root["Arranque de la aplicación"] --> state["Instancia de sesión"]

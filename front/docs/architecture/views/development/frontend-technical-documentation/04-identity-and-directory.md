@@ -28,14 +28,16 @@ Referencia de responsabilidades y contratos del dominio `identity / directory`. 
 | Reportes | Búsqueda/orden sin paginación; Personas no admite rol en Excel y exige limpiar ese filtro. |
 | Edición | Versión original; cuenta omite password/personId y conserva vinculación existente. |
 
+La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
+
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |
 | --- | --- |
-| Responsabilidades de persona | [Responsabilidades de persona](../../processes/06-person-responsibilities.md) |
-| Cuenta y contraseña | [Cuenta y contraseña](../../processes/07-user-account.md) |
-| Ciclo de guardado y conflicto | [Ciclo de guardado y conflicto](../../processes/23-directory-save.md) |
-| Reportes | [Reportes](../../processes/19-reports.md) |
+| Responsabilidades de persona | [Responsabilidades de persona](../../processes/04-identity/01-person-responsibilities.md) |
+| Cuenta y contraseña | [Cuenta y contraseña](../../processes/04-identity/02-user-account.md) |
+| Ciclo de guardado y conflicto | [Ciclo de guardado y conflicto](../../processes/03-catalogs-and-directory/02-directory-save.md) |
+| Reportes | [Reportes](../../processes/08-movements-and-reports/02-reports.md) |
 
 Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
 

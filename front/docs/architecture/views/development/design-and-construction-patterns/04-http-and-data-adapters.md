@@ -13,6 +13,8 @@ su presencia no convierte el proyecto en una arquitectura hexagonal completa.
 externa en un modelo del cliente? **Fuente:** servicios, mappers y transporte
 existentes. Flechas continuas = llamada; discontinuas = datos adaptados.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     usecase["Coordinación del caso"] --> service["Servicio del recurso<br/>contrato HTTP"]

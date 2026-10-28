@@ -30,16 +30,18 @@ Referencia de responsabilidades y contratos del dominio `purchases`. El [corte d
 | Observaciones | Encabezado editable según modo; historia de ajustes/movimientos conserva registro separado. |
 | Totales y stock | Preview del cliente; API valida/persiste e informa resultado. |
 
+La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
+
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |
 | --- | --- |
-| Lectura y partidas | [Lectura y partidas](../../processes/12-purchase-read-lines.md) |
-| Alta y edición | [Alta y edición](../../processes/13-purchase-save.md) |
-| Corrección | [Corrección](../../processes/14-purchase-correction.md) |
-| Cancelación | [Cancelación](../../processes/15-purchase-cancel.md) |
-| Alta contextual | [Alta contextual](../../processes/03-documents-and-contextual-creation.md) |
-| Reportes | [Reportes](../../processes/19-reports.md) |
+| Lectura y partidas | [Lectura y partidas](../../processes/06-purchases/01-purchase-read-lines.md) |
+| Alta y edición | [Alta y edición](../../processes/06-purchases/02-purchase-save.md) |
+| Corrección | [Corrección](../../processes/06-purchases/03-purchase-correction.md) |
+| Cancelación | [Cancelación](../../processes/06-purchases/04-purchase-cancel.md) |
+| Alta contextual | [Alta contextual](../../processes/02-shared-runtime/02-documents-and-contextual-creation.md) |
+| Reportes | [Reportes](../../processes/08-movements-and-reports/02-reports.md) |
 
 Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
 

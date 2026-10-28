@@ -10,10 +10,12 @@
             ]
         },
         "requisitos": {
-            "title": "Especificación y glosario",
+            "title": "Especificación, dominio y glosario",
             "sources": [
                 "requirements/index.md",
                 "requirements/business-glossary.md",
+                "architecture/views/diagram-reading.md",
+                "requirements/domain-model/",
                 "requirements/01-applicability-and-traceability.md",
                 "requirements/requirements-specification/index.md",
                 "requirements/requirements-specification/client-specification.md",
@@ -39,6 +41,7 @@
             "sources": [
                 "architecture/index.md",
                 "architecture/views/index.md",
+                "architecture/views/diagram-reading.md",
                 "architecture/views/overview.md",
                 "architecture/decisions.md",
                 "architecture/views/scenarios/",
@@ -47,7 +50,9 @@
                 "architecture/views/logical/components/",
                 "architecture/views/logical/state-and-lifecycle.md",
                 "architecture/views/logical/document-contracts.md",
+                "architecture/views/logical/class-and-type-models/",
                 "architecture/views/logical/document-states.md",
+                "architecture/views/logical/states/",
                 "architecture/views/logical/input-security.md",
                 "architecture/contracts/",
                 "architecture/views/processes/",

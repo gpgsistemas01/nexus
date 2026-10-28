@@ -15,6 +15,8 @@ acoplar el núcleo al dominio? **Fuente:** contratos de `usePagedList`,
 `useRemoteLookup` y `useRecordSave`. Flechas continuas = configuración/consumo;
 discontinuas = invocación configurada o resultado observable.
 
+**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias); [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     consumer["Consumidor del dominio"] -->|configura| core["Composable compartido<br/>estado por instancia"]
@@ -85,10 +87,10 @@ un desmontaje impide la transición tardía.
 sequenceDiagram
     autonumber
     actor U as Usuario autorizado
-    participant E as Alta y entrada<br/>useInventory<br/>Editor
-    participant A as Express API
-    participant R as useWaste<br/>Duplicate<br/>Recovery
-    participant P as Contenedor<br/>InventoryPage
+    participant E@{ "type": "control" } as Alta y entrada<br/>useInventory<br/>Editor
+    participant A@{ "type": "boundary" } as Express API
+    participant R@{ "type": "control" } as useWaste<br/>Duplicate<br/>Recovery
+    participant P@{ "type": "boundary" } as Contenedor<br/>InventoryPage
     U->>E: Guardar alta
     E->>A: POST de alta con operationId
     A-->>E: 409, rechazo definitivo y merma existente

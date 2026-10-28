@@ -6,7 +6,9 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 **Identificador:** `DIA-VUE-CU-005`. **Pregunta:** ¿Qué objetivos y actores participan en Movimientos de materiales?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
@@ -20,7 +22,7 @@ direction LR
     end
 
     admin -- ucMaterialMovements
-    ucMaterialMovements -- ucMaterialMovementReport
+    admin -- ucMaterialMovementReport
 ```
 
 
@@ -28,7 +30,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-007`. **Pregunta:** ¿Qué objetivos y actores participan en Movimientos de mermas?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
@@ -42,7 +44,7 @@ direction LR
     end
 
     admin -- ucWasteMovements
-    ucWasteMovements -- ucWasteMovementReport
+    admin -- ucWasteMovementReport
 ```
 
 
@@ -50,7 +52,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-009`. **Pregunta:** ¿Qué objetivos y actores participan en Movimientos de consumibles?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
@@ -62,5 +64,5 @@ direction LR
         report("CU-ALM-24 Generar reporte de movimientos de consumibles")
     end
     admin -- query
-    query -- report
+    admin -- report
 ```

@@ -2,19 +2,21 @@
 
 La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociaciones y límites. Las figuras conservan los IDs de los objetivos; sus pasos completos se encuentran en las fichas de requisitos.
 
+La [jerarquía común de actores](01-access.md#autenticación) conserva la participación heredada del Administrador del sistema.
+
 ## Personas
 
 **Identificador:** `DIA-VUE-CU-002`. **Pregunta:** ¿Qué objetivos y actores participan en Personas?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
     actor warehouse("Personal de almacén")
-    actor admin("Administrador del sistema")
-    admin --|> warehouse
 
     systemBoundary identityPackage1["Nexus · Personas"]
         ucPersonQuery("CU-IDA-01 Consultar personas")
@@ -24,10 +26,9 @@ direction LR
     end
 
     warehouse -- ucPersonQuery
-
-    ucPersonQuery -- ucPersonCreate
-    ucPersonQuery -- ucPersonEdit
-    ucPersonQuery -- ucPersonReport
+    warehouse -- ucPersonCreate
+    warehouse -- ucPersonEdit
+    warehouse -- ucPersonReport
 ```
 
 
@@ -35,7 +36,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-003`. **Pregunta:** ¿Qué objetivos y actores participan en Usuarios y credenciales?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
@@ -52,9 +53,8 @@ direction LR
     end
 
     admin -- ucUserQuery
-
-    ucUserQuery -- ucUserCreate
-    ucUserQuery -- ucUserEdit
-    ucUserQuery -- ucPasswordEdit
-    ucUserQuery -- ucUserReport
+    admin -- ucUserCreate
+    admin -- ucUserEdit
+    admin -- ucPasswordEdit
+    admin -- ucUserReport
 ```

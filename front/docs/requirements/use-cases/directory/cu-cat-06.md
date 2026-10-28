@@ -20,4 +20,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Directorio: alta, edición y retorno de opción](../../../architecture/views/processes/23-directory-save.md).
+- [Directorio: alta, edición y retorno de opción](../../../architecture/views/processes/03-catalogs-and-directory/02-directory-save.md).

@@ -19,4 +19,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Personas y responsabilidades](../../../architecture/views/processes/06-person-responsibilities.md).
+- [Personas y responsabilidades](../../../architecture/views/processes/04-identity/01-person-responsibilities.md).

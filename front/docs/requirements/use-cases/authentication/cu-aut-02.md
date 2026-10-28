@@ -12,7 +12,7 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La sesión queda cerrada en ese navegador; el actor debe volver a iniciar sesión para acceder al contenido protegido.<br>2. **Fallo:** El sistema no debe presentar contenido protegido sin volver a comprobar una sesión válida. |
 | Requisitos relacionados | `RF-AUT-003`, `RN-001`. |
 
-El cierre disponible elimina el acceso conservado por ese navegador. La invalidación central de credenciales previamente emitidas permanece pendiente; por eso `RF-AUT-003` se registra como Parcial. La brecha técnica se mantiene en [acceso y auditoría](../../../architecture/views/processes/01-bootstrap-and-session.md).
+El cierre disponible elimina el acceso conservado por ese navegador. La invalidación central de credenciales previamente emitidas permanece pendiente; por eso `RF-AUT-003` se registra como Parcial. La brecha técnica se mantiene en [acceso y auditoría](../../../architecture/views/processes/01-session/01-bootstrap-and-session.md).
 
 ## Realización y verificación del cliente
 
@@ -20,4 +20,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Cierre de sesión y acceso posterior](../../../architecture/views/processes/21-logout.md).
+- [Cierre de sesión y acceso posterior](../../../architecture/views/processes/01-session/03-logout.md).

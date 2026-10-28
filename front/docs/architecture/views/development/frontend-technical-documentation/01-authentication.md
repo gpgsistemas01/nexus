@@ -26,13 +26,15 @@ Referencia de responsabilidades y contratos del dominio `auth`. El [corte de com
 | Cierre | Formulario POST `/cerrar-sesion`; navegador/API administran cookies HttpOnly. |
 | Error | Campo, credencial genérica, límite de intentos o indisponibilidad; conservar retorno interno. |
 
+La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
+
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |
 | --- | --- |
-| Captura, rechazo y éxito | [Captura, rechazo y éxito](../../processes/04-login.md) |
-| Guarda, refresh y recuperación | [Guarda, refresh y recuperación](../../processes/01-bootstrap-and-session.md) |
-| Cierre y acceso posterior | [Cierre y acceso posterior](../../processes/21-logout.md) |
+| Captura, rechazo y éxito | [Captura, rechazo y éxito](../../processes/01-session/02-login.md) |
+| Guarda, refresh y recuperación | [Guarda, refresh y recuperación](../../processes/01-session/01-bootstrap-and-session.md) |
+| Cierre y acceso posterior | [Cierre y acceso posterior](../../processes/01-session/03-logout.md) |
 
 Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
 

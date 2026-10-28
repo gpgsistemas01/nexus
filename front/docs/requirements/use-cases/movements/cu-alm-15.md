@@ -19,5 +19,5 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Movimientos: filtros dependientes e historial](../../../architecture/views/processes/24-movement-filters.md).
-- [2. Consulta y guardado de registros](../../../architecture/views/processes/02-list-and-record-save.md).
+- [Movimientos: filtros dependientes e historial](../../../architecture/views/processes/08-movements-and-reports/01-movement-filters.md).
+- [2. Consulta y guardado de registros](../../../architecture/views/processes/02-shared-runtime/01-list-and-record-save.md).

@@ -14,6 +14,8 @@ presenta la interacción? **Fuente:** contratos de props/eventos de Vue y sus
 consumidores actuales. Modelo conceptual; flechas continuas = consumo o datos
 entregados, discontinuas = intenciones emitidas.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     container["Contenedor<br/>coordina el caso"] -->|props| view["Presentación<br/>controles y texto"]

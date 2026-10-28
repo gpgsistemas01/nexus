@@ -10,6 +10,8 @@ Se combinan contenedor/presentación, composición por eventos/callbacks y adapt
 
 **Identificador:** `DIA-VUE-GEN-007`. **Pregunta:** ¿cómo coordinar una captura auxiliar conservando el propietario del formulario origen? **Alcance:** cliente, apertura, confirmación y retorno. **Fuente:** contrato de composición aplicado por los Workspaces. Flechas continuas representan intención/composición; discontinuas, el resultado confirmado hacia el propietario de captura. No representan herencia o una transacción de base de datos.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     selector["Selector<br/>presentación"] -->|intención y texto| origin["Contenedor origen<br/>captura"]

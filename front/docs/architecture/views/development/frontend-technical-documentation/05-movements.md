@@ -25,13 +25,15 @@ Referencia de responsabilidades y contratos del dominio `movements`. El [corte d
 | Archivo | Filtros aplicados o alcance mensual admitido, sin paginación. |
 | Tabla | Fecha/folio/tipo/referencia/cantidades y saldos; texto y valores históricos no se recalculan como autoridad. |
 
+La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
+
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |
 | --- | --- |
-| Consulta paginada | [Consulta paginada](../../processes/02-list-and-record-save.md) |
-| Selección remota | [Selección remota](../../processes/24-movement-filters.md) |
-| Alcance y descarga | [Alcance y descarga](../../processes/19-reports.md) |
+| Consulta paginada | [Consulta paginada](../../processes/02-shared-runtime/01-list-and-record-save.md) |
+| Selección remota | [Selección remota](../../processes/08-movements-and-reports/01-movement-filters.md) |
+| Alcance y descarga | [Alcance y descarga](../../processes/08-movements-and-reports/02-reports.md) |
 
 Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
 

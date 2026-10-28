@@ -6,15 +6,19 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 **Identificador:** `DIA-VUE-CU-001`. **Pregunta:** ¿Qué objetivos y actores participan en Autenticación?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
     actor user("Usuario registrado")
+    actor operational("Usuario de área operativa")
     actor warehouse("Personal de almacén")
     actor admin("Administrador del sistema")
+    operational --|> user
     warehouse --|> user
     admin --|> warehouse
 

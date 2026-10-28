@@ -2,19 +2,21 @@
 
 La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociaciones y límites. Las figuras conservan los IDs de los objetivos; sus pasos completos se encuentran en las fichas de requisitos.
 
+La [jerarquía común de actores](01-access.md#autenticación) conserva la participación heredada del Administrador del sistema.
+
 ## Compras de materiales
 
 **Identificador:** `DIA-VUE-CU-018`. **Pregunta:** ¿Qué objetivos y actores participan en Compras de materiales?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
     actor warehouse("Personal de almacén")
-    actor admin("Administrador del sistema")
-    admin --|> warehouse
 
     systemBoundary receiptPackage1["Nexus · Compras de materiales"]
         ucReceiptQuery("CU-ENT-01 Consultar compras de material")
@@ -33,12 +35,11 @@ direction LR
     warehouse -- ucReceiptQuery
     warehouse -- supplierExtension
     warehouse -- materialExtension
-
-    ucReceiptQuery -- ucReceiptCreate
-    ucReceiptQuery -- ucReceiptEdit
-    ucReceiptQuery -- ucReceiptCorrect
-    ucReceiptQuery -- ucReceiptCancel
-    ucReceiptQuery -- ucPurchaseReport
+    warehouse -- ucReceiptCreate
+    warehouse -- ucReceiptEdit
+    warehouse -- ucReceiptCorrect
+    warehouse -- ucReceiptCancel
+    warehouse -- ucPurchaseReport
 ```
 
 
@@ -46,15 +47,13 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-019`. **Pregunta:** ¿Qué objetivos y actores participan en Compras de consumibles?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta
 %%{init: {"layout": "dagre"}}%%
 direction LR
     actor warehouse("Personal de almacén")
-    actor admin("Administrador del sistema")
-    admin --|> warehouse
 
     systemBoundary receiptPackage2["Nexus · Compras de consumibles"]
         ucConsumableReceiptQuery("CU-ENT-07 Consultar compras de consumible")
@@ -73,10 +72,9 @@ direction LR
     warehouse -- ucConsumableReceiptQuery
     warehouse -- supplierExtension
     warehouse -- consumableExtension
-
-    ucConsumableReceiptQuery -- ucConsumableReceiptCreate
-    ucConsumableReceiptQuery -- ucConsumableReceiptEdit
-    ucConsumableReceiptQuery -- ucConsumableReceiptCorrect
-    ucConsumableReceiptQuery -- ucConsumableReceiptCancel
-    ucConsumableReceiptQuery -- ucConsumablePurchaseReport
+    warehouse -- ucConsumableReceiptCreate
+    warehouse -- ucConsumableReceiptEdit
+    warehouse -- ucConsumableReceiptCorrect
+    warehouse -- ucConsumableReceiptCancel
+    warehouse -- ucConsumablePurchaseReport
 ```

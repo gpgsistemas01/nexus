@@ -13,9 +13,9 @@ Los casos y contratos se mantienen íntegros en sus fuentes propietarias.
 | Sección de publicación | Contenido |
 | --- | --- |
 | `inicio` | Preparación local, incorporación y herramientas. |
-| `requisitos` | Glosario, trazabilidad y especificación. |
+| `requisitos` | Glosario, modelo de dominio, trazabilidad y especificación. |
 | `casos-de-uso` | Fichas completas agrupadas por objetivo y familia. |
-| `arquitectura` | Contexto, vistas 4+1, decisiones, contratos, patrones y módulos. |
+| `arquitectura` | Contexto, vistas 4+1, modelos de interfaces/tipos y estados, procesos por sección, decisiones, contratos y patrones. |
 | `estandar` | Reglas de construcción y revisión del código. |
 | `referencia` | Inventario generado de archivos, exports, contratos SFC e imports. |
 | `pruebas` | Plan, diseño, registro CP, cobertura y preparación de sistema. |

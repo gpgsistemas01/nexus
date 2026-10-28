@@ -18,4 +18,4 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Compra: cancelación y reintento explícito](../../../architecture/views/processes/15-purchase-cancel.md).
+- [Compra: cancelación y reintento explícito](../../../architecture/views/processes/06-purchases/04-purchase-cancel.md).

@@ -14,6 +14,8 @@ componente común y qué contenido aporta el consumidor? **Fuente:** contratos d
 slots de Vue y componentes actuales. Flechas continuas = composición/consumo;
 discontinuas = datos de un slot con alcance.
 
+**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     consumer["Consumidor del recurso"] -->|props y contenido de slots| frame["Componente compartido<br/>estructura estable"]

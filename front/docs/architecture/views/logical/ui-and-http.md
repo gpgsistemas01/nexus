@@ -27,46 +27,20 @@ en el navegador. Los slots mantienen botones y celdas como componentes Vue.
 
 ## Tema, estilos y controles
 
-El tema define colores, bordes, jerarquías y agrupaciones. Los componentes de
-Vuetify controlan los elementos interactivos y su ciclo de vida. Los estilos comunes
-pertenecen a los defaults y hojas compartidas del cliente.
+| Elemento | Fuente y aplicación |
+| --- | --- |
+| Tema y paleta | `app/plugins/vuetify.ts`: tabla verde, subencabezado ámbar, modal oscuro con franja ámbar, menú oscuro y selección celeste; acciones azul/gris según control. |
+| Defaults de controles | `shared/ui/controlDefaults.ts` y `VDefaultsProvider` en layout/modal: densidad, variante, bordes y mensajes. El login conserva su composición. |
+| Ajustes compartidos | `shared/ui/warehouse.css`: foco, contornos, consulta y detalles de los controles; conserva errores de Vuetify. |
+| Tipografía | Montserrat Variable de Fontsource incluida en assets; `style.css` define `--v-font-body` y `--v-font-heading`. Incluye login y evita descarga de fuentes durante el uso. |
+| Distribución y accesibilidad | Grid, diálogos y paneles Vuetify controlan adaptación, scroll, foco y Escape. Acciones con icono, nombre y tooltip; el color acompaña su significado. |
+| Alcance CSS | SFC con CSS scoped; `:deep()` sólo para los detalles adaptados de controles. Vue conserva la propiedad del DOM. |
 
-Las páginas usan estos títulos de tabla: «Tabla de Existencias» para
-Materiales, «Tabla de Consumibles», «Tabla de Mermas» y «Tabla de» seguido del
-nombre de cada catálogo. Cada página tiene un único `h1` centrado; no se repiten
-«Almacén» ni «Catálogos» como rótulos sobre él. Esos grupos siguen identificando
-la navegación en el menú y la barra superior. Los enlaces y el título de la pestaña
-conservan el nombre del módulo, por ejemplo, Materiales.
-
-Se aplican las [variables de tema de Vuetify](https://vuetifyjs.com/en/features/theme/)
-y sus [defaults por ámbito](https://vuetifyjs.com/en/features/global-configuration/):
-
-- `app/plugins/vuetify.ts`: paleta de Almacén, tabla con degradado verde y borde
-  inferior oscuro, filas alternadas y acciones de filtro azul/gris. El modal
-  presenta cabecera oscura y franja ámbar; el menú compacto usa fondo oscuro
-  y selección celeste. Las acciones distinguen editar, ajustar, agregar y eliminar
-  por color, nombre accesible y tooltip, sin depender sólo del color.
-- `shared/ui/controlDefaults.ts` y `VDefaultsProvider` del layout y del modal: densidad, variante, redondeo,
-  color y mensajes de los controles. El login conserva sus propios estilos.
-- `shared/ui/warehouse.css` adapta sólo las clases de esos defaults: contornos,
-  fondo de consulta, foco visible y tooltip. La tabla conserva centrado, bordes,
-  degradados, acciones y controles de paginación; la identidad queda alineada a
-  la izquierda. Los estilos de estado de error de Vuetify permanecen vigentes.
-- Montserrat Variable se sirve desde los assets compilados mediante Fontsource;
-  `style.css` configura `--v-font-body` y `--v-font-heading` para Vuetify. No se
-  consulta Google Fonts durante el uso. La fuente aplica también al login.
-- Los componentes usan [CSS scoped de Vue](https://vuejs.org/api/sfc-css-features.html).
-  `:deep()` se limita a celdas y detalles de los controles que realmente se adaptan;
-  no se agregan resets globales de Bootstrap ni hojas completas de otra biblioteca.
-- `VRow`/`VCol`, `VDialog` y `VExpansionPanels` resuelven distribución, scroll,
-  foco, Escape y apertura. No se crean gestores manuales de modales ni listeners
-  de Select2 sobre nodos controlados por Vue.
-
-No se añaden Tailwind, otro motor de tabla ni un generador universal de formularios
-para estos flujos. VeeValidate administra validación y errores; Axios administra
-transporte y renovación. La selección dependiente, los payloads versionados y la
-recuperación de operaciones siguen siendo reglas propias del módulo. Un plugin
-visual no conoce esas reglas de la API.
+Cada página tiene un `h1` centrado con el nombre del módulo. Las tablas muestran
+«Tabla de Existencias», «Tabla de Consumibles», «Tabla de Mermas» o «Tabla de» + catálogo.
+Almacén/Catálogos identifican grupos del menú y barra, sin otro título sobre la página.
+Las [decisiones ADR-VUE-006](../../decisions.md) fijan Vuetify y SweetAlert2;
+los [marcos compartidos](#consistencia-de-listados-y-tablas) concentran su aplicación.
 
 ### Campos y modos del modal
 
@@ -96,63 +70,49 @@ Los campos de consulta nunca amplían el payload admitido por el servidor.
 
 ### SweetAlert2 y errores
 
-`shared/ui/feedback.ts` concentra configuración y estilo con `confirmAction`. Se importa SweetAlert2
-directamente con Composition API; no se requiere otro wrapper ni una propiedad
-global de Vue. Su entrada raíz ya incorpora el CSS base. La confirmación de baja
-usa `preConfirm` y `showLoaderOnConfirm`; Cancelar no realiza solicitudes. Un fallo
-conserva el diálogo para reintentar y no dispara otra escritura automáticamente.
-Al desmontar la página se cancela la solicitud y se cierra sólo su confirmación.
-Los nombres y mensajes se pasan mediante `titleText`/`text`, sin interpolar HTML.
-La capa `nexus-feedback-container` queda por encima de los overlays Vuetify.
-Cuando Compras confirma una cancelación desde su diálogo de consulta, ese diálogo
-pausa su retención de foco mediante `retainFocus=false` y bloquea cierre/acciones
-hasta resolver la confirmación; SweetAlert2 controla el foco mientras está abierto.
-Los otros modales conservan `retainFocus=true`. `showSubmit=false` permite
-reutilizar el marco para consulta sin presentar una acción de guardado.
-`RecordEditorDialog` limita la columna de captura con `minmax(0, 1fr)` para que
-una tabla ancha se desplace dentro de su wrapper sin estirar los campos.
-
-`useInventoryRemoval` coordina la operación y conserva el ID de la relación con el
-proveedor. `useInventory` mantiene permisos y coordina actualización/aviso de éxito.
-No se usa el modal de captura como una confirmación vacía de eliminación.
-Los errores de validación, conflicto, carga de catálogos y listado continúan en el
-contexto donde se pueden corregir, mediante mensajes de campo o `VAlert`.
+| Situación | Responsable y comportamiento |
+| --- | --- |
+| Confirmar baja | `shared/ui/feedback.ts` configura SweetAlert2 con foco en Cancelar, `preConfirm` y `showLoaderOnConfirm`. Cancelar no escribe; enviar bloquea duplicados; fallar permite reintento explícito. |
+| Texto del aviso | `titleText`/`text`, sin interpolar HTML. La entrada raíz de SweetAlert2 incluye su CSS; `nexus-feedback-container` queda sobre los overlays Vuetify. |
+| Desmontaje | Cancela la solicitud y cierra sólo la confirmación de su consumidor. |
+| Cancelación de detalle de compra | El diálogo de consulta usa temporalmente `retainFocus=false` y bloquea cierre/acciones; SweetAlert2 administra el foco. Los demás modales mantienen `retainFocus=true`. |
+| Consulta de registro | `showSubmit=false` reutiliza el marco sin botón de guardado. `RecordEditorDialog` usa `minmax(0, 1fr)` para contener tablas anchas sin estirar los campos. |
+| Baja de inventario | `useInventoryRemoval` conserva el ID de la relación proveedor–artículo; `useInventory` coordina actualización y aviso. |
+| Error corregible | Campo o `VAlert` en el contexto de captura, conflicto, catálogo o listado; los formularios permanecen en Vue. |
 
 ## Tabla y selectores
 
-Materiales y Mermas conservan las dos filas de encabezados: Material, Medidas
-(Base/Altura), Stock actual, Stock Mínimo, Presentación y Conversión (Cantidad/Unidad).
-Costo y Activo dependen de los permisos originales. Mermas añade Pesos por unidad
-(Cono/Total con cono/Neto); una consulta adicional muestra las referencias históricas.
-Consumibles conserva Consumible, Existencia, Stock Mínimo, Presentación y Unidad
-con su costo/estado según permisos. Las acciones dependen de los permisos de cada
-operación y la elegibilidad devuelta por el servidor.
+| Recurso | Estructura visible |
+| --- | --- |
+| Materiales | Dos niveles: Material, Medidas (Base/Altura), Stock actual, Stock Mínimo, Presentación y Conversión (Cantidad/Unidad). Costo/Activo dependen del permiso. |
+| Mermas | La estructura anterior más Pesos por unidad (Cono/Total con cono/Neto); consulta de referencias históricas disponible. |
+| Consumibles | Consumible, Existencia, Stock Mínimo, Presentación y Unidad; costo/estado según permisos. |
 
-Sólo se habilita orden para columnas reconocidas por la API: nombre en los tres
-recursos; base, altura y stock mínimo en Materiales. Los índices enviados conservan
-el contrato DataTables que ya admite Express; usar Vuetify no obliga a cambiarlo.
+`ServerTable` usa `VDataTableServer`; API resuelve búsqueda, orden y paginación.
+Sólo se ordena por columnas admitidas: nombre en los tres recursos y base/altura/stock
+mínimo en Materiales. Los parámetros conservan el contrato DataTables de la API.
+Las acciones dependen de permiso y elegibilidad recibida.
 
-`RemoteSelect` presenta opciones y emite búsqueda, más opciones o reintento.
-`useRemoteOptions` resuelve páginas, debounce, cancelación y respuestas tardías.
-Cambiar proveedor o búsqueda limpia la página anterior; la opción seleccionada
-mantiene su etiqueta visual aunque deje de estar en el resultado de búsqueda.
-Llegar al final dispara una sola solicitud pendiente. Un fallo conserva el catálogo
-cargado y permite repetir la página fallida, sin avanzar ni duplicar las opciones.
-El núcleo compartido elimina IDs repetidos dentro y entre páginas con un `Set`.
-La paginación cuenta las filas recibidas, no las opciones únicas; una respuesta
-vacía termina la carga aunque el servidor conserve un conteo antiguo. Cambiar
-búsqueda reinicia el reintento y cancela la consulta anterior; reintentar cancela
-el debounce para no duplicar solicitudes. Desmontar bloquea nuevas consultas.
+| Evento del selector | Resultado |
+| --- | --- |
+| Buscar o cambiar proveedor | Reinicia páginas y cancela/invalida la consulta anterior. |
+| Llegar al final | Solicita una página con una única carga pendiente. |
+| Recibir opciones repetidas | Deduplica por ID; el avance cuenta filas recibidas, no opciones únicas. |
+| Página vacía | Termina la carga aunque el conteo del servidor esté desactualizado. |
+| Error | Conserva opciones y página fallida para reintento explícito; éste cancela debounce pendiente. |
+| Selección fuera de página | `useSelectedOption` conserva etiqueta/datos del mismo ID; cambia o limpia al cambiar el ID. |
+| Desmontaje | Aborta/invalida y bloquea nuevas consultas. |
+
+`RemoteSelect` presenta y emite intenciones; `useRemoteOptions` adapta el comportamiento
+compartido. La [secuencia del lookup](../processes/02-shared-runtime/03-remote-lookup.md)
+explica la coordinación con `useRemoteLookup`.
 
 ## Alta contextual desde un selector
 
-Se conserva `VAutocomplete` de Vuetify dentro de
-[RemoteSelect](../../../../src/shared/components/RemoteSelect.vue). El slot `append-item`
-presenta **Registrar…** para una búsqueda no vacía sin coincidencia exacta en las
-opciones visibles, cuando el flujo lo autoriza y el control está disponible.
-La comparación visual no garantiza unicidad en la base: Express conserva ese control.
-El widget emite `create(search)`; no fabrica un ID ni registra el texto como entidad.
-Las acciones también funcionan con teclado y los textos largos pueden ocupar varias líneas.
+`RemoteSelect` compone `VAutocomplete`. Su slot `append-item` ofrece **Registrar…**
+si hay búsqueda no vacía, falta coincidencia exacta visible y el contexto/permiso lo
+admite. Emite `create(search)`; Express comprueba unicidad. Teclado y texto multilínea
+conservan el comportamiento del control.
 
 ### Componentes revisados y decisión
 
@@ -177,144 +137,84 @@ No se programa un selector completo ni se crea un modal distinto para cada consu
 | Merma: proveedor y plantilla; Presentación, Unidad, Motivo y filtros | Consulta de entidades existentes, sin alta contextual. | Los componentes mantienen búsqueda, paginación y selección del recurso. |
 | Asesor y Solicitante de Salidas | Consulta de Personas según dependencias del encabezado. | `useIssueHeaderSelection` aplica filtros y limpieza de selecciones dependientes. |
 
-Las fuentes de esta coordinación son [InventoryWorkspace](../../../../src/app/pages/InventoryWorkspace.vue),
-[PurchaseWorkspace](../../../../src/app/pages/PurchaseWorkspace.vue),
-[IssueWorkspace](../../../../src/app/pages/IssueWorkspace.vue),
-[DirectoryCreationPage](../../../../src/app/pages/DirectoryCreationPage.vue) y
-[RemoteSelect](../../../../src/shared/components/RemoteSelect.vue). Los
-[modelos general y específicos](../development/design-and-construction-patterns/09-contextual-creation.md) explican
-los eventos, contratos y propietarios de cada caso.
+| Resultado del alta auxiliar | Efecto en la captura origen |
+| --- | --- |
+| Confirmada y activa | Workspace adapta a `LookupItem`, invoca el callback y conserva etiqueta/selección mientras refresca opciones. |
+| Cancelada o con error | Conserva la selección anterior; el error permanece en el auxiliar. |
+| Registro inactivo | No selecciona una opción inactiva para una operación activa. |
+| Consumidor desmontado | Descarta el callback tardío. |
 
-`LookupCreation` lleva texto y callback del consumidor vivo. Los Workspaces componen
-módulos y vuelven a comprobar permisos; `DirectoryCreationPage` concentra el alta
-de Proveedor/Cliente y la adaptación a `LookupItem`. `initialName` sólo precarga el
-campo adecuado al crear. Cancelar no cambia la selección; un error mantiene el modal.
-La selección confirmada conserva su etiqueta aunque la primera página remota aún
-no contenga el ID. Los callbacks del formulario descartan respuestas tras desmontar;
-un registro inactivo no queda seleccionado para una operación activa.
-
-El [modelo aplicado](../development/design-and-construction-patterns/03-composables-and-callbacks.md#altas-contextuales-mediante-eventos-y-callbacks)
-y [selectCreation.spec.ts](../../../../tests/e2e/selectCreation.spec.ts) documentan la
-coordinación y su evidencia de navegador con API simulada.
+Los [diagramas general y aplicados](../development/design-and-construction-patterns/09-contextual-creation.md)
+identifican Workspaces, `DirectoryCreationPage`, eventos y callbacks. `LookupCreation`
+transporta búsqueda/callback; `initialName` sólo precarga el alta. La evidencia está en
+[selectCreation.spec.ts](../../../../tests/e2e/selectCreation.spec.ts), con API simulada.
 
 ## Propietarios y responsabilidades
 
-| Ubicación | Responsabilidad |
+| Capa | Propietarios y responsabilidad |
 | --- | --- |
-| `app/layouts/AppLayout.vue` | Coordina sesión y distribución general; compone barra, drawer, navegación y ruta activa. |
-| `app/components/AppNavigation.vue` | Presenta enlaces Vue ya autorizados y la acción de cerrar sesión; no obtiene permisos ni datos. |
-| `app/navigation.ts` | Catálogo de rutas Vue del menú y permiso de cada entrada. |
-| `app/pages/*Workspace.vue` | Composición entre módulos y apertura del alta auxiliar con callback del formulario de origen. |
-| `app/pages/DirectoryCreationPage.vue` | Contenedor compartido de alta contextual de Proveedor/Cliente, permisos y adaptación del resultado a opción. |
-| `shared/http/apiClient.ts` | Instancia Axios, transporte e interceptor de sesión. |
-| `shared/http/apiError.ts` | Traduce el contrato público de errores, incluidos JSON recibidos como Blob. |
-| `modules/auth/services/authService.ts` | Credenciales y resultado del login; declara esa operación pública para evitar refresh al rechazarla. |
-| `modules/warehouse/pages/` | Contenedores que conectan componentes y composables. |
-| `modules/warehouse/components/` | Tabla, acciones de fila, captura y selector remoto con props/eventos. |
-| `InventoryFilters.vue` | Panel visual con buscar, limpiar y actualizar; emite intenciones sin consultar la API. |
-| `InventoryReportToolbar.vue` | Presenta alcance, descarga y reintento del reporte; no realiza solicitudes. |
-| `modules/warehouse/composables/useInventory.ts` | Coordina permisos visuales, apertura/cierre del editor y confirmación de operaciones. |
-| `useInventoryList.ts` | Lista, filtros, orden, paginación, actualización y cancelación de consultas. |
-| `useInventoryReport.ts` | Descarga y ciclo de vida del reporte, con error independiente. |
-| `useInventoryRemoval.ts` | Confirmación y escritura de baja, con cancelación al desmontar. |
-| `useSelectedOption.ts` | Precarga una opción del mismo ID, incorpora datos remotos y conserva la selección al paginar; descarta la anterior al cambiar o limpiar el ID. Se reutiliza en controles, Compras, Salidas e Inventario. |
-| `shared/ui/feedback.ts` | SweetAlert2 y su configuración común; sin estado de negocio ni acceso a la API. |
-| `useInventoryEditor.ts` | Captura con VeeValidate, envío versionado y recuperación de merma. |
-| `useInventorySelection.ts` | Consulta catálogos y conserva proveedor, unidad y plantilla; coordina los campos que dependen de esas selecciones. No guarda registros ni abre modales. |
-| `useRemoteOptions.ts` | Estado de catálogos paginados, sin renderizado. |
-| `modules/warehouse/services/` | Adaptadores separados de inventario, catálogos y reportes; `inventoryPageRequest` conserva los parámetros de inventario y `shared/http/pageRequest` valida el contrato paginado común. |
-| `modules/warehouse/mappers/inventoryMapper.ts` | Convierte DTOs de inventario en filas de presentación, conservando ambas identidades y versiones. |
-| `inventoryTable.ts` | Configuración de columnas y orden permitido, sin acceso a API. El formato numérico vive en `shared/utils/formatNumbers`. |
-| `formModel.ts` / `formFields.ts` | Datos permitidos, conexión a validadores públicos y controles de la captura. |
+| Navegación | `AppLayout`, `AppNavigation` y `app/navigation.ts`: distribución, enlaces autorizados y ruta activa; la presentación recibe enlaces resueltos. |
+| Composición entre dominios | `app/pages/*Workspace` y `DirectoryCreationPage`: alta auxiliar, comprobación de permisos y retorno tipado al formulario. |
+| Páginas | Contenedores de `modules/*/pages`: conectan sesión, comportamiento y eventos. |
+| Presentación | Tablas, filtros, toolbar de reporte y campos de captura: props/eventos; marcos visuales comunes en `shared/components`. |
+| Interacción | `useInventory`, `useInventoryList`, `useInventoryReport`, `useInventoryRemoval` y `useInventoryEditor`: coordinación de permisos visuales, listado, reporte, baja y captura en flujos separados. |
+| Selección | `useInventorySelection`, `useRemoteOptions`, `useRemoteLookup` y `useSelectedOption`: dependencias, páginas, cancelación y etiqueta seleccionada. |
+| Contratos | Servicios de inventario/catálogos/reportes, `inventoryMapper`, `inventoryPageRequest` y `shared/http/pageRequest`: endpoints, DTOs, parámetros y páginas válidas. |
+| Esquemas y columnas | `formModel`/`formFields` y `inventoryTable`: captura admitida y orden; formato numérico en `shared/utils/formatNumbers`. |
+| Infraestructura | `apiClient`, `apiError` y `feedback`: HTTP/sesión, error normalizado y avisos; `authService` define la solicitud pública de login. |
 
-El menú ofrece las secciones implementadas en Vue y filtra enlaces por permiso.
-El proxy reenvía `/api` y el POST `/cerrar-sesion`; las rutas de página pertenecen
-a Vue Router. El cierre procesa las cookies de respuesta y vuelve a
-`/inicio-sesion` del cliente.
+La [referencia por módulo](../development/frontend-technical-documentation/index.md)
+localiza los colaboradores concretos. El proxy deriva `/api` y POST `/cerrar-sesion`;
+Vue Router resuelve páginas. El cierre procesa cookies y vuelve a `/inicio-sesion`.
 
 ## Axios y sesión
 
-Login, `/api/auth/me`, catálogos, inventario y reportes usan el mismo cliente.
-El navegador conserva las cookies HttpOnly del mismo origen. El interceptor
-comparte una única renovación entre respuestas `401` concurrentes y repite cada
-solicitud original una sola vez. El login y la propia renovación se declaran
-públicos. No se repiten automáticamente escrituras tras `403`, `409`, `5xx`,
-timeout o pérdida de red. La cancelación conserva su significado y no se muestra
-como fallo de conexión. Una descarga HTML no se confirma como Excel.
+| Condición | Comportamiento del cliente compartido |
+| --- | --- |
+| Login, sesión, catálogos, inventario o reporte | Misma instancia Axios; cookies HttpOnly administradas por el navegador para el mismo origen. |
+| 401 concurrentes | Comparten una renovación pendiente; cada original se reintenta una vez. |
+| Login o refresh rechazado | Operaciones públicas sin renovación recursiva. |
+| 403, 409, 5xx, timeout o pérdida de red | Sin repetición automática de escritura. |
+| Cancelación | Se conserva como cancelación; no se transforma en error de conexión. |
+| Descarga no válida | Un cuerpo HTML no confirma un archivo Excel. |
+
+La [renovación compartida](../processes/01-session/04-concurrent-renewal.md) desarrolla
+las decisiones y la continuación de cada petición.
 
 ## Ubicación y contrato de las pruebas
 
-Las URLs `/inicio-sesion` o `/almacen/materiales` son navegación de Vue; las URLs
-`/api/auth/login` o `/api/warehouse/materials` son contratos HTTP con Express. Las
-pruebas del frontend deben observar ambas: qué ve el usuario y qué solicitud envía
-el navegador. Cambiar estas últimas por URLs ficticias puede dejar de comprobar
-el contrato que realmente se consume.
+| Ubicación | Comprueba | Límite |
+| --- | --- | --- |
+| `front/tests/unit` | Captura, navegación, estado, mappers e interceptores. El adaptador simulado permite ejecutar Axios real. | Sin Express ni PostgreSQL. |
+| `front/tests/e2e` | Componentes reales en Chromium: interacción, payload, permisos visibles y recuperación. | `/api/*` simulado; no acredita contraseña válida ni stock persistido. |
+| `back/tests/integration` | HTTP real, autorización y persistencia con base aislada. | Sus garantías requieren el entorno del servidor. |
 
-- `front/tests/unit/`: comprueba captura, navegación, estado, mapeo e interceptores.
-  Un adaptador simulado sustituye el transporte de Axios y deja ejecutar sus
-  transformaciones/interceptores reales; no arranca Express ni usa PostgreSQL.
-- `front/tests/e2e/`: ejecuta componentes reales en Chromium y simula respuestas
-  de `/api/*`. Comprueba interacción, payload, permisos visibles, errores y reintentos.
-  No demuestra que una contraseña sea válida ni que el stock quede persistido.
-- `back/tests/integration/`: comprueba HTTP real, autorización y estado persistido
-  con una base de pruebas aislada. Es el propietario de esas garantías.
+Las rutas de página son navegación Vue; `/api/*` define el intercambio HTTP que las
+pruebas del cliente observan. Fixtures de `front/tests/fixtures` representan respuestas;
+no importan controllers, servicios privados ni Prisma. Los alias públicos comparten
+reglas de captura sin ejecutar el backend dentro de Vue.
 
-Los fixtures de API en `front/tests/fixtures/` son datos de contrato para la UI.
-No se importan controllers, servicios privados ni Prisma en las pruebas de Vue.
-La importación de validadores públicos por sus alias reutiliza una fuente de
-reglas; no ejecuta el backend dentro del frontend.
-
-Las reglas de texto plano compartidas rechazan marcado y controles no imprimibles,
-incluido NUL, y conservan saltos de línea y tabulaciones en observaciones. Vue muestra
-nombres y errores mediante interpolación; no se usa `v-html` ni se almacenan entidades
-HTML para sustituir el escape de salida. La validación del navegador ayuda a capturar;
-Express vuelve a validar tipos, límites y permisos antes de persistir. Las contraseñas
-no se recortan. El contrato de entrada y salida del servidor se mantiene en
-[el estándar de seguridad](../../coding-standards/09-errors-security-and-feedback.md).
-
-La estrategia y sus condiciones observables están en [tooling.md](../../../development/02-tooling.md).
+La [guía de seguridad](input-security.md) conserva normalización/escape/contraseñas y
+[tooling](../../../development/02-tooling.md), la preparación de pruebas.
 
 ## Reutilización con Catálogos
 
-La [guía de entradas y salida segura](input-security.md) distingue normalización,
-validación y escape, documenta SweetAlert2 como texto y enlaza los controles del
-servidor. Los patrones de composición y la evaluación SOLID están en
-[patrones Vue](../development/design-and-construction-patterns/01-applicability-and-principles.md).
-
-El [módulo de Catálogos](../development/frontend-technical-documentation/03-catalogs.md) usa EditorDialog y ServerTable, extraídos del
-editor y la tabla de inventario. Sus slots conservan los campos y celdas propios
-de cada dominio. Los estilos compartidos pertenecen a esos marcos; las secciones de
-pesos, stock y referencias siguen en los componentes de Almacén. La validación,
-la sesión y HTTP se coordinan fuera de la presentación.
-
+Catálogos reutiliza `EditorDialog` y `ServerTable`. Los slots mantienen campos y celdas
+del dominio; pesos, stock y referencias permanecen en Almacén. Validación, sesión y HTTP
+se coordinan fuera de presentación. Los [patrones y principios](../development/design-and-construction-patterns/01-applicability-and-principles.md)
+explican esta distribución.
 
 ## Consistencia de listados y tablas
 
-`RecordListPanel` comparte tarjeta con fondo degradado, título, acciones, errores
-y contador entre todos los listados. `ListFilters` ofrece el acordeón y los botones
-Actualizar/Limpiar/Buscar también en Catálogos, Identidad y Directorio. Los filtros
-por área/rol conservan su lógica y se distribuyen mediante columnas Vuetify.
+| Componente o fuente | Contrato visual compartido |
+| --- | --- |
+| `RecordListPanel` | Tarjeta degradada, título, acciones, errores y contador de listados. |
+| `ListFilters` | Acordeón y Actualizar/Limpiar/Buscar; filtros propios distribuidos por grid. |
+| `TableFrame` | Encabezados verdes, subencabezado ámbar cuando aplica, bordes, filas alternas, hover/foco y paginador. |
+| `ServerTable` / `PersonForm` | Reutilizan el marco con `VDataTableServer` paginado o `VTable` para asignaciones locales, respectivamente. |
+| Tema y `--table-row-highlight` | Paleta central y aviso de stock bajo conservado en filas pares, hover y foco; reglas comunes sin copiar CSS por pantalla. |
+| `TableAction` / `StateBadge` | Acción con nombre, icono, tooltip y bloqueo pendiente / estado activo uniforme. Consulta omite acciones. |
+| `PurchaseTotals` | Resumen del encabezado y de corrección con etiquetas de Compras. La corrección exige confirmación antes del request. |
+| `confirmMutation` / feedback | El servicio confirma el código recibido; el aviso presenta su mensaje público. No genera códigos ni folios desde la UI. |
 
-`TableFrame` es el propietario único de la apariencia de tablas paginadas y locales:
-encabezado verde, subencabezados ámbar de inventario, bordes, filas alternas,
-realce de hover/foco y paginador. `ServerTable` lo compone con `VDataTableServer`;
-PersonForm lo utiliza con `VTable` para las asignaciones aún no guardadas, sin
-introducir paginación ni solicitudes HTTP para esa captura.
-
-Los colores se centralizan en el tema de Vuetify. Las filas con stock bajo definen
-`--table-row-highlight` desde Inventario; el marco conserva ese aviso en filas
-pares, al pasar el cursor y al enfocar una acción. Las reglas comunes tienen
-especificidad suficiente frente a las tablas base de Vuetify, sin copiar estilos
-en cada pantalla.
-
-`TableAction` mantiene nombre accesible, icono, tooltip, color por operación y
-bloqueo durante captura pendiente. `StateBadge` presenta el estado activo de forma
-uniforme. Las tablas de sólo lectura omiten la columna de acciones. Los permisos,
-el stock, las asignaciones y los payloads permanecen en sus módulos.
-
-En Compras, `PurchaseTotals` reutiliza el resumen visual del encabezado y de
-corrección, con las etiquetas del módulo. La corrección conserva su
-confirmación explícita antes del request. Los avisos de éxito usan el mensaje
-traducido del código realmente confirmado por el servicio mediante el catálogo
-público `getSuccessMessage` del contrato de respuestas. `confirmMutation` sólo valida
-el contrato y devuelve datos; no presenta avisos ni fabrica un código.
+Permisos, stock, asignaciones y payloads conservan sus propietarios de dominio.

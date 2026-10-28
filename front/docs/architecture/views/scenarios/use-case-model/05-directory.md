@@ -6,7 +6,9 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 **Identificador:** `DIA-VUE-CU-010`. **Pregunta:** ¿Qué objetivos y actores participan en Proveedores?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
@@ -33,7 +35,7 @@ direction LR
 
 **Identificador:** `DIA-VUE-CU-011`. **Pregunta:** ¿Qué objetivos y actores participan en Clientes?
 
-**Fuente:** fichas CU del catálogo local y permisos públicos del recurso. **Notación y alcance:** UML de casos de uso; asociaciones, generalizaciones y dependencias con su estereotipo. No representa llamadas entre componentes.
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
 ```mermaid
 usecase-beta

@@ -19,5 +19,5 @@ La [guía de realización Vue](../../../architecture/views/development/frontend-
 
 ## Diagramas de realización
 
-- [Selección dependiente y escritura de inventario](../../../architecture/views/processes/08-inventory-selection-write.md).
-- [Merma: respuesta incierta y reintento](../../../architecture/views/processes/09-waste-pending.md).
+- [Selección dependiente y escritura de inventario](../../../architecture/views/processes/05-warehouse/01-inventory-selection-write.md).
+- [Merma: respuesta incierta y reintento](../../../architecture/views/processes/05-warehouse/02-waste-pending.md).

@@ -2,14 +2,9 @@
 
 Este capítulo describe cómo se distribuyen contratos, captura, operaciones y transporte en Compras y Salidas.
 
-Los participantes pertenecen a `modules/issues`, `modules/purchases`, sus pantallas
-contenedoras en `app` y sus consumidores de `shared`. La estructura sigue la
-arquitectura existente de Vue; una carpeta o un nombre de patrón por sí solos no
-establecen una separación de responsabilidades.
-
-El catálogo general de [patrones y principios](01-applicability-and-principles.md) conserva los mecanismos
-comunes. Aquí se documentan sus colaboradores concretos, con enlaces al código;
-los diagramas describen la implementación actual, no una arquitectura propuesta.
+Participan `modules/issues`, `modules/purchases`, sus contenedores de `app` y
+los colaboradores de `shared`. El [catálogo de patrones](01-applicability-and-principles.md)
+conserva la definición general; aquí se localiza su aplicación.
 
 ## Propietarios del código
 
@@ -38,28 +33,16 @@ porque asignar una identidad local no corresponde al mapper de respuestas HTTP.
 
 ## Patrones y principios aplicados
 
-- **Contenedor y presentación:** las páginas conectan comportamiento; formularios,
-  tablas y filtros reciben props y emiten eventos. Las reglas de ESLint protegen
-  las importaciones de estas fronteras.
-- **Composición:** captura, lectura cancelable, guardado, selectores, listados y
-  reportes conservan sus composables. `useDocumentRead` y `useRecordSave` reciben
-  operaciones/callbacks; no importan Salidas ni Compras.
-- **Adaptadores:** requests, respuestas y transporte tienen propietarios distintos.
-  Cambiar la representación HTTP no requiere cambiar el componente visual.
-- **Fábrica de esquemas por modo:** `createIssueValidationSchema` elige la
-  validación de encabezado, documento o surtido y no valida capturas en consulta
-  o devolución. `createPurchaseValidationSchema` adapta alta y edición sin copiar
-  las reglas públicas de captura.
-- **Uniones discriminadas de TypeScript:** crear no exige documento; editar,
-  surtir y devolver sí lo exigen. `IssueWriteTarget` y `PurchaseWriteTarget`
-  excluyen la consulta. Corregir una compra exige cantidad/costo; cancelar no
-  acepta esos datos. El servicio convierte la intención en su ruta HTTP.
+| Mecanismo | Aplicación |
+| --- | --- |
+| Contenedor/presentación | Páginas coordinan; formularios, tablas y filtros usan props/eventos. ESLint protege imports. |
+| Composición por callbacks | Lectura, guardado, selección y reportes tienen contratos propios; `useDocumentRead`/`useRecordSave` reciben operaciones del dominio. |
+| Adaptadores | Request, respuesta y transporte conservan propietarios distintos. |
+| Fábrica de esquemas | `createIssueValidationSchema`/`createPurchaseValidationSchema` adaptan reglas públicas al modo de captura. |
+| Uniones discriminadas | Exigen documento cuando corresponde y separan consulta, escritura, corrección y cancelación. |
 
-Esto concreta responsabilidad única (SRP). La inyección de operaciones/callbacks
-mantiene los composables compartidos independientes de los dominios. No se declara
-una aplicación completa de SOLID: no hay una jerarquía polimórfica que justifique
-inventar clases para Liskov o interfaces sin consumidores. Una nueva regla que
-cambie estado, stock o autorización se implementa y comprueba también en Express.
+La [evaluación SOLID](01-applicability-and-principles.md) describe cohesión y dependencias.
+La API conserva las reglas definitivas de permiso, estado y stock.
 
 ## Composición del editor y adaptadores
 
@@ -69,6 +52,8 @@ Compras aplica el mismo corte con sus propios módulos. Flechas continuas = cons
 o composición; discontinuas = eventos o ejecución de una operación configurada.
 Es un diagrama de colaboración funcional, no un diagrama UML de clases.
 
+**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias); [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+
 ```mermaid
 flowchart TB
     page["IssueEditorPage<br/>contenedor"] --> ui["IssueEditor<br/>props y presentación"]
@@ -76,7 +61,8 @@ flowchart TB
     page --> editor["useIssueEditor<br/>captura y coordinación"]
     editor --> rules["issueForm y RequestMapper<br/>esquema y payload"]
     editor --> save["useRecordSave<br/>ciclo de guardado"]
-    save -.->|operation del editor| service["issueService<br/>ruta y confirmación"]
+    save -.->|operation signal| editor
+    editor --> service["issueService<br/>ruta y confirmación"]
     service --> http["apiClient<br/>Axios compartido"]
     http --> api["Express<br/>validación y persistencia"]
 ```
@@ -97,23 +83,10 @@ centrarse en esa frontera, sin atribuir sus tareas al editor visual.
 | Lectura por callback | [useIssueActions](../../../../../src/modules/issues/composables/useIssueActions.ts) configura [useDocumentRead](../../../../../src/shared/composables/useDocumentRead.ts) con `issueService.get`. | [usePurchaseActions](../../../../../src/modules/purchases/composables/usePurchaseActions.ts) configura el mismo lector con `purchaseService.get`. |
 | Guardado por callback | Ambos editores configuran [useRecordSave](../../../../../src/shared/composables/useRecordSave.ts). | El mismo contrato conserva `AbortSignal`, errores y confirmación sin conocer el dominio. |
 
-La fábrica selecciona funciones de validación; no es una jerarquía Abstract Factory.
-Las reglas públicas siguen en `back/src/public` y sólo orientan la captura. Las
-uniones de [issue.ts](../../../../../src/modules/issues/issue.ts) y
-[purchase.ts](../../../../../src/modules/purchases/purchase.ts) expresan estas diferencias:
-
-| Captura | Esquema y operación admitida |
-| --- | --- |
-| Salida `create` / `edit` | Documento completo según recurso; editar requiere documento leído. |
-| Salida `header` | Sólo encabezado, sin volver a enviar sus detalles. |
-| Salida `supply` | Selección de pendientes y cantidad de proyecto; no edición del encabezado. |
-| Salida `view` / `return` | Esquema vacío en el editor principal y sin llamada a `save`. La devolución usa [useIssueReturn](../../../../../src/modules/issues/composables/useIssueReturn.ts) y `returnDetail`, con su captura propia. |
-| Compra `create` / `edit` | Reglas públicas de alta/edición; `PurchaseWriteTarget` excluye `view`. |
-| Corrección / cancelación de partida | `PurchaseDetailChange` distingue datos de corrección y cancelación; [usePurchaseCorrection](../../../../../src/modules/purchases/composables/usePurchaseCorrection.ts) coordina el flujo. |
-
-Estas opciones son modos de interacción y contratos de tipos; no constituyen un
-patrón State ni una máquina de estados persistente. El servidor vuelve a comprobar
-permisos, pertenencia y estado antes de modificar datos.
+Los [contratos de Salidas](../../logical/class-and-type-models/08-issues.md#modos-y-contrato-de-escritura)
+y [Compras](../../logical/class-and-type-models/07-purchases.md#datos-y-modos) comparan
+los modos, datos exigidos y cuerpos admitidos. Las variantes son contratos de interacción;
+los [estados](../../logical/states/index.md) desarrollan sus transiciones.
 
 ## Secuencia de guardado confirmado
 
@@ -127,21 +100,20 @@ contenedores para mantener visible el contrato del callback.
 ```mermaid
 sequenceDiagram
     autonumber
-    participant E as Editor<br/>useIssueEditor
-    participant G as Guardado<br/>useRecordSave
-    participant S as Servicio<br/>issueService
-    participant A as Express API
-    E->>E: submit: validar con VeeValidate
+    participant E@{ "type": "control" } as useIssueEditor
+    participant G@{ "type": "control" } as useRecordSave
+    participant S@{ "type": "boundary" } as issueService
+    participant A@{ "type": "boundary" } as API
     E->>G: execute(operation)
-    G->>G: activar isSubmitting
-    G->>S: operation(signal): save(target, payload)
-    Note over E,G: Callback del editor:<br/>mapea la captura
-    S->>A: POST o PATCH mediante apiClient
-    A-->>S: respuesta con code
-    S->>S: confirmMutation(code esperado)
-    S-->>G: MutationConfirmation
-    G->>G: liberar isSubmitting
-    G->>E: onSaved(result)
+    G->>E: operation(signal)
+    E->>E: mapear captura
+    E->>S: save(payload, signal)
+    S->>A: POST o PATCH
+    A-->>S: respuesta
+    S->>S: confirmMutation
+    S-->>E: confirmación
+    E-->>G: resultado de operation
+    G->>E: onSaved si vigente
 ```
 
 `onSaved` emite `saved` desde `IssueEditorPage`; `IssuePage` conecta ese evento con
@@ -151,16 +123,12 @@ código recibido: no genera un folio ni confirma una transacción por sí mismo.
 El servicio de lectura usa el mapper de respuesta; el guardado devuelve una
 confirmación, sin simular que retorna un documento completo.
 
-Los caminos que no aparecen en la secuencia conservan estos efectos:
-
-- Captura inválida: VeeValidate impide ejecutar la operación HTTP.
-- Rechazo HTTP o código inesperado: no se llama a `onSaved`; `useRecordSave`
-  conserva el mensaje y copia los errores de campos cuando recibe `ApiError`.
-  Sólo `RECORD_VERSION_CONFLICT` marca conflicto; 401/403 llaman a `onDenied`.
-- Desmontaje: se aborta el `signal` y no se notifica un guardado tardío. Esto no
-  deshace una transacción que el servidor ya haya confirmado.
-- Lectura sustituida o cerrada: `useDocumentRead` aborta e invalida la secuencia;
-  una respuesta antigua no reemplaza el documento actual.
+| Condición alternativa | Resultado |
+| --- | --- |
+| Captura inválida | VeeValidate evita la operación HTTP. |
+| Rechazo HTTP/código inesperado | Sin `onSaved`; conserva mensaje y errores de `ApiError`. Sólo `RECORD_VERSION_CONFLICT` bloquea por conflicto; 401/403 notifican `onDenied`. |
+| Desmontaje | Aborta e impide callback tardío; no acredita reversión de una escritura confirmada. |
+| Lectura sustituida/cerrada | `useDocumentRead` invalida/aborta; el resultado antiguo no reemplaza el actual. |
 
 ## Composición entre dominios para altas rápidas
 
@@ -196,22 +164,16 @@ es compartida por la aplicación; estas capturas conservan estado por instancia.
 
 ## Convenciones de nombres comprobadas
 
-Los métodos `get`, `list`, `save` y `changeDetail` son verbos válidos dentro de un
-servicio de recurso. Las funciones independientes necesitan expresar el efecto:
-`createInitialIssueValues`, `mapIssueFormToRequest`, `createIssueDetailDraft`,
-`resolveIssueEditMode`, `getIssueReturnableQuantity` y `calculatePurchaseTotals`.
+| Elemento | Ejemplo y significado |
+| --- | --- |
+| Operación de servicio | `get`, `list`, `save`, `changeDetail`, con el recurso aportado por el servicio. |
+| Función independiente | `createInitialIssueValues`, `mapIssueFormToRequest`, `createIssueDetailDraft`, `resolveIssueEditMode`, `getIssueReturnableQuantity`, `calculatePurchaseTotals`: expresan efecto. |
+| Capacidad/estado | `canEditHeader`, `canEditDetails`, `isOriginallySupplied`. |
+| Callback/evento | `handleSaved`, `handleDetailSaved`, `handleClientSaved`; el evento Vue es `saved`. |
+| Composable/componente | `useIssueHeaderSelection` nombra su interacción; componentes en PascalCase y composables con prefijo `use`. |
+| Operación con varios IDs | Objeto con `resource`, `documentId`, `detailId`, `change`, `signal`. Campos API en el borde; imports al propietario real. |
 
-Los booleanos `canEditHeader`, `canEditDetails` y `isOriginallySupplied` explican
-capacidad o estado. `handleSaved`, `handleDetailSaved` y `handleClientSaved` son
-callbacks; el evento Vue conserva el nombre `saved`. El composable
-`useIssueHeaderSelection` declara su responsabilidad completa, no sólo la carga
-de opciones. Los componentes mantienen PascalCase y los composables el prefijo
-`use`, conforme al estándar del repositorio.
-
-Las operaciones HTTP con varios identificadores reciben un objeto con nombres
-explícitos (`resource`, `documentId`, `detailId`, `change`, `signal`). Los nombres
-de campos de la API se conservan en el borde HTTP. No se agregan barriles ni
-reexports de compatibilidad: los consumidores importan al propietario real.
+El [estándar de código](../../../coding-standards/index.md) conserva las reglas generales.
 
 ## Verificación
 
