@@ -23,7 +23,7 @@ const tempRoot = async () => {
   return root;
 };
 
-it('define seis áreas operativas con coordinador y operador, además de Almacén y administración', () => {
+it('define seis áreas operativas con Instalador en Instalaciones y Operador en las otras cinco', async () => {
   expect(DEMO_PROFILES).toHaveLength(15);
   expect(DEMO_PROFILES.filter((profile) => profile.departmentKey === 'router')).toHaveLength(2);
   expect(
@@ -31,6 +31,31 @@ it('define seis áreas operativas con coordinador y operador, además de Almacé
       (profile) => profile.label,
     ),
   ).toEqual(['Taller/Herrería · Coordinador', 'Taller/Herrería · Operador']);
+  expect(DEMO_PROFILES.filter((profile) => profile.departmentKey === 'installations')).toEqual([
+    expect.objectContaining({
+      id: 'instalaciones-coordinador',
+      label: 'Instalaciones · Coordinador',
+      roleKey: 'coordinator',
+    }),
+    expect.objectContaining({
+      id: 'instalaciones-instalador',
+      label: 'Instalaciones · Instalador',
+      roleKey: 'installer',
+    }),
+  ]);
+  const { accounts } = await readAccounts(path.resolve('manual.accounts.example.json'));
+  const installerAccount = accounts.find(
+    ({ id }: { id: string }) => id === 'instalaciones-instalador',
+  );
+  expect(installerAccount?.expectedAccess).toEqual({
+    roleKey: 'installer',
+    departmentKey: 'installations',
+  });
+  expect(() =>
+    verifyConfiguredAccess(installerAccount!, {
+      accesses: [{ roleKey: 'operator', departmentKey: 'installations' }],
+    }),
+  ).toThrow('no coincide');
 });
 
 it.each(
@@ -48,6 +73,18 @@ it.each(
     expect(selectedChapters(session.permissions).map(({ file }) => file)).not.toContain(
       '14-reports.md',
     );
+    expect(selectedChapters(session.permissions).map(({ file }) => file)).toContain(
+      '16-glossary.md',
+    );
+    const glossary = filterManualContent(
+      await readFile(path.resolve('docs/user-manual/16-glossary.md'), 'utf8'),
+      session.permissions,
+    );
+    expect(glossary).toContain('Estado de cumplimiento');
+    expect(glossary).toContain('Almacén registra la devolución');
+    expect(glossary).not.toContain('### Referencias para surtir o devolver');
+    expect(glossary).not.toContain('## Compras');
+    expect(glossary).not.toContain('### Costos');
     for (const filename of [
       '03-materials.md',
       '04-consumables.md',
@@ -74,12 +111,18 @@ it('Almacén conserva surtido y devolución, mientras sólo administración reci
   const admin = demoSession(DEMO_PROFILES[0]!);
   const issues = await readFile(path.resolve('docs/user-manual/12-issues.md'), 'utf8');
   expect(filterManualContent(issues, warehouse.permissions)).toContain('## Devolver una entrega');
+  const glossary = await readFile(path.resolve('docs/user-manual/16-glossary.md'), 'utf8');
+  expect(filterManualContent(glossary, warehouse.permissions)).toContain(
+    '### Referencias para surtir o devolver',
+  );
+  expect(filterManualContent(glossary, warehouse.permissions)).not.toContain('el saldo queda en 3');
+  expect(filterManualContent(glossary, admin.permissions)).toContain('el saldo queda en 3');
   expect(warehouse.permissions).not.toContain('materials:adjust-stock');
   expect(selectedChapters(warehouse.permissions).map(({ file }) => file)).not.toContain(
     '08-users.md',
   );
   expect(admin.permissions).toContain('materials:adjust-stock');
-  expect(selectedChapters(admin.permissions)).toHaveLength(16);
+  expect(selectedChapters(admin.permissions)).toHaveLength(17);
 });
 
 it.each(['almacen-auxiliar', 'almacen-coordinador', 'impresion-operador'])(

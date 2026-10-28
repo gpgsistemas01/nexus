@@ -88,21 +88,99 @@ para pruebas aisladas, conforme a [la guía de sistema](../testing/05-system-tes
 La aplicación necesita una cuenta activa y permisos existentes; esta guía no
 inventa una cuenta o contraseña inicial.
 
-Para crear el archivo opcional del frontend en **PowerShell**, si aún no existe:
+### Configurar `front/.env.local` para Vue
+
+`front/.env.example` es una plantilla versionada. Copiarla crea
+`front/.env.local`, junto a `front/package.json`; Vite lee esa copia para configurar
+el frontend. La copia no instala dependencias, no crea usuarios y no inicia Express.
+Si usa la API local en `http://127.0.0.1:3000` y no necesita logo personalizado,
+puede trabajar sin crear el archivo: el código ya tiene esos valores por defecto.
+
+En **PowerShell**, desde la raíz que contiene `front/` y `back/`, ejecute sólo si
+todavía no existe:
 
 ```powershell
-Copy-Item front/.env.example front/.env.local
+if (-not (Test-Path front/.env.local)) {
+    Copy-Item front/.env.example front/.env.local
+}
 ```
 
-En **Bash**, para la misma copia inicial:
+En **Bash**, desde esa misma raíz:
 
 ```bash
-cp front/.env.example front/.env.local
+if [ ! -e front/.env.local ]; then
+    cp front/.env.example front/.env.local
+fi
 ```
 
-Conserva un archivo ya configurado; la copia inicial no es un paso de cada arranque.
-Si Express usa otro puerto, ajusta `BACKEND_PROXY_TARGET` con ese origen. El valor
-predeterminado es `http://127.0.0.1:3000`; esta variable configura Vite, no el navegador.
+Si la terminal ya está dentro de `front/`, omita `front/` en las rutas del bloque:
+la copia es de `.env.example` a `.env.local`. Usar `front/.env.local` desde esa
+carpeta apuntaría a una subcarpeta diferente. En Windows, compruebe que el editor
+guardó exactamente `.env.local`, sin añadir `.txt`.
+
+Abra **`front/.env.local`** en su editor. La configuración inicial es:
+
+```dotenv
+BACKEND_PROXY_TARGET=http://127.0.0.1:3000
+VITE_LOGIN_LOGO_URL=
+```
+
+| Variable | Quién la utiliza | Qué debe escribir |
+| --- | --- | --- |
+| `BACKEND_PROXY_TARGET` | El proceso Vite de desarrollo o vista previa. Reenvía las peticiones de `/api` y `/cerrar-sesion` a Express. No se expone como `import.meta.env` al cliente Vue. | Origen de Express con protocolo, host y puerto, por ejemplo `http://127.0.0.1:3000`. No agregue `/api`, una página, usuario o contraseña. |
+| `VITE_LOGIN_LOGO_URL` | El componente de login. Es un valor público incorporado al frontend. | Déjelo vacío para mostrar N. Para `front/public/logo.png`, escriba `/logo.png`; también se admite una URL pública. El archivo del logo debe existir. |
+
+Por ejemplo, si Express escucha en 3001, cambie únicamente el destino del proxy:
+
+```dotenv
+BACKEND_PROXY_TARGET=http://127.0.0.1:3001
+```
+
+Eso no cambia el puerto de Express ni el de Vue. Configure el `PORT` del backend
+en `back/.env` para que coincida con el puerto real anunciado por Express. Continúe
+abriendo las páginas desde Vite, normalmente en `http://localhost:5173`; no use el
+destino del proxy como dirección del frontend.
+
+#### Cuándo se aplican los cambios
+
+1. Guarde la copia local. Modificar sólo `.env.example` no cambia la configuración
+   utilizada: Vite no carga esa plantilla.
+2. Si Vite está abierto, deténgalo con Ctrl+C y vuelva a ejecutar, desde la raíz,
+   `npm --prefix front run dev`. Vite lee los archivos de entorno al arrancar.
+3. Compruebe la página de inicio y la comunicación con la API. Si hay un 502 o
+   `ECONNREFUSED`, confirme primero que Express esté activo en el destino indicado.
+
+Para comprobar una compilación, vuelva a ejecutar `npm --prefix front run build`
+y reinicie `preview` si lo estaba usando. El logo `VITE_*` queda incorporado en
+los assets: cambiar una variable después de compilarlos no cambia esos archivos.
+
+Vite carga `.env.local` en desarrollo y compilación. Si configura también archivos
+por modo, el orden de menor a mayor prioridad es `.env`, `.env.local`,
+`.env.[modo]` y `.env.[modo].local`; las variables ya definidas en el proceso tienen
+prioridad sobre esos archivos. `build` usa normalmente el modo `production`.
+Si un cambio parece ignorado, compruebe esas otras fuentes y reinicie el proceso.
+
+#### Separación de archivos y despliegue
+
+| Configuración | Dónde corresponde |
+| --- | --- |
+| Proxy local y logo de Vue | `front/.env.local`; configuración descrita aquí. |
+| PostgreSQL y secretos JWT | `back/.env` o entorno de Express. No se copian a Vue. |
+| Credenciales para generar manuales por cuenta | `front/.env.manual.local`, según la [guía de manuales](../governance/07-manual-accounts-and-files.md). |
+| Conexiones de pruebas de sistema | Variables de la terminal/CI según la [preparación de pruebas](../testing/06-test-files-and-credentials.md). |
+
+Las variables con prefijo `VITE_*` son públicas. Mantenga en esta copia sólo la
+configuración indicada; no agregue contraseñas, tokens ni conexiones de base de
+datos. `.env.local` está ignorado por Git: cada desarrollador prepara su copia y
+actualizar el repositorio no recupera sus valores locales. No vuelva a copiar la
+plantilla sobre un archivo ya configurado.
+
+El Dockerfile del frontend excluye los `.env` locales. En Docker, el destino de
+la API se configura con `BACKEND_UPSTREAM` al arrancar Nginx; para el logo se utiliza
+el argumento de construcción `VITE_LOGIN_LOGO_URL`. En hosting estático, configure
+las variables de build y el proxy del proveedor. `BACKEND_PROXY_TARGET` controla
+Vite dev/preview; no configura esos proxies de producción. Consulte
+[compilación y despliegue](03-build-and-deployment.md).
 
 ## 4. Preparar Prisma y la base de desarrollo
 

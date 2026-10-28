@@ -20,6 +20,11 @@ Las versiones de Node admitidas proceden de `front/package.json`; `npm ci` usa e
 
 ## Variables y momento de aplicación
 
+La [configuración de `.env.local`](01-getting-started.md#configurar-frontenvlocal-para-vue)
+explica la copia inicial y su prioridad. Vite puede leer ese archivo al compilar
+localmente; el Dockerfile lo excluye. Los valores `VITE_*` deben suministrarse en
+el build del proveedor o como argumentos admitidos por el Dockerfile.
+
 | Configuración | Ubicación y efecto |
 | --- | --- |
 | `BACKEND_PROXY_TARGET` | `front/.env.local`, Vite dev/preview. Predeterminado `http://127.0.0.1:3000`. Reiniciar Vite después de cambiarlo. |
@@ -57,6 +62,19 @@ El Dockerfile raíz y Compose mantienen la aplicación backend; el frontend usa 
 En Vercel o Render Static Site se ejecuta la compilación de Vite y se publica `dist`; no se necesita el Dockerfile frontend para ese modo. El proveedor debe descargar el repositorio completo y permitir que el build lea las fuentes públicas fuera de `front/`. Con Root Directory `front`, instalación y build son `npm ci` / `npm run build` y salida `dist`, sujetos al contexto permitido por el proveedor.
 
 `front/vercel.json` contiene únicamente el fallback SPA. No contiene el destino real de Express: antes de usar la sesión hay que configurar los rewrites/proxy de `/api/:path*` y `/cerrar-sesion` hacia la API propia, con prioridad sobre el fallback. En Render Static Site se necesita también el fallback de página y una solución para el acceso a la API con sus cookies. Este documento no atribuye una configuración remota activa a un archivo local.
+
+| Configuración | Para qué sirve |
+| --- | --- |
+| `front/vercel.json` | Archivo opcional para desplegar en Vercel. Permite abrir o recargar rutas como `/almacen/materiales` entregando `index.html` a Vue Router. |
+| `front/vite.config.ts` | Servidor local y proxy en desarrollo/vista previa. No lee `vercel.json`. |
+| `front/nginx.conf` | Rutas y proxy de la imagen Docker. No lee `vercel.json`. |
+
+El archivo de Vercel tiene utilidad para ese proveedor; no es necesario para ejecutar
+Vue con Vite ni para la VPS con Nginx. Su regla actual `/(.*)` dirige también una
+petición `/api/...` al fallback si no se configura una regla de API previa: podría
+recibirse HTML en lugar del JSON esperado. Por eso este archivo no constituye una
+configuración completa de despliegue del sistema. El destino de Express depende del
+entorno y debe definirse antes de publicar en Vercel.
 
 ## Comprobación y recuperación
 

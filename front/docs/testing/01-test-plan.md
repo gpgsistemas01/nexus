@@ -44,7 +44,10 @@ Unitarias reutilizan fixtures de dominio y harnesses (`mountComposable`, adaptad
 
 Navegador reutiliza las funciones `mockWarehouse`, `mockPurchases`, `mockIssues` y las fixtures del módulo. Los errores 401/403/409/503 se preparan como datos del caso; no se considera que un mock de éxito confirme una transacción de la API.
 
-Sistema genera identificadores y cuentas de prueba, aplica migraciones a una base dedicada y elimina sólo sus filas/manifiesto según el setup. Sus credenciales no se copian a documentación ni se usa una cuenta personal. Si no existe ese ambiente, se registra el bloqueo en lugar de atribuir resultados reales a la suite simulada.
+Sistema requiere aplicar primero las migraciones a una base dedicada; después su setup genera identificadores y cuentas de prueba y elimina sólo sus filas/manifiesto. Sus credenciales no se copian a documentación ni se usa una cuenta personal. Si no existe ese ambiente, se registra el bloqueo en lugar de atribuir resultados reales a la suite simulada.
+
+La [guía de archivos y credenciales](06-test-files-and-credentials.md) explica qué
+se configura en cada nivel, cómo cargar el entorno local y qué genera el setup.
 
 ## Forma de documentar diseño, casos y ejecución
 

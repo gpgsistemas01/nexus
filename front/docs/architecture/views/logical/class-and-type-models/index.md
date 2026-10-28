@@ -13,7 +13,7 @@ No se exige convertir composables o componentes funcionales en clases.
 | [Sesión y login](01-session-and-login.md) | Sesión inyectada, credenciales, props y eventos. | `DIA-VUE-DAT-003/004` |
 | [Transporte y selectores](02-shared-contracts.md) | Configuración Axios, error, resultado paginado y opciones. | `DIA-VUE-DAT-005/006` |
 | [Catálogos y directorio](03-catalogs-and-directory.md) | Capturas, filas versionadas y destinos de edición. | `DIA-VUE-DAT-007` |
-| [Identidades](04-identity.md) | Filas proyectadas, responsabilidades y cuerpos por acción. | `DIA-VUE-DAT-008` |
+| [Identidades y organización](04-identity.md) | Filas, responsabilidades, cuerpos por acción y opciones de Área/Rol. | `DIA-VUE-DAT-008/014` |
 | [Inventario](05-inventory.md) | Identidad de fila/artículo, cantidades y destinos. | `DIA-VUE-DAT-009` |
 | [Movimientos y consultas](06-movements-and-queries.md) | Filtros, consulta compuesta, fila de historial y reporte. | `DIA-VUE-DAT-010` |
 | [Compras](07-purchases.md) | Fila, documento, detalle, captura y payload de escritura. | `DIA-VUE-DAT-001/011` |

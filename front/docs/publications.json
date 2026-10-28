@@ -81,7 +81,8 @@
                 "testing/03-test-cases.md",
                 "testing/cases/",
                 "testing/04-use-case-coverage.md",
-                "testing/05-system-tests.md"
+                "testing/05-system-tests.md",
+                "testing/06-test-files-and-credentials.md"
             ]
         },
         "operacion": {

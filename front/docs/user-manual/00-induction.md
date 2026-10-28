@@ -26,6 +26,10 @@ que revisen su acceso y actualicen el manual; no use una cuenta prestada.
 
 ## Vocabulario que encontrará en las pantallas
 
+Esta tabla reúne las palabras para empezar. Si necesita distinguir cantidades,
+estados o participantes de una operación, consulte el
+[Glosario para trabajar en Nexus](16-glossary.md).
+
 | Palabra | Qué significa al trabajar |
 | --- | --- |
 | Registro | Un elemento guardado, por ejemplo un cliente o un material. |

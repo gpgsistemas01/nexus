@@ -3,9 +3,9 @@
 ## Audiencia y alcance
 
 El [manual](../user-manual/index.md) explica las tareas del operador en la interfaz
-Vue. Sus quince capítulos cubren acceso, navegación, Almacén, Catálogos, Identidad,
+Vue. Sus capítulos cubren acceso, navegación, Almacén, Catálogos, Identidad,
 Directorio, Compras, Salidas, Movimientos, reportes e incidencias, precedidos de un
-recorrido de primera jornada. No exige abrir
+recorrido de primera jornada y acompañados de un glosario de operación. No exige abrir
 la referencia técnica para conocer un campo o completar una operación.
 
 Los entregables por cuenta se generan mediante el
@@ -32,6 +32,20 @@ editorial están en su índice propio. Su estado permanece En revisión hasta la
 revisión funcional y editorial correspondiente.
 
 ## Fuentes y alcance de publicación
+
+El [glosario de operación](../user-manual/16-glossary.md) explica términos visibles,
+distinciones que afectan la captura y ejemplos de cantidades. Se contrasta con el
+[glosario funcional](../requirements/business-glossary.md), que conserva las
+definiciones del negocio. No se trasladan al manual nombres de modelos, contratos,
+patrones ni términos de requisitos o infraestructura. La inducción introduce el
+vocabulario básico; el glosario es la referencia de consulta. Los capítulos
+operativos conservan los pasos y las advertencias junto a la acción.
+
+El capítulo se incluye también en cada manual por acceso. Sus bloques condicionales
+reutilizan los permisos y el filtrado existentes: las cuentas de áreas operativas
+leen los estados de sus solicitudes, pero las instrucciones de surtido y devolución
+permanecen en las ediciones con ese permiso. Al cambiar una etiqueta o regla de
+operación, revisar ambas definiciones y los ejemplos afectados.
 
 - Markdown: `front/docs/user-manual/index.md` y capítulos numerados.
 - Imágenes fuente: `front/docs/user-manual/images/*.png`, versionadas junto al texto.

@@ -1,4 +1,4 @@
-# Identidad y organización
+# Personas, usuarios y asignaciones organizacionales
 
 **Identificador:** `DIA-VUE-DOM-001`. **Pregunta:** ¿Cómo se relacionan persona,
 cuenta y asignaciones sin confundir responsabilidad con autorización?
@@ -39,14 +39,32 @@ classDiagram
 
 ## Interpretación y restricciones
 
+| Concepto del diagrama | Vocabulario del negocio |
+| --- | --- |
+| Persona | Individuo que participa en el trabajo, por ejemplo como solicitante, asesor o receptor. |
+| Usuario | Cuenta de acceso a Nexus; «cuenta» se utiliza con ese mismo sentido. |
+| Responsabilidad de persona | Función desempeñada por una persona en un área. |
+| Acceso de usuario | Rol y área asignados a una cuenta para determinar sus permisos. |
+| Asignación organizacional | Concepto común que reúne las dos asignaciones anteriores; no es otra operación de captura. |
+| Área | Departamento de la organización. |
+| Rol | Función organizacional, como Auxiliar, Coordinador, Operador o Instalador. |
+
 Una persona participa como solicitante, asesor o receptora sin necesitar credenciales.
 Asignarle responsabilidades no concede acceso a una cuenta. Una cuenta puede estar
-vinculada a una persona y sus accesos combinan rol y área; la API determina los permisos
-efectivos y el alcance autorizado. La sesión Vue conserva los permisos recibidos para
-presentar navegación y acciones; no reconstruye la política desde nombres de roles.
+vinculada a una persona y sus accesos combinan rol y área. Una persona puede tener
+ninguna o varias cuentas vinculadas; cada cuenta se vincula como máximo a una persona.
+Las responsabilidades y los accesos conservan finalidades distintas aunque ambos
+relacionen un rol con un área.
 
 El área de una salida es un dato operativo y también participa en su alcance de acceso.
-Almacén puede consultar las áreas autorizadas; una cuenta de área operativa sólo opera
-en las suyas. La [selección de área](../../architecture/views/processes/07-issues/04-department-scope.md)
-explica la adaptación del campo al alcance recibido. Un selector bloqueado no sustituye
-la comprobación de la solicitud en el servidor.
+Auxiliar y Coordinador de Almacén pueden consultar y registrar solicitudes para todas
+las áreas; las cuentas de áreas operativas sólo lo hacen para sus áreas autorizadas.
+
+## Relación con la implementación
+
+El [modelo de clases y tipos de Identidad](../../architecture/views/logical/class-and-type-models/04-identity.md)
+usa los nombres del código: `IdentityEntry`, `PersonAccess`, `PersonValues`,
+`UserValues` y `OrganizationState`. La generalización conceptual de esta figura no
+declara una clase TypeScript `AsignacionOrganizacional`. La
+[selección de área](../../architecture/views/processes/07-issues/04-department-scope.md)
+explica el comportamiento del campo en Salidas.

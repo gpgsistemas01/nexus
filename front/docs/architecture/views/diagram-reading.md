@@ -103,6 +103,11 @@ ejecutado por un coordinador del import o la llamada HTTP de su consumidor.
 
 ## Estados
 
+Una **guarda** es la condición que debe cumplirse para tomar una transición; se
+escribe entre corchetes, como `[válida]`. El **efecto de transición** es el resultado
+de ejecutarla, como publicar una lectura o confirmar una captura. Estado, condición,
+acción y resultado se distinguen mediante la etiqueta y la leyenda local.
+
 **Ejemplo:** `DIA-VUE-LEG-003`. Ciclo ilustrativo de una interacción.
 
 ```mermaid
@@ -125,6 +130,10 @@ Los estados de UI describen captura, lectura o envío. Los campos `status` recib
 la API conservan su significado de negocio en los contratos de cada documento.
 
 ## Casos de uso
+
+Un **actor de caso de uso** es el papel externo que interactúa con Nexus para
+alcanzar un objetivo. Puede especializar a otro actor; no representa una entidad
+de datos, una cuenta concreta ni una pantalla.
 
 **Ejemplo:** `DIA-VUE-LEG-004`. Objetivo principal con una ampliación condicional.
 

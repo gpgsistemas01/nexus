@@ -18,6 +18,12 @@ Las dependencias siguen en cada aplicación y no se agregan paquetes al cliente.
 
 ## Preparación desde la raíz
 
+Para preparar archivos por primera vez, siga
+[Archivos, credenciales y ejecución de pruebas](06-test-files-and-credentials.md).
+Explica de dónde salen las credenciales, qué archivos genera el setup y cuáles
+no hay que crear manualmente. Esta sección detalla las variables de la terminal
+y las condiciones del entorno.
+
 Instalar las dependencias de ambas aplicaciones y Chromium conforme al
 [README](../../README.md#pruebas-de-navegador). Preparar una base PostgreSQL vacía
 dedicada, por ejemplo `nexus_vue_test`, con un usuario que pueda aplicar sus migraciones.
@@ -27,16 +33,28 @@ la base ni reinicia el esquema: aplica las migraciones existentes al destino dec
 Ejemplo PowerShell; sustituir usuario y contraseña de la base aislada:
 
 ```powershell
-$env:DATABASE_URL = 'postgresql://usuario:clave@127.0.0.1:5432/nexus_unused'
+$env:DATABASE_URL = 'postgresql://usuario:clave@127.0.0.1:5432/nexus_dev'
 $env:DATABASE_TEST_URL = 'postgresql://usuario:clave@127.0.0.1:5432/nexus_vue_test'
 $env:DIRECT_TEST_URL = $env:DATABASE_TEST_URL
 npm --prefix back run test:db:migrate
 npm --prefix front run test:e2e:system
 ```
 
-En Bash se declaran las mismas variables con `export`. `nexus_unused` representa
-un destino diferente que no se consulta. Los valores de este ejemplo no son cuentas
-de Nexus. La configuración fija `NODE_ENV=test` y genera claves JWT efímeras cuando
+En Bash, también desde la raíz:
+
+```bash
+export DATABASE_URL='postgresql://usuario:clave@127.0.0.1:5432/nexus_dev'
+export DATABASE_TEST_URL='postgresql://usuario:clave@127.0.0.1:5432/nexus_vue_test'
+export DIRECT_TEST_URL="$DATABASE_TEST_URL"
+npm --prefix back run test:db:migrate
+npm --prefix front run test:e2e:system
+```
+
+Sustituya host, puerto, bases y credenciales por los de su entorno.
+`DATABASE_URL` identifica el destino habitual que debe quedar excluido; bajo
+`NODE_ENV=test` no se consulta como base de aplicación. Los valores de este ejemplo
+son conexiones PostgreSQL, no cuentas de Nexus. La configuración fija
+`NODE_ENV=test` y genera claves JWT efímeras cuando
 no están definidas. Las variables de prueba pertenecen al proceso de ejecución;
 no se copian a los `.env` normales ni a `VITE_*`. Al terminar, retirar esas variables
 de la terminal o usar otra para el desarrollo habitual.
@@ -54,6 +72,8 @@ El teardown borra clientes, proveedores, auditoría y cuentas de esas fixtures,
 sus asignaciones y los catálogos de acceso que haya creado. No borra todos los datos
 de la base. El manifiesto temporal `front/build/test-results/system-fixture.json`
 se elimina; el JUnit `system.xml` y las trazas de fallo permanecen ignorados por Git.
+El JSON temporal incluye la contraseña de la cuenta de prueba; no se completa ni
+se distribuye. Las trazas pueden contener datos de esa sesión de prueba.
 Ante una interrupción forzada puede quedar una fixture: retirar únicamente sus IDs
 o desechar la base efímera preparada para esa corrida.
 

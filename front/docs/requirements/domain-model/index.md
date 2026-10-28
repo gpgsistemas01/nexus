@@ -9,7 +9,7 @@ Proveedor mantiene su significado y permite leer cada operación sin una figura 
 
 | Corte | Pregunta | Figura |
 | --- | --- | --- |
-| [Identidad y organización](01-identity-and-organization.md) | ¿Qué distingue una cuenta, una persona y sus asignaciones? | `DIA-VUE-DOM-001` |
+| [Personas, usuarios y asignaciones](01-identity-and-organization.md) | ¿Qué distingue una cuenta, una persona y sus asignaciones? | `DIA-VUE-DOM-001` |
 | [Artículos y existencias](02-items-and-stock.md) | ¿De quién es cada existencia y qué distingue una merma? | `DIA-VUE-DOM-002/006` |
 | [Compras](03-purchases.md) | ¿Qué se recibe y qué identifica cada detalle? | `DIA-VUE-DOM-003` |
 | [Salidas](04-issues.md) | ¿Quién solicita, para qué área y de qué existencia se surte? | `DIA-VUE-DOM-004/007` |
@@ -22,6 +22,10 @@ vínculos de negocio con multiplicidades; la generalización apunta al concepto 
 la composición expresa pertenencia exclusiva del detalle al documento. Los atributos
 se desarrollan en los contratos técnicos; estos cortes priorizan conceptos y relaciones, sin convertirse en un diccionario de campos.
 Los nombres de roles en una relación distinguen participaciones de un mismo concepto.
+
+El modelo conceptual puede omitir atributos cuando explica conceptos y relaciones.
+Una característica necesaria para distinguir un concepto se incorpora como atributo
+de negocio, sin copiar claves ni estructuras internas de la base de datos.
 
 El documento registrado tiene detalles; la captura temporal puede estar vacía. Por eso
 un documento del dominio contiene `1..*` detalles y un array TypeScript admite `0..*`.

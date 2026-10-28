@@ -2,6 +2,11 @@
 
 ## Propósito
 
+Para consultar definiciones orientadas al uso de las pantallas, está disponible el
+[Glosario para trabajar en Nexus](../user-manual/16-glossary.md) del manual de
+usuario. Sus ejemplos explican la captura sin los nombres internos del código ni
+los conceptos propios de la especificación.
+
 Este glosario forma parte del paquete versionado de requisitos, actualmente en revisión. Define el vocabulario que
 usuarios, responsables funcionales, desarrollo y pruebas deben interpretar de la misma
 forma. No es un inventario de columnas: el
@@ -46,7 +51,7 @@ fuente de verdad.
 
 | Término canónico | Definición compartida | Alias o distinción importante |
 | --- | --- | --- |
-| Artículo de compra | Concepto común que agrupa material y consumible, adquirido mediante una entrada de compra. | Clase abstracta del dominio; no incluye merma ni constituye un catálogo adicional. |
+| Artículo de compra | Concepto común que agrupa material y consumible, adquirido mediante una entrada de compra. | Agrupa materiales y consumibles; no incluye merma ni constituye un catálogo adicional. |
 | Material | Artículo base administrado en inventario, definido por nombre, presentación, unidad y reglas de existencia. | No representa por sí solo la existencia de un proveedor concreto. |
 | Contexto de inventario | Clasificación como material o consumible que delimita consultas, selectores y operaciones. | Es independiente del área organizacional y los permisos. |
 | Identidad de material | Combinación de clasificación como material o consumible, nombre recortado y comparado sin distinguir mayúsculas, presentación, unidad de medida, base y altura que permite reconocer el mismo artículo aunque lo ofrezcan proveedores distintos. | Base y altura ocupan posiciones distintas y pueden omitirse sólo como pareja. El proveedor no forma parte de esta identidad: se conserva en la oferta proveedor-material. Cambiar existencia, cantidad convertida, costo máximo, stock mínimo o el estado activo de una oferta no crea otra identidad. |
@@ -77,7 +82,7 @@ fuente de verdad.
 | Término canónico | Definición compartida | Alias o distinción importante |
 | --- | --- | --- |
 | Documento operativo | Registro de una intención o hecho de inventario con referencia y estado; puede contener encabezado y detalles según su tipo. | «Documento de inventario» es el concepto general usado en el dominio. Entradas, salidas y ajustes tienen estructuras y reglas propias. |
-| Salida de artículos | Concepto común de las salidas de material y consumible. | Clase abstracta del dominio; cada documento mantiene un solo contexto, sin mezclar ambos tipos. No incluye salida de merma. |
+| Salida de artículos | Concepto común de las salidas de material y consumible. | Cada documento mantiene un solo contexto, sin mezclar ambos tipos. No incluye salida de merma. |
 | Entrada adicional de merma | Documento de incorporación de una cantidad positiva a una merma existente. | Corresponde a **Agregar stock**; no es compra ni ajuste que sustituya el saldo total. |
 | Requisición de compra | Solicitud planificada de materiales con eventual aprobación y entrega. | No forma parte del código ni del esquema vigente; requiere un nuevo alcance antes de reimplementarse. |
 | Entrada de compra | Recepción de materiales o consumibles de un proveedor que incrementa existencias y genera trazabilidad de movimiento. | En código se denomina `GoodsReceipt`; «compra» en la UI no sustituye la recepción efectiva. |
@@ -128,46 +133,13 @@ fuente de verdad.
 | Monto sin/con IVA | Importe de un detalle o compra antes o después de aplicar el impuesto al valor agregado (IVA) utilizado por Nexus. | El monto con IVA se calcula a partir del monto sin IVA; ninguno representa una cantidad de inventario. |
 | Existencia anterior/nueva | Valores antes y después de una operación confirmada que afecta inventario. | Se conservan en movimientos o ajustes para explicar la diferencia. |
 
-## Requisitos, alcance y representación
+## Vocabulario de documentación
 
-| Término canónico | Definición compartida | Distinción importante |
-| --- | --- | --- |
-| Parte interesada | Persona, grupo u organización con necesidades o preocupaciones sobre el producto. | No toda parte interesada es usuario o actor de un caso de uso. |
-| Actor de caso de uso | Papel externo que interactúa con Nexus para alcanzar un objetivo. | Puede generalizar otro papel; no representa una entidad de datos ni una pantalla. |
-| Objetivo de negocio | Resultado de valor que justifica el producto o una capacidad. | Una capacidad implementada no demuestra una meta alcanzada; requiere indicadores acordados. |
-| Alcance vigente | Capacidades y límites incluidos actualmente en el producto. | Un concepto modelado o una propuesta no equivalen a una capacidad disponible. |
-| Supuesto | Condición que se toma como base para analizar u operar y debe confirmarse. | No es un hecho verificado ni un requisito aprobado por sí mismo. |
-| Dependencia | Condición, dato o servicio necesario para una capacidad u operación. | Su disponibilidad y responsabilidad requieren revisión. |
-| Restricción | Límite que condiciona una solución u operación. | Debe tener fuente; no se deduce de una preferencia de implementación. |
-| Riesgo | Posible situación que afecta un objetivo o la operación. | No es un incidente ya ocurrido; las decisiones abiertas pueden dejar riesgos sin tratar. |
-| SRS | Especificación de requisitos de software que conserva obligaciones, reglas, criterios, estados y trazabilidad. | Complementa visión y alcance; no equivale a arquitectura ni a código. |
-| Requisito | Obligación identificada y verificable sobre una capacidad, dato, regla o calidad. | Su fuente normativa es la SRS; el código aporta evidencia, no aceptación funcional. |
-| Criterio de aceptación | Condición observable que permite comprobar el cumplimiento de un requisito o resultado acordado. | Aprobar pruebas técnicas no sustituye la aceptación de negocio. |
-| Línea base de requisitos | Conjunto versionado y aprobado de requisitos y vocabulario usado como referencia para cambios. | Un paquete En revisión es una propuesta; su versionado no demuestra aceptación funcional. |
-| Guarda | Condición que debe cumplirse para tomar una transición de estado. | Se representa entre corchetes; no es una acción ni su efecto. |
-| Efecto de transición | Resultado de ejecutar una transición, por ejemplo incorporar, descontar o reponer existencia. | Puede nombrarse brevemente y definirse en una leyenda; no exige código de programación. |
-| SLA | Acuerdo de nivel de servicio con medidas y compromisos aceptados. | Nexus no tiene aquí valores comprometidos; están pendientes de acuerdo. |
-| RTO | Objetivo de tiempo de recuperación del servicio después de una interrupción. | Es un objetivo por acordar, no un tiempo demostrado. |
-| RPO | Objetivo de pérdida máxima de datos expresada como intervalo entre el último punto recuperable y la interrupción. | Es distinto de RTO; requiere política y medios de recuperación acordados. |
-
-El modelo conceptual puede omitir atributos cuando su propósito es explicar conceptos
-y relaciones. Si una característica resulta imprescindible para distinguir un concepto
-o entender una regla, se incorpora como atributo de negocio en una vista que lo requiera,
-sin copiar identificadores, claves o estructuras internas de la base de datos.
-
-## Gobierno del glosario
-
-1. Un requisito nuevo reutiliza primero un término canónico; no crea un sinónimo por
-   módulo o pantalla.
-2. Una diferencia real de contexto se expresa con un calificativo, por ejemplo «salida
-   de material», «salida de consumible» y «salida de merma», y reutiliza el proceso común cuando corresponde.
-3. El responsable funcional valida definiciones nuevas o ambiguas antes de aceptar el
-   requisito. Desarrollo verifica su correspondencia con rutas, DTO, servicios y datos.
-4. Cambiar el significado de un término obliga a revisar requisitos, casos de uso,
-   modos y efectos de las operaciones,
-   diagramas de dominio, contrato API, mensajes visibles y pruebas relacionadas.
-5. El glosario no enumera todos los campos ni valores permitidos. Esos detalles se
-   mantienen en el diccionario técnico, Prisma, validadores o catálogos según su fuente.
+Los términos de requisitos y calidad se consultan en el
+[vocabulario documental](../governance/08-documentation-vocabulary.md). Los actores,
+guardas y efectos usados para leer figuras pertenecen a la
+[guía de diagramas](../architecture/views/diagram-reading.md), con sus símbolos y
+leyendas. Estas definiciones se mantienen fuera del vocabulario operativo del negocio.
 
 ## Peso unitario de merma de rollo
 

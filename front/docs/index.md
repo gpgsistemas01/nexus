@@ -58,12 +58,14 @@ front/docs/
 | Necesidad | Recorrido |
 | --- | --- |
 | Operar el sistema | [Manual de usuario](user-manual/index.md) → procedimiento del módulo → reportes o recuperación. |
-| Generar la inducción por cuenta | [Perfiles, credenciales locales y capturas](governance/06-manuals-by-access.md) → manual del acceso efectivo. |
+| Generar la inducción por cuenta | [Preparar cuentas y archivos](governance/07-manual-accounts-and-files.md) → [perfiles y capturas](governance/06-manuals-by-access.md) → manual del acceso efectivo. |
 | Incorporarse al proyecto | [Inicio local](development/01-getting-started.md) → [guía del código](architecture/views/development/developer-onboarding.md) → [vista general](architecture/views/overview.md). |
 | Implementar una operación | [Requisito y CU](requirements/index.md) → [secuencia del proceso](architecture/views/processes/index.md) → [responsabilidad del módulo](architecture/views/development/frontend-technical-documentation/index.md) → [estándar](architecture/coding-standards/index.md). |
 | Leer un diagrama | [Guía visual](architecture/views/diagram-reading.md) → leyenda local → fuentes de la figura. |
+| Interpretar términos documentales | [Vocabulario de requisitos y documentación](governance/08-documentation-vocabulary.md); los conceptos operativos están en el glosario de negocio. |
 | Revisar datos o errores | [Contrato del cliente](architecture/contracts/index.md) → [mappers/servicios](architecture/views/development/code-reference.md) → [pruebas de la condición](testing/02-test-design.md). |
 | Diseñar o ejecutar pruebas | [Plan](testing/01-test-plan.md) → [diseño DP](testing/02-test-design.md) → [caso CP](testing/03-test-cases.md) → evidencia EP de la corrida. |
+| Preparar la primera ejecución de pruebas | [Archivos, credenciales y comandos](testing/06-test-files-and-credentials.md) → suite del nivel elegido → revisión de resultados. |
 | Construir o desplegar | [Guía de operación](development/03-build-and-deployment.md) y [topología](architecture/views/physical/index.md). |
 | Mantener documentación | [Reglas editoriales](governance/01-documentation-rules.md) → [catálogo de publicación](publications.json) → [validación/exportación](governance/02-generation-and-publication.md). |
 

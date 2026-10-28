@@ -115,26 +115,30 @@ El Dockerfile instala las herramientas en la etapa de build, copia los tsconfig 
 compila con comprobación de tipos. La imagen final contiene sólo Nginx y `dist/`.
 Los casos de prueba se ejecutan en CI antes del despliegue, no en Nginx.
 
-## Herramientas aplazadas
+## Interfaz y formularios
 
-Vuetify y VeeValidate se usan en login y Almacén. Login, sesión, inventario y reportes usan Axios con un único interceptor
-de renovación y errores normalizados. La sesión actual usa provide/inject por aplicación; Pinia se aplaza hasta
-necesitar varios stores y sus herramientas de gestión. Zod/Yup no se agregan para reescribir las
-reglas públicas del login ya existentes. Prettier se incorpora para corregir y
-prevenir las inconsistencias de formato observadas.
-Playwright comprueba los controles reales de Vuetify. Contenedores, presentación y composables
-no requieren esas dependencias adicionales.
+Vuetify proporciona los controles visuales; VeeValidate mantiene valores, errores y
+validación de los formularios. Sus consumidores actuales son:
 
-## Retiro de demostraciones
+| Ámbito | Vuetify | VeeValidate: composables de captura |
+| --- | --- | --- |
+| Login | `LoginPage`, `LoginForm`. | `useLoginForm`. |
+| Almacén | `InventoryPage` y componentes de inventario. | `useInventoryEditor`. |
+| Catálogos | `CatalogPage` y formularios de catálogo. | `useCatalogEditor`. |
+| Identidad | `IdentityPage`, `PersonForm`, `UserForm`. | `usePersonEditor`, `useUserEditor`. |
+| Directorio | `DirectoryPage`, `DirectoryForm`. | `useDirectoryEditor`. |
+| Compras | Páginas, editor, partidas y corrección. | `usePurchaseEditor`, `usePurchaseLineEntry`, `usePurchaseCorrection`. |
+| Salidas | Páginas, editor, partidas, surtido y devolución. | `useIssueEditor`, `useIssueLineEntry`, `useIssueReturn`. |
 
-Se retiran las pruebas del contador (`welcomePageTest.ts`) y del comparador
-(`loginComparison.spec.ts`) porque sus pantallas dejaron de formar parte del
-producto. También se reemplaza el caso de navegación al comparador por sus rutas
-retiradas como páginas no encontradas. No se conserva cobertura del incremento
-del contador ni de controles MDB/PrimeVue, funcionalidades eliminadas.
+Movimientos y los controles compartidos también utilizan Vuetify. Los filtros y
+los formularios de cada operación conservan responsabilidades distintas: usar
+Vuetify en una página no implica que todos sus controles utilicen VeeValidate.
+Las fuentes son los imports de `front/src/modules` y `front/src/shared`; los
+[contratos de formularios](../architecture/views/development/frontend-technical-documentation/08-form-and-event-contracts.md)
+detallan campos, eventos y validación por módulo.
 
-Los contratos vigentes de props/eventos, captura, navegación, sesión y adaptación
-a móvil siguen cubiertos por las pruebas de login y Almacén indicadas arriba.
-El backend conserva su suite sin cambios; este retiro no elimina pruebas de reglas
-de negocio ni persistencia. Las dependencias y recursos exclusivos de las
-demostraciones se eliminan del manifiesto, lockfile y compilación.
+Axios centraliza el transporte y la renovación de autenticación. La sesión usa
+provide/inject por aplicación y las reglas públicas existentes se adaptan a
+VeeValidate en los composables; los componentes de presentación reciben props y
+emiten eventos. La [selección de controles](../architecture/views/logical/ui-and-http.md)
+explica las responsabilidades visuales y HTTP.

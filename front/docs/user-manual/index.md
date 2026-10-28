@@ -53,6 +53,7 @@ Empiece por [Primera jornada: recorrido de inducción](00-induction.md).
 | [13. Movimientos](13-movements.md) | Historial de entradas y salidas de existencias. |
 | [14. Reportes](14-reports.md) | Descargar información según filtros o periodo. |
 | [15. Errores y recuperación](15-errors-and-recovery.md) | Capturas inválidas, conflictos y fallos de conexión. |
+| [16. Glosario para trabajar en Nexus](16-glossary.md) | Significado de campos, cantidades, estados y operaciones. |
 
 ## Convenciones de operación
 

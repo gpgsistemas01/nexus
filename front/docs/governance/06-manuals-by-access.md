@@ -24,7 +24,7 @@ y las mismas claves de permiso que consumen las páginas Vue. No concede permiso
 | `acabados-coordinador`, `acabados-operador` | Mismo alcance operativo. |
 | `router-coordinador`, `router-operador` | Mismo alcance operativo. |
 | `pt-coordinador`, `pt-operador` | Mismo alcance operativo; el área se identifica como PT/TRÁFICO. |
-| `instalaciones-coordinador`, `instalaciones-operador` | Mismo alcance operativo. |
+| `instalaciones-coordinador`, `instalaciones-instalador` | Coordinador e Instalador; mismo alcance operativo. |
 
 Los perfiles operativos no reciben instrucciones ni capturas para surtir, devolver,
 modificar inventario, consultar costos, gestionar compras o administrar registros.
@@ -68,52 +68,22 @@ flowchart TB
 
 ## Preparar las cuentas reales
 
-Utilice cuentas del entorno de capacitación con sus roles y áreas reales. La
-automatización no crea cuentas, artículos, compras, solicitudes ni entregas para
-preparar una captura. Los registros necesarios para edición, corrección o devolución
-deben existir en ese entorno antes de ejecutar la herramienta.
+Siga [Preparar cuentas y archivos para los manuales](07-manual-accounts-and-files.md)
+antes de ejecutar el modo `live`. La guía explica el alta o reutilización de una
+cuenta, la contraseña, cada campo del JSON y la relación con las variables locales.
 
-Desde `front/`, copie las plantillas. En PowerShell:
+Desde `front/`, la preparación debe dejar:
 
-```powershell
-Copy-Item manual.accounts.example.json manual.accounts.local.json
-Copy-Item .env.manual.example .env.manual.local
-```
+| Entrada | Resultado esperado |
+| --- | --- |
+| Cuenta del entorno de capacitación | Puede ingresar a Nexus con el rol y área que se van a documentar. El generador no crea la cuenta ni su contraseña. |
+| `manual.accounts.local.json` | Copia local de la plantilla, con el origen de Vue, los perfiles elegidos y referencias a variables. |
+| `.env.manual.local` o variables del proceso | Valores de usuario y contraseña de cada cuenta seleccionada; el JSON contiene sus referencias. |
+| Datos de capacitación existentes | Registros que permitan las capturas de consulta, edición o devolución según los permisos. El recorrido no los crea. |
 
-En Bash:
-
-```bash
-cp manual.accounts.example.json manual.accounts.local.json
-cp .env.manual.example .env.manual.local
-```
-
-Edite `manual.accounts.local.json`: indique el origen de Vue en `baseUrl` y conserve
-las cuentas que utilizará. Por defecto apunta a `http://127.0.0.1:5173`; Vue y Express
-deben estar iniciados conforme a la [guía local](../development/01-getting-started.md).
-Para un entorno remoto utilice HTTPS. La URL no contiene usuario, contraseña ni
-parámetros.
-
-Una entrada identifica el perfil y referencia nombres de variables:
-
-```json
-{
-    "id": "impresion-operador",
-    "label": "Impresión · Operador",
-    "expectedAccess": { "roleKey": "operator", "departmentKey": "printing" },
-    "usernameEnv": "DOCS_FRONT_IMPRESION_OPERADOR_USER",
-    "passwordEnv": "DOCS_FRONT_IMPRESION_OPERADOR_PASSWORD"
-}
-```
-
-Complete los valores correspondientes sólo en `.env.manual.local` o en las variables
-del proceso/CI. La contraseña conserva espacios; no se recorta. Las variables del
-proceso tienen prioridad. El archivo de cuentas no contiene los valores de usuario
-y contraseña. `expectedAccess` permite detectar que se utilizó por error otra cuenta;
-no asigna ese rol ni limita la unión de accesos realmente otorgados por el servidor.
-
-Los dos archivos locales están ignorados por Git. Las variables son `DOCS_FRONT_*`,
-no `VITE_*`: no se incorporan al navegador al compilar. No copie credenciales en
-Markdown, comandos, archivos versionados, mensajes de soporte ni capturas.
+Para Instalaciones, use `instalaciones-instalador`, con rol `installer` y área
+`installations`; Coordinador conserva su propio perfil. Los archivos locales están
+ignorados y no se publican. En `demo` no se necesitan cuentas ni credenciales reales.
 
 ## Ejecutar y exportar
 

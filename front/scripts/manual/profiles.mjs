@@ -30,20 +30,26 @@ export const DEMO_PROFILES = [
         ['pt', 'PT', DEPARTMENT_KEYS.PT_TRAFFIC],
         ['instalaciones', 'Instalaciones', DEPARTMENT_KEYS.INSTALLATIONS],
         ['acabados', 'Acabados', DEPARTMENT_KEYS.FINISHING],
-    ].flatMap(([id, label, departmentKey]) => [
-        {
-            id: `${id}-coordinador`,
-            label: `${label} · Coordinador`,
-            roleKey: ROLE_KEYS.COORDINATOR,
-            departmentKey,
-        },
-        {
-            id: `${id}-operador`,
-            label: `${label} · Operador`,
-            roleKey: ROLE_KEYS.OPERATOR,
-            departmentKey,
-        },
-    ]),
+    ].flatMap(([id, label, departmentKey]) => {
+        const operationalRole =
+            departmentKey === DEPARTMENT_KEYS.INSTALLATIONS
+                ? { id: 'instalador', label: 'Instalador', key: ROLE_KEYS.INSTALLER }
+                : { id: 'operador', label: 'Operador', key: ROLE_KEYS.OPERATOR };
+        return [
+            {
+                id: `${id}-coordinador`,
+                label: `${label} · Coordinador`,
+                roleKey: ROLE_KEYS.COORDINATOR,
+                departmentKey,
+            },
+            {
+                id: `${id}-${operationalRole.id}`,
+                label: `${label} · ${operationalRole.label}`,
+                roleKey: operationalRole.key,
+                departmentKey,
+            },
+        ];
+    }),
 ];
 
 export const validProfileId = (id) =>

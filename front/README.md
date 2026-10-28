@@ -40,6 +40,10 @@ npm run dev
 Abre la URL que muestra Vite en la terminal. Express se inicia por separado desde
 `back/` con `npm run dev`. Para otro destino del proxy define `BACKEND_PROXY_TARGET`
 en `front/.env.local` y reinicia Vite; hay un ejemplo en `.env.example`.
+La [preparación del archivo local](docs/development/01-getting-started.md#configurar-frontenvlocal-para-vue)
+explica desde qué carpeta copiarlo, los valores permitidos, la prioridad y los
+cambios de desarrollo a producción. `.env.example` es la plantilla; la copia
+ignorada `.env.local` es la que utiliza Vite.
 Vite usa el puerto 5173 con `strictPort`: si está ocupado avisa en lugar de abrir
 silenciosamente otro puerto.
 
@@ -122,7 +126,9 @@ a esa dirección o recargarla. Para producción, el servidor debe devolver `inde
 al solicitar una ruta de la aplicación:
 
 - Nginx: lo configura `nginx.conf`.
-- Vercel: lo configura `front/vercel.json`, usando `front` como Root Directory.
+- Vercel: `front/vercel.json` configura el fallback SPA al desplegar con `front`
+  como Root Directory. El proxy de `/api` y `/cerrar-sesion` hacia Express debe
+  configurarse antes del fallback para usar la autenticación.
 - Render Static Site: agrega en Redirects/Rewrites la fuente `/*`, destino
   `/index.html` y acción **Rewrite**.
 
@@ -164,6 +170,10 @@ módulos. Consulta [decisiones y responsabilidades de Vue](docs/architecture/vie
 
 ## Pruebas de navegador
 
+La [guía de archivos y credenciales de pruebas](docs/testing/06-test-files-and-credentials.md)
+explica la preparación de cada nivel, qué archivos se crean y qué significan los
+resultados. Unitarias y navegador con API simulada no necesitan cuentas de Nexus.
+
 Desde `front/`, instala el navegador una vez y ejecuta:
 
 ```bash
@@ -187,6 +197,10 @@ de ambas aplicaciones y PostgreSQL aislado/migrado: sigue la
 [preparación y limpieza](docs/testing/05-system-tests.md). Este comando inicia
 Express en 3107 y Vite en 5175; no reutiliza los procesos normales de desarrollo.
 La suite `test:e2e` conserva sus respuestas API simuladas y no requiere una base.
+
+Las conexiones PostgreSQL aisladas se configuran como variables de la terminal o
+CI, según la guía de preparación. El setup genera las cuentas y contraseñas de
+Nexus que usará la prueba; no se configuran en los archivos de manuales.
 
 ## Documentación propia y publicación
 
@@ -217,8 +231,12 @@ Estas fuentes, herramientas y artefactos permanecen fuera del contenedor de prod
 El [manual de usuario Vue](docs/user-manual/index.md) tiene procedimientos y capturas
 propios. Se publica aparte del libro técnico:
 
-Para los manuales de inducción por cuenta, prepara las referencias y credenciales
-locales siguiendo [esta guía](docs/governance/06-manuals-by-access.md). Desde `front/`:
+Para los manuales de inducción por cuenta, sigue primero la
+[preparación de cuentas y archivos](docs/governance/07-manual-accounts-and-files.md):
+explica cómo crear o reutilizar un usuario de Nexus, copiar las plantillas y completar
+las credenciales locales. El generador no crea usuarios ni contraseñas. La
+[guía de perfiles](docs/governance/06-manuals-by-access.md) describe capturas,
+reanudación y resultados. Desde `front/`:
 
 ```bash
 npm run docs:manuals -- --mode demo --all --format ambos

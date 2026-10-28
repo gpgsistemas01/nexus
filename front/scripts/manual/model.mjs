@@ -24,6 +24,7 @@ export const MANUAL_CHAPTERS = [
         P.SUPPLIER_REPORTS_READ,
     ]),
     chapter('15-errors-and-recovery.md', 'Errores y recuperación'),
+    chapter('16-glossary.md', 'Glosario para trabajar en Nexus'),
 ];
 
 export const permits = (permissions, any = []) =>

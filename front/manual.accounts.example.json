@@ -122,14 +122,14 @@
             "passwordEnv": "DOCS_FRONT_INSTALACIONES_COORDINADOR_PASSWORD"
         },
         {
-            "id": "instalaciones-operador",
-            "label": "Instalaciones · Operador",
+            "id": "instalaciones-instalador",
+            "label": "Instalaciones · Instalador",
             "expectedAccess": {
-                "roleKey": "operator",
+                "roleKey": "installer",
                 "departmentKey": "installations"
             },
-            "usernameEnv": "DOCS_FRONT_INSTALACIONES_OPERADOR_USER",
-            "passwordEnv": "DOCS_FRONT_INSTALACIONES_OPERADOR_PASSWORD"
+            "usernameEnv": "DOCS_FRONT_INSTALACIONES_INSTALADOR_USER",
+            "passwordEnv": "DOCS_FRONT_INSTALACIONES_INSTALADOR_PASSWORD"
         },
         {
             "id": "acabados-coordinador",

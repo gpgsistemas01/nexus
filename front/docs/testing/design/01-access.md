@@ -39,7 +39,7 @@ criptográfica de JWT ni sustituye las integraciones de Express/Prisma.
 | --- | --- | --- |
 | Perder el acceso al entrar directamente | Router en memoria; particiones `/` y `/inicio-sesion` | Ambas abren el login operativo. |
 | Quedar atrapado en una dirección inválida | Transición ruta desconocida → enlace de retorno | Se recupera el login. |
-| Mantener accesibles demostraciones retiradas | Router en memoria; particiones `/inicio`, `/comparar/login/vuetify` y `/ejemplo` | Muestran página no encontrada y conservan la recuperación al login. |
+| Navegar a rutas no registradas | Router en memoria; particiones `/inicio`, `/comparar/login/vuetify` y `/ejemplo` | Muestran página no encontrada y conservan la recuperación al login. |
 
 Se comprueba comportamiento visible, no clases CSS, funciones privadas ni estructura
 interna de Vue. No hay HTTP real, base de datos ni navegador real en esta suite unitaria.

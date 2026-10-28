@@ -12,6 +12,7 @@ contienen su especificación y flujos completos.
 3. [Registro de casos](03-test-cases.md): datos, pasos, resultado esperado y limpieza de las fichas CP.
 4. [Cobertura por caso de uso](04-use-case-coverage.md): objetivos representados y límites de evidencia.
 5. [Preparación de sistema](05-system-tests.md): ambiente aislado, ejecución y limpieza con API/base reales.
+6. [Archivos, credenciales y ejecución](06-test-files-and-credentials.md): instalación, configuración local, origen de usuarios de prueba y significado de los resultados.
 
 El resultado de una corrida se conserva como EP en CI o revisión. El plan precede
 al diseño; el caso concreta sus datos; la cobertura relaciona esa evidencia con los
@@ -32,9 +33,9 @@ se especifican en subcasos separados, aunque compartan una prueba ejecutable.
 
 ## Ejecución y resultado
 
-Desde la raíz: `npm --prefix front run test:unit` para unitarias. La preparación y
-ejecución de Playwright se mantienen en [README](../../README.md#pruebas-de-navegador);
-su configuración fija Chromium, un worker y el servidor Vite local.
+Para la primera ejecución, siga [Archivos, credenciales y ejecución](06-test-files-and-credentials.md).
+Desde la raíz: `npm --prefix front run test:unit` para unitarias. Playwright utiliza
+Chromium, un worker y el servidor Vite local según el tipo de recorrido.
 `npm --prefix front run test:e2e:system` es independiente: requiere la base aislada,
 migraciones y dependencias de ambas aplicaciones según [la preparación](05-system-tests.md).
 
