@@ -29,6 +29,8 @@ convenciones y responsabilidades de implementación. Los comandos npm se ejecuta
   para el estándar y la estrategia específicos de Vue.
 - No edites manualmente `docs/architecture/views/development/code-reference.md`: regenera con
   `npm run docs:generate` al cambiar archivos/imports/contratos de `src`.
+- La misma generación mantiene `docs/architecture/views/logical/type-reference/`:
+  contratos TS/SFC, atributos y relaciones. No edites sus capítulos generados.
 - Ejecuta `npm run docs:check`. Publica con `npm run docs:export -- ambos`; las
   fuentes y resultados pertenecen a `front/docs` y `front/build/docs`.
 - Cada patrón aplicado conserva modelo general y diagrama específico con fuentes,

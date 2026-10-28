@@ -9,7 +9,7 @@ recorrido de primera jornada y acompañados de un glosario de operación. No exi
 la referencia técnica para conocer un campo o completar una operación.
 
 Los entregables por cuenta se generan mediante el
-[flujo de perfiles](06-manuals-by-access.md): selecciona tareas por permiso y obtiene
+[procedimiento de generación por cuenta](07-manual-accounts-and-files.md): selecciona tareas por permiso y obtiene
 capturas con el acceso correspondiente. Este capítulo describe la fuente completa
 y las capturas de referencia con datos ficticios.
 

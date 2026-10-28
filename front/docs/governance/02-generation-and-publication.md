@@ -2,8 +2,9 @@
 
 ## Fuentes y resultados
 
-Las fuentes editables viven en `front/docs`. La referencia de código se genera
-desde `front/src`; las demás guías se redactan y revisan contra la implementación.
+Las fuentes editables viven en `front/docs`. La referencia de código y los
+contratos TypeScript se generan desde `front/src`; las guías curadas se redactan
+y revisan contra la implementación.
 El paquete Vue incorpora requisitos, arquitectura, desarrollo, pruebas y gobierno.
 Arquitectura incluye las cinco vistas, patrones y referencias breves por dominio.
 Los casos y contratos se mantienen íntegros en sus fuentes propietarias.
@@ -18,6 +19,7 @@ Los casos y contratos se mantienen íntegros en sus fuentes propietarias.
 | `arquitectura` | Contexto, vistas 4+1, modelos de interfaces/tipos y estados, procesos por sección, decisiones, contratos y patrones. |
 | `estandar` | Reglas de construcción y revisión del código. |
 | `referencia` | Inventario generado de archivos, exports, contratos SFC e imports. |
+| `tipos` / `tipos-<ámbito>` | Contratos de datos completos, firmas y relaciones; libros independientes por ámbito. |
 | `pruebas` | Plan, diseño, registro CP, cobertura y preparación de sistema. |
 | `operacion` | Construcción y despliegue. |
 | `gobierno` | Reglas editoriales, referencias, criterios y publicación. |
@@ -116,3 +118,22 @@ admite archivos de compilación, fuentes y módulos públicos necesarios; excluy
 `docs/`, `scripts/` y `build/`. La imagen final contiene Nginx y assets de Vue.
 Generar documentación es una tarea de desarrollo/CI y no un paso del arranque
 del sitio en producción.
+
+## Referencia completa de tipos
+
+`npm run docs:generate` mantiene también
+`architecture/views/logical/type-reference/`: interfaces, clases, aliases y
+contratos tipados SFC, retornos públicos inferidos y objetos públicos, con sus
+miembros y relaciones de tipos.
+La publicación `npm run docs:export -- tipos ambos` reúne sus ámbitos en un
+libro separado. Los modelos curados enlazan esta referencia; conservan los cortes
+que explican responsabilidades. `docs:check` comprueba ambas fuentes generadas.
+
+El catálogo completo de tipos se consulta por separado del libro general para
+mantener legibles las vistas arquitectónicas. Cada campo mantiene su firma completa
+y las figuras se dividen en partes; el índice generado declara los límites de inferencia.
+
+Para publicar un ámbito concreto, use `tipos-identidad`, `tipos-inventario`,
+`tipos-compras`, `tipos-salidas`, `tipos-acceso`, `tipos-catalogos`,
+`tipos-directorio`, `tipos-movimientos`, `tipos-aplicacion` o `tipos-compartidos`.
+Por ejemplo: `npm run docs:export -- tipos-identidad ambos`.

@@ -4,16 +4,24 @@ import ts from 'typescript';
 import { parse } from 'vue/compiler-sfc';
 
 /** @param {string} filename @param {string} content */
-export const inspectSource = (filename, content) => {
+export const parseSource = (filename, content) => {
     let script = content;
     if (filename.endsWith('.vue')) {
         const { descriptor, errors } = parse(content, { filename });
         if (errors.length) throw new Error(`${filename}: ${errors.map(String).join('; ')}`);
-        script = [descriptor.script?.content, descriptor.scriptSetup?.content]
-            .filter(Boolean)
-            .join('\n');
+        script = content.replace(/[^\r\n]/g, ' ');
+        for (const block of [descriptor.script, descriptor.scriptSetup].filter(Boolean))
+            script =
+                script.slice(0, block.loc.start.offset) +
+                block.content +
+                script.slice(block.loc.end.offset);
     }
-    const source = ts.createSourceFile(filename, script, ts.ScriptTarget.Latest, true);
+    return ts.createSourceFile(filename, script, ts.ScriptTarget.Latest, true);
+};
+
+/** @param {string} filename @param {string} content */
+export const inspectSource = (filename, content) => {
+    const source = parseSource(filename, content);
     const imports = new Set();
     const exports = new Set();
     const contracts = new Set();
@@ -71,7 +79,7 @@ export const inspectSource = (filename, content) => {
 };
 
 /** @param {string} directory */
-const sourceFiles = async (directory) => {
+export const sourceFiles = async (directory) => {
     const entries = await readdir(directory, { withFileTypes: true });
     const nested = await Promise.all(
         entries.map((entry) => {

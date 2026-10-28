@@ -231,22 +231,9 @@ Estas fuentes, herramientas y artefactos permanecen fuera del contenedor de prod
 El [manual de usuario Vue](docs/user-manual/index.md) tiene procedimientos y capturas
 propios. Se publica aparte del libro técnico:
 
-Para los manuales de inducción por cuenta, sigue primero la
-[preparación de cuentas y archivos](docs/governance/07-manual-accounts-and-files.md):
-explica cómo crear o reutilizar un usuario de Nexus, copiar las plantillas y completar
-las credenciales locales. El generador no crea usuarios ni contraseñas. La
-[guía de perfiles](docs/governance/06-manuals-by-access.md) describe capturas,
-reanudación y resultados. Desde `front/`:
-
-```bash
-npm run docs:manuals -- --mode demo --all --format ambos
-npm run docs:manuals -- --mode live --profile impresion-operador --format ambos
-```
-
-Cada perfil recibe sus propias capturas y sólo las tareas permitidas. Los archivos
-`manual.accounts.local.json` y `.env.manual.local` están ignorados; no envíes las
-contraseñas por el chat. `--missing` reanuda las capturas pendientes. Los resultados
-quedan bajo `front/build/manuals` y `front/build/docs/{docx,pdf}/manuales-vue`.
+La [guía para generar manuales por cuenta](docs/governance/07-manual-accounts-and-files.md)
+reúne la preparación de credenciales, los comandos, los resultados y la recuperación
+de errores. Cada cuenta recibe sus propias capturas y las tareas permitidas por su acceso.
 
 Para la fuente completa de referencia, desde la raíz:
 
@@ -329,3 +316,15 @@ credenciales del API. `BACKEND_UPSTREAM` es una variable de Nginx, independiente
 
 El Dockerfile de la raíz y Docker Compose siguen construyendo únicamente el backend.
 Vercel utiliza la compilación de Vite directamente, sin este Dockerfile.
+
+## Contratos TypeScript completos
+
+La [referencia generada de tipos](docs/architecture/views/logical/type-reference/index.md)
+complementa los diagramas curados con todos los contratos declarados de TS/SFC,
+miembros, uniones y dependencias. Desde `front/`:
+
+```bash
+npm run docs:generate
+npm run docs:check
+npm run docs:export -- tipos ambos
+```

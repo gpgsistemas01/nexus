@@ -217,6 +217,59 @@ it('comprueba el rol y área esperados en la misma asignación de la cuenta', ()
   ).toThrow('no coincide');
 });
 
+it('selecciona el manual por la sesión sin declarar acceso esperado ni confiar en la etiqueta', async () => {
+  const root = await tempRoot();
+  const account = {
+    id: 'cuenta-01',
+    label: 'Administración del sistema',
+    usernameEnv: 'DOCS_FRONT_CUENTA_01_USER',
+    passwordEnv: 'DOCS_FRONT_CUENTA_01_PASSWORD',
+  };
+  const filename = path.join(root, 'accounts.json');
+  await writeFile(
+    filename,
+    JSON.stringify({ baseUrl: 'http://localhost:5173', accounts: [account] }),
+  );
+  const configuration = await readAccounts(filename);
+  const session = demoSession(DEMO_PROFILES.find(({ id }) => id === 'instalaciones-instalador')!);
+  expect(() => verifyConfiguredAccess(configuration.accounts[0], session)).not.toThrow();
+  await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
+    recursive: true,
+  });
+  const manifest = await prepareManual(root, { ...account, mode: 'live' }, session);
+  expect(manifest.sources).toContain('12-issues.md');
+  expect(manifest.sources).not.toContain('08-users.md');
+  expect(manifest.sources).not.toContain('11-purchases.md');
+  expect(manifest.images).not.toContain('25-issue-return.png');
+  expect(manifest.id).toBe(account.id);
+  const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
+  expect(index).toContain('| INSTALACIONES | Instalador |');
+  expect(index).toContain('## Acceso detectado de la cuenta');
+});
+
+it('publica los nombres de acceso como texto y no atribuye operaciones ausentes de la sesión', async () => {
+  const root = await tempRoot();
+  await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
+    recursive: true,
+  });
+  const session = {
+    id: 'fixture',
+    permissions: [],
+    accesses: [{ role: '[Rol](https://example.invalid)', department: 'Área | <b>nombre</b>' }],
+  };
+  const manifest = await prepareManual(
+    root,
+    { id: 'cuenta-01', label: 'Cuenta 01', mode: 'live' },
+    session,
+  );
+  const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
+  expect(index).toContain('\\[Rol\\]');
+  expect(index).toContain('Área \\| &lt;b&gt;nombre&lt;/b&gt;');
+  expect(index).not.toContain('[Rol](https://example.invalid)');
+  expect(index).not.toContain('puede consultar y registrar');
+  expect(manifest.sources).not.toContain('12-issues.md');
+});
+
 it('bloquea la exportación de un perfil incompleto y las rutas fuera de su directorio', async () => {
   const root = await tempRoot();
   await expect(loadManualPublication(root, '../private')).rejects.toThrow('inválido');

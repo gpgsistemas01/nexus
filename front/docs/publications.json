@@ -67,6 +67,11 @@
             "title": "Estándar de codificación",
             "sources": ["architecture/coding-standards/"]
         },
+        "tipos": {
+            "title": "Contratos completos TypeScript y SFC",
+            "includeInComplete": false,
+            "sources": ["architecture/views/logical/type-reference/"]
+        },
         "referencia": {
             "title": "Referencia generada del código",
             "sources": ["architecture/views/development/code-reference.md"]
@@ -98,6 +103,86 @@
         "gobierno": {
             "title": "Reglas documentales y publicación",
             "sources": ["governance/"]
+        },
+        "tipos-aplicacion": {
+            "title": "Contratos TypeScript de Aplicación",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/app.md"
+            ]
+        },
+        "tipos-acceso": {
+            "title": "Contratos TypeScript de Acceso",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/auth.md"
+            ]
+        },
+        "tipos-catalogos": {
+            "title": "Contratos TypeScript de Catálogos",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/catalogs.md"
+            ]
+        },
+        "tipos-directorio": {
+            "title": "Contratos TypeScript de Directorio",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/directory.md"
+            ]
+        },
+        "tipos-identidad": {
+            "title": "Contratos TypeScript de Identidad",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/identity.md"
+            ]
+        },
+        "tipos-salidas": {
+            "title": "Contratos TypeScript de Salidas",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/issues.md"
+            ]
+        },
+        "tipos-movimientos": {
+            "title": "Contratos TypeScript de Movimientos",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/movements.md"
+            ]
+        },
+        "tipos-compras": {
+            "title": "Contratos TypeScript de Compras",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/purchases.md"
+            ]
+        },
+        "tipos-inventario": {
+            "title": "Contratos TypeScript de Inventario",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/warehouse.md"
+            ]
+        },
+        "tipos-compartidos": {
+            "title": "Contratos TypeScript de Compartidos",
+            "includeInComplete": false,
+            "sources": [
+                "architecture/views/logical/type-reference/index.md",
+                "architecture/views/logical/type-reference/shared.md"
+            ]
         }
     }
 }

@@ -58,7 +58,7 @@ front/docs/
 | Necesidad | Recorrido |
 | --- | --- |
 | Operar el sistema | [Manual de usuario](user-manual/index.md) → procedimiento del módulo → reportes o recuperación. |
-| Generar la inducción por cuenta | [Preparar cuentas y archivos](governance/07-manual-accounts-and-files.md) → [perfiles y capturas](governance/06-manuals-by-access.md) → manual del acceso efectivo. |
+| Generar la inducción por cuenta | [Guía completa de generación](governance/07-manual-accounts-and-files.md): preparación, credenciales, capturas, publicación y recuperación. |
 | Incorporarse al proyecto | [Inicio local](development/01-getting-started.md) → [guía del código](architecture/views/development/developer-onboarding.md) → [vista general](architecture/views/overview.md). |
 | Implementar una operación | [Requisito y CU](requirements/index.md) → [secuencia del proceso](architecture/views/processes/index.md) → [responsabilidad del módulo](architecture/views/development/frontend-technical-documentation/index.md) → [estándar](architecture/coding-standards/index.md). |
 | Leer un diagrama | [Guía visual](architecture/views/diagram-reading.md) → leyenda local → fuentes de la figura. |

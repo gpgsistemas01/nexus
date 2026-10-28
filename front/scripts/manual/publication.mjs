@@ -28,6 +28,15 @@ export const accessFingerprint = (session) =>
         )
         .digest('hex');
 
+const manualText = (value) =>
+    String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('\\', '\\\\')
+        .replace(/[|[\]!*_`#]/g, (character) => '\\' + character)
+        .replace(/\s+/g, ' ');
+
 export const prepareManual = async (frontRoot, profile, session) => {
     if (
         !validProfileId(profile.id) ||
@@ -56,14 +65,33 @@ export const prepareManual = async (frontRoot, profile, session) => {
         );
         sources.push({ file: chapter.file, content });
     }
-    const scope = hasDataScope(session.accesses ?? [], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)
-        ? 'En Salidas de Materiales, Consumibles y Mermas puede consultar y registrar documentos para todas las áreas, según los permisos y el estado de cada documento.'
-        : 'En Salidas de Materiales, Consumibles y Mermas sólo puede consultar y registrar solicitudes para las áreas asignadas a su cuenta. Limpiar los filtros no amplía ese acceso.';
+    const scope = !chapters.some((chapter) => chapter.file === '12-issues.md')
+        ? ''
+        : hasDataScope(session.accesses ?? [], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)
+          ? 'En Salidas de Materiales, Consumibles y Mermas puede consultar y registrar documentos para todas las áreas, según los permisos y el estado de cada documento.'
+          : 'En Salidas de Materiales, Consumibles y Mermas sólo puede consultar y registrar solicitudes para las áreas asignadas a su cuenta. Limpiar los filtros no amplía ese acceso.';
+    const accessRows = [
+        ...new Set(
+            (session.accesses ?? []).map(
+                (access) =>
+                    '| ' +
+                    manualText(access.department ?? access.departmentKey) +
+                    ' | ' +
+                    manualText(access.role ?? access.roleKey) +
+                    ' |',
+            ),
+        ),
+    ].sort();
+    const detectedAccess = accessRows.length
+        ? '## Acceso detectado de la cuenta\n\n| Área | Rol |\n| --- | --- |\n' +
+          accessRows.join('\n') +
+          '\n\nLas tareas siguientes se seleccionan con los permisos efectivos de esta sesión.\n\n'
+        : '';
     const title = `Manual de inducción de Nexus — ${profile.label}`;
     const documentDate = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/Mexico_City',
     }).format(new Date());
-    const index = `# ${title}\n\n## Datos generales del documento\n\n| Versión documental | Versión del sistema | Estado | Fecha | Responsable |\n| --- | --- | --- | --- | --- |\n| 1.1 | 1.0.0 | En revisión | ${documentDate} | Equipo Nexus |\n\n## Su recorrido de aprendizaje\n\nEste manual corresponde al acceso **${profile.label}**. Empiece por Primera jornada y continúe con la tarea que necesita realizar. Las funciones y capturas se seleccionaron con los permisos efectivos de la sesión al generar esta edición.\n\n${profile.mode === 'demo' ? 'Las capturas usan datos ficticios y los permisos calculados por las políticas actuales del sistema. Esta edición de demostración no certifica la asignación de una cuenta real.' : 'Las capturas muestran la interfaz de la cuenta utilizada en el entorno de capacitación. Los nombres y cantidades de su trabajo pueden ser diferentes.'}\n\n${scope}\n\n| Orden | Lección |\n| --- | --- |\n${chapters.map((chapter, i) => `| ${i + 1} | [${chapter.title}](${chapter.file}) |`).join('\n')}\n\n## Localizar una solución rápidamente\n\nSi una captura presenta un mensaje o no sabe si una operación terminó, abra [Errores y recuperación](15-errors-and-recovery.md). Si todavía está aprendiendo la navegación o el significado de un campo, comience por [Primera jornada](00-induction.md) y [Navegación y controles](02-navigation-and-controls.md).\n\nNo comparta su contraseña para solicitar ayuda. Si cambia su acceso, solicite una edición actualizada del manual.\n`;
+    const index = `# ${title}\n\n## Datos generales del documento\n\n| Versión documental | Versión del sistema | Estado | Fecha | Responsable |\n| --- | --- | --- | --- | --- |\n| 1.1 | 1.0.0 | En revisión | ${documentDate} | Equipo Nexus |\n\n## Su recorrido de aprendizaje\n\nEsta edición se identifica como **${profile.label}**. Empiece por Primera jornada y continúe con la tarea que necesita realizar. Las funciones y capturas se seleccionaron con los permisos efectivos de la sesión al generar esta edición.\n\n${profile.mode === 'demo' ? 'Las capturas usan datos ficticios y los permisos calculados por las políticas actuales del sistema. Esta edición de demostración no certifica la asignación de una cuenta real.' : 'Las capturas muestran la interfaz de la cuenta utilizada en el entorno de capacitación. Los nombres y cantidades de su trabajo pueden ser diferentes.'}\n\n${detectedAccess}${scope}\n\n| Orden | Lección |\n| --- | --- |\n${chapters.map((chapter, i) => `| ${i + 1} | [${chapter.title}](${chapter.file}) |`).join('\n')}\n\n## Localizar una solución rápidamente\n\nSi una captura presenta un mensaje o no sabe si una operación terminó, abra [Errores y recuperación](15-errors-and-recovery.md). Si todavía está aprendiendo la navegación o el significado de un campo, comience por [Primera jornada](00-induction.md) y [Navegación y controles](02-navigation-and-controls.md).\n\nNo comparta su contraseña para solicitar ayuda. Si cambia su acceso, solicite una edición actualizada del manual.\n`;
     await mkdir(path.join(root, 'sources'), { recursive: true });
     await writeFile(path.join(root, 'sources/index.md'), index);
     for (const source of sources)

@@ -86,3 +86,9 @@ captura pendiente, reintentos e identidad/versiones. `purchaseTest.ts` e
 `issueTest.ts` conservan precarga de documentos, altas recientes y formularios de
 consulta. Los recorridos de navegador existentes comprueban los consumidores
 reales de `RemoteSelect`, incluidos filtros y altas contextuales con API simulada.
+
+## Referencia de contratos TypeScript
+
+| Riesgo | Nivel y técnica | Condición y fuente ejecutable |
+| --- | --- | --- |
+| Omitir atributos, confundir callbacks/herencia o conservar contratos obsoletos. | Herramienta documental; particiones TS/SFC, genéricos, imports con alias y cambios/retirada de fuentes. | `typeDocumentationTest.ts`: campos completos, parámetros propiedad, objetos inline, props/eventos/slots, asociaciones, multiplicidades, dependencias y frescura determinista. No valida reglas del negocio. |

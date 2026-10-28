@@ -11,8 +11,8 @@ locales. El lector no necesita abrir la documentación de Express para aplicarla
 3. [Aplicación de estándares a la documentación Vue](03-standard-applicability.md).
 4. [Reglas del proyecto, recomendaciones y criterios de aceptación](04-conventions-and-criteria.md).
 5. [Manual de usuario: fuentes, capturas y publicación](05-user-manual.md).
-6. [Manuales de inducción por acceso](06-manuals-by-access.md).
-7. [Preparar cuentas y archivos para los manuales](07-manual-accounts-and-files.md).
+6. [Accesos y funcionamiento del generador de manuales](06-manuals-by-access.md).
+7. [Generar manuales por cuenta: procedimiento completo](07-manual-accounts-and-files.md).
 8. [Vocabulario de requisitos y documentación](08-documentation-vocabulary.md).
 
 La [entrada general](../index.md) conserva versión, estado y alcance de la colección.

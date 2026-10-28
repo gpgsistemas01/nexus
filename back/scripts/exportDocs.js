@@ -77,7 +77,7 @@ const frontendSource = source => `../front/docs/${source}`;
 const frontendSectionParts = requestedPublication === 'arquitectura'
     && requestedDocument?.startsWith('frontend-vue-')
     ? Object.fromEntries(Object.entries(frontendCatalog.sections)
-        .filter(([, definition]) => definition.includeInComplete)
+        .filter(([name]) => name !== 'manual')
         .map(([name, definition]) => [
             `frontend-vue-${name}`,
             definition.sources.map(frontendSource)

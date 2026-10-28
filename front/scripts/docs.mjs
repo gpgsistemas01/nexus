@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import { generateCodeReference } from './documentation.mjs';
+import { generateTypeReference } from './typeDocumentation.mjs';
 import { loadDocumentationCatalog, parseDocumentationExportArgs } from './documentationCatalog.mjs';
 
 const frontRoot = fileURLToPath(new URL('../', import.meta.url));
@@ -36,13 +37,16 @@ const runExport = (exportArgs, section = null) => {
 try {
     if (command === 'generate' && !args.length) {
         await generateCodeReference(frontRoot, false);
+        await generateTypeReference(frontRoot, false);
         console.log(
-            'Referencia Vue generada en front/docs/architecture/views/development/code-reference.md.',
+            'Referencias Vue y contratos TypeScript generados en front/docs/architecture/views/.',
         );
     } else if (command === 'check' && !args.length) {
         await generateCodeReference(frontRoot, true);
+        await generateTypeReference(frontRoot, true);
         runExport(['--check']);
         runExport(['--check'], 'manual');
+        runExport(['--check'], 'tipos');
     } else if (command === 'export') {
         const catalog = await loadDocumentationCatalog(path.join(frontRoot, 'docs'));
         const { section, format } = parseDocumentationExportArgs(
@@ -50,6 +54,7 @@ try {
             Object.keys(catalog.sections),
         );
         await generateCodeReference(frontRoot, true);
+        await generateTypeReference(frontRoot, true);
         runExport([format], section);
     } else
         throw new Error(

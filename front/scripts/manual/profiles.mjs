@@ -66,10 +66,19 @@ const departmentLabels = {
     finishing: 'ACABADOS',
 };
 
+const roleLabels = {
+    system_admin: 'Administrador del sistema',
+    coordinator: 'Coordinador',
+    auxiliary: 'Auxiliar',
+    operator: 'Operador',
+    installer: 'Instalador',
+};
+
 export const demoSession = (profile) => {
     const accesses = [
         {
             roleKey: profile.roleKey,
+            role: roleLabels[profile.roleKey],
             departmentKey: profile.departmentKey,
             departmentId: 'manual-department',
             department: departmentLabels[profile.departmentKey],
