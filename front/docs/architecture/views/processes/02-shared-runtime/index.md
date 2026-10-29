@@ -11,4 +11,6 @@
 
 - [Recorrido de los datos tipados](06-typed-data-flow.md): `DIA-VUE-FLU-001/002`.
 
+- [Transporte, errores y contrato paginado](07-http-and-contracts.md): `DIA-VUE-SEQ-034/035`.
+
 [Catálogo de procesos y figuras](../index.md).

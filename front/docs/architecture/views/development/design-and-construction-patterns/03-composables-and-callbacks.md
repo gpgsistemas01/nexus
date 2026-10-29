@@ -87,21 +87,29 @@ un desmontaje impide la transición tardía.
 sequenceDiagram
     autonumber
     actor U as Usuario autorizado
-    participant E@{ "type": "control" } as Alta y entrada<br/>useInventory<br/>Editor
-    participant A@{ "type": "boundary" } as API del sistema
-    participant R@{ "type": "control" } as useWaste<br/>Duplicate<br/>Recovery
-    participant P@{ "type": "boundary" } as Contenedor<br/>InventoryPage
-    U->>E: Guardar alta
-    E->>A: POST de alta con operationId
-    A-->>E: 409, rechazo definitivo y merma existente
-    E->>R: recover(error, captura)
-    R->>U: Ofrecer Abrir Agregar stock
-    U-->>R: Confirmar
-    R->>P: callback y evento addStock(target)
-    P->>E: Abrir entrada con la captura
-    Note over P,A: Abrir el editor no registra entrada
-    U->>E: Revisar y Guardar
-    E->>A: POST stock-additions
+    box Interfaz
+    participant Page@{ "type": "boundary" } as Inventory<br/>Editor<br/>Page.vue
+    participant Parent@{ "type": "boundary" } as Inventory<br/>Page.vue
+    end
+    box Coordinación
+    participant Editor@{ "type": "control" } as useInventory<br/>Editor.ts
+    participant Recovery@{ "type": "control" } as useWaste<br/>Duplicate<br/>Recovery.ts
+    participant Inventory@{ "type": "control" } as use<br/>Inventory.ts
+    end
+    U->>Page: Guardar alta de merma
+    Page->>Editor: submit()
+    Note over Editor: inventoryService y apiClient ejecutan el alta, SEQ-040
+    Editor->>Recovery: recover tras WASTE_ALREADY_EXISTS definitivo
+    Note over Recovery: Mapper y confirmAction se desarrollan en SEQ-009
+    Recovery->>Page: onAddStock(target) si confirmó y sigue vigente
+    Page->>Parent: addStock(target)
+    Parent->>Inventory: openEditor(target)
+    Inventory-->>Parent: target add-stock
+    Parent->>Page: nueva instancia de entrada con captura
+    Note over Parent,Editor: Abrir no escribe existencias
+    U->>Page: revisar y Guardar entrada
+    Page->>Editor: submit() de la nueva instancia
+    Note over Editor: Nueva operación stock-additions con su propia clave
 ```
 
 Se aplican los patrones ya adoptados: contenedor/presentación, composición por
@@ -186,3 +194,11 @@ comprueba precarga, actualización remota, limpieza e independencia de instancia
 Las pruebas existentes de Inventario, Compras y Salidas mantienen sus oráculos de
 captura, payloads, dependencias y recuperación; no se sustituyen por aserciones
 sobre el nuevo reparto de archivos.
+
+## Fuentes de los participantes
+
+[InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue),
+[InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue),
+[useInventoryEditor.ts](../../../../../src/modules/warehouse/composables/useInventoryEditor.ts),
+[useWasteDuplicateRecovery.ts](../../../../../src/modules/warehouse/composables/useWasteDuplicateRecovery.ts),
+[useInventory.ts](../../../../../src/modules/warehouse/composables/useInventory.ts).

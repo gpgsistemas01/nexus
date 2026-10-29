@@ -4,8 +4,6 @@
 
 **Casos relacionados:** CU-ALM-10/13; RF-VUE-007/008.
 
-**Fuente técnica:** useInventoryEditor.execute y createPendingWasteOperation.
-
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-008`.
@@ -15,38 +13,39 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Usuario
-    participant Editor@{ "type": "control" } as useInventoryEditor
-    participant Pending@{ "type": "boundary" } as pendingWasteOperation
-    participant Service@{ "type": "boundary" } as inventoryService
-    participant API@{ "type": "boundary" } as API
-    Editor->>Pending: read por usuario, acción e identidad
-    Pending-->>Editor: cuerpo pendiente o ausencia
-    Usuario->>Editor: Guardar o recuperar captura pendiente
+    actor U as Usuario autorizado
+    box Interfaz
+    participant Page@{ "type": "boundary" } as Inventory<br/>Editor<br/>Page.vue
+    end
+    box Coordinación
+    participant Editor@{ "type": "control" } as useInventory<br/>Editor.ts
+    end
+    box Integración
+    participant Pending@{ "type": "boundary" } as pendingWaste<br/>Operation.ts
+    participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
+    end
+    Editor->>Pending: createPendingWasteOperation(userId, action, id).read()
+    Pending-->>Editor: InventoryPayload pendiente o null
+    U->>Page: Guardar o reintentar captura pendiente
+    Page->>Editor: submit()
     Editor->>Pending: save(payload)
     alt almacenamiento no disponible
-        Pending-->>Editor: error
-        Editor-->>Usuario: no enviar y explicar recuperación bloqueada
+        Pending-->>Editor: error al conservar captura
+        Editor-->>Page: impedir envío y mostrar bloqueo recuperable
     else cuerpo conservado
-        Pending-->>Editor: mismo cuerpo y operationId
-        Editor->>Service: mutate con cuerpo conservado
-        Service->>API: alta o entrada de merma
+        Pending-->>Editor: cuerpo estable con operationId
+        Editor->>Service: mutate(wastes, action, pendingData, id, signal)
+        Note over Service: Transporte y confirmación en SEQ-040
         alt respuesta confirmada
-            API-->>Service: código admitido
-            Service-->>Editor: confirmación
-            Editor->>Pending: clear
-            Editor-->>Usuario: confirmar sólo si sigue montado
-        else resultado incierto
-            API-->>Service: red o error no definitivo
-            Service-->>Editor: ApiError
-            Editor->>Pending: reject evalúa si debe conservar
-            Pending-->>Editor: pendiente conservado
-            Editor-->>Usuario: captura bloqueada y reintento explícito
-        else rechazo definitivo
-            API-->>Service: rechazo de operación
-            Service-->>Editor: ApiError y metadatos
-            Editor->>Pending: reject limpia según contrato
-            Editor-->>Usuario: captura editable y error
+            Service-->>Editor: resultado validado
+            Editor->>Pending: clear()
+            Editor->>Page: onSaved() si sigue vigente
+        else respuesta incierta o rechazo
+            Service-->>Editor: ApiError con código y meta
+            Editor->>Pending: reject(cause, wasPending)
+            Editor->>Pending: read()
+            Pending-->>Editor: cuerpo conservado o null según el contrato
+            Editor-->>Page: pendiente bloqueado o captura editable con error
         end
     end
 ```
@@ -58,3 +57,10 @@ Reabrir recupera el cuerpo y no convierte una captura modificada en otro intento
 ## Evidencia
 
 inventoryFormTest.ts, warehouse.spec.ts y CP-VUE-WH-011-01/02. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
+
+## Fuentes de los participantes
+
+[InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue),
+[useInventoryEditor.ts](../../../../../src/modules/warehouse/composables/useInventoryEditor.ts),
+[pendingWasteOperation.ts](../../../../../src/modules/warehouse/services/pendingWasteOperation.ts),
+[inventoryService.ts](../../../../../src/modules/warehouse/services/inventoryService.ts).

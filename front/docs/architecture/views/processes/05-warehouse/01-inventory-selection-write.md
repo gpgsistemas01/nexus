@@ -4,8 +4,6 @@
 
 **Casos relacionados:** CU-ALM-02/03/05/10/11/12/13/18/19/21.
 
-**Fuente técnica:** useInventoryEditor.ts, useInventorySelection.ts, formModel.ts e inventoryService.ts.
-
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-007`.
@@ -15,33 +13,52 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Usuario
-    participant Page@{ "type": "boundary" } as InventoryEditorPage
-    participant Editor@{ "type": "control" } as useInventoryEditor
-    participant Selection@{ "type": "control" } as useInventorySelection
-    participant Service@{ "type": "boundary" } as inventoryService
-    participant API@{ "type": "boundary" } as API
-    Page->>Editor: resource, target y contexto de alta
-    Editor->>Selection: valores, callbacks y catálogos
-    Usuario->>Page: cambiar proveedor o plantilla o unidad
-    Page->>Editor: update de captura
-    Editor->>Selection: reaccionar a dependencias
-    Selection-->>Editor: limpiar campos dependientes y ajustar selección
-    Editor-->>Page: captura y preview actualizados sin validar campos intactos
-    Usuario->>Page: Guardar
-    Page->>Editor: submit y validación por recurso/modo
-    alt inválido
-        Editor-->>Page: errores sin request
-    else válido
-        Editor->>Editor: buildInventoryPayload explícito
-        opt alta o entrada de merma
-            Editor->>Editor: conservar operación pendiente antes de enviar
+    actor U as Usuario autorizado
+    box Interfaz
+    participant Form@{ "type": "boundary" } as Inventory<br/>Editor.vue
+    participant Page@{ "type": "boundary" } as Inventory<br/>Editor<br/>Page.vue
+    end
+    box Coordinación
+    participant Editor@{ "type": "control" } as useInventory<br/>Editor.ts
+    participant Selection@{ "type": "control" } as useInventory<br/>Selection.ts
+    end
+    box Reglas y datos
+    participant Model@{ "type": "control" } as formModel.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
+    end
+    Page->>Editor: resource, target y creationContext
+    Editor->>Selection: crear selección con values y callbacks
+    U->>Form: cambiar proveedor, plantilla o unidad
+    Form->>Page: update(field, value)
+    Page->>Editor: update(field, value)
+    Selection->>Selection: reaccionar a proveedor, plantilla o unidad
+    Selection->>Editor: setValue y clearError configurados
+    Editor-->>Page: values y preview
+    Page-->>Form: props actualizadas
+    U->>Form: Guardar
+    Form->>Page: submit
+    Page->>Editor: submit()
+    alt captura nueva sin pendiente
+        Editor->>Editor: validar reglas del recurso y modo
+        break captura inválida
+            Editor-->>Page: errors sin ejecutar escritura
         end
-        Editor->>Service: mutate o createForPurchase
-        Service->>API: operación del recurso y campos permitidos
-        API-->>Service: confirmación o rechazo
-        Service-->>Editor: resultado validado o ApiError
-        Editor-->>Page: onSaved si vigente o captura/conflicto
+        Editor->>Model: buildInventoryPayload(resource, target, values, preview, context)
+        Model-->>Editor: InventoryPayload permitido
+    else merma pendiente recuperada
+        Editor->>Editor: reutilizar pendingData sin fabricar otro intento
+    end
+    Note over Editor: execute(payload) protege doble envío y conserva pendiente de merma
+    Editor->>Service: mutate o createForPurchase con signal
+    Note over Service: Transporte y códigos por operación en SEQ-040
+    Service-->>Editor: resultado o ApiError
+    alt confirmado y vigente
+        Editor->>Page: onSaved(created)
+        Page->>Page: emitir saved(created)
+    else rechazo
+        Editor-->>Page: mensaje, errores y conflicto o pendiente
     end
 ```
 
@@ -52,3 +69,12 @@ El recurso fija reglas; Consumibles omite medidas, edición preserva identidad/s
 ## Evidencia
 
 inventoryFormTest.ts, inventoryListTest.ts y warehouse.spec.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
+
+## Fuentes de los participantes
+
+[InventoryEditor.vue](../../../../../src/modules/warehouse/components/InventoryEditor.vue),
+[InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue),
+[useInventoryEditor.ts](../../../../../src/modules/warehouse/composables/useInventoryEditor.ts),
+[useInventorySelection.ts](../../../../../src/modules/warehouse/composables/useInventorySelection.ts),
+[formModel.ts](../../../../../src/modules/warehouse/formModel.ts),
+[inventoryService.ts](../../../../../src/modules/warehouse/services/inventoryService.ts).

@@ -36,6 +36,11 @@ usa un [flujo de decisiones](../diagram-reading.md#mapas-y-actividades).
 Las secuencias compartidas conservan ciclo de vida/transporte; las de dominio,
 modos y efectos observables. La API permanece como frontera externa.
 
+Los diagramas de una operación se dividen cuando cambian el propietario o la
+frontera: interacción → callback del dominio → servicio/transporte → resultado al
+contenedor. La figura que continúa otra conserva los datos y participantes de ese
+punto, sin volver a describir todo el recorrido.
+
 ## Secuencias por operación
 
 | Proceso | Casos/contrato | Figura |
@@ -60,7 +65,7 @@ modos y efectos observables. La API permanece como frontera externa.
 | [Reportes: alcance, archivo y error recuperable](08-movements-and-reports/02-reports.md) | CU de reporte de cada familia; RF-VUE-013 | `DIA-VUE-SEQ-018` / `DIA-VUE-SEQ-033` |
 | [Recarga visible sin solapamiento](02-shared-runtime/04-visible-refresh.md) | RN-VUE-003/005; consultas de CU-ALM y listados | `DIA-VUE-SEQ-019` |
 | [Cierre de sesión y acceso posterior](01-session/03-logout.md) | CU-AUT-02 | `DIA-VUE-SEQ-020` |
-| [Baja de relación de inventario](05-warehouse/04-inventory-removal.md) | CU-ALM-04/14/20 | `DIA-VUE-SEQ-021` |
+| [Baja de relación de inventario](05-warehouse/04-inventory-removal.md) | CU-ALM-04/20 | `DIA-VUE-SEQ-021` |
 | [Directorio: alta y edición](03-catalogs-and-directory/02-directory-save.md) | CU-CAT-02/03/06/07 | `DIA-VUE-SEQ-022` |
 | [Filtros de movimientos](08-movements-and-reports/01-movement-filters.md) | CU-ALM-07/15/23 | `DIA-VUE-SEQ-023` |
 | [Actividad de vista previa de merma](05-warehouse/05-waste-preview.md) | CU-ALM-10 | `DIA-VUE-ACT-001` |
@@ -73,6 +78,23 @@ modos y efectos observables. La API permanece como frontera externa.
 | [Adaptación visual del área](07-issues/04-department-scope.md#adaptación-de-captura-y-filtros) | Consulta/alta CU-SAL | `DIA-VUE-SEQ-030` |
 | [Compra: envío y confirmación](06-purchases/02-purchase-save.md#envío-y-resultado-de-la-operación) | CU-ENT de alta/edición | `DIA-VUE-SEQ-031` |
 | [Transformación de datos tipados](02-shared-runtime/06-typed-data-flow.md) | Lectura y escritura del cliente; ejemplo de Compra | `DIA-VUE-FLU-001/002` |
+| [Transporte y errores normalizados](02-shared-runtime/07-http-and-contracts.md) | Frontera HTTP común y cancelación | `DIA-VUE-SEQ-034` |
+| [Página y registros de Directorio](02-shared-runtime/07-http-and-contracts.md#lectura-paginada-y-adaptación-de-filas) | Conteos, filas y adaptación de consulta | `DIA-VUE-SEQ-035` |
+| [Transporte de Catálogos](03-catalogs-and-directory/01-catalog-record-save.md#transporte-y-registro-confirmado) | Código y CatalogEntry | `DIA-VUE-SEQ-036` |
+| [Transporte de Directorio](03-catalogs-and-directory/02-directory-save.md#transporte-y-retorno-del-registro) | Código y DirectoryEntry | `DIA-VUE-SEQ-037` |
+| [Transporte de Identidad](04-identity/03-save-transport.md) | Persona, cuenta y cambio de contraseña | `DIA-VUE-SEQ-038` |
+| [Guardado de persona](04-identity/04-person-save.md) | Payload de responsabilidades y callback | `DIA-VUE-SEQ-039` |
+| [Transporte de Inventario](05-warehouse/06-inventory-transport.md) | Operación, código y alta auxiliar para compra | `DIA-VUE-SEQ-040` |
+| [Evento de compra guardada](06-purchases/02-purchase-save.md#entrega-del-evento-y-actualización-del-listado) | Cierre, recarga y aviso | `DIA-VUE-SEQ-041` |
+| [Lectura de Salida](07-issues/05-issue-read-transport.md) | Mapper de respuesta e ID solicitado | `DIA-VUE-SEQ-042` |
+| [Partidas de Salida](07-issues/06-issue-line-entry.md) | Selección, borrador y colección de captura | `DIA-VUE-SEQ-043` |
+| [Partidas de Compra](06-purchases/05-purchase-line-entry.md) | Cantidad, costo y detalle nuevo | `DIA-VUE-SEQ-044` |
+| [Transporte de Salida y devolución](07-issues/07-issue-save-transport.md) | Endpoints de cada modo y confirmación | `DIA-VUE-SEQ-045` |
+| [Descarga directa de Directorio](08-movements-and-reports/02-reports.md#descarga-directa-de-directorio) | Reportes sin selector de alcance | `DIA-VUE-SEQ-046` |
+| [Transporte de login](01-session/02-login.md#petición-y-contrato-de-acceso) | Código de acceso y errores | `DIA-VUE-SEQ-047` |
+| [Destino de entrada de merma](05-warehouse/03-waste-duplicate.md#entrega-del-destino-de-entrada) | Callback y eventos entre contenedores | `DIA-VUE-SEQ-048` |
+| [Payload de surtido](07-issues/02-issue-supply.md#payload-y-guardado-del-surtido) | Captura válida, mapper y servicio | `DIA-VUE-SEQ-049` |
+| [Consulta de movimientos](08-movements-and-reports/01-movement-filters.md#aplicación-de-criterios-y-consulta) | Fechas, query y callback de listado | `DIA-VUE-SEQ-050` |
 
 ## Figuras complementarias
 

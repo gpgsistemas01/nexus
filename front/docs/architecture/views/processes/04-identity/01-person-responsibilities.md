@@ -4,8 +4,6 @@
 
 **Casos relacionados:** CU-IDA-02/03.
 
-**Fuente técnica:** usePersonEditor.ts, organizationService.ts e identityService.ts.
-
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-005`.
@@ -15,30 +13,42 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Usuario
-    participant Page@{ "type": "boundary" } as PersonEditorPage
-    participant Editor@{ "type": "control" } as usePersonEditor
-    participant Org@{ "type": "boundary" } as organizationService
-    participant Service@{ "type": "boundary" } as identityService
-    participant API@{ "type": "boundary" } as API
-    Page->>Editor: abrir create o edit con fila/version
-    Editor->>Org: cargar áreas y roles con permiso
-    Org-->>Editor: opciones y selección precargada
-    Usuario->>Page: seleccionar área/rol y Agregar
-    Page->>Editor: addAccess
-    alt área ya asignada o captura incompleta
-        Editor-->>Page: error de asignación sin duplicar fila
-    else asignación válida
-        Editor-->>Page: responsabilidades actualizadas en borrador
+    actor U as Usuario autorizado
+    box Interfaz
+    participant Form@{ "type": "boundary" } as Person<br/>Form.vue
+    participant Page@{ "type": "boundary" } as PersonEditor<br/>Page.vue
     end
-    Usuario->>Page: Guardar persona
-    Page->>Editor: submit y validar nombre/asignaciones
-    Editor->>Service: save persons con IDs y versión de edición
-    Service->>API: POST o PUT según modo
-    API-->>Service: confirmación o error
-    Service-->>Editor: contrato confirmado o rechazo
-    Editor-->>Page: onSaved o conservar captura/errores
+    box Coordinación
+    participant Editor@{ "type": "control" } as usePerson<br/>Editor.ts
+    participant Org@{ "type": "control" } as use<br/>Organization<br/>Options.ts
+    end
+    box Reglas y datos
+    participant Rules@{ "type": "control" } as personAccess<br/>Validation
+    end
+    Page->>Editor: crear editor con target y permissions
+    Editor->>Org: preparar opciones de áreas y roles
+    Note over Org: useRemoteLookup y organizationService consultan por permiso
+    Org-->>Editor: state de opciones
+    Editor-->>Page: organization.state
+    U->>Form: seleccionar área y rol, Agregar
+    Form->>Page: draft y add
+    Page->>Editor: addAccess()
+    Editor->>Rules: departmentId y roleId
+    Rules-->>Editor: mensaje o captura válida
+    alt área repetida o selección incompleta
+        Editor-->>Page: accessError sin añadir responsabilidad
+    else selección válida
+        Editor->>Editor: añadir IDs y etiquetas al borrador
+        Editor-->>Page: values.accesses
+    end
+    U->>Form: Guardar persona
+    Form->>Page: submit
+    Page->>Editor: submit(): validar nombre y responsabilidades
+    Note over Editor: Captura válida entra en useRecordSave, continuación en SEQ-039
 ```
+
+El [guardado de persona](04-person-save.md) completa validación, payload, servicio y
+confirmación.
 
 ## Reglas y recuperación
 
@@ -47,3 +57,11 @@ Las responsabilidades son de la persona; no se envían etiquetas ni datos de cue
 ## Evidencia
 
 identityTest.ts y records.spec.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
+
+## Fuentes de los participantes
+
+[PersonForm.vue](../../../../../src/modules/identity/components/PersonForm.vue),
+[PersonEditorPage.vue](../../../../../src/modules/identity/pages/PersonEditorPage.vue),
+[usePersonEditor.ts](../../../../../src/modules/identity/composables/usePersonEditor.ts),
+[useOrganizationOptions.ts](../../../../../src/shared/composables/useOrganizationOptions.ts),
+[personAccessValidation](../../../../../../back/src/public/js/utils/validations/validators.js).

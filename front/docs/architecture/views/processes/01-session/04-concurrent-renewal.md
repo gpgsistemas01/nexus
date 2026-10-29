@@ -16,16 +16,20 @@ que reciben 401 mientras la misma promesa `refresh` está pendiente.
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Client@{ "type": "boundary" } as apiClient
-    participant API@{ "type": "boundary" } as API externa
-    Note over Client,API: A y B ya enviadas
-    API-->>Client: 401 de A
-    Client->>Client: marcar A
-    Client->>API: POST refresh
-    API-->>Client: 401 de B
-    Client->>Client: await refresh
-    API-->>Client: refresh resuelto
-    Client->>Client: refresh = null
+    box Integración
+    participant HTTP@{ "type": "boundary" } as apiClient.ts
+    end
+    box Sistema externo
+    participant API@{ "type": "boundary" } as API del sistema
+    end
+    Note over HTTP,API: A y B ya fueron enviadas, ambas reciben 401 durante el mismo refresh
+    API-->>HTTP: 401 de A
+    HTTP->>HTTP: hasRetried de A true y crear refresh compartido
+    HTTP->>API: POST /api/auth/refresh sin renovación recursiva
+    API-->>HTTP: 401 de B
+    HTTP->>HTTP: hasRetried de B true y esperar el refresh existente
+    API-->>HTTP: resolver o rechazar renovación
+    HTTP->>HTTP: finally libera la promesa refresh
 ```
 
 ## Continuación de cada petición original
@@ -37,19 +41,24 @@ petición que esperaba la promesa anterior. Cada petición ejecuta su continuaci
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Client@{ "type": "boundary" } as apiClient
-    participant API@{ "type": "boundary" } as API externa
-    participant Owner@{ "type": "control" } as Consumidor
-    Client->>Client: await refresh
+    box Integración
+    participant Owner@{ "type": "boundary" } as purchase<br/>Service.ts
+    participant HTTP@{ "type": "boundary" } as apiClient.ts
+    end
+    box Sistema externo
+    participant API@{ "type": "boundary" } as API del sistema
+    end
+    Note over Owner,API: Un get de compra con signal espera la renovación de SEQ-024
     alt refresh rechazado
-        Client-->>Owner: error normalizado
+        HTTP-->>Owner: ApiError normalizado
+        Owner->>Owner: rechazar get sin documento
     else refresh aceptado
-        alt señal abortada
-            Client-->>Owner: cancelación
-        else sigue vigente
-            Client->>API: request(original)
-            API-->>Client: respuesta del reintento
-            Client-->>Owner: resultado o error
+        alt señal del original abortada
+            HTTP-->>Owner: cancelación del original
+        else original vigente
+            HTTP->>API: reenviar una vez GET de compra
+            API-->>HTTP: respuesta del reintento
+            HTTP-->>Owner: cuerpo o error normalizado
         end
     end
 ```
@@ -76,3 +85,8 @@ futuros en una renovación permanente ni repite escrituras arbitrariamente.
 distintas. El [arranque y guarda](01-bootstrap-and-session.md) decide navegación tras
 éxito, sesión terminada o servicio no disponible. Un reintento manual vuelve a comprobar
 acceso; no anuncia autenticación sin respuesta válida.
+
+## Fuentes de los participantes
+
+[apiClient.ts](../../../../../src/shared/http/apiClient.ts),
+[purchaseService.ts](../../../../../src/modules/purchases/services/purchaseService.ts).

@@ -94,26 +94,38 @@ los [estados](../../logical/states/index.md) desarrollan sus transiciones.
 editor y actualizar el listado? **Fuente:** `useIssueEditor`, `useRecordSave`,
 `issueService.save`, `confirmMutation` y `useIssueActions.handleSaved`.
 Secuencia UML del camino válido; los participantes son módulos funcionales.
-La página entrega `onSaved` al editor; se omite la propagación de eventos Vue entre
-contenedores para mantener visible el contrato del callback.
+El [guardado](../../processes/07-issues/01-issue-open-save.md) y su
+[transporte](../../processes/07-issues/07-issue-save-transport.md) confirman la operación.
+Esta figura desarrolla la entrega del callback y los eventos entre contenedores.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant E@{ "type": "control" } as useIssueEditor
-    participant G@{ "type": "control" } as useRecordSave
-    participant S@{ "type": "boundary" } as issueService
-    participant A@{ "type": "boundary" } as API
-    E->>G: execute(operation)
-    G->>E: operation(signal)
-    E->>E: mapear captura
-    E->>S: save(payload, signal)
-    S->>A: POST o PATCH
-    A-->>S: respuesta
-    S->>S: confirmMutation
-    S-->>E: confirmación
-    E-->>G: resultado de operation
-    G->>E: onSaved si vigente
+    box Interfaz
+    participant EditorPage@{ "type": "boundary" } as IssueEditor<br/>Page.vue
+    participant Page@{ "type": "boundary" } as Issue<br/>Page.vue
+    participant Feedback@{ "type": "boundary" } as feedback.ts
+    end
+    box Coordinación
+    participant Save@{ "type": "control" } as useRecord<br/>Save.ts
+    participant Actions@{ "type": "control" } as useIssue<br/>Actions.ts
+    participant State@{ "type": "control" } as useList<br/>Editor.ts
+    participant Reader@{ "type": "control" } as useDocument<br/>Read.ts
+    end
+    Note over Save: operation completó issueService.save y confirmMutation, SEQ-027 y SEQ-045
+    alt señal vigente
+        Save->>EditorPage: options.onSaved(confirmation)
+        EditorPage->>Page: emitir saved(confirmation)
+        Page->>Actions: handleSaved(confirmation)
+        Actions->>Actions: close()
+        Actions->>Reader: close()
+        Actions->>State: closeEditor()
+        Actions->>Page: options.reload() configurado
+        Page->>Page: cargar listado vigente
+        Actions->>Feedback: showSuccess(confirmation.message)
+    else desmontado
+        Save->>Save: omitir onSaved
+    end
 ```
 
 `onSaved` emite `saved` desde `IssueEditorPage`; `IssuePage` conecta ese evento con
@@ -183,3 +195,13 @@ adicionales comprueban que consulta/devolución no escriban el documento y que e
 surtido no altere detalles ya persistidos o cancelados ni el documento leído.
 Estas pruebas observan comportamiento; no fijan el número de archivos ni el
 nombre de una función privada.
+
+## Fuentes de los participantes
+
+[IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue),
+[IssuePage.vue](../../../../../src/modules/issues/pages/IssuePage.vue),
+[useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
+[useIssueActions.ts](../../../../../src/modules/issues/composables/useIssueActions.ts),
+[useListEditor.ts](../../../../../src/shared/composables/useListEditor.ts),
+[useDocumentRead.ts](../../../../../src/shared/composables/useDocumentRead.ts),
+[feedback.ts](../../../../../src/shared/ui/feedback.ts).

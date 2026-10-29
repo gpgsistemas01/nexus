@@ -117,10 +117,12 @@ sequenceDiagram
 | Símbolo `control`: círculo con flecha curva | Coordinación, decisión o cálculo: composable, Router, mapper o esquema. |
 | Nombre junto al símbolo | Colaborador representado; puede ser una función o módulo, sin una clase instanciada. |
 | Línea vertical bajo la cabecera | Línea de vida del participante. Se lee de arriba abajo. |
+| Caja de grupo con título | Agrupa líneas de vida por responsabilidad, como Interfaz, Coordinación o Integración. No representa una clase, un objeto adicional ni un proceso independiente. |
 | Flecha continua / discontinua | Llamada o solicitud / resultado, callback o actualización reactiva según su etiqueta y alcance. |
 | Flecha que vuelve al mismo participante | Paso interno de ese colaborador. |
 | Círculo oscuro con número | Orden del mensaje, generado por `autonumber`; no es un código HTTP ni prioridad. |
 | Marco `alt` / `opt` | Alternativas mutuamente excluyentes / recorrido opcional. La etiqueta expresa la condición. |
+| Marco `break` | Si se cumple la condición, el recorrido termina en ese punto; los mensajes posteriores no se ejecutan en esa rama. |
 | Caja de nota | Explicación del tramo señalado. Su fondo no representa un error. |
 
 El orden muestra coordinación; la distancia vertical entre mensajes no mide duración.

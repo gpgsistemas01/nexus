@@ -9,30 +9,42 @@ posterior invalida la anterior; desmontar impide publicar respuestas.
 
 **ID:** `DIA-VUE-SEQ-002`. **Pregunta:** ¿qué cambia al aplicar búsqueda y cómo se
 conserva el propietario de la tabla? **Fuente:** `useListSearch`, `usePagedList`,
-`useTableQuery`, servicio del recurso y `ServerTable`.
+`useTableQuery`, `DirectoryPage` y `directoryService`. La figura desarrolla la
+búsqueda de Directorio; el transporte paginado se amplía en `SEQ-035`.
 
 **Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Usuario
-    participant Pagina@{ "type": "boundary" } as Pagina
-    participant Lista@{ "type": "control" } as usePagedList
-    participant Servicio@{ "type": "boundary" } as Servicio
-    participant API@{ "type": "boundary" } as API
-    Usuario->>Pagina: aplicar búsqueda/filtros
-    Pagina->>Lista: applyQuery y página inicial
-    Lista->>Lista: invalidar consulta anterior
-    Lista->>Servicio: request(query, signal)
-    Servicio->>API: GET del recurso y parámetros permitidos
-    API-->>Servicio: filas y conteos
-    Servicio-->>Lista: PageResult validado
-    alt sigue vigente
-        Lista-->>Pagina: filas, total y estado de carga
-        Pagina-->>Usuario: tabla correspondiente a filtros aplicados
-    else consulta sustituida o desmontada
-        Lista->>Lista: descartar respuesta
+    actor U as Usuario autorizado
+    box Interfaz
+    participant Page@{ "type": "boundary" } as Directory<br/>Page.vue
+    end
+    box Coordinación
+    participant Search@{ "type": "control" } as useList<br/>Search.ts
+    participant List@{ "type": "control" } as usePaged<br/>List.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as directory<br/>Service.ts
+    end
+    U->>Page: aplicar búsqueda
+    Page->>Search: applySearch()
+    alt mismos criterios y página 1
+        Search->>List: load()
+    else criterios distintos o nueva página inicial
+        Search->>List: applyQuery(changes)
+        List->>List: reiniciar página y cargar
+    end
+    List->>List: invalidar lectura anterior
+    List->>Service: request(query, signal) configurado por DirectoryPage
+    Note over Service: list(resource, query, signal), transporte en SEQ-035
+    Service-->>List: PageResult de DirectoryEntry o error
+    alt lectura vigente
+        List-->>Page: rows, total, isLoading y error
+        Page-->>U: tabla de la consulta aplicada
+    else lectura sustituida o desmontada
+        List->>List: descartar respuesta
     end
 ```
 
@@ -57,3 +69,10 @@ un guardado. Un callback de una instancia desmontada no cierra otra captura.
 Las pruebas de catálogo, directorio, identidad e inventario representan payload,
 conflicto y cierre. Las pruebas de lista representan secuencia, búsqueda y recarga.
 La [cobertura por CU](../../../../testing/04-use-case-coverage.md) conserva los límites por recurso.
+
+## Fuentes de los participantes
+
+[DirectoryPage.vue](../../../../../src/modules/directory/pages/DirectoryPage.vue),
+[useListSearch.ts](../../../../../src/shared/composables/useListSearch.ts),
+[usePagedList.ts](../../../../../src/shared/composables/usePagedList.ts),
+[directoryService.ts](../../../../../src/modules/directory/services/directoryService.ts).

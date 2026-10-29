@@ -4,8 +4,6 @@
 
 **Casos relacionados:** RN-VUE-003/005/007; consultas de CU-ALM y listados.
 
-**Fuente técnica:** useVisibleRefresh.ts, useInventoryList.ts y usePagedList.ts.
-
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-019`.
@@ -15,31 +13,34 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Event@{ "type": "boundary" } as Eventos del navegador
-    participant Refresh@{ "type": "control" } as useVisibleRefresh
-    participant Domain@{ "type": "control" } as useInventoryList
-    participant List@{ "type": "control" } as usePagedList
-    participant Service@{ "type": "boundary" } as inventoryService
-    Event->>Refresh: refreshVisible
-    Refresh->>Refresh: visible y antigüedad mínima de 30 s
-    Refresh->>Domain: canRefresh
-    Domain-->>Refresh: permiso, sin editor y sin consulta pendiente
-    alt no corresponde recargar
-        Refresh->>Refresh: terminar sin request
-    else habilitado y vencido
-        Refresh->>List: refresh en segundo plano
-        List->>Service: request query aplicada y signal
+    box Coordinación
+    participant Refresh@{ "type": "control" } as useVisible<br/>Refresh.ts
+    participant Domain@{ "type": "control" } as useInventory<br/>List.ts
+    participant List@{ "type": "control" } as usePaged<br/>List.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
+    end
+    Note over Refresh: Foco, visibilidad o intervalo invocan refreshVisible
+    Refresh->>Domain: canRefresh() configurado por el consumidor
+    Domain-->>Refresh: permiso, sin editor ni consulta pendiente
+    alt visible, habilitado y antigüedad mínima cumplida
+        Refresh->>List: options.refresh(): refresh()
+        List->>List: iniciar lectura en segundo plano
+        List->>Service: request(query, signal)
         Service-->>List: PageResult o error
         alt resultado vigente
-            List->>List: conservar filas idénticas y actualizar conteo
-        else fallo o consulta reemplazada
-            List->>List: error recuperable o descartar obsoleta
+            List->>List: conservar filas idénticas y actualizar conteos
+        else error o lectura sustituida
+            List->>List: publicar error o descartar resultado antiguo
         end
-        List->>List: liberar isRefreshing sin bloquear tabla completa
+        List->>List: liberar isRefreshing
+    else no corresponde recargar
+        Refresh->>Refresh: terminar sin petición
     end
-    opt desmontaje
+    opt desmontaje del consumidor
         Refresh->>Refresh: retirar listeners e intervalo
-        List->>List: abortar e invalidar secuencia
+        List->>List: abortar e invalidar lectura
     end
 ```
 
@@ -50,3 +51,10 @@ El intervalo no determina por sí solo una carga periódica incondicional. Pausa
 ## Evidencia
 
 listInteractionTest.ts, inventoryListTest.ts y pruebas de recarga del navegador. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
+
+## Fuentes de los participantes
+
+[useVisibleRefresh.ts](../../../../../src/shared/composables/useVisibleRefresh.ts),
+[useInventoryList.ts](../../../../../src/modules/warehouse/composables/useInventoryList.ts),
+[usePagedList.ts](../../../../../src/shared/composables/usePagedList.ts),
+[inventoryService.ts](../../../../../src/modules/warehouse/services/inventoryService.ts).

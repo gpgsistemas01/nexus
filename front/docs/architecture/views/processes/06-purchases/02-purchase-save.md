@@ -4,8 +4,6 @@
 
 **Casos relacionados:** CU-ENT-02/03/08/09.
 
-**Fuente técnica:** usePurchaseEditor.ts, purchaseRequestMapper.ts, purchaseService.save y usePurchaseActions.handleSaved.
-
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-012`.
@@ -15,19 +13,39 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Usuario
-    participant Editor@{ "type": "control" } as usePurchaseEditor
-    participant Form@{ "type": "control" } as vee-validate
-    participant Save@{ "type": "control" } as useRecordSave
-    participant Mapper@{ "type": "control" } as Mapper
-    Usuario->>Editor: submit()
-    Editor->>Editor: habilitado
-    Editor->>Form: handleSubmit
-    Form-->>Editor: values válidos
-    Editor->>Save: execute(operation)
-    Save->>Editor: operation(signal)
-    Editor->>Mapper: values y documento
-    Mapper-->>Editor: payload permitido
+    actor U as Usuario autorizado
+    box Interfaz
+    participant Form@{ "type": "boundary" } as Purchase<br/>Editor.vue
+    participant Page@{ "type": "boundary" } as Purchase<br/>Editor<br/>Page.vue
+    end
+    box Coordinación
+    participant Editor@{ "type": "control" } as usePurchase<br/>Editor.ts
+    participant Save@{ "type": "control" } as useRecord<br/>Save.ts
+    end
+    box Reglas y datos
+    participant Schema@{ "type": "control" } as purchase<br/>Form.ts
+    participant Mapper@{ "type": "control" } as purchase<br/>Request<br/>Mapper.ts
+    end
+    Page->>Editor: crear editor con resource y target
+    Editor->>Schema: createInitialPurchaseValues y createPurchaseValidationSchema
+    Schema-->>Editor: captura inicial y esquema del modo
+    U->>Form: Guardar compra
+    Form->>Page: submit
+    Page->>Editor: submit()
+    alt consulta, pendiente, conflicto o desmontado
+        Editor-->>Page: sin nuevo guardado
+    else captura editable
+        Editor->>Editor: validar esquema de captura
+        alt inválida
+            Editor-->>Page: errors, conservar captura
+        else válida
+            Editor->>Save: execute(operation)
+            Save->>Editor: operation(signal)
+            Editor->>Mapper: mapPurchaseFormToRequest(values, document)
+            Mapper-->>Editor: campos admitidos y sólo partidas nuevas
+            Note over Editor,Mapper: Continúa en SEQ-031
+        end
+    end
 ```
 
 ## Envío y resultado de la operación
@@ -40,24 +58,45 @@ guardada y quién cierra la captura? **Fuentes:** `purchaseService.save`,
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Editor@{ "type": "control" } as Editor
-    participant Service@{ "type": "boundary" } as purchaseService
-    participant API@{ "type": "boundary" } as API externa
-    participant Save@{ "type": "control" } as useRecordSave
-    participant Actions@{ "type": "control" } as Actions
-    Editor->>Service: save(payload, signal)
-    Service->>API: POST o PATCH
-    API-->>Service: respuesta
-    Service->>Service: confirmMutation
+    box Coordinación
+    participant Editor@{ "type": "control" } as usePurchase<br/>Editor.ts
+    participant Save@{ "type": "control" } as useRecord<br/>Save.ts
+    end
+    box Reglas y datos
+    participant Contract@{ "type": "control" } as record<br/>Contract.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as purchase<br/>Service.ts
+    participant HTTP@{ "type": "boundary" } as apiClient.ts
+    end
+    box Sistema externo
+    participant API@{ "type": "boundary" } as API del sistema
+    end
+    Editor->>Service: save con resource, target, payload y signal
+    Service->>HTTP: request(url, method, data, signal)
+    HTTP->>API: POST compra o PATCH compra/id
+    API-->>HTTP: respuesta de operación
+    alt fallo HTTP o red
+        HTTP-->>Service: ApiError
+        Service-->>Editor: propagar rechazo
+        Editor-->>Save: rechazo de operation
+        break operación rechazada
+            Save->>Save: conservar mensaje y errores, sin onSaved
+        end
+    else petición admitida
+        HTTP-->>Service: cuerpo JSON
+    end
+    Service->>Contract: confirmMutation(response, expected)
     alt código esperado
+        Contract-->>Service: MutationConfirmation
         Service-->>Editor: confirmación
         Editor-->>Save: resultado de operation
-        Save->>Actions: onSaved si vigente
-        Actions->>Actions: cerrar/recargar
-    else rechazo o cuerpo inesperado
+        Note over Save: onSaved se entrega al contenedor, SEQ-041
+    else respuesta inesperada o rechazo
+        Contract-->>Service: ApiError de confirmación
         Service-->>Editor: error
         Editor-->>Save: rechazo de operation
-        Save->>Save: mensaje y campos
+        Save->>Save: mensaje, campos y conflicto si corresponde
     end
 ```
 
@@ -87,6 +126,35 @@ protege la apertura; `useRecordSave` impide dos ejecuciones simultáneas y evita
 después del desmontaje. Los límites de responsabilidad se conservan en
 [guardado confirmado](../../development/design-and-construction-patterns/08-document-responsibilities.md#secuencia-de-guardado-confirmado).
 
+## Entrega del evento y actualización del listado
+
+**Identificador:** `DIA-VUE-SEQ-041`. **Pregunta:** ¿Qué archivos enlazan onSaved con cierre, recarga y aviso?
+
+```mermaid
+sequenceDiagram
+    autonumber
+    box Interfaz
+    participant EditorPage@{ "type": "boundary" } as Purchase<br/>Editor<br/>Page.vue
+    participant Page@{ "type": "boundary" } as Purchase<br/>Page.vue
+    participant Feedback@{ "type": "boundary" } as feedback.ts
+    end
+    box Coordinación
+    participant Save@{ "type": "control" } as useRecord<br/>Save.ts
+    participant Actions@{ "type": "control" } as usePurchase<br/>Actions.ts
+    participant State@{ "type": "control" } as useList<br/>Editor.ts
+    end
+    Note over Save: Continuación de operation resuelta en SEQ-031
+    opt señal vigente
+        Save->>EditorPage: options.onSaved(confirmation)
+        EditorPage->>Page: emitir saved(confirmation)
+        Page->>Actions: handleSaved(confirmation)
+        Actions->>Actions: close(): cerrar lector y captura
+        Actions->>State: onSaved()
+        State->>Page: options.reload() configurado
+        Actions->>Feedback: showSuccess(confirmation.message)
+    end
+```
+
 ## Reglas y recuperación
 
 Las observaciones de encabezado se incluyen en lectura y escritura admitida; el historial de corrección no se sustituye por ese texto. La compra no contabiliza otra vez el alta contextual de un artículo.
@@ -94,3 +162,19 @@ Las observaciones de encabezado se incluyen en lectura y escritura admitida; el 
 ## Evidencia
 
 purchaseTest.ts, purchases.spec.ts y recordContractTest.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
+
+## Fuentes de los participantes
+
+[PurchaseEditor.vue](../../../../../src/modules/purchases/components/PurchaseEditor.vue),
+[PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue),
+[usePurchaseEditor.ts](../../../../../src/modules/purchases/composables/usePurchaseEditor.ts),
+[useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
+[purchaseForm.ts](../../../../../src/modules/purchases/purchaseForm.ts),
+[purchaseRequestMapper.ts](../../../../../src/modules/purchases/mappers/purchaseRequestMapper.ts),
+[recordContract.ts](../../../../../src/shared/http/recordContract.ts),
+[purchaseService.ts](../../../../../src/modules/purchases/services/purchaseService.ts),
+[apiClient.ts](../../../../../src/shared/http/apiClient.ts),
+[PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue),
+[feedback.ts](../../../../../src/shared/ui/feedback.ts),
+[usePurchaseActions.ts](../../../../../src/modules/purchases/composables/usePurchaseActions.ts),
+[useListEditor.ts](../../../../../src/shared/composables/useListEditor.ts).

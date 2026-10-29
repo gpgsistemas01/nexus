@@ -2,7 +2,7 @@
 
 ## Escenario y fuente
 
-Casos CU-ALM-04/14/20. Fuentes: `useInventoryRemoval.ts`, `inventoryService.mutate`
+Casos CU-ALM-04/20: Materiales y Consumibles. Fuentes: `useInventoryRemoval.ts`, `inventoryService.mutate`
 y `confirmAction`. La fila tiene ID de relación y entityId con significados distintos.
 
 ## Secuencia aplicada
@@ -15,30 +15,40 @@ la API conserva el control definitivo de relaciones y efectos.
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Usuario
-    participant Page@{ "type": "boundary" } as InventoryPage
-    participant Remove@{ "type": "control" } as useInventoryRemoval
-    participant Feedback@{ "type": "boundary" } as confirmAction
-    participant Service@{ "type": "boundary" } as inventoryService
-    participant API@{ "type": "boundary" } as API
-    Usuario->>Page: Eliminar fila autorizada
-    Page->>Remove: remove(row)
-    Remove->>Remove: bloquear confirmación duplicada
-    Remove->>Feedback: título, proveedor y submit cancelable
+    actor U as Usuario autorizado
+    box Interfaz
+    participant Page@{ "type": "boundary" } as Inventory<br/>Page.vue
+    participant Feedback@{ "type": "boundary" } as feedback.ts
+    end
+    box Coordinación
+    participant Inventory@{ "type": "control" } as use<br/>Inventory.ts
+    participant Remove@{ "type": "control" } as useInventory<br/>Removal.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
+    end
+    U->>Page: Eliminar fila autorizada
+    Page->>Inventory: openEditor con target delete
+    Inventory->>Remove: remove(row)
+    Remove->>Remove: comprobar bloqueo de confirmación
+    Remove->>Feedback: confirmAction con callback submit
+    Feedback-->>U: confirmación cancelable
     alt cancelar
-        Feedback-->>Remove: false sin request
-    else aceptar
-        Feedback->>Service: mutate delete con row.id y cuerpo vacío
-        Service->>API: operación de baja del recurso
+        Feedback-->>Remove: false sin petición
+    else confirmar
+        U->>Feedback: aceptar
+        Feedback->>Remove: submit() definido en remove
+        Remove->>Service: mutate(resource, delete, {}, row.id, signal)
         alt rechazo
-            API-->>Service: error
-            Service-->>Feedback: fallo normalizado
-            Feedback-->>Usuario: conservar aviso y reintento explícito
-        else confirmado
-            API-->>Service: código esperado
-            Service-->>Feedback: confirmación
+            Service-->>Remove: ApiError
+            Remove-->>Feedback: rechazar callback
+            Feedback-->>U: aviso abierto con error y reintento
+        else respuesta confirmada
+            Service-->>Remove: resultado validado
+            Remove-->>Feedback: callback resuelto
             Feedback-->>Remove: true
-            Remove->>Page: onSaved y recarga
+            Remove->>Inventory: onSaved()
+            Inventory->>Inventory: cerrar editor y recargar listado
         end
     end
     Remove->>Remove: finally libera isConfirming
@@ -50,3 +60,11 @@ El ID enviado es `row.id`, no `entityId`. Desmontar aborta el popup/solicitud; u
 invoca recuperación de acceso. Cancelar o fallar no anuncia eliminación exitosa.
 `warehouse.spec.ts`, pruebas de `feedback` y `inventoryService` conservan la evidencia
 representativa; la eliminación persistente requiere API/base reales.
+
+## Fuentes de los participantes
+
+[InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue),
+[feedback.ts](../../../../../src/shared/ui/feedback.ts),
+[useInventory.ts](../../../../../src/modules/warehouse/composables/useInventory.ts),
+[useInventoryRemoval.ts](../../../../../src/modules/warehouse/composables/useInventoryRemoval.ts),
+[inventoryService.ts](../../../../../src/modules/warehouse/services/inventoryService.ts).
