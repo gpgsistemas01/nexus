@@ -8,7 +8,7 @@ Compras y Salidas; no necesita iniciar las consultas de Directorio.
 
 ## Proveedores
 
-**Identificador:** `DIA-VUE-CU-010`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-010`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -30,16 +30,11 @@ direction LR
     admin -- ucSupplierCreate
     admin -- ucSupplierEdit
     admin -- ucSupplierReport
-
-    ucSupplierCreate ..>:extend ucSupplierQuery
-    ucSupplierEdit ..>:extend ucSupplierQuery
-    ucSupplierReport ..>:extend ucSupplierQuery
 ```
-
 
 ## Clientes
 
-**Identificador:** `DIA-VUE-CU-011`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-011`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -59,10 +54,6 @@ direction LR
     admin -- ucClientCreate
     admin -- ucClientEdit
     admin -- ucClientReport
-
-    ucClientCreate ..>:extend ucClientQuery
-    ucClientEdit ..>:extend ucClientQuery
-    ucClientReport ..>:extend ucClientQuery
 ```
 
 Almacén participa en el alta únicamente desde un selector de una operación

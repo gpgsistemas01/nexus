@@ -5,7 +5,6 @@
 | Identificador | `CU-SAL-05` |
 | Nombre | Surtir material. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-SAL-01` en **Acciones sobre los resultados** (después del paso 4, flujo A4) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Va a entregar material de una solicitud pendiente y abre sus detalles. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. El detalle conserva cantidad pendiente.<br>5. Hay existencia suficiente para surtir la cantidad solicitada. |
 | Flujo principal | 1. **Actor:** abre los detalles de la salida de material y selecciona un renglón pendiente **(ver E1)**.<br>2. **Nexus:** muestra la cantidad pendiente y la existencia disponible.<br>3. **Actor:** marca los renglones que surtirá, captura la cantidad de proyecto requerida para cada uno y confirma **(ver A1)**.<br>4. **Nexus:** valida el estado, los renglones seleccionados, la cantidad pendiente y la existencia suficiente **(ver A2)** **(ver E2)**; descuenta existencia, acumula lo surtido, actualiza estados, registra el movimiento y confirma **(ver EOP)**. |

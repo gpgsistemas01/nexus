@@ -6,6 +6,11 @@ condición y retorno que los demás modelos. El Administrador del sistema hereda
 participación de Almacén; las áreas operativas no reciben permisos de alta de
 Directorio por poder solicitar una salida.
 
+Las líneas continuas representan la participación de Almacén tanto en la captura
+como en el alta auxiliar. Las flechas `«extend»` representan únicamente la inserción
+condicionada de esa alta; no sustituyen asociaciones ni transmiten actores. Los demás
+participantes de las capturas se muestran en sus cortes funcionales.
+
 **Fuente:** `InventoryWorkspace`, `PurchaseEditorPage`, `IssueWorkspace`,
 `IssueEditorPage` y las fichas de las capturas y altas auxiliares.
 **Lectura visual:** [actores, extensiones y dirección de flechas](../../architecture/views/diagram-reading.md#casos-de-uso).
@@ -26,6 +31,10 @@ direction LR
         consumablePurchase("CU-ENT-08 Crear compra de consumible")
     end
     warehouse -- supplier
+    warehouse -- material
+    warehouse -- consumable
+    warehouse -- materialPurchase
+    warehouse -- consumablePurchase
     supplier ..>:extend material
     supplier ..>:extend consumable
     supplier ..>:extend materialPurchase
@@ -55,6 +64,10 @@ direction LR
     end
     warehouse -- material
     warehouse -- consumable
+    warehouse -- createMaterialPurchase
+    warehouse -- editMaterialPurchase
+    warehouse -- createConsumablePurchase
+    warehouse -- editConsumablePurchase
     material ..>:extend createMaterialPurchase
     material ..>:extend editMaterialPurchase
     consumable ..>:extend createConsumablePurchase
@@ -84,6 +97,12 @@ direction LR
         headerConsumable("CU-SAL-17 Editar encabezado de consumible")
     end
     warehouse -- client
+    warehouse -- createMaterial
+    warehouse -- headerMaterial
+    warehouse -- createWaste
+    warehouse -- headerWaste
+    warehouse -- createConsumable
+    warehouse -- headerConsumable
     client ..>:extend createMaterial
     client ..>:extend headerMaterial
     client ..>:extend createWaste

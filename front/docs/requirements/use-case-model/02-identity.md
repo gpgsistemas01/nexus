@@ -6,7 +6,7 @@ La [jerarquía común de actores](01-access.md#autenticación) conserva la parti
 
 ## Personas
 
-**Identificador:** `DIA-VUE-CU-002`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-002`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -29,16 +29,11 @@ direction LR
     warehouse -- ucPersonCreate
     warehouse -- ucPersonEdit
     warehouse -- ucPersonReport
-
-    ucPersonCreate ..>:extend ucPersonQuery
-    ucPersonEdit ..>:extend ucPersonQuery
-    ucPersonReport ..>:extend ucPersonQuery
 ```
-
 
 ## Usuarios y credenciales
 
-**Identificador:** `DIA-VUE-CU-003`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-003`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -61,9 +56,4 @@ direction LR
     admin -- ucUserEdit
     admin -- ucPasswordEdit
     admin -- ucUserReport
-
-    ucUserCreate ..>:extend ucUserQuery
-    ucUserEdit ..>:extend ucUserQuery
-    ucPasswordEdit ..>:extend ucUserQuery
-    ucUserReport ..>:extend ucUserQuery
 ```

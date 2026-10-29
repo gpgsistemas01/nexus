@@ -137,8 +137,8 @@ Un **actor de caso de uso** es el papel externo que interactúa con Nexus para
 alcanzar un objetivo. Puede especializar a otro actor; no representa una entidad
 de datos, una cuenta concreta ni una pantalla.
 
-**Ejemplo:** `DIA-VUE-LEG-004`. Consulta compartida, acción opcional de un actor
-especializado y comportamiento requerido por esa acción. Es un ejemplo de notación,
+**Ejemplo:** `DIA-VUE-LEG-004`. Consulta compartida, objetivo propio de un actor
+especializado y comportamientos incorporados a ese objetivo. Es un ejemplo de notación,
 no otro conjunto de casos de Nexus.
 
 ```mermaid
@@ -149,13 +149,15 @@ direction LR
     specialized --|> general
     systemBoundary example["Sistema de ejemplo"]
         main("Consultar registros")
-        extra("Modificar registro")
+        extra("Ejecutar operación")
         required("Comportamiento requerido")
+        optional("Resolver situación opcional")
     end
     general -- main
     specialized -- extra
-    extra ..>:extend main
+    specialized -- optional
     extra ..>:include required
+    optional ..>:extend extra
 ```
 
 | Elemento visible | Lectura |
@@ -163,16 +165,23 @@ direction LR
 | Figura humana con nombre | Actor: una función externa que participa, no una cuenta concreta. |
 | Óvalo | Objetivo del actor, identificado por `CU-*` en los modelos de Nexus. |
 | Rectángulo que agrupa óvalos | Límite del sistema o corte funcional; los actores quedan fuera. |
-| Línea actor–óvalo | Participación del actor; no orden de ejecución ni concesión automática de permisos. |
-| Triángulo hueco entre actores | Especialización; apunta al actor general. |
-| Flecha discontinua `«extend»` | Del caso opcional al caso base; se incorpora bajo la condición de extensión y retorna al paso indicado por la ficha. |
-| Flecha discontinua `«include»` | De la base al comportamiento requerido que incorpora. No expresa cronología de pantallas ni permisos. |
+| Línea continua actor–óvalo, sin punta | Asociación normal: participación del actor en el objetivo, incluida la consulta. No indica orden de ejecución ni concesión automática de permisos. |
+| Triángulo hueco entre actores | Generalización; apunta al actor general. El especializado hereda sus asociaciones y conserva las propias. |
+| Flecha discontinua `«extend»` | Del caso que agrega comportamiento al caso base. Requiere un punto de extensión y una condición documentados; la base conserva sentido completo sin la extensión. |
+| Flecha discontinua `«include»` | De la base al comportamiento requerido al alcanzar su punto de inclusión. No expresa cronología de pantallas ni permisos. |
 
-En Nexus, las acciones opcionales de consulta y las altas contextuales usan
-extensiones condicionadas por elección, permisos y estado. Ajustar, por ejemplo,
-mantiene un actor administrativo aunque otros usuarios puedan consultar. La inclusión
-del ejemplo explica su notación: no atribuye un `include` nuevo a los casos del sistema.
-No existe un conector UML `exclude`; un rechazo se expresa mediante condiciones y excepciones.
+En el ejemplo, el actor especializado puede consultar por herencia e iniciar su
+operación por la asociación propia. No hay una relación entre Consultar registros y
+Ejecutar operación. Dentro de esta última, el comportamiento requerido se incorpora
+al alcanzar su punto de inclusión; la situación opcional se inserta sólo cuando se
+cumple su condición, en el punto de extensión definido para resolverla.
+
+En Nexus, las asociaciones de consulta y mantenimiento se mantienen independientes.
+Las altas contextuales desde selectores justifican `«extend»` por su inserción y
+retorno a una captura; las fichas identifican condición y punto concretos. La inclusión
+del ejemplo explica su notación sin atribuir un `include` a los casos del sistema.
+La [guía del modelo](../../requirements/use-case-model/index.md#asociaciones-y-relaciones-entre-casos)
+concentra la aplicación de estas relaciones y la representación de restricciones.
 La navegación entre pantallas se documenta en su [catálogo](scenarios/navigation-and-screens.md).
 
 ## Mapas y actividades

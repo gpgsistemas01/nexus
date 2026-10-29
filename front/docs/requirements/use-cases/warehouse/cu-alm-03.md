@@ -5,7 +5,6 @@
 | Identificador | `CU-ALM-03` |
 | Nombre | Editar material. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-ALM-01` en **Acciones sobre los resultados** (después del paso 4, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Detecta datos que debe corregir en un material y selecciona su acción de edición. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Flujo principal | 1. **Actor:** selecciona material y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra los valores actuales; bloquea proveedor, presentación, unidad y dimensiones, y habilita nombre, stock mínimo, costo máximo y estado de la oferta.<br>3. **Actor:** modifica los datos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, formato, identidad y relaciones **(ver A2)**; actualiza los datos compartidos del material y el costo y estado de la oferta seleccionada, actualiza el listado y muestra la confirmación **(ver EOP)**. |

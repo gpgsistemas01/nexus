@@ -5,7 +5,6 @@
 | Identificador | `CU-CAT-07` |
 | Nombre | Editar cliente. |
 | Actor | Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-CAT-05` en **Acciones sobre los resultados** (después del paso 4, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Detecta datos que debe corregir en un cliente y selecciona su acción de edición. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Flujo principal | 1. **Actor:** selecciona cliente y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra el nombre y el estado actuales.<br>3. **Actor:** modifica el nombre o la casilla **Activo** y confirma **(ver A1)**.<br>4. **Nexus:** comprueba que la información sea válida; guarda los cambios, actualiza el listado y muestra la confirmación **(ver EOP)**. |

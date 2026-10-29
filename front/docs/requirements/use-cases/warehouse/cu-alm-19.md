@@ -5,7 +5,6 @@
 | Identificador | `CU-ALM-19` |
 | Nombre | Editar consumible. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-ALM-17` en **Acciones sobre los resultados** (después del paso 4, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Selecciona **Editar** sobre un renglón de `CU-ALM-17`. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor tiene autorización para mantener el catálogo de consumibles.<br>3. El consumible y la oferta seleccionada existen. |
 | Flujo principal | 1. **Actor:** selecciona **Editar registro** sobre una oferta **(ver E1)**.<br>2. **Nexus:** comprueba que el artículo sea un consumible, carga nombre, stock mínimo, costo máximo y estado y mantiene proveedor, presentación, unidad, tipo y existencia fuera de edición.<br>3. **Actor:** modifica uno o más campos admitidos y confirma **(ver A1)**.<br>4. **Nexus:** comprueba que los datos sean válidos y que el artículo siga clasificado como consumible; actualiza como una sola operación los campos compartidos de la identidad y los propios de la oferta seleccionada **(ver A2)** **(ver EOP)**; confirma, cierra el formulario y actualiza el listado de consumibles sin ajustar stock. |

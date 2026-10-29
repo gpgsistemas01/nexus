@@ -8,7 +8,7 @@ Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-conte
 
 ## Compras de materiales
 
-**Identificador:** `DIA-VUE-CU-018`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-018`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -29,25 +29,17 @@ direction LR
         ucPurchaseReport("CU-ENT-06 Generar reporte")
     end
 
-
     warehouse -- ucReceiptQuery
     warehouse -- ucReceiptCreate
     warehouse -- ucReceiptEdit
     warehouse -- ucReceiptCorrect
     warehouse -- ucReceiptCancel
     warehouse -- ucPurchaseReport
-
-    ucReceiptCreate ..>:extend ucReceiptQuery
-    ucReceiptEdit ..>:extend ucReceiptQuery
-    ucReceiptCorrect ..>:extend ucReceiptQuery
-    ucReceiptCancel ..>:extend ucReceiptQuery
-    ucPurchaseReport ..>:extend ucReceiptQuery
 ```
-
 
 ## Compras de consumibles
 
-**Identificador:** `DIA-VUE-CU-019`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-019`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -66,17 +58,10 @@ direction LR
         ucConsumablePurchaseReport("CU-ENT-12 Generar reporte")
     end
 
-
     warehouse -- ucConsumableReceiptQuery
     warehouse -- ucConsumableReceiptCreate
     warehouse -- ucConsumableReceiptEdit
     warehouse -- ucConsumableReceiptCorrect
     warehouse -- ucConsumableReceiptCancel
     warehouse -- ucConsumablePurchaseReport
-
-    ucConsumableReceiptCreate ..>:extend ucConsumableReceiptQuery
-    ucConsumableReceiptEdit ..>:extend ucConsumableReceiptQuery
-    ucConsumableReceiptCorrect ..>:extend ucConsumableReceiptQuery
-    ucConsumableReceiptCancel ..>:extend ucConsumableReceiptQuery
-    ucConsumablePurchaseReport ..>:extend ucConsumableReceiptQuery
 ```

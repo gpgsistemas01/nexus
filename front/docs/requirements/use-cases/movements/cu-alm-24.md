@@ -5,7 +5,6 @@
 | Identificador | `CU-ALM-24` |
 | Nombre | Generar reporte de movimientos de consumibles. |
 | Actor | Administrador del sistema del área Sistemas. |
-| Relaciones entre casos | Extiende `CU-ALM-23` en **Acciones sobre los resultados** (después del paso 4, flujo A2) bajo la condición: elección del actor, permiso de reporte y criterios admitidos. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Desde `CU-ALM-23` Consultar movimientos de consumibles, selecciona **Exportar Excel** con los filtros que necesita conservar. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** con las opciones **Mes actual**, **Mes específico** y **Filtros aplicados en la tabla** **(ver E1)**.<br>2. **Actor:** elige el alcance, captura **Mes del reporte** si eligió un mes específico y pulsa **Descargar Excel** **(ver A1 y A2)**.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros; usa los filtros aplicados si se eligió esa opción, o el mes completo sin los filtros de la tabla si se eligió un alcance mensual. Obtiene la información **(ver EOP)** de movimientos de consumibles, conservando el contexto en informes personalizados y mensuales; genera el archivo de Excel e inicia su descarga. |

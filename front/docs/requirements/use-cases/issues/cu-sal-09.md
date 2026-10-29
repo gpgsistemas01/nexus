@@ -5,7 +5,6 @@
 | Identificador | `CU-SAL-09` |
 | Nombre | Crear salida de merma. |
 | Actor | Usuario autorizado de área operativa, Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-SAL-08` en **Acciones sobre los resultados** (después del paso 4, flujo A7) bajo la condición: elección del actor y permiso de alta para ese contexto. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Puntos de extensión | Cliente no catalogado: durante el paso 3, elección **Registrar cliente** con permisos de lectura y alta; extensión `CU-CAT-06`, flujo A3; retorna al paso 3. |
 | Disparador | Selecciona la acción principal para crear una salida desde `CU-SAL-08` Consultar salidas de merma. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro.<br>4. El área del documento y el área de destino pertenecen al alcance autorizado de la sesión. |

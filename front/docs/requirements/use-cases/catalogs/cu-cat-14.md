@@ -5,7 +5,6 @@
 | Identificador | `CU-CAT-14` |
 | Nombre | Editar rol. |
 | Actor | Administrador del sistema del área Sistemas. |
-| Relaciones entre casos | Extiende `CU-CAT-12` en **Acciones sobre los resultados** (después del paso 2, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 3 de la consulta. |
 | Disparador | Selecciona **Editar registro** en la pantalla **Roles**. |
 | Precondiciones | 1. El actor inició sesión y tiene autorización para administrar catálogos.<br>2. La entrada existe en **Roles**. |
 | Flujo principal | 1. **Actor:** abre **Roles** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Actor:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Roles; confirma y refresca la tabla de Roles **(ver EOP)**. |

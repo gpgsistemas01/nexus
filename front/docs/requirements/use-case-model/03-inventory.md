@@ -6,7 +6,7 @@ Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-conte
 
 ## Materiales
 
-**Identificador:** `DIA-VUE-CU-004`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-004`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -37,18 +37,11 @@ direction LR
     warehouse -- ucMaterialRemove
     warehouse -- ucMaterialInventoryReport
     operational -- ucMaterialQuery
-
-    ucMaterialCreate ..>:extend ucMaterialQuery
-    ucMaterialEdit ..>:extend ucMaterialQuery
-    ucMaterialRemove ..>:extend ucMaterialQuery
-    ucMaterialStock ..>:extend ucMaterialQuery
-    ucMaterialInventoryReport ..>:extend ucMaterialQuery
 ```
-
 
 ## Mermas
 
-**Identificador:** `DIA-VUE-CU-006`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-006`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -77,18 +70,11 @@ direction LR
     warehouse -- ucWasteAddStock
     warehouse -- ucWasteReport
     operational -- ucWasteQuery
-
-    ucWasteCreate ..>:extend ucWasteQuery
-    ucWasteEdit ..>:extend ucWasteQuery
-    ucWasteStock ..>:extend ucWasteQuery
-    ucWasteAddStock ..>:extend ucWasteQuery
-    ucWasteReport ..>:extend ucWasteQuery
 ```
-
 
 ## Consumibles
 
-**Identificador:** `DIA-VUE-CU-008`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-008`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -117,10 +103,4 @@ direction LR
     warehouse -- ucConsumableRemove
     warehouse -- ucConsumableReport
     operational -- ucConsumableQuery
-
-    ucConsumableCreate ..>:extend ucConsumableQuery
-    ucConsumableEdit ..>:extend ucConsumableQuery
-    ucConsumableRemove ..>:extend ucConsumableQuery
-    ucConsumableStock ..>:extend ucConsumableQuery
-    ucConsumableReport ..>:extend ucConsumableQuery
 ```

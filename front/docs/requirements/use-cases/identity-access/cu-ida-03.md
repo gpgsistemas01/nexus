@@ -5,7 +5,6 @@
 | Identificador | `CU-IDA-03` |
 | Nombre | Editar persona. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-IDA-01` en **Acciones sobre los resultados** (después del paso 4, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Detecta datos que debe corregir en una persona y selecciona su acción de edición. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Flujo principal | 1. **Actor:** selecciona una persona y abre la edición **(ver E1)**.<br>2. **Nexus:** muestra el nombre y la tabla de accesos actuales, con las acciones permitidas.<br>3. **Actor:** modifica el nombre, elimina un acceso existente o selecciona un área y un rol y selecciona **Agregar** para incorporar un acceso nuevo **(ver A1)**.<br>4. **Nexus:** valida el acceso nuevo cuando corresponde y refleja la adición o eliminación en la tabla sin guardar todavía los cambios.<br>5. **Actor:** repite las operaciones necesarias, revisa los renglones de la tabla y selecciona **Actualizar**.<br>6. **Nexus:** valida autorización, formato, identidad y todos los accesos **(ver A2)**; guarda la persona y reemplaza sus asignaciones como una sola operación, actualiza el listado y muestra la confirmación **(ver EOP)**. |

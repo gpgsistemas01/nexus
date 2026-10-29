@@ -30,3 +30,10 @@ direction LR
     user -- ucLogin
     user -- ucLogout
 ```
+
+El triángulo apunta al actor general. Personal de almacén y Usuario de área operativa
+heredan las asociaciones de Usuario registrado, pero no las del otro. Administrador
+del sistema hereda las de Personal de almacén y agrega sus objetivos exclusivos.
+Por eso no se repiten las líneas de autenticación para cada especialización ni las
+operaciones de Almacén para el administrador. Una generalización entre actores no
+establece `include` ni `extend` entre sus objetivos.

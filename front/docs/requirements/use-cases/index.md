@@ -13,21 +13,23 @@ El [modelo visual de casos de uso](../use-case-model/index.md) representa actore
 
 ## Semántica de actores y generalización UML
 
-En los diagramas, las asociaciones compartidas enlazan al actor general con la consulta
-del recurso. Las asociaciones directas con otras operaciones corresponden a los casos
-particulares justificados en las fichas. Estas nombran a los actores autorizados para
-iniciar el objetivo; una relación entre casos no hereda actores ni concede permisos. Personal de almacén especializa a
+En los diagramas, la consulta mantiene una asociación normal con el actor que la
+realiza. Las asociaciones compartidas por una jerarquía se sitúan en el actor general
+que participa en esos objetivos; las exclusivas se sitúan en el especializado. Cada
+ficha nombra a los actores autorizados para iniciar su objetivo; una relación entre
+casos no hereda actores ni concede permisos. Personal de almacén especializa a
 Usuario registrado; Administrador del sistema especializa a Personal de almacén y
 hereda todas sus asociaciones. Los casos exclusivos del administrador conservan
 asociaciones directas adicionales; no se duplican las funciones heredadas.
 
-La notación, dirección y límites de la representación Mermaid se explican en el
-modelo de escenarios. Las
-asociaciones son líneas continuas sin punta; la generalización tiene un triángulo hueco
+La [guía visual](../../architecture/views/diagram-reading.md#casos-de-uso) explica la
+notación y dirección de las relaciones Mermaid. Las asociaciones son líneas continuas
+sin punta; la generalización tiene un triángulo hueco
 hacia el general; `«include»` y `«extend»` son dependencias discontinuas con el estereotipo
-correspondiente. La generalización no lleva texto adicional. Las operaciones opcionales
-realizadas dentro de una consulta usan extensiones con condición, punto y retorno;
-una línea simple entre casos no se utiliza para sustituir esa semántica.
+correspondiente. La generalización no lleva texto adicional. No establece inclusiones
+ni extensiones entre los objetivos de esos actores. Las acciones de una pantalla
+pueden iniciar objetivos independientes sin relacionarlos con `include` o `extend`;
+una línea simple entre casos tampoco representa esa navegación.
 
 ## Estructura de las fichas
 
@@ -60,13 +62,17 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   comienza con el participante que debe actuar después del paso referenciado: si ese
   paso corresponde a Nexus, comienza el actor; si corresponde al actor, comienza Nexus.
   El flujo principal de consulta termina al revisar los resultados: no obliga a crear,
-  modificar ni exportar. Las acciones opcionales se describen como extensiones
-  independientes en sus alternativas, sin agrupar destinos distintos bajo «Elegir
-  otra acción».
-- **Puntos de extensión y relaciones entre casos:** la consulta identifica dónde
-  ofrece cada extensión y su condición. La ficha extendiente nombra la base, alternativa
-  y retorno. Una operación puede extender más de una base cuando conserva el mismo
-  objetivo desde un listado o desde una captura contextual.
+  modificar ni exportar. Sus alternativas describen variantes de la consulta, como
+  cambiar los criterios.
+- **Acciones de la pantalla:** identifica controles y fichas de otros objetivos que
+  pueden iniciarse desde el listado. Es una referencia de navegación; cada destino
+  conserva sus actores, precondiciones y resultados. No forma parte del flujo ni de
+  las postcondiciones de la consulta.
+- **Puntos de extensión y relaciones entre casos:** se incluyen cuando hay una
+  inserción de comportamiento justificada. La base identifica el punto y la condición;
+  la ficha que extiende nombra la base, alternativa y retorno. Un alta auxiliar puede
+  extender varias capturas cuando devuelve el registro seleccionado y permite
+  continuarlas. Abrirla desde un listado no basta para establecer esa relación.
 - **Excepciones:** título breve, punto de rechazo o fallo y serie numerada de pasos que
   describe el efecto protegido y la terminación del caso. Su secuencia respeta la misma
   alternancia de participantes definida para los flujos alternativos.
@@ -86,21 +92,21 @@ después del cual se inicia y cada excepción identifica el paso o flujo alterna
 después del cual puede ocurrir.
 El primer paso de esa secuencia no repite la acción referenciada, sino que continúa con
 el otro participante. Así, la variante o el rechazo puede localizarse sin inferir su
-punto de extensión a partir de otra sección. Los párrafos de grupo sólo declaran
+punto de inicio a partir de otra sección. Los párrafos de grupo sólo declaran
 contexto realmente compartido y no mantienen una segunda versión de los flujos.
 
 El último paso de cada alternativa declara su destino: **continúa en el paso N del flujo
 principal** cuando retorna dentro del mismo caso, o **termina el caso de uso** cuando no
-quedan más interacciones. No se usa «volver» o «continuar» sin indicar el paso. Si el
-destino fuera otro caso de uso, no se redactaría como un salto de control informal:
+quedan más interacciones. No se usa «volver» o «continuar» sin indicar el paso.
+Las relaciones UML se distinguen de la navegación a otro objetivo:
 
 - Una asociación simple conecta al actor con el caso en el que participa; se dibuja
   como línea continua sin punta ni frase. No representa una llamada ni transmite
-  permisos a otros casos. Las acciones de mantenimiento o reporte que se ejecutan
-  dentro de la consulta se insertan en su punto de extensión y comprueban sus propias
-  precondiciones y autorización.
-- `«include»` identifica un caso requerido que el caso base incorpora siempre; al
-  concluir, la interacción continúa en el paso siguiente a la inclusión.
+  permisos a otros casos. La consulta y las operaciones de mantenimiento o reporte
+  mantienen sus propias asociaciones aunque compartan pantalla.
+- `«include»` identifica comportamiento requerido que el caso base incorpora al
+  alcanzar el punto de inclusión; al concluir, la interacción continúa en el paso
+  siguiente a la inclusión.
 - `«extend»` identifica comportamiento opcional que se inserta en un punto de extensión
   del caso base; al concluir, continúa en el paso de retorno indicado por la ficha.
 - La **generalización** identifica un caso especializado que sustituye el comportamiento
@@ -114,8 +120,9 @@ por sí solo una relación UML.
 
 `include` no representa una consulta previa, una lectura interna de datos ni una
 restricción de actor. `exclude` no es una relación UML: las prohibiciones se expresan
-mediante permisos, condiciones y excepciones. Una extensión puede pertenecer a un
-actor específico aunque la consulta sea compartida con otros actores.
+mediante permisos, condiciones y excepciones. El
+[modelo visual](../use-case-model/index.md#asociaciones-y-relaciones-entre-casos)
+concentra los ejemplos del sistema y justifica las extensiones de altas contextuales.
 
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
 En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela

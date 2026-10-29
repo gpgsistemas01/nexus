@@ -8,7 +8,7 @@ Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-conte
 
 ## Salidas de materiales
 
-**Identificador:** `DIA-VUE-CU-020`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-020`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -31,7 +31,6 @@ direction LR
         ucMaterialIssueReport("CU-SAL-07 Generar reporte")
     end
 
-
     warehouse -- ucMaterialIssueQuery
     warehouse -- ucMaterialIssueCreate
     warehouse -- ucMaterialIssueHeader
@@ -43,20 +42,11 @@ direction LR
     operational -- ucMaterialIssueCreate
     operational -- ucMaterialIssueHeader
     operational -- ucMaterialIssueDetails
-
-
-    ucMaterialIssueCreate ..>:extend ucMaterialIssueQuery
-    ucMaterialIssueHeader ..>:extend ucMaterialIssueQuery
-    ucMaterialIssueDetails ..>:extend ucMaterialIssueQuery
-    ucMaterialSupply ..>:extend ucMaterialIssueQuery
-    ucMaterialReturn ..>:extend ucMaterialIssueQuery
-    ucMaterialIssueReport ..>:extend ucMaterialIssueQuery
 ```
-
 
 ## Salidas de mermas
 
-**Identificador:** `DIA-VUE-CU-021`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-021`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -88,20 +78,11 @@ direction LR
     operational -- ucWasteIssueCreate
     operational -- ucWasteIssueHeader
     operational -- ucWasteIssueDetails
-
-
-    ucWasteIssueCreate ..>:extend ucWasteIssueQuery
-    ucWasteIssueHeader ..>:extend ucWasteIssueQuery
-    ucWasteIssueDetails ..>:extend ucWasteIssueQuery
-    ucWasteSupply ..>:extend ucWasteIssueQuery
-    ucWasteReturn ..>:extend ucWasteIssueQuery
-    ucWasteIssueReport ..>:extend ucWasteIssueQuery
 ```
-
 
 ## Salidas de consumibles
 
-**Identificador:** `DIA-VUE-CU-022`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-022`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -122,7 +103,6 @@ direction LR
         ucConsumableIssueReport("CU-SAL-21 Generar reporte")
     end
 
-
     warehouse -- ucConsumableIssueQuery
     warehouse -- ucConsumableIssueCreate
     warehouse -- ucConsumableIssueHeader
@@ -134,12 +114,4 @@ direction LR
     operational -- ucConsumableIssueCreate
     operational -- ucConsumableIssueHeader
     operational -- ucConsumableIssueDetails
-
-
-    ucConsumableIssueCreate ..>:extend ucConsumableIssueQuery
-    ucConsumableIssueHeader ..>:extend ucConsumableIssueQuery
-    ucConsumableIssueDetails ..>:extend ucConsumableIssueQuery
-    ucConsumableSupply ..>:extend ucConsumableIssueQuery
-    ucConsumableReturn ..>:extend ucConsumableIssueQuery
-    ucConsumableIssueReport ..>:extend ucConsumableIssueQuery
 ```

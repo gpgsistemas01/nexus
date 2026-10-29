@@ -22,9 +22,13 @@ complementan y no se repiten aquí como otra matriz.
 
 Personal de almacén especializa a Usuario registrado; Administrador del sistema
 especializa a Personal de almacén y hereda sus asociaciones, incluida autenticación.
-Las asociaciones compartidas se dibujan sólo en el actor general; los objetivos
+Usuario de área operativa también especializa a Usuario registrado, en una rama
+independiente: no hereda las funciones de Almacén. Las asociaciones compartidas por
+una jerarquía se dibujan en su actor general; los objetivos
 exclusivos, como ajustes administrativos y consulta de movimientos, se asocian al
-administrador. Esta generalización funcional no sustituye la comprobación de permisos.
+administrador. Consultar conserva una asociación normal y no incluye ni extiende las
+otras acciones por compartir pantalla. La generalización de actores no define
+relaciones entre casos ni sustituye la comprobación de permisos.
 
 Solicitantes, aprobadores, asesores, receptores y proveedores
 pueden participar en un documento sin convertirse por ello en actores con acceso. Las

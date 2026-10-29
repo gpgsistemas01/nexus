@@ -5,7 +5,6 @@
 | Identificador | `CU-CAT-11` |
 | Nombre | Editar área. |
 | Actor | Administrador del sistema del área Sistemas. |
-| Relaciones entre casos | Extiende `CU-CAT-09` en **Acciones sobre los resultados** (después del paso 2, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 3 de la consulta. |
 | Disparador | Selecciona **Editar registro** en la pantalla **Áreas**. |
 | Precondiciones | 1. El actor inició sesión y tiene autorización para administrar catálogos.<br>2. La entrada existe en **Áreas**. |
 | Flujo principal | 1. **Actor:** abre **Áreas** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes de **Nombre** y **Activo**.<br>3. **Actor:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Áreas; confirma y refresca la tabla de Áreas **(ver EOP)**. |

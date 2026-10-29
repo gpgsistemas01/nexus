@@ -5,7 +5,6 @@
 | Identificador | `CU-ALM-14` |
 | Nombre | Generar reporte de mermas. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-ALM-09` en **Acciones sobre los resultados** (después del paso 4, flujo A4) bajo la condición: elección del actor, permiso de reporte y criterios admitidos. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Desde `CU-ALM-09`, necesita descargar el inventario de mermas. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Actor:** revisa la consulta y selecciona en **Incluir en Excel** uno de los alcances **Activos o con stock**, **Activos** o **Con stock**.<br>2. **Actor:** pulsa **Descargar Excel** **(ver E1)**.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros, consulta la búsqueda por nombre, el proveedor aplicado y el alcance de mermas **(ver EOP)** y genera el archivo de Excel; inicia su descarga sin modificar inventario. |

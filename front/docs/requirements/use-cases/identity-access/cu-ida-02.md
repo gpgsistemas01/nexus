@@ -5,7 +5,6 @@
 | Identificador | `CU-IDA-02` |
 | Nombre | Crear persona. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-IDA-01` en **Acciones sobre los resultados** (después del paso 4, flujo A4) bajo la condición: elección del actor y permiso de alta para ese contexto. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Selecciona la acción principal para crear una persona desde `CU-IDA-01` Consultar personas. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre la opción para crear persona **(ver E1)**.<br>2. **Nexus:** muestra el formulario y carga las áreas y roles disponibles.<br>3. **Actor:** captura el nombre completo; selecciona un área y un rol y selecciona **Agregar** **(ver A1)**.<br>4. **Nexus:** valida que el área y el rol sean válidos y que el área no esté repetida; incorpora el acceso a la tabla.<br>5. **Actor:** repite la adición para cada acceso requerido, revisa los renglones de la tabla y selecciona **Guardar**.<br>6. **Nexus:** valida autorización, obligatoriedad, formato, identidad y todos los accesos **(ver A2)**; registra la persona y sus accesos como una sola operación, actualiza el listado y muestra la confirmación **(ver EOP)**. |

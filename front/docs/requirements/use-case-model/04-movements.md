@@ -4,7 +4,7 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 ## Movimientos de materiales
 
-**Identificador:** `DIA-VUE-CU-005`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-005`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -23,14 +23,11 @@ direction LR
 
     admin -- ucMaterialMovements
     admin -- ucMaterialMovementReport
-
-    ucMaterialMovementReport ..>:extend ucMaterialMovements
 ```
-
 
 ## Movimientos de mermas
 
-**Identificador:** `DIA-VUE-CU-007`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-007`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -47,14 +44,11 @@ direction LR
 
     admin -- ucWasteMovements
     admin -- ucWasteMovementReport
-
-    ucWasteMovementReport ..>:extend ucWasteMovements
 ```
-
 
 ## Movimientos de consumibles
 
-**Identificador:** `DIA-VUE-CU-009`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
+**Identificador:** `DIA-VUE-CU-009`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -69,6 +63,4 @@ direction LR
     end
     admin -- query
     admin -- report
-
-    report ..>:extend query
 ```

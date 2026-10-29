@@ -5,7 +5,6 @@
 | Identificador | `CU-ALM-20` |
 | Nombre | Retirar consumible. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-ALM-17` en **Acciones sobre los resultados** (después del paso 4, flujo A3) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Solicita eliminar la oferta mostrada en `CU-ALM-17`. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor tiene autorización para mantener el catálogo de consumibles.<br>3. La oferta pertenece a un consumible existente. |
 | Flujo principal | 1. **Actor:** selecciona **Eliminar registro** sobre una oferta **(ver E1)**.<br>2. **Nexus:** muestra la confirmación compartida e identifica que se retirará la relación del proveedor, no un movimiento de stock.<br>3. **Actor:** confirma el retiro **(ver A1)**.<br>4. **Nexus:** comprueba que la oferta pertenezca a un consumible, que exista y que no tenga historia operativa protegida; elimina la oferta y elimina la identidad sólo cuando no conserva otras ofertas **(ver A2)** **(ver EOP)**; informa el resultado y actualiza el listado de consumibles. |

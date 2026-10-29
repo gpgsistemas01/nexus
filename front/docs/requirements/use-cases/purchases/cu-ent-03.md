@@ -5,7 +5,6 @@
 | Identificador | `CU-ENT-03` |
 | Nombre | Editar compra de material. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-ENT-01` en **Acciones sobre los resultados** (después del paso 4, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Puntos de extensión | Material no catalogado al preparar un detalle nuevo: durante el paso 3, elección **Registrar material** con permisos de captura y catálogos auxiliares; extensión `CU-ALM-02`, flujo A3; retorna al paso 3. El proveedor de la compra existente permanece fijado. |
 | Disparador | Detecta datos que debe corregir en una compra de material y selecciona su acción de edición. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
