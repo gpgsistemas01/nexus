@@ -24,3 +24,7 @@ Las guardas y controles orientan la interfaz; la API comprueba cada petición.
 Los archivos y símbolos se consultan desde el capítulo afectado y el código real.
 Una modificación común enlaza [Arquitectura](../../../index.md) o
 [Patrones](../design-and-construction-patterns/index.md), sin copiar sus diagramas a todos los módulos.
+
+Los [estados de captura y documento](../../logical/document-states.md) complementan
+las secuencias de cada módulo; los [patrones](../design-and-construction-patterns/index.md)
+concentran modelos generales y aplicaciones específicas.

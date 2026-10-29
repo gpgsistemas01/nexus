@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [issues.spec.ts](../../../tests/e2e/issues.spec.ts), tramo de devolución del mismo recorrido. Aislamiento Playwright. El incremento del stock y la transacción requieren backend real.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

@@ -1,6 +1,6 @@
 # Clientes y proveedores: modelo de casos de uso
 
-La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociaciones y límites. Las figuras conservan los IDs de los objetivos; sus pasos completos se encuentran en las fichas de requisitos.
+[Índice y notación del modelo](index.md#alcance-y-notación).
 
 Estos cortes representan la consulta y el mantenimiento independientes de Sistemas.
 La participación de Almacén en las altas contextuales se representa en Inventario,

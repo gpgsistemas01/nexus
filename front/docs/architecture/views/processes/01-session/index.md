@@ -8,5 +8,4 @@
 
 - [Renovación compartida](04-concurrent-renewal.md): `DIA-VUE-SEQ-024/028`.
 
-Las figuras identifican colaboradores del cliente y tratan la API como frontera externa.
-El [índice de procesos](../index.md) relaciona operaciones, casos de uso y figuras.
+[Catálogo de procesos y figuras](../index.md).

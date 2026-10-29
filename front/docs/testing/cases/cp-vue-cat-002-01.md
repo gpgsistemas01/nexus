@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [catalogs.spec.ts](../../../tests/e2e/catalogs.spec.ts), `catálogos: conflicto conserva captura, impide reenvío y exige nueva lectura`. Estado en memoria del harness nuevo por test. No comprueba UPDATE condicionado ni persistencia real.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

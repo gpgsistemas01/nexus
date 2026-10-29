@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [selectCreation.spec.ts](../../../tests/e2e/selectCreation.spec.ts), `select compras materials: crea proveedor y artículo desde el desplegable con contexto de compra` y variante `consumables`. Contextos aislados y API simulada. No demuestra alta o stock persistidos.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

@@ -8,5 +8,4 @@
 
 - [Área autorizada: selección y bloqueo](04-department-scope.md): `DIA-VUE-SEQ-026/030`.
 
-Las figuras identifican colaboradores del cliente y tratan la API como frontera externa.
-El [índice de procesos](../index.md) relaciona operaciones, casos de uso y figuras.
+[Catálogo de procesos y figuras](../index.md).

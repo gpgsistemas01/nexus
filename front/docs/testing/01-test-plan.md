@@ -40,7 +40,8 @@ La fuente ejecutable son `front/tests`, sus fixtures y aserciones. El [diseño](
 
 ## Preparación y datos
 
-Unitarias reutilizan fixtures de dominio y harnesses (`mountComposable`, adaptador HTTP). Cada caso restaura mocks, timers y montajes mediante el setup vigente; un composable crea estado por instancia. El Storage de jsdom se enlaza explícitamente para evitar diferencias con el Storage nativo de Node.
+El [estándar de construcción](07-test-standards.md) define aislamiento, fixtures,
+limpieza y aserciones del código de prueba.
 
 Navegador reutiliza las funciones `mockWarehouse`, `mockPurchases`, `mockIssues` y las fixtures del módulo. Los errores 401/403/409/503 se preparan como datos del caso; no se considera que un mock de éxito confirme una transacción de la API.
 
@@ -138,29 +139,14 @@ aceptado, identificando la cobertura que permanece.
 
 ## Ejecución
 
-Desde `front/`:
-
-```bash
-npm run test:unit
-npm run check
-npm run docs:check
-npx playwright install chromium
-npm run test:e2e
-```
-
-`npm run check` ejecuta formato, lint, unitarias y build con tipos. La instalación de Chromium es preparación del equipo, no un paso obligatorio de cada corrida. Con un navegador instalado puede usarse `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`; CI prepara su navegador.
-
-Para sistema, después de seguir su guía y disponer de la base aislada:
-
-```bash
-npm run test:e2e:system
-```
-
-Desde la raíz usar `npm --prefix front run ...`. Para seleccionar un caso se pasa archivo y `--grep` a Playwright, o el archivo a Vitest. No se usa watch en comprobaciones no interactivas.
+Los comandos, instalación de Chromium, selección de casos y archivos locales están
+en [Archivos, credenciales y ejecución](06-test-files-and-credentials.md). El nivel
+de sistema se prepara según su [guía de aislamiento](05-system-tests.md).
 
 ## Criterios de revisión y finalización
 
-Los casos pertinentes pasan en el ambiente declarado y conservan sus aserciones. Tipos, lint/formato, build y documentación deben corresponder al cambio. Un fallo se investiga; no se retira una aserción para convertirlo en aprobado. Una prueba retirada requiere regla obsoleta, duplicidad demostrada o límite aceptado, indicando qué cobertura permanece.
+Aplicar los criterios de [entrada, suspensión y salida](#entrada-suspensión-y-salida)
+y la [revisión de cambios](../development/04-change-review.md).
 
 CI ejecuta Node 24.15.0 y 26.12.1 para frontend, publica JUnit en `build/test-results` y conserva sistema como ejecución separada. Las capturas y trazas fallidas son artefactos, no fuentes del producto. No se amplía repetidamente una suite ya aprobada sin cambio, fallo o preocupación nueva.
 

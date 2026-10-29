@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [records.spec.ts](../../../tests/e2e/records.spec.ts), `reportes Usuarios: exporta filtros sin paginación y recupera una descarga fallida` y variantes `Clientes`/`Proveedores`. Aislamiento Playwright; esta ficha no comprueba filas del archivo simulado.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

@@ -1,7 +1,5 @@
 # Diseño de pruebas: Recuperación y recorrido de sistema
 
-La [guía de diseño](../02-test-design.md) define las tablas DP y sus relaciones con los casos. Esta ficha agrupa condiciones del mismo dominio o contrato.
-
 ## Recuperación, cierre y persistencia
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |

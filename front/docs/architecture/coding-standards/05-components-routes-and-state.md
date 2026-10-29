@@ -7,17 +7,33 @@ oficiales. El orden de macros, si existen, es `defineOptions`, `defineProps`,
 `defineEmits`, `defineSlots`. Las props son entrada: no mutarlas ni mutar sus objetos
 anidados para actualizar al contenedor. Emitir intención y datos suficientes.
 
-```ts
-const emit = defineEmits<{
-    'update:modelValue': [value: string];
-    search: [value: string];
-    create: [search: string];
-}>();
+### Ejemplo de props y eventos
+
+Versión abreviada de [TableAction.vue](../../../src/shared/components/TableAction.vue),
+centrada en el contrato del botón:
+
+```vue
+<script setup lang="ts">
+import { VBtn } from 'vuetify/components/VBtn';
+
+defineProps<{ label: string; isDisabled?: boolean }>();
+const emit = defineEmits<{ click: [] }>();
+</script>
+
+<template>
+    <VBtn
+        :disabled="isDisabled"
+        @click="emit('click')"
+    >
+        {{ label }}
+    </VBtn>
+</template>
 ```
 
-Este contrato corresponde al selector reutilizable. `create` solicita un alta; no
-crea una identidad ni abre por sí mismo un editor de otro dominio. El Workspace
-compone la captura auxiliar y devuelve la opción confirmada al propietario.
+Las props determinan la presentación; `click` comunica la intención al consumidor.
+El componente no modifica la prop ni decide qué registro editar. Del mismo modo,
+`create` en [RemoteSelect.vue](../../../src/shared/components/RemoteSelect.vue)
+solicita un alta; el Workspace abre el auxiliar y devuelve la opción confirmada.
 
 ## Estado reactivo
 

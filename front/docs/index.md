@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.8 | 1.0.0 | En revisión | 2026-10-29 | Equipo Nexus |
+| 1.9 | 1.0.0 | En revisión | 2026-10-29 | Equipo Nexus |
 
 ## Propósito y audiencia
 
@@ -31,7 +31,7 @@ front/docs/
 │   ├── use-case-model/               # Actores y objetivos del negocio
 │   └── use-cases/                    # Fichas por objetivo y familia
 ├── architecture/
-│   ├── coding-standards/             # Reglas de construcción y revisión
+│   ├── coding-standards/             # Convenciones del código Vue/TypeScript
 │   ├── contracts/                    # Interfaces consumidas por el cliente
 │   └── views/
 │       ├── scenarios/                # Navegación y objetivos
@@ -49,7 +49,8 @@ front/docs/
 | --- | --- | --- |
 | [Requisitos](requirements/index.md) | Visión, alcance, obligaciones, actores, estados y 94 fichas de caso de uso. | Especificación y familia funcional afectada. |
 | [Arquitectura](architecture/index.md) | Vistas 4+1, decisiones, interfaces, realización y patrones. | Vista general y preocupación del cambio. |
-| [Estándar de código](architecture/coding-standards/index.md) | Doce capítulos de formato, nombres, dependencias, SFC, datos, errores y revisión. | Capítulo correspondiente y checklist. |
+| [Estándar de código](architecture/coding-standards/index.md) | Nueve capítulos de formato, nombres, dependencias, SFC, datos, errores y comentarios. | Capítulo correspondiente. |
+| [Estándares por ámbito](governance/09-standards-and-ownership.md) | Reglas de interfaz, seguridad, pruebas, documentación y diagramación en sus fuentes propias. | Mapa de estándares. |
 | [Desarrollo](development/index.md) | Instalación, archivos locales, arranque, herramientas y despliegue. | Inicio local. |
 | [Pruebas](testing/index.md) | Plan, diseños DP, fichas CP, matriz por CU y ejecución de sistema. | Plan y casos del riesgo afectado. |
 | [Gobierno](governance/index.md) | Reglas editoriales, responsables, referencias y generación. | Reglas y publicación. |
@@ -93,28 +94,10 @@ fuentes curadas, referencia generada y artefactos. El catálogo [publications.js
 define documentos temáticos y el orden de lectura de la publicación completa. Se
 comprueba que cada fuente Markdown tenga ubicación en ese catálogo.
 
-Desde la raíz del repositorio:
+Los comandos, herramientas, secciones y rutas de resultados se mantienen en la
+[guía de publicación](governance/02-generation-and-publication.md). El manual tiene
+publicación independiente; su generación por cuenta se explica en la
+[guía de credenciales y ejecución](governance/07-manual-accounts-and-files.md).
 
-```bash
-npm --prefix front run docs:generate
-npm --prefix front run docs:check
-npm --prefix front run docs:export -- inicio ambos
-npm --prefix front run docs:export -- arquitectura ambos
-npm --prefix front run docs:export -- completo ambos
-npm --prefix front run docs:manual -- ambos
-```
-
-Las secciones disponibles son `inicio`, `requisitos`, `casos-de-uso`, `arquitectura`,
-`estandar`, `referencia`, `pruebas`, `operacion` y `gobierno`. Cada publicación comienza
-con los datos y la orientación de la colección. La completa reúne sus capítulos sin
-repetir fuentes. `docs:export -- ambos` conserva la publicación completa.
-
-El manual se publica por separado mediante `docs:manual` o `docs:export -- manual`.
-Tiene portada propia, instrucciones y capturas Vue; no forma parte del libro técnico
-completo. Sus fuentes y PNG están en `user-manual/`. El procedimiento de
-[capturas y revisión](governance/05-user-manual.md) describe su actualización.
-
-Los resultados quedan en `front/build/docs`, ignorados por Git y excluidos de producción.
-El motor común se ejecuta desde `back/scripts`; las fuentes pertenecen a `front/docs`.
-La [clasificación de reglas y criterios](governance/04-conventions-and-criteria.md)
-distingue obligaciones del proyecto, recomendaciones, decisiones y evidencia de aceptación.
+Las [reglas y recomendaciones](governance/04-conventions-and-criteria.md) distinguen
+obligaciones del proyecto, decisiones y evidencia de aceptación.

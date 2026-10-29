@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [selectCreation.spec.ts](../../../tests/e2e/selectCreation.spec.ts), `select salidas materiales: cliente nuevo precargado y elegido sin guardar la salida` y variantes `consumibles`/`mermas`. Aislamiento Playwright; API simulada. Los casos adicionales del archivo comprueban teclado, permisos y consumidores sin alta.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

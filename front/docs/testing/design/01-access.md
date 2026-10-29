@@ -1,13 +1,8 @@
 # Diseño de pruebas: Acceso, sesión y navegación
 
-La [guía de diseño](../02-test-design.md) define las tablas DP y sus relaciones con los casos. Esta ficha agrupa condiciones del mismo dominio o contrato.
-
 ## Pruebas y diseño de los casos
 
-La estrategia está en el [plan de pruebas](../01-test-plan.md); la suite pertenece
-a `front/tests/` y se ejecuta desde `front/`. Se usa Vitest, Vue Test Utils y jsdom.
-Las pruebas importan `describe`, `it` y `expect`, siguiendo la suite existente; usan
-archivos `*Test.ts`. Los componentes se desmontan tras cada caso.
+La preparación común sigue el [estándar de pruebas](../07-test-standards.md).
 
 La coordinación compartida de las páginas se comprueba en
 `tests/unit/shared/composables/listInteractionTest.ts` y

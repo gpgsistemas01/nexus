@@ -1,7 +1,5 @@
 # Diseño de pruebas: Catálogos, identidad y directorio
 
-La [guía de diseño](../02-test-design.md) define las tablas DP y sus relaciones con los casos. Esta ficha agrupa condiciones del mismo dominio o contrato.
-
 ## Pruebas de Catálogos
 
 El plan y registro general del backend siguen siendo propietarios de las pruebas
@@ -24,7 +22,6 @@ Los iconos del menú se importan desde `@mdi/js` en `app/icons.ts` y se renderiz
 con el proveedor SVG de Vuetify. Al incorporar esta actualización se ejecuta
 `npm ci --include=dev` en `front/`; no se carga una fuente de iconos por CDN.
 ESLint excluye `test-results/`, una salida temporal regenerada por Playwright.
-
 
 ## Pruebas de Identidad y Directorio comercial
 

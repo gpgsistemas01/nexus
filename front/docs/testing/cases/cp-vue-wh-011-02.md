@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [warehouse.spec.ts](../../../tests/e2e/warehouse.spec.ts), `mermas: duplicado traslada cantidad 0 y observaciones sólo después de confirmar`. Contexto aislado de navegador con API simulada; no hay limpieza SQL.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

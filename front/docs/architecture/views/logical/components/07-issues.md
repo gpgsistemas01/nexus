@@ -30,8 +30,6 @@ flowchart TB
     service --> response["issueResponseMapper / confirmMutation"]
 ```
 
-El corte representa elementos del cliente, no clases ni procesos desplegados. La [vista de procesos](../../processes/index.md) detalla orden, validación, rechazo y recuperación. Los contratos de props/eventos se localizan en la [referencia generada](../../development/code-reference.md).
-
 `useIssueDepartments` comparte la precarga y el bloqueo entre encabezado y filtros.
 Cada consumidor conserva su selección: el alta puede asignar una vacía y la edición
 mantiene el área original. `IssueEditor` y `IssueFilters` reciben valores y estado de

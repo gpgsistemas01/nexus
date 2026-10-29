@@ -10,6 +10,7 @@ de pruebas no sustituya un procedimiento ejecutable.
 1. [Preparar e iniciar el proyecto Vue](01-getting-started.md).
 2. [Herramientas del frontend](02-tooling.md).
 3. [Compilación y despliegue](03-build-and-deployment.md).
+4. [Revisión de cambios](04-change-review.md).
 
 ## Contratos de estas guías
 

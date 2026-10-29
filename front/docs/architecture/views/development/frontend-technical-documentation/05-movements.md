@@ -35,8 +35,6 @@ La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) 
 | Selección remota | [Selección remota](../../processes/08-movements-and-reports/01-movement-filters.md) |
 | Alcance y descarga | [Alcance y descarga](../../processes/08-movements-and-reports/02-reports.md) |
 
-Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
-
 ## Evidencia
 
 movementServiceTest.ts, movementFiltersTest.ts y movements.spec.ts. La [matriz por CU](../../../../testing/04-use-case-coverage.md) precisa condiciones y límites; la API simulada no acredita stock, autorización o transacciones reales.

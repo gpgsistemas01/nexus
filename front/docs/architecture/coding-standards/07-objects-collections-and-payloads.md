@@ -29,6 +29,37 @@ conservar también `expectedMaterialVersion`. Una creación no fabrica una versi
 `operationId` identifica el intento de merma que se recupera, no la identidad inventada
 de una entidad seleccionable.
 
+### Ejemplo de payload por recurso y operación
+
+Fragmento de [directory.ts](../../../src/modules/directory/directory.ts):
+
+```ts
+export const directoryPayload = (
+    resource: DirectoryResource,
+    target: DirectoryTarget,
+    values: DirectoryValues,
+) => ({
+    ...(resource === 'clients'
+        ? { name: values.name.trim() }
+        : { legalName: values.legalName.trim(), tradeName: values.tradeName.trim() }),
+    isActive: values.isActive,
+    ...(target.action === 'edit' ? { expectedVersion: target.row.version } : {}),
+});
+```
+
+Los spreads combinan objetos con campos seleccionados explícitamente. El formulario
+completo no se envía. Con nombre `  Cliente ejemplo  `, estado activo y versión leída
+4, los resultados para Clientes son:
+
+| Operación | Payload |
+| --- | --- |
+| Crear | `{ name: 'Cliente ejemplo', isActive: true }` |
+| Editar | `{ name: 'Cliente ejemplo', isActive: true, expectedVersion: 4 }` |
+
+El ID de edición se incorpora a la URL en
+[directoryService.ts](../../../src/modules/directory/services/directoryService.ts);
+la versión permanece en el payload para detectar cambios concurrentes.
+
 ## Colecciones y selección
 
 Las listas se paginan en servidor. El índice visible de columna se traduce mediante

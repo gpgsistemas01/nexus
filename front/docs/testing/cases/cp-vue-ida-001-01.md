@@ -13,7 +13,3 @@ DP-VUE-IDA-001; CU-IDA-03; RD-VUE-002. Decisiones por área duplicada y conserva
 ## Fuente ejecutable y alcance
 
 [identityTest.ts](../../../tests/unit/modules/identity/identityTest.ts), agregar rechaza área duplicada y editar conserva las otras responsabilidades y la versión original. Servicio simulado: no acredita persistencia.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

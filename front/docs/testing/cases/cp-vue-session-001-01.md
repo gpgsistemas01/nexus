@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [sessionRecovery.spec.ts](../../../tests/e2e/sessionRecovery.spec.ts), `sesión: un access token vencido se renueva automáticamente mediante la cookie HttpOnly`. Aislamiento Playwright. No demuestra validez criptográfica ni rotación persistente.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

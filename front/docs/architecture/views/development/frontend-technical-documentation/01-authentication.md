@@ -36,8 +36,6 @@ La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) 
 | Guarda, refresh y recuperación | [Guarda, refresh y recuperación](../../processes/01-session/01-bootstrap-and-session.md) |
 | Cierre y acceso posterior | [Cierre y acceso posterior](../../processes/01-session/03-logout.md) |
 
-Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
-
 ## Evidencia
 
 login.spec.ts, sessionRecovery.spec.ts, apiClientTest.ts, useLoginFormTest.ts y sistema representativo. La [matriz por CU](../../../../testing/04-use-case-coverage.md) precisa condiciones y límites; la API simulada no acredita stock, autorización o transacciones reales.

@@ -9,6 +9,24 @@ Mantener imports al inicio y agrupación estable de externos, colaboradores y ti
 No envolver imports en `try/catch`; la recuperación del arranque rodea su operación
 asíncrona, como en `main.ts`.
 
+### Ejemplo de imports
+
+Fragmento de
+[DirectoryTable.vue](../../../src/modules/directory/components/DirectoryTable.vue):
+
+```ts
+import { computed } from 'vue';
+import type { DataTableHeader } from 'vuetify';
+import TableAction from '../../../shared/components/TableAction.vue';
+import { useTableQuery } from '../../../shared/composables/useTableQuery.js';
+import type { DirectoryEntry, DirectoryResource } from '../directory.js';
+```
+
+`computed` y `useTableQuery` se usan en ejecución; los contratos se importan con
+`type`. `.vue` identifica el componente y `.js` resuelve al módulo TypeScript durante
+la compilación. La tabla depende de presentación y contratos, sin importar el servicio
+de Directorio.
+
 ## Dirección admisible
 
 | Consumidor | Puede depender de | Dependencia que debe evitar |
@@ -42,7 +60,7 @@ cadenas o mantener registros globales mutables.
 
 ## Dependencias npm
 
-Modificar manifiesto y lockfile juntos, revisar engines y compatibilidad del contrato,
-e instalar desde `front/`. `npm ci --include=dev` reproduce la instalación; no se
-versiona `node_modules`. Una dependencia de desarrollo sólo puede usarse en tooling
-si no es requerida por el bundle en ejecución.
+Modificar manifiesto y lockfile juntos; comprobar compatibilidad de los contratos y
+reservar `devDependencies` para herramientas que no requiera el bundle en ejecución.
+La instalación y el diagnóstico se describen en
+[Herramientas](../../development/02-tooling.md).

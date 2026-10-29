@@ -13,7 +13,3 @@ DP-VUE-IDA-002; CU-IDA-08; RD-VUE-004. Particiones de operación y campos admiti
 ## Fuente ejecutable y alcance
 
 [identityTest.ts](../../../tests/unit/modules/identity/identityTest.ts), cambiar contraseña sólo envía la clave y la versión, sin consultar opciones organizacionales; las mutaciones de contraseña usan PATCH y su endpoint específico. No demuestra hashing o actualización SQL.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

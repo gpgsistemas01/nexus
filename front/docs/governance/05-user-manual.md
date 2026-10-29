@@ -13,11 +13,8 @@ Los entregables por cuenta se generan mediante el
 capturas con el acceso correspondiente. Este capítulo describe la fuente completa
 y las capturas de referencia con datos ficticios.
 
-La referencia específica para información de usuario es
-[ISO/IEC/IEEE 26514:2022](https://www.iso.org/standard/77451.html), cuya ficha pública
-se consultó el 2026-10-27. Su alcance incluye necesidades de la audiencia y estructura,
-contenido y presentación de la información. Se adopta selectivamente como guía de
-organización y revisión; no se declara una certificación ni conformidad integral.
+La [aplicabilidad de estándares](03-standard-applicability.md) recoge la referencia
+ISO/IEC/IEEE 26514 y su alcance para esta colección.
 
 Cada capítulo agrupa las tareas de una página o familia funcional: preparación,
 pasos, campos, resultado y alternativas de error. La granularidad sigue el objetivo

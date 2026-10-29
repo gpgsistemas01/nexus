@@ -1,6 +1,6 @@
 # Inventario: modelo de casos de uso
 
-La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociaciones y límites. Las figuras conservan los IDs de los objetivos; sus pasos completos se encuentran en las fichas de requisitos.
+[Índice y notación del modelo](index.md#alcance-y-notación).
 
 Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-contextual-creation.md).
 

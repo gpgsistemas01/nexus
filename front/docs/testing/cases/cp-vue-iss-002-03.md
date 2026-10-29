@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [issueTest.ts](../../../tests/unit/modules/issues/issueTest.ts), `devolución limita por el saldo leído, conserva precisión y exige reintento explícito`, con `resource: materials`. Se desmonta el wrapper; los hooks restauran dobles. No es navegador ni persistencia, ni demuestra por sí solo las variantes merma/consumible.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

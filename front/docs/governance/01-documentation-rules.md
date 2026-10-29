@@ -32,9 +32,11 @@ certificación.
 | `governance` | Reglas editoriales, mantenimiento, generación y publicación. |
 | `user-manual` | Procedimientos, campos, resultados, incidencias y capturas de las pantallas Vue. Publicación independiente. |
 
-Cada documento desarrolla el contenido que le corresponde y enlaza su realización,
-contrato y evidencia local. Las reglas funcionales y los flujos se mantienen completos
-en requisitos; los contratos técnicos y decisiones, en arquitectura.
+El [mapa de estándares y fuentes propietarias](09-standards-and-ownership.md)
+identifica dónde se mantiene cada regla transversal. Cada documento desarrolla su
+contenido y enlaza realización, contrato y evidencia local. Las reglas funcionales y
+los flujos se mantienen completos en requisitos; los contratos técnicos y decisiones,
+en arquitectura.
 
 ## Convenciones editoriales
 
@@ -75,9 +77,9 @@ propia. Aquí se describen sus garantías observables y los límites del cliente
 
 ## Ubicación, navegación y publicación
 
-Las cinco colecciones separan requisitos, arquitectura, procedimientos de desarrollo,
-pruebas y gobierno. Las vistas 4+1 describen la arquitectura; el estándar de código y
-los contratos son referencias transversales. La guía de incorporación introduce los
+Las colecciones separan requisitos, arquitectura, procedimientos de desarrollo,
+pruebas, gobierno y manual de usuario. Las vistas 4+1 describen la arquitectura; los
+estándares y contratos son referencias transversales. La guía de incorporación introduce los
 conceptos y un recorrido del código; la referencia generada permite localizar símbolos.
 El manual de usuario es una colección independiente orientada a las tareas del
 operador, con procedimientos y capturas propios; no se incorpora al libro técnico.
@@ -104,7 +106,7 @@ para requisitos, diagramas, procesos y referencias de código.
 | Clases/interfaces/tipos | Familia de contratos del cliente. | Extensiones reales, colecciones, aliases, variantes y transformación de escritura. |
 | Proceso técnico | Operación o colaboración con decisiones propias. | Participantes, mensajes, errores y recuperación; sus fases se explican juntas cuando forman el mismo recorrido. |
 | Componente/patrón | Responsabilidad o mecanismo con consumidores concretos. | Modelo, contrato, aplicación, límites y evidencia; una figura puede ser el contenido principal. |
-| Estándar | Preocupación de construcción. | Reglas relacionadas de formato, nombres, dependencias o errores, con ejemplos. |
+| Estándar | Ámbito con reglas y controles propios. | Codificación, interfaz, seguridad, pruebas o documentación según el mapa de estándares. |
 | Referencia generada | Catálogo técnico mantenido por la herramienta. | Fuentes e interpretación de sus tablas; se publica separada de la introducción. |
 | Manual de usuario | Una página o familia de tareas operativas. | Preparación, campos, pasos, resultado e incidencias, con capturas de Vue. |
 
@@ -117,27 +119,9 @@ límite obligatorio. Los índices orientan y enlazan, sin repetir las fichas com
 
 ## Figuras y fuentes
 
-Se usa Mermaid. Cada figura indica identificador, pregunta, alcance, fuente y
-significado de sus flechas. El modelo general explica el mecanismo; la aplicación
-nombra componentes, composables, servicios o contratos que existen en Vue.
-Los diagramas de flujo no se presentan como UML de clases. Actores, mensajes y
-límites se usan cuando corresponde, sin inventar relaciones ni concurrencia.
-Los diagramas curados explican decisiones; el generador sólo inventaría elementos
-declarados en las fuentes. Ninguno demuestra por sí mismo calidad o SOLID.
-
-| Familia | Comprobación visual y semántica |
-| --- | --- |
-| Secuencia | Actor humano y participantes `boundary`/`control` según responsabilidad; mensajes numerados y extremos declarados. El callback conserva su propietario de código. |
-| Clases/dominio | Estereotipos, atributos, asociaciones, multiplicidades y generalizaciones correspondientes al modelo. Los eventos tipados se describen como datos/contratos, no métodos inventados. |
-| Casos de uso | Actor fuera del límite, objetivos en óvalos, participación y relaciones funcionales justificadas. |
-| Estados/actividad | Inicio, estados/acciones, transiciones y decisiones del ciclo representado; los finales y alternativas conservan su significado. |
-| Mapas/ejecución | Consumidor hacia colaborador y leyenda de relaciones; construcción, artefactos y procesos en ejecución tienen alcance explícito. |
-
-El dominio se mantiene en `requirements/domain-model`; los contratos estáticos en
-`architecture/views/logical/class-and-type-models`; los estados en `logical/states`.
-Los procesos se agrupan por responsabilidad y conservan un índice por sección. Un
-diagrama de dominio no reemplaza el de tipos y una secuencia no reemplaza el ciclo de
-estados. El [índice de vistas](../architecture/views/index.md) relaciona esos niveles.
+La [guía de diagramación](../architecture/views/diagram-reading.md#reglas-de-elaboración)
+define metadatos, notación y comprobaciones por familia. Los modelos específicos
+conservan fuentes, identificadores y restricciones locales.
 
 ## Síntesis y lectura visual
 
@@ -150,12 +134,9 @@ estados. El [índice de vistas](../architecture/views/index.md) relaciona esos n
 | Justificación o restricción delicada | Párrafo breve junto al modelo. | Motivo y límite que la figura no expresa. |
 | Caso de uso o prueba seleccionado | Ficha establecida. | Preparación, pasos, alternativas y resultado verificable. |
 
-La [guía de lectura](../architecture/views/diagram-reading.md) concentra símbolos,
-multiplicidades, líneas, numeración, marcos y color. Cada documento con figuras enlaza
-su familia; una convención particular se explica junto al diagrama. El texto desarrolla
-motivos, restricciones y recuperación; las comparaciones pertenecen a la tabla y las
-relaciones al gráfico. La revisión elimina la repetición de esa misma información en
-varios formatos y conserva una fuente propietaria por detalle.
+El texto explica motivos, restricciones y recuperación; las tablas comparan y los
+diagramas representan relaciones o recorridos. Evitar repetir la misma explicación
+en los tres formatos.
 
 La guía de un módulo identifica objetivo/CU, ruta y permiso, estado y operaciones,
 entradas/salidas/errores, mecanismos reutilizados y evidencia. Router y contratos HTTP
@@ -164,18 +145,8 @@ cambian el comportamiento visible.
 
 ## Referencias adoptadas
 
-| Referencia | Uso selectivo en esta colección |
-| --- | --- |
-| Documentación oficial de Vue | SFC, Composition API, props/eventos, composables, slots, provide/inject y ciclo de vida. |
-| ISO/IEC/IEEE 42010:2022 | Preocupaciones, interesados, vistas, decisiones y relaciones de arquitectura. |
-| IEEE 1016-2009 | Vocabulario histórico de descripción de diseño; no prescribe carpetas ni una ficha por método. |
-| ISO/IEC/IEEE 15289:2019 | Propósito, audiencia, mantenimiento y relaciones entre documentos. |
-| ISO/IEC/IEEE 29148:2018 | Obligaciones identificables, verificables y trazables. |
-| ISO/IEC/IEEE 29119-2/-3/-4 | Proceso, artefactos y técnicas de diseño de pruebas. |
-| ISO/IEC 25010:2023 | Criterios de interacción, seguridad, mantenibilidad y desempeño; sin inventar umbrales o resultados. |
-
-Esta es una adaptación local, sin declaración de conformidad integral. La norma
-no prescribe estas tablas, Markdown o un patrón Vue particular.
+La [aplicabilidad de estándares](03-standard-applicability.md) concentra las
+referencias ISO/IEEE y Vue, su alcance y la adaptación local.
 
 ## Cambio y versionado
 

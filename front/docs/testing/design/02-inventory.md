@@ -1,7 +1,5 @@
 # Diseño de pruebas: Inventario y captura de merma
 
-La [guía de diseño](../02-test-design.md) define las tablas DP y sus relaciones con los casos. Esta ficha agrupa condiciones del mismo dominio o contrato.
-
 ## Pruebas de Almacén
 
 Los casos unitarios viven en `tests/unit/modules/warehouse/` y
@@ -21,7 +19,6 @@ los casos `CU-ALM-01..06`, `CU-ALM-09..10`, sin sustituir sus pruebas persistent
 `materialControllerDbTest.js`, `inventoryWriteConcurrencyDbTest.js`,
 `wasteWeightDbTest.js` e `inventoryReportControllerDbTest.js` conservan la evidencia
 HTTP/Prisma en una base aislada; no se usa la base de desarrollo.
-
 
 ## UI, HTTP y pruebas de contrato
 

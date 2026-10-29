@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [warehouse.spec.ts](../../../tests/e2e/warehouse.spec.ts), `mermas: duplicado traslada cantidad 3 y observaciones sólo después de confirmar`. Contexto aislado; APIs simuladas. Unitarias de [recuperación](../../../tests/unit/modules/warehouse/wasteDuplicateRecoveryTest.ts) añaden rechazos por permiso, incertidumbre, metadatos y desmontaje. No acredita stock SQL.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

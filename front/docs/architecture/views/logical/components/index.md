@@ -18,3 +18,8 @@ la [vista de procesos](../../processes/00-reading-and-roles.md) desarrolla su ej
 - [Historiales y reportes](05-movements.md).
 - [Compras y correcciones](06-purchases.md).
 - [Salidas, surtido y devolución](07-issues.md).
+
+Los cortes representan elementos del cliente. Los
+[procesos](../../processes/index.md) detallan orden, rechazo y recuperación;
+la [referencia generada](../../development/code-reference.md) localiza los contratos
+de props y eventos.

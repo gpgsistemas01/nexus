@@ -13,7 +13,3 @@ DP-VUE-WH-002; CU-ALM-03; RD-VUE-002. Transición edición → conflicto → int
 ## Fuente ejecutable y alcance
 
 [inventoryFormTest.ts](../../../tests/unit/modules/warehouse/inventoryFormTest.ts), un conflicto no cambia la versión ni reenvía automáticamente la escritura. El UPDATE condicionado requiere servidor real.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [issues.spec.ts](../../../tests/e2e/issues.spec.ts), tramo de surtido de `salidas materiales: edición pendiente, surtido y devolución` , `salidas consumibles: edición pendiente, surtido y devolución` y `salidas mermas: edición pendiente, surtido y devolución`. Aislamiento Playwright. No demuestra descuento real ni falta de stock.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

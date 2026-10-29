@@ -34,8 +34,6 @@ La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) 
 | Consulta compartida | [Consulta compartida](../../processes/02-shared-runtime/01-list-and-record-save.md) |
 | Alta y edición versionadas | [Alta y edición versionadas](../../processes/03-catalogs-and-directory/01-catalog-record-save.md) |
 
-Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
-
 ## Evidencia
 
 catalogEditorTest.ts, catalogServiceTest.ts, catalogListTest.ts y catalogs.spec.ts. La [matriz por CU](../../../../testing/04-use-case-coverage.md) precisa condiciones y límites; la API simulada no acredita stock, autorización o transacciones reales.

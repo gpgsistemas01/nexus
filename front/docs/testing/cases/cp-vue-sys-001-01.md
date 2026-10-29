@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [application.spec.ts](../../../tests/system/application.spec.ts), `sistema: login, alta persistida, reportes reales, renovación y cierre con rutas protegidas`. `setup.ts` limpia sus filas, asignaciones, auditoría y catálogos creados y elimina el manifiesto. No prueba todos los roles, fórmulas o transacciones de inventario.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

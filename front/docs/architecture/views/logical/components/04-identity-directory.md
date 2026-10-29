@@ -25,5 +25,3 @@ flowchart TB
     identityService --> http["apiClient"]
     directoryService --> http
 ```
-
-El corte representa elementos del cliente, no clases ni procesos desplegados. La [vista de procesos](../../processes/index.md) detalla orden, validación, rechazo y recuperación. Los contratos de props/eventos se localizan en la [referencia generada](../../development/code-reference.md).

@@ -55,8 +55,6 @@ La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) 
 | Alcance del área | [Selección y bloqueo](../../processes/07-issues/04-department-scope.md) |
 | Reportes | [Reportes](../../processes/08-movements-and-reports/02-reports.md) |
 
-Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
-
 ## Evidencia
 
 issueTest.ts, issues.spec.ts y selectCreation.spec.ts en los tres recursos. La [matriz por CU](../../../../testing/04-use-case-coverage.md) precisa condiciones y límites; la API simulada no acredita stock, autorización o transacciones reales.

@@ -27,18 +27,13 @@ El plan, los diseños, las fichas de prueba y la evidencia de ejecución conserv
 formatos DP, CP y EP del [plan de pruebas](../testing/01-test-plan.md). La tecnología
 no reduce los campos ni el nivel de detalle exigido para esos registros.
 
-Arquitectura se organiza en vistas 4+1, con preocupación, fuentes, relaciones y
-restricciones. Los patrones tienen modelo general y aplicación concreta. El estándar
-de código contiene capítulos propios de formato, nombres, dependencias, responsabilidades,
-SFC, asincronía, datos, seguridad, pruebas y revisión.
+Arquitectura se organiza en vistas 4+1. La distribución de las reglas locales se
+consulta en el [mapa de estándares](09-standards-and-ownership.md); cada ámbito
+mantiene su propia fuente y controles.
 
 La revisión comprueba enlaces, IDs, correspondencia con código, frescura de fuentes
 generadas y legibilidad de figuras/tablas. `docs:check` automatiza controles de fuentes;
 la revisión de prosa y la aceptación requieren evidencia y responsable.
 
-Para el manual se consultó la ficha pública de ISO/IEC/IEEE 26514:2022 el
-2026-10-27. Su alcance no depende de utilizar Vue o de publicar en PDF. El proyecto
-adopta una organización por tareas y controles de revisión; no declara conformidad
-integral con un texto normativo que no ha sido auditado. La aplicación concreta y
-la comprobación de capturas se describen en el
-[procedimiento del manual](05-user-manual.md).
+La aplicación de la información de usuario se detalla en el
+[estándar editorial del manual](05-user-manual.md).

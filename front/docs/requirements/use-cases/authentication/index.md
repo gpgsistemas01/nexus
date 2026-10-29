@@ -1,6 +1,6 @@
 # Acceso y sesión: casos de uso
 
-Las operaciones tienen fichas independientes. Cada ficha conserva actor, disparador, precondiciones, interacción numerada, alternativas con punto de entrada, excepciones y postcondiciones. El [índice de casos](../index.md) define la plantilla y las reglas de lectura.
+[Catálogo y plantilla de casos de uso](../index.md).
 
 | Caso | Objetivo |
 | --- | --- |
@@ -9,4 +9,5 @@ Las operaciones tienen fichas independientes. Cada ficha conserva actor, dispara
 
 ## Realización y verificación del cliente
 
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/01-authentication.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `login.spec.ts y sessionRecovery.spec.ts`.
+[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/01-authentication.md).
+Pruebas de navegador: [login.spec.ts](../../../../tests/e2e/login.spec.ts), [sessionRecovery.spec.ts](../../../../tests/e2e/sessionRecovery.spec.ts).

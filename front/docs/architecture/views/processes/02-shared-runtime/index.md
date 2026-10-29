@@ -11,5 +11,4 @@
 
 - [Recorrido de los datos tipados](06-typed-data-flow.md): `DIA-VUE-FLU-001/002`.
 
-Las figuras identifican colaboradores del cliente y tratan la API como frontera externa.
-El [índice de procesos](../index.md) relaciona operaciones, casos de uso y figuras.
+[Catálogo de procesos y figuras](../index.md).

@@ -1,54 +1,41 @@
 # 1. Propósito, alcance y prioridad
 
-## Objetivo
+## Alcance
 
-El estándar establece reglas para construir y revisar el cliente Vue: archivos SFC,
-TypeScript, estilos, pruebas, configuración y herramientas de documentación. Una
-regla permite decidir dónde reside un comportamiento, cómo se expresa y cómo se
-comprueba. La arquitectura describe la solución; este estándar regula su construcción.
+Las reglas se aplican a SFC, TypeScript, funciones, módulos, estilos y configuración
+escritos para el cliente. Regulan cómo expresar y separar el código; los requisitos
+establecen el comportamiento y las vistas de arquitectura explican su realización.
+Las herramientas y versiones se consultan en [Herramientas](../../development/02-tooling.md).
 
-## Aplicación y fuentes de las reglas
+## Aplicación
 
-1. Identificar la operación y su contrato funcional en requisitos y casos de uso.
-2. Consultar `AGENTS.md`, este estándar y la documentación del módulo propietario.
-3. Comprobar la configuración versionada de ESLint, Prettier, TypeScript y Vite.
-4. Reutilizar una implementación equivalente antes de crear otra abstracción.
-5. Ante una diferencia entre prosa, configuración y código, identificar la regla
-   pretendida y corregir las fuentes afectadas en el mismo cambio; no normalizar
-   todo el repositorio como efecto secundario.
+1. Identificar el contrato funcional y el módulo propietario.
+2. Consultar `AGENTS.md`, el capítulo correspondiente y una implementación equivalente.
+3. Contrastar la regla con la configuración versionada y reutilizar los contratos existentes.
+4. Si prosa, configuración y código difieren, corregir las fuentes afectadas dentro
+   del alcance del cambio.
 
-La herramienta no decide por sí sola una responsabilidad. Un archivo que pasa lint
-puede seguir mezclando transporte y presentación. Las recomendaciones oficiales de
-Vue complementan estas reglas, con las versiones instaladas en `package.json`.
+Pasar lint no demuestra separación de responsabilidades. La revisión comprueba
+consumidores, efectos y dirección de dependencias, además del formato automatizado.
+Los ejemplos ilustran la convención; las fuentes operativas siguen siendo el código
+y su configuración.
 
-## Ámbito técnico
+### Ejemplo de aplicación
 
-Se usa Vue 3 con Composition API y `<script setup lang="ts">`, Vue Router, Vuetify,
-VeeValidate y Axios. Los manifiestos y el lockfile fijan las versiones compatibles;
-no se documenta una actualización de dependencia como si fuera una decisión de diseño.
-Los módulos ES mantienen extensiones explícitas. Los rangos de Node se consultan en
-`engines`, incluidos para instalar herramientas de desarrollo.
+Al incorporar una acción a la tabla de Directorio, el componente presenta la acción
+y emite la intención; la página decide abrir el editor:
 
-## Excepciones justificadas
+| Archivo | Aplicación de la regla |
+| --- | --- |
+| [DirectoryTable.vue](../../../src/modules/directory/components/DirectoryTable.vue) | `emit('edit', item)` entrega la fila seleccionada sin llamar al servicio. |
+| [DirectoryPage.vue](../../../src/modules/directory/pages/DirectoryPage.vue) | `@edit="openEditor({ action: 'edit', row: $event })"` conecta la intención con el editor. |
 
-Una excepción debe explicar el contrato que la exige, sus consumidores y la evidencia
-que protege el cambio. No se introduce otra biblioteca de formularios, HTTP o estado
-para resolver un caso ya cubierto. Las reglas visuales locales se justifican por la
-necesidad del componente y no por copiar una pantalla completa.
+La revisión comprueba esa separación además del formato: que ambos archivos pasen
+lint no autoriza a trasladar una petición HTTP al componente de presentación.
 
-## Fuentes verificables
+## Obligaciones y alternativas
 
-`front/.editorconfig`, `prettier.config.js`, `eslint.config.js`, `tsconfig.*.json`,
-`vite.config.ts` y `package.json` son las fuentes operativas. Las instrucciones de
-preparación se mantienen en [Inicio local](../../development/01-getting-started.md).
-
-## Obligaciones y juicio técnico
-
-El formato configurado, los contratos de entrada/salida, los controles de seguridad
-y las fronteras de dependencia son comunes al proyecto. Las recomendaciones sobre
-extraer funciones o introducir una abstracción se evalúan por responsabilidad,
-consumidores y claridad; no establecen un tamaño obligatorio por archivo.
-
-La [clasificación de reglas y criterios](../../governance/04-conventions-and-criteria.md)
-explica qué es obligatorio, qué admite alternativas y cómo se revisa un cambio de
-convención. Las decisiones no se sustituyen por preferencias individuales incompatibles.
+La [clasificación de reglas](../../governance/04-conventions-and-criteria.md) define
+obligaciones, recomendaciones y excepciones. Una extracción se evalúa por su
+responsabilidad y consumidores; no existe un límite de líneas que determine por sí
+solo la necesidad de otro archivo o composable.

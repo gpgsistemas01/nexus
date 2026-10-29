@@ -1,7 +1,5 @@
 # Diseño de pruebas: Compras
 
-La [guía de diseño](../02-test-design.md) define las tablas DP y sus relaciones con los casos. Esta ficha agrupa condiciones del mismo dominio o contrato.
-
 ## Pruebas de Compras
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
@@ -13,7 +11,6 @@ El cambio de lectura de observaciones se cubre en la integración HTTP/Prisma
 `back/tests/integration/controllers/goodsReceiptContextDbTest.js`: nulo o texto
 en listado y por id, conservación después de editar y omisión de detalles en listado,
 en ambas variantes.
-
 
 ## Respuestas confirmadas y corrección de compras
 

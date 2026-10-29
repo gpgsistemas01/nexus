@@ -1,6 +1,9 @@
 # Especificaciones de casos de prueba
 
-El [registro selectivo](../03-test-cases.md) contiene navegación, diseños y alcance de las fichas.
+El [registro selectivo](../03-test-cases.md) contiene diseños y alcance de las fichas.
+El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado
+y evidencia según el [plan](../01-test-plan.md#3-registro-de-ejecución-y-resultado-real);
+las fichas no contienen resultados de corridas.
 
 - [CP-VUE-MAN-001-01: manual de inducción coherente con el acceso](cp-vue-man-001-01.md).
 

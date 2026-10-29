@@ -8,5 +8,4 @@
 - [Baja confirmada de una relación de inventario](04-inventory-removal.md): `DIA-VUE-SEQ-021`.
 - [Merma: selección de referencia y vista previa](05-waste-preview.md): `DIA-VUE-ACT-001`.
 
-Las figuras identifican colaboradores del cliente y tratan la API como frontera externa.
-El [índice de procesos](../index.md) relaciona operaciones, casos de uso y figuras.
+[Catálogo de procesos y figuras](../index.md).

@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [sessionRecovery.spec.ts](../../../tests/e2e/sessionRecovery.spec.ts), `sesión: un 502 del refresh se puede recuperar sin volver a capturar credenciales`. Aislamiento Playwright. El fallo y la recuperación son simulados.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

@@ -10,41 +10,19 @@ separados. Los resultados de ejecución permanecen en CI o en la revisión del c
 
 La base usa Vue 3, Vue Router 5 y Vite, con TypeScript estricto. `vue-tsc` comprueba
 componentes y módulos; ESLint analiza errores comunes de JavaScript/TypeScript y Vue.
-El preset de Vue es `recommended`, con Composition API mediante `script setup`,
-orden de macros y convenciones de componentes. Prettier y `.editorconfig` aplican
-cuatro espacios en código Vue/TypeScript/CSS y configuración, dos en
-pruebas y en el manifiesto `package.json`, comillas simples en JavaScript/TypeScript, punto y coma, LF y
-un atributo por línea.
-Los templates usan `htmlWhitespaceSensitivity: 'ignore'` para separar contenido,
-etiquetas y cierres sin agrupar construcciones como `><VBtn` en la misma línea.
-La separación visual de elementos inline debe expresarse en su texto o estilos;
-no se depende de espacios accidentales del archivo.
-`eslint-config-prettier` evita reglas de formato que compitan con el formateador.
-`@stylistic/eslint-plugin` aplica líneas vacías después de imports, entre funciones
-y bloques, y después de guardas `if`. Vue comprueba la separación entre bloques
-`script`, `template` y `style`. Prettier conserva esas líneas vacías; no las inserta
-por sí solo. La separación de fases semánticas dentro de una función sigue siendo
-parte de la revisión del código.
-`npm run format` ejecuta primero ESLint con corrección y después Prettier;
-`npm run format:check` comprueba Prettier y `npm run lint` comprueba también esas
-reglas de separación. `npm run check` ejecuta ambas comprobaciones.
-Se siguen las reglas de [eslint-plugin-vue](https://eslint.vuejs.org/user-guide/)
-y la [configuración de Prettier](https://prettier.io/docs/configuration), adaptadas
-al estándar local; Vue no impone una indentación universal.
-Las reglas de presentación impiden imports de HTTP, stores, páginas, validadores
-y VeeValidate, además de fetch/XMLHttpRequest y almacenamiento local mediante
-globales o window/globalThis. No sustituyen la revisión de dependencias indirectas.
+El preset de Vue es `recommended`; `eslint-config-prettier` evita reglas que
+compitan con Prettier. `@stylistic/eslint-plugin` y las reglas Vue comprueban
+separaciones que Prettier conserva pero no inserta. Las reglas concretas de sangría,
+comillas, atributos y líneas vacías están en el
+[estándar de formato](../architecture/coding-standards/02-format-of-the-file.md).
+ESLint comprueba además las
+[fronteras de dependencia](../architecture/coding-standards/04-imports-exports-and-dependencies.md#dirección-admisible).
 
 Se admiten Node.js `^22.22.2 || ^24.15.0 || ^26.12.1`. jsdom 30.1.3 y las
 herramientas transitivas de Vue Test Utils 2.5.1 requieren al menos 22.22.2 o
 24.15.0 en esas ramas. Node 26.12.1 sigue siendo válido. CI verifica el frontend
 con Node 24.15.0 y 26.12.1, e instala con `npm ci --include=dev --engine-strict`.
 Cambiar sólo `engines` no actualiza Node en el equipo ni valida sus dependencias.
-
-El setup enlaza localStorage/sessionStorage con los objetos reales de jsdom antes
-de cada caso y restaura los globals al terminar. Así Vitest 5 no conserva por
-accidente el Storage nativo de Node 26. Se mantienen las aserciones y el alcance
-de las pruebas del login.
 
 Las versiones exactas se registran en `package-lock.json` y se instalan con `npm ci`.
 Después de descargar cambios que actualicen dependencias, detén Vite y ejecuta

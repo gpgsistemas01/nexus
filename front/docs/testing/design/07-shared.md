@@ -1,7 +1,5 @@
 # Diseño de pruebas: Contratos y componentes transversales
 
-La [guía de diseño](../02-test-design.md) define las tablas DP y sus relaciones con los casos. Esta ficha agrupa condiciones del mismo dominio o contrato.
-
 ## Consistencia y reutilización de tablas
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
@@ -16,8 +14,6 @@ casos existentes; no se sustituyen por pruebas que fijen clases CSS o copien los
 colores de la implementación. La revisión visual de escritorio y 320/390 px
 comprueba presentación, subencabezados, filas de stock bajo y ausencia de
 recortes globales. Las respuestas HTTP se simulan y no demuestran persistencia.
-
-
 
 ## Crecimiento de catálogos y fronteras arquitectónicas
 
@@ -34,7 +30,6 @@ Vue/Router/componentes en servicios y mappers) con la configuración real de ESL
 No se añaden pruebas de tiempo con umbrales de rendimiento ni se atribuye a estos
 casos una capacidad de usuarios concurrentes. Las pruebas de navegador simulan la API.
 
-
 ## Seguridad de texto y avisos
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
@@ -49,7 +44,6 @@ en [entradas y salida segura](../../architecture/views/logical/input-security.md
 ESLint mantiene `vue/no-v-html` como error; esta regla no certifica ausencia de todos
 los posibles usos inseguros del DOM ni sustituye revisar las opciones de un plugin.
 
-
 ## Responsabilidades de documentos
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
@@ -61,7 +55,6 @@ se comprueban con `npm run check`; no se fijan rutas internas ni llamadas privad
 como criterio de arquitectura. La [tabla de propietarios](../../architecture/views/development/design-and-construction-patterns/08-document-responsibilities.md)
 describe la colaboración que comprueban estas pruebas.
 
-
 ## Altas contextuales desde selectores
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
@@ -72,7 +65,6 @@ Los casos de navegador usan los componentes Vuetify reales con API simulada.
 No sustituyen integraciones de persistencia ni declaran probado cada modo de edición.
 Las guardas de rutas permanecen aisladas de los controles visuales en unitarias;
 su doble apunta al contenedor `InventoryWorkspace`, que compone inventario y creación auxiliar.
-
 
 ## Selección y separación del editor
 

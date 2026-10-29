@@ -14,6 +14,7 @@ locales. Cada capítulo contiene las instrucciones necesarias para su tarea.
 6. [Accesos y funcionamiento del generador de manuales](06-manuals-by-access.md).
 7. [Generar manuales por cuenta: procedimiento completo](07-manual-accounts-and-files.md).
 8. [Vocabulario de requisitos y documentación](08-documentation-vocabulary.md).
+9. [Estándares y fuentes propietarias](09-standards-and-ownership.md).
 
 La [entrada general](../index.md) conserva versión, estado y alcance de la colección.
 Los requisitos, el diseño, las pruebas y sus resultados tienen propósitos distintos;

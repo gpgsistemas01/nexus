@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [sessionRecovery.spec.ts](../../../tests/e2e/sessionRecovery.spec.ts), `sesión: cerrar elimina cookies y el acceso directo posterior vuelve al login`. Aislamiento Playwright. El caso de sistema siguiente comprueba además el router real.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

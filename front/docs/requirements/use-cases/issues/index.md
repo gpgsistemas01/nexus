@@ -1,6 +1,6 @@
 # Salidas: casos de uso
 
-Las operaciones tienen fichas independientes. Cada ficha conserva actor, disparador, precondiciones, interacción numerada, alternativas con punto de entrada, excepciones y postcondiciones. El [índice de casos](../index.md) define la plantilla y las reglas de lectura.
+[Catálogo y plantilla de casos de uso](../index.md).
 
 ## Alcance de áreas
 
@@ -40,4 +40,5 @@ del alta no reemplaza el área ni sus datos dependientes al editar un documento.
 
 ## Realización y verificación del cliente
 
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/07-issues.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `issues.spec.ts`.
+[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/07-issues.md).
+Pruebas de navegador: [issues.spec.ts](../../../../tests/e2e/issues.spec.ts).

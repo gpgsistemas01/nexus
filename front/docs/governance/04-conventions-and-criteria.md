@@ -45,8 +45,8 @@ se justifica por su necesidad y alcance; no crea automáticamente otra convenci�
 ## Fuentes y estado documental
 
 Los criterios funcionales proceden de la [especificación](../requirements/requirements-specification/index.md).
-Las reglas de código pertenecen al [estándar](../architecture/coding-standards/index.md)
-y las de evidencia al [plan de pruebas](../testing/01-test-plan.md). Las referencias
+El [mapa de estándares](09-standards-and-ownership.md) identifica las reglas de cada
+ámbito; el [plan de pruebas](../testing/01-test-plan.md) define la evidencia. Las referencias
 ISO/IEEE orientan el contenido adoptado; no imponen nombres de carpetas ni una
 arquitectura Vue concreta. El estado En revisión de la colección expresa su situación
 documental; los controles automatizados conservan el comportamiento de su configuración.

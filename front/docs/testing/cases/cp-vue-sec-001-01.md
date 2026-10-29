@@ -13,7 +13,3 @@ DP-VUE-SEC-001; RN-VUE-004. Particiones título/descripción/error y transición
 ## Fuente ejecutable y alcance
 
 [feedbackTest.ts](../../../tests/unit/shared/ui/feedbackTest.ts), la confirmación y el error del servidor no interpretan HTML. Oráculo de DOM en jsdom, sin una evaluación general de seguridad del servidor.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

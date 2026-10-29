@@ -13,8 +13,6 @@
 | Valores | camelCase; plural para colecciones. | `editedFields`, `projectConvertedQuantity`. |
 | Predicados | Condición afirmativa reconocible. | `isSubmitting`, `canCreateSupplier`, `hasMore`. |
 | Constantes de catálogo | Convención estable del propietario. | `ISSUE_CONFIG`, `PERMISSIONS`. |
-| Prueba unitaria | Sufijo `Test.ts`, dominio paralelo al código. | `selectedOptionTest.ts`. |
-| Prueba de navegador/sistema | `.spec.ts`; nombre describe recorrido. | `selectCreation.spec.ts`. |
 
 ## Significado y dominio
 
@@ -34,6 +32,24 @@ comportamientos transversales con consumidores reales. Las piezas de presentaci�
 ubican en `components`; estado de interacción en `composables`; traducción de datos en
 `mappers` o servicios; contratos de dominio en sus archivos de tipos. Evitar carpetas
 vacías, archivos `utils` con responsabilidades ajenas y barriles que oculten dependencias.
+
+### Ejemplo de nombres y ubicación
+
+Corte de [Directorio](../../../src/modules/directory):
+
+```text
+src/modules/directory/
+├── directory.ts
+├── pages/DirectoryEditorPage.vue
+├── components/DirectoryForm.vue
+├── composables/useDirectoryEditor.ts
+└── services/directoryService.ts
+```
+
+`DirectoryEditorPage` coordina la captura, `DirectoryForm` la presenta y
+`useDirectoryEditor` mantiene su interacción. `directoryPayload`, en `directory.ts`,
+es una transformación pura: su nombre no lleva `use`. El sufijo y la carpeta permiten
+distinguir responsabilidades antes de abrir el archivo.
 
 ## Renombrado
 

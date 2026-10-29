@@ -1,6 +1,6 @@
 # Personas y usuarios: casos de uso
 
-Las operaciones tienen fichas independientes. Cada ficha conserva actor, disparador, precondiciones, interacción numerada, alternativas con punto de entrada, excepciones y postcondiciones. El [índice de casos](../index.md) define la plantilla y las reglas de lectura.
+[Catálogo y plantilla de casos de uso](../index.md).
 
 | Caso | Objetivo |
 | --- | --- |
@@ -16,4 +16,5 @@ Las operaciones tienen fichas independientes. Cada ficha conserva actor, dispara
 
 ## Realización y verificación del cliente
 
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/04-identity-and-directory.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `records.spec.ts`.
+[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/04-identity-and-directory.md).
+Pruebas de navegador: [records.spec.ts](../../../../tests/e2e/records.spec.ts).

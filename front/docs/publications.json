@@ -6,7 +6,8 @@
                 "development/index.md",
                 "development/01-getting-started.md",
                 "architecture/views/development/developer-onboarding.md",
-                "development/02-tooling.md"
+                "development/02-tooling.md",
+                "development/04-change-review.md"
             ]
         },
         "requisitos": {
@@ -50,6 +51,8 @@
             "title": "Arquitectura y diseño",
             "sources": [
                 "architecture/index.md",
+                "architecture/interface-standards.md",
+                "architecture/security-standards.md",
                 "architecture/views/index.md",
                 "architecture/views/diagram-reading.md",
                 "architecture/views/overview.md",
@@ -97,7 +100,8 @@
                 "testing/cases/",
                 "testing/04-use-case-coverage.md",
                 "testing/05-system-tests.md",
-                "testing/06-test-files-and-credentials.md"
+                "testing/06-test-files-and-credentials.md",
+                "testing/07-test-standards.md"
             ]
         },
         "operacion": {

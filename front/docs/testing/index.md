@@ -18,29 +18,14 @@ El resultado de una corrida se conserva como EP en CI o revisión. El plan prece
 al diseño; el caso concreta sus datos; la cobertura relaciona esa evidencia con los
 objetivos funcionales. La preparación de sistema se consulta al ejecutar ese nivel.
 
-## Niveles y oráculos
+## Estándar de construcción
 
-| Evidencia | Qué comprueba | Límite |
-| --- | --- | --- |
-| Vitest/Vue Test Utils/jsdom | Reglas, composables, estado, contratos y datos enviados. | No ejecuta un navegador ni Prisma real. |
-| Playwright/Chromium con API simulada | Interacción, rutas, formularios, cookies del navegador y solicitudes observadas. | El servidor simulado no acredita autorización, cálculo persistido ni rollback reales. |
-| Playwright contra Vue, Express y PostgreSQL reales | Login, alta y lectura persistida de cliente, reportes reales de usuarios/clientes/proveedores, refresh y cierre mediante los routers de la aplicación. | Un recorrido representativo no demuestra todos los CU, roles ni transacciones de inventario. |
-| Integraciones de `back/tests` | HTTP, reglas del servidor y persistencia según cada harness. | Revisar sus límites; un harness sin middleware no demuestra autorización de la ruta de producción. |
+El [estándar de pruebas](07-test-standards.md) define nombres, aislamiento, aserciones
+y mantenimiento del código de prueba.
 
-Las fichas selectivas complementan el código; no transcriben cada `it`. Los IDs
-anteriores de diseño se conservan. Las condiciones con resultados independientes
-se especifican en subcasos separados, aunque compartan una prueba ejecutable.
+## Elegir el nivel y ejecutar
 
-## Ejecución y resultado
-
-Para la primera ejecución, siga [Archivos, credenciales y ejecución](06-test-files-and-credentials.md).
-Desde la raíz: `npm --prefix front run test:unit` para unitarias. Playwright utiliza
-Chromium, un worker y el servidor Vite local según el tipo de recorrido.
-`npm --prefix front run test:e2e:system` es independiente: requiere la base aislada,
-migraciones y dependencias de ambas aplicaciones según [la preparación](05-system-tests.md).
-
-Para cada revisión se registra en CI o en la solicitud de cambio el comando, commit
-o estado local identificado, Node/herramientas, navegador cuando corresponda, fecha,
-resultado real, conteos y fallos/bloqueos. Los reportes viven en
-`front/build/test-results`; no se versiona una tabla de aprobaciones por cada corrida.
-Una prueba que pasa no convierte una brecha funcional en un requisito aceptado.
+El [plan](01-test-plan.md#niveles-y-entornos) define herramientas, oráculos y límites
+por nivel. La [guía de ejecución](06-test-files-and-credentials.md) reúne los comandos,
+archivos de preparación y resultados. Las integraciones de `back/tests` permanecen
+en su propia suite; un recorrido simulado no demuestra sus garantías.

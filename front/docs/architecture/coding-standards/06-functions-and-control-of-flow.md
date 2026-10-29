@@ -23,6 +23,34 @@ la petición y descartan respuestas anteriores. `usePagedList` utiliza además s
 de solicitud: abortar no sustituye la protección frente a respuestas que ya llegaron.
 No confirmar un formulario desmontado ni sustituir filas nuevas con una consulta vieja.
 
+### Ejemplo de lectura vigente y desmontaje
+
+Fragmento de `load` en
+[useDocumentRead.ts](../../../src/shared/composables/useDocumentRead.ts):
+
+```ts
+const result = await options.request(id, current.signal);
+if (attempt !== sequence || current.signal.aborted) return;
+
+document.value = result;
+return result;
+```
+
+`attempt` identifica la solicitud; `sequence` cambia al reemplazarla o cerrar la
+lectura. La guarda permite publicar sólo el resultado vigente. El mismo composable
+registra la limpieza:
+
+```ts
+onBeforeUnmount(() => {
+    isDisposed = true;
+    close();
+});
+```
+
+`close` invalida la secuencia y aborta la petición. La implementación completa
+conserva `catch` para comunicar el fallo y `finally` para liberar el pendiente sólo
+si corresponde a esa lectura.
+
 ## Reintentos
 
 Las escrituras no se repiten automáticamente por un fallo de red. El cliente HTTP

@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [selectCreation.spec.ts](../../../tests/e2e/selectCreation.spec.ts), `select materials: proveedor precargado, cancelar, error y selección tras guardar` y variante `consumables`. Contexto Playwright aislado; API simulada, sin limpieza SQL. `inventoryFormTest.ts` comprueba rechazo de inactivos y callback tras desmontaje.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

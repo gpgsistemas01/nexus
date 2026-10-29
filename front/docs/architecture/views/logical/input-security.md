@@ -16,7 +16,7 @@ el significado de la captura y tratarla como dato en todo el recorrido.
 | Escape de salida | Interpolación/props de texto y SweetAlert2 `titleText`/`text`. | JSON con tipo de respuesta correcto; la API devuelve datos, sin construir el DOM del cliente. |
 | Sanitización HTML | No hay consumidor que la necesite. No se usa `v-html`. | Tampoco se transforman nombres en HTML “limpio”. Un futuro editor enriquecido necesita contrato propio. |
 
-El [estándar Vue](../../coding-standards/index.md) y los
+El [estándar de seguridad](../../security-standards.md) y los
 [contratos del cliente](../../contracts/client-contracts.md) describen estas fronteras desde la
 captura, construcción de payloads y presentación del resultado. Las reglas y sus
 límites se explican aquí aunque los predicados públicos vivan junto al servidor.

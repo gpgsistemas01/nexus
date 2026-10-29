@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [login.spec.ts](../../../tests/e2e/login.spec.ts), `login: captura inválida, rechazo genérico y reintento con cookies hacia materiales`. Aislamiento Playwright. No comprueba hash, cuenta real ni emisión JWT.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

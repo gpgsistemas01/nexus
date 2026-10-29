@@ -12,6 +12,31 @@ identificadores, fuentes y leyendas locales.
 | Objetivos y participación del usuario | [Casos de uso](#casos-de-uso). |
 | Dependencias, comunicación o decisiones | [Mapas y actividades](#mapas-y-actividades). |
 
+## Reglas de elaboración
+
+Se usa Mermaid. Cada figura indica identificador, pregunta, alcance, fuente y
+significado de sus flechas. El modelo general explica el mecanismo; la aplicación
+nombra componentes, composables, servicios o contratos que existen en Vue.
+Los diagramas de flujo no se presentan como UML de clases. Actores, mensajes y
+límites se usan cuando corresponde, sin inventar relaciones ni concurrencia.
+Los diagramas curados explican decisiones; el generador sólo inventaría elementos
+declarados en las fuentes. Ninguno demuestra por sí mismo calidad o SOLID.
+
+| Familia | Comprobación visual y semántica |
+| --- | --- |
+| Secuencia | Actor humano y participantes `boundary`/`control` según responsabilidad; mensajes numerados y extremos declarados. El callback conserva su propietario de código. |
+| Clases/dominio | Estereotipos, atributos, asociaciones, multiplicidades y generalizaciones correspondientes al modelo. Los eventos tipados se describen como datos/contratos, no métodos inventados. |
+| Casos de uso | Actor fuera del límite, objetivos en óvalos, participación y relaciones funcionales justificadas. |
+| Estados/actividad | Inicio, estados/acciones, transiciones y decisiones del ciclo representado; los finales y alternativas conservan su significado. |
+| Mapas/ejecución | Consumidor hacia colaborador y leyenda de relaciones; construcción, artefactos y procesos en ejecución tienen alcance explícito. |
+
+El dominio se mantiene en `requirements/domain-model`; los contratos estáticos en
+`architecture/views/logical/class-and-type-models`; los estados en `logical/states`.
+Los procesos se agrupan por responsabilidad y conservan un índice por sección. Un
+diagrama de dominio no reemplaza el de tipos y una secuencia no reemplaza el ciclo de
+estados. El [índice de vistas](index.md) relaciona esos niveles.
+
+
 ## Clases y dominio
 
 **Ejemplo:** `DIA-VUE-LEG-001`. Interfaces ficticias para leer estructura y relaciones.

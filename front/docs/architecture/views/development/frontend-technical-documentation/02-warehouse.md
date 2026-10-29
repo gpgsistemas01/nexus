@@ -42,8 +42,6 @@ La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) 
 | Baja confirmada de relación | [Baja confirmada de relación](../../processes/05-warehouse/04-inventory-removal.md) |
 | Recarga visible | [Recarga visible](../../processes/02-shared-runtime/04-visible-refresh.md) |
 
-Los [estados de captura y documento](../../logical/document-states.md) complementan las secuencias; los [patrones](../design-and-construction-patterns/index.md) conservan modelo general y aplicación específica.
-
 ## Evidencia
 
 inventoryFormTest.ts, wasteDuplicateRecoveryTest.ts, inventoryListTest.ts, warehouse.spec.ts y selectCreation.spec.ts. La [matriz por CU](../../../../testing/04-use-case-coverage.md) precisa condiciones y límites; la API simulada no acredita stock, autorización o transacciones reales.

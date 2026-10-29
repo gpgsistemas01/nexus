@@ -7,5 +7,4 @@
 - [Compra: corrección de un detalle](03-purchase-correction.md): `DIA-VUE-SEQ-013`.
 - [Compra: cancelación y reintento explícito](04-purchase-cancel.md): `DIA-VUE-SEQ-014`.
 
-Las figuras identifican colaboradores del cliente y tratan la API como frontera externa.
-El [índice de procesos](../index.md) relaciona operaciones, casos de uso y figuras.
+[Catálogo de procesos y figuras](../index.md).

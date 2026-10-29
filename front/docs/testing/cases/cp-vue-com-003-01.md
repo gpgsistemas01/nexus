@@ -13,7 +13,3 @@
 ## Fuente ejecutable y alcance
 
 [purchases.spec.ts](../../../tests/e2e/purchases.spec.ts), tramo de corrección de `compras: consulta, corrección y cancelación explícita conservan el historial`. El mismo test contiene aserciones adicionales de cancelación, fuera de esta ficha. Aislamiento Playwright; no verifica stock/historial SQL ni el cálculo persistido.
-
-## Ejecución
-
-El resultado real se registra como EP con revisión, ambiente, fecha, comando, estado y evidencia conforme al [plan](../01-test-plan.md). Esta ficha no contiene resultados de corridas.

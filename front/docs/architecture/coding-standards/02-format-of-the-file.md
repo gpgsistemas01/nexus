@@ -12,6 +12,11 @@
 | Templates | Un atributo por línea en elementos multilínea; anidación legible. | `singleAttributePerLine` y formateador Vue. |
 | SFC | Separar bloques `script`, `template` y `style` con una línea vacía. | Reglas `vue/block-tag-newline` y `vue/padding-line-between-blocks`. |
 
+`htmlWhitespaceSensitivity: 'ignore'` permite separar etiquetas y cierres del template.
+El espacio visual de elementos inline se expresa mediante texto o estilos; no depende
+de espacios accidentales del archivo. `eslint-config-prettier` evita reglas de
+formato que compitan con Prettier.
+
 ## Líneas vacías con significado
 
 Separar imports del código ejecutable. Los imports consecutivos pueden permanecer
@@ -19,23 +24,24 @@ juntos. Separar declaraciones de funciones y bloques de control de las fases vec
 después de una guarda `if` debe verse la fase que continúa. ESLint comprueba estas
 separaciones en `src` con `padding-line-between-statements`.
 
+Fragmento de `update` en
+[useFormInteraction.ts](../../../src/shared/composables/useFormInteraction.ts):
+
 ```ts
-const submit = async () => {
-    if (isSubmitting.value) return;
+const update = (field: Field, value: Value) => {
+    if (options.isDisabled() || form.values[field] === value) return;
 
-    isSubmitting.value = true;
-
-    try {
-        await save();
-    } finally {
-        isSubmitting.value = false;
-    }
+    editedFields.add(field);
+    form.setFieldValue(field, value, false);
+    form.setFieldError(field, undefined);
+    options.onChange();
 };
 ```
 
-El ejemplo ilustra formato; el guardado real utiliza el coordinador existente.
-Una línea vacía puede separar captura, transformación y confirmación. No usar varias
-líneas vacías para ocultar una función que necesita dividirse por responsabilidad.
+La línea vacía separa la guarda de las actualizaciones; cuatro espacios delimitan el
+cuerpo. `Field`, `Value`, `form` y `options` pertenecen al composable que contiene esta
+función. No usar varias líneas vacías para ocultar una responsabilidad que necesita
+separarse.
 
 ## Orden y tamaño
 

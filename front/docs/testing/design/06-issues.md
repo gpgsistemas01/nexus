@@ -1,7 +1,5 @@
 # Diseño de pruebas: Salidas
 
-La [guía de diseño](../02-test-design.md) define las tablas DP y sus relaciones con los casos. Esta ficha agrupa condiciones del mismo dominio o contrato.
-
 ## Salidas de Materiales, Consumibles y Mermas
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
