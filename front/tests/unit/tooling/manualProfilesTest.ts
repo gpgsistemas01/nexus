@@ -149,9 +149,9 @@ it.each([
     for (const section of [
       'Registrar una compra',
       'Editar el encabezado',
-      'Agregar partidas a una compra existente',
-      'Corregir una partida registrada',
-      'Cancelar una partida',
+      'Agregar detalles a una compra existente',
+      'Corregir un detalle registrado',
+      'Cancelar un detalle',
     ])
       expect(content.includes('## ' + section)).toBe(manage);
     expect(content.includes('19-purchase-create.png')).toBe(manage);

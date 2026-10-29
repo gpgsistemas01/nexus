@@ -42,4 +42,4 @@ El cierre de un subformulario sin guardar conserva la consulta; un fallo de escr
 conserva el contexto y no se presenta como confirmación. La
 [secuencia de cancelación](../../processes/06-purchases/04-purchase-cancel.md)
 detalla aviso, fallo y reintento; el [modelo de tipos](../class-and-type-models/07-purchases.md)
-separa fila, documento, captura y partida.
+separa fila, documento, captura y detalle.

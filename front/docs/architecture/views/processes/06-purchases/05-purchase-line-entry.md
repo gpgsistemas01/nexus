@@ -1,6 +1,6 @@
-# Compra: selección y agregado de nuevas partidas
+# Compra: selección y agregado de nuevos detalles
 
-## Partida nueva y captura del encabezado
+## Detalle nuevo y captura del encabezado
 
 **Identificador:** `DIA-VUE-SEQ-044`.
 

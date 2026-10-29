@@ -35,7 +35,7 @@ classDiagram
     PurchaseDocument "1" --> "0..*" PurchaseDetail : details recibidos
 ```
 
-## Captura y partidas nuevas
+## Captura y detalles nuevos
 
 **Identificador:** `DIA-VUE-DAT-011`. **Pregunta:** ¿Qué relación utiliza el editor
 antes de construir la escritura? **Fuente:** `PurchaseValues` y `PurchaseDetail` en
@@ -67,7 +67,7 @@ classDiagram
 La fila añade referencia, recepción, factura, etiquetas e importes neto/bruto.
 El detalle añade cantidad convertida, costo por unidad convertida e importes neto/bruto.
 La separación de figuras conserva el mismo tipo `PurchaseDetail`: no hay una copia
-estructural distinta de la partida por cada figura.
+estructural distinta del detalle por cada figura.
 
 ## Datos y modos
 
@@ -89,7 +89,7 @@ incluye etiquetas de proveedor y receptor. El documento siempre incluye observac
 fecha, factura y observaciones de la captura. Recorta observaciones y normaliza factura
 a mayúsculas sólo cuando está facturada. Convierte la fecha a UTC mediante la regla
 compartida. Selecciona sólo detalles `isNew`; envía `materialId`, `Number(quantity)` y
-`Number(costPerUnitType)`. En edición sin partidas nuevas omite `details`.
+`Number(costPerUnitType)`. En edición sin detalles nuevos omite `details`.
 
 No envía totales, importes derivados, `status` ni una copia completa de `PurchaseRow`.
 La corrección y cancelación usan `changeDetail` con IDs de documento y detalle.

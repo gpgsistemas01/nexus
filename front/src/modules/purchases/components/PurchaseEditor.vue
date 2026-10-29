@@ -198,13 +198,13 @@ const emit = defineEmits<{
             </VRow>
         </section>
         <slot name="entry" />
-        <section aria-label="Partidas de compra">
-            <h3 class="purchase-section-title">Partidas de la compra</h3>
+        <section aria-label="Detalles de compra">
+            <h3 class="purchase-section-title">Detalles de la compra</h3>
             <p
                 v-if="isEditing"
                 class="mb-3"
             >
-                Las partidas guardadas se conservan. Para corregirlas o cancelarlas, abre la compra
+                Los detalles guardados se conservan. Para corregirlos o cancelarlos, abre la compra
                 en consulta.
             </p>
             <PurchaseDetailsTable

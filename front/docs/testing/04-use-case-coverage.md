@@ -15,7 +15,7 @@ bloqueados se registran en EP, no se deducen de esta matriz.
 | RF-VUE-003/004; RN-VUE-003/005 | Consultas de todas las familias, listados remotos, filtros y navegación. |
 | RF-VUE-005; RD-VUE-001/002 | CU-CAT y CU-IDA: captura, asignaciones, cuenta y edición versionada. |
 | RF-VUE-006/007/008; RD-VUE-003/005 | CU-ALM: inventario, peso, ajuste, entrada, versión e idempotencia. |
-| RF-VUE-009 | CU-ENT: compra, encabezado, nuevas partidas y corrección/cancelación. |
+| RF-VUE-009 | CU-ENT: compra, encabezado, nuevos detalles y corrección/cancelación. |
 | RF-VUE-010 | CU-SAL: solicitud, encabezado, detalle, surtido y devolución. |
 | RF-VUE-011/013 | Historiales y reportes de sus respectivas familias. |
 | RF-VUE-012; RD-VUE-006 | Altas contextuales y selección: CP-VUE-SEL-001-01/02/03 y unitarias de selección. |

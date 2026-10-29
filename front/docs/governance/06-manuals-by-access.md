@@ -79,7 +79,7 @@ se escribe en la pantalla. Cookies y tokens permanecen en memoria; no se generan
 archivos de sesión. Trazas, video y capturas de error automáticas de Playwright están
 deshabilitados para este recorrido. Las peticiones del navegador que cambien datos
 de negocio se bloquean; sólo se permite renovar la autenticación cuando corresponde.
-Abrir un formulario o agregar una partida a un borrador no lo guarda.
+Abrir un formulario o agregar un detalle a un borrador no lo guarda.
 
 El acceso vuelve a comprobarse al terminar. Una modificación de permisos o
 asignaciones interrumpe la publicación para evitar mezclar capturas de accesos

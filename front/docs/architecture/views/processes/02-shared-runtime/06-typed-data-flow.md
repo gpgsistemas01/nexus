@@ -30,8 +30,8 @@ flowchart TB
 | Paso | Precisión del contrato |
 | --- | --- |
 | Leer | `apiClient` comprueba el contenedor general; el mapper valida campos y el servicio comprueba el ID solicitado. |
-| Crear captura | Copia encabezado/observaciones y prepara `values.details = []` para partidas nuevas. |
-| Mostrar partidas | La Page combina detalles persistidos y nuevos mediante `computed`. |
+| Crear captura | Copia encabezado/observaciones y prepara `values.details = []` para detalles nuevos. |
+| Mostrar detalles | La Page combina detalles persistidos y nuevos mediante `computed`. |
 | Actualizar control | El componente emite; la Page conecta `editor.update` y `useFormInteraction` modifica valores con setters. |
 | Conservar lectura | El editor trabaja con su captura; modificar la UI no confirma persistencia. |
 
@@ -66,7 +66,7 @@ flowchart LR
 
 | Frontera | Resultado y límite |
 | --- | --- |
-| Captura → payload | `Record<string, unknown>` con campos seleccionados: proveedor leído en edición, fecha UTC, factura condicional, observaciones y partidas nuevas. No hay una clase `PurchaseRequest` en el código actual. |
+| Captura → payload | `Record<string, unknown>` con campos seleccionados: proveedor leído en edición, fecha UTC, factura condicional, observaciones y detalles nuevos. No hay una clase `PurchaseRequest` en el código actual. |
 | Red → confirmación | TypeScript no valida JSON. Un error HTTP o código inesperado interrumpe el recorrido y conserva el error. |
 | Confirmación → UI | Código/mensaje comprobados; el callback actúa sólo con consumidor vigente. |
 | Totales/stock | La API calcula y persiste; el cálculo previo orienta la captura. |

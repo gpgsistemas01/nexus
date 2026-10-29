@@ -59,9 +59,9 @@ flowchart TB
     editor -.->|supplierId| form
 ```
 
-### Artículo desde una partida
+### Artículo desde un detalle
 
-**Identificador:** `DIA-VUE-APL-010`. **Pregunta:** ¿qué código fija el contexto del artículo y devuelve el ID a la partida? **Fuente:** `PurchaseLineEntryPage`, `PurchaseWorkspace`, `InventoryEditorPage`, `useInventoryEditor`, `inventoryService` y `usePurchaseLineEntry`. Alcance: composición y retorno; la escritura interna del editor usa el servicio de Inventario.
+**Identificador:** `DIA-VUE-APL-010`. **Pregunta:** ¿qué código fija el contexto del artículo y devuelve el ID al detalle? **Fuente:** `PurchaseLineEntryPage`, `PurchaseWorkspace`, `InventoryEditorPage`, `useInventoryEditor`, `inventoryService` y `usePurchaseLineEntry`. Alcance: composición y retorno; la escritura interna del editor usa el servicio de Inventario.
 
 ```mermaid
 flowchart TB
@@ -75,9 +75,9 @@ flowchart TB
 
 `PurchaseWorkspace` conserva una unión discriminada: `kind=supplier` o `kind=item`. El segundo caso añade `supplier` a la búsqueda y callback. No se intenta representar ambos con una bandera ambigua o un formulario universal.
 
-Proveedor reutiliza Directorio y su adaptación a `LookupItem`. Artículo reutiliza Inventario en modo de compra: nombre precargado, proveedor fijado y `creationContext=goodsReceipt`, sin stock/costo inicial capturado. Su `saved` pasa por el Workspace para invocar el callback de la partida. Una opción inactiva no se admite como partida operativa.
+Proveedor reutiliza Directorio y su adaptación a `LookupItem`. Artículo reutiliza Inventario en modo de compra: nombre precargado, proveedor fijado y `creationContext=goodsReceipt`, sin stock/costo inicial capturado. Su `saved` pasa por el Workspace para invocar el callback del detalle. Una opción inactiva no se admite como detalle operativo.
 
-Los composables de Compras actualizan sus IDs y renuevan catálogos; el selector conserva etiqueta. La compra no se guarda al crear un proveedor o artículo. Cancelar o fallar el auxiliar mantiene observaciones y las demás capturas del origen. Agregar una partida al documento sigue siendo otra intención del formulario.
+Los composables de Compras actualizan sus IDs y renuevan catálogos; el selector conserva etiqueta. La compra no se guarda al crear un proveedor o artículo. Cancelar o fallar el auxiliar mantiene observaciones y las demás capturas del origen. Agregar un detalle al documento sigue siendo otra intención del formulario.
 
 ## Caso 3: cliente desde Salidas
 

@@ -42,9 +42,9 @@ con permisos de lectura y alta. El resultado guardado vuelve seleccionado al
 formulario; cancelar conserva su captura. Editar una compra no permite cambiar ni
 registrar otro proveedor: el existente permanece fijado.
 
-## Artículo para una partida nueva de compra
+## Artículo para un detalle nuevo de compra
 
-**Identificador:** `DIA-VUE-CU-025`. **Pregunta:** ¿Dónde puede darse de alta el artículo que falta en una partida nueva?
+**Identificador:** `DIA-VUE-CU-025`. **Pregunta:** ¿Dónde puede darse de alta el artículo que falta en un detalle nuevo?
 
 ```mermaid
 usecase-beta
@@ -69,7 +69,7 @@ direction LR
 Requiere los permisos de artículo y catálogos auxiliares y un proveedor seleccionado.
 El alta conserva ese proveedor y utiliza el contexto de compra, sin existencia
 inicial ni costo máximo. Al volver, el actor completa cantidad y costo y agrega el
-renglón. Registrar el artículo no guarda la compra ni modifica una partida persistida.
+renglón. Registrar el artículo no guarda la compra ni modifica un detalle persistido.
 
 ## Cliente durante una salida
 

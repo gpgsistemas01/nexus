@@ -18,5 +18,5 @@ Familia: [objetivos y realización](index.md).
 
 ## Diagramas de realización
 
-- [Compra: lectura y preparación de partidas](../../../architecture/views/processes/06-purchases/01-purchase-read-lines.md).
+- [Compra: lectura y preparación de detalles](../../../architecture/views/processes/06-purchases/01-purchase-read-lines.md).
 - [Compra: alta y edición confirmadas](../../../architecture/views/processes/06-purchases/02-purchase-save.md).

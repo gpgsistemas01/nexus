@@ -9,7 +9,7 @@ los permisos y áreas autorizados de cada cuenta.
 
 | Momento de la operación | Resultado que presenta la aplicación |
 | --- | --- |
-| Recepción de una compra | Documento con proveedor, comprobante y partidas recibidas; cantidades, costos e importes de la compra confirmada. |
+| Recepción de una compra | Documento con proveedor, comprobante y detalles recibidos; cantidades, costos e importes de la compra confirmada. |
 | Solicitud de una salida | Documento pendiente con cliente, área, solicitante y artículos requeridos. Solicitar no equivale a entregar ni descontar existencias. |
 | Surtido y devolución | Estado de cumplimiento y cantidades entregadas o devueltas, con los saldos confirmados de la operación. Las tareas se habilitan según el acceso y estado del documento. |
 | Control de existencias | Materiales y consumibles con sus ofertas por proveedor; mermas con sus datos físicos y existencias propios. Los movimientos permiten consultar los hechos que explican los cambios de saldo. |

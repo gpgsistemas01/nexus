@@ -28,11 +28,11 @@ const emit = defineEmits<{
 
 <template>
     <section
-        aria-label="Agregar partida"
+        aria-label="Agregar detalle"
         class="purchase-entry"
         @keydown.enter.prevent="!isDisabled && canRead && emit('add')"
     >
-        <h3>Agregar partida</h3>
+        <h3>Agregar detalle</h3>
         <VRow class="mt-1">
             <VCol
                 cols="12"

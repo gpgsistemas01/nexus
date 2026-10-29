@@ -76,7 +76,7 @@ Los datos muestran registros ficticios existentes. La ruta de contexto bloquea
 cualquier petición API no simulada y una barrera de página bloquea todo método
 distinto de GET. La comprobación final exige cero intentos de escritura. Las
 capturas sólo consultan, abren formularios, cambian valores locales o agregan
-partidas al borrador; nunca pulsan la acción que confirma una mutación.
+detalles al borrador; nunca pulsan la acción que confirma una mutación.
 
 La devolución se abre sobre un fixture ya surtido; no se registra un surtido para
 preparar la imagen. La edición usa un registro existente. Las contraseñas permanecen

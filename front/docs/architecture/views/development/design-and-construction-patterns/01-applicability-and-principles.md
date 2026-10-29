@@ -42,7 +42,7 @@ letras de SOLID.
 | Fábricas de esquemas | [DIA-VUE-GEN-006](07-schema-factories.md#modelo-general-de-construcción-de-un-esquema) | [DIA-VUE-APL-006: validación de Salidas](07-schema-factories.md#aplicación-al-esquema-del-editor-de-salidas). |
 | Selección dependiente | [DIA-VUE-GEN-002](03-composables-and-callbacks.md#modelo-general-de-composición-por-callback) | [DIA-VUE-PAT-004: selección de Inventario](03-composables-and-callbacks.md#selección-dependiente-de-inventario). |
 | Alta contextual de proveedor en Inventario | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-007](09-contextual-creation.md#caso-1-proveedor-desde-inventario). |
-| Alta de proveedor/artículo en Compras | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-008](09-contextual-creation.md#proveedor-desde-el-encabezado) y [010](09-contextual-creation.md#artículo-desde-una-partida). |
+| Alta de proveedor/artículo en Compras | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-008](09-contextual-creation.md#proveedor-desde-el-encabezado) y [010](09-contextual-creation.md#artículo-desde-un-detalle). |
 | Alta de cliente en Salidas | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-009](09-contextual-creation.md#caso-3-cliente-desde-salidas). |
 
 La [composición de altas contextuales](09-contextual-creation.md) conserva otro par completo: `DIA-VUE-GEN-007` explica el modelo; `DIA-VUE-APL-007`, `008`, `009` y `010` concretan Inventario, Compras y Salidas con sus eventos, callbacks y propietarios reales. La selección dependiente y el guardado mantienen su separación en `DIA-VUE-PAT-004`.

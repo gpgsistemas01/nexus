@@ -11,7 +11,7 @@ Referencia de responsabilidades y contratos del dominio `purchases`. El [corte d
 | `PurchaseWorkspace` | Proveedor/artículo auxiliares sin imports privados entre módulos. |
 | `PurchasePage` / `usePurchaseActions` | Listado, lectura, modos, corrección/cancelación y recarga. |
 | `usePurchaseEditor` | Encabezado, borrador, selección de proveedor y validación de documento. |
-| `usePurchaseLineEntry` | Selección/cantidad/costo de una partida transitoria; emite add. |
+| `usePurchaseLineEntry` | Selección/cantidad/costo de un detalle transitorio; emite add. |
 | `usePurchaseCorrection` | Captura, preview y confirmación de corrección. |
 | Reglas, cálculos y mappers | Modo permitido, vista previa y campos de request/response. |
 | `purchaseService` | Rutas fijas por contexto, normalización y códigos confirmados. |
@@ -21,9 +21,9 @@ Referencia de responsabilidades y contratos del dominio `purchases`. El [corte d
 | Operación | Contrato |
 | --- | --- |
 | Recurso | materials/consumables; no mezclar detalles entre contextos. |
-| Alta | Proveedor, receptor, fecha, factura si aplica, observaciones y al menos una partida válida. |
-| Partida | Artículo del proveedor, cantidad y costo; Agregar sólo cambia borrador. |
-| Edición | Proveedor fijo, encabezado admitido y partidas nuevas; detalles persistidos no se reescriben. |
+| Alta | Proveedor, receptor, fecha, factura si aplica, observaciones y al menos un detalle válido. |
+| Detalle | Artículo del proveedor, cantidad y costo; Agregar sólo cambia borrador. |
+| Edición | Proveedor fijo, encabezado admitido y detalles nuevos; detalles persistidos no se reescriben. |
 | Consulta | Documento/detalles/observaciones; no ofrece guardado general. |
 | Corrección | Cantidad/costo cambiados; confirmación y PATCH de detalle específico. |
 | Cancelación | Aviso cancelable/reintentable, PATCH /cancel sin payload de corrección. |
@@ -34,7 +34,7 @@ Referencia de responsabilidades y contratos del dominio `purchases`. El [corte d
 
 | Pregunta | Secuencia aplicada |
 | --- | --- |
-| Lectura y partidas | [Lectura y partidas](../../processes/06-purchases/01-purchase-read-lines.md) |
+| Lectura y detalles | [Lectura y detalles](../../processes/06-purchases/01-purchase-read-lines.md) |
 | Alta y edición | [Alta y edición](../../processes/06-purchases/02-purchase-save.md) |
 | Corrección | [Corrección](../../processes/06-purchases/03-purchase-correction.md) |
 | Cancelación | [Cancelación](../../processes/06-purchases/04-purchase-cancel.md) |

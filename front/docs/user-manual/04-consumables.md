@@ -26,7 +26,7 @@ consumible. Compruebe que el registro no exista con los mismos datos.
 
 El formulario adapta sus campos al consumible. No agregue dimensiones en el nombre
 para compensar una unidad o presentación equivocada. Si lo registra desde una
-compra, la recepción se captura con las partidas de esa compra y no se duplica
+compra, la recepción se captura con los detalles de esa compra y no se duplica
 como existencia inicial.
 <!-- manual:end -->
 

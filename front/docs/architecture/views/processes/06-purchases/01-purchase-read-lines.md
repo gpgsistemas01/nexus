@@ -1,4 +1,4 @@
-# Compra: lectura y preparación de partidas
+# Compra: lectura y preparación de detalles
 
 **Casos relacionados:** CU-ENT-01/02/03/07/08/09.
 

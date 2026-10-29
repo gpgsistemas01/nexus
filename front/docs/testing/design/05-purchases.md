@@ -4,7 +4,7 @@
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
-| `DP-VUE-COM-001` | RF-VUE-009; compra y detalles | Particiones de contexto y formato, fronteras numéricas, transiciones de captura/consulta | `purchaseTest.ts`: distingue material/consumible, rechaza documentos incompletos, conserva hora de México/proveedor/observaciones, omite partidas existentes y valores derivados, valida alta y corrección sin publicar errores al abrir; cerrar invalida lecturas tardías. | [purchaseTest.ts](../../../tests/unit/modules/purchases/purchaseTest.ts) |
+| `DP-VUE-COM-001` | RF-VUE-009; compra y detalles | Particiones de contexto y formato, fronteras numéricas, transiciones de captura/consulta | `purchaseTest.ts`: distingue material/consumible, rechaza documentos incompletos, conserva hora de México/proveedor/observaciones, omite detalles existentes y valores derivados, valida alta y corrección sin publicar errores al abrir; cerrar invalida lecturas tardías. | [purchaseTest.ts](../../../tests/unit/modules/purchases/purchaseTest.ts) |
 | `DP-VUE-COM-002` | RF-VUE-009; compra y detalles | Transiciones de documento y decisiones de permisos/confirmación | `purchases.spec.ts`: alta en ambas variantes, edición incremental, consulta/corrección/cancelación explícita, filtros y reporte aplicados, acceso y móvil en Chromium con HTTP simulado. No demuestra persistencia ni autorización del servidor. | [purchases.spec.ts](../../../tests/e2e/purchases.spec.ts) |
 
 El cambio de lectura de observaciones se cubre en la integración HTTP/Prisma

@@ -61,8 +61,8 @@ const headers: DataTableHeader<PurchaseDetail>[] = [
             :items-per-page-options="[10, 20, 50]"
             :mobile="false"
             density="compact"
-            no-data-text="Agrega una partida a la compra."
-            items-per-page-text="Partidas por página:"
+            no-data-text="Agrega un detalle a la compra."
+            items-per-page-text="Detalles por página:"
             page-text="{0}–{1} de {2}"
         >
             <template
@@ -80,7 +80,7 @@ const headers: DataTableHeader<PurchaseDetail>[] = [
                 {{ currencyText(item[key]) }}
             </template>
             <template #[`item.status`]="{ item }">
-                {{ item.isNew ? 'Nueva' : item.status === 'ACTIVE' ? 'Activa' : 'Cancelada' }}
+                {{ item.isNew ? 'Nuevo' : item.status === 'ACTIVE' ? 'Activo' : 'Cancelado' }}
             </template>
             <template #[`item.actions`]="{ item }">
                 <TableAction

@@ -59,7 +59,7 @@ surtidas y devueltas, descritas por sus contratos; la división no crea otro doc
 ## Interpretación y restricciones
 
 Las figuras reúnen los tres contextos bajo el concepto Salida. Cada documento es de
-materiales, consumibles o mermas y sus partidas no mezclan contextos. Cada detalle
+materiales, consumibles o mermas y sus detalles no mezclan contextos. Cada detalle
 apunta exclusivamente a una oferta de artículo o a una merma; las dos relaciones
 opcionales no permiten un detalle sin recurso ni con ambos recursos.
 

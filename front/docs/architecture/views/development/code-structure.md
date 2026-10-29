@@ -28,7 +28,7 @@ front/src/
 │   ├── identity/       # Personas, responsabilidades y usuarios
 │   ├── directory/      # Clientes y proveedores
 │   ├── movements/      # Historiales y sus filtros/reportes
-│   ├── purchases/      # Compras, partidas y corrección/cancelación
+│   ├── purchases/      # Compras, detalles y corrección/cancelación
 │   └── issues/         # Salidas, surtido y devolución
 └── shared/
     ├── components/     # Marcos, tabla, modal, selector y controles transversales

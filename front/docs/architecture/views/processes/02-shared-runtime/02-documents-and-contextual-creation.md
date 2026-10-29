@@ -4,8 +4,8 @@
 
 `PurchaseWorkspace` compone página y auxiliares. `usePurchaseEditor` coordina captura
 y lectura; encabezado, selección de línea, borrador, vista previa y mappers conservan
-responsabilidades propias. Alta permite partidas; edición conserva proveedor y sólo
-agrega partidas nuevas; consulta no guarda. Corrección/cancelación de un detalle
+responsabilidades propias. Alta permite detalles; edición conserva proveedor y sólo
+agrega detalles nuevos; consulta no guarda. Corrección/cancelación de un detalle
 usan sus operaciones y confirmaciones, sin reescribir el documento entero.
 
 Las observaciones del encabezado permanecen editables conforme al modo; las de
@@ -15,8 +15,8 @@ La respuesta confirmada y una consulta posterior muestran el estado del servidor
 ## Salida
 
 `IssueWorkspace` compone alta de cliente y página. Encabezado, líneas, selección de
-surtido y devolución tienen contratos distintos. Antes de surtir se editan las
-partidas admitidas; después se protegen los detalles persistidos/surtidos. Surtir
+surtido y devolución tienen contratos distintos. Antes de surtir se editan los
+detalles admitidos; después se protegen los detalles persistidos/surtidos. Surtir
 requiere selección y cantidad de proyecto; devolver exige positivo hasta el saldo
 entregado leído. La API comprueba de nuevo estado, pertenencia, permisos y saldo.
 

@@ -20,7 +20,7 @@ símbolos de frontera/coordinación, callbacks y actualizaciones reactivas.
 | [3. Catálogos y directorio](03-catalogs-and-directory/index.md) | Captura por recurso, versión y confirmación. |
 | [4. Personas y cuentas](04-identity/index.md) | Responsabilidades, edición y cambio de contraseña. |
 | [5. Inventario y mermas](05-warehouse/index.md) | Selecciones dependientes, pendiente, duplicado, baja y vista previa. |
-| [6. Compras](06-purchases/index.md) | Lectura/partidas, guardado, corrección y cancelación. |
+| [6. Compras](06-purchases/index.md) | Lectura/detalles, guardado, corrección y cancelación. |
 | [7. Salidas](07-issues/index.md) | Resolución de modo, surtido, devolución y alcance de área. |
 | [8. Movimientos y reportes](08-movements-and-reports/index.md) | Aplicación de filtros y descarga recuperable. |
 
@@ -55,7 +55,7 @@ punto, sin volver a describir todo el recorrido.
 | [Merma: respuesta incierta y reintento](05-warehouse/02-waste-pending.md) | CU-ALM-10/13; RF-VUE-007/008 | `DIA-VUE-SEQ-008` |
 | [Merma duplicada: apertura de una entrada](05-warehouse/03-waste-duplicate.md) | CU-ALM-10 A2 y CU-ALM-13 | `DIA-VUE-SEQ-009` |
 | [Búsqueda, paginación y selección remota](02-shared-runtime/03-remote-lookup.md) | RD-VUE-006; RN-VUE-003/005; soporte de captura | `DIA-VUE-SEQ-010` |
-| [Compra: lectura y preparación de partidas](06-purchases/01-purchase-read-lines.md) | CU-ENT-01/02/03/07/08/09 | `DIA-VUE-SEQ-011` |
+| [Compra: lectura y preparación de detalles](06-purchases/01-purchase-read-lines.md) | CU-ENT-01/02/03/07/08/09 | `DIA-VUE-SEQ-011` |
 | [Compra: alta y edición confirmadas](06-purchases/02-purchase-save.md) | CU-ENT-02/03/08/09 | `DIA-VUE-SEQ-012` |
 | [Compra: corrección de un detalle](06-purchases/03-purchase-correction.md) | CU-ENT-04/10 | `DIA-VUE-SEQ-013` |
 | [Compra: cancelación y reintento explícito](06-purchases/04-purchase-cancel.md) | CU-ENT-05/11 | `DIA-VUE-SEQ-014` |
@@ -87,8 +87,8 @@ punto, sin volver a describir todo el recorrido.
 | [Transporte de Inventario](05-warehouse/06-inventory-transport.md) | Operación, código y alta auxiliar para compra | `DIA-VUE-SEQ-040` |
 | [Evento de compra guardada](06-purchases/02-purchase-save.md#entrega-del-evento-y-actualización-del-listado) | Cierre, recarga y aviso | `DIA-VUE-SEQ-041` |
 | [Lectura de Salida](07-issues/05-issue-read-transport.md) | Mapper de respuesta e ID solicitado | `DIA-VUE-SEQ-042` |
-| [Partidas de Salida](07-issues/06-issue-line-entry.md) | Selección, borrador y colección de captura | `DIA-VUE-SEQ-043` |
-| [Partidas de Compra](06-purchases/05-purchase-line-entry.md) | Cantidad, costo y detalle nuevo | `DIA-VUE-SEQ-044` |
+| [Detalles de Salida](07-issues/06-issue-line-entry.md) | Selección, borrador y colección de captura | `DIA-VUE-SEQ-043` |
+| [Detalles de Compra](06-purchases/05-purchase-line-entry.md) | Cantidad, costo y detalle nuevo | `DIA-VUE-SEQ-044` |
 | [Transporte de escritura de Salida](07-issues/07-issue-save-transport.md) | Endpoints de cada modo y confirmación | `DIA-VUE-SEQ-045` |
 | [Descarga directa de Directorio](08-movements-and-reports/02-reports.md#descarga-directa-de-directorio) | Reportes sin selector de alcance | `DIA-VUE-SEQ-046` |
 | [Transporte de login](01-session/02-login.md#petición-y-contrato-de-acceso) | Código de acceso y errores | `DIA-VUE-SEQ-047` |

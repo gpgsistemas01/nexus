@@ -1,6 +1,6 @@
-# Salida: selección y agregado de partidas al borrador
+# Salida: selección y agregado de detalles al borrador
 
-## Construcción de la partida
+## Construcción del detalle
 
 **Identificador:** `DIA-VUE-SEQ-043`.
 

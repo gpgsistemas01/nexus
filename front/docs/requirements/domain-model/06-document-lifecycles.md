@@ -39,7 +39,7 @@ todos sus detalles están íntegramente devueltos; no existe cancelación direct
 
 ## Cumplimiento de un detalle de material, consumible o merma
 
-**Identificador:** `DIA-VUE-REQ-EST-002`. **Pregunta:** ¿Cómo cambia el cumplimiento de una partida al surtir o devolver?
+**Identificador:** `DIA-VUE-REQ-EST-002`. **Pregunta:** ¿Cómo cambia el cumplimiento de un detalle al surtir o devolver?
 **Fuente normativa:** catálogo de requisitos y casos de uso de Compras/Salidas.
 **Notación:** estados de negocio, guardas entre corchetes y final del ciclo operativo.
 **Lectura visual:** [estados y transiciones](../../architecture/views/diagram-reading.md#estados).
@@ -64,7 +64,7 @@ stateDiagram-v2
 
 ## Estado de una compra de material o consumible
 
-**Identificador:** `DIA-VUE-REQ-EST-003`. **Pregunta:** ¿Cuándo la cancelación de partidas cancela la compra?
+**Identificador:** `DIA-VUE-REQ-EST-003`. **Pregunta:** ¿Cuándo la cancelación de detalles cancela la compra?
 **Fuente normativa:** catálogo de requisitos y casos de uso de Compras/Salidas.
 **Notación:** estados de negocio, guardas entre corchetes y final del ciclo operativo.
 **Lectura visual:** [estados y transiciones](../../architecture/views/diagram-reading.md#estados).

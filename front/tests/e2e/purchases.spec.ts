@@ -8,7 +8,7 @@ for (const [path, title, item] of [
   ['materiales', 'Materiales', 'Material'],
   ['consumibles', 'Consumibles', 'Consumible'],
 ]) {
-  test(`compras ${path}: alta con partidas, validación diferida y payload sin totales`, async ({
+  test(`compras ${path}: alta con detalles, validación diferida y payload sin totales`, async ({
     page,
   }) => {
     const { writes } = await mockPurchases(page);
@@ -49,7 +49,7 @@ for (const [path, title, item] of [
   });
 }
 
-test('compras: edición de encabezado conserva proveedor, observaciones y partidas existentes', async ({
+test('compras: edición de encabezado conserva proveedor, observaciones y detalles existentes', async ({
   page,
 }) => {
   const { writes } = await mockPurchases(page);
@@ -142,7 +142,7 @@ test('compras: consulta, corrección y cancelación explícita conservan el hist
   expect(writes).toHaveLength(1);
   await dialog.getByRole('button', { name: 'Cancelar detalle', exact: true }).click();
   await confirm.getByRole('button', { name: 'Cancelar detalle', exact: true }).click();
-  await expect(dialog.getByRole('cell', { name: 'Cancelada', exact: true })).toBeVisible();
+  await expect(dialog.getByRole('cell', { name: 'Cancelado', exact: true })).toBeVisible();
   expect(writes).toHaveLength(2);
   expect(writes[1]!.data).toBeNull();
   await expect(dialog.getByRole('button', { name: 'Corregir detalle', exact: true })).toHaveCount(

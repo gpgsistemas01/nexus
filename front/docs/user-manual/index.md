@@ -48,7 +48,7 @@ Empiece por [Primera jornada: recorrido de inducción](00-induction.md).
 | [8. Usuarios](08-users.md) | Cuentas, asignaciones y contraseñas. |
 | [9. Clientes](09-clients.md) | Datos y disponibilidad del cliente. |
 | [10. Proveedores](10-suppliers.md) | Razón social, nombre comercial y disponibilidad. |
-| [11. Compras](11-purchases.md) | Recepciones, partidas, correcciones y cancelaciones. |
+| [11. Compras](11-purchases.md) | Recepciones, detalles, correcciones y cancelaciones. |
 | [12. Salidas](12-issues.md) | Solicitudes, surtido y devoluciones. |
 | [13. Movimientos](13-movements.md) | Historial de entradas y salidas de existencias. |
 | [14. Reportes](14-reports.md) | Descargar información según filtros o periodo. |
@@ -58,8 +58,8 @@ Empiece por [Primera jornada: recorrido de inducción](00-induction.md).
 ## Convenciones de operación
 
 **Guardar**, **Actualizar**, **Surtir**, **Devolver** y las confirmaciones de
-corrección o cancelación envían cambios al sistema. **Agregar** dentro de las
-partidas de un documento o de las responsabilidades de una persona prepara la
+corrección o cancelación envían cambios al sistema. **Agregar** dentro de los
+detalles de un documento o de las responsabilidades de una persona prepara la
 captura; todavía debe guardar el formulario principal. **Cerrar** o **Regresar**
 permiten abandonar una captura sin enviarla. Cerrar un mensaje después de una
 confirmación exitosa no revierte una operación ya guardada.

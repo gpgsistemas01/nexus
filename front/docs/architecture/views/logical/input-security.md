@@ -3,7 +3,7 @@
 Esta guía describe la captura, la normalización y la presentación segura de datos
 en el cliente. El [índice Vue](../../../index.md) ubica sus fuentes normativas.
 
-Los módulos actuales capturan texto plano, números, fechas, opciones y partidas.
+Los módulos actuales capturan texto plano, números, fechas, opciones y detalles.
 No admiten contenido HTML escrito por usuarios. La regla general es conservar
 el significado de la captura y tratarla como dato en todo el recorrido.
 

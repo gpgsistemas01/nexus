@@ -153,7 +153,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
   ])('rechaza una consulta incoherente %j', (changes) => {
     expect(() => normalizePurchaseDocument({ ...purchase, ...changes }, 'materials')).toThrow();
   });
-  it('la edición conserva proveedor y hora de México; omite partidas guardadas y valores derivados', () => {
+  it('la edición conserva proveedor y hora de México; omite detalles guardados y valores derivados', () => {
     const values = createInitialPurchaseValues(document());
     expect(values.receptionDate).toBe('2026-10-22T12:30');
     values.supplierId = 'otro';
@@ -190,7 +190,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     expect(state.errors.value.supplierId).toBeTruthy();
     expect(request).not.toHaveBeenCalled();
   });
-  it('editar no requiere nuevas partidas; un fallo conserva captura y sólo reenvía explícitamente', async () => {
+  it('editar no requiere nuevos detalles; un fallo conserva captura y sólo reenvía explícitamente', async () => {
     const { state, request, saved } = editor({ action: 'edit', document: document() });
     request.mockRejectedValueOnce(new Error('Sin conexión'));
     state.update('observations', ' Mi captura ');
@@ -203,7 +203,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     expect(request.mock.calls[1]![0].payload).not.toHaveProperty('details');
     expect(saved).toHaveBeenCalledOnce();
   });
-  it('cambiar proveedor limpia las partidas nuevas y receptor; la consulta no escribe', async () => {
+  it('cambiar proveedor limpia los detalles nuevos y receptor; la consulta no escribe', async () => {
     const { state } = editor();
     state.update('supplierId', ids.supplier);
     state.update('receivedById', purchase.receivedById);
@@ -251,7 +251,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
       signal: expect.any(AbortSignal),
     });
   });
-  it('agregar partida valida el mínimo uno y selecciona altas recientes aunque no estén en la página', async () => {
+  it('agregar detalle valida el mínimo uno y selecciona altas recientes aunque no estén en la página', async () => {
     vi.spyOn(purchaseLookupService, 'list').mockResolvedValue(pageOf([]));
     const added = vi.fn();
     const { state, wrapper } = harness(() =>

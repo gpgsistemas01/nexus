@@ -15,7 +15,7 @@ significa que su cuenta tenga acceso a esa acción.
 | Fila | Línea de una tabla. Sus botones actúan sobre el registro de esa línea. |
 | Filtro | Condición para reducir la lista, por ejemplo nombre, área o fecha. Pulse **Buscar** para aplicarla; filtrar no modifica registros. |
 | Selector | Campo donde debe elegir una opción de la lista. Escribir el nombre sin seleccionarlo puede dejar la captura incompleta. |
-| Borrador | Datos preparados en un formulario que todavía no ha guardado. Agregar una partida al borrador no registra el documento completo. |
+| Borrador | Datos preparados en un formulario que todavía no ha guardado. Agregar un detalle al borrador no registra el documento completo. |
 | Confirmación de guardado | Mensaje que indica que el sistema aceptó la operación. Cerrar la pantalla después no deshace el cambio. Si no recibió una respuesta, consulte [Errores y recuperación](15-errors-and-recovery.md) antes de repetirlo. |
 | Conflicto | Aviso de que el registro cambió desde que lo abrió. Consulte los datos actuales antes de intentar guardar otra vez. |
 
@@ -85,8 +85,8 @@ de confirmar; no utilice el ajuste para registrar una entrega ordinaria.
 | Término | Qué significa para su trabajo |
 | --- | --- |
 | Folio | Referencia visible para localizar un documento y pedir ayuda. No es el número de factura ni el número de proyecto. |
-| Encabezado | Datos generales de un documento, como fecha, proveedor, cliente u observaciones. Se comparten entre sus partidas. |
-| Partida o detalle | Renglón del documento que identifica un artículo y una cantidad. Compruebe cada renglón antes de guardar. |
+| Encabezado | Datos generales de un documento, como fecha, proveedor, cliente u observaciones. Se comparten entre sus detalles. |
+| Detalle | Renglón del documento que identifica un artículo y una cantidad. Compruebe cada renglón antes de guardar. |
 | Observaciones | Explicación adicional de la operación. Las observaciones de una compra, un ajuste o una devolución corresponden a registros distintos. |
 <!-- manual:end -->
 
@@ -98,10 +98,10 @@ de confirmar; no utilice el ajuste para registrar una entrega ordinaria.
 | Compra o entrada de compra | Recepción registrada de materiales o consumibles de un proveedor. Confirmarla incrementa existencias; no es una solicitud de compra futura. |
 | Persona que recibe | Persona a cuyo nombre queda la recepción. Puede ser distinta del usuario que captura la compra. |
 | Factura / Remisión | Tipo de comprobante de la compra. Una compra con factura requiere su número; una compra con remisión no lleva número de factura. |
-| Costo por presentación | Costo capturado en una partida de compra según su presentación. No lo confunda con el costo máximo unitario del inventario. |
+| Costo por presentación | Costo capturado en un detalle de compra según su presentación. No lo confunda con el costo máximo unitario del inventario. |
 | Monto sin IVA / Monto con IVA | Importe antes o después del impuesto. Es un valor monetario, no una cantidad de artículos. |
 | Corrección de detalle | Cambio que conserva el valor anterior y el motivo. Revise su efecto sobre existencias e importes antes de confirmar. |
-| Cancelación de detalle | Operación que revierte el inventario de esa partida y conserva su historia. La compra queda cancelada cuando todos sus detalles están cancelados. |
+| Cancelación de detalle | Operación que revierte el inventario de ese detalle y conserva su historia. La compra queda cancelada cuando todos sus detalles están cancelados. |
 
 Para capturar o corregir una recepción, siga [Compras](11-purchases.md).
 <!-- manual:end -->
@@ -115,7 +115,7 @@ Para capturar o corregir una recepción, siga [Compras](11-purchases.md).
 | Cliente | Organización o contexto comercial al que corresponde la salida. Se captura por separado del número de proyecto. |
 | Asesor | Persona asociada al contexto comercial de la salida. No es necesariamente quien ingresa o captura en Nexus. |
 | Solicitante | Persona que requiere los artículos para el área elegida. Puede ser distinta del usuario que registra la salida. |
-| Cantidad solicitada | Cantidad requerida en la partida. Revísela antes de guardar la solicitud. |
+| Cantidad solicitada | Cantidad requerida en el detalle. Revísela antes de guardar la solicitud. |
 | Cantidad suministrada o surtida | Cantidad que Almacén ya entregó y registró. No equivale al stock que permanece disponible. |
 | Cantidad pendiente de surtir | Cantidad solicitada que todavía no se ha entregado. Una devolución no vuelve a abrir el detalle como pendiente. |
 | Devolución / Cantidad devuelta | Reingreso de artículos que se habían entregado. Almacén registra la devolución; la cantidad devuelta permite consultar cuánto regresó. |

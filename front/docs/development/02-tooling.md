@@ -105,8 +105,8 @@ validación de los formularios. Sus consumidores actuales son:
 | Catálogos | `CatalogPage` y formularios de catálogo. | `useCatalogEditor`. |
 | Identidad | `IdentityPage`, `PersonForm`, `UserForm`. | `usePersonEditor`, `useUserEditor`. |
 | Directorio | `DirectoryPage`, `DirectoryForm`. | `useDirectoryEditor`. |
-| Compras | Páginas, editor, partidas y corrección. | `usePurchaseEditor`, `usePurchaseLineEntry`, `usePurchaseCorrection`. |
-| Salidas | Páginas, editor, partidas, surtido y devolución. | `useIssueEditor`, `useIssueLineEntry`, `useIssueReturn`. |
+| Compras | Páginas, editor, detalles y corrección. | `usePurchaseEditor`, `usePurchaseLineEntry`, `usePurchaseCorrection`. |
+| Salidas | Páginas, editor, detalles, surtido y devolución. | `useIssueEditor`, `useIssueLineEntry`, `useIssueReturn`. |
 
 Movimientos y los controles compartidos también utilizan Vuetify. Los filtros y
 los formularios de cada operación conservan responsabilidades distintas: usar

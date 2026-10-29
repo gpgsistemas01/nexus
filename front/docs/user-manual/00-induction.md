@@ -38,7 +38,7 @@ estados o participantes de una operación, consulte el
 | Existencia o stock | Cantidad disponible de un artículo. Un ajuste cambia ese saldo. |
 | Presentación | Forma en que se maneja el artículo, como un rollo o una pieza. |
 | Conversión | Equivalencia de la cantidad a su unidad de control. Dos rollos pueden representar muchos metros cuadrados. |
-| Partida o detalle | Una línea de artículos y cantidades dentro de una compra o salida. |
+| Detalle | Una línea de artículos y cantidades dentro de una compra o salida. |
 | Encabezado | Datos comunes del documento, como fecha, proveedor, cliente o proyecto. |
 | Borrador | Captura preparada en el formulario que todavía no se ha guardado. |
 | Guardado o confirmado | Cambio aceptado por el sistema. Cerrar el formulario después no lo deshace. |
@@ -74,7 +74,7 @@ qué cantidad tiene disponible y en qué unidad. Esta práctica no modifica dato
 
 ## Preparar una captura y guardarla son acciones distintas
 
-Al añadir una partida con **Agregar**, la ve dentro del documento, pero todavía
+Al añadir un detalle con **Agregar**, lo ve dentro del documento, pero todavía
 no está registrada la compra o solicitud. Revise esa lista y después pulse
 **Guardar** en el formulario principal. En cambio, un cliente o proveedor creado
 en un formulario secundario sí queda guardado al confirmar ese formulario, aunque

@@ -29,7 +29,7 @@ identifica quién los conserva y cuándo se descartan.
 | Formularios: `blur(field)`; `RemoteSelect`: `blur()` | Campo que pierde foco; el contenedor identifica el campo cuando el selector no lo aporta. | Handler de interacción del editor. |
 | `RemoteSelect`: `search(value)`, `more()`, `retry()` | Búsqueda, siguiente página o repetición de carga. Algunos formularios añaden el campo o tipo de selector al reenviar el evento. | Lookup correspondiente. |
 | Formularios: `submit()` | Intención de enviar la captura; no contiene una confirmación. | Método `submit` del composable. |
-| Partidas de Compra/Salida: `add(line)` | `PurchaseDetail` o `IssueDetail` de la captura local. | Editor del documento; agregar no confirma el documento en la API. |
+| Detalles de Compra/Salida: `add(line)` | `PurchaseDetail` o `IssueDetail` de la captura local. | Editor del documento; agregar no confirma el documento en la API. |
 | Editores: `close()` y `reload()` | Cierre o solicitud de nueva lectura. | Contenedor que abrió el editor. |
 | Catálogos, Identidad, Directorio e `IssueReturnPage`: `denied(status)` | Estado de rechazo; Inventario utiliza `unauthorized()` sin argumento. | Handler de acceso del contenedor. |
 | Inventario: `addStock(target)` | `StockAdditionTarget` para sustituir el editor actual por una entrada de merma. | `InventoryPage` y su coordinador. |
