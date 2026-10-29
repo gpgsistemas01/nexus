@@ -102,45 +102,27 @@ Esta figura desarrolla la entrega del callback y los eventos entre contenedores.
 sequenceDiagram
     autonumber
     box Interfaz
-    participant EditorPage@{ "type": "boundary" } as IssueEditor<br/>Page.vue
-    participant Page@{ "type": "boundary" } as Issue<br/>Page.vue
     participant Feedback@{ "type": "boundary" } as feedback.ts
     end
     box Coordinación
+    participant EditorPage@{ "type": "control" } as IssueEditor<br/>Page.vue
+    participant Page@{ "type": "control" } as Issue<br/>Page.vue
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     participant Actions@{ "type": "control" } as useIssue<br/>Actions.ts
     participant State@{ "type": "control" } as useList<br/>Editor.ts
     participant Reader@{ "type": "control" } as useDocument<br/>Read.ts
     end
-    Note over Save: operation completó issueService.save y confirmMutation, SEQ-027 y SEQ-045
-    alt señal vigente
-        Save->>EditorPage: options.onSaved(confirmation)
-        EditorPage->>Page: emitir saved(confirmation)
-        Page->>Actions: handleSaved(confirmation)
-        Actions->>Actions: close()
-        Actions->>Reader: close()
-        Actions->>State: closeEditor()
-        Actions->>Page: options.reload() configurado
-        Page->>Page: cargar listado vigente
-        Actions->>Feedback: showSuccess(confirmation.message)
-    else desmontado
-        Save->>Save: omitir onSaved
+    opt nowrap: !controller.signal.aborted
+        Save->>EditorPage: nowrap: options.onSaved(result)
+        EditorPage->>Page: nowrap: emit('saved', result)
+        Page->>Actions: nowrap: actions.handleSaved(result)
+        Actions->>Actions: nowrap: close()
+        Actions->>Reader: nowrap: reader.close()
+        Actions->>State: nowrap: editorState.closeEditor()
+        Actions->>Page: nowrap: options.reload()
+        Actions->>Feedback: nowrap: showSuccess(result.message)
     end
 ```
-
-`onSaved` emite `saved` desde `IssueEditorPage`; `IssuePage` conecta ese evento con
-`useIssueActions.handleSaved`, que cierra, solicita la recarga y muestra el mensaje.
-Compras usa el mismo ciclo con `purchaseService`. `confirmMutation` comprueba el
-código recibido: no genera un folio ni confirma una transacción por sí mismo.
-El servicio de lectura usa el mapper de respuesta; el guardado devuelve una
-confirmación, sin simular que retorna un documento completo.
-
-| Condición alternativa | Resultado |
-| --- | --- |
-| Captura inválida | VeeValidate evita la operación HTTP. |
-| Rechazo HTTP/código inesperado | Sin `onSaved`; conserva mensaje y errores de `ApiError`. Sólo `RECORD_VERSION_CONFLICT` bloquea por conflicto; 401/403 notifican `onDenied`. |
-| Desmontaje | Aborta e impide callback tardío; no acredita reversión de una escritura confirmada. |
-| Lectura sustituida/cerrada | `useDocumentRead` invalida/aborta; el resultado antiguo no reemplaza el actual. |
 
 ## Composición entre dominios para altas rápidas
 

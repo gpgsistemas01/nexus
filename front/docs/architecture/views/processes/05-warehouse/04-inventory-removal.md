@@ -1,65 +1,54 @@
 # Baja confirmada de una relación de inventario
 
-## Escenario y fuente
-
-Casos CU-ALM-04/20: Materiales y Consumibles. Fuentes: `useInventoryRemoval.ts`, `inventoryService.mutate`
-y `confirmAction`. La fila tiene ID de relación y entityId con significados distintos.
-
 ## Secuencia aplicada
 
-**Identificador:** `DIA-VUE-SEQ-021`. Mensajes numerados y ramas de confirmación;
-la API conserva el control definitivo de relaciones y efectos.
-
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
+**Identificador:** `DIA-VUE-SEQ-021`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
-    participant Page@{ "type": "boundary" } as Inventory<br/>Page.vue
     participant Feedback@{ "type": "boundary" } as feedback.ts
     end
     box Coordinación
+    participant Page@{ "type": "control" } as Inventory<br/>Page.vue
     participant Inventory@{ "type": "control" } as use<br/>Inventory.ts
     participant Remove@{ "type": "control" } as useInventory<br/>Removal.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
     end
-    U->>Page: Eliminar fila autorizada
-    Page->>Inventory: openEditor con target delete
-    Inventory->>Remove: remove(row)
-    Remove->>Remove: comprobar bloqueo de confirmación
-    Remove->>Feedback: confirmAction con callback submit
-    Feedback-->>U: confirmación cancelable
-    alt cancelar
-        Feedback-->>Remove: false sin petición
-    else confirmar
-        U->>Feedback: aceptar
-        Feedback->>Remove: submit() definido en remove
-        Remove->>Service: mutate(resource, delete, {}, row.id, signal)
-        alt rechazo
-            Service-->>Remove: ApiError
-            Remove-->>Feedback: rechazar callback
-            Feedback-->>U: aviso abierto con error y reintento
-        else respuesta confirmada
-            Service-->>Remove: resultado validado
-            Remove-->>Feedback: callback resuelto
-            Feedback-->>Remove: true
-            Remove->>Inventory: onSaved()
-            Inventory->>Inventory: cerrar editor y recargar listado
+    U->>Page: nowrap: action({ action: 'delete', row })
+    Page->>Inventory: nowrap: inventory.openEditor(target)
+    Inventory->>Remove: nowrap: removal.remove(target.row)
+    opt nowrap: !isConfirming.value && !controller.signal.aborted
+        Remove->>Remove: nowrap: isConfirming.value = true
+        Remove->>Feedback: nowrap: confirmAction({ signal: controller.signal,<br/>submit, ... })
+        Feedback-->>U: nowrap: Confirmar eliminación / Cancelar
+        U->>Feedback: nowrap: confirm
+        Feedback->>Remove: nowrap: options.submit?.()
+        Remove->>Service: nowrap: inventoryService.mutate(options.resource,<br/>'delete', {}, row.id, controller.signal)
+        alt nowrap: try
+            Service-->>Remove: nowrap: result
+            Remove-->>Feedback: nowrap: undefined
+            Feedback-->>Remove: nowrap: confirmed
+            opt nowrap: confirmed
+                Remove->>Inventory: nowrap: options.onSaved()
+                Inventory->>Inventory: nowrap: editor.value = null
+                Inventory->>Inventory: nowrap: list.load()
+            end
+        else nowrap: catch(cause)
+            Service-->>Remove: nowrap: throw ApiError
+            opt nowrap: cause.status === 401
+                Remove->>Page: nowrap: options.onUnauthorized()
+            end
+            Remove-->>Feedback: nowrap: throw cause
+            Feedback-->>U: nowrap: cause.message
         end
+        Remove->>Remove: nowrap: isConfirming.value = false
     end
-    Remove->>Remove: finally libera isConfirming
 ```
-
-## Protección y evidencia
-
-El ID enviado es `row.id`, no `entityId`. Desmontar aborta el popup/solicitud; un 401
-invoca recuperación de acceso. Cancelar o fallar no anuncia eliminación exitosa.
-`warehouse.spec.ts`, pruebas de `feedback` y `inventoryService` conservan la evidencia
-representativa; la eliminación persistente requiere API/base reales.
 
 ## Fuentes de los participantes
 

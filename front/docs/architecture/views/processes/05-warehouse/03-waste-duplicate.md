@@ -1,19 +1,15 @@
 # Merma duplicada: apertura de una entrada
 
-## Escenario y contratos
-
 **Casos relacionados:** CU-ALM-10 A2 y CU-ALM-13.
 
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-009`.
 
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
-
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant Feedback@{ "type": "boundary" } as feedback.ts
     end
@@ -22,57 +18,50 @@ sequenceDiagram
     participant Recovery@{ "type": "control" } as useWaste<br/>Duplicate<br/>Recovery.ts
     end
     box Reglas y datos
-    participant Mapper@{ "type": "control" } as wasteStock<br/>Addition<br/>Mapper.ts
+    participant Mapper as wasteStock<br/>Addition<br/>Mapper.ts
     end
-    Editor->>Recovery: recover(cause, capture)
-    Recovery->>Recovery: permiso, callback y rechazo definitivo
-    alt contrato o permiso inválido
-        Recovery-->>Editor: false
-    else duplicado identificado
-        Recovery->>Mapper: mapWasteStockAddition(waste, capture)
-        Mapper-->>Recovery: StockAdditionTarget o null
-        opt target válido
-            Recovery->>Feedback: confirmAction con signal
-            Feedback-->>U: ofrecer Abrir Agregar stock
-            U->>Feedback: cancelar o confirmar
-            Feedback-->>Recovery: false o true
-            opt confirmado y vigente
-                Note over Editor,Mapper: Ejecutar onAddStock(target), continuación en SEQ-048
+    Editor->>Recovery: nowrap: duplicateRecovery.recover(cause, payload)
+    alt nowrap: !options.canAddStock || !options.onAddStock ||<br/>options.signal.aborted || isConfirming.value
+        Recovery-->>Editor: nowrap: false
+    else nowrap: !(cause instanceof ApiError) || cause.code !==<br/>'WASTE_ALREADY_EXISTS' ||<br/>cause.meta.operationRejected !== true
+        Recovery-->>Editor: nowrap: false
+    else
+        Recovery->>Mapper: nowrap: mapWasteStockAddition(cause.meta.waste,<br/>capture)
+        Mapper-->>Recovery: nowrap: target
+        opt nowrap: target
+            Recovery->>Recovery: nowrap: isConfirming.value = true
+            Recovery->>Feedback: nowrap: confirmAction({ signal: options.signal,<br/>confirmLabel: 'Abrir Agregar stock', ...<br/>})
+            Feedback-->>U: nowrap: Abrir Agregar stock / Cancelar
+            U->>Feedback: nowrap: confirm
+            Feedback-->>Recovery: nowrap: confirmed
+            opt nowrap: confirmed && !options.signal.aborted
+                Recovery->>Recovery: nowrap: options.onAddStock(target)
             end
+            Recovery->>Recovery: nowrap: isConfirming.value = false
         end
     end
 ```
 
 ## Entrega del destino de entrada
 
-**Identificador:** `DIA-VUE-SEQ-048`. Continúa la confirmación del aviso, conservando el propietario de cada evento y callback.
+**Identificador:** `DIA-VUE-SEQ-048`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    box Interfaz
-    participant Page@{ "type": "boundary" } as Inventory<br/>Editor<br/>Page.vue
-    participant Parent@{ "type": "boundary" } as Inventory<br/>Page.vue
-    end
     box Coordinación
+    participant Page@{ "type": "control" } as Inventory<br/>Editor<br/>Page.vue
+    participant Parent@{ "type": "control" } as Inventory<br/>Page.vue
     participant Recovery@{ "type": "control" } as useWaste<br/>Duplicate<br/>Recovery.ts
     participant Inventory@{ "type": "control" } as use<br/>Inventory.ts
     end
-    Recovery->>Page: onAddStock(target)
-    Page->>Parent: addStock(target)
-    Parent->>Inventory: openEditor(target)
-    Inventory-->>Parent: editor con target add-stock
-    Parent->>Page: nueva instancia con cantidad y observaciones
-    Note over Parent,Recovery: Abrir el editor no registra existencias
+    Recovery->>Page: nowrap: options.onAddStock(target)
+    Page->>Parent: nowrap: emit('addStock', target)
+    Parent->>Inventory: nowrap: inventory.openEditor(target)
+    Inventory->>Inventory: nowrap: editor.value = target
+    Inventory-->>Parent: nowrap: editor
+    Parent->>Page: nowrap: { target: editor, resource, userId }
 ```
-
-## Reglas y recuperación
-
-Guardar el editor de entrada inicia otra operación con su propia clave y revisión. El ajuste absoluto no reemplaza esta entrada.
-
-## Evidencia
-
-wasteDuplicateRecoveryTest.ts y warehouse.spec.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
 
 ## Fuentes de los participantes
 

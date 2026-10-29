@@ -1,13 +1,8 @@
 # Salida: lectura y adaptación del documento
 
-La apertura de `SEQ-015` configura el callback de lectura en `useIssueActions`.
-El lector compartido protege la vigencia; el servicio comprueba la identidad recibida.
-
 ## Documento solicitado y documento recibido
 
-**Identificador:** `DIA-VUE-SEQ-042`. **Pregunta:** ¿Qué colaboradores convierten una respuesta HTTP en IssueDocument?
-
-**Lectura visual:** [roles y callbacks](../00-reading-and-roles.md).
+**Identificador:** `DIA-VUE-SEQ-042`.
 
 ```mermaid
 sequenceDiagram
@@ -17,7 +12,7 @@ sequenceDiagram
     participant Reader@{ "type": "control" } as useDocument<br/>Read.ts
     end
     box Reglas y datos
-    participant Mapper@{ "type": "control" } as issue<br/>Response<br/>Mapper.ts
+    participant Mapper as issue<br/>Response<br/>Mapper.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as issue<br/>Service.ts
@@ -26,19 +21,27 @@ sequenceDiagram
     box Sistema externo
     participant API@{ "type": "boundary" } as API del sistema
     end
-    Reader->>Actions: request(id, signal) configurado por open
-    Actions->>Service: get(resource, id, signal)
-    Service->>HTTP: request por ID
-    HTTP->>API: GET goods-issues/resource/id o waste-issues/id
-    API-->>HTTP: goodsIssue o wasteIssue
-    HTTP-->>Service: cuerpo JSON
-    Service->>Mapper: normalizeIssueDocument(registro, resource)
-    Mapper-->>Service: IssueDocument o error de contrato
-    Service->>Service: comprobar document.id === id
-    Service-->>Actions: documento o error
-    Actions-->>Reader: resolver o rechazar callback
-    Reader->>Reader: comprobar intento y señal
-    Reader-->>Actions: documento vigente o undefined con error
+    Reader->>Actions: nowrap: options.request(id, current.signal)
+    Actions->>Service: nowrap: issueService.get(options.resource, id,<br/>signal)
+    Service->>HTTP: nowrap: apiClient.request(getIssueEndpoint(<br/>resource) + '/' + encodeURIComponent(id),<br/>{ signal })
+    HTTP->>API: nowrap: GET {url}
+    API-->>HTTP: nowrap: { goodsIssue, wasteIssue }
+    HTTP-->>Service: nowrap: result
+    Service->>Mapper: nowrap: normalizeIssueDocument(result[resource<br/>=== 'wastes' ? 'wasteIssue' :<br/>'goodsIssue'], resource)
+    Mapper-->>Service: nowrap: document
+    alt nowrap: document.id !== id
+        Service-->>Actions: nowrap: throw Error
+        Actions-->>Reader: nowrap: throw Error
+        Reader->>Reader: nowrap: readError.value = cause.message
+        Reader->>Actions: nowrap: options.onError(cause)
+    else
+        Service-->>Actions: nowrap: document
+        Actions-->>Reader: nowrap: document
+        opt nowrap: attempt === sequence && !current.signal.aborted
+            Reader->>Reader: nowrap: document.value = result
+            Reader-->>Actions: nowrap: result
+        end
+    end
 ```
 
 ## Fuentes de los participantes
@@ -48,3 +51,7 @@ sequenceDiagram
 [issueResponseMapper.ts](../../../../../src/modules/issues/mappers/issueResponseMapper.ts),
 [issueService.ts](../../../../../src/modules/issues/services/issueService.ts),
 [apiClient.ts](../../../../../src/shared/http/apiClient.ts).
+
+## Secuencias relacionadas
+
+[DIA-VUE-SEQ-015](01-issue-open-save.md#apertura-y-resolución-del-modo).

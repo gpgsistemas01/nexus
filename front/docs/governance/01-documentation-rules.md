@@ -68,7 +68,7 @@ entender una integración concreta.
 | Requisitos, pantallas, permisos y contratos HTTP | Usar «API», «servidor» o «backend» y explicar solicitudes, respuestas y errores que afectan al cliente. |
 | Patrones y componentes Vue | Explicar la colaboración del cliente y su frontera HTTP; evitar comparaciones con controladores o patrones del servidor. |
 | Diagramas de clases y tipos | Conservar contratos del negocio y de infraestructura creados para el sistema, como `ApiError`, `InteractiveForm` y los contratos de props que explican sus patrones. Los tipos externos se conservan en firmas o metadatos cuando son necesarios, sin desarrollar clases de bibliotecas. |
-| Secuencias | Mostrar archivos y funciones propios con sus callbacks, eventos y contratos. Las bibliotecas se identifican en texto; sus objetos internos no reciben líneas de vida. La API permanece como frontera externa. La [guía de roles](../architecture/views/processes/00-reading-and-roles.md) define agrupación y alcance. |
+| Secuencias | Mostrar archivos y funciones propios con sus callbacks, eventos, guardas y retornos del código. Las bibliotecas se identifican en texto; sus objetos internos no reciben líneas de vida. La API permanece como frontera externa. La [guía de roles](../architecture/views/processes/00-reading-and-roles.md) define agrupación y alcance. |
 | Arranque, despliegue y pruebas de sistema | Nombrar Express cuando identifica el proceso, contenedor o dependencia que se ejecuta realmente. |
 | Módulos compartidos | Conservar nombres, rutas y dependencias exactos para distinguir código público compilable de adaptadores privados del servidor. |
 

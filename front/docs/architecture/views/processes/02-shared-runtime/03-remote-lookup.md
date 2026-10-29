@@ -1,24 +1,20 @@
 # Búsqueda, paginación y selección remota
 
-## Escenario y contratos
-
 **Casos relacionados:** RD-VUE-006; RN-VUE-003/005; soporte de captura.
 
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-010`.
 
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
-
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant Select@{ "type": "boundary" } as Remote<br/>Select.vue
-    participant Page@{ "type": "boundary" } as Purchase<br/>Editor<br/>Page.vue
     end
     box Coordinación
+    participant Page@{ "type": "control" } as Purchase<br/>Editor<br/>Page.vue
     participant Editor@{ "type": "control" } as usePurchase<br/>Editor.ts
     participant Lookup@{ "type": "control" } as useRemote<br/>Lookup.ts
     participant Selection@{ "type": "control" } as useSelected<br/>Option.ts
@@ -26,38 +22,32 @@ sequenceDiagram
     box Integración
     participant Service@{ "type": "boundary" } as purchase<br/>Lookup<br/>Service.ts
     end
-    U->>Select: escribir búsqueda de proveedor
-    Select->>Page: search(value)
-    Page->>Lookup: editor.suppliers.updateSearch(value)
-    Lookup->>Lookup: invalidar, reiniciar y aplicar debounce
-    Lookup->>Editor: request(search, page, signal)
-    Editor->>Service: list(suppliers, resource, search, page, signal)
-    Service-->>Editor: PageResult de LookupItem
-    Editor-->>Lookup: resultado del callback
-    Lookup-->>Page: estado de opciones
-    Page-->>Select: items y hasMore por props
-    Select->>Selection: ID, items e initialOption actualizados
-    Selection-->>Select: opción conservada por identidad
-    U->>Select: alcanzar final de opciones
-    Select->>Page: more
-    Page->>Lookup: suppliers.loadMore()
-    alt siguiente página disponible y sin petición pendiente
-        Lookup->>Editor: request con siguiente página
-        Editor->>Service: list con página y signal
-        Service-->>Editor: resultado o error
-        Editor-->>Lookup: resolver o rechazar callback
-        Lookup-->>Page: opciones únicas o error recuperable
-        Page-->>Select: estado por props
+    U->>Select: nowrap: update:search
+    Select->>Page: nowrap: emit('search', value)
+    Page->>Lookup: nowrap: editor.suppliers.updateSearch(value)
+    Lookup->>Lookup: nowrap: resetOptions()
+    Lookup->>Lookup: nowrap: ++sequence
+    Lookup->>Lookup: nowrap: controller?.abort()
+    Lookup->>Lookup: nowrap: setTimeout(() => load(), 250)
+    Lookup->>Editor: nowrap: request(search.value, nextPage,<br/>requestController.signal)
+    Editor->>Service: nowrap: purchaseLookupService.list('suppliers',<br/>options.resource, search, page, signal, {<br/>capture: true })
+    Service-->>Editor: nowrap: result
+    Editor-->>Lookup: nowrap: result
+    opt nowrap: requestId === sequence
+        Lookup->>Lookup: nowrap: items.value = [...previous, ...additions]
+        Lookup->>Lookup: nowrap: hasMore.value = result.data.length > 0 &&<br/>recordsRead < result.recordsFiltered
+        Lookup-->>Page: nowrap: suppliers.state
+        Page-->>Select: nowrap: { items, isLoading, hasMore, loadError }
+        Select->>Selection: nowrap: useSelectedOption(toRef(props, 'items'),<br/>getId, getInitialOption)
+        Selection-->>Select: nowrap: selected
+    end
+    U->>Select: nowrap: intersect
+    Select->>Page: nowrap: emit('more')
+    Page->>Lookup: nowrap: suppliers.loadMore()
+    opt nowrap: !isLoading.value && !error.value && hasMore.value
+        Lookup->>Lookup: nowrap: load(page.value + 1)
     end
 ```
-
-## Reglas y recuperación
-
-Cambiar dependencia reinicia búsqueda/opciones; desmontar limpia timer y aborta/invalida. La selección pertenece al consumidor y no autoriza el registro ni fabrica su ID.
-
-## Evidencia
-
-remoteLookupTest.ts, selectedOptionTest.ts y selectCreation.spec.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
 
 ## Fuentes de los participantes
 

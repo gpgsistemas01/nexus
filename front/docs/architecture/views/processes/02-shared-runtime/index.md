@@ -13,4 +13,6 @@
 
 - [Transporte, errores y contrato paginado](07-http-and-contracts.md): `DIA-VUE-SEQ-034/035`.
 
+- [execute(operation)](08-record-save.md): `DIA-VUE-SEQ-051/053`.
+
 [Catálogo de procesos y figuras](../index.md).

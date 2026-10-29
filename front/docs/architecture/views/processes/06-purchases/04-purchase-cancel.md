@@ -1,64 +1,58 @@
 # Compra: cancelación y reintento explícito
 
-## Escenario y contratos
-
 **Casos relacionados:** CU-ENT-05/11.
 
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-014`.
 
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
-
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
-    participant Page@{ "type": "boundary" } as Purchase<br/>Page.vue
     participant Feedback@{ "type": "boundary" } as feedback.ts
     end
     box Coordinación
+    participant Page@{ "type": "control" } as Purchase<br/>Page.vue
     participant Actions@{ "type": "control" } as usePurchase<br/>Actions.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as purchase<br/>Service.ts
     end
-    U->>Page: cancelar detalle desde consulta
-    Page->>Actions: cancel(line)
-    Actions->>Actions: editableDetailDocument(line) y marcar isChanging
-    Actions->>Feedback: confirmAction con callback submit
-    Feedback-->>U: pedir confirmación
-    alt cancelar aviso
-        Feedback-->>Actions: false sin petición
-    else confirmar aviso
-        U->>Feedback: aceptar
-        Feedback->>Actions: ejecutar submit() configurado
-        Actions->>Service: changeDetail con action cancel y signal
-        Note over Service: PATCH details/id/cancel, sin cuerpo de corrección
-        alt rechazo
-            Service-->>Actions: ApiError
-            Actions->>Actions: options.onError(cause)
-            Actions-->>Feedback: rechazar submit
-            Feedback-->>U: error en aviso, reintento explícito
-        else código confirmado
-            Service-->>Actions: MutationConfirmation
-            Actions-->>Feedback: callback resuelto
-            Feedback-->>Actions: true
-            Actions->>Actions: handleDetailSaved(confirmation)
-            Actions->>Actions: cerrar corrección, marcar needsReload y recargar
+    U->>Page: nowrap: cancel(line)
+    Page->>Actions: nowrap: actions.cancel(line)
+    Actions->>Actions: nowrap: editableDetailDocument(line)
+    alt nowrap: !document
+        Actions-->>Page: nowrap: undefined
+    else
+        Actions->>Actions: nowrap: isChanging.value = true
+        Actions->>Feedback: nowrap: confirmAction({ signal: controller.signal,<br/>submit, ... })
+        Feedback-->>U: nowrap: Confirmar / Cancelar
+        U->>Feedback: nowrap: confirm
+        Feedback->>Actions: nowrap: options.submit?.()
+        Actions->>Service: nowrap: purchaseService.changeDetail({ resource,<br/>documentId, detailId, change: { action:<br/>'cancel' }, signal })
+        alt nowrap: try
+            Service-->>Actions: nowrap: confirmation
+            Actions-->>Feedback: nowrap: undefined
+            Feedback-->>Actions: nowrap: confirmed
+            Actions->>Actions: nowrap: isChanging.value = false
+            opt nowrap: confirmed && confirmation &&<br/>!controller.signal.aborted
+                Actions->>Actions: nowrap: handleDetailSaved(confirmation)
+                Actions->>Actions: nowrap: correction.value = undefined
+                Actions->>Actions: nowrap: needsReload.value = true
+                Actions->>Page: nowrap: options.reload()
+                Actions->>Actions: nowrap: reload()
+            end
+        else nowrap: catch(cause)
+            Service-->>Actions: nowrap: throw ApiError
+            Actions->>Page: nowrap: options.onError(cause)
+            Actions-->>Feedback: nowrap: throw cause
+            Feedback-->>U: nowrap: cause.message
         end
+        Actions->>Actions: nowrap: isChanging.value = false
     end
-    Actions->>Actions: finally libera isChanging
 ```
-
-## Reglas y recuperación
-
-Reintentar requiere otra acción del usuario sobre el aviso. Desmontar aborta la confirmación. La UI no marca el detalle cancelado antes de recibir el código esperado.
-
-## Evidencia
-
-purchases.spec.ts y pruebas de feedback. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
 
 ## Fuentes de los participantes
 

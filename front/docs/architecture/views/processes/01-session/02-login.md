@@ -1,59 +1,51 @@
 # Captura, login y navegación
 
-## Escenario y contratos
-
 **Casos relacionados:** CU-AUT-01.
 
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-003`.
 
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
-
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant Form@{ "type": "boundary" } as Login<br/>Form.vue
-    participant Page@{ "type": "boundary" } as Login<br/>Page.vue
     end
     box Coordinación
+    participant Page@{ "type": "control" } as Login<br/>Page.vue
     participant Editor@{ "type": "control" } as useLogin<br/>Form.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as auth<br/>Service.ts
     end
-    U->>Form: capturar y pulsar Ingresar
-    Form->>Page: update:name, update:password y submit
-    Page->>Editor: updateField y submit()
-    Editor->>Editor: validar con loginValidation
-    alt captura inválida
-        Editor-->>Page: errors y mensaje
-        Page-->>Form: props de errores, sin petición
-    else captura válida
-        Editor->>Service: loginRequest(credentials, signal)
-        Note over Page,Service: Transporte y traducción del rechazo en SEQ-047
-        alt acceso confirmado y editor vigente
-            Service-->>Editor: promesa resuelta
-            Editor->>Editor: recordar nombre y vaciar contraseña
-            Editor->>Page: onSuccess()
-            Page->>Page: protectedDestination y solicitar navegación
-        else rechazo
-            Service-->>Editor: LoginRequestError
-            Editor-->>Page: mensaje y errores
-            Page-->>Form: conservar captura recuperable
+    U->>Form: nowrap: submit
+    Form->>Page: nowrap: emit('submit')
+    Page->>Editor: nowrap: submit()
+    opt nowrap: !isSubmitting.value
+        Editor->>Editor: nowrap: submitValidated()
+        Editor->>Service: nowrap: request(credentials, controller.signal)
+        Service-->>Editor: nowrap: undefined
+        opt nowrap: !controller.signal.aborted
+            Editor->>Editor: nowrap: setFieldValue('password', '', false)
+            Editor->>Page: nowrap: onSuccess()
+            Page->>Page: nowrap: protectedDestination(router,<br/>route.query.returnTo)
+            Page->>Page: nowrap: router.replace(destination)
         end
     end
 ```
 
 ## Petición y contrato de acceso
 
-**Identificador:** `DIA-VUE-SEQ-047`. Amplía `loginRequest` sin representar objetos internos de la biblioteca HTTP.
+**Identificador:** `DIA-VUE-SEQ-047`.
 
 ```mermaid
 sequenceDiagram
     autonumber
+    box Coordinación
+    participant Editor@{ "type": "control" } as useLogin<br/>Form.ts
+    end
     box Integración
     participant Service@{ "type": "boundary" } as auth<br/>Service.ts
     participant HTTP@{ "type": "boundary" } as apiClient.ts
@@ -61,31 +53,80 @@ sequenceDiagram
     box Sistema externo
     participant API@{ "type": "boundary" } as API del sistema
     end
-    Service->>Service: recortar nombre y conservar contraseña
-    Service->>HTTP: request con requiresAuth false y signal
-    HTTP->>API: POST /api/auth/login
-    API-->>HTTP: respuesta de acceso
-    alt respuesta HTTP admitida
-        HTTP-->>Service: cuerpo JSON
-        alt code SUCCESS_LOGIN
-            Service->>Service: resolver loginRequest sin valor
-        else código inesperado
-            Service->>Service: lanzar LoginRequestError INVALID_RESPONSE
-        end
-    else fallo HTTP o red
-        HTTP-->>Service: ApiError
-        Service->>Service: traducir 400, 401, 429, red o respuesta inválida
-        Note over Service: Rechazar con LoginRequestError y campos cuando corresponde
+    Service->>HTTP: nowrap: apiClient.request('/api/auth/login', {<br/>method: 'POST', data: { name:<br/>credentials.name.trim(), password:<br/>credentials.password }, signal,<br/>requiresAuth: false })
+    HTTP->>API: nowrap: POST /api/auth/login
+    API-->>HTTP: nowrap: { code }
+    HTTP-->>Service: nowrap: data
+    alt nowrap: data.code !== successCodeMessages.SUCCESS_LOGIN
+        Service-->>Editor: nowrap: throw new LoginRequestError(<br/>LOGIN_MESSAGES.INVALID_RESPONSE)
+    else
+        Service-->>Editor: nowrap: undefined
     end
 ```
 
-## Reglas y recuperación
+## catch(error) en el formulario
 
-Los espacios de contraseña se conservan; nombre se recorta al construir la solicitud. Un fallo de Storage no revoca un acceso ya confirmado. La [renovación y retorno](01-bootstrap-and-session.md) tienen secuencia propia.
+**Identificador:** `DIA-VUE-SEQ-054`.
 
-## Evidencia
+```mermaid
+sequenceDiagram
+    autonumber
+    box Interfaz
+    participant Form@{ "type": "boundary" } as Login<br/>Form.vue
+    end
+    box Coordinación
+    participant Page@{ "type": "control" } as Login<br/>Page.vue
+    participant Editor@{ "type": "control" } as useLogin<br/>Form.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as auth<br/>Service.ts
+    end
+    Service-->>Editor: nowrap: throw error
+    opt nowrap: !controller.signal.aborted
+        Editor->>Editor: nowrap: message.value = error instanceof<br/>LoginRequestError ? error.message :<br/>LOGIN_MESSAGES.REQUEST_FAILED
+        opt nowrap: error instanceof LoginRequestError
+            loop nowrap: field of ['name', 'password']
+                opt nowrap: error.fieldErrors[field]
+                    Editor->>Editor: nowrap: setFieldError(field,<br/>error.fieldErrors[field])
+                end
+            end
+        end
+        Editor-->>Page: nowrap: { errors, message, isSubmitting }
+        Page-->>Form: nowrap: { errors, message, isSubmitting }
+    end
+```
 
-login.spec.ts, useLoginFormTest.ts y authServiceTest.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
+## catch(cause) en loginRequest
+
+**Identificador:** `DIA-VUE-SEQ-055`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    box Coordinación
+    participant Editor@{ "type": "control" } as useLogin<br/>Form.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as auth<br/>Service.ts
+    participant HTTP@{ "type": "boundary" } as apiClient.ts
+    end
+    HTTP-->>Service: nowrap: throw cause
+    alt nowrap: !(cause instanceof ApiError)
+        Service-->>Editor: nowrap: throw cause
+    else nowrap: cause.status === 401
+        Service-->>Editor: nowrap: throw new LoginRequestError(<br/>errorMessages.LOGIN_ERROR)
+    else nowrap: cause.status === 429
+        Service-->>Editor: nowrap: throw new LoginRequestError(<br/>LOGIN_MESSAGES.TOO_MANY_ATTEMPTS)
+    else nowrap: cause.status === 400
+        Service-->>Editor: nowrap: throw new LoginRequestError(<br/>LOGIN_MESSAGES.INVALID_FIELDS,<br/>cause.fieldErrors)
+    else nowrap: cause.code === 'NETWORK_ERROR'
+        Service-->>Editor: nowrap: throw new LoginRequestError(<br/>LOGIN_MESSAGES.CONNECTION_FAILED)
+    else nowrap: cause.code === 'INVALID_RESPONSE'
+        Service-->>Editor: nowrap: throw new LoginRequestError(<br/>LOGIN_MESSAGES.INVALID_RESPONSE)
+    else
+        Service-->>Editor: nowrap: throw new LoginRequestError(<br/>LOGIN_MESSAGES.REQUEST_FAILED)
+    end
+```
 
 ## Fuentes de los participantes
 

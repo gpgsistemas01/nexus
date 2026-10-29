@@ -1,13 +1,8 @@
 # Inventario: operación HTTP y alta de artículo para compra
 
-Las operaciones `create`, `edit`, `stock`, `add-stock` y `delete` tienen endpoints
-y cuerpos distintos. La confirmación precede al retorno de una opción creada.
-
 ## Operación y código del recurso
 
-**Identificador:** `DIA-VUE-SEQ-040`. **Pregunta:** ¿Cómo se distingue una escritura de inventario de un alta auxiliar para Compras?
-
-**Lectura visual:** [roles y callbacks](../00-reading-and-roles.md).
+**Identificador:** `DIA-VUE-SEQ-040`.
 
 ```mermaid
 sequenceDiagram
@@ -16,8 +11,8 @@ sequenceDiagram
     participant Editor@{ "type": "control" } as useInventory<br/>Editor.ts
     end
     box Reglas y datos
-    participant Mapper@{ "type": "control" } as inventory<br/>Mapper.ts
-    participant Contract@{ "type": "control" } as record<br/>Contract.ts
+    participant Mapper as inventory<br/>Mapper.ts
+    participant Contract as record<br/>Contract.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
@@ -26,28 +21,28 @@ sequenceDiagram
     box Sistema externo
     participant API@{ "type": "boundary" } as API del sistema
     end
-    Editor->>Service: mutate o createForPurchase(resource, payload, signal)
-    opt createForPurchase de material o consumible
-        Service->>Service: mutate create con creationContext goodsReceipt
+    alt nowrap: options.creationContext === 'goodsReceipt' &&<br/>resource !== 'wastes' && isCreating.value
+        Editor->>Service: nowrap: inventoryService.createForPurchase(<br/>resource, payload, controller.signal)
+        Service->>Service: nowrap: inventoryService.mutate(resource,<br/>'create', { ...payload, creationContext:<br/>'goodsReceipt' }, undefined, signal)
+    else
+        Editor->>Service: nowrap: inventoryService.mutate(resource,<br/>target.action, payload, id,<br/>controller.signal)
     end
-    Service->>Service: elegir método, suffix y código esperado
-    Service->>HTTP: request con cuerpo permitido, DELETE omite data
-    HTTP->>API: endpoint de recurso, stock o stock-additions
-    API-->>HTTP: respuesta de operación
-    alt rechazo
-        HTTP-->>Service: ApiError
-        Service-->>Editor: rechazar sin confirmar
-    else cuerpo recibido
-        HTTP-->>Service: resultado
-        Service->>Contract: confirmMutation(result, expected)
-        Contract-->>Service: confirmación o ApiError
-        alt alta contextual para Compras
-            Service->>Mapper: normalizeInventoryRow(result.material)
-            Mapper-->>Service: InventoryRow o error de contrato
-            Service->>Service: construir LookupItem con entityId y actividad
-            Service-->>Editor: LookupItem confirmado
-        else operación ordinaria
-            Service-->>Editor: resultado confirmado
+    Service->>HTTP: nowrap: apiClient.request(url, { method, data:<br/>payload, signal })
+    HTTP->>API: nowrap: {method}<br/>/api/warehouse/{resource}[/{id}][/stock|/stock-additions]
+    API-->>HTTP: nowrap: { code, material }
+    HTTP-->>Service: nowrap: result
+    Service->>Contract: nowrap: confirmMutation(result, expected,<br/>errorMessage)
+    alt nowrap: value.code !== expected
+        Contract-->>Service: nowrap: throw ApiError
+        Service-->>Editor: nowrap: throw ApiError
+    else
+        Contract-->>Service: nowrap: MutationConfirmation
+        alt nowrap: creationContext === 'goodsReceipt'
+            Service->>Mapper: nowrap: normalizeInventoryRow(result.material)
+            Mapper-->>Service: nowrap: row
+            Service-->>Editor: nowrap: { id: row.entityId, title, data:<br/>result.material, isDisabled:<br/>!row.isActive }
+        else
+            Service-->>Editor: nowrap: result
         end
     end
 ```

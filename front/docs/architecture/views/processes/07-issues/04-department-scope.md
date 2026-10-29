@@ -1,18 +1,10 @@
 # Alcance de área: selección inicial y campo bloqueado
 
+**Casos relacionados:** consulta y creación de CU-SAL; RN de autorización y selección.
+
 ## Escenario y contratos
 
-**Identificador:** `DIA-VUE-SEQ-026`. **Pregunta:** ¿Cómo se adapta el área de
-filtro/captura al alcance real sin inferirlo desde el nombre del rol?
-**Casos relacionados:** consulta y creación de CU-SAL; RN de autorización y selección.
-**Fuentes:** [useIssueDepartments.ts](../../../../../src/modules/issues/composables/useIssueDepartments.ts),
-[useIssueHeaderSelection.ts](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts),
-[useIssueFilters.ts](../../../../../src/modules/issues/composables/useIssueFilters.ts),
-[issueLookupService.ts](../../../../../src/modules/issues/services/issueLookupService.ts).
-**Notación:** secuencia; el total del catálogo sin búsqueda determina la adaptación visual,
-no una autorización independiente de la API.
-
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
+**Identificador:** `DIA-VUE-SEQ-026`.
 
 ```mermaid
 sequenceDiagram
@@ -29,26 +21,26 @@ sequenceDiagram
     box Sistema externo
     participant API@{ "type": "boundary" } as API del sistema
     end
-    Scope->>Lookup: crear lookup habilitado por isEnabled
-    Lookup->>Scope: request(search, page, signal) configurado
-    Scope->>Service: list(departments, resource, search, page, signal)
-    Service->>Paged: requestPage con context issues
-    Paged->>HTTP: request(url, signal)
-    HTTP->>API: GET /api/admin/departments?context=issues
-    API-->>HTTP: filas y conteos autorizados
-    HTTP-->>Paged: cuerpo JSON
-    Paged-->>Service: PageResult validado
-    Service-->>Scope: PageResult de LookupItem
-    Scope->>Scope: fijar singleDepartment sólo sin búsqueda y en página 1
-    Scope-->>Lookup: resultado del callback
-    Lookup->>Lookup: publicar items y hasMore
+    Scope->>Lookup: nowrap: useRemoteLookup(request, computed(<br/>options.isEnabled))
+    Lookup->>Scope: nowrap: request(search.value, nextPage,<br/>requestController.signal)
+    Scope->>Service: nowrap: issueLookupService.list('departments',<br/>options.resource, search, page, signal)
+    Service->>Paged: nowrap: requestPage(url, signal)
+    Paged->>HTTP: nowrap: apiClient.request(url, { signal })
+    HTTP->>API: nowrap: GET /api/admin/departments?context=issues
+    API-->>HTTP: nowrap: { data, recordsFiltered, recordsTotal }
+    HTTP-->>Paged: nowrap: page
+    Paged-->>Service: nowrap: page
+    Service-->>Scope: nowrap: result
+    opt nowrap: !signal.aborted && !search && page === 1
+        Scope->>Scope: nowrap: singleDepartment.value =<br/>result.recordsFiltered === 1 &&<br/>result.data.length === 1 &&<br/>!item?.isDisabled ? item : undefined
+    end
+    Scope-->>Lookup: nowrap: result
+    Lookup->>Lookup: nowrap: items.value = [...previous, ...additions]
 ```
 
 ## Adaptación de captura y filtros
 
-**Identificador:** `DIA-VUE-SEQ-030`. **Pregunta:** ¿Cuándo se preselecciona,
-bloquea y conserva el área? **Fuente:** el watch de `useIssueDepartments` y sus callbacks
-de encabezado/filtros. **Notación:** colaboración reactiva después de publicar opciones.
+**Identificador:** `DIA-VUE-SEQ-030`.
 
 ```mermaid
 sequenceDiagram
@@ -59,56 +51,24 @@ sequenceDiagram
     participant Header@{ "type": "control" } as useIssue<br/>Header<br/>Selection.ts
     participant Filters@{ "type": "control" } as useIssue<br/>Filters.ts
     end
-    Lookup-->>Scope: items actualizados
-    opt habilitado, área única publicada y selección vacía
-        alt instancia usada por encabezado
-            Scope->>Header: selectDefault(id) configurado
-            alt sin documento existente
-                Header->>Header: setHeaderField(departmentId, id)
-            else edición
-                Header->>Header: conservar área del documento
+    Lookup-->>Scope: nowrap: lookup.items
+    opt nowrap: options.isEnabled() && singleDepartment.value &&<br/>lookup.items.value.some((item) => item.id ===<br/>singleDepartment.value?.id) && !options.getSelectedId(<br/>)
+        alt nowrap: useIssueHeaderSelection
+            Scope->>Header: nowrap: options.selectDefault(<br/>singleDepartment.value.id)
+            opt nowrap: !options.document
+                Header->>Header: nowrap: options.setHeaderField('departmentId', id)
             end
-        else instancia usada por filtros
-            Scope->>Filters: selectDefault(id) configurado
-            Filters->>Filters: precargar departmentId
+        else nowrap: useIssueFilters
+            Scope->>Filters: nowrap: options.selectDefault(<br/>singleDepartment.value.id)
+            Filters->>Filters: nowrap: values.departmentId = id
         end
     end
-    alt consumidor de encabezado
-        Scope-->>Header: isLocked de su instancia
-    else consumidor de filtros
-        Scope-->>Filters: isLocked de su instancia
+    alt nowrap: useIssueHeaderSelection
+        Scope-->>Header: nowrap: isLocked
+    else nowrap: useIssueFilters
+        Scope-->>Filters: nowrap: isLocked
     end
-    Note over Header,Filters: Cada consumidor tiene su propio lookup, una búsqueda no redefine el alcance
 ```
-
-| Decisión | Condición exacta |
-| --- | --- |
-| Alcance único | Página 1 sin búsqueda, señal vigente, `recordsFiltered === 1`, una fila y no deshabilitada. |
-| Preselección | Habilitado, área única ya incluida en `items` y selección vacía. |
-| Callback de encabezado | Asigna sólo cuando no hay documento, conservando el área en edición. |
-| Bloqueo | Existe área única y `getSelectedId()` coincide con ella; se combina con otras restricciones del campo. |
-| Limpieza de filtros | Conserva `departmentId` si bloqueado y reinicia los otros campos/búsquedas. |
-| Búsqueda paginada | No redefine el alcance por encontrar una única coincidencia. |
-
-El request completo del catálogo usa `/api/admin/departments?context=issues` con
-búsqueda vacía y página inicial. La instantánea se calcula en el callback que espera
-el servicio, antes de que `useRemoteLookup` publique `items`. El watch espera la opción
-publicada antes de invocar el callback; no representa una llamada HTTP adicional.
-
-## Decisiones y rechazo
-
-Esperar a `lookup.items` conserva la etiqueta y evita mostrar temporalmente el UUID.
-Si falla el catálogo, el selector presenta error/reintento y no inventa un área
-predeterminada. Las capacidades del formulario pueden deshabilitar el campo por otros
-motivos, además de `isLocked`.
-
-La política de cuenta y alcance se comprueba en la API para consulta y escritura,
-incluso si una solicitud manipulada cambia `departmentId`. El cliente sólo adapta
-la interacción al catálogo autorizado. La figura no concede surtidos ni devoluciones
-a las áreas operativas. La evidencia del cliente está en
-[issueDepartmentsTest.ts](../../../../../tests/unit/modules/issues/issueDepartmentsTest.ts);
-el [dominio](../../../../requirements/domain-model/01-identity-and-organization.md)
-explica cuenta, persona y asignaciones.
 
 ## Fuentes de los participantes
 

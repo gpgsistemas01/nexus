@@ -1,45 +1,42 @@
 # Salida: selección y agregado de partidas al borrador
 
-La selección remota usa `SEQ-010`; esta colaboración empieza con una opción disponible.
-Agregar una partida cambia la captura local y no escribe la salida ni el inventario.
-
 ## Construcción de la partida
 
-**Identificador:** `DIA-VUE-SEQ-043`. **Pregunta:** ¿Dónde se crea el borrador y quién lo incorpora a la salida?
-
-**Lectura visual:** [roles y callbacks](../00-reading-and-roles.md).
+**Identificador:** `DIA-VUE-SEQ-043`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant Form@{ "type": "boundary" } as IssueLine<br/>Entry<br/>Form.vue
-    participant Page@{ "type": "boundary" } as IssueLine<br/>Entry<br/>Page.vue
-    participant Parent@{ "type": "boundary" } as IssueEditor<br/>Page.vue
     end
     box Coordinación
+    participant Page@{ "type": "control" } as IssueLine<br/>Entry<br/>Page.vue
+    participant Parent@{ "type": "control" } as IssueEditor<br/>Page.vue
     participant Line@{ "type": "control" } as useIssueLine<br/>Entry.ts
     participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
     end
     box Reglas y datos
-    participant Details@{ "type": "control" } as issue<br/>Details.ts
+    participant Details as issue<br/>Details.ts
     end
-    U->>Form: seleccionar artículo y cantidad, Agregar
-    Form->>Page: add
-    Page->>Line: add()
-    Line->>Line: validar opción activa y cantidad por recurso
-    alt inválido o deshabilitado
-        Line-->>Page: errors sin modificar el documento
-    else captura válida
-        Line->>Details: createIssueDetailDraft(selected, cantidad, resource)
-        Details-->>Line: IssueDetail con identidad local
-        Line->>Page: onAdd(line)
-        Page->>Parent: emitir add(line)
-        Parent->>Editor: addDetail(line)
-        Editor->>Details: addIssueDetail(details, line)
-        Details-->>Editor: nueva colección de captura
-        Line->>Line: limpiar formulario y búsqueda de opciones
+    U->>Form: nowrap: add
+    Form->>Page: nowrap: emit('add')
+    Page->>Line: nowrap: entry.add()
+    opt nowrap: isEnabled.value
+        Line->>Line: nowrap: validated()
+        opt nowrap: selected.value && !selected.value.isDisabled
+            Line->>Details: nowrap: createIssueDetailDraft(selected.value,<br/>Number(values.quantity), options.resource)
+            Details-->>Line: nowrap: IssueDetail
+            Line->>Page: nowrap: options.onAdd(line)
+            Page->>Parent: nowrap: emit('add', line)
+            Parent->>Editor: nowrap: editor.addDetail(line)
+            Editor->>Details: nowrap: addIssueDetail(form.values.details, line)
+            Details-->>Editor: nowrap: IssueDetail[]
+            Editor->>Editor: nowrap: interaction.update('details', details)
+            Line->>Line: nowrap: form.resetForm()
+            Line->>Line: nowrap: items.updateSearch('')
+        end
     end
 ```
 
@@ -51,3 +48,7 @@ sequenceDiagram
 [useIssueLineEntry.ts](../../../../../src/modules/issues/composables/useIssueLineEntry.ts),
 [useIssueEditor.ts](../../../../../src/modules/issues/composables/useIssueEditor.ts),
 [issueDetails.ts](../../../../../src/modules/issues/issueDetails.ts).
+
+## Secuencias relacionadas
+
+[DIA-VUE-SEQ-010](../02-shared-runtime/03-remote-lookup.md#secuencia-aplicada).

@@ -1,14 +1,10 @@
 # Recarga visible sin solapamiento
 
-## Escenario y contratos
-
 **Casos relacionados:** RN-VUE-003/005/007; consultas de CU-ALM y listados.
 
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-019`.
-
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
 
 ```mermaid
 sequenceDiagram
@@ -21,36 +17,27 @@ sequenceDiagram
     box Integración
     participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
     end
-    Note over Refresh: Foco, visibilidad o intervalo invocan refreshVisible
-    Refresh->>Domain: canRefresh() configurado por el consumidor
-    Domain-->>Refresh: permiso, sin editor ni consulta pendiente
-    alt visible, habilitado y antigüedad mínima cumplida
-        Refresh->>List: options.refresh(): refresh()
-        List->>List: iniciar lectura en segundo plano
-        List->>Service: request(query, signal)
-        Service-->>List: PageResult o error
-        alt resultado vigente
-            List->>List: conservar filas idénticas y actualizar conteos
-        else error o lectura sustituida
-            List->>List: publicar error o descartar resultado antiguo
+    Refresh->>Refresh: nowrap: refreshVisible()
+    opt nowrap: document.visibilityState === 'visible'
+        Refresh->>Domain: nowrap: options.canRefresh()
+        Domain-->>Refresh: nowrap: canRead && !isPaused.value &&<br/>!list.isLoading.value &&<br/>!list.isRefreshing.value
+        opt nowrap: options.canRefresh() && Date.now() -<br/>options.lastAttemptAt() >= intervalMs
+            Refresh->>List: nowrap: options.refresh()
+            List->>List: nowrap: fetchPage(true)
+            List->>Domain: nowrap: options.request({ ...query },<br/>requestController.signal)
+            Domain->>Service: nowrap: inventoryService.list(resource, query,<br/>signal)
+            Service-->>Domain: nowrap: result
+            Domain-->>List: nowrap: result
+            opt nowrap: requestId === sequence
+                opt nowrap: JSON.stringify(rows.value) !== JSON.stringify(<br/>result.data)
+                    List->>List: nowrap: rows.value = result.data
+                end
+                List->>List: nowrap: total.value = result.recordsFiltered
+                List->>List: nowrap: isRefreshing.value = false
+            end
         end
-        List->>List: liberar isRefreshing
-    else no corresponde recargar
-        Refresh->>Refresh: terminar sin petición
-    end
-    opt desmontaje del consumidor
-        Refresh->>Refresh: retirar listeners e intervalo
-        List->>List: abortar e invalidar lectura
     end
 ```
-
-## Reglas y recuperación
-
-El intervalo no determina por sí solo una carga periódica incondicional. Pausas, visibilidad, antigüedad y petición vigente pertenecen al contrato del consumidor.
-
-## Evidencia
-
-listInteractionTest.ts, inventoryListTest.ts y pruebas de recarga del navegador. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
 
 ## Fuentes de los participantes
 

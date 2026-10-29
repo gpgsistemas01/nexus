@@ -1,62 +1,54 @@
 # Personas y responsabilidades
 
-## Escenario y contratos
-
 **Casos relacionados:** CU-IDA-02/03.
 
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-005`.
 
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
-
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant Form@{ "type": "boundary" } as Person<br/>Form.vue
-    participant Page@{ "type": "boundary" } as PersonEditor<br/>Page.vue
     end
     box Coordinación
+    participant Page@{ "type": "control" } as PersonEditor<br/>Page.vue
     participant Editor@{ "type": "control" } as usePerson<br/>Editor.ts
     participant Org@{ "type": "control" } as use<br/>Organization<br/>Options.ts
     end
     box Reglas y datos
-    participant Rules@{ "type": "control" } as personAccess<br/>Validation
+    participant Rules as personAccess<br/>Validation
     end
-    Page->>Editor: crear editor con target y permissions
-    Editor->>Org: preparar opciones de áreas y roles
-    Note over Org: useRemoteLookup y organizationService consultan por permiso
-    Org-->>Editor: state de opciones
-    Editor-->>Page: organization.state
-    U->>Form: seleccionar área y rol, Agregar
-    Form->>Page: draft y add
-    Page->>Editor: addAccess()
-    Editor->>Rules: departmentId y roleId
-    Rules-->>Editor: mensaje o captura válida
-    alt área repetida o selección incompleta
-        Editor-->>Page: accessError sin añadir responsabilidad
-    else selección válida
-        Editor->>Editor: añadir IDs y etiquetas al borrador
-        Editor-->>Page: values.accesses
+    Page->>Editor: nowrap: usePersonEditor({ target, permissions,<br/>onSaved, onDenied })
+    Editor->>Org: nowrap: useOrganizationOptions(<br/>options.permissions)
+    Org-->>Editor: nowrap: { departments, roles, state }
+    Editor-->>Page: nowrap: organization
+    U->>Form: nowrap: add
+    Form->>Page: nowrap: emit('add')
+    Page->>Editor: nowrap: editor.addAccess()
+    opt nowrap: !isDisabled()
+        Editor->>Rules: nowrap: personAccessValidation.departmentId(<br/>departmentId.value, { accesses:<br/>form.values.accesses }) ||<br/>personAccessValidation.roleId(<br/>roleId.value) || ''
+        Rules-->>Editor: nowrap: accessError.value
+        alt nowrap: accessError.value
+            Editor-->>Page: nowrap: accessError
+        else
+            Editor->>Editor: nowrap: department = selectedDepartment.value,<br/>role = selectedRole.value
+            alt nowrap: !department || !role
+                Editor->>Editor: nowrap: accessError.value = 'Selecciona un área y<br/>un rol de las opciones disponibles.'
+                Editor-->>Page: nowrap: accessError
+            else
+                Editor->>Editor: nowrap: form.setFieldValue('accesses',<br/>[...form.values.accesses, { departmentId:<br/>department.id, roleId: role.id, ... }],<br/>false)
+                Editor->>Editor: nowrap: departmentId.value = ''
+                Editor->>Editor: nowrap: roleId.value = ''
+                Editor->>Editor: nowrap: save.message.value = ''
+                Editor->>Editor: nowrap: form.validateField('accesses')
+                Editor-->>Page: nowrap: values.accesses
+            end
+        end
     end
-    U->>Form: Guardar persona
-    Form->>Page: submit
-    Page->>Editor: submit(): validar nombre y responsabilidades
-    Note over Editor: Captura válida entra en useRecordSave, continuación en SEQ-039
 ```
-
-El [guardado de persona](04-person-save.md) completa validación, payload, servicio y
-confirmación.
-
-## Reglas y recuperación
-
-Las responsabilidades son de la persona; no se envían etiquetas ni datos de cuenta. Quitar la última responsabilidad impide guardar. Las asignaciones de cuenta tienen una secuencia independiente.
-
-## Evidencia
-
-identityTest.ts y records.spec.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
 
 ## Fuentes de los participantes
 
@@ -65,3 +57,7 @@ identityTest.ts y records.spec.ts. La [matriz por caso](../../../../testing/04-u
 [usePersonEditor.ts](../../../../../src/modules/identity/composables/usePersonEditor.ts),
 [useOrganizationOptions.ts](../../../../../src/shared/composables/useOrganizationOptions.ts),
 [personAccessValidation](../../../../../../back/src/public/js/utils/validations/validators.js).
+
+## Secuencias relacionadas
+
+[DIA-VUE-SEQ-039](04-person-save.md#coordinación-del-guardado).

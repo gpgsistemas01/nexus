@@ -1,87 +1,82 @@
 # Movimientos: filtros dependientes e historial
 
-## Escenario y fuente
-
-CU-ALM-07/15/23 y reportes asociados. Fuentes: `useMovementFilters`, `MovementPage`,
-`movementService` y `useRemoteLookup`. Se consulta el historial del recurso fijo;
-esta pantalla no escribe movimientos.
-
 ## Secuencia aplicada
 
-**Identificador:** `DIA-VUE-SEQ-023`. Las dependencias de proveedor y artículo se
-resuelven antes de aplicar la consulta. Mensajes numerados; no implica escritura.
-
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
+**Identificador:** `DIA-VUE-SEQ-023`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant View@{ "type": "boundary" } as Movement<br/>Filters.vue
-    participant Page@{ "type": "boundary" } as Movement<br/>Page.vue
     end
     box Coordinación
+    participant Page@{ "type": "control" } as Movement<br/>Page.vue
     participant Filters@{ "type": "control" } as useMovement<br/>Filters.ts
     participant Lookup@{ "type": "control" } as useRemote<br/>Lookup.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as movement<br/>Service.ts
     end
-    U->>View: cambiar proveedor
-    View->>Page: update(supplierId, value)
-    Page->>Filters: update(field, value)
-    Filters->>Filters: limpiar itemId por dependencia
-    Lookup->>Lookup: invalidar y reiniciar búsqueda dependiente
-    opt permiso y proveedor presentes
-        Lookup->>Filters: request(search, page, signal)
-        Filters->>Service: lookup(resource, search, page, supplierId, signal)
-        Service-->>Filters: opciones paginadas
-        Filters-->>Lookup: resultado del callback
+    U->>View: nowrap: update('supplierId', value)
+    View->>Page: nowrap: emit('update', 'supplierId', value)
+    Page->>Filters: nowrap: filters.update(field, value)
+    Filters->>Filters: nowrap: values.supplierId = value
+    Filters->>Filters: nowrap: values.itemId = ''
+    Lookup->>Lookup: nowrap: resetOptions()
+    opt nowrap: isEnabled.value
+        Lookup->>Filters: nowrap: request(search.value, nextPage,<br/>requestController.signal)
+        Filters->>Service: nowrap: movementService.lookup(resource, search,<br/>page, supplierId.value, signal)
+        Service-->>Filters: nowrap: PageResult
+        Filters-->>Lookup: nowrap: result
+        Lookup-->>Page: nowrap: filters.itemState
+        Page-->>View: nowrap: { itemState, supplierState }
     end
-    Lookup-->>Page: state de opciones
-    Page-->>View: props de opciones y errores
 ```
-
-El tipo de movimiento se limita a la lista admitida. La identidad del material y de
-la merma no se intercambian. Exportar utiliza los filtros aplicados, no una captura
-incompleta del panel. Las [descargas](02-reports.md) conservan su proceso separado.
-Evidencia: `movementFiltersTest.ts`, `movementServiceTest.ts` y `movements.spec.ts`.
 
 ## Aplicación de criterios y consulta
 
-**Identificador:** `DIA-VUE-SEQ-050`. La consulta utiliza filtros aplicados, después de comprobar el intervalo de fechas.
+**Identificador:** `DIA-VUE-SEQ-050`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
-    box Interfaz
-    participant Page@{ "type": "boundary" } as Movement<br/>Page.vue
-    end
+    actor U as Usuario
     box Coordinación
+    participant Page@{ "type": "control" } as Movement<br/>Page.vue
     participant Search@{ "type": "control" } as useList<br/>Search.ts
     participant List@{ "type": "control" } as usePaged<br/>List.ts
     end
     box Reglas y datos
-    participant Rules@{ "type": "control" } as report.ts
+    participant Rules as report.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as movement<br/>Service.ts
     end
-    U->>Page: aplicar búsqueda y filtros
-    Page->>Rules: dateRangeError(filters.values)
-    Rules-->>Page: error o intervalo admitido
-    opt sin error de fechas
-        Page->>Search: applySearch()
-        Search->>Page: readFilters() configurado
-        Page-->>Search: copia de filters.values
-        Search->>List: applyQuery(changes) o load()
-        List->>Page: request(query, signal) configurado
-        Page->>Service: list(resource, query, signal)
-        Service-->>Page: PageResult normalizado o error
-        Page-->>List: resultado del callback
-        List-->>Page: filas, conteos o error vigente
+    U->>Page: nowrap: apply
+    Page->>Rules: nowrap: dateRangeError(filters.values)
+    Rules-->>Page: nowrap: filterError
+    opt nowrap: !filterError.value
+        Page->>Search: nowrap: searchForm.applySearch()
+        Search->>Page: nowrap: readFilters()
+        Page-->>Search: nowrap: { ...filters.values }
+        alt nowrap: unchanged && list.query.page === 1
+            Search->>List: nowrap: list.load()
+        else
+            Search->>List: nowrap: list.applyQuery(changes)
+        end
+        List->>Page: nowrap: options.request({ ...query },<br/>requestController.signal)
+        Page->>Service: nowrap: movementService.list(props.resource,<br/>query, signal)
+        Service-->>Page: nowrap: result
+        Page-->>List: nowrap: result
+        opt nowrap: requestId === sequence
+            opt nowrap: JSON.stringify(rows.value) !== JSON.stringify(<br/>result.data)
+                List->>List: nowrap: rows.value = result.data
+            end
+            List->>List: nowrap: total.value = result.recordsFiltered
+            List-->>Page: nowrap: { rows, total, isLoading, error }
+        end
     end
 ```
 

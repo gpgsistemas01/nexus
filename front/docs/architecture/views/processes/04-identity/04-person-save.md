@@ -1,48 +1,36 @@
 # Persona: guardado del nombre y las responsabilidades
 
-El borrador de responsabilidades procede de `SEQ-005`. El payload elimina etiquetas
-y conserva únicamente los identificadores que admite la escritura.
-
 ## Coordinación del guardado
 
-**Identificador:** `DIA-VUE-SEQ-039`. **Pregunta:** ¿Quién transforma el borrador y entrega la confirmación al contenedor?
-
-**Lectura visual:** [roles y callbacks](../00-reading-and-roles.md).
+**Identificador:** `DIA-VUE-SEQ-039`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    box Interfaz
-    participant Page@{ "type": "boundary" } as PersonEditor<br/>Page.vue
-    end
     box Coordinación
+    participant Page@{ "type": "control" } as PersonEditor<br/>Page.vue
     participant Editor@{ "type": "control" } as usePerson<br/>Editor.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Reglas y datos
-    participant Payload@{ "type": "control" } as identity.ts
+    participant Payload as identity.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as identity<br/>Service.ts
     end
-    Page->>Editor: submit()
-    Editor->>Editor: validar fullName y accesses
-    alt inválido o conflicto
-        Editor-->>Page: errores sin iniciar operación
-    else captura válida
-        Editor->>Save: execute(operation)
-        Save->>Editor: operation(signal)
-        Editor->>Payload: personPayload(target, values)
-        Payload-->>Editor: fullName, IDs y versión original de edición
-        Editor->>Service: save(persons, target, payload, signal)
-        Note over Service: HTTP y confirmación en SEQ-038
-        Service-->>Editor: operación resuelta o ApiError
-        Editor-->>Save: resultado o rechazo
-        alt confirmado y vigente
-            Save->>Page: onSaved(): emitir saved
-        else rechazo
-            Save-->>Editor: mensaje y errores de nombre o responsabilidades
-            Editor-->>Page: captura conservada
+    Page->>Editor: nowrap: editor.submit()
+    opt nowrap: !form.isSubmitting.value && !save.isConflicted.value
+        Editor->>Editor: nowrap: validated()
+        Editor->>Save: nowrap: save.execute(operation)
+        Save->>Editor: nowrap: operation(controller.signal)
+        Editor->>Payload: nowrap: personPayload(options.target, values)
+        Payload-->>Editor: nowrap: payload
+        Editor->>Service: nowrap: identityService.save('persons',<br/>options.target, payload, signal)
+        Service-->>Editor: nowrap: undefined
+        Editor-->>Save: nowrap: undefined
+        opt nowrap: !controller.signal.aborted
+            Save->>Page: nowrap: options.onSaved(result)
+            Page->>Page: nowrap: emit('saved')
         end
     end
 ```
@@ -54,3 +42,7 @@ sequenceDiagram
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [identity.ts](../../../../../src/modules/identity/identity.ts),
 [identityService.ts](../../../../../src/modules/identity/services/identityService.ts).
+
+## Secuencias relacionadas
+
+[DIA-VUE-SEQ-005](01-person-responsibilities.md#secuencia-aplicada), [DIA-VUE-SEQ-038](03-save-transport.md#petición-y-confirmación-de-identidad), [DIA-VUE-SEQ-051](../02-shared-runtime/08-record-save.md).

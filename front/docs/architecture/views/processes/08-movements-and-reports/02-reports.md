@@ -1,70 +1,60 @@
 # Reportes: alcance, archivo y error recuperable
 
-## Escenario y contratos
-
 **Casos relacionados:** CU de reporte de cada familia; RF-VUE-013.
 
 ## Selección del alcance y resultado visible
 
-**Identificador:** `DIA-VUE-SEQ-018`. La primera figura desarrolla Compras; Salidas y Movimientos reutilizan el mismo
-contrato de `useReportScope`. La descarga se amplía en `SEQ-033`.
-
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
+**Identificador:** `DIA-VUE-SEQ-018`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant Dialog@{ "type": "boundary" } as ReportScope<br/>Dialog.vue
-    participant Page@{ "type": "boundary" } as Purchase<br/>Page.vue
     end
     box Coordinación
+    participant Page@{ "type": "control" } as Purchase<br/>Page.vue
     participant Scope@{ "type": "control" } as useReport<br/>Scope.ts
     participant Export@{ "type": "control" } as useFile<br/>Export.ts
     end
     box Reglas y datos
-    participant Rules@{ "type": "control" } as report.ts
+    participant Rules as report.ts
     end
-    U->>Page: Exportar Excel
-    Page->>Scope: openReport()
-    Scope-->>Page: isReportOpen
-    Page->>Dialog: valores y estado por props
-    U->>Dialog: elegir alcance y Descargar Excel
-    Dialog->>Page: mode, month y submit
-    Page->>Scope: setReportMode, setReportMonth y exportReport()
-    Scope->>Rules: reportScopeError(reportValues)
-    Rules-->>Scope: mensaje o captura admitida
-    alt permiso, mes y estado admitidos
-        Scope->>Export: exportReport(copia de reportValues)
-        Note over Export: Callback de PurchasePage y descarga en SEQ-033
-        Export-->>Scope: operación terminada, exportError
-        alt sin error
-            Scope-->>Page: isReportOpen false
-        else error
-            Scope-->>Page: conservar diálogo y presentar exportError
+    U->>Page: nowrap: openReport
+    Page->>Scope: nowrap: openReport()
+    opt nowrap: options.canExport()
+        Scope->>Scope: nowrap: clearErrors()
+        Scope->>Scope: nowrap: isReportOpen.value = true
+        Scope-->>Page: nowrap: { isReportOpen, reportValues,<br/>reportFormError }
+        Page-->>Dialog: nowrap: { values: reportValues, error:<br/>reportFormError }
+    end
+    U->>Dialog: nowrap: submit
+    Dialog->>Page: nowrap: emit('submit')
+    Page->>Scope: nowrap: exportReport()
+    opt nowrap: options.canExport() && !report.isExporting.value
+        Scope->>Rules: nowrap: reportScopeError(reportValues)
+        Rules-->>Scope: nowrap: reportFormError
+        opt nowrap: !reportFormError.value
+            Scope->>Export: nowrap: report.exportReport({ ...reportValues })
+            Export-->>Scope: nowrap: undefined
+            opt nowrap: !report.exportError.value
+                Scope->>Scope: nowrap: isReportOpen.value = false
+            end
+            Scope-->>Page: nowrap: { isReportOpen, exportError }
         end
-    else no admitido
-        Scope-->>Page: error de campo o sin nueva descarga
     end
 ```
 
-Un mes inválido detiene la operación antes de llamar al exportador; el usuario puede
-corregirlo sin abandonar el diálogo. Cada descarga utiliza los criterios admitidos
-por ese reporte, no necesariamente todos los filtros que aparecen en la tabla.
-
 ## Petición y descarga compartida
 
-**Identificador:** `DIA-VUE-SEQ-033`. Amplía la llamada a `useFileExport` configurada por `PurchasePage`.
-Las descargas directas usan el mismo exportador, con el servicio de su recurso.
+**Identificador:** `DIA-VUE-SEQ-033`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    box Interfaz
-    participant Page@{ "type": "boundary" } as Purchase<br/>Page.vue
-    end
     box Coordinación
+    participant Page@{ "type": "control" } as Purchase<br/>Page.vue
     participant Export@{ "type": "control" } as useFile<br/>Export.ts
     end
     box Integración
@@ -75,42 +65,43 @@ sequenceDiagram
     box Sistema externo
     participant API@{ "type": "boundary" } as API del sistema
     end
-    Export->>Page: request(scope, signal) configurado
-    Page->>Service: export(resource, query, scope, signal)
-    Service->>Service: validar alcance y construir parámetros sin paginación
-    Service->>Excel: requestExcel(endpoint y parámetros, signal)
-    Excel->>HTTP: request con responseType blob
-    HTTP->>API: GET reporte de compras
-    API-->>HTTP: archivo o rechazo HTTP
-    HTTP-->>Excel: Blob o ApiError
-    alt archivo Excel admitido
-        Excel->>Excel: comprobar Blob y MIME
-        Excel-->>Service: Blob validado
-        Service-->>Page: archivo
-        Page-->>Export: resultado del callback
-        Export->>Export: descargar y programar liberación de URL
-    else fallo o archivo inesperado
-        Excel-->>Service: error normalizado o Error de archivo
-        Service-->>Page: propagar error
-        Page-->>Export: rechazo del callback
-        Export->>Export: establecer exportError y notificar onDenied si aplica
+    Export->>Page: nowrap: options.request(scope, current.signal)
+    Page->>Service: nowrap: purchaseService.export(props.resource, {<br/>...query }, scope, signal)
+    Service->>Excel: nowrap: requestExcel(url, signal)
+    Excel->>HTTP: nowrap: apiClient.request(url, { signal,<br/>responseType: 'blob' })
+    HTTP->>API: nowrap: GET<br/>/api/warehouse/reports/goods-receipts/{resource}/excel?{params}
+    API-->>HTTP: nowrap: Blob
+    HTTP-->>Excel: nowrap: file
+    alt nowrap: !(file instanceof Blob) || !file.type.includes(<br/>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        Excel-->>Service: nowrap: throw Error
+        Service-->>Page: nowrap: throw Error
+        Page-->>Export: nowrap: throw cause
+        Export->>Export: nowrap: exportError.value = cause.message
+    else
+        Excel-->>Service: nowrap: file
+        Service-->>Page: nowrap: file
+        Page-->>Export: nowrap: file
+        opt nowrap: !current.signal.aborted
+            Export->>Export: nowrap: URL.createObjectURL(file)
+            Export->>Export: nowrap: link.href = url
+            Export->>Export: nowrap: link.download = options.filename
+            Export->>Export: nowrap: link.click()
+            Export->>Export: nowrap: setTimeout(() => URL.revokeObjectURL(url),<br/>1000)
+        end
     end
+    Export->>Export: nowrap: isExporting.value = false
 ```
 
 ## Descarga directa de Directorio
 
-**Identificador:** `DIA-VUE-SEQ-046`. **Pregunta:** ¿Cómo se descarga un reporte sin
-abrir el selector de alcance? **Fuente:** `DirectoryPage`, `directoryService` y
-los mismos adaptadores compartidos de archivo y HTTP.
+**Identificador:** `DIA-VUE-SEQ-046`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
-    box Interfaz
-    participant Page@{ "type": "boundary" } as Directory<br/>Page.vue
-    end
+    actor U as Usuario
     box Coordinación
+    participant Page@{ "type": "control" } as Directory<br/>Page.vue
     participant Export@{ "type": "control" } as useFile<br/>Export.ts
     end
     box Integración
@@ -121,36 +112,35 @@ sequenceDiagram
     box Sistema externo
     participant API@{ "type": "boundary" } as API del sistema
     end
-    U->>Page: Exportar Excel con criterios aplicados
-    Page->>Export: exportReport()
-    Export->>Page: request con signal configurado
-    Page->>Service: export(resource, copia de query, signal)
-    Service->>Excel: requestExcel con recordParams sin paginación
-    Excel->>HTTP: request con responseType blob
-    HTTP->>API: GET reporte de clientes o proveedores
-    API-->>HTTP: archivo o rechazo
-    HTTP-->>Excel: Blob o ApiError
-    Excel->>Excel: comprobar formato antes de devolver archivo
-    Excel-->>Service: Blob admitido o error
-    Service-->>Page: resolver o rechazar export
-    Page-->>Export: resultado del callback
-    Export-->>Page: isExporting y exportError
-    Note over Export: Sólo un archivo admitido inicia descarga y liberación de URL
+    U->>Page: nowrap: exportReport
+    Page->>Export: nowrap: report.exportReport()
+    opt nowrap: options.canExport() && !isExporting.value &&<br/>!isDisposed
+        Export->>Page: nowrap: options.request(scope, current.signal)
+        Page->>Service: nowrap: directoryService.export(props.resource, {<br/>...query }, signal)
+        Service->>Excel: nowrap: requestExcel(<br/>DIRECTORY_CONFIG[resource].reportPath +<br/>'?' + recordParams(query, { paginate:<br/>false }), signal)
+        Excel->>HTTP: nowrap: apiClient.request(url, { signal,<br/>responseType: 'blob' })
+        HTTP->>API: nowrap: GET {url}
+        API-->>HTTP: nowrap: Blob
+        HTTP-->>Excel: nowrap: file
+        alt nowrap: file instanceof Blob && file.type.includes(<br/>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            Excel-->>Service: nowrap: file
+            Service-->>Page: nowrap: file
+            Page-->>Export: nowrap: file
+            opt nowrap: !current.signal.aborted
+                Export->>Export: nowrap: URL.createObjectURL(file)
+                Export->>Export: nowrap: link.click()
+                Export->>Export: nowrap: setTimeout(() => URL.revokeObjectURL(url),<br/>1000)
+            end
+        else
+            Excel-->>Service: nowrap: throw Error
+            Service-->>Page: nowrap: throw Error
+            Page-->>Export: nowrap: throw cause
+            Export->>Export: nowrap: exportError.value = cause.message
+        end
+        Export->>Export: nowrap: isExporting.value = false
+        Export-->>Page: nowrap: { isExporting, exportError }
+    end
 ```
-
-| Descarga directa | Propietario del callback configurado en useFileExport | Servicio |
-| --- | --- | --- |
-| Clientes y proveedores | `DirectoryPage.vue`. | `directoryService.export`. |
-| Personas y cuentas | `IdentityPage.vue`. | `identityService.export`; Personas rechaza el filtro de rol no admitido. |
-| Materiales, consumibles y mermas | `useInventoryReport.ts`, compuesto por `useInventory.ts`. | `inventoryReportService.export`, con `inventoryScope`. |
-
-## Reglas y recuperación
-
-Los módulos con descarga directa usan useFileExport sin diálogo de alcance. Personas bloquea el filtro de rol no admitido por su API de exportación. El contenido real de XLSX requiere sistema, no un blob simulado.
-
-## Evidencia
-
-reportScopeTest.ts, inventoryReportTest.ts, records.spec.ts y application.spec.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
 
 ## Fuentes de los participantes
 

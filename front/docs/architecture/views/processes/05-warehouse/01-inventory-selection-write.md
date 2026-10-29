@@ -1,74 +1,66 @@
 # Selección dependiente y escritura de inventario
 
-## Escenario y contratos
-
 **Casos relacionados:** CU-ALM-02/03/05/10/11/12/13/18/19/21.
 
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-007`.
 
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
-
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant Form@{ "type": "boundary" } as Inventory<br/>Editor.vue
-    participant Page@{ "type": "boundary" } as Inventory<br/>Editor<br/>Page.vue
     end
     box Coordinación
+    participant Page@{ "type": "control" } as Inventory<br/>Editor<br/>Page.vue
     participant Editor@{ "type": "control" } as useInventory<br/>Editor.ts
     participant Selection@{ "type": "control" } as useInventory<br/>Selection.ts
     end
     box Reglas y datos
-    participant Model@{ "type": "control" } as formModel.ts
+    participant Model as formModel.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as inventory<br/>Service.ts
     end
-    Page->>Editor: resource, target y creationContext
-    Editor->>Selection: crear selección con values y callbacks
-    U->>Form: cambiar proveedor, plantilla o unidad
-    Form->>Page: update(field, value)
-    Page->>Editor: update(field, value)
-    Selection->>Selection: reaccionar a proveedor, plantilla o unidad
-    Selection->>Editor: setValue y clearError configurados
-    Editor-->>Page: values y preview
-    Page-->>Form: props actualizadas
-    U->>Form: Guardar
-    Form->>Page: submit
-    Page->>Editor: submit()
-    alt captura nueva sin pendiente
-        Editor->>Editor: validar reglas del recurso y modo
-        break captura inválida
-            Editor-->>Page: errors sin ejecutar escritura
+    Page->>Editor: nowrap: useInventoryEditor(options)
+    Editor->>Selection: nowrap: useInventorySelection({ resource, target,<br/>values, isPending, setValue, clearError,<br/>... })
+    U->>Form: nowrap: update('unitMeasureId', value)
+    Form->>Page: nowrap: emit('update', 'unitMeasureId', value)
+    Page->>Editor: nowrap: editor.update('unitMeasureId', value)
+    Editor-->>Selection: nowrap: values.unitMeasureId
+    opt nowrap: resource === 'materials' && isCreating && unit &&<br/>!unitUsesMeasurements(unit.data)
+        loop nowrap: field of ['base', 'height']
+            Selection->>Editor: nowrap: options.setValue(field, '')
+            Selection->>Editor: nowrap: options.clearError(field)
         end
-        Editor->>Model: buildInventoryPayload(resource, target, values, preview, context)
-        Model-->>Editor: InventoryPayload permitido
-    else merma pendiente recuperada
-        Editor->>Editor: reutilizar pendingData sin fabricar otro intento
     end
-    Note over Editor: execute(payload) protege doble envío y conserva pendiente de merma
-    Editor->>Service: mutate o createForPurchase con signal
-    Note over Service: Transporte y códigos por operación en SEQ-040
-    Service-->>Editor: resultado o ApiError
-    alt confirmado y vigente
-        Editor->>Page: onSaved(created)
-        Page->>Page: emitir saved(created)
-    else rechazo
-        Editor-->>Page: mensaje, errores y conflicto o pendiente
+    Editor-->>Page: nowrap: { values: form.values, lookups, preview }
+    Page-->>Form: nowrap: { values, lookups, preview }
+    U->>Form: nowrap: submit
+    Form->>Page: nowrap: emit('submit')
+    Page->>Editor: nowrap: editor.submit()
+    alt nowrap: pendingData
+        Editor->>Editor: nowrap: execute(pendingData)
+    else
+        Editor->>Editor: nowrap: submitValidated()
+        Editor->>Model: nowrap: buildInventoryPayload(resource, target,<br/>values, preview.value,<br/>options.creationContext)
+        Model-->>Editor: nowrap: InventoryPayload
+        Editor->>Editor: nowrap: execute(payload)
+    end
+    alt nowrap: options.creationContext === 'goodsReceipt' &&<br/>resource !== 'wastes' && isCreating.value
+        Editor->>Service: nowrap: inventoryService.createForPurchase(<br/>resource, payload, controller.signal)
+        Service-->>Editor: nowrap: created
+    else
+        Editor->>Service: nowrap: inventoryService.mutate(resource,<br/>target.action, payload, id,<br/>controller.signal)
+        Service-->>Editor: nowrap: result
+    end
+    opt nowrap: !controller.signal.aborted
+        Editor->>Page: nowrap: options.onSaved(created)
+        Page->>Page: nowrap: emit('saved', created)
     end
 ```
-
-## Reglas y recuperación
-
-El recurso fija reglas; Consumibles omite medidas, edición preserva identidad/stock y el ajuste conserva versión/motivo. La recuperación de merma se detalla en las siguientes secuencias y no se resuelve como un reintento genérico.
-
-## Evidencia
-
-inventoryFormTest.ts, inventoryListTest.ts y warehouse.spec.ts. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
 
 ## Fuentes de los participantes
 
@@ -78,3 +70,7 @@ inventoryFormTest.ts, inventoryListTest.ts y warehouse.spec.ts. La [matriz por c
 [useInventorySelection.ts](../../../../../src/modules/warehouse/composables/useInventorySelection.ts),
 [formModel.ts](../../../../../src/modules/warehouse/formModel.ts),
 [inventoryService.ts](../../../../../src/modules/warehouse/services/inventoryService.ts).
+
+## Secuencias relacionadas
+
+[DIA-VUE-SEQ-040](06-inventory-transport.md#operación-y-código-del-recurso).

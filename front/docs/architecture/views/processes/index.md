@@ -89,12 +89,17 @@ punto, sin volver a describir todo el recorrido.
 | [Lectura de Salida](07-issues/05-issue-read-transport.md) | Mapper de respuesta e ID solicitado | `DIA-VUE-SEQ-042` |
 | [Partidas de Salida](07-issues/06-issue-line-entry.md) | Selección, borrador y colección de captura | `DIA-VUE-SEQ-043` |
 | [Partidas de Compra](06-purchases/05-purchase-line-entry.md) | Cantidad, costo y detalle nuevo | `DIA-VUE-SEQ-044` |
-| [Transporte de Salida y devolución](07-issues/07-issue-save-transport.md) | Endpoints de cada modo y confirmación | `DIA-VUE-SEQ-045` |
+| [Transporte de escritura de Salida](07-issues/07-issue-save-transport.md) | Endpoints de cada modo y confirmación | `DIA-VUE-SEQ-045` |
 | [Descarga directa de Directorio](08-movements-and-reports/02-reports.md#descarga-directa-de-directorio) | Reportes sin selector de alcance | `DIA-VUE-SEQ-046` |
 | [Transporte de login](01-session/02-login.md#petición-y-contrato-de-acceso) | Código de acceso y errores | `DIA-VUE-SEQ-047` |
 | [Destino de entrada de merma](05-warehouse/03-waste-duplicate.md#entrega-del-destino-de-entrada) | Callback y eventos entre contenedores | `DIA-VUE-SEQ-048` |
 | [Payload de surtido](07-issues/02-issue-supply.md#payload-y-guardado-del-surtido) | Captura válida, mapper y servicio | `DIA-VUE-SEQ-049` |
 | [Consulta de movimientos](08-movements-and-reports/01-movement-filters.md#aplicación-de-criterios-y-consulta) | Fechas, query y callback de listado | `DIA-VUE-SEQ-050` |
+| [execute(operation)](02-shared-runtime/08-record-save.md) | Guardas, estado y callbacks de guardado | `DIA-VUE-SEQ-051/053` |
+| [returnDetail(options)](07-issues/07-issue-save-transport.md#returndetailoptions) | Petición y confirmación de devolución | `DIA-VUE-SEQ-052` |
+
+| [Error del formulario de login](01-session/02-login.md#catcherror-en-el-formulario) | Errores de campo y estado de captura | `DIA-VUE-SEQ-054` |
+| [Traducción de errores de login](01-session/02-login.md#catchcause-en-loginrequest) | HTTP, red y contrato de respuesta | `DIA-VUE-SEQ-055` |
 
 ## Figuras complementarias
 

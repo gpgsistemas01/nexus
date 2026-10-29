@@ -24,7 +24,7 @@ declarados en las fuentes. Ninguno demuestra por sí mismo calidad o SOLID.
 
 | Familia | Comprobación visual y semántica |
 | --- | --- |
-| Secuencia | Actor humano y participantes `boundary`/`control` según responsabilidad; mensajes numerados y extremos declarados. El callback conserva su propietario de código. |
+| Secuencia | Actor humano; participantes `boundary`, `control` o simples según responsabilidad; mensajes numerados y extremos declarados. El callback conserva su propietario de código. |
 | Clases/dominio | Estereotipos, atributos, asociaciones, multiplicidades y generalizaciones correspondientes al modelo. Los eventos tipados se describen como datos/contratos, no métodos inventados. |
 | Casos de uso | Actor fuera del límite, objetivos en óvalos, participación y relaciones funcionales justificadas. |
 | Estados/actividad | Inicio, estados/acciones, transiciones y decisiones del ciclo representado; los finales y alternativas conservan su significado. |
@@ -92,33 +92,33 @@ que dos asociaciones opcionales son alternativas exclusivas.
 
 ## Secuencias
 
-**Ejemplo:** `DIA-VUE-LEG-002`. Orden de mensajes de una operación genérica.
+**Ejemplo:** `DIA-VUE-LEG-002`. Eventos y props de Directorio.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Usuario
-    participant Editor@{ "type": "control" } as Editor
-    participant API@{ "type": "boundary" } as API
-    Usuario->>Editor: Guardar
-    Editor->>Editor: validar
-    alt captura válida
-        Editor->>API: solicitud
-        API-->>Editor: respuesta
-    else captura inválida
-        Editor-->>Usuario: errores
-    end
+    participant Form@{ "type": "boundary" } as DirectoryForm.vue
+    participant Page@{ "type": "control" } as DirectoryEditorPage.vue
+    participant Editor@{ "type": "control" } as useDirectoryEditor.ts
+    Usuario->>Form: nowrap: submit
+    Form->>Page: nowrap: emit('submit')
+    Page->>Editor: nowrap: editor.submit()
+    Editor-->>Page: nowrap: { values, errors, message, isSubmitting }
+    Page-->>Form: nowrap: { values, errors, message, isSubmitting }
 ```
 
 | Elemento visible | Lectura |
 | --- | --- |
 | Figura humana | Actor externo que participa en la interacción. |
-| Símbolo `boundary`: círculo con trazo lateral | Frontera de interacción: vista, control visual, adaptador HTTP, API o entorno del navegador. |
-| Símbolo `control`: círculo con flecha curva | Coordinación, decisión o cálculo: composable, Router, mapper o esquema. |
+| Símbolo `boundary`: círculo con trazo lateral | Frontera de entrada/salida: formulario visual, menú, adaptador de avisos o HTTP y API. |
+| Símbolo `control`: círculo con flecha curva | Coordinador de una interacción: página contenedora, composable, sesión o guarda de navegación propia. |
+| Rectángulo de participante sin estereotipo | Módulo o función que interviene en llamadas: mapper, constructor de payload, validación pura o adaptación de errores. |
+| Símbolo `entity`: círculo con línea inferior | Objeto del dominio que recibe mensajes. Los contratos de datos TypeScript que sólo viajan como valores se escriben en los retornos, sin inventar métodos o instancias. |
 | Nombre junto al símbolo | Colaborador representado; puede ser una función o módulo, sin una clase instanciada. |
 | Línea vertical bajo la cabecera | Línea de vida del participante. Se lee de arriba abajo. |
 | Caja de grupo con título | Agrupa líneas de vida por responsabilidad, como Interfaz, Coordinación o Integración. No representa una clase, un objeto adicional ni un proceso independiente. |
-| Flecha continua / discontinua | Llamada o solicitud / resultado, callback o actualización reactiva según su etiqueta y alcance. |
+| Flecha continua / discontinua | Llamada, evento o solicitud / resultado o valores expuestos, según la etiqueta. Los callbacks se muestran como llamadas a su propietario. |
 | Flecha que vuelve al mismo participante | Paso interno de ese colaborador. |
 | Círculo oscuro con número | Orden del mensaje, generado por `autonumber`; no es un código HTTP ni prioridad. |
 | Marco `alt` / `opt` | Alternativas mutuamente excluyentes / recorrido opcional. La etiqueta expresa la condición. |

@@ -86,30 +86,25 @@ un desmontaje impide la transición tardía.
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
-    box Interfaz
-    participant Page@{ "type": "boundary" } as Inventory<br/>Editor<br/>Page.vue
-    participant Parent@{ "type": "boundary" } as Inventory<br/>Page.vue
-    end
+    actor U as Usuario
     box Coordinación
+    participant Page@{ "type": "control" } as Inventory<br/>Editor<br/>Page.vue
+    participant Parent@{ "type": "control" } as Inventory<br/>Page.vue
     participant Editor@{ "type": "control" } as useInventory<br/>Editor.ts
     participant Recovery@{ "type": "control" } as useWaste<br/>Duplicate<br/>Recovery.ts
     participant Inventory@{ "type": "control" } as use<br/>Inventory.ts
     end
-    U->>Page: Guardar alta de merma
-    Page->>Editor: submit()
-    Note over Editor: inventoryService y apiClient ejecutan el alta, SEQ-040
-    Editor->>Recovery: recover tras WASTE_ALREADY_EXISTS definitivo
-    Note over Recovery: Mapper y confirmAction se desarrollan en SEQ-009
-    Recovery->>Page: onAddStock(target) si confirmó y sigue vigente
-    Page->>Parent: addStock(target)
-    Parent->>Inventory: openEditor(target)
-    Inventory-->>Parent: target add-stock
-    Parent->>Page: nueva instancia de entrada con captura
-    Note over Parent,Editor: Abrir no escribe existencias
-    U->>Page: revisar y Guardar entrada
-    Page->>Editor: submit() de la nueva instancia
-    Note over Editor: Nueva operación stock-additions con su propia clave
+    U->>Page: nowrap: submit
+    Page->>Editor: nowrap: editor.submit()
+    Editor->>Recovery: nowrap: duplicateRecovery.recover(cause, payload)
+    opt nowrap: confirmed && !options.signal.aborted
+        Recovery->>Page: nowrap: options.onAddStock(target)
+        Page->>Parent: nowrap: emit('addStock', target)
+        Parent->>Inventory: nowrap: inventory.openEditor(target)
+        Inventory->>Inventory: nowrap: editor.value = target
+        Inventory-->>Parent: nowrap: editor
+        Parent->>Page: nowrap: { target: editor, resource, userId }
+    end
 ```
 
 Se aplican los patrones ya adoptados: contenedor/presentación, composición por

@@ -1,16 +1,10 @@
 # Lectura de documento y descarte de respuestas sustituidas
 
+**Casos relacionados:** aperturas de compra y salida, CU-ENT y CU-SAL.
+
 ## Escenario y contratos
 
-**Identificador:** `DIA-VUE-SEQ-025`. **Pregunta:** ¿Cómo se impide que una lectura
-lenta abra un documento que el usuario ya dejó de solicitar?
-**Casos relacionados:** aperturas de compra y salida, CU-ENT y CU-SAL.
-**Fuentes:** [useDocumentRead.ts](../../../../../src/shared/composables/useDocumentRead.ts),
-[usePurchaseActions.ts](../../../../../src/modules/purchases/composables/usePurchaseActions.ts),
-[useIssueActions.ts](../../../../../src/modules/issues/composables/useIssueActions.ts).
-**Notación:** secuencia con guardas de vigencia y frontera HTTP externa.
-
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
+**Identificador:** `DIA-VUE-SEQ-025`.
 
 ```mermaid
 sequenceDiagram
@@ -20,7 +14,7 @@ sequenceDiagram
     participant Reader@{ "type": "control" } as useDocument<br/>Read.ts
     end
     box Reglas y datos
-    participant Mapper@{ "type": "control" } as purchase<br/>Response<br/>Mapper.ts
+    participant Mapper as purchase<br/>Response<br/>Mapper.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as purchase<br/>Service.ts
@@ -29,31 +23,35 @@ sequenceDiagram
     box Sistema externo
     participant API@{ "type": "boundary" } as API del sistema
     end
-    Actions->>Reader: load(row.id)
-    Reader->>Reader: incrementar secuencia y abortar lectura anterior
-    Reader->>Actions: request(id, signal) configurado
-    Actions->>Service: get(resource, id, signal)
-    Service->>HTTP: request por ID
-    HTTP->>API: GET /api/warehouse/goods-receipts/resource/id
-    API-->>HTTP: goodsReceipt o error
-    HTTP-->>Service: respuesta JSON o ApiError
-    Service->>Mapper: normalizePurchaseDocument(goodsReceipt, resource)
-    Mapper-->>Service: PurchaseDocument o error de contrato
-    Service->>Service: comprobar document.id === id
-    Service-->>Actions: documento normalizado
-    Actions-->>Reader: resultado del callback
-    alt intento y señal vigentes
-        Reader-->>Actions: documento para abrir editor
-    else solicitud sustituida
-        Reader->>Reader: descartar sin publicar
+    Actions->>Reader: nowrap: reader.load(row.id)
+    Reader->>Reader: nowrap: attempt = ++sequence
+    Reader->>Reader: nowrap: controller?.abort()
+    Reader->>Actions: nowrap: options.request(id, current.signal)
+    Actions->>Service: nowrap: purchaseService.get(options.resource, id,<br/>signal)
+    Service->>HTTP: nowrap: apiClient.request(getPurchaseEndpoint(<br/>resource) + '/' + encodeURIComponent(id),<br/>{ signal })
+    HTTP->>API: nowrap: GET<br/>/api/warehouse/goods-receipts/{resource}/{id}
+    API-->>HTTP: nowrap: { goodsReceipt }
+    HTTP-->>Service: nowrap: result
+    Service->>Mapper: nowrap: normalizePurchaseDocument(<br/>result.goodsReceipt, resource)
+    Mapper-->>Service: nowrap: document
+    alt nowrap: document.id !== id
+        Service-->>Actions: nowrap: throw Error
+        Actions-->>Reader: nowrap: throw Error
+        Reader->>Reader: nowrap: readError.value = cause.message
+        Reader->>Actions: nowrap: options.onError(cause)
+    else
+        Service-->>Actions: nowrap: document
+        Actions-->>Reader: nowrap: document
+        opt nowrap: attempt === sequence && !current.signal.aborted
+            Reader->>Reader: nowrap: document.value = result
+            Reader-->>Actions: nowrap: result
+        end
     end
 ```
 
 ## Lectura sustituida y recuperación
 
-**Identificador:** `DIA-VUE-SEQ-029`. **Pregunta:** ¿Qué sucede con la respuesta
-anterior al cambiar de fila o cerrar? **Fuente:** `useDocumentRead.load/close` y
-`Actions.retry`. **Notación:** secuencia de una lectura X ya pendiente.
+**Identificador:** `DIA-VUE-SEQ-029`.
 
 ```mermaid
 sequenceDiagram
@@ -65,41 +63,16 @@ sequenceDiagram
     box Integración
     participant Service@{ "type": "boundary" } as purchase<br/>Service.ts
     end
-    Note over Reader,Service: X ya está pendiente mediante el callback de usePurchaseActions
-    Actions->>Reader: load(Y) o close()
-    Reader->>Reader: incrementar sequence y abortar X
-    Service-->>Actions: resultado o error tardío de X
-    Actions-->>Reader: continuación del callback X
-    Reader->>Reader: descartar X por secuencia o signal
-    Note over Reader: No publica ni modifica el estado de la lectura Y
+    Actions->>Reader: nowrap: load(Y)
+    Reader->>Reader: nowrap: requestedId = Y
+    Reader->>Reader: nowrap: attempt = ++sequence
+    Reader->>Reader: nowrap: controller?.abort()
+    Service-->>Actions: nowrap: result_X
+    Actions-->>Reader: nowrap: result_X
+    alt nowrap: attempt_X !== sequence || current_X.signal.aborted
+        Reader-->>Actions: nowrap: undefined
+    end
 ```
-
-| Condición de la lectura vigente | Resultado y recuperación |
-| --- | --- |
-| Documento normalizado e ID coincidente | Devuelve documento al coordinador, que resuelve el modo y abre. |
-| Red rechazada, JSON inválido o ID distinto | Establece `readError`, llama `onError` y no retorna documento. |
-| Intento sustituido o señal abortada | Descarta resultado/error sin modificar la lectura nueva. |
-| Reintentar | El coordinador repite la última fila/modo y el lector crea un intento nuevo. |
-| Cierre/desmontaje | Invalida y aborta; limpia documento/error. Desmontaje impide nuevas cargas. |
-
-## Estado y límites
-
-`requestedId` permite repetir lectura; el coordinador conserva además el modo y la fila
-de la última apertura. `close` invalida, aborta y limpia documento/error. El desmontaje
-marca `isDisposed` antes de cerrar para impedir otra carga. En `finally` sólo el intento
-vigente modifica `isReading`; una respuesta vieja no oculta la carga nueva.
-
-La normalización corresponde a `purchaseResponseMapper` y la comprobación del ID al
-servicio. Salidas desarrolla sus propios colaboradores en [SEQ-042](../07-issues/05-issue-read-transport.md). Un fallo
-de JSON o ID también se propaga como error vigente, aunque la red haya respondido 200.
-Abortar no prueba reversión del servidor: aquí sólo se consulta y se protege el estado
-del cliente. Las [secuencias de compra](../06-purchases/index.md) y
-[salida](../07-issues/index.md) desarrollan la resolución específica del modo.
-
-La evidencia de apertura, reintento y selección de documento se localiza en
-[purchaseTest.ts](../../../../../tests/unit/modules/purchases/purchaseTest.ts),
-[issueTest.ts](../../../../../tests/unit/modules/issues/issueTest.ts) y en la
-[matriz de cobertura](../../../../testing/04-use-case-coverage.md).
 
 ## Fuentes de los participantes
 
@@ -108,3 +81,7 @@ La evidencia de apertura, reintento y selección de documento se localiza en
 [purchaseResponseMapper.ts](../../../../../src/modules/purchases/mappers/purchaseResponseMapper.ts),
 [purchaseService.ts](../../../../../src/modules/purchases/services/purchaseService.ts),
 [apiClient.ts](../../../../../src/shared/http/apiClient.ts).
+
+## Secuencias relacionadas
+
+[DIA-VUE-SEQ-042](../07-issues/05-issue-read-transport.md#documento-solicitado-y-documento-recibido).

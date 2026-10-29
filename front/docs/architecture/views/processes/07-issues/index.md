@@ -10,6 +10,6 @@
 
 - [Lectura y adaptación del documento](05-issue-read-transport.md): `DIA-VUE-SEQ-042`.
 - [Partidas del borrador](06-issue-line-entry.md): `DIA-VUE-SEQ-043`.
-- [Transporte de escritura y devolución](07-issue-save-transport.md): `DIA-VUE-SEQ-045`.
+- [Transporte de escritura y devolución](07-issue-save-transport.md): `DIA-VUE-SEQ-045/052`.
 
 [Catálogo de procesos y figuras](../index.md).

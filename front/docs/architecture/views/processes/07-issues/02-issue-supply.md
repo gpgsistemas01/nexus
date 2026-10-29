@@ -1,89 +1,80 @@
 # Salida: selección y surtido
 
-## Escenario y contratos
-
 **Casos relacionados:** CU-SAL-05/12/19.
 
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-016`.
 
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
-
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario autorizado
+    actor U as Usuario
     box Interfaz
     participant Form@{ "type": "boundary" } as Issue<br/>Editor.vue
-    participant Page@{ "type": "boundary" } as IssueEditor<br/>Page.vue
     end
     box Coordinación
+    participant Page@{ "type": "control" } as IssueEditor<br/>Page.vue
     participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
     end
     box Reglas y datos
-    participant Details@{ "type": "control" } as issue<br/>Details.ts
+    participant Details as issue<br/>Details.ts
     end
-    Note over Form,Details: Apertura y permiso de surtido comprobados en SEQ-015
-    U->>Form: seleccionar detalle y cantidad de proyecto
-    Form->>Page: supply(id, changes)
-    Page->>Editor: updateDetailSupply(id, changes)
-    Editor->>Details: updateIssueDetailSupply(details, id, changes)
-    Details-->>Editor: borrador con detalles protegidos conservados
-    U->>Form: Guardar surtido
-    Form->>Page: submit
-    Page->>Editor: submit()
-    Editor->>Editor: validar selección y cantidades
-    alt inválido
-        Editor-->>Page: errors sin escritura
-    else captura válida
-        Note over Editor: Entrar en el coordinador de SEQ-049
+    U->>Form: nowrap: supply(id, changes)
+    Form->>Page: nowrap: emit('supply', id, changes)
+    Page->>Editor: nowrap: editor.updateDetailSupply(id, changes)
+    opt nowrap: mode === 'supply'
+        Editor->>Details: nowrap: updateIssueDetailSupply(<br/>form.values.details, id, changes)
+        Details-->>Editor: nowrap: IssueDetail[]
+        Editor->>Editor: nowrap: interaction.update('details', details)
+    end
+    U->>Form: nowrap: submit
+    Form->>Page: nowrap: emit('submit')
+    Page->>Editor: nowrap: editor.submit()
+    opt nowrap: !isDisabled()
+        Editor->>Editor: nowrap: submitValidated()
     end
 ```
 
 ## Payload y guardado del surtido
 
-**Identificador:** `DIA-VUE-SEQ-049`. Continúa el envío válido, con el callback definido por el editor.
+**Identificador:** `DIA-VUE-SEQ-049`.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    box Interfaz
-    participant Page@{ "type": "boundary" } as IssueEditor<br/>Page.vue
-    end
     box Coordinación
+    participant Page@{ "type": "control" } as IssueEditor<br/>Page.vue
     participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Reglas y datos
-    participant Mapper@{ "type": "control" } as issueRequest<br/>Mapper.ts
+    participant Mapper as issueRequest<br/>Mapper.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as issue<br/>Service.ts
     end
-    Editor->>Save: execute(operation)
-    Save->>Editor: operation(signal)
-    Editor->>Mapper: mapIssueFormToRequest(values, resource, supply)
-    Mapper-->>Editor: detalles modificables seleccionados
-    Editor->>Service: save con target supply y signal
-    Note over Service: PATCH documento/id/details, contrato en SEQ-045
-    Service-->>Editor: MutationConfirmation o ApiError
-    Editor-->>Save: resultado o rechazo
-    alt confirmado y vigente
-        Save->>Page: onSaved(confirmation)
-        Page->>Page: emitir saved, continuación en DOC-002
-    else rechazo
-        Save-->>Editor: mensaje y errores
+    Editor->>Save: nowrap: save.execute(operation)
+    Save->>Editor: nowrap: operation(controller.signal)
+    Editor->>Mapper: nowrap: mapIssueFormToRequest(values,<br/>options.resource, target.mode)
+    Mapper-->>Editor: nowrap: payload
+    Editor->>Service: nowrap: issueService.save({ resource:<br/>options.resource, target, payload, signal<br/>})
+    alt nowrap: try
+        Service-->>Editor: nowrap: MutationConfirmation
+        Editor-->>Save: nowrap: result
+        opt nowrap: !controller.signal.aborted
+            Save->>Page: nowrap: options.onSaved(result)
+            Page->>Page: nowrap: emit('saved', result)
+        end
+    else nowrap: catch(cause)
+        Service-->>Editor: nowrap: throw ApiError
+        Editor-->>Save: nowrap: throw cause
+        opt nowrap: !controller.signal.aborted && cause instanceof<br/>ApiError
+            Save->>Editor: nowrap: options.setErrors(cause.fieldErrors)
+            Editor-->>Page: nowrap: { errors, message, isConflicted }
+        end
     end
 ```
-
-## Reglas y recuperación
-
-El encabezado queda bloqueado en este modo. Detalles originalmente surtidos/cancelados se protegen. El stock suficiente se vuelve a comprobar en la API y un rechazo no se anuncia como surtido completado.
-
-## Evidencia
-
-issueTest.ts, issues.spec.ts y CP-VUE-ISS-002-01. La [matriz por caso](../../../../testing/04-use-case-coverage.md) identifica alcance y límites, y el [registro CP](../../../../testing/03-test-cases.md) concreta datos y oráculos críticos.
 
 ## Fuentes de los participantes
 
@@ -94,3 +85,7 @@ issueTest.ts, issues.spec.ts y CP-VUE-ISS-002-01. La [matriz por caso](../../../
 [issueDetails.ts](../../../../../src/modules/issues/issueDetails.ts),
 [issueRequestMapper.ts](../../../../../src/modules/issues/mappers/issueRequestMapper.ts),
 [issueService.ts](../../../../../src/modules/issues/services/issueService.ts).
+
+## Secuencias relacionadas
+
+[DIA-VUE-SEQ-015](01-issue-open-save.md#apertura-y-resolución-del-modo), [DIA-VUE-SEQ-045](07-issue-save-transport.md#endpoint-y-confirmación-de-la-operación), [DIA-VUE-DOC-002](../../development/design-and-construction-patterns/08-document-responsibilities.md#secuencia-de-guardado-confirmado), [DIA-VUE-SEQ-051](../02-shared-runtime/08-record-save.md).
