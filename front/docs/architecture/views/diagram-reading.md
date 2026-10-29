@@ -158,17 +158,11 @@ direction LR
     main -- specific
 ```
 
-El actor especializado hereda la asociación con la consulta y conserva la asociación
-propia con Operación específica. Esta operación sigue conectada con la consulta:
-la generalización entre actores no sustituye el enlace de acceso. La vista omite las
-asociaciones repetidas del actor general con las operaciones; sus fichas mantienen
-todos los actores que pueden iniciarlas. Dos actores pueden participar en el mismo
-caso sin tener generalización entre sí. En esta vista resumida, los actores que
-comparten operaciones se conectan sólo a la consulta. La asociación directa adicional
-identifica una operación exclusiva, justificada por los permisos y su ficha.
+En esta vista resumida, los actores que comparten operaciones se conectan sólo
+a la consulta. Las fichas identifican todos los participantes; una asociación
+adicional señala una operación exclusiva.
 
-**Ejemplo:** `DIA-VUE-LEG-007`. Inclusión y extensión de comportamiento. Es un
-ejemplo de notación, sin atribuir nuevos casos a Nexus.
+**Ejemplo:** `DIA-VUE-LEG-007`. Inclusión y extensión de comportamiento.
 
 ```mermaid
 usecase-beta
@@ -184,12 +178,6 @@ direction LR
     optional ..>:extend base
 ```
 
-Completar objetivo incorpora el comportamiento requerido al alcanzar el punto de
-inclusión de su flujo. Resolver situación opcional se inserta en el punto de extensión
-previsto cuando se cumple su condición; el objetivo base puede completarse sin esa
-situación. Los dos ejemplos separan el acceso desde una consulta de la incorporación
-de comportamiento.
-
 | Elemento visible | Lectura |
 | --- | --- |
 | Figura humana con nombre | Actor: una función externa que participa, no una cuenta concreta. |
@@ -201,12 +189,9 @@ de comportamiento.
 | Flecha discontinua `«extend»` | Del caso que agrega comportamiento al caso base. Requiere un punto de extensión y una condición documentados; la base conserva sentido completo sin la extensión. |
 | Flecha discontinua `«include»` | De la base al comportamiento requerido al alcanzar su punto de inclusión. No expresa cronología de pantallas ni permisos. |
 
-En Nexus, las altas contextuales desde selectores justifican `«extend»` por su
-inserción y retorno a una captura; las fichas identifican condición y punto concretos.
-El segundo ejemplo explica la inclusión sin atribuir un `include` a los casos del sistema.
-La [guía del modelo](../../requirements/use-case-model/index.md#asociaciones-y-relaciones-entre-casos)
-concentra la aplicación de estas relaciones y la representación de restricciones.
-La navegación entre pantallas se documenta en su [catálogo](scenarios/navigation-and-screens.md).
+Los actores y objetivos de Nexus se consultan en el
+[modelo de casos de uso](../../requirements/use-case-model/index.md); los recorridos
+entre pantallas, en el [catálogo de navegación](scenarios/navigation-and-screens.md).
 
 ## Mapas y actividades
 

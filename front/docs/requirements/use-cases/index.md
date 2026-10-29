@@ -11,28 +11,8 @@ de sus pasos. Cada índice de familia concentra su realización y fuentes de pru
 
 El [modelo visual de casos de uso](../use-case-model/index.md) representa actores, límites y objetivos por recurso.
 
-## Semántica de actores y generalización UML
-
-En los diagramas, la consulta mantiene una asociación normal con el actor que la
-realiza y conecta las operaciones del recurso mediante enlaces simples de acceso.
-La vista conecta a los actores que comparten operaciones sólo con la consulta;
-las asociaciones adicionales se reservan para participaciones exclusivas comprobadas
-en los permisos y la ficha. Un mismo caso puede tener varios actores;
-la ficha los nombra y distingue su alcance cuando corresponde. Una relación entre
-casos no hereda actores ni concede permisos. Personal de almacén especializa a
-Usuario registrado; Administrador del sistema especializa a Personal de almacén y
-hereda todas sus asociaciones. Los casos exclusivos del administrador conservan
-asociaciones directas adicionales; no se duplican las funciones heredadas.
-
-La [guía visual](../../architecture/views/diagram-reading.md#casos-de-uso) explica la
-notación y dirección de las relaciones Mermaid. Las asociaciones son líneas continuas
-sin punta; la generalización tiene un triángulo hueco
-hacia el general; `«include»` y `«extend»` son dependencias discontinuas con el estereotipo
-correspondiente. La generalización no lleva texto adicional. No establece inclusiones
-ni extensiones entre los objetivos de esos actores. Los enlaces simples desde
-Consulta son una convención de navegación de esta vista, no una asociación UML
-entre casos. Un objetivo exclusivo conserva tanto su actor específico como su enlace
-con la consulta desde la que se inicia, aunque ese actor herede participación.
+La [leyenda visual](../../architecture/views/diagram-reading.md#casos-de-uso)
+define la notación y la convención de enlaces del modelo.
 
 ## Estructura de las fichas
 
@@ -104,39 +84,14 @@ contexto realmente compartido y no mantienen una segunda versión de los flujos.
 El último paso de cada alternativa declara su destino: **continúa en el paso N del flujo
 principal** cuando retorna dentro del mismo caso, o **termina el caso de uso** cuando no
 quedan más interacciones. No se usa «volver» o «continuar» sin indicar el paso.
-Las relaciones UML se distinguen de la navegación a otro objetivo:
-
-- Una asociación simple conecta al actor con el caso en el que participa; se dibuja
-  como línea continua sin punta ni frase. No representa una llamada ni transmite
-  permisos a otros casos. Los enlaces simples consulta–operación organizan el acceso
-  desde un listado en la vista resumida. Cada destino conserva los actores y permisos
-  de su ficha; un enlace específico de actor puede coexistir con el de la consulta.
-- `«include»` identifica comportamiento requerido que el caso base incorpora al
-  alcanzar el punto de inclusión; al concluir, la interacción continúa en el paso
-  siguiente a la inclusión.
-- `«extend»` identifica comportamiento opcional que se inserta en un punto de extensión
-  del caso base; al concluir, continúa en el paso de retorno indicado por la ficha.
-- La **generalización** identifica un caso especializado que sustituye el comportamiento
-  heredado aplicable; no representa una llamada entre casos.
-
-Las inclusiones, extensiones o generalizaciones entre casos deben aparecer también en
-el diagrama y nombrar ambos identificadores `CU-*`; una extensión documenta su condición,
-punto de inserción y retorno. Las continuaciones de navegación no son relaciones UML
-entre casos; compartir servicios de inventario, persistencia o consulta tampoco crea
-por sí solo una relación UML.
-
-`include` no representa una consulta previa, una lectura interna de datos ni una
-restricción de actor. `exclude` no es una relación UML: las prohibiciones se expresan
-mediante permisos, condiciones y excepciones. El
-[modelo visual](../use-case-model/index.md#asociaciones-y-relaciones-entre-casos)
-concentra los ejemplos del sistema y justifica las extensiones de altas contextuales.
+Las relaciones se registran en el diagrama y en las fichas de los casos implicados.
+Una inclusión identifica el caso requerido y el punto del flujo donde se incorpora;
+una extensión identifica la base, condición, punto de inserción y retorno. La
+navegación hacia otro objetivo se registra en **Acciones de la pantalla**.
 
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
 En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela
 como actor externo ni inicia el caso por sí mismo.
-El **Administrador del sistema** hereda las funciones del Personal de almacén
-mediante generalización y tiene asociaciones adicionales con sus casos exclusivos. **Dirección** no se atribuye como
-actor mientras no se definan y autoricen sus objetivos concretos.
 Los casos de catálogos siguen listar-crear-actualizar y sólo incluyen eliminar, activar,
 desactivar o ajustar cuando el contexto lo permite. Los documentos comparten encabezado
 y detalles, pero surtir, devolver y corregir mantienen reglas y efectos propios.

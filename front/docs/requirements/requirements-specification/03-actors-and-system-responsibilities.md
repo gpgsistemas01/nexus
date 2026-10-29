@@ -17,24 +17,7 @@ El [diagrama de casos de uso](../use-case-model/index.md) conserva
 las asociaciones y generalizaciones de actores; cada [ficha `CU-*`](../use-cases/index.md)
 nombra al actor que inicia el objetivo. Los
 [modos y efectos](06-operation-modes-and-effects.md) concentran las reglas funcionales;
-la arquitectura y OpenAPI describen su realización. Estas fuentes se
-complementan y no se repiten aquí como otra matriz.
-
-Personal de almacén especializa a Usuario registrado; Administrador del sistema
-especializa a Personal de almacén y hereda sus asociaciones, incluida autenticación.
-Usuario de área operativa también especializa a Usuario registrado, en una rama
-independiente: no hereda las funciones de Almacén. Las asociaciones compartidas por
-una jerarquía se dibujan en su actor general; los objetivos
-exclusivos, como ajustes administrativos y consulta de movimientos, se asocian al
-administrador. Consultar conserva una asociación normal y no incluye ni extiende las
-otras acciones por compartir pantalla. La generalización de actores no define
-relaciones entre casos ni sustituye la comprobación de permisos.
-
-La vista resumida conecta las operaciones con su consulta mediante enlaces simples
-de acceso y conserva las asociaciones de actores específicos. El enlace de una
-operación con la consulta permanece aunque su actor herede participación del actor
-general. Un mismo caso puede admitir varios actores; sus responsabilidades y alcance
-se explicitan en la ficha, sin deducirlos de la navegación ni exigir una nueva jerarquía.
+la arquitectura y OpenAPI describen su realización.
 
 Solicitantes, aprobadores, asesores, receptores y proveedores
 pueden participar en un documento sin convertirse por ello en actores con acceso. Las
