@@ -8,7 +8,7 @@ Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-conte
 
 ## Compras de materiales
 
-**Identificador:** `DIA-VUE-CU-018`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
+**Identificador:** `DIA-VUE-CU-018`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -30,16 +30,17 @@ direction LR
     end
 
     warehouse -- ucReceiptQuery
-    warehouse -- ucReceiptCreate
-    warehouse -- ucReceiptEdit
-    warehouse -- ucReceiptCorrect
-    warehouse -- ucReceiptCancel
-    warehouse -- ucPurchaseReport
+
+    ucReceiptQuery -- ucReceiptCreate
+    ucReceiptQuery -- ucReceiptEdit
+    ucReceiptQuery -- ucReceiptCorrect
+    ucReceiptQuery -- ucReceiptCancel
+    ucReceiptQuery -- ucPurchaseReport
 ```
 
 ## Compras de consumibles
 
-**Identificador:** `DIA-VUE-CU-019`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
+**Identificador:** `DIA-VUE-CU-019`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -59,9 +60,10 @@ direction LR
     end
 
     warehouse -- ucConsumableReceiptQuery
-    warehouse -- ucConsumableReceiptCreate
-    warehouse -- ucConsumableReceiptEdit
-    warehouse -- ucConsumableReceiptCorrect
-    warehouse -- ucConsumableReceiptCancel
-    warehouse -- ucConsumablePurchaseReport
+
+    ucConsumableReceiptQuery -- ucConsumableReceiptCreate
+    ucConsumableReceiptQuery -- ucConsumableReceiptEdit
+    ucConsumableReceiptQuery -- ucConsumableReceiptCorrect
+    ucConsumableReceiptQuery -- ucConsumableReceiptCancel
+    ucConsumableReceiptQuery -- ucConsumablePurchaseReport
 ```

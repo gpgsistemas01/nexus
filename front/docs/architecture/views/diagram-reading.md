@@ -137,9 +137,9 @@ Un **actor de caso de uso** es el papel externo que interactúa con Nexus para
 alcanzar un objetivo. Puede especializar a otro actor; no representa una entidad
 de datos, una cuenta concreta ni una pantalla.
 
-**Ejemplo:** `DIA-VUE-LEG-004`. Consulta compartida, objetivo propio de un actor
-especializado y comportamientos incorporados a ese objetivo. Es un ejemplo de notación,
-no otro conjunto de casos de Nexus.
+**Ejemplo:** `DIA-VUE-LEG-004`. Vista resumida de consulta y operaciones, con un caso
+propio de un actor especializado. Los enlaces consulta–operación son la convención
+de acceso del documento; no representan relaciones UML entre casos.
 
 ```mermaid
 usecase-beta
@@ -149,16 +149,44 @@ direction LR
     specialized --|> general
     systemBoundary example["Sistema de ejemplo"]
         main("Consultar registros")
-        extra("Ejecutar operación")
+        common("Operar registro")
+        specific("Operación específica")
+    end
+    general -- main
+    specialized -- specific
+    main -- common
+    main -- specific
+```
+
+El actor especializado hereda la asociación con la consulta y conserva la asociación
+propia con Operación específica. Esta operación sigue conectada con la consulta:
+la generalización entre actores no sustituye el enlace de acceso. La vista omite las
+asociaciones repetidas del actor general con las operaciones; sus fichas mantienen
+todos los actores que pueden iniciarlas. Dos actores pueden participar en el mismo
+caso sin tener generalización entre sí.
+
+**Ejemplo:** `DIA-VUE-LEG-007`. Inclusión y extensión de comportamiento. Es un
+ejemplo de notación, sin atribuir nuevos casos a Nexus.
+
+```mermaid
+usecase-beta
+direction LR
+    actor participant("Actor autorizado")
+    systemBoundary behaviorExample["Sistema de ejemplo"]
+        base("Completar objetivo")
         required("Comportamiento requerido")
         optional("Resolver situación opcional")
     end
-    general -- main
-    specialized -- extra
-    specialized -- optional
-    extra ..>:include required
-    optional ..>:extend extra
+    participant -- base
+    base ..>:include required
+    optional ..>:extend base
 ```
+
+Completar objetivo incorpora el comportamiento requerido al alcanzar el punto de
+inclusión de su flujo. Resolver situación opcional se inserta en el punto de extensión
+previsto cuando se cumple su condición; el objetivo base puede completarse sin esa
+situación. Los dos ejemplos separan el acceso desde una consulta de la incorporación
+de comportamiento.
 
 | Elemento visible | Lectura |
 | --- | --- |
@@ -166,20 +194,14 @@ direction LR
 | Óvalo | Objetivo del actor, identificado por `CU-*` en los modelos de Nexus. |
 | Rectángulo que agrupa óvalos | Límite del sistema o corte funcional; los actores quedan fuera. |
 | Línea continua actor–óvalo, sin punta | Asociación normal: participación del actor en el objetivo, incluida la consulta. No indica orden de ejecución ni concesión automática de permisos. |
+| Línea continua consulta–operación, sin punta ni etiqueta | Enlace de acceso de la vista resumida, como convención del documento. No es una asociación UML entre casos ni implica `include`, `extend` o autorización. |
 | Triángulo hueco entre actores | Generalización; apunta al actor general. El especializado hereda sus asociaciones y conserva las propias. |
 | Flecha discontinua `«extend»` | Del caso que agrega comportamiento al caso base. Requiere un punto de extensión y una condición documentados; la base conserva sentido completo sin la extensión. |
 | Flecha discontinua `«include»` | De la base al comportamiento requerido al alcanzar su punto de inclusión. No expresa cronología de pantallas ni permisos. |
 
-En el ejemplo, el actor especializado puede consultar por herencia e iniciar su
-operación por la asociación propia. No hay una relación entre Consultar registros y
-Ejecutar operación. Dentro de esta última, el comportamiento requerido se incorpora
-al alcanzar su punto de inclusión; la situación opcional se inserta sólo cuando se
-cumple su condición, en el punto de extensión definido para resolverla.
-
-En Nexus, las asociaciones de consulta y mantenimiento se mantienen independientes.
-Las altas contextuales desde selectores justifican `«extend»` por su inserción y
-retorno a una captura; las fichas identifican condición y punto concretos. La inclusión
-del ejemplo explica su notación sin atribuir un `include` a los casos del sistema.
+En Nexus, las altas contextuales desde selectores justifican `«extend»` por su
+inserción y retorno a una captura; las fichas identifican condición y punto concretos.
+El segundo ejemplo explica la inclusión sin atribuir un `include` a los casos del sistema.
 La [guía del modelo](../../requirements/use-case-model/index.md#asociaciones-y-relaciones-entre-casos)
 concentra la aplicación de estas relaciones y la representación de restricciones.
 La navegación entre pantallas se documenta en su [catálogo](scenarios/navigation-and-screens.md).

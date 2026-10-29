@@ -4,7 +4,7 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 ## Áreas
 
-**Identificador:** `DIA-VUE-CU-012`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
+**Identificador:** `DIA-VUE-CU-012`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -23,13 +23,14 @@ direction LR
     end
 
     admin -- ucAreaQuery
-    admin -- ucAreaCreate
-    admin -- ucAreaEdit
+
+    ucAreaQuery -- ucAreaCreate
+    ucAreaQuery -- ucAreaEdit
 ```
 
 ## Roles
 
-**Identificador:** `DIA-VUE-CU-013`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
+**Identificador:** `DIA-VUE-CU-013`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -46,13 +47,14 @@ direction LR
     end
 
     admin -- ucRoleQuery
-    admin -- ucRoleCreate
-    admin -- ucRoleEdit
+
+    ucRoleQuery -- ucRoleCreate
+    ucRoleQuery -- ucRoleEdit
 ```
 
 ## Presentaciones
 
-**Identificador:** `DIA-VUE-CU-014`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
+**Identificador:** `DIA-VUE-CU-014`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -69,13 +71,14 @@ direction LR
     end
 
     admin -- ucPresentationQuery
-    admin -- ucPresentationCreate
-    admin -- ucPresentationEdit
+
+    ucPresentationQuery -- ucPresentationCreate
+    ucPresentationQuery -- ucPresentationEdit
 ```
 
 ## Unidades de medida
 
-**Identificador:** `DIA-VUE-CU-015`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
+**Identificador:** `DIA-VUE-CU-015`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -92,13 +95,14 @@ direction LR
     end
 
     admin -- ucUnitMeasureQuery
-    admin -- ucUnitMeasureCreate
-    admin -- ucUnitMeasureEdit
+
+    ucUnitMeasureQuery -- ucUnitMeasureCreate
+    ucUnitMeasureQuery -- ucUnitMeasureEdit
 ```
 
 ## Motivos de ajuste
 
-**Identificador:** `DIA-VUE-CU-016`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
+**Identificador:** `DIA-VUE-CU-016`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -115,13 +119,14 @@ direction LR
     end
 
     admin -- ucAdjustmentReasonQuery
-    admin -- ucAdjustmentReasonCreate
-    admin -- ucAdjustmentReasonEdit
+
+    ucAdjustmentReasonQuery -- ucAdjustmentReasonCreate
+    ucAdjustmentReasonQuery -- ucAdjustmentReasonEdit
 ```
 
 ## Estados de cumplimiento
 
-**Identificador:** `DIA-VUE-CU-017`. **Pregunta:** ¿Qué objetivos puede iniciar cada actor en este recurso?
+**Identificador:** `DIA-VUE-CU-017`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -138,6 +143,7 @@ direction LR
     end
 
     admin -- ucFulfillmentStatusQuery
-    admin -- ucFulfillmentStatusCreate
-    admin -- ucFulfillmentStatusEdit
+
+    ucFulfillmentStatusQuery -- ucFulfillmentStatusCreate
+    ucFulfillmentStatusQuery -- ucFulfillmentStatusEdit
 ```

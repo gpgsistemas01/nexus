@@ -30,6 +30,12 @@ administrador. Consultar conserva una asociación normal y no incluye ni extiend
 otras acciones por compartir pantalla. La generalización de actores no define
 relaciones entre casos ni sustituye la comprobación de permisos.
 
+La vista resumida conecta las operaciones con su consulta mediante enlaces simples
+de acceso y conserva las asociaciones de actores específicos. El enlace de una
+operación con la consulta permanece aunque su actor herede participación del actor
+general. Un mismo caso puede admitir varios actores; sus responsabilidades y alcance
+se explicitan en la ficha, sin deducirlos de la navegación ni exigir una nueva jerarquía.
+
 Solicitantes, aprobadores, asesores, receptores y proveedores
 pueden participar en un documento sin convertirse por ello en actores con acceso. Las
 lecturas auxiliares para selectores tampoco conceden mantenimiento del catálogo ni

@@ -14,9 +14,10 @@ El [modelo visual de casos de uso](../use-case-model/index.md) representa actore
 ## Semántica de actores y generalización UML
 
 En los diagramas, la consulta mantiene una asociación normal con el actor que la
-realiza. Las asociaciones compartidas por una jerarquía se sitúan en el actor general
-que participa en esos objetivos; las exclusivas se sitúan en el especializado. Cada
-ficha nombra a los actores autorizados para iniciar su objetivo; una relación entre
+realiza y conecta las operaciones del recurso mediante enlaces simples de acceso.
+La vista omite las asociaciones repetidas del actor del recurso con cada operación
+y mantiene las de actores específicos. Un mismo caso puede tener varios actores;
+la ficha los nombra y distingue su alcance cuando corresponde. Una relación entre
 casos no hereda actores ni concede permisos. Personal de almacén especializa a
 Usuario registrado; Administrador del sistema especializa a Personal de almacén y
 hereda todas sus asociaciones. Los casos exclusivos del administrador conservan
@@ -27,9 +28,10 @@ notación y dirección de las relaciones Mermaid. Las asociaciones son líneas c
 sin punta; la generalización tiene un triángulo hueco
 hacia el general; `«include»` y `«extend»` son dependencias discontinuas con el estereotipo
 correspondiente. La generalización no lleva texto adicional. No establece inclusiones
-ni extensiones entre los objetivos de esos actores. Las acciones de una pantalla
-pueden iniciar objetivos independientes sin relacionarlos con `include` o `extend`;
-una línea simple entre casos tampoco representa esa navegación.
+ni extensiones entre los objetivos de esos actores. Los enlaces simples desde
+Consulta son una convención de navegación de esta vista, no una asociación UML
+entre casos. Un objetivo exclusivo conserva tanto su actor específico como su enlace
+con la consulta desde la que se inicia, aunque ese actor herede participación.
 
 ## Estructura de las fichas
 
@@ -37,7 +39,10 @@ Cada caso emplea la misma tabla de dos columnas y conserva dentro de ella toda l
 información que permite recorrer su objetivo sin consultar una segunda descripción:
 
 - **Identificador y nombre:** identidad estable y objetivo observable.
-- **Actor:** responsable que inicia el caso.
+- **Actor:** uno o varios papeles autorizados para iniciar el caso. Si pueden actuar
+  alternativamente, se enumeran sin exigir participación conjunta. Un actor de apoyo
+  se identifica sólo cuando interviene en los pasos; ser cliente, solicitante o
+  proveedor registrado como dato no constituye esa participación por sí mismo.
 - **Disparador:** necesidad o evento observable que activa el caso. Estas dos secciones permanecen separadas para no confundir quién participa con el motivo de inicio.
 - **Precondiciones:** lista numerada de estados que deben existir antes del primer paso;
   cada condición se registra por separado y no se confunde con una acción de validación
@@ -102,8 +107,9 @@ Las relaciones UML se distinguen de la navegación a otro objetivo:
 
 - Una asociación simple conecta al actor con el caso en el que participa; se dibuja
   como línea continua sin punta ni frase. No representa una llamada ni transmite
-  permisos a otros casos. La consulta y las operaciones de mantenimiento o reporte
-  mantienen sus propias asociaciones aunque compartan pantalla.
+  permisos a otros casos. Los enlaces simples consulta–operación organizan el acceso
+  desde un listado en la vista resumida. Cada destino conserva los actores y permisos
+  de su ficha; un enlace específico de actor puede coexistir con el de la consulta.
 - `«include»` identifica comportamiento requerido que el caso base incorpora al
   alcanzar el punto de inclusión; al concluir, la interacción continúa en el paso
   siguiente a la inclusión.
