@@ -25,8 +25,6 @@ Referencia de responsabilidades y contratos del dominio `catalogs`. El [corte de
 | Consulta | Búsqueda/paginación remotas, nombre recibido presentado como texto. |
 | Efectos | Alta/edición; no inventar eliminación donde no existe. |
 
-La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
-
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |

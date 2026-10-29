@@ -50,13 +50,10 @@ desplazable y acciones siempre visibles;
 a partir del tamaño móvil de Vuetify ocupa la pantalla. `InventoryFormField`
 concentra la adaptación de inputs, checkbox, textarea y selector remoto.
 
-| Modo | Datos y comportamiento |
-| --- | --- |
-| Crear material/consumible | Datos, proveedor, presentación, unidad, inventario y existencias/observaciones. Muestra Stock inicial como motivo de consulta. Materiales habilita medidas según la unidad; cambiar a piezas limpia las medidas capturadas. |
-| Editar | Muestra proveedor, presentación, unidad y medidas como consulta; permite nombre, stock mínimo, costo y estado según el contrato existente. No envía identidad, dimensiones ni stock como cambios. |
-| Ajustar stock | Conserva datos, inventario, medidas y pesos visibles como consulta, junto al stock actual. Captura nuevo stock, motivo y observaciones. Conserva la versión original. |
-| Crear merma | Selecciona proveedor/material y muestra presentación/unidad heredadas. El material se habilita después del proveedor; cambiar proveedor limpia la referencia y captura anterior. Rollos capturan muestra, cono y peso total; neto y medidas calculadas son de consulta. |
-| Editar merma / agregar stock | Conserva pesos y medidas. Muestra rollo completo cuando existe; de lo contrario conserva largo/peso de la referencia histórica. Agregar captura cantidad y observaciones. |
+Los [modos de operación](../../../requirements/requirements-specification/06-operation-modes-and-effects.md)
+definen los campos modificables. El [modelo de Inventario](class-and-type-models/05-inventory.md)
+identifica destinos y datos; los [contratos de formularios](../../contracts/form-and-event-contracts.md)
+definen los eventos que conecta el contenedor.
 
 Los selectores de Inventario conservan la consulta de opciones y el alta contextual
 de proveedor en Materiales/Consumibles mediante `InventoryWorkspace`.
@@ -169,17 +166,12 @@ Vue Router resuelve páginas. El cierre procesa cookies y vuelve a `/inicio-sesi
 
 ## Axios y sesión
 
-| Condición | Comportamiento del cliente compartido |
-| --- | --- |
-| Login, sesión, catálogos, inventario o reporte | Misma instancia Axios; cookies HttpOnly administradas por el navegador para el mismo origen. |
-| 401 concurrentes | Comparten una renovación pendiente; cada original se reintenta una vez. |
-| Login o refresh rechazado | Operaciones públicas sin renovación recursiva. |
-| 403, 409, 5xx, timeout o pérdida de red | Sin repetición automática de escritura. |
-| Cancelación | Se conserva como cancelación; no se transforma en error de conexión. |
-| Descarga no válida | Un cuerpo HTML no confirma un archivo Excel. |
-
-La [renovación compartida](../processes/01-session/04-concurrent-renewal.md) desarrolla
-las decisiones y la continuación de cada petición.
+`apiClient` encapsula la instancia Axios y el interceptor de autenticación;
+`createAuthSession` proporciona identidad y permisos a los contenedores. Las
+condiciones de renovación y los resultados del transporte se definen en el
+[contrato HTTP](../../contracts/client-contracts.md#sesión-y-errores). La
+[secuencia de renovación](../processes/01-session/04-concurrent-renewal.md)
+identifica las llamadas entre sus propietarios.
 
 ## Ubicación y contrato de las pruebas
 

@@ -1,16 +1,18 @@
-# Contratos consumidos por Vue
+# Contratos del cliente Vue
 
-El [contrato del cliente](client-contracts.md) describe consulta remota, lectura,
-mutación, versiones, contexto, errores y descargas. Los servicios/mappers de cada
-dominio validan/traducen esos datos antes de publicarlos a los coordinadores.
+## Interfaces de intercambio
 
-| Frontera | Responsabilidad |
+| Referencia | Contenido propietario |
 | --- | --- |
-| Componente → Page | Evento tipado e intención; no transporte. |
-| Composable → servicio | Operación del dominio, datos permitidos y AbortSignal. |
-| Servicio → API | Ruta fija del recurso, método, parámetros y payload contractual. |
-| API → servicio | JSON/blob validable; código y campos esperados. |
-| Servicio → contenedor | Resultado de dominio confirmado o error normalizado. |
+| [HTTP del cliente](client-contracts.md) | Endpoints consumidos, parámetros, respuestas, confirmaciones, metadatos, errores y archivos. |
+| [Formularios, eventos y callbacks](form-and-event-contracts.md) | Props, intenciones, resultados de guardado y comunicación entre componentes y composables. |
 
-Los contratos de entrada y las postcondiciones funcionales están en
-[Requisitos](../../requirements/index.md). Las secuencias detallan orden y recuperación.
+## Modelos relacionados
+
+| Necesidad | Documento |
+| --- | --- |
+| Atributos, relaciones y variantes TypeScript | [Clases, interfaces y tipos](../views/logical/class-and-type-models/index.md). |
+| Firmas completas declaradas o inferidas | [Referencia TypeScript y SFC generada](../views/logical/type-reference/index.md). |
+| Condiciones y efectos funcionales | [Modos de operación](../../requirements/requirements-specification/06-operation-modes-and-effects.md). |
+| Transiciones de captura y recuperación | [Estado y ciclo de vida](../views/logical/state-and-lifecycle.md). |
+| Orden de llamadas entre propietarios | [Procesos y secuencias](../views/processes/index.md). |

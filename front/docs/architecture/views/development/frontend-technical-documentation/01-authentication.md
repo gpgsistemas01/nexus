@@ -26,8 +26,6 @@ Referencia de responsabilidades y contratos del dominio `auth`. El [corte de com
 | Cierre | Formulario POST `/cerrar-sesion`; navegador/API administran cookies HttpOnly. |
 | Error | Campo, credencial genérica, límite de intentos o indisponibilidad; conservar retorno interno. |
 
-La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
-
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |

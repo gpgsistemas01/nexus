@@ -112,8 +112,8 @@ Movimientos y los controles compartidos también utilizan Vuetify. Los filtros y
 los formularios de cada operación conservan responsabilidades distintas: usar
 Vuetify en una página no implica que todos sus controles utilicen VeeValidate.
 Las fuentes son los imports de `front/src/modules` y `front/src/shared`; los
-[contratos de formularios](../architecture/views/development/frontend-technical-documentation/08-form-and-event-contracts.md)
-detallan campos, eventos y validación por módulo.
+[contratos de formularios](../architecture/contracts/form-and-event-contracts.md)
+definen props, eventos y resultados entre contenedores.
 
 Axios centraliza el transporte y la renovación de autenticación. La sesión usa
 provide/inject por aplicación y las reglas públicas existentes se adaptan a

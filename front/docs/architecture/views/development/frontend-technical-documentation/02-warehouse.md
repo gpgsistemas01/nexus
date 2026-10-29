@@ -30,8 +30,6 @@ Referencia de responsabilidades y contratos del dominio `warehouse`. El [corte d
 | Alta desde compra | Contexto goodsReceipt, proveedor fijado y sin stock inicial; devuelve opción confirmada. |
 | Tabla | Encabezados/columnas por recurso, permiso de costo/estado y filas de stock bajo. |
 
-La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
-
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |

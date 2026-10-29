@@ -19,8 +19,9 @@ explica la solución y sus dependencias.
 | Alta desde un selector | Conservar el formulario principal y seleccionar el registro confirmado al cerrar el auxiliar. |
 
 VeeValidate se integra en el composable del editor; los componentes visuales reciben
-valores y errores mediante contratos tipados. Los campos y reglas particulares se
-definen en los [contratos de captura](views/development/frontend-technical-documentation/08-form-and-event-contracts.md).
+valores y errores mediante contratos tipados. Los [modos de operación](../requirements/requirements-specification/06-operation-modes-and-effects.md)
+precisan los campos modificables; los [contratos de formularios](contracts/form-and-event-contracts.md),
+los valores y eventos intercambiados.
 
 ## Controles y estilos
 

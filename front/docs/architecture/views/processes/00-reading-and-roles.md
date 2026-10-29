@@ -50,5 +50,5 @@ mensajes; no representa duración ni acredita una transacción del servidor.
 | Ciclo de guardado | [useRecordSave.ts](../../../../src/shared/composables/useRecordSave.ts). |
 | Vigencia de lectura | [useDocumentRead.ts](../../../../src/shared/composables/useDocumentRead.ts). |
 | Interacción por campo | [useFormInteraction.ts](../../../../src/shared/composables/useFormInteraction.ts). |
-| Eventos y modos | [Contratos de captura](../development/frontend-technical-documentation/08-form-and-event-contracts.md). |
+| Eventos y callbacks | [Contratos de formularios](../../contracts/form-and-event-contracts.md). |
 | Dependencias/exportaciones | [Referencia generada](../development/code-reference.md). |

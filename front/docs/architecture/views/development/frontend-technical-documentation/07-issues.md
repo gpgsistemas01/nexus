@@ -42,8 +42,6 @@ Referencia de responsabilidades y contratos del dominio `issues`. El [corte de c
 La [secuencia de alcance](../../processes/07-issues/04-department-scope.md) precisa
 conteos, búsqueda, cancelación y bloqueo en los tres recursos.
 
-La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
-
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |

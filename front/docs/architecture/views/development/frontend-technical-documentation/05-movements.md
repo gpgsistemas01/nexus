@@ -25,8 +25,6 @@ Referencia de responsabilidades y contratos del dominio `movements`. El [corte d
 | Archivo | Filtros aplicados o alcance mensual admitido, sin paginación. |
 | Tabla | Fecha/folio/tipo/referencia/cantidades y saldos; texto y valores históricos no se recalculan como autoridad. |
 
-La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
-
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |

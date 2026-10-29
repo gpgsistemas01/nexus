@@ -32,7 +32,7 @@ front/docs/
 │   └── use-cases/                    # Fichas por objetivo y familia
 ├── architecture/
 │   ├── coding-standards/             # Convenciones del código Vue/TypeScript
-│   ├── contracts/                    # Interfaces consumidas por el cliente
+│   ├── contracts/                    # Interfaces HTTP y entre componentes
 │   └── views/
 │       ├── scenarios/                # Navegación y objetivos
 │       ├── logical/                  # Componentes, modelos de tipos y estados

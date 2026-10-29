@@ -62,7 +62,6 @@
                 "architecture/views/logical/ui-and-http.md",
                 "architecture/views/logical/components/",
                 "architecture/views/logical/state-and-lifecycle.md",
-                "architecture/views/logical/document-contracts.md",
                 "architecture/views/logical/class-and-type-models/",
                 "architecture/views/logical/document-states.md",
                 "architecture/views/logical/states/",

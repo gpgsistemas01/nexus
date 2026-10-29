@@ -28,8 +28,6 @@ Referencia de responsabilidades y contratos del dominio `identity / directory`. 
 | Reportes | Búsqueda/orden sin paginación; Personas no admite rol en Excel y exige limpiar ese filtro. |
 | Edición | Versión original; cuenta omite password/personId y conserva vinculación existente. |
 
-La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
-
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |

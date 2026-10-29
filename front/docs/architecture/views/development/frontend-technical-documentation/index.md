@@ -14,7 +14,9 @@ evidencia según [el criterio documental](../../../../index.md#organización-y-f
 5. [Movimientos en Vue](05-movements.md).
 6. [Compras en Vue](06-purchases.md).
 7. [Salidas en Vue](07-issues.md).
-8. [Contratos de captura, eventos y recuperación](08-form-and-event-contracts.md).
+
+Los [contratos de formularios, eventos y callbacks](../../../contracts/form-and-event-contracts.md)
+son comunes a los módulos y se consultan desde la colección de contratos.
 
 ## Propiedad y límites
 

@@ -59,7 +59,7 @@ documentan la representación intercambiada con la API. Ninguno debe sustituir a
 Los [modos, precondiciones y efectos](06-operation-modes-and-effects.md) conservan el
 contrato funcional de las operaciones. La composición técnica se consulta en el
 [diagrama de componentes](../../architecture/views/logical/components/index.md),
-los métodos y rutas en [OpenAPI](../../architecture/contracts/client-contracts.md) y la
+los métodos y rutas en [contrato HTTP del cliente](../../architecture/contracts/client-contracts.md) y la
 autorización efectiva en la política del servidor.
 
 ## 2.5 Condiciones y comprobación

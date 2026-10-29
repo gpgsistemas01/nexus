@@ -35,13 +35,10 @@ classDiagram
 `AxiosRequestConfig` y añade `requiresAuth`; ambas bases se conservan en las
 declaraciones TypeScript enlazadas.
 
-`normalizeApiError` produce `ApiError`; una cancelación Axios se propaga como
-cancelación y no como fallo de negocio. El código interno `RetriableRequest` añade
-`hasRetried` a la configuración interceptada para limitar el reintento autenticado.
-`confirmMutation(value, expected)` sólo devuelve `MutationConfirmation` si el código
-recibido coincide con el esperado. `message` procede del catálogo público de mensajes,
-no de inventar un código exitoso en el formulario. No hay asociación estructural entre
-el error y la confirmación: son resultados alternativos de la operación.
+`RetriableRequest` es la configuración interna que añade `hasRetried` a la solicitud.
+`ApiError` y `MutationConfirmation` representan resultados alternativos; no hay una
+asociación estructural entre ambos. El [contrato HTTP](../../../contracts/client-contracts.md)
+define su aceptación, códigos y tratamiento de errores.
 
 ## Páginas y opciones remotas
 

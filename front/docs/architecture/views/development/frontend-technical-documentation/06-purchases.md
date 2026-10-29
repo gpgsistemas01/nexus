@@ -30,8 +30,6 @@ Referencia de responsabilidades y contratos del dominio `purchases`. El [corte d
 | Observaciones | Encabezado editable según modo; historia de ajustes/movimientos conserva registro separado. |
 | Totales y stock | Preview del cliente; API valida/persiste e informa resultado. |
 
-La [matriz de captura, eventos y recuperación](08-form-and-event-contracts.md) precisa los campos editables y los resultados de interacción.
-
 ## Diagramas del proceso
 
 | Pregunta | Secuencia aplicada |

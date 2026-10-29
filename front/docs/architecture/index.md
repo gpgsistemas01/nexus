@@ -37,7 +37,7 @@ consecuencias y riesgos de la solución vigente.
 3. [Procesos y secuencias](views/processes/index.md).
 4. [Desarrollo, patrones y realización por módulo](views/development/index.md).
 5. [Ejecución y despliegue](views/physical/index.md).
-6. [Contratos HTTP del cliente](contracts/index.md).
+6. [Contratos HTTP y de formularios](contracts/index.md).
 7. [Estándar de codificación](coding-standards/index.md).
 8. [Estándar de interfaz y accesibilidad](interface-standards.md).
 9. [Estándar de seguridad](security-standards.md).
