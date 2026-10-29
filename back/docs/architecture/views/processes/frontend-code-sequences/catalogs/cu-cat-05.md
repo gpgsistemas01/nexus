@@ -77,7 +77,7 @@ por la fábrica, usando el nombre público mostrado en la secuencia.
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Initiator as Personal de almacén
+    actor Initiator as Administrador del sistema
     participant Browser as Navegador
     participant View@{ "type": "boundary" } as clientsPage.js
     participant Table@{ "type": "control" } as clientDatatable.js

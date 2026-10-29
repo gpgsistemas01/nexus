@@ -24,7 +24,7 @@ Este capítulo explica los accesos y las responsabilidades internas de la herram
 | Perfiles de referencia | Alcance actual |
 | --- | --- |
 | `sistemas-admin` | Administración del sistema; acceso completo, incluidos ajustes, catálogos, usuarios, surtido y devolución. |
-| `almacen-auxiliar`, `almacen-coordinador` | Gestión de inventario, compras, solicitudes, surtido y devolución; sin ajustes administrativos, usuarios o catálogos. |
+| `almacen-auxiliar`, `almacen-coordinador` | Gestión de inventario, compras, solicitudes, surtido y devolución; altas de clientes/proveedores desde selectores, sin páginas independientes de Directorio, ajustes administrativos, Usuarios o Catálogos. |
 | `impresion-coordinador`, `impresion-operador` | Almacén de consulta y solicitudes de Salidas. |
 | `taller-herreria-coordinador`, `taller-herreria-operador` | Mismo alcance operativo; el área existente tiene clave `workshop_3d` y nombre TALLER 3D. |
 | `acabados-coordinador`, `acabados-operador` | Mismo alcance operativo. |

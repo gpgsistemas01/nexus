@@ -8,7 +8,7 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
-**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
+**Lectura visual:** [actores, objetivos y relaciones](../../architecture/views/diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
@@ -24,7 +24,7 @@ direction LR
         ucSupplierReport("CU-CAT-04 Generar reporte de proveedores")
     end
 
-    warehouse -- ucSupplierQuery
+    admin -- ucSupplierQuery
     warehouse -- ucSupplierCreate
     admin -- ucSupplierEdit
     admin -- ucSupplierReport
@@ -51,8 +51,12 @@ direction LR
         ucClientReport("CU-CAT-08 Generar reporte de clientes")
     end
 
-    warehouse -- ucClientQuery
+    admin -- ucClientQuery
     warehouse -- ucClientCreate
     admin -- ucClientEdit
     admin -- ucClientReport
 ```
+
+Almacén participa en el alta únicamente desde un selector de una operación
+autorizada. Las consultas independientes, edición y reportes se asocian a Sistemas.
+Las lecturas de opciones son soporte del formulario y no un objetivo de mantenimiento.

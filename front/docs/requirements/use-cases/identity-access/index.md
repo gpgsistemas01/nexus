@@ -13,3 +13,7 @@ Las operaciones tienen fichas independientes. Cada ficha conserva actor, dispara
 | [CU-IDA-07](cu-ida-07.md) | Editar usuario y acceso. |
 | [CU-IDA-08](cu-ida-08.md) | Cambiar contraseña de usuario. |
 | [CU-IDA-09](cu-ida-09.md) | Generar reporte de usuarios. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/04-identity-and-directory.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `records.spec.ts`.

@@ -80,6 +80,35 @@ sostienen el historial se conservan como consulta. Un registro con **Referencia
 histórica** muestra la muestra conservada para ese registro; no obliga a recapturarla.
 <!-- manual:end -->
 
+<!-- manual:any wastes:adjust-stock -->
+## Ajustar el saldo
+
+Utilice este ajuste para corregir una diferencia comprobada del inventario. No
+lo use para registrar otra entrada: **Agregar stock** suma unidades y el ajuste
+establece el saldo final. Esta acción requiere autorización de administración.
+
+1. Localice la merma y pulse **Ajustar stock**.
+2. Compruebe nombre, proveedor, medidas y **Stock actual**.
+3. Seleccione **Motivo del ajuste**.
+4. Capture en **Nuevo stock** la cantidad total que debe quedar. Puede ser cero;
+   no escriba la diferencia que desea sumar o restar.
+5. Explique la corrección en **Observaciones** y pulse **Guardar**.
+6. Espere la confirmación, compruebe el saldo y consulte su movimiento cuando tenga acceso.
+
+El ajuste conserva la identidad y los pesos de la merma. Si otro usuario cambió el
+registro, vuelva a consultarlo antes de preparar otro ajuste. Un fallo o conflicto
+no debe interpretarse como un saldo confirmado.
+<!-- manual:end -->
+
+<!-- manual:any warehouse:reports-read -->
+## Descargar el inventario
+
+Revise la búsqueda y el proveedor, seleccione **Incluir en Excel** y pulse
+**Descargar Excel**. En Mermas, el proveedor elegido sí delimita el archivo.
+Compruebe sus cantidades y pesos antes de distribuirlo; un peso desconocido no
+debe interpretarse como cero. El [capítulo de reportes](14-reports.md) explica las opciones de inclusión.
+<!-- manual:end -->
+
 <!-- manual:any wastes:write wastes:add-stock -->
 ## Recuperar una captura pendiente
 

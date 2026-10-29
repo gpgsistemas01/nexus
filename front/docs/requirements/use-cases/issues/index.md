@@ -14,7 +14,6 @@ En el cliente, una única área disponible se muestra seleccionada y bloqueada e
 formularios y filtros. Con varias opciones autorizadas se puede elegir. La precarga
 del alta no reemplaza el área ni sus datos dependientes al editar un documento.
 
-
 | Caso | Objetivo |
 | --- | --- |
 | [CU-SAL-01](cu-sal-01.md) | Consultar salidas de material. |
@@ -38,3 +37,7 @@ del alta no reemplaza el área ni sus datos dependientes al editar un documento.
 | [CU-SAL-19](cu-sal-19.md) | Surtir consumible. |
 | [CU-SAL-20](cu-sal-20.md) | Devolver consumible surtido. |
 | [CU-SAL-21](cu-sal-21.md) | Generar reporte de salidas de consumible. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/07-issues.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `issues.spec.ts`.

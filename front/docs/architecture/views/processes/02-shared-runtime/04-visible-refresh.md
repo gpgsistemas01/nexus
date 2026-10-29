@@ -2,7 +2,7 @@
 
 ## Escenario y contratos
 
-**Casos relacionados:** RN-VUE-003/005; consultas de CU-ALM y listados.
+**Casos relacionados:** RN-VUE-003/005/007; consultas de CU-ALM y listados.
 
 **Fuente técnica:** useVisibleRefresh.ts, useInventoryList.ts y usePagedList.ts.
 

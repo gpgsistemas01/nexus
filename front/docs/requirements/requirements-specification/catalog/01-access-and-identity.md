@@ -1,8 +1,5 @@
 # 4.1 Acceso e identidad
 
-La [matriz por caso de uso](../../../testing/04-use-case-coverage.md) identifica la evidencia del cliente y sus límites. El estado de producto no es un resultado de ejecución de Vue.
-
-
 Las cuentas permiten acceso; las personas describen participantes del negocio.
 Las asignaciones de acceso pertenecen a usuarios y las de responsabilidad a personas.
 Consultar un catálogo auxiliar no concede su administración.

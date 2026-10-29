@@ -12,7 +12,7 @@ Los IDs locales distinguen esta especificación de los requisitos del producto. 
 | --- | --- |
 | Visitante sin sesión | Capturar credenciales y recibir un resultado de acceso. No obtiene acceso por escribir una URL protegida. |
 | Usuario autenticado | Consultar módulos permitidos, capturar operaciones y descargar reportes autorizados. Sus capacidades proceden de permisos recibidos, no de un rol fijo inventado por el cliente. |
-| Operador con escritura | Crear/editar registros o documentos y realizar ajustes, surtidos o devoluciones según recurso, estado y permiso. |
+| Usuario con permiso de escritura | Crear/editar registros o documentos y realizar ajustes, surtidos o devoluciones únicamente según recurso, estado y permiso; no equivale al rol operativo Operador. |
 | Administrador autorizado | Mantener Catálogos, Personas, Usuarios, Clientes y Proveedores conforme a la autorización específica de cada módulo. |
 | API del sistema | Proporcionar identidad, permisos, páginas de datos y resultados; resolver persistencia, stock, códigos y conflictos. Es externa al proceso Vue. |
 
@@ -58,6 +58,7 @@ El menú contiene Almacén, Compras, Salidas, Movimientos, Identidad, Directorio
 | RN-VUE-004 | Texto recibido se presenta como texto; avisos usan `titleText`/`text`. Foco, teclado y disposición móvil se apoyan en componentes Vue/Vuetify. |
 | RN-VUE-005 | Tablas/selectores consultan páginas; no descargan el catálogo completo para simular paginación remota. IDs repetidos no duplican opciones; página vacía termina la carga. |
 | RN-VUE-006 | Presentación recibe props/emite eventos; servicios/mappers no dependen del renderizado. Composables mantienen estado por instancia y liberan recursos. |
+| RN-VUE-007 | Los listados con actualización automática sólo renuevan una consulta vencida mientras la página está visible y el consumidor lo permite. La actualización conserva los filtros y se pospone durante formularios u operaciones que protegen la captura; no se solapan peticiones ni se reemplaza una edición en curso. |
 | RC-VUE-001 | La SPA usa Vue 3, TypeScript, Composition API y Vue Router con herramientas compatibles de los manifiestos. |
 | RC-VUE-002 | Los alias públicos se compilan desde el repositorio completo; la imagen final sirve archivos estáticos y no ejecuta el backend. |
 | RC-VUE-003 | API y cierre de sesión deben compartir un origen coherente mediante proxy. El fallback SPA por sí solo no configura la sesión. |
@@ -65,11 +66,18 @@ El menú contiene Almacén, Compras, Salidas, Movimientos, Identidad, Directorio
 
 No se declara latencia máxima, usuarios concurrentes, certificación de accesibilidad o porcentaje de cobertura: requieren obligaciones y mediciones específicas.
 
+Las [interfaces y condiciones de operación](07-interfaces-and-operating-conditions.md)
+precisan las dependencias de estas obligaciones. Los
+[criterios de recorridos críticos](08-verification-and-acceptance.md#criterios-de-los-recorridos-críticos-del-cliente)
+desarrollan sesión, alcance por área, altas contextuales, versiones y actualización visible.
+
 ## Trazabilidad y aceptación
 
 El [catálogo de casos de uso](../use-cases/index.md) describe actor, disparador,
 precondiciones, flujo, alternativas, excepciones y postcondiciones por objetivo.
-La [matriz](../../testing/04-use-case-coverage.md) relaciona obligaciones y evidencia.
+La [trazabilidad de las 31 obligaciones del cliente](08-verification-and-acceptance.md#trazabilidad-de-las-obligaciones-del-cliente)
+identifica su forma de comprobación; la [matriz por caso](../../testing/04-use-case-coverage.md)
+relaciona los objetivos de negocio con su evidencia y brechas.
 Los [módulos](../../architecture/views/development/frontend-technical-documentation/index.md)
 explican su realización. El [plan](../../testing/01-test-plan.md) separa diseño,
 especificación de caso y resultado de ejecución.

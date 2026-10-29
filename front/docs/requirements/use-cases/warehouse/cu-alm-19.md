@@ -13,9 +13,7 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** se guardan sólo los cambios admitidos, sin modificar existencia ni tipo.<br>2. **Fallo:** no se producen cambios parciales. |
 | Requisitos relacionados | `RF-CAT-027`, `RN-023`, `RN-027`, `RN-030`, `RN-031`, `RN-034`. |
 
-## Realización y verificación del cliente
-
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+Familia: [objetivos y realización](index.md).
 
 ## Diagramas de realización
 

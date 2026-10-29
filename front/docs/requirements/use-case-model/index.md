@@ -2,9 +2,13 @@
 
 ## Alcance y notación
 
-Los objetivos están descritos íntegramente en las [94 fichas locales](../../../../requirements/use-cases/index.md).
+Este modelo representa objetivos del negocio y forma parte de los requisitos.
+Arquitectura lo utiliza como referencia para la vista de escenarios; las llamadas
+entre componentes y los detalles de implementación pertenecen a sus procesos.
+
+Los objetivos están descritos íntegramente en las [94 fichas locales](../use-cases/index.md).
 Las figuras agrupan objetivos por recurso dentro del límite Nexus. La
-[leyenda visual](../../diagram-reading.md#casos-de-uso) explica actores, óvalos,
+[leyenda visual](../../architecture/views/diagram-reading.md#casos-de-uso) explica actores, óvalos,
 asociación, generalización y extensiones. Las líneas simples vinculan al actor con
 sus objetivos; los recorridos de navegación pertenecen al catálogo de pantallas.
 
@@ -21,7 +25,7 @@ sistema. Actores, precondiciones y permisos se comprueban en la ficha de cada ob
 La jerarquía común está en [Acceso](01-access.md#autenticación): el actor operativo
 especializa Usuario registrado y conserva asociaciones propias, sin heredar gestión de
 Almacén. El alcance por área se describe en la
-[selección de destino](../../processes/07-issues/04-department-scope.md).
+[selección de destino](../../architecture/views/processes/07-issues/04-department-scope.md).
 
 ## Áreas funcionales
 
@@ -33,3 +37,7 @@ Almacén. El alcance por área se describe en la
 - [Catálogos administrables](06-catalogs.md).
 - [Compras](07-purchases.md).
 - [Salidas](08-issues.md).
+
+Las páginas independientes de Clientes y Proveedores corresponden a Sistemas.
+Almacén conserva el alta contextual desde los selectores; esa participación no
+hereda la consulta ni el mantenimiento independiente del Directorio.

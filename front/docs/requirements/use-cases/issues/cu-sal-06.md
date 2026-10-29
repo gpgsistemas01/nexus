@@ -13,9 +13,7 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia aumenta en la cantidad devuelta y el movimiento inverso queda registrado.<br>2. **Éxito, devolución parcial del detalle:** el detalle acumula la devolución y conserva el cumplimiento `Surtido`; no queda cancelado.<br>3. **Éxito, devolución total del detalle:** el detalle acumula la devolución y queda con cumplimiento `Cancelado`; no se ejecuta una acción adicional de cancelación.<br>4. **Éxito, agregación del encabezado:** sólo si todos los detalles tienen cumplimiento `Cancelado`, la salida queda con cumplimiento `Cancelado` y con estado documental `Cancelada`; mientras exista otro detalle no cancelado, el encabezado no se cancela.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-ISS-003`, `RN-002`, `RN-011`, `RN-013`, `RN-014`, `RN-028`, `RN-029`. |
 
-## Realización y verificación del cliente
-
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/07-issues.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `issues.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+Familia: [objetivos y realización](index.md).
 
 ## Diagramas de realización
 

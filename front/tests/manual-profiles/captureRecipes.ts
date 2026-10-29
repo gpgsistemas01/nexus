@@ -11,6 +11,8 @@ export const captureFamily = (image: string, permissions: readonly string[]): Ca
   const number = Number.parseInt(image);
   if (number < 11) return 'warehouse';
   if (number < 13) return 'catalogs';
+  if (number === 16 && !permissions.includes(P.CLIENTS_PAGE_VIEW)) return 'issues';
+  if (number === 17 && !permissions.includes(P.SUPPLIERS_PAGE_VIEW)) return 'purchases';
   if (number < 18) return 'records';
   if (number < 22) return 'purchases';
   if (number < 26) return 'issues';
@@ -134,6 +136,32 @@ export const captureRecipe = async (
   } else if (number <= 12) {
     await go(page, '/catalogos/unit-measures');
     if (number === 12) await openAction(page, 'Nueva unidad de medida');
+  } else if (number === 16 && !user.permissions.includes(P.CLIENTS_PAGE_VIEW)) {
+    await go(page, '/salidas/materiales');
+    await openAction(page, 'Nueva salida');
+    const term = 'Cliente de ejemplo';
+    await page
+      .getByRole('dialog')
+      .last()
+      .getByRole('combobox', { name: 'Cliente', exact: true })
+      .fill(term);
+    await page.getByRole('button', { name: `Registrar cliente «${term}»`, exact: true }).click();
+    await expect(
+      page.getByRole('dialog', { name: 'Registrar cliente', exact: true }),
+    ).toBeVisible();
+  } else if (number === 17 && !user.permissions.includes(P.SUPPLIERS_PAGE_VIEW)) {
+    await go(page, '/compras/materiales');
+    await openAction(page, 'Nueva compra');
+    const term = 'Proveedor de ejemplo';
+    await page
+      .getByRole('dialog')
+      .last()
+      .getByRole('combobox', { name: 'Proveedor', exact: true })
+      .fill(term);
+    await page.getByRole('button', { name: `Registrar proveedor «${term}»`, exact: true }).click();
+    await expect(
+      page.getByRole('dialog', { name: 'Registrar proveedor', exact: true }),
+    ).toBeVisible();
   } else if (number <= 17) {
     const [route, action] = (
       {

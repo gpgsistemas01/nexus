@@ -13,9 +13,7 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El detalle conserva la cantidad o el costo corregido.<br>2. **Éxito:** La existencia refleja la diferencia autorizada.<br>3. **Éxito:** El movimiento y los totales reflejan la corrección.<br>4. **Éxito:** El historial conserva los valores anteriores, los corregidos y el actor de la corrección.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-002`, `RN-002`, `RN-005`, `RN-012`. |
 
-## Realización y verificación del cliente
-
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/06-purchases.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `purchases.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+Familia: [objetivos y realización](index.md).
 
 ## Diagramas de realización
 

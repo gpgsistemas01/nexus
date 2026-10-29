@@ -4,9 +4,12 @@
 
 Este catálogo contiene 94 fichas independientes de los objetivos disponibles en la aplicación: acceso, inventario, catálogos, directorio, identidad, compras y salidas. Los identificadores de negocio `CU-AUT`, `CU-ALM`, `CU-CAT`, `CU-IDA`, `CU-ENT` y `CU-SAL` se conservan para trazar el mismo objetivo. Cada ficha se mantiene íntegra en su familia funcional. Inventario, Movimientos, Directorio y Catálogos tienen entradas independientes.
 
-Los pasos describen acciones del actor y respuestas observables de Nexus. Los componentes, endpoints y callbacks pertenecen a las [vistas de arquitectura](../../architecture/views/index.md). Los efectos persistentes son resultados esperados del sistema completo; su evidencia requiere una prueba con API y base reales. La suite con API simulada comprueba interacción y contrato del cliente.
+Los pasos describen acciones del actor y respuestas observables de Nexus. Los componentes, endpoints y callbacks pertenecen a las [vistas de arquitectura](../../architecture/views/index.md). Los efectos persistentes son resultados esperados del sistema completo; su evidencia requiere una prueba con API y base reales. La suite con API simulada comprueba interacción y contrato del cliente. La
+[matriz de cobertura](../../testing/04-use-case-coverage.md) conserva evidencia y límites;
+la existencia de una ficha o archivo de prueba no acredita la ejecución completa
+de sus pasos. Cada índice de familia concentra su realización y fuentes de prueba.
 
-El [modelo visual de casos de uso](../../architecture/views/scenarios/use-case-model/index.md) representa actores, límites y objetivos por recurso.
+El [modelo visual de casos de uso](../use-case-model/index.md) representa actores, límites y objetivos por recurso.
 
 ## Semántica de actores y generalización UML
 
@@ -119,7 +122,6 @@ Las lecturas de roles, áreas, presentaciones, unidades de medida, motivos de aj
 estados de cumplimiento que sólo alimentan selectores son soporte técnico de esos
 objetivos: conservan autorización y trazabilidad arquitectónica, pero no reciben un
 identificador de caso de uso independiente.
-
 
 ## Catálogo por familia
 

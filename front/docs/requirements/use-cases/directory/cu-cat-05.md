@@ -4,7 +4,7 @@
 | --- | --- |
 | Identificador | `CU-CAT-05` |
 | Nombre | Consultar clientes. |
-| Actor | Personal de almacén o Administrador del sistema, con permiso de consulta. |
+| Actor | Administrador del sistema del área Sistemas, con permiso de consulta de la página independiente. |
 | Disparador | Necesita localizar o revisar clientes y abre la opción de consulta correspondiente. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Actor:** abre la opción para consultar clientes **(ver E1)**.<br>2. **Nexus:** comprueba su autorización y muestra la consulta con sus criterios disponibles.<br>3. **Actor:** define los criterios que necesita y solicita aplicarlos **(ver A1)**.<br>4. **Nexus:** obtiene la información disponible **(ver EOP)** y presenta la información autorizada y la acción principal para registrar un cliente **(ver A2)** **(ver A3)**.<br>5. **Actor:** selecciona la acción principal; termina `CU-CAT-05` y con esa selección dispara `CU-CAT-06` Crear cliente. |
@@ -13,9 +13,7 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Listado de clientes autorizados.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-003`. |
 
-## Realización y verificación del cliente
-
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+Familia: [objetivos y realización](index.md).
 
 ## Diagramas de realización
 

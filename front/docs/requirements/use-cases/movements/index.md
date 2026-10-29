@@ -10,3 +10,7 @@ Cada ficha describe un objetivo completo con actor, disparador, precondiciones, 
 | [CU-ALM-16](cu-alm-16.md) | Generar reporte de movimientos de mermas. |
 | [CU-ALM-23](cu-alm-23.md) | Consultar movimientos de consumibles. |
 | [CU-ALM-24](cu-alm-24.md) | Generar reporte de movimientos de consumibles. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`.

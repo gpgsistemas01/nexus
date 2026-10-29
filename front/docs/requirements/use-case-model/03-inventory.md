@@ -8,7 +8,7 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
-**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
+**Lectura visual:** [actores, objetivos y relaciones](../../architecture/views/diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
@@ -26,8 +26,10 @@ direction LR
         ucMaterialRemove("CU-ALM-04 Retirar material")
         ucMaterialStock("CU-ALM-05 Ajustar existencia de material")
         ucMaterialInventoryReport("CU-ALM-06 Generar reporte de inventario de materiales")
+        supplierCreation("CU-CAT-02 Crear proveedor")
     end
 
+    supplierCreation ..>:extend ucMaterialCreate
     warehouse -- ucMaterialQuery
     admin -- ucMaterialStock
     warehouse -- ucMaterialCreate
@@ -94,8 +96,10 @@ direction LR
         ucConsumableRemove("CU-ALM-20 Retirar consumible")
         ucConsumableStock("CU-ALM-21 Ajustar existencia de consumible")
         ucConsumableReport("CU-ALM-22 Generar reporte de inventario de consumibles")
+        supplierCreation("CU-CAT-02 Crear proveedor")
     end
 
+    supplierCreation ..>:extend ucConsumableCreate
     warehouse -- ucConsumableQuery
     admin -- ucConsumableStock
     warehouse -- ucConsumableCreate

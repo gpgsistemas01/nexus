@@ -1,8 +1,5 @@
 # 4.3 Entradas, salidas e inventario
 
-La [matriz por caso de uso](../../../testing/04-use-case-coverage.md) identifica la evidencia del cliente y sus límites. El estado de producto no es un resultado de ejecución de Vue.
-
-
 Las recepciones y salidas de artículos se operan en contextos separados de materiales
 y consumibles. Comparten las obligaciones de recepción `RF-REC-001` a `RF-REC-008`
 y de salida `RF-ISS-001` a `RF-ISS-008`; compartir proceso no permite mezclar detalles.

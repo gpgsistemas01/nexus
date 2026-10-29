@@ -23,7 +23,7 @@ las [interfaces y tipos](logical/class-and-type-models/index.md), a la vista ló
 
 | Preocupación | Figura y detalle |
 | --- | --- |
-| Objetivos del actor (+1) | [Casos de uso por recurso](scenarios/use-case-model/index.md), con actores y límite Nexus; [pantallas](scenarios/navigation-and-screens.md) enlaza sus entradas. |
+| Objetivos del actor (+1) | [Casos de uso por recurso](../../requirements/use-case-model/index.md), con actores y límite Nexus; [pantallas](scenarios/navigation-and-screens.md) enlaza sus entradas. |
 | Conceptos del negocio (entrada a las vistas) | [Cinco cortes de dominio](../../requirements/domain-model/index.md): identidad, existencias, compras, salidas y trazabilidad. |
 | Responsabilidades (lógica) | [Cortes de siete dominios](logical/components/index.md), [modelos de clases/interfaces/tipos](logical/class-and-type-models/index.md), [estados por responsabilidad](logical/states/index.md). |
 | Orden y recuperación (procesos) | [Índice de secuencias](processes/index.md), con operación, CU y figura; [actividad de merma](processes/05-warehouse/05-waste-preview.md) detalla el cálculo de preview. |

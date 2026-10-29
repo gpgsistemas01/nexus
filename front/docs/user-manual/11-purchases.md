@@ -8,6 +8,7 @@ recibe y fechas cuando los necesite. Pulse **Buscar** para utilizar esos filtros
 
 ![Tabla de compras con folio, proveedor, importes y acciones.](images/18-purchases-list.png)
 
+<!-- manual:any goods:receipts-manage -->
 ## Registrar una compra
 
 **Antes de empezar.** Identifique el proveedor, la persona que recibe, el documento
@@ -40,12 +41,18 @@ No escriba el importe total en el campo de costo por presentación.
 Si falta un proveedor o artículo y aparece su acción **Registrar**, utilice el
 alta secundaria. El artículo creado desde la compra no necesita repetir la
 entrada inicial: las existencias se reciben al guardar la compra.
+<!-- manual:end -->
 
-## Consultar y editar el encabezado
+## Consultar una compra
 
 **Ver compra** abre el documento para consultar folio, proveedor, persona que
 recibe, fecha, factura, observaciones y partidas. Con permiso de gestión también
 ofrece las acciones de corrección y cancelación de partidas. Use **Regresar** al terminar.
+
+![Consulta de una compra ya registrada y sus partidas.](images/20-purchase-view.png)
+
+<!-- manual:any goods:receipts-manage -->
+## Editar el encabezado
 
 Para una modificación autorizada:
 
@@ -57,8 +64,21 @@ Para una modificación autorizada:
 Las observaciones del encabezado pueden editarse. Los datos y observaciones
 conservados en el historial de movimientos pertenecen a sus operaciones; no son
 el mismo dato que el encabezado de la compra.
+<!-- manual:end -->
 
-![Consulta de una compra ya registrada y sus partidas.](images/20-purchase-view.png)
+<!-- manual:any goods:receipts-manage -->
+## Agregar partidas a una compra existente
+
+1. Abra **Editar compra** en el folio al que corresponde la recepción adicional.
+2. Compruebe el proveedor, que permanece bloqueado.
+3. Seleccione el artículo de ese proveedor, capture **Cantidad** y **Costo por
+   Presentación** y pulse **Agregar**.
+4. Revise las partidas nuevas y los totales. Use **Quitar detalle nuevo** si preparó una partida equivocada.
+5. Pulse **Actualizar**, espere la confirmación y vuelva a consultar la compra.
+
+Las partidas nuevas incrementan existencias al confirmar. Las ya registradas no
+vuelven a recibirse y se conservan sin sobrescribirlas. Para cambiar una partida
+persistida, utilice su corrección o cancelación específica.
 
 ## Corregir una partida registrada
 
@@ -78,10 +98,13 @@ correctos; no escriba solamente la diferencia.
 ![Formulario de corrección de cantidad y costo de una partida de compra.](images/21-purchase-correction.png)
 
 La cantidad correcta representa el valor final de la partida, no una diferencia.
+No puede superar la cantidad recibida vigente. Puede conservar la cantidad si sólo
+cambia el costo; esa corrección no genera un cambio de existencia. Reducir la
+cantidad requiere saldo suficiente para revertir la diferencia.
 El sistema puede rechazar una corrección incompatible con las existencias actuales.
 No compense ese rechazo modificando un artículo distinto.
 
-## Cancelar una partida y reportar
+## Cancelar una partida
 
 **Antes de cancelar.** Compruebe que debe anular esa partida, no otra del mismo
 artículo. La cancelación modifica sus efectos y conserva el historial. Si tiene
@@ -96,3 +119,15 @@ La cancelación conserva el rastro de la operación y puede ser rechazada si el
 estado o saldo no la permiten. Consulte [Movimientos](13-movements.md) para
 contrastar los efectos y [Reportes](14-reports.md) para exportar por consulta o mes.
 Ante una respuesta incierta, consulte el folio antes de volver a registrar la compra.
+
+Cancelar la última partida activa deja la compra **Cancelada**. El documento y su
+historial se conservan para consulta; no se elimina la compra ni se habilita otra recepción sobre ella.
+<!-- manual:end -->
+
+<!-- manual:any warehouse:reports-read -->
+## Exportar compras
+
+En el listado, pulse **Exportar Excel** y seleccione filtros aplicados o periodo
+mensual. Compruebe el contexto Materiales/Consumibles y el alcance elegido. El
+[capítulo de reportes](14-reports.md) explica los pasos y la recuperación de una descarga fallida.
+<!-- manual:end -->

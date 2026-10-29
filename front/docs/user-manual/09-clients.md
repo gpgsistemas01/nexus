@@ -1,56 +1,56 @@
 # 9. Clientes
 
-## Consultar clientes
+<!-- manual:all clients:create clients:read -->
+## Registrar un cliente desde el selector
 
-Abra **Directorio comercial → Clientes**. Utilice **Buscar por nombre** y
-**Buscar** en la **Tabla de Clientes** para localizar el registro antes de crear
-otro. Un cliente se utiliza, entre otros contextos, en el encabezado de una salida.
+Utilice este procedimiento cuando esté preparando una salida y no encuentre el
+cliente. El alta se abre dentro de la captura; no necesita una página de Directorio.
 
-<!-- manual:any clients:create -->
-## Registrar un cliente
-
-1. Pulse **Nuevo cliente**.
-2. En **Registrar cliente**, escriba **Nombre**.
-3. Mantenga **Activo** marcado si debe ofrecerse en nuevas operaciones.
-4. Pulse **Guardar** y espere la confirmación.
-5. Compruebe el nombre y la disponibilidad en la tabla.
+1. Abra **Cliente** y busque el nombre. Si ya existe, selecciónelo y continúe la salida.
+2. Si no existe y aparece **Registrar cliente**, pulse esa acción.
+3. En el modal **Registrar cliente**, revise el nombre precargado y complete **Nombre**.
+4. Mantenga **Activo** marcado para poder utilizarlo en la operación.
+5. Pulse **Guardar** una sola vez y espere la confirmación.
+6. Compruebe que se cierra el alta y vuelve a la salida con el cliente nuevo seleccionado.
+7. Continúe la captura y confirme la salida cuando haya revisado sus datos y detalles.
 
 ![Formulario para registrar un cliente.](images/16-client-form.png)
 
-El formulario actual captura nombre y disponibilidad. No requiere teléfono.
-No utilice el nombre para almacenar teléfonos, contraseñas u otros datos ajenos
-a la identificación del cliente.
+El formulario captura nombre y disponibilidad; no requiere teléfono. No utilice
+el nombre para guardar datos ajenos a la identificación del cliente.
+**Cerrar** abandona el alta sin crear ni seleccionar otro registro. Si falla el
+alta, corrija el aviso y reintente; la salida permanece en preparación. El cliente
+confirmado queda guardado por separado: cerrar después la salida no lo elimina.
 <!-- manual:end -->
 
-<!-- manual:any clients:update -->
+<!-- manual:any clients:page-view -->
+## Consulta independiente
+
+Con acceso de administración, abra **Directorio comercial → Clientes** y utilice
+**Buscar por nombre** y **Buscar**. La tabla permite comprobar nombre y disponibilidad.
+<!-- manual:end -->
+
+<!-- manual:all clients:page-view clients:create -->
+Para dar de alta desde esta página, pulse **Nuevo cliente**, complete los mismos
+campos y guarde. El listado se actualiza; no hay una salida de origen que deba guardarse.
+<!-- manual:end -->
+
+<!-- manual:all clients:page-view clients:update -->
 ## Editar y desactivar
 
 1. Localice la fila y pulse **Editar registro**.
 2. Corrija **Nombre** o cambie **Activo**.
 3. Pulse **Actualizar** y compruebe el resultado.
 
-Desactivar un cliente evita su uso en las búsquedas operativas que requieren
-clientes activos y conserva su relación con documentos existentes. No equivale
-a eliminar las salidas de ese cliente.
+Desactivar impide utilizar el cliente en operaciones nuevas que requieren recursos
+activos; conserva las salidas que ya lo utilizaron. Un conflicto requiere consultar
+la versión vigente antes de preparar otra edición.
 <!-- manual:end -->
 
-<!-- manual:any clients:create -->
-## Registrar desde una salida
+<!-- manual:all clients:page-view client:reports-read -->
+## Exportar clientes
 
-Si el selector de Cliente ofrece **Registrar cliente**, puede abrir el alta sin
-abandonar la salida. Guarde el cliente y compruebe que queda seleccionado al
-volver. Después complete y guarde la salida. Cerrar la salida no elimina el
-cliente que ya se creó.
-<!-- manual:end -->
-
-<!-- manual:any client:reports-read -->
-## Reporte y problemas frecuentes
-
-**Exportar Excel** está disponible según los permisos. Aplique primero la búsqueda;
-la exportación utiliza esa consulta y no sólo la página visible. Si no encuentra
-un registro recién creado, limpie la búsqueda. Si el selector no lo ofrece,
-compruebe su disponibilidad y que se haya guardado realmente.
-
-Si se informa un conflicto de edición, utilice **Cerrar y actualizar listado** y
-revise la versión actual antes de volver a corregir el nombre o disponibilidad.
+Aplique la búsqueda y pulse **Exportar Excel**. El archivo utiliza la consulta
+completa, no sólo la página visible. El [capítulo de reportes](14-reports.md)
+explica las descargas y cómo resolver un fallo.
 <!-- manual:end -->

@@ -28,6 +28,10 @@ for (const [path, resource, title] of [
     page,
   }) => {
     await mockWarehouse(page, [...user.permissions, 'suppliers:manage']);
+    await page.goto('/directorio/proveedores');
+    await expect(
+      page.getByRole('heading', { name: 'Acceso no permitido', exact: true }),
+    ).toBeVisible();
     let attempts = 0;
     const term = `Proveedor nuevo ${resource}`;
     await page.route('**/api/warehouse/suppliers', async (route) => {
@@ -165,7 +169,16 @@ for (const path of ['materiales', 'consumibles', 'mermas']) {
   test(`select salidas ${path}: cliente nuevo precargado y elegido sin guardar la salida`, async ({
     page,
   }) => {
-    const { writes } = await mockIssues(page);
+    const { writes } = await mockIssues(
+      page,
+      issuePermissions.filter(
+        (permission) => permission !== 'clients:page-view' && permission !== 'suppliers:page-view',
+      ),
+    );
+    await page.goto('/directorio/clientes');
+    await expect(
+      page.getByRole('heading', { name: 'Acceso no permitido', exact: true }),
+    ).toBeVisible();
     const term = `Cliente nuevo ${path}`;
     await page.route('**/api/sales/clients', (route) =>
       route.fulfill({

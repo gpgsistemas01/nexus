@@ -22,3 +22,7 @@ Cada ficha describe un objetivo completo con actor, disparador, precondiciones, 
 | [CU-ALM-20](cu-alm-20.md) | Retirar consumible. |
 | [CU-ALM-21](cu-alm-21.md) | Ajustar existencia de consumible. |
 | [CU-ALM-22](cu-alm-22.md) | Generar reporte de inventario de consumibles. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`.

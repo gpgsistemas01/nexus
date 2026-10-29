@@ -14,9 +14,7 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La compra y sus detalles quedan registrados.<br>2. **Éxito:** Las existencias incorporan las cantidades recibidas.<br>3. **Éxito:** Los movimientos de entrada quedan registrados.<br>4. **Éxito:** La compra, las existencias y los movimientos se conservan como una sola operación conjunta.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-REC-003`, `RF-REC-004`, `RF-REC-007`, `RN-002`, `RN-011`, `RN-013`, `RN-018`, `RN-023`. |
 
-## Realización y verificación del cliente
-
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/06-purchases.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `purchases.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+Familia: [objetivos y realización](index.md).
 
 ## Diagramas de realización
 

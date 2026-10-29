@@ -321,7 +321,7 @@ direction LR
         ucSupplierReport("CU-CAT-04 Generar reporte de proveedores")
     end
 
-    warehouse -- ucSupplierQuery
+    admin -- ucSupplierQuery
     warehouse -- ucSupplierCreate
     admin -- ucSupplierEdit
     admin -- ucSupplierReport
@@ -344,7 +344,7 @@ direction LR
         ucClientReport("CU-CAT-08 Generar reporte de clientes")
     end
 
-    warehouse -- ucClientQuery
+    admin -- ucClientQuery
     warehouse -- ucClientCreate
     admin -- ucClientEdit
     admin -- ucClientReport

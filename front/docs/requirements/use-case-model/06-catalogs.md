@@ -8,7 +8,7 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
-**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
+**Lectura visual:** [actores, objetivos y relaciones](../../architecture/views/diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta

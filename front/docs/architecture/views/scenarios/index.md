@@ -7,7 +7,7 @@ permanecen completos en [Casos de uso](../../../requirements/use-cases/index.md)
 El [catálogo de pantallas](navigation-and-screens.md) identifica entrada, contenedor y
 condición de acceso. Las secuencias de procesos describen la coordinación interna.
 
-El [modelo de casos de uso](use-case-model/index.md) representa actores y objetivos por recurso.
+El [modelo de casos de uso](../../../requirements/use-case-model/index.md) representa actores y objetivos por recurso.
 
 ## Escenarios que condicionan el diseño
 

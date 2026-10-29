@@ -57,7 +57,7 @@ modos y efectos observables. La API permanece como frontera externa.
 | [Salida: apertura, modos y escritura](07-issues/01-issue-open-save.md) | CU-SAL-02/03/04/09/10/11/16/17/18 | `DIA-VUE-SEQ-015` |
 | [Salida: selección y surtido](07-issues/02-issue-supply.md) | CU-SAL-05/12/19 | `DIA-VUE-SEQ-016` |
 | [Salida: devolución por saldo leído](07-issues/03-issue-return.md) | CU-SAL-06/13/20 | `DIA-VUE-SEQ-017/032` |
-| [Reportes: alcance, archivo y error recuperable](08-movements-and-reports/02-reports.md) | CU de reporte de cada familia; RF-VUE-013 | `DIA-VUE-SEQ-018` |
+| [Reportes: alcance, archivo y error recuperable](08-movements-and-reports/02-reports.md) | CU de reporte de cada familia; RF-VUE-013 | `DIA-VUE-SEQ-018` / `DIA-VUE-SEQ-033` |
 | [Recarga visible sin solapamiento](02-shared-runtime/04-visible-refresh.md) | RN-VUE-003/005; consultas de CU-ALM y listados | `DIA-VUE-SEQ-019` |
 | [Cierre de sesión y acceso posterior](01-session/03-logout.md) | CU-AUT-02 | `DIA-VUE-SEQ-020` |
 | [Baja de relación de inventario](05-warehouse/04-inventory-removal.md) | CU-ALM-04/14/20 | `DIA-VUE-SEQ-021` |

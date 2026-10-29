@@ -5,17 +5,14 @@
 | Identificador | `CU-ALM-22` |
 | Nombre | Generar reporte de inventario de consumibles. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Disparador | Selecciona **Exportar Excel** desde `CU-ALM-17`. |
+| Disparador | Desde `CU-ALM-17`, necesita descargar el inventario de consumibles. |
 | Precondiciones | 1. El actor inició sesión.<br>2. Cuenta con el permiso de consulta o reporte correspondiente. |
-| Flujo principal | 1. **Actor:** selecciona **Exportar Excel** desde la consulta filtrada **(ver E1)**.<br>2. **Nexus:** muestra el diálogo de alcance con **Activos o con existencia**, **Sólo activos** y **Sólo con existencia**.<br>3. **Actor:** elige el alcance y confirma **(ver A1)**.<br>4. **Nexus:** vuelve a comprobar autorización, aplica la búsqueda, el proveedor y el alcance exclusivamente al catálogo de consumibles, consulta las ofertas sin incluir materiales y genera el archivo **(ver A2)** **(ver EOP)**; inicia la descarga sin modificar inventario. |
-| Flujos alternativos | **A1 — Cancelar la exportación (antes del paso 3):**<br>1. **Actor:** cierra el diálogo.<br>2. **Nexus:** conserva los filtros y la consulta sin generar un archivo; termina el caso de uso.<br>**A2 — Resultado vacío (durante el paso 4):**<br>1. **Nexus:** informa que no hay datos para los criterios elegidos, sin incluir registros de otro catálogo.<br>2. **Actor:** recibe el aviso; termina el caso de uso. |
-| Excepciones | **E1 — Exportación no autorizada:** Nexus rechaza la solicitud sin exponer datos.<br>**EOP — Error de consulta o generación:** Nexus informa el fallo y no entrega un archivo parcial. |
+| Flujo principal | 1. **Actor:** revisa la consulta y selecciona en **Incluir en Excel** uno de los alcances **Activos o con stock**, **Activos** o **Con stock**.<br>2. **Actor:** pulsa **Descargar Excel** **(ver E1)**.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros, consulta la búsqueda por nombre, el tipo Consumible y el alcance; incluye todos sus proveedores aunque la tabla tenga uno seleccionado **(ver EOP)** y genera el archivo de Excel; inicia su descarga sin modificar inventario. |
+| Excepciones | **E1 — Exportación no autorizada (después del paso 2):** Nexus rechaza la solicitud sin exponer datos.<br>**EOP — Error de consulta o generación (durante el paso 3):** Nexus informa el fallo y no entrega un archivo parcial; el actor conserva la consulta y puede reintentar la descarga. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** se descarga un archivo limitado a consumibles y al alcance elegido.<br>2. **Fallo:** no se modifica inventario ni se entrega un archivo parcial. |
 | Requisitos relacionados | `RF-CAT-025`, `RF-REP-002`, `RF-REP-004`, `RF-REP-008`, `RF-REP-010`. |
 
-## Realización y verificación del cliente
-
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+Familia: [objetivos y realización](index.md).
 
 ## Diagramas de realización
 

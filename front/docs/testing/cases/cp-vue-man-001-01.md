@@ -17,6 +17,13 @@ completitud de los artefactos. Es una prueba de la herramienta documental.
 
 [manualProfilesTest.ts](../../../tests/unit/tooling/manualProfilesTest.ts) comprueba
 selección, configuración, secretos locales y rechazo de publicaciones incompletas.
+Las particiones de lectura, gestión y reporte comprueban que un lector de Compras
+no recibe instrucciones de alta, edición, corrección ni cancelación; el reporte
+se incluye con su permiso independiente. El reporte de Proveedores no concede el
+alta y el ajuste de Mermas se incluye para administración, no para Almacén.
+Almacén recibe las instrucciones y capturas de alta de Clientes y Proveedores
+desde selectores de Salidas y Compras; no recibe la consulta ni el mantenimiento
+de sus páginas independientes, reservadas a Sistemas.
 [profileManuals.spec.ts](../../../tests/manual-profiles/profileManuals.spec.ts)
 comprueba las pantallas con los permisos calculados por el código y datos simulados.
 No demuestra la asignación de una cuenta real, su autenticación contra Express ni

@@ -12,3 +12,7 @@ Cada ficha describe un objetivo completo con actor, disparador, precondiciones, 
 | [CU-CAT-06](cu-cat-06.md) | Crear cliente. |
 | [CU-CAT-07](cu-cat-07.md) | Editar cliente. |
 | [CU-CAT-08](cu-cat-08.md) | Generar reporte de clientes. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`.

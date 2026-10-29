@@ -22,3 +22,7 @@ Cada ficha describe un objetivo completo con actor, disparador, precondiciones, 
 | [CU-CAT-24](cu-cat-24.md) | Consultar estado de cumplimiento. |
 | [CU-CAT-25](cu-cat-25.md) | Crear estado de cumplimiento. |
 | [CU-CAT-26](cu-cat-26.md) | Editar estado de cumplimiento. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`.

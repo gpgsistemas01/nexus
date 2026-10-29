@@ -123,7 +123,82 @@ it('Almacén conserva surtido y devolución, mientras sólo administración reci
   );
   expect(admin.permissions).toContain('materials:adjust-stock');
   expect(selectedChapters(admin.permissions)).toHaveLength(17);
+  const wastes = await readFile(path.resolve('docs/user-manual/05-wastes.md'), 'utf8');
+  expect(filterManualContent(wastes, admin.permissions)).toContain('## Ajustar el saldo');
+  expect(filterManualContent(wastes, warehouse.permissions)).not.toContain('## Ajustar el saldo');
 });
+
+it.each([
+  { manage: false, report: false },
+  { manage: false, report: true },
+  { manage: true, report: false },
+])(
+  'el manual de Compras separa lectura, gestión y reporte: $manage/$report',
+  async ({ manage, report }) => {
+    const permissions = [
+      'goods:receipts-page-view',
+      ...(manage ? ['goods:receipts-manage'] : []),
+      ...(report ? ['warehouse:reports-read'] : []),
+    ];
+    const content = filterManualContent(
+      await readFile(path.resolve('docs/user-manual/11-purchases.md'), 'utf8'),
+      permissions,
+    );
+    expect(content).toContain('## Consultar una compra');
+    expect(content).toContain('20-purchase-view.png');
+    for (const section of [
+      'Registrar una compra',
+      'Editar el encabezado',
+      'Agregar partidas a una compra existente',
+      'Corregir una partida registrada',
+      'Cancelar una partida',
+    ])
+      expect(content.includes('## ' + section)).toBe(manage);
+    expect(content.includes('19-purchase-create.png')).toBe(manage);
+    expect(content.includes('21-purchase-correction.png')).toBe(manage);
+    expect(content.includes('## Exportar compras')).toBe(report);
+  },
+);
+
+it('el reporte de Proveedores se incluye con permiso de reporte sin conceder alta', async () => {
+  const source = await readFile(path.resolve('docs/user-manual/10-suppliers.md'), 'utf8');
+  const reader = filterManualContent(source, ['suppliers:page-view', 'supplier:reports-read']);
+  expect(reader).toContain('## Consulta independiente');
+  expect(reader).toContain('## Exportar proveedores');
+  expect(reader).not.toContain('## Registrar un proveedor');
+  const creator = filterManualContent(source, [
+    'suppliers:page-view',
+    'suppliers:manage',
+    'suppliers:read',
+  ]);
+  expect(creator).toContain('## Registrar un proveedor');
+  expect(creator).not.toContain('## Exportar proveedores');
+});
+
+it.each(['almacen-auxiliar', 'almacen-coordinador'])(
+  '%s conserva altas contextuales en el manual sin páginas independientes de Directorio',
+  async (id) => {
+    const session = demoSession(DEMO_PROFILES.find((profile) => profile.id === id)!);
+    const chapters = selectedChapters(session.permissions).map(({ file }) => file);
+    expect(chapters).toContain('09-clients.md');
+    expect(chapters).toContain('10-suppliers.md');
+    const groups = APP_NAVIGATION_GROUPS.filter(({ links }) =>
+      links.some(({ permission }) => session.permissions.includes(permission)),
+    ).map(({ id }) => id);
+    expect(groups).not.toContain('directory');
+    for (const file of ['09-clients.md', '10-suppliers.md']) {
+      const content = filterManualContent(
+        await readFile(path.resolve('docs/user-manual', file), 'utf8'),
+        session.permissions,
+      );
+      expect(content).toContain('desde el selector');
+      expect(content).not.toContain('## Consulta independiente');
+      expect(content).not.toContain('## Editar y desactivar');
+      expect(content).not.toContain('Directorio comercial');
+      expect(content).toMatch(/images\/(16-client-form|17-supplier-form)\.png/);
+    }
+  },
+);
 
 it.each(['almacen-auxiliar', 'almacen-coordinador', 'impresion-operador'])(
   'el índice de %s explica el alcance de consulta y registro en Salidas',

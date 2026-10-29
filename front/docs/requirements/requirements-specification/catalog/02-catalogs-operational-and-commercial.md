@@ -1,8 +1,5 @@
 # 4.2 Catálogos operativos y comerciales
 
-La [matriz por caso de uso](../../../testing/04-use-case-coverage.md) identifica la evidencia del cliente y sus límites. El estado de producto no es un resultado de ejecución de Vue.
-
-
 La separación siguiente aplica la singularidad adoptada por el proyecto: consultar,
 crear, actualizar, retirar y ajustar son obligaciones independientes porque tienen
 permisos y resultados comprobables distintos. Cada `RF-*` describe una capacidad
@@ -17,18 +14,18 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 | ID | Requisito y criterio de aceptación | Estado del requisito de producto |
 | --- | --- | --- |
 | RF-CAT-001 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder consultar materiales y sus ofertas de proveedor sin modificar existencias. | Implementado |
-| RF-CAT-002 | El Administrador del sistema del área Sistemas debe poder consultar proveedores autorizados sin modificar sus datos. | Implementado |
-| RF-CAT-003 | El Administrador del sistema del área Sistemas debe poder consultar clientes autorizados sin modificar sus datos. | Implementado |
+| RF-CAT-002 | El Administrador del sistema del área Sistemas debe poder consultar proveedores autorizados en su página independiente sin modificar sus datos; Almacén conserva las lecturas de los selectores operativos. | Implementado |
+| RF-CAT-003 | El Administrador del sistema del área Sistemas debe poder consultar clientes autorizados en su página independiente sin modificar sus datos; Almacén conserva las lecturas de los selectores operativos. | Implementado |
 | RF-CAT-004 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder consultar existencias de merma sin modificar sus datos ni existencias. | Implementado |
 | RF-CAT-005 | Un usuario autorizado debe poder consultar presentaciones activas sin modificar el catálogo. | Implementado |
 | RF-CAT-006 | Personal de almacén o el Administrador del sistema deben poder crear un material y su oferta de proveedor con identidad y datos válidos; el efecto inicial depende del alta directa o contextual según sus criterios. | Implementado |
 | RF-CAT-007 | Personal de almacén o el Administrador del sistema deben poder editar el nombre y stock mínimo compartidos de un material, y el costo máximo y estado de la oferta seleccionada, sin cambiar existencias. | Implementado |
 | RF-CAT-008 | Personal de almacén o el Administrador del sistema deben poder retirar una oferta de material sólo cuando el material no tenga historia operativa protegida; su identidad sólo se elimina si no conserva otras ofertas. | Implementado |
 | RF-CAT-009 | El Administrador del sistema debe poder ajustar las existencias de un material únicamente mediante la acción autorizada disponible desde su consulta, conservando el resultado trazable; el personal de almacén sin ese permiso no debe poder ejecutarla. | Implementado |
-| RF-CAT-010 | Personal de almacén o el Administrador del sistema deben poder crear un proveedor con razón social, nombre comercial y estado válido; el sistema debe asignarle un código único. Personal de almacén inicia el alta desde el selector de una compra o de otro formulario operativo autorizado, sin acceder al listado independiente. | Implementado |
+| RF-CAT-010 | Personal de almacén o el Administrador del sistema deben poder crear un proveedor con razón social, nombre comercial y estado válido; el sistema debe asignarle un código único. Almacén inicia el alta desde el selector de una compra, material o consumible autorizado; tras guardar, el modal se cierra y el nuevo proveedor queda seleccionado sin perder la captura. La página independiente y su mantenimiento quedan para Sistemas. | Implementado |
 | RF-CAT-011 | El Administrador del sistema del área Sistemas debe poder actualizar los datos admitidos y el estado activo de un proveedor sin eliminar sus relaciones o historia. | Implementado |
 | RF-CAT-012 | El sistema debe rechazar una oferta de proveedor duplicada sin modificar sus datos, existencia ni costo. | Implementado |
-| RF-CAT-013 | Personal de almacén o el Administrador del sistema deben poder crear un cliente con estado activo válido; cuando indique un asesor, éste debe corresponder a una persona registrada. Personal de almacén inicia el alta desde el selector de una salida autorizada, sin acceder al listado independiente. | Implementado |
+| RF-CAT-013 | Personal de almacén o el Administrador del sistema deben poder crear un cliente con estado activo válido; cuando indique un asesor, éste debe corresponder a una persona registrada. Almacén inicia el alta desde el selector de cliente de una salida autorizada; tras guardar, el modal se cierra y el cliente queda seleccionado sin perder la captura. La página independiente y su mantenimiento quedan para Sistemas. | Implementado |
 | RF-CAT-014 | El Administrador del sistema del área Sistemas debe poder actualizar los datos admitidos y el estado activo de un cliente sin eliminar sus relaciones o historia. | Implementado |
 | RF-CAT-015 | Personal de almacén o el Administrador del sistema deben poder crear una merma con datos propios a partir de un material y proveedor usados como plantilla. | Implementado |
 | RF-CAT-016 | El sistema debe impedir que una edición de merma cambie su proveedor, presentación, unidad de medida o dimensiones, para conservar su identidad física. | Implementado |

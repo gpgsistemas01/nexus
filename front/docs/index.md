@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.7 | 1.0.0 | En revisión | 2026-10-28 | Equipo Nexus |
+| 1.8 | 1.0.0 | En revisión | 2026-10-29 | Equipo Nexus |
 
 ## Propósito y audiencia
 
@@ -25,8 +25,10 @@ front/docs/
 ├── index.md
 ├── publications.json                # Alcance y orden de los documentos exportados
 ├── requirements/
+│   ├── vision-scope-and-requirements/ # Necesidad, interesados y alcance
 │   ├── requirements-specification/   # Reglas del producto y obligaciones del cliente
-│   ├── domain-model/                 # Conceptos, relaciones y multiplicidades
+│   ├── domain-model/                 # Conceptos, relaciones y ciclos de estado
+│   ├── use-case-model/               # Actores y objetivos del negocio
 │   └── use-cases/                    # Fichas por objetivo y familia
 ├── architecture/
 │   ├── coding-standards/             # Reglas de construcción y revisión
@@ -45,7 +47,7 @@ front/docs/
 
 | Colección | Contenido propietario | Lectura inicial |
 | --- | --- | --- |
-| [Requisitos](requirements/index.md) | Obligaciones, actores, criterios y 94 fichas de caso de uso. | Especificación y familia funcional afectada. |
+| [Requisitos](requirements/index.md) | Visión, alcance, obligaciones, actores, estados y 94 fichas de caso de uso. | Especificación y familia funcional afectada. |
 | [Arquitectura](architecture/index.md) | Vistas 4+1, decisiones, interfaces, realización y patrones. | Vista general y preocupación del cambio. |
 | [Estándar de código](architecture/coding-standards/index.md) | Doce capítulos de formato, nombres, dependencias, SFC, datos, errores y revisión. | Capítulo correspondiente y checklist. |
 | [Desarrollo](development/index.md) | Instalación, archivos locales, arranque, herramientas y despliegue. | Inicio local. |

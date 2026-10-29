@@ -1,0 +1,95 @@
+# 2. Convenciones
+
+## 2.1 Identificadores
+
+| Prefijo | Tipo |
+| --- | --- |
+| `RF` | Requisito funcional observable por un actor o consumidor. |
+| `RN` | Regla de negocio que restringe varios flujos. |
+| `RD` | Requisito sobre persistencia o representación de datos. |
+| `RC` | Requisito de calidad u operación. |
+| `RF/RD/RN/RC-VUE` | Obligación específica de navegación, captura, estado, datos o construcción del cliente. |
+| `CA` | Criterio de aceptación numerado dentro de un requisito cuando se necesitan varios escenarios verificables. |
+
+Un requisito conserva una obligación principal. Si requiere varios ejemplos o
+escenarios, se redactan criterios `CA-<ID>-<n>` en lugar de construir una sola oración
+con decisiones de interfaz, implementación y excepciones. La evidencia técnica se
+mantiene en su columna y no sustituye el resultado observable.
+
+ISO/IEC/IEEE 29148 no obliga a crear una fila independiente para cada verbo CRUD ni
+define la numeración concreta de Nexus. Sí orienta a que los requisitos sean singulares,
+inequívocos y verificables. El proyecto aplica esos criterios separando operaciones que
+pueden autorizarse, fallar y probarse por separado; mantiene juntos únicamente los
+atributos y escenarios que describen una misma obligación observable.
+
+Por tanto, no se dejan juntas obligaciones independientes ni se fragmenta cada campo en
+un requisito. La singularidad aplica a requisitos funcionales (`RF-*`), de datos
+(`RD-*`), reglas de negocio (`RN-*`) y calidad (`RC-*`): se crea otro identificador
+cuando cambia el resultado, la restricción, la aprobación o la prueba que decide su
+cumplimiento. Los criterios `CA-*` conservan variantes inseparables de una misma
+obligación.
+
+## 2.2 Estados
+
+| Estado | Interpretación |
+| --- | --- |
+| Implementado | Existe un flujo registrado y evidencia suficiente en el código. |
+| Parcial | Existe parte del flujo, pero falta una operación, interfaz o evidencia relevante. |
+| Modelado | Existen entidades o piezas aisladas, pero no un flujo web/API registrado. |
+| Fuera del alcance actual | Capacidad excluida del producto vigente; requiere un nuevo acuerdo de alcance. |
+| Propuesto | Requiere decisión o implementación futura; no debe anunciarse como disponible. |
+
+El estado describe la evidencia del repositorio, no la aprobación del producto por un
+usuario responsable. Esa aprobación debe registrarse en la historia o incidencia que
+originó el cambio.
+
+## 2.3 Lectura y aceptación entre partes interesadas
+
+El responsable funcional revisa la necesidad, el actor, las reglas y el resultado observable. Desarrollo y pruebas revisan factibilidad y evidencia; el estado técnico no sustituye la decisión de aceptación. La [gobernanza documental](../../governance/01-documentation-rules.md) define dónde registrar esa decisión y sus pendientes.
+
+Por ejemplo, para una recepción: **dado** un proveedor y artículos válidos, **cuando** Almacén confirme lo recibido, **Nexus debe** registrar el folio e incrementar la existencia de esos artículos; si la operación falla, no debe quedar una recepción parcial. El negocio puede revisar esa garantía sin conocer nombres de tablas ni rutas HTTP.
+
+## 2.4 Terminología y operaciones
+
+Los requisitos usan los términos canónicos del
+[glosario del negocio](../business-glossary.md). El glosario define significado compartido
+para usuarios y responsables; los [contratos del cliente](../../architecture/contracts/client-contracts.md)
+documentan la representación intercambiada con la API. Ninguno debe sustituir al otro.
+
+Los [modos, precondiciones y efectos](06-operation-modes-and-effects.md) conservan el
+contrato funcional de las operaciones. La composición técnica se consulta en el
+[diagrama de componentes](../../architecture/views/logical/components/index.md),
+los métodos y rutas en [OpenAPI](../../architecture/contracts/client-contracts.md) y la
+autorización efectiva en la política del servidor.
+
+## 2.5 Condiciones y comprobación
+
+La obligación y sus criterios expresan resultados del negocio. Los nombres de rutas,
+modelos, campos y herramientas se conservan en la evidencia, salvo que constituyan una
+restricción técnica explícita de datos, seguridad u operación. No se eliminan esas
+restricciones de `RD-*` o `RC-*` para hacerlas parecer funciones de un actor.
+
+Cada criterio `CA-<ID>-<n>` pertenece al requisito indicado y conserva numeración local.
+Las condiciones transversales se enlazan mediante `RN-*`, sin copiar su definición.
+Una operación rechazada conserva los datos e inventario anteriores y no deja cambios
+parciales; una consulta o reporte no modifica los datos consultados.
+
+Los IDs son referencias estables, no pasos de un flujo. El orden de interacción se lee
+en las fichas de casos de uso; corregir redacción o alcance no renumera requisitos ni
+asigna un ID existente a una capacidad distinta.
+
+## 2.6 Atributos y mantenimiento
+
+| Información del requisito | Ubicación y regla de lectura |
+| --- | --- |
+| Identidad, obligación y criterios | Fila normativa de catálogo o especificación Vue y sus criterios `CA-*`. Los enunciados enlazados desde otros capítulos no son nuevas definiciones. |
+| Necesidad y alcance | Visión, actores y reglas relacionadas explican el contexto. Una fuente de código identifica realización; no acredita por sí sola el origen o la aprobación de la necesidad. |
+| Prioridad | La entrega o incidencia registra qué obligaciones y escenarios se incluyen y su orden acordado. El número del ID y el estado Implementado no expresan prioridad. Las capacidades modeladas o excluidas requieren decisión de alcance antes de incorporarse. |
+| Dependencias y restricciones | Las reglas de trazabilidad y las interfaces identifican condiciones compartidas, datos previos y responsabilidades. |
+| Estado y aceptación | El catálogo registra disponibilidad del producto; la aceptación funcional registra una decisión separada con su responsable y evidencia. |
+| Verificación | Casos relacionados, criterios y forma de comprobación del capítulo 8. DP/CP describen pruebas; EP registra la ejecución y su resultado. |
+| Versión y cambios | Control documental de la colección e historia de Git, vinculados a la revisión de alcance o defecto. Una obligación modificada conserva su ID cuando mantiene el mismo propósito. |
+
+Los responsables de aprobación y objetivos aún no acordados se concentran en
+[decisiones pendientes](../vision-scope-and-requirements/10-known-gaps-and-pending-decisions.md).
+No se completa esa información asignando prioridades, firmas o umbrales ficticios.

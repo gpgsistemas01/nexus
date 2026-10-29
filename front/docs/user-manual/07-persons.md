@@ -41,11 +41,14 @@ Si un usuario tiene datos de acceso que deben modificarse, revíselos también e
 **Usuarios**; no asuma que editar una persona sustituye esa administración.
 <!-- manual:end -->
 
-<!-- manual:any person:reports-read -->
-## Filtrar y exportar
+## Filtrar la consulta
 
 Utilice **Filtrar por área** y **Filtrar por rol**, seleccione sus opciones y
 pulse **Buscar**. Si no aparece una persona, limpie los filtros y revise su nombre.
+
+<!-- manual:any person:reports-read -->
+## Exportar personas
+
 Con permiso de reporte puede usar **Exportar Excel**. Si el filtro por rol está
 aplicado, la exportación de Personas queda deshabilitada: quite ese filtro o use
 **Limpiar filtros** y, si lo necesita, aplique sólo el área antes de exportar.

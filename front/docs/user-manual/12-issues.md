@@ -56,11 +56,13 @@ secundario y regresar con la selección preparada.
 <!-- manual:end -->
 <!-- manual:end -->
 
-<!-- manual:any goods:issues-manage waste:issues-manage -->
-## Consultar y editar
+## Consultar un documento
 
 **Consultar salida** abre el documento para revisar encabezado, cantidades,
 cumplimiento, surtido y devoluciones. Use **Regresar** al terminar.
+
+<!-- manual:any goods:issues-manage waste:issues-manage -->
+## Editar una solicitud
 
 1. Para una corrección, abra **Editar salida** del folio adecuado.
 2. Modifique sólo los campos habilitados.
@@ -93,8 +95,9 @@ no se corrige cerrando la ventana después de guardar.
 
 ![Selección de detalles pendientes para surtir.](images/24-issue-supply.png)
 
-La selección surte la cantidad solicitada del detalle según las reglas del
-documento. **Cantidad de proyecto** es un dato de referencia del proyecto; no
+La selección surte toda la cantidad pendiente de cada detalle. Una salida queda
+**Surtido parcial** si todavía tiene otros detalles pendientes; no se captura
+libremente una entrega parcial de un renglón. **Cantidad de proyecto** es un dato de referencia del proyecto; no
 sustituye la cantidad de inventario que se entrega. No marque una entrega que
 todavía no se ha realizado. El sistema vuelve a comprobar existencias y estado
 al confirmar; otra operación puede haberlos cambiado desde que abrió la pantalla.
@@ -107,7 +110,10 @@ al confirmar; otra operación puede haberlos cambiado desde que abrió la pantal
 Almacén debe comprobar qué material regresó y su cantidad. No capture como devolución
 una solicitud que nunca se surtió.
 
-1. En una salida con material surtido, pulse **Devolver material surtido**.
+La salida completa debe tener cumplimiento **Surtido**. Mientras permanezca en
+**Surtido parcial**, no puede devolver un detalle que ya fue entregado.
+
+1. En una salida con cumplimiento **Surtido**, pulse **Devolver material surtido**.
 2. Localice el detalle entregado y pulse **Devolver detalle de salida**.
 3. Revise las cantidades del detalle y el saldo que aún admite devolución.
 4. Capture **Cantidad a devolver** y **Observaciones**.
@@ -120,6 +126,10 @@ una solicitud que nunca se surtió.
 No puede devolver más de lo surtido pendiente de devolver. Una devolución no
 representa una nueva compra ni borra la solicitud original. **Regresar** cierra
 el formulario sin enviar una devolución nueva.
+
+Una devolución parcial conserva el detalle como **Surtido**. Devolver todo su
+saldo lo deja **Cancelado**; cuando todos los detalles quedan cancelados, también
+se cancela la salida. No existe una acción independiente para cancelar una salida.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->

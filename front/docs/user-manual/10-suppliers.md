@@ -1,54 +1,61 @@
 # 10. Proveedores
 
-## Consultar proveedores
+<!-- manual:all suppliers:manage suppliers:read -->
+## Registrar un proveedor desde el selector
 
-Abra **Directorio comercial → Proveedores**. La **Tabla de Proveedores** permite
-buscar el nombre comercial y distinguirlo de la razón social. Compruebe ambos
-antes de asociar materiales o compras al proveedor.
+Puede iniciar esta alta desde el selector **Proveedor** de un material, consumible
+o compra que esté preparando. Primero busque para evitar repetir un registro.
 
-<!-- manual:any suppliers:manage -->
-## Registrar un proveedor
-
-1. Busque el proveedor existente con **Buscar por nombre** y **Buscar**.
-2. Si necesita uno nuevo, pulse **Nuevo proveedor**.
-3. En **Registrar proveedor**, capture **Razón social** y **Nombre comercial**.
-4. Revise **Activo** y pulse **Guardar**.
-5. Compruebe los datos en el listado y en el selector donde lo necesite.
+1. Abra **Proveedor** y busque su nombre comercial. Si ya existe, selecciónelo.
+2. Si falta y aparece **Registrar proveedor**, pulse esa acción sin cerrar la captura principal.
+3. En el modal **Registrar proveedor**, complete **Razón social** y revise el **Nombre comercial** precargado.
+4. Mantenga **Activo** marcado si utilizará el proveedor en la operación.
+5. Pulse **Guardar** y espere la confirmación.
+6. Compruebe que vuelve al formulario principal y que el proveedor nuevo queda seleccionado.
+7. Continúe y guarde el artículo o la compra cuando haya revisado la captura completa.
 
 ![Datos del proveedor: razón social, nombre comercial y disponibilidad.](images/17-supplier-form.png)
 
 | Campo | Uso |
 | --- | --- |
 | Razón social | Identificación legal del proveedor. |
-| Nombre comercial | Nombre por el que se reconoce en la operación y los selectores. |
-| Activo | Disponibilidad para nuevas capturas que requieren proveedores activos. |
+| Nombre comercial | Nombre visible en búsquedas y selectores. |
+| Activo | Disponibilidad para nuevas operaciones que requieren proveedores activos. |
 
-El formulario actual no captura teléfono. Mantenga los nombres libres de notas
-que no correspondan a la identidad del proveedor.
+No se captura teléfono. **Cerrar** abandona el alta secundaria sin crear un registro.
+Si el servicio rechaza el alta, revise el aviso y corrija los campos; la captura de
+origen se conserva. El proveedor confirmado queda guardado independientemente del
+artículo o compra: cerrar después ese formulario no elimina el proveedor.
 <!-- manual:end -->
 
-<!-- manual:any suppliers:update -->
+<!-- manual:any suppliers:page-view -->
+## Consulta independiente
+
+Con acceso de administración, abra **Directorio comercial → Proveedores**. Use
+**Buscar por nombre** y **Buscar** para distinguir razón social y nombre comercial.
+<!-- manual:end -->
+
+<!-- manual:all suppliers:page-view suppliers:manage -->
+Para registrar desde esta página, pulse **Nuevo proveedor**, complete los mismos
+campos y guarde. Se actualiza el listado; no hay otro formulario de origen pendiente.
+<!-- manual:end -->
+
+<!-- manual:all suppliers:page-view suppliers:update -->
 ## Editar y desactivar
 
 1. Localice el proveedor y pulse **Editar registro**.
-2. Compruebe que corresponde a la empresa correcta.
-3. Corrija los campos habilitados o desmarque **Activo** si deja de utilizarse.
-4. Pulse **Actualizar** y revise el resultado.
+2. Compruebe la identidad de la empresa, corrija los campos o desmarque **Activo**.
+3. Pulse **Actualizar** y revise el resultado.
 
-Esta edición no cambia el proveedor de las compras y artículos por otra empresa.
-La desactivación conserva el historial de documentos que ya lo utilizan.
+Desactivar conserva el historial. La edición no sustituye por otra empresa al
+proveedor de compras o artículos existentes. Ante un conflicto, cierre y actualice
+el listado antes de volver a preparar los cambios.
 <!-- manual:end -->
 
-<!-- manual:any suppliers:manage -->
-## Alta desde una compra
+<!-- manual:all suppliers:page-view supplier:reports-read -->
+## Exportar proveedores
 
-Cuando la captura de una compra ofrece **Registrar proveedor**, abra el formulario
-secundario, complete los datos y guárdelo. Al regresar, compruebe el proveedor
-seleccionado y continúe la compra. El proveedor se registra en ese momento;
-la compra todavía requiere **Guardar** en su formulario principal.
-
-Si no tiene permiso para el alta o la acción no aparece en ese contexto, solicite
-el registro a una persona autorizada. Ante un conflicto, cierre y actualice el
-listado antes de editar nuevamente. Con permiso de reporte puede utilizar
-**Exportar Excel** sobre la consulta aplicada.
+Revise la búsqueda aplicada y pulse **Exportar Excel**. El archivo incluye la
+consulta completa, no sólo la página visible. El [capítulo de reportes](14-reports.md)
+explica su alcance y la recuperación de descargas.
 <!-- manual:end -->

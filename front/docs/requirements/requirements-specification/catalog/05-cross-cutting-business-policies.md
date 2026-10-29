@@ -1,8 +1,5 @@
 # 4.5 Políticas transversales del negocio
 
-La [matriz por caso de uso](../../../testing/04-use-case-coverage.md) identifica la evidencia del cliente y sus límites. El estado de producto no es un resultado de ejecución de Vue.
-
-
 Las reglas también aplican singularidad: cada `RN-*` expresa una restricción que puede
 incumplirse y comprobarse de manera independiente.
 

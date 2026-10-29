@@ -32,6 +32,12 @@ guarda correctamente, revise el listado actualizado; un filtro puede dejar fuera
 al registro recién creado. No recargue toda la página durante una captura que
 todavía no ha guardado.
 
+Cuando vuelva a la pestaña o permanezca consultando un listado, éste puede
+actualizarse automáticamente si su información ya venció. La actualización se
+pospone mientras hay un formulario u otra operación que protege la captura.
+Conserva los filtros aplicados; no necesita volver a abrir el módulo. Si falla,
+revise el aviso y utilice **Actualizar** o **Reintentar**, según ofrezca la página.
+
 ## Seleccionar registros relacionados
 
 Los selectores de proveedor, material, persona, área y otros registros permiten

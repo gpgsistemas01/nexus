@@ -4,7 +4,7 @@
 
 El dominio explica qué significan los datos que el usuario consulta y modifica en
 Nexus. Sus conceptos son independientes de los componentes Vue y de los nombres de
-las tablas. Las figuras se agrupan en cinco cortes del mismo modelo: repetir Persona o
+las tablas. Las relaciones se agrupan en cinco cortes del mismo modelo: repetir Persona o
 Proveedor mantiene su significado y permite leer cada operación sin una figura única saturada.
 
 | Corte | Pregunta | Figura |
@@ -14,6 +14,7 @@ Proveedor mantiene su significado y permite leer cada operación sin una figura 
 | [Compras](03-purchases.md) | ¿Qué se recibe y qué identifica cada detalle? | `DIA-VUE-DOM-003` |
 | [Salidas](04-issues.md) | ¿Quién solicita, para qué área y de qué existencia se surte? | `DIA-VUE-DOM-004/007` |
 | [Movimientos y trazabilidad](05-movements.md) | ¿Qué hecho explica un cambio de existencia? | `DIA-VUE-DOM-005` |
+| [Ciclos de estado de los documentos](06-document-lifecycles.md) | ¿Qué transiciones y efectos tienen Compra, Salida y sus detalles? | `DIA-VUE-REQ-EST-001/002/003/004` |
 
 ## Lectura de las relaciones
 

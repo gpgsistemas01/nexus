@@ -13,18 +13,28 @@
             "title": "Especificación, dominio y glosario",
             "sources": [
                 "requirements/index.md",
+                "requirements/vision-scope-and-requirements/",
+                "requirements/requirements-specification/index.md",
+                "requirements/requirements-specification/01-purpose-and-scope.md",
+                "requirements/requirements-specification/02-conventions.md",
+                "requirements/requirements-specification/03-actors-and-system-responsibilities.md",
+                "requirements/requirements-specification/catalog/",
+                "requirements/requirements-specification/05-requirement-traceability-rules.md",
+                "requirements/requirements-specification/06-operation-modes-and-effects.md",
+                "requirements/requirements-specification/client-specification.md",
+                "requirements/requirements-specification/07-interfaces-and-operating-conditions.md",
+                "requirements/requirements-specification/08-verification-and-acceptance.md",
+                "requirements/01-applicability-and-traceability.md",
                 "requirements/business-glossary.md",
                 "architecture/views/diagram-reading.md",
                 "requirements/domain-model/",
-                "requirements/01-applicability-and-traceability.md",
-                "requirements/requirements-specification/index.md",
-                "requirements/requirements-specification/client-specification.md",
-                "requirements/requirements-specification/catalog/"
+                "requirements/use-case-model/"
             ]
         },
         "casos-de-uso": {
             "title": "Catálogo de casos de uso",
             "sources": [
+                "requirements/use-case-model/",
                 "requirements/use-cases/index.md",
                 "requirements/use-cases/authentication/",
                 "requirements/use-cases/identity-access/",

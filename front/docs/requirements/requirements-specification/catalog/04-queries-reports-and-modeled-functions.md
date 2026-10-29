@@ -1,8 +1,5 @@
 # 4.4 Consulta, reportes y funciones modeladas
 
-La [matriz por caso de uso](../../../testing/04-use-case-coverage.md) identifica la evidencia del cliente y sus límites. El estado de producto no es un resultado de ejecución de Vue.
-
-
 | ID | Requisito y criterio de aceptación | Estado del requisito de producto |
 | --- | --- | --- |
 | RF-REP-001 | El Administrador del sistema debe poder consultar movimientos de artículos o mermas con filtros, sin modificar inventario; elegir un recurso exige seleccionar primero su proveedor y cambiarlo limpia la selección anterior. | Implementado |
@@ -12,9 +9,9 @@ La [matriz por caso de uso](../../../testing/04-use-case-coverage.md) identifica
 | RF-REP-005 | El Administrador del sistema del área Sistemas debe poder exportar los movimientos ofrecidos por la consulta conservando su ámbito y filtros aplicables. | Implementado |
 | RF-REP-006 | El reporte de mermas debe presentar como total de cada grupo la suma del stock de sus existencias. | Implementado |
 | RF-REP-007 | La exportación de mermas debe incluir todos los grupos y el total general en una sola hoja denominada `Mermas`. | Implementado |
-| RF-REP-008 | Antes de exportar inventario de materiales o mermas, el usuario debe poder incluir registros activos o con existencia, sólo activos o sólo registros con existencia; la opción elegida debe combinarse con los filtros visibles. | Implementado |
+| RF-REP-008 | Antes de exportar inventario de materiales o mermas, el usuario debe poder incluir registros activos o con existencia, sólo activos o sólo registros con existencia; la opción elegida debe combinarse con los filtros admitidos por el reporte: búsqueda por nombre en Materiales, y nombre y proveedor en Mermas. El inventario de Materiales incluye todos sus proveedores. | Implementado |
 | RF-REP-009 | El reporte de mermas debe calcular el área total de cada grupo sumando existencia × base × altura por recurso; una dimensión ausente aporta cero. | Implementado |
-| RF-REP-010 | Un usuario autorizado debe poder exportar el inventario de consumibles con los filtros y alcance seleccionados, excluyendo ofertas de materiales. | Implementado |
+| RF-REP-010 | Un usuario autorizado debe poder exportar el inventario de consumibles con la búsqueda por nombre y el alcance seleccionado, incluyendo todos los proveedores de consumibles y excluyendo ofertas de materiales. | Implementado |
 | RF-REP-011 | El Administrador del sistema de Sistemas debe disponer de Materiales, Consumibles y Mermas dentro de Movimientos. Cada consulta, total y Excel debe incluir exclusivamente su contexto; el informe mensual debe conservar esa separación y los filtros no deben permitir cambiarla. | Implementado |
 | RF-REP-012 | El reporte de mermas debe mostrar el peso total disponible de los rollos, sumando existencia × peso neto unitario de cada medida antes de consolidar el grupo. Si un rollo con existencia carece de peso, debe indicar «Sin peso capturado» en su grupo y en el total, sin presentar una suma parcial como completa. Otras presentaciones no aportan peso. La tabla general presenta cono, total con cono y neto por unidad, agrupados antes de Acciones; el formulario presenta los pesos en una sección propia y sólo permite capturarlos al crear un Rollo. | Implementado |
 | RF-MER-001 | Durante el alta de una merma, almacén debe elegir un proveedor antes del material usado como plantilla; cambiar el proveedor debe limpiar la plantilla anterior. | Implementado |
@@ -40,9 +37,10 @@ La [matriz por caso de uso](../../../testing/04-use-case-coverage.md) identifica
 
 - `RF-REP-003`, `RF-REP-006`, `RF-REP-007`, `RF-REP-009` y `RF-REP-012` son condiciones del
   reporte de mermas de `RF-REP-002`, no objetivos adicionales del actor.
-- **CA-RF-REP-008-1:** «Activos o con existencia» aplica la unión de ambas condiciones;
-  «Sólo activos» exige estado activo y «Sólo con existencia» exige saldo positivo.
-  La condición elegida se combina con los filtros de consulta aplicables.
+- **CA-RF-REP-008-1:** **Activos o con stock** aplica la unión de ambas condiciones;
+  **Activos** exige estado activo y **Con stock** exige saldo positivo.
+  La condición se combina con los filtros admitidos por cada reporte; el proveedor
+  de la tabla sólo limita el Excel de Mermas, no el de Materiales ni Consumibles.
 - **CA-RF-MER-011-1:** el peso del cono admite cero; el total con cono debe ser
   mayor que el cono y no superar 999.99 kg. Ambos admiten tres enteros y dos decimales.
   Capturar un peso requiere el otro. El sistema calcula el neto por unidad y rechaza

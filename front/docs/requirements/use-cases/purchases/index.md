@@ -16,3 +16,7 @@ Las operaciones tienen fichas independientes. Cada ficha conserva actor, dispara
 | [CU-ENT-10](cu-ent-10.md) | Corregir consumible de una compra. |
 | [CU-ENT-11](cu-ent-11.md) | Cancelar consumible de una compra. |
 | [CU-ENT-12](cu-ent-12.md) | Generar reporte de compras de consumible. |
+
+## Realización y verificación del cliente
+
+La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/06-purchases.md) describe captura, permisos de interfaz, contratos y propietarios del estado de esta familia. Las pruebas de navegador de esta familia están en `purchases.spec.ts`.

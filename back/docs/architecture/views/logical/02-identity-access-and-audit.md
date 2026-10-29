@@ -130,3 +130,12 @@ de una tabla o de un permiso.
 
 La separación de credenciales de aplicación y migración se explica en la
 [vista física](../physical/02-postgresql-runtime-and-migration-roles.md).
+
+### Directorio y altas desde selectores
+
+Las páginas independientes de Clientes y Proveedores requieren una asignación de
+Administrador del sistema en Sistemas. Almacén conserva `clients:read`,
+`clients:create`, `suppliers:read` y `suppliers:manage` para leer las opciones y
+registrar desde los formularios operativos autorizados. El permiso de alta no
+concede `clients:page-view` ni `suppliers:page-view`; después del alta contextual,
+el formulario de origen selecciona el registro confirmado y conserva la captura.

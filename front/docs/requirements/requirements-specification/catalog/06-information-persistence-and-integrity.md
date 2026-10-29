@@ -1,8 +1,5 @@
 # 4.6 Persistencia e integridad de información
 
-La [matriz por caso de uso](../../../testing/04-use-case-coverage.md) identifica la evidencia del cliente y sus límites. El estado de producto no es un resultado de ejecución de Vue.
-
-
 | ID | Requisito y forma de comprobación | Estado |
 | --- | --- | --- |
 | RD-001 | Las entidades persistentes deben usar UUID como identificador técnico cuando así lo define el modelo común. | Implementado |

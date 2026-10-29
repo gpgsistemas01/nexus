@@ -1,6 +1,6 @@
 # Especificación de requisitos
 
-## Propósito, actores y alcance
+## Propósito y alcance
 
 El cliente permite acceso y cierre de sesión, inventario de Materiales/Consumibles/
 Mermas, seis catálogos auxiliares, Personas/Usuarios, Clientes/Proveedores, Compras,
@@ -8,12 +8,22 @@ Salidas, Movimientos y reportes. Usuario registrado, Personal de almacén y Admi
 del sistema participan conforme a permisos de sus asignaciones; aparecer como actor
 no concede una autorización adicional.
 
-## Catálogo
+## Orden de lectura
 
-1. [Requisitos del cliente](client-specification.md): navegación, captura, estado, datos y restricciones de build.
-2. [Reglas de negocio](catalog/index.md): criterios de acceso, catálogos, inventario, documentos, información y calidad.
-3. [Casos de uso](../use-cases/index.md): objetivos por operación y flujos completos.
-4. [Glosario](../business-glossary.md): términos del dominio.
+1. [Propósito y alcance](01-purpose-and-scope.md).
+2. [Convenciones, estados y aceptación](02-conventions.md).
+3. [Actores y responsabilidades](03-actors-and-system-responsibilities.md).
+4. [Catálogo por ámbito](catalog/index.md): las 165 obligaciones del producto, con sus criterios identificados y estados.
+5. [Trazabilidad de requisitos](05-requirement-traceability-rules.md).
+6. [Modos, precondiciones y efectos](06-operation-modes-and-effects.md).
+7. [Obligaciones específicas del cliente](client-specification.md): navegación, captura, recuperación, datos y construcción.
+8. [Interfaces y condiciones de operación](07-interfaces-and-operating-conditions.md): intercambios, dependencias, supuestos y límites de compatibilidad.
+9. [Verificación y aceptación](08-verification-and-acceptance.md): escenarios críticos, comprobación de las 31 obligaciones Vue y datos necesarios para aceptar una entrega.
+
+La [visión](../vision-scope-and-requirements/index.md) explica los límites de alto nivel.
+Las [fichas de casos de uso](../use-cases/index.md) desarrollan cada objetivo y el
+[modelo de dominio](../domain-model/index.md) conserva conceptos y estados. El
+[glosario](../business-glossary.md) fija el significado de los términos compartidos.
 
 ## Lectura de estados y aceptación
 

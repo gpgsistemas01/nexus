@@ -13,9 +13,7 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La existencia anterior aumenta exactamente en la cantidad capturada.<br>2. **Éxito:** El documento individual de entrada queda vinculado al historial común de movimientos de merma.<br>3. **Fallo:** No quedan cambios parciales. |
 | Requisitos relacionados | `RF-MER-010`, `RN-002`, `RN-005`, `RN-013`, `RN-033`. |
 
-## Realización y verificación del cliente
-
-La [guía de realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md) describe captura, permisos de interfaz, contratos y propietarios del estado. La [cobertura por caso](../../../testing/04-use-case-coverage.md) identifica la evidencia y sus límites. Las pruebas de navegador de esta familia están en `warehouse.spec.ts, catalogs.spec.ts, records.spec.ts y movements.spec.ts`; la existencia del archivo no acredita por sí sola todos los pasos de esta ficha.
+Familia: [objetivos y realización](index.md).
 
 ## Diagramas de realización
 

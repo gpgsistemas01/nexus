@@ -10,7 +10,7 @@ La [jerarquía común de actores](01-access.md#autenticación) conserva la parti
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
-**Lectura visual:** [actores, objetivos y relaciones](../../diagram-reading.md#casos-de-uso).
+**Lectura visual:** [actores, objetivos y relaciones](../../architecture/views/diagram-reading.md#casos-de-uso).
 
 ```mermaid
 usecase-beta
@@ -44,6 +44,8 @@ direction LR
     operational -- ucMaterialIssueCreate
     operational -- ucMaterialIssueHeader
     operational -- ucMaterialIssueDetails
+
+    clientExtension ..>:extend ucMaterialIssueHeader
 ```
 
 
@@ -122,4 +124,6 @@ direction LR
     operational -- ucConsumableIssueCreate
     operational -- ucConsumableIssueHeader
     operational -- ucConsumableIssueDetails
+
+    clientExtension ..>:extend ucConsumableIssueHeader
 ```
