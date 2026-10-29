@@ -15,8 +15,9 @@ El [modelo visual de casos de uso](../use-case-model/index.md) representa actore
 
 En los diagramas, la consulta mantiene una asociación normal con el actor que la
 realiza y conecta las operaciones del recurso mediante enlaces simples de acceso.
-La vista omite las asociaciones repetidas del actor del recurso con cada operación
-y mantiene las de actores específicos. Un mismo caso puede tener varios actores;
+La vista conecta a los actores que comparten operaciones sólo con la consulta;
+las asociaciones adicionales se reservan para participaciones exclusivas comprobadas
+en los permisos y la ficha. Un mismo caso puede tener varios actores;
 la ficha los nombra y distingue su alcance cuando corresponde. Una relación entre
 casos no hereda actores ni concede permisos. Personal de almacén especializa a
 Usuario registrado; Administrador del sistema especializa a Personal de almacén y

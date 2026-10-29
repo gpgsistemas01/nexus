@@ -163,7 +163,9 @@ propia con Operación específica. Esta operación sigue conectada con la consul
 la generalización entre actores no sustituye el enlace de acceso. La vista omite las
 asociaciones repetidas del actor general con las operaciones; sus fichas mantienen
 todos los actores que pueden iniciarlas. Dos actores pueden participar en el mismo
-caso sin tener generalización entre sí.
+caso sin tener generalización entre sí. En esta vista resumida, los actores que
+comparten operaciones se conectan sólo a la consulta. La asociación directa adicional
+identifica una operación exclusiva, justificada por los permisos y su ficha.
 
 **Ejemplo:** `DIA-VUE-LEG-007`. Inclusión y extensión de comportamiento. Es un
 ejemplo de notación, sin atribuir nuevos casos a Nexus.

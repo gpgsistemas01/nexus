@@ -61,11 +61,17 @@ precondiciones y efectos; el enlace de acceso no concede permisos ni hace obliga
 la operación dentro de la consulta.
 
 Un mismo caso admite varios actores. Sus asociaciones pueden coexistir sin que los
-actores tengan generalización entre sí. En Salidas, el acceso de área operativa y el
-de Almacén pueden iniciar las mismas altas y ediciones, con distinto alcance por área.
-Los enlaces específicos del actor operativo distinguen esas operaciones del surtido,
-la devolución y los reportes de Almacén. La ficha conserva los actores alternativos
-que pueden iniciar cada ejecución; no implica que todos deban intervenir juntos.
+actores tengan generalización entre sí. En esta vista, los actores que comparten
+operaciones se conectan sólo a la consulta; las altas y ediciones compartidas mantienen
+sus enlaces desde ella. Una asociación adicional con una operación se reserva para
+una participación exclusiva, como los ajustes del Administrador del sistema.
+
+En Salidas, Almacén y las áreas operativas pueden iniciar las mismas altas y ediciones.
+Auxiliar y Coordinador de Almacén, y Administrador del sistema, acceden a todas las
+áreas; el acceso operativo se limita a sus áreas autorizadas. Surtir, devolver y
+generar reportes requieren los permisos de Almacén o Sistemas. La ficha conserva los
+actores alternativos de cada ejecución y sus límites; no exige que intervengan juntos
+ni concede operaciones por compartir la consulta.
 
 | Relación | Cuándo aplica y cómo se lee |
 | --- | --- |
