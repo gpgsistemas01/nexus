@@ -5,6 +5,7 @@
 | Identificador | `CU-IDA-08` |
 | Nombre | Cambiar contraseña de usuario. |
 | Actor | Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-IDA-05` en **Acciones sobre los resultados** (después del paso 4, flujo A3) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Necesita renovar la credencial de una cuenta y abre la edición de contraseña. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de cambio de credencial.<br>3. La cuenta objetivo existe. |
 | Flujo principal | 1. **Actor:** selecciona un usuario y abre «Editar contraseña» **(ver E1)**.<br>2. **Nexus:** muestra el formulario de nueva contraseña sin exponer la credencial actual.<br>3. **Actor:** captura y confirma la nueva contraseña **(ver A1)**.<br>4. **Nexus:** comprueba que la nueva contraseña cumpla las reglas y sustituye la anterior sin exponer ninguna de ellas; cierra el formulario y confirma la actualización **(ver EOP)**. |

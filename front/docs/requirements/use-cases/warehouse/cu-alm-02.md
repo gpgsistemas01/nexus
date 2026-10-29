@@ -5,7 +5,7 @@
 | Identificador | `CU-ALM-02` |
 | Nombre | Crear material. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-ENT-02` en el punto de selección de material (paso 3, A5 de la compra) cuando se elige **Registrar material**; devuelve la oferta con existencia cero y sin costo máximo y reanuda el detalle en el paso 4. Desde `CU-ALM-01` es un objetivo independiente. |
+| Relaciones entre casos | Extiende `CU-ALM-01` en **Acciones sobre los resultados** (después del paso 4, flujo A6) bajo la condición: elección del actor y permiso de alta para ese contexto. Al completar o cancelar la operación retorna al paso 5 de la consulta. Extiende `CU-ENT-02` en el punto de selección de material (paso 3, A5 de la compra) cuando se elige **Registrar material**; devuelve la oferta con existencia cero y sin costo máximo y reanuda el detalle en el paso 4. Extiende también `CU-ENT-03` durante la selección de artículo de una partida nueva (paso 3, A3), con proveedor fijado; retorna al paso 3 para completar el renglón, sin editar partidas persistidas. |
 | Puntos de extensión | Selección de proveedor durante el paso 3, si falta el registro y el actor tiene permiso de alta; `CU-CAT-02` registra el proveedor y devuelve la selección sin cerrar la captura. |
 | Disparador | Selecciona la acción principal para crear un material desde `CU-ALM-01` Consultar materiales o **Registrar material** desde el selector de `CU-ENT-02` Crear compra de material. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |

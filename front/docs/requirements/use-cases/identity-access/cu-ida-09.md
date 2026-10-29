@@ -5,6 +5,7 @@
 | Identificador | `CU-IDA-09` |
 | Nombre | Generar reporte de usuarios. |
 | Actor | Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-IDA-05` en **Acciones sobre los resultados** (después del paso 4, flujo A4) bajo la condición: elección del actor, permiso de reporte y criterios admitidos. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Desde `CU-IDA-05` Consultar usuarios, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Actor:** aplica la búsqueda y los filtros admitidos en la consulta.<br>2. **Actor:** pulsa **Exportar Excel** **(ver E1)**.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros, obtiene los registros de usuarios conforme a la consulta aplicada, sin limitarse a la página visible **(ver EOP)**; genera el archivo de Excel e inicia la descarga. |

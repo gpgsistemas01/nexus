@@ -137,7 +137,9 @@ Un **actor de caso de uso** es el papel externo que interactúa con Nexus para
 alcanzar un objetivo. Puede especializar a otro actor; no representa una entidad
 de datos, una cuenta concreta ni una pantalla.
 
-**Ejemplo:** `DIA-VUE-LEG-004`. Objetivo principal con una ampliación condicional.
+**Ejemplo:** `DIA-VUE-LEG-004`. Consulta compartida, acción opcional de un actor
+especializado y comportamiento requerido por esa acción. Es un ejemplo de notación,
+no otro conjunto de casos de Nexus.
 
 ```mermaid
 usecase-beta
@@ -146,12 +148,14 @@ direction LR
     actor specialized("Actor especializado")
     specialized --|> general
     systemBoundary example["Sistema de ejemplo"]
-        main("Objetivo principal")
-        extra("Alta auxiliar")
+        main("Consultar registros")
+        extra("Modificar registro")
+        required("Comportamiento requerido")
     end
     general -- main
-    general -- extra
+    specialized -- extra
     extra ..>:extend main
+    extra ..>:include required
 ```
 
 | Elemento visible | Lectura |
@@ -161,9 +165,14 @@ direction LR
 | Rectángulo que agrupa óvalos | Límite del sistema o corte funcional; los actores quedan fuera. |
 | Línea actor–óvalo | Participación del actor; no orden de ejecución ni concesión automática de permisos. |
 | Triángulo hueco entre actores | Especialización; apunta al actor general. |
-| Flecha discontinua `«extend»` | Del caso auxiliar al caso base; se incorpora bajo la condición de extensión. |
+| Flecha discontinua `«extend»` | Del caso opcional al caso base; se incorpora bajo la condición de extensión y retorna al paso indicado por la ficha. |
+| Flecha discontinua `«include»` | De la base al comportamiento requerido que incorpora. No expresa cronología de pantallas ni permisos. |
 
-En Nexus las altas contextuales usan extensiones condicionadas por captura y permisos.
+En Nexus, las acciones opcionales de consulta y las altas contextuales usan
+extensiones condicionadas por elección, permisos y estado. Ajustar, por ejemplo,
+mantiene un actor administrativo aunque otros usuarios puedan consultar. La inclusión
+del ejemplo explica su notación: no atribuye un `include` nuevo a los casos del sistema.
+No existe un conector UML `exclude`; un rechazo se expresa mediante condiciones y excepciones.
 La navegación entre pantallas se documenta en su [catálogo](scenarios/navigation-and-screens.md).
 
 ## Mapas y actividades

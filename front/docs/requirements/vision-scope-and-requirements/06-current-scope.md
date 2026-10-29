@@ -8,7 +8,9 @@
 3. Materiales con presentación, unidad y ofertas por proveedor, existencias y cantidades convertidas.
 4. Consumibles clasificados explícitamente, sin dimensiones, con presentación y unidad
    de medida, separados de materiales en consultas, documentos y reportes.
-5. Proveedores, clientes y asesores asociados a personas.
+5. Clientes y proveedores como catálogos de contexto comercial, con altas desde
+   selectores para Almacén y mantenimiento independiente para Sistemas. Los asesores
+   se seleccionan entre personas registradas.
 6. Recepciones de compra de materiales o consumibles con detalle, importes,
    correcciones, cancelación de renglones y movimientos de entrada.
 7. Salidas separadas de material, consumible y merma, con surtido de detalles completos,

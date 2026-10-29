@@ -6,7 +6,7 @@ La [jerarquía común de actores](01-access.md#autenticación) conserva la parti
 
 ## Personas
 
-**Identificador:** `DIA-VUE-CU-002`. **Pregunta:** ¿Qué objetivos y actores participan en Personas?
+**Identificador:** `DIA-VUE-CU-002`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -19,22 +19,26 @@ direction LR
     actor warehouse("Personal de almacén")
 
     systemBoundary identityPackage1["Nexus · Personas"]
-        ucPersonQuery("CU-IDA-01 Consultar personas")
-        ucPersonCreate("CU-IDA-02 Crear persona")
-        ucPersonEdit("CU-IDA-03 Editar persona")
-        ucPersonReport("CU-IDA-04 Generar reporte de personas")
+        ucPersonQuery("CU-IDA-01 Consultar")
+        ucPersonCreate("CU-IDA-02 Crear")
+        ucPersonEdit("CU-IDA-03 Editar")
+        ucPersonReport("CU-IDA-04 Generar reporte")
     end
 
     warehouse -- ucPersonQuery
     warehouse -- ucPersonCreate
     warehouse -- ucPersonEdit
     warehouse -- ucPersonReport
+
+    ucPersonCreate ..>:extend ucPersonQuery
+    ucPersonEdit ..>:extend ucPersonQuery
+    ucPersonReport ..>:extend ucPersonQuery
 ```
 
 
 ## Usuarios y credenciales
 
-**Identificador:** `DIA-VUE-CU-003`. **Pregunta:** ¿Qué objetivos y actores participan en Usuarios y credenciales?
+**Identificador:** `DIA-VUE-CU-003`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -45,11 +49,11 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary identityPackage2["Nexus · Usuarios y credenciales"]
-        ucUserQuery("CU-IDA-05 Consultar usuarios")
-        ucUserCreate("CU-IDA-06 Crear usuario y asignar acceso")
-        ucUserEdit("CU-IDA-07 Editar usuario y acceso")
-        ucPasswordEdit("CU-IDA-08 Cambiar contraseña de usuario")
-        ucUserReport("CU-IDA-09 Generar reporte de usuarios")
+        ucUserQuery("CU-IDA-05 Consultar")
+        ucUserCreate("CU-IDA-06 Crear")
+        ucUserEdit("CU-IDA-07 Editar")
+        ucPasswordEdit("CU-IDA-08 Cambiar contraseña")
+        ucUserReport("CU-IDA-09 Generar reporte")
     end
 
     admin -- ucUserQuery
@@ -57,4 +61,9 @@ direction LR
     admin -- ucUserEdit
     admin -- ucPasswordEdit
     admin -- ucUserReport
+
+    ucUserCreate ..>:extend ucUserQuery
+    ucUserEdit ..>:extend ucUserQuery
+    ucPasswordEdit ..>:extend ucUserQuery
+    ucUserReport ..>:extend ucUserQuery
 ```

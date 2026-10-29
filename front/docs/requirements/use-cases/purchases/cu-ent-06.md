@@ -5,6 +5,7 @@
 | Identificador | `CU-ENT-06` |
 | Nombre | Generar reporte de compras de material. |
 | Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ENT-01` en **Acciones sobre los resultados** (después del paso 4, flujo A5) bajo la condición: elección del actor, permiso de reporte y criterios admitidos. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Desde `CU-ENT-01` Consultar compras de material, selecciona la opción para generar el reporte con los filtros que necesita conservar. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de consulta o reporte correspondiente. |
 | Flujo principal | 1. **Nexus:** después de que el actor selecciona la exportación desde la consulta de origen, abre el modal **Exportar reporte** con las opciones **Mes actual**, **Mes específico** y **Filtros aplicados en la tabla** **(ver E1)**.<br>2. **Actor:** elige el alcance, captura **Mes del reporte** si eligió un mes específico y pulsa **Descargar Excel** **(ver A1 y A2)**.<br>3. **Nexus:** vuelve a comprobar autorización y parámetros; usa los filtros aplicados si se eligió esa opción, o el mes completo sin los filtros de la tabla si se eligió un alcance mensual. Obtiene la información **(ver EOP)** de compras de material; genera el archivo de Excel e inicia su descarga. |

@@ -5,6 +5,7 @@
 | Identificador | `CU-IDA-06` |
 | Nombre | Crear usuario y asignar acceso. |
 | Actor | Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-IDA-05` en **Acciones sobre los resultados** (después del paso 4, flujo A5) bajo la condición: elección del actor y permiso de alta para ese contexto. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Selecciona la acción principal para crear un usuario desde `CU-IDA-05` Consultar usuarios. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre la opción para crear usuario y asignar acceso **(ver E1)**.<br>2. **Nexus:** muestra el formulario con nombre de usuario, contraseña, persona asociada cuando corresponde, área, rol y estado activo.<br>3. **Actor:** captura los datos de la cuenta, selecciona el área y el rol que determinan su acceso y confirma **(ver A1)**.<br>4. **Nexus:** valida autorización, obligatoriedad, formato, identidad y relaciones; registra el usuario y su asignación de acceso, actualiza el listado y muestra la confirmación **(ver EOP)**. |

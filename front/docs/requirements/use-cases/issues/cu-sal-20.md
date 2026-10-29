@@ -5,6 +5,7 @@
 | Identificador | `CU-SAL-20` |
 | Nombre | Devolver consumible surtido. |
 | Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-SAL-15` en **Acciones sobre los resultados** (después del paso 4, flujo A5) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Recibe de vuelta consumible surtido y abre la devolución del detalle. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La salida y el detalle existen.<br>4. La salida completa tiene cumplimiento `Surtido`.<br>5. El detalle conserva saldo entregado positivo. |
 | Flujo principal | 1. **Actor:** abre una salida de consumible y selecciona un detalle surtido para devolverlo **(ver E1)**.<br>2. **Nexus:** muestra la cantidad que todavía puede devolverse.<br>3. **Actor:** captura la cantidad recibida de vuelta, registra las observaciones y selecciona «Devolver» **(ver A1)**.<br>4. **Nexus:** valida que la salida esté completamente surtida y que la cantidad positiva no exceda el saldo entregado; reintegra existencia, acumula la devolución, actualiza estados, registra el movimiento inverso y confirma **(ver EOP)**. |

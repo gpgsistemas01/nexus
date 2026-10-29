@@ -5,6 +5,7 @@
 | Identificador | `CU-IDA-07` |
 | Nombre | Editar usuario y acceso. |
 | Actor | Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-IDA-05` en **Acciones sobre los resultados** (después del paso 4, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Detecta datos que debe corregir en una cuenta o su acceso y selecciona **Editar registro** en `CU-IDA-05` Consultar usuarios. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados. |
 | Flujo principal | 1. **Nexus:** abre la edición de la cuenta y su acceso **(ver E1)**; muestra los valores actuales y habilita sólo los campos permitidos.<br>2. **Actor:** modifica los datos admitidos y selecciona **Actualizar** **(ver A1)**.<br>3. **Nexus:** valida autorización, formato, identidad y relaciones; guarda los cambios, actualiza el listado y muestra la confirmación **(ver EOP)**. |

@@ -5,6 +5,7 @@
 | Identificador | `CU-CAT-23` |
 | Nombre | Editar motivo de ajuste. |
 | Actor | Administrador del sistema del área Sistemas. |
+| Relaciones entre casos | Extiende `CU-CAT-21` en **Acciones sobre los resultados** (después del paso 2, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 3 de la consulta. |
 | Disparador | Selecciona **Editar registro** en la pantalla **Motivos de ajuste**. |
 | Precondiciones | 1. El actor inició sesión y tiene autorización para administrar catálogos.<br>2. La entrada existe en **Motivos de ajuste**. |
 | Flujo principal | 1. **Actor:** abre **Motivos de ajuste** y selecciona **Editar registro** en una fila **(ver E1)**.<br>2. **Nexus:** presenta los valores existentes y únicamente los campos **Nombre** y **Activo**.<br>3. **Actor:** modifica los datos y selecciona **Actualizar** **(ver A1)**.<br>4. **Nexus:** revisa la información y actualiza la entrada de Motivos de ajuste; confirma y refresca la tabla de Motivos de ajuste **(ver EOP)**. |

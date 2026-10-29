@@ -25,9 +25,9 @@ La notación, dirección y límites de la representación Mermaid se explican en
 modelo de escenarios. Las
 asociaciones son líneas continuas sin punta; la generalización tiene un triángulo hueco
 hacia el general; `«include»` y `«extend»` son dependencias discontinuas con el estereotipo
-correspondiente. La generalización no lleva texto adicional. Los enlaces desde Consulta
-a otras operaciones se dibujan sin etiqueta como convención visual del documento;
-no constituyen inclusión, extensión ni herencia de actores.
+correspondiente. La generalización no lleva texto adicional. Las operaciones opcionales
+realizadas dentro de una consulta usan extensiones con condición, punto y retorno;
+una línea simple entre casos no se utiliza para sustituir esa semántica.
 
 ## Estructura de las fichas
 
@@ -59,10 +59,14 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   inválida cuando Nexus permite corregirla y volver al flujo principal. La secuencia
   comienza con el participante que debe actuar después del paso referenciado: si ese
   paso corresponde a Nexus, comienza el actor; si corresponde al actor, comienza Nexus.
-  En los casos de consulta que preceden a operaciones de mantenimiento, el flujo
-  principal termina con la acción de alta por ser la continuación prioritaria y esa
-  selección constituye el disparador del caso siguiente. Permanecer en la consulta y
-  elegir cada una de las demás acciones se documenta como un flujo alternativo independiente y no ambiguo; no se agrupan destinos distintos bajo «Elegir otra acción» ni se crea una sección de continuaciones asociadas.
+  El flujo principal de consulta termina al revisar los resultados: no obliga a crear,
+  modificar ni exportar. Las acciones opcionales se describen como extensiones
+  independientes en sus alternativas, sin agrupar destinos distintos bajo «Elegir
+  otra acción».
+- **Puntos de extensión y relaciones entre casos:** la consulta identifica dónde
+  ofrece cada extensión y su condición. La ficha extendiente nombra la base, alternativa
+  y retorno. Una operación puede extender más de una base cuando conserva el mismo
+  objetivo desde un listado o desde una captura contextual.
 - **Excepciones:** título breve, punto de rechazo o fallo y serie numerada de pasos que
   describe el efecto protegido y la terminación del caso. Su secuencia respeta la misma
   alternancia de participantes definida para los flujos alternativos.
@@ -91,15 +95,14 @@ quedan más interacciones. No se usa «volver» o «continuar» sin indicar el p
 destino fuera otro caso de uso, no se redactaría como un salto de control informal:
 
 - Una asociación simple conecta al actor con el caso en el que participa; se dibuja
-  como línea continua sin punta ni frase. Los enlaces sin texto entre consultas y
-  operaciones conservan la organización visual por recurso y no transmiten actores
-  ni permisos. Cuando una consulta presenta operaciones de mantenimiento,
-  la selección termina la consulta y dispara un caso independiente, que comprueba de
-  nuevo sus precondiciones y autorización; esa navegación se describe en las fichas.
+  como línea continua sin punta ni frase. No representa una llamada ni transmite
+  permisos a otros casos. Las acciones de mantenimiento o reporte que se ejecutan
+  dentro de la consulta se insertan en su punto de extensión y comprueban sus propias
+  precondiciones y autorización.
 - `«include»` identifica un caso requerido que el caso base incorpora siempre; al
   concluir, la interacción continúa en el paso siguiente a la inclusión.
 - `«extend»` identifica comportamiento opcional que se inserta en un punto de extensión
-  del caso base; al concluir, retorna a ese punto.
+  del caso base; al concluir, continúa en el paso de retorno indicado por la ficha.
 - La **generalización** identifica un caso especializado que sustituye el comportamiento
   heredado aplicable; no representa una llamada entre casos.
 
@@ -108,6 +111,11 @@ el diagrama y nombrar ambos identificadores `CU-*`; una extensión documenta su 
 punto de inserción y retorno. Las continuaciones de navegación no son relaciones UML
 entre casos; compartir servicios de inventario, persistencia o consulta tampoco crea
 por sí solo una relación UML.
+
+`include` no representa una consulta previa, una lectura interna de datos ni una
+restricción de actor. `exclude` no es una relación UML: las prohibiciones se expresan
+mediante permisos, condiciones y excepciones. Una extensión puede pertenecer a un
+actor específico aunque la consulta sea compartida con otros actores.
 
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
 En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela

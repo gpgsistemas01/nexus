@@ -5,6 +5,7 @@
 | Identificador | `CU-ALM-21` |
 | Nombre | Ajustar existencia de consumible. |
 | Actor | Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ALM-17` en **Acciones sobre los resultados** (después del paso 4, flujo A4) bajo la condición: elección del Administrador del sistema, permiso de ajuste y registro válido. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Abre **Ajustar stock** desde `CU-ALM-17`. |
 | Precondiciones | 1. El actor inició sesión como Administrador del sistema.<br>2. El actor tiene autorización para ajustar existencias de consumibles.<br>3. El consumible y su oferta existen. |
 | Flujo principal | 1. **Actor:** selecciona **Ajustar stock** sobre una oferta **(ver E1)**.<br>2. **Nexus:** comprueba el permiso exclusivo, carga la existencia actual y muestra proveedor, nueva cantidad, motivo y observaciones.<br>3. **Actor:** captura en **Nuevo stock** el saldo final no negativo, no la diferencia, selecciona el motivo, agrega las observaciones requeridas y confirma **(ver A1)**.<br>4. **Nexus:** vuelve a comprobar que el consumible y su oferta existan y pertenezcan al catálogo de consumibles; calcula saldos y diferencia y registra como una sola operación existencia, ajuste, actor y movimiento **(ver A2)** **(ver EOP)**; confirma el nuevo saldo, cierra el diálogo y actualiza el listado de consumibles. |

@@ -5,6 +5,7 @@
 | Identificador | `CU-ALM-10` |
 | Nombre | Registrar merma. |
 | Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ALM-09` en **Acciones sobre los resultados** (después del paso 4, flujo A6) bajo la condición: elección del actor y permiso de alta para ese contexto. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Selecciona la acción principal para registrar una merma desde `CU-ALM-09` Consultar mermas. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de alta.<br>3. Existen los datos relacionados requeridos para completar el registro. |
 | Flujo principal | 1. **Actor:** abre «Agregar merma» y selecciona primero un proveedor **(ver E1)**.<br>2. **Nexus:** carga los materiales de ese proveedor con unidad m² o metro cuadrado; excluye consumibles.<br>3. **Actor:** elige el material, completa los datos propios de la merma; para Rollo captura el peso del rollo completo con cono, el del sobrante con cono y un único peso de cono; el largo original procede del material; confirma **(ver A1)**.<br>4. **Nexus:** valida identidad, dimensiones, existencia y datos relacionados **(ver A2)**; crea la merma con sus propios datos históricos, registra su existencia inicial y confirma el alta **(ver EOP)**. |

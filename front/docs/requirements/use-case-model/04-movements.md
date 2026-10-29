@@ -4,7 +4,7 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 ## Movimientos de materiales
 
-**Identificador:** `DIA-VUE-CU-005`. **Pregunta:** ¿Qué objetivos y actores participan en Movimientos de materiales?
+**Identificador:** `DIA-VUE-CU-005`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -17,18 +17,20 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary materialMovementsPackage["Nexus · Movimientos de materiales"]
-        ucMaterialMovements("CU-ALM-07 Consultar movimientos de materiales")
-        ucMaterialMovementReport("CU-ALM-08 Generar reporte de movimientos de materiales")
+        ucMaterialMovements("CU-ALM-07 Consultar")
+        ucMaterialMovementReport("CU-ALM-08 Generar reporte")
     end
 
     admin -- ucMaterialMovements
     admin -- ucMaterialMovementReport
+
+    ucMaterialMovementReport ..>:extend ucMaterialMovements
 ```
 
 
 ## Movimientos de mermas
 
-**Identificador:** `DIA-VUE-CU-007`. **Pregunta:** ¿Qué objetivos y actores participan en Movimientos de mermas?
+**Identificador:** `DIA-VUE-CU-007`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -39,18 +41,20 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary wasteMovementsPackage["Nexus · Movimientos de mermas"]
-        ucWasteMovements("CU-ALM-15 Consultar movimientos de mermas")
-        ucWasteMovementReport("CU-ALM-16 Generar reporte de movimientos de mermas")
+        ucWasteMovements("CU-ALM-15 Consultar")
+        ucWasteMovementReport("CU-ALM-16 Generar reporte")
     end
 
     admin -- ucWasteMovements
     admin -- ucWasteMovementReport
+
+    ucWasteMovementReport ..>:extend ucWasteMovements
 ```
 
 
 ## Movimientos de consumibles
 
-**Identificador:** `DIA-VUE-CU-009`. **Pregunta:** ¿Qué objetivos y actores participan en Movimientos de consumibles?
+**Identificador:** `DIA-VUE-CU-009`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -60,9 +64,11 @@ usecase-beta
 direction LR
     actor admin("Administrador del sistema")
     systemBoundary consumableMovementsPackage["Nexus · Movimientos de consumibles"]
-        query("CU-ALM-23 Consultar movimientos de consumibles")
-        report("CU-ALM-24 Generar reporte de movimientos de consumibles")
+        query("CU-ALM-23 Consultar")
+        report("CU-ALM-24 Generar reporte")
     end
     admin -- query
     admin -- report
+
+    report ..>:extend query
 ```

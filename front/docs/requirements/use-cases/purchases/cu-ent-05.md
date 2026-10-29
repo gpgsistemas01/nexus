@@ -5,6 +5,7 @@
 | Identificador | `CU-ENT-05` |
 | Nombre | Cancelar material de una compra. |
 | Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ENT-01` en **Acciones sobre los resultados** (después del paso 4, flujo A4) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Determina que debe anular material de una compra y solicita la cancelación. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle activo existen.<br>4. El detalle se encuentra en un estado que admite cancelación. |
 | Flujo principal | 1. **Actor:** selecciona un detalle activo y solicita cancelarlo **(ver E1)**.<br>2. **Nexus:** identifica el detalle y solicita confirmación.<br>3. **Actor:** confirma la cancelación **(ver A1)**.<br>4. **Nexus:** valida que el detalle siga activo y que la existencia recibida pueda revertirse **(ver E2)**; cancela el detalle, revierte existencia, movimiento y totales y confirma el resultado **(ver EOP)**. |

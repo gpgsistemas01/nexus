@@ -5,6 +5,7 @@
 | Identificador | `CU-CAT-25` |
 | Nombre | Crear estado de cumplimiento. |
 | Actor | Administrador del sistema del área Sistemas. |
+| Relaciones entre casos | Extiende `CU-CAT-24` en **Acciones sobre los resultados** (después del paso 2, flujo A3) bajo la condición: elección del actor y permiso de alta para ese contexto. Al completar o cancelar la operación retorna al paso 3 de la consulta. |
 | Disparador | Selecciona **Nuevo estado de cumplimiento** en `CU-CAT-24` Consultar estado de cumplimiento. |
 | Precondiciones | 1. El actor inició sesión y tiene autorización para administrar catálogos.<br>2. La pantalla seleccionada corresponde exactamente a **Estados de cumplimiento**. |
 | Flujo principal | 1. **Actor:** abre la pantalla **Estados de cumplimiento** y selecciona **Nuevo estado de cumplimiento** **(ver E1)**.<br>2. **Nexus:** presenta los campos **Nombre** y **Activo**.<br>3. **Actor:** captura los datos y selecciona **Guardar** **(ver A1)**.<br>4. **Nexus:** revisa la información y crea la entrada de Estados de cumplimiento; confirma y refresca la tabla de Estados de cumplimiento **(ver EOP)**. |

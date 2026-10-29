@@ -6,6 +6,7 @@
 | Nombre | Editar encabezado de salida de material. |
 | Actor | Usuario autorizado de área operativa, Personal de almacén o Administrador del sistema. |
 | Puntos de extensión | Selección de Cliente durante el paso 3, cuando el actor autorizado no encuentra el registro; el alta contextual `CU-CAT-06` devuelve el cliente seleccionado. |
+| Relaciones entre casos | Extiende `CU-SAL-01` en **Acciones sobre los resultados** (después del paso 4, flujo A2) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Detecta datos que debe corregir en el encabezado de una salida de material y selecciona su acción de edición. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso de edición.<br>3. El registro objetivo existe.<br>4. El registro se encuentra en un estado que admite los cambios solicitados.<br>5. El área del documento y el área de destino pertenecen al alcance autorizado de la sesión. |
 | Flujo principal | 1. **Actor:** selecciona una salida de material y abre la edición de encabezado **(ver E1)**.<br>2. **Nexus:** muestra los datos actuales y habilita sólo los campos permitidos por su estado.<br>3. **Actor:** modifica los datos contextuales y confirma **(ver A1)** **(ver A2)**.<br>4. **Nexus:** valida el estado, los participantes y las relaciones y actualiza el encabezado; conserva intactas las cantidades y existencias y confirma la actualización **(ver EOP)**. |

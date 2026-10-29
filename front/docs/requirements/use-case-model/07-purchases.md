@@ -4,9 +4,11 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 La [jerarquía común de actores](01-access.md#autenticación) conserva la participación heredada del Administrador del sistema.
 
+Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-contextual-creation.md).
+
 ## Compras de materiales
 
-**Identificador:** `DIA-VUE-CU-018`. **Pregunta:** ¿Qué objetivos y actores participan en Compras de materiales?
+**Identificador:** `DIA-VUE-CU-018`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -19,33 +21,33 @@ direction LR
     actor warehouse("Personal de almacén")
 
     systemBoundary receiptPackage1["Nexus · Compras de materiales"]
-        ucReceiptQuery("CU-ENT-01 Consultar compras de material")
-        ucReceiptCreate("CU-ENT-02 Crear compra de material")
-        ucReceiptEdit("CU-ENT-03 Editar compra de material")
-        ucReceiptCorrect("CU-ENT-04 Corregir material de una compra")
-        ucReceiptCancel("CU-ENT-05 Cancelar material de una compra")
-        ucPurchaseReport("CU-ENT-06 Generar reporte de compras de material")
-        supplierExtension("CU-CAT-02 Crear proveedor")
-        materialExtension("CU-ALM-02 Crear material")
+        ucReceiptQuery("CU-ENT-01 Consultar")
+        ucReceiptCreate("CU-ENT-02 Crear")
+        ucReceiptEdit("CU-ENT-03 Editar")
+        ucReceiptCorrect("CU-ENT-04 Corregir detalle")
+        ucReceiptCancel("CU-ENT-05 Cancelar detalle")
+        ucPurchaseReport("CU-ENT-06 Generar reporte")
     end
 
-    supplierExtension ..>:extend ucReceiptCreate
-    materialExtension ..>:extend ucReceiptCreate
 
     warehouse -- ucReceiptQuery
-    warehouse -- supplierExtension
-    warehouse -- materialExtension
     warehouse -- ucReceiptCreate
     warehouse -- ucReceiptEdit
     warehouse -- ucReceiptCorrect
     warehouse -- ucReceiptCancel
     warehouse -- ucPurchaseReport
+
+    ucReceiptCreate ..>:extend ucReceiptQuery
+    ucReceiptEdit ..>:extend ucReceiptQuery
+    ucReceiptCorrect ..>:extend ucReceiptQuery
+    ucReceiptCancel ..>:extend ucReceiptQuery
+    ucPurchaseReport ..>:extend ucReceiptQuery
 ```
 
 
 ## Compras de consumibles
 
-**Identificador:** `DIA-VUE-CU-019`. **Pregunta:** ¿Qué objetivos y actores participan en Compras de consumibles?
+**Identificador:** `DIA-VUE-CU-019`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -56,25 +58,25 @@ direction LR
     actor warehouse("Personal de almacén")
 
     systemBoundary receiptPackage2["Nexus · Compras de consumibles"]
-        ucConsumableReceiptQuery("CU-ENT-07 Consultar compras de consumible")
-        ucConsumableReceiptCreate("CU-ENT-08 Crear compra de consumible")
-        ucConsumableReceiptEdit("CU-ENT-09 Editar compra de consumible")
-        ucConsumableReceiptCorrect("CU-ENT-10 Corregir consumible de una compra")
-        ucConsumableReceiptCancel("CU-ENT-11 Cancelar consumible de una compra")
-        ucConsumablePurchaseReport("CU-ENT-12 Generar reporte de compras de consumible")
-        supplierExtension("CU-CAT-02 Crear proveedor")
-        consumableExtension("CU-ALM-18 Crear consumible")
+        ucConsumableReceiptQuery("CU-ENT-07 Consultar")
+        ucConsumableReceiptCreate("CU-ENT-08 Crear")
+        ucConsumableReceiptEdit("CU-ENT-09 Editar")
+        ucConsumableReceiptCorrect("CU-ENT-10 Corregir detalle")
+        ucConsumableReceiptCancel("CU-ENT-11 Cancelar detalle")
+        ucConsumablePurchaseReport("CU-ENT-12 Generar reporte")
     end
 
-    supplierExtension ..>:extend ucConsumableReceiptCreate
-    consumableExtension ..>:extend ucConsumableReceiptCreate
 
     warehouse -- ucConsumableReceiptQuery
-    warehouse -- supplierExtension
-    warehouse -- consumableExtension
     warehouse -- ucConsumableReceiptCreate
     warehouse -- ucConsumableReceiptEdit
     warehouse -- ucConsumableReceiptCorrect
     warehouse -- ucConsumableReceiptCancel
     warehouse -- ucConsumablePurchaseReport
+
+    ucConsumableReceiptCreate ..>:extend ucConsumableReceiptQuery
+    ucConsumableReceiptEdit ..>:extend ucConsumableReceiptQuery
+    ucConsumableReceiptCorrect ..>:extend ucConsumableReceiptQuery
+    ucConsumableReceiptCancel ..>:extend ucConsumableReceiptQuery
+    ucConsumablePurchaseReport ..>:extend ucConsumableReceiptQuery
 ```

@@ -5,6 +5,7 @@
 | Identificador | `CU-ENT-10` |
 | Nombre | Corregir consumible de una compra. |
 | Actor | Personal de almacén o Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ENT-07` en **Acciones sobre los resultados** (después del paso 4, flujo A3) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Detecta una diferencia en un consumible de una compra y abre la corrección del detalle. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle existen.<br>4. El detalle se encuentra en un estado que admite corrección. |
 | Flujo principal | 1. **Actor:** selecciona un consumible de la compra y abre «Corregir detalle» **(ver E1)**.<br>2. **Nexus:** muestra el detalle y sus valores actuales y habilita «Cantidad correcta» y «Costo por presentación correcto».<br>3. **Actor:** captura la corrección y la confirma **(ver A1)**.<br>4. **Nexus:** valida que la cantidad corregida sea positiva y no exceda la recibida, que el costo sea positivo, que exista una diferencia y que el inventario permita aplicar la reducción **(ver E2)**; actualiza detalle, existencia, movimiento, totales e historial como una sola operación y confirma **(ver EOP)**. |

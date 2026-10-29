@@ -4,7 +4,7 @@ La [leyenda del modelo](index.md#alcance-y-notación) define actores, asociacion
 
 ## Áreas
 
-**Identificador:** `DIA-VUE-CU-012`. **Pregunta:** ¿Qué objetivos y actores participan en Áreas?
+**Identificador:** `DIA-VUE-CU-012`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -17,20 +17,23 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage3["Nexus · Áreas"]
-        ucAreaQuery("CU-CAT-09 Consultar área")
-        ucAreaCreate("CU-CAT-10 Crear área")
-        ucAreaEdit("CU-CAT-11 Editar área")
+        ucAreaQuery("CU-CAT-09 Consultar")
+        ucAreaCreate("CU-CAT-10 Crear")
+        ucAreaEdit("CU-CAT-11 Editar")
     end
 
     admin -- ucAreaQuery
     admin -- ucAreaCreate
     admin -- ucAreaEdit
+
+    ucAreaCreate ..>:extend ucAreaQuery
+    ucAreaEdit ..>:extend ucAreaQuery
 ```
 
 
 ## Roles
 
-**Identificador:** `DIA-VUE-CU-013`. **Pregunta:** ¿Qué objetivos y actores participan en Roles?
+**Identificador:** `DIA-VUE-CU-013`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -41,20 +44,23 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage4["Nexus · Roles"]
-        ucRoleQuery("CU-CAT-12 Consultar rol")
-        ucRoleCreate("CU-CAT-13 Crear rol")
-        ucRoleEdit("CU-CAT-14 Editar rol")
+        ucRoleQuery("CU-CAT-12 Consultar")
+        ucRoleCreate("CU-CAT-13 Crear")
+        ucRoleEdit("CU-CAT-14 Editar")
     end
 
     admin -- ucRoleQuery
     admin -- ucRoleCreate
     admin -- ucRoleEdit
+
+    ucRoleCreate ..>:extend ucRoleQuery
+    ucRoleEdit ..>:extend ucRoleQuery
 ```
 
 
 ## Presentaciones
 
-**Identificador:** `DIA-VUE-CU-014`. **Pregunta:** ¿Qué objetivos y actores participan en Presentaciones?
+**Identificador:** `DIA-VUE-CU-014`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -65,20 +71,23 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage5["Nexus · Presentaciones"]
-        ucPresentationQuery("CU-CAT-15 Consultar presentación")
-        ucPresentationCreate("CU-CAT-16 Crear presentación")
-        ucPresentationEdit("CU-CAT-17 Editar presentación")
+        ucPresentationQuery("CU-CAT-15 Consultar")
+        ucPresentationCreate("CU-CAT-16 Crear")
+        ucPresentationEdit("CU-CAT-17 Editar")
     end
 
     admin -- ucPresentationQuery
     admin -- ucPresentationCreate
     admin -- ucPresentationEdit
+
+    ucPresentationCreate ..>:extend ucPresentationQuery
+    ucPresentationEdit ..>:extend ucPresentationQuery
 ```
 
 
 ## Unidades de medida
 
-**Identificador:** `DIA-VUE-CU-015`. **Pregunta:** ¿Qué objetivos y actores participan en Unidades de medida?
+**Identificador:** `DIA-VUE-CU-015`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -89,20 +98,23 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage6["Nexus · Unidades de medida"]
-        ucUnitMeasureQuery("CU-CAT-18 Consultar unidad de medida")
-        ucUnitMeasureCreate("CU-CAT-19 Crear unidad de medida")
-        ucUnitMeasureEdit("CU-CAT-20 Editar unidad de medida")
+        ucUnitMeasureQuery("CU-CAT-18 Consultar")
+        ucUnitMeasureCreate("CU-CAT-19 Crear")
+        ucUnitMeasureEdit("CU-CAT-20 Editar")
     end
 
     admin -- ucUnitMeasureQuery
     admin -- ucUnitMeasureCreate
     admin -- ucUnitMeasureEdit
+
+    ucUnitMeasureCreate ..>:extend ucUnitMeasureQuery
+    ucUnitMeasureEdit ..>:extend ucUnitMeasureQuery
 ```
 
 
 ## Motivos de ajuste
 
-**Identificador:** `DIA-VUE-CU-016`. **Pregunta:** ¿Qué objetivos y actores participan en Motivos de ajuste?
+**Identificador:** `DIA-VUE-CU-016`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -113,20 +125,23 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage7["Nexus · Motivos de ajuste"]
-        ucAdjustmentReasonQuery("CU-CAT-21 Consultar motivo de ajuste")
-        ucAdjustmentReasonCreate("CU-CAT-22 Crear motivo de ajuste")
-        ucAdjustmentReasonEdit("CU-CAT-23 Editar motivo de ajuste")
+        ucAdjustmentReasonQuery("CU-CAT-21 Consultar")
+        ucAdjustmentReasonCreate("CU-CAT-22 Crear")
+        ucAdjustmentReasonEdit("CU-CAT-23 Editar")
     end
 
     admin -- ucAdjustmentReasonQuery
     admin -- ucAdjustmentReasonCreate
     admin -- ucAdjustmentReasonEdit
+
+    ucAdjustmentReasonCreate ..>:extend ucAdjustmentReasonQuery
+    ucAdjustmentReasonEdit ..>:extend ucAdjustmentReasonQuery
 ```
 
 
 ## Estados de cumplimiento
 
-**Identificador:** `DIA-VUE-CU-017`. **Pregunta:** ¿Qué objetivos y actores participan en Estados de cumplimiento?
+**Identificador:** `DIA-VUE-CU-017`. **Pregunta:** ¿Cómo se relacionan la consulta, las operaciones y sus actores en este recurso?
 
 **Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
 
@@ -137,12 +152,15 @@ direction LR
     actor admin("Administrador del sistema")
 
     systemBoundary catalogPackage8["Nexus · Estados de cumplimiento"]
-        ucFulfillmentStatusQuery("CU-CAT-24 Consultar estado de cumplimiento")
-        ucFulfillmentStatusCreate("CU-CAT-25 Crear estado de cumplimiento")
-        ucFulfillmentStatusEdit("CU-CAT-26 Editar estado de cumplimiento")
+        ucFulfillmentStatusQuery("CU-CAT-24 Consultar")
+        ucFulfillmentStatusCreate("CU-CAT-25 Crear")
+        ucFulfillmentStatusEdit("CU-CAT-26 Editar")
     end
 
     admin -- ucFulfillmentStatusQuery
     admin -- ucFulfillmentStatusCreate
     admin -- ucFulfillmentStatusEdit
+
+    ucFulfillmentStatusCreate ..>:extend ucFulfillmentStatusQuery
+    ucFulfillmentStatusEdit ..>:extend ucFulfillmentStatusQuery
 ```

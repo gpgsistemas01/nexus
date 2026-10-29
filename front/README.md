@@ -1,10 +1,14 @@
 # Nexus · Frontend
 
-Base de Vue 3 con TypeScript, componentes `.vue`, Composition API (`<script setup>`)
-y Vite, creada con la plantilla oficial `create-vite`. El login en `/inicio-sesion`
-usa Vuetify y VeeValidate y está conectado a Express. Materiales, Consumibles y
-Mermas, los seis catálogos administrables, Personas, Usuarios, Clientes,
-Proveedores, Compras, Salidas y los historiales de Movimientos se sirven en Vue.
+Cliente web de Nexus para consultar inventario, registrar compras y salidas y operar
+materiales, consumibles y mermas según los permisos de la cuenta. Incluye catálogos,
+Personas, Usuarios, Clientes, Proveedores, Movimientos y reportes autorizados.
+
+La aplicación usa Vue 3, TypeScript, Composition API (`<script setup>`) y Vite.
+El login en `/inicio-sesion` usa Vuetify y VeeValidate y consume la API del sistema.
+La [descripción del producto](docs/requirements/vision-scope-and-requirements/03-product-description.md)
+presenta su uso operativo y el [alcance](docs/requirements/vision-scope-and-requirements/06-current-scope.md)
+identifica las capacidades vigentes.
 
 ## Iniciar sesión
 

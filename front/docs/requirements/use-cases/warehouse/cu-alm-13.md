@@ -5,6 +5,7 @@
 | Identificador | `CU-ALM-13` |
 | Nombre | Agregar existencia de merma. |
 | Actor | Personal de almacén; Administrador del sistema. |
+| Relaciones entre casos | Extiende `CU-ALM-09` en **Acciones sobre los resultados** (después del paso 4, flujo A5) bajo la condición: elección del actor, permiso de la operación y estado admitido del registro o documento. Al completar o cancelar la operación retorna al paso 5 de la consulta. |
 | Disparador | Recibe o identifica una cantidad adicional de una merma ya registrada y selecciona **Agregar stock**. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor tiene autorización para agregar existencias de merma.<br>3. La merma existe. |
 | Flujo principal | 1. **Actor:** abre **Agregar stock** sobre una merma **(ver E1)**.<br>2. **Nexus:** abre un modal específico para la operación; muestra la identidad y la existencia actual como información de sólo lectura y solicita la cantidad a agregar y observaciones opcionales del documento de entrada.<br>3. **Actor:** captura una cantidad positiva, registra la nota si corresponde y confirma **(ver A1)**.<br>4. **Nexus:** suma la cantidad y crea un documento individual de entrada con folio, actor, observaciones, cantidad y saldos, vinculado a su movimiento de entrada, como una sola operación, sin cambios parciales; cierra el modal, actualiza el listado y confirma **(ver EOP)**. |
