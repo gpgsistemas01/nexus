@@ -7,10 +7,9 @@
 | Administrador del sistema, en Sistemas | Todas las capacidades vigentes, incluidos ajustes, Personas, Usuarios, Directorio, catálogos y consulta independiente de movimientos. | La API comprueba la autorización en cada operación. |
 
 Los permisos proceden de la sesión y de las asignaciones de la cuenta. Si tiene
-varias, combina sus accesos autorizados. Las
-[áreas operativas](../vision-scope-and-requirements/02-users-and-areas.md#áreas-operativas)
-son Impresión, Taller/Herrería, Acabados, Router, PT/Tráfico e Instalaciones;
-Instalaciones utiliza el rol Instalador.
+varias, combina sus accesos autorizados. El catálogo de áreas y los roles
+operativos se describen en
+[Usuarios y áreas](../vision-scope-and-requirements/02-users-and-areas.md#áreas-operativas).
 
 Dirección aún no tiene acceso definido y Ventas no tiene acceso vigente. Figurar
 como solicitante, asesor, receptor, cliente o proveedor en un documento no convierte
@@ -27,10 +26,9 @@ a ese registro en una cuenta ni le concede permisos.
 
 ## Alta contextual de clientes y proveedores
 
-Almacén puede buscar y crear Clientes/Proveedores desde los selectores autorizados.
-El alta abre un modal y vuelve con el nuevo registro seleccionado. Cancelar conserva
-la captura principal; un registro confirmado permanece aunque después se abandone
-la operación de origen. Las páginas independientes, su edición y sus reportes
-corresponden a Sistemas.
+Almacén conserva la búsqueda y el alta de Clientes/Proveedores desde los selectores
+autorizados. Las páginas independientes, su edición y sus reportes corresponden a
+Sistemas. La interacción del alta y su independencia del documento principal se
+rigen por `RF-VUE-012` y sus criterios de aceptación.
 
 Los [casos de uso](../use-cases/index.md) detallan los recorridos por actor.

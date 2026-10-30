@@ -1,14 +1,16 @@
-# 1. Propósito y alcance
+# 1. Propósito y alcance de la especificación
 
-Esta especificación define las funciones, reglas y restricciones de Nexus que
-utiliza la aplicación Vue. El [catálogo](catalog/index.md) reúne las obligaciones
-del producto y la [especificación del cliente](client-specification.md), las de
-navegación, captura e interacción.
+Esta especificación permite a negocio, Almacén, Sistemas, desarrollo y pruebas
+revisar los resultados exigidos a Nexus. Incluye funciones, reglas, datos,
+restricciones y criterios verificables del producto y su cliente Vue.
 
-El cliente presenta datos y operaciones; la API comprueba permisos, valida y
-confirma los cambios. Los [casos de uso](../use-cases/index.md) describen los pasos
-y resultados esperados por operación.
+La [descripción del producto](../vision-scope-and-requirements/01-product-overview.md)
+explica el propósito del software y sus funciones; el
+[alcance](../vision-scope-and-requirements/03-current-scope.md), sus límites.
+El [catálogo](catalog/index.md) y los
+[requisitos del cliente](client-specification.md) conservan las obligaciones;
+los [casos de uso](../use-cases/index.md), los recorridos para cumplirlas.
 
-El [alcance actual](../vision-scope-and-requirements/03-current-scope.md) identifica
-las capacidades incluidas y excluidas. Las [convenciones](02-conventions.md)
-explican los identificadores y estados usados en esta especificación.
+La identificación, versión y estado documental se conservan en la
+[entrada de la colección](../../index.md); las referencias y su aplicación,
+en [Estándares](../../governance/03-standard-applicability.md).

@@ -1,21 +1,17 @@
 # Requisitos y casos de uso
 
-Nexus controla inventario, compras y salidas de materiales, consumibles y mermas.
-Esta colección describe sus capacidades, reglas y recorridos de usuario.
+Esta colección describe el contexto de Nexus, las obligaciones del producto y los
+objetivos que realizan sus usuarios.
 
-## Encontrar información
-
-| Necesito saber… | Consultar |
+| Información | Fuente principal |
 | --- | --- |
-| Qué hace el sistema y qué queda fuera | [Visión y alcance](vision-scope-and-requirements/index.md). |
-| Qué datos del negocio conserva y qué calidad se espera | [Datos y trazabilidad](vision-scope-and-requirements/03-current-scope.md#datos-y-trazabilidad) y [necesidades de calidad](vision-scope-and-requirements/03-current-scope.md#necesidades-de-calidad). |
-| Quién puede realizar una operación | [Actores y responsabilidades](requirements-specification/03-actors-and-system-responsibilities.md). |
-| Qué reglas y excepciones aplican | [Consulta por tema](requirements-specification/index.md#consulta-rápida-de-reglas-y-excepciones). |
-| Qué se puede modificar y qué efecto tiene | [Modos de operación](requirements-specification/06-operation-modes-and-effects.md). |
-| Cuáles son los pasos y cómo se resuelve un rechazo | [Casos de uso](use-cases/index.md). |
-| Cómo se relacionan actores y objetivos | [Diagramas de casos de uso](use-case-model/index.md). |
-| Qué significa un término o un estado | [Glosario](business-glossary.md) y [modelo de dominio](domain-model/index.md). |
-| Qué requisito corresponde a una capacidad | [Mapa por capacidad](01-applicability-and-traceability.md). |
+| Propósito, funciones, usuarios y alcance | [Descripción general del producto](vision-scope-and-requirements/index.md). |
+| Reglas, datos, permisos y condiciones verificables | [Especificación de requisitos](requirements-specification/index.md). |
+| Conceptos y relaciones del negocio | [Glosario](business-glossary.md) y [modelo de dominio](domain-model/index.md). |
+| Objetivos, pasos, alternativas y excepciones | [Casos de uso](use-cases/index.md) y [modelo visual](use-case-model/index.md). |
+| Relaciones entre requisitos, casos, manuales y diagramas | [Mapa por capacidad](01-applicability-and-traceability.md). |
 
-La implementación se explica en [Arquitectura](../architecture/index.md) y sus
-comprobaciones en [Pruebas](../testing/index.md).
+La [cobertura de pruebas](../testing/04-use-case-coverage.md) registra la evidencia;
+[Arquitectura](../architecture/index.md) explica la implementación. La
+[aplicación de estándares](../governance/03-standard-applicability.md#organización-de-la-información-de-requisitos)
+define la correspondencia documental con las referencias ISO adoptadas.

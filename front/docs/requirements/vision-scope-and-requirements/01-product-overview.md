@@ -1,10 +1,12 @@
-# 1. Producto y objetivos
+# 1. Descripción del producto
+
+## Propósito
 
 Nexus es la aplicación web de GPG para controlar materiales, consumibles y mermas.
-Reúne existencias, documentos, cantidades, costos y participantes de la operación
-del almacén.
+Relaciona existencias, documentos, cantidades, costos y participantes de la
+operación del almacén.
 
-## Necesidad y valor esperado
+## Necesidad y objetivos
 
 Los registros dispersos dificultan conciliar existencias, explicar diferencias y
 supervisar entregas. Nexus busca conservar el vínculo de cada cantidad, costo o
@@ -17,33 +19,36 @@ entrega con su documento de origen y las personas que participaron.
 | Delimitar responsabilidades | Distinguir personas de cuentas y permitir sólo operaciones y áreas autorizadas. |
 | Apoyar la supervisión | Buscar documentos y descargar información operativa autorizada para revisar saldos y entregas. |
 
-Estos son resultados esperados. Sus indicadores, línea base, metas, período de
-medición y responsables siguen [pendientes de acuerdo](04-open-decisions.md).
+Los indicadores, línea base, metas, período de medición y responsables están en
+[Decisiones pendientes](04-open-decisions.md).
 
-## Relación con la operación del almacén
+## Perspectiva del producto
 
-| Momento | Información y resultado |
+El cliente Vue es la interfaz web de Nexus. Permite consultar información,
+capturar documentos y conocer el resultado de las operaciones mediante la API.
+El servicio comprueba acceso y reglas y confirma documentos, existencias e historia.
+Los [actores y responsabilidades](../requirements-specification/03-actors-and-system-responsibilities.md)
+precisan esa frontera.
+
+El almacén registra recepciones, atiende solicitudes de las áreas y recibe
+las devoluciones. Personas, áreas, clientes y proveedores identifican participantes
+y destinos; el número de proyecto aporta contexto a la salida. La aplicación
+conserva los hechos registrados, mientras el personal realiza y comprueba la
+operación física.
+
+## Funciones principales
+
+| Función | Resultado para el usuario |
 | --- | --- |
-| Recibir una compra | Proveedor, comprobante, receptor y detalles recibidos, con cantidades, costos e importes. Confirmar la recepción incrementa las existencias. |
-| Solicitar una salida | Cliente, área, asesor, solicitante, proyecto y artículos requeridos. Se crea un documento pendiente; solicitar no equivale a entregar ni descontar existencias. |
-| Surtir y devolver | Cantidades entregadas o devueltas y estado de cumplimiento. Cada acción confirma su efecto en el inventario conforme al permiso y estado del documento. |
-| Controlar existencias | Ofertas de materiales y consumibles por proveedor, inventario propio de mermas y movimientos que explican sus cambios. |
-| Consultar y supervisar | Listados filtrados, folios, estados y reportes Excel del ámbito autorizado. |
+| Acceso e identidad | Iniciar, renovar y cerrar sesión; administrar personas, cuentas y asignaciones. |
+| Inventario | Consultar y mantener Materiales, Consumibles y Mermas, sus ofertas por proveedor y existencias; registrar entradas de merma y ajustes autorizados. |
+| Catálogos de apoyo | Mantener Áreas, Roles, Presentaciones, Unidades de medida, Motivos de ajuste y Estados de cumplimiento. |
+| Clientes y proveedores | Incorporar el contexto comercial de compras y salidas mediante los registros autorizados. |
+| Compras | Registrar recepciones de materiales o consumibles, editar encabezados, agregar detalles y corregir o cancelar detalles conservando su historia. |
+| Salidas | Solicitar materiales, consumibles o mermas, editar las solicitudes permitidas, surtirlas y registrar devoluciones. |
+| Consultas y reportes | Buscar documentos y movimientos por contexto y descargar reportes Excel autorizados de inventario, compras, salidas, directorio e identidad. |
 
-Personas, áreas, clientes y proveedores identifican a los participantes y el destino
-de las operaciones. La cuenta de usuario permite ingresar; aparecer en un documento
-no concede acceso. El proyecto aporta contexto a la salida, sin un módulo de gestión.
-
-## Uso desde Vue
-
-La cuenta ve las páginas y acciones permitidas. Desde una consulta puede revisar
-registros y abrir sus formularios. Si falta una opción y tiene permiso para crearla,
-el selector permite abrir el alta, guardar y volver con el nuevo registro seleccionado
-sin perder la captura principal.
-
-Los formularios señalan errores corregibles y comunican el resultado del guardado.
-La actualización de listados conserva una captura en curso. Los cálculos mostrados
-antes de guardar son estimaciones; cantidades e importes se confirman con el servicio.
-
-El [alcance](03-current-scope.md) reúne capacidades y límites; los
-[usuarios y áreas](02-users-and-areas.md), sus participantes.
+Los [usuarios y áreas](02-users-and-areas.md) describen el contexto de uso;
+el [alcance](03-current-scope.md), sus límites y dependencias. Las condiciones,
+campos y efectos de cada acción se especifican en
+[Operaciones](../requirements-specification/06-operation-modes-and-effects.md).

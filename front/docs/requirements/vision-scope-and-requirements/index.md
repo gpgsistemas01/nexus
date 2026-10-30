@@ -1,11 +1,11 @@
-# Visión y alcance
+# Descripción general, visión y alcance
 
-| Consulta | Contenido |
+| Capítulo | Contenido |
 | --- | --- |
-| [1. Producto y objetivos](01-product-overview.md) | Necesidad, objetivos y recorrido del almacén. |
-| [2. Usuarios y áreas](02-users-and-areas.md) | Participantes, límites de acceso y contexto organizacional. |
-| [3. Alcance actual](03-current-scope.md) | Capacidades, datos del negocio, calidad, exclusiones y condiciones de uso. |
+| [1. Descripción del producto](01-product-overview.md) | Propósito, necesidad, objetivos, perspectiva y funciones principales. |
+| [2. Contexto organizacional y usuarios](02-users-and-areas.md) | Partes interesadas, áreas, perfiles y características de uso. |
+| [3. Alcance y condiciones de uso](03-current-scope.md) | Límites funcionales, información del negocio, calidad, supuestos y dependencias. |
 | [4. Decisiones pendientes](04-open-decisions.md) | Acuerdos, participantes de la revisión y riesgos. |
 
-Las reglas de cada operación se consultan en la
+Las obligaciones y condiciones de cada operación se definen en la
 [especificación de requisitos](../requirements-specification/index.md).

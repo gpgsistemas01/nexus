@@ -29,9 +29,15 @@ comprobado. La aceptación funcional se registra por entrega.
 
 ## Calidad de la redacción
 
-Cada requisito expresa una obligación con condiciones y resultado comprobables.
-Usa los términos del [glosario](../business-glossary.md); los pasos completos van
-en el caso de uso y los detalles de implementación, en Arquitectura.
+Cada requisito tiene una obligación principal, condiciones y resultado comprobables.
+Los criterios enumerables se identifican mediante `CA-*`. La redacción utiliza los
+términos del [glosario](../business-glossary.md), evita expresiones ambiguas y
+mantiene consistencia con permisos, casos y estados. Las medidas de calidad que aún
+no se han acordado conservan su estado Propuesto.
+
+Los pasos completos pertenecen al caso de uso; los nombres de archivos y decisiones
+de implementación, a Arquitectura. Las relaciones con las funciones y pruebas se
+mantienen en [Trazabilidad](05-requirement-traceability-rules.md) y en la cobertura.
 
 | Expresión imprecisa | Resultado comprobable |
 | --- | --- |

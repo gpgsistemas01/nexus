@@ -12,7 +12,7 @@ disponibles.
 | Proyectos: negocio y Almacén | Fuente de datos, responsable y necesidad de administración futura. | Confundir el contexto de una salida con gestión de proyectos. |
 | Calidad del servicio: usuarios y operación técnica | Tiempos de respuesta, volumen, concurrencia, disponibilidad, respaldo, recuperación y pérdida admisible de datos, con medios de comprobación. | Prometer niveles de servicio sin medidas ni recursos acordados. |
 | Compatibilidad: usuarios y Sistemas | Navegadores, versiones, dispositivos, escenarios críticos y política de soporte. Las pruebas actuales usan Chromium. | Deducir compatibilidad general a partir de un solo motor. |
-| Accesibilidad: usuarios, negocio y Sistemas | Necesidades de asistencia, criterios exigibles y evaluación de recorridos. | Atribuir accesibilidad a la biblioteca visual sin comprobar la operación. |
+| Características de usuarios y accesibilidad: usuarios, negocio y Sistemas | Experiencia, formación, necesidades de asistencia, criterios exigibles y evaluación de recorridos. | Atribuir accesibilidad a la biblioteca visual sin comprobar la operación. |
 | Datos e historia: negocio y Sistemas | Clasificación, retención, protección y alcance requerido de auditoría. | Conservar información insuficiente para las necesidades de revisión o protección. |
 | Puesta en operación: Almacén y Sistemas | Responsables de capturar y validar cuentas, catálogos y existencias iniciales. | Iniciar con datos o accesos incorrectos. |
 

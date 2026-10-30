@@ -1,5 +1,12 @@
 # Especificación de requisitos
 
+## Descripción general
+
+El [producto](../vision-scope-and-requirements/01-product-overview.md), sus
+[usuarios](../vision-scope-and-requirements/02-users-and-areas.md) y su
+[alcance](../vision-scope-and-requirements/03-current-scope.md) sitúan las obligaciones
+que se especifican a continuación.
+
 ## Consulta rápida de reglas y excepciones
 
 | Busco… | Consultar |

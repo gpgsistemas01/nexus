@@ -1,47 +1,15 @@
-# 3. Alcance actual
+# 3. Alcance y condiciones de uso
 
-## Incluido
+## Alcance funcional
 
-| Capacidad | Operaciones incluidas | Requisitos |
-| --- | --- | --- |
-| Acceso e identidad | Iniciar, renovar y cerrar sesión; administrar personas, cuentas y asignaciones de acceso o responsabilidad. | [Acceso e identidad](../requirements-specification/catalog/01-access-and-identity.md). |
-| Inventario | Consultar y mantener Materiales, Consumibles y Mermas; agregar stock de merma y aplicar ajustes autorizados, con historia y movimientos. | [Catálogos](../requirements-specification/catalog/02-catalogs-operational-and-commercial.md) e [inventario](../requirements-specification/catalog/03-receipts-issues-and-inventory.md). |
-| Catálogos de apoyo | Administrar Áreas, Roles, Presentaciones, Unidades de medida, Motivos de ajuste y Estados de cumplimiento. Otros estados técnicos no son catálogos administrables vigentes. | [Catálogos](../requirements-specification/catalog/02-catalogs-operational-and-commercial.md). |
-| Clientes y proveedores | Crear registros desde selectores de Almacén; consultar, editar y exportar desde las páginas de Sistemas. | [Directorio](../use-cases/directory/index.md). |
-| Compras | Registrar recepciones de materiales o consumibles, editar encabezados y agregar detalles nuevos; corregir o cancelar detalles conservando importes, historia y movimientos. | [Compras](../use-cases/purchases/index.md). |
-| Salidas | Crear y editar solicitudes separadas de materiales, consumibles o mermas. Surtir detalles completos; el documento puede quedar parcialmente surtido si quedan otros pendientes. Devolver sólo después de surtir la salida completa. | [Salidas](../use-cases/issues/index.md). |
-| Consultas y reportes | Filtrar información y descargar reportes Excel autorizados de inventario, documentos, clientes, proveedores, personas, usuarios y movimientos. | [Consultas y reportes](../requirements-specification/catalog/04-queries-reports-and-modeled-functions.md). |
+El producto incluye las [funciones descritas](01-product-overview.md#funciones-principales)
+para Materiales, Consumibles y Mermas. Sus capacidades vigentes, parciales,
+modeladas o propuestas se identifican por estado en el
+[catálogo de requisitos](../requirements-specification/catalog/index.md).
 
-Los [campos y efectos por acción](../requirements-specification/06-operation-modes-and-effects.md)
-precisan qué cambia, qué se conserva y cuándo se afecta el inventario.
-
-## Datos y trazabilidad
-
-| Datos del negocio | Significado y condición relevante |
-| --- | --- |
-| [Personas y cuentas](../requirements-specification/catalog/06-information-persistence-and-integrity.md) | La persona identifica participantes; la cuenta permite ingresar. Las responsabilidades organizacionales de la persona y los accesos de la cuenta se registran por separado. |
-| [Materiales y consumibles](../requirements-specification/catalog/02-catalogs-operational-and-commercial.md) | Conservan clasificación, nombre, presentación y unidad. Los materiales admiten las dimensiones permitidas por su unidad; los consumibles carecen de dimensiones. |
-| [Ofertas por proveedor](../requirements-specification/catalog/05-cross-cutting-business-policies.md#identidad-y-estado-de-registros) | Cada oferta conserva existencia, cantidad convertida, costo máximo y actividad. Otro proveedor puede ofrecer el mismo artículo sin crear otra identidad. |
-| [Mermas](../requirements-specification/catalog/04-queries-reports-and-modeled-functions.md#criterios-de-captura-de-merma) | Tienen proveedor, datos físicos, pesos y existencias propios. El material de referencia sirve como plantilla; los datos históricos no se reemplazan si cambia la oferta de origen. Rollo utiliza su muestra y pesos conforme a las reglas de captura. |
-| [Documentos](../requirements-specification/catalog/03-receipts-issues-and-inventory.md) | Las compras conservan proveedor, comprobante, receptor, fecha, detalles e importes; las salidas, cliente, área, asesor, solicitante y contexto de proyecto. Los asesores se eligen entre personas registradas. |
-| [Cliente interno](../requirements-specification/catalog/05-cross-cutting-business-policies.md#cliente-interno) | GPG INTERNO exige asesor con responsabilidad de coordinador y el número de proyecto configurado para el área de destino. Esa responsabilidad no concede acceso al sistema. |
-| [Historia y movimientos](../requirements-specification/catalog/05-cross-cutting-business-policies.md#documentos-y-trazabilidad) | Las correcciones y ajustes conservan actor, motivo y valores anteriores y nuevos. Cada movimiento tiene un origen; una salida de merma no se atribuye a una entrada específica mientras se administre como saldo. |
-| [Fechas y estados](../requirements-specification/catalog/06-information-persistence-and-integrity.md) | La fecha del negocio se distingue de la fecha técnica de registro. Los estados describen el proceso y no se deducen del momento de creación ni del formulario abierto. |
-
-Los tres contextos de inventario permanecen separados en documentos, consultas,
-selectores y reportes. Conservar la historia también implica proteger relaciones
-previas cuando un registro se desactiva o una operación se cancela.
-
-## Necesidades de calidad
-
-| Necesidad | Resultado esperado |
-| --- | --- |
-| [Integridad](../requirements-specification/catalog/06-information-persistence-and-integrity.md) | Conservar relaciones, cantidades, estados e historia ante cambios simultáneos; un rechazo no deja documentos, stock o costos modificados parcialmente. |
-| [Seguridad](../requirements-specification/catalog/07-product-operation-and-quality.md) | Proteger credenciales y datos, rechazar operaciones no autorizadas y evitar divulgar secretos en mensajes o diagnósticos. |
-| [Interacción y compatibilidad](../requirements-specification/catalog/07-product-operation-and-quality.md) | Alcanzar las acciones en pantallas angostas, comprender los errores y corregirlos sin perder el contexto. Los navegadores y dispositivos objetivo requieren acuerdo. |
-| [Rendimiento y continuidad](../requirements-specification/catalog/07-product-operation-and-quality.md#objetivos-de-calidad-por-definir) | Consultar listados paginados donde corresponda. Tiempos, concurrencia, disponibilidad y recuperación necesitan medidas y responsables acordados. |
-| [Diagnóstico y mantenimiento](../requirements-specification/catalog/07-product-operation-and-quality.md) | Reconocer fallos, conservar documentación útil y mantener consistencia de reglas y preparación del servicio. |
-| [Cambios comprobables](../requirements-specification/catalog/07-product-operation-and-quality.md) | Aplicar cambios de datos reproducibles y verificar el comportamiento con pruebas aisladas; la cobertura disponible conserva sus límites. |
+La administración de catálogos auxiliares se limita a los seis indicados en
+[Funciones principales](01-product-overview.md#funciones-principales). Otros
+estados técnicos no son catálogos administrables vigentes.
 
 ## Fuera del alcance actual
 
@@ -53,14 +21,42 @@ previas cuando un registro se desactiva o una operación se cancela.
   CRM o transportistas.
 - Eliminación física generalizada del historial operativo.
 
-## Condiciones para operar
+## Datos y trazabilidad
 
-Se necesitan cuentas autorizadas, catálogos vigentes, proveedores y clientes,
-existencias iniciales validadas, navegador compatible y conexión con la API.
-El personal registra los documentos y cantidades de los hechos del almacén;
-la aplicación no comprueba físicamente las entregas. La responsabilidad de captura
-y la preparación de los datos deben acordarse antes de la puesta en operación.
+| Información del negocio | Datos y relaciones principales |
+| --- | --- |
+| Personas y cuentas | Participantes del negocio, cuentas de ingreso, responsabilidades organizacionales y asignaciones de acceso. |
+| Materiales y consumibles | Clasificación, nombre, presentación y unidad; dimensiones de materiales cuando corresponden. Los consumibles carecen de dimensiones. |
+| Ofertas de proveedor | Artículo y proveedor asociados, existencia, cantidad convertida, costo máximo y actividad. Un artículo puede tener ofertas de varios proveedores. |
+| Mermas | Material de referencia, proveedor, datos físicos, pesos y existencias propios; muestra del rollo completo cuando la presentación es Rollo. |
+| Compras | Proveedor, comprobante, receptor, fecha, observaciones, detalles recibidos, cantidades, costos e importes. |
+| Salidas | Cliente, área, asesor, solicitante, número de proyecto, fecha, observaciones y detalles con cantidades solicitadas, surtidas y devueltas. Asesor y solicitante son personas registradas. |
+| Historia | Documentos de origen, movimientos, correcciones, cancelaciones, devoluciones y ajustes relacionados, con sus fechas y estados. |
 
-Las [condiciones de operación](../requirements-specification/07-interfaces-and-operating-conditions.md)
-describen dependencias y recuperación. Los acuerdos pendientes están en
-[Decisiones](04-open-decisions.md).
+El [glosario](../business-glossary.md) define los conceptos y el
+[modelo de dominio](../domain-model/index.md), sus relaciones. Las condiciones
+sobre identidad, datos históricos, cliente interno, saldos y fechas se especifican
+en [Políticas del negocio](../requirements-specification/catalog/05-cross-cutting-business-policies.md)
+e [Integridad](../requirements-specification/catalog/06-information-persistence-and-integrity.md).
+
+## Necesidades de calidad
+
+Las condiciones verificables se agrupan en
+[Operación y calidad](../requirements-specification/catalog/07-product-operation-and-quality.md)
+y [Requisitos de datos](../requirements-specification/catalog/06-information-persistence-and-integrity.md).
+La interacción y recuperación del navegador se detallan en los
+[requisitos del cliente](../requirements-specification/client-specification.md).
+Los objetivos de servicio aún por acordar figuran en [Decisiones](04-open-decisions.md).
+
+## Supuestos, restricciones y dependencias
+
+La operación supone que el personal autorizado registra documentos y cantidades
+correspondientes a los hechos del almacén. La responsabilidad de captura y la
+validación de cuentas, catálogos y existencias iniciales requieren acuerdo antes
+de la puesta en operación.
+
+La aplicación depende de un navegador compatible y del servicio API. Sus
+intercambios, datos de preparación y respuestas ante fallos se definen en
+[Condiciones de operación](../requirements-specification/07-interfaces-and-operating-conditions.md).
+Los cálculos mostrados durante la captura son estimaciones; el servicio confirma
+los saldos e importes según los requisitos del cliente.

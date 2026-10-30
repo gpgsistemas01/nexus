@@ -1,48 +1,58 @@
-# 2. Usuarios y áreas
+# 2. Contexto organizacional y usuarios
 
-## Participantes del negocio
+## Partes interesadas y necesidades
 
-| Grupo | Participación y límites |
+| Grupo | Necesidad o participación |
 | --- | --- |
-| Personal de Almacén | Registrar recepciones, mantener el inventario autorizado, surtir y recibir devoluciones. Auxiliar y Coordinador tienen el mismo acceso operativo y preparan salidas para todas las áreas. Las altas de clientes/proveedores se hacen desde selectores; su mantenimiento independiente y los ajustes administrativos corresponden a Sistemas. |
-| Áreas operativas | Consultar existencias y registrar o editar solicitudes para sus áreas autorizadas. No modifican inventario ni realizan surtidos, devoluciones o administración de catálogos. |
-| Sistemas / Administrador del sistema | Administrar personas, cuentas, accesos y catálogos, y ejecutar las capacidades operativas vigentes. Incluye ajustes y consulta independiente de movimientos. |
-| Dirección | Supervisar resultados para tomar decisiones. Sus accesos, indicadores y reportes específicos están pendientes de definición. |
-| Áreas solicitantes futuras | Plantear necesidades de suministro y responsabilidades de solicitud. Su acceso como usuarios requiere definición. |
-| Clientes y proveedores | Identificar el contexto comercial de salidas y recepciones. Son registros del negocio, sin acceso propio a Nexus. |
-| Desarrollo y pruebas | Mantener y comprobar funciones, autorizaciones e integridad. La evidencia técnica no sustituye la aceptación funcional. |
+| Personal de Almacén | Controlar recepciones y existencias, atender solicitudes, documentar entregas y devoluciones y explicar diferencias de inventario. |
+| Áreas operativas | Conocer la disponibilidad y solicitar los artículos que necesitan para sus actividades. |
+| Sistemas | Mantener personas, cuentas, accesos y catálogos; supervisar las operaciones protegidas del sistema. |
+| Dirección | Disponer de información para supervisar resultados y tomar decisiones. |
+| Áreas solicitantes futuras | Plantear necesidades de suministro y responsabilidades de solicitud. |
+| Clientes y proveedores | Identificar el destino comercial de las salidas y el origen de las recepciones. |
+| Desarrollo y pruebas | Mantener las funciones y comprobar reglas, autorizaciones e integridad. |
 
-El responsable de aprobar objetivos y alcance está por designar. La participación
-de Sistemas o Dirección no les atribuye esa aprobación.
+Los permisos vigentes se definen en
+[Actores y responsabilidades](../requirements-specification/03-actors-and-system-responsibilities.md).
+La autoridad de aceptación y los nuevos accesos se tratan en
+[Decisiones pendientes](04-open-decisions.md).
 
 ## Áreas operativas
 
-Impresión, Taller/Herrería, Acabados, Router, PT/Tráfico e Instalaciones tienen
-acceso operativo. Usan los roles Coordinador y Operador; Instalaciones utiliza
-Instalador en lugar de Operador. Las cuentas con varias asignaciones combinan
-sus accesos autorizados.
+Los perfiles operativos corresponden a Impresión, Taller/Herrería, Acabados,
+Router, PT/Tráfico e Instalaciones. Los roles son Coordinador y Operador;
+Instalaciones utiliza Instalador en lugar de Operador. En Almacén se utilizan
+Auxiliar y Coordinador. Taller/Herrería y Taller 3D identifican la misma área.
 
 ## Contexto organizacional
 
-El catálogo de áreas se utiliza en responsabilidades de personas, asignaciones
-de acceso y destinos de salidas. Figurar en él no concede permisos.
-En esta tabla, «operativa» se refiere al acceso descrito en la sección anterior.
+El catálogo de áreas relaciona responsabilidades de personas, asignaciones de
+acceso y destinos de salidas. Su presencia en el catálogo no define los permisos.
 
-| Área | Participación en Nexus |
+| Área | Participación en la operación |
 | --- | --- |
-| Dirección | Supervisión; acceso y casos de uso por definir. |
-| Acabados | Operativa y referencia para responsabilidades de personas. |
+| Dirección | Supervisión de resultados. |
+| Acabados | Referencia operativa de solicitudes y responsabilidades de personas. |
 | Administrativo | Referencia organizacional y de catálogos autorizados. |
 | Almacén y proveduría | Recepciones, existencias, mermas, salidas, surtidos y devoluciones. |
 | Diseño | Responsabilidades de personas y destino de salidas. |
-| Instalaciones | Operativa y referencia para responsabilidades de personas. |
-| Impresión | Operativa y referencia para responsabilidades de personas. |
-| Router | Operativa y referencia para responsabilidades de personas. |
-| PT/Tráfico | Operativa y referencia para responsabilidades de personas. |
-| Servicios y vigilancia | Referencia organizacional y destino de salidas; sin acceso atribuido por su presencia en el catálogo. |
+| Instalaciones | Referencia operativa de solicitudes y responsabilidades de personas. |
+| Impresión | Referencia operativa de solicitudes y responsabilidades de personas. |
+| Router | Referencia operativa de solicitudes y responsabilidades de personas. |
+| PT/Tráfico | Referencia operativa de solicitudes y responsabilidades de personas. |
+| Servicios y vigilancia | Referencia organizacional y destino de salidas. |
 | Sistemas | Cuentas, accesos, catálogos y operaciones protegidas. |
-| Taller 3D (Taller/Herrería) | Misma área operativa; no se trata como dos áreas separadas. |
-| Ventas y proyectos especiales | Referencia para personas y registros relacionados; Ventas no tiene acceso vigente. |
+| Taller 3D (Taller/Herrería) | Referencia operativa de solicitudes y responsabilidades de personas. |
+| Ventas y proyectos especiales | Referencia para personas y registros comerciales relacionados. |
 
-Los permisos por operación se detallan en
-[Actores y responsabilidades](../requirements-specification/03-actors-and-system-responsibilities.md).
+## Características de uso
+
+La operación utiliza listados, formularios con varios detalles, selectores y
+cantidades expresadas en distintas unidades. Quien captura necesita distinguir
+existencia disponible, cantidad solicitada, surtida y devuelta. El
+[manual](../../user-manual/index.md) introduce ese vocabulario y explica las tareas
+paso a paso.
+
+La experiencia previa, la formación necesaria, los dispositivos habituales y las
+necesidades de asistencia deben confirmarse con los usuarios. Sus acuerdos se
+registran en [Decisiones pendientes](04-open-decisions.md).
