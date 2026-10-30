@@ -1,21 +1,9 @@
 # 7. Generar manuales por cuenta
 
-## Propósito y punto de partida
+Para generar un manual, use el usuario y la contraseña habituales de la cuenta.
+La herramienta detecta sus áreas, roles y permisos al iniciar sesión.
 
-Esta guía reúne el procedimiento completo: preparar las cuentas, configurar los
-archivos, generar capturas, revisar los manuales y recuperar una ejecución fallida.
-
-Para generar el manual de una cuenta, use su usuario y contraseña habituales.
-El generador inicia sesión y obtiene automáticamente sus áreas, roles y permisos;
-no necesita escribirlos en la configuración.
-
-Guarde los dos archivos locales **directamente en la carpeta `front/`, junto a
-su `package.json`**:
-
-- `front/manual.accounts.local.json`: dirección del sistema y lista de manuales que se generarán.
-- `front/.env.manual.local`: usuarios y contraseñas de esas cuentas, todos en el mismo archivo.
-
-La ubicación desde la raíz del repositorio debe quedar así:
+Guarde estos archivos **directamente en `front/`, junto a `package.json`**:
 
 ```text
 front/
@@ -26,72 +14,59 @@ front/
 └── docs/
 ```
 
-Ambos archivos quedan fuera de `src/` y `docs/`. Las rutas predeterminadas del
-generador parten de `front/`; las credenciales de manuales tampoco van en `back/.env`.
-
-Cada cuenta tiene un `id` para distinguir su carpeta y un `label` para identificar
-el manual. Sus capturas y tareas dependen del acceso real de esa cuenta.
-Los comandos de esta guía se ejecutan desde **`front/`**; si está en la raíz,
-entre con `cd front`.
+El JSON identifica las ediciones; `.env.manual.local` reúne sus usuarios y
+contraseñas. Ambos son locales, ignorados por Git y excluidos del despliegue.
+Los comandos siguientes se ejecutan desde **`front/`** (`cd front` desde la raíz).
 
 ## 1. Elegir el tipo de generación
 
-| Necesidad | Comando o modo | Cuenta y archivos requeridos |
+| Necesidad | Comando o modo | Requisitos |
 | --- | --- | --- |
-| Revisar manuales con datos ficticios. | `docs:manuals -- --mode demo --all` | Perfiles incluidos en la herramienta; no necesita cuentas reales, JSON local ni contraseñas. Inicia su propio Vite en el puerto 5177. |
-| Obtener los manuales de las cuentas configuradas. | `docs:manuals -- --mode live --all` | Cuentas existentes, Vue/API funcionando y los dos archivos locales explicados abajo. |
-| Publicar el manual general de referencia. | `docs:manual -- ambos` | Fuentes e imágenes de `docs/user-manual`. No inicia sesión ni selecciona contenido por cuenta. |
+| Revisar ediciones ficticias | `docs:manuals -- --mode demo --all` | Perfiles incluidos; no usa cuentas ni archivos locales. Inicia Vite en el puerto 5177. |
+| Generar por cuentas existentes | `docs:manuals -- --mode live --all` | Vue/API funcionando, cuentas y los dos archivos locales. |
+| Publicar el manual general | `docs:manual -- ambos` | Fuentes e imágenes de `docs/user-manual`; no selecciona por cuenta. |
 
-Para instalar las dependencias y el navegador de captura:
+Instalar dependencias y navegador:
 
 ```bash
 npm ci --include=dev
 npx playwright install chromium
 ```
 
-La exportación Word requiere Pandoc; PDF requiere además LibreOffice. La
-[preparación del publicador](02-generation-and-publication.md#preparación-del-publicador)
-explica su instalación y comprobación. Para `live`, prepare e inicie los servicios
-con la [guía local](../development/01-getting-started.md). El generador no los arranca
-en ese modo. En un entorno remoto, use la dirección HTTPS de Vue.
+Para Word/PDF, completar la [preparación del publicador](02-generation-and-publication.md#preparación-del-publicador).
+En `live`, iniciar Vue y la API con la [guía local](../development/01-getting-started.md);
+la herramienta no los arranca. Para un sitio remoto, usar su dirección HTTPS.
 
 ## 2. Qué contiene cada archivo de entrada
 
-Todas las rutas de esta tabla son relativas a `front/`.
+Rutas relativas a `front/`:
 
-| Archivo | Quién lo prepara y qué significa | Tratamiento |
-| --- | --- | --- |
-| [manual.accounts.example.json](../../manual.accounts.example.json) | Plantilla versionada con los perfiles de referencia, el origen de Vue, las asignaciones esperadas y los nombres de variables. No contiene credenciales. | Se copia al preparar una configuración local por primera vez. |
-| `manual.accounts.local.json` | El publicador conserva los perfiles que utilizará y configura su dirección de Vue. Selecciona qué cuentas procesar; no crea esas cuentas. | Local, ignorado por Git. Predeterminado de `--accounts`. |
-| [.env.manual.example](../../.env.manual.example) | Plantilla versionada con variables vacías para nombres de usuario y contraseñas. | Se copia; los valores reales se escriben únicamente en la copia local. |
-| `.env.manual.local` | Valores de las credenciales que leerá el proceso de captura. No es un archivo de sesión ni una contraseña generada automáticamente. | Local, ignorado por Git. Predeterminado de `--env-file`. |
-| `.env.local` | Configuración opcional de Vite, por ejemplo `BACKEND_PROXY_TARGET` para conectar la API local. | Su propósito es iniciar Vue; las credenciales de los manuales van en `.env.manual.local`. |
-| `../back/.env` | Configuración del backend y su base de datos. | Se prepara al iniciar la API. No se copia a los archivos de manuales. |
+| Archivo | Función |
+| --- | --- |
+| [manual.accounts.example.json](../../manual.accounts.example.json) | Plantilla versionada: perfiles de referencia, dirección de Vue, accesos esperados y nombres de variables. Sin credenciales. |
+| `manual.accounts.local.json` | Copia local: dirección de Vue y cuentas que se procesarán. Predeterminado de `--accounts`; no crea usuarios. |
+| [.env.manual.example](../../.env.manual.example) | Plantilla versionada con variables vacías para usuarios y contraseñas. |
+| `.env.manual.local` | Credenciales reales de todas las cuentas configuradas. Predeterminado de `--env-file`. |
 
-Los nombres `DOCS_FRONT_*` son variables de la herramienta de captura. No llevan
-el prefijo `VITE_` y no se incorporan a los assets compilados del navegador.
-Los archivos de configuración, fuentes y resultados de los manuales permanecen
-fuera del despliegue del frontend.
+`front/.env.local` configura Vite y `back/.env` configura la API; las credenciales
+de manuales no van en esos archivos. Las variables `DOCS_FRONT_*` pertenecen a la
+herramienta, no llevan `VITE_` ni se compilan en el navegador.
 
 ## 3. Obtener el usuario y la contraseña
 
-Si ya puede ingresar a Nexus con esa cuenta, continúe en el paso 4. No necesita
-crear otro usuario para generar el manual.
+Si la cuenta ya permite ingresar a Nexus, continuar en el paso 4. Si falta la
+cuenta o su contraseña, acudir al responsable de usuarios; el procedimiento está
+en [Usuarios](../user-manual/08-users.md).
 
-Si todavía no tiene cuenta o desconoce su contraseña, solicite ayuda al responsable
-de usuarios. El procedimiento de alta y cambio de contraseña está en
-[Usuarios](../user-manual/08-users.md). El generador usa cuentas existentes.
-
-Antes de capturar en `live`, deben existir también los datos que se van a mostrar:
-por ejemplo, un registro para editar o una salida surtida para ilustrar la devolución
-de Almacén. El recorrido no registra operaciones para fabricar esos ejemplos.
+Para `live`, preparar también registros de capacitación: una edición requiere un
+registro existente y una devolución de Almacén requiere una salida surtida.
+Los recorridos no registran operaciones para preparar las imágenes.
 
 ## 4. Crear las dos copias locales
 
-Ejecute la copia sólo para archivos que todavía no existan. Estos comandos conservan
-las configuraciones anteriores.
+Estos comandos copian sólo los archivos que aún no existen.
 
-En PowerShell, desde `front/`:
+PowerShell:
 
 ```powershell
 if (-not (Test-Path manual.accounts.local.json)) {
@@ -102,7 +77,7 @@ if (-not (Test-Path .env.manual.local)) {
 }
 ```
 
-En Bash, desde la misma carpeta:
+Bash:
 
 ```bash
 if [ ! -e manual.accounts.local.json ]; then
@@ -113,13 +88,12 @@ if [ ! -e .env.manual.local ]; then
 fi
 ```
 
-Abra ambas copias en su editor. Descargar cambios de Git actualiza las plantillas,
-pero no crea ni actualiza sus archivos locales.
+Descargar cambios de Git actualiza las plantillas, no las copias locales.
 
 ## 5. Configurar el perfil en el JSON
 
-Reemplace el contenido de `manual.accounts.local.json` con este ejemplo para una
-cuenta y ajuste `baseUrl` a la dirección donde abre Vue:
+Para una cuenta, usar este contenido en `manual.accounts.local.json` y ajustar
+`baseUrl` a la dirección de Vue:
 
 ```json
 {
@@ -135,89 +109,79 @@ cuenta y ajuste `baseUrl` a la dirección donde abre Vue:
 }
 ```
 
-| Campo | Significado y forma de completarlo |
+| Campo | Cómo completarlo |
 | --- | --- |
-| `baseUrl` | Origen del frontend que abrirá el navegador, sin ruta, parámetros ni credenciales. Use el origen donde funciona Vue; no el puerto directo de la API. Se admite HTTP en localhost o HTTPS. |
-| `accounts` | Lista de perfiles que se pueden procesar. Conserve sólo las cuentas que va a preparar; cada entrada necesita sus credenciales. |
-| `id` | Identificador del perfil documental, único en la lista. Usa minúsculas, números y guiones; determina `--profile` y las carpetas de resultados. No es el nombre de ingreso ni el identificador de la base de datos. |
-| `label` | Nombre legible para identificar la edición. No configura permisos ni tiene que coincidir con un rol. |
-| `usernameEnv` | Nombre de la variable que contiene el usuario de ingreso. Aquí se escribe `DOCS_FRONT_..._USER`, no el usuario real. |
-| `passwordEnv` | Nombre de la variable que contiene su contraseña. Aquí se escribe `DOCS_FRONT_..._PASSWORD`, no la clave real. |
+| `baseUrl` | Origen de Vue, no el puerto directo de la API. Sin ruta, parámetros ni credenciales. HTTP sólo en localhost; HTTPS para un sitio remoto. |
+| `accounts` | Lista de cuentas que se procesarán. Cada entrada necesita sus credenciales. |
+| `id` | Identificador documental único, con letra minúscula inicial, minúsculas, números y guiones. Determina `--profile` y la carpeta; no es el usuario de ingreso ni el ID de base de datos. |
+| `label` | Nombre legible de la edición; no asigna permisos. |
+| `usernameEnv`, `passwordEnv` | Nombres de variables `DOCS_FRONT_*`; los valores reales van en `.env.manual.local`. |
 
 ### Distinguir varias ediciones
 
-Para agregar otra cuenta, copie el bloque dentro de `accounts` y cambie `id`,
-`label`, `usernameEnv` y `passwordEnv`. Por ejemplo, use `cuenta-02` y variables
-`DOCS_FRONT_CUENTA_02_USER` / `DOCS_FRONT_CUENTA_02_PASSWORD`. Agregue sus valores
-al mismo `.env.manual.local`. Separe los bloques con una coma, sin coma al final.
+Agregar un bloque por cuenta, con otro `id`, `label` y variables; por ejemplo,
+`cuenta-02`, `DOCS_FRONT_CUENTA_02_USER` y `DOCS_FRONT_CUENTA_02_PASSWORD`.
+Separar los bloques con coma, sin coma final, y agregar sus credenciales al mismo
+`.env.manual.local`.
 
-El generador inicia una sesión independiente por cuenta y guarda cada manual en
-su propia carpeta. El manual muestra las áreas y roles detectados. Si la cuenta
-tiene varios accesos, incluye las tareas permitidas por todos ellos. Dos cuentas
-con los mismos permisos pueden tener las mismas secciones.
+Cada cuenta inicia una sesión independiente y tiene su propia carpeta. El manual
+muestra las áreas y roles detectados e incluye la unión de sus tareas permitidas.
+Dos cuentas con los mismos permisos pueden tener las mismas secciones.
 
 ## 6. Completar las credenciales locales
 
-En `.env.manual.local`, complete las variables referenciadas por el JSON. Ejemplo
-de estructura; **sustituya los dos valores de muestra por los de la cuenta existente**:
+En `.env.manual.local`, sustituir los valores de muestra por las credenciales de
+la cuenta existente:
 
 ```dotenv
 DOCS_FRONT_CUENTA_01_USER="USUARIO"
 DOCS_FRONT_CUENTA_01_PASSWORD="CONTRASENA"
 ```
 
-Los nombres de las variables deben coincidir exactamente entre ambos archivos.
-Use sintaxis dotenv; las comillas permiten conservar espacios o un `#` que forme
-parte del valor. Guarde los usuarios y contraseñas sólo en `.env.manual.local`;
-no los escriba en el JSON ni en las plantillas versionadas. Las dos copias locales
-están ignoradas por Git y fuera del despliegue.
+Los nombres deben coincidir exactamente con el JSON. La sintaxis dotenv permite
+comillas para conservar espacios o `#` dentro del valor. No escribir credenciales
+en el JSON ni en las plantillas versionadas.
 
 ## 7. Comprobar y ejecutar
 
-Con Vue y la API funcionando, genere el manual de `cuenta-01`:
+Con Vue y la API funcionando, generar una edición:
 
 ```bash
 npm run docs:manuals -- --mode live --profile cuenta-01 --format ambos
 ```
 
-`--profile` corresponde al `id` escrito en el JSON. Para generar los manuales de
-todas las cuentas de ese archivo:
+`--profile` usa el `id` del JSON. Para todas sus cuentas:
 
 ```bash
 npm run docs:manuals -- --mode live --all --format ambos
 ```
 
-El comando comprueba la configuración y autentica cada cuenta antes de capturar.
-Sólo procesa las cuentas de su lista; no busca otros usuarios del sistema.
-
-Para revisar el procedimiento sin usar cuentas reales:
+La herramienta valida y autentica las cuentas de esa lista; no busca otros usuarios.
+Para una edición ficticia:
 
 ```bash
 npm run docs:manuals -- --mode demo --profile instalaciones-instalador --format ambos
 ```
 
-El modo `demo` no lee sus credenciales locales y prepara sus propios datos ficticios.
-Para revisar todos los perfiles de demostración, sustituya `--profile instalaciones-instalador`
-por `--all`. Este modo permite revisar los manuales sin cuentas reales; no demuestra
-los permisos ni los datos de una instalación real. Para obtener sólo fuentes y
-capturas sin Word/PDF, añada `--capture-only`.
+En `demo`, sustituir `--profile instalaciones-instalador` por `--all` para revisar
+todos los perfiles incluidos. Este modo no lee credenciales ni demuestra permisos
+de una instalación real. Añadir `--capture-only` obtiene fuentes y capturas sin
+invocar Pandoc/LibreOffice.
 
 ## 8. Entender los archivos generados
 
-| Ruta bajo `front/` | Para qué sirve y cuándo aparece |
+| Ruta bajo `front/` | Contenido |
 | --- | --- |
-| `build/manuals/<perfil>/sources/index.md` | Portada, alcance e índice de la edición por cuenta. Lo crea la herramienta después de obtener su acceso. |
-| `build/manuals/<perfil>/sources/*.md` | Capítulos filtrados, incluido el glosario. Se regeneran desde `docs/user-manual`; las correcciones se hacen en esas fuentes originales. |
-| `build/manuals/<perfil>/images/*.png` | Capturas de esa edición. En `live` muestran los datos visibles para la cuenta de capacitación. |
-| `build/manuals/<perfil>/manifest.json` | Estado `pending` o `ready`, permisos, fuentes, capturas y huellas para comprobar vigencia y reanudación. No se completa a mano ni contiene la contraseña. |
-| `build/docs/docx/manuales-vue/<perfil>/manual-<perfil>.docx` | Manual Word exportado cuando todas las capturas requeridas están completas. |
-| `build/docs/pdf/manuales-vue/<perfil>/manual-<perfil>.pdf` | Manual PDF si se solicitó `pdf` o `ambos` y terminó la conversión. |
-| `build/test-results/manual-profiles.xml` | Reporte de ejecución del recorrido; ayuda a identificar un fallo. No es el manual para distribuir. |
+| `build/manuals/<perfil>/sources/index.md` | Portada, alcance e índice de la cuenta. |
+| `build/manuals/<perfil>/sources/*.md` | Capítulos filtrados y glosario. Corregir sus originales en `docs/user-manual`; se regeneran. |
+| `build/manuals/<perfil>/images/*.png` | Capturas propias; en `live`, muestran los datos visibles para esa cuenta. |
+| `build/manuals/<perfil>/manifest.json` | Estado `pending`/`ready`, permisos, fuentes y huellas de vigencia y reanudación. No editar a mano; no contiene contraseñas. |
+| `build/docs/docx/manuales-vue/<perfil>/manual-<perfil>.docx` | Word, después de completar las capturas requeridas. |
+| `build/docs/pdf/manuales-vue/<perfil>/manual-<perfil>.pdf` | PDF, si se solicitó y terminó la conversión. |
+| `build/test-results/manual-profiles.xml` | Reporte del recorrido para diagnosticar fallos; no es el manual. |
 
-Para el ejemplo mínimo, `<perfil>` se sustituye por `cuenta-01`. Los
-resultados de `build/` son locales e ignorados. La herramienta autentica con una
-sesión nueva y conserva cookies/tokens en memoria; no hay que generar un archivo
-de sesión ni copiar cookies del navegador.
+En el ejemplo, `<perfil>` es `cuenta-01`. Cookies y tokens permanecen en memoria;
+no se necesita un archivo de sesión ni copiar cookies del navegador.
 
 ## 9. Reanudar y localizar un problema
 
@@ -225,49 +189,42 @@ de sesión ni copiar cookies del navegador.
 npm run docs:manuals -- --mode live --profile cuenta-01 --missing --format ambos
 ```
 
-`--missing` conserva capturas completas cuando coinciden cuenta, acceso, modo,
-fuentes y código del recorrido, y cuando el PNG conserva su huella. Completa las
-pendientes o las que ya no coinciden. Sin esa opción se recaptura el perfil completo.
-`--capture-only` prepara fuentes e imágenes sin invocar Pandoc/LibreOffice.
+`--missing` conserva capturas cuando coinciden cuenta, acceso, modo, fuentes,
+código del recorrido y huella del PNG; completa las pendientes o desactualizadas.
+Sin esa opción, se recaptura el perfil completo.
 
-| Situación | Comprobación y recuperación |
+| Situación | Recuperación |
 | --- | --- |
-| No autentica | Revisar servicio, cuenta y variables locales sin imprimir sus valores. |
+| No autentica | Revisar servicios, cuenta y variables locales sin imprimir valores. |
 | Cuenta distinta del perfil | Revisar `expectedAccess`, área/rol real y referencia de credenciales. |
-| Una tabla está vacía | La captura de consulta puede ser válida. Para una edición hace falta un registro existente; preparar datos de capacitación. |
-| No encuentra una opción | Revisar dependencias del selector, registros activos y permisos. Para la captura de pesos se necesita un material de referencia ROLLO. |
-| No aparece una devolución | Se necesita permiso de Almacén y una salida existente en estado surtido. No se surte automáticamente para preparar la foto. |
-| Falla un selector o recorrido | Consultar el nombre de imagen y motivo en `manifest.json`; corregir preparación o recorrido y reanudar. |
-| Intenta una escritura de negocio | El recorrido falla; revisar la automatización, no habilitar el envío para obtener la captura. |
-| Cambió el acceso | Volver a autenticar y regenerar la edición de ese perfil. |
-| Cambió un PNG | Se vuelve a capturar; una imagen alterada no se publica como verificada. |
-| Falla DOCX/PDF | Revisar Pandoc/LibreOffice y el código de salida. No considerar actualizados los documentos de una corrida anterior. |
-
+| Tabla vacía | Puede servir para consulta. Para editar, preparar un registro existente. |
+| Falta una opción | Revisar dependencias, registros activos y permisos. Para pesos se necesita un material de referencia ROLLO. |
+| Falta devolución | Comprobar permiso de Almacén y salida surtida existente; no se surte automáticamente. |
+| Falla un selector o recorrido | Revisar imagen y motivo en `manifest.json`, corregir y reanudar. |
+| Intenta escribir datos de negocio | Corregir la automatización; no habilitar el envío para obtener una imagen. |
+| Cambió el acceso | Autenticar de nuevo y regenerar la edición. |
+| Cambió un PNG | Recapturar; la imagen alterada no se publica como verificada. |
+| Falla Word/PDF | Revisar Pandoc/LibreOffice y código de salida. Una versión anterior no acredita la ejecución actual. |
 
 ## 10. Revisar y distribuir
 
-Abra el DOCX y el PDF y compruebe:
+Abrir Word/PDF y comprobar:
 
-1. Que el título, las áreas y los roles corresponden a la cuenta utilizada.
-2. Que el índice y las tareas muestran las funciones que esa cuenta puede utilizar.
-3. Que los pasos, etiquetas, advertencias y opciones de recuperación coinciden con las pantallas.
-4. Que las capturas y las tablas se leen completas, sin recortes.
-5. Que los datos visibles pueden compartirse con los destinatarios del manual.
+1. Título, áreas y roles de la cuenta correcta.
+2. Índice y tareas acordes con su acceso.
+3. Pasos, etiquetas, advertencias y recuperación iguales a las pantallas.
+4. Capturas y tablas completas y legibles.
+5. Datos visibles aptos para compartir con los destinatarios.
 
-Distribuya los documentos por el canal autorizado. Las fuentes y resultados
-permanecen fuera del despliegue; no los copie a `public/` ni a `dist/`.
-Una ejecución correcta no sustituye esta revisión. El estado editorial permanece
-En revisión hasta su aceptación.
-
-Si la ejecución falla, revise `manifest.json` y la terminal: un PDF de una corrida
-anterior no demuestra que la generación actual haya terminado. Las comprobaciones
-internas de sesión y captura están descritas en
-[Funcionamiento del generador](06-manuals-by-access.md#garantías-durante-la-captura).
+Distribuir los documentos revisados por el canal autorizado. El estado editorial
+permanece En revisión hasta su aceptación. Las
+[garantías de captura](06-manuals-by-access.md#garantías-durante-la-captura)
+describen los controles de sesión y escrituras.
 
 ## Opciones adicionales
 
-- `expectedAccess`: comprobación opcional de rol y área. Algunas entradas de la
-  plantilla la incluyen; puede omitirla como en el ejemplo mínimo. No asigna permisos.
-- Variables del proceso/CI: pueden sustituir `.env.manual.local` y tienen prioridad
-  sobre sus valores. Revise esta opción si editar el archivo no cambia las credenciales usadas.
-- `--accounts` y `--env-file`: permiten indicar otros archivos de cuentas y credenciales.
+| Opción | Uso |
+| --- | --- |
+| `expectedAccess` en el JSON | Comprueba opcionalmente un rol y área. La plantilla puede incluirlo; se puede omitir. No asigna permisos. |
+| Variables del proceso/CI | Sustituyen las credenciales locales y tienen prioridad sobre `.env.manual.local`. |
+| `--accounts`, `--env-file` | Seleccionan otros archivos de cuentas y credenciales. |

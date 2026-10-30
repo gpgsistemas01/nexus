@@ -2,155 +2,122 @@
 
 ## Propósito y audiencia
 
-La documentación permite preparar, entender, modificar y comprobar la aplicación
-Vue sin reconstruir su funcionamiento a partir de enlaces al servidor. La redactan
-desarrollo y pruebas; la revisan quienes mantienen el módulo y sus consumidores.
-El contenido corresponde al código versionado, no al estado supuesto de un despliegue.
+Estas reglas organizan la documentación del cliente Vue para desarrollo y pruebas.
+Las descripciones corresponden al código versionado; la disponibilidad de un
+despliegue se comprueba en ese entorno.
 
 ## Responsables y aceptación
 
 | Función | Responsabilidad |
 | --- | --- |
-| Desarrollo del frontend | Mantener componentes, contratos, comandos, diagramas y documentación junto al cambio. |
-| Revisión técnica | Contrastar la descripción con imports, props/eventos, composables, servicios, configuración y pruebas. |
-| Pruebas | Identificar riesgo, datos, oráculo, nivel y límites; conservar el resultado de la ejecución fuera de las fichas permanentes. |
-| Responsable funcional/técnico | Aceptar requisitos y recorridos cuando exista una designación y evidencia suficientes. Hasta registrarlo, el estado es En revisión. |
+| Desarrollo | Actualizar las guías y figuras afectadas junto al código. |
+| Revisión técnica | Contrastar contenido, contratos y comandos con sus fuentes. |
+| Pruebas | Mantener diseños y casos; guardar resultados de ejecución fuera de las fichas permanentes. |
+| Responsable funcional/técnico designado | Aceptar requisitos y recorridos con su evidencia. Hasta registrarlo, el estado es En revisión. |
 
-Un commit, compilación o prueba aprobada no acredita aceptación funcional ni una
-certificación.
-
-## Colecciones y contenido
-
-El [mapa de estándares](09-standards-and-ownership.md) identifica la fuente de cada
-regla transversal. Cada colección mantiene su índice y los enlaces a sus capítulos.
+Una compilación o prueba aprobada no sustituye la aceptación funcional.
 
 ## Convenciones editoriales
 
-- Carpetas y nombres de archivos técnicos en inglés; títulos y explicación en español.
-- Cada colección tiene `index.md`; las series de capítulos mantienen numeración
-  consecutiva. El índice conserva el orden de lectura. La referencia generada también tiene un propietario explícito.
-- Un `h1` por archivo y niveles de títulos sin saltos. Una tabla compara elementos;
-  una secuencia expresa pasos; la prosa explica propósito, decisiones y límites.
-- Escribir para quien conoce el sistema por primera vez: indicar primero qué puede
-  hacer o consultar y después sus condiciones. Usar frases directas, explicar las
-  siglas al introducirlas y retirar el relato de cambios o pedidos de desarrollo.
-- Rutas relativas al documento para enlaces. Los comandos indican si se ejecutan
-  en la raíz, en `front/` o en `back/`; la raíz no contiene un manifiesto npm.
-- Nombres de archivos, campos y comandos exactos. Ejemplos identificados como tales,
-  con valores de demostración y sin secretos o datos personales reales.
-- No se mantienen secciones vacías para imitar una norma. Tampoco se describen
-  herramientas aplazadas como si ya estuvieran instaladas.
-- Los requisitos locales `RF-VUE-*`, `RC-VUE-*`, `RD-VUE-*` y `RN-VUE-*` describen
-  el cliente. `CU-*` identifica su ficha de interacción; los IDs de producto
-  existentes se conservan como correspondencia, sin renombrarlos.
-- `DP-*` expresa diseño de prueba; `CP-*`, un caso; `EP-*`, una ejecución. No se
-  copian conteos de una corrida a un requisito como aprobación permanente.
+- Archivos técnicos en inglés; títulos y explicación en español. Cada colección
+  tiene `index.md` y sus capítulos numerados conservan el orden de lectura.
+- Un `h1` por archivo y niveles sin saltos. Usar tablas para comparar, listas
+  numeradas para pasos y párrafos breves para condiciones o límites.
+- Explicar primero la tarea o el comportamiento y después sus condiciones.
+  Definir siglas al introducirlas; retirar relatos de cambios y pedidos de desarrollo.
+- Usar enlaces relativos, nombres exactos y ejemplos ficticios identificados.
+  Indicar la carpeta de ejecución de los comandos: raíz, `front/` o `back/`.
+  La raíz no tiene manifiesto npm.
+- Documentar lo disponible. No mantener secciones vacías ni presentar herramientas
+  pendientes como instaladas. No incluir secretos ni datos personales reales.
+
+Ejemplo: «Para editar, abra el menú del registro y seleccione Editar» indica una
+acción concreta. «La edición se cambió según lo solicitado» no explica cómo usarla.
+
+Los identificadores y estados se definen en las
+[convenciones de requisitos](../requirements/requirements-specification/02-conventions.md)
+y los formatos DP/CP/EP en el [plan de pruebas](../testing/01-test-plan.md).
+Se conservan al reubicar contenido.
 
 ## Referencias al backend
 
-La documentación del frontend explica sus responsabilidades y los contratos que
-consume. Se identifica la tecnología del servidor cuando ayuda a preparar o
-entender una integración concreta.
+Describir la integración que observa el cliente. La implementación interna del
+servidor permanece en su documentación.
 
 | Contexto | Forma de documentarlo |
 | --- | --- |
-| Requisitos, pantallas, permisos y contratos HTTP | Usar «API», «servidor» o «backend» y explicar solicitudes, respuestas y errores que afectan al cliente. |
-| Patrones y componentes Vue | Explicar la colaboración del cliente y su frontera HTTP; evitar comparaciones con controladores o patrones del servidor. |
-| Diagramas de clases y tipos | Conservar contratos del negocio y de infraestructura creados para el sistema, como `ApiError`, `InteractiveForm` y los contratos de props que explican sus patrones. Los tipos externos se conservan en firmas o metadatos cuando son necesarios, sin desarrollar clases de bibliotecas. |
-| Secuencias | Mostrar archivos y funciones propios con sus callbacks, eventos, guardas y retornos del código. Las bibliotecas se identifican en texto; sus objetos internos no reciben líneas de vida. La API permanece como frontera externa. La [guía de roles](../architecture/views/processes/00-reading-and-roles.md) define agrupación y alcance. |
-| Arranque, despliegue y pruebas de sistema | Nombrar Express cuando identifica el proceso, contenedor o dependencia que se ejecuta realmente. |
-| Módulos compartidos | Conservar nombres, rutas y dependencias exactos para distinguir código público compilable de adaptadores privados del servidor. |
-
-Los servicios, repositorios y transacciones del servidor tienen su documentación
-propia. Aquí se describen sus garantías observables y los límites del cliente.
+| Requisitos y contratos HTTP | Solicitudes, respuestas, permisos y errores; usar API o servidor. |
+| Patrones y componentes | Colaboraciones del cliente y frontera HTTP. |
+| Clases y secuencias | Archivos, funciones y contratos propios, incluidos `ApiError`, `InteractiveForm` y props. Excluir clases y objetos internos de bibliotecas; mencionar la tecnología en texto. Conservar tipos externos necesarios dentro de las firmas. |
+| Arranque, despliegue y pruebas de sistema | Nombrar Express cuando identifica el proceso o contenedor ejecutado. |
+| Módulos compartidos | Rutas y dependencias exactas que distinguen código público de adaptadores privados. |
 
 ## Ubicación, navegación y publicación
 
-Al agregar o reubicar una guía, actualice su índice, el
+Al agregar o reubicar una guía, actualizar su índice, el
 [catálogo de publicaciones](../publications.json) y los enlaces consumidores.
-Conserve los identificadores CU/DP/CP/DIA y el formato de sus fichas.
-La [guía de publicación](02-generation-and-publication.md) define los comandos y salidas.
+El [mapa de estándares](09-standards-and-ownership.md) identifica dónde definir cada
+regla y cuándo conservar información contextual en una ficha.
 
 ## Unidad documental y granularidad
 
-La unidad de división es un tema que pueda entenderse y mantenerse completo.
-Compartir plantilla y nivel de detalle no obliga a usar el mismo número de archivos
-para requisitos, diagramas, procesos y referencias de código.
+Separar por objetivo, contrato o tarea que pueda entenderse y mantenerse completo.
+Reunir fragmentos que repiten preparación o exigen saltos para comprender un único
+recorrido. El número de líneas o páginas no fija una división obligatoria.
 
 | Artefacto | Unidad de división | Contenido que permanece unido |
 | --- | --- | --- |
-| Caso de uso | Un objetivo observable, con su ID estable. | Actor, precondiciones, flujo, alternativas, excepciones y postcondiciones. |
-| Caso de prueba seleccionado | Una condición con preparación, datos y oráculo reproducibles. | Entrada, pasos, resultado esperado y limpieza. No una ficha por cada aserción o `it`. |
-| Diseño de prueba | Dominio o contrato con riesgos y evidencia relacionados. | Condiciones DP, técnicas, casos y límites de ese ámbito. |
-| Modelo de casos de uso | Capacidad funcional del cliente. | Figuras de sus recursos y actores; no un archivo por óvalo o enlace. |
-| Modelo de dominio | Corte coherente de conceptos de negocio. | Significado, relaciones, multiplicidades y restricciones; sin componentes Vue ni tablas SQL. |
-| Clases/interfaces/tipos | Familia de contratos del cliente. | Extensiones reales, colecciones, aliases, variantes y transformación de escritura. |
-| Proceso técnico | Operación o colaboración con decisiones propias. | Participantes, mensajes, errores y recuperación; sus fases se explican juntas cuando forman el mismo recorrido. |
-| Componente/patrón | Responsabilidad o mecanismo con consumidores concretos. | Modelo, contrato, aplicación, límites y evidencia; una figura puede ser el contenido principal. |
-| Estándar | Ámbito con reglas y controles propios. | Codificación, interfaz, seguridad, pruebas o documentación según el mapa de estándares. |
-| Referencia generada | Catálogo técnico mantenido por la herramienta. | Fuentes e interpretación de sus tablas; se publica separada de la introducción. |
-| Manual de usuario | Una página o familia de tareas operativas. | Preparación, campos, pasos, resultado e incidencias, con capturas de Vue. |
-
-Separar cuando cambian de forma independiente el dominio, el contrato o la tarea del
-lector y la sección puede conservar su explicación completa. Reunir cuando la división
-obliga a saltar entre fragmentos para comprender un único objetivo, repite la misma
-preparación o sólo crea encabezados sin información propia. El número de líneas o
-páginas sirve para detectar un documento que conviene revisar; no fija por sí solo un
-límite obligatorio. Los índices orientan y enlazan, sin repetir las fichas completas.
+| Caso de uso | Objetivo observable. | Actor, preparación, flujos, excepciones y postcondiciones. |
+| Caso de prueba | Condición reproducible. | Datos, pasos, resultado esperado y limpieza; no una ficha por aserción. |
+| Diseño de prueba | Dominio o contrato. | Riesgos, técnicas, casos y límites. |
+| Modelo de casos de uso | Capacidad funcional. | Actores y objetivos relacionados. |
+| Modelo de dominio | Conceptos de negocio. | Significado, relaciones, multiplicidades y restricciones. |
+| Clases y tipos | Familia de contratos propios. | Extensiones, colecciones, variantes y transformaciones. |
+| Proceso técnico | Operación o colaboración. | Participantes, mensajes, decisiones y recuperación. |
+| Componente o patrón | Responsabilidad o mecanismo. | Modelo, aplicación, contratos y pruebas. |
+| Estándar | Ámbito con controles propios. | Reglas y ejemplos del ámbito. |
+| Referencia generada | Catálogo de la herramienta. | Fuentes e interpretación de tablas; publicación separada. |
+| Manual | Página o familia de tareas. | Preparación, campos, pasos, resultado e incidencias. |
 
 ## Figuras y fuentes
 
-La [guía de diagramación](../architecture/views/diagram-reading.md#reglas-de-elaboración)
-define metadatos, notación y comprobaciones por familia. Los modelos específicos
-conservan fuentes, identificadores y restricciones locales.
+Usar Mermaid. Cada figura indica identificador DIA, pregunta, alcance, fuente y
+significado de las flechas. Los participantes y relaciones corresponden al código
+o al modelo representado; no se inventan enlaces ni concurrencia.
 
-## Síntesis y lectura visual
+| Familia | Comprobación visual y semántica |
+| --- | --- |
+| Secuencia | Actor humano; participantes `boundary`, `control` o simples según responsabilidad; mensajes numerados y extremos declarados. El callback conserva su propietario de código. Consultar [roles y agrupación](../architecture/views/processes/00-reading-and-roles.md). |
+| Clases/dominio | Estereotipos, atributos, asociaciones, multiplicidades y generalizaciones del modelo. Los eventos tipados son contratos de datos. Un flujo no se presenta como UML de clases. |
+| Casos de uso | Actor fuera del límite, objetivos en óvalos, participación y relaciones funcionales justificadas. |
+| Estados/actividad | Inicio, estados/acciones, transiciones y decisiones del ciclo representado; los finales y alternativas conservan su significado. |
+| Mapas/ejecución | Consumidor hacia colaborador y leyenda de relaciones; construcción, artefactos y procesos en ejecución tienen alcance explícito. |
 
-| Información que se explica | Forma de resumirla | Detalle que debe conservarse |
-| --- | --- | --- |
-| Responsabilidades y dependencias | Diagrama de componentes/mapa. | Propietarios, frontera y significado de cada tipo de flecha. |
-| Diferencias entre modos, campos o herramientas | Tabla comparativa. | Condiciones, datos admitidos y excepciones que cambian el resultado. |
-| Orden, rechazo y recuperación | Secuencia. | Participantes, mensajes relevantes y alternativas. |
-| Ciclo de una interacción | Estados. | Evento, guarda y resultado de cada transición relevante. |
-| Justificación o restricción delicada | Párrafo breve junto al modelo. | Motivo y límite que la figura no expresa. |
-| Caso de uso o prueba seleccionado | Ficha establecida. | Preparación, pasos, alternativas y resultado verificable. |
-
-Después de una figura, explique sólo las guardas abreviadas, excepciones o límites
-que no se puedan leer en ella. No vuelva a enumerar sus participantes, llamadas o
-efectos. Las reglas compartidas se definen una vez y se enlazan desde sus consumidores.
+La [guía visual](../architecture/views/diagram-reading.md) explica los símbolos.
+El texto junto a la figura aclara guardas abreviadas, excepciones o límites que
+esta no muestra; no repite sus participantes ni mensajes.
 
 ## Fichas de patrones Vue
 
-Las fichas describen colaboraciones implementadas en el cliente. Se distingue el
-mecanismo de Vue, la organización elegida por Nexus y los contratos TypeScript.
+Cada ficha describe una colaboración implementada, con estos elementos:
 
 | Parte de la ficha | Contenido |
 | --- | --- |
-| Propósito | Problema del código que resuelve y responsabilidades separadas. |
+| Propósito | Problema que resuelve y responsabilidades separadas. |
 | Modelo general | Roles, inicio, intercambio y resultado. Secuencia para props/eventos, callbacks, adaptación e inyección; actividad para seleccionar reglas; mapa de regiones para composición de slots. |
-| Aplicación | Mismo recorrido y notación, con archivos, símbolos y guardas reales. El callback se dirige al archivo que lo declara. |
-| Contrato y límites | Props/eventos y estado visual; argumentos, retorno, efectos y limpieza de composables; nombres y props de slots; clave, valor y actualización de la inyección. Guardas y excepciones que cambian el resultado. |
-| Pruebas relacionadas | Enlaces a las pruebas del contrato y sus consumidores; el diseño y los resultados permanecen en la colección de pruebas. |
+| Aplicación | Mismo recorrido y notación, con archivos, símbolos y guardas reales. |
+| Contrato y límites | Props/eventos; argumentos, retorno, efectos y limpieza de composables; nombres y props de slots; clave, valor y actualización de la inyección. |
+| Pruebas relacionadas | Enlaces a pruebas del contrato y consumidores; diseños y resultados permanecen en Pruebas. |
 
-El texto complementa las figuras con las condiciones que no muestran. Las fichas
-no requieren clases para representar componentes, composables o funciones.
-Cuando el mapa describe una estructura, una secuencia complementaria desarrolla
-la interacción relevante. Los imports pertenecen a la vista de componentes.
-
-## Referencias adoptadas
-
-La [aplicabilidad de estándares](03-standard-applicability.md) concentra las
-referencias ISO/IEEE y Vue, su alcance y la adaptación local.
+Un mapa de estructura puede acompañarse de una secuencia para la interacción.
+Los imports pertenecen a la vista de componentes.
 
 ## Cambio y versionado
 
-Una modificación identifica motivo, código afectado, documentos, requisitos/casos,
-comprobaciones y pendientes. Desarrollo actualiza la guía propietaria y los
-consumidores que describan el mismo contrato. Una corrección editorial cambia la
-versión documental cuando se publique la revisión, no la versión de Nexus.
-El índice general conserva ambos números, fecha, responsable y estado.
-Git conserva el historial; no se duplica en una tabla por commit.
+Actualizar la fuente propietaria y sus consumidores al cambiar un contrato.
+Registrar motivo, comprobaciones y pendientes en la revisión del cambio; Git
+conserva el historial. Al publicar, actualizar versión documental, fecha y estado
+en el índice general. Una corrección editorial no cambia la versión de Nexus.
 
-Para cerrar la revisión se contrasta contenido con código, se revisan enlaces,
-fuentes generadas, diagramas modificados y la exportación representativa. Los
-comandos y resultados esperados están en [publicación](02-generation-and-publication.md).
+Los controles y la revisión de Word/PDF están en
+[publicación](02-generation-and-publication.md).

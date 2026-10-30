@@ -1,72 +1,63 @@
-# 6. Modos, precondiciones y efectos de las operaciones
+# 6. Operaciones, campos y efectos
 
-Esta tabla documenta las precondiciones, los datos modificables y los efectos de cada
-acción. «Modo» es la configuración de pantalla y
-«estado requerido» es la condición del documento o recurso antes de ejecutar la acción.
+Cada tabla indica cuándo está disponible una acción, qué datos pueden cambiar y
+qué resultado produce. Los permisos por actor están en
+[Actores y responsabilidades](03-actors-and-system-responsibilities.md).
 
-En catálogos, **estado** significa el indicador activo/inactivo que el actor modifica
-con la casilla **Activo** dentro de `create` o `edit`; no es otro modo ni una operación
-de inventario. El cambio conserva identidad, relaciones, stock e historia. En documentos
-de compra o salida, en cambio, los estados y el cumplimiento se derivan de crear,
-corregir, cancelar, surtir o devolver conforme a sus reglas; el actor no los captura
-como un campo libre.
+En catálogos, **Activo** es un campo de alta o edición que conserva identidad,
+relaciones, stock e historia. Los estados de Compras y Salidas se derivan de las
+operaciones; no se eligen libremente.
 
-La [regla de actividad `RN-023`](catalog/05-cross-cutting-business-policies.md#identidad-y-estado-de-registros)
-distingue una relación nueva de un detalle histórico pendiente de surtir.
+## Materiales y Consumibles
 
-| Contexto / acción | Modo y estado requerido | Datos que pueden cambiar | Efectos que no deben confundirse con edición |
-| --- | --- | --- | --- |
-| Material o consumible / crear | `create`; no existe la oferta de proveedor | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna sólo para material; consumible sin dimensiones; stock mínimo, costo máximo, estado de la oferta, existencia inicial y observaciones | crea o reutiliza la identidad compartida y crea la oferta; una oferta repetida se rechaza sin modificar stock ni costo |
-| Material o consumible / crear desde compra | `create`; formulario invocado desde una compra y no existe la oferta de proveedor | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna sólo para material; consumible sin dimensiones; stock mínimo y estado de la oferta | reutiliza el alta del artículo con contexto de compra; crea la oferta con existencia cero y sin costo máximo, no genera ajuste inicial y deja que el detalle establezca costo y existencia sólo al confirmar la compra |
-| Material o consumible / editar | `edit`; relación existente | nombre y stock mínimo compartidos; costo máximo y estado de la oferta seleccionada | proveedor, presentación, unidad y dimensiones permanecen bloqueados; un nombre que produzca otra identidad se rechaza y no cambia existencia |
-| Material o consumible / ajustar | `stock`; relación existente y actor autorizado | proveedor asociado conservado desde la fila, nueva existencia total, motivo y observaciones | crea ajuste y movimiento; no permite elegir otro proveedor, no cambia identidad ni interpreta la cantidad como incremento |
-| Merma / crear | `create`; no existe la combinación de nombre, proveedor, dimensiones y pesos | proveedor, material de referencia, nombre, base, altura, stock mínimo, costo máximo, estado, existencia inicial, observaciones y, para Rollo, cono precargado editable y total; dimensiones automáticas con pesos | crea la merma y, con cantidad positiva, una entrada EME con movimiento; cantidad cero no crea documento ni consume folio; una identidad repetida se rechaza sin sumar stock |
-| Merma / editar | `edit`; merma existente | nombre, stock mínimo, costo máximo y estado | proveedor, material de referencia, presentación, unidad y dimensiones permanecen bloqueados; no cambia existencia |
-| Merma / ajustar | `stock`; merma existente y actor autorizado | nuevo stock total, motivo y observaciones | crea ajuste AME y movimiento ADJUSTMENT; no cambia identidad ni interpreta el stock como incremento |
-| Merma / agregar stock | `add-stock`; merma existente y actor autorizado | cantidad positiva y observaciones opcionales | crea un documento EME vinculado a su movimiento de entrada; suma la cantidad sin reemplazar el saldo |
-| Entrada de material o consumible / crear | `create`; documento nuevo | tipo de comprobante, factura cuando aplica, proveedor, receptor, fecha de recepción, observaciones y detalles | incrementa existencias y registra movimientos sin cambios parciales |
-| Entrada de material o consumible / editar | `edit`; entrada no cancelada | tipo de comprobante, factura cuando aplica, receptor, fecha, observaciones y detalles **nuevos** | el proveedor permanece bloqueado; un detalle persistido se cambia mediante `correct`, no sobrescribiéndola |
-| Entrada de material o consumible / consultar | `view`; entrada cancelada | ninguno | formulario, detalles y acciones permanecen en sólo lectura |
-| Entrada / corregir detalle | `correct`; detalle activo y entrada habilitada | cantidad corregida positiva no mayor que la recibida vigente; costo positivo; motivo de corrección determinado por el cambio | requiere una diferencia real de cantidad o costo; reducir cantidad exige existencia suficiente y genera movimiento; corregir sólo costo conserva cantidades e historia sin movimiento de inventario |
-| Entrada / cancelar detalle | acción de cancelación del detalle; detalle activo y existencia suficiente para revertirlo | motivo determinado por la cancelación y registro de la reversión | revierte la cantidad vigente, excluye el detalle de totales activos y conserva su historia; si no quedan detalles activos, la compra queda cancelada |
-| Salida de material, consumible o merma / crear | `create`; documento nuevo | cliente, asesor, área, solicitante, número de proyecto, fecha de solicitud, observaciones y detalles solicitados | no descuenta stock mientras el detalle no se surta |
-| Salida de material, consumible o merma / editar completa | `edit`; salida pendiente | encabezado y detalles nuevos o cantidades todavía no surtidas | no reescribe cantidades ya surtidas o devueltas |
-| Salida de material, consumible o merma / editar encabezado | `header`; salida no cancelada que ya no está pendiente | cliente, asesor, área, solicitante, número de proyecto, fecha de solicitud y observaciones | los detalles permanecen en sólo lectura y no cambia inventario |
-| Salida de material, consumible o merma / surtir | `supply`; detalle con cantidad pendiente; la salida puede estar pendiente o parcialmente surtida | selección del detalle y cantidad de proyecto a surtir | el encabezado permanece bloqueado; reduce existencia y crea movimiento atómicamente |
-| Salida de material, consumible o merma / devolver | `return`; salida con cumplimiento Surtido y detalle con cantidad surtida disponible | cantidad devuelta y observaciones de devolución | encabezado y detalles originales permanecen bloqueados; incrementa existencia y crea movimiento inverso |
-| Salida de material, consumible o merma / consultar | `view`; salida cancelada | ninguno | formulario y detalles permanecen en sólo lectura |
+| Acción y condición previa | Datos editables | Efecto |
+| --- | --- | --- |
+| **Crear**: no existe la oferta de proveedor. | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna sólo para material; consumible sin dimensiones; stock mínimo, costo máximo, estado de la oferta, existencia inicial y observaciones | crea o reutiliza la identidad compartida y crea la oferta; una oferta repetida se rechaza sin modificar stock ni costo |
+| **Crear desde compra**: formulario invocado desde una compra y no existe la oferta de proveedor. | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna sólo para material; consumible sin dimensiones; stock mínimo y estado de la oferta | crea la oferta con existencia cero y sin costo máximo, no genera ajuste inicial y deja que el detalle establezca costo y existencia sólo al confirmar la compra |
+| **Editar**: relación existente. | nombre y stock mínimo compartidos; costo máximo y estado de la oferta seleccionada | proveedor, presentación, unidad y dimensiones permanecen bloqueados; un nombre que produzca otra identidad se rechaza y no cambia existencia |
+| **Ajustar**: relación existente. | nueva existencia total, motivo y observaciones | crea ajuste y movimiento; no permite elegir otro proveedor, no cambia identidad ni interpreta la cantidad como incremento |
 
-Los nombres técnicos de los campos HTTP pertenecen al
-[contrato API](../../architecture/contracts/client-contracts.md); las reglas observables pertenecen al
-[catálogo unificado](catalog/index.md). Este capítulo enumera los controles por
-modo para hacer verificable qué puede modificar el operador, sin convertir el estado
-visual del formulario en un estado persistido del documento.
+## Mermas
 
-## Límites de interpretación
+| Acción y condición previa | Datos editables | Efecto |
+| --- | --- | --- |
+| **Crear**: no existe la combinación de nombre, proveedor, dimensiones y pesos. | proveedor, material de referencia, nombre, base, altura, stock mínimo, costo máximo, estado, existencia inicial, observaciones y, para Rollo, peso del cono editable, total de merma con cono y total del rollo completo con cono; dimensiones calculadas | crea la merma y, con cantidad positiva, una entrada de merma (`EME`) con movimiento; cantidad cero no crea documento ni consume folio; una identidad repetida se rechaza sin sumar stock |
+| **Editar**: merma existente. | nombre, stock mínimo, costo máximo y estado | proveedor, material de referencia, presentación, unidad y dimensiones permanecen bloqueados; no cambia existencia |
+| **Ajustar**: merma existente. | nuevo stock total, motivo y observaciones | crea ajuste de merma (`AME`) y su movimiento; no cambia identidad ni interpreta el stock como incremento |
+| **Agregar stock**: merma existente. | cantidad positiva y observaciones opcionales | crea una entrada de merma (`EME`) vinculada a su movimiento; suma la cantidad sin reemplazar el saldo |
 
-1. La tabla describe capacidades del producto. La participación de cada actor y la
-   separación entre cliente y API se definen en
-   [Actores y responsabilidades](03-actors-and-system-responsibilities.md).
-2. El menú y las guardas del cliente orientan el acceso a las páginas. La API
-   comprueba el permiso y alcance de cada operación; un control visible no los concede.
-3. «Modelado» o «Parcial» no significa permitido. Un modelo, permiso declarado o
-   servicio aislado no equivale a un flujo disponible.
-4. Una operación especializada conserva su permiso, transición, efecto de inventario y
-   pruebas propios. No se resume como actualización genérica.
-5. Los contextos equivalentes pueden compartir la realización técnica, pero mantienen
-   separadas sus reglas, existencias y movimientos.
+## Compras
 
-### Separación de compras y salidas
+| Acción y condición previa | Datos editables | Efecto |
+| --- | --- | --- |
+| **Crear**: documento nuevo. | tipo de comprobante, factura cuando aplica, proveedor, receptor, fecha de recepción, observaciones y detalles | incrementa existencias y registra movimientos sin cambios parciales |
+| **Editar**: entrada no cancelada. | tipo de comprobante, factura cuando aplica, receptor, fecha, observaciones y detalles **nuevos** | el proveedor permanece bloqueado; un detalle persistido se cambia mediante la corrección, sin sobrescribirlo |
+| **Ver compra cancelada**: entrada cancelada. | ninguno | formulario, detalles y acciones permanecen en sólo lectura |
+| **Corregir detalle**: detalle activo y entrada habilitada. | cantidad corregida positiva no mayor que la recibida vigente; costo positivo | registra el motivo según el cambio y requiere una diferencia real de cantidad o costo; reducir cantidad exige existencia suficiente y genera movimiento; corregir sólo costo conserva cantidades e historia sin movimiento de inventario |
+| **Cancelar detalle**: detalle activo y existencia suficiente para revertirlo. | sin captura adicional | registra el motivo y la reversión; revierte la cantidad vigente, excluye el detalle de totales activos y conserva su historia; si no quedan detalles activos, la compra queda cancelada |
 
+## Salidas
+
+| Acción y condición previa | Datos editables | Efecto |
+| --- | --- | --- |
+| **Crear**: documento nuevo. | cliente, asesor, área, solicitante, número de proyecto, fecha de solicitud, observaciones y detalles solicitados | no descuenta stock mientras el detalle no se surta |
+| **Editar encabezado y detalles**: salida pendiente. | encabezado y detalles nuevos o cantidades todavía no surtidas | no reescribe cantidades ya surtidas o devueltas |
+| **Editar encabezado**: salida no cancelada que ya no está pendiente. | cliente, asesor, área, solicitante, número de proyecto, fecha de solicitud y observaciones | los detalles permanecen en sólo lectura y no cambia inventario |
+| **Surtir**: detalle con cantidad pendiente; la salida puede estar pendiente o parcialmente surtida. | selección del detalle y Cantidad de proyecto | entrega toda la cantidad pendiente del detalle; el encabezado permanece bloqueado; reduce existencia y crea movimiento sin cambios parciales; otros detalles pendientes mantienen el documento parcialmente surtido |
+| **Devolver**: salida completamente surtida y detalle con saldo entregado disponible. | cantidad positiva no mayor que lo surtido menos devoluciones anteriores; observaciones de devolución | encabezado y detalles originales permanecen bloqueados; incrementa existencia y crea movimiento inverso; una devolución parcial conserva el detalle Surtido, devolver todo su saldo lo cancela y cancelar todos los detalles cancela la salida |
+| **Ver salida cancelada**: salida cancelada. | ninguno | formulario y detalles permanecen en sólo lectura |
+
+Los [estados de los documentos](../domain-model/06-document-lifecycles.md)
+describen sus transiciones. La
+[regla de actividad](catalog/05-cross-cutting-business-policies.md#identidad-y-estado-de-registros)
+precisa el uso de registros inactivos.
+
+## Separación de documentos e historia
+
+Las compras separan materiales y consumibles; las salidas separan materiales,
+consumibles y mermas. Cada documento debe tener al menos un detalle y todos,
+incluidos los cancelados, deben pertenecer a su contexto. Los documentos históricos
+vacíos o mixtos conservan su historia y quedan fuera de los flujos operativos; su
+regularización requiere un flujo aprobado, todavía no disponible.
 La [regla `RN-034`](catalog/05-cross-cutting-business-policies.md#identidad-y-estado-de-registros)
-define el contexto admitido y el tratamiento de documentos históricos mixtos o vacíos.
-Aplica a listados, reportes y escrituras.
-
-## Modos del cliente y estados del negocio
-
-`stock`, `header` y `supply` identifican el ajuste, la edición de encabezado y el
-surtido del cliente. La corrección y devolución utilizan formularios propios.
-Estos nombres no sustituyen los estados de Compra o Salida ni cambian sus reglas.
-Los [ciclos de los documentos](../domain-model/06-document-lifecycles.md) describen
-sus transiciones; las [máquinas de interacción](../../architecture/views/logical/states/index.md)
-explican lectura, captura y recuperación en Vue.
+detalla la separación de materiales y consumibles en consultas, reportes y escrituras.

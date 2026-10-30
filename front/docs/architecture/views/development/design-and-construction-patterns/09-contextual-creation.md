@@ -2,9 +2,10 @@
 
 ## Propósito y funcionamiento
 
-Un formulario puede necesitar un proveedor, artículo o cliente que todavía no existe. Debe abrir su captura completa, conservar el origen y seleccionar sólo el resultado confirmado. Una etiqueta de combobox no representa por sí misma un registro persistido.
-
-La colaboración combina contenedor/presentación, eventos/callbacks y adaptación de datos. `RemoteSelect` usa el `VAutocomplete` instalado; emite texto de búsqueda y no conoce entidades, API o páginas de otro módulo. Los Workspaces de `app/pages` componen módulos mediante contratos explícitos. Cada formulario conserva la responsabilidad de aceptar la nueva opción según modo, disponibilidad y estado.
+El formulario conserva su captura mientras otro modal crea un proveedor,
+artículo o cliente. El Workspace compone los módulos y devuelve el registro
+confirmado mediante un callback. `RemoteSelect` emite la búsqueda; el formulario
+de origen decide si puede seleccionar el resultado.
 
 ## Modelo general
 

@@ -1,16 +1,8 @@
-# Especificación del cliente Vue
+# Requisitos del cliente Vue
 
-## Propósito, estado y alcance
-
-Esta especificación define los resultados que debe ofrecer la aplicación Vue.
-Complementa los requisitos del producto con obligaciones de navegación, captura,
-datos e interacción. El estado documental se consulta en el [índice](../../index.md).
-
-Los IDs locales distinguen esta especificación de los requisitos del producto. El cliente conserva la versión leída y construye las solicitudes según el contrato de cada operación. La API autoriza, valida definitivamente y confirma las escrituras.
-
-Los [actores y responsabilidades](03-actors-and-system-responsibilities.md) definen
-quién realiza cada operación y qué comprueba la API. El [catálogo de pantallas](../../architecture/views/scenarios/navigation-and-screens.md)
-identifica sus entradas de navegación.
+El cliente presenta las operaciones autorizadas, conserva la captura y comunica
+los resultados de la API. Los campos y efectos por acción están en los
+[modos de operación](06-operation-modes-and-effects.md).
 
 ## Requisitos funcionales
 
@@ -30,11 +22,6 @@ identifica sus entradas de navegación.
 | RF-VUE-012 | El cliente debe permitir registrar opciones desde los selectores autorizados y volver al formulario de origen. | Debe admitir proveedor desde Materiales, Consumibles o Compras; artículo desde Compras; y cliente desde Salidas. Debe precargar el texto y seleccionar sólo el registro confirmado, conservando la captura principal. |
 | RF-VUE-013 | El cliente debe permitir exportar reportes con el alcance elegido. | Debe enviar los filtros admitidos por el reporte o el mes cuando esa opción exista, omitiendo paginación. Un fallo debe permitir reintentar; una respuesta inválida no debe anunciarse como Excel válido. |
 | RF-VUE-014 | El cliente debe permitir cerrar la sesión mediante el servidor y volver al login. | Tras confirmar el cierre, debe dejar de presentar los módulos protegidos. Las cookies y la revocación deben seguir el contrato del servidor. |
-
-`RF-VUE-005` a `RF-VUE-010` describen la interacción por familia. Las operaciones
-independientes conservan sus requisitos específicos en el [catálogo del producto](catalog/index.md)
-y sus fichas `CU-*`; no se aceptan todas las operaciones de una familia por comprobar
-un único formulario.
 
 ## Requisitos de datos
 
@@ -64,18 +51,8 @@ un único formulario.
 | RC-VUE-003 | El alojamiento debe servir la API y el cierre de sesión mediante el proxy del mismo origen usado por el cliente. El fallback SPA debe resolver las páginas sin sustituir las respuestas de la API. |
 | RC-VUE-004 | La entrega de producción debe excluir fuentes, herramientas y artefactos documentales de `public`, `dist` y la imagen del frontend. |
 
-Las [interfaces y condiciones de operación](07-interfaces-and-operating-conditions.md)
-precisan las dependencias de estas obligaciones. Los
-[criterios de recorridos críticos](08-verification-and-acceptance.md#criterios-de-los-recorridos-críticos-del-cliente)
-desarrollan sesión, alcance por área, altas contextuales, versiones y actualización visible.
 
-## Trazabilidad y aceptación
-
-El [catálogo de casos de uso](../use-cases/index.md) describe actor, disparador,
-precondiciones, flujo, alternativas, excepciones y postcondiciones por objetivo.
-La [trazabilidad de las obligaciones del cliente](08-verification-and-acceptance.md#trazabilidad-de-las-obligaciones-del-cliente)
-identifica su forma de comprobación; la [matriz por caso](../../testing/04-use-case-coverage.md)
-relaciona los objetivos de negocio con su evidencia y brechas.
-Las [vistas por capacidad](../../architecture/views/index.md#recorrido-por-capacidad)
-localizan su realización. El [plan](../../testing/01-test-plan.md) separa diseño,
-especificación de caso y resultado de ejecución.
+Los [criterios de aceptación](08-verification-and-acceptance.md) detallan las
+condiciones de los recorridos críticos. La
+[cobertura de pruebas](../../testing/04-use-case-coverage.md#requisitos-del-cliente)
+identifica sus comprobaciones.

@@ -1,48 +1,36 @@
-# 3. Actores y responsabilidad del sistema
+# 3. Actores y responsabilidades
 
-| Participante | Responsabilidad |
-| --- | --- |
-| Personal de almacén (área Almacén y proveduría) | Mantener los catálogos operativos autorizados y ejecutar entradas, salidas y devoluciones. No ajusta existencias mediante la acción administrativa. |
-| Usuario de área operativa (Impresión, Taller 3D (Taller/Herrería), Router, PT/Tráfico, Instalaciones o Acabados) | Consultar inventario y crear o editar solicitudes de salida de materiales, consumibles y merma con un rol autorizado. No modifica inventario ni realiza surtidos o devoluciones por este acceso. |
-| Solicitante o aprobador | Persona que participa como dato del documento cuando corresponde; no implica una cuenta, acceso ni un flujo de aprobación disponible. |
-| Administrador del sistema (área Sistemas) | Ejecutar todas las capacidades vigentes, incluida la administración de clientes, personas, usuarios y accesos, siempre con autorización comprobada en el servidor. Ventas no accede al sistema. |
-| Dirección | Parte interesada de supervisión; sus casos de uso y alcance autorizado permanecen pendientes de definición. |
-| Nexus (sistema) | Comprobar accesos y reglas, confirmar operaciones sin cambios parciales, asignar folios, conservar historia y notificar actualizaciones. La auditoría tiene el alcance configurado, no cobertura exhaustiva; el sistema no es actor externo. |
+| Actor | Operaciones permitidas | Restricciones |
+| --- | --- | --- |
+| Personal de Almacén: Auxiliar y Coordinador | Mantener el inventario autorizado, registrar compras y solicitudes, surtir y devolver. Consultar y preparar salidas para todas las áreas. | Sin ajustes administrativos de existencias ni mantenimiento independiente de Clientes/Proveedores. |
+| Usuario de área operativa | Consultar inventario y crear o editar solicitudes de materiales, consumibles y mermas para sus áreas autorizadas. | Sin cambios de inventario, surtidos, devoluciones ni administración de catálogos. |
+| Administrador del sistema, en Sistemas | Todas las capacidades vigentes, incluidos ajustes, Personas, Usuarios, Directorio, catálogos y consulta independiente de movimientos. | La API comprueba la autorización en cada operación. |
 
-Los nombres de actor expresan responsabilidades, no conceden acceso por sí mismos. La
-autorización efectiva se calcula con las asignaciones de usuario, rol y departamento
-descritas en [usuarios y permisos](../../architecture/contracts/index.md).
+Los permisos proceden de la sesión y de las asignaciones de la cuenta. Si tiene
+varias, combina sus accesos autorizados. Las
+[áreas operativas](../vision-scope-and-requirements/02-users-and-areas.md#áreas-operativas)
+son Impresión, Taller/Herrería, Acabados, Router, PT/Tráfico e Instalaciones;
+Instalaciones utiliza el rol Instalador.
 
-El [diagrama de casos de uso](../use-case-model/index.md) conserva
-las asociaciones y generalizaciones de actores; cada [ficha `CU-*`](../use-cases/index.md)
-nombra al actor que inicia el objetivo. Los
-[modos y efectos](06-operation-modes-and-effects.md) concentran las reglas funcionales;
-la arquitectura y OpenAPI describen su realización.
-
-Solicitantes, aprobadores, asesores, receptores y proveedores
-pueden participar en un documento sin convertirse por ello en actores con acceso. Las
-lecturas auxiliares para selectores tampoco conceden mantenimiento del catálogo ni
-sustituyen los controles de acceso del sistema.
+Dirección aún no tiene acceso definido y Ventas no tiene acceso vigente. Figurar
+como solicitante, asesor, receptor, cliente o proveedor en un documento no convierte
+a ese registro en una cuenta ni le concede permisos.
 
 ## Responsabilidades del cliente y de la API
 
-| Responsabilidad | Cliente Vue | API del sistema |
+| Ámbito | Cliente Vue | API |
 | --- | --- | --- |
-| Acceso | Presenta rutas y acciones según los permisos recibidos y recupera la sesión cuando se permite. | Autentica y comprueba autorización vigente en cada petición. |
-| Captura | Valida las reglas públicas, conserva la información corregible y construye la solicitud del modo elegido. | Valida la entrada y resuelve relaciones, versiones y estado persistido. |
-| Existencias e importes | Presenta saldos y vistas previas; espera la confirmación y recarga los datos vigentes. | Calcula y confirma los cambios de documentos, detalle, stock y movimientos sin efectos parciales. |
-| Historia y datos | Presenta la información autorizada y los errores sin exponer secretos. | Conserva los datos y la auditoría configurada. |
-
-Una cuenta con varias asignaciones combina los accesos permitidos por ellas. Auxiliar
-y Coordinador de Almacén pueden consultar y registrar salidas para todas las áreas;
-el acceso operativo se limita a sus áreas autorizadas y no concede surtido ni devolución.
-Instalaciones utiliza el rol Instalador. El Administrador del sistema tiene las
-capacidades vigentes completas. La fuente de autorización sigue siendo la sesión real.
+| Acceso | Presentar páginas y acciones según la sesión. | Comprobar sesión, permisos y áreas en cada petición. |
+| Captura | Validar los campos y conservar los datos corregibles. | Validar relaciones, versiones y estado vigente. |
+| Existencias e importes | Mostrar saldos y cálculos previos; esperar la confirmación. | Calcular y confirmar documento, stock y movimientos sin cambios parciales. |
+| Historia | Mostrar la información permitida. | Conservar datos e historia y aplicar la auditoría configurada. |
 
 ## Alta contextual de clientes y proveedores
 
-Almacén conserva la lectura de opciones y los permisos de alta para los selectores
-de sus operaciones. Si falta un registro, abre el modal, lo guarda y vuelve con
-el nuevo registro seleccionado; cancelar conserva la captura principal. El alta
-confirmada es independiente de que después guarde o abandone esa operación.
-Las páginas de Directorio, su edición y sus reportes corresponden a Sistemas.
+Almacén puede buscar y crear Clientes/Proveedores desde los selectores autorizados.
+El alta abre un modal y vuelve con el nuevo registro seleccionado. Cancelar conserva
+la captura principal; un registro confirmado permanece aunque después se abandone
+la operación de origen. Las páginas independientes, su edición y sus reportes
+corresponden a Sistemas.
+
+Los [casos de uso](../use-cases/index.md) detallan los recorridos por actor.

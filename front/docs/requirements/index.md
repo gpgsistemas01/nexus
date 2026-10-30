@@ -1,21 +1,21 @@
 # Requisitos y casos de uso
 
-## Control documental
+Nexus controla inventario, compras y salidas de materiales, consumibles y mermas.
+Esta colección describe sus capacidades, reglas y recorridos de usuario.
 
-Estado: En revisión. Responsable: Equipo Nexus. Versión de la colección: [entrada documental](../index.md).
+## Encontrar información
 
-## Organización
-
-| Colección | Pregunta y contenido propietario |
+| Necesito saber… | Consultar |
 | --- | --- |
-| [Visión y alcance](vision-scope-and-requirements/index.md) | Por qué existe el producto, quién participa y qué capacidades quedan incluidas, excluidas o pendientes. |
-| [Especificación de requisitos](requirements-specification/index.md) | Qué resultados y restricciones deben cumplirse: propósito, convenciones, actores, catálogo, trazabilidad, modos y obligaciones específicas del cliente. |
-| [Modelo de dominio](domain-model/index.md) | Qué significan los conceptos, sus relaciones y los ciclos de estado de Compras y Salidas. |
-| [Modelo de casos de uso](use-case-model/index.md) | Qué actores participan en cada objetivo, con límites del sistema y relaciones justificadas. |
-| [Fichas de casos de uso](use-cases/index.md) | Los 94 objetivos, con actor, precondiciones, pasos, variantes, excepciones y garantías. |
-| [Glosario de negocio](business-glossary.md) | Vocabulario compartido para interpretar objetivos, datos y restricciones. |
-| [Identificadores y trazabilidad](01-applicability-and-traceability.md) | Cómo relacionar las obligaciones, su realización y la evidencia de pruebas. |
+| Qué hace el sistema y qué queda fuera | [Visión y alcance](vision-scope-and-requirements/index.md). |
+| Qué datos del negocio conserva y qué calidad se espera | [Datos y trazabilidad](vision-scope-and-requirements/03-current-scope.md#datos-y-trazabilidad) y [necesidades de calidad](vision-scope-and-requirements/03-current-scope.md#necesidades-de-calidad). |
+| Quién puede realizar una operación | [Actores y responsabilidades](requirements-specification/03-actors-and-system-responsibilities.md). |
+| Qué reglas y excepciones aplican | [Consulta por tema](requirements-specification/index.md#consulta-rápida-de-reglas-y-excepciones). |
+| Qué se puede modificar y qué efecto tiene | [Modos de operación](requirements-specification/06-operation-modes-and-effects.md). |
+| Cuáles son los pasos y cómo se resuelve un rechazo | [Casos de uso](use-cases/index.md). |
+| Cómo se relacionan actores y objetivos | [Diagramas de casos de uso](use-case-model/index.md). |
+| Qué significa un término o un estado | [Glosario](business-glossary.md) y [modelo de dominio](domain-model/index.md). |
+| Qué requisito corresponde a una capacidad | [Mapa por capacidad](01-applicability-and-traceability.md). |
 
-Para entender una operación, consulte su requisito y ficha de uso. La
-[arquitectura](../architecture/index.md) explica la implementación y la
-[matriz de pruebas](../testing/04-use-case-coverage.md) identifica la evidencia disponible.
+La implementación se explica en [Arquitectura](../architecture/index.md) y sus
+comprobaciones en [Pruebas](../testing/index.md).

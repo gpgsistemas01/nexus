@@ -88,13 +88,10 @@ define cancelación y respuestas tardías; el
 [contrato de callbacks](../../../contracts/form-and-event-contracts.md#callbacks-de-composición),
 los intercambios del lector y guardado.
 
-El callback debe conservar resultados, errores y `AbortSignal`; una firma válida
-de TypeScript no demuestra sustitución de comportamiento.
-Los lectores reciben su consulta al crearse; `useRecordSave` recibe la escritura
-en cada `execute(operation)`.
-[catalogListTest](../../../../../tests/unit/modules/catalogs/catalogListTest.ts) y
-[remoteLookupTest](../../../../../tests/unit/shared/composables/remoteLookupTest.ts)
-comprueban estado, paginación y respuestas tardías según sus contratos.
+Los lectores reciben la consulta al crearse; el guardado recibe la operación en
+`execute(operation)`. Las pruebas de [listados](../../../../../tests/unit/modules/catalogs/catalogListTest.ts)
+y [búsqueda remota](../../../../../tests/unit/shared/composables/remoteLookupTest.ts)
+comprueban sus resultados y respuestas tardías.
 
 ## Coordinación de la alternativa de merma duplicada
 
@@ -143,15 +140,10 @@ permiso, incertidumbre y confirmación separada de la escritura.
 
 ## Selección dependiente de inventario
 
-El [modelo general de composición por callback](#modelo-general-de-composición-por-callback)
-se aplica a la selección del formulario sin trasladar a ese colaborador el guardado.
 [useInventoryEditor](../../../../../src/modules/warehouse/composables/useInventoryEditor.ts)
-es propietario de VeeValidate, validación, envío versionado y captura pendiente de
-merma. [useInventorySelection](../../../../../src/modules/warehouse/composables/useInventorySelection.ts)
-compone las consultas y opciones elegidas; los cambios de unidad, proveedor o
-plantilla actualizan sólo sus campos dependientes mediante callbacks del editor.
-Esos cambios programáticos no se confunden con interacción del usuario ni disparan
-validación al abrir el modal.
+conserva la captura y el guardado.
+[useInventorySelection](../../../../../src/modules/warehouse/composables/useInventorySelection.ts)
+coordina las opciones y actualiza campos dependientes mediante callbacks del editor.
 
 **Identificador:** `DIA-VUE-PAT-004`. **Pregunta:** ¿cómo separar selección y guardado
 conservando un único propietario de la captura? **Fuente:** `useInventoryEditor`,
@@ -181,16 +173,10 @@ sequenceDiagram
     end
 ```
 
-`useSelectedOption` admite una precarga que debe coincidir con el ID vigente.
-La opción remota actualiza datos; después se conserva aunque cambie la página.
-Limpiar o cambiar el ID invalida la selección anterior. Compras y Salidas usan el
-mismo núcleo para altas recientes y documentos cargados; sus composables conservan
-reglas de inactivos, permisos, captura y renovación del catálogo.
-
-[selectedOptionTest](../../../../../tests/unit/shared/composables/selectedOptionTest.ts)
-comprueba precarga, actualización remota, limpieza e independencia de instancias.
-Las pruebas de Inventario, Compras y Salidas observan captura, payloads,
-dependencias y recuperación del consumidor.
+El [contrato de selección](../../../contracts/form-and-event-contracts.md#props-y-propiedad-de-los-datos)
+define los datos compartidos. Las pruebas de
+[selección por ID](../../../../../tests/unit/shared/composables/selectedOptionTest.ts)
+y los consumidores de Inventario, Compras y Salidas comprueban sus cambios y recuperación.
 
 ## Fuentes de los participantes
 

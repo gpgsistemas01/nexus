@@ -60,5 +60,5 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 - Las páginas independientes, su edición y reportes requieren el acceso de Sistemas
   definido en [Actores y responsabilidades](../03-actors-and-system-responsibilities.md#alta-contextual-de-clientes-y-proveedores).
 
-Las [equivalencias históricas](../05-requirement-traceability-rules.md#cobertura-y-límites-de-evidencia)
+Las [equivalencias históricas](../05-requirement-traceability-rules.md#equivalencias-de-requisitos)
 identifican los requisitos que describen una misma garantía de merma.

@@ -1,99 +1,50 @@
-# 5. Reglas de trazabilidad de requisitos
+# 5. Relación entre requisitos y casos de uso
 
-La trazabilidad relaciona cada obligación con los objetivos, la realización y la
-evidencia que permiten revisarla. Las reglas de mantenimiento pertenecen a
-[gobierno documental](../../governance/01-documentation-rules.md) y las decisiones
-pendientes a [visión y alcance](../vision-scope-and-requirements/10-known-gaps-and-pending-decisions.md).
+Cada caso de uso indica sus requisitos y las reglas que afectan sus pasos. Un
+requisito compartido puede apoyar varios casos sin crear un objetivo nuevo.
+El [mapa por capacidad](../01-applicability-and-traceability.md) enlaza las familias,
+sus manuales y diagramas.
 
-La [vista de componentes](../../architecture/views/logical/components/index.md)
-identifica responsabilidades; las [secuencias](../../architecture/views/processes/index.md)
-explican las colaboraciones; la [referencia del código](../../architecture/views/development/code-reference.md)
-localiza contratos y la [matriz de cobertura](../../testing/04-use-case-coverage.md)
-relaciona los 94 casos con sus condiciones y límites de evidencia.
-Los identificadores permiten recorrer requisito ↔ caso ↔ realización ↔ prueba.
+## Reglas comunes
 
-No todo requisito debe crear un caso de uso independiente. Los requisitos de soporte
-para selectores operativos, unicidad de relaciones, validaciones compartidas, permisos
-transversales o cálculos de reportes pueden estar relacionados con varias fichas o con
-ninguna ficha exclusiva cuando describen una responsabilidad interna de Nexus. La
-completitud se verifica en sentido inverso: cada caso vigente debe enlazar al menos un
-`RF-*` o una regla `RN-*`, y cada requisito de soporte debe conservar evidencia técnica
-o una relación explícita con los flujos que regula.
-
-## Lectura de requisitos y reglas desde los casos de uso
-
-La revisión de completitud comienza en cada ficha `CU-*`: su fila **Requisitos
-relacionados** enlaza los requisitos funcionales que definen el objetivo y las reglas de
-negocio que deciden sus variantes, rechazos o efectos. Una referencia no reemplaza el
-paso observable; la ficha debe expresar también dónde valida Nexus la regla y qué
-resultado conserva cuando se incumple.
-
-Las reglas transversales siguientes no se repiten en cada ficha vigente. Aplican por
-la naturaleza de la interacción y se revisan junto con sus precondiciones y excepciones:
-
-| Alcance de casos de uso | Requisitos y reglas aplicables |
+| Casos a los que aplican | Reglas |
 | --- | --- |
-| Todo `CU-*` que accede a una operación protegida | `RN-001` y `RN-009`: sesión y permiso comprobados en el servidor antes de exponer datos o ejecutar el objetivo. `CU-AUT-01` es la excepción de entrada y valida credenciales conforme a `RF-AUT-001`; `CU-AUT-02` exige una sesión vigente. |
-| Todo `CU-*` que crea, edita, retira, ajusta, corrige, cancela, surte, devuelve o cambia credenciales | `RN-010`: validación de la entrada en el servidor antes de persistir. |
-| Crear o editar encabezado/detalles en `CU-SAL-02/03/04`, `CU-SAL-09/10/11` y `CU-SAL-16/17/18` | `RN-019` y `RN-035`: al guardar el encabezado para GPG INTERNO, asesor y proyecto deben cumplir las condiciones del cliente interno. La edición de detalles conserva el encabezado enviado y sus reglas. |
-| Toda escritura crítica configurada para auditoría | `RN-008`: registro del actor, acción, recurso, resultado y datos admitidos; la configuración de auditoría determina el alcance, no la mera presencia de un botón en la ficha. |
-| Altas, correcciones, cancelaciones, ajustes, surtimientos y devoluciones que generan movimientos | `RN-002`, `RN-011` y `RN-013` cuando cambian conjuntamente documento, detalle o stock: confirmación sin cambios parciales, vínculo único con el origen y condiciones de cantidad según la operación. Cada ficha operativa agrega además las reglas específicas que cambian su recorrido. |
+| Operaciones protegidas | `RN-001` y `RN-009`: sesión y permiso. El login `CU-AUT-01` comprueba credenciales según `RF-AUT-001`; el cierre `CU-AUT-02` exige sesión. |
+| Crear, editar, retirar, ajustar, corregir, cancelar, surtir, devolver o cambiar credenciales | `RN-010`: validación antes de persistir. |
+| Encabezado y detalles de `CU-SAL-02/03/04`, `CU-SAL-09/10/11` y `CU-SAL-16/17/18` | `RN-019` y `RN-035`: asesor y proyecto del cliente interno. |
+| Escrituras configuradas para auditoría | `RN-008`: registro del actor, la operación y los datos admitidos. |
+| Operaciones que generan movimientos | `RN-002`, `RN-011` y `RN-013`: confirmación sin cambios parciales, origen y cantidades. |
 
-Los requisitos de soporte tampoco originan artificialmente otro caso de uso. Su relación
-con los objetivos vigentes se interpreta así:
+## Requisitos compartidos por varios recorridos
 
-| Requisito de soporte | Casos de uso en los que se comprueba |
+| Requisitos | Casos relacionados |
 | --- | --- |
-| `RF-AUT-002` | Renovación interna de una sesión durante cualquier caso protegido; no constituye un objetivo separado del actor. |
-| `RF-IAM-003` | `CU-IDA-06` y `CU-IDA-07`, al cargar y validar roles y áreas para asignaciones de acceso. |
-| `RF-CAT-005`, `RF-CAT-019` a `RF-CAT-021` | Altas y ediciones que consumen presentaciones, unidades, motivos o estados como selectores; su administración corresponde a `CU-CAT-09` a `CU-CAT-26`. |
-| `RF-REC-006` | `CU-ALM-02` y `CU-ENT-02`: una marca que distingue físicamente el material se resuelve en el catálogo antes de recibirlo. |
-| `RF-REC-009` | `CU-ENT-02` y `CU-ENT-08`: folios de compra asignados por la API con series separadas. La normalización histórica requiere evidencia de migración y persistencia; no crea una pantalla Vue. |
-| `RF-REC-010` | `CU-ENT-06` y `CU-ENT-12`: reporte del contexto de compra, incluido nombre del archivo y hoja. La descarga simulada no demuestra esas propiedades del XLSX real. |
-| `RF-REC-011` | `CU-ENT-01` a `CU-ENT-12`, según su operación: documentos y detalles del mismo contexto, incluso al consultar, corregir o cancelar. La API rechaza cruces sin cambios parciales. |
-| `RF-ISS-007` y `RF-ISS-008` | `CU-SAL-02` y `CU-SAL-16` reciben el folio confirmado de su contexto. La conversión de folios históricos se verifica en migración y base aisladas; no es una operación solicitada desde Vue. |
-| `RF-WST-001` y `RF-WST-007` | `CU-ALM-09` consulta existencias del catálogo de mermas; `CU-SAL-08` consulta documentos de salida de merma. Los identificadores no se intercambian aunque ambos recorridos sean consultas. |
-| `RF-REP-003`, `RF-REP-006`, `RF-REP-007` y `RF-REP-009` | `CU-ALM-14`, reporte de mermas; complementan sus requisitos relacionados sin crear otra exportación. |
-| `RF-REP-011` | `CU-ALM-07`, `CU-ALM-08`, `CU-ALM-15`, `CU-ALM-16`, `CU-ALM-23` y `CU-ALM-24`: tres consultas y reportes que conservan su contexto. |
-| `RF-REP-012` | `CU-ALM-14`: peso total de rollos y aviso cuando falta peso capturado. |
-| `RF-MER-011` | `CU-ALM-10` y `CU-ALM-11`: captura inicial y consulta del peso unitario de Rollo, conservado al editar y operar stock. |
-| `RF-MER-010`, `RF-MER-012` y `RF-MER-013` | `CU-ALM-13` registra la entrada trazable; `CU-ALM-10` captura la muestra y calcula las dimensiones de Rollo. La vista previa se comprueba en cliente y la persistencia en API/base aisladas. |
-| `RF-MER-001` a `RF-MER-009` | `CU-ALM-10` a `CU-ALM-12` y, para cantidad convertida, `CU-SAL-12` y `CU-SAL-13`; las fichas enlazan cada restricción que modifica su flujo. |
-| `RF-ADJ-001` y `RF-ADJ-002` | `CU-ALM-05`, `CU-ALM-12` y `CU-ALM-21`, ajustes de material, merma y consumible respectivamente. |
-| `RF-REQ-001`, `RF-PRJ-001` y `RF-PRJ-002` | No se asignan a un `CU-*` vigente mientras permanezcan fuera de alcance o modelados. |
+| `RF-AUT-002` | Renovación de sesión durante cualquier operación protegida. |
+| `RF-IAM-003` | `CU-IDA-06/07`: áreas y roles de las cuentas. |
+| `RF-CAT-005`, `RF-CAT-019` a `RF-CAT-021` | Selectores de las altas y ediciones; mantenimiento en `CU-CAT-09` a `CU-CAT-26`. |
+| `RF-REC-006` | `CU-ALM-02`, `CU-ENT-02`: una marca que distingue físicamente el material se registra como otra identidad de catálogo antes de recibirlo. |
+| `RF-REC-009` | `CU-ENT-02/08`: folios de compra separados por contexto. |
+| `RF-REC-010` | `CU-ENT-06/12`: contexto, archivo y hoja del reporte de compras. |
+| `RF-REC-011` | `CU-ENT-01` a `CU-ENT-12`: documentos y detalles del mismo contexto. |
+| `RF-ISS-007/008` | `CU-SAL-02/16`: folios confirmados del contexto de salida. La normalización de series históricas conserva año, consecutivo e identidad; no constituye una acción de pantalla. |
+| `RF-WST-001` y `RF-WST-007` | `CU-ALM-09`: inventario de merma; `CU-SAL-08`: documentos de salida de merma. |
+| `RF-REP-003/006/007/009/012` | `CU-ALM-14`: reporte de mermas, pesos y aviso por datos faltantes. |
+| `RF-REP-011` | `CU-ALM-07/08/15/16/23/24`: movimientos y reportes por recurso. |
+| `RF-MER-011` | `CU-ALM-10/11`: captura y consulta del peso unitario de Rollo, conservado al editar y mover stock. |
+| `RF-MER-010/012/013` | `CU-ALM-13`: entrada trazable de merma; `CU-ALM-10`: muestra del rollo completo, pesos y dimensiones calculadas. |
+| `RF-MER-001` a `RF-MER-009` | `CU-ALM-10` a `CU-ALM-12`; cantidades convertidas en `CU-SAL-12/13`. |
+| `RF-ADJ-001/002` | `CU-ALM-05/12/21`: ajustes de material, merma y consumible. |
+| `RF-REQ-001`, `RF-PRJ-001/002` | Sin caso vigente mientras permanezcan excluidos o modelados. |
 
-Los requisitos de datos `RD-*` y de calidad `RC-*` se verifican sobre la solución y sus
-evidencias técnicas; sólo se incorporan a una ficha si producen una decisión observable
-del recorrido. Esta separación evita convertir despliegue, pruebas, logging o estructura
-de persistencia en acciones ficticias del actor.
+## Equivalencias de requisitos
 
-## Cobertura y límites de evidencia
+Los pares `RF-CAT-004` / `RF-WST-001`, `RF-CAT-016` / `RF-MER-005` y
+`RF-CAT-017` / `RF-MER-003` conservan IDs históricos para la misma consulta,
+restricción o edición de merma. No representan operaciones adicionales.
 
-Los IDs estables no prueban por sí solos una relación bidireccional completa. La revisión
-comprueba que cada ID enlazado exista una sola vez como definición y que el alcance de
-la ficha coincida con el requisito. Las reglas citadas por rangos se leen con todos sus
-identificadores intermedios.
+## Comprobación
 
-Las salidas de consumibles se describen en `CU-SAL-15` a `CU-SAL-21`. Sus
-operaciones se rigen por `RF-ISS-001` a `RF-ISS-006`, la separación por `RN-034`
-y los reportes por `RF-REP-002` y `RF-REP-004`. Cada caso tiene una ficha propia y
-secuencias del cliente; `CU-CAT-06` extiende opcionalmente el alta cuando falta
-el cliente. Sus pruebas y brechas se identifican en el catálogo de cobertura.
-
-`RF-CAT-004` y `RF-WST-001`, `RF-CAT-016` y `RF-MER-005`, y `RF-CAT-017` y
-`RF-MER-003` se comprueban como referencias a la misma consulta, garantía o edición,
-respectivamente. Mantener sus IDs históricos no exige nuevas operaciones. Todo requisito
-que todavía carezca de evidencia suficiente conserva su brecha o estado; no se supone
-que tenga una prueba sólo porque otro flujo reutilice el mismo servicio.
-
-## Obligaciones específicas del cliente
-
-Los IDs `RF/RD/RN/RC-VUE-*` se definen en la
-[especificación del cliente](client-specification.md). Se relacionan con las mismas
-fichas de negocio; renovar sesión, conservar una captura o rechazar una respuesta
-tardía no crea por sí solo otro objetivo del usuario. Los resultados DP/CP/EP se
-registran según el [plan de pruebas](../../testing/01-test-plan.md).
-La [tabla por ID local](08-verification-and-acceptance.md#trazabilidad-de-las-obligaciones-del-cliente)
-identifica una forma de comprobación para cada obligación Vue.
-Las pruebas con API simulada demuestran interacción y contrato; la confirmación
-persistente y la autorización efectiva requieren evidencia con servicios reales.
+Los requisitos `RF/RD/RN/RC-VUE-*` se definen en la
+[especificación del cliente](client-specification.md). La
+[cobertura de pruebas](../../testing/04-use-case-coverage.md) reúne sus
+comprobaciones y las de cada caso de uso.

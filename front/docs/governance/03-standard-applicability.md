@@ -1,42 +1,25 @@
 # 3. Aplicación de estándares a la documentación Vue
 
-## Referencias adoptadas
-
-Estas referencias orientan requisitos, arquitectura, pruebas y manuales. La tabla
-indica qué contenido adopta Nexus. La revisión de las fichas públicas de alcance
-se registró el 2026-10-26; no constituye una auditoría del texto normativo completo
-ni una declaración de conformidad.
+Estas referencias orientan el contenido documental. Se revisaron sus fichas públicas
+de alcance el 2026-10-26; su adopción local no declara conformidad integral.
 
 ## Alcance de las referencias
 
-| Referencia | Qué aporta | Decisión para Vue |
-| --- | --- | --- |
-| [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html) | Propósito y contenido de los elementos de información del ciclo de vida. | Conservar guías identificables, responsables y relaciones; adaptar su contenido a desarrollo, operación y pruebas del cliente. |
-| [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) | Ingeniería de requisitos e información que resulta de ella. | Mantener obligaciones observables y trazables. `RF/RD/RN/RC-VUE-*` y fichas `CU-AUT/CU-ALM/CU-CAT/CU-IDA/CU-ENT/CU-SAL` son identificadores locales, con criterios de captura/interacción y postcondiciones propias. |
-| [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Descripción de arquitectura y relaciones entre sus conceptos. | Usar preocupaciones, vistas y decisiones del cliente. La referencia no fija herramienta, notación, método o soporte de registro; Mermaid, C4 y organización Markdown son elecciones del proyecto. |
-| [IEEE 1016-2009](https://standards.ieee.org/ieee/1016/4502/) | Referencia histórica de descripción de diseño. IEEE la identifica Inactive-Reserved. | Complementar la explicación de interfaces, responsabilidades y relaciones; no presentarla como una obligación actual de Vue ni como plantilla universal por función. |
-| [ISO/IEC/IEEE 29119-3:2021](https://www.iso.org/standard/79429.html) | Documentación de pruebas que resulta de los procesos de prueba. | Conservar plan, diseño, datos, resultado esperado y ejecución como información distinta; los formatos DP/CP/EP se adaptan localmente. |
-| [ISO/IEC/IEEE 26514:2022](https://www.iso.org/standard/77451.html) | Diseño y desarrollo de información para usuarios de software. | Organizar el manual por audiencia y tareas, con conceptos, instrucciones, referencia de campos y resolución de problemas; revisar su estructura, contenido y presentación. |
-| [ISO/IEC/IEEE 29119-4:2021](https://www.iso.org/standard/79430.html) | Técnicas de diseño de pruebas. | Aplicar particiones, fronteras, decisiones y transiciones a captura, permisos, sesión, paginación y recuperación. Vitest/Playwright son herramientas de ejecución. |
-| [ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) | Modelo de calidad del producto para especificar y evaluar sus características. | Revisar mantenibilidad, interacción, seguridad y desempeño con criterios verificables. Una compilación o conteo de pruebas no demuestra por sí solo esos atributos. |
-| [Guía de Vue 3](https://vuejs.org/guide/introduction.html) y configuración local | Recomendaciones y mecanismos propios del framework. | Describir SFC, composables, props/eventos, slots, reactividad e inyección según su API. Las fichas de patrones tienen una estructura local; ESLint/Prettier y el estándar del proyecto concretan el estilo del código. |
+| Referencia | Aplicación en Nexus |
+| --- | --- |
+| [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html) | Guías identificables por propósito, audiencia, responsable y relaciones. |
+| [ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) | Obligaciones observables, identificadores, criterios y trazabilidad de requisitos. Los IDs y las plantillas son locales. |
+| [ISO/IEC/IEEE 42010:2022](https://www.iso.org/standard/74393.html) | Descripción por preocupaciones, vistas y decisiones. La organización 4+1, Mermaid, C4 y Markdown son elecciones del proyecto. |
+| [IEEE 1016-2009](https://standards.ieee.org/ieee/1016/4502/) | Referencia histórica para interfaces, responsabilidades y relaciones. Estado Inactive-Reserved; no es una plantilla obligatoria por función. |
+| [ISO/IEC/IEEE 29119-3:2021](https://www.iso.org/standard/79429.html) | Plan, diseño, datos, resultados esperados y ejecuciones diferenciados; formatos locales DP/CP/EP. |
+| [ISO/IEC/IEEE 26514:2022](https://www.iso.org/standard/77451.html) | Manual por audiencia y tareas, con pasos, campos, conceptos y recuperación. |
+| [ISO/IEC/IEEE 29119-4:2021](https://www.iso.org/standard/79430.html) | Particiones, fronteras, decisiones y transiciones según el riesgo. Vitest y Playwright ejecutan las pruebas. |
+| [ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) | Criterios verificables de mantenibilidad, interacción, seguridad y desempeño. |
+| [Guía de Vue 3](https://vuejs.org/guide/introduction.html) | SFC, composables, props/eventos, slots, reactividad e inyección. El estándar y la configuración locales concretan el estilo del código. |
 
-Las ediciones listadas identifican referencias elegidas, no un cambio automático de versión cuando aparece un borrador. Modificar la base normativa requiere revisar su alcance e impacto documental; cambiar de framework o motor de renderizado tampoco justifica hacerlo por sí solo.
+Cambiar una referencia requiere revisar su alcance e impacto. Una nueva edición
+o un cambio de tecnología no sustituye automáticamente las referencias adoptadas.
 
-## Artefactos y controles
-
-Los casos de uso siguen la tabla y granularidad definidas en su [catálogo](../requirements/use-cases/index.md).
-El plan, los diseños, las fichas de prueba y la evidencia de ejecución conservan los
-formatos DP, CP y EP del [plan de pruebas](../testing/01-test-plan.md). La tecnología
-no reduce los campos ni el nivel de detalle exigido para esos registros.
-
-Arquitectura se organiza en vistas 4+1. La distribución de las reglas locales se
-consulta en el [mapa de estándares](09-standards-and-ownership.md); cada ámbito
-mantiene su propia fuente y controles.
-
-La revisión comprueba enlaces, IDs, correspondencia con código, frescura de fuentes
-generadas y legibilidad de figuras/tablas. `docs:check` automatiza controles de fuentes;
-la revisión de prosa y la aceptación requieren evidencia y responsable.
-
-La aplicación de la información de usuario se detalla en el
-[estándar editorial del manual](05-user-manual.md).
+Las plantillas y comprobaciones se consultan en el
+[mapa de estándares](09-standards-and-ownership.md); la exportación, en la
+[guía de publicación](02-generation-and-publication.md).

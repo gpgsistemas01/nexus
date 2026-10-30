@@ -5,10 +5,6 @@
 El cliente de Nexus es una SPA de Vue 3 con TypeScript. El navegador ejecuta la interfaz; un
 servidor estático entrega `dist` y la API procesa autenticación, permisos y datos.
 
-`app` compone navegación, sesión y módulos. Cada módulo contiene páginas,
-componentes, composables y adaptadores de sus operaciones. `shared` reúne los
-controles y coordinadores reutilizados.
-
 ## Recorrido técnico
 
 | Necesita entender | Referencia |

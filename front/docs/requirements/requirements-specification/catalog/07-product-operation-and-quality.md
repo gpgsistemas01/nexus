@@ -25,12 +25,6 @@
 
 ## Alcance y comprobación de calidad
 
-Esta sección incluye restricciones técnicas explícitas de seguridad, datos, construcción
-y operación. Son requisitos de calidad, no pasos del actor ni reglas de dominio nuevas.
-Su evidencia se consulta en el plan de pruebas, la
-arquitectura y el
-registro de aplicación de calidad.
-
 - **CA-RC-USA-001-1:** en una pantalla angosta el usuario puede alcanzar las acciones
   operativas y consultar los datos de la tabla mediante los controles de desplazamiento
   previstos; ocultar una columna no debe ocultar su única acción disponible.
@@ -44,9 +38,8 @@ registro de aplicación de calidad.
 
 ## Objetivos de calidad por definir
 
-Estas necesidades conservan su ID, pero todavía no tienen condiciones suficientes
-para verificar cumplimiento. Sus medidas y responsables deben acordarse en el
-[registro de pendientes](../../vision-scope-and-requirements/10-known-gaps-and-pending-decisions.md).
+Las medidas y responsables de estos requisitos siguen pendientes de acuerdo.
+Véase [Decisiones pendientes](../../vision-scope-and-requirements/04-open-decisions.md).
 
 | ID | Definición necesaria | Estado |
 | --- | --- | --- |
@@ -57,33 +50,21 @@ para verificar cumplimiento. Sus medidas y responsables deben acordarse en el
 
 ## Restricción de construcción con identificador histórico
 
-`RN-006` se conserva por trazabilidad, pero su obligación es de construcción, no una
-regla del negocio ni una acción del actor. Se revisa junto con `RC-MAN-002`.
+`RN-006` conserva su ID histórico para una condición de construcción relacionada
+con `RC-MAN-002`.
 
 | ID | Requisito | Estado |
 | --- | --- | --- |
 | RN-006 | Un catálogo debe reutilizar el ciclo listar-crear-actualizar y sus componentes existentes cuando no cambien sus reglas, permisos ni persistencia. | Implementado |
 
-## Responsabilidad y evidencia de calidad
+## Responsabilidad de comprobación
 
-Las obligaciones anteriores conservan su alcance de producto. Esta tabla identifica
-qué puede comprobar el cliente y qué requiere evidencia del servicio que consume.
-
-| Requisitos | Responsabilidad y comprobación |
+| Ámbito | Dónde se comprueba |
 | --- | --- |
-| `RC-SEG-001` | La API protege el almacenamiento de contraseñas. Vue conserva su contenido al ingresar, no las guarda en Storage y no necesita implementar el hash persistente. |
-| `RC-SEG-002`, `RC-SEG-003` | El cliente presenta acciones autorizadas y construye las solicitudes del contrato. La autorización y el rechazo del contenido HTTP se prueban también contra la API real. |
-| `RC-SEG-004`, `RC-OBS-002` | Las variables públicas, mensajes y archivos del cliente se revisan para impedir exposición de secretos; los diagnósticos privados permanecen en el servidor. |
-| `RC-DAT-001`, `RC-DES-001`, `RC-DES-002` | Son condiciones de migración y arranque del backend. El sitio estático no ejecuta Prisma ni requiere `DATABASE_URL` o `DIRECT_URL`; consume el servicio ya preparado. |
-| `RC-DAT-002`, `RC-PRU-001`, `RC-PRU-002` | Las unitarias y pruebas de navegador con API simulada comprueban contratos e interacción. La suite de sistema utiliza servicios y base aislados; no equivale a cubrir todos los flujos persistentes. |
-| `RC-MAN-001`, `RC-MAN-002`, `RN-006` | En Vue se comprueban módulos funcionales, separación de presentación/coordinación/transporte y reutilización de componentes y composables. Las capas privadas del servidor no se trasladan al cliente. |
-| `RC-DOC-001` | Los cambios del cliente mantienen su documentación local y `docs:check`. Su referencia generada procede de TS/SFC; los cambios de Prisma se verifican en el servicio propietario. |
-| `RC-OBS-001` | El servidor conserva sus logs operacionales; el cliente normaliza y presenta errores recuperables. Esta obligación no exige incorporar el logger privado al navegador. |
-| `RC-COM-001`, `RC-COM-002` | La compilación usa el rango de Node declarado por `front/package.json`; la integración comprueba JSON y las respuestas de archivos o texto admitidas. |
-| `RC-USA-001`, `RC-USA-002`, `RC-REN-001` | El navegador comprueba interacción en pantalla angosta, errores corregibles y consultas paginadas en los consumidores aplicables. |
-| `RC-REN-002`, `RC-REN-003`, `RC-DIS-001`, `RC-DIS-002` | Permanecen propuestos hasta acordar y medir condiciones, límites y responsables; la compilación y las pruebas existentes no les asignan umbrales. |
+| Contraseñas persistidas, autorización, migraciones, arranque y auditoría | Servicio API; el cliente consume sus resultados. |
+| Captura, mensajes, navegación, tablas y paginación | Cliente Vue. |
+| Contratos y publicación | Integración entre cliente, API y alojamiento. |
 
-La [arquitectura](../../../architecture/index.md) explica la realización y el
-[plan de pruebas](../../../testing/01-test-plan.md) distingue niveles y límites de
-evidencia. Las restricciones de persistencia y operación se mantienen como contexto
-del producto y no se presentan como funciones implementadas dentro de Vue.
+La [cobertura de pruebas](../../../testing/04-use-case-coverage.md) identifica las
+comprobaciones disponibles y sus límites. La
+[arquitectura](../../../architecture/index.md) explica cómo se implementan.

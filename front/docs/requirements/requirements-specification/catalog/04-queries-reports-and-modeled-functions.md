@@ -71,7 +71,7 @@
 ## Capacidades no vigentes
 
 Estas capacidades no tienen un flujo disponible en el cliente. Sus decisiones se
-registran en [Brechas y decisiones pendientes](../../vision-scope-and-requirements/10-known-gaps-and-pending-decisions.md).
+registran en [Brechas y decisiones pendientes](../../vision-scope-and-requirements/04-open-decisions.md).
 
 | ID | Requisito | Estado |
 | --- | --- | --- |

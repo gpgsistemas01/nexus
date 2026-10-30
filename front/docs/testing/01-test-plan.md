@@ -155,7 +155,7 @@ Aplicar los criterios de [entrada, suspensión y salida](#entrada-suspensión-y-
 y la [revisión de cambios](../development/04-change-review.md).
 
 La configuración de CI y los comandos se consultan en
-[Herramientas](../development/02-tooling.md#automatización). Los resultados JUnit,
+[Herramientas](../development/02-tooling.md#configuración-y-compatibilidad). Los resultados JUnit,
 capturas y trazas permanecen como artefactos de ejecución.
 
 No se deduce cobertura total de conteos aprobados ni rendimiento de producción por el tiempo de la suite. Las brechas funcionales/de evidencia permanecen en la [matriz local](04-use-case-coverage.md).

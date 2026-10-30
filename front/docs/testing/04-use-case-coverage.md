@@ -7,19 +7,47 @@ La columna de alcance identifica la condición y sus límites. Un archivo compar
 demuestra todas las alternativas de cada caso. Los resultados aprobados, fallidos o
 bloqueados se registran en EP, no se deducen de esta matriz.
 
-## Requisitos del cliente y familias
+## Requisitos del cliente
 
-| Requisitos | Casos y evidencia |
+La tabla localiza las comprobaciones de cada requisito Vue. Las pruebas con API
+simulada cubren contratos e interacción; los efectos persistidos y los archivos
+reales requieren las comprobaciones de sistema indicadas. Cada fila identifica
+fuentes de revisión, no una cobertura completa de todos sus escenarios.
+
+| Requisito | Evidencia o forma de revisión |
 | --- | --- |
-| RF-VUE-001/002/014; RD-VUE-004 | Acceso, renovación y cierre: CU-AUT; sesión/HTTP y casos reales representativos de sistema. |
-| RF-VUE-003/004; RN-VUE-003/005 | Consultas de todas las familias, listados remotos, filtros y navegación. |
-| RF-VUE-005; RD-VUE-001/002 | CU-CAT y CU-IDA: captura, asignaciones, cuenta y edición versionada. |
-| RF-VUE-006/007/008; RD-VUE-003/005 | CU-ALM: inventario, peso, ajuste, entrada, versión e idempotencia. |
-| RF-VUE-009 | CU-ENT: compra, encabezado, nuevos detalles y corrección/cancelación. |
-| RF-VUE-010 | CU-SAL: solicitud, encabezado, detalle, surtido y devolución. |
-| RF-VUE-011/013 | Historiales y reportes de sus respectivas familias. |
-| RF-VUE-012; RD-VUE-006 | Altas contextuales y selección: CP-VUE-SEL-001-01/02/03 y unitarias de selección. |
-| RN-VUE-001/002/004/006; RC-VUE | Formularios, seguridad textual, cancelación, fronteras de imports, tipos/build y controles documentales. |
+| `RF-VUE-001` | [Formulario de login](../../tests/unit/modules/auth/composables/useLoginFormTest.ts) y [login en navegador](../../tests/e2e/login.spec.ts). |
+| `RF-VUE-002` | [Cliente HTTP](../../tests/unit/shared/http/apiClientTest.ts), [recuperación de sesión](../../tests/e2e/sessionRecovery.spec.ts) y [sistema](../../tests/system/application.spec.ts). |
+| `RF-VUE-003` | [Router](../../tests/unit/app/routerTest.ts), [acceso a páginas](../../tests/unit/app/pageAccessTest.ts) y [navegación en Salidas](../../tests/e2e/issues.spec.ts). |
+| `RF-VUE-004` | [Interacción de listados](../../tests/unit/shared/composables/listInteractionTest.ts), [query de tabla](../../tests/unit/shared/composables/tableQueryTest.ts) y [contrato paginado](../../tests/unit/shared/http/pageRequestTest.ts). |
+| `RF-VUE-005` | [Catálogos](../../tests/e2e/catalogs.spec.ts) y [Directorio/Identidad](../../tests/e2e/records.spec.ts). |
+| `RF-VUE-006` | [Formulario de inventario](../../tests/unit/modules/warehouse/inventoryFormTest.ts) y [Almacén](../../tests/e2e/warehouse.spec.ts). |
+| `RF-VUE-007` | [Formulario de inventario](../../tests/unit/modules/warehouse/inventoryFormTest.ts), [Almacén](../../tests/e2e/warehouse.spec.ts) y los efectos reales exigidos por los casos de Merma. |
+| `RF-VUE-008` | [Recuperación de merma](../../tests/unit/modules/warehouse/wasteDuplicateRecoveryTest.ts) y [Almacén](../../tests/e2e/warehouse.spec.ts); confirmar idempotencia persistente requiere además la API/base aisladas. |
+| `RF-VUE-009` | [Compras unitarias](../../tests/unit/modules/purchases/purchaseTest.ts) y [Compras en navegador](../../tests/e2e/purchases.spec.ts). |
+| `RF-VUE-010` | [Salidas unitarias](../../tests/unit/modules/issues/issueTest.ts), [alcance de áreas](../../tests/unit/modules/issues/issueDepartmentsTest.ts) y [Salidas en navegador](../../tests/e2e/issues.spec.ts). |
+| `RF-VUE-011` | [Servicio de movimientos](../../tests/unit/modules/movements/movementServiceTest.ts) y [Movimientos en navegador](../../tests/e2e/movements.spec.ts). |
+| `RF-VUE-012` | [Altas desde selectores](../../tests/e2e/selectCreation.spec.ts) y [alta contextual de artículos](../../tests/unit/modules/purchases/purchaseQuickCreateTest.ts). |
+| `RF-VUE-013` | [Reportes de inventario](../../tests/unit/modules/warehouse/inventoryReportTest.ts), [alcance de reportes](../../tests/unit/shared/composables/reportScopeTest.ts) y [XLSX representativos de sistema](../../tests/system/application.spec.ts). |
+| `RF-VUE-014` | [Cierre y acceso posterior](../../tests/e2e/sessionRecovery.spec.ts) y [sesión real en sistema](../../tests/system/application.spec.ts). |
+| `RD-VUE-001` | [Opciones remotas](../../tests/unit/modules/warehouse/remoteOptionsTest.ts) y [altas desde selectores](../../tests/e2e/selectCreation.spec.ts). |
+| `RD-VUE-002` | [Editores de catálogo](../../tests/unit/modules/catalogs/catalogEditorTest.ts), [Directorio](../../tests/unit/modules/directory/directoryTest.ts) e [Inventario](../../tests/unit/modules/warehouse/inventoryFormTest.ts). |
+| `RD-VUE-003` | [Captura de inventario](../../tests/unit/modules/warehouse/inventoryFormTest.ts), [Compras](../../tests/unit/modules/purchases/purchaseTest.ts) y [Salidas](../../tests/unit/modules/issues/issueTest.ts). |
+| `RD-VUE-004` | [Login](../../tests/unit/modules/auth/composables/useLoginFormTest.ts), [sesión](../../tests/e2e/sessionRecovery.spec.ts) e inspección de Storage/cookies en el entorno integrado. |
+| `RD-VUE-005` | [Mappers de Compras](../../tests/unit/modules/purchases/purchaseTest.ts) y [Salidas](../../tests/unit/modules/issues/issueTest.ts); revisar además validación y cálculo definitivo en la API. |
+| `RD-VUE-006` | [Selección por ID](../../tests/unit/shared/composables/selectedOptionTest.ts) y [lookup remoto](../../tests/unit/shared/composables/remoteLookupTest.ts). |
+| `RD-VUE-007` | [Páginas](../../tests/unit/shared/http/pageRequestTest.ts), [confirmaciones](../../tests/unit/shared/http/recordContractTest.ts), documentos de [Compras](../../tests/unit/modules/purchases/purchaseTest.ts) y [Salidas](../../tests/unit/modules/issues/issueTest.ts), y [tipo de descarga](../../tests/unit/modules/warehouse/inventoryReportTest.ts). Revisar también las guardas de ID en los servicios de lectura; la validación MIME no comprueba la estructura interna del XLSX, que se verifica en los representantes de sistema. |
+| `RN-VUE-001` | [Login en navegador](../../tests/e2e/login.spec.ts), [Almacén](../../tests/e2e/warehouse.spec.ts) y [registros](../../tests/e2e/records.spec.ts). |
+| `RN-VUE-002` | [Guardado y recuperación de merma](../../tests/unit/modules/warehouse/wasteDuplicateRecoveryTest.ts) y [Compras](../../tests/unit/modules/purchases/purchaseTest.ts). |
+| `RN-VUE-003` | [Lookup remoto](../../tests/unit/shared/composables/remoteLookupTest.ts), [listado de inventario](../../tests/unit/modules/warehouse/inventoryListTest.ts) y desmontaje de consumidores. |
+| `RN-VUE-004` | [Avisos como texto](../../tests/unit/shared/ui/feedbackTest.ts) y [texto recibido en tablas/formularios](../../tests/e2e/catalogs.spec.ts). |
+| `RN-VUE-005` | [Lookup remoto](../../tests/unit/shared/composables/remoteLookupTest.ts) y [página HTTP](../../tests/unit/shared/http/pageRequestTest.ts). |
+| `RN-VUE-006` | Revisión de responsabilidades conforme al [estándar de código](../architecture/coding-standards/index.md), ESLint y aislamiento de instancias en [listados](../../tests/unit/shared/composables/listInteractionTest.ts). |
+| `RN-VUE-007` | [Listados de inventario](../../tests/unit/modules/warehouse/inventoryListTest.ts) y revisión de los consumidores de `useVisibleRefresh`; no representa una medida de rendimiento. |
+| `RC-VUE-001` | `npm run check`, manifiestos/lockfile y [herramientas de construcción](../development/02-tooling.md). |
+| `RC-VUE-002` | Build desde el repositorio y revisión de [la imagen y frontera de ejecución](../architecture/views/physical/runtime-and-build.md). La compilación sola no demuestra un proxy publicado. |
+| `RC-VUE-003` | [Sesión de sistema](../../tests/system/application.spec.ts) y comprobación del proxy y recarga de URL en el alojamiento de destino. |
+| `RC-VUE-004` | Revisión de `dist`, contenido de la imagen, reglas de exclusión y [publicación documental](../governance/02-generation-and-publication.md). |
 
 ## Alcance de la evidencia
 

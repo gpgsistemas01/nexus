@@ -1,45 +1,24 @@
 # 8. Composición de documentos de compra y salida
 
-Este capítulo describe cómo se distribuyen contratos, captura, operaciones y transporte en Compras y Salidas.
-
-Participan `modules/issues`, `modules/purchases`, sus contenedores de `app` y
-los colaboradores de `shared`. El [catálogo de patrones](01-applicability-and-principles.md)
-conserva la definición general; aquí se localiza su aplicación.
+Compras y Salidas separan los datos, las reglas, la captura y el transporte.
+La [estructura del código](../code-structure.md) define las responsabilidades de
+páginas, componentes y composables.
 
 ## Propietarios del código
 
-| Archivo o capa | Contenido y uso |
+| Fuente | Contenido |
 | --- | --- |
-| `issue.ts` / `purchase.ts` | Tipos de documento, captura, consulta y operaciones. No contienen valores de configuración ni reglas ejecutables. |
-| `issueConfig.ts` / `purchaseConfig.ts` | Descriptores de recursos, etiquetas, rutas Vue y permisos de presentación. Salidas también mantiene aquí los descriptores estáticos de sus filtros. |
-| `issueRules.ts` / `purchaseRules.ts` | Decidir qué modo admite el estado leído. Salidas conserva además el saldo visible de devolución y la distinción entre destinos de lectura y escritura. No autorizan ni reemplazan transacciones del backend. |
-| `issueForm.ts` / `purchaseForm.ts` | Crear valores iniciales y adaptar las reglas públicas al esquema de VeeValidate. La validación consulta la captura vigente mediante `getValues`; no conserva un payload anterior. |
-| `issueDetails.ts` / `purchaseDetails.ts` | Crear borradores con identificador local. Salidas también acumula por artículo/proveedor, actualiza la selección de surtido y obtiene los detalles nuevos seleccionados. El ID local no se persiste como ID del documento. |
-| `purchaseCalculations.ts` | Calcular totales visibles y el escenario de corrección. El servidor conserva el cálculo que persiste. |
-| `mappers/*RequestMapper.ts` | Seleccionar y normalizar campos del request por operación. No envían HTTP, no conocen componentes ni deciden rutas de endpoints. |
-| `mappers/*ResponseMapper.ts` | Comprobar respuestas y adaptar registros/opciones a los modelos de lectura. Los lectores internos de decimales, relaciones y detalles permanecen privados. |
-| `services` | Resolver endpoints, verbos HTTP, código de éxito esperado, archivos y adaptación de respuestas mediante Axios compartido. |
-| `composables` | Coordinar el estado reactivo y el ciclo de una interacción: captura, guardado, filtros, selección dependiente o acciones del editor. Componen capacidades sin implementar todo el módulo en un único composable. |
-| `pages` | Conectar sesión/permisos, composables y eventos de presentación. Incluye contenedores de diálogo; no toda página tiene que ser una ruta independiente. |
-| `components` | Presentar props y emitir intenciones. Un `Editor` presenta el formulario modal conforme a la convención existente; su nombre no implica que conozca la API. |
-| `app/pages/*Workspace` | Componer las altas rápidas entre dominios mediante callbacks, sin importar las páginas de Directorio o Inventario desde Salidas/Compras. |
+| `issue.ts` / `purchase.ts` | Tipos de documento, captura, consulta y operaciones. |
+| `*Config.ts` | Recursos, etiquetas, rutas y permisos de presentación; Salidas incluye descriptores de filtros. |
+| `*Rules.ts` | Modo permitido por el estado; Salidas añade saldos de devolución y destinos de lectura/escritura. |
+| `*Form.ts` | Valores iniciales y esquemas que consultan la captura vigente. |
+| `*Details.ts` | Borradores con ID local; Salidas acumula artículos/proveedores y prepara el surtido. |
+| `purchaseCalculations.ts` | Totales visibles y escenario de corrección. |
+| `*RequestMapper.ts` / `*ResponseMapper.ts` | Campos enviados y adaptación/comprobación de datos recibidos. |
+| `services` | Endpoints, métodos, confirmaciones y archivos. |
 
 `useIssueHeaderSelection` conserva las selecciones dependientes del encabezado.
-Los ID locales de `*Details` identifican borradores; los ID persistidos proceden
-de la respuesta API.
-
-## Patrones y principios aplicados
-
-| Mecanismo | Aplicación |
-| --- | --- |
-| Contenedor/presentación | Páginas coordinan; formularios, tablas y filtros usan props/eventos. ESLint protege imports. |
-| Composición por callbacks | Lectura, guardado, selección y reportes tienen contratos propios; `useDocumentRead`/`useRecordSave` reciben operaciones del dominio. |
-| Adaptadores | Request, respuesta y transporte conservan propietarios distintos. |
-| Fábrica de esquemas | `createIssueValidationSchema`/`createPurchaseValidationSchema` adaptan reglas públicas al modo de captura. |
-| Uniones discriminadas | Exigen documento cuando corresponde y separan consulta, escritura, corrección y cancelación. |
-
-La [evaluación SOLID](01-applicability-and-principles.md) describe cohesión y dependencias.
-La API conserva las reglas definitivas de permiso, estado y stock.
+Los IDs locales identifican borradores; los persistidos proceden de la API.
 
 ## Composición del editor y adaptadores
 
@@ -72,9 +51,8 @@ sequenceDiagram
     Editor-->>Save: nowrap: resultado de operation
 ```
 
-La operación se configura en el editor: `useRecordSave` no importa el servicio
-del dominio. El [contrato del callback](../../../contracts/form-and-event-contracts.md#callbacks-de-composición)
-define sus argumentos y resultado.
+El [contrato de callbacks](../../../contracts/form-and-event-contracts.md#callbacks-de-composición)
+define los argumentos y resultados del guardado compartido.
 
 | Frontera / mecanismo | Fuente en Salidas | Consumidor equivalente en Compras |
 | --- | --- | --- |
@@ -86,10 +64,9 @@ define sus argumentos y resultado.
 | Lectura por callback | [useIssueActions](../../../../../src/modules/issues/composables/useIssueActions.ts) configura [useDocumentRead](../../../../../src/shared/composables/useDocumentRead.ts) con `issueService.get`. | [usePurchaseActions](../../../../../src/modules/purchases/composables/usePurchaseActions.ts) configura el mismo lector con `purchaseService.get`. |
 | Guardado por callback | Ambos editores configuran [useRecordSave](../../../../../src/shared/composables/useRecordSave.ts). | El mismo contrato conserva `AbortSignal`, errores y confirmación sin conocer el dominio. |
 
-Los [contratos de Salidas](../../logical/class-and-type-models/08-issues.md#modos-y-contrato-de-escritura)
-y [Compras](../../logical/class-and-type-models/07-purchases.md#datos-y-modos) comparan
-los modos, datos exigidos y cuerpos admitidos. Las variantes son contratos de interacción;
-los [estados](../../logical/states/index.md) desarrollan sus transiciones.
+Los contratos de [Salidas](../../logical/class-and-type-models/08-issues.md#modos-y-contrato-de-escritura)
+y [Compras](../../logical/class-and-type-models/07-purchases.md#datos-y-modos)
+precisan los datos admitidos por modo.
 
 ## Secuencia de guardado confirmado
 
@@ -133,12 +110,9 @@ apertura y retorno en cada consumidor.
 
 ## Verificación
 
-Las pruebas de ambos módulos observan contratos, payloads, filtros, totales,
-conflictos, cancelación al desmontar y recorridos de navegador. Comprueban que
-consulta/devolución no escriban el documento y que el
-surtido no altere detalles ya persistidos o cancelados ni el documento leído.
 Los diseños de [Compras](../../../../testing/design/05-purchases.md) y
-[Salidas](../../../../testing/design/06-issues.md) identifican sus condiciones y evidencia.
+[Salidas](../../../../testing/design/06-issues.md) reúnen las condiciones y las
+pruebas de estos contratos.
 
 ## Fuentes de los participantes
 
