@@ -56,21 +56,17 @@ flowchart TB
 
 ## Código, contrato y límites
 
-[issueForm](../../../../../src/modules/issues/issueForm.ts) adapta las reglas; el esquema
-de `view`/`return` es vacío en el editor principal. `supply` comprueba detalles
-pendientes seleccionados y cantidad de proyecto. `header` valida encabezado;
-`create`/`edit` usan las reglas del recurso. Devolución tiene captura y validación
-propias. [useIssueEditor](../../../../../src/modules/issues/composables/useIssueEditor.ts)
-conecta el esquema a `useForm`, sin validar al montar.
+| Condición | Precisión que complementa el flujo |
+| --- | --- |
+| Esquema principal vacío para `return` | Devolución tiene formulario y validación propios; el esquema vacío no omite su validación. |
+| Esquema de surtido | Comprueba detalles pendientes seleccionados y su cantidad de proyecto. |
+| Resultado de una regla pública | Mensaje o `null`; la adaptación `mensaje || true` corresponde a VeeValidate. |
 
-[purchaseForm](../../../../../src/modules/purchases/purchaseForm.ts) aplica la misma decisión
-para alta/edición. La adaptación `mensaje || true` pertenece a VeeValidate;
-los predicados públicos devuelven mensaje o `null`. `getValues` evita validar una
-instantánea anterior. Los tipos discriminados de `issue.ts`/`purchase.ts` expresan
-operaciones admitidas en TypeScript; la validación definitiva de cada petición HTTP corresponde a la API.
+La [integración de reglas públicas](../input-handling.md#adaptación-en-formularios-y-payloads)
+explica su adaptación; el [estándar de formularios](../../../interface-standards.md#formularios),
+cuándo se presentan los errores.
 
 [issueTest](../../../../../tests/unit/modules/issues/issueTest.ts),
 [purchaseTest](../../../../../tests/unit/modules/purchases/purchaseTest.ts) y las
 [pruebas de paridad](../../../../../../back/tests/unit/validators/formValidationParityTest.js)
-protegen captura y solicitudes. No se trasladan reglas privadas ni comprobaciones
-de existencias/estado al esquema del navegador.
+protegen captura y solicitudes.

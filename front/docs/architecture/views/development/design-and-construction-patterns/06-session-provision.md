@@ -59,29 +59,17 @@ sequenceDiagram
 
 ## Código, contrato y límites
 
-[main.ts](../../../../../src/main.ts) crea la sesión y pasa **esa misma instancia** al
-[Router](../../../../../src/app/router/index.ts) y al proveedor de descendientes.
-[session.ts](../../../../../src/modules/auth/session.ts) define la clave, la inyección y
-la lectura de `/api/auth/me`; agrupa lecturas simultáneas con `loading`.
-[usePageAccess](../../../../../src/app/composables/usePageAccess.ts) observa permisos y
-traduce 401/403 a navegación. No expone un método para que un botón conceda permisos.
-En el ejemplo, [CatalogPage](../../../../../src/modules/catalogs/pages/CatalogPage.vue)
-obtiene por ese composable la misma sesión proporcionada durante el arranque.
-
-La renovación de tokens pertenece a [apiClient](../../../../../src/shared/http/apiClient.ts),
-no al mecanismo de inyección. Las credenciales viajan en cookies; los permisos de
-la interfaz no sustituyen la autorización en el backend. La agrupación de promesas
-de sesión y la renovación coordinada son mecanismos diferentes.
+Si no existe el proveedor, `useAuthSession` lanza «La sesión no se ha configurado».
+La inyección debe prepararse antes de montar sus consumidores.
+La [renovación HTTP](../../processes/01-session/04-concurrent-renewal.md) es una
+colaboración distinta de la provisión de esta instancia.
 
 [routerTest](../../../../../tests/unit/app/routerTest.ts),
 [pageAccessTest](../../../../../tests/unit/app/pageAccessTest.ts) y
 [sessionRecovery.spec.ts](../../../../../tests/e2e/sessionRecovery.spec.ts) ejercitan estos
-consumidores. La API del navegador se simula; no se acredita la firma real de JWT.
-Referencia: [provide/inject](https://vuejs.org/guide/components/provide-inject.html).
+consumidores.
 
 ## Alcance del estado compartido
 
-La sesión pertenece a la aplicación. Listados, filtros y capturas pertenecen a cada
-pantalla. El [inventario de propietarios](../../logical/states/04-state-ownership-and-save.md#inventario-de-propietarios)
-identifica su vida útil y la [decisión de estado compartido](../../logical/states/04-state-ownership-and-save.md#decisión-de-estado-compartido)
-explica el alcance de la provisión actual.
+El [inventario de propietarios](../../logical/states/04-state-ownership-and-save.md#inventario-de-propietarios)
+identifica el estado único de aplicación y los datos que pertenecen a cada pantalla.

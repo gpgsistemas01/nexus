@@ -60,6 +60,18 @@ del DOCX o PDF porque está destinado a validadores, generadores de clientes y
 visualizadores; dividirlo por formato de respuesta no aporta documentos adicionales al
 lector.
 
+## Mantenimiento del contrato API
+
+`npm run docs:check` resuelve las referencias OpenAPI y compara métodos y rutas con
+el mapa generado desde el código. Detecta operaciones ausentes u obsoletas; no
+comprueba por sí solo que cada campo y condición coincida con una respuesta real.
+Esa correspondencia se revisa con validadores, DTO, controladores y pruebas.
+
+Al cambiar una operación, actualice su definición en `docs/architecture/openapi/`,
+los esquemas reutilizados y las pruebas relacionadas. El
+[contrato HTTP](../../architecture/openapi/api-contract.md) mantiene las reglas
+compartidas de consumo.
+
 ## Capturas del manual
 
 Las capturas siempre se solicitan para un área. El comando acepta `almacen` o `sistemas`, y no

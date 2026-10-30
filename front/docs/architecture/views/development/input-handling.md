@@ -83,6 +83,6 @@ y `text` al abrir o actualizar un aviso. No hay un paso de limpieza HTML ni un
 filtro de Axios que cambie todas las cadenas de las respuestas.
 
 `vue/no-v-html` se configura como error en ESLint. La revisión de otros puntos de
-salida sigue el [estándar de seguridad](../../security-standards.md#cambios-de-contexto-de-salida).
+salida sigue el [estándar de seguridad](../../security-standards.md#reglas-y-controles).
 Las pruebas y sus límites se mantienen en el
 [diseño de seguridad de texto y avisos](../../../testing/design/07-shared.md#seguridad-de-texto-y-avisos).

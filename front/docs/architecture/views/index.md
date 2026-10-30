@@ -1,8 +1,7 @@
 # Vistas arquitectónicas
 
-La organización 4+1 mantiene una fuente por preocupación y enlaza requisitos,
-realización y pruebas. Una vista puede usar varias notaciones si responden preguntas
-complementarias. La [vista general](overview.md) contiene el contexto y el corte de componentes.
+El cliente se describe mediante cinco vistas: escenarios, lógica, procesos,
+desarrollo y ejecución. Cada vista utiliza las figuras que explican su contenido. La [vista general](overview.md) contiene el contexto y el corte de componentes.
 
 | Vista | Pregunta | Artefactos |
 | --- | --- | --- |
@@ -18,17 +17,6 @@ La [guía de diagramas](diagram-reading.md) explica símbolos, líneas, números
 agrupaciones y color mediante ejemplos breves. Cada figura añade su significado local.
 El [dominio](../../requirements/domain-model/index.md) pertenece a requisitos;
 las [interfaces y tipos](logical/class-and-type-models/index.md), a la vista lógica.
-
-## Trazabilidad de las figuras entre vistas
-
-| Preocupación | Figura y detalle |
-| --- | --- |
-| Objetivos del actor (+1) | [Casos de uso por recurso](../../requirements/use-case-model/index.md), con actores y límite Nexus; [pantallas](scenarios/navigation-and-screens.md) enlaza sus entradas. |
-| Conceptos del negocio (entrada a las vistas) | [Cinco cortes de dominio](../../requirements/domain-model/index.md): identidad, existencias, compras, salidas y trazabilidad. |
-| Responsabilidades (lógica) | [Cortes de siete dominios](logical/components/index.md), [modelos de clases/interfaces/tipos](logical/class-and-type-models/index.md), [estados por responsabilidad](logical/states/index.md). |
-| Orden y recuperación (procesos) | [Índice de secuencias](processes/index.md), con operación, CU y figura; [actividad de merma](processes/05-warehouse/05-waste-preview.md) detalla el cálculo de preview. |
-| Construcción (desarrollo) | [Estructura y dependencias del código](development/code-structure.md), [patrones generales y aplicados](development/design-and-construction-patterns/index.md) y [referencia generada](development/code-reference.md). |
-| Ejecución (física) | [Topología local y frontera del build](physical/runtime-and-build.md), complementada por configuración de alojamiento/proxy. |
 
 ## Recorrido por capacidad
 

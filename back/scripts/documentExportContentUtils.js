@@ -58,6 +58,8 @@ const headingFragment = (title) => cleanHeadingTitle(title)
     .trim()
     .replace(/[ _]/g, '-');
 
+const documentDataPattern = /^## Datos generales del documento\r?\n\r?\n(?:\|[^\r\n]+\|\r?\n){3}/m;
+
 export const exportedDocumentTitle = (output) => {
     const name = path.basename(output, path.extname(output));
     if (documentTitles.has(name)) return documentTitles.get(name);
@@ -71,6 +73,13 @@ export const documentExportAnchor = (source, fragment) => {
     return `nexus_${identifier}`;
 };
 
+export const prepareSectionEntry = (content, title) => {
+    const documentData = content.match(documentDataPattern);
+    if (!documentData) throw new Error('La entrada temática no contiene datos generales del documento.');
+
+    return `# ${title}\n\n${documentData[0].replace(/\r\n/g, '\n').trimEnd()}\n`;
+};
+
 export const prepareManualEntry = (content, output) => {
     if (!output.startsWith(`manuales${path.sep}`)
         || path.basename(output, path.extname(output)) === 'informacion-general-y-anexos') {
@@ -78,9 +87,7 @@ export const prepareManualEntry = (content, output) => {
     }
 
     const title = exportedDocumentTitle(output);
-    const documentData = content.match(
-        /^## Datos generales del documento\r?\n\r?\n(?:\|[^\r\n]+\|\r?\n){3}/m
-    );
+    const documentData = content.match(documentDataPattern);
     if (!documentData) return content;
 
     const end = documentData.index + documentData[0].length;

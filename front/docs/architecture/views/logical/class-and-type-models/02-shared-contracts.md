@@ -80,14 +80,10 @@ classDiagram
     LookupCreation ..> LookupItem : argumento de onCreated
 ```
 
-`PageResult<T>` expresa filas y conteos; en el selector se liga `T = LookupItem`.
-`requestPage` comprueba arrays de objetos y conteos enteros no negativos; el mapper
-del recurso valida sus campos. `LookupState` es la fotografía que recibe la UI y no
-expone controladores de aborto. `LookupCreation` entrega búsqueda y callback al editor
-contextual; no es un registro persistido.
+`PageResult<LookupItem>` es la página del selector. `LookupCreation` transporta
+búsqueda y callback; no representa el registro persistido. La validación de filas
+y conteos pertenece al [contrato paginado](../../../contracts/client-contracts.md#página-de-datos-y-selección-remota).
 
-`useRemoteLookup` conserva secuencia, página, debounce y aborto. `useSelectedOption`
-conserva la etiqueta de la selección aunque no esté en la página actual. La
-[secuencia del selector](../../processes/02-shared-runtime/03-remote-lookup.md)
-y el [patrón de alta contextual](../../development/design-and-construction-patterns/09-contextual-creation.md)
-describen esas colaboraciones sin duplicar sus contratos.
+La [secuencia del selector](../../processes/02-shared-runtime/03-remote-lookup.md)
+muestra la búsqueda y selección; el [alta contextual](../../development/design-and-construction-patterns/09-contextual-creation.md),
+el retorno de un registro nuevo.

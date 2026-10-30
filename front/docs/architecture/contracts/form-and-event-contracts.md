@@ -41,6 +41,16 @@ Fuentes: [contratos de Login](../../../src/modules/auth/login.ts),
 [PurchaseLineEntryPage](../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) e
 [IssueLineEntryPage](../../../src/modules/issues/pages/IssueLineEntryPage.vue).
 
+### Eventos del login
+
+| Evento | Argumentos |
+| --- | --- |
+| `update:name` | `[name: string]`. |
+| `update:password` | `[password: string]`. |
+| `update:shouldRememberUser` | `[shouldRememberUser: boolean]`. |
+| `blur` | `[field: LoginField]`. |
+| `togglePassword` / `submit` | `[]`. |
+
 ## Resultado de guardado por contenedor
 
 El nombre `saved` no define un payload común a todos los módulos.

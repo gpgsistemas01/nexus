@@ -61,7 +61,8 @@ flowchart TB
 `item.isActive` y `item.actions` usando el `item` recibido.
 [ServerTable](../../../../../src/shared/components/ServerTable.vue) reenvía los slots a
 Vuetify y emite `options`; no consulta filas ni asigna permisos.
-El evento `edit` termina en la página contenedora.
+El contenido del slot conserva el ámbito de `CatalogTable`; accede a la fila
+mediante el `item` recibido. `edit` se emite desde ese consumidor hacia la página.
 
 Otra aplicación es [RecordListPanel](../../../../../src/shared/components/RecordListPanel.vue):
 conserva estructura, carga y errores; `CatalogPage` aporta el botón en `actions`
@@ -69,5 +70,4 @@ y la tabla en el slot predeterminado. El contenido y sus eventos siguen conectad
 al consumidor que los define; las escrituras permanecen en sus servicios.
 
 [catalogs.spec.ts](../../../../../tests/e2e/catalogs.spec.ts) observa tabla y apertura del
-editor; el contrato visual no se comprueba contando llamadas internas de slots.
-Referencia: [slots de Vue](https://vuejs.org/guide/components/slots.html).
+editor.

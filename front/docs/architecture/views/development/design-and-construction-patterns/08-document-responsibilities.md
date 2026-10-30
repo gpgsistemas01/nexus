@@ -24,11 +24,9 @@ conserva la definición general; aquí se localiza su aplicación.
 | `components` | Presentar props y emitir intenciones. Un `Editor` presenta el formulario modal conforme a la convención existente; su nombre no implica que conozca la API. |
 | `app/pages/*Workspace` | Componer las altas rápidas entre dominios mediante callbacks, sin importar las páginas de Directorio o Inventario desde Salidas/Compras. |
 
-`useIssueHeaderSelection` coordina la selección del encabezado: opciones iniciales,
-dependencias cliente/asesor y área/solicitante, y sugerencia de proyecto. El editor
-utiliza esos valores al guardar. Los constructores de `*Details` asignan identidad
-local a la captura; los mappers de respuesta leen la identidad persistida que
-devuelve la API.
+`useIssueHeaderSelection` conserva las selecciones dependientes del encabezado.
+Los ID locales de `*Details` identifican borradores; los ID persistidos proceden
+de la respuesta API.
 
 ## Patrones y principios aplicados
 
@@ -66,11 +64,9 @@ flowchart TB
     http --> api["API<br/>confirmación de la operación"]
 ```
 
-El callback que ejecuta `useRecordSave` está definido en `useIssueEditor`: construye
-el payload con `mapIssueFormToRequest` y llama al servicio. El núcleo compartido
-no importa el servicio de Salidas. La página pasa props y conecta eventos; el
-componente visual no conoce Axios. La figura omite selectores y lectura para
-centrarse en esa frontera, sin atribuir sus tareas al editor visual.
+La operación se configura en el editor: `useRecordSave` no importa el servicio
+del dominio. El [contrato del callback](../../../contracts/form-and-event-contracts.md#callbacks-de-composición)
+define sus argumentos y resultado.
 
 | Frontera / mecanismo | Fuente en Salidas | Consumidor equivalente en Compras |
 | --- | --- | --- |

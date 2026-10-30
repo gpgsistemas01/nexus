@@ -34,6 +34,10 @@ el catálogo; el documento completo elimina repeticiones. Una sección con `entr
 declara su portada propia y con `includeInComplete: false` queda fuera del libro
 técnico, manteniendo la comprobación de sus fuentes. Así se publica el manual.
 
+Los libros temáticos reutilizan sólo el título y los datos generales de la entrada
+común; después del índice comienza el contenido de la sección elegida. El libro
+completo conserva la presentación general de la colección.
+
 ## Comandos
 
 Desde `front/`:

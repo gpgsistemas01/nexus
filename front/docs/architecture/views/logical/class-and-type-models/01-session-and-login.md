@@ -26,15 +26,11 @@ classDiagram
     AuthSession "1" --> "0..1" SessionUser : user.value
 ```
 
-`AuthSession` es `ReturnType<typeof createAuthSession>`, no una clase instanciada.
-`createAuthSession` posee la referencia y la promesa de carga; `load` valida la forma
-de `/api/auth/me`, publica sólo ID, nombre y permisos, y comparte la carga pendiente.
-`useAuthSession` obtiene esa misma instancia con `authSessionKey`. Los consumidores
-reciben una referencia de sólo lectura, sin copiar cookies o tokens a un store.
+`AuthSession` es `ReturnType<typeof createAuthSession>`. Sus consumidores reciben
+la referencia readonly de la instancia proporcionada por `authSessionKey`.
 
-La renovación HTTP pertenece a `apiClient`; la
-[secuencia de concurrencia](../../processes/01-session/04-concurrent-renewal.md)
-distingue ambas promesas compartidas. Describir este contrato no implica incorporar Pinia.
+La [secuencia de renovación](../../processes/01-session/04-concurrent-renewal.md)
+distingue la carga compartida de sesión del refresh HTTP.
 
 ## Props y eventos del formulario
 
@@ -76,18 +72,7 @@ classDiagram
     note for LoginFieldErrors "Partial Record de LoginField a string"
 ```
 
-`LoginFormEmits` declara propiedades cuyo tipo es una tupla de argumentos de evento.
-En la figura se seleccionan tres; `[LoginField]` abrevia la tupla nombrada
-`[field: LoginField]`. El contrato completo es:
-
-| Evento | Argumentos |
-| --- | --- |
-| `update:name` | `[name: string]`. |
-| `update:password` | `[password: string]`. |
-| `update:shouldRememberUser` | `[shouldRememberUser: boolean]`. |
-| `blur` | `[field: LoginField]`. |
-| `togglePassword` / `submit` | `[]`. |
-
-`LoginField = keyof LoginCredentials`. El componente recibe valores y emite intención;
-el composable valida y llama al servicio. La
-[secuencia de login](../../processes/01-session/02-login.md) explica orden y rechazos.
+`LoginFormEmits` declara tuplas de argumentos. `[LoginField]` abrevia
+`[field: LoginField]`, con `LoginField = keyof LoginCredentials`.
+Los [eventos completos del login](../../../contracts/form-and-event-contracts.md#eventos-del-login)
+se definen junto a los demás intercambios de componentes.

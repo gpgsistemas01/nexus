@@ -26,18 +26,9 @@ flowchart TB
     api -->|consultas y transacciones| db[("PostgreSQL")]
 ```
 
-La SPA y la API son unidades de software con responsabilidades distintas. Un
-«contenedor» C4 no equivale necesariamente a un contenedor Docker: Vue se ejecuta
-en el navegador; Nginx u otro alojamiento entrega sus archivos estáticos.
-El [Dockerfile frontend](../../../Dockerfile) compila `dist` y lo entrega con Nginx;
-el [Dockerfile raíz](../../../../Dockerfile) prepara Express. No se necesita ejecutar
-ambas aplicaciones en una misma imagen.
-
-En desarrollo Vite sirve el cliente y deriva la API. En la imagen frontend,
-[nginx.conf](../../../nginx.conf) configura el destino mediante `BACKEND_UPSTREAM`.
-Las variantes de proveedor requieren su configuración de proxy/fallback y cookies;
-el repositorio no acredita por sí solo cuál está desplegada. El navegador no
-accede a Prisma, credenciales de PostgreSQL ni archivos privados del servidor.
+Un contenedor C4 es una unidad de software; no equivale a una imagen Docker.
+La [vista física](physical/index.md) define alojamiento, proxy, cookies y variantes
+de ejecución.
 
 ## Vista de componentes: navegación y acceso a Catálogos
 
@@ -57,12 +48,8 @@ flowchart TB
     http --> api["API del sistema"]
 ```
 
-La tabla de [fuentes propietarias](../../index.md#organización-y-fuentes-propietarias)
-ubica los componentes. El [patrón contenedor/presentación](development/design-and-construction-patterns/02-container-and-presentation.md)
-y los [composables configurados](development/design-and-construction-patterns/03-composables-and-callbacks.md)
-amplían el interior del módulo; la [provisión de sesión](development/design-and-construction-patterns/06-session-provision.md)
-explica que Router y páginas usan la misma instancia. Para seguir otro módulo,
-consulta el [recorrido por capacidad](index.md#recorrido-por-capacidad).
+Detalle por capacidad: [componentes](logical/components/index.md). Mecanismos de
+construcción: [patrones](development/design-and-construction-patterns/index.md).
 
 ## Referencias
 

@@ -41,7 +41,8 @@ sequenceDiagram
     end
 ```
 
-El callback viaja en la solicitud tipada; no necesita persistirse en un store. Cancelar no lo invoca. Confirmar el auxiliar no guarda también el documento principal. El cliente sólo selecciona un ID devuelto por el servidor y descarta callbacks cuando ya no está disponible la captura.
+El [contrato de composición](../../../contracts/form-and-event-contracts.md#callbacks-de-composición)
+define `LookupCreation`, `ItemCreation` y la adaptación a `LookupItem`.
 
 ## Caso 1: proveedor desde Inventario
 
@@ -57,10 +58,6 @@ flowchart TB
     editor -->|opción confirmada| selection["useInventorySelection"]
     editor -.->|actualizar supplierId| form
 ```
-
-La solicitud tiene `search` y `onCreated`. `initialName` precarga nombre comercial; razón social se captura en el formulario propio de Proveedores. El editor de Inventario conserva nombre, cantidad y demás datos del artículo. `selectCreatedSupplier` rechaza modo incompatible, proveedor fijo, envío/captura pendiente, desmontaje y proveedor inactivo. La selección sobrevive aunque la página remota todavía no incluya el registro.
-
-La apertura requiere lectura/alta de proveedor y que el origen sea Materiales o Consumibles. Los campos Presentación/Unidad/Motivo no reciben esta capacidad por compartir el control. `InventoryWorkspace` sólo compone; las escrituras permanecen en Directorio y el resultado se adapta en `DirectoryCreationPage`.
 
 ## Caso 2: proveedor o artículo desde Compras
 
@@ -91,11 +88,8 @@ flowchart TB
     line -.->|materialId| form
 ```
 
-`PurchaseWorkspace` conserva una unión discriminada: `kind=supplier` o `kind=item`. El segundo caso añade `supplier` a la búsqueda y callback. No se intenta representar ambos con una bandera ambigua o un formulario universal.
-
-Proveedor reutiliza Directorio y su adaptación a `LookupItem`. Artículo reutiliza Inventario en modo de compra: nombre precargado, proveedor fijado y `creationContext=goodsReceipt`, sin stock/costo inicial capturado. Su `saved` pasa por el Workspace para invocar el callback del detalle. Una opción inactiva no se admite como detalle operativo.
-
-Los composables de Compras actualizan sus IDs y renuevan catálogos; el selector conserva etiqueta. La compra no se guarda al crear un proveedor o artículo. Cancelar o fallar el auxiliar mantiene observaciones y las demás capturas del origen. Agregar un detalle al documento sigue siendo otra intención del formulario.
+`PurchaseWorkspace` discrimina `kind=supplier` y `kind=item`; el segundo incluye
+el proveedor fijado para el artículo.
 
 ## Caso 3: cliente desde Salidas
 
@@ -113,29 +107,25 @@ flowchart TB
     editor -.->|encabezado actualizado| form
 ```
 
-Se requiere que el encabezado sea editable y que el usuario pueda leer/crear clientes.
-El nombre buscado precarga el cliente; `DirectoryCreationPage.saved` adapta la
-respuesta de Directorio a `LookupItem` e invoca `request.onCreated`.
-[useIssueHeaderSelection.selectCreatedClient](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts)
-comprueba disponibilidad e inactividad antes de seleccionar. El cambio de cliente
-limpia asesor/proyecto según la coordinación existente y conserva el resto de la
-salida. No se guarda la salida como efecto secundario del auxiliar.
+## Condiciones y excepciones
 
-## Propietarios, contratos y límites
-
-| Pieza | Responsabilidad concreta |
+| Caso o condición | Regla de aplicación |
 | --- | --- |
-| [RemoteSelect](../../../../../src/shared/components/RemoteSelect.vue) | Mostrar búsqueda/opciones/acción y emitir `create(search)`; teclado y presentación de carga/error. |
-| [LookupCreation](../../../../../src/shared/lookup.ts) | Texto y callback de retorno con `LookupItem`; no incluye cliente HTTP ni estado de sesión. |
-| [DirectoryCreationPage](../../../../../src/app/pages/DirectoryCreationPage.vue) | Componer alta de Directorio, comprobar permisos y adaptar `DirectoryEntry` a opción. |
-| [InventoryWorkspace](../../../../../src/app/pages/InventoryWorkspace.vue) | Abrir/cerrar el proveedor desde Inventario. |
-| [PurchaseWorkspace](../../../../../src/app/pages/PurchaseWorkspace.vue) | Distinguir proveedor/artículo y configurar el editor compatible. |
-| [IssueWorkspace](../../../../../src/app/pages/IssueWorkspace.vue) | Abrir/cerrar el cliente desde Salidas. |
-| Composable del formulario origen | Aceptar el resultado, actualizar el ID y mantener sus reglas/dependencias. |
-| [useSelectedOption](../../../../../src/shared/composables/useSelectedOption.ts) | Conservar la opción por ID, incorporar precarga/datos remotos y descartar una selección ajena al nuevo ID. |
+| Proveedor desde Inventario | Sólo alta de Materiales/Consumibles, con lectura y alta de proveedor. No aplica a Merma, proveedor fijado, envío o captura pendiente ni instancia desmontada. El texto buscado precarga el nombre comercial; la razón social se captura aparte. |
+| Proveedor desde Compras | Sólo compra nueva editable y con permisos de lectura/alta. La edición conserva el proveedor original. |
+| Artículo desde Compras | Requiere lectura/escritura de artículos y lectura de Presentación/Unidad. Usa el proveedor de la compra y `creationContext=goodsReceipt`; no captura stock ni costo inicial. |
+| Cliente desde Salidas | Requiere encabezado editable y permisos de lectura/alta de cliente. Cambiarlo actualiza sus selecciones dependientes de asesor y proyecto. No permite crear asesor o solicitante. |
+| Registro creado como inactivo | El alta permanece guardada, pero el origen no selecciona ese registro para la operación. |
+| Opción aún fuera de la página remota | `useSelectedOption` conserva su ID y etiqueta; no necesita esperar a encontrarla en una página del selector. |
+| Guardado auxiliar confirmado | Selecciona el registro; no guarda el documento principal ni agrega su detalle automáticamente. |
+| Origen cerrado o incompatible al regresar | El consumidor comprueba vigencia, modo y disponibilidad antes de aplicar el resultado. La captura principal conserva sus datos ante cancelación o fallo del auxiliar. |
+| Nombre sin coincidencia visible | No acredita unicidad; la API valida la identidad y autoriza el alta. |
 
-La API autoriza y valida cada alta, aunque el Workspace ya haya comprobado permisos. La ausencia de coincidencia visible no demuestra unicidad en la base. Abortar una solicitud o cerrar el modal no revierte una escritura que el servidor ya confirmó.
+El [ciclo de vida](../../logical/states/04-state-ownership-and-save.md#ciclo-de-guardado)
+explica el límite de abortar una escritura ya confirmada por la API.
 
-## Evidencia
+## Pruebas relacionadas
 
-`selectCreation.spec.ts` prueba los tres consumidores, nombres precargados, cancelación, error/reintento, selección fuera de página, permisos y teclado. `inventoryFormTest.ts`, `purchaseTest.ts`, `issueTest.ts` y `selectedOptionTest.ts` comprueban contratos y estado. Los casos de navegador usan API simulada; no acreditan persistencia.
+- [Altas desde selectores](../../../../../tests/e2e/selectCreation.spec.ts).
+- [Inventario](../../../../../tests/unit/modules/warehouse/inventoryFormTest.ts), [Compras](../../../../../tests/unit/modules/purchases/purchaseTest.ts) y [Salidas](../../../../../tests/unit/modules/issues/issueTest.ts).
+- [Opción seleccionada](../../../../../tests/unit/shared/composables/selectedOptionTest.ts).

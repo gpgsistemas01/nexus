@@ -43,30 +43,13 @@ conserva las firmas completas.
 | `usePurchaseEditor` | `PurchaseField`. | `string`, `boolean` o `PurchaseDetail[]`. |
 | `useIssueEditor` | `IssueField`. | `string` o `IssueDetail[]`. |
 
-El helper conserva los campos editados por instancia. Actualizar llama a
-`setFieldValue(..., false)` y limpia su error; blur valida tras editar o intentar
-el envío. Los tipos conectan claves/valores; las reglas validan su contenido.
+El [estándar de formularios](../../../interface-standards.md#formularios) define
+cuándo se muestran los errores. Los tipos relacionan claves y valores; las reglas
+validan su contenido.
 
-## Dónde viven los datos
+El [inventario de estado](../states/04-state-ownership-and-save.md#inventario-de-propietarios)
+identifica el contenedor reactivo y la vida útil de cada dato. En script, las refs
+usan `.value`; Vue desempaqueta las de nivel superior del template.
 
-| Dato | Contenedor real | Actualización |
-| --- | --- | --- |
-| `SessionUser` | `shallowRef` expuesto readonly por `createAuthSession`. | `load` valida/publica; consumidores leen `.value`. |
-| Documento leído | `shallowRef` de `useDocumentRead`. | Sólo la respuesta vigente sustituye el documento. |
-| `PurchaseValues` / `IssueValues` | `form.values` reactivo de VeeValidate. | Setters del composable; presentación emite eventos. |
-| Filas | `shallowRef<Row[]>` de `usePagedList<Query, Row>`. | Página vigente; conserva filas si el JSON recibido no cambió. |
-| `LookupState` | Fotografía `computed` de `useRemoteLookup`. | Opciones/carga/error derivados; el ID pertenece a captura/filtro. |
-
-Los modelos de [Compra](07-purchases.md) y [Salida](08-issues.md) describen sus estructuras.
-El [recorrido tipado](../../processes/02-shared-runtime/06-typed-data-flow.md) muestra
-lectura, props y payload; los [estados](../states/index.md), los modos.
-
-En script se accede a una ref con `.value`; Vue desempaqueta las refs de nivel superior
-del contexto del template. `form.values` conserva su contrato de objeto reactivo.
-
-## Comprobación estática y JSON
-
-`interface`, `type`, `keyof`, `Record`, uniones y genéricos describen contratos durante
-desarrollo/compilación. Declarar una interfaz no crea una instancia. Escribir
-`request<PurchaseDocument>` o convertir con `as` no comprueba los campos de la red:
-servicios y mappers validan los datos desconocidos en ejecución.
+La [comprobación de respuestas HTTP](../../../contracts/client-contracts.md#escrituras-y-confirmación)
+es independiente de los tipos estáticos: una aserción `as` no valida los datos de red.

@@ -30,18 +30,7 @@ OpenAPI agrupa las operaciones en cuatro fuentes procesables:
 | [`admin`](paths/admin.json) | Personas, usuarios, accesos, movimientos, catálogos administrables y reportes administrativos. |
 
 Los [esquemas comunes](components/common-schemas.json) y las
-[respuestas compartidas](components/responses.json) se reutilizan mediante `$ref`.
-La exportación resuelve las referencias en un archivo autocontenido.
-
-`npm run docs:check` resuelve las referencias y compara los métodos y rutas publicados
-con el [mapa generado desde el código](../views/development/code-map.md). Informa el total
-de operaciones y detecta rutas ausentes o definiciones obsoletas. La correspondencia
-de cada campo y condición se revisa con los validadores, DTO, controladores y pruebas;
-la comprobación de rutas no demuestra por sí sola esa coincidencia.
-
-Al cambiar una operación, actualice su definición OpenAPI, sus esquemas reutilizados
-y las pruebas relacionadas. Este capítulo mantiene las reglas compartidas; el detalle
-de parámetros y respuestas de cada operación permanece en OpenAPI.
+[respuestas compartidas](components/responses.json) definen sus estructuras reutilizadas.
 
 ## Reglas contractuales complementarias
 
@@ -91,7 +80,9 @@ compartidas de OpenAPI documentan su estructura y ejemplos. En particular:
 
 | HTTP | `code` | Significado y recuperación |
 | --- | --- | --- |
+| `400` | `VALIDATION_ERROR` | El body contiene campos o metadatos inválidos. `errors` identifica los campos; un identificador de detalle inválido se informa en `errors.details`. Corrija la captura y vuelva a enviar. |
 | `400` | `RECORD_ID_INVALID` | El identificador de ruta no tiene un formato UUID admitido. Corrija el UUID recibido; el rechazo es global y no contiene errores de campos del body. |
+| `404` | `WASTE_NOT_FOUND`, `PERSON_NOT_FOUND` u otro código del recurso | Un UUID válido no identifica un registro disponible para la operación. No se divulgan datos del recurso. |
 | `500` | `SERVER_ERROR` | Ocurrió un fallo interno no controlado. El detalle técnico se registra en el servidor y no forma parte de la respuesta pública. |
 | `503` | `DATABASE_TABLE_MISSING` | Falta una tabla requerida por la versión desplegada. El administrador del despliegue debe revisar las migraciones pendientes. |
 | `503` | `DATABASE_COLUMN_MISSING` | Falta una columna requerida por la versión desplegada. El administrador del despliegue debe revisar las migraciones pendientes. |
@@ -166,26 +157,6 @@ La ruta fija el contexto de materiales o consumibles; el payload y la query
 no pueden cambiarlo. Listados, reportes y escrituras verifican cabecera y
 detalles del mismo tipo. Véase la [regla de separación](../../requirements/requirements-specification/06-operation-modes-and-effects.md#separación-de-compras-y-salidas).
 
-### Versiones y reintentos de merma
-
-Las ediciones de inventario, proveedores, clientes, personas, usuarios y catálogos
-requieren `expectedVersion`; material/consumible requiere además
-`expectedMaterialVersion` para su identidad compartida. El valor procede de la lectura,
-no del cálculo del cliente. `409 RECORD_VERSION_CONFLICT` exige actualizar y revisar
-la captura antes de repetir. Los campos de versión no son datos editables.
-
-POST de merma y POST de stock-additions requieren `operationId` UUID v4. Se conserva
-por captura y actor hasta confirmar su resultado. Repetir la misma clave/captura devuelve
-el recibo original, sin otra entrada; reutilizarla para otros datos produce
-`409 OPERATION_KEY_CONFLICT`. La captura no cambia mientras su resultado sea ambiguo.
-Si el servicio confirma el rollback, añade `meta.operationRejected=true`; permite
-corregir un pendiente. Un rechazo previo de autenticación/validación o un conflicto
-de clave no acredita ese rollback y no descarta el pendiente.
-Un `WASTE_ALREADY_EXISTS` por identidad, incluso en carrera concurrente, incluye
-`meta.waste` para identificar la merma existente y permitir una entrada adicional.
-Recuperar una creación propia ya confirmada responde éxito y no utiliza ese
-conflicto para generar otra entrada.
-
 Los GET de listados de compras/salidas omiten `details`. En compras, el campo
 `observations` pertenece al encabezado y se devuelve tanto en listado como
 por ID, incluido `null` cuando no hay texto; no depende de `includeDetails`.
@@ -194,6 +165,25 @@ autorización y contexto del listado.
 Omitir la relación en un listado no permite guardar un documento vacío: las altas y
 ediciones completas exigen al menos un detalle. Editar sólo el encabezado conserva
 los detalles existentes y permite omitir el campo; si se envía, no acepta un array vacío.
+
+### Concurrencia y reintentos
+
+| Metadato | Operación y valor requerido |
+| --- | --- |
+| `expectedVersion` | Edición de inventario, proveedor, cliente, persona, usuario o catálogo: versión obtenida en la lectura de esa captura. |
+| `expectedMaterialVersion` | Material/consumible: versión adicional de su identidad compartida. |
+| `operationId` | POST de merma y POST de stock-additions: UUID v4 conservado por captura y actor. |
+
+| Operación o condición | Resultado y recuperación |
+| --- | --- |
+| Edición o ajuste con versión anterior | `409 RECORD_VERSION_CONFLICT`. Actualice la lectura y revise la captura antes de repetir. La versión no se calcula ni se sustituye justo antes de enviar. |
+| Merma: misma clave y mismo cuerpo | Devuelve el recibo original, sin crear otra entrada. Conserve clave y cuerpo mientras el resultado sea incierto. |
+| Merma: misma clave y otro cuerpo | `409 OPERATION_KEY_CONFLICT`; no reutilice la clave con datos distintos. |
+| Merma: `meta.operationRejected=true` | El servidor confirmó que revirtió los cambios del intento; permite corregir el pendiente. Un rechazo previo de autenticación/validación o un conflicto de clave no demuestra esa reversión. |
+| Merma: `WASTE_ALREADY_EXISTS` | Incluye `meta.waste` para identificar la merma existente y permitir una entrada adicional. Recuperar una creación propia ya confirmada responde éxito, sin producir este conflicto ni otra entrada. |
+| Surtir o cancelar detalles | El bloqueo y la comprobación transaccional impiden repetir una transición consumida; no recuperan automáticamente su respuesta original. |
+| Devolver parcialmente | El saldo limita la devolución, pero repetir la petición puede registrar otra mientras quede cantidad disponible. No hay recuperación por clave. |
+| Crear compra sin factura, ampliar detalles o crear salida | No hay recibo persistente de reintento. Repetir la captura puede crear otro documento o movimiento. |
 
 ### Alcance de áreas de Salidas
 
@@ -211,16 +201,9 @@ de surtido/devolución permanecen independientes.
 
 ### Identificadores y datos de escritura
 
-Los errores de campos y metadatos enviados en el body responden con
-`400 VALIDATION_ERROR` y un objeto `errors` por campo. Esto incluye `expectedVersion`
-y `operationId` cuando la operación los exige. Un identificador de detalle con formato
-inválido se informa dentro de `details`; la existencia, pertenencia y estado del
-registro se comprueban en el servidor.
-
-Un UUID de ruta válido que no identifica un registro disponible devuelve `404` y su
-código de dominio, como `WASTE_NOT_FOUND` o `PERSON_NOT_FOUND`. Un UUID de ruta mal
-formado devuelve `400 RECORD_ID_INVALID`, sin `errors.id`, `errors.detailId` ni detalles
-SQL. Es un error global, no un rechazo de un campo del body.
+Los [errores globales y de campo](#errores-globales-y-códigos-públicos) distinguen
+los rechazos de identificadores de ruta, metadatos y detalles. El servidor comprueba
+existencia, pertenencia y estado del registro.
 
 La validación distingue ausencia y tipo incorrecto: un campo opcional presente con un
 tipo no admitido se rechaza. Un array no es un identificador, un booleano no es un nombre
@@ -240,22 +223,6 @@ La composición de validadores, normalización y DTO pertenece a la
 [referencia de validadores comunes](../views/development/reuse-and-refactoring/01-backend-handlers-and-services.md#validadores-comunes-y-condiciones-de-captura).
 Los errores, su formato y los códigos públicos son parte del contrato HTTP; su
 presentación visual corresponde a cada cliente.
-
-### Protección de escrituras y reintentos
-
-| Operación | Protección vigente y límite |
-| --- | --- |
-| Crear merma y agregar stock | Recibo transaccional por actor y `operationId`; recupera el resultado original. |
-| Ajustar saldo y editar recursos versionados | Escritura condicionada por la versión de la captura; un reintento viejo se rechaza, sin recuperar automáticamente la respuesta original. |
-| Surtir y cancelar detalles | Bloqueos y comprobación transaccional del estado evitan aplicar dos veces una transición ya consumida; no equivalen a un recibo de respuesta. |
-| Devolver parcialmente materiales, consumibles o merma | El saldo devuelto se bloquea y acota, pero una repetición puede aceptar otra devolución mientras quede cantidad disponible. La recuperación por clave sigue pendiente. |
-| Crear compras sin factura, ampliar sus detalles o crear solicitudes de salida | Se mantienen sus reglas de identidad/estado; no hay recibo de reintento. Una captura repetida puede crear otro documento o movimiento. |
-
-La necesidad depende del efecto repetible, no del verbo HTTP ni de que el recurso
-principal sea nuevo. Extender la recuperación a estos procesos requiere un contrato
-de clave conservada por captura, rechazo de otra captura con la misma clave y recibo
-en la misma transacción de sus efectos. La tabla `WasteOperation` no acredita esa
-cobertura para otros módulos.
 
 ### Códigos de éxito
 

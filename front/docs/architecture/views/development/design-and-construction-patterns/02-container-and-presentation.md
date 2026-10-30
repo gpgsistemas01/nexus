@@ -49,12 +49,11 @@ columnas y emite eventos; no solicita HTTP ni consulta la sesión.
 [useListEditor](../../../../../src/shared/composables/useListEditor.ts) conserva el ciclo
 de apertura y recarga, sin definir las reglas del catálogo.
 
-La presentación puede tener estado visual local o valores calculados. Una page
+Los eventos de componente llegan al padre directo; un contenedor intermedio los
+reenvía explícitamente. La presentación puede tener estado visual local o valores calculados. Una page
 también puede contener un diálogo: la carpeta `pages` identifica su coordinación,
 mientras el Router determina cuáles de esas páginas tienen una URL.
 
 [catalogs.spec.ts](../../../../../tests/e2e/catalogs.spec.ts) comprueba el flujo con API
 simulada; las [pruebas del editor](../../../../../tests/unit/modules/catalogs/catalogEditorTest.ts)
-observan captura, errores y confirmación. No acreditan autorización en el backend.
-Referencia: [props](https://vuejs.org/guide/components/props.html) y
-[eventos de Vue](https://vuejs.org/guide/components/events.html).
+observan captura, errores y confirmación.

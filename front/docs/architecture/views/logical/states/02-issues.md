@@ -38,14 +38,15 @@ stateDiagram-v2
 | `resolveIssueEditMode` | No editable → `view`; editable y cumplimiento pendiente → `edit`; editable con detalles protegidos → `header`. |
 | `G1` | `options.canSupply() && canSupplyIssue(document)`. Aprobada, no cancelada y con cumplimiento pendiente o parcial. |
 | `G2` | `options.canSupply() && canReturnIssue(document)`. Aprobada, no cancelada y con cumplimiento completo. |
-| Lectura vigente | El lector admite sólo la secuencia actual y no abortada; captura el rechazo HTTP y devuelve `undefined` con `readError`. `retry()` repite fila/modo, incluso tras el rechazo de estado. |
 | `G3` | `(resolved === 'supply' && !G1) || (resolved === 'return' && !G2)`. El rechazo publica `readError` y no abre el modo pedido. |
 | `Abierta` / `Editor` | Estados compuestos para cierre común y editor. `ModoLeido` agrupa los cinco modos que desarrollan las figuras siguientes. El alta usa `{ mode: 'create' }`; consulta no emite `saved`. |
 
-`handleSaved` cierra, recarga y muestra la confirmación. Devolución usa su formulario
-específico; consulta no envía desde el editor. Un error de escritura conserva captura
-y no simula el descuento de stock. Las [secuencias](../../processes/07-issues/index.md)
-y los [contratos por modo](../class-and-type-models/08-issues.md) desarrollan esas operaciones.
+Consulta no envía desde el editor; devolución usa su formulario específico.
+El [guardado compartido](04-state-ownership-and-save.md#ciclo-de-guardado) define
+qué ocurre si la escritura falla o el consumidor deja de estar vigente.
+
+La [lectura compartida](04-state-ownership-and-save.md#consulta-y-actualización)
+define cancelación, respuestas tardías y `readError`.
 
 ## Consulta y edición del documento leído
 

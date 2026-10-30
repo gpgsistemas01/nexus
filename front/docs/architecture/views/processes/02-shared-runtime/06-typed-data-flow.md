@@ -27,17 +27,11 @@ flowchart TB
     details -->|prop details| view
 ```
 
-| Paso | Precisión del contrato |
-| --- | --- |
-| Leer | `apiClient` comprueba el contenedor general; el mapper valida campos y el servicio comprueba el ID solicitado. |
-| Crear captura | Copia encabezado/observaciones y prepara `values.details = []` para detalles nuevos. |
-| Mostrar detalles | La Page combina detalles persistidos y nuevos mediante `computed`. |
-| Actualizar control | El componente emite; la Page conecta `editor.update` y `useFormInteraction` modifica valores con setters. |
-| Conservar lectura | El editor trabaja con su captura; modificar la UI no confirma persistencia. |
-
-El [contrato genérico](../../logical/class-and-type-models/09-reactive-contracts.md)
-explica `Record<Field, Value>` y `Ref<T>`; el
-[modelo de compra](../../logical/class-and-type-models/07-purchases.md), las interfaces del documento.
+La captura conserva sólo los detalles nuevos en `values.details`; la página los
+combina con los persistidos para consulta. Editar la vista no confirma la compra.
+Los [tipos de Compra](../../logical/class-and-type-models/07-purchases.md) definen
+la estructura; el [contrato HTTP](../../../contracts/client-contracts.md#escrituras-y-confirmación),
+la aceptación de los datos recibidos.
 
 ## Escritura y confirmación
 
@@ -64,13 +58,7 @@ flowchart LR
     sent -->|respuesta de API| received
 ```
 
-| Frontera | Resultado y límite |
-| --- | --- |
-| Captura → payload | `Record<string, unknown>` con campos seleccionados: proveedor leído en edición, fecha UTC, factura condicional, observaciones y detalles nuevos. No hay una clase `PurchaseRequest` en el código actual. |
-| Red → confirmación | TypeScript no valida JSON. Un error HTTP o código inesperado interrumpe el recorrido y conserva el error. |
-| Confirmación → UI | Código/mensaje comprobados; el callback actúa sólo con consumidor vigente. |
-| Totales/stock | La API calcula y persiste; el cálculo previo orienta la captura. |
-
-El [guardado compartido](../00-reading-and-roles.md#contratos-que-deben-distinguirse)
-explica el callback `operation(signal)`; las
-[secuencias de Compra](../06-purchases/02-purchase-save.md) desarrollan solicitud y rechazos.
+`mapPurchaseFormToRequest` devuelve un `Record<string, unknown>` con los campos
+admitidos; no existe una clase `PurchaseRequest`. La API calcula los totales y el
+stock que persiste. El [guardado compartido](08-record-save.md) y la
+[secuencia de Compra](../06-purchases/02-purchase-save.md) muestran los rechazos.

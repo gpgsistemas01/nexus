@@ -59,23 +59,17 @@ flowchart TB
 ## Código, contrato y límites
 
 [useCatalogList](../../../../../src/modules/catalogs/composables/useCatalogList.ts)
-configura `request(query, signal)` y traduce rechazos 401/403 mediante `onDenied`.
-[usePagedList](../../../../../src/shared/composables/usePagedList.ts) conserva la consulta,
-las filas y el error, aborta la solicitud anterior e invalida respuestas antiguas
-con una secuencia; al desmontar cancela el trabajo. No importa `catalogService`.
-
-[useDocumentRead](../../../../../src/shared/composables/useDocumentRead.ts) y
-[useRecordSave](../../../../../src/shared/composables/useRecordSave.ts) aplican el mismo
-criterio a contratos distintos: el lector entrega un documento y el guardado
-notifica una confirmación. Cancelar en el navegador deja de esperar el resultado;
-una escritura que la API ya confirmó permanece registrada.
+configura `request(query, signal)` y traduce 401/403 mediante `onDenied`.
+El [ciclo de lectura](../../logical/states/04-state-ownership-and-save.md#consulta-y-actualización)
+define cancelación y respuestas tardías; el
+[contrato de callbacks](../../../contracts/form-and-event-contracts.md#callbacks-de-composición),
+los intercambios del lector y guardado.
 
 El callback debe conservar resultados, errores y `AbortSignal`; una firma válida
 de TypeScript no demuestra sustitución de comportamiento.
 [catalogListTest](../../../../../tests/unit/modules/catalogs/catalogListTest.ts) y
 [remoteLookupTest](../../../../../tests/unit/shared/composables/remoteLookupTest.ts)
 comprueban estado, paginación y respuestas tardías según sus contratos.
-Referencia: [composables de Vue](https://vuejs.org/guide/reusability/composables.html).
 
 ## Coordinación de la alternativa de merma duplicada
 
@@ -118,9 +112,6 @@ sequenceDiagram
     end
 ```
 
-Se aplican los patrones ya adoptados: contenedor/presentación, composición por
-callback y adaptador de datos. La transición es un flujo local con una unión
-discriminada de TypeScript; no constituye State de GoF ni requiere un almacén global.
 Las pruebas de [recuperación](../../../../../tests/unit/modules/warehouse/wasteDuplicateRecoveryTest.ts)
 y [navegador](../../../../../tests/e2e/warehouse.spec.ts) protegen cancelación, cero/positivo,
 permiso, incertidumbre y confirmación separada de la escritura.

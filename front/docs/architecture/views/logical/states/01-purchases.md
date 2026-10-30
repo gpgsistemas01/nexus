@@ -36,11 +36,13 @@ stateDiagram-v2
 | Condición o resultado | Correspondencia con el código |
 | --- | --- |
 | `G1` | `options.canManage() && !controller.signal.aborted && !isChanging.value`. La falta de permiso o el desmontaje no inicia la lectura. |
-| Lectura vigente | `attempt === sequence && !current.signal.aborted`; el lector descarta respuestas anteriores. Captura el rechazo HTTP: `load` devuelve `undefined` con `readError`, no propaga ese rechazo. |
 | `canEditPurchase(document)` | Estado recibido `Confirmada` o `Abierta`. Una solicitud de edición no editable termina en consulta. |
 | Resolver → Consulta/Edición | `editorState.openEditor({ action, document })`; se incrementa `editorKey` y se libera `needsReload`. El rombo es una decisión inmediata, no un modo de formulario. |
 | `handleSaved` | Cierra, actualiza el listado y muestra el mensaje confirmado. Un rechazo de escritura no dispara este callback; véase el [guardado compartido](04-state-ownership-and-save.md#ciclo-de-guardado). |
 | `Abierta` / `Editor` | Estados compuestos para el cierre común y los modos visibles. `saved` procede del alta o edición; consulta no lo emite. |
+
+La [lectura compartida](04-state-ownership-and-save.md#consulta-y-actualización)
+define cancelación, respuestas tardías y `readError`.
 
 ## Corrección, cancelación y relectura
 

@@ -1,35 +1,24 @@
 # 1. Patrones y principios de diseño en Vue
 
-Este catálogo relaciona los mecanismos del cliente con sus responsabilidades y consumidores.
-La [arquitectura](../code-structure.md) conserva organización y fronteras; el
-[índice documental](../../../../index.md) explica qué criterios se adaptan a Vue. El catálogo
-separa patrones, mecanismos del framework, tipos y principios de revisión.
+El cliente reutiliza componentes, composables, adaptadores y funciones de esquema.
+La tabla identifica su naturaleza y los puntos donde se aplican.
 
 ## Aplicabilidad comprobada
 
-| Decisión aplicada | Clasificación | Consumidores y límite |
+| Mecanismo | Naturaleza | Aplicación en Nexus |
 | --- | --- | --- |
-| Contenedor/presentación | Patrón de separación de responsabilidades. | Las páginas coordinan; tablas y formularios reciben props y emiten eventos. |
-| Composables y operaciones por callback | Composición reactiva y estrategia funcional. | `usePagedList`, `useRemoteLookup`, `useDocumentRead` y `useRecordSave` conservan contratos distintos. No necesitan clases Strategy ni un estado global por formulario. |
-| Adaptadores HTTP y de datos | Patrón aplicado a fronteras concretas. | Servicios, mappers, `apiClient`, `requestPage` y `confirmMutation`. No prueban independencia completa de Vue, Axios o la API. |
-| Slots y composición visual | Mecanismo de Vue que permite reutilizar presentación. | `ServerTable`, `RecordListPanel` y diálogos. No es herencia ni un generador universal de CRUD. |
-| Provisión de sesión | Inyección de una instancia mediante Vue y composición del arranque. | `main.ts`, `createAuthSession`, `provide/inject` y guarda de Router. No equivale a un singleton global ni concede autorización en el backend. |
-| Fábricas de esquemas | Funciones que construyen validación según contexto. | `createIssueValidationSchema` y `createPurchaseValidationSchema`. No son Abstract Factory ni una máquina de estados. |
-| Uniones discriminadas | Mecanismo del sistema de tipos de TypeScript. | `IssueTarget`, `PurchaseWriteTarget` y `PurchaseDetailChange`. No validan JSON recibido ni sustituyen reglas del servidor. |
-| SOLID | Principios de evaluación, con aplicación parcial. | Se revisan cohesión, contratos y dependencias funcionales. No se inventa herencia para representar Liskov. |
-
-Los patrones organizan las colaboraciones del cliente. Vue aporta reactividad,
-componentes, slots e inyección; TypeScript describe sus datos y operaciones.
-La API resuelve autorización y persistencia. La [guía de incorporación](../developer-onboarding.md)
-introduce estos conceptos y sigue una operación completa por el código.
+| Contenedor/presentación | Separación de responsabilidades mediante componentes. | Páginas y composables coordinan el caso; formularios y tablas reciben props y emiten eventos. |
+| Composables y callbacks | Reutilización de lógica reactiva con operaciones configurables. | `usePagedList`, `useRemoteLookup`, `useDocumentRead` y `useRecordSave` reciben consultas o mutaciones por función. |
+| Adaptadores HTTP y de datos | Adaptación entre contratos de red y modelos del cliente. | Servicios, mappers, `apiClient`, `requestPage` y `confirmMutation`. |
+| Slots | Composición visual de Vue. | `ServerTable`, `RecordListPanel` y diálogos reciben contenido definido por su consumidor. |
+| Provisión de sesión | Inyección de una instancia de aplicación. | `main.ts` crea `AuthSession`; Router y descendientes consumen esa instancia. |
+| Fábricas de esquemas | Funciones que construyen validadores por contexto. | `createIssueValidationSchema` y `createPurchaseValidationSchema`. |
+| Uniones discriminadas | Modelado de variantes con TypeScript. | `IssueTarget`, `PurchaseWriteTarget` y `PurchaseDetailChange` relacionan modo, datos y operación. |
 
 ## Modelo general y aplicación en código
 
-Los [capítulos de diagramas](index.md) describen cada decisión con propósito,
-funcionamiento, contrato, código y evidencia. La columna general explica
-la colaboración sin nombres del proyecto; la aplicada usa archivos/símbolos reales.
-Una misma figura aplicada no pretende documentar todos los módulos ni todas las
-letras de SOLID.
+El modelo general identifica roles; la aplicación usa archivos y símbolos del
+proyecto. Los capítulos enlazados desarrollan sus contratos y límites.
 
 | Decisión | Modelo general | Aplicación existente |
 | --- | --- | --- |
@@ -59,26 +48,14 @@ documentados mediante sus componentes, estado y transporte reales. La frontera
 compartida se explica en la [integración de reglas públicas](../input-handling.md)
 y en el [estándar de seguridad](../../../security-standards.md).
 
-## Evaluación de SOLID
+## Aplicación de SOLID
 
-| Principio | Aplicación observable | Límite de la evaluación |
-| --- | --- | --- |
-| S — Responsabilidad única | Presentación, coordinación reactiva, reglas públicas y transporte están separados. | Una page coordina varias operaciones de un mismo caso; su tamaño no exige por sí solo más capas. |
-| O — Abierto/cerrado | Slots, configuración y callbacks extienden marcos compartidos. | Otra semántica de stock o recuperación exige un flujo específico; no se añade una bandera por cada excepción a un composable universal. |
-| L — Sustitución | No hay una jerarquía de subtipos de clases que permita afirmar cumplimiento de Liskov. Se revisa como criterio práctico la sustitución de callbacks: consulta, `AbortSignal`, resultados y rechazo ante error. | La analogía funcional no es una prueba formal del principio. TypeScript comprueba firmas; las pruebas comprueban comportamiento. Ocultar errores o cambiar el significado del total rompe el contrato. |
-| I — Segregación | Props/eventos y tipos como `LookupState` exponen lo que la presentación necesita. | No se entrega la sesión, el cliente HTTP o todo el editor a un botón o tabla. |
-| D — Inversión | `usePagedList` recibe `request`; `useRemoteLookup` recibe su consulta; los módulos aportan adaptadores concretos. | Es inversión por contratos funcionales en esos puntos; el frontend sigue usando Vue y Axios. No se declara independencia completa de frameworks. |
+| Principio | Aplicación en el código |
+| --- | --- |
+| Responsabilidad única | Páginas/composables coordinan; componentes presentan; mappers transforman; servicios realizan HTTP. |
+| Abierto/cerrado | Slots, configuración y callbacks permiten variar marcos compartidos sin copiar su implementación. |
+| Sustitución | Los callbacks deben conservar entradas, resultado, errores y `AbortSignal` del contrato configurado. En estos coordinadores no hay una jerarquía de clases. |
+| Segregación de interfaces | Props, eventos y contratos como `LookupState` entregan a cada consumidor los datos y operaciones que necesita. |
+| Inversión de dependencias | Los módulos proporcionan consultas y mutaciones a coordinadores compartidos mediante funciones. |
 
-La evaluación usa [SOLID de Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2020/10/18/Solid-Relevance.html)
-como criterio de revisión y [composables de Vue](https://vuejs.org/guide/reusability/composables.html)
-como mecanismo. No se agregan herencia, stores por formulario ni un contenedor de
-inyección para representar cada letra.
-
-## Evidencia y mantenimiento
-
-Cada capítulo enlaza pruebas de sus consumidores y distingue el contrato observado
-por unitarias, componentes o navegador. La [guía de pruebas](../../../../testing/index.md) conserva
-el diseño selectivo y sus identificadores; los resultados reales permanecen en CI
-o en la revisión. Las simulaciones de la API no demuestran persistencia del servidor
-ni capacidad bajo carga. Al cambiar el código se revisa la figura aplicada; al
-cambiar el contrato común también se revisa el modelo general y sus consumidores.
+Referencia: [principios SOLID](https://blog.cleancoder.com/uncle-bob/2020/10/18/Solid-Relevance.html).

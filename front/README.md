@@ -119,20 +119,8 @@ El despliegue se prepara con la [guía de compilación y publicación](docs/deve
 
 ## Documentación
 
-El [índice de documentación Vue](docs/index.md) organiza los documentos completos.
-
-| Necesidad | Guía |
-| --- | --- |
-| Instalar, configurar y trabajar en local | [Entorno y flujo de trabajo](docs/development/index.md). |
-| Entender el código por primera vez | [Incorporación y recorrido de una edición](docs/architecture/views/development/developer-onboarding.md). |
-| Conocer responsabilidades, modelos y patrones | [Arquitectura](docs/architecture/index.md). |
-| Consultar convenciones y ejemplos de código | [Estándar Vue/TypeScript](docs/architecture/coding-standards/index.md). |
-| Revisar alcance, permisos y operaciones | [Requisitos y casos de uso](docs/requirements/index.md). |
-| Ejecutar unitarias, navegador o sistema | [Archivos, credenciales y comandos de pruebas](docs/testing/06-test-files-and-credentials.md). |
-| Desplegar con Docker/VPS o hosting estático | [Compilación y despliegue](docs/development/03-build-and-deployment.md). |
-| Generar referencias y exportar documentos | [Publicación técnica](docs/governance/02-generation-and-publication.md). |
-| Operar las pantallas | [Manual de usuario](docs/user-manual/index.md). |
-| Generar manuales con las cuentas del entorno | [Credenciales, capturas y publicación por cuenta](docs/governance/07-manual-accounts-and-files.md). |
+El [índice de documentación Vue](docs/index.md) permite localizar requisitos,
+reglas y excepciones, arquitectura, pruebas, manuales y procedimientos de publicación.
 
 Las fuentes documentales se versionan en `front/docs`. Sus herramientas y resultados
 permanecen fuera de `public/`, `dist/` y la imagen de producción.

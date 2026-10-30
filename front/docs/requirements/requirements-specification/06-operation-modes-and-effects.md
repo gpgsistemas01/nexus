@@ -11,10 +11,8 @@ de compra o salida, en cambio, los estados y el cumplimiento se derivan de crear
 corregir, cancelar, surtir o devolver conforme a sus reglas; el actor no los captura
 como un campo libre.
 
-El efecto del indicador en consultas, reportes, altas y surtimientos se define mediante
-`RN-023` y se resume en esta tabla. Los recursos inactivos no pueden incorporarse a operaciones nuevas. Una salida existente
-con pendientes sí puede completarse después de la desactivación: usa su detalle histórico
-y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
+La [regla de actividad `RN-023`](catalog/05-cross-cutting-business-policies.md#identidad-y-estado-de-registros)
+distingue una relación nueva de un detalle histórico pendiente de surtir.
 
 | Contexto / acción | Modo y estado requerido | Datos que pueden cambiar | Efectos que no deben confundirse con edición |
 | --- | --- | --- | --- |
@@ -60,14 +58,9 @@ visual del formulario en un estado persistido del documento.
 
 ### Separación de compras y salidas
 
-El contexto de materiales o consumibles queda fijado por la operación elegida; no
-puede alterarse mediante filtros ni datos enviados por el usuario. Cada documento debe tener al menos un
-detalle y todos sus recursos deben coincidir con el tipo de cabecera, incluidos los cancelados.
-
-Listados, reportes y escrituras aplican esta regla. Las operaciones cruzadas
-se rechazan sin cambios de documento, stock ni trazabilidad. Los documentos
-históricos mixtos o vacíos se conservan para regularización, pero quedan
-excluidos de ambos contextos.
+La [regla `RN-034`](catalog/05-cross-cutting-business-policies.md#identidad-y-estado-de-registros)
+define el contexto admitido y el tratamiento de documentos históricos mixtos o vacíos.
+Aplica a listados, reportes y escrituras.
 
 ## Modos del cliente y estados del negocio
 

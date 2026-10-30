@@ -47,21 +47,11 @@ flowchart TB
 
 ## Código, contrato y límites
 
-[purchaseService](../../../../../src/modules/purchases/services/purchaseService.ts)
-extrae `goodsReceipt`, invoca
-[purchaseResponseMapper](../../../../../src/modules/purchases/mappers/purchaseResponseMapper.ts)
-y rechaza un documento cuyo id difiere del solicitado.
-[usePurchaseActions](../../../../../src/modules/purchases/composables/usePurchaseActions.ts)
-aporta la operación al lector y coordina el modo del editor después de leer.
-
-En escritura, [usePurchaseEditor](../../../../../src/modules/purchases/composables/usePurchaseEditor.ts)
-construye el cuerpo mediante
-[purchaseRequestMapper](../../../../../src/modules/purchases/mappers/purchaseRequestMapper.ts)
-antes de llamar al servicio. El mapper selecciona campos, sin enviar HTTP.
-`confirmMutation` comprueba el código de la respuesta, sin generar identificadores
-ni sustituir una transacción. El recorrido temporal se conserva en la
-[secuencia de guardado](08-document-responsibilities.md#secuencia-de-guardado-confirmado).
+Las [condiciones de aceptación HTTP](../../../contracts/client-contracts.md#escrituras-y-confirmación)
+se definen en el contrato del cliente. La
+[composición de documentos](08-document-responsibilities.md#propietarios-del-código)
+ubica los adaptadores de lectura y escritura.
 
 [purchaseTest](../../../../../tests/unit/modules/purchases/purchaseTest.ts) comprueba modelos
 y solicitudes; [apiClientTest](../../../../../tests/unit/shared/http/apiClientTest.ts)
-comprueba transporte/sesión. Los tipos estáticos no validan por sí solos JSON.
+comprueba transporte/sesión.

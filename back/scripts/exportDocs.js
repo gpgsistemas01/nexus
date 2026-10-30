@@ -15,7 +15,8 @@ import {
     mapMarkdownProse,
     externalDocumentAnchorFragment,
     externalDocumentLinkLabel,
-    prepareManualEntry
+    prepareManualEntry,
+    prepareSectionEntry
 } from './documentExportContentUtils.js';
 import { removeDocumentOutput } from './documentOutputUtils.js';
 import { loadDocumentationCatalog } from '../../front/scripts/documentationCatalog.mjs';
@@ -306,6 +307,8 @@ const addInternalAnchors = (content, source) => {
     return `[]{#${documentExportAnchor(source)}}\n\n${anchoredHeadings}`;
 };
 
+const renderedFigurePattern = /^\s*\[\]\{#([^}]+)\}\s*\r?\n\s*!\[([^\]]+)\]\([^)]+\)\{[^}]*\}$/gm;
+
 const addFigureAnchors = async (content, source, firstFigureNumber) => {
     let figureNumber = firstFigureNumber;
     const figurePattern = /^(\s*)(!\[([^\]]+)\]\(([^)]+)\))$/gm;
@@ -313,8 +316,10 @@ const addFigureAnchors = async (content, source, firstFigureNumber) => {
     let preparedContent = content;
     for (const [figure, indentation, image, title, imagePath] of figures) {
         const dimensions = getPngDimensions(await readFile(imagePath));
-        const replacement = `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
-            + `{#${documentExportAnchor(source, `figura-${figureNumber++}`)} ${getFigureSizeAttribute(dimensions)}}`;
+        const anchor = documentExportAnchor(source, `figura-${figureNumber}`);
+        const replacement = `${indentation}[]{#${anchor}}\n\n`
+            + `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber++}. ${title}]`)}`
+            + `{${getFigureSizeAttribute(dimensions)}}`;
         preparedContent = preparedContent.replace(figure, replacement);
     }
     return preparedContent;
@@ -330,9 +335,9 @@ const buildDocumentIndexes = async (preparedSources) => {
             title: match[2],
             link: `#${match[3]}`
         })).filter(({ level }) => level <= 3));
-        figures.push(...[...content.matchAll(/^\s*!\[([^\]]+)\]\([^)]+\)\{#([^ }]+)[^}]*\}$/gm)].map((match) => ({
-            title: match[1],
-            link: `#${match[2]}`
+        figures.push(...[...content.matchAll(renderedFigurePattern)].map((match) => ({
+            title: match[2],
+            link: `#${match[1]}`
         })));
     }
     const tableOfContents = headings.map(({ level, title, link }) => (
@@ -364,7 +369,7 @@ const preparePublicationSource = (content, source, output) => {
     const document = path.basename(output).replace(/\.(?:docx|pdf)$/, '');
     const section = frontendCatalog.sections[document.replace(/^frontend-vue-/, '')];
     const titledContent = source === '../front/docs/index.md' && section
-        ? content.replace(/^# [^\r\n]+/, `# ${section.title} del frontend Vue`)
+        ? prepareSectionEntry(content, `${section.title} del frontend Vue`)
         : content;
     return prepareManualSource(titledContent, source, output);
 };
@@ -621,7 +626,7 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
     return {
         renderedSource,
         nextFigureNumber: firstFigureNumber
-            + [...renderedContent.matchAll(/^\s*!\[[^\]]+\]\([^)]+\)\{#[^}]+\}$/gm)].length
+            + [...renderedContent.matchAll(renderedFigurePattern)].length
     };
 };
 

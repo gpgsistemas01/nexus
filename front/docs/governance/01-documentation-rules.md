@@ -21,26 +21,8 @@ certificación.
 
 ## Colecciones y contenido
 
-| Colección | Contenido que debe explicar por sí misma |
-| --- | --- |
-| `front/README.md` | Propósito del cliente, inicio rápido y enlaces a los procedimientos completos. |
-| `requirements` | Alcance del cliente, obligaciones observables, datos, restricciones, actores y fichas de interacción. |
-| `architecture` | Responsabilidades, estado, dependencias, transporte, entradas y despliegue; inventario técnico generado separado de las decisiones. |
-| `architecture/views/development/design-and-construction-patterns` | Problema, decisión, modelo general, aplicación con nombres reales, límites y evidencia. |
-| `architecture/contracts` | Datos, eventos, callbacks y condiciones de aceptación en las fronteras HTTP y de componentes. |
-| `architecture/views/logical/components` | Colaboradores propios, responsabilidades y dirección de sus dependencias. |
-| `architecture/views/development` | Unidades y organización del código, integración de reglas públicas y mecanismos de construcción. Los patrones conservan su aplicación concreta aunque usen colaboradores de la vista lógica. |
-| `architecture/views/processes` | Orden de llamadas, decisiones, rechazo, recuperación y resultado de una operación. |
-| `development` | Procedimientos de entorno y flujo de trabajo: instalación, archivos locales, comandos, herramientas, compilación y despliegue. |
-| `testing` | Plan propio, condiciones, casos, datos, oráculos, cobertura y preparación de ambientes. |
-| `governance` | Reglas editoriales, mantenimiento, generación y publicación. |
-| `user-manual` | Procedimientos, campos, resultados, incidencias y capturas de las pantallas Vue. Publicación independiente. |
-
-El [mapa de estándares y fuentes propietarias](09-standards-and-ownership.md)
-identifica dónde se mantiene cada regla transversal. Cada documento desarrolla su
-contenido y enlaza realización, contrato y evidencia local. Las reglas funcionales y
-los flujos se mantienen completos en requisitos; los contratos técnicos y decisiones,
-en arquitectura.
+El [mapa de estándares](09-standards-and-ownership.md) identifica la fuente de cada
+regla transversal. Cada colección mantiene su índice y los enlaces a sus capítulos.
 
 ## Convenciones editoriales
 
@@ -84,18 +66,10 @@ propia. Aquí se describen sus garantías observables y los límites del cliente
 
 ## Ubicación, navegación y publicación
 
-Las colecciones separan requisitos, arquitectura, procedimientos de desarrollo,
-pruebas, gobierno y manual de usuario. Las vistas 4+1 describen la arquitectura; los
-estándares y contratos son referencias transversales. La guía de incorporación introduce los
-conceptos y un recorrido del código; la referencia generada permite localizar símbolos.
-El manual de usuario es una colección independiente orientada a las tareas del
-operador, con procedimientos y capturas propios; no se incorpora al libro técnico.
-
-Cada índice enlaza sus capítulos en orden de lectura. El [catálogo de publicaciones](../publications.json)
-refleja ese orden en los documentos exportados y conserva todas las fuentes. Al agregar
-o reubicar una guía, actualizar índice, catálogo y enlaces consumidores. No renumerar
-identificadores CU/DP/CP/DIA por mover archivos. El formato de las fichas funcionales
-y de pruebas se mantiene al reorganizar la colección.
+Al agregar o reubicar una guía, actualice su índice, el
+[catálogo de publicaciones](../publications.json) y los enlaces consumidores.
+Conserve los identificadores CU/DP/CP/DIA y el formato de sus fichas.
+La [guía de publicación](02-generation-and-publication.md) define los comandos y salidas.
 
 ## Unidad documental y granularidad
 
@@ -141,9 +115,25 @@ conservan fuentes, identificadores y restricciones locales.
 | Justificación o restricción delicada | Párrafo breve junto al modelo. | Motivo y límite que la figura no expresa. |
 | Caso de uso o prueba seleccionado | Ficha establecida. | Preparación, pasos, alternativas y resultado verificable. |
 
-El texto explica motivos, restricciones y recuperación; las tablas comparan y los
-diagramas representan relaciones o recorridos. Evitar repetir la misma explicación
-en los tres formatos.
+Después de una figura, explique sólo las guardas abreviadas, excepciones o límites
+que no se puedan leer en ella. No vuelva a enumerar sus participantes, llamadas o
+efectos. Las reglas compartidas se definen una vez y se enlazan desde sus consumidores.
+
+## Fichas de patrones Vue
+
+Las fichas describen colaboraciones implementadas en el cliente. Se distingue el
+mecanismo de Vue, la organización elegida por Nexus y los contratos TypeScript.
+
+| Parte de la ficha | Contenido |
+| --- | --- |
+| Propósito | Problema del código que resuelve y responsabilidades separadas. |
+| Modelo general | Roles y colaboración, con el diagrama adecuado: componentes para props/eventos, secuencia para callbacks/inyección, composición para slots y flujo para adaptación o construcción. |
+| Aplicación | Archivos y símbolos reales, fuentes y figura con sus nombres. |
+| Contrato y límites | Props/eventos y estado visual; argumentos, retorno, efectos y limpieza de composables; nombres y props de slots; clave, valor y actualización de la inyección. Guardas y excepciones que cambian el resultado. |
+| Pruebas relacionadas | Enlaces a las pruebas del contrato y sus consumidores; el diseño y los resultados permanecen en la colección de pruebas. |
+
+El texto complementa las figuras con las condiciones que no muestran. Las fichas
+no requieren clases para representar componentes, composables o funciones.
 
 ## Referencias adoptadas
 

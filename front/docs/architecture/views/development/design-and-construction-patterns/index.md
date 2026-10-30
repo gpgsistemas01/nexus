@@ -6,7 +6,7 @@ el aplicado permite seguirlos en el código. La notación se elige según la pre
 
 | Capítulo | Pregunta principal | Diagramas utilizados |
 | --- | --- | --- |
-| [Principios y clasificación](01-applicability-and-principles.md) | ¿Qué clase de mecanismo representa cada colaboración y cómo se revisa SOLID? | Catálogo de figuras y evaluación con fuentes concretas. |
+| [Principios y clasificación](01-applicability-and-principles.md) | ¿Qué mecanismos comparten los módulos y dónde se aplican? | Catálogo de mecanismos, figuras y aplicación de SOLID. |
 | [Contenedor y presentación](02-container-and-presentation.md) | ¿Quién conserva el estado y quién presenta/emite intenciones? | Mapa de composición de componentes con props y eventos. |
 | [Composables y callbacks](03-composables-and-callbacks.md) | ¿Cómo ejecuta un coordinador una operación aportada por su consumidor? | Secuencia UML del callback y mapas de dependencias aplicadas. |
 | [Adaptadores HTTP y de datos](04-http-and-data-adapters.md) | ¿Cómo se transforma y admite una respuesta externa? | Flujo de datos con transformación y decisiones de aceptación. |
@@ -32,4 +32,10 @@ como tecnología utilizada en el texto, sin convertirlas en entidades del sistem
 Los [contratos de intercambio](../../../contracts/index.md) definen los datos y
 resultados requeridos. Las pruebas de cada capítulo observan ese contrato; el
 [plan de pruebas](../../../../testing/01-test-plan.md) explica los niveles y sus límites.
-El mantenimiento documental sigue las [reglas de gobierno](../../../../governance/01-documentation-rules.md).
+
+## Mecanismos de Vue utilizados
+
+- [Props](https://vuejs.org/guide/components/props.html) y [eventos](https://vuejs.org/guide/components/events.html): datos hacia la presentación e intenciones hacia su contenedor.
+- [Composables](https://vuejs.org/guide/reusability/composables.html): lógica reactiva reutilizable con estado y operaciones explícitos.
+- [Slots](https://vuejs.org/guide/components/slots.html): contenido del consumidor y datos recibidos por props del slot.
+- [Provide/inject](https://vuejs.org/guide/components/provide-inject.html): acceso a la sesión proporcionada por la aplicación.

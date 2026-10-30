@@ -25,4 +25,4 @@ Las [secuencias](../processes/index.md) explican el orden de las colaboraciones.
 | Organización del código y mecanismos reutilizados | [Desarrollo y patrones](../development/index.md). |
 
 La [guía visual](../diagram-reading.md) concentra la notación. Cada figura conserva
-sus fuentes y condiciones particulares; la estructura de carpetas no altera los IDs.
+sus fuentes y condiciones particulares.

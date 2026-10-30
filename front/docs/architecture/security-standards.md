@@ -25,14 +25,4 @@ Los permisos visibles no conceden autorización. Los payloads seleccionan campos
 admitidos conforme al [estándar de datos](coding-standards/07-objects-collections-and-payloads.md);
 el servidor resuelve identidad, relaciones, estado y resultados definitivos.
 
-## Cambios de contexto de salida
-
-El cliente actual presenta texto. Incorporar URLs capturadas o HTML enriquecido
-requiere definir protocolos/destinos o etiquetas/atributos permitidos y revisar su
-tratamiento antes de habilitar la función. El escape de texto no valida una URL.
-
-## Evidencia
-
-Los oráculos y límites se mantienen en el
-[diseño de seguridad de texto](../testing/design/07-shared.md#seguridad-de-texto-y-avisos)
-y sus casos. Las pruebas del cliente no acreditan controles internos del servidor.
+Pruebas relacionadas: [seguridad de texto y avisos](../testing/design/07-shared.md#seguridad-de-texto-y-avisos).
