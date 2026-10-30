@@ -55,19 +55,7 @@ Empiece por [Primera jornada: recorrido de inducción](00-induction.md).
 | [15. Errores y recuperación](15-errors-and-recovery.md) | Capturas inválidas, conflictos y fallos de conexión. |
 | [16. Glosario para trabajar en Nexus](16-glossary.md) | Significado de campos, cantidades, estados y operaciones. |
 
-## Convenciones de operación
-
-**Guardar**, **Actualizar**, **Surtir**, **Devolver** y las confirmaciones de
-corrección o cancelación envían cambios al sistema. **Agregar** dentro de los
-detalles de un documento o de las responsabilidades de una persona prepara la
-captura; todavía debe guardar el formulario principal. **Cerrar** o **Regresar**
-permiten abandonar una captura sin enviarla. Cerrar un mensaje después de una
-confirmación exitosa no revierte una operación ya guardada.
-
-Use las unidades indicadas en cada campo. Una cantidad por presentación y una
-cantidad convertida pueden tener valores diferentes. Antes de confirmar una
-operación de inventario, compruebe el artículo, proveedor, unidad y cantidad.
-
-La confirmación del sistema y la consulta actualizada son la referencia del
-resultado. Si se interrumpe la conexión al guardar, siga el capítulo de
-[recuperación](15-errors-and-recovery.md) antes de repetir la operación.
+La [inducción](00-induction.md) explica cómo preparar, guardar y comprobar una
+operación. Los [controles comunes](02-navigation-and-controls.md) enseñan a buscar,
+seleccionar y usar formularios. Si aparece un problema, consulte
+[Errores y recuperación](15-errors-and-recovery.md) antes de repetir el envío.

@@ -5,6 +5,7 @@
 | Estado | Propietario | Alcance y salida |
 | --- | --- | --- |
 | Identidad y permisos | `createAuthSession` proporcionado desde `main.ts`. | Una instancia por aplicación; carga compartida pendiente, usuario readonly. |
+| Preferencia de login | `useLoginForm`. | `nexus.rememberedUser` conserva el nombre tras el éxito; precarga sólo si es válido. Storage es opcional y su fallo no impide ingresar. |
 | Consulta aplicada/filas | `usePagedList` por listado. | Cada pantalla conserva query, conteo y carga/error; desmontar aborta/invalida. |
 | Búsqueda borrador | `useListSearch` y filtros de dominio. | Se aplica explícitamente, sin mutar resultados por cada tecla. |
 | Captura y errores | Composable de editor y VeeValidate. | Cada apertura tiene su instancia; precarga no cuenta como interacción. |
@@ -28,26 +29,32 @@ crea un store por modal o para reemplazar props/eventos.
 cerrada? **Fuente:** `useRecordSave.ts` y editores consumidores. Diagrama de estados
 selectivo del coordinador, no del estado persistido del documento.
 
-**Lectura visual:** [estados, transiciones e inicio/fin](../diagram-reading.md#estados).
+**Estado observado:** `isSubmitting`, `isConflicted` y vigencia del consumidor.
+**Lectura visual:** [evento, guarda y efecto](../../diagram-reading.md#estados).
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Disponible
-    Disponible --> Pendiente: enviar captura válida
-    Pendiente --> Disponible: fallo recuperable
-    Pendiente --> Conflicto: RECORD_VERSION_CONFLICT
-    Pendiente --> Confirmado: respuesta admitida y consumidor vigente
-    Disponible --> Finalizado: desmontar
-    Pendiente --> Finalizado: desmontar y abortar
-    Conflicto --> Finalizado: cerrar y solicitar nueva lectura
-    Confirmado --> Finalizado: contenedor cierra editor
-    Finalizado --> [*]
+    state Instancia {
+        [*] --> Disponible
+        Disponible --> Pendiente: execute(operation) [G1] / isSubmitting.value = true
+        Pendiente --> Disponible: operation resuelve [!aborted] / options.onSaved(result)
+        Pendiente --> Disponible: operation rechaza [!aborted && !G2] / publicar error
+        Pendiente --> Conflicto: operation rechaza [!aborted && G2] / isConflicted.value = true
+    }
+    Instancia --> [*]: onBeforeUnmount / controller.abort()
 ```
 
-El conflicto conserva la captura y bloquea otra escritura desde esa instancia. La
-confirmación sólo se propaga si no se abortó. Abortar una solicitud no revierte una
-transacción que ya completó la API; la recuperación debe consultar o reutilizar la
-identidad idempotente cuando exista.
+| Guarda o efecto | Correspondencia |
+| --- | --- |
+| `G1` | `!isSubmitting.value && !isConflicted.value && !controller.signal.aborted`. Si falla, `execute` retorna sin iniciar otra escritura. |
+| `G2` | `cause instanceof ApiError && cause.code === 'RECORD_VERSION_CONFLICT'`. Esa instancia queda bloqueada; cerrarla y abrir otra permite una lectura nueva. |
+| `aborted` | Abreviatura de `controller.signal.aborted`, no otro flag. El desmontaje termina la instancia desde cualquiera de sus estados. |
+| Publicar error | Asigna `message`; para `ApiError` llama a `setErrors`, y para estado HTTP 401/403, a `onDenied`. La captura pertenece al editor consumidor. |
+| Fin de operación | `finally` libera `isSubmitting` tanto en éxito como en rechazo. La confirmación invoca `onSaved` sólo si sigue vigente; ese callback puede cerrar el editor, no lo impone el helper. |
+
+El retorno a Disponible no es una confirmación persistida ni termina la aplicación.
+Abortar no revierte una transacción que ya completó la API; la recuperación consulta
+el resultado o reutiliza la identidad idempotente cuando el contrato lo permite.
 
 ## Consulta y actualización
 
@@ -60,5 +67,5 @@ puede publicar datos. Una respuesta vacía puede ajustar la página al último r
 ## Evidencia
 
 `listInteractionTest.ts`, `selectedOptionTest.ts`, las pruebas de formularios y los
-recorridos de catálogo/almacén/documentos cubren estados observables. La [matriz](../../../testing/04-use-case-coverage.md)
+recorridos de catálogo/almacén/documentos cubren estados observables. La [matriz](../../../../testing/04-use-case-coverage.md)
 identifica representantes y límites de persistencia.

@@ -47,8 +47,8 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "0..*" R1 : rows
-    Subject "1" --> "1" R2 : query
+    Subject --> "0..*" R1 : rows
+    Subject --> "1" R2 : query
 ```
 
 ## IdentityTable.defineEmits
@@ -141,8 +141,8 @@ classDiagram
     class R2["OrganizationState"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
-    Subject "1" --> "1" R1 : errors
+    Subject --> "1" R0 : values
+    Subject --> "1" R1 : errors
     Subject ..> R2 : options
 ```
 
@@ -270,10 +270,10 @@ classDiagram
     class R3["IdentityEntry"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : errors
     Subject ..> R2 : options
-    Subject "1" --> "0..1" R3 : row
+    Subject --> "0..1" R3 : row
 ```
 
 ## UserForm.defineEmits
@@ -435,16 +435,6 @@ classDiagram
 'persons' | 'users'
 ```
 
-**Figura:** `DIA-VUE-TS-IDENTITY-11-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["IdentityResource"] {
-        <<type>>
-    }
-```
-
 ## PersonAccess
 
 **Fuente:** [src/modules/identity/identity.ts](../../../../../src/modules/identity/identity.ts) · línea 10, columna 1. **Declaración:** interface.
@@ -510,7 +500,7 @@ classDiagram
     class R0["PersonAccess"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : accesses
+    Subject --> "0..*" R0 : accesses
 ```
 
 ## PersonValues
@@ -539,7 +529,7 @@ classDiagram
     class R0["PersonAccess"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : accesses
+    Subject --> "0..*" R0 : accesses
 ```
 
 ## UserValues
@@ -673,7 +663,7 @@ classDiagram
     class R0["IdentityEntry"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : row
+    Subject --> "1" R0 : row
 ```
 
 ## IdentityTarget
@@ -735,7 +725,7 @@ classDiagram
     class R0["IdentityEntry"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : row
+    Subject --> "1" R0 : row
 ```
 
 ## IdentityPage.defineProps
@@ -933,7 +923,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : organization
-    Subject "1" --> "1" R1 : values
+    Subject --> "1" R1 : values
 ```
 
 **Figura:** `DIA-VUE-TS-IDENTITY-27-2`. Parte 2/2.
@@ -1238,7 +1228,7 @@ classDiagram
     Subject ..> R0 : organization
     Subject ..> R1 : update
     Subject ..> R1 : blur
-    Subject "1" --> "1" R1 : values
+    Subject --> "1" R1 : values
 ```
 
 ## useUserEditor.return.organization.shape1
@@ -1507,8 +1497,8 @@ classDiagram
     class R1["IDENTITY_CONFIG.users.shape2"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : persons
-    Subject "1" --> "1" R1 : users
+    Subject --> "1" R0 : persons
+    Subject --> "1" R1 : users
 ```
 
 ## IDENTITY_CONFIG.persons.shape1
@@ -1593,7 +1583,7 @@ classDiagram
     class R0["personPayload.return.<br/>accesses.shape1"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : accesses
+    Subject --> "0..*" R0 : accesses
 ```
 
 ## personPayload.return.accesses.shape1
@@ -1772,5 +1762,5 @@ classDiagram
     class R0["IdentityEntry"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```

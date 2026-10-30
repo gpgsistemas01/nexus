@@ -234,6 +234,11 @@
         "type": "apiKey",
         "in": "cookie",
         "name": "accessToken"
+      },
+      "refreshCookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "refreshToken"
       }
     },
     "responses": {

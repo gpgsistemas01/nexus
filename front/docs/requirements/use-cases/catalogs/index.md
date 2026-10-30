@@ -25,5 +25,5 @@
 
 ## Realización y verificación del cliente
 
-[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/03-catalogs.md).
+[Componentes del cliente](../../../architecture/views/logical/components/03-catalogs.md).
 Pruebas de navegador: [catalogs.spec.ts](../../../../tests/e2e/catalogs.spec.ts).

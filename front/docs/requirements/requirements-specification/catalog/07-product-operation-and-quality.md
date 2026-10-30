@@ -1,6 +1,6 @@
 # 4.7 Operación y calidad del producto
 
-| ID | Requisito y forma de comprobación | Estado |
+| ID | Requisito | Estado |
 | --- | --- | --- |
 | RC-SEG-001 | Las contraseñas deben almacenarse mediante hash y nunca como texto plano. | Implementado |
 | RC-SEG-002 | Una operación protegida debe rechazar una sesión ausente o un permiso insuficiente antes de consultar información protegida o ejecutar cambios. | Implementado |
@@ -17,19 +17,11 @@
 | RC-OBS-002 | Los errores y logs expuestos al cliente no deben revelar secretos. | Implementado |
 | RC-DES-001 | Si falta `DIRECT_URL` o falla una migración requerida, el contenedor debe terminar antes de iniciar la aplicación. | Implementado |
 | RC-DES-002 | La aplicación debe usar `DATABASE_URL` y Prisma CLI debe preferir `DIRECT_URL` para migraciones. | Implementado |
-| RC-COM-001 | El cliente debe instalarse y compilarse con un Node.js admitido por `front/package.json`: `^22.22.2 || ^24.15.0 || ^26.12.1`. | Implementado |
+| RC-COM-001 | El cliente debe instalarse y compilarse con una versión de Node.js admitida por `engines` de `front/package.json` y las dependencias fijadas en su lockfile. | Implementado |
 | RC-COM-002 | La API debe intercambiar JSON salvo rutas declaradas para archivos o texto plano. | Implementado |
 | RC-USA-001 | Una tabla en pantalla angosta debe conservar accesibles las acciones y datos prioritarios. | Implementado |
 | RC-USA-002 | La interfaz debe presentar los errores de validación sin perder el contexto del formulario. | Implementado |
-| RC-REN-001 | Los listados cuyo flujo contempla paginación y filtros deben aplicarlos al obtener los datos; las consultas todavía no cubiertas conservan el estado Parcial. | Parcial |
-| RC-REN-002 | Los tiempos máximos de respuesta requieren línea base, umbral y aprobación del responsable del producto. | Propuesto |
-| RC-REN-003 | Los límites de concurrencia y volumen requieren línea base, umbral y aprobación del responsable del producto. | Propuesto |
-| RC-DIS-001 | El objetivo de disponibilidad requiere infraestructura, medida y aprobación explícitas. | Propuesto |
-| RC-DIS-002 | Los objetivos de recuperación y respaldo requieren RTO, RPO, infraestructura y aprobación explícitos. | Propuesto |
-
-No se inventan umbrales de rendimiento o disponibilidad: deben acordarse con quien
-opera el sistema y convertirse en una prueba o monitor reproducible antes de cambiar
-su estado.
+| RC-REN-001 | Los listados definidos como paginados deben obtener los datos aplicando filtros y límites de página, sin descargar el conjunto completo para paginarlo en el navegador. | Parcial |
 
 ## Alcance y comprobación de calidad
 
@@ -44,18 +36,31 @@ registro de aplicación de calidad.
   previstos; ocultar una columna no debe ocultar su única acción disponible.
 - **CA-RC-USA-002-1:** un rechazo de validación identifica la información que debe
   corregirse y conserva el contexto del formulario para reintentar.
-- `RC-REN-002`, `RC-REN-003`, `RC-DIS-001` y `RC-DIS-002` son necesidades propuestas,
-  no objetivos cuantitativos aprobados. Antes de verificar cumplimiento se deben acordar
-  medida, carga o escenario, umbral, infraestructura, responsable y método de evaluación.
+- **CA-RC-SEG-002-1:** la consulta de inventario debe omitir los costos cuando la
+  cuenta no tenga permiso para leerlos. El cliente debe omitir su presentación y
+  la API no debe incluir el valor protegido en la respuesta.
 - `RC-PRU-001`, `RC-PRU-002` y `RC-REN-001` permanecen parciales. Un resultado positivo
   de la suite disponible no demuestra cobertura completa de esas obligaciones.
+
+## Objetivos de calidad por definir
+
+Estas necesidades conservan su ID, pero todavía no tienen condiciones suficientes
+para verificar cumplimiento. Sus medidas y responsables deben acordarse en el
+[registro de pendientes](../../vision-scope-and-requirements/10-known-gaps-and-pending-decisions.md).
+
+| ID | Definición necesaria | Estado |
+| --- | --- | --- |
+| RC-REN-002 | Tiempo máximo de respuesta por operación y carga: línea base, medida, umbral y responsable de aceptación. | Propuesto |
+| RC-REN-003 | Volumen y concurrencia soportados: escenario, datos, usuarios simultáneos, umbrales y forma de prueba. | Propuesto |
+| RC-DIS-001 | Disponibilidad del servicio: infraestructura, período de medida, objetivo y responsable de operación. | Propuesto |
+| RC-DIS-002 | Recuperación y respaldo: tiempo de recuperación (RTO), pérdida de datos tolerada (RPO), infraestructura y forma de comprobación. | Propuesto |
 
 ## Restricción de construcción con identificador histórico
 
 `RN-006` se conserva por trazabilidad, pero su obligación es de construcción, no una
 regla del negocio ni una acción del actor. Se revisa junto con `RC-MAN-002`.
 
-| ID | Requisito y criterio de aceptación | Estado del requisito de producto |
+| ID | Requisito | Estado |
 | --- | --- | --- |
 | RN-006 | Un catálogo debe reutilizar el ciclo listar-crear-actualizar y sus componentes existentes cuando no cambien sus reglas, permisos ni persistencia. | Implementado |
 

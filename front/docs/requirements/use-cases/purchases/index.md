@@ -19,5 +19,5 @@
 
 ## Realización y verificación del cliente
 
-[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/06-purchases.md).
+[Componentes del cliente](../../../architecture/views/logical/components/06-purchases.md).
 Pruebas de navegador: [purchases.spec.ts](../../../../tests/e2e/purchases.spec.ts).

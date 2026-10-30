@@ -11,8 +11,8 @@ No se exige convertir composables o componentes funcionales en clases.
 Los capítulos siguientes son vistas de lectura por responsabilidad. La
 [referencia completa de contratos TS/SFC](../type-reference/index.md) enumera los
 campos, firmas, uniones y relaciones declarados en todos los archivos de `src/`.
-Se regenera con `npm run docs:generate` y se publica con
-`npm run docs:export -- tipos ambos`; `docs:check` detecta diferencias con el código.
+Su [procedimiento de generación y publicación](../../../../governance/02-generation-and-publication.md#referencia-completa-de-tipos)
+conserva comandos y resultados.
 
 | Capítulo | Estructura representada | Figuras | Contratos completos |
 | --- | --- | --- | --- |
@@ -36,4 +36,5 @@ compartimentos, estereotipos, flechas y multiplicidades. En esta colección:
 | `extends` declarado | Generalización; un alias de unión/intersección conserva su dependencia o tabla de variantes. |
 | Propiedad o array | Asociación dirigida; no expresa destrucción en cascada. |
 | Interfaz/alias | Describe estructura; los mappers y lectores validan JSON en ejecución. |
+| Alias de valores sin estructura ni relaciones | Su definición completa resulta suficiente en la referencia; no se dibuja como una clase vacía. |
 | Operación | La [vista de procesos](../../processes/index.md) explica orden, rechazo y reintento. |

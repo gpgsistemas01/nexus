@@ -14,16 +14,6 @@ Generado con `npm run docs:generate`. No editar manualmente.
 keyof typeof PUBLIC_CATALOGS
 ```
 
-**Figura:** `DIA-VUE-TS-CATALOGS-1-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["CatalogName"] {
-        <<type>>
-    }
-```
-
 ## CatalogField
 
 **Fuente:** [src/modules/catalogs/catalog.ts](../../../../../src/modules/catalogs/catalog.ts) · línea 4, columna 1. **Declaración:** type.
@@ -32,16 +22,6 @@ classDiagram
 
 ```typescript
 'name' | 'symbol' | 'isActive'
-```
-
-**Figura:** `DIA-VUE-TS-CATALOGS-2-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["CatalogField"] {
-        <<type>>
-    }
 ```
 
 ## CatalogValues
@@ -199,7 +179,7 @@ classDiagram
     class R0["CatalogEntry"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : row
+    Subject --> "1" R0 : row
 ```
 
 ## maxLengths@23:23
@@ -269,7 +249,7 @@ classDiagram
     class R1["CatalogField"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : errors
 ```
 
@@ -346,8 +326,8 @@ classDiagram
     class R1["CatalogQuery"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : rows
-    Subject "1" --> "1" R1 : query
+    Subject --> "0..*" R0 : rows
+    Subject --> "1" R1 : query
 ```
 
 ## CatalogTable.defineEmits
@@ -563,7 +543,7 @@ classDiagram
     class R0["catalogDefinition.return.<br/>variant1.maxLengths.shape1"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : maxLengths
+    Subject --> "1" R0 : maxLengths
 ```
 
 ## catalogDefinition.return.variant1.maxLengths.shape1
@@ -621,7 +601,7 @@ classDiagram
     class R0["catalogDefinition.return.<br/>variant2.maxLengths.shape1"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : maxLengths
+    Subject --> "1" R0 : maxLengths
 ```
 
 ## catalogDefinition.return.variant2.maxLengths.shape1
@@ -679,7 +659,7 @@ classDiagram
     class R0["catalogDefinition.return.<br/>variant3.maxLengths.shape1"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : maxLengths
+    Subject --> "1" R0 : maxLengths
 ```
 
 ## catalogDefinition.return.variant3.maxLengths.shape1
@@ -737,7 +717,7 @@ classDiagram
     class R0["catalogDefinition.return.<br/>variant4.maxLengths.shape1"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : maxLengths
+    Subject --> "1" R0 : maxLengths
 ```
 
 ## catalogDefinition.return.variant4.maxLengths.shape1
@@ -795,7 +775,7 @@ classDiagram
     class R0["catalogDefinition.return.<br/>variant5.maxLengths.shape1"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : maxLengths
+    Subject --> "1" R0 : maxLengths
 ```
 
 ## catalogDefinition.return.variant5.maxLengths.shape1
@@ -853,7 +833,7 @@ classDiagram
     class R0["catalogDefinition.return.<br/>variant6.maxLengths.shape1"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : maxLengths
+    Subject --> "1" R0 : maxLengths
 ```
 
 ## catalogDefinition.return.variant6.maxLengths.shape1
@@ -953,7 +933,7 @@ classDiagram
     }
     Subject ..> R0 : update
     Subject ..> R0 : blur
-    Subject "1" --> "1" R1 : values
+    Subject --> "1" R1 : values
 ```
 
 ## useCatalogList.return
@@ -1096,5 +1076,5 @@ classDiagram
     class R0["CatalogEntry"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```

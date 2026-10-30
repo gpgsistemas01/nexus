@@ -3,7 +3,7 @@
 ## Alcance
 
 Estas reglas se aplican a captura, presentación, sesión y datos públicos del cliente.
-La [arquitectura de entradas y salidas](views/logical/input-security.md) identifica
+La [integración de reglas públicas](views/development/input-handling.md) identifica
 los validadores, alias y fronteras concretos. La API conserva autorización,
 validación definitiva e integridad de los datos persistidos.
 

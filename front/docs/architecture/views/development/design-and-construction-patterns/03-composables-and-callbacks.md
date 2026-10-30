@@ -1,29 +1,39 @@
 # 3. Composables y operaciones por callback
 
-## Problema y decisión
+## Propósito y funcionamiento
 
-Los listados comparten carga, error, cancelación y paginación, pero consultan
-recursos distintos. Un composable concentra el comportamiento reactivo común
-y recibe la operación variable como función. Es composición y estrategia
-funcional; no se declaran clases Strategy ni se comparte el estado de todas las
-pantallas en una única instancia.
+Un composable crea el estado reactivo de una interacción y expone sus operaciones.
+En los listados administra carga, error, cancelación y paginación. El consumidor
+aporta la consulta como callback: así el mismo mecanismo trabaja con recursos
+distintos y cada pantalla conserva su propia instancia.
 
 ## Modelo general de composición por callback
 
 **Identificador:** `DIA-VUE-GEN-002`. **Pregunta:** ¿cómo varía la operación sin
 acoplar el núcleo al dominio? **Fuente:** contratos de `usePagedList`,
-`useRemoteLookup` y `useRecordSave`. Flechas continuas = configuración/consumo;
-discontinuas = invocación configurada o resultado observable.
+`useRemoteLookup` y `useRecordSave`. **Notación:** secuencia UML de roles genéricos;
+flechas continuas = llamada, discontinuas = retorno o estado expuesto. Los nombres
+ilustran el mecanismo; las funciones concretas se identifican en los casos aplicados.
 
 **Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias); [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
 
 ```mermaid
-flowchart TB
-    consumer["Consumidor del dominio"] -->|configura| core["Composable compartido<br/>estado por instancia"]
-    consumer -->|aporta| operation["Operación concreta<br/>consulta o guardado"]
-    core -.->|invoca callback con signal| operation
-    core -.->|estado y métodos| consumer
-    core --> cleanup["Ciclo de vida<br/>cancelar e invalidar"]
+sequenceDiagram
+    autonumber
+    participant Consumer@{ "type": "control" } as Consumidor
+    participant Core@{ "type": "control" } as Composable
+    participant Operation as Operación configurada
+    Consumer->>Core: crear({ operation })
+    Core-->>Consumer: estado y métodos de esa instancia
+    Consumer->>Core: ejecutar(entrada)
+    Core->>Operation: operation(entrada, signal)
+    alt resultado admitido y consumidor vigente
+        Operation-->>Core: resultado
+        Core-->>Consumer: estado actualizado
+    else rechazo y consumidor vigente
+        Operation-->>Core: error
+        Core-->>Consumer: error observable
+    end
 ```
 
 ## Dependencias y composición de un listado
@@ -56,8 +66,9 @@ con una secuencia; al desmontar cancela el trabajo. No importa `catalogService`.
 
 [useDocumentRead](../../../../../src/shared/composables/useDocumentRead.ts) y
 [useRecordSave](../../../../../src/shared/composables/useRecordSave.ts) aplican el mismo
-criterio a contratos distintos. No se fusionan sólo porque todos tengan una
-promesa. Cancelar en el navegador no revierte una escritura ya confirmada.
+criterio a contratos distintos: el lector entrega un documento y el guardado
+notifica una confirmación. Cancelar en el navegador deja de esperar el resultado;
+una escritura que la API ya confirmó permanece registrada.
 
 El callback debe conservar resultados, errores y `AbortSignal`; una firma válida
 de TypeScript no demuestra sustitución de comportamiento.
@@ -114,40 +125,6 @@ Las pruebas de [recuperación](../../../../../tests/unit/modules/warehouse/waste
 y [navegador](../../../../../tests/e2e/warehouse.spec.ts) protegen cancelación, cero/positivo,
 permiso, incertidumbre y confirmación separada de la escritura.
 
-## Altas contextuales mediante eventos y callbacks
-
-**Identificador:** `DIA-VUE-PAT-003`. **Pregunta:** ¿cómo abre un selector el
-formulario de otro módulo sin consultar su API ni perder la captura de origen?
-**Fuente:** `RemoteSelect`, `LookupCreation`, `InventoryWorkspace`, `PurchaseWorkspace`,
-`IssueWorkspace`, `DirectoryCreationPage` e `InventoryEditorPage`.
-Flujo de composición del cliente: las flechas representan eventos/callbacks y
-responsabilidades; no son relaciones de clases ni una transacción de base de datos.
-
-```mermaid
-flowchart TB
-    select["RemoteSelect<br/>VAutocomplete"] -->|create con búsqueda| origin["Formulario origen<br/>LookupCreation"]
-    origin -->|solicitud tipada| workspace["Workspace<br/>composición"]
-    workspace --> directory["DirectoryCreationPage<br/>Proveedor / Cliente"]
-    workspace --> inventory["InventoryEditorPage<br/>Artículo"]
-    directory --> save["Editor y servicio<br/>guardar en API"]
-    inventory --> save
-    save -->|registro confirmado| callback["onCreated<br/>ID del servidor"]
-    callback -->|seleccionar y renovar catálogo| origin
-```
-
-Se reutiliza contenedor/presentación y composición por callbacks. `RemoteSelect`
-no importa módulos de negocio; cada Workspace importa los contenedores necesarios.
-No se implementa un bus de eventos global ni un store para estas capturas locales.
-Cancelar no invoca `onCreated`; los formularios vivos admiten sólo la selección
-compatible con su modo y disponibilidad. El alta desde Compras conserva el proveedor
-fijado y su contrato de artículo sin existencia inicial capturada.
-
-La [comparación de bibliotecas y flujos Vue](../../logical/ui-and-http.md#alta-contextual-desde-un-selector)
-justifica extender el control Vuetify instalado. Las pruebas de
-[navegador](../../../../../tests/e2e/selectCreation.spec.ts) y
-[captura de inventario](../../../../../tests/unit/modules/warehouse/inventoryFormTest.ts)
-comprueban los efectos observables, no las llamadas privadas entre componentes.
-
 ## Selección dependiente de inventario
 
 El [modelo general de composición por callback](#modelo-general-de-composición-por-callback)
@@ -186,9 +163,8 @@ reglas de inactivos, permisos, captura y renovación del catálogo.
 
 [selectedOptionTest](../../../../../tests/unit/shared/composables/selectedOptionTest.ts)
 comprueba precarga, actualización remota, limpieza e independencia de instancias.
-Las pruebas existentes de Inventario, Compras y Salidas mantienen sus oráculos de
-captura, payloads, dependencias y recuperación; no se sustituyen por aserciones
-sobre el nuevo reparto de archivos.
+Las pruebas de Inventario, Compras y Salidas observan captura, payloads,
+dependencias y recuperación del consumidor.
 
 ## Fuentes de los participantes
 

@@ -24,10 +24,6 @@ símbolos de frontera/coordinación, callbacks y actualizaciones reactivas.
 | [7. Salidas](07-issues/index.md) | Resolución de modo, surtido, devolución y alcance de área. |
 | [8. Movimientos y reportes](08-movements-and-reports/index.md) | Aplicación de filtros y descarga recuperable. |
 
-Las secuencias compartidas explican vigencia, transporte y ciclo de vida una sola vez.
-Las de dominio desarrollan decisiones de campos, modos y efectos observables. Cada
-índice de sección permite leer su colaboración completa y volver al catálogo global.
-
 ## Lectura de las colaboraciones
 
 La [leyenda de secuencias](../diagram-reading.md#secuencias) explica participantes,
@@ -97,13 +93,12 @@ punto, sin volver a describir todo el recorrido.
 | [Consulta de movimientos](08-movements-and-reports/01-movement-filters.md#aplicación-de-criterios-y-consulta) | Fechas, query y callback de listado | `DIA-VUE-SEQ-050` |
 | [execute(operation)](02-shared-runtime/08-record-save.md) | Guardas, estado y callbacks de guardado | `DIA-VUE-SEQ-051/053` |
 | [returnDetail(options)](07-issues/07-issue-save-transport.md#returndetailoptions) | Petición y confirmación de devolución | `DIA-VUE-SEQ-052` |
-
 | [Error del formulario de login](01-session/02-login.md#catcherror-en-el-formulario) | Errores de campo y estado de captura | `DIA-VUE-SEQ-054` |
 | [Traducción de errores de login](01-session/02-login.md#catchcause-en-loginrequest) | HTTP, red y contrato de respuesta | `DIA-VUE-SEQ-055` |
 
 ## Figuras complementarias
 
-Los [estados de documento/captura](../logical/document-states.md) explican modos y
+Los [estados de documento/captura](../logical/states/index.md) explican modos y
 transiciones. Los [componentes](../logical/components/index.md) explican responsabilidades.
 Los diagramas de [alta contextual](../development/design-and-construction-patterns/09-contextual-creation.md)
 representan por separado proveedor en inventario, proveedor/artículo en compra y

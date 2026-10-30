@@ -15,13 +15,6 @@ adoptadas en el [registro de aplicación](../../governance/03-standard-applicabi
 | Consistencia y trazabilidad | Vincular objetivos y capacidades con la SRS; registrar discrepancias con la implementación sin convertir el código en aprobación de negocio. |
 | Mantenimiento | Conservar decisiones pendientes y revisar el impacto de cambios de objetivos, interesados o límites. |
 
-[ISO/IEC/IEEE 29148:2018](https://www.iso.org/standard/72089.html) orienta la ingeniería de
-necesidades y requisitos; [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html)
-orienta el propósito y contenido de los elementos de información del ciclo de vida;
-[ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) aporta el modelo de calidad
-para revisar necesidades del producto. La tabla anterior es una adaptación local, no
-una plantilla obligatoria ni una evaluación de conformidad cláusula por cláusula.
-
-Los identificadores, criterios de aceptación, estados y evidencia de cada requisito
-se mantienen en la [SRS](../requirements-specification/index.md). «Implementado» describe
-evidencia de una capacidad, no aceptación funcional ni consecución de un objetivo.
+La redacción y los ejemplos de requisitos se mantienen en las
+[convenciones de la especificación](../requirements-specification/02-conventions.md#calidad-de-la-redacción).
+La tabla anterior revisa la visión del producto, antes del detalle de cada obligación.

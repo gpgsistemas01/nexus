@@ -492,6 +492,8 @@ export const buildTypeModel = async (frontRoot) => {
 };
 
 const diagramParts = (contract) => {
+    if (contract.kind === 'type' && !contract.members.length && !contract.edges.length) return [];
+
     const parts = [];
     const refersToMember = (edge, member) =>
         edge.role === member.name ||
@@ -558,7 +560,7 @@ const diagram = (contract, members, edges) => {
                 : edge.kind === 'implementation'
                   ? '    ' + target + ' <|.. Subject : implements'
                   : edge.kind === 'association'
-                    ? '    Subject "1" --> "' + edge.multiplicity + '" ' + target + ' : ' + role
+                    ? '    Subject --> "' + edge.multiplicity + '" ' + target + ' : ' + role
                     : '    Subject ..> ' + target + ' : ' + role,
         );
     }
@@ -696,11 +698,11 @@ export const renderTypeReference = async (frontRoot) => {
             'Cada miembro directo conserva su firma completa. La herencia local se consulta siguiendo extends; las bases externas sólo se nombran en la declaración del contrato.',
             'Los aliases conservan uniones, intersecciones, keyof, Record, Pick, Exclude y ReturnType tal como están declarados.',
             'Las relaciones se obtienen de referencias de tipo y de las cláusulas extends/implements, no de campos cuyo nombre termine en Id.',
-            'Asociación: propiedad estructural con multiplicidad. Dependencia discontinua: uso de un tipo, callback, unión o parámetro genérico.',
+            'Asociación dirigida: propiedad estructural con multiplicidad sólo en el destino. La cantidad de propietarios de un objeto no se deduce de TypeScript; no se fija un 1 inverso. Dependencia discontinua: uso de un tipo, callback, unión o parámetro genérico.',
             'Las figuras y las tablas de relaciones sólo incluyen contratos identificados en src/. Incluyen los modelos del negocio y los contratos propios de componentes, transporte y coordinación, que permiten explicar los patrones aplicados.',
             'Las tecnologías utilizadas son Vue, TypeScript, Axios y VeeValidate. Sus clases externas no se dibujan; sus tipos y utilidades conservan el nombre en las firmas únicamente cuando el contrato lo necesita.',
             'Los destinos sin atributos remiten a su propia ficha local. Los saltos de línea de las etiquetas sólo distribuyen su nombre para facilitar lectura.',
-            'La división por ámbito sigue las carpetas de src/. Cada contrato se presenta en una figura mientras no supere ' +
+            'La división por ámbito sigue las carpetas de src/. Los aliases sin miembros ni relaciones propias conservan su definición completa, sin una caja vacía que los presente como clase. Las estructuras y relaciones usan diagramas de clases UML adaptados a TypeScript, no un modelo de clases instanciadas. Cada estructura se presenta en una figura mientras no supere ' +
                 diagramMemberLimit +
                 ' miembros o ' +
                 diagramTargetLimit +

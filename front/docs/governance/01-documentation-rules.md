@@ -23,11 +23,15 @@ certificación.
 
 | Colección | Contenido que debe explicar por sí misma |
 | --- | --- |
+| `front/README.md` | Propósito del cliente, inicio rápido y enlaces a los procedimientos completos. |
 | `requirements` | Alcance del cliente, obligaciones observables, datos, restricciones, actores y fichas de interacción. |
 | `architecture` | Responsabilidades, estado, dependencias, transporte, entradas y despliegue; inventario técnico generado separado de las decisiones. |
 | `architecture/views/development/design-and-construction-patterns` | Problema, decisión, modelo general, aplicación con nombres reales, límites y evidencia. |
-| `architecture/views/development/frontend-technical-documentation` | Rutas, campos, modos, permisos, efectos, errores y propietarios de cada capacidad Vue. |
-| `development` | Instalación, archivos locales, comandos, herramientas, compilación y publicación. |
+| `architecture/contracts` | Datos, eventos, callbacks y condiciones de aceptación en las fronteras HTTP y de componentes. |
+| `architecture/views/logical/components` | Colaboradores propios, responsabilidades y dirección de sus dependencias. |
+| `architecture/views/development` | Unidades y organización del código, integración de reglas públicas y mecanismos de construcción. Los patrones conservan su aplicación concreta aunque usen colaboradores de la vista lógica. |
+| `architecture/views/processes` | Orden de llamadas, decisiones, rechazo, recuperación y resultado de una operación. |
+| `development` | Procedimientos de entorno y flujo de trabajo: instalación, archivos locales, comandos, herramientas, compilación y despliegue. |
 | `testing` | Plan propio, condiciones, casos, datos, oráculos, cobertura y preparación de ambientes. |
 | `governance` | Reglas editoriales, mantenimiento, generación y publicación. |
 | `user-manual` | Procedimientos, campos, resultados, incidencias y capturas de las pantallas Vue. Publicación independiente. |
@@ -45,6 +49,9 @@ en arquitectura.
   consecutiva. El índice conserva el orden de lectura. La referencia generada también tiene un propietario explícito.
 - Un `h1` por archivo y niveles de títulos sin saltos. Una tabla compara elementos;
   una secuencia expresa pasos; la prosa explica propósito, decisiones y límites.
+- Escribir para quien conoce el sistema por primera vez: indicar primero qué puede
+  hacer o consultar y después sus condiciones. Usar frases directas, explicar las
+  siglas al introducirlas y retirar el relato de cambios o pedidos de desarrollo.
 - Rutas relativas al documento para enlaces. Los comandos indican si se ejecutan
   en la raíz, en `front/` o en `back/`; la raíz no contiene un manifiesto npm.
 - Nombres de archivos, campos y comandos exactos. Ejemplos identificados como tales,
@@ -137,11 +144,6 @@ conservan fuentes, identificadores y restricciones locales.
 El texto explica motivos, restricciones y recuperación; las tablas comparan y los
 diagramas representan relaciones o recorridos. Evitar repetir la misma explicación
 en los tres formatos.
-
-La guía de un módulo identifica objetivo/CU, ruta y permiso, estado y operaciones,
-entradas/salidas/errores, mecanismos reutilizados y evidencia. Router y contratos HTTP
-conservan sus fuentes técnicas; el módulo explica las decisiones y condiciones que
-cambian el comportamiento visible.
 
 ## Referencias adoptadas
 

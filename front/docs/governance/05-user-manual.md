@@ -22,11 +22,8 @@ de consulta del operador; no replica carpetas de componentes ni crea una ficha p
 botón. Las etiquetas se contrastan con las pantallas actuales. Los procedimientos
 describen el funcionamiento, sin explicar decisiones de conversaciones de desarrollo.
 
-Los casos de uso, casos de prueba y diagramas de arquitectura conservan su propósito
-y sus ubicaciones; no sustituyen el manual. Este usa capturas y procedimientos,
-sin imponer notación UML al lector operativo. Los datos generales y el estado
-editorial están en su índice propio. Su estado permanece En revisión hasta la
-revisión funcional y editorial correspondiente.
+Los procedimientos utilizan capturas y etiquetas de pantalla, sin requerir
+conocimientos técnicos. El índice del manual conserva sus datos y estado editorial.
 
 ## Fuentes y alcance de publicación
 
@@ -52,9 +49,6 @@ operación, revisar ambas definiciones y los ejemplos afectados.
   [recorridos de captura](../../tests/manual/manualScreenshots.spec.ts).
 - Artefactos ignorados: `front/build/docs/docx/manuales-vue/manual-usuario.docx`
   y `front/build/docs/pdf/manuales-vue/manual-usuario.pdf`.
-
-Las fuentes de las demás aplicaciones y sus manuales permanecen separados. Se
-comparte el motor de publicación, no sus procedimientos ni sus capturas.
 
 ## Generar las capturas
 

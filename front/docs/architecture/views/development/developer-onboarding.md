@@ -65,12 +65,10 @@ con terminales y archivos de entorno separados para frontend y API.
 ## Orden de lectura y comprobación
 
 La [estructura](code-structure.md) permite localizar archivos; las [vistas 4+1](../index.md)
-permiten elegir la figura adecuada; la [referencia de módulos](frontend-technical-documentation/index.md)
-resume contratos y enlaza procesos. El [estándar](../../coding-standards/index.md)
+permiten elegir la figura adecuada; los [contratos](../../contracts/index.md)
+precisan los intercambios. El [estándar](../../coding-standards/index.md)
 explica convenciones compartidas y el [plan](../../../testing/01-test-plan.md) establece
 cómo registrar condición, caso y resultado.
 
-Desde `front/`, `npm run check` comprueba formato, lint, unitarias y build con tipos;
-`npm run docs:check` comprueba fuentes documentales. La [guía de sistema](../../../testing/05-system-tests.md)
-se utiliza sólo con base aislada y su preparación. Los resultados de una corrida se
-asocian a su revisión, no se convierten en una aprobación permanente del documento.
+Para ejecutar y revisar ese cambio, consulta [Herramientas](../../../development/02-tooling.md)
+y el [procedimiento de revisión](../../../development/04-change-review.md).

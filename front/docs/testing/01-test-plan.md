@@ -10,9 +10,15 @@ Los comandos y las rutas de esta guía son relativos a `front/`.
 
 Este plan define la estrategia del cliente: rutas, captura, estado reactivo, contratos, selección, errores, interacción, descargas y compilación. Define la ubicación y el diseño de las pruebas Vue. Los requisitos están en la [especificación local](../requirements/requirements-specification/client-specification.md) y los recorridos en las fichas `CU-*`.
 
-La fuente ejecutable son `front/tests`, sus fixtures y aserciones. El [diseño](02-test-design.md) conserva riesgos/condiciones; el [registro](03-test-cases.md) añade fichas selectivas para casos críticos. Este plan adopta conceptos de 29119-2/-3/-4 sin declarar conformidad integral ni un porcentaje mínimo de cobertura.
+Las pruebas ejecutables están en `front/tests`. El [diseño](02-test-design.md)
+conserva riesgos y condiciones; el [registro](03-test-cases.md) añade fichas de
+casos críticos. Las referencias de documentación y técnicas se identifican en
+[Aplicación de estándares](../governance/03-standard-applicability.md).
 
 ## Niveles y entornos
+
+El oráculo es el resultado con el que se compara lo observado para decidir si
+la prueba pasa. Cada nivel comprueba una parte distinta del sistema.
 
 | Nivel | Herramienta y ubicación | Oráculo y límite |
 | --- | --- | --- |
@@ -148,6 +154,8 @@ de sistema se prepara según su [guía de aislamiento](05-system-tests.md).
 Aplicar los criterios de [entrada, suspensión y salida](#entrada-suspensión-y-salida)
 y la [revisión de cambios](../development/04-change-review.md).
 
-CI ejecuta Node 24.15.0 y 26.12.1 para frontend, publica JUnit en `build/test-results` y conserva sistema como ejecución separada. Las capturas y trazas fallidas son artefactos, no fuentes del producto. No se amplía repetidamente una suite ya aprobada sin cambio, fallo o preocupación nueva.
+La configuración de CI y los comandos se consultan en
+[Herramientas](../development/02-tooling.md#automatización). Los resultados JUnit,
+capturas y trazas permanecen como artefactos de ejecución.
 
 No se deduce cobertura total de conteos aprobados ni rendimiento de producción por el tiempo de la suite. Las brechas funcionales/de evidencia permanecen en la [matriz local](04-use-case-coverage.md).

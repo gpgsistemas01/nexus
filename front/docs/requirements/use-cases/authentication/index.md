@@ -9,5 +9,5 @@
 
 ## Realización y verificación del cliente
 
-[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/01-authentication.md).
+[Componentes del cliente](../../../architecture/views/logical/components/01-access.md).
 Pruebas de navegador: [login.spec.ts](../../../../tests/e2e/login.spec.ts), [sessionRecovery.spec.ts](../../../../tests/e2e/sessionRecovery.spec.ts).

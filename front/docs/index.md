@@ -39,7 +39,7 @@ front/docs/
 │       ├── processes/                # Secuencias agrupadas por responsabilidad
 │       ├── development/              # Estructura, patrones y referencia de código
 │       └── physical/                 # Ejecución y despliegue
-├── development/                     # Preparación y comandos
+├── development/                     # Entorno y flujo de trabajo local
 ├── testing/                         # Plan, diseño, casos, cobertura y sistema
 ├── user-manual/                     # Procedimientos y capturas para operadores
 └── governance/                      # Edición, revisión y publicación
@@ -51,7 +51,7 @@ front/docs/
 | [Arquitectura](architecture/index.md) | Vistas 4+1, decisiones, interfaces, realización y patrones. | Vista general y preocupación del cambio. |
 | [Estándar de código](architecture/coding-standards/index.md) | Nueve capítulos de formato, nombres, dependencias, SFC, datos, errores y comentarios. | Capítulo correspondiente. |
 | [Estándares por ámbito](governance/09-standards-and-ownership.md) | Reglas de interfaz, seguridad, pruebas, documentación y diagramación en sus fuentes propias. | Mapa de estándares. |
-| [Desarrollo](development/index.md) | Instalación, archivos locales, arranque, herramientas y despliegue. | Inicio local. |
+| [Entorno y flujo de trabajo](development/index.md) | Instalación, archivos locales, arranque, herramientas y despliegue. | Inicio local. |
 | [Pruebas](testing/index.md) | Plan, diseños DP, fichas CP, matriz por CU y ejecución de sistema. | Plan y casos del riesgo afectado. |
 | [Gobierno](governance/index.md) | Reglas editoriales, responsables, referencias y generación. | Reglas y publicación. |
 | [Manual de usuario](user-manual/index.md) | Operación de las pantallas Vue, campos, resultados y recuperación. | Ingreso y tarea del operador. |
@@ -63,7 +63,7 @@ front/docs/
 | Operar el sistema | [Manual de usuario](user-manual/index.md) → procedimiento del módulo → reportes o recuperación. |
 | Generar la inducción por cuenta | [Guía completa de generación](governance/07-manual-accounts-and-files.md): preparación, credenciales, capturas, publicación y recuperación. |
 | Incorporarse al proyecto | [Inicio local](development/01-getting-started.md) → [guía del código](architecture/views/development/developer-onboarding.md) → [vista general](architecture/views/overview.md). |
-| Implementar una operación | [Requisito y CU](requirements/index.md) → [secuencia del proceso](architecture/views/processes/index.md) → [responsabilidad del módulo](architecture/views/development/frontend-technical-documentation/index.md) → [estándar](architecture/coding-standards/index.md). |
+| Implementar una operación | [Requisito y CU](requirements/index.md) → [componentes](architecture/views/logical/components/index.md) → [contratos](architecture/contracts/index.md) → [secuencia](architecture/views/processes/index.md) → [estándar](architecture/coding-standards/index.md). |
 | Leer un diagrama | [Guía visual](architecture/views/diagram-reading.md) → leyenda local → fuentes de la figura. |
 | Interpretar términos documentales | [Vocabulario de requisitos y documentación](governance/08-documentation-vocabulary.md); los conceptos operativos están en el glosario de negocio. |
 | Revisar datos o errores | [Contrato del cliente](architecture/contracts/index.md) → [mappers/servicios](architecture/views/development/code-reference.md) → [pruebas de la condición](testing/02-test-design.md). |

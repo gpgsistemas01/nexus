@@ -51,7 +51,11 @@ docker build -f front/Dockerfile -t nexus-front .
 docker run --rm --name nexus-front --network nexus -p 8080:80 -e BACKEND_UPSTREAM=http://backend:3000 nexus-front
 ```
 
-La red `nexus` debe existir; Express debe resolver con el alias `backend` en esa red y escuchar en 3000. El comando de ejemplo publica Vue en `http://localhost:8080`. `front/Dockerfile` tiene etapa de compilación con Node y etapa final con Nginx; copia únicamente `dist` al sitio servido. La construcción usa la raíz como contexto para incluir los módulos públicos permitidos.
+La red `nexus` debe existir; Express debe resolver con el alias `backend` en esa red y escuchar en 3000. El comando de ejemplo publica Vue en `http://localhost:8080`. `front/Dockerfile` tiene etapa de compilación con Node y etapa final con Nginx; copia únicamente `dist` al sitio servido. La construcción usa la raíz como contexto para incluir los módulos públicos permitidos. No es necesario generar `dist` antes de construir la imagen.
+
+`front/Dockerfile.dockerignore` excluye dependencias locales, compilaciones previas,
+archivos `.env`, documentación y sus herramientas. Las guías permanecen en
+`front/docs`; copiarlas a `public/` las incorporaría al sitio compilado.
 
 `front/nginx.conf` aplica fallback SPA y proxy a la API/cierre. Su resolución DNS corresponde a Docker. Si se ejecuta Nginx fuera de Docker, hay que adaptar el resolver y upstream al entorno de la VPS. TLS, dominio y proxy externo pertenecen a la configuración de ese servidor; estos archivos no demuestran que ya estén instalados en una VPS.
 
@@ -62,6 +66,11 @@ El Dockerfile raíz y Compose mantienen la aplicación backend; el frontend usa 
 En Vercel o Render Static Site se ejecuta la compilación de Vite y se publica `dist`; no se necesita el Dockerfile frontend para ese modo. El proveedor debe descargar el repositorio completo y permitir que el build lea las fuentes públicas fuera de `front/`. Con Root Directory `front`, instalación y build son `npm ci` / `npm run build` y salida `dist`, sujetos al contexto permitido por el proveedor.
 
 `front/vercel.json` contiene únicamente el fallback SPA. No contiene el destino real de Express: antes de usar la sesión hay que configurar los rewrites/proxy de `/api/:path*` y `/cerrar-sesion` hacia la API propia, con prioridad sobre el fallback. En Render Static Site se necesita también el fallback de página y una solución para el acceso a la API con sus cookies. Este documento no atribuye una configuración remota activa a un archivo local.
+
+En Render Static Site, el fallback se añade en **Redirects/Rewrites** con fuente
+`/*`, destino `/index.html` y acción **Rewrite**, después de resolver el acceso a
+la API. La página de ruta desconocida la dibuja Vue; el servidor que entrega el
+fallback puede responder HTTP 200 aunque se muestre esa página.
 
 | Configuración | Para qué sirve |
 | --- | --- |

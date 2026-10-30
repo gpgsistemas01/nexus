@@ -61,16 +61,8 @@ La tabla de [fuentes propietarias](../../index.md#organización-y-fuentes-propie
 ubica los componentes. El [patrón contenedor/presentación](development/design-and-construction-patterns/02-container-and-presentation.md)
 y los [composables configurados](development/design-and-construction-patterns/03-composables-and-callbacks.md)
 amplían el interior del módulo; la [provisión de sesión](development/design-and-construction-patterns/06-session-provision.md)
-explica que Router y páginas usan la misma instancia. Se evita repetir todo el
-código de cada página en el diagrama arquitectónico.
-
-## Cómo documentar una página o flujo web
-
-Las [reglas de síntesis](../../governance/01-documentation-rules.md#síntesis-y-lectura-visual)
-indican cuándo usar gráficos, tablas y texto. La
-[referencia por módulo](development/frontend-technical-documentation/index.md)
-relaciona objetivos, contratos, permisos, errores y evidencia con los colaboradores reales.
-El [inicio local](../../development/01-getting-started.md) conserva los comandos de preparación.
+explica que Router y páginas usan la misma instancia. Para seguir otro módulo,
+consulta el [recorrido por capacidad](index.md#recorrido-por-capacidad).
 
 ## Referencias
 

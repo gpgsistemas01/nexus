@@ -69,7 +69,7 @@ direction LR
 Requiere los permisos de artículo y catálogos auxiliares y un proveedor seleccionado.
 El alta conserva ese proveedor y utiliza el contexto de compra, sin existencia
 inicial ni costo máximo. Al volver, el actor completa cantidad y costo y agrega el
-renglón. Registrar el artículo no guarda la compra ni modifica un detalle persistido.
+detalle. Registrar el artículo no guarda la compra ni modifica un detalle persistido.
 
 ## Cliente durante una salida
 

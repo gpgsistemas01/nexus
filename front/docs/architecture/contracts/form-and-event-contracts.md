@@ -17,7 +17,7 @@ tipos y `defineEmits` de sus fuentes; los datos HTTP se describen en el
 | Documento, detalle y vista previa | El contenedor entrega los datos de lectura o calculados que necesita la presentación; no se convierten en una copia del request. |
 
 Los modelos de [tipos por dominio](../views/logical/class-and-type-models/index.md)
-describen los datos; el [inventario de estado](../views/logical/state-and-lifecycle.md#inventario-de-propietarios)
+describen los datos; el [inventario de estado](../views/logical/states/04-state-ownership-and-save.md#inventario-de-propietarios)
 identifica quién los conserva y cuándo se descartan.
 
 ## Eventos de interacción
@@ -80,6 +80,6 @@ Fuentes: [useRecordSave](../../../src/shared/composables/useRecordSave.ts),
 | --- | --- |
 | Campos editables y efectos por acción | [Modos, precondiciones y efectos](../../requirements/requirements-specification/06-operation-modes-and-effects.md). |
 | Validación visible, foco y mensajes | [Estándar de interfaz](../interface-standards.md#formularios). |
-| Captura, cierre, conflicto y respuesta tardía | [Ciclo de vida compartido](../views/logical/state-and-lifecycle.md) y [estados de documentos](../views/logical/states/index.md). |
+| Captura, cierre, conflicto y respuesta tardía | [Ciclo de vida compartido](../views/logical/states/04-state-ownership-and-save.md) y [estados de documentos](../views/logical/states/index.md). |
 | Orden de llamadas y recuperación | [Secuencias de procesos](../views/processes/index.md). |
 | Preparación y evidencia de un cambio | [Revisión de cambios](../../development/04-change-review.md). |

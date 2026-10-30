@@ -31,6 +31,11 @@ vista y no registre el mismo recibo dos veces.
 8. Compruebe todos los detalles y pulse **Guardar** en el formulario principal.
 9. Espere la confirmación y localice el folio de la compra en el listado.
 
+Al agregar un detalle, **Cantidad** debe ser al menos 1 y **Costo por Presentación**
+debe ser mayor que cero. Si cambia de proveedor antes de guardar, se borran los
+detalles preparados y la selección de Persona que recibe; vuelva a revisarlos.
+Las fechas y horas de recepción corresponden al horario de Ciudad de México.
+
 ![Compra en preparación con encabezado, detalle y totales estimados.](images/19-purchase-create.png)
 
 **Agregar** no registra una recepción: prepara un detalle local. **Guardar**
@@ -98,6 +103,7 @@ correctos; no escriba solamente la diferencia.
 ![Formulario de corrección de cantidad y costo de un detalle de compra.](images/21-purchase-correction.png)
 
 La cantidad correcta representa el valor final del detalle, no una diferencia.
+Puede ser una fracción menor que 1, pero siempre debe ser mayor que cero.
 No puede superar la cantidad recibida vigente. Puede conservar la cantidad si sólo
 cambia el costo; esa corrección no genera un cambio de existencia. Reducir la
 cantidad requiere saldo suficiente para revertir la diferencia.

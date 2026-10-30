@@ -2,10 +2,9 @@
 
 La aplicación actual de Express, Prisma y vistas EJS vive en `back/`.
 El frontend Vue 3 con TypeScript, Router y Vite está en `front/`, con login conectado
-a Express usando Vuetify y VeeValidate para la migración gradual.
-Materiales, Consumibles, Mermas, Movimientos, Catálogos, Personas, Usuarios, Clientes
-y Proveedores ya tienen interfaz Vue; las demás pantallas
-operativas permanecen en el backend y no se enlazan desde el menú de Vue.
+a Express usando Vuetify y VeeValidate.
+Almacén, Compras, Salidas, Movimientos, Catálogos, Personas, Usuarios, Clientes y
+Proveedores tienen interfaz Vue con acceso según los permisos de la cuenta.
 
 ```text
 back/                 # Express, EJS, Prisma, pruebas y documentación
@@ -79,59 +78,44 @@ git check-ignore -v back/.env front/.env.local back/node_modules front/node_modu
 
 ## Desarrollo
 
-```bash
-cd back
-npm ci
-npm run db:generate
-npm run dev
-```
+Para preparar una copia por primera vez, sigue los pasos de
+[Inicio rápido del sistema](front/README.md#inicio-rápido): herramientas,
+dependencias, `back/.env`, base de desarrollo y cliente Prisma.
 
-Consulta [instalación y operación](back/README.md) y el
-[índice de documentación](back/docs/README.md). Las rutas técnicas de esa documentación
-son relativas a `back/`.
+Con esa preparación completa, inicia las aplicaciones en este orden. Los comandos
+siguientes se ejecutan desde la raíz, donde están `back/` y `front/`.
+
+1. En una primera terminal, inicia la API y déjala abierta:
+
+   ```bash
+   npm --prefix back run dev
+   ```
+
+2. Abre una segunda terminal en la misma raíz, inicia Vue y déjala abierta:
+
+   ```bash
+   npm --prefix front run dev
+   ```
+
+3. Abre **http://localhost:5173/inicio-sesion** e ingresa con una cuenta habilitada
+   en la base de desarrollo. Para detener el sistema, pulsa Ctrl+C en cada terminal.
+
+La [guía detallada de inicio](front/docs/development/01-getting-started.md) explica
+la configuración y los errores de dependencias, Prisma y conexión. Para trabajar
+sólo con el backend, consulta [instalación y operación](back/README.md).
 
 ## Frontend Vue
 
-Abre `/inicio-sesion` en el puerto 5173 para usar el login Vue con Express ejecutándose
-en el puerto 3000. Al autenticar se abre Almacén en Vue según los permisos.
-Si tienes una copia anterior, actualiza `features`, instala con `npm ci` en `front/`
-y reinicia Vite.
-Si el arranque indica que no puede resolver `vee-validate`, consulta la
-[recuperación de dependencias del frontend](front/README.md#dependencias-no-resueltas-en-vite).
+El cliente contiene Almacén, Compras, Salidas, Movimientos, Catálogos, Personas,
+Usuarios, Clientes y Proveedores, con acceso según permisos. Su menú enlaza las
+pantallas Vue. Consulta el [README frontend](front/README.md) para los comandos y
+la [arquitectura](front/docs/architecture/index.md) para la organización del código.
 
-Para trabajar con ambas aplicaciones, usa Node.js 24.15.0+ de la rama 24,
-22.22.2+ de la rama 22 o 26.12.1+ de la rama 26. CI comprueba las ramas 24 y 26 en ambas aplicaciones. Los
-Dockerfiles conservan sus versiones propias: Node 22 en Express y Node 24 para
-compilar Vue; cambiar Node en tu equipo no actualiza producción.
-
-En otra terminal, desde la raíz del repositorio:
-
-```bash
-cd front
-npm ci
-npm run dev
-```
-
-Para compilar: `npm run build` desde `front/`, o `npm --prefix front run build` desde
-la raíz. La salida queda en `front/dist/`. Consulta [la guía del frontend](front/README.md).
-El login, Almacén (Materiales, Consumibles y Mermas), Compras, Salidas, Movimientos y los seis
-Catálogos integran la API mediante un proxy del mismo origen. El menú sólo contempla vistas Vue; los demás módulos
-conservan sus pantallas EJS en el backend.
-Para preparar una copia completa y arrancar Vue y Express, consulta
-[inicio del proyecto](front/docs/development/01-getting-started.md).
-Consulta [configuración del login](front/docs/architecture/views/development/frontend-technical-documentation/01-authentication.md),
-[operaciones y arquitectura de Almacén](front/docs/architecture/views/development/frontend-technical-documentation/02-warehouse.md),
-[Compras](front/docs/architecture/views/development/frontend-technical-documentation/06-purchases.md), [Salidas](front/docs/architecture/views/development/frontend-technical-documentation/07-issues.md),
-[Catálogos](front/docs/architecture/views/development/frontend-technical-documentation/03-catalogs.md) y [Movimientos](front/docs/architecture/views/development/frontend-technical-documentation/05-movements.md).
-
-El [manual de usuario Vue](front/docs/user-manual/index.md) reúne los procedimientos
-y capturas de esta interfaz. Se genera desde la raíz con
-`npm --prefix front run docs:manual -- ambos`; sus DOCX/PDF quedan en
-`front/build/docs`, fuera del contenedor. Consulta la
-[preparación y revisión](front/docs/governance/05-user-manual.md).
-Desde la raíz, `npm --prefix front run check` ejecuta formato, ESLint, pruebas y build con tipos.
-En VS Code instala las extensiones recomendadas Vue - Official y ESLint; para
-comprobar tipos continuamente usa `npm --prefix front run type-check:watch`.
+Desde la raíz, `npm --prefix front run build` genera `front/dist/` y
+`npm --prefix front run check` ejecuta formato, ESLint, unitarias y build con tipos.
+Los [procedimientos de usuario](front/docs/user-manual/index.md) y la
+[publicación de manuales](front/docs/governance/05-user-manual.md) tienen sus guías
+propias.
 
 ## Validación
 
@@ -141,10 +125,10 @@ GitHub Actions conserva sus disparadores y ejecuta los comandos desde `back/`.
 
 ## Docker y Render
 
-El frontend dispone de su propio [Dockerfile y comandos](front/README.md#docker-para-vps-o-pruebas-locales).
+El frontend dispone de su propio [Dockerfile y comandos](front/docs/development/03-build-and-deployment.md#docker-y-vps).
 Desde la raíz, `docker build -f front/Dockerfile -t nexus-front .` compila Vue
 y sus reglas públicas compartidas automáticamente. Para probarlo con Express,
-consulta la red y `BACKEND_UPSTREAM` en [la guía del frontend](front/docs/architecture/views/development/frontend-technical-documentation/01-authentication.md).
+consulta la red y `BACKEND_UPSTREAM` en [la guía del frontend](front/docs/development/03-build-and-deployment.md#docker-y-vps).
 
 Desde la raíz: `docker compose up --build`. El archivo local de entorno está
 en `back/.env`; nunca se versiona ni se copia a la imagen.

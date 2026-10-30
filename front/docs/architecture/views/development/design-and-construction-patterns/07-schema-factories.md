@@ -1,44 +1,57 @@
 # 7. Fábricas funcionales de esquemas
 
-## Problema y decisión
+## Propósito y funcionamiento
 
-Crear, consultar y surtir no validan la misma captura. Una función construye el
-esquema a partir del modo y las reglas públicas, y lee valores vigentes mediante
-un callback. Es una fábrica funcional; no una implementación del patrón GoF
-Abstract Factory ni una máquina State basada en clases.
+La fábrica es una función que devuelve las reglas del formulario según recurso
+y modo. El esquema resultante contiene validadores por campo. Estos validadores
+consultan los valores actuales mediante `getValues` cuando se ejecutan; construir
+el esquema todavía no valida la captura.
 
 ## Modelo general de construcción de un esquema
 
 **Identificador:** `DIA-VUE-GEN-006`. **Pregunta:** ¿cómo variar validación sin
 copiar reglas en cada componente? **Fuente:** factories actuales de formularios.
-Flechas continuas = entrada o producto; discontinuas = lectura diferida de captura.
+**Notación:** actividad con notación de flujo; terminales = inicio/retorno,
+rombos = decisiones, rectángulos = construcción y paralelogramos = datos/producto.
 
 **Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
 
 ```mermaid
 flowchart TB
-    context["Contexto de captura<br/>recurso y modo"] --> factory["Fábrica funcional"]
-    rules["Reglas públicas"] --> factory
-    factory --> schema["Esquema de validación"]
-    schema --> form["Gestor del formulario"]
-    schema -.->|consulta valores actuales| form
+    start([Inicio]) --> context[/Contexto y acceso a captura vigente/]
+    context --> editable{¿El contexto valida campos?}
+    editable -->|no| empty[/Esquema vacío/]
+    editable -->|sí| rules[Seleccionar reglas del contexto]
+    rules --> build[Crear funciones que leen la captura al ejecutarse]
+    build --> schema[/Esquema de validadores/]
+    empty --> finish([Devolver esquema])
+    schema --> finish
 ```
 
 ## Aplicación al esquema del editor de Salidas
 
 **Identificador:** `DIA-VUE-APL-006`. **Pregunta:** ¿quién elige las reglas y quién
 las ejecuta sobre la captura actual? **Fuente:** `createIssueValidationSchema`,
-`useIssueEditor`, `@nexus/form-validation` y VeeValidate. Flechas continuas =
-configuración/consumo; discontinuas = callback `getValues`.
+`useIssueEditor` y `@nexus/form-validation`. **Notación:** actividad de construcción
+con las ramas del código. VeeValidate recibe el producto en `useIssueEditor` y
+ejecuta después sus funciones cuando valida la captura.
 
 ```mermaid
 flowchart TB
-    editor["useIssueEditor<br/>resource y target.mode"] --> factory["createIssueValidationSchema"]
-    rules["Reglas públicas<br/>encabezado, documento, surtido"] --> factory
-    factory --> schema["validationSchema<br/>funciones por campo"]
-    editor --> form["VeeValidate useForm<br/>values y errors"]
-    schema -->|configura validación| form
-    schema -.->|getValues lee form.values| form
+    start([createIssueValidationSchema]) --> mode{mode}
+    mode -->|view o return| empty[/return: esquema vacío/]
+    mode -->|supply| details[/return: validador details/]
+    mode -->|header| headerRules[issueHeaderValidation]
+    mode -->|create o edit| resource{resource}
+    resource -->|wastes| wasteRules[wasteIssueValidation]
+    resource -->|materials o consumables| goodsRules[goodsIssueValidation]
+    headerRules --> build[Object.fromEntries:<br/>crear validadores con getValues]
+    wasteRules --> build
+    goodsRules --> build
+    build --> schema[/return: validadores por campo/]
+    details --> finish([Fin de la construcción])
+    empty --> finish
+    schema --> finish
 ```
 
 ## Código, contrato y límites

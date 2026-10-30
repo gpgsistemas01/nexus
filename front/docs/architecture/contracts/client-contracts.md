@@ -25,7 +25,7 @@ define el alcance de cada acceso.
 | --- | --- |
 | Acceso | `POST /api/auth/login`: `name` recortado y `password` exacta. `GET /api/auth/me`: usuario con ID, nombre y array de permisos. Renovación: `POST /api/auth/refresh`. Cierre: `POST /cerrar-sesion`. |
 | Catálogos | `GET/POST /api/admin/catalogs/:catalog`; edición `PUT /:id`. Lista blanca de seis recursos; nombre/Activo y símbolo sólo en Unidad. Edición añade `expectedVersion`. |
-| Personas | `GET/POST /api/admin/persons`, edición `PUT /:id`. Nombre completo y `accesses` con pares área/rol; consulta con `includeAccesses=true` y filtros de área/rol. |
+| Personas | `GET/POST /api/admin/persons`, edición `PUT /:id`. Nombre completo y `accesses` con pares área/rol; consulta con `includeAccesses=true`, filtros `department`/`role` y `strictDepartmentFilter=true` al seleccionar un área (`false` sin ella). |
 | Usuarios | `GET/POST /api/admin/users`; edición `PATCH /:id`; contraseña `PATCH /:id/password`. Alta incluye contraseña; editar datos no la reenvía; ambos modos de edición conservan versión. |
 | Clientes | `GET/POST /api/sales/clients`, edición `PUT /:id`. Nombre/Activo y versión al editar. |
 | Proveedores | `GET/POST /api/warehouse/suppliers`, edición `PUT /:id`. Razón social, nombre comercial, Activo y versión al editar. |
@@ -35,6 +35,10 @@ define el alcance de cada acceso.
 | Reportes | Servicios del recurso construyen filtros/alcance y llaman `requestExcel`. La paginación se elimina. Los endpoints y diferencias de alcance permanecen en cada servicio de reporte. |
 
 La tabla describe contratos existentes del cliente, no habilita todas las acciones para todos los recursos o cuentas. Por ejemplo, la UI de merma no presenta una baja genérica de material ni un formulario de stock inicial de compra.
+
+`loginRequest` exige el código `SUCCESS_LOGIN`; otro resultado no confirma el acceso.
+La preferencia local del nombre tiene su propietario y vida útil en el
+[inventario de estado](../views/logical/states/04-state-ownership-and-save.md#inventario-de-propietarios).
 
 ## Página de datos y selección remota
 
@@ -88,7 +92,7 @@ Login traduce los rechazos mediante `LoginRequestError`: distingue `401`, `400`,
 [secuencia de acceso](../views/processes/01-session/02-login.md#catchcause-en-loginrequest).
 
 Los servicios reciben `AbortSignal`. La presentación y recuperación de los fallos
-pertenecen al [ciclo de vida](../views/logical/state-and-lifecycle.md) y a las
+pertenecen al [ciclo de vida](../views/logical/states/04-state-ownership-and-save.md) y a las
 [secuencias del proceso](../views/processes/index.md).
 
 ## Descargas

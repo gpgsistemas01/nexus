@@ -35,6 +35,7 @@ la naturaleza de la interacción y se revisan junto con sus precondiciones y exc
 | --- | --- |
 | Todo `CU-*` que accede a una operación protegida | `RN-001` y `RN-009`: sesión y permiso comprobados en el servidor antes de exponer datos o ejecutar el objetivo. `CU-AUT-01` es la excepción de entrada y valida credenciales conforme a `RF-AUT-001`; `CU-AUT-02` exige una sesión vigente. |
 | Todo `CU-*` que crea, edita, retira, ajusta, corrige, cancela, surte, devuelve o cambia credenciales | `RN-010`: validación de la entrada en el servidor antes de persistir. |
+| Crear o editar encabezado/detalles en `CU-SAL-02/03/04`, `CU-SAL-09/10/11` y `CU-SAL-16/17/18` | `RN-019` y `RN-035`: al guardar el encabezado para GPG INTERNO, asesor y proyecto deben cumplir las condiciones del cliente interno. La edición de detalles conserva el encabezado enviado y sus reglas. |
 | Toda escritura crítica configurada para auditoría | `RN-008`: registro del actor, acción, recurso, resultado y datos admitidos; la configuración de auditoría determina el alcance, no la mera presencia de un botón en la ficha. |
 | Altas, correcciones, cancelaciones, ajustes, surtimientos y devoluciones que generan movimientos | `RN-002`, `RN-011` y `RN-013` cuando cambian conjuntamente documento, detalle o stock: confirmación sin cambios parciales, vínculo único con el origen y condiciones de cantidad según la operación. Cada ficha operativa agrega además las reglas específicas que cambian su recorrido. |
 

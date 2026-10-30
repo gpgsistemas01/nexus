@@ -1,36 +1,60 @@
 # Salidas, surtido y devolución: componentes
 
-**Identificador:** `DIA-VUE-COMP-007`. **Pregunta:** ¿Qué colaboradores tienen responsabilidad propia y qué contratos los conectan?
-
-**Fuente:** IssueWorkspace, IssuePage, useIssueActions, useIssueEditor, useIssueHeaderSelection, useIssueFilters, useIssueDepartments, useIssueReturn y mappers. **Notación y alcance:** Las flechas indican dependencia o consumo; no orden temporal ni herencia.
-
-**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+**Identificador:** `DIA-VUE-COMP-007`. **Pregunta:** ¿qué dependencias separan apertura, captura y devolución?
+**Fuentes:** [IssueWorkspace.vue](../../../../../src/app/pages/IssueWorkspace.vue), [IssuePage.vue](../../../../../src/modules/issues/pages/IssuePage.vue), [issueService.ts](../../../../../src/modules/issues/services/issueService.ts), [issueRequestMapper.ts](../../../../../src/modules/issues/mappers/issueRequestMapper.ts).
+**Notación:** [mapa de dependencias](../../diagram-reading.md#componentes-y-dependencias).
 
 ```mermaid
 flowchart TB
-    workspace["IssueWorkspace"] --> page["IssuePage"]
-    workspace --> client["DirectoryCreationPage"]
-    page --> actions["useIssueActions"]
-    actions --> read["useDocumentRead"]
-    page --> editorPage["IssueEditorPage"]
-    editorPage --> editor["useIssueEditor"]
-    editorPage --> view["IssueEditor · presentación"]
-    editorPage --> returnPage["IssueReturnPage"]
-    returnPage --> returns["useIssueReturn"]
-    editor --> header["useIssueHeaderSelection"]
-    page --> filters["useIssueFilters"]
-    header --> departments["useIssueDepartments"]
-    filters --> departments
-    departments --> lookup["useRemoteLookup"]
-    editor --> draft["issueDetails"]
-    editor --> mapper["issueRequestMapper"]
-    editor --> service["issueService"]
-    returns --> service
+    workspace["IssueWorkspace"]
+    page["IssuePage"]
+    client["DirectoryCreationPage"]
+    actions["useIssueActions"]
+    read["useDocumentRead"]
+    editorPage["IssueEditorPage"]
+    editor["useIssueEditor"]
+    form["IssueEditor"]
+    returnPage["IssueReturnPage"]
+    returns["useIssueReturn"]
+    service["issueService"]
+    mapper["issueRequestMapper"]
+    workspace --> page
+    workspace --> client
+    page --> actions
+    page --> editorPage
+    actions --> read
     actions --> service
-    service --> response["issueResponseMapper / confirmMutation"]
+    editorPage --> editor
+    editorPage --> form
+    editorPage --> returnPage
+    returnPage --> returns
+    editor --> service
+    editor --> mapper
+    returns --> service
 ```
 
-`useIssueDepartments` comparte la precarga y el bloqueo entre encabezado y filtros.
-Cada consumidor conserva su selección: el alta puede asignar una vacía y la edición
-mantiene el área original. `IssueEditor` y `IssueFilters` reciben valores y estado de
-bloqueo mediante props; no consultan la sesión ni resuelven permisos en presentación.
+**Identificador:** `DIA-VUE-COMP-012`. **Pregunta:** ¿qué comparten encabezado y filtros al resolver el área operativa?
+**Fuentes:** [useIssueEditor.ts](../../../../../src/modules/issues/composables/useIssueEditor.ts), [useIssueHeaderSelection.ts](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts), [useRemoteLookup.ts](../../../../../src/shared/composables/useRemoteLookup.ts), [issueLookupService.ts](../../../../../src/modules/issues/services/issueLookupService.ts).
+**Notación:** [mapa de dependencias](../../diagram-reading.md#componentes-y-dependencias).
+
+```mermaid
+flowchart TB
+    editor["useIssueEditor"]
+    header["useIssueHeaderSelection"]
+    page["IssuePage"]
+    filters["useIssueFilters"]
+    departments["useIssueDepartments"]
+    lookup["useRemoteLookup"]
+    service["issueLookupService"]
+    editor --> header
+    page --> filters
+    header --> departments
+    filters --> departments
+    departments --> lookup
+    departments --> service
+```
+
+Vue/Vuetify presentan valores y bloqueos. `useIssueDepartments` comparte precarga y
+restricción; cada consumidor conserva su selección. `IssueEditor` y `IssueFilters`
+reciben props sin consultar sesión ni conceder permisos. El
+[proceso de área](../../processes/07-issues/04-department-scope.md) precisa alta, edición y filtros.

@@ -1,6 +1,6 @@
 # 1. Patrones y principios de diseño en Vue
 
-Esta guía identifica las decisiones que sí tienen consumidores en el código actual.
+Este catálogo relaciona los mecanismos del cliente con sus responsabilidades y consumidores.
 La [arquitectura](../code-structure.md) conserva organización y fronteras; el
 [índice documental](../../../../index.md) explica qué criterios se adaptan a Vue. El catálogo
 separa patrones, mecanismos del framework, tipos y principios de revisión.
@@ -18,16 +18,15 @@ separa patrones, mecanismos del framework, tipos y principios de revisión.
 | Uniones discriminadas | Mecanismo del sistema de tipos de TypeScript. | `IssueTarget`, `PurchaseWriteTarget` y `PurchaseDetailChange`. No validan JSON recibido ni sustituyen reglas del servidor. |
 | SOLID | Principios de evaluación, con aplicación parcial. | Se revisan cohesión, contratos y dependencias funcionales. No se inventa herencia para representar Liskov. |
 
-No se documentan como implementados Pinia, Zod, Tailwind, Atomic Design, CQRS,
-Event Sourcing, un bus global de eventos ni una arquitectura hexagonal completa.
-Las transacciones, el acceso a la base de datos y la autorización de cada petición
-pertenecen al backend. Vue Router y las bibliotecas instaladas son herramientas: su presencia
-no constituye por sí sola un patrón de diseño.
+Los patrones organizan las colaboraciones del cliente. Vue aporta reactividad,
+componentes, slots e inyección; TypeScript describe sus datos y operaciones.
+La API resuelve autorización y persistencia. La [guía de incorporación](../developer-onboarding.md)
+introduce estos conceptos y sigue una operación completa por el código.
 
 ## Modelo general y aplicación en código
 
-Los [capítulos de diagramas](index.md) describen cada decisión con problema,
-justificación, contrato, código, límites y evidencia. La columna general explica
+Los [capítulos de diagramas](index.md) describen cada decisión con propósito,
+funcionamiento, contrato, código y evidencia. La columna general explica
 la colaboración sin nombres del proyecto; la aplicada usa archivos/símbolos reales.
 Una misma figura aplicada no pretende documentar todos los módulos ni todas las
 letras de SOLID.
@@ -45,28 +44,20 @@ letras de SOLID.
 | Alta de proveedor/artículo en Compras | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-008](09-contextual-creation.md#proveedor-desde-el-encabezado) y [010](09-contextual-creation.md#artículo-desde-un-detalle). |
 | Alta de cliente en Salidas | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-009](09-contextual-creation.md#caso-3-cliente-desde-salidas). |
 
-La [composición de altas contextuales](09-contextual-creation.md) conserva otro par completo: `DIA-VUE-GEN-007` explica el modelo; `DIA-VUE-APL-007`, `008`, `009` y `010` concretan Inventario, Compras y Salidas con sus eventos, callbacks y propietarios reales. La selección dependiente y el guardado mantienen su separación en `DIA-VUE-PAT-004`.
-
 ## Colaboraciones que combinan mecanismos
 
-La [revisión de Salidas/Compras](08-document-responsibilities.md) conserva otras
+La [composición de Salidas/Compras](08-document-responsibilities.md) conserva otras
 preguntas, sin repetir los diagramas generales:
 
 | Pregunta | Figura aplicada |
 | --- | --- |
 | ¿Quién presenta, valida y guarda el documento? | [DIA-VUE-DOC-001](08-document-responsibilities.md#composición-del-editor-y-adaptadores). |
 | ¿Cuándo se confirma la escritura y se recarga? | [DIA-VUE-DOC-002](08-document-responsibilities.md#secuencia-de-guardado-confirmado). |
-| ¿Cómo se compone un alta de otro dominio? | [DIA-VUE-DOC-003](08-document-responsibilities.md#composición-entre-dominios-para-altas-rápidas). |
 
 La sesión Vue tiene sus propios colaboradores y secuencia HTTP,
 documentados mediante sus componentes, estado y transporte reales. La frontera
-compartida de seguridad se explica en [entradas y salida segura](../../logical/input-security.md).
-
-## Dependencias y composición de un listado
-
-La figura canónica `DIA-VUE-PAT-001` identifica el
-[capítulo de composables](03-composables-and-callbacks.md#dependencias-y-composición-de-un-listado).
-Esta sección mantiene la navegación previa sin duplicar la imagen.
+compartida se explica en la [integración de reglas públicas](../input-handling.md)
+y en el [estándar de seguridad](../../../security-standards.md).
 
 ## Evaluación de SOLID
 

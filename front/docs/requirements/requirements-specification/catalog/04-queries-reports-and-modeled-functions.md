@@ -1,37 +1,32 @@
 # 4.4 Consulta, reportes y funciones modeladas
 
-| ID | Requisito y criterio de aceptación | Estado del requisito de producto |
+| ID | Requisito | Estado |
 | --- | --- | --- |
-| RF-REP-001 | El Administrador del sistema debe poder consultar movimientos de artículos o mermas con filtros, sin modificar inventario; elegir un recurso exige seleccionar primero su proveedor y cambiarlo limpia la selección anterior. | Implementado |
-| RF-REP-002 | Un usuario autorizado debe poder exportar los reportes registrados para su ámbito con los filtros aplicables. | Implementado |
+| RF-REP-001 | Nexus debe permitir al Administrador del sistema consultar movimientos de artículos o mermas con filtros, sin modificar inventario; elegir un recurso exige seleccionar primero su proveedor y cambiarlo limpia la selección anterior. | Implementado |
+| RF-REP-002 | Nexus debe permitir al usuario autorizado exportar los reportes registrados para su ámbito con los filtros aplicables. | Implementado |
 | RF-REP-003 | El reporte de mermas debe consolidar por nombre, proveedor y base; la altura también debe separar grupos excepto para la presentación `ROLLO`. | Implementado |
 | RF-REP-004 | Los archivos Excel deben conservar resultados calculados y fórmulas para las celdas derivadas definidas por cada reporte, sin alterar datos de origen. | Implementado |
-| RF-REP-005 | El Administrador del sistema del área Sistemas debe poder exportar los movimientos ofrecidos por la consulta conservando su ámbito y filtros aplicables. | Implementado |
+| RF-REP-005 | Nexus debe permitir al Administrador del sistema de Sistemas exportar los movimientos ofrecidos por la consulta conservando su ámbito y filtros aplicables. | Implementado |
 | RF-REP-006 | El reporte de mermas debe presentar como total de cada grupo la suma del stock de sus existencias. | Implementado |
 | RF-REP-007 | La exportación de mermas debe incluir todos los grupos y el total general en una sola hoja denominada `Mermas`. | Implementado |
-| RF-REP-008 | Antes de exportar inventario de materiales o mermas, el usuario debe poder incluir registros activos o con existencia, sólo activos o sólo registros con existencia; la opción elegida debe combinarse con los filtros admitidos por el reporte: búsqueda por nombre en Materiales, y nombre y proveedor en Mermas. El inventario de Materiales incluye todos sus proveedores. | Implementado |
+| RF-REP-008 | Nexus debe permitir elegir el alcance Activos o con stock, Activos o Con stock antes de exportar inventario de materiales o mermas. Debe combinarlo con los filtros admitidos por cada reporte según sus criterios. | Implementado |
 | RF-REP-009 | El reporte de mermas debe calcular el área total de cada grupo sumando existencia × base × altura por recurso; una dimensión ausente aporta cero. | Implementado |
-| RF-REP-010 | Un usuario autorizado debe poder exportar el inventario de consumibles con la búsqueda por nombre y el alcance seleccionado, incluyendo todos los proveedores de consumibles y excluyendo ofertas de materiales. | Implementado |
-| RF-REP-011 | El Administrador del sistema de Sistemas debe disponer de Materiales, Consumibles y Mermas dentro de Movimientos. Cada consulta, total y Excel debe incluir exclusivamente su contexto; el informe mensual debe conservar esa separación y los filtros no deben permitir cambiarla. | Implementado |
-| RF-REP-012 | El reporte de mermas debe mostrar el peso total disponible de los rollos, sumando existencia × peso neto unitario de cada medida antes de consolidar el grupo. Si un rollo con existencia carece de peso, debe indicar «Sin peso capturado» en su grupo y en el total, sin presentar una suma parcial como completa. Otras presentaciones no aportan peso. La tabla general presenta cono, total con cono y neto por unidad, agrupados antes de Acciones; el formulario presenta los pesos en una sección propia y sólo permite capturarlos al crear un Rollo. | Implementado |
+| RF-REP-010 | Nexus debe permitir al usuario autorizado exportar el inventario de consumibles con la búsqueda por nombre y el alcance seleccionado, incluyendo todos los proveedores de consumibles y excluyendo ofertas de materiales. | Implementado |
+| RF-REP-011 | Nexus debe permitir al Administrador del sistema de Sistemas consultar y exportar los movimientos de Materiales, Consumibles y Mermas por separado. Las consultas, conteos, archivos e informes mensuales deben conservar el contexto elegido; los filtros no deben cambiarlo. | Implementado |
+| RF-REP-012 | El reporte de mermas debe mostrar el peso total disponible de los rollos, sumando existencia × peso neto unitario de cada medida antes de consolidar el grupo. Si un rollo con existencia carece de peso, debe indicar «Sin peso capturado» en su grupo y en el total, sin presentar una suma parcial como completa. Otras presentaciones no aportan peso. | Implementado |
 | RF-MER-001 | Durante el alta de una merma, almacén debe elegir un proveedor antes del material usado como plantilla; cambiar el proveedor debe limpiar la plantilla anterior. | Implementado |
 | RF-MER-002 | Al seleccionar una plantilla, el sistema debe proponer el mayor costo unitario máximo aplicable; el actor puede corregirlo y el valor guardado se conserva como dato histórico propio de la merma. | Implementado |
-| RF-MER-003 | Personal de almacén o el Administrador del sistema deben poder actualizar el nombre, stock mínimo, costo unitario máximo y estado de una merma sin usar la edición general para cambiar existencias. | Implementado |
-| RF-MER-004 | El origen debe ser un material de tipo MATERIAL con unidad m², reconocida por símbolo o nombre metro cuadrado; consumibles y otras unidades quedan excluidos del selector y del alta. Deben validarse proveedor, nombre, estado, existencia y medidas finales antes de registrar. | Implementado |
+| RF-MER-003 | Nexus debe permitir al Personal de almacén o al Administrador del sistema actualizar el nombre, stock mínimo, costo unitario máximo y estado de una merma sin usar la edición general para cambiar existencias. | Implementado |
+| RF-MER-004 | Nexus debe admitir como referencia de merma sólo un material de tipo MATERIAL con unidad m², reconocida por símbolo o nombre metro cuadrado. Debe excluir consumibles y otras unidades y validar la captura antes del alta. | Implementado |
 | RF-MER-005 | Una edición de merma debe conservar proveedor, presentación, unidad y dimensiones como identidad física inmutable. | Implementado |
-| RF-MER-006 | El sistema debe impedir dos mermas con la misma combinación normalizada de nombre, proveedor, ancho, largo, peso del cono y peso total. Dos rollos de iguales medidas con pesos distintos deben poder registrarse por separado; una coincidencia completa durante el alta debe ofrecer abrir el modal existente de Agregar stock mediante Swal, precargando cantidad y observaciones. Sólo guardar ese modal debe registrar la entrada. | Implementado |
-| RF-MER-007 | Para presentación ROLLO, el formulario debe mantener ambas medidas deshabilitadas, fijar la menor dimensión nominal positiva en su campo original y calcular la otra con los pesos netos de la merma y el rollo completo. El envío debe incluir ambos valores. Para otras presentaciones, el actor debe capturar las dimensiones requeridas. | Implementado |
+| RF-MER-006 | El sistema debe rechazar un alta que repita la identidad de merma definida por `RN-021`. Ante un duplicado definitivo, debe ofrecer continuar con Agregar stock según sus criterios. | Implementado |
+| RF-MER-007 | Al crear una merma de Rollo, Nexus debe mostrar base y altura calculadas y sin edición manual, conforme a `RF-MER-013`. Para otras presentaciones, debe permitir capturar las dimensiones requeridas. | Implementado |
 | RF-MER-008 | El sistema debe calcular la cantidad convertida de una merma como existencia × base × altura en altas, ajustes y salidas, sin solicitar su captura manual. | Implementado |
 | RF-MER-009 | La merma debe vincularse al material de origen y conservar dimensiones, pesos de la merma, total de muestra y costo propios sin modificar la oferta ni recalcular registros anteriores. | Implementado |
-| RF-MER-010 | Personal de almacén o el Administrador del sistema deben poder sumar una cantidad positiva a una merma mediante **Agregar stock**, conservando un documento individual con folio, actor, observaciones opcionales, cantidad y saldos, vinculado a un movimiento de entrada. | Implementado |
+| RF-MER-010 | Nexus debe permitir al Personal de almacén o al Administrador del sistema sumar una cantidad positiva a una merma mediante **Agregar stock**, conservando un documento individual con folio, actor, observaciones opcionales, cantidad y saldos, vinculado a un movimiento de entrada. | Implementado |
 | RF-MER-011 | Al registrar una merma de Rollo, almacén debe capturar en kg el peso del cono y el peso de una unidad de merma con cono, distintos del peso del rollo completo. El sistema debe calcular el neto como total menos cono. Los tres pesos quedan para consulta después del alta y se conservan al mover existencias de la misma identidad. Los históricos sin peso conservan su valor desconocido. | Implementado |
-| RF-MER-012 | Al registrar merma de Rollo, la muestra es un rollo completo con cono. Almacén sólo captura su peso total como referencia adicional en Merma; el largo procede del material. El mismo cono se descuenta de la referencia y del sobrante. Los valores quedan inmutables con la merma y no modifican material/proveedor. | Implementado |
-| RF-MER-013 | El sistema calcula neto = total − cono y largo = neto de merma × largo del rollo / neto del rollo completo. Fija la menor dimensión nominal en su campo y calcula la otra. Ambas medidas de Rollo quedan deshabilitadas; un dato incompleto limpia el resultado y requiere completar la captura. | Implementado |
-| RF-REQ-001 | Una reimplementación de requisiciones debe permanecer fuera del alcance vigente hasta definir y aprobar nuevamente su comportamiento, autorización, persistencia y pruebas. | Fuera del alcance actual |
-| RF-PRJ-001 | El Administrador del sistema deberá poder mantener proyectos si se incorpora y aprueba esa capacidad; sus datos, operaciones y criterios permanecen pendientes de definición. | Modelado |
-| RF-PRJ-002 | El personal de almacén deberá poder seleccionar un proyecto registrado como contexto de salida si se define y aprueba ese flujo; capturar el número de proyecto no demuestra esta capacidad. | Modelado |
-
-`RF-REP-001` y `RF-REP-005` están implementados para su alcance vigente: la consulta y la exportación de movimientos sólo están disponibles para el **Administrador del sistema** del área Sistemas. El Personal de almacén no puede iniciar `CU-ALM-07`, `CU-ALM-08`, `CU-ALM-15`, `CU-ALM-16`, `CU-ALM-23` ni `CU-ALM-24`.
+| RF-MER-012 | Al registrar una merma de Rollo, Nexus debe usar un rollo completo con cono como muestra. Debe solicitar su peso total y tomar su largo del material, descontando el mismo cono de la muestra y del sobrante. Debe conservar esos valores con la merma sin modificar material ni proveedor. | Implementado |
+| RF-MER-013 | Nexus debe calcular neto = total − cono y largo = neto de merma × largo del rollo / neto del rollo completo. Debe fijar la menor dimensión nominal positiva en su campo original y calcular la otra. Si faltan datos, debe limpiar el resultado y solicitar completar la captura. | Implementado |
 
 ## Condiciones de consulta y reporte
 
@@ -41,6 +36,18 @@
   **Activos** exige estado activo y **Con stock** exige saldo positivo.
   La condición se combina con los filtros admitidos por cada reporte; el proveedor
   de la tabla sólo limita el Excel de Mermas, no el de Materiales ni Consumibles.
+- **CA-RF-REP-008-2:** Materiales debe aplicar la búsqueda por nombre e incluir todos
+  sus proveedores. Mermas debe combinar nombre y proveedor. El filtro de proveedor
+  de una tabla de Materiales o Consumibles no debe limitar su exportación de inventario.
+
+## Criterios de captura de merma
+
+- **CA-RF-MER-006-1:** dos rollos con iguales medidas y pesos distintos no se
+  consideran el mismo registro conforme a `RN-021`.
+- **CA-RF-MER-006-2:** si el alta fue rechazada definitivamente por duplicado y el
+  usuario tiene permiso de entrada, confirmar la alternativa abre **Agregar stock**
+  con cantidad y observaciones precargadas. Abrirlo no registra la entrada; el
+  usuario debe confirmar ese formulario por separado.
 - **CA-RF-MER-011-1:** el peso del cono admite cero; el total con cono debe ser
   mayor que el cono y no superar 999.99 kg. Ambos admiten tres enteros y dos decimales.
   Capturar un peso requiere el otro. El sistema calcula el neto por unidad y rechaza
@@ -58,10 +65,19 @@
   No actualiza pesos ni existencias de material/proveedor.
 - **CA-RF-MER-012-3:** las referencias históricas permanecen intactas, sin inferir un
   peso del rollo completo ni recalcular medidas anteriores.
+- **CA-RF-MER-007-1:** al confirmar un Rollo, el cliente debe enviar las dos medidas
+  calculadas aunque sus controles estén deshabilitados.
 
-Las capacidades modeladas o excluidas no son promesas de acceso vigente. Sus criterios
-futuros requieren un acuerdo de alcance; no se presentan como implementadas por la mera
-existencia de una entidad de datos.
+## Capacidades no vigentes
+
+Estas capacidades no tienen un flujo disponible en el cliente. Sus decisiones se
+registran en [Brechas y decisiones pendientes](../../vision-scope-and-requirements/10-known-gaps-and-pending-decisions.md).
+
+| ID | Requisito | Estado |
+| --- | --- | --- |
+| RF-REQ-001 | El registro de requisiciones queda excluido del alcance vigente. Su incorporación requiere acordar comportamiento, autorización, datos y criterios de aceptación. | Fuera del alcance actual |
+| RF-PRJ-001 | Nexus deberá permitir al Administrador del sistema mantener un catálogo de proyectos. Sus datos, operaciones y criterios de aceptación están pendientes de definición. | Modelado |
+| RF-PRJ-002 | Nexus deberá permitir al Personal de almacén seleccionar un proyecto registrado como contexto de una salida. La fuente de proyectos y sus condiciones de selección están pendientes de definición. | Modelado |
 
 ## Recorrido del peso de merma
 

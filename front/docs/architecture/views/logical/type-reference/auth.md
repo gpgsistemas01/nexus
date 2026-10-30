@@ -410,7 +410,7 @@ classDiagram
     class R0["LoginCredentials"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R0 : updateField
     Subject ..> R0 : blurField
 ```

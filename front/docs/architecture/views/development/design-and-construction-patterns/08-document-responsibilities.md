@@ -1,4 +1,4 @@
-# 8. Responsabilidades y nombres de Salidas y Compras
+# 8. Composición de documentos de compra y salida
 
 Este capítulo describe cómo se distribuyen contratos, captura, operaciones y transporte en Compras y Salidas.
 
@@ -8,7 +8,7 @@ conserva la definición general; aquí se localiza su aplicación.
 
 ## Propietarios del código
 
-| Archivo o capa | Responsabilidad y motivo de cambio |
+| Archivo o capa | Contenido y uso |
 | --- | --- |
 | `issue.ts` / `purchase.ts` | Tipos de documento, captura, consulta y operaciones. No contienen valores de configuración ni reglas ejecutables. |
 | `issueConfig.ts` / `purchaseConfig.ts` | Descriptores de recursos, etiquetas, rutas Vue y permisos de presentación. Salidas también mantiene aquí los descriptores estáticos de sus filtros. |
@@ -24,12 +24,11 @@ conserva la definición general; aquí se localiza su aplicación.
 | `components` | Presentar props y emitir intenciones. Un `Editor` presenta el formulario modal conforme a la convención existente; su nombre no implica que conozca la API. |
 | `app/pages/*Workspace` | Componer las altas rápidas entre dominios mediante callbacks, sin importar las páginas de Directorio o Inventario desde Salidas/Compras. |
 
-No se extrae una función a otro archivo únicamente por su longitud. Por ejemplo,
-`useIssueHeaderSelection` conserva consultas de opciones, selección inicial,
-dependencias cliente/asesor y área/solicitante y sugerencia de proyecto: todas
-forman la misma interacción de selección del encabezado. Guardar el documento
-pertenece a otro flujo. Los constructores de borradores están en `*Details`,
-porque asignar una identidad local no corresponde al mapper de respuestas HTTP.
+`useIssueHeaderSelection` coordina la selección del encabezado: opciones iniciales,
+dependencias cliente/asesor y área/solicitante, y sugerencia de proyecto. El editor
+utiliza esos valores al guardar. Los constructores de `*Details` asignan identidad
+local a la captura; los mappers de respuesta leen la identidad persistida que
+devuelve la API.
 
 ## Patrones y principios aplicados
 
@@ -124,59 +123,18 @@ sequenceDiagram
     end
 ```
 
-## Composición entre dominios para altas rápidas
-
-**Identificador:** `DIA-VUE-DOC-003`. **Pregunta:** ¿cómo registrar un cliente desde
-una salida sin acoplar Salidas a las pantallas de Directorio? **Fuente:**
-`IssueWorkspace.createClient`, `handleClientSaved`, el evento `createClient` de
-`IssuePage` y `useIssueHeaderSelection.selectCreatedClient`. Flechas continuas =
-composición; discontinuas = evento o callback. Es un mapa de colaboración, no una
-secuencia de llamadas HTTP.
-
-```mermaid
-flowchart TB
-    workspace["IssueWorkspace<br/>composición entre dominios"] --> issues["IssuePage y editor<br/>dominio Salidas"]
-    workspace --> directory["DirectoryEditorPage<br/>dominio Directorio"]
-    issues -.->|createClient con callback| workspace
-    directory -.->|saved con DirectoryEntry| workspace
-    workspace -.->|handleClientSaved invoca callback| selection["selectCreatedClient<br/>selección del encabezado"]
-    issues --> selection
-```
-
-El [workspace](../../../../../src/app/pages/IssueWorkspace.vue) comprueba permisos de crear y
-leer clientes antes de abrir [DirectoryEditorPage](../../../../../src/modules/directory/pages/DirectoryEditorPage.vue).
-Tras el alta convierte `DirectoryEntry` en `LookupItem` y ejecuta el callback
-recibido. [useIssueHeaderSelection](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts)
-conserva la opción creada, selecciona su id y refresca opciones; no selecciona una
-opción inactiva. El guardado permanece en Directorio y la autorización definitiva
-en el backend. Cerrar el diálogo elimina el callback pendiente.
-
-[PurchaseWorkspace](../../../../../src/app/pages/PurchaseWorkspace.vue) aplica la misma composición
-para proveedores y artículos con sus contratos de callback. No hay un bus global
-ni una importación de pantallas entre los módulos. La [sesión proporcionada](01-applicability-and-principles.md)
-es compartida por la aplicación; estas capturas conservan estado por instancia.
-
-## Convenciones de nombres comprobadas
-
-| Elemento | Ejemplo y significado |
-| --- | --- |
-| Operación de servicio | `get`, `list`, `save`, `changeDetail`, con el recurso aportado por el servicio. |
-| Función independiente | `createInitialIssueValues`, `mapIssueFormToRequest`, `createIssueDetailDraft`, `resolveIssueEditMode`, `getIssueReturnableQuantity`, `calculatePurchaseTotals`: expresan efecto. |
-| Capacidad/estado | `canEditHeader`, `canEditDetails`, `isOriginallySupplied`. |
-| Callback/evento | `handleSaved`, `handleDetailSaved`, `handleClientSaved`; el evento Vue es `saved`. |
-| Composable/componente | `useIssueHeaderSelection` nombra su interacción; componentes en PascalCase y composables con prefijo `use`. |
-| Operación con varios IDs | Objeto con `resource`, `documentId`, `detailId`, `change`, `signal`. Campos API en el borde; imports al propietario real. |
-
-El [estándar de código](../../../coding-standards/index.md) conserva las reglas generales.
+Las altas de clientes, proveedores y artículos se componen en los Workspaces.
+El [patrón de alta contextual](09-contextual-creation.md) desarrolla sus contratos,
+apertura y retorno en cada consumidor.
 
 ## Verificación
 
-Se conservan las pruebas de contratos, payloads, filtros, totales, conflictos,
-cancelación al desmontar y recorridos de navegador de ambos módulos. Los casos
-adicionales comprueban que consulta/devolución no escriban el documento y que el
+Las pruebas de ambos módulos observan contratos, payloads, filtros, totales,
+conflictos, cancelación al desmontar y recorridos de navegador. Comprueban que
+consulta/devolución no escriban el documento y que el
 surtido no altere detalles ya persistidos o cancelados ni el documento leído.
-Estas pruebas observan comportamiento; no fijan el número de archivos ni el
-nombre de una función privada.
+Los diseños de [Compras](../../../../testing/design/05-purchases.md) y
+[Salidas](../../../../testing/design/06-issues.md) identifican sus condiciones y evidencia.
 
 ## Fuentes de los participantes
 

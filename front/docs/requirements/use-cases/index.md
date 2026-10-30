@@ -32,7 +32,7 @@ información que permite recorrer su objetivo sin consultar una segunda descripc
   participante y una acción observable. Los turnos alternan entre actor y Nexus; cuando
   varias acciones consecutivas corresponden al mismo participante, se integran en un
   solo paso. La captura de filas incluye la acción **Agregar** y la revisión de cada
-  renglón. La consulta describe la información que obtiene el actor; una modificación describe
+  fila. La consulta describe la información que obtiene el actor; una modificación describe
   los datos y efectos de negocio que quedan confirmados. El paso remite a una excepción
   de operación cuando ésta no puede completarse, sin explicar bases de datos,
   transacciones ni componentes internos. Se nombran los controles que disparan cada acción, el formulario,
@@ -92,9 +92,11 @@ navegación hacia otro objetivo se registra en **Acciones de la pantalla**.
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
 En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela
 como actor externo ni inicia el caso por sí mismo.
+
 Los casos de catálogos siguen listar-crear-actualizar y sólo incluyen eliminar, activar,
 desactivar o ajustar cuando el contexto lo permite. Los documentos comparten encabezado
 y detalles, pero surtir, devolver y corregir mantienen reglas y efectos propios.
+
 Las lecturas de roles, áreas, presentaciones, unidades de medida, motivos de ajuste y
 estados de cumplimiento que sólo alimentan selectores son soporte técnico de esos
 objetivos: conservan autorización y trazabilidad arquitectónica, pero no reciben un

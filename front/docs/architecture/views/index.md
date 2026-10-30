@@ -9,7 +9,7 @@ complementarias. La [vista general](overview.md) contiene el contexto y el corte
 | [Escenarios (+1)](scenarios/index.md) | ¿Qué objetivo se realiza y cómo se llega a él? | Catálogo de pantallas, navegación y casos de uso. |
 | [Lógica](logical/index.md) | ¿Qué componentes, contratos y estados colaboran? | Componentes por dominio, clases/interfaces/tipos, propiedad de datos y estados. |
 | [Procesos](processes/index.md) | ¿En qué orden se coordina una operación? | Ocho secciones de secuencias con decisiones, vigencia, rechazo y recuperación. |
-| [Desarrollo](development/index.md) | ¿Dónde vive el código y cómo se reutiliza? | Estructura, patrones, guías de módulo y referencia generada. |
+| [Desarrollo: organización del código](development/index.md) | ¿Dónde vive el código y cómo se compone? | Unidades de código, patrones, integración de reglas públicas y referencia generada. |
 | [Física](physical/index.md) | ¿Dónde se ejecuta y qué configuración necesita? | Vite, alojamiento estático, proxy, build e imagen final. |
 
 ## Lectura visual
@@ -27,7 +27,7 @@ las [interfaces y tipos](logical/class-and-type-models/index.md), a la vista ló
 | Conceptos del negocio (entrada a las vistas) | [Cinco cortes de dominio](../../requirements/domain-model/index.md): identidad, existencias, compras, salidas y trazabilidad. |
 | Responsabilidades (lógica) | [Cortes de siete dominios](logical/components/index.md), [modelos de clases/interfaces/tipos](logical/class-and-type-models/index.md), [estados por responsabilidad](logical/states/index.md). |
 | Orden y recuperación (procesos) | [Índice de secuencias](processes/index.md), con operación, CU y figura; [actividad de merma](processes/05-warehouse/05-waste-preview.md) detalla el cálculo de preview. |
-| Construcción (desarrollo) | [Patrones generales y aplicados](development/design-and-construction-patterns/index.md), [referencias breves por módulo](development/frontend-technical-documentation/index.md) y [código generado](development/code-reference.md). |
+| Construcción (desarrollo) | [Estructura y dependencias del código](development/code-structure.md), [patrones generales y aplicados](development/design-and-construction-patterns/index.md) y [referencia generada](development/code-reference.md). |
 | Ejecución (física) | [Topología local y frontera del build](physical/runtime-and-build.md), complementada por configuración de alojamiento/proxy. |
 
 ## Recorrido por capacidad

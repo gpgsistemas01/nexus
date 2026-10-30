@@ -21,7 +21,7 @@ recortes globales. Las respuestas HTTP se simulan y no demuestran persistencia.
 | --- | --- | --- | --- | --- |
 | `DP-VUE-LOOKUP-001` | Cargas interminables y opciones duplicadas al cambiar un catálogo | Unitario; transiciones entre páginas | `remoteLookupTest.ts`: páginas con IDs repetidos avanzan por filas recibidas; una página vacía con conteo antiguo desactiva más carga; un error se reintenta en la misma página y no adelanta el contador. `warehouse.spec.ts` verifica en navegador tres solicitudes (0/20/40), opciones únicas, selección conservada y fin del indicador con conteo antiguo. | [remoteLookupTest.ts](../../../tests/unit/shared/composables/remoteLookupTest.ts); [warehouse.spec.ts](../../../tests/e2e/warehouse.spec.ts) |
 | `DP-VUE-LOOKUP-002` | Consultas fuera de contexto | Unitario; transiciones búsqueda/reintento, permiso y desmontaje | `remoteLookupTest.ts`: buscar reinicia reintento a página 1, reintentar cancela debounce, deshabilitar limpia el error y desmontar cancela/bloquea callbacks posteriores. Las pruebas existentes de proveedor y respuestas tardías siguen en `remoteOptionsTest.ts` y `movementFiltersTest.ts`. | [remoteLookupTest.ts](../../../tests/unit/shared/composables/remoteLookupTest.ts); [remoteOptionsTest.ts](../../../tests/unit/modules/warehouse/remoteOptionsTest.ts); [movementFiltersTest.ts](../../../tests/unit/modules/movements/movementFiltersTest.ts) |
-| `DP-VUE-PAGE-001` | Conteos inválidos usados en paginación | Unitario; fronteras cero/negativo/fraccionario/entero no seguro | `pageRequestTest.ts`: cero conserva un listado vacío válido; los conteos inválidos rechazan el contrato en el adaptador HTTP y no se presentan como páginas válidas. | [pageRequestTest.ts](../../../tests/unit/shared/http/pageRequestTest.ts) |
+| `DP-VUE-PAGE-001` | RD-VUE-007; conteos inválidos usados en paginación | Unitario; fronteras cero/negativo/fraccionario/entero no seguro | `pageRequestTest.ts`: cero conserva un listado vacío válido; los conteos inválidos rechazan el contrato en el adaptador HTTP y no se presentan como páginas válidas. | [pageRequestTest.ts](../../../tests/unit/shared/http/pageRequestTest.ts) |
 
 `npm run lint` mantiene las fronteras de imports estáticos de `shared`, presentación,
 servicios y mappers. La revisión comprueba también ejemplos permitidos (contratos
@@ -40,7 +40,7 @@ casos una capacidad de usuarios concurrentes. Las pruebas de navegador simulan l
 Las reglas de proyecto compartidas se verifican en `formValidationParityTest.js` y
 los tres endpoints reales de salidas se cubren con `CP-INT-VAL-007`. El navegador no
 decide que una captura sea segura para persistir. El contrato y los patrones están
-en [entradas y salida segura](../../architecture/views/logical/input-security.md) y [patrones/SOLID](../../architecture/views/development/design-and-construction-patterns/01-applicability-and-principles.md).
+en [entradas y salida segura](../../architecture/views/development/input-handling.md) y [patrones/SOLID](../../architecture/views/development/design-and-construction-patterns/01-applicability-and-principles.md).
 ESLint mantiene `vue/no-v-html` como error; esta regla no certifica ausencia de todos
 los posibles usos inseguros del DOM ni sustituye revisar las opciones de un plugin.
 

@@ -8,26 +8,38 @@
 | `RN` | Regla de negocio que restringe varios flujos. |
 | `RD` | Requisito sobre persistencia o representación de datos. |
 | `RC` | Requisito de calidad u operación. |
-| `RF/RD/RN/RC-VUE` | Obligación específica de navegación, captura, estado, datos o construcción del cliente. |
+| `RF-VUE` / `RD-VUE` | Función o condición de datos específica del cliente. |
+| `RN-VUE` | Identificador local de interacción, estado o separación de responsabilidades; no es una regla adicional del negocio. |
+| `RC-VUE` | Restricción de tecnología, construcción o despliegue del cliente. |
 | `CA` | Criterio de aceptación numerado dentro de un requisito cuando se necesitan varios escenarios verificables. |
 
-Un requisito conserva una obligación principal. Si requiere varios ejemplos o
-escenarios, se redactan criterios `CA-<ID>-<n>` en lugar de construir una sola oración
-con decisiones de interfaz, implementación y excepciones. La evidencia técnica se
-mantiene en su columna y no sustituye el resultado observable.
+Cada requisito expresa una obligación principal. Sus variantes se concretan con
+criterios `CA-<ID>-<n>`. Una obligación que puede aprobarse o rechazarse de forma
+independiente necesita una definición propia; un campo o ejemplo no necesita otro
+ID sólo por aparecer en una pantalla. La numeración es una convención de Nexus.
 
-ISO/IEC/IEEE 29148 no obliga a crear una fila independiente para cada verbo CRUD ni
-define la numeración concreta de Nexus. Sí orienta a que los requisitos sean singulares,
-inequívocos y verificables. El proyecto aplica esos criterios separando operaciones que
-pueden autorizarse, fallar y probarse por separado; mantiene juntos únicamente los
-atributos y escenarios que describen una misma obligación observable.
+### Calidad de la redacción
 
-Por tanto, no se dejan juntas obligaciones independientes ni se fragmenta cada campo en
-un requisito. La singularidad aplica a requisitos funcionales (`RF-*`), de datos
-(`RD-*`), reglas de negocio (`RN-*`) y calidad (`RC-*`): se crea otro identificador
-cuando cambia el resultado, la restricción, la aprobación o la prueba que decide su
-cumplimiento. Los criterios `CA-*` conservan variantes inseparables de una misma
-obligación.
+| Comprobar | Forma de aplicarlo |
+| --- | --- |
+| Necesidad y alcance | Identificar el actor o consumidor, el resultado y la capacidad de la que forma parte. |
+| Claridad | Usar los términos del glosario y condiciones concretas; evitar «adecuado», «rápido» o «cuando corresponda» sin una regla enlazada. |
+| Una obligación principal | Separar objetivos con permisos o resultados independientes. Los requisitos por familia del cliente enlazan su detalle funcional del catálogo. |
+| Verificación | Indicar la condición, el resultado aceptado y el rechazo relevante. Las cantidades, estados y límites deben poder comprobarse. |
+| Viabilidad y acuerdos | Distinguir lo implementado de lo propuesto. Mantener metas y responsables aún no acordados en el registro de pendientes. |
+| Consistencia y trazabilidad | Definir cada ID una sola vez y enlazar reglas comunes, casos y evidencia. Los IDs históricos equivalentes conservan una definición canónica identificada. |
+| Separación del diseño | Expresar qué debe ocurrir. Bibliotecas, componentes y algoritmos van en arquitectura, salvo una restricción técnica explícita de datos u operación. |
+
+Ejemplos de redacción:
+
+| Evitar | Enunciado comprobable |
+| --- | --- |
+| «Validar correctamente la devolución». | «Rechazar una devolución mayor que la cantidad entregada menos las devoluciones anteriores, sin modificar existencias». |
+| «Mostrar el duplicado con Swal». | «Ante una merma duplicada, ofrecer abrir Agregar stock con la cantidad y observaciones capturadas; abrirlo no registra una entrada». |
+| «Los listados deben ser rápidos». | Definir carga, medida y umbral antes de aceptar un objetivo de rendimiento; la necesidad permanece propuesta mientras falte ese acuerdo. |
+
+La [aplicabilidad de estándares](../../governance/03-standard-applicability.md)
+identifica la referencia ISO/IEC/IEEE 29148 y su alcance en este proyecto.
 
 ## 2.2 Estados
 

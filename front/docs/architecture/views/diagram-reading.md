@@ -10,7 +10,8 @@ identificadores, fuentes y leyendas locales.
 | Orden de llamadas y respuestas | [Secuencias](#secuencias). |
 | Modos y transiciones | [Estados](#estados). |
 | Objetivos y participación del usuario | [Casos de uso](#casos-de-uso). |
-| Dependencias, comunicación o decisiones | [Mapas y actividades](#mapas-y-actividades). |
+| Componentes y dependencias | [Mapas de componentes](#componentes-y-dependencias). |
+| Comunicación o decisiones | [Mapas y actividades](#mapas-y-actividades). |
 
 ## Reglas de elaboración
 
@@ -71,7 +72,8 @@ classDiagram
 | Atributo con `?`, tipo con `null` o `T[]` | Propiedad opcional, valor nulo admitido o colección de elementos, respectivamente. Una abreviación de la figura se desarrolla junto al contrato. |
 | Línea continua sin punta | Asociación: los elementos están vinculados. Su texto nombra el vínculo o un rol. |
 | Línea continua con flecha abierta | Referencia navegable: el origen contiene o conoce el destino. No indica una llamada temporal. |
-| Triángulo hueco | Generalización; apunta al elemento general. En modelos TypeScript corresponde al `extends` declarado. |
+| Triángulo hueco y línea continua | Generalización; apunta al elemento general y corresponde al `extends` declarado. |
+| Triángulo hueco y línea discontinua | Realización: una clase implementa la interfaz indicada por `implements`; no es herencia de implementación. |
 | Rombo sólido `◆` | Composición; está junto al todo. En el dominio, Compra contiene sus Detalles. |
 | Línea discontinua con flecha abierta | Dependencia: usa el tipo o concepto de destino, sin afirmar que lo almacena como propiedad. |
 | Nota conectada con línea discontinua | Aclaración o restricción. Esa conexión no es una asociación del negocio. |
@@ -84,6 +86,10 @@ classDiagram
 | `0..1` | Ninguno o uno. |
 | `0..*` o `*` | Ninguno, uno o varios. |
 | `1..*` | Uno o varios. |
+
+Una multiplicidad omitida en una figura generada no se presume igual a `1`: el
+generador no deduce cuántos objetos comparten una referencia. Sólo etiqueta el
+destino cuya cantidad se obtiene de la propiedad.
 
 En el ejemplo, un Documento referencia cero o más Detalles. En el dominio, una compra
 registrada requiere al menos uno: la cardinalidad del documento válido y la del array
@@ -132,31 +138,48 @@ ejecutado por un coordinador del import o la llamada HTTP de su consumidor.
 
 ## Estados
 
-Una **guarda** es la condición que debe cumplirse para tomar una transición; se
-escribe entre corchetes, como `[válida]`. El **efecto de transición** es el resultado
-de ejecutarla, como publicar una lectura o confirmar una captura. Estado, condición,
-acción y resultado se distinguen mediante la etiqueta y la leyenda local.
+Una transición se lee como `evento [guarda] / efecto`: el evento solicita o completa
+el cambio, la guarda decide si puede ocurrir y el efecto se ejecuta al tomarlo.
+El evento también puede ser la resolución o el rechazo de una promesa. No se usa
+una conjunción en prosa para confundir estas tres funciones.
 
-**Ejemplo:** `DIA-VUE-LEG-003`. Ciclo ilustrativo de una interacción.
+**Ejemplo:** `DIA-VUE-LEG-003`. Ciclo ilustrativo; los nombres no son funciones de Nexus.
 
 ```mermaid
 stateDiagram-v2
+    state Resolver <<choice>>
     [*] --> Captura
-    Captura --> Enviando: guardar [válida]
-    Enviando --> Error: rechazo
-    Error --> Captura: corregir
-    Enviando --> [*]: confirmado
+    Captura --> Enviando: guardar [válida] / bloquear envío
+    Enviando --> Resolver: respuesta recibida
+    Resolver --> Confirmada: [admitida] / notificar resultado
+    Resolver --> Error: [else] / publicar mensaje
+    Error --> Captura: corregir / conservar valores
+    Confirmada --> [*]: cerrar
 ```
 
 | Elemento visible | Lectura |
 | --- | --- |
-| Punto negro `●` | Inicio de la máquina representada. |
-| Rectángulo redondeado | Estado en el que puede permanecer la interacción. |
-| Flecha | Transición; la etiqueta indica evento y, cuando existen, `[guarda]` o `/ efecto`. La guarda es una condición necesaria. |
-| Punto rodeado por un círculo `◉` | Final de esa máquina. Un error recuperable conserva una salida hacia la recuperación. |
+| Punto negro `●` | Pseudoestado inicial; señala dónde comienza ese ciclo, sin representar una actividad. |
+| Rectángulo redondeado | Estado: situación en la que puede permanecer el sujeto observado. Su nombre puede resumir flags reales; no crea otro enum. |
+| Flecha de transición | Sale del estado origen hacia el destino. La etiqueta separa evento, `[guarda]` y `/ efecto`; no expresa dependencia entre archivos. |
+| `[guarda]` | Condición booleana necesaria. Si es falsa no se toma esa salida; no obliga por sí sola a mostrar un error. |
+| `/ efecto` | Acción relevante asociada al cambio; no es el nombre del estado destino ni una actividad permanente. |
+| Rombo `«choice»` | Decisión inmediata. Sus salidas llevan guardas excluyentes; `[else]` completa la alternativa restante. No es un modo de UI. |
+| Marco con nombre y estados internos | Estado compuesto: reúne subestados y permite una salida común. Sin regiones separadas no expresa paralelismo. |
+| Texto dentro del estado `evento / efecto` | Reacción interna que no abandona ese estado; se distingue de una flecha que sale y vuelve a entrar. |
+| Punto rodeado por un círculo `◉` | Estado final del ciclo representado; no implica apagar la aplicación, limpiar Storage o revertir una escritura. |
 
-Los estados de UI describen captura, lectura o envío. Los campos `status` recibidos de
-la API conservan su significado de negocio en los contratos de cada documento.
+Una etiqueta sin guarda no añade una condición al evento. Una salida sin evento
+explícito desde una decisión es inmediata al evaluar su guarda. Un estado sin
+final puede participar en recorridos repetidos mientras su coordinador siga vivo.
+La salida del pseudoestado inicial no espera un evento ni evalúa una guarda;
+si necesita una acción inicial, se etiqueta sólo como `/ efecto`.
+No es obligatorio usar historia, regiones paralelas o actividades `entry`/`exit`/`do`
+si no corresponden al comportamiento representado.
+
+Los [modelos de estado](logical/states/index.md) declaran sujeto, flags, guardas
+abreviadas y límites del corte. Los campos `status` de la API conservan el significado
+del negocio; no son automáticamente estados de la interfaz.
 
 ## Casos de uso
 
@@ -220,6 +243,26 @@ Los actores y objetivos de Nexus se consultan en el
 [modelo de casos de uso](../../requirements/use-case-model/index.md); los recorridos
 entre pantallas, en el [catálogo de navegación](scenarios/navigation-and-screens.md).
 
+## Componentes y dependencias
+
+Los cortes `DIA-VUE-COMP-*` son mapas de componentes lógicos con notación de flujo
+Mermaid. Explican organización y dependencias del cliente; no se presentan como
+UML formal de componentes ni como C4 completo: no dibujan puertos, interfaces
+provistas/requeridas o unidades de despliegue que el código no declara.
+
+| Elemento visible | Lectura en estos cortes |
+| --- | --- |
+| Rectángulo con archivo o export propio | Componente, composable, módulo o adaptador de Nexus. El nombre distingue su función sin atribuirle una clase instanciada. |
+| Flecha continua `A → B` | A importa o carga B directamente. La punta apunta al colaborador utilizado; no muestra que B emita un evento ni el orden de ejecución. |
+| Marco con nombre | Agrupación por responsabilidad o alcance del corte; no añade un import ni un proceso independiente. |
+| Nodo sin flecha a otra pieza visual | Puede recibirla por un slot o callback del consumidor. No se añade una dependencia sólo porque aparezcan juntos en pantalla. |
+| Librería citada en texto | Tecnología utilizada en los archivos; sus clases externas no se convierten en entidades propias. |
+
+Los cortes seleccionan colaboraciones relevantes: la lista completa de imports está
+en la [referencia generada de código](development/code-reference.md). Props, eventos
+y callbacks se precisan en [contratos](../contracts/form-and-event-contracts.md) y
+[secuencias](processes/index.md), donde sus flechas tienen otro significado.
+
 ## Mapas y actividades
 
 **Ejemplo:** `DIA-VUE-LEG-005`. Mapa de comunicación, con flechas etiquetadas.
@@ -245,10 +288,15 @@ flowchart LR
 | --- | --- |
 | Rectángulo | Colaborador, artefacto o acción, según el alcance del mapa. El texto lo identifica. |
 | Cilindro | Almacenamiento, como PostgreSQL. |
+| Paralelogramo | Entrada, producto o dato que se transforma en un flujo de datos. No es una función ejecutable. |
 | Caja que contiene otras cajas | Agrupación o límite de responsabilidad/ejecución; su rótulo explica cuál. |
 | Rombo con pregunta | Decisión; las salidas llevan condiciones como Sí/No. |
 | Cápsula | Inicio/fin de una actividad cuando así se rotula. |
 | Flecha etiquetada | Comunicación, dependencia o flujo de control según la leyenda local. |
+
+En un árbol de slots, las regiones muestran lugares donde se inserta contenido,
+no nuevas clases. Una actividad de fábrica muestra cómo se construye su producto;
+la ejecución posterior del producto tiene otro alcance.
 
 En los patrones, una flecha discontinua puede representar evento/callback; en el mapa
 de construcción identifica una exclusión. La leyenda local fija ese significado. Los
@@ -260,7 +308,7 @@ El color depende del tema del visor o exportador. En estos diagramas no codifica
 permiso, prioridad ni estado del negocio. El significado lo dan forma, texto, extremos
 y tipo de línea. Los nombres resaltados son títulos; las cajas oscuras de notas y los
 círculos de numeración son ayudas de lectura. La apariencia de la aplicación Vue se
-describe por separado en [interfaz y tema](logical/ui-and-http.md#tema-estilos-y-controles).
+describe por separado en [interfaz y tema](logical/components/08-shared-ui.md#tema-estilos-y-controles).
 
 Referencias de notación: [UML](https://www.omg.org/spec/UML/2.5.1) y
 [sintaxis de Mermaid](https://mermaid.js.org/intro/syntax-reference.html).

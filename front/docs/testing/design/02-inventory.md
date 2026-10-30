@@ -22,9 +22,10 @@ HTTP/Prisma en una base aislada; no se usa la base de desarrollo.
 
 ## UI, HTTP y pruebas de contrato
 
-La [revisión de interfaz y HTTP](../../architecture/views/logical/ui-and-http.md) mantiene la comparación de
-DataTables Vue, VDataTableServer, SweetAlert2 y los componentes ya instalados de
-Vuetify, así como el mapa de responsabilidades.
+La [composición visual](../../architecture/views/logical/components/08-shared-ui.md)
+identifica marcos, estilos y selectores propios. El
+[contrato HTTP](../../architecture/contracts/client-contracts.md) define las respuestas
+que estas pruebas admiten o rechazan.
 
 Las pruebas del frontend usan rutas `/api/*` porque comprueban el contrato que
 consume Vue. El adaptador simulado de Axios conserva sus transformaciones e

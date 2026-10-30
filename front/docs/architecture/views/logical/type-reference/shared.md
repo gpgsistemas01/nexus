@@ -198,9 +198,9 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : options
-    Subject "1" --> "0..1" R1 : errors
-    Subject "1" --> "0..1" R2 : initialDepartment
-    Subject "1" --> "0..1" R2 : initialRole
+    Subject --> "0..1" R1 : errors
+    Subject --> "0..1" R2 : initialDepartment
+    Subject --> "0..1" R2 : initialRole
 ```
 
 ## OrganizationFields.errors@10:14
@@ -436,8 +436,8 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : items
-    Subject "1" --> "0..1" R0 : initialOption
+    Subject --> "0..*" R0 : items
+    Subject --> "0..1" R0 : initialOption
 ```
 
 ## RemoteSelect.defineEmits
@@ -501,7 +501,7 @@ classDiagram
     class R0["ReportScope"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
 ```
 
 ## ReportScopeDialog.defineEmits
@@ -1302,7 +1302,7 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : items
+    Subject --> "0..*" R0 : items
 ```
 
 ## LookupCreation
@@ -1342,16 +1342,6 @@ classDiagram
 
 ```typescript
 'departments' | 'roles'
-```
-
-**Figura:** `DIA-VUE-TS-SHARED-50-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["OrganizationResource"] {
-        <<type>>
-    }
 ```
 
 ## OrganizationState
@@ -2043,7 +2033,7 @@ classDiagram
     class R1["ReportScope"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : reportValues
+    Subject --> "1" R0 : reportValues
     Subject ..> R1 : setReportMode
 ```
 
@@ -2096,7 +2086,7 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : value
+    Subject --> "0..1" R0 : value
 ```
 
 ## useTableQuery.return
@@ -2390,8 +2380,8 @@ classDiagram
     class R0["LookupState"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : departments
-    Subject "1" --> "1" R0 : roles
+    Subject --> "1" R0 : departments
+    Subject --> "1" R0 : roles
 ```
 
 ## organizationService
@@ -2449,7 +2439,7 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```
 
 ## controlDefaults
@@ -2502,10 +2492,10 @@ classDiagram
     class R3["controlDefaults.<br/>VAutocomplete.shape4"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : VBtn
-    Subject "1" --> "1" R1 : VTextField
-    Subject "1" --> "1" R2 : VTextarea
-    Subject "1" --> "1" R3 : VAutocomplete
+    Subject --> "1" R0 : VBtn
+    Subject --> "1" R1 : VTextField
+    Subject --> "1" R2 : VTextarea
+    Subject --> "1" R3 : VAutocomplete
 ```
 
 **Figura:** `DIA-VUE-TS-SHARED-87-2`. Parte 2/2.
@@ -2532,10 +2522,10 @@ classDiagram
     class R3["controlDefaults.VTooltip.<br/>shape8"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : VSelect
-    Subject "1" --> "1" R1 : VCheckbox
-    Subject "1" --> "1" R2 : VDataTableServer
-    Subject "1" --> "1" R3 : VTooltip
+    Subject --> "1" R0 : VSelect
+    Subject --> "1" R1 : VCheckbox
+    Subject --> "1" R2 : VDataTableServer
+    Subject --> "1" R3 : VTooltip
 ```
 
 ## controlDefaults.VBtn.shape1
@@ -2909,10 +2899,10 @@ classDiagram
     class R3["numberText.return.search.<br/>shape7"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : localeCompare
-    Subject "1" --> "0..1" R1 : match
+    Subject --> "1" R0 : localeCompare
+    Subject --> "0..1" R1 : match
     Subject ..> R2 : replace
-    Subject "1" --> "1" R3 : search
+    Subject --> "1" R3 : search
 ```
 
 **Figura:** `DIA-VUE-TS-SHARED-99-2`. Parte 2/5.
@@ -2931,8 +2921,8 @@ classDiagram
     class R1["numberText.return.<br/>toLocaleLowerCase.shape11"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : split
-    Subject "1" --> "1" R1 : toLocaleLowerCase
+    Subject --> "1" R0 : split
+    Subject --> "1" R1 : toLocaleLowerCase
 ```
 
 **Figura:** `DIA-VUE-TS-SHARED-99-3`. Parte 3/5.
@@ -2965,8 +2955,8 @@ classDiagram
     class R1["numberText.return.normalize.<br/>shape13"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : toLocaleUpperCase
-    Subject "1" --> "1" R1 : normalize
+    Subject --> "1" R0 : toLocaleUpperCase
+    Subject --> "1" R1 : normalize
 ```
 
 **Figura:** `DIA-VUE-TS-SHARED-99-4`. Parte 4/5.
@@ -2999,7 +2989,7 @@ classDiagram
     class R1["numberText.return.replaceAll.<br/>shape15"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : fontsize
+    Subject --> "1" R0 : fontsize
     Subject ..> R1 : replaceAll
 ```
 
@@ -3467,10 +3457,10 @@ classDiagram
     class R3["currencyText.return.search.<br/>shape7"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : localeCompare
-    Subject "1" --> "0..1" R1 : match
+    Subject --> "1" R0 : localeCompare
+    Subject --> "0..1" R1 : match
     Subject ..> R2 : replace
-    Subject "1" --> "1" R3 : search
+    Subject --> "1" R3 : search
 ```
 
 **Figura:** `DIA-VUE-TS-SHARED-115-2`. Parte 2/5.
@@ -3489,8 +3479,8 @@ classDiagram
     class R1["currencyText.return.<br/>toLocaleLowerCase.shape11"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : split
-    Subject "1" --> "1" R1 : toLocaleLowerCase
+    Subject --> "1" R0 : split
+    Subject --> "1" R1 : toLocaleLowerCase
 ```
 
 **Figura:** `DIA-VUE-TS-SHARED-115-3`. Parte 3/5.
@@ -3523,8 +3513,8 @@ classDiagram
     class R1["currencyText.return.<br/>normalize.shape13"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : toLocaleUpperCase
-    Subject "1" --> "1" R1 : normalize
+    Subject --> "1" R0 : toLocaleUpperCase
+    Subject --> "1" R1 : normalize
 ```
 
 **Figura:** `DIA-VUE-TS-SHARED-115-4`. Parte 4/5.
@@ -3557,7 +3547,7 @@ classDiagram
     class R1["currencyText.return.<br/>replaceAll.shape15"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : fontsize
+    Subject --> "1" R0 : fontsize
     Subject ..> R1 : replaceAll
 ```
 

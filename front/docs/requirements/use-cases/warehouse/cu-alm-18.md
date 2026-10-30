@@ -5,7 +5,7 @@
 | Identificador | `CU-ALM-18` |
 | Nombre | Crear consumible. |
 | Actor | Personal de almacén o Administrador del sistema. |
-| Relaciones entre casos | Extiende `CU-ENT-08` en el punto de selección de consumible (paso 3, A5 de la compra) cuando se elige **Registrar consumible**; devuelve la oferta con existencia cero y sin costo máximo y reanuda el detalle en el paso 4. Extiende también `CU-ENT-09` durante la selección de artículo de un detalle nuevo (paso 3, A3), con proveedor fijado; retorna al paso 3 para completar el renglón, sin editar detalles persistidos. |
+| Relaciones entre casos | Extiende `CU-ENT-08` en el punto de selección de consumible (paso 3, A5 de la compra) cuando se elige **Registrar consumible**; devuelve la oferta con existencia cero y sin costo máximo y reanuda el detalle en el paso 4. Extiende también `CU-ENT-09` durante la selección de artículo de un detalle nuevo (paso 3, A3), con proveedor fijado; retorna al paso 3 para completar el detalle, sin editar detalles persistidos. |
 | Puntos de extensión | Selección de proveedor durante el paso 3, si falta el registro y el actor tiene permiso de alta; `CU-CAT-02` registra el proveedor y devuelve la selección sin cerrar la captura. |
 | Disparador | Selecciona **Nuevo consumible** desde `CU-ALM-17` o **Registrar consumible** desde el selector de `CU-ENT-08` o de un detalle nuevo de `CU-ENT-09`. |
 | Precondiciones | 1. El actor inició sesión.<br>2. El actor tiene autorización para mantener el catálogo de consumibles.<br>3. Existen proveedor, presentación y unidad disponibles. |

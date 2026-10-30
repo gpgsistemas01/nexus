@@ -1,9 +1,9 @@
 # 4.6 Persistencia e integridad de información
 
-| ID | Requisito y forma de comprobación | Estado |
+| ID | Requisito | Estado |
 | --- | --- | --- |
-| RD-001 | Las entidades persistentes deben usar UUID como identificador técnico cuando así lo define el modelo común. | Implementado |
-| RD-002 | Cantidades, existencias, dimensiones, costos e importes deben persistirse con `Decimal(18,6)`. | Implementado |
+| RD-001 | Las entidades con identificador individual deben utilizar UUID. Las asociaciones y recibos con clave compuesta deben conservar la combinación de identificadores definida en el esquema de datos. | Implementado |
+| RD-002 | Cantidades, existencias, dimensiones, costos e importes deben persistirse con `Decimal(18,6)`. Los pesos de cono, total, neto unitario y total de referencia de Rollo deben usar `Decimal(5,2)`. | Implementado |
 | RD-003 | Recepciones, salidas y movimientos deben conservar mediante claves foráneas sus relaciones de encabezado y detalle. | Implementado |
 | RD-004 | Correcciones, cancelaciones, devoluciones y ajustes deben representarse con registros relacionados, sin sobrescribir el hecho histórico. | Implementado |
 | RD-005 | Los modelos que declaran auditoría temporal deben conservar `createdAt` y `updatedAt`. | Implementado |
@@ -12,7 +12,7 @@
 | RD-008 | Las referencias documentales y las identidades de catálogo marcadas como únicas no deben duplicarse. | Implementado |
 | RD-009 | Las fechas del negocio deben conservarse separadas de las marcas técnicas de creación y actualización. | Implementado |
 | RD-010 | Los documentos y detalles deben persistir estados explícitos del proceso en lugar de inferirlos desde marcas temporales. | Implementado |
-| RD-011 | Las escrituras simultáneas de una salida o compra deben conservar cantidades, estados y totales coherentes. Surtido y devolución consultan el pendiente después de bloquear el documento; los movimientos guardan los saldos reales de cada actualización y los ajustes absolutos calculan su diferencia desde el saldo protegido. Un fallo revierte documento, detalles, existencias, movimientos y costos que participan en la operación. | Implementado |
+| RD-011 | Las escrituras simultáneas de una salida o compra deben conservar cantidades, estados, totales y saldos trazables. Una operación rechazada no debe dejar cambios parciales en documento, detalles, existencias, movimientos o costos. | Implementado |
 
 ## Comprobación de datos
 
@@ -33,3 +33,11 @@ y mediante pruebas de persistencia aisladas.
   `warehouseConcurrencyControllerDbTest.js`. El bloqueo se aplica al guardar; no reserva
   el documento mientras el usuario mantiene abierto un formulario ni identifica
   reenvíos de entradas independientes como una misma operación.
+
+## Criterios de fechas del negocio
+
+- **CA-RD-009-1:** Compras y Salidas deben interpretar la fecha y hora capturadas en
+  `America/Mexico_City`, convertirlas a UTC para el intercambio y volver a mostrarlas
+  en esa zona al abrir el documento.
+- **CA-RD-009-2:** una fecha inexistente, como 30 de febrero, debe rechazarse antes
+  del envío; no debe normalizarse silenciosamente a otro día.

@@ -1,70 +1,68 @@
-# 2. Especificación del cliente Vue
+# Especificación del cliente Vue
 
 ## Propósito, estado y alcance
 
-Esta especificación describe las obligaciones observables de la aplicación Vue implementada en `front/src`. Sirve para desarrollo, revisión y pruebas del cliente. Está En revisión: describe la realización actual sin acreditar aceptación funcional ni capacidad de carga. Los comportamientos del cliente se explican en esta especificación y en las fichas locales.
+Esta especificación define los resultados que debe ofrecer la aplicación Vue.
+Complementa los requisitos del producto con obligaciones de navegación, captura,
+datos e interacción. El estado documental se consulta en el [índice](../../index.md).
 
 Los IDs locales distinguen esta especificación de los requisitos del producto. El cliente conserva la versión leída y construye las solicitudes según el contrato de cada operación. La API autoriza, valida definitivamente y confirma las escrituras.
 
-## Actores, contexto y límites
-
-| Actor o colaborador | Objetivo y límite |
-| --- | --- |
-| Visitante sin sesión | Capturar credenciales y recibir un resultado de acceso. No obtiene acceso por escribir una URL protegida. |
-| Usuario autenticado | Consultar módulos permitidos, capturar operaciones y descargar reportes autorizados. Sus capacidades proceden de permisos recibidos, no de un rol fijo inventado por el cliente. |
-| Usuario con permiso de escritura | Crear/editar registros o documentos y realizar ajustes, surtidos o devoluciones únicamente según recurso, estado y permiso; no equivale al rol operativo Operador. |
-| Administrador autorizado | Mantener Catálogos, Personas, Usuarios, Clientes y Proveedores conforme a la autorización específica de cada módulo. |
-| API del sistema | Proporcionar identidad, permisos, páginas de datos y resultados; resolver persistencia, stock, códigos y conflictos. Es externa al proceso Vue. |
-
-El menú contiene Almacén, Compras, Salidas, Movimientos, Identidad, Directorio comercial y seis Catálogos. La navegación se limita a las capacidades implementadas en el cliente. El cliente no conecta directamente con PostgreSQL ni expone Prisma.
+Los [actores y responsabilidades](03-actors-and-system-responsibilities.md) definen
+quién realiza cada operación y qué comprueba la API. El [catálogo de pantallas](../../architecture/views/scenarios/navigation-and-screens.md)
+identifica sus entradas de navegación.
 
 ## Requisitos funcionales
 
-| ID | Obligación | Criterio observable y propietario |
+| ID | Obligación | Condición y resultado esperado |
 | --- | --- | --- |
-| RF-VUE-001 | Permitir acceso con usuario y contraseña sin transformar el contenido de la contraseña. | El login conserva errores corregibles; confirmar acceso abre un destino protegido permitido. `auth`, Router y Axios. |
-| RF-VUE-002 | Recuperar sesión con refresh cuando el servidor lo permita. | Un 401 de operación protegida puede renovar y repetir la solicitud mediante la coordinación compartida. Rechazo de sesión vuelve a login; fallo de conexión ofrece reintento y conserva destino. Sesión y `apiClient`. |
-| RF-VUE-003 | Mostrar y proteger navegación por permisos. | Se comprueban menú y acceso directo; 403 abre acceso denegado. Escritorio conserva barra compacta, expansión y cierre; móvil usa drawer temporal. `app`. |
-| RF-VUE-004 | Consultar listados con filtros, orden permitido y paginación remota. | Una búsqueda nueva vuelve a la primera página. Limpiar restablece los filtros; carga, vacío, fallo y reintento son visibles. Páginas y `usePagedList`. |
-| RF-VUE-005 | Mantener Catálogos, Personas, Usuarios, Clientes y Proveedores con sus capturas propias. | Sólo se envían campos del recurso y modo. Editar conserva la versión de apertura; conflicto exige recargar. `catalogs`, `identity`, `directory`. |
-| RF-VUE-006 | Mantener Materiales y Consumibles con información, medidas y modos de inventario. | Alta, edición, ajuste y baja presentan campos propios. Piezas limpia medidas; Consumibles omite dimensiones. Identidad de artículo y relación con proveedor se conservan separadas. `warehouse`. |
-| RF-VUE-007 | Capturar Mermas con proveedor, plantilla y pesos/referencias aplicables. | Cambiar proveedor limpia plantilla y datos heredados. Edición, ajuste y agregar stock mantienen contratos distintos. Los cálculos son vistas previas. `warehouse`. |
-| RF-VUE-008 | Recuperar altas/entradas de merma con resultado incierto. | Se conserva `operationId` y payload por usuario/operación. Reintentar repite esa captura. Un duplicado definitivo puede abrir Agregar stock tras confirmar; abrir no escribe. Recuperación de inventario. |
-| RF-VUE-009 | Registrar y mantener Compras de Materiales o Consumibles. | Encabezado, detalles nuevos, consulta, corrección y cancelación siguen su modo. Observaciones del encabezado continúan editables. Corregir/cancelar exige confirmación. `purchases`. |
-| RF-VUE-010 | Solicitar, editar, surtir y devolver Salidas según el estado leído. | Se consulta por ID antes de resolver modo. Surtido protege detalles persistidos/cancelados; devolución no permite superar el saldo leído. La API vuelve a comprobarlo. `issues`. |
-| RF-VUE-011 | Consultar Movimientos sin ofrecer escrituras de historial. | Filtros y reportes conservan el recurso; no aparece una acción genérica de editar/eliminar. `movements`. |
-| RF-VUE-012 | Registrar entidades desde los selectores autorizados y volver al origen. | Proveedor desde Materiales/Consumibles y Compras; artículo desde Compras; cliente desde Salidas. Precarga texto y selecciona sólo el registro confirmado. Workspaces y `RemoteSelect`. |
-| RF-VUE-013 | Exportar reportes con el alcance elegido. | Usa filtros aplicados o mes cuando el módulo lo permite; omite paginación y conserva recuperación ante error. Una respuesta inválida no se anuncia como Excel válido. Servicios de reporte. |
-| RF-VUE-014 | Cerrar sesión mediante el servidor y volver al login. | Confirmado el cierre, el cliente limpia su identidad y deja de presentar módulos protegidos. Cookies y revocación siguen el contrato del servidor. Layout y sesión. |
+| RF-VUE-001 | El cliente debe permitir iniciar sesión con usuario y contraseña. | Debe conservar el contenido de la contraseña, mostrar los errores corregibles y abrir un destino protegido permitido tras confirmar el acceso. |
+| RF-VUE-002 | El cliente debe recuperar el acceso mediante renovación cuando la sesión lo permita. | Ante un 401 de una operación protegida, debe coordinar la renovación y repetir la solicitud como máximo una vez. Un rechazo definitivo vuelve al login; un fallo de conexión permite reintentar y conserva el destino. |
+| RF-VUE-003 | El cliente debe limitar la navegación a las páginas permitidas para la cuenta. | Debe comprobar el menú y el acceso por URL. Un 403 debe mostrar acceso denegado; el menú debe cumplir el [estándar de interfaz](../../architecture/interface-standards.md#teclado-y-distribución). |
+| RF-VUE-004 | El cliente debe permitir consultar listados con filtros, orden admitido y paginación remota. | Una búsqueda nueva debe comenzar en la primera página. Limpiar debe restablecer los filtros; la interfaz debe distinguir carga, resultados vacíos y fallo con reintento. |
+| RF-VUE-005 | El cliente debe presentar los formularios autorizados de Catálogos, Personas, Usuarios, Clientes y Proveedores. | Las altas y ediciones deben enviar sólo los campos del recurso y modo. Usuarios debe distinguir la edición de datos del cambio de contraseña. Las versiones de edición se rigen por `RD-VUE-002`. |
+| RF-VUE-006 | El cliente debe presentar las operaciones autorizadas de Materiales y Consumibles con sus campos propios. | Crear, editar, ajustar y retirar deben seguir los [modos de inventario](06-operation-modes-and-effects.md). Consumibles debe omitir dimensiones; Materiales debe habilitarlas según su unidad. |
+| RF-VUE-007 | El cliente debe permitir registrar mermas con proveedor, material de referencia y los datos de su presentación. | Cambiar de proveedor debe limpiar el material de referencia y sus datos heredados. Editar, ajustar y agregar stock deben mantener capturas distintas. Los cálculos deben usarse como estimaciones hasta confirmar la operación. |
+| RF-VUE-008 | El cliente debe permitir recuperar altas o entradas adicionales de merma cuyo resultado sea incierto. | El reintento debe conservar `operationId` y el cuerpo de la solicitud original, separados por cuenta y operación. La alternativa ante duplicado definitivo se rige por `RF-MER-006`; abrir Agregar stock no debe registrar una entrada. |
+| RF-VUE-009 | El cliente debe presentar las operaciones de Compras de Materiales o Consumibles conforme al modo elegido. | Debe conservar los campos y bloqueos de los [modos de compra](06-operation-modes-and-effects.md). Las observaciones del encabezado deben permanecer editables en edición; corregir o cancelar debe requerir confirmación. |
+| RF-VUE-010 | El cliente debe presentar las operaciones autorizadas de Salidas según el documento leído. | Debe consultar el documento antes de resolver el modo. Surtir debe actuar sobre los pendientes sin reescribir cantidades ya surtidas o devueltas. Devolver debe limitar la captura al saldo leído; la API debe comprobar el saldo vigente. |
+| RF-VUE-011 | El cliente debe permitir consultar Movimientos sin ofrecer escrituras de historial. | Los filtros y reportes deben conservar el contexto de Materiales, Consumibles o Mermas. No deben ofrecerse acciones de editar o eliminar movimientos. |
+| RF-VUE-012 | El cliente debe permitir registrar opciones desde los selectores autorizados y volver al formulario de origen. | Debe admitir proveedor desde Materiales, Consumibles o Compras; artículo desde Compras; y cliente desde Salidas. Debe precargar el texto y seleccionar sólo el registro confirmado, conservando la captura principal. |
+| RF-VUE-013 | El cliente debe permitir exportar reportes con el alcance elegido. | Debe enviar los filtros admitidos por el reporte o el mes cuando esa opción exista, omitiendo paginación. Un fallo debe permitir reintentar; una respuesta inválida no debe anunciarse como Excel válido. |
+| RF-VUE-014 | El cliente debe permitir cerrar la sesión mediante el servidor y volver al login. | Tras confirmar el cierre, debe dejar de presentar los módulos protegidos. Las cookies y la revocación deben seguir el contrato del servidor. |
+
+`RF-VUE-005` a `RF-VUE-010` describen la interacción por familia. Las operaciones
+independientes conservan sus requisitos específicos en el [catálogo del producto](catalog/index.md)
+y sus fichas `CU-*`; no se aceptan todas las operaciones de una familia por comprobar
+un único formulario.
 
 ## Requisitos de datos
 
 | ID | Condición del cliente |
 | --- | --- |
-| RD-VUE-001 | IDs recibidos son opacos. Texto escrito en un selector no se convierte en un UUID inventado. |
-| RD-VUE-002 | `expectedVersion` procede de la lectura que abrió la edición/ajuste. Cuando corresponde se conserva `expectedMaterialVersion`. Crear no fabrica una versión. |
-| RD-VUE-003 | Números de captura pueden permanecer como texto mientras se editan; el mapper construye el payload por modo sin convertir una ausencia en cero arbitrariamente. |
-| RD-VUE-004 | Contraseñas no se recortan ni se guardan en Storage. Recordar usuario conserva sólo el nombre. El navegador y el servidor administran cookies HttpOnly. |
-| RD-VUE-005 | Totales, pesos y conversiones mostrados son vistas previas; no sustituyen permisos, saldos o resultados persistidos del servidor. |
-| RD-VUE-006 | Una opción conserva etiqueta/datos al paginar. Cambiar/limpiar su ID descarta la selección anterior; opciones remotas pueden actualizar sus datos. |
+| RD-VUE-001 | El cliente debe conservar los identificadores recibidos de la API. Escribir una etiqueta en un selector no debe crear ni deducir el ID del registro. |
+| RD-VUE-002 | En Catálogos, Directorio, Personas, Usuarios e inventario, el cliente debe enviar la versión de apertura cuando el contrato de edición o ajuste la exige. Al editar Materiales o Consumibles, debe conservar además `expectedMaterialVersion` de la identidad compartida. No debe agregar versiones a las altas, compras, salidas ni entradas adicionales de merma cuyos contratos no las solicitan. |
+| RD-VUE-003 | El cliente debe distinguir un número ausente del valor cero al construir la solicitud. Durante la captura puede conservar números como texto; la conversión debe respetar los campos y tipos del modo elegido. |
+| RD-VUE-004 | El cliente debe conservar las contraseñas sin recortarlas y no debe guardarlas en el almacenamiento del navegador. Recordar usuario debe conservar sólo el nombre; las cookies HttpOnly deben ser administradas por el navegador y el servidor. |
+| RD-VUE-005 | El cliente debe tratar totales, pesos y conversiones calculados durante la captura como vistas previas. Debe obtener de la API los saldos y resultados confirmados de la operación. |
+| RD-VUE-006 | El cliente debe conservar la etiqueta y los datos de la opción seleccionada al paginar. Cambiar o limpiar el ID debe descartar la opción anterior; una respuesta remota del mismo ID debe poder actualizar sus datos. |
+| RD-VUE-007 | El cliente debe aceptar una respuesta sólo si cumple el contrato de la operación solicitada. Debe rechazar páginas, documentos, confirmaciones y archivos incompletos o incompatibles antes de usarlos o anunciar éxito. |
 
 ## Interacción, calidad y restricciones
 
 | ID | Criterio verificable |
 | --- | --- |
-| RN-VUE-001 | Abrir modal, cargar datos o mover foco sin capturar no publica errores. Editar y salir valida el campo; enviar valida toda la captura. |
-| RN-VUE-002 | Un envío pendiente bloquea duplicaciones desde sus controles. Un fallo de red no inicia un bucle de escrituras; merma conserva su recuperación específica. |
-| RN-VUE-003 | Consultas anteriores se cancelan o invalidan al cambiar contexto y desmontar. Una respuesta tardía no sustituye datos vigentes ni actualiza otra pantalla. |
-| RN-VUE-004 | Texto recibido se presenta como texto; avisos usan `titleText`/`text`. Foco, teclado y disposición móvil se apoyan en componentes Vue/Vuetify. |
-| RN-VUE-005 | Tablas/selectores consultan páginas; no descargan el catálogo completo para simular paginación remota. IDs repetidos no duplican opciones; página vacía termina la carga. |
-| RN-VUE-006 | Presentación recibe props/emite eventos; servicios/mappers no dependen del renderizado. Composables mantienen estado por instancia y liberan recursos. |
-| RN-VUE-007 | Los listados con actualización automática sólo renuevan una consulta vencida mientras la página está visible y el consumidor lo permite. La actualización conserva los filtros y se pospone durante formularios u operaciones que protegen la captura; no se solapan peticiones ni se reemplaza una edición en curso. |
-| RC-VUE-001 | La SPA usa Vue 3, TypeScript, Composition API y Vue Router con herramientas compatibles de los manifiestos. |
-| RC-VUE-002 | Los alias públicos se compilan desde el repositorio completo; la imagen final sirve archivos estáticos y no ejecuta el backend. |
-| RC-VUE-003 | API y cierre de sesión deben compartir un origen coherente mediante proxy. El fallback SPA por sí solo no configura la sesión. |
-| RC-VUE-004 | Fuentes, scripts y artefactos documentales permanecen fuera de `public`, `dist` y la imagen de producción. |
-
-No se declara latencia máxima, usuarios concurrentes, certificación de accesibilidad o porcentaje de cobertura: requieren obligaciones y mediciones específicas.
+| RN-VUE-001 | El cliente no debe mostrar errores por abrir o precargar un formulario intacto. Debe validar un campo al perder el foco si fue modificado o ya se intentó enviar; al enviar, debe validar toda la captura. |
+| RN-VUE-002 | El cliente debe bloquear el envío repetido desde sus controles mientras una escritura esté pendiente. Un fallo de red no debe iniciar reenvíos automáticos; la recuperación de merma debe seguir `RF-VUE-008`. |
+| RN-VUE-003 | El cliente debe cancelar o invalidar las consultas sustituidas al cambiar el contexto o desmontar la pantalla. Una respuesta anterior no debe reemplazar los datos vigentes ni actualizar otra pantalla. |
+| RN-VUE-004 | El cliente debe mostrar los datos recibidos como texto literal, sin interpretar su contenido como HTML, tanto en controles como en avisos. |
+| RN-VUE-005 | Las tablas y selectores remotos deben consultar páginas de datos. Los selectores no deben duplicar opciones con el mismo ID y deben terminar la carga adicional al recibir una página vacía, aunque el conteo anuncie más resultados. |
+| RN-VUE-006 | La presentación debe recibir datos y emitir intenciones sin consumir servicios HTTP. Los servicios y mappers no deben depender del renderizado. Cada captura o listado debe conservar su estado por instancia y liberar sus recursos al terminar. |
+| RN-VUE-007 | Los listados con recarga automática deben actualizarse sólo si la página está visible, no hay una carga incompatible ni una captura protegida y ha transcurrido el intervalo configurado desde el último intento de lectura. La recarga debe conservar los filtros y evitar solicitudes solapadas. |
+| RC-VUE-001 | El cliente debe construirse con Vue 3, TypeScript, Composition API y Vue Router, usando versiones compatibles con los manifiestos y el lockfile. |
+| RC-VUE-002 | La compilación debe resolver los alias públicos desde el repositorio completo y producir archivos estáticos. La imagen final del frontend no debe ejecutar el backend. |
+| RC-VUE-003 | El alojamiento debe servir la API y el cierre de sesión mediante el proxy del mismo origen usado por el cliente. El fallback SPA debe resolver las páginas sin sustituir las respuestas de la API. |
+| RC-VUE-004 | La entrega de producción debe excluir fuentes, herramientas y artefactos documentales de `public`, `dist` y la imagen del frontend. |
 
 Las [interfaces y condiciones de operación](07-interfaces-and-operating-conditions.md)
 precisan las dependencias de estas obligaciones. Los
@@ -75,9 +73,9 @@ desarrollan sesión, alcance por área, altas contextuales, versiones y actualiz
 
 El [catálogo de casos de uso](../use-cases/index.md) describe actor, disparador,
 precondiciones, flujo, alternativas, excepciones y postcondiciones por objetivo.
-La [trazabilidad de las 31 obligaciones del cliente](08-verification-and-acceptance.md#trazabilidad-de-las-obligaciones-del-cliente)
+La [trazabilidad de las obligaciones del cliente](08-verification-and-acceptance.md#trazabilidad-de-las-obligaciones-del-cliente)
 identifica su forma de comprobación; la [matriz por caso](../../testing/04-use-case-coverage.md)
 relaciona los objetivos de negocio con su evidencia y brechas.
-Los [módulos](../../architecture/views/development/frontend-technical-documentation/index.md)
-explican su realización. El [plan](../../testing/01-test-plan.md) separa diseño,
+Las [vistas por capacidad](../../architecture/views/index.md#recorrido-por-capacidad)
+localizan su realización. El [plan](../../testing/01-test-plan.md) separa diseño,
 especificación de caso y resultado de ejecución.

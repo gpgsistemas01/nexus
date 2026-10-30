@@ -1,29 +1,28 @@
 # Vista lógica
 
-## Contenido
+Esta vista describe colaboradores del cliente, estructuras de datos en memoria y
+estados de interacción. Cada familia reúne su índice, figuras, fuentes y lectura.
 
-1. [Interfaz, componentes y transporte](ui-and-http.md): composición visual y fronteras.
-2. [Estado y ciclo de vida](state-and-lifecycle.md): propiedad, aislamiento y transición.
-3. [Entradas y salida segura](input-security.md): normalización, validación y texto.
-4. [Componentes por dominio](components/index.md).
-5. [Clases, interfaces y tipos](class-and-type-models/index.md): sesión/login, transporte,
-   selectores, catálogos/directorio, identidad, inventario, movimientos, compras y salidas.
-6. [Estados de interacción y captura](states/index.md): modos y recuperación de compra,
-   salida y merma pendiente.
+| Familia | Pregunta | Contenido |
+| --- | --- | --- |
+| [Componentes](components/index.md) | ¿Quién depende de quién y qué responsabilidad conserva? | Cortes por dominio y composición visual compartida. |
+| [Clases, interfaces y tipos](class-and-type-models/index.md) | ¿Cómo se estructuran y relacionan los datos? | Modelos curados por responsabilidad, variantes y multiplicidades. |
+| [Referencia TypeScript](type-reference/index.md) | ¿Cuál es la firma completa de cada contrato propio? | Inventario generado de TS/SFC, miembros y relaciones locales. |
+| [Estado y ciclo de vida](states/index.md) | ¿Qué evento cambia el modo y bajo qué condición? | Propietarios, guardado, lectura, acciones documentales y captura recuperable. |
 
-## Relaciones entre niveles
+## Límites y documentos relacionados
 
-El [dominio conceptual](../../../requirements/domain-model/index.md) representa conceptos
-y reglas del negocio. Los modelos de tipos de esta vista representan sus proyecciones
-en memoria; las asociaciones de `details` son arrays, no relaciones SQL. Los componentes
-explican propietarios de estado y dependencias; los estados explican transiciones.
-Las [secuencias](../processes/index.md) completan el orden de llamadas.
+El [dominio conceptual](../../../requirements/domain-model/index.md) define conceptos
+del negocio. Los modelos de esta vista son sus proyecciones en el navegador: un array
+`details` no es una relación SQL y una interfaz no implica una clase instanciada.
+Las [secuencias](../processes/index.md) explican el orden de las colaboraciones.
 
-Una clase de error puede ser una clase real; una interfaz de fila no se instancia
-como clase y un composable no se convierte en servicio orientado a objetos por usar
-un diagrama UML. Las extensiones, dependencias y variantes se contrastan con TypeScript.
+| Preocupación transversal | Fuente propietaria |
+| --- | --- |
+| Datos intercambiados, errores y sesión HTTP | [Contratos del cliente](../../contracts/index.md). |
+| Reglas de estilo, foco y accesibilidad | [Estándar de interfaz](../../interface-standards.md). |
+| Normalización, reglas públicas y salida segura | [Integración de reglas públicas](../development/input-handling.md) y [estándar de seguridad](../../security-standards.md). |
+| Organización del código y mecanismos reutilizados | [Desarrollo y patrones](../development/index.md). |
 
-El [corte de componentes](../overview.md#vista-de-componentes-navegación-y-acceso-a-catálogos)
-relaciona navegación, sesión, dominio y HTTP. Las [interfaces](../../contracts/index.md)
-concretan qué se intercambia; los [patrones](../development/design-and-construction-patterns/index.md)
-describen mecanismos reutilizados.
+La [guía visual](../diagram-reading.md) concentra la notación. Cada figura conserva
+sus fuentes y condiciones particulares; la estructura de carpetas no altera los IDs.

@@ -1,11 +1,11 @@
 # 1. Estructura exportable
 
-La estructura actual es válida para exportar: cada paquete comienza en el `index.md` de
-su propia familia, las fuentes curadas permanecen junto a esa entrada y `build/docs/` recibe los
-resultados ignorados por Git. El paquete de
-requisitos comienza en `requirements/index.md`, no en una carpeta genérica de
-publicaciones. Los paquetes no dependen de archivos binarios versionados. Antes de
-publicar, todavía se debe revisar lo siguiente:
+Cada paquete comienza con su título y tabla de datos generales. Las colecciones
+usan el `index.md` de su familia; el contrato API comienza directamente en
+`architecture/openapi/api-contract.md` y se publica como documento independiente.
+Las fuentes curadas permanecen en su sección y `build/docs/` recibe los resultados
+ignorados por Git. Los paquetes no dependen de archivos binarios versionados.
+Antes de publicar, revise lo siguiente:
 
 - un enlace o una imagen ausente hace fallar `--check`;
 - Mermaid permanece como fuente Markdown; durante la exportación, el script entrega a Pandoc las

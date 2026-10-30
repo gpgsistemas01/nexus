@@ -1,25 +1,24 @@
-# Componentes por dominio
+# Componentes por responsabilidad
 
-Cada corte muestra colaboradores reales y dirección de dependencia. Las flechas no son mensajes temporales; las secuencias pertenecen a Procesos.
+Los mapas muestran archivos y exports propios de Nexus y sus dependencias directas.
+La [leyenda de componentes](../../diagram-reading.md#componentes-y-dependencias)
+define cajas, flechas y límites de esta notación de flujo Mermaid.
 
-La [guía visual](../../diagram-reading.md#mapas-y-actividades) explica cajas, agrupaciones
-y líneas; cada corte concreta qué representa su dependencia.
+| Capítulo | Cortes y figuras |
+| --- | --- |
+| [Acceso y sesión](01-access.md) | Arranque, login y sesión: `DIA-VUE-COMP-001`. |
+| [Inventario y merma](02-inventory.md) | Listado/editor: `002`; selección y recuperación: `010`. |
+| [Catálogos](03-catalogs.md) | Consulta, definición y guardado: `003`. |
+| [Identidad y directorio](04-identity-directory.md) | Personas/cuentas: `004`; directorio independiente y contextual: `008`. |
+| [Historiales y reportes](05-movements.md) | Filtros y paginación: `005`; coordinación y transporte del reporte: `013`. |
+| [Compras](06-purchases.md) | Composición/apertura: `006`; captura y corrección: `011`; alta de detalle: `014`. |
+| [Salidas](07-issues.md) | Documento/devolución: `007`; área de encabezado/filtros: `012`. |
+| [Composición visual compartida](08-shared-ui.md) | Marcos y selector: `009`; fuentes de tema y estilos. |
 
-Una flecha continua va del consumidor al colaborador utilizado. Los grupos nombran
-su responsabilidad y seleccionan imports reales; una relación con un grupo no enumera
-todos sus archivos. Los mappers devuelven datos al consumidor y no importan servicios
-ni presentación. Los composables genéricos reciben operaciones del dominio por callback;
-la [vista de procesos](../../processes/00-reading-and-roles.md) desarrolla su ejecución.
+Los números abreviados conservan el prefijo `DIA-VUE-COMP-`. Separar cortes de
+un dominio permite seguir una responsabilidad sin agrupar archivos distintos dentro
+de una misma caja ni repetir todo el inventario de imports.
 
-- [Acceso y sesión](01-access.md).
-- [Inventario y merma](02-inventory.md).
-- [Catálogos administrables](03-catalogs.md).
-- [Identidad y directorio](04-identity-directory.md).
-- [Historiales y reportes](05-movements.md).
-- [Compras y correcciones](06-purchases.md).
-- [Salidas, surtido y devolución](07-issues.md).
-
-Los cortes representan elementos del cliente. Los
-[procesos](../../processes/index.md) detallan orden, rechazo y recuperación;
-la [referencia generada](../../development/code-reference.md) localiza los contratos
-de props y eventos.
+Las [secuencias](../../processes/index.md) desarrollan orden, eventos y callbacks.
+Los [contratos](../../../contracts/form-and-event-contracts.md) definen intercambios;
+la [referencia generada](../../development/code-reference.md), todas las fuentes e imports.

@@ -86,7 +86,7 @@ de confirmar; no utilice el ajuste para registrar una entrega ordinaria.
 | --- | --- |
 | Folio | Referencia visible para localizar un documento y pedir ayuda. No es el número de factura ni el número de proyecto. |
 | Encabezado | Datos generales de un documento, como fecha, proveedor, cliente u observaciones. Se comparten entre sus detalles. |
-| Detalle | Renglón del documento que identifica un artículo y una cantidad. Compruebe cada renglón antes de guardar. |
+| Detalle | Elemento de una compra o salida que identifica un artículo y una cantidad. Compruebe cada detalle antes de guardar. |
 | Observaciones | Explicación adicional de la operación. Las observaciones de una compra, un ajuste o una devolución corresponden a registros distintos. |
 <!-- manual:end -->
 

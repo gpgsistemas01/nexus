@@ -12,7 +12,7 @@
    selectores para Almacén y mantenimiento independiente para Sistemas. Los asesores
    se seleccionan entre personas registradas.
 6. Recepciones de compra de materiales o consumibles con detalle, importes,
-   correcciones, cancelación de renglones y movimientos de entrada.
+   correcciones, cancelación de detalles y movimientos de entrada.
 7. Salidas separadas de material, consumible y merma, con surtido de detalles completos,
    cumplimiento parcial del documento cuando quedan detalles pendientes y devoluciones
    una vez surtida la salida completa.

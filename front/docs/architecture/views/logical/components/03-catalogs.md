@@ -1,22 +1,27 @@
 # Catálogos administrables: componentes
 
-**Identificador:** `DIA-VUE-COMP-003`. **Pregunta:** ¿Qué colaboradores tienen responsabilidad propia y qué contratos los conectan?
-
-**Fuente:** CatalogPage, useCatalogList, CatalogEditorPage, useCatalogEditor, catalogDefinition y catalogService. **Notación y alcance:** Las flechas indican dependencia o consumo; no orden temporal ni herencia.
-
-**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+**Identificador:** `DIA-VUE-COMP-003`. **Pregunta:** ¿qué dependencias separan consulta, captura y guardado de catálogos?
+**Fuentes:** [CatalogPage.vue](../../../../../src/modules/catalogs/pages/CatalogPage.vue), [useCatalogList.ts](../../../../../src/modules/catalogs/composables/useCatalogList.ts), [CatalogTable.vue](../../../../../src/modules/catalogs/components/CatalogTable.vue), [catalogService.ts](../../../../../src/modules/catalogs/services/catalogService.ts).
+**Notación:** [mapa de dependencias](../../diagram-reading.md#componentes-y-dependencias).
 
 ```mermaid
 flowchart TB
-    page["CatalogPage"] --> list["useCatalogList y usePagedList"]
-    page --> editorPage["CatalogEditorPage"]
-    editorPage --> editor["useCatalogEditor"]
-    editorPage --> form["CatalogForm"]
-    page --> table["CatalogTable y ServerTable"]
-    editor --> config["catalogDefinition · campos y límites"]
-    editor --> interaction["VeeValidate y useFormInteraction"]
-    editor --> save["useRecordSave · pendiente y conflicto"]
-    list --> service["catalogService"]
+    page["CatalogPage"]
+    list["useCatalogList"]
+    editorPage["CatalogEditorPage"]
+    editor["useCatalogEditor"]
+    form["CatalogForm"]
+    table["CatalogTable"]
+    service["catalogService"]
+    page --> list
+    page --> editorPage
+    page --> table
+    editorPage --> editor
+    editorPage --> form
     editor --> service
-    service --> http["apiClient y confirmMutation"]
+    list --> service
 ```
+
+VeeValidate se integra en el editor y Vuetify en los componentes visuales. La definición
+`catalog.ts` es código propio de configuración. La [secuencia de guardado](../../processes/03-catalogs-and-directory/01-catalog-record-save.md)
+muestra cómo el callback del editor permite reutilizar `useRecordSave` sin imports al dominio.

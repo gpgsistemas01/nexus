@@ -2,7 +2,10 @@
 
 ## Referencias adoptadas
 
-Se revisaron las fichas públicas oficiales de alcance de ISO/IEEE y la documentación de Vue el 2026-10-26. La aplicación a Nexus que sigue es una decisión selectiva del proyecto. No representa una auditoría completa del texto normativo ni una declaración de conformidad integral.
+Estas referencias orientan requisitos, arquitectura, pruebas y manuales. La tabla
+indica qué contenido adopta Nexus. La revisión de las fichas públicas de alcance
+se registró el 2026-10-26; no constituye una auditoría del texto normativo completo
+ni una declaración de conformidad.
 
 ## Alcance de las referencias
 

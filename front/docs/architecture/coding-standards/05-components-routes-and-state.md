@@ -46,7 +46,7 @@ explícitamente por aplicación.
 
 Los modos fijos por instancia se tipan y el contenedor recrea el editor al cambiarlos.
 La sesión se crea una vez en `main.ts` y se proporciona con una InjectionKey tipada.
-No se agrega Pinia para compartir cada formulario: la [decisión de estado](../views/logical/state-and-lifecycle.md)
+No se agrega Pinia para compartir cada formulario: la [decisión de estado](../views/logical/states/04-state-ownership-and-save.md)
 identifica propietarios y condiciones para reconsiderarla.
 
 ## Rutas y permisos de interfaz

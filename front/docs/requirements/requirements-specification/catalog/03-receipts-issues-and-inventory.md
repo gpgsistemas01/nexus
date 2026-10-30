@@ -22,41 +22,42 @@ bloquear el campo. La edición conserva el área registrada y limpiar filtros ma
 la única área obligatoria.
 
 En una edición, tanto el área original como la nueva deben estar autorizadas. El
-servidor rechaza un alta o traslado a un área ajena con `403 FORBIDDEN`; una consulta
-o edición por ID fuera del alcance responde `404` sin exponer el documento. No se
-modifican documentos, detalles, existencias ni movimientos ante esos rechazos.
+sistema debe rechazar altas o cambios a un área ajena y no debe exponer un documento
+fuera del alcance de la cuenta. Estos rechazos no deben modificar documentos,
+detalles, existencias ni movimientos. Los estados HTTP se precisan en el
+[contrato del cliente](../../../architecture/contracts/client-contracts.md).
 Los permisos de surtido y devolución se verifican por separado y siguen reservados
 a Almacén y administración.
 
-| ID | Requisito y criterio de aceptación | Estado del requisito de producto |
+| ID | Requisito | Estado |
 | --- | --- | --- |
-| RF-REC-001 | Personal de almacén o el Administrador del sistema deben poder consultar entradas, encabezados, detalles y estados sin modificar inventario; cada consulta presenta únicamente compras del contexto elegido, materiales o consumibles. | Implementado |
-| RF-REC-002 | Personal de almacén o el Administrador del sistema deben poder corregir cantidad o costo de un detalle activo conservando actor, motivo, valores anteriores y corregidos y el efecto correspondiente; se aplican los criterios de corrección. | Implementado |
-| RF-REC-003 | El sistema debe impedir que una factura pertenezca a más de una entrada del mismo proveedor e identificar la entrada existente ante un conflicto. | Implementado |
+| RF-REC-001 | Nexus debe permitir al Personal de almacén o al Administrador del sistema consultar entradas, encabezados, detalles y estados sin modificar inventario; cada consulta presenta únicamente compras del contexto elegido, materiales o consumibles. | Implementado |
+| RF-REC-002 | Nexus debe permitir al Personal de almacén o al Administrador del sistema corregir cantidad o costo de un detalle activo conservando actor, motivo, valores anteriores y corregidos y el efecto correspondiente; se aplican los criterios de corrección. | Implementado |
+| RF-REC-003 | Nexus debe rechazar una factura que ya pertenezca a otra entrada del mismo proveedor e identificar la entrada existente, conforme a `RN-018`. | Implementado |
 | RF-REC-004 | Una entrada debe admitir detalles independientes del mismo material cuando tienen costos por presentación diferentes. | Implementado |
-| RF-REC-005 | Personal de almacén o el Administrador del sistema deben poder editar el encabezado admitido de una entrada no cancelada y agregar detalles nuevos, sin cambiar el proveedor ni reescribir detalles persistidos. | Implementado |
-| RF-REC-006 | Cuando una marca distingue físicamente un material, almacén debe registrarla como otra identidad del catálogo en lugar de capturarla en el detalle. | Implementado |
-| RF-REC-007 | Personal de almacén o el Administrador del sistema deben poder registrar una entrada con proveedor y detalles válidos del mismo contexto, incrementando existencias y generando movimientos como una sola operación; el alta contextual se rige por sus criterios. | Implementado |
-| RF-REC-008 | Personal de almacén o el Administrador del sistema deben poder cancelar un detalle activo revirtiendo su efecto de inventario y conservando su historia; un fallo no debe dejar una reversión parcial. | Implementado |
-| RF-REC-009 | Las compras de materiales y consumibles deben tener series anuales independientes y folios únicos: `CMA-AAAA-consecutivo` para materiales y `CCO-AAAA-consecutivo` para consumibles. Una compra no debe consumir el contador del otro contexto ni consumir un consecutivo si falla su registro. Al normalizar folios históricos se deben conservar año, consecutivo, identidad, detalles y efectos de inventario; una colisión debe impedir cambios parciales. | Implementado |
+| RF-REC-005 | Nexus debe permitir al Personal de almacén o al Administrador del sistema editar el encabezado admitido de una entrada no cancelada y agregar detalles nuevos, sin cambiar el proveedor ni reescribir detalles persistidos. | Implementado |
+| RF-REC-006 | Un material que se distinga físicamente por su marca debe registrarse como otra identidad del catálogo; la marca no debe capturarse como dato del detalle de compra. | Implementado |
+| RF-REC-007 | Nexus debe permitir al Personal de almacén o al Administrador del sistema registrar una entrada con proveedor y detalles válidos del mismo contexto, incrementando existencias y generando movimientos como una sola operación; el alta contextual se rige por sus criterios. | Implementado |
+| RF-REC-008 | Nexus debe permitir al Personal de almacén o al Administrador del sistema cancelar un detalle activo revirtiendo su efecto de inventario y conservando su historia; un fallo no debe dejar una reversión parcial. | Implementado |
+| RF-REC-009 | Nexus debe asignar folios anuales únicos con series independientes: `CMA-AAAA-consecutivo` para compras de materiales y `CCO-AAAA-consecutivo` para compras de consumibles. Debe conservar la continuidad y la historia conforme a sus criterios. | Implementado |
 | RF-REC-010 | El reporte generado desde cada consulta de compras debe incluir únicamente el contexto correspondiente y distinguirlo en el nombre del archivo y la hoja; el contexto no puede alterarse mediante filtros enviados por el usuario. | Implementado |
 | RF-REC-011 | Las compras de consumibles deben rechazar detalles o documentos del contexto de materiales, y viceversa, sin cambios parciales; las operaciones de compra se rigen por `RF-REC-001` a `RF-REC-008`. | Implementado |
-| RF-ISS-001 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder consultar salidas de material o consumible, sus detalles y contexto sin modificar existencias; cada consulta se limita a su contexto. | Implementado |
-| RF-ISS-002 | Personal de almacén o el Administrador del sistema deben poder surtir toda la cantidad pendiente de un detalle cuando exista stock suficiente, actualizando documento, existencias y movimiento atómicamente. | Implementado |
-| RF-ISS-003 | Personal de almacén o el Administrador del sistema deben poder devolver una cantidad positiva que no exceda el saldo entregado de un detalle de material o consumible, sólo cuando la salida esté completamente surtida, y conservar el vínculo con documento, detalle y movimiento inverso. | Implementado |
-| RF-ISS-004 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder crear una salida pendiente de material o consumible con encabezado y detalles válidos del mismo contexto, sin descontar existencias. | Implementado |
-| RF-ISS-005 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder actualizar únicamente los campos admitidos del encabezado de una salida cuyo estado permita edición. | Implementado |
-| RF-ISS-006 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder agregar o actualizar detalles todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado |
+| RF-ISS-001 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar salidas de material o consumible, sus detalles y contexto sin modificar existencias; cada consulta se limita a su contexto. | Implementado |
+| RF-ISS-002 | Nexus debe permitir al Personal de almacén o al Administrador del sistema surtir toda la cantidad pendiente de un detalle cuando exista stock suficiente, actualizando documento, existencias y movimiento atómicamente. | Implementado |
+| RF-ISS-003 | Nexus debe permitir al Personal de almacén o al Administrador del sistema devolver una cantidad positiva que no exceda el saldo entregado de un detalle de material o consumible, sólo cuando la salida esté completamente surtida, y conservar el vínculo con documento, detalle y movimiento inverso. | Implementado |
+| RF-ISS-004 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema crear una salida pendiente de material o consumible con encabezado y detalles válidos del mismo contexto, sin descontar existencias. | Implementado |
+| RF-ISS-005 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema actualizar únicamente los campos admitidos del encabezado de una salida cuyo estado permita edición. | Implementado |
+| RF-ISS-006 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema agregar o actualizar detalles todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado |
 | RF-ISS-007 | Las salidas de materiales y consumibles deben tener series anuales independientes y folios únicos: `SMA-AAAA-consecutivo` para materiales y `SCO-AAAA-consecutivo` para consumibles. Crear una salida de un contexto no debe consumir el contador del otro; un fallo al guardar tampoco debe consumir un consecutivo. | Implementado |
 | RF-ISS-008 | Las salidas históricas con prefijos `SAL`, `SAL-MAT` o `SAL-CON` deben adoptar el prefijo de su clasificación registrada, conservando año, consecutivo, identidad, detalles e inventario. Las nuevas series deben continuar por encima del máximo emitido y del contador anterior; una colisión debe impedir la conversión completa sin cambios parciales. | Implementado |
-| RF-WST-001 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder consultar el inventario de mermas y sus existencias; corresponde a la misma consulta de `RF-CAT-004`, no a documentos de salida. | Implementado |
-| RF-WST-002 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder crear una salida de merma pendiente con encabezado y detalles válidos, sin descontar existencias. | Implementado |
-| RF-WST-003 | Personal de almacén o el Administrador del sistema deben poder surtir toda la cantidad pendiente de un detalle de merma cuando exista stock suficiente, actualizando documento, existencias y movimiento atómicamente. | Implementado |
-| RF-WST-004 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder actualizar únicamente los campos admitidos del encabezado de una salida de merma cuyo estado permita edición. | Implementado |
-| RF-WST-005 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder agregar o actualizar detalles de merma todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado |
-| RF-WST-006 | Personal de almacén o el Administrador del sistema deben poder devolver una cantidad positiva que no exceda el saldo entregado de un detalle de merma, sólo cuando la salida esté completamente surtida, y confirmar existencia y movimiento inverso como una sola operación. | Implementado |
-| RF-WST-007 | Usuarios autorizados de áreas operativas, personal de almacén o el Administrador del sistema deben poder consultar salidas de merma, sus detalles y contexto sin modificar existencias. | Implementado |
-| RF-ADJ-001 | El Administrador del sistema debe poder establecer la nueva existencia total no negativa de un material, consumible o merma mediante un ajuste con motivo y observaciones; se aplica inmediatamente, se deriva su tipo de la diferencia y el usuario queda registrado como creador y aprobador, sin una aprobación posterior. | Implementado |
+| RF-WST-001 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar el inventario de mermas y sus existencias; corresponde a la misma consulta de `RF-CAT-004`, no a documentos de salida. | Implementado |
+| RF-WST-002 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema crear una salida de merma pendiente con encabezado y detalles válidos, sin descontar existencias. | Implementado |
+| RF-WST-003 | Nexus debe permitir al Personal de almacén o al Administrador del sistema surtir toda la cantidad pendiente de un detalle de merma cuando exista stock suficiente, actualizando documento, existencias y movimiento atómicamente. | Implementado |
+| RF-WST-004 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema actualizar únicamente los campos admitidos del encabezado de una salida de merma cuyo estado permita edición. | Implementado |
+| RF-WST-005 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema agregar o actualizar detalles de merma todavía modificables sin reescribir cantidades surtidas o devueltas. | Implementado |
+| RF-WST-006 | Nexus debe permitir al Personal de almacén o al Administrador del sistema devolver una cantidad positiva que no exceda el saldo entregado de un detalle de merma, sólo cuando la salida esté completamente surtida, y confirmar existencia y movimiento inverso como una sola operación. | Implementado |
+| RF-WST-007 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar salidas de merma, sus detalles y contexto sin modificar existencias. | Implementado |
+| RF-ADJ-001 | Nexus debe permitir al Administrador del sistema establecer la nueva existencia total no negativa de un material, consumible o merma mediante un ajuste con motivo y observaciones; se aplica inmediatamente, se deriva su tipo de la diferencia y el usuario queda registrado como creador y aprobador, sin una aprobación posterior. | Implementado |
 | RF-ADJ-002 | Al aplicar un ajuste, el sistema debe actualizar atómicamente la existencia y cantidad convertida, y generar el movimiento con los valores anterior, nuevo y diferencia. | Implementado |
 
 ## Criterios de recepción y corrección
@@ -75,6 +76,11 @@ a Almacén y administración.
 - **CA-RF-REC-008-1:** cancelar un detalle revierte su cantidad vigente; si la existencia
   no lo permite, se rechaza sin cambios. La compra queda cancelada cuando no conserva
   detalles activos.
+- **CA-RF-REC-009-1:** registrar una compra no debe consumir un consecutivo de otro
+  contexto ni consumirlo si falla la operación.
+- **CA-RF-REC-009-2:** normalizar folios históricos debe conservar año, consecutivo,
+  identidad, detalles y efectos de inventario. Una colisión debe impedir cambios
+  parciales.
 
 ## Criterios de salida y ajuste
 
@@ -111,3 +117,12 @@ a Almacén y administración.
 - **CA-RF-WST-002-1:** la salida de merma utiliza `SME-AAAA-consecutivo`, una
   serie propia que no consume los consecutivos de materiales ni consumibles.
   Sus folios anteriores se normalizan conservando año, consecutivo e identidad.
+- **CA-RF-ISS-004-1:** al agregar otra vez el mismo material o consumible con el mismo
+  proveedor a una captura de salida, el cliente debe sumar la cantidad y su conversión
+  al detalle existente. Un proveedor distinto debe conservar otro detalle.
+- **CA-RF-ISS-006-1:** la misma agrupación debe aplicarse cuando se agregan cantidades
+  a los detalles de una salida pendiente editable. Agregar no debe modificar stock
+  hasta que se ejecute el surtido.
+- **CA-RF-WST-002-2:** al agregar otra vez la misma merma, el cliente debe sumar su
+  cantidad y conversión en un único detalle. La regla también aplica al editar
+  detalles pendientes conforme a `RF-WST-005`; no permite enviar IDs de merma duplicados.

@@ -1,12 +1,9 @@
 # Estructura y responsabilidades del código
 
-## Solución y alcance
-
-El cliente es una SPA Vue 3 con TypeScript y Composition API. Vue Router selecciona
-páginas; Vuetify presenta controles; los composables coordinan estado e interacciones;
-los servicios consumen la API mediante Axios. La API decide autorización y persistencia.
-La [guía de incorporación](developer-onboarding.md) explica estos términos y recorre
-un cambio desde la ruta hasta sus pruebas.
+El código fuente se divide en aplicación, módulos de negocio y colaboradores
+compartidos. Este mapa permite encontrar sus archivos y las unidades que componen
+cada capacidad. La [guía de incorporación](developer-onboarding.md) sigue una
+edición completa para aprender a recorrer esa estructura.
 
 ## Organización del código
 
@@ -43,75 +40,34 @@ Las carpetas de cada módulo existen según sus necesidades. Un dominio puede te
 contratos en su raíz, `pages`, `components`, `composables`, `services` y `mappers`.
 Los tipos no son otra capa ejecutable: describen datos y operaciones permitidas.
 
-## Dirección de dependencias
+## Unidades de construcción
 
-| Elemento | Responsabilidad | Colaboración |
-| --- | --- | --- |
-| Arranque y Router | Crear colaboradores compartidos, resolver ruta y cargar sesión. | `main.ts`, `createAppRouter`, `createAuthSession`. |
-| Page | Conectar permisos, consulta/editor y presentación de una capacidad. | Composable propio, componentes y contratos del módulo. |
-| Workspace | Componer capacidades de dominios distintos por callbacks/eventos. | Inventario/Directorio con Compra o Salida. |
-| Componente presentacional | Mostrar props, estado visual local y emitir intenciones. | Vue/Vuetify y presentación compartida; sin HTTP/sesión. |
-| Composable | Estado, interacción y ciclo de vida de una responsabilidad. | Funciones, servicios y otros composables mediante contratos explícitos. |
-| Servicio/mapper | Validar/traducir datos y realizar la operación HTTP del recurso. | Contratos, funciones puras y transporte compartido; sin renderizado. |
-| Shared | Contrato o mecanismo transversal con consumidores identificados. | Sin dependencia de `app` o módulos de negocio. |
+| Unidad | Organización concreta |
+| --- | --- |
+| `main.ts` y `app` | El arranque inicia la aplicación; el Router carga sus páginas. Los Workspaces integran dominios: `PurchaseWorkspace` compone Compras, Directorio e Inventario. |
+| `modules/<dominio>` | El archivo del dominio, como `purchase.ts`, declara contratos; `*Config.ts`, etiquetas y descriptores. `pages` conecta presentación y composables; `services` y `mappers` conservan sus adaptaciones propias. |
+| `shared` | Controles, contratos y funciones usados por distintos módulos. `usePagedList` recibe la consulta por callback y `ServerTable` recibe datos/slots; ninguno importa el servicio de un dominio. |
 
-ESLint comprueba parte de estas fronteras; la revisión comprueba también dependencias
-indirectas y efectos. La [referencia generada](code-reference.md) enumera archivos,
-exports, contratos SFC e imports. Las [vistas de componentes](../logical/components/index.md)
-muestran las colaboraciones de cada dominio.
+La [composición de documentos](design-and-construction-patterns/08-document-responsibilities.md)
+localiza reglas, esquemas, detalles y adaptadores de Compras/Salidas. El
+[alta contextual](design-and-construction-patterns/09-contextual-creation.md) muestra
+cómo un Workspace conecta módulos mediante contratos de retorno.
 
-## Estado y ciclo de vida
+Las direcciones permitidas y las restricciones que comprueba ESLint se definen en
+el [estándar de imports](../../coding-standards/04-imports-exports-and-dependencies.md#dirección-admisible).
+La [referencia generada](code-reference.md) enumera los archivos, exports e imports
+reales; los [mapas de componentes](../logical/components/index.md) seleccionan las
+dependencias relevantes de cada dominio.
 
-Cada lista/editor tiene estado propio. La sesión se crea una vez por aplicación y
-se proporciona con una clave tipada. Las páginas consultan permisos de esa sesión;
-las guardas conservan un destino interno válido cuando se requiere recuperar acceso.
-Las lecturas reciben AbortSignal y una secuencia cuando se necesita descartar datos
-obsoletos. Los listeners, timers y callbacks se cierran con su propietario.
+## Navegación y carga de páginas
 
-El [inventario de estado](../logical/state-and-lifecycle.md) identifica alcance y salida
-de cada dato. Los [estados de documentos](../logical/document-states.md) distinguen
-consulta, edición, surtido, devolución y captura incierta.
+`src/app/router/index.ts` registra las rutas y carga sus páginas bajo demanda;
+`App.vue` presenta la página activa mediante `RouterView`. Para añadir una pantalla
+navegable se crea su contenedor en el módulo correspondiente y se registra en ese
+router con su recurso y permiso. Los contenedores de diálogo pueden vivir en
+`pages` sin tener una URL propia.
 
-## Reutilización y extensión
-
-Los marcos de tabla, filtros y modal se componen con props, eventos y slots. Las listas
-usan query aplicada y búsqueda borrador separadas. Los selectores remotos comparten
-paginación, selección fuera de página, cancelación y reintento. Los editores comparten
-interacción/guardado; los payloads y reglas de cada operación permanecen en su dominio.
-
-Una capacidad exclusiva de un módulo permanece allí. Una necesidad transversal puede
-extraerse cuando sus consumidores comparten un contrato. La extracción conserva
-responsabilidades: un selector emite `create`, un Workspace abre el auxiliar y sólo
-el resultado confirmado vuelve como opción al formulario origen.
-
-El [catálogo de patrones](design-and-construction-patterns/index.md) mantiene problema,
-modelo general, aplicaciones y límites. El [estándar](../../coding-standards/index.md)
-regula nombres, formato, imports y revisión; las [decisiones](../../decisions.md)
-explican las elecciones de arquitectura.
-
-## Contratos, reglas públicas y construcción
-
-Los servicios comprueban JSON y códigos de éxito. Los mappers seleccionan campos por
-modo, conservan las versiones leídas cuando corresponden y excluyen derivados que
-la API calcula. Las reglas de captura públicas se compilan mediante alias `@nexus/*`
-definidos en Vite/TypeScript. El build requiere esas fuentes del checkout; los assets
-resultantes no acceden al filesystem privado del servidor.
-
-Los [contratos HTTP](../../contracts/client-contracts.md) describen paginación, errores, mutaciones
-y descargas. La [vista física](../physical/index.md) identifica procesos, proxy y
-frontera de build. Los comandos y archivos locales pertenecen a la [guía de inicio](../../../development/01-getting-started.md).
-
-Los [contratos de formularios](../../contracts/form-and-event-contracts.md)
-definen props, eventos y callbacks; los [modos de operación](../../../requirements/requirements-specification/06-operation-modes-and-effects.md),
-los datos modificables. Los
-[roles de las secuencias](../processes/00-reading-and-roles.md) identifican la frontera
-visual o de transporte y el coordinador que ejecuta cada operación.
-
-## Verificación del cambio
-
-Se identifica el contrato afectado, se revisan consumidores y se elige la evidencia
-que observa el riesgo. Unitarias comprueban datos/estado; navegador comprueba
-interacción real con API simulada; sistema comprueba un recorrido con API y base
-reales. El [plan](../../../testing/01-test-plan.md) define sus formatos y límites.
-Los diagramas se mantienen junto con su colaboración y la referencia se regenera
-cuando cambian fuentes o imports.
+Los enlaces internos usan `RouterLink`; una operación puede navegar mediante el
+router. Los enlaces HTML normales se reservan a destinos externos. El
+[catálogo de pantallas](../scenarios/navigation-and-screens.md) conserva rutas,
+contenedores y recuperación de navegación.

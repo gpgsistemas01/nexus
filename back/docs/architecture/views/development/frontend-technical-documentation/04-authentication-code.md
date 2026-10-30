@@ -74,5 +74,5 @@ con Vuetify y VeeValidate, se describe en
 Después del login, Vue Router abre Almacén y comprueba `/api/auth/me`; la sesión
 readonly se comparte por provide/inject. Materiales, Consumibles y Mermas ya tienen
 contenedores y componentes Vue. El resto de este capítulo describe el flujo EJS
-conservado; los [contratos de Almacén Vue](../../../../../../front/docs/architecture/views/development/frontend-technical-documentation/02-warehouse.md)
-son el documento propietario de esa interfaz.
+conservado; la [composición de Almacén Vue](../../../../../../front/docs/architecture/views/logical/components/02-inventory.md)
+se describe en su documentación propia.

@@ -150,6 +150,7 @@ it('dibuja contratos propios del sistema y conserva los tipos externos en las fi
     }
     export class ApiError extends Error { code: string; }
     export interface PurchaseFormProps { row: PurchaseRow<string>; }
+    export type PurchaseResource = 'materials' | 'consumables';
   `,
   );
   const { contracts } = await buildTypeModel(root);
@@ -165,6 +166,8 @@ it('dibuja contratos propios del sistema y conserva los tipos externos en las fi
   expect(document).toContain('Record<string, PurchaseDetail>');
   expect(document).toContain('extends Error');
   expect(document).toContain('## ApiError');
+  expect(document).toContain('## PurchaseResource');
+  expect(document).toContain("'materials' | 'consumables'");
   expect(document).not.toContain('Parte 1/1');
   const diagrams = [...document.matchAll(/```mermaid\n([\s\S]*?)```/g)]
     .map((match) => match[1])
@@ -173,6 +176,9 @@ it('dibuja contratos propios del sistema y conserva los tipos externos en las fi
   expect(diagrams).toContain('["PurchaseDetail"]');
   expect(diagrams).toContain('Subject["ApiError"]');
   expect(diagrams).toContain('Subject["PurchaseFormProps"]');
+  expect(diagrams).toContain('Subject --> "1" R0 : row');
+  expect(diagrams).not.toContain('Subject "1" -->');
+  expect(diagrams).not.toContain('Subject["PurchaseResource"]');
   for (const technical of ['Box', 'Record', 'Promise', 'AbortSignal', 'Error', 'T'])
     expect(diagrams).not.toContain('["' + technical + '"]');
 });

@@ -1,19 +1,34 @@
 # Acceso y sesión: componentes
 
-**Identificador:** `DIA-VUE-COMP-001`. **Pregunta:** ¿Qué colaboradores tienen responsabilidad propia y qué contratos los conectan?
-
-**Fuente:** main.ts, LoginPage, useLoginForm, authService, createAuthSession y Router. **Notación y alcance:** Las flechas indican dependencia o consumo; no orden temporal ni herencia.
-
-**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+**Identificador:** `DIA-VUE-COMP-001`. **Pregunta:** ¿qué dependencias enlazan arranque, sesión y captura de login?
+**Fuentes:** [main.ts](../../../../../src/main.ts), [index.ts](../../../../../src/app/router/index.ts), [authService.ts](../../../../../src/modules/auth/services/authService.ts), [apiClient.ts](../../../../../src/shared/http/apiClient.ts).
+**Notación:** [mapa de dependencias](../../diagram-reading.md#componentes-y-dependencias).
 
 ```mermaid
 flowchart TB
-    page["LoginPage · coordinación"] --> form["LoginForm · props y eventos"]
-    page --> login["useLoginForm · captura e interacción"]
-    login --> rules["VeeValidate y loginValidation"]
-    login --> service["loginRequest · contrato login"]
-    service --> http["apiClient · HTTP y refresh"]
-    router["Router · guarda y retorno"] --> session["createAuthSession · identidad readonly"]
+    main["main.ts"]
+    router["createAppRouter<br/>app/router/index.ts"]
+    session["createAuthSession<br/>session.ts"]
+    page["LoginPage"]
+    form["LoginForm"]
+    login["useLoginForm"]
+    validation["loginValidation.js"]
+    interaction["useFormInteraction"]
+    service["authService"]
+    http["apiClient.ts"]
+    main --> router
+    main --> session
+    router --> session
+    router --> page
+    page --> form
+    page --> login
+    login --> validation
+    login --> interaction
+    login --> service
+    service --> http
     session --> http
-    http --> api["API · autorización y cookies"]
 ```
+
+Vue Router ejecuta la guarda; VeeValidate ejecuta la validación del formulario y Axios
+transporta HTTP. Sus clases no forman parte del modelo. La [provisión de sesión](../../development/design-and-construction-patterns/06-session-provision.md)
+explica la instancia compartida; el mapa representa imports, no el retorno tras autenticar.

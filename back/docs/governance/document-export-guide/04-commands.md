@@ -16,6 +16,7 @@ esta interfaz.
 | Validar un paquete | `npm run docs:export -- <paquete> --check` |
 | Validar sólo la documentación Vue | `npm run docs:export -- arquitectura frontend-vue --check` |
 | Publicar las fuentes Vue en DOCX y PDF | `npm run docs:export -- arquitectura frontend-vue ambos` |
+| Publicar sólo el contrato API en DOCX y PDF, junto con OpenAPI | `npm run docs:export -- arquitectura contrato-api ambos` |
 | Generar toda la entrega en DOCX y PDF | `npm run docs:export` |
 | Generar un paquete y formato concretos | `npm run docs:export -- <paquete> <docx\|pdf\|ambos>` |
 

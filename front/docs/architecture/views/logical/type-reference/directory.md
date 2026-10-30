@@ -51,7 +51,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : values
+    Subject --> "1" R1 : values
     Subject ..> R2 : errors
 ```
 
@@ -137,8 +137,8 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "0..*" R1 : rows
-    Subject "1" --> "1" R2 : query
+    Subject --> "0..*" R1 : rows
+    Subject --> "1" R2 : query
 ```
 
 ## DirectoryTable.defineEmits
@@ -226,16 +226,6 @@ classDiagram
 
 ```typescript
 'clients' | 'suppliers'
-```
-
-**Figura:** `DIA-VUE-TS-DIRECTORY-6-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["DirectoryResource"] {
-        <<type>>
-    }
 ```
 
 ## DirectoryValues
@@ -374,7 +364,7 @@ classDiagram
     class R0["DirectoryEntry"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : row
+    Subject --> "1" R0 : row
 ```
 
 ## DirectoryField
@@ -547,7 +537,7 @@ classDiagram
     }
     Subject ..> R0 : update
     Subject ..> R0 : blur
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
 ```
 
 ## DIRECTORY_CONFIG
@@ -580,8 +570,8 @@ classDiagram
     class R1["DIRECTORY_CONFIG.suppliers.<br/>shape2"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : clients
-    Subject "1" --> "1" R1 : suppliers
+    Subject --> "1" R0 : clients
+    Subject --> "1" R1 : suppliers
 ```
 
 ## DIRECTORY_CONFIG.clients.shape1
@@ -798,5 +788,5 @@ classDiagram
     class R0["DirectoryEntry"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```

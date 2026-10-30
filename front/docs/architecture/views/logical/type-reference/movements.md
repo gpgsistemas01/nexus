@@ -47,9 +47,9 @@ classDiagram
     class R1["LookupState"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
-    Subject "1" --> "1" R1 : suppliers
-    Subject "1" --> "1" R1 : items
+    Subject --> "1" R0 : values
+    Subject --> "1" R1 : suppliers
+    Subject --> "1" R1 : items
 ```
 
 ## MovementFilters.defineEmits
@@ -133,7 +133,7 @@ classDiagram
     }
     Subject ..> R0 : resource
     Subject ..> R1 : query
-    Subject "1" --> "0..*" R2 : rows
+    Subject --> "0..*" R2 : rows
 ```
 
 ## MovementTable.defineEmits
@@ -173,16 +173,6 @@ classDiagram
 'materials' | 'consumables' | 'wastes'
 ```
 
-**Figura:** `DIA-VUE-TS-MOVEMENTS-5-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["MovementResource"] {
-        <<type>>
-    }
-```
-
 ## MovementType
 
 **Fuente:** [src/modules/movements/movement.ts](../../../../../src/modules/movements/movement.ts) · línea 4, columna 1. **Declaración:** type.
@@ -191,16 +181,6 @@ classDiagram
 
 ```typescript
 '' | 'ENTRY' | 'ISSUE' | 'ADJUSTMENT' | 'RETURN'
-```
-
-**Figura:** `DIA-VUE-TS-MOVEMENTS-6-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["MovementType"] {
-        <<type>>
-    }
 ```
 
 ## MovementFilters
@@ -389,7 +369,7 @@ classDiagram
     class R3["useMovementFilters.return.<br/>items.shape5"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : update
     Subject ..> R2 : suppliers
     Subject ..> R3 : items
@@ -666,9 +646,9 @@ classDiagram
     class R2["MOVEMENT_CONFIG.wastes.<br/>shape3"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : materials
-    Subject "1" --> "1" R1 : consumables
-    Subject "1" --> "1" R2 : wastes
+    Subject --> "1" R0 : materials
+    Subject --> "1" R1 : consumables
+    Subject --> "1" R2 : wastes
 ```
 
 ## MOVEMENT_CONFIG.materials.shape1
@@ -877,7 +857,7 @@ classDiagram
     class R0["MovementRow"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```
 
 ## movementService.lookup.shape2
@@ -908,5 +888,5 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```

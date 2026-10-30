@@ -1,26 +1,44 @@
 # 9. Composición de altas contextuales: modelo y casos Vue
 
-## Problema, clasificación y decisión
+## Propósito y funcionamiento
 
 Un formulario puede necesitar un proveedor, artículo o cliente que todavía no existe. Debe abrir su captura completa, conservar el origen y seleccionar sólo el resultado confirmado. Una etiqueta de combobox no representa por sí misma un registro persistido.
 
-Se combinan contenedor/presentación, composición por eventos/callbacks y adaptación de datos. No es un patrón GoF nuevo ni un bus global. `RemoteSelect` usa el `VAutocomplete` instalado; emite texto de búsqueda y no conoce entidades, API o páginas de otro módulo. Los Workspaces de `app/pages` componen módulos mediante contratos explícitos. Cada formulario conserva la responsabilidad de aceptar la nueva opción según modo, disponibilidad y estado.
+La colaboración combina contenedor/presentación, eventos/callbacks y adaptación de datos. `RemoteSelect` usa el `VAutocomplete` instalado; emite texto de búsqueda y no conoce entidades, API o páginas de otro módulo. Los Workspaces de `app/pages` componen módulos mediante contratos explícitos. Cada formulario conserva la responsabilidad de aceptar la nueva opción según modo, disponibilidad y estado.
 
 ## Modelo general
 
-**Identificador:** `DIA-VUE-GEN-007`. **Pregunta:** ¿cómo coordinar una captura auxiliar conservando el propietario del formulario origen? **Alcance:** cliente, apertura, confirmación y retorno. **Fuente:** contrato de composición aplicado por los Workspaces. Flechas continuas representan intención/composición; discontinuas, el resultado confirmado hacia el propietario de captura. No representan herencia o una transacción de base de datos.
+**Identificador:** `DIA-VUE-GEN-007`. **Pregunta:** ¿cómo coordinar una captura auxiliar conservando el propietario del formulario origen? **Alcance:** apertura, cancelación, confirmación y retorno. **Fuente:** composición aplicada por los Workspaces. **Notación:** secuencia UML de roles genéricos; las llamadas y retornos muestran cuándo se invoca el callback.
 
-**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+**Lectura visual:** [líneas de vida, llamadas y retornos](../../diagram-reading.md#secuencias).
 
 ```mermaid
-flowchart TB
-    selector["Selector<br/>presentación"] -->|intención y texto| origin["Contenedor origen<br/>captura"]
-    origin -->|solicitud y callback| composition["Composición<br/>entre módulos"]
-    composition -->|props de alta| auxiliary["Editor auxiliar<br/>registro"]
-    auxiliary -->|guardar| service["Servicio del recurso"]
-    service -->|registro confirmado| auxiliary
-    auxiliary -.->|onCreated con identidad| state["Captura origen<br/>selección"]
-    state -.->|ID y etiqueta| origin
+sequenceDiagram
+    autonumber
+    actor User as Usuario
+    participant Origin@{ "type": "control" } as Captura origen
+    participant Coordinator@{ "type": "control" } as Composición
+    participant Auxiliary@{ "type": "control" } as Captura auxiliar
+    participant Operation@{ "type": "boundary" } as Servicio de alta
+    Origin->>Coordinator: solicitarAlta(texto, onCreated)
+    Coordinator->>Auxiliary: abrir(textoInicial)
+    alt cancela la captura auxiliar
+        User->>Auxiliary: cancelar
+        Auxiliary-->>Coordinator: cierre sin resultado
+    else confirma la captura auxiliar
+        User->>Auxiliary: enviar captura
+        Auxiliary->>Operation: guardar(valores)
+        alt resultado confirmado
+            Operation-->>Auxiliary: registro creado
+            Auxiliary-->>Coordinator: registro confirmado
+            opt origen vigente
+                Coordinator->>Origin: onCreated(opción)
+            end
+        else error de alta
+            Operation-->>Auxiliary: error
+            Auxiliary-->>User: campos y mensaje para corregir
+        end
+    end
 ```
 
 El callback viaja en la solicitud tipada; no necesita persistirse en un store. Cancelar no lo invoca. Confirmar el auxiliar no guarda también el documento principal. El cliente sólo selecciona un ID devuelto por el servidor y descarta callbacks cuando ya no está disponible la captura.
@@ -95,7 +113,13 @@ flowchart TB
     editor -.->|encabezado actualizado| form
 ```
 
-Se requiere que el encabezado sea editable y que el usuario pueda leer/crear clientes. El nombre buscado precarga el cliente; `DirectoryCreationPage` adapta la respuesta. El callback comprueba disponibilidad e inactividad antes de seleccionar. El cambio de cliente limpia asesor/proyecto según la coordinación existente y conserva el resto de la salida. No se guarda la salida como efecto secundario del auxiliar.
+Se requiere que el encabezado sea editable y que el usuario pueda leer/crear clientes.
+El nombre buscado precarga el cliente; `DirectoryCreationPage.saved` adapta la
+respuesta de Directorio a `LookupItem` e invoca `request.onCreated`.
+[useIssueHeaderSelection.selectCreatedClient](../../../../../src/modules/issues/composables/useIssueHeaderSelection.ts)
+comprueba disponibilidad e inactividad antes de seleccionar. El cambio de cliente
+limpia asesor/proyecto según la coordinación existente y conserva el resto de la
+salida. No se guarda la salida como efecto secundario del auxiliar.
 
 ## Propietarios, contratos y límites
 
@@ -112,8 +136,6 @@ Se requiere que el encabezado sea editable y que el usuario pueda leer/crear cli
 
 La API autoriza y valida cada alta, aunque el Workspace ya haya comprobado permisos. La ausencia de coincidencia visible no demuestra unicidad en la base. Abortar una solicitud o cerrar el modal no revierte una escritura que el servidor ya confirmó.
 
-## Evidencia y mantenimiento de las figuras
+## Evidencia
 
 `selectCreation.spec.ts` prueba los tres consumidores, nombres precargados, cancelación, error/reintento, selección fuera de página, permisos y teclado. `inventoryFormTest.ts`, `purchaseTest.ts`, `issueTest.ts` y `selectedOptionTest.ts` comprueban contratos y estado. Los casos de navegador usan API simulada; no acreditan persistencia.
-
-Al cambiar la solicitud tipada o el propietario del retorno se revisa el modelo general y cada figura afectada. Al cambiar sólo un caso se actualiza su diagrama específico y sus pruebas. Las otras familias de patrones mantienen su par general/aplicado en el [catálogo](01-applicability-and-principles.md#modelo-general-y-aplicación-en-código); estas figuras concretan la colaboración entre componentes, composables y servicios del cliente.

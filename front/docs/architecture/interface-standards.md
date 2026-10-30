@@ -5,7 +5,7 @@
 Estas reglas regulan formularios, controles, estilos, navegación y recuperación
 visual. Sus fuentes operativas son `app/plugins/vuetify.ts`,
 `shared/ui/controlDefaults.ts`, `shared/ui/warehouse.css` y los componentes
-compartidos de `front/src`. La [selección de controles](views/logical/ui-and-http.md)
+compartidos de `front/src`. La [selección de controles](views/logical/components/08-shared-ui.md)
 explica la solución y sus dependencias.
 
 ## Formularios

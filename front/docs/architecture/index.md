@@ -6,25 +6,30 @@ Estado: En revisión. Responsable: Equipo Nexus. Versión de la colección: [ent
 
 ## Propósito y alcance
 
-La aplicación es una SPA cliente-servidor, organizada por dominios funcionales,
-componentes de presentación, coordinadores reactivos y adaptadores HTTP. Vue se
-ejecuta en el navegador; el alojamiento entrega sus assets y la API resuelve
-identidad, autorización y persistencia. Este documento es la entrada a sus vistas,
-contratos y reglas de construcción.
+Nexus permite consultar inventario y registrar compras, salidas, surtidos y
+devoluciones. Este documento explica cómo el cliente web presenta esas operaciones
+y las conecta con la API. Vue ejecuta la interfaz en el navegador; el alojamiento
+entrega los archivos compilados y la API comprueba identidad, permisos y persistencia.
+
+El código se organiza por capacidades del negocio. Una página conecta sesión,
+estado y presentación; los composables coordinan las interacciones; los servicios
+y mappers preparan solicitudes y adaptan respuestas. La [guía de incorporación](views/development/developer-onboarding.md)
+introduce los términos y recorre una edición de catálogo de principio a fin.
 
 ## Interesados y preocupaciones
 
 | Interesado | Preocupación | Evidencia documental |
 | --- | --- | --- |
 | Usuario operativo | Encontrar su módulo, conservar captura y reconocer confirmación o rechazo. | Escenarios, CU y estados de interacción. |
-| Desarrollo Vue | Ubicar responsabilidad, compartir comportamiento y evitar dependencias cruzadas. | Desarrollo, patrones, módulos y estándar. |
+| Desarrollo Vue | Ubicar responsabilidad, compartir comportamiento y evitar dependencias cruzadas. | Componentes, desarrollo, patrones y estándar. |
 | Desarrollo API | Conservar campos permitidos, versiones, códigos y contexto del recurso. | Contratos, mappers y procesos. |
 | Pruebas/revisión | Identificar riesgo, reproducir condición y limitar lo que demuestra cada nivel. | Casos de uso, DP/CP y matriz de cobertura. |
 | Operación | Compilar, servir rutas, conectar API y recuperar errores de configuración. | Vista física y preparación local. |
 
 ## Organización 4+1
 
-La [colección de vistas](views/index.md) organiza cinco preguntas: objetivos/navegación,
+Una vista reúne modelos que responden una pregunta sobre el sistema. La
+[organización 4+1](views/index.md) separa cinco preguntas: objetivos/navegación,
 componentes/estado, colaboraciones, organización del código y ejecución. C4 aporta
 cortes de contexto/componentes; secuencias y estados utilizan Mermaid con semántica
 explicada por figura. El [catálogo de decisiones](decisions.md) registra motivos,
@@ -32,15 +37,27 @@ consecuencias y riesgos de la solución vigente.
 
 ## Entradas de lectura
 
+La [vista general](views/overview.md) sitúa navegador, aplicación y API.
+Para seguir un módulo, el [recorrido por capacidad](views/index.md#recorrido-por-capacidad)
+enlaza sus modelos, componentes, estados y procesos.
+
+### Vistas 4+1
+
 1. [Escenarios y navegación](views/scenarios/index.md).
 2. [Vista lógica](views/logical/index.md).
 3. [Procesos y secuencias](views/processes/index.md).
-4. [Desarrollo, patrones y realización por módulo](views/development/index.md).
+4. [Desarrollo, patrones y referencia de código](views/development/index.md).
 5. [Ejecución y despliegue](views/physical/index.md).
-6. [Contratos HTTP y de formularios](contracts/index.md).
-7. [Estándar de codificación](coding-standards/index.md).
-8. [Estándar de interfaz y accesibilidad](interface-standards.md).
-9. [Estándar de seguridad](security-standards.md).
+
+### Contratos y estándares de arquitectura
+
+Los contratos describen interfaces compartidas por varias vistas y forman parte de
+esta arquitectura en `front/docs/architecture/contracts/`.
+
+1. [Contratos HTTP y de formularios](contracts/index.md).
+2. [Estándar de codificación](coding-standards/index.md).
+3. [Estándar de interfaz y accesibilidad](interface-standards.md).
+4. [Estándar de seguridad](security-standards.md).
 
 ## Restricciones y calidad
 
@@ -50,9 +67,9 @@ son remotos/paginados. Las mutaciones conservan códigos, versiones e idempotenc
 operación. Las respuestas tardías no deben reemplazar captura vigente. Los criterios
 verificables se mantienen en la [especificación del cliente](../requirements/requirements-specification/client-specification.md).
 
-La mantenibilidad se evalúa mediante contratos, dirección de dependencias, consumidores
-y pruebas relevantes. La configuración actual no acredita capacidad concurrente ni un
-SLA de producción; esas obligaciones necesitan escenarios y mediciones propios.
+Los contratos tipados y la dirección de dependencias permiten identificar los
+consumidores de cada cambio. Las [pruebas](../testing/index.md) observan resultados,
+rechazos y recuperación del flujo afectado.
 
 ## Mantenimiento
 

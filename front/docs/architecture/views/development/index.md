@@ -1,30 +1,20 @@
-# Vista de desarrollo
+# Vista de desarrollo: organización del código
 
-Para una primera lectura, comenzar por la [guía de incorporación](developer-onboarding.md).
+Esta vista de la arquitectura 4+1 describe las unidades de código y cómo se componen:
+`app` integra la aplicación, `modules` agrupa las capacidades del negocio y `shared`
+reúne colaboradores transversales. Permite localizar una responsabilidad y entender
+los mecanismos que reutilizan sus consumidores.
 
-## Organización
+| Consulta | Documento |
+| --- | --- |
+| Ubicación de archivos y composición entre dominios | [Estructura del código](code-structure.md). |
+| Funcionamiento de un mecanismo reutilizado | [Patrones generales y aplicaciones concretas](design-and-construction-patterns/index.md). |
+| Integración de validadores, utilidades y datos públicos en Vue | [Reglas públicas y presentación de datos](input-handling.md). |
+| Archivos, exports e imports declarados | [Referencia generada de código](code-reference.md). |
 
-1. [Estructura y dirección de dependencias](code-structure.md).
-2. [Patrones de diseño y construcción](design-and-construction-patterns/index.md).
-3. [Realización técnica por módulo](frontend-technical-documentation/index.md).
-4. [Referencia generada de código](code-reference.md).
+Para una primera lectura, la [guía de incorporación](developer-onboarding.md) sigue
+una edición desde la ruta hasta sus pruebas. La [vista lógica](../logical/index.md)
+representa colaboradores, datos y estados; los patrones de esta vista explican
+cómo se construyen esas colaboraciones con componentes, funciones y contratos.
 
-La estructura se organiza por dominio (`modules`), composición de aplicación (`app`)
-y capacidades transversales (`shared`). Cada módulo conserva contratos, servicios,
-composables, páginas y presentación según sus consumidores. Las restricciones de
-imports verifican parte de esas fronteras; los contratos y motivos de cambio requieren
-revisión del código.
-
-## Lectura de una capacidad
-
-Partir de la ruta y su configuración; localizar la Page/Workspace; seguir props y
-eventos hasta el coordinador; revisar esquema, mapper y servicio; consultar prueba y
-caso de uso correspondiente. La referencia generada permite localizar símbolos e
-imports, y la guía curada explica por qué colaboran.
-
-## Construcción y revisión
-
-El [estándar](../../coding-standards/index.md) regula nombres, formato, funciones,
-SFC, datos y errores. Las [decisiones](../../decisions.md) conservan justificación y
-consecuencias. El [plan de pruebas](../../../testing/01-test-plan.md) define el nivel de
-evidencia necesario para un contrato modificado.
+La instalación y los comandos se consultan en [Entorno y flujo de trabajo](../../../development/index.md).

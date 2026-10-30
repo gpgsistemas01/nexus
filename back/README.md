@@ -23,7 +23,7 @@ correspondiente es `/app`.
 - [Ejecución](#ejecución)
 - [Scripts disponibles](#scripts-disponibles)
 - [Publicación de documentos y capturas](#publicación-de-documentos-y-capturas)
-- [Rutas](#rutas)
+- [Rutas principales](#rutas-principales)
 - [Pruebas automatizadas](#pruebas-automatizadas)
 - [Convenciones de desarrollo](#convenciones-de-desarrollo)
 - [Docker](#docker)
@@ -94,7 +94,7 @@ La aplicación usa una separación por capas: las rutas delegan en controladores
 Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` componen
 los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
 con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
-incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
+incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en la
 [descripción de arquitectura y construcción](docs/architecture/views/index.md).
 
 ## Documentación
@@ -104,6 +104,14 @@ artefacto por familia, distingue su documento principal de los complementos y de
 fuente de verdad. El mapa de rutas y dependencias se genera desde el código; el esquema y
 el diccionario técnico se derivan de Prisma; los diagramas de diseño se mantienen de
 forma curada. CI comprueba que el contenido generado esté actualizado.
+
+- Para consumir la API, consulta el [contrato HTTP](docs/architecture/openapi/api-contract.md)
+  y la [especificación OpenAPI](docs/architecture/openapi/openapi.json).
+- Para modificar el servidor, consulta la
+  [documentación técnica del backend](docs/architecture/views/development/backend-technical-documentation/index.md)
+  y sus [responsabilidades por capa](docs/architecture/views/development/code-structure/index.md).
+- La [documentación de la interfaz EJS](docs/architecture/views/development/frontend-technical-documentation/index.md)
+  describe sus pantallas y controles visuales.
 
 ## Requisitos
 
@@ -333,30 +341,10 @@ reduce el ancho disponible.
 
 ### API REST
 
-Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json` salvo endpoints especializados:
-
-- `/api/auth`
-- `/api/sales/clients`
-- `/api/sales/reports`
-- `/api/warehouse/consumables`
-- `/api/warehouse/materials`
-- `/api/warehouse/wastes`
-- `/api/warehouse/suppliers`
-- `/api/warehouse/goods-receipts/materials`
-- `/api/warehouse/goods-receipts/consumables`
-- `/api/warehouse/goods-issues`
-- `/api/warehouse/notifications`
-- `/api/warehouse/reports`
-- `/api/warehouse/unit-measures`
-- `/api/warehouse/presentations`
-- `/api/warehouse/reasons`
-- `/api/warehouse/fulfillment-statuses`
-- `/api/admin/users`
-- `/api/admin/roles`
-- `/api/admin/departments`
-- `/api/admin/persons` (`/api/admin/profiles` se conserva como alias de compatibilidad)
-- `/api/admin/movements`
-- `/api/admin/reports`
+Las operaciones bajo `/api` están documentadas en el
+[contrato HTTP y OpenAPI](docs/architecture/openapi/api-contract.md).
+Consulta esa referencia para métodos, rutas, permisos, cuerpos y respuestas;
+los controles visuales de las páginas se explican en la documentación de la interfaz.
 
 ## Pruebas automatizadas
 

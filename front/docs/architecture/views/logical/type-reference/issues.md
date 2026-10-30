@@ -38,7 +38,7 @@ classDiagram
     class R1["IssueMode"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : rows
+    Subject --> "0..*" R0 : rows
     Subject ..> R1 : mode
 ```
 
@@ -133,10 +133,10 @@ classDiagram
     class R3["IssueHeaderSelect"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : errors
     Subject ..> R2 : mode
-    Subject "1" --> "0..*" R3 : selects
+    Subject --> "0..*" R3 : selects
 ```
 
 ## IssueEditor.defineEmits
@@ -244,8 +244,8 @@ classDiagram
     class R1["IssueFilterSelect"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
-    Subject "1" --> "0..*" R1 : selects
+    Subject --> "1" R0 : values
+    Subject --> "0..*" R1 : selects
 ```
 
 ## IssueFilters.defineEmits
@@ -340,9 +340,9 @@ classDiagram
     class R2["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
-    Subject "1" --> "1" R1 : state
-    Subject "1" --> "0..1" R2 : selected
+    Subject --> "1" R0 : values
+    Subject --> "1" R1 : state
+    Subject --> "0..1" R2 : selected
 ```
 
 ## IssueLineEntryForm.values@10:13
@@ -435,7 +435,7 @@ classDiagram
     class R0["IssueReturnForm.values@12:13"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
 ```
 
 ## IssueReturnForm.values@12:13
@@ -528,7 +528,7 @@ classDiagram
     class R1["IssueQuery"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : rows
+    Subject --> "0..*" R0 : rows
     Subject ..> R1 : query
 ```
 
@@ -638,7 +638,7 @@ classDiagram
     class R1["IssueOpenMode"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : row
+    Subject --> "1" R0 : row
     Subject ..> R1 : mode
 ```
 
@@ -765,8 +765,8 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : values
-    Subject "1" --> "0..1" R2 : document
+    Subject --> "1" R1 : values
+    Subject --> "0..1" R2 : document
 ```
 
 ## useIssueLineEntry.options@14:44
@@ -852,8 +852,8 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : document
-    Subject "1" --> "1" R2 : detail
+    Subject --> "1" R1 : document
+    Subject --> "1" R2 : detail
     Subject ..> R3 : onSaved
 ```
 
@@ -867,16 +867,6 @@ classDiagram
 'materials' | 'consumables' | 'wastes'
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-22-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["IssueResource"] {
-        <<type>>
-    }
-```
-
 ## IssueMode
 
 **Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 5, columna 1. **Declaración:** type.
@@ -885,16 +875,6 @@ classDiagram
 
 ```typescript
 'create' | 'edit' | 'header' | 'view' | 'supply' | 'return'
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-23-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["IssueMode"] {
-        <<type>>
-    }
 ```
 
 ## IssueRow
@@ -1036,7 +1016,7 @@ classDiagram
         <<reference>>
     }
     R0 <|-- Subject : extends
-    Subject "1" --> "0..*" R1 : details
+    Subject --> "0..*" R1 : details
 ```
 
 ## IssueValues
@@ -1077,7 +1057,7 @@ classDiagram
     class R0["IssueDetail"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : details
+    Subject --> "0..*" R0 : details
 ```
 
 ## IssueField
@@ -1118,16 +1098,6 @@ classDiagram
 'create' | 'edit' | 'header' | 'supply'
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-29-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["IssueWriteMode"] {
-        <<type>>
-    }
-```
-
 ## IssueOpenMode
 
 **Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 57, columna 1. **Declaración:** type.
@@ -1136,16 +1106,6 @@ classDiagram
 
 ```typescript
 'edit' | 'view' | 'supply' | 'return'
-```
-
-**Figura:** `DIA-VUE-TS-ISSUES-30-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["IssueOpenMode"] {
-        <<type>>
-    }
 ```
 
 ## IssueWriteTarget
@@ -1234,7 +1194,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : mode
-    Subject "1" --> "1" R1 : document
+    Subject --> "1" R1 : document
 ```
 
 ## IssueTarget
@@ -1296,7 +1256,7 @@ classDiagram
     class R0["IssueDocument"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : document
+    Subject --> "1" R0 : document
 ```
 
 ## IssueFilters
@@ -1373,16 +1333,6 @@ classDiagram
 'clients' | 'departments' | 'persons' | 'statuses' | 'items'
 ```
 
-**Figura:** `DIA-VUE-TS-ISSUES-38-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["IssueLookup"] {
-        <<type>>
-    }
-```
-
 ## IssueHeaderSelect
 
 **Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 73, columna 1. **Declaración:** interface.
@@ -1423,8 +1373,8 @@ classDiagram
     class R1["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : state
-    Subject "1" --> "0..1" R1 : initialOption
+    Subject --> "1" R0 : state
+    Subject --> "0..1" R1 : initialOption
 ```
 
 ## IssueFilterSelect
@@ -1461,7 +1411,7 @@ classDiagram
     class R0["LookupState"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : state
+    Subject --> "1" R0 : state
 ```
 
 ## createIssueValidationSchema.options@39:54
@@ -1726,8 +1676,8 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : document
-    Subject "1" --> "1" R2 : detail
+    Subject --> "1" R1 : document
+    Subject --> "1" R2 : detail
 ```
 
 ## IssueReturnPage.defineEmits
@@ -2075,7 +2025,7 @@ classDiagram
     class R3["MutationConfirmation"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : headerSelection
     Subject ..> R2 : addDetail
     Subject ..> R2 : updateDetailSupply
@@ -2643,7 +2593,7 @@ classDiagram
     class R3["useIssueFilters.return.<br/>selects.shape16"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : lookups
     Subject ..> R2 : selects
     Subject ..> R3 : selects
@@ -3806,10 +3756,10 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : clientId
-    Subject "1" --> "0..1" R0 : departmentId
-    Subject "1" --> "0..1" R0 : advisorId
-    Subject "1" --> "0..1" R0 : requesterId
+    Subject --> "0..1" R0 : clientId
+    Subject --> "0..1" R0 : departmentId
+    Subject --> "0..1" R0 : advisorId
+    Subject --> "0..1" R0 : requesterId
 ```
 
 ## useIssueLineEntry.return
@@ -3852,7 +3802,7 @@ classDiagram
     class R1["useIssueLineEntry.return.<br/>items.shape2"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : items
 ```
 
@@ -4027,7 +3977,7 @@ classDiagram
     class R1["MutationConfirmation"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : execute
 ```
 
@@ -4088,9 +4038,9 @@ classDiagram
     class R2["ISSUE_CONFIG.wastes.shape3"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : materials
-    Subject "1" --> "1" R1 : consumables
-    Subject "1" --> "0..1" R2 : wastes
+    Subject --> "1" R0 : materials
+    Subject --> "1" R1 : consumables
+    Subject --> "0..1" R2 : wastes
 ```
 
 ## ISSUE_CONFIG.materials.shape1
@@ -4418,7 +4368,7 @@ classDiagram
     class R0["IssueDetail"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : details
+    Subject --> "0..*" R0 : details
 ```
 
 ## mapIssueItemOption.return
@@ -4511,7 +4461,7 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```
 
 ## issueService

@@ -13,5 +13,5 @@
 
 ## Realización y verificación del cliente
 
-[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/05-movements.md).
+[Componentes del cliente](../../../architecture/views/logical/components/05-movements.md).
 Pruebas de navegador: [movements.spec.ts](../../../../tests/e2e/movements.spec.ts).

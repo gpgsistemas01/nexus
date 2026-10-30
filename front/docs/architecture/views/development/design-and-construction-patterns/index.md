@@ -1,33 +1,35 @@
 # Patrones y mecanismos del frontend Vue
 
-Los capítulos de mecanismos separan el **modelo general** y su **aplicación actual**.
-El primero explica responsabilidades sin nombres del proyecto; el segundo permite
-seguir archivos y símbolos existentes. Cada capítulo identifica el código que implementa la colaboración.
-La [evaluación de aplicabilidad](01-applicability-and-principles.md) conserva la clasificación y SOLID.
+Cada capítulo explica una colaboración del cliente, su modelo general y su
+realización con archivos y funciones de Nexus. El modelo general presenta roles;
+el aplicado permite seguirlos en el código. La notación se elige según la pregunta.
 
-## Capítulos
+| Capítulo | Pregunta principal | Diagramas utilizados |
+| --- | --- | --- |
+| [Principios y clasificación](01-applicability-and-principles.md) | ¿Qué clase de mecanismo representa cada colaboración y cómo se revisa SOLID? | Catálogo de figuras y evaluación con fuentes concretas. |
+| [Contenedor y presentación](02-container-and-presentation.md) | ¿Quién conserva el estado y quién presenta/emite intenciones? | Mapa de composición de componentes con props y eventos. |
+| [Composables y callbacks](03-composables-and-callbacks.md) | ¿Cómo ejecuta un coordinador una operación aportada por su consumidor? | Secuencia UML del callback y mapas de dependencias aplicadas. |
+| [Adaptadores HTTP y de datos](04-http-and-data-adapters.md) | ¿Cómo se transforma y admite una respuesta externa? | Flujo de datos con transformación y decisiones de aceptación. |
+| [Slots y composición visual](05-slots-and-visual-composition.md) | ¿Qué marco se comparte y dónde se inserta el contenido específico? | Árbol/regiones de composición con contenido y props de slot. |
+| [Provisión de sesión](06-session-provision.md) | ¿Cómo recuperan varios consumidores la misma instancia? | Mapa de provisión y secuencia UML de creación e inyección. |
+| [Fábricas de esquemas](07-schema-factories.md) | ¿Qué reglas construye la función para cada contexto? | Actividad con decisiones y productos, usando notación de flujo. |
+| [Composición de documentos](08-document-responsibilities.md) | ¿Cómo colaboran los mecanismos en Compras y Salidas? | Mapas de responsabilidades y secuencia UML de confirmación. |
+| [Altas contextuales](09-contextual-creation.md) | ¿Cómo retorna un alta auxiliar sin guardar el documento principal? | Secuencia UML general y mapas de los cuatro casos aplicados. |
 
-1. [Patrones y principios de diseño en Vue](01-applicability-and-principles.md).
-2. [Contenedor y presentación](02-container-and-presentation.md).
-3. [Composables y operaciones por callback](03-composables-and-callbacks.md).
-4. [Adaptadores HTTP y de datos](04-http-and-data-adapters.md).
-5. [Slots y composición visual](05-slots-and-visual-composition.md).
-6. [Provisión de sesión e inyección](06-session-provision.md).
-7. [Fábricas funcionales de esquemas](07-schema-factories.md).
-8. [Responsabilidades y nombres de Salidas y Compras](08-document-responsibilities.md).
-9. [Altas contextuales: modelo y casos de Inventario, Compras y Salidas](09-contextual-creation.md).
+## Lectura de las figuras
 
-## Notación y mantenimiento
+La [guía visual](../../diagram-reading.md) define símbolos y flechas. Los mapas de
+composición y las actividades con Mermaid explican sus convenciones locales;
+las secuencias usan líneas de vida, llamadas, retornos y alternativas UML.
+Las funciones, slots y callbacks conservan su naturaleza en el modelo.
 
-Los diagramas de flujo muestran composición, dependencias y contratos, sin atribuir
-herencia ni notación UML de clases a funciones de Composition API. Cada figura
-declara identificador, pregunta, alcance, fuente y significado de las flechas.
-Los identificadores generales `DIA-VUE-GEN-*` y aplicados `DIA-VUE-APL-*` son una
-convención local; la figura de listado conserva su ID previo `DIA-VUE-PAT-001`.
+`DIA-VUE-GEN-*` identifica modelos generales; `DIA-VUE-APL-*`, casos aplicados.
+Las figuras de colaboraciones compartidas usan `DIA-VUE-PAT-*` o `DIA-VUE-DOC-*`.
+El [catálogo](01-applicability-and-principles.md#modelo-general-y-aplicación-en-código)
+relaciona esos IDs con sus fuentes. Las clases de dependencias externas se describen
+como tecnología utilizada en el texto, sin convertirlas en entidades del sistema.
 
-La [secuencia de guardado](08-document-responsibilities.md#secuencia-de-guardado-confirmado)
-y las [altas rápidas entre dominios](08-document-responsibilities.md#composición-entre-dominios-para-altas-rápidas)
-amplían colaboraciones que cruzan varios mecanismos, sin reemplazar estos modelos.
-Los capítulos enlazan pruebas existentes y explican sus límites; no mantienen
-otra lista de resultados de ejecución. Al cambiar un colaborador se revisan su
-figura aplicada, contratos y consumidores, siguiendo el [índice documental](../../../../index.md).
+Los [contratos de intercambio](../../../contracts/index.md) definen los datos y
+resultados requeridos. Las pruebas de cada capítulo observan ese contrato; el
+[plan de pruebas](../../../../testing/01-test-plan.md) explica los niveles y sus límites.
+El mantenimiento documental sigue las [reglas de gobierno](../../../../governance/01-documentation-rules.md).

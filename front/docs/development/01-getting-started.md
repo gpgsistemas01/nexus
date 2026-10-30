@@ -239,7 +239,7 @@ el origen del frontend.
 | Cambio de componente en desarrollo | Vite actualiza la vista; los errores de tipos también se revisan con el editor o `type-check`. |
 
 La recuperación de sesión y los estados de rechazo se explican en
-[acceso y sesión](../architecture/views/development/frontend-technical-documentation/01-authentication.md). Para detener el desarrollo usa Ctrl+C en cada terminal.
+[acceso y sesión](../architecture/views/logical/components/01-access.md). Para detener el desarrollo usa Ctrl+C en cada terminal.
 No hace falta eliminar dependencias o la base al terminar.
 
 ## 7. Comprobaciones y compilación
@@ -251,7 +251,7 @@ npm --prefix front run check
 ```
 
 Los recorridos de navegador, su instalación de Playwright y sus respuestas simuladas
-se describen en [pruebas de navegador](../../README.md#pruebas-de-navegador).
+se describen en [archivos y ejecución de pruebas](../testing/06-test-files-and-credentials.md).
 No sustituyen las integraciones de PostgreSQL. Para comprobar únicamente la
 compilación y revisar el resultado local:
 
@@ -262,7 +262,7 @@ npm --prefix front run preview
 
 `build` genera `front/dist`; `preview` anuncia su URL en la terminal y conserva
 el proxy configurado. Vite `dev`/`preview` son herramientas locales. La publicación
-mediante Nginx se explica en [Docker para VPS](../../README.md#docker-para-vps-o-pruebas-locales).
+mediante Nginx se explica en [Docker para VPS](03-build-and-deployment.md#docker-y-vps).
 
 El [recorrido de sistema](../testing/05-system-tests.md) complementa esas pruebas
 con Express y PostgreSQL reales, base aislada y procesos propios. Se ejecuta con
@@ -277,12 +277,30 @@ contexto frontend y de la imagen final.
 | Síntoma | Comprobación y corrección |
 | --- | --- |
 | `ENOENT ... SistemaMerma/package.json` | El comando se lanzó en la raíz sin aplicación. Usar `npm --prefix front ...` o `npm --prefix back ...`, o entrar a la carpeta correspondiente. |
-| No se resuelve `axios`, `vee-validate` o la fuente | Detener Vite; completar `npm --prefix front ci --include=dev` y volver a iniciar. No instalar esas dependencias en `back/`. |
+| No se resuelve `axios`, `vee-validate` o la fuente | Seguir la [recuperación de dependencias de Vite](#dependencias-no-resueltas-en-vite). |
 | No se resuelve `@nexus/*` | Confirmar que está disponible el repositorio completo y que las rutas públicas compartidas existen. Reinstalar npm no recupera archivos ausentes de Git. |
 | Falta `back/generated/prisma/client.ts` | Verificar `back/.env` y ejecutar `npm --prefix back run db:generate`; no editar el archivo generado. |
 | `502` o `ECONNREFUSED 127.0.0.1:3000` | Comprobar que Express siga activo y que `BACKEND_PROXY_TARGET` apunte al puerto real. Reiniciar Vite si cambió `.env.local`. |
 | `401` o `403` con Express respondiendo | Revisar sesión, credenciales y permisos. Son rechazos HTTP diferentes de un fallo de conexión. |
 | `EBADENGINE` | Comparar Node con ambos `engines`; actualizar Node dentro de una rama admitida antes de reinstalar dependencias. |
+
+### Dependencias no resueltas en Vite
+
+Ante `Failed to resolve import` o `Failed to run dependency scan`, detener Vite con
+Ctrl+C. Desde la raíz, reinstalar las dependencias declaradas del frontend y
+comprobar el paquete que indica el error; por ejemplo, para `vee-validate`:
+
+```bash
+npm --prefix front ci --include=dev
+npm --prefix front ls vee-validate --depth=0
+npm --prefix front run dev -- --force
+```
+
+Continuar sólo si la instalación termina correctamente y `ls` muestra el paquete.
+Si falta en `front/package.json` o en el lockfile, comprobar la rama y la copia
+que ejecuta Vite. Conservar la salida de una instalación fallida para diagnosticarla.
+`--force` rehace la caché de optimización; no instala paquetes. Las líneas
+`dependencies optimized` de otras bibliotecas tampoco resuelven un import ausente.
 
 ## Archivos locales ignorados y su ubicación
 

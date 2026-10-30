@@ -9,7 +9,7 @@ Se inspeccionan 173 archivos TypeScript y SFC de `src/`, con TypeScript y el par
 Las tablas muestran exports declarados, nombres de props/eventos/slots tipados e imports estáticos o diferidos.
 Los contratos referenciados por un tipo conservan su nombre; no se expande el compilador ni se ejecuta la aplicación.
 No se infieren responsabilidades, permisos, calidad o cobertura a partir de los nombres.
-Las decisiones pertenecen a [arquitectura](code-structure.md), [patrones](design-and-construction-patterns/index.md) y [módulos](frontend-technical-documentation/index.md).
+La [estructura](code-structure.md) define las capas; los [componentes](../logical/components/index.md), sus dependencias; los [patrones](design-and-construction-patterns/index.md), los mecanismos reutilizados.
 No incluye secretos, dependencias instaladas, archivos compilados ni código privado del servidor.
 
 ## App.vue

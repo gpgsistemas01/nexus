@@ -64,7 +64,7 @@ classDiagram
     class R3["LookupState"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : sections
+    Subject --> "0..*" R0 : sections
     Subject ..> R1 : values
     Subject ..> R2 : errors
     Subject ..> R3 : lookups
@@ -82,7 +82,7 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : supplier
+    Subject --> "0..1" R0 : supplier
 ```
 
 ## InventoryEditor.defineEmits
@@ -166,7 +166,7 @@ classDiagram
     class R0["LookupState"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : suppliers
+    Subject --> "1" R0 : suppliers
 ```
 
 ## InventoryFilters.defineEmits
@@ -244,9 +244,9 @@ classDiagram
     class R2["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : field
-    Subject "1" --> "0..1" R1 : lookup
-    Subject "1" --> "0..1" R2 : initialOption
+    Subject --> "1" R0 : field
+    Subject --> "0..1" R1 : lookup
+    Subject --> "0..1" R2 : initialOption
 ```
 
 ## InventoryFormField.defineEmits
@@ -356,8 +356,8 @@ classDiagram
     class R1["InventoryPermissions"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : row
-    Subject "1" --> "1" R1 : permissions
+    Subject --> "1" R0 : row
+    Subject --> "1" R1 : permissions
 ```
 
 ## InventoryRowActions.defineEmits
@@ -433,10 +433,10 @@ classDiagram
     class R3["InventoryQuery"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : rows
-    Subject "1" --> "1" R1 : permissions
+    Subject --> "0..*" R0 : rows
+    Subject --> "1" R1 : permissions
     Subject ..> R2 : resource
-    Subject "1" --> "1" R3 : query
+    Subject --> "1" R3 : query
 ```
 
 ## InventoryTable.defineEmits
@@ -497,7 +497,7 @@ classDiagram
     class R0["InventoryRow"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : item
+    Subject --> "1" R0 : item
 ```
 
 ## useInventoryEditor.options@25:45
@@ -556,7 +556,7 @@ classDiagram
     Subject ..> R0 : resource
     Subject ..> R1 : target
     Subject ..> R2 : onSaved
-    Subject "1" --> "0..1" R2 : initialSupplier
+    Subject --> "0..1" R2 : initialSupplier
     Subject ..> R3 : onAddStock
 ```
 
@@ -661,7 +661,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : query
+    Subject --> "1" R1 : query
 ```
 
 ## useInventorySelection.options@14:48
@@ -715,7 +715,7 @@ classDiagram
     Subject ..> R0 : resource
     Subject ..> R1 : target
     Subject ..> R2 : values
-    Subject "1" --> "0..1" R3 : initialSupplier
+    Subject --> "0..1" R3 : initialSupplier
 ```
 
 **Figura:** `DIA-VUE-TS-WAREHOUSE-18-2`. Parte 2/2.
@@ -864,8 +864,8 @@ classDiagram
     class R1["InventorySummaryItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : fields
-    Subject "1" --> "0..*" R1 : summary
+    Subject --> "0..*" R0 : fields
+    Subject --> "0..*" R1 : summary
 ```
 
 ## inventorySections.options@33:14
@@ -901,8 +901,8 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : template
-    Subject "1" --> "0..1" R0 : supplier
+    Subject --> "0..1" R0 : template
+    Subject --> "0..1" R0 : supplier
 ```
 
 ## isRoll@56:46
@@ -934,16 +934,6 @@ classDiagram
 'materials' | 'consumables' | 'wastes'
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-25-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["InventoryResource"] {
-        <<type>>
-    }
-```
-
 ## InventoryAction
 
 **Fuente:** [src/modules/warehouse/inventory.ts](../../../../../src/modules/warehouse/inventory.ts) · línea 4, columna 1. **Declaración:** type.
@@ -954,16 +944,6 @@ classDiagram
 'create' | 'edit' | 'stock' | 'add-stock' | 'delete'
 ```
 
-**Figura:** `DIA-VUE-TS-WAREHOUSE-26-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["InventoryAction"] {
-        <<type>>
-    }
-```
-
 ## Numeric
 
 **Fuente:** [src/modules/warehouse/inventory.ts](../../../../../src/modules/warehouse/inventory.ts) · línea 5, columna 1. **Declaración:** type.
@@ -972,16 +952,6 @@ classDiagram
 
 ```typescript
 string | number | null
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-27-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["Numeric"] {
-        <<type>>
-    }
 ```
 
 ## InventoryRow
@@ -1254,7 +1224,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : action
-    Subject "1" --> "0..1" R1 : row
+    Subject --> "0..1" R1 : row
 ```
 
 ## InventoryField
@@ -1282,16 +1252,6 @@ classDiagram
     | 'coneWeightKg'
     | 'totalWeightKg'
     | 'referenceRollTotalWeightKg'
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-34-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["InventoryField"] {
-        <<type>>
-    }
 ```
 
 ## InventoryValues
@@ -1335,16 +1295,6 @@ classDiagram
 
 ```typescript
 Record<string, string | number | boolean | null>
-```
-
-**Figura:** `DIA-VUE-TS-WAREHOUSE-36-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["InventoryPayload"] {
-        <<type>>
-    }
 ```
 
 ## InventoryEditorPage.defineProps
@@ -1393,7 +1343,7 @@ classDiagram
     }
     Subject ..> R0 : resource
     Subject ..> R1 : target
-    Subject "1" --> "0..1" R2 : initialSupplier
+    Subject --> "0..1" R2 : initialSupplier
 ```
 
 ## InventoryEditorPage.defineEmits
@@ -1591,8 +1541,8 @@ classDiagram
     }
     Subject ..> R0 : openEditor
     Subject ..> R1 : suppliers
-    Subject "1" --> "0..1" R2 : config
-    Subject "1" --> "0..1" R3 : config
+    Subject --> "0..1" R2 : config
+    Subject --> "0..1" R3 : config
 ```
 
 **Figura:** `DIA-VUE-TS-WAREHOUSE-42-2`. Parte 2/3.
@@ -1607,7 +1557,7 @@ classDiagram
     class R0["useInventory.return.config.<br/>shape6"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : config
+    Subject --> "0..1" R0 : config
 ```
 
 **Figura:** `DIA-VUE-TS-WAREHOUSE-42-3`. Parte 3/3.
@@ -1626,7 +1576,7 @@ classDiagram
     class R1["EditorTarget"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : permissions
+    Subject --> "1" R0 : permissions
     Subject ..> R1 : editor
 ```
 
@@ -2434,15 +2384,15 @@ classDiagram
     class R3["inventorySections.return.<br/>splice.shape3"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : toLocaleString
+    Subject --> "1" R0 : toLocaleString
     Subject ..> R1 : pop
     Subject ..> R1 : push
-    Subject "1" --> "1" R2 : concat
+    Subject --> "1" R2 : concat
     Subject ..> R1 : reverse
     Subject ..> R1 : shift
     Subject ..> R1 : slice
     Subject ..> R1 : sort
-    Subject "1" --> "1" R3 : splice
+    Subject --> "1" R3 : splice
     Subject ..> R1 : unshift
     Subject ..> R1 : indexOf
     Subject ..> R1 : lastIndexOf
@@ -2547,7 +2497,7 @@ classDiagram
     }
     Subject ..> R0 : at
     Subject ..> R0 : __@iterator@308
-    Subject "1" --> "0..1" R1 : __@unscopables@432
+    Subject --> "0..1" R1 : __@unscopables@432
 ```
 
 ## inventorySections.return.toLocaleString.shape1
@@ -2598,7 +2548,7 @@ classDiagram
     class R0["InventoryFormSection"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : signature
+    Subject --> "0..*" R0 : signature
     Subject ..> R0 : signature.items
 ```
 
@@ -2629,7 +2579,7 @@ classDiagram
     class R0["InventoryFormSection"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : signature
+    Subject --> "0..*" R0 : signature
     Subject ..> R0 : signature.items
 ```
 
@@ -2690,7 +2640,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : signature.predicate
-    Subject "1" --> "0..*" R0 : signature
+    Subject --> "0..*" R0 : signature
 ```
 
 ## inventorySections.return.reduce.shape6
@@ -2723,7 +2673,7 @@ classDiagram
     class R0["InventoryFormSection"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : signature
+    Subject --> "1" R0 : signature
     Subject ..> R0 : signature.callbackfn
     Subject ..> R0 : signature.initialValue
 ```
@@ -2758,7 +2708,7 @@ classDiagram
     class R0["InventoryFormSection"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : signature
+    Subject --> "1" R0 : signature
     Subject ..> R0 : signature.callbackfn
     Subject ..> R0 : signature.initialValue
 ```
@@ -2791,7 +2741,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : signature.predicate
-    Subject "1" --> "0..1" R0 : signature
+    Subject --> "0..1" R0 : signature
 ```
 
 ## inventorySections.return.__@unscopables@432.shape9
@@ -3027,9 +2977,9 @@ classDiagram
     class R2["INVENTORY_CONFIG.wastes.<br/>shape3"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : materials
-    Subject "1" --> "1" R1 : consumables
-    Subject "1" --> "1" R2 : wastes
+    Subject --> "1" R0 : materials
+    Subject --> "1" R1 : consumables
+    Subject --> "1" R2 : wastes
 ```
 
 ## INVENTORY_CONFIG.materials.shape1
@@ -3292,15 +3242,15 @@ classDiagram
     class R3["inventoryHeaders.return.<br/>splice.shape3"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : toLocaleString
+    Subject --> "1" R0 : toLocaleString
     Subject ..> R1 : pop
     Subject ..> R1 : push
-    Subject "1" --> "1" R2 : concat
+    Subject --> "1" R2 : concat
     Subject ..> R1 : reverse
     Subject ..> R1 : shift
     Subject ..> R1 : slice
     Subject ..> R1 : sort
-    Subject "1" --> "1" R3 : splice
+    Subject --> "1" R3 : splice
     Subject ..> R1 : unshift
     Subject ..> R1 : indexOf
     Subject ..> R1 : lastIndexOf
@@ -3405,7 +3355,7 @@ classDiagram
     }
     Subject ..> R0 : at
     Subject ..> R0 : __@iterator@308
-    Subject "1" --> "0..1" R1 : __@unscopables@432
+    Subject --> "0..1" R1 : __@unscopables@432
 ```
 
 ## inventoryHeaders.return.toLocaleString.shape1
@@ -3951,7 +3901,7 @@ classDiagram
     class R0["inventoryCatalogService.<br/>lookup.data.shape2"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```
 
 ## inventoryCatalogService.lookup.data.shape2

@@ -45,6 +45,19 @@ Almacén y consulte su estado para conocer el avance.
 6. Revise encabezado y detalles, pulse **Guardar** y espere la confirmación.
 7. Consulte el folio registrado y su estado de cumplimiento.
 
+Si vuelve a agregar el mismo material o consumible del mismo proveedor, su cantidad
+se **suma** al detalle existente. Lo mismo ocurre al repetir una merma. Revise la
+cantidad acumulada antes de guardar; otro proveedor conserva un detalle diferente.
+
+Para Materiales y Consumibles, la cantidad debe ser al menos 1; para Mermas puede
+ser menor que 1, siempre que sea positiva. La fecha y hora de solicitud corresponden
+al horario de Ciudad de México. Si cambia Cliente o Área, revise de nuevo Asesor,
+Solicitante y Número de proyecto: sus selecciones dependientes se actualizan.
+
+Para **GPG INTERNO**, el número de proyecto se completa según **Área** y debe
+conservar ese valor. Si no aparece un número, solicite que revisen la configuración
+del área; escribir uno diferente puede impedir guardar la salida.
+
 ![Preparación de una solicitud de salida con sus datos y detalle.](images/23-issue-create.png)
 
 Los selectores identifican registros existentes; escribir un nombre sin elegirlo
@@ -97,7 +110,7 @@ no se corrige cerrando la ventana después de guardar.
 
 La selección surte toda la cantidad pendiente de cada detalle. Una salida queda
 **Surtido parcial** si todavía tiene otros detalles pendientes; no se captura
-libremente una entrega parcial de un renglón. **Cantidad de proyecto** es un dato de referencia del proyecto; no
+libremente una entrega parcial de un detalle. **Cantidad de proyecto** es un dato de referencia del proyecto; no
 sustituye la cantidad de inventario que se entrega. No marque una entrega que
 todavía no se ha realizado. El sistema vuelve a comprobar existencias y estado
 al confirmar; otra operación puede haberlos cambiado desde que abrió la pantalla.

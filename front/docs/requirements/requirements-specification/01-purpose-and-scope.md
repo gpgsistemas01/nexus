@@ -16,23 +16,15 @@ pruebas aportan evidencia, sin sustituir la aceptación funcional.
 | Condiciones de operación | [Interfaces y dependencias](07-interfaces-and-operating-conditions.md): contratos, entorno, compatibilidad y recuperación. |
 | Aceptación de requisitos | [Verificación y aceptación](08-verification-and-acceptance.md): escenarios del cliente, fuentes de comprobación y decisión funcional. |
 
-El alcance vigente comprende autenticación, Personas y Usuarios, seis catálogos
-auxiliares, Clientes y Proveedores, Materiales, Consumibles, Mermas, Compras,
-Salidas, devoluciones, Movimientos y reportes autorizados. Las requisiciones están
-fuera de alcance; la administración de proyectos permanece modelada sin una pantalla
-disponible. Los objetivos cuantitativos del servicio requieren un acuerdo pendiente.
+El [alcance vigente](../vision-scope-and-requirements/06-current-scope.md) reúne las
+capacidades incluidas y excluidas. Las requisiciones están fuera de alcance; la
+administración de proyectos permanece modelada sin una pantalla disponible.
 
 La aplicación captura datos, presenta resultados y conserva el contexto del usuario.
 La API comprueba acceso, reglas y estado persistido y confirma las operaciones. Las
 reglas del producto se explican íntegramente en esta colección; ninguna garantía de
 persistencia se atribuye al navegador.
 
-La estructura adopta selectivamente ISO/IEC/IEEE 29148:2018 para requisitos e
-ISO/IEC/IEEE 15289:2019 para elementos de información, según su
-[aplicación documental](../../governance/03-standard-applicability.md).
-Se conserva granularidad por obligación y objetivo, sin crear un requisito por
-campo ni convertir una decisión de implementación en una función del negocio.
-
-El paquete permanece **En revisión** hasta registrar responsable, condiciones,
-resultado y evidencia de su aceptación. «Implementado» describe evidencia de una
-capacidad y no significa que ya haya sido aceptada por el negocio.
+Las [convenciones](02-conventions.md) definen redacción, identificadores y estados.
+Las referencias normativas y su alcance se consultan en
+[Aplicación de estándares](../../governance/03-standard-applicability.md).

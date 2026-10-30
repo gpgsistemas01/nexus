@@ -44,8 +44,8 @@ classDiagram
     class R1["PurchaseCorrectionForm.<br/>values@9:13"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : totals
-    Subject "1" --> "1" R1 : values
+    Subject --> "0..1" R0 : totals
+    Subject --> "1" R1 : values
 ```
 
 ## PurchaseCorrectionForm.totals@8:13
@@ -149,7 +149,7 @@ classDiagram
     class R0["PurchaseDetail"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : rows
+    Subject --> "0..*" R0 : rows
 ```
 
 ## PurchaseDetailsTable.defineEmits
@@ -258,11 +258,11 @@ classDiagram
     class R3["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : errors
-    Subject "1" --> "1" R2 : suppliers
-    Subject "1" --> "1" R2 : persons
-    Subject "1" --> "0..1" R3 : supplier
+    Subject --> "1" R2 : suppliers
+    Subject --> "1" R2 : persons
+    Subject --> "0..1" R3 : supplier
 ```
 
 **Figura:** `DIA-VUE-TS-PURCHASES-7-2`. Parte 2/2.
@@ -285,9 +285,9 @@ classDiagram
     class R2["PurchaseEditor.totals@35:13"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : receiver
-    Subject "1" --> "0..*" R1 : details
-    Subject "1" --> "1" R2 : totals
+    Subject --> "0..1" R0 : receiver
+    Subject --> "0..*" R1 : details
+    Subject --> "1" R2 : totals
 ```
 
 ## PurchaseEditor.totals@35:13
@@ -412,9 +412,9 @@ classDiagram
     class R1["LookupState"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
-    Subject "1" --> "1" R1 : suppliers
-    Subject "1" --> "1" R1 : persons
+    Subject --> "1" R0 : values
+    Subject --> "1" R1 : suppliers
+    Subject --> "1" R1 : persons
 ```
 
 ## PurchaseFilters.defineEmits
@@ -502,9 +502,9 @@ classDiagram
     class R2["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
-    Subject "1" --> "1" R1 : items
-    Subject "1" --> "0..1" R2 : selected
+    Subject --> "1" R0 : values
+    Subject --> "1" R1 : items
+    Subject --> "0..1" R2 : selected
 ```
 
 ## PurchaseLineEntryForm.values@10:13
@@ -597,7 +597,7 @@ classDiagram
     class R1["PurchaseQuery"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : rows
+    Subject --> "0..*" R0 : rows
     Subject ..> R1 : query
 ```
 
@@ -661,7 +661,7 @@ classDiagram
     class R0["PurchaseTotals.totals@6:17"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : totals
+    Subject --> "0..1" R0 : totals
 ```
 
 ## PurchaseTotals.totals@6:17
@@ -746,7 +746,7 @@ classDiagram
     class R0["PurchaseRow"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : row
+    Subject --> "1" R0 : row
 ```
 
 ## usePurchaseCorrection.options@12:48
@@ -794,8 +794,8 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : document
-    Subject "1" --> "1" R2 : detail
+    Subject --> "1" R1 : document
+    Subject --> "1" R2 : detail
     Subject ..> R3 : onSaved
 ```
 
@@ -807,16 +807,6 @@ classDiagram
 
 ```typescript
 'quantity' | 'costPerUnitType'
-```
-
-**Figura:** `DIA-VUE-TS-PURCHASES-22-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["Field"] {
-        <<type>>
-    }
 ```
 
 ## usePurchaseEditor.options@23:44
@@ -905,7 +895,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : supplier
+    Subject --> "1" R1 : supplier
     Subject ..> R2 : onAdded
 ```
 
@@ -917,16 +907,6 @@ classDiagram
 
 ```typescript
 'materialId' | 'quantity' | 'costPerUnitType'
-```
-
-**Figura:** `DIA-VUE-TS-PURCHASES-25-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["Field"] {
-        <<type>>
-    }
 ```
 
 ## PurchaseCorrectionPage.defineProps
@@ -966,8 +946,8 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : document
-    Subject "1" --> "1" R2 : detail
+    Subject --> "1" R1 : document
+    Subject --> "1" R2 : detail
 ```
 
 ## PurchaseCorrectionPage.defineEmits
@@ -1134,7 +1114,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : supplier
+    Subject --> "1" R1 : supplier
 ```
 
 ## PurchaseLineEntryPage.defineEmits
@@ -1242,16 +1222,6 @@ classDiagram
 'materials' | 'consumables'
 ```
 
-**Figura:** `DIA-VUE-TS-PURCHASES-34-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["PurchaseResource"] {
-        <<type>>
-    }
-```
-
 ## Decimal
 
 **Fuente:** [src/modules/purchases/purchase.ts](../../../../../src/modules/purchases/purchase.ts) · línea 5, columna 1. **Declaración:** type.
@@ -1260,16 +1230,6 @@ classDiagram
 
 ```typescript
 string | number
-```
-
-**Figura:** `DIA-VUE-TS-PURCHASES-35-1`.
-
-```mermaid
-classDiagram
-    direction LR
-    class Subject["Decimal"] {
-        <<type>>
-    }
 ```
 
 ## PurchaseFilters
@@ -1487,7 +1447,7 @@ classDiagram
         <<reference>>
     }
     R0 <|-- Subject : extends
-    Subject "1" --> "0..*" R1 : details
+    Subject --> "0..*" R1 : details
 ```
 
 ## PurchaseValues
@@ -1526,7 +1486,7 @@ classDiagram
     class R0["PurchaseDetail"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : details
+    Subject --> "0..*" R0 : details
 ```
 
 ## PurchaseField
@@ -1642,7 +1602,7 @@ classDiagram
     class R0["PurchaseDocument"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : document
+    Subject --> "1" R0 : document
 ```
 
 ## PurchaseTarget@62:7
@@ -1671,7 +1631,7 @@ classDiagram
     class R0["PurchaseDocument"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : document
+    Subject --> "1" R0 : document
 ```
 
 ## PurchaseWriteTarget
@@ -1832,7 +1792,7 @@ classDiagram
         <<reference>>
     }
     R0 <|-- Subject : extends
-    Subject "1" --> "1" R1 : supplier
+    Subject --> "1" R1 : supplier
 ```
 
 ## calculatePurchaseCorrectionTotals.values@19:13
@@ -2229,7 +2189,7 @@ classDiagram
     class R3["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : suppliers
     Subject ..> R2 : persons
     Subject ..> R3 : supplier
@@ -2258,7 +2218,7 @@ classDiagram
     class R2["usePurchaseEditor.return.<br/>totals.shape9"] {
         <<reference>>
     }
-    Subject "1" --> "0..1" R0 : receiverSeed
+    Subject --> "0..1" R0 : receiverSeed
     Subject ..> R1 : addDetail
     Subject ..> R2 : totals
     Subject ..> R1 : update
@@ -2526,7 +2486,7 @@ classDiagram
     class R0["usePurchaseEditor.return.<br/>receiverSeed.data.shape8"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : data
+    Subject --> "1" R0 : data
 ```
 
 ## usePurchaseEditor.return.receiverSeed.data.shape8
@@ -2614,7 +2574,7 @@ classDiagram
     class R2["usePurchaseFilters.return.<br/>persons.shape5"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : values
+    Subject --> "1" R0 : values
     Subject ..> R1 : suppliers
     Subject ..> R2 : persons
 ```
@@ -3119,7 +3079,7 @@ classDiagram
     class R1["Decimal"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : details
+    Subject --> "0..*" R0 : details
     Subject ..> R1 : totalQuantity
     Subject ..> R1 : totalNetPurchaseAmount
     Subject ..> R1 : totalGrossPurchaseAmount
@@ -3226,8 +3186,8 @@ classDiagram
     class R1["PURCHASE_CONFIG.consumables.<br/>shape2"] {
         <<reference>>
     }
-    Subject "1" --> "1" R0 : materials
-    Subject "1" --> "1" R1 : consumables
+    Subject --> "1" R0 : materials
+    Subject --> "1" R1 : consumables
 ```
 
 ## PURCHASE_CONFIG.materials.shape1
@@ -3473,7 +3433,7 @@ classDiagram
     class R0["LookupItem"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : data
+    Subject --> "0..*" R0 : data
 ```
 
 ## purchaseService

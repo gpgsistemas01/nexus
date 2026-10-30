@@ -36,7 +36,7 @@ classDiagram
     class R0["NavigationGroup"] {
         <<reference>>
     }
-    Subject "1" --> "0..*" R0 : groups
+    Subject --> "0..*" R0 : groups
 ```
 
 ## AppNavigation.defineEmits
@@ -190,7 +190,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : resource
-    Subject "1" --> "1" R1 : request
+    Subject --> "1" R1 : request
 ```
 
 ## DirectoryCreationPage.defineEmits
@@ -583,7 +583,7 @@ classDiagram
         <<reference>>
     }
     Subject ..> R0 : addRoute
-    Subject "1" --> "1" R1 : resolve
+    Subject --> "1" R1 : resolve
 ```
 
 **Figura:** `DIA-VUE-TS-APP-19-2`. Parte 2/2.

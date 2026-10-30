@@ -25,5 +25,5 @@
 
 ## Realización y verificación del cliente
 
-[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/02-warehouse.md).
+[Componentes del cliente](../../../architecture/views/logical/components/02-inventory.md).
 Pruebas de navegador: [warehouse.spec.ts](../../../../tests/e2e/warehouse.spec.ts).

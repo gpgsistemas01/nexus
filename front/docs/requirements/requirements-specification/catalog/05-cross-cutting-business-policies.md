@@ -3,13 +3,13 @@
 Las reglas también aplican singularidad: cada `RN-*` expresa una restricción que puede
 incumplirse y comprobarse de manera independiente.
 
-| ID | Requisito y criterio de aceptación | Estado del requisito de producto |
+| ID | Requisito | Estado |
 | --- | --- | --- |
 | RN-001 | Toda operación protegida debe comprobar autenticación válida en el servidor antes de acceder a datos. | Implementado |
 | RN-002 | Una operación que cambia documento, detalle, stock y movimiento debe ser atómica: se confirman todos los cambios o ninguno. | Implementado |
 | RN-003 | La cantidad acumulada surtida de un detalle no debe superar su cantidad solicitada vigente. | Implementado |
-| RN-004 | Cada documento o movimiento que requiera referencia debe tener una referencia única. | Implementado |
-| RN-005 | Las correcciones y ajustes deben conservar datos históricos suficientes para explicar el valor anterior, el nuevo, el motivo y el actor. | Implementado |
+| RN-004 | Todo documento o movimiento identificado por folio debe tener un folio único. | Implementado |
+| RN-005 | Las correcciones y ajustes deben conservar el valor anterior, el nuevo, el motivo y el actor que efectuó el cambio. | Implementado |
 | RN-007 | La eliminación física sólo debe proceder cuando el recurso no tenga relaciones históricas protegidas; en otro caso se debe conservar mediante estado o cancelación. | Implementado |
 | RN-008 | Cada escritura crítica configurada debe registrar actor, acción, recurso, resultado y los datos de solicitud admitidos por la política de auditoría. | Implementado |
 | RN-009 | Toda operación protegida debe comprobar en el servidor el permiso requerido antes de ejecutar el caso de uso. | Implementado |
@@ -18,7 +18,7 @@ incumplirse y comprobarse de manera independiente.
 | RN-012 | Una disminución de inventario debe rechazarse cuando la existencia vigente no alcance para cubrir la cantidad solicitada. | Implementado |
 | RN-013 | Las cantidades solicitadas o recibidas, las nuevas devoluciones y las entradas adicionales de merma deben ser positivas. El saldo final de un ajuste admite cero; su diferencia puede ser positiva, negativa o cero. Las diferencias de corrección y reversión no se validan como cantidades de entrega. | Implementado |
 | RN-014 | Cada nueva devolución debe ser positiva y no superar el saldo entregado, calculado como cantidad suministrada menos devoluciones anteriores; el acumulado devuelto no debe superar el acumulado suministrado. | Implementado |
-| RN-015 | En el flujo vigente, un detalle permanece `Pendiente` hasta surtir toda su cantidad pendiente y pasa a `Surtido`; las devoluciones se rigen por `RN-028`. El cumplimiento parcial del documento no implica entrega parcial libre de un detalle. | Implementado |
+| RN-015 | Durante el surtido vigente, un detalle debe permanecer `Pendiente` hasta entregar toda su cantidad pendiente y pasar a `Surtido`. Las devoluciones deben seguir `RN-028`; el cumplimiento parcial del documento no debe habilitar una entrega parcial libre de un detalle. | Implementado |
 | RN-016 | Una salida debe estar `Pendiente` si no tiene detalles surtidos, `Surtido parcial` si tiene entregas y otros detalles pendientes, y `Surtido` cuando todos se han surtido. Las devoluciones conservan ese cumplimiento hasta la cancelación total definida por `RN-029`. | Implementado |
 | RN-017 | Un detalle cancelado de entrada no debe volver a cancelarse ni participar en los totales activos del documento. | Implementado |
 | RN-018 | Una factura informada sólo puede identificar una entrada por proveedor; un conflicto debe señalar la entrada ya registrada. | Implementado |
@@ -38,6 +38,7 @@ incumplirse y comprobarse de manera independiente.
 | RN-032 | Base y altura deben compararse en sus posiciones respectivas y no intercambiarse al determinar la identidad de un material. | Implementado |
 | RN-033 | La trazabilidad de una merma debe conservar el documento que origina cada entrada o salida y su movimiento con saldos; mientras la existencia se administre como saldo fungible y no por lotes, una salida no debe atribuirse a una entrada específica. | Implementado |
 | RN-034 | Materiales y consumibles deben conservar ofertas por proveedor, existencias y movimientos comparables, pero permanecer separados en consultas, selectores, reportes, compras y salidas. Cada documento debe tener al menos un detalle y todos deben pertenecer al contexto de su cabecera, incluidos los cancelados; un documento vacío, mixto o de otro contexto queda excluido de ambos flujos operativos. | Implementado |
+| RN-035 | En una salida para GPG INTERNO, el número de proyecto debe coincidir con el configurado para el área de destino. El sistema debe rechazar el alta o la edición del encabezado si el área no tiene un número configurado o si el valor no coincide. | Implementado |
 
 ## Aplicación de las reglas
 

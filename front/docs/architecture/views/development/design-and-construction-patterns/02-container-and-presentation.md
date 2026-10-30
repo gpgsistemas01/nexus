@@ -1,6 +1,6 @@
 # 2. Contenedor y presentación
 
-## Problema y decisión
+## Propósito y funcionamiento
 
 Un componente que consulta la API, decide permisos y dibuja controles cambia por
 motivos distintos. El contenedor coordina el caso; la presentación recibe props
@@ -50,9 +50,8 @@ columnas y emite eventos; no solicita HTTP ni consulta la sesión.
 de apertura y recarga, sin definir las reglas del catálogo.
 
 La presentación puede tener estado visual local o valores calculados. Una page
-puede ser contenedor de un diálogo sin ser una ruta independiente. No se extrae
-un contenedor adicional por cada botón. ESLint protege imports de presentación;
-la revisión comprueba también dependencias indirectas.
+también puede contener un diálogo: la carpeta `pages` identifica su coordinación,
+mientras el Router determina cuáles de esas páginas tienen una URL.
 
 [catalogs.spec.ts](../../../../../tests/e2e/catalogs.spec.ts) comprueba el flujo con API
 simulada; las [pruebas del editor](../../../../../tests/unit/modules/catalogs/catalogEditorTest.ts)

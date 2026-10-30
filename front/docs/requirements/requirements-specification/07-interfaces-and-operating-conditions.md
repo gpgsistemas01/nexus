@@ -10,14 +10,15 @@ los métodos, rutas, campos y códigos; no se mantiene aquí otro catálogo de e
 | --- | --- | --- |
 | Navegador y aplicación | Abrir o recargar una URL Vue debe resolver su página. El servidor de archivos distingue el fallback de la SPA de una petición API o de un asset ausente. | `RF-VUE-003`, `RC-VUE-002`, `RC-VUE-003`. |
 | Aplicación y sesión | Login, consulta de identidad, renovación y cierre usan el mismo origen visible para el navegador mediante la estrategia de proxy. Las cookies de sesión las administra el navegador; el cliente no necesita leerlas desde JavaScript. | `RF-VUE-001`, `RF-VUE-002`, `RF-VUE-014`, `RD-VUE-004`. |
-| Aplicación y datos | Las consultas reciben JSON con estructura comprobable. Un listado exige filas y conteos válidos; una escritura exige la confirmación del recurso y operación. Un código HTTP favorable por sí solo no confirma un contrato incompleto. | `RF-VUE-004` a `RF-VUE-011`, `RC-COM-002`. |
-| Aplicación y archivos | Una descarga recibe el tipo de archivo admitido; JSON de error o HTML no se anuncia como Excel válido. El navegador inicia la descarga y el usuario necesita una aplicación compatible para abrir el archivo. | `RF-VUE-013`, `RC-COM-002`. |
+| Aplicación y datos | Las consultas reciben JSON con estructura comprobable. Un listado exige filas y conteos válidos; una escritura exige la confirmación del recurso y operación. Un código HTTP favorable por sí solo no confirma un contrato incompleto. | `RF-VUE-004` a `RF-VUE-011`, `RD-VUE-007`, `RC-COM-002`. |
+| Aplicación y archivos | Una descarga recibe el tipo de archivo admitido; JSON de error o HTML no se anuncia como Excel válido. El navegador inicia la descarga y el usuario necesita una aplicación compatible para abrir el archivo. | `RF-VUE-013`, `RD-VUE-007`, `RC-COM-002`. |
 | Compilación y reglas públicas | Los módulos compartidos permitidos se incorporan al compilar. Los assets publicados no consultan rutas del filesystem del servicio API durante la ejecución. Las reglas privadas, secretos y persistencia permanecen en el servidor. | `RC-VUE-001`, `RC-VUE-002`, `RC-SEG-004`. |
 
 API y frontend pueden ejecutarse en servicios o contenedores independientes. Compartir
 el origen público de las peticiones no exige compartir proceso ni imagen. El
 [despliegue](../../development/03-build-and-deployment.md) especifica cómo proporcionar
-assets, fallback y proxy; cambiar a peticiones entre orígenes requiere revisar cookies,+CORS y los escenarios de sesión antes de declarar compatible ese despliegue.
+assets, fallback y proxy; cambiar a peticiones entre orígenes requiere revisar
+cookies, CORS y los escenarios de sesión antes de declarar compatible ese despliegue.
 
 ## Supuestos, dependencias y restricciones
 

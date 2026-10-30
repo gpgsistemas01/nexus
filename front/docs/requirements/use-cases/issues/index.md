@@ -40,5 +40,5 @@ del alta no reemplaza el área ni sus datos dependientes al editar un documento.
 
 ## Realización y verificación del cliente
 
-[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/07-issues.md).
+[Componentes del cliente](../../../architecture/views/logical/components/07-issues.md).
 Pruebas de navegador: [issues.spec.ts](../../../../tests/e2e/issues.spec.ts).

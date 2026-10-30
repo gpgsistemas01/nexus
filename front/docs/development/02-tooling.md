@@ -1,12 +1,35 @@
 # 2. Herramientas del frontend
 
-Esta guía conserva herramientas, versiones, formato y ejecución local. El
-[diseño de pruebas](../testing/02-test-design.md), las
-[fichas de casos](../testing/03-test-cases.md) y la
-[cobertura por caso de uso](../testing/04-use-case-coverage.md) tienen propietarios
-separados. Los resultados de ejecución permanecen en CI o en la revisión del cambio.
+Esta guía explica los comandos del frontend, su comprobación de código y las
+bibliotecas que utiliza la interfaz. La instalación inicial se describe en
+[Preparar e iniciar el proyecto](01-getting-started.md).
 
-## Decisiones aplicadas
+## Comandos del frontend
+
+Ejecutar desde `front/`. Desde la raíz, sustituir `npm run` por
+`npm --prefix front run`.
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run dev` | Inicia Vite con actualización automática. |
+| `npm run type-check` | Comprueba tipos de componentes, código, pruebas y configuración. |
+| `npm run type-check:watch` | Mantiene la comprobación de tipos en otra terminal. |
+| `npm run format` | Aplica correcciones de lint y el formato versionado. |
+| `npm run format:check` | Comprueba el formato sin modificar archivos. |
+| `npm run lint` | Comprueba las reglas ESLint sin modificar archivos. |
+| `npm run lint:fix` | Aplica las correcciones automáticas de ESLint. |
+| `npm run test:unit` | Ejecuta las pruebas unitarias una vez. |
+| `npm run build` | Comprueba tipos y genera `dist/`. |
+| `npm run build-only` | Sólo compila; no sustituye la comprobación de tipos. |
+| `npm run preview` | Sirve localmente `dist/` para revisarlo. |
+| `npm run check` | Ejecuta formato, lint, unitarias y build con tipos. |
+
+La [ejecución de pruebas](../testing/06-test-files-and-credentials.md) contiene la
+instalación de Chromium, los comandos de navegador y la preparación de sistema.
+La [publicación documental](../governance/02-generation-and-publication.md)
+conserva los comandos `docs:*` y sus resultados.
+
+## Configuración y compatibilidad
 
 La base usa Vue 3, Vue Router 5 y Vite, con TypeScript estricto. `vue-tsc` comprueba
 componentes y módulos; ESLint analiza errores comunes de JavaScript/TypeScript y Vue.
@@ -29,25 +52,23 @@ Después de descargar cambios que actualicen dependencias, detén Vite y ejecuta
 desde la raíz `npm --prefix front ci --include=dev`, seguido de
 `npm --prefix front run dev`. Git no actualiza `node_modules`.
 
-### Versiones y compatibilidad
+### Compatibilidad de herramientas
 
-- Vue Router 5.4.0 conserva el router explícito existente, las guardas y la carga
-  diferida; no exige incorporar Pinia ni generación de rutas por archivos.
-- Vitest 5.0.5, jsdom 30.1.3 y Vue Test Utils 2.5.1 actualizan la infraestructura
-  de pruebas; no se cambia el estado aislado por prueba para optimizar tiempos.
+- Vue Router 5.4.0 utiliza el router explícito, las guardas y la carga diferida
+  declarados en `src/app/router/index.ts`.
+- Vitest 5.0.5 ejecuta las unitarias en jsdom 30.1.3; Vue Test Utils 2.5.1
+  proporciona el montaje de componentes en esas pruebas.
 - TypeScript 6.0.3 es compatible con `vue-tsc` y el analizador de ESLint instalado.
-  TypeScript 7 queda pendiente: `@typescript-eslint/typescript-estree` declara
-  soporte `>=4.8.4 <6.1.0`. El aviso de una versión mayor disponible no basta para
-  adoptar un compilador que el conjunto de herramientas todavía no admite.
+  `@typescript-eslint/typescript-estree` declara soporte `>=4.8.4 <6.1.0`;
+  ese rango también se revisa al actualizar el compilador.
 - `@types/node` conserva la rama 24 para comprobar las APIs del entorno mínimo
   compartido; ejecutar Node 26 no exige usar sus tipos en herramientas que también
   deben funcionar con Node 24.
 
 ### Avisos de obsolescencia
 
-Vue Test Utils 2.5.1 usa js-beautify 2.x y glob 13.x. La actualización elimina la
-cadena antigua de glob 10.5.0 sin forzar una versión mayor mediante overrides.
-Comprueba el origen de cualquier aviso nuevo con `npm explain <paquete>` desde
+Vue Test Utils 2.5.1 usa js-beautify 2.x y glob 13.x. Comprueba el origen de un
+aviso de obsolescencia con `npm explain <paquete>` desde
 la aplicación afectada. Un aviso de obsolescencia y una vulnerabilidad de
 `npm audit` son comprobaciones distintas.
 
@@ -82,16 +103,14 @@ y activar «Format on Save»; la configuración versionada determina el resultad
 No hace falta la extensión para ejecutar los comandos ni para CI. El alcance
 es código, pruebas, herramientas y configuración del frontend.
 
-## Automatización y Docker
+## Automatización
 
-Desde `front/`, `npm run check` ejecuta formato, lint, pruebas y build con tipos. Desde la raíz
-puedes usar `npm --prefix front run check`. CI ejecuta esos controles en pasos separados
-y conserva el reporte JUnit del frontend como artefacto. No modifica los disparadores
-ni las comprobaciones unitarias e integración del backend.
+CI ejecuta formato, lint, pruebas y build en pasos separados y conserva el reporte
+JUnit del frontend como artefacto. Sus disparadores y versiones de Node se declaran
+en [ci.yml](../../../.github/workflows/ci.yml).
 
-El Dockerfile instala las herramientas en la etapa de build, copia los tsconfig y
-compila con comprobación de tipos. La imagen final contiene sólo Nginx y `dist/`.
-Los casos de prueba se ejecutan en CI antes del despliegue, no en Nginx.
+La [guía de despliegue](03-build-and-deployment.md) explica la construcción de la
+imagen y los archivos que contiene cada etapa.
 
 ## Interfaz y formularios
 
@@ -115,8 +134,7 @@ Las fuentes son los imports de `front/src/modules` y `front/src/shared`; los
 [contratos de formularios](../architecture/contracts/form-and-event-contracts.md)
 definen props, eventos y resultados entre contenedores.
 
-Axios centraliza el transporte y la renovación de autenticación. La sesión usa
-provide/inject por aplicación y las reglas públicas existentes se adaptan a
-VeeValidate en los composables; los componentes de presentación reciben props y
-emiten eventos. La [selección de controles](../architecture/views/logical/ui-and-http.md)
-explica las responsabilidades visuales y HTTP.
+Axios proporciona el transporte y SweetAlert2 los avisos mediante los adaptadores
+propios. La [composición visual](../architecture/views/logical/components/08-shared-ui.md)
+localiza esos controles y sus estilos; el [contrato HTTP](../architecture/contracts/client-contracts.md)
+define sesión, errores y aceptación de respuestas.

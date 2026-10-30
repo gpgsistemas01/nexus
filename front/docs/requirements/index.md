@@ -16,11 +16,6 @@ Estado: En revisión. Responsable: Equipo Nexus. Versión de la colección: [ent
 | [Glosario de negocio](business-glossary.md) | Vocabulario compartido para interpretar objetivos, datos y restricciones. |
 | [Identificadores y trazabilidad](01-applicability-and-traceability.md) | Cómo relacionar las obligaciones, su realización y la evidencia de pruebas. |
 
-Visión explica la necesidad y los límites; la especificación y las fichas definen
-obligaciones verificables; Arquitectura explica su realización. La existencia de
-una pantalla o un resultado de prueba no acredita aceptación funcional.
-
-Las fichas describen objetivos observables. La [arquitectura](../architecture/index.md)
-explica su realización y el [plan de pruebas](../testing/01-test-plan.md) define cómo
-seleccionar condiciones y conservar evidencia. La [matriz](../testing/04-use-case-coverage.md)
-permite recorrer cada caso sin confundir implementación, simulación y ejecución real.
+Para entender una operación, consulte su requisito y ficha de uso. La
+[arquitectura](../architecture/index.md) explica la implementación y la
+[matriz de pruebas](../testing/04-use-case-coverage.md) identifica la evidencia disponible.

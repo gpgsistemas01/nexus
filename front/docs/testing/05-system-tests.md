@@ -14,7 +14,7 @@ Las dependencias siguen en cada aplicación y no se agregan paquetes al cliente.
 | [environment.ts](../../tests/system/environment.ts) | Exige `DATABASE_TEST_URL`, nombre con segmento `test` y destino distinto de `DATABASE_URL`; compara host/puerto/base sin depender de usuario, contraseña o query. `DIRECT_TEST_URL`, si existe, debe identificar la misma base de prueba. |
 | [setup.ts](../../tests/system/setup.ts) | Crea cuentas, accesos, proveedores y cliente excluido con sufijo único. Genera credenciales sólo de fixture y limpia sus registros al terminar o fallar la preparación. |
 | [fixture.ts](../../tests/system/fixture.ts) | Contrato de datos y captura del login de prueba. |
-| [application.spec.ts](../../tests/system/application.spec.ts) | Ejecuta el recorrido, consulta la persistencia con Prisma y abre los XLSX descargados con ExcelJS. No crea un servidor alternativo sin autorización. |
+| [application.spec.ts](../../tests/system/application.spec.ts) | Ejecuta el recorrido, consulta la persistencia con Prisma y abre los XLSX descargados con ExcelJS. |
 
 ## Preparación desde la raíz
 
@@ -25,7 +25,7 @@ no hay que crear manualmente. Esta sección detalla las variables de la terminal
 y las condiciones del entorno.
 
 Instalar las dependencias de ambas aplicaciones y Chromium conforme al
-[README](../../README.md#pruebas-de-navegador). Preparar una base PostgreSQL vacía
+[procedimiento de pruebas](06-test-files-and-credentials.md). Preparar una base PostgreSQL vacía
 dedicada, por ejemplo `nexus_vue_test`, con un usuario que pueda aplicar sus migraciones.
 No usar la base de desarrollo ni una URL de producción. Este comando no crea
 la base ni reinicia el esquema: aplica las migraciones existentes al destino declarado.

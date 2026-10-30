@@ -1,44 +1,48 @@
 # 4. Adaptadores HTTP y de datos
 
-## Problema y decisión
+## Propósito y funcionamiento
 
-La representación HTTP puede cambiar sin que una tabla cambie su responsabilidad.
-El servicio adapta rutas/verbos y el mapper adapta datos. El cliente HTTP compartido
-gestiona transporte y sesión. Son adaptadores funcionales en fronteras concretas;
-su presencia no convierte el proyecto en una arquitectura hexagonal completa.
+El servicio del recurso prepara la solicitud HTTP y comprueba la respuesta de su
+operación. Un mapper transforma el JSON recibido en un modelo que el editor o la
+tabla pueden utilizar. `apiClient` aporta el transporte y la recuperación de sesión.
+Estas tres responsabilidades permiten localizar un error de comunicación, un dato
+inválido o una incompatibilidad de formato en su propietario.
 
 ## Modelo general de adaptación de una lectura
 
 **Identificador:** `DIA-VUE-GEN-003`. **Pregunta:** ¿cómo convertir una respuesta
 externa en un modelo del cliente? **Fuente:** servicios, mappers y transporte
-existentes. Flechas continuas = llamada; discontinuas = datos adaptados.
+existentes. **Notación:** flujo de datos y decisiones; paralelogramos = datos,
+rectángulos = transformación y rombo = condición de aceptación.
 
 **Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
 
 ```mermaid
 flowchart TB
-    usecase["Coordinación del caso"] --> service["Servicio del recurso<br/>contrato HTTP"]
-    service --> transport["Cliente HTTP compartido"]
-    transport --> api["API externa al navegador"]
-    service --> mapper["Adaptador de respuesta<br/>comprueba y transforma"]
-    mapper -.->|modelo de lectura| usecase
+    raw[/Respuesta externa sin validar/] --> mapper[Comprobar estructura y transformar]
+    mapper --> model[/Modelo de lectura del cliente/]
+    mapper -->|estructura inválida| failure([Rechazar respuesta])
+    model --> identity{¿Corresponde al registro solicitado?}
+    identity -->|sí| result[/Modelo admitido para el consumidor/]
+    identity -->|no| failure
 ```
 
 ## Aplicación al consultar una compra
 
 **Identificador:** `DIA-VUE-APL-003`. **Pregunta:** ¿quién garantiza que se presenta
-la compra solicitada? **Fuente:** `usePurchaseActions`, `useDocumentRead`,
-`purchaseService.get`, `apiClient` y `normalizePurchaseDocument`.
-Flechas continuas = consumo; discontinuas = resultado del callback configurado.
+la compra solicitada? **Fuente:** `purchaseService.get` y `normalizePurchaseDocument`.
+**Notación:** flujo de datos dentro de `purchaseService.get`, después de recibir
+la respuesta HTTP. Las flechas siguen transformación, aceptación o rechazo.
 
 ```mermaid
 flowchart TB
-    actions["usePurchaseActions"] --> reader["useDocumentRead<br/>request configurado"]
-    reader -.->|id y signal| service["purchaseService.get"]
-    service --> http["apiClient.request<br/>GET por id"]
-    service --> mapper["normalizePurchaseDocument<br/>validar respuesta"]
-    mapper -.->|documento normalizado| service
-    service -.->|comprueba id y devuelve| reader
+    raw[/result.goodsReceipt: unknown/] --> mapper[normalizePurchaseDocument<br/>result.goodsReceipt, resource]
+    mapper --> document[/document: PurchaseDocument/]
+    mapper -->|estructura inválida| failure([Lanzar error])
+    document --> identity{document.id === id}
+    identity -->|true| result[/return document/]
+    identity -->|false| mismatch[Error: compra distinta a la solicitada]
+    mismatch --> failure
 ```
 
 ## Código, contrato y límites

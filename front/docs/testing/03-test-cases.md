@@ -11,11 +11,9 @@ una ejecución aprobada por estar documentado.
 
 ## Ambiente y preparación
 
-Los comandos se ejecutan desde `front/`. Unitarias usan Vitest/jsdom; navegador usa
-Chromium y un harness nuevo por test; sistema usa Vue, Express y PostgreSQL aislados.
-Cada caso tiene preparación propia; un tramo de un recorrido utiliza el estado inicial
-del mismo test, sin depender de la ejecución de otra ficha. Las credenciales y nombres
-son fixtures, no datos de usuarios reales. La limpieza se declara en cada caso.
+Cada caso declara su preparación y limpieza. Un recorrido parte del estado inicial
+de su propia prueba, sin depender de otra ficha. La [guía de ejecución](06-test-files-and-credentials.md)
+explica las herramientas, archivos y credenciales de cada nivel.
 
 ## Fichas
 
@@ -46,4 +44,6 @@ son fixtures, no datos de usuarios reales. La limpieza se declara en cada caso.
 
 ## Reproducción y resultados
 
-Los comandos, selección de archivos/títulos y formato EP pertenecen al [plan](01-test-plan.md). La [matriz por CU](04-use-case-coverage.md) identifica la evidencia representativa y sus límites. Los reportes, trazas y capturas de corridas son artefactos de revisión/CI; no se versionan como fuente del producto.
+Los comandos y la selección de archivos o títulos están en la
+[guía de ejecución](06-test-files-and-credentials.md). Los resultados se registran
+con el [formato EP](01-test-plan.md#3-registro-de-ejecución-y-resultado-real).

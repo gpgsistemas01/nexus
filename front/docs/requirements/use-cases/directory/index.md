@@ -15,5 +15,5 @@
 
 ## Realización y verificación del cliente
 
-[Realización Vue](../../../architecture/views/development/frontend-technical-documentation/04-identity-and-directory.md).
+[Componentes del cliente](../../../architecture/views/logical/components/04-identity-directory.md).
 Pruebas de navegador: [records.spec.ts](../../../../tests/e2e/records.spec.ts).

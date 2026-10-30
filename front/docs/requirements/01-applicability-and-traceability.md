@@ -1,22 +1,9 @@
 # Requisitos y trazabilidad documental
 
-## Fuentes propietarias
-
-| Información común | Documento que la define |
-| --- | --- |
-| Necesidad, interesados y límites | [Visión y alcance](vision-scope-and-requirements/index.md). |
-| Identificadores de requisitos, estados y aceptación | [Convenciones de la SRS](requirements-specification/02-conventions.md). |
-| Relaciones normativas entre obligaciones y objetivos | [Trazabilidad de requisitos](requirements-specification/05-requirement-traceability-rules.md). |
-| Condiciones de entorno y dependencias | [Interfaces y operación](requirements-specification/07-interfaces-and-operating-conditions.md). |
-| Comprobación de cada requisito Vue y decisión funcional | [Verificación y aceptación](requirements-specification/08-verification-and-acceptance.md). |
-| Plantilla y reglas de lectura de una ficha | [Catálogo de casos de uso](use-cases/index.md). |
-| Modos, datos modificables y efectos | [Modos y operaciones](requirements-specification/06-operation-modes-and-effects.md). |
-| Diseño, casos y evidencia DP/CP/EP | [Plan de pruebas](../testing/01-test-plan.md). |
-| Revisión y mantenimiento documental | [Reglas de documentación](../governance/01-documentation-rules.md). |
-
-Cada ficha conserva su objetivo y datos completos. Los índices de familia concentran
-las referencias de realización y pruebas compartidas; los diagramas específicos se
-enlazan desde las operaciones que explican.
+Las [convenciones de requisitos](requirements-specification/02-conventions.md)
+definen los IDs y estados; las [reglas de trazabilidad](requirements-specification/05-requirement-traceability-rules.md),
+sus relaciones. La tabla siguiente conecta cada capacidad con sus casos, manual
+y diagramas para seguir una operación entre documentos.
 
 ## Correspondencia por capacidad
 

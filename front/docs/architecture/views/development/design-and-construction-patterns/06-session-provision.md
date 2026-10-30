@@ -1,11 +1,11 @@
 # 6. Provisión de sesión e inyección
 
-## Problema y decisión
+## Propósito y funcionamiento
 
 La navegación y las páginas deben observar la misma sesión sin pasarla por cada
 componente visual. El arranque crea una instancia, configura el Router con ella
-y la proporciona a los descendientes. Es inyección mediante `provide/inject`;
-no hay un singleton global obligatorio ni un store por formulario.
+y la proporciona a los descendientes mediante `provide/inject`. Un componente
+descendiente recupera esa instancia por la clave `authSessionKey`.
 
 ## Modelo general de provisión de estado de aplicación
 
@@ -30,28 +30,43 @@ flowchart TB
 **Identificador:** `DIA-VUE-APL-005`. **Pregunta:** ¿dónde se comparte realmente
 la sesión? **Fuente:** `main.bootstrap`, `createAuthSession`, `authSessionKey`,
 `createAppRouter`, `useAuthSession` y `usePageAccess`.
-Flechas continuas = creación/configuración; discontinuas = consumo de la instancia.
+**Notación:** secuencia UML de creación y recuperación de la misma instancia.
+Los participantes son archivos/funciones propios; las llamadas a Vue permanecen
+en la línea de vida del código que las realiza.
 
 ```mermaid
-flowchart TB
-    main["main.bootstrap"] --> session["createAuthSession<br/>user readonly y load"]
-    main --> router["createAppRouter<br/>recibe session"]
-    main --> provide["app.provide<br/>authSessionKey y session"]
-    provide --> inject["useAuthSession<br/>inject por clave"]
-    inject --> access["usePageAccess<br/>permisos de interfaz"]
-    router -.->|load y user| session
-    access -.->|lee user| session
+sequenceDiagram
+    autonumber
+    participant Main@{ "type": "control" } as main.ts
+    participant Session@{ "type": "control" } as session.ts
+    participant Router@{ "type": "control" } as createApp<br/>Router
+    participant Page@{ "type": "control" } as Catalog<br/>Page.vue
+    participant Access@{ "type": "control" } as usePage<br/>Access.ts
+    Main->>Session: nowrap: createAuthSession()
+    Session-->>Main: nowrap: session: { user, load }
+    Main->>Router: nowrap: createAppRouter(<br/>undefined, session)
+    Router-->>Main: nowrap: router
+    Main->>Main: nowrap: app.provide(<br/>authSessionKey, session)
+    Main->>Main: nowrap: app.use(router)
+    Main->>Main: nowrap: await router.isReady()
+    Main->>Main: nowrap: app.mount('#35;app')
+    Page->>Access: nowrap: usePageAccess()
+    Access->>Session: nowrap: useAuthSession()
+    Session->>Session: nowrap: inject(authSessionKey)
+    Session-->>Access: nowrap: session
+    Access-->>Page: nowrap: { session, has, onDenied, onError }
 ```
 
 ## Código, contrato y límites
 
 [main.ts](../../../../../src/main.ts) crea la sesión y pasa **esa misma instancia** al
-[Router](../../../../../src/app/router/index.ts). El valor predeterminado de la factory
-del Router existe, pero no crea otra sesión en este arranque explícito.
+[Router](../../../../../src/app/router/index.ts) y al proveedor de descendientes.
 [session.ts](../../../../../src/modules/auth/session.ts) define la clave, la inyección y
 la lectura de `/api/auth/me`; agrupa lecturas simultáneas con `loading`.
 [usePageAccess](../../../../../src/app/composables/usePageAccess.ts) observa permisos y
 traduce 401/403 a navegación. No expone un método para que un botón conceda permisos.
+En el ejemplo, [CatalogPage](../../../../../src/modules/catalogs/pages/CatalogPage.vue)
+obtiene por ese composable la misma sesión proporcionada durante el arranque.
 
 La renovación de tokens pertenece a [apiClient](../../../../../src/shared/http/apiClient.ts),
 no al mecanismo de inyección. Las credenciales viajan en cookies; los permisos de
@@ -64,25 +79,9 @@ de sesión y la renovación coordinada son mecanismos diferentes.
 consumidores. La API del navegador se simula; no se acredita la firma real de JWT.
 Referencia: [provide/inject](https://vuejs.org/guide/components/provide-inject.html).
 
-## Decisión sobre Pinia
+## Alcance del estado compartido
 
-[Vue](https://vuejs.org/guide/scaling-up/state-management.html) recomienda Pinia
-para necesidades de gestión compartida más amplias; [Pinia](https://pinia.vuejs.org/introduction.html)
-añade stores, acciones, integración con Devtools y herramientas de prueba. Es una
-opción válida, no un requisito de Router, VeeValidate ni de la composición de Vue.
-
-En este código la sesión tiene un propietario por aplicación y consumidores
-inyectados; listados, filtros y capturas viven por pantalla. El traspaso de merma
-duplicada ocurre entre editores del mismo contenedor y no necesita sobrevivir al
-cambio de ruta. Se mantienen esos propietarios y no se instala Pinia por este flujo.
-
-Se reconsiderará cuando varias rutas necesiten modificar un mismo borrador de
-negocio, conservarlo al navegar o coordinar varios stores y sus acciones con Devtools.
-Entonces se migrará el contrato compartido, sin duplicar la sesión entre un store
-y `createAuthSession`, ni convertir cada formulario en estado global. Los tokens
-seguirán en cookies HttpOnly y la autorización se comprobará en el backend;
-Pinia no sustituye esos controles.
-
-La evidencia de sesión tiene dos propietarios de prueba: `tests/e2e` simula API;
-[tests/system](../../../../../tests/system/application.spec.ts) añade login/refresh/cierre reales.
-Un store nuevo no sería evidencia adicional de seguridad ni de persistencia.
+La sesión pertenece a la aplicación. Listados, filtros y capturas pertenecen a cada
+pantalla. El [inventario de propietarios](../../logical/states/04-state-ownership-and-save.md#inventario-de-propietarios)
+identifica su vida útil y la [decisión de estado compartido](../../logical/states/04-state-ownership-and-save.md#decisión-de-estado-compartido)
+explica el alcance de la provisión actual.
