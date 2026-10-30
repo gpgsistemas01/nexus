@@ -13,10 +13,7 @@ export const useIssueDepartments = (options: {
     const singleDepartment = shallowRef<LookupItem>();
     const lookup = useRemoteLookup(async (search, page, signal) => {
         const result = await issueLookupService.list(
-            'departments',
-            options.resource,
-            search,
-            page,
+            { kind: 'departments', resource: options.resource, search, page },
             signal,
         );
 

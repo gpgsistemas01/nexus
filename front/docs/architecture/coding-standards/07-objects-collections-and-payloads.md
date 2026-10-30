@@ -7,6 +7,19 @@ comprueba el DTO y el mapper traduce los campos; TypeScript no valida JSON en ej
 Las respuestas incompletas se rechazan como contrato inválido. Un listado vacío válido
 no equivale a una respuesta sin sus conteos obligatorios.
 
+## Contratos de captura
+
+Declare el tipo de cada campo y derive sus claves del contrato. En
+[InventoryValues](../../../src/modules/warehouse/inventory.ts), `name` y `quantity`
+son `string`; `isActive` es `boolean`. La lista de campos se obtiene sin repetirla:
+
+```ts
+export type InventoryField = keyof InventoryValues;
+```
+
+Las uniones por operación y los genéricos compartidos conservan las restricciones
+de sus consumidores. Use `Record` para diccionarios con valores homogéneos.
+
 ## Captura numérica
 
 Durante edición un campo puede conservar texto para representar vacío, separador o una

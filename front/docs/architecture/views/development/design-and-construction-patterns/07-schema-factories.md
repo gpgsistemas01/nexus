@@ -30,8 +30,8 @@ flowchart TB
 
 ## Aplicación al esquema del editor de Salidas
 
-**Identificador:** `DIA-VUE-APL-006`. **Pregunta:** ¿quién elige las reglas y quién
-las ejecuta sobre la captura actual? **Fuente:** `createIssueValidationSchema`,
+**Identificador:** `DIA-VUE-APL-006`. **Pregunta:** ¿qué producto se construye para
+cada modo y recurso? **Fuente:** `createIssueValidationSchema`,
 `useIssueEditor` y `@nexus/form-validation`. **Notación:** actividad de construcción
 con las ramas del código. VeeValidate recibe el producto en `useIssueEditor` y
 ejecuta después sus funciones cuando valida la captura.
@@ -52,6 +52,61 @@ flowchart TB
     details --> finish([Fin de la construcción])
     empty --> finish
     schema --> finish
+```
+
+## Ejecución general del producto de la fábrica
+
+**Identificador:** `DIA-VUE-GEN-009`. **Pregunta:** ¿cuándo lee la captura una regla
+construida por la fábrica? **Fuente:** fábricas de `issueForm` y `purchaseForm`.
+Secuencia conceptual: la construcción devuelve funciones;
+su ejecución posterior obtiene los valores vigentes mediante un callback.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Consumer@{ "type": "control" } as Propietario del formulario
+    participant Factory as Fábrica de esquema
+    participant Validator as Validador construido
+    participant Rule as Regla seleccionada
+    Consumer->>Factory: nowrap: construir(contexto, getValues)
+    Factory-->>Consumer: nowrap: esquema de funciones de<br/>validación
+    Consumer->>Validator: nowrap: solicitar evaluación de un<br/>campo
+    Validator->>Consumer: nowrap: getValues()
+    Consumer-->>Validator: nowrap: captura vigente
+    Validator->>Rule: nowrap: comprobar dato del campo
+    Rule-->>Validator: nowrap: mensaje o ausencia de error
+    Validator-->>Consumer: nowrap: mensaje o resultado válido
+```
+
+## Ejecución del esquema de Salidas
+
+**Identificador:** `DIA-VUE-APL-012`. **Pregunta:** ¿qué colaboración evita validar
+un payload anterior? **Fuente:** `useIssueEditor`, `createIssueValidationSchema`,
+`mapIssueFormToRequest` y las reglas públicas de `@nexus/form-validation`.
+Secuencia de un campo de `create`, `edit` o `header`; la selección de las otras
+ramas permanece en `DIA-VUE-APL-006`. VeeValidate invoca la función configurada.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
+    participant Factory as issueForm.ts
+    participant Mapper as issueRequest<br/>Mapper.ts
+    participant Rules as Reglas públicas<br/>validators.js
+    Editor->>Factory: nowrap: createIssueValidationSchema({<br/>resource, mode, getValues })
+    Factory-->>Editor: nowrap: validationSchema: funciones<br/>por campo
+    Note over Editor,Factory: Evaluación posterior de un campo del esquema
+    Factory->>Editor: nowrap: getValues()
+    Editor-->>Factory: nowrap: form.values vigente
+    Factory->>Mapper: nowrap: mapIssueFormToRequest(values,<br/>resource, mode)
+    Mapper-->>Factory: nowrap: request
+    alt nowrap: field === 'requestDate'
+        Factory->>Rules: nowrap: rule(values.requestDate)
+    else nowrap: otro campo
+        Factory->>Rules: nowrap: rule(request[field])
+    end
+    Rules-->>Factory: nowrap: mensaje o null
+    Factory-->>Editor: nowrap: mensaje o true como resultado<br/>de validación
 ```
 
 ## Código, contrato y límites

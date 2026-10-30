@@ -9,34 +9,63 @@ composables, que conservan el estado y coordinan las operaciones de la página.
 
 ## Modelo general de contenedor y presentación
 
-**Identificador:** `DIA-VUE-GEN-001`. **Pregunta:** ¿quién posee el estado y quién
-presenta la interacción? **Fuente:** contratos de props/eventos de Vue y sus
-consumidores actuales. Modelo conceptual; flechas continuas = consumo o datos
-entregados, discontinuas = intenciones emitidas.
+**Identificador:** `DIA-VUE-GEN-001`. **Pregunta:** ¿cómo vuelve una intención del
+usuario al propietario del estado? **Fuente:** contratos de props/eventos de Vue
+y sus consumidores actuales. Secuencia conceptual de consulta y apertura de captura.
 
-**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+**Lectura visual:** [mensajes, retornos y alternativas de secuencia](../../diagram-reading.md#secuencias).
 
 ```mermaid
-flowchart TB
-    container["Contenedor<br/>coordina el caso"] -->|props| view["Presentación<br/>controles y texto"]
-    view -.-> container
-    container --> behavior["Comportamiento reactivo<br/>estado y operaciones"]
-    behavior -.->|estado observable| container
+sequenceDiagram
+    autonumber
+    actor User as Usuario
+    participant View@{ "type": "boundary" } as Presentación
+    participant Container@{ "type": "control" } as Contenedor
+    participant State@{ "type": "control" } as Estado y operaciones
+    Container->>View: nowrap: props de datos y estado
+    User->>View: nowrap: cambiar consulta
+    View->>Container: nowrap: emitir intención con la<br/>consulta
+    Container->>State: nowrap: aplicar consulta
+    State-->>Container: nowrap: nuevos datos o error<br/>observable
+    Container->>View: nowrap: props actualizadas
+    User->>View: nowrap: solicitar edición de una fila
+    View->>Container: nowrap: emitir intención con la fila
+    Container->>State: nowrap: abrir captura si el acceso lo<br/>permite
+    State-->>Container: nowrap: destino de captura
+    Container->>Container: nowrap: componer el editor con ese<br/>destino
 ```
 
 ## Aplicación en la página de Catálogos
 
-**Identificador:** `DIA-VUE-APL-001`. **Pregunta:** ¿quién carga, presenta y abre la
-edición de un catálogo? **Fuente:** `CatalogPage`, `useCatalogList`, `CatalogTable`
-y `useListEditor`. Flechas continuas = composición; discontinuas = datos o eventos.
+**Identificador:** `DIA-VUE-APL-001`. **Pregunta:** ¿cómo se aplican las intenciones
+de `CatalogTable`? **Fuente:** `CatalogPage`, `CatalogTable`, `useCatalogList`,
+`usePagedList` y `useListEditor`. Secuencia sobre las instancias ya creadas;
+el callback de consulta se desarrolla en `DIA-VUE-PAT-001`.
 
 ```mermaid
-flowchart TB
-    page["CatalogPage<br/>permisos y coordinación"] --> list["useCatalogList<br/>consulta y estado"]
-    page --> table["CatalogTable<br/>props de filas y consulta"]
-    table -.->|query o edit| page
-    list -.->|rows y total| page
-    page --> editor["useListEditor<br/>abrir y cerrar captura"]
+sequenceDiagram
+    autonumber
+    participant Table@{ "type": "boundary" } as Catalog<br/>Table.vue
+    participant Page@{ "type": "control" } as Catalog<br/>Page.vue
+    participant List@{ "type": "control" } as usePaged<br/>List.ts
+    participant Editor@{ "type": "control" } as useList<br/>Editor.ts
+    participant Dialog@{ "type": "control" } as CatalogEditor<br/>Page.vue
+    Page->>Table: nowrap: { rows, total, query,<br/>isLoading }
+    Table->>Page: nowrap: emit('query', { page, length<br/>})
+    Page->>List: nowrap: list.applyQuery(changes)
+    opt nowrap: consulta distinta de la<br/>vigente
+        List->>List: nowrap: Object.assign(query, next)<br/>load()
+        List-->>Page: nowrap: rows, total, isLoading, error
+        Page->>Table: nowrap: props actualizadas
+    end
+    Table->>Page: nowrap: emit('edit', item)
+    Page->>Editor: nowrap: openEditor({ action: 'edit',<br/>row: item })
+    Editor->>Page: nowrap: options.canOpen(target)
+    Page-->>Editor: nowrap: canManage.value
+    opt nowrap: acceso permitido
+        Editor-->>Page: nowrap: editor.value = target
+        Page->>Dialog: nowrap: :catalog="catalog"<br/>:target="editor"
+    end
 ```
 
 ## Código, contrato y límites

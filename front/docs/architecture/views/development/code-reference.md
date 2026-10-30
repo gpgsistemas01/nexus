@@ -237,7 +237,7 @@ No incluye secretos, dependencias instaladas, archivos compilados ni código pri
 | [recordParams.ts](../../../../src/shared/http/recordParams.ts) | **Exports:** `recordParams`<br>**Contratos SFC:** —<br>**Imports:** `../list.js (tipo)` |
 | [requestExcel.ts](../../../../src/shared/http/requestExcel.ts) | **Exports:** `requestExcel`<br>**Contratos SFC:** —<br>**Imports:** `./apiClient.js` |
 | [list.ts](../../../../src/shared/list.ts) | **Exports:** `initialRecordQuery`<br>`RecordQuery`<br>**Contratos SFC:** —<br>**Imports:** — |
-| [lookup.ts](../../../../src/shared/lookup.ts) | **Exports:** `LookupCreation`<br>`LookupItem`<br>`LookupState`<br>`OrganizationResource`<br>`OrganizationState`<br>**Contratos SFC:** —<br>**Imports:** — |
+| [lookup.ts](../../../../src/shared/lookup.ts) | **Exports:** `LookupCreation`<br>`LookupItem`<br>`LookupQuery`<br>`LookupState`<br>`OrganizationResource`<br>`OrganizationState`<br>**Contratos SFC:** —<br>**Imports:** — |
 | [report.ts](../../../../src/shared/report.ts) | **Exports:** `dateRangeError`<br>`ReportScope`<br>`reportScopeError`<br>**Contratos SFC:** —<br>**Imports:** — |
 | [organizationService.ts](../../../../src/shared/services/organizationService.ts) | **Exports:** `organizationService`<br>**Contratos SFC:** —<br>**Imports:** `../http/pageRequest.js`<br>`../http/recordContract.js`<br>`../lookup.js (tipo)` |
 | [controlDefaults.ts](../../../../src/shared/ui/controlDefaults.ts) | **Exports:** `controlDefaults`<br>**Contratos SFC:** —<br>**Imports:** — |

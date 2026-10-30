@@ -65,8 +65,6 @@ classDiagram
 | --- | --- |
 | Rectángulo con compartimentos | Arriba: nombre; después: atributos y, si aparecen, operaciones. `campo: tipo` describe un dato; `nombre()` una operación. Un compartimento vacío no declara ausencia de comportamiento. |
 | `«interface»`, `«type»`, `«abstract»` | Interfaz TypeScript, alias de tipo o concepto abstracto, respectivamente. Son etiquetas de clasificación. |
-| `«reference»` | Referencia a un contrato propio cuya definición se consulta en su ficha local. |
-| `«SFC_contract»`, `«inferred_return»`, `«inferred_object»` o `«evaluated_alias»` | Contrato de componente o estructura obtenida del código TypeScript; no implica una clase instanciada. La fuente y la firma completa identifican su origen. |
 | Tipo de biblioteca dentro de una firma, como `Ref<number>` | Anotación de un dato del contrato. No representa una entidad propia ni requiere un nodo de clase separado. |
 | Nombre con parámetro, como `PageResult<T>` | Tipo genérico: `T` identifica el tipo de sus filas, por ejemplo `LookupItem`. |
 | Atributo con `?`, tipo con `null` o `T[]` | Propiedad opcional, valor nulo admitido o colección de elementos, respectivamente. Una abreviación de la figura se desarrolla junto al contrato. |
@@ -87,9 +85,8 @@ classDiagram
 | `0..*` o `*` | Ninguno, uno o varios. |
 | `1..*` | Uno o varios. |
 
-Una multiplicidad omitida en una figura generada no se presume igual a `1`: el
-generador no deduce cuántos objetos comparten una referencia. Sólo etiqueta el
-destino cuya cantidad se obtiene de la propiedad.
+Una multiplicidad omitida no se presume igual a `1`; requiere una restricción
+explícita del modelo.
 
 En el ejemplo, un Documento referencia cero o más Detalles. En el dominio, una compra
 registrada requiere al menos uno: la cardinalidad del documento válido y la del array
@@ -128,6 +125,7 @@ sequenceDiagram
 | Flecha que vuelve al mismo participante | Paso interno de ese colaborador. |
 | Círculo oscuro con número | Orden del mensaje, generado por `autonumber`; no es un código HTTP ni prioridad. |
 | Marco `alt` / `opt` | Alternativas mutuamente excluyentes / recorrido opcional. La etiqueta expresa la condición. |
+| Marco `loop` | Repite los mensajes encerrados según su etiqueta, por ejemplo por cada campo o elemento renderizado. No expresa concurrencia. |
 | Marco `break` | Si se cumple la condición, el recorrido termina en ese punto; los mensajes posteriores no se ejecutan en esa rama. |
 | Caja de nota | Explicación del tramo señalado. Su fondo no representa un error. |
 

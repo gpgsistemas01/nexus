@@ -25,13 +25,16 @@ proyecto. Los capítulos enlazados desarrollan sus contratos y límites.
 | Contenedor/presentación | [DIA-VUE-GEN-001](02-container-and-presentation.md#modelo-general-de-contenedor-y-presentación) | [DIA-VUE-APL-001: Catálogos](02-container-and-presentation.md#aplicación-en-la-página-de-catálogos). |
 | Composables/callbacks | [DIA-VUE-GEN-002](03-composables-and-callbacks.md#modelo-general-de-composición-por-callback) | [DIA-VUE-PAT-001: listado](03-composables-and-callbacks.md#dependencias-y-composición-de-un-listado) y [DIA-VUE-PAT-002: transición de merma](03-composables-and-callbacks.md#coordinación-de-la-alternativa-de-merma-duplicada). |
 | Adaptadores | [DIA-VUE-GEN-003](04-http-and-data-adapters.md#modelo-general-de-adaptación-de-una-lectura) | [DIA-VUE-APL-003: lectura de Compra](04-http-and-data-adapters.md#aplicación-al-consultar-una-compra). |
-| Slots | [DIA-VUE-GEN-004](05-slots-and-visual-composition.md#modelo-general-de-composición-por-slots) | [DIA-VUE-APL-004: celdas de Catálogos](05-slots-and-visual-composition.md#aplicación-a-las-celdas-de-catálogos). |
+| Regiones de slots | [DIA-VUE-GEN-004](05-slots-and-visual-composition.md#modelo-general-de-composición-por-slots) | [DIA-VUE-APL-004: celdas de Catálogos](05-slots-and-visual-composition.md#aplicación-a-las-celdas-de-catálogos). |
+| Evaluación de slots | [DIA-VUE-GEN-008](05-slots-and-visual-composition.md#evaluación-general-de-un-slot-con-alcance) | [DIA-VUE-APL-011: renderizado y evento de celda](05-slots-and-visual-composition.md#evaluación-de-una-celda-de-catálogos). |
 | Provisión de sesión | [DIA-VUE-GEN-005](06-session-provision.md#modelo-general-de-provisión-de-estado-de-aplicación) | [DIA-VUE-APL-005: arranque y consumidores](06-session-provision.md#aplicación-en-el-arranque-de-vue). |
 | Fábricas de esquemas | [DIA-VUE-GEN-006](07-schema-factories.md#modelo-general-de-construcción-de-un-esquema) | [DIA-VUE-APL-006: validación de Salidas](07-schema-factories.md#aplicación-al-esquema-del-editor-de-salidas). |
+| Ejecución del esquema | [DIA-VUE-GEN-009](07-schema-factories.md#ejecución-general-del-producto-de-la-fábrica) | [DIA-VUE-APL-012: captura vigente de Salidas](07-schema-factories.md#ejecución-del-esquema-de-salidas). |
 | Selección dependiente | [DIA-VUE-GEN-002](03-composables-and-callbacks.md#modelo-general-de-composición-por-callback) | [DIA-VUE-PAT-004: selección de Inventario](03-composables-and-callbacks.md#selección-dependiente-de-inventario). |
-| Alta contextual de proveedor en Inventario | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-007](09-contextual-creation.md#caso-1-proveedor-desde-inventario). |
-| Alta de proveedor/artículo en Compras | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-008](09-contextual-creation.md#proveedor-desde-el-encabezado) y [010](09-contextual-creation.md#artículo-desde-un-detalle). |
-| Alta de cliente en Salidas | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [DIA-VUE-APL-009](09-contextual-creation.md#caso-3-cliente-desde-salidas). |
+| Alta contextual de proveedor en Inventario | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [Apertura: APL-007](09-contextual-creation.md#caso-1-proveedor-desde-inventario) y [retorno: APL-013](09-contextual-creation.md#retorno-del-proveedor-a-inventario). |
+| Alta de proveedor en Compras | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [Apertura: APL-008](09-contextual-creation.md#proveedor-desde-el-encabezado) y [retorno: APL-014](09-contextual-creation.md#retorno-del-proveedor-a-compras). |
+| Alta de artículo en Compras | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [Apertura: APL-010](09-contextual-creation.md#artículo-desde-un-detalle) y [retorno: APL-015](09-contextual-creation.md#retorno-del-artículo-al-detalle). |
+| Alta de cliente en Salidas | [DIA-VUE-GEN-007](09-contextual-creation.md#modelo-general) | [Apertura: APL-009](09-contextual-creation.md#caso-3-cliente-desde-salidas) y [retorno: APL-016](09-contextual-creation.md#retorno-del-cliente-a-salidas). |
 
 ## Colaboraciones que combinan mecanismos
 

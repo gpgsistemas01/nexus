@@ -57,14 +57,18 @@ export const usePurchaseEditor = (options: {
     const canPersons = computed(() => options.has(PERMISSIONS.PERSONS_READ));
     const suppliers = useRemoteLookup(
         (search, page, signal) =>
-            purchaseLookupService.list('suppliers', options.resource, search, page, signal, {
-                capture: true,
-            }),
+            purchaseLookupService.list(
+                { kind: 'suppliers', resource: options.resource, search, page, capture: true },
+                signal,
+            ),
         computed(() => !document && !isReadOnly && canSuppliers.value),
     );
     const persons = useRemoteLookup(
         (search, page, signal) =>
-            purchaseLookupService.list('persons', options.resource, search, page, signal),
+            purchaseLookupService.list(
+                { kind: 'persons', resource: options.resource, search, page },
+                signal,
+            ),
         computed(() => !isReadOnly && canPersons.value),
     );
     const supplier = useSelectedOption(

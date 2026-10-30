@@ -12,7 +12,8 @@ export const useIssueFilters = (resource: IssueResource, has: (permission: strin
 
     const createFilterLookup = (kind: IssueLookup, permission: string) =>
         useRemoteLookup(
-            (search, page, signal) => issueLookupService.list(kind, resource, search, page, signal),
+            (search, page, signal) =>
+                issueLookupService.list({ kind, resource, search, page }, signal),
             computed(() => has(permission)),
         );
 

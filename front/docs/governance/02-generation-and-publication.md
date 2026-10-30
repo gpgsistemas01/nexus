@@ -19,7 +19,7 @@ Los casos y contratos se mantienen íntegros en sus fuentes propietarias.
 | `arquitectura` | Contexto, vistas 4+1, modelos de interfaces/tipos y estados, procesos por sección, decisiones, contratos y patrones. |
 | `estandar` | Reglas de construcción y revisión del código. |
 | `referencia` | Inventario generado de archivos, exports, contratos SFC e imports. |
-| `tipos` / `tipos-<ámbito>` | Contratos de datos completos, firmas y relaciones; libros independientes por ámbito. |
+| `tipos` / `tipos-<ámbito>` | Declaraciones TypeScript/SFC, firmas y referencias locales; libros independientes por ámbito. |
 | `pruebas` | Plan, diseño, registro CP, cobertura y preparación de sistema. |
 | `operacion` | Construcción y despliegue. |
 | `gobierno` | Reglas editoriales, referencias, criterios y publicación. |
@@ -123,22 +123,20 @@ admite archivos de compilación, fuentes y módulos públicos necesarios; excluy
 Generar documentación es una tarea de desarrollo/CI y no un paso del arranque
 del sitio en producción.
 
-## Referencia completa de tipos
+## Referencia de contratos declarados
 
 `npm run docs:generate` mantiene también
-`architecture/views/logical/type-reference/`: interfaces, clases, aliases y
-contratos tipados SFC, retornos públicos inferidos y objetos públicos, con sus
-miembros y relaciones de tipos.
+`architecture/views/logical/type-reference/`: interfaces, clases, enums, aliases y
+contratos tipados SFC escritos en el código. Las tablas conservan nombres, firmas y
+referencias a otros contratos locales. Los objetos anónimos permanecen en la firma
+que los contiene; los aliases conservan su declaración sin desarrollar retornos inferidos.
 La publicación `npm run docs:export -- tipos ambos` reúne sus ámbitos en un
 libro separado. Los modelos curados enlazan esta referencia; conservan los cortes
 que explican responsabilidades. `docs:check` comprueba ambas fuentes generadas.
 
-El catálogo completo de tipos se consulta por separado del libro general para
-mantener legibles las vistas arquitectónicas. Sus archivos agrupan los contratos
-por ámbito de `src/`. Las figuras sólo relacionan contratos locales; los tipos de
-dependencias conservan su nombre en las firmas, sin nodos propios. Un contrato se
-divide únicamente al superar el límite de legibilidad descrito en el índice generado;
-las propiedades se presentan junto a sus relaciones y las tablas conservan las firmas completas.
+La referencia se consulta por separado del libro general y agrupa los contratos
+por ámbito de `src/`. Los diagramas explicativos pertenecen a los
+[modelos estructurales](../architecture/views/logical/class-and-type-models/index.md).
 
 Para publicar un ámbito concreto, use `tipos-identidad`, `tipos-inventario`,
 `tipos-compras`, `tipos-salidas`, `tipos-acceso`, `tipos-catalogos`,

@@ -12,37 +12,63 @@ inválido o una incompatibilidad de formato en su propietario.
 
 **Identificador:** `DIA-VUE-GEN-003`. **Pregunta:** ¿cómo convertir una respuesta
 externa en un modelo del cliente? **Fuente:** servicios, mappers y transporte
-existentes. **Notación:** flujo de datos y decisiones; paralelogramos = datos,
-rectángulos = transformación y rombo = condición de aceptación.
+existentes. Secuencia conceptual de lectura, transformación y aceptación.
 
-**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+**Lectura visual:** [llamadas, retornos y alternativas](../../diagram-reading.md#secuencias).
 
 ```mermaid
-flowchart TB
-    raw[/Respuesta externa sin validar/] --> mapper[Comprobar estructura y transformar]
-    mapper --> model[/Modelo de lectura del cliente/]
-    mapper -->|estructura inválida| failure([Rechazar respuesta])
-    model --> identity{¿Corresponde al registro solicitado?}
-    identity -->|sí| result[/Modelo admitido para el consumidor/]
-    identity -->|no| failure
+sequenceDiagram
+    autonumber
+    participant Consumer@{ "type": "control" } as Consumidor
+    participant Service@{ "type": "boundary" } as Servicio del recurso
+    participant Transport@{ "type": "boundary" } as Transporte compartido
+    participant Mapper as Mapper de respuesta
+    Consumer->>Service: nowrap: consultar recurso e identidad
+    Service->>Transport: nowrap: solicitar respuesta con signal
+    Transport-->>Service: nowrap: datos externos
+    Service->>Mapper: nowrap: comprobar y transformar datos
+    alt nowrap: estructura inválida
+        Mapper-->>Service: nowrap: error de respuesta
+        Service-->>Consumer: nowrap: rechazo
+    else nowrap: estructura válida
+        Mapper-->>Service: nowrap: modelo del cliente
+        alt nowrap: identidad solicitada
+            Service-->>Consumer: nowrap: modelo admitido
+        else nowrap: identidad distinta
+            Service-->>Consumer: nowrap: rechazo de identidad
+        end
+    end
 ```
 
 ## Aplicación al consultar una compra
 
 **Identificador:** `DIA-VUE-APL-003`. **Pregunta:** ¿quién garantiza que se presenta
-la compra solicitada? **Fuente:** `purchaseService.get` y `normalizePurchaseDocument`.
-**Notación:** flujo de datos dentro de `purchaseService.get`, después de recibir
-la respuesta HTTP. Las flechas siguen transformación, aceptación o rechazo.
+la compra solicitada? **Fuente:** `usePurchaseActions`, `purchaseService.get`,
+`apiClient` y `normalizePurchaseDocument`. Secuencia del callback de lectura y sus
+condiciones de aceptación. La renovación de sesión pertenece al transporte.
 
 ```mermaid
-flowchart TB
-    raw[/result.goodsReceipt: unknown/] --> mapper[normalizePurchaseDocument<br/>result.goodsReceipt, resource]
-    mapper --> document[/document: PurchaseDocument/]
-    mapper -->|estructura inválida| failure([Lanzar error])
-    document --> identity{document.id === id}
-    identity -->|true| result[/return document/]
-    identity -->|false| mismatch[Error: compra distinta a la solicitada]
-    mismatch --> failure
+sequenceDiagram
+    autonumber
+    participant Actions@{ "type": "control" } as usePurchase<br/>Actions.ts
+    participant Service@{ "type": "boundary" } as purchase<br/>Service.ts
+    participant Http@{ "type": "boundary" } as apiClient.ts
+    participant Mapper as purchaseResponse<br/>Mapper.ts
+    Actions->>Service: nowrap: purchaseService.get(resource,<br/>id, signal)
+    Service->>Http: nowrap: request(endpoint/id, { signal<br/>})
+    Http-->>Service: nowrap: { goodsReceipt: unknown }
+    Service->>Mapper: nowrap: normalizePurchaseDocument(result.goodsReceipt,<br/>resource)
+    alt nowrap: estructura inválida
+        Mapper-->>Service: nowrap: error
+        Service-->>Actions: nowrap: rechazo de la lectura
+    else nowrap: estructura válida
+        Mapper-->>Service: nowrap: document: PurchaseDocument
+        alt nowrap: document.id === id
+            Service-->>Actions: nowrap: document
+        else nowrap: document.id !== id
+            Service-->>Actions: nowrap: Error de compra distinta a la<br/>solicitada
+        end
+    end
 ```
 
 ## Código, contrato y límites

@@ -47,11 +47,40 @@ classDiagram
 | Clasificación | `presentationId`, `unitMeasureId` y sus etiquetas; dimensiones de material/merma. |
 | Existencias | `currentStock`, `convertedQuantity`, `minStock`, `maxUnitCost?`; el permiso determina lo visible. |
 | Pesos | `coneWeightKg`, `totalWeightKg`, `weightKg`, `referenceRollTotalWeightKg`, `sampleLengthM`, `sampleNetWeightKg`. Se mantienen las diferencias entre referencia y peso utilizado. |
-| Captura | `InventoryValues` usa campos de formulario: incluye, entre otros, `newStock`, `initialQuantity`, `quantity`, `reasonId` y observaciones. No es una copia de la fila. |
+| Captura | `InventoryValues` declara cada campo: `isActive` es booleano; cantidades, IDs y texto se conservan como strings durante la edición. `InventoryField` deriva sus claves mediante `keyof InventoryValues`. |
 
 `Numeric = string | number | null` admite cantidades serializadas y ausencia de dato;
 un `null` no equivale por sí mismo a cero. La presentación y los mappers tratan cada campo.
 `InventoryPayload` es un diccionario de escalares admitidos, construido por acción.
+
+## Captura y claves de campo
+
+**Identificador:** `DIA-VUE-DAT-017`. **Pregunta:** ¿cómo se distinguen los valores
+editables de sus nombres de campo? **Fuente:** `InventoryValues` e `InventoryField`
+en [inventory.ts](../../../../../src/modules/warehouse/inventory.ts).
+**Notación:** interfaz y dependencia de alias `keyof`; se muestran campos representativos.
+
+```mermaid
+classDiagram
+    direction LR
+    class InventoryValues {
+        <<interface>>
+        name: string
+        supplierId: string
+        quantity: string
+        observations: string
+        isActive: boolean
+    }
+    class InventoryField {
+        <<type>>
+    }
+    InventoryField ..> InventoryValues : keyof
+```
+
+Las claves se derivan de una sola declaración. El
+[estándar de captura](../../../coding-standards/07-objects-collections-and-payloads.md#contratos-de-captura)
+define el criterio de tipado; la [referencia](../type-reference/warehouse.md#inventoryvalues)
+incluye todos los campos.
 
 ## Unión de destinos
 

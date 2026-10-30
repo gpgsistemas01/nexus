@@ -199,7 +199,7 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
 
   it('cambiar proveedor elimina la referencia y la captura heredada de la merma anterior', async () => {
     const { editor, request } = openEditor('wastes', { action: 'create' });
-    vi.mocked(inventoryCatalogService.lookup).mockImplementation(async (path) =>
+    vi.mocked(inventoryCatalogService.lookup).mockImplementation(async ({ path }) =>
       pageOf(
         path === 'wastes/material-templates'
           ? [{ id: ids.material, title: 'Lona', data: template }]

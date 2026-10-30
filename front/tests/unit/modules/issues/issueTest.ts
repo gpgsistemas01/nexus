@@ -33,8 +33,42 @@ import { useIssueActions } from '../../../../src/modules/issues/composables/useI
 const signal = () => new AbortController().signal;
 const document = () => normalizeIssueDocument(issue, 'materials');
 const confirmation = { code: 'UPDATED_GOODS_ISSUE', message: 'Guardado' };
-afterEach(() => vi.restoreAllMocks());
+const originalAdapter = apiClient.http.defaults.adapter;
+afterEach(() => {
+  vi.restoreAllMocks();
+  apiClient.http.defaults.adapter = originalAdapter;
+});
 describe('salidas Vue: contratos y modos', () => {
+  it('la consulta de personas conserva los filtros múltiples y la señal de cancelación', async () => {
+    const requestSignal = signal();
+    apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
+      const url = new URL(config.url!, 'http://test');
+      expect(url.pathname).toBe('/api/admin/persons');
+      expect(url.searchParams.get('search')).toBe('Ana');
+      expect(url.searchParams.get('start')).toBe('20');
+      expect(url.searchParams.get('length')).toBe('20');
+      expect(url.searchParams.getAll('role')).toEqual(['Coordinador', 'Instalador']);
+      expect(url.searchParams.get('department')).toBe('IMPRESIÓN');
+      expect(url.searchParams.get('strictDepartmentFilter')).toBe('true');
+      expect(config.signal).toBe(requestSignal);
+      return { data: pageOf([]) };
+    });
+    const result = await issueLookupService.list(
+      {
+        kind: 'persons',
+        resource: 'materials',
+        search: 'Ana',
+        page: 2,
+        filters: {
+          role: ['Coordinador', 'Instalador'],
+          department: 'IMPRESIÓN',
+          strictDepartmentFilter: 'true',
+        },
+      },
+      requestSignal,
+    );
+    expect(result.data).toEqual([]);
+  });
   it('solicita áreas de Salidas filtradas por el servidor para los selectores y filtros', async () => {
     apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
       const url = new URL(config.url!, 'http://test');
@@ -43,7 +77,10 @@ describe('salidas Vue: contratos y modos', () => {
       expect(url.searchParams.get('search')).toBe('imp');
       return { data: pageOf([{ id: issue.departmentId, name: 'IMPRESIÓN' }]) };
     });
-    const result = await issueLookupService.list('departments', 'materials', 'imp', 1, signal());
+    const result = await issueLookupService.list(
+      { kind: 'departments', resource: 'materials', search: 'imp', page: 1 },
+      signal(),
+    );
     expect(result.data.map(({ title }) => title)).toEqual(['IMPRESIÓN']);
   });
   it.each(['materials', 'consumables', 'wastes'] as const)(
@@ -320,7 +357,7 @@ describe('salidas Vue: captura y efectos', () => {
   it('no muestra errores iniciales; cliente/área reinician dependencias y filtran personas', async () => {
     const lookup = vi
       .spyOn(issueLookupService, 'list')
-      .mockImplementation(async (kind) =>
+      .mockImplementation(async ({ kind }) =>
         pageOf(
           kind === 'clients'
             ? [{ id: issue.clientId, title: 'GPG INTERNO', data: {} }]
@@ -344,8 +381,10 @@ describe('salidas Vue: captura y efectos', () => {
     value.update('clientId', issue.clientId);
     value.update('departmentId', issue.departmentId);
     await flushPromises();
-    expect(lookup.mock.calls.some((call) => call[5]?.role === 'Coordinador')).toBe(true);
-    expect(lookup.mock.calls.some((call) => call[5]?.department === 'SISTEMAS')).toBe(true);
+    expect(lookup.mock.calls.some(([query]) => query.filters?.role === 'Coordinador')).toBe(true);
+    expect(lookup.mock.calls.some(([query]) => query.filters?.department === 'SISTEMAS')).toBe(
+      true,
+    );
     expect(value.values.projectNumber).toBe('120010');
     value.update('requesterId', issue.requesterId);
     value.update('departmentId', 'another');

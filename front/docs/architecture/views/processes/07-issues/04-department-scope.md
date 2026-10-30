@@ -23,7 +23,7 @@ sequenceDiagram
     end
     Scope->>Lookup: nowrap: useRemoteLookup(request, computed(<br/>options.isEnabled))
     Lookup->>Scope: nowrap: request(search.value, nextPage,<br/>requestController.signal)
-    Scope->>Service: nowrap: issueLookupService.list('departments',<br/>options.resource, search, page, signal)
+    Scope->>Service: nowrap: issueLookupService.list({<br/>kind: 'departments', resource: options.resource,<br/>search, page }, signal)
     Service->>Paged: nowrap: requestPage(url, signal)
     Paged->>HTTP: nowrap: apiClient.request(url, { signal })
     HTTP->>API: nowrap: GET /api/admin/departments?context=issues

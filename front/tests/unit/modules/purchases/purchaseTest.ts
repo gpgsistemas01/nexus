@@ -89,6 +89,48 @@ it('una corrección sin cambios no pide confirmación ni escribe; cancelar conse
 });
 const document = () => normalizePurchaseDocument(purchase, 'materials');
 const signal = () => new AbortController().signal;
+it.each([
+  ['suppliers', 'materials', true, '/api/warehouse/suppliers'],
+  ['suppliers', 'materials', false, '/api/warehouse/suppliers'],
+  ['persons', 'consumables', false, '/api/admin/persons'],
+  ['items', 'consumables', false, '/api/warehouse/consumables'],
+] as const)(
+  'la consulta %s de %s conserva filtros, página y señal con captura=%s',
+  async (kind, resource, capture, endpoint) => {
+    const requestSignal = signal();
+    apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
+      const url = new URL(config.url!, 'http://test');
+      expect(url.pathname).toBe(endpoint);
+      expect(url.searchParams.get('search')).toBe('Registro A');
+      expect(url.searchParams.get('start')).toBe('20');
+      expect(url.searchParams.get('length')).toBe('20');
+      expect(url.searchParams.get('onlyActive')).toBe(
+        kind === 'suppliers' && capture ? 'true' : null,
+      );
+      expect(url.searchParams.get('supplierId')).toBe(kind === 'items' ? ids.supplier : null);
+      expect(url.searchParams.get('department')).toBe(
+        kind === 'persons' ? 'ALMACÉN Y PROVEDURÍA' : null,
+      );
+      expect(url.searchParams.get('strictDepartmentFilter')).toBe(
+        kind === 'persons' ? 'true' : null,
+      );
+      expect(config.signal).toBe(requestSignal);
+      return { data: pageOf([]) };
+    });
+    const result = await purchaseLookupService.list(
+      {
+        kind,
+        resource,
+        search: 'Registro A',
+        page: 2,
+        ...(kind === 'suppliers' ? { capture } : {}),
+        ...(kind === 'items' ? { supplierId: ids.supplier } : {}),
+      },
+      requestSignal,
+    );
+    expect(result.data).toEqual([]);
+  },
+);
 const query = {
   ...emptyPurchaseFilters(),
   page: 2,

@@ -87,3 +87,57 @@ y conteos pertenece al [contrato paginado](../../../contracts/client-contracts.m
 La [secuencia del selector](../../processes/02-shared-runtime/03-remote-lookup.md)
 muestra la búsqueda y selección; el [alta contextual](../../development/design-and-construction-patterns/09-contextual-creation.md),
 el retorno de un registro nuevo.
+
+## Consultas tipadas de selectores
+
+**Identificador:** `DIA-VUE-DAT-016`. **Pregunta:** ¿qué comparten las solicitudes
+de opciones y qué contexto añade cada módulo? **Fuentes:**
+[lookup.ts](../../../../../src/shared/lookup.ts),
+[purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts),
+[issueLookupService.ts](../../../../../src/modules/issues/services/issueLookupService.ts),
+[inventoryCatalogService.ts](../../../../../src/modules/warehouse/services/inventoryCatalogService.ts) y
+[organizationService.ts](../../../../../src/shared/services/organizationService.ts).
+**Notación:** generalización de interfaces mediante `extends`; atributos propios
+de cada solicitud, sin repetir los heredados.
+
+```mermaid
+classDiagram
+    direction TB
+    class LookupQuery {
+        <<interface>>
+        search: string
+        page: number
+    }
+    class PurchaseLookupRequest {
+        <<interface>>
+        kind: suppliers | persons | items
+        resource: PurchaseResource
+        supplierId?: string
+        capture?: boolean
+    }
+    class IssueLookupRequest {
+        <<interface>>
+        kind: IssueLookup
+        resource: IssueResource
+        filters?: Record
+    }
+    class InventoryLookupRequest {
+        <<interface>>
+        path: string
+        supplierId?: string
+    }
+    class OrganizationLookupRequest {
+        <<interface>>
+        resource: OrganizationResource
+    }
+    LookupQuery <|-- PurchaseLookupRequest
+    LookupQuery <|-- IssueLookupRequest
+    LookupQuery <|-- InventoryLookupRequest
+    LookupQuery <|-- OrganizationLookupRequest
+```
+
+Cada servicio recibe `(query, signal)`: la señal controla la ejecución y no es
+una propiedad de la consulta. `filters` conserva valores string o arrays de
+strings; `Record` abrevia ese diccionario. Los
+[contratos de consultas](../../../contracts/form-and-event-contracts.md#consultas-de-selectores)
+definen los intercambios con los composables.

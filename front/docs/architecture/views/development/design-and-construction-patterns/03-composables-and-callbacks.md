@@ -12,7 +12,7 @@ distintos y cada pantalla conserva su propia instancia.
 **Identificador:** `DIA-VUE-GEN-002`. **Pregunta:** ¿cómo varía la operación sin
 acoplar el núcleo al dominio? **Fuente:** contratos de `usePagedList`,
 `useRemoteLookup` y `useRecordSave`. **Notación:** secuencia UML de roles genéricos;
-flechas continuas = llamada, discontinuas = retorno o estado expuesto. Los nombres
+el callback pertenece al consumidor y el coordinador lo ejecuta. Los nombres
 ilustran el mecanismo; las funciones concretas se identifican en los casos aplicados.
 
 **Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias); [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
@@ -22,38 +22,61 @@ sequenceDiagram
     autonumber
     participant Consumer@{ "type": "control" } as Consumidor
     participant Core@{ "type": "control" } as Composable
-    participant Operation as Operación configurada
-    Consumer->>Core: crear({ operation })
-    Core-->>Consumer: estado y métodos de esa instancia
-    Consumer->>Core: ejecutar(entrada)
-    Core->>Operation: operation(entrada, signal)
-    alt resultado admitido y consumidor vigente
-        Operation-->>Core: resultado
-        Core-->>Consumer: estado actualizado
-    else rechazo y consumidor vigente
-        Operation-->>Core: error
-        Core-->>Consumer: error observable
+    Consumer->>Core: nowrap: crear instancia con callbacks<br/>de coordinación
+    Core-->>Consumer: nowrap: estado y métodos de esa<br/>instancia
+    Consumer->>Core: nowrap: ejecutar la operación<br/>configurada
+    Core->>Consumer: nowrap: invocar callback con entrada y<br/>signal
+    alt nowrap: la operación resuelve
+        Consumer-->>Core: nowrap: resultado
+        opt nowrap: instancia y solicitud vigentes
+            Core->>Core: nowrap: actualizar estado
+            Core-->>Consumer: nowrap: resultado observable
+        end
+    else nowrap: la operación rechaza
+        Consumer-->>Core: nowrap: error
+        opt nowrap: instancia y solicitud vigentes
+            Core->>Core: nowrap: publicar error
+            Core->>Consumer: nowrap: callback de error
+        end
     end
 ```
 
 ## Dependencias y composición de un listado
 
-**Identificador:** `DIA-VUE-PAT-001`. **Pregunta:** ¿cómo reutilizar el listado sin
-acoplar presentación y HTTP? **Fuente:** `CatalogPage`, `useCatalogList`,
-`usePagedList`, `catalogService`, `RecordListPanel` y `CatalogTable`. Flechas
-continuas = composición/llamada; discontinuas = datos, eventos o callbacks.
+**Identificador:** `DIA-VUE-PAT-001`. **Pregunta:** ¿quién configura y quién ejecuta
+la consulta del listado? **Fuente:** `CatalogPage`, `useCatalogList`, `usePagedList`
+y `catalogService`. Secuencia de configuración y de una carga; el transporte
+interno del servicio queda fuera de este corte.
 
 ```mermaid
-flowchart TB
-    page["CatalogPage<br/>acceso y coordinación"] --> list["useCatalogList<br/>recurso y política de error"]
-    page --> panel["RecordListPanel / CatalogTable<br/>presentación"]
-    panel -.->|eventos de usuario| page
-    list --> core["usePagedList<br/>carga, cancelación y estado"]
-    list -.->|callback request| service["catalogService.list<br/>parámetros y DTO de respuesta"]
-    core -.->|invoca callback configurado| service
-    service --> http["requestPage / apiClient<br/>Axios y errores"]
-    http --> api["API del sistema"]
-    core -.->|filas y estado| page
+sequenceDiagram
+    autonumber
+    participant Page@{ "type": "control" } as Catalog<br/>Page.vue
+    participant List@{ "type": "control" } as useCatalog<br/>List.ts
+    participant Core@{ "type": "control" } as usePaged<br/>List.ts
+    participant Service@{ "type": "boundary" } as catalog<br/>Service.ts
+    Page->>List: nowrap: useCatalogList(catalog,<br/>onDenied)
+    List->>Core: nowrap: usePagedList({ initialQuery,<br/>request, onError, errorMessage<br/>})
+    Core-->>List: nowrap: { query, rows, total, load,<br/>applyQuery, ... }
+    List-->>Page: nowrap: misma instancia del listado
+    Page->>Core: nowrap: list.load()
+    Core->>Core: nowrap: fetchPage(false)<br/>abortar consulta anterior
+    Core->>List: nowrap: options.request({ ...query },<br/>signal)
+    List->>Service: nowrap: catalogService.list(catalog,<br/>query, signal)
+    alt nowrap: consulta confirmada y<br/>requestId vigente
+        Service-->>List: nowrap: PageResult con CatalogEntry[]
+        List-->>Core: nowrap: resultado
+        Core->>Core: nowrap: actualizar rows y total
+        Core-->>Page: nowrap: estado reactivo actualizado
+    else nowrap: error y solicitud vigente sin<br/>abortar
+        Service-->>List: nowrap: error
+        List-->>Core: nowrap: error
+        Core->>Core: nowrap: error.value = mensaje
+        Core->>List: nowrap: options.onError(cause)
+        opt nowrap: ApiError 401 o 403
+            List->>Page: nowrap: onDenied(cause.status)
+        end
+    end
 ```
 
 ## Código, contrato y límites
@@ -67,6 +90,8 @@ los intercambios del lector y guardado.
 
 El callback debe conservar resultados, errores y `AbortSignal`; una firma válida
 de TypeScript no demuestra sustitución de comportamiento.
+Los lectores reciben su consulta al crearse; `useRecordSave` recibe la escritura
+en cada `execute(operation)`.
 [catalogListTest](../../../../../tests/unit/modules/catalogs/catalogListTest.ts) y
 [remoteLookupTest](../../../../../tests/unit/shared/composables/remoteLookupTest.ts)
 comprueban estado, paginación y respuestas tardías según sus contratos.
@@ -129,21 +154,31 @@ Esos cambios programáticos no se confunden con interacción del usuario ni disp
 validación al abrir el modal.
 
 **Identificador:** `DIA-VUE-PAT-004`. **Pregunta:** ¿cómo separar selección y guardado
-conservando un único propietario de la captura? **Fuente:** `InventoryEditorPage`,
-`useInventoryEditor`, `useInventorySelection`, `useRemoteOptions`, `useRemoteLookup`,
-`useSelectedOption`, `inventoryService` e `inventoryCatalogService`.
-Flechas continuas = composición o consulta; discontinuas = callbacks sobre la captura.
+conservando un único propietario de la captura? **Fuente:** `useInventoryEditor`,
+`useInventorySelection`, `useSelectedOption` y los callbacks del editor.
+Secuencia del cambio a una unidad sin medidas en un alta de Materiales. Los callbacks
+`setValue` y `clearError` se declaran en el editor; la selección no posee el formulario.
 
 ```mermaid
-flowchart TB
-    page["InventoryEditorPage"] --> editor["useInventoryEditor<br/>formulario y guardado"]
-    editor --> selection["useInventorySelection<br/>catálogos y dependencias"]
-    editor --> write["inventoryService<br/>escritura HTTP"]
-    selection -.->|setValue / clearError| editor
-    selection --> lookup["useRemoteOptions<br/>consulta de catálogos"]
-    selection --> selected["useSelectedOption<br/>opción por ID"]
-    lookup --> remote["useRemoteLookup<br/>páginas y cancelación"]
-    lookup --> catalog["inventoryCatalogService<br/>lectura HTTP"]
+sequenceDiagram
+    autonumber
+    participant Editor@{ "type": "control" } as useInventory<br/>Editor.ts
+    participant Selection@{ "type": "control" } as useInventory<br/>Selection.ts
+    participant Selected@{ "type": "control" } as useSelected<br/>Option.ts
+    Editor->>Selection: nowrap: useInventorySelection({<br/>values, setValue, clearError,<br/>... })
+    Selection->>Selected: nowrap: useSelectedOption(units.items,<br/>() => values.unitMeasureId)
+    Selected-->>Selection: nowrap: selectedUnit
+    Selection-->>Editor: nowrap: { usesMeasurements, lookups,<br/>... }
+    Editor->>Editor: nowrap: update('unitMeasureId', id)
+    Selected-->>Selection: nowrap: selectedUnit actualizado desde<br/>el ID
+    opt nowrap: alta de materials y unidad sin<br/>medidas
+        loop nowrap: field de ['base', 'height']
+            Selection->>Editor: nowrap: options.setValue(field, '')
+            Editor->>Editor: nowrap: form.setFieldValue(field, '',<br/>false)
+            Selection->>Editor: nowrap: options.clearError(field)
+            Editor->>Editor: nowrap: form.setFieldError(field,<br/>undefined)
+        end
+    end
 ```
 
 `useSelectedOption` admite una precarga que debe coincidir con el ID vigente.

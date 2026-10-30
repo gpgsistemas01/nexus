@@ -30,7 +30,7 @@ it('conserva todos los campos, opcionales, genéricos y parámetros propiedad de
   const result = inspectTypeSource(
     'src/types.ts',
     `
-    export interface Item<T> { id: string; optional?: T[]; value: Record<string, number>; }
+    export interface Item<T> { id: string; optional?: T[]; value: Record<string, number>; meta?: { active: boolean; owner: Item<T> }; }
     export type Mode = { mode: 'create' } | { mode: 'edit'; row: Item<string> };
     export class Failure extends Error { constructor(public fields: Item<string>[]) { super(); } }
   `,
@@ -39,11 +39,14 @@ it('conserva todos los campos, opcionales, genéricos y parámetros propiedad de
     result.contracts
       .find(({ name }) => name === 'Item')
       ?.members.map(({ name }: { name: string }) => name),
-  ).toEqual(['id', 'optional', 'value']);
+  ).toEqual(['id', 'optional', 'value', 'meta']);
   expect(result.contracts.find(({ name }) => name === 'Mode')?.definition).toContain(
     "mode: 'edit'",
   );
-  expect(result.contracts.filter(({ kind }) => kind === 'inline object')).toHaveLength(2);
+  expect(result.contracts.map(({ name }) => name)).toEqual(['Item', 'Mode', 'Failure']);
+  expect(result.contracts[0]?.members[3]?.signature).toContain(
+    'meta?: { active: boolean; owner: Item<T> }',
+  );
   expect(
     result.contracts
       .find(({ name }) => name === 'Failure')
@@ -106,34 +109,31 @@ it('resuelve imports renombrados y distingue herencia, referencia, array, alias 
   ).toBe(true);
 });
 
-it('incluye retornos públicos inferidos con spreads y objetos de estado sin convertirlos en clases declaradas', async () => {
+it('conserva aliases y nombres declarados sin expandir retornos, spreads ni objetos anónimos', async () => {
   const root = await fixture();
+  const modelFile = await modelFixture(root);
   await writeFile(
-    path.join(root, 'src/editor.ts'),
+    modelFile,
     `
     export const useBase = () => ({ isLoading: false });
     export const useEditor = () => ({ ...useBase(), values: { name: '' }, save: () => true });
     export type Values = Record<'name' | 'active', string | boolean>;
+    export type EditorState = ReturnType<typeof useEditor>;
   `,
   );
   const model = await buildTypeModel(root);
-  const editor = model.contracts.find(({ name }) => name === 'useEditor.return')!;
-  expect(editor.kind).toBe('inferred return');
-  expect(editor.members.map(({ name }: { name: string }) => name)).toEqual([
-    'values',
-    'save',
-    'isLoading',
-  ]);
-  expect(model.contracts.some(({ kind }) => kind === 'inferred object')).toBe(true);
-  const values = model.contracts.find(({ name }) => name === 'Values.expanded')!;
-  expect(values.kind).toBe('evaluated alias');
-  expect(values.members.map(({ name }: { name: string }) => name).sort()).toEqual([
-    'active',
-    'name',
-  ]);
+  expect(model.contracts.map(({ name }) => name)).toEqual(['Values', 'EditorState']);
+  expect(model.contracts.find(({ name }) => name === 'EditorState')?.definition).toBe(
+    'ReturnType<typeof useEditor>',
+  );
+  const document = (await renderTypeReference(root)).get('purchases.md')!;
+  expect(document).toContain("Record<'name' | 'active', string | boolean>");
+  expect(document).toContain('ReturnType<typeof useEditor>');
+  expect(document).not.toContain('useEditor.return');
+  expect(document).not.toContain('Values.expanded');
 });
 
-it('dibuja contratos propios del sistema y conserva los tipos externos en las firmas', async () => {
+it('publica contratos propios en tablas y conserva los tipos externos en las firmas', async () => {
   const root = await fixture();
   const modelFile = await modelFixture(root);
   await writeFile(
@@ -168,22 +168,15 @@ it('dibuja contratos propios del sistema y conserva los tipos externos en las fi
   expect(document).toContain('## ApiError');
   expect(document).toContain('## PurchaseResource');
   expect(document).toContain("'materials' | 'consumables'");
-  expect(document).not.toContain('Parte 1/1');
-  const diagrams = [...document.matchAll(/```mermaid\n([\s\S]*?)```/g)]
-    .map((match) => match[1])
-    .join('\n');
-  expect(diagrams).toContain('Subject["PurchaseRow"]');
-  expect(diagrams).toContain('["PurchaseDetail"]');
-  expect(diagrams).toContain('Subject["ApiError"]');
-  expect(diagrams).toContain('Subject["PurchaseFormProps"]');
-  expect(diagrams).toContain('Subject --> "1" R0 : row');
-  expect(diagrams).not.toContain('Subject "1" -->');
-  expect(diagrams).not.toContain('Subject["PurchaseResource"]');
+  expect(document).toContain('## PurchaseRow');
+  expect(document).toContain('## PurchaseFormProps');
+  expect(document).toContain('[PurchaseDetail]');
+  expect(document).not.toContain('```mermaid');
   for (const technical of ['Box', 'Record', 'Promise', 'AbortSignal', 'Error', 'T'])
-    expect(diagrams).not.toContain('["' + technical + '"]');
+    expect(document).not.toContain('## ' + technical + '\n');
 });
 
-it('divide contratos con muchos destinos sin separar cada propiedad de su relación', async () => {
+it('conserva campos y relaciones de un contrato con varios destinos en una sola ficha', async () => {
   const root = await fixture();
   const modelFile = await modelFixture(root);
   const names = [
@@ -201,20 +194,17 @@ it('divide contratos con muchos destinos sin separar cada propiedad de su relaci
       ' name: string; }',
   );
   const document = (await renderTypeReference(root)).get('purchases.md')!;
-  const diagrams = [...document.matchAll(/```mermaid\n([\s\S]*?)```/g)]
-    .map((match) => match[1])
-    .filter((source) => source.includes('Subject["PurchaseRow"]'));
-  expect(diagrams).toHaveLength(2);
+  const contract = document.split('## PurchaseRow\n')[1]!;
   for (let i = 0; i < names.length; i++) {
-    const withField = diagrams.filter((source) => source.includes(`row${i}: ${names[i]}`));
-    expect(withField).toHaveLength(1);
-    expect(withField[0]).toContain('["' + names[i] + '"]');
-    expect(withField[0]).toContain(': row' + i);
+    expect(contract).toContain(`row${i}: ${names[i]}`);
+    expect(contract).toContain('[' + names[i] + ']');
   }
-  expect(diagrams.filter((source) => source.includes('name: string'))).toHaveLength(1);
+  expect(contract).toContain('name: string');
+  expect(document.match(/^## PurchaseRow$/gm)).toHaveLength(1);
+  expect(document).not.toContain('```mermaid');
 });
 
-it('publica todos los miembros por partes y detecta fuentes cambiadas o retiradas', async () => {
+it('publica todos los miembros y detecta fuentes cambiadas o retiradas', async () => {
   const root = await fixture();
   const modelFile = await modelFixture(root);
   await writeFile(
@@ -227,7 +217,7 @@ it('publica todos los miembros por partes y detecta fuentes cambiadas o retirada
   expect([...first]).toEqual([...(await renderTypeReference(root))]);
   const document = first.get('purchases.md')!;
   expect(document).toContain('field18: string');
-  expect(document.match(/```mermaid/g)).toHaveLength(2);
+  expect(document).not.toContain('```mermaid');
   await expect(generateTypeReference(root, true)).rejects.toThrow('desactualizados');
   await generateTypeReference(root, false);
   await expect(generateTypeReference(root, true)).resolves.toBeUndefined();

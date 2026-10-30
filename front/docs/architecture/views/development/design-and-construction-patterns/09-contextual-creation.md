@@ -8,7 +8,7 @@ La colaboración combina contenedor/presentación, eventos/callbacks y adaptaci�
 
 ## Modelo general
 
-**Identificador:** `DIA-VUE-GEN-007`. **Pregunta:** ¿cómo coordinar una captura auxiliar conservando el propietario del formulario origen? **Alcance:** apertura, cancelación, confirmación y retorno. **Fuente:** composición aplicada por los Workspaces. **Notación:** secuencia UML de roles genéricos; las llamadas y retornos muestran cuándo se invoca el callback.
+**Identificador:** `DIA-VUE-GEN-007`. **Pregunta:** ¿cómo coordinar una captura auxiliar conservando el propietario del formulario origen? **Alcance:** apertura, cancelación, confirmación y retorno. **Fuente:** composición aplicada por los Workspaces. Secuencia de roles; la composición incluye el adaptador que recibe el resultado del auxiliar.
 
 **Lectura visual:** [líneas de vida, llamadas y retornos](../../diagram-reading.md#secuencias).
 
@@ -16,27 +16,28 @@ La colaboración combina contenedor/presentación, eventos/callbacks y adaptaci�
 sequenceDiagram
     autonumber
     actor User as Usuario
-    participant Origin@{ "type": "control" } as Captura origen
-    participant Coordinator@{ "type": "control" } as Composición
+    participant Owner@{ "type": "control" } as Propietario de captura
+    participant Origin@{ "type": "control" } as Contenedor origen
+    participant Coordinator@{ "type": "control" } as Composición y adaptación
     participant Auxiliary@{ "type": "control" } as Captura auxiliar
-    participant Operation@{ "type": "boundary" } as Servicio de alta
-    Origin->>Coordinator: solicitarAlta(texto, onCreated)
-    Coordinator->>Auxiliary: abrir(textoInicial)
-    alt cancela la captura auxiliar
-        User->>Auxiliary: cancelar
-        Auxiliary-->>Coordinator: cierre sin resultado
-    else confirma la captura auxiliar
-        User->>Auxiliary: enviar captura
-        Auxiliary->>Operation: guardar(valores)
-        alt resultado confirmado
-            Operation-->>Auxiliary: registro creado
-            Auxiliary-->>Coordinator: registro confirmado
-            opt origen vigente
-                Coordinator->>Origin: onCreated(opción)
+    Origin->>Coordinator: nowrap: solicitarAlta({ búsqueda,<br/>onCreated })
+    Coordinator->>Auxiliary: nowrap: abrir con valores iniciales
+    alt nowrap: cancela la captura auxiliar
+        User->>Auxiliary: nowrap: cancelar
+        Auxiliary->>Coordinator: nowrap: cierre sin resultado
+    else nowrap: confirma la captura auxiliar
+        User->>Auxiliary: nowrap: enviar captura
+        Auxiliary->>Auxiliary: nowrap: validar y guardar con su<br/>propio flujo
+        alt nowrap: resultado confirmado
+            Auxiliary->>Coordinator: nowrap: registro confirmado
+            Coordinator->>Owner: nowrap: onCreated(opción adaptada)
+            opt nowrap: origen vigente y opción<br/>admitida
+                Owner->>Owner: nowrap: conservar opción y actualizar<br/>ID
+                Owner-->>Origin: nowrap: selección actualizada
             end
-        else error de alta
-            Operation-->>Auxiliary: error
-            Auxiliary-->>User: campos y mensaje para corregir
+            Coordinator->>Coordinator: nowrap: cerrar auxiliar
+        else nowrap: error de alta
+            Auxiliary-->>User: nowrap: campos y mensaje para corregir
         end
     end
 ```
@@ -46,46 +47,125 @@ define `LookupCreation`, `ItemCreation` y la adaptación a `LookupItem`.
 
 ## Caso 1: proveedor desde Inventario
 
-**Identificador:** `DIA-VUE-APL-007`. **Pregunta:** ¿qué código conserva el artículo y aplica el proveedor nuevo? **Fuente:** `InventoryEditor`, `InventoryEditorPage`, `InventoryWorkspace`, `DirectoryCreationPage`, `DirectoryEditorPage`, `useInventoryEditor` y `useInventorySelection`. Flujo de composición del alta de Materiales/Consumibles; Mermas mantiene sólo consulta de proveedor.
+**Identificador:** `DIA-VUE-APL-007`. **Pregunta:** ¿cómo llega la solicitud de proveedor al auxiliar? **Fuente:** `InventoryEditorPage`, `InventoryPage`, `InventoryWorkspace`, `DirectoryCreationPage` y `DirectoryEditorPage`. Apertura autorizada en Materiales/Consumibles; el retorno continúa en `DIA-VUE-APL-013`.
 
 ```mermaid
-flowchart TB
-    form["InventoryEditor<br/>InventoryEditorPage"] -->|LookupCreation| workspace["InventoryWorkspace"]
-    workspace -->|suppliers y request| auxiliary["DirectoryCreationPage<br/>DirectoryEditorPage"]
-    auxiliary -->|guardar proveedor| service["useDirectoryEditor<br/>directoryService"]
-    service -->|DirectoryEntry| auxiliary
-    auxiliary -.->|onCreated: LookupItem| editor["useInventoryEditor<br/>selectCreatedSupplier"]
-    editor -->|opción confirmada| selection["useInventorySelection"]
-    editor -.->|actualizar supplierId| form
+sequenceDiagram
+    autonumber
+    participant Origin@{ "type": "control" } as InventoryEditor<br/>Page.vue
+    participant Page@{ "type": "control" } as Inventory<br/>Page.vue
+    participant Workspace@{ "type": "control" } as Inventory<br/>Workspace.vue
+    participant Creation@{ "type": "control" } as DirectoryCreation<br/>Page.vue
+    participant Auxiliary@{ "type": "control" } as DirectoryEditor<br/>Page.vue
+    Origin->>Page: nowrap: emit('createSupplier',<br/>{ search, onCreated })
+    Page->>Workspace: nowrap: emit('createSupplier',<br/>request)
+    Workspace->>Workspace: nowrap: createSupplier(request)<br/>creation.value = request
+    Workspace->>Creation: nowrap: resource="suppliers"<br/>:request="creation"
+    Creation->>Auxiliary: nowrap: :target={ action: 'create',<br/>initialName:<br/>request.search }
+```
+
+### Retorno del proveedor a Inventario
+
+**Identificador:** `DIA-VUE-APL-013`. **Pregunta:** ¿quién aplica el proveedor y cierra el auxiliar? **Fuente:** `DirectoryEditorPage`, `DirectoryCreationPage`, `useInventoryEditor` e `InventoryWorkspace`. Retorno de un `entry` confirmado mientras `DirectoryCreationPage` conserva permiso de alta y lectura; el guardado interno de Directorio queda fuera del corte.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Auxiliary@{ "type": "control" } as DirectoryEditor<br/>Page.vue
+    participant Creation@{ "type": "control" } as DirectoryCreation<br/>Page.vue
+    participant Editor@{ "type": "control" } as useInventory<br/>Editor.ts
+    participant Workspace@{ "type": "control" } as Inventory<br/>Workspace.vue
+    Auxiliary->>Creation: nowrap: emit('saved', entry)
+    Creation->>Editor: nowrap: request.onCreated(LookupItem)<br/>selectCreatedSupplier(created)
+    opt nowrap: alta vigente y proveedor<br/>activo, sin bloqueo
+        Editor->>Editor: nowrap: selection.selectedSupplier.value<br/>= created
+        Editor->>Editor: nowrap: update('supplierId',<br/>created.id)<br/>selection.refreshSuppliers()
+    end
+    Creation->>Workspace: nowrap: emit('close')
+    Workspace->>Workspace: nowrap: creation = undefined
 ```
 
 ## Caso 2: proveedor o artículo desde Compras
 
 ### Proveedor desde el encabezado
 
-**Identificador:** `DIA-VUE-APL-008`. **Pregunta:** ¿cómo vuelve el proveedor al encabezado sin acoplar Compras a las páginas privadas de Directorio? **Fuente:** `PurchaseEditorPage`, `PurchaseWorkspace`, `DirectoryCreationPage` y `usePurchaseEditor`. Flechas continuas = evento/composición; discontinuas = resultado confirmado y captura actualizada.
+**Identificador:** `DIA-VUE-APL-008`. **Pregunta:** ¿cómo se abre el alta desde el encabezado de compra? **Fuente:** `PurchaseEditorPage`, `PurchasePage`, `PurchaseWorkspace`, `DirectoryCreationPage` y `DirectoryEditorPage`. Apertura autorizada; el retorno continúa en `DIA-VUE-APL-014`.
 
 ```mermaid
-flowchart TB
-    form["PurchaseEditorPage"] -->|LookupCreation| workspace["PurchaseWorkspace"]
-    workspace -->|suppliers y request| auxiliary["DirectoryCreationPage"]
-    auxiliary -.->|onCreated| editor["usePurchaseEditor<br/>selectCreatedSupplier"]
-    editor -->|conservar opción| option["useSelectedOption"]
-    editor -.->|supplierId| form
+sequenceDiagram
+    autonumber
+    participant Origin@{ "type": "control" } as PurchaseEditor<br/>Page.vue
+    participant Page@{ "type": "control" } as Purchase<br/>Page.vue
+    participant Workspace@{ "type": "control" } as Purchase<br/>Workspace.vue
+    participant Creation@{ "type": "control" } as DirectoryCreation<br/>Page.vue
+    participant Auxiliary@{ "type": "control" } as DirectoryEditor<br/>Page.vue
+    Origin->>Page: nowrap: emit('createSupplier',<br/>{ search, onCreated })
+    Page->>Workspace: nowrap: emit('createSupplier',<br/>request)
+    Workspace->>Workspace: nowrap: auxiliary.value = { kind:<br/>'supplier', ...request }
+    Workspace->>Creation: nowrap: resource="suppliers"<br/>:request="auxiliary"
+    Creation->>Auxiliary: nowrap: :target={ action: 'create',<br/>initialName:<br/>request.search }
+```
+
+### Retorno del proveedor a Compras
+
+**Identificador:** `DIA-VUE-APL-014`. **Pregunta:** ¿qué callback selecciona el proveedor en la compra? **Fuente:** `DirectoryEditorPage`, `DirectoryCreationPage`, `usePurchaseEditor` y `PurchaseWorkspace`. Retorno confirmado con permiso de alta/lectura vigente en el adaptador de Directorio.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Auxiliary@{ "type": "control" } as DirectoryEditor<br/>Page.vue
+    participant Creation@{ "type": "control" } as DirectoryCreation<br/>Page.vue
+    participant Editor@{ "type": "control" } as usePurchase<br/>Editor.ts
+    participant Workspace@{ "type": "control" } as Purchase<br/>Workspace.vue
+    Auxiliary->>Creation: nowrap: emit('saved', entry)
+    Creation->>Editor: nowrap: request.onCreated(LookupItem)<br/>selectCreatedSupplier(item)
+    opt nowrap: compra nueva editable,<br/>instancia vigente y proveedor<br/>activo
+        Editor->>Editor: nowrap: supplier.value = item<br/>interaction.update('supplierId',<br/>item.id)
+        Editor->>Editor: nowrap: suppliers.updateSearch('')<br/>suppliers.refresh()
+    end
+    Creation->>Workspace: nowrap: emit('close')
+    Workspace->>Workspace: nowrap: auxiliary = undefined
 ```
 
 ### Artículo desde un detalle
 
-**Identificador:** `DIA-VUE-APL-010`. **Pregunta:** ¿qué código fija el contexto del artículo y devuelve el ID al detalle? **Fuente:** `PurchaseLineEntryPage`, `PurchaseWorkspace`, `InventoryEditorPage`, `useInventoryEditor`, `inventoryService` y `usePurchaseLineEntry`. Alcance: composición y retorno; la escritura interna del editor usa el servicio de Inventario.
+**Identificador:** `DIA-VUE-APL-010`. **Pregunta:** ¿cómo se abre el artículo con el proveedor de la compra? **Fuente:** `PurchaseLineEntryPage`, `PurchaseEditorPage`, `PurchasePage`, `PurchaseWorkspace` e `InventoryEditorPage`. Apertura autorizada; el retorno continúa en `DIA-VUE-APL-015`.
 
 ```mermaid
-flowchart TB
-    form["PurchaseLineEntryPage"] -->|ItemCreation| workspace["PurchaseWorkspace"]
-    workspace -->|proveedor y búsqueda| auxiliary["InventoryEditorPage<br/>contexto goodsReceipt"]
-    auxiliary -->|saved: LookupItem| workspace
-    workspace -.->|onCreated| line["usePurchaseLineEntry<br/>selectCreatedItem"]
-    line -->|conservar opción| option["useSelectedOption"]
-    line -.->|materialId| form
+sequenceDiagram
+    autonumber
+    participant Origin@{ "type": "control" } as PurchaseLine<br/>EntryPage.vue
+    participant EditorPage@{ "type": "control" } as PurchaseEditor<br/>Page.vue
+    participant Page@{ "type": "control" } as Purchase<br/>Page.vue
+    participant Workspace@{ "type": "control" } as Purchase<br/>Workspace.vue
+    participant Auxiliary@{ "type": "control" } as InventoryEditor<br/>Page.vue
+    Origin->>EditorPage: nowrap: emit('create', { supplier,<br/>search, onCreated })
+    EditorPage->>Page: nowrap: emit('createItem',<br/>request)
+    Page->>Workspace: nowrap: emit('createItem',<br/>request)
+    Workspace->>Workspace: nowrap: auxiliary.value = { kind:<br/>'item', ...request }
+    Workspace->>Auxiliary: nowrap: :initial-supplier=<br/>"auxiliary.supplier"<br/>creation-context=<br/>"goodsReceipt"
+```
+
+### Retorno del artículo al detalle
+
+**Identificador:** `DIA-VUE-APL-015`. **Pregunta:** ¿qué resultado selecciona el artículo sin agregar el detalle? **Fuente:** `InventoryEditorPage`, `PurchaseWorkspace` y `usePurchaseLineEntry`. El editor de Inventario ya confirmó su escritura antes de emitir `saved`.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Auxiliary@{ "type": "control" } as InventoryEditor<br/>Page.vue
+    participant Workspace@{ "type": "control" } as Purchase<br/>Workspace.vue
+    participant Line@{ "type": "control" } as usePurchase<br/>LineEntry.ts
+    Auxiliary->>Workspace: nowrap: emit('saved', item)
+    Workspace->>Workspace: nowrap: handleItemSaved(item)
+    opt nowrap: auxiliary.kind === 'item' y<br/>resultado presente
+        Workspace->>Line: nowrap: auxiliary.onCreated(item)<br/>selectCreatedItem(created)
+        opt nowrap: captura disponible y artículo<br/>activo
+            Line->>Line: nowrap: item.value = created<br/>interaction.update('materialId',<br/>created.id)
+            Line->>Line: nowrap: items.updateSearch('')<br/>items.refresh()
+        end
+        Workspace->>Workspace: nowrap: auxiliary.value = undefined
+    end
 ```
 
 `PurchaseWorkspace` discrimina `kind=supplier` y `kind=item`; el segundo incluye
@@ -93,18 +173,45 @@ el proveedor fijado para el artículo.
 
 ## Caso 3: cliente desde Salidas
 
-**Identificador:** `DIA-VUE-APL-009`. **Pregunta:** ¿cómo vuelve el cliente confirmado y qué componente resuelve sus dependencias? **Fuente:** `IssueEditor`, `IssueEditorPage`, `IssueWorkspace`, `DirectoryCreationPage`, `useIssueHeaderSelection` y `useSelectedOption`. Aplica a Materiales, Consumibles y Mermas; no ofrece crear asesor/solicitante desde esos selectores.
+**Identificador:** `DIA-VUE-APL-009`. **Pregunta:** ¿cómo se abre el cliente desde el encabezado de salida? **Fuente:** `IssueEditorPage`, `IssuePage`, `IssueWorkspace`, `DirectoryCreationPage` y `DirectoryEditorPage`. Apertura autorizada en Materiales, Consumibles y Mermas; el retorno continúa en `DIA-VUE-APL-016`.
 
 ```mermaid
-flowchart TB
-    form["IssueEditor<br/>IssueEditorPage"] -->|createClient: LookupCreation| workspace["IssueWorkspace"]
-    workspace -->|clients y request| auxiliary["DirectoryCreationPage<br/>DirectoryEditorPage"]
-    auxiliary -->|guardar cliente| service["useDirectoryEditor<br/>directoryService"]
-    service -->|DirectoryEntry| auxiliary
-    auxiliary -.->|onCreated: LookupItem| selection["useIssueHeaderSelection<br/>selectCreatedClient"]
-    selection -->|ID y etiqueta| option["useSelectedOption<br/>catálogo de clientes"]
-    selection -.->|seleccionar cliente| editor["useIssueEditor<br/>captura del encabezado"]
-    editor -.->|encabezado actualizado| form
+sequenceDiagram
+    autonumber
+    participant Origin@{ "type": "control" } as IssueEditor<br/>Page.vue
+    participant Page@{ "type": "control" } as Issue<br/>Page.vue
+    participant Workspace@{ "type": "control" } as Issue<br/>Workspace.vue
+    participant Creation@{ "type": "control" } as DirectoryCreation<br/>Page.vue
+    participant Auxiliary@{ "type": "control" } as DirectoryEditor<br/>Page.vue
+    Origin->>Page: nowrap: emit('createClient',<br/>{ search, onCreated })
+    Page->>Workspace: nowrap: emit('createClient',<br/>request)
+    Workspace->>Workspace: nowrap: creation.value = request
+    Workspace->>Creation: nowrap: resource="clients"<br/>:request="creation"
+    Creation->>Auxiliary: nowrap: :target={ action: 'create',<br/>initialName:<br/>request.search }
+```
+
+### Retorno del cliente a Salidas
+
+**Identificador:** `DIA-VUE-APL-016`. **Pregunta:** ¿quién selecciona el cliente y actualiza el encabezado? **Fuente:** `DirectoryEditorPage`, `DirectoryCreationPage`, `useIssueHeaderSelection`, `useIssueEditor` e `IssueWorkspace`. Retorno confirmado con permiso de alta/lectura vigente en el adaptador de Directorio.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Auxiliary@{ "type": "control" } as DirectoryEditor<br/>Page.vue
+    participant Creation@{ "type": "control" } as DirectoryCreation<br/>Page.vue
+    participant Selection@{ "type": "control" } as useIssueHeader<br/>Selection.ts
+    participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
+    participant Workspace@{ "type": "control" } as Issue<br/>Workspace.vue
+    Auxiliary->>Creation: nowrap: emit('saved', entry)
+    Creation->>Selection: nowrap: request.onCreated(<br/>LookupItem)<br/>callback selectCreatedClient
+    opt nowrap: encabezado disponible y<br/>cliente activo
+        Selection->>Selection: nowrap: selectedClient.value<br/>= item
+        Selection->>Editor: nowrap: options.selectClient(<br/>item.id)
+        Editor->>Editor: nowrap: interaction.update(<br/>'clientId', id)
+        Selection->>Selection: nowrap: clients.updateSearch('')<br/>clients.refresh()
+    end
+    Creation->>Workspace: nowrap: emit('close')
+    Workspace->>Workspace: nowrap: creation = undefined
 ```
 
 ## Condiciones y excepciones

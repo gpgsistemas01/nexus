@@ -51,7 +51,8 @@ export const useIssueEditor = (options: {
         },
     });
     const headerSelection = useIssueHeaderSelection({
-        ...options,
+        resource: options.resource,
+        has: options.has,
         selectClient: (id) => interaction.update('clientId', id),
         values: form.values,
         document,

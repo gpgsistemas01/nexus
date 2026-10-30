@@ -87,24 +87,25 @@ export const INVENTORY_CONFIG = {
     },
 } as const;
 
-export type InventoryField =
-    | 'name'
-    | 'supplierId'
-    | 'presentationId'
-    | 'unitMeasureId'
-    | 'materialId'
-    | 'base'
-    | 'height'
-    | 'minStock'
-    | 'maxUnitCost'
-    | 'isActive'
-    | 'newStock'
-    | 'initialQuantity'
-    | 'quantity'
-    | 'reasonId'
-    | 'observations'
-    | 'coneWeightKg'
-    | 'totalWeightKg'
-    | 'referenceRollTotalWeightKg';
-export type InventoryValues = Record<InventoryField, string | boolean>;
+export interface InventoryValues {
+    name: string;
+    supplierId: string;
+    presentationId: string;
+    unitMeasureId: string;
+    materialId: string;
+    base: string;
+    height: string;
+    minStock: string;
+    maxUnitCost: string;
+    isActive: boolean;
+    newStock: string;
+    initialQuantity: string;
+    quantity: string;
+    reasonId: string;
+    observations: string;
+    coneWeightKg: string;
+    totalWeightKg: string;
+    referenceRollTotalWeightKg: string;
+}
+export type InventoryField = keyof InventoryValues;
 export type InventoryPayload = Record<string, string | number | boolean | null>;

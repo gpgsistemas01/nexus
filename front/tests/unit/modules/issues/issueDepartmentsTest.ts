@@ -24,7 +24,7 @@ it.each(['materials', 'consumables', 'wastes'] as const)(
   async (resource) => {
     const lookup = vi
       .spyOn(issueLookupService, 'list')
-      .mockImplementation(async (kind) => pageOf(kind === 'departments' ? [printing] : []));
+      .mockImplementation(async ({ kind }) => pageOf(kind === 'departments' ? [printing] : []));
     const { value, wrapper } = mountComposable(() =>
       useIssueEditor({
         resource,
@@ -40,10 +40,10 @@ it.each(['materials', 'consumables', 'wastes'] as const)(
     expect(value.errors.value).toEqual({});
     expect(
       lookup.mock.calls.some(
-        (call) =>
-          call[0] === 'persons' &&
-          call[5]?.department === printing.title &&
-          call[5]?.strictDepartmentFilter === 'true',
+        ([query]) =>
+          query.kind === 'persons' &&
+          query.filters?.department === printing.title &&
+          query.filters?.strictDepartmentFilter === 'true',
       ),
     ).toBe(true);
     expect(mapIssueFormToRequest(value.values, resource, 'create').departmentId).toBe(printing.id);
@@ -81,7 +81,7 @@ it.each([
 
 it('una búsqueda con un solo resultado conserva el selector y el área elegida', async () => {
   vi.useFakeTimers();
-  vi.spyOn(issueLookupService, 'list').mockImplementation(async (_kind, _resource, search) =>
+  vi.spyOn(issueLookupService, 'list').mockImplementation(async ({ search }) =>
     pageOf(search ? [printing] : [printing, router]),
   );
   const selected = ref(router.id);
@@ -107,7 +107,7 @@ it('una búsqueda con un solo resultado conserva el selector y el área elegida'
 it.each([printing, router])(
   'editar conserva el área original, solicitante y proyecto aunque el catálogo devuelva $title',
   async (available) => {
-    vi.spyOn(issueLookupService, 'list').mockImplementation(async (kind) =>
+    vi.spyOn(issueLookupService, 'list').mockImplementation(async ({ kind }) =>
       pageOf(kind === 'departments' ? [available] : []),
     );
     const original = {
@@ -135,7 +135,7 @@ it.each([printing, router])(
 );
 
 it('limpiar filtros conserva el área obligatoria y elimina los filtros opcionales', async () => {
-  vi.spyOn(issueLookupService, 'list').mockImplementation(async (kind) =>
+  vi.spyOn(issueLookupService, 'list').mockImplementation(async ({ kind }) =>
     pageOf(kind === 'departments' ? [printing] : []),
   );
   const { value, wrapper } = mountComposable(() => useIssueFilters('materials', () => true));

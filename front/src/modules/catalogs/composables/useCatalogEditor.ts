@@ -40,7 +40,8 @@ export const useCatalogEditor = (options: {
     }
 
     const save = useRecordSave({
-        ...options,
+        onSaved: options.onSaved,
+        onDenied: options.onDenied,
         setErrors: form.setErrors,
         errorMessage: 'No se pudo guardar el catálogo.',
     });

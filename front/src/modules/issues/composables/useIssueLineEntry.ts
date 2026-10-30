@@ -20,7 +20,10 @@ export const useIssueLineEntry = (options: {
     const isEnabled = computed(() => options.canRead() && !options.isDisabled());
     const items = useRemoteLookup(
         (search, page, signal) =>
-            issueLookupService.list('items', options.resource, search, page, signal),
+            issueLookupService.list(
+                { kind: 'items', resource: options.resource, search, page },
+                signal,
+            ),
         isEnabled,
     );
     const form = useForm({

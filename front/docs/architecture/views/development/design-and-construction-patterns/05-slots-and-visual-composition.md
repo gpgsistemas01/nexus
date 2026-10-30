@@ -29,6 +29,27 @@ flowchart TB
     consumer -->|props de configuración| structure
 ```
 
+## Evaluación general de un slot con alcance
+
+**Identificador:** `DIA-VUE-GEN-008`. **Pregunta:** ¿cómo llega el dato del marco
+al contenido definido por su consumidor? **Fuente:** contratos de slots y
+`ServerTable`. Secuencia conceptual de renderizado;
+las regiones del modelo anterior no son componentes adicionales.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Consumer@{ "type": "control" } as Consumidor
+    participant Frame@{ "type": "boundary" } as Marco reutilizable
+    participant Slot as Contenido del slot
+    Consumer->>Frame: nowrap: props de configuración y<br/>contenido con nombre
+    loop nowrap: cada elemento que presenta el<br/>marco
+        Frame->>Slot: nowrap: evaluar contenido con props<br/>del slot
+        Slot->>Slot: nowrap: combinar datos del consumidor<br/>y props recibidas
+        Slot-->>Frame: nowrap: contenido visual del elemento
+    end
+```
+
 ## Aplicación a las celdas de Catálogos
 
 **Identificador:** `DIA-VUE-APL-004`. **Pregunta:** ¿cómo se comparten controles de
@@ -53,6 +74,37 @@ flowchart TB
     shared -.->|item del slot| active
     shared -.->|item del slot| actions
     action -.->|click convertido en edit| table
+```
+
+## Evaluación de una celda de Catálogos
+
+**Identificador:** `DIA-VUE-APL-011`. **Pregunta:** ¿cómo se utiliza `item` y de
+dónde sale el evento `edit`? **Fuente:** templates de `CatalogTable`, reenvío de
+slots de `ServerTable`, `StateBadge` y `TableAction`. Secuencia de renderizado e
+interacción; las etiquetas de props y slots son expresiones de template, no métodos.
+El control de Vuetify ejecuta los slots que `ServerTable` reenvía.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Usuario
+    participant Page@{ "type": "control" } as Catalog<br/>Page.vue
+    participant Table@{ "type": "control" } as Catalog<br/>Table.vue
+    participant Frame@{ "type": "boundary" } as Server<br/>Table.vue
+    participant Badge@{ "type": "boundary" } as State<br/>Badge.vue
+    participant Action@{ "type": "boundary" } as Table<br/>Action.vue
+    Table->>Frame: nowrap: :headers, :rows y templates de<br/>celdas
+    Frame->>Table: nowrap: slot item.isActive con { item<br/>}
+    Table->>Badge: nowrap: :is-active="item.isActive"
+    Badge-->>Table: nowrap: contenido de la celda de<br/>estado
+    Table-->>Frame: nowrap: contenido de item.isActive
+    Frame->>Table: nowrap: slot item.actions con { item }
+    Table->>Action: nowrap: icon="$edit"<br/>label="Editar registro"
+    Action-->>Table: nowrap: control de la celda de<br/>acciones
+    Table-->>Frame: nowrap: contenido de item.actions
+    User->>Action: nowrap: click
+    Action->>Table: nowrap: emit('click')
+    Table->>Page: nowrap: emit('edit', item)
 ```
 
 ## Código, contrato y límites

@@ -11,6 +11,35 @@ Nombrar la condición de una rama compleja o extraer una función pura si repres
 regla reutilizable. Una extracción no se justifica por delegar una única llamada sin
 conservar un contrato o proteger una frontera.
 
+## Parámetros y contexto
+
+Agrupar en un objeto tipado los datos que describen una misma consulta. Conservar
+`AbortSignal` separado: controla la ejecución y no es un filtro. El consumidor
+aporta el contexto de su pantalla; el servicio lo traduce al contrato HTTP.
+
+Ejemplo de [usePurchaseEditor](../../../src/modules/purchases/composables/usePurchaseEditor.ts):
+
+```ts
+purchaseLookupService.list(
+    { kind: 'suppliers', resource: options.resource, search, page, capture: true },
+    signal,
+);
+```
+
+Al componer colaboradores, pasar los campos y callbacks que declara el receptor.
+Evitar reenviar todas las props o todo el editor mediante un spread cuando sólo
+se necesita una parte. En [useUserEditor](../../../src/modules/identity/composables/useUserEditor.ts),
+el guardado recibe confirmación, rechazo y errores; la selección y los permisos
+permanecen en el editor:
+
+```ts
+const save = useRecordSave({
+    onSaved: options.onSaved,
+    onDenied: options.onDenied,
+    setErrors: form.setErrors,
+});
+```
+
 ## Efectos y promesas
 
 Esperar las operaciones que deben completar antes de continuar. `void` sólo expresa

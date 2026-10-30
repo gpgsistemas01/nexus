@@ -43,25 +43,33 @@ La API conserva las reglas definitivas de permiso, estado y stock.
 
 ## Composición del editor y adaptadores
 
-**Identificador:** `DIA-VUE-DOC-001`. **Pregunta:** ¿qué cambia al modificar la vista,
-las reglas o el contrato HTTP? **Alcance:** dependencias del editor de Salidas;
-Compras aplica el mismo corte con sus propios módulos. Flechas continuas = consumo
-o composición; discontinuas = eventos o ejecución de una operación configurada.
-Es un diagrama de colaboración funcional, no un diagrama UML de clases.
+**Identificador:** `DIA-VUE-DOC-001`. **Pregunta:** ¿cómo se ejecuta la escritura
+configurada en el guardado compartido? **Fuente:** `IssueEditorPage`, `useIssueEditor`,
+`useRecordSave`, `mapIssueFormToRequest` e `issueService`. Secuencia del camino válido
+de Salidas, desde el envío hasta que el callback devuelve la confirmación. El
+transporte interno del servicio tiene su [secuencia propia](../../processes/07-issues/07-issue-save-transport.md).
 
-**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias); [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+**Lectura visual:** [líneas de vida, números y mensajes](../../diagram-reading.md#secuencias).
 
 ```mermaid
-flowchart TB
-    page["IssueEditorPage<br/>contenedor"] --> ui["IssueEditor<br/>props y presentación"]
-    ui -.->|eventos| page
-    page --> editor["useIssueEditor<br/>captura y coordinación"]
-    editor --> rules["issueForm y RequestMapper<br/>esquema y payload"]
-    editor --> save["useRecordSave<br/>ciclo de guardado"]
-    save -.->|operation signal| editor
-    editor --> service["issueService<br/>ruta y confirmación"]
-    service --> http["apiClient<br/>Axios compartido"]
-    http --> api["API<br/>confirmación de la operación"]
+sequenceDiagram
+    autonumber
+    participant Page@{ "type": "control" } as IssueEditor<br/>Page.vue
+    participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
+    participant Save@{ "type": "control" } as useRecord<br/>Save.ts
+    participant Mapper as issueRequest<br/>Mapper.ts
+    participant Service@{ "type": "boundary" } as issue<br/>Service.ts
+    Page->>Editor: nowrap: editor.submit()
+    Editor->>Editor: nowrap: submitValidated() tras<br/>comprobar isDisabled()
+    Note over Editor: Captura válida y target de escritura
+    Editor->>Save: nowrap: save.execute(operation)
+    Save->>Save: nowrap: comprobar envío, conflicto y<br/>signal
+    Save->>Editor: nowrap: operation(controller.signal)
+    Editor->>Mapper: nowrap: mapIssueFormToRequest(values,<br/>resource, target.mode)
+    Mapper-->>Editor: nowrap: payload
+    Editor->>Service: nowrap: issueService.save({ resource,<br/>target, payload, signal })
+    Service-->>Editor: nowrap: MutationConfirmation
+    Editor-->>Save: nowrap: resultado de operation
 ```
 
 La operación se configura en el editor: `useRecordSave` no importa el servicio

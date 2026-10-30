@@ -14,7 +14,9 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ add: [line: PurchaseDetail]; create: [request: ItemCreation] }>();
 const line = usePurchaseLineEntry({
-    ...props,
+    resource: props.resource,
+    supplier: props.supplier,
+    canRead: props.canRead,
     isDisabled: () => props.isDisabled,
     onAdded: (value) => emit('add', value),
 });

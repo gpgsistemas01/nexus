@@ -29,7 +29,10 @@ export const useIssueHeaderSelection = (options: {
     const canReadPersons = computed(() => options.has(PERMISSIONS.PERSONS_READ));
     const clients = useRemoteLookup(
         (search, page, signal) =>
-            issueLookupService.list('clients', options.resource, search, page, signal),
+            issueLookupService.list(
+                { kind: 'clients', resource: options.resource, search, page },
+                signal,
+            ),
         computed(() => options.isEnabled() && canReadClients.value),
     );
     const departments = useIssueDepartments({
@@ -79,29 +82,40 @@ export const useIssueHeaderSelection = (options: {
     const advisors = useRemoteLookup(
         (search, page, signal) =>
             issueLookupService.list(
-                'persons',
-                options.resource,
-                search,
-                page,
+                {
+                    kind: 'persons',
+                    resource: options.resource,
+                    search,
+                    page,
+                    filters: isInternalClientName(clientName.value)
+                        ? { role: 'Coordinador' }
+                        : {
+                              department: resolveAdvisorDepartmentByClientName({
+                                  clientName: clientName.value,
+                              }),
+                              strictDepartmentFilter: 'true',
+                          },
+                },
                 signal,
-                isInternalClientName(clientName.value)
-                    ? { role: 'Coordinador' }
-                    : {
-                          department: resolveAdvisorDepartmentByClientName({
-                              clientName: clientName.value,
-                          }),
-                          strictDepartmentFilter: 'true',
-                      },
             ),
         computed(() => options.isEnabled() && canReadPersons.value && !!clientName.value),
         clientName,
     );
     const requesters = useRemoteLookup(
         (search, page, signal) =>
-            issueLookupService.list('persons', options.resource, search, page, signal, {
-                department: departmentName.value,
-                strictDepartmentFilter: 'true',
-            }),
+            issueLookupService.list(
+                {
+                    kind: 'persons',
+                    resource: options.resource,
+                    search,
+                    page,
+                    filters: {
+                        department: departmentName.value,
+                        strictDepartmentFilter: 'true',
+                    },
+                },
+                signal,
+            ),
         computed(() => options.isEnabled() && canReadPersons.value && !!departmentName.value),
         departmentName,
     );

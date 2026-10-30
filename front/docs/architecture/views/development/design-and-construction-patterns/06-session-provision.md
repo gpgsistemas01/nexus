@@ -9,20 +9,30 @@ descendiente recupera esa instancia por la clave `authSessionKey`.
 
 ## Modelo general de provisión de estado de aplicación
 
-**Identificador:** `DIA-VUE-GEN-005`. **Pregunta:** ¿cómo comparten un estado la
-navegación y sus consumidores? **Fuente:** composición del arranque e inyección
-de Vue. Flechas continuas = configuración; discontinuas = uso de la misma instancia.
+**Identificador:** `DIA-VUE-GEN-005`. **Pregunta:** ¿en qué orden se crea, proporciona
+y recupera la sesión? **Fuente:** composición del arranque e inyección de Vue.
+Secuencia conceptual; el proveedor devuelve la misma instancia a cada consumidor.
 
-**Lectura visual:** [formas, límites y flechas del mapa](../../diagram-reading.md#mapas-y-actividades).
+**Lectura visual:** [llamadas, retornos y alternativas](../../diagram-reading.md#secuencias).
 
 ```mermaid
-flowchart TB
-    root["Arranque de la aplicación"] --> state["Instancia de sesión"]
-    root --> router["Guarda de navegación"]
-    root --> provider["Proveedor a descendientes"]
-    provider --> consumers["Consumidores del estado"]
-    router -.->|consulta| state
-    consumers -.->|consulta| state
+sequenceDiagram
+    autonumber
+    participant Root@{ "type": "control" } as Arranque
+    participant Session@{ "type": "control" } as Módulo de sesión
+    participant Navigation@{ "type": "control" } as Navegación
+    participant Consumer@{ "type": "control" } as Consumidor
+    Root->>Session: nowrap: crear sesión
+    Session-->>Root: nowrap: instancia con lectura y<br/>operaciones
+    Root->>Navigation: nowrap: configurar con esa instancia
+    Root->>Root: nowrap: proporcionar instancia<br/>mediante una clave
+    Root->>Root: nowrap: montar aplicación
+    Consumer->>Session: nowrap: recuperar sesión por la clave
+    alt nowrap: proveedor disponible
+        Session-->>Consumer: nowrap: misma instancia de sesión
+    else nowrap: proveedor ausente
+        Session-->>Consumer: nowrap: error de configuración
+    end
 ```
 
 ## Aplicación en el arranque de Vue

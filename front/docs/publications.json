@@ -76,7 +76,7 @@
             "sources": ["architecture/coding-standards/"]
         },
         "tipos": {
-            "title": "Contratos completos TypeScript y SFC",
+            "title": "Referencia de contratos TypeScript y SFC",
             "includeInComplete": false,
             "sources": ["architecture/views/logical/type-reference/"]
         },

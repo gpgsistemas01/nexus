@@ -7,14 +7,19 @@ el aplicado permite seguirlos en el código. La notación se elige según la pre
 | Capítulo | Pregunta principal | Diagramas utilizados |
 | --- | --- | --- |
 | [Principios y clasificación](01-applicability-and-principles.md) | ¿Qué mecanismos comparten los módulos y dónde se aplican? | Catálogo de mecanismos, figuras y aplicación de SOLID. |
-| [Contenedor y presentación](02-container-and-presentation.md) | ¿Quién conserva el estado y quién presenta/emite intenciones? | Mapa de composición de componentes con props y eventos. |
-| [Composables y callbacks](03-composables-and-callbacks.md) | ¿Cómo ejecuta un coordinador una operación aportada por su consumidor? | Secuencia UML del callback y mapas de dependencias aplicadas. |
-| [Adaptadores HTTP y de datos](04-http-and-data-adapters.md) | ¿Cómo se transforma y admite una respuesta externa? | Flujo de datos con transformación y decisiones de aceptación. |
-| [Slots y composición visual](05-slots-and-visual-composition.md) | ¿Qué marco se comparte y dónde se inserta el contenido específico? | Árbol/regiones de composición con contenido y props de slot. |
-| [Provisión de sesión](06-session-provision.md) | ¿Cómo recuperan varios consumidores la misma instancia? | Mapa de provisión y secuencia UML de creación e inyección. |
-| [Fábricas de esquemas](07-schema-factories.md) | ¿Qué reglas construye la función para cada contexto? | Actividad con decisiones y productos, usando notación de flujo. |
-| [Composición de documentos](08-document-responsibilities.md) | ¿Cómo colaboran los mecanismos en Compras y Salidas? | Mapas de responsabilidades y secuencia UML de confirmación. |
-| [Altas contextuales](09-contextual-creation.md) | ¿Cómo retorna un alta auxiliar sin guardar el documento principal? | Secuencia UML general y mapas de los cuatro casos aplicados. |
+| [Contenedor y presentación](02-container-and-presentation.md) | ¿Cómo vuelve una intención del usuario al propietario del estado? | Secuencias de props, eventos, actualización y apertura de captura. |
+| [Composables y callbacks](03-composables-and-callbacks.md) | ¿Quién configura, ejecuta y recibe el resultado del callback? | Secuencias de configuración, consulta y selección dependiente. |
+| [Adaptadores HTTP y de datos](04-http-and-data-adapters.md) | ¿Quién solicita, transforma y admite una respuesta externa? | Secuencias de servicio, transporte y mapper con alternativas de rechazo. |
+| [Slots y composición visual](05-slots-and-visual-composition.md) | ¿Dónde se inserta el contenido y cómo recibe los datos del marco? | Mapas de regiones y secuencias de evaluación e interacción. |
+| [Provisión de sesión](06-session-provision.md) | ¿En qué orden se crea, proporciona y recupera la misma instancia? | Secuencias de arranque e inyección. |
+| [Fábricas de esquemas](07-schema-factories.md) | ¿Qué reglas se construyen y cuándo leen la captura vigente? | Actividades de selección de reglas y secuencias de ejecución del producto. |
+| [Composición de documentos](08-document-responsibilities.md) | ¿Cómo se conectan captura, payload, escritura y confirmación? | Secuencias del callback de escritura y de su resultado entre contenedores. |
+| [Altas contextuales](09-contextual-creation.md) | ¿Cómo vuelve el registro confirmado al formulario origen? | Secuencia general y secuencias de eventos/callbacks de los cuatro casos. |
+
+Cada pareja conserva el mismo recorrido: los roles del modelo general se sustituyen
+por los archivos que los realizan. Las secuencias hacen visible el orden y el retorno;
+las actividades, las decisiones; los mapas de slots, las regiones de contenido.
+Los imports se consultan en la [vista de componentes](../../logical/components/index.md).
 
 ## Lectura de las figuras
 

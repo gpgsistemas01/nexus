@@ -25,7 +25,12 @@ const emit = defineEmits<{
     createSupplier: [request: LookupCreation];
 }>();
 const editor = useInventoryEditor({
-    ...props,
+    resource: props.resource,
+    target: props.target,
+    userId: props.userId,
+    creationContext: props.creationContext,
+    initialSupplier: props.initialSupplier,
+    canAddStock: props.canAddStock,
     onSaved: (created) => emit('saved', created),
     onUnauthorized: () => emit('unauthorized'),
     onAddStock: (target) => emit('addStock', target),

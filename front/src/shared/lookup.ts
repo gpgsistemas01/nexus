@@ -11,6 +11,10 @@ export interface LookupState {
     error: string;
     hasMore: boolean;
 }
+export interface LookupQuery {
+    search: string;
+    page: number;
+}
 export interface LookupCreation {
     search: string;
     onCreated: (item: LookupItem) => void;

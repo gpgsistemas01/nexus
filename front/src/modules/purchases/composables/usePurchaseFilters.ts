@@ -14,12 +14,12 @@ export const usePurchaseFilters = (
     const canPersons = computed(() => has(PERMISSIONS.PERSONS_READ));
     const suppliers = useRemoteLookup(
         (search, page, signal) =>
-            purchaseLookupService.list('suppliers', resource, search, page, signal),
+            purchaseLookupService.list({ kind: 'suppliers', resource, search, page }, signal),
         canSuppliers,
     );
     const persons = useRemoteLookup(
         (search, page, signal) =>
-            purchaseLookupService.list('persons', resource, search, page, signal),
+            purchaseLookupService.list({ kind: 'persons', resource, search, page }, signal),
         canPersons,
     );
 

@@ -3,8 +3,8 @@
 ## Alcance
 
 Esta referencia define los intercambios entre formularios, contenedores y
-composables: props, eventos y callbacks. Las firmas completas permanecen en los
-tipos y `defineEmits` de sus fuentes; los datos HTTP se describen en el
+composables: props, eventos, callbacks y consultas de selectores. Las firmas
+completas permanecen en los tipos y `defineEmits` de sus fuentes; los datos HTTP se describen en el
 [contrato de la API consumida](client-contracts.md).
 
 ## Props y propiedad de los datos
@@ -83,6 +83,24 @@ Fuentes: [useRecordSave](../../../src/shared/composables/useRecordSave.ts),
 [LookupCreation](../../../src/shared/lookup.ts),
 [ItemCreation](../../../src/modules/purchases/purchase.ts) y
 [DirectoryCreationPage](../../../src/app/pages/DirectoryCreationPage.vue).
+
+## Consultas de selectores
+
+`useRemoteLookup` invoca `request(search, page, signal)`. El consumidor añade el
+contexto del dominio y llama al servicio con `(query, signal)`. Los datos comunes
+de `query` son `LookupQuery`: `search: string` y `page: number`.
+
+| Solicitud | Contexto adicional y fuente |
+| --- | --- |
+| `PurchaseLookupRequest` | `kind`, `resource`, `supplierId?` y `capture?`; [purchaseLookupService](../../../src/modules/purchases/services/purchaseLookupService.ts). |
+| `IssueLookupRequest` | `kind`, `resource` y `filters?` para condiciones de personas; [issueLookupService](../../../src/modules/issues/services/issueLookupService.ts). |
+| `InventoryLookupRequest` | `path` y `supplierId?`; [inventoryCatalogService](../../../src/modules/warehouse/services/inventoryCatalogService.ts). |
+| `OrganizationLookupRequest` | `resource` (`departments` o `roles`); [organizationService](../../../src/shared/services/organizationService.ts). |
+
+El servicio convierte la página a `start`/`length` y devuelve
+`PageResult<LookupItem>`. La cancelación no forma parte de los datos enviados a
+la API. La captura conserva el ID seleccionado; `LookupState` contiene sólo el
+estado visual del selector.
 
 ## Referencias de comportamiento
 

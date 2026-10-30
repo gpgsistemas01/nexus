@@ -33,7 +33,8 @@ const emit = defineEmits<{
 }>();
 const { has, onDenied } = usePageAccess();
 const editor = usePurchaseEditor({
-    ...props,
+    resource: props.resource,
+    target: props.target,
     has,
     onSaved: (confirmation) => emit('saved', confirmation),
     onDenied,

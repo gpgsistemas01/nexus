@@ -1,31 +1,32 @@
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { mapPurchaseItemOption } from '../mappers/purchaseResponseMapper.js';
-import type { LookupItem } from '../../../shared/lookup.js';
+import type { LookupItem, LookupQuery } from '../../../shared/lookup.js';
 import type { PurchaseResource } from '../purchase.js';
 
+interface PurchaseLookupRequest extends LookupQuery {
+    kind: 'suppliers' | 'persons' | 'items';
+    resource: PurchaseResource;
+    supplierId?: string;
+    capture?: boolean;
+}
+
 export const purchaseLookupService = {
-    async list(
-        kind: 'suppliers' | 'persons' | 'items',
-        resource: PurchaseResource,
-        search: string,
-        page: number,
-        signal: AbortSignal,
-        options: { supplierId?: string; capture?: boolean } = {},
-    ) {
+    async list(query: PurchaseLookupRequest, signal: AbortSignal) {
+        const { kind, resource, search, page } = query;
         const params = new URLSearchParams({
             search,
             start: String((page - 1) * 20),
             length: '20',
         });
-        if (kind === 'suppliers' && options.capture) params.set('onlyActive', 'true');
+        if (kind === 'suppliers' && query.capture) params.set('onlyActive', 'true');
 
         if (kind === 'persons') {
             params.set('department', 'ALMACÉN Y PROVEDURÍA');
             params.set('strictDepartmentFilter', 'true');
         }
 
-        if (kind === 'items') params.set('supplierId', options.supplierId ?? '');
+        if (kind === 'items') params.set('supplierId', query.supplierId ?? '');
 
         const path =
             kind === 'persons'

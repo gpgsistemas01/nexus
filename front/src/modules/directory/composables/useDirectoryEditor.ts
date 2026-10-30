@@ -41,8 +41,8 @@ export const useDirectoryEditor = (options: {
         form.defineField(field, { validateOnModelUpdate: false });
     let savedEntry: DirectoryEntry | undefined;
     const save = useRecordSave({
-        ...options,
         onSaved: () => options.onSaved(savedEntry),
+        onDenied: options.onDenied,
         setErrors: form.setErrors,
     });
     const interaction = useFormInteraction<DirectoryField, string | boolean>(form, {

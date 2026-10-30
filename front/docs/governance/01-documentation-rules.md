@@ -127,13 +127,15 @@ mecanismo de Vue, la organización elegida por Nexus y los contratos TypeScript.
 | Parte de la ficha | Contenido |
 | --- | --- |
 | Propósito | Problema del código que resuelve y responsabilidades separadas. |
-| Modelo general | Roles y colaboración, con el diagrama adecuado: componentes para props/eventos, secuencia para callbacks/inyección, composición para slots y flujo para adaptación o construcción. |
-| Aplicación | Archivos y símbolos reales, fuentes y figura con sus nombres. |
+| Modelo general | Roles, inicio, intercambio y resultado. Secuencia para props/eventos, callbacks, adaptación e inyección; actividad para seleccionar reglas; mapa de regiones para composición de slots. |
+| Aplicación | Mismo recorrido y notación, con archivos, símbolos y guardas reales. El callback se dirige al archivo que lo declara. |
 | Contrato y límites | Props/eventos y estado visual; argumentos, retorno, efectos y limpieza de composables; nombres y props de slots; clave, valor y actualización de la inyección. Guardas y excepciones que cambian el resultado. |
 | Pruebas relacionadas | Enlaces a las pruebas del contrato y sus consumidores; el diseño y los resultados permanecen en la colección de pruebas. |
 
 El texto complementa las figuras con las condiciones que no muestran. Las fichas
 no requieren clases para representar componentes, composables o funciones.
+Cuando el mapa describe una estructura, una secuencia complementaria desarrolla
+la interacción relevante. Los imports pertenecen a la vista de componentes.
 
 ## Referencias adoptadas
 

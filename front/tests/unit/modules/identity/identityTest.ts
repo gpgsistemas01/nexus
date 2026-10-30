@@ -21,7 +21,7 @@ import {
 import { pageOf } from '../../../fixtures/inventory.js';
 const adapter = apiClient.http.defaults.adapter;
 beforeEach(() => {
-  vi.spyOn(organizationService, 'options').mockImplementation(async (resource) =>
+  vi.spyOn(organizationService, 'options').mockImplementation(async ({ resource }) =>
     pageOf(
       (resource === 'departments' ? departments : roles).map((row) => ({
         id: row.id,
@@ -36,6 +36,28 @@ afterEach(() => {
   apiClient.http.defaults.adapter = adapter;
 });
 const callbacks = () => ({ onSaved: vi.fn(), onDenied: vi.fn(), permissions: recordPermissions });
+
+it.each(['departments', 'roles'] as const)(
+  'las opciones de %s conservan paginación, búsqueda y señal',
+  async (resource) => {
+    vi.mocked(organizationService.options).mockRestore();
+    const requestSignal = new AbortController().signal;
+    apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
+      const url = new URL(config.url!, 'http://test');
+      expect(url.pathname).toBe(`/api/admin/${resource}`);
+      expect(url.searchParams.get('search')).toBe('Coordinación');
+      expect(url.searchParams.get('start')).toBe('20');
+      expect(url.searchParams.get('length')).toBe('20');
+      expect(config.signal).toBe(requestSignal);
+      return { data: pageOf([]) };
+    });
+    const result = await organizationService.options(
+      { resource, search: 'Coordinación', page: 2 },
+      requestSignal,
+    );
+    expect(result.data).toEqual([]);
+  },
+);
 
 describe('personas Vue: responsabilidades independientes de cuentas (DP-VUE-IDA-001)', () => {
   it('el alta exige nombre y asignación, y abrir no muestra errores sin captura', async () => {

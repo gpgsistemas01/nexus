@@ -2,17 +2,17 @@ import { requestPage } from '../../../shared/http/pageRequest.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { mapIssueItemOption } from '../mappers/issueResponseMapper.js';
 import type { IssueResource, IssueLookup } from '../issue.js';
-import type { LookupItem } from '../../../shared/lookup.js';
+import type { LookupItem, LookupQuery } from '../../../shared/lookup.js';
+
+interface IssueLookupRequest extends LookupQuery {
+    kind: IssueLookup;
+    resource: IssueResource;
+    filters?: Record<string, string | string[]>;
+}
 
 export const issueLookupService = {
-    async list(
-        kind: IssueLookup,
-        resource: IssueResource,
-        search: string,
-        page: number,
-        signal: AbortSignal,
-        extra: Record<string, string | string[]> = {},
-    ) {
+    async list(query: IssueLookupRequest, signal: AbortSignal) {
+        const { kind, resource, search, page } = query;
         const params = new URLSearchParams({
             search,
             start: String((page - 1) * 20),
@@ -20,7 +20,7 @@ export const issueLookupService = {
         });
         if (kind === 'departments') params.set('context', 'issues');
 
-        for (const [key, value] of Object.entries(extra)) {
+        for (const [key, value] of Object.entries(query.filters ?? {})) {
             if (Array.isArray(value)) value.forEach((item) => params.append(key, item));
             else params.set(key, value);
         }

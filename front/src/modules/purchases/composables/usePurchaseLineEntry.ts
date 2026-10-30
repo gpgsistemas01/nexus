@@ -36,9 +36,16 @@ export const usePurchaseLineEntry = (options: {
         form.defineField(field, { validateOnModelUpdate: false });
     const items = useRemoteLookup(
         (search, page, signal) =>
-            purchaseLookupService.list('items', options.resource, search, page, signal, {
-                supplierId: options.supplier.id,
-            }),
+            purchaseLookupService.list(
+                {
+                    kind: 'items',
+                    resource: options.resource,
+                    search,
+                    page,
+                    supplierId: options.supplier.id,
+                },
+                signal,
+            ),
         computed(() => options.canRead),
     );
     const item = useSelectedOption(items.items, () => form.values.materialId);

@@ -30,7 +30,7 @@ sequenceDiagram
     Lookup->>Lookup: nowrap: controller?.abort()
     Lookup->>Lookup: nowrap: setTimeout(() => load(), 250)
     Lookup->>Editor: nowrap: request(search.value, nextPage,<br/>requestController.signal)
-    Editor->>Service: nowrap: purchaseLookupService.list('suppliers',<br/>options.resource, search, page, signal, {<br/>capture: true })
+    Editor->>Service: nowrap: purchaseLookupService.list({<br/>kind: 'suppliers', resource: options.resource,<br/>search, page, capture: true }, signal)
     Service-->>Editor: nowrap: result
     Editor-->>Lookup: nowrap: result
     opt nowrap: requestId === sequence

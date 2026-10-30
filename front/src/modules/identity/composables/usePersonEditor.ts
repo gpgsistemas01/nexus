@@ -30,7 +30,8 @@ export const usePersonEditor = (options: {
     form.defineField('fullName', { validateOnModelUpdate: false });
     form.defineField('accesses', { validateOnModelUpdate: false });
     const save = useRecordSave({
-        ...options,
+        onSaved: options.onSaved,
+        onDenied: options.onDenied,
         setErrors: (errors) => {
             form.setErrors({
                 fullName: errors.fullName,

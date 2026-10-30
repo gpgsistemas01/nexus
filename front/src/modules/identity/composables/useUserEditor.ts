@@ -37,7 +37,11 @@ export const useUserEditor = (options: {
     });
     for (const field of Object.keys(rules) as UserField[])
         form.defineField(field, { validateOnModelUpdate: false });
-    const save = useRecordSave({ ...options, setErrors: form.setErrors });
+    const save = useRecordSave({
+        onSaved: options.onSaved,
+        onDenied: options.onDenied,
+        setErrors: form.setErrors,
+    });
     const interaction = useFormInteraction<UserField, string>(form, {
         isDisabled: () =>
             form.isSubmitting.value ||
