@@ -2,10 +2,9 @@
 
 ## Propósito
 
-Esta vista relaciona objetivos del actor y rutas del cliente. Los flujos normativos
-permanecen completos en [Casos de uso](../../../requirements/use-cases/index.md).
-El [catálogo de pantallas](navigation-and-screens.md) identifica entrada, contenedor y
-condición de acceso. Las secuencias de procesos describen la coordinación interna.
+Esta vista conecta objetivos y rutas. Los pasos están en [Casos de
+uso](../../../requirements/use-cases/index.md); rutas, contenedores y acceso, en
+[Pantallas](navigation-and-screens.md); la coordinación interna, en las secuencias.
 
 El [modelo de casos de uso](../../../requirements/use-case-model/index.md) representa actores y objetivos por recurso.
 

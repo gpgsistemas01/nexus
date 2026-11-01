@@ -21,22 +21,19 @@ comprueban los permisos al entrar.
 4. Revise los resultados y utilice los controles de página para recorrerlos.
 5. Use **Limpiar filtros** para regresar a la consulta general.
 
-Los encabezados que admiten ordenamiento permiten cambiar el orden. El tamaño de
-página controla cuántas filas se muestran, no cuántos registros existen. Una tabla
-sin resultados puede deberse a los filtros; límpielos antes de concluir que falta
-un registro. En pantallas estrechas, desplace horizontalmente la tabla para ver
-sus demás columnas y acciones.
+Pulse un encabezado habilitado para ordenar. El tamaño de página cambia las filas
+visibles, no el total. Si no hay resultados, limpie filtros antes de concluir que falta un
+registro. En pantallas estrechas, desplace la tabla horizontalmente para ver columnas y
+acciones.
 
 La actualización del listado respeta la consulta vigente. Si una operación se
 guarda correctamente, revise el listado actualizado; un filtro puede dejar fuera
 al registro recién creado. No recargue toda la página durante una captura que
 todavía no ha guardado.
 
-Cuando vuelva a la pestaña o permanezca consultando un listado, éste puede
-actualizarse automáticamente si su información ya venció. La actualización se
-pospone mientras hay un formulario u otra operación que protege la captura.
-Conserva los filtros aplicados; no necesita volver a abrir el módulo. Si falla,
-revise el aviso y utilice **Actualizar** o **Reintentar**, según ofrezca la página.
+Los listados pueden actualizarse automáticamente al volver a la pestaña o cuando sus datos
+vencen. Conservan filtros y posponen la recarga mientras un formulario u operación protege
+la captura. Ante fallos, use **Actualizar** o **Reintentar**, según la página.
 
 ## Seleccionar registros relacionados
 
@@ -44,10 +41,9 @@ Los selectores de proveedor, material, persona, área y otros registros permiten
 buscar opciones. Abra el selector, escriba parte del nombre y **seleccione una
 opción de la lista**. Escribir texto sin elegir una opción no establece la relación.
 
-Algunos selectores dependen de otro campo. Por ejemplo, debe elegir el proveedor
-antes del material de referencia de una merma. Cambiar el proveedor obliga a
-revisar nuevamente el artículo. Si el selector ofrece más resultados, cárguelos
-para continuar la búsqueda; si informa un fallo, utilice su opción de reintento.
+Algunos campos dependen de otro: el proveedor debe elegirse antes del material de
+referencia de una merma. Si lo cambia, revise el artículo. Cargue más resultados para
+continuar la búsqueda y use reintento si falla.
 
 <!-- manual:any suppliers:manage clients:create materials:write persons:write -->
 Cuando aparezca **Registrar proveedor**, **Registrar cliente**, **Registrar
@@ -59,10 +55,9 @@ material** o una acción equivalente junto a un selector:
    seleccionado.
 4. Continúe y guarde la operación principal.
 
-El alta secundaria se guarda por separado: cerrar después la compra o salida no
-elimina el proveedor, cliente o artículo que ya creó. Si cierra el alta secundaria
-sin guardar, vuelve a la captura principal sin crear ese registro. Estas acciones
-se ofrecen según el contexto y los permisos; no todos los selectores permiten altas.
+El alta secundaria se guarda por separado: cerrar la compra o salida no elimina el
+registro creado. Cerrar el auxiliar sin guardar conserva la captura principal. Sólo los
+selectores autorizados ofrecen esta función.
 
 <!-- manual:end -->
 

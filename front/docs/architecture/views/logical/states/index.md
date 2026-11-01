@@ -1,9 +1,9 @@
 # Estado y ciclo de vida
 
-Estas máquinas representan una proyección del estado reactivo de coordinadores
-Vue; no son enums persistidos ni una biblioteca de máquinas de estado instalada.
-Las [reglas del negocio](../../../../requirements/domain-model/06-document-lifecycles.md)
-definen los ciclos definitivos de los documentos; aquí se representa su interacción.
+Estas máquinas muestran el estado reactivo de los coordinadores Vue. Los estados
+definitivos del negocio están en los [ciclos de
+documentos](../../../../requirements/domain-model/06-document-lifecycles.md); aquí se
+describe la interacción del cliente.
 
 | Lectura | Propietario y figuras |
 | --- | --- |
@@ -14,11 +14,9 @@ definen los ciclos definitivos de los documentos; aquí se representa su interac
 
 ## Convenciones de estas máquinas
 
-La [leyenda de estados](../../diagram-reading.md#estados) define símbolos y la forma
-`evento [guarda] / efecto`. Los eventos pueden ser llamadas, eventos de componentes
-o la resolución/rechazo de una promesa. Las guardas abreviadas se desarrollan junto
-a su figura; no son métodos añadidos al código. `[else]` es el complemento de las
-otras salidas de la misma decisión.
+La [leyenda](../../diagram-reading.md#estados) define `evento [guarda] / efecto`. Los
+eventos son llamadas, eventos de componentes o resultados de promesas. Las guardas se
+aclaran junto a la figura; `[else]` reúne las demás salidas de la decisión.
 
 | Dato que podría parecer omitido | Lectura correcta |
 | --- | --- |

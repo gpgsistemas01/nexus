@@ -45,13 +45,11 @@ classDiagram
 
 ## Proyecciones y acciones
 
-`IdentityEntry` es la proyección normalizada que reutilizan tablas y editores de
-`persons`/`users`. Sus etiquetas sirven para consulta y precarga; no se envían como
-fuente de verdad en una escritura. `PersonAccess` describe las responsabilidades de
-personas en este contrato. `identityService` llena `accesses` al normalizar `persons`
-y devuelve un array vacío para `users`; en esa proyección de usuario, área y rol se
-conservan en los campos escalares de la fila. Ese nombre técnico no convierte una
-responsabilidad de persona en autorización de usuario.
+`IdentityEntry` normaliza `persons`/`users` para tablas y editores; sus etiquetas sirven
+para consulta y precarga, no autorizan escrituras. `PersonAccess` representa
+responsabilidades de personas. `identityService` llena `accesses` para `persons`; en
+`users` lo deja vacío y conserva área/rol en campos escalares. Una responsabilidad de
+persona no concede acceso a la cuenta.
 
 | Acción | Cuerpo construido |
 | --- | --- |

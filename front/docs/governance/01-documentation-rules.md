@@ -61,9 +61,9 @@ regla y cuándo conservar información contextual en una ficha.
 
 ## Unidad documental y granularidad
 
-Separar por objetivo, contrato o tarea que pueda entenderse y mantenerse completo.
-Reunir fragmentos que repiten preparación o exigen saltos para comprender un único
-recorrido. El número de líneas o páginas no fija una división obligatoria.
+Cada archivo cubre un objetivo, contrato o tarea completa. Reunir fragmentos que repiten
+preparación o separan un mismo recorrido. La división depende del contenido, no de un
+límite de líneas o páginas.
 
 | Artefacto | Unidad de división | Contenido que permanece unido |
 | --- | --- | --- |
@@ -78,6 +78,36 @@ recorrido. El número de líneas o páginas no fija una división obligatoria.
 | Estándar | Ámbito con controles propios. | Reglas y ejemplos del ámbito. |
 | Referencia generada | Catálogo de la herramienta. | Fuentes e interpretación de tablas; publicación separada. |
 | Manual | Página o familia de tareas. | Preparación, campos, pasos, resultado e incidencias. |
+
+## Fichas de casos de uso
+
+Cada ficha usa una tabla de dos columnas:
+
+| Sección | Qué describe |
+| --- | --- |
+| Identificador y nombre | ID estable y tarea del usuario. |
+| Actor | Quién inicia o participa como apoyo. Una persona registrada como dato no es por ello un actor. |
+| Disparador | Qué acción o evento inicia la tarea. |
+| Precondiciones | Qué debe cumplirse antes de empezar; enumerar cada condición. |
+| Flujo principal | Empieza con el Actor; numera sus acciones y las respuestas de Nexus. Nombrar controles reales y agrupar acciones sin respuesta intermedia. |
+| Flujos alternativos | Variantes `A1`, `A2`… y errores corregibles: título, paso de origen, pasos desde 1 y retorno numerado o fin. |
+| Excepciones | Rechazos `E1`, `E2`… o fallos `EOP`: origen, pasos desde 1, aviso, efecto en los datos y recuperación o fin. |
+| Acciones de la pantalla | Otros objetivos disponibles, con sus propios permisos. La consulta termina al revisar resultados; navegar no establece una inclusión o extensión. |
+| Puntos de extensión y relaciones entre casos | Casos relacionados, condición, punto y retorno cuando corresponda; deben coincidir con el diagrama. |
+| Postcondiciones (éxito y fallo) | Qué queda al terminar: éxito, rechazo o resultado incierto. Enumerar cada resultado. |
+| Requisitos relacionados | IDs de las reglas y obligaciones aplicables. |
+
+Marcar cada variante desde su paso de origen con **(ver A1)** o **(ver E1)**;
+indicar si ocurre durante ese paso o después de él.
+
+Ejemplo: **Nexus señala el error → Actor corrige y pulsa Guardar → Nexus vuelve a
+validar**. El retorno conserva las confirmaciones existentes y no repite el envío.
+
+Describir sólo la recuperación disponible. Una respuesta perdida no prueba que el
+guardado falló. La recuperación de merma reenvía la misma operación; los demás
+guardados requieren comprobar el resultado antes de repetirlos.
+
+Los componentes, llamadas HTTP y transacciones se explican en Arquitectura.
 
 ## Figuras y fuentes
 
@@ -114,10 +144,9 @@ Los imports pertenecen a la vista de componentes.
 
 ## Cambio y versionado
 
-Actualizar la fuente propietaria y sus consumidores al cambiar un contrato.
-Registrar motivo, comprobaciones y pendientes en la revisión del cambio; Git
-conserva el historial. Al publicar, actualizar versión documental, fecha y estado
-en el índice general. Una corrección editorial no cambia la versión de Nexus.
+Al cambiar un contrato, actualizar su documento y consumidores. Registrar motivo,
+comprobaciones y pendientes en la revisión. Al publicar, actualizar versión documental,
+fecha y estado del índice general; una corrección editorial no cambia la versión de Nexus.
 
 Los controles y la revisión de Word/PDF están en
 [publicación](02-generation-and-publication.md).

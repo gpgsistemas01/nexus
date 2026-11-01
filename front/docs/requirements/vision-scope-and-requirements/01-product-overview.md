@@ -24,11 +24,10 @@ Los indicadores, línea base, metas, período de medición y responsables están
 
 ## Perspectiva del producto
 
-El cliente Vue es la interfaz web de Nexus. Permite consultar información,
-capturar documentos y conocer el resultado de las operaciones mediante la API.
-El servicio comprueba acceso y reglas y confirma documentos, existencias e historia.
-Los [actores y responsabilidades](../requirements-specification/03-actors-and-system-responsibilities.md)
-precisan esa frontera.
+Vue permite consultar datos, capturar documentos y ver resultados de la API. El servicio
+valida acceso y reglas y confirma documentos, existencias e historia. [Actores y
+responsabilidades](../requirements-specification/03-actors-and-system-responsibilities.md)
+define esta separación.
 
 El almacén registra recepciones, atiende solicitudes de las áreas y recibe
 las devoluciones. Personas, áreas, clientes y proveedores identifican participantes

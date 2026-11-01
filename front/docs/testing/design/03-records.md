@@ -18,11 +18,6 @@ no ejecutan Express ni acceden a la base de datos de desarrollo.
 cubriendo cabeceras agrupadas, modales, selección, filtros, versiones y recuperación
 de merma; no se sustituye esa evidencia por la del formulario de Catálogos.
 
-Los iconos del menú se importan desde `@mdi/js` en `app/icons.ts` y se renderizan
-con el proveedor SVG de Vuetify. Al incorporar esta actualización se ejecuta
-`npm ci --include=dev` en `front/`; no se carga una fuente de iconos por CDN.
-ESLint excluye `test-results/`, una salida temporal regenerada por Playwright.
-
 ## Pruebas de Identidad y Directorio comercial
 
 Los requisitos y operaciones siguen en `CU-IDA-01..09` y `CU-CAT-01..08`;
@@ -36,10 +31,8 @@ esta adaptación añade evidencia de interfaz, no reemplaza las pruebas de servi
 | `DP-VUE-REC-001` | Unitario/navegador | Unitario; particiones por permiso y entrada exclusiva de módulo | Cada ruta/directorio se permite o rechaza por su permiso; las entradas de grupo y login resuelven al primer enlace autorizado. Sólo lectura oculta escritura/exportación; el menú usa rutas Vue. | [recordNavigationTest.ts](../../../tests/unit/modules/identity/recordNavigationTest.ts); [records.spec.ts](../../../tests/e2e/records.spec.ts) |
 | `DP-VUE-REC-002` | Adaptador/navegador | Unitario; filtros y archivo válido/HTML, escritorio/móvil | Consultas usan paginación/orden y Personas incluye responsabilidades. Reporte por área descarga Excel; filtro de rol no admitido se bloquea antes de solicitar archivo. Formularios a 320 px conservan acciones visibles y no desbordan la página. | [recordNavigationTest.ts](../../../tests/unit/modules/identity/recordNavigationTest.ts); [records.spec.ts](../../../tests/e2e/records.spec.ts) |
 
-`identityTest.ts`, `recordNavigationTest.ts`, `directoryTest.ts` y `records.spec.ts`
-son la especificación ejecutable. Reutilizan fixtures de registros, el adaptador
-Axios y las opciones/recorridos de navegador existentes. `RemoteSelect`,
-`useSelectedOption` y `useRemoteLookup` se prueban también desde Almacén tras moverlos
-a `shared`; `inventoryReportTest.ts` conserva la validación de Excel y filtros.
-La API simulada no demuestra cambios persistidos, contenido de reportes de servidor
-ni políticas reales de autorización. No se usan datos ni una base de desarrollo.
+La evidencia está en `identityTest.ts`, `recordNavigationTest.ts`, `directoryTest.ts` y
+`records.spec.ts`, con fixtures y adaptador Axios. Almacén prueba `RemoteSelect`,
+`useSelectedOption` y `useRemoteLookup`; `inventoryReportTest.ts`, Excel y filtros. La
+autorización, persistencia y reportes reales requieren los [niveles
+correspondientes](../01-test-plan.md#niveles-y-entornos).

@@ -7,13 +7,11 @@
 | `DP-VUE-TABLE-001` | Orden incorrecto al compartir tablas | Unitario; particiones por mapa y transición de recurso | `tableQueryTest.ts`: conserva índices discontinuos de inventario, traduce página/tamaño/sentido, descarta una columna exclusiva de proveedor al cambiar a cliente y conserva Fecha descendente del historial. | [tableQueryTest.ts](../../../tests/unit/shared/composables/tableQueryTest.ts) |
 | `DP-VUE-LIST-002` | Limpieza compartida pierde filtros, tamaño u orden | Unitario; transición aplicada → borrador → limpio | `listInteractionTest.ts`: limpia texto aplicado y borrador, reinicia filtros y página, conserva tamaño y sentido. | [listInteractionTest.ts](../../../tests/unit/shared/composables/listInteractionTest.ts) |
 
-La suite de navegador existente recorre los consumidores reales de `RecordListPanel`,
-`ListFilters`, `TableFrame`, `TableAction` y `StateBadge`, incluidos captura de
-responsabilidades, permisos, conflictos y pantallas móviles. Se conservan los
-casos existentes; no se sustituyen por pruebas que fijen clases CSS o copien los
-colores de la implementación. La revisión visual de escritorio y 320/390 px
-comprueba presentación, subencabezados, filas de stock bajo y ausencia de
-recortes globales. Las respuestas HTTP se simulan y no demuestran persistencia.
+Las pruebas de navegador cubren `RecordListPanel`, `ListFilters`, `TableFrame`, `TableAction` y
+`StateBadge`: responsabilidades, permisos, conflictos y móvil. La revisión visual cubre
+escritorio y 320/390 px, subencabezados, stock bajo y recortes. No sustituir estos casos
+por aserciones de CSS o colores. Aplican los [límites de
+simulación](../01-test-plan.md#niveles-y-entornos).
 
 ## Crecimiento de catálogos y fronteras arquitectónicas
 
@@ -24,12 +22,10 @@ recortes globales. Las respuestas HTTP se simulan y no demuestran persistencia.
 | `DP-VUE-LOOKUP-003` | Perder filtros o cancelación al agrupar los parámetros de consulta | Unitario con adaptador HTTP simulado; particiones por recurso, proveedor activo/de captura, área y roles múltiples | Las solicitudes tipadas conservan endpoint, búsqueda, segunda página, filtros y `AbortSignal`. Se ejercitan Compras, Salidas, Inventario y opciones de Identidad sin servidor ni base de datos. | [purchaseTest.ts](../../../tests/unit/modules/purchases/purchaseTest.ts); [issueTest.ts](../../../tests/unit/modules/issues/issueTest.ts); [remoteOptionsTest.ts](../../../tests/unit/modules/warehouse/remoteOptionsTest.ts); [identityTest.ts](../../../tests/unit/modules/identity/identityTest.ts) |
 | `DP-VUE-PAGE-001` | RD-VUE-007; conteos inválidos usados en paginación | Unitario; fronteras cero/negativo/fraccionario/entero no seguro | `pageRequestTest.ts`: cero conserva un listado vacío válido; los conteos inválidos rechazan el contrato en el adaptador HTTP y no se presentan como páginas válidas. | [pageRequestTest.ts](../../../tests/unit/shared/http/pageRequestTest.ts) |
 
-`npm run lint` mantiene las fronteras de imports estáticos de `shared`, presentación,
-servicios y mappers. La revisión comprueba también ejemplos permitidos (contratos
-públicos y transporte compartido) y rechazados (estado de módulos en shared,
-Vue/Router/componentes en servicios y mappers) con la configuración real de ESLint.
-No se añaden pruebas de tiempo con umbrales de rendimiento ni se atribuye a estos
-casos una capacidad de usuarios concurrentes. Las pruebas de navegador simulan la API.
+`npm run lint` comprueba imports de `shared`, presentación, servicios y mappers. Revisar
+contratos/transporte permitidos y dependencias rechazadas: estado de módulos en `shared` y
+Vue/Router/componentes en servicios o mappers. Estas pruebas no miden rendimiento ni
+capacidad concurrente.
 
 ## Seguridad de texto y avisos
 
@@ -38,12 +34,12 @@ casos una capacidad de usuarios concurrentes. Las pruebas de navegador simulan l
 | `DP-VUE-SEC-001` | Un aviso interpreta el nombre/error como HTML | Unitario; particiones título/descripción/error | `feedbackTest.ts` usa SweetAlert2 real en jsdom con `<img data-injected ...>`: conserva título y texto, no crea el nodo, un error no confirma la eliminación y se cierra al cancelar. El aviso de éxito también conserva el mensaje como texto. | [CP-VUE-SEC-001-01](../cases/cp-vue-sec-001-01.md) |
 | `DP-VUE-SEC-002` | Datos antiguos/externos ejecutan marcado pese a validar el alta actual | Unitario; particiones salida de tabla/valor de formulario | `catalogs.spec.ts` recibe un nombre con `img` y `onerror`; Chromium muestra el texto exacto, precarga el mismo valor al editar, no crea el elemento y no asigna la variable del manejador. API simulada, sin escritura. | [catalogs.spec.ts](../../../tests/e2e/catalogs.spec.ts) |
 
-Las reglas de proyecto compartidas se verifican en `formValidationParityTest.js` y
-los tres endpoints reales de salidas se cubren con `CP-INT-VAL-007`. El navegador no
-decide que una captura sea segura para persistir. El contrato y los patrones están
-en [entradas y salida segura](../../architecture/views/development/input-handling.md) y [patrones/SOLID](../../architecture/views/development/design-and-construction-patterns/01-applicability-and-principles.md).
-ESLint mantiene `vue/no-v-html` como error; esta regla no certifica ausencia de todos
-los posibles usos inseguros del DOM ni sustituye revisar las opciones de un plugin.
+`formValidationParityTest.js` verifica reglas compartidas; `CP-INT-VAL-007`, los tres
+endpoints reales de salidas. Los contratos están en [Entradas y salida
+segura](../../architecture/views/development/input-handling.md) y
+[Patrones/SOLID](../../architecture/views/development/design-and-construction-patterns/01-applicability-and-principles.md).
+`vue/no-v-html` es error de lint; todavía deben revisarse otros usos del DOM y opciones de
+plugins.
 
 ## Responsabilidades de documentos
 
@@ -62,10 +58,9 @@ describe la colaboración que comprueban estas pruebas.
 | --- | --- | --- | --- | --- |
 | `DP-VUE-SEL-001` | RF-VUE-012; selección contextual | `CU-CAT-02/06`, `CU-ALM-02/18`, soporte de `CU-ENT-02/08` y Salidas; navegador y unitario. Particiones por consumidor/permiso, coincidencia/ausencia y transiciones abrir → cancelar/error/reintentar/guardar. | `selectCreation.spec.ts` representa proveedor en Materiales/Consumibles y Compras, artículo en ambas Compras y cliente en las tres Salidas. Comprueba precarga, retorno, captura conservada, contratos de compra, teclado y exclusión de alta en filtros/catálogos/merma o sin permiso. `inventoryFormTest.ts` añade proveedor inactivo, selección fuera de la página remota y respuesta tras desmontaje. Fichas `CP-VUE-SEL-001-01/02/03`. | [CP-VUE-SEL-001-01](../cases/cp-vue-sel-001-01.md); [CP-VUE-SEL-001-02](../cases/cp-vue-sel-001-02.md); [CP-VUE-SEL-001-03](../cases/cp-vue-sel-001-03.md) |
 
-Los casos de navegador usan los componentes Vuetify reales con API simulada.
-No sustituyen integraciones de persistencia ni declaran probado cada modo de edición.
-Las guardas de rutas permanecen aisladas de los controles visuales en unitarias;
-su doble apunta al contenedor `InventoryWorkspace`, que compone inventario y creación auxiliar.
+Las pruebas de navegador usan Vuetify y API simulada; no acredita todos los modos ni persistencia. Las
+unitarias aíslan las guardas de ruta con un doble de `InventoryWorkspace`, coordinador de
+inventario y altas auxiliares.
 
 ## Selección y separación del editor
 

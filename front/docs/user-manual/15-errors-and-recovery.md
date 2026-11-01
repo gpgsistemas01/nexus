@@ -16,10 +16,9 @@
 
 ## Conflictos de edición
 
-Varias personas pueden trabajar sobre el mismo registro. Si el sistema informa
-que cambió desde que lo abrió, conserva la captura para revisión y puede bloquear
-el envío. En los formularios que lo ofrecen, use **Cerrar y actualizar listado**.
-En los demás, cierre, vuelva a consultar y abra otra vez el registro.
+Si el registro cambió mientras lo editaba, el sistema conserva su captura y puede bloquear
+el envío. Use **Cerrar y actualizar listado** si está disponible; en otros formularios,
+cierre, consulte y abra el registro nuevamente.
 
 Compare los datos actuales con la corrección que intentaba hacer. No use la
 recarga del navegador como forma de forzar una captura antigua sobre un saldo
@@ -46,10 +45,9 @@ nueva alta, un cambio de pesos o una segunda entrada independiente.
 
 ## Solicitar soporte
 
-Informe módulo, acción, hora aproximada, folio o nombre del registro y el mensaje
-visible. Indique si había pulsado el botón que guarda y si después pudo consultar
-el resultado. Una captura del mensaje y de los campos relevantes puede ayudar,
-siempre que su organización autorice compartir esos datos.
+Informe módulo, acción, hora, registro o folio y mensaje. Indique si pulsó guardar y si
+pudo consultar el resultado. Adjunte una captura sólo si su organización autoriza
+compartir esos datos.
 
 No envíe contraseñas, cookies, tokens de sesión ni archivos de configuración.
 El personal de soporte no necesita su contraseña para revisar un error de tabla,

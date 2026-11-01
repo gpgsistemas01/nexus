@@ -2,10 +2,9 @@
 
 ## Propósito y funcionamiento
 
-Un composable crea el estado reactivo de una interacción y expone sus operaciones.
-En los listados administra carga, error, cancelación y paginación. El consumidor
-aporta la consulta como callback: así el mismo mecanismo trabaja con recursos
-distintos y cada pantalla conserva su propia instancia.
+El composable mantiene estado y operaciones de una interacción. En listados gestiona
+carga, errores, cancelación y paginación; recibe la consulta como callback. Cada pantalla
+usa una instancia propia del mismo mecanismo.
 
 ## Modelo general de composición por callback
 

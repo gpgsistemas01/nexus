@@ -7,10 +7,9 @@ Las descargas dependen del módulo y de los permisos de la cuenta. Inventario us
 Salidas y Movimientos abren un diálogo **Exportar reporte** para seleccionar el
 alcance.
 
-Un reporte de consulta no se limita a las filas de la página visible. Compras,
-Salidas, Movimientos, Identidad y Directorio utilizan los filtros admitidos de la
-consulta. El texto que acaba de escribir en un
-filtro no reemplaza la búsqueda aplicada: pulse **Buscar** antes de exportar.
+El reporte incluye todos los resultados de la consulta, no sólo la página visible.
+Compras, Salidas, Movimientos, Identidad y Directorio usan sus filtros admitidos: pulse
+**Buscar** para aplicarlos antes de exportar.
 
 ## Descargar desde una tabla
 
@@ -28,10 +27,9 @@ En inventario, revise también **Incluir en Excel** antes de descargar:
 | Activos | Registros activos. |
 | Con stock | Registros con existencias. |
 
-Esta selección establece el alcance del archivo; no cambia los datos del inventario.
-En Materiales y Consumibles, el Excel conserva la búsqueda por nombre e incluye
-todos los proveedores del tipo elegido: el filtro por proveedor de la tabla no
-limita ese archivo. En Mermas sí se utiliza también el proveedor seleccionado.
+La selección cambia el archivo, no el inventario. Materiales y Consumibles exportan la
+búsqueda por nombre con todos los proveedores del tipo elegido. Mermas también aplica el
+proveedor seleccionado.
 
 En Personas, el filtro por rol no es compatible con su exportación actual. Quite
 ese filtro y vuelva a buscar; puede utilizar el filtro de área. La pantalla
@@ -48,11 +46,9 @@ deshabilita la exportación cuando se ha aplicado un rol.
 
 ![Selección del alcance y periodo de una exportación.](images/27-report.png)
 
-El alcance mensual incluye todos los registros del mes y no aplica los filtros de
-la tabla. **Mes actual** utiliza el mes determinado por el servicio en la zona
-horaria de Ciudad de México. La consulta filtrada utiliza los filtros aplicados.
-Revise la opción seleccionada cada vez; la página visible no define el contenido
-del archivo.
+El alcance mensual incluye el mes completo, sin filtros de tabla. **Mes actual** usa el
+horario de Ciudad de México; consulta filtrada usa los filtros aplicados. Revise el
+alcance: la página visible no limita el archivo.
 
 ## Resolver una descarga fallida
 

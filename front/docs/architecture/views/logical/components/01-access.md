@@ -29,6 +29,7 @@ flowchart TB
     session --> http
 ```
 
-Vue Router ejecuta la guarda; VeeValidate ejecuta la validación del formulario y Axios
-transporta HTTP. Sus clases no forman parte del modelo. La [provisión de sesión](../../development/design-and-construction-patterns/06-session-provision.md)
-explica la instancia compartida; el mapa representa imports, no el retorno tras autenticar.
+Vue Router gestiona la guarda; VeeValidate, el formulario; Axios, HTTP. El mapa muestra
+imports. La [provisión de
+sesión](../../development/design-and-construction-patterns/06-session-provision.md)
+explica cómo se comparte la instancia.

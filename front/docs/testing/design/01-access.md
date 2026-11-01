@@ -36,15 +36,11 @@ criptográfica de JWT ni sustituye las integraciones de Express/Prisma.
 | Quedar atrapado en una dirección inválida | Transición ruta desconocida → enlace de retorno | Se recupera el login. |
 | Navegar a rutas no registradas | Router en memoria; particiones `/inicio`, `/comparar/login/vuetify` y `/ejemplo` | Muestran página no encontrada y conservan la recuperación al login. |
 
-Se comprueba comportamiento visible, no clases CSS, funciones privadas ni estructura
-interna de Vue. No hay HTTP real, base de datos ni navegador real en esta suite unitaria.
-La suite Playwright en `front/tests/e2e/` verifica login y Almacén en Chromium,
-incluidos permisos, reintentos y adaptación a móvil.
-Los resultados se generan en `front/build/test-results/` y no se versionan.
-El login operativo tiene pruebas en
-`tests/unit/modules/auth/composables/useLoginFormTest.ts`,
-`tests/unit/modules/auth/services/authServiceTest.ts` y
-`tests/e2e/login.spec.ts`, asociados a los diseños de acceso siguientes:
+Las unitarias comprueban comportamiento sin HTTP, base ni Chromium reales. Playwright
+verifica login y Almacén, permisos, reintentos y móvil; los resultados quedan en
+`front/build/test-results/`. El login se prueba en `useLoginFormTest.ts`,
+`authServiceTest.ts` y `tests/e2e/login.spec.ts`. Los [niveles del
+plan](../01-test-plan.md#niveles-y-entornos) delimitan esta evidencia.
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |

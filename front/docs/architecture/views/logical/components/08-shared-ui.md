@@ -57,12 +57,12 @@ definen campos modificables, props, eventos y callbacks.
 
 ## Selección remota y foco
 
-`RemoteSelect` presenta las opciones, la búsqueda y las acciones de carga. Su
-contrato de [eventos](../../../contracts/form-and-event-contracts.md#eventos-de-interacción)
-permite al contenedor conectar la consulta o solicitar un alta auxiliar. El
-[patrón de alta contextual](../../development/design-and-construction-patterns/09-contextual-creation.md)
-describe la composición de ese editor; la [secuencia de lookup](../../processes/02-shared-runtime/03-remote-lookup.md),
-la carga de opciones.
+`RemoteSelect` presenta opciones, búsqueda y carga. Sus
+[eventos](../../../contracts/form-and-event-contracts.md#eventos-de-interacción) permiten
+consultar o solicitar un alta. La [creación
+contextual](../../development/design-and-construction-patterns/09-contextual-creation.md)
+explica el editor auxiliar; la [secuencia de
+lookup](../../processes/02-shared-runtime/03-remote-lookup.md), las consultas.
 
 En la cancelación de un detalle de compra, el editor de consulta libera temporalmente
 la retención de foco y bloquea sus acciones mientras SweetAlert2 controla la confirmación.

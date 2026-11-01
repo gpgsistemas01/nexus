@@ -26,11 +26,10 @@ purchaseLookupService.list(
 );
 ```
 
-Al componer colaboradores, pasar los campos y callbacks que declara el receptor.
-Evitar reenviar todas las props o todo el editor mediante un spread cuando sólo
-se necesita una parte. En [useUserEditor](../../../src/modules/identity/composables/useUserEditor.ts),
-el guardado recibe confirmación, rechazo y errores; la selección y los permisos
-permanecen en el editor:
+Pasar sólo los campos y callbacks del contrato del receptor. Evitar spreads con todo el
+editor o las props. En
+[useUserEditor](../../../src/modules/identity/composables/useUserEditor.ts), el guardado
+recibe confirmación, rechazo y errores; selección y permisos permanecen en el editor:
 
 ```ts
 const save = useRecordSave({
@@ -42,10 +41,10 @@ const save = useRecordSave({
 
 ## Efectos y promesas
 
-Esperar las operaciones que deben completar antes de continuar. `void` sólo expresa
-que un efecto deliberado es atendido por su coordinador de errores. Un callback de
-confirmación se ejecuta después de validar la respuesta, y sólo si su consumidor sigue
-vigente. `try/catch` traduce o recupera un fallo concreto; `finally` libera pendiente.
+Esperar las operaciones necesarias para continuar. Usar `void` sólo si otro coordinador
+atiende el efecto y sus errores. Confirmar después de validar la respuesta y mientras el
+consumidor siga vigente. `catch` trata un fallo concreto; `finally` libera el estado
+pendiente.
 
 Las lecturas reciben `AbortSignal`. Cambio de contexto y desmontaje abortan o invalidan
 la petición y descartan respuestas anteriores. `usePagedList` utiliza además secuencia

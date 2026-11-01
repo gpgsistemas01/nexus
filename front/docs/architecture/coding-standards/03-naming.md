@@ -27,11 +27,10 @@ no puede anunciar éxito antes de comprobar la respuesta esperada.
 
 ## Ubicación
 
-Mantener el elemento junto al dominio que conoce. Extraer a `shared` sólo contratos y
-comportamientos transversales con consumidores reales. Las piezas de presentación se
-ubican en `components`; estado de interacción en `composables`; traducción de datos en
-`mappers` o servicios; contratos de dominio en sus archivos de tipos. Evitar carpetas
-vacías, archivos `utils` con responsabilidades ajenas y barriles que oculten dependencias.
+Ubicar cada pieza en su dominio: presentación en `components`, interacción en
+`composables`, transformación en `mappers` o servicios y contratos en sus tipos. Reservar
+`shared` para consumidores de varios dominios. Evitar carpetas vacías, `utils` sin
+responsabilidad definida y barriles que oculten dependencias.
 
 ### Ejemplo de nombres y ubicación
 

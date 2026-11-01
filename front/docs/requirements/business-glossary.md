@@ -7,24 +7,17 @@ Para consultar definiciones orientadas al uso de las pantallas, está disponible
 usuario. Sus ejemplos explican la captura sin los nombres internos del código ni
 los conceptos propios de la especificación.
 
-Este glosario forma parte del paquete versionado de requisitos, actualmente en revisión. Define el vocabulario que
-usuarios, responsables funcionales, desarrollo y pruebas deben interpretar de la misma
-forma. No es un inventario de columnas: el
-diccionario técnico de datos describe nombres, tipos y
-restricciones de Prisma, mientras este documento describe significado, alcance y
-sinónimos aceptados en el negocio.
+Este glosario de requisitos, en revisión, define el vocabulario común para usuarios,
+responsables funcionales, desarrollo y pruebas. Explica significados, alcance y sinónimos
+del negocio; los nombres, tipos y restricciones de Prisma pertenecen al diccionario
+técnico.
 
-Una palabra usada con otro sentido en una historia, pantalla o reporte debe aclararse
-antes de implementar el cambio. La definición funcional prevalece sobre un nombre
-histórico del código; si ambos difieren, se registra el alias y se planifica la
-alineación sin renombrar silenciosamente contratos existentes.
+Aclarar términos ambiguos antes de implementar. Si el nombre histórico del código difiere
+del significado funcional, registrar el alias y planificar su alineación sin renombrar
+contratos silenciosamente.
 
-Se revisaron los conceptos que aparecen de forma transversal en requisitos, casos de
-uso, interfaz y modelo persistente. Se documentan aquí cuando su interpretación cambia
-una regla, un permiso, una identidad o un efecto de inventario. Los nombres de campos,
-estados técnicos y detalles de implementación que no aportan una distinción funcional
-permanecen en sus fuentes técnicas; repetirlos en este glosario produciría una segunda
-fuente de verdad.
+Incluir conceptos que cambian una regla, permiso, identidad o efecto de inventario. Los
+campos y detalles sin significado funcional permanecen en sus referencias técnicas.
 
 ## Personas, acceso y responsabilidades
 
@@ -135,11 +128,9 @@ fuente de verdad.
 
 ## Vocabulario de documentación
 
-Los términos de requisitos y calidad se consultan en el
-[vocabulario documental](../governance/08-documentation-vocabulary.md). Los actores,
-guardas y efectos usados para leer figuras pertenecen a la
-[guía de diagramas](../architecture/views/diagram-reading.md), con sus símbolos y
-leyendas. Estas definiciones se mantienen fuera del vocabulario operativo del negocio.
+Los términos de requisitos y calidad están en el [vocabulario
+documental](../governance/08-documentation-vocabulary.md); los símbolos y elementos de las
+figuras, en la [guía de diagramas](../architecture/views/diagram-reading.md).
 
 ## Peso unitario de merma de rollo
 

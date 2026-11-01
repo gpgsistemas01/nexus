@@ -58,10 +58,9 @@ surtidas y devueltas, descritas por sus contratos; la división no crea otro doc
 
 ## Interpretación y restricciones
 
-Las figuras reúnen los tres contextos bajo el concepto Salida. Cada documento es de
-materiales, consumibles o mermas y sus detalles no mezclan contextos. Cada detalle
-apunta exclusivamente a una oferta de artículo o a una merma; las dos relaciones
-opcionales no permiten un detalle sin recurso ni con ambos recursos.
+Cada salida contiene materiales, consumibles o mermas, sin mezclarlos. Cada detalle
+refiere a una oferta de artículo o a una merma: debe tener exactamente uno de esos
+recursos.
 
 Solicitante y asesor son dos participaciones de Persona y pueden diferir del usuario
 autenticado. El número de proyecto es un dato del encabezado en la captura actual;

@@ -29,11 +29,9 @@ comprobado. La aceptación funcional se registra por entrega.
 
 ## Calidad de la redacción
 
-Cada requisito tiene una obligación principal, condiciones y resultado comprobables.
-Los criterios enumerables se identifican mediante `CA-*`. La redacción utiliza los
-términos del [glosario](../business-glossary.md), evita expresiones ambiguas y
-mantiene consistencia con permisos, casos y estados. Las medidas de calidad que aún
-no se han acordado conservan su estado Propuesto.
+Cada requisito expresa una obligación, sus condiciones y un resultado comprobable.
+Identificar criterios con `CA-*` y usar el [glosario](../business-glossary.md), permisos y
+estados vigentes. Las medidas de calidad no acordadas permanecen como Propuesto.
 
 Los pasos completos pertenecen al caso de uso; los nombres de archivos y decisiones
 de implementación, a Arquitectura. Las relaciones con las funciones y pruebas se

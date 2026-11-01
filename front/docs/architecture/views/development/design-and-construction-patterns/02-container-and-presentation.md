@@ -2,10 +2,9 @@
 
 ## Propósito y funcionamiento
 
-Un componente que consulta la API, decide permisos y dibuja controles cambia por
-motivos distintos. El contenedor coordina el caso; la presentación recibe props
-y emite intenciones. En Vue esta separación se implementa con componentes y
-composables, que conservan el estado y coordinan las operaciones de la página.
+El contenedor coordina permisos y operaciones; la presentación recibe props y emite
+intenciones. Los composables mantienen estado e interacción. Esta separación permite
+cambiar la lógica o los controles sin concentrarlos en un componente.
 
 ## Modelo general de contenedor y presentación
 
@@ -70,13 +69,12 @@ sequenceDiagram
 
 ## Código, contrato y límites
 
-[CatalogPage](../../../../../src/modules/catalogs/pages/CatalogPage.vue) compone los
-colaboradores, pasa filas/consulta y conecta `query` a `list.applyQuery`; `edit`
-abre el editor con la fila seleccionada.
+[CatalogPage](../../../../../src/modules/catalogs/pages/CatalogPage.vue) pasa filas y
+consulta, conecta `query` con `list.applyQuery` y abre el editor al recibir `edit`.
 [CatalogTable](../../../../../src/modules/catalogs/components/CatalogTable.vue) define
-columnas y emite eventos; no solicita HTTP ni consulta la sesión.
-[useListEditor](../../../../../src/shared/composables/useListEditor.ts) conserva el ciclo
-de apertura y recarga, sin definir las reglas del catálogo.
+columnas y eventos.
+[useListEditor](../../../../../src/shared/composables/useListEditor.ts) gestiona apertura
+y recarga; las reglas permanecen en el catálogo.
 
 Los eventos de componente llegan al padre directo; un contenedor intermedio los
 reenvía explícitamente. La presentación puede tener estado visual local o valores calculados. Una page

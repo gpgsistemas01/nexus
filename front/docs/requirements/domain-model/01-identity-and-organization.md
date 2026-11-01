@@ -49,12 +49,10 @@ classDiagram
 | Área | Departamento de la organización. |
 | Rol | Función organizacional, como Auxiliar, Coordinador, Operador o Instalador. |
 
-Una persona participa como solicitante, asesor o receptora sin necesitar credenciales.
-Asignarle responsabilidades no concede acceso a una cuenta. Una cuenta puede estar
-vinculada a una persona y sus accesos combinan rol y área. Una persona puede tener
-ninguna o varias cuentas vinculadas; cada cuenta se vincula como máximo a una persona.
-Las responsabilidades y los accesos conservan finalidades distintas aunque ambos
-relacionen un rol con un área.
+Una persona puede solicitar, asesorar o recibir sin credenciales; sus responsabilidades no
+conceden acceso. Puede tener varias cuentas o ninguna; cada cuenta se vincula como máximo
+a una persona. Las responsabilidades describen su función; los accesos de la cuenta
+combinan rol y área.
 
 El área de una salida es un dato operativo y también participa en su alcance de acceso.
 Auxiliar y Coordinador de Almacén pueden consultar y registrar solicitudes para todas

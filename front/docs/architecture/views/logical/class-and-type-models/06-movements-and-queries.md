@@ -67,9 +67,8 @@ presenta como «—». El tipo estático no elimina estas comprobaciones de ejec
 | Identidad | `IdentityQuery extends RecordQuery`: área y rol. Aquí sí existe extensión declarada. |
 | Inventario | `InventoryQuery` declara sus campos propios: búsqueda, proveedor, página, longitud, dirección y columna opcional. No hereda de `RecordQuery`. |
 
-`ReportScope` tiene `mode: filtered | current-month | specific-month` y `month: string`.
-Los servicios de documentos validan el alcance y eliminan paginación al exportar;
-`specific-month` exige un mes válido. Compartir consulta no exige compartir un endpoint.
-La [secuencia de reportes](../../processes/08-movements-and-reports/02-reports.md)
-explica Blob, nombre de archivo, errores y descarga; las
-[pruebas](../../../../testing/04-use-case-coverage.md) conservan los límites del contrato observado.
+`ReportScope` define `mode: filtered | current-month | specific-month` y `month: string`.
+Los servicios validan el alcance, exigen mes válido en `specific-month` y omiten
+paginación. La [secuencia](../../processes/08-movements-and-reports/02-reports.md) detalla
+archivo y errores; la [cobertura](../../../../testing/04-use-case-coverage.md), sus
+límites de prueba.

@@ -105,7 +105,7 @@ fuente de verdad. El mapa de rutas y dependencias se genera desde el código; el
 el diccionario técnico se derivan de Prisma; los diagramas de diseño se mantienen de
 forma curada. CI comprueba que el contenido generado esté actualizado.
 
-- Para consumir la API, consulta el [contrato HTTP](docs/architecture/openapi/api-contract.md)
+- Para consumir la API, consulta su [documentación independiente](docs/architecture/openapi/index.md), el [contrato HTTP](docs/architecture/openapi/api-contract.md)
   y la [especificación OpenAPI](docs/architecture/openapi/openapi.json).
 - Para modificar el servidor, consulta la
   [documentación técnica del backend](docs/architecture/views/development/backend-technical-documentation/index.md)

@@ -37,7 +37,6 @@ como «salida de material» o «salida de merma». El responsable funcional vali
 significados nuevos o ambiguos y desarrollo comprueba su correspondencia con el
 código.
 
-Cambiar un significado exige revisar requisitos, casos, campos y efectos,
-diagramas, contrato API, mensajes y pruebas afectados. Los campos y valores
-permitidos se detallan en sus contratos y reglas de captura, sin duplicarlos
-en el glosario.
+Al cambiar un término, revisar requisitos, casos, campos, efectos, diagramas, API,
+mensajes y pruebas. Los contratos y reglas de captura detallan campos y valores; el
+glosario define su significado.

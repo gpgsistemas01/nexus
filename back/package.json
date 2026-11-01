@@ -43,7 +43,9 @@
     "docs:export": "node scripts/exportDocs.js",
     "docs:screenshots": "node scripts/runManualScreenshotWorkflow.js",
     "db:migrate": "prisma migrate deploy && prisma generate",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "docs:api:lint": "npx --yes @redocly/cli@2.72.1 lint docs/architecture/openapi/openapi.json",
+    "docs:api:bundle": "npx --yes @redocly/cli@2.72.1 bundle docs/architecture/openapi/openapi.json --output build/docs/openapi/openapi.json"
   },
   "repository": {
     "type": "git",

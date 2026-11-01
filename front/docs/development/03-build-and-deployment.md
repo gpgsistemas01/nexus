@@ -51,10 +51,9 @@ docker build -f front/Dockerfile -t nexus-front .
 docker run --rm --name nexus-front --network nexus -p 8080:80 -e BACKEND_UPSTREAM=http://backend:3000 nexus-front
 ```
 
-El ejemplo publica Vue en `http://localhost:8080`. La etapa Node compila y la
-etapa final ejecuta Nginx con `dist`; no hace falta generar `dist` previamente.
-`front/Dockerfile.dockerignore` excluye dependencias locales, `.env`, documentación
-y herramientas. La imagen backend se construye por separado.
+El ejemplo publica Vue en `http://localhost:8080`: Node compila y Nginx sirve `dist`. El
+Dockerfile genera `dist` y excluye dependencias locales, `.env`, documentación y
+herramientas mediante `front/Dockerfile.dockerignore`. El backend usa otra imagen.
 
 `front/nginx.conf` define el proxy y el fallback. Si usas Nginx fuera de Docker,
 adapta su resolver y upstream a la VPS. Configura TLS, dominio y el proxy externo

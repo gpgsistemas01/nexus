@@ -66,13 +66,18 @@ Los reportes y la infraestructura transversal se localizan en el
 
 El login valida presencia, tipo texto y longitud máxima de usuario/contraseña; no aplica la política de creación de claves. El nombre admite minúsculas, se recortan sólo sus espacios exteriores y la contraseña se conserva exactamente. Backend y frontend comparten `AUTH_FIELD_LIMITS`. La creación/cambio mantiene los requisitos de contraseña existentes. Una captura inválida responde `400` por campo y una credencial no coincidente responde el `401 LOGIN_ERROR` genérico del servicio.
 
-El formulario EJS y Vue importan las reglas públicas desde su propietario
-`public/js/utils/validations/loginValidation.js`; `validators.js` conserva las
-reglas de los demás formularios y no reexporta el login. La implementación Vue,
-con Vuetify y VeeValidate, se describe en
-[la arquitectura de front](../../../../../../front/docs/architecture/views/development/code-structure.md).
-Después del login, Vue Router abre Almacén y comprueba `/api/auth/me`; la sesión
-readonly se comparte por provide/inject. Materiales, Consumibles y Mermas ya tienen
-contenedores y componentes Vue. El resto de este capítulo describe el flujo EJS
-conservado; la [composición de Almacén Vue](../../../../../../front/docs/architecture/views/logical/components/02-inventory.md)
-se describe en su documentación propia.
+El formulario importa las reglas públicas de
+`public/js/utils/validations/loginValidation.js`. `validators.js` conserva las de
+los demás formularios. El contrato de login, consulta y refresh JSON pertenece a
+la [API](../../../openapi/index.md).
+
+## Rutas web de sesión
+
+| Solicitud web | Resultado |
+| --- | --- |
+| `GET /inicio-sesion` | Renderiza el formulario EJS. |
+| `GET /revocar-sesion` | Intenta renovar cookies y redirige al destino conservado; si falla, cierra la sesión. |
+| `POST /cerrar-sesion` | Borra `accessToken`, `refreshToken` y `returnTo`; redirige `302` al login. |
+
+El cierre afecta a las cookies del navegador actual; no revoca sesiones de otros
+dispositivos. Estas rutas devuelven HTML o redirecciones, fuera del contrato `/api`.

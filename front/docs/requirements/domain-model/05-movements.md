@@ -32,10 +32,9 @@ classDiagram
 
 ## Interpretación y restricciones
 
-Una compra, salida surtida/devuelta, ajuste o entrada adicional de merma explica el
-hecho que modifica stock. Una solicitud aún pendiente no genera por sí misma ese efecto.
-Cada efecto corresponde a un solo recurso; un movimiento puede agrupar varios efectos.
-Corregir o devolver conserva la referencia del documento original.
+Compras, surtidos, devoluciones, ajustes y entradas de merma modifican stock; las
+solicitudes pendientes no. Cada efecto corresponde a un recurso y un movimiento puede
+agrupar varios efectos. Correcciones y devoluciones conservan la referencia original.
 
 El listado Vue muestra una proyección consultable por recurso con referencia, fecha,
 tipo, stock anterior, cantidad y nuevo stock. `MovementRow` no es el agregado conceptual

@@ -62,10 +62,11 @@ lector.
 
 ## Mantenimiento del contrato API
 
-`npm run docs:check` resuelve las referencias OpenAPI y compara métodos y rutas con
-el mapa generado desde el código. Detecta operaciones ausentes u obsoletas; no
-comprueba por sí solo que cada campo y condición coincida con una respuesta real.
-Esa correspondencia se revisa con validadores, DTO, controladores y pruebas.
+`npm run docs:check` comprueba referencias, IDs, grupos, parámetros, seguridad y
+respuestas OpenAPI; compara las operaciones con el mapa de rutas.
+`npm run docs:api:lint` añade las reglas recomendadas de Redocly y
+`npm run docs:api:bundle` genera el JSON autocontenido. La correspondencia con los
+datos reales se verifica con validadores, DTO, controladores y pruebas.
 
 Al cambiar una operación, actualice su definición en `docs/architecture/openapi/`,
 los esquemas reutilizados y las pruebas relacionadas. El

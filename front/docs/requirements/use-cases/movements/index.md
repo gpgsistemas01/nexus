@@ -1,6 +1,6 @@
 # Movimientos e informes de historial: casos de uso
 
-[Catálogo y plantilla de casos de uso](../index.md).
+[Catálogo de casos de uso](../index.md).
 
 | Caso | Objetivo |
 | --- | --- |

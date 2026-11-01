@@ -2,17 +2,14 @@
 
 ## Alcance y lectura
 
-Cada fila enlaza una ficha local y la evidencia ejecutable que aporta a ese objetivo.
-La columna de alcance identifica la condición y sus límites. Un archivo compartido no
-demuestra todas las alternativas de cada caso. Los resultados aprobados, fallidos o
-bloqueados se registran en EP, no se deducen de esta matriz.
+Cada fila enlaza el caso, sus pruebas y límites. Un archivo compartido no acredita todas
+sus alternativas. Los resultados se registran en EP; esta matriz localiza evidencia, no
+aprueba casos.
 
 ## Requisitos del cliente
 
-La tabla localiza las comprobaciones de cada requisito Vue. Las pruebas con API
-simulada cubren contratos e interacción; los efectos persistidos y los archivos
-reales requieren las comprobaciones de sistema indicadas. Cada fila identifica
-fuentes de revisión, no una cobertura completa de todos sus escenarios.
+La tabla localiza pruebas por requisito Vue. La simulación comprueba contratos e
+interacción; persistencia y archivos reales requieren las pruebas de sistema indicadas.
 
 | Requisito | Evidencia o forma de revisión |
 | --- | --- |
@@ -172,8 +169,6 @@ implementación o evidencia añadida; no equivale a aceptación integral del pro
 | BRE-VUE-004 | `records.spec.ts` parametriza Usuarios, Clientes y Proveedores: búsqueda, fallo/reintento, archivo y ausencia de paginación. El caso de sistema abre sus XLSX reales y comprueba inclusión/exclusión por búsqueda. | Evidencia de reportes añadida: `CP-VUE-REC-003-01` y `CP-VUE-SYS-001-01`. No afirma todas sus columnas, fórmulas, volúmenes ni combinaciones de filtros. |
 | BRE-VUE-005 | `tests/system/application.spec.ts`, con Express/routers/middleware reales y PostgreSQL aislado; preparación y ejecución propias en CI. `CP-VUE-SYS-001-01` verifica alta persistida, reportes, sesión y cierre. | Unión cliente/servidor representada. Las demás pruebas de navegador siguen simulando API; este recorrido no cierra todas las brechas de integración del inventario. |
 
-Las ejecuciones y sus resultados se conservan como `EP-*` en CI o en la revisión.
-Los procedimientos de reproducción y limpieza están en
-[pruebas de sistema](05-system-tests.md). Se conservan las integraciones backend
-y los demás pendientes de la matriz del producto; no se deduce cobertura total
-por compartir componentes o por resolver estas cinco observaciones.
+Guardar las ejecuciones `EP-*` en CI o en la revisión. [Pruebas de
+sistema](05-system-tests.md) describe reproducción y limpieza. Resolver estas
+observaciones no cierra las demás brechas ni sustituye integraciones backend.

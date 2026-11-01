@@ -2,11 +2,9 @@
 
 ## Alcance y propietarios
 
-`tests/e2e` conserva recorridos rápidos con API simulada. `tests/system` añade
-un representante contra Vue, los routers/middleware reales de Express y PostgreSQL.
-No intercepta la API ni sustituye la autenticación. Prisma y ExcelJS sólo se importan
-en el proceso Node de pruebas; no forman parte de `front/src` ni del bundle público.
-Las dependencias siguen en cada aplicación y no se agregan paquetes al cliente.
+`tests/e2e` usa API simulada; `tests/system`, Vue, Express y PostgreSQL reales, sin
+interceptar la API ni simular autenticación. Prisma y ExcelJS se ejecutan sólo en Node de
+pruebas; no entran en `front/src` ni en el bundle.
 
 | Archivo | Responsabilidad |
 | --- | --- |
@@ -18,11 +16,9 @@ Las dependencias siguen en cada aplicación y no se agregan paquetes al cliente.
 
 ## Preparación desde la raíz
 
-Para preparar archivos por primera vez, siga
-[Archivos, credenciales y ejecución de pruebas](06-test-files-and-credentials.md).
-Explica de dónde salen las credenciales, qué archivos genera el setup y cuáles
-no hay que crear manualmente. Esta sección detalla las variables de la terminal
-y las condiciones del entorno.
+[Archivos, credenciales y ejecución](06-test-files-and-credentials.md) explica la
+preparación inicial y los archivos generados. Aquí se detallan variables y condiciones del
+entorno.
 
 Instalar las dependencias de ambas aplicaciones y Chromium conforme al
 [procedimiento de pruebas](06-test-files-and-credentials.md). Preparar una base PostgreSQL vacía
@@ -68,14 +64,11 @@ que el archivo real contiene el representante y excluye otra fixture. Eliminar
 la cookie de acceso conserva la de renovación y provoca un refresh real. Cerrar
 sesión borra ambas cookies; `/me`, refresh y el acceso protegido vuelven a rechazarse.
 
-El teardown borra clientes, proveedores, auditoría y cuentas de esas fixtures,
-sus asignaciones y los catálogos de acceso que haya creado. No borra todos los datos
-de la base. El manifiesto temporal `front/build/test-results/system-fixture.json`
-se elimina; el JUnit `system.xml` y las trazas de fallo permanecen ignorados por Git.
-El JSON temporal incluye la contraseña de la cuenta de prueba; no se completa ni
-se distribuye. Las trazas pueden contener datos de esa sesión de prueba.
-Ante una interrupción forzada puede quedar una fixture: retirar únicamente sus IDs
-o desechar la base efímera preparada para esa corrida.
+El teardown borra sólo clientes, proveedores, auditoría, cuentas, asignaciones y catálogos
+creados por la prueba. Elimina `front/build/test-results/system-fixture.json`, que
+contiene la contraseña temporal; no completarlo ni distribuirlo. JUnit `system.xml` y
+trazas quedan ignorados; las trazas pueden contener datos de sesión. Tras una
+interrupción, retirar sólo los IDs propios o desechar la base efímera.
 
 La [CI](../../../.github/workflows/ci.yml) queda configurada para ejecutar este recorrido en Node 24,
 con PostgreSQL local aislado, además de conservar las suites unitarias y de navegador

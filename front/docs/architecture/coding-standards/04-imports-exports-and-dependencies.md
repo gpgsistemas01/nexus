@@ -43,12 +43,11 @@ comprueba también dependencias indirectas y el motivo de cambio de cada archivo
 
 ## Alias públicos
 
-Los alias `@nexus/*` se resuelven en `vite.config.ts` y los `paths` de TypeScript.
-Su fuente es código público compatible con navegador: reglas de captura, constantes,
-mensajes o cálculos de vista previa. La compilación necesita esos archivos del checkout;
-el resultado se incorpora al bundle, sin una lectura del filesystem del servidor.
-No importar Prisma, variables secretas, middleware, fórmulas privadas o políticas internas.
-Cambiar un alias exige revisar Vite, TypeScript, pruebas y contexto de build.
+Los alias `@nexus/*` se configuran en `vite.config.ts` y los `paths` de TypeScript.
+Incorporan al bundle fuentes públicas del checkout: reglas de captura, constantes,
+mensajes y vistas previas. No leen archivos del servidor en ejecución. Excluir Prisma,
+secretos, middleware, fórmulas privadas y políticas internas. Al cambiar un alias, revisar
+Vite, TypeScript, pruebas y contexto de build.
 
 ## Carga diferida y ciclos
 

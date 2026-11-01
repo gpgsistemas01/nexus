@@ -2,10 +2,8 @@
 
 ## Contexto y organización
 
-La aplicación es una SPA cliente-servidor con dominios funcionales, componentes de
-presentación, composables y adaptadores HTTP. La documentación se organiza en vistas
-4+1. Los cortes C4 muestran límites y colaboradores; las secuencias describen mensajes
-y decisiones; los estados describen modos y recuperación.
+Nexus es una SPA cliente-servidor organizada por dominios, componentes, composables y adaptadores HTTP. Las vistas 4+1 describen su arquitectura: C4 muestra límites; las secuencias,
+interacciones; los estados, modos y recuperación.
 
 ## Vista lógica de ejecución del cliente
 
@@ -54,12 +52,12 @@ flowchart TB
     session --> http
 ```
 
-La [provisión de sesión](development/design-and-construction-patterns/06-session-provision.md)
-desarrolla el arranque en `main.ts`. Las rutas públicas de login, recuperación de acceso y página no encontrada están
-fuera del marco protegido. El [catálogo de navegación](scenarios/navigation-and-screens.md)
-identifica todas las rutas y sus entradas. Los [componentes por capacidad](logical/components/index.md)
-desarrollan las dependencias internas; los [patrones](development/design-and-construction-patterns/index.md),
-el proceso de colaboración.
+La [provisión de
+sesión](development/design-and-construction-patterns/06-session-provision.md) explica el
+arranque. Login, recuperación y página no encontrada quedan fuera del marco protegido.
+Consulte [Navegación](scenarios/navigation-and-screens.md) para rutas,
+[Componentes](logical/components/index.md) para dependencias y
+[Patrones](development/design-and-construction-patterns/index.md) para colaboraciones.
 
 ## Referencias
 

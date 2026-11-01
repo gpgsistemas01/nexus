@@ -23,10 +23,9 @@ mayúsculas, minúsculas y caracteres de su contraseña. No comparta sus credenc
 
 ## Corregir un ingreso rechazado
 
-Si aparece un error junto a un campo, corrija ese dato. Si el sistema rechaza el
-acceso, revise ambos campos e intente nuevamente. Solicite ayuda al responsable de
-accesos si el rechazo persiste. El formulario de ingreso no permite crear cuentas
-ni restablecer una contraseña por correo.
+Corrija los campos señalados. Si se rechaza el acceso, revise usuario y contraseña y
+reintente; si persiste, contacte al responsable de accesos. Esta pantalla no crea cuentas
+ni recupera contraseñas por correo.
 
 ## Continuidad y recuperación de la sesión
 

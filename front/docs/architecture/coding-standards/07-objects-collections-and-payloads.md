@@ -22,11 +22,10 @@ de sus consumidores. Use `Record` para diccionarios con valores homogéneos.
 
 ## Captura numérica
 
-Durante edición un campo puede conservar texto para representar vacío, separador o una
-captura incompleta. La conversión ocurre en la frontera apropiada después de validar;
-no aplicar `Number(value) || 0`, que vuelve indistinguibles ausencia, error y cero.
-Usar las utilidades numéricas públicas del proyecto y las fronteras de cada esquema.
-Costo ausente y costo cero no se interpretan como el mismo estado.
+La captura conserva texto para representar vacío, separadores o valores incompletos;
+convertirlo después de validar. Evitar `Number(value) || 0`: confunde ausencia, error y
+cero. Usar las utilidades numéricas públicas y los límites del esquema. Un costo ausente
+no es un costo cero.
 
 ## Lista explícita por operación
 

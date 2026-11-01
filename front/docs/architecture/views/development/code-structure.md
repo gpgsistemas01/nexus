@@ -1,9 +1,8 @@
 # Estructura y responsabilidades del código
 
-El código fuente se divide en aplicación, módulos de negocio y colaboradores
-compartidos. Este mapa permite encontrar sus archivos y las unidades que componen
-cada capacidad. La [guía de incorporación](developer-onboarding.md) sigue una
-edición completa para aprender a recorrer esa estructura.
+El código se organiza en aplicación, módulos de negocio y colaboradores compartidos. La
+[guía de incorporación](developer-onboarding.md) recorre una edición para mostrar cómo
+encontrarlos.
 
 ## Organización del código
 
@@ -36,9 +35,9 @@ front/src/
     └── utils/          # Funciones puras transversales
 ```
 
-Las carpetas de cada módulo existen según sus necesidades. Un dominio puede tener
-contratos en su raíz, `pages`, `components`, `composables`, `services` y `mappers`.
-Los tipos no son otra capa ejecutable: describen datos y operaciones permitidas.
+Cada módulo crea sólo las carpetas que necesita: contratos, `pages`, `components`,
+`composables`, `services` y `mappers`. Los tipos describen datos y operaciones; no añaden
+una capa ejecutable.
 
 ## Unidades de construcción
 
@@ -61,11 +60,9 @@ dependencias relevantes de cada dominio.
 
 ## Navegación y carga de páginas
 
-`src/app/router/index.ts` registra las rutas y carga sus páginas bajo demanda;
-`App.vue` presenta la página activa mediante `RouterView`. Para añadir una pantalla
-navegable se crea su contenedor en el módulo correspondiente y se registra en ese
-router con su recurso y permiso. Los contenedores de diálogo pueden vivir en
-`pages` sin tener una URL propia.
+`src/app/router/index.ts` registra y carga páginas bajo demanda; `App.vue` las presenta en
+`RouterView`. Para añadir una pantalla, crear su contenedor y registrar recurso y permiso
+en el router. Los diálogos pueden vivir en `pages` sin URL propia.
 
 Los enlaces internos usan `RouterLink`; una operación puede navegar mediante el
 router. Los enlaces HTML normales se reservan a destinos externos. El

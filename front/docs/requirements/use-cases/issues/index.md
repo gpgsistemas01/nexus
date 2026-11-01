@@ -1,6 +1,6 @@
 # Salidas: casos de uso
 
-[Catálogo y plantilla de casos de uso](../index.md).
+[Catálogo de casos de uso](../index.md).
 
 ## Alcance de áreas
 

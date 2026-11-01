@@ -43,7 +43,7 @@ flowchart TB
     editor --> service
 ```
 
-Los formularios usan VeeValidate y controles Vuetify. Persona, cuenta y entidad comercial
-conservan contratos distintos; compartir guardado no los convierte en una misma entidad.
-Los [contratos de formularios](../../../contracts/form-and-event-contracts.md) precisan qué
-editor emite una entidad creada y cuál sólo notifica finalización.
+Los formularios usan VeeValidate y Vuetify. Persona, cuenta y entidad comercial comparten
+guardado con contratos distintos. Los [contratos de
+formularios](../../../contracts/form-and-event-contracts.md) indican qué editor devuelve
+una entidad y cuál sólo confirma finalización.

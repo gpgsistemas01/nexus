@@ -22,11 +22,10 @@ por Git.
 | `gobierno` | Reglas editoriales, referencias y publicación. |
 | `manual` | Procedimientos y capturas; libro independiente del técnico. |
 
-El [catálogo publications.json](../publications.json) fija fuentes y orden. Los
-directorios se expanden con su índice y capítulos numerados; el libro completo
-elimina fuentes repetidas. `entry` define una portada propia;
-`includeInComplete: false` excluye la sección del libro técnico, manteniendo sus
-comprobaciones. Los libros temáticos muestran sólo el contenido elegido.
+[publications.json](../publications.json) fija fuentes y orden. Los directorios incluyen
+índice y capítulos numerados; el libro completo elimina duplicados. `entry` elige portada
+e `includeInComplete: false` excluye un libro temático del completo, sin omitir sus
+comprobaciones.
 
 ## Comandos
 
@@ -95,9 +94,9 @@ recortes. Al cambiar figuras o el exportador, comprobar la publicación afectada
 Registrar comando, entorno, fecha, resultado y limitaciones en CI o en la revisión.
 Si la exportación falla, los archivos anteriores no se consideran actualizados.
 
-La documentación se distribuye como artefacto. `docs/`, `scripts/` y `build/` quedan
-fuera del contexto Docker; no se copian a `public/` ni a `dist/`. La imagen final
-sirve los assets de Vue y no genera documentación al arrancar.
+La documentación se publica como artefacto. Docker excluye `docs/`, `scripts/` y `build/`;
+no se copian a `public/` ni `dist/`. La imagen final sirve Vue y no genera documentos al
+arrancar.
 
 ## Referencia de contratos declarados
 

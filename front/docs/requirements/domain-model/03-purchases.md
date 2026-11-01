@@ -41,11 +41,10 @@ Todos los detalles pertenecen al contexto de la compra: materiales o consumibles
 El proveedor del encabezado y el artículo del detalle determinan la oferta afectada.
 La persona que recibe es un dato del proceso; puede ser distinta del usuario que lo registra.
 
-La edición conserva el proveedor del documento leído. Los detalles ya registrados se
-consultan; los nuevos se agregan mediante el editor. Corregir cantidad/costo o cancelar
-un detalle son acciones específicas: no se simulan eliminando la historia del documento.
-Las observaciones de encabezado son editables en el comportamiento vigente; no reemplazan
-las observaciones de los ajustes y movimientos que resultan de otras operaciones.
+La edición mantiene el proveedor y permite agregar detalles nuevos; los registrados son de
+consulta. Corregir cantidad/costo o cancelar usa acciones específicas que conservan la
+historia. Las observaciones del encabezado son editables e independientes de las de
+ajustes y movimientos.
 
 La composición expresa pertenencia del detalle, no una orden de borrado físico.
 Los [estados de interacción](../../architecture/views/logical/states/01-purchases.md)

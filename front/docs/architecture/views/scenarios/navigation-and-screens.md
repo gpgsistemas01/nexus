@@ -22,11 +22,10 @@ el primer recurso autorizado cuando corresponde; el catch-all presenta página n
 
 ## Menú y editores
 
-El menú contiene grupos plegables y enlaces Vue autorizados. En escritorio la barra
-compacta muestra iconos; pulsar la expande y clic fuera, Escape o navegación la cierran.
-En móvil se utiliza drawer temporal. Los editores son diálogos del contexto actual;
-abrir uno no registra una ruta nueva ni escribe. Los auxiliares se componen en el
-Workspace para preservar la captura origen.
+El menú agrupa enlaces Vue autorizados. En escritorio muestra iconos: un clic lo expande;
+clic fuera, Escape o navegación lo cierran. En móvil usa un drawer temporal. Los diálogos
+no crean rutas ni guardan al abrirse; el Workspace conserva la captura al abrir
+auxiliares.
 
 ## Destino y recuperación
 

@@ -8,11 +8,9 @@
 
 ## Propósito y destinatarios
 
-Este manual explica cómo utilizar Nexus desde el navegador para administrar
-existencias, registrar compras, solicitar y surtir salidas, consultar movimientos
-y mantener los registros auxiliares. Está dirigido a las personas que operan el
-sistema y a quienes administran sus accesos. No requiere conocimientos de Vue ni
-de programación.
+Este manual enseña a administrar existencias, registrar compras, solicitar y surtir salidas, consultar
+movimientos y mantener registros auxiliares en Nexus. Está dirigido a operadores y
+responsables de accesos, sin conocimientos de programación.
 
 Cada procedimiento indica dónde empezar, qué capturar, qué acción confirma el
 cambio y cómo comprobar su resultado. Los nombres en **negritas** corresponden a

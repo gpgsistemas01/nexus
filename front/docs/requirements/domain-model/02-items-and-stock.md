@@ -67,10 +67,9 @@ permite leer las cardinalidades sin cruzar los vínculos comerciales con los cat
 
 ## Interpretación y restricciones
 
-La existencia de materiales y consumibles pertenece a la oferta artículo–proveedor.
-No hay un stock único por nombre de artículo. La misma combinación artículo–proveedor
-no se registra dos veces; un proveedor diferente produce otra oferta del mismo artículo.
-Material y consumible son clasificaciones separadas; el consumible carece de dimensiones.
+El stock de materiales y consumibles pertenece a cada oferta artículo–proveedor. Esa
+combinación es única; otro proveedor crea otra oferta del mismo artículo. Material y
+consumible son clasificaciones separadas; el consumible no tiene dimensiones.
 
 La merma conserva proveedor y stock propios. Al registrarla usa un material como
 plantilla y puede precargar pesos de su oferta; los datos guardados de la merma no se

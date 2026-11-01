@@ -2,15 +2,13 @@
 
 ## Cómo utilizar esta guía
 
-Empiece por este recorrido aunque ya conozca otras aplicaciones de inventario.
-Después abra el capítulo de la tarea que va a realizar. Cada procedimiento indica
-qué necesita, qué botón debe pulsar, qué dato debe escribir y cómo reconocer que
-terminó. No tiene que aprender todos los módulos en una sola sesión.
+Empiece con este recorrido y luego abra el capítulo de su tarea. Cada procedimiento indica
+qué necesita, qué pulsar, qué escribir y cómo reconocer el resultado. No necesita aprender
+todos los módulos a la vez.
 
-Las capturas de su manual corresponden al acceso con el que se generó. Busque el
-nombre del botón y del campo; los nombres de personas, artículos, folios y cantidades
-pueden ser distintos. Si una acción que figura en su manual desaparece, solicite
-que revisen su acceso y actualicen el manual; no use una cuenta prestada.
+Las capturas corresponden a su acceso. Identifique botones y campos; los nombres, folios y
+cantidades pueden variar. Si desaparece una acción del manual, solicite revisar su acceso
+y actualizarlo. No use cuentas prestadas.
 
 ## Antes de su primera tarea
 
@@ -74,21 +72,18 @@ qué cantidad tiene disponible y en qué unidad. Esta práctica no modifica dato
 
 ## Preparar una captura y guardarla son acciones distintas
 
-Al añadir un detalle con **Agregar**, lo ve dentro del documento, pero todavía
-no está registrada la compra o solicitud. Revise esa lista y después pulse
-**Guardar** en el formulario principal. En cambio, un cliente o proveedor creado
-en un formulario secundario sí queda guardado al confirmar ese formulario, aunque
-después cierre el documento principal.
+**Agregar** prepara un detalle; **Guardar** registra la compra o solicitud. Revise la
+lista antes de guardar. Los clientes y proveedores creados en un formulario secundario sí
+quedan registrados, aunque después cierre el documento principal.
 
 Si quiere salir de una captura que no ha confirmado, utilice **Cerrar** o
 **Regresar**. Si el sistema ya confirmó el cambio, cerrar la pantalla no lo revierte.
 
 ## Cuándo detenerse y pedir ayuda
 
-Deténgase si no reconoce el registro, desconoce la unidad, falta autorización,
-otra persona cambió el saldo o no sabe si un envío terminó. Anote el folio y el
-mensaje, consulte el capítulo de recuperación y avise a su responsable. Una
-segunda operación hecha para probar puede duplicar una entrada o entrega.
+Deténgase si no reconoce el registro o la unidad, falta autorización, cambió el saldo o
+desconoce el resultado del envío. Anote folio y mensaje, consulte recuperación y avise al
+responsable. Repetir para probar puede duplicar entradas o entregas.
 
 ## Comprobación al terminar la inducción
 

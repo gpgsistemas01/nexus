@@ -2,10 +2,8 @@
 
 ## Propósito y funcionamiento
 
-La fábrica es una función que devuelve las reglas del formulario según recurso
-y modo. El esquema resultante contiene validadores por campo. Estos validadores
-consultan los valores actuales mediante `getValues` cuando se ejecutan; construir
-el esquema todavía no valida la captura.
+La fábrica devuelve validadores según recurso y modo. Cada validador consulta `getValues`
+al ejecutarse; crear el esquema todavía no valida el formulario.
 
 ## Modelo general de construcción de un esquema
 

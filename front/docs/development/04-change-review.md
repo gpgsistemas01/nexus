@@ -20,7 +20,7 @@ propietarios.
 
 ## Entregar evidencia
 
-Ejecutar el chequeo frontend exigido por el alcance. Los comandos se mantienen en
-[herramientas](02-tooling.md) y [ejecución de pruebas](../testing/06-test-files-and-credentials.md).
-Registrar revisión, ambiente, comando, resultado y bloqueos en CI o en la revisión
-del cambio; no versionar los artefactos de ejecución.
+Ejecutar las comprobaciones del alcance según [Herramientas](02-tooling.md) y
+[Pruebas](../testing/06-test-files-and-credentials.md). Registrar revisión, entorno,
+comando, resultado y bloqueos en CI o en la revisión del cambio; los artefactos no se
+versionan.

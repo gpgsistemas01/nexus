@@ -2,11 +2,9 @@
 
 ## Consultar existencias
 
-Abra **Almacén → Materiales**. La página **Tabla de Existencias** muestra los
-materiales, proveedor, presentación, unidad y existencias. Las columnas agrupadas
-de medidas y conversión permiten distinguir las dimensiones del artículo de la
-cantidad disponible. Utilice los filtros y búsqueda para localizar el registro
-correcto y leer sus datos completos.
+Abra **Almacén → Materiales**. **Tabla de Existencias** muestra material, proveedor,
+presentación, unidad y stock. Las columnas agrupadas distinguen dimensiones y conversión.
+Busque y filtre para localizar el registro correcto.
 
 ![Tabla de existencias de materiales con filtros y acciones.](images/03-materials-list.png)
 

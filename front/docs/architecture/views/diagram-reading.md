@@ -111,10 +111,9 @@ ejecutado por un coordinador del import o la llamada HTTP de su consumidor.
 
 ## Estados
 
-Una transición se lee como `evento [guarda] / efecto`: el evento solicita o completa
-el cambio, la guarda decide si puede ocurrir y el efecto se ejecuta al tomarlo.
-El evento también puede ser la resolución o el rechazo de una promesa. No se usa
-una conjunción en prosa para confundir estas tres funciones.
+Leer cada transición como `evento [guarda] / efecto`: el evento solicita o completa el
+cambio, la guarda lo permite y el efecto ocurre al tomarlo. El evento también puede ser el
+resultado de una promesa.
 
 **Ejemplo:** `DIA-VUE-LEG-003`. Ciclo ilustrativo; los nombres no son funciones de Nexus.
 
@@ -275,11 +274,10 @@ cortes C4 y las actividades son aproximaciones con cajas Mermaid, con su alcance
 
 ## Color y énfasis
 
-El color depende del tema del visor o exportador. En estos diagramas no codifica rol,
-permiso, prioridad ni estado del negocio. El significado lo dan forma, texto, extremos
-y tipo de línea. Los nombres resaltados son títulos; las cajas oscuras de notas y los
-círculos de numeración son ayudas de lectura. La apariencia de la aplicación Vue se
-describe por separado en [interfaz y tema](logical/components/08-shared-ui.md#tema-estilos-y-controles).
+El color depende del visor: no expresa rol, permiso, prioridad ni estado. El significado
+está en las formas, etiquetas y líneas. Títulos, notas y números ayudan a leer. El estilo
+de Vue se explica en [Interfaz y
+tema](logical/components/08-shared-ui.md#tema-estilos-y-controles).
 
 Referencias de notación: [UML](https://www.omg.org/spec/UML/2.5.1) y
 [sintaxis de Mermaid](https://mermaid.js.org/intro/syntax-reference.html).

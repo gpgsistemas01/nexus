@@ -1,15 +1,12 @@
 # Altas desde selectores: modelo de casos de uso
 
-Estos cortes amplían las capturas de Inventario, Compras y Salidas sin repetir sus
-consultas y operaciones. Las fichas conservan el mismo ID, actor, punto de extensión,
-condición y retorno que los demás modelos. El Administrador del sistema hereda la
-participación de Almacén; las áreas operativas no reciben permisos de alta de
-Directorio por poder solicitar una salida.
+Estas figuras muestran altas auxiliares de Inventario, Compras y Salidas. Comparten ID,
+actor, condición, punto y retorno con sus fichas. El Administrador del sistema hereda la participación
+de Almacén; las áreas operativas no obtienen permisos de Directorio por solicitar salidas.
 
-Las asociaciones directas identifican a Almacén como participante de las altas
-auxiliares. La entrada a las capturas desde sus consultas se conserva en los cortes
-funcionales, sin repetir esos enlaces aquí. Las flechas `«extend»` representan la
-inserción condicionada del alta; no transmiten actores ni permisos.
+Las líneas directas asocian Almacén con las altas; las flechas `«extend»` muestran cuándo
+se insertan, sin transmitir permisos. Los modelos de cada módulo conservan los enlaces
+desde sus consultas.
 
 **Fuente:** `InventoryWorkspace`, `PurchaseEditorPage`, `IssueWorkspace`,
 `IssueEditorPage` y las fichas de las capturas y altas auxiliares.
@@ -37,10 +34,9 @@ direction LR
     supplier ..>:extend consumablePurchase
 ```
 
-Se activa cuando el actor no encuentra el proveedor y elige **Registrar proveedor**
-con permisos de lectura y alta. El resultado guardado vuelve seleccionado al
-formulario; cancelar conserva su captura. Editar una compra no permite cambiar ni
-registrar otro proveedor: el existente permanece fijado.
+Con permisos de lectura y alta, **Registrar proveedor** abre el auxiliar. Al guardar, el
+proveedor activo queda seleccionado; cancelar conserva la captura. En edición de compra el
+proveedor permanece fijo, sin cambio ni alta auxiliar.
 
 ## Artículo para un detalle nuevo de compra
 
@@ -97,7 +93,6 @@ direction LR
     client ..>:extend headerConsumable
 ```
 
-La selección de cliente debe ser editable y el actor debe tener lectura y alta de
-Clientes. **Registrar cliente** devuelve el registro confirmado y reanuda la captura;
-no guarda la salida ni concede consulta del Directorio independiente. Los modos de
-surtido y devolución mantienen el encabezado bloqueado y no activan esta extensión.
+Con cliente editable y permisos de lectura/alta, **Registrar cliente** devuelve el cliente
+activo y reanuda la captura. No guarda la salida ni abre el Directorio independiente.
+Surtido y devolución bloquean el encabezado y no ofrecen esta extensión.

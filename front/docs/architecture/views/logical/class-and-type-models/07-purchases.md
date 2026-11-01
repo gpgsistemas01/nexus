@@ -85,11 +85,11 @@ incluye etiquetas de proveedor y receptor. El documento siempre incluye observac
 
 ## Transformación de escritura
 
-`mapPurchaseFormToRequest` conserva el proveedor leído en edición; toma receptor,
-fecha, factura y observaciones de la captura. Recorta observaciones y normaliza factura
-a mayúsculas sólo cuando está facturada. Convierte la fecha a UTC mediante la regla
-compartida. Selecciona sólo detalles `isNew`; envía `materialId`, `Number(quantity)` y
-`Number(costPerUnitType)`. En edición sin detalles nuevos omite `details`.
+`mapPurchaseFormToRequest` mantiene el proveedor leído y toma receptor, fecha, factura y
+observaciones del formulario. Recorta observaciones, pasa factura a mayúsculas sólo si
+está facturada y convierte fecha a UTC con la regla compartida. Envía sólo detalles
+`isNew` con `materialId`, `Number(quantity)` y `Number(costPerUnitType)`; en edición sin
+nuevos omite `details`.
 
 No envía totales, importes derivados, `status` ni una copia completa de `PurchaseRow`.
 La corrección y cancelación usan `changeDetail` con IDs de documento y detalle.

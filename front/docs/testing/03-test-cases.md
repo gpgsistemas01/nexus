@@ -2,12 +2,9 @@
 
 ## Alcance
 
-Las fichas concretan captura, sesión, concurrencia, documentos, selección contextual y
-seguridad con datos reproducibles. Cada una utiliza el formato de seis columnas del
-[plan](01-test-plan.md): ID, precondiciones, datos, pasos, resultado esperado y limpieza.
-Los archivos de pruebas conservan su especificación ejecutable; la ficha enlaza su
-título y declara el límite de simulación. No se transcribe cada `it` ni se atribuye
-una ejecución aprobada por estar documentado.
+Las fichas documentan casos críticos de captura, sesión, concurrencia, documentos,
+selección y seguridad con el formato del [plan](01-test-plan.md). Enlazan la prueba
+ejecutable y sus límites; no copian cada `it`. Documentar un caso no demuestra que pasó.
 
 ## Ambiente y preparación
 

@@ -1,10 +1,8 @@
 # Ciclos de estado de los documentos
 
-Los diagramas muestran estados de negocio. Las etiquetas **acción [condición]**
-conservan las guardas que distinguen transiciones; los efectos de inventario se
-resumen una sola vez en la tabla común. Los modos de formulario no son estados.
-La notación **acción [guarda] / efecto** permite nombrar un efecto breve sin código.
-Aquí las acciones remiten a la tabla para no repetirlo en cada flecha.
+Las figuras muestran estados de negocio, no modos de formulario. La notación **acción
+[guarda] / efecto** identifica la acción, su condición y resultado. La tabla común detalla
+los efectos de inventario para evitar repetirlos en las flechas.
 
 ## Cumplimiento de una salida de material, consumible o merma
 
@@ -135,7 +133,6 @@ y en el [catálogo de casos de uso](../use-cases/index.md).
 | Cumplimiento de Salida y detalle | `RF-ISS-001` a `RF-ISS-006`, `RF-WST-002` a `RF-WST-006`, `RN-003`, `RN-014` a `RN-016`, `RN-028`, `RN-029`; familias `CU-SAL-*`. |
 | Estado de Compra y detalle | `RF-REC-002`, `RF-REC-007`, `RF-REC-008`, `RN-005`, `RN-017`; familias `CU-ENT-*`. |
 
-El cliente presenta el estado recibido y ofrece las acciones autorizadas; el nuevo
-estado se publica después de confirmar la operación. La lectura o apertura de un
-formulario no produce estas transiciones. Los modos de lectura, captura y recuperación
-se describen por separado en [Arquitectura](../../architecture/views/logical/states/index.md).
+El cliente muestra el estado recibido y lo actualiza tras confirmar una operación. Abrir
+un formulario no cambia ese estado. Los modos de captura y recuperación se explican en
+[Arquitectura](../../architecture/views/logical/states/index.md).

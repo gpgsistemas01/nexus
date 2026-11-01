@@ -2,10 +2,9 @@
 
 ## Propósito y funcionamiento
 
-La navegación y las páginas deben observar la misma sesión sin pasarla por cada
-componente visual. El arranque crea una instancia, configura el Router con ella
-y la proporciona a los descendientes mediante `provide/inject`. Un componente
-descendiente recupera esa instancia por la clave `authSessionKey`.
+El arranque crea una sesión, configura el Router y la comparte con `provide/inject`.
+Navegación y páginas recuperan esa instancia con `authSessionKey`, sin pasarla por los
+componentes visuales.
 
 ## Modelo general de provisión de estado de aplicación
 

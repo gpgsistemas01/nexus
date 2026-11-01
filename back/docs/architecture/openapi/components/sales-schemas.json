@@ -20,6 +20,9 @@
         "type": "integer",
         "minimum": 0,
         "readOnly": true
+      },
+      "isActive": {
+        "type": "boolean"
       }
     },
     "additionalProperties": false,
@@ -35,11 +38,16 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 255
+      },
+      "isActive": {
+        "type": "boolean",
+        "description": "Disponibilidad del cliente para operaciones nuevas."
       }
     },
     "additionalProperties": false,
     "required": [
-      "name"
+      "name",
+      "isActive"
     ]
   },
   "ClientList": {
@@ -93,13 +101,18 @@
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
+      },
+      "isActive": {
+        "type": "boolean",
+        "description": "Disponibilidad del cliente para operaciones nuevas."
       }
     },
     "additionalProperties": false,
     "required": [
       "name",
-      "expectedVersion"
+      "expectedVersion",
+      "isActive"
     ]
   }
 }

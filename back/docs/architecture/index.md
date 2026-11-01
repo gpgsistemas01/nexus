@@ -80,7 +80,7 @@ Comience con la [guía de incorporación](views/development/developer-onboarding
    [vista lógica](views/logical/index.md) → patrón relevante en la
    [vista de desarrollo](views/development/index.md).
 2. Para revisar una interacción web: [vista de escenarios](views/scenarios/index.md) →
-   [contrato API](openapi/api-contract.md) → [vista de procesos](views/processes/index.md).
+   [documentación API](openapi/index.md) → [vista de procesos](views/processes/index.md).
 3. Para revisar persistencia: [vista lógica](views/logical/index.md) → esquema y
    diccionario generados → servicio en la [vista de desarrollo](views/development/index.md).
 4. Para comprobar realización y cobertura: requisito o caso de uso →

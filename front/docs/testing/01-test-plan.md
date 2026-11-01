@@ -8,7 +8,10 @@ Los comandos y las rutas de esta guía son relativos a `front/`.
 
 ## Objetivo y alcance
 
-Este plan define la estrategia del cliente: rutas, captura, estado reactivo, contratos, selección, errores, interacción, descargas y compilación. Define la ubicación y el diseño de las pruebas Vue. Los requisitos están en la [especificación local](../requirements/requirements-specification/client-specification.md) y los recorridos en las fichas `CU-*`.
+Este plan organiza las pruebas de rutas, formularios, estado, contratos, selectores,
+errores, descargas y compilación. La
+[especificación](../requirements/requirements-specification/client-specification.md)
+define requisitos; las fichas `CU-*`, los recorridos.
 
 Las pruebas ejecutables están en `front/tests`. El [diseño](02-test-design.md)
 conserva riesgos y condiciones; el [registro](03-test-cases.md) añade fichas de
@@ -51,7 +54,9 @@ limpieza y aserciones del código de prueba.
 
 Navegador reutiliza las funciones `mockWarehouse`, `mockPurchases`, `mockIssues` y las fixtures del módulo. Los errores 401/403/409/503 se preparan como datos del caso; no se considera que un mock de éxito confirme una transacción de la API.
 
-Sistema requiere aplicar primero las migraciones a una base dedicada; después su setup genera identificadores y cuentas de prueba y elimina sólo sus filas/manifiesto. Sus credenciales no se copian a documentación ni se usa una cuenta personal. Si no existe ese ambiente, se registra el bloqueo en lugar de atribuir resultados reales a la suite simulada.
+En sistema, aplicar migraciones a una base dedicada; el setup crea cuentas e IDs y limpia
+sólo sus datos. Usar credenciales de prueba. Si falta el entorno, registrar el bloqueo; la
+simulación no aporta evidencia de persistencia.
 
 La [guía de archivos y credenciales](06-test-files-and-credentials.md) explica qué
 se configura en cada nivel, cómo cargar el entorno local y qué genera el setup.
@@ -79,14 +84,10 @@ niveles si cada uno aporta evidencia diferente.
 
 ### 2. Especificación del caso y datos
 
-Cada caso que requiere ficha documental registra al menos los datos de entrada y el
-resultado esperado que permiten
-decidir objetivamente si pasa. En operaciones de escritura, los datos de prueba deben
-identificar los valores que se intentan registrar y el resultado esperado debe indicar
-tanto la respuesta que devuelve el sistema como los datos que deben quedar persistidos
-o la ausencia de escritura. No basta con anotar «registro correcto» o únicamente el
-código HTTP. Los valores sensibles se reemplazan por fixtures o referencias
-reproducibles; no se copian credenciales ni datos personales reales.
+Cada ficha identifica entradas reproducibles y un resultado comprobable. En escrituras,
+indicar valores enviados, respuesta esperada y datos persistidos o ausencia de efectos. No
+basta «registro correcto» ni el código HTTP. Usar fixtures o referencias reproducibles,
+sin credenciales ni datos personales reales.
 
 | ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
 | --- | --- | --- | --- | --- | --- |
@@ -131,12 +132,11 @@ con secretos y datos personales excluidos.
 
 ## Entrada, suspensión y salida
 
-Se inicia con instalación reproducible, configuración compatible y datos/servicios del
-nivel elegido. Sistema requiere validación de aislamiento y migraciones antes de crear
-fixtures. Suspender un escenario si el entorno no permite garantizar aislamiento,
-falla su preparación o falta un servicio requerido; registrar el bloqueo y continuar
-comprobaciones independientes. Reanudar con la causa corregida, sin tratar el tiempo
-transcurrido como resultado aprobado.
+Iniciar con instalación reproducible y los datos y servicios del nivel elegido. En
+sistema, comprobar aislamiento y migraciones antes de crear fixtures. Si falla la
+preparación, falta un servicio o no se garantiza aislamiento, suspender el escenario y
+registrar el bloqueo. Continuar comprobaciones independientes y reanudar al corregir la
+causa.
 
 La salida exige casos pertinentes aprobados, fallos investigados, límites documentados
 y evidencia asociada a la revisión. Un porcentaje o conteo no decide suficiencia por sí

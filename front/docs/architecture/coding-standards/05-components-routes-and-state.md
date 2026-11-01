@@ -37,12 +37,10 @@ solicita un alta; el Workspace abre el auxiliar y devuelve la opción confirmada
 
 ## Estado reactivo
 
-Acceder con `.value` en script; el template desempaqueta las refs expuestas según Vue.
-Usar `computed` para derivados y una única fuente de verdad para cada dato. Evitar dos
-refs para la misma selección o duplicar un total que puede derivarse de la captura.
-Los cambios programáticos de precarga se distinguen de los cambios del usuario.
-Una llamada a un composable crea estado por instancia, salvo el contrato proporcionado
-explícitamente por aplicación.
+Usar `.value` en script; Vue desempaqueta las refs expuestas en el template. Calcular
+derivados con `computed` y conservar una sola fuente por dato. Distinguir precarga de
+cambios del usuario. Cada instancia de un composable tiene estado propio, salvo el
+contrato compartido de aplicación.
 
 Los modos fijos por instancia se tipan y el contenedor recrea el editor al cambiarlos.
 La sesión se crea una vez en `main.ts` y se proporciona con una InjectionKey tipada.
@@ -59,8 +57,7 @@ No añadir al menú rutas de otra aplicación ni construir destinos externos des
 
 ## Página y Workspace
 
-Una Page conecta sesión/permisos, composables y presentación. Un Workspace coordina
-módulos mediante contratos públicos, preserva el formulario principal y controla el
-auxiliar. La lógica de dominio permanece en el módulo; la UI no conoce transacciones
-ni persistencia. Extraer otra capa sólo cuando se pueda identificar su responsabilidad
-y consumidores sin repetir el coordinador existente.
+La Page conecta permisos, composables y presentación. El Workspace coordina módulos y
+conserva la captura principal al abrir auxiliares. El dominio permanece en su módulo; la
+UI no gestiona persistencia. Extraer capas sólo con una responsabilidad y consumidores
+distintos.

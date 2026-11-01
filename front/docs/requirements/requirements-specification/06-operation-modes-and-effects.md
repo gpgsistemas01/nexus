@@ -54,10 +54,9 @@ precisa el uso de registros inactivos.
 
 ## Separación de documentos e historia
 
-Las compras separan materiales y consumibles; las salidas separan materiales,
-consumibles y mermas. Cada documento debe tener al menos un detalle y todos,
-incluidos los cancelados, deben pertenecer a su contexto. Los documentos históricos
-vacíos o mixtos conservan su historia y quedan fuera de los flujos operativos; su
-regularización requiere un flujo aprobado, todavía no disponible.
-La [regla `RN-034`](catalog/05-cross-cutting-business-policies.md#identidad-y-estado-de-registros)
-detalla la separación de materiales y consumibles en consultas, reportes y escrituras.
+Compras separa materiales y consumibles; Salidas añade mermas. Cada documento requiere al
+menos un detalle y todos, incluso los cancelados, deben pertenecer a su contexto. Los
+históricos vacíos o mixtos se conservan fuera de la operación; su regularización aún
+requiere un flujo aprobado.
+[`RN-034`](catalog/05-cross-cutting-business-policies.md#identidad-y-estado-de-registros)
+define la separación en consultas, reportes y escrituras.

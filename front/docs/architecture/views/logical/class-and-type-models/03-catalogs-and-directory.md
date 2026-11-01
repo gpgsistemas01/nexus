@@ -49,10 +49,9 @@ classDiagram
 | `buildCatalogPayload` | Recorta nombre; incluye símbolo sólo en unidad de medida; envía estado y `expectedVersion` sólo en edición. |
 | `directoryPayload` | Cliente envía `name`; proveedor envía `legalName` y `tradeName`; ambos envían estado y versión sólo en edición. |
 
-La unión discriminada evita exigir un ID ficticio al alta. `version` es dato de lectura;
-`expectedVersion` es el nombre de escritura para comprobar la lectura utilizada.
-El ID localiza el registro, pero no demuestra que la captura siga vigente. Un conflicto
-conserva la captura y pide actualizar; no sustituye automáticamente su versión.
+El alta no necesita ID. `version` es la versión leída y `expectedVersion` la enviada para
+comprobarla: el ID identifica el registro, pero no asegura vigencia. Un conflicto conserva
+la captura y exige actualizar; no reemplaza su versión automáticamente.
 
 Los campos comunes de `DirectoryValues` facilitan reutilizar editor y flujo; no implica
 enviar todos los campos para ambos recursos. Tampoco existe un DTO universal compartido

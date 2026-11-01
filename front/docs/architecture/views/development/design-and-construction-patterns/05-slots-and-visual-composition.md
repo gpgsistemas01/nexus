@@ -2,10 +2,9 @@
 
 ## Propósito y funcionamiento
 
-Un slot es una región que un componente deja disponible para que su consumidor
-aporte contenido. Un slot con alcance también entrega datos a ese contenido.
-`ServerTable` reutiliza el marco y la paginación de la tabla, mientras cada recurso
-define cómo presentar sus celdas y acciones.
+El slot permite al consumidor aportar contenido; si tiene alcance, también recibe datos.
+`ServerTable` comparte estructura y paginación, mientras cada recurso define celdas y
+acciones.
 
 ## Modelo general de composición por slots
 
@@ -110,11 +109,10 @@ sequenceDiagram
 ## Código, contrato y límites
 
 [CatalogTable](../../../../../src/modules/catalogs/components/CatalogTable.vue) define
-`item.isActive` y `item.actions` usando el `item` recibido.
+`item.isActive` e `item.actions` con el `item` recibido y emite `edit` hacia la página.
 [ServerTable](../../../../../src/shared/components/ServerTable.vue) reenvía los slots a
-Vuetify y emite `options`; no consulta filas ni asigna permisos.
-El contenido del slot conserva el ámbito de `CatalogTable`; accede a la fila
-mediante el `item` recibido. `edit` se emite desde ese consumidor hacia la página.
+Vuetify y emite `options`; no consulta filas ni permisos. El contenido conserva el ámbito
+de `CatalogTable`.
 
 Otra aplicación es [RecordListPanel](../../../../../src/shared/components/RecordListPanel.vue):
 conserva estructura, carga y errores; `CatalogPage` aporta el botón en `actions`

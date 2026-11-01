@@ -31,17 +31,15 @@ vista y no registre el mismo recibo dos veces.
 8. Compruebe todos los detalles y pulse **Guardar** en el formulario principal.
 9. Espere la confirmación y localice el folio de la compra en el listado.
 
-Al agregar un detalle, **Cantidad** debe ser al menos 1 y **Costo por Presentación**
-debe ser mayor que cero. Si cambia de proveedor antes de guardar, se borran los
-detalles preparados y la selección de Persona que recibe; vuelva a revisarlos.
-Las fechas y horas de recepción corresponden al horario de Ciudad de México.
+**Cantidad** admite valores desde 1 y **Costo por Presentación** debe ser positivo.
+Cambiar de proveedor borra detalles preparados y Persona que recibe: vuelva a revisarlos.
+Las fechas y horas usan el horario de Ciudad de México.
 
 ![Compra en preparación con encabezado, detalle y totales estimados.](images/19-purchase-create.png)
 
-**Agregar** no registra una recepción: prepara un detalle local. **Guardar**
-confirma el documento y sus efectos. Las conversiones e importes mostrados durante
-la captura son una vista previa; compruebe los valores de la compra guardada.
-No escriba el importe total en el campo de costo por presentación.
+**Agregar** prepara una fila; **Guardar** registra la recepción. Conversiones e importes
+son vistas previas: compruebe la compra guardada. En costo por presentación capture el
+valor unitario, no el total.
 
 Si falta un proveedor o artículo y aparece su acción **Registrar**, utilice el
 alta secundaria. El artículo creado desde la compra no necesita repetir la
@@ -102,13 +100,15 @@ correctos; no escriba solamente la diferencia.
 
 ![Formulario de corrección de cantidad y costo de un detalle de compra.](images/21-purchase-correction.png)
 
-La cantidad correcta representa el valor final del detalle, no una diferencia.
-Puede ser una fracción menor que 1, pero siempre debe ser mayor que cero.
-No puede superar la cantidad recibida vigente. Puede conservar la cantidad si sólo
-cambia el costo; esa corrección no genera un cambio de existencia. Reducir la
-cantidad requiere saldo suficiente para revertir la diferencia.
-El sistema puede rechazar una corrección incompatible con las existencias actuales.
-No compense ese rechazo modificando un artículo distinto.
+Capture el valor final, no la diferencia:
+
+| Corrección | Regla |
+| --- | --- |
+| Cantidad correcta | Mayor que cero, incluso una fracción menor que 1; no puede superar la cantidad recibida vigente. |
+| Sólo costo | Puede conservar la cantidad; no cambia la existencia. |
+| Reducir cantidad | Requiere stock suficiente para revertir la diferencia. |
+
+Si la existencia impide corregir, revise el caso; no compense cambiando otro artículo.
 
 ## Cancelar un detalle
 

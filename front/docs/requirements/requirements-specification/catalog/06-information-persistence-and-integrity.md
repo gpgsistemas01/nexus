@@ -16,11 +16,9 @@
 
 ## Comprobación de datos
 
-Las referencias técnicas de esta sección son restricciones de representación, no
-atributos obligatorios de los diagramas conceptuales. Persona y Usuario corresponden a
-`Person` y `User` en el modelo persistente. Las garantías se revisan en el
-modelo y diccionario de datos
-y mediante pruebas de persistencia aisladas.
+Estas restricciones describen la representación técnica, no atributos exigidos al dominio.
+Persona y Usuario corresponden a `Person` y `User`. Sus garantías se verifican con el
+modelo, diccionario y pruebas de persistencia aisladas.
 
 - Para `RD-002`, comprobar que cantidades, costos e importes conservan la precisión
   declarada sin convertirla en una tolerancia de negocio inventada.

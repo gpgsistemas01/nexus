@@ -2,10 +2,9 @@
 
 ## Alcance
 
-Esta referencia define los intercambios entre formularios, contenedores y
-composables: props, eventos, callbacks y consultas de selectores. Las firmas
-completas permanecen en los tipos y `defineEmits` de sus fuentes; los datos HTTP se describen en el
-[contrato de la API consumida](client-contracts.md).
+Aquí se definen props, eventos, callbacks y consultas de selectores entre formularios,
+contenedores y composables. Las firmas completas están en los tipos y `defineEmits`; los
+datos HTTP, en el [contrato de la API](client-contracts.md).
 
 ## Props y propiedad de los datos
 

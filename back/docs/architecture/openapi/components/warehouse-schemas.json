@@ -602,100 +602,33 @@
     ]
   },
   "MaterialCreateRequest": {
-    "type": "object",
-    "properties": {
-      "name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 200
+    "description": "Seleccione el alta independiente o el contexto goodsReceipt.",
+    "oneOf": [
+      {
+        "$ref": "../openapi.json#/components/schemas/InventoryMaterialCreateRequest"
       },
-      "supplierId": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "presentationId": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "unitMeasureId": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "base": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
-        "multipleOf": 0.01,
-        "exclusiveMaximum": 100000000,
-        "exclusiveMinimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
-      },
-      "height": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
-        "multipleOf": 0.01,
-        "exclusiveMaximum": 100000000,
-        "exclusiveMinimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
-      },
-      "minStock": {
-        "type": [
-          "number",
-          "string",
-          "null"
-        ],
-        "minimum": 0,
-        "exclusiveMaximum": 1000000000000,
-        "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number.",
-        "multipleOf": 0.01
-      },
-      "maxUnitCost": {
-        "type": [
-          "number",
-          "string"
-        ],
-        "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
-        "multipleOf": 1e-06,
-        "exclusiveMaximum": 100000000,
-        "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
-      },
-      "isActive": {
-        "type": "boolean"
-      },
-      "newStock": {
-        "type": [
-          "number",
-          "string"
-        ],
-        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
-        "multipleOf": 0.01,
-        "exclusiveMaximum": 100000000,
-        "minimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
-      },
-      "observations": {
-        "type": "string",
-        "maxLength": 500
+      {
+        "$ref": "../openapi.json#/components/schemas/GoodsReceiptMaterialCreateRequest"
       }
-    },
-    "additionalProperties": false,
-    "required": [
-      "name",
-      "supplierId",
-      "presentationId",
-      "unitMeasureId",
-      "maxUnitCost",
-      "isActive",
-      "newStock"
+    ],
+    "examples": [
+      {
+        "name": "ARTICULO DE EJEMPLO",
+        "supplierId": "11111111-1111-4111-8111-111111111111",
+        "presentationId": "22222222-2222-4222-8222-222222222222",
+        "unitMeasureId": "33333333-3333-4333-8333-333333333333",
+        "isActive": true,
+        "maxUnitCost": 0,
+        "newStock": 0
+      },
+      {
+        "name": "ARTICULO DE EJEMPLO",
+        "supplierId": "11111111-1111-4111-8111-111111111111",
+        "presentationId": "22222222-2222-4222-8222-222222222222",
+        "unitMeasureId": "33333333-3333-4333-8333-333333333333",
+        "isActive": true,
+        "creationContext": "goodsReceipt"
+      }
     ]
   },
   "MaterialUpdateRequest": {
@@ -719,7 +652,7 @@
         "minimum": 0,
         "exclusiveMaximum": 1000000000000,
         "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number.",
+        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
         "multipleOf": 0.01
       },
       "maxUnitCost": {
@@ -731,7 +664,7 @@
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -775,7 +708,7 @@
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
       },
       "reasonId": {
         "type": "string",
@@ -823,7 +756,7 @@
           "string",
           "null"
         ],
-        "description": "Dimensión final de la merma. El formulario incluye su valor aunque el input esté deshabilitado. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensión transversal del material.",
+        "description": "Dimensi\u00f3n final de la merma. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensi\u00f3n transversal del material.",
         "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
@@ -835,7 +768,7 @@
           "string",
           "null"
         ],
-        "description": "Dimensión final de la merma. El formulario incluye su valor aunque el input esté deshabilitado. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensión transversal del material.",
+        "description": "Dimensi\u00f3n final de la merma. Para Rollo con pesos, el servidor recalcula la longitud y consulta la dimensi\u00f3n transversal del material.",
         "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
@@ -850,7 +783,7 @@
         "minimum": 0,
         "exclusiveMaximum": 1000000000000,
         "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number.",
+        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
         "multipleOf": 0.01
       },
       "maxUnitCost": {
@@ -862,7 +795,7 @@
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -953,7 +886,7 @@
         "minimum": 0,
         "exclusiveMaximum": 1000000000000,
         "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number.",
+        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
         "multipleOf": 0.01
       },
       "maxUnitCost": {
@@ -965,7 +898,7 @@
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -1050,7 +983,7 @@
       "requestDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": [
@@ -1099,7 +1032,7 @@
       "requestDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": [
@@ -1134,7 +1067,7 @@
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000,
-              "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+              "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
             }
           },
           "additionalProperties": false,
@@ -1187,7 +1120,7 @@
       "requestDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": [
@@ -1214,7 +1147,7 @@
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000,
-              "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+              "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
             }
           },
           "additionalProperties": false,
@@ -1261,7 +1194,7 @@
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000,
-              "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+              "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
             }
           },
           "additionalProperties": false,
@@ -1291,7 +1224,7 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
       },
       "observations": {
         "type": "string",
@@ -1324,7 +1257,7 @@
       "receptionDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": "string",
@@ -1349,7 +1282,7 @@
                 "string"
               ],
               "minimum": 1,
-              "description": "Cantidad por presentación, al menos uno; hasta 8 enteros y 2 decimales.",
+              "description": "Cantidad por presentaci\u00f3n, al menos uno; hasta 8 enteros y 2 decimales.",
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000
@@ -1396,7 +1329,7 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
       },
       "costPerUnitType": {
         "type": [
@@ -1407,7 +1340,7 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a número en el validador."
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
       }
     },
     "additionalProperties": false,
@@ -1673,7 +1606,7 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
       },
       "observations": {
         "description": "Nota opcional del documento individual de entrada de merma vinculado al movimiento ENTRY.",
@@ -1828,7 +1761,7 @@
       "receptionDate": {
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d+)?)?(?:Z|[+-]\\d{2}:\\d{2})?)?$",
-        "description": "Fecha ISO real en el calendario; admite sólo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
+        "description": "Fecha ISO real en el calendario; admite s\u00f3lo fecha o fecha/hora, con zona opcional. No acepta fechas imposibles como el 30 de febrero."
       },
       "observations": {
         "type": "string",
@@ -1853,7 +1786,7 @@
                 "string"
               ],
               "minimum": 1,
-              "description": "Cantidad por presentación, al menos uno; hasta 8 enteros y 2 decimales.",
+              "description": "Cantidad por presentaci\u00f3n, al menos uno; hasta 8 enteros y 2 decimales.",
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000
@@ -1878,7 +1811,7 @@
           ]
         },
         "minItems": 1,
-        "description": "Sólo partidas nuevas. Omitir el campo cuando no se agreguen partidas; una lista explícita vacía es inválida."
+        "description": "S\u00f3lo detalles nuevas. Omitir el campo cuando no se agreguen detalles; una lista expl\u00edcita vac\u00eda es inv\u00e1lida."
       }
     },
     "additionalProperties": false,
@@ -1887,5 +1820,207 @@
       "receivedById",
       "receptionDate"
     ]
+  },
+  "InventoryMaterialCreateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "presentationId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "unitMeasureId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "exclusiveMinimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+      },
+      "height": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "exclusiveMinimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "minimum": 0,
+        "exclusiveMaximum": 1000000000000,
+        "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
+        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
+        "multipleOf": 0.01
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+        "multipleOf": 1e-06,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "newStock": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "supplierId",
+      "presentationId",
+      "unitMeasureId",
+      "isActive",
+      "maxUnitCost",
+      "newStock"
+    ],
+    "description": "Alta independiente con costo m\u00e1ximo y existencia inicial."
+  },
+  "GoodsReceiptMaterialCreateRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "supplierId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "presentationId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "unitMeasureId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "base": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "exclusiveMinimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+      },
+      "height": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "pattern": "^(?:|\\d{1,8}(\\.\\d{1,2})?)$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "exclusiveMinimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+      },
+      "minStock": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "minimum": 0,
+        "exclusiveMaximum": 1000000000000,
+        "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
+        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
+        "multipleOf": 0.01
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
+        "multipleOf": 1e-06,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "newStock": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+        "multipleOf": 0.01,
+        "exclusiveMaximum": 100000000,
+        "minimum": 0,
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+      },
+      "observations": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "creationContext": {
+        "type": "string",
+        "enum": [
+          "goodsReceipt"
+        ],
+        "description": "Alta para una compra: omite costo m\u00e1ximo y existencia inicial; crea la oferta con stock cero."
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "supplierId",
+      "presentationId",
+      "unitMeasureId",
+      "isActive",
+      "creationContext"
+    ],
+    "description": "Alta para una compra: crea la oferta con stock cero y sin costo m\u00e1ximo; ambos campos se ignoran si se env\u00edan."
   }
 }

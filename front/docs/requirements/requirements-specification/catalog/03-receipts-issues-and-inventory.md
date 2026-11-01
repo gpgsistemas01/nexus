@@ -7,19 +7,15 @@ Las salidas de merma conservan sus recursos y movimientos propios.
 
 ## Alcance de áreas en Salidas
 
-Auxiliar y Coordinador de Almacén, además del Administrador del sistema, pueden
-consultar y registrar salidas para todas las áreas. Los usuarios de áreas operativas
-sólo pueden consultar, crear y editar solicitudes de sus áreas asignadas y autorizadas.
-La regla aplica a Materiales, Consumibles y Mermas, incluidos filtros, conteos,
-lectura por ID y reportes cuando el rol tiene permiso para exportarlos. Un filtro
-reduce el alcance de la sesión; nunca lo amplía.
+Almacén (Auxiliar y Coordinador) y el Administrador del sistema consultan y registran salidas de todas
+las áreas. Las cuentas operativas sólo consultan, crean y editan las de sus áreas
+autorizadas. Esto cubre Materiales, Consumibles y Mermas: filtros, conteos, lectura por ID
+y reportes permitidos. Los filtros reducen el alcance; no lo amplían.
 
-Si la respuesta completa de áreas disponibles contiene una sola opción, el cliente
-la selecciona automáticamente y mantiene el campo visible y deshabilitado en el
-alta y los filtros. Carga los solicitantes de esa área sin una selección manual.
-Con varias áreas autorizadas permite elegir; una coincidencia de búsqueda no debe
-bloquear el campo. La edición conserva el área registrada y limpiar filtros mantiene
-la única área obligatoria.
+Con una sola área en la respuesta completa, seleccionarla automáticamente y mostrarla
+deshabilitada en alta y filtros; cargar sus solicitantes. Limpiar filtros conserva esa
+área y la edición precarga la registrada. Con varias áreas, permitir elegir; un único
+resultado de búsqueda no bloquea el campo.
 
 En una edición, tanto el área original como la nueva deben estar autorizadas. El
 sistema debe rechazar altas o cambios a un área ajena y no debe exponer un documento

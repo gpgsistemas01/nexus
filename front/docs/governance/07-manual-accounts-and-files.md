@@ -124,9 +124,8 @@ Agregar un bloque por cuenta, con otro `id`, `label` y variables; por ejemplo,
 Separar los bloques con coma, sin coma final, y agregar sus credenciales al mismo
 `.env.manual.local`.
 
-Cada cuenta inicia una sesión independiente y tiene su propia carpeta. El manual
-muestra las áreas y roles detectados e incluye la unión de sus tareas permitidas.
-Dos cuentas con los mismos permisos pueden tener las mismas secciones.
+Cada cuenta tiene sesión y carpeta propias. Su manual muestra áreas, roles y tareas
+permitidas. Dos cuentas con iguales permisos pueden compartir secciones.
 
 ## 6. Completar las credenciales locales
 

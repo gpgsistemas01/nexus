@@ -27,10 +27,9 @@ los selectores de otros módulos.
 
 ![Formulario de una unidad de medida con nombre, símbolo y disponibilidad.](images/12-catalog-form.png)
 
-Use nombres consistentes y símbolos que otros operadores puedan interpretar.
-Cambiar un nombre no transforma por sí mismo los saldos ni las medidas de los
-artículos que ya lo utilizan. Si el sistema informa que el nombre ya existe,
-revise el registro existente en lugar de añadir variaciones para evitar el aviso.
+Use nombres y símbolos claros. Renombrarlos no cambia saldos ni medidas de artículos
+existentes. Si el nombre ya existe, revise ese registro en lugar de crear variaciones para
+evitar el aviso.
 
 ## Editar o desactivar
 

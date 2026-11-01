@@ -8,7 +8,7 @@
 | [ISO/IEC 25010:2023](https://www.iso.org/standard/78176.html) | Usar un vocabulario consistente para características de calidad y convertir sólo objetivos acordados en requisitos medibles. | Sirve para revisar la sección de calidad; no autoriza inventar umbrales de rendimiento, disponibilidad o seguridad. |
 | [ISO/IEC/IEEE 15289:2019](https://www.iso.org/standard/74909.html) | Orientar el contenido y ciclo de vida de los elementos de información sin imponer un formato único. | Se usa para revisar propósito, contenido, referencias y mantenimiento de visión y alcance y de los paquetes documentales, sin afirmar conformidad completa. |
 | [ISO/IEC/IEEE 29119-3:2021](https://www.iso.org/standard/79429.html) y [29119-4:2021](https://www.iso.org/standard/79430.html) | Separar diseño, especificación del caso y resultado real; elegir técnicas según condiciones y riesgos. | El [plan de pruebas](../../testing/test-plan.md) adapta formatos `DP-*`, `CP-*` y `EP-*` de forma selectiva. No se atribuyen tablas literales a ISO ni se declara conformidad; los resultados permanecen en CI o en la revisión del cambio. |
-| OpenAPI 3.1 | Versionar el contrato HTTP de rutas, parámetros, cuerpos, respuestas, errores y autenticación. | Es una especificación técnica complementaria, no una norma ISO ni un sustituto de requisitos o arquitectura. Su adopción sigue la estrategia de `api-contract.md`. |
+| OpenAPI 3.1 | Versionar el contrato HTTP de rutas, parámetros, cuerpos, respuestas, errores y autenticación. | Es una especificación técnica complementaria, no una norma ISO ni un sustituto de requisitos o arquitectura. Su mantenimiento se describe en la [guía API](../../architecture/openapi/02-maintenance.md). |
 
 ### Decisión para documentación técnica y rutas API
 
@@ -28,7 +28,7 @@ documentar una ruta Express. Para Nexus se combinan referencias según la pregun
 
 Por tanto, las tablas de símbolos, firmas y bloques de código de las referencias de
 [backend](../../architecture/views/development/backend-technical-documentation/index.md) y
-[frontend](../../architecture/views/development/frontend-technical-documentation/index.md) son una convención local
+[interfaz EJS](../../architecture/views/development/frontend-technical-documentation/index.md) son una convención local
 alineada selectivamente con 1016. Las fichas actuales del
 [contrato API](../../architecture/openapi/api-contract.md) se complementan con la
 [especificación OpenAPI 3.1](../../architecture/openapi/openapi.json). No se atribuye a ninguna ISO

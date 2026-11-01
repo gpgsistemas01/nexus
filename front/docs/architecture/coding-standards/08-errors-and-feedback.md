@@ -36,11 +36,11 @@ export const confirmMutation = (
 };
 ```
 
-El código `expected` procede del catálogo de la operación. Una respuesta HTTP exitosa
-con un código distinto produce un error y detiene la confirmación. En
-[directoryService.save](../../../src/modules/directory/services/directoryService.ts),
-esta comprobación precede a la normalización y devolución del registro; el
-coordinador comunica el éxito después de que el servicio termine correctamente.
+`expected` es el código de éxito de la operación. Otro código impide confirmar, aunque
+HTTP sea exitoso. En
+[directoryService.save](../../../src/modules/directory/services/directoryService.ts), la
+comprobación precede a normalizar y devolver el registro; el coordinador anuncia éxito
+después.
 
 ## Descargas y recursos
 

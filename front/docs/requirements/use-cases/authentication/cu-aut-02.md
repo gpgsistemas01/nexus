@@ -7,8 +7,8 @@
 | Actor | Usuario registrado con sesión autenticada. |
 | Disparador | Decide terminar su acceso a Nexus. |
 | Precondiciones | 1. El actor dispone de una sesión autenticada. |
-| Flujo principal | 1. **Actor:** selecciona «Cerrar sesión» **(ver E1)**.<br>2. **Nexus:** cierra el acceso de la sesión en ese navegador y lleva al actor a la página de inicio de sesión. |
-| Excepciones | **E1 — Acceso rechazado (después del paso 1):**<br>1. **Nexus:** comprueba las precondiciones y la autorización, determina que alguna no se cumple y rechaza la solicitud sin modificar datos ni exponer información no autorizada; comunica el motivo.<br>2. **Actor:** reconoce el rechazo; termina el caso de uso. |
+| Flujo principal | 1. **Actor:** pulsa **Cerrar sesión** en el menú de la aplicación.<br>2. **Nexus:** termina el acceso de ese navegador y dirige al actor a la página de inicio de sesión, incluso si la sesión ya había vencido **(ver EOP)**. |
+| Excepciones | **EOP — Respuesta de cierre no disponible (durante el paso 2):**<br>1. **Nexus:** no devuelve una respuesta que confirme el cierre y la navegación no llega al formulario de acceso; el resultado queda sin confirmar. Termina el caso de uso y requiere comprobar de nuevo la sesión antes de acceder a contenido protegido. |
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** La sesión queda cerrada en ese navegador; el actor debe volver a iniciar sesión para acceder al contenido protegido.<br>2. **Fallo:** El sistema no debe presentar contenido protegido sin volver a comprobar una sesión válida. |
 | Requisitos relacionados | `RF-AUT-003`, `RN-001`. |
 

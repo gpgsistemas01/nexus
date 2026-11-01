@@ -2,10 +2,9 @@
 
 ## Cómo consultar este glosario
 
-Busque la sección relacionada con su tarea. Cada tabla explica las palabras que
-encontrará en las pantallas y qué debe comprobar al utilizarlas. Para realizar una
-operación, siga los pasos del capítulo correspondiente. Conocer un término no
-significa que su cuenta tenga acceso a esa acción.
+Busque los términos de su tarea y siga el procedimiento del capítulo correspondiente. Las
+tablas explican qué significan y qué revisar; conocerlos no concede permiso para realizar
+la acción.
 
 ## Navegación y captura
 

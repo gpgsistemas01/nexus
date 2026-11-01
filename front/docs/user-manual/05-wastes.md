@@ -2,10 +2,9 @@
 
 ## Consultar una merma
 
-Abra **Almacén → Mermas**. En **Tabla de Mermas**, busque por nombre y proveedor,
-revise las medidas y distinga cantidad de piezas o presentaciones de su conversión.
-Utilice **Detalles de peso** cuando esté disponible para consultar los pesos
-conservados del registro; **Cerrar detalles** termina esa consulta.
+Abra **Almacén → Mermas**. Busque por nombre y proveedor y revise medidas, cantidad y
+conversión. **Detalles de peso** muestra los pesos guardados cuando están disponibles;
+**Cerrar detalles** termina esa consulta.
 
 ![Tabla de mermas con sus medidas y existencias.](images/08-wastes-list.png)
 

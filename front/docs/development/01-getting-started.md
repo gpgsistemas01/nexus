@@ -209,7 +209,7 @@ no instala dependencias.
 | Compilación | `front/dist`, producido por `build`. |
 | Resultados documentales y de pruebas | `front/build/docs` y `front/build/test-results`. |
 
-Git no recupera estos archivos. Conserva los entornos ya configurados y regenera
-los resultados con sus comandos; no edites `node_modules` ni el cliente Prisma.
-Las [credenciales de manuales](../governance/07-manual-accounts-and-files.md) y las
-[de pruebas](../testing/06-test-files-and-credentials.md) se preparan en sus guías.
+Estos archivos son locales. Conservar los entornos configurados y regenerar resultados con
+sus comandos; no editar `node_modules` ni Prisma. Las guías de
+[manuales](../governance/07-manual-accounts-and-files.md) y
+[pruebas](../testing/06-test-files-and-credentials.md) explican sus credenciales.

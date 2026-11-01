@@ -21,11 +21,10 @@ de entrada/salida; también define las plantillas DP, CP y EP. La
 
 ## Aserciones y dobles
 
-Comprobar valores, transición visible, payload, respuesta y ausencia de solicitudes
-al cancelar o rechazar. No fijar HTML literal, clases internas de Vuetify ni llamadas
-privadas sin un contrato observable que lo justifique. Un adaptador simulado permite
-observar transporte; una prueba de sistema comprueba persistencia cuando ése sea
-su objetivo.
+Comprobar valores, estados visibles, payload, respuesta y ausencia de requests al cancelar
+o rechazar. Evitar HTML literal, clases de Vuetify y llamadas privadas sin contrato
+observable. El adaptador prueba transporte; sistema verifica persistencia cuando
+corresponde.
 
 La matriz CRUD y las condiciones de conflicto/permisos se eligen desde el
 [plan](01-test-plan.md#cobertura-crud-mínima). Las matrices extensas pertenecen al

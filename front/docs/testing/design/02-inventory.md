@@ -27,11 +27,10 @@ identifica marcos, estilos y selectores propios. El
 [contrato HTTP](../../architecture/contracts/client-contracts.md) define las respuestas
 que estas pruebas admiten o rechazan.
 
-Las pruebas del frontend usan rutas `/api/*` porque comprueban el contrato que
-consume Vue. El adaptador simulado de Axios conserva sus transformaciones e
-interceptores reales sin arrancar Express; Chromium usa componentes reales con
-respuestas de API simuladas. Las pruebas HTTP/Prisma permanecen en `back/tests`.
-No se importa el código privado del backend en la suite de Vue.
+Las rutas `/api/*` prueban el contrato de Vue. El adaptador Axios conserva
+transformaciones e interceptores; Chromium usa componentes reales con API simulada. Las
+integraciones HTTP/Prisma quedan en `back/tests`, sin importar código privado al cliente.
+Véanse los [límites por nivel](../01-test-plan.md#niveles-y-entornos).
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
@@ -42,14 +41,11 @@ No se importa el código privado del backend en la suite de Vue.
 | `DP-VUE-WH-009` | RF-VUE-006/007/008; captura e inventario | Unitario y navegador; apertura → foco sin captura → edición → validación → envío → reapertura | Cargar catálogos o perder foco sin modificar no publica errores. Validar un campo editado no muestra errores de los campos intactos; enviar valida toda la captura. Reabrir no conserva errores anteriores. Login aplica la misma política. | [inventoryFormTest.ts](../../../tests/unit/modules/warehouse/inventoryFormTest.ts); [warehouse.spec.ts](../../../tests/e2e/warehouse.spec.ts) |
 | `DP-VUE-WH-010` | RF-VUE-006/007/008; captura e inventario | Unitario; fronteras antes/a los 30 s y transiciones visible/oculta, modal abierto/cerrado, consulta pendiente/fallida y desmontaje | Foco no repite una lectura reciente. La recarga automática no solapa consultas ni activa la carga de la tabla; conserva filas idénticas. Pausa con modal/pestaña oculta, renueva datos vencidos al volver, admite reintento manual y descarta respuestas tras desmontar. | [inventoryListTest.ts](../../../tests/unit/modules/warehouse/inventoryListTest.ts); [warehouse.spec.ts](../../../tests/e2e/warehouse.spec.ts) |
 
-Las pruebas de `usePagedList` comprueban catálogo y recarga de
-inventario en sus consumidores. `inventoryListTest.ts` cubre las particiones sin
-permiso de lectura (ninguna consulta manual o automática) y página fuera de rango
-(salto directo a la última disponible). Las pruebas existentes de login, inventario
-y catálogos siguen comprobando la política de campos intactos/editados y el envío
-completo mediante `useFormInteraction`. Los recorridos de navegador utilizan
-los formularios y botones reales; cada catálogo tiene su propio caso de alta y su
-propio límite de ejecución. No se agregan pruebas de clases CSS ni del formato.
+`usePagedList` se prueba desde catálogo e inventario. `inventoryListTest.ts` cubre falta
+de permiso (sin consultas manuales ni automáticas) y página fuera de rango (última
+disponible). Login, inventario y catálogos comprueban campos intactos/editados y envío
+mediante `useFormInteraction`. Navegador usa controles reales y un alta por catálogo, sin
+fijar CSS o formato.
 
 Los casos `apiClientTest.ts` mantienen renovación única, límite de un reintento,
 rechazo público sin refresh, errores de red sin repetición de escritura y cancelación.

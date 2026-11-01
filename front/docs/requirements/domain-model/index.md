@@ -2,10 +2,8 @@
 
 ## Propósito y alcance
 
-El dominio explica qué significan los datos que el usuario consulta y modifica en
-Nexus. Sus conceptos son independientes de los componentes Vue y de los nombres de
-las tablas. Las relaciones se agrupan en cinco cortes del mismo modelo: repetir Persona o
-Proveedor mantiene su significado y permite leer cada operación sin una figura única saturada.
+El dominio define los datos del negocio, independientemente de componentes o tablas. Las vistas comparten conceptos como Persona y Proveedor; cada una muestra las relaciones
+necesarias para una operación.
 
 | Corte | Pregunta | Figura |
 | --- | --- | --- |
@@ -34,12 +32,12 @@ La validación comprueba esa diferencia antes de guardar y la API vuelve a verif
 
 ## Correspondencia con la arquitectura
 
-El [glosario](../business-glossary.md) define el vocabulario y la
-[especificación](../requirements-specification/index.md) establece obligaciones.
-Los [casos de uso](../use-cases/index.md) explican las acciones del actor.
-Los [modelos de interfaces y tipos](../../architecture/views/logical/class-and-type-models/index.md)
-representan cómo esos conceptos se proyectan en memoria: IDs, etiquetas, filas,
-capturas y documentos. No se deduce una clase de implementación por cada concepto.
+El [glosario](../business-glossary.md) define términos; la
+[especificación](../requirements-specification/index.md), obligaciones; los [casos de
+uso](../use-cases/index.md), acciones. Los [modelos de
+tipos](../../architecture/views/logical/class-and-type-models/index.md) muestran IDs,
+etiquetas, filas y capturas del cliente. Un concepto de negocio no implica una clase de
+implementación.
 
 Las cifras de existencia, costos, permisos y efectos persistentes proceden de la API.
 El modelo no atribuye al navegador autorización ni contabilidad definitiva de inventario.

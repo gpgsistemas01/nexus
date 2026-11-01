@@ -2,10 +2,9 @@
 
 ## Propósito y frontera
 
-Esta referencia describe solicitudes, respuestas y errores de los servicios del
-cliente. Sus fuentes son los adaptadores de `shared/http` y los servicios/mappers
-de cada dominio. Los [contratos de formularios](form-and-event-contracts.md)
-definen los intercambios internos de la interfaz.
+Esta referencia define solicitudes, respuestas y errores de `shared/http` y los
+servicios/mappers. Los intercambios internos de la interfaz están en [Formularios y
+eventos](form-and-event-contracts.md).
 
 `shared/http/apiClient` es el punto HTTP compartido. Los servicios codifican los IDs
 de ruta y construyen filtros mediante URLSearchParams/adaptadores compartidos.
@@ -34,7 +33,8 @@ define el alcance de cada acceso.
 | Salidas | Base `/api/warehouse/goods-issues/materials`, `/consumables` o `/api/warehouse/waste-issues`: GET listado/ID, POST alta, PATCH edición; `/:id/header` para encabezado y `/:id/details` para surtido. Devolución: PATCH `/:id/details/:detailId/returns`. |
 | Reportes | Servicios del recurso construyen filtros/alcance y llaman `requestExcel`. La paginación se elimina. Los endpoints y diferencias de alcance permanecen en cada servicio de reporte. |
 
-La tabla describe contratos existentes del cliente, no habilita todas las acciones para todos los recursos o cuentas. Por ejemplo, la UI de merma no presenta una baja genérica de material ni un formulario de stock inicial de compra.
+Las acciones disponibles dependen del recurso y los permisos. Merma no ofrece una baja
+genérica de material ni stock inicial desde compra.
 
 `loginRequest` exige el código `SUCCESS_LOGIN`; otro resultado no confirma el acceso.
 La preferencia local del nombre tiene su propietario y vida útil en el
@@ -51,9 +51,13 @@ La paginación del control se desarrolla en la
 
 ## Escrituras y confirmación
 
-El payload se construye por recurso y operación. Una fila leída no se envía completa como captura. `confirmMutation` exige el código de éxito esperado; una respuesta genérica, de otro recurso u omitida no confirma la escritura. El mensaje se obtiene del catálogo público por código y se presenta como texto.
+Construir el payload por recurso y operación, sin reenviar la fila completa.
+`confirmMutation` exige el código de éxito esperado; sólo entonces se muestra su mensaje
+del catálogo público, como texto.
 
-Los lectores de registros comprueban ID, versión, campos y estado necesarios; los mappers de documentos comprueban estructura y recurso. TypeScript sólo comprueba código estático: el JSON real requiere estas verificaciones. No se inventa costo cero, versión o detalle vacío para encubrir una respuesta incompleta.
+Los lectores validan ID, versión, campos y estado; los mappers, estructura y recurso.
+Estas comprobaciones validan el JSON recibido, que TypeScript no verifica en ejecución.
+Una respuesta incompleta se rechaza, sin inventar costos, versiones o detalles.
 
 | Metadato | Uso y regla del cliente |
 | --- | --- |

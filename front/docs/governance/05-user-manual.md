@@ -2,10 +2,9 @@
 
 ## Audiencia y alcance
 
-El [manual](../user-manual/index.md) enseña las tareas de la interfaz Vue paso a
-paso. Cada capítulo agrupa una página o familia de tareas e incluye preparación,
-campos, pasos, resultado e incidencias. Las etiquetas y capturas corresponden a
-las pantallas actuales; la persona que lo lee no necesita conocimientos técnicos.
+El [manual](../user-manual/index.md) enseña cada tarea paso a paso, sin conocimientos
+técnicos. Cada capítulo incluye preparación, campos, pasos, resultado e incidencias; sus
+etiquetas y capturas corresponden a las pantallas actuales.
 
 Este capítulo mantiene la fuente completa y sus capturas ficticias. Para obtener
 una edición con el acceso de una cuenta, seguir el
@@ -21,11 +20,9 @@ una edición con el acceso de una cuenta, seguir el
 | Sección `manual` de [publications.json](../publications.json) | Entrada propia, excluida del libro técnico completo. |
 | [Configuración Playwright](../../playwright.manual.config.ts) y [recorridos](../../tests/manual/manualScreenshots.spec.ts) | Generación de capturas de referencia. |
 
-Al cambiar una pantalla, actualizar el procedimiento y la imagen afectados.
-Mantener las advertencias junto a la acción y los términos del negocio en el
-glosario. No trasladar al manual nombres de contratos o patrones técnicos.
-Las instrucciones de surtido y devolución se incluyen sólo en ediciones con ese
-permiso; el generador filtra los bloques del manual y del glosario por acceso.
+Actualizar procedimiento y captura junto a la pantalla. Mantener advertencias junto a la
+acción y términos de negocio en el glosario, sin contratos o patrones técnicos. El
+generador filtra manual y glosario por permisos, incluidos surtido y devolución.
 
 ## Generar las capturas
 
@@ -53,11 +50,10 @@ Para revisar un recorrido concreto:
 npm run docs:screenshots -- --grep "compras:"
 ```
 
-Las imágenes de otros capítulos se conservan. Antes de publicar, ejecutar el
-conjunto completo y revisar los cambios en las imágenes. Ante un fallo, corregir
-la preparación o el selector; no omitir la captura requerida ni cambiar la
-aplicación para obtenerla. El reporte queda en
-`front/build/test-results/manual.xml`; los rastros de fallo son artefactos ignorados.
+Conservar las imágenes de otros capítulos y ejecutar el conjunto completo antes de
+publicar. Ante fallos, corregir preparación o selector sin omitir capturas ni cambiar la
+aplicación. El reporte es `front/build/test-results/manual.xml`; las trazas permanecen
+ignoradas.
 
 ## Comprobar y exportar
 

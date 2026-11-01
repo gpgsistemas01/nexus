@@ -9,7 +9,7 @@
 | Seguridad | [Estándar del cliente](../architecture/security-standards.md) | Tratamiento de captura, salida segura, sesión, secretos y límites del navegador. |
 | Construcción de pruebas | [Estándar de pruebas](../testing/07-test-standards.md) | Organización, nombres, aislamiento, aserciones, dobles y mantenimiento del código de prueba. |
 | Estrategia y registros de pruebas | [Plan de pruebas](../testing/01-test-plan.md) | Niveles, riesgos, técnicas, criterios y plantillas DP/CP/EP. |
-| Especificación funcional | [Convenciones de requisitos](../requirements/requirements-specification/02-conventions.md) y [plantilla CU](../requirements/use-cases/index.md) | Obligaciones, identificadores, estados y descripción completa de objetivos. |
+| Especificación funcional | [Convenciones de requisitos](../requirements/requirements-specification/02-conventions.md) y [estructura CU](01-documentation-rules.md#fichas-de-casos-de-uso) | Obligaciones, identificadores, estados y descripción completa de objetivos. |
 | Documentación | [Reglas editoriales](01-documentation-rules.md) | Redacción, estructura, granularidad, mantenimiento y propiedad del contenido. |
 | Diagramación | [Reglas de figuras](01-documentation-rules.md#figuras-y-fuentes) y [guía visual](../architecture/views/diagram-reading.md) | Elaboración y lectura de modelos por familia. |
 | Referencias ISO/IEEE y Vue | [Aplicabilidad](03-standard-applicability.md) | Referencias seleccionadas y adaptación al proyecto, sin declaración de conformidad integral. |
@@ -24,9 +24,8 @@ que corresponden a cada cambio.
 Definir cada regla transversal una vez en la fuente de la tabla. Los consumidores
 la enlazan y describen sólo su aplicación; los índices facilitan la búsqueda.
 
-Los casos de uso y prueba conservan su preparación, pasos y resultados para poder
-ejecutarse. El manual conserva las advertencias junto a la acción. Esa información
-contextual permite consultar una tarea completa sin copiar normas generales.
+Cada caso conserva preparación, pasos y resultados; el manual, advertencias junto a la
+acción. Esto permite seguir una tarea completa sin copiar las normas generales.
 
 Instalación, ejecución y publicación pertenecen a sus guías operativas; las
 decisiones arquitectónicas explican la solución y sus motivos.

@@ -51,10 +51,9 @@ npm --prefix front run test:unit
 npm --prefix front run test:e2e
 ```
 
-No cree un archivo de credenciales para estos dos comandos. Las fixtures están en
-`front/tests/fixtures` y en los archivos `*Fixtures.ts` de `front/tests/e2e`. Los
-casos simulan los contratos de la API y los estados válidos o rechazados del login.
-Una contraseña escrita en esos casos sólo es un dato del escenario simulado.
+Estos comandos usan fixtures de `front/tests/fixtures` y `*Fixtures.ts` de
+`front/tests/e2e`, sin archivo de credenciales. Las respuestas de API y login son
+simuladas; las contraseñas son datos del escenario.
 
 Para un recorrido concreto:
 
@@ -82,10 +81,8 @@ Las rutas de la tabla son relativas a `front/`.
 | `../back/.env` | Configuración habitual de Express. No coloque la base de prueba en `DATABASE_URL` para hacer funcionar un caso. Las pruebas seleccionan `DATABASE_TEST_URL` con `NODE_ENV=test`. |
 | `manual.accounts.local.json` / `.env.manual.local` | Pertenecen a las capturas de manuales por cuentas existentes. Las pruebas unitarias, de navegador y de sistema no leen esos archivos. |
 
-Las pruebas de sistema leen las variables del proceso. No requieren un archivo
-JSON de cuentas ni tienen un archivo local de credenciales que deba rellenarse.
-`npm run test:e2e:system` no carga automáticamente un archivo `.env.test.local`.
-Use las variables de terminal del siguiente procedimiento o las de su CI.
+Sistema lee variables del proceso; no necesita JSON de cuentas ni carga `.env.test.local`
+automáticamente. Prepararlas en la terminal según el procedimiento siguiente, o en CI.
 
 ## 4. Preparar PostgreSQL para sistema
 
@@ -105,10 +102,9 @@ Si todavía no dispone de ese entorno, puede ejecutar unitarias y navegador simu
 
 ### Definir las variables de conexión
 
-La [preparación de sistema](05-system-tests.md#preparación-desde-la-raíz) contiene
-los bloques completos para PowerShell y Bash. Sustituya los valores de demostración
-por las conexiones proporcionadas para su entorno. Cada asignación pertenece a la
-terminal donde se ejecutará el comando, no a un formulario de Nexus.
+[Preparación de sistema](05-system-tests.md#preparación-desde-la-raíz) contiene los
+bloques PowerShell y Bash. Sustituir las conexiones de ejemplo por las del entorno y
+asignarlas en la terminal del comando.
 
 | Variable | Significado |
 | --- | --- |
@@ -160,22 +156,17 @@ entorno para estos comandos; no necesita un archivo de credenciales de manuales.
 
 ## 5. Cómo se generan las credenciales de Nexus
 
-En sistema, [tests/system/setup.ts](../../tests/system/setup.ts) genera un sufijo
-único, un nombre de usuario y una contraseña aleatoria de fixture. Crea en la base
-aislada una cuenta con acceso de Administrador del sistema en Sistemas y otra
-cuenta de contraste para los reportes. También prepara proveedores y un cliente
-que debe quedar fuera de los resultados filtrados.
+[tests/system/setup.ts](../../tests/system/setup.ts) genera IDs únicos y credenciales
+aleatorias. En la base aislada crea una cuenta administradora en Sistemas, otra de
+contraste para reportes, proveedores y un cliente que debe excluirse al filtrar.
 
-El setup guarda temporalmente esos datos en
-`build/test-results/system-fixture.json`. El caso los lee para ingresar desde Vue;
-no necesita crear cuentas manualmente ni usar las credenciales de un empleado.
-Ese JSON contiene la contraseña de prueba en claro: lo escribe y elimina la
-automatización, está ignorado y no es una plantilla que deba rellenarse o distribuirse.
+El setup guarda las credenciales en `build/test-results/system-fixture.json` para que Vue
+inicie sesión; no se requieren cuentas personales ni altas manuales. La automatización
+crea y elimina este archivo ignorado, con contraseña en claro: no rellenarlo ni
+distribuirlo.
 
-El caso puede escribir datos a través de la aplicación; no es un recorrido de
-capturas sin escrituras. El teardown elimina las filas propias y el JSON temporal.
-Las trazas de fallo pueden contener los datos de esa sesión de prueba; se mantienen
-como evidencia local o de CI, no como imágenes del manual.
+Estas pruebas escriben datos; el teardown elimina sus filas y JSON. Las trazas de fallo
+pueden contener datos de sesión: son evidencia local o de CI, no capturas del manual.
 
 ## 6. Resultados, limpieza y recuperación
 

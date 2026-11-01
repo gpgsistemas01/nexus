@@ -2,22 +2,16 @@
 
 ## Elegir el contexto y consultar
 
-Abra **Salidas → Materiales**, **Consumibles** o **Mermas**. Busque por folio o
-proyecto y utilice los filtros disponibles de encabezado, fechas y **Observaciones
-contiene:**. Pulse **Buscar**. Cada tabla reúne las solicitudes de su contexto;
-no mezcle una salida de material con una salida de merma del mismo nombre.
+Abra **Salidas → Materiales**, **Consumibles** o **Mermas**. Busque por folio o proyecto,
+aplique filtros de encabezado, fechas u **Observaciones contiene:** y pulse **Buscar**.
+Cada tabla contiene sólo su contexto; no mezcle material y merma del mismo nombre.
 
-Con acceso de Auxiliar o Coordinador de Almacén puede consultar y registrar salidas
-para todas las áreas. Si pertenece a un área operativa, sólo verá sus áreas
-autorizadas y sólo podrá registrar solicitudes para ellas. Por ejemplo, una cuenta
-asignada únicamente a Impresión no puede registrar una solicitud para Router.
-Limpiar los filtros no permite consultar documentos de otras áreas.
+Auxiliar y Coordinador de Almacén consultan y registran salidas de todas las áreas. Las
+cuentas operativas sólo acceden a sus áreas autorizadas: una cuenta asignada sólo a Impresión no puede solicitar para Router. Limpiar filtros no amplía ese acceso.
 
-Cuando sólo tenga un área disponible, **Área** se selecciona automáticamente y
-permanece visible y bloqueada, tanto en los filtros como en el formulario. No
-necesita seleccionarla ni puede borrarla. **Limpiar filtros** conserva esa área y
-retira los filtros opcionales. Si tiene varias áreas autorizadas, el selector
-permite elegir entre ellas.
+Si sólo tiene un área, **Área** se selecciona y queda visible y bloqueada en filtros y
+formulario. **Limpiar filtros** la conserva y retira los filtros opcionales. Con varias
+áreas autorizadas, puede elegir entre ellas.
 
 ![Listado de salidas con búsqueda, filtros y acciones por documento.](images/22-issues-list.png)
 
@@ -108,12 +102,11 @@ no se corrige cerrando la ventana después de guardar.
 
 ![Selección de detalles pendientes para surtir.](images/24-issue-supply.png)
 
-La selección surte toda la cantidad pendiente de cada detalle. Una salida queda
-**Surtido parcial** si todavía tiene otros detalles pendientes; no se captura
-libremente una entrega parcial de un detalle. **Cantidad de proyecto** es un dato de referencia del proyecto; no
-sustituye la cantidad de inventario que se entrega. No marque una entrega que
-todavía no se ha realizado. El sistema vuelve a comprobar existencias y estado
-al confirmar; otra operación puede haberlos cambiado desde que abrió la pantalla.
+La selección entrega toda la cantidad pendiente del detalle, sin capturar una entrega
+parcial. La salida queda **Surtido parcial** si tiene otros detalles pendientes.
+**Cantidad de proyecto** es una referencia, no la cantidad de inventario. Marque sólo
+entregas realizadas; al confirmar, el sistema vuelve a comprobar stock y estado porque
+pueden haber cambiado.
 <!-- manual:end -->
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->

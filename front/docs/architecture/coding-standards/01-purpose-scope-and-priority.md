@@ -2,10 +2,9 @@
 
 ## Alcance
 
-Las reglas se aplican a SFC, TypeScript, funciones, módulos, estilos y configuración
-escritos para el cliente. Regulan cómo expresar y separar el código; los requisitos
-establecen el comportamiento y las vistas de arquitectura explican su realización.
-Las herramientas y versiones se consultan en [Herramientas](../../development/02-tooling.md).
+Estas reglas cubren SFC, TypeScript, funciones, módulos, estilos y configuración del
+cliente. Los requisitos definen el comportamiento; Arquitectura, su implementación. Las
+versiones están en [Herramientas](../../development/02-tooling.md).
 
 ## Aplicación
 
@@ -15,10 +14,9 @@ Las herramientas y versiones se consultan en [Herramientas](../../development/02
 4. Si prosa, configuración y código difieren, corregir las fuentes afectadas dentro
    del alcance del cambio.
 
-Pasar lint no demuestra separación de responsabilidades. La revisión comprueba
-consumidores, efectos y dirección de dependencias, además del formato automatizado.
-Los ejemplos ilustran la convención; las fuentes operativas siguen siendo el código
-y su configuración.
+Lint comprueba las reglas automatizadas; la revisión verifica responsabilidades,
+consumidores, efectos y dependencias. Los ejemplos ilustran las convenciones; el código y
+su configuración son las fuentes operativas.
 
 ### Ejemplo de aplicación
 

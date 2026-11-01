@@ -171,7 +171,10 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/views/processes/shared-runtime-behavior')
             ]),
             'contrato-api': [
-                'docs/architecture/openapi/api-contract.md'
+                'docs/architecture/openapi/index.md',
+                'docs/architecture/openapi/01-consumption.md',
+                'docs/architecture/openapi/api-contract.md',
+                'docs/architecture/openapi/02-maintenance.md'
             ],
             estandar: packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/coding-standards')

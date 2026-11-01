@@ -2,17 +2,16 @@
 
 ## Propósito y lectura
 
-Esta colección representa la estructura estática que realmente consume Vue: interfaces
-TypeScript, tipos derivados, contratos de props/eventos y la clase de error HTTP.
-El [dominio conceptual](../../../../requirements/domain-model/index.md) explica los
-conceptos del negocio; estos diagramas explican cómo los transporta y conserva el cliente.
-No se exige convertir composables o componentes funcionales en clases.
+Estos diagramas muestran interfaces, tipos, props/eventos y la clase de error HTTP que usa
+Vue. El [dominio](../../../../requirements/domain-model/index.md) define su significado de
+negocio; aquí se muestra su estructura en el cliente, sin convertir componentes o
+composables en clases.
 
-Los capítulos siguientes son vistas de lectura por responsabilidad. La
-[referencia de contratos TS/SFC](../type-reference/index.md) reúne en tablas los
-campos, firmas, uniones y referencias de los contratos declarados en `src/`.
-Su [procedimiento de generación y publicación](../../../../governance/02-generation-and-publication.md#referencia-de-contratos-declarados)
-conserva comandos y resultados.
+Los capítulos se agrupan por responsabilidad. La [referencia
+TS/SFC](../type-reference/index.md) detalla campos, firmas, uniones y relaciones de
+`src/`; su [guía de
+generación](../../../../governance/02-generation-and-publication.md#referencia-de-contratos-declarados)
+reúne los comandos.
 
 | Capítulo | Estructura representada | Figuras | Declaraciones |
 | --- | --- | --- | --- |

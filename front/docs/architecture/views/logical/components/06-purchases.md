@@ -70,7 +70,6 @@ flowchart TB
     line --> details
 ```
 
-Los controles son Vuetify y los avisos de confirmación usan SweetAlert2. El mapa de imports
-no describe el callback de un alta ni el orden de la relectura: los
-[procesos](../../processes/06-purchases/index.md) y los [estados](../states/01-purchases.md)
-explican esas colaboraciones.
+Vuetify aporta controles y SweetAlert2, confirmaciones. Los callbacks de altas y la
+relectura se explican en [Procesos](../../processes/06-purchases/index.md); los modos, en
+[Estados](../states/01-purchases.md).

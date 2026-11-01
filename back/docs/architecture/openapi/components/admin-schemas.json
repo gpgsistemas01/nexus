@@ -251,7 +251,7 @@
           ]
         },
         "minItems": 1,
-        "description": "Cada fila contiene UUID v4 de área y rol. No se permite repetir área, incluso con diferente capitalización del UUID."
+        "description": "Cada fila contiene UUID v4 de \u00e1rea y rol. No se permite repetir \u00e1rea, incluso con diferente capitalizaci\u00f3n del UUID."
       }
     },
     "additionalProperties": false,
@@ -272,11 +272,12 @@
         "type": "string",
         "minLength": 6,
         "maxLength": 50,
-        "description": "Entre 6 y 50 caracteres admitidos, al menos una mayúscula y un número. No requiere un carácter especial. Se conserva el texto exacto."
+        "description": "Entre 6 y 50 caracteres admitidos, al menos una may\u00fascula y un n\u00famero. No requiere un car\u00e1cter especial. Se conserva el texto exacto."
       },
       "personId": {
         "type": "string",
-        "format": "uuid"
+        "format": "uuid",
+        "description": "V\u00ednculo opcional a una persona; no es necesario para crear la cuenta."
       },
       "roleId": {
         "type": "string",
@@ -291,7 +292,6 @@
     "required": [
       "name",
       "password",
-      "personId",
       "roleId",
       "departmentId"
     ]
@@ -306,7 +306,8 @@
       },
       "personId": {
         "type": "string",
-        "format": "uuid"
+        "format": "uuid",
+        "description": "V\u00ednculo opcional a una persona; no es necesario para crear la cuenta."
       },
       "roleId": {
         "type": "string",
@@ -320,13 +321,12 @@
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
       }
     },
     "additionalProperties": false,
     "required": [
       "name",
-      "personId",
       "roleId",
       "departmentId",
       "expectedVersion"
@@ -339,13 +339,13 @@
         "type": "string",
         "minLength": 6,
         "maxLength": 50,
-        "description": "Entre 6 y 50 caracteres admitidos, al menos una mayúscula y un número. No requiere un carácter especial. Se conserva el texto exacto."
+        "description": "Entre 6 y 50 caracteres admitidos, al menos una may\u00fascula y un n\u00famero. No requiere un car\u00e1cter especial. Se conserva el texto exacto."
       },
       "expectedVersion": {
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
       }
     },
     "additionalProperties": false,
@@ -484,13 +484,13 @@
           ]
         },
         "minItems": 1,
-        "description": "Cada fila contiene UUID v4 de área y rol. No se permite repetir área, incluso con diferente capitalización del UUID."
+        "description": "Cada fila contiene UUID v4 de \u00e1rea y rol. No se permite repetir \u00e1rea, incluso con diferente capitalizaci\u00f3n del UUID."
       },
       "expectedVersion": {
         "type": "integer",
         "minimum": 0,
         "maximum": 2147483647,
-        "description": "Versión recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambió."
+        "description": "Versi\u00f3n recibida al consultar el registro; se rechaza con RECORD_VERSION_CONFLICT si cambi\u00f3."
       }
     },
     "additionalProperties": false,

@@ -1,4 +1,4 @@
-# Documentación técnica del frontend
+# Documentación técnica de la interfaz EJS
 
 Esta referencia explica la estructura de código de cada módulo: archivos propietarios,
 imports, dependencias compartidas y contratos internos. Los mapas muestran módulos ES;

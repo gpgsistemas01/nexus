@@ -22,10 +22,8 @@ o compra que esté preparando. Primero busque para evitar repetir un registro.
 | Nombre comercial | Nombre visible en búsquedas y selectores. |
 | Activo | Disponibilidad para nuevas operaciones que requieren proveedores activos. |
 
-No se captura teléfono. **Cerrar** abandona el alta secundaria sin crear un registro.
-Si el servicio rechaza el alta, revise el aviso y corrija los campos; la captura de
-origen se conserva. El proveedor confirmado queda guardado independientemente del
-artículo o compra: cerrar después ese formulario no elimina el proveedor.
+**Cerrar** cancela el alta secundaria. Ante un rechazo, corrija los campos; se conserva la
+captura de origen. El proveedor guardado permanece aunque cierre el artículo o la compra.
 <!-- manual:end -->
 
 <!-- manual:any suppliers:page-view -->

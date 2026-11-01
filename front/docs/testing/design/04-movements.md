@@ -9,9 +9,7 @@
 | `DP-VUE-MOV-003` | CU-ALM-08, 16, 24; alcance de exportación | Adaptador/navegador; decisiones por modo y fronteras de mes | Mes actual/específico omiten filtros; personalizado usa filtros aplicados, excluye paginación y borrador. Mes inválido no solicita archivo ni muestra error al abrir. Descarga reutiliza validación MIME compartida. | [movementServiceTest.ts](../../../tests/unit/modules/movements/movementServiceTest.ts); [movements.spec.ts](../../../tests/e2e/movements.spec.ts) |
 | `DP-VUE-MOV-004` | Acceso y navegación Vue | Navegador/composable; particiones por permisos y viewport | Cuenta exclusiva entra al historial, sin permiso se bloquea antes de API; faltando lectura auxiliar no pide opciones, faltando reportes oculta exportar; menú Vue, recarga y 320/390 px sin desbordamiento global. | [movementServiceTest.ts](../../../tests/unit/modules/movements/movementServiceTest.ts); [movements.spec.ts](../../../tests/e2e/movements.spec.ts) |
 
-Especificación: `tests/unit/modules/movements/`, `tests/e2e/movements.spec.ts` y sus
-fixtures. `inventoryListTest.ts` comprueba pausa, foco y carga
-visible de la recarga compartida; la suite de Almacén comprueba su consumidor.
-La API simulada comprueba la integración del cliente, no la persistencia, autorización
-real ni contenido del Excel del servidor. Las brechas de integración de mermas
-se mantienen en la matriz del backend.
+La evidencia está en `tests/unit/modules/movements/`, `tests/e2e/movements.spec.ts` y sus
+fixtures. `inventoryListTest.ts` comprueba pausa, foco y carga visible; Almacén prueba su
+consumidor. Aplican los [límites de API simulada](../01-test-plan.md#niveles-y-entornos);
+las brechas de merma permanecen en la matriz backend.

@@ -1,234 +1,168 @@
 # Contrato de la API
 
-## Datos generales del documento
-
-| Versión documental | Versión del sistema | Estado | Fecha | Responsable |
-| --- | --- | --- | --- | --- |
-| 1.0 | 1.0.0 | En revisión | 2026-10-30 | Equipo Nexus |
-
-## Propósito y uso
-
-La [especificación OpenAPI 3.1](openapi.json) es la referencia procesable de
-métodos, rutas, parámetros, cuerpos, respuestas y autenticación. Sus fuentes modulares se
-organizan por dominio bajo `docs/architecture/openapi/`; la exportación las resuelve en
-un solo archivo para herramientas externas. El contrato describe lo que recibe y
-devuelve el servidor, con independencia de la interfaz que lo consuma.
-
-La organización de servicios, repositorios y transacciones se explica en la
-[referencia interna del backend](../views/development/backend-technical-documentation/index.md)
-y sus [procesos](../views/processes/index.md).
-
-## Cobertura del contrato
-
-OpenAPI agrupa las operaciones en cuatro fuentes procesables:
-
-| Área HTTP | Operaciones y contratos propietarios |
-| --- | --- |
-| [`auth`](paths/auth.json) | Inicio, consulta y renovación de sesión; esquemas de autenticación. |
-| [`sales`](paths/sales.json) | Clientes y su exportación. |
-| [`warehouse`](paths/warehouse.json) | Materiales, mermas, proveedores, entradas, salidas, devoluciones, inventario, catálogos operativos y reportes. |
-| [`admin`](paths/admin.json) | Personas, usuarios, accesos, movimientos, catálogos administrables y reportes administrativos. |
-
-Los [esquemas comunes](components/common-schemas.json) y las
-[respuestas compartidas](components/responses.json) definen sus estructuras reutilizadas.
+[OpenAPI](openapi.json) detalla cada operación. Esta guía resume las condiciones
+compartidas; el [inicio rápido](01-consumption.md) muestra cómo consumirlas.
 
 ## Reglas contractuales complementarias
 
 ### Autenticación y sesión
 
-La sesión utiliza cookies `HttpOnly`: `accessToken` para operaciones protegidas y
-`refreshToken` para renovar el acceso. Se emiten con `SameSite=Lax` y, en producción,
-`Secure`; un cliente HTTP debe conservar y reenviar las cookies correspondientes.
-Los tokens no se devuelven como campos JSON.
-
-| Paso | Solicitud | Resultado y uso |
+| Operación | Autenticación | Respuesta correcta |
 | --- | --- | --- |
-| Iniciar sesión | `POST /api/auth/login`, JSON con `name` y `password` | `200` con `code=SUCCESS_LOGIN` y cookies de sesión. |
-| Consultar la cuenta | `GET /api/auth/me`, con `accessToken` | `200` con `user`, incluida la información de acceso vigente. |
-| Renovar el acceso | `POST /api/auth/refresh`, con `refreshToken` | `200`, cuerpo de texto `OK` y nuevas cookies. No exige un access token válido. |
-| Cerrar la sesión actual | `POST /cerrar-sesion` | Borra las cookies y responde con una redirección `302` a `/inicio-sesion`. Es una ruta web, fuera del inventario `/api`; no existe `/api/auth/logout`. |
+| `POST /api/auth/login` | Credenciales JSON `name` y `password`. | `200`, `SUCCESS_LOGIN` y cookies. |
+| `GET /api/auth/me` | Cookie `accessToken`. | `200` con `user` y acceso vigente. |
+| `POST /api/auth/refresh` | Cookie `refreshToken`; no requiere access token válido. | `200`, texto `OK` y cookies renovadas. |
 
-El login admite texto de 1 a 50 caracteres por credencial. El usuario se recorta en
-sus extremos; la contraseña conserva todos sus caracteres. La política de
-creación o cambio de contraseña no se exige al iniciar sesión. Una captura inválida
-devuelve `400 VALIDATION_ERROR`; credenciales rechazadas devuelven `401 LOGIN_ERROR`,
-igual para una cuenta inexistente o una contraseña incorrecta.
+Las cookies son `HttpOnly`, `SameSite=Lax` y `Secure` en producción. Los tokens no
+se devuelven en JSON. La API no publica `/api/auth/logout`; el
+[cierre web](../views/development/frontend-technical-documentation/04-authentication-code.md#rutas-web-de-sesión)
+pertenece a la interfaz EJS.
 
-Un `401` en una operación protegida permite intentar la renovación y repetir la
-petición si ésta tiene éxito. El `401` del propio login rechaza las credenciales;
-el de refresh rechaza la renovación. Ninguno debe iniciar un bucle de refresh.
-Un fallo de red o servidor no confirma que las credenciales hayan sido rechazadas.
+Login admite 1–50 caracteres por credencial: recorta el usuario y conserva la
+contraseña exacta, sin aplicar la política de creación de claves. Datos inválidos
+responden `400 VALIDATION_ERROR`; usuario inexistente o contraseña incorrecta,
+`401 LOGIN_ERROR`.
+
+Ante un `401` protegido, renovar y repetir una vez si tiene éxito. El `401` de
+login o refresh termina ese intento; no inicia otro refresh. Una caída de red o
+servidor no demuestra credenciales inválidas.
 
 ### Paginación de listados
 
-Los listados paginados y selectores admiten `start` entero entre
-`0` y `2147483647`, y `length` entero entre `0` y `100`, con longitud predeterminada
-`10`. Un tamaño superior se limita a `100`; uno negativo se normaliza a `0`.
-`length=0` conserva los conteos sin consultar filas. Arrays, objetos, fracciones,
-sufijos como `25abc` y enteros no representables con seguridad usan el valor por
-defecto; un desplazamiento fuera de rango vuelve a `0`.
+| Parámetro | Comportamiento |
+| --- | --- |
+| `start` | Entero 0–2147483647; formato inválido o fuera de rango usa 0. |
+| `length` | Predeterminado 10; máximo efectivo 100; negativo usa 0. Cero devuelve sólo conteos. |
+| Formatos inválidos | Arrays, objetos, fracciones, `25abc` o enteros no seguros usan el valor predeterminado. |
 
-El consumidor avanza con el tamaño realmente recibido. Este límite no se aplica a
-las exportaciones XLSX: sus repositorios recorren lotes internos, sin truncar el
-reporte a la longitud de una página HTTP.
+La respuesta incluye `data`, `recordsTotal` y `recordsFiltered`. Avance según las
+filas recibidas. OpenAPI declara búsqueda, orden y filtros de cada ruta. Los XLSX
+recorren todos los resultados admitidos, sin el límite de una página.
 
 ### Errores globales y códigos públicos
 
-Los errores globales conservan un `code` estable para que la interfaz y soporte
-identifiquen la causa sin mostrar detalles internos del servidor. Las respuestas
-compartidas de OpenAPI documentan su estructura y ejemplos. En particular:
+| HTTP / código | Interpretación |
+| --- | --- |
+| `400 VALIDATION_ERROR` | Campos inválidos en `errors`; un ID de detalle inválido aparece en `errors.details`. Corregir y enviar. |
+| `400 RECORD_ID_INVALID` | UUID de ruta inválido; rechazo global, sin errores por campo del cuerpo. |
+| `401` / `403` | Sesión inválida o permiso insuficiente, según la operación. |
+| `404` y código del recurso | Registro no disponible para ese contexto; no divulga datos. |
+| `409` y código de dominio | Conflicto de estado, identidad, versión o clave. Revisar antes de repetir. |
+| `500 SERVER_ERROR` | Fallo interno; el detalle técnico queda en el servidor. |
+| `503 DATABASE_TABLE_MISSING` / `DATABASE_COLUMN_MISSING` | El despliegue requiere revisar migraciones. |
+| `503 PRISMA_CLIENT_OUT_OF_SYNC` | El despliegue requiere regenerar Prisma. |
 
-| HTTP | `code` | Significado y recuperación |
-| --- | --- | --- |
-| `400` | `VALIDATION_ERROR` | El body contiene campos o metadatos inválidos. `errors` identifica los campos; un identificador de detalle inválido se informa en `errors.details`. Corrija la captura y vuelva a enviar. |
-| `400` | `RECORD_ID_INVALID` | El identificador de ruta no tiene un formato UUID admitido. Corrija el UUID recibido; el rechazo es global y no contiene errores de campos del body. |
-| `404` | `WASTE_NOT_FOUND`, `PERSON_NOT_FOUND` u otro código del recurso | Un UUID válido no identifica un registro disponible para la operación. No se divulgan datos del recurso. |
-| `500` | `SERVER_ERROR` | Ocurrió un fallo interno no controlado. El detalle técnico se registra en el servidor y no forma parte de la respuesta pública. |
-| `503` | `DATABASE_TABLE_MISSING` | Falta una tabla requerida por la versión desplegada. El administrador del despliegue debe revisar las migraciones pendientes. |
-| `503` | `DATABASE_COLUMN_MISSING` | Falta una columna requerida por la versión desplegada. El administrador del despliegue debe revisar las migraciones pendientes. |
-| `503` | `PRISMA_CLIENT_OUT_OF_SYNC` | El cliente Prisma desplegado no corresponde al esquema requerido. El administrador del despliegue debe regenerarlo antes de reintentar. |
+Use `code` como identificador; el texto del mensaje no es un contrato. Las respuestas
+compartidas de OpenAPI incluyen estructura y ejemplos.
 
-Los errores operativos de dominio pueden aportar otros códigos para `401`, `403`,
-`404`, `409` o `500`; cada operación referencia la respuesta correspondiente y el
-cliente debe tratar el código como identificador, no el texto como contrato.
-
-En salidas de merma, HTTP 409 distingue `WASTE_ISSUE_STATE_CONFLICT` (ya no hay
-detalles pendientes), `WASTE_ISSUE_DUPLICATE_WASTE` (merma repetida en el documento) y
-`WASTE_ISSUE_WASTE_UNAVAILABLE` (merma inexistente o inactiva). La ausencia de estados
-requeridos es una configuración incompleta: devuelve HTTP 500 con
-`WASTE_ISSUE_FULFILLMENT_STATUS_NOT_FOUND`.
+En salidas de merma, `409` distingue `WASTE_ISSUE_STATE_CONFLICT` (sin pendientes),
+`WASTE_ISSUE_DUPLICATE_WASTE` (merma repetida) y `WASTE_ISSUE_WASTE_UNAVAILABLE`
+(inexistente/inactiva). Una configuración incompleta de estados responde
+`500 WASTE_ISSUE_FULFILLMENT_STATUS_NOT_FOUND`.
 
 ### Exportación mensual de reportes
 
-Las exportaciones devuelven XLSX si tienen éxito y errores JSON si fallan antes
-de iniciar la descarga. El consumidor debe distinguir ambos tipos de respuesta,
-incluso si solicita un archivo binario. Si la transferencia ya comenzó y falla,
-se interrumpe la conexión; no se escribe JSON dentro de un XLSX parcial. La generación,
-limpieza de temporales y medición pertenecen a la
-[guía de rendimiento del servidor](../../testing/backend-performance.md).
+| Modo | Alcance |
+| --- | --- |
+| Ordinario | Filtros admitidos por el reporte; sin paginación. |
+| `monthlyReport=true` | Mes completo; ignora los filtros del listado. |
+| `reportMonth=AAAA-MM` | Elige mes en modo mensual; ausente o inválido usa el mes actual de Ciudad de México. |
 
-Los endpoints de exportación de compras, salidas y movimientos aceptan
-`monthlyReport=true`. En ese modo ignoran los filtros aplicados al listado y consultan
-el mes actual de México de forma predeterminada. El parámetro opcional `reportMonth`,
-con formato `AAAA-MM`, permite consultar un mes calendario específico; un valor
-ausente o inválido conserva el comportamiento seguro del mes actual.
-
-Fuera del modo mensual, se aplican los filtros admitidos por el reporte solicitado.
+Éxito devuelve XLSX; un fallo previo a la transferencia, JSON. Si la descarga ya
+comenzó, se interrumpe la conexión sin insertar JSON en el archivo parcial. La
+[guía de rendimiento](../../testing/backend-performance.md) explica generación y temporales.
 
 ### Captura del número de proyecto
 
-Las reglas de captura y de salida segura se mantienen en
-[el estándar de seguridad](../coding-standards/09-errors-security-audit-and-logging.md#qué-significa-sanitizar-en-este-proyecto).
-El número de proyecto es texto de hasta 10 caracteres, recortado en los extremos y
-sin caracteres de control internos; conserva sus signos permitidos. Un control
-inválido devuelve `PROJECT_NUMBER_INVALID_FORMAT` por campo, sin eliminarlo para
-aceptar otra referencia. Sus tres contratos de escritura se definen en
-`components/warehouse-schemas.json`.
-
-En una salida para **GPG INTERNO**, además, el número debe coincidir con el configurado
-para el área de destino. Crear la salida o editar su encabezado se rechaza si no hay
-número configurado para esa área o si el valor recibido es distinto. El servidor
-comprueba esta relación aunque el cliente haya sugerido o bloqueado el campo.
+Texto de hasta 10 caracteres, recortado y sin controles internos. Conserva signos
+permitidos; un control inválido responde `PROJECT_NUMBER_INVALID_FORMAT` por campo.
+Para **GPG INTERNO** debe coincidir con el número configurado para el área: alta y
+edición de encabezado rechazan configuración ausente o valor diferente.
 
 ### Precisión de valores decimales
 
-La captura de existencias, cantidades y medidas acepta hasta **8 dígitos enteros y
-2 decimales**. El stock mínimo opcional acepta **12 enteros y 2 decimales**. Los
-costos monetarios conservan **8 enteros y 6 decimales**. Los históricos y conversiones
-de inventario pueden conservar seis decimales; el límite de captura no los redondea
-retroactivamente. La longitud calculada de merma se redondea a dos decimales.
-El peso unitario de merma admite **3 enteros y 2 decimales**. Las propiedades de
-cada payload y sus límites se definen en OpenAPI. Los campos históricos de largo y
-neto de muestra conservan seis decimales; las altas nuevas los dejan nulos.
-El alta sólo recibe el total del rollo completo con cono, el total del sobrante y el
-cono compartido, con dos decimales. Se guardan el neto de merma y sus medidas finales;
-el neto y largo de muestra sólo se utilizan en el cálculo. Sólo materiales en m² pueden ser su origen.
+| Dato | Enteros / decimales de captura |
+| --- | --- |
+| Existencias, cantidades y medidas | 8 / 2. |
+| Stock mínimo opcional | 12 / 2. |
+| Costos monetarios | 8 / 6. |
+| Peso unitario de merma | 3 / 2. |
+| Históricos y conversiones | Pueden conservar 6 decimales; no se redondean retroactivamente. |
+| Largo calculado de merma | Se redondea a 2 decimales. |
 
-Un tercer decimal en una cantidad se rechaza; no se redondea para aceptarlo.
-El stock mínimo vacío o nulo se omite; cero se conserva. Stock inicial, stock mínimo,
-saldo de ajuste y costo máximo permiten cero. Entradas, devoluciones y medidas son
-positivas. La cantidad por presentación de un detalle de compra o salida de material
-o consumible tiene un mínimo de uno. El cono permite cero, pero los pesos totales
-deben superar al cono.
+Un decimal adicional se rechaza, no se redondea. Stock inicial, mínimo, ajuste y
+costo máximo admiten cero; mínimo vacío/nulo se omite. Entradas, devoluciones y
+medidas son positivas; los detalles de compra/salida de material o consumible
+exigen cantidad por presentación desde 1.
+
+Rollo recibe total completo con cono, total sobrante y un cono compartido; los
+pesos totales superan al cono, que admite cero. El origen debe ser material en m².
+Guarda neto y medidas finales; los campos históricos de muestra conservan seis
+decimales, pero las altas nuevas los dejan nulos y sólo usan la muestra para calcular.
+Los esquemas precisan propiedades y límites.
 
 ### Contextos de compras y salidas
 
-La ruta fija el contexto de materiales o consumibles; el payload y la query
-no pueden cambiarlo. Listados, reportes y escrituras verifican cabecera y
-detalles del mismo tipo. Véase la [regla de separación](../../requirements/requirements-specification/06-operation-modes-and-effects.md#separación-de-compras-y-salidas).
+La ruta fija materiales o consumibles; cuerpo y query no cambian el contexto.
+Consultas, reportes y escrituras verifican cabecera y detalles del mismo tipo,
+según la [regla de separación](../../requirements/requirements-specification/06-operation-modes-and-effects.md#separación-de-compras-y-salidas).
 
-Los GET de listados de compras/salidas omiten `details`. En compras, el campo
-`observations` pertenece al encabezado y se devuelve tanto en listado como
-por ID, incluido `null` cuando no hay texto; no depende de `includeDetails`.
-Antes de editar, surtir o devolver, el cliente consulta GET por ID con la misma
-autorización y contexto del listado.
-Omitir la relación en un listado no permite guardar un documento vacío: las altas y
-ediciones completas exigen al menos un detalle. Editar sólo el encabezado conserva
-los detalles existentes y permite omitir el campo; si se envía, no acepta un array vacío.
+Los listados omiten `details`; en compras siempre devuelven `observations`, incluso
+`null`. Antes de editar, surtir o devolver, consulte por ID con el mismo acceso.
+Altas y ediciones completas requieren detalles; editar sólo encabezado permite
+omitirlos, pero no enviar un array vacío.
 
 ### Concurrencia y reintentos
 
-| Metadato | Operación y valor requerido |
+| Metadato | Uso |
 | --- | --- |
-| `expectedVersion` | Edición de inventario, proveedor, cliente, persona, usuario o catálogo: versión obtenida en la lectura de esa captura. |
-| `expectedMaterialVersion` | Material/consumible: versión adicional de su identidad compartida. |
-| `operationId` | POST de merma y POST de stock-additions: UUID v4 conservado por captura y actor. |
+| `expectedVersion` | Versión leída al preparar una edición o ajuste versionado. |
+| `expectedMaterialVersion` | Versión adicional de la identidad de material/consumible. |
+| `operationId` | UUID v4 conservado por captura y actor en alta y entrada de merma. |
 
-| Operación o condición | Resultado y recuperación |
+| Condición | Resultado o recuperación |
 | --- | --- |
-| Edición o ajuste con versión anterior | `409 RECORD_VERSION_CONFLICT`. Actualice la lectura y revise la captura antes de repetir. La versión no se calcula ni se sustituye justo antes de enviar. |
-| Merma: misma clave y mismo cuerpo | Devuelve el recibo original, sin crear otra entrada. Conserve clave y cuerpo mientras el resultado sea incierto. |
-| Merma: misma clave y otro cuerpo | `409 OPERATION_KEY_CONFLICT`; no reutilice la clave con datos distintos. |
-| Merma: `meta.operationRejected=true` | El servidor confirmó que revirtió los cambios del intento; permite corregir el pendiente. Un rechazo previo de autenticación/validación o un conflicto de clave no demuestra esa reversión. |
-| Merma: `WASTE_ALREADY_EXISTS` | Incluye `meta.waste` para identificar la merma existente y permitir una entrada adicional. Recuperar una creación propia ya confirmada responde éxito, sin producir este conflicto ni otra entrada. |
-| Surtir o cancelar detalles | El bloqueo y la comprobación transaccional impiden repetir una transición consumida; no recuperan automáticamente su respuesta original. |
-| Devolver parcialmente | El saldo limita la devolución, pero repetir la petición puede registrar otra mientras quede cantidad disponible. No hay recuperación por clave. |
-| Crear compra sin factura, ampliar detalles o crear salida | No hay recibo persistente de reintento. Repetir la captura puede crear otro documento o movimiento. |
+| Versión anterior | `409 RECORD_VERSION_CONFLICT`. Actualizar lectura y revisar captura; no sustituir la versión justo antes del envío. |
+| Merma, misma clave/cuerpo | Recupera el recibo original sin otra entrada; conservar ambos si el resultado es incierto. |
+| Merma, misma clave/otro cuerpo | `409 OPERATION_KEY_CONFLICT`. |
+| Merma, `meta.operationRejected=true` | Confirma reversión del intento. Un rechazo previo de autenticación/validación o un conflicto de clave no demuestra esa reversión. |
+| `WASTE_ALREADY_EXISTS` | `meta.waste` identifica la merma para una entrada adicional. Recuperar una creación propia confirmada devuelve éxito, sin este conflicto. |
+| Surtir/cancelar | Impide repetir una transición consumida; no recupera su respuesta original. |
+| Devolución parcial | Repetir puede registrar otra mientras quede saldo; no tiene recibo por clave. |
+| Compra sin factura, ampliación de detalles o salida nueva | Repetir puede crear otro documento o movimiento; no tiene recibo persistente. |
 
 ### Alcance de áreas de Salidas
 
-`GET /api/admin/departments?context=issues` filtra las opciones según las asignaciones
-vigentes de la sesión. Auxiliar y Coordinador de Almacén, y Administrador del sistema,
-consultan y registran salidas de todas las áreas. Para las demás cuentas autorizadas,
-listado, conteos, reportes y lectura por ID se limitan a sus áreas. Esto aplica por
-igual a Materiales, Consumibles y Mermas.
+`GET /api/admin/departments?context=issues` devuelve áreas según la sesión. Auxiliar
+y Coordinador de Almacén y Administrador del sistema consultan/registran para todas;
+las demás cuentas autorizadas se limitan a sus áreas en listados, conteos, reportes
+y lectura por ID, en los tres recursos.
 
-La API no acepta permisos ni alcances enviados en el payload. Alta o cambio de
-destino a un área no autorizada devuelve `403 FORBIDDEN`; consulta o edición de un
-ID ajeno devuelve `404` sin divulgar su contenido. En edición se comprueba también
-el área original, dentro de la transacción y antes de cambiar datos. Los permisos
-de surtido/devolución permanecen independientes.
+Alta/cambio a área ajena responde `403 FORBIDDEN`; un ID ajeno, `404`. La edición
+comprueba también el área original antes de modificar. El servidor obtiene permisos
+y alcance de fuentes propias; surtido y devolución requieren sus permisos independientes.
 
 ### Identificadores y datos de escritura
 
-Los [errores globales y de campo](#errores-globales-y-códigos-públicos) distinguen
-los rechazos de identificadores de ruta, metadatos y detalles. El servidor comprueba
-existencia, pertenencia y estado del registro.
+El servidor comprueba existencia, pertenencia y estado. Rechaza tipos incorrectos
+antes de normalizar: arrays como ID, booleanos como nombre o `2abc` como cantidad.
+Recorta textos válidos y normaliza observaciones ausentes/nulas a vacío.
 
-La validación distingue ausencia y tipo incorrecto: un campo opcional presente con un
-tipo no admitido se rechaza. Un array no es un identificador, un booleano no es un nombre
-y `2abc` no es una cantidad. Los textos se recortan después de comprobar su tipo;
-las observaciones ausentes o nulas de la escritura se normalizan a texto vacío.
-Nombres de personas y clientes admiten 255 caracteres; materiales, mermas y razón
-social, 200; nombre comercial, 100; observaciones, 500. Las fechas deben existir en el
-calendario, además de cumplir el formato admitido. Los accesos requieren al menos una
-fila con UUID v4 de área y rol, sin repetir área aunque cambie la capitalización del UUID.
+| Texto | Longitud máxima |
+| --- | --- |
+| Persona / cliente | 255. |
+| Material / merma / razón social | 200. |
+| Nombre comercial | 100. |
+| Observaciones | 500. |
 
-En materiales y consumibles, `creationContext=goodsReceipt` permite omitir costo y
-stock inicial sólo al crear el recurso. No exime los valores obligatorios de una
-edición o un ajuste. En los detalles de surtido se admiten booleanos o los textos
-`true`/`false`; el texto `false` conserva el valor falso.
-
-La composición de validadores, normalización y DTO pertenece a la
-[referencia de validadores comunes](../views/development/reuse-and-refactoring/01-backend-handlers-and-services.md#validadores-comunes-y-condiciones-de-captura).
-Los errores, su formato y los códigos públicos son parte del contrato HTTP; su
-presentación visual corresponde a cada cliente.
+Las fechas deben existir en el calendario. Los accesos exigen al menos una fila
+con área y rol UUID v4, sin repetir área aunque cambie la capitalización.
+`creationContext=goodsReceipt` permite omitir costo/stock inicial sólo en el alta;
+no exime datos de edición o ajuste. Surtido admite booleanos y textos `true`/`false`,
+conservando `false` como falso.
 
 ### Códigos de éxito
 
-Las operaciones que devuelven `code` usan los códigos definidos en
-`src/shared/constants/apiSuccessCodes.js`. El cliente comprueba el código esperado
-para la operación y los datos requeridos por su respuesta antes de anunciar éxito.
-No construye códigos por prefijos ni usa el texto de un mensaje como identificador.
-La renovación de sesión y las descargas tienen los tipos de respuesta específicos
-que declara OpenAPI; no todas las respuestas correctas contienen un `code`.
+Los códigos están en `src/shared/constants/apiSuccessCodes.js`. Compruebe el código
+de la operación y sus datos antes de anunciar éxito; no fabrique códigos por prefijo.
+Refresh devuelve texto y las descargas, XLSX: no todas las respuestas contienen `code`.

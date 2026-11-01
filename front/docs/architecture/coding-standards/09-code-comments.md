@@ -1,9 +1,8 @@
 # 9. Comentarios del código
 
-Comentar una restricción o decisión que no sea evidente por el código. No narrar cada
-asignación. Los contratos públicos tipados y nombres concretos explican entrada y
-salida; un comentario añade el motivo de una excepción, de una guarda de concurrencia
-o de un dato histórico. Eliminar comentarios obsoletos al cambiar el comportamiento.
+Comentar restricciones o decisiones que el código no explica: excepciones, guardas de
+concurrencia o datos históricos. Usar nombres y contratos tipados para describir entradas
+y salidas. Evitar narrar asignaciones y retirar comentarios obsoletos.
 
 ## Ejemplo de comentario con intención
 

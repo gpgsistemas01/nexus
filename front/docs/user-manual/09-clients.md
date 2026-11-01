@@ -16,11 +16,9 @@ cliente. El alta se abre dentro de la captura; no necesita una página de Direct
 
 ![Formulario para registrar un cliente.](images/16-client-form.png)
 
-El formulario captura nombre y disponibilidad; no requiere teléfono. No utilice
-el nombre para guardar datos ajenos a la identificación del cliente.
-**Cerrar** abandona el alta sin crear ni seleccionar otro registro. Si falla el
-alta, corrija el aviso y reintente; la salida permanece en preparación. El cliente
-confirmado queda guardado por separado: cerrar después la salida no lo elimina.
+Capture nombre y disponibilidad del cliente; use el nombre sólo para identificarlo. **Cerrar** cancela el alta sin crear ni
+seleccionar otro registro. Ante un rechazo, corrija los campos y reintente; la salida
+sigue en preparación. El cliente guardado permanece aunque cierre la salida.
 <!-- manual:end -->
 
 <!-- manual:any clients:page-view -->

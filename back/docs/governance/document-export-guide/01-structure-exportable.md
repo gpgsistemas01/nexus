@@ -1,8 +1,8 @@
 # 1. Estructura exportable
 
 Cada paquete comienza con su título y tabla de datos generales. Las colecciones
-usan el `index.md` de su familia; el contrato API comienza directamente en
-`architecture/openapi/api-contract.md` y se publica como documento independiente.
+usan el `index.md` de su familia; la API comienza en
+`architecture/openapi/index.md` y se publica como documento independiente.
 Las fuentes curadas permanecen en su sección y `build/docs/` recibe los resultados
 ignorados por Git. Los paquetes no dependen de archivos binarios versionados.
 Antes de publicar, revise lo siguiente:

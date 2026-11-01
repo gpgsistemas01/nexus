@@ -2,11 +2,9 @@
 
 ## Propósito y funcionamiento
 
-El servicio del recurso prepara la solicitud HTTP y comprueba la respuesta de su
-operación. Un mapper transforma el JSON recibido en un modelo que el editor o la
-tabla pueden utilizar. `apiClient` aporta el transporte y la recuperación de sesión.
-Estas tres responsabilidades permiten localizar un error de comunicación, un dato
-inválido o una incompatibilidad de formato en su propietario.
+El servicio prepara la solicitud y valida la respuesta; el mapper transforma el JSON al
+modelo de tabla o formulario. `apiClient` transporta HTTP y recupera la sesión. Cada
+responsabilidad tiene un propietario.
 
 ## Modelo general de adaptación de una lectura
 

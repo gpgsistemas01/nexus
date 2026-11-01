@@ -45,10 +45,9 @@ separarse.
 
 ## Orden y tamaño
 
-Imports al principio; después tipos/constantes y la lógica en un orden que facilite
-seguir sus dependencias. En SFC se conserva el orden local de script, template y
-estilos. No se mezclan cambios de formato de archivos ajenos con un cambio funcional.
-No existe un número de líneas que por sí solo determine una clase o un composable.
+Ordenar imports, tipos/constantes y lógica según sus dependencias. En SFC, conservar el
+orden local de script, template y estilos. Limitar el formato a los archivos afectados;
+dividir responsabilidades según sus consumidores, no por cantidad de líneas.
 
 ## Comprobación
 

@@ -101,9 +101,8 @@ Las [secuencias](../../processes/07-issues/index.md) y los
 
 ## Contratos visuales de selección
 
-`IssueHeaderSelect` identifica `field`, `kind`, etiqueta, `LookupState`, opción inicial,
-`isDisabled` e indicación `hint`. `IssueFilterSelect` presenta el mismo propósito para
-los campos de filtro. El estado de opciones pertenece al lookup; el ID seleccionado,
-a los valores del formulario/filtro. El [contrato compartido](02-shared-contracts.md)
-explica la estructura y la [secuencia de área](../../processes/07-issues/04-department-scope.md)
-explica selección inicial, bloqueo y limpieza sin inventar permisos locales.
+`IssueHeaderSelect` define `field`, `kind`, etiqueta, `LookupState`, opción inicial,
+`isDisabled` y `hint`; `IssueFilterSelect` sirve a los filtros. El lookup posee las
+opciones; formulario/filtro, el ID seleccionado. Véanse el [contrato
+compartido](02-shared-contracts.md) y el [proceso de
+área](../../processes/07-issues/04-department-scope.md) para precarga, bloqueo y limpieza.
