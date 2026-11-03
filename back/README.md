@@ -257,6 +257,17 @@ LOG_LEVEL="info"
 
 ## Base de datos, usuarios y permisos
 
+La migración de datos `20261103000000_reclassify_six_confirmed_consumables`
+reclasifica PLAYO, HULE BURBUJA, PAPEL KRAFT, MALLA VERDE y las dos KOLA LOKA
+(2000 y 1200) revisadas contra `LISTA CONSUMIBLES.pdf` y el respaldo del
+27 de octubre de 2026. Usa los seis IDs confirmados y valida nombre, SKU,
+presentación/unidad PIEZA y ausencia de medidas antes de cambiar `MATERIAL`
+a `CONSUMABLE`. Omite registros ausentes, modificados o ya reclasificados;
+no incluye tornillos ni ventosas. Conserva existencias, relaciones y documentos
+históricos; el trigger existente incrementa la versión del material.
+No requiere cambios en `schema.prisma`, porque solo corrige datos.
+Se aplica con `npm run db:migrate` junto con las demás migraciones pendientes.
+
 Prisma selecciona la URL según el entorno: `DATABASE_URL` para la aplicación,
 `DATABASE_TEST_URL` para pruebas y las variantes `DIRECT_*` para migraciones cuando
 están definidas. Los comandos de base de datos se encuentran en la tabla de scripts.
