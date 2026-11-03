@@ -79,33 +79,23 @@ const emit = defineEmits<{
                         :model-value="supplier?.title ?? ''"
                         readonly
                     />
-                    <template v-else>
-                        <RemoteSelect
-                            label="Proveedor"
-                            :model-value="values.supplierId"
-                            :state="suppliers"
-                            :error="errors.supplierId"
-                            :initial-option="supplier"
-                            :is-disabled="isSubmitting || !canSuppliers"
-                            :hint="!canSuppliers ? 'Sin permiso para consultar proveedores.' : ''"
-                            :create-label="canCreateSupplier ? 'Registrar proveedor' : undefined"
-                            @create="emit('createSupplier', $event)"
-                            @update:model-value="emit('update', 'supplierId', $event)"
-                            @blur="emit('blur', 'supplierId')"
-                            @search="emit('search', 'suppliers', $event)"
-                            @more="emit('more', 'suppliers')"
-                            @retry="emit('retry', 'suppliers')"
-                        />
-                        <VBtn
-                            v-if="canCreateSupplier"
-                            variant="text"
-                            size="small"
-                            :disabled="isSubmitting"
-                            @click="emit('createSupplier', '')"
-                        >
-                            Registrar proveedor
-                        </VBtn>
-                    </template>
+                    <RemoteSelect
+                        v-else
+                        label="Proveedor"
+                        :model-value="values.supplierId"
+                        :state="suppliers"
+                        :error="errors.supplierId"
+                        :initial-option="supplier"
+                        :is-disabled="isSubmitting || !canSuppliers"
+                        :hint="!canSuppliers ? 'Sin permiso para consultar proveedores.' : ''"
+                        :create-label="canCreateSupplier ? 'Registrar proveedor' : undefined"
+                        @create="emit('createSupplier', $event)"
+                        @update:model-value="emit('update', 'supplierId', $event)"
+                        @blur="emit('blur', 'supplierId')"
+                        @search="emit('search', 'suppliers', $event)"
+                        @more="emit('more', 'suppliers')"
+                        @retry="emit('retry', 'suppliers')"
+                    />
                 </VCol>
                 <VCol
                     cols="12"

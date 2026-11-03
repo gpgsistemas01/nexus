@@ -19,6 +19,12 @@ escritorio y 320/390 px, subencabezados, stock bajo y recortes. No sustituir est
 por aserciones de CSS o colores. Aplican los [límites de
 simulación](../01-test-plan.md#niveles-y-entornos).
 
+## Identificadores de captura
+
+| Riesgo | Nivel y técnica | Condición y fuente ejecutable |
+| --- | --- | --- |
+| Fallar al agregar detalles o recuperar una merma desde HTTP sin `crypto.randomUUID`. | Unitario y navegador; particiones API nativa disponible/ausente. | [createUuidTest.ts](../../../tests/unit/shared/utils/createUuidTest.ts) comprueba formato UUID v4, variante y claves distintas con ambas implementaciones. Compras y Salidas agregan detalles en Chromium sin la API nativa; [inventoryFormTest.ts](../../../tests/unit/modules/warehouse/inventoryFormTest.ts) conserva el `operationId` y payload original tras un fallo incierto. |
+
 ## Crecimiento de catálogos y fronteras arquitectónicas
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |

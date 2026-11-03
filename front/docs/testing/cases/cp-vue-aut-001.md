@@ -13,3 +13,8 @@
 ## Fuente ejecutable y alcance
 
 [login.spec.ts](../../../tests/e2e/login.spec.ts), `login: captura inválida, rechazo genérico y reintento con cookies hacia materiales`. Aislamiento Playwright. No comprueba hash, cuenta real ni emisión JWT.
+
+El escenario `login: un 502 inicial conserva las credenciales y permite un nuevo intento
+sin recargar` comprueba la recuperación del proxy: el primer envío muestra un error de
+conexión, conserva ambos campos y no dispara refresh ni reenvíos. Un segundo clic
+confirma el acceso con la respuesta simulada. No determina qué interrumpió la conexión real.

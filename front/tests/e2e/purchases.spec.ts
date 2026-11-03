@@ -11,6 +11,11 @@ for (const [path, title, item] of [
   test(`compras ${path}: alta con detalles, validación diferida y payload sin totales`, async ({
     page,
   }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(crypto, 'randomUUID', { value: undefined });
+    });
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
     const { writes } = await mockPurchases(page);
     await page.goto(`/compras/${path}`);
     await expect(
@@ -46,6 +51,7 @@ for (const [path, title, item] of [
     });
     expect(writes[0]!.data).not.toHaveProperty('invoice');
     expect(writes[0]!.data).not.toHaveProperty('totalGrossPurchaseAmount');
+    expect(errors).toEqual([]);
   });
 }
 
@@ -217,7 +223,13 @@ test('compras: altas rápidas reutilizan editores y seleccionan registros fuera 
   await page.goto('/compras/materiales');
   await page.getByRole('button', { name: 'Nueva compra', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Registrar compra', exact: true });
-  await dialog.getByRole('button', { name: 'Registrar proveedor', exact: true }).click();
+  await expect(
+    dialog.getByRole('button', { name: 'Registrar proveedor', exact: true }),
+  ).toHaveCount(0);
+  await dialog.getByRole('combobox', { name: 'Proveedor', exact: true }).fill('Proveedor nuevo');
+  await page
+    .getByRole('button', { name: 'Registrar proveedor «Proveedor nuevo»', exact: true })
+    .click();
   const supplier = page.getByRole('dialog', { name: 'Registrar proveedor', exact: true });
   await supplier.getByLabel('Razón social', { exact: true }).fill('Empresa nueva');
   await supplier.getByLabel('Nombre comercial', { exact: true }).fill('Proveedor nuevo');
@@ -226,7 +238,13 @@ test('compras: altas rápidas reutilizan editores y seleccionan registros fuera 
   await expect(dialog.getByRole('combobox', { name: 'Proveedor', exact: true })).toHaveValue(
     'Proveedor nuevo',
   );
-  await dialog.getByRole('button', { name: 'Registrar material', exact: true }).click();
+  await expect(dialog.getByRole('button', { name: 'Registrar material', exact: true })).toHaveCount(
+    0,
+  );
+  await dialog.getByRole('combobox', { name: 'Material', exact: true }).fill('Material nuevo');
+  await page
+    .getByRole('button', { name: 'Registrar material «Material nuevo»', exact: true })
+    .click();
   const item = page.getByRole('dialog', { name: 'Crear material', exact: true });
   await item.getByLabel('Nombre', { exact: true }).fill('Material nuevo');
   await item.getByRole('combobox', { name: 'Presentación', exact: true }).click();

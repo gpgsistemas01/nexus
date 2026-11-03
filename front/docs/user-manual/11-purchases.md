@@ -37,8 +37,9 @@ Los importes mostrados son estimados hasta guardar. Capture el costo por present
 no el total de la compra.
 
 <!-- manual:any suppliers:manage materials:write -->
-Si falta un proveedor o artículo y aparece **Registrar**, use el alta secundaria.
-La recepción de ese artículo se registra al guardar la compra.
+Si falta un proveedor o artículo, escriba su nombre en el selector y pulse
+**Registrar «nombre»** dentro del desplegable. Complete el formulario y guarde;
+el registro nuevo quedará seleccionado. La recepción se registra al guardar la compra.
 <!-- manual:end -->
 <!-- manual:end -->
 

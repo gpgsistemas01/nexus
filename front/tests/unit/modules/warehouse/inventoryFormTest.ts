@@ -246,6 +246,7 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
   });
 
   it('conserva cantidad y operationId tras una respuesta incierta y al volver a abrir', async () => {
+    vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) });
     const first = openEditor('wastes', { action: 'add-stock', row: normalizeInventoryRow(waste) });
     first.request.mockRejectedValueOnce(new ApiError('Conexión interrumpida'));
     first.editor.update('quantity', '3');

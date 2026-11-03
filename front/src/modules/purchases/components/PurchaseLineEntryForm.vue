@@ -54,15 +54,6 @@ const emit = defineEmits<{
                     @more="emit('more')"
                     @retry="emit('retry')"
                 />
-                <VBtn
-                    v-if="canCreate"
-                    size="small"
-                    variant="text"
-                    :disabled="isDisabled"
-                    @click="emit('create', '')"
-                >
-                    Registrar {{ itemLabel.toLowerCase() }}
-                </VBtn>
             </VCol>
             <VCol
                 cols="12"

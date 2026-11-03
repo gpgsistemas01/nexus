@@ -1,5 +1,6 @@
 import { calculateGoodsReceiptDetailAmounts } from '@nexus/purchase-calculations';
 import { isRecord } from '../../shared/utils/isRecord.js';
+import { createUuid } from '../../shared/utils/createUuid.js';
 import type { LookupItem } from '../../shared/lookup.js';
 import type { PurchaseDetail } from './purchase.js';
 
@@ -12,7 +13,7 @@ export const createPurchaseDetailDraft = (
     const presentation = isRecord(material.presentation) ? material.presentation : {};
     const unit = isRecord(material.unitMeasure) ? material.unitMeasure : {};
     return {
-        id: crypto.randomUUID(),
+        id: createUuid(),
         materialId: item.id,
         name: String(material.name ?? item.title),
         base: material.base == null ? null : Number(material.base),

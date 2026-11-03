@@ -40,6 +40,11 @@ Fuentes: [contratos de Login](../../../src/modules/auth/login.ts),
 [PurchaseLineEntryPage](../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) e
 [IssueLineEntryPage](../../../src/modules/issues/pages/IssueLineEntryPage.vue).
 
+Los detalles nuevos de Compra y Salida reciben un ID local de
+[createUuid](../../../src/shared/utils/createUuid.ts) para identificarlos durante la
+captura. Los mappers omiten esa clave al registrar los detalles; la API asigna sus
+identificadores persistentes.
+
 ### Eventos del login
 
 | Evento | Argumentos |

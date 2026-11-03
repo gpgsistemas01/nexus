@@ -39,7 +39,7 @@ export const loginRequest = async (
             throw new LoginRequestError(LOGIN_MESSAGES.INVALID_FIELDS, cause.fieldErrors);
 
         throw new LoginRequestError(
-            cause.code === 'NETWORK_ERROR'
+            cause.code === 'NETWORK_ERROR' || [502, 503, 504].includes(cause.status)
                 ? LOGIN_MESSAGES.CONNECTION_FAILED
                 : cause.code === 'INVALID_RESPONSE'
                   ? LOGIN_MESSAGES.INVALID_RESPONSE

@@ -133,7 +133,7 @@ test('login: envío pendiente bloquea duplicados y recupera controles tras un fa
   expect(requests).toBe(1);
   finish();
   await expect(page.getByRole('alert', { name: 'Error de acceso' })).toContainText(
-    'No se pudo iniciar sesión',
+    'No fue posible conectar',
   );
   await expect(page.getByRole('button', { name: 'Ingresar', exact: true })).toBeEnabled();
 });
@@ -152,6 +152,47 @@ test('login: acceso directo, recarga y móvil sin desbordamiento', async ({ page
   await page.getByRole('link', { name: 'Volver al inicio' }).click();
   await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Ingresar', exact: true })).toBeVisible();
+});
+
+test('login: un 502 inicial conserva las credenciales y permite un nuevo intento sin recargar', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  let attempts = 0;
+  let refreshCalls = 0;
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.route('**/api/auth/refresh', (route) => {
+    refreshCalls++;
+    return route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } });
+  });
+  await page.route('**/api/auth/login', (route) => {
+    attempts++;
+    return attempts === 1
+      ? route.fulfill({ status: 502, contentType: 'text/plain', body: '' })
+      : route.fulfill({ json: { code: 'SUCCESS_LOGIN' } });
+  });
+  await page.goto('/inicio-sesion');
+  const name = page.getByRole('textbox', { name: 'Nombre de usuario', exact: true });
+  const password = page.getByLabel('Contraseña', { exact: true });
+  await name.fill('usuario');
+  await password.fill('legado');
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
+  await expect(page.getByRole('alert', { name: 'Error de acceso' })).toContainText(
+    'No fue posible conectar con el servidor',
+  );
+  await expect(name).toHaveValue('usuario');
+  await expect(password).toHaveValue('legado');
+  await expect(page.getByRole('button', { name: 'Ingresar', exact: true })).toBeEnabled();
+  expect(attempts).toBe(1);
+  expect(refreshCalls).toBe(0);
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Tabla de Existencias', exact: true }),
+  ).toBeVisible();
+  expect(attempts).toBe(2);
+  expect(refreshCalls).toBe(0);
+  expect(errors).toEqual([]);
 });
 
 test('un fallo al cargar la página muestra recuperación y permite reintentar', async ({ page }) => {

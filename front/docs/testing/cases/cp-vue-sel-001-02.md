@@ -13,3 +13,8 @@
 ## Fuente ejecutable y alcance
 
 [selectCreation.spec.ts](../../../tests/e2e/selectCreation.spec.ts), `select compras materials: crea proveedor y artículo desde el desplegable con contexto de compra` y variante `consumables`. Contextos aislados y API simulada. No demuestra alta o stock persistidos.
+
+[purchases.spec.ts](../../../tests/e2e/purchases.spec.ts) comprueba también que no
+haya botones de alta separados de los selectores. Los recorridos de alta con detalles
+deshabilitan `crypto.randomUUID`, como ocurre al acceder por HTTP desde la red local,
+y verifican el detalle y su payload sin errores de ejecución.

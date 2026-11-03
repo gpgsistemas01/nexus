@@ -294,6 +294,7 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     });
   });
   it('agregar detalle valida el mínimo uno y selecciona altas recientes aunque no estén en la página', async () => {
+    vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) });
     vi.spyOn(purchaseLookupService, 'list').mockResolvedValue(pageOf([]));
     const added = vi.fn();
     const { state, wrapper } = harness(() =>

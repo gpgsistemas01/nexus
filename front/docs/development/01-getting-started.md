@@ -181,7 +181,7 @@ npm --prefix front run preview
 | No se resuelve `@nexus/*` | Comprueba la rama y las fuentes públicas del repositorio completo. |
 | Falta `back/generated/prisma/client.ts` | Configura `back/.env` y ejecuta `npm --prefix back run db:generate`. |
 | `502` o `ECONNREFUSED` | El proxy no pudo conectar con la API. Comprueba que esté activa en el host y puerto de `BACKEND_PROXY_TARGET`. |
-| `ECONNRESET` en el proxy | Revisa el log de la API en ese momento: la conexión se cerró durante la petición; puede coincidir con un reinicio o un fallo del servidor. |
+| `ECONNRESET` en el proxy | La conexión hacia la API se interrumpió. Compara acceso directo y proxy con las consultas siguientes; puede ocurrir antes de que la API registre la petición. |
 | `[vite] (client) hmr update` | Vite actualizó un módulo editado; es un mensaje normal de desarrollo. |
 | `500` con `tenant/user … not found` en Prisma | Corrige `DATABASE_URL` en `back/.env`: copia la cadena del pooler desde **Connect** del proyecto Supabase y reemplaza el marcador de contraseña. Host y usuario deben pertenecer al mismo proyecto. Reinicia la API. |
 | `401` o `403` con la API respondiendo | Revisa sesión, credenciales y permisos. |
@@ -190,7 +190,22 @@ npm --prefix front run preview
 Cuando la API vuelva al mismo host y puerto, reintenta desde la pantalla: **Volver
 a comprobar el acceso** para la sesión, **Actualizar** o **Reintentar** para una
 tabla y **Reintentar catálogo** para un selector. El proxy puede recuperarse sin
-reiniciar Vite. Si cambiaste `BACKEND_PROXY_TARGET`, reinícialo para aplicar el valor.
+reiniciar Vite. En el login, pulsa **Ingresar** nuevamente; conserva los campos y no
+reenvía credenciales automáticamente. Si cambiaste `BACKEND_PROXY_TARGET`, reinícialo
+para aplicar el valor.
+
+Para distinguir API y proxy, ejecuta sin cookies desde PowerShell. Ajusta los puertos
+si no usas los predeterminados:
+
+```powershell
+curl.exe -sS -o NUL -w "API: %{http_code}\n" http://127.0.0.1:3000/api/auth/me
+curl.exe -sS -o NUL -w "Vite: %{http_code}\n" http://localhost:5173/api/auth/me
+```
+
+`401` en ambas confirma que la conexión funciona sin sesión. Si falla también el
+acceso directo, revisa el proceso de la API y su puerto. Si sólo falla Vite, revisa
+`BACKEND_PROXY_TARGET` y el error del proxy; no lo atribuyas a la base de datos sin
+el log correspondiente.
 
 Para comprobar el puerto predeterminado desde PowerShell en el equipo que ejecuta
 Vite, usa `Test-NetConnection 127.0.0.1 -Port 3000 -InformationLevel Quiet`.

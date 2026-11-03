@@ -1,5 +1,6 @@
 import { roundTo } from '@nexus/numbers';
 import { isRecord } from '../../shared/utils/isRecord.js';
+import { createUuid } from '../../shared/utils/createUuid.js';
 import type { LookupItem } from '../../shared/lookup.js';
 import type { IssueDetail, IssueResource } from './issue.js';
 
@@ -52,7 +53,7 @@ export const createIssueDetailDraft = (
     const base = item.base == null ? null : Number(item.base);
     const height = item.height == null ? null : Number(item.height);
     return {
-        id: crypto.randomUUID(),
+        id: createUuid(),
         itemId: String(item.id),
         supplierId:
             resource === 'wastes'

@@ -13,6 +13,9 @@ for (const [path, resource, title, label] of [
   test(`salidas ${path}: menú Vue, alta sin errores iniciales y payload de solicitud`, async ({
     page,
   }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(crypto, 'randomUUID', { value: undefined });
+    });
     const { writes, reads } = await mockIssues(page);
     await page.goto(`/salidas/${path}`);
     await expect(

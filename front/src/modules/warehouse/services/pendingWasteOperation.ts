@@ -1,5 +1,6 @@
 import { ApiError } from '../../../shared/http/apiError.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
+import { createUuid } from '../../../shared/utils/createUuid.js';
 import type { InventoryPayload } from '../inventory.js';
 
 export const createPendingWasteOperation = (
@@ -33,7 +34,7 @@ export const createPendingWasteOperation = (
     };
 
     const save = (payload: InventoryPayload) => {
-        const data = read() ?? { ...payload, operationId: crypto.randomUUID() };
+        const data = read() ?? { ...payload, operationId: createUuid() };
         storage.setItem(key, JSON.stringify(data));
         return data;
     };

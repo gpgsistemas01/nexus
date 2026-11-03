@@ -42,13 +42,16 @@ describe('adaptador Axios del login público', () => {
     });
   });
 
-  it.each([401, 429, 500])('HTTP %s no confirma el acceso ni renueva tokens', async (status) => {
-    const request = reply({}, status);
-    await expect(loginRequest({ name: 'usuario', password: 'abc' })).rejects.toBeInstanceOf(
-      LoginRequestError,
-    );
-    expect(request).toHaveBeenCalledOnce();
-  });
+  it.each([401, 429, 500, 502, 503, 504])(
+    'HTTP %s no confirma el acceso ni renueva tokens',
+    async (status) => {
+      const request = reply({}, status);
+      await expect(loginRequest({ name: 'usuario', password: 'abc' })).rejects.toBeInstanceOf(
+        LoginRequestError,
+      );
+      expect(request).toHaveBeenCalledOnce();
+    },
+  );
 
   it.each(['<html>Frontend en lugar de API</html>', { ok: true }])(
     'rechaza una respuesta inesperada aunque tenga HTTP 200',
@@ -74,6 +77,9 @@ describe('adaptador Axios del login público', () => {
   it.each([
     [401, 'Usuario o contraseña incorrectos.'],
     [429, 'Demasiados intentos. Espera un momento e intenta nuevamente.'],
+    [502, 'No fue posible conectar con el servidor. Intenta nuevamente.'],
+    [503, 'No fue posible conectar con el servidor. Intenta nuevamente.'],
+    [504, 'No fue posible conectar con el servidor. Intenta nuevamente.'],
   ] as const)('conserva HTTP %s aunque el proxy devuelva HTML', async (status, message) => {
     reply('<h1>Gateway</h1>', status);
     await expect(loginRequest({ name: 'usuario', password: 'legado' })).rejects.toThrow(message);
