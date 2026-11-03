@@ -268,6 +268,12 @@ históricos; el trigger existente incrementa la versión del material.
 No requiere cambios en `schema.prisma`, porque solo corrige datos.
 Se aplica con `npm run db:migrate` junto con las demás migraciones pendientes.
 
+La migración incremental `20261103010000_reclassify_screw_and_suction_cup`
+incorpora los dos registros confirmados posteriormente: `TORNILLO DE PLASTICO`
+(`TOR-PLA-1`) y `VENTOSA MEDIANA` (`VEN-MED-1`). Conserva sus nombres y demás
+campos; solo cambia el tipo a `CONSUMABLE` y el trigger incrementa la versión.
+Usa las mismas guardas de identidad y no modifica la migración anterior.
+
 Prisma selecciona la URL según el entorno: `DATABASE_URL` para la aplicación,
 `DATABASE_TEST_URL` para pruebas y las variantes `DIRECT_*` para migraciones cuando
 están definidas. Los comandos de base de datos se encuentran en la tabla de scripts.

@@ -90,3 +90,52 @@ describe('reclasificación de los seis consumibles confirmados', () => {
     });
   });
 });
+
+const additionalMigration = readFileSync(new URL(
+  '../../../prisma/migrations/20261103010000_reclassify_screw_and_suction_cup/migration.sql',
+  import.meta.url
+), 'utf8');
+const additional = [
+  ['12759e60-d56d-4dfc-8f4e-a223c606fade', 'TORNILLO DE PLASTICO', 'TOR-PLA-1'],
+  ['5efea6dd-f15a-4f98-b1dc-9d62a4f45341', 'VENTOSA MEDIANA', 'VEN-MED-1']
+];
+
+describe('reclasificación incremental del tornillo y la ventosa', () => {
+  it('conserva nombres, datos y los seis consumibles anteriores; repetir no incrementa versiones', async () => {
+    await withTable(async connection => {
+      for (const row of [...confirmed, ...additional]) await insertMaterial(connection, row);
+      await insertMaterial(connection, [randomUUID(), 'OTRO MATERIAL', 'OTRO-1']);
+      await connection.query(migration);
+      const before = await snapshot(connection);
+      expect((await connection.query(additionalMigration)).rowCount).toBe(2);
+      const after = await snapshot(connection);
+      const ids = new Set(additional.map(([id]) => id));
+      expect(after).toEqual(before.map(row => ids.has(row.id)
+        ? { ...row, type: 'CONSUMABLE', version: row.version + 1 } : row));
+      expect((await connection.query(additionalMigration)).rowCount).toBe(0);
+      expect(await snapshot(connection)).toEqual(after);
+    });
+  });
+
+  it('admite catálogo vacío y omite identidades modificadas u otros IDs', async () => {
+    await withTable(async connection => {
+      expect((await connection.query(additionalMigration)).rowCount).toBe(0);
+      await insertMaterial(connection, additional[0], { name: 'TORNILLO DIFERENTE' });
+      await insertMaterial(connection, additional[1], { sku: 'OTRO-SKU' });
+      await insertMaterial(connection, [randomUUID(), 'VENTOSA MEDIANA', 'VEN-OTRA']);
+      const before = await snapshot(connection);
+      expect((await connection.query(additionalMigration)).rowCount).toBe(0);
+      expect(await snapshot(connection)).toEqual(before);
+    });
+  });
+
+  it('revierte ambos cambios si ya existe un consumible con la misma identidad', async () => {
+    await withTable(async connection => {
+      for (const row of additional) await insertMaterial(connection, row);
+      await insertMaterial(connection, [randomUUID(), 'VENTOSA MEDIANA', 'VEN-DUP'], { type: 'CONSUMABLE' });
+      const before = await snapshot(connection);
+      await expect(connection.query(additionalMigration)).rejects.toMatchObject({ code: '23505' });
+      expect(await snapshot(connection)).toEqual(before);
+    });
+  });
+});
