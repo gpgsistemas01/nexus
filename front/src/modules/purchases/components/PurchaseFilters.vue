@@ -46,10 +46,7 @@ const search = defineModel<string>('search', { required: true });
             <RemoteSelect
                 label="Proveedor"
                 :model-value="values.supplierId"
-                :items="suppliers.items"
-                :is-loading="suppliers.isLoading"
-                :has-more="suppliers.hasMore"
-                :load-error="suppliers.error"
+                :state="suppliers"
                 :is-disabled="!canSuppliers"
                 :hint="!canSuppliers ? 'Sin permiso para consultar proveedores.' : ''"
                 @update:model-value="emit('update', 'supplierId', $event)"
@@ -65,10 +62,7 @@ const search = defineModel<string>('search', { required: true });
             <RemoteSelect
                 label="Persona que recibe"
                 :model-value="values.personId"
-                :items="persons.items"
-                :is-loading="persons.isLoading"
-                :has-more="persons.hasMore"
-                :load-error="persons.error"
+                :state="persons"
                 :is-disabled="!canPersons"
                 :hint="!canPersons ? 'Sin permiso para consultar personas.' : ''"
                 @update:model-value="emit('update', 'personId', $event)"

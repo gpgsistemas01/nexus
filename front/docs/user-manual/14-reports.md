@@ -2,14 +2,27 @@
 
 ## Identificar el alcance
 
-Las descargas dependen del módulo y de los permisos de la cuenta. Inventario usa
-**Descargar Excel**. Directorio e Identidad ofrecen **Exportar Excel**. Compras,
-Salidas y Movimientos abren un diálogo **Exportar reporte** para seleccionar el
-alcance.
+El archivo incluye todos los resultados de la consulta. Aplique primero los filtros
+con **Buscar**.
 
-El reporte incluye todos los resultados de la consulta, no sólo la página visible.
-Compras, Salidas, Movimientos, Identidad y Directorio usan sus filtros admitidos: pulse
-**Buscar** para aplicarlos antes de exportar.
+<!-- manual:any warehouse:reports-read -->
+- En **Almacén**, use **Descargar Excel**; en **Compras** y **Salidas**, **Exportar Excel**.
+<!-- manual:end -->
+<!-- manual:all persons:page-view person:reports-read -->
+- En **Personas**, use **Exportar Excel**.
+<!-- manual:end -->
+<!-- manual:all users:manage admin:reports-read -->
+- En **Usuarios**, use **Exportar Excel**.
+<!-- manual:end -->
+<!-- manual:all clients:page-view client:reports-read -->
+- En **Clientes**, use **Exportar Excel**.
+<!-- manual:end -->
+<!-- manual:all suppliers:page-view supplier:reports-read -->
+- En **Proveedores**, use **Exportar Excel**.
+<!-- manual:end -->
+<!-- manual:all movements:read admin:reports-read -->
+- En **Movimientos**, use **Exportar Excel**.
+<!-- manual:end -->
 
 ## Descargar desde una tabla
 
@@ -19,7 +32,8 @@ Compras, Salidas, Movimientos, Identidad y Directorio usan sus filtros admitidos
 4. Espere la descarga y abra el archivo en una aplicación compatible con Excel.
 5. Revise su contenido, periodo y artículos antes de distribuirlo.
 
-En inventario, revise también **Incluir en Excel** antes de descargar:
+<!-- manual:any warehouse:reports-read -->
+En inventario, revise **Incluir en Excel**:
 
 | Opción | Registros incluidos por disponibilidad |
 | --- | --- |
@@ -27,17 +41,19 @@ En inventario, revise también **Incluir en Excel** antes de descargar:
 | Activos | Registros activos. |
 | Con stock | Registros con existencias. |
 
-La selección cambia el archivo, no el inventario. Materiales y Consumibles exportan la
-búsqueda por nombre con todos los proveedores del tipo elegido. Mermas también aplica el
-proveedor seleccionado.
+La selección sólo cambia el archivo. Materiales y Consumibles incluyen todos los
+proveedores que coinciden con la búsqueda; Mermas también aplica el proveedor seleccionado.
+<!-- manual:end -->
 
-En Personas, el filtro por rol no es compatible con su exportación actual. Quite
-ese filtro y vuelva a buscar; puede utilizar el filtro de área. La pantalla
-deshabilita la exportación cuando se ha aplicado un rol.
+<!-- manual:all persons:page-view person:reports-read -->
+En Personas, quite el filtro por rol para habilitar la descarga. Puede filtrar por área.
+<!-- manual:end -->
 
+<!-- manual:any warehouse:reports-read admin:reports-read -->
+<!-- manual:any warehouse:reports-read movements:read -->
 ## Elegir periodo o filtros en un documento
 
-1. En Compras, Salidas o Movimientos, pulse **Exportar Excel**.
+1. En el listado, pulse **Exportar Excel**.
 2. En **Exportar reporte**, revise **Alcance del reporte**.
 3. Para la consulta de la tabla, seleccione **Filtros aplicados en la tabla**.
 4. Para un periodo mensual, elija **Mes actual** o **Mes específico**. En el segundo
@@ -46,17 +62,13 @@ deshabilita la exportación cuando se ha aplicado un rol.
 
 ![Selección del alcance y periodo de una exportación.](images/27-report.png)
 
-El alcance mensual incluye el mes completo, sin filtros de tabla. **Mes actual** usa el
-horario de Ciudad de México; consulta filtrada usa los filtros aplicados. Revise el
-alcance: la página visible no limita el archivo.
+El alcance mensual incluye el mes completo y omite los filtros de tabla.
+**Mes actual** usa el horario de Ciudad de México.
+<!-- manual:end -->
+<!-- manual:end -->
 
 ## Resolver una descarga fallida
 
-Si aparece **Error de descarga**, compruebe conexión y disponibilidad del servicio.
-Corrija un mes inválido si el formulario lo señala y vuelva a descargar. Un
-reintento de descarga no crea registros de inventario. Revise también si el
-navegador bloqueó la descarga o cambió su carpeta de destino.
-
-Si la acción no aparece, puede faltar el permiso de reporte. Solicite su revisión
-al responsable de accesos. Los archivos descargados pueden contener información
-operativa: compártalos sólo con las personas autorizadas por su organización.
+Compruebe la conexión y el mensaje del formulario antes de repetir la descarga.
+Revise también la carpeta de destino y los bloqueos del navegador. Descargar otra
+vez no modifica inventario. Comparta los archivos por el medio autorizado de su organización.

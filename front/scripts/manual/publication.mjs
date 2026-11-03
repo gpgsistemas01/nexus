@@ -1,7 +1,7 @@
-import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, access, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { selectedChapters, filterManualContent, imageNames } from './model.mjs';
+import { MANUAL_SECTIONS, selectedChapters, filterManualContent, imageNames } from './model.mjs';
 import { validProfileId } from './profiles.mjs';
 import { DATA_SCOPES, hasDataScope } from '../../../back/src/constants/permissions.js';
 
@@ -15,6 +15,7 @@ export const accessFingerprint = (session) =>
         .update(
             JSON.stringify({
                 id: session.id,
+                name: session.name ?? null,
                 permissions: [...session.permissions].sort(),
                 accesses: (session.accesses ?? [])
                     .map(({ roleKey, departmentKey, departmentId }) => ({
@@ -36,6 +37,26 @@ const manualText = (value) =>
         .replaceAll('\\', '\\\\')
         .replace(/[|[\]!*_`#]/g, (character) => '\\' + character)
         .replace(/\s+/g, ' ');
+
+const removeUnselectedFiles = async (directory, selected, extension) => {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+        if (entry.isFile() && entry.name.endsWith(extension) && !selected.has(entry.name))
+            await rm(path.join(directory, entry.name));
+    }
+};
+
+const manualContents = (chapters) => {
+    const lessons = chapters.map((chapter, index) => ({ ...chapter, number: index + 1 }));
+    return MANUAL_SECTIONS.map(({ id, title }) => {
+        const selected = lessons.filter((chapter) => chapter.section === id);
+        if (!selected.length) return '';
+        return `## ${title}\n\n| Orden | Lección |\n| --- | --- |\n${selected
+            .map(({ number, title: label, file }) => `| ${number} | [${label}](${file}) |`)
+            .join('\n')}\n`;
+    })
+        .filter(Boolean)
+        .join('\n');
+};
 
 export const prepareManual = async (frontRoot, profile, session) => {
     if (
@@ -68,8 +89,8 @@ export const prepareManual = async (frontRoot, profile, session) => {
     const scope = !chapters.some((chapter) => chapter.file === '12-issues.md')
         ? ''
         : hasDataScope(session.accesses ?? [], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)
-          ? 'En Salidas de Materiales, Consumibles y Mermas puede consultar y registrar documentos para todas las áreas, según los permisos y el estado de cada documento.'
-          : 'En Salidas de Materiales, Consumibles y Mermas sólo puede consultar y registrar solicitudes para las áreas asignadas a su cuenta. Limpiar los filtros no amplía ese acceso.';
+          ? 'En Salidas de Materiales, Consumibles y Mermas puede consultar y registrar documentos para todas las áreas.'
+          : 'En Salidas de Materiales, Consumibles y Mermas sólo puede consultar y registrar solicitudes para las áreas asignadas a su cuenta.';
     const accessRows = [
         ...new Set(
             (session.accesses ?? []).map(
@@ -83,16 +104,18 @@ export const prepareManual = async (frontRoot, profile, session) => {
         ),
     ].sort();
     const detectedAccess = accessRows.length
-        ? '## Acceso detectado de la cuenta\n\n| Área | Rol |\n| --- | --- |\n' +
-          accessRows.join('\n') +
-          '\n\nLas tareas siguientes se seleccionan con los permisos efectivos de esta sesión.\n\n'
+        ? '## Su cuenta\n\n| Área | Rol |\n| --- | --- |\n' + accessRows.join('\n') + '\n'
         : '';
-    const title = `Manual de inducción de Nexus — ${profile.label}`;
+    const accountName =
+        typeof session.name === 'string' && session.name.trim() ? session.name : profile.label;
+    const title = `Manual de Nexus — ${manualText(accountName)}`;
     const documentDate = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/Mexico_City',
     }).format(new Date());
-    const index = `# ${title}\n\n## Datos generales del documento\n\n| Versión documental | Versión del sistema | Estado | Fecha | Responsable |\n| --- | --- | --- | --- | --- |\n| 1.1 | 1.0.0 | En revisión | ${documentDate} | Equipo Nexus |\n\n## Su recorrido de aprendizaje\n\nEsta edición se identifica como **${profile.label}**. Empiece por Primera jornada y continúe con la tarea que necesita realizar. Las funciones y capturas se seleccionaron con los permisos efectivos de la sesión al generar esta edición.\n\n${profile.mode === 'demo' ? 'Las capturas usan datos ficticios y los permisos calculados por las políticas actuales del sistema. Esta edición de demostración no certifica la asignación de una cuenta real.' : 'Las capturas muestran la interfaz de la cuenta utilizada en el entorno de capacitación. Los nombres y cantidades de su trabajo pueden ser diferentes.'}\n\n${detectedAccess}${scope}\n\n| Orden | Lección |\n| --- | --- |\n${chapters.map((chapter, i) => `| ${i + 1} | [${chapter.title}](${chapter.file}) |`).join('\n')}\n\n## Localizar una solución rápidamente\n\nSi una captura presenta un mensaje o no sabe si una operación terminó, abra [Errores y recuperación](15-errors-and-recovery.md). Si todavía está aprendiendo la navegación o el significado de un campo, comience por [Primera jornada](00-induction.md) y [Navegación y controles](02-navigation-and-controls.md).\n\nNo comparta su contraseña para solicitar ayuda. Si cambia su acceso, solicite una edición actualizada del manual.\n`;
+    const index = `# ${title}\n\n## Datos generales del documento\n\n| Versión documental | Versión del sistema | Estado | Fecha | Responsable |\n| --- | --- | --- | --- | --- |\n| 1.3 | 1.0.0 | En revisión | ${documentDate} | Equipo Nexus |\n\n${detectedAccess}\n${scope}\n\nEsta guía reúne las tareas disponibles para su cuenta. Empiece por Primera jornada y continúe con la tarea que necesita.\n\n${profile.mode === 'demo' ? 'Las imágenes muestran ejemplos con datos ficticios.\n\n' : ''}${manualContents(chapters)}\nSi aparece un mensaje, consulte [Errores y recuperación](15-errors-and-recovery.md). Si cambia su acceso, solicite un manual actualizado.\n`;
     await mkdir(path.join(root, 'sources'), { recursive: true });
+    await removeUnselectedFiles(path.join(root, 'sources'), files, '.md');
+    await removeUnselectedFiles(path.join(root, 'images'), images, '.png');
     await writeFile(path.join(root, 'sources/index.md'), index);
     for (const source of sources)
         await writeFile(path.join(root, 'sources', source.file), source.content);

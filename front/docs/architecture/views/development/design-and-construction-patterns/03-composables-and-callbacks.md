@@ -87,8 +87,15 @@ define cancelación y respuestas tardías; el
 [contrato de callbacks](../../../contracts/form-and-event-contracts.md#callbacks-de-composición),
 los intercambios del lector y guardado.
 
-Los lectores reciben la consulta al crearse; el guardado recibe la operación en
-`execute(operation)`. Las pruebas de [listados](../../../../../tests/unit/modules/catalogs/catalogListTest.ts)
+Los lectores reciben la consulta al crearse. [useRecordForm](../../../../../src/shared/composables/useRecordForm.ts)
+compone `useFormInteraction` y `useRecordSave`: el editor configura
+`handleSubmit(operation)` y obtiene un envío validado y protegido contra duplicados,
+conflictos y desmontaje. Las reglas y la operación permanecen en el dominio.
+La [composición de Salidas](08-document-responsibilities.md#composición-del-editor-y-adaptadores)
+muestra la aplicación; [recordFormTest](../../../../../tests/unit/shared/composables/recordFormTest.ts)
+comprueba ese ciclo.
+
+Las pruebas de [listados](../../../../../tests/unit/modules/catalogs/catalogListTest.ts)
 y [búsqueda remota](../../../../../tests/unit/shared/composables/remoteLookupTest.ts)
 comprueban sus resultados y respuestas tardías.
 

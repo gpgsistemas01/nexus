@@ -86,7 +86,7 @@ export const captureRecipe = async (
     );
     if (!first) throw new Error('La cuenta no tiene ninguna página de navegación disponible.');
     await go(page, first.to);
-    await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+    await page.getByRole('button', { name: 'Menú', exact: true }).click();
     const menu = page.getByRole('navigation', { name: 'Navegación principal' });
     for (const group of APP_NAVIGATION_GROUPS)
       if (!group.links.some(({ permission }) => user.permissions.includes(permission)))

@@ -16,7 +16,7 @@ for (const entry of recordRoutes) {
     await expect(
       page.getByRole('heading', { name: `Tabla de ${entry.title}`, exact: true }),
     ).toBeVisible();
-    await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+    await page.getByRole('button', { name: 'Menú', exact: true }).click();
     const menu = page.getByRole('navigation', { name: 'Navegación principal' });
     await expect(
       menu.getByRole('button', {

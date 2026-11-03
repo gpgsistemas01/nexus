@@ -24,4 +24,4 @@ flowchart TB
 
 VeeValidate se integra en el editor y Vuetify en los componentes visuales. La definición
 `catalog.ts` es código propio de configuración. La [secuencia de guardado](../../processes/03-catalogs-and-directory/01-catalog-record-save.md)
-muestra cómo el callback del editor permite reutilizar `useRecordSave` sin imports al dominio.
+muestra cómo `useRecordForm` compone interacción y guardado mediante el callback del editor.

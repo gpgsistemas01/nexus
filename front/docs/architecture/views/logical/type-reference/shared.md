@@ -167,17 +167,14 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## RemoteSelect.defineProps
 
-**Fuente:** [src/shared/components/RemoteSelect.vue](../../../../../src/shared/components/RemoteSelect.vue) · línea 10, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/RemoteSelect.vue](../../../../../src/shared/components/RemoteSelect.vue) · línea 11, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `label` | `label: string;` |
 | `modelValue` | `modelValue: string;` |
-| `items` | `items: LookupItem[];` |
-| `isLoading` | `isLoading: boolean;` |
+| `state` | `state?: LookupState;` |
 | `error` | `error?: string;` |
-| `loadError` | `loadError?: string;` |
-| `hasMore` | `hasMore?: boolean;` |
 | `isDisabled` | `isDisabled?: boolean;` |
 | `hint` | `hint?: string;` |
 | `initialOption` | `initialOption?: LookupItem;` |
@@ -185,12 +182,12 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| association | [LookupItem](../../../../../src/shared/lookup.ts) | `items` |
+| association | [LookupState](../../../../../src/shared/lookup.ts) | `state` |
 | association | [LookupItem](../../../../../src/shared/lookup.ts) | `initialOption` |
 
 ## RemoteSelect.defineEmits
 
-**Fuente:** [src/shared/components/RemoteSelect.vue](../../../../../src/shared/components/RemoteSelect.vue) · línea 23, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/RemoteSelect.vue](../../../../../src/shared/components/RemoteSelect.vue) · línea 29, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -339,6 +336,30 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- |
 | `page` | `page: number;` |
 | `length` | `length: number;` |
+
+## RecordForm
+
+**Fuente:** [src/shared/composables/useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts) · línea 7, columna 1. **Declaración:** type.
+
+**Parámetros:** `Values extends object`.
+
+**Definición completa:**
+
+```typescript
+InteractiveForm<
+    keyof Values & string,
+    Values[keyof Values]
+> & {
+    values: Values;
+    isSubmitting: Ref<boolean>;
+    setErrors: (errors: Record<string, string>) => void;
+    handleSubmit: (handler: (values: Values) => Promise<void>) => () => Promise<unknown>;
+}
+```
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [InteractiveForm](../../../../../src/shared/composables/useFormInteraction.ts) | `type` |
 
 ## TableOptions
 

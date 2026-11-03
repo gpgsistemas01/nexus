@@ -20,7 +20,7 @@ test('catálogos: navegación Vue, seis rutas y cuenta con acceso exclusivo a ca
   await mockCatalogs(page, ['catalogs:manage']);
   await page.goto('/almacen');
   await expect(page).toHaveURL(/\/catalogos\/departments$/);
-  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
   const menu = page.getByRole('navigation', { name: 'Navegación principal' });
   await expect(menu.getByRole('button', { name: 'Almacén', exact: true })).toBeHidden();
   await expect(menu.getByRole('button', { name: 'Catálogos', exact: true })).toHaveAttribute(
@@ -197,7 +197,7 @@ test('catálogos: acceso directo sin permiso no consulta la API administrativa',
   ).toBeVisible();
   expect(reads).toEqual([]);
   await page.goto('/almacen/materiales');
-  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Catálogos', exact: true })).toBeHidden();
 });
 

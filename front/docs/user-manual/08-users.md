@@ -2,9 +2,8 @@
 
 ## Crear una cuenta
 
-Abra **Identidad y acceso → Usuarios**. Esta función requiere permiso de
-administración de usuarios. La **Tabla de Usuarios** permite distinguir el nombre
-de acceso, la persona vinculada y la asignación organizativa.
+Abra **Identidad y acceso → Usuarios**. La tabla muestra cuenta, persona vinculada,
+área y rol.
 
 1. Pulse **Nuevo usuario**.
 2. En **Registrar usuario**, capture **Usuario** y **Contraseña**.
@@ -15,15 +14,13 @@ de acceso, la persona vinculada y la asignación organizativa.
 
 ![Formulario de alta de una cuenta de acceso.](images/14-user-create.png)
 
-El nombre de usuario identifica la cuenta al ingresar. Use una contraseña que
-cumpla los mensajes del formulario. No coloque una contraseña real en capturas de
-pantalla ni en solicitudes de soporte.
+La contraseña debe cumplir los mensajes del formulario. No la incluya en capturas
+ni solicitudes de soporte.
 
 ## Editar una cuenta
 
-**Antes de actualizar.** Cambiar el área o rol afecta lo que la cuenta puede ver y
-hacer. Confirme la autorización de esa asignación y la identidad del usuario. No
-asigne administración del sistema para resolver una consulta operativa.
+**Antes de actualizar.** El área y rol determinan lo que la cuenta puede hacer.
+Compruebe la identidad y la asignación autorizada.
 
 1. Localice el usuario y pulse **Editar registro**.
 2. Revise **Usuario**, **Área** y **Rol**.
@@ -32,14 +29,12 @@ asigne administración del sistema para resolver una consulta operativa.
 4. Cambie únicamente los campos autorizados y pulse **Actualizar**.
 5. Compruebe los datos en el listado.
 
-La edición de datos no muestra ni vuelve a enviar la contraseña. No necesita
-conocer la contraseña anterior para corregir un nombre o asignación.
+Esta edición conserva la contraseña actual.
 
 ## Cambiar una contraseña
 
-**Antes de actualizar una contraseña.** El cambio afecta el siguiente ingreso de
-esa cuenta. Confirme quién debe recibir la nueva clave y el medio autorizado para
-entregarla. No escriba la clave en observaciones ni en un reporte.
+**Antes de actualizar.** La nueva contraseña se usará en el siguiente ingreso.
+Compruebe a quién debe entregarla y utilice el medio autorizado.
 
 1. Identifique cuidadosamente la cuenta en la tabla.
 2. Pulse **Cambiar contraseña**.
@@ -49,12 +44,12 @@ entregarla. No escriba la clave en observaciones ni en un reporte.
 
 ![Operación independiente para actualizar la contraseña de una cuenta.](images/15-user-password.png)
 
-Si aparece un conflicto, cierre y actualice el listado antes de volver a preparar
-el cambio para la cuenta vigente. Si se rechaza la autorización, solicite la
-revisión de sus permisos; una cuenta de consulta no puede administrar otras cuentas.
+Ante un conflicto o rechazo, siga [Errores y recuperación](15-errors-and-recovery.md).
 
 ## Consultar y reportar
 
-Busque por nombre y pulse **Buscar**. Con permiso de reporte, **Exportar Excel**
-descarga la consulta aplicada sin limitarse a la página visible. Las contraseñas
-no forman parte de los datos de consulta de la tabla.
+Busque por nombre y pulse **Buscar**. La tabla no muestra contraseñas.
+
+<!-- manual:any admin:reports-read -->
+**Exportar Excel** descarga todos los resultados de la consulta.
+<!-- manual:end -->

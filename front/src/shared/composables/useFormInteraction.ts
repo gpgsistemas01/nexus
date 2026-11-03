@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 
-interface InteractiveForm<Field extends string, Value> {
+export interface InteractiveForm<Field extends string, Value> {
     values: Record<Field, Value>;
     submitCount: Ref<number>;
     setFieldValue: (field: Field, value: Value, shouldValidate: boolean) => void;

@@ -11,12 +11,8 @@ recibe y fechas cuando los necesite. Pulse **Buscar** para utilizar esos filtros
 <!-- manual:any goods:receipts-manage -->
 ## Registrar una compra
 
-**Antes de empezar.** Identifique el proveedor, la persona que recibe, el documento
-de compra y los artículos recibidos. Revise las unidades y costos por presentación.
-
-**Qué va a conseguir.** Registrar la mercancía recibida y sus importes en un
-documento. Al guardarlo se afectan las existencias. Tenga el documento físico a la
-vista y no registre el mismo recibo dos veces.
+**Antes de empezar.** Reúna comprobante, proveedor, persona que recibe y artículos.
+Guardar la compra incrementa existencias; compruebe que la recepción no esté registrada.
 
 1. Pulse **Nueva compra** para abrir **Registrar compra**.
 2. Seleccione **Proveedor** y **Persona que recibe**.
@@ -37,20 +33,19 @@ Las fechas y horas usan el horario de Ciudad de México.
 
 ![Compra en preparación con encabezado, detalle y totales estimados.](images/19-purchase-create.png)
 
-**Agregar** prepara una fila; **Guardar** registra la recepción. Conversiones e importes
-son vistas previas: compruebe la compra guardada. En costo por presentación capture el
-valor unitario, no el total.
+Los importes mostrados son estimados hasta guardar. Capture el costo por presentación,
+no el total de la compra.
 
-Si falta un proveedor o artículo y aparece su acción **Registrar**, utilice el
-alta secundaria. El artículo creado desde la compra no necesita repetir la
-entrada inicial: las existencias se reciben al guardar la compra.
+<!-- manual:any suppliers:manage materials:write -->
+Si falta un proveedor o artículo y aparece **Registrar**, use el alta secundaria.
+La recepción de ese artículo se registra al guardar la compra.
+<!-- manual:end -->
 <!-- manual:end -->
 
 ## Consultar una compra
 
-**Ver compra** abre el documento para consultar folio, proveedor, persona que
-recibe, fecha, factura, observaciones y detalles. Con permiso de gestión también
-ofrece las acciones de corrección y cancelación de detalles. Use **Regresar** al terminar.
+**Ver compra** muestra folio, proveedor, persona que recibe, fecha, factura,
+observaciones y detalles. Use **Regresar** al terminar.
 
 ![Consulta de una compra ya registrada y sus detalles.](images/20-purchase-view.png)
 
@@ -64,9 +59,7 @@ Para una modificación autorizada:
 3. Modifique los campos habilitados del encabezado, incluidas **Observaciones**.
 4. Pulse **Actualizar** y consulte nuevamente el documento.
 
-Las observaciones del encabezado pueden editarse. Los datos y observaciones
-conservados en el historial de movimientos pertenecen a sus operaciones; no son
-el mismo dato que el encabezado de la compra.
+Editar **Observaciones** del encabezado conserva las observaciones de los movimientos anteriores.
 <!-- manual:end -->
 
 <!-- manual:any goods:receipts-manage -->
@@ -79,15 +72,13 @@ el mismo dato que el encabezado de la compra.
 4. Revise los detalles nuevos y los totales. Use **Quitar detalle nuevo** si preparó un detalle equivocado.
 5. Pulse **Actualizar**, espere la confirmación y vuelva a consultar la compra.
 
-Los detalles nuevos incrementan existencias al confirmar. Los ya registrados no
-vuelven a recibirse y se conservan sin sobrescribirlos. Para cambiar un detalle
-persistido, utilice su corrección o cancelación específica.
+Al confirmar se reciben sólo los detalles nuevos. Para cambiar uno ya guardado,
+use su corrección o cancelación.
 
 ## Corregir un detalle registrado
 
-**Antes de confirmar.** Corregir sustituye la cantidad y el costo de un detalle
-ya guardado y puede modificar inventario e importes. Capture los valores finales
-correctos; no escriba solamente la diferencia.
+**Antes de confirmar.** La corrección cambia inventario e importes. Capture los
+valores finales de cantidad y costo, no la diferencia.
 
 1. Abra **Ver compra** y localice el detalle.
 2. Pulse **Corregir detalle**.
@@ -100,8 +91,6 @@ correctos; no escriba solamente la diferencia.
 
 ![Formulario de corrección de cantidad y costo de un detalle de compra.](images/21-purchase-correction.png)
 
-Capture el valor final, no la diferencia:
-
 | Corrección | Regla |
 | --- | --- |
 | Cantidad correcta | Mayor que cero, incluso una fracción menor que 1; no puede superar la cantidad recibida vigente. |
@@ -112,28 +101,24 @@ Si la existencia impide corregir, revise el caso; no compense cambiando otro art
 
 ## Cancelar un detalle
 
-**Antes de cancelar.** Compruebe que debe anular ese detalle, no otro del mismo
-artículo. La cancelación modifica sus efectos y conserva el historial. Si tiene
-dudas sobre una recepción ya utilizada, consulte al responsable de Almacén.
+**Antes de cancelar.** Compruebe el detalle y su proveedor. Cancelar revierte su
+efecto en inventario; una recepción ya utilizada puede requerir revisión de Almacén.
 
 En **Ver compra**, **Cancelar detalle** solicita una confirmación. Revise folio,
 artículo y consecuencia antes de confirmar **Cancelar detalle**. **Cancelar**
 abandona la confirmación sin aplicar el cambio. Compruebe el estado del detalle
 y los totales actualizados después de una cancelación exitosa.
 
-La cancelación conserva el rastro de la operación y puede ser rechazada si el
-estado o saldo no la permiten. Consulte [Movimientos](13-movements.md) para
-contrastar los efectos y [Reportes](14-reports.md) para exportar por consulta o mes.
-Ante una respuesta incierta, consulte el folio antes de volver a registrar la compra.
+El estado o saldo pueden impedir cancelar. Revise los efectos en [Movimientos](13-movements.md).
+Ante un envío sin respuesta, consulte [Errores y recuperación](15-errors-and-recovery.md).
 
-Cancelar el último detalle activo deja la compra **Cancelada**. El documento y su
-historial se conservan para consulta; no se elimina la compra ni se habilita otra recepción sobre ella.
+Al cancelar el último detalle activo, la compra queda **Cancelada** y conserva su
+historial. No admite nuevas recepciones.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->
 ## Exportar compras
 
-En el listado, pulse **Exportar Excel** y seleccione filtros aplicados o periodo
-mensual. Compruebe el contexto Materiales/Consumibles y el alcance elegido. El
-[capítulo de reportes](14-reports.md) explica los pasos y la recuperación de una descarga fallida.
+Pulse **Exportar Excel** y compruebe el contexto Materiales/Consumibles.
+[Reportes](14-reports.md) explica los filtros y periodos disponibles.
 <!-- manual:end -->

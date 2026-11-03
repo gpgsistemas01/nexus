@@ -91,7 +91,7 @@ export const useRemoteLookup = (
 
         search.value = value;
         resetOptions();
-        isLoading.value = false;
+        isLoading.value = isEnabled.value;
         clearTimeout(timer);
         // Invalidar inmediatamente, incluso durante el debounce.
         ++sequence;

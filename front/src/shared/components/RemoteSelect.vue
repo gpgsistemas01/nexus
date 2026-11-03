@@ -5,21 +5,27 @@ import { VProgressCircular } from 'vuetify/components/VProgressCircular';
 import { Intersect as vIntersect } from 'vuetify/directives/intersect';
 import { computed, ref, toRef } from 'vue';
 import { useSelectedOption } from '../composables/useSelectedOption.js';
-import type { LookupItem } from '../lookup.js';
+import type { LookupItem, LookupState } from '../lookup.js';
 
-const props = defineProps<{
-    label: string;
-    modelValue: string;
-    items: LookupItem[];
-    isLoading: boolean;
-    error?: string;
-    loadError?: string;
-    hasMore?: boolean;
-    isDisabled?: boolean;
-    hint?: string;
-    initialOption?: LookupItem;
-    createLabel?: string;
-}>();
+const props = withDefaults(
+    defineProps<{
+        label: string;
+        modelValue: string;
+        state?: LookupState;
+        error?: string;
+        isDisabled?: boolean;
+        hint?: string;
+        initialOption?: LookupItem;
+        createLabel?: string;
+    }>(),
+    {
+        state: () => ({ items: [], isLoading: false, error: '', hasMore: false }),
+        error: undefined,
+        hint: undefined,
+        initialOption: undefined,
+        createLabel: undefined,
+    },
+);
 const emit = defineEmits<{
     'update:modelValue': [value: string];
     search: [value: string];
@@ -31,22 +37,22 @@ const emit = defineEmits<{
 const isMenuOpen = ref(false);
 const search = ref('');
 const currentItem = useSelectedOption(
-    toRef(props, 'items'),
+    toRef(() => props.state.items),
     () => props.modelValue,
     () => props.initialOption,
 );
 const visibleItems = computed(() =>
-    currentItem.value && !props.items.some((item) => item.id === currentItem.value!.id)
-        ? [currentItem.value, ...props.items]
-        : props.items,
+    currentItem.value && !props.state.items.some((item) => item.id === currentItem.value!.id)
+        ? [currentItem.value, ...props.state.items]
+        : props.state.items,
 );
 const canCreate = computed(
     () =>
         !!props.createLabel &&
         !!search.value.trim() &&
         !props.isDisabled &&
-        !props.isLoading &&
-        !props.loadError &&
+        !props.state.isLoading &&
+        !props.state.error &&
         !visibleItems.value.some(
             (item) =>
                 item.title.trim().toLocaleLowerCase() === search.value.trim().toLocaleLowerCase(),
@@ -74,9 +80,9 @@ const loadWhenVisible = (isVisible: boolean) => {
     if (
         isVisible &&
         isMenuOpen.value &&
-        props.hasMore &&
-        !props.isLoading &&
-        !props.loadError &&
+        props.state.hasMore &&
+        !props.state.isLoading &&
+        !props.state.error &&
         !props.isDisabled
     )
         emit('more');
@@ -92,13 +98,13 @@ const loadWhenVisible = (isVisible: boolean) => {
         item-title="title"
         item-value="id"
         :item-props="(item) => ({ disabled: item.isDisabled === true })"
-        :loading="isLoading"
+        :loading="state.isLoading"
         :disabled="isDisabled"
         :hint="hint"
         :persistent-hint="!!hint && isDisabled"
-        :error-messages="error || loadError"
+        :error-messages="error || state.error"
         :aria-label="label"
-        :aria-invalid="!!error || !!loadError"
+        :aria-invalid="!!error || !!state.error"
         :menu-props="{ maxHeight: 280 }"
         variant="outlined"
         density="compact"
@@ -116,15 +122,15 @@ const loadWhenVisible = (isVisible: boolean) => {
             >
                 <span>
                     {{
-                        isLoading
+                        state.isLoading
                             ? 'Cargando opciones…'
-                            : loadError
+                            : state.error
                               ? 'No se pudo cargar el catálogo.'
                               : 'No hay resultados.'
                     }}
                 </span>
                 <VBtn
-                    v-if="loadError"
+                    v-if="state.error"
                     variant="text"
                     @click.stop="emit('retry')"
                 >
@@ -146,20 +152,20 @@ const loadWhenVisible = (isVisible: boolean) => {
                 {{ createLabel }} «{{ search.trim() }}»
             </VBtn>
             <div
-                v-if="hasMore"
-                :key="items.length"
+                v-if="state.hasMore"
+                :key="state.items.length"
                 v-intersect="loadWhenVisible"
                 class="catalog-status"
                 role="status"
             >
                 <VProgressCircular
-                    v-if="isLoading"
+                    v-if="state.isLoading"
                     indeterminate
                     size="18"
                     width="2"
                 />
                 <VBtn
-                    v-else-if="loadError"
+                    v-else-if="state.error"
                     variant="text"
                     @click.stop="emit('retry')"
                 >

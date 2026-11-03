@@ -16,6 +16,7 @@ sequenceDiagram
     box Coordinación
     participant Page@{ "type": "control" } as IssueReturn<br/>Page.vue
     participant Return@{ "type": "control" } as useIssue<br/>Return.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Reglas y datos
@@ -26,10 +27,10 @@ sequenceDiagram
     Rules-->>Return: nowrap: availableQuantity
     U->>Form: nowrap: submit
     Form->>Page: nowrap: emit('submit')
-    Page->>Return: nowrap: form.submit()
+    Page->>Record: nowrap: form.submit()
     opt nowrap: !isDisabled()
-        Return->>Return: nowrap: validated()
-        Return->>Save: nowrap: save.execute(operation)
+        Record->>Record: nowrap: validated()
+        Record->>Save: nowrap: save.execute(operation)
     end
 ```
 
@@ -44,16 +45,19 @@ sequenceDiagram
     participant Page@{ "type": "control" } as IssueReturn<br/>Page.vue
     participant Parent@{ "type": "control" } as IssueEditor<br/>Page.vue
     participant Return@{ "type": "control" } as useIssue<br/>Return.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Integración
     participant Service@{ "type": "boundary" } as issue<br/>Service.ts
     end
-    Save->>Return: nowrap: operation(controller.signal)
+    Save->>Record: nowrap: operation(controller.signal)
+    Record->>Return: nowrap: operation(values, signal)
     Return->>Service: nowrap: issueService.returnDetail({ resource:<br/>options.resource, documentId:<br/>options.document.id, detailId:<br/>options.detail.id, payload: {<br/>returnQuantity: Number(<br/>values.returnQuantity), observations:<br/>values.observations.trim() }, signal })
     alt nowrap: try
         Service-->>Return: nowrap: MutationConfirmation
-        Return-->>Save: nowrap: result
+        Return-->>Record: nowrap: result
+        Record-->>Save: nowrap: result
         opt nowrap: !controller.signal.aborted
             Save->>Page: nowrap: options.onSaved(result)
             Page->>Parent: nowrap: emit('saved', result)
@@ -61,7 +65,8 @@ sequenceDiagram
         end
     else nowrap: catch(cause)
         Service-->>Return: nowrap: throw ApiError
-        Return-->>Save: nowrap: throw cause
+        Return-->>Record: nowrap: throw cause
+        Record-->>Save: nowrap: throw cause
         opt nowrap: !controller.signal.aborted && cause instanceof<br/>ApiError
             Save->>Return: nowrap: options.setErrors(cause.fieldErrors)
             Return-->>Page: nowrap: { errors, message, isConflicted }
@@ -74,6 +79,7 @@ sequenceDiagram
 [IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue),
 [IssueReturnPage.vue](../../../../../src/modules/issues/pages/IssueReturnPage.vue),
 [useIssueReturn.ts](../../../../../src/modules/issues/composables/useIssueReturn.ts),
+[useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts),
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [issueRules.ts](../../../../../src/modules/issues/issueRules.ts),
 [IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue),

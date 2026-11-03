@@ -1,7 +1,6 @@
 import { useForm } from 'vee-validate';
 import { createCatalogValidation } from '@nexus/form-validation';
-import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
-import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
+import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { buildCatalogPayload, catalogDefinition } from '../catalog.js';
 import { catalogService } from '../services/catalogService.js';
 import type { CatalogField, CatalogName, CatalogTarget, CatalogValues } from '../catalog.js';
@@ -39,44 +38,19 @@ export const useCatalogEditor = (options: {
         form.defineField(field, { validateOnModelUpdate: false });
     }
 
-    const save = useRecordSave({
+    const record = useRecordForm(form, {
         onSaved: options.onSaved,
         onDenied: options.onDenied,
-        setErrors: form.setErrors,
         errorMessage: 'No se pudo guardar el catálogo.',
     });
-    const { update, blur } = useFormInteraction<CatalogField, string | boolean>(form, {
-        isDisabled: () =>
-            form.isSubmitting.value ||
-            save.isSubmitting.value ||
-            save.isConflicted.value ||
-            save.isDisposed(),
-        onChange: () => {
-            save.message.value = '';
-        },
-    });
-    const submitValidated = form.handleSubmit((values) =>
-        save.execute((signal) =>
-            catalogService.save(
-                catalog,
-                target,
-                buildCatalogPayload(catalog, target, values),
-                signal,
-            ),
-        ),
+    const submit = record.handleSubmit((values, signal) =>
+        catalogService.save(catalog, target, buildCatalogPayload(catalog, target, values), signal),
     );
-
-    const submit = () => {
-        if (!form.isSubmitting.value && !save.isConflicted.value) return submitValidated();
-    };
 
     return {
         values: form.values,
         errors: form.errors,
-        ...save,
-        isSubmitting: form.isSubmitting,
-        update,
-        blur,
+        ...record,
         submit,
     };
 };

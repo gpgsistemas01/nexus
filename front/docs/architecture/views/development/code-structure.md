@@ -47,6 +47,9 @@ una capa ejecutable.
 | `modules/<dominio>` | El archivo del dominio, como `purchase.ts`, declara contratos; `*Config.ts`, etiquetas y descriptores. `pages` conecta presentación y composables; `services` y `mappers` conservan sus adaptaciones propias. |
 | `shared` | Controles, contratos y funciones usados por distintos módulos. `usePagedList` recibe la consulta por callback y `ServerTable` recibe datos/slots; ninguno importa el servicio de un dominio. |
 
+`useRecordForm` compone interacción y guardado para Catálogos, Directorio, Identidad,
+Compras y Salidas. Cada editor conserva sus reglas, valores iniciales y payloads.
+
 La [composición de documentos](design-and-construction-patterns/08-document-responsibilities.md)
 localiza reglas, esquemas, detalles y adaptadores de Compras/Salidas. El
 [alta contextual](design-and-construction-patterns/09-contextual-creation.md) muestra

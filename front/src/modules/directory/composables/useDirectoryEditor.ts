@@ -1,7 +1,6 @@
 import { useForm } from 'vee-validate';
 import { clientValidation, supplierValidation } from '@nexus/form-validation';
-import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
-import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
+import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { directoryPayload } from '../directory.js';
 import { directoryService } from '../services/directoryService.js';
 import type {
@@ -39,36 +38,18 @@ export const useDirectoryEditor = (options: {
     });
     for (const field of Object.keys(rules) as DirectoryField[])
         form.defineField(field, { validateOnModelUpdate: false });
-    let savedEntry: DirectoryEntry | undefined;
-    const save = useRecordSave({
-        onSaved: () => options.onSaved(savedEntry),
+    const record = useRecordForm(form, {
+        onSaved: options.onSaved,
         onDenied: options.onDenied,
-        setErrors: form.setErrors,
     });
-    const interaction = useFormInteraction<DirectoryField, string | boolean>(form, {
-        isDisabled: () =>
-            form.isSubmitting.value ||
-            save.isSubmitting.value ||
-            save.isConflicted.value ||
-            save.isDisposed(),
-        onChange: () => {
-            save.message.value = '';
-        },
-    });
-    const submitValidated = form.handleSubmit((values) =>
-        save.execute(async (signal) => {
-            savedEntry = await directoryService.save(
-                options.resource,
-                options.target,
-                directoryPayload(options.resource, options.target, values),
-                signal,
-            );
-        }),
+    const submit = record.handleSubmit((values, signal) =>
+        directoryService.save(
+            options.resource,
+            options.target,
+            directoryPayload(options.resource, options.target, values),
+            signal,
+        ),
     );
 
-    const submit = () => {
-        if (!form.isSubmitting.value && !save.isConflicted.value) return submitValidated();
-    };
-
-    return { values: form.values, errors: form.errors, ...save, ...interaction, submit };
+    return { values: form.values, errors: form.errors, ...record, submit };
 };

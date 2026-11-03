@@ -29,13 +29,13 @@ purchaseLookupService.list(
 Pasar sólo los campos y callbacks del contrato del receptor. Evitar spreads con todo el
 editor o las props. En
 [useUserEditor](../../../src/modules/identity/composables/useUserEditor.ts), el guardado
-recibe confirmación, rechazo y errores; selección y permisos permanecen en el editor:
+reutiliza el formulario y recibe confirmación y rechazo; selección y permisos
+permanecen en el editor:
 
 ```ts
-const save = useRecordSave({
+const record = useRecordForm(form, {
     onSaved: options.onSaved,
     onDenied: options.onDenied,
-    setErrors: form.setErrors,
 });
 ```
 

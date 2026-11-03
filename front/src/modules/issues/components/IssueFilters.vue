@@ -54,10 +54,7 @@ const hasActiveFilters = computed(
             <RemoteSelect
                 :label="select.label"
                 :model-value="values[select.field]"
-                :items="select.state.items"
-                :is-loading="select.state.isLoading"
-                :has-more="select.state.hasMore"
-                :load-error="select.state.error"
+                :state="select.state"
                 :is-disabled="select.isDisabled"
                 :hint="select.hint"
                 @update:model-value="emit('update', select.field, $event)"

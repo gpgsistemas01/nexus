@@ -181,8 +181,14 @@ npm --prefix front run preview
 | No se resuelve `@nexus/*` | Comprueba la rama y las fuentes públicas del repositorio completo. |
 | Falta `back/generated/prisma/client.ts` | Configura `back/.env` y ejecuta `npm --prefix back run db:generate`. |
 | `502` o `ECONNREFUSED` | Comprueba que la API está activa en `BACKEND_PROXY_TARGET`; reinicia Vite si modificaste su entorno. |
+| `ECONNRESET` en el proxy | Revisa el log de la API en ese momento: la conexión se cerró durante la petición; puede coincidir con un reinicio o un fallo del servidor. |
+| `500` con `tenant/user … not found` en Prisma | Corrige `DATABASE_URL` en `back/.env`: copia la cadena del pooler desde **Connect** del proyecto Supabase y reemplaza el marcador de contraseña. Host y usuario deben pertenecer al mismo proyecto. Reinicia la API. |
 | `401` o `403` con la API respondiendo | Revisa sesión, credenciales y permisos. |
 | `EBADENGINE` | Compara Node con los dos manifiestos y actualiza el ejecutable a una rama admitida. |
+
+La API usa `DATABASE_URL`; `DIRECT_URL` se reserva para migraciones. El diagnóstico
+de [Supabase sobre el pooler](https://supabase.com/kb/troubleshooting/tenant-or-user-not-found)
+explica el formato de host y usuario. Conserva las credenciales sólo en `back/.env`.
 
 ### Dependencias no resueltas en Vite
 

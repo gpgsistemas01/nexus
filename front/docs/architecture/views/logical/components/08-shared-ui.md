@@ -9,6 +9,7 @@ La decisión de herramientas pertenece a [ADR-VUE-006](../../../decisions.md).
 **Identificador:** `DIA-VUE-COMP-009`. **Pregunta:** ¿qué piezas propias componen los
 marcos compartidos? **Fuentes:** `RecordListPanel.vue`, `ServerTable.vue`,
 `TableFrame.vue`, `RecordEditorDialog.vue`, `EditorDialog.vue` y `RemoteSelect.vue`.
+El ciclo de formulario se compone en [useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts).
 **Notación:** [mapa de dependencias](../../diagram-reading.md#componentes-y-dependencias).
 
 ```mermaid
@@ -28,6 +29,13 @@ flowchart TB
         select["RemoteSelect.vue"]
         selected["useSelectedOption.ts"]
         select --> selected
+    end
+    subgraph form["Interacción y guardado"]
+        recordForm["useRecordForm.ts"]
+        interaction["useFormInteraction.ts"]
+        save["useRecordSave.ts"]
+        recordForm --> interaction
+        recordForm --> save
     end
 ```
 

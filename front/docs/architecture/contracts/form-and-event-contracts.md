@@ -12,7 +12,7 @@ datos HTTP, en el [contrato de la API](client-contracts.md).
 | --- | --- |
 | `values`, `errors` y `message` | El composable del editor conserva captura y errores; el contenedor los entrega al formulario. |
 | `isSubmitting`, `isPending`, `isConflicted` y capacidades del modo | El contenedor aporta los indicadores que declara cada componente. |
-| Opciones remotas y selección | El control recibe `LookupState`, el ID y, cuando corresponde, una opción inicial. La consulta y la selección tienen propietarios distintos. |
+| `RemoteSelect.state` y selección | `LookupState` reúne `items`, `isLoading`, `hasMore` y `error`. El ID y la opción inicial se entregan aparte; el error de validación pertenece al campo. |
 | Documento, detalle y vista previa | El contenedor entrega los datos de lectura o calculados que necesita la presentación; no se convierten en una copia del request. |
 
 Los modelos de [tipos por dominio](../views/logical/class-and-type-models/index.md)
@@ -67,7 +67,8 @@ El nombre `saved` no define un payload común a todos los módulos.
 
 | Contrato | Propietario y consumidor |
 | --- | --- |
-| `operation(signal)` | El editor define la operación; `useRecordSave.execute` la ejecuta con su `AbortSignal`. |
+| `useRecordForm.handleSubmit(operation)` | Devuelve `submit()`: comprueba el bloqueo, valida y llama a `operation(values, signal)`. El editor aporta el mapper y el servicio; el resultado llega a `onSaved`. |
+| `operation(signal)` | `useRecordSave.execute` ejecuta la operación del consumidor con su `AbortSignal`. |
 | `onSaved(result)` y `onDenied(status)` | El consumidor los proporciona al composable. El contenedor decide si los transforma en eventos Vue o llama a un handler de acceso. |
 | `LookupCreation` | El formulario solicita un alta con `search` y `onCreated(item)`. El contenedor de aplicación recibe el contrato y compone el editor auxiliar. |
 | `ItemCreation` | Añade `supplier: LookupItem` al contrato anterior para el artículo creado desde Compra. |
@@ -78,7 +79,8 @@ callback al reenviarla como `createSupplier`, `createClient` o `createItem`.
 El [patrón de alta contextual](../views/development/design-and-construction-patterns/09-contextual-creation.md)
 desarrolla la composición y sus alternativas.
 
-Fuentes: [useRecordSave](../../../src/shared/composables/useRecordSave.ts),
+Fuentes: [useRecordForm](../../../src/shared/composables/useRecordForm.ts),
+[useRecordSave](../../../src/shared/composables/useRecordSave.ts),
 [LookupCreation](../../../src/shared/lookup.ts),
 [ItemCreation](../../../src/modules/purchases/purchase.ts) y
 [DirectoryCreationPage](../../../src/app/pages/DirectoryCreationPage.vue).

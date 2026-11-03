@@ -38,7 +38,7 @@ npm run docs:export -- inicio ambos
 npm run docs:export -- arquitectura pdf
 npm run docs:export -- pruebas docx
 npm run docs:export -- completo ambos
-npm run docs:manual -- ambos
+npm run docs:manuals -- --mode live --all
 ```
 
 Desde la raíz se usa `npm --prefix front run` antes del nombre del script.
@@ -50,11 +50,15 @@ técnico y del manual. Estos comandos no requieren Pandoc.
 Sin sección, o con `completo`, reúne la colección; por ejemplo,
 `docs:export -- ambos`. Una selección desconocida se rechaza antes de publicar.
 
+`docs:manuals` genera una edición por cuenta configurada, con sus áreas y roles.
+La preparación se concentra en el [procedimiento por cuenta](07-manual-accounts-and-files.md).
+`docs:manual -- ambos` reúne todas las tareas en una referencia para mantenimiento.
+
 | Selección | DOCX | PDF |
 | --- | --- | --- |
 | Completo | `build/docs/docx/arquitectura/frontend-vue.docx` | `build/docs/pdf/arquitectura/frontend-vue.pdf` |
 | Tema, por ejemplo Pruebas | `build/docs/docx/arquitectura/frontend-vue-pruebas.docx` | `build/docs/pdf/arquitectura/frontend-vue-pruebas.pdf` |
-| Manual general | `build/docs/docx/manuales-vue/manual-usuario.docx` | `build/docs/pdf/manuales-vue/manual-usuario.pdf` |
+| Referencia completa del manual | `build/docs/docx/manuales-vue/manual-usuario.docx` | `build/docs/pdf/manuales-vue/manual-usuario.pdf` |
 
 El formato PDF conserva su DOCX intermedio.
 

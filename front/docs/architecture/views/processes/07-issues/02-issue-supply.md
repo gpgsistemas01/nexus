@@ -16,6 +16,7 @@ sequenceDiagram
     box Coordinación
     participant Page@{ "type": "control" } as IssueEditor<br/>Page.vue
     participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     end
     box Reglas y datos
     participant Details as issue<br/>Details.ts
@@ -26,13 +27,13 @@ sequenceDiagram
     opt nowrap: mode === 'supply'
         Editor->>Details: nowrap: updateIssueDetailSupply(<br/>form.values.details, id, changes)
         Details-->>Editor: nowrap: IssueDetail[]
-        Editor->>Editor: nowrap: interaction.update('details', details)
+        Editor->>Record: nowrap: record.update('details', details)
     end
     U->>Form: nowrap: submit
     Form->>Page: nowrap: emit('submit')
-    Page->>Editor: nowrap: editor.submit()
+    Page->>Record: nowrap: editor.submit()
     opt nowrap: !isDisabled()
-        Editor->>Editor: nowrap: submitValidated()
+        Record->>Record: nowrap: validated()
     end
 ```
 
@@ -46,6 +47,7 @@ sequenceDiagram
     box Coordinación
     participant Page@{ "type": "control" } as IssueEditor<br/>Page.vue
     participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Reglas y datos
@@ -54,21 +56,24 @@ sequenceDiagram
     box Integración
     participant Service@{ "type": "boundary" } as issue<br/>Service.ts
     end
-    Editor->>Save: nowrap: save.execute(operation)
-    Save->>Editor: nowrap: operation(controller.signal)
+    Record->>Save: nowrap: save.execute(operation)
+    Save->>Record: nowrap: operation(controller.signal)
+    Record->>Editor: nowrap: operation(values, signal)
     Editor->>Mapper: nowrap: mapIssueFormToRequest(values,<br/>options.resource, target.mode)
     Mapper-->>Editor: nowrap: payload
     Editor->>Service: nowrap: issueService.save({ resource:<br/>options.resource, target, payload, signal<br/>})
     alt nowrap: try
         Service-->>Editor: nowrap: MutationConfirmation
-        Editor-->>Save: nowrap: result
+        Editor-->>Record: nowrap: result
+        Record-->>Save: nowrap: result
         opt nowrap: !controller.signal.aborted
             Save->>Page: nowrap: options.onSaved(result)
             Page->>Page: nowrap: emit('saved', result)
         end
     else nowrap: catch(cause)
         Service-->>Editor: nowrap: throw ApiError
-        Editor-->>Save: nowrap: throw cause
+        Editor-->>Record: nowrap: throw cause
+        Record-->>Save: nowrap: throw cause
         opt nowrap: !controller.signal.aborted && cause instanceof<br/>ApiError
             Save->>Editor: nowrap: options.setErrors(cause.fieldErrors)
             Editor-->>Page: nowrap: { errors, message, isConflicted }
@@ -81,6 +86,7 @@ sequenceDiagram
 [IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue),
 [IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue),
 [useIssueEditor.ts](../../../../../src/modules/issues/composables/useIssueEditor.ts),
+[useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts),
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [issueDetails.ts](../../../../../src/modules/issues/issueDetails.ts),
 [issueRequestMapper.ts](../../../../../src/modules/issues/mappers/issueRequestMapper.ts),

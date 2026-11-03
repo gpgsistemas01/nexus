@@ -13,6 +13,26 @@ const result = (ids: string[], total = ids.length): PageResult<LookupItem> => ({
 });
 afterEach(() => vi.useRealTimers());
 
+it('la espera de búsqueda ya está pendiente y no presenta resultados antiguos como una consulta terminada', async () => {
+  vi.useFakeTimers();
+  const request = vi
+    .fn()
+    .mockResolvedValueOnce(result(['anterior']))
+    .mockResolvedValueOnce(result(['nuevo']));
+  const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  await flushPromises();
+  value.updateSearch('borrador');
+  expect(value.state.value).toEqual({ items: [], isLoading: true, error: '', hasMore: false });
+  await vi.advanceTimersByTimeAsync(249);
+  expect(request).toHaveBeenCalledTimes(1);
+  value.updateSearch('búsqueda final');
+  await vi.advanceTimersByTimeAsync(250);
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(request.mock.calls[1]!.slice(0, 2)).toEqual(['búsqueda final', 1]);
+  expect(value.state.value).toMatchObject({ isLoading: false, error: '' });
+  expect(value.items.value.map((item) => item.id)).toEqual(['nuevo']);
+});
+
 it('avanza por filas recibidas y termina aunque se repitan IDs entre páginas o dentro de una página', async () => {
   const request = vi
     .fn()

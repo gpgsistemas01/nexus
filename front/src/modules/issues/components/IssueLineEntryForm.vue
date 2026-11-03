@@ -39,10 +39,7 @@ const emit = defineEmits<{
                 <RemoteSelect
                     :label="label"
                     :model-value="values.itemId"
-                    :items="state.items"
-                    :is-loading="state.isLoading"
-                    :has-more="state.hasMore"
-                    :load-error="state.error"
+                    :state="state"
                     :initial-option="selected"
                     :error="errors.itemId"
                     :is-disabled="isDisabled"

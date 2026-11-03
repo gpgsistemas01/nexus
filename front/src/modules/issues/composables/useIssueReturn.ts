@@ -1,8 +1,6 @@
-import { computed } from 'vue';
 import { useForm } from 'vee-validate';
 import { issueReturnValidation } from '@nexus/form-validation';
-import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
-import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
+import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { issueService } from '../services/issueService.js';
 import { getIssueReturnableQuantity } from '../issueRules.js';
 import type { IssueResource, IssueDocument, IssueDetail } from '../issue.js';
@@ -30,46 +28,27 @@ export const useIssueReturn = (options: {
     });
     form.defineField('returnQuantity', { validateOnModelUpdate: false });
     form.defineField('observations', { validateOnModelUpdate: false });
-    const save = useRecordSave({
-        setErrors: form.setErrors,
+    const record = useRecordForm(form, {
         onSaved: options.onSaved,
         onDenied: options.onDenied,
     });
-    const isSubmitting = computed(() => form.isSubmitting.value || save.isSubmitting.value);
-
-    const isDisabled = () => isSubmitting.value || save.isDisposed();
-
-    const interaction = useFormInteraction(form, {
-        isDisabled,
-        onChange: () => {
-            save.message.value = '';
-        },
-    });
-    const validated = form.handleSubmit((values) =>
-        save.execute((signal) =>
-            issueService.returnDetail({
-                resource: options.resource,
-                documentId: options.document.id,
-                detailId: options.detail.id,
-                payload: {
-                    returnQuantity: Number(values.returnQuantity),
-                    observations: values.observations.trim(),
-                },
-                signal,
-            }),
-        ),
+    const submit = record.handleSubmit((values, signal) =>
+        issueService.returnDetail({
+            resource: options.resource,
+            documentId: options.document.id,
+            detailId: options.detail.id,
+            payload: {
+                returnQuantity: Number(values.returnQuantity),
+                observations: values.observations.trim(),
+            },
+            signal,
+        }),
     );
 
-    const submit = () => {
-        if (!isDisabled()) return validated();
-    };
-
     return {
-        ...save,
-        ...interaction,
+        ...record,
         values: form.values,
         errors: form.errors,
-        isSubmitting,
         availableQuantity,
         submit,
     };

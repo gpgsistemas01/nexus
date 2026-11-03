@@ -1,8 +1,7 @@
 import { computed, watch } from 'vue';
 import { useForm } from 'vee-validate';
 import { PERMISSIONS } from '@nexus/permissions';
-import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
-import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
+import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import type { LookupItem } from '../../../shared/lookup.js';
@@ -37,22 +36,11 @@ export const usePurchaseEditor = (options: {
     });
     for (const field of Object.keys(validationSchema) as PurchaseField[])
         form.defineField(field, { validateOnModelUpdate: false });
-    const save = useRecordSave({
-        setErrors: form.setErrors,
+    const record = useRecordForm(form, {
         onSaved: options.onSaved,
         onDenied: options.onDenied,
+        isReadOnly: () => isReadOnly,
     });
-    const isSubmitting = computed(() => form.isSubmitting.value || save.isSubmitting.value);
-    const interaction = useFormInteraction<PurchaseField, string | boolean | PurchaseDetail[]>(
-        form,
-        {
-            isDisabled: () =>
-                isReadOnly || isSubmitting.value || save.isConflicted.value || save.isDisposed(),
-            onChange: () => {
-                save.message.value = '';
-            },
-        },
-    );
     const canSuppliers = computed(() => options.has(PERMISSIONS.SUPPLIERS_READ));
     const canPersons = computed(() => options.has(PERMISSIONS.PERSONS_READ));
     const suppliers = useRemoteLookup(
@@ -95,26 +83,26 @@ export const usePurchaseEditor = (options: {
     );
 
     const selectCreatedSupplier = (item: LookupItem) => {
-        if (save.isDisposed() || isReadOnly || document) return;
+        if (record.isDisposed() || isReadOnly || document) return;
 
         if (item.isDisabled) {
-            save.message.value =
+            record.message.value =
                 'El proveedor se registró como inactivo. Actívalo antes de capturar una compra.';
             void suppliers.refresh();
             return;
         }
 
         supplier.value = item;
-        interaction.update('supplierId', item.id);
+        record.update('supplierId', item.id);
         suppliers.updateSearch('');
         void suppliers.refresh();
     };
 
     const addDetail = (line: PurchaseDetail) =>
-        interaction.update('details', [...form.values.details, line]);
+        record.update('details', [...form.values.details, line]);
 
     const removeDetail = (id: string) =>
-        interaction.update(
+        record.update(
             'details',
             form.values.details.filter((row) => row.id !== id),
         );
@@ -122,31 +110,23 @@ export const usePurchaseEditor = (options: {
     const totals = computed(() =>
         calculatePurchaseTotals([...(document?.details ?? []), ...form.values.details]),
     );
-    const submitValidated = form.handleSubmit((values) => {
-        const target = options.target;
-        if (target.action === 'view') return;
-
-        return save.execute((signal) =>
-            purchaseService.save({
-                resource: options.resource,
-                target,
-                payload: mapPurchaseFormToRequest(values, document),
-                signal,
-            }),
-        );
-    });
-
-    const submit = () => {
-        if (!isReadOnly && !isSubmitting.value && !save.isConflicted.value && !save.isDisposed())
-            return submitValidated();
-    };
+    const target = options.target;
+    const submit =
+        target.action === 'view'
+            ? () => undefined
+            : record.handleSubmit((values, signal) =>
+                  purchaseService.save({
+                      resource: options.resource,
+                      target,
+                      payload: mapPurchaseFormToRequest(values, document),
+                      signal,
+                  }),
+              );
 
     return {
-        ...save,
-        ...interaction,
+        ...record,
         values: form.values,
         errors: form.errors,
-        isSubmitting,
         isReadOnly,
         suppliers,
         persons,

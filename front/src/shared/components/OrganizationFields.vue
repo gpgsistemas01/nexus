@@ -25,10 +25,7 @@ const emit = defineEmits<{
         <RemoteSelect
             label="Área"
             :model-value="departmentId"
-            :items="options.departments.items"
-            :is-loading="options.departments.isLoading"
-            :has-more="options.departments.hasMore"
-            :load-error="options.departments.error"
+            :state="options.departments"
             :error="errors?.departmentId"
             :is-disabled="isDisabled"
             :initial-option="initialDepartment"
@@ -41,10 +38,7 @@ const emit = defineEmits<{
         <RemoteSelect
             label="Rol"
             :model-value="roleId"
-            :items="options.roles.items"
-            :is-loading="options.roles.isLoading"
-            :has-more="options.roles.hasMore"
-            :load-error="options.roles.error"
+            :state="options.roles"
             :error="errors?.roleId"
             :is-disabled="isDisabled"
             :initial-option="initialRole"

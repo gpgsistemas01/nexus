@@ -27,6 +27,10 @@ Almacén recibe las instrucciones y capturas de alta de Clientes y Proveedores
 desde selectores de Salidas y Compras; no recibe la consulta ni el mantenimiento
 de sus páginas independientes, reservadas a Sistemas.
 
+La comprobación abarca notas, glosario y referencias a descargas, además de los
+procedimientos. Dos cuentas con el mismo rol y área reciben índices propios. Al
+reducir el acceso se retiran los capítulos e imágenes anteriores que ya no correspondan.
+
 [profileManuals.spec.ts](../../../tests/manual-profiles/profileManuals.spec.ts)
 comprueba las pantallas con los permisos calculados por el código y datos simulados.
 No demuestra la asignación de una cuenta real, su autenticación contra Express ni

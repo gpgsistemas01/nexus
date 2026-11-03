@@ -21,6 +21,9 @@ registro, versión leída y contexto de alta. No usar una variable `data` para r
 indistintamente formulario, DTO y resultado confirmado. `initialQuantity`, `newStock`
 y cantidad de devolución expresan operaciones distintas y conservan nombres distintos.
 
+`PurchaseRow` e `IssueRow` resumen documentos de sus listados. `PurchaseDetail` e
+`IssueDetail` representan los artículos contenidos en esos documentos.
+
 Los eventos expresan intenciones (`submit`, `close`, `create`) y los callbacks su efecto
 (`onSaved`, `onDenied`). Una función `load` no debe escribir. Una función `confirm`
 no puede anunciar éxito antes de comprobar la respuesta esperada.

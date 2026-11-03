@@ -7,16 +7,19 @@ sequenceDiagram
     autonumber
     box Coordinación
     participant Editor@{ "type": "control" } as useCatalog<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     participant Page@{ "type": "control" } as Catalog<br/>Editor<br/>Page.vue
     end
-    Editor->>Save: nowrap: save.execute(operation)
+    Record->>Save: nowrap: save.execute(operation)
     alt nowrap: isSubmitting.value || isConflicted.value ||<br/>controller.signal.aborted
-        Save-->>Editor: nowrap: undefined
+        Save-->>Record: nowrap: undefined
     else
         Save->>Save: nowrap: isSubmitting.value = true
-        Save->>Editor: nowrap: operation(controller.signal)
-        Editor-->>Save: nowrap: result
+        Save->>Record: nowrap: operation(controller.signal)
+        Record->>Editor: nowrap: operation(values, signal)
+        Editor-->>Record: nowrap: result
+        Record-->>Save: nowrap: result
         Save->>Save: nowrap: isSubmitting.value = false
         opt nowrap: !controller.signal.aborted
             Save->>Page: nowrap: options.onSaved(result)
@@ -34,10 +37,12 @@ sequenceDiagram
     autonumber
     box Coordinación
     participant Editor@{ "type": "control" } as useCatalog<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     participant Page@{ "type": "control" } as Catalog<br/>Editor<br/>Page.vue
     end
-    Editor-->>Save: nowrap: throw cause
+    Editor-->>Record: nowrap: throw cause
+    Record-->>Save: nowrap: throw cause
     opt nowrap: !controller.signal.aborted
         Save->>Save: nowrap: message.value = cause instanceof Error ?<br/>cause.message : (options.errorMessage ??<br/>'No se pudo guardar.')
         opt nowrap: cause instanceof ApiError
@@ -55,5 +60,6 @@ sequenceDiagram
 ## Fuentes de los participantes
 
 [useCatalogEditor.ts](../../../../../src/modules/catalogs/composables/useCatalogEditor.ts),
+[useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts),
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [CatalogEditorPage.vue](../../../../../src/modules/catalogs/pages/CatalogEditorPage.vue).

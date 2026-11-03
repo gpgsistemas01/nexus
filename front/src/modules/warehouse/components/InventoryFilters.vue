@@ -40,10 +40,7 @@ const search = defineModel<string>('search', { required: true });
             <RemoteSelect
                 label="Filtrar por proveedor"
                 :model-value="supplierId"
-                :items="suppliers.items"
-                :is-loading="suppliers.isLoading"
-                :load-error="suppliers.error"
-                :has-more="suppliers.hasMore"
+                :state="suppliers"
                 @update:model-value="emit('supplier', $event)"
                 @search="emit('searchOptions', $event)"
                 @more="emit('more')"

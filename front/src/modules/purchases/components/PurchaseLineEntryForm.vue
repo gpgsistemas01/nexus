@@ -41,11 +41,8 @@ const emit = defineEmits<{
                 <RemoteSelect
                     :label="itemLabel"
                     :model-value="values.materialId"
-                    :items="items.items"
-                    :is-loading="items.isLoading"
-                    :has-more="items.hasMore"
+                    :state="items"
                     :error="errors.materialId"
-                    :load-error="items.error"
                     :initial-option="selected"
                     :is-disabled="isDisabled || !canRead"
                     :hint="!canRead ? 'Sin permiso para consultar este inventario.' : ''"

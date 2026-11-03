@@ -1,7 +1,5 @@
-import { computed } from 'vue';
 import { useForm } from 'vee-validate';
-import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
-import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
+import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { issueService } from '../services/issueService.js';
 import { createInitialIssueValues, createIssueValidationSchema } from '../issueForm.js';
 import { isIssueWriteTarget } from '../issueRules.js';
@@ -34,40 +32,28 @@ export const useIssueEditor = (options: {
     });
     for (const field of Object.keys(validationSchema) as IssueField[])
         form.defineField(field, { validateOnModelUpdate: false });
-    const save = useRecordSave({
-        setErrors: form.setErrors,
+    const record = useRecordForm(form, {
         onSaved: options.onSaved,
         onDenied: options.onDenied,
-    });
-    const isSubmitting = computed(() => form.isSubmitting.value || save.isSubmitting.value);
-
-    const isDisabled = () =>
-        isReadOnly || isSubmitting.value || save.isConflicted.value || save.isDisposed();
-
-    const interaction = useFormInteraction<IssueField, string | IssueDetail[]>(form, {
-        isDisabled,
-        onChange: () => {
-            save.message.value = '';
-        },
+        isReadOnly: () => isReadOnly,
     });
     const headerSelection = useIssueHeaderSelection({
         resource: options.resource,
         has: options.has,
-        selectClient: (id) => interaction.update('clientId', id),
+        selectClient: (id) => record.update('clientId', id),
         values: form.values,
         document,
-        isEnabled: () => canEditHeader && !isDisabled(),
+        isEnabled: () => canEditHeader && !record.isDisabled(),
         setHeaderField: (field, value) => form.setFieldValue(field, value, false),
     });
 
     const addDetail = (line: IssueDetail) => {
-        if (canEditDetails)
-            interaction.update('details', addIssueDetail(form.values.details, line));
+        if (canEditDetails) record.update('details', addIssueDetail(form.values.details, line));
     };
 
     const removeDetail = (id: string) => {
         if (canEditDetails)
-            interaction.update(
+            record.update(
                 'details',
                 form.values.details.filter((row) => row.id !== id || row.isOriginallySupplied),
             );
@@ -79,33 +65,25 @@ export const useIssueEditor = (options: {
     ) => {
         if (mode !== 'supply') return;
 
-        interaction.update('details', updateIssueDetailSupply(form.values.details, id, changes));
+        record.update('details', updateIssueDetailSupply(form.values.details, id, changes));
     };
 
-    const submitValidated = form.handleSubmit((values) => {
-        const target = options.target;
-        if (!isIssueWriteTarget(target)) return;
-
-        return save.execute((signal) =>
-            issueService.save({
-                resource: options.resource,
-                target,
-                payload: mapIssueFormToRequest(values, options.resource, target.mode),
-                signal,
-            }),
-        );
-    });
-
-    const submit = () => {
-        if (!isDisabled()) return submitValidated();
-    };
+    const target = options.target;
+    const submit = isIssueWriteTarget(target)
+        ? record.handleSubmit((values, signal) =>
+              issueService.save({
+                  resource: options.resource,
+                  target,
+                  payload: mapIssueFormToRequest(values, options.resource, target.mode),
+                  signal,
+              }),
+          )
+        : () => undefined;
 
     return {
-        ...save,
-        ...interaction,
+        ...record,
         values: form.values,
         errors: form.errors,
-        isSubmitting,
         isReadOnly,
         canEditHeader,
         canEditDetails,

@@ -1,5 +1,11 @@
 # Diseño de pruebas: Contratos y componentes transversales
 
+## Formularios de registro
+
+| ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
+| --- | --- | --- | --- | --- |
+| `DP-VUE-FORM-001` | Escrituras inválidas, duplicadas o posteriores al cierre al compartir el ciclo de formulario | Unitario; particiones y transiciones consulta → edición → validación → envío/error/conflicto/desmontaje | Apertura sin errores; rechazo local sin request; bloqueo durante envío y conflicto; resultado confirmado, corrección tras error y desmontaje durante validación asíncrona sin escritura. | [recordFormTest.ts](../../../tests/unit/shared/composables/recordFormTest.ts); suites de Catálogos, Directorio, Identidad, Compras y Salidas. |
+
 ## Consistencia y reutilización de tablas
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
@@ -18,7 +24,7 @@ simulación](../01-test-plan.md#niveles-y-entornos).
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
 | `DP-VUE-LOOKUP-001` | Cargas interminables y opciones duplicadas al cambiar un catálogo | Unitario; transiciones entre páginas | `remoteLookupTest.ts`: páginas con IDs repetidos avanzan por filas recibidas; una página vacía con conteo antiguo desactiva más carga; un error se reintenta en la misma página y no adelanta el contador. `warehouse.spec.ts` verifica en navegador tres solicitudes (0/20/40), opciones únicas, selección conservada y fin del indicador con conteo antiguo. | [remoteLookupTest.ts](../../../tests/unit/shared/composables/remoteLookupTest.ts); [warehouse.spec.ts](../../../tests/e2e/warehouse.spec.ts) |
-| `DP-VUE-LOOKUP-002` | Consultas fuera de contexto | Unitario; transiciones búsqueda/reintento, permiso y desmontaje | `remoteLookupTest.ts`: buscar reinicia reintento a página 1, reintentar cancela debounce, deshabilitar limpia el error y desmontar cancela/bloquea callbacks posteriores. Las pruebas existentes de proveedor y respuestas tardías siguen en `remoteOptionsTest.ts` y `movementFiltersTest.ts`. | [remoteLookupTest.ts](../../../tests/unit/shared/composables/remoteLookupTest.ts); [remoteOptionsTest.ts](../../../tests/unit/modules/warehouse/remoteOptionsTest.ts); [movementFiltersTest.ts](../../../tests/unit/modules/movements/movementFiltersTest.ts) |
+| `DP-VUE-LOOKUP-002` | Consultas fuera de contexto o alta ofrecida antes de completar la búsqueda | Unitario; transiciones búsqueda/reintento, permiso y desmontaje | `remoteLookupTest.ts`: la espera de 250 ms ya es pendiente; cambiar texto sustituye esa búsqueda y reinicia la página. Reintentar cancela la espera; deshabilitar o desmontar limpia/invalida la consulta. | [remoteLookupTest.ts](../../../tests/unit/shared/composables/remoteLookupTest.ts); [remoteOptionsTest.ts](../../../tests/unit/modules/warehouse/remoteOptionsTest.ts); [movementFiltersTest.ts](../../../tests/unit/modules/movements/movementFiltersTest.ts) |
 | `DP-VUE-LOOKUP-003` | Perder filtros o cancelación al agrupar los parámetros de consulta | Unitario con adaptador HTTP simulado; particiones por recurso, proveedor activo/de captura, área y roles múltiples | Las solicitudes tipadas conservan endpoint, búsqueda, segunda página, filtros y `AbortSignal`. Se ejercitan Compras, Salidas, Inventario y opciones de Identidad sin servidor ni base de datos. | [purchaseTest.ts](../../../tests/unit/modules/purchases/purchaseTest.ts); [issueTest.ts](../../../tests/unit/modules/issues/issueTest.ts); [remoteOptionsTest.ts](../../../tests/unit/modules/warehouse/remoteOptionsTest.ts); [identityTest.ts](../../../tests/unit/modules/identity/identityTest.ts) |
 | `DP-VUE-PAGE-001` | RD-VUE-007; conteos inválidos usados en paginación | Unitario; fronteras cero/negativo/fraccionario/entero no seguro | `pageRequestTest.ts`: cero conserva un listado vacío válido; los conteos inválidos rechazan el contrato en el adaptador HTTP y no se presentan como páginas válidas. | [pageRequestTest.ts](../../../tests/unit/shared/http/pageRequestTest.ts) |
 

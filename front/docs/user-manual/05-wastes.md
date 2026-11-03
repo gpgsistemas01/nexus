@@ -33,32 +33,25 @@ Tome los pesos en kilogramos y las medidas en metros.
 | Base (m), Altura (m) | Se calculan para rollos; en otros casos se capturan cuando están habilitadas. |
 | Cantidad inicial | Número de unidades de esa merma, distinto del peso por unidad. |
 
-El formulario puede requerir desplazamiento vertical. Las siguientes capturas
-muestran sus secciones en la misma captura en preparación.
-
 ![Selección del material de origen e identidad de la merma.](images/09-waste-create.png)
 
 ![Referencia del rollo, pesos y medidas calculadas de la merma.](images/09a-waste-measurements.png)
 
 ![Existencia inicial y observaciones de la merma antes de guardar.](images/09b-waste-stock.png)
 
-Un peso total debe ser coherente con el peso del cono. No escriba el peso de varias
-mermas como si fuera el peso de una unidad. La vista previa ayuda a revisar la
-captura; el resultado confirmado aparece después de guardar.
+Capture el peso de una sola merma. Los pesos con cono deben superar el peso del
+cono. Revise las medidas calculadas antes de guardar.
 <!-- manual:end -->
 
 <!-- manual:any wastes:add-stock -->
 ## Merma existente y entradas adicionales
 
-Si el sistema identifica una merma existente, revise el aviso y el registro que
-propone. Sólo si corresponde a la misma merma, confirme continuar con la entrada
-de existencias. No acepte otra identidad sólo para completar el alta.
+Si aparece una merma existente, compruebe su identidad antes de continuar.
 
-**Antes de confirmar.** La entrada aumenta el inventario. No vuelva a agregar
-una cantidad que ya se registró al crear la merma. Compruebe el resultado anterior
-si hubo una interrupción.
+**Antes de confirmar.** La entrada suma unidades al saldo. No repita una cantidad
+ya registrada; compruebe el resultado si se interrumpió el envío.
 
-Para una entrada posterior, use **Agregar stock** cuando la fila ofrezca esa acción:
+Para una entrada posterior, use **Agregar stock** cuando esté disponible en el registro:
 
 1. Compruebe el nombre y las características de la merma.
 2. En **Cantidad a agregar**, capture la entrada positiva.
@@ -67,24 +60,22 @@ Para una entrada posterior, use **Agregar stock** cuando la fila ofrezca esa acc
 
 ![Entrada adicional a una merma existente.](images/10-waste-add-stock.png)
 
-**Cantidad a agregar** incrementa el saldo; **Nuevo stock** en **Ajustar stock**
-lo reemplaza. Para un conteo físico utilice el ajuste con su motivo, no una entrada.
+Use esta acción para unidades que ingresan. Si el conteo físico difiere del saldo,
+avise al responsable del inventario.
 <!-- manual:end -->
 
 <!-- manual:any wastes:write -->
 ## Editar datos
 
-Use **Editar** para los datos habilitados. Las medidas, pesos e identidad que
-sostienen el historial se conservan como consulta. Un registro con **Referencia
-histórica** muestra la muestra conservada para ese registro; no obliga a recapturarla.
+Use **Editar** para los campos habilitados. Identidad, medidas y pesos se conservan
+como consulta. **Referencia histórica** muestra la muestra guardada; no debe recapturarla.
 <!-- manual:end -->
 
 <!-- manual:any wastes:adjust-stock -->
 ## Ajustar el saldo
 
-Utilice este ajuste para corregir una diferencia comprobada del inventario. No
-lo use para registrar otra entrada: **Agregar stock** suma unidades y el ajuste
-establece el saldo final. Esta acción requiere autorización de administración.
+El ajuste reemplaza el saldo con un conteo comprobado. Para recibir otras unidades,
+use **Agregar stock**.
 
 1. Localice la merma y pulse **Ajustar stock**.
 2. Compruebe nombre, proveedor, medidas y **Stock actual**.
@@ -94,9 +85,8 @@ establece el saldo final. Esta acción requiere autorización de administración
 5. Explique la corrección en **Observaciones** y pulse **Guardar**.
 6. Espere la confirmación, compruebe el saldo y consulte su movimiento cuando tenga acceso.
 
-El ajuste conserva la identidad y los pesos de la merma. Si otro usuario cambió el
-registro, vuelva a consultarlo antes de preparar otro ajuste. Un fallo o conflicto
-no debe interpretarse como un saldo confirmado.
+El ajuste conserva identidad y pesos. Ante un conflicto, siga
+[Errores y recuperación](15-errors-and-recovery.md#conflictos-de-edición).
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->
@@ -104,15 +94,14 @@ no debe interpretarse como un saldo confirmado.
 
 Revise la búsqueda y el proveedor, seleccione **Incluir en Excel** y pulse
 **Descargar Excel**. En Mermas, el proveedor elegido sí delimita el archivo.
-Compruebe sus cantidades y pesos antes de distribuirlo; un peso desconocido no
-debe interpretarse como cero. El [capítulo de reportes](14-reports.md) explica las opciones de inclusión.
+Revise cantidades y pesos; un peso desconocido no es cero. Las opciones de inclusión
+se explican en [Reportes](14-reports.md).
 <!-- manual:end -->
 
 <!-- manual:any wastes:write wastes:add-stock -->
 ## Recuperar una captura pendiente
 
-Si aparece **Recuperar captura**, mantenga esa captura y pulse el botón para
-comprobar el resultado de la operación anterior. El sistema reutiliza la misma
-operación. No abra otra alta para repetirla. Consulte
-[Errores y recuperación](15-errors-and-recovery.md) si el servicio sigue sin responder.
+Pulse **Recuperar captura** para comprobar el envío anterior. Conserve sus datos y
+evite abrir otra alta. Si el servicio no responde, consulte
+[Errores y recuperación](15-errors-and-recovery.md).
 <!-- manual:end -->

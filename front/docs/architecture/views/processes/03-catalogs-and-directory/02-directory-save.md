@@ -14,6 +14,7 @@ sequenceDiagram
     box Coordinación
     participant Page@{ "type": "control" } as Directory<br/>Editor<br/>Page.vue
     participant Editor@{ "type": "control" } as useDirectory<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Reglas y datos
@@ -24,20 +25,20 @@ sequenceDiagram
     end
     U->>Form: nowrap: submit
     Form->>Page: nowrap: emit('submit')
-    Page->>Editor: nowrap: editor.submit()
-    opt nowrap: !form.isSubmitting.value && !save.isConflicted.value
-        Editor->>Editor: nowrap: submitValidated()
-        Editor->>Save: nowrap: save.execute(operation)
-        Save->>Editor: nowrap: operation(controller.signal)
+    Page->>Record: nowrap: editor.submit()
+    opt nowrap: !isDisabled()
+        Record->>Record: nowrap: validated()
+        Record->>Save: nowrap: save.execute(operation)
+        Save->>Record: nowrap: operation(controller.signal)
+        Record->>Editor: nowrap: operation(values, signal)
         Editor->>Payload: nowrap: directoryPayload(options.resource,<br/>options.target, values)
         Payload-->>Editor: nowrap: payload
         Editor->>Service: nowrap: directoryService.save(options.resource,<br/>options.target, payload, signal)
         Service-->>Editor: nowrap: DirectoryEntry
-        Editor->>Editor: nowrap: savedEntry = DirectoryEntry
-        Editor-->>Save: nowrap: undefined
+        Editor-->>Record: nowrap: DirectoryEntry
+        Record-->>Save: nowrap: DirectoryEntry
         opt nowrap: !controller.signal.aborted
-            Save->>Editor: nowrap: options.onSaved(result)
-            Editor->>Page: nowrap: options.onSaved(savedEntry)
+            Save->>Page: nowrap: options.onSaved(result)
             Page->>Page: nowrap: emit('saved', entry)
         end
     end
@@ -84,6 +85,7 @@ sequenceDiagram
 [DirectoryForm.vue](../../../../../src/modules/directory/components/DirectoryForm.vue),
 [DirectoryEditorPage.vue](../../../../../src/modules/directory/pages/DirectoryEditorPage.vue),
 [useDirectoryEditor.ts](../../../../../src/modules/directory/composables/useDirectoryEditor.ts),
+[useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts),
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [directory.ts](../../../../../src/modules/directory/directory.ts),
 [directoryService.ts](../../../../../src/modules/directory/services/directoryService.ts),

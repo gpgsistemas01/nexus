@@ -6,8 +6,8 @@ Abra **Salidas → Materiales**, **Consumibles** o **Mermas**. Busque por folio 
 aplique filtros de encabezado, fechas u **Observaciones contiene:** y pulse **Buscar**.
 Cada tabla contiene sólo su contexto; no mezcle material y merma del mismo nombre.
 
-Auxiliar y Coordinador de Almacén consultan y registran salidas de todas las áreas. Las
-cuentas operativas sólo acceden a sus áreas autorizadas: una cuenta asignada sólo a Impresión no puede solicitar para Router. Limpiar filtros no amplía ese acceso.
+El índice de su manual indica las áreas disponibles para su cuenta. Limpiar filtros
+conserva ese alcance.
 
 Si sólo tiene un área, **Área** se selecciona y queda visible y bloqueada en filtros y
 formulario. **Limpiar filtros** la conserva y retira los filtros opcionales. Con varias
@@ -18,12 +18,8 @@ formulario. **Limpiar filtros** la conserva y retira los filtros opcionales. Con
 <!-- manual:any goods:issues-manage waste:issues-manage -->
 ## Registrar una solicitud
 
-**Antes de empezar.** Tenga el cliente, asesor, área, solicitante, proyecto y los
-artículos requeridos. Crear una solicitud no equivale a surtirla.
-
-**Qué va a conseguir.** Dejar registrada una solicitud con artículos y cantidades.
-La solicitud no significa que ya se entregó el material. Espere la atención de
-Almacén y consulte su estado para conocer el avance.
+**Antes de empezar.** Reúna cliente, asesor, área, solicitante, proyecto y artículos.
+Guardar registra la solicitud; Almacén atiende su entrega.
 
 1. Pulse **Nueva salida**.
 2. En **Registrar salida** o **Registrar salida de merma**, seleccione
@@ -39,23 +35,18 @@ Almacén y consulte su estado para conocer el avance.
 6. Revise encabezado y detalles, pulse **Guardar** y espere la confirmación.
 7. Consulte el folio registrado y su estado de cumplimiento.
 
-Si vuelve a agregar el mismo material o consumible del mismo proveedor, su cantidad
-se **suma** al detalle existente. Lo mismo ocurre al repetir una merma. Revise la
-cantidad acumulada antes de guardar; otro proveedor conserva un detalle diferente.
+Repetir el mismo artículo y proveedor **suma** su cantidad al detalle. Otro proveedor
+conserva un detalle distinto. Revise la cantidad acumulada antes de guardar.
 
 Para Materiales y Consumibles, la cantidad debe ser al menos 1; para Mermas puede
 ser menor que 1, siempre que sea positiva. La fecha y hora de solicitud corresponden
 al horario de Ciudad de México. Si cambia Cliente o Área, revise de nuevo Asesor,
 Solicitante y Número de proyecto: sus selecciones dependientes se actualizan.
 
-Para **GPG INTERNO**, el número de proyecto se completa según **Área** y debe
-conservar ese valor. Si no aparece un número, solicite que revisen la configuración
-del área; escribir uno diferente puede impedir guardar la salida.
+Para **GPG INTERNO**, conserve el número de proyecto que completa **Área**. Si falta,
+solicite su revisión; escribir otro puede impedir guardar.
 
 ![Preparación de una solicitud de salida con sus datos y detalle.](images/23-issue-create.png)
-
-Los selectores identifican registros existentes; escribir un nombre sin elegirlo
-no completa la relación.
 
 <!-- manual:any clients:create -->
 Cuando aparezca **Registrar cliente**, puede darlo de alta en el formulario
@@ -77,21 +68,15 @@ cumplimiento, surtido y devoluciones. Use **Regresar** al terminar.
    antes de añadirlos o retirarlos.
 4. Pulse **Actualizar** y compruebe el documento.
 
-Después de que existen detalles surtidos, las restricciones cambian: puede quedar
-disponible sólo la edición de encabezado. No elimine o reescriba una entrega ya
-realizada como si siguiera pendiente. Si necesita corregir una entrega, avise a
-Almacén para que revise la operación.
+Con detalles surtidos puede quedar habilitado sólo el encabezado. Para corregir
+una entrega realizada, avise a Almacén.
 <!-- manual:end -->
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ## Surtir
 
-**Antes de empezar.** Verifique la solicitud, los artículos y la existencia que
-se entregará. Necesita permiso de surtido para ese contexto.
-
-**Antes de confirmar.** El surtido registra una entrega y descuenta inventario.
-Marque únicamente los detalles que entrega físicamente. Una selección equivocada
-no se corrige cerrando la ventana después de guardar.
+**Antes de confirmar.** Surtir descuenta inventario. Compruebe solicitud, artículos
+y existencia; marque sólo lo que entrega físicamente.
 
 1. Pulse **Surtir detalle** en la salida.
 2. Revise el encabezado de consulta y los detalles pendientes.
@@ -102,19 +87,16 @@ no se corrige cerrando la ventana después de guardar.
 
 ![Selección de detalles pendientes para surtir.](images/24-issue-supply.png)
 
-La selección entrega toda la cantidad pendiente del detalle, sin capturar una entrega
-parcial. La salida queda **Surtido parcial** si tiene otros detalles pendientes.
-**Cantidad de proyecto** es una referencia, no la cantidad de inventario. Marque sólo
-entregas realizadas; al confirmar, el sistema vuelve a comprobar stock y estado porque
-pueden haber cambiado.
+Se entrega toda la cantidad pendiente del detalle. **Surtido parcial** indica que
+quedan otros detalles pendientes. **Cantidad de proyecto** es una referencia; no
+determina la cantidad que se descuenta.
 <!-- manual:end -->
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ## Devolver una entrega
 
-**Antes de confirmar.** La devolución reintegra existencia de una entrega previa.
-Almacén debe comprobar qué material regresó y su cantidad. No capture como devolución
-una solicitud que nunca se surtió.
+**Antes de confirmar.** Devolver reintegra existencias. Compruebe el artículo y la
+cantidad que regresaron de una entrega previa.
 
 La salida completa debe tener cumplimiento **Surtido**. Mientras permanezca en
 **Surtido parcial**, no puede devolver un detalle que ya fue entregado.
@@ -129,22 +111,17 @@ La salida completa debe tener cumplimiento **Surtido**. Mientras permanezca en
 
 ![Devolución de un detalle que ya fue surtido.](images/25-issue-return.png)
 
-No puede devolver más de lo surtido pendiente de devolver. Una devolución no
-representa una nueva compra ni borra la solicitud original. **Regresar** cierra
-el formulario sin enviar una devolución nueva.
+El saldo entregado es el máximo que puede devolver. **Regresar** cierra sin enviar.
 
-Una devolución parcial conserva el detalle como **Surtido**. Devolver todo su
-saldo lo deja **Cancelado**; cuando todos los detalles quedan cancelados, también
-se cancela la salida. No existe una acción independiente para cancelar una salida.
+Una devolución parcial conserva el detalle **Surtido**; devolver todo su saldo lo
+deja **Cancelado**. Al cancelar todos los detalles se cancela la salida. No hay una
+acción independiente de cancelación.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->
 ## Reportes e incidencias
 
-Con permiso de reporte, use **Exportar Excel** y elija el alcance. Las fechas y
-filtros deben aplicarse con **Buscar** antes de exportar la consulta.
-Si el documento cambió o el saldo ya no permite la operación, vuelva a consultarlo
-antes de preparar otra captura. Si se perdió la respuesta al surtir o devolver,
-revise primero cantidades surtidas y devueltas; repetir sin comprobar puede
-representar otra operación.
+Use **Exportar Excel** después de aplicar los filtros con **Buscar**.
+[Reportes](14-reports.md) explica el alcance; [Errores y recuperación](15-errors-and-recovery.md),
+los conflictos y envíos sin respuesta.
 <!-- manual:end -->

@@ -23,6 +23,124 @@ const tempRoot = async () => {
   return root;
 };
 
+const manualRoot = async () => {
+  const root = await tempRoot();
+  await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
+    recursive: true,
+  });
+  return root;
+};
+
+it.each(DEMO_PROFILES)(
+  '$id excluye acciones ajenas también de notas, glosario e imágenes',
+  async (profile) => {
+    const root = await manualRoot();
+    const session = demoSession(profile);
+    const manifest = await prepareManual(root, { ...profile, mode: 'demo' }, session);
+    const content = (
+      await Promise.all(
+        manifest.sources.map((file: string) =>
+          readFile(path.join(manifest.root, 'sources', file), 'utf8'),
+        ),
+      )
+    ).join('\n');
+    const isAdmin = profile.id === 'sistemas-admin';
+    const isWarehouse = profile.departmentKey === 'warehouse_and_supply';
+    expect(content.includes('**Ajustar stock**')).toBe(isAdmin);
+    expect(content.includes('**Cambiar contraseña**')).toBe(isAdmin);
+    expect(content.includes('**Usuarios**')).toBe(isAdmin);
+    expect(content.includes('**Exportar Excel**')).toBe(isAdmin || isWarehouse);
+    expect(content.includes('**Descargar Excel**')).toBe(isAdmin || isWarehouse);
+    expect(manifest.images.includes('05-material-stock.png')).toBe(isAdmin);
+    expect(manifest.images.includes('15-user-password.png')).toBe(isAdmin);
+    expect(manifest.images.includes('27-report.png')).toBe(isAdmin || isWarehouse);
+    expect(content).not.toContain('<!-- manual:');
+    const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
+    expect(index).toContain('## Para empezar');
+    expect(index).toContain('## Sus tareas');
+    expect(index).toContain('## Ayuda y consulta');
+    expect(index.indexOf('## Para empezar')).toBeLessThan(index.indexOf('## Sus tareas'));
+    expect(index.indexOf('## Sus tareas')).toBeLessThan(index.indexOf('## Ayuda y consulta'));
+  },
+);
+
+it('dos cuentas con el mismo rol y área reciben manuales identificados por su usuario', async () => {
+  const root = await manualRoot();
+  const profile = DEMO_PROFILES.find(({ id }) => id === 'almacen-auxiliar')!;
+  const session = demoSession(profile);
+  const first = await prepareManual(
+    root,
+    { id: 'cuenta-uno', label: 'Almacén', mode: 'live' },
+    {
+      ...session,
+      name: 'almacenista_uno',
+    },
+  );
+  const second = await prepareManual(
+    root,
+    { id: 'cuenta-dos', label: 'Almacén', mode: 'live' },
+    {
+      ...session,
+      name: 'almacenista_dos',
+    },
+  );
+  const index = await readFile(path.join(first.root, 'sources/index.md'), 'utf8');
+  const other = await readFile(path.join(second.root, 'sources/index.md'), 'utf8');
+  expect(index).toContain('# Manual de Nexus — almacenista\\_uno');
+  expect(other).toContain('# Manual de Nexus — almacenista\\_dos');
+  expect(index).toContain('| ALMACÉN Y PROVEDURÍA | Auxiliar |');
+  expect(first.sources).toEqual(second.sources);
+  expect(first.images).toEqual(second.images);
+  expect(index).not.toContain('almacenista\\_dos');
+  expect(other).not.toContain('almacenista\\_uno');
+  expect(first.accessFingerprint).not.toBe(second.accessFingerprint);
+});
+
+it('al reducir el acceso retira capítulos e imágenes anteriores y conserva los permitidos', async () => {
+  const root = await manualRoot();
+  const profile = { id: 'cuenta-uno', label: 'Cuenta 01', mode: 'live' };
+  const admin = demoSession(DEMO_PROFILES[0]!);
+  const previous = await prepareManual(root, profile, admin);
+  await writeFile(path.join(previous.root, 'images/15-user-password.png'), 'captura anterior');
+  await writeFile(path.join(previous.root, 'images/03-materials-list.png'), 'captura permitida');
+  const warehouse = demoSession(DEMO_PROFILES.find(({ id }) => id === 'almacen-auxiliar')!);
+  const current = await prepareManual(root, profile, { ...warehouse, id: admin.id });
+  expect(current.sources).not.toContain('08-users.md');
+  expect(current.images).not.toContain('15-user-password.png');
+  await expect(readFile(path.join(current.root, 'sources/08-users.md'))).rejects.toMatchObject({
+    code: 'ENOENT',
+  });
+  await expect(
+    readFile(path.join(current.root, 'images/15-user-password.png')),
+  ).rejects.toMatchObject({ code: 'ENOENT' });
+  expect(await readFile(path.join(current.root, 'images/03-materials-list.png'), 'utf8')).toBe(
+    'captura permitida',
+  );
+  expect(await readFile(path.join(current.root, 'sources/03-materials.md'), 'utf8')).not.toContain(
+    '**Ajustar stock**',
+  );
+});
+
+it('los capítulos comunes separan cada tipo de reporte por su permiso y página', async () => {
+  const report = await readFile(path.resolve('docs/user-manual/14-reports.md'), 'utf8');
+  const persons = filterManualContent(report, ['persons:page-view', 'person:reports-read']);
+  expect(persons).toContain('En **Personas**');
+  expect(persons).not.toContain('En **Usuarios**');
+  expect(persons).not.toContain('En **Movimientos**');
+  expect(persons).not.toContain('**Incluir en Excel**');
+  expect(persons).not.toContain('## Elegir periodo');
+  const users = await readFile(path.resolve('docs/user-manual/08-users.md'), 'utf8');
+  expect(filterManualContent(users, ['users:manage'])).not.toContain('**Exportar Excel**');
+  expect(filterManualContent(users, ['users:manage', 'admin:reports-read'])).toContain(
+    '**Exportar Excel**',
+  );
+  const movements = await readFile(path.resolve('docs/user-manual/13-movements.md'), 'utf8');
+  expect(filterManualContent(movements, ['movements:read'])).not.toContain('**Exportar Excel**');
+  expect(filterManualContent(movements, ['movements:read', 'admin:reports-read'])).toContain(
+    '**Exportar Excel**',
+  );
+});
+
 it('define seis áreas operativas con Instalador en Instalaciones y Operador en las otras cinco', async () => {
   expect(DEMO_PROFILES).toHaveLength(15);
   expect(DEMO_PROFILES.filter((profile) => profile.departmentKey === 'router')).toHaveLength(2);
@@ -319,7 +437,7 @@ it('selecciona el manual por la sesión sin declarar acceso esperado ni confiar 
   expect(manifest.id).toBe(account.id);
   const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
   expect(index).toContain('| INSTALACIONES | Instalador |');
-  expect(index).toContain('## Acceso detectado de la cuenta');
+  expect(index).toContain('## Su cuenta');
 });
 
 it('publica los nombres de acceso como texto y no atribuye operaciones ausentes de la sesión', async () => {

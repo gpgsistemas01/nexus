@@ -2,37 +2,36 @@
 
 ## Cómo consultar este glosario
 
-Busque los términos de su tarea y siga el procedimiento del capítulo correspondiente. Las
-tablas explican qué significan y qué revisar; conocerlos no concede permiso para realizar
-la acción.
+Busque el término que necesita entender. Los procedimientos están en cada capítulo.
 
 ## Navegación y captura
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
 | Registro | Elemento guardado, como un material, cliente o solicitud. |
-| Fila | Línea de una tabla. Sus botones actúan sobre el registro de esa línea. |
-| Filtro | Condición para reducir la lista, por ejemplo nombre, área o fecha. Pulse **Buscar** para aplicarla; filtrar no modifica registros. |
-| Selector | Campo donde debe elegir una opción de la lista. Escribir el nombre sin seleccionarlo puede dejar la captura incompleta. |
-| Borrador | Datos preparados en un formulario que todavía no ha guardado. Agregar un detalle al borrador no registra el documento completo. |
-| Confirmación de guardado | Mensaje que indica que el sistema aceptó la operación. Cerrar la pantalla después no deshace el cambio. Si no recibió una respuesta, consulte [Errores y recuperación](15-errors-and-recovery.md) antes de repetirlo. |
-| Conflicto | Aviso de que el registro cambió desde que lo abrió. Consulte los datos actuales antes de intentar guardar otra vez. |
+| Filtro | Condición que reduce los resultados, por ejemplo nombre, área o fecha. |
+| Selector | Campo para buscar y elegir un registro existente. |
+| Borrador | Datos preparados que todavía no ha guardado. |
+| Confirmación de guardado | Mensaje que indica que el sistema aceptó el cambio. |
+| Conflicto | Aviso de que el registro cambió desde que lo abrió. |
 
 ## Su cuenta y su área
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Persona | Individuo registrado, por ejemplo un solicitante. Tener un registro de persona no implica tener una cuenta para ingresar. |
-| Usuario o cuenta | Acceso con nombre de usuario y contraseña. Utilice su propia cuenta para que las operaciones queden asociadas a quien las realiza. |
-| Área | Departamento al que corresponde una asignación o solicitud, por ejemplo Impresión o Router. No es el tipo de artículo. |
-| Rol | Función asignada a una cuenta, como Auxiliar, Coordinador, Operador o Instalador. Las acciones disponibles dependen de su combinación de rol y área. |
-| Permiso | Autorización para consultar o realizar una acción. Ver un listado no significa que pueda modificar sus registros. |
+| Persona | Individuo registrado, por ejemplo un solicitante. Su registro no crea una cuenta de ingreso. |
+| Usuario o cuenta | Acceso personal con nombre de usuario y contraseña. |
+| Área | Departamento de una asignación o solicitud, como Impresión o Router. |
+| Rol | Función de la cuenta, como Auxiliar, Coordinador, Operador o Instalador. |
+| Permiso | Autorización para consultar o realizar una acción, según el rol y área. |
 
-<!-- manual:any persons:page-view users:manage -->
-| Término de administración | Qué debe distinguir |
-| --- | --- |
-| Responsabilidad de persona | Rol y área que describen la participación de una persona en el trabajo. Asignarlos no le da acceso para ingresar a Nexus. |
-| Acceso de usuario | Rol y área asignados a una cuenta para determinar sus acciones disponibles. Revise la asignación completa al administrar accesos. |
+<!-- manual:any persons:page-view -->
+**Responsabilidad de persona:** área y rol que describen su participación en el
+trabajo. Se administra en Personas y no concede una cuenta de ingreso.
+<!-- manual:end -->
+<!-- manual:any users:manage -->
+**Acceso de usuario:** área y rol de la cuenta que determinan sus acciones. Se
+administra en Usuarios.
 <!-- manual:end -->
 
 <!-- manual:any materials:read wastes:page-view -->
@@ -40,23 +39,22 @@ la acción.
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Material | Artículo del inventario de **Materiales**. Compare proveedor, presentación y medidas para elegir el correcto. |
-| Consumible | Artículo del inventario de **Consumibles**, con presentación y unidad, sin dimensiones. Se consulta por separado de Materiales. |
-| Merma | Recurso residual o reutilizable con medidas y existencias propias. En Nexus no significa necesariamente material desechado. |
-| Proveedor | Organización que suministra el artículo. Un mismo material puede tener existencias diferentes con cada proveedor. |
-| Presentación | Forma comercial o física del artículo, por ejemplo un rollo. No la confunda con la unidad de medida. |
-| Unidad de medida | Unidad que acompaña a una cantidad, por ejemplo metros cuadrados. Lea la unidad antes de interpretar o capturar una cantidad. |
+| Material | Artículo identificado por proveedor, presentación y medidas. |
+| Consumible | Artículo con presentación y unidad, sin dimensiones. |
+| Merma | Recurso residual o reutilizable con medidas y existencias propias. Puede seguir siendo útil. |
+| Proveedor | Organización que suministra el artículo. Cada proveedor puede tener existencias distintas del mismo material. |
+| Presentación | Forma comercial o física del artículo, por ejemplo un rollo. |
+| Unidad de medida | Unidad de una cantidad, por ejemplo metros cuadrados. |
 | Base y Altura | Medidas físicas del artículo o merma. No indican cuántas unidades hay disponibles. |
-| Cantidad convertida | Cantidad expresada según la conversión del artículo. Por ejemplo, los rollos y los metros cuadrados representan magnitudes distintas; consulte la unidad mostrada. |
-| Existencia o Stock actual | Cantidad disponible en el registro consultado. Compruebe artículo y proveedor antes de usar ese saldo como referencia. |
-| Stock mínimo | Umbral para identificar existencias bajas. Cambiar ese umbral no agrega ni retira artículos. |
-| Activo / Inactivo | Disponibilidad del registro para operaciones posteriores. Desactivarlo conserva su historia y no cambia por sí solo su stock. |
+| Cantidad convertida | Cantidad expresada en la unidad de control del artículo; por ejemplo, metros cuadrados obtenidos de rollos. |
+| Existencia o Stock actual | Cantidad disponible del artículo y proveedor consultados. |
+| Stock mínimo | Referencia para identificar existencias bajas. Cambiarla conserva el saldo. |
+| Activo / Inactivo | Disponibilidad para nuevas operaciones. Desactivar conserva historia y stock. |
 
+<!-- manual:any wastes:add-stock materials:adjust-stock wastes:adjust-stock -->
 ### Cantidad a agregar y Nuevo stock
 
 **Cantidad a agregar** es un incremento; **Nuevo stock**, el saldo que quedará.
-Lea el nombre de la acción junto al campo: el mismo valor tiene consecuencias
-diferentes en una entrada y en un ajuste.
 
 <!-- manual:any wastes:add-stock -->
 En **Agregar stock** de una merma, si hay 8 unidades y captura 3 en **Cantidad a
@@ -64,9 +62,9 @@ agregar**, el **Nuevo stock** calculado será 11. Los pasos están en [Mermas](0
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock wastes:adjust-stock -->
-En **Ajustar stock**, **Nuevo stock** es el total que debe quedar. Si hay 8 unidades
-y captura 3, el saldo queda en 3: se reduce en 5. Revise el conteo y la razón antes
-de confirmar; no utilice el ajuste para registrar una entrega ordinaria.
+En **Ajustar stock**, si hay 8 unidades y captura 3, el saldo queda en 3: se reduce en 5.
+Compruebe el conteo y el motivo.
+<!-- manual:end -->
 <!-- manual:end -->
 
 <!-- manual:any inventory:costs-read -->
@@ -83,10 +81,10 @@ de confirmar; no utilice el ajuste para registrar una entrega ordinaria.
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Folio | Referencia visible para localizar un documento y pedir ayuda. No es el número de factura ni el número de proyecto. |
-| Encabezado | Datos generales de un documento, como fecha, proveedor, cliente u observaciones. Se comparten entre sus detalles. |
-| Detalle | Elemento de una compra o salida que identifica un artículo y una cantidad. Compruebe cada detalle antes de guardar. |
-| Observaciones | Explicación adicional de la operación. Las observaciones de una compra, un ajuste o una devolución corresponden a registros distintos. |
+| Folio | Referencia para localizar un documento. Es distinto de factura y proyecto. |
+| Encabezado | Datos comunes del documento: fecha, proveedor, cliente u observaciones. |
+| Detalle | Artículo incluido en una compra o salida, con su cantidad y demás datos. |
+| Observaciones | Notas de la operación. Cada compra, ajuste o devolución conserva las suyas. |
 <!-- manual:end -->
 
 <!-- manual:any goods:receipts-page-view -->
@@ -94,13 +92,13 @@ de confirmar; no utilice el ajuste para registrar una entrega ordinaria.
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Compra o entrada de compra | Recepción registrada de materiales o consumibles de un proveedor. Confirmarla incrementa existencias; no es una solicitud de compra futura. |
+| Compra o entrada de compra | Recepción de artículos de un proveedor. Al confirmarse incrementa existencias. |
 | Persona que recibe | Persona a cuyo nombre queda la recepción. Puede ser distinta del usuario que captura la compra. |
-| Factura / Remisión | Tipo de comprobante de la compra. Una compra con factura requiere su número; una compra con remisión no lleva número de factura. |
-| Costo por presentación | Costo capturado en un detalle de compra según su presentación. No lo confunda con el costo máximo unitario del inventario. |
-| Monto sin IVA / Monto con IVA | Importe antes o después del impuesto. Es un valor monetario, no una cantidad de artículos. |
-| Corrección de detalle | Cambio que conserva el valor anterior y el motivo. Revise su efecto sobre existencias e importes antes de confirmar. |
-| Cancelación de detalle | Operación que revierte el inventario de ese detalle y conserva su historia. La compra queda cancelada cuando todos sus detalles están cancelados. |
+| Factura / Remisión | Comprobante de la compra. Sólo Factura requiere número de factura. |
+| Costo por presentación | Costo de una presentación del artículo. Difiere del costo máximo unitario del inventario. |
+| Monto sin IVA / Monto con IVA | Importe antes o después del impuesto. |
+| Corrección de detalle | Cambio de cantidad o costo que conserva los valores anteriores. |
+| Cancelación de detalle | Reversión del inventario del detalle, con su historia conservada. Cancelar todos los detalles cancela la compra. |
 
 Para capturar o corregir una recepción, siga [Compras](11-purchases.md).
 <!-- manual:end -->
@@ -110,27 +108,26 @@ Para capturar o corregir una recepción, siga [Compras](11-purchases.md).
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Salida o solicitud | Documento para solicitar artículos a Almacén. Crear la solicitud todavía no registra su entrega. |
-| Cliente | Organización o contexto comercial al que corresponde la salida. Se captura por separado del número de proyecto. |
-| Asesor | Persona asociada al contexto comercial de la salida. No es necesariamente quien ingresa o captura en Nexus. |
-| Solicitante | Persona que requiere los artículos para el área elegida. Puede ser distinta del usuario que registra la salida. |
+| Salida o solicitud | Documento para pedir artículos a Almacén. Su registro aún no confirma la entrega. |
+| Cliente | Organización o contexto comercial de la salida. Es distinto del número de proyecto. |
+| Asesor | Persona asociada al contexto comercial de la salida. |
+| Solicitante | Persona que requiere los artículos para el área elegida; puede ser distinta de quien captura. |
 | Cantidad solicitada | Cantidad requerida en el detalle. Revísela antes de guardar la solicitud. |
-| Cantidad suministrada o surtida | Cantidad que Almacén ya entregó y registró. No equivale al stock que permanece disponible. |
+| Cantidad suministrada o surtida | Cantidad entregada y registrada por Almacén. |
 | Cantidad pendiente de surtir | Cantidad solicitada que todavía no se ha entregado. Una devolución no vuelve a abrir el detalle como pendiente. |
-| Devolución / Cantidad devuelta | Reingreso de artículos que se habían entregado. Almacén registra la devolución; la cantidad devuelta permite consultar cuánto regresó. |
-| Estado de cumplimiento | Avance de la salida: **Pendiente**, **Surtido parcial**, **Surtido** o **Cancelado**. El surtido parcial significa que quedan otros detalles pendientes. No es el estado Activo/Inactivo de un catálogo. |
+| Devolución / Cantidad devuelta | Reingreso de artículos entregados. Almacén registra la devolución; la consulta muestra cuánto regresó. |
+| Estado de cumplimiento | **Pendiente**, **Surtido parcial**, **Surtido** o **Cancelado**. El surtido parcial deja otros detalles pendientes; es distinto de Activo/Inactivo. |
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ### Referencias para surtir o devolver
 
 | Término | Qué debe distinguir |
 | --- | --- |
-| Surtir | Registrar la entrega de la cantidad pendiente completa de los detalles seleccionados. Descuenta existencias al confirmarse. |
+| Surtir | Registrar la entrega completa de los detalles seleccionados y descontar sus existencias. |
 | Cantidad de proyecto | Referencia capturada al surtir para comparar el consumo previsto con la cantidad convertida. No sustituye la cantidad que se descuenta del inventario. |
 | Saldo entregado | Cantidad suministrada menos devoluciones anteriores. Es el máximo que aún puede devolver, no el stock de Almacén. |
 
-Por ejemplo, si entregó 10 unidades y ya regresaron 4, quedan 6 disponibles para
-devolución. Devolverlas conserva el historial; no borra la entrega original.
+Si entregó 10 unidades y ya regresaron 4, puede recibir hasta 6 más en devolución.
 <!-- manual:end -->
 
 Consulte [Salidas](12-issues.md) para los pasos y las restricciones de cada operación.

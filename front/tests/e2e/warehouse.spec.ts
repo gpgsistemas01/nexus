@@ -80,9 +80,12 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
     destinations.every((to) => to?.startsWith('/almacen') || to?.startsWith('/catalogos')),
   ).toBe(true);
   await page.mouse.click(page.viewportSize()!.width - 16, 70);
-  await expect(page.getByRole('button', { name: 'Expandir menú', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Menú', exact: true })).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  );
   await expect(navigation.getByRole('link', { name: 'Materiales', exact: true })).toBeHidden();
-  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
   await page.getByRole('link', { name: 'Consumibles', exact: true }).click();
   await expect(page).toHaveURL(/\/almacen\/consumibles$/);
   await page.reload();
@@ -99,7 +102,7 @@ test('almacén: encabezados originales, navegación Vue, recarga y móvil', asyn
   ])
     await expect(page.getByRole('columnheader', { name: label, exact: true })).toBeVisible();
   await expect(page.getByRole('columnheader', { name: 'Medidas', exact: true })).toBeHidden();
-  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
   await page.getByRole('link', { name: 'Mermas', exact: true }).click();
   await expect(
     page.getByRole('cell', { name: 'Sobrante de lona Proveedor Central' }),
@@ -131,12 +134,15 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
   await expect(page.getByRole('button', { name: 'Editar', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Descargar Excel' })).toBeHidden();
-  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
   const navigation = page.getByRole('navigation', { name: 'Navegación principal' });
   await expect(navigation.getByRole('link', { name: 'Materiales', exact: true })).toBeVisible();
   await expect(navigation.getByRole('link', { name: 'Mermas', exact: true })).toBeHidden();
   await navigation.getByRole('button', { name: 'Almacén', exact: true }).press('Escape');
-  await expect(page.getByRole('button', { name: 'Expandir menú', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Menú', exact: true })).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  );
   await expect(
     page.getByRole('columnheader', { name: 'Costo Unitario de Conversión', exact: true }),
   ).toBeHidden();

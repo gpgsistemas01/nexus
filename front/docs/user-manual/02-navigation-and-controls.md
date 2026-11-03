@@ -2,14 +2,14 @@
 
 ## Abrir una sección
 
-En pantallas grandes, el menú comienza como una columna de iconos. Pulse
-**Expandir menú**, abra el grupo deseado y seleccione una página. El menú muestra las secciones permitidas para su cuenta. Abra el grupo indicado
-en el procedimiento de su tarea.
+Pulse **Menú**, abra el grupo deseado y seleccione una página. El menú muestra las
+secciones permitidas para su cuenta.
 
-Al navegar, hacer clic fuera del panel o pulsar **Escape**, el menú vuelve a su
-estado compacto. En un teléfono, utilice **Menú** y **Cerrar menú**. La barra de
-direcciones permite volver a una página o guardarla como favorito; siempre se
-comprueban los permisos al entrar.
+En pantallas grandes, el panel comienza como una columna de iconos. Al navegar,
+hacer clic fuera del panel o pulsar **Escape**, vuelve al estado compacto. En un
+teléfono, también puede cerrarlo con **Cerrar menú**.
+
+Puede guardar la dirección de una página como favorito.
 
 ![Menú expandido con los grupos y páginas disponibles para la cuenta de demostración.](images/02-navigation.png)
 
@@ -21,33 +21,27 @@ comprueban los permisos al entrar.
 4. Revise los resultados y utilice los controles de página para recorrerlos.
 5. Use **Limpiar filtros** para regresar a la consulta general.
 
-Pulse un encabezado habilitado para ordenar. El tamaño de página cambia las filas
-visibles, no el total. Si no hay resultados, limpie filtros antes de concluir que falta un
-registro. En pantallas estrechas, desplace la tabla horizontalmente para ver columnas y
-acciones.
+Pulse un encabezado habilitado para ordenar y cambie el tamaño de página para ver
+más registros. El total de resultados se conserva.
+En pantallas estrechas, desplace la tabla para ver las demás columnas.
 
-La actualización del listado respeta la consulta vigente. Si una operación se
-guarda correctamente, revise el listado actualizado; un filtro puede dejar fuera
-al registro recién creado. No recargue toda la página durante una captura que
-todavía no ha guardado.
-
-Los listados pueden actualizarse automáticamente al volver a la pestaña o cuando sus datos
-vencen. Conservan filtros y posponen la recarga mientras un formulario u operación protege
-la captura. Ante fallos, use **Actualizar** o **Reintentar**, según la página.
+Si falta un registro, limpie los filtros. La actualización automática los conserva
+y espera mientras tiene una captura abierta. Ante un fallo, use **Actualizar** o
+**Reintentar**. Evite recargar el navegador con cambios sin guardar.
 
 ## Seleccionar registros relacionados
 
-Los selectores de proveedor, material, persona, área y otros registros permiten
-buscar opciones. Abra el selector, escriba parte del nombre y **seleccione una
-opción de la lista**. Escribir texto sin elegir una opción no establece la relación.
+Abra el selector, escriba parte del nombre y **seleccione una opción de la lista**.
+Escribir el nombre no basta para elegir el registro.
 
-Algunos campos dependen de otro: el proveedor debe elegirse antes del material de
-referencia de una merma. Si lo cambia, revise el artículo. Cargue más resultados para
-continuar la búsqueda y use reintento si falla.
+Algunos campos dependen de una selección previa. En Mermas, elija primero el
+proveedor y después el material de referencia. Revise el artículo si cambia de proveedor.
+
+Desplácese al final de la lista para cargar más opciones. Ante un fallo, pulse
+**Reintentar catálogo**.
 
 <!-- manual:any suppliers:manage clients:create materials:write persons:write -->
-Cuando aparezca **Registrar proveedor**, **Registrar cliente**, **Registrar
-material** o una acción equivalente junto a un selector:
+Cuando aparezca una acción **Registrar…** junto al selector:
 
 1. Abra esa acción sin cerrar el formulario principal.
 2. Complete el formulario secundario y guárdelo.
@@ -55,20 +49,16 @@ material** o una acción equivalente junto a un selector:
    seleccionado.
 4. Continúe y guarde la operación principal.
 
-El alta secundaria se guarda por separado: cerrar la compra o salida no elimina el
-registro creado. Cerrar el auxiliar sin guardar conserva la captura principal. Sólo los
-selectores autorizados ofrecen esta función.
+El registro creado permanece aunque cierre la operación principal. Cerrar el
+formulario secundario sin guardar conserva la captura principal.
 
 <!-- manual:end -->
 
 ## Usar los formularios
 
-Al abrir un formulario nuevo, los campos vacíos no representan todavía una captura
-rechazada. Si aparecen mensajes después de editar o intentar enviar, corrija los
-campos señalados y vuelva a confirmar. Un campo gris o de consulta muestra datos
-que esa operación no permite cambiar.
+Corrija los campos que muestren un mensaje al editar o enviar. Los campos de
+consulta no se pueden cambiar.
 
-**Guardar** registra un alta y **Actualizar** aplica una edición. Mientras se envía,
-espere sin repetir la acción. Use **Cerrar** o **Regresar** para abandonar cambios
-no guardados. Un mensaje de conflicto requiere consultar la versión actual; no
-se resuelve pulsando repetidamente el botón de envío.
+**Guardar** registra un alta; **Actualizar** guarda una edición. Espere la respuesta
+sin repetir el envío. **Cerrar** o **Regresar** abandona los cambios sin guardar.
+Si aparece un conflicto, siga [Errores y recuperación](15-errors-and-recovery.md).

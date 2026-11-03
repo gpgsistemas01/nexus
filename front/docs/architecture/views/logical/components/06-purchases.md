@@ -26,7 +26,7 @@ flowchart TB
 ```
 
 **Identificador:** `DIA-VUE-COMP-011`. **Pregunta:** ¿cómo se dividen captura, corrección y adaptación de la escritura?
-**Fuentes:** [PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue), [usePurchaseEditor.ts](../../../../../src/modules/purchases/composables/usePurchaseEditor.ts), [purchaseResponseMapper.ts](../../../../../src/modules/purchases/mappers/purchaseResponseMapper.ts), [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts).
+**Fuentes:** [PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue), [usePurchaseEditor.ts](../../../../../src/modules/purchases/composables/usePurchaseEditor.ts), [purchaseResponseMapper.ts](../../../../../src/modules/purchases/mappers/purchaseResponseMapper.ts), [useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts), [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts).
 **Notación:** [mapa de dependencias](../../diagram-reading.md#componentes-y-dependencias).
 
 ```mermaid
@@ -39,12 +39,14 @@ flowchart TB
     request["purchaseRequestMapper"]
     service["purchaseService"]
     response["purchaseResponseMapper"]
+    recordForm["useRecordForm"]
     save["useRecordSave"]
     editorPage --> editor
     editorPage --> form
     correctionPage --> correction
     editor --> request
-    editor --> save
+    editor --> recordForm
+    recordForm --> save
     editor --> service
     correction --> service
     correction --> save

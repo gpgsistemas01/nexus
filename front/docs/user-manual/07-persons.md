@@ -3,8 +3,7 @@
 ## Consultar personas
 
 Abra **Identidad y acceso → Personas**. La **Tabla de Personas** muestra el nombre
-y las responsabilidades de cada persona. Una persona representa a alguien que
-participa en la operación; su registro no implica por sí mismo una cuenta de ingreso.
+y las responsabilidades de cada persona. Registrar una persona no crea una cuenta de ingreso.
 
 <!-- manual:any persons:write -->
 ## Registrar una persona
@@ -22,9 +21,8 @@ corresponden a esa persona. Los catálogos deben estar disponibles.
 
 ![Persona existente con responsabilidades por área en el formulario de edición.](images/13-person-form.png)
 
-Cada área puede aparecer una sola vez en la lista de responsabilidades de la
-persona. **Agregar** prepara una asignación dentro del formulario; las
-asignaciones se guardan con **Guardar** o **Actualizar**, no individualmente.
+Cada área puede aparecer una sola vez. **Agregar** prepara la asignación; **Guardar**
+o **Actualizar** confirma todas las asignaciones.
 <!-- manual:end -->
 
 <!-- manual:any persons:write -->
@@ -36,9 +34,10 @@ asignaciones se guardan con **Guardar** o **Actualizar**, no individualmente.
 4. Mantenga al menos una responsabilidad válida y pulse **Actualizar**.
 5. Compruebe que se conservaron las asignaciones que no debía retirar.
 
-Cambiar responsabilidades debe responder a la organización real del trabajo.
-Si un usuario tiene datos de acceso que deben modificarse, revíselos también en
-**Usuarios**; no asuma que editar una persona sustituye esa administración.
+Cambie las responsabilidades según la organización real del trabajo.
+<!-- manual:any users:manage -->
+Los accesos de una cuenta se administran por separado en **Usuarios**.
+<!-- manual:end -->
 <!-- manual:end -->
 
 ## Filtrar la consulta
@@ -49,13 +48,13 @@ pulse **Buscar**. Si no aparece una persona, limpie los filtros y revise su nomb
 <!-- manual:any person:reports-read -->
 ## Exportar personas
 
-Con permiso de reporte puede usar **Exportar Excel**. Si el filtro por rol está
-aplicado, la exportación de Personas queda deshabilitada: quite ese filtro o use
-**Limpiar filtros** y, si lo necesita, aplique sólo el área antes de exportar.
+Pulse **Exportar Excel**. Si aplicó un filtro por rol, quítelo o use **Limpiar filtros**;
+ese filtro deshabilita la descarga. Puede filtrar por área.
 <!-- manual:end -->
 
 ## Incidencias
 
-Un aviso de área repetida exige corregir la lista de responsabilidades. Si el
-registro cambió mientras lo editaba, conserve una referencia de su corrección,
-cierre y actualice el listado, y vuelva a revisar las asignaciones actuales.
+<!-- manual:any persons:write -->
+Si un área está repetida, corrija las asignaciones.
+<!-- manual:end -->
+Para otros mensajes, consulte [Errores y recuperación](15-errors-and-recovery.md).

@@ -24,7 +24,7 @@ Los IDs locales identifican borradores; los persistidos proceden de la API.
 
 **Identificador:** `DIA-VUE-DOC-001`. **Pregunta:** ¿cómo se ejecuta la escritura
 configurada en el guardado compartido? **Fuente:** `IssueEditorPage`, `useIssueEditor`,
-`useRecordSave`, `mapIssueFormToRequest` e `issueService`. Secuencia del camino válido
+`useRecordForm`, `useRecordSave`, `mapIssueFormToRequest` e `issueService`. Secuencia del camino válido
 de Salidas, desde el envío hasta que el callback devuelve la confirmación. El
 transporte interno del servicio tiene su [secuencia propia](../../processes/07-issues/07-issue-save-transport.md).
 
@@ -35,20 +35,23 @@ sequenceDiagram
     autonumber
     participant Page@{ "type": "control" } as IssueEditor<br/>Page.vue
     participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     participant Mapper as issueRequest<br/>Mapper.ts
     participant Service@{ "type": "boundary" } as issue<br/>Service.ts
-    Page->>Editor: nowrap: editor.submit()
-    Editor->>Editor: nowrap: submitValidated() tras<br/>comprobar isDisabled()
-    Note over Editor: Captura válida y target de escritura
-    Editor->>Save: nowrap: save.execute(operation)
+    Page->>Record: nowrap: editor.submit()
+    Record->>Record: nowrap: validated() si !isDisabled()
+    Note over Record: Captura válida y target de escritura
+    Record->>Save: nowrap: save.execute(operation)
     Save->>Save: nowrap: comprobar envío, conflicto y<br/>signal
-    Save->>Editor: nowrap: operation(controller.signal)
+    Save->>Record: nowrap: operation(controller.signal)
+    Record->>Editor: nowrap: operation(values, signal)
     Editor->>Mapper: nowrap: mapIssueFormToRequest(values,<br/>resource, target.mode)
     Mapper-->>Editor: nowrap: payload
     Editor->>Service: nowrap: issueService.save({ resource,<br/>target, payload, signal })
     Service-->>Editor: nowrap: MutationConfirmation
-    Editor-->>Save: nowrap: resultado de operation
+    Editor-->>Record: nowrap: MutationConfirmation
+    Record-->>Save: nowrap: resultado de operation
 ```
 
 El [contrato de callbacks](../../../contracts/form-and-event-contracts.md#callbacks-de-composición)
@@ -62,7 +65,7 @@ define los argumentos y resultados del guardado compartido.
 | Adaptación de request | [mapIssueFormToRequest](../../../../../src/modules/issues/mappers/issueRequestMapper.ts). | [mapPurchaseFormToRequest](../../../../../src/modules/purchases/mappers/purchaseRequestMapper.ts). |
 | Adaptación de respuesta | [issueResponseMapper](../../../../../src/modules/issues/mappers/issueResponseMapper.ts), consumido por [issueService](../../../../../src/modules/issues/services/issueService.ts). | [purchaseResponseMapper](../../../../../src/modules/purchases/mappers/purchaseResponseMapper.ts), consumido por [purchaseService](../../../../../src/modules/purchases/services/purchaseService.ts). |
 | Lectura por callback | [useIssueActions](../../../../../src/modules/issues/composables/useIssueActions.ts) configura [useDocumentRead](../../../../../src/shared/composables/useDocumentRead.ts) con `issueService.get`. | [usePurchaseActions](../../../../../src/modules/purchases/composables/usePurchaseActions.ts) configura el mismo lector con `purchaseService.get`. |
-| Guardado por callback | Ambos editores configuran [useRecordSave](../../../../../src/shared/composables/useRecordSave.ts). | El mismo contrato conserva `AbortSignal`, errores y confirmación sin conocer el dominio. |
+| Formulario de registro | Ambos editores configuran [useRecordForm](../../../../../src/shared/composables/useRecordForm.ts). | Compone interacción y guardado con `AbortSignal`, errores y confirmación. |
 
 Los contratos de [Salidas](../../logical/class-and-type-models/08-issues.md#modos-y-contrato-de-escritura)
 y [Compras](../../logical/class-and-type-models/07-purchases.md#datos-y-modos)
@@ -118,6 +121,7 @@ pruebas de estos contratos.
 
 [IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue),
 [IssuePage.vue](../../../../../src/modules/issues/pages/IssuePage.vue),
+[useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts),
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [useIssueActions.ts](../../../../../src/modules/issues/composables/useIssueActions.ts),
 [useListEditor.ts](../../../../../src/shared/composables/useListEditor.ts),

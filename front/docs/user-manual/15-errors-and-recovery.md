@@ -4,51 +4,43 @@
 
 | Situación observable | Qué hacer | Cómo comprobar la recuperación |
 | --- | --- | --- |
-| Un campo tiene un mensaje de dato requerido o inválido. | Corrija el campo señalado, revise las demás secciones y vuelva a enviar. | El envío es aceptado y se muestra el resultado guardado. |
-| Un selector no ofrece el registro esperado. | Compruebe su registro previo, disponibilidad, permisos y selección de la dependencia; busque y elija una opción. | El selector muestra el registro seleccionado. |
+| Un campo señala un dato requerido o inválido. | Corrija el campo y vuelva a enviar. | Se confirma el guardado. |
+| Falta una opción en el selector. | Busque el nombre y revise la selección previa, por ejemplo el proveedor. | Puede seleccionar el registro correcto. |
 | La tabla está vacía. | Limpie filtros, revise contexto y fechas, y vuelva a buscar. | La consulta general muestra los registros esperados o confirma que no existen. |
-| La consulta informa un error de carga. | Compruebe conexión y utilice Reintentar. | Se muestran datos del servicio. |
+| La consulta informa un error de carga. | Compruebe conexión y pulse **Reintentar**. | Se muestran los datos. |
 | Aparece Acceso no permitido. | Solicite revisión de permisos para esa función. | La persona autorizada puede entrar con su propia cuenta. |
 | La sesión no puede comprobarse. | Restablezca conexión y use Volver a comprobar acceso; ingrese de nuevo si se solicita. | Se abre una página autorizada. |
-| El registro cambió durante la edición. | Cierre y actualice el listado; vuelva a abrirlo y contraste la captura con la información vigente. | La nueva edición utiliza los datos actuales y se confirma sin conflicto. |
-| Falta stock o la operación no corresponde al estado actual. | Consulte saldo y documento; prepare una operación que respete la existencia y el estado vigentes. | El documento y el saldo reflejan la operación aceptada. |
-| Se perdió la respuesta después de guardar. | Consulte el documento o saldo antes de repetir; use la recuperación específica de merma si aparece. | Se determina si la operación anterior ya quedó registrada. |
+| El registro cambió durante la edición. | Siga **Conflictos de edición**, abajo. | Puede revisar y guardar la corrección vigente. |
+| Se perdió la respuesta al guardar. | Siga **Resultado incierto al guardar**, abajo. | Comprueba si el envío anterior se registró. |
+
+<!-- manual:any materials:write materials:adjust-stock wastes:write wastes:add-stock wastes:adjust-stock goods:receipts-manage goods:issue-details-manage waste:issues-supply -->
+Si el saldo o el estado impiden operar, vuelva a consultar el documento y las existencias.
+<!-- manual:end -->
 
 ## Conflictos de edición
 
-Si el registro cambió mientras lo editaba, el sistema conserva su captura y puede bloquear
-el envío. Use **Cerrar y actualizar listado** si está disponible; en otros formularios,
-cierre, consulte y abra el registro nuevamente.
-
-Compare los datos actuales con la corrección que intentaba hacer. No use la
-recarga del navegador como forma de forzar una captura antigua sobre un saldo
-nuevo. Un conflicto evita que se pierda el trabajo ya guardado por otra persona.
+El formulario conserva su captura y bloquea el envío. Use **Cerrar y actualizar
+listado**, o cierre y vuelva a abrir el registro. Compare los datos actuales antes
+de preparar otra corrección.
 
 ## Resultado incierto al guardar
 
-Una interrupción de conexión no demuestra que el servidor rechazó la operación:
-puede haberla confirmado antes de perderse la respuesta.
+El cambio puede haberse guardado aunque no haya recibido la confirmación.
 
 1. Espere a que el servicio vuelva a responder.
 2. Consulte el documento por folio, fecha, proveedor o proyecto, según el módulo.
 3. Revise cantidades, estado, inventario e historial correspondientes.
 4. Si ya está aplicado, continúe sin registrarlo otra vez.
-5. Si no puede determinar el resultado, solicite soporte antes de repetir una
-   entrada, recepción, surtido o devolución.
+5. Si no puede determinar el resultado, solicite soporte antes de repetir la operación.
 
 <!-- manual:any wastes:write wastes:add-stock -->
-En altas y entradas adicionales de merma, **Recuperar captura** comprueba la misma
-captura anterior. Utilice ese control cuando aparezca. No lo sustituya por una
-nueva alta, un cambio de pesos o una segunda entrada independiente.
+En Mermas, use **Recuperar captura** cuando aparezca. Conserva el intento anterior;
+abrir otra alta puede duplicarlo.
 
 <!-- manual:end -->
 
 ## Solicitar soporte
 
-Informe módulo, acción, hora, registro o folio y mensaje. Indique si pulsó guardar y si
-pudo consultar el resultado. Adjunte una captura sólo si su organización autoriza
-compartir esos datos.
-
-No envíe contraseñas, cookies, tokens de sesión ni archivos de configuración.
-El personal de soporte no necesita su contraseña para revisar un error de tabla,
-conflicto de edición o descarga.
+Informe módulo, acción, hora, folio y mensaje. Indique si pulsó guardar y si pudo
+consultar el resultado. Adjunte una captura cuando su organización lo permita.
+No comparta su contraseña.

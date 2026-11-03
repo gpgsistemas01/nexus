@@ -1,10 +1,17 @@
 import { PERMISSIONS as P } from '../../../back/src/shared/constants/permissions.js';
 
-const chapter = (file, title, any = []) => ({ file, title, any });
+const chapter = (file, title, any = [], section = 'tasks') => ({ file, title, any, section });
+
+export const MANUAL_SECTIONS = [
+    { id: 'start', title: 'Para empezar' },
+    { id: 'tasks', title: 'Sus tareas' },
+    { id: 'help', title: 'Ayuda y consulta' },
+];
+
 export const MANUAL_CHAPTERS = [
-    chapter('00-induction.md', 'Primera jornada: recorrido de inducción'),
-    chapter('01-access.md', 'Acceso y sesión'),
-    chapter('02-navigation-and-controls.md', 'Navegación y controles'),
+    chapter('00-induction.md', 'Primera jornada: recorrido de inducción', [], 'start'),
+    chapter('01-access.md', 'Acceso y sesión', [], 'start'),
+    chapter('02-navigation-and-controls.md', 'Navegación y controles', [], 'start'),
     chapter('03-materials.md', 'Materiales', [P.MATERIALS_READ]),
     chapter('04-consumables.md', 'Consumibles', [P.MATERIALS_READ]),
     chapter('05-wastes.md', 'Mermas', [P.WASTES_PAGE_VIEW]),
@@ -23,8 +30,8 @@ export const MANUAL_CHAPTERS = [
         P.CLIENT_REPORTS_READ,
         P.SUPPLIER_REPORTS_READ,
     ]),
-    chapter('15-errors-and-recovery.md', 'Errores y recuperación'),
-    chapter('16-glossary.md', 'Glosario para trabajar en Nexus'),
+    chapter('15-errors-and-recovery.md', 'Errores y recuperación', [], 'help'),
+    chapter('16-glossary.md', 'Glosario para trabajar en Nexus', [], 'help'),
 ];
 
 export const permits = (permissions, any = []) =>

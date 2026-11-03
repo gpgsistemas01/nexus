@@ -1,8 +1,7 @@
 import { ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { personValidation, personAccessValidation } from '@nexus/form-validation';
-import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
-import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
+import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { useOrganizationOptions } from '../../../shared/composables/useOrganizationOptions.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
 import { identityService } from '../services/identityService.js';
@@ -29,7 +28,7 @@ export const usePersonEditor = (options: {
     });
     form.defineField('fullName', { validateOnModelUpdate: false });
     form.defineField('accesses', { validateOnModelUpdate: false });
-    const save = useRecordSave({
+    const record = useRecordForm(form, {
         onSaved: options.onSaved,
         onDenied: options.onDenied,
         setErrors: (errors) => {
@@ -42,18 +41,7 @@ export const usePersonEditor = (options: {
         },
     });
 
-    const isDisabled = () =>
-        form.isSubmitting.value ||
-        save.isSubmitting.value ||
-        save.isConflicted.value ||
-        save.isDisposed();
-
-    const interaction = useFormInteraction<'fullName', string>(form, {
-        isDisabled,
-        onChange: () => {
-            save.message.value = '';
-        },
-    });
+    const { isDisabled, message } = record;
     const organization = useOrganizationOptions(options.permissions);
     const departmentId = ref('');
     const roleId = ref('');
@@ -98,7 +86,7 @@ export const usePersonEditor = (options: {
         );
         departmentId.value = '';
         roleId.value = '';
-        save.message.value = '';
+        message.value = '';
         await form.validateField('accesses');
     };
 
@@ -111,30 +99,23 @@ export const usePersonEditor = (options: {
             false,
         );
         accessError.value = '';
-        save.message.value = '';
+        message.value = '';
         await form.validateField('accesses');
     };
 
-    const validated = form.handleSubmit((values) =>
-        save.execute((signal) =>
-            identityService.save(
-                'persons',
-                options.target,
-                personPayload(options.target, values),
-                signal,
-            ),
+    const submit = record.handleSubmit((values, signal) =>
+        identityService.save(
+            'persons',
+            options.target,
+            personPayload(options.target, values),
+            signal,
         ),
     );
-
-    const submit = () => {
-        if (!form.isSubmitting.value && !save.isConflicted.value) return validated();
-    };
 
     return {
         values: form.values,
         errors: form.errors,
-        ...save,
-        ...interaction,
+        ...record,
         organization,
         departmentId,
         roleId,

@@ -6,9 +6,11 @@ El [manual](../user-manual/index.md) enseña cada tarea paso a paso, sin conocim
 técnicos. Cada capítulo incluye preparación, campos, pasos, resultado e incidencias; sus
 etiquetas y capturas corresponden a las pantallas actuales.
 
-Este capítulo mantiene la fuente completa y sus capturas ficticias. Para obtener
-una edición con el acceso de una cuenta, seguir el
-[procedimiento por cuenta](07-manual-accounts-and-files.md).
+Mantener una fuente por tarea. Los pasos describen la acción; las notas adicionales
+se limitan a consecuencias, restricciones o recuperación que no quedan claras en ellos.
+
+Las ediciones se generan por cuenta y muestran sus áreas y roles. Para entregar
+manuales, seguir el [procedimiento por cuenta](07-manual-accounts-and-files.md).
 
 ## Fuentes y alcance de publicación
 
@@ -23,6 +25,15 @@ una edición con el acceso de una cuenta, seguir el
 Actualizar procedimiento y captura junto a la pantalla. Mantener advertencias junto a la
 acción y términos de negocio en el glosario, sin contratos o patrones técnicos. El
 generador filtra manual y glosario por permisos, incluidos surtido y devolución.
+
+| Grupo de la edición | Fuentes compartidas |
+| --- | --- |
+| Para empezar | Inducción, acceso y controles comunes. |
+| Sus tareas | Capítulos por módulo y bloques de acciones filtrados por permiso. |
+| Ayuda y consulta | Recuperación y glosario, también filtrados. |
+
+Los bloques `manual:any` y `manual:all` deben abarcar título, pasos, notas e imágenes
+de la acción. Las referencias a reportes y ajustes se filtran también fuera de su capítulo.
 
 ## Generar las capturas
 
@@ -59,11 +70,12 @@ ignoradas.
 
 ```bash
 npm run docs:check
-npm run docs:manual -- ambos
+npm run docs:manuals -- --mode live --all
 ```
 
-`docs:export -- manual pdf` exporta sólo PDF. `docs:check` verifica enlaces e
-imágenes sin iniciar el navegador. Los requisitos del publicador, las rutas de
+El comando genera una edición por cuenta configurada. `docs:manual -- ambos` reúne
+todas las tareas en una referencia para mantenimiento; no es la edición por usuario.
+`docs:check` verifica enlaces e imágenes sin iniciar el navegador. Las rutas de
 salida y la revisión de Word/PDF están en
 [generación y publicación](02-generation-and-publication.md).
 

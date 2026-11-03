@@ -64,9 +64,7 @@ const groups = computed(() =>
                 <VBtn
                     icon="$menu"
                     size="small"
-                    :aria-label="
-                        mobile ? 'Menú' : isNavigationOpen ? 'Contraer menú' : 'Expandir menú'
-                    "
+                    aria-label="Menú"
                     :aria-expanded="isNavigationOpen"
                     @click="isNavigationOpen = !isNavigationOpen"
                 />

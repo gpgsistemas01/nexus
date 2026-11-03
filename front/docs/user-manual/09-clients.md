@@ -3,8 +3,7 @@
 <!-- manual:all clients:create clients:read -->
 ## Registrar un cliente desde el selector
 
-Utilice este procedimiento cuando esté preparando una salida y no encuentre el
-cliente. El alta se abre dentro de la captura; no necesita una página de Directorio.
+Si falta el cliente de una salida, regístrelo desde su selector.
 
 1. Abra **Cliente** y busque el nombre. Si ya existe, selecciónelo y continúe la salida.
 2. Si no existe y aparece **Registrar cliente**, pulse esa acción.
@@ -16,39 +15,36 @@ cliente. El alta se abre dentro de la captura; no necesita una página de Direct
 
 ![Formulario para registrar un cliente.](images/16-client-form.png)
 
-Capture nombre y disponibilidad del cliente; use el nombre sólo para identificarlo. **Cerrar** cancela el alta sin crear ni
-seleccionar otro registro. Ante un rechazo, corrija los campos y reintente; la salida
-sigue en preparación. El cliente guardado permanece aunque cierre la salida.
+**Cerrar** cancela el alta y conserva la salida en preparación. Si guarda el cliente,
+su registro permanece aunque después cierre la salida.
 <!-- manual:end -->
 
 <!-- manual:any clients:page-view -->
 ## Consulta independiente
 
-Con acceso de administración, abra **Directorio comercial → Clientes** y utilice
+Abra **Directorio comercial → Clientes** y utilice
 **Buscar por nombre** y **Buscar**. La tabla permite comprobar nombre y disponibilidad.
 <!-- manual:end -->
 
 <!-- manual:all clients:page-view clients:create -->
 Para dar de alta desde esta página, pulse **Nuevo cliente**, complete los mismos
-campos y guarde. El listado se actualiza; no hay una salida de origen que deba guardarse.
+campos y guarde. Compruebe el cliente en el listado.
 <!-- manual:end -->
 
 <!-- manual:all clients:page-view clients:update -->
 ## Editar y desactivar
 
-1. Localice la fila y pulse **Editar registro**.
+1. Localice el registro y pulse **Editar registro**.
 2. Corrija **Nombre** o cambie **Activo**.
 3. Pulse **Actualizar** y compruebe el resultado.
 
-Desactivar impide utilizar el cliente en operaciones nuevas que requieren recursos
-activos; conserva las salidas que ya lo utilizaron. Un conflicto requiere consultar
-la versión vigente antes de preparar otra edición.
+Desactivar retira el cliente de nuevas operaciones y conserva sus salidas anteriores.
+Ante un conflicto, siga [Errores y recuperación](15-errors-and-recovery.md).
 <!-- manual:end -->
 
 <!-- manual:all clients:page-view client:reports-read -->
 ## Exportar clientes
 
-Aplique la búsqueda y pulse **Exportar Excel**. El archivo utiliza la consulta
-completa, no sólo la página visible. El [capítulo de reportes](14-reports.md)
-explica las descargas y cómo resolver un fallo.
+Aplique la búsqueda y pulse **Exportar Excel**. Consulte [Reportes](14-reports.md)
+para revisar el alcance o recuperar una descarga.
 <!-- manual:end -->

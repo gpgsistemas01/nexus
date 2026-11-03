@@ -16,6 +16,7 @@ sequenceDiagram
     box Coordinación
     participant Page@{ "type": "control" } as Purchase<br/>Editor<br/>Page.vue
     participant Editor@{ "type": "control" } as usePurchase<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Reglas y datos
@@ -29,11 +30,12 @@ sequenceDiagram
     Schema-->>Editor: nowrap: PurchaseValues
     U->>Form: nowrap: submit
     Form->>Page: nowrap: emit('submit')
-    Page->>Editor: nowrap: editor.submit()
-    opt nowrap: !isReadOnly && !isSubmitting.value &&<br/>!save.isConflicted.value && !save.isDisposed()
-        Editor->>Editor: nowrap: submitValidated()
-        Editor->>Save: nowrap: save.execute(operation)
-        Save->>Editor: nowrap: operation(controller.signal)
+    Page->>Record: nowrap: editor.submit()
+    opt nowrap: !isDisabled()
+        Record->>Record: nowrap: validated()
+        Record->>Save: nowrap: save.execute(operation)
+        Save->>Record: nowrap: operation(controller.signal)
+        Record->>Editor: nowrap: operation(values, signal)
         Editor->>Mapper: nowrap: mapPurchaseFormToRequest(values, document)
         Mapper-->>Editor: nowrap: payload
     end
@@ -48,6 +50,7 @@ sequenceDiagram
     autonumber
     box Coordinación
     participant Editor@{ "type": "control" } as usePurchase<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Reglas y datos
@@ -70,17 +73,20 @@ sequenceDiagram
         alt nowrap: value.code !== expected
             Contract-->>Service: nowrap: throw ApiError
             Service-->>Editor: nowrap: throw ApiError
-            Editor-->>Save: nowrap: throw ApiError
+            Editor-->>Record: nowrap: throw ApiError
+            Record-->>Save: nowrap: throw ApiError
         else
             Contract-->>Service: nowrap: MutationConfirmation
             Service-->>Editor: nowrap: MutationConfirmation
-            Editor-->>Save: nowrap: result
+            Editor-->>Record: nowrap: result
+            Record-->>Save: nowrap: result
         end
     else nowrap: catch(cause)
         API-->>HTTP: nowrap: cause
         HTTP-->>Service: nowrap: throw ApiError
         Service-->>Editor: nowrap: throw ApiError
-        Editor-->>Save: nowrap: throw ApiError
+        Editor-->>Record: nowrap: throw ApiError
+        Record-->>Save: nowrap: throw ApiError
     end
 ```
 
@@ -118,6 +124,7 @@ sequenceDiagram
 [PurchaseEditor.vue](../../../../../src/modules/purchases/components/PurchaseEditor.vue),
 [PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue),
 [usePurchaseEditor.ts](../../../../../src/modules/purchases/composables/usePurchaseEditor.ts),
+[useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts),
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [purchaseForm.ts](../../../../../src/modules/purchases/purchaseForm.ts),
 [purchaseRequestMapper.ts](../../../../../src/modules/purchases/mappers/purchaseRequestMapper.ts),

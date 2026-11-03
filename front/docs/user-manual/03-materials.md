@@ -11,8 +11,7 @@ Busque y filtre para localizar el registro correcto.
 <!-- manual:any materials:write -->
 ## Registrar un material
 
-**Antes de empezar.** Deben existir el proveedor, la presentación y la unidad que
-corresponden al artículo. Necesita permiso para crear materiales.
+**Antes de empezar.** Identifique proveedor, presentación y unidad del artículo.
 
 1. Pulse **Nuevo material** para abrir **Crear material**.
 2. Complete los campos de la tabla siguiente.
@@ -35,9 +34,8 @@ corresponden al artículo. Necesita permiso para crear materiales.
 
 ![Formulario para crear un material.](images/04-material-create.png)
 
-La captura de un material desde una compra puede omitir cantidad inicial y costo:
-las existencias y el costo de esa recepción se registran en la compra. No repita
-la misma entrada como cantidad inicial y como recepción.
+Desde una compra puede omitir cantidad inicial y costo: se registran al guardar
+la recepción. No duplique esa entrada como existencia inicial.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
@@ -47,20 +45,17 @@ la misma entrada como cantidad inicial y como recepción.
 2. Revise los datos cargados y modifique únicamente los campos habilitados.
 3. Pulse **Guardar** y compruebe el registro actualizado.
 
-Proveedor, presentación, unidad y medidas se muestran como consulta en la edición.
-La edición de datos no reemplaza un ajuste de stock. Para un cambio de identidad
-del artículo, consulte al responsable del inventario en lugar de alterar otro
-registro que ya tiene historial.
+Proveedor, presentación, unidad y medidas son de consulta. Editar conserva el
+saldo. Si necesita cambiar la identidad del artículo, consulte al responsable del inventario.
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->
 ## Ajustar el saldo
 
-**Antes de confirmar.** Este ajuste cambia la existencia disponible y puede afectar
-las entregas posteriores. Use un conteo comprobado y un motivo claro. No lo utilice
-para registrar una compra que todavía no recibió.
+**Antes de confirmar.** El ajuste reemplaza el saldo. Compruebe el conteo y el
+motivo; las recepciones se registran en Compras.
 
-1. Pulse **Ajustar stock** en la fila correcta.
+1. Pulse **Ajustar stock** en el registro correcto.
 2. Compruebe **Stock actual** y **Cantidad convertida actual**.
 3. Seleccione **Motivo del ajuste**.
 4. En **Nuevo stock**, escriba el saldo final que debe quedar y capture las
@@ -69,29 +64,24 @@ para registrar una compra que todavía no recibió.
 
 ![Ajuste de existencias con saldo actual, motivo y nuevo saldo.](images/05-material-stock.png)
 
-**Nuevo stock** es un saldo absoluto. Si hay 10 unidades y el conteo correcto es
-12, capture 12. Una recepción de compra se registra en Compras, no como ajuste de
-conteo. Si otra persona cambió el registro, cierre y actualice el listado antes
-de preparar un nuevo ajuste. Consulte el historial en **Movimientos → Materiales**.
+Si hay 10 unidades y el conteo correcto es 12, capture **12** en **Nuevo stock**.
+Compruebe el historial en **Movimientos → Materiales**. Ante un conflicto, siga
+[Errores y recuperación](15-errors-and-recovery.md#conflictos-de-edición).
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
 ## Retirar un registro
 
-**Antes de confirmar una eliminación.** Compruebe nombre y proveedor. Si retira la
-última relación con un proveedor, también puede retirarse el material. Si necesita
-conservarlo para consulta, revise con su responsable si corresponde desactivarlo.
+**Antes de eliminar.** Revise nombre y proveedor en la confirmación. Eliminar la
+última relación con un proveedor también puede eliminar el material. Sus relaciones
+o historial pueden impedirlo.
 
-Si aparece **Eliminar**, revise el registro y el proveedor de la relación que se
-retirará. La confirmación informa que, si no quedan otros proveedores, también
-se eliminará el material. Confirme sólo si corresponde; el sistema puede impedirlo
-por sus relaciones o historial. Desmarcar **Activo** en una edición expresa que el registro
-deja de estar disponible para nuevas operaciones, sin borrar su historia.
+Desmarcar **Activo** conserva el registro y su historia para consulta.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->
 ## Descargar el inventario
 
-Use **Descargar Excel** si su cuenta puede exportar el inventario. Revise primero
-los filtros; el reporte no se limita a las filas de la página visible.
+Revise los filtros y pulse **Descargar Excel**. El archivo incluye todos los
+resultados de la consulta.
 <!-- manual:end -->

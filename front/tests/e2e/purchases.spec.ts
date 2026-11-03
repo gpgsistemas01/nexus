@@ -263,7 +263,7 @@ test('compras: acceso, menú Vue y diálogo móvil sin desbordamiento global', a
   await expect(page).toHaveURL(/\/compras\/materiales$/);
   await expect(page.getByRole('cell', { name: 'COM-001', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Exportar Excel', exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
   const menu = page.getByRole('navigation', { name: 'Navegación principal' });
   await expect(menu.getByRole('link', { name: 'Consumibles', exact: true })).toHaveAttribute(
     'href',

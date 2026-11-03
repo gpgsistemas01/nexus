@@ -125,10 +125,7 @@ onMounted(() => {
                 <RemoteSelect
                     v-model="departmentId"
                     label="Filtrar por área"
-                    :items="options.departments.items"
-                    :is-loading="options.departments.isLoading"
-                    :has-more="options.departments.hasMore"
-                    :load-error="options.departments.error"
+                    :state="options.departments"
                     @search="filters.departments.updateSearch"
                     @more="filters.departments.loadMore"
                     @retry="filters.departments.retry"
@@ -142,10 +139,7 @@ onMounted(() => {
                 <RemoteSelect
                     v-model="roleId"
                     label="Filtrar por rol"
-                    :items="options.roles.items"
-                    :is-loading="options.roles.isLoading"
-                    :has-more="options.roles.hasMore"
-                    :load-error="options.roles.error"
+                    :state="options.roles"
                     @search="filters.roles.updateSearch"
                     @more="filters.roles.loadMore"
                     @retry="filters.roles.retry"

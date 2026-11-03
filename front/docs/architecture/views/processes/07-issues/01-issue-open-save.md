@@ -57,6 +57,7 @@ sequenceDiagram
     box Coordinación
     participant Page@{ "type": "control" } as IssueEditor<br/>Page.vue
     participant Editor@{ "type": "control" } as useIssue<br/>Editor.ts
+    participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
     end
     box Reglas y datos
@@ -65,21 +66,21 @@ sequenceDiagram
     box Integración
     participant Service@{ "type": "boundary" } as issue<br/>Service.ts
     end
-    Page->>Editor: nowrap: editor.submit()
-    opt nowrap: !isDisabled()
-        Editor->>Editor: nowrap: submitValidated()
-        opt nowrap: isIssueWriteTarget(options.target)
-            Editor->>Save: nowrap: save.execute(operation)
-            Save->>Editor: nowrap: operation(controller.signal)
-            Editor->>Mapper: nowrap: mapIssueFormToRequest(values,<br/>options.resource, target.mode)
-            Mapper-->>Editor: nowrap: payload
-            Editor->>Service: nowrap: issueService.save({ resource:<br/>options.resource, target, payload, signal<br/>})
-            Service-->>Editor: nowrap: MutationConfirmation
-            Editor-->>Save: nowrap: result
-            opt nowrap: !controller.signal.aborted
-                Save->>Page: nowrap: options.onSaved(result)
-                Page->>Page: nowrap: emit('saved', result)
-            end
+    Page->>Record: nowrap: editor.submit()
+    opt nowrap: isIssueWriteTarget(target) && !isDisabled()
+        Record->>Record: nowrap: validated()
+        Record->>Save: nowrap: save.execute(operation)
+        Save->>Record: nowrap: operation(controller.signal)
+        Record->>Editor: nowrap: operation(values, signal)
+        Editor->>Mapper: nowrap: mapIssueFormToRequest(values,<br/>options.resource, target.mode)
+        Mapper-->>Editor: nowrap: payload
+        Editor->>Service: nowrap: issueService.save({ resource:<br/>options.resource, target, payload, signal<br/>})
+        Service-->>Editor: nowrap: MutationConfirmation
+        Editor-->>Record: nowrap: result
+        Record-->>Save: nowrap: result
+        opt nowrap: !controller.signal.aborted
+            Save->>Page: nowrap: options.onSaved(result)
+            Page->>Page: nowrap: emit('saved', result)
         end
     end
 ```
@@ -93,6 +94,7 @@ sequenceDiagram
 [issueRules.ts](../../../../../src/modules/issues/issueRules.ts),
 [IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue),
 [useIssueEditor.ts](../../../../../src/modules/issues/composables/useIssueEditor.ts),
+[useRecordForm.ts](../../../../../src/shared/composables/useRecordForm.ts),
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [issueRequestMapper.ts](../../../../../src/modules/issues/mappers/issueRequestMapper.ts),
 [issueService.ts](../../../../../src/modules/issues/services/issueService.ts).

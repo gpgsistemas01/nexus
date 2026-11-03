@@ -3,9 +3,11 @@
 ## Consultar consumibles
 
 Abra **Almacén → Consumibles**. La **Tabla de Consumibles** distingue existencia,
-stock mínimo, presentación y unidad de medida. El costo unitario se muestra a
-las cuentas autorizadas. No interprete una
-cantidad como metros cuadrados si el consumible se controla en otra unidad.
+stock mínimo, presentación y unidad de medida. Lea la unidad para interpretar la cantidad.
+
+<!-- manual:any inventory:costs-read -->
+También puede consultar el costo unitario.
+<!-- manual:end -->
 
 ![Listado de consumibles y sus existencias.](images/06-consumables-list.png)
 
@@ -24,16 +26,14 @@ consumible. Compruebe que el registro no exista con los mismos datos.
 
 ![Formulario de alta de un consumible.](images/07-consumable-create.png)
 
-El formulario adapta sus campos al consumible. No agregue dimensiones en el nombre
-para compensar una unidad o presentación equivocada. Si lo registra desde una
-compra, la recepción se captura con los detalles de esa compra y no se duplica
-como existencia inicial.
+Compruebe presentación y unidad antes de guardar. Desde una compra, la existencia
+se recibe al guardar la compra; no la duplique como cantidad inicial.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
 ## Editar datos
 
-Para corregir los datos habilitados, pulse **Editar** en la fila, revise los
+Para corregir los datos habilitados, pulse **Editar** en el registro, revise los
 valores, cambie lo necesario y pulse **Guardar**. La edición no cambia proveedor,
 presentación o unidad de un registro con identidad ya establecida.
 <!-- manual:end -->
@@ -56,18 +56,14 @@ para entregas. Los ajustes corrigen el saldo; no sustituyen esos documentos.
 <!-- manual:any materials:write -->
 ## Disponibilidad e incidencias
 
-La casilla **Activo** controla la disponibilidad del registro para nuevas
-operaciones. Si una eliminación está disponible, requiere revisar su confirmación
-y puede ser rechazada si el consumible tiene relaciones que deben conservarse.
-
-Si un cambio simultáneo impide guardar, cierre y actualice el listado, revise el
-saldo vigente y vuelva a preparar la corrección. Si se perdió la conexión después
-de enviar, compruebe primero si el cambio quedó aplicado.
+Desmarcar **Activo** retira el registro de nuevas operaciones y conserva su historia.
+Para eliminarlo, revise la confirmación; sus relaciones pueden impedirlo. Ante un
+conflicto o un envío sin respuesta, siga [Errores y recuperación](15-errors-and-recovery.md).
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->
 ## Descargar el inventario
 
-Con permiso de reporte, pulse **Descargar Excel** después de revisar la consulta.
+Pulse **Descargar Excel** después de revisar la consulta.
 El [capítulo de reportes](14-reports.md) explica su alcance.
 <!-- manual:end -->

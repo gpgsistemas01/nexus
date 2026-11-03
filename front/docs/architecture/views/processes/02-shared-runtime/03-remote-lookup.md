@@ -26,6 +26,7 @@ sequenceDiagram
     Select->>Page: nowrap: emit('search', value)
     Page->>Lookup: nowrap: editor.suppliers.updateSearch(value)
     Lookup->>Lookup: nowrap: resetOptions()
+    Lookup->>Lookup: nowrap: isLoading.value = isEnabled.value
     Lookup->>Lookup: nowrap: ++sequence
     Lookup->>Lookup: nowrap: controller?.abort()
     Lookup->>Lookup: nowrap: setTimeout(() => load(), 250)
@@ -37,8 +38,8 @@ sequenceDiagram
         Lookup->>Lookup: nowrap: items.value = [...previous, ...additions]
         Lookup->>Lookup: nowrap: hasMore.value = result.data.length > 0 &&<br/>recordsRead < result.recordsFiltered
         Lookup-->>Page: nowrap: suppliers.state
-        Page-->>Select: nowrap: { items, isLoading, hasMore, loadError }
-        Select->>Selection: nowrap: useSelectedOption(toRef(props, 'items'),<br/>getId, getInitialOption)
+        Page-->>Select: nowrap: state: LookupState
+        Select->>Selection: nowrap: useSelectedOption(toRef(() =><br/>props.state.items), getId, getInitialOption)
         Selection-->>Select: nowrap: selected
     end
     U->>Select: nowrap: intersect

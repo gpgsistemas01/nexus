@@ -48,7 +48,7 @@ test('movimientos: menú exclusivo, enlaces Vue, acceso directo y móvil', async
   const { reads } = await mockMovements(page, ['movements:read']);
   await page.goto('/almacen');
   await expect(page).toHaveURL(/\/movimientos\/materiales$/);
-  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
   const menu = page.getByRole('navigation', { name: 'Navegación principal' });
   await expect(menu.getByRole('button', { name: 'Movimientos', exact: true })).toHaveAttribute(
     'aria-expanded',

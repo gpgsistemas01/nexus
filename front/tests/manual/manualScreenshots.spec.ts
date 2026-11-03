@@ -73,7 +73,7 @@ test('menú de una cuenta con acceso a todas las secciones', async ({ page }) =>
   await readOnly(page);
   await page.goto('/almacen/materiales');
   await expect(page.getByRole('cell', { name: /^Lona(?: Proveedor Central)?$/ })).toBeVisible();
-  await page.getByRole('button', { name: 'Expandir menú', exact: true }).click();
+  await page.getByRole('button', { name: 'Menú', exact: true }).click();
   await expect(
     page.getByRole('navigation').getByRole('button', { name: 'Almacén', exact: true }),
   ).toHaveAttribute('aria-expanded', 'true');

@@ -2,9 +2,8 @@
 
 ## Elegir el catálogo
 
-Abra **Catálogos** y elija el tipo de dato que necesita administrar. La cuenta
-debe tener permiso de gestión de catálogos. Estos registros se ofrecen después en
-los selectores de otros módulos.
+Abra **Catálogos** y elija el dato que necesita administrar. Sus registros se usan
+en los selectores del sistema.
 
 | Catálogo | Uso principal | Acción de alta |
 | --- | --- | --- |
@@ -27,9 +26,8 @@ los selectores de otros módulos.
 
 ![Formulario de una unidad de medida con nombre, símbolo y disponibilidad.](images/12-catalog-form.png)
 
-Use nombres y símbolos claros. Renombrarlos no cambia saldos ni medidas de artículos
-existentes. Si el nombre ya existe, revise ese registro en lugar de crear variaciones para
-evitar el aviso.
+Use nombres y símbolos claros. Renombrar conserva saldos y medidas existentes.
+Si aparece un duplicado, revise el registro encontrado.
 
 ## Editar o desactivar
 
@@ -38,14 +36,9 @@ evitar el aviso.
 3. Si deja de utilizarse para nuevas capturas, desmarque **Activo**.
 4. Pulse **Actualizar** y compruebe el resultado.
 
-La desactivación no elimina documentos históricos. Los flujos operativos pueden
-excluir registros inactivos al buscar nuevas opciones y conservar los valores
-ya asociados a registros existentes.
+Desactivar retira el registro de nuevas selecciones y conserva los documentos que ya lo usan.
 
 ## Resolver un rechazo
 
-Si falta un dato, corrija el campo señalado. Si otra persona modificó el registro,
-el formulario conserva su captura y bloquea el envío; utilice **Cerrar y actualizar
-listado**, vuelva a abrir el registro y contraste la información vigente antes de
-editar. No cambie catálogos ajenos a su responsabilidad para resolver un permiso
-o un problema de conexión.
+Corrija los campos señalados. Si el registro cambió, use **Cerrar y actualizar listado**
+y vuelva a abrirlo. Consulte [Errores y recuperación](15-errors-and-recovery.md) ante otros fallos.

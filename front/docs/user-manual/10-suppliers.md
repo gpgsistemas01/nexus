@@ -3,8 +3,7 @@
 <!-- manual:all suppliers:manage suppliers:read -->
 ## Registrar un proveedor desde el selector
 
-Puede iniciar esta alta desde el selector **Proveedor** de un material, consumible
-o compra que esté preparando. Primero busque para evitar repetir un registro.
+Si falta un proveedor, regístrelo desde el selector del artículo o la compra.
 
 1. Abra **Proveedor** y busque su nombre comercial. Si ya existe, selecciónelo.
 2. Si falta y aparece **Registrar proveedor**, pulse esa acción sin cerrar la captura principal.
@@ -22,20 +21,20 @@ o compra que esté preparando. Primero busque para evitar repetir un registro.
 | Nombre comercial | Nombre visible en búsquedas y selectores. |
 | Activo | Disponibilidad para nuevas operaciones que requieren proveedores activos. |
 
-**Cerrar** cancela el alta secundaria. Ante un rechazo, corrija los campos; se conserva la
-captura de origen. El proveedor guardado permanece aunque cierre el artículo o la compra.
+**Cerrar** cancela el alta y conserva la captura principal. Un proveedor guardado
+permanece aunque después cierre esa captura.
 <!-- manual:end -->
 
 <!-- manual:any suppliers:page-view -->
 ## Consulta independiente
 
-Con acceso de administración, abra **Directorio comercial → Proveedores**. Use
+Abra **Directorio comercial → Proveedores**. Use
 **Buscar por nombre** y **Buscar** para distinguir razón social y nombre comercial.
 <!-- manual:end -->
 
 <!-- manual:all suppliers:page-view suppliers:manage -->
 Para registrar desde esta página, pulse **Nuevo proveedor**, complete los mismos
-campos y guarde. Se actualiza el listado; no hay otro formulario de origen pendiente.
+campos y guarde. Compruebe el proveedor en el listado.
 <!-- manual:end -->
 
 <!-- manual:all suppliers:page-view suppliers:update -->
@@ -45,15 +44,14 @@ campos y guarde. Se actualiza el listado; no hay otro formulario de origen pendi
 2. Compruebe la identidad de la empresa, corrija los campos o desmarque **Activo**.
 3. Pulse **Actualizar** y revise el resultado.
 
-Desactivar conserva el historial. La edición no sustituye por otra empresa al
-proveedor de compras o artículos existentes. Ante un conflicto, cierre y actualice
-el listado antes de volver a preparar los cambios.
+Desactivar conserva el historial. Edite los datos de la misma empresa; no los
+sustituya por los de otro proveedor. Ante un conflicto, siga
+[Errores y recuperación](15-errors-and-recovery.md).
 <!-- manual:end -->
 
 <!-- manual:all suppliers:page-view supplier:reports-read -->
 ## Exportar proveedores
 
-Revise la búsqueda aplicada y pulse **Exportar Excel**. El archivo incluye la
-consulta completa, no sólo la página visible. El [capítulo de reportes](14-reports.md)
-explica su alcance y la recuperación de descargas.
+Revise la búsqueda y pulse **Exportar Excel**. Consulte [Reportes](14-reports.md)
+para revisar el alcance o recuperar una descarga.
 <!-- manual:end -->

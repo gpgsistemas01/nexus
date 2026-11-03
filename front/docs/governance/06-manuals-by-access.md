@@ -6,8 +6,9 @@ El generador inicia sesión, consulta `/api/auth/me` y selecciona tareas y captu
 con los mismos permisos que consume Vue. Una cuenta con varias asignaciones
 activas recibe la unión de sus funciones. El generador no concede permisos.
 
-Cada edición contiene recorrido inicial, tareas permitidas, advertencias,
-recuperación e índice propio. Las fuentes comunes están en `docs/user-manual`.
+Cada cuenta recibe su edición, identificada con el usuario y sus áreas y roles.
+El índice agrupa inicio, tareas permitidas y ayuda. Las fuentes se comparten en
+`docs/user-manual`; no se copian para mantener una versión por rol.
 La configuración, ejecución y recuperación se explican en el
 [procedimiento por cuenta](07-manual-accounts-and-files.md).
 
@@ -39,7 +40,7 @@ siguen aplicándose. El índice de cada edición indica su alcance detectado.
 | --- | --- |
 | [profiles.mjs](../../scripts/manual/profiles.mjs) | Perfiles de referencia, configuración y lectura local de credenciales. La demostración calcula permisos con las políticas existentes. |
 | [model.mjs](../../scripts/manual/model.mjs) | Capítulos, permisos y evaluación de bloques de tareas. |
-| [publication.mjs](../../scripts/manual/publication.mjs) | Índice personalizado, fuentes filtradas, huellas de acceso y validación. |
+| [publication.mjs](../../scripts/manual/publication.mjs) | Índice por usuario, fuentes filtradas, retirada de capítulos e imágenes sin acceso y huellas de publicación. |
 | [manuals.mjs](../../scripts/manuals.mjs) | Selección de perfiles, capturas y exportación con el motor común. |
 | [profileManuals.spec.ts](../../tests/manual-profiles/profileManuals.spec.ts) | Sesión aislada, control de escrituras y recuperación de capturas. |
 | [captureRecipes.ts](../../tests/manual-profiles/captureRecipes.ts) | Recorridos visibles sin confirmar operaciones. |

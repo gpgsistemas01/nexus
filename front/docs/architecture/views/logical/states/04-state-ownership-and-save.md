@@ -8,9 +8,10 @@
 | Preferencia de login | `useLoginForm`. | `nexus.rememberedUser` conserva el nombre tras el éxito; precarga sólo si es válido. Storage es opcional y su fallo no impide ingresar. |
 | Consulta aplicada/filas | `usePagedList`, `shallowRef<Row[]>` por listado. | Conserva query, conteos y carga/error; mantiene las filas si el JSON no cambió; desmontar aborta/invalida. |
 | Documento leído | `useDocumentRead`, `shallowRef`. | Sólo la respuesta vigente sustituye el documento. |
-| Opciones remotas | `useRemoteLookup`, `computed<LookupState>`. | Deriva opciones, carga y error; el ID seleccionado pertenece a la captura o filtro. |
+| Opciones remotas | `useRemoteLookup`, `computed<LookupState>`. | Incluye la espera de búsqueda en el estado pendiente; el ID seleccionado pertenece a la captura o filtro. |
 | Búsqueda borrador | `useListSearch` y filtros de dominio. | Se aplica explícitamente, sin mutar resultados por cada tecla. |
 | Captura y errores | Composable de editor y `form.values` reactivo de VeeValidate. | Cada apertura tiene su instancia; precarga no cuenta como interacción. |
+| Interacción y envío validado | `useRecordForm`, compuesto con el formulario del dominio. | Unifica bloqueo, validación y guardado; cada apertura conserva una instancia independiente. |
 | Opción seleccionada | `useSelectedOption`. | Persiste fuera de la página remota mientras su ID esté vigente. |
 | Pendiente de escritura | `useRecordSave`. | Bloquea duplicados, conserva error/conflicto e invalida al desmontar. |
 | Captura incierta de merma | `pendingWasteOperation`. | Conserva clave/cuerpo para recuperación según contrato; no guarda credenciales. |

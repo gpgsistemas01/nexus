@@ -60,10 +60,7 @@ const search = defineModel<string>('search', { required: true });
             <RemoteSelect
                 label="Proveedor"
                 :model-value="values.supplierId"
-                :items="suppliers.items"
-                :is-loading="suppliers.isLoading"
-                :has-more="suppliers.hasMore"
-                :load-error="suppliers.error"
+                :state="suppliers"
                 :is-disabled="!canSelectSupplier"
                 :hint="
                     !canSelectSupplier
@@ -83,10 +80,7 @@ const search = defineModel<string>('search', { required: true });
             <RemoteSelect
                 :label="itemLabel"
                 :model-value="values.itemId"
-                :items="items.items"
-                :is-loading="items.isLoading"
-                :has-more="items.hasMore"
-                :load-error="items.error"
+                :state="items"
                 :is-disabled="!values.supplierId || !canSelectItem"
                 :hint="
                     !canSelectItem

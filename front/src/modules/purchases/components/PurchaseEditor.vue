@@ -83,10 +83,7 @@ const emit = defineEmits<{
                         <RemoteSelect
                             label="Proveedor"
                             :model-value="values.supplierId"
-                            :items="suppliers.items"
-                            :is-loading="suppliers.isLoading"
-                            :has-more="suppliers.hasMore"
-                            :load-error="suppliers.error"
+                            :state="suppliers"
                             :error="errors.supplierId"
                             :initial-option="supplier"
                             :is-disabled="isSubmitting || !canSuppliers"
@@ -117,10 +114,7 @@ const emit = defineEmits<{
                     <RemoteSelect
                         label="Persona que recibe"
                         :model-value="values.receivedById"
-                        :items="persons.items"
-                        :is-loading="persons.isLoading"
-                        :has-more="persons.hasMore"
-                        :load-error="persons.error"
+                        :state="persons"
                         :error="errors.receivedById"
                         :initial-option="receiver"
                         :is-disabled="isSubmitting || isReadOnly || !canPersons"
