@@ -10,6 +10,7 @@ import {
   verifyConfiguredAccess,
 } from '../../scripts/manual/profiles.mjs';
 import { prepareManual, accessFingerprint } from '../../scripts/manual/publication.mjs';
+import { assertManualDevelopment, parseManualMode } from '../../scripts/manual/environment.mjs';
 import { captureRecipe, captureFamily, type CaptureFamily } from './captureRecipes.js';
 import { mockWarehouse } from '../e2e/warehouseFixtures.js';
 import { mockRecords } from '../e2e/recordsFixtures.js';
@@ -20,7 +21,8 @@ import { mockMovements } from '../e2e/movementFixtures.js';
 import { PERMISSIONS as P } from '@nexus/permissions';
 import type { SessionUser } from '../../src/modules/auth/session.js';
 
-const mode = process.env.FRONT_MANUAL_MODE ?? 'demo';
+assertManualDevelopment();
+const mode = parseManualMode(process.env.FRONT_MANUAL_MODE);
 const frontRoot = process.cwd();
 const accounts =
   mode === 'demo'
@@ -96,7 +98,7 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
     context.on('request', (request) => {
       const url = new URL(request.url());
       if (!url.pathname.startsWith('/api/') || request.method() === 'GET') return;
-      if (mode === 'live' && request.method() === 'POST' && url.pathname === '/api/auth/refresh')
+      if (mode === 'dev' && request.method() === 'POST' && url.pathname === '/api/auth/refresh')
         return;
       writes.push(`${request.method()} ${url.pathname}`);
     });
@@ -105,13 +107,13 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
         const request = route.request();
         const pathname = new URL(request.url()).pathname;
         return request.method() === 'GET' ||
-          (mode === 'live' && request.method() === 'POST' && pathname === '/api/auth/refresh')
+          (mode === 'dev' && request.method() === 'POST' && pathname === '/api/auth/refresh')
           ? route.fallback()
           : route.abort('blockedbyclient');
       });
     };
     // Authentication uses the API context, never a password field, trace or disk session.
-    if (mode === 'live') {
+    if (mode === 'dev') {
       try {
         const credentials = await readCredentials(account, process.env.FRONT_MANUAL_ENV_FILE);
         if (!credentials) throw new Error('Credentials unavailable');
@@ -124,7 +126,7 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
       }
     }
     const user = mode === 'demo' ? demoSession(account) : await realSession(context);
-    if (mode === 'live') verifyConfiguredAccess(account, user);
+    if (mode === 'dev') verifyConfiguredAccess(account, user);
     const root = path.join(frontRoot, 'build/manuals', account.id);
     let previous;
     try {
@@ -190,7 +192,7 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
             );
         }
         await protect(page);
-        if (mode === 'live' && filename === '01-login.png') {
+        if (mode === 'dev' && filename === '01-login.png') {
           // The public login illustration uses an isolated, unauthenticated context.
           const anonymous = await context.browser()!.newContext({
             baseURL: (await readAccounts(process.env.FRONT_MANUAL_ACCOUNTS!)).baseUrl,
@@ -231,7 +233,7 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
     }
     const pending = manifest.images.filter((filename) => captures[filename]?.status !== 'complete');
     expect(writes).toEqual([]);
-    if (mode === 'live')
+    if (mode === 'dev')
       expect(accessFingerprint(await realSession(context))).toBe(manifest.accessFingerprint);
     if (pending.length)
       throw new Error(

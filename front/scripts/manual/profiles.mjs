@@ -3,6 +3,7 @@ import { parseEnv } from 'node:util';
 import { getGrantedPermissions } from '../../../back/src/constants/permissions.js';
 import { DEPARTMENT_KEYS } from '../../../back/src/constants/departments.js';
 import { ROLE_KEYS } from '../../../back/src/constants/roles.js';
+import { parseManualBaseUrl } from './environment.mjs';
 
 export const DEMO_PROFILES = [
     {
@@ -104,28 +105,7 @@ export const readAccounts = async (filename) => {
     const ids = new Set();
     if (!Array.isArray(value.accounts) || !value.accounts.length)
         throw new Error('La configuración debe declarar accounts.');
-    let baseUrl;
-    try {
-        baseUrl = new URL(value.baseUrl);
-    } catch {
-        throw new Error('baseUrl debe ser un origen HTTP local o HTTPS válido.');
-    }
-    if (
-        baseUrl.username ||
-        baseUrl.password ||
-        baseUrl.search ||
-        baseUrl.hash ||
-        baseUrl.pathname !== '/'
-    )
-        throw new Error('baseUrl debe ser un origen sin credenciales, ruta ni parámetros.');
-    if (
-        baseUrl.protocol !== 'https:' &&
-        !(
-            baseUrl.protocol === 'http:' &&
-            ['localhost', '127.0.0.1', '[::1]'].includes(baseUrl.hostname)
-        )
-    )
-        throw new Error('Use HTTPS o HTTP en localhost para la captura de cuentas.');
+    const baseUrl = parseManualBaseUrl(value.baseUrl);
     for (const account of value.accounts) {
         if (
             !validProfileId(account.id) ||
@@ -150,7 +130,7 @@ export const readAccounts = async (filename) => {
                 'La configuración sólo admite referencias a credenciales, no sus valores.',
             );
     }
-    return { baseUrl: baseUrl.origin, accounts: value.accounts };
+    return { baseUrl, accounts: value.accounts };
 };
 
 export const verifyConfiguredAccess = (account, session) => {

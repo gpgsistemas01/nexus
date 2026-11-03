@@ -1,13 +1,15 @@
 import { validProfileId } from './profiles.mjs';
+import { parseManualMode } from './environment.mjs';
 
-export const MANUAL_HELP = `Capturas y manuales por cuenta
+export const MANUAL_HELP = `Capturas y manuales por cuenta: sólo desarrollo local
 
 Desde front/:
   npm run docs:screenshots -- --all
   npm run docs:manuals -- --all --format ambos
   npm run docs:manuals -- --profile cuenta-01 --missing
 
-El modo predeterminado es live. Lee manual.accounts.local.json y .env.manual.local.
+El modo predeterminado es dev. Lee manual.accounts.local.json y .env.manual.local.
+La dirección de Vue debe ser local y NODE_ENV no puede ser production.
 Cada cuenta inicia sesión para detectar sus áreas, roles y permisos.
 Las cuentas sin usuario o contraseña se omiten, sin detener las demás.
 Las capturas quedan en build/manuals/<cuenta>/images/.
@@ -21,7 +23,7 @@ Opciones:
   --format docx|pdf|ambos    Formato de publicación; predeterminado: ambos.
   --accounts <archivo>      Configuración de cuentas; rutas relativas a front/.
   --env-file <archivo>      Credenciales locales; rutas relativas a front/.
-  --mode demo               Usar perfiles y datos ficticios, sin credenciales.
+  --mode dev|demo           Cuentas locales o datos ficticios; predeterminado: dev.
   --help                    Mostrar esta ayuda.
 
 Preparación: docs/governance/07-manual-accounts-and-files.md
@@ -29,7 +31,7 @@ Preparación: docs/governance/07-manual-accounts-and-files.md
 
 export const parseManualOptions = (args) => {
     const values = {
-        mode: 'live',
+        mode: 'dev',
         format: 'ambos',
         accounts: 'manual.accounts.local.json',
         'env-file': '.env.manual.local',
@@ -51,7 +53,7 @@ export const parseManualOptions = (args) => {
         }
     }
     if (values.help) return values;
-    if (!['demo', 'live'].includes(values.mode)) throw new Error('Use --mode live o --mode demo.');
+    parseManualMode(values.mode);
     if (!['ambos', 'pdf', 'docx'].includes(values.format))
         throw new Error('Use --format docx, --format pdf o --format ambos.');
     if (Boolean(values.profile) === values.all)

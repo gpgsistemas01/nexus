@@ -5,6 +5,7 @@ import process from 'node:process';
 import { generateCodeReference } from './documentation.mjs';
 import { generateTypeReference } from './typeDocumentation.mjs';
 import { loadDocumentationCatalog, parseDocumentationExportArgs } from './documentationCatalog.mjs';
+import { assertManualDevelopment } from './manual/environment.mjs';
 
 const frontRoot = fileURLToPath(new URL('../', import.meta.url));
 const [command, ...args] = process.argv.slice(2);
@@ -53,6 +54,7 @@ try {
             args,
             Object.keys(catalog.sections),
         );
+        if (section === 'manual') assertManualDevelopment();
         await generateCodeReference(frontRoot, true);
         await generateTypeReference(frontRoot, true);
         runExport([format], section);

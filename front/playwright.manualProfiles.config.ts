@@ -1,7 +1,13 @@
 import { defineConfig } from '@playwright/test';
+import {
+    assertManualDevelopment,
+    parseManualMode,
+    parseManualBaseUrl,
+} from './scripts/manual/environment.mjs';
 
-const mode = process.env.FRONT_MANUAL_MODE ?? 'demo';
-const baseURL = process.env.FRONT_MANUAL_BASE_URL ?? 'http://127.0.0.1:5177';
+assertManualDevelopment();
+const mode = parseManualMode(process.env.FRONT_MANUAL_MODE);
+const baseURL = parseManualBaseUrl(process.env.FRONT_MANUAL_BASE_URL ?? 'http://127.0.0.1:5177');
 
 export default defineConfig({
     testDir: './tests/manual-profiles',

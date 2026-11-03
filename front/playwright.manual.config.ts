@@ -1,4 +1,7 @@
 import { defineConfig } from '@playwright/test';
+import { assertManualDevelopment } from './scripts/manual/environment.mjs';
+
+assertManualDevelopment();
 
 export default defineConfig({
     testDir: './tests/manual',

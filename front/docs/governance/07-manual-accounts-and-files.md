@@ -1,6 +1,7 @@
 # 7. Generar manuales por cuenta
 
-Para generar un manual, use el usuario y la contraseña habituales de la cuenta.
+La generación es sólo para desarrollo local. Use el usuario y la contraseña de
+una cuenta del entorno de desarrollo.
 La herramienta detecta sus áreas, roles y permisos al iniciar sesión.
 
 Guarde estos archivos **directamente en `front/`, junto a `package.json`**:
@@ -26,12 +27,12 @@ Los comandos siguientes se ejecutan desde **`front/`** (`cd front` desde la raí
 | Capturas y manuales por cuenta | `npm run docs:manuals -- --all` | Lo anterior y herramientas de Word/PDF. |
 | Revisar ediciones ficticias | `npm run docs:manuals -- --mode demo --all` | Perfiles incluidos; no usa credenciales. Inicia Vite en el puerto 5177. |
 
-El modo predeterminado es `live`: ambos comandos leen
+El modo predeterminado es `dev`: ambos comandos leen
 `manual.accounts.local.json` y `.env.manual.local`. `docs:manual` es un alias de
 `docs:manuals`. Los comandos con sufijo `:reference` mantienen las capturas y el
 manual general descritos en [mantenimiento](05-user-manual.md).
 
-Instalar dependencias y navegador:
+Instalar dependencias y navegador en el equipo de desarrollo:
 
 ```bash
 npm ci --include=dev
@@ -39,8 +40,10 @@ npx playwright install chromium
 ```
 
 Para Word/PDF, completar la [preparación del publicador](02-generation-and-publication.md#preparación-del-publicador).
-En `live`, iniciar Vue y la API con la [guía local](../development/01-getting-started.md);
-la herramienta no los arranca. Para un sitio remoto, usar su dirección HTTPS.
+En `dev`, iniciar Vue y la API con la [guía local](../development/01-getting-started.md);
+la herramienta no los arranca. La generación rechaza `NODE_ENV=production` y
+direcciones ajenas a `localhost`, `127.0.0.1` o `[::1]`. Los scripts, las credenciales
+y Chromium permanecen fuera de la imagen final de producción.
 
 ## 2. Qué contiene cada archivo de entrada
 
@@ -63,7 +66,7 @@ Si la cuenta ya permite ingresar a Nexus, continuar en el paso 4. Si falta la
 cuenta o su contraseña, acudir al responsable de usuarios; el procedimiento está
 en [Usuarios](../user-manual/08-users.md).
 
-Para `live`, preparar también registros de capacitación: una edición requiere un
+Para `dev`, preparar también registros de capacitación: una edición requiere un
 registro existente y una devolución de Almacén requiere una salida surtida.
 Los recorridos no registran operaciones para preparar las imágenes.
 
@@ -116,7 +119,7 @@ Para una cuenta, usar este contenido en `manual.accounts.local.json` y ajustar
 
 | Campo | Cómo completarlo |
 | --- | --- |
-| `baseUrl` | Origen de Vue, no el puerto directo de la API. Sin ruta, parámetros ni credenciales. HTTP sólo en localhost; HTTPS para un sitio remoto. |
+| `baseUrl` | Origen local de Vue, por ejemplo `http://127.0.0.1:5173`; no el puerto de la API. HTTP o HTTPS en `localhost`, `127.0.0.1` o `[::1]`, sin ruta, parámetros ni credenciales. |
 | `accounts` | Lista de cuentas posibles; se procesan las que tengan usuario y contraseña. |
 | `id` | Identificador documental único, con letra minúscula inicial, minúsculas, números y guiones. Determina `--profile` y la carpeta; no es el usuario de ingreso ni el ID de base de datos. |
 | `label` | Nombre legible de la edición; no asigna permisos. |
@@ -201,7 +204,7 @@ invocar Pandoc/LibreOffice.
 | --- | --- |
 | `build/manuals/<cuenta>/sources/index.md` | Portada, alcance e índice de la cuenta. |
 | `build/manuals/<cuenta>/sources/*.md` | Capítulos filtrados y glosario. Corregir sus originales en `docs/user-manual`; se regeneran. |
-| `build/manuals/<cuenta>/images/*.png` | Capturas propias; en `live`, muestran los datos visibles para esa cuenta. |
+| `build/manuals/<cuenta>/images/*.png` | Capturas propias; en `dev`, muestran los datos visibles para esa cuenta. |
 | `build/manuals/<cuenta>/manifest.json` | Estado `pending`/`ready`, permisos, fuentes y huellas de vigencia y reanudación. No editar a mano; no contiene contraseñas. |
 | `build/docs/docx/manuales-vue/<cuenta>/manual-<cuenta>.docx` | Word, después de completar las capturas requeridas. |
 | `build/docs/pdf/manuales-vue/<cuenta>/manual-<cuenta>.pdf` | PDF, si se solicitó y terminó la conversión. |
@@ -231,6 +234,7 @@ Sin esa opción, se recaptura el perfil completo.
 
 | Situación | Recuperación |
 | --- | --- |
+| Entorno o dirección de producción | Ejecutar en desarrollo y usar el origen local de Vue. |
 | Cuenta omitida | Completar usuario y contraseña cuando se quiera generar su edición. |
 | No autentica con ambas credenciales completas | Revisar servicios y credenciales. Un rechazo de acceso se informa como error; no se trata como una cuenta vacía. |
 | Cuenta distinta del perfil | Revisar `expectedAccess`, área/rol real y referencia de credenciales. |

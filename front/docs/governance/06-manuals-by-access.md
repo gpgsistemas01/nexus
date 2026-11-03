@@ -6,6 +6,9 @@ El generador inicia sesión, consulta `/api/auth/me` y selecciona tareas y captu
 con los mismos permisos que consume Vue. Una cuenta con varias asignaciones
 activas recibe la unión de sus funciones. El generador no concede permisos.
 
+Se ejecuta sólo en desarrollo local. Las URLs se validan también en Playwright;
+los comandos de generación rechazan el entorno de producción.
+
 Cada cuenta recibe su edición, identificada con el usuario y sus áreas y roles.
 El índice agrupa inicio, tareas permitidas y ayuda. Las fuentes se comparten en
 `docs/user-manual`; no se copian para mantener una versión por rol.
@@ -38,8 +41,9 @@ siguen aplicándose. El índice de cada edición indica su alcance detectado.
 
 | Fuente | Responsabilidad |
 | --- | --- |
-| [options.mjs](../../scripts/manual/options.mjs) | Opciones de ejecución, modo live predeterminado y ayuda de comandos. |
-| [profiles.mjs](../../scripts/manual/profiles.mjs) | Perfiles de referencia, configuración, credenciales y selección de cuentas completas. La demostración calcula permisos con las políticas existentes. |
+| [environment.mjs](../../scripts/manual/environment.mjs) | Entorno de desarrollo, modos admitidos y orígenes locales; reglas compartidas con Playwright. |
+| [options.mjs](../../scripts/manual/options.mjs) | Opciones de ejecución, modo dev predeterminado y ayuda. |
+| [profiles.mjs](../../scripts/manual/profiles.mjs) | Perfiles, configuración, credenciales y selección de cuentas completas. La demostración calcula permisos con las políticas existentes. |
 | [model.mjs](../../scripts/manual/model.mjs) | Capítulos, permisos y evaluación de bloques de tareas. |
 | [publication.mjs](../../scripts/manual/publication.mjs) | Índice por usuario, fuentes filtradas, retirada de capítulos e imágenes sin acceso y huellas de publicación. |
 | [manuals.mjs](../../scripts/manuals.mjs) | Selección de perfiles, capturas y exportación con el motor común. |

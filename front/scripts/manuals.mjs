@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DEMO_PROFILES, readAccounts, selectAccountsWithCredentials } from './manual/profiles.mjs';
 import { MANUAL_HELP, parseManualOptions } from './manual/options.mjs';
+import { assertManualDevelopment } from './manual/environment.mjs';
 import { loadManualPublication } from './manual/publication.mjs';
 
 const frontRoot = fileURLToPath(new URL('../', import.meta.url));
@@ -12,6 +13,7 @@ const runManuals = async () => {
         console.log(MANUAL_HELP);
         return;
     }
+    assertManualDevelopment();
     const configuration =
         values.mode === 'demo'
             ? { baseUrl: 'http://127.0.0.1:5177', accounts: DEMO_PROFILES }
@@ -21,7 +23,7 @@ const runManuals = async () => {
     if (!requested.length) throw new Error('La cuenta solicitada no está configurada.');
     const envFile = path.resolve(frontRoot, values['env-file']);
     const selection =
-        values.mode === 'live'
+        values.mode === 'dev'
             ? await selectAccountsWithCredentials(requested, envFile)
             : { accounts: requested, omitted: [] };
     for (const id of selection.omitted)

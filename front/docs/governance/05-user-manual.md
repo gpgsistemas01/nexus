@@ -37,6 +37,9 @@ de la acción. Las referencias a reportes y ajustes se filtran también fuera de
 
 ## Generar capturas por cuenta
 
+La generación se ejecuta sólo en desarrollo local, con las dependencias de desarrollo
+y el Chromium de Playwright instalados en ese equipo.
+
 `npm run docs:screenshots -- --all` lee las cuentas y credenciales locales y
 guarda imágenes separadas por usuario. La preparación, selección de cuentas y
 rutas están en el [procedimiento por cuenta](07-manual-accounts-and-files.md).

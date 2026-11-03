@@ -12,6 +12,7 @@ import {
   verifyConfiguredAccess,
 } from '../../../scripts/manual/profiles.mjs';
 import { filterManualContent, selectedChapters } from '../../../scripts/manual/model.mjs';
+import { parseManualBaseUrl } from '../../../scripts/manual/environment.mjs';
 import { prepareManual, loadManualPublication } from '../../../scripts/manual/publication.mjs';
 import { APP_NAVIGATION_GROUPS } from '../../../src/app/navigation.js';
 
@@ -96,7 +97,7 @@ it('dos cuentas del mismo env y con igual rol y área reciben manuales y carpeta
   const session = demoSession(profile);
   const first = await prepareManual(
     root,
-    { ...accounts[0], mode: 'live' },
+    { ...accounts[0], mode: 'dev' },
     {
       ...session,
       id: 'user-uno',
@@ -105,7 +106,7 @@ it('dos cuentas del mismo env y con igual rol y área reciben manuales y carpeta
   );
   const second = await prepareManual(
     root,
-    { ...accounts[1], mode: 'live' },
+    { ...accounts[1], mode: 'dev' },
     {
       ...session,
       id: 'user-dos',
@@ -129,7 +130,7 @@ it('dos cuentas del mismo env y con igual rol y área reciben manuales y carpeta
 
 it('al reducir el acceso retira capítulos e imágenes anteriores y conserva los permitidos', async () => {
   const root = await manualRoot();
-  const profile = { id: 'cuenta-uno', label: 'Cuenta 01', mode: 'live' };
+  const profile = { id: 'cuenta-uno', label: 'Cuenta 01', mode: 'dev' };
   const admin = demoSession(DEMO_PROFILES[0]!);
   const previous = await prepareManual(root, profile, admin);
   await writeFile(path.join(previous.root, 'images/15-user-password.png'), 'captura anterior');
@@ -511,6 +512,7 @@ it('rechaza credenciales en URL o configuración y perfiles duplicados', async (
   };
   for (const data of [
     { baseUrl: 'http://example.com', accounts: [account] },
+    { baseUrl: 'https://example.com', accounts: [account] },
     { baseUrl: 'https://user:fixture@example.com', accounts: [account] },
     { baseUrl: 'http://localhost:5173', accounts: [account, account] },
     { baseUrl: 'http://localhost:5173', accounts: [{ ...account, password: 'fixture' }] },
@@ -519,6 +521,50 @@ it('rechaza credenciales en URL o configuración y perfiles duplicados', async (
     await expect(readAccounts(filename)).rejects.toThrow();
   }
 });
+
+it.each([
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://[::1]:5173',
+  'https://localhost:5173',
+])('admite el origen local de desarrollo %s', (baseUrl) => {
+  expect(parseManualBaseUrl(baseUrl)).toBe(baseUrl);
+});
+
+it.each([
+  'https://nexus.example.com',
+  'http://10.0.0.104:5173',
+  'http://localhost.example.com:5173',
+  'ftp://localhost:5173',
+])('rechaza capturas fuera del origen local de desarrollo: %s', (baseUrl) => {
+  expect(() => parseManualBaseUrl(baseUrl)).toThrow('sólo de desarrollo local');
+});
+
+it.each([[], ['--capture-only']])(
+  'bloquea la generación en producción antes de leer credenciales: %j',
+  async (...args) => {
+    const root = await tempRoot();
+    const result = spawnSync(
+      process.execPath,
+      [
+        path.resolve('scripts/manuals.mjs'),
+        '--all',
+        ...args,
+        '--accounts',
+        path.join(root, 'no-existe.json'),
+      ],
+      {
+        encoding: 'utf8',
+        timeout: 10_000,
+        env: { ...process.env, NODE_ENV: 'production' },
+      },
+    );
+    expect(result.error).toBeUndefined();
+    expect(result.status, result.stderr).toBe(1);
+    expect(result.stderr).toContain('sólo para desarrollo');
+    expect(result.stdout).not.toContain('Running');
+  },
+);
 
 it('comprueba el rol y área esperados en la misma asignación de la cuenta', () => {
   const account = {
@@ -559,7 +605,7 @@ it('selecciona el manual por la sesión sin declarar acceso esperado ni confiar 
   await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
     recursive: true,
   });
-  const manifest = await prepareManual(root, { ...account, mode: 'live' }, session);
+  const manifest = await prepareManual(root, { ...account, mode: 'dev' }, session);
   expect(manifest.sources).toContain('12-issues.md');
   expect(manifest.sources).not.toContain('08-users.md');
   expect(manifest.sources).not.toContain('11-purchases.md');
@@ -582,7 +628,7 @@ it('publica los nombres de acceso como texto y no atribuye operaciones ausentes 
   };
   const manifest = await prepareManual(
     root,
-    { id: 'cuenta-01', label: 'Cuenta 01', mode: 'live' },
+    { id: 'cuenta-01', label: 'Cuenta 01', mode: 'dev' },
     session,
   );
   const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');

@@ -31,6 +31,10 @@ Si no queda ninguna cuenta, el comando termina correctamente sin capturas ni
 exportación, también con `--profile`. Un error de lectura del archivo conserva
 su rechazo y no se oculta como una cuenta omitida.
 
+El modo con cuentas es `dev`. Los orígenes remotos, incluido HTTPS, se rechazan
+antes de capturar. Los comandos de capturas y publicación de manuales fallan con
+`NODE_ENV=production`, también para el manual general de referencia.
+
 Las particiones de lectura, gestión y reporte comprueban que un lector de Compras
 no recibe instrucciones de alta, edición, corrección ni cancelación; el reporte
 se incluye con su permiso independiente. El reporte de Proveedores no concede el
@@ -47,7 +51,7 @@ reducir el acceso se retiran los capítulos e imágenes anteriores que ya no cor
 [profileManuals.spec.ts](../../../tests/manual-profiles/profileManuals.spec.ts)
 comprueba las pantallas con los permisos calculados por el código y datos simulados.
 No demuestra la asignación de una cuenta real, su autenticación contra Express ni
-la persistencia de operaciones. El modo live requiere la cuenta y datos preparados
+la persistencia de operaciones. El modo dev requiere la cuenta y datos preparados
 del entorno de capacitación, siguiendo el [procedimiento](../../governance/07-manual-accounts-and-files.md).
 
 La autorización efectiva de las áreas se comprueba por separado en las pruebas

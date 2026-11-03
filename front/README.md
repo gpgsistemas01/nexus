@@ -127,6 +127,9 @@ permanecen fuera de `public/`, `dist/` y la imagen de producción.
 
 ### Capturas y manuales por cuenta
 
+Estas herramientas son sólo para desarrollo local. Playwright y su Chromium se
+instalan en el equipo de desarrollo y quedan fuera de la imagen final de producción.
+
 Prepara `front/manual.accounts.local.json` y `front/.env.manual.local` con la
 [guía por cuenta](docs/governance/07-manual-accounts-and-files.md). Con Vue y la API
 funcionando, elige desde la raíz:
