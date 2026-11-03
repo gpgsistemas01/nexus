@@ -287,7 +287,7 @@ medida de defensa en profundidad que limita el impacto de una inyección SQL, un
 dependencia comprometida o credenciales de runtime filtradas. Se recomienda aplicarla
 antes de producción o durante la siguiente ventana de infraestructura.
 
-Si el proveedor solo entrega una cuenta, el sistema puede continuar temporalmente con
+Si el proveedor solo entrega una cuenta, Nexus puede continuar temporalmente con
 la configuración actual. En ese caso se debe registrar la excepción, restringir la
 red, rotar el secreto y evitar exponer `DIRECT_URL` fuera del proceso de despliegue.
 

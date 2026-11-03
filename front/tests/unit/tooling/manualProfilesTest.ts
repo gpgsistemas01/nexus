@@ -1,12 +1,14 @@
 import { mkdtemp, rm, writeFile, readFile, cp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { afterEach, expect, it } from 'vitest';
 import {
   DEMO_PROFILES,
   demoSession,
   readAccounts,
   readCredentials,
+  selectAccountsWithCredentials,
   verifyConfiguredAccess,
 } from '../../../scripts/manual/profiles.mjs';
 import { filterManualContent, selectedChapters } from '../../../scripts/manual/model.mjs';
@@ -64,24 +66,50 @@ it.each(DEMO_PROFILES)(
   },
 );
 
-it('dos cuentas con el mismo rol y área reciben manuales identificados por su usuario', async () => {
+it('dos cuentas del mismo env y con igual rol y área reciben manuales y carpetas propios', async () => {
   const root = await manualRoot();
+  const envFile = path.join(root, '.env.manual.local');
+  const accountsFile = path.join(root, 'manual.accounts.local.json');
+  await writeFile(
+    envFile,
+    'DOCS_FRONT_UNO_USER=almacenista_uno\nDOCS_FRONT_UNO_PASSWORD=clave-ficticia-uno\n' +
+      'DOCS_FRONT_DOS_USER=almacenista_dos\nDOCS_FRONT_DOS_PASSWORD=clave-ficticia-dos\n',
+  );
+  await writeFile(
+    accountsFile,
+    JSON.stringify({
+      baseUrl: 'http://127.0.0.1:5173',
+      accounts: ['uno', 'dos'].map((name) => ({
+        id: `cuenta-${name}`,
+        label: 'Almacén',
+        usernameEnv: `DOCS_FRONT_${name.toUpperCase()}_USER`,
+        passwordEnv: `DOCS_FRONT_${name.toUpperCase()}_PASSWORD`,
+      })),
+    }),
+  );
+  const { accounts } = await readAccounts(accountsFile);
+  const [one, two] = await Promise.all([
+    readCredentials(accounts[0], envFile, {}),
+    readCredentials(accounts[1], envFile, {}),
+  ]);
   const profile = DEMO_PROFILES.find(({ id }) => id === 'almacen-auxiliar')!;
   const session = demoSession(profile);
   const first = await prepareManual(
     root,
-    { id: 'cuenta-uno', label: 'Almacén', mode: 'live' },
+    { ...accounts[0], mode: 'live' },
     {
       ...session,
-      name: 'almacenista_uno',
+      id: 'user-uno',
+      name: one!.name,
     },
   );
   const second = await prepareManual(
     root,
-    { id: 'cuenta-dos', label: 'Almacén', mode: 'live' },
+    { ...accounts[1], mode: 'live' },
     {
       ...session,
-      name: 'almacenista_dos',
+      id: 'user-dos',
+      name: two!.name,
     },
   );
   const index = await readFile(path.join(first.root, 'sources/index.md'), 'utf8');
@@ -93,6 +121,9 @@ it('dos cuentas con el mismo rol y área reciben manuales identificados por su u
   expect(first.images).toEqual(second.images);
   expect(index).not.toContain('almacenista\\_dos');
   expect(other).not.toContain('almacenista\\_uno');
+  expect(index + other).not.toContain('clave-ficticia');
+  expect(first.root).toBe(path.join(root, 'build/manuals/cuenta-uno'));
+  expect(second.root).toBe(path.join(root, 'build/manuals/cuenta-dos'));
   expect(first.accessFingerprint).not.toBe(second.accessFingerprint);
 });
 
@@ -365,10 +396,109 @@ it('carga secretos desde variables o archivo local, sin incluir valores en error
       DOCS_FRONT_PASSWORD: 'fixture',
     }),
   ).toEqual({ name: 'env', password: 'fixture' });
-  await expect(readCredentials(account, filename, { DOCS_FRONT_PASSWORD: '' })).rejects.toThrow(
-    'DOCS_FRONT_PASSWORD',
+  await expect(readCredentials(account, filename, { DOCS_FRONT_PASSWORD: '' })).resolves.toBeNull();
+  await expect(readCredentials(account, root, {})).rejects.toThrow(
+    'No se pudo leer el archivo local de credenciales.',
   );
 });
+
+it.each([
+  {},
+  { DOCS_FRONT_USER: '', DOCS_FRONT_PASSWORD: '' },
+  { DOCS_FRONT_PASSWORD: 'clave-ficticia' },
+  { DOCS_FRONT_USER: 'usuario-ficticio' },
+  { DOCS_FRONT_USER: '   ', DOCS_FRONT_PASSWORD: 'clave-ficticia' },
+  { DOCS_FRONT_USER: 'usuario-ficticio', DOCS_FRONT_PASSWORD: '' },
+])('omite credenciales incompletas sin intentar autenticar: %j', async (environment) => {
+  expect(
+    await readCredentials(
+      { id: 'cuenta-01', usernameEnv: 'DOCS_FRONT_USER', passwordEnv: 'DOCS_FRONT_PASSWORD' },
+      undefined,
+      environment,
+    ),
+  ).toBeNull();
+});
+
+it('selecciona sólo cuentas completas del mismo env y conserva la prioridad del proceso', async () => {
+  const root = await tempRoot();
+  const file = path.join(root, '.env.manual.local');
+  const accounts = ['UNO', 'DOS', 'TRES', 'CUATRO'].map((name) => ({
+    id: name.toLowerCase(),
+    usernameEnv: `DOCS_FRONT_${name}_USER`,
+    passwordEnv: `DOCS_FRONT_${name}_PASSWORD`,
+  }));
+  await writeFile(
+    file,
+    'DOCS_FRONT_UNO_USER=usuario-uno\nDOCS_FRONT_UNO_PASSWORD=clave-ficticia-uno\n' +
+      'DOCS_FRONT_DOS_USER=usuario-dos\n' +
+      'DOCS_FRONT_TRES_PASSWORD=clave-ficticia-tres\n' +
+      'DOCS_FRONT_CUATRO_USER=usuario-cuatro\nDOCS_FRONT_CUATRO_PASSWORD=clave-ficticia-cuatro\n',
+  );
+  const selection = await selectAccountsWithCredentials(accounts, file, {
+    DOCS_FRONT_DOS_PASSWORD: 'clave-ficticia-dos',
+    DOCS_FRONT_CUATRO_PASSWORD: '',
+  });
+  expect(selection.accounts).toEqual([accounts[0], accounts[1]]);
+  expect(selection.omitted).toEqual(['tres', 'cuatro']);
+  expect(JSON.stringify(selection)).not.toContain('clave-ficticia');
+  await expect(selectAccountsWithCredentials(accounts, root, {})).rejects.toThrow(
+    'No se pudo leer el archivo local de credenciales.',
+  );
+});
+
+it.each([['--all'], ['--profile', 'cuenta-01']])(
+  'termina sin navegador ni exportación si no hay credenciales: %j',
+  async (...selection) => {
+    const root = await tempRoot();
+    const configFile = path.join(root, 'accounts.json');
+    const envFile = path.join(root, '.env.manual.local');
+    await writeFile(
+      configFile,
+      JSON.stringify({
+        baseUrl: 'http://127.0.0.1:1',
+        accounts: [
+          {
+            id: 'cuenta-01',
+            label: 'Cuenta de prueba',
+            usernameEnv: 'DOCS_FRONT_EMPTY_FIXTURE_USER',
+            passwordEnv: 'DOCS_FRONT_EMPTY_FIXTURE_PASSWORD',
+          },
+        ],
+      }),
+    );
+    await writeFile(
+      envFile,
+      'DOCS_FRONT_EMPTY_FIXTURE_USER=\nDOCS_FRONT_EMPTY_FIXTURE_PASSWORD=\n',
+    );
+    const result = spawnSync(
+      process.execPath,
+      [
+        path.resolve('scripts/manuals.mjs'),
+        ...selection,
+        '--accounts',
+        configFile,
+        '--env-file',
+        envFile,
+      ],
+      {
+        cwd: root,
+        encoding: 'utf8',
+        timeout: 10_000,
+        env: {
+          ...process.env,
+          DOCS_FRONT_EMPTY_FIXTURE_USER: '',
+          DOCS_FRONT_EMPTY_FIXTURE_PASSWORD: '',
+        },
+      },
+    );
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('Cuenta omitida: cuenta-01');
+    expect(result.stdout).toContain('No hay cuentas con credenciales completas.');
+    expect(result.stdout).not.toContain('Running');
+  },
+);
 
 it('rechaza credenciales en URL o configuración y perfiles duplicados', async () => {
   const root = await tempRoot();

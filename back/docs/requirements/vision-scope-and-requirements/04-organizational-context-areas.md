@@ -19,4 +19,4 @@ rol, área y permiso.
 | Servicios y vigilancia | Contexto de proyectos y salidas; no se le atribuye acceso por aparecer en el catálogo. |
 | Sistemas | Administración de cuentas, accesos, catálogos contextuales y operaciones protegidas. |
 | Taller 3D | Contexto organizacional de personas, proyectos y salidas. |
-| Ventas y proyectos especiales | Contexto comercial y de proyectos; ventas no tiene acceso vigente al sistema. |
+| Ventas y proyectos especiales | Contexto comercial y de proyectos; ventas no tiene acceso vigente a Nexus. |

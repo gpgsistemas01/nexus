@@ -9,10 +9,10 @@
 ## Propósito y audiencia
 
 Esta colección explica requisitos, arquitectura, construcción, pruebas y operación
-del cliente Vue. Está dirigida a desarrollo, pruebas y usuarios del sistema.
+del cliente Vue. Está dirigida a desarrollo, pruebas y usuarios de Nexus.
 
 Nexus administra inventario, compras, solicitudes de salida, surtido, devoluciones y
-sus movimientos. El cliente Vue presenta estos procesos y consume la API del sistema.
+sus movimientos. El cliente Vue presenta estos procesos y consume la API de Nexus.
 La [guía de incorporación](architecture/views/development/developer-onboarding.md)
 explica el dominio, el vocabulario técnico y un recorrido de código para quien empieza.
 
@@ -58,7 +58,7 @@ front/docs/
 
 | Necesidad | Recorrido |
 | --- | --- |
-| Operar el sistema | [Manual de usuario](user-manual/index.md) → procedimiento del módulo → reportes o recuperación. |
+| Operar Nexus | [Manual de usuario](user-manual/index.md) → procedimiento del módulo → reportes o recuperación. |
 | Generar la inducción por cuenta | [Guía completa de generación](governance/07-manual-accounts-and-files.md): preparación, credenciales, capturas, publicación y recuperación. |
 | Incorporarse al proyecto | [Inicio local](development/01-getting-started.md) → [guía del código](architecture/views/development/developer-onboarding.md) → [vista general](architecture/views/overview.md). |
 | Localizar reglas y excepciones | [Consulta por tema](requirements/requirements-specification/index.md#consulta-rápida-de-reglas-y-excepciones) → regla → alternativas y excepciones del caso. |

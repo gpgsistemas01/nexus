@@ -22,9 +22,14 @@ Los comandos siguientes se ejecutan desde **`front/`** (`cd front` desde la raí
 
 | Necesidad | Comando o modo | Requisitos |
 | --- | --- | --- |
-| Revisar ediciones ficticias | `docs:manuals -- --mode demo --all` | Perfiles incluidos; no usa cuentas ni archivos locales. Inicia Vite en el puerto 5177. |
-| Generar por cuentas existentes | `docs:manuals -- --mode live --all` | Vue/API funcionando, cuentas y los dos archivos locales. |
-| Publicar el manual general | `docs:manual -- ambos` | Fuentes e imágenes de `docs/user-manual`; no selecciona por cuenta. |
+| Sólo capturas por cuenta | `npm run docs:screenshots -- --all` | Vue/API funcionando, cuentas y los dos archivos locales. |
+| Capturas y manuales por cuenta | `npm run docs:manuals -- --all` | Lo anterior y herramientas de Word/PDF. |
+| Revisar ediciones ficticias | `npm run docs:manuals -- --mode demo --all` | Perfiles incluidos; no usa credenciales. Inicia Vite en el puerto 5177. |
+
+El modo predeterminado es `live`: ambos comandos leen
+`manual.accounts.local.json` y `.env.manual.local`. `docs:manual` es un alias de
+`docs:manuals`. Los comandos con sufijo `:reference` mantienen las capturas y el
+manual general descritos en [mantenimiento](05-user-manual.md).
 
 Instalar dependencias y navegador:
 
@@ -112,7 +117,7 @@ Para una cuenta, usar este contenido en `manual.accounts.local.json` y ajustar
 | Campo | Cómo completarlo |
 | --- | --- |
 | `baseUrl` | Origen de Vue, no el puerto directo de la API. Sin ruta, parámetros ni credenciales. HTTP sólo en localhost; HTTPS para un sitio remoto. |
-| `accounts` | Lista de cuentas que se procesarán. Cada entrada necesita sus credenciales. |
+| `accounts` | Lista de cuentas posibles; se procesan las que tengan usuario y contraseña. |
 | `id` | Identificador documental único, con letra minúscula inicial, minúsculas, números y guiones. Determina `--profile` y la carpeta; no es el usuario de ingreso ni el ID de base de datos. |
 | `label` | Nombre legible de la edición; no asigna permisos. |
 | `usernameEnv`, `passwordEnv` | Nombres de variables `DOCS_FRONT_*`; los valores reales van en `.env.manual.local`. |
@@ -125,7 +130,9 @@ Separar los bloques con coma, sin coma final, y agregar sus credenciales al mism
 `.env.manual.local`.
 
 Cada cuenta tiene sesión y carpeta propias. Su manual muestra áreas, roles y tareas
-permitidas. Dos cuentas con iguales permisos pueden compartir secciones.
+permitidas. Usa un `id` distinto para cada usuario, aunque compartan rol y área;
+por ejemplo, `ana-almacen` y `luis-almacen`. Las áreas y roles se obtienen de la
+sesión; los nombres de las variables y las etiquetas no asignan accesos.
 
 ## 6. Completar las credenciales locales
 
@@ -141,21 +148,42 @@ Los nombres deben coincidir exactamente con el JSON. La sintaxis dotenv permite
 comillas para conservar espacios o `#` dentro del valor. No escribir credenciales
 en el JSON ni en las plantillas versionadas.
 
-## 7. Comprobar y ejecutar
+Si falta el usuario o la contraseña, o alguno está vacío, la cuenta se omite.
+Puedes dejar sin completar las cuentas que todavía no utilizarás.
 
-Con Vue y la API funcionando, generar una edición:
+## 7. Generar capturas y manuales
+
+Con Vue y la API funcionando, elige el resultado que necesitas.
+
+Sólo capturas de una cuenta:
 
 ```bash
-npm run docs:manuals -- --mode live --profile cuenta-01 --format ambos
+npm run docs:screenshots -- --profile cuenta-01
 ```
 
-`--profile` usa el `id` del JSON. Para todas sus cuentas:
+Sólo capturas de todas las cuentas del JSON:
 
 ```bash
-npm run docs:manuals -- --mode live --all --format ambos
+npm run docs:screenshots -- --all
 ```
 
-La herramienta valida y autentica las cuentas de esa lista; no busca otros usuarios.
+Capturas actualizadas y manuales Word/PDF de todas las cuentas en una ejecución:
+
+```bash
+npm run docs:manuals -- --all --format ambos
+```
+
+Sustituye `--all` por `--profile cuenta-01` para generar una sola edición.
+`--profile` usa el `id` del JSON. La herramienta comprueba sus credenciales antes
+de abrir el navegador, informa los identificadores omitidos sin mostrar valores
+y autentica las cuentas completas por separado. `--all` selecciona la lista del
+JSON, no todos los usuarios de la base ni todas las variables del `.env`.
+
+Si no hay cuentas con credenciales completas, termina sin abrir el navegador ni
+exportar documentos. Las cuentas omitidas conservan sus archivos anteriores;
+esta ejecución no actualiza sus capturas ni sus manuales.
+
+Para revisar las opciones, usa `npm run docs:manuals -- --help`.
 Para una edición ficticia:
 
 ```bash
@@ -171,21 +199,30 @@ invocar Pandoc/LibreOffice.
 
 | Ruta bajo `front/` | Contenido |
 | --- | --- |
-| `build/manuals/<perfil>/sources/index.md` | Portada, alcance e índice de la cuenta. |
-| `build/manuals/<perfil>/sources/*.md` | Capítulos filtrados y glosario. Corregir sus originales en `docs/user-manual`; se regeneran. |
-| `build/manuals/<perfil>/images/*.png` | Capturas propias; en `live`, muestran los datos visibles para esa cuenta. |
-| `build/manuals/<perfil>/manifest.json` | Estado `pending`/`ready`, permisos, fuentes y huellas de vigencia y reanudación. No editar a mano; no contiene contraseñas. |
-| `build/docs/docx/manuales-vue/<perfil>/manual-<perfil>.docx` | Word, después de completar las capturas requeridas. |
-| `build/docs/pdf/manuales-vue/<perfil>/manual-<perfil>.pdf` | PDF, si se solicitó y terminó la conversión. |
+| `build/manuals/<cuenta>/sources/index.md` | Portada, alcance e índice de la cuenta. |
+| `build/manuals/<cuenta>/sources/*.md` | Capítulos filtrados y glosario. Corregir sus originales en `docs/user-manual`; se regeneran. |
+| `build/manuals/<cuenta>/images/*.png` | Capturas propias; en `live`, muestran los datos visibles para esa cuenta. |
+| `build/manuals/<cuenta>/manifest.json` | Estado `pending`/`ready`, permisos, fuentes y huellas de vigencia y reanudación. No editar a mano; no contiene contraseñas. |
+| `build/docs/docx/manuales-vue/<cuenta>/manual-<cuenta>.docx` | Word, después de completar las capturas requeridas. |
+| `build/docs/pdf/manuales-vue/<cuenta>/manual-<cuenta>.pdf` | PDF, si se solicitó y terminó la conversión. |
 | `build/test-results/manual-profiles.xml` | Reporte del recorrido para diagnosticar fallos; no es el manual. |
 
-En el ejemplo, `<perfil>` es `cuenta-01`. Cookies y tokens permanecen en memoria;
-no se necesita un archivo de sesión ni copiar cookies del navegador.
+`<cuenta>` es el `id` del JSON, por ejemplo `cuenta-01`. Cada usuario conserva sus
+imágenes aunque otro tenga el mismo rol y área:
+
+```text
+front/build/manuals/
+├── cuenta-01/images/
+└── cuenta-02/images/
+```
+
+Cookies y tokens permanecen en memoria; no se necesita un archivo de sesión ni
+copiar cookies del navegador.
 
 ## 9. Reanudar y localizar un problema
 
 ```bash
-npm run docs:manuals -- --mode live --profile cuenta-01 --missing --format ambos
+npm run docs:manuals -- --profile cuenta-01 --missing --format ambos
 ```
 
 `--missing` conserva capturas cuando coinciden cuenta, acceso, modo, fuentes,
@@ -194,7 +231,8 @@ Sin esa opción, se recaptura el perfil completo.
 
 | Situación | Recuperación |
 | --- | --- |
-| No autentica | Revisar servicios, cuenta y variables locales sin imprimir valores. |
+| Cuenta omitida | Completar usuario y contraseña cuando se quiera generar su edición. |
+| No autentica con ambas credenciales completas | Revisar servicios y credenciales. Un rechazo de acceso se informa como error; no se trata como una cuenta vacía. |
 | Cuenta distinta del perfil | Revisar `expectedAccess`, área/rol real y referencia de credenciales. |
 | Tabla vacía | Puede servir para consulta. Para editar, preparar un registro existente. |
 | Falta una opción | Revisar dependencias, registros activos y permisos. Para pesos se necesita un material de referencia ROLLO. |

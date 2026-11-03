@@ -17,13 +17,13 @@ extendido**.
 ## Relación con visión, SRS y casos de uso
 
 Arquitectura responde **cómo** está organizada la solución y cómo satisface las
-obligaciones del sistema. No es propietaria del propósito y alcance de negocio ni de la
+obligaciones de Nexus. No es propietaria del propósito y alcance de negocio ni de la
 conducta normativa de los actores:
 
 | Fuente | Responsabilidad | Uso desde arquitectura |
 | --- | --- | --- |
 | [Visión y alcance](../requirements/vision-scope-and-requirements/index.md) | Define por qué existe el producto, sus interesados y sus límites. | Alimenta el contexto y las preocupaciones arquitectónicas. |
-| [SRS](../requirements/requirements-specification/index.md) y [casos de uso](../requirements/use-cases/index.md) | Definen qué debe hacer el sistema, sus reglas y los flujos actor–Nexus. | Aportan los `CU-*` y requisitos que la solución debe realizar. |
+| [SRS](../requirements/requirements-specification/index.md) y [casos de uso](../requirements/use-cases/index.md) | Definen qué debe hacer Nexus, sus reglas y los flujos actor–Nexus. | Aportan los `CU-*` y requisitos que la solución debe realizar. |
 | Este documento de arquitectura | Define estructura, responsabilidades, decisiones, contratos, despliegue y realización técnica. | Traza cada obligación hacia vistas, secuencias, código y pruebas sin copiar su definición funcional. |
 
 Que los servicios ejecuten un “caso de uso” o que las secuencias técnicas se organicen
@@ -44,14 +44,14 @@ mantiene otra versión de las normas ni del modelo de vistas. El
 
 ## Organización de la documentación arquitectónica
 
-La organización separa las **vistas del sistema** de los **artefactos de apoyo**:
+La organización separa las **vistas de Nexus** de los **artefactos de apoyo**:
 
 1. [Vistas arquitectónicas](views/index.md): escenarios, lógica, procesos, desarrollo y
    física. Bajo `views/` se mantiene todo artefacto cuyo propósito principal es
    representar la solución desde una de esas perspectivas.
 2. **Apoyo transversal:** contrato API y estándar de codificación. El contrato se
    mantiene junto a su especificación OpenAPI; el estándar permanece en arquitectura
-   porque gobierna la construcción del sistema. El gobierno de la documentación, en
+   porque gobierna la construcción de Nexus. El gobierno de la documentación, en
    cambio, pertenece a `docs/governance`.
 
 ```text
@@ -72,11 +72,11 @@ su propiedad normativa.
 
 ## Incorporación al equipo de desarrollo
 
-Comience con la [guía de incorporación](views/development/developer-onboarding.md), que explica responsabilidades, recorridos de código y comprobaciones para contribuir al sistema.
+Comience con la [guía de incorporación](views/development/developer-onboarding.md), que explica responsabilidades, recorridos de código y comprobaciones para contribuir a Nexus.
 
 ## Recorridos de lectura
 
-1. Para comprender el sistema: [vista física](views/physical/index.md) →
+1. Para comprender Nexus: [vista física](views/physical/index.md) →
    [vista lógica](views/logical/index.md) → patrón relevante en la
    [vista de desarrollo](views/development/index.md).
 2. Para revisar una interacción web: [vista de escenarios](views/scenarios/index.md) →

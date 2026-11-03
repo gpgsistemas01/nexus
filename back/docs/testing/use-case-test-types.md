@@ -44,7 +44,7 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 
 La [vista de cobertura Vue](../../../front/docs/testing/04-use-case-coverage.md)
 conserva la aplicación de requisitos/casos, fichas del cliente y brechas específicas
-de la migración. Complementa esta evidencia del sistema; las respuestas simuladas
+de la migración. Complementa esta evidencia del backend; las respuestas simuladas
 del navegador no cierran las brechas de autorización o persistencia indicadas aquí.
 
 Para la interfaz Vue de `CU-ALM-01..06` y `CU-ALM-09..14`, la evidencia adicional
@@ -62,7 +62,7 @@ no una demostración de todos los CU.
 
 | Casos de uso | Evidencia automatizada relevante | Tipo, datos y resultado esperado | Estado de cobertura |
 | --- | --- | --- | --- |
-| `CU-AUT-01` | `authControllerDbTest.js`; pruebas Vue de login/sesión y `front/tests/system/application.spec.ts`. | HTTP/Prisma de captura inválida/rechazada/válida; sistema con login, refresh real y cookies HttpOnly; navegador simulado añade caída/recuperación. | **Evidencia por niveles.** El sistema no repite todas las fronteras ni acredita todos los escenarios de refresh. |
+| `CU-AUT-01` | `authControllerDbTest.js`; pruebas Vue de login/sesión y `front/tests/system/application.spec.ts`. | HTTP/Prisma de captura inválida/rechazada/válida; sistema con login, refresh real y cookies HttpOnly; navegador simulado añade caída/recuperación. | **Evidencia por niveles.** Nexus no repite todas las fronteras ni acredita todos los escenarios de refresh. |
 | `CU-AUT-02` | `cookiesUtilsTest.js`, `sessionRecovery.spec.ts` y `front/tests/system/application.spec.ts`; `CP-VUE-SESSION-004-01`, `CP-VUE-SYS-001-01`. | Helper, navegador simulado y recorrido real: POST de cierre, cookies eliminadas, `/me`/refresh 401 y rechazo posterior de URL protegida. | **Evidencia unitaria, navegador y sistema.** No implica revocar tokens copiados fuera del navegador. |
 | `CU-ALM-01` | `materialControllerTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Unitaria de permisos e interacción; queries y retorno simulado; oculta costos sin permiso y conserva respuesta autorizada. | **Unitaria existente.** |
 | `CU-ALM-02` | `materialValidationTest.js`, `materialMeasurementFieldTest.js`, `materialControllerDbTest.js`. | Unitarias e integración de piezas sin medidas, pareja opcional completa, conversión y alta contextual desde compra. | **Evidencia parcial existente**; no demuestra todo el CRUD de materiales. |
@@ -143,7 +143,7 @@ CSS, orden incidental o delegaciones sin decisiones según la
 unitarias; integración comprueba representantes y efectos persistidos. El registro
 selectivo documenta las reglas críticas; los resultados de corridas permanecen en CI o
 en la revisión del cambio. La revisión por archivo abarca el inventario activo completo;
-esa clasificación no acredita aceptación ni cobertura funcional total del sistema.
+esa clasificación no acredita aceptación ni cobertura funcional total de Nexus.
 
 La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 

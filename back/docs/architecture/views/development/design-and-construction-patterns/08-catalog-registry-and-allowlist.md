@@ -6,7 +6,7 @@ Seis catálogos auxiliares comparten consulta, creación y edición, pero difier
 campos y etiquetas. `constants/catalogs.js` define `MANAGED_CATALOGS` para configurar
 una implementación administrativa común. El servicio resuelve únicamente esas claves;
 el cliente no selecciona modelos Prisma o campos arbitrarios. Es un registro de
-configuración con lista blanca, no un CRUD universal para las entidades del sistema.
+configuración con lista blanca, no un CRUD universal para las entidades de Nexus.
 
 Las [referencias backend](../backend-technical-documentation/16-catalogs-code.md) y
 [frontend](../frontend-technical-documentation/16-catalogs-code.md) poseen los mapas de

@@ -35,7 +35,7 @@ los paquetes exportables se presentan en español:
 El [índice de vistas arquitectónicas](architecture/views/index.md) organiza bajo
 `architecture/views/` las cinco perspectivas de la adaptación 4+1 de Nexus: escenarios,
 lógica, procesos, desarrollo y física. Cada subcarpeta contiene los artefactos cuyo
-propósito principal es representar el sistema desde esa perspectiva. El contrato API se
+propósito principal es representar Nexus desde esa perspectiva. El contrato API se
 mantiene junto a OpenAPI; el estándar de codificación permanece en `architecture/` como
 regla de construcción transversal. Las normas para mantener y publicar documentos
 permanecen en `governance/`. Una subcarpeta

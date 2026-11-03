@@ -23,9 +23,11 @@
     "docs:generate": "node scripts/docs.mjs generate",
     "docs:check": "node scripts/docs.mjs check",
     "docs:export": "node scripts/docs.mjs export",
-    "docs:manual": "node scripts/docs.mjs export manual",
+    "docs:manual": "node scripts/manuals.mjs",
     "docs:manuals": "node scripts/manuals.mjs",
-    "docs:screenshots": "playwright test --config playwright.manual.config.ts"
+    "docs:screenshots": "node scripts/manuals.mjs --capture-only",
+    "docs:manual:reference": "node scripts/docs.mjs export manual",
+    "docs:screenshots:reference": "playwright test --config playwright.manual.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "5.3.0",

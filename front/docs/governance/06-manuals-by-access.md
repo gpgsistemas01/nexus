@@ -38,7 +38,8 @@ siguen aplicándose. El índice de cada edición indica su alcance detectado.
 
 | Fuente | Responsabilidad |
 | --- | --- |
-| [profiles.mjs](../../scripts/manual/profiles.mjs) | Perfiles de referencia, configuración y lectura local de credenciales. La demostración calcula permisos con las políticas existentes. |
+| [options.mjs](../../scripts/manual/options.mjs) | Opciones de ejecución, modo live predeterminado y ayuda de comandos. |
+| [profiles.mjs](../../scripts/manual/profiles.mjs) | Perfiles de referencia, configuración, credenciales y selección de cuentas completas. La demostración calcula permisos con las políticas existentes. |
 | [model.mjs](../../scripts/manual/model.mjs) | Capítulos, permisos y evaluación de bloques de tareas. |
 | [publication.mjs](../../scripts/manual/publication.mjs) | Índice por usuario, fuentes filtradas, retirada de capítulos e imágenes sin acceso y huellas de publicación. |
 | [manuals.mjs](../../scripts/manuals.mjs) | Selección de perfiles, capturas y exportación con el motor común. |

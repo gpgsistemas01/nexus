@@ -8,7 +8,7 @@ la notación, en la [guía de diagramas](../architecture/views/diagram-reading.m
 
 | Término | Significado |
 | --- | --- |
-| Parte interesada | Persona o grupo con necesidades sobre el producto; puede no usar el sistema. |
+| Parte interesada | Persona o grupo con necesidades sobre el producto; puede no usar Nexus. |
 | Objetivo de negocio | Resultado de valor que justifica una capacidad. Su cumplimiento requiere indicadores acordados. |
 | Alcance vigente | Capacidades y límites incluidos actualmente; una propuesta o un concepto modelado no implica disponibilidad. |
 | Supuesto | Condición tomada como base que requiere confirmación. |

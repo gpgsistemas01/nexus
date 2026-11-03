@@ -18,6 +18,19 @@ completitud de los artefactos. Es una prueba de la herramienta documental.
 [manualProfilesTest.ts](../../../tests/unit/tooling/manualProfilesTest.ts) comprueba
 selección, configuración, secretos locales y rechazo de publicaciones incompletas.
 
+[manualOptionsTest.ts](../../../tests/unit/tooling/manualOptionsTest.ts) comprueba
+que la ejecución use cuentas locales por defecto, admita demo sólo al solicitarlo
+y rechace selecciones ambiguas o formatos inválidos. La ayuda funciona sin
+archivos locales. Dos cuentas de un mismo `.env` generan carpetas propias aunque
+compartan rol y área.
+
+Las cuentas sin usuario o sin contraseña se omiten antes de abrir el navegador;
+las completas siguen seleccionadas. La prueba cubre valores ausentes, vacíos,
+usuario compuesto sólo por espacios y prioridad del proceso sobre el archivo.
+Si no queda ninguna cuenta, el comando termina correctamente sin capturas ni
+exportación, también con `--profile`. Un error de lectura del archivo conserva
+su rechazo y no se oculta como una cuenta omitida.
+
 Las particiones de lectura, gestión y reporte comprueban que un lector de Compras
 no recibe instrucciones de alta, edición, corrección ni cancelación; el reporte
 se incluye con su permiso independiente. El reporte de Proveedores no concede el

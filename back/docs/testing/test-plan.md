@@ -92,7 +92,7 @@ Cada caso que requiere ficha documental registra al menos los datos de entrada y
 resultado esperado que permiten
 decidir objetivamente si pasa. En operaciones de escritura, los datos de prueba deben
 identificar los valores que se intentan registrar y el resultado esperado debe indicar
-tanto la respuesta que devuelve el sistema como los datos que deben quedar persistidos
+tanto la respuesta que devuelve Nexus como los datos que deben quedar persistidos
 o la ausencia de escritura. No basta con anotar «registro correcto» o únicamente el
 código HTTP. Los valores sensibles se reemplazan por fixtures o referencias
 reproducibles; no se copian credenciales ni datos personales reales.
@@ -258,7 +258,7 @@ aunque la terminal o el archivo local declaren otro entorno.
 | Salidas de material | Mantener `goodsIssueControllerDbTest.js` y `warehouseConcurrencyControllerDbTest.js`: contexto, surtido, devolución parcial, concurrencia y rollback; completar fronteras de devolución. |
 | Entradas de compra | Mantener `goodsReceiptContextDbTest.js` y `warehouseConcurrencyControllerDbTest.js`: aislamiento, alta, edición, corrección, cancelación, folios y fallos; ampliar sólo la regla afectada. |
 | Personas y usuarios | Incorporar persistencia de relaciones de rol y departamento. |
-| Autorización por contexto | Mantener casos unitarios positivos y negativos por combinación rol/departamento; ventas permanece sin permisos del sistema. |
+| Autorización por contexto | Mantener casos unitarios positivos y negativos por combinación rol/departamento; ventas permanece sin permisos de Nexus. |
 | Auditoría de escrituras | Incorporar unitarias de clasificación/sanitizado y middleware, más integración que distinga respuesta exitosa, fallida y persistencia best effort. |
 | Ajustes, requisiciones y proyectos | Probar únicamente cuando exista el CRUD accesible desde controller. |
 | Reportes y movimientos | Cubrir consultas, permisos, filtros y datos exportados. |

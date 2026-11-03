@@ -18,7 +18,7 @@ manuales, seguir el [procedimiento por cuenta](07-manual-accounts-and-files.md).
 | --- | --- |
 | `front/docs/user-manual/index.md` y capítulos numerados | Instrucciones para el usuario. |
 | [Glosario de operación](../user-manual/16-glossary.md) | Términos visibles y ejemplos de captura, contrastados con el [glosario de negocio](../requirements/business-glossary.md). |
-| `front/docs/user-manual/images/*.png` | Capturas fuente, versionadas junto al texto. |
+| `front/docs/user-manual/images/*.png` | Capturas generales de referencia, versionadas junto al texto. |
 | Sección `manual` de [publications.json](../publications.json) | Entrada propia, excluida del libro técnico completo. |
 | [Configuración Playwright](../../playwright.manual.config.ts) y [recorridos](../../tests/manual/manualScreenshots.spec.ts) | Generación de capturas de referencia. |
 
@@ -35,14 +35,20 @@ generador filtra manual y glosario por permisos, incluidos surtido y devolución
 Los bloques `manual:any` y `manual:all` deben abarcar título, pasos, notas e imágenes
 de la acción. Las referencias a reportes y ajustes se filtran también fuera de su capítulo.
 
-## Generar las capturas
+## Generar capturas por cuenta
+
+`npm run docs:screenshots -- --all` lee las cuentas y credenciales locales y
+guarda imágenes separadas por usuario. La preparación, selección de cuentas y
+rutas están en el [procedimiento por cuenta](07-manual-accounts-and-files.md).
+
+## Actualizar capturas de referencia
 
 Desde `front/`:
 
 ```bash
 npm ci --include=dev
 npx playwright install chromium
-npm run docs:screenshots
+npm run docs:screenshots:reference
 ```
 
 Playwright inicia Vite en `http://127.0.0.1:5176`; el puerto debe estar libre.
@@ -58,7 +64,7 @@ edición, de un registro existente. Las contraseñas permanecen vacías.
 Para revisar un recorrido concreto:
 
 ```bash
-npm run docs:screenshots -- --grep "compras:"
+npm run docs:screenshots:reference -- --grep "compras:"
 ```
 
 Conservar las imágenes de otros capítulos y ejecutar el conjunto completo antes de
@@ -70,10 +76,10 @@ ignoradas.
 
 ```bash
 npm run docs:check
-npm run docs:manuals -- --mode live --all
+npm run docs:manuals -- --all
 ```
 
-El comando genera una edición por cuenta configurada. `docs:manual -- ambos` reúne
+El comando genera una edición por cuenta configurada. `docs:manual:reference -- ambos` reúne
 todas las tareas en una referencia para mantenimiento; no es la edición por usuario.
 `docs:check` verifica enlaces e imágenes sin iniciar el navegador. Las rutas de
 salida y la revisión de Word/PDF están en

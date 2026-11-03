@@ -54,7 +54,7 @@ a Almacén y administración.
 | RF-WST-006 | Nexus debe permitir al Personal de almacén o al Administrador del sistema devolver una cantidad positiva que no exceda el saldo entregado de un detalle de merma, sólo cuando la salida esté completamente surtida, y confirmar existencia y movimiento inverso como una sola operación. | Implementado |
 | RF-WST-007 | Nexus debe permitir a los usuarios autorizados de áreas operativas, al Personal de almacén o al Administrador del sistema consultar salidas de merma, sus detalles y contexto sin modificar existencias. | Implementado |
 | RF-ADJ-001 | Nexus debe permitir al Administrador del sistema establecer la nueva existencia total no negativa de un material, consumible o merma mediante un ajuste con motivo y observaciones; se aplica inmediatamente, se deriva su tipo de la diferencia y el usuario queda registrado como creador y aprobador, sin una aprobación posterior. | Implementado |
-| RF-ADJ-002 | Al aplicar un ajuste, el sistema debe actualizar atómicamente la existencia y cantidad convertida, y generar el movimiento con los valores anterior, nuevo y diferencia. | Implementado |
+| RF-ADJ-002 | Al aplicar un ajuste, Nexus debe actualizar atómicamente la existencia y cantidad convertida, y generar el movimiento con los valores anterior, nuevo y diferencia. | Implementado |
 
 ## Criterios de recepción y corrección
 

@@ -80,7 +80,7 @@ consultar la base por cada elemento ni alterar el orden del historial.
 - Las exportaciones recorren lotes sin el límite anterior de 100.000 filas; cada
   lote de documentos carga sus detalles. La generación de XML sigue usando CPU
   del hilo principal, con pausas periódicas para permitir I/O; no equivale a un worker.
-  Los temporales requieren espacio escribible en el directorio temporal del sistema.
+  Los temporales requieren espacio escribible en el directorio temporal del sistema operativo.
   No se truncan resultados ni se cambia el contrato
   del listado para reducir el volumen sin adaptar también su consumidor.
 - Los índices se evalúan con planes y cardinalidades representativas. Una búsqueda

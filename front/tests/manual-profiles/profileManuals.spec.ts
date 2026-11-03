@@ -114,6 +114,7 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
     if (mode === 'live') {
       try {
         const credentials = await readCredentials(account, process.env.FRONT_MANUAL_ENV_FILE);
+        if (!credentials) throw new Error('Credentials unavailable');
         const response = await context.request.post('/api/auth/login', { data: credentials });
         if (!response.ok()) throw new Error('Authentication rejected');
       } catch {

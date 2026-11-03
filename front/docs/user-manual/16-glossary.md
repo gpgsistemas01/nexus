@@ -12,7 +12,7 @@ Busque el término que necesita entender. Los procedimientos están en cada cap�
 | Filtro | Condición que reduce los resultados, por ejemplo nombre, área o fecha. |
 | Selector | Campo para buscar y elegir un registro existente. |
 | Borrador | Datos preparados que todavía no ha guardado. |
-| Confirmación de guardado | Mensaje que indica que el sistema aceptó el cambio. |
+| Confirmación de guardado | Mensaje que indica que Nexus aceptó el cambio. |
 | Conflicto | Aviso de que el registro cambió desde que lo abrió. |
 
 ## Su cuenta y su área

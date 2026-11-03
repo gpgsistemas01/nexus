@@ -29,7 +29,7 @@ ni recupera contraseñas por correo.
 
 ## Continuidad y recuperación de la sesión
 
-Durante el uso, el sistema intenta mantener el acceso automáticamente mientras la
+Durante el uso, Nexus intenta mantener el acceso automáticamente mientras la
 sesión pueda renovarse. Si necesita volver a identificarse, se muestra el ingreso.
 Si no puede comprobar la sesión por un fallo del servicio, puede aparecer una
 pantalla de sesión no disponible.

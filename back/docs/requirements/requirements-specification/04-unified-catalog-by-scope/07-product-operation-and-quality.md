@@ -28,7 +28,7 @@
 | RC-DIS-002 | Los objetivos de recuperación y respaldo requieren RTO, RPO, infraestructura y aprobación explícitos. | Propuesto |
 
 No se inventan umbrales de rendimiento o disponibilidad: deben acordarse con quien
-opera el sistema y convertirse en una prueba o monitor reproducible antes de cambiar
+opera Nexus y convertirse en una prueba o monitor reproducible antes de cambiar
 su estado.
 
 ### Alcance y comprobación de calidad

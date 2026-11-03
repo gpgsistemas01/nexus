@@ -3,7 +3,7 @@
 ## Elegir el catálogo
 
 Abra **Catálogos** y elija el dato que necesita administrar. Sus registros se usan
-en los selectores del sistema.
+en los selectores de Nexus.
 
 | Catálogo | Uso principal | Acción de alta |
 | --- | --- | --- |

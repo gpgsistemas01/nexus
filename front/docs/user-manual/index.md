@@ -14,7 +14,7 @@ Los nombres en **negritas** corresponden a controles de la pantalla.
 
 ## Preparación
 
-Necesita la dirección del sistema, conexión y su cuenta habilitada. Abra la dirección
+Necesita la dirección de Nexus, conexión y su cuenta habilitada. Abra la dirección
 en un navegador actualizado. Si falta una opción para su trabajo, solicite la revisión
 de su acceso.
 

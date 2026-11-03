@@ -96,7 +96,7 @@ forma nativa en las versiones PostgreSQL admitidas por el despliegue actual.
 
 ## Conservar el respaldo local
 
-Guardar archivo, log, listado del archivo, versiones y revisión del sistema en una
+Guardar archivo, log, listado del archivo, versiones y revisión de Nexus en una
 carpeta con acceso restringido y cifrado. El archivo contiene datos de usuarios y hashes
 de contraseñas. Mantener además una copia cifrada fuera del equipo. No subirla a Git.
 

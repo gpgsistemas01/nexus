@@ -10,7 +10,7 @@ Para diseñar o modificar casos, consulte el [plan](01-test-plan.md), los
 | Tipo | Qué prepara la persona que ejecuta | De dónde salen los usuarios y datos |
 | --- | --- | --- |
 | Unitarias, `test:unit` | Dependencias de `front/`. Sin PostgreSQL ni Chromium. | Fixtures y dobles definidos en las pruebas. No necesita usuario de Nexus. |
-| Navegador con API simulada, `test:e2e` | Dependencias frontend y Chromium. Vite puede iniciarse desde la configuración. | Los casos simulan sesión, respuestas y datos. Los nombres y contraseñas de ejemplo no son cuentas para ingresar al sistema real. |
+| Navegador con API simulada, `test:e2e` | Dependencias frontend y Chromium. Vite puede iniciarse desde la configuración. | Los casos simulan sesión, respuestas y datos. Los nombres y contraseñas de ejemplo no son cuentas para ingresar a Nexus. |
 | Sistema, `test:e2e:system` | Dependencias de ambas aplicaciones, Chromium, base PostgreSQL aislada y variables de conexión. | El setup crea cuentas temporales, genera la contraseña y prepara registros en esa base. El caso inicia sesión con esa fixture y comprueba datos persistidos. |
 
 `npm --prefix front run check` ejecuta formato, lint, unitarias y build con tipos.
@@ -38,7 +38,7 @@ cd ..
 ```
 
 En Linux, `npx playwright install --with-deps chromium` instala también sus
-dependencias del sistema cuando se dispone de permisos para ello. Si ya tiene un
+dependencias del sistema operativo cuando se dispone de permisos para ello. Si ya tiene un
 Chromium adecuado, puede indicar su ejecutable mediante
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. Este valor es una ruta, no una credencial.
 
@@ -174,7 +174,7 @@ pueden contener datos de sesión: son evidencia local o de CI, no capturas del m
 | --- | --- |
 | `build/test-results/browser.xml` | JUnit del navegador con API simulada. Lo genera `test:e2e`. |
 | `build/test-results/system.xml` | JUnit del recorrido de sistema. Lo genera `test:e2e:system`. |
-| `build/test-results/system-fixture.json` | Intercambio temporal de fixtures del sistema. Debe desaparecer después de su limpieza normal. |
+| `build/test-results/system-fixture.json` | Intercambio temporal de fixtures de las pruebas de sistema. Debe desaparecer después de su limpieza normal. |
 | `test-results/` | Artefactos de Playwright, incluidas trazas retenidas al fallar. No es código fuente. |
 | `../back/generated/prisma/` | Cliente generado por la preparación de migraciones. No se rellena ni edita manualmente. |
 

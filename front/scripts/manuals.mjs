@@ -1,49 +1,38 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEMO_PROFILES, readAccounts, validProfileId } from './manual/profiles.mjs';
+import { DEMO_PROFILES, readAccounts, selectAccountsWithCredentials } from './manual/profiles.mjs';
+import { MANUAL_HELP, parseManualOptions } from './manual/options.mjs';
 import { loadManualPublication } from './manual/publication.mjs';
 
 const frontRoot = fileURLToPath(new URL('../', import.meta.url));
-const values = {
-    mode: 'demo',
-    format: 'ambos',
-    accounts: 'manual.accounts.local.json',
-    'env-file': '.env.manual.local',
-    profile: '',
-    all: false,
-    missing: false,
-    'capture-only': false,
-};
-try {
-    const args = process.argv.slice(2);
-    for (let i = 0; i < args.length; i++) {
-        const key = args[i].replace(/^--/, '');
-        if (!args[i].startsWith('--') || !Object.hasOwn(values, key))
-            throw new Error('Opción de manual desconocida.');
-        if (typeof values[key] === 'boolean') values[key] = true;
-        else {
-            if (!args[i + 1] || args[i + 1].startsWith('--'))
-                throw new Error(`Falta el valor de --${key}.`);
-            values[key] = args[++i];
-        }
+const runManuals = async () => {
+    const values = parseManualOptions(process.argv.slice(2));
+    if (values.help) {
+        console.log(MANUAL_HELP);
+        return;
     }
-    if (
-        !['demo', 'live'].includes(values.mode) ||
-        !['ambos', 'pdf', 'docx'].includes(values.format) ||
-        (values.profile && !validProfileId(values.profile)) ||
-        Boolean(values.profile) === values.all
-    )
-        throw new Error(
-            'Use --mode demo|live y --profile <id> o --all, con --format docx|pdf|ambos.',
-        );
     const configuration =
         values.mode === 'demo'
             ? { baseUrl: 'http://127.0.0.1:5177', accounts: DEMO_PROFILES }
             : await readAccounts(path.resolve(frontRoot, values.accounts));
     const accounts = configuration.accounts;
-    const selected = accounts.filter((profile) => values.all || profile.id === values.profile);
-    if (!selected.length) throw new Error('El perfil solicitado no está configurado.');
+    const requested = accounts.filter((profile) => values.all || profile.id === values.profile);
+    if (!requested.length) throw new Error('La cuenta solicitada no está configurada.');
+    const envFile = path.resolve(frontRoot, values['env-file']);
+    const selection =
+        values.mode === 'live'
+            ? await selectAccountsWithCredentials(requested, envFile)
+            : { accounts: requested, omitted: [] };
+    for (const id of selection.omitted)
+        console.log(`Cuenta omitida: ${id} (falta usuario o contraseña).`);
+    const selected = selection.accounts;
+    if (!selected.length) {
+        console.log(
+            'No hay cuentas con credenciales completas. No se generaron capturas ni manuales en esta ejecución.',
+        );
+        return;
+    }
     const result = spawnSync(
         process.execPath,
         [
@@ -61,17 +50,18 @@ try {
                 FRONT_MANUAL_BASE_URL: configuration.baseUrl,
                 FRONT_MANUAL_IDS: selected.map(({ id }) => id).join(','),
                 FRONT_MANUAL_ACCOUNTS: path.resolve(frontRoot, values.accounts),
-                FRONT_MANUAL_ENV_FILE: path.resolve(frontRoot, values['env-file']),
+                FRONT_MANUAL_ENV_FILE: envFile,
                 FRONT_MANUAL_MISSING: String(values.missing),
             },
         },
     );
     if (result.error || result.status !== 0)
         throw new Error(
-            'La captura de perfiles no terminó. Revise el estado de cada manual; no se publicaron resultados incompletos.',
+            'La captura por cuenta no terminó. Revise el estado de cada manual; no se publicaron resultados incompletos.',
         );
     for (const profile of selected) {
         await loadManualPublication(frontRoot, profile.id);
+        console.log(`Capturas de ${profile.id}: build/manuals/${profile.id}/images/`);
         if (values['capture-only']) continue;
         const output = spawnSync(
             process.execPath,
@@ -85,6 +75,10 @@ try {
         if (output.error || output.status !== 0)
             throw new Error(`No se pudo exportar ${profile.id}.`);
     }
+};
+
+try {
+    await runManuals();
 } catch (error) {
     console.error(error instanceof Error ? error.message : 'No se pudo generar el manual.');
     process.exitCode = 1;

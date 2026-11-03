@@ -35,7 +35,7 @@ estados o participantes de una operación, consulte el
 | Detalle | Un artículo incluido en una compra o salida, con su cantidad y demás datos. |
 | Encabezado | Datos comunes del documento, como fecha, proveedor, cliente o proyecto. |
 | Borrador | Captura preparada en el formulario que todavía no se ha guardado. |
-| Guardado o confirmado | Cambio aceptado por el sistema. Cerrar el formulario después no lo deshace. |
+| Guardado o confirmado | Cambio aceptado por Nexus. Cerrar el formulario después no lo deshace. |
 | Activo | Registro disponible para nuevas operaciones; desactivarlo conserva su historia. |
 | Conflicto | El registro cambió desde que lo abrió. Debe consultar los datos actuales antes de volver a editar. |
 
@@ -64,7 +64,7 @@ qué cantidad tiene disponible y en qué unidad. Esta práctica no modifica dato
 | 2. Localizar | Busque el registro y compare nombre, proveedor, medidas y folio. | El registro corresponde a su tarea. |
 | 3. Capturar | Abra la acción, seleccione opciones y escriba los datos. | No confundió una cantidad con un saldo o un costo con un total. |
 | 4. Revisar | Lea encabezado, detalles y consecuencias indicadas junto a la operación. | Todos los datos corresponden a la operación real. |
-| 5. Confirmar | Pulse la acción final una sola vez y espere. | El sistema comunica el resultado. |
+| 5. Confirmar | Pulse la acción final una sola vez y espere. | Nexus comunica el resultado. |
 | 6. Verificar | Consulte otra vez el registro o documento. | Cambiaron el saldo, estado o datos que esperaba. |
 | 7. Recuperar, si hace falta | Localice su situación en Errores y recuperación antes de repetir. | Sabe si la operación anterior se aplicó. |
 
@@ -79,7 +79,7 @@ aunque después cierre el documento principal.
 <!-- manual:end -->
 
 Si quiere salir de una captura que no ha confirmado, utilice **Cerrar** o
-**Regresar**. Si el sistema ya confirmó el cambio, cerrar la pantalla no lo revierte.
+**Regresar**. Si Nexus ya confirmó el cambio, cerrar la pantalla no lo revierte.
 
 ## Cuándo detenerse y pedir ayuda
 

@@ -21,7 +21,7 @@ para abrir el formulario y **Guardar** para confirmarlo.
    de Rollo, junto con el peso del rollo completo capturado desde merma, en una sesión del entorno de prueba.
 
 2. En **Material de origen**, elija proveedor y un material en **m²**; los consumibles y las demás unidades no aparecen. Revise nombre, presentación y unidad precargados.
-   Para **Rollo**, complete **Rollo completo (muestra)** con su peso total incluyendo el cono. Capture el peso del cono una sola vez (cero si no tiene) y el peso del sobrante con cono. El sistema descuenta el mismo cono de ambos totales y obtiene el largo original del material; no necesita capturar metros ni un neto de muestra.
+   Para **Rollo**, complete **Rollo completo (muestra)** con su peso total incluyendo el cono. Capture el peso del cono una sola vez (cero si no tiene) y el peso del sobrante con cono. Nexus descuenta el mismo cono de ambos totales y obtiene el largo original del material; no necesita capturar metros ni un neto de muestra.
    Ambas medidas permanecen deshabilitadas: el ancho menor procede del material y la otra medida se calcula con la proporción de la muestra. Para **Hoja** u otras presentaciones en m², capture las dos medidas manualmente.
    Complete inventario, **Cantidad inicial** y observaciones. El stock mínimo y el estado Activo se guardan como se capturen. Borrar un peso o el peso del rollo completo limpia el largo calculado. Después del alta, muestra, medidas y pesos quedan para consulta.
 3. Seleccione el botón **Guardar** para registrar la merma. Una cantidad positiva genera

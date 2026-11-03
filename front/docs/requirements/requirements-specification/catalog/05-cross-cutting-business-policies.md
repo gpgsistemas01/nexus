@@ -68,4 +68,4 @@ puede cambiarse mediante filtros ni datos enviados por el usuario.
 | ID | Requisito | Estado |
 | --- | --- | --- |
 | RN-019 | Una salida para el cliente interno GPG INTERNO sólo debe admitir como asesor a una persona con responsabilidad de coordinador; esa responsabilidad no le concede acceso a Nexus. | Implementado |
-| RN-035 | En una salida para GPG INTERNO, el número de proyecto debe coincidir con el configurado para el área de destino. El sistema debe rechazar el alta o la edición del encabezado si el área no tiene un número configurado o si el valor no coincide. | Implementado |
+| RN-035 | En una salida para GPG INTERNO, el número de proyecto debe coincidir con el configurado para el área de destino. Nexus debe rechazar el alta o la edición del encabezado si el área no tiene un número configurado o si el valor no coincide. | Implementado |

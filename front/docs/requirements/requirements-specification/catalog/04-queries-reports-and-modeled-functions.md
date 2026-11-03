@@ -15,16 +15,16 @@
 | RF-REP-011 | Nexus debe permitir al Administrador del sistema de Sistemas consultar y exportar los movimientos de Materiales, Consumibles y Mermas por separado. Las consultas, conteos, archivos e informes mensuales deben conservar el contexto elegido; los filtros no deben cambiarlo. | Implementado |
 | RF-REP-012 | El reporte de mermas debe mostrar el peso total disponible de los rollos, sumando existencia × peso neto unitario de cada medida antes de consolidar el grupo. Si un rollo con existencia carece de peso, debe indicar «Sin peso capturado» en su grupo y en el total, sin presentar una suma parcial como completa. Otras presentaciones no aportan peso. | Implementado |
 | RF-MER-001 | Durante el alta de una merma, almacén debe elegir un proveedor antes del material usado como plantilla; cambiar el proveedor debe limpiar la plantilla anterior. | Implementado |
-| RF-MER-002 | Al seleccionar una plantilla, el sistema debe proponer el mayor costo unitario máximo aplicable; el actor puede corregirlo y el valor guardado se conserva como dato histórico propio de la merma. | Implementado |
+| RF-MER-002 | Al seleccionar una plantilla, Nexus debe proponer el mayor costo unitario máximo aplicable; el actor puede corregirlo y el valor guardado se conserva como dato histórico propio de la merma. | Implementado |
 | RF-MER-003 | Nexus debe permitir al Personal de almacén o al Administrador del sistema actualizar el nombre, stock mínimo, costo unitario máximo y estado de una merma sin usar la edición general para cambiar existencias. | Implementado |
 | RF-MER-004 | Nexus debe admitir como referencia de merma sólo un material de tipo MATERIAL con unidad m², reconocida por símbolo o nombre metro cuadrado. Debe excluir consumibles y otras unidades y validar la captura antes del alta. | Implementado |
 | RF-MER-005 | Una edición de merma debe conservar proveedor, presentación, unidad y dimensiones como identidad física inmutable. | Implementado |
-| RF-MER-006 | El sistema debe rechazar un alta que repita la identidad de merma definida por `RN-021`. Ante un duplicado definitivo, debe ofrecer continuar con Agregar stock según sus criterios. | Implementado |
+| RF-MER-006 | Nexus debe rechazar un alta que repita la identidad de merma definida por `RN-021`. Ante un duplicado definitivo, debe ofrecer continuar con Agregar stock según sus criterios. | Implementado |
 | RF-MER-007 | Al crear una merma de Rollo, Nexus debe mostrar base y altura calculadas y sin edición manual, conforme a `RF-MER-013`. Para otras presentaciones, debe permitir capturar las dimensiones requeridas. | Implementado |
-| RF-MER-008 | El sistema debe calcular la cantidad convertida de una merma como existencia × base × altura en altas, ajustes y salidas, sin solicitar su captura manual. | Implementado |
+| RF-MER-008 | Nexus debe calcular la cantidad convertida de una merma como existencia × base × altura en altas, ajustes y salidas, sin solicitar su captura manual. | Implementado |
 | RF-MER-009 | La merma debe vincularse al material de origen y conservar dimensiones, pesos de la merma, total de muestra y costo propios sin modificar la oferta ni recalcular registros anteriores. | Implementado |
 | RF-MER-010 | Nexus debe permitir al Personal de almacén o al Administrador del sistema sumar una cantidad positiva a una merma mediante **Agregar stock**, conservando un documento individual con folio, actor, observaciones opcionales, cantidad y saldos, vinculado a un movimiento de entrada. | Implementado |
-| RF-MER-011 | Al registrar una merma de Rollo, almacén debe capturar en kg el peso del cono y el peso de una unidad de merma con cono, distintos del peso del rollo completo. El sistema debe calcular el neto como total menos cono. Los tres pesos quedan para consulta después del alta y se conservan al mover existencias de la misma identidad. Los históricos sin peso conservan su valor desconocido. | Implementado |
+| RF-MER-011 | Al registrar una merma de Rollo, almacén debe capturar en kg el peso del cono y el peso de una unidad de merma con cono, distintos del peso del rollo completo. Nexus debe calcular el neto como total menos cono. Los tres pesos quedan para consulta después del alta y se conservan al mover existencias de la misma identidad. Los históricos sin peso conservan su valor desconocido. | Implementado |
 | RF-MER-012 | Al registrar una merma de Rollo, Nexus debe usar un rollo completo con cono como muestra. Debe solicitar su peso total y tomar su largo del material, descontando el mismo cono de la muestra y del sobrante. Debe conservar esos valores con la merma sin modificar material ni proveedor. | Implementado |
 | RF-MER-013 | Nexus debe calcular neto = total − cono y largo = neto de merma × largo del rollo / neto del rollo completo. Debe fijar la menor dimensión nominal positiva en su campo original y calcular la otra. Si faltan datos, debe limpiar el resultado y solicitar completar la captura. | Implementado |
 
@@ -50,7 +50,7 @@
   usuario debe confirmar ese formulario por separado.
 - **CA-RF-MER-011-1:** el peso del cono admite cero; el total con cono debe ser
   mayor que el cono y no superar 999.99 kg. Ambos admiten tres enteros y dos decimales.
-  Capturar un peso requiere el otro. El sistema calcula el neto por unidad y rechaza
+  Capturar un peso requiere el otro. Nexus calcula el neto por unidad y rechaza
   entradas inválidas antes del alta.
 - **CA-RF-MER-010-1:** agregar una cantidad incrementa el saldo; no sustituye un ajuste
   administrativo. Establecer el saldo final requiere **Ajustar stock**, motivo y permiso

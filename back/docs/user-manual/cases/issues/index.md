@@ -5,7 +5,7 @@ Cada procedimiento identifica sus casos de uso, controles y errores posibles; lo
 ## Capítulos
 
 **Cómo cambia el estado.** El estado no es un campo editable. Al registrar una salida y sus
-detalles, Nexus los deja **Pendientes**. Al confirmar un surtido, el sistema calcula
+detalles, Nexus los deja **Pendientes**. Al confirmar un surtido, Nexus calcula
 automáticamente **Surtido parcial** si quedan otros detalles pendientes o **Surtido** al completarlos
 todos. En materiales y consumibles se entrega toda la cantidad pendiente de cada renglón
 seleccionado. La devolución requiere que la salida completa esté **Surtida** y se realiza

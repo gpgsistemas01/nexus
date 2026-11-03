@@ -4,7 +4,7 @@
 
 | Prefijo | Significado |
 | --- | --- |
-| `RF` | Función que ofrece el sistema. |
+| `RF` | Función que ofrece Nexus. |
 | `RN` | Regla que limita o condiciona una operación. |
 | `RD` | Condición sobre los datos y su integridad. |
 | `RC` | Condición de calidad u operación. |

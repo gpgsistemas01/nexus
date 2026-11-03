@@ -18,11 +18,11 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
 | RF-CAT-009 | Nexus debe permitir sólo al Administrador del sistema establecer la nueva existencia de un material mediante un ajuste trazable, con motivo y observaciones, conforme a `RF-ADJ-001`. | Implementado |
 | RF-CAT-010 | Nexus debe permitir al Personal de almacén o al Administrador del sistema crear un proveedor con razón social, nombre comercial y estado activo o inactivo. Debe asignarle un código único; el acceso contextual de Almacén sigue sus criterios. | Implementado |
 | RF-CAT-011 | Nexus debe permitir al Administrador del sistema de Sistemas actualizar los datos admitidos y el estado activo de un proveedor sin eliminar sus relaciones o historia. | Implementado |
-| RF-CAT-012 | El sistema debe rechazar una oferta de proveedor duplicada sin modificar sus datos, existencia ni costo. | Implementado |
+| RF-CAT-012 | Nexus debe rechazar una oferta de proveedor duplicada sin modificar sus datos, existencia ni costo. | Implementado |
 | RF-CAT-013 | Nexus debe permitir al Personal de almacén o al Administrador del sistema crear un cliente con nombre y estado activo o inactivo. El acceso contextual de Almacén sigue sus criterios. | Implementado |
 | RF-CAT-014 | Nexus debe permitir al Administrador del sistema de Sistemas actualizar los datos admitidos y el estado activo de un cliente sin eliminar sus relaciones o historia. | Implementado |
 | RF-CAT-015 | Nexus debe permitir al Personal de almacén o al Administrador del sistema crear una merma con datos propios a partir de un material y proveedor usados como plantilla. | Implementado |
-| RF-CAT-016 | El sistema debe impedir que una edición de merma cambie su proveedor, presentación, unidad de medida o dimensiones, para conservar su identidad física. | Implementado |
+| RF-CAT-016 | Nexus debe impedir que una edición de merma cambie su proveedor, presentación, unidad de medida o dimensiones, para conservar su identidad física. | Implementado |
 | RF-CAT-017 | Nexus debe permitir al Personal de almacén o al Administrador del sistema actualizar nombre, stock mínimo, costo unitario máximo y estado activo de una merma sin alterar existencias ni historia; `RF-MER-003` precisa esa misma edición. | Implementado |
 | RF-CAT-018 | Nexus debe permitir sólo al Administrador del sistema establecer la nueva existencia de una merma mediante un ajuste trazable, con motivo y observaciones, conforme a `RF-ADJ-001`. | Implementado |
 | RF-CAT-019 | Nexus debe permitir al usuario operativo autorizado consultar unidades de medida activas para las operaciones que las requieren; su mantenimiento se rige por `RF-CAT-022` a `RF-CAT-024`. | Implementado |

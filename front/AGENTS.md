@@ -39,10 +39,12 @@ convenciones y responsabilidades de implementación. Los comandos npm se ejecuta
 - Conserva el motor Mermaid común y valida figuras/exportación representativa al
   cambiarlas. La documentación y herramientas no se incluyen en producción.
 - Los procedimientos y capturas de usuario pertenecen a `docs/user-manual/`.
-  Si cambia una pantalla, revisa su procedimiento y captura con `npm run docs:screenshots`.
-  Ese recorrido usa datos ficticios y bloquea escrituras; no debe registrar operaciones
-  para preparar imágenes. Publica con `npm run docs:manual -- ambos` y revisa DOCX/PDF.
-- La inducción por cuenta usa `npm run docs:manuals -- --mode live --profile <id>`.
+  Si cambia una pantalla, revisa su procedimiento y captura por cuenta con
+  `npm run docs:screenshots -- --all`. El recorrido bloquea escrituras; no debe
+  registrar operaciones para preparar imágenes. Para las imágenes generales de
+  referencia, usa `npm run docs:screenshots:reference` con datos ficticios.
+- La inducción por cuenta usa `npm run docs:manuals -- --profile <id>`; el modo
+  predeterminado es `live`. Revisa las capturas propias y los DOCX/PDF generados.
   Consulta `docs/governance/06-manuals-by-access.md`: usa permisos de la sesión,
   capturas propias y archivos locales ignorados; las áreas operativas no realizan
   surtidos ni devoluciones. No cambies una captura faltante por otra de administración.

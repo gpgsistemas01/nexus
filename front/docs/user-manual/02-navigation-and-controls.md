@@ -11,7 +11,7 @@ teléfono, también puede cerrarlo con **Cerrar menú**.
 
 Puede guardar la dirección de una página como favorito.
 
-![Menú expandido con los grupos y páginas disponibles para la cuenta de demostración.](images/02-navigation.png)
+![Menú expandido con los grupos y páginas disponibles para la cuenta.](images/02-navigation.png)
 
 ## Buscar y recorrer una tabla
 

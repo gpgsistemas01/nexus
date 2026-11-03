@@ -21,7 +21,7 @@ casos críticos. Las referencias de documentación y técnicas se identifican en
 ## Niveles y entornos
 
 El oráculo es el resultado con el que se compara lo observado para decidir si
-la prueba pasa. Cada nivel comprueba una parte distinta del sistema.
+la prueba pasa. Cada nivel comprueba una parte distinta de Nexus.
 
 | Nivel | Herramienta y ubicación | Oráculo y límite |
 | --- | --- | --- |
@@ -31,7 +31,7 @@ la prueba pasa. Cada nivel comprueba una parte distinta del sistema.
 | Sistema | Playwright; `tests/system`, Vue, Express y PostgreSQL aislado. | Cookie/login/refresh/cierre reales, alta persistida de cliente y reportes XLSX representativos. No cubre automáticamente todos los estados o transacciones. |
 | Comprobación estática/documental | ESLint, Prettier, vue-tsc, Vite y `docs:check`. | Contratos de tipos, fronteras configuradas, compilación, referencia generada y enlaces. No sustituye una prueba funcional. |
 
-`test:e2e` inicia Vite en 5173 y puede reutilizar un servidor de desarrollo permitido por su configuración. Sistema usa procesos propios en 5175/3107 y una base dedicada. La [preparación del sistema](05-system-tests.md) comprueba URLs y limpieza antes de iniciar. Nunca se usa la base habitual de desarrollo como base de prueba.
+`test:e2e` inicia Vite en 5173 y puede reutilizar un servidor de desarrollo permitido por su configuración. Las pruebas de sistema usan procesos propios en 5175/3107 y una base dedicada. La [preparación de estas pruebas](05-system-tests.md) comprueba URLs y limpieza antes de iniciar. Nunca se usa la base habitual de desarrollo como base de prueba.
 
 ## Selección por riesgo y técnicas
 

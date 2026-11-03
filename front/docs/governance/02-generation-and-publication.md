@@ -38,7 +38,7 @@ npm run docs:export -- inicio ambos
 npm run docs:export -- arquitectura pdf
 npm run docs:export -- pruebas docx
 npm run docs:export -- completo ambos
-npm run docs:manuals -- --mode live --all
+npm run docs:manuals -- --all
 ```
 
 Desde la raíz se usa `npm --prefix front run` antes del nombre del script.
@@ -52,7 +52,7 @@ Sin sección, o con `completo`, reúne la colección; por ejemplo,
 
 `docs:manuals` genera una edición por cuenta configurada, con sus áreas y roles.
 La preparación se concentra en el [procedimiento por cuenta](07-manual-accounts-and-files.md).
-`docs:manual -- ambos` reúne todas las tareas en una referencia para mantenimiento.
+`docs:manual:reference -- ambos` reúne todas las tareas en una referencia para mantenimiento.
 
 | Selección | DOCX | PDF |
 | --- | --- | --- |

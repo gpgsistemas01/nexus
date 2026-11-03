@@ -6,7 +6,7 @@
 | --- | --- |
 | Personal de Almacén | Controlar recepciones y existencias, atender solicitudes, documentar entregas y devoluciones y explicar diferencias de inventario. |
 | Áreas operativas | Conocer la disponibilidad y solicitar los artículos que necesitan para sus actividades. |
-| Sistemas | Mantener personas, cuentas, accesos y catálogos; supervisar las operaciones protegidas del sistema. |
+| Sistemas | Mantener personas, cuentas, accesos y catálogos; supervisar las operaciones protegidas de Nexus. |
 | Dirección | Disponer de información para supervisar resultados y tomar decisiones. |
 | Áreas solicitantes futuras | Plantear necesidades de suministro y responsabilidades de solicitud. |
 | Clientes y proveedores | Identificar el destino comercial de las salidas y el origen de las recepciones. |

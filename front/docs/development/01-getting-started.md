@@ -180,11 +180,22 @@ npm --prefix front run preview
 | No se resuelve `axios`, `vee-validate` o la fuente | Sigue la [recuperación de dependencias](#dependencias-no-resueltas-en-vite). |
 | No se resuelve `@nexus/*` | Comprueba la rama y las fuentes públicas del repositorio completo. |
 | Falta `back/generated/prisma/client.ts` | Configura `back/.env` y ejecuta `npm --prefix back run db:generate`. |
-| `502` o `ECONNREFUSED` | Comprueba que la API está activa en `BACKEND_PROXY_TARGET`; reinicia Vite si modificaste su entorno. |
+| `502` o `ECONNREFUSED` | El proxy no pudo conectar con la API. Comprueba que esté activa en el host y puerto de `BACKEND_PROXY_TARGET`. |
 | `ECONNRESET` en el proxy | Revisa el log de la API en ese momento: la conexión se cerró durante la petición; puede coincidir con un reinicio o un fallo del servidor. |
+| `[vite] (client) hmr update` | Vite actualizó un módulo editado; es un mensaje normal de desarrollo. |
 | `500` con `tenant/user … not found` en Prisma | Corrige `DATABASE_URL` en `back/.env`: copia la cadena del pooler desde **Connect** del proyecto Supabase y reemplaza el marcador de contraseña. Host y usuario deben pertenecer al mismo proyecto. Reinicia la API. |
 | `401` o `403` con la API respondiendo | Revisa sesión, credenciales y permisos. |
 | `EBADENGINE` | Compara Node con los dos manifiestos y actualiza el ejecutable a una rama admitida. |
+
+Cuando la API vuelva al mismo host y puerto, reintenta desde la pantalla: **Volver
+a comprobar el acceso** para la sesión, **Actualizar** o **Reintentar** para una
+tabla y **Reintentar catálogo** para un selector. El proxy puede recuperarse sin
+reiniciar Vite. Si cambiaste `BACKEND_PROXY_TARGET`, reinícialo para aplicar el valor.
+
+Para comprobar el puerto predeterminado desde PowerShell en el equipo que ejecuta
+Vite, usa `Test-NetConnection 127.0.0.1 -Port 3000 -InformationLevel Quiet`.
+`False` indica que no se pudo establecer la conexión TCP; conserva el log de la API
+de ese momento para identificar la causa.
 
 La API usa `DATABASE_URL`; `DIRECT_URL` se reserva para migraciones. El diagnóstico
 de [Supabase sobre el pooler](https://supabase.com/kb/troubleshooting/tenant-or-user-not-found)

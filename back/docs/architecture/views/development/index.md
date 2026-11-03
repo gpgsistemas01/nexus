@@ -15,7 +15,7 @@ capacidades y trazabilidad a [lógica](../logical/index.md).
 | 4. Mecanismo reutilizable | [Reutilización y refactorización](reuse-and-refactoring/index.md) | ¿Qué núcleo se comparte y qué configura cada consumidor? Contratos de extensión e impacto de una extracción. |
 | Evidencia técnica | [Mapa generado](code-map.md) | Inventario de rutas, imports y símbolos derivado de `src`. |
 
-Para conocer el sistema se empieza por el nivel 1. Para cambiar un módulo se entra
+Para conocer Nexus se empieza por el nivel 1. Para cambiar un módulo se entra
 directamente en su referencia backend/frontend y se siguen los enlaces a Prisma,
 patrones o reutilización que expliquen sus dependencias. No es necesario recorrer
 primero todos los patrones para localizar el código de un recurso.

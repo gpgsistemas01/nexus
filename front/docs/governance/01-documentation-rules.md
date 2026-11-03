@@ -19,6 +19,11 @@ Una compilación o prueba aprobada no sustituye la aceptación funcional.
 
 ## Convenciones editoriales
 
+- El producto se llama **Nexus**. Usar ese nombre para sus acciones y resultados
+  en requisitos, casos de uso y manuales.
+- Conservar términos generales como sistema operativo, pruebas de sistema y límite
+  del sistema en UML; también los nombres visibles, como Administrador del sistema,
+  y el campo documental Versión del sistema.
 - Archivos técnicos en inglés; títulos y explicación en español. Cada colección
   tiene `index.md` y sus capítulos numerados conservan el orden de lectura.
 - Un `h1` por archivo y niveles sin saltos. Usar tablas para comparar, listas

@@ -24,6 +24,12 @@ repositorio y ya exige mantener sincronizados los documentos relacionados.
 
 ### Títulos y vocabulario técnico
 
+El producto se llama **Nexus**. Al describir sus funciones, acciones y resultados
+en requisitos, casos de uso y manuales, se usa ese nombre. Los términos sistema
+operativo, pruebas de sistema y límite del sistema en UML conservan su significado;
+también los nombres visibles, como Administrador del sistema, y el campo documental
+Versión del sistema.
+
 Cada documento conserva un único título de nivel 1, específico y coherente con el
 nombre mostrado en el índice. Las secciones usan niveles consecutivos y no repiten el
 título del documento. Los nombres literales del código, rutas, variables, bibliotecas y

@@ -124,3 +124,21 @@ reglas y excepciones, arquitectura, pruebas, manuales y procedimientos de public
 
 Las fuentes documentales se versionan en `front/docs`. Sus herramientas y resultados
 permanecen fuera de `public/`, `dist/` y la imagen de producción.
+
+### Capturas y manuales por cuenta
+
+Prepara `front/manual.accounts.local.json` y `front/.env.manual.local` con la
+[guía por cuenta](docs/governance/07-manual-accounts-and-files.md). Con Vue y la API
+funcionando, elige desde la raíz:
+
+| Resultado | Comando |
+| --- | --- |
+| Sólo capturas por cuenta | `npm --prefix front run docs:screenshots -- --all` |
+| Capturas y manuales Word/PDF por cuenta | `npm --prefix front run docs:manuals -- --all` |
+
+Ambos leen los mismos archivos locales y detectan áreas, roles y permisos al
+ingresar. Las cuentas sin usuario o sin contraseña se informan como omitidas y
+se continúa con las completas. Cada entrada del JSON identifica una cuenta y su
+carpeta de imágenes en
+`front/build/manuals/<cuenta>/images/`. Usa `--profile <id>` en lugar de `--all`
+para procesar una sola cuenta; `--help` muestra las opciones.

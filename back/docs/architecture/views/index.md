@@ -26,7 +26,7 @@ permanecen fuera de `views/` porque se consultan desde varias perspectivas:
 - [Estándar de codificación](../coding-standards/index.md): reglas de construcción del
   código, no descripción de la solución.
 
-Así, `views/` contiene todo artefacto cuyo propósito principal es representar el sistema;
+Así, `views/` contiene todo artefacto cuyo propósito principal es representar Nexus;
 la raíz de `architecture/` conserva las referencias, correspondencias y estándares que
 apoyan varias vistas sin pertenecer a una sola.
 

@@ -180,9 +180,20 @@ export const readCredentials = async (account, envFile, environment = process.en
     }
     const name = environment[account.usernameEnv] ?? local[account.usernameEnv];
     const password = environment[account.passwordEnv] ?? local[account.passwordEnv];
-    if (!name?.trim() || !password)
-        throw new Error(
-            `Faltan ${account.usernameEnv} y/o ${account.passwordEnv} para ${account.id}.`,
-        );
+    if (!name?.trim() || !password) return null;
     return { name: name.trim(), password };
+};
+
+export const selectAccountsWithCredentials = async (
+    accounts,
+    envFile,
+    environment = process.env,
+) => {
+    const selected = [];
+    const omitted = [];
+    for (const account of accounts) {
+        if (await readCredentials(account, envFile, environment)) selected.push(account);
+        else omitted.push(account.id);
+    }
+    return { accounts: selected, omitted };
 };
