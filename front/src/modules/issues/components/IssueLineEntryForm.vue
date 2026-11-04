@@ -11,6 +11,7 @@ defineProps<{
     errors: Partial<Record<'itemId' | 'quantity', string>>;
     state: LookupState;
     selected?: LookupItem;
+    presentation: string;
     isDisabled: boolean;
     minimum: string;
 }>();
@@ -32,10 +33,7 @@ const emit = defineEmits<{
     >
         <h3>Agregar detalle</h3>
         <VRow class="mt-1">
-            <VCol
-                cols="12"
-                md="8"
-            >
+            <VCol cols="12">
                 <RemoteSelect
                     :label="label"
                     :model-value="values.itemId"
@@ -52,7 +50,8 @@ const emit = defineEmits<{
             </VCol>
             <VCol
                 cols="12"
-                md="4"
+                md="6"
+                lg="7"
             >
                 <VTextField
                     label="Cantidad"
@@ -66,15 +65,34 @@ const emit = defineEmits<{
                     @blur="emit('blur', 'quantity')"
                 />
             </VCol>
+            <VCol
+                cols="12"
+                md="4"
+                lg="3"
+            >
+                <VTextField
+                    label="Presentación"
+                    :model-value="presentation"
+                    readonly
+                    tabindex="-1"
+                />
+            </VCol>
+            <VCol
+                cols="12"
+                md="2"
+                class="d-flex align-center"
+            >
+                <VBtn
+                    block
+                    prepend-icon="$plus"
+                    variant="outlined"
+                    :disabled="isDisabled"
+                    @click="emit('add')"
+                >
+                    Agregar
+                </VBtn>
+            </VCol>
         </VRow>
-        <VBtn
-            prepend-icon="$plus"
-            variant="outlined"
-            :disabled="isDisabled"
-            @click="emit('add')"
-        >
-            Agregar
-        </VBtn>
     </section>
 </template>
 

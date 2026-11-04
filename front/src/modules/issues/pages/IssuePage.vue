@@ -27,10 +27,15 @@ import IssueEditorPage from './IssueEditorPage.vue';
 const props = defineProps<{ resource: IssueResource }>();
 const emit = defineEmits<{ createClient: [request: LookupCreation] }>();
 const config = ISSUE_CONFIG[props.resource];
-const { has, onDenied, onError } = usePageAccess();
+const { session, has, onDenied, onError } = usePageAccess();
 const canManage = computed(() => has(config.managePermission));
 const canSupply = computed(() => has(config.supplyPermission));
 const canExport = computed(() => has(PERMISSIONS.WAREHOUSE_REPORTS_READ));
+const showDepartment = computed(
+    () =>
+        session.user.value?.organization?.isWarehouse === true ||
+        session.user.value?.organization?.isSystem === true,
+);
 const filters = useIssueFilters(props.resource, has);
 let lastAttemptAt = -Infinity;
 const list = usePagedList<IssueQuery, IssueRow>({
@@ -165,7 +170,7 @@ onMounted(() => {
             :is-reading="isReading"
             :can-manage="canManage"
             :can-supply="canSupply"
-            :is-waste="resource === 'wastes'"
+            :show-department="showDepartment"
             @query="list.applyQuery"
             @open="actions.open"
         />

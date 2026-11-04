@@ -98,6 +98,12 @@ localizan las variantes y transformaciones de cada payload.
 
 ## Sesión y errores
 
+La sesión conserva `id`, `name`, `permissions` y los indicadores
+`organization.isWarehouse` e `organization.isSystem` recibidos de `/api/auth/me`.
+Los indicadores determinan la visibilidad de **Área** en el listado de Salidas;
+si no están presentes, la columna se oculta. No sustituyen permisos ni el alcance
+que aplica la API.
+
 `apiClient` comparte una renovación pendiente ante respuestas `401` de solicitudes
 protegidas. Marca cada original con `hasRetried` y la reenvía una sola vez después
 del refresh. `requiresAuth: false` excluye login y refresh de la renovación ante 401.

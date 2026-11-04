@@ -1,6 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { parseEnv } from 'node:util';
-import { getGrantedPermissions } from '../../../back/src/constants/permissions.js';
+import {
+    getGrantedPermissions,
+    getOrganizationContext,
+} from '../../../back/src/constants/permissions.js';
 import { DEPARTMENT_KEYS } from '../../../back/src/constants/departments.js';
 import { ROLE_KEYS } from '../../../back/src/constants/roles.js';
 import { parseManualBaseUrl } from './environment.mjs';
@@ -85,10 +88,15 @@ export const demoSession = (profile) => {
             department: departmentLabels[profile.departmentKey],
         },
     ];
+    const organization = getOrganizationContext(accesses);
     return {
         id: '88888888-8888-4888-8888-888888888888',
         name: profile.id,
         permissions: getGrantedPermissions(accesses),
+        organization: {
+            isWarehouse: organization.isWarehouse === true,
+            isSystem: organization.isSystem === true,
+        },
         accesses,
     };
 };

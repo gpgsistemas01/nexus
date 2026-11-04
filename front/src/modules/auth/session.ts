@@ -7,6 +7,7 @@ export interface SessionUser {
     id: string;
     name: string;
     permissions: readonly string[];
+    organization?: { isWarehouse: boolean; isSystem: boolean };
 }
 
 export const createAuthSession = (request = apiClient.request) => {
@@ -30,6 +31,14 @@ export const createAuthSession = (request = apiClient.request) => {
                     id: data.user.id,
                     name: data.user.name,
                     permissions: data.user.permissions,
+                    ...(isRecord(data.user.organization)
+                        ? {
+                              organization: {
+                                  isWarehouse: data.user.organization.isWarehouse === true,
+                                  isSystem: data.user.organization.isSystem === true,
+                              },
+                          }
+                        : {}),
                 };
                 return user.value;
             })

@@ -139,10 +139,11 @@ Partial<Record<LoginField, string>>
 | `id` | `id: string;` |
 | `name` | `name: string;` |
 | `permissions` | `permissions: readonly string[];` |
+| `organization` | `organization?: { isWarehouse: boolean; isSystem: boolean };` |
 
 ## AuthSession
 
-**Fuente:** [src/modules/auth/session.ts](../../../../../src/modules/auth/session.ts) · línea 49, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/auth/session.ts](../../../../../src/modules/auth/session.ts) · línea 58, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

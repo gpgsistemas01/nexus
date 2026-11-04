@@ -22,6 +22,9 @@ export default defineConfig(({ mode }) => {
         },
         resolve: {
             alias: {
+                '@nexus/input-validation': fileURLToPath(
+                    new URL('../back/src/shared/constants/inputValidation.js', import.meta.url),
+                ),
                 '@nexus/numbers': fileURLToPath(
                     new URL('../back/src/shared/utils/numberUtils.js', import.meta.url),
                 ),

@@ -29,7 +29,8 @@ Guardar registra la solicitud; Almacén atiende su entrega.
    esa área; sus opciones se cargan automáticamente.
 3. Capture **Número de proyecto**, revise **Fecha y hora de solicitud:** y
    complete **Observaciones** cuando corresponda.
-4. Seleccione **Material**, **Consumible** o **Merma** y capture **Cantidad**.
+4. Seleccione **Material**, **Consumible** o **Merma**, capture **Cantidad** y
+   compruebe **Presentación**; este último campo se completa automáticamente.
 5. Pulse **Agregar** y compruebe el detalle preparado. Repita para los demás
    artículos. Retire un detalle equivocado antes de guardar.
 6. Revise encabezado y detalles, pulse **Guardar** y espere la confirmación.
@@ -49,15 +50,16 @@ solicite su revisión; escribir otro puede impedir guardar.
 ![Preparación de una solicitud de salida con sus datos y detalle.](images/23-issue-create.png)
 
 <!-- manual:any clients:create -->
-Cuando aparezca **Registrar cliente**, puede darlo de alta en el formulario
-secundario y regresar con la selección preparada.
+Si no encuentra un cliente, escriba su nombre en **Cliente** y pulse
+**Registrar cliente «nombre»** dentro del desplegable. Complete y guarde el
+formulario secundario; el nuevo cliente quedará seleccionado.
 <!-- manual:end -->
 <!-- manual:end -->
 
 ## Consultar un documento
 
-**Consultar salida** abre el documento para revisar encabezado, cantidades,
-cumplimiento, surtido y devoluciones. Use **Regresar** al terminar. Las opciones de carga y
+**Consultar salida** abre el documento para revisar encabezado y detalles solicitados.
+Use **Regresar** al terminar. Las opciones de carga y
 recuperación se explican en [Consultas de documentos](02-navigation-and-controls.md#consultas-de-documentos).
 
 <!-- manual:any goods:issues-manage waste:issues-manage -->

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { usePurchaseLineEntry } from '../composables/usePurchaseLineEntry.js';
 import { PURCHASE_CONFIG } from '../purchaseConfig.js';
+import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
 import type { PurchaseResource, PurchaseDetail, ItemCreation } from '../purchase.js';
 import type { LookupItem } from '../../../shared/lookup.js';
 import PurchaseLineEntryForm from '../components/PurchaseLineEntryForm.vue';
@@ -30,6 +31,7 @@ const { values, errors, items, item } = line;
         :errors="errors"
         :items="items.state.value"
         :selected="item"
+        :presentation="getLookupPresentation(item)"
         :is-disabled="isDisabled"
         :can-read="canRead"
         :can-create="canCreate"

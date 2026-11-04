@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useIssueLineEntry } from '../composables/useIssueLineEntry.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
+import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
 import type { IssueResource, IssueDetail } from '../issue.js';
 import IssueLineEntryForm from '../components/IssueLineEntryForm.vue';
 
@@ -21,6 +22,7 @@ const entry = useIssueLineEntry({
         :errors="entry.errors.value"
         :state="entry.items.state.value"
         :selected="entry.selected.value"
+        :presentation="getLookupPresentation(entry.selected.value)"
         :is-disabled="isDisabled || !canRead"
         :minimum="resource === 'wastes' ? '0.01' : '1'"
         @update="entry.update"

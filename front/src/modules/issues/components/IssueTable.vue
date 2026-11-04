@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { mdiEyeOutline, mdiPackageUp, mdiUndoVariant } from '@mdi/js';
 import type { DataTableHeader } from 'vuetify';
 import ServerTable from '../../../shared/components/ServerTable.vue';
@@ -15,29 +16,27 @@ const props = defineProps<{
     isReading: boolean;
     canManage: boolean;
     canSupply: boolean;
-    isWaste: boolean;
+    showDepartment: boolean;
 }>();
 const emit = defineEmits<{
     query: [changes: Partial<IssueQuery>];
     open: [row: IssueRow, mode: IssueOpenMode];
 }>();
-const headers: DataTableHeader<IssueRow>[] = [
+const headers = computed<DataTableHeader<IssueRow>[]>(() => [
     { title: 'Folio', key: 'referenceNumber', nowrap: true },
     { title: 'Solicitud', key: 'requestDate', nowrap: true },
-    { title: 'Área', key: 'departmentName' },
+    ...(props.showDepartment ? [{ title: 'Área', key: 'departmentName' }] : []),
     { title: 'Proyecto', key: 'projectNumber' },
     { title: 'Cliente', key: 'clientName' },
     { title: 'Estado surtido', key: 'fulfillmentStatus', sortable: false },
-    ...(props.isWaste ? [{ title: 'Observaciones', key: 'observations' }] : []),
     { title: 'Acciones', key: 'actions', sortable: false },
-];
+]);
 const columns = {
     referenceNumber: 0,
     requestDate: 1,
     departmentName: 2,
     projectNumber: 3,
     clientName: 4,
-    ...(props.isWaste ? { observations: 6 } : {}),
 };
 const { sortBy, changesFromOptions } = useTableQuery(
     () => props.query,
@@ -72,12 +71,6 @@ const dateText = (value: string) =>
         </template>
         <template #[`item.actions`]="{ item }">
             <TableAction
-                label="Consultar salida"
-                :icon="`svg:${mdiEyeOutline}`"
-                :is-disabled="isReading"
-                @click="emit('open', item, 'view')"
-            />
-            <TableAction
                 v-if="canManage && canEditIssue(item)"
                 label="Editar salida"
                 icon="$edit"
@@ -97,6 +90,12 @@ const dateText = (value: string) =>
                 :icon="`svg:${mdiUndoVariant}`"
                 :is-disabled="isReading"
                 @click="emit('open', item, 'return')"
+            />
+            <TableAction
+                label="Consultar salida"
+                :icon="`svg:${mdiEyeOutline}`"
+                :is-disabled="isReading"
+                @click="emit('open', item, 'view')"
             />
         </template>
     </ServerTable>

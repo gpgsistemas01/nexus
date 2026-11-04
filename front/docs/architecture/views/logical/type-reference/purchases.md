@@ -32,7 +32,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseDetailsTable.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 13, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 14, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -47,7 +47,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseDetailsTable.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 19, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -171,6 +171,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `errors` | `errors: Partial<Record<'materialId' \| 'quantity' \| 'costPerUnitType', string>>;` |
 | `items` | `items: LookupState;` |
 | `selected` | `selected?: LookupItem;` |
+| `presentation` | `presentation: string;` |
 | `isDisabled` | `isDisabled: boolean;` |
 | `canRead` | `canRead: boolean;` |
 | `canCreate` | `canCreate: boolean;` |
@@ -182,7 +183,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 18, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 19, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -324,7 +325,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryPage.defineProps
 
-**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 8, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 9, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -341,7 +342,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryPage.defineEmits
 
-**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 15, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchaseLineEntryPage.vue](../../../../../src/modules/purchases/pages/PurchaseLineEntryPage.vue) · línea 16, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

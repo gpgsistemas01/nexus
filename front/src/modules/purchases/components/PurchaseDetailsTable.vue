@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { VDataTable } from 'vuetify/components/VDataTable';
 import type { DataTableHeader } from 'vuetify';
 import TableFrame from '../../../shared/components/TableFrame.vue';
@@ -10,7 +11,7 @@ import {
 } from '../../../shared/utils/formatNumbers.js';
 import type { PurchaseDetail } from '../purchase.js';
 
-defineProps<{
+const props = defineProps<{
     rows: PurchaseDetail[];
     canChange: boolean;
     canRemove: boolean;
@@ -28,7 +29,7 @@ const money = [
     'netPurchaseAmount',
     'grossPurchaseAmount',
 ] as const;
-const headers: DataTableHeader<PurchaseDetail>[] = [
+const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
     { title: 'Material', key: 'name', nowrap: true },
     {
         title: 'Medidas',
@@ -50,9 +51,10 @@ const headers: DataTableHeader<PurchaseDetail>[] = [
     { title: 'Costo por Presentación', key: 'costPerUnitType' },
     { title: 'Monto s/ IVA', key: 'netPurchaseAmount' },
     { title: 'Monto c/ IVA', key: 'grossPurchaseAmount' },
-    { title: 'Estado', key: 'status' },
-    { title: 'Acciones', key: 'actions', sortable: false },
-];
+    ...(props.canChange || props.canRemove
+        ? [{ title: 'Acciones', key: 'actions', sortable: false }]
+        : []),
+]);
 </script>
 
 <template>
@@ -86,8 +88,14 @@ const headers: DataTableHeader<PurchaseDetail>[] = [
             >
                 {{ currencyText(item[key]) }}
             </template>
-            <template #[`item.status`]="{ item }">
-                {{ item.isNew ? 'Nuevo' : item.status === 'ACTIVE' ? 'Activo' : 'Cancelado' }}
+            <template #[`item.name`]="{ item }">
+                {{ item.name }}
+                <small
+                    v-if="item.status === 'CANCELED'"
+                    class="d-block text-error"
+                >
+                    Cancelado
+                </small>
             </template>
             <template #[`item.actions`]="{ item }">
                 <TableAction

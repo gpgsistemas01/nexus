@@ -39,8 +39,10 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
         ],
     },
     { title: 'Salida', key: 'quantity' },
-    { title: 'Cantidad surtida', key: 'suppliedQuantity' },
-    { title: 'Cantidad devuelta', key: 'returnedQuantity' },
+    ...(['supply', 'return'].includes(props.mode)
+        ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity' }]
+        : []),
+    ...(props.mode === 'return' ? [{ title: 'Cantidad devuelta', key: 'returnedQuantity' }] : []),
     { title: 'Presentación', key: 'presentation' },
     {
         title: 'Conversión',

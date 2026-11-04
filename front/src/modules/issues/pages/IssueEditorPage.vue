@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue';
-import { VBtn } from 'vuetify/components/VBtn';
 import { PERMISSIONS } from '@nexus/permissions';
 import { usePageAccess } from '../../../app/composables/usePageAccess.js';
 import { useIssueEditor } from '../composables/useIssueEditor.js';
@@ -132,26 +131,6 @@ const openReturnDialog = (line: IssueDetail) => {
         @close="emit('close')"
         @reload="emit('reload')"
     >
-        <template #client-action>
-            <VBtn
-                v-if="
-                    editor.canEditHeader &&
-                    has(PERMISSIONS.CLIENTS_CREATE) &&
-                    has(PERMISSIONS.CLIENTS_READ)
-                "
-                size="small"
-                variant="text"
-                :disabled="editor.isSubmitting.value"
-                @click="
-                    emit('createClient', {
-                        search: '',
-                        onCreated: headerSelection.selectCreatedClient,
-                    })
-                "
-            >
-                Registrar cliente
-            </VBtn>
-        </template>
         <template #entry>
             <IssueLineEntryPage
                 :resource="resource"

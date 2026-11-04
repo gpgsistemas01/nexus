@@ -11,6 +11,7 @@ defineProps<{
     errors: Partial<Record<'materialId' | 'quantity' | 'costPerUnitType', string>>;
     items: LookupState;
     selected?: LookupItem;
+    presentation: string;
     isDisabled: boolean;
     canRead: boolean;
     canCreate: boolean;
@@ -34,10 +35,7 @@ const emit = defineEmits<{
     >
         <h3>Agregar detalle</h3>
         <VRow class="mt-1">
-            <VCol
-                cols="12"
-                md="6"
-            >
+            <VCol cols="12">
                 <RemoteSelect
                     :label="itemLabel"
                     :model-value="values.materialId"
@@ -57,7 +55,8 @@ const emit = defineEmits<{
             </VCol>
             <VCol
                 cols="12"
-                md="3"
+                md="2"
+                lg="3"
             >
                 <VTextField
                     label="Cantidad"
@@ -73,7 +72,7 @@ const emit = defineEmits<{
             </VCol>
             <VCol
                 cols="12"
-                md="3"
+                md="4"
             >
                 <VTextField
                     label="Costo por Presentación"
@@ -87,15 +86,34 @@ const emit = defineEmits<{
                     @blur="emit('blur', 'costPerUnitType')"
                 />
             </VCol>
+            <VCol
+                cols="12"
+                md="4"
+                lg="3"
+            >
+                <VTextField
+                    label="Presentación"
+                    :model-value="presentation"
+                    readonly
+                    tabindex="-1"
+                />
+            </VCol>
+            <VCol
+                cols="12"
+                md="2"
+                class="d-flex align-center"
+            >
+                <VBtn
+                    block
+                    variant="outlined"
+                    prepend-icon="$plus"
+                    :disabled="isDisabled || !canRead"
+                    @click="emit('add')"
+                >
+                    Agregar
+                </VBtn>
+            </VCol>
         </VRow>
-        <VBtn
-            variant="outlined"
-            prepend-icon="$plus"
-            :disabled="isDisabled || !canRead"
-            @click="emit('add')"
-        >
-            Agregar
-        </VBtn>
     </section>
 </template>
 

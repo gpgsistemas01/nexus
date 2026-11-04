@@ -11,6 +11,7 @@ export const ids = {
 export const user = {
   id: ids.user,
   name: 'almacenista',
+  organization: { isWarehouse: true, isSystem: false },
   permissions: [
     'materials:read',
     'materials:write',

@@ -317,7 +317,7 @@ it.each(
       expect(content).not.toContain('24-issue-supply.png');
       expect(content).not.toContain('25-issue-return.png');
       expect(content).not.toContain('utilice la devolución');
-      expect(content).not.toContain('Cuando aparezca **Registrar cliente**');
+      expect(content).not.toContain('**Registrar cliente «nombre»**');
     }
   },
 );

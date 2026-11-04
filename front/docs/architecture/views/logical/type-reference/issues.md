@@ -37,7 +37,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 17, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 18, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -63,7 +63,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 31, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 32, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -140,6 +140,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `errors` | `errors: Partial<Record<'itemId' \| 'quantity', string>>;` |
 | `state` | `state: LookupState;` |
 | `selected` | `selected?: LookupItem;` |
+| `presentation` | `presentation: string;` |
 | `isDisabled` | `isDisabled: boolean;` |
 | `minimum` | `minimum: string;` |
 
@@ -150,7 +151,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueLineEntryForm.vue](../../../../../src/modules/issues/components/IssueLineEntryForm.vue) · línea 17, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueLineEntryForm.vue](../../../../../src/modules/issues/components/IssueLineEntryForm.vue) · línea 18, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -191,7 +192,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueTable.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueTable.vue](../../../../../src/modules/issues/components/IssueTable.vue) · línea 10, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueTable.vue](../../../../../src/modules/issues/components/IssueTable.vue) · línea 11, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -202,7 +203,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `isReading` | `isReading: boolean;` |
 | `canManage` | `canManage: boolean;` |
 | `canSupply` | `canSupply: boolean;` |
-| `isWaste` | `isWaste: boolean;` |
+| `showDepartment` | `showDepartment: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -211,7 +212,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueTable.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueTable.vue](../../../../../src/modules/issues/components/IssueTable.vue) · línea 20, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueTable.vue](../../../../../src/modules/issues/components/IssueTable.vue) · línea 21, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -466,7 +467,7 @@ RecordQuery & IssueFilters
 
 ## IssueEditorPage.defineProps
 
-**Fuente:** [src/modules/issues/pages/IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue) · línea 16, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/pages/IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue) · línea 15, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -480,7 +481,7 @@ RecordQuery & IssueFilters
 
 ## IssueEditorPage.defineEmits
 
-**Fuente:** [src/modules/issues/pages/IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue) · línea 17, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/pages/IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue) · línea 16, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -496,7 +497,7 @@ RecordQuery & IssueFilters
 
 ## IssueLineEntryPage.defineProps
 
-**Fuente:** [src/modules/issues/pages/IssueLineEntryPage.vue](../../../../../src/modules/issues/pages/IssueLineEntryPage.vue) · línea 7, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/pages/IssueLineEntryPage.vue](../../../../../src/modules/issues/pages/IssueLineEntryPage.vue) · línea 8, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -510,7 +511,7 @@ RecordQuery & IssueFilters
 
 ## IssueLineEntryPage.defineEmits
 
-**Fuente:** [src/modules/issues/pages/IssueLineEntryPage.vue](../../../../../src/modules/issues/pages/IssueLineEntryPage.vue) · línea 8, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/pages/IssueLineEntryPage.vue](../../../../../src/modules/issues/pages/IssueLineEntryPage.vue) · línea 9, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

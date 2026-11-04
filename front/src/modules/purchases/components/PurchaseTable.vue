@@ -69,17 +69,17 @@ const displayDate = (value: string) =>
         </template>
         <template #[`item.actions`]="{ item }">
             <TableAction
-                label="Ver compra"
-                :icon="`svg:${mdiEyeOutline}`"
-                :is-disabled="isReading"
-                @click="emit('open', item, 'view')"
-            />
-            <TableAction
                 v-if="canEditPurchase(item)"
                 label="Editar compra"
                 icon="$edit"
                 :is-disabled="isReading"
                 @click="emit('open', item, 'edit')"
+            />
+            <TableAction
+                label="Ver compra"
+                :icon="`svg:${mdiEyeOutline}`"
+                :is-disabled="isReading"
+                @click="emit('open', item, 'view')"
             />
         </template>
     </ServerTable>

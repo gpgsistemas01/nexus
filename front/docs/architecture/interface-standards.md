@@ -17,6 +17,30 @@ explica la solución y sus dependencias.
 | Envío | Validar el conjunto y presentar el mensaje junto al campo correspondiente. |
 | Pendiente o rechazo | Indicar el estado y conservar la captura recuperable; confirmar sólo después de la respuesta contractual. |
 | Alta desde un selector | Conservar el formulario principal y seleccionar el registro confirmado al cerrar el auxiliar. |
+| Compras y Salidas | Las altas auxiliares se ofrecen dentro de los selectores. El cuerpo del formulario utiliza **Agregar** para preparar detalles; el pie conserva **Regresar** y el envío. Las acciones de cada detalle permanecen en su tabla. |
+
+En Compras, el orden de captura es comprobante y factura, proveedor y receptor,
+fecha de recepción, observaciones y detalles. En Salidas: cliente y asesor, área y
+solicitante, proyecto y fecha, observaciones y detalles. Los encabezados usan
+medias filas en escritorio y filas completas en móvil; observaciones y selector de
+artículo ocupan todo el ancho. Debajo del artículo aparecen cantidad, costo por
+presentación cuando corresponde, presentación de consulta y **Agregar**.
+
+Los límites de factura (50), proyecto (10) y observaciones (500) proceden de
+`FORM_FIELD_LIMITS`; los controles aplican `maxlength` sin sustituir la validación.
+En la columna **Acciones**, Compras muestra **Editar compra** y **Ver compra**;
+Salidas muestra **Editar salida**, **Surtir detalle** o **Devolver material surtido**,
+y **Consultar salida**, según permisos y estado. Los detalles de compra conservan
+**Corregir detalle** antes de **Cancelar detalle**.
+
+Las tablas de detalles agrupan **Base/Altura** en **Medidas** y **Cantidad/Unidad**
+en **Conversión**. En Salidas, **Cantidad surtida** aparece al surtir o devolver;
+**Cantidad devuelta**, sólo al devolver. Costos, proyecto, diferencia y casilla de
+surtido corresponden al modo **Surtir**. Las columnas de acciones se omiten en
+consulta sin operaciones disponibles. El estado cancelado de un detalle de compra
+se indica junto al artículo. El listado de Salidas muestra **Área** para Almacén y
+Sistemas, a partir de `organization` en la sesión; ocultarla no cambia los índices
+de ordenación que recibe la API.
 
 VeeValidate se integra en el composable del editor; los componentes visuales reciben
 valores y errores mediante contratos tipados. Los [modos de operación](../requirements/requirements-specification/06-operation-modes-and-effects.md)

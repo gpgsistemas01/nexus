@@ -3,6 +3,7 @@ import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VAlert } from 'vuetify/components/VAlert';
+import { FORM_FIELD_LIMITS } from '@nexus/input-validation';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import IssueDetailsTable from './IssueDetailsTable.vue';
@@ -90,10 +91,6 @@ const emit = defineEmits<{
                     @more="emit('more', select.kind)"
                     @retry="emit('retry', select.kind)"
                 />
-                <slot
-                    v-if="select.field === 'clientId'"
-                    name="client-action"
-                />
             </VCol>
             <VCol
                 cols="12"
@@ -101,6 +98,7 @@ const emit = defineEmits<{
             >
                 <VTextField
                     label="Número de proyecto"
+                    :maxlength="FORM_FIELD_LIMITS.PROJECT_NUMBER"
                     :model-value="values.projectNumber"
                     :error-messages="errors.projectNumber"
                     :disabled="!canEditHeader || isSubmitting"
@@ -127,7 +125,9 @@ const emit = defineEmits<{
             <VCol cols="12">
                 <VTextarea
                     label="Observaciones"
-                    rows="2"
+                    rows="4"
+                    auto-grow
+                    :maxlength="FORM_FIELD_LIMITS.OBSERVATIONS"
                     :model-value="values.observations"
                     :error-messages="errors.observations"
                     :disabled="!canEditHeader || isSubmitting"

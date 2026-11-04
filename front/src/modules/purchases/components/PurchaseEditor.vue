@@ -4,8 +4,8 @@ import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
 import { VRadioGroup } from 'vuetify/components/VRadioGroup';
 import { VRadio } from 'vuetify/components/VRadio';
-import { VBtn } from 'vuetify/components/VBtn';
 import { VAlert } from 'vuetify/components/VAlert';
+import { FORM_FIELD_LIMITS } from '@nexus/input-validation';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import PurchaseTotals from './PurchaseTotals.vue';
@@ -73,6 +73,46 @@ const emit = defineEmits<{
                     cols="12"
                     md="6"
                 >
+                    <VRadioGroup
+                        :model-value="values.isInvoiced"
+                        inline
+                        hide-details
+                        label="Tipo de comprobante"
+                        :disabled="isSubmitting || isReadOnly"
+                        @update:model-value="emit('update', 'isInvoiced', $event === true)"
+                    >
+                        <VRadio
+                            label="Factura"
+                            :value="true"
+                        />
+                        <VRadio
+                            label="Remisión"
+                            :value="false"
+                        />
+                    </VRadioGroup>
+                </VCol>
+                <VCol
+                    v-if="values.isInvoiced"
+                    cols="12"
+                    md="6"
+                >
+                    <VTextField
+                        label="Número de Factura"
+                        :model-value="values.invoice"
+                        :maxlength="FORM_FIELD_LIMITS.INVOICE"
+                        :readonly="isReadOnly"
+                        :disabled="isSubmitting"
+                        :error-messages="errors.invoice"
+                        @update:model-value="emit('update', 'invoice', $event ?? '')"
+                        @blur="emit('blur', 'invoice')"
+                    />
+                </VCol>
+            </VRow>
+            <VRow>
+                <VCol
+                    cols="12"
+                    md="6"
+                >
                     <VTextField
                         v-if="isEditing || isReadOnly"
                         label="Proveedor"
@@ -135,45 +175,15 @@ const emit = defineEmits<{
                         @blur="emit('blur', 'receptionDate')"
                     />
                 </VCol>
-                <VCol
-                    cols="12"
-                    md="6"
-                >
-                    <VRadioGroup
-                        :model-value="values.isInvoiced"
-                        inline
-                        label="Documento de compra"
-                        :disabled="isSubmitting || isReadOnly"
-                        @update:model-value="emit('update', 'isInvoiced', $event === true)"
-                    >
-                        <VRadio
-                            label="Factura"
-                            :value="true"
-                        />
-                        <VRadio
-                            label="Remisión"
-                            :value="false"
-                        />
-                    </VRadioGroup>
-                    <VTextField
-                        v-if="values.isInvoiced"
-                        label="Número de Factura"
-                        :model-value="values.invoice"
-                        :readonly="isReadOnly"
-                        :disabled="isSubmitting"
-                        :error-messages="errors.invoice"
-                        @update:model-value="emit('update', 'invoice', $event ?? '')"
-                        @blur="emit('blur', 'invoice')"
-                    />
-                </VCol>
                 <VCol cols="12">
                     <VTextarea
                         label="Observaciones"
                         :model-value="values.observations"
+                        :maxlength="FORM_FIELD_LIMITS.OBSERVATIONS"
                         :readonly="isReadOnly"
                         :disabled="isSubmitting"
                         :error-messages="errors.observations"
-                        rows="2"
+                        rows="4"
                         auto-grow
                         @update:model-value="emit('update', 'observations', $event ?? '')"
                         @blur="emit('blur', 'observations')"
@@ -211,14 +221,6 @@ const emit = defineEmits<{
             </VAlert>
         </section>
         <PurchaseTotals :totals="totals" />
-        <VBtn
-            v-if="isEditing || isReadOnly"
-            variant="text"
-            :disabled="isSubmitting"
-            @click="emit('reload')"
-        >
-            Volver a cargar compra
-        </VBtn>
     </RecordEditorDialog>
 </template>
 

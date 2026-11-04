@@ -15,12 +15,13 @@ recibe y fechas cuando los necesite. Pulse **Buscar** para utilizar esos filtros
 Guardar la compra incrementa existencias; compruebe que la recepción no esté registrada.
 
 1. Pulse **Nueva compra** para abrir **Registrar compra**.
-2. Seleccione **Proveedor** y **Persona que recibe**.
-3. Revise **Fecha y hora de recepción:**.
-4. Seleccione **Factura** o **Remisión**. Capture **Número de Factura** cuando
-   la compra sea facturada y complete **Observaciones** si corresponde.
+2. Seleccione **Factura** o **Remisión**. Capture **Número de Factura** cuando
+   la compra sea facturada.
+3. Seleccione **Proveedor** y **Persona que recibe**.
+4. Revise **Fecha y hora de recepción:** y complete **Observaciones** si corresponde.
 5. Seleccione el **Material** o **Consumible** del proveedor elegido.
-6. Capture **Cantidad** y **Costo por Presentación**; pulse **Agregar**.
+6. Capture **Cantidad** y **Costo por Presentación**, compruebe **Presentación**
+   y pulse **Agregar**.
 7. Revise el detalle, sus conversiones y los **Totales de compra**. Repita para
    los demás detalles. Para retirar un detalle todavía no guardado, utilice
    **Quitar detalle nuevo**.
