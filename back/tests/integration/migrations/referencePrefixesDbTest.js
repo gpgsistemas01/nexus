@@ -152,6 +152,155 @@ describe('migración incremental de cinco series cortas', () => {
     });
 });
 
+const counterRepair = migrationSql('20261104120000_repair_independent_goods_reference_counters');
+
+describe('reconciliación de contadores con el último folio de cada documento', () => {
+    it('corrige la herencia SAL/REC y deja en cero las series sin documentos, sin renumerar historia', async () => {
+        await withTables(async connection => {
+            await insertIssue(connection, 'GoodsIssue', 'SAL-2026-000015');
+            await insertReceipt(connection, 'REC-2026-000027');
+            await insertIssue(connection, 'WasteIssue', 'SME-2026-000070');
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('SAL', 2026, 15), ('REC', 2026, 27), ('SME', 2026, 70)`);
+            await connection.query(migrationSql('20261012120000_split_goods_issue_reference_prefixes'));
+            await connection.query(migration);
+            expect(await counter(connection, 'SCO')).toBe(15);
+            expect(await counter(connection, 'CCO')).toBe(27);
+            const before = await snapshot(connection);
+
+            await connection.query(counterRepair);
+
+            for (const table of ['GoodsIssue', 'GoodsReceipt', 'WasteIssue']) {
+                expect((await snapshot(connection))[table]).toEqual(before[table]);
+            }
+            for (const [prefix, expected] of [['SMA', 15], ['SCO', 0], ['CMA', 27], ['CCO', 0]]) {
+                expect(await counter(connection, prefix)).toBe(expected);
+            }
+            const after = await snapshot(connection);
+            for (const row of before.ReferenceNumberCounter) {
+                if (['SAL', 'REC', 'SAL-MAT', 'SAL-CON'].includes(row.prefix)) {
+                    expect(after.ReferenceNumberCounter.find(item => item.id === row.id)).toBeUndefined();
+                    continue;
+                }
+                expect(after.ReferenceNumberCounter.find(item => item.id === row.id)).toEqual({
+                    ...row,
+                    counter: ({ SCO: 0, CCO: 0 })[row.prefix] ?? row.counter
+                });
+            }
+            await connection.query(counterRepair);
+            expect(await snapshot(connection)).toEqual(after);
+        });
+    });
+
+    it('usa el máximo numérico propio, no la cantidad de documentos, su fecha de edición ni otro contador', async () => {
+        await withTables(async connection => {
+            await insertIssue(connection, 'GoodsIssue', 'SMA-2026-000099');
+            const last = await insertIssue(connection, 'GoodsIssue', 'SCO-2026-000011', 'CONSUMABLE');
+            const edited = await insertIssue(connection, 'GoodsIssue', 'SCO-2026-000002', 'CONSUMABLE');
+            await connection.query('UPDATE "GoodsIssue" SET "updatedAt" = $1 WHERE "id" = $2', ['2026-11-04', edited]);
+            await insertReceipt(connection, 'CMA-2026-000080');
+            await insertReceipt(connection, 'CCO-2026-000009', 'CONSUMABLE');
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('SMA', 2026, 500), ('SCO', 2026, 500), ('CMA', 2026, 700), ('CCO', 2026, 700),
+                ('SAL', 2026, 800), ('SAL-CON', 2026, 600), ('REC', 2026, 900)`);
+            const before = await snapshot(connection);
+
+            await connection.query(counterRepair);
+
+            for (const [prefix, expected] of [['SMA', 99], ['SCO', 11], ['CMA', 80], ['CCO', 9]]) {
+                expect(await counter(connection, prefix)).toBe(expected);
+            }
+            expect((await snapshot(connection)).GoodsIssue).toEqual(before.GoodsIssue);
+            expect((await snapshot(connection)).GoodsReceipt).toEqual(before.GoodsReceipt);
+            expect(before.GoodsIssue.find(row => row.id === last).referenceNumber).toBe('SCO-2026-000011');
+            expect(await counter(connection, 'SAL')).toBeUndefined();
+            expect(await counter(connection, 'SAL-CON')).toBeUndefined();
+            expect(await counter(connection, 'REC')).toBeUndefined();
+        });
+    });
+
+    it('nunca baja de un folio ya emitido y protege sus referencias aunque cambie la clasificación', async () => {
+        await withTables(async connection => {
+            await insertIssue(connection, 'GoodsIssue', 'SCO-2026-1000001', 'MATERIAL');
+            await insertReceipt(connection, 'CCO-2026-1000002', 'MATERIAL');
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('SCO', 2026, 20), ('CCO', 2026, 30)`);
+            const before = await snapshot(connection);
+            await connection.query(counterRepair);
+            expect(await counter(connection, 'SCO')).toBe(1000001);
+            expect(await counter(connection, 'CCO')).toBe(1000002);
+            expect((await snapshot(connection)).GoodsIssue).toEqual(before.GoodsIssue);
+            expect((await snapshot(connection)).GoodsReceipt).toEqual(before.GoodsReceipt);
+        });
+    });
+
+    it('crea sólo contadores necesarios y conserva año cero, proveedores, merma, ajustes y referencias externas', async () => {
+        await withTables(async connection => {
+            await insertIssue(connection, 'GoodsIssue', 'SMA-2025-000005');
+            await insertReceipt(connection, 'CCO-2026-000003', 'CONSUMABLE');
+            await insertReceipt(connection, 'COMPRA-EXTERNA');
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('SMA', 0, 999), ('SMA', 2026, 90), ('CCO', 2025, 80),
+                ('SME', 2026, 5000), ('AME', 2026, 6000), ('EME', 2026, 7000), ('AJU', 2026, 8000), ('PRO', 0, 40)`);
+            const before = await snapshot(connection);
+            await connection.query(counterRepair);
+            expect(await counter(connection, 'SMA', 2025)).toBe(5);
+            expect(await counter(connection, 'SMA', 2026)).toBe(0);
+            expect(await counter(connection, 'CCO', 2025)).toBe(0);
+            expect(await counter(connection, 'CCO', 2026)).toBe(3);
+            expect(await counter(connection, 'SCO')).toBeUndefined();
+            expect(await counter(connection, 'CMA')).toBeUndefined();
+            const after = await snapshot(connection);
+            for (const row of before.ReferenceNumberCounter.filter(row => row.year === 0 || ['SME', 'AME', 'EME', 'AJU'].includes(row.prefix))) {
+                expect(after.ReferenceNumberCounter.find(item => item.id === row.id)).toEqual(row);
+            }
+            expect(after.GoodsIssue).toEqual(before.GoodsIssue);
+            expect(after.GoodsReceipt).toEqual(before.GoodsReceipt);
+        });
+    });
+
+    it('retira todos los prefijos no registrados aunque tengan tres letras y conserva las nueve series vigentes', async () => {
+        await withTables(async connection => {
+            const active = ['SMA', 'SCO', 'SME', 'CMA', 'CCO', 'AJU', 'AME', 'EME', 'PRO'];
+            const retired = ['SAL', 'REC', 'SAL-MAT', 'SAL-CON', 'SM', 'SAL-MER', 'AJU-MER', 'ENT-MER', 'REQ', 'OLD'];
+            for (const prefix of [...active, ...retired]) {
+                await connection.query('INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES ($1, $2, 50)',
+                    [prefix, prefix === 'PRO' ? 0 : 2026]);
+            }
+            const before = await snapshot(connection);
+            await connection.query(counterRepair);
+            const after = await snapshot(connection);
+            expect(after.ReferenceNumberCounter.map(row => row.prefix).sort()).toEqual([...active].sort());
+            for (const row of before.ReferenceNumberCounter.filter(row => active.includes(row.prefix))) {
+                expect(after.ReferenceNumberCounter.find(item => item.prefix === row.prefix).id).toBe(row.id);
+            }
+            expect(after.GoodsIssue).toEqual(before.GoodsIssue);
+            expect(after.GoodsReceipt).toEqual(before.GoodsReceipt);
+        });
+    });
+
+    it('revierte todos los contadores si falla una escritura de la reconciliación', async () => {
+        await withTables(async connection => {
+            await insertIssue(connection, 'GoodsIssue', 'SMA-2026-000005');
+            await connection.query(`INSERT INTO "ReferenceNumberCounter" ("prefix", "year", "counter") VALUES
+                ('SMA', 2026, 80), ('SCO', 2026, 80)`);
+            await connection.query('ALTER TABLE "ReferenceNumberCounter" ADD CONSTRAINT positive_counter_for_test CHECK ("counter" > 0)');
+            const before = await snapshot(connection);
+            await expect(connection.query(counterRepair)).rejects.toMatchObject({ code: '23514' });
+            await connection.query('ROLLBACK');
+            expect(await snapshot(connection)).toEqual(before);
+        });
+    });
+
+    it('no crea contadores en una instalación vacía', async () => {
+        await withTables(async connection => {
+            const before = await snapshot(connection);
+            await connection.query(counterRepair);
+            expect(await snapshot(connection)).toEqual(before);
+        });
+    });
+});
+
 const wasteMigration = migrationSql('20261016120000_normalize_waste_stock_reference_prefixes');
 const wasteTables = ['WasteStockAdjustment', 'WasteStockEntry', 'WasteMovement',
     'WasteStockAdjustmentDetail', 'WasteMovementDetail', 'ReferenceNumberCounter'];

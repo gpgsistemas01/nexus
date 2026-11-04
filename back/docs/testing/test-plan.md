@@ -162,7 +162,12 @@ módulo; los contextos añaden evidencia sólo cuando tienen decisiones o contra
 
 Las pruebas de `tests/integration/migrations` verifican restricciones, conservación
 histórica y rollback en PostgreSQL; no se confunden con preparar el esquema de las
-integraciones HTTP. Las unitarias de herramientas y del adaptador transaccional protegen
+integraciones HTTP. La cadena completa se comprueba desde una base desechable vacía
+y con sus filas retiradas antes de cada paso. Las correcciones de registros se prueban
+además con ausencia parcial, identidades modificadas y datos ya transformados.
+Repetir `prisma migrate deploy` debe reconocer el historial aplicado; no se exige
+que cada cambio estructural pueda ejecutarse dos veces como SQL suelto.
+Las unitarias de herramientas y del adaptador transaccional protegen
 sus contratos de soporte; `npm run docs:check` valida documentación. No constituyen
 niveles funcionales nuevos. El backend no tiene una suite propia de navegador.
 Vue conserva sus recorridos Playwright en `front/tests/e2e`, con diseño, fichas y

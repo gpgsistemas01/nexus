@@ -516,6 +516,8 @@ model Client {
 }
 
 /// Contadores anuales independientes por prefijo: SMA, SCO, SME, CMA y CCO, entre otros.
+/// SMA/SCO y CMA/CCO no heredan el piso del contador general retirado SAL/REC.
+/// Los prefijos vigentes tienen tres letras; PRO reserva el año cero para proveedores.
 model ReferenceNumberCounter {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   prefix  String @db.VarChar(10)

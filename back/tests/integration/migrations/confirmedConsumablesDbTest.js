@@ -117,12 +117,14 @@ describe('reclasificación incremental del tornillo y la ventosa', () => {
     });
   });
 
-  it('admite catálogo vacío y omite identidades modificadas u otros IDs', async () => {
+  it.each([
+    { label: 'nombre modificado', record: additional[0], overrides: { name: 'TORNILLO DIFERENTE' } },
+    { label: 'SKU modificado', record: additional[1], overrides: { sku: 'OTRO-SKU' } },
+    { label: 'otro ID', record: [randomUUID(), 'VENTOSA MEDIANA', 'VEN-OTRA'], overrides: {} }
+  ])('admite catálogo vacío y omite $label', async ({ record, overrides }) => {
     await withTable(async connection => {
       expect((await connection.query(additionalMigration)).rowCount).toBe(0);
-      await insertMaterial(connection, additional[0], { name: 'TORNILLO DIFERENTE' });
-      await insertMaterial(connection, additional[1], { sku: 'OTRO-SKU' });
-      await insertMaterial(connection, [randomUUID(), 'VENTOSA MEDIANA', 'VEN-OTRA']);
+      await insertMaterial(connection, record, overrides);
       const before = await snapshot(connection);
       expect((await connection.query(additionalMigration)).rowCount).toBe(0);
       expect(await snapshot(connection)).toEqual(before);

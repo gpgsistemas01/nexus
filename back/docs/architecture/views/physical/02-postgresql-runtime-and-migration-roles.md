@@ -293,6 +293,26 @@ red, rotar el secreto y evitar exponer `DIRECT_URL` fuera del proceso de desplie
 
 ## Migración de folios de salidas por contexto
 
+### Datos ausentes y repetición
+
+La cadena debe ejecutarse en orden mediante `npm run db:migrate`. Prisma registra
+cada migración aplicada y omite su ejecución en despliegues posteriores; ejecutar
+manualmente todos los SQL por segunda vez no es equivalente a repetir el comando.
+
+Las correcciones de filas usan condiciones sobre los registros existentes. Un ID,
+folio o contador ausente no exige crear datos de negocio para completar la migración.
+La conciliación actual crea sólo los contadores que necesitan los documentos emitidos;
+una limpieza ya realizada no produce otra eliminación. Una colisión o un valor que
+perdería precisión sí detiene el cambio, para conservar los datos antes de corregirlo.
+
+La comprobación de la cadena parte de una base de prueba nueva; las pruebas de
+`tests/integration/migrations` añaden ausencia parcial, repetición y rollback.
+Las tablas y columnas que requiere cada paso pertenecen a su versión del esquema.
+Si falta una estructura por cambios externos, se revisa la reparación correspondiente
+antes de continuar.
+
+### Prefijos vigentes y reconciliación
+
 La migración incremental
 `20261012180000_shorten_issue_and_purchase_reference_prefixes` establece cinco
 series cortas. Usa las columnas `type` ya incorporadas a compras y salidas; no
@@ -325,12 +345,18 @@ bloquea `ReferenceNumberCounter`, `GoodsIssue`, `GoodsReceipt` y `WasteIssue`.
 Una colisión con cualquier folio destino aborta todo: se revisan los documentos
 conflictivos antes de reintentar, sin borrar ni renumerar automáticamente.
 
-Los contadores vigentes conservan el mayor valor entre documentos emitidos,
-contadores propios existentes y contadores anteriores de su serie. El contador
-compartido `REC` alimenta inicialmente `CMA` y `CCO`; `SAL` alimenta `SMA` y `SCO`.
-`SAL-MAT` y `SAL-CON` alimentan sólo su contexto; `SM` y `SAL-MER`, sólo `SME`.
-Los contadores retirados se conservan como historia. Las cinco series avanzan
-independientemente desde ese máximo y un año nuevo empieza en uno.
+La migración histórica copiaba `REC` a `CMA`/`CCO` y `SAL` a `SMA`/`SCO`.
+La corrección `20261104120000_repair_independent_goods_reference_counters`
+reconcilia esas cuatro filas con el último consecutivo numérico emitido por su
+propio prefijo y año. No usa conteos de filas ni la fecha de edición. Una serie
+sin documentos queda en cero; la siguiente alta genera `000001`. Si ya tiene un
+folio alto emitido, lo conserva y continúa desde él.
+
+En la misma transacción se eliminan los contadores no registrados. Permanecen
+`SMA`, `SCO`, `SME`, `CMA`, `CCO`, `AJU`, `AME`, `EME` y `PRO`; este último usa año
+cero para códigos de proveedor. Los documentos, UUID, detalles y saldos permanecen
+intactos. El bloqueo empieza por el contador y continúa por los documentos, igual
+que en las altas, para impedir asignaciones durante la conciliación.
 
 Antes del despliegue:
 
@@ -341,13 +367,26 @@ Antes del despliegue:
    durante la conversión para impedir que vuelvan a emitir prefijos retirados.
 3. Aplicar con la cuenta de migraciones y `DIRECT_URL` mediante `npm run db:migrate`;
    comprobar `npx prisma migrate status` antes de iniciar la nueva versión.
-4. Comprobar los cinco prefijos y la continuidad de contadores en consultas y
+4. Comprobar los prefijos vigentes y la continuidad de contadores en consultas y
    reportes. Un folio impreso o exportado antes del cambio conserva su texto
    anterior; localice el documento por su año, sufijo y datos operativos.
 
 Las pruebas de persistencia usan una base aislada y verifican la cadena histórica,
 conservación de registros, merma separada, máximos de contadores, repetición,
 instalación vacía y colisiones con rollback. Nunca se usa producción para pruebas.
+
+Después de aplicar la cadena, esta consulta sólo debe devolver los nueve prefijos
+registrados y sus filas por año:
+
+```sql
+SELECT "prefix", "year", "counter"
+FROM "ReferenceNumberCounter"
+ORDER BY "prefix", "year";
+```
+
+La migración correctiva ajusta las filas existentes; no sustituye sus UUID ni
+recalcula los contadores en cada petición. Los prefijos y sus documentos propietarios
+se enumeran en el [modelo persistente](../logical/data-and-persistence/index.md#folios-de-documentos-por-contexto).
 
 ## Migración de peso unitario de merma
 

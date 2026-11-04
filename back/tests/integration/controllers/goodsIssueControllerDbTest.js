@@ -347,6 +347,9 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
     it.each(['material', 'consumable'])('permite editar, surtir y devolver dentro de %s', async inventoryResource => {
         const created = await createIssue(inventoryResource).expect(200);
         const issue = created.body.goodsIssue;
+        const beforeCounters = await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['SMA', 'SCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        });
         const edited = await request(app).patch(`${issuePath(inventoryResource)}/${issue.id}`)
             .send({ ...header(), observations: 'Editada en su contexto', details: [detail(inventoryResource)] }).expect(200);
         const detailId = edited.body.goodsIssue.details[0].id;
@@ -363,6 +366,10 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(Number(persisted.suppliedQuantity)).toBe(2);
         expect(Number(persisted.returnedQuantity)).toBe(1);
         expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: issue.id } })).toBe(2);
+        expect((await prisma.goodsIssue.findUnique({ where: { id: issue.id } })).referenceNumber).toBe(issue.referenceNumber);
+        expect(await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['SMA', 'SCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        })).toEqual(beforeCounters);
     });
     it('genera consecutivos independientes por tipo incluso con altas concurrentes', async () => {
         const before = { material: await getIssueCounter('SMA'), consumable: await getIssueCounter('SCO') };

@@ -106,16 +106,23 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
 
     it.each(['material', 'consumable'])('permite editar una compra homogénea de %s', async resource => {
         const receipt = receipts[resource];
+        const beforeCounters = await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['CMA', 'CCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        });
         await request(app).patch(`${path(resource)}/${receipt.id}`).send({
             supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-07T00:00:00.000Z', observations: 'Contexto correcto', details: []
         }).expect(200);
         expect((await prisma.goodsReceipt.findUnique({ where: { id: receipt.id } })).observations).toBe('Contexto correcto');
         const detail = await request(app).get(`${path(resource)}/${receipt.id}`).expect(200);
         expect(detail.body.goodsReceipt.observations).toBe('Contexto correcto');
+        expect(detail.body.goodsReceipt.referenceNumber).toBe(receipt.referenceNumber);
         const list = await request(app).get(path(resource)).query({ supplierId: ids.supplier }).expect(200);
         const row = list.body.data.find(item => item.id === receipt.id);
         expect(row.observations).toBe('Contexto correcto');
         expect(row).not.toHaveProperty('details');
+        expect(await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['CMA', 'CCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        })).toEqual(beforeCounters);
     });
 
     it.each(['mixed', 'empty', 'consumable'])('rechaza editar %s desde materiales y conserva la cabecera', async key => {
