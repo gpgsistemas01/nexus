@@ -77,6 +77,9 @@ en [Usuarios](../user-manual/08-users.md).
 
 Para `dev`, preparar también registros de capacitación: una edición requiere un
 registro existente y una devolución de Almacén requiere una salida surtida.
+Las tres imágenes del alta de Mermas requieren un proveedor activo con un material
+de referencia ROLLO y medidas válidas. El recorrido busca esa combinación en los
+catálogos paginados y la conserva para las tres imágenes de la cuenta.
 Los recorridos no registran operaciones para preparar las imágenes.
 
 ## 4. Crear las dos copias locales
@@ -191,6 +194,10 @@ de abrir el navegador, informa los identificadores omitidos sin mostrar valores
 y autentica las cuentas completas por separado. `--all` selecciona la lista del
 JSON, no todos los usuarios de la base ni todas las variables del `.env`.
 
+Las cuentas se procesan una por una, en el orden del JSON. Sus capturas siguen
+el orden de archivo: `09`, `09a`, `09b`, `10`. La consola muestra cuenta, número,
+archivo y resultado; un fallo queda pendiente con su motivo en el manifest.
+
 Si no hay cuentas con credenciales completas, termina sin abrir el navegador ni
 exportar documentos. Las cuentas omitidas conservan sus archivos anteriores;
 esta ejecución no actualiza sus capturas ni sus manuales.
@@ -211,10 +218,10 @@ invocar Pandoc/LibreOffice.
 
 | Ruta bajo `front/` | Contenido |
 | --- | --- |
-| `build/manuals/<cuenta>/sources/index.md` | Portada, alcance e índice de la cuenta. |
-| `build/manuals/<cuenta>/sources/*.md` | Capítulos filtrados y glosario. Corregir sus originales en `docs/user-manual`; se regeneran. |
-| `build/manuals/<cuenta>/images/*.png` | Capturas propias; en `dev`, muestran los datos visibles para esa cuenta. |
-| `build/manuals/<cuenta>/manifest.json` | Estado `pending`/`ready`, permisos, fuentes y huellas de vigencia y reanudación. No editar a mano; no contiene contraseñas. |
+| `docs/user-manual/accounts/<cuenta>/sources/index.md` | Portada, alcance e índice de la cuenta. |
+| `docs/user-manual/accounts/<cuenta>/sources/*.md` | Capítulos filtrados y glosario. Corregir sus originales en `docs/user-manual`; se regeneran. |
+| `docs/user-manual/accounts/<cuenta>/images/*.png` | Capturas propias; en `dev`, muestran los datos visibles para esa cuenta. |
+| `docs/user-manual/accounts/<cuenta>/manifest.json` | Estado `pending`/`ready`, permisos, fuentes y huellas de vigencia y reanudación. No editar a mano; no contiene contraseñas. |
 | `build/docs/docx/manuales-vue/<cuenta>/manual-<cuenta>.docx` | Word, después de completar las capturas requeridas. |
 | `build/docs/pdf/manuales-vue/<cuenta>/manual-<cuenta>.pdf` | PDF, si se solicitó y terminó la conversión. |
 | `build/test-results/manual-profiles.xml` | Reporte del recorrido para diagnosticar fallos; no es el manual. |
@@ -223,10 +230,15 @@ invocar Pandoc/LibreOffice.
 imágenes aunque otro tenga el mismo rol y área:
 
 ```text
-front/build/manuals/
+front/docs/user-manual/accounts/
 ├── cuenta-01/images/
 └── cuenta-02/images/
 ```
+
+Estas ediciones locales están ignoradas por Git, excluidas del contenedor y
+separadas del manual general. Al procesar una cuenta, su edición anterior en
+`build/manuals` se traslada aquí si todavía no existe la nueva carpeta; no se
+sobrescribe una edición nueva.
 
 Cookies y tokens permanecen en memoria; no se necesita un archivo de sesión ni
 copiar cookies del navegador.
@@ -240,6 +252,8 @@ npm run docs:manuals -- --profile cuenta-01 --missing --format ambos
 `--missing` conserva capturas cuando coinciden cuenta, acceso, modo, fuentes,
 código del recorrido y huella del PNG; completa las pendientes o desactualizadas.
 Sin esa opción, se recaptura el perfil completo.
+Si cambió el código o el contenido desde la ejecución anterior, el comando lo
+indica y vuelve a capturar las imágenes desactualizadas.
 
 | Situación | Recuperación |
 | --- | --- |

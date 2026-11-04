@@ -11,7 +11,7 @@ completitud de los artefactos. Es una prueba de la herramienta documental.
 
 | ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
 | --- | --- | --- | --- | --- | --- |
-| `CP-VUE-MAN-001-01` | Dependencias frontend y Chromium; puerto 5177 libre. Fuentes curadas del manual, políticas de autorización vigentes y fixtures de navegador. No necesita base de datos ni credenciales reales para el modo demo. | Administrador en Sistemas; Auxiliar y Coordinador en Almacén; Coordinador y Operador en Impresión, Taller/Herrería, Acabados, Router y PT; Coordinador e Instalador en Instalaciones. Ejemplos existentes de inventario, compra, persona y salida Pendiente/Surtido. Variables de credenciales ficticias sólo en la prueba unitaria. | 1. Ejecutar las particiones de `manualProfilesTest.ts`. 2. Ejecutar `npm run docs:manuals -- --mode demo --all --capture-only`. 3. Revisar fuentes, imágenes y manifest de los perfiles. 4. Comprobar el caso de salida Surtida para Operador e Instalador. 5. Exportar representantes de Administrador, Almacén y área operativa. 6. Para comprobar recuperación, reanudar con `--missing` sin modificar las huellas y contrastar los PNG conservados. | Cada perfil tiene portada, índice, capítulos y capturas propios. Operativos muestran sólo los grupos Almacén/Salidas; no reciben procedimientos de ajustes, surtido o devolución, costos ni reportes. Almacén conserva surtido/devolución y administración conserva sus funciones adicionales. No se intentan escrituras de negocio. Directivas inválidas, rutas ajenas, cuentas inconsistentes o capturas pendientes impiden publicar. Una cuenta sin `expectedAccess` selecciona contenido desde los permisos de la sesión; una etiqueta de Administrador no eleva el acceso de Instalador. Los secretos no forman parte de las fuentes o del manifest. | Cerrar los contextos y el Vite temporal. Las unitarias eliminan sus directorios temporales. Los artefactos de `build/manuals`, `build/docs` y reportes permanecen ignorados para revisión; no modificar registros para limpiarlos. |
+| `CP-VUE-MAN-001-01` | Dependencias frontend y Chromium; puerto 5177 libre. Fuentes curadas del manual, políticas de autorización vigentes y fixtures de navegador. No necesita base de datos ni credenciales reales para el modo demo. | Administrador en Sistemas; Auxiliar y Coordinador en Almacén; Coordinador y Operador en Impresión, Taller/Herrería, Acabados, Router y PT; Coordinador e Instalador en Instalaciones. Ejemplos existentes de inventario, compra, persona y salida Pendiente/Surtido. Variables de credenciales ficticias sólo en la prueba unitaria. | 1. Ejecutar las particiones de `manualProfilesTest.ts`. 2. Ejecutar `npm run docs:manuals -- --mode demo --all --capture-only`. 3. Revisar fuentes, imágenes y manifest de los perfiles. 4. Comprobar el caso de salida Surtida para Operador e Instalador. 5. Exportar representantes de Administrador, Almacén y área operativa. 6. Para comprobar recuperación, reanudar con `--missing` sin modificar las huellas y contrastar los PNG conservados. | Cada perfil tiene portada, índice, capítulos y capturas propios. Operativos muestran sólo los grupos Almacén/Salidas; no reciben procedimientos de ajustes, surtido o devolución, costos ni reportes. Almacén conserva surtido/devolución y administración conserva sus funciones adicionales. No se intentan escrituras de negocio. Directivas inválidas, rutas ajenas, cuentas inconsistentes o capturas pendientes impiden publicar. Una cuenta sin `expectedAccess` selecciona contenido desde los permisos de la sesión; una etiqueta de Administrador no eleva el acceso de Instalador. Los secretos no forman parte de las fuentes o del manifest. | Cerrar los contextos y el Vite temporal. Las unitarias eliminan sus directorios temporales. Los artefactos de `docs/user-manual/accounts`, `build/docs` y las pruebas permanecen ignorados para revisión; no modificar registros para limpiarlos. |
 
 ## Fuente ejecutable y alcance
 
@@ -60,6 +60,18 @@ del entorno de capacitación, siguiendo el [procedimiento](../../governance/07-m
 La autorización efectiva de las áreas se comprueba por separado en las pruebas
 backend `permissionsTest.js` y `operationalAccessDbTest.js`. La revisión de Word/PDF
 comprueba la presentación; una prueba de navegador aprobada no sustituye esa revisión.
+
+La ubicación y el traslado de ediciones anteriores se comprueban en
+[manualPathsTest.ts](../../../tests/unit/tooling/manualPathsTest.ts).
+[manualPreparationTest.ts](../../../tests/unit/tooling/manualPreparationTest.ts)
+cubre proveedores y materiales en páginas posteriores, medidas inválidas y
+consultas fallidas. [manualCapture.spec.ts](../../../tests/e2e/manualCapture.spec.ts)
+comprueba los tres cortes de Mermas con una referencia disponible en otro proveedor,
+sin escrituras. La ausencia de ROLLO y el error HTTP conservan la captura pendiente.
+
+El catálogo general excluye las ediciones locales por cuenta. El hash del recorrido
+también las excluye: generar otra cuenta no invalida por sí solo la reanudación.
+Las imágenes siguen orden numérico, incluidos `09`, `09a`, `09b` y `10`.
 
 ## Ejecución
 

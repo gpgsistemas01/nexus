@@ -519,7 +519,7 @@ if (outputPlan.generatePdf) {
 }
 
 const frontendOnly = publications.every(({ sources }) => sources.every((source) => (
-    source.startsWith('../front/docs/') || source.startsWith('../front/build/manuals/')
+    source.startsWith('../front/docs/')
 )));
 const outputDirectory = path.resolve(ROOT, frontendOnly ? '../front/build/docs' : 'build/docs');
 const documentOutputDirectories = {

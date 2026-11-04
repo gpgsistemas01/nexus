@@ -47,9 +47,12 @@ siguen aplicándose. El índice de cada edición indica su alcance detectado.
 | [profiles.mjs](../../scripts/manual/profiles.mjs) | Perfiles, configuración, credenciales y selección de cuentas completas. La demostración calcula permisos con las políticas existentes. |
 | [model.mjs](../../scripts/manual/model.mjs) | Capítulos, permisos y evaluación de bloques de tareas. |
 | [publication.mjs](../../scripts/manual/publication.mjs) | Índice por usuario, fuentes filtradas, retirada de capítulos e imágenes sin acceso y huellas de publicación. |
+| [paths.mjs](../../scripts/manual/paths.mjs) | Directorio local por cuenta, traslado desde la ubicación anterior y exclusión del catálogo general. |
+| [preparation.mjs](../../scripts/manual/preparation.mjs) | Búsqueda paginada de una referencia ROLLO existente para las capturas de Mermas. |
 | [manuals.mjs](../../scripts/manuals.mjs) | Selección de perfiles, capturas y exportación con el motor común. |
 | [profileManuals.spec.ts](../../tests/manual-profiles/profileManuals.spec.ts) | Sesión aislada, control de escrituras y recuperación de capturas. |
 | [captureRecipes.ts](../../tests/manual-profiles/captureRecipes.ts) | Recorridos visibles sin confirmar operaciones. |
+| [selectPreparation.ts](../../tests/manual-profiles/selectPreparation.ts) | Lecturas de preparación con la sesión del navegador y selección visible de proveedor/material; una referencia por cuenta. |
 
 ## Configuración interna del recorrido
 

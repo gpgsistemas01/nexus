@@ -144,5 +144,5 @@ Ambos leen los mismos archivos locales y detectan áreas, roles y permisos al
 ingresar. Las cuentas sin usuario o sin contraseña se informan como omitidas y
 se continúa con las completas. Cada entrada del JSON identifica una cuenta y su
 carpeta de imágenes en
-`front/build/manuals/<cuenta>/images/`. Usa `--profile <id>` en lugar de `--all`
+`front/docs/user-manual/accounts/<cuenta>/images/`. Usa `--profile <id>` en lugar de `--all`
 para procesar una sola cuenta; `--help` muestra las opciones.

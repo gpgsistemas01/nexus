@@ -1,5 +1,6 @@
 import { readFile, writeFile, access, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { stripVTControlCharacters } from 'node:util';
 import path from 'node:path';
 import { test, expect, type Page, type BrowserContext } from '@playwright/test';
 import {
@@ -10,6 +11,7 @@ import {
   verifyConfiguredAccess,
 } from '../../scripts/manual/profiles.mjs';
 import { prepareManual, accessFingerprint } from '../../scripts/manual/publication.mjs';
+import { prepareManualDirectory, isManualAccountPath } from '../../scripts/manual/paths.mjs';
 import { assertManualDevelopment, parseManualMode } from '../../scripts/manual/environment.mjs';
 import { authenticateManualAccount } from '../../scripts/manual/authentication.mjs';
 import { captureRecipe, captureFamily, type CaptureFamily } from './captureRecipes.js';
@@ -42,6 +44,13 @@ const treeHash = async (folder: string): Promise<string> => {
     a.name.localeCompare(b.name),
   )) {
     const filename = path.join(folder, entry.name);
+    if (
+      isManualAccountPath(
+        path.relative(path.join(frontRoot, 'docs'), filename).split(path.sep).join('/'),
+      )
+    )
+      continue;
+
     result.push(
       entry.name + (entry.isDirectory() ? await treeHash(filename) : await fileHash(filename)),
     );
@@ -124,7 +133,7 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
     }
     const user = mode === 'demo' ? demoSession(account) : await realSession(context);
     if (mode === 'dev') verifyConfiguredAccess(account, user);
-    const root = path.join(frontRoot, 'build/manuals', account.id);
+    const root = await prepareManualDirectory(frontRoot, account.id);
     let previous;
     try {
       previous = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
@@ -156,7 +165,12 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
         JSON.stringify({ ...manifest, revision, status, captures }, null, 2) + '\n',
       );
     await save('pending');
-    for (const filename of manifest.images) {
+    if (process.env.FRONT_MANUAL_MISSING === 'true' && previous && previous.revision !== revision)
+      console.log(
+        `[${account.id}] Cambiaron las fuentes o el recorrido; se actualizarán las capturas.`,
+      );
+    for (const [index, filename] of manifest.images.entries()) {
+      const progress = `[${account.id}] ${index + 1}/${manifest.images.length} ${filename}`;
       const destination = path.join(root, 'images', filename);
       if (
         process.env.FRONT_MANUAL_MISSING === 'true' &&
@@ -167,6 +181,7 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
           await access(destination);
           if ((await fileHash(destination)) === previous.captures[filename].sha256) {
             captures[filename] = previous.captures[filename];
+            console.log(`${progress}: conservada`);
             continue;
           }
         } catch (error) {
@@ -203,14 +218,14 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
         } else await captureRecipe(page, filename, root, user);
         expect(writes).toEqual([]);
         captures[filename] = { status: 'complete', sha256: await fileHash(destination) };
+        console.log(`${progress}: capturada`);
       } catch (cause) {
-        captures[filename] = {
-          status: 'pending',
-          reason:
-            cause instanceof Error
-              ? cause.message.slice(0, 1400)
-              : 'Revisar servicio, permisos, registro existente o selector de esta captura.',
-        };
+        const reason =
+          cause instanceof Error
+            ? stripVTControlCharacters(cause.message).slice(0, 1400)
+            : 'Revisar servicio, permisos, registro existente o selector de esta captura.';
+        captures[filename] = { status: 'pending', reason };
+        console.warn(`${progress}: pendiente. ${reason.split('\n')[0]}`);
       } finally {
         await page.close();
       }
@@ -234,7 +249,7 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
       expect(accessFingerprint(await realSession(context))).toBe(manifest.accessFingerprint);
     if (pending.length)
       throw new Error(
-        `Capturas pendientes para ${account.id}: ${pending.join(', ')}. Revise build/manuals/${account.id}/manifest.json y reanude con --missing.`,
+        `Capturas pendientes para ${account.id}: ${pending.join(', ')}. Revise ${path.relative(frontRoot, path.join(root, 'manifest.json'))} y reanude con --missing.`,
       );
     await save('ready');
   });

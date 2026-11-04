@@ -3,6 +3,7 @@ import { expect, type Page, type Locator } from '@playwright/test';
 import { APP_NAVIGATION_GROUPS } from '../../src/app/navigation.js';
 import type { SessionUser } from '../../src/modules/auth/session.js';
 import { PERMISSIONS as P } from '@nexus/permissions';
+import { selectWasteReference } from './selectPreparation.js';
 
 export type CaptureFamily =
   'warehouse' | 'records' | 'catalogs' | 'purchases' | 'issues' | 'movements';
@@ -120,8 +121,7 @@ export const captureRecipe = async (
       const dialog = page.getByRole('dialog').last();
       await expect(dialog).toBeVisible();
       if (number === 9) {
-        await chooseFirst(page, dialog, 'Proveedor');
-        await chooseFirst(page, dialog, 'Material de referencia del proveedor', /ROLLO/);
+        await selectWasteReference(page, dialog);
         await dialog
           .getByLabel('Nombre de la merma', { exact: true })
           .fill('Ejemplo de captura sin guardar');

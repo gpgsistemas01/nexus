@@ -103,6 +103,24 @@ it('publica un manual con entrada propia y comprueba sus fuentes sin añadirlo a
   await expect(loadDocumentationCatalog(root)).rejects.toThrow('unlisted.md');
 });
 
+it('excluye las ediciones locales del manual general y prohíbe incluirlas explícitamente', async () => {
+  const root = await createFixture(['z-intro.md', 'a-detail.md', 'appendix/']);
+  const account = 'user-manual/accounts/cuenta-uno/sources/index.md';
+  await mkdir(path.dirname(path.join(root, account)), { recursive: true });
+  await writeFile(path.join(root, account), '# Manual local privado\n');
+  const catalog = await loadDocumentationCatalog(root);
+  expect(catalog.completeSources).not.toContain(account);
+  await writeFile(
+    path.join(root, 'publications.json'),
+    JSON.stringify({
+      sections: {
+        inicio: { title: 'Inicio', sources: ['z-intro.md', 'a-detail.md', 'appendix/', account] },
+      },
+    }),
+  );
+  await expect(loadDocumentationCatalog(root)).rejects.toThrow('no pertenecen al catálogo general');
+});
+
 it.each([
   [[], { section: null, format: 'ambos' }],
   [['pdf'], { section: null, format: 'pdf' }],

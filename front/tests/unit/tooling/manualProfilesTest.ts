@@ -14,6 +14,7 @@ import {
 import { filterManualContent, selectedChapters } from '../../../scripts/manual/model.mjs';
 import { parseManualBaseUrl } from '../../../scripts/manual/environment.mjs';
 import { prepareManual, loadManualPublication } from '../../../scripts/manual/publication.mjs';
+import { isManualAccountPath } from '../../../scripts/manual/paths.mjs';
 import { APP_NAVIGATION_GROUPS } from '../../../src/app/navigation.js';
 
 const temporary: string[] = [];
@@ -30,6 +31,8 @@ const manualRoot = async () => {
   const root = await tempRoot();
   await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
     recursive: true,
+    filter: (source) =>
+      !isManualAccountPath(path.relative(path.resolve('docs'), source).split(path.sep).join('/')),
   });
   return root;
 };
@@ -111,8 +114,23 @@ it('identifica el capítulo y la línea de una directiva inválida antes de publ
     cause: expect.any(Error),
   });
   await expect(
-    readFile(path.join(root, 'build/manuals', profile.id, 'sources/index.md')),
+    readFile(path.join(root, 'docs/user-manual/accounts', profile.id, 'sources/index.md')),
   ).rejects.toMatchObject({ code: 'ENOENT' });
+});
+
+it('ordena el acceso antes de la navegación y los tres cortes de Mermas antes de Agregar stock', async () => {
+  const root = await manualRoot();
+  const profile = { ...DEMO_PROFILES[0]!, mode: 'demo' };
+  const manifest = await prepareManual(root, profile, demoSession(profile));
+  expect(manifest.images.slice(0, 2)).toEqual(['01-login.png', '02-navigation.png']);
+  expect(
+    manifest.images.filter((name: string) => name.startsWith('09') || name.startsWith('10')),
+  ).toEqual([
+    '09-waste-create.png',
+    '09a-waste-measurements.png',
+    '09b-waste-stock.png',
+    '10-waste-add-stock.png',
+  ]);
 });
 
 it('dos cuentas del mismo env y con igual rol y área reciben manuales y carpetas propios', async () => {
@@ -171,8 +189,8 @@ it('dos cuentas del mismo env y con igual rol y área reciben manuales y carpeta
   expect(index).not.toContain('almacenista\\_dos');
   expect(other).not.toContain('almacenista\\_uno');
   expect(index + other).not.toContain('clave-ficticia');
-  expect(first.root).toBe(path.join(root, 'build/manuals/cuenta-uno'));
-  expect(second.root).toBe(path.join(root, 'build/manuals/cuenta-dos'));
+  expect(first.root).toBe(path.join(root, 'docs/user-manual/accounts/cuenta-uno'));
+  expect(second.root).toBe(path.join(root, 'docs/user-manual/accounts/cuenta-dos'));
   expect(first.accessFingerprint).not.toBe(second.accessFingerprint);
 });
 
@@ -401,11 +419,8 @@ it.each(['almacen-auxiliar', 'almacen-coordinador'])(
 it.each(['almacen-auxiliar', 'almacen-coordinador', 'impresion-operador'])(
   'el índice de %s explica el alcance de consulta y registro en Salidas',
   async (id) => {
-    const root = await tempRoot();
+    const root = await manualRoot();
     const profile = DEMO_PROFILES.find((candidate) => candidate.id === id)!;
-    await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
-      recursive: true,
-    });
     const manifest = await prepareManual(root, { ...profile, mode: 'demo' }, demoSession(profile));
     const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
     expect(index).toContain('Materiales, Consumibles y Mermas');
@@ -678,7 +693,7 @@ it('comprueba el rol y área esperados en la misma asignación de la cuenta', ()
 });
 
 it('selecciona el manual por la sesión sin declarar acceso esperado ni confiar en la etiqueta', async () => {
-  const root = await tempRoot();
+  const root = await manualRoot();
   const account = {
     id: 'cuenta-01',
     label: 'Administración del sistema',
@@ -693,9 +708,6 @@ it('selecciona el manual por la sesión sin declarar acceso esperado ni confiar 
   const configuration = await readAccounts(filename);
   const session = demoSession(DEMO_PROFILES.find(({ id }) => id === 'instalaciones-instalador')!);
   expect(() => verifyConfiguredAccess(configuration.accounts[0], session)).not.toThrow();
-  await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
-    recursive: true,
-  });
   const manifest = await prepareManual(root, { ...account, mode: 'dev' }, session);
   expect(manifest.sources).toContain('12-issues.md');
   expect(manifest.sources).not.toContain('08-users.md');
@@ -708,10 +720,7 @@ it('selecciona el manual por la sesión sin declarar acceso esperado ni confiar 
 });
 
 it('publica los nombres de acceso como texto y no atribuye operaciones ausentes de la sesión', async () => {
-  const root = await tempRoot();
-  await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
-    recursive: true,
-  });
+  const root = await manualRoot();
   const session = {
     id: 'fixture',
     permissions: [],
@@ -731,12 +740,9 @@ it('publica los nombres de acceso como texto y no atribuye operaciones ausentes 
 });
 
 it('bloquea la exportación de un perfil incompleto y las rutas fuera de su directorio', async () => {
-  const root = await tempRoot();
+  const root = await manualRoot();
   await expect(loadManualPublication(root, '../private')).rejects.toThrow('inválido');
   const profile = DEMO_PROFILES.find(({ id }) => id === 'impresion-operador')!;
-  await cp(path.resolve('docs/user-manual'), path.join(root, 'docs/user-manual'), {
-    recursive: true,
-  });
   const manifest = await prepareManual(root, { ...profile, mode: 'demo' }, demoSession(profile));
   const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
   expect(index).not.toContain('08-users.md');

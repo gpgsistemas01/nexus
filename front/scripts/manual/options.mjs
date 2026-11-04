@@ -13,7 +13,7 @@ La dirección de Vue debe ser local y NODE_ENV no puede ser production.
 En HTTP inicia Vite si hace falta o reutiliza el existente. La API debe estar activa.
 Cada cuenta inicia sesión para detectar sus áreas, roles y permisos.
 Las cuentas sin usuario o contraseña se omiten, sin detener las demás.
-Las capturas quedan en build/manuals/<cuenta>/images/.
+Las capturas quedan en docs/user-manual/accounts/<cuenta>/images/.
 Word y PDF quedan en build/docs/{docx,pdf}/manuales-vue/<cuenta>/.
 
 Opciones:

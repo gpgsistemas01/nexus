@@ -36,3 +36,6 @@ playwright-report/
 !.env.manual.example
 .env.manual.local
 manual.accounts.local.json
+
+# Ediciones locales por cuenta: fuentes filtradas, capturas y estado de publicación
+/docs/user-manual/accounts/

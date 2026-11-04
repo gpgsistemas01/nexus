@@ -3,6 +3,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { MANUAL_SECTIONS, selectedChapters, filterManualContent, imageNames } from './model.mjs';
 import { validProfileId } from './profiles.mjs';
+import { prepareManualDirectory } from './paths.mjs';
 import { DATA_SCOPES, hasDataScope } from '../../../back/src/constants/permissions.js';
 
 export const permissionFingerprint = (permissions) =>
@@ -65,7 +66,7 @@ export const prepareManual = async (frontRoot, profile, session) => {
         !session.permissions.every((p) => typeof p === 'string')
     )
         throw new Error('Perfil o permisos de sesión inválidos.');
-    const root = path.join(frontRoot, 'build/manuals', profile.id);
+    const root = await prepareManualDirectory(frontRoot, profile.id);
     await mkdir(path.join(root, 'images'), { recursive: true });
     const chapters = selectedChapters(session.permissions);
     const files = new Set(['index.md', ...chapters.map(({ file }) => file)]);
@@ -133,14 +134,16 @@ export const prepareManual = async (frontRoot, profile, session) => {
         fingerprint: permissionFingerprint(session.permissions),
         accessFingerprint: accessFingerprint(session),
         sources: ['index.md', ...sources.map(({ file }) => file)],
-        images: [...images],
+        images: [...images].sort((left, right) =>
+            left.localeCompare(right, 'en', { numeric: true }),
+        ),
         status: 'pending',
     };
 };
 
 export const loadManualPublication = async (frontRoot, id) => {
     if (!validProfileId(id)) throw new Error('Identificador de manual inválido.');
-    const root = path.join(frontRoot, 'build/manuals', id);
+    const root = await prepareManualDirectory(frontRoot, id);
     const manifest = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
     if (
         manifest.id !== id ||

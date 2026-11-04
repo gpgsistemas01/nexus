@@ -1,5 +1,6 @@
 import { readFile, readdir, realpath, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { isManualAccountPath } from './manual/paths.mjs';
 
 /**
  * Resolve the documented reading order without following links outside docs.
@@ -20,6 +21,9 @@ export const loadDocumentationCatalog = async (directory) => {
             source.split('/').includes('..')
         )
             throw new Error(`Fuente documental no permitida: ${source}.`);
+        if (isManualAccountPath(source))
+            throw new Error('Las ediciones locales por cuenta no pertenecen al catálogo general.');
+
         const resolved = await realpath(path.resolve(root, source));
         if (!resolved.startsWith(`${root}${path.sep}`))
             throw new Error(`La fuente debe pertenecer a docs: ${source}.`);
@@ -36,7 +40,10 @@ export const loadDocumentationCatalog = async (directory) => {
         );
         const result = [];
         for (const entry of entries) {
-            const filename = await resolveSource(relativeName(path.join(folder, entry.name)));
+            const source = relativeName(path.join(folder, entry.name));
+            if (isManualAccountPath(source)) continue;
+
+            const filename = await resolveSource(source);
             if (entry.isDirectory()) result.push(...(await markdownFiles(filename)));
             else if (entry.name.endsWith('.md')) result.push(relativeName(filename));
         }

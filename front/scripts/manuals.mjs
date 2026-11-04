@@ -5,6 +5,7 @@ import { DEMO_PROFILES, readAccounts, selectAccountsWithCredentials } from './ma
 import { MANUAL_HELP, parseManualOptions } from './manual/options.mjs';
 import { assertManualDevelopment } from './manual/environment.mjs';
 import { loadManualPublication } from './manual/publication.mjs';
+import { manualAccountDirectory } from './manual/paths.mjs';
 
 const frontRoot = fileURLToPath(new URL('../', import.meta.url));
 const runManuals = async () => {
@@ -64,7 +65,9 @@ const runManuals = async () => {
         );
     for (const profile of selected) {
         await loadManualPublication(frontRoot, profile.id);
-        console.log(`Capturas de ${profile.id}: build/manuals/${profile.id}/images/`);
+        console.log(
+            `Capturas de ${profile.id}: ${path.join(manualAccountDirectory(frontRoot, profile.id), 'images')}`,
+        );
         if (values['capture-only']) continue;
         const output = spawnSync(
             process.execPath,
