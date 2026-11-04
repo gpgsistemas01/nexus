@@ -2,13 +2,13 @@
 
 ## Diseño y trazabilidad
 
-`RF-ISS-002` / `RF-WST-003`, `CU-SAL-05` / `CU-SAL-19` / `CU-SAL-12`; `DP-VUE-ISS-002`. Selección pendiente y cantidad de proyecto ausente/válida.
+`RF-ISS-002` / `RF-WST-003`, `CU-SAL-05` / `CU-SAL-19` / `CU-SAL-12`; `DP-VUE-ISS-002`. Selección pendiente, cantidades vacías/fuera de saldo y transición de entrega parcial a completa.
 
 ## Especificación del caso y datos
 
 | ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
 | --- | --- | --- | --- | --- | --- |
-| `CP-VUE-ISS-002-01` | Chromium con mockIssues nuevo para cada recurso; salida aprobada pendiente con un detalle y permiso de surtido. | Cantidad del detalle 2; proyecto 180. Variantes Materiales/Lona, Consumibles/Lona y Mermas/Sobrante de lona. | Abrir Surtir detalle; seleccionar el detalle; enviar sin cantidad de proyecto; capturar 180 y reenviar. | Encabezado bloqueado. El primer intento no genera escritura. El segundo envía sólo `details: [{ id: issueDetailId, isSupplied: true, projectConvertedQuantity: 180 }]` a `/details`; se cierra el diálogo. | Contexto Playwright y estado del harness descartados al terminar; sin escrituras SQL. |
+| `CP-VUE-ISS-002-01` | Chromium con mockIssues nuevo por recurso, detalle solicitado de 2 y permiso de surtido. | Completo: entrega 2 y proyecto 180. Parcial: entregas 0.5, 0.5 y 1, proyecto total 250 y conversión 200. | Seleccionar el detalle; enviar con cantidad vacía o mayor que 2; corregir y surtir. En el recorrido parcial, reabrir el surtido para cada entrega restante. | No escribe con cantidad inválida. Cada envío contiene ID, selección, `quantityToSupply`, acumulado leído en `expectedSuppliedQuantity` y proyecto. Las primeras entregas conservan Surtido parcial; la última completa 2. Proyecto permanece en 250 y diferencia en −50; los acumulados esperados son 0, 0.5 y 1. | Contexto Playwright descartado; sin escrituras SQL. |
 
 ## Fuente ejecutable y alcance
 

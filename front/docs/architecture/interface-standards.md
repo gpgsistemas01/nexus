@@ -35,7 +35,7 @@ y **Consultar salida**, según permisos y estado. Los detalles de compra conserv
 
 Las tablas de detalles agrupan **Base/Altura** en **Medidas** y **Cantidad/Unidad**
 en **Conversión**. En Salidas, **Cantidad surtida** aparece al surtir o devolver;
-**Cantidad devuelta**, sólo al devolver. Costos, proyecto, diferencia y casilla de
+**Cantidad devuelta**, sólo al devolver. Costos, cantidad a surtir, proyecto, diferencia y casilla de
 surtido corresponden al modo **Surtir**. Las columnas de acciones se omiten en
 consulta sin operaciones disponibles. El estado cancelado de un detalle de compra
 se indica junto al artículo. El listado de Salidas muestra **Área** para Almacén y

@@ -32,7 +32,7 @@ operaciones; no se eligen libremente.
 | --- | --- | --- |
 | **Crear**: documento nuevo. | tipo de comprobante, factura cuando aplica, proveedor, receptor, fecha de recepción, observaciones y detalles | incrementa existencias y registra movimientos sin cambios parciales |
 | **Editar**: entrada no cancelada. | tipo de comprobante, factura cuando aplica, receptor, fecha, observaciones y detalles **nuevos** | el proveedor permanece bloqueado; un detalle persistido se cambia mediante la corrección, sin sobrescribirlo |
-| **Ver compra cancelada**: entrada cancelada. | ninguno | formulario, detalles y acciones permanecen en sólo lectura |
+| **Ver compra cancelada**: entrada cancelada. | ninguno | consulta la suma de los detalles cancelados como importe histórico; formulario y detalles permanecen en sólo lectura |
 | **Corregir detalle**: detalle activo y entrada habilitada. | cantidad corregida positiva no mayor que la recibida vigente; costo positivo | registra el motivo según el cambio y requiere una diferencia real de cantidad o costo; reducir cantidad exige existencia suficiente y genera movimiento; corregir sólo costo conserva cantidades e historia sin movimiento de inventario |
 | **Cancelar detalle**: detalle activo y existencia suficiente para revertirlo. | sin captura adicional | registra el motivo y la reversión; revierte la cantidad vigente, excluye el detalle de totales activos y conserva su historia; si no quedan detalles activos, la compra queda cancelada |
 
@@ -43,7 +43,7 @@ operaciones; no se eligen libremente.
 | **Crear**: documento nuevo. | cliente, asesor, área, solicitante, número de proyecto, fecha de solicitud, observaciones y detalles solicitados | no descuenta stock mientras el detalle no se surta |
 | **Editar encabezado y detalles**: salida pendiente. | encabezado y detalles nuevos o cantidades todavía no surtidas | no reescribe cantidades ya surtidas o devueltas |
 | **Editar encabezado**: salida no cancelada que ya no está pendiente. | cliente, asesor, área, solicitante, número de proyecto, fecha de solicitud y observaciones | los detalles permanecen en sólo lectura y no cambia inventario |
-| **Surtir**: detalle con cantidad pendiente; la salida puede estar pendiente o parcialmente surtida. | selección del detalle y Cantidad de proyecto | entrega toda la cantidad pendiente del detalle; el encabezado permanece bloqueado; reduce existencia y crea movimiento sin cambios parciales; otros detalles pendientes mantienen el documento parcialmente surtido |
+| **Surtir**: detalle con cantidad pendiente; la salida puede estar pendiente o parcialmente surtida. | selección del detalle, Cantidad a surtir y Cantidad de proyecto | descuenta sólo la entrega indicada; acumula lo surtido y completa el detalle al cubrir lo solicitado. El proyecto conserva su valor y puede producir una diferencia negativa. El encabezado permanece bloqueado y saldo, movimiento y estados se confirman juntos |
 | **Devolver**: salida completamente surtida y detalle con saldo entregado disponible. | cantidad positiva no mayor que lo surtido menos devoluciones anteriores; observaciones de devolución | encabezado y detalles originales permanecen bloqueados; incrementa existencia y crea movimiento inverso; una devolución parcial conserva el detalle Surtido, devolver todo su saldo lo cancela y cancelar todos los detalles cancela la salida |
 | **Ver salida cancelada**: salida cancelada. | ninguno | formulario y detalles permanecen en sólo lectura |
 

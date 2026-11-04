@@ -27,17 +27,17 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | Miembro | Firma completa |
 | --- | --- |
 | `remove` | `remove: [id: string];` |
-| `supply` | `supply: [ id: string, changes: Partial<Pick<IssueDetail, 'isSupplied' \| 'projectConvertedQuantity'>>, ];` |
+| `supply` | `supply: [id: string, changes: IssueSupplyChanges];` |
 | `return` | `return: [row: IssueDetail];` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `supply` |
+| dependency | [IssueSupplyChanges](../../../../../src/modules/issues/issue.ts) | `supply` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `return` |
 
 ## IssueEditor.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 18, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 19, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -63,7 +63,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueEditor.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 32, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueEditor.vue](../../../../../src/modules/issues/components/IssueEditor.vue) · línea 33, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -73,7 +73,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `more` | `more: [kind: IssueHeaderSelect['kind']];` |
 | `retry` | `retry: [kind: IssueHeaderSelect['kind']];` |
 | `remove` | `remove: [id: string];` |
-| `supply` | `supply: [ id: string, changes: Partial<Pick<IssueDetail, 'isSupplied' \| 'projectConvertedQuantity'>>, ];` |
+| `supply` | `supply: [id: string, changes: IssueSupplyChanges];` |
 | `return` | `return: [detail: IssueDetail];` |
 | `submit` | `submit: [];` |
 | `close` | `close: [];` |
@@ -88,7 +88,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | dependency | [IssueHeaderSelect](../../../../../src/modules/issues/issue.ts) | `search` |
 | dependency | [IssueHeaderSelect](../../../../../src/modules/issues/issue.ts) | `more` |
 | dependency | [IssueHeaderSelect](../../../../../src/modules/issues/issue.ts) | `retry` |
-| dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `supply` |
+| dependency | [IssueSupplyChanges](../../../../../src/modules/issues/issue.ts) | `supply` |
 | dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `return` |
 
 ## IssueFilters.defineProps
@@ -284,6 +284,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `quantity` | `quantity: number;` |
 | `convertedQuantity` | `convertedQuantity: number;` |
 | `suppliedQuantity` | `suppliedQuantity: number;` |
+| `quantityToSupply` | `quantityToSupply: string;` |
 | `returnedQuantity` | `returnedQuantity: number;` |
 | `maxUnitCost` | `maxUnitCost: number \| null;` |
 | `projectConvertedQuantity` | `projectConvertedQuantity: string;` |
@@ -291,9 +292,25 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `isOriginallySupplied` | `isOriginallySupplied: boolean;` |
 | `isCanceled` | `isCanceled: boolean;` |
 
+## IssueSupplyChanges
+
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 43, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+Partial<
+    Pick<IssueDetail, 'isSupplied' | 'quantityToSupply' | 'projectConvertedQuantity'>
+>
+```
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [IssueDetail](../../../../../src/modules/issues/issue.ts) | `type` |
+
 ## IssueDocument
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 42, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 46, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends IssueRow`.
 
@@ -308,7 +325,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueValues
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 45, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 49, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -327,7 +344,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueField
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 55, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 59, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -341,7 +358,7 @@ keyof IssueValues
 
 ## IssueWriteMode
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 56, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 60, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -351,7 +368,7 @@ keyof IssueValues
 
 ## IssueOpenMode
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 57, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 61, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -361,7 +378,7 @@ keyof IssueValues
 
 ## IssueWriteTarget
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 58, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 62, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -377,7 +394,7 @@ keyof IssueValues
 
 ## IssueTarget
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 61, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 65, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -392,7 +409,7 @@ IssueWriteTarget | { mode: 'view' | 'return'; document: IssueDocument }
 
 ## IssueFilters
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 62, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 66, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -406,7 +423,7 @@ IssueWriteTarget | { mode: 'view' | 'return'; document: IssueDocument }
 
 ## IssueQuery
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 71, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 75, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -421,7 +438,7 @@ RecordQuery & IssueFilters
 
 ## IssueLookup
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 72, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 76, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -431,7 +448,7 @@ RecordQuery & IssueFilters
 
 ## IssueHeaderSelect
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 73, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 77, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -450,7 +467,7 @@ RecordQuery & IssueFilters
 
 ## IssueFilterSelect
 
-**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 82, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/issue.ts](../../../../../src/modules/issues/issue.ts) · línea 86, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

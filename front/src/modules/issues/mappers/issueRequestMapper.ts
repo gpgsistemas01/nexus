@@ -12,6 +12,8 @@ export const mapIssueFormToRequest = (
             details: getIssueDetailsToSupply(values.details).map((row) => ({
                 id: row.id,
                 isSupplied: true,
+                quantityToSupply: Number(row.quantityToSupply),
+                expectedSuppliedQuantity: row.suppliedQuantity,
                 projectConvertedQuantity: Number(row.projectConvertedQuantity),
             })),
         };

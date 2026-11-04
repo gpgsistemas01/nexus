@@ -6,7 +6,14 @@ import { isIssueWriteTarget } from '../issueRules.js';
 import { mapIssueFormToRequest } from '../mappers/issueRequestMapper.js';
 import { addIssueDetail, updateIssueDetailSupply } from '../issueDetails.js';
 import { useIssueHeaderSelection } from './useIssueHeaderSelection.js';
-import type { IssueResource, IssueTarget, IssueValues, IssueField, IssueDetail } from '../issue.js';
+import type {
+    IssueResource,
+    IssueTarget,
+    IssueValues,
+    IssueField,
+    IssueDetail,
+    IssueSupplyChanges,
+} from '../issue.js';
 import type { MutationConfirmation } from '../../../shared/http/recordContract.js';
 
 export const useIssueEditor = (options: {
@@ -59,10 +66,7 @@ export const useIssueEditor = (options: {
             );
     };
 
-    const updateDetailSupply = (
-        id: string,
-        changes: Partial<Pick<IssueDetail, 'isSupplied' | 'projectConvertedQuantity'>>,
-    ) => {
+    const updateDetailSupply = (id: string, changes: IssueSupplyChanges) => {
         if (mode !== 'supply') return;
 
         record.update('details', updateIssueDetailSupply(form.values.details, id, changes));

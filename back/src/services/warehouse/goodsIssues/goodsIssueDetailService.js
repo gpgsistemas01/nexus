@@ -7,7 +7,6 @@ import {
 import { getDb } from '../../../repository/baseRepository.js';
 import { lockGoodsIssue } from '../../../repository/warehouse/documentLockRepository.js';
 import { updateGoodsIssueDetails as persistGoodsIssueDetails } from '../../../repository/warehouse/issueDetailRepository.js';
-import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { createServiceLogger } from '../../../utils/logger.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
@@ -16,12 +15,12 @@ import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { applyInventoryMovement } from '../../inventory/movementService.js';
 import { findFulfillmentStatusIdsByName } from '../fulfillmentStatusService.js';
 import { resolveIssueFulfillmentStatus } from '../issues/issueFulfillmentRules.js';
+import { resolveIssueSupplyChange } from '../issues/issueSupplyRules.js';
 import { buildGoodsIssueContextWhere } from './goodsIssueHelpers.js';
 import { GOODS_ISSUE_DETAIL_SELECT } from './goodsIssueDetailSelect.js';
 import { resolveGoodsIssueDetailFulfillmentStatusName } from './goodsIssueFulfillmentRules.js';
 
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueDetailService');
-const FLOAT_EPSILON = 0.000001;
 
 const supplyGoodsIssue = async ({ id, goodsIssueDto, type }) => getDb().$transaction(async tx => {
     await lockGoodsIssue({ tx, id });
@@ -65,21 +64,17 @@ const supplyGoodsIssue = async ({ id, goodsIssueDto, type }) => getDb().$transac
 
         // Consumir el id valida pertenencia y duplicados en el mismo recorrido.
         currentById.delete(detail.id);
-        const quantity = normalizeDecimal(current.quantity);
-        const pending = normalizeDecimal(quantity - normalizeDecimal(current.suppliedQuantity));
-        const data = {
-            projectConvertedQuantity: detail.projectConvertedQuantity,
-            convertedQuantityDifference: normalizeDecimal(Number(current.convertedQuantity) - detail.projectConvertedQuantity)
-        };
-        if (detail.isSupplied && pending > FLOAT_EPSILON) {
-            data.suppliedQuantity = quantity;
-            data.isSupplied = true;
+        const change = resolveIssueSupplyChange({ current, requested: detail });
+        if (!change) continue;
+
+        const { data, quantityToSupply } = change;
+        if (quantityToSupply > 0) {
             data.fulfillmentStatusId = statusIds.get(resolveGoodsIssueDetailFulfillmentStatusName({ ...current, ...data }));
             movements.push({
                 materialId: current.materialId,
                 supplierId: current.supplierId,
                 goodsIssueDetailId: current.id,
-                quantity: pending
+                quantity: quantityToSupply
             });
         }
         Object.assign(current, data);

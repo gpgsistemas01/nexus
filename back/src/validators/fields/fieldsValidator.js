@@ -261,6 +261,23 @@ export const validateIssueProjectQuantityDetailsEdition =
                 const isSupplied = isSuppliedRaw === 'true' ? true
                     : isSuppliedRaw === 'false' ? false : isSuppliedRaw;
 
+                if (Object.hasOwn(detail, 'quantityToSupply') || Object.hasOwn(detail, 'expectedSuppliedQuantity')) {
+                    const rawSupply = detail.quantityToSupply;
+                    const supply = typeof rawSupply === 'number' || typeof rawSupply === 'string'
+                        ? Number(rawSupply) : NaN;
+                    if (!Number.isFinite(supply) || supply <= 0
+                        || !DECIMAL_INPUT_FORMAT.pattern.test(String(rawSupply))) {
+                        errors[detailId] ??= {};
+                        errors[detailId].quantityToSupply = errorMap.details.INVALID_FORMAT_QUANTITY;
+                    }
+                    if (typeof detail.expectedSuppliedQuantity !== 'number'
+                        || !Number.isFinite(detail.expectedSuppliedQuantity)
+                        || detail.expectedSuppliedQuantity < 0) {
+                        errors[detailId] ??= {};
+                        errors[detailId].expectedSuppliedQuantity = errorMap.details.INVALID_FORMAT_QUANTITY;
+                    }
+                }
+
                 if (rawQuantity === undefined || rawQuantity === null || rawQuantity === '') {
 
                     if (!errors[detailId]) errors[detailId] = {};
@@ -297,6 +314,9 @@ export const validateIssueProjectQuantityDetailsEdition =
         .customSanitizer(details => details.map(detail => ({
             ...detail,
             projectConvertedQuantity: Number(detail.projectConvertedQuantity),
+            ...(detail.quantityToSupply !== undefined && {
+                quantityToSupply: Number(detail.quantityToSupply)
+            }),
             isSupplied: detail.isSupplied === true || detail.isSupplied === 'true'
         })))
 ;

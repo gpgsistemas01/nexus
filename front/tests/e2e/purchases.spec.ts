@@ -198,6 +198,8 @@ test('compras: consulta, corrección y cancelación explícita conservan el hist
   await dialog.getByRole('button', { name: 'Cancelar detalle', exact: true }).click();
   await confirm.getByRole('button', { name: 'Cancelar detalle', exact: true }).click();
   await expect(dialog.getByRole('cell', { name: 'Lona Cancelado', exact: true })).toBeVisible();
+  await expect(dialog.getByLabel('Totales de compra')).toContainText('$100.00');
+  await expect(dialog.getByLabel('Totales de compra')).toContainText('$116.00');
   expect(writes).toHaveLength(2);
   expect(writes[1]!.data).toBeNull();
   await expect(dialog.getByRole('button', { name: 'Corregir detalle', exact: true })).toHaveCount(

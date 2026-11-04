@@ -39,6 +39,25 @@ describe('reglas estándar y personalizadas usan el mismo validate', () => {
   });
 
   describe.each(['materials', 'consumables', 'wastes'])('%s', resource => {
+    it('normaliza una entrega parcial y omite saldos derivados enviados por el cliente', async () => {
+      const response = await request(app).post(`/${resource}`).send({
+        details: [{ id: detailId, projectConvertedQuantity: 250, isSupplied: true,
+          quantityToSupply: '0.5', expectedSuppliedQuantity: 0, suppliedQuantity: 999 }]
+      }).expect(200);
+      expect(response.body.details).toEqual([{
+        id: detailId, projectConvertedQuantity: 250, isSupplied: true,
+        quantityToSupply: 0.5, expectedSuppliedQuantity: 0
+      }]);
+    });
+
+    it.each([
+      [0, 0], [-1, 0], [0.001, 0], [true, 0], [0.5, -1], [0.5, '0'], [0.5, undefined]
+    ])('rechaza entrega %s con acumulado esperado %s inválidos', async (quantityToSupply, expectedSuppliedQuantity) => {
+      await request(app).post(`/${resource}`).send({
+        details: [{ id: detailId, projectConvertedQuantity: 250, isSupplied: true, quantityToSupply, expectedSuppliedQuantity }]
+      }).expect(400);
+      expect(controller).not.toHaveBeenCalled();
+    });
     it.each([[true, true], [false, false], ['true', true], ['false', false]])(
       'conserva %s como %s al entregar el detalle validado al controller', async (value, expected) => {
         const response = await request(app).post(`/${resource}`).send({

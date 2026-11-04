@@ -227,6 +227,10 @@ export const captureRecipe = async (
         .first()
         .check();
       await page
+        .getByRole('spinbutton', { name: /^Cantidad a surtir:/ })
+        .first()
+        .fill('1');
+      await page
         .getByRole('spinbutton', { name: /^Cantidad de proyecto:/ })
         .first()
         .fill('1');

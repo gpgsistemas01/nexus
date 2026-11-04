@@ -142,6 +142,22 @@ Alta/cambio a área ajena responde `403 FORBIDDEN`; un ID ajeno, `404`. La edici
 comprueba también el área original antes de modificar. El servidor obtiene permisos
 y alcance de fuentes propias; surtido y devolución requieren sus permisos independientes.
 
+### Entregas de Salidas
+
+En `PATCH /:id/details`, cada detalle seleccionado puede enviar `quantityToSupply`
+y `expectedSuppliedQuantity`: entrega física actual y acumulado consultado. Ambos
+se envían juntos. El servidor bloquea el documento, comprueba el acumulado y el
+pendiente, y actualiza detalles y movimientos por lote en una sola transacción.
+No se añaden consultas por cada detalle.
+
+| Resultado | Regla |
+| --- | --- |
+| Parcial / completo | El detalle acumula lo entregado y queda completo al cubrir su cantidad solicitada. |
+| Proyecto | `projectConvertedQuantity` es el total del proyecto en la unidad de conversión; se conserva sin acumular y la diferencia puede ser negativa. |
+| Captura anterior | `409 RECORD_VERSION_CONFLICT`; no se repite la entrega. Consultar de nuevo antes de preparar otro envío. |
+| Cantidad fuera del pendiente | `409 ISSUE_SUPPLY_QUANTITY_CONFLICT`, sin cambios de inventario. |
+| Cliente sin los dos campos nuevos | Conserva la entrega de todo el pendiente del detalle seleccionado. |
+
 ### Identificadores y datos de escritura
 
 El servidor comprueba existencia, pertenencia y estado. Rechaza tipos incorrectos

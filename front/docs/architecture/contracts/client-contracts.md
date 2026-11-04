@@ -87,6 +87,7 @@ recibido, porque su contrato no admite `null`.
 | `expectedVersion` | Versión leída al abrir la operación; se envía para condicionar la escritura del registro versionado. |
 | `expectedMaterialVersion` | Conserva la versión del artículo cuando Inventario distingue artículo y relación con proveedor. |
 | `operationId` | Se conserva junto al payload de altas/entradas recuperables de merma; identifica el reintento de la misma intención. |
+| `quantityToSupply`, `expectedSuppliedQuantity` | Surtido: cantidad de esta entrega y acumulado leído del detalle. La API valida el saldo y rechaza con `RECORD_VERSION_CONFLICT` una captura cuyo acumulado ya cambió; no repite el descuento. |
 | `creationContext=goodsReceipt` | Alta de artículo desde Compras; proveedor fijado y sin captura inicial de stock/costo. |
 | Campos de consulta/derivados | Se omiten del request donde la operación no los admite como captura. |
 

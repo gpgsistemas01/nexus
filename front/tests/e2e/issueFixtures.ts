@@ -83,9 +83,20 @@ export const mockIssues = async (
       const data = req.postDataJSON() as Record<string, unknown>;
       writes.push({ url, method: req.method(), data });
       if (url.pathname.endsWith('/details')) {
-        doc.fulfillmentStatus.name = 'Surtido';
-        doc.details[0]!.isSupplied = true;
-        doc.details[0]!.suppliedQuantity = '2';
+        for (const change of data.details as {
+          id: string;
+          quantityToSupply: number;
+          projectConvertedQuantity: number;
+        }[]) {
+          const line = doc.details.find((row) => row.id === change.id)!;
+          line.suppliedQuantity = String(Number(line.suppliedQuantity) + change.quantityToSupply);
+          line.isSupplied = Number(line.suppliedQuantity) >= Number(line.quantity);
+          line.projectConvertedQuantity = String(change.projectConvertedQuantity);
+          line.fulfillmentStatus.name = line.isSupplied ? 'Surtido' : 'Surtido parcial';
+        }
+        doc.fulfillmentStatus.name = doc.details.every((row) => row.isSupplied)
+          ? 'Surtido'
+          : 'Surtido parcial';
       }
       if (url.pathname.endsWith('/returns'))
         doc.details[0]!.returnedQuantity = String(data.returnQuantity);

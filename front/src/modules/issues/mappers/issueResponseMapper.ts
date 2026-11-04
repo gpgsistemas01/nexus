@@ -91,6 +91,7 @@ const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDet
         presentation: readText(readOptionalRelation(item.presentation), 'name'),
         unitMeasure: typeof unit.symbol === 'string' ? unit.symbol : readText(unit, 'name'),
         quantity: readIssueDecimal(value.quantity),
+        quantityToSupply: '',
         convertedQuantity: readIssueDecimal(value.convertedQuantity),
         suppliedQuantity:
             resource !== 'wastes' && value.suppliedQuantity === null

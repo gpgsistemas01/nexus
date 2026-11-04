@@ -4,8 +4,10 @@ import {
     wasteIssueValidation,
     issueHeaderValidation,
     issueProjectQuantityDetailsValidation,
+    validateIssueSupplyQuantity,
 } from '@nexus/form-validation';
 import { getIssueDetailsToSupply } from './issueDetails.js';
+import { getIssuePendingQuantity } from './issueRules.js';
 import { mapIssueFormToRequest } from './mappers/issueRequestMapper.js';
 import type {
     IssueDocument,
@@ -51,6 +53,12 @@ export const createIssueValidationSchema = (options: {
                 if (!details.length) return 'Seleccione al menos un detalle pendiente por surtir.';
 
                 for (const detail of details) {
+                    const quantityError = validateIssueSupplyQuantity(detail.quantityToSupply);
+                    if (quantityError) return `${detail.name}: Cantidad a surtir: ${quantityError}`;
+
+                    if (Number(detail.quantityToSupply) > getIssuePendingQuantity(detail))
+                        return `${detail.name}: La cantidad a surtir no puede superar el saldo pendiente.`;
+
                     const error = issueProjectQuantityDetailsValidation.projectConvertedQuantity(
                         detail.projectConvertedQuantity,
                     );

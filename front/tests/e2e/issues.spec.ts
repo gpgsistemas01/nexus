@@ -113,6 +113,68 @@ for (const [path, resource, title, label] of [
   });
 }
 
+for (const [path, label] of [
+  ['materiales', 'Lona'],
+  ['consumibles', 'Lona'],
+  ['mermas', 'Sobrante de lona'],
+] as const) {
+  test(`salidas ${path}: entregas parciales conservan proyecto y diferencia negativa`, async ({
+    page,
+  }) => {
+    const { writes } = await mockIssues(page);
+    await page.goto(`/salidas/${path}`);
+    for (const [quantity, expected] of [
+      [0.5, 0],
+      [0.5, 0.5],
+      [1, 1],
+    ] as const) {
+      await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
+      const dialog = page.getByRole('dialog');
+      await dialog.getByRole('checkbox', { name: `Surtir: ${label}`, exact: true }).check();
+      await dialog
+        .getByRole('spinbutton', { name: `Cantidad de proyecto: ${label}`, exact: true })
+        .fill('250');
+      const field = dialog.getByRole('spinbutton', {
+        name: `Cantidad a surtir: ${label}`,
+        exact: true,
+      });
+      await expect(field).toHaveAttribute('max', String(2 - expected));
+      if (expected === 0) {
+        await field.fill('3');
+        await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
+        await expect(
+          dialog.getByRole('alert').filter({
+            hasText: 'no puede superar el saldo pendiente',
+          }),
+        ).toBeVisible();
+        expect(writes).toHaveLength(0);
+      }
+      await field.fill(String(quantity));
+      await expect(dialog.getByRole('cell', { name: '-50.00', exact: true })).toBeVisible();
+      await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
+      await expect(dialog).toBeHidden();
+      expect(writes.at(-1)!.data.details).toEqual([
+        {
+          id: issueDetailId,
+          isSupplied: true,
+          projectConvertedQuantity: 250,
+          quantityToSupply: quantity,
+          expectedSuppliedQuantity: expected,
+        },
+      ]);
+      if (expected < 1)
+        await expect(
+          page.getByRole('cell', { name: 'Surtido parcial', exact: true }),
+        ).toBeVisible();
+    }
+    expect(writes).toHaveLength(3);
+    await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Devolver material surtido', exact: true }),
+    ).toBeVisible();
+  });
+}
+
 test('salidas: varias áreas autorizadas conservan la selección y una búsqueda no bloquea el selector', async ({
   page,
 }) => {
@@ -174,6 +236,7 @@ for (const [path, label, name] of [
       'Presentación',
       'Conversión',
       'Costo unitario de Conversión',
+      'Cantidad a surtir',
       'Cantidad de proyecto',
       'Diferencia',
       'Surtir',
@@ -189,11 +252,22 @@ for (const [path, label, name] of [
     await dialog
       .getByRole('spinbutton', { name: `Cantidad de proyecto: ${name}`, exact: true })
       .fill('180');
+    await dialog
+      .getByRole('spinbutton', { name: `Cantidad a surtir: ${name}`, exact: true })
+      .fill('2');
     await dialog.getByRole('button', { name: 'Surtir', exact: true }).click();
     await expect(dialog).toBeHidden();
     expect(writes[0]!.url.pathname).toMatch(/\/details$/);
     expect(writes[0]!.data).toEqual({
-      details: [{ id: issueDetailId, isSupplied: true, projectConvertedQuantity: 180 }],
+      details: [
+        {
+          id: issueDetailId,
+          isSupplied: true,
+          quantityToSupply: 2,
+          expectedSuppliedQuantity: 0,
+          projectConvertedQuantity: 180,
+        },
+      ],
     });
     await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
     dialog = page.getByRole('dialog');

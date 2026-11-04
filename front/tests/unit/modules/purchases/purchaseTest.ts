@@ -168,6 +168,25 @@ const editor = (target: PurchaseTarget = { action: 'create' }) => {
 };
 
 describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
+  it.each([
+    ['Confirmada', ['ACTIVE', 'CANCELED'], { quantity: 2, net: 200, gross: 232 }],
+    ['Cancelada', ['CANCELED', 'CANCELED'], { quantity: 4, net: 400, gross: 464 }],
+  ] as const)(
+    'conserva los totales correspondientes al consultar una compra %s',
+    (status, statuses, expected) => {
+      const receipt = document();
+      receipt.status = status;
+      receipt.details = statuses.map((state, index) => ({
+        ...receipt.details[0]!,
+        id: `detalle-${index}`,
+        status: state,
+      }));
+      const { state, wrapper } = editor({ action: 'view', document: receipt });
+      expect(state.totals.value).toEqual(expected);
+      expect(state.isReadOnly).toBe(true);
+      wrapper.unmount();
+    },
+  );
   it.each(['materials', 'consumables'] as const)(
     'lista %s con su contexto y filtros; no necesita versión',
     async (resource) => {

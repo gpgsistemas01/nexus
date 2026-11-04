@@ -4,6 +4,7 @@ import { FORM_FIELD_LIMITS } from '../../../shared/constants/inputValidation.js'
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from '../../../shared/messages/goodsReceiptMessages.js';
 
 export const errorMessages = {
+    ISSUE_SUPPLY_QUANTITY_CONFLICT: 'La cantidad a surtir debe ser positiva y no superar el saldo pendiente del detalle.',
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',
     DATABASE_TABLE_MISSING: 'Falta una tabla requerida en la base de datos. Contacta a soporte.',
     DATABASE_COLUMN_MISSING: 'Falta una columna requerida en la base de datos. Contacta a soporte.',

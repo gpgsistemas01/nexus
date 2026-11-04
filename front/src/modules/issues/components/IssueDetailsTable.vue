@@ -12,8 +12,8 @@ import {
     currencyText,
     convertedQuantityText,
 } from '../../../shared/utils/formatNumbers.js';
-import { getIssueReturnableQuantity } from '../issueRules.js';
-import type { IssueDetail, IssueMode } from '../issue.js';
+import { getIssueReturnableQuantity, getIssuePendingQuantity } from '../issueRules.js';
+import type { IssueDetail, IssueMode, IssueSupplyChanges } from '../issue.js';
 
 const props = defineProps<{
     rows: IssueDetail[];
@@ -23,10 +23,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
     remove: [id: string];
-    supply: [
-        id: string,
-        changes: Partial<Pick<IssueDetail, 'isSupplied' | 'projectConvertedQuantity'>>,
-    ];
+    supply: [id: string, changes: IssueSupplyChanges];
     return: [row: IssueDetail];
 }>();
 const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
@@ -54,6 +51,7 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
     ...(props.mode === 'supply'
         ? [
               { title: 'Costo unitario de Conversión', key: 'maxUnitCost' },
+              { title: 'Cantidad a surtir', key: 'quantityToSupply', minWidth: 160 },
               { title: 'Cantidad de proyecto', key: 'projectConvertedQuantity' },
               { title: 'Diferencia', key: 'difference' },
               { title: 'Surtir', key: 'supply' },
@@ -99,6 +97,27 @@ const projectValue = (item: IssueDetail) =>
             </template>
             <template #[`item.maxUnitCost`]="{ item }">
                 {{ item.maxUnitCost == null ? '—' : currencyText(item.maxUnitCost) }}
+            </template>
+            <template #[`item.quantityToSupply`]="{ item }">
+                <VTextField
+                    :aria-label="`Cantidad a surtir: ${item.name}`"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    :max="getIssuePendingQuantity(item)"
+                    :model-value="item.quantityToSupply"
+                    :hint="`Pendiente: ${numberText(getIssuePendingQuantity(item))} ${item.presentation}`"
+                    persistent-hint
+                    :disabled="
+                        isDisabled ||
+                        item.isOriginallySupplied ||
+                        item.isCanceled ||
+                        !item.isSupplied
+                    "
+                    @update:model-value="
+                        emit('supply', item.id, { quantityToSupply: $event ?? '' })
+                    "
+                />
             </template>
             <template #[`item.projectConvertedQuantity`]="{ item }">
                 <VTextField

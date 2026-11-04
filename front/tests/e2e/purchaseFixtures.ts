@@ -58,12 +58,15 @@ export const mockPurchases = async (page: Page, permissions = purchasePermission
     if (url.pathname.endsWith('/cancel')) {
       current.details[0]!.status = 'CANCELED';
       current.status.name = 'Cancelada';
-      current.totalQuantity = '0';
-      current.totalNetPurchaseAmount = '0';
-      current.totalGrossPurchaseAmount = '0';
     } else if (url.pathname.endsWith('/corrections')) {
       current.details[0]!.quantity = String(data!.quantity);
       current.details[0]!.costPerUnitType = String(data!.costPerUnitType);
+      const net = Number(data!.quantity) * Number(data!.costPerUnitType);
+      current.details[0]!.netPurchaseAmount = String(net);
+      current.details[0]!.grossPurchaseAmount = String(net * 1.16);
+      current.totalQuantity = String(data!.quantity);
+      current.totalNetPurchaseAmount = String(net);
+      current.totalGrossPurchaseAmount = String(net * 1.16);
     } else if (req.method() === 'PATCH') {
       current = { ...current, ...data } as typeof current;
     }

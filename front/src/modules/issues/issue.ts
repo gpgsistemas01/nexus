@@ -32,6 +32,7 @@ export interface IssueDetail {
     quantity: number;
     convertedQuantity: number;
     suppliedQuantity: number;
+    quantityToSupply: string;
     returnedQuantity: number;
     maxUnitCost: number | null;
     projectConvertedQuantity: string;
@@ -39,6 +40,9 @@ export interface IssueDetail {
     isOriginallySupplied: boolean;
     isCanceled: boolean;
 }
+export type IssueSupplyChanges = Partial<
+    Pick<IssueDetail, 'isSupplied' | 'quantityToSupply' | 'projectConvertedQuantity'>
+>;
 export interface IssueDocument extends IssueRow {
     details: IssueDetail[];
 }

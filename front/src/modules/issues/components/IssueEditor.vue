@@ -12,6 +12,7 @@ import type {
     IssueField,
     IssueMode,
     IssueDetail,
+    IssueSupplyChanges,
     IssueHeaderSelect,
 } from '../issue.js';
 
@@ -36,10 +37,7 @@ const emit = defineEmits<{
     more: [kind: IssueHeaderSelect['kind']];
     retry: [kind: IssueHeaderSelect['kind']];
     remove: [id: string];
-    supply: [
-        id: string,
-        changes: Partial<Pick<IssueDetail, 'isSupplied' | 'projectConvertedQuantity'>>,
-    ];
+    supply: [id: string, changes: IssueSupplyChanges];
     return: [detail: IssueDetail];
     submit: [];
     close: [];

@@ -11,9 +11,8 @@ los efectos de inventario para evitar repetirlos en las flechas.
 **Notación:** estados de negocio, guardas entre corchetes y final del ciclo operativo.
 **Lectura visual:** [estados y transiciones](../../architecture/views/diagram-reading.md#estados).
 
-El ciclo es común a los tres tipos de salida. Cada detalle seleccionado se surte por
-toda su cantidad pendiente; la salida queda parcialmente surtida si quedan otros
-detalles pendientes. Sólo se devuelve cuando la salida completa está `Surtido`.
+El ciclo es común a los tres tipos de salida. Cada detalle acumula las entregas indicadas; la salida queda parcialmente surtida
+si algún detalle conserva saldo pendiente después de una entrega. Sólo se devuelve cuando la salida completa está `Surtido`.
 
 ```mermaid
 stateDiagram-v2
@@ -23,9 +22,9 @@ stateDiagram-v2
     state "Surtido" as Surtido
     state "Cancelado" as Cancelado
     [*] --> Pendiente: registrar salida
-    Pendiente --> Parcial: surtir [parte de los detalles pendientes]
+    Pendiente --> Parcial: surtir [queda saldo pendiente]
     Pendiente --> Surtido: surtir [todos los detalles pendientes]
-    Parcial --> Parcial: surtir [parte de los pendientes]
+    Parcial --> Parcial: surtir [queda saldo pendiente]
     Parcial --> Surtido: surtir [todos los pendientes]
     Surtido --> Surtido: devolver [no completa todos los saldos]
     Surtido --> Cancelado: devolver [último saldo completo]
@@ -53,7 +52,11 @@ stateDiagram-v2
     state "Pendiente" as Pendiente
     state "Surtido" as Surtido
     state "Cancelado" as Cancelado
+    state "Surtido parcial" as Parcial
     [*] --> Pendiente: registrar detalle
+    Pendiente --> Parcial: surtir [entrega menor que el pendiente]
+    Parcial --> Parcial: surtir [queda saldo pendiente]
+    Parcial --> Surtido: surtir [completa el saldo pendiente]
     Pendiente --> Surtido: surtir toda la cantidad pendiente
     Surtido --> Surtido: devolver [salida surtida y retorno parcial]
     Surtido --> Cancelado: devolver [salida surtida y retorno total]

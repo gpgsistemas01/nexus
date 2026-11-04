@@ -273,8 +273,17 @@ describe('salidas Vue: contratos y modos', () => {
     expect(mapIssueFormToRequest(values, 'materials', 'header')).not.toHaveProperty('details');
     values.details[0]!.isSupplied = true;
     values.details[0]!.projectConvertedQuantity = '180';
+    values.details[0]!.quantityToSupply = '0.5';
     expect(mapIssueFormToRequest(values, 'materials', 'supply')).toEqual({
-      details: [{ id: issueDetailId, isSupplied: true, projectConvertedQuantity: 180 }],
+      details: [
+        {
+          id: issueDetailId,
+          isSupplied: true,
+          projectConvertedQuantity: 180,
+          quantityToSupply: 0.5,
+          expectedSuppliedQuantity: 0,
+        },
+      ],
     });
     values.details[0]!.isOriginallySupplied = true;
     expect(mapIssueFormToRequest(values, 'materials', 'supply')).toEqual({ details: [] });
@@ -329,6 +338,12 @@ describe('salidas Vue: captura y efectos', () => {
     await value.submit();
     expect(save).not.toHaveBeenCalled();
     value.updateDetailSupply(issueDetailId, { projectConvertedQuantity: '180' });
+    await value.submit();
+    expect(save).not.toHaveBeenCalled();
+    value.updateDetailSupply(issueDetailId, { quantityToSupply: '3' });
+    await value.submit();
+    expect(save).not.toHaveBeenCalled();
+    value.updateDetailSupply(issueDetailId, { quantityToSupply: '2' });
     await value.submit();
     expect(value.message.value).toBe('Stock insuficiente');
     expect(value.values.details[0]!.projectConvertedQuantity).toBe('180');
@@ -506,7 +521,11 @@ it('el surtido protege detalles persistidos/cancelados y desmarcar limpia sólo 
   );
   value.updateDetailSupply('persisted', { isSupplied: false, projectConvertedQuantity: '10' });
   value.updateDetailSupply('canceled', { isSupplied: true });
-  value.updateDetailSupply(issueDetailId, { isSupplied: true, projectConvertedQuantity: '180' });
+  value.updateDetailSupply(issueDetailId, {
+    isSupplied: true,
+    projectConvertedQuantity: '180',
+    quantityToSupply: '0.5',
+  });
   value.updateDetailSupply(issueDetailId, { isSupplied: false });
   expect(value.values.details[0]).toMatchObject({
     isSupplied: false,

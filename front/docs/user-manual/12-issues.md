@@ -84,15 +84,22 @@ y existencia; marque sólo lo que entrega físicamente.
 1. Pulse **Surtir detalle** en la salida.
 2. Revise el encabezado de consulta y los detalles pendientes.
 3. Marque **Surtir** en los detalles que realmente entregará.
-4. Complete **Cantidad de proyecto** cuando la captura la requiera.
-5. Revise la selección y pulse **Surtir**.
-6. Espere la confirmación y compruebe cantidades surtidas, cumplimiento y saldo.
+4. En **Cantidad a surtir**, capture lo que entregará ahora, en la presentación del
+   artículo. El campo indica el saldo pendiente; no puede superarlo.
+5. Revise **Cantidad de proyecto**, expresada en la unidad de conversión. Es el
+   valor total del detalle para el proyecto; no se suma en cada entrega.
+6. Revise la selección y pulse **Surtir**.
+7. Espere la confirmación y compruebe cantidades surtidas, cumplimiento y saldo.
 
 ![Selección de detalles pendientes para surtir.](images/24-issue-supply.png)
 
-Se entrega toda la cantidad pendiente del detalle. **Surtido parcial** indica que
-quedan otros detalles pendientes. **Cantidad de proyecto** es una referencia; no
-determina la cantidad que se descuenta.
+Por ejemplo, si se solicitan 2 rollos y entrega 0.5, se descuentan 0.5 y quedan
+1.5 pendientes. El detalle queda **Surtido** al completar los 2 rollos.
+**Surtido parcial** también puede indicar otros detalles pendientes.
+
+**Diferencia** compara la conversión de la salida con **Cantidad de proyecto**.
+Un valor negativo indica que el proyecto supera esa conversión: revise los datos;
+Nexus conserva la captura y no la reemplaza para hacer coincidir los valores.
 <!-- manual:end -->
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->

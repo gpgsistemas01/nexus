@@ -249,6 +249,7 @@ test('salidas: consulta, borrador local y selección de surtido', async ({ page 
   await creating.getByRole('button', { name: 'Regresar', exact: true }).click();
   await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
   await page.getByRole('checkbox', { name: 'Surtir: Lona', exact: true }).check();
+  await page.getByRole('spinbutton', { name: 'Cantidad a surtir: Lona', exact: true }).fill('1');
   await page
     .getByRole('spinbutton', { name: 'Cantidad de proyecto: Lona', exact: true })
     .fill('180');

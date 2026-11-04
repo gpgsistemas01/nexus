@@ -116,7 +116,8 @@ El estado o saldo pueden impedir cancelar. Revise los efectos en [Movimientos](1
 Ante un envío sin respuesta, consulte [Errores y recuperación](15-errors-and-recovery.md).
 
 Al cancelar el último detalle activo, la compra queda **Cancelada** y conserva su
-historial. No admite nuevas recepciones.
+historial. Sus totales muestran la suma de los detalles cancelados para consultar
+el importe del documento; no representan existencias vigentes. No admite nuevas recepciones.
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->

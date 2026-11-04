@@ -108,7 +108,9 @@ export const usePurchaseEditor = (options: {
         );
 
     const totals = computed(() =>
-        calculatePurchaseTotals([...(document?.details ?? []), ...form.values.details]),
+        calculatePurchaseTotals([...(document?.details ?? []), ...form.values.details], {
+            includeCanceled: document?.status === 'Cancelada',
+        }),
     );
     const target = options.target;
     const submit =

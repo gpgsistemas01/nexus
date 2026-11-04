@@ -213,6 +213,8 @@ export const issueProjectQuantityDetailsValidation = {
         || (typeof value === 'boolean' || value === 'true' || value === 'false' ? null : 'El estado de surtido debe ser verdadero o falso')
 }
 
+export const validateIssueSupplyQuantity = value => validatePositiveNumber(value, 'La cantidad a surtir');
+
 export const issueReturnValidation = {
     returnQuantity: (value) => validatePositiveNumber(value, 'La cantidad a devolver'),
     observations: (value) => validateTextOptional(value, FORM_FIELD_LIMITS.OBSERVATIONS, 'Las observaciones')

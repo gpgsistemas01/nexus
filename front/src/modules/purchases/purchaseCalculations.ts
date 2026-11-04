@@ -1,9 +1,12 @@
 import { calculateGoodsReceiptDetailAmounts } from '@nexus/purchase-calculations';
 import type { PurchaseDetail, PurchaseDocument } from './purchase.js';
 
-export const calculatePurchaseTotals = (details: PurchaseDetail[]) =>
+export const calculatePurchaseTotals = (
+    details: PurchaseDetail[],
+    { includeCanceled = false }: { includeCanceled?: boolean } = {},
+) =>
     details
-        .filter((row) => row.status === 'ACTIVE')
+        .filter((row) => includeCanceled || row.status === 'ACTIVE')
         .reduce(
             (total, row) => ({
                 quantity: total.quantity + Number(row.quantity),

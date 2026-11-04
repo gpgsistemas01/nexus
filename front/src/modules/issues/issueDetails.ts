@@ -2,7 +2,7 @@ import { roundTo } from '@nexus/numbers';
 import { isRecord } from '../../shared/utils/isRecord.js';
 import { createUuid } from '../../shared/utils/createUuid.js';
 import type { LookupItem } from '../../shared/lookup.js';
-import type { IssueDetail, IssueResource } from './issue.js';
+import type { IssueDetail, IssueResource, IssueSupplyChanges } from './issue.js';
 
 export const addIssueDetail = (rows: IssueDetail[], line: IssueDetail) => {
     const match = rows.find(
@@ -29,7 +29,7 @@ export const getIssueDetailsToSupply = (details: IssueDetail[]) =>
 export const updateIssueDetailSupply = (
     details: IssueDetail[],
     detailId: string,
-    changes: Partial<Pick<IssueDetail, 'isSupplied' | 'projectConvertedQuantity'>>,
+    changes: IssueSupplyChanges,
 ) =>
     details.map((detail) =>
         detail.id !== detailId || detail.isOriginallySupplied || detail.isCanceled
@@ -37,7 +37,9 @@ export const updateIssueDetailSupply = (
             : {
                   ...detail,
                   ...changes,
-                  ...(changes.isSupplied === false ? { projectConvertedQuantity: '' } : {}),
+                  ...(changes.isSupplied === false
+                      ? { projectConvertedQuantity: '', quantityToSupply: '' }
+                      : {}),
               },
     );
 
@@ -69,6 +71,7 @@ export const createIssueDetailDraft = (
         quantity,
         convertedQuantity: base && height ? roundTo(base * height * quantity) : quantity,
         suppliedQuantity: 0,
+        quantityToSupply: '',
         returnedQuantity: 0,
         maxUnitCost: null,
         projectConvertedQuantity: '',

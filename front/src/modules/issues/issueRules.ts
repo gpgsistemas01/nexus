@@ -24,6 +24,9 @@ export const canReturnIssue = (row: IssueRow) =>
 export const getIssueReturnableQuantity = (row: IssueDetail) =>
     roundTo(row.suppliedQuantity - row.returnedQuantity);
 
+export const getIssuePendingQuantity = (row: IssueDetail) =>
+    roundTo(row.quantity - row.suppliedQuantity);
+
 export const isIssueWriteTarget = (target: IssueTarget): target is IssueWriteTarget =>
     target.mode === 'create' ||
     target.mode === 'edit' ||

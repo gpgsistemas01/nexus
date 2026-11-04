@@ -1183,7 +1183,8 @@
               "format": "uuid"
             },
             "isSupplied": {
-              "type": "boolean"
+              "type": "boolean",
+              "description": "Selecciona el detalle para la entrega; el servidor calcula si queda completamente surtido."
             },
             "projectConvertedQuantity": {
               "type": [
@@ -1194,7 +1195,23 @@
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000,
-              "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+              "description": "Cantidad total de proyecto en la unidad de conversi\u00f3n, hasta 8 enteros y 2 decimales. Se conserva tal como se captura, incluso si la diferencia resultante es negativa; no se acumula por entrega ni determina el descuento de stock."
+            },
+            "quantityToSupply": {
+              "type": [
+                "number",
+                "string"
+              ],
+              "exclusiveMinimum": 0,
+              "exclusiveMaximum": 100000000,
+              "multipleOf": 0.01,
+              "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
+              "description": "Cantidad f\u00edsica de esta entrega, en la presentaci\u00f3n del art\u00edculo, no mayor que el saldo pendiente. Si se omite junto con expectedSuppliedQuantity, se entrega todo el pendiente por compatibilidad."
+            },
+            "expectedSuppliedQuantity": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Acumulado suppliedQuantity le\u00eddo al abrir el surtido; null hist\u00f3rico se representa como 0. Debe acompa\u00f1ar quantityToSupply. Si cambi\u00f3, responde 409 RECORD_VERSION_CONFLICT sin repetir el descuento."
             }
           },
           "additionalProperties": false,
@@ -1202,7 +1219,15 @@
             "id",
             "isSupplied",
             "projectConvertedQuantity"
-          ]
+          ],
+          "dependentRequired": {
+            "quantityToSupply": [
+              "expectedSuppliedQuantity"
+            ],
+            "expectedSuppliedQuantity": [
+              "quantityToSupply"
+            ]
+          }
         },
         "minItems": 1
       }

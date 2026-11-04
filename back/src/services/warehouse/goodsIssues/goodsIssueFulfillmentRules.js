@@ -14,7 +14,9 @@ export const resolveGoodsIssueDetailFulfillmentStatusName = (detail = {}) => {
         return FULFILLMENT_STATUS_NAMES.CANCELED;
     }
 
-    return detail.isSupplied
-        ? FULFILLMENT_STATUS_NAMES.COMPLETE
+    if (detail.isSupplied) return FULFILLMENT_STATUS_NAMES.COMPLETE;
+
+    return suppliedQuantity > FLOAT_EPSILON
+        ? FULFILLMENT_STATUS_NAMES.PARTIAL
         : FULFILLMENT_STATUS_NAMES.PENDING;
 };

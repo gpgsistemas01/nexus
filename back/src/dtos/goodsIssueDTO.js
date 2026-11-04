@@ -1,4 +1,4 @@
-import { createIssueDetailsDto, createIssueHeaderDto } from './issueDTO.js';
+import { createIssueDetailsDto, createIssueHeaderDto, createIssueSupplyDetailsDto } from './issueDTO.js';
 
 const buildGoodsIssueDto = (body = {}) => ({
     ...createIssueHeaderDto(body),
@@ -18,11 +18,7 @@ export const createGoodsIssueDtoForRegister = (body = {}) => buildGoodsIssueDto(
 export const createGoodsIssueDtoForEdit = (body = {}) => buildGoodsIssueDto(body);
 
 export const createGoodsIssueDetailsDtoForEdit = (body = {}) => ({
-    details: (body.details).map(d => ({
-        id: d.id,
-        isSupplied: d.isSupplied,
-        projectConvertedQuantity: d.projectConvertedQuantity
-    }))
+    details: createIssueSupplyDetailsDto(body.details)
 });
 
 

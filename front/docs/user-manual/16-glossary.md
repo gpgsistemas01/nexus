@@ -124,6 +124,7 @@ Para capturar o corregir una recepción, siga [Compras](11-purchases.md).
 | Término | Qué debe distinguir |
 | --- | --- |
 | Surtir | Registrar la entrega completa de los detalles seleccionados y descontar sus existencias. |
+| Cantidad a surtir | Lo que entregará ahora, en la presentación del artículo. No debe superar el saldo pendiente mostrado. |
 | Cantidad de proyecto | Referencia capturada al surtir para comparar el consumo previsto con la cantidad convertida. No sustituye la cantidad que se descuenta del inventario. |
 | Saldo entregado | Cantidad suministrada menos devoluciones anteriores. Es el máximo que aún puede devolver, no el stock de Almacén. |
 

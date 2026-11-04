@@ -192,3 +192,13 @@ La renovación y recuperación de sesión Vue añaden los diseños
 Chromium administra cookies HttpOnly de prueba y recorre 401 → refresh → reintento,
 502 → recuperación y cambios de permisos. Las respuestas de API son simuladas;
 esta evidencia no sustituye la validación de JWT ni el cierre de sesión HTTP en Express.
+
+## Entregas parciales de un detalle
+
+| ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
+| --- | --- | --- | --- | --- |
+| `DP-SAL-006` | Cantidad física ignorada, proyecto modificado o doble descuento al repetir/concurrir. | Unitario e integración; fronteras del pendiente y transiciones pendiente → parcial → completo, repetición y concurrencia. | Sólo se descuenta la entrega indicada. Proyecto y diferencia negativa se conservan. El acumulado leído impide aplicar dos veces una captura; un rechazo no altera saldos ni movimientos. | `CP-INT-SAL-006`; `issueSupplyRulesTest.js`, `issueDetailsValidationTest.js`. |
+
+| ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- | --- |
+| `CP-INT-SAL-006` | PostgreSQL aislado y migrado; fixtures de Materiales, Consumibles y Mermas, stock suficiente y detalle solicitado de 2. | Proyecto igual a conversión + 1; entregas 0.5, 0.5 y 1. Acumulados esperados 0, 0.5 y 1. Merma con base 1, altura 2 y stock inicial 10/conversión 20. | En los tests de entregas de `goodsIssueControllerDbTest.js` y `wasteIssueControllerDbTest.js`, registrar primera entrega, repetir su captura, intentar exceder el pendiente, enviar dos entregas simultáneas con el mismo acumulado y completar el saldo. | Éxitos 200: acumulados 0.5, 1 y 2; estados parcial, parcial y completo. Proyecto no cambia y diferencia es −1. Captura anterior responde 409 RECORD_VERSION_CONFLICT; exceso, 409 ISSUE_SUPPLY_QUANTITY_CONFLICT. De los dos envíos concurrentes sólo uno escribe. Existen tres movimientos; stock baja exactamente 2 y conversión de la merma termina en 16. | `afterAll` elimina fixtures propios; nunca se usa la base habitual. |
