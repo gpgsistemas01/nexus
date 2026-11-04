@@ -76,7 +76,12 @@ export const prepareManual = async (frontRoot, profile, session) => {
             path.join(frontRoot, 'docs/user-manual', chapter.file),
             'utf8',
         );
-        let content = filterManualContent(source, session.permissions);
+        let content;
+        try {
+            content = filterManualContent(source, session.permissions);
+        } catch (cause) {
+            throw new Error(`No se pudo preparar ${chapter.file}: ${cause.message}`, { cause });
+        }
         content = content.replace(/^# [^\r\n]+/, `# ${chapterIndex + 1}. ${chapter.title}`);
         for (const name of imageNames(content)) images.add(name);
         content = content.replace(/\]\(images\//g, '](../images/');

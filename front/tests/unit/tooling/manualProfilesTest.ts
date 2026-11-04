@@ -67,6 +67,54 @@ it.each(DEMO_PROFILES)(
   },
 );
 
+it.each(['sistemas-admin', 'almacen-coordinador'])(
+  'prepara los mismos capítulos e imágenes para %s con LF y CRLF',
+  async (id) => {
+    const root = await manualRoot();
+    const profile = { ...DEMO_PROFILES.find((candidate) => candidate.id === id)!, mode: 'demo' };
+    const session = demoSession(profile);
+    const original = await prepareManual(root, profile, session);
+    const originalSources = await Promise.all(
+      original.sources.map((file: string) =>
+        readFile(path.join(original.root, 'sources', file), 'utf8'),
+      ),
+    );
+    for (const { file } of selectedChapters(session.permissions)) {
+      const filename = path.join(root, 'docs/user-manual', file);
+      const content = await readFile(filename, 'utf8');
+      await writeFile(filename, content.replace(/\r\n?/g, '\n').replaceAll('\n', '\r\n'));
+    }
+
+    const windows = await prepareManual(root, profile, session);
+    expect(windows.sources).toEqual(original.sources);
+    expect(windows.images).toEqual(original.images);
+    expect(
+      await Promise.all(
+        windows.sources.map((file: string) =>
+          readFile(path.join(windows.root, 'sources', file), 'utf8'),
+        ),
+      ),
+    ).toEqual(originalSources);
+  },
+);
+
+it('identifica el capítulo y la línea de una directiva inválida antes de publicar fuentes', async () => {
+  const root = await manualRoot();
+  const profile = { ...DEMO_PROFILES[0]!, mode: 'demo' };
+  await writeFile(
+    path.join(root, 'docs/user-manual/03-materials.md'),
+    '# Materiales\r\n\r\n<!-- manual:invalid materials:read -->\r\n',
+  );
+
+  await expect(prepareManual(root, profile, demoSession(profile))).rejects.toMatchObject({
+    message: 'No se pudo preparar 03-materials.md: Directiva de manual inválida (línea 3).',
+    cause: expect.any(Error),
+  });
+  await expect(
+    readFile(path.join(root, 'build/manuals', profile.id, 'sources/index.md')),
+  ).rejects.toMatchObject({ code: 'ENOENT' });
+});
+
 it('dos cuentas del mismo env y con igual rol y área reciben manuales y carpetas propios', async () => {
   const root = await manualRoot();
   const envFile = path.join(root, '.env.manual.local');
@@ -369,13 +417,56 @@ it.each(['almacen-auxiliar', 'almacen-coordinador', 'impresion-operador'])(
   },
 );
 
-it('evalúa condiciones anidadas y rechaza directivas desconocidas o desbalanceadas', () => {
+it.each([
+  { format: 'LF', separator: '\n' },
+  { format: 'CRLF', separator: '\r\n' },
+])('evalúa condiciones anidadas y rechaza directivas inválidas con $format', ({ separator }) => {
+  const source = [
+    'base  ',
+    '<!-- manual:any materials:read wastes:page-view -->',
+    'lectura',
+    '<!-- manual:all materials:read materials:write -->',
+    'escritura',
+    '<!-- manual:end -->',
+    '<!-- manual:end -->',
+    '',
+  ].join(separator);
+  expect(filterManualContent(source, [])).toBe('base  \n');
+  expect(filterManualContent(source, ['materials:read'])).toBe('base  \nlectura\n');
+  expect(filterManualContent(source, ['wastes:page-view'])).toBe('base  \nlectura\n');
+  expect(filterManualContent(source, ['materials:read', 'materials:write'])).toBe(
+    'base  \nlectura\nescritura\n',
+  );
+  expect(() =>
+    filterManualContent(`base${separator}<!-- manual:any unknown:grant -->${separator}`, []),
+  ).toThrow('desconocido (línea 2)');
+  expect(() => filterManualContent(`<!-- manual:end -->${separator}`, [])).toThrow(
+    'sin apertura (línea 1)',
+  );
+  expect(() => filterManualContent(`<!-- manual:any materials:read -->${separator}`, [])).toThrow(
+    'sin cerrar',
+  );
+  expect(() =>
+    filterManualContent(`<!-- manual:invalid materials:read -->${separator}`, []),
+  ).toThrow('Directiva de manual inválida (línea 1)');
+  expect(() =>
+    filterManualContent(
+      [
+        '<!-- manual:any materials:read -->',
+        '<!-- manual:any unknown:grant -->',
+        '<!-- manual:end -->',
+        '<!-- manual:end -->',
+      ].join(separator),
+      [],
+    ),
+  ).toThrow('desconocido (línea 2)');
+});
+
+it('admite saltos LF y CRLF mezclados sin alterar los espacios del texto', () => {
   const source =
-    'base\n<!-- manual:any materials:read -->\nlectura\n<!-- manual:all materials:write -->\nescritura\n<!-- manual:end -->\n<!-- manual:end -->';
-  expect(filterManualContent(source, ['materials:read'])).toBe('base\nlectura');
-  expect(() => filterManualContent('<!-- manual:any unknown:grant -->', [])).toThrow('desconocido');
-  expect(() => filterManualContent('<!-- manual:end -->', [])).toThrow('sin apertura');
-  expect(() => filterManualContent('<!-- manual:any materials:read -->', [])).toThrow('sin cerrar');
+    'base  \r\n<!-- manual:any materials:read -->\nlectura\r\n<!-- manual:end -->\nfin\r\n';
+  expect(filterManualContent(source, ['materials:read'])).toBe('base  \nlectura\nfin\n');
+  expect(filterManualContent(source, [])).toBe('base  \nfin\n');
 });
 
 it('carga secretos desde variables o archivo local, sin incluir valores en errores', async () => {

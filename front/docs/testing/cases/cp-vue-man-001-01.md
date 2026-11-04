@@ -17,6 +17,9 @@ completitud de los artefactos. Es una prueba de la herramienta documental.
 
 [manualProfilesTest.ts](../../../tests/unit/tooling/manualProfilesTest.ts) comprueba
 selección, configuración, secretos locales y rechazo de publicaciones incompletas.
+Los capítulos con LF, CRLF o saltos mezclados conservan el filtrado por permisos;
+las ediciones de Sistemas y Almacén conservan las mismas fuentes y referencias a capturas.
+Una directiva inválida identifica capítulo y línea e impide publicar fuentes.
 
 [manualOptionsTest.ts](../../../tests/unit/tooling/manualOptionsTest.ts) comprueba
 que la ejecución use cuentas locales por defecto, admita demo sólo al solicitarlo

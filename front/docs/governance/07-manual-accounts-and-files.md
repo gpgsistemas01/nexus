@@ -251,6 +251,7 @@ Sin esa opción, se recaptura el perfil completo.
 | Login HTTP 429 | Esperar antes de volver a ejecutar; no repetir intentos con credenciales dudosas. |
 | Login HTTP 500/502/503/504 o `ECONNREFUSED`/`ECONNRESET` | Revisar Vue, la API y sus terminales. El código distingue un servicio no disponible de credenciales rechazadas. |
 | Cuenta distinta del perfil | Revisar `expectedAccess`, área/rol real y referencia de credenciales. |
+| Directiva de manual inválida | Corregir el capítulo y la línea indicados en `docs/user-manual`. Se admiten saltos de línea LF y CRLF; no es necesario cambiar las credenciales. |
 | Tabla vacía | Puede servir para consulta. Para editar, preparar un registro existente. |
 | Falta una opción | Revisar dependencias, registros activos y permisos. Para pesos se necesita un material de referencia ROLLO. |
 | Falta devolución | Comprobar permiso de Almacén y salida surtida existente; no se surte automáticamente. |

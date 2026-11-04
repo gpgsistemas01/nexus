@@ -44,22 +44,28 @@ export const filterManualContent = (content, permissions) => {
     const known = new Set(Object.values(P));
     const stack = [true];
     const result = [];
-    for (const line of content.split('\n')) {
+    for (const [lineIndex, line] of content.split(/\r?\n/).entries()) {
         const open = /^<!-- manual:(any|all) ([a-z0-9: -]+) -->$/.exec(line);
         if (open) {
             const required = open[2].split(' ');
             if (required.some((permission) => !known.has(permission)))
-                throw new Error('El manual contiene un permiso desconocido.');
+                throw new Error(
+                    `El manual contiene un permiso desconocido (línea ${lineIndex + 1}).`,
+                );
             const allowed =
                 open[1] === 'any'
                     ? permits(permissions, required)
                     : required.every((permission) => permissions.includes(permission));
             stack.push(stack.at(-1) && allowed);
         } else if (line === '<!-- manual:end -->') {
-            if (stack.length === 1) throw new Error('Cierre condicional de manual sin apertura.');
+            if (stack.length === 1)
+                throw new Error(
+                    `Cierre condicional de manual sin apertura (línea ${lineIndex + 1}).`,
+                );
             stack.pop();
         } else {
-            if (line.includes('<!-- manual:')) throw new Error('Directiva de manual inválida.');
+            if (line.includes('<!-- manual:'))
+                throw new Error(`Directiva de manual inválida (línea ${lineIndex + 1}).`);
             if (stack.at(-1)) result.push(line);
         }
     }
