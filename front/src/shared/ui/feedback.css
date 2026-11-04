@@ -29,7 +29,7 @@
     color: white;
 }
 .nexus-feedback .feedback-cancel {
-    background: white;
+    background: rgb(var(--v-theme-surface));
     color: rgb(var(--v-theme-filter-clear));
     border-color: rgb(var(--v-theme-filter-clear));
 }

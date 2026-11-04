@@ -16,13 +16,13 @@ withDefaults(defineProps<{ isLoading?: boolean }>(), { isLoading: false });
     min-width: 0;
     border: 1px solid rgb(var(--v-theme-table-border));
     border-radius: 0.75rem;
-    background: white;
+    background: rgb(var(--v-theme-surface));
     overflow: hidden;
 }
 .table-frame :deep(.v-table .v-table__wrapper th) {
     color: var(--table-header-text, white);
     font-weight: 700;
-    font-size: 0.76rem;
+    font-size: 0.8rem;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
     border-bottom: 2px solid var(--table-header-border, rgb(var(--v-theme-table-header-hover)));
     background: var(
@@ -51,7 +51,9 @@ withDefaults(defineProps<{ isLoading?: boolean }>(), { isLoading: false });
 }
 .table-frame :deep(.v-table td) {
     background: var(--table-row-highlight, rgb(var(--v-theme-surface)));
-    font-size: 0.8rem;
+    color: rgb(var(--v-theme-on-surface));
+    font-size: 0.85rem;
+    font-weight: 500;
     border-right: 1px solid rgba(var(--v-theme-table-border), 0.45);
     border-bottom: 1px solid rgba(var(--v-theme-table-border), 0.6);
     text-align: center;

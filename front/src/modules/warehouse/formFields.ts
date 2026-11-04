@@ -1,5 +1,6 @@
 import { isRollPresentation } from '@nexus/waste-measurements';
 import { isRecord } from '../../shared/utils/isRecord.js';
+import { numberText, convertedQuantityText } from '../../shared/utils/formatNumbers.js';
 import type { EditorTarget, InventoryField, InventoryResource } from './inventory.js';
 import type { LookupItem } from '../../shared/lookup.js';
 import type { previewWaste } from './formModel.js';
@@ -144,11 +145,15 @@ export const inventorySections = (
                     ? [
                           {
                               label: 'Base del material de origen (m)',
-                              value: String(template.base ?? '—'),
+                              value: numberText(
+                                  template.base == null ? null : Number(template.base),
+                              ),
                           },
                           {
                               label: 'Altura del material de origen (m)',
-                              value: String(template.height ?? '—'),
+                              value: numberText(
+                                  template.height == null ? null : Number(template.height),
+                              ),
                           },
                       ]
                     : undefined,
@@ -178,7 +183,7 @@ export const inventorySections = (
             summary: [
                 {
                     label: 'Peso neto de la merma (kg)',
-                    value: String((isCreating ? preview.weightKg : row?.weightKg) ?? '—'),
+                    value: numberText(isCreating ? preview.weightKg : row?.weightKg),
                 },
             ],
         });
@@ -195,10 +200,10 @@ export const inventorySections = (
             description: 'Datos conservados del registro anterior.',
             fields: [],
             summary: [
-                { label: 'Largo de referencia (m)', value: String(row.sampleLengthM ?? '—') },
+                { label: 'Largo de referencia (m)', value: numberText(row.sampleLengthM) },
                 {
                     label: 'Peso neto de referencia (kg)',
-                    value: String(row.sampleNetWeightKg ?? '—'),
+                    value: numberText(row.sampleNetWeightKg),
                 },
             ],
         });
@@ -271,10 +276,13 @@ export const inventorySections = (
                     ? [{ label: 'Motivo del movimiento', value: 'Stock inicial' }]
                     : undefined
                 : [
-                      { label: 'Stock actual', value: String(row?.currentStock ?? '—') },
+                      { label: 'Stock actual', value: numberText(row?.currentStock) },
                       {
                           label: 'Cantidad convertida actual',
-                          value: String(row?.convertedQuantity ?? '—'),
+                          value: convertedQuantityText(
+                              row?.convertedQuantity,
+                              row?.unitMeasure ?? '',
+                          ),
                       },
                   ],
             fields: [

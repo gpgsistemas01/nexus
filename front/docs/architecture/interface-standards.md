@@ -30,10 +30,23 @@ los valores y eventos intercambiados.
 | Listados y tablas | Reutilizar `RecordListPanel`, `ServerTable` y `TableFrame`, con estados de carga, vacío, error y paginación. |
 | Editores y selectores | Reutilizar `RecordEditorDialog`, `EditorDialog` y `RemoteSelect`; aportar campos, celdas o acciones mediante sus slots y eventos. |
 | Tema y defaults | Modificarlos en las fuentes compartidas; evitar bloques globales copiados por módulo. |
+| Lectura y contraste | Fondos gris verdoso, texto oscuro y valores de entrada con peso 600. El texto normal mantiene contraste mínimo de 4.5:1 como referencia de WCAG 2.2 AA; los encabezados de tabla conservan texto claro sobre verde oscuro. |
+| Campos de consulta o bloqueados | Mantener `readonly` o `disabled`, con fondo diferenciado y datos legibles. El estilo no habilita edición ni envío. |
 | CSS local | Usar `scoped` para detalles propios; limitar `:deep` a la adaptación justificada de un control. |
 | Selectores CSS | Referirse a clases y contratos estables; evitar texto visible o posición del registro. |
 | DOM | Conservar el control de Vue/Vuetify; no superponer otro controlador sobre sus nodos. |
 | Avisos | Reutilizar `shared/ui/feedback.ts`; enfocar Cancelar en confirmaciones destructivas. |
+
+## Presentación numérica
+
+`convertedQuantityText` presenta las cantidades en m² con dos decimales en tablas,
+resúmenes, diferencias y campos de consulta. Por ejemplo, `1.921383` se muestra como
+`1.92`. Las demás unidades conservan hasta seis decimales y los importes su formato
+monetario. En campos numéricos de consulta se omiten separadores de miles.
+
+El payload utiliza los valores originales de la captura. Los cálculos y la
+persistencia conservan la precisión del contrato de la API; el formato pertenece a
+[formatNumbers.ts](../../src/shared/utils/formatNumbers.ts).
 
 ## Carga y recuperación
 

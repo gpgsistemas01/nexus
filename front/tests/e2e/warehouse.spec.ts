@@ -3,6 +3,61 @@ import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { ids, material, pageOf, waste } from '../fixtures/inventory.js';
 import { chooseOption, mockWarehouse } from './warehouseFixtures.js';
 
+test('presentación: m² con dos decimales en tabla y formulario conserva el envío original', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const writes: Record<string, unknown>[] = [];
+  const row = {
+    ...material,
+    currentStock: '1.23',
+    convertedQuantity: '1.921383',
+    material: { ...material.material, base: 1.23, height: 1.27 },
+  };
+  await page.route('**/api/warehouse/materials?**', (route) =>
+    route.fulfill({ json: pageOf([row]) }),
+  );
+  await page.route(`**/api/warehouse/materials/${ids.material}/stock`, (route) => {
+    writes.push(route.request().postDataJSON());
+    return route.fulfill({ json: { code: 'UPDATED_MATERIAL' } });
+  });
+  await page.goto('/almacen/materiales');
+  await expect(page.getByRole('cell', { name: '1.92', exact: true })).toBeVisible();
+  await expect(page.getByRole('cell', { name: '1.921383', exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Ajustar stock', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Ajustar stock de material', exact: true });
+  const converted = dialog.getByRole('textbox', {
+    name: 'Cantidad convertida actual',
+    exact: true,
+  });
+  await expect(converted).toHaveValue('1.92');
+  await expect(converted).not.toBeEditable();
+  await dialog.getByRole('spinbutton', { name: 'Nuevo stock', exact: true }).fill('1.24');
+  await chooseOption(page, 'Motivo del ajuste', 'Conteo físico');
+  for (const width of [1280, 320]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.screenshot({
+      path: test.info().outputPath(`area-${width}.png`),
+      animations: 'disabled',
+      fullPage: true,
+    });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  }
+  await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  expect(writes).toEqual([
+    {
+      supplierId: ids.supplier,
+      expectedVersion: 3,
+      newStock: 1.24,
+      reasonId: ids.reason,
+      observations: '',
+    },
+  ]);
+});
+
 test('formularios: abrir, cargar catálogos y mover foco no muestra errores sin captura', async ({
   page,
 }) => {

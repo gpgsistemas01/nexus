@@ -20,6 +20,15 @@ escritorio y 320/390 px, subencabezados, stock bajo y recortes. No sustituir est
 por aserciones de CSS o colores. Aplican los [límites de
 simulación](../01-test-plan.md#niveles-y-entornos).
 
+## Presentación numérica
+
+`formatNumbersTest.ts` comprueba la presentación de m² con dos decimales, signos,
+ceros y campos numéricos sin separadores de miles. Las demás unidades mantienen
+su precisión. `warehouse.spec.ts` comprueba tabla y resumen con `1.921383 → 1.92`,
+conserva el campo de consulta bloqueado y envía el nuevo stock original, sin enviar
+la cantidad convertida como dato del cliente. La revisión visual cubre escritorio
+y 320 px, fondos, etiquetas y controles de consulta.
+
 ## Identificadores de captura
 
 | Riesgo | Nivel y técnica | Condición y fuente ejecutable |

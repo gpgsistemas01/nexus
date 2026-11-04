@@ -7,7 +7,11 @@ import { VCard, VCardTitle, VCardText, VCardActions } from 'vuetify/components/V
 import ServerTable from '../../../shared/components/ServerTable.vue';
 import { useTableQuery } from '../../../shared/composables/useTableQuery.js';
 import StateBadge from '../../../shared/components/StateBadge.vue';
-import { numberText, currencyText } from '../../../shared/utils/formatNumbers.js';
+import {
+    numberText,
+    currencyText,
+    convertedQuantityText,
+} from '../../../shared/utils/formatNumbers.js';
 import InventoryRowActions from './InventoryRowActions.vue';
 import { inventoryHeaders, INVENTORY_SORT_COLUMNS } from '../inventoryTable.js';
 import type {
@@ -74,10 +78,13 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
                 </VBtn>
             </template>
             <template
-                v-for="key in ['base', 'height', 'minStock', 'convertedQuantity'] as const"
+                v-for="key in ['base', 'height', 'minStock'] as const"
                 #[`item.${key}`]="{ item }"
             >
                 {{ numberText(item[key]) }}
+            </template>
+            <template #[`item.convertedQuantity`]="{ item }">
+                {{ convertedQuantityText(item.convertedQuantity, item.unitMeasure) }}
             </template>
             <template #[`item.currentStock`]="{ item }">
                 <strong>{{ numberText(item.currentStock) }}</strong>

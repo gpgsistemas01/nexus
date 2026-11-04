@@ -53,9 +53,10 @@ y los imports se consultan en la [referencia de código](../../development/code-
 
 | Fuente propia | Aplicación |
 | --- | --- |
-| `app/plugins/vuetify.ts` | Tema y paleta: tabla verde, subencabezado ámbar, modal/menú oscuros, franja ámbar y selección celeste. |
+| `app/plugins/vuetify.ts` | Fondos gris verdoso, texto oscuro, tabla verde con subencabezado ámbar, cabeceras de modal y menú oscuros, y selección celeste. |
 | `shared/ui/controlDefaults.ts` | Densidad, variante, bordes y mensajes, aplicados por los proveedores de defaults de layout y modal. |
 | `shared/ui/warehouse.css` | Foco, contornos, consulta y adaptación común de controles; conserva los mensajes de validación. |
+| `shared/utils/formatNumbers.ts` | Presentación numérica compartida: dos decimales para m², precisión de otras cantidades e importes. |
 | `style.css` | Variables tipográficas Montserrat Variable, incorporada en los assets con Fontsource. |
 | `RecordListPanel` / `ListFilters` | Marco, título, acciones, errores, contador y panel plegable de filtros. |
 | `ServerTable` / `TableFrame` | Datos remotos, encabezados agrupados, slots de celdas, bordes, filas alternas y desplazamiento horizontal. `PersonForm` reutiliza el marco para asignaciones locales. |

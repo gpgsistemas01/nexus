@@ -1,18 +1,82 @@
 /* Sólo controles de operación que reciben los defaults de Almacén. */
+.v-theme--warehouse {
+    font-weight: 500;
+}
+
 .warehouse-control .v-field {
     border-radius: 1rem;
-    background: rgb(var(--v-theme-surface));
-    font-size: 0.875rem;
+    background: rgb(var(--v-theme-control-surface));
+    font-size: 0.9375rem;
     transition: box-shadow 0.2s ease;
+}
+
+.warehouse-control .v-field__input {
+    color: rgb(var(--v-theme-on-surface));
+    font-weight: 600;
+    opacity: 1;
+}
+
+.warehouse-control .v-field__input::placeholder {
+    color: rgb(var(--v-theme-muted));
+    font-weight: 500;
+    opacity: 1;
+}
+
+.warehouse-control .v-label {
+    font-weight: 600;
+    opacity: 1;
+}
+
+.warehouse-control .v-field:not(.v-field--error, .v-field--focused) .v-label {
+    color: rgb(var(--v-theme-muted));
+}
+
+.warehouse-control .v-input__details,
+.warehouse-control .v-messages {
+    font-weight: 500;
+    opacity: 1;
+}
+
+.warehouse-control:not(.v-input--error) .v-input__details {
+    color: rgb(var(--v-theme-muted));
 }
 
 .warehouse-control .v-field--focused:not(.v-field--error) {
     box-shadow: 0 0 0 3px rgba(var(--v-theme-primary), 0.12);
 }
 
-.warehouse-control .v-field--disabled,
+.warehouse-control.v-input--readonly .v-field,
+.warehouse-control.consultation-field .v-field,
 .warehouse-control .v-field--readonly {
-    background: rgba(var(--v-theme-on-surface), 0.04);
+    background: rgb(var(--v-theme-control-readonly));
+}
+
+.warehouse-control .v-field--disabled {
+    background: rgb(var(--v-theme-control-disabled));
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+.warehouse-control .v-field--disabled .v-field__outline {
+    --v-field-border-opacity: 0.6;
+}
+
+.warehouse-checkbox .v-label {
+    font-weight: 600;
+    opacity: 1;
+}
+
+.warehouse-checkbox:not(.v-input--error) .v-label {
+    color: rgb(var(--v-theme-on-surface));
+}
+
+.warehouse-checkbox .v-selection-control--disabled {
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+.warehouse-checkbox .v-selection-control--disabled .v-selection-control__input {
+    opacity: 0.8;
 }
 
 .warehouse-button {

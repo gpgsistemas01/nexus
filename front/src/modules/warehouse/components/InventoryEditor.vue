@@ -163,7 +163,4 @@ const emit = defineEmits<{
 .editor-section :deep(.v-col) {
     padding: 0.45rem;
 }
-.consultation-field :deep(.v-field) {
-    background: rgba(var(--v-theme-on-surface), 0.04);
-}
 </style>

@@ -84,9 +84,3 @@ const update = (value: string | boolean) => {
         @blur="!field.isReadOnly && emit('blur')"
     />
 </template>
-
-<style scoped>
-.consultation-field :deep(.v-field) {
-    background: rgba(var(--v-theme-on-surface), 0.04);
-}
-</style>

@@ -167,7 +167,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryTable.defineProps
 
-**Fuente:** [src/modules/warehouse/components/InventoryTable.vue](../../../../../src/modules/warehouse/components/InventoryTable.vue) · línea 21, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryTable.vue](../../../../../src/modules/warehouse/components/InventoryTable.vue) · línea 25, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -187,7 +187,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryTable.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryTable.vue](../../../../../src/modules/warehouse/components/InventoryTable.vue) · línea 29, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryTable.vue](../../../../../src/modules/warehouse/components/InventoryTable.vue) · línea 33, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -211,7 +211,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryFieldSpec
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 7, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 8, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -230,7 +230,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventorySummaryItem
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 17, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 18, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -239,7 +239,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryFormSection
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 21, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 22, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

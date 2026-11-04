@@ -596,3 +596,13 @@ Record<OrganizationResource, LookupState>
 | --- | --- | --- |
 | inheritance | [LookupQuery](../../../../../src/shared/lookup.ts) | `extends` |
 | dependency | [OrganizationResource](../../../../../src/shared/lookup.ts) | `resource` |
+
+## NumericDisplayValue
+
+**Fuente:** [src/shared/utils/formatNumbers.ts](../../../../../src/shared/utils/formatNumbers.ts) · línea 3, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+string | number | null | undefined
+```

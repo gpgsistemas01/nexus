@@ -98,15 +98,15 @@ const groups = computed(() =>
     background: rgb(var(--v-theme-background));
 }
 .app-bar {
-    border-bottom: 1px solid #dce7df;
+    border-bottom: 1px solid rgba(var(--v-theme-on-surface), 0.18);
 }
 .app-bar :deep(.v-toolbar-title) {
     font-size: 0.9rem;
     font-weight: 700;
 }
 .bar-section {
-    color: #698171;
-    font-weight: 400;
+    color: rgb(var(--v-theme-muted));
+    font-weight: 500;
     font-size: 0.8rem;
     margin-left: 0.35rem;
 }

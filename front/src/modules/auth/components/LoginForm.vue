@@ -36,7 +36,7 @@ const emit = defineEmits<LoginFormEmits>();
             variant="solo"
             flat
             rounded="lg"
-            bg-color="#f6faf7"
+            bg-color="#e1ece4"
             color="primary"
             base-color="#332d2d"
             @update:model-value="emit('update:name', $event ?? '')"
@@ -63,7 +63,7 @@ const emit = defineEmits<LoginFormEmits>();
             variant="solo"
             flat
             rounded="lg"
-            bg-color="#f6faf7"
+            bg-color="#e1ece4"
             color="primary"
             base-color="#332d2d"
             @update:model-value="emit('update:password', $event ?? '')"
@@ -114,12 +114,13 @@ const emit = defineEmits<LoginFormEmits>();
     display: block;
     color: #d7e6dc;
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.5rem;
 }
 
 .login-form :deep(.v-field__input) {
     color: #332d2d;
+    font-weight: 600;
     opacity: 1;
 }
 

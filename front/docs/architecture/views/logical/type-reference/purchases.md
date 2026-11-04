@@ -32,7 +32,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseDetailsTable.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 9, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 13, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -47,7 +47,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseDetailsTable.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 15, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseDetailsTable.vue](../../../../../src/modules/purchases/components/PurchaseDetailsTable.vue) · línea 19, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

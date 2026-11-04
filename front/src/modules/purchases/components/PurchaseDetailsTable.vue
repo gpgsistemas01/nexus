@@ -3,7 +3,11 @@ import { VDataTable } from 'vuetify/components/VDataTable';
 import type { DataTableHeader } from 'vuetify';
 import TableFrame from '../../../shared/components/TableFrame.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
-import { currencyText, numberText } from '../../../shared/utils/formatNumbers.js';
+import {
+    currencyText,
+    numberText,
+    convertedQuantityText,
+} from '../../../shared/utils/formatNumbers.js';
 import type { PurchaseDetail } from '../purchase.js';
 
 defineProps<{
@@ -17,7 +21,7 @@ const emit = defineEmits<{
     correct: [row: PurchaseDetail];
     cancel: [row: PurchaseDetail];
 }>();
-const numeric = ['base', 'height', 'quantity', 'convertedQuantity'] as const;
+const numeric = ['base', 'height', 'quantity'] as const;
 const money = [
     'conversionUnitCost',
     'costPerUnitType',
@@ -71,6 +75,9 @@ const headers: DataTableHeader<PurchaseDetail>[] = [
                 #[`item.${key}`]="{ item }"
             >
                 {{ numberText(item[key]) }}
+            </template>
+            <template #[`item.convertedQuantity`]="{ item }">
+                {{ convertedQuantityText(item.convertedQuantity, item.unitMeasure) }}
             </template>
             <template
                 v-for="key in money"

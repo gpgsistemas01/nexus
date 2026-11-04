@@ -37,7 +37,12 @@ export const controlDefaults = {
         color: 'primary',
         hideDetails: 'auto',
     },
-    VCheckbox: { density: 'compact', color: 'primary', hideDetails: 'auto' },
+    VCheckbox: {
+        class: 'warehouse-checkbox',
+        density: 'compact',
+        color: 'primary',
+        hideDetails: 'auto',
+    },
     VDataTableServer: { density: 'compact', hover: true },
     VTooltip: { contentClass: 'warehouse-tooltip' },
 };

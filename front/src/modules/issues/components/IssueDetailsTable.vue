@@ -7,7 +7,11 @@ import { mdiUndoVariant } from '@mdi/js';
 import type { DataTableHeader } from 'vuetify';
 import TableFrame from '../../../shared/components/TableFrame.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
-import { numberText, currencyText } from '../../../shared/utils/formatNumbers.js';
+import {
+    numberText,
+    currencyText,
+    convertedQuantityText,
+} from '../../../shared/utils/formatNumbers.js';
 import { getIssueReturnableQuantity } from '../issueRules.js';
 import type { IssueDetail, IssueMode } from '../issue.js';
 
@@ -57,14 +61,14 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
         ? [{ title: 'Acciones', key: 'actions', sortable: false }]
         : []),
 ]);
-const numeric = [
-    'base',
-    'height',
-    'quantity',
-    'suppliedQuantity',
-    'returnedQuantity',
-    'convertedQuantity',
-] as const;
+const numeric = ['base', 'height', 'quantity', 'suppliedQuantity', 'returnedQuantity'] as const;
+
+const projectValue = (item: IssueDetail) =>
+    item.isOriginallySupplied && item.projectConvertedQuantity !== ''
+        ? convertedQuantityText(item.projectConvertedQuantity, item.unitMeasure, {
+              useGrouping: false,
+          })
+        : item.projectConvertedQuantity;
 </script>
 
 <template>
@@ -88,6 +92,9 @@ const numeric = [
             >
                 {{ numberText(item[key]) }}
             </template>
+            <template #[`item.convertedQuantity`]="{ item }">
+                {{ convertedQuantityText(item.convertedQuantity, item.unitMeasure) }}
+            </template>
             <template #[`item.maxUnitCost`]="{ item }">
                 {{ item.maxUnitCost == null ? '—' : currencyText(item.maxUnitCost) }}
             </template>
@@ -97,7 +104,7 @@ const numeric = [
                     type="number"
                     min="0.01"
                     step="0.01"
-                    :model-value="item.projectConvertedQuantity"
+                    :model-value="projectValue(item)"
                     :disabled="
                         isDisabled ||
                         item.isOriginallySupplied ||
@@ -113,7 +120,10 @@ const numeric = [
             <template #[`item.difference`]="{ item }">
                 {{
                     item.projectConvertedQuantity
-                        ? numberText(item.convertedQuantity - Number(item.projectConvertedQuantity))
+                        ? convertedQuantityText(
+                              item.convertedQuantity - Number(item.projectConvertedQuantity),
+                              item.unitMeasure,
+                          )
                         : '—'
                 }}
             </template>

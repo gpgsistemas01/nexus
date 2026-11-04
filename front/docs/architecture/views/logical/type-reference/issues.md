@@ -6,7 +6,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 14, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 18, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -22,7 +22,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 20, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 24, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
