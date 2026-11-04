@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import type { Locator, Page } from '@playwright/test';
 import { mockWarehouse, chooseOption } from './warehouseFixtures.js';
 import { mockPurchases } from './purchaseFixtures.js';
@@ -70,7 +71,7 @@ for (const [path, resource, title] of [
     await openCreation(page, parent, 'Proveedor', 'Registrar proveedor', term);
     await child.getByLabel('Razón social', { exact: true }).fill('Empresa nueva');
     await child.getByRole('button', { name: 'Guardar', exact: true }).click();
-    await expect(child.getByRole('alert')).toBeVisible();
+    await acknowledgeFormError(page, 'No se pudo completar');
     await expect(child.getByLabel('Nombre comercial', { exact: true })).toHaveValue(term);
     await child.getByRole('button', { name: 'Guardar', exact: true }).click();
     await expect(child).toBeHidden();

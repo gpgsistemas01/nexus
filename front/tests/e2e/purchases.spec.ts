@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { mockPurchases } from './purchaseFixtures.js';
 import { ids } from '../fixtures/inventory.js';
 import { personData } from '../fixtures/records.js';
@@ -97,7 +98,7 @@ test('compras: rechazar una edición conserva captura y exige otro envío explí
   const dialog = page.getByRole('dialog', { name: 'Editar compra - Folio COM-001', exact: true });
   await dialog.getByLabel('Observaciones', { exact: true }).fill('Conservar mi captura');
   await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
-  await expect(dialog.getByRole('alert').filter({ hasText: /factura/i })).toBeVisible();
+  await acknowledgeFormError(page, /factura/i);
   await expect(dialog.getByLabel('Observaciones', { exact: true })).toHaveValue(
     'Conservar mi captura',
   );
@@ -183,6 +184,44 @@ test('compras: filtros aplicados, paginación y reporte filtrado sin límites', 
   expect(reports[0]!.searchParams.get('search')).toBe('aplicado');
   expect(reports[0]!.searchParams.get('startDate')).toBe('2026-10-01');
   expect(reports[0]!.searchParams.has('start')).toBe(false);
+});
+
+test('compras: el reporte valida el mes en el campo y conserva el alcance tras un error', async ({
+  page,
+}) => {
+  await mockPurchases(page);
+  let available = false;
+  let attempts = 0;
+  await page.route('**/api/warehouse/reports/goods-receipts/**', (route) => {
+    attempts++;
+    return available
+      ? route.fallback()
+      : route.fulfill({ status: 503, json: { code: 'SERVER_ERROR' } });
+  });
+  await page.goto('/compras/materiales');
+  await page.getByRole('button', { name: 'Exportar Excel', exact: true }).click();
+  const report = page.getByRole('dialog', { name: 'Exportar reporte', exact: true });
+  await report
+    .getByRole('combobox', { name: 'Alcance del reporte', exact: true })
+    .press('ArrowDown');
+  await page.getByRole('option', { name: 'Mes específico', exact: true }).click();
+  await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
+  await expect(
+    report.getByText('Selecciona un mes válido para el reporte.', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  expect(attempts).toBe(0);
+  await report.getByLabel('Mes del reporte', { exact: true }).fill('2026-10');
+  await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
+  await acknowledgeFormError(page, 'No se pudo completar');
+  await expect(report.getByLabel('Mes del reporte', { exact: true })).toHaveValue('2026-10');
+  expect(attempts).toBe(3);
+  available = true;
+  const download = page.waitForEvent('download');
+  await report.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
+  await download;
+  await expect(report).toBeHidden();
+  expect(attempts).toBe(4);
 });
 
 test('compras: altas rápidas reutilizan editores y seleccionan registros fuera de la página actual', async ({

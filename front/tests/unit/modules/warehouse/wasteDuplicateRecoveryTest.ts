@@ -43,7 +43,7 @@ describe('CU-ALM-10 A2: traspaso confirmado al modal de entrada', () => {
           initialQuantity,
           observations: 'Captura conservada',
         }),
-      ).toBe(true);
+      ).toBe('confirmed');
       const target = recovery.onAddStock.mock.calls[0]![0];
       expect(target.action).toBe('add-stock');
       expect(target.row.entityId).toBe(waste.id);
@@ -63,7 +63,7 @@ describe('CU-ALM-10 A2: traspaso confirmado al modal de entrada', () => {
     '%s no ofrece transición ni llama al contenedor',
     async (_condition, allowed, error) => {
       const recovery = setup(allowed);
-      expect(await recovery.recover(error, { initialQuantity: 3 })).toBe(false);
+      expect(await recovery.recover(error, { initialQuantity: 3 })).toBe('unavailable');
       expect(recovery.confirm).not.toHaveBeenCalled();
       expect(recovery.onAddStock).not.toHaveBeenCalled();
     },
@@ -71,7 +71,7 @@ describe('CU-ALM-10 A2: traspaso confirmado al modal de entrada', () => {
   it('cancelar conserva el alta y desmontar durante la confirmación impide la transición tardía', async () => {
     const recovery = setup();
     recovery.confirm.mockResolvedValueOnce(false);
-    expect(await recovery.recover(duplicate(), {})).toBe(false);
+    expect(await recovery.recover(duplicate(), {})).toBe('canceled');
     expect(recovery.onAddStock).not.toHaveBeenCalled();
     let finish!: (confirmed: boolean) => void;
     recovery.confirm.mockReturnValueOnce(
@@ -81,10 +81,10 @@ describe('CU-ALM-10 A2: traspaso confirmado al modal de entrada', () => {
     );
     const pending = recovery.recover(duplicate(), {});
     expect(recovery.isConfirming.value).toBe(true);
-    expect(await recovery.recover(duplicate(), {})).toBe(false);
+    expect(await recovery.recover(duplicate(), {})).toBe('unavailable');
     recovery.controller.abort();
     finish(true);
-    expect(await pending).toBe(false);
+    expect(await pending).toBe('canceled');
     expect(recovery.isConfirming.value).toBe(false);
     expect(recovery.onAddStock).not.toHaveBeenCalled();
   });

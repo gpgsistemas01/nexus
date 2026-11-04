@@ -3,6 +3,7 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VTextField } from 'vuetify/components/VTextField';
 import type { LoginFormEmits, LoginFormProps } from '../login.js';
+import FormErrorDialog from '../../../shared/components/FormErrorDialog.vue';
 
 defineProps<LoginFormProps>();
 const emit = defineEmits<LoginFormEmits>();
@@ -88,14 +89,11 @@ const emit = defineEmits<LoginFormEmits>();
                 {{ isPasswordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña' }}
             </button>
         </div>
-        <p
-            v-if="message"
-            class="login-error"
-            role="alert"
-            aria-label="Error de acceso"
-        >
-            {{ message }}
-        </p>
+        <FormErrorDialog
+            title="No se pudo iniciar sesión"
+            :message="message"
+            :is-submitting="isSubmitting"
+        />
         <VBtn
             type="submit"
             color="primary"
@@ -181,16 +179,6 @@ const emit = defineEmits<LoginFormEmits>();
 .password-toggle:disabled {
     opacity: 0.6;
     cursor: default;
-}
-
-.login-error {
-    color: #ffdad6;
-    border: 1px solid #9c5852;
-    border-radius: 0.75rem;
-    background: #47201e;
-    padding: 0.875rem;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
 }
 
 .login-submit {

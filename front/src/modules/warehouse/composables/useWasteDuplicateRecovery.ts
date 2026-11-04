@@ -4,6 +4,8 @@ import { confirmAction } from '../../../shared/ui/feedback.js';
 import { mapWasteStockAddition } from '../mappers/wasteStockAdditionMapper.js';
 import type { InventoryPayload, StockAdditionTarget } from '../inventory.js';
 
+type WasteDuplicateRecoveryResult = 'unavailable' | 'canceled' | 'confirmed';
+
 export const useWasteDuplicateRecovery = (options: {
     canAddStock: boolean;
     signal: AbortSignal;
@@ -11,7 +13,10 @@ export const useWasteDuplicateRecovery = (options: {
 }) => {
     const isConfirming = ref(false);
 
-    const recover = async (cause: unknown, capture: InventoryPayload) => {
+    const recover = async (
+        cause: unknown,
+        capture: InventoryPayload,
+    ): Promise<WasteDuplicateRecoveryResult> => {
         if (
             !options.canAddStock ||
             !options.onAddStock ||
@@ -21,10 +26,10 @@ export const useWasteDuplicateRecovery = (options: {
             cause.code !== 'WASTE_ALREADY_EXISTS' ||
             cause.meta.operationRejected !== true
         )
-            return false;
+            return 'unavailable';
 
         const target = mapWasteStockAddition(cause.meta.waste, capture);
-        if (!target) return false;
+        if (!target) return 'unavailable';
 
         isConfirming.value = true;
 
@@ -35,10 +40,10 @@ export const useWasteDuplicateRecovery = (options: {
                 confirmLabel: 'Abrir Agregar stock',
                 signal: options.signal,
             });
-            if (!confirmed || options.signal.aborted) return false;
+            if (!confirmed || options.signal.aborted) return 'canceled';
 
             options.onAddStock(target);
-            return true;
+            return 'confirmed';
         } finally {
             isConfirming.value = false;
         }

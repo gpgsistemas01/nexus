@@ -15,6 +15,12 @@ export class ApiError extends Error {
     }
 }
 
+export const isFieldValidationError = (cause: unknown, fields: readonly string[]) =>
+    cause instanceof ApiError &&
+    [400, 422].includes(cause.status) &&
+    Object.keys(cause.fieldErrors).length > 0 &&
+    Object.keys(cause.fieldErrors).every((field) => fields.includes(field));
+
 const knownMessage = (data: Record<string, unknown>) =>
     typeof data.code === 'string' && Object.hasOwn(errorMessages, data.code)
         ? String(getErrorMessage(data))

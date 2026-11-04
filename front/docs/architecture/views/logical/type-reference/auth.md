@@ -6,7 +6,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## LoginForm.defineProps
 
-**Fuente:** [src/modules/auth/components/LoginForm.vue](../../../../../src/modules/auth/components/LoginForm.vue) · línea 7, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/auth/components/LoginForm.vue](../../../../../src/modules/auth/components/LoginForm.vue) · línea 8, columna 13. **Declaración:** SFC contract.
 
 **Definición completa:**
 
@@ -20,7 +20,7 @@ LoginFormProps
 
 ## LoginForm.defineEmits
 
-**Fuente:** [src/modules/auth/components/LoginForm.vue](../../../../../src/modules/auth/components/LoginForm.vue) · línea 8, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/auth/components/LoginForm.vue](../../../../../src/modules/auth/components/LoginForm.vue) · línea 9, columna 26. **Declaración:** SFC contract.
 
 **Definición completa:**
 

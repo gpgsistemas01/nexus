@@ -12,6 +12,7 @@ datos HTTP, en el [contrato de la API](client-contracts.md).
 | --- | --- |
 | `values`, `errors` y `message` | El composable del editor conserva captura y errores; el contenedor los entrega al formulario. |
 | `isSubmitting`, `isPending`, `isConflicted` y capacidades del modo | El contenedor aporta los indicadores que declara cada componente. |
+| `FormErrorDialog.message`, `isSubmitting` y `title` | Presentación del fallo general al terminar el envío. El aviso conserva sólo su apertura local; cerrarlo no emite `submit`, no limpia la captura ni confirma un resultado. `EditorDialog` lo compone para sus consumidores; Login lo utiliza directamente. |
 | `RemoteSelect.state` y selección | `LookupState` reúne `items`, `isLoading`, `hasMore` y `error`. El ID y la opción inicial se entregan aparte; el error de validación pertenece al campo. |
 | Documento, detalle y vista previa | El contenedor entrega los datos de lectura o calculados que necesita la presentación; no se convierten en una copia del request. |
 

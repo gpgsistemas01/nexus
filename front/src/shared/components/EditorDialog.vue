@@ -6,6 +6,7 @@ import { VCard, VCardTitle, VCardText, VCardActions } from 'vuetify/components/V
 import { VBtn } from 'vuetify/components/VBtn';
 import { VDefaultsProvider } from 'vuetify/components/VDefaultsProvider';
 import { controlDefaults } from '../ui/controlDefaults.js';
+import FormErrorDialog from './FormErrorDialog.vue';
 
 withDefaults(
     defineProps<{
@@ -20,6 +21,7 @@ withDefaults(
         showSubmit?: boolean;
         closeLabel?: string;
         retainFocus?: boolean;
+        message?: string;
     }>(),
     {
         eyebrow: 'ALMACÉN',
@@ -30,6 +32,7 @@ withDefaults(
         showSubmit: true,
         closeLabel: 'Cerrar',
         retainFocus: true,
+        message: '',
     },
 );
 const emit = defineEmits<{ close: []; submit: [] }>();
@@ -113,6 +116,10 @@ const titleId = useId();
                 </VCardActions>
             </VCard>
         </VDefaultsProvider>
+        <FormErrorDialog
+            :message="message"
+            :is-submitting="isSubmitting"
+        />
     </VDialog>
 </template>
 

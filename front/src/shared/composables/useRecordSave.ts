@@ -1,7 +1,8 @@
 import { onBeforeUnmount, ref } from 'vue';
-import { ApiError } from '../http/apiError.js';
+import { ApiError, isFieldValidationError } from '../http/apiError.js';
 
 export const useRecordSave = <Result = unknown>(options: {
+    fields: readonly string[];
     setErrors: (errors: Record<string, string>) => void;
     onSaved: (result: Result) => void;
     onDenied: (status: number) => void;
@@ -32,6 +33,8 @@ export const useRecordSave = <Result = unknown>(options: {
 
             if (cause instanceof ApiError) {
                 options.setErrors(cause.fieldErrors);
+                if (isFieldValidationError(cause, options.fields)) message.value = '';
+
                 isConflicted.value = cause.code === 'RECORD_VERSION_CONFLICT';
                 if ([401, 403].includes(cause.status)) options.onDenied(cause.status);
             }

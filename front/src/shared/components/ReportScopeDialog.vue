@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { VSelect } from 'vuetify/components/VSelect';
 import { VTextField } from 'vuetify/components/VTextField';
-import { VAlert } from 'vuetify/components/VAlert';
 import EditorDialog from './EditorDialog.vue';
 import type { ReportScope } from '../report.js';
 
@@ -10,10 +9,11 @@ withDefaults(
         values: ReportScope;
         isSubmitting: boolean;
         error: string;
+        validationError?: string;
         eyebrow?: string;
         subject?: string;
     }>(),
-    { eyebrow: 'REPORTES', subject: 'registros' },
+    { eyebrow: 'REPORTES', subject: 'registros', validationError: '' },
 );
 const emit = defineEmits<{
     mode: [value: ReportScope['mode']];
@@ -34,6 +34,7 @@ const modes = [
         :eyebrow="eyebrow"
         :max-width="600"
         :is-submitting="isSubmitting"
+        :message="error"
         submit-label="Descargar Excel"
         @submit="emit('submit')"
         @close="emit('close')"
@@ -51,6 +52,7 @@ const modes = [
             type="month"
             :model-value="values.month"
             :disabled="isSubmitting"
+            :error-messages="validationError"
             class="mt-4"
             @update:model-value="emit('month', $event ?? '')"
         />
@@ -61,14 +63,5 @@ const modes = [
                     : `El reporte mensual incluye la totalidad de ${subject} de ese mes, sin los filtros de la tabla. El servidor determina el mes actual en la zona horaria de Ciudad de México.`
             }}
         </p>
-        <VAlert
-            v-if="error"
-            role="alert"
-            type="error"
-            variant="tonal"
-            class="mt-4"
-        >
-            {{ error }}
-        </VAlert>
     </EditorDialog>
 </template>

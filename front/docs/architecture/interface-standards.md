@@ -41,11 +41,11 @@ los valores y eventos intercambiados.
 | --- | --- |
 | Abrir o recargar un documento desde una acción de tabla | `DocumentReadDialog` bloquea el fondo mientras se consulta. Permite cancelar y descarta respuestas tardías. Ante un fallo recuperable ofrece **Reintentar consulta**. No cierra por Escape o clic fuera. |
 | Buscar opciones | `RemoteSelect` carga al abrirse y muestra la espera/error en el control. El resto del formulario sigue disponible. **Reintentar catálogo** aparece también con una opción previamente seleccionada. |
-| Validación de captura | Mensaje junto al campo; conservar los valores para corregirlos. No abrir otro diálogo. |
+| Validación de captura | Mensaje junto al campo; conservar los valores para corregirlos. Los errores HTTP 400/422 se muestran sin otro diálogo sólo si todos corresponden a campos del formulario; los demás conservan el aviso general. |
 | Sesión o permiso rechazados | Las páginas delegan en el flujo de acceso. Un rechazo del catálogo se muestra en su control sin ofrecer repetirlo. |
 | Registro/consulta inexistente o salida que cambió a un estado incompatible | Informar el rechazo y permitir cerrar. No ofrecer repetir el mismo ID o modo. Actualizar el listado antes de elegir otra operación. |
-| Conflicto de versión al guardar | Conservar la captura, bloquear otro envío con la versión anterior y ofrecer actualizar. |
-| Escritura fallida | Conservar el formulario o la confirmación abierta. El usuario decide el siguiente envío; no repetir escrituras automáticamente por errores de conexión. |
+| Conflicto de versión al guardar | Mostrar el error en el modal, conservar la captura y bloquear otro envío con la versión anterior. Al volver al formulario se ofrece actualizar. |
+| Envío o descarga fallidos desde un formulario | `FormErrorDialog` muestra el error en el centro y bloquea el fondo, Escape y clic fuera. **Volver al formulario** cierra sólo el aviso y conserva la captura; no repite la operación. La confirmación destructiva conserva su propio modal. |
 
 La [política HTTP](contracts/client-contracts.md#sesión-y-errores) define la recuperación
 automática. `readFailure.ts` clasifica los rechazos que no admiten reintento manual.

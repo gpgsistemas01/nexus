@@ -1,7 +1,7 @@
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { useForm } from 'vee-validate';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
-import { ApiError } from '../../../shared/http/apiError.js';
+import { ApiError, isFieldValidationError } from '../../../shared/http/apiError.js';
 import { inventoryService } from '../services/inventoryService.js';
 import { createPendingWasteOperation } from '../services/pendingWasteOperation.js';
 import {
@@ -193,12 +193,16 @@ export const useInventoryEditor = (options: {
 
                 if (cause instanceof ApiError) {
                     form.setErrors(cause.fieldErrors);
+                    if (isFieldValidationError(cause, Object.keys(rules))) message.value = '';
+
                     isConflicted.value = cause.code === 'RECORD_VERSION_CONFLICT';
                     if (cause.status === 401) options.onUnauthorized();
                 }
 
-                if (resource === 'wastes' && isCreating.value && !isPending.value)
-                    await duplicateRecovery.recover(cause, payload);
+                if (resource === 'wastes' && isCreating.value && !isPending.value) {
+                    const recovery = await duplicateRecovery.recover(cause, payload);
+                    if (recovery !== 'unavailable') message.value = '';
+                }
             }
 
             return;

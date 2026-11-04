@@ -33,6 +33,7 @@ export const usePurchaseCorrection = (options: {
     for (const field of ['quantity', 'costPerUnitType'] as const)
         form.defineField(field, { validateOnModelUpdate: false });
     const save = useRecordSave({
+        fields: Object.keys(form.values),
         setErrors: form.setErrors,
         onSaved: options.onSaved,
         onDenied: options.onDenied,

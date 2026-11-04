@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { mockRecords, recordRoutes } from './recordsFixtures.js';
 import { chooseOption } from './warehouseFixtures.js';
 import { personData, accountData, supplierData, recordIds } from '../fixtures/records.js';
@@ -240,7 +241,7 @@ test('directorio: conflicto conserva captura y exige recargar antes de editar ot
   const dialog = page.getByRole('dialog', { name: 'Editar proveedor', exact: true });
   await dialog.getByRole('textbox', { name: 'Razón social', exact: true }).fill('Mi razón social');
   await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
-  await expect(dialog.getByRole('alert')).toContainText('El registro cambió');
+  await acknowledgeFormError(page, 'El registro cambió');
   await expect(dialog.getByRole('textbox', { name: 'Razón social', exact: true })).toHaveValue(
     'Mi razón social',
   );

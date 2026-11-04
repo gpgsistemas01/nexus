@@ -26,7 +26,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## EditorDialog.defineProps
 
-**Fuente:** [src/shared/components/EditorDialog.vue](../../../../../src/shared/components/EditorDialog.vue) · línea 11, columna 17. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/EditorDialog.vue](../../../../../src/shared/components/EditorDialog.vue) · línea 12, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -41,10 +41,11 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `showSubmit` | `showSubmit?: boolean;` |
 | `closeLabel` | `closeLabel?: string;` |
 | `retainFocus` | `retainFocus?: boolean;` |
+| `message` | `message?: string;` |
 
 ## EditorDialog.defineEmits
 
-**Fuente:** [src/shared/components/EditorDialog.vue](../../../../../src/shared/components/EditorDialog.vue) · línea 35, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/EditorDialog.vue](../../../../../src/shared/components/EditorDialog.vue) · línea 38, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -67,6 +68,16 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- |
 | `refresh` | `refresh: [];` |
 | `clear` | `clear: []` |
+
+## FormErrorDialog.defineProps
+
+**Fuente:** [src/shared/components/FormErrorDialog.vue](../../../../../src/shared/components/FormErrorDialog.vue) · línea 9, columna 17. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `message` | `message: string;` |
+| `isSubmitting` | `isSubmitting: boolean;` |
+| `title` | `title?: string` |
 
 ## ListFilters.defineProps
 
@@ -129,7 +140,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## RecordEditorDialog.defineProps
 
-**Fuente:** [src/shared/components/RecordEditorDialog.vue](../../../../../src/shared/components/RecordEditorDialog.vue) · línea 7, columna 17. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/RecordEditorDialog.vue](../../../../../src/shared/components/RecordEditorDialog.vue) · línea 6, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -149,7 +160,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## RecordEditorDialog.defineEmits
 
-**Fuente:** [src/shared/components/RecordEditorDialog.vue](../../../../../src/shared/components/RecordEditorDialog.vue) · línea 33, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/RecordEditorDialog.vue](../../../../../src/shared/components/RecordEditorDialog.vue) · línea 32, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -220,13 +231,14 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## ReportScopeDialog.defineProps
 
-**Fuente:** [src/shared/components/ReportScopeDialog.vue](../../../../../src/shared/components/ReportScopeDialog.vue) · línea 9, columna 17. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ReportScopeDialog.vue](../../../../../src/shared/components/ReportScopeDialog.vue) · línea 8, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `values` | `values: ReportScope;` |
 | `isSubmitting` | `isSubmitting: boolean;` |
 | `error` | `error: string;` |
+| `validationError` | `validationError?: string;` |
 | `eyebrow` | `eyebrow?: string;` |
 | `subject` | `subject?: string;` |
 

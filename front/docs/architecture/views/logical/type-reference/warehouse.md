@@ -199,6 +199,16 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | dependency | [EditorTarget](../../../../../src/modules/warehouse/inventory.ts) | `action` |
 | dependency | [InventoryQuery](../../../../../src/modules/warehouse/inventory.ts) | `query` |
 
+## WasteDuplicateRecoveryResult
+
+**Fuente:** [src/modules/warehouse/composables/useWasteDuplicateRecovery.ts](../../../../../src/modules/warehouse/composables/useWasteDuplicateRecovery.ts) · línea 7, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+'unavailable' | 'canceled' | 'confirmed'
+```
+
 ## InventoryFieldSpec
 
 **Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 7, columna 1. **Declaración:** interface.

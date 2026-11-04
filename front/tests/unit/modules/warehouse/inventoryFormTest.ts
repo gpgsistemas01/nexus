@@ -280,6 +280,42 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     expect(editor.message.value).toContain('Almacenamiento');
   });
 
+  it.each([400, 422])(
+    'la validación %s mantiene el error junto al campo sin mensaje general',
+    async (status) => {
+      const { editor, request, saved } = openEditor('materials', {
+        action: 'stock',
+        row: normalizeInventoryRow(material),
+      });
+      request.mockRejectedValueOnce(
+        new ApiError('Revisa el stock.', status, 'VALIDATION_ERROR', {
+          newStock: 'Stock inválido.',
+        }),
+      );
+      editor.update('reasonId', ids.reason);
+      await editor.submit();
+      expect(editor.errors.value.newStock).toBe('Stock inválido.');
+      expect(editor.message.value).toBe('');
+      expect(saved).not.toHaveBeenCalled();
+      expect(request).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('un error de metadatos del inventario conserva el mensaje general', async () => {
+    const { editor, request } = openEditor('materials', {
+      action: 'stock',
+      row: normalizeInventoryRow(material),
+    });
+    request.mockRejectedValueOnce(
+      new ApiError('Versión inválida.', 400, 'VALIDATION_ERROR', {
+        expectedVersion: 'Versión inválida.',
+      }),
+    );
+    editor.update('reasonId', ids.reason);
+    await editor.submit();
+    expect(editor.message.value).toBe('Versión inválida.');
+  });
+
   it('un conflicto no cambia la versión ni reenvía automáticamente la escritura', async () => {
     const { editor, request, saved } = openEditor('materials', {
       action: 'stock',

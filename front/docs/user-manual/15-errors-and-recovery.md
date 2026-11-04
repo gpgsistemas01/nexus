@@ -1,5 +1,9 @@
 # 15. Errores y recuperación
 
+Si aparece un aviso de error al enviar un formulario, lea el mensaje y pulse
+**Volver al formulario**. Se conservan sus datos; cerrar el aviso no repite el envío.
+Los errores junto a un campo se corrigen directamente en ese campo.
+
 ## Elegir la acción adecuada
 
 | Situación observable | Qué hacer | Cómo comprobar la recuperación |

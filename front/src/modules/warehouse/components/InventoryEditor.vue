@@ -42,6 +42,7 @@ const emit = defineEmits<{
         :title="title"
         :context="context"
         :is-submitting="isSubmitting"
+        :message="message"
         :retain-focus="!isConfirmingDuplicate"
         :is-submit-disabled="isConflicted && !isPending"
         :submit-label="isPending ? 'Recuperar captura' : 'Guardar'"
@@ -66,15 +67,6 @@ const emit = defineEmits<{
                     {{ values.name || context }} · Cantidad:
                     {{ values.quantity || values.initialQuantity }}
                 </p>
-            </VAlert>
-            <VAlert
-                v-if="message"
-                role="alert"
-                type="error"
-                variant="tonal"
-                class="mb-4"
-            >
-                {{ message }}
             </VAlert>
             <template v-if="!isPending">
                 <section

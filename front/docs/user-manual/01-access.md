@@ -23,9 +23,10 @@ mayúsculas, minúsculas y caracteres de su contraseña. No comparta sus credenc
 
 ## Corregir un ingreso rechazado
 
-Corrija los campos señalados. Si se rechaza el acceso, revise usuario y contraseña y
-reintente; si persiste, contacte al responsable de accesos. Esta pantalla no crea cuentas
-ni recupera contraseñas por correo.
+Corrija los campos señalados. Si aparece un aviso de acceso rechazado, pulse
+**Volver al formulario**, revise usuario y contraseña y vuelva a pulsar **Ingresar**.
+Si persiste, contacte al responsable de accesos. Esta pantalla no crea cuentas ni
+recupera contraseñas por correo.
 
 ## Continuidad y recuperación de la sesión
 

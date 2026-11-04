@@ -7,6 +7,8 @@ La decisión de herramientas pertenece a [ADR-VUE-006](../../../decisions.md).
 `DocumentReadDialog` compone la carga y el error de una lectura con Vuetify.
 Conserva el bloqueo del fondo hasta reintentar o cancelar; el estado y el aborto
 pertenecen al lector de la página. SweetAlert2 mantiene confirmaciones y avisos de resultado.
+Los fallos generales de envío usan `FormErrorDialog`; su interacción se define en
+el [estándar de interfaz](../../../interface-standards.md#carga-y-recuperación).
 
 ## Dependencias de presentación
 
@@ -58,6 +60,7 @@ y los imports se consultan en la [referencia de código](../../development/code-
 | `RecordListPanel` / `ListFilters` | Marco, título, acciones, errores, contador y panel plegable de filtros. |
 | `ServerTable` / `TableFrame` | Datos remotos, encabezados agrupados, slots de celdas, bordes, filas alternas y desplazamiento horizontal. `PersonForm` reutiliza el marco para asignaciones locales. |
 | `RecordEditorDialog` / `EditorDialog` | Cabecera, cuerpo desplazable y acciones visibles. El editor de registro contiene tablas anchas sin estirar campos. |
+| `FormErrorDialog` | Aviso modal de error compartido por `EditorDialog` y Login; recibe el mensaje y el estado de envío, sin conocer servicios ni permisos. |
 | `TableAction` / `StateBadge` | Nombre, icono, tooltip, bloqueo pendiente y presentación uniforme de estado. |
 | `PurchaseTotals` | Resumen del documento y de la corrección, con etiquetas de Compras. |
 | `shared/ui/feedback.ts` | Confirmación, espera y reintento explícito; texto mediante `titleText`/`text`. Su consumidor cancela la petición y cierra su aviso al desmontarse. |

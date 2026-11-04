@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { ids, material, pageOf, waste } from '../fixtures/inventory.js';
 import { chooseOption, mockWarehouse } from './warehouseFixtures.js';
 
@@ -217,7 +218,7 @@ test('materiales: conflicto de stock exige actualizar y no pierde la versión or
   await dialog.getByRole('spinbutton', { name: 'Nuevo stock' }).fill('8');
   await chooseOption(page, 'Motivo del ajuste', 'Conteo físico');
   await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
-  await expect(dialog.getByRole('alert').filter({ hasText: 'El registro cambió' })).toBeVisible();
+  await acknowledgeFormError(page, 'El registro cambió');
   await expect(dialog.getByRole('button', { name: 'Guardar', exact: true })).toBeDisabled();
   expect(writes).toEqual([
     {
@@ -397,6 +398,7 @@ for (const initialQuantity of ['3', '0']) {
     await expect(confirmation).toBeVisible();
     expect(entries).toHaveLength(0);
     await confirmation.getByRole('button', { name: 'Cancelar', exact: true }).click();
+    await expect(page.getByRole('alertdialog')).toHaveCount(0);
     await expect(creating.getByLabel('Observaciones', { exact: true })).toHaveValue(
       'Conservar esta captura',
     );
@@ -468,6 +470,7 @@ test('mermas: referencia de rollo, peso calculado y recuperación tras recargar 
   await expect(dialog.getByRole('spinbutton', { name: 'Base (m)' })).toHaveValue('2');
   await expect(dialog.getByRole('spinbutton', { name: 'Altura (m)' })).toHaveValue('12.5');
   await dialog.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await acknowledgeFormError(page, 'No fue posible conectar');
   await expect(dialog.getByRole('button', { name: 'Recuperar captura' })).toBeVisible();
   const sent = writes[0]!;
   expect(sent).toMatchObject({

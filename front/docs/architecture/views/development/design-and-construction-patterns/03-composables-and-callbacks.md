@@ -109,6 +109,10 @@ que necesitarían Editar o Ajustar. `useInventoryEditor` conserva validación, c
 e idempotencia; la página propietaria sustituye el editor mediante el evento tipado
 `addStock`. La presentación no navega ni escribe por su cuenta.
 
+`recover` devuelve `unavailable`, `canceled` o `confirmed`. Cuando presenta la
+alternativa, ese diálogo atiende el rechazo; el editor no abre otro aviso general
+al cancelarla.
+
 **Identificador:** `DIA-VUE-PAT-002`. **Pregunta:** ¿cómo realiza Vue `CU-ALM-10` A2
 sin acoplar dos modales ni escribir al aceptar el aviso? **Fuente:** `useInventoryEditor`,
 `useWasteDuplicateRecovery`, `InventoryEditorPage`, `InventoryPage` y `useInventory`.

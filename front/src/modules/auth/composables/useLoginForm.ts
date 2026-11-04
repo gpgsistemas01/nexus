@@ -78,7 +78,10 @@ export const useLoginForm = ({ onSuccess, request = loginRequest }: LoginFormOpt
                         : LOGIN_MESSAGES.REQUEST_FAILED;
 
                 if (error instanceof LoginRequestError) {
-                    for (const field of ['name', 'password'] as const) {
+                    const fields = ['name', 'password'] as const;
+                    if (fields.some((field) => error.fieldErrors[field])) message.value = '';
+
+                    for (const field of fields) {
                         if (error.fieldErrors[field])
                             setFieldError(field, error.fieldErrors[field]);
                     }

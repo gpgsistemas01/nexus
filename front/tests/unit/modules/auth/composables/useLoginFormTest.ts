@@ -83,6 +83,7 @@ describe('login Vue: captura y transición de acceso (DP-VAL-002)', () => {
     form.updateField('password', ' legado ');
     await form.submit();
     expect(form.errors.value.name).toBe('Nombre inválido.');
+    expect(form.message.value).toBe('');
     expect(form.isSubmitting.value).toBe(false);
     expect(onSuccess).not.toHaveBeenCalled();
     form.updateField('name', 'usuario.correcto');

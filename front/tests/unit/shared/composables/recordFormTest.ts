@@ -98,22 +98,59 @@ describe('ciclo compartido de formularios de registro (DP-VUE-FORM-001)', () => 
     expect(saved).not.toHaveBeenCalled();
   });
 
-  it('un fallo recuperable permite corregir y reintentar sin borrar la captura', async () => {
+  it.each([400, 422])(
+    'un rechazo %s muestra la validación por campo y permite corregir',
+    async (status) => {
+      const { value, request, saved } = openForm();
+      request.mockRejectedValueOnce(
+        new ApiError('No se pudo guardar.', status, 'VALIDATION_ERROR', {
+          name: 'Nombre duplicado.',
+        }),
+      );
+      value.update('name', 'Cliente');
+      await value.submit();
+      expect(value.errors.value.name).toBe('Nombre duplicado.');
+      expect(value.message.value).toBe('');
+      expect(saved).not.toHaveBeenCalled();
+      value.update('name', 'Otro cliente');
+      expect(value.message.value).toBe('');
+      expect(value.errors.value.name).toBeUndefined();
+      await value.submit();
+      expect(saved).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it.each([0, 409, 500, 502])(
+    'el fallo general %s conserva el mensaje sin repetir el envío',
+    async (status) => {
+      const { value, request, saved } = openForm();
+      request.mockRejectedValueOnce(new ApiError('No se pudo guardar.', status));
+      value.update('name', 'Captura conservada');
+      await value.submit();
+      expect(value.message.value).toBe('No se pudo guardar.');
+      expect(value.values.name).toBe('Captura conservada');
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(saved).not.toHaveBeenCalled();
+      await value.submit();
+      expect(value.message.value).toBe('');
+      expect(saved).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it.each<Record<string, string>>([
+    { expectedVersion: 'Versión inválida.' },
+    { 'details[0].materialId': 'Artículo inválido.' },
+    { name: 'Nombre inválido.', expectedVersion: 'Versión inválida.' },
+  ])('mantiene el mensaje general si hay errores sin campo visible: %j', async (fieldErrors) => {
     const { value, request, saved } = openForm();
     request.mockRejectedValueOnce(
-      new ApiError('No se pudo guardar.', 400, 'VALIDATION_ERROR', {
-        name: 'Nombre duplicado.',
-      }),
+      new ApiError('Revisa los datos del registro.', 400, 'VALIDATION_ERROR', fieldErrors),
     );
-    value.update('name', 'Cliente');
+    value.update('name', 'Captura conservada');
     await value.submit();
-    expect(value.errors.value.name).toBe('Nombre duplicado.');
+    expect(value.message.value).toBe('Revisa los datos del registro.');
+    expect(value.values.name).toBe('Captura conservada');
     expect(saved).not.toHaveBeenCalled();
-    value.update('name', 'Otro cliente');
-    expect(value.message.value).toBe('');
-    expect(value.errors.value.name).toBeUndefined();
-    await value.submit();
-    expect(saved).toHaveBeenCalledTimes(1);
   });
 
   it('el modo de consulta impide editar y enviar hasta habilitar el formulario', async () => {

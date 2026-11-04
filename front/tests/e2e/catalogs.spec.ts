@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { catalogs, entryId, mockCatalogs } from './catalogFixtures.js';
+import { acknowledgeFormError } from '../helpers/formFeedback.js';
 
 test('catálogos: los nombres recibidos se muestran como texto sin crear HTML', async ({ page }) => {
   const { store } = await mockCatalogs(page);
@@ -124,7 +125,7 @@ test('catálogos: conflicto conserva captura, impide reenvío y exige nueva lect
   const dialog = page.getByRole('dialog', { name: 'Editar rol', exact: true });
   await dialog.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Mi captura');
   await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
-  await expect(dialog.getByRole('alert')).toContainText('El registro cambió');
+  await acknowledgeFormError(page, 'El registro cambió');
   await expect(dialog.getByRole('textbox', { name: 'Nombre', exact: true })).toHaveValue(
     'Mi captura',
   );
@@ -139,6 +140,68 @@ test('catálogos: conflicto conserva captura, impide reenvío y exige nueva lect
   await dialog.getByRole('button', { name: 'Actualizar', exact: true }).click();
   await expect(dialog).toBeHidden();
   expect(writes.at(-1)?.data.expectedVersion).toBe(8);
+});
+
+test('catálogos: el error de envío bloquea el fondo y requiere aceptar antes de reintentar', async ({
+  page,
+}) => {
+  await mockCatalogs(page);
+  let attempts = 0;
+  await page.route('**/api/admin/catalogs/roles/*', (route) => {
+    attempts++;
+    return route.fulfill({ status: 503, json: { code: 'SERVER_ERROR' } });
+  });
+  await page.goto('/catalogos/roles');
+  await page.getByRole('button', { name: 'Editar registro', exact: true }).click();
+  const editor = page.getByRole('dialog', { name: 'Editar rol', exact: true });
+  await editor.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Captura conservada');
+  const error = page.getByRole('alertdialog', {
+    name: 'No se pudo completar la operación',
+    exact: true,
+  });
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    await editor.getByRole('button', { name: 'Actualizar', exact: true }).click();
+    await expect(error).toBeVisible();
+    expect(attempts).toBe(attempt);
+    await page.keyboard.press('Escape');
+    await page.mouse.click(2, 2);
+    await expect(error).toBeVisible();
+    await page.keyboard.press('Tab');
+    await expect(error.getByRole('button', { name: 'Volver al formulario' })).toBeFocused();
+    await acknowledgeFormError(page, 'No se pudo completar');
+    await expect(editor.getByRole('textbox', { name: 'Nombre', exact: true })).toHaveValue(
+      'Captura conservada',
+    );
+    expect(attempts).toBe(attempt);
+  }
+});
+
+test('catálogos: un rechazo de validación se corrige junto al campo sin otro modal', async ({
+  page,
+}) => {
+  const { writes } = await mockCatalogs(page);
+  let attempts = 0;
+  await page.route('**/api/admin/catalogs/roles/*', (route) => {
+    if (attempts++) return route.fallback();
+    return route.fulfill({
+      status: 400,
+      json: { code: 'VALIDATION_ERROR', errors: { name: { code: 'NAME_REQUIRED' } } },
+    });
+  });
+  await page.goto('/catalogos/roles');
+  await page.getByRole('button', { name: 'Editar registro', exact: true }).click();
+  const editor = page.getByRole('dialog', { name: 'Editar rol', exact: true });
+  await editor.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Captura');
+  await editor.getByRole('button', { name: 'Actualizar', exact: true }).click();
+  await expect(
+    editor.getByRole('textbox', { name: 'Nombre', exact: true }),
+  ).toHaveAccessibleDescription('El nombre es requerido.');
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  expect(writes).toHaveLength(0);
+  await editor.getByRole('textbox', { name: 'Nombre', exact: true }).fill('Nombre corregido');
+  await editor.getByRole('button', { name: 'Actualizar', exact: true }).click();
+  await expect(editor).toBeHidden();
+  expect(writes).toHaveLength(1);
 });
 
 test('catálogos: búsqueda, paginación, recuperación de lectura y vista móvil', async ({ page }) => {

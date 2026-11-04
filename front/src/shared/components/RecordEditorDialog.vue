@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import EditorDialog from './EditorDialog.vue';
 
@@ -46,18 +45,10 @@ const emit = defineEmits<{ close: []; submit: []; reload: [] }>();
         :show-submit="showSubmit"
         :close-label="closeLabel"
         :retain-focus="retainFocus"
+        :message="message"
         @close="emit('close')"
         @submit="emit('submit')"
     >
-        <VAlert
-            v-if="message"
-            role="alert"
-            type="error"
-            variant="tonal"
-            class="mb-4"
-        >
-            {{ message }}
-        </VAlert>
         <div class="record-fields"><slot /></div>
         <template #actions>
             <VBtn

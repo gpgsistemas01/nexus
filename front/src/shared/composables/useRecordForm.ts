@@ -25,6 +25,7 @@ export const useRecordForm = <Values extends object, Result = unknown>(
     },
 ) => {
     const save = useRecordSave({
+        fields: Object.keys(form.values),
         onSaved: options.onSaved,
         onDenied: options.onDenied,
         setErrors: options.setErrors ?? form.setErrors,

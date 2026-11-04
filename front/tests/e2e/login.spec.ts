@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { acknowledgeFormError } from '../helpers/formFeedback.js';
 import { mockWarehouse } from './warehouseFixtures.js';
 import { user } from '../fixtures/inventory.js';
 
@@ -53,9 +54,7 @@ test('login: captura inválida, rechazo genérico y reintento con cookies hacia 
   await expect(password).toHaveAttribute('type', 'password');
   await page.getByRole('checkbox', { name: 'Recordar usuario' }).check();
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await expect(page.getByRole('alert', { name: 'Error de acceso' })).toHaveText(
-    'Usuario o contraseña incorrectos.',
-  );
+  await acknowledgeFormError(page, 'Usuario o contraseña incorrectos.');
   expect(await page.evaluate(() => localStorage.length)).toBe(0);
   await password.fill(' válida ');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
@@ -98,15 +97,11 @@ test('login: errores 400 por campo y fallos de conexión permiten reintentar', a
   await page.locator('input[name="name"]').fill('usuario');
   await page.locator('input[name="password"]').fill('abc');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await expect(page.getByRole('alert', { name: 'Error de acceso' })).toHaveText(
-    'Revisa los datos de acceso.',
-  );
   await expect(page.locator('input[name="name"]')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.getByRole('alertdialog')).toHaveCount(0);
   await page.locator('input[name="name"]').fill('otro.usuario');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await expect(page.getByRole('alert', { name: 'Error de acceso' })).toContainText(
-    'No fue posible conectar',
-  );
+  await acknowledgeFormError(page, 'No fue posible conectar');
   await expect(page.getByRole('button', { name: 'Ingresar', exact: true })).toBeEnabled();
 });
 
@@ -132,9 +127,7 @@ test('login: envío pendiente bloquea duplicados y recupera controles tras un fa
   await page.locator('form').dispatchEvent('submit');
   expect(requests).toBe(1);
   finish();
-  await expect(page.getByRole('alert', { name: 'Error de acceso' })).toContainText(
-    'No fue posible conectar',
-  );
+  await acknowledgeFormError(page, 'No fue posible conectar');
   await expect(page.getByRole('button', { name: 'Ingresar', exact: true })).toBeEnabled();
 });
 
@@ -178,9 +171,7 @@ test('login: un 502 inicial conserva las credenciales y permite un nuevo intento
   await name.fill('usuario');
   await password.fill('legado');
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click();
-  await expect(page.getByRole('alert', { name: 'Error de acceso' })).toContainText(
-    'No fue posible conectar con el servidor',
-  );
+  await acknowledgeFormError(page, 'No fue posible conectar con el servidor');
   await expect(name).toHaveValue('usuario');
   await expect(password).toHaveValue('legado');
   await expect(page.getByRole('button', { name: 'Ingresar', exact: true })).toBeEnabled();
