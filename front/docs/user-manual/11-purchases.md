@@ -46,7 +46,8 @@ el registro nuevo quedará seleccionado. La recepción se registra al guardar la
 ## Consultar una compra
 
 **Ver compra** muestra folio, proveedor, persona que recibe, fecha, factura,
-observaciones y detalles. Use **Regresar** al terminar.
+observaciones y detalles. Use **Regresar** al terminar. Las opciones de carga y
+recuperación se explican en [Consultas de documentos](02-navigation-and-controls.md#consultas-de-documentos).
 
 ![Consulta de una compra ya registrada y sus detalles.](images/20-purchase-view.png)
 

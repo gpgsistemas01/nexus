@@ -49,6 +49,24 @@ Los servicios adaptan las filas de opciones a `LookupItem`, definido en el
 La paginación del control se desarrolla en la
 [secuencia de selección remota](../views/processes/02-shared-runtime/03-remote-lookup.md).
 
+`useRemoteLookup` carga al recibir la búsqueda del selector abierto. Reutiliza los
+resultados de esa búsqueda dentro de la instancia; no comparte una caché entre
+cuentas o formularios. Cambiar la dependencia o el permiso cancela la consulta y
+limpia las opciones. Una alta contextual refresca su catálogo y conserva la
+selección confirmada. `preload: true` se reserva a las áreas de Salidas, necesarias
+para resolver su asignación y bloqueo sin interacción.
+
+## Datos al abrir una operación
+
+| Operación | Fuente de datos |
+| --- | --- |
+| Consultar, editar, surtir o devolver una salida; consultar o editar una compra | Consultar por ID al abrir. El listado es un resumen; no precargar los detalles de todos los documentos. Resolver el modo con el documento recibido. |
+| Editar Catálogos, Directorio, Personas, Usuarios o Inventario | Usar la fila completa que entrega el listado, incluida su versión. Un conflicto obliga a actualizar; no sustituir la versión de una captura abierta para reenviarla. |
+| Abrir una captura nueva | Crear los valores locales. Consultar las opciones que se abran y las precargas requeridas por sus reglas. |
+
+Los datos leídos orientan la captura; la API comprueba estado, permisos y saldos al
+guardar. Abrir una consulta no reserva inventario ni autoriza una escritura futura.
+
 ## Escrituras y confirmación
 
 Construir el payload por recurso y operación, sin reenviar la fila completa.
@@ -58,6 +76,11 @@ del catálogo público, como texto.
 Los lectores validan ID, versión, campos y estado; los mappers, estructura y recurso.
 Estas comprobaciones validan el JSON recibido, que TypeScript no verifica en ejecución.
 Una respuesta incompleta se rechaza, sin inventar costos, versiones o detalles.
+
+En los detalles de Materiales y Consumibles, `suppliedQuantity` admite `null`
+en la API y se adapta a `0` en Vue, igual que en los cálculos del servidor. Un campo
+omitido o un valor no numérico sigue siendo inválido. Mermas exige el número
+recibido, porque su contrato no admite `null`.
 
 | Metadato | Uso y regla del cliente |
 | --- | --- |
@@ -77,9 +100,22 @@ localizan las variantes y transformaciones de cada payload.
 
 `apiClient` comparte una renovación pendiente ante respuestas `401` de solicitudes
 protegidas. Marca cada original con `hasRetried` y la reenvía una sola vez después
-del refresh. `requiresAuth: false` excluye login y refresh de esa recuperación;
-otros estados HTTP no activan el reintento automático. Una cancelación se propaga
-como tal antes de normalizar errores.
+del refresh. `requiresAuth: false` excluye login y refresh de la renovación ante 401.
+
+[connectionRecovery](../../../src/shared/http/connectionRecovery.ts) permite dos
+reintentos de conexión, con esperas de 500 y 1000 ms, sólo para GET/HEAD y el POST
+de refresh. Aplica a errores de red/timeout y HTTP 502, 503 o 504. Conserva la
+solicitud y su cancelación; el refresh sigue compartido mientras se recupera.
+Login y escrituras de negocio no se reenvían por estos fallos.
+
+El router espera el resultado de la recuperación antes de mostrar sesión no
+disponible. Un refresh 401 termina en login sin reintentos de conexión. Una
+cancelación se propaga como tal antes de normalizar errores.
+
+`isReadRetryable` excluye los rechazos HTTP 400, 401, 403, 404, 405, 410 y 422 del
+reintento manual de lecturas. Un cambio de estado incompatible tampoco permite
+repetir la acción elegida. La [presentación de cada fallo](../interface-standards.md#carga-y-recuperación)
+depende del control y de la operación, sin convertir todo error en un bloqueo global.
 
 | Respuesta o condición | Contrato expuesto al consumidor |
 | --- | --- |
@@ -88,7 +124,7 @@ como tal antes de normalizar errores.
 | `409` con `RECORD_VERSION_CONFLICT` | El código conserva la distinción entre conflicto de versión y otros rechazos. |
 | `WASTE_ALREADY_EXISTS` | `meta.operationRejected` y `meta.waste` transportan el contexto que evalúa la recuperación de merma. |
 | Red o timeout sin respuesta HTTP | `ApiError` con `status = 0` y `code = NETWORK_ERROR`. |
-| `502` del proxy o del refresh | Se conserva como error HTTP; no confirma la petición original. |
+| `502/503/504` o corte de conexión en una lectura/refresh | Se intenta recuperar automáticamente dentro del límite anterior. Si persiste, conserva el último error; no confirma la petición original. |
 | JSON no admitido, registro incompleto o código de éxito diferente | `apiClient`, lector o mapper rechaza el resultado antes de publicar una confirmación. |
 
 Login traduce los rechazos mediante `LoginRequestError`: distingue `401`, `400`,
@@ -113,6 +149,7 @@ operación. La entrega del archivo se muestra en la
 
 Las fuentes comunes son [apiClient](../../../src/shared/http/apiClient.ts),
 [apiError](../../../src/shared/http/apiError.ts),
+[readFailure](../../../src/shared/http/readFailure.ts),
 [pageRequest](../../../src/shared/http/pageRequest.ts),
 [recordParams](../../../src/shared/http/recordParams.ts),
 [recordContract](../../../src/shared/http/recordContract.ts) y

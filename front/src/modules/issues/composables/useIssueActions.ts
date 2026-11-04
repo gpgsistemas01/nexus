@@ -52,6 +52,7 @@ export const useIssueActions = (options: {
             (resolved === 'return' && (!options.canSupply() || !canReturnIssue(document)))
         ) {
             reader.readError.value = 'La salida cambió de estado. Actualiza el listado.';
+            reader.canRetry.value = false;
             return;
         }
 
@@ -83,6 +84,7 @@ export const useIssueActions = (options: {
         open,
         create,
         close,
+        cancelRead: reader.close,
         retry,
         handleSaved,
     };

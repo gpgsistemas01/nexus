@@ -92,7 +92,10 @@ const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDet
         unitMeasure: typeof unit.symbol === 'string' ? unit.symbol : readText(unit, 'name'),
         quantity: readIssueDecimal(value.quantity),
         convertedQuantity: readIssueDecimal(value.convertedQuantity),
-        suppliedQuantity: readIssueDecimal(value.suppliedQuantity),
+        suppliedQuantity:
+            resource !== 'wastes' && value.suppliedQuantity === null
+                ? 0
+                : readIssueDecimal(value.suppliedQuantity),
         returnedQuantity: readIssueDecimal(value.returnedQuantity),
         maxUnitCost: value.maxUnitCost == null ? null : readIssueDecimal(value.maxUnitCost),
         projectConvertedQuantity:

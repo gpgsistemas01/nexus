@@ -2,6 +2,45 @@
 
 **Casos relacionados:** RD-VUE-006; RN-VUE-003/005; soporte de captura.
 
+## Primera apertura y reutilización
+
+**Identificador:** `DIA-VUE-SEQ-058`. Apertura sin texto de búsqueda. La
+[política de carga](../../../contracts/client-contracts.md#página-de-datos-y-selección-remota)
+define la vida útil de las opciones y la precarga del área.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    box Interfaz
+    participant Select@{ "type": "boundary" } as RemoteSelect.vue
+    end
+    box Coordinación
+    participant Page@{ "type": "control" } as PurchaseEditorPage.vue
+    participant Lookup@{ "type": "control" } as useRemoteLookup.ts
+    participant Editor@{ "type": "control" } as usePurchaseEditor.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as purchaseLookupService.ts
+    end
+    U->>Select: nowrap: update:menu = true
+    Select->>Select: nowrap: updateMenu(true)
+    Select->>Page: nowrap: emit('search', '')
+    Page->>Lookup: nowrap: editor.suppliers.updateSearch('')
+    alt nowrap: !hasRequested && !isLoading.value
+        Lookup->>Lookup: nowrap: load(1)
+        Lookup->>Editor: nowrap: request(search.value, nextPage, requestController.signal)
+        Editor->>Service: nowrap: purchaseLookupService.list(query, signal)
+        Service-->>Editor: nowrap: result
+        Editor-->>Lookup: nowrap: result
+        Lookup->>Lookup: nowrap: items.value = [...previous, ...additions]
+        Lookup-->>Page: nowrap: suppliers.state
+        Page-->>Select: nowrap: state
+    else nowrap: hasRequested || isLoading.value
+        Lookup-->>Page: nowrap: undefined
+    end
+```
+
 ## Secuencia aplicada
 
 **Identificador:** `DIA-VUE-SEQ-010`.
@@ -49,6 +88,12 @@ sequenceDiagram
         Lookup->>Lookup: nowrap: load(page.value + 1)
     end
 ```
+
+Si la lectura falla, `useRemoteLookup` publica `error` y calcula `canRetry` mediante
+`isReadRetryable`. `RemoteSelect` emite `retry` sólo cuando ofrece ese botón;
+la página llama `retry()`, que repite `load(requestedPage)` sin saltar de página.
+La [presentación del error](../../../interface-standards.md#carga-y-recuperación)
+no bloquea los otros campos del formulario.
 
 ## Fuentes de los participantes
 

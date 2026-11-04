@@ -99,7 +99,7 @@ export const useIssueHeaderSelection = (options: {
                 signal,
             ),
         computed(() => options.isEnabled() && canReadPersons.value && !!clientName.value),
-        clientName,
+        { dependency: clientName },
     );
     const requesters = useRemoteLookup(
         (search, page, signal) =>
@@ -117,7 +117,7 @@ export const useIssueHeaderSelection = (options: {
                 signal,
             ),
         computed(() => options.isEnabled() && canReadPersons.value && !!departmentName.value),
-        departmentName,
+        { dependency: departmentName },
     );
 
     const updateSuggestedProjectNumber = () =>

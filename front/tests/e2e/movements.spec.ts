@@ -168,7 +168,6 @@ test('movimientos: rechazo de ruta sin permiso y recuperación de lectura fallid
   let fail = true;
   await page.route('**/api/admin/movements/wastes?**', (route) => {
     if (!fail) return route.fallback();
-    fail = false;
     return route.fulfill({ status: 503, json: { code: 'UNAVAILABLE' } });
   });
   await page.reload();
@@ -178,6 +177,7 @@ test('movimientos: rechazo de ruta sin permiso y recuperación de lectura fallid
       .getByRole('region', { name: 'Historial de Movimientos de merma', exact: true })
       .getByRole('alert'),
   ).toBeVisible();
+  fail = false;
   await page.getByRole('button', { name: 'Reintentar', exact: true }).click();
   await expect(page.getByRole('cell', { name: 'SAL-001', exact: true })).toBeVisible();
 });

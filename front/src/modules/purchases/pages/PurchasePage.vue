@@ -12,6 +12,7 @@ import { initialRecordQuery } from '../../../shared/list.js';
 import { dateRangeError } from '../../../shared/report.js';
 import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
 import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue';
+import DocumentReadDialog from '../../../shared/components/DocumentReadDialog.vue';
 import { purchaseService } from '../services/purchaseService.js';
 import { usePurchaseFilters } from '../composables/usePurchaseFilters.js';
 import { usePurchaseActions } from '../composables/usePurchaseActions.js';
@@ -93,6 +94,7 @@ useVisibleRefresh({
         canManage.value &&
         !editor.value &&
         !isReading.value &&
+        !readError.value &&
         !isReportOpen.value &&
         !isExporting.value &&
         !isLoading.value &&
@@ -153,32 +155,6 @@ onMounted(() => {
                 Nueva compra
             </VBtn>
         </template>
-        <template #messages>
-            <VAlert
-                v-if="isReading"
-                role="status"
-                type="info"
-                variant="tonal"
-                class="mb-4"
-            >
-                Cargando compra…
-            </VAlert>
-            <VAlert
-                v-if="readError"
-                role="alert"
-                type="error"
-                variant="tonal"
-                class="mb-4"
-            >
-                {{ readError }}
-                <VBtn
-                    variant="text"
-                    @click="actions.retry"
-                >
-                    Reintentar consulta
-                </VBtn>
-            </VAlert>
-        </template>
         <PurchaseTable
             v-if="canManage"
             :rows="rows"
@@ -196,13 +172,21 @@ onMounted(() => {
             Tu cuenta no tiene permiso para consultar compras.
         </VAlert>
     </RecordListPanel>
+    <DocumentReadDialog
+        v-if="isReading || readError"
+        :is-reading="isReading"
+        :error="readError"
+        :can-retry="actions.canRetry.value"
+        loading-label="Cargando compra…"
+        @retry="actions.retry"
+        @cancel="actions.cancelRead"
+    />
     <PurchaseEditorPage
         v-if="editor"
         :key="editorKey"
         :resource="resource"
         :target="editor"
         :is-changing="actions.isChanging.value"
-        :read-error="readError"
         :can-change-details="!isReading && !actions.isChanging.value && !actions.needsReload.value"
         @saved="actions.handleSaved"
         @close="actions.close"

@@ -2,11 +2,12 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { PageResult } from '../http/pageRequest.js';
 import type { LookupItem, LookupState } from '../lookup.js';
+import { isReadRetryable } from '../http/readFailure.js';
 
 export const useRemoteLookup = (
     request: (search: string, page: number, signal: AbortSignal) => Promise<PageResult<LookupItem>>,
     isEnabled: Ref<boolean>,
-    dependency?: Ref<string>,
+    options: { dependency?: Ref<string>; preload?: boolean } = {},
 ) => {
     const items = ref<LookupItem[]>([]);
     const isLoading = ref(false);
@@ -14,18 +15,21 @@ export const useRemoteLookup = (
     const search = ref('');
     const page = ref(1);
     const hasMore = ref(false);
+    const canRetry = ref(false);
     let recordsRead = 0;
     let controller: AbortController | null = null;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let sequence = 0;
     let requestedPage = 1;
     let isDisposed = false;
+    let hasRequested = false;
 
     const resetOptions = () => {
         items.value = [];
         recordsRead = 0;
         hasMore.value = false;
         error.value = '';
+        canRetry.value = false;
         page.value = 1;
         requestedPage = 1;
     };
@@ -45,9 +49,11 @@ export const useRemoteLookup = (
         }
 
         const requestController = new AbortController();
+        hasRequested = true;
         controller = requestController;
         isLoading.value = true;
         error.value = '';
+        canRetry.value = false;
 
         try {
             const result = await request(search.value, nextPage, requestController.signal);
@@ -68,26 +74,39 @@ export const useRemoteLookup = (
             // Una página vacía termina la carga incluso si el conteo quedó desactualizado.
             hasMore.value = result.data.length > 0 && recordsRead < result.recordsFiltered;
         } catch (cause) {
-            if (requestId === sequence && !requestController.signal.aborted)
+            if (requestId === sequence && !requestController.signal.aborted) {
                 error.value =
                     cause instanceof Error ? cause.message : 'No se pudo cargar el catálogo.';
+                canRetry.value = isReadRetryable(cause);
+            }
         } finally {
             if (requestId === sequence) isLoading.value = false;
         }
     };
 
     watch(
-        [isEnabled, ...(dependency ? [dependency] : [])],
+        [isEnabled, ...(options.dependency ? [options.dependency] : [])],
         () => {
+            ++sequence;
+            clearTimeout(timer);
+            controller?.abort();
+            isLoading.value = false;
+            hasRequested = false;
             search.value = '';
             resetOptions();
-            void load();
+            if (options.preload) void load();
         },
         { immediate: true },
     );
 
     const updateSearch = (value: string) => {
-        if (isDisposed || value === search.value) return;
+        if (isDisposed || !isEnabled.value) return;
+
+        if (value === search.value) {
+            if (!hasRequested && !isLoading.value) void load();
+
+            return;
+        }
 
         search.value = value;
         resetOptions();
@@ -113,6 +132,7 @@ export const useRemoteLookup = (
         isLoading: isLoading.value,
         error: error.value,
         hasMore: hasMore.value,
+        canRetry: canRetry.value,
     }));
     return {
         state,
@@ -126,6 +146,8 @@ export const useRemoteLookup = (
         loadMore: () => {
             if (!isLoading.value && !error.value && hasMore.value) return load(page.value + 1);
         },
-        retry: () => load(requestedPage),
+        retry: () => {
+            if (canRetry.value) return load(requestedPage);
+        },
     };
 };

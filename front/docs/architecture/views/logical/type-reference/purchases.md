@@ -294,7 +294,6 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `target` | `target: PurchaseTarget;` |
 | `canChangeDetails` | `canChangeDetails: boolean;` |
 | `isChanging` | `isChanging: boolean;` |
-| `readError` | `readError: string;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -303,7 +302,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseEditorPage.defineEmits
 
-**Fuente:** [src/modules/purchases/pages/PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue) · línea 25, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchaseEditorPage.vue](../../../../../src/modules/purchases/pages/PurchaseEditorPage.vue) · línea 24, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -356,7 +355,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchasePage.defineProps
 
-**Fuente:** [src/modules/purchases/pages/PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue) · línea 27, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue) · línea 28, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -368,7 +367,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchasePage.defineEmits
 
-**Fuente:** [src/modules/purchases/pages/PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue) · línea 28, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/pages/PurchasePage.vue](../../../../../src/modules/purchases/pages/PurchasePage.vue) · línea 29, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

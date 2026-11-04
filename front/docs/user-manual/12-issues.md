@@ -57,7 +57,8 @@ secundario y regresar con la selección preparada.
 ## Consultar un documento
 
 **Consultar salida** abre el documento para revisar encabezado, cantidades,
-cumplimiento, surtido y devoluciones. Use **Regresar** al terminar.
+cumplimiento, surtido y devoluciones. Use **Regresar** al terminar. Las opciones de carga y
+recuperación se explican en [Consultas de documentos](02-navigation-and-controls.md#consultas-de-documentos).
 
 <!-- manual:any goods:issues-manage waste:issues-manage -->
 ## Editar una solicitud

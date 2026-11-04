@@ -30,6 +30,7 @@ identifica quién los conserva y cuándo se descartan.
 | Formularios: `submit()` | Intención de enviar la captura; no contiene una confirmación. | Método `submit` del composable. |
 | Detalles de Compra/Salida: `add(line)` | `PurchaseDetail` o `IssueDetail` de la captura local. | Editor del documento; agregar no confirma el documento en la API. |
 | Editores: `close()` y `reload()` | Cierre o solicitud de nueva lectura. | Contenedor que abrió el editor. |
+| `DocumentReadDialog`: `retry()` y `cancel()` | Reintentar o detener la lectura, sin datos de formulario. | La página conecta `actions.retry` y `actions.cancelRead`; el lector aborta e invalida respuestas anteriores. |
 | Catálogos, Identidad, Directorio e `IssueReturnPage`: `denied(status)` | Estado de rechazo; Inventario utiliza `unauthorized()` sin argumento. | Handler de acceso del contenedor. |
 | Inventario: `addStock(target)` | `StockAdditionTarget` para sustituir el editor actual por una entrada de merma. | `InventoryPage` y su coordinador. |
 

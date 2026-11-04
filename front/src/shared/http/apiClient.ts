@@ -1,12 +1,14 @@
 import axios, { CanceledError } from 'axios';
-import type { AxiosAdapter, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import type { AxiosAdapter, AxiosRequestConfig } from 'axios';
 import { ApiError, normalizeApiError } from './apiError.js';
+import { recoverConnection, SESSION_REFRESH_PATH } from './connectionRecovery.js';
+import type { RecoverableRequest } from './connectionRecovery.js';
 import { isRecord } from '../utils/isRecord.js';
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
     requiresAuth?: boolean;
 }
-interface RetriableRequest extends InternalAxiosRequestConfig {
+interface RetriableRequest extends RecoverableRequest {
     requiresAuth?: boolean;
     hasRetried?: boolean;
 }
@@ -24,9 +26,12 @@ export const createApiClient = (adapter?: AxiosAdapter) => {
             if (!axios.isAxiosError(cause)) throw cause;
 
             const original = cause.config as RetriableRequest | undefined;
+            if (!original) throw cause;
+
+            if (await recoverConnection(cause, original)) return http.request(original);
+
             if (
                 cause.response?.status !== 401 ||
-                !original ||
                 original.requiresAuth === false ||
                 original.hasRetried
             )
@@ -34,7 +39,7 @@ export const createApiClient = (adapter?: AxiosAdapter) => {
 
             original.hasRetried = true;
             refresh ??= http
-                .post('/api/auth/refresh', {}, { requiresAuth: false } as ApiRequestConfig)
+                .post(SESSION_REFRESH_PATH, {}, { requiresAuth: false } as ApiRequestConfig)
                 .finally(() => {
                     refresh = null;
                 });

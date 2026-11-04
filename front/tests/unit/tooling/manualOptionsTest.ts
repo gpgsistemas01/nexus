@@ -1,6 +1,9 @@
 import { expect, it } from 'vitest';
 import { parseManualOptions } from '../../../scripts/manual/options.mjs';
-import { assertManualDevelopment } from '../../../scripts/manual/environment.mjs';
+import {
+  assertManualDevelopment,
+  createManualWebServer,
+} from '../../../scripts/manual/environment.mjs';
 
 it('usa cuentas y credenciales locales por defecto, sin seleccionar demostraciones', () => {
   expect(parseManualOptions(['--all'])).toMatchObject({
@@ -49,6 +52,32 @@ it.each([undefined, '', 'development', 'test'])(
 
 it.each(['production', 'staging'])('rechaza la generación fuera de desarrollo: %s', (nodeEnv) => {
   expect(() => assertManualDevelopment(nodeEnv)).toThrow('sólo para desarrollo');
+});
+
+it.each([
+  ['http://127.0.0.1:5173', '127.0.0.1', '5173'],
+  ['http://localhost:5190', 'localhost', '5190'],
+  ['http://[::1]:5173', '::1', '5173'],
+])(
+  'prepara Vue en el origen configurado %s y reutiliza un servidor existente',
+  (baseUrl, host, port) => {
+    expect(createManualWebServer({ mode: 'dev', baseUrl })).toEqual({
+      command: `npm run dev -- --host ${host} --port ${port}`,
+      url: baseUrl,
+      reuseExistingServer: true,
+      timeout: 60_000,
+    });
+  },
+);
+
+it('la demostración mantiene su servidor aislado y no reutiliza un servicio real', () => {
+  expect(createManualWebServer({ mode: 'demo', baseUrl: 'http://127.0.0.1:5177' })).toMatchObject({
+    reuseExistingServer: false,
+  });
+});
+
+it('un origen HTTPS local requiere su servicio TLS ya configurado', () => {
+  expect(createManualWebServer({ mode: 'dev', baseUrl: 'https://localhost:5173' })).toBeUndefined();
 });
 
 it.each(['docx', 'pdf', 'ambos'])('admite publicar el formato %s', (format) => {

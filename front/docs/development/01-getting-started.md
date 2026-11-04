@@ -187,7 +187,8 @@ npm --prefix front run preview
 | `401` o `403` con la API respondiendo | Revisa sesión, credenciales y permisos. |
 | `EBADENGINE` | Compara Node con los dos manifiestos y actualiza el ejecutable a una rama admitida. |
 
-Cuando la API vuelva al mismo host y puerto, reintenta desde la pantalla: **Volver
+Las consultas y el refresh intentan recuperar un corte breve automáticamente. Si
+el fallo persiste y la API vuelve al mismo host y puerto, reintenta desde la pantalla: **Volver
 a comprobar el acceso** para la sesión, **Actualizar** o **Reintentar** para una
 tabla y **Reintentar catálogo** para un selector. El proxy puede recuperarse sin
 reiniciar Vite. En el login, pulsa **Ingresar** nuevamente; conserva los campos y no

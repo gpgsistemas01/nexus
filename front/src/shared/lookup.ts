@@ -10,6 +10,7 @@ export interface LookupState {
     isLoading: boolean;
     error: string;
     hasMore: boolean;
+    canRetry?: boolean;
 }
 export interface LookupQuery {
     search: string;

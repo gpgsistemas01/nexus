@@ -569,7 +569,7 @@ test('selectores: carga automática al final, reintento y selección conservada'
 }) => {
   await mockWarehouse(page);
   const starts: number[] = [];
-  let hasFailed = false;
+  let isAvailable = false;
   const suppliers = Array.from({ length: 45 }, (_, index) => ({
     id: `99999999-9999-4999-8999-${String(index + 1).padStart(12, '0')}`,
     tradeName: `Proveedor ${String(index + 1).padStart(3, '0')}`,
@@ -578,8 +578,7 @@ test('selectores: carga automática al final, reintento y selección conservada'
     const query = new URL(route.request().url()).searchParams;
     const start = Number(query.get('start'));
     starts.push(start);
-    if (start === 20 && !hasFailed) {
-      hasFailed = true;
+    if (start === 20 && !isAvailable) {
       return route.fulfill({ status: 503, json: {} });
     }
     return route.fulfill({
@@ -596,9 +595,10 @@ test('selectores: carga automática al final, reintento y selección conservada'
   await expect(
     page.getByRole('button', { name: 'Reintentar catálogo', exact: true }),
   ).toBeVisible();
-  expect(starts.filter((start) => start === 20)).toHaveLength(1);
+  expect(starts.filter((start) => start === 20)).toHaveLength(3);
+  isAvailable = true;
   await page.getByRole('button', { name: 'Reintentar catálogo', exact: true }).click();
-  await expect.poll(() => starts.filter((start) => start === 20).length).toBe(2);
+  await expect.poll(() => starts.filter((start) => start === 20).length).toBe(4);
   await list.hover();
   await page.mouse.wheel(0, 1800);
   await expect.poll(() => starts.includes(40)).toBe(true);

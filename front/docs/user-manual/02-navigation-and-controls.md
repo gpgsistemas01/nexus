@@ -29,9 +29,27 @@ Si falta un registro, limpie los filtros. La actualización automática los cons
 y espera mientras tiene una captura abierta. Ante un fallo, use **Actualizar** o
 **Reintentar**. Evite recargar el navegador con cambios sin guardar.
 
+## Consultas de documentos
+
+Al abrir un documento, una ventana muestra su carga e impide usar los controles del fondo.
+
+| Situación | Qué hacer |
+| --- | --- |
+| La consulta está cargando | Espere, o pulse **Cancelar consulta** para detenerla. |
+| La consulta informa un error | Si aparece **Reintentar consulta**, púlselo para volver a abrir el documento. |
+| Quiere dejar de intentar | Pulse **Cancelar consulta**; podrá continuar usando la página. |
+
+Cancelar una lectura no guarda ni modifica registros.
+
+Si el registro ya no está disponible o cambió de estado, cierre el aviso y actualice
+el listado antes de elegir otra acción. En esos casos no aparece el reintento.
+
 ## Seleccionar registros relacionados
 
 Abra el selector, escriba parte del nombre y **seleccione una opción de la lista**.
+Las opciones cargan al abrirlo. Si la consulta falla, use **Reintentar catálogo**
+cuando aparezca. Puede cerrar la lista y continuar con los otros campos; su captura
+se conserva. El área asignada automáticamente en Salidas se prepara al abrir el formulario.
 Escribir el nombre no basta para elegir el registro.
 
 Algunos campos dependen de una selección previa. En Mermas, elija primero el

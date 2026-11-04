@@ -20,7 +20,7 @@ afterEach(() => {
 });
 
 it.each(['materials', 'consumables', 'wastes'] as const)(
-  '%s asigna la única área autorizada, carga solicitantes y conserva el ID en el payload',
+  '%s asigna la única área autorizada, consulta solicitantes al abrir y conserva el ID en el payload',
   async (resource) => {
     const lookup = vi
       .spyOn(issueLookupService, 'list')
@@ -38,6 +38,9 @@ it.each(['materials', 'consumables', 'wastes'] as const)(
     expect(value.values.departmentId).toBe(printing.id);
     expect(value.headerSelection.departments.isLocked.value).toBe(true);
     expect(value.errors.value).toEqual({});
+    expect(lookup.mock.calls.every(([query]) => query.kind === 'departments')).toBe(true);
+    value.headerSelection.requesters.updateSearch('');
+    await flushPromises();
     expect(
       lookup.mock.calls.some(
         ([query]) =>

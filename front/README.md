@@ -131,8 +131,9 @@ Estas herramientas son sólo para desarrollo local. Playwright y su Chromium se
 instalan en el equipo de desarrollo y quedan fuera de la imagen final de producción.
 
 Prepara `front/manual.accounts.local.json` y `front/.env.manual.local` con la
-[guía por cuenta](docs/governance/07-manual-accounts-and-files.md). Con Vue y la API
-funcionando, elige desde la raíz:
+[guía por cuenta](docs/governance/07-manual-accounts-and-files.md). Mantén la API
+funcionando; el comando inicia Vite si hace falta o reutiliza el que ya esté activo.
+Elige desde la raíz:
 
 | Resultado | Comando |
 | --- | --- |

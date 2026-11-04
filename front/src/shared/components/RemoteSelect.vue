@@ -73,7 +73,13 @@ const updateValue = (value: string | null) => {
 
 const searchOptions = (value: string) => {
     search.value = value;
-    if (value !== currentItem.value?.title) emit('search', value);
+    if (isMenuOpen.value && value !== currentItem.value?.title) emit('search', value);
+};
+
+const updateMenu = (isOpen: boolean) => {
+    isMenuOpen.value = isOpen;
+    if (isOpen && !props.isDisabled)
+        emit('search', search.value === currentItem.value?.title ? '' : search.value);
 };
 
 const loadWhenVisible = (isVisible: boolean) => {
@@ -91,7 +97,7 @@ const loadWhenVisible = (isVisible: boolean) => {
 
 <template>
     <VAutocomplete
-        v-model:menu="isMenuOpen"
+        :menu="isMenuOpen"
         :label="label"
         :model-value="modelValue || null"
         :items="visibleItems"
@@ -113,6 +119,7 @@ const loadWhenVisible = (isVisible: boolean) => {
         no-data-text="No hay resultados. Escribe para buscar."
         @update:model-value="updateValue"
         @update:search="searchOptions($event ?? '')"
+        @update:menu="updateMenu"
         @blur="emit('blur')"
     >
         <template #no-data>
@@ -129,13 +136,6 @@ const loadWhenVisible = (isVisible: boolean) => {
                               : 'No hay resultados.'
                     }}
                 </span>
-                <VBtn
-                    v-if="state.error"
-                    variant="text"
-                    @click.stop="emit('retry')"
-                >
-                    Reintentar catálogo
-                </VBtn>
             </div>
         </template>
         <template #append-item>
@@ -152,7 +152,18 @@ const loadWhenVisible = (isVisible: boolean) => {
                 {{ createLabel }} «{{ search.trim() }}»
             </VBtn>
             <div
-                v-if="state.hasMore"
+                v-if="state.error && state.canRetry !== false"
+                class="catalog-status"
+            >
+                <VBtn
+                    variant="text"
+                    @click.stop="emit('retry')"
+                >
+                    Reintentar catálogo
+                </VBtn>
+            </div>
+            <div
+                v-else-if="state.hasMore && !state.error"
                 :key="state.items.length"
                 v-intersect="loadWhenVisible"
                 class="catalog-status"
@@ -164,13 +175,6 @@ const loadWhenVisible = (isVisible: boolean) => {
                     size="18"
                     width="2"
                 />
-                <VBtn
-                    v-else-if="state.error"
-                    variant="text"
-                    @click.stop="emit('retry')"
-                >
-                    Reintentar catálogo
-                </VBtn>
                 <span v-else>Desplázate para cargar más opciones</span>
             </div>
         </template>

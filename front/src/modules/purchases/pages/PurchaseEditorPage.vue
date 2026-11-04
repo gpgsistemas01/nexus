@@ -20,7 +20,6 @@ const props = defineProps<{
     target: PurchaseTarget;
     canChangeDetails: boolean;
     isChanging: boolean;
-    readError: string;
 }>();
 const emit = defineEmits<{
     saved: [confirmation: MutationConfirmation];
@@ -71,7 +70,7 @@ const title = document
         :title="title"
         :values="values"
         :errors="errors"
-        :message="message || readError"
+        :message="message"
         :is-submitting="isSubmitting"
         :is-conflicted="isConflicted"
         :is-read-only="editor.isReadOnly"

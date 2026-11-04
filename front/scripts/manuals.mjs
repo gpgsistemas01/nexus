@@ -35,6 +35,7 @@ const runManuals = async () => {
         );
         return;
     }
+    console.log(`Capturas de desarrollo en ${configuration.baseUrl} (${selected.length} cuentas).`);
     const result = spawnSync(
         process.execPath,
         [

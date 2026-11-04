@@ -34,3 +34,16 @@ export const parseManualBaseUrl = (value) => {
         );
     return baseUrl.origin;
 };
+
+export const createManualWebServer = ({ mode, baseUrl }) => {
+    const url = new URL(parseManualBaseUrl(baseUrl));
+    if (url.protocol !== 'http:') return undefined;
+
+    const host = url.hostname === '[::1]' ? '::1' : url.hostname;
+    return {
+        command: `npm run dev -- --host ${host} --port ${url.port || '80'}`,
+        url: url.origin,
+        reuseExistingServer: mode === 'dev',
+        timeout: 60_000,
+    };
+};

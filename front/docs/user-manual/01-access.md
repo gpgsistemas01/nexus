@@ -30,12 +30,12 @@ ni recupera contraseñas por correo.
 ## Continuidad y recuperación de la sesión
 
 Durante el uso, Nexus intenta mantener el acceso automáticamente mientras la
-sesión pueda renovarse. Si necesita volver a identificarse, se muestra el ingreso.
-Si no puede comprobar la sesión por un fallo del servicio, puede aparecer una
-pantalla de sesión no disponible.
+sesión pueda renovarse. Ante un corte breve, reintenta automáticamente y continúa
+en la página solicitada. Si necesita volver a identificarse, muestra el ingreso.
+La pantalla de sesión no disponible aparece si no logra recuperar el servicio.
 
 1. Compruebe la conexión y espere a que el servicio esté disponible.
-2. Pulse **Volver a comprobar acceso** cuando esa opción aparezca.
+2. Pulse **Volver a comprobar el acceso** cuando esa opción aparezca.
 3. Si vuelve al ingreso, identifíquese de nuevo.
 4. Antes de repetir una operación que estaba guardando, consulte su resultado.
 

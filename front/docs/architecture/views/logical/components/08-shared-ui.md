@@ -4,6 +4,10 @@ Los componentes propios encapsulan el marco de listas, tablas, formularios y sel
 Vue controla su estado visual; Vuetify aporta los controles y SweetAlert2 los avisos.
 La decisión de herramientas pertenece a [ADR-VUE-006](../../../decisions.md).
 
+`DocumentReadDialog` compone la carga y el error de una lectura con Vuetify.
+Conserva el bloqueo del fondo hasta reintentar o cancelar; el estado y el aborto
+pertenecen al lector de la página. SweetAlert2 mantiene confirmaciones y avisos de resultado.
+
 ## Dependencias de presentación
 
 **Identificador:** `DIA-VUE-COMP-009`. **Pregunta:** ¿qué piezas propias componen los

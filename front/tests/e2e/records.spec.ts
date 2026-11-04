@@ -294,15 +294,17 @@ for (const [path, title, reportPath, search] of [
     await page.getByRole('textbox', { name: 'Buscar por nombre', exact: true }).fill(search);
     await page.getByRole('button', { name: 'Buscar', exact: true }).click();
     await expect.poll(() => reads.at(-1)?.searchParams.get('search')).toBe(search);
-    await page.route(
-      `**${reportPath}?**`,
-      (route) => route.fulfill({ status: 503, json: { code: 'SERVER_ERROR' } }),
-      { times: 1 },
+    let isAvailable = false;
+    await page.route(`**${reportPath}?**`, (route) =>
+      isAvailable
+        ? route.fallback()
+        : route.fulfill({ status: 503, json: { code: 'SERVER_ERROR' } }),
     );
     const exportButton = page.getByRole('button', { name: 'Exportar Excel', exact: true });
     await exportButton.click();
     await expect(page.getByRole('alert', { name: 'Error de descarga', exact: true })).toBeVisible();
     await expect(exportButton).toBeEnabled();
+    isAvailable = true;
     const download = page.waitForEvent('download');
     await exportButton.click();
     expect((await download).suggestedFilename()).toMatch(/\.xlsx$/);

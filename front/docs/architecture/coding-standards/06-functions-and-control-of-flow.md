@@ -83,7 +83,9 @@ si corresponde a esa lectura.
 
 Las escrituras no se repiten automáticamente por un fallo de red. El cliente HTTP
 coordina una renovación ante 401 y reintenta una vez la petición protegida; no renueva
-un login rechazado. La merma conserva `operationId` en el reintento de su captura
+un login rechazado. Las lecturas y el refresh utilizan la
+[recuperación limitada de conexión](../contracts/client-contracts.md#sesión-y-errores);
+no añadir otro bucle por formulario. La merma conserva `operationId` en el reintento de su captura
 incierta, conforme a su contrato específico.
 
 ## Recursos

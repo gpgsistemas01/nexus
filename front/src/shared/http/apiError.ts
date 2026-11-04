@@ -59,9 +59,11 @@ export const normalizeApiError = async (cause: unknown): Promise<ApiError> => {
             ? 'Tu sesión terminó. Vuelve a iniciar sesión.'
             : status === 403
               ? 'No tienes permiso para realizar esta operación.'
-              : status === 429
-                ? 'Demasiadas solicitudes. Espera antes de reintentar.'
-                : 'No se pudo completar la operación. Inténtalo de nuevo.';
+              : status === 404 || status === 410
+                ? 'El registro o la consulta ya no están disponibles.'
+                : status === 429
+                  ? 'Demasiadas solicitudes. Espera antes de reintentar.'
+                  : 'No se pudo completar la operación. Inténtalo de nuevo.';
     return new ApiError(
         knownMessage(body) ?? fallback,
         status,

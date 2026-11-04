@@ -29,14 +29,20 @@ it('requiere proveedor, limpia el material inmediatamente y descarta opciones ta
     useMovementFilters('materials', () => true),
   );
   await flushPromises();
+  expect(lookup).not.toHaveBeenCalled();
+  filters.suppliers.updateSearch('');
+  await flushPromises();
   expect(lookup.mock.calls.map((call) => call[0])).toEqual(['suppliers']);
   filters.update('supplierId', 'primero');
   await nextTick();
+  filters.items.updateSearch('');
   const previousSignal = lookup.mock.calls.find((call) => call[3] === 'primero')![4];
   filters.update('itemId', 'material-primero');
   filters.update('supplierId', 'segundo');
   expect(filters.values.itemId).toBe('');
   await nextTick();
+  expect(filters.items.items.value).toEqual([]);
+  filters.items.updateSearch('');
   await flushPromises();
   expect(previousSignal.aborted).toBe(true);
   finish(optionPage('material-tardío'));

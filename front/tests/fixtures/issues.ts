@@ -25,7 +25,7 @@ export const issueDetail = {
   material: { ...material.material, type: 'MATERIAL' },
   quantity: '2',
   convertedQuantity: '200',
-  suppliedQuantity: '0',
+  suppliedQuantity: null as string | null,
   returnedQuantity: '0',
   projectConvertedQuantity: null as string | null,
   maxUnitCost: '100',
@@ -63,6 +63,7 @@ export const issueFor = (resource: 'materials' | 'consumables' | 'wastes') => ({
             materialName: waste.name,
             waste,
             material: undefined,
+            suppliedQuantity: '0',
           },
         ]
       : [

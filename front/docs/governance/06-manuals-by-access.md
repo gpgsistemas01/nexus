@@ -42,6 +42,7 @@ siguen aplicándose. El índice de cada edición indica su alcance detectado.
 | Fuente | Responsabilidad |
 | --- | --- |
 | [environment.mjs](../../scripts/manual/environment.mjs) | Entorno de desarrollo, modos admitidos y orígenes locales; reglas compartidas con Playwright. |
+| [authentication.mjs](../../scripts/manual/authentication.mjs) | Login de la cuenta y diagnóstico HTTP/conexión, sin publicar credenciales, cookies ni causas privadas. |
 | [options.mjs](../../scripts/manual/options.mjs) | Opciones de ejecución, modo dev predeterminado y ayuda. |
 | [profiles.mjs](../../scripts/manual/profiles.mjs) | Perfiles, configuración, credenciales y selección de cuentas completas. La demostración calcula permisos con las políticas existentes. |
 | [model.mjs](../../scripts/manual/model.mjs) | Capítulos, permisos y evaluación de bloques de tareas. |
@@ -49,6 +50,23 @@ siguen aplicándose. El índice de cada edición indica su alcance detectado.
 | [manuals.mjs](../../scripts/manuals.mjs) | Selección de perfiles, capturas y exportación con el motor común. |
 | [profileManuals.spec.ts](../../tests/manual-profiles/profileManuals.spec.ts) | Sesión aislada, control de escrituras y recuperación de capturas. |
 | [captureRecipes.ts](../../tests/manual-profiles/captureRecipes.ts) | Recorridos visibles sin confirmar operaciones. |
+
+## Configuración interna del recorrido
+
+`manuals.mjs` lee los archivos locales y pasa estas variables a Playwright durante
+la ejecución. No requieren otro `.env` ni se completan manualmente:
+
+| Variables | Función |
+| --- | --- |
+| `FRONT_MANUAL_MODE`, `FRONT_MANUAL_BASE_URL` | Modo y origen de Vue obtenidos de los argumentos y del JSON de cuentas. |
+| `FRONT_MANUAL_IDS` | IDs de las cuentas seleccionadas que tienen credenciales completas. |
+| `FRONT_MANUAL_ACCOUNTS`, `FRONT_MANUAL_ENV_FILE` | Rutas de los dos archivos de entrada; no contienen sus valores. |
+| `FRONT_MANUAL_MISSING` | Activa la reanudación solicitada con `--missing`. |
+
+Leer las credenciales sólo prepara los datos de entrada. Después,
+`authenticateManualAccount` llama a `/api/auth/login` y `realSession` consulta
+`/api/auth/me` para obtener la identidad y los permisos que determinan el manual.
+La configuración de Playwright prepara Vite antes de realizar esas peticiones.
 
 **Identificador:** `DIA-VUE-MAN-001`. **Pregunta:** ¿cómo se obtiene una publicación
 coherente con el acceso de una cuenta? **Fuentes:** archivos de la tabla anterior y

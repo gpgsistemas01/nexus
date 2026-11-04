@@ -9,11 +9,10 @@ La coordinación compartida de las páginas se comprueba en
 `tests/unit/app/pageAccessTest.ts`, además de los recorridos de navegador existentes.
 No se retiran las pruebas de campos, payloads ni versiones de cada módulo.
 
-`tests/unit/shared/http/apiClientTest.ts` comprueba también la transición de
-renovación concurrente → `502 Bad Gateway` → backend disponible → reintento
-explícito. El error conserva su estado 502 y la siguiente renovación acepta el
-`200 text/plain OK` real de Express; no se convierte una caída del proxy en
-credenciales inválidas ni se reenvía una escritura por un fallo de red.
+`apiClientTest.ts` y `connectionRecoveryTest.ts` comprueban renovación compartida,
+recuperación de lecturas/refresh ante fallos transitorios y agotamiento del límite.
+Cancelar durante la espera evita otra consulta; cancelar una petición no cancela
+el refresh que esperan las demás. Login y escrituras no se repiten por fallos de conexión.
 
 `tests/e2e/sessionRecovery.spec.ts` ejercita el router, Axios y la administración de
 cookies HttpOnly de Chromium con respuestas HTTP simuladas. No demuestra la validez
@@ -22,7 +21,7 @@ criptográfica de JWT ni sustituye las integraciones de Express/Prisma.
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
 | `DP-VUE-SESSION-001` | pérdida de renovación automática de sesión | Navegador; transición access token rechazado → refresh válido/inválido | 401 de `/me` dispara un único refresh; el texto `OK` y Set-Cookie permiten repetir la consulta sin login. Un refresh 401 abre el login con destino y sin bucle. | [CP-VUE-SESSION-001-01](../cases/cp-vue-session-001-01.md) |
-| `DP-VUE-SESSION-002` | reintento sin resultado ni contexto | Navegador; servidor/refresh 502 → reintento fallido/servidor recuperado y decisiones de permiso | Se conserva ruta, query y fragmento incluso al recargar la pantalla de error. El botón informa espera y fallo, evita duplicados y recupera la ruta original. Revalidar permisos vuelve al módulo solicitado. | [CP-VUE-SESSION-002-01](../cases/cp-vue-session-002-01.md) |
+| `DP-VUE-SESSION-002` | reintento sin resultado ni contexto | Navegador; servidor/refresh 502 → reintento fallido/servidor recuperado y decisiones de permiso | Un fallo transitorio se recupera sin clic ni pantalla de error. Si persiste tras el límite, se conserva ruta, query y fragmento para el reintento manual. El botón informa espera/fallo y evita duplicados. Revalidar permisos vuelve al módulo solicitado. | [CP-VUE-SESSION-002-01](../cases/cp-vue-session-002-01.md) |
 | `DP-VUE-SESSION-003` | retorno externo o cíclico | Unitario, `tests/unit/app/protectedDestinationTest.ts`; particiones de destino | Sólo se conservan rutas protegidas registradas; externos, arrays, rutas desconocidas, login y error vuelven a la entrada autorizada. | [protectedDestinationTest.ts](../../../tests/unit/app/protectedDestinationTest.ts) |
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |

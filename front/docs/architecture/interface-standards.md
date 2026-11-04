@@ -35,6 +35,21 @@ los valores y eventos intercambiados.
 | DOM | Conservar el control de Vue/Vuetify; no superponer otro controlador sobre sus nodos. |
 | Avisos | Reutilizar `shared/ui/feedback.ts`; enfocar Cancelar en confirmaciones destructivas. |
 
+## Carga y recuperación
+
+| Situación | Presentación y acción |
+| --- | --- |
+| Abrir o recargar un documento desde una acción de tabla | `DocumentReadDialog` bloquea el fondo mientras se consulta. Permite cancelar y descarta respuestas tardías. Ante un fallo recuperable ofrece **Reintentar consulta**. No cierra por Escape o clic fuera. |
+| Buscar opciones | `RemoteSelect` carga al abrirse y muestra la espera/error en el control. El resto del formulario sigue disponible. **Reintentar catálogo** aparece también con una opción previamente seleccionada. |
+| Validación de captura | Mensaje junto al campo; conservar los valores para corregirlos. No abrir otro diálogo. |
+| Sesión o permiso rechazados | Las páginas delegan en el flujo de acceso. Un rechazo del catálogo se muestra en su control sin ofrecer repetirlo. |
+| Registro/consulta inexistente o salida que cambió a un estado incompatible | Informar el rechazo y permitir cerrar. No ofrecer repetir el mismo ID o modo. Actualizar el listado antes de elegir otra operación. |
+| Conflicto de versión al guardar | Conservar la captura, bloquear otro envío con la versión anterior y ofrecer actualizar. |
+| Escritura fallida | Conservar el formulario o la confirmación abierta. El usuario decide el siguiente envío; no repetir escrituras automáticamente por errores de conexión. |
+
+La [política HTTP](contracts/client-contracts.md#sesión-y-errores) define la recuperación
+automática. `readFailure.ts` clasifica los rechazos que no admiten reintento manual.
+
 ## Teclado y distribución
 
 Los controles conservan nombre accesible, foco y acción de teclado. Un diálogo

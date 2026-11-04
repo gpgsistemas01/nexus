@@ -115,6 +115,8 @@ describe('personas Vue: responsabilidades independientes de cuentas (DP-VUE-IDA-
     const { value: editor } = mountComposable(() =>
       usePersonEditor({ target: { action: 'create' }, ...callbacks() }),
     );
+    editor.organization.departments.updateSearch('');
+    editor.organization.roles.updateSearch('');
     await flushPromises();
     editor.departmentId.value = recordIds.department;
     editor.roleId.value = recordIds.role;

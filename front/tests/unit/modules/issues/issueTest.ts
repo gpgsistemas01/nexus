@@ -39,6 +39,48 @@ afterEach(() => {
   apiClient.http.defaults.adapter = originalAdapter;
 });
 describe('salidas Vue: contratos y modos', () => {
+  it.each(['materials', 'consumables'] as const)(
+    'una cantidad surtida nula de %s representa cero y permite consultar la salida',
+    (resource) => {
+      const source = issueFor(resource);
+      expect(source.details[0]!.suppliedQuantity).toBeNull();
+      expect(normalizeIssueDocument(source, resource).details[0]).toMatchObject({
+        suppliedQuantity: 0,
+        isOriginallySupplied: false,
+      });
+    },
+  );
+
+  it.each([undefined, '', 'no-es-un-numero', -1])(
+    'una cantidad surtida inválida %s sigue rechazándose',
+    (suppliedQuantity) => {
+      const source = issueFor('materials');
+      expect(() =>
+        normalizeIssueDocument(
+          {
+            ...source,
+            details: [{ ...source.details[0], suppliedQuantity }],
+          },
+          'materials',
+        ),
+      ).toThrow(/salida incompleta/);
+    },
+  );
+
+  it('mermas mantiene el contrato de cantidad surtida obligatoria', () => {
+    const source = issueFor('wastes');
+    expect(normalizeIssueDocument(source, 'wastes').details[0]!.suppliedQuantity).toBe(0);
+    expect(() =>
+      normalizeIssueDocument(
+        {
+          ...source,
+          details: [{ ...source.details[0], suppliedQuantity: null }],
+        },
+        'wastes',
+      ),
+    ).toThrow(/salida incompleta/);
+  });
+
   it('la consulta de personas conserva los filtros múltiples y la señal de cancelación', async () => {
     const requestSignal = signal();
     apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
@@ -352,6 +394,7 @@ describe('salidas Vue: captura y efectos', () => {
     await value.open(document(), 'supply');
     expect(value.editor.value).toBeNull();
     expect(value.readError.value).toMatch(/estado/);
+    expect(value.canRetry.value).toBe(false);
     wrapper.unmount();
   });
   it('no muestra errores iniciales; cliente/área reinician dependencias y filtran personas', async () => {
@@ -378,8 +421,13 @@ describe('salidas Vue: captura y efectos', () => {
     await flushPromises();
     value.blur('clientId');
     expect(value.errors.value).toEqual({});
+    value.headerSelection.clients.updateSearch('');
+    await flushPromises();
     value.update('clientId', issue.clientId);
     value.update('departmentId', issue.departmentId);
+    await flushPromises();
+    value.headerSelection.advisors.updateSearch('');
+    value.headerSelection.requesters.updateSearch('');
     await flushPromises();
     expect(lookup.mock.calls.some(([query]) => query.filters?.role === 'Coordinador')).toBe(true);
     expect(lookup.mock.calls.some(([query]) => query.filters?.department === 'SISTEMAS')).toBe(

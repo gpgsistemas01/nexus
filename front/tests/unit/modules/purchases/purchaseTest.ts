@@ -25,6 +25,7 @@ import { purchaseLookupService } from '../../../../src/modules/purchases/service
 import { usePurchaseEditor } from '../../../../src/modules/purchases/composables/usePurchaseEditor.js';
 import { usePurchaseLineEntry } from '../../../../src/modules/purchases/composables/usePurchaseLineEntry.js';
 import { useDocumentRead } from '../../../../src/shared/composables/useDocumentRead.js';
+import { ApiError } from '../../../../src/shared/http/apiError.js';
 import { usePurchaseCorrection } from '../../../../src/modules/purchases/composables/usePurchaseCorrection.js';
 import type { PurchaseTarget } from '../../../../src/modules/purchases/purchase.js';
 
@@ -348,6 +349,29 @@ describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
     resolve(document());
     await pending;
     expect(state.document.value).toBeUndefined();
+  });
+  it.each([
+    [404, false],
+    [403, false],
+    [503, true],
+    [0, true],
+  ])('la lectura HTTP %s permite reintentar: %s', async (status, canRetry) => {
+    const cause = new ApiError('No se pudo abrir la compra.', status);
+    const onError = vi.fn();
+    const { state } = harness(() =>
+      useDocumentRead({
+        request: () => Promise.reject(cause),
+        onError,
+        errorMessage: 'Error de lectura',
+      }),
+    );
+    await state.load(purchase.id);
+    expect(state.readError.value).toBe(cause.message);
+    expect(state.canRetry.value).toBe(canRetry);
+    expect(onError).toHaveBeenCalledWith(cause);
+    state.close();
+    expect(state.readError.value).toBe('');
+    expect(state.canRetry.value).toBe(false);
   });
   it.each(['filtered', 'current-month', 'specific-month'] as const)(
     'exportar %s no hereda límites ni borradores ajenos al alcance',

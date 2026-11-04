@@ -11,5 +11,5 @@ export const useRemoteOptions = (path: string, isEnabled: Ref<boolean>, supplier
                 signal,
             ),
         computed(() => isEnabled.value && (!supplierId || !!supplierId.value)),
-        supplierId,
+        { dependency: supplierId },
     );

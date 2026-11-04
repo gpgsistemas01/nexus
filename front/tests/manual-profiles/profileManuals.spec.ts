@@ -11,6 +11,7 @@ import {
 } from '../../scripts/manual/profiles.mjs';
 import { prepareManual, accessFingerprint } from '../../scripts/manual/publication.mjs';
 import { assertManualDevelopment, parseManualMode } from '../../scripts/manual/environment.mjs';
+import { authenticateManualAccount } from '../../scripts/manual/authentication.mjs';
 import { captureRecipe, captureFamily, type CaptureFamily } from './captureRecipes.js';
 import { mockWarehouse } from '../e2e/warehouseFixtures.js';
 import { mockRecords } from '../e2e/recordsFixtures.js';
@@ -114,16 +115,12 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
     };
     // Authentication uses the API context, never a password field, trace or disk session.
     if (mode === 'dev') {
-      try {
-        const credentials = await readCredentials(account, process.env.FRONT_MANUAL_ENV_FILE);
-        if (!credentials) throw new Error('Credentials unavailable');
-        const response = await context.request.post('/api/auth/login', { data: credentials });
-        if (!response.ok()) throw new Error('Authentication rejected');
-      } catch {
+      const credentials = await readCredentials(account, process.env.FRONT_MANUAL_ENV_FILE);
+      if (!credentials)
         throw new Error(
-          `No se pudo autenticar ${account.id}. Revise sus variables locales y el servicio; no comparta los valores.`,
+          `Falta usuario o contraseña para ${account.id}. Revise las variables locales de esa cuenta.`,
         );
-      }
+      await authenticateManualAccount(context.request, account.id, credentials);
     }
     const user = mode === 'demo' ? demoSession(account) : await realSession(context);
     if (mode === 'dev') verifyConfiguredAccess(account, user);

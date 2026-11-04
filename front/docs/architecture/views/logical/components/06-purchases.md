@@ -12,12 +12,14 @@ flowchart TB
     item["InventoryEditorPage"]
     actions["usePurchaseActions"]
     read["useDocumentRead"]
+    readDialog["DocumentReadDialog"]
     editorPage["PurchaseEditorPage"]
     correctionPage["PurchaseCorrectionPage"]
     service["purchaseService"]
     workspace --> page
     workspace --> auxiliary
     workspace --> item
+    page --> readDialog
     page --> actions
     page --> editorPage
     page --> correctionPage

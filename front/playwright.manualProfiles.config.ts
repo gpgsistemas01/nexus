@@ -3,6 +3,7 @@ import {
     assertManualDevelopment,
     parseManualMode,
     parseManualBaseUrl,
+    createManualWebServer,
 } from './scripts/manual/environment.mjs';
 
 assertManualDevelopment();
@@ -28,13 +29,5 @@ export default defineConfig({
             ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
             : {},
     },
-    webServer:
-        mode === 'demo'
-            ? {
-                  command: 'npm run dev -- --port 5177',
-                  url: baseURL,
-                  reuseExistingServer: false,
-                  timeout: 60_000,
-              }
-            : undefined,
+    webServer: createManualWebServer({ mode, baseUrl: baseURL }),
 });

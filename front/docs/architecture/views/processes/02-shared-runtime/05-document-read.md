@@ -38,6 +38,7 @@ sequenceDiagram
         Service-->>Actions: nowrap: throw Error
         Actions-->>Reader: nowrap: throw Error
         Reader->>Reader: nowrap: readError.value = cause.message
+        Reader->>Reader: nowrap: canRetry.value = isReadRetryable(cause)
         Reader->>Actions: nowrap: options.onError(cause)
     else
         Service-->>Actions: nowrap: document
@@ -74,6 +75,41 @@ sequenceDiagram
     end
 ```
 
+## Cancelación desde el diálogo de lectura
+
+**Identificador:** `DIA-VUE-SEQ-057`. Consulta de compra en curso que el usuario
+cancela antes de recibir la respuesta. Salidas compone el mismo lector y diálogo.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    box Presentación
+    participant Dialog@{ "type": "boundary" } as DocumentReadDialog.vue
+    participant Page@{ "type": "control" } as PurchasePage.vue
+    end
+    box Coordinación
+    participant Actions@{ "type": "control" } as usePurchaseActions.ts
+    participant Reader@{ "type": "control" } as useDocumentRead.ts
+    end
+    box Integración
+    participant Service@{ "type": "boundary" } as purchaseService.ts
+    end
+    U->>Dialog: nowrap: Cancelar consulta
+    Dialog->>Page: nowrap: emit('cancel')
+    Page->>Actions: nowrap: actions.cancelRead()
+    Actions->>Reader: nowrap: reader.close()
+    Reader->>Reader: nowrap: ++sequence<br/>controller?.abort()
+    Reader->>Reader: nowrap: isReading.value = false<br/>document.value = undefined<br/>readError.value = ''
+    Page->>Dialog: nowrap: v-if="isReading || readError" = false
+    opt nowrap: respuesta recibida después de cancelar
+        Service-->>Actions: nowrap: result
+        Actions-->>Reader: nowrap: result
+        Reader->>Reader: nowrap: attempt !== sequence || current.signal.aborted
+        Reader-->>Actions: nowrap: undefined
+    end
+```
+
 ## Fuentes de los participantes
 
 [usePurchaseActions.ts](../../../../../src/modules/purchases/composables/usePurchaseActions.ts),
@@ -81,6 +117,10 @@ sequenceDiagram
 [purchaseResponseMapper.ts](../../../../../src/modules/purchases/mappers/purchaseResponseMapper.ts),
 [purchaseService.ts](../../../../../src/modules/purchases/services/purchaseService.ts),
 [apiClient.ts](../../../../../src/shared/http/apiClient.ts).
+
+[DocumentReadDialog.vue](../../../../../src/shared/components/DocumentReadDialog.vue)
+recibe el estado y emite `retry`/`cancel`; no consulta HTTP. La página conecta el
+reintento y el aborto del lector. Los rechazos de escritura permanecen en su formulario.
 
 ## Secuencias relacionadas
 

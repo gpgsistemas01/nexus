@@ -155,11 +155,11 @@ test('catálogos: búsqueda, paginación, recuperación de lectura y vista móvi
   let fail = true;
   await page.route('**/api/admin/catalogs/roles?**', (route) => {
     if (!fail) return route.fallback();
-    fail = false;
     return route.fulfill({ status: 503, json: { code: 'UNAVAILABLE' } });
   });
   await page.goto('/catalogos/roles');
   await expect(page.getByRole('alert')).toBeVisible();
+  fail = false;
   await page.getByRole('button', { name: 'Reintentar', exact: true }).click();
   await expect(page.getByRole('cell', { name: 'Rol 01', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Siguiente', exact: true }).click();

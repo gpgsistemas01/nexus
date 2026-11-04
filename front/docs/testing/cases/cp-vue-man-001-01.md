@@ -60,6 +60,15 @@ comprueba la presentación; una prueba de navegador aprobada no sustituye esa re
 
 ## Ejecución
 
+[manualAuthenticationTest.ts](../../../tests/unit/tooling/manualAuthenticationTest.ts)
+comprueba el contrato `SUCCESS_LOGIN`, el diagnóstico por estado HTTP y conexión,
+y la ausencia de credenciales/cookies del error original en el mensaje. Un 200 con
+HTML o un contrato distinto no permite continuar las capturas.
+El recorrido HTTP inicia Vue si no está disponible y reutiliza un servidor existente
+en modo `dev`; la demostración conserva su servidor aislado. Los orígenes HTTPS
+locales requieren el servicio TLS preparado. `manualOptionsTest.ts` comprueba estas
+particiones de host, puerto, modo y protocolo.
+
 Registrar ambiente, revisión, fecha, comando, código de salida y artefactos como
 evidencia EP conforme al [plan](../01-test-plan.md). No versionar resultados de una
 corrida ni credenciales en esta ficha.

@@ -12,6 +12,7 @@ import { initialRecordQuery } from '../../../shared/list.js';
 import { dateRangeError } from '../../../shared/report.js';
 import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
 import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue';
+import DocumentReadDialog from '../../../shared/components/DocumentReadDialog.vue';
 import { issueService } from '../services/issueService.js';
 import { useIssueFilters } from '../composables/useIssueFilters.js';
 import { useIssueActions } from '../composables/useIssueActions.js';
@@ -96,6 +97,7 @@ useVisibleRefresh({
         canManage.value &&
         !editor.value &&
         !isReading.value &&
+        !readError.value &&
         !isReportOpen.value &&
         !isExporting.value &&
         !isLoading.value &&
@@ -154,32 +156,6 @@ onMounted(() => {
                 Nueva salida
             </VBtn>
         </template>
-        <template #messages>
-            <VAlert
-                v-if="isReading"
-                role="status"
-                type="info"
-                variant="tonal"
-                class="mb-4"
-            >
-                Cargando salida…
-            </VAlert>
-            <VAlert
-                v-if="readError"
-                role="alert"
-                type="error"
-                variant="tonal"
-                class="mb-4"
-            >
-                {{ readError }}
-                <VBtn
-                    variant="text"
-                    @click="actions.retry"
-                >
-                    Reintentar consulta
-                </VBtn>
-            </VAlert>
-        </template>
         <IssueTable
             v-if="canManage"
             :rows="rows"
@@ -201,6 +177,15 @@ onMounted(() => {
             No tienes permiso para consultar salidas.
         </VAlert>
     </RecordListPanel>
+    <DocumentReadDialog
+        v-if="isReading || readError"
+        :is-reading="isReading"
+        :error="readError"
+        :can-retry="actions.canRetry.value"
+        loading-label="Cargando salida…"
+        @retry="actions.retry"
+        @cancel="actions.cancelRead"
+    />
     <IssueEditorPage
         v-if="editor"
         :key="editorKey"

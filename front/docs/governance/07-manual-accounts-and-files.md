@@ -23,7 +23,7 @@ Los comandos siguientes se ejecutan desde **`front/`** (`cd front` desde la raí
 
 | Necesidad | Comando o modo | Requisitos |
 | --- | --- | --- |
-| Sólo capturas por cuenta | `npm run docs:screenshots -- --all` | Vue/API funcionando, cuentas y los dos archivos locales. |
+| Sólo capturas por cuenta | `npm run docs:screenshots -- --all` | API funcionando, cuentas y los dos archivos locales. Inicia Vue si hace falta. |
 | Capturas y manuales por cuenta | `npm run docs:manuals -- --all` | Lo anterior y herramientas de Word/PDF. |
 | Revisar ediciones ficticias | `npm run docs:manuals -- --mode demo --all` | Perfiles incluidos; no usa credenciales. Inicia Vite en el puerto 5177. |
 
@@ -40,8 +40,14 @@ npx playwright install chromium
 ```
 
 Para Word/PDF, completar la [preparación del publicador](02-generation-and-publication.md#preparación-del-publicador).
-En `dev`, iniciar Vue y la API con la [guía local](../development/01-getting-started.md);
-la herramienta no los arranca. La generación rechaza `NODE_ENV=production` y
+En una terminal aparte, mantener activa la API según la
+[guía local](../development/01-getting-started.md): `npm --prefix back run dev`
+desde la raíz. Ejecutar el comando de capturas o manuales en otra terminal.
+
+En HTTP, la herramienta inicia Vite en el host y puerto de `baseUrl`, o reutiliza
+el que ya esté activo. Al terminar cierra sólo el Vite que ella inició. Un origen
+HTTPS local necesita su servidor TLS ya configurado y activo.
+La generación rechaza `NODE_ENV=production` y
 direcciones ajenas a `localhost`, `127.0.0.1` o `[::1]`. Los scripts, las credenciales
 y Chromium permanecen fuera de la imagen final de producción.
 
@@ -57,8 +63,11 @@ Rutas relativas a `front/`:
 | `.env.manual.local` | Credenciales reales de todas las cuentas configuradas. Predeterminado de `--env-file`. |
 
 `front/.env.local` configura Vite y `back/.env` configura la API; las credenciales
-de manuales no van en esos archivos. Las variables `DOCS_FRONT_*` pertenecen a la
-herramienta, no llevan `VITE_` ni se compilan en el navegador.
+de manuales no van en esos archivos. Las variables `DOCS_FRONT_*` indicadas por `usernameEnv` y `passwordEnv`
+se completan en `.env.manual.local` sólo para
+las cuentas que se quieran procesar. No llevan `VITE_` ni se compilan en el navegador.
+Las variables internas `FRONT_MANUAL_*` las genera el comando; no hay que agregarlas
+al archivo. Su función se describe en la [configuración interna](06-manuals-by-access.md#configuración-interna-del-recorrido).
 
 ## 3. Obtener el usuario y la contraseña
 
@@ -156,7 +165,7 @@ Puedes dejar sin completar las cuentas que todavía no utilizarás.
 
 ## 7. Generar capturas y manuales
 
-Con Vue y la API funcionando, elige el resultado que necesitas.
+Con la API funcionando, elige el resultado que necesitas; Vue se prepara automáticamente.
 
 Sólo capturas de una cuenta:
 
@@ -236,7 +245,11 @@ Sin esa opción, se recaptura el perfil completo.
 | --- | --- |
 | Entorno o dirección de producción | Ejecutar en desarrollo y usar el origen local de Vue. |
 | Cuenta omitida | Completar usuario y contraseña cuando se quiera generar su edición. |
-| No autentica con ambas credenciales completas | Revisar servicios y credenciales. Un rechazo de acceso se informa como error; no se trata como una cuenta vacía. |
+| `ECONNREFUSED 127.0.0.1:5173` | El comando no pudo conectar con Vue; no indica contraseña incorrecta. Revisar `baseUrl` y el arranque automático de Vite. La API debe permanecer activa en otra terminal. |
+| Login HTTP 400/401 | Revisar las variables indicadas por `usernameEnv`/`passwordEnv` y probar esas credenciales en una ventana privada en el mismo `baseUrl`. Un 401 también puede indicar una cuenta inactiva. |
+| Login HTTP 404/405 o respuesta no válida | Revisar `baseUrl` del JSON y el proxy `/api`; debe responder la API de Nexus, sin redirección a una página HTML. |
+| Login HTTP 429 | Esperar antes de volver a ejecutar; no repetir intentos con credenciales dudosas. |
+| Login HTTP 500/502/503/504 o `ECONNREFUSED`/`ECONNRESET` | Revisar Vue, la API y sus terminales. El código distingue un servicio no disponible de credenciales rechazadas. |
 | Cuenta distinta del perfil | Revisar `expectedAccess`, área/rol real y referencia de credenciales. |
 | Tabla vacía | Puede servir para consulta. Para editar, preparar un registro existente. |
 | Falta una opción | Revisar dependencias, registros activos y permisos. Para pesos se necesita un material de referencia ROLLO. |

@@ -208,6 +208,8 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
     );
     editor.update('supplierId', ids.supplier);
     await flushPromises();
+    editor.searchLookup('materialId', '');
+    await flushPromises();
     editor.update('materialId', ids.material);
     await flushPromises();
     expect(editor.values.name).toBe('Lona');

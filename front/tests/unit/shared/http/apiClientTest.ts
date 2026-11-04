@@ -57,7 +57,7 @@ describe('cliente Axios compartido: sesión y errores', () => {
     expect(respond).toHaveBeenCalledTimes(2);
   });
 
-  it('un 502 al renovar conserva el fallo del proxy y permite reintentar cuando vuelve el backend', async () => {
+  it('un 502 persistente al renovar agota los reintentos y permite recuperar cuando vuelve el backend', async () => {
     let isAvailable = false;
     let isRefreshed = false;
     let refreshCalls = 0;
@@ -89,10 +89,10 @@ describe('cliente Axios compartido: sesión y errores', () => {
       expect(result.status).toBe('rejected');
       if (result.status === 'rejected') expect(result.reason).toMatchObject({ status: 502 });
     }
-    expect(refreshCalls).toBe(1);
+    expect(refreshCalls).toBe(3);
     isAvailable = true;
     await expect(request('/api/auth/me')).resolves.toEqual({ user: { id: 'user-1' } });
-    expect(refreshCalls).toBe(2);
+    expect(refreshCalls).toBe(4);
   });
 
   it('un segundo 401 termina el reintento y no genera un bucle de renovación', async () => {

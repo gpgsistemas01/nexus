@@ -522,7 +522,7 @@ RecordQuery & IssueFilters
 
 ## IssuePage.defineProps
 
-**Fuente:** [src/modules/issues/pages/IssuePage.vue](../../../../../src/modules/issues/pages/IssuePage.vue) · línea 26, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/pages/IssuePage.vue](../../../../../src/modules/issues/pages/IssuePage.vue) · línea 27, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -534,7 +534,7 @@ RecordQuery & IssueFilters
 
 ## IssuePage.defineEmits
 
-**Fuente:** [src/modules/issues/pages/IssuePage.vue](../../../../../src/modules/issues/pages/IssuePage.vue) · línea 27, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/pages/IssuePage.vue](../../../../../src/modules/issues/pages/IssuePage.vue) · línea 28, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

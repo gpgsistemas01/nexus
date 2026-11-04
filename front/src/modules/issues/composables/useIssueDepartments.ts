@@ -11,23 +11,27 @@ export const useIssueDepartments = (options: {
     selectDefault: (id: string) => void;
 }) => {
     const singleDepartment = shallowRef<LookupItem>();
-    const lookup = useRemoteLookup(async (search, page, signal) => {
-        const result = await issueLookupService.list(
-            { kind: 'departments', resource: options.resource, search, page },
-            signal,
-        );
+    const lookup = useRemoteLookup(
+        async (search, page, signal) => {
+            const result = await issueLookupService.list(
+                { kind: 'departments', resource: options.resource, search, page },
+                signal,
+            );
 
-        // El total sin búsqueda identifica el alcance, no una página o un resultado filtrado.
-        if (!signal.aborted && !search && page === 1) {
-            const item = result.data[0];
-            singleDepartment.value =
-                result.recordsFiltered === 1 && result.data.length === 1 && !item?.isDisabled
-                    ? item
-                    : undefined;
-        }
+            // El total sin búsqueda identifica el alcance, no una página o un resultado filtrado.
+            if (!signal.aborted && !search && page === 1) {
+                const item = result.data[0];
+                singleDepartment.value =
+                    result.recordsFiltered === 1 && result.data.length === 1 && !item?.isDisabled
+                        ? item
+                        : undefined;
+            }
 
-        return result;
-    }, computed(options.isEnabled));
+            return result;
+        },
+        computed(options.isEnabled),
+        { preload: true },
+    );
 
     watch([lookup.items, singleDepartment, options.getSelectedId], () => {
         if (

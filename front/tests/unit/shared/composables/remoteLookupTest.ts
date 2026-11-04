@@ -2,6 +2,7 @@ import { nextTick, ref } from 'vue';
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, expect, it, vi } from 'vitest';
 import { useRemoteLookup } from '../../../../src/shared/composables/useRemoteLookup.js';
+import { ApiError } from '../../../../src/shared/http/apiError.js';
 import type { LookupItem } from '../../../../src/shared/lookup.js';
 import type { PageResult } from '../../../../src/shared/http/pageRequest.js';
 import { mountComposable } from '../../../helpers/mountComposable.js';
@@ -20,9 +21,15 @@ it('la espera de búsqueda ya está pendiente y no presenta resultados antiguos 
     .mockResolvedValueOnce(result(['anterior']))
     .mockResolvedValueOnce(result(['nuevo']));
   const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('');
   await flushPromises();
   value.updateSearch('borrador');
-  expect(value.state.value).toEqual({ items: [], isLoading: true, error: '', hasMore: false });
+  expect(value.state.value).toMatchObject({
+    items: [],
+    isLoading: true,
+    error: '',
+    hasMore: false,
+  });
   await vi.advanceTimersByTimeAsync(249);
   expect(request).toHaveBeenCalledTimes(1);
   value.updateSearch('búsqueda final');
@@ -40,6 +47,7 @@ it('avanza por filas recibidas y termina aunque se repitan IDs entre páginas o 
     .mockResolvedValueOnce(result(['dos', 'tres'], 7))
     .mockResolvedValueOnce(result(['tres', 'cuatro'], 7));
   const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('');
   await flushPromises();
   expect(value.items.value.map((item) => item.id)).toEqual(['uno', 'dos']);
   await value.loadMore();
@@ -55,6 +63,7 @@ it('una página vacía termina la carga cuando el conteo del servidor quedó des
     .mockResolvedValueOnce(result(['uno'], 99))
     .mockResolvedValueOnce(result([], 99));
   const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('');
   await flushPromises();
   await value.loadMore();
   expect(value.state.value).toMatchObject({ hasMore: false, isLoading: false, error: '' });
@@ -69,6 +78,7 @@ it('reintentar una página fallida no avanza el contador ni omite resultados', a
     .mockRejectedValueOnce(new Error('Sin conexión'))
     .mockResolvedValueOnce(result(['dos'], 2));
   const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('');
   await flushPromises();
   await value.loadMore();
   expect(value.error.value).toBe('Sin conexión');
@@ -78,7 +88,7 @@ it('reintentar una página fallida no avanza el contador ni omite resultados', a
   expect(value.hasMore.value).toBe(false);
   expect(request.mock.calls.map((call) => call[1])).toEqual([1, 2, 2]);
 });
-it('cambiar la búsqueda invalida el reintento de la página vieja y cancela el debounce al reintentar', async () => {
+it('cambiar la búsqueda invalida el reintento de la página vieja sin duplicar el debounce', async () => {
   vi.useFakeTimers();
   const request = vi
     .fn()
@@ -86,11 +96,13 @@ it('cambiar la búsqueda invalida el reintento de la página vieja y cancela el 
     .mockRejectedValueOnce(new Error('Sin conexión'))
     .mockResolvedValueOnce(result(['nuevo']));
   const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('');
   await flushPromises();
   await value.loadMore();
   value.updateSearch('nueva búsqueda');
   expect(value.error.value).toBe('');
   await value.retry();
+  expect(request).toHaveBeenCalledTimes(2);
   await vi.advanceTimersByTimeAsync(300);
   expect(request.mock.calls.map((call) => [call[0], call[1]])).toEqual([
     ['', 1],
@@ -99,22 +111,30 @@ it('cambiar la búsqueda invalida el reintento de la página vieja y cancela el 
   ]);
   expect(value.items.value.map((item) => item.id)).toEqual(['nuevo']);
 });
-it('deshabilitar el catálogo limpia errores y opciones; habilitarlo comienza otra vez en la primera página', async () => {
+it('deshabilitar el catálogo limpia errores y opciones; volver a abrirlo comienza en la primera página', async () => {
   const enabled = ref(true);
   const request = vi
     .fn()
     .mockRejectedValueOnce(new Error('Sin permiso'))
     .mockResolvedValueOnce(result(['autorizado']));
   const { value } = mountComposable(() => useRemoteLookup(request, enabled));
+  value.updateSearch('');
   await flushPromises();
   expect(value.error.value).toBe('Sin permiso');
   enabled.value = false;
   await nextTick();
   await value.retry();
-  expect(value.state.value).toEqual({ items: [], isLoading: false, error: '', hasMore: false });
+  expect(value.state.value).toMatchObject({
+    items: [],
+    isLoading: false,
+    error: '',
+    hasMore: false,
+  });
   expect(request).toHaveBeenCalledTimes(1);
   enabled.value = true;
   await nextTick();
+  expect(request).toHaveBeenCalledTimes(1);
+  value.updateSearch('');
   await flushPromises();
   expect(value.items.value.map((item) => item.id)).toEqual(['autorizado']);
   expect(request.mock.calls.at(-1)?.[1]).toBe(1);
@@ -131,6 +151,7 @@ it('desmontar cancela la petición y el debounce y bloquea callbacks conservados
       }),
   );
   const { value, wrapper } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('');
   value.updateSearch('consulta pendiente');
   const signal = request.mock.calls[0]![2];
   wrapper.unmount();
@@ -143,7 +164,12 @@ it('desmontar cancela la petición y el debounce y bloquea callbacks conservados
   await flushPromises();
   expect(signal.aborted).toBe(true);
   expect(request).toHaveBeenCalledTimes(1);
-  expect(value.state.value).toEqual({ items: [], isLoading: false, error: '', hasMore: false });
+  expect(value.state.value).toMatchObject({
+    items: [],
+    isLoading: false,
+    error: '',
+    hasMore: false,
+  });
 });
 
 it('refrescar un catálogo vuelve a la primera página y sustituye opciones tras una alta', async () => {
@@ -153,6 +179,7 @@ it('refrescar un catálogo vuelve a la primera página y sustituye opciones tras
     .mockResolvedValueOnce(result(['dos'], 2))
     .mockResolvedValueOnce(result(['nuevo', 'uno'], 3));
   const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  value.updateSearch('');
   await flushPromises();
   await value.loadMore();
   await value.refresh();
@@ -160,3 +187,40 @@ it('refrescar un catálogo vuelve a la primera página y sustituye opciones tras
   expect(value.items.value.map((item) => item.id)).toEqual(['nuevo', 'uno']);
   expect(value.hasMore.value).toBe(true);
 });
+
+it('abre bajo demanda y reutiliza los resultados al abrir otra vez la misma búsqueda', async () => {
+  const request = vi.fn().mockResolvedValue(result(['opción']));
+  const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+  await flushPromises();
+  expect(request).not.toHaveBeenCalled();
+  value.updateSearch('');
+  value.updateSearch('');
+  await flushPromises();
+  expect(request).toHaveBeenCalledOnce();
+  expect(value.items.value.map((item) => item.id)).toEqual(['opción']);
+  value.updateSearch('');
+  await flushPromises();
+  expect(request).toHaveBeenCalledOnce();
+});
+
+it('precarga sólo cuando el formulario necesita resolver opciones sin interacción', async () => {
+  const request = vi.fn().mockResolvedValue(result(['área asignada']));
+  const { value } = mountComposable(() => useRemoteLookup(request, ref(true), { preload: true }));
+  await flushPromises();
+  expect(value.items.value.map((item) => item.id)).toEqual(['área asignada']);
+  expect(request).toHaveBeenCalledOnce();
+});
+
+it.each([400, 401, 403, 404, 405, 410, 422])(
+  'HTTP %s no ofrece repetir una consulta rechazada definitivamente',
+  async (status) => {
+    const request = vi.fn().mockRejectedValue(new ApiError('Consulta rechazada', status));
+    const { value } = mountComposable(() => useRemoteLookup(request, ref(true)));
+    value.updateSearch('');
+    await flushPromises();
+    expect(value.state.value).toMatchObject({ error: 'Consulta rechazada', canRetry: false });
+    await value.retry();
+    value.updateSearch('');
+    expect(request).toHaveBeenCalledOnce();
+  },
+);

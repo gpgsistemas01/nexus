@@ -27,7 +27,7 @@ export const useMovementFilters = (
         computed(
             () => has(PERMISSIONS.MOVEMENTS_READ) && canSelectItem.value && !!supplierId.value,
         ),
-        supplierId,
+        { dependency: supplierId },
     );
     watch(
         supplierId,

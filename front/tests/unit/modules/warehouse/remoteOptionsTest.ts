@@ -66,8 +66,12 @@ it('cambiar proveedor invalida opciones anteriores y descarta su respuesta tard�
       },
     }),
   );
+  options.updateSearch('');
   supplier.value = 'segundo proveedor';
   await nextTick();
+  expect(options.items.value).toEqual([]);
+  expect(lookup).toHaveBeenCalledOnce();
+  options.updateSearch('');
   await flushPromises();
   expect(options.items.value.map((item) => item.id)).toEqual(['material del segundo proveedor']);
   expect(lookup.mock.calls[0]?.[1]?.aborted).toBe(true);
@@ -93,6 +97,7 @@ it('desmontar cancela la consulta y no conserva sus opciones tardías', async ()
       },
     }),
   );
+  options.updateSearch('');
   wrapper.unmount();
   expect(lookup.mock.calls[0]?.[1]?.aborted).toBe(true);
   finish(page('proveedor tardío'));

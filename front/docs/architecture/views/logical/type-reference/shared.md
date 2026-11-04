@@ -4,6 +4,26 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 [Alcance y notación](index.md#alcance-y-notación).
 
+## DocumentReadDialog.defineProps
+
+**Fuente:** [src/shared/components/DocumentReadDialog.vue](../../../../../src/shared/components/DocumentReadDialog.vue) · línea 8, columna 13. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `isReading` | `isReading: boolean;` |
+| `error` | `error: string;` |
+| `loadingLabel` | `loadingLabel: string;` |
+| `canRetry` | `canRetry: boolean` |
+
+## DocumentReadDialog.defineEmits
+
+**Fuente:** [src/shared/components/DocumentReadDialog.vue](../../../../../src/shared/components/DocumentReadDialog.vue) · línea 9, columna 26. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `retry` | `retry: [];` |
+| `cancel` | `cancel: []` |
+
 ## EditorDialog.defineProps
 
 **Fuente:** [src/shared/components/EditorDialog.vue](../../../../../src/shared/components/EditorDialog.vue) · línea 11, columna 17. **Declaración:** SFC contract.
@@ -387,7 +407,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## ApiRequestConfig
 
-**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 6, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 8, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends AxiosRequestConfig`.
 
@@ -397,14 +417,18 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## RetriableRequest
 
-**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 9, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 11, columna 1. **Declaración:** interface.
 
-**Extensión/implementación:** `extends InternalAxiosRequestConfig`.
+**Extensión/implementación:** `extends RecoverableRequest`.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `requiresAuth` | `requiresAuth?: boolean;` |
 | `hasRetried` | `hasRetried?: boolean;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| inheritance | [RecoverableRequest](../../../../../src/shared/http/connectionRecovery.ts) | `extends` |
 
 ## ApiError
 
@@ -419,6 +443,16 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 | `code` | `public code = ''` |
 | `fieldErrors` | `public fieldErrors: Record<string, string> = {}` |
 | `meta` | `public meta: Record<string, unknown> = {}` |
+
+## RecoverableRequest
+
+**Fuente:** [src/shared/http/connectionRecovery.ts](../../../../../src/shared/http/connectionRecovery.ts) · línea 7, columna 1. **Declaración:** interface.
+
+**Extensión/implementación:** `extends InternalAxiosRequestConfig`.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `connectionRetries` | `connectionRetries?: number;` |
 
 ## PageResult
 
@@ -474,6 +508,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 | `isLoading` | `isLoading: boolean;` |
 | `error` | `error: string;` |
 | `hasMore` | `hasMore: boolean;` |
+| `canRetry` | `canRetry?: boolean;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
@@ -481,7 +516,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## LookupQuery
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 14, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 15, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -490,7 +525,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## LookupCreation
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 18, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 19, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -503,7 +538,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## OrganizationResource
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 22, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 23, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -513,7 +548,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## OrganizationState
 
-**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 23, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/lookup.ts](../../../../../src/shared/lookup.ts) · línea 24, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

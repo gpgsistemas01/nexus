@@ -113,6 +113,35 @@ test('sesión: un access token vencido se renueva automáticamente mediante la c
   });
 });
 
+for (const endpoint of ['me', 'refresh'] as const) {
+  test(`sesión: un 502 transitorio de ${endpoint} se recupera sin abrir la pantalla de reintento`, async ({
+    page,
+  }) => {
+    const state = await sessionScenario(page);
+    await page.route(
+      `**/api/auth/${endpoint}`,
+      (route) => {
+        if (endpoint === 'me') state.meCalls++;
+        else state.refreshCalls++;
+        return route.fulfill({ status: 502, contentType: 'text/plain', body: '' });
+      },
+      { times: 1 },
+    );
+    await page.goto(target);
+    await expect(
+      page.getByRole('heading', { name: 'Tabla de Clientes', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'No se pudo comprobar la sesión' })).toHaveCount(
+      0,
+    );
+    expect(
+      new URL(page.url()).pathname + new URL(page.url()).search + new URL(page.url()).hash,
+    ).toBe(target);
+    expect(state.refreshCalls).toBe(endpoint === 'refresh' ? 2 : 1);
+    expect(state.meCalls).toBe(endpoint === 'me' ? 3 : 2);
+  });
+}
+
 test('sesión: el reintento informa la espera y recupera la ruta original tras una caída del backend', async ({
   page,
 }) => {
@@ -120,6 +149,7 @@ test('sesión: el reintento informa la espera y recupera la ruta original tras u
   state.isAvailable = false;
   await page.goto(target);
   await expect(page.getByRole('heading', { name: 'No se pudo comprobar la sesión' })).toBeVisible();
+  expect(state.meCalls).toBe(3);
   expect(new URL(page.url()).searchParams.get('returnTo')).toBe(target);
   await page.reload();
   let release!: () => void;
@@ -150,18 +180,18 @@ test('sesión: el reintento informa la espera y recupera la ruta original tras u
   expect(state.refreshCalls).toBe(1);
 });
 
-test('sesión: un 502 del refresh se puede recuperar sin volver a capturar credenciales', async ({
+test('sesión: un 502 persistente del refresh permite reintentar después de agotar la recuperación automática', async ({
   page,
 }) => {
   const state = await sessionScenario(page);
   state.refreshStatus = 502;
   await page.goto(target);
   await expect(page.getByRole('heading', { name: 'No se pudo comprobar la sesión' })).toBeVisible();
-  expect(state.refreshCalls).toBe(1);
+  expect(state.refreshCalls).toBe(3);
   state.refreshStatus = 200;
   await page.getByRole('button', { name: 'Volver a comprobar el acceso', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Tabla de Clientes', exact: true })).toBeVisible();
-  expect(state.refreshCalls).toBe(2);
+  expect(state.refreshCalls).toBe(4);
 });
 
 test('sesión: un refresh rechazado abre el login y conserva el destino, sin bucle', async ({

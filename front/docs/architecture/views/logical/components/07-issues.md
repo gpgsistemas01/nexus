@@ -11,6 +11,7 @@ flowchart TB
     client["DirectoryCreationPage"]
     actions["useIssueActions"]
     read["useDocumentRead"]
+    readDialog["DocumentReadDialog"]
     editorPage["IssueEditorPage"]
     editor["useIssueEditor"]
     form["IssueEditor"]
@@ -20,6 +21,7 @@ flowchart TB
     mapper["issueRequestMapper"]
     workspace --> page
     workspace --> client
+    page --> readDialog
     page --> actions
     page --> editorPage
     actions --> read

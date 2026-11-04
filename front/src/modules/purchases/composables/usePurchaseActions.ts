@@ -157,6 +157,7 @@ export const usePurchaseActions = (options: {
         open,
         create,
         close,
+        cancelRead: reader.close,
         reload,
         retry,
         handleSaved,

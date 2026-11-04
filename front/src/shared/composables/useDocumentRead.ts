@@ -1,4 +1,5 @@
 import { onBeforeUnmount, ref, shallowRef } from 'vue';
+import { isReadRetryable } from '../http/readFailure.js';
 
 export const useDocumentRead = <Document>(options: {
     request: (id: string, signal: AbortSignal) => Promise<Document>;
@@ -8,6 +9,7 @@ export const useDocumentRead = <Document>(options: {
     const document = shallowRef<Document>();
     const isReading = ref(false);
     const readError = ref('');
+    const canRetry = ref(false);
     let controller: AbortController | undefined;
     let requestedId = '';
     let sequence = 0;
@@ -23,6 +25,7 @@ export const useDocumentRead = <Document>(options: {
         controller = current;
         isReading.value = true;
         readError.value = '';
+        canRetry.value = false;
 
         try {
             const result = await options.request(id, current.signal);
@@ -34,6 +37,7 @@ export const useDocumentRead = <Document>(options: {
             if (attempt !== sequence || current.signal.aborted) return;
 
             readError.value = cause instanceof Error ? cause.message : options.errorMessage;
+            canRetry.value = isReadRetryable(cause);
             options.onError(cause);
         } finally {
             if (attempt === sequence) isReading.value = false;
@@ -46,11 +50,12 @@ export const useDocumentRead = <Document>(options: {
         isReading.value = false;
         document.value = undefined;
         readError.value = '';
+        canRetry.value = false;
     };
 
     onBeforeUnmount(() => {
         isDisposed = true;
         close();
     });
-    return { document, isReading, readError, load, close };
+    return { document, isReading, readError, canRetry, load, close };
 };

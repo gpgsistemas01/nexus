@@ -24,6 +24,17 @@ const openAction = async (page: Page, name: string) => {
     const action = page.getByRole('button', { name, exact: true }).first();
     if (await action.count()) {
       await action.click();
+      await expect(page.getByRole('dialog', { name: /^Cargando (compra|salida)/ })).toHaveCount(0, {
+        timeout: 60_000,
+      });
+      if (
+        await page
+          .getByRole('dialog', { name: 'No se pudo completar la consulta', exact: true })
+          .count()
+      )
+        throw new Error(
+          `No se pudo preparar «${name}»: la consulta falló. Revise el servicio antes de volver a capturar.`,
+        );
       return;
     }
     const next = page.getByRole('button', { name: 'Siguiente', exact: true }).first();
