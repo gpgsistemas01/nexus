@@ -62,7 +62,9 @@ export const useIssueEditor = (options: {
         if (canEditDetails)
             record.update(
                 'details',
-                form.values.details.filter((row) => row.id !== id || row.isOriginallySupplied),
+                form.values.details.filter(
+                    (row) => row.id !== id || row.isOriginallySupplied || row.isCanceled,
+                ),
             );
     };
 

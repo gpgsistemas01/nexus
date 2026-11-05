@@ -43,6 +43,7 @@ de surtir y saldo entregado de cada partida. **Regresar** cierra sin cambios.
 | Cancelado | Todos los detalles se devolvieron por completo; sólo admite consulta. |
 
 El estado se calcula al operar; abrir o cerrar una pantalla no lo cambia.
+Las partidas canceladas se conservan sin botones de acción.
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ## Surtir

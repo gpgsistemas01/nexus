@@ -99,7 +99,7 @@ const headers = computed<DataTableHeader<PurchaseDetail>[]>(() => [
             </template>
             <template #[`item.actions`]="{ item }">
                 <TableAction
-                    v-if="item.isNew && canRemove"
+                    v-if="item.status === 'ACTIVE' && item.isNew && canRemove"
                     label="Quitar detalle nuevo"
                     icon="$delete"
                     :is-disabled="isDisabled"

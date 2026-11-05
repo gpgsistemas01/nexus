@@ -108,6 +108,9 @@ it.each(DEMO_PROFILES)(
     expect(manifest.images.includes('05-material-stock.png')).toBe(isAdmin);
     expect(manifest.images.includes('15-user-password.png')).toBe(isAdmin);
     expect(manifest.images.includes('27-report.png')).toBe(isAdmin || isWarehouse);
+    expect(manifest.images).not.toContain('20a-purchase-mixed.png');
+    expect(manifest.images).not.toContain('20b-purchase-mixed.png');
+    expect(content).not.toContain('purchase-mixed.png');
     expect(content).not.toContain('<!-- manual:');
     const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
     expect(index).toContain('## Para empezar');
@@ -840,7 +843,7 @@ it('publica las acciones y la tabla de estados aunque falten ejemplos histórico
   const content = await readFile(path.join(manifest.root, 'sources/11-purchases.md'), 'utf8');
   expect(content).toContain('Partidas activas y canceladas');
   expect(content).toContain('images/20-purchase-view.png');
-  expect(content).not.toContain('images/20a-purchase-mixed.png');
+  expect(content).not.toContain('images/20c-purchase-canceled.png');
   expect(await loadManualPublication(root, 'lector')).toHaveLength(manifest.sources.length);
 });
 
@@ -851,7 +854,7 @@ it('conserva los ejemplos sin datos al reanudar y no repite su búsqueda hasta -
     'vigente',
     manifest.images,
   );
-  expect(progress['20a-purchase-mixed.png']).toEqual(captures['20a-purchase-mixed.png']);
+  expect(progress['20c-purchase-canceled.png']).toEqual(captures['20c-purchase-canceled.png']);
   expect(
     recoverManualCaptures(
       { ...manifest, captures, revision: 'anterior' },
@@ -865,7 +868,7 @@ it('rechaza una referencia de imagen omitida que todavía está en las fuentes p
   const { root, manifest } = await publicationWithoutExamples();
   await writeFile(
     path.join(manifest.root, 'sources/11-purchases.md'),
-    '![Ejemplo](../images/20a-purchase-mixed.png)\n',
+    '![Ejemplo](../images/20c-purchase-canceled.png)\n',
   );
   await expect(loadManualPublication(root, 'lector')).rejects.toThrow('referencia sin captura');
 });

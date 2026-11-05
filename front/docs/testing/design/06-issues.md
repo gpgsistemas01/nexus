@@ -14,3 +14,8 @@ La cobertura de cliente vive en `tests/unit/modules/issues/issueTest.ts` y
 `tests/e2e/issues.spec.ts`. Reutiliza fixtures y el transporte de prueba existentes;
 los dobles HTTP no demuestran persistencia. El backend mantiene las integraciones
 de salidas, devoluciones y concurrencia con base aislada.
+
+`DP-VUE-ISS-002` incluye las partidas canceladas: editar no ofrece eliminarlas en
+ninguno de los tres recursos. El composable conserva partidas canceladas y ya
+surtidas incluso ante una llamada directa a quitar; retirar una pendiente
+conserva el historial y el documento original.

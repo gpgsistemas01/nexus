@@ -12,6 +12,11 @@ El cambio de lectura de observaciones se cubre en la integración HTTP/Prisma
 en listado y por ID, conservación después de editar y omisión de detalles en listado,
 en ambas variantes.
 
+`DP-VUE-COM-002` comprueba también que las partidas canceladas no muestran botones
+y que las activas conservan corrección/cancelación en Materiales y Consumibles.
+La transición de cancelación en Materiales vuelve a leer el documento y retira
+los botones de la partida cancelada.
+
 ## Respuestas confirmadas y corrección de compras
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |

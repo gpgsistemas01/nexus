@@ -48,13 +48,11 @@ Cancelar la confirmación no cambia el documento ni el inventario.
 | --- | --- |
 | Confirmada | Tiene partidas activas. |
 | Partidas activas y canceladas | Conserva ambas; los totales vigentes incluyen sólo las activas. |
-| Cancelada | Todas las partidas están canceladas. Conserva sus totales históricos y es de consulta. |
+| Cancelada | Todas canceladas; conserva totales históricos. Sólo consulta. |
+
+Las partidas canceladas se conservan sin botones de acción.
 
 ![Consulta de una compra registrada.](images/20-purchase-view.png)
-
-![Compra de materiales con partidas activas y canceladas.](images/20a-purchase-mixed.png)
-
-![Compra de consumibles con partidas activas y canceladas.](images/20b-purchase-mixed.png)
 
 ![Compra de materiales cancelada con totales históricos.](images/20c-purchase-canceled.png)
 

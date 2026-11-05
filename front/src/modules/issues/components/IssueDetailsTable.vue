@@ -188,10 +188,10 @@ const projectValue = (item: IssueDetail) =>
                     @click="emit('return', item)"
                 />
                 <TableAction
-                    v-else-if="mode === 'create' || mode === 'edit'"
+                    v-else-if="(mode === 'create' || mode === 'edit') && !item.isCanceled"
                     label="Eliminar detalle"
                     icon="$delete"
-                    :is-disabled="isDisabled || item.isOriginallySupplied || item.isCanceled"
+                    :is-disabled="isDisabled || item.isOriginallySupplied"
                     @click="emit('remove', item.id)"
                 />
             </template>

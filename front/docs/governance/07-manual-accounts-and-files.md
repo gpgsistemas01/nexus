@@ -284,7 +284,6 @@ modificado o buscar de nuevo ejemplos antes marcados como `unavailable`.
 | Tabla vacía | Puede servir para consulta. Para editar, preparar un registro existente. |
 | El documento no aparece primero | La preparación recorre las páginas y abre el folio encontrado después de recibir la búsqueda. También busca detalles disponibles en páginas posteriores para surtir o devolver. |
 | `ejemplo sin datos` | No impide publicar. La explicación del estado permanece y la imagen se incluye cuando hay un ejemplo disponible. No crear operaciones para obtenerla. |
-| Compra mixta | El ejemplo reúne una partida activa y otra cancelada de la misma compra; no es un requisito para corregir ni registrar compras. |
 | Devolución registrada | El ejemplo puede mostrar un renglón devuelto completo y otro con saldo entregado; no exige una devolución parcial dentro del mismo renglón. |
 | `Test timeout of 180000ms` y navegador cerrado | Actualizar el recorrido: el límite ahora se calcula por cuenta y cada imagen tiene su propio tiempo. Repetir el comando para recuperar las pendientes. |
 | Falta una opción | Revisar dependencias, registros activos y permisos. Para pesos se necesita un material de referencia ROLLO. |

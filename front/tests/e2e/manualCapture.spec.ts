@@ -171,7 +171,6 @@ const serveDocuments = async (
 };
 
 for (const filename of [
-  '20a-purchase-mixed.png',
   '20d-purchase-canceled.png',
   '24c-issue-partial.png',
   '25a-issue-partial-return.png',
@@ -202,16 +201,8 @@ for (const filename of [
         doc.type = resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE';
         doc.details[0]!.material.type = doc.type;
         if (index === 21) {
-          if (capture.state === 'mixed')
-            doc.details.push({
-              ...structuredClone(doc.details[0]!),
-              id: documentId(100),
-              status: 'CANCELED',
-            });
-          else {
-            doc.status.name = 'Cancelada';
-            doc.details[0]!.status = 'CANCELED';
-          }
+          doc.status.name = 'Cancelada';
+          doc.details[0]!.status = 'CANCELED';
         }
         return doc;
       }
@@ -300,17 +291,11 @@ for (const mode of ['supply', 'return'] as const) {
   });
 }
 
-test('manual: una compra sin historial mixto permite abrir la corrección real del detalle', async ({
+test('manual: la corrección utiliza una partida activa sin exigir historial de cancelaciones', async ({
   page,
 }) => {
   const root = await destination();
   const { writes } = await mockPurchases(page, operator.permissions);
-  await expect(
-    captureRecipe(page, '20a-purchase-mixed.png', root, operator),
-  ).rejects.toBeInstanceOf(ManualExampleUnavailable);
-  await expect(access(path.join(root, 'images/20a-purchase-mixed.png'))).rejects.toMatchObject({
-    code: 'ENOENT',
-  });
   await captureRecipe(page, '21-purchase-correction.png', root, operator);
   await expect(
     page.getByRole('dialog', { name: 'Corregir detalle de compra', exact: true }),
@@ -393,7 +378,7 @@ test('manual: agotar la búsqueda de un ejemplo no exige preparar operaciones nu
 }) => {
   await mockPurchases(page, operator.permissions);
   await expect(
-    openDocumentCapture(page, DOCUMENT_STATE_CAPTURES['20a-purchase-mixed.png']!, {
+    openDocumentCapture(page, DOCUMENT_STATE_CAPTURES['20c-purchase-canceled.png']!, {
       exampleLookupTimeout: 0,
     }),
   ).rejects.toBeInstanceOf(ManualExampleUnavailable);

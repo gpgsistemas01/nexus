@@ -89,6 +89,28 @@ for (const [path, title, item] of [
     expect(writes[0]!.data).not.toHaveProperty('totalGrossPurchaseAmount');
     expect(errors).toEqual([]);
   });
+
+  test(`compras ${path}: sólo las partidas activas muestran acciones`, async ({ page }) => {
+    const { writes } = await mockPurchases(page, undefined, 'mixed');
+    await page.goto(`/compras/${path}`);
+    await page.getByRole('button', { name: 'Ver compra', exact: true }).first().click();
+    const dialog = page.getByRole('dialog', { name: 'Ver compra - Folio COM-001', exact: true });
+    const canceled = dialog.getByRole('row').filter({
+      has: page.getByRole('cell', { name: 'Lona Cancelado', exact: true }),
+    });
+    await expect(canceled).toBeVisible();
+    await expect(canceled.getByRole('button')).toHaveCount(0);
+    const active = dialog.getByRole('row').filter({
+      has: page.getByRole('cell', { name: 'Lona', exact: true }),
+    });
+    await expect(
+      active.getByRole('button', { name: 'Corregir detalle', exact: true }),
+    ).toBeEnabled();
+    await expect(
+      active.getByRole('button', { name: 'Cancelar detalle', exact: true }),
+    ).toBeEnabled();
+    expect(writes).toHaveLength(0);
+  });
 }
 
 test('compras: edición de encabezado conserva proveedor, observaciones y detalles existentes', async ({
@@ -203,9 +225,10 @@ test('compras: consulta, corrección y cancelación explícita conservan el hist
   await expect(dialog.getByLabel('Totales de compra')).toContainText('$116.00');
   expect(writes).toHaveLength(2);
   expect(writes[1]!.data).toBeNull();
-  await expect(dialog.getByRole('button', { name: 'Corregir detalle', exact: true })).toHaveCount(
-    0,
-  );
+  const canceled = dialog.getByRole('row').filter({
+    has: page.getByRole('cell', { name: 'Lona Cancelado', exact: true }),
+  });
+  await expect(canceled.getByRole('button')).toHaveCount(0);
   expect(reads.filter((url) => !url.search)).toHaveLength(3);
 });
 

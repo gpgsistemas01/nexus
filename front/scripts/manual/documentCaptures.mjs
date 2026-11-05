@@ -1,13 +1,8 @@
-/** @typedef {{family: 'purchases'|'issues', resource: 'materiales'|'consumibles'|'mermas', state: 'mixed'|'canceled'|'partial'|'returned'|'correct'|'supply'|'return'}} DocumentCapture */
+/** @typedef {{family: 'purchases'|'issues', resource: 'materiales'|'consumibles'|'mermas', state: 'canceled'|'partial'|'returned'|'correct'|'supply'|'return'}} DocumentCapture */
 
 /** @type {Record<string, DocumentCapture>} */
 export const DOCUMENT_STATE_CAPTURES = {};
 for (const [index, resource] of /** @type {const} */ (['materiales', 'consumibles']).entries()) {
-    DOCUMENT_STATE_CAPTURES[`20${index ? 'b' : 'a'}-purchase-mixed.png`] = {
-        family: 'purchases',
-        resource,
-        state: 'mixed',
-    };
     DOCUMENT_STATE_CAPTURES[`20${index ? 'd' : 'c'}-purchase-canceled.png`] = {
         family: 'purchases',
         resource,

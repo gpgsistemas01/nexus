@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { mockIssues } from './issueFixtures.js';
 import { chooseOption } from './warehouseFixtures.js';
-import { issuePermissions, issueDetailId, departmentId } from '../fixtures/issues.js';
+import { issuePermissions, issueDetailId, departmentId, issueFor } from '../fixtures/issues.js';
 import { ids, pageOf, user } from '../fixtures/inventory.js';
 import { clientData, personData } from '../fixtures/records.js';
 
@@ -110,6 +110,49 @@ for (const [path, resource, title, label] of [
     await expect(page.getByRole('combobox', { name: 'Área', exact: true })).toBeDisabled();
     await expect(page.getByRole('combobox', { name: 'Área', exact: true })).toHaveValue('SISTEMAS');
     await expect(page.getByText('Todos los registros', { exact: true })).toBeVisible();
+  });
+
+  test(`salidas ${path}: las partidas canceladas no muestran acciones de edición`, async ({
+    page,
+  }) => {
+    const { writes } = await mockIssues(page);
+    const doc = issueFor(resource);
+    const endpoint =
+      resource === 'wastes'
+        ? '/api/warehouse/waste-issues'
+        : `/api/warehouse/goods-issues/${resource}`;
+    await page.route(`${endpoint}/${doc.id}`, (route) =>
+      route.fulfill({
+        json: {
+          [resource === 'wastes' ? 'wasteIssue' : 'goodsIssue']: {
+            ...doc,
+            details: [
+              ...doc.details,
+              {
+                ...doc.details[0]!,
+                id: 'dddddddd-2222-4222-8222-222222222222',
+                materialName: 'Detalle cancelado',
+                fulfillmentStatus: { name: 'Cancelado' },
+              },
+            ],
+          },
+        },
+      }),
+    );
+    await page.goto(`/salidas/${path}`);
+    await page.getByRole('button', { name: 'Editar salida', exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    const canceled = dialog.getByRole('row').filter({
+      has: page.getByRole('cell', { name: 'Detalle cancelado', exact: true }),
+    });
+    await expect(canceled).toBeVisible();
+    await expect(canceled.getByRole('button')).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Eliminar detalle', exact: true }).click();
+    await expect(dialog.getByRole('button', { name: 'Eliminar detalle', exact: true })).toHaveCount(
+      0,
+    );
+    await expect(canceled).toBeVisible();
+    expect(writes).toHaveLength(0);
   });
 }
 

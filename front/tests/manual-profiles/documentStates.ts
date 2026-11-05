@@ -36,11 +36,7 @@ export const mockDocumentCapture = (
   department = 'SISTEMAS',
 ) =>
   capture.family === 'purchases'
-    ? mockPurchases(
-        page,
-        [...permissions],
-        capture.state === 'mixed' ? 'mixed' : capture.state === 'canceled' ? 'canceled' : 'active',
-      )
+    ? mockPurchases(page, [...permissions], capture.state === 'canceled' ? 'canceled' : 'active')
     : mockIssues(
         page,
         [...permissions],
@@ -68,7 +64,7 @@ export const openDocumentCapture = async (
   const route = `/${capture.family === 'purchases' ? 'compras' : 'salidas'}/${capture.resource}`;
   await page.goto(route);
   await expect(page.locator('main h1')).toBeVisible({ timeout: 30_000 });
-  const example = ['mixed', 'canceled', 'partial', 'returned'].includes(capture.state);
+  const example = ['canceled', 'partial', 'returned'].includes(capture.state);
   const deadline = Date.now() + exampleLookupTimeout;
   const checkDeadline = () => {
     if (example && Date.now() >= deadline)
@@ -121,12 +117,7 @@ export const openDocumentCapture = async (
           if (!doc.details.length) return null;
           const active = doc.details.some((detail) => detail.status === 'ACTIVE');
           const canceled = doc.details.some((detail) => detail.status === 'CANCELED');
-          const matches =
-            capture.state === 'mixed'
-              ? active && canceled
-              : capture.state === 'correct'
-                ? active
-                : canceled;
+          const matches = capture.state === 'correct' ? active : canceled;
           return matches ? { reference: doc.referenceNumber } : null;
         }
         const doc = normalizeIssueDocument(raw, resource);
@@ -148,7 +139,6 @@ export const openDocumentCapture = async (
   }
   if (!selected) {
     const descriptions = {
-      mixed: 'compra con partidas activas y canceladas',
       canceled: 'documento cancelado',
       partial: 'salida con surtido parcial',
       returned: 'salida con devolución registrada y saldo entregado',

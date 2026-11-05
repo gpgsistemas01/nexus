@@ -500,6 +500,30 @@ it.each(['view', 'return'] as const)(
   },
 );
 
+it('editar conserva las partidas canceladas o surtidas al quitar un detalle disponible', () => {
+  vi.spyOn(issueLookupService, 'list').mockResolvedValue(pageOf([]));
+  const original = document();
+  original.details.push(
+    { ...original.details[0]!, id: 'canceled', isCanceled: true },
+    { ...original.details[0]!, id: 'supplied', isOriginallySupplied: true, isSupplied: true },
+  );
+  const { value, wrapper } = mountComposable(() =>
+    useIssueEditor({
+      resource: 'materials',
+      target: { mode: 'edit', document: original },
+      has: () => true,
+      onSaved: vi.fn(),
+      onDenied: vi.fn(),
+    }),
+  );
+  value.removeDetail('canceled');
+  value.removeDetail('supplied');
+  value.removeDetail(issueDetailId);
+  expect(value.values.details.map((row) => row.id)).toEqual(['canceled', 'supplied']);
+  expect(original.details.map((row) => row.id)).toEqual([issueDetailId, 'canceled', 'supplied']);
+  wrapper.unmount();
+});
+
 it('el surtido protege detalles persistidos/cancelados y desmarcar limpia sólo la cantidad de proyecto de la captura', async () => {
   const original = document();
   original.details.push({
