@@ -5,7 +5,6 @@ import { updateVersionedRecord } from '../../repository/versionRepository.js';
 import { findPage } from "../../repository/paginationRepository.js";
 import { isAppError } from "../../errors/AppError.js";
 import {
-    SupplierCodeNotFound,
     SupplierCreateDatabaseError,
     SupplierNotFound,
     SupplierUpdateDatabaseError
@@ -100,21 +99,6 @@ export const findUniqueSupplier = async ({
     });
 
     if (!supplier) throw new SupplierNotFound();
-
-    return supplier;
-};
-
-export const findUniqueSupplierCode = async ({
-    tx = null,
-    id
-}) => {
-
-    const supplier = await getDb(tx).supplier.findUnique({
-        where: { id },
-        select: { code: true }
-    });
-
-    if (!supplier) throw new SupplierCodeNotFound();
 
     return supplier;
 };

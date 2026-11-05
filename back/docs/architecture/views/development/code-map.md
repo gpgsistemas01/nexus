@@ -17,33 +17,33 @@ flowchart LR
     controllers["controllers (45 módulos)"] --> dtos["dtos (12 módulos)"]
     controllers["controllers (45 módulos)"] --> errors["errors (22 módulos)"]
     controllers["controllers (45 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (45 módulos)"] --> services["services (70 módulos)"]
+    controllers["controllers (45 módulos)"] --> services["services (69 módulos)"]
     controllers["controllers (45 módulos)"] --> shared["shared (12 módulos)"]
     controllers["controllers (45 módulos)"] --> utils["utils (15 módulos)"]
     dtos["dtos (12 módulos)"] --> shared["shared (12 módulos)"]
     errors["errors (22 módulos)"] --> messages["messages (2 módulos)"]
     errors["errors (22 módulos)"] --> shared["shared (12 módulos)"]
-    middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (70 módulos)"]
-    middleware["middleware (5 módulos)"] --> utils["utils (15 módulos)"]
-    public["public (212 módulos)"] --> shared["shared (12 módulos)"]
+    middleware["middleware (4 módulos)"] --> messages["messages (2 módulos)"]
+    middleware["middleware (4 módulos)"] --> services["services (69 módulos)"]
+    middleware["middleware (4 módulos)"] --> utils["utils (15 módulos)"]
+    public["public (211 módulos)"] --> shared["shared (12 módulos)"]
     repository["repository (8 módulos)"] --> constants["constants (11 módulos)"]
     repository["repository (8 módulos)"] --> errors["errors (22 módulos)"]
     repository["repository (8 módulos)"] --> lib["lib (3 módulos)"]
     repository["repository (8 módulos)"] --> shared["shared (12 módulos)"]
     routes["routes (48 módulos)"] --> controllers["controllers (45 módulos)"]
-    routes["routes (48 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (48 módulos)"] --> middleware["middleware (4 módulos)"]
     routes["routes (48 módulos)"] --> shared["shared (12 módulos)"]
     routes["routes (48 módulos)"] --> validators["validators (16 módulos)"]
-    services["services (70 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (70 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (70 módulos)"] --> errors["errors (22 módulos)"]
-    services["services (70 módulos)"] --> repository["repository (8 módulos)"]
-    services["services (70 módulos)"] --> shared["shared (12 módulos)"]
-    services["services (70 módulos)"] --> utils["utils (15 módulos)"]
+    services["services (69 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (69 módulos)"] --> dtos["dtos (12 módulos)"]
+    services["services (69 módulos)"] --> errors["errors (22 módulos)"]
+    services["services (69 módulos)"] --> repository["repository (8 módulos)"]
+    services["services (69 módulos)"] --> shared["shared (12 módulos)"]
+    services["services (69 módulos)"] --> utils["utils (15 módulos)"]
     utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
     utils["utils (15 módulos)"] --> errors["errors (22 módulos)"]
-    utils["utils (15 módulos)"] --> services["services (70 módulos)"]
+    utils["utils (15 módulos)"] --> services["services (69 módulos)"]
     utils["utils (15 módulos)"] --> shared["shared (12 módulos)"]
     validators["validators (16 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (16 módulos)"] --> messages["messages (2 módulos)"]
@@ -261,12 +261,11 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/inventory/movementService.js`](../../../../src/services/inventory/movementService.js) | `applyInventoryMovement`, `createInventoryMovement` |
 | [`src/services/inventory/reportService.js`](../../../../src/services/inventory/reportService.js) | `findMovementReportRows` |
 | [`src/services/inventory/stockHelpers.js`](../../../../src/services/inventory/stockHelpers.js) | `assertSufficientStock`, `calculateConvertedQuantity`, `hasDimensions` |
-| [`src/services/jwtService.js`](../../../../src/services/jwtService.js) | `generateAccessToken`, `generateOneTimeToken`, `generateRefreshToken`, `verifyAccessToken`, `verifyOneTimeToken`, `verifyRefreshToken`, `verifyToken` |
-| [`src/services/roleService.js`](../../../../src/services/roleService.js) | `getRoleNameById` |
+| [`src/services/jwtService.js`](../../../../src/services/jwtService.js) | `generateAccessToken`, `generateRefreshToken`, `verifyAccessToken`, `verifyRefreshToken`, `verifyToken` |
 | [`src/services/sales/clientService.js`](../../../../src/services/sales/clientService.js) | `createClient`, `findAllClients`, `findClientById`, `updateClient` |
 | [`src/services/sales/reportService.js`](../../../../src/services/sales/reportService.js) | `findClientReportRows` |
 | [`src/services/serviceErrorHandler.js`](../../../../src/services/serviceErrorHandler.js) | `executeServiceOperation`, `handleServiceError` |
-| [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `createStockAdjustment`, `createStockAdjustmentByQuantityChange` |
+| [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `createStockAdjustment` |
 | [`src/services/warehouse/consumables/consumableService.js`](../../../../src/services/warehouse/consumables/consumableService.js) | `createConsumable`, `deleteConsumable`, `findAllConsumables`, `updateConsumable`, `updateConsumableStock` |
 | [`src/services/warehouse/fulfillmentStatusService.js`](../../../../src/services/warehouse/fulfillmentStatusService.js) | `findAllFulfillmentStatuses`, `findFulfillmentStatusIdByName`, `findFulfillmentStatusIdsByName` |
 | [`src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js`](../../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js) | `createConsumableGoodsIssue`, `findAllConsumableGoodsIssues`, `findConsumableGoodsIssueReportRows`, `returnConsumableGoodsIssueDetail`, `updateConsumableGoodsIssue`, `updateConsumableGoodsIssueDetails`, `updateConsumableGoodsIssueHeader` |
@@ -299,7 +298,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/presentationService.js`](../../../../src/services/warehouse/presentationService.js) | `findAllPresentations`, `findUniquePresentation` |
 | [`src/services/warehouse/reasonService.js`](../../../../src/services/warehouse/reasonService.js) | `INITIAL_STOCK_REASON_NAME`, `findAllReasons`, `findGoodsReceiptDetailChangeReason`, `findInitialStockAdjustmentReason` |
 | [`src/services/warehouse/reportService.js`](../../../../src/services/warehouse/reportService.js) | `findGoodsIssueReportRows`, `findSupplierReportRows`, `findWarehouseReportRows`, `findWasteIssueReportRows`, `findWasteReportRows` |
-| [`src/services/warehouse/supplierService.js`](../../../../src/services/warehouse/supplierService.js) | `createSupplier`, `findAllSuppliers`, `findUniqueSupplier`, `findUniqueSupplierCode`, `updateSupplier` |
+| [`src/services/warehouse/supplierService.js`](../../../../src/services/warehouse/supplierService.js) | `createSupplier`, `findAllSuppliers`, `findUniqueSupplier`, `updateSupplier` |
 | [`src/services/warehouse/unitMeasureService.js`](../../../../src/services/warehouse/unitMeasureService.js) | `findAllUnitMeasures`, `findUniqueUnitMeasure` |
 | [`src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js`](../../../../src/services/warehouse/wasteIssues/detailReturns/wasteIssueReturnService.js) | `returnWasteIssueDetail` |
 | [`src/services/warehouse/wasteIssues/wasteIssueDetailService.js`](../../../../src/services/warehouse/wasteIssues/wasteIssueDetailService.js) | `updateWasteIssueDetails` |

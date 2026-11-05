@@ -60,7 +60,7 @@ que aún no tienen un flujo accesible completo.
 - **Tiempo real:** Socket.IO.
 - **Logs:** Pino y Pino HTTP.
 - **Pruebas:** Vitest y Supertest.
-- **Utilidades:** bcrypt, jsonwebtoken, cookie-parser, ioredis, xlsx.
+- **Utilidades:** bcrypt, jsonwebtoken, cookie-parser y ExcelJS.
 
 ## Arquitectura del proyecto
 
@@ -149,7 +149,7 @@ Git no mueve el `.env`, las dependencias ni el cliente Prisma generado de tu equ
 
 ### Dependencias y actualizaciones
 
-Se actualizan dotenv 18, EJS 7, ioredis 6, rate-limit-redis 6 y Vitest 5 con su
+Se actualizan dotenv 18, EJS 7 y Vitest 5 con su
 proveedor V8 de la misma versión. Prisma conserva la versión estable 7.10.1 en
 CLI, cliente y adaptador; una etiqueta `latest` con `8.0.0-rc` no representa una
 versión estable para producción.
@@ -229,7 +229,6 @@ valores destinados a versionarse.
 | `DIRECT_TEST_URL` | No | Conexión directa para migrar la base de pruebas; si falta se usa `DATABASE_TEST_URL`. |
 | `JWT_SECRET_ACCESS` | Sí | Firma tokens de acceso con vigencia de una hora. |
 | `JWT_SECRET_REFRESH` | Sí | Firma tokens de renovación con vigencia de siete días. |
-| `JWT_SECRET_ONE_TIME` | Sí | Firma tokens de un solo uso con vigencia de quince minutos. |
 | `PORT` | No | Puerto HTTP; el valor predeterminado es `3000`. |
 | `NODE_ENV` | No en local | Selecciona la base de pruebas cuando vale `test`; la imagen Docker lo fija en `production`. |
 | `LOG_LEVEL` | No | Nivel de Pino. Acepta `fatal`, `error`, `warn`, `info`, `debug`, `trace` o `silent`; el predeterminado es `warn`. |

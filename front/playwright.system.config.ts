@@ -6,7 +6,6 @@ requireSystemTestDatabase();
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET_ACCESS ??= randomUUID();
 process.env.JWT_SECRET_REFRESH ??= randomUUID();
-process.env.JWT_SECRET_ONE_TIME ??= randomUUID();
 
 export default defineConfig({
     testDir: './tests/system',

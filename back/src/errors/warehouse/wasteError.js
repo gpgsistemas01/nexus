@@ -63,10 +63,3 @@ export class WasteStockEntryDatabaseError extends AppError {
         super('Error de base de datos al registrar la entrada de merma.', 'WASTE_STOCK_ENTRY_DB_ERROR', 500);
     }
 }
-
-export class WasteDeleteDatabaseError extends AppError {
-
-    constructor () {
-        super('Error de base de datos al eliminar la merma.', 'WASTE_DELETE_DB_ERROR', 500);
-    }
-}

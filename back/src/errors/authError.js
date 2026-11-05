@@ -13,10 +13,3 @@ export class authError extends AppError {
         super('No autorizado', 'INVALID_AUTH', 401);
     }
 }
-
-export class detectedReuseError extends AppError {
-
-    constructor() {
-        super('Reutilizacion de token detectada', 'DETECTED_REUSE', 403);
-    }
-}

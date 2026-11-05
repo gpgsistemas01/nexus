@@ -276,16 +276,6 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     [PERMISSIONS.WASTES_PAGE_VIEW]: operationalAccessPolicy
 });
 
-export const getAuthorizationPolicy = (permission) => {
-    const policy = AUTHORIZATION_POLICIES[permission];
-
-    if (!policy) {
-        throw new Error(`Permiso de autorización no configurado: ${permission}`);
-    }
-
-    return policy;
-};
-
 const matchesAccessConditions = (accesses, conditions) => accesses.some(access => (
     conditions.some(condition => Object.entries(condition).every(([key, value]) => (
         access[key] === value

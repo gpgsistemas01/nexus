@@ -321,16 +321,6 @@ export const validateIssueProjectQuantityDetailsEdition =
         })))
 ;
 
-export const validateArrayOfUUIDs = ({ fieldName }) =>
-    body(fieldName)
-        .isArray({ min: 1 }).withMessage(errorMap[fieldName].REQUIRED)
-        .custom(
-            arr => Array.isArray(arr) && arr.every(
-                id => uuidV4Regex.test(id)
-            )
-        ).withMessage(errorMap[fieldName].INVALID_FORMAT)
-;
-
 export const validateWeightCapture = ({
     fieldName,
     coneFieldName = 'coneWeightKg',

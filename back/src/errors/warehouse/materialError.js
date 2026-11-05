@@ -1,11 +1,5 @@
 import { AppError } from "../AppError.js";
 
-export class MaterialRollReferenceInvalid extends AppError {
-    constructor() {
-        super('Los pesos de referencia sólo aplican a materiales con presentación Rollo.', 'MATERIAL_ROLL_REFERENCE_INVALID', 400);
-    }
-}
-
 export class MaterialRollReferenceReadOnly extends AppError {
     constructor() {
         super('Los pesos de referencia registrados no se pueden modificar ni eliminar.', 'MATERIAL_ROLL_REFERENCE_READ_ONLY', 409);
@@ -41,27 +35,6 @@ export class ExcededMaxRetriesSkuError extends AppError {
 
     constructor () {
         super('Excedido el número máximo de intentos para generar un SKU único', 'EXCEDED_MAX_RETRIES_SKU', 500);
-    }
-}
-
-export class SupplierMaterialCreateDatabaseError extends AppError {
-
-    constructor () {
-        super('Error de base de datos al relacionar el material a un proveedor', 'SUPPLIER_MATERIAL_CREATE_DB_ERROR', 500);
-    }
-}
-
-export class SupplierMaterialDeleteDatabaseError extends AppError {
-
-    constructor () {
-        super('Error de base de datos al eliminar la relación entre material y proveedor', 'SUPPLIER_MATERIAL_DELETE_DB_ERROR', 500);
-    }
-}
-
-export class MaterialSnapshotFindDatabaseError extends AppError {
-
-    constructor () {
-        super('Error de base de datos al buscar los datos históricos del material', 'MATERIAL_SNAPSHOT_FIND_DB_ERROR', 500);
     }
 }
 
@@ -104,23 +77,9 @@ export class MaterialDeleteRelationConflict extends AppError {
     }
 }
 
-export class MaterialSupplierChangeConflict extends AppError {
-
-    constructor () {
-        super('No se puede cambiar el proveedor del material porque ya tiene historial de compras o salidas.', 'MATERIAL_SUPPLIER_CHANGE_CONFLICT', 409);
-    }
-}
-
 export class MaterialStockAdjustmentDatabaseError extends AppError {
 
     constructor () {
         super('Error de base de datos al editar el ajuste de stock del material', 'MATERIAL_STOCK_ADJUSTMENT_DB_ERROR', 500);
-    }
-}
-
-export class MaterialUnitCostUpdateDatabaseError extends AppError {
-
-    constructor () {
-        super('Error de base de datos al editar el costo unitario del material', 'MATERIAL_UNIT_COST_UPDATE_DB_ERROR', 500);
     }
 }

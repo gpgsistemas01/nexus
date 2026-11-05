@@ -52,7 +52,7 @@ Todos admiten `isActive` booleano, además de los campos de texto indicados.
 | `reasons` | Motivos de ajuste | `stockAdjustmentReason` / `StockAdjustmentReason` | `name`: 100 |
 | `fulfillment-statuses` | Estados de cumplimiento | `fulfillmentStatus` / `FulfillmentStatus` | `name`: 50 |
 
-`MANAGED_CATALOG_NAMES` deriva las claves del registro. El validator usa esa lista y
+El validator resuelve cada clave con `findManagedCatalog` y aplica
 los límites del catálogo; el servicio vuelve a resolver la clave y usa `catalogDTO`
 para conservar campos propios permitidos y recortar textos. Comprueba tipos y
 longitudes antes de persistir. El cliente no

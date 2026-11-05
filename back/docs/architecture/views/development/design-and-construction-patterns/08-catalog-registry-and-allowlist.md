@@ -23,7 +23,7 @@ los nodos de función/campo son partes de archivos existentes, no nuevos módulo
 
 ```mermaid
 flowchart TB
-    registry["constants/catalogs.js<br/>MANAGED_CATALOGS"] -->|deriva claves| names["MANAGED_CATALOG_NAMES"]
+    registry["constants/catalogs.js<br/>MANAGED_CATALOGS"]
     lookup["findManagedCatalog<br/>sólo propiedades propias"] --> registry
     validator["catalogValidations.js"] -->|campos y longitudes| lookup
     service["catalogService<br/>getCatalog · validateCatalogData"] -->|resuelve modelo permitido| lookup

@@ -1,10 +1,4 @@
-export const DEPARTMENT_NAMES = Object.freeze({
-    WAREHOUSE_AND_SUPPLY: 'ALMACÉN Y PROVEDURÍA',
-    WAREHOUSE: 'Almacén',
-    MANAGEMENT: 'DIRECCIÓN',
-    SYSTEMS: 'SISTEMAS',
-    SALES: 'VENTAS Y PROYECTOS ESPECIALES'
-});
+
 
 export const DEPARTMENT_KEYS = Object.freeze({
     MANAGEMENT: 'management',

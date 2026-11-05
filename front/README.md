@@ -44,12 +44,12 @@ Espera a que cada comando termine correctamente. La raíz no tiene `package.json
 ### 3. Configurar la conexión y la sesión
 
 Crea **`back/.env`**, junto a `back/package.json`, con `NODE_ENV` de desarrollo,
-`DATABASE_URL` de tu base y los secretos independientes `JWT_SECRET_ACCESS`,
-`JWT_SECRET_REFRESH` y `JWT_SECRET_ONE_TIME`. `PORT` es opcional y vale 3000.
+`DATABASE_URL` de tu base y los secretos independientes `JWT_SECRET_ACCESS`
+y `JWT_SECRET_REFRESH`. `PORT` es opcional y vale 3000.
 Si ya tienes el archivo configurado, conserva sus valores.
 
 La base, el usuario y la contraseña de PostgreSQL deben existir antes de continuar.
-Usa tres secretos distintos. Guarda esta configuración en `back/.env`; las variables
+Usa dos secretos distintos. Guarda esta configuración en `back/.env`; las variables
 `VITE_*` del frontend son públicas y no admiten estos secretos.
 
 Con la API en el puerto 3000, Vue funciona con su configuración predeterminada.

@@ -4,11 +4,6 @@ export const INVENTORY_MOVEMENT_TYPES = Object.freeze({
     ADJUSTMENT: 'ADJUSTMENT'
 });
 
-export const INVENTORY_REFERENCE_TYPES = Object.freeze({
-    GOODS_RECEIPT: 'GOODS_RECEIPT',
-    GOODS_ISSUE: 'GOODS_ISSUE'
-});
-
 export const STOCK_ADJUSTMENT_TYPES = Object.freeze({
     INCREASE: 'INCREASE',
     DECREASE: 'DECREASE'

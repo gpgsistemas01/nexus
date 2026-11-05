@@ -89,18 +89,20 @@ orden temporal de todas las peticiones.
 
 ```mermaid
 flowchart TB
-    policy["permissions.js<br/>PERMISSIONS + AUTHORIZATION_POLICIES<br/>createPolicy: roles y departamentos inmutables"] --> server["getAuthorizationPolicy(permission)<br/>createAuthorizeMiddleware"]
-    accesses["getLoggedUser<br/>usuario vigente + user.accesses"] --> server
-    server --> test{"¿Algún acceso satisface<br/>rol Y departamento de la política?"}
-    test -->|Sí| next["Establecer req.user y ejecutar next<br/>controller autorizado"]
-    test -->|No| deny["Rechazar acceso<br/>respuesta API o redirección web"]
-    policy --> granted["getGrantedPermissions(accesses)<br/>permisos calculados del usuario"]
+    policy["constants/permissions.js<br/>AUTHORIZATION_POLICIES<br/>roles y departamentos inmutables"] --> granted["getGrantedPermissions(accesses)<br/>rol Y departamento de un mismo acceso"]
+    accesses["getLoggedUser<br/>usuario y accesos vigentes de base de datos"]
     accesses --> granted
-    granted --> presentation["EJS / UI<br/>mostrar acciones permitidas"]
+    granted --> current["loadAuthenticatedUser<br/>req.user.permissions"]
+    current --> server["createAuthorizeMiddleware(permission)<br/>comprobar permiso de la ruta"]
+    server --> test{"¿El permiso pertenece<br/>a req.user.permissions?"}
+    test -->|Sí| next["Ejecutar next<br/>controller autorizado"]
+    test -->|No| deny["Rechazar acceso<br/>respuesta API o redirección web"]
+    current --> presentation["UI<br/>mostrar acciones permitidas"]
 ```
 
-La ruta fija el permiso de la operación. El middleware consulta la política y vuelve a
-comprobar los accesos del usuario vigente; no autoriza por la visibilidad del botón ni
-confía únicamente en una lista enviada al navegador. El mismo registro alimenta
-`getGrantedPermissions`, evitando mantener una segunda definición de roles y áreas.
+La ruta fija el permiso de la operación. Al cargar al usuario vigente, el servidor
+calcula sus permisos con `getGrantedPermissions` y el registro de políticas.
+El middleware comprueba ese resultado en `req.user.permissions`; la presentación
+utiliza los permisos obtenidos por la sesión. El mismo registro conserva la
+definición de roles y áreas para ambos consumidores.
 El resultado es política declarativa evaluada por funciones comunes, sin jerarquía GoF.

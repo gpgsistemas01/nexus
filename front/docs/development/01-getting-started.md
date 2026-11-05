@@ -45,8 +45,8 @@ Espera a que ambos comandos terminen correctamente. Cada uno instala su propio
 
 Crea **`back/.env`**, junto a `back/package.json`. Si ya está configurado, conserva
 sus valores. Configura `NODE_ENV` para desarrollo, `DATABASE_URL` con la conexión
-de tu base y tres secretos distintos: `JWT_SECRET_ACCESS`, `JWT_SECRET_REFRESH`
-y `JWT_SECRET_ONE_TIME`. `PORT` es opcional y usa 3000 si se omite.
+de tu base y dos secretos distintos: `JWT_SECRET_ACCESS` y `JWT_SECRET_REFRESH`.
+`PORT` es opcional y usa 3000 si se omite.
 
 La base y su cuenta PostgreSQL deben existir. Si la migración requiere conexión
 directa, agrega `DIRECT_URL` para esa misma base. Las variables y los secretos de
