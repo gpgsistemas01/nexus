@@ -14,6 +14,11 @@
             "application/json": {
               "schema": {
                 "$ref": "../openapi.json#/components/schemas/ClientList"
+              },
+              "example": {
+                "data": [],
+                "recordsTotal": 0,
+                "recordsFiltered": 0
               }
             }
           }
@@ -26,8 +31,47 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Clientes"
+      ],
+      "summary": "Consultar clientes",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name, 1=isActive. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/AdvisorId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OnlyActive"
+        }
+      ]
     },
     "post": {
       "operationId": "postSalesClients",
@@ -43,6 +87,15 @@
             "application/json": {
               "schema": {
                 "$ref": "../openapi.json#/components/schemas/ClientResponse"
+              },
+              "example": {
+                "code": "CREATED_CLIENT",
+                "client": {
+                  "id": "11111111-1111-4111-8111-111111111111",
+                  "name": "CLIENTE DE EJEMPLO",
+                  "isActive": true,
+                  "version": 0
+                }
               }
             }
           }
@@ -55,6 +108,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -63,10 +122,18 @@
           "application/json": {
             "schema": {
               "$ref": "../openapi.json#/components/schemas/ClientRequest"
+            },
+            "example": {
+              "name": "CLIENTE DE EJEMPLO",
+              "isActive": true
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Clientes"
+      ],
+      "summary": "Crear cliente"
     }
   },
   "/api/sales/clients/{id}": {
@@ -104,7 +171,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -112,6 +179,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -120,6 +190,11 @@
           "application/json": {
             "schema": {
               "$ref": "../openapi.json#/components/schemas/ClientUpdateRequest"
+            },
+            "example": {
+              "name": "CLIENTE DE EJEMPLO",
+              "isActive": true,
+              "expectedVersion": 0
             }
           }
         }
@@ -132,9 +207,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Clientes"
+      ],
+      "summary": "Editar cliente"
     }
   },
   "/api/sales/reports/clients/excel": {
@@ -165,8 +245,37 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Clientes"
+      ],
+      "summary": "Exportar clientes a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/AdvisorId"
+        }
+      ]
     }
   }
 }

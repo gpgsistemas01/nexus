@@ -4,6 +4,7 @@ import { errorMap } from '../../../src/messages/codeMessages.js';
 import { PERMISSIONS } from '../../../src/shared/constants/permissions.js';
 import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
+import { getGrantedPermissions } from '../../../src/constants/permissions.js';
 
 const { getLoggedUser, verifyAccessToken } = vi.hoisted(() => ({
     getLoggedUser: vi.fn(),
@@ -17,12 +18,42 @@ vi.mock('../../../src/services/authService.js', () => ({
     loginUser: vi.fn()
 }));
 
-const { authorizeUserApi, verifyApiTokenRequired, verifyCookiesAuthTokenRequired } =
+const { authorizeUserApi, authorizeUserWeb, verifyApiTokenRequired, verifyCookiesAuthTokenRequired } =
     await import('../../../src/middleware/authMiddleware.js');
 const { getCurrentUser } = await import('../../../src/controllers/api/authController.js');
 
 describe('authMiddleware authorization', () => {
     beforeEach(() => vi.clearAllMocks());
+
+    it.each([PERMISSIONS.CLIENTS_PAGE_VIEW, PERMISSIONS.SUPPLIERS_PAGE_VIEW])(
+        'reserva la página %s para Sistemas y mantiene las altas contextuales de Almacén', permission => {
+            for (const roleKey of [ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR, ROLE_KEYS.WAREHOUSE_KEEPER]) {
+                const req = { user: { permissions: getGrantedPermissions([{
+                    roleKey, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+                }]) } };
+                const res = { redirect: vi.fn(), status: vi.fn().mockReturnThis(), json: vi.fn() };
+                const nextPage = vi.fn();
+                authorizeUserWeb(permission)(req, res, nextPage);
+                expect(res.redirect).toHaveBeenCalledWith('/error/404');
+                expect(nextPage).not.toHaveBeenCalled();
+                for (const allowed of [PERMISSIONS.CLIENTS_READ, PERMISSIONS.CLIENTS_CREATE,
+                    PERMISSIONS.SUPPLIERS_READ, PERMISSIONS.SUPPLIERS_MANAGE]) {
+                    const nextApi = vi.fn();
+                    authorizeUserApi(allowed)(req, res, nextApi);
+                    expect(nextApi).toHaveBeenCalledOnce();
+                }
+                expect(res.status).not.toHaveBeenCalled();
+            }
+            const req = { user: { permissions: getGrantedPermissions([{
+                roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.SYSTEMS
+            }]) } };
+            const res = { redirect: vi.fn() };
+            const next = vi.fn();
+            authorizeUserWeb(permission)(req, res, next);
+            expect(next).toHaveBeenCalledOnce();
+            expect(res.redirect).not.toHaveBeenCalled();
+        }
+    );
 
     it('loads the user once and reuses it for authorization and the current-user endpoint', async () => {
         const user = { id: 'user-1', permissions: [PERMISSIONS.MATERIALS_READ] };

@@ -12,6 +12,7 @@ import { updateWasteIssueDetails as persistWasteIssueDetails } from '../../../re
 import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { applyWasteMovement } from '../wastes/wasteMovementService.js';
+import { resolveIssueSupplyChange } from '../issues/issueSupplyRules.js';
 import {
     resolveIssueDetailFulfillmentStatus,
     resolveIssueFulfillmentStatus
@@ -59,27 +60,20 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
         if (!detail) throw new WasteIssueDetailNotFound();
 
         currentById.delete(requested.id);
-        if (!requested.isSupplied || detail.isSupplied) continue;
+        if (requested.quantityToSupply === undefined && (!requested.isSupplied || detail.isSupplied)) continue;
 
-        const maximum = Number(detail.quantity);
-        const delta = maximum - Number(detail.suppliedQuantity);
-        Object.assign(detail, {
-            suppliedQuantity: maximum,
-            isSupplied: true,
-            projectConvertedQuantity: requested.projectConvertedQuantity,
-            convertedQuantityDifference: Number(detail.convertedQuantity) - requested.projectConvertedQuantity,
-            fulfillmentStatusId: statusIds.get(resolveIssueDetailFulfillmentStatus({
-                quantity: maximum,
-                suppliedQuantity: maximum
-            }))
-        });
+        const change = resolveIssueSupplyChange({ current: detail, requested });
+        if (!change) continue;
+
+        Object.assign(detail, change.data);
+        detail.fulfillmentStatusId = statusIds.get(resolveIssueDetailFulfillmentStatus(detail));
         updates.push(detail);
         supplyDetails.push({
             wasteId: detail.wasteId,
             wasteIssueDetailId: detail.id,
             materialName: detail.materialName,
-            quantity: delta,
-            convertedQuantity: Number(detail.convertedQuantity) * delta / maximum
+            quantity: change.quantityToSupply,
+            convertedQuantity: Number(detail.convertedQuantity) * change.quantityToSupply / Number(detail.quantity)
         });
     }
 

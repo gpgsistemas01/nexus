@@ -2,6 +2,15 @@
 
 ### Grupo funcional SAL — Salidas de material, merma y consumible
 
+## Alcance de áreas
+
+Auxiliar y Coordinador de Almacén, y Administrador del sistema, pueden consultar y
+registrar salidas para todas las áreas. Las cuentas operativas sólo consultan,
+crean y editan solicitudes de sus áreas asignadas y autorizadas. La regla cubre
+Materiales, Consumibles y Mermas. En ediciones se autorizan tanto el área original
+como el destino; no se permite trasladar un documento ajeno al área propia.
+
+
 | Identificador | Caso de uso específico | Evidencia funcional |
 | --- | --- | --- |
 | `CU-SAL-01` | Consultar salidas de material | Consulta sin modificar existencias. |

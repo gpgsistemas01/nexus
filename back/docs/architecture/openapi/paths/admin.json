@@ -26,8 +26,40 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Usuarios"
+      ],
+      "summary": "Consultar usuarios",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ]
     },
     "post": {
       "operationId": "postAdminUsers",
@@ -55,6 +87,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -66,7 +104,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Usuarios"
+      ],
+      "summary": "Crear usuario"
     }
   },
   "/api/admin/users/{id}": {
@@ -104,7 +146,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -112,6 +154,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -132,9 +177,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Usuarios"
+      ],
+      "summary": "Editar usuario"
     }
   },
   "/api/admin/users/{id}/password": {
@@ -172,7 +222,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -180,6 +230,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -200,9 +253,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Usuarios"
+      ],
+      "summary": "Cambiar contrase\u00f1a de usuario"
     }
   },
   "/api/admin/roles": {
@@ -232,8 +290,40 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Consultar registros de cat\u00e1logo",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ]
     }
   },
   "/api/admin/departments": {
@@ -263,8 +353,52 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "parameters": [
+        {
+          "name": "context",
+          "in": "query",
+          "required": false,
+          "description": "issues devuelve s\u00f3lo las \u00e1reas autorizadas para consultar y registrar Salidas. Auxiliar/Coordinador de Almac\u00e9n y Administrador del sistema tienen alcance de todas las \u00e1reas. Sin este contexto se conserva el selector general.",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "issues"
+            ]
+          }
+        },
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ],
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Consultar registros de cat\u00e1logo"
     }
   },
   "/api/admin/persons": {
@@ -294,8 +428,52 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Personas"
+      ],
+      "summary": "Consultar personas",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=fullName. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Departments"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Roles"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StrictDepartmentFilter"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/IncludeAccesses"
+        }
+      ]
     },
     "post": {
       "operationId": "postAdminPersons",
@@ -323,6 +501,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -334,7 +518,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Personas"
+      ],
+      "summary": "Crear persona"
     }
   },
   "/api/admin/persons/{id}": {
@@ -372,7 +560,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -380,6 +568,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -400,9 +591,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Personas"
+      ],
+      "summary": "Editar persona"
     }
   },
   "/api/admin/movements/wastes": {
@@ -432,8 +628,60 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Movimientos"
+      ],
+      "summary": "Consultar movimientos",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MovementType"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MaterialId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/WasteId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        }
+      ]
     }
   },
   "/api/admin/movements/materials": {
@@ -463,8 +711,60 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Movimientos"
+      ],
+      "summary": "Consultar movimientos",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MovementType"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MaterialId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/WasteId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        }
+      ]
     }
   },
   "/api/admin/reports/movements/materials/excel": {
@@ -495,8 +795,69 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Movimientos"
+      ],
+      "summary": "Exportar movimientos a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MovementType"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MaterialId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/WasteId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/GoodsIssueId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/GoodsReceiptId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StockAdjustmentId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MonthlyReport"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ReportMonth"
+        }
+      ]
     }
   },
   "/api/admin/reports/movements/wastes/excel": {
@@ -527,8 +888,60 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Movimientos"
+      ],
+      "summary": "Exportar movimientos a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MovementType"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MaterialId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/WasteId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MonthlyReport"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ReportMonth"
+        }
+      ]
     }
   },
   "/api/admin/reports/users/excel": {
@@ -559,8 +972,34 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Usuarios"
+      ],
+      "summary": "Exportar usuarios a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ]
     }
   },
   "/api/admin/catalogs/{catalog}": {
@@ -586,24 +1025,30 @@
               "reasons",
               "fulfillment-statuses"
             ]
-          }
+          },
+          "description": "Cat\u00e1logo permitido."
         },
         {
           "name": "start",
           "in": "query",
           "required": false,
+          "description": "Desplazamiento entero. Inv\u00e1lido o fuera de rango se normaliza a 0.",
           "schema": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": 0
           }
         },
         {
           "name": "length",
           "in": "query",
           "required": false,
+          "description": "Tama\u00f1o de p\u00e1gina; valores superiores se limitan a 100. Cero devuelve s\u00f3lo conteos. Inv\u00e1lido usa 10; negativo se normaliza a 0.",
           "schema": {
             "type": "integer",
             "minimum": 0,
+            "maximum": 100,
             "default": 10
           }
         },
@@ -614,6 +1059,9 @@
           "schema": {
             "type": "string"
           }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
         }
       ],
       "responses": {
@@ -656,8 +1104,15 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Consultar registros de cat\u00e1logo"
     },
     "post": {
       "operationId": "postManagedCatalog",
@@ -681,7 +1136,8 @@
               "reasons",
               "fulfillment-statuses"
             ]
-          }
+          },
+          "description": "Cat\u00e1logo permitido."
         }
       ],
       "requestBody": {
@@ -829,8 +1285,15 @@
         },
         "400": {
           "$ref": "../openapi.json#/components/responses/ValidationError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Crear registro de cat\u00e1logo"
     }
   },
   "/api/admin/catalogs/{catalog}/{id}": {
@@ -856,7 +1319,8 @@
               "reasons",
               "fulfillment-statuses"
             ]
-          }
+          },
+          "description": "Cat\u00e1logo permitido."
         },
         {
           "name": "id",
@@ -865,7 +1329,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
       "requestBody": {
@@ -1060,7 +1525,7 @@
           "$ref": "../openapi.json#/components/responses/WriteConflict"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1068,8 +1533,15 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Editar registro de cat\u00e1logo"
     }
   },
   "/api/admin/reports/persons/excel": {
@@ -1100,9 +1572,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "summary": "Exportar personas y asignaciones de \u00e1rea y rol",
+      "summary": "Exportar personas a Excel",
       "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con b\u00fasqueda y \u00e1reas; no pagina la exportaci\u00f3n.",
       "parameters": [
         {
@@ -1150,7 +1625,13 @@
               "desc"
             ]
           }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
         }
+      ],
+      "tags": [
+        "Personas"
       ]
     }
   },
@@ -1182,9 +1663,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "summary": "Exportar personas y asignaciones de \u00e1rea y rol",
+      "summary": "Exportar personas a Excel",
       "description": "Requiere person:reports-read. Genera XLSX con todas las personas que coinciden con b\u00fasqueda y \u00e1reas; no pagina la exportaci\u00f3n. Alias de compatibilidad de /api/admin/reports/persons/excel, registrado con el mismo controlador y permiso.",
       "parameters": [
         {
@@ -1232,7 +1716,13 @@
               "desc"
             ]
           }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
         }
+      ],
+      "tags": [
+        "Personas"
       ]
     }
   },
@@ -1263,9 +1753,61 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Consulta o exporta exclusivamente movimientos de consumibles; el contexto lo fija la ruta."
+      "description": "Consulta o exporta exclusivamente movimientos de consumibles; el contexto lo fija la ruta.",
+      "tags": [
+        "Movimientos"
+      ],
+      "summary": "Consultar movimientos",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MovementType"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MaterialId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/WasteId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        }
+      ]
     }
   },
   "/api/admin/reports/movements/consumables/excel": {
@@ -1296,9 +1838,61 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Consulta o exporta exclusivamente movimientos de consumibles; el contexto lo fija la ruta."
+      "description": "Consulta o exporta exclusivamente movimientos de consumibles; el contexto lo fija la ruta.",
+      "tags": [
+        "Movimientos"
+      ],
+      "summary": "Exportar movimientos a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=date, 1=type, 2=referenceNumber. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MovementType"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MaterialId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/WasteId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MonthlyReport"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ReportMonth"
+        }
+      ]
     }
   }
 }

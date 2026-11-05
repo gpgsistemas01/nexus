@@ -24,6 +24,10 @@ export const findBatches = async function* ({
     batchSize = QUERY_BATCH_SIZES.ROWS,
     fetchPage = query => model.findMany(query)
 }) {
+    if (!Number.isSafeInteger(batchSize) || batchSize < 1) {
+        throw new TypeError('El tamaño de bloque debe ser un entero positivo.');
+    }
+
     let cursor;
     while (true) {
         const data = await fetchPage({
@@ -33,8 +37,13 @@ export const findBatches = async function* ({
         });
         if (!data.length) return;
 
+        const nextCursor = data.at(-1).id;
+        if (typeof nextCursor !== 'string' || !nextCursor || nextCursor === cursor) {
+            throw new Error('La consulta por bloques debe seleccionar id y avanzar el cursor.');
+        }
+
         yield data;
         if (data.length < batchSize) return;
-        cursor = data.at(-1).id;
+        cursor = nextCursor;
     }
 };

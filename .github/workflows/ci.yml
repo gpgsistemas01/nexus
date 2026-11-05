@@ -51,8 +51,11 @@ jobs:
           git push
 
   test:
-    name: Test
+    name: Test (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['24', '26.12.1']
     defaults:
       run:
         working-directory: back
@@ -74,7 +77,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ matrix.node }}
           cache: npm
           cache-dependency-path: back/package-lock.json
 
@@ -120,7 +123,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-node-${{ matrix.node }}
           path: back/build/test-results/*.xml
           if-no-files-found: warn
 
@@ -128,8 +131,93 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports
+          name: coverage-reports-node-${{ matrix.node }}
           path: |
             back/coverage/unit/
             back/coverage/integration/
+          if-no-files-found: warn
+
+  frontend-build:
+    name: Build Vue frontend (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['24.15.0', '26.12.1']
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --include=dev --engine-strict
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Check frontend formatting
+        run: npm run format:check
+
+      - name: Verify Vue documentation and generated reference
+        run: npm run docs:check
+
+      - name: Test frontend components and navigation
+        run: npm run test:unit -- --reporter=default --reporter=junit --outputFile=build/test-results/unit.xml
+
+      - name: Type-check and build frontend
+        run: npm run build
+
+      - name: Install browser for frontend tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Test login and warehouse in browser
+        run: npm run test:e2e
+
+      - name: Install backend for the system browser test
+        if: matrix.node == '24.15.0'
+        run: npm --prefix ../back ci --include=dev
+
+      - name: Prepare isolated PostgreSQL for the system browser test
+        if: matrix.node == '24.15.0'
+        env:
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql --set=ON_ERROR_STOP=1 <<SQL
+          ALTER USER postgres WITH PASSWORD 'postgres';
+          CREATE DATABASE nexus_vue_test;
+          SQL
+          DATABASE_URL="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/nexus_unused"
+          DATABASE_TEST_URL="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/nexus_vue_test"
+          echo "::add-mask::${DATABASE_URL}"
+          echo "::add-mask::${DATABASE_TEST_URL}"
+          echo "DATABASE_URL=${DATABASE_URL}" >> "$GITHUB_ENV"
+          echo "DATABASE_TEST_URL=${DATABASE_TEST_URL}" >> "$GITHUB_ENV"
+          echo "DIRECT_TEST_URL=${DATABASE_TEST_URL}" >> "$GITHUB_ENV"
+
+      - name: Apply migrations to the system test database
+        if: matrix.node == '24.15.0'
+        run: npm --prefix ../back run test:db:migrate
+
+      - name: Test Vue with real Express and PostgreSQL
+        if: matrix.node == '24.15.0'
+        run: npm run test:e2e:system
+
+      - name: Upload frontend test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results-node-${{ matrix.node }}
+          path: front/build/test-results/*.xml
           if-no-files-found: warn

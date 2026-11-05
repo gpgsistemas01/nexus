@@ -44,7 +44,9 @@ coverage/
 *.gz
 
 # Editor settings
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 *.sublime-workspace
 

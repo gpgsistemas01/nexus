@@ -1,0 +1,20 @@
+# `CU-ALM-20` — Retirar consumible
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-ALM-20` |
+| Nombre | Retirar consumible. |
+| Actor | Personal de almacén o Administrador del sistema. |
+| Disparador | Solicita eliminar la oferta mostrada en `CU-ALM-17`. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor tiene autorización para mantener el catálogo de consumibles.<br>3. La oferta pertenece a un consumible existente. |
+| Flujo principal | 1. **Actor:** selecciona **Eliminar registro** sobre una oferta **(ver E1)**.<br>2. **Nexus:** muestra la confirmación compartida e identifica que se retirará la relación del proveedor, no un movimiento de stock.<br>3. **Actor:** pulsa **Confirmar eliminación** **(ver A1)**.<br>4. **Nexus:** comprueba que la oferta pertenezca a un consumible, que exista y que no tenga historia operativa protegida; elimina la oferta y elimina la identidad sólo cuando no conserva otras ofertas **(ver A2)** **(ver EOP)**; informa el resultado y actualiza el listado de consumibles. |
+| Flujos alternativos | **A1 — Cancelar el retiro (antes del paso 3):**<br>1. **Actor:** cancela la confirmación.<br>2. **Nexus:** cierra el aviso y conserva el consumible, la oferta y la existencia; termina el caso de uso.<br>**A2 — Historia protegida u oferta no válida (durante el paso 4):**<br>1. **Nexus:** informa el motivo del rechazo y conserva el artículo, sus ofertas, existencia e historia sin cambios parciales; termina el caso de uso. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1 o durante el paso 4):**<br>1. **Nexus:** rechaza la solicitud, comunica el motivo y no presenta información ni ejecuta cambios fuera de la autorización del actor; termina el caso de uso.<br>**EOP — Operación no confirmada (durante el paso 4):**<br>1. **Nexus:** comunica que no pudo confirmar el resultado y no anuncia éxito; conserva la captura cuando el formulario sigue disponible. Termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** la oferta deja de estar disponible y la identidad sólo desaparece si no conserva otras ofertas.<br>2. **Fallo:** ante un rechazo, identidad, oferta, existencia e historial permanecen sin cambios. |
+| Requisitos relacionados | `RF-CAT-028`, `RN-007`, `RN-034`. |
+
+Familia: [objetivos y realización](index.md).
+
+## Diagramas de realización
+
+- [Selección dependiente y escritura de inventario](../../../architecture/views/processes/05-warehouse/01-inventory-selection-write.md).

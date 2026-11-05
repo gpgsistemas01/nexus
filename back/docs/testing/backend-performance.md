@@ -74,16 +74,13 @@ consultar la base por cada elemento ni alterar el orden del historial.
 
 ## Límites que siguen necesitando diseño o carga representativa
 
-- El selector de plantillas aún lee la familia completa antes de paginar. Llevar esa
-  agrupación a SQL exige conservar las reglas de identidad y costo máximo.
-- Los listados de documentos incluyen detalles para el contrato actual del navegador.
-  Una compra grande genera una respuesta grande; cargar el detalle al abrir el modal
-  requiere modificar ese contrato y su consumidor.
-- Las exportaciones consultan hasta 100.000 documentos o movimientos. El escritor libera las
-  filas conforme las confirma, pero los reportes distintos de inventario todavía
-  consultan y preparan sus filas completas. La generación de XML sigue usando CPU
+- La agrupación de plantillas se pagina en SQL y los documentos consultan detalles
+  mediante su GET por id, como se describe en las correcciones posteriores. Una
+  compra individual grande todavía puede generar una respuesta de detalle grande.
+- Las exportaciones recorren lotes sin el límite anterior de 100.000 filas; cada
+  lote de documentos carga sus detalles. La generación de XML sigue usando CPU
   del hilo principal, con pausas periódicas para permitir I/O; no equivale a un worker.
-  Los temporales requieren espacio escribible en el directorio temporal del sistema.
+  Los temporales requieren espacio escribible en el directorio temporal del sistema operativo.
   No se truncan resultados ni se cambia el contrato
   del listado para reducir el volumen sin adaptar también su consumidor.
 - Los índices se evalúan con planes y cardinalidades representativas. Una búsqueda
@@ -129,7 +126,7 @@ Se cede el event loop cada 250 filas y se espera al drenaje del destino cuando e
 saturado. La generación sigue usando el hilo principal; estas pausas no ejecutan el
 cálculo en paralelo. No se incorpora un pool de workers. Los controladores conservan
 las columnas y permisos existentes. Inventario, compras, salidas, movimientos,
-proveedores, usuarios, personas y clientes se consultan por bloques. SheetJS queda como lector independiente para verificar los archivos en
+proveedores, usuarios, personas y clientes se consultan por bloques. read-excel-file verifica los valores con un lector independiente y ExcelJS inspecciona las fórmulas en
 las pruebas, sin formar parte de las dependencias de producción.
 
 `findWarehouseReportRows` entrega un iterable asíncrono y reutiliza `findBatches` del

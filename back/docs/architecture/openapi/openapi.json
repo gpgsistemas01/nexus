@@ -3,7 +3,11 @@
   "info": {
     "title": "Nexus API",
     "version": "1.0.0",
-    "description": "Contrato procesable de solicitudes y respuestas implementadas. Los listados reflejan la proyecci\u00f3n observable; algunos campos dependen de permisos."
+    "description": "API HTTP de Nexus. Autenticaci\u00f3n por cookies, recursos operativos y reportes XLSX.",
+    "license": {
+      "name": "ISC",
+      "identifier": "ISC"
+    }
   },
   "servers": [
     {
@@ -233,7 +237,14 @@
       "cookieAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "accessToken"
+        "name": "accessToken",
+        "description": "Cookie accessToken HttpOnly emitida al iniciar o renovar sesi\u00f3n; se usa en operaciones protegidas."
+      },
+      "refreshCookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "refreshToken",
+        "description": "Cookie refreshToken HttpOnly; se usa s\u00f3lo para renovar el acceso."
       }
     },
     "responses": {
@@ -471,7 +482,174 @@
       },
       "GoodsReceiptHeaderRequest": {
         "$ref": "./components/warehouse-schemas.json#/GoodsReceiptHeaderRequest"
+      },
+      "SupplierMaterial": {
+        "$ref": "./components/warehouse-schemas.json#/SupplierMaterial"
+      },
+      "SupplierMaterialSupplier": {
+        "$ref": "./components/warehouse-schemas.json#/SupplierMaterialSupplier"
+      },
+      "InventoryMaterialCreateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/InventoryMaterialCreateRequest"
+      },
+      "GoodsReceiptMaterialCreateRequest": {
+        "$ref": "./components/warehouse-schemas.json#/GoodsReceiptMaterialCreateRequest"
+      }
+    },
+    "parameters": {
+      "Start": {
+        "$ref": "./components/parameters.json#/Start"
+      },
+      "Length": {
+        "$ref": "./components/parameters.json#/Length"
+      },
+      "Search": {
+        "$ref": "./components/parameters.json#/Search"
+      },
+      "OrderDirection": {
+        "$ref": "./components/parameters.json#/OrderDirection"
+      },
+      "SupplierId": {
+        "$ref": "./components/parameters.json#/SupplierId"
+      },
+      "ClientId": {
+        "$ref": "./components/parameters.json#/ClientId"
+      },
+      "DepartmentId": {
+        "$ref": "./components/parameters.json#/DepartmentId"
+      },
+      "PersonId": {
+        "$ref": "./components/parameters.json#/PersonId"
+      },
+      "AdvisorId": {
+        "$ref": "./components/parameters.json#/AdvisorId"
+      },
+      "MaterialId": {
+        "$ref": "./components/parameters.json#/MaterialId"
+      },
+      "WasteId": {
+        "$ref": "./components/parameters.json#/WasteId"
+      },
+      "FulfillmentStatusId": {
+        "$ref": "./components/parameters.json#/FulfillmentStatusId"
+      },
+      "GoodsIssueId": {
+        "$ref": "./components/parameters.json#/GoodsIssueId"
+      },
+      "GoodsReceiptId": {
+        "$ref": "./components/parameters.json#/GoodsReceiptId"
+      },
+      "StockAdjustmentId": {
+        "$ref": "./components/parameters.json#/StockAdjustmentId"
+      },
+      "StartDate": {
+        "$ref": "./components/parameters.json#/StartDate"
+      },
+      "EndDate": {
+        "$ref": "./components/parameters.json#/EndDate"
+      },
+      "ObservationsSearch": {
+        "$ref": "./components/parameters.json#/ObservationsSearch"
+      },
+      "MovementType": {
+        "$ref": "./components/parameters.json#/MovementType"
+      },
+      "OnlyActive": {
+        "$ref": "./components/parameters.json#/OnlyActive"
+      },
+      "MonthlyReport": {
+        "$ref": "./components/parameters.json#/MonthlyReport"
+      },
+      "ReportMonth": {
+        "$ref": "./components/parameters.json#/ReportMonth"
+      },
+      "InventoryScope": {
+        "$ref": "./components/parameters.json#/InventoryScope"
+      },
+      "MaterialType": {
+        "$ref": "./components/parameters.json#/MaterialType"
+      },
+      "DepartmentContext": {
+        "$ref": "./components/parameters.json#/DepartmentContext"
+      },
+      "Departments": {
+        "$ref": "./components/parameters.json#/Departments"
+      },
+      "Roles": {
+        "$ref": "./components/parameters.json#/Roles"
+      },
+      "StrictDepartmentFilter": {
+        "$ref": "./components/parameters.json#/StrictDepartmentFilter"
+      },
+      "IncludeAccesses": {
+        "$ref": "./components/parameters.json#/IncludeAccesses"
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Sesi\u00f3n",
+      "description": "Operaciones de sesi\u00f3n."
+    },
+    {
+      "name": "Clientes",
+      "description": "Operaciones de clientes."
+    },
+    {
+      "name": "Consumibles",
+      "description": "Operaciones de consumibles."
+    },
+    {
+      "name": "Materiales",
+      "description": "Operaciones de materiales."
+    },
+    {
+      "name": "Mermas",
+      "description": "Operaciones de mermas."
+    },
+    {
+      "name": "Salidas de mermas",
+      "description": "Operaciones de salidas de mermas."
+    },
+    {
+      "name": "Proveedores",
+      "description": "Operaciones de proveedores."
+    },
+    {
+      "name": "Salidas de materiales",
+      "description": "Operaciones de salidas de materiales."
+    },
+    {
+      "name": "Salidas de consumibles",
+      "description": "Operaciones de salidas de consumibles."
+    },
+    {
+      "name": "Inventario",
+      "description": "Operaciones de inventario."
+    },
+    {
+      "name": "Cat\u00e1logos",
+      "description": "Operaciones de cat\u00e1logos."
+    },
+    {
+      "name": "Compras de materiales",
+      "description": "Operaciones de compras de materiales."
+    },
+    {
+      "name": "Compras de consumibles",
+      "description": "Operaciones de compras de consumibles."
+    },
+    {
+      "name": "Usuarios",
+      "description": "Operaciones de usuarios."
+    },
+    {
+      "name": "Personas",
+      "description": "Operaciones de personas."
+    },
+    {
+      "name": "Movimientos",
+      "description": "Operaciones de movimientos."
+    }
+  ]
 }

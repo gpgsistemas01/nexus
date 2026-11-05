@@ -64,6 +64,15 @@ Los listados reutilizan `repository/paginationRepository.js`: el servicio conser
 filtros, proyección y permisos; `findPage` coordina filas y conteos independientes.
 Cuando el alcance total coincide con el filtro se comparte un conteo. Las exportaciones
 pueden solicitar `includeCounts: false` sin alterar los resultados de los listados.
+
+`getDataTablePaging` acota las páginas HTTP a 100 registros y rechaza coerciones de
+arrays, fracciones y sufijos. El contrato de normalización está en
+[paginación de listados](../../../openapi/api-contract.md#paginación-de-listados).
+`findBatches` usa tamaños internos positivos y cursores por id: si un bloque no
+aporta id final o no avanza, falla antes de emitirlo. Así no repite filas sin límite
+ni completa silenciosamente una exportación incompleta. Conserva memoria por bloque,
+orden estable y cancelación; no mantiene una colección de todos los ids exportados.
+
 En cada petición protegida, el middleware de token llama una sola vez a
 `getLoggedUser` y conserva el resultado en `req.user` para autorización y controllers,
 incluido `/api/auth/me`. No se cachean permisos entre peticiones; la consulta carga

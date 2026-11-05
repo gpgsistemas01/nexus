@@ -5,7 +5,7 @@ imports, dependencias compartidas y contratos internos. Los mapas muestran módu
 las flechas son dependencias entre grupos de archivos, no pasos de un CRUD.
 
 La [organización general](../code-structure/index.md) ubica esta implementación en
-el sistema. Esta referencia posee el detalle de cada módulo; [patrones](../design-and-construction-patterns/index.md)
+Nexus. Esta referencia posee el detalle de cada módulo; [patrones](../design-and-construction-patterns/index.md)
 explica las decisiones compartidas y [reutilización](../reuse-and-refactoring/index.md)
 los contratos de sus núcleos. No se replican sus diagramas en cada recurso.
 

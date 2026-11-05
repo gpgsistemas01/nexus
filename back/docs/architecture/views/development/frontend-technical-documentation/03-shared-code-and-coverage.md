@@ -71,6 +71,39 @@ Las tablas propietarias importan estas applications. La factory devuelve `respon
 el consumidor conserva nombre de archivo, filtros y descarga. No hay una página general
 de reportes. Los reportes de compras/salidas usan requests específicos por variante.
 
+### Controles de exportación
+
+`ui/tableUI.js#buildExcelButton` coordina la descarga. El diálogo de
+`ui/reportExportDialog.js` presenta el alcance antes de llamar a la application:
+
+| Opción | Comportamiento del control |
+| --- | --- |
+| **Mes actual** | Opción inicial del diálogo mensual. Usa el mes de México. |
+| **Otro mes** | Habilita el selector mensual Flatpickr; exige seleccionar un mes antes de confirmar. |
+| **Personalizado: usar filtros aplicados** | Usa la búsqueda, filtros y orden del listado. |
+
+El selector mensual comparte los estilos y estados de los campos de formulario.
+`allowMonthlyReport` y `allowInventoryScope` eligen el diálogo del reporte; los
+reportes de inventario tienen sus opciones de existencia y actividad. El consumidor
+conserva el nombre del archivo y libera la URL temporal del Blob después de descargar.
+Los parámetros HTTP y las respuestas de archivo pertenecen al
+[contrato API](../../../openapi/api-contract.md#exportación-mensual-de-reportes).
+
+## Presentación de errores
+
+`api/errorHandler.js#handleApiError` presenta los rechazos recibidos del transporte.
+Los códigos se traducen con `constants/apiMessages.js`; los errores con campos
+visibles se delegan a `ui/forms/formErrorsUI.js`, incluidos los detalles del documento.
+Un error global o un campo sin feedback visible usa la notificación compartida de
+Swal. El aviso omite el texto adicional cuando coincide con el título y conserva
+el mensaje público del servidor si falta una traducción local.
+
+El transporte normaliza también errores JSON recibidos como Blob, sin decidir cómo
+mostrarlos. Los presentadores no repiten una notificación ni liberan el submit:
+`useForm` realiza esa limpieza en `finally`. La
+[gestión de formularios y sesión](../../processes/shared-runtime-behavior/02-browser-session-and-form-state.md)
+describe esa coordinación, incluido el login público con `requiresAuth: false`.
+
 ## Infraestructura de presentación y transporte
 
 | Código | Contrato y cobertura |

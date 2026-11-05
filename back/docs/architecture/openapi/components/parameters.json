@@ -1,0 +1,316 @@
+{
+  "Start": {
+    "name": "start",
+    "in": "query",
+    "description": "Desplazamiento. Fuera de 0..2147483647 o formato inv\u00e1lido usa 0.",
+    "required": false,
+    "schema": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647,
+      "default": 0
+    }
+  },
+  "Length": {
+    "name": "length",
+    "in": "query",
+    "description": "Filas por p\u00e1gina: por defecto 10, m\u00e1ximo efectivo 100. Negativo usa 0; inv\u00e1lido usa 10. Cero devuelve s\u00f3lo conteos.",
+    "required": false,
+    "schema": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 10
+    }
+  },
+  "Search": {
+    "name": "search",
+    "in": "query",
+    "description": "Texto de b\u00fasqueda. Tambi\u00e9n admite search[value] por compatibilidad con DataTables.",
+    "required": false,
+    "schema": {
+      "type": "string"
+    },
+    "example": "EJEMPLO"
+  },
+  "OrderDirection": {
+    "name": "order[0][dir]",
+    "in": "query",
+    "description": "Sentido del orden. Valores no admitidos usan el predeterminado del recurso.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "enum": [
+        "asc",
+        "desc"
+      ]
+    }
+  },
+  "SupplierId": {
+    "name": "supplierId",
+    "in": "query",
+    "description": "Proveedor del recurso.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "ClientId": {
+    "name": "clientId",
+    "in": "query",
+    "description": "Cliente de la salida.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "DepartmentId": {
+    "name": "departmentId",
+    "in": "query",
+    "description": "\u00c1rea autorizada de destino; no ampl\u00eda el alcance de la sesi\u00f3n.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "PersonId": {
+    "name": "personId",
+    "in": "query",
+    "description": "Persona relacionada: receptor en compras o solicitante en salidas.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "AdvisorId": {
+    "name": "advisorId",
+    "in": "query",
+    "description": "Persona asesora asociada al cliente.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "MaterialId": {
+    "name": "materialId",
+    "in": "query",
+    "description": "Material o consumible del movimiento.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "WasteId": {
+    "name": "wasteId",
+    "in": "query",
+    "description": "Merma del movimiento.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "FulfillmentStatusId": {
+    "name": "fulfillmentStatusId",
+    "in": "query",
+    "description": "Estado de cumplimiento.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "GoodsIssueId": {
+    "name": "goodsIssueId",
+    "in": "query",
+    "description": "Salida de origen del movimiento.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "GoodsReceiptId": {
+    "name": "goodsReceiptId",
+    "in": "query",
+    "description": "Compra de origen del movimiento.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "StockAdjustmentId": {
+    "name": "stockAdjustmentId",
+    "in": "query",
+    "description": "Ajuste de origen del movimiento.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "StartDate": {
+    "name": "startDate",
+    "in": "query",
+    "description": "Fecha inicial del intervalo; la fecha final incluye todo ese d\u00eda.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "EndDate": {
+    "name": "endDate",
+    "in": "query",
+    "description": "Fecha final del intervalo; la fecha final incluye todo ese d\u00eda.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "ObservationsSearch": {
+    "name": "observationsSearch",
+    "in": "query",
+    "description": "Texto contenido en las observaciones del encabezado.",
+    "required": false,
+    "schema": {
+      "type": "string"
+    }
+  },
+  "MovementType": {
+    "name": "movementType",
+    "in": "query",
+    "description": "Tipo de movimiento registrado.",
+    "required": false,
+    "schema": {
+      "type": "string"
+    }
+  },
+  "OnlyActive": {
+    "name": "onlyActive",
+    "in": "query",
+    "description": "true limita a registros activos; omitirlo conserva el listado ordinario.",
+    "required": false,
+    "schema": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "MonthlyReport": {
+    "name": "monthlyReport",
+    "in": "query",
+    "description": "true exporta el mes completo e ignora los filtros del listado.",
+    "required": false,
+    "schema": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "ReportMonth": {
+    "name": "reportMonth",
+    "in": "query",
+    "description": "Mes AAAA-MM para el modo mensual; ausente o inv\u00e1lido usa el mes actual de Ciudad de M\u00e9xico.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])$"
+    },
+    "example": "2026-10"
+  },
+  "InventoryScope": {
+    "name": "inventoryScope",
+    "in": "query",
+    "description": "Incluye activos, registros con stock distinto de cero o cualquiera de ambas condiciones.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inStock",
+        "activeOrStock"
+      ],
+      "default": "activeOrStock"
+    }
+  },
+  "MaterialType": {
+    "name": "type",
+    "in": "query",
+    "description": "Tipo incluido en el reporte de inventario; omitirlo incluye ambos.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "enum": [
+        "MATERIAL",
+        "CONSUMABLE"
+      ]
+    }
+  },
+  "DepartmentContext": {
+    "name": "context",
+    "in": "query",
+    "description": "issues devuelve s\u00f3lo las \u00e1reas disponibles para salidas seg\u00fan la sesi\u00f3n.",
+    "required": false,
+    "schema": {
+      "type": "string",
+      "enum": [
+        "issues"
+      ]
+    }
+  },
+  "Departments": {
+    "name": "department",
+    "in": "query",
+    "description": "Nombres de \u00e1reas. Repetir el par\u00e1metro para varias; tambi\u00e9n admite department[].",
+    "required": false,
+    "schema": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "style": "form",
+    "explode": true
+  },
+  "Roles": {
+    "name": "role",
+    "in": "query",
+    "description": "Nombres de roles. Repetir para varios; tambi\u00e9n admite role[].",
+    "required": false,
+    "schema": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "style": "form",
+    "explode": true
+  },
+  "StrictDepartmentFilter": {
+    "name": "strictDepartmentFilter",
+    "in": "query",
+    "description": "true utiliza s\u00f3lo las \u00e1reas recibidas, sin inferirlas de la sesi\u00f3n.",
+    "required": false,
+    "schema": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "IncludeAccesses": {
+    "name": "includeAccesses",
+    "in": "query",
+    "description": "true incluye las responsabilidades por \u00e1rea de cada persona.",
+    "required": false,
+    "schema": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

@@ -7,7 +7,7 @@ Sistema y documentación evolucionan de forma relacionada, pero no comparten nú
 - **Documento:** `MAYOR.MENOR`; MAYOR cambia estructura, alcance aprobado o interpretación
   normativa; MENOR aclara, agrega evidencia o sincroniza comportamiento sin redefinir alcance.
 - Un documento registra la versión del sistema que describe. Un cambio funcional debe elevar la
-  versión documental del paquete afectado; cambios sólo editoriales no elevan la del sistema.
+  versión documental del paquete afectado; cambios sólo editoriales no elevan la de Nexus.
 - Estados: `Borrador`, `En revisión`, `Aprobado` y `Obsoleto`. Sólo una versión aprobada se trata
   como línea base. Git conserva el historial; la portada y el control de cambios expresan la
   línea base para lectores externos.

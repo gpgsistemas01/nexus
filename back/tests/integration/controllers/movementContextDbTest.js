@@ -4,10 +4,10 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
-import XLSX from 'xlsx';
 import { randomUUID } from 'node:crypto';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { readExcelReport } from '../../helpers/readExcelReport.js';
 
 const suffix = randomUUID().slice(0, 8);
 const ids = {};
@@ -121,12 +121,11 @@ describe('movimientos por contexto, permisos y reportes', () => {
         for (const query of [{ supplierId: ids.supplier }, { monthlyReport: true, reportMonth: '2026-10' }]) {
             const response = await request(app).get(`/reports/movements/${resource}/excel`).set('Cookie', authCookies.admin)
                 .query({ ...query, type: 'WRONG', context: other }).buffer(true).parse(binaryParser).expect(200);
-            const workbook = XLSX.read(response.body, { type: 'buffer' });
-            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+            const { workbook, rows } = await readExcelReport(response.body);
             expect(rows).toHaveLength(4);
             expect(rows.slice(1).every(row => row[4] === `IT MOV ${resource} ${suffix}`)).toBe(true);
             if (resource === 'consumables') {
-                expect(workbook.SheetNames).toEqual(['Movimientos de consumibles']);
+                expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(['Movimientos de consumibles']);
                 expect(rows[0][4]).toBe('Consumible');
                 expect(response.headers['content-disposition']).toContain('informe_movimientos_consumibles');
             }

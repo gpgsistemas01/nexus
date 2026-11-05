@@ -15,6 +15,7 @@ const monthYearFormatter = new Intl.DateTimeFormat('en-US', {
     year: 'numeric'
 });
 
+// Compatibilidad: sólo normaliza vacíos de primer nivel; no escapa HTML ni valida entradas.
 export const sanitizeEmptyStrings = (obj) => {
   return Object.fromEntries(
     Object.entries(obj).map(([key, value]) => [

@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import XLSX from 'xlsx';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { readExcelReport } from '../../helpers/readExcelReport.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
 const ids = {};
@@ -93,8 +93,10 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(response.body.data.map(receipt => receipt.id)).toEqual([receipts[resource].id]);
         expect(response.body.recordsFiltered).toBe(1);
         expect(response.body.data[0]).not.toHaveProperty('details');
+        expect(response.body.data[0].observations).toBeNull();
         const detail = await request(app).get(`${path(resource)}/${receipts[resource].id}`).expect(200);
         expect(detail.body.goodsReceipt.details.map(row => row.materialId)).toEqual([ids[resource]]);
+        expect(detail.body.goodsReceipt.observations).toBeNull();
         const other = resource === 'material' ? 'consumable' : 'material';
         await request(app).get(`${path(resource)}/${receipts[other].id}`).expect(404);
         await request(app).get(`${path(resource)}/${receipts.mixed.id}`).expect(404);
@@ -104,10 +106,23 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
 
     it.each(['material', 'consumable'])('permite editar una compra homogénea de %s', async resource => {
         const receipt = receipts[resource];
+        const beforeCounters = await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['CMA', 'CCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        });
         await request(app).patch(`${path(resource)}/${receipt.id}`).send({
             supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-07T00:00:00.000Z', observations: 'Contexto correcto', details: []
         }).expect(200);
         expect((await prisma.goodsReceipt.findUnique({ where: { id: receipt.id } })).observations).toBe('Contexto correcto');
+        const detail = await request(app).get(`${path(resource)}/${receipt.id}`).expect(200);
+        expect(detail.body.goodsReceipt.observations).toBe('Contexto correcto');
+        expect(detail.body.goodsReceipt.referenceNumber).toBe(receipt.referenceNumber);
+        const list = await request(app).get(path(resource)).query({ supplierId: ids.supplier }).expect(200);
+        const row = list.body.data.find(item => item.id === receipt.id);
+        expect(row.observations).toBe('Contexto correcto');
+        expect(row).not.toHaveProperty('details');
+        expect(await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['CMA', 'CCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        })).toEqual(beforeCounters);
     });
 
     it.each(['mixed', 'empty', 'consumable'])('rechaza editar %s desde materiales y conserva la cabecera', async key => {
@@ -198,16 +213,14 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
                 res.on('data', chunk => chunks.push(chunk));
                 res.on('end', () => callback(null, Buffer.concat(chunks)));
             }).expect(200);
-        const workbook = XLSX.read(response.body, { type: 'buffer' });
-        const sheet = workbook.Sheets['Compras materiales'];
-        const values = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const { sheet, rows: values } = await readExcelReport(response.body, 'Compras materiales');
         expect(values.filter(row => String(row[0]).startsWith(prefix))).toHaveLength(251);
         expect(new Set(values.filter(row => String(row[0]).startsWith(prefix)).map(row => row[0])).size).toBe(251);
-        expect(sheet.O252).toMatchObject({ f: 'I252*N252', v: 10 });
-        expect(sheet.P252).toMatchObject({ f: 'O252*1.16', v: 11.6 });
-        expect(sheet.B257.v).toBe(2510);
-        expect(sheet.D262.v).toBe(2510);
-        expect(sheet.E262.v).toBe(251);
+        expect(sheet.getCell('O252').value).toEqual({ formula: 'I252*N252', result: 10 });
+        expect(sheet.getCell('P252').value).toEqual({ formula: 'O252*1.16', result: 11.6 });
+        expect(sheet.getCell('B257').value).toBe(2510);
+        expect(sheet.getCell('D262').value).toBe(2510);
+        expect(sheet.getCell('E262').value).toBe(251);
     });
 
 });

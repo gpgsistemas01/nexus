@@ -1,11 +1,11 @@
 import { EventEmitter } from 'node:events';
 import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import xlsx from 'xlsx';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { readExcelReport } from '../../helpers/readExcelReport.js';
 import { DatabaseTableMissing } from '../../../src/errors/databaseError.js';
 import { createFormulaCell, sendExcelReport } from '../../../src/utils/reportExcelUtils.js';
 
@@ -42,37 +42,34 @@ describe('generación progresiva de reportes Excel', () => {
     ];
     const { response, operation } = await exportData(data);
     await operation;
-    const sheet = xlsx.read(response.body, { type: 'buffer' }).Sheets.Reporte;
+    const { sheet, rows } = await readExcelReport(response.body, 'Reporte');
 
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toContain('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     expect(response.headers['content-disposition']).toMatch(
       /^attachment; filename=("?)inventario_\d{2}_\d{4}\.xlsx\1$/
     );
-    expect(sheet.C2).toMatchObject({ f: 'A2+B2', t: 'n', v: 5 });
-    expect(sheet.C4).toMatchObject({ f: 'A4+B4', t: 'n', v: 0 });
-    expect(sheet.A3.v).toBe('México');
-    expect(sheet.B3).toBeUndefined();
-    expect(sheet.C3.v).toBe(0);
-    expect(sheet.D3.v).toBe(false);
-    expect(sheet.E3.v).toBe(1.234567);
+    expect(sheet.getCell('C2').value).toEqual({ formula: 'A2+B2', result: 5 });
+    expect(sheet.getCell('C4').formula).toBe('A4+B4');
+    expect(rows[3][2]).toBe(0);
+    expect(rows[2]).toEqual(['México', null, 0, false, 1.234567]);
     expect(data[1][2]).toEqual({ formula: 'A2+B2', result: 5 });
     expect(await readdir(paths.root)).toEqual([]);
   });
 
   it('consume filas asíncronas y conserva un reporte vacío con sus encabezados', async () => {
-    async function* rows() { yield ['Proveedor', 'Material']; }
-    const { response, operation } = await exportData(rows());
+    async function* sourceRows() { yield ['Proveedor', 'Material']; }
+    const { response, operation } = await exportData(sourceRows());
     await operation;
-    const sheet = xlsx.read(response.body, { type: 'buffer' }).Sheets.Reporte;
-    expect(xlsx.utils.sheet_to_json(sheet, { header: 1 })).toEqual([['Proveedor', 'Material']]);
+    const { rows } = await readExcelReport(response.body, 'Reporte');
+    expect(rows).toEqual([['Proveedor', 'Material']]);
     expect(await readdir(paths.root)).toEqual([]);
   });
 
   it('aísla dos descargas simultáneas con el mismo nombre de archivo', async () => {
     const exports = await Promise.all(['Primero', 'Segundo'].map(name => exportData([['Material'], [name]])));
     await Promise.all(exports.map(item => item.operation));
-    expect(exports.map(({ response }) => xlsx.read(response.body, { type: 'buffer' }).Sheets.Reporte.A2.v))
+    expect(await Promise.all(exports.map(async ({ response }) => (await readExcelReport(response.body, 'Reporte')).sheet.getCell('A2').value)))
       .toEqual(['Primero', 'Segundo']);
     expect(await readdir(paths.root)).toEqual([]);
   });

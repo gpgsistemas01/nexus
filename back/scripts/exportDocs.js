@@ -15,9 +15,12 @@ import {
     mapMarkdownProse,
     externalDocumentAnchorFragment,
     externalDocumentLinkLabel,
-    prepareManualEntry
+    prepareManualEntry,
+    prepareSectionEntry
 } from './documentExportContentUtils.js';
 import { removeDocumentOutput } from './documentOutputUtils.js';
+import { loadDocumentationCatalog } from '../../front/scripts/documentationCatalog.mjs';
+import { loadManualPublication } from '../../front/scripts/manual/publication.mjs';
 import { prepareMermaidCli } from './prepareMermaidCli.js';
 import { getMermaidImageId, hasInvalidSvgGeometry, MERMAID_EXPORT_CONFIG, normalizeMermaidSource } from './mermaidExportUtils.js';
 import { validatePdfOutput } from './pdfExportUtils.js';
@@ -60,7 +63,40 @@ const sequenceGroups = [
 const packagePart = (entry, sources) => [entry, ...sources.filter((source) => source !== entry)];
 const REQUIREMENT_ENTRY = 'docs/requirements/index.md';
 const ARCHITECTURE_ENTRY = 'docs/architecture/index.md';
+const {
+    publication: requestedPublication,
+    document: requestedDocument,
+    format: requestedFormat,
+    checkOnly
+} = getDocumentExportRequest(process.argv.slice(2));
+const frontendCatalog = await loadDocumentationCatalog(path.resolve(ROOT, '../front/docs'));
+const frontendManualProfile = requestedPublication === 'manual-vue'
+    ? process.env.DOCS_FRONT_MANUAL_PROFILE : undefined;
+const frontendManualSources = frontendManualProfile
+    ? await loadManualPublication(path.resolve(ROOT, '../front'), frontendManualProfile) : null;
+const frontendSource = source => `../front/docs/${source}`;
+const frontendSectionParts = requestedPublication === 'arquitectura'
+    && requestedDocument?.startsWith('frontend-vue-')
+    ? Object.fromEntries(Object.entries(frontendCatalog.sections)
+        .filter(([name]) => name !== 'manual')
+        .map(([name, definition]) => [
+            `frontend-vue-${name}`,
+            definition.sources.map(frontendSource)
+        ]))
+    : {};
 const PUBLICATIONS = Object.freeze({
+    ...(requestedPublication === 'manual-vue' ? {
+        'manual-vue': {
+            directory: frontendManualProfile ? `manuales-vue/${frontendManualProfile}` : 'manuales-vue',
+            parts: {
+                ...(frontendManualProfile ? {
+                    [`manual-${frontendManualProfile}`]: frontendManualSources
+                } : {
+                    'manual-usuario': frontendCatalog.sections.manual.sources.map(frontendSource)
+                })
+            }
+        }
+    } : {}),
     requisitos: {
         directory: 'requisitos',
         parts: {
@@ -112,6 +148,8 @@ const PUBLICATIONS = Object.freeze({
                 ...getDirectoryDocuments('docs/architecture/views/development/code-structure'),
                 ...getDirectoryDocuments('docs/architecture/views/development/design-and-construction-patterns'),
                 ...getDirectoryDocuments('docs/architecture/views/development/reuse-and-refactoring'),
+                '../front/docs/architecture/views/overview.md',
+                ...getDirectoryDocuments('../front/docs/architecture/views/development/design-and-construction-patterns'),
                 'docs/architecture/views/development/code-map.md'
             ]),
             'incorporacion-desarrolladores': packagePart(ARCHITECTURE_ENTRY, [
@@ -126,13 +164,18 @@ const PUBLICATIONS = Object.freeze({
                 'docs/architecture/views/development/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
             ]),
+            'frontend-vue': frontendCatalog.completeSources.map(frontendSource),
+            ...frontendSectionParts,
             'comportamiento-transversal': packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/processes/index.md',
                 ...getDirectoryDocuments('docs/architecture/views/processes/shared-runtime-behavior')
             ]),
-            'contrato-api': packagePart(ARCHITECTURE_ENTRY, [
-                'docs/architecture/openapi/api-contract.md'
-            ]),
+            'contrato-api': [
+                'docs/architecture/openapi/index.md',
+                'docs/architecture/openapi/01-consumption.md',
+                'docs/architecture/openapi/api-contract.md',
+                'docs/architecture/openapi/02-maintenance.md'
+            ],
             estandar: packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/coding-standards')
             ]),
@@ -159,12 +202,6 @@ const PUBLICATIONS = Object.freeze({
         }
     }
 });
-const {
-    publication: requestedPublication,
-    document: requestedDocument,
-    format: requestedFormat,
-    checkOnly
-} = getDocumentExportRequest(process.argv.slice(2));
 const formats = new Set(['docx', 'pdf', 'ambos']);
 const outputPlan = getDocumentOutputPlan(requestedFormat);
 const positionalArgumentCount = process.argv.slice(2)
@@ -273,6 +310,8 @@ const addInternalAnchors = (content, source) => {
     return `[]{#${documentExportAnchor(source)}}\n\n${anchoredHeadings}`;
 };
 
+const renderedFigurePattern = /^\s*\[\]\{#([^}]+)\}\s*\r?\n\s*!\[([^\]]+)\]\([^)]+\)\{[^}]*\}$/gm;
+
 const addFigureAnchors = async (content, source, firstFigureNumber) => {
     let figureNumber = firstFigureNumber;
     const figurePattern = /^(\s*)(!\[([^\]]+)\]\(([^)]+)\))$/gm;
@@ -280,8 +319,10 @@ const addFigureAnchors = async (content, source, firstFigureNumber) => {
     let preparedContent = content;
     for (const [figure, indentation, image, title, imagePath] of figures) {
         const dimensions = getPngDimensions(await readFile(imagePath));
-        const replacement = `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber}. ${title}]`)}`
-            + `{#${documentExportAnchor(source, `figura-${figureNumber++}`)} ${getFigureSizeAttribute(dimensions)}}`;
+        const anchor = documentExportAnchor(source, `figura-${figureNumber}`);
+        const replacement = `${indentation}[]{#${anchor}}\n\n`
+            + `${indentation}${image.replace(`![${title}]`, `![Figura ${figureNumber++}. ${title}]`)}`
+            + `{${getFigureSizeAttribute(dimensions)}}`;
         preparedContent = preparedContent.replace(figure, replacement);
     }
     return preparedContent;
@@ -297,9 +338,9 @@ const buildDocumentIndexes = async (preparedSources) => {
             title: match[2],
             link: `#${match[3]}`
         })).filter(({ level }) => level <= 3));
-        figures.push(...[...content.matchAll(/^\s*!\[([^\]]+)\]\([^)]+\)\{#([^ }]+)[^}]*\}$/gm)].map((match) => ({
-            title: match[1],
-            link: `#${match[2]}`
+        figures.push(...[...content.matchAll(renderedFigurePattern)].map((match) => ({
+            title: match[2],
+            link: `#${match[1]}`
         })));
     }
     const tableOfContents = headings.map(({ level, title, link }) => (
@@ -325,6 +366,15 @@ const insertAfterDocumentData = (content, insertion) => {
     if (!documentData) throw new Error('La entrada del paquete no contiene una tabla de datos generales válida.');
     const insertionIndex = documentData.index + documentData[0].length;
     return `${content.slice(0, insertionIndex)}\n\n${insertion}\n${content.slice(insertionIndex).replace(/^\r?\n+/, '')}`;
+};
+
+const preparePublicationSource = (content, source, output) => {
+    const document = path.basename(output).replace(/\.(?:docx|pdf)$/, '');
+    const section = frontendCatalog.sections[document.replace(/^frontend-vue-/, '')];
+    const titledContent = source === '../front/docs/index.md' && section
+        ? prepareSectionEntry(content, `${section.title} del frontend Vue`)
+        : content;
+    return prepareManualSource(titledContent, source, output);
 };
 
 const selectedDefinition = PUBLICATIONS[requestedPublication];
@@ -360,7 +410,7 @@ const publications = await Promise.all(publicationParts.map(async ({ publication
     await Promise.all(sources.map((source) => access(path.join(ROOT, source))));
     const sourceContents = await Promise.all(sources.map(async (source) => ({
         source,
-        content: prepareManualSource(
+        content: preparePublicationSource(
             await readFile(path.join(ROOT, source), 'utf8'),
             source,
             directory ? `${directory}/${document}.docx` : `${document}.docx`
@@ -468,7 +518,10 @@ if (outputPlan.generatePdf) {
     }
 }
 
-const outputDirectory = path.join(ROOT, 'build/docs');
+const frontendOnly = publications.every(({ sources }) => sources.every((source) => (
+    source.startsWith('../front/docs/')
+)));
+const outputDirectory = path.resolve(ROOT, frontendOnly ? '../front/build/docs' : 'build/docs');
 const documentOutputDirectories = {
     docx: path.join(outputDirectory, 'docx'),
     pdf: path.join(outputDirectory, 'pdf')
@@ -490,7 +543,7 @@ await writeFile(mermaidConfigFile, JSON.stringify(MERMAID_EXPORT_CONFIG));
 let mermaidPrepared = false;
 
 const prepareSource = async (source, publicationSources, firstFigureNumber, currentOutput, outputFormat) => {
-    const sourceContent = prepareManualSource(
+    const sourceContent = preparePublicationSource(
         await readFile(path.join(ROOT, source), 'utf8'), source, currentOutput
     );
     const content = source.startsWith('docs/user-manual/actors/')
@@ -576,7 +629,7 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
     return {
         renderedSource,
         nextFigureNumber: firstFigureNumber
-            + [...renderedContent.matchAll(/^\s*!\[[^\]]+\]\([^)]+\)\{#[^}]+\}$/gm)].length
+            + [...renderedContent.matchAll(renderedFigurePattern)].length
     };
 };
 

@@ -4,7 +4,7 @@ import { ROLE_KEYS } from './roles.js';
 
 export const DATA_SCOPES = Object.freeze({
     SYSTEM_WIDE_READ: 'system-wide-read',
-    GOODS_ISSUES_READ_ALL: 'goods-issues:read-all'
+    ISSUES_ALL_DEPARTMENTS: 'issues:all-departments'
 });
 
 const createPolicy = ({ roles, departments }) => Object.freeze({
@@ -21,10 +21,14 @@ export const DATA_SCOPE_POLICIES = Object.freeze({
         { roleKey: ROLE_KEYS.DIRECTOR },
         { departmentKey: DEPARTMENT_KEYS.MANAGEMENT }
     ]),
-    [DATA_SCOPES.GOODS_ISSUES_READ_ALL]: createAccessConditions([
+    [DATA_SCOPES.ISSUES_ALL_DEPARTMENTS]: createAccessConditions([
         { roleKey: ROLE_KEYS.SYSTEM_ADMIN },
         {
             roleKey: ROLE_KEYS.COORDINATOR,
+            departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+        },
+        {
+            roleKey: ROLE_KEYS.AUXILIARY,
             departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
         }
     ])
@@ -38,13 +42,14 @@ export const ORGANIZATION_CONTEXT_POLICIES = Object.freeze({
 });
 
 // Accesos comunes de consulta y solicitudes. Almacén y Sistemas conservan además
-// sus políticas de gestión; el acceso de sólo consulta aplica a las otras cinco áreas.
+// sus políticas de gestión; el acceso de consulta y solicitudes aplica a las áreas operativas.
 const operationalAccessPolicy = createPolicy({
     roles: [ROLE_KEYS.SYSTEM_ADMIN, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.OPERATOR, ROLE_KEYS.INSTALLER, ROLE_KEYS.WAREHOUSE_KEEPER],
     departments: [
         DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY,
         DEPARTMENT_KEYS.SYSTEMS,
         DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
         DEPARTMENT_KEYS.WORKSHOP_3D,
         DEPARTMENT_KEYS.PT_TRAFFIC,
         DEPARTMENT_KEYS.INSTALLATIONS,
@@ -256,8 +261,8 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.CLIENTS_PAGE_VIEW]: createPolicy({
-    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
-    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
+    roles: [ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.GOODS_ISSUES_PAGE_VIEW]: operationalAccessPolicy,
     [PERMISSIONS.GOODS_RECEIPTS_PAGE_VIEW]: createPolicy({
@@ -265,8 +270,8 @@ export const AUTHORIZATION_POLICIES = Object.freeze({
     departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.SUPPLIERS_PAGE_VIEW]: createPolicy({
-    roles: [ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.COORDINATOR, ROLE_KEYS.AUXILIARY, ROLE_KEYS.SYSTEM_ADMIN],
-    departments: [DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, DEPARTMENT_KEYS.SYSTEMS]
+    roles: [ROLE_KEYS.SYSTEM_ADMIN],
+    departments: [DEPARTMENT_KEYS.SYSTEMS]
 }),
     [PERMISSIONS.WASTES_PAGE_VIEW]: operationalAccessPolicy
 });

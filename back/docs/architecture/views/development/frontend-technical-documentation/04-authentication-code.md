@@ -65,3 +65,19 @@ Los reportes y la infraestructura transversal se localizan en el
 [procesos](../../processes/frontend-code-sequences/index.md).
 
 El login valida presencia, tipo texto y longitud máxima de usuario/contraseña; no aplica la política de creación de claves. El nombre admite minúsculas, se recortan sólo sus espacios exteriores y la contraseña se conserva exactamente. Backend y frontend comparten `AUTH_FIELD_LIMITS`. La creación/cambio mantiene los requisitos de contraseña existentes. Una captura inválida responde `400` por campo y una credencial no coincidente responde el `401 LOGIN_ERROR` genérico del servicio.
+
+El formulario importa las reglas públicas de
+`public/js/utils/validations/loginValidation.js`. `validators.js` conserva las de
+los demás formularios. El contrato de login, consulta y refresh JSON pertenece a
+la [API](../../../openapi/index.md).
+
+## Rutas web de sesión
+
+| Solicitud web | Resultado |
+| --- | --- |
+| `GET /inicio-sesion` | Renderiza el formulario EJS. |
+| `GET /revocar-sesion` | Intenta renovar cookies y redirige al destino conservado; si falla, cierra la sesión. |
+| `POST /cerrar-sesion` | Borra `accessToken`, `refreshToken` y `returnTo`; redirige `302` al login. |
+
+El cierre afecta a las cookies del navegador actual; no revoca sesiones de otros
+dispositivos. Estas rutas devuelven HTML o redirecciones, fuera del contrato `/api`.

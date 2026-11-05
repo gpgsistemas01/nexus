@@ -19,6 +19,18 @@ departamentos activos otorgan permisos. Una cuenta inactiva o sin asignaciones v
 no puede iniciar sesión, renovar ni superar la autorización.
 La relación cuenta–persona no es uno a uno: `personId` no tiene una restricción única.
 
+## Sesión web y cookies
+
+Express administra las cookies `accessToken` y `refreshToken`; el navegador no
+necesita leer sus valores para iniciar sesión. Se emiten con `HttpOnly` y
+`SameSite=Lax`. `NODE_ENV=production` añade `Secure`, por lo que requieren HTTPS;
+el desarrollo y las pruebas locales admiten HTTP. La renovación y el cierre
+conservan las opciones de seguridad al emitir o eliminar cookies.
+
+El login Vue usa el mismo origen mediante proxy y sólo recuerda el nombre de usuario
+si se solicita. Esa preferencia no modifica la duración de las cookies ni traslada
+contraseñas o tokens a localStorage. El backend mantiene los permisos efectivos.
+
 ## Autorización
 
 `getLoggedUser` lee las asignaciones vigentes y deriva `permissions`, `scope` y
@@ -42,16 +54,20 @@ claves a los registros existentes y las altas de catálogo generan claves nuevas
 `permissions.js` define las políticas de permisos, alcance de datos y contexto
 organizativo mediante esas claves. La consulta global de lectura se concede por la
 clave de Director o de Dirección. La consulta de todas las salidas se concede por la
-clave de Administrador del sistema o por Coordinador con clave de Almacén y
-Proveeduría; las demás asignaciones limitan la consulta mediante el ID del área.
+clave de Administrador del sistema o por Auxiliar o Coordinador con clave de Almacén
+y Proveeduría. El alcance `ISSUES_ALL_DEPARTMENTS` permite consultar y registrar
+salidas de Materiales, Consumibles y Mermas para todas las áreas. Las demás
+asignaciones autorizadas limitan consulta y escritura al ID de sus áreas.
+`issueAccessService` construye el filtro común y comprueba el destino de la captura;
+las ediciones verifican también la pertenencia del documento dentro de la transacción.
 `organization` expone indicadores informativos y no sustituye los permisos del servidor.
 
-Las áreas `IMPRESIÓN`, `TALLER 3D`, `PT/TRÁFICO`, `INSTALACIONES` y `ACABADOS`
+Las áreas `IMPRESIÓN`, `TALLER 3D` (Taller/Herrería), `ROUTER`, `PT/TRÁFICO`, `INSTALACIONES` y `ACABADOS`
 comparten el acceso operativo para los roles Administrador del sistema, Coordinador,
 Auxiliar, Operador, Instalador y Almacenista. El rol y el área deben coincidir en una
 misma asignación; no basta con tenerlos en asignaciones distintas.
 
-La limitación de inventario a sólo consulta corresponde a esas cinco áreas.
+La limitación de inventario a sólo consulta corresponde a esas seis áreas.
 `ALMACÉN Y PROVEDURÍA` y `SISTEMAS` conservan sus permisos adicionales por rol:
 gestión de inventario, compras, costos, reportes, surtidos y devoluciones. Los ajustes
 administrativos y la administración de usuarios/catálogos siguen reservados al
@@ -114,3 +130,12 @@ de una tabla o de un permiso.
 
 La separación de credenciales de aplicación y migración se explica en la
 [vista física](../physical/02-postgresql-runtime-and-migration-roles.md).
+
+### Directorio y altas desde selectores
+
+Las páginas independientes de Clientes y Proveedores requieren una asignación de
+Administrador del sistema en Sistemas. Almacén conserva `clients:read`,
+`clients:create`, `suppliers:read` y `suppliers:manage` para leer las opciones y
+registrar desde los formularios operativos autorizados. El permiso de alta no
+concede `clients:page-view` ni `suppliers:page-view`; después del alta contextual,
+el formulario de origen selecciona el registro confirmado y conserva la captura.

@@ -100,6 +100,9 @@ conservan continuidad sin alargar el prefijo.
 | Entrada inicial o adicional de merma | `WasteStockEntry` | `EME` |
 | Corrección de existencia de merma | `WasteStockAdjustment` | `AME` |
 
+`PRO` es el contador no anual de códigos de proveedor (`year = 0`); no genera un
+folio documental. Esos nueve prefijos son los registrados en el código actual.
+
 El alta de merma crea existencia cero y, si la cantidad capturada es positiva,
 reutiliza el servicio de entrada para aplicar una sola vez la cantidad y generar
 documento y movimiento ENTRY en la misma transacción. Con cantidad cero no genera
@@ -120,10 +123,18 @@ resultan `SMA` y `CMA`; la conversión no reclasifica un consumible guardado.
 
 La cadena conserva las migraciones previas: la de agosto convirtió `SM` a
 `SAL-MER` y la primera de octubre dividió `SAL` en `SAL-MAT` y `SAL-CON`.
-La nueva migración continúa esa evolución sin reescribir su SQL. Los contadores
-vigentes toman el máximo de los folios emitidos y los contadores históricos
-correspondientes, sin disminuir valores existentes. Merma no participa en los
-máximos de materiales ni consumibles; los contadores retirados se conservan.
+Las migraciones históricas copiaban el contador general a ambos contextos.
+`20261104120000_repair_independent_goods_reference_counters` corrige ese piso:
+reconcilia `SMA`, `SCO`, `CMA` y `CCO` con el máximo consecutivo numérico de sus
+propios folios y año. Incluye los documentos cancelados y conserva los folios
+emitidos; una serie existente sin documentos queda en cero y su próxima alta usa uno.
+La fecha de edición y la cantidad de documentos no determinan el consecutivo.
+
+La misma transacción retira de `ReferenceNumberCounter` los prefijos no registrados
+en el código. Conserva las ocho series documentales y `PRO`, sin borrar documentos,
+movimientos o saldos. Los archivos de migraciones anteriores permanecen en la cadena.
+La generación sigue incrementando la fila propia de prefijo/año dentro de la
+transacción del alta. Editar, surtir, devolver o cancelar no genera otro folio.
 Véanse el [despliegue y comprobaciones](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-folios-de-salidas-por-contexto)
 y el [resumen de Prisma](../../development/code-structure/06-prisma-and-persistence.md).
 

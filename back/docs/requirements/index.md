@@ -24,7 +24,7 @@ Este paquete contiene tres niveles relacionados, pero no intercambiables:
 | Nivel | Responsabilidad | Ejemplo de contenido |
 | --- | --- | --- |
 | [Visión y alcance](vision-scope-and-requirements/index.md) | Explicar la necesidad, los interesados, los límites y las capacidades esperadas sin diseñar la solución. | Objetivo del producto, actores interesados, alcance incluido y excluido. |
-| [SRS](requirements-specification/index.md) | Establecer las obligaciones verificables del sistema. Las [fichas de casos de uso](use-cases/index.md) forman parte de esta familia normativa y desarrollan la interacción de los actores. | Requisitos, reglas, atributos de calidad, precondiciones, flujos y postcondiciones. |
+| [SRS](requirements-specification/index.md) | Establecer las obligaciones verificables de Nexus. Las [fichas de casos de uso](use-cases/index.md) forman parte de esta familia normativa y desarrollan la interacción de los actores. | Requisitos, reglas, atributos de calidad, precondiciones, flujos y postcondiciones. |
 | [Arquitectura](../architecture/index.md) | Describir cómo la solución satisface esas obligaciones mediante vistas, decisiones y evidencia técnica. Se publica como documento separado. | Contexto técnico, contenedores, componentes, despliegue, contratos y secuencias internas. |
 
 Los casos de uso no se trasladan ni se duplican en arquitectura. Arquitectura enlaza el
@@ -63,7 +63,7 @@ Las imágenes que se incorporen a estas secciones pertenecen a
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
-| 1.4 | 2026-10-08 | Revisión de visión, glosario y SRS; incorporación de los siete casos de salida de consumibles, referencias y realizaciones; conserva el alcance del sistema 1.0.0 y los IDs anteriores. |
+| 1.4 | 2026-10-08 | Revisión de visión, glosario y SRS; incorporación de los siete casos de salida de consumibles, referencias y realizaciones; conserva el alcance de Nexus 1.0.0 y los IDs anteriores. |
 | 1.5 | 2026-10-12 | Movimientos por contexto y peso de merma: captura inicial, consulta posterior y cálculo del reporte; recorrido de negocio consolidado en un diagrama. |
 | 1.6 | 2026-10-12 | Criterio de aceptación del peso unitario: límites, precisión y rechazo previo al alta de valores inválidos. |
 | 1.7 | 2026-10-12 | Máximo de 100 kg por unidad de merma de Rollo, validación y migración conservando los datos históricos. |

@@ -1,0 +1,318 @@
+import { isRollPresentation } from '@nexus/waste-measurements';
+import { isRecord } from '../../shared/utils/isRecord.js';
+import { numberText, convertedQuantityText } from '../../shared/utils/formatNumbers.js';
+import type { EditorTarget, InventoryField, InventoryResource } from './inventory.js';
+import type { LookupItem } from '../../shared/lookup.js';
+import type { previewWaste } from './formModel.js';
+
+export interface InventoryFieldSpec {
+    name: InventoryField;
+    label: string;
+    type?: 'number' | 'lookup' | 'checkbox' | 'textarea';
+    isReadOnly?: boolean;
+    isDisabled?: boolean;
+    displayValue?: string;
+    hint?: string;
+    isWide?: boolean;
+}
+export interface InventorySummaryItem {
+    label: string;
+    value: string;
+}
+export interface InventoryFormSection {
+    id: string;
+    title: string;
+    description?: string;
+    fields: InventoryFieldSpec[];
+    summary?: InventorySummaryItem[];
+}
+
+export const inventorySections = (
+    resource: InventoryResource,
+    target: EditorTarget,
+    preview: ReturnType<typeof previewWaste>,
+    options: {
+        template?: LookupItem;
+        usesMeasurements: boolean;
+        hasSupplier: boolean;
+        creationContext?: 'goodsReceipt';
+        supplier?: LookupItem;
+    },
+): InventoryFormSection[] => {
+    const { action, row } = target;
+    const isCreating = action === 'create';
+    const fromPurchase = isCreating && options.creationContext === 'goodsReceipt';
+    const isWaste = resource === 'wastes';
+    const isStock = action === 'stock' || action === 'add-stock';
+    const isRoll = isCreating ? preview.isRoll : isRollPresentation(row?.presentation);
+    const template = options.template?.data;
+    const presentation = isRecord(template?.presentation)
+        ? String(template.presentation.name ?? '')
+        : '';
+    const unit = isRecord(template?.unitMeasure)
+        ? String(template.unitMeasure.symbol || template.unitMeasure.name || '')
+        : '';
+    const sections: InventoryFormSection[] = [];
+    if (action === 'delete') return sections;
+
+    if (isCreating && isWaste)
+        sections.push({
+            id: 'origin',
+            title: 'Material de origen',
+            description: 'Selecciona el proveedor y después el material que origina la merma.',
+            fields: [
+                { name: 'supplierId', label: 'Proveedor', type: 'lookup' },
+                {
+                    name: 'materialId',
+                    label: 'Material de referencia del proveedor',
+                    type: 'lookup',
+                    isDisabled: !options.hasSupplier,
+                    hint: !options.hasSupplier ? 'Selecciona primero un proveedor.' : undefined,
+                },
+            ],
+        });
+
+    sections.push({
+        id: 'identity',
+        title: isWaste
+            ? 'Datos de la merma'
+            : resource === 'consumables'
+              ? 'Datos del consumible'
+              : 'Datos del material',
+        description: !isCreating
+            ? 'Consulta el proveedor, la presentación y la unidad del registro.'
+            : undefined,
+        fields: [
+            {
+                name: 'name',
+                label: isWaste ? 'Nombre de la merma' : 'Nombre',
+                isReadOnly: isStock,
+                isWide: true,
+            },
+            ...(!isCreating || !isWaste
+                ? [
+                      {
+                          name: 'supplierId' as const,
+                          label: 'Proveedor',
+                          type: isCreating && !options.supplier ? ('lookup' as const) : undefined,
+                          isReadOnly: !isCreating || !!options.supplier,
+                          displayValue:
+                              options.supplier?.title ??
+                              (isCreating ? undefined : row?.supplierName),
+                          isWide: true,
+                      },
+                  ]
+                : []),
+            {
+                name: 'presentationId',
+                label: 'Presentación',
+                type: isCreating && !isWaste ? 'lookup' : undefined,
+                isReadOnly: !isCreating || isWaste,
+                displayValue:
+                    isWaste && isCreating
+                        ? presentation || 'Selecciona un material'
+                        : row?.presentation,
+            },
+            {
+                name: 'unitMeasureId',
+                label: 'Unidad de medida',
+                type: isCreating && !isWaste ? 'lookup' : undefined,
+                isReadOnly: !isCreating || isWaste,
+                displayValue:
+                    isWaste && isCreating ? unit || 'Selecciona un material' : row?.unitMeasure,
+            },
+        ],
+    });
+    if (isWaste && isRoll && (isCreating || row?.referenceRollTotalWeightKg != null))
+        sections.push({
+            id: 'reference',
+            title: 'Rollo completo (muestra)',
+            description:
+                'El largo proviene del material de origen. Se utiliza el mismo cono de la merma.',
+            fields: [
+                {
+                    name: 'referenceRollTotalWeightKg',
+                    label: 'Peso del rollo completo con cono (kg)',
+                    type: 'number',
+                    isReadOnly: !isCreating,
+                    displayValue: isCreating
+                        ? undefined
+                        : String(row?.referenceRollTotalWeightKg ?? ''),
+                },
+            ],
+            summary:
+                isCreating && template
+                    ? [
+                          {
+                              label: 'Base del material de origen (m)',
+                              value: numberText(
+                                  template.base == null ? null : Number(template.base),
+                              ),
+                          },
+                          {
+                              label: 'Altura del material de origen (m)',
+                              value: numberText(
+                                  template.height == null ? null : Number(template.height),
+                              ),
+                          },
+                      ]
+                    : undefined,
+        });
+
+    if (isWaste && isRoll)
+        sections.push({
+            id: 'weights',
+            title: 'Pesos de la merma',
+            description: 'Pesos por unidad de merma.',
+            fields: [
+                {
+                    name: 'coneWeightKg',
+                    label: 'Peso del cono de la merma (kg)',
+                    type: 'number',
+                    isReadOnly: !isCreating,
+                    displayValue: isCreating ? undefined : String(row?.coneWeightKg ?? ''),
+                },
+                {
+                    name: 'totalWeightKg',
+                    label: 'Peso de la merma con cono (kg)',
+                    type: 'number',
+                    isReadOnly: !isCreating,
+                    displayValue: isCreating ? undefined : String(row?.totalWeightKg ?? ''),
+                },
+            ],
+            summary: [
+                {
+                    label: 'Peso neto de la merma (kg)',
+                    value: numberText(isCreating ? preview.weightKg : row?.weightKg),
+                },
+            ],
+        });
+
+    if (
+        isWaste &&
+        !isCreating &&
+        row?.referenceRollTotalWeightKg == null &&
+        (row?.sampleLengthM != null || row?.sampleNetWeightKg != null)
+    )
+        sections.push({
+            id: 'history',
+            title: 'Referencia histórica',
+            description: 'Datos conservados del registro anterior.',
+            fields: [],
+            summary: [
+                { label: 'Largo de referencia (m)', value: numberText(row.sampleLengthM) },
+                {
+                    label: 'Peso neto de referencia (kg)',
+                    value: numberText(row.sampleNetWeightKg),
+                },
+            ],
+        });
+
+    if (isWaste || options.usesMeasurements)
+        sections.push({
+            id: 'measurements',
+            title: isWaste ? 'Medidas de la merma' : 'Medidas del material',
+            description:
+                isWaste && isRoll && isCreating
+                    ? 'Se calculan a partir de los pesos y del material de origen.'
+                    : undefined,
+            fields: (['base', 'height'] as const).map((name) => ({
+                name,
+                label: name === 'base' ? 'Base (m)' : 'Altura (m)',
+                type: 'number',
+                isReadOnly: !isCreating || (isWaste && isRoll),
+                ...(isCreating && isWaste && isRoll
+                    ? { displayValue: String(preview[name] ?? '') }
+                    : {}),
+            })),
+        });
+
+    sections.push({
+        id: 'inventory',
+        title: isWaste
+            ? 'Inventario de la merma'
+            : resource === 'consumables'
+              ? 'Inventario del consumible'
+              : 'Inventario del material',
+        fields: [
+            ...(!isStock || row?.minStock !== undefined
+                ? [
+                      {
+                          name: 'minStock' as const,
+                          label: 'Stock mínimo',
+                          type: 'number' as const,
+                          isReadOnly: isStock,
+                      },
+                  ]
+                : []),
+            ...(!fromPurchase && (!isStock || row?.maxUnitCost !== undefined)
+                ? [
+                      {
+                          name: 'maxUnitCost' as const,
+                          label: 'Costo máximo unitario',
+                          type: 'number' as const,
+                          isReadOnly: isStock,
+                      },
+                  ]
+                : []),
+            ...(!isStock || row?.isActive !== undefined
+                ? [
+                      {
+                          name: 'isActive' as const,
+                          label: 'Activo',
+                          type: 'checkbox' as const,
+                          isReadOnly: isStock,
+                      },
+                  ]
+                : []),
+        ],
+    });
+    if ((isCreating || isStock) && !fromPurchase)
+        sections.push({
+            id: 'stock',
+            title: 'Existencias y observaciones',
+            summary: isCreating
+                ? !isWaste
+                    ? [{ label: 'Motivo del movimiento', value: 'Stock inicial' }]
+                    : undefined
+                : [
+                      { label: 'Stock actual', value: numberText(row?.currentStock) },
+                      {
+                          label: 'Cantidad convertida actual',
+                          value: convertedQuantityText(
+                              row?.convertedQuantity,
+                              row?.unitMeasure ?? '',
+                          ),
+                      },
+                  ],
+            fields: [
+                ...(action === 'stock'
+                    ? [
+                          {
+                              name: 'reasonId' as const,
+                              label: 'Motivo del ajuste',
+                              type: 'lookup' as const,
+                          },
+                      ]
+                    : []),
+                {
+                    name:
+                        action === 'add-stock'
+                            ? 'quantity'
+                            : isCreating && isWaste
+                              ? 'initialQuantity'
+                              : 'newStock',
+                    label:
+                        action === 'add-stock'
+                            ? 'Cantidad a agregar'
+                            : isCreating
+                              ? 'Cantidad inicial'
+                              : 'Nuevo stock',
+                    type: 'number',
+                },
+                { name: 'observations', label: 'Observaciones', type: 'textarea', isWide: true },
+            ],
+        });
+
+    return sections;
+};

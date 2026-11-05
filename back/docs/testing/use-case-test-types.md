@@ -42,9 +42,28 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 
 ## Cobertura vigente
 
+La [vista de cobertura Vue](../../../front/docs/testing/04-use-case-coverage.md)
+conserva la aplicación de requisitos/casos, fichas del cliente y brechas específicas
+de la migración. Complementa esta evidencia del backend; las respuestas simuladas
+del navegador no cierran las brechas de autorización o persistencia indicadas aquí.
+
+Para la interfaz Vue de `CU-ALM-01..06` y `CU-ALM-09..14`, la evidencia adicional
+está en [DP-VUE-WH-001–010](../../../front/docs/testing/design/02-inventory.md#pruebas-de-almacén):
+`inventoryFormTest.ts`, `inventoryNavigationTest.ts`, `apiClientTest.ts` y
+`warehouse.spec.ts`. Cubre permisos visuales, altas, edición, identificador de baja,
+versiones de captura, filtros/paginación, descarga y recuperación de merma tras
+recarga. Chromium usa respuestas HTTP simuladas: no sustituye la evidencia
+persistente ni resuelve las brechas HTTP/Prisma indicadas en la tabla.
+El flujo de duplicado Vue ofrece abrir Agregar stock tras confirmar el aviso, con
+cantidad/observaciones transferidas y sin escritura automática; `DP-VUE-WH-011`.
+El recorrido separado `front/tests/system/application.spec.ts` añade evidencia
+contra los routers reales, JWT, PostgreSQL y XLSX; su alcance es representativo,
+no una demostración de todos los CU.
+
 | Casos de uso | Evidencia automatizada relevante | Tipo, datos y resultado esperado | Estado de cobertura |
 | --- | --- | --- | --- |
-| `CU-AUT-01..02` | Sin prueba funcional directa. | Sesión limpia/autenticada, credenciales válidas e inválidas; crear o invalidar sesión según corresponda. | **Brecha.** |
+| `CU-AUT-01` | `authControllerDbTest.js`; pruebas Vue de login/sesión y `front/tests/system/application.spec.ts`. | HTTP/Prisma de captura inválida/rechazada/válida; sistema con login, refresh real y cookies HttpOnly; navegador simulado añade caída/recuperación. | **Evidencia por niveles.** Nexus no repite todas las fronteras ni acredita todos los escenarios de refresh. |
+| `CU-AUT-02` | `cookiesUtilsTest.js`, `sessionRecovery.spec.ts` y `front/tests/system/application.spec.ts`; `CP-VUE-SESSION-004-01`, `CP-VUE-SYS-001-01`. | Helper, navegador simulado y recorrido real: POST de cierre, cookies eliminadas, `/me`/refresh 401 y rechazo posterior de URL protegida. | **Evidencia unitaria, navegador y sistema.** No implica revocar tokens copiados fuera del navegador. |
 | `CU-ALM-01` | `materialControllerTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Unitaria de permisos e interacción; queries y retorno simulado; oculta costos sin permiso y conserva respuesta autorizada. | **Unitaria existente.** |
 | `CU-ALM-02` | `materialValidationTest.js`, `materialMeasurementFieldTest.js`, `materialControllerDbTest.js`. | Unitarias e integración de piezas sin medidas, pareja opcional completa, conversión y alta contextual desde compra. | **Evidencia parcial existente**; no demuestra todo el CRUD de materiales. |
 | `CU-ALM-03` | `wasteWeightDbTest.js`, `materialDTOTest.js`. | Edición de costo conserva pesos históricos; DTO descarta referencias del material. | **Evidencia parcial existente**; no acredita toda la edición de materiales. |
@@ -60,7 +79,7 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 | `CU-ALM-14` | `reportControllerTest.js`, `reportServiceTest.js`, `wasteWeightDbTest.js`. | Agrupación y cálculo; integración descarga Excel, comprueba peso neto total, fórmula SUM y peso desconocido sin modificar inventario. | **Unitarias e integración del archivo existentes**, sin afirmar todos sus filtros. |
 | `CU-ALM-15` | `movementQueryServiceTest.js`. | Unitaria de consulta por identidad de merma con Prisma simulado. | **Unitaria existente**; falta integración. |
 | `CU-ALM-16` | Sin prueba funcional directa del reporte. | Fixtures de movimientos, periodo, filtros, columnas/fórmulas y vacío. | **Brecha.** |
-| `CU-ALM-17` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Consulta con proveedor y permiso de costos simulados; comprueba respuesta `200`, autorización de lectura y filtro fijo `CONSUMABLE`. | **Unitarias existentes**; faltan paginación, vacío e integración HTTP/Prisma que demuestre la exclusión de materiales. |
+| `CU-ALM-17` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. `confirmedConsumablesDbTest.js` (`CP-INT-CONS-001`): reclasificación de seis IDs revisados y dos adicionales confirmados. | Consulta con proveedor y permiso de costos simulados; comprueba respuesta `200`, autorización de lectura y filtro fijo `CONSUMABLE`. La migración comprueba identidad, exclusiones, repetición y atomicidad ante colisión. | **Unitarias y migración existentes**; faltan paginación, vacío e integración HTTP/Prisma que demuestre la exclusión de materiales. |
 | `CU-ALM-18` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js` del servidor y `materialControllerDbTest.js`. | Permiso/contexto fijo; integración de altas directa y desde compra que descartan medidas y conservan cantidad. | **Unitarias e integración parcial existentes**; completar otras fronteras y atomicidad del alta de consumibles. |
 | `CU-ALM-19` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js`. | Edición con id, nombre y proveedor simulados; comprueba validación, permiso y contexto fijo `CONSUMABLE`. | **Unitarias existentes**; falta integración de campos permitidos, conflicto y conservación de stock. |
 | `CU-ALM-20` | `consumableControllerTest.js`, `consumableApiRouteTest.js`, `consumableServiceTest.js`. | Retiro con id de oferta simulado; comprueba permiso y delegación de baja limitada a `CONSUMABLE`. | **Unitarias existentes**; falta integración de historia protegida, otras ofertas y ausencia de eliminación parcial. |
@@ -69,20 +88,21 @@ conforme a la tabla `EP-*` del [plan](test-plan.md).
 | `CU-ALM-23` | Integración HTTP/Prisma: contexto, conteos, paginación, filtros cruzados y permisos. | Historial de consumibles separado, con proveedor y selector propios. | `movementContextDbTest.js`. |
 | `CU-ALM-24` | Integración con Excel real personalizado y mensual, contenido y permisos. | Descargar desde la consulta y revisar hoja, folios y saldos. | `movementContextDbTest.js`. |
 | `CU-CAT-01..03` | `supplierControllerDbTest.js`. | Integración de alta, consulta y actualización con fixtures y limpieza en base aislada. | **Integración existente.** |
-| `CU-CAT-04` | Sin prueba funcional directa del reporte. | Proveedores dentro/fuera de filtros, permisos y archivo esperado. | **Brecha.** |
+| `CU-CAT-04` | `records.spec.ts` y `front/tests/system/application.spec.ts`. | Descarga/reintento de interfaz y XLSX real con búsqueda: incluye fixture de proveedor y excluye otra. | **Navegador y sistema representativos.** Faltan otras combinaciones/roles y volúmenes. |
 | `CU-CAT-05..07` | `clientControllerDbTest.js`. | Integración de alta, listado, actualización y error específico con fixtures y limpieza. | **Integración existente.** |
-| `CU-CAT-08` | Sin prueba funcional directa del reporte. | Clientes dentro/fuera de filtros, permisos y archivo esperado. | **Brecha.** |
-| `CU-CAT-09..26` | `catalogServiceTest.js`, `catalogControllersDbTest.js`. | Unitaria del servicio compartido e integración CRUD/validación con catálogo permitido, payload válido/inválido y lectura Prisma. | **Unitaria e integración existentes.** |
+| `CU-CAT-08` | `records.spec.ts` y `front/tests/system/application.spec.ts`. | Descarga/reintento de interfaz y XLSX real con búsqueda: incluye cliente persistido desde Vue y excluye otro. | **Navegador y sistema representativos.** No afirma todas las columnas/roles o escalas. |
+| `CU-CAT-09..26` | `catalogServiceTest.js`, `catalogControllersDbTest.js` (`CP-INT-PAG-001`, `CP-INT-VAL-006`); Vue: [DP-VUE-CAT-001–004](../../../front/docs/testing/design/03-records.md#pruebas-de-catálogos). | Unitaria e integración CRUD/validación con catálogo permitido, normalización, campos ajenos, marcado/control/tipos inválidos sin efectos, paginación acotada y lectura Prisma. | **Unitaria e integración existentes.** |
 | `CU-IDA-01` | Sin prueba funcional directa. | Actor autorizado/no autorizado, filtros, paginación y conjunto vacío. | **Brecha.** |
 | `CU-IDA-02..03` | `personApiRouteTest.js`. | Unitaria de orden validación–autorización–handler para escrituras. | **Unitaria existente**, limitada al contrato de ruta; falta persistencia. |
-| `CU-IDA-04..09` | Sin prueba de servidor o integración directa. | Reportes/usuarios requieren permisos, payloads, relaciones, credenciales, filtros y persistencia según el caso. | **Brecha**; los requests simulados de frontend no prueban el flujo completo. |
-| `CU-SAL-01..05` | `goodsIssueContextServicesTest.js`, `goodsIssueContextRoutesTest.js`, `goodsIssueControllerDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Contexto fijo, rutas y validadores; alta/edición/surtido, rechazo cruzado, surtido coincidente, stock insuficiente y rollback con saldos/movimientos. | **Unitarias e integración existentes**; completar otras fronteras de cantidades según el cambio. |
+| `CU-IDA-04..08` | Vue: [DP-VUE-IDA-002 y REC](../../../front/docs/testing/design/03-records.md#pruebas-de-identidad-y-directorio-comercial). Sin prueba de servidor o integración directa para ese grupo. | Reporte de personas y escrituras de usuarios requieren permisos, payloads, relaciones, credenciales, filtros y persistencia según el caso. | **Brecha**; los requests simulados de frontend no prueban el flujo completo. |
+| `CU-IDA-09` | `records.spec.ts` y `front/tests/system/application.spec.ts`. | Descarga/reintento y reporte XLSX real de usuarios por búsqueda, con inclusión/exclusión de fixtures. | **Navegador y sistema representativos.** No cierra brechas de las escrituras de usuarios ni todos los alcances del reporte. |
+| `CU-SAL-01..05` | `goodsIssueContextServicesTest.js`, `goodsIssueContextRoutesTest.js`, `goodsIssueControllerDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001/002`: consulta, alta y edición por área; rechazo cruzado sin cambios): autorización real de áreas operativas. | Contexto fijo, rutas y validadores; alta/edición/surtido, rechazo cruzado, surtido coincidente, stock insuficiente y rollback con saldos/movimientos. `apiWriteValidationDbTest.js` añade `CP-INT-VAL-007`: proyecto con NUL rechazado sin escritura. | **Unitarias e integración existentes**; completar otras fronteras de cantidades según el cambio. |
 | `CU-SAL-06` | `goodsIssueControllerTest.js`, `goodsIssueControllerDbTest.js`. | Delegación unitaria e integración de devolución parcial con existencia, acumulados y movimiento. | **Unitarias e integración existentes**; faltan devolución total, cantidad excesiva y rollback. |
 | `CU-SAL-07` | `reportControllerTest.js`. | Unitaria de fórmulas del reporte de salida; cantidades convertidas y escritor simulado. | **Unitaria existente**; falta integración del archivo. |
-| `CU-SAL-08..12` | `wasteIssueControllerTest.js`, `wasteIssueControllerDbTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Unitarias de consulta/DTO/edición/surtido e integración de documento, stock, movimiento, parcial y rollback con fixtures reales. | **Unitarias e integración existentes.** |
+| `CU-SAL-08..12` | `wasteIssueControllerTest.js`, `wasteIssueControllerDbTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001/002`: consulta, alta y edición por área; rechazo cruzado sin cambios): autorización real de áreas operativas. | Unitarias de consulta/DTO/edición/surtido e integración de documento, stock, movimiento, parcial y rollback con fixtures reales. `apiWriteValidationDbTest.js` añade `CP-INT-VAL-007`: proyecto con NUL rechazado sin escritura. | **Unitarias e integración existentes.** |
 | `CU-SAL-13` | `wasteIssueControllerTest.js`, `wasteIssueControllerDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. | DTO/actor; devolución parcial y total con saldo/estado, prohibición de resurtir una salida cancelada y devoluciones coincidentes sin sobrepasar disponible. | **Unitarias e integración existentes**; conservar estos escenarios al dividir el caso extenso. |
 | `CU-SAL-14` | `reportControllerTest.js`. | Unitaria de fórmula/contenido operativo del reporte con escritor simulado. | **Unitaria existente**; falta integración del archivo. |
-| `CU-SAL-15..20` | `goodsIssueContextServicesTest.js`, `goodsIssueContextRoutesTest.js`, `goodsIssueControllerDbTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001`): autorización real de áreas operativas. | Tipo fijo, rutas, permisos y validadores; integración de alta, consultas, edición, surtimiento y devolución parcial, con saldos y movimientos, además del rechazo de operaciones cruzadas. | **Unitarias e integración existentes**; faltan fronteras de cantidad y existencia, devolución total y rollback de fallos operativos. |
+| `CU-SAL-15..20` | `goodsIssueContextServicesTest.js`, `goodsIssueContextRoutesTest.js`, `goodsIssueControllerDbTest.js`. `operationalAccessDbTest.js` (`CP-INT-AUT-001/002`: consulta, alta y edición por área; rechazo cruzado sin cambios): autorización real de áreas operativas. | Tipo fijo, rutas, permisos y validadores; integración de alta, consultas, edición, surtimiento y devolución parcial, con saldos y movimientos, además del rechazo de operaciones cruzadas. `apiWriteValidationDbTest.js` añade `CP-INT-VAL-007`: proyecto con NUL rechazado sin escritura. | **Unitarias e integración existentes**; faltan fronteras de cantidad y existencia, devolución total y rollback de fallos operativos. |
 | `CU-SAL-21` | `goodsIssueContextServicesTest.js`, `goodsIssueControllerDbTest.js`. | Delegación de consulta de reporte con tipo fijo e integración de filas limitadas al contexto. | **Evidencia de aislamiento existente**; falta integración del archivo Excel, fórmulas y resultado vacío de consumibles. |
 | `CU-ENT-01..02`, `CU-ENT-07..08` | `goodsReceiptContextServicesTest.js`, `goodsReceiptContextDbTest.js`. | Consulta de compras homogéneas; alta concurrente CMA/CCO con tipo fijo, stock y movimientos; fallo revierte contador/compra/stock. | **Unitarias e integración existentes**, limitadas a esos escenarios. |
 | `CU-ENT-03..04`, `CU-ENT-09..10` | `goodsReceiptControllerTest.js`, `goodsReceiptContextDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. | Cabecera homogénea y rechazo cruzado; correcciones concurrentes y fallo de historial revierten stock/costos en compra material. | **Evidencia existente**; no atribuir corrección completa de consumibles a fixtures de material. |
@@ -123,7 +143,7 @@ CSS, orden incidental o delegaciones sin decisiones según la
 unitarias; integración comprueba representantes y efectos persistidos. El registro
 selectivo documenta las reglas críticas; los resultados de corridas permanecen en CI o
 en la revisión del cambio. La revisión por archivo abarca el inventario activo completo;
-esa clasificación no acredita aceptación ni cobertura funcional total del sistema.
+esa clasificación no acredita aceptación ni cobertura funcional total de Nexus.
 
 La cobertura del peso unitario de merma se distribuye entre estas pruebas:
 
@@ -191,3 +211,34 @@ material y los rechazos de inventario. Se conserva la cobertura existente de can
 inicial de merma cero sin entrada y de adición/devolución positiva. Los DTOs y
 controllers reciben los tipos que entregan los validators; sus pruebas no simulan
 una conversión adicional. No se modifica el esquema para redondear históricos.
+
+La adaptación Vue de Personas y del directorio comercial se comprueba adicionalmente
+en [DP-VUE-IDA-001 y DP-VUE-DIR-001](../../../front/docs/testing/design/03-records.md#pruebas-de-identidad-y-directorio-comercial):
+responsabilidades, validación de captura, permisos de interfaz, alta/edición y versiones.
+Las integraciones existentes de Clientes/Proveedores siguen siendo la evidencia de
+persistencia. Las pruebas Vue no cierran las brechas de servidor de Personas/Usuarios
+ni las de contenido de reportes; el filtro de rol del reporte de Personas no está
+implementado en esa API y Vue impide solicitarlo como si lo estuviera.
+
+
+La migración de Movimientos a Vue añade evidencia para `CU-ALM-07..08`,
+`CU-ALM-15..16` y `CU-ALM-23..24` en
+[`front/tests/unit/modules/movements`](../../../front/tests/unit/modules/movements/)
+y [`movements.spec.ts`](../../../front/tests/e2e/movements.spec.ts): contrato por
+recurso, identidades de selectores, filtros, permisos de navegación, diez columnas
+y descarga en tres modalidades con API simulada. El
+[diseño DP-VUE-MOV-001..004](../../../front/docs/testing/design/04-movements.md#movimientos-diseño-de-comprobación) delimita su alcance.
+Esta evidencia del cliente no cierra las brechas de integración ni de contenido
+real del reporte de merma indicadas arriba.
+
+### Compras desde Vue
+
+Para `CU-ENT-01..12`, la migración conserva las integraciones de compras y añade
+`front/tests/unit/modules/purchases/purchaseTest.ts` y
+`front/tests/e2e/purchases.spec.ts` (diseños `DP-VUE-COM-001/002` en la guía de
+herramientas Vue). Cubren consulta, captura, edición incremental, corrección,
+cancelación confirmada y exportación en navegador con respuestas simuladas.
+La consulta HTTP por id de ambas variantes conserva observaciones después
+de editar, verificada con Prisma en `goodsReceiptContextDbTest.js`; el listado
+conserva esas observaciones, incluidas las nulas, y omite sólo los detalles. El navegador simulado no sustituye esa
+integración ni demuestra autorización o stock persistido.

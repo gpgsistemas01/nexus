@@ -26,8 +26,23 @@ sólo cuando la sesión posee el permiso indicado por
 
 ### Administración y personas
 
-**Movimientos**, **Catálogos** y **Usuarios** son accesos administrativos. **Personas**, **Clientes** y **Proveedores** también están disponibles para el Personal de almacén autorizado; la consulta y alta comercial no conceden edición, cambio de estado ni reportes de clientes o proveedores.
+**Movimientos**, **Usuarios** y los seis **catálogos auxiliares** son accesos administrativos. **Personas**, **Clientes** y **Proveedores** también están disponibles para el Personal de almacén autorizado; la consulta y alta comercial no conceden edición, cambio de estado ni reportes de clientes o proveedores.
 La ubicación técnica de una plantilla no determina quién puede abrirla.
+
+El menú EJS agrupa **Personas** y **Usuarios** bajo **Identidad y acceso**, y
+**Clientes** y **Proveedores** bajo **Directorio comercial**. Los seis auxiliares
+permanecen en **Catálogos**. Compartir sección
+no fusiona pantallas, tablas, endpoints ni permisos. Una persona puede participar en
+la operación sin tener cuenta; un usuario representa el acceso y la auditoría, con
+vínculo opcional a una persona. Clientes y proveedores conservan sus datos y
+operaciones comerciales propios. La organización técnica vigente continúa en
+`admin/persons`, `admin/users`, `sales/clients` y `warehouse/suppliers`.
+
+La visibilidad se calcula por hijo. Esto permite consultar Clientes o Proveedores
+sin mostrar Áreas, Roles ni Usuarios a una cuenta operativa. La ubicación en el menú
+no depende de la cantidad de campos: las fichas comerciales pueden incorporar
+contactos o direcciones en su módulo propio, sin convertirse en un catálogo auxiliar
+ni mezclar el dominio de clientes con proveedores.
 
 | Pantalla y ruta | Propósito visible | Interacciones principales | Implementación EJS |
 | --- | --- | --- | --- |

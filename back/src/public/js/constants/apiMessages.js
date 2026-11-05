@@ -1,7 +1,10 @@
+import { successCodeMessages } from '../../../shared/constants/apiSuccessCodes.js';
 import { AUTH_FIELD_LIMITS } from '../../../shared/constants/auth.js';
+import { FORM_FIELD_LIMITS } from '../../../shared/constants/inputValidation.js';
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from '../../../shared/messages/goodsReceiptMessages.js';
 
 export const errorMessages = {
+    ISSUE_SUPPLY_QUANTITY_CONFLICT: 'La cantidad a surtir debe ser positiva y no superar el saldo pendiente del detalle.',
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',
     DATABASE_TABLE_MISSING: 'Falta una tabla requerida en la base de datos. Contacta a soporte.',
     DATABASE_COLUMN_MISSING: 'Falta una columna requerida en la base de datos. Contacta a soporte.',
@@ -91,7 +94,8 @@ export const errorMessages = {
 
     PROJECT_NUMBER_REQUIRED: 'El número de proyecto es requerido.',
     PROJECT_NUMBER_INVALID_TYPE: 'El número de proyecto debe ser texto.',
-    PROJECT_NUMBER_TOO_LONG: 'El número de proyecto no debe exceder 50 caracteres.',
+    PROJECT_NUMBER_TOO_LONG: `El número de proyecto no debe exceder ${FORM_FIELD_LIMITS.PROJECT_NUMBER} caracteres.`,
+    PROJECT_NUMBER_INVALID_FORMAT: 'El número de proyecto no debe contener caracteres de control.',
 
     CLIENT_ID_REQUIRED: 'El cliente es requerido.',
     CLIENT_ID_INVALID_UUID: 'El cliente no es válido.',
@@ -340,33 +344,33 @@ export const errorMessages = {
 };
 
 const successMessages = {
-    CREATED_ACCOUNT: '¡Cuenta registrada exitosamente!',
-    UPDATED_ACCOUNT: '¡Cuenta actualizada con éxito!',
-    SUCCESS_LOGIN: '¡Inicio de sesión exitoso!',
-    SUCCESS_LOGOUT: 'Sesión cerrada exitosamente.',
-    CREATED_PERSON: '¡Persona creada exitosamente!',
-    UPDATED_PERSON: '¡Persona actualizada exitosamente!',
-    CREATED_MATERIAL: '¡Material creado exitosamente!',
-    UPDATED_MATERIAL: '¡Material actuallizado exitosamente!',
-    DELETED_MATERIAL: '¡Relación entre material y proveedor eliminada exitosamente!',
-    CREATED_SUPPLIER: '¡Proveedor creado exitosamente!',
-    UPDATED_SUPPLIER: '¡Proveedor actualizado exitosamente!',
-    CREATED_GOODS_RECEIPT: '¡Entrada de mercancía creada exitosamente!',
-    UPDATED_GOODS_RECEIPT: '¡Compra actualizada exitosamente!',
-    CREATED_GOODS_ISSUE: '¡Salida de almacén creada exitosamente!',
-    UPDATED_GOODS_ISSUE: '¡Salida de almacén actualizada exitosamente!',
-    CREATED_CLIENT: '¡Cliente creado exitosamente!',
-    CREATED_CATALOG_ENTRY: '¡Entrada de catálogo creada exitosamente!',
-    CREATED_USER: '¡Usuario creado exitosamente!',
-    UPDATED_USER: '¡Usuario actualizado exitosamente!',
-    UPDATED_USER_PASSWORD: '¡Contraseña actualizada exitosamente!',
-    UPDATED_CLIENT: '¡Cliente actualizado exitosamente!',
-    UPDATED_CATALOG_ENTRY: '¡Entrada de catálogo actualizada exitosamente!',
-    CREATED_WASTE: '¡Merma registrada exitosamente!',
-    UPDATED_WASTE: '¡Merma actualizada exitosamente!',
-    DELETED_WASTE: '¡Merma eliminada exitosamente!',
-    CREATED_WASTE_ISSUE: '¡Salida de merma registrada exitosamente!',
-    UPDATED_WASTE_ISSUE: '¡Salida de merma surtida exitosamente!',
+    [successCodeMessages.CREATED_ACCOUNT]: '¡Cuenta registrada exitosamente!',
+    [successCodeMessages.UPDATED_ACCOUNT]: '¡Cuenta actualizada con éxito!',
+    [successCodeMessages.SUCCESS_LOGIN]: '¡Inicio de sesión exitoso!',
+    [successCodeMessages.SUCCESS_LOGOUT]: 'Sesión cerrada exitosamente.',
+    [successCodeMessages.CREATED_PERSON]: '¡Persona creada exitosamente!',
+    [successCodeMessages.UPDATED_PERSON]: '¡Persona actualizada exitosamente!',
+    [successCodeMessages.CREATED_MATERIAL]: '¡Material creado exitosamente!',
+    [successCodeMessages.UPDATED_MATERIAL]: '¡Material actuallizado exitosamente!',
+    [successCodeMessages.DELETED_MATERIAL]: '¡Relación entre material y proveedor eliminada exitosamente!',
+    [successCodeMessages.CREATED_SUPPLIER]: '¡Proveedor creado exitosamente!',
+    [successCodeMessages.UPDATED_SUPPLIER]: '¡Proveedor actualizado exitosamente!',
+    [successCodeMessages.CREATED_GOODS_RECEIPT]: '¡Entrada de mercancía creada exitosamente!',
+    [successCodeMessages.UPDATED_GOODS_RECEIPT]: '¡Compra actualizada exitosamente!',
+    [successCodeMessages.CREATED_GOODS_ISSUE]: '¡Salida de almacén creada exitosamente!',
+    [successCodeMessages.UPDATED_GOODS_ISSUE]: '¡Salida de almacén actualizada exitosamente!',
+    [successCodeMessages.CREATED_CLIENT]: '¡Cliente creado exitosamente!',
+    [successCodeMessages.CREATED_CATALOG_ENTRY]: '¡Entrada de catálogo creada exitosamente!',
+    [successCodeMessages.CREATED_USER]: '¡Usuario creado exitosamente!',
+    [successCodeMessages.UPDATED_USER]: '¡Usuario actualizado exitosamente!',
+    [successCodeMessages.UPDATED_USER_PASSWORD]: '¡Contraseña actualizada exitosamente!',
+    [successCodeMessages.UPDATED_CLIENT]: '¡Cliente actualizado exitosamente!',
+    [successCodeMessages.UPDATED_CATALOG_ENTRY]: '¡Entrada de catálogo actualizada exitosamente!',
+    [successCodeMessages.CREATED_WASTE]: '¡Merma registrada exitosamente!',
+    [successCodeMessages.UPDATED_WASTE]: '¡Merma actualizada exitosamente!',
+    [successCodeMessages.DELETED_WASTE]: '¡Merma eliminada exitosamente!',
+    [successCodeMessages.CREATED_WASTE_ISSUE]: '¡Salida de merma registrada exitosamente!',
+    [successCodeMessages.UPDATED_WASTE_ISSUE]: '¡Salida de merma surtida exitosamente!',
 };
 
 export const getErrorMessage = (data = {}) => {

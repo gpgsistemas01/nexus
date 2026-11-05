@@ -39,7 +39,7 @@ fuente de verdad.
 | Persona que recibe | Persona a cuyo nombre se registra la recepción de una compra. | No es necesariamente el usuario que captura la entrada ni el proveedor que entrega el material. En código corresponde a `receivedBy`. |
 | Personal de almacén | Actor funcional que mantiene catálogos y ejecuta operaciones de almacén cuando sus accesos le conceden el permiso correspondiente. | No es una persona concreta, un rol único ni el campo técnico `warehouseStaff`; cada operación conserva su propia política de autorización. |
 | Administrador del sistema | Actor funcional del área Sistemas que administra identidades y catálogos y puede ejecutar las capacidades operativas vigentes, siempre sujeto a la autorización del servidor. | No equivale a omitir permisos ni a conceder acceso por el nombre de una cuenta; sus capacidades proceden de una asignación de acceso válida. |
-| Asesor | Persona asociada como dato del contexto comercial de un cliente o salida. | No es actor ni usuario del sistema y no debe inferirse a partir del usuario autenticado. |
+| Asesor | Persona asociada como dato del contexto comercial de un cliente o salida. | No es actor ni usuario de Nexus y no debe inferirse a partir del usuario autenticado. |
 | Actor de auditoría | Usuario al que se atribuye una escritura o cambio crítico. | Puede conservarse como nulo únicamente en los casos técnicos previstos por la auditoría. |
 
 ## Catálogo, existencias y relaciones comerciales

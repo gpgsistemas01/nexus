@@ -21,6 +21,7 @@ import { createServiceLogger } from '../../../utils/logger.js';
 import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
 import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
+import { assertIssueDepartmentAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
 
@@ -33,6 +34,7 @@ export const findAllWasteIssues = async ({
     endDate = '',
     clientId = '',
     departmentId = '',
+    accesses = [],
     personId = '',
     fulfillmentStatusId = '',
     observationsSearch = '',
@@ -56,7 +58,7 @@ export const findAllWasteIssues = async ({
         ...(id && { id }),
         ...buildDateRangeFilter({ field: 'requestDate', startDate, endDate }),
         ...(clientId && { clientId }),
-        ...(departmentId && { departmentId }),
+        ...buildIssueDepartmentWhere({ accesses, departmentId }),
         ...(personId && { requesterId: personId }),
         ...(fulfillmentStatusId && { fulfillmentStatusId }),
         ...(observationsSearch && {
@@ -72,7 +74,8 @@ export const findAllWasteIssues = async ({
 
     const page = await findPage({
         model: db.wasteIssue,
-        hasFilters: Object.keys(where).length > 0,
+        totalWhere: where,
+        hasFilters: false,
         includeCounts,
         query: {
             skip,
@@ -114,21 +117,27 @@ const createWasteIssueTransaction = async ({ wasteIssueDto, userId }) => getDb()
     return normalizeWasteIssueResponse(issue);
 });
 
-export const createWasteIssue = async ({ wasteIssueDto, userId }) => executeServiceOperation({
+export const createWasteIssue = async ({ wasteIssueDto, userId, accesses = [] }) => executeServiceOperation({
     logger: serviceLogger,
     operation: 'warehouse.wasteIssues.wasteIssueService.createWasteIssue',
     model: 'wasteIssue',
     data: wasteIssueDto,
     fallbackError: new WasteIssueCreateDatabaseError(),
-    action: () => createWasteIssueTransaction({ wasteIssueDto, userId })
+    action: () => {
+        assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
+        return createWasteIssueTransaction({ wasteIssueDto, userId });
+    }
 });
 
-const updateWasteIssueTransaction = async ({ id, wasteIssueDto }) => getDb().$transaction(async tx => {
+const updateWasteIssueTransaction = async ({ id, wasteIssueDto, accesses }) => getDb().$transaction(async tx => {
     await lockWasteIssue({ tx, id });
 
-    const current = await tx.wasteIssue.findUnique({ where: { id }, include: { details: true } });
+    const current = await tx.wasteIssue.findUnique({
+        where: { id, ...buildIssueDepartmentWhere({ accesses }) }, include: { details: true }
+    });
 
     if (!current) throw new WasteIssueNotFound();
+    assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
     if (current.details.some(detail => Number(detail.suppliedQuantity) > 0)) {
         throw new WasteIssueAlreadySuppliedConflict();
     }
@@ -157,16 +166,16 @@ const updateWasteIssueTransaction = async ({ id, wasteIssueDto }) => getDb().$tr
     return normalizeWasteIssueResponse(issue);
 });
 
-export const updateWasteIssue = async ({ id, wasteIssueDto }) => executeServiceOperation({
+export const updateWasteIssue = async ({ id, wasteIssueDto, accesses = [] }) => executeServiceOperation({
     logger: serviceLogger,
     operation: 'warehouse.wasteIssues.wasteIssueService.updateWasteIssue',
     model: 'wasteIssue',
     data: { id, ...wasteIssueDto },
     fallbackError: new WasteIssueUpdateDatabaseError(),
-    action: () => updateWasteIssueTransaction({ id, wasteIssueDto })
+    action: () => updateWasteIssueTransaction({ id, wasteIssueDto, accesses })
 });
 
-export const updateWasteIssueHeader = async ({ id, wasteIssueDto }) => {
+export const updateWasteIssueHeader = async ({ id, wasteIssueDto, accesses = [] }) => {
     return executeServiceOperation({
         logger: serviceLogger,
         operation: 'warehouse.wasteIssues.wasteIssueService.updateWasteIssueHeader',
@@ -175,6 +184,11 @@ export const updateWasteIssueHeader = async ({ id, wasteIssueDto }) => {
         fallbackError: new WasteIssueUpdateDatabaseError(),
         action: () => getDb().$transaction(async tx => {
             await lockWasteIssue({ tx, id });
+            const current = await tx.wasteIssue.findUnique({
+                where: { id, ...buildIssueDepartmentWhere({ accesses }) }, select: { id: true }
+            });
+            if (!current) throw new WasteIssueNotFound();
+            assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
             const headerData = await resolveWasteIssueHeaderData({ tx, dto: wasteIssueDto });
 
             try {

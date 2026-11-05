@@ -27,6 +27,15 @@ const agrees = async ({ rules, validator, field, value, valid, data = {} }) => {
 
 describe('captura coherente entre navegador y servidor (DP-VAL-004)', () => {
     it.each([
+        ['AB/07-2', true], ["A'O2", true], ['<A-1>', true], ['1'.repeat(10), true],
+        ['1'.repeat(11), false], [123, false], [['AB'], false],
+        ['A\u0000B', false], ['A\u001BB', false], ['A\nB', false], ['A\tB', false]
+    ])('número de proyecto %j conserva texto y rechaza controles: válido=%s', async (value, valid) => {
+        await agrees({ rules: [fields.validateProjectNumber('projectNumber')],
+            validator: front.issueHeaderValidation.projectNumber, field: 'projectNumber', value, valid });
+    });
+
+    it.each([
         [0, true], ['0', true], ['0.01', true], ['99999999.99', true],
         [undefined, false], [null, false], ['', false], [' ', false], [-1, false],
         ['2abc', false], ['1e2', false], [Infinity, false], [true, false], [[2], false], [{}, false],
@@ -77,7 +86,9 @@ describe('captura coherente entre navegador y servidor (DP-VAL-004)', () => {
     );
 
     it.each([[undefined, true], [null, true], ['', true], ['   ', true], ['O'.repeat(500), true], ['O'.repeat(501), false],
-        [false, false], [0, false], [['Nota'], false], ['Nota <script>', false]])(
+        [false, false], [0, false], [['Nota'], false], ['Nota <script>', false],
+        ['Nota\u0000oculta', false], ['Nota\u001Boculta', false], ['Nota\u007Foculta', false],
+        ['Línea 1\nLínea 2\tcon tabulación', true], ["Nota de O'Brien & hijos", true]])(
         'observaciones opcionales %j: válido=%s', async (value, valid) => agrees({
             rules: [fields.validateTextOptional({ fieldName: 'observations', maxLength: 500 })],
             validator: front.issueReturnValidation.observations, field: 'observations', value, valid

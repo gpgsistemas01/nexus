@@ -4,6 +4,7 @@ import { DEPARTMENT_KEYS } from '../../../../../src/constants/departments.js';
 
 const findMany = vi.fn();
 const count = vi.fn();
+const printingAccess = { departmentId: 'department-1', roleKey: ROLE_KEYS.OPERATOR, departmentKey: DEPARTMENT_KEYS.PRINTING };
 vi.mock('../../../../../src/repository/baseRepository.js', () => ({
     getDb: () => ({ goodsIssue: { findMany, count } })
 }));
@@ -19,7 +20,7 @@ describe('listado de salidas por recurso', () => {
     it.each([
         ['material', 'MATERIAL'], ['consumable', 'CONSUMABLE']
     ])('filtra %s conservando la restricción de área y el mismo conteo', async (inventoryResource, type) => {
-        await findAllGoodsIssues({ type, accesses: [{ departmentId: 'department-1' }] });
+        await findAllGoodsIssues({ type, accesses: [printingAccess] });
         const where = findMany.mock.calls[0][0].where;
         expect(where).toMatchObject({
             type,
@@ -39,6 +40,10 @@ describe('listado de salidas por recurso', () => {
 
     it.each([
         ['administrador del sistema', { roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.PRINTING }],
+        ['auxiliar de almacén', {
+            roleKey: ROLE_KEYS.AUXILIARY,
+            departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+        }],
         ['coordinador de almacén', {
             roleKey: ROLE_KEYS.COORDINATOR,
             departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
@@ -46,7 +51,7 @@ describe('listado de salidas por recurso', () => {
     ])('omite el filtro de área para %s', async (_, access) => {
         await findAllGoodsIssues({ accesses: [access] });
 
-        expect(findMany.mock.calls[0][0].where.department).toBeUndefined();
+        expect(findMany.mock.calls[0][0].where.departmentId).toBeUndefined();
     });
 
     it('conserva el filtro de área para coordinadores de otras áreas', async () => {
@@ -67,7 +72,7 @@ describe('listado de salidas por recurso', () => {
         const { findGoodsIssueReportRows } = await import('../../../../../src/services/warehouse/reportService.js');
         expect(await Array.fromAsync(findGoodsIssueReportRows({
             type: 'CONSUMABLE',
-            accesses: [{ departmentId: 'department-1' }]
+            accesses: [printingAccess]
         }))).toEqual([]);
         expect(count).not.toHaveBeenCalled();
         expect(findMany.mock.calls[0][0].where).toMatchObject({

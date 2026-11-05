@@ -33,7 +33,8 @@ flowchart TB
 | Registro permitido | `constants/catalogs.js` |
 | Transporte API y web | `routes/api/admin/catalogApiRoute.js`<br/>`routes/web/admin/catalogWebRoute.js` |
 | Contrato JSON y renderizado | `controllers/api/admin/`<br/>`catalogController.js`<br/>`controllers/web/admin/`<br/>`catalogController.js` |
-| Resolución, normalización y persistencia | `services/admin/catalogService.js`<br/>`repository/baseRepository.js` |
+| Selección y normalización de campos | `dtos/catalogDTO.js` |
+| Resolución, invariantes y persistencia | `services/admin/catalogService.js`<br/>`repository/baseRepository.js` |
 | Validación y acceso | `validators/forms/catalogValidations.js`<br/>`middleware/validatorMiddleware.js`<br/>`middleware/authMiddleware.js`<br/>`constants/permissions.js` |
 
 ## Configuración de los seis catálogos
@@ -52,9 +53,14 @@ Todos admiten `isActive` booleano, además de los campos de texto indicados.
 | `fulfillment-statuses` | Estados de cumplimiento | `fulfillmentStatus` / `FulfillmentStatus` | `name`: 50 |
 
 `MANAGED_CATALOG_NAMES` deriva las claves del registro. El validator usa esa lista y
-los límites del catálogo; el servicio vuelve a resolver la clave, conserva únicamente
-sus campos permitidos, recorta textos y comprueba tipos y longitudes. El cliente no
+los límites del catálogo; el servicio vuelve a resolver la clave y usa `catalogDTO`
+para conservar campos propios permitidos y recortar textos. Comprueba tipos y
+longitudes antes de persistir. El cliente no
 elige un modelo Prisma ni define campos persistibles mediante el body.
+La resolución exige una propiedad propia del registro: nombres heredados como
+`constructor` o `__proto__` son catálogos inexistentes, con el mismo 404 seguro.
+Los límites de texto se cuentan por caracteres Unicode tanto en el validator como
+en el servicio, sin confundirlos con unidades UTF-16.
 
 ## Contratos y límites implementados
 

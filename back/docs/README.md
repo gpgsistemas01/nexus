@@ -14,6 +14,11 @@ conservan sus rutas relativas dentro de esa carpeta.
 Los comandos `docker compose` se ejecutan desde la raíz del repositorio, donde
 están `Dockerfile` y `docker-compose.yml`; Compose carga `back/.env`.
 
+La arquitectura y herramientas específicas de Vue se mantienen en
+[la documentación del frontend](../../front/docs/index.md), junto a sus fuentes y
+con los mismos criterios de gobierno documental. No se incluyen en los contenedores
+de producción.
+
 ## Organización de los artefactos
 
 La documentación se organiza por **familias**. Cada familia tiene un artefacto principal,
@@ -30,7 +35,7 @@ los paquetes exportables se presentan en español:
 El [índice de vistas arquitectónicas](architecture/views/index.md) organiza bajo
 `architecture/views/` las cinco perspectivas de la adaptación 4+1 de Nexus: escenarios,
 lógica, procesos, desarrollo y física. Cada subcarpeta contiene los artefactos cuyo
-propósito principal es representar el sistema desde esa perspectiva. El contrato API se
+propósito principal es representar Nexus desde esa perspectiva. El contrato API se
 mantiene junto a OpenAPI; el estándar de codificación permanece en `architecture/` como
 regla de construcción transversal. Las normas para mantener y publicar documentos
 permanecen en `governance/`. Una subcarpeta
@@ -54,7 +59,9 @@ docs/
 
 | Familia | Artefacto principal | Artefactos complementarios | Evidencia generada |
 | --- | --- | --- | --- |
-| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/views/index.md), [modelo persistente](architecture/views/logical/data-and-persistence/index.md), [contrato API](architecture/openapi/api-contract.md), [navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/views/development/backend-technical-documentation/index.md) y [frontend](architecture/views/development/frontend-technical-documentation/index.md), [secuencias](architecture/views/processes/backend-code-sequences/index.md), [estructura del código](architecture/views/development/code-structure/index.md) y [reutilización](architecture/views/development/reuse-and-refactoring/index.md) y [patrones](architecture/views/development/design-and-construction-patterns/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
+| Arquitectura, construcción y datos | [Documento de arquitectura y construcción](architecture/index.md) | [Descripción de arquitectura](architecture/views/index.md), [modelo persistente](architecture/views/logical/data-and-persistence/index.md), [navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md), referencias de [backend](architecture/views/development/backend-technical-documentation/index.md), [secuencias](architecture/views/processes/backend-code-sequences/index.md), [estructura del código](architecture/views/development/code-structure/index.md) y [reutilización](architecture/views/development/reuse-and-refactoring/index.md) y [patrones](architecture/views/development/design-and-construction-patterns/index.md) | [Mapa del código](architecture/views/development/code-map.md), [esquema de base de datos](architecture/views/logical/data-and-persistence/generated/database-schema.md) y [diccionario técnico](architecture/views/logical/data-and-persistence/generated/data-dictionary.md) |
+| API HTTP | [Documentación de la API](architecture/openapi/index.md) | [Inicio rápido](architecture/openapi/01-consumption.md), [reglas HTTP](architecture/openapi/api-contract.md) y [mantenimiento](architecture/openapi/02-maintenance.md) | [OpenAPI 3.1](architecture/openapi/openapi.json); contrato autocontenido en `build/docs/openapi/` |
+| Interfaz web EJS | [Referencia de la interfaz EJS](architecture/views/development/frontend-technical-documentation/index.md) | [Navegación web](architecture/views/scenarios/web-navigation-and-screen-catalog/index.md) y [manuales por actor](user-manual/actors/) | Capturas de la interfaz web; el contrato de las peticiones pertenece a API HTTP |
 | Dominio y requisitos | [Índice y portada del paquete](requirements/index.md); la [SRS](requirements/requirements-specification/index.md) y las [fichas de casos de uso](requirements/use-cases/index.md) son las fuentes normativas complementarias | [Visión y alcance](requirements/vision-scope-and-requirements/index.md), [dominio y casos de uso](requirements/domain-and-use-cases/index.md) y [glosario](requirements/business-glossary.md) | No aplica; el estado funcional requiere revisión humana |
 | Pruebas | [Plan de pruebas](testing/test-plan.md) | [Registro selectivo de casos automatizados](testing/automated-test-case-index.md), [cobertura relevante por caso de uso](testing/use-case-test-types.md) y [revisión de la suite](testing/suite-review.md) | La implementación ejecutable vive en `tests`; CI conserva el resultado de cada ejecución sin versionar resultados que queden obsoletos |
 | Gobierno documental | [Gobernanza documental](governance/index.md) | [Registro de aplicación de normas](governance/standards-application/index.md) | No aplica |

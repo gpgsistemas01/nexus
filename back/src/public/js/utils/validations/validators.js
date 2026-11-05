@@ -2,10 +2,10 @@ import {
     FORM_FIELD_LIMITS,
     MIN_STOCK_INPUT_FORMAT,
     MONEY_INPUT_FORMAT,
-    PERSON_NAME_PATTERN
+    PERSON_NAME_PATTERN,
+    PROJECT_NUMBER_PATTERN
 } from '../../../../shared/constants/inputValidation.js';
-import { AUTH_FIELD_LIMITS } from '../../../../shared/constants/auth.js';
-import { isEmptyOrNull, isString, isLengthInRangeMax } from "./baseValidations.js";
+import { isEmptyOrNull } from "./baseValidations.js";
 import { isRollPresentation } from '../../../../shared/inventory/wasteMeasurements.js';
 import {
     validateUUID,
@@ -137,15 +137,6 @@ export const wasteValidation = {
     observations: wasteStockAdjustmentValidation.observations,
 }
 
-export const loginValidation = {
-    name: value => isEmptyOrNull(value, 'El nombre de usuario')
-        || isString(value, 'El nombre de usuario')
-        || isLengthInRangeMax(value.trim(), AUTH_FIELD_LIMITS.USERNAME_MAX_LENGTH, 'El nombre de usuario'),
-    password: value => isEmptyOrNull(value, 'La contraseña')
-        || isString(value, 'La contraseña')
-        || isLengthInRangeMax(value, AUTH_FIELD_LIMITS.PASSWORD_MAX_LENGTH, 'La contraseña')
-}
-
 export const addGoodsReceiptMaterialValidation = {
     materialId: (value) => validateUUID(value, 'El material'),
     quantity: (value) => validateNumber(value, 'La cantidad', { minimum: 1 }),
@@ -191,7 +182,7 @@ export const issueHeaderValidation = {
         name: value,
         length: FORM_FIELD_LIMITS.PROJECT_NUMBER,
         fieldName: 'El número de proyecto',
-        regex: /^[\s\S]+$/u
+        regex: PROJECT_NUMBER_PATTERN
     }),
     advisorId: (value) => validateUUID(value, 'El asesor'),
     clientId: (value) => validateUUID(value, 'El cliente'),
@@ -221,6 +212,8 @@ export const issueProjectQuantityDetailsValidation = {
     isSupplied: value => isEmptyOrNull(value, 'El estado de surtido')
         || (typeof value === 'boolean' || value === 'true' || value === 'false' ? null : 'El estado de surtido debe ser verdadero o falso')
 }
+
+export const validateIssueSupplyQuantity = value => validatePositiveNumber(value, 'La cantidad a surtir');
 
 export const issueReturnValidation = {
     returnQuantity: (value) => validatePositiveNumber(value, 'La cantidad a devolver'),
@@ -282,6 +275,7 @@ export const personValidation = {
 }
 
 export const personAccessValidation = {
+    /** @param {unknown} value @param {{ accesses?: Array<{ departmentId: string }> }} context */
     departmentId: (value, { accesses = [] } = {}) => {
         const requiredError = validateUUID(value, 'El área');
 

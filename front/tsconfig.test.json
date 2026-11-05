@@ -1,0 +1,34 @@
+{
+    "extends": "./tsconfig.app.json",
+    "include": [
+        "env.d.ts",
+        "src/**/*.ts",
+        "src/**/*.vue",
+        "tests/**/*.ts",
+        "scripts/**/*.mjs",
+        "../back/src/public/js/utils/validations/loginValidation.js",
+        "../back/src/public/js/utils/validations/baseValidations.js",
+        "../back/src/public/js/constants/apiMessages.js",
+        "../back/src/shared/constants/auth.js",
+        "../back/src/shared/constants/inputValidation.js",
+        "../back/src/shared/messages/goodsReceiptMessages.js",
+        "../back/src/public/js/utils/validations/validators.js",
+        "../back/src/public/js/utils/validations/fieldValidations.js",
+        "../back/src/shared/constants/inventory.js",
+        "../back/src/shared/constants/permissions.js",
+        "../back/src/shared/inventory/wasteMeasurements.js",
+        "../back/src/shared/validation/weightValidations.js",
+        "../back/src/shared/utils/numberUtils.js",
+        "../back/src/shared/constants/catalogs.js",
+        "../back/src/shared/inventory/goodsReceiptCalculations.js",
+        "../back/src/public/js/utils/timeZone.js",
+        "../back/src/shared/constants/apiSuccessCodes.js",
+        "../back/src/public/js/application/warehouse/issues/issueHeaderRules.js",
+        "../back/src/public/js/constants/fulfillmentStatuses.js",
+        "../back/src/public/js/utils/formatters.js"
+    ],
+    "compilerOptions": {
+        "types": ["vite/client", "node"],
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo"
+    }
+}
