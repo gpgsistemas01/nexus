@@ -74,4 +74,6 @@ export const filterManualContent = (content, permissions) => {
 };
 
 export const imageNames = (content) =>
-    [...content.matchAll(/!\[[^\]]+\]\(images\/([a-z0-9-]+\.png)\)/g)].map((match) => match[1]);
+    [...content.matchAll(/!\[[^\]]+\]\((?:\.\.\/)?images\/([a-z0-9-]+\.png)\)/g)].map(
+        (match) => match[1],
+    );

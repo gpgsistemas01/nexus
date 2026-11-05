@@ -8,8 +8,16 @@ import { ids, template, user } from '../fixtures/inventory.js';
 import { purchase } from '../fixtures/purchases.js';
 import { issueFor, issue } from '../fixtures/issues.js';
 import { PERMISSIONS } from '@nexus/permissions';
-import { DOCUMENT_STATE_CAPTURES, mockDocumentCapture } from '../manual-profiles/documentStates.js';
+import {
+  DOCUMENT_STATE_CAPTURES,
+  mockDocumentCapture,
+  openDocumentCapture,
+} from '../manual-profiles/documentStates.js';
 import { mockIssues } from './issueFixtures.js';
+import { mockPurchases } from './purchaseFixtures.js';
+import { ManualExampleUnavailable } from '../../scripts/manual/documentCaptures.mjs';
+import { runManualCapture } from '../../scripts/manual/capture.mjs';
+import { readManualJson } from '../manual-profiles/selectPreparation.js';
 
 const supplierWithRoll = '99999999-9999-4999-8999-999999999999';
 const roots: string[] = [];
@@ -68,6 +76,7 @@ const prepareCatalogs = async (page: Page, hasRoll: boolean, status = 200) => {
 test('manual: captura Mermas en orden con otro proveedor y un ROLLO de la segunda página', async ({
   context,
 }) => {
+  test.setTimeout(60_000);
   const root = await destination();
   for (const filename of [
     '09-waste-create.png',
@@ -290,3 +299,151 @@ for (const mode of ['supply', 'return'] as const) {
     expect(writes).toEqual([]);
   });
 }
+
+test('manual: una compra sin historial mixto permite abrir la corrección real del detalle', async ({
+  page,
+}) => {
+  const root = await destination();
+  const { writes } = await mockPurchases(page, operator.permissions);
+  await expect(
+    captureRecipe(page, '20a-purchase-mixed.png', root, operator),
+  ).rejects.toBeInstanceOf(ManualExampleUnavailable);
+  await expect(access(path.join(root, 'images/20a-purchase-mixed.png'))).rejects.toMatchObject({
+    code: 'ENOENT',
+  });
+  await captureRecipe(page, '21-purchase-correction.png', root, operator);
+  await expect(
+    page.getByRole('dialog', { name: 'Corregir detalle de compra', exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel('Cantidad correcta', { exact: true })).toHaveValue('2');
+  await expect(page.getByLabel('Costo por presentación correcto', { exact: true })).toHaveValue(
+    '100',
+  );
+  expect(writes).toEqual([]);
+});
+
+for (const state of ['partial', 'returned'] as const) {
+  test(`manual: ${state} respeta los estados individuales de cada renglón`, async ({ page }) => {
+    const root = await destination();
+    await mockIssues(page, operator.permissions);
+    const doc = structuredClone(issue);
+    doc.fulfillmentStatus.name = state === 'partial' ? 'Surtido parcial' : 'Surtido';
+    doc.details = [
+      {
+        ...structuredClone(doc.details[0]!),
+        isSupplied: true,
+        suppliedQuantity: '2',
+        returnedQuantity: state === 'returned' ? '2' : '0',
+        fulfillmentStatus: { name: state === 'returned' ? 'Cancelado' : 'Surtido' },
+      },
+      {
+        ...structuredClone(doc.details[0]!),
+        id: documentId(88),
+        materialName: 'Otro detalle',
+        isSupplied: state === 'returned',
+        suppliedQuantity: state === 'returned' ? '2' : '0',
+        fulfillmentStatus: { name: state === 'returned' ? 'Surtido' : 'Pendiente' },
+      },
+    ];
+    const { writes } = await serveDocuments(
+      page,
+      '/api/warehouse/goods-issues/materials',
+      [doc],
+      'goodsIssue',
+    );
+    const filename = state === 'partial' ? '24a-issue-partial.png' : '25a-issue-partial-return.png';
+    await captureRecipe(page, filename, root, operator);
+    await expect(
+      page
+        .getByRole('dialog')
+        .last()
+        .getByRole('cell', { name: state === 'partial' ? 'Pendiente' : 'Cancelado', exact: true }),
+    ).toBeVisible();
+    expect(writes).toEqual([]);
+  });
+}
+
+for (const projectQuantity of [null, '125.5']) {
+  test(`manual: surtir utiliza el pendiente y conserva la referencia de proyecto ${projectQuantity}`, async ({
+    page,
+  }) => {
+    const root = await destination();
+    await mockIssues(page, operator.permissions);
+    const doc = structuredClone(issue);
+    doc.details[0]!.projectConvertedQuantity = projectQuantity;
+    const { writes } = await serveDocuments(
+      page,
+      '/api/warehouse/goods-issues/materials',
+      [doc],
+      'goodsIssue',
+    );
+    await captureRecipe(page, '24-issue-supply.png', root, operator);
+    await expect(
+      page.getByRole('spinbutton', { name: 'Cantidad a surtir: Lona', exact: true }),
+    ).toHaveValue('2');
+    await expect(
+      page.getByRole('spinbutton', { name: 'Cantidad de proyecto: Lona', exact: true }),
+    ).toHaveValue(projectQuantity ?? '200');
+    expect(writes).toEqual([]);
+  });
+}
+
+test('manual: agotar la búsqueda de un ejemplo no exige preparar operaciones nuevas', async ({
+  page,
+}) => {
+  await mockPurchases(page, operator.permissions);
+  await expect(
+    openDocumentCapture(page, DOCUMENT_STATE_CAPTURES['20a-purchase-mixed.png']!, {
+      exampleLookupTimeout: 0,
+    }),
+  ).rejects.toBeInstanceOf(ManualExampleUnavailable);
+});
+
+test('manual: cancela la consulta pendiente antes de continuar en otra página de la cuenta', async ({
+  page,
+  context,
+}) => {
+  await mockWarehouse(page);
+  await page.goto('/almacen/materiales');
+  await expect(page.locator('main h1')).toBeVisible({ timeout: 30_000 });
+  let requested: () => void = () => {};
+  const started = new Promise<void>((resolve) => {
+    requested = resolve;
+  });
+  await page.route('**/api/warehouse/manual-pending', async (route) => {
+    requested();
+    await page.waitForEvent('close');
+    await route.abort().catch(() => {});
+  });
+  const work = readManualJson(page, '/api/warehouse/manual-pending');
+  await started;
+  await expect(
+    runManualCapture(() => work, { timeout: 50, cancel: () => page.close() }),
+  ).rejects.toThrow('su página se canceló antes de continuar');
+  const next = await context.newPage();
+  await mockWarehouse(next);
+  const root = await destination();
+  await captureRecipe(next, '03-materials-list.png', root, user);
+  await access(path.join(root, 'images/03-materials-list.png'));
+  await next.close();
+});
+
+test('manual: una cuenta con surtido de mermas utiliza su propio módulo', async ({ page }) => {
+  const excluded = new Set<string>([
+    PERMISSIONS.GOODS_ISSUES_PAGE_VIEW,
+    PERMISSIONS.GOODS_ISSUES_MANAGE,
+    PERMISSIONS.GOODS_ISSUE_DETAILS_MANAGE,
+  ]);
+  const account = {
+    ...operator,
+    permissions: operator.permissions.filter((permission) => !excluded.has(permission)),
+  };
+  const { writes } = await mockIssues(page, account.permissions);
+  const root = await destination();
+  await captureRecipe(page, '24-issue-supply.png', root, account);
+  await expect(page).toHaveURL(/\/salidas\/mermas$/);
+  await expect(
+    page.getByRole('spinbutton', { name: 'Cantidad a surtir: Sobrante de lona', exact: true }),
+  ).toHaveValue('2');
+  expect(writes).toEqual([]);
+});

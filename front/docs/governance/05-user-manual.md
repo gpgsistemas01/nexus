@@ -25,6 +25,9 @@ manuales, seguir el [procedimiento por cuenta](07-manual-accounts-and-files.md).
 Actualizar procedimiento y captura junto a la pantalla. Mantener advertencias junto a la
 acción y términos de negocio en el glosario, sin contratos o patrones técnicos. El
 generador filtra manual y glosario por permisos, incluidos surtido y devolución.
+Las acciones se documentan con sus campos reales de Vue. Las imágenes históricas
+de estados son condicionales por cuenta; las tablas explican siempre esos estados.
+La referencia ficticia conserva el inventario completo de ejemplos.
 
 | Grupo de la edición | Fuentes compartidas |
 | --- | --- |

@@ -28,7 +28,7 @@ Guarde el alta auxiliar y continúe la compra con el registro seleccionado.
 
 - **Editar compra:** cambie los campos habilitados del encabezado y pulse **Actualizar**.
 - **Agregar detalles:** prepare las nuevas partidas y confirme; compruebe la existencia recibida.
-- **Corregir detalle:** revise la cantidad y costo, seleccione el motivo y confirme la corrección.
+- **Corregir detalle:** capture **Cantidad correcta** y **Costo por presentación correcto** y confirme **Corregir detalle**.
 - **Cancelar detalle:** compruebe la partida y confirme la reversión de su existencia.
 
 ![Corrección de una partida registrada.](images/21-purchase-correction.png)

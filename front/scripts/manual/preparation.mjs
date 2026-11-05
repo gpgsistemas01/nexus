@@ -4,6 +4,19 @@ const PAGE_LIMIT = 100;
 export const MANUAL_LOOKUP_PAGE_SIZE = 20;
 const validMeasure = (value) => Number.isFinite(Number(value)) && Number(value) > 0;
 
+export const findPreparedDocument = async (rows, prepare) => {
+    for (let start = 0; start < rows.length; start += 4) {
+        const results = await Promise.allSettled(
+            rows.slice(start, start + 4).map((row) => Promise.resolve().then(() => prepare(row))),
+        );
+        const match = results.find((result) => result.status === 'fulfilled' && result.value);
+        if (match) return match.value;
+        const failed = results.find((result) => result.status === 'rejected');
+        if (failed) throw failed.reason;
+    }
+    return null;
+};
+
 export const lookupPages = async function* (lookup, resource, supplierId = '') {
     let start = 0;
     for (let page = 1; page <= PAGE_LIMIT; page++) {

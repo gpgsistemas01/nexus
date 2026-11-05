@@ -190,6 +190,22 @@ archivo y resultado; un fallo queda pendiente con su motivo en el manifest.
 Cada captura dispone de hasta 90 segundos; el presupuesto de la cuenta crece
 con su número de imágenes. Un fallo guarda el motivo y permite continuar con las
 siguientes. Las acciones esperan hasta 15 segundos y la navegación hasta 30.
+Al agotar el plazo se cierra la página y se espera la finalización de su operación
+antes de iniciar la siguiente captura.
+
+Las acciones se preparan con las mismas reglas de disponibilidad de Vue. Para
+corregir basta una partida activa; para surtir, un detalle pendiente; para devolver,
+una salida habilitada con saldo retornable. El borrador de surtido usa el pendiente
+y conserva la cantidad de proyecto registrada; si está vacía, ilustra el total
+convertido del detalle. No se confirma ninguna operación.
+
+Los ejemplos históricos de estados son condicionales en `dev`. Se buscan durante
+30 segundos con hasta cuatro consultas de detalle simultáneas y un límite de 15
+segundos por consulta. Si no se encuentra un ejemplo, queda como `unavailable`
+con su motivo y se retira sólo su imagen de las fuentes de esa cuenta. La tabla de
+estados se conserva y el manual puede publicarse. Una falla del servicio, del contrato
+o del recorrido que impida preparar la captura continúa pendiente. En `demo` se
+requieren todos los ejemplos configurados.
 
 Si no hay cuentas con credenciales completas, termina sin abrir el navegador ni
 exportar documentos. Las cuentas omitidas conservan sus archivos anteriores;
@@ -243,14 +259,16 @@ npm run docs:manuals -- --profile cuenta-01 --missing --format ambos
 ```
 
 El comando principal reanuda por defecto: en el primer uso captura todo y después
-conserva las imágenes completas con la misma cuenta, acceso, modo, fuentes,
-recorrido y huella del PNG. Completa las faltantes o desactualizadas en cada cuenta
+conserva las imágenes completas con la misma cuenta, acceso, modo, interfaz
+y huella del PNG. Completa las faltantes o desactualizadas en cada cuenta
 de `--all`; `--missing` conserva ese mismo comportamiento.
 Use `--fresh` para volver a capturar desde el inicio.
 Si una pendiente falla otra vez, el manifiesto conserva las completas anteriores
 y posteriores; el próximo intento vuelve a verificar sus archivos y huellas.
-Si cambió el código o el contenido desde la ejecución anterior, el comando lo
-indica y vuelve a capturar las imágenes desactualizadas.
+Cambiar Vue, el acceso o el entorno invalida las capturas. Editar el texto del
+manual o sus herramientas conserva las imágenes verificadas; las referencias
+nuevas se capturan por estar faltantes. Use `--fresh` para revisar un recorrido
+modificado o buscar de nuevo ejemplos antes marcados como `unavailable`.
 
 | Situación | Recuperación |
 | --- | --- |
@@ -265,7 +283,9 @@ indica y vuelve a capturar las imágenes desactualizadas.
 | Directiva de manual inválida | Corregir el capítulo y la línea indicados en `docs/user-manual`. Se admiten saltos de línea LF y CRLF; no es necesario cambiar las credenciales. |
 | Tabla vacía | Puede servir para consulta. Para editar, preparar un registro existente. |
 | El documento no aparece primero | La preparación recorre las páginas y abre el folio encontrado después de recibir la búsqueda. También busca detalles disponibles en páginas posteriores para surtir o devolver. |
-| Compra mixta pendiente | Se necesita una misma compra Confirmada con una partida activa y otra cancelada. Tener compras Confirmadas y Canceladas por separado no demuestra este caso. |
+| `ejemplo sin datos` | No impide publicar. La explicación del estado permanece y la imagen se incluye cuando hay un ejemplo disponible. No crear operaciones para obtenerla. |
+| Compra mixta | El ejemplo reúne una partida activa y otra cancelada de la misma compra; no es un requisito para corregir ni registrar compras. |
+| Devolución registrada | El ejemplo puede mostrar un renglón devuelto completo y otro con saldo entregado; no exige una devolución parcial dentro del mismo renglón. |
 | `Test timeout of 180000ms` y navegador cerrado | Actualizar el recorrido: el límite ahora se calcula por cuenta y cada imagen tiene su propio tiempo. Repetir el comando para recuperar las pendientes. |
 | Falta una opción | Revisar dependencias, registros activos y permisos. Para pesos se necesita un material de referencia ROLLO. |
 | Falta devolución | Comprobar permiso de Almacén y salida surtida existente; no se surte automáticamente. |

@@ -5,6 +5,7 @@ import { MANUAL_SECTIONS, selectedChapters, filterManualContent, imageNames } fr
 import { validProfileId } from './profiles.mjs';
 import { prepareManualDirectory } from './paths.mjs';
 import { DATA_SCOPES, hasDataScope } from '../../../back/src/constants/permissions.js';
+import { isUnavailableExample } from './documentCaptures.mjs';
 
 export const permissionFingerprint = (permissions) =>
     createHash('sha256')
@@ -16,7 +17,11 @@ export const recoverManualCaptures = (previous, revision, images) => {
 
     return Object.fromEntries(
         images
-            .filter((image) => previous.captures?.[image]?.status === 'complete')
+            .filter(
+                (image) =>
+                    previous.captures?.[image]?.status === 'complete' ||
+                    isUnavailableExample(image, previous.captures?.[image], previous.mode),
+            )
             .map((image) => [image, { ...previous.captures[image] }]),
     );
 };
@@ -151,6 +156,26 @@ export const prepareManual = async (frontRoot, profile, session) => {
     };
 };
 
+export const finalizeManualSources = async (manifest, captures) => {
+    const unavailable = new Set(
+        manifest.images.filter((image) =>
+            isUnavailableExample(image, captures[image], manifest.mode),
+        ),
+    );
+    if (!unavailable.size) return;
+    for (const filename of manifest.sources) {
+        const source = path.join(manifest.root, 'sources', filename);
+        const content = await readFile(source, 'utf8');
+        await writeFile(
+            source,
+            content.replace(
+                /^!\[[^\r\n]+\]\(\.\.\/images\/([a-z0-9-]+\.png)\)[ \t]*\r?\n?/gm,
+                (line, image) => (unavailable.has(image) ? '' : line),
+            ),
+        );
+    }
+};
+
 export const loadManualPublication = async (frontRoot, id) => {
     if (!validProfileId(id)) throw new Error('Identificador de manual inválido.');
     const root = await prepareManualDirectory(frontRoot, id);
@@ -163,21 +188,27 @@ export const loadManualPublication = async (frontRoot, id) => {
     )
         throw new Error(`El manual ${id} no está completo; revise las capturas pendientes.`);
     const sources = [];
+    const referencedImages = new Set();
     for (const filename of manifest.sources) {
         if (!/^[a-z0-9-]+\.md$/.test(filename)) throw new Error('Fuente de manual inválida.');
         const source = path.join(root, 'sources', filename);
         await access(source);
+        for (const image of imageNames(await readFile(source, 'utf8'))) referencedImages.add(image);
         sources.push(
             path.relative(path.resolve(frontRoot, '../back'), source).split(path.sep).join('/'),
         );
     }
     for (const image of manifest.images) {
         if (!/^[a-z0-9-]+\.png$/.test(image)) throw new Error('Imagen de manual inválida.');
+        if (isUnavailableExample(image, manifest.captures?.[image], manifest.mode)) {
+            if (referencedImages.has(image))
+                throw new Error(`El ejemplo ${image} conserva una referencia sin captura.`);
+            continue;
+        }
+        if (manifest.captures?.[image]?.status !== 'complete')
+            throw new Error(`La captura ${image} debe volver a verificarse.`);
         const bytes = await readFile(path.join(root, 'images', image));
-        if (
-            manifest.captures?.[image]?.status !== 'complete' ||
-            manifest.captures[image].sha256 !== createHash('sha256').update(bytes).digest('hex')
-        )
+        if (manifest.captures[image].sha256 !== createHash('sha256').update(bytes).digest('hex'))
             throw new Error(`La captura ${image} debe volver a verificarse.`);
     }
     return sources;

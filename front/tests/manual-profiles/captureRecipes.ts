@@ -198,7 +198,7 @@ export const captureRecipe = async (
     await go(page, route);
     await openAction(page, action);
   } else if (number <= 21) {
-    await go(page, '/compras/materiales');
+    if (number !== 21) await go(page, '/compras/materiales');
     if (number === 19) {
       await openAction(page, 'Nueva compra');
       const dialog = page.getByRole('dialog').last();
@@ -210,12 +210,25 @@ export const captureRecipe = async (
       await dialog.getByLabel('Costo por Presentación', { exact: true }).fill('100');
       await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     } else if (number >= 20) {
-      await openAction(page, 'Ver compra');
-      if (number === 21) await openAction(page, 'Corregir detalle');
+      if (number === 21) {
+        await openDocumentCapture(page, {
+          family: 'purchases',
+          resource: 'materiales',
+          state: 'correct',
+        });
+        await openAction(page, 'Corregir detalle');
+      } else await openAction(page, 'Ver compra');
     }
   } else if (number <= 25) {
-    await go(page, '/salidas/materiales');
-    if (!user.permissions.includes(P.GOODS_ISSUE_DETAILS_MANAGE)) {
+    const needsSupply = number === 24 || number === 25;
+    const materials =
+      user.permissions.includes(P.GOODS_ISSUES_PAGE_VIEW) &&
+      (!needsSupply || user.permissions.includes(P.GOODS_ISSUE_DETAILS_MANAGE));
+    const resource = materials ? 'materiales' : 'mermas';
+    if (number <= 23) await go(page, `/salidas/${resource}`);
+    if (
+      !user.permissions.includes(materials ? P.GOODS_ISSUE_DETAILS_MANAGE : P.WASTE_ISSUES_SUPPLY)
+    ) {
       await expect(page.getByRole('button', { name: 'Surtir detalle', exact: true })).toHaveCount(
         0,
       );
@@ -229,11 +242,15 @@ export const captureRecipe = async (
       for (const label of ['Cliente', 'Asesor', 'Área', 'Solicitante'])
         await chooseFirst(page, dialog, label);
       await dialog.getByLabel('Número de proyecto', { exact: true }).fill('120010');
-      await chooseFirst(page, dialog, 'Material');
+      await chooseFirst(page, dialog, materials ? 'Material' : 'Merma');
       await dialog.getByLabel('Cantidad', { exact: true }).fill('1');
       await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     } else if (number === 24) {
-      await openAction(page, 'Surtir detalle');
+      const { supplyDetail } = await openDocumentCapture(page, {
+        family: 'issues',
+        resource,
+        state: 'supply',
+      });
       const row = await findInTablePages(
         page,
         page
@@ -248,11 +265,13 @@ export const captureRecipe = async (
       await checkbox.check();
       const quantity = row.getByRole('spinbutton', { name: /^Cantidad a surtir:/ });
       const pending = Number(await quantity.getAttribute('max'));
-      await quantity.fill(String(Math.min(1, pending)));
-      await row.getByRole('spinbutton', { name: /^Cantidad de proyecto:/ }).fill('1');
+      await quantity.fill(String(pending));
+      const project = row.getByRole('spinbutton', { name: /^Cantidad de proyecto:/ });
+      if (!(await project.inputValue()))
+        await project.fill(String(supplyDetail!.convertedQuantity));
       await checkbox.scrollIntoViewIfNeeded();
     } else if (number === 25) {
-      await openAction(page, 'Devolver material surtido');
+      await openDocumentCapture(page, { family: 'issues', resource, state: 'return' });
       await openAction(page, 'Devolver detalle de salida');
     }
   } else {

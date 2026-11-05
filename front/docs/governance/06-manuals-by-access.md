@@ -47,8 +47,10 @@ siguen aplicándose. El índice de cada edición indica su alcance detectado.
 | [profiles.mjs](../../scripts/manual/profiles.mjs) | Perfiles, configuración, credenciales y selección de cuentas completas. La demostración calcula permisos con las políticas existentes. |
 | [model.mjs](../../scripts/manual/model.mjs) | Capítulos, permisos y evaluación de bloques de tareas. |
 | [publication.mjs](../../scripts/manual/publication.mjs) | Índice por usuario, fuentes filtradas, retirada de capítulos e imágenes sin acceso y huellas de publicación. |
+| [documentCaptures.mjs](../../scripts/manual/documentCaptures.mjs) | Inventario único de ejemplos de estados y reconocimiento de ejemplos sin datos. |
+| [capture.mjs](../../scripts/manual/capture.mjs) | Cancelación de la página al agotar el tiempo y espera de la operación antes de continuar. |
 | [paths.mjs](../../scripts/manual/paths.mjs) | Directorio local por cuenta, traslado desde la ubicación anterior y exclusión del catálogo general. |
-| [preparation.mjs](../../scripts/manual/preparation.mjs) | Búsqueda paginada de una referencia ROLLO existente para las capturas de Mermas. |
+| [preparation.mjs](../../scripts/manual/preparation.mjs) | Búsqueda paginada de referencias ROLLO y preparación de documentos con consultas simultáneas acotadas. |
 | [manuals.mjs](../../scripts/manuals.mjs) | Selección de perfiles, capturas y exportación con el motor común. |
 | [profileManuals.spec.ts](../../tests/manual-profiles/profileManuals.spec.ts) | Sesión aislada, control de escrituras y recuperación de capturas. |
 | [captureRecipes.ts](../../tests/manual-profiles/captureRecipes.ts) | Recorridos visibles sin confirmar operaciones. |
@@ -99,3 +101,7 @@ El navegador bloquea escrituras de negocio; permite la renovación de sesión.
 Abrir formularios o agregar detalles a un borrador no los guarda. Al terminar se
 comprueba de nuevo el acceso: si cambió, se interrumpe la publicación. Una imagen
 requerida ausente deja el manual pendiente; no se sustituye por otra de administración.
+Los ejemplos históricos son condicionales en `dev`: su ausencia se registra y se
+conserva la explicación textual del estado. Las capturas de acciones siguen siendo
+obligatorias. La preparación reutiliza las reglas de Compras y Salidas de Vue y
+no agrega campos ni modifica sus validaciones.

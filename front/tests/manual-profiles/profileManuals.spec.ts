@@ -14,12 +14,18 @@ import {
   prepareManual,
   accessFingerprint,
   recoverManualCaptures,
+  finalizeManualSources,
 } from '../../scripts/manual/publication.mjs';
-import { prepareManualDirectory, isManualAccountPath } from '../../scripts/manual/paths.mjs';
+import { prepareManualDirectory } from '../../scripts/manual/paths.mjs';
 import { assertManualDevelopment, parseManualMode } from '../../scripts/manual/environment.mjs';
 import { authenticateManualAccount } from '../../scripts/manual/authentication.mjs';
 import { captureRecipe, captureFamily, type CaptureFamily } from './captureRecipes.js';
 import { DOCUMENT_STATE_CAPTURES, mockDocumentCapture } from './documentStates.js';
+import {
+  ManualExampleUnavailable,
+  isUnavailableExample,
+} from '../../scripts/manual/documentCaptures.mjs';
+import { runManualCapture } from '../../scripts/manual/capture.mjs';
 import { mockWarehouse } from '../e2e/warehouseFixtures.js';
 import { mockRecords } from '../e2e/recordsFixtures.js';
 import { mockCatalogs } from '../e2e/catalogFixtures.js';
@@ -49,13 +55,6 @@ const treeHash = async (folder: string): Promise<string> => {
     a.name.localeCompare(b.name),
   )) {
     const filename = path.join(folder, entry.name);
-    if (
-      isManualAccountPath(
-        path.relative(path.join(frontRoot, 'docs'), filename).split(path.sep).join('/'),
-      )
-    )
-      continue;
-
     result.push(
       entry.name + (entry.isDirectory() ? await treeHash(filename) : await fileHash(filename)),
     );
@@ -151,16 +150,11 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
     const revision = createHash('sha256')
       .update(
         JSON.stringify([
+          'manual-ui-v2',
           await treeHash(path.join(frontRoot, 'src')),
-          await treeHash(path.join(frontRoot, 'scripts/manual')),
-          await treeHash(path.join(frontRoot, 'tests/manual-profiles')),
-          await treeHash(path.join(frontRoot, 'docs/user-manual')),
-          user.id,
-          user.accesses ?? [],
           manifest.accessFingerprint,
           await fileHash(path.resolve(frontRoot, '../back/src/constants/permissions.js')),
           process.env.FRONT_MANUAL_BASE_URL,
-          profile.label,
           mode,
         ]),
       )
@@ -177,11 +171,15 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
     await save('pending');
     if (process.env.FRONT_MANUAL_MISSING === 'true' && previous && previous.revision !== revision)
       console.log(
-        `[${account.id}] Cambiaron las fuentes o el recorrido; se actualizarán las capturas.`,
+        `[${account.id}] Cambió la interfaz, el acceso o la revisión de captura; se actualizarán las imágenes.`,
       );
     for (const [index, filename] of manifest.images.entries()) {
       const progress = `[${account.id}] ${index + 1}/${manifest.images.length} ${filename}`;
       const destination = path.join(root, 'images', filename);
+      if (isUnavailableExample(filename, captures[filename], mode)) {
+        console.log(`${progress}: ejemplo sin datos (conservado)`);
+        continue;
+      }
       if (
         process.env.FRONT_MANUAL_MISSING === 'true' &&
         previous?.revision === revision &&
@@ -199,48 +197,52 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
         }
       }
       let page: Page | undefined;
+      let activePage: Page | undefined;
       try {
-        await test.step(
-          filename,
-          async () => {
-            page = await context.newPage();
-            if (mode === 'demo') {
-              if (filename === '01-login.png')
-                await page.route('**/api/auth/me', (route) =>
-                  route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } }),
-                );
-              else if (DOCUMENT_STATE_CAPTURES[filename]) {
-                await mockDocumentCapture(
-                  page,
-                  user.permissions,
-                  DOCUMENT_STATE_CAPTURES[filename],
-                  (user as SessionUser & { accesses?: { department?: string }[] }).accesses?.[0]
-                    ?.department,
-                );
-                await page.route('**/api/auth/me', (route) => route.fulfill({ json: { user } }));
-              } else
-                await installDemo(
-                  page,
-                  captureFamily(filename, user.permissions),
-                  user,
-                  filename.startsWith('25-') ? 'Surtido' : 'Pendiente',
-                );
-            }
-            await protect(page);
-            if (mode === 'dev' && filename === '01-login.png') {
-              // The public login illustration uses an isolated, unauthenticated context.
-              const anonymous = await context.browser()!.newContext({
-                baseURL: (await readAccounts(process.env.FRONT_MANUAL_ACCOUNTS!)).baseUrl,
-                viewport: { width: 1600, height: 1400 },
-              });
-              try {
-                await captureRecipe(await anonymous.newPage(), filename, root, user);
-              } finally {
-                await anonymous.close();
+        await test.step(filename, () =>
+          runManualCapture(
+            async () => {
+              page = await context.newPage();
+              activePage = page;
+              if (mode === 'demo') {
+                if (filename === '01-login.png')
+                  await page.route('**/api/auth/me', (route) =>
+                    route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } }),
+                  );
+                else if (DOCUMENT_STATE_CAPTURES[filename]) {
+                  await mockDocumentCapture(
+                    page,
+                    user.permissions,
+                    DOCUMENT_STATE_CAPTURES[filename],
+                    (user as SessionUser & { accesses?: { department?: string }[] }).accesses?.[0]
+                      ?.department,
+                  );
+                  await page.route('**/api/auth/me', (route) => route.fulfill({ json: { user } }));
+                } else
+                  await installDemo(
+                    page,
+                    captureFamily(filename, user.permissions),
+                    user,
+                    filename.startsWith('25-') ? 'Surtido' : 'Pendiente',
+                  );
               }
-            } else await captureRecipe(page, filename, root, user);
-          },
-          { timeout: captureTimeout },
+              await protect(page);
+              if (mode === 'dev' && filename === '01-login.png') {
+                // The public login illustration uses an isolated, unauthenticated context.
+                const anonymous = await context.browser()!.newContext({
+                  baseURL: (await readAccounts(process.env.FRONT_MANUAL_ACCOUNTS!)).baseUrl,
+                  viewport: { width: 1600, height: 1400 },
+                });
+                try {
+                  activePage = await anonymous.newPage();
+                  await captureRecipe(activePage, filename, root, user);
+                } finally {
+                  await anonymous.close();
+                }
+              } else await captureRecipe(page, filename, root, user);
+            },
+            { timeout: captureTimeout, cancel: () => activePage?.close() },
+          ),
         );
         expect(writes).toEqual([]);
         captures[filename] = { status: 'complete', sha256: await fileHash(destination) };
@@ -250,8 +252,14 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
           cause instanceof Error
             ? stripVTControlCharacters(cause.message).slice(0, 1400)
             : 'Revisar servicio, permisos, registro existente o selector de esta captura.';
-        captures[filename] = { status: 'pending', reason };
-        console.warn(`${progress}: pendiente. ${reason.split('\n')[0]}`);
+        const unavailable =
+          mode === 'dev' &&
+          Object.hasOwn(DOCUMENT_STATE_CAPTURES, filename) &&
+          cause instanceof ManualExampleUnavailable;
+        captures[filename] = { status: unavailable ? 'unavailable' : 'pending', reason };
+        console.warn(
+          `${progress}: ${unavailable ? 'ejemplo sin datos' : 'pendiente'}. ${reason.split('\n')[0]}`,
+        );
       } finally {
         await save('pending');
         await page?.close();
@@ -269,7 +277,11 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
       ).toHaveCount(0);
       await page.close();
     }
-    const pending = manifest.images.filter((filename) => captures[filename]?.status !== 'complete');
+    const pending = manifest.images.filter(
+      (filename) =>
+        captures[filename]?.status !== 'complete' &&
+        !isUnavailableExample(filename, captures[filename], mode),
+    );
     expect(writes).toEqual([]);
     if (mode === 'dev')
       expect(accessFingerprint(await realSession(context))).toBe(manifest.accessFingerprint);
@@ -277,5 +289,12 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
       throw new Error(
         `Capturas pendientes para ${account.id}: ${pending.join(', ')}. Revise ${path.relative(frontRoot, path.join(root, 'manifest.json'))} y reanude con --missing.`,
       );
+    await finalizeManualSources(manifest, captures);
     await save('ready');
+    const unavailable = manifest.images.filter((filename) =>
+      isUnavailableExample(filename, captures[filename], mode),
+    ).length;
+    console.log(
+      `[${account.id}] manual listo: ${manifest.images.length - unavailable} capturas y ${unavailable} ejemplos de estado no incluidos.`,
+    );
   });

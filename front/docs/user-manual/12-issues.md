@@ -49,12 +49,14 @@ El estado se calcula al operar; abrir o cerrar una pantalla no lo cambia.
 
 1. Pulse **Surtir detalle** y marque las partidas que entregará.
 2. Capture **Cantidad a surtir** sin superar el saldo pendiente.
-3. Revise **Cantidad de proyecto**, que expresa el total del detalle para el proyecto.
+3. Capture **Cantidad de proyecto**, que expresa el total del detalle para el proyecto.
 4. Pulse **Surtir** y compruebe cantidades, cumplimiento y existencia descontada.
 
 ![Preparación de una entrega de inventario.](images/24-issue-supply.png)
 
 El artículo debe tener costo máximo mayor que cero. Si falta, configúrelo en **Almacén**.
+La cantidad de proyecto se expresa en la unidad de conversión y sirve para comparar
+lo previsto con la cantidad convertida. El descuento de stock usa **Cantidad a surtir**.
 
 ## Devolver una entrega
 
@@ -69,7 +71,8 @@ cuando todos se cancelan, se cancela la salida. No hay otra acción de cancelaci
 No se devuelve mientras la salida siga en **Surtido parcial**.
 <!-- manual:end -->
 
-## Ejemplos por contexto
+Materiales, Consumibles y Mermas comparten los estados de la tabla anterior.
+Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibles.
 
 <!-- manual:any goods:issues-page-view -->
 ![Materiales con surtido parcial y saldo pendiente.](images/24a-issue-partial.png)

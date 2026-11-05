@@ -1,4 +1,5 @@
 import { mkdtemp, rm, writeFile, readFile, cp } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -17,7 +18,9 @@ import {
   prepareManual,
   loadManualPublication,
   recoverManualCaptures,
+  finalizeManualSources,
 } from '../../../scripts/manual/publication.mjs';
+import { DOCUMENT_STATE_CAPTURES } from '../../../scripts/manual/documentCaptures.mjs';
 import { isManualAccountPath } from '../../../scripts/manual/paths.mjs';
 import { APP_NAVIGATION_GROUPS } from '../../../src/app/navigation.js';
 
@@ -794,5 +797,89 @@ it('bloquea la exportación de un perfil incompleto y las rutas fuera de su dire
   );
   await expect(loadManualPublication(root, profile.id)).rejects.toThrow(
     'Fuente de manual inválida',
+  );
+});
+
+const publicationWithoutExamples = async (mode = 'dev') => {
+  const root = await manualRoot();
+  const manifest = await prepareManual(
+    root,
+    { id: 'lector', label: 'Lectura', mode },
+    {
+      id: 'lector',
+      permissions: ['goods:receipts-page-view'],
+      accesses: [],
+    },
+  );
+  const bytes = await readFile(path.resolve('docs/user-manual/images/01-login.png'));
+  const captures: Record<string, { status: string; reason?: string; sha256?: string }> = {};
+  for (const image of manifest.images) {
+    if (Object.hasOwn(DOCUMENT_STATE_CAPTURES, image))
+      captures[image] = {
+        status: 'unavailable',
+        reason: 'No existe un documento con este estado.',
+      };
+    else {
+      await writeFile(path.join(manifest.root, 'images', image), bytes);
+      captures[image] = {
+        status: 'complete',
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+      };
+    }
+  }
+  await finalizeManualSources(manifest, captures);
+  await writeFile(
+    path.join(manifest.root, 'manifest.json'),
+    JSON.stringify({ ...manifest, revision: 'vigente', status: 'ready', captures }),
+  );
+  return { root, manifest, captures };
+};
+
+it('publica las acciones y la tabla de estados aunque falten ejemplos históricos condicionales', async () => {
+  const { root, manifest } = await publicationWithoutExamples();
+  const content = await readFile(path.join(manifest.root, 'sources/11-purchases.md'), 'utf8');
+  expect(content).toContain('Partidas activas y canceladas');
+  expect(content).toContain('images/20-purchase-view.png');
+  expect(content).not.toContain('images/20a-purchase-mixed.png');
+  expect(await loadManualPublication(root, 'lector')).toHaveLength(manifest.sources.length);
+});
+
+it('conserva los ejemplos sin datos al reanudar y no repite su búsqueda hasta --fresh', async () => {
+  const { manifest, captures } = await publicationWithoutExamples();
+  const progress = recoverManualCaptures(
+    { ...manifest, captures, revision: 'vigente' },
+    'vigente',
+    manifest.images,
+  );
+  expect(progress['20a-purchase-mixed.png']).toEqual(captures['20a-purchase-mixed.png']);
+  expect(
+    recoverManualCaptures(
+      { ...manifest, captures, revision: 'anterior' },
+      'nueva',
+      manifest.images,
+    ),
+  ).toEqual({});
+});
+
+it('rechaza una referencia de imagen omitida que todavía está en las fuentes publicables', async () => {
+  const { root, manifest } = await publicationWithoutExamples();
+  await writeFile(
+    path.join(manifest.root, 'sources/11-purchases.md'),
+    '![Ejemplo](../images/20a-purchase-mixed.png)\n',
+  );
+  await expect(loadManualPublication(root, 'lector')).rejects.toThrow('referencia sin captura');
+});
+
+it('mantiene obligatorias las capturas de acciones y los ejemplos del modo demo', async () => {
+  const { root, manifest, captures } = await publicationWithoutExamples();
+  captures['20-purchase-view.png'] = { status: 'unavailable', reason: 'No hay compra.' };
+  await writeFile(
+    path.join(manifest.root, 'manifest.json'),
+    JSON.stringify({ ...manifest, status: 'ready', captures }),
+  );
+  await expect(loadManualPublication(root, 'lector')).rejects.toThrow('debe volver a verificarse');
+  const demo = await publicationWithoutExamples('demo');
+  await expect(loadManualPublication(demo.root, 'lector')).rejects.toThrow(
+    'debe volver a verificarse',
   );
 });

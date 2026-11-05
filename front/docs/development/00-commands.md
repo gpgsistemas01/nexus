@@ -105,6 +105,11 @@ las faltantes o pendientes. `--missing` conserva este comportamiento; no es
 necesario agregarlo. `--fresh` rehace el conjunto seleccionado.
 `docs:manual` es alias de `docs:manuals`.
 
+En `dev`, un ejemplo histórico sin datos se registra y no impide publicar el
+manual; las capturas de acciones siguen siendo obligatorias. `--fresh` vuelve a
+buscar esos ejemplos. Cambiar sólo el texto o las herramientas conserva las
+capturas verificadas; cambiar Vue o el acceso exige renovarlas.
+
 Las imágenes se generan y revisan por separado; los PNG nuevos y las ediciones
 por cuenta están ignorados por Git. `docs:check` comprueba las referencias del
 manual sin exigir los archivos generados. La exportación exige todas las imágenes

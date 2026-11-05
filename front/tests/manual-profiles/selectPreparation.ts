@@ -9,6 +9,7 @@ export const readManualJson = async (page: Page, url: string) => {
   const response = await page.evaluate(async (url) => {
     const result = await fetch(url, {
       credentials: 'same-origin',
+      signal: AbortSignal.timeout(15_000),
       headers: { Accept: 'application/json' },
     });
     return { ok: result.ok, status: result.status, body: await result.json().catch(() => null) };

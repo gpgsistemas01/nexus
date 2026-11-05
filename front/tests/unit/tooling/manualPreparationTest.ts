@@ -1,5 +1,9 @@
 import { expect, it, vi } from 'vitest';
-import { findWasteReference, lookupPages } from '../../../scripts/manual/preparation.mjs';
+import {
+  findWasteReference,
+  lookupPages,
+  findPreparedDocument,
+} from '../../../scripts/manual/preparation.mjs';
 
 type Query = { resource: string; supplierId: string; page: number };
 const supplier = (id: string) => ({ id, tradeName: `Proveedor ${id}`, isActive: true });
@@ -93,4 +97,36 @@ it('no confunde un error de consulta ni un contrato inválido con falta de datos
   await expect(findWasteReference(async () => ({ data: [], recordsFiltered: -1 }))).rejects.toThrow(
     'catálogo incompleto',
   );
+});
+
+it('limita las consultas simultáneas y espera el lote antes de devolver un documento', async () => {
+  let active = 0;
+  let maximum = 0;
+  const result = await findPreparedDocument([0, 1, 2, 3, 4, 5], async (id: number) => {
+    active++;
+    maximum = Math.max(maximum, active);
+    await Promise.resolve();
+    active--;
+    return id === 2 ? { id } : null;
+  });
+  expect(result).toEqual({ id: 2 });
+  expect(maximum).toBeLessThanOrEqual(4);
+  expect(active).toBe(0);
+});
+
+it('no deja consultas pendientes ni convierte una falla del servicio en falta de ejemplos', async () => {
+  let active = 0;
+  await expect(
+    findPreparedDocument([0, 1, 2, 3], async (id: number) => {
+      active++;
+      try {
+        if (id === 0) throw new Error('HTTP 503');
+        await Promise.resolve();
+        return null;
+      } finally {
+        active--;
+      }
+    }),
+  ).rejects.toThrow('HTTP 503');
+  expect(active).toBe(0);
 });
