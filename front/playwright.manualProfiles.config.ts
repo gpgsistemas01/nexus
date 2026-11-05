@@ -22,6 +22,8 @@ export default defineConfig({
         locale: 'es-MX',
         timezoneId: 'America/Mexico_City',
         headless: true,
+        actionTimeout: 15_000,
+        navigationTimeout: 30_000,
         trace: 'off',
         screenshot: 'off',
         video: 'off',

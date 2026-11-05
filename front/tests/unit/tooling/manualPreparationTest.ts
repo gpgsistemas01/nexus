@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-import { findWasteReference } from '../../../scripts/manual/preparation.mjs';
+import { findWasteReference, lookupPages } from '../../../scripts/manual/preparation.mjs';
 
 type Query = { resource: string; supplierId: string; page: number };
 const supplier = (id: string) => ({ id, tradeName: `Proveedor ${id}`, isActive: true });
@@ -43,12 +43,30 @@ it('recorre las páginas de proveedores y referencias y descarta medidas inváli
     supplier: supplier('ultimo'),
     material: roll,
   });
-  expect(lookup).toHaveBeenCalledWith({ resource: 'suppliers', supplierId: '', page: 2 });
+  expect(lookup).toHaveBeenCalledWith({
+    resource: 'suppliers',
+    supplierId: '',
+    page: 2,
+    start: 20,
+  });
   expect(lookup).toHaveBeenCalledWith({
     resource: 'wastes/material-templates',
     supplierId: 'ultimo',
     page: 2,
+    start: 20,
   });
+});
+
+it('no omite documentos cuando la API devuelve páginas menores que el tamaño solicitado', async () => {
+  const starts: number[] = [];
+  const rows = [];
+  for await (const data of lookupPages(async ({ start }: { start: number }) => {
+    starts.push(start);
+    return { data: [{ id: start + 1 }], recordsFiltered: 3 };
+  }, 'documents'))
+    rows.push(...data);
+  expect(rows).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
+  expect(starts).toEqual([0, 1, 2]);
 });
 
 it('informa el dato faltante si no hay ROLLO y no toma un proveedor inactivo', async () => {

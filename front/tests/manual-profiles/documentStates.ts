@@ -65,7 +65,7 @@ export const mockDocumentCapture = (
 export const openDocumentCapture = async (page: Page, capture: DocumentCapture) => {
   const route = `/${capture.family === 'purchases' ? 'compras' : 'salidas'}/${capture.resource}`;
   await page.goto(route);
-  await expect(page.locator('main h1')).toBeVisible();
+  await expect(page.locator('main h1')).toBeVisible({ timeout: 30_000 });
   const resource =
     capture.resource === 'materiales'
       ? 'materials'
@@ -85,11 +85,8 @@ export const openDocumentCapture = async (page: Page, capture: DocumentCapture) 
           : 'Confirmada';
   let reference = '';
   for await (const rows of lookupPages(
-    ({ page: number }: { page: number }) =>
-      readManualJson(
-        page,
-        `${endpoint}?start=${(number - 1) * MANUAL_LOOKUP_PAGE_SIZE}&length=${MANUAL_LOOKUP_PAGE_SIZE}`,
-      ),
+    ({ start }: { start: number }) =>
+      readManualJson(page, `${endpoint}?start=${start}&length=${MANUAL_LOOKUP_PAGE_SIZE}`),
     endpoint,
   )) {
     for (const row of rows) {
@@ -118,19 +115,39 @@ export const openDocumentCapture = async (page: Page, capture: DocumentCapture) 
     }
     if (reference) break;
   }
-  if (!reference)
+  if (!reference) {
+    const description =
+      capture.state === 'mixed'
+        ? 'una compra Confirmada con al menos una partida activa y otra cancelada'
+        : capture.state === 'returned'
+          ? 'una salida Surtida con un detalle parcialmente devuelto'
+          : `un documento con estado ${state} y detalles existentes`;
     throw new Error(
-      `Preparación pendiente: se requiere ${capture.resource} con estado ${state} y detalles de ${capture.state}.`,
+      `Preparación pendiente en ${capture.resource}: se requiere ${description}. Se revisaron las páginas disponibles; no se crean registros para la captura.`,
     );
+  }
   if (capture.family === 'issues') {
     await page.getByRole('combobox', { name: 'Estado de surtido', exact: true }).click();
     await page.getByRole('option', { name: state, exact: true }).click();
   }
   await page.getByRole('textbox', { name: /Buscar por Folio/ }).fill(reference);
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await Promise.all([
+    page.waitForResponse((response) => {
+      const url = new URL(response.url());
+      return (
+        response.request().method() === 'GET' &&
+        url.pathname === endpoint &&
+        url.searchParams.get('search') === reference
+      );
+    }),
+    page.getByRole('button', { name: 'Buscar', exact: true }).click(),
+  ]);
   await expect(page.locator('.v-data-table__progress .v-progress-linear')).toHaveCount(0);
   const action = capture.family === 'purchases' ? 'Ver compra' : 'Consultar salida';
-  await page.getByRole('button', { name: action, exact: true }).first().click();
+  const row = page
+    .getByRole('row')
+    .filter({ has: page.getByRole('cell', { name: reference, exact: true }) });
+  await row.getByRole('button', { name: action, exact: true }).click();
   await expect(page.getByRole('dialog', { name: /^Cargando (compra|salida)/ })).toHaveCount(0, {
     timeout: 60_000,
   });

@@ -146,6 +146,8 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
     }
     const manifest = await prepareManual(frontRoot, profile, user);
+    const captureTimeout = 90_000;
+    test.setTimeout(60_000 + manifest.images.length * (captureTimeout + 10_000));
     const revision = createHash('sha256')
       .update(
         JSON.stringify([
@@ -196,43 +198,50 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
           if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
         }
       }
-      const page = await context.newPage();
+      let page: Page | undefined;
       try {
-        if (mode === 'demo') {
-          if (filename === '01-login.png')
-            await page.route('**/api/auth/me', (route) =>
-              route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } }),
-            );
-          else if (DOCUMENT_STATE_CAPTURES[filename]) {
-            await mockDocumentCapture(
-              page,
-              user.permissions,
-              DOCUMENT_STATE_CAPTURES[filename],
-              (user as SessionUser & { accesses?: { department?: string }[] }).accesses?.[0]
-                ?.department,
-            );
-            await page.route('**/api/auth/me', (route) => route.fulfill({ json: { user } }));
-          } else
-            await installDemo(
-              page,
-              captureFamily(filename, user.permissions),
-              user,
-              filename.startsWith('25-') ? 'Surtido' : 'Pendiente',
-            );
-        }
-        await protect(page);
-        if (mode === 'dev' && filename === '01-login.png') {
-          // The public login illustration uses an isolated, unauthenticated context.
-          const anonymous = await context.browser()!.newContext({
-            baseURL: (await readAccounts(process.env.FRONT_MANUAL_ACCOUNTS!)).baseUrl,
-            viewport: { width: 1600, height: 1400 },
-          });
-          try {
-            await captureRecipe(await anonymous.newPage(), filename, root, user);
-          } finally {
-            await anonymous.close();
-          }
-        } else await captureRecipe(page, filename, root, user);
+        await test.step(
+          filename,
+          async () => {
+            page = await context.newPage();
+            if (mode === 'demo') {
+              if (filename === '01-login.png')
+                await page.route('**/api/auth/me', (route) =>
+                  route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } }),
+                );
+              else if (DOCUMENT_STATE_CAPTURES[filename]) {
+                await mockDocumentCapture(
+                  page,
+                  user.permissions,
+                  DOCUMENT_STATE_CAPTURES[filename],
+                  (user as SessionUser & { accesses?: { department?: string }[] }).accesses?.[0]
+                    ?.department,
+                );
+                await page.route('**/api/auth/me', (route) => route.fulfill({ json: { user } }));
+              } else
+                await installDemo(
+                  page,
+                  captureFamily(filename, user.permissions),
+                  user,
+                  filename.startsWith('25-') ? 'Surtido' : 'Pendiente',
+                );
+            }
+            await protect(page);
+            if (mode === 'dev' && filename === '01-login.png') {
+              // The public login illustration uses an isolated, unauthenticated context.
+              const anonymous = await context.browser()!.newContext({
+                baseURL: (await readAccounts(process.env.FRONT_MANUAL_ACCOUNTS!)).baseUrl,
+                viewport: { width: 1600, height: 1400 },
+              });
+              try {
+                await captureRecipe(await anonymous.newPage(), filename, root, user);
+              } finally {
+                await anonymous.close();
+              }
+            } else await captureRecipe(page, filename, root, user);
+          },
+          { timeout: captureTimeout },
+        );
         expect(writes).toEqual([]);
         captures[filename] = { status: 'complete', sha256: await fileHash(destination) };
         console.log(`${progress}: capturada`);
@@ -244,9 +253,9 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
         captures[filename] = { status: 'pending', reason };
         console.warn(`${progress}: pendiente. ${reason.split('\n')[0]}`);
       } finally {
-        await page.close();
+        await save('pending');
+        await page?.close();
       }
-      await save('pending');
     }
     // A supplied record demonstrates that hidden return controls are permission based.
     if (mode === 'demo' && !user.permissions.includes(P.GOODS_ISSUE_DETAILS_MANAGE)) {

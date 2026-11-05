@@ -31,17 +31,18 @@ export const selectWasteReference = async (page: Page, dialog: Locator) => {
       async ({
         resource,
         supplierId,
-        page: number,
+        start,
       }: {
         resource: string;
         supplierId: string;
-        page: number;
+        start: number;
       }) => {
         const params = inventoryParams({
           supplierId,
-          page: number,
+          page: 1,
           length: MANUAL_LOOKUP_PAGE_SIZE,
         });
+        params.set('start', String(start));
         if (resource === 'suppliers') params.set('onlyActive', 'true');
 
         return readManualJson(page, `/api/warehouse/${resource}?${params}`);

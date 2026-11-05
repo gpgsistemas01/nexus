@@ -106,6 +106,13 @@ captura pendiente, reintentos e identidad/versiones. `purchaseTest.ts` e
 consulta. Los recorridos de navegador existentes comprueban los consumidores
 reales de `RemoteSelect`, incluidos filtros y altas contextuales con API simulada.
 
+## Preparación y recuperación de capturas del manual
+
+| ID de diseño | Riesgo y técnica | Condición observable | Fuentes |
+| --- | --- | --- | --- |
+| `DP-VUE-MAN-001` | Omitir registros posteriores o capturar una fila anterior; particiones por estado y fronteras de paginación. | Una página corta avanza por filas recibidas. Compras mixtas/canceladas y salidas parciales/con devolución se encuentran después de veinte registros; la búsqueda diferida abre el ID del folio elegido. | `manualPreparationTest.ts` y `manualCapture.spec.ts`. |
+| `DP-VUE-MAN-002` | Bloquearse con el primer detalle surtido o sin saldo; transiciones consulta → página posterior → selección. | Surtido y devolución recorren documentos y detalles hasta encontrar una opción disponible. La cantidad de muestra respeta un pendiente menor que uno; no se envían escrituras. Cada imagen tiene límite propio y conserva el estado de recuperación. | `manualCapture.spec.ts`, `profileManuals.spec.ts` y `manualProfilesTest.ts`. |
+
 ## Referencia de contratos TypeScript
 
 | Riesgo | Nivel y técnica | Condición y fuente ejecutable |

@@ -5,8 +5,9 @@ export const MANUAL_LOOKUP_PAGE_SIZE = 20;
 const validMeasure = (value) => Number.isFinite(Number(value)) && Number(value) > 0;
 
 export const lookupPages = async function* (lookup, resource, supplierId = '') {
+    let start = 0;
     for (let page = 1; page <= PAGE_LIMIT; page++) {
-        const result = await lookup({ resource, supplierId, page });
+        const result = await lookup({ resource, supplierId, page, start });
         if (
             !Array.isArray(result?.data) ||
             !Number.isSafeInteger(result.recordsFiltered) ||
@@ -15,7 +16,8 @@ export const lookupPages = async function* (lookup, resource, supplierId = '') {
             throw new Error('La preparación recibió un catálogo incompleto.');
 
         yield result.data;
-        if (!result.data.length || page * MANUAL_LOOKUP_PAGE_SIZE >= result.recordsFiltered) return;
+        start += result.data.length;
+        if (!result.data.length || start >= result.recordsFiltered) return;
     }
     throw new Error('La preparación excedió el límite de páginas del catálogo.');
 };

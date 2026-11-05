@@ -22,32 +22,37 @@ export const captureFamily = (image: string, permissions: readonly string[]): Ca
   return permissions.includes(P.MOVEMENTS_READ) ? 'movements' : 'purchases';
 };
 
-const openAction = async (page: Page, name: string) => {
+const findInTablePages = async (page: Page, target: Locator, description: string) => {
+  const dialog = page.getByRole('dialog').last();
+  const scope = (await dialog.count()) ? dialog : page;
   for (let pageNumber = 0; pageNumber < 100; pageNumber++) {
-    const action = page.getByRole('button', { name, exact: true }).first();
-    if (await action.count()) {
-      await action.click();
-      await expect(page.getByRole('dialog', { name: /^Cargando (compra|salida)/ })).toHaveCount(0, {
-        timeout: 60_000,
-      });
-      if (
-        await page
-          .getByRole('dialog', { name: 'No se pudo completar la consulta', exact: true })
-          .count()
-      )
-        throw new Error(
-          `No se pudo preparar «${name}»: la consulta falló. Revise el servicio antes de volver a capturar.`,
-        );
-      return;
-    }
-    const next = page.getByRole('button', { name: 'Siguiente', exact: true }).first();
+    if (await target.count()) return target;
+    const next = scope.getByRole('button', { name: /^(Siguiente|Next page)$/ }).first();
     if (!(await next.count()) || !(await next.isEnabled())) break;
     await next.click();
     await expect(page.locator('.v-data-table__progress .v-progress-linear')).toHaveCount(0);
   }
-  throw new Error(
-    `Preparación pendiente: se necesita un registro existente con la acción «${name}».`,
+  throw new Error(`Preparación pendiente: se necesita ${description} en las páginas disponibles.`);
+};
+
+const openAction = async (page: Page, name: string) => {
+  const action = await findInTablePages(
+    page,
+    page.getByRole('button', { name, exact: true }).and(page.locator(':enabled:visible')).first(),
+    `un registro existente con la acción «${name}»`,
   );
+  await action.click();
+  await expect(page.getByRole('dialog', { name: /^Cargando (compra|salida)/ })).toHaveCount(0, {
+    timeout: 60_000,
+  });
+  if (
+    await page
+      .getByRole('dialog', { name: 'No se pudo completar la consulta', exact: true })
+      .count()
+  )
+    throw new Error(
+      `No se pudo preparar «${name}»: la consulta falló. Revise el servicio antes de volver a capturar.`,
+    );
 };
 
 const chooseFirst = async (page: Page, scope: Locator, label: string, matching?: RegExp) => {
@@ -65,7 +70,7 @@ const chooseFirst = async (page: Page, scope: Locator, label: string, matching?:
 
 const go = async (page: Page, route: string) => {
   await page.goto(route);
-  await expect(page.locator('main h1')).toBeVisible();
+  await expect(page.locator('main h1')).toBeVisible({ timeout: 30_000 });
   await expect(
     page.getByRole('heading', { name: /Acceso no permitido|Sesión no disponible/ }),
   ).toHaveCount(0);
@@ -229,30 +234,26 @@ export const captureRecipe = async (
       await dialog.getByRole('button', { name: 'Agregar', exact: true }).click();
     } else if (number === 24) {
       await openAction(page, 'Surtir detalle');
-      await page
-        .getByRole('checkbox', { name: /^Surtir:/ })
-        .first()
-        .check();
-      await page
-        .getByRole('spinbutton', { name: /^Cantidad a surtir:/ })
-        .first()
-        .fill('1');
-      await page
-        .getByRole('spinbutton', { name: /^Cantidad de proyecto:/ })
-        .first()
-        .fill('1');
-      await page
-        .getByRole('checkbox', { name: /^Surtir:/ })
-        .first()
-        .scrollIntoViewIfNeeded();
+      const row = await findInTablePages(
+        page,
+        page
+          .getByRole('row')
+          .filter({
+            has: page.getByRole('checkbox', { name: /^Surtir:/ }).and(page.locator(':enabled')),
+          })
+          .first(),
+        'un detalle pendiente de surtir',
+      );
+      const checkbox = row.getByRole('checkbox', { name: /^Surtir:/ });
+      await checkbox.check();
+      const quantity = row.getByRole('spinbutton', { name: /^Cantidad a surtir:/ });
+      const pending = Number(await quantity.getAttribute('max'));
+      await quantity.fill(String(Math.min(1, pending)));
+      await row.getByRole('spinbutton', { name: /^Cantidad de proyecto:/ }).fill('1');
+      await checkbox.scrollIntoViewIfNeeded();
     } else if (number === 25) {
       await openAction(page, 'Devolver material surtido');
-      await page
-        .getByRole('dialog')
-        .last()
-        .getByRole('button', { name: 'Devolver detalle de salida', exact: true })
-        .first()
-        .click();
+      await openAction(page, 'Devolver detalle de salida');
     }
   } else {
     await go(

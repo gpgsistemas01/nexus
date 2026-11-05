@@ -187,6 +187,10 @@ Las cuentas se procesan una por una, en el orden del JSON. Sus capturas siguen
 el orden de archivo: `09`, `09a`, `09b`, `10`. La consola muestra cuenta, número,
 archivo y resultado; un fallo queda pendiente con su motivo en el manifest.
 
+Cada captura dispone de hasta 90 segundos; el presupuesto de la cuenta crece
+con su número de imágenes. Un fallo guarda el motivo y permite continuar con las
+siguientes. Las acciones esperan hasta 15 segundos y la navegación hasta 30.
+
 Si no hay cuentas con credenciales completas, termina sin abrir el navegador ni
 exportar documentos. Las cuentas omitidas conservan sus archivos anteriores;
 esta ejecución no actualiza sus capturas ni sus manuales.
@@ -260,6 +264,9 @@ indica y vuelve a capturar las imágenes desactualizadas.
 | Cuenta distinta del perfil | Revisar `expectedAccess`, área/rol real y referencia de credenciales. |
 | Directiva de manual inválida | Corregir el capítulo y la línea indicados en `docs/user-manual`. Se admiten saltos de línea LF y CRLF; no es necesario cambiar las credenciales. |
 | Tabla vacía | Puede servir para consulta. Para editar, preparar un registro existente. |
+| El documento no aparece primero | La preparación recorre las páginas y abre el folio encontrado después de recibir la búsqueda. También busca detalles disponibles en páginas posteriores para surtir o devolver. |
+| Compra mixta pendiente | Se necesita una misma compra Confirmada con una partida activa y otra cancelada. Tener compras Confirmadas y Canceladas por separado no demuestra este caso. |
+| `Test timeout of 180000ms` y navegador cerrado | Actualizar el recorrido: el límite ahora se calcula por cuenta y cada imagen tiene su propio tiempo. Repetir el comando para recuperar las pendientes. |
 | Falta una opción | Revisar dependencias, registros activos y permisos. Para pesos se necesita un material de referencia ROLLO. |
 | Falta devolución | Comprobar permiso de Almacén y salida surtida existente; no se surte automáticamente. |
 | Falla un selector o recorrido | Revisar imagen y motivo en `manifest.json`, corregir y reanudar. |
