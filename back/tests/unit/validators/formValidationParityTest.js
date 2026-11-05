@@ -128,8 +128,8 @@ describe('captura coherente entre navegador y servidor (DP-VAL-004)', () => {
         }
     );
 
-    it.each([[0, true], ['0.000001', true], ['12.123456', true], ['1.1234567', false], [false, false]])(
-        'el costo máximo %j conserva su precisión monetaria y permite cero: válido=%s', async (value, valid) => agrees({
+    it.each([[0, false], ['0.000001', true], ['12.123456', true], ['1.1234567', false], [false, false]])(
+        'el costo máximo %j conserva su precisión y exige positivo al editar: válido=%s', async (value, valid) => agrees({
             rules: wasteEditValidation, validator: front.wasteEditValidation.maxUnitCost,
             field: 'maxUnitCost', value, valid, data: { name: 'Recorte', isActive: true, expectedVersion: 0 }
         })

@@ -40,7 +40,10 @@ const { search, clearSearch } = searchForm;
 const filterError = ref('');
 const report = useReportScope({
     canExport: () => canExport.value,
-    filename: `reporte_movimientos_${props.resource}.xlsx`,
+    filename:
+        props.resource === 'materials'
+            ? 'reporte_movimientos'
+            : `reporte_movimientos_${props.resource === 'consumables' ? 'consumibles' : 'merma'}`,
     request: (scope, signal) => movementService.export(props.resource, { ...query }, scope, signal),
     onDenied,
 });

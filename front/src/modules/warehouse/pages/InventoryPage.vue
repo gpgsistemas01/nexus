@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { PERMISSIONS } from '@nexus/permissions';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
 import InventoryTable from '../components/InventoryTable.vue';
 import InventoryFilters from '../components/InventoryFilters.vue';
-import InventoryReportToolbar from '../components/InventoryReportToolbar.vue';
+import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue';
 import InventoryEditorPage from './InventoryEditorPage.vue';
 import { useAuthSession } from '../../auth/session.js';
 import { useListSearch } from '../../../shared/composables/useListSearch.js';
@@ -33,10 +33,11 @@ const {
     isExporting,
     error,
     exportError,
+    isReportOpen,
+    reportValues,
     editor,
 } = inventory;
 const { search, applySearch, clearSearch } = useListSearch(inventory);
-const reportScope = ref('activeOrStock');
 
 const clearFilters = () => {
     inventory.suppliers.updateSearch('');
@@ -86,6 +87,14 @@ onMounted(() => {
     >
         <template #actions>
             <VBtn
+                v-if="permissions.canRead && permissions.canExport"
+                variant="outlined"
+                :loading="isExporting"
+                @click="inventory.openReport()"
+            >
+                Exportar Excel
+            </VBtn>
+            <VBtn
                 v-if="permissions.canWrite"
                 color="primary"
                 variant="flat"
@@ -100,16 +109,6 @@ onMounted(() => {
                           : 'Nuevo material'
                 }}
             </VBtn>
-        </template>
-        <template #messages>
-            <InventoryReportToolbar
-                v-if="permissions.canRead && permissions.canExport"
-                v-model:scope="reportScope"
-                :has-supplier-filter="!!query.supplierId"
-                :is-exporting="isExporting"
-                :error="exportError"
-                @export="inventory.exportReport(reportScope)"
-            />
         </template>
         <InventoryTable
             v-if="permissions.canRead"
@@ -131,6 +130,19 @@ onMounted(() => {
             existencias.
         </VAlert>
     </RecordListPanel>
+    <ReportScopeDialog
+        v-if="isReportOpen"
+        kind="inventory"
+        :values="reportValues"
+        :is-submitting="isExporting"
+        :error="exportError"
+        :note="
+            query.supplierId ? 'El Excel incluye todos los proveedores del tipo seleccionado.' : ''
+        "
+        @inventory="inventory.setInventoryScope"
+        @submit="inventory.exportReport"
+        @close="isReportOpen = false"
+    />
     <InventoryEditorPage
         v-if="editor"
         :key="`${editor.action}:${editor.row?.id ?? 'new'}`"

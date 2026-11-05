@@ -5,6 +5,7 @@ import {
     GoodsIssueUpdateDatabaseError
 } from '../../../errors/warehouse/goodsIssueError.js';
 import { getDb } from '../../../repository/baseRepository.js';
+import { GoodsIssueMissingMaxUnitCost } from '../../../errors/inventory/stockError.js';
 import { lockGoodsIssue } from '../../../repository/warehouse/documentLockRepository.js';
 import { updateGoodsIssueDetails as persistGoodsIssueDetails } from '../../../repository/warehouse/issueDetailRepository.js';
 import { createServiceLogger } from '../../../utils/logger.js';
@@ -34,6 +35,8 @@ const supplyGoodsIssue = async ({ id, goodsIssueDto, type }) => getDb().$transac
                     id: true,
                     materialId: true,
                     supplierId: true,
+                    materialName: true,
+                    maxUnitCost: true,
                     quantity: true,
                     convertedQuantity: true,
                     suppliedQuantity: true,
@@ -69,6 +72,9 @@ const supplyGoodsIssue = async ({ id, goodsIssueDto, type }) => getDb().$transac
 
         const { data, quantityToSupply } = change;
         if (quantityToSupply > 0) {
+            if (!(Number(current.maxUnitCost) > 0)) {
+                throw new GoodsIssueMissingMaxUnitCost({ materialName: current.materialName });
+            }
             data.fulfillmentStatusId = statusIds.get(resolveGoodsIssueDetailFulfillmentStatusName({ ...current, ...data }));
             movements.push({
                 materialId: current.materialId,

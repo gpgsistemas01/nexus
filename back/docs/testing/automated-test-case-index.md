@@ -84,7 +84,32 @@ Decisiones relevantes de `DP-MER-003` (todas parten de `WASTE_ALREADY_EXISTS`):
 | Editar | Sí | Presente | No se solicita | Propagar conflicto sin convertir edición en entrada. |
 | Crear | Sí | Ausente | No se solicita | Propagar conflicto sin abrir modal ni escribir. |
 
+## Costos de almacén y selección de capturas
+
+| ID de diseño | Requisito / riesgo | Nivel y técnica | Condición y resultado esperado | Evidencia |
+| --- | --- | --- | --- | --- |
+| `DP-COS-001` | Control del costo máximo desde almacén; salidas sin costo o con costo manipulado. | Unitario e integración; particiones ausente/cero/positivo y frontera 0.000001; decisiones alta/edición/surtido. | El alta admite cero; edición exige positivo; las salidas leen costo confiable y rechazan antes de efectos parciales, incluido surtido histórico. | `goodsIssueHelpersTest.js`, `wasteIssueHelpersTest.js`, validadores de material/merma, `CP-INT-COS-001`. |
+| `DP-COS-002` | Una compra, corrección o cancelación sobrescribe costos administrados o destruye sus importes históricos. | Integración; transiciones alta → agregar → corregir → cancelar. | Costo máximo positivo o nulo permanece igual; totales parciales sólo activos; cancelación total conserva historia sin resumar compras para costear inventario. | `CP-INT-COS-002`. |
+| `DP-CAP-001` | Repetición de PNG posteriores a un hueco o selección de una situación documental incorrecta. | Unitario y revisión de navegador; particiones primera ejecución/parcial/completa, por área y por estado de detalle. | Primer uso selecciona todo; los demás sólo ausentes en ambas áreas; compras mixtas y retornos parciales cumplen las condiciones de sus imágenes. | `manualScreenshotRecoveryTest.js`, `manualScreenshotInventoryTest.js` y capturas nuevas por área. |
+
+| ID de caso | Estado y datos | Acción | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- |
+| `CP-INT-COS-001` | Material/consumible/merma con costo nulo o cero; cliente intenta imponer 999; documento histórico con detalle sin costo y otro válido. | Alta HTTP y surtido en `goodsIssueControllerDbTest.js`, `wasteIssueControllerDbTest.js`, `warehouseConcurrencyControllerDbTest.js`. | `409` con código de costo faltante; no hay nuevos documentos, movimientos, descuentos ni surtidos parciales. | Fixtures de cada suite en base aislada. |
+| `CP-INT-COS-002` | Oferta con costo 10 o nulo y compra con costo 100; nueva partida de costo 100; correcciones a 20/30 y cancelación de la última partida de 20. | Compras por contexto y corrección/cancelación en `goodsReceiptContextDbTest.js` y `warehouseConcurrencyControllerDbTest.js`. | Costo de oferta permanece; nueva partida aporta 200; totales activos 220; cancelación completa conserva 20 históricos y revierte stock una sola vez. | Fixtures de cada suite en base aislada. |
+
+| ID de diseño | Requisito / riesgo | Nivel y técnica | Condición y resultado esperado | Evidencia |
+| --- | --- | --- | --- | --- |
+| `DP-EST-001` | Edición HTTP de una salida cancelada pese al modo consulta del formulario. | Unitario e integración; decisiones por cancelación de documento/surtido y transición de estados. | Encabezados cancelados devuelven 409 sin cambios; Pendiente, Surtido parcial y Surtido siguen admitiendo edición de encabezado. | `issueFulfillmentRulesTest.js`, `CP-INT-EST-001`. |
+
+| ID de caso | Estado y datos | Acción | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- |
+| `CP-INT-EST-001` | Salida de material o merma cancelada, saldo 20 y captura de encabezado NO-EDITAR con estados manipulados. | PATCH directo al encabezado en `warehouseConcurrencyControllerDbTest.js`. | `409 ISSUE_CANCELED_CONFLICT`; documento y detalles idénticos al snapshot, stock 20 y ningún movimiento nuevo. | Fixtures en base aislada. |
+
 ## Casos unitarios seleccionados
+
+| ID de diseño | Requisito / riesgo | Nivel y técnica | Condición y resultado esperado | Evidencia |
+| --- | --- | --- | --- | --- |
+| `DP-EXP-002` | Diferencias entre constructores Excel de las áreas. | Unitario e integración; particiones por contexto, sin filas, accesos múltiples y saldo cero. | Filas asíncronas, encabezados, fórmulas, tipos y nombre común `reporte_<recurso>_MM_AAAA.xlsx` conservados. | `adminReportExcelTest.js`, `salesReportExcelTest.js`, `reportControllerTest.js`, `inventoryReportControllerDbTest.js`, `movementContextDbTest.js`. |
 
 Las variaciones de la matriz de acceso se agrupan porque prueban la misma política con
 roles, áreas y operaciones distintas. El mismo criterio se usa para fronteras y

@@ -1,4 +1,4 @@
-import { useFileExport } from '../../../shared/composables/useFileExport.js';
+import { useReportScope } from '../../../shared/composables/useReportScope.js';
 import { inventoryReportService } from '../services/inventoryReportService.js';
 import type { InventoryQuery, InventoryResource } from '../inventory.js';
 
@@ -8,11 +8,20 @@ export const useInventoryReport = (options: {
     canExport: boolean;
     onUnauthorized: () => void;
 }) =>
-    useFileExport<string>({
+    useReportScope({
+        kind: 'inventory',
         canExport: () => options.canExport,
-        filename: `inventario_${options.resource}.xlsx`,
+        filename:
+            options.resource === 'wastes'
+                ? 'reporte_mermas'
+                : `reporte_inventario_${options.resource === 'consumables' ? 'consumibles' : 'materiales'}`,
         request: (scope, signal) =>
-            inventoryReportService.export(options.resource, { ...options.query }, scope, signal),
+            inventoryReportService.export(
+                options.resource,
+                { ...options.query },
+                scope.inventoryScope ?? 'activeOrStock',
+                signal,
+            ),
         onDenied: (status) => {
             if (status === 401) options.onUnauthorized();
         },

@@ -1,9 +1,5 @@
 # 16. Glosario para trabajar en Nexus
 
-## Cómo consultar este glosario
-
-Busque el término que necesita entender. Los procedimientos están en cada capítulo.
-
 ## Navegación y captura
 
 | Término | Qué significa para su trabajo |
@@ -19,7 +15,7 @@ Busque el término que necesita entender. Los procedimientos están en cada cap�
 
 | Término | Qué significa para su trabajo |
 | --- | --- |
-| Persona | Individuo registrado, por ejemplo un solicitante. Su registro no crea una cuenta de ingreso. |
+| Persona | Individuo registrado; no implica una cuenta de ingreso. |
 | Usuario o cuenta | Acceso personal con nombre de usuario y contraseña. |
 | Área | Departamento de una asignación o solicitud, como Impresión o Router. |
 | Rol | Función de la cuenta, como Auxiliar, Coordinador, Operador o Instalador. |
@@ -41,12 +37,12 @@ administra en Usuarios.
 | --- | --- |
 | Material | Artículo identificado por proveedor, presentación y medidas. |
 | Consumible | Artículo con presentación y unidad, sin dimensiones. |
-| Merma | Recurso residual o reutilizable con medidas y existencias propias. Puede seguir siendo útil. |
-| Proveedor | Organización que suministra el artículo. Cada proveedor puede tener existencias distintas del mismo material. |
+| Merma | Sobrante reutilizable con medidas y existencias propias. |
+| Proveedor | Suministra artículos; sus existencias se controlan por separado. |
 | Presentación | Forma comercial o física del artículo, por ejemplo un rollo. |
 | Unidad de medida | Unidad de una cantidad, por ejemplo metros cuadrados. |
 | Base y Altura | Medidas físicas del artículo o merma. No indican cuántas unidades hay disponibles. |
-| Cantidad convertida | Cantidad expresada en la unidad de control del artículo; por ejemplo, metros cuadrados obtenidos de rollos. |
+| Cantidad convertida | Cantidad en la unidad de control; por ejemplo, m² de un rollo. |
 | Existencia o Stock actual | Cantidad disponible del artículo y proveedor consultados. |
 | Stock mínimo | Referencia para identificar existencias bajas. Cambiarla conserva el saldo. |
 | Activo / Inactivo | Disponibilidad para nuevas operaciones. Desactivar conserva historia y stock. |
@@ -72,7 +68,7 @@ Compruebe el conteo y el motivo.
 
 | Término | Qué debe distinguir |
 | --- | --- |
-| Costo máximo unitario / Costo Máximo | Referencia del mayor costo por unidad convertida conservado para el registro. No es el importe total de una compra. |
+| Costo máximo unitario / Costo Máximo | Referencia por unidad configurada en Almacén; no es el total de una compra. |
 <!-- manual:end -->
 <!-- manual:end -->
 
@@ -116,14 +112,14 @@ Para capturar o corregir una recepción, siga [Compras](11-purchases.md).
 | Cantidad suministrada o surtida | Cantidad entregada y registrada por Almacén. |
 | Cantidad pendiente de surtir | Cantidad solicitada que todavía no se ha entregado. Una devolución no vuelve a abrir el detalle como pendiente. |
 | Devolución / Cantidad devuelta | Reingreso de artículos entregados. Almacén registra la devolución; la consulta muestra cuánto regresó. |
-| Estado de cumplimiento | **Pendiente**, **Surtido parcial**, **Surtido** o **Cancelado**. El surtido parcial deja otros detalles pendientes; es distinto de Activo/Inactivo. |
+| Estado de cumplimiento | Pendiente, Surtido parcial, Surtido o Cancelado; es distinto de Activo/Inactivo. |
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ### Referencias para surtir o devolver
 
 | Término | Qué debe distinguir |
 | --- | --- |
-| Surtir | Registrar la entrega completa de los detalles seleccionados y descontar sus existencias. |
+| Surtir | Registrar una entrega parcial o completa y descontar existencias. |
 | Cantidad a surtir | Lo que entregará ahora, en la presentación del artículo. No debe superar el saldo pendiente mostrado. |
 | Cantidad de proyecto | Referencia capturada al surtir para comparar el consumo previsto con la cantidad convertida. No sustituye la cantidad que se descuenta del inventario. |
 | Saldo entregado | Cantidad suministrada menos devoluciones anteriores. Es el máximo que aún puede devolver, no el stock de Almacén. |

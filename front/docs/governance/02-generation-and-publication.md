@@ -44,7 +44,10 @@ npm run docs:manuals -- --all
 Desde la raíz se usa `npm --prefix front run` antes del nombre del script.
 `docs:generate` actualiza las referencias de código y tipos; no se editan a mano.
 `docs:check` comprueba su vigencia, catálogo, enlaces y recursos del documento
-técnico y del manual. Estos comandos no requieren Pandoc.
+técnico, además de las referencias declaradas del manual. Las capturas se generan
+y revisan por separado; la exportación comprueba que estén presentes antes de
+publicar. Estos comandos no requieren Pandoc. La
+[consulta de comandos](../development/00-commands.md) reúne los flujos de desarrollo.
 
 `docs:export -- [seccion] [docx|pdf|ambos]` selecciona contenido y formato.
 Sin sección, o con `completo`, reúne la colección; por ejemplo,

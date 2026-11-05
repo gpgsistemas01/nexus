@@ -9,11 +9,9 @@ import { getMexicoMonthYearParts } from './formattersUtils.js';
 
 const ROW_YIELD_INTERVAL = 250;
 
-export const buildReportFilename = ({ filename, separator = '_', order = 'month-year' } = {}) => {
+export const buildReportFilename = ({ filename } = {}) => {
     const { month, year } = getMexicoMonthYearParts();
-    const dateParts = order === 'year-month' ? [year, month] : [month, year];
-
-    return [filename, dateParts.join(separator)].join('_');
+    return [filename, month, year].join('_');
 };
 
 /**
@@ -30,6 +28,7 @@ const writeWorkbookFile = async ({ filePath, sheetName, data, abortController })
     signal.throwIfAborted();
     const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({
         filename: filePath,
+        useStyles: true,
         useSharedStrings: false,
         zip: { zlib: { level: 1 } }
     });
@@ -40,11 +39,22 @@ const writeWorkbookFile = async ({ filePath, sheetName, data, abortController })
     signal.addEventListener('abort', onAbort, { once: true });
 
     const writing = async () => {
-        const worksheet = workbook.addWorksheet(sheetName);
+        const worksheet = workbook.addWorksheet(sheetName, {
+            views: [{ state: 'frozen', ySplit: 1 }]
+        });
         let rowCount = 0;
         for await (const row of data) {
             signal.throwIfAborted();
-            worksheet.addRow(row).commit();
+            if (rowCount === 0) {
+                worksheet.columns = row.map(label => ({ width: Math.min(40, Math.max(14, String(label ?? '').length + 4)) }));
+            }
+            const worksheetRow = worksheet.addRow(row);
+            if (rowCount === 0) {
+                worksheetRow.font = { bold: true };
+                worksheetRow.alignment = { vertical: 'middle', wrapText: true };
+                worksheetRow.height = 32;
+            }
+            worksheetRow.commit();
             // Ceder el loop permite vaciar las colas de escritura sin retener todas las filas.
             if (++rowCount % ROW_YIELD_INTERVAL === 0) {
                 await setImmediate(undefined, { signal });
@@ -70,7 +80,7 @@ const writeWorkbookFile = async ({ filePath, sheetName, data, abortController })
     }
 };
 
-export const sendExcelReport = async ({ res, data, sheetName, filename, filenameOptions = {} }) => {
+export const sendExcelReport = async ({ res, data, sheetName, filename }) => {
     const abortController = new AbortController();
     const onClose = () => {
         if (!res.writableFinished) abortController.abort();
@@ -83,7 +93,7 @@ export const sendExcelReport = async ({ res, data, sheetName, filename, filename
         await writeWorkbookFile({ filePath, sheetName, data, abortController });
         await new Promise((resolve, reject) => res.download(
             filePath,
-            `${buildReportFilename({ filename, ...filenameOptions })}.xlsx`,
+            `${buildReportFilename({ filename })}.xlsx`,
             error => error ? reject(error) : resolve()
         ));
         return res;

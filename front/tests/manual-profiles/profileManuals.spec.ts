@@ -10,11 +10,16 @@ import {
   readCredentials,
   verifyConfiguredAccess,
 } from '../../scripts/manual/profiles.mjs';
-import { prepareManual, accessFingerprint } from '../../scripts/manual/publication.mjs';
+import {
+  prepareManual,
+  accessFingerprint,
+  recoverManualCaptures,
+} from '../../scripts/manual/publication.mjs';
 import { prepareManualDirectory, isManualAccountPath } from '../../scripts/manual/paths.mjs';
 import { assertManualDevelopment, parseManualMode } from '../../scripts/manual/environment.mjs';
 import { authenticateManualAccount } from '../../scripts/manual/authentication.mjs';
 import { captureRecipe, captureFamily, type CaptureFamily } from './captureRecipes.js';
+import { DOCUMENT_STATE_CAPTURES, mockDocumentCapture } from './documentStates.js';
 import { mockWarehouse } from '../e2e/warehouseFixtures.js';
 import { mockRecords } from '../e2e/recordsFixtures.js';
 import { mockCatalogs } from '../e2e/catalogFixtures.js';
@@ -158,7 +163,10 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
         ]),
       )
       .digest('hex');
-    const captures: Record<string, { status: string; sha256?: string; reason?: string }> = {};
+    const captures: Record<string, { status: string; sha256?: string; reason?: string }> =
+      process.env.FRONT_MANUAL_MISSING === 'true'
+        ? recoverManualCaptures(previous, revision, manifest.images)
+        : {};
     const save = async (status: string) =>
       writeFile(
         path.join(root, 'manifest.json'),
@@ -195,7 +203,16 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
             await page.route('**/api/auth/me', (route) =>
               route.fulfill({ status: 401, json: { code: 'INVALID_AUTH' } }),
             );
-          else
+          else if (DOCUMENT_STATE_CAPTURES[filename]) {
+            await mockDocumentCapture(
+              page,
+              user.permissions,
+              DOCUMENT_STATE_CAPTURES[filename],
+              (user as SessionUser & { accesses?: { department?: string }[] }).accesses?.[0]
+                ?.department,
+            );
+            await page.route('**/api/auth/me', (route) => route.fulfill({ json: { user } }));
+          } else
             await installDemo(
               page,
               captureFamily(filename, user.permissions),

@@ -9,6 +9,7 @@ export const mockIssues = async (
   permissions = issuePermissions,
   state = 'Pendiente',
   departmentName = 'SISTEMAS',
+  returnedQuantity = 0,
 ) => {
   await mockWarehouse(page, permissions);
   const reads: URL[] = [];
@@ -22,9 +23,15 @@ export const mockIssues = async (
   for (const doc of Object.values(docs)) {
     doc.departmentName = departmentName;
     doc.fulfillmentStatus.name = state;
-    if (state === 'Surtido') {
+    if (state === 'Surtido' || state === 'Cancelado') {
       doc.details[0]!.isSupplied = true;
       doc.details[0]!.suppliedQuantity = '2';
+      doc.details[0]!.returnedQuantity = state === 'Cancelado' ? '2' : String(returnedQuantity);
+      doc.details[0]!.fulfillmentStatus.name = state;
+      if (state === 'Cancelado') doc.status.name = 'Cancelada';
+    } else if (state === 'Surtido parcial') {
+      doc.details[0]!.suppliedQuantity = '1';
+      doc.details[0]!.fulfillmentStatus.name = state;
     }
   }
   await page.route('**/api/sales/clients?**', (route) =>
@@ -37,7 +44,14 @@ export const mockIssues = async (
     route.fulfill({ json: pageOf([personData]) }),
   );
   await page.route('**/api/warehouse/fulfillment-statuses?**', (route) =>
-    route.fulfill({ json: pageOf([{ id: departmentId, name: 'Pendiente' }]) }),
+    route.fulfill({
+      json: pageOf(
+        ['Pendiente', 'Surtido parcial', 'Surtido', 'Cancelado'].map((name, index) => ({
+          id: index ? `${departmentId.slice(0, -1)}${index + 1}` : departmentId,
+          name,
+        })),
+      ),
+    }),
   );
   await page.route(/\/api\/warehouse\/(materials|consumables|wastes)\?/, (route) => {
     const resource = new URL(route.request().url()).pathname.split('/').pop();

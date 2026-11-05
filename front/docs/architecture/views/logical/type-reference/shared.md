@@ -241,25 +241,30 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `validationError` | `validationError?: string;` |
 | `eyebrow` | `eyebrow?: string;` |
 | `subject` | `subject?: string;` |
+| `kind` | `kind?: ReportKind;` |
+| `note` | `note?: string;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | association | [ReportScope](../../../../../src/shared/report.ts) | `values` |
+| dependency | [ReportKind](../../../../../src/shared/report.ts) | `kind` |
 
 ## ReportScopeDialog.defineEmits
 
-**Fuente:** [src/shared/components/ReportScopeDialog.vue](../../../../../src/shared/components/ReportScopeDialog.vue) · línea 18, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ReportScopeDialog.vue](../../../../../src/shared/components/ReportScopeDialog.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `mode` | `mode: [value: ReportScope['mode']];` |
 | `month` | `month: [value: string];` |
+| `inventory` | `inventory: [value: NonNullable<ReportScope['inventoryScope']>];` |
 | `submit` | `submit: [];` |
 | `close` | `close: [];` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [ReportScope](../../../../../src/shared/report.ts) | `mode` |
+| dependency | [ReportScope](../../../../../src/shared/report.ts) | `inventory` |
 
 ## ServerTable.defineProps
 
@@ -326,7 +331,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## FileExportOptions
 
-**Fuente:** [src/shared/composables/useFileExport.ts](../../../../../src/shared/composables/useFileExport.ts) · línea 4, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/composables/useFileExport.ts](../../../../../src/shared/composables/useFileExport.ts) · línea 5, columna 1. **Declaración:** interface.
 
 **Parámetros:** `Scope`.
 
@@ -575,12 +580,23 @@ Record<OrganizationResource, LookupState>
 
 ## ReportScope
 
-**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 1, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 3, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `mode` | `mode: 'filtered' \| 'current-month' \| 'specific-month';` |
 | `month` | `month: string;` |
+| `inventoryScope` | `inventoryScope?: 'activeOrStock' \| 'active' \| 'inStock';` |
+
+## ReportKind
+
+**Fuente:** [src/shared/report.ts](../../../../../src/shared/report.ts) · línea 9, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+'period' | 'inventory' | 'filtered'
+```
 
 ## OrganizationLookupRequest
 

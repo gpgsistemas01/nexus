@@ -4,7 +4,7 @@ const { applyInventoryMovement } = await import('../../../../src/services/invent
 
 describe('saldos de movimientos de inventario', () => {
   it('distribuye el saldo real entre detalles repetidos sin modificar la oferta recibida', async () => {
-    const offer = Object.freeze({ materialId: 'material', supplierId: 'supplier', currentStock: 20, material: Object.freeze({ base: 1, height: 1 }) });
+    const offer = Object.freeze({ materialId: 'material', supplierId: 'supplier', maxUnitCost: 10, currentStock: 20, material: Object.freeze({ base: 1, height: 1 }) });
     const create = vi.fn().mockImplementation(async ({ data }) => ({ details: data.details.create }));
     const queryRaw = vi.fn().mockResolvedValue([{ materialId: 'material', supplierId: 'supplier', currentStock: 13 }]);
     const result = await applyInventoryMovement({

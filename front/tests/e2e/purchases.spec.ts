@@ -188,6 +188,7 @@ test('compras: consulta, corrección y cancelación explícita conservan el hist
   await expect(correction).toBeHidden();
   await expect(page.getByText('¡Compra actualizada exitosamente!', { exact: true })).toBeVisible();
   await expect(dialog).toBeVisible();
+  await expect(dialog.getByLabel('Totales de compra')).toContainText('$116');
   expect(writes[0]!.url.pathname).toMatch(/\/details\/.*\/corrections$/);
   expect(writes[0]!.data).toEqual({ quantity: 1, costPerUnitType: 100 });
   await dialog.getByRole('button', { name: 'Cancelar detalle', exact: true }).click();

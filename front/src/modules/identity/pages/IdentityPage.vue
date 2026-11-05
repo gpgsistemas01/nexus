@@ -12,7 +12,8 @@ import { useListSearch } from '../../../shared/composables/useListSearch.js';
 import { usePagedList } from '../../../shared/composables/usePagedList.js';
 import { useOrganizationOptions } from '../../../shared/composables/useOrganizationOptions.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
-import { useFileExport } from '../../../shared/composables/useFileExport.js';
+import { useReportScope } from '../../../shared/composables/useReportScope.js';
+import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue';
 import { initialRecordQuery } from '../../../shared/list.js';
 import { IDENTITY_CONFIG } from '../identity.js';
 import type { IdentityResource, IdentityEntry, IdentityTarget } from '../identity.js';
@@ -46,13 +47,14 @@ const departmentId = ref('');
 const roleId = ref('');
 const selectedDepartment = useSelectedOption(filters.departments.items, () => departmentId.value);
 const selectedRole = useSelectedOption(filters.roles.items, () => roleId.value);
-const report = useFileExport<void>({
+const report = useReportScope({
+    kind: 'filtered',
     canExport: () => canExport.value && !query.role,
-    filename: `reporte_${props.resource}.xlsx`,
+    filename: `reporte_${props.resource === 'persons' ? 'personas' : 'usuarios'}`,
     request: (_, signal) => identityService.export(props.resource, { ...query }, signal),
     onDenied,
 });
-const { isExporting, exportError } = report;
+const { isExporting, exportError, isReportOpen, reportValues } = report;
 
 const { search, applySearch, clearSearch } = useListSearch(list, () => ({
     department: selectedDepartment.value?.title ?? '',
@@ -96,7 +98,7 @@ onMounted(() => {
                 variant="outlined"
                 :disabled="!!query.role"
                 :loading="isExporting"
-                @click="report.exportReport()"
+                @click="report.openReport()"
             >
                 Exportar Excel
             </VBtn>
@@ -148,15 +150,6 @@ onMounted(() => {
         </template>
         <template #messages>
             <VAlert
-                v-if="exportError"
-                role="alert"
-                aria-label="Error de descarga"
-                type="error"
-                class="mb-4"
-            >
-                {{ exportError }}
-            </VAlert>
-            <VAlert
                 v-if="query.role && canExport"
                 type="info"
                 class="mb-4"
@@ -183,6 +176,15 @@ onMounted(() => {
             Tu cuenta no tiene permiso para consultar este listado.
         </VAlert>
     </RecordListPanel>
+    <ReportScopeDialog
+        v-if="isReportOpen"
+        kind="filtered"
+        :values="reportValues"
+        :is-submitting="isExporting"
+        :error="exportError"
+        @submit="report.exportReport"
+        @close="isReportOpen = false"
+    />
     <PersonEditorPage
         v-if="editor && resource === 'persons' && editor.action !== 'password'"
         :target="editor"

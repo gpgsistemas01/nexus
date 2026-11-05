@@ -91,3 +91,10 @@ Los reportes y la infraestructura transversal se localizan en el
 `createGoodsIssue` selecciona `SMA` para materiales y `SCO` para consumibles a partir del `type` fijado por el servicio específico. El contador por prefijo y año se incrementa mediante `upsert` dentro de la misma transacción que inserta la salida. Un fallo revierte ambos cambios; las series no comparten incrementos.
 
 La [conciliación de contadores](../../physical/02-postgresql-runtime-and-migration-roles.md#migración-de-folios-de-salidas-por-contexto) toma el último consecutivo numérico de cada prefijo y año, sin heredar el contador general retirado. Detalles y movimientos siguen vinculados por UUID; las ediciones conservan el folio del documento.
+
+La edición de encabezado conserva el bloqueo del documento y consulta su estado de
+documento y surtido antes de resolver participantes. `assertIssueNotCanceled`, de
+`issues/issueFulfillmentRules.js`, se reutiliza entre materiales, consumibles y merma;
+una salida cancelada responde `409 ISSUE_CANCELED_CONFLICT` también ante una petición
+HTTP directa, sin modificar encabezado, detalles ni existencias. Los estados pendientes,
+parciales y surtidos conservan sus posibilidades de edición de encabezado.

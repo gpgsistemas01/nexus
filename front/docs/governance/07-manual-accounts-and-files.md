@@ -59,7 +59,6 @@ Rutas relativas a `front/`:
 | --- | --- |
 | [manual.accounts.example.json](../../manual.accounts.example.json) | Plantilla versionada: perfiles de referencia, dirección de Vue, accesos esperados y nombres de variables. Sin credenciales. |
 | `manual.accounts.local.json` | Copia local: dirección de Vue y cuentas que se procesarán. Predeterminado de `--accounts`; no crea usuarios. |
-| [.env.manual.example](../../.env.manual.example) | Plantilla versionada con variables vacías para usuarios y contraseñas. |
 | `.env.manual.local` | Credenciales reales de todas las cuentas configuradas. Predeterminado de `--env-file`. |
 
 `front/.env.local` configura Vite y `back/.env` configura la API; las credenciales
@@ -82,18 +81,16 @@ de referencia ROLLO y medidas válidas. El recorrido busca esa combinación en l
 catálogos paginados y la conserva para las tres imágenes de la cuenta.
 Los recorridos no registran operaciones para preparar las imágenes.
 
-## 4. Crear las dos copias locales
+## 4. Preparar los archivos locales
 
-Estos comandos copian sólo los archivos que aún no existen.
+Copia el JSON sólo si aún no existe. Crea `.env.manual.local` en el editor para
+guardar las variables de credenciales indicadas en ese JSON.
 
 PowerShell:
 
 ```powershell
 if (-not (Test-Path manual.accounts.local.json)) {
     Copy-Item manual.accounts.example.json manual.accounts.local.json
-}
-if (-not (Test-Path .env.manual.local)) {
-    Copy-Item .env.manual.example .env.manual.local
 }
 ```
 
@@ -103,12 +100,9 @@ Bash:
 if [ ! -e manual.accounts.local.json ]; then
     cp manual.accounts.example.json manual.accounts.local.json
 fi
-if [ ! -e .env.manual.local ]; then
-    cp .env.manual.example .env.manual.local
-fi
 ```
 
-Descargar cambios de Git actualiza las plantillas, no las copias locales.
+Descargar cambios de Git actualiza la plantilla JSON, no los archivos locales.
 
 ## 5. Configurar el perfil en el JSON
 
@@ -151,17 +145,12 @@ sesión; los nombres de las variables y las etiquetas no asignan accesos.
 
 ## 6. Completar las credenciales locales
 
-En `.env.manual.local`, sustituir los valores de muestra por las credenciales de
-la cuenta existente:
-
-```dotenv
-DOCS_FRONT_CUENTA_01_USER="USUARIO"
-DOCS_FRONT_CUENTA_01_PASSWORD="CONTRASENA"
-```
+En `.env.manual.local`, definir las variables nombradas en `usernameEnv` y
+`passwordEnv` de cada cuenta con su usuario y contraseña existentes.
 
 Los nombres deben coincidir exactamente con el JSON. La sintaxis dotenv permite
 comillas para conservar espacios o `#` dentro del valor. No escribir credenciales
-en el JSON ni en las plantillas versionadas.
+en el JSON ni en archivos versionados.
 
 Si falta el usuario o la contraseña, o alguno está vacío, la cuenta se omite.
 Puedes dejar sin completar las cuentas que todavía no utilizarás.
@@ -249,9 +238,13 @@ copiar cookies del navegador.
 npm run docs:manuals -- --profile cuenta-01 --missing --format ambos
 ```
 
-`--missing` conserva capturas cuando coinciden cuenta, acceso, modo, fuentes,
-código del recorrido y huella del PNG; completa las pendientes o desactualizadas.
-Sin esa opción, se recaptura el perfil completo.
+El comando principal reanuda por defecto: en el primer uso captura todo y después
+conserva las imágenes completas con la misma cuenta, acceso, modo, fuentes,
+recorrido y huella del PNG. Completa las faltantes o desactualizadas en cada cuenta
+de `--all`; `--missing` conserva ese mismo comportamiento.
+Use `--fresh` para volver a capturar desde el inicio.
+Si una pendiente falla otra vez, el manifiesto conserva las completas anteriores
+y posteriores; el próximo intento vuelve a verificar sus archivos y huellas.
 Si cambió el código o el contenido desde la ejecución anterior, el comando lo
 indica y vuelve a capturar las imágenes desactualizadas.
 

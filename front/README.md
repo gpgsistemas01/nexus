@@ -4,6 +4,12 @@ Cliente web de Nexus para inventario, compras, salidas y movimientos. Incluye
 catálogos, Personas, Usuarios, Clientes y Proveedores según los permisos de la
 cuenta. Utiliza Vue 3, TypeScript, Composition API y Vite.
 
+## Comandos para desarrolladores
+
+Consulta [Comandos para desarrollo](docs/development/00-commands.md) para iniciar
+el sistema, acceder desde el móvil, ejecutar pruebas, migraciones, capturas y
+publicaciones. La guía indica la carpeta de ejecución y las opciones de recuperación.
+
 ## Inicio rápido
 
 Sigue los pasos en orden para iniciar Vue y la API en tu equipo. Ejecuta todos los
@@ -37,18 +43,10 @@ Espera a que cada comando termine correctamente. La raíz no tiene `package.json
 
 ### 3. Configurar la conexión y la sesión
 
-Crea **`back/.env`**, junto a `back/package.json`. Si ya tienes ese archivo
-configurado, conserva sus valores. Ejemplo mínimo; sustituye la conexión y los
-tres secretos por valores propios del entorno local:
-
-```dotenv
-NODE_ENV=development
-PORT=3000
-DATABASE_URL="postgresql://usuario_local:clave_local@127.0.0.1:5432/nexus_dev"
-JWT_SECRET_ACCESS="reemplazar-por-un-secreto-local"
-JWT_SECRET_REFRESH="reemplazar-por-otro-secreto-local"
-JWT_SECRET_ONE_TIME="reemplazar-por-otro-secreto-independiente"
-```
+Crea **`back/.env`**, junto a `back/package.json`, con `NODE_ENV` de desarrollo,
+`DATABASE_URL` de tu base y los secretos independientes `JWT_SECRET_ACCESS`,
+`JWT_SECRET_REFRESH` y `JWT_SECRET_ONE_TIME`. `PORT` es opcional y vale 3000.
+Si ya tienes el archivo configurado, conserva sus valores.
 
 La base, el usuario y la contraseña de PostgreSQL deben existir antes de continuar.
 Usa tres secretos distintos. Guarda esta configuración en `back/.env`; las variables
@@ -114,7 +112,7 @@ npm --prefix front run check
 
 Este comando comprueba formato, ESLint, pruebas unitarias y compilación con tipos.
 Produce `front/dist/`; no ejecuta pruebas de navegador ni de sistema. Los comandos
-individuales están en [Herramientas](docs/development/02-tooling.md#comandos-del-frontend).
+individuales están en [Comandos para desarrollo](docs/development/00-commands.md).
 El despliegue se prepara con la [guía de compilación y publicación](docs/development/03-build-and-deployment.md).
 
 ## Documentación

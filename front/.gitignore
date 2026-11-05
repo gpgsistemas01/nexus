@@ -33,9 +33,11 @@ test-results/
 playwright-report/
 
 # Credenciales y configuración local de los manuales por cuenta
-!.env.manual.example
 .env.manual.local
 manual.accounts.local.json
 
 # Ediciones locales por cuenta: fuentes filtradas, capturas y estado de publicación
 /docs/user-manual/accounts/
+
+# Capturas de referencia: se generan y revisan por separado
+/docs/user-manual/images/

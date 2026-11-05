@@ -4,7 +4,7 @@ import { requestPage } from '../../../shared/http/pageRequest.js';
 import { recordParams } from '../../../shared/http/recordParams.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { requestExcel } from '../../../shared/http/requestExcel.js';
-import { reportScopeError } from '../../../shared/report.js';
+import { reportParams } from '../../../shared/report.js';
 import type { ReportScope } from '../../../shared/report.js';
 import type { IssueResource, IssueQuery, IssueWriteTarget } from '../issue.js';
 import { normalizeIssueDocument, normalizeIssueRow } from '../mappers/issueResponseMapper.js';
@@ -101,18 +101,7 @@ export const issueService = {
         );
     },
     export(resource: IssueResource, query: IssueQuery, scope: ReportScope, signal: AbortSignal) {
-        const error = reportScopeError(scope);
-        if (error) throw new Error(error);
-
-        const params =
-            scope.mode === 'filtered'
-                ? buildIssueQueryParams(query)
-                : new URLSearchParams({
-                      monthlyReport: 'true',
-                      reportMonth: scope.mode === 'specific-month' ? scope.month : '',
-                  });
-        params.delete('start');
-        params.delete('length');
+        const params = reportParams(buildIssueQueryParams(query), scope);
         const path = resource === 'wastes' ? 'waste-issues' : `goods-issues/${resource}`;
         return requestExcel(`/api/warehouse/reports/${path}/excel?${params}`, signal);
     },

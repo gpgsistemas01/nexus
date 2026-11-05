@@ -2,7 +2,8 @@ import {
     buildInventoryReportData,
     buildIssueReportData,
     buildGoodsReceiptReportData,
-    buildWasteReportData
+    buildWasteReportData,
+    buildSupplierReportData
 } from '../../../utils/reports/warehouseReportExcel.js';
 import {
     findSupplierReportRows,
@@ -151,7 +152,7 @@ export const exportWasteReportExcel = async (req, res) => {
 
     return sendExcelReport({
         res,
-        data: await buildWasteReportData(rows),
+        data: buildWasteReportData(rows),
         sheetName: WASTE_SHEET_NAME,
         filename: WASTE_FILENAME
     });
@@ -171,14 +172,9 @@ export const exportSupplierReportExcel = async (req, res) => {
         orderDir
     });
 
-    const data = async function* () {
-        yield ['Nombre comercial', 'Razón social', 'Estatus'];
-        for await (const row of rows) yield [row.tradeName, row.legalName, row.isActive ? 'Activo' : 'Inactivo'];
-    };
-
     return sendExcelReport({
         res,
-        data: data(),
+        data: buildSupplierReportData(rows),
         sheetName: SUPPLIER_SHEET_NAME,
         filename: SUPPLIER_FILENAME
     });

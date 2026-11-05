@@ -31,7 +31,7 @@ define el alcance de cada acceso.
 | Inventario | Base `/api/warehouse/materials`, `/consumables` o `/wastes`: GET lista, POST alta, PATCH `/:id` metadatos, PATCH `/:id/stock` ajuste. POST `/:id/stock-additions` es entrada de merma; DELETE usa la identidad de la relación admitida para baja. |
 | Compras | Base `/api/warehouse/goods-receipts/materials` o `/consumables`: listado, lectura por ID, alta y edición a través de `purchaseService`; corrección/cancelación de detalle conserva su operación y confirmación propias. |
 | Salidas | Base `/api/warehouse/goods-issues/materials`, `/consumables` o `/api/warehouse/waste-issues`: GET listado/ID, POST alta, PATCH edición; `/:id/header` para encabezado y `/:id/details` para surtido. Devolución: PATCH `/:id/details/:detailId/returns`. |
-| Reportes | Servicios del recurso construyen filtros/alcance y llaman `requestExcel`. La paginación se elimina. Los endpoints y diferencias de alcance permanecen en cada servicio de reporte. |
+| Reportes | Todas las páginas usan `useReportScope` y `ReportScopeDialog`; `useFileExport` comparte permiso, bloqueo, cancelación, nombre fechado y descarga. Los servicios configuran la ruta y usan `requestExcel`; `reportParams` comparte periodos, filtros, orden y eliminación de paginación. |
 
 Las acciones disponibles dependen del recurso y los permisos. Merma no ofrece una baja
 genérica de material ni stock inicial desde compra.
@@ -148,8 +148,11 @@ pertenecen al [ciclo de vida](../views/logical/states/04-state-ownership-and-sav
 `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`. Un error HTTP
 recibido como Blob pasa por `normalizeApiError`, que intenta leer su JSON.
 Una respuesta exitosa con HTML o JSON no cumple el contrato del archivo.
-Los servicios de reporte omiten paginación y construyen los filtros/alcance de su
-operación. La entrega del archivo se muestra en la
+`reportParams` conserva búsqueda y filtros en modo personalizado; el modo mensual
+omite filtros y mantiene orden. `useReportScope` ofrece periodo, inventario o filtros
+según el recurso; todos confirman la descarga mediante `ReportScopeDialog`.
+`reportFilename` usa el mes y año actuales de México y una sola extensión `.xlsx`.
+La entrega del archivo, después de confirmar el diálogo, se muestra en la
 [secuencia de reportes](../views/processes/08-movements-and-reports/02-reports.md).
 
 ## Fuentes técnicas

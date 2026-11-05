@@ -15,20 +15,20 @@ cada archivo individual.
 flowchart LR
     constants["constants (11 módulos)"] --> shared["shared (12 módulos)"]
     controllers["controllers (45 módulos)"] --> dtos["dtos (12 módulos)"]
-    controllers["controllers (45 módulos)"] --> errors["errors (21 módulos)"]
+    controllers["controllers (45 módulos)"] --> errors["errors (22 módulos)"]
     controllers["controllers (45 módulos)"] --> messages["messages (2 módulos)"]
     controllers["controllers (45 módulos)"] --> services["services (70 módulos)"]
     controllers["controllers (45 módulos)"] --> shared["shared (12 módulos)"]
-    controllers["controllers (45 módulos)"] --> utils["utils (13 módulos)"]
+    controllers["controllers (45 módulos)"] --> utils["utils (15 módulos)"]
     dtos["dtos (12 módulos)"] --> shared["shared (12 módulos)"]
-    errors["errors (21 módulos)"] --> messages["messages (2 módulos)"]
-    errors["errors (21 módulos)"] --> shared["shared (12 módulos)"]
+    errors["errors (22 módulos)"] --> messages["messages (2 módulos)"]
+    errors["errors (22 módulos)"] --> shared["shared (12 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (2 módulos)"]
     middleware["middleware (5 módulos)"] --> services["services (70 módulos)"]
-    middleware["middleware (5 módulos)"] --> utils["utils (13 módulos)"]
+    middleware["middleware (5 módulos)"] --> utils["utils (15 módulos)"]
     public["public (212 módulos)"] --> shared["shared (12 módulos)"]
     repository["repository (8 módulos)"] --> constants["constants (11 módulos)"]
-    repository["repository (8 módulos)"] --> errors["errors (21 módulos)"]
+    repository["repository (8 módulos)"] --> errors["errors (22 módulos)"]
     repository["repository (8 módulos)"] --> lib["lib (3 módulos)"]
     repository["repository (8 módulos)"] --> shared["shared (12 módulos)"]
     routes["routes (48 módulos)"] --> controllers["controllers (45 módulos)"]
@@ -37,14 +37,14 @@ flowchart LR
     routes["routes (48 módulos)"] --> validators["validators (16 módulos)"]
     services["services (70 módulos)"] --> constants["constants (11 módulos)"]
     services["services (70 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (70 módulos)"] --> errors["errors (21 módulos)"]
+    services["services (70 módulos)"] --> errors["errors (22 módulos)"]
     services["services (70 módulos)"] --> repository["repository (8 módulos)"]
     services["services (70 módulos)"] --> shared["shared (12 módulos)"]
-    services["services (70 módulos)"] --> utils["utils (13 módulos)"]
-    utils["utils (13 módulos)"] --> constants["constants (11 módulos)"]
-    utils["utils (13 módulos)"] --> errors["errors (21 módulos)"]
-    utils["utils (13 módulos)"] --> services["services (70 módulos)"]
-    utils["utils (13 módulos)"] --> shared["shared (12 módulos)"]
+    services["services (70 módulos)"] --> utils["utils (15 módulos)"]
+    utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
+    utils["utils (15 módulos)"] --> errors["errors (22 módulos)"]
+    utils["utils (15 módulos)"] --> services["services (70 módulos)"]
+    utils["utils (15 módulos)"] --> shared["shared (12 módulos)"]
     validators["validators (16 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (16 módulos)"] --> messages["messages (2 módulos)"]
     validators["validators (16 módulos)"] --> shared["shared (12 módulos)"]
@@ -289,12 +289,12 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js`](../../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js) | `cancelGoodsReceiptDetailAndTotals`, `correctGoodsReceiptDetailAndTotals`, `createGoodsReceiptDetailsAndUpdateTotals` |
 | [`src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js`](../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js) | `cancelMaterialGoodsReceiptDetailLine`, `correctMaterialGoodsReceiptDetailLine`, `createMaterialGoodsReceipt`, `findAllMaterialGoodsReceipts`, `findMaterialGoodsReceiptReportRows`, `updateMaterialGoodsReceipt` |
 | [`src/services/warehouse/issues/issueAccessService.js`](../../../../src/services/warehouse/issues/issueAccessService.js) | `assertIssueDepartmentAccess`, `buildIssueDepartmentWhere` |
-| [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
+| [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `assertIssueNotCanceled`, `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
 | [`src/services/warehouse/issues/issueHeaderService.js`](../../../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
 | [`src/services/warehouse/issues/issueSupplyRules.js`](../../../../src/services/warehouse/issues/issueSupplyRules.js) | `resolveIssueSupplyChange` |
 | [`src/services/warehouse/materials/materialHelpers.js`](../../../../src/services/warehouse/materials/materialHelpers.js) | `assertMaterialRollReference`, `prepareMaterialData`, `withRetry` |
 | [`src/services/warehouse/materials/materialService.js`](../../../../src/services/warehouse/materials/materialService.js) | `createMaterial`, `deleteMaterial`, `existsMaterial`, `findAllMaterials`, `findMaterialsSnapshot`, `updateMaterial`, `updateMaterialStock` |
-| [`src/services/warehouse/materials/supplierMaterialService.js`](../../../../src/services/warehouse/materials/supplierMaterialService.js) | `createSupplierMaterial`, `existsMaterialUsage`, `findAllSupplierMaterials`, `findSupplierMaterialById`, `findSupplierMaterialByIds`, `findSupplierMaterialsSnapshot`, `recalculateMaterialUnitCosts`, `updateMaterialUnitCostIfHigher` |
+| [`src/services/warehouse/materials/supplierMaterialService.js`](../../../../src/services/warehouse/materials/supplierMaterialService.js) | `createSupplierMaterial`, `existsMaterialUsage`, `findAllSupplierMaterials`, `findSupplierMaterialById`, `findSupplierMaterialByIds`, `findSupplierMaterialsSnapshot` |
 | [`src/services/warehouse/materials/supplierMaterialStockService.js`](../../../../src/services/warehouse/materials/supplierMaterialStockService.js) | `adjustSupplierMaterialStock`, `findSupplierMaterialsForStockMovement`, `updateSupplierMaterialStock` |
 | [`src/services/warehouse/presentationService.js`](../../../../src/services/warehouse/presentationService.js) | `findAllPresentations`, `findUniquePresentation` |
 | [`src/services/warehouse/reasonService.js`](../../../../src/services/warehouse/reasonService.js) | `INITIAL_STOCK_REASON_NAME`, `findAllReasons`, `findGoodsReceiptDetailChangeReason`, `findInitialStockAdjustmentReason` |

@@ -64,6 +64,6 @@ conflicto o un envío sin respuesta, siga [Errores y recuperación](15-errors-an
 <!-- manual:any warehouse:reports-read -->
 ## Descargar el inventario
 
-Pulse **Descargar Excel** después de revisar la consulta.
+Pulse **Exportar Excel** después de revisar la consulta.
 El [capítulo de reportes](14-reports.md) explica su alcance.
 <!-- manual:end -->

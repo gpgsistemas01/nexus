@@ -37,6 +37,11 @@ describe('validadores del CRUD de mermas', () => {
     expect(wasteEditValidation.maxUnitCost(value)).toEqual(expected);
   });
 
+  it('permite costo cero únicamente al registrar una merma nueva', () => {
+    expect(wasteValidation.maxUnitCost(0)).toBeNull();
+    expect(wasteEditValidation.maxUnitCost(0)).toEqual(expect.any(String));
+  });
+
   it.each([
     ['cantidad inicial en cero', 0, null],
     ['cantidad inicial positiva', 3, null],

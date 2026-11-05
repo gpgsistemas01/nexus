@@ -1,5 +1,6 @@
 import { onBeforeUnmount, ref } from 'vue';
 import { ApiError } from '../http/apiError.js';
+import { reportFilename } from '../report.js';
 
 export interface FileExportOptions<Scope> {
     canExport: () => boolean;
@@ -29,7 +30,7 @@ export const useFileExport = <Scope>(options: FileExportOptions<Scope>) => {
             const url = URL.createObjectURL(file);
             const link = document.createElement('a');
             link.href = url;
-            link.download = options.filename;
+            link.download = reportFilename(options.filename);
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (cause) {

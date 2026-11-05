@@ -5,6 +5,26 @@ import { createApiClient } from '../../../../src/shared/http/apiClient.js';
 import { mockHttpAdapter } from '../../../helpers/httpAdapter.js';
 
 describe('cliente Axios compartido: sesión y errores', () => {
+  it.each(['GOODS_ISSUE_MISSING_MAX_UNIT_COST', 'WASTE_ISSUE_MISSING_MAX_UNIT_COST'])(
+    'identifica el artículo sin costo y conserva el rechazo %s',
+    async (code) => {
+      const respond = vi.fn(() => ({
+        status: 409,
+        data: { code, meta: { materialName: 'Lona de prueba' } },
+      }));
+      const result = createApiClient(mockHttpAdapter(respond)).request(
+        '/api/warehouse/goods-issues/materials',
+        { method: 'POST' },
+      );
+      await expect(result).rejects.toMatchObject({
+        code,
+        status: 409,
+        message: expect.stringContaining('Lona de prueba'),
+      });
+      expect(respond).toHaveBeenCalledOnce();
+    },
+  );
+
   it('comparte una renovación entre solicitudes concurrentes y reintenta sólo el 401', async () => {
     let isRefreshed = false;
     let finish!: () => void;

@@ -66,7 +66,7 @@ export const buildGoodsIssueDetails = async ({
             height
         });
 
-        if (maxUnitCost === null || maxUnitCost === undefined) {
+        if (!(Number(maxUnitCost) > 0)) {
             throw new GoodsIssueMissingMaxUnitCost({
                 materialName: name,
                 height,

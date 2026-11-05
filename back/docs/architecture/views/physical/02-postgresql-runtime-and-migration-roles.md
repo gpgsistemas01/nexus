@@ -129,26 +129,16 @@ y el propietario reservado varían; se debe usar el mecanismo de roles del prove
 
 ## Variables de entorno
 
-Las URLs deben contener usuarios diferentes:
-
-```env
-# Runtime, posiblemente mediante pooler.
-DATABASE_URL="postgresql://nexus_app:<secret-app>@pooler.example.com:6543/nexus"
-
-# Migraciones, conexión directa y cuenta con DDL sobre el esquema de Nexus.
-DIRECT_URL="postgresql://nexus_migrator:<secret-migrator>@db.example.com:5432/nexus"
-```
+Las URLs deben contener usuarios diferentes: `DATABASE_URL` utiliza la cuenta
+de ejecución, posiblemente mediante pooler; `DIRECT_URL` utiliza la conexión
+directa y una cuenta con DDL sobre el esquema de Nexus.
 
 La imagen actual puede seguir ejecutando migraciones y aplicación en el mismo
 contenedor porque cada fase resuelve una variable distinta. Para una separación más
 estricta, el pipeline de despliegue puede ejecutar `npm run db:migrate` como un job con
 `DIRECT_URL` y `NODE_ENV=production`, sin `DATABASE_URL`. Después puede arrancar
-el contenedor de aplicación con:
-
-```env
-RUN_MIGRATIONS=false
-DATABASE_URL="postgresql://nexus_app:<secret-app>@pooler.example.com:6543/nexus"
-```
+el contenedor de aplicación con `RUN_MIGRATIONS` desactivado y `DATABASE_URL`
+configurada únicamente con la cuenta de ejecución.
 
 En ese modo el proceso de aplicación nunca recibe el secreto de migración. El job debe
 terminar correctamente antes de desplegar la nueva versión. Esta separación es una

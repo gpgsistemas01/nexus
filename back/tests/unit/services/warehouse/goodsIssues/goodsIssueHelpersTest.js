@@ -71,6 +71,21 @@ describe('buildGoodsIssueDetails', () => {
             .resolves.toHaveLength(1);
     });
 
+    it.each(['MATERIAL', 'CONSUMABLE'])('rechaza costos ausentes o no positivos en %s y conserva el costo de almacén', async type => {
+        for (const maxUnitCost of [null, undefined, 0, '0.000000', -1]) {
+            findSupplierMaterialsSnapshot.mockResolvedValue([{
+                ...supplierMaterial, maxUnitCost, material: { ...supplierMaterial.material, type }
+            }]);
+            await expect(buildGoodsIssueDetails({ details: [{ ...detail, maxUnitCost: 99 }], type }))
+                .rejects.toMatchObject({ code: 'GOODS_ISSUE_MISSING_MAX_UNIT_COST', statusCode: 409 });
+        }
+        findSupplierMaterialsSnapshot.mockResolvedValue([{
+            ...supplierMaterial, maxUnitCost: '0.000001', material: { ...supplierMaterial.material, type }
+        }]);
+        await expect(buildGoodsIssueDetails({ details: [{ ...detail, maxUnitCost: 99 }], type }))
+            .resolves.toEqual([expect.objectContaining({ maxUnitCost: '0.000001' })]);
+    });
+
     it('construye el detalle cuando material y proveedor están activos', async () => {
         await expect(buildGoodsIssueDetails({ details: [detail] })).resolves.toEqual([
             expect.objectContaining({

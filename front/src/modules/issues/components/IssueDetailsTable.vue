@@ -28,6 +28,7 @@ const emit = defineEmits<{
 }>();
 const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
     { title: props.itemLabel, key: 'name', nowrap: true },
+    ...(props.mode === 'view' ? [{ title: 'Estado del detalle', key: 'fulfillmentStatus' }] : []),
     {
         title: 'Medidas',
         children: [
@@ -36,10 +37,18 @@ const headers = computed<DataTableHeader<IssueDetail>[]>(() => [
         ],
     },
     { title: 'Salida', key: 'quantity' },
-    ...(['supply', 'return'].includes(props.mode)
+    ...(['supply', 'return', 'view'].includes(props.mode)
         ? [{ title: 'Cantidad surtida', key: 'suppliedQuantity' }]
         : []),
-    ...(props.mode === 'return' ? [{ title: 'Cantidad devuelta', key: 'returnedQuantity' }] : []),
+    ...(['return', 'view'].includes(props.mode)
+        ? [{ title: 'Cantidad devuelta', key: 'returnedQuantity' }]
+        : []),
+    ...(props.mode === 'view'
+        ? [
+              { title: 'Pendiente de surtir', key: 'pendingQuantity' },
+              { title: 'Saldo entregado', key: 'deliveredQuantity' },
+          ]
+        : []),
     { title: 'Presentación', key: 'presentation' },
     {
         title: 'Conversión',
@@ -94,6 +103,15 @@ const projectValue = (item: IssueDetail) =>
             </template>
             <template #[`item.convertedQuantity`]="{ item }">
                 {{ convertedQuantityText(item.convertedQuantity, item.unitMeasure) }}
+            </template>
+            <template #[`item.fulfillmentStatus`]="{ item }">
+                {{ item.fulfillmentStatus || '—' }}
+            </template>
+            <template #[`item.pendingQuantity`]="{ item }">
+                {{ numberText(getIssuePendingQuantity(item)) }}
+            </template>
+            <template #[`item.deliveredQuantity`]="{ item }">
+                {{ numberText(getIssueReturnableQuantity(item)) }}
             </template>
             <template #[`item.maxUnitCost`]="{ item }">
                 {{ item.maxUnitCost == null ? '—' : currencyText(item.maxUnitCost) }}

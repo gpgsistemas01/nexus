@@ -4,11 +4,13 @@ import { APP_NAVIGATION_GROUPS } from '../../src/app/navigation.js';
 import type { SessionUser } from '../../src/modules/auth/session.js';
 import { PERMISSIONS as P } from '@nexus/permissions';
 import { selectWasteReference } from './selectPreparation.js';
+import { DOCUMENT_STATE_CAPTURES, openDocumentCapture } from './documentStates.js';
 
 export type CaptureFamily =
   'warehouse' | 'records' | 'catalogs' | 'purchases' | 'issues' | 'movements';
 
 export const captureFamily = (image: string, permissions: readonly string[]): CaptureFamily => {
+  if (DOCUMENT_STATE_CAPTURES[image]) return DOCUMENT_STATE_CAPTURES[image].family;
   const number = Number.parseInt(image);
   if (number < 11) return 'warehouse';
   if (number < 13) return 'catalogs';
@@ -88,8 +90,13 @@ export const captureRecipe = async (
   root: string,
   user: SessionUser,
 ) => {
+  if (filename === '03a-material-mobile.png')
+    await page.setViewportSize({ width: 390, height: 1000 });
   const number = Number.parseInt(filename);
-  if (number === 1) {
+  const documentState = DOCUMENT_STATE_CAPTURES[filename];
+  if (documentState) {
+    await openDocumentCapture(page, documentState);
+  } else if (number === 1) {
     await page.goto('/inicio-sesion');
     await expect(page.getByRole('heading', { name: 'Iniciar sesión', exact: true })).toBeVisible();
   } else if (number === 2) {

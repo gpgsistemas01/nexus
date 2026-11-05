@@ -28,6 +28,7 @@ import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { DOCUMENT_REFERENCE_TYPES } from "../../../constants/documentReferenceTypes.js";
 import { resolveIssueHeaderData } from "../issues/issueHeaderService.js";
 import { GOODS_ISSUE_DETAIL_SELECT } from "./goodsIssueDetailSelect.js";
+import { assertIssueNotCanceled } from "../issues/issueFulfillmentRules.js";
 
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueService');
 
@@ -341,11 +342,13 @@ export const updateGoodsIssueHeader = async ({ id, goodsIssueDto, type = MATERIA
             await lockGoodsIssue({ tx, id });
             const goodsIssue = await tx.goodsIssue.findUnique({
                 where: { id, ...buildGoodsIssueContextWhere(type), ...buildIssueDepartmentWhere({ accesses }) },
-                select: { id: true }
+                select: { id: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
             });
 
             if (!goodsIssue) throw new GoodsIssueNotFound();
             assertIssueDepartmentAccess({ accesses, departmentId });
+
+            assertIssueNotCanceled(goodsIssue);
 
             const headerData = await resolveIssueHeaderData({
                 tx,

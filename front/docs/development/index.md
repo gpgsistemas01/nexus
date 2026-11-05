@@ -2,6 +2,7 @@
 
 | Quiero… | Seguir |
 | --- | --- |
+| Localizar un comando | [Comandos para desarrollo](00-commands.md). |
 | Preparar e iniciar el proyecto | [Instalación, entorno y diagnóstico](01-getting-started.md). |
 | Usar el editor o ejecutar comprobaciones | [Herramientas y comandos](02-tooling.md). |
 | Compilar y publicar | [Build, proxy y alojamiento](03-build-and-deployment.md). |

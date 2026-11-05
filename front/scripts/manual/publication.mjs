@@ -11,6 +11,16 @@ export const permissionFingerprint = (permissions) =>
         .update([...new Set(permissions)].sort().join('\n'))
         .digest('hex');
 
+export const recoverManualCaptures = (previous, revision, images) => {
+    if (previous?.revision !== revision) return {};
+
+    return Object.fromEntries(
+        images
+            .filter((image) => previous.captures?.[image]?.status === 'complete')
+            .map((image) => [image, { ...previous.captures[image] }]),
+    );
+};
+
 export const accessFingerprint = (session) =>
     createHash('sha256')
         .update(

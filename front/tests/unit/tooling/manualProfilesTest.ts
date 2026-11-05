@@ -13,11 +13,56 @@ import {
 } from '../../../scripts/manual/profiles.mjs';
 import { filterManualContent, selectedChapters } from '../../../scripts/manual/model.mjs';
 import { parseManualBaseUrl } from '../../../scripts/manual/environment.mjs';
-import { prepareManual, loadManualPublication } from '../../../scripts/manual/publication.mjs';
+import {
+  prepareManual,
+  loadManualPublication,
+  recoverManualCaptures,
+} from '../../../scripts/manual/publication.mjs';
 import { isManualAccountPath } from '../../../scripts/manual/paths.mjs';
 import { APP_NAVIGATION_GROUPS } from '../../../src/app/navigation.js';
 
 const temporary: string[] = [];
+
+it('conserva capturas posteriores completas aunque otra pendiente falle de nuevo', () => {
+  const previous = {
+    revision: 'cuenta-a-vigente',
+    captures: {
+      'primera.png': { status: 'complete', sha256: 'primera' },
+      'pendiente.png': { status: 'pending', reason: 'Consulta fallida' },
+      'posterior.png': { status: 'complete', sha256: 'posterior' },
+      'retirada.png': { status: 'complete', sha256: 'retirada' },
+    },
+  };
+  const progress = recoverManualCaptures(previous, 'cuenta-a-vigente', [
+    'primera.png',
+    'pendiente.png',
+    'posterior.png',
+  ]);
+  const saved = JSON.parse(
+    JSON.stringify({
+      ...progress,
+      'pendiente.png': { status: 'pending', reason: 'El servicio sigue sin responder' },
+    }),
+  );
+  expect(saved['posterior.png']).toEqual({ status: 'complete', sha256: 'posterior' });
+  expect(saved['primera.png']).toEqual({ status: 'complete', sha256: 'primera' });
+  expect(saved).not.toHaveProperty('retirada.png');
+  expect(previous.captures['pendiente.png'].reason).toBe('Consulta fallida');
+});
+
+it('el primer uso y una revisión de otra cuenta no reutilizan capturas', () => {
+  expect(recoverManualCaptures(undefined, 'cuenta-nueva', ['primera.png'])).toEqual({});
+  expect(
+    recoverManualCaptures(
+      {
+        revision: 'cuenta-anterior',
+        captures: { 'primera.png': { status: 'complete', sha256: 'anterior' } },
+      },
+      'cuenta-nueva',
+      ['primera.png'],
+    ),
+  ).toEqual({});
+});
 afterEach(async () => {
   await Promise.all(temporary.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
@@ -362,13 +407,7 @@ it.each([
     );
     expect(content).toContain('## Consultar una compra');
     expect(content).toContain('20-purchase-view.png');
-    for (const section of [
-      'Registrar una compra',
-      'Editar el encabezado',
-      'Agregar detalles a una compra existente',
-      'Corregir un detalle registrado',
-      'Cancelar un detalle',
-    ])
+    for (const section of ['Registrar una compra', 'Editar o corregir'])
       expect(content.includes('## ' + section)).toBe(manage);
     expect(content.includes('19-purchase-create.png')).toBe(manage);
     expect(content.includes('21-purchase-correction.png')).toBe(manage);

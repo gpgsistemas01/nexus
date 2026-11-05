@@ -1,27 +1,13 @@
 # 2. Herramientas del frontend
 
-La [guía de inicio](01-getting-started.md) prepara el entorno. Esta página reúne
-los comandos y las herramientas utilizadas para trabajar en Vue.
+La [guía de inicio](01-getting-started.md) prepara el entorno. La consulta de
+[Comandos para desarrollo](00-commands.md) reúne los scripts de Vue, API, pruebas,
+capturas y publicación. Esta página explica las herramientas.
 
 ## Comandos del frontend
 
-Ejecutar desde `front/`. Desde la raíz, sustituir `npm run` por
-`npm --prefix front run`.
-
-| Comando | Resultado |
-| --- | --- |
-| `npm run dev` | Inicia Vite con actualización automática. |
-| `npm run type-check` | Comprueba tipos de componentes, código, pruebas y configuración. |
-| `npm run type-check:watch` | Mantiene la comprobación de tipos en otra terminal. |
-| `npm run format` | Aplica correcciones de lint y el formato versionado. |
-| `npm run format:check` | Comprueba el formato sin modificar archivos. |
-| `npm run lint` | Comprueba las reglas ESLint sin modificar archivos. |
-| `npm run lint:fix` | Aplica las correcciones automáticas de ESLint. |
-| `npm run test:unit` | Ejecuta las pruebas unitarias una vez. |
-| `npm run build` | Comprueba tipos y genera `dist/`. |
-| `npm run build-only` | Sólo compila; no sustituye la comprobación de tipos. |
-| `npm run preview` | Sirve localmente `dist/` para revisarlo. |
-| `npm run check` | Ejecuta formato, lint, unitarias y build con tipos. |
+Consulta [comprobación y compilación](00-commands.md#comprobar-y-compilar-vue).
+La guía central indica el directorio de ejecución y el resultado de cada script.
 
 La [ejecución de pruebas](../testing/06-test-files-and-credentials.md) contiene la
 instalación de Chromium, los comandos de navegador y la preparación de sistema.

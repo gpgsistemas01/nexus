@@ -93,7 +93,7 @@ El ajuste conserva identidad y pesos. Ante un conflicto, siga
 ## Descargar el inventario
 
 Revise la búsqueda y el proveedor, seleccione **Incluir en Excel** y pulse
-**Descargar Excel**. En Mermas, el proveedor elegido sí delimita el archivo.
+**Exportar Excel**. En Mermas, el proveedor elegido sí delimita el archivo.
 Revise cantidades y pesos; un peso desconocido no es cero. Las opciones de inclusión
 se explican en [Reportes](14-reports.md).
 <!-- manual:end -->

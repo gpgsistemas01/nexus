@@ -8,6 +8,8 @@ Busque y filtre para localizar el registro correcto.
 
 ![Tabla de existencias de materiales con filtros y acciones.](images/03-materials-list.png)
 
+![Vista de materiales adaptada a un teléfono.](images/03a-material-mobile.png)
+
 <!-- manual:any materials:write -->
 ## Registrar un material
 
@@ -34,8 +36,8 @@ Busque y filtre para localizar el registro correcto.
 
 ![Formulario para crear un material.](images/04-material-create.png)
 
-Desde una compra puede omitir cantidad inicial y costo: se registran al guardar
-la recepción. No duplique esa entrada como existencia inicial.
+Desde una compra se omiten cantidad inicial y costo máximo. La recepción registra
+la existencia; el costo máximo se configura en **Almacén**. No duplique la entrada.
 <!-- manual:end -->
 
 <!-- manual:any materials:write -->
@@ -82,6 +84,6 @@ Desmarcar **Activo** conserva el registro y su historia para consulta.
 <!-- manual:any warehouse:reports-read -->
 ## Descargar el inventario
 
-Revise los filtros y pulse **Descargar Excel**. El archivo incluye todos los
+Revise los filtros y pulse **Exportar Excel**. El archivo incluye todos los
 resultados de la consulta.
 <!-- manual:end -->

@@ -43,11 +43,14 @@ y módulos propietarios; no se interpretan como variantes del catálogo auxiliar
   inicial no negativos; se conserva el ajuste inicial con sus observaciones.
 - **CA-RF-CAT-006-2:** desde una compra no se solicitan costo máximo, existencia
   inicial, motivo ni observaciones de ajuste. La oferta se crea sin existencia ni ajuste
-  inicial; el detalle recibido establece costo y existencia al confirmar la compra.
+  inicial; el detalle recibido establece la existencia al confirmar la compra.
+  El costo máximo se configura exclusivamente desde Almacén.
 - **CA-RF-CAT-006-3:** si la identidad ya existe para otro proveedor, se reutiliza y se
   crea únicamente la oferta nueva; si la oferta ya existe, se rechaza sin modificarla.
 - **CA-RF-CAT-026-1:** las mismas variantes se aplican al consumible con clasificación
   explícita y sin dimensiones; su unidad de medida no está restringida a «pieza».
+- El costo máximo puede ser cero sólo en el alta inicial. La edición y el uso en
+  salidas requieren un costo mayor que cero; las compras y sus correcciones no lo actualizan.
 
 ## Criterios de alta comercial
 

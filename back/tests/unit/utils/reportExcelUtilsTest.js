@@ -54,6 +54,9 @@ describe('generación progresiva de reportes Excel', () => {
     expect(rows[3][2]).toBe(0);
     expect(rows[2]).toEqual(['México', null, 0, false, 1.234567]);
     expect(data[1][2]).toEqual({ formula: 'A2+B2', result: 5 });
+    expect(sheet.views[0]).toMatchObject({ state: 'frozen', ySplit: 1 });
+    expect(sheet.getRow(1).font).toMatchObject({ bold: true });
+    expect(sheet.getColumn(1).width).toBeGreaterThanOrEqual(14);
     expect(await readdir(paths.root)).toEqual([]);
   });
 

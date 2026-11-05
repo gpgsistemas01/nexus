@@ -22,6 +22,7 @@ import { executeServiceOperation } from '../../serviceErrorHandler.js';
 import { findWasteIssueFulfillmentStatusIds } from './wasteIssueFulfillmentService.js';
 import { buildDateRangeFilter } from '../../../utils/requestQueryUtils.js';
 import { assertIssueDepartmentAccess, buildIssueDepartmentWhere } from '../issues/issueAccessService.js';
+import { assertIssueNotCanceled } from '../issues/issueFulfillmentRules.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueService');
 
@@ -133,11 +134,13 @@ const updateWasteIssueTransaction = async ({ id, wasteIssueDto, accesses }) => g
     await lockWasteIssue({ tx, id });
 
     const current = await tx.wasteIssue.findUnique({
-        where: { id, ...buildIssueDepartmentWhere({ accesses }) }, include: { details: true }
+        where: { id, ...buildIssueDepartmentWhere({ accesses }) },
+        include: { details: true, status: true, fulfillmentStatus: true }
     });
 
     if (!current) throw new WasteIssueNotFound();
     assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
+    assertIssueNotCanceled(current);
     if (current.details.some(detail => Number(detail.suppliedQuantity) > 0)) {
         throw new WasteIssueAlreadySuppliedConflict();
     }
@@ -185,10 +188,12 @@ export const updateWasteIssueHeader = async ({ id, wasteIssueDto, accesses = [] 
         action: () => getDb().$transaction(async tx => {
             await lockWasteIssue({ tx, id });
             const current = await tx.wasteIssue.findUnique({
-                where: { id, ...buildIssueDepartmentWhere({ accesses }) }, select: { id: true }
+                where: { id, ...buildIssueDepartmentWhere({ accesses }) },
+                select: { id: true, status: { select: { name: true } }, fulfillmentStatus: { select: { name: true } } }
             });
             if (!current) throw new WasteIssueNotFound();
             assertIssueDepartmentAccess({ accesses, departmentId: wasteIssueDto.departmentId });
+            assertIssueNotCanceled(current);
             const headerData = await resolveWasteIssueHeaderData({ tx, dto: wasteIssueDto });
 
             try {

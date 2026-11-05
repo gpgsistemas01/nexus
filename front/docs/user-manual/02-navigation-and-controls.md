@@ -23,7 +23,9 @@ Puede guardar la dirección de una página como favorito.
 
 Pulse un encabezado habilitado para ordenar y cambie el tamaño de página para ver
 más registros. El total de resultados se conserva.
-En pantallas estrechas, desplace la tabla para ver las demás columnas.
+En el teléfono, cada registro muestra sus campos apilados. En las tablas de
+detalle extensas, deslice horizontalmente dentro de la tabla para consultar las
+demás columnas. Los formularios distribuyen los campos según el ancho disponible.
 
 Si falta un registro, limpie los filtros. La actualización automática los conserva
 y espera mientras tiene una captura abierta. Ante un fallo, use **Actualizar** o

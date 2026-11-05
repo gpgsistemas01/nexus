@@ -18,7 +18,7 @@ manuales, seguir el [procedimiento por cuenta](07-manual-accounts-and-files.md).
 | --- | --- |
 | `front/docs/user-manual/index.md` y capítulos numerados | Instrucciones para el usuario. |
 | [Glosario de operación](../user-manual/16-glossary.md) | Términos visibles y ejemplos de captura, contrastados con el [glosario de negocio](../requirements/business-glossary.md). |
-| `front/docs/user-manual/images/*.png` | Capturas generales de referencia, versionadas junto al texto. |
+| `front/docs/user-manual/images/*.png` | Capturas generales de referencia, generadas y revisadas por separado; los archivos nuevos están ignorados por Git. |
 | Sección `manual` de [publications.json](../publications.json) | Entrada propia, excluida del libro técnico completo. |
 | [Configuración Playwright](../../playwright.manual.config.ts) y [recorridos](../../tests/manual/manualScreenshots.spec.ts) | Generación de capturas de referencia. |
 
@@ -84,7 +84,8 @@ npm run docs:manuals -- --all
 
 El comando genera una edición por cuenta configurada. `docs:manual:reference -- ambos` reúne
 todas las tareas en una referencia para mantenimiento; no es la edición por usuario.
-`docs:check` verifica enlaces e imágenes sin iniciar el navegador. Las rutas de
+`docs:check` verifica enlaces y referencias de imagen sin iniciar el navegador ni
+exigir las capturas generadas. La exportación exige las imágenes del manual. Las rutas de
 salida y la revisión de Word/PDF están en
 [generación y publicación](02-generation-and-publication.md).
 

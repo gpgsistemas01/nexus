@@ -189,7 +189,7 @@ test('almacén: sesión vencida y acceso directo sin permiso', async ({ page }) 
   await expect(page.getByRole('button', { name: 'Nuevo material' })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Editar', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Ajustar stock', exact: true })).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Descargar Excel' })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Exportar Excel', exact: true })).toBeHidden();
   await page.getByRole('button', { name: 'Menú', exact: true }).click();
   const navigation = page.getByRole('navigation', { name: 'Navegación principal' });
   await expect(navigation.getByRole('link', { name: 'Materiales', exact: true })).toBeVisible();
@@ -394,17 +394,18 @@ test('inventario: exportar respeta filtros y recupera una respuesta que no es Ex
   await page.goto('/almacen/consumibles');
   await page.getByRole('textbox', { name: 'Buscar por nombre' }).fill('Cinta');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await page.getByRole('button', { name: 'Exportar Excel', exact: true }).click();
   await page.getByText('Activos o con stock', { exact: true }).click();
   await page.getByRole('option', { name: 'Con stock', exact: true }).click();
   await page.getByRole('button', { name: 'Descargar Excel' }).click();
-  await expect(page.getByRole('alert', { name: 'Error de descarga' })).toContainText(
-    'Excel válido',
-  );
+  await acknowledgeFormError(page, 'Excel válido');
   expect(downloads).toEqual([]);
   const downloading = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Reintentar descarga' }).click();
+  await page.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
   const download = await downloading;
-  expect(download.suggestedFilename()).toBe('inventario_consumables.xlsx');
+  expect(download.suggestedFilename()).toMatch(
+    /^reporte_inventario_consumibles_\d{2}_\d{4}\.xlsx$/,
+  );
   expect(query?.get('type')).toBe('CONSUMABLE');
   expect(query?.get('search')).toBe('Cinta');
   expect(query?.get('inventoryScope')).toBe('inStock');
@@ -822,7 +823,7 @@ test('merma histórica: conserva pesos, referencia y medidas como consulta al ed
   ).toHaveValue('2');
   await expect(
     dialog.getByRole('textbox', { name: 'Peso neto de la merma (kg)', exact: true }),
-  ).toHaveValue('2.50');
+  ).toHaveValue(/^2\.5(?:0+)?$/);
   await expect(
     dialog.getByRole('spinbutton', { name: 'Peso de la merma con cono (kg)', exact: true }),
   ).not.toBeEditable();

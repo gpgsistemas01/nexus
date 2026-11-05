@@ -14,6 +14,7 @@ esta interfaz.
 | --- | --- |
 | Validar todos los paquetes sin generar archivos | `npm run docs:export -- --check` |
 | Validar un paquete | `npm run docs:export -- <paquete> --check` |
+| Validar fuentes del manual Vue sin exigir capturas locales | `npm run docs:export -- manual-vue manual-usuario --check-sources` |
 | Validar sólo la documentación Vue | `npm run docs:export -- arquitectura frontend-vue --check` |
 | Publicar las fuentes Vue en DOCX y PDF | `npm run docs:export -- arquitectura frontend-vue ambos` |
 | Publicar sólo el contrato API en DOCX y PDF, junto con OpenAPI | `npm run docs:export -- arquitectura contrato-api ambos` |
@@ -49,6 +50,11 @@ admitidos son `docx`, `pdf` y `ambos`; `pdf` y
 `ambos` conservan el DOCX intermedio además del PDF, mientras que `ambos` permite expresar esa
 intención de forma explícita. Markdown permanece como fuente navegable y por eso no se genera una
 copia HTML equivalente.
+
+`--check` exige las imágenes referenciadas. `--check-sources` valida fuentes,
+enlaces y declaraciones de imagen sin exigir los PNG generados por separado;
+es un modo de comprobación que no publica archivos. La exportación normal
+siempre exige las imágenes de la publicación seleccionada.
 
 Los manuales se dividen por los destinos visibles del menú: cada inventario, compra y salida conserva su contexto de materiales, consumibles o mermas. Las colecciones técnicas conservan su organización por grupo funcional. Las
 capturas de consultas y exportaciones se incluyen en el grupo del caso de uso al que dan evidencia;

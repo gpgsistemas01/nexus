@@ -154,11 +154,12 @@ proveedor V8 de la misma versión. Prisma conserva la versión estable 7.10.1 en
 CLI, cliente y adaptador; una etiqueta `latest` con `8.0.0-rc` no representa una
 versión estable para producción.
 
-`npm run dev` usa el modo watch nativo de Node. Reinicia al cambiar módulos
-importados y conserva la salida. Las vistas EJS se vuelven a leer en desarrollo;
-modificar una plantilla no requiere reiniciar el proceso. Al cambiar el esquema
-Prisma sigue siendo necesario ejecutar `npm run db:generate`. Se retira Nodemon
-y su configuración, cuya cadena Chokidar/braces no tenía una actualización corregida.
+`npm run dev` usa Nodemon con vigilancia limitada a `src/` y `.env` en
+[`nodemon.json`](nodemon.json). Las cargas de dependencias, incluidas las de Prisma
+en la primera consulta, no reinician el proceso ni interrumpen el proxy de Vue.
+Las vistas se leen de nuevo en desarrollo sin reinicio. Después de generar el
+cliente Prisma con `npm run db:generate`, reinicia la API. La versión de Nodemon
+queda fijada en el manifiesto y el lockfile.
 
 ExcelJS conserva su última versión estable oficial, 4.4.0. Un override limitado a
 `exceljs → uuid@11` evita la versión vulnerable 8 manteniendo la API CommonJS `v4`
@@ -220,28 +221,6 @@ configuración en un archivo `.env` local; en despliegues, utiliza el gestor de 
 de la plataforma. El archivo `.env` está excluido por `.gitignore` y nunca debe contener
 valores destinados a versionarse.
 
-```env
-# Aplicación
-PORT=3000
-NODE_ENV=development
-
-# Base de datos
-DATABASE_URL="postgresql://nexus_app:password@pooler.example.com:6543/nexus"
-DIRECT_URL="postgresql://nexus_migrator:password@localhost:5432/nexus"
-DATABASE_TEST_URL="postgresql://nexus_test_app:password@pooler.example.com:6543/nexus_test"
-DIRECT_TEST_URL="postgresql://nexus_test_migrator:password@localhost:5432/nexus_test"
-
-# Autenticación / seguridad
-JWT_SECRET_ACCESS="cambiar-en-produccion"
-JWT_SECRET_REFRESH="cambiar-en-produccion"
-JWT_SECRET_ONE_TIME="cambiar-en-produccion"
-
-# Logs
-LOG_LEVEL="info"
-```
-
-> Ajusta los nombres/secretos según el ambiente real. No subas archivos `.env` con credenciales al repositorio.
-
 | Variable | Obligatoria | Uso |
 | --- | --- | --- |
 | `DATABASE_URL` | Sí, excepto en pruebas | Conexión PostgreSQL del proceso de la aplicación. |
@@ -302,10 +281,13 @@ npm start
 
 ## Scripts disponibles
 
+La [consulta de comandos para desarrolladores](../front/docs/development/00-commands.md)
+reúne API, Vue, base de datos, pruebas, capturas y publicación desde la raíz.
+
 | Script | Descripción |
 | --- | --- |
 | `npm start` | Ejecuta `node src/app.js`. |
-| `npm run dev` | Ejecuta `node --watch --watch-preserve-output src/app.js`. |
+| `npm run dev` | Reinicia con Nodemon sólo por cambios de código o `.env`; excluye dependencias y archivos generados. |
 | `npm run db:migrate` | Aplica migraciones pendientes con Prisma; usa `DIRECT_URL` automáticamente cuando está definida. |
 | `npm run db:generate` | Genera el cliente Prisma. |
 | `npm test` | Ejecuta las pruebas unitarias y auxiliares; excluye `tests/integration`. |
@@ -477,11 +459,6 @@ Migraciones Prisma verificadas correctamente.
 ```
 
 Define ambas variables en el entorno de despliegue, sin incluirlas como argumentos de build ni guardarlas dentro de la imagen:
-
-```env
-DATABASE_URL="postgresql://usuario:password@pooler.example.com:6543/nexus"
-DIRECT_URL="postgresql://usuario:password@db.example.com:5432/nexus"
-```
 
 Para levantar el entorno con Docker Compose:
 

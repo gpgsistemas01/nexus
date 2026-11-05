@@ -10,7 +10,8 @@ describe('getDocumentOutputPlan', () => {
             publication: 'todos',
             document: null,
             format: 'ambos',
-            checkOnly: false
+            checkOnly: false,
+            checkSourcesOnly: false
         });
         expect(getDocumentOutputPlan()).toEqual({
             generateDocx: true,
@@ -23,7 +24,8 @@ describe('getDocumentOutputPlan', () => {
             publication: 'arquitectura',
             document: null,
             format: 'docx',
-            checkOnly: true
+            checkOnly: true,
+            checkSourcesOnly: false
         });
     });
 
@@ -32,13 +34,25 @@ describe('getDocumentOutputPlan', () => {
             publication: 'arquitectura',
             document: 'backend',
             format: 'pdf',
-            checkOnly: false
+            checkOnly: false,
+            checkSourcesOnly: false
         });
         expect(getDocumentExportRequest(['arquitectura', 'backend', '--check'])).toEqual({
             publication: 'arquitectura',
             document: 'backend',
             format: 'ambos',
-            checkOnly: true
+            checkOnly: true,
+            checkSourcesOnly: false
+        });
+    });
+
+    it('valida sólo fuentes sin publicar cuando las capturas se preparan aparte', () => {
+        expect(getDocumentExportRequest(['manual-vue', 'manual-usuario', 'ambos', '--check-sources'])).toEqual({
+            publication: 'manual-vue',
+            document: 'manual-usuario',
+            format: 'ambos',
+            checkOnly: true,
+            checkSourcesOnly: true
         });
     });
 

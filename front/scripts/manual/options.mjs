@@ -15,12 +15,14 @@ Cada cuenta inicia sesión para detectar sus áreas, roles y permisos.
 Las cuentas sin usuario o contraseña se omiten, sin detener las demás.
 Las capturas quedan en docs/user-manual/accounts/<cuenta>/images/.
 Word y PDF quedan en build/docs/{docx,pdf}/manuales-vue/<cuenta>/.
+El primer uso captura todo; las siguientes ejecuciones completan las faltantes.
 
 Opciones:
   --all                     Cuentas del JSON con credenciales completas.
   --profile <id>            Una cuenta del JSON.
   --capture-only            Sólo fuentes y capturas, sin exportar Word/PDF.
   --missing                 Reanudar capturas pendientes o desactualizadas.
+  --fresh                   Volver a capturar todo desde el inicio.
   --format docx|pdf|ambos    Formato de publicación; predeterminado: ambos.
   --accounts <archivo>      Configuración de cuentas; rutas relativas a front/.
   --env-file <archivo>      Credenciales locales; rutas relativas a front/.
@@ -38,7 +40,8 @@ export const parseManualOptions = (args) => {
         'env-file': '.env.manual.local',
         profile: '',
         all: false,
-        missing: false,
+        missing: true,
+        fresh: false,
         'capture-only': false,
         help: false,
     };
@@ -54,6 +57,9 @@ export const parseManualOptions = (args) => {
         }
     }
     if (values.help) return values;
+    if (values.fresh && args.includes('--missing'))
+        throw new Error('Use --fresh o --missing, sin combinarlos.');
+    if (values.fresh) values.missing = false;
     parseManualMode(values.mode);
     if (!['ambos', 'pdf', 'docx'].includes(values.format))
         throw new Error('Use --format docx, --format pdf o --format ambos.');

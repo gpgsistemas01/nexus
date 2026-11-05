@@ -26,7 +26,7 @@ const issueDetailModel = kind => kind === 'goods' ? prisma.goodsIssueDetail : pr
 const createStock = async (kind = 'goods', stock = 20) => {
   const data = { name: `CC ${kind} ${randomUUID()}`, presentationId: ids.presentation, unitMeasureId: ids.unit };
   if (kind === 'waste') {
-    const waste = await prisma.waste.create({ data: { ...data, supplierId: ids.supplier, base: 1, height: 1, currentStock: stock, convertedQuantity: stock } });
+    const waste = await prisma.waste.create({ data: { ...data, supplierId: ids.supplier, base: 1, height: 1, currentStock: stock, convertedQuantity: stock, maxUnitCost: 10 } });
     wastes.push(waste.id);
     return waste;
   }
@@ -97,9 +97,11 @@ describe('consistencia de operaciones simultáneas de almacén', () => {
     app = createControllerTestApp({ registerRoutes: router => {
       router.use((req, _res, next) => { req.user = { id: req.get('x-actor-id') || ids.user, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] }; next(); });
       router.patch('/goods/:id', goods.editMaterialGoodsIssue);
+      router.patch('/goods/:id/header', goods.editMaterialGoodsIssueHeader);
       router.patch('/goods/:id/details', goods.editMaterialGoodsIssueDetails);
       router.patch('/goods/:id/details/:detailId/returns', goods.registerMaterialGoodsIssueDetailReturn);
       router.patch('/waste/:id', waste.editWasteIssue);
+      router.patch('/waste/:id/header', waste.editWasteIssueHeader);
       router.patch('/waste/:id/details', waste.editWasteIssueDetails);
       router.patch('/waste/:id/details/:detailId/returns', waste.registerWasteIssueDetailReturn);
       router.patch('/receipts/:id', receipt.editMaterialGoodsReceipt);
@@ -348,6 +350,8 @@ describe('consistencia de operaciones simultáneas de almacén', () => {
     expect(Number(saved.totalNetPurchaseAmount)).toBe(100);
     expect(saved.details.reduce((sum, detail) => sum + Number(detail.netPurchaseAmount), 0)).toBe(100);
     expect(await prisma.goodsReceiptDetailChange.count({ where: { goodsReceiptId: receipt.id } })).toBe(2);
+    const offers = await prisma.supplierMaterial.findMany({ where: { materialId: { in: receipt.details.map(detail => detail.materialId) } } });
+    expect(offers.map(offer => Number(offer.maxUnitCost))).toEqual([10, 10]);
   });
 
   it('dos cancelaciones de la misma compra modifican existencias una sola vez', async () => {
@@ -358,6 +362,14 @@ describe('consistencia de operaciones simultáneas de almacén', () => {
     expect(await stock('goods', { id: receipt.details[0].materialId })).toEqual([18, 18]);
     expect(await prisma.goodsReceiptDetailChange.count({ where: { goodsReceiptId: receipt.id } })).toBe(1);
     expect(await prisma.movementDetail.count({ where: { goodsReceiptDetailId: receipt.details[0].id } })).toBe(1);
+    const saved = await prisma.goodsReceipt.findUnique({ where: { id: receipt.id }, include: { status: true } });
+    expect(saved.status.name).toBe('Cancelada');
+    expect(Number(saved.totalQuantity)).toBe(2);
+    expect(Number(saved.totalNetPurchaseAmount)).toBe(20);
+    const offer = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: {
+      supplierId: ids.supplier, materialId: receipt.details[0].materialId
+    } } });
+    expect(Number(offer.maxUnitCost)).toBe(10);
   });
 
   it('agregar un detalle mientras se cancela el último conserva el estado de la compra', async () => {
@@ -395,11 +407,49 @@ describe('consistencia de operaciones simultáneas de almacén', () => {
     const item = await createStock();
     await request(app).patch(`/receipts/${receipt.id}`).send({
       supplierId: ids.supplier, receivedById: ids.person, receptionDate: new Date().toISOString(),
-      details: [{ materialId: item.id, quantity: 2, costPerUnitType: 10 }]
+      details: [{ materialId: item.id, quantity: 2, costPerUnitType: 100 }]
     }).expect(200);
     const saved = await prisma.goodsReceipt.findUnique({ where: { id: receipt.id }, include: { details: true } });
     expect(Number(saved.totalQuantity)).toBe(4);
-    expect(Number(saved.totalNetPurchaseAmount)).toBe(40);
+    expect(Number(saved.totalNetPurchaseAmount)).toBe(220);
     expect(saved.details).toHaveLength(3);
+    const offer = await prisma.supplierMaterial.findUnique({ where: { supplierId_materialId: { supplierId: ids.supplier, materialId: item.id } } });
+    expect(Number(offer.maxUnitCost)).toBe(10);
+  });
+
+  it.each(['goods', 'waste'])('rechaza surtir %s histórico sin costo y revierte los demás renglones', async kind => {
+    const items = await Promise.all([createStock(kind), createStock(kind)]);
+    const issue = await createIssue(kind, items);
+    if (kind === 'goods') {
+      await prisma.goodsIssueDetail.update({ where: { id: issue.details[1].id }, data: { maxUnitCost: 0 } });
+    } else {
+      await prisma.waste.update({ where: { id: items[1].id }, data: { maxUnitCost: null } });
+    }
+    const before = await issueDetailModel(kind).findMany({ where: { [kind === 'goods' ? 'goodsIssueId' : 'wasteIssueId']: issue.id } });
+    const response = await supply(kind, issue).expect(409);
+    expect(response.body.code).toBe(kind === 'goods' ? 'GOODS_ISSUE_MISSING_MAX_UNIT_COST' : 'WASTE_ISSUE_MISSING_MAX_UNIT_COST');
+    expect(await stock(kind, items[0])).toEqual([20, 20]);
+    expect(await stock(kind, items[1])).toEqual([20, 20]);
+    expect(await issueMovements(kind, issue)).toEqual([]);
+    expect(await issueDetailModel(kind).findMany({ where: { [kind === 'goods' ? 'goodsIssueId' : 'wasteIssueId']: issue.id } })).toEqual(before);
+  });
+
+  it.each(['goods', 'waste'])('rechaza modificar el encabezado de %s cancelada mediante HTTP directo', async kind => {
+    const item = await createStock(kind);
+    const issue = await createIssue(kind, [item]);
+    await prisma.status.upsert({ where: { name: 'Cancelada' }, update: {}, create: { name: 'Cancelada' } });
+    await issueModel(kind).update({ where: { id: issue.id }, data: {
+      status: { connect: { name: 'Cancelada' } }, fulfillmentStatus: { connect: { name: 'Cancelado' } }
+    } });
+    const before = await issueModel(kind).findUnique({ where: { id: issue.id }, include: { details: true } });
+    const response = await request(app).patch(`/${kind}/${issue.id}/header`).send({
+      requesterId: ids.person, advisorId: ids.person, clientId: ids.client, departmentId: ids.department,
+      requestDate: new Date().toISOString(), projectNumber: 'NO-EDITAR', observations: 'No debe persistir',
+      status: { name: 'Aprobada' }, fulfillmentStatusId: statuses.Pendiente
+    }).expect(409);
+    expect(response.body.code).toBe('ISSUE_CANCELED_CONFLICT');
+    expect(await issueModel(kind).findUnique({ where: { id: issue.id }, include: { details: true } })).toEqual(before);
+    expect(await stock(kind, item)).toEqual([20, 20]);
+    expect(await issueMovements(kind, issue)).toEqual([]);
   });
 });

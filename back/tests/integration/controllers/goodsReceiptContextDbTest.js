@@ -149,6 +149,25 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-12T12:00:00.000Z',
         details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 10 }]
     });
+
+    it.each(['material', 'consumable'])('comprar %s conserva el costo de almacén, incluso si aún no se capturó', async resource => {
+        const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
+        try {
+            for (const maxUnitCost of [10, null]) {
+                await prisma.supplierMaterial.update({ where, data: { maxUnitCost } });
+                const response = await request(app).post(path(resource)).send({
+                    ...purchaseBody(resource), maxUnitCost: 999,
+                    details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 100, maxUnitCost: 999 }]
+                }).expect(200);
+                const saved = await prisma.goodsReceiptDetail.findMany({ where: { goodsReceiptId: response.body.goodsReceipt.id } });
+                expect(Number(saved[0].costPerUnitType)).toBe(100);
+                const offer = await prisma.supplierMaterial.findUnique({ where });
+                expect(offer.maxUnitCost === null ? null : Number(offer.maxUnitCost)).toBe(maxUnitCost);
+            }
+        } finally {
+            await prisma.supplierMaterial.update({ where, data: { maxUnitCost: 10 } });
+        }
+    });
     const getCounter = prefix => prisma.referenceNumberCounter.findUnique({
         where: { prefix_year: { prefix, year: new Date().getFullYear() } }
     });

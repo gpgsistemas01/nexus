@@ -4,7 +4,7 @@ const PAGE_LIMIT = 100;
 export const MANUAL_LOOKUP_PAGE_SIZE = 20;
 const validMeasure = (value) => Number.isFinite(Number(value)) && Number(value) > 0;
 
-const lookupPages = async function* (lookup, resource, supplierId = '') {
+export const lookupPages = async function* (lookup, resource, supplierId = '') {
     for (let page = 1; page <= PAGE_LIMIT; page++) {
         const result = await lookup({ resource, supplierId, page });
         if (

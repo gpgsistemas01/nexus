@@ -1,4 +1,4 @@
-import { reportScopeError } from '../../../shared/report.js';
+import { reportParams } from '../../../shared/report.js';
 import type { ReportScope } from '../../../shared/report.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
@@ -71,20 +71,7 @@ export const movementService = {
         report: ReportScope,
         signal: AbortSignal,
     ) {
-        const error = reportScopeError(report);
-        if (error) throw new Error(error);
-
-        const params =
-            report.mode === 'filtered'
-                ? movementParams(resource, query)
-                : new URLSearchParams({
-                      'order[0][column]': String(query.orderColumn),
-                      'order[0][dir]': query.direction,
-                      monthlyReport: 'true',
-                      reportMonth: report.mode === 'specific-month' ? report.month : '',
-                  });
-        params.delete('start');
-        params.delete('length');
+        const params = reportParams(movementParams(resource, query), report);
         return requestExcel(`/api/admin/reports/movements/${resource}/excel?${params}`, signal);
     },
     async lookup(

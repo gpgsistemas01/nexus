@@ -46,7 +46,7 @@ try {
         await generateCodeReference(frontRoot, true);
         await generateTypeReference(frontRoot, true);
         runExport(['--check']);
-        runExport(['--check'], 'manual');
+        runExport(['--check-sources'], 'manual');
         runExport(['--check'], 'tipos');
     } else if (command === 'export') {
         const catalog = await loadDocumentationCatalog(path.join(frontRoot, 'docs'));

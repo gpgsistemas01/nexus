@@ -663,8 +663,8 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
-        "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+        "exclusiveMinimum": 0,
+        "description": "Mayor que cero, hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
       },
       "isActive": {
         "type": "boolean"
@@ -897,8 +897,8 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,6})?$",
         "multipleOf": 1e-06,
         "exclusiveMaximum": 100000000,
-        "minimum": 0,
-        "description": "Hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
+        "exclusiveMinimum": 0,
+        "description": "Mayor que cero, hasta 8 enteros y 6 decimales; se convierte a n\u00famero en el validador."
       },
       "isActive": {
         "type": "boolean"

@@ -171,7 +171,7 @@ keyof DirectoryValues
 
 ## DirectoryPage.defineProps
 
-**Fuente:** [src/modules/directory/pages/DirectoryPage.vue](../../../../../src/modules/directory/pages/DirectoryPage.vue) · línea 20, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/directory/pages/DirectoryPage.vue](../../../../../src/modules/directory/pages/DirectoryPage.vue) · línea 21, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

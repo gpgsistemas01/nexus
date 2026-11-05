@@ -18,6 +18,15 @@ const runValidation = async (body, validation = materialValidation) => {
 };
 
 describe('materialValidation', () => {
+  it('permite costo cero sólo en el alta y exige costo positivo al editar', async () => {
+    const body = { ...validMaterial, maxUnitCost: 0, newStock: 0, expectedVersion: 0, expectedMaterialVersion: 0 };
+    expect(await runValidation({ ...body })).toEqual([]);
+    expect(await runValidation({ ...body }, materialEditValidation)).toContainEqual(
+      expect.objectContaining({ path: 'maxUnitCost', msg: 'MAX_UNIT_COST_INVALID_NUMBER' })
+    );
+    expect(await runValidation({ ...body, maxUnitCost: '0.000001' }, materialEditValidation)).toEqual([]);
+  });
+
   it('no valida costo máximo ni stock nuevo en el contexto de una compra', async () => {
     const errors = await runValidation({
       ...validMaterial,

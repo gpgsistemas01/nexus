@@ -13,6 +13,8 @@ it('usa cuentas y credenciales locales por defecto, sin seleccionar demostracion
     all: true,
     format: 'ambos',
     'capture-only': false,
+    missing: true,
+    fresh: false,
   });
 });
 
@@ -42,6 +44,14 @@ it('permite capturar una cuenta y reanudar usando sus archivos seleccionados', (
 it('sólo utiliza datos ficticios cuando se solicita el modo demo', () => {
   expect(parseManualOptions(['--mode', 'demo', '--all']).mode).toBe('demo');
 });
+
+it.each([['--all'], ['--profile', 'cuenta-01']])(
+  'recupera faltantes por defecto: %j',
+  (...args) => {
+    expect(parseManualOptions(args).missing).toBe(true);
+    expect(parseManualOptions([...args, '--fresh'])).toMatchObject({ missing: false, fresh: true });
+  },
+);
 
 it.each([undefined, '', 'development', 'test'])(
   'permite las herramientas en el entorno de desarrollo o pruebas: %s',
@@ -87,6 +97,7 @@ it.each(['docx', 'pdf', 'ambos'])('admite publicar el formato %s', (format) => {
 it.each([
   [],
   ['--all', '--profile', 'cuenta-01'],
+  ['--all', '--missing', '--fresh'],
   ['--profile', '../otra-cuenta'],
   ['--profile', ''],
   ['--all', '--mode', 'otro'],

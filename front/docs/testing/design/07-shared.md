@@ -20,6 +20,13 @@ escritorio y 320/390 px, subencabezados, stock bajo y recortes. No sustituir est
 por aserciones de CSS o colores. Aplican los [límites de
 simulación](../01-test-plan.md#niveles-y-entornos).
 
+## Exportación y adaptación móvil
+
+| ID de diseño | Riesgo y técnica | Condición observable | Fuentes |
+| --- | --- | --- | --- |
+| `DP-VUE-EXP-001` | Diferencias entre módulos; particiones periodo/inventario/filtros y transiciones abrir/cancelar/confirmar/fallar. | Confirmar usa filtros vigentes; cancelar no consulta; un error conserva selección y permite reintentar. El mes de México se calcula al descargar, con una sola extensión. | `fileExportTest.ts`, `reportScopeTest.ts`, `warehouse.spec.ts`, `records.spec.ts`, `movements.spec.ts`, `issues.spec.ts`, `purchases.spec.ts`. |
+| `DP-VUE-TABLE-002` | Controles fuera de pantalla; fronteras 320/390/768 y referencia 1440 px. | Los 17 listados caben en la página; los formularios se abren y cierran con controles visibles. Las tablas de captura extensas se desplazan dentro de su contenedor. | `responsive.spec.ts` y revisión de la captura móvil del manual. |
+
 ## Presentación numérica
 
 `formatNumbersTest.ts` comprueba la presentación de m² con dos decimales, signos,

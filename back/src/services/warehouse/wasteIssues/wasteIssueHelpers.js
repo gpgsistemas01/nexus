@@ -2,6 +2,7 @@ import {
     WasteIssueAdvisorNotFound,
     WasteIssueClientAdvisorConflict,
     WasteIssueDuplicateWasteConflict,
+    WasteIssueMissingMaxUnitCost,
     WasteIssueProjectNumberConflict,
     WasteIssueRequesterNotFound,
     WasteIssueWasteUnavailableConflict
@@ -94,7 +95,7 @@ export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId 
 
     const wastes = await tx.waste.findMany({
         where: { id: { in: [...uniqueIds] }, isActive: true },
-        select: { id: true, name: true, base: true, height: true }
+        select: { id: true, name: true, base: true, height: true, maxUnitCost: true }
     });
 
     if (wastes.length !== uniqueIds.size) {
@@ -102,6 +103,12 @@ export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId 
     }
 
     const byId = new Map(wastes.map(waste => [waste.id, waste]));
+
+    for (const waste of wastes) {
+        if (!(Number(waste.maxUnitCost) > 0)) {
+            throw new WasteIssueMissingMaxUnitCost({ materialName: waste.name });
+        }
+    }
 
     return details.map(detail => createWasteIssueDetailSnapshot({
         waste: byId.get(detail.wasteId),

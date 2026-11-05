@@ -6,6 +6,9 @@ admitida por los manifiestos de [front](../../package.json) y
 [back](../../../back/package.json). Para ingresar necesitas una cuenta activa en
 la base del entorno.
 
+La [consulta rápida de comandos](00-commands.md) reúne inicio, pruebas, capturas
+y publicación para desarrolladores.
+
 ## 1. Comprobar la copia y Node
 
 Si aún no tienes una copia:
@@ -41,17 +44,9 @@ Espera a que ambos comandos terminen correctamente. Cada uno instala su propio
 ### Configuración mínima de la API de desarrollo
 
 Crea **`back/.env`**, junto a `back/package.json`. Si ya está configurado, conserva
-sus valores. Sustituye los datos de ejemplo por la conexión de tu base de desarrollo
-y tres secretos distintos:
-
-```dotenv
-NODE_ENV=development
-PORT=3000
-DATABASE_URL="postgresql://usuario_local:clave_local@127.0.0.1:5432/nexus_dev"
-JWT_SECRET_ACCESS="reemplazar-por-secreto-local-independiente"
-JWT_SECRET_REFRESH="reemplazar-por-otro-secreto-local-independiente"
-JWT_SECRET_ONE_TIME="reemplazar-por-otro-secreto-local-independiente"
-```
+sus valores. Configura `NODE_ENV` para desarrollo, `DATABASE_URL` con la conexión
+de tu base y tres secretos distintos: `JWT_SECRET_ACCESS`, `JWT_SECRET_REFRESH`
+y `JWT_SECRET_ONE_TIME`. `PORT` es opcional y usa 3000 si se omite.
 
 La base y su cuenta PostgreSQL deben existir. Si la migración requiere conexión
 directa, agrega `DIRECT_URL` para esa misma base. Las variables y los secretos de
@@ -62,45 +57,17 @@ Las conexiones de pruebas se preparan por separado según la
 ### Configurar `front/.env.local` para Vue
 
 Este archivo es opcional con la API en `http://127.0.0.1:3000` y el logo predeterminado.
-Para personalizarlo, copia la plantilla **sólo si todavía no existe**.
-
-En PowerShell:
-
-```powershell
-if (-not (Test-Path front/.env.local)) {
-    Copy-Item front/.env.example front/.env.local
-}
-```
-
-En Bash:
-
-```bash
-if [ ! -e front/.env.local ]; then
-    cp front/.env.example front/.env.local
-fi
-```
-
-La copia queda junto a `front/package.json`. Abre `front/.env.local` en el editor:
-
-```dotenv
-BACKEND_PROXY_TARGET=http://127.0.0.1:3000
-VITE_LOGIN_LOGO_URL=
-```
+Créalo localmente junto a `front/package.json` sólo para cambiar estas opciones:
 
 | Variable | Valor y aplicación |
 | --- | --- |
 | `BACKEND_PROXY_TARGET` | Origen de la API, sin `/api` ni credenciales. Destino del proxy para API y cierre de sesión. |
 | `VITE_LOGIN_LOGO_URL` | Público. Vacío muestra N; `/logo.png` usa `front/public/logo.png`. Admite URL pública. |
 
-Si la API escucha en 3001:
-
-```dotenv
-BACKEND_PROXY_TARGET=http://127.0.0.1:3001
-```
+Si la API usa otro puerto, configura `BACKEND_PROXY_TARGET` con su origen completo.
 
 Guarda el archivo y reinicia Vite. Este valor no cambia el `PORT` de la API ni el
 puerto de Vue; sigue abriendo las páginas desde `http://localhost:5173`.
-Modificar sólo `.env.example` no cambia la configuración activa.
 
 Vite aplica, de menor a mayor prioridad: `.env`, `.env.local`, `.env.[modo]` y
 `.env.[modo].local`. Las variables del proceso tienen prioridad sobre esos archivos.
@@ -142,6 +109,14 @@ Abre `http://localhost:5173/inicio-sesion` e ingresa con la cuenta del entorno.
 Vite informa si el puerto 5173 está ocupado. Conserva el mismo host durante la
 sesión y deja ambas terminales abiertas; Ctrl+C detiene cada proceso.
 
+### Acceso desde un móvil en la red local
+
+Conecta el móvil a la misma red y abre
+`http://<IP_LOCAL_DEL_EQUIPO>:5173/inicio-sesion`. Vite escucha en `0.0.0.0`;
+permite su puerto 5173 en el firewall del equipo. El navegador conserva el host
+de Vue para la API: el proxy conecta desde el equipo servidor hacia Express,
+normalmente en `127.0.0.1:3000`.
+
 ## 6. Comprobar el resultado
 
 | Comprobación | Resultado esperado |
@@ -181,7 +156,8 @@ npm --prefix front run preview
 | No se resuelve `@nexus/*` | Comprueba la rama y las fuentes públicas del repositorio completo. |
 | Falta `back/generated/prisma/client.ts` | Configura `back/.env` y ejecuta `npm --prefix back run db:generate`. |
 | `502` o `ECONNREFUSED` | El proxy no pudo conectar con la API. Comprueba que esté activa en el host y puerto de `BACKEND_PROXY_TARGET`. |
-| `ECONNRESET` en el proxy | La conexión hacia la API se interrumpió. Compara acceso directo y proxy con las consultas siguientes; puede ocurrir antes de que la API registre la petición. |
+| `ECONNRESET` junto a reinicios al cargar `node_modules` | Detén el proceso anterior y ejecuta `npm --prefix back ci --include=dev` y `npm --prefix back run dev`. El script usa vigilancia limitada a `src/` y `.env`, para que la primera carga de Prisma no reinicie la API. |
+| `ECONNRESET` sin reinicios | Compara acceso directo y proxy con las consultas siguientes y revisa la terminal de la API. |
 | `[vite] (client) hmr update` | Vite actualizó un módulo editado; es un mensaje normal de desarrollo. |
 | `500` con `tenant/user … not found` en Prisma | Corrige `DATABASE_URL` en `back/.env`: copia la cadena del pooler desde **Connect** del proyecto Supabase y reemplaza el marcador de contraseña. Host y usuario deben pertenecer al mismo proyecto. Reinicia la API. |
 | `401` o `403` con la API respondiendo | Revisa sesión, credenciales y permisos. |
@@ -236,7 +212,7 @@ no instala dependencias.
 | Archivo o directorio | Ubicación y preparación |
 | --- | --- |
 | Variables de la API | `back/.env`, creado localmente. |
-| Variables de Vue | `front/.env.local`, copia opcional de `.env.example`. |
+| Variables de Vue | `front/.env.local`, creado localmente sólo si se necesita. |
 | Dependencias | `back/node_modules` y `front/node_modules`, instaladas por separado. |
 | Cliente Prisma | `back/generated/prisma`, producido por `db:generate`. |
 | Compilación | `front/dist`, producido por `build`. |

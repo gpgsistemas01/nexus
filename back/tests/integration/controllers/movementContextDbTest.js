@@ -127,7 +127,7 @@ describe('movimientos por contexto, permisos y reportes', () => {
             if (resource === 'consumables') {
                 expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(['Movimientos de consumibles']);
                 expect(rows[0][4]).toBe('Consumible');
-                expect(response.headers['content-disposition']).toContain('informe_movimientos_consumibles');
+                expect(response.headers['content-disposition']).toMatch(/reporte_movimientos_consumibles_\d{2}_\d{4}\.xlsx/);
             }
         }
         expect(await prisma.movementDetail.findMany({ where: { movementId: { in: movementIds } }, orderBy: { id: 'asc' } })).toEqual(before);

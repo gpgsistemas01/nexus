@@ -64,7 +64,7 @@ la ejecución. No requieren otro `.env` ni se completan manualmente:
 | `FRONT_MANUAL_MODE`, `FRONT_MANUAL_BASE_URL` | Modo y origen de Vue obtenidos de los argumentos y del JSON de cuentas. |
 | `FRONT_MANUAL_IDS` | IDs de las cuentas seleccionadas que tienen credenciales completas. |
 | `FRONT_MANUAL_ACCOUNTS`, `FRONT_MANUAL_ENV_FILE` | Rutas de los dos archivos de entrada; no contienen sus valores. |
-| `FRONT_MANUAL_MISSING` | Activa la reanudación solicitada con `--missing`. |
+| `FRONT_MANUAL_MISSING` | Reanudación automática por cuenta; `--fresh` la desactiva. |
 
 Leer las credenciales sólo prepara los datos de entrada. Después,
 `authenticateManualAccount` llama a `/api/auth/login` y `realSession` consulta

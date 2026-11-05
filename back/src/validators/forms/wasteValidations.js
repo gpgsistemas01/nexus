@@ -41,7 +41,8 @@ const wasteSecondaryDataValidation = [
 export const wasteEditValidation = [
     ...WASTE_IMMUTABLE_FIELDS.map(field => body(field).not().exists({ values: 'undefined' }).withMessage(errorMap.weightKg.READ_ONLY)),
     validateText({ fieldName: 'name', maxLength: FORM_FIELD_LIMITS.MATERIAL_NAME }),
-    ...wasteSecondaryDataValidation,
+    ...createInventoryStateValidation(),
+    validatePositiveNumber('maxUnitCost', { format: MONEY_INPUT_FORMAT }),
     validateRecordVersion()
 ];
 

@@ -147,6 +147,25 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         } });
     });
 
+    it.each(['material', 'consumable'])('rechaza %s sin costo y no confía en el costo enviado', async resource => {
+        const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
+        const beforeCount = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
+        try {
+            for (const maxUnitCost of [null, 0]) {
+                await prisma.supplierMaterial.update({ where, data: { maxUnitCost } });
+                const before = await prisma.supplierMaterial.findUnique({ where });
+                const response = await request(app).post(issuePath(resource)).send({
+                    ...header(), details: [{ ...detail(resource), maxUnitCost: 999 }]
+                }).expect(409);
+                expect(response.body.code).toBe('GOODS_ISSUE_MISSING_MAX_UNIT_COST');
+                expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(beforeCount);
+                expect(await prisma.supplierMaterial.findUnique({ where })).toEqual(before);
+            }
+        } finally {
+            await prisma.supplierMaterial.update({ where, data: { maxUnitCost: 10 } });
+        }
+    });
+
     afterAll(cleanCreatedRecords);
 
     it('clasifica las salidas históricas con la misma regla de la migración de compras', async () => {

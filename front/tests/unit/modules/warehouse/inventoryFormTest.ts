@@ -180,7 +180,7 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
   });
 
   it.each(['materials', 'wastes'] as const)(
-    'editar %s sin costo recibido exige capturarlo y admite cero explícito',
+    'editar %s sin costo recibido exige un costo mayor que cero',
     async (resource) => {
       const data = resource === 'wastes' ? waste : material;
       const { editor, request } = openEditor(resource, {
@@ -192,8 +192,12 @@ describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)'
       expect(editor.errors.value.maxUnitCost).toBeTruthy();
       editor.update('maxUnitCost', '0');
       await editor.submit();
+      expect(request).not.toHaveBeenCalled();
+      expect(editor.errors.value.maxUnitCost).toBeTruthy();
+      editor.update('maxUnitCost', '12.50');
+      await editor.submit();
       expect(request).toHaveBeenCalledOnce();
-      expect(request.mock.calls[0]?.[2].maxUnitCost).toBe(0);
+      expect(request.mock.calls[0]?.[2].maxUnitCost).toBe(12.5);
     },
   );
 

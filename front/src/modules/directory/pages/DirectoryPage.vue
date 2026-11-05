@@ -8,7 +8,8 @@ import { usePageAccess } from '../../../app/composables/usePageAccess.js';
 import { useListEditor } from '../../../shared/composables/useListEditor.js';
 import { useListSearch } from '../../../shared/composables/useListSearch.js';
 import { usePagedList } from '../../../shared/composables/usePagedList.js';
-import { useFileExport } from '../../../shared/composables/useFileExport.js';
+import { useReportScope } from '../../../shared/composables/useReportScope.js';
+import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue';
 import { initialRecordQuery } from '../../../shared/list.js';
 import type { RecordQuery } from '../../../shared/list.js';
 import { DIRECTORY_CONFIG } from '../directory.js';
@@ -34,13 +35,14 @@ const list = usePagedList<RecordQuery, DirectoryEntry>({
     onError,
 });
 const { rows, query, total, isLoading, error } = list;
-const report = useFileExport<void>({
+const report = useReportScope({
+    kind: 'filtered',
     canExport: () => canExport.value,
-    filename: `reporte_${props.resource}.xlsx`,
+    filename: `reporte_${props.resource === 'clients' ? 'clientes' : 'proveedores'}`,
     request: (_, signal) => directoryService.export(props.resource, { ...query }, signal),
     onDenied,
 });
-const { isExporting, exportError } = report;
+const { isExporting, exportError, isReportOpen, reportValues } = report;
 
 const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor<DirectoryTarget>({
     canOpen: (target) => (target.action === 'create' ? canCreate.value : canEdit.value),
@@ -72,7 +74,7 @@ onMounted(() => {
                 v-if="canExport"
                 variant="outlined"
                 :loading="isExporting"
-                @click="report.exportReport()"
+                @click="report.openReport()"
             >
                 Exportar Excel
             </VBtn>
@@ -84,17 +86,6 @@ onMounted(() => {
             >
                 {{ config.createLabel }}
             </VBtn>
-        </template>
-        <template #messages>
-            <VAlert
-                v-if="exportError"
-                aria-label="Error de descarga"
-                type="error"
-                role="alert"
-                class="mb-4"
-            >
-                {{ exportError }}
-            </VAlert>
         </template>
         <DirectoryTable
             v-if="canRead"
@@ -115,6 +106,15 @@ onMounted(() => {
             Tu cuenta no tiene permiso para consultar este listado.
         </VAlert>
     </RecordListPanel>
+    <ReportScopeDialog
+        v-if="isReportOpen"
+        kind="filtered"
+        :values="reportValues"
+        :is-submitting="isExporting"
+        :error="exportError"
+        @submit="report.exportReport"
+        @close="isReportOpen = false"
+    />
     <DirectoryEditorPage
         v-if="editor"
         :resource="resource"

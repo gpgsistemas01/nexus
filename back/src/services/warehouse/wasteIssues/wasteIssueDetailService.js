@@ -2,6 +2,7 @@ import { FULFILLMENT_STATUS_NAMES } from '../../../constants/warehouseStatuses.j
 import { INVENTORY_MOVEMENT_TYPES } from '../../../constants/inventory.js';
 import {
     WasteIssueDetailNotFound,
+    WasteIssueMissingMaxUnitCost,
     WasteIssueNotFound,
     WasteIssueStateConflict,
     WasteIssueUpdateDatabaseError
@@ -35,6 +36,7 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
                     id: true,
                     wasteId: true,
                     materialName: true,
+                    waste: { select: { maxUnitCost: true } },
                     quantity: true,
                     convertedQuantity: true,
                     suppliedQuantity: true,
@@ -64,6 +66,10 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
 
         const change = resolveIssueSupplyChange({ current: detail, requested });
         if (!change) continue;
+
+        if (change.quantityToSupply > 0 && !(Number(detail.waste.maxUnitCost) > 0)) {
+            throw new WasteIssueMissingMaxUnitCost({ materialName: detail.materialName });
+        }
 
         Object.assign(detail, change.data);
         detail.fulfillmentStatusId = statusIds.get(resolveIssueDetailFulfillmentStatus(detail));

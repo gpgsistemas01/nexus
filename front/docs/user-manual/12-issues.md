@@ -1,137 +1,101 @@
 # 12. Salidas
 
-## Elegir el contexto y consultar
+Abra **Salidas → Materiales**, **Consumibles** o **Mermas**. Aplique búsqueda,
+fechas, área o cumplimiento y pulse **Buscar**. Su cuenta sólo muestra las áreas autorizadas.
+Si dispone de una sola área, permanece seleccionada al limpiar filtros.
 
-Abra **Salidas → Materiales**, **Consumibles** o **Mermas**. Busque por folio o proyecto,
-aplique filtros de encabezado, fechas u **Observaciones contiene:** y pulse **Buscar**.
-Cada tabla contiene sólo su contexto; no mezcle material y merma del mismo nombre.
-
-El índice de su manual indica las áreas disponibles para su cuenta. Limpiar filtros
-conserva ese alcance.
-
-Si sólo tiene un área, **Área** se selecciona y queda visible y bloqueada en filtros y
-formulario. **Limpiar filtros** la conserva y retira los filtros opcionales. Con varias
-áreas autorizadas, puede elegir entre ellas.
-
-![Listado de salidas con búsqueda, filtros y acciones por documento.](images/22-issues-list.png)
+![Listado de salidas con búsqueda y cumplimiento.](images/22-issues-list.png)
 
 <!-- manual:any goods:issues-manage waste:issues-manage -->
 ## Registrar una solicitud
 
-**Antes de empezar.** Reúna cliente, asesor, área, solicitante, proyecto y artículos.
-Guardar registra la solicitud; Almacén atiende su entrega.
+1. Pulse **Nueva salida** y seleccione cliente, asesor, área y solicitante.
+2. Capture proyecto, fecha y observaciones. Para **GPG INTERNO**, conserve el proyecto del área.
+3. Seleccione material, consumible o merma, capture **Cantidad** y pulse **Agregar**.
+4. Revise las partidas, pulse **Guardar** y compruebe el folio pendiente.
 
-1. Pulse **Nueva salida**.
-2. En **Registrar salida** o **Registrar salida de merma**, seleccione
-   **Cliente** y **Asesor**. Revise **Área**: si está seleccionada y bloqueada,
-   corresponde a su única área disponible. Si puede elegir, seleccione el área que
-   recibirá los artículos. Después seleccione **Solicitante** entre las personas de
-   esa área; sus opciones se cargan automáticamente.
-3. Capture **Número de proyecto**, revise **Fecha y hora de solicitud:** y
-   complete **Observaciones** cuando corresponda.
-4. Seleccione **Material**, **Consumible** o **Merma**, capture **Cantidad** y
-   compruebe **Presentación**; este último campo se completa automáticamente.
-5. Pulse **Agregar** y compruebe el detalle preparado. Repita para los demás
-   artículos. Retire un detalle equivocado antes de guardar.
-6. Revise encabezado y detalles, pulse **Guardar** y espere la confirmación.
-7. Consulte el folio registrado y su estado de cumplimiento.
+![Solicitud preparada con encabezado y partidas.](images/23-issue-create.png)
 
-Repetir el mismo artículo y proveedor **suma** su cantidad al detalle. Otro proveedor
-conserva un detalle distinto. Revise la cantidad acumulada antes de guardar.
-
-Para Materiales y Consumibles, la cantidad debe ser al menos 1; para Mermas puede
-ser menor que 1, siempre que sea positiva. La fecha y hora de solicitud corresponden
-al horario de Ciudad de México. Si cambia Cliente o Área, revise de nuevo Asesor,
-Solicitante y Número de proyecto: sus selecciones dependientes se actualizan.
-
-Para **GPG INTERNO**, conserve el número de proyecto que completa **Área**. Si falta,
-solicite su revisión; escribir otro puede impedir guardar.
-
-![Preparación de una solicitud de salida con sus datos y detalle.](images/23-issue-create.png)
+Repetir artículo y proveedor suma su cantidad; otro proveedor crea una partida distinta.
+Materiales y consumibles requieren al menos una unidad; merma admite cantidades positivas menores.
+Solicitar no descuenta inventario.
 
 <!-- manual:any clients:create -->
-Si no encuentra un cliente, escriba su nombre en **Cliente** y pulse
-**Registrar cliente «nombre»** dentro del desplegable. Complete y guarde el
-formulario secundario; el nuevo cliente quedará seleccionado.
-<!-- manual:end -->
+Si falta un cliente, use **Registrar cliente «nombre»** en el selector y continúe después del alta.
 <!-- manual:end -->
 
-## Consultar un documento
+## Editar
 
-**Consultar salida** abre el documento para revisar encabezado y detalles solicitados.
-Use **Regresar** al terminar. Las opciones de carga y
-recuperación se explican en [Consultas de documentos](02-navigation-and-controls.md#consultas-de-documentos).
-
-<!-- manual:any goods:issues-manage waste:issues-manage -->
-## Editar una solicitud
-
-1. Para una corrección, abra **Editar salida** del folio adecuado.
-2. Modifique sólo los campos habilitados.
-3. Cuando el estado permita corregir detalles pendientes, revise sus cantidades
-   antes de añadirlos o retirarlos.
-4. Pulse **Actualizar** y compruebe el documento.
-
-Con detalles surtidos puede quedar habilitado sólo el encabezado. Para corregir
-una entrega realizada, avise a Almacén.
+Pulse **Editar salida**, cambie los campos habilitados y confirme **Actualizar**.
+Los detalles se editan mientras no haya surtidos; después puede quedar habilitado sólo el encabezado.
 <!-- manual:end -->
+
+## Consultar y distinguir estados
+
+**Consultar salida** muestra estado, cantidades surtidas y devueltas, pendiente
+de surtir y saldo entregado de cada partida. **Regresar** cierra sin cambios.
+
+| Cumplimiento | Qué significa |
+| --- | --- |
+| Pendiente | No hay entregas. |
+| Surtido parcial | Se entregó una parte de un renglón o quedan renglones pendientes. |
+| Surtido | Se completó la entrega. Una devolución parcial conserva este cumplimiento. |
+| Cancelado | Todos los detalles se devolvieron por completo; sólo admite consulta. |
+
+El estado se calcula al operar; abrir o cerrar una pantalla no lo cambia.
 
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ## Surtir
 
-**Antes de confirmar.** Surtir descuenta inventario. Compruebe solicitud, artículos
-y existencia; marque sólo lo que entrega físicamente.
+1. Pulse **Surtir detalle** y marque las partidas que entregará.
+2. Capture **Cantidad a surtir** sin superar el saldo pendiente.
+3. Revise **Cantidad de proyecto**, que expresa el total del detalle para el proyecto.
+4. Pulse **Surtir** y compruebe cantidades, cumplimiento y existencia descontada.
 
-1. Pulse **Surtir detalle** en la salida.
-2. Revise el encabezado de consulta y los detalles pendientes.
-3. Marque **Surtir** en los detalles que realmente entregará.
-4. En **Cantidad a surtir**, capture lo que entregará ahora, en la presentación del
-   artículo. El campo indica el saldo pendiente; no puede superarlo.
-5. Revise **Cantidad de proyecto**, expresada en la unidad de conversión. Es el
-   valor total del detalle para el proyecto; no se suma en cada entrega.
-6. Revise la selección y pulse **Surtir**.
-7. Espere la confirmación y compruebe cantidades surtidas, cumplimiento y saldo.
+![Preparación de una entrega de inventario.](images/24-issue-supply.png)
 
-![Selección de detalles pendientes para surtir.](images/24-issue-supply.png)
+El artículo debe tener costo máximo mayor que cero. Si falta, configúrelo en **Almacén**.
 
-Por ejemplo, si se solicitan 2 rollos y entrega 0.5, se descuentan 0.5 y quedan
-1.5 pendientes. El detalle queda **Surtido** al completar los 2 rollos.
-**Surtido parcial** también puede indicar otros detalles pendientes.
-
-**Diferencia** compara la conversión de la salida con **Cantidad de proyecto**.
-Un valor negativo indica que el proyecto supera esa conversión: revise los datos;
-Nexus conserva la captura y no la reemplaza para hacer coincidir los valores.
-<!-- manual:end -->
-
-<!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ## Devolver una entrega
 
-**Antes de confirmar.** Devolver reintegra existencias. Compruebe el artículo y la
-cantidad que regresaron de una entrega previa.
+1. En una salida **Surtida**, pulse **Devolver material surtido**.
+2. Elija **Devolver detalle de salida** y compruebe el saldo retornable.
+3. Capture cantidad y observaciones, confirme **Devolver** y revise el reintegro.
 
-La salida completa debe tener cumplimiento **Surtido**. Mientras permanezca en
-**Surtido parcial**, no puede devolver un detalle que ya fue entregado.
+![Devolución de un detalle surtido.](images/25-issue-return.png)
 
-1. En una salida con cumplimiento **Surtido**, pulse **Devolver material surtido**.
-2. Localice el detalle entregado y pulse **Devolver detalle de salida**.
-3. Revise las cantidades del detalle y el saldo que aún admite devolución.
-4. Capture **Cantidad a devolver** y **Observaciones**.
-5. Pulse **Devolver** y espere la confirmación.
-6. Consulte el detalle para comprobar la cantidad devuelta y el inventario
-   reintegrado.
+Una devolución parcial conserva el detalle surtido. La devolución total lo cancela;
+cuando todos se cancelan, se cancela la salida. No hay otra acción de cancelación.
+No se devuelve mientras la salida siga en **Surtido parcial**.
+<!-- manual:end -->
 
-![Devolución de un detalle que ya fue surtido.](images/25-issue-return.png)
+## Ejemplos por contexto
 
-El saldo entregado es el máximo que puede devolver. **Regresar** cierra sin enviar.
+<!-- manual:any goods:issues-page-view -->
+![Materiales con surtido parcial y saldo pendiente.](images/24a-issue-partial.png)
 
-Una devolución parcial conserva el detalle **Surtido**; devolver todo su saldo lo
-deja **Cancelado**. Al cancelar todos los detalles se cancela la salida. No hay una
-acción independiente de cancelación.
+![Consumibles con surtido parcial y saldo pendiente.](images/24b-issue-partial.png)
+
+![Materiales con devolución parcial registrada.](images/25a-issue-partial-return.png)
+
+![Consumibles con devolución parcial registrada.](images/25b-issue-partial-return.png)
+
+![Salida de materiales cancelada por devolución total.](images/25d-issue-canceled.png)
+
+![Salida de consumibles cancelada por devolución total.](images/25e-issue-canceled.png)
+<!-- manual:end -->
+
+<!-- manual:any waste:issues-page-view -->
+![Merma con surtido parcial y saldo pendiente.](images/24c-issue-partial.png)
+
+![Merma con devolución parcial registrada.](images/25c-issue-partial-return.png)
+
+![Salida de merma cancelada por devolución total.](images/25f-issue-canceled.png)
 <!-- manual:end -->
 
 <!-- manual:any warehouse:reports-read -->
-## Reportes e incidencias
+## Exportar
 
-Use **Exportar Excel** después de aplicar los filtros con **Buscar**.
-[Reportes](14-reports.md) explica el alcance; [Errores y recuperación](15-errors-and-recovery.md),
-los conflictos y envíos sin respuesta.
+Pulse **Exportar Excel**, elija alcance y confirme **Descargar Excel**.
+Consulte [Reportes](14-reports.md).
 <!-- manual:end -->

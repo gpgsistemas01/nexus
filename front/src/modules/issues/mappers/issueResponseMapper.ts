@@ -81,6 +81,7 @@ const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDet
         throw createInvalidResponseError();
 
     const unit = readOptionalRelation(item.unitMeasure);
+    const fulfillmentStatus = readOptionalRelation(value.fulfillmentStatus).name;
     return {
         id: value.id,
         itemId: readText(value, resource === 'wastes' ? 'wasteId' : 'materialId'),
@@ -105,9 +106,8 @@ const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDet
                 : String(readIssueDecimal(value.projectConvertedQuantity)),
         isSupplied: value.isSupplied,
         isOriginallySupplied: value.isSupplied,
-        isCanceled:
-            readOptionalRelation(value.fulfillmentStatus).name ===
-            FULFILLMENT_STATUS_NAMES.CANCELED,
+        fulfillmentStatus: typeof fulfillmentStatus === 'string' ? fulfillmentStatus : undefined,
+        isCanceled: fulfillmentStatus === FULFILLMENT_STATUS_NAMES.CANCELED,
     };
 };
 

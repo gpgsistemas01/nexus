@@ -10,6 +10,7 @@ export const errorMessages = {
     DATABASE_COLUMN_MISSING: 'Falta una columna requerida en la base de datos. Contacta a soporte.',
     PRISMA_CLIENT_OUT_OF_SYNC: 'El cliente de base de datos no está actualizado. Contacta a soporte.',
     WASTE_NOT_FOUND: 'La merma no existe.',
+    ISSUE_CANCELED_CONFLICT: 'La salida está cancelada y sólo puede consultarse.',
     OPERATION_ID_REQUIRED: 'Falta la clave de la operación.',
     OPERATION_ID_INVALID: 'La clave de la operación no es válida.',
     RECORD_VERSION_REQUIRED: 'Actualice la información antes de guardar.',
@@ -18,6 +19,7 @@ export const errorMessages = {
     WASTE_ISSUE_STATE_CONFLICT: 'La salida de merma no tiene detalles pendientes por surtir. Actualice la información.',
     WASTE_ISSUE_DUPLICATE_WASTE: 'No se puede repetir la misma merma en una salida.',
     WASTE_ISSUE_WASTE_UNAVAILABLE: 'Una o más mermas no existen o están inactivas. Actualice la selección.',
+    WASTE_ISSUE_MISSING_MAX_UNIT_COST: meta => `Configure un costo unitario máximo mayor que cero en Almacén antes de usar la merma: ${ meta.materialName }.`,
     WASTE_ISSUE_FULFILLMENT_STATUS_NOT_FOUND: 'No están configurados los estados de surtido. Contacte al administrador.',
     MATERIAL_ROLL_REFERENCE_INVALID: 'La referencia sólo aplica a materiales con presentación Rollo.',
     MATERIAL_ROLL_REFERENCE_READ_ONLY: 'Los pesos del rollo completo son históricos. Capture el peso del rollo completo al registrar merma.',
@@ -174,7 +176,7 @@ export const errorMessages = {
 
     // 💰 MAX UNIT COST
     MAX_UNIT_COST_REQUIRED: 'El costo máximo es requerido.',
-    MAX_UNIT_COST_INVALID_NUMBER: 'El costo máximo debe ser un número.',
+    MAX_UNIT_COST_INVALID_NUMBER: 'El costo máximo debe ser un decimal válido; al editar debe ser mayor que cero.',
     MAX_UNIT_COST_TOO_LONG: 'El costo máximo es demasiado grande.',
 
     INITIAL_QUANTITY_REQUIRED: 'La cantidad inicial es requerida.',
@@ -328,7 +330,7 @@ export const errorMessages = {
             ? meta.supplierName
             : '';
 
-        return `No se puede realizar la salida porque el material: ${ meta.materialName } y proveedor: ${ meta.supplierName } no tiene costo unitario máximo configurado.`
+        return `Configure un costo unitario máximo mayor que cero en Almacén antes de usar: ${ meta.materialName }${ dimensions }${ supplier ? `, proveedor: ${ supplier }` : '' }.`;
     },
     GOODS_ISSUE_NOT_PENDING_CONFLICT: 'La salida solo puede editarse cuando está pendiente.',
     GOODS_ISSUE_SUPPLIED_CONFLICT: 'La salida ya tiene materiales surtidos y no puede editarse en general.',

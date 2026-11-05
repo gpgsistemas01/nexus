@@ -257,7 +257,7 @@ PersonTarget | { action: 'password'; row: IdentityEntry }
 
 ## IdentityPage.defineProps
 
-**Fuente:** [src/modules/identity/pages/IdentityPage.vue](../../../../../src/modules/identity/pages/IdentityPage.vue) · línea 25, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/identity/pages/IdentityPage.vue](../../../../../src/modules/identity/pages/IdentityPage.vue) · línea 26, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

@@ -39,6 +39,7 @@ export interface IssueDetail {
     isSupplied: boolean;
     isOriginallySupplied: boolean;
     isCanceled: boolean;
+    fulfillmentStatus?: string;
 }
 export type IssueSupplyChanges = Partial<
     Pick<IssueDetail, 'isSupplied' | 'quantityToSupply' | 'projectConvertedQuantity'>

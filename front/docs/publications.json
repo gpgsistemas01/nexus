@@ -4,6 +4,7 @@
             "title": "Inicio e incorporación",
             "sources": [
                 "development/index.md",
+                "development/00-commands.md",
                 "development/01-getting-started.md",
                 "architecture/views/development/developer-onboarding.md",
                 "development/02-tooling.md",

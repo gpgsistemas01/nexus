@@ -4,12 +4,15 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.9 | 1.0.0 | En revisión | 2026-10-29 | Equipo Nexus |
+| 1.10 | 1.0.0 | En revisión | 2026-11-05 | Equipo Nexus |
 
 ## Propósito y audiencia
 
 Esta colección explica requisitos, arquitectura, construcción, pruebas y operación
 del cliente Vue. Está dirigida a desarrollo, pruebas y usuarios de Nexus.
+
+Para ejecutar el proyecto, las comprobaciones o los manuales, consulta
+[Comandos para desarrollo](development/00-commands.md).
 
 Nexus administra inventario, compras, solicitudes de salida, surtido, devoluciones y
 sus movimientos. El cliente Vue presenta estos procesos y consume la API de Nexus.

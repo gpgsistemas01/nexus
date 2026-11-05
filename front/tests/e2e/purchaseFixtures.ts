@@ -4,12 +4,28 @@ import { purchase, purchaseItem, purchasePermissions } from '../fixtures/purchas
 import { pageOf } from '../fixtures/inventory.js';
 import { personData, supplierData } from '../fixtures/records.js';
 
-export const mockPurchases = async (page: Page, permissions = purchasePermissions) => {
+export const mockPurchases = async (
+  page: Page,
+  permissions = purchasePermissions,
+  state: 'active' | 'mixed' | 'canceled' = 'active',
+) => {
   await mockWarehouse(page, permissions);
   const reads: URL[] = [];
   const reports: URL[] = [];
   const writes: { url: URL; method: string; data: Record<string, unknown> | null }[] = [];
   let current = structuredClone(purchase);
+  if (state === 'mixed')
+    current.details.push({
+      ...structuredClone(current.details[0]!),
+      id: 'dddddddd-2222-4222-8222-222222222222',
+      status: 'CANCELED',
+    });
+  if (state === 'canceled') {
+    current.status.name = 'Cancelada';
+    current.details.forEach((detail) => {
+      detail.status = 'CANCELED';
+    });
+  }
   await page.route('**/api/admin/persons?**', (route) =>
     route.fulfill({ json: pageOf([personData]) }),
   );

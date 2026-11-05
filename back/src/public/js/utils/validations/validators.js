@@ -57,11 +57,12 @@ export const materialEditValidation = {
     name: (value) => validateName(value, FORM_FIELD_LIMITS.MATERIAL_NAME),
     supplierId: (value) => validateUUID(value, 'El proveedor'),
     ...inventoryStateValidation,
-    maxUnitCost: (value) => validateNumber(value, 'El costo máximo', { format: MONEY_INPUT_FORMAT }),
+    maxUnitCost: (value) => validatePositiveNumber(value, 'El costo máximo', { format: MONEY_INPUT_FORMAT }),
 }
 
 export const materialValidation = {
     ...materialEditValidation,
+    maxUnitCost: value => validateNumber(value, 'El costo máximo', { format: MONEY_INPUT_FORMAT }),
     presentationId: (value) => validateUUID(value, 'La presentación'),
     unitMeasureId: (value) => validateUUID(value, 'La unidad'),
     base: (_, { base, height }) => validatePairedOptionalNumber({
@@ -104,7 +105,8 @@ const wasteSecondaryDataValidation = {
 
 export const wasteEditValidation = {
     name: value => validateName(value, FORM_FIELD_LIMITS.MATERIAL_NAME),
-    ...wasteSecondaryDataValidation
+    ...wasteSecondaryDataValidation,
+    maxUnitCost: value => validatePositiveNumber(value, 'El costo máximo de la merma', { format: MONEY_INPUT_FORMAT })
 };
 
 export const wasteStockAdjustmentValidation = createInventoryStockValidation({

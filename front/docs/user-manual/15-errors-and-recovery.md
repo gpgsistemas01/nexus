@@ -21,6 +21,17 @@ Los errores junto a un campo se corrigen directamente en ese campo.
 Si el saldo o el estado impiden operar, vuelva a consultar el documento y las existencias.
 <!-- manual:end -->
 
+## Costo sin registrar
+
+El costo puede ser cero sólo en el alta inicial. Si un artículo sin costo impide
+registrar o surtir una salida, solicite su configuración al responsable de **Almacén**.
+Las compras no actualizan ese costo.
+
+<!-- manual:any materials:write wastes:write -->
+En **Almacén**, edite el artículo y capture un costo máximo mayor que cero.
+Un costo vacío o cero impide guardar la edición.
+<!-- manual:end -->
+
 ## Conflictos de edición
 
 El formulario conserva su captura y bloquea el envío. Use **Cerrar y actualizar

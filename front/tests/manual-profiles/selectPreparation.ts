@@ -5,6 +5,18 @@ import { inventoryParams } from '../../src/modules/warehouse/services/inventoryP
 type WasteReference = Awaited<ReturnType<typeof findWasteReference>>;
 const wasteReferences = new WeakMap<BrowserContext, WasteReference>();
 
+export const readManualJson = async (page: Page, url: string) => {
+  const response = await page.evaluate(async (url) => {
+    const result = await fetch(url, {
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json' },
+    });
+    return { ok: result.ok, status: result.status, body: await result.json().catch(() => null) };
+  }, url);
+  if (!response.ok) throw new Error(`No se pudo preparar la captura (HTTP ${response.status}).`);
+  return response.body;
+};
+
 const selectNamedOption = async (page: Page, dialog: Locator, label: string, value: string) => {
   const field = dialog.getByRole('combobox', { name: label, exact: true });
   await expect(field).toBeEnabled();
@@ -32,23 +44,7 @@ export const selectWasteReference = async (page: Page, dialog: Locator) => {
         });
         if (resource === 'suppliers') params.set('onlyActive', 'true');
 
-        const response = await page.evaluate(async (url) => {
-          const result = await fetch(url, {
-            credentials: 'same-origin',
-            headers: { Accept: 'application/json' },
-          });
-          return {
-            ok: result.ok,
-            status: result.status,
-            body: await result.json().catch(() => null),
-          };
-        }, `/api/warehouse/${resource}?${params}`);
-        if (!response.ok)
-          throw new Error(
-            `No se pudo preparar el catálogo de referencia (HTTP ${response.status}).`,
-          );
-
-        return response.body;
+        return readManualJson(page, `/api/warehouse/${resource}?${params}`);
       },
     );
     wasteReferences.set(page.context(), reference);

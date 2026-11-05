@@ -6,6 +6,8 @@ a Express usando Vuetify y VeeValidate.
 Almacén, Compras, Salidas, Movimientos, Catálogos, Personas, Usuarios, Clientes y
 Proveedores tienen interfaz Vue con acceso según los permisos de la cuenta.
 
+**Desarrolladores:** [comandos de inicio, pruebas, base de datos, capturas y publicación](front/docs/development/00-commands.md).
+
 ```text
 back/                 # Express, EJS, Prisma, pruebas y documentación
 front/                # Vue 3 + Vite, login, Almacén, Movimientos, Identidad y Directorio
@@ -43,7 +45,7 @@ Las rutas siguientes son relativas a la raíz del repositorio:
 | Archivo o carpeta local | Ubicación actual | Cómo se prepara |
 | --- | --- | --- |
 | Variables y secretos de Express/PostgreSQL | `back/.env` | Trasladar el `.env` anterior conservando sus valores. Si ya existe el destino, comparar y combinar sin sobrescribirlo a ciegas. |
-| Configuración opcional de Vite | `front/.env.local` | Crear a partir de `front/.env.example`. No copiar los secretos del backend; las variables `VITE_*` se publican en el navegador. |
+| Configuración opcional de Vite | `front/.env.local` | Crear localmente sólo para cambiar el destino de la API o el logo. Las variables `VITE_*` se publican en el navegador. |
 | Dependencias de Express y herramientas del backend | `back/node_modules/` | Ejecutar `npm --prefix back ci`. |
 | Dependencias de Vue y herramientas del frontend | `front/node_modules/` | Ejecutar `npm --prefix front ci --include=dev`. |
 | Cliente generado de Prisma | `back/generated/prisma/` | Ejecutar `npm --prefix back run db:generate`; no se descarga con Git. |
@@ -66,7 +68,8 @@ global de archivos ignorados para resolver errores de instalación.
 
 Los archivos de dependencias como `jsx-runtime.d.ts` dentro de `node_modules/`
 los administra npm: no se editan ni se versionan. Los `package.json` y
-`package-lock.json` de ambas aplicaciones y `front/.env.example` sí se versionan.
+`package-lock.json` de ambas aplicaciones sí se versionan. Los archivos de entorno
+se preparan localmente; no se incluyen plantillas `.env`.
 `.gitignore` determina lo que Git ignora; `.dockerignore` controla el contexto de
 Docker y no sustituye la configuración local.
 

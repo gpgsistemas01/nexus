@@ -63,6 +63,25 @@ it('corregir conserva los otros detalles y excluye cancelados de la vista previa
   ).toBeNull();
 });
 
+it('recalcula toda la compra al corregir y excluye partidas canceladas sin mutar el documento', () => {
+  const current = document();
+  const first = current.details[0]!;
+  current.details.push({ ...first, id: 'otra-activa' });
+  current.details.push({
+    ...first,
+    id: 'cancelada',
+    status: 'CANCELED',
+    netPurchaseAmount: 9999,
+    grossPurchaseAmount: 11598.84,
+  });
+  const original = structuredClone(current);
+
+  expect(
+    calculatePurchaseCorrectionTotals(current, first, { quantity: '1', costPerUnitType: '50' }),
+  ).toEqual({ quantity: 3, net: 250, gross: 290 });
+  expect(current).toEqual(original);
+});
+
 it('una corrección sin cambios no pide confirmación ni escribe; cancelar conserva la captura', async () => {
   const request = vi.spyOn(purchaseService, 'changeDetail').mockResolvedValue(confirmation);
   const saved = vi.fn();

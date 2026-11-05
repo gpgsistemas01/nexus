@@ -80,6 +80,12 @@ consumible se crea desde compra. Esta excepción no se comparte con edición o a
 `newStock`, aunque el body incluya `creationContext='goodsReceipt'`. Se reutilizan las
 comprobaciones del campo y los códigos de error, conservando la condición de cada operación.
 
+Almacén es el propietario del costo máximo de cada oferta y de cada merma. El alta
+directa admite cero como captura inicial; la edición requiere un valor positivo.
+Las salidas validan el costo almacenado al preparar detalles y al surtir. La consulta
+de existencias ya usada para el surtido incluye el costo actual, sin buscar compras
+históricas ni emitir otra lectura por renglón. Un rechazo conserva documento y saldo.
+
 Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/backend-code-sequences/index.md).

@@ -8,7 +8,7 @@ import {
     normalizePurchaseDocument,
     normalizePurchaseRow,
 } from '../mappers/purchaseResponseMapper.js';
-import { reportScopeError } from '../../../shared/report.js';
+import { reportParams } from '../../../shared/report.js';
 import type { ReportScope } from '../../../shared/report.js';
 import type {
     PurchaseResource,
@@ -91,20 +91,7 @@ export const purchaseService = {
         scope: ReportScope,
         signal: AbortSignal,
     ) {
-        const error = reportScopeError(scope);
-        if (error) throw new Error(error);
-
-        const params =
-            scope.mode === 'filtered'
-                ? buildPurchaseQueryParams(query)
-                : new URLSearchParams({
-                      monthlyReport: 'true',
-                      reportMonth: scope.mode === 'specific-month' ? scope.month : '',
-                      'order[0][column]': String(query.orderColumn),
-                      'order[0][dir]': query.direction,
-                  });
-        params.delete('start');
-        params.delete('length');
+        const params = reportParams(buildPurchaseQueryParams(query), scope);
         return requestExcel(
             `/api/warehouse/reports/goods-receipts/${resource}/excel?${params}`,
             signal,

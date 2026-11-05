@@ -4,6 +4,21 @@ El código se organiza en aplicación, módulos de negocio y colaboradores compa
 [guía de incorporación](developer-onboarding.md) recorre una edición para mostrar cómo
 encontrarlos.
 
+## Reportes y tablas adaptables
+
+Todas las páginas de inventario, identidad, directorio, compras, salidas y movimientos
+configuran `useReportScope` y muestran `ReportScopeDialog`. Las páginas aportan el
+nombre base, permiso y callback del servicio; no construyen enlaces ni Blobs.
+Los filtros se leen al confirmar. `useFileExport` bloquea envíos simultáneos, cancela
+al desmontar, descarga con el nombre común `reporte_<recurso>_MM_AAAA.xlsx` y libera
+el recurso temporal. `requestExcel` valida el Blob; la sesión y errores siguen en HTTP.
+`reportParams` comparte filtros, periodos, orden y eliminación de paginación.
+
+`ServerTable` activa la presentación móvil de Vuetify por debajo de `sm`: cada fila
+apila sus campos. `TableFrame` contiene los listados y las tablas de detalle conservan
+su desplazamiento horizontal para revisar y capturar partidas. `EditorDialog`
+aprovecha el ancho disponible y distribuye campos mediante la cuadrícula compartida.
+
 ## Organización del código
 
 ```text

@@ -71,7 +71,7 @@ const actions = usePurchaseActions({
 const { editor, editorKey, isReading, readError, correction } = actions;
 const report = useReportScope({
     canExport: () => canExport.value,
-    filename: `reporte_compras_${config.path}.xlsx`,
+    filename: `reporte_compras_${config.path}`,
     request: (scope, signal) => purchaseService.export(props.resource, { ...query }, scope, signal),
     onDenied,
 });

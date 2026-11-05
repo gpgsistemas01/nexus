@@ -2,7 +2,7 @@
 import { VSelect } from 'vuetify/components/VSelect';
 import { VTextField } from 'vuetify/components/VTextField';
 import EditorDialog from './EditorDialog.vue';
-import type { ReportScope } from '../report.js';
+import type { ReportKind, ReportScope } from '../report.js';
 
 withDefaults(
     defineProps<{
@@ -12,12 +12,15 @@ withDefaults(
         validationError?: string;
         eyebrow?: string;
         subject?: string;
+        kind?: ReportKind;
+        note?: string;
     }>(),
-    { eyebrow: 'REPORTES', subject: 'registros', validationError: '' },
+    { eyebrow: 'REPORTES', subject: 'registros', validationError: '', kind: 'period', note: '' },
 );
 const emit = defineEmits<{
     mode: [value: ReportScope['mode']];
     month: [value: string];
+    inventory: [value: NonNullable<ReportScope['inventoryScope']>];
     submit: [];
     close: [];
 }>();
@@ -40,6 +43,7 @@ const modes = [
         @close="emit('close')"
     >
         <VSelect
+            v-if="kind === 'period'"
             label="Alcance del reporte"
             :model-value="values.mode"
             :items="modes"
@@ -47,7 +51,7 @@ const modes = [
             @update:model-value="emit('mode', $event)"
         />
         <VTextField
-            v-if="values.mode === 'specific-month'"
+            v-if="kind === 'period' && values.mode === 'specific-month'"
             label="Mes del reporte"
             type="month"
             :model-value="values.month"
@@ -56,12 +60,27 @@ const modes = [
             class="mt-4"
             @update:model-value="emit('month', $event ?? '')"
         />
+        <VSelect
+            v-if="kind === 'inventory'"
+            label="Incluir en Excel"
+            :model-value="values.inventoryScope"
+            :items="[
+                { title: 'Activos o con stock', value: 'activeOrStock' },
+                { title: 'Activos', value: 'active' },
+                { title: 'Con stock', value: 'inStock' },
+            ]"
+            :disabled="isSubmitting"
+            @update:model-value="emit('inventory', $event)"
+        />
         <p class="my-4">
             {{
-                values.mode === 'filtered'
-                    ? 'Se exportan todos los registros que coincidan con los filtros aplicados, sin limitarse a la página visible.'
-                    : `El reporte mensual incluye la totalidad de ${subject} de ese mes, sin los filtros de la tabla. El servidor determina el mes actual en la zona horaria de Ciudad de México.`
+                kind === 'inventory'
+                    ? 'Se aplican la búsqueda, el orden y el alcance seleccionado.'
+                    : values.mode === 'filtered'
+                      ? 'Se aplican la búsqueda, los filtros y el orden de la tabla, en todas las páginas.'
+                      : `Incluye todos los ${subject} del mes, sin los filtros de la tabla.`
             }}
         </p>
+        <p v-if="note">{{ note }}</p>
     </EditorDialog>
 </template>

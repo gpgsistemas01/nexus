@@ -116,6 +116,26 @@ describe('waste issue controller database integration', () => {
 
   afterAll(cleanCreatedRecords);
 
+  it('rechaza merma sin costo y descarta el costo manipulado sin crear documentos ni descontar stock', async () => {
+    const beforeCount = await prisma.wasteIssue.count({ where: { createdById: ids.user } });
+    try {
+      for (const maxUnitCost of [null, 0]) {
+        await prisma.waste.update({ where: { id: ids.waste }, data: { maxUnitCost } });
+        const before = await prisma.waste.findUnique({ where: { id: ids.waste } });
+        const response = await request(app).post('/waste-issues').send({
+          requesterId: ids.requester, advisorId: ids.advisor, clientId: ids.client, departmentId: ids.department,
+          projectNumber: 'SIN-COSTO', requestDate: '2026-08-11T12:30:00.000Z',
+          details: [{ wasteId: ids.waste, quantity: 2, maxUnitCost: 999 }]
+        }).expect(409);
+        expect(response.body.code).toBe('WASTE_ISSUE_MISSING_MAX_UNIT_COST');
+        expect(await prisma.wasteIssue.count({ where: { createdById: ids.user } })).toBe(beforeCount);
+        expect(await prisma.waste.findUnique({ where: { id: ids.waste } })).toEqual(before);
+      }
+    } finally {
+      await prisma.waste.update({ where: { id: ids.waste }, data: { maxUnitCost: 25 } });
+    }
+  });
+
   it('crea y surte una salida por HTTP, persiste estados, stock y movimiento', async () => {
     const created = await request(app).post('/waste-issues').send({
       requesterId: ids.requester, advisorId: ids.advisor, clientId: ids.client, departmentId: ids.department, projectNumber: 'PR-100',

@@ -41,6 +41,10 @@ test('sistema: login, alta persistida, reportes reales, renovación y cierre con
       await response;
       const downloaded = page.waitForEvent('download');
       await page.getByRole('button', { name: 'Exportar Excel', exact: true }).click();
+      await page
+        .getByRole('dialog', { name: 'Exportar reporte', exact: true })
+        .getByRole('button', { name: 'Descargar Excel', exact: true })
+        .click();
       const stream = await (await downloaded).createReadStream();
       const chunks: Buffer[] = [];
       for await (const chunk of stream) chunks.push(Buffer.from(chunk));

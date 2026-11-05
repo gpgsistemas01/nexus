@@ -273,6 +273,10 @@ test('identidad: filtros de personas y reporte por área; vista móvil sin desbo
   await page.getByRole('button', { name: 'Limpiar filtros', exact: true }).click();
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Exportar Excel', exact: true }).click();
+  await page
+    .getByRole('dialog', { name: 'Exportar reporte', exact: true })
+    .getByRole('button', { name: 'Descargar Excel', exact: true })
+    .click();
   await download;
   expect(reports.at(-1)?.pathname).toBe('/api/admin/reports/persons/excel');
   await page.setViewportSize({ width: 320, height: 844 });
@@ -303,12 +307,14 @@ for (const [path, title, reportPath, search] of [
     );
     const exportButton = page.getByRole('button', { name: 'Exportar Excel', exact: true });
     await exportButton.click();
-    await expect(page.getByRole('alert', { name: 'Error de descarga', exact: true })).toBeVisible();
-    await expect(exportButton).toBeEnabled();
+    const dialog = page.getByRole('dialog', { name: 'Exportar reporte', exact: true });
+    await dialog.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
+    await acknowledgeFormError(page, /No se pudo|conectar/i);
+    await expect(dialog).toBeVisible();
     isAvailable = true;
     const download = page.waitForEvent('download');
-    await exportButton.click();
-    expect((await download).suggestedFilename()).toMatch(/\.xlsx$/);
+    await dialog.getByRole('button', { name: 'Descargar Excel', exact: true }).click();
+    expect((await download).suggestedFilename()).toMatch(/^reporte_.+_\d{2}_\d{4}\.xlsx$/);
     expect(reports).toHaveLength(1);
     expect(reports[0]!.pathname).toBe(reportPath);
     expect(reports[0]!.searchParams.get('search')).toBe(search);

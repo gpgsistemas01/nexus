@@ -1,13 +1,17 @@
 import { reactive, ref } from 'vue';
 import { reportScopeError } from '../report.js';
-import type { ReportScope } from '../report.js';
+import type { ReportKind, ReportScope } from '../report.js';
 import { useFileExport } from './useFileExport.js';
 import type { FileExportOptions } from './useFileExport.js';
 
-export const useReportScope = (options: FileExportOptions<ReportScope>) => {
+export const useReportScope = (options: FileExportOptions<ReportScope> & { kind?: ReportKind }) => {
     const report = useFileExport(options);
     const isReportOpen = ref(false);
-    const reportValues = reactive<ReportScope>({ mode: 'current-month', month: '' });
+    const reportValues = reactive<ReportScope>({
+        mode: !options.kind || options.kind === 'period' ? 'current-month' : 'filtered',
+        month: '',
+        ...(options.kind === 'inventory' ? { inventoryScope: 'activeOrStock' as const } : {}),
+    });
     const reportFormError = ref('');
 
     const clearErrors = () => {
@@ -46,6 +50,13 @@ export const useReportScope = (options: FileExportOptions<ReportScope>) => {
         clearErrors();
     };
 
+    const setInventoryScope = (value: NonNullable<ReportScope['inventoryScope']>) => {
+        if (report.isExporting.value) return;
+
+        reportValues.inventoryScope = value;
+        clearErrors();
+    };
+
     return {
         ...report,
         isReportOpen,
@@ -55,5 +66,6 @@ export const useReportScope = (options: FileExportOptions<ReportScope>) => {
         exportReport,
         setReportMode,
         setReportMonth,
+        setInventoryScope,
     };
 };

@@ -80,7 +80,7 @@ const actions = useIssueActions({
 const { editor, editorKey, isReading, readError } = actions;
 const report = useReportScope({
     canExport: () => canExport.value,
-    filename: `reporte_salidas_${config.path}.xlsx`,
+    filename: `reporte_salidas_${props.resource === 'wastes' ? 'merma' : config.path}`,
     request: (scope, signal) => issueService.export(props.resource, { ...query }, scope, signal),
     onDenied,
 });

@@ -24,7 +24,6 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `Change` | control | [`goodsReceiptDetailChangeService.js`](../../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js) |
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
-| `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `FileBaseRepository` | control | [`baseRepository.js`](../../../../../../src/repository/baseRepository.js) |
 | `FileMaterialGoodsReceiptController` | control | [`materialGoodsReceiptController.js`](../../../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js) |
@@ -139,7 +138,6 @@ sequenceDiagram
     participant Inventory@{ "type": "control" } as movementService.js
     participant Change@{ "type": "control" } as goodsReceiptDetailChangeService.js
     participant Reason@{ "type": "control" } as reasonService.js
-    participant Costs@{ "type": "control" } as supplierMaterialService.js
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
 
@@ -166,7 +164,6 @@ sequenceDiagram
             end
             Core->>Totals: cancelGoodsReceiptDetailAndTotals({ tx, goodsReceiptId: id, detailId, ... })
             Core->>Change: createGoodsReceiptDetailChange({ tx, changedById: userId, ... })
-            Core->>Costs: recalculateMaterialUnitCosts({ tx, supplierId, materialIds })
         end
         Prisma-->>Core: commit de detalle, totales, trazabilidad y stock
         Core-->>Facade: cancelGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]

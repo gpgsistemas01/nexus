@@ -67,7 +67,8 @@ const {
     publication: requestedPublication,
     document: requestedDocument,
     format: requestedFormat,
-    checkOnly
+    checkOnly,
+    checkSourcesOnly
 } = getDocumentExportRequest(process.argv.slice(2));
 const frontendCatalog = await loadDocumentationCatalog(path.resolve(ROOT, '../front/docs'));
 const frontendManualProfile = requestedPublication === 'manual-vue'
@@ -205,7 +206,7 @@ const PUBLICATIONS = Object.freeze({
 const formats = new Set(['docx', 'pdf', 'ambos']);
 const outputPlan = getDocumentOutputPlan(requestedFormat);
 const positionalArgumentCount = process.argv.slice(2)
-    .filter((argument) => argument !== '--check').length;
+    .filter((argument) => argument !== '--check' && argument !== '--check-sources').length;
 let pdfConverter = process.env.DOCS_PDF_CONVERTER;
 const manualNames = Object.keys(MANUALS);
 const publicationNames = [...manualNames, ...Object.keys(PUBLICATIONS)];
@@ -387,7 +388,7 @@ if ((requestedPublication !== 'todos' && !selectablePublicationNames.includes(re
     || invalidDocument
     || positionalArgumentCount > 3
     || (checkOnly ? requestedFormat && !formats.has(requestedFormat) : !formats.has(requestedFormat))) {
-    console.error('Uso: npm run docs:export -- [todos|manuales|requisitos|datos|arquitectura|pruebas|gobernanza] [seccion] [docx|pdf|ambos] [--check]');
+    console.error('Uso: npm run docs:export -- [todos|manuales|requisitos|datos|arquitectura|pruebas|gobernanza] [seccion] [docx|pdf|ambos] [--check|--check-sources]');
     process.exit(1);
 }
 
@@ -476,8 +477,8 @@ const missingImages = new Map(publications.flatMap(part => part.missingImages.ma
     const resolvedImage = path.resolve(ROOT, path.dirname(source), image);
     return [resolvedImage, path.relative(ROOT, resolvedImage)];
 })));
-if (missingImages.size) {
-    throw new Error(`Faltan ${missingImages.size} imágenes requeridas para publicar:\n${[...missingImages.values()].join('\n')}\nGenere las capturas por área y revise sus PNG antes de incorporarlos a docs/user-manual/images/areas/.`);
+if (missingImages.size && !checkSourcesOnly) {
+    throw new Error(`Faltan ${missingImages.size} imágenes requeridas para publicar:\n${[...missingImages.values()].join('\n')}\nGenere y revise las capturas del manual correspondiente antes de publicar.`);
 }
 
 const sourceContents = new Map((await Promise.all(
@@ -499,7 +500,10 @@ for (const { document, directory, sources } of publications) {
 
 if (checkOnly) {
     for (const { publication, document, sources, imageReferences } of publications) {
-        console.log(`Paquete ${publication}/${document}: ${sources.length} fuentes y ${imageReferences.length} imágenes válidas.`);
+        const imageStatus = checkSourcesOnly
+            ? 'referencias de imagen declaradas; los archivos se comprueban al publicar'
+            : 'imágenes válidas';
+        console.log(`Paquete ${publication}/${document}: ${sources.length} fuentes y ${imageReferences.length} ${imageStatus}.`);
     }
     process.exit(0);
 }

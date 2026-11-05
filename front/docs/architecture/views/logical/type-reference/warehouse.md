@@ -118,26 +118,6 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `retry` | `retry: [];` |
 | `create` | `create: [search: string];` |
 
-## InventoryReportToolbar.defineProps
-
-**Fuente:** [src/modules/warehouse/components/InventoryReportToolbar.vue](../../../../../src/modules/warehouse/components/InventoryReportToolbar.vue) · línea 6, columna 13. **Declaración:** SFC contract.
-
-| Miembro | Firma completa |
-| --- | --- |
-| `scope` | `scope: string;` |
-| `hasSupplierFilter` | `hasSupplierFilter: boolean;` |
-| `isExporting` | `isExporting: boolean;` |
-| `error` | `error: string` |
-
-## InventoryReportToolbar.defineEmits
-
-**Fuente:** [src/modules/warehouse/components/InventoryReportToolbar.vue](../../../../../src/modules/warehouse/components/InventoryReportToolbar.vue) · línea 7, columna 26. **Declaración:** SFC contract.
-
-| Miembro | Firma completa |
-| --- | --- |
-| `update:scope` | `'update:scope': [scope: string];` |
-| `export` | `export: []` |
-
 ## InventoryRowActions.defineProps
 
 **Fuente:** [src/modules/warehouse/components/InventoryRowActions.vue](../../../../../src/modules/warehouse/components/InventoryRowActions.vue) · línea 5, columna 13. **Declaración:** SFC contract.

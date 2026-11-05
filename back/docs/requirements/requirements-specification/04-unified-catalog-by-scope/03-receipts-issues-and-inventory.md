@@ -54,6 +54,13 @@ a Almacén y administración.
 
 ### Criterios de recepción y corrección
 
+- **Costo administrado en almacén:** registrar, agregar, corregir o cancelar compras
+  conserva el costo máximo de cada oferta. El costo por presentación de la compra es
+  independiente; no alimenta un máximo histórico ni un promedio del inventario.
+- **Totales cancelados:** mientras queden partidas activas se suman sólo sus importes.
+  Al cancelar la última, el encabezado conserva la suma histórica para consulta;
+  documentos y partidas cancelados se excluyen de reportes operativos.
+
 - **CA-RF-REC-007-1:** la entrada tiene al menos un detalle y todos pertenecen al
   contexto correspondiente. Un documento vacío, mixto o de otro contexto se rechaza
   sin modificar documento, existencia ni movimientos.
@@ -70,6 +77,12 @@ a Almacén y administración.
   detalles activos.
 
 ### Criterios de salida y ajuste
+
+- **Costo antes del uso:** materiales, consumibles y mermas requieren un costo máximo
+  mayor que cero al crear o editar una solicitud de salida y al surtirla. Un costo
+  ausente o cero produce una alerta y ningún efecto parcial. El costo enviado en los
+  detalles por el cliente no sustituye el registrado en almacén. Sólo el alta inicial
+  del artículo admite costo cero; al editarlo se requiere un costo positivo.
 
 - **Alta y entradas de merma:** registrar una merma con cantidad positiva genera una
   entrada `EME-AAAA-consecutivo` y un movimiento ENTRY; se incrementa una sola vez.
