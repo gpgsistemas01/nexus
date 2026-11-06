@@ -3,6 +3,16 @@
 Vite produce los archivos estáticos de `front/dist`. El alojamiento los entrega
 al navegador y reenvía las peticiones de datos a la API.
 
+## Consulta rápida
+
+| Necesito… | Ir a |
+| --- | --- |
+| Publicar Vue en Render con Nginx | [Web Service Docker](#render-conservar-la-api-y-publicar-vue). |
+| Configurar un Render Static Site | [Rutas hacia la API y fallback de Vue](#render-static-site-rutas-y-api). |
+| Resolver `Not Found` o un login con `200` vacío | [Diagnóstico del despliegue](#diagnóstico-del-despliegue). |
+| Comprobar qué cambios están publicados | [Rama y versión publicada](#rama-y-versión-publicada). |
+| Configurar el servicio API | [Despliegue del backend](../../../back/docs/architecture/views/physical/01-system-runtime-and-deployment.md#configurar-el-servicio-api-en-render). |
+
 ## Construcción reproducible
 
 Desde la raíz del repositorio:
@@ -108,6 +118,14 @@ Referencias del proveedor: [Docker](https://render.com/docs/docker),
 [monorepos](https://render.com/docs/monorepo-support) y
 [red privada](https://render.com/docs/private-network).
 
+### Rama y versión publicada
+
+En cada servicio, revisa **Branch**, **Auto-Deploy** y el commit del despliegue
+**Live** en **Deploys**. Si la rama es `main`, guardar en `features` requiere
+integrar esos cambios en `main` para que se publiquen. La opción **After CI Checks
+Pass** espera las comprobaciones del commit. Confirma la versión activa de Vue y
+API antes de probar; un despliegue iniciado todavía puede estar construyéndose.
+
 ## Hosting estático
 
 El proveedor debe descargar el repositorio completo y permitir las fuentes
@@ -121,7 +139,7 @@ npm --prefix front ci --include=dev && npm --prefix front run build
 | Proveedor | Configuración necesaria |
 | --- | --- |
 | Vercel | `front/vercel.json` aporta el fallback SPA. Agrega antes las reglas de `/api/:path*` y `/cerrar-sesion` hacia tu API. |
-| Render Static Site | La regla `/*` → `/index.html` resuelve las páginas. La API requiere reglas anteriores hacia el backend y verificación de métodos HTTP, cookies y descargas. |
+| Render Static Site | Configura las [reglas de API y Vue](#render-static-site-rutas-y-api) y comprueba métodos HTTP, cookies y descargas. |
 
 El sitio estático es una alternativa a la imagen Nginx. Antes de adoptarlo,
 comprueba las escrituras y `Set-Cookie` mediante las reglas externas del proveedor;
@@ -132,6 +150,32 @@ El proxy de Vite funciona en desarrollo/vista previa; Nginx y el hosting utiliza
 sus propias reglas. Sin la regla de API anterior al fallback, puede recibirse
 HTML donde se espera JSON.
 
+### Render Static Site: rutas y API
+
+Abre el servicio frontend en Render y entra en **Redirects/Rewrites**. Configura
+estas reglas en este orden. Sustituye la URL ficticia `https://api.example.com`
+por la URL HTTPS pública de tu servicio API:
+
+| Source | Destination | Action |
+| --- | --- | --- |
+| `/api/*` | `https://api.example.com/api/*` | Rewrite |
+| `/cerrar-sesion` | `https://api.example.com/cerrar-sesion` | Rewrite |
+| `/*` | `/index.html` | Rewrite |
+
+Usa **Rewrite** para conservar la URL del frontend y deja el fallback al final.
+Render permite abrir o recargar `/inicio-sesion` al servir `index.html` en esa
+ruta. Las reglas de API deben conservar método, cuerpo, query y cookies.
+Comprueba login, renovación, cierre, escrituras y Excel antes de dar el sitio por
+operativo. Si el alojamiento no conserva esos contratos, usa el Web Service
+Docker con Nginx descrito arriba.
+
+Un Static Site publica `front/dist`; `front/vercel.json` pertenece a Vercel y
+`front/nginx.conf` se utiliza al ejecutar la imagen Docker. El proxy de Vite y
+`BACKEND_PROXY_TARGET` corresponden a desarrollo/vista previa.
+
+Referencias: [reglas de Render](https://render.com/docs/redirects-rewrites) y
+[despliegues y comprobaciones CI](https://render.com/docs/deploys).
+
 ## Comprobación y recuperación
 
 | Comprobación | Resultado esperado |
@@ -141,6 +185,21 @@ HTML donde se espera JSON.
 | Iniciar sesión y renovar acceso | Cookies compatibles con el origen y recuperación de sesión. |
 | Pedir un asset inexistente | Respuesta 404. |
 | Inspeccionar el sitio y la imagen | Archivos compilados, sin secretos, fuentes documentales ni resultados de pruebas. |
+
+### Diagnóstico del despliegue
+
+En **DevTools → Network**, selecciona **POST `/api/auth/login`** y revisa URL,
+estado, `Content-Type` y **Response**. El acceso correcto devuelve JSON con
+`{"code":"SUCCESS_LOGIN"}` y establece las cookies de sesión. Un `200` vacío o
+con HTML no cumple ese contrato; un `OPTIONS 200` tampoco confirma el login.
+
+| Síntoma | Comprobar / corregir |
+| --- | --- |
+| `/` abre Vue, pero recargar `/inicio-sesion` muestra `Not Found` | Aplicar el fallback del alojamiento. En Static Site, revisar la última regla `/*` → `/index.html`; en Docker, usar `front/nginx.conf`. Para volver al formulario mientras se corrige, abrir `/`. |
+| POST de login con `200`, vacío o HTML | Revisar que `/api/*` llegue al backend antes del fallback. Conservar la validación de `SUCCESS_LOGIN` del cliente. |
+| Login correcto, pero `/api/auth/me` devuelve `401` | Comprobar `Set-Cookie` del login y el envío de cookies en `/me`, su dominio y el proxy del mismo origen. |
+| `/api/auth/me` devuelve HTML | Corregir el destino o el orden de las reglas de API. Sin sesión, se espera un `401` JSON; con sesión válida, un `200` JSON con `user`. |
+| Los cambios de `features` no aparecen | Revisar [rama y commit Live](#rama-y-versión-publicada) de ambos servicios. |
 
 Si falla la publicación, conserva la versión anterior y revisa los logs de build,
 proxy y Network del navegador. Corrige las variables de compilación y reconstruye

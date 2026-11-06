@@ -126,3 +126,5 @@ necesarias para la publicación elegida.
 Consulta [proxy y alojamiento](03-build-and-deployment.md) para conectar los contenedores.
 La [configuración de Render](03-build-and-deployment.md#render-conservar-la-api-y-publicar-vue)
 indica cómo reutilizar el backend y publicar la imagen Vue.
+Para un Static Site, consulta las [reglas de rutas](03-build-and-deployment.md#render-static-site-rutas-y-api);
+para `Not Found` o un login con `200` vacío, el [diagnóstico](03-build-and-deployment.md#diagnóstico-del-despliegue).
