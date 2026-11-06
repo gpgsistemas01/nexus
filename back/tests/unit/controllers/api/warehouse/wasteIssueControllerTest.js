@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('../../../../../src/utils/socketUtils.js', () => ({ emitInventoryUpdated: vi.fn() }));
+
 const createWasteIssue = vi.fn();
 const findAllWasteIssues = vi.fn();
 const updateWasteIssueDetails = vi.fn();

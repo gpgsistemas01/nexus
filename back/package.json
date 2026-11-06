@@ -62,6 +62,7 @@
     "nodemon": "3.1.11",
     "read-excel-file": "^9.3.12",
     "supertest": "^7.3.1",
+    "swagger-ui-express": "5.0.1",
     "vitest": "5.0.5"
   },
   "engines": {
@@ -71,6 +72,9 @@
     "bcrypt@6.0.0": true,
     "prisma@7.10.1": true,
     "@prisma/engines@7.10.1": true
+  },
+  "scarfSettings": {
+    "enabled": false
   },
   "overrides": {
     "exceljs": {

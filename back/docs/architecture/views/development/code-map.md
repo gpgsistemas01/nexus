@@ -31,11 +31,12 @@ flowchart LR
     repository["repository (8 módulos)"] --> errors["errors (22 módulos)"]
     repository["repository (8 módulos)"] --> lib["lib (3 módulos)"]
     repository["repository (8 módulos)"] --> shared["shared (13 módulos)"]
-    routes["routes (49 módulos)"] --> controllers["controllers (45 módulos)"]
-    routes["routes (49 módulos)"] --> middleware["middleware (4 módulos)"]
-    routes["routes (49 módulos)"] --> services["services (70 módulos)"]
-    routes["routes (49 módulos)"] --> shared["shared (13 módulos)"]
-    routes["routes (49 módulos)"] --> validators["validators (16 módulos)"]
+    routes["routes (50 módulos)"] --> controllers["controllers (45 módulos)"]
+    routes["routes (50 módulos)"] --> middleware["middleware (4 módulos)"]
+    routes["routes (50 módulos)"] --> services["services (70 módulos)"]
+    routes["routes (50 módulos)"] --> shared["shared (13 módulos)"]
+    routes["routes (50 módulos)"] --> utils["utils (16 módulos)"]
+    routes["routes (50 módulos)"] --> validators["validators (16 módulos)"]
     services["services (70 módulos)"] --> constants["constants (11 módulos)"]
     services["services (70 módulos)"] --> dtos["dtos (12 módulos)"]
     services["services (70 módulos)"] --> errors["errors (22 módulos)"]
@@ -153,7 +154,7 @@ flowchart LR
 | `POST` | `/api/admin/catalogs/:catalog` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 | `PUT` | `/api/admin/catalogs/:catalog/:id` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 
-## Rutas web (26)
+## Rutas web (28)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -163,6 +164,8 @@ flowchart LR
 | `GET` | `/inicio-sesion` | [`src/routes/web/auth/loginWebRoute.js`](../../../../src/routes/web/auth/loginWebRoute.js) |
 | `GET` | `/revocar-sesion` | [`src/routes/web/auth/refreshWebRoute.js`](../../../../src/routes/web/auth/refreshWebRoute.js) |
 | `POST` | `/cerrar-sesion` | [`src/routes/web/auth/logoutWebRoute.js`](../../../../src/routes/web/auth/logoutWebRoute.js) |
+| `GET` | `/api-docs/openapi.json` | [`src/routes/web/apiDocsWebRoute.js`](../../../../src/routes/web/apiDocsWebRoute.js) |
+| `GET` | `/api-docs` | [`src/routes/web/apiDocsWebRoute.js`](../../../../src/routes/web/apiDocsWebRoute.js) |
 | `GET` | `/almacen/materiales` | [`src/routes/web/warehouse/materialWebRoute.js`](../../../../src/routes/web/warehouse/materialWebRoute.js) |
 | `GET` | `/almacen/consumibles` | [`src/routes/web/warehouse/consumableWebRoute.js`](../../../../src/routes/web/warehouse/consumableWebRoute.js) |
 | `GET` | `/almacen/mermas` | [`src/routes/web/warehouse/wasteWebRoute.js`](../../../../src/routes/web/warehouse/wasteWebRoute.js) |

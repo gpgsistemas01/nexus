@@ -242,6 +242,21 @@ Fuentes: `materialControllerDbTest.js`, `goodsReceiptContextDbTest.js`,
 usan servicios y PostgreSQL reales; la autorización se comprueba en sus suites
 propias. Los formularios Vue se verifican en su [diseño de cantidades](../../../front/docs/testing/design/07-shared.md#cantidades-por-presentación).
 
+## Visor del contrato API
+
+| ID de diseño | Riesgo y técnica | Condición observable | Fuente |
+| --- | --- | --- | --- |
+| `DP-API-DOCS-001` | Contrato duplicado, recursos relativos rotos o exposición en producción; particiones desarrollo/producción y HTML/JSON/assets. | La aplicación registrada sirve Swagger UI y el mismo contrato OpenAPI autocontenido. La URL sin barra redirige; producción devuelve 404 para interfaz, contrato y recursos. El visor usa cookies del mismo origen y no persiste autorización. | `apiDocsWebRouteTest.js`; `openApiContractUtilsTest.js`. |
+
+| ID de caso | Precondiciones y datos | Acción | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- |
+| `CP-HTTP-DOCS-001` | Aplicación Express real con Prisma sustituido; entornos development/production; contrato curado. | Consultar `/api-docs`, `/api-docs/`, contrato JSON, inicializador JS y CSS. | Desarrollo sirve la interfaz, redirige a la URL con barra y publica el contrato validado actual; producción responde 404 para todos sus recursos. Ningún request documental accede a datos. | Restaurar variables de entorno y cerrar los servidores HTTP de Supertest. |
+
+`apiDocsWebRouteTest.js` usa `createApp` real con Prisma sustituido; los requests
+documentales no acceden a datos. La revisión de navegador comprueba carga del
+contrato y login/consulta con cookies de prueba mediante una API simulada.
+Esta evidencia no sustituye las pruebas de autorización HTTP/Prisma del proyecto.
+
 ## Casos de seguridad y operación del runtime
 
 | ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |

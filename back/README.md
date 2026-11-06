@@ -107,6 +107,8 @@ forma curada. CI comprueba que el contenido generado esté actualizado.
 
 - Para consumir la API, consulta su [documentación independiente](docs/architecture/openapi/index.md), el [contrato HTTP](docs/architecture/openapi/api-contract.md)
   y la [especificación OpenAPI](docs/architecture/openapi/openapi.json).
+  En desarrollo, [Swagger UI](docs/architecture/openapi/02-maintenance.md#swagger-ui-en-desarrollo)
+  está disponible en `http://localhost:3000/api-docs/` al iniciar con `npm run dev`.
 - Para modificar el servidor, consulta la
   [documentación técnica del backend](docs/architecture/views/development/backend-technical-documentation/index.md)
   y sus [responsabilidades por capa](docs/architecture/views/development/code-structure/index.md).

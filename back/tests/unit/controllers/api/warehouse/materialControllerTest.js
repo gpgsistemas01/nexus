@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('../../../../../src/utils/socketUtils.js', () => ({ emitInventoryUpdated: vi.fn() }));
+
 const findAllMaterials = vi.fn();
 
 vi.mock('../../../../../src/services/warehouse/materials/materialService.js', () => ({
