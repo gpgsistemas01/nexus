@@ -74,3 +74,7 @@ Para comenzar a contribuir, consulte la [guía de incorporación](developer-onbo
 La [importación de inventario por Excel](inventory-excel-import.md) define
 plantillas, contratos, reutilización, confirmación y retención de archivos.
 Incluye límites de ejecución, confirmación atómica y limpieza de borradores.
+
+La [conciliación de inventario y entregas históricas](inventory-reconciliation-proposal.md)
+propone ampliar ese flujo con conteos y un cierre documental sin otro descuento
+de existencias. Estas dos ampliaciones todavía no están implementadas.

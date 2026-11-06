@@ -8,6 +8,11 @@
 
 ## Pruebas de Almacén
 
+`DP-VUE-IMP-001` incluye el aviso explícito de que validar no guarda filas y un
+duplicado bloquea todo el lote. Chromium verifica el número de fila coincidente,
+la descarga del informe y la ausencia del botón de confirmación. Si la confirmación
+queda incierta, el aviso de «todavía no guardado» se oculta hasta recuperar el resultado.
+
 Los casos unitarios viven en `tests/unit/modules/warehouse/` y
 `tests/unit/shared/http/apiClientTest.ts`. `tests/e2e/warehouse.spec.ts`
 comprueba los componentes reales de Vuetify en Chromium. Comparte fixtures de

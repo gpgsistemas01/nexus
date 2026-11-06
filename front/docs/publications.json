@@ -194,6 +194,12 @@
                 "architecture/views/logical/type-reference/index.md",
                 "architecture/views/logical/type-reference/shared.md"
             ]
+        },
+        "propuestas": {
+            "title": "Conciliación de inventario propuesta",
+            "entry": "development/06-inventory-reconciliation-proposal.md",
+            "includeInComplete": false,
+            "sources": ["development/06-inventory-reconciliation-proposal.md"]
         }
     }
 }

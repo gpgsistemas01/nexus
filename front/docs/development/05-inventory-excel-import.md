@@ -4,6 +4,17 @@
 con lectura, escritura y lectura de costos. Comparte formulario, servicio y
 recuperación entre los tres módulos.
 
+## Altas y edición
+
+| Operación | Archivo y tratamiento de IDs |
+| --- | --- |
+| Crear registros | Descargar una plantilla de altas vacía. El servidor genera el ID del registro nuevo. Elegir proveedor, presentación y unidad en las listas; para merma, seleccionar la opción completa del material de referencia, que ya incluye su ID. |
+| Actualizar datos | Descargar los registros actuales con IDs y versiones, modificar los campos habilitados y volver a subir ese archivo. Conservar las columnas grises; una fila sin ID produce error y no se convierte en un alta. |
+
+Cada archivo tiene un solo modo. Para altas y ediciones, usar dos plantillas.
+La edición se dirige por ID, de modo que cambiar el nombre conserva el mismo registro.
+Las plantillas se descargan dentro de **Importar Excel**; **Exportar Excel** genera reportes de consulta.
+
 ## Recorrido
 
 1. Elegir **Crear registros** o **Actualizar datos**.
@@ -24,6 +35,28 @@ afectan al material compartido entre proveedores. Las altas duplicadas se rechaz
 Pieza exige enteros; un alta sin costo muestra advertencia y no puede usarse en salidas
 hasta configurar un costo positivo en Almacén.
 
+## Duplicados y resultado
+
+Se revisan las identidades dentro del Excel y contra lo registrado:
+
+| Recurso | Identidad para detectar repetidos |
+| --- | --- |
+| Materiales | Nombre, presentación, unidad y medidas, junto con el proveedor de la relación. |
+| Consumibles | Nombre, presentación y unidad, junto con el proveedor de la relación. |
+| Mermas | Proveedor, nombre, medidas y pesos de cono/total cuando correspondan. |
+
+Cambiar costo o cantidad inicial no convierte un registro existente en uno nuevo.
+Un mismo material con otro proveedor puede crear esa relación sin duplicar el material.
+
+Si una fila está repetida o tiene errores, **no se aplica ninguna fila**. La vista
+previa señala fila/columna y, para repetidos internos, la primera fila coincidente.
+**Descargar errores** entrega el detalle. Corregir o retirar los repetidos, descartar
+el borrador y volver a validar; confirmar después de revisar todo el lote.
+Las filas sin cambios de una actualización se omiten al confirmar.
+
+Validar todavía no guarda inventario. Un duplicado surgido entre validación y
+confirmación también bloquea el lote completo y obliga a revisar el archivo.
+
 ## Código y transporte
 
 `InventoryPage` carga `InventoryImportPage` al abrir la función y pausa la recarga
@@ -33,7 +66,8 @@ carga y presentación de pantalla completa en móvil.
 
 `inventoryImportService` reutiliza `apiClient`, validación de confirmaciones,
 `requestExcel` y `useFileExport`. Envía `FormData` sólo en la vista previa; el navegador
-establece su boundary. Confirmar envía una sola petición JSON con `expectedVersion`+y `operationId`, sin escrituras por fila. El contrato de respuesta se comprueba
+establece su boundary. Confirmar envía una sola petición JSON con `expectedVersion`
+y `operationId`, sin escrituras por fila. El contrato de respuesta se comprueba
 antes de mostrar éxito. Un `200` incompleto no confirma la importación.
 
 Los límites públicos se comparten por `@nexus/inventory-imports`: 2 MiB y 100 filas.

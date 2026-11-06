@@ -4,7 +4,7 @@
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.13 | 1.0.0 | En revisión | 2026-11-06 | Equipo Nexus |
+| 1.14 | 1.0.0 | En revisión | 2026-11-06 | Equipo Nexus |
 
 ## Propósito y audiencia
 
@@ -74,6 +74,7 @@ front/docs/
 | Construir o desplegar | [Guía de operación](development/03-build-and-deployment.md) y [topología](architecture/views/physical/index.md). |
 | Configurar Render o resolver errores del despliegue | [Rutas de Static Site](development/03-build-and-deployment.md#render-static-site-rutas-y-api), [diagnóstico](development/03-build-and-deployment.md#diagnóstico-del-despliegue) y [rama publicada](development/03-build-and-deployment.md#rama-y-versión-publicada). |
 | Importar inventario por Excel | [Altas, actualización, recuperación y archivos](development/05-inventory-excel-import.md). |
+| Revisar inventario desfasado y entregas antiguas | [Propuesta de conciliación](development/06-inventory-reconciliation-proposal.md); pendiente de implementación. |
 | Mantener documentación | [Reglas editoriales](governance/01-documentation-rules.md) → [catálogo de publicación](publications.json) → [validación/exportación](governance/02-generation-and-publication.md). |
 
 ## Trazabilidad

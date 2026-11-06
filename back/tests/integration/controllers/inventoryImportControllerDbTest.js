@@ -3,9 +3,11 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
+import ExcelJS from 'exceljs';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { createInventoryImportFixture, inventoryWorkbook } from '../../helpers/inventoryImportFixture.js';
 import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
+import { getImportConfig } from '../../../src/services/warehouse/imports/inventoryImportConfig.js';
 
 let prisma, app, fixture, cookie, deniedCookie, previousSecret;
 const preview = async (rows, resource = 'materials', mode = 'create') => {
@@ -26,6 +28,28 @@ const seedOffer = async name => {
 const updateRow = offer => ({ id: offer.materialId, supplierId: offer.supplierId,
     expectedVersion: offer.version, expectedMaterialVersion: offer.material.version,
     name: offer.material.name, minStock: Number(offer.material.minStock), maxUnitCost: Number(offer.maxUnitCost), isActive: 'SI' });
+
+const newRow = async (resource, name) => {
+    if (resource !== 'wastes') return fixture.row(name);
+    const source = await seedOffer(`Fuente ${name}`);
+    return { name: fixture.row(name).name, supplierCode: fixture.suppliers[0].code, materialId: source.materialId,
+        base: 1.5, height: 2, minStock: 1, maxUnitCost: 10, isActive: 'SI', initialQuantity: 3 };
+};
+
+const inventorySnapshot = async () => {
+    const supplierIds = fixture.suppliers.map(item => item.id);
+    return JSON.parse(JSON.stringify(await prisma.$transaction([
+        prisma.material.count({ where: { supplierMaterials: { some: { supplierId: { in: supplierIds } } } } }),
+        prisma.supplierMaterial.findMany({ where: { supplierId: { in: supplierIds } }, orderBy: { id: 'asc' } }),
+        prisma.waste.findMany({ where: { supplierId: { in: supplierIds } }, orderBy: { id: 'asc' } }),
+        prisma.stockAdjustment.count({ where: { createdById: fixture.user.id } }),
+        prisma.movementDetail.count({ where: { supplierId: { in: supplierIds } } }),
+        prisma.wasteStockEntry.count({ where: { createdById: fixture.user.id } }),
+        prisma.wasteMovementDetail.count({ where: { waste: { supplierId: { in: supplierIds } } } }),
+        prisma.inventoryImport.count({ where: { userId: fixture.user.id, status: 'COMPLETED' } }),
+        prisma.referenceNumberCounter.findMany({ orderBy: [{ prefix: 'asc' }, { year: 'asc' }] })
+    ])));
+};
 
 describe('importación XLSX: permisos, estados y persistencia atómica', () => {
     beforeAll(async () => {
@@ -230,13 +254,26 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
             .attach('file', buffer, 'inventario.csv').expect(400);
     });
 
-    it('genera una plantilla descargable con IDs y versiones y permite validar su actualización', async () => {
-        await seedOffer('Plantilla actual');
+    it('descarga IDs y versiones, permite editar el nombre y actualiza el mismo registro al subirlo', async () => {
+        const offer = await seedOffer('Plantilla actual');
         const { createInventoryImportTemplate } = await import('../../../src/services/warehouse/imports/inventoryImportTemplateService.js');
         const bytes = await createInventoryImportTemplate({ user: fixture.user, resource: 'materials', mode: 'update', query: { supplierId: fixture.suppliers[0].id, search: 'Plantilla actual' } });
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(Buffer.from(bytes));
+        const sheet = workbook.getWorksheet('Datos');
+        expect(sheet.getRow(2).values.slice(1, 5)).toEqual([offer.materialId, offer.supplierId, offer.version, offer.material.version]);
+        const name = fixture.row('Plantilla editada').name;
+        sheet.getCell('E2').value = name;
         const response = await request(app).post('/materials/preview?mode=update').set('Cookie', cookie)
-            .attach('file', Buffer.from(bytes), 'actualizar.xlsx').expect(200);
-        expect(response.body.batch.preview.summary).toMatchObject({ unchanged: 1, errors: 0 });
+            .attach('file', Buffer.from(await workbook.xlsx.writeBuffer()), 'actualizar.xlsx').expect(200);
+        const batch = response.body.batch;
+        expect(batch.preview.summary).toMatchObject({ updates: 1, errors: 0 });
+        expect(batch.preview.rows[0]).toMatchObject({ id: offer.materialId, before: { name: offer.material.name }, after: { name } });
+        await confirm(batch).expect(200);
+        const saved = await prisma.supplierMaterial.findUnique({ where: { id: offer.id }, include: { material: true } });
+        expect(saved.material).toMatchObject({ id: offer.materialId, name });
+        expect(Number(saved.currentStock)).toBe(2);
+        expect(await prisma.material.count({ where: { name } })).toBe(1);
     });
 
     it('informa IDs de proveedor inválidos por fila sin abortar toda la vista previa', async () => {
@@ -245,5 +282,76 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(batch.preview.summary.errors).toBe(1);
         expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'id_proveedor' }));
         expect(Number((await prisma.supplierMaterial.findUnique({ where: { id: offer.id } })).maxUnitCost)).toBe(10);
+    });
+
+    it.each(['materials', 'consumables', 'wastes'])('%s: un repetido dentro del Excel bloquea también las filas nuevas válidas', async resource => {
+        const row = await newRow(resource, `Duplicado interno ${resource}`);
+        const valid = { ...row, name: fixture.row(`Fila válida interna ${resource}`).name };
+        const before = await inventorySnapshot();
+        const batch = await preview([valid, row, { ...row, name: `  ${row.name}  `, newStock: 9, initialQuantity: 9 }], resource);
+        expect(batch.preview.summary).toMatchObject({ total: 3, creates: 2, errors: 1 });
+        expect(batch.preview.rows[2].errors).toContainEqual(expect.objectContaining({ column: 'nombre', message: expect.stringContaining('fila 3') }));
+        await confirm(batch).expect(400);
+        expect(await inventorySnapshot()).toEqual(before);
+    });
+
+    it.each(['materials', 'consumables', 'wastes'])('%s: un registro ya existente bloquea todo el archivo sin sumar stock', async resource => {
+        const row = await newRow(resource, `Duplicado existente ${resource}`);
+        const existing = await preview([row], resource);
+        expect(existing.preview.summary.errors).toBe(0);
+        await confirm(existing).expect(200);
+        const valid = { ...row, name: fixture.row(`Fila válida externa ${resource}`).name };
+        const before = await inventorySnapshot();
+        const batch = await preview([valid, { ...row, newStock: 8, initialQuantity: 8 }], resource);
+        expect(batch.preview.summary).toMatchObject({ creates: 1, errors: 1 });
+        expect(batch.preview.rows[1].errors).toContainEqual(expect.objectContaining({ column: 'nombre', message: expect.stringMatching(/ya existe|ya está registrada/) }));
+        await confirm(batch).expect(400);
+        expect(await inventorySnapshot()).toEqual(before);
+    });
+
+    it('un duplicado registrado después de validar deja todo el lote sin aplicar al confirmar', async () => {
+        const valid = fixture.row('Válido antes de carrera');
+        const repeated = fixture.row('Duplicado por carrera');
+        const batch = await preview([valid, repeated]);
+        expect(batch.preview.summary.errors).toBe(0);
+        await seedOffer('Duplicado por carrera');
+        const before = await inventorySnapshot();
+        const response = await confirm(batch).expect(409);
+        expect(response.body).toMatchObject({ code: 'INVENTORY_IMPORT_CONFLICT', meta: { rows: [expect.objectContaining({ row: 3, action: 'error' })] } });
+        expect(await inventorySnapshot()).toEqual(before);
+        expect(await savedOffer(valid.name)).toBeNull();
+    });
+
+    it('una fila sin ID en Actualizar datos no se convierte en un alta', async () => {
+        const before = await inventorySnapshot();
+        const batch = await preview([{ name: fixture.row('Actualización sin ID').name, supplierId: fixture.suppliers[0].id,
+            expectedVersion: 0, expectedMaterialVersion: 0, minStock: 1, maxUnitCost: 10, isActive: 'SI' }], 'materials', 'update');
+        expect(batch.preview.summary).toMatchObject({ creates: 0, updates: 0, errors: 1 });
+        expect(batch.preview.rows[0].errors).toContainEqual(expect.objectContaining({ column: 'id_material' }));
+        await confirm(batch).expect(400);
+        expect(await inventorySnapshot()).toEqual(before);
+    });
+
+    it('el alta de merma usa la opción del catálogo sin capturar un ID nuevo', async () => {
+        const source = await seedOffer('Referencia seleccionable');
+        const { createInventoryImportTemplate } = await import('../../../src/services/warehouse/imports/inventoryImportTemplateService.js');
+        const bytes = await createInventoryImportTemplate({ user: fixture.user, resource: 'wastes', mode: 'create', query: { supplierId: source.supplierId, search: source.material.name } });
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(Buffer.from(bytes));
+        const reference = workbook.getWorksheet('Catalogos').getCell('E2').value;
+        expect(reference).toContain(`${source.materialId} | ${source.material.name}`);
+        const data = { name: fixture.row('Merma desde catálogo').name, supplierCode: fixture.suppliers[0].code,
+            materialId: reference, base: 1.5, height: 2, minStock: 0, maxUnitCost: 10, isActive: 'SI', initialQuantity: 3 };
+        const columns = getImportConfig('wastes', 'create').columns;
+        expect(columns.map(([header]) => header)).not.toContain('id_merma');
+        workbook.getWorksheet('Datos').getRow(2).values = columns.map(([, key]) => data[key] ?? '');
+        const response = await request(app).post('/wastes/preview').set('Cookie', cookie)
+            .attach('file', Buffer.from(await workbook.xlsx.writeBuffer()), 'mermas.xlsx').expect(200);
+        const batch = response.body.batch;
+        expect(batch.preview.summary).toMatchObject({ creates: 1, errors: 0 });
+        const confirmed = await confirm(batch).expect(200);
+        const waste = await prisma.waste.findUnique({ where: { id: confirmed.body.batch.result.rows[0].id } });
+        expect(waste).toMatchObject({ name: data.name, sourceMaterialId: source.materialId });
+        expect(Number(waste.currentStock)).toBe(3);
     });
 });

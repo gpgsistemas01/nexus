@@ -58,7 +58,7 @@ const read = async ({ bytes, config }) => {
 const template = async ({ config, rows = [], catalogs }) => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Datos', { views: [{ state: 'frozen', ySplit: 1 }] });
-    sheet.columns = config.columns.map(([header]) => ({ header, width: header.startsWith('id_') ? 40 : 25 }));
+    sheet.columns = config.columns.map(([header, key]) => ({ header, width: key === 'materialId' ? 80 : header.startsWith('id_') ? 40 : 25 }));
     sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
     sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF174A5B' } };
     sheet.getRow(1).height = 32;
@@ -69,12 +69,14 @@ const template = async ({ config, rows = [], catalogs }) => {
     for (const row of [
         ['Formato', INVENTORY_IMPORT_FORMAT], ['Recurso', config.resource], ['Operacion', config.mode],
         ['Límites', 'Hasta 100 filas y 2 MiB. Conserva hojas, encabezados, identificadores y versiones.'],
+        ['Identificadores', 'Altas: el sistema genera los IDs nuevos. Actualización: descarga los registros actuales y conserva sus IDs y versiones en las columnas grises.'],
         ['Captura', 'Una fila por registro. Usa números sin signo de moneda. Activo: SI o NO. No uses fórmulas.'],
-        ['Catálogos', 'Las listas contienen hasta 500 opciones. Para mermas, selecciona proveedor al descargar y usa el material de referencia de ese proveedor.'],
+        ['Catálogos', 'Listas de hasta 500 opciones. Elige proveedor, presentación y unidad; en merma selecciona la opción completa del material de referencia, incluido su ID, sin escribirlo manualmente.'],
+        ['Duplicados', 'Se revisan por identidad dentro del archivo y contra los registros existentes. Si una fila está repetida o tiene errores, no se aplica ninguna fila.'],
         ['Cantidad inicial', 'Sólo en altas. Es cantidad por presentación, no área ni peso. Pieza exige enteros.'],
         ['Medidas', 'Base y altura en metros. Consumibles no tienen dimensiones. En Rollo de merma deja ambas vacías: el servidor las calcula con los tres pesos en kg.'],
         ['Actualización', 'Nombre y mínimo se comparten entre proveedores. Costo y activo corresponden a cada proveedor. Un vacío no borra datos.'],
-        ['Confirmación', 'Primero valida y revisa. La confirmación aplica todo el lote o no aplica nada.'],
+        ['Confirmación', 'Validar sólo genera una vista previa. Confirmar aplica todas las filas válidas juntas; si alguna falla, no se aplica ninguna.'],
         ['Archivos', 'El servidor descarta el XLSX después del análisis. El original de tu equipo permanece bajo tu control.']
     ]) instructions.addRow(row);
     instructions.eachRow(row => { row.alignment = { wrapText: true, vertical: 'top' }; row.height = 40; });

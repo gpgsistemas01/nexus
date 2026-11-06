@@ -6,7 +6,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Descargar plantilla de altas o actualizaci\u00f3n",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Formato NEXUS_INVENTORY_V1. Hojas Datos, Instrucciones y Catalogos (m\u00e1ximo 500 opciones). Actualizaci\u00f3n incluye IDs, versiones y s\u00f3lo nombre, m\u00ednimo, costo y activo; no importa stock ni cambia dimensiones/pesos. Mermas Rollo calcula sus medidas desde los pesos y el material de referencia.",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Formato NEXUS_INVENTORY_V1. Hojas Datos, Instrucciones y Catalogos (m\u00e1ximo 500 opciones). Actualizaci\u00f3n incluye IDs, versiones y s\u00f3lo nombre, m\u00ednimo, costo y activo; no importa stock ni cambia dimensiones/pesos. Mermas Rollo calcula sus medidas desde los pesos y el material de referencia. Las altas generan el ID del nuevo registro en el servidor; las referencias se eligen del cat\u00e1logo. Para editar, descargar la plantilla con IDs/versiones, modificar campos habilitados y subir el mismo archivo. Una fila sin ID en actualizaci\u00f3n se rechaza y no crea un registro.",
       "security": [
         {
           "cookieAuth": []
@@ -161,7 +161,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Validar archivo sin cambiar el inventario",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Un \u00fanico campo file .xlsx, hasta 2 MiB y 100 filas. Rechaza f\u00f3rmulas, macros, libros corruptos y encabezados o modo distintos. Devuelve errores por fila sin aplicar ninguna. Borrador privado por 24 horas; XLSX descartado tras el an\u00e1lisis.",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Un \u00fanico campo file .xlsx, hasta 2 MiB y 100 filas. Rechaza f\u00f3rmulas, macros, libros corruptos y encabezados o modo distintos. Devuelve errores por fila sin aplicar ninguna. Borrador privado por 24 horas; XLSX descartado tras el an\u00e1lisis. Detecta repetidos por identidad dentro del archivo y contra la base. Un solo duplicado o error bloquea todo el lote, incluidas las filas v\u00e1lidas. Los repetidos internos indican la primera fila coincidente; el informe de errores identifica filas y columnas.",
       "security": [
         {
           "cookieAuth": []
@@ -306,7 +306,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Confirmar todas las filas del borrador",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Revalida permisos, cat\u00e1logos, identidad y versiones. Una \u00fanica transacci\u00f3n guarda registros, stock inicial, movimientos, folios y recibo. Mismo operationId y expectedVersion devuelve el recibo confirmado, incluso despu\u00e9s de reiniciar; otra clave para el mismo lote confirmado produce 409. No enviar filas ni totales desde el cliente.",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Revalida permisos, cat\u00e1logos, identidad y versiones. Una \u00fanica transacci\u00f3n guarda registros, stock inicial, movimientos, folios y recibo. Mismo operationId y expectedVersion devuelve el recibo confirmado, incluso despu\u00e9s de reiniciar; otra clave para el mismo lote confirmado produce 409. No enviar filas ni totales desde el cliente. Un duplicado surgido despu\u00e9s de la vista previa produce 409 sin aplicar ninguna fila. Las filas sin cambios de una actualizaci\u00f3n se omiten.",
       "security": [
         {
           "cookieAuth": []

@@ -19,7 +19,7 @@ const issue = (field, message, code = 'INVENTORY_IMPORT_VALIDATION') => ({ field
 export const validateInventoryImportRows = async ({ db, config, rows }) => {
     const context = await loadInventoryImportContext({ db, config, rows });
     const results = [];
-    const targets = new Set();
+    const targets = new Map();
     const shared = new Map();
     for (const input of rows) {
         const body = { ...input.values };
@@ -124,8 +124,8 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                 if (!error.isOperational) throw error;
                 errors.push(issue(domainField, error.message, error.code));
             }
-            if (identity && targets.has(identity)) add('name', 'El registro está repetido dentro del archivo.');
-            if (identity) targets.add(identity);
+            if (identity && targets.has(identity)) add('name', `El registro está repetido: coincide con la fila ${targets.get(identity)} del archivo.`);
+            else if (identity) targets.set(identity, input.row);
             if (config.mode === 'create' && dto.maxUnitCost === 0) warnings.push('Alta sin costo: no podrá usarse en salidas hasta configurar un costo mayor que cero en Almacén.');
         }
         const after = dto ? editable(dto) : null;
@@ -173,7 +173,10 @@ export const validateInventoryImportRows = async ({ db, config, rows }) => {
                 : config.resource === 'wastes' && existingId;
             const previous = proposed.get(identity);
             if (conflict || (previous && config.mode === 'update' && previous !== row.id)) {
-                row.errors.push({ ...issue('name', 'La identidad resultante corresponde a otro registro.'), column: 'nombre' });
+                const message = config.mode === 'create' && config.resource === 'wastes'
+                    ? 'Esta merma ya está registrada. Usa Actualizar datos para corregirla o Agregar stock para recibir otras unidades.'
+                    : 'La identidad resultante corresponde a otro registro.';
+                row.errors.push({ ...issue('name', message), column: 'nombre' });
                 row.action = 'error';
             }
             proposed.set(identity, row.id);

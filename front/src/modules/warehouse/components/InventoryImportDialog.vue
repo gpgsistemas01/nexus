@@ -128,9 +128,13 @@ const locked = computed(() => props.isWorking || props.isDownloading);
             <p class="mb-4">
                 {{
                     mode === 'create'
-                        ? 'Descarga la plantilla y captura una fila por artículo y proveedor.'
-                        : 'Descarga los registros actuales. Edita nombre, mínimo, costo o activo; conserva los identificadores y las versiones. El stock se cambia desde sus operaciones de inventario.'
+                        ? 'El sistema genera los IDs de las altas. Descarga la plantilla y usa las opciones de Catálogos.'
+                        : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
                 }}
+            </p>
+            <p class="mb-4">
+                Un duplicado o error bloquea todo el archivo. La vista previa indica las filas que
+                debes corregir.
             </p>
             <div class="template-fields">
                 <RemoteSelect
@@ -166,7 +170,8 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                 v-if="resource === 'wastes' && mode === 'create'"
                 class="mb-3"
             >
-                Selecciona el proveedor para incluir sus materiales de referencia en m².
+                Selecciona el proveedor para incluir sus materiales de referencia en m². En el
+                Excel, elige la opción completa de la lista sin escribir el ID manualmente.
             </p>
             <VBtn
                 variant="outlined"
@@ -218,7 +223,21 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                 El borrador fue descartado o venció. Descarga una plantilla nueva.
             </VAlert>
             <template v-if="preview">
+                <VAlert
+                    v-if="batch.status === 'DRAFT' && !recoveryRequired"
+                    :type="preview.summary.errors ? 'warning' : 'info'"
+                    variant="tonal"
+                    class="mb-4"
+                    :role="preview.summary.errors ? 'alert' : 'status'"
+                >
+                    {{
+                        preview.summary.errors
+                            ? 'No se ha guardado ninguna fila. Corrige todos los errores o duplicados y vuelve a validar el archivo.'
+                            : 'Esta es una vista previa. Todavía no se ha guardado ningún cambio; revisa las filas y confirma la importación.'
+                    }}
+                </VAlert>
                 <p class="mb-3">
+                    {{ batch.status === 'COMPLETED' ? 'Resultado de' : 'Vista previa de' }}
                     <strong>{{ batch.filename }}</strong>
                     : {{ preview.summary.creates }} nuevos, {{ preview.summary.updates }} cambios,
                     {{ preview.summary.unchanged }} sin cambios y {{ preview.summary.errors }} con

@@ -16,6 +16,13 @@ Busque y filtre para localizar el registro correcto.
 5. Si hay errores, descárguelos, pulse **Descartar borrador**, corrija el original y vuelva a validarlo.
 6. Pulse **Confirmar importación** y espere el recibo. Use **Otro archivo** para continuar.
 
+En altas, el sistema genera los IDs. Para editar, descargue **Actualizar datos**,
+cambie los campos permitidos y vuelva a subir el archivo conservando IDs y versiones.
+Use archivos separados para altas y ediciones.
+
+Un duplicado o error bloquea **todo el archivo**: todavía no se guarda ninguna fila.
+**Descargar errores** indica cuáles corregir o retirar antes de volver a validar.
+
 Máximo: 100 filas y 2 MiB. Actualizar cambia nombre, mínimo, costo y activo; conserva
 existencias y medidas. Nombre y mínimo se comparten entre proveedores. Pieza exige
 enteros. Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo.

@@ -24,6 +24,26 @@ obligatorio produce error; no borra valores. Las filas sin cambios se omiten al 
 Nombre y mínimo son comunes a todos los proveedores del material. Costo y activo
 corresponden a su relación con el proveedor.
 
+## Identificación y duplicados
+
+Las altas no reciben el ID del artículo nuevo: el servidor lo genera. Las referencias
+a catálogos se resuelven por código de proveedor, presentación y unidad; en merma,
+la opción seleccionada del catálogo contiene el ID del material de origen.
+La actualización se descarga con IDs y versiones y se vuelve a subir conservándolos.
+Se identifica el destino por ID, por lo que editar el nombre no crea otro artículo.
+Una fila de actualización sin ID se rechaza; los dos modos usan plantillas distintas.
+
+Materiales y consumibles comparan su identidad de nombre, tipo, presentación, unidad
+y dimensiones, y verifican la relación con el proveedor. Una relación nueva puede
+reutilizar el material existente. Merma compara proveedor, nombre, medidas y pesos
+de cono/total aplicables. Costo y cantidad inicial no forman parte de esa identidad.
+
+Un repetido interno señala la primera fila coincidente. Un duplicado existente
+produce un error por fila; no se convierte en edición ni en una entrada de stock.
+**Un solo error o duplicado bloquea todo el lote**, incluidas las filas válidas.
+La confirmación vuelve a comprobarlo: un duplicado concurrente devuelve conflicto
+y no deja efectos parciales. Las filas sin cambios de una edición se omiten al escribir.
+
 ## Flujo HTTP y permisos
 
 Prefijo: `/api/warehouse/inventory-imports`. Recursos: `materials`, `consumables`,

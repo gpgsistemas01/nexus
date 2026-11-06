@@ -10,6 +10,13 @@
 5. Corrija los errores en el original, descarte el borrador y vuelva a validar.
 6. Pulse **Confirmar importación** y espere el recibo.
 
+El ID de la nueva merma lo genera el sistema. Seleccione el material de referencia
+de la lista del Excel; la opción ya incluye su ID. Para editar, descargue
+**Actualizar datos** y vuelva a subirlo conservando IDs y versiones.
+
+Si una fila está repetida o es inválida, **no se aplica ninguna fila**. Descargue
+los errores, corrija o retire los repetidos y vuelva a validar. Un alta repetida no suma stock.
+
 Máximo: 100 filas y 2 MiB. Actualizar sólo cambia nombre, mínimo, costo y activo;
 conserva stock, medidas y pesos. Para entradas posteriores use **Agregar stock**.
 Si se pierde la respuesta, pulse **Revisar y reintentar confirmación** desde la
