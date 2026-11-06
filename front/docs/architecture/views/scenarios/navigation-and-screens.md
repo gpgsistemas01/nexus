@@ -34,3 +34,8 @@ El retorno conserva ruta, query y fragmento de una ruta protegida registrada.
 rutas desconocidas. Un 401 definitivo abre login; un 403 muestra acceso no permitido;
 un fallo de conexión conserva destino en recuperación con reintento visible.
 Las pruebas de router y `sessionRecovery.spec.ts` verifican esos escenarios.
+
+`NotFoundPage`, `AccessErrorPage` y `StartupErrorPage` comparten la presentación
+`AppStatusPage`. Cada página conserva su navegación o reintento; el componente
+presenta el estado y las acciones sin depender de Vuetify ni de una sesión.
+`fallbacks.spec.ts` verifica móvil, teclado y recuperación tras un fallo de arranque.

@@ -15,7 +15,7 @@ interacción; persistencia y archivos reales requieren las pruebas de sistema in
 | --- | --- |
 | `RF-VUE-001` | [Formulario de login](../../tests/unit/modules/auth/composables/useLoginFormTest.ts) y [login en navegador](../../tests/e2e/login.spec.ts). |
 | `RF-VUE-002` | [Cliente HTTP](../../tests/unit/shared/http/apiClientTest.ts), [recuperación de sesión](../../tests/e2e/sessionRecovery.spec.ts) y [sistema](../../tests/system/application.spec.ts). |
-| `RF-VUE-003` | [Router](../../tests/unit/app/routerTest.ts), [acceso a páginas](../../tests/unit/app/pageAccessTest.ts) y [navegación en Salidas](../../tests/e2e/issues.spec.ts). |
+| `RF-VUE-003` | [Router](../../tests/unit/app/routerTest.ts), [acceso a páginas](../../tests/unit/app/pageAccessTest.ts), [fallbacks](../../tests/e2e/fallbacks.spec.ts) y [navegación en Salidas](../../tests/e2e/issues.spec.ts). |
 | `RF-VUE-004` | [Interacción de listados](../../tests/unit/shared/composables/listInteractionTest.ts), [query de tabla](../../tests/unit/shared/composables/tableQueryTest.ts) y [contrato paginado](../../tests/unit/shared/http/pageRequestTest.ts). |
 | `RF-VUE-005` | [Catálogos](../../tests/e2e/catalogs.spec.ts) y [Directorio/Identidad](../../tests/e2e/records.spec.ts). |
 | `RF-VUE-006` | [Formulario de inventario](../../tests/unit/modules/warehouse/inventoryFormTest.ts) y [Almacén](../../tests/e2e/warehouse.spec.ts). |

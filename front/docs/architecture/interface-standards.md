@@ -76,6 +76,7 @@ persistencia conservan la precisión del contrato de la API; el formato pertenec
 
 | Situación | Presentación y acción |
 | --- | --- |
+| Ruta inexistente, acceso denegado, sesión no disponible o fallo de arranque | Las páginas reutilizan `AppStatusPage`: título, causa y acción de recuperación, con foco visible y controles accesibles en móvil. El componente usa HTML y CSS y funciona aunque falle la carga de Vuetify. El reintento de sesión conserva el destino. |
 | Abrir o recargar un documento desde una acción de tabla | `DocumentReadDialog` bloquea el fondo mientras se consulta. Permite cancelar y descarta respuestas tardías. Ante un fallo recuperable ofrece **Reintentar consulta**. No cierra por Escape o clic fuera. |
 | Buscar opciones | `RemoteSelect` carga al abrirse y muestra la espera/error en el control. El resto del formulario sigue disponible. **Reintentar catálogo** aparece también con una opción previamente seleccionada. |
 | Validación de captura | Mensaje junto al campo; conservar los valores para corregirlos. Los errores HTTP 400/422 se muestran sin otro diálogo sólo si todos corresponden a campos del formulario; los demás conservan el aviso general. |

@@ -886,3 +886,109 @@ it('mantiene obligatorias las capturas de acciones y los ejemplos del modo demo'
     'debe volver a verificarse',
   );
 });
+
+it.each(DEMO_PROFILES)(
+  '$id publica sólo los capítulos y capturas de su selección',
+  async (profile) => {
+    const root = await manualRoot();
+    const manifest = await prepareManual(root, { ...profile, mode: 'demo' }, demoSession(profile));
+    const bytes = await readFile(path.resolve('docs/user-manual/images/01-login.png'));
+    const captures: Record<string, { status: string; sha256: string }> = {};
+    for (const image of manifest.images) {
+      await writeFile(path.join(manifest.root, 'images', image), bytes);
+      captures[image] = {
+        status: 'complete',
+        sha256: createHash('sha256').update(bytes).digest('hex'),
+      };
+    }
+    await writeFile(
+      path.join(manifest.root, 'manifest.json'),
+      JSON.stringify({ ...manifest, status: 'ready', captures }),
+    );
+
+    const sources = await loadManualPublication(root, profile.id);
+    expect(sources).toEqual(
+      manifest.sources.map((file: string) =>
+        path
+          .relative(path.resolve(root, '../back'), path.join(manifest.root, 'sources', file))
+          .split(path.sep)
+          .join('/'),
+      ),
+    );
+  },
+);
+
+it('rechaza un capítulo anterior que ya no corresponde a los permisos del usuario', async () => {
+  const { root, manifest, captures } = await publicationWithoutExamples();
+  await writeFile(path.join(manifest.root, 'sources/08-users.md'), '# Usuarios\n');
+  await writeFile(
+    path.join(manifest.root, 'manifest.json'),
+    JSON.stringify({
+      ...manifest,
+      status: 'ready',
+      captures,
+      sources: [...manifest.sources, '08-users.md'],
+    }),
+  );
+  await expect(loadManualPublication(root, 'lector')).rejects.toThrow(
+    'El capítulo 08-users.md no corresponde al acceso',
+  );
+});
+
+it('rechaza imágenes de acciones sin permiso aunque se agreguen al manifiesto', async () => {
+  const { root, manifest, captures } = await publicationWithoutExamples();
+  await writeFile(
+    path.join(manifest.root, 'manifest.json'),
+    JSON.stringify({
+      ...manifest,
+      status: 'ready',
+      captures,
+      images: [...manifest.images, '15-user-password.png'],
+    }),
+  );
+  await expect(loadManualPublication(root, 'lector')).rejects.toThrow(
+    'La imagen 15-user-password.png no corresponde al acceso',
+  );
+});
+
+it('rechaza referencias a capturas que no forman parte de la selección de esa cuenta', async () => {
+  const { root, manifest } = await publicationWithoutExamples();
+  await writeFile(
+    path.join(manifest.root, 'sources/11-purchases.md'),
+    '![Otra acción](../images/15-user-password.png)\n',
+  );
+  await expect(loadManualPublication(root, 'lector')).rejects.toThrow(
+    'no pertenece a las capturas de la cuenta lector',
+  );
+});
+
+it.each(['../../otra/images/20-purchase-view.png', 'https://example.com/imagen.png'])(
+  'rechaza imágenes fuera de la carpeta de la cuenta: %s',
+  async (reference) => {
+    const { root, manifest } = await publicationWithoutExamples();
+    await writeFile(
+      path.join(manifest.root, 'sources/11-purchases.md'),
+      `![Otra cuenta](${reference})\n`,
+    );
+    await expect(loadManualPublication(root, 'lector')).rejects.toThrow(
+      'sólo admite imágenes de su propia carpeta',
+    );
+  },
+);
+
+it('una captura disponible en otra cuenta no sustituye la que falta en la cuenta seleccionada', async () => {
+  const { root, manifest } = await publicationWithoutExamples();
+  await cp(path.join(manifest.root, 'images'), path.resolve(manifest.root, '../otra/images'), {
+    recursive: true,
+  });
+  await rm(path.join(manifest.root, 'images/20-purchase-view.png'));
+  await expect(loadManualPublication(root, 'lector')).rejects.toThrow(
+    'Falta la captura 20-purchase-view.png de lector',
+  );
+});
+
+it('rechaza una captura modificada después de verificarla', async () => {
+  const { root, manifest } = await publicationWithoutExamples();
+  await writeFile(path.join(manifest.root, 'images/20-purchase-view.png'), 'imagen posterior');
+  await expect(loadManualPublication(root, 'lector')).rejects.toThrow('debe volver a verificarse');
+});

@@ -101,6 +101,9 @@ El navegador bloquea escrituras de negocio; permite la renovación de sesión.
 Abrir formularios o agregar detalles a un borrador no los guarda. Al terminar se
 comprueba de nuevo el acceso: si cambió, se interrumpe la publicación. Una imagen
 requerida ausente deja el manual pendiente; no se sustituye por otra de administración.
+Antes de exportar, se contrastan capítulos e imágenes con los permisos de esa
+cuenta. Cada referencia debe pertenecer a su selección y carpeta; cada PNG debe
+conservar la huella verificada. Un archivo de otra cuenta no cubre una captura faltante.
 Los ejemplos históricos son condicionales en `dev`: su ausencia se registra y se
 conserva la explicación textual del estado. Las capturas de acciones siguen siendo
 obligatorias. La preparación reutiliza las reglas de Compras y Salidas de Vue y

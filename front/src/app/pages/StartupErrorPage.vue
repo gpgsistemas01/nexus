@@ -1,40 +1,25 @@
 <script setup lang="ts">
+import { mdiAlertCircleOutline } from '@mdi/js';
+import AppStatusPage from '../components/AppStatusPage.vue';
+
 const reloadPage = () => window.location.reload();
 </script>
 
 <template>
-    <main
-        class="startup-error"
-        aria-labelledby="startup-error-title"
+    <AppStatusPage
+        code="Inicio"
+        :icon="mdiAlertCircleOutline"
+        title="No se pudo cargar la aplicación"
+        description="Comprueba tu conexión y vuelve a cargar la página para iniciar Nexus. Si el problema continúa, informa al responsable del sistema."
     >
-        <h1 id="startup-error-title">No se pudo cargar la aplicación</h1>
-        <p>Revisa tu conexión e intenta nuevamente.</p>
-        <button
-            type="button"
-            @click="reloadPage"
-        >
-            Volver a intentar
-        </button>
-    </main>
+        <template #actions>
+            <button
+                class="status-action status-action--primary"
+                type="button"
+                @click="reloadPage"
+            >
+                Volver a intentar
+            </button>
+        </template>
+    </AppStatusPage>
 </template>
-
-<style scoped>
-.startup-error {
-    max-width: 36rem;
-    margin: auto;
-    padding: 4rem 1.5rem;
-}
-
-p {
-    margin-block: 1rem 1.5rem;
-}
-
-button {
-    padding: 0.75rem 1.25rem;
-    border: 0;
-    border-radius: 0.5rem;
-    background: #0f7f3a;
-    color: #fff;
-    cursor: pointer;
-}
-</style>

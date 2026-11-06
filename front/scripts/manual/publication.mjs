@@ -1,7 +1,13 @@
 import { readFile, writeFile, mkdir, access, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { MANUAL_SECTIONS, selectedChapters, filterManualContent, imageNames } from './model.mjs';
+import {
+    MANUAL_SECTIONS,
+    selectedChapters,
+    filterManualContent,
+    imageNames,
+    imageReferences,
+} from './model.mjs';
 import { validProfileId } from './profiles.mjs';
 import { prepareManualDirectory } from './paths.mjs';
 import { DATA_SCOPES, hasDataScope } from '../../../back/src/constants/permissions.js';
@@ -74,6 +80,21 @@ const manualContents = (chapters) => {
         .join('\n');
 };
 
+const readManualChapters = async (frontRoot, permissions) =>
+    Promise.all(
+        selectedChapters(permissions).map(async (chapter) => {
+            const source = await readFile(
+                path.join(frontRoot, 'docs/user-manual', chapter.file),
+                'utf8',
+            );
+            try {
+                return { ...chapter, content: filterManualContent(source, permissions) };
+            } catch (cause) {
+                throw new Error(`No se pudo preparar ${chapter.file}: ${cause.message}`, { cause });
+            }
+        }),
+    );
+
 export const prepareManual = async (frontRoot, profile, session) => {
     if (
         !validProfileId(profile.id) ||
@@ -83,22 +104,15 @@ export const prepareManual = async (frontRoot, profile, session) => {
         throw new Error('Perfil o permisos de sesión inválidos.');
     const root = await prepareManualDirectory(frontRoot, profile.id);
     await mkdir(path.join(root, 'images'), { recursive: true });
-    const chapters = selectedChapters(session.permissions);
+    const chapters = await readManualChapters(frontRoot, session.permissions);
     const files = new Set(['index.md', ...chapters.map(({ file }) => file)]);
     const sources = [];
     const images = new Set();
     for (const [chapterIndex, chapter] of chapters.entries()) {
-        const source = await readFile(
-            path.join(frontRoot, 'docs/user-manual', chapter.file),
-            'utf8',
+        let content = chapter.content.replace(
+            /^# [^\r\n]+/,
+            `# ${chapterIndex + 1}. ${chapter.title}`,
         );
-        let content;
-        try {
-            content = filterManualContent(source, session.permissions);
-        } catch (cause) {
-            throw new Error(`No se pudo preparar ${chapter.file}: ${cause.message}`, { cause });
-        }
-        content = content.replace(/^# [^\r\n]+/, `# ${chapterIndex + 1}. ${chapter.title}`);
         for (const name of imageNames(content)) images.add(name);
         content = content.replace(/\]\(images\//g, '](../images/');
         content = content.replace(
@@ -187,13 +201,42 @@ export const loadManualPublication = async (frontRoot, id) => {
         manifest.sources[0] !== 'index.md'
     )
         throw new Error(`El manual ${id} no está completo; revise las capturas pendientes.`);
+    if (
+        !Array.isArray(manifest.permissions) ||
+        !manifest.permissions.every((permission) => typeof permission === 'string') ||
+        manifest.fingerprint !== permissionFingerprint(manifest.permissions) ||
+        !Array.isArray(manifest.images)
+    )
+        throw new Error(`La selección del manual ${id} debe volver a generarse con esa cuenta.`);
+    const chapters = await readManualChapters(frontRoot, manifest.permissions);
+    const allowedSources = new Set(['index.md', ...chapters.map(({ file }) => file)]);
+    const allowedImages = new Set(chapters.flatMap(({ content }) => imageNames(content)));
+    const selectedImages = new Set(manifest.images);
+    for (const image of selectedImages) {
+        if (typeof image !== 'string' || !/^[a-z0-9-]+\.png$/.test(image))
+            throw new Error('Imagen de manual inválida.');
+        if (!allowedImages.has(image))
+            throw new Error(`La imagen ${image} no corresponde al acceso de la cuenta ${id}.`);
+    }
     const sources = [];
     const referencedImages = new Set();
     for (const filename of manifest.sources) {
         if (!/^[a-z0-9-]+\.md$/.test(filename)) throw new Error('Fuente de manual inválida.');
+        if (!allowedSources.has(filename))
+            throw new Error(`El capítulo ${filename} no corresponde al acceso de la cuenta ${id}.`);
         const source = path.join(root, 'sources', filename);
         await access(source);
-        for (const image of imageNames(await readFile(source, 'utf8'))) referencedImages.add(image);
+        for (const reference of imageReferences(await readFile(source, 'utf8'))) {
+            const match = /^\.\.\/images\/([a-z0-9-]+\.png)$/.exec(reference);
+            if (!match)
+                throw new Error(`El manual ${id} sólo admite imágenes de su propia carpeta.`);
+            const image = match[1];
+            if (!selectedImages.has(image))
+                throw new Error(
+                    `La imagen ${image} no pertenece a las capturas de la cuenta ${id}.`,
+                );
+            referencedImages.add(image);
+        }
         sources.push(
             path.relative(path.resolve(frontRoot, '../back'), source).split(path.sep).join('/'),
         );
@@ -207,7 +250,13 @@ export const loadManualPublication = async (frontRoot, id) => {
         }
         if (manifest.captures?.[image]?.status !== 'complete')
             throw new Error(`La captura ${image} debe volver a verificarse.`);
-        const bytes = await readFile(path.join(root, 'images', image));
+        const bytes = await readFile(path.join(root, 'images', image)).catch((cause) => {
+            if (cause.code === 'ENOENT')
+                throw new Error(
+                    `Falta la captura ${image} de ${id}; vuelva a generarla con esa cuenta.`,
+                );
+            throw cause;
+        });
         if (manifest.captures[image].sha256 !== createHash('sha256').update(bytes).digest('hex'))
             throw new Error(`La captura ${image} debe volver a verificarse.`);
     }
