@@ -1,0 +1,88 @@
+# Importación de inventario por Excel
+
+Almacén importa altas y actualizaciones de Materiales, Consumibles y Mermas.
+El [procedimiento y cliente Vue](../../../../../front/docs/development/05-inventory-excel-import.md)
+pertenecen a `front/`; los contratos HTTP están en [OpenAPI](../../openapi/index.md).
+
+## Plantillas y alcance
+
+| Operación | Datos admitidos |
+| --- | --- |
+| Alta de materiales | Nombre, código de proveedor, presentación, unidad, base/altura opcionales, mínimo, costo máximo unitario, activo, cantidad inicial y observaciones. |
+| Alta de consumibles | Los mismos campos, sin base/altura. |
+| Alta de mermas | Nombre, código de proveedor, material de referencia en m², mínimo, costo, activo, cantidad inicial y observaciones; base/altura para otras presentaciones o los tres pesos para Rollo. |
+| Actualización de materiales y consumibles | IDs de material/proveedor y sus dos versiones; nombre, mínimo, costo y activo. |
+| Actualización de mermas | ID y versión; nombre, mínimo, costo y activo. |
+
+El formato `NEXUS_INVENTORY_V1` contiene `Datos`, `Instrucciones` y `Catalogos`.
+La plantilla de actualización contiene hasta 100 relaciones por página y admite
+filtros por nombre y proveedor. Sus IDs y versiones deben conservarse. La de alta
+incluye hasta 500 opciones activas por catálogo; para merma se elige proveedor.
+
+La actualización conserva stock, dimensiones, unidad, presentación y pesos. Un vacío
+obligatorio produce error; no borra valores. Las filas sin cambios se omiten al escribir.
+Nombre y mínimo son comunes a todos los proveedores del material. Costo y activo
+corresponden a su relación con el proveedor.
+
+## Flujo HTTP y permisos
+
+Prefijo: `/api/warehouse/inventory-imports`. Recursos: `materials`, `consumables`,
+`wastes`. Modos: `create`, `update`.
+
+| Ruta | Resultado |
+| --- | --- |
+| `GET /:resource/template?mode=...&supplierId=...&search=...&page=1` | XLSX de captura o actualización; páginas de 100 registros. |
+| `POST /:resource/preview?mode=...` | Multipart con un único `file`; `{ code, batch }` con versión, vencimiento, resumen y filas. No cambia inventario. |
+| `POST /:id/confirm` | JSON `{ expectedVersion, operationId }`; confirma el borrador del servidor y devuelve su recibo. |
+| `GET /:id` | `{ batch }` con vista previa vigente o resultado confirmado. |
+| `DELETE /:id` | Descarta el borrador y elimina su contenido temporal. |
+| `GET /:id/errors/excel` | Informe de errores por fila/columna. No es una plantilla para reimportar. |
+
+Todas requieren lectura y escritura del recurso y `inventory:costs-read`.
+Consumibles usa los permisos de Materiales. Un lote sólo es accesible por su creador
+mientras conserva esos permisos. La autorización precede al parser multipart.
+Las rutas JSON existentes conservan su transporte.
+
+## Reglas y confirmación
+
+[La validación](../../../../src/services/warehouse/imports/inventoryImportValidationService.js)
+reutiliza los validadores y DTO de los formularios, `assertPieceQuantity` y
+`prepareWasteMeasurements`. Resuelve catálogos en consultas acotadas al lote;
+rechaza duplicados, identidades ambiguas, proveedores inactivos y versiones viejas.
+Pieza exige enteros. Costo cero sólo se admite en altas y genera una advertencia;
+su uso posterior conserva los bloqueos de inventario sin costo.
+
+Confirmar revalida las filas y compara sus datos normalizados, referencias y valores
+anteriores con la vista previa. Una transacción guarda artículos, stock inicial,
+documentos, movimientos, folios y recibo. Las escrituras se agrupan con `createMany`
+y UPDATE condicionado por versión; los triggers incrementan cada versión. Los datos
+comunes de un material se actualizan una sola vez por lote.
+
+Los cálculos e historia inicial reutilizan los servicios de ajustes y entradas de
+merma. Se reserva un intervalo de folios por tipo en una sola consulta. Cada fila
+conserva su documento y observaciones; merma con cantidad inicial cero no genera
+entrada. Un fallo también revierte folios e historia.
+
+`InventoryImport` conserva el recibo en PostgreSQL. La misma clave y comando devuelve
+el resultado ya confirmado sin revalidar las versiones consumidas ni repetir stock.
+Otra clave o comando para ese lote devuelve conflicto. Un `DRAFT` consultado tras
+una desconexión no demuestra rollback: se reintenta con la misma clave. El descarte
+condicionado por estado no puede borrar una confirmación que ganó la carrera.
+
+## Límites, rendimiento y retención
+
+| Control | Implementación |
+| --- | --- |
+| Tamaño | 2 MiB, 100 filas, 600 caracteres por celda; ZIP de hasta 16 MiB descomprimidos y 200 entradas. |
+| Contenido | Rechaza fórmulas, macros, vínculos externos, objetos de celda y hojas/encabezados incompatibles. |
+| CPU | ExcelJS se ejecuta en un worker temporal con límite de memoria y 10 s de análisis/generación. |
+| Admisión | Una vista previa y un trabajo XLSX por proceso; una confirmación de importación por base. Otra solicitud recibe `429` y puede reintentarse. |
+| Bloqueos | Espera de 1,5 s y transacción de hasta 30 s; las consultas normales no usan la puerta de importación. |
+| XLSX | Sólo memoria; se liberan referencias tras analizarlo y ante error. No se crea un archivo en disco ni se necesita un disco de Render. |
+| Borrador | Vence a las 24 h. Confirmación y descarte eliminan payload/vista previa inmediatamente. La limpieza de vencidos procesa hasta 100 cada cinco minutos y se detiene antes de desconectar Prisma. |
+| Recibo | Conserva actor, fechas, hash, resumen e IDs/cambios. Su retención sigue la política de historia pendiente de acuerdo. |
+| Descargas | Plantillas e informes se generan en memoria. Los archivos del equipo del usuario permanecen bajo su control. |
+
+La [medición reproducible](../../../testing/backend-performance.md#importación-de-inventario)
+compara consultas normales con seis lotes de 100 filas. Sus resultados locales no
+establecen un SLA. Los comandos están en la sección de desarrollo de Vue y en esa guía.

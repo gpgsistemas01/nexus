@@ -1,5 +1,13 @@
 # 4.3 Entradas, salidas e inventario
 
+### Importación de inventario
+
+| ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
+| --- | --- | --- | --- |
+| RF-IMP-001 | Almacén debe importar altas y actualizaciones de materiales, consumibles y mermas mediante plantillas XLSX de hasta 2 MiB y 100 filas. Requiere lectura, escritura y lectura de costos; valida catálogos, duplicados, enteros para Pieza y costo cero sólo en altas. La vista previa informa errores sin modificar inventario. | Implementado | `src/services/warehouse/imports`, `tests/unit/services/warehouse/inventoryWorkbookTest.js` |
+| RF-IMP-002 | Confirmar debe revalidar el borrador y sus versiones y guardar artículos, stock inicial, documentos, folios y recibo como una sola transacción. La actualización sólo cambia nombre, mínimo, costo y activo y omite filas iguales. Repetir el mismo lote/clave devuelve el recibo sin duplicar movimientos; otra clave produce conflicto. | Implementado | `inventoryImportService.js`, `inventoryImportWriteRepository.js`, `tests/integration/controllers/inventoryImportControllerDbTest.js` |
+| RF-IMP-003 | Cada lote sólo debe ser accesible por su creador autorizado. El XLSX no se conserva en disco; el contenido temporal se elimina al confirmar o descartar y los borradores vencen en 24 h con limpieza periódica. El recibo confirmado permanece para recuperación. | Implementado | Modelo `InventoryImport`, `inventoryImportCleanup.js`, `tests/integration/controllers/inventoryImportControllerDbTest.js` |
+
 Las recepciones y salidas de artículos se operan en contextos separados de materiales
 y consumibles. Comparten las obligaciones de recepción `RF-REC-001` a `RF-REC-008`
 y de salida `RF-ISS-001` a `RF-ISS-008`; compartir proceso no permite mezclar detalles.

@@ -69,8 +69,8 @@ cuando no reproducen esa misma lista.
 
 Para comenzar a contribuir, consulte la [guía de incorporación](developer-onboarding.md).
 
-## Propuestas de ampliación
+## Importación de inventario
 
-La [importación de inventario por Excel](inventory-excel-import-proposal.md) define
+La [importación de inventario por Excel](inventory-excel-import.md) define
 plantillas, contratos, reutilización, confirmación y retención de archivos.
-Es una propuesta pendiente de implementación; no amplía las rutas vigentes.
+Incluye límites de ejecución, confirmación atómica y limpieza de borradores.

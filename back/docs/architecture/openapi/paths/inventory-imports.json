@@ -1,0 +1,751 @@
+{
+  "/api/warehouse/inventory-imports/{resource}/template": {
+    "get": {
+      "operationId": "getInventoryImportTemplate",
+      "tags": [
+        "Importaciones de inventario"
+      ],
+      "summary": "Descargar plantilla de altas o actualizaci\u00f3n",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Formato NEXUS_INVENTORY_V1. Hojas Datos, Instrucciones y Catalogos (m\u00e1ximo 500 opciones). Actualizaci\u00f3n incluye IDs, versiones y s\u00f3lo nombre, m\u00ednimo, costo y activo; no importa stock ni cambia dimensiones/pesos. Mermas Rollo calcula sus medidas desde los pesos y el material de referencia.",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "resource",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "materials",
+              "consumables",
+              "wastes"
+            ]
+          }
+        },
+        {
+          "name": "mode",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "create",
+              "update"
+            ],
+            "default": "create"
+          }
+        },
+        {
+          "name": "supplierId",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Obligatorio para la plantilla de alta de mermas. En actualizaci\u00f3n delimita las relaciones del proveedor."
+        },
+        {
+          "name": "search",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999,
+            "default": 1
+          },
+          "description": "Actualizaci\u00f3n: 100 filas por p\u00e1gina, orden estable por nombre e identificador."
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Libro XLSX generado en memoria; Cache-Control: no-store.",
+          "content": {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Lote propio inexistente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "410": {
+          "description": "Borrador vencido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "413": {
+          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        }
+      }
+    }
+  },
+  "/api/warehouse/inventory-imports/{resource}/preview": {
+    "post": {
+      "operationId": "postInventoryImportPreview",
+      "tags": [
+        "Importaciones de inventario"
+      ],
+      "summary": "Validar archivo sin cambiar el inventario",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Un \u00fanico campo file .xlsx, hasta 2 MiB y 100 filas. Rechaza f\u00f3rmulas, macros, libros corruptos y encabezados o modo distintos. Devuelve errores por fila sin aplicar ninguna. Borrador privado por 24 horas; XLSX descartado tras el an\u00e1lisis.",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "resource",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "materials",
+              "consumables",
+              "wastes"
+            ]
+          }
+        },
+        {
+          "name": "mode",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "create",
+              "update"
+            ],
+            "default": "create"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Lote privado, vista previa o recibo persistido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/InventoryImportResponse"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Lote propio inexistente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "410": {
+          "description": "Borrador vencido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "413": {
+          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "file"
+              ],
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/warehouse/inventory-imports/{id}/confirm": {
+    "post": {
+      "operationId": "postInventoryImportConfirm",
+      "tags": [
+        "Importaciones de inventario"
+      ],
+      "summary": "Confirmar todas las filas del borrador",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Revalida permisos, cat\u00e1logos, identidad y versiones. Una \u00fanica transacci\u00f3n guarda registros, stock inicial, movimientos, folios y recibo. Mismo operationId y expectedVersion devuelve el recibo confirmado, incluso despu\u00e9s de reiniciar; otra clave para el mismo lote confirmado produce 409. No enviar filas ni totales desde el cliente.",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Lote privado, vista previa o recibo persistido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/InventoryImportResponse"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Lote propio inexistente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "410": {
+          "description": "Borrador vencido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "413": {
+          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/InventoryImportConfirmRequest"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/warehouse/inventory-imports/{id}": {
+    "get": {
+      "operationId": "getInventoryImport",
+      "tags": [
+        "Importaciones de inventario"
+      ],
+      "summary": "Consultar vista previa o recibo de una importaci\u00f3n propia",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Un DRAFT consultado tras una desconexi\u00f3n no demuestra rollback: repetir la confirmaci\u00f3n con el mismo operationId/expectedVersion. Un EXPIRED oculta su contenido aunque la limpieza f\u00edsica siga pendiente.",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Lote privado, vista previa o recibo persistido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/InventoryImportResponse"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Lote propio inexistente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "410": {
+          "description": "Borrador vencido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "413": {
+          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteInventoryImport",
+      "tags": [
+        "Importaciones de inventario"
+      ],
+      "summary": "Descartar un borrador sin confirmar",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Elimina el contenido temporal y marca CANCELED. No revierte un lote COMPLETED. Si hay una confirmaci\u00f3n en curso, la condici\u00f3n de estado y el bloqueo impiden descartarla como si no se hubiera aplicado.",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Lote privado, vista previa o recibo persistido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/InventoryImportResponse"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Lote propio inexistente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "410": {
+          "description": "Borrador vencido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "413": {
+          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        }
+      }
+    }
+  },
+  "/api/warehouse/inventory-imports/{id}/errors/excel": {
+    "get": {
+      "operationId": "getInventoryImportErrors",
+      "tags": [
+        "Importaciones de inventario"
+      ],
+      "summary": "Descargar errores de la vista previa",
+      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Disponible para un DRAFT propio, vigente y con errores. Columnas fila, nombre, columna y mensaje. Es un informe de revisi\u00f3n; no se puede reimportar como plantilla.",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Libro XLSX generado en memoria; Cache-Control: no-store.",
+          "content": {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Lote propio inexistente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "409": {
+          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "410": {
+          "description": "Borrador vencido.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "413": {
+          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "429": {
+          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/Error"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        }
+      }
+    }
+  }
+}

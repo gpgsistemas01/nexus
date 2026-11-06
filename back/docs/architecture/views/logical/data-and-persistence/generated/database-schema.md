@@ -724,6 +724,23 @@ erDiagram
     Waste ||..o{ WasteStockAdjustmentDetail : "wasteId = Waste.id"
 ```
 
+## Importaciones de inventario
+
+### InventoryImport
+
+```mermaid
+erDiagram
+    direction LR
+    InventoryImport {
+        String id PK
+        String userId FK
+    }
+    User {
+        String id PK
+    }
+    User o|..o{ InventoryImport : "userId = User.id"
+```
+
 ## Correspondencias de claves entre modelos
 
 Las claves compuestas se corresponden por posición. «Referenciados por dependiente»
@@ -734,6 +751,7 @@ forma parte de la PK del dependiente; la discontinua, una relación no identific
 | Campos FK del dependiente | Clave referenciada | Referenciados por dependiente | Dependientes por referenciado |
 | --- | --- | --- | --- |
 | `User.personId` | `Person.id` | 0..1 | 0..N |
+| `InventoryImport.userId` | `User.id` | 0..1 | 0..N |
 | `CriticalWriteAudit.actorId` | `User.id` | 0..1 | 0..N |
 | `UserRoleDepartment.userId` | `User.id` | 1 | 0..N |
 | `UserRoleDepartment.roleId` | `Role.id` | 1 | 0..N |

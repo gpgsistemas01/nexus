@@ -1,0 +1,284 @@
+{
+  "InventoryImportSummary": {
+    "type": "object",
+    "required": [
+      "total",
+      "creates",
+      "updates",
+      "unchanged",
+      "errors"
+    ],
+    "properties": {
+      "total": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "creates": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "updates": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "unchanged": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "errors": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      }
+    }
+  },
+  "InventoryImportRow": {
+    "type": "object",
+    "required": [
+      "row",
+      "id",
+      "name",
+      "action",
+      "before",
+      "after",
+      "details",
+      "errors",
+      "warnings"
+    ],
+    "properties": {
+      "row": {
+        "type": "integer",
+        "minimum": 2
+      },
+      "id": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "action": {
+        "enum": [
+          "create",
+          "update",
+          "unchanged",
+          "error"
+        ]
+      },
+      "before": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "after": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "details": {
+        "type": "object",
+        "additionalProperties": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "errors": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "column",
+            "message",
+            "code"
+          ],
+          "properties": {
+            "column": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "warnings": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "InventoryImportData": {
+    "type": "object",
+    "required": [
+      "summary",
+      "rows"
+    ],
+    "properties": {
+      "summary": {
+        "$ref": "../openapi.json#/components/schemas/InventoryImportSummary"
+      },
+      "rows": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "$ref": "../openapi.json#/components/schemas/InventoryImportRow"
+        }
+      }
+    }
+  },
+  "InventoryImportBatch": {
+    "type": "object",
+    "required": [
+      "id",
+      "version",
+      "resource",
+      "mode",
+      "status",
+      "filename",
+      "createdAt",
+      "expiresAt",
+      "completedAt",
+      "preview",
+      "result"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "version": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "resource": {
+        "enum": [
+          "materials",
+          "consumables",
+          "wastes"
+        ]
+      },
+      "mode": {
+        "enum": [
+          "create",
+          "update"
+        ]
+      },
+      "status": {
+        "enum": [
+          "DRAFT",
+          "COMPLETED",
+          "CANCELED",
+          "EXPIRED"
+        ]
+      },
+      "filename": {
+        "type": "string",
+        "maxLength": 120
+      },
+      "createdAt": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "expiresAt": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "completedAt": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "date-time"
+      },
+      "preview": {
+        "oneOf": [
+          {
+            "$ref": "../openapi.json#/components/schemas/InventoryImportData"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "result": {
+        "oneOf": [
+          {
+            "$ref": "../openapi.json#/components/schemas/InventoryImportData"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    }
+  },
+  "InventoryImportResponse": {
+    "type": "object",
+    "required": [
+      "batch"
+    ],
+    "properties": {
+      "code": {
+        "enum": [
+          "INVENTORY_IMPORT_PREVIEW",
+          "INVENTORY_IMPORT_COMPLETED",
+          "INVENTORY_IMPORT_CANCELED"
+        ]
+      },
+      "batch": {
+        "$ref": "../openapi.json#/components/schemas/InventoryImportBatch"
+      }
+    }
+  },
+  "InventoryImportConfirmRequest": {
+    "type": "object",
+    "required": [
+      "expectedVersion",
+      "operationId"
+    ],
+    "properties": {
+      "expectedVersion": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "operationId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    }
+  }
+}

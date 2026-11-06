@@ -1,5 +1,21 @@
 # 5. Mermas
 
+<!-- manual:all wastes:read wastes:write inventory:costs-read -->
+## Importar desde Excel
+
+1. Pulse **Importar Excel** y elija **Crear registros** o **Actualizar datos**.
+2. Para altas, seleccione proveedor y descargue la plantilla con sus materiales de referencia en m².
+3. Capture los datos; en Rollo use cono, merma con cono y rollo completo con cono, en kg. El sistema calcula las medidas.
+4. Seleccione el archivo y pulse **Validar archivo**. Revise cantidad inicial, cambios y errores.
+5. Corrija los errores en el original, descarte el borrador y vuelva a validar.
+6. Pulse **Confirmar importación** y espere el recibo.
+
+Máximo: 100 filas y 2 MiB. Actualizar sólo cambia nombre, mínimo, costo y activo;
+conserva stock, medidas y pesos. Para entradas posteriores use **Agregar stock**.
+Si se pierde la respuesta, pulse **Revisar y reintentar confirmación** desde la
+misma opción de importación. El borrador vence en 24 h; el archivo de su equipo no se elimina.
+<!-- manual:end -->
+
 ## Consultar una merma
 
 Abra **Almacén → Mermas**. Busque por nombre y proveedor y revise medidas, cantidad y

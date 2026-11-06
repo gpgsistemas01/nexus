@@ -21,6 +21,17 @@ define el alcance de cada acceso.
 
 ## Operaciones consumidas
 
+La importación usa `/api/warehouse/inventory-imports`: plantilla por recurso/modo,
+`POST /:resource/preview` con un único `file` en `FormData`, lectura y descarte de
+`/:id`, y `POST /:id/confirm` con `{ expectedVersion, operationId }`.
+La respuesta es `{ code, batch }`; la lectura omite `code`. `batch` contiene estado,
+versión, resumen/filas de la vista previa o recibo final. Cada fila identifica valores
+anteriores/propuestos, detalles, errores y advertencias. `GET /:id/errors/excel`
+descarga el informe. El cliente no confirma enviando filas ni abre otra alta tras una
+respuesta incierta. `429` permite reintentar el mismo lote; `409` exige revisar su
+estado. Un `200` incompleto no confirma la operación. La
+[guía de importación](../../development/05-inventory-excel-import.md) precisa límites y recuperación.
+
 | Área | Contrato consumido y datos relevantes |
 | --- | --- |
 | Acceso | `POST /api/auth/login`: `name` recortado y `password` exacta. `GET /api/auth/me`: usuario con ID, nombre y array de permisos. Renovación: `POST /api/auth/refresh`. Cierre: `POST /cerrar-sesion`. |

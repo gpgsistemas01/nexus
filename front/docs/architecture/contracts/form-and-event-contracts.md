@@ -8,6 +8,11 @@ datos HTTP, en el [contrato de la API](client-contracts.md).
 
 ## Props y propiedad de los datos
 
+`InventoryImportPage` entrega modo, archivo, lote y carga a `InventoryImportDialog`.
+Éste emite selección de archivo, descarga, validación, confirmación, recuperación,
+descarte y cierre. `useInventoryImport` conserva el borrador y la referencia pendiente;
+el componente no llama HTTP ni calcula stock.
+
 | Entrada de presentación | Propietario y contrato |
 | --- | --- |
 | `values`, `errors` y `message` | El composable del editor conserva captura y errores; el contenedor los entrega al formulario. |

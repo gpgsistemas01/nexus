@@ -771,6 +771,33 @@ usuarios y responsables se mantiene en el
 | `wasteStockAdjustment` | `WasteStockAdjustment` | `wasteStockAdjustmentId` | Exactamente uno |
 | `waste` | `Waste` | `wasteId` | Exactamente uno |
 
+## Importaciones de inventario
+
+### `InventoryImport`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
+| `version` | `Int` | Sí | — | `0` | — |
+| `userId` | `String?` | No | FK | — | `@db.Uuid` |
+| `resource` | `String` | Sí | — | — | `@db.VarChar(16)` |
+| `mode` | `String` | Sí | — | — | `@db.VarChar(8)` |
+| `status` | `String` | Sí | — | `"DRAFT"` | `@db.VarChar(16)` |
+| `filename` | `String` | Sí | — | — | `@db.VarChar(120)` |
+| `fileHash` | `String` | Sí | — | — | `@db.VarChar(64)` |
+| `payload` | `Json?` | No | — | — | — |
+| `preview` | `Json?` | No | — | — | — |
+| `result` | `Json?` | No | — | — | — |
+| `operationId` | `String?` | No | — | — | `@db.Uuid` |
+| `commandHash` | `String?` | No | — | — | `@db.VarChar(64)` |
+| `expiresAt` | `DateTime` | Sí | — | — | — |
+| `createdAt` | `DateTime` | Sí | — | `now()` | — |
+| `completedAt` | `DateTime?` | No | — | — | — |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `user` | `User` | `userId` | Cero o uno |
+
 ## Enumeraciones
 
 | Tipo | Valores permitidos por Prisma |

@@ -19,7 +19,9 @@ Los comandos se ejecutan desde `back/`.
 
 OpenAPI conserva el detalle por operación en [Sesión](paths/auth.json),
 [Clientes](paths/sales.json), [Almacén](paths/warehouse.json) y
-[Administración](paths/admin.json). El contrato HTTP reúne las reglas comunes.
+[Administración](paths/admin.json). Las
+[importaciones de inventario](paths/inventory-imports.json) documentan plantillas,
+multipart, confirmación y recuperación. El contrato HTTP reúne las reglas comunes.
 
 La [interfaz EJS](../views/development/frontend-technical-documentation/index.md)
 y la [implementación del servidor](../views/development/backend-technical-documentation/index.md)

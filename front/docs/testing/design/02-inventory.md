@@ -1,5 +1,11 @@
 # Diseño de pruebas: Inventario y captura de merma
 
+## Importación XLSX
+
+| ID de diseño | Requisito / riesgo | Nivel y técnica | Condición observable | Casos |
+| --- | --- | --- | --- | --- |
+| `DP-VUE-IMP-001` | `RF-VUE-015`, duplicación tras perder la respuesta y acceso indebido | Unitario/transporte y Chromium con API simulada; particiones válido/error/permiso y transiciones vista previa → envío incierto → recarga → recibo/reintento | Un multipart para validar y un JSON con versión/clave para confirmar. Un 200 incompleto se rechaza. Errores bloquean el lote. El pendiente guarda sólo referencia por cuenta/recurso; recuperar conserva su clave. Vista legible a 320 px. | [CP-VUE-IMP-001-01](../cases/cp-vue-imp-001-01.md) |
+
 ## Pruebas de Almacén
 
 Los casos unitarios viven en `tests/unit/modules/warehouse/` y

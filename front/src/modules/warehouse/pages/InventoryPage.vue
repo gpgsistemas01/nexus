@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PERMISSIONS } from '@nexus/permissions';
-import { onMounted } from 'vue';
+import { defineAsyncComponent, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
@@ -16,7 +16,11 @@ import type { InventoryResource } from '../inventory.js';
 import type { LookupCreation } from '../../../shared/lookup.js';
 
 const props = defineProps<{ resource: InventoryResource }>();
+
 const emit = defineEmits<{ createSupplier: [request: LookupCreation] }>();
+
+const InventoryImportPage = defineAsyncComponent(() => import('./InventoryImportPage.vue'));
+
 const router = useRouter();
 const session = useAuthSession();
 const inventory = useInventory(props.resource, session.user.value!, () => {
@@ -36,6 +40,7 @@ const {
     isReportOpen,
     reportValues,
     editor,
+    isImportOpen,
 } = inventory;
 const { search, applySearch, clearSearch } = useListSearch(inventory);
 
@@ -86,6 +91,13 @@ onMounted(() => {
         @refresh="inventory.load"
     >
         <template #actions>
+            <VBtn
+                v-if="permissions.canRead && permissions.canWrite && permissions.canReadCosts"
+                variant="outlined"
+                @click="isImportOpen = true"
+            >
+                Importar Excel
+            </VBtn>
             <VBtn
                 v-if="permissions.canRead && permissions.canExport"
                 variant="outlined"
@@ -160,5 +172,16 @@ onMounted(() => {
         @reload="reloadEditor"
         @unauthorized="router.replace({ name: 'login' })"
         @add-stock="inventory.openEditor"
+    />
+    <InventoryImportPage
+        v-if="isImportOpen"
+        :resource="resource"
+        :user-id="session.user.value!.id"
+        :can-read-suppliers="session.user.value!.permissions.includes(PERMISSIONS.SUPPLIERS_READ)"
+        :initial-supplier-id="query.supplierId"
+        :initial-search="query.search"
+        @close="isImportOpen = false"
+        @saved="inventory.load()"
+        @unauthorized="router.replace({ name: 'login' })"
     />
 </template>

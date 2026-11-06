@@ -9,6 +9,7 @@
         "../back/src/public/js/constants/apiMessages.js",
         "../back/src/shared/constants/auth.js",
         "../back/src/shared/constants/inputValidation.js",
+        "../back/src/shared/constants/inventoryImport.js",
         "../back/src/shared/messages/goodsReceiptMessages.js",
         "../back/src/public/js/utils/validations/validators.js",
         "../back/src/public/js/utils/validations/fieldValidations.js",
@@ -32,6 +33,7 @@
         "allowJs": true,
         "checkJs": false,
         "paths": {
+            "@nexus/inventory-imports": ["../back/src/shared/constants/inventoryImport.js"],
             "@nexus/piece-quantity": ["../back/src/shared/inventory/pieceQuantity.js"],
             "@nexus/input-validation": ["../back/src/shared/constants/inputValidation.js"],
             "@nexus/login-validation": [

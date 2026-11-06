@@ -1,5 +1,16 @@
 # 4.3 Entradas, salidas e inventario
 
+## Importación de inventario
+
+| ID | Requisito y criterio de aceptación | Estado |
+| --- | --- | --- |
+| RF-IMP-001 | Con lectura, escritura y lectura de costos, importar altas o actualizaciones mediante una plantilla XLSX de hasta 2 MiB y 100 filas. Mostrar errores por fila sin cambiar inventario. Conservar reglas de proveedor, duplicados, Pieza entera y costo cero sólo en altas. | Implementado |
+| RF-IMP-002 | Confirmar todo el lote o ninguno y recuperar la misma operación sin duplicar stock. Actualizar sólo nombre, mínimo, costo y activo, conservando IDs/versiones. Mostrar filas iguales como omitidas. | Implementado |
+| RF-IMP-003 | Permitir acceso sólo al creador autorizado. Descartar archivo tras analizarlo, vencer el borrador en 24 h y conservar el recibo confirmado. El navegador sólo guarda la referencia de confirmación. | Implementado |
+
+El [flujo Vue](../../../development/05-inventory-excel-import.md) concreta la
+captura; el servidor verifica las reglas y ejecuta la transacción.
+
 Las recepciones y salidas de artículos se operan en contextos separados de materiales
 y consumibles. Comparten las obligaciones de recepción `RF-REC-001` a `RF-REC-008`
 y de salida `RF-ISS-001` a `RF-ISS-008`; compartir proceso no permite mezclar detalles.

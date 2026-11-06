@@ -15,7 +15,7 @@ export const throwIfReferenceNumberAlreadyExists = ({ err, referenceNumber = nul
     }
 };
 
-const incrementYearlyReferenceNumberCounter = async ({ type, tx, year }) => {
+const incrementYearlyReferenceNumberCounter = async ({ type, tx, year, count = 1 }) => {
 
     return tx.referenceNumberCounter.upsert({
         where: {
@@ -26,13 +26,13 @@ const incrementYearlyReferenceNumberCounter = async ({ type, tx, year }) => {
         },
         update: {
             counter: {
-                increment: 1
+                increment: count
             }
         },
         create: {
             prefix: type,
             year,
-            counter: 1
+            counter: count
         }
     });
 }
@@ -65,3 +65,12 @@ export const generateYearlyReferenceNumber = async ({ type, tx }) => {
 
     return `${type}-${year}-${counter.counter.toString().padStart(6, '0')}`;
 }
+
+// Reserva un intervalo dentro de la misma tx: un rollback también revierte todos sus folios.
+export const reserveYearlyReferenceNumbers = async ({ type, tx, count }) => {
+    if (count === 0) return [];
+    if (!Number.isInteger(count) || count < 0 || count > 1000) throw new RangeError('Cantidad de folios fuera de rango.');
+    const year = new Date().getFullYear();
+    const counter = await incrementYearlyReferenceNumberCounter({ type, tx, year, count });
+    return Array.from({ length: count }, (_, index) => `${type}-${year}-${String(counter.counter - count + index + 1).padStart(6, '0')}`);
+};

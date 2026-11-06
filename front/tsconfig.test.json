@@ -11,6 +11,7 @@
         "../back/src/public/js/constants/apiMessages.js",
         "../back/src/shared/constants/auth.js",
         "../back/src/shared/constants/inputValidation.js",
+        "../back/src/shared/constants/inventoryImport.js",
         "../back/src/shared/messages/goodsReceiptMessages.js",
         "../back/src/public/js/utils/validations/validators.js",
         "../back/src/public/js/utils/validations/fieldValidations.js",

@@ -21,6 +21,18 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe('cierre del proceso', () => {
+    it('espera la limpieza en curso antes de desconectar la base', async () => {
+        let finishCleanup;
+        const beforeDisconnect = vi.fn(() => new Promise(resolve => { finishCleanup = resolve; }));
+        const stop = registerServerLifecycle({ ...runtime, beforeDisconnect });
+        const completion = stop('SIGTERM');
+        finishHttp(); finishSockets();
+        await Promise.resolve(); await Promise.resolve();
+        expect(runtime.prisma.$disconnect).not.toHaveBeenCalled();
+        finishCleanup();
+        await completion;
+        expect(runtime.prisma.$disconnect).toHaveBeenCalledOnce();
+    });
     it.each(['SIGTERM', 'SIGINT'])('drena HTTP y sockets antes de cerrar Prisma con %s', async signal => {
         runtime.processRef.emit(signal, signal);
         const completion = shutdown(signal);

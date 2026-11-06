@@ -46,6 +46,16 @@ durante el primer acceso a Prisma. Después de regenerar Prisma, reinicia la API
 
 ## Pruebas
 
+Para medir la importación, prepare `DATABASE_TEST_URL` y `DIRECT_TEST_URL` con una
+base **desechable** terminada en `_performance_test`, distinta de la habitual, y ejecute:
+
+```sh
+npm --prefix back run test:performance:imports
+```
+
+Compara consultas simultáneas con seis lotes de 100 filas. El detalle y los límites
+están en la [guía de rendimiento](../../../back/docs/testing/backend-performance.md#importación-de-inventario).
+
 | Acción | Comando |
 | --- | --- |
 | Unitarias Vue | `npm --prefix front run test:unit` |

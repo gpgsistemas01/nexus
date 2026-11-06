@@ -1,10 +1,21 @@
-import { WasteWeightInvalid, WasteDimensionsInvalid } from '../../../errors/warehouse/wasteError.js';
+import { WasteWeightInvalid, WasteDimensionsInvalid, WasteMaterialInvalid, WasteNotFound } from '../../../errors/warehouse/wasteError.js';
+import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
+import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import {
     calculateWasteNetWeight,
     calculateWasteRollLength,
     isRollPresentation,
-    prepareWasteRollReference
+    prepareWasteRollReference,
+    isSquareMeterUnitMeasure
 } from '../../../shared/inventory/wasteMeasurements.js';
+
+export const assertWasteMaterialReference = offer => {
+    if (offer?.supplier?.isActive === false) throw new SupplierInactiveConflict();
+    if (!offer?.isActive) throw new WasteNotFound();
+    if (offer.material.type !== MATERIAL_TYPES.MATERIAL || !isSquareMeterUnitMeasure(offer.material.unitMeasure)) {
+        throw new WasteMaterialInvalid();
+    }
+};
 
 export const prepareWasteMeasurements = ({ wasteDto, offer }) => {
     const material = offer.material;

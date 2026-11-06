@@ -7,6 +7,7 @@
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
     "bcrypt": "^6.0.0",
+    "busboy": "1.6.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^18.0.8",
     "ejs": "^7.0.2",
@@ -19,7 +20,8 @@
     "pino": "^10.4.0",
     "pino-http": "^11.0.0",
     "prisma": "^7.10.1",
-    "socket.io": "^4.8.4"
+    "socket.io": "^4.8.4",
+    "unzipper": "0.10.14"
   },
   "scripts": {
     "start": "node src/server.js",
@@ -33,6 +35,7 @@
     "test:integration": "npm run test:db:verify && cross-env NODE_ENV=test prisma migrate deploy && cross-env NODE_ENV=test prisma generate && cross-env NODE_ENV=test vitest run --config vitestIntegrationConfig.js",
     "test:performance": "npm run test:db:migrate && cross-env NODE_ENV=test node --import=dotenv/config tests/performance/backendBenchmark.js",
     "test:performance:mixed": "npm run test:db:migrate && cross-env NODE_ENV=test node --import=dotenv/config tests/performance/backendMixedBenchmark.js",
+    "test:performance:imports": "npm run test:db:migrate && cross-env NODE_ENV=test node --import=dotenv/config tests/performance/inventoryImportBenchmark.js",
     "test:db": "npm run test:integration",
     "test:db:verify": "node scripts/verifyTestDatabaseEnv.js",
     "docs:architecture": "node scripts/generateArchitectureDocs.js",

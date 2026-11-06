@@ -8,7 +8,8 @@
                 "development/01-getting-started.md",
                 "architecture/views/development/developer-onboarding.md",
                 "development/02-tooling.md",
-                "development/04-change-review.md"
+                "development/04-change-review.md",
+                "development/05-inventory-excel-import.md"
             ]
         },
         "requisitos": {
@@ -103,12 +104,6 @@
         "operacion": {
             "title": "Construcción y despliegue",
             "sources": ["development/03-build-and-deployment.md"]
-        },
-        "propuestas": {
-            "title": "Propuestas de ampliación",
-            "entry": "development/05-inventory-excel-import-proposal.md",
-            "includeInComplete": false,
-            "sources": ["development/05-inventory-excel-import-proposal.md"]
         },
         "manual": {
             "title": "Manual de usuario",

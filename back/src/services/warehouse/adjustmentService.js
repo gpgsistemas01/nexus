@@ -1,6 +1,8 @@
+import { randomUUID } from 'node:crypto';
 import { getDb } from "../../repository/baseRepository.js";
 import {
     generateYearlyReferenceNumber,
+    reserveYearlyReferenceNumbers,
     throwIfReferenceNumberAlreadyExists
 } from "../document/referenceNumberService.js";
 import { toNumber } from '../../utils/formattersUtils.js';
@@ -19,6 +21,8 @@ import { createInventoryMovement } from "../inventory/movementService.js";
 import { buildInventoryMovementDetail } from "../inventory/movementHelpers.js";
 
 import { assertRecordVersion } from '../../repository/versionRepository.js';
+import { updateSupplierMaterialStocks } from '../../repository/warehouse/stockUpdateRepository.js';
+import { RecordVersionConflictError } from '../../errors/concurrencyError.js';
 
 const createStockAdjustmentMovement = async ({
     tx,
@@ -232,4 +236,42 @@ export const createStockAdjustment = async ({
         throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
         throw err;
     }
+};
+
+export const createInitialMaterialStockBatch = async ({ tx, entries, userId, reasonId }) => {
+    if (!entries.length) return [];
+    const references = await reserveYearlyReferenceNumbers({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx, count: entries.length });
+    const adjustments = [];
+    const details = [];
+    const movements = [];
+    const movementDetails = [];
+    const changes = [];
+    const now = new Date();
+    entries.forEach((entry, index) => {
+        const { materialId, supplierId, observations, newStock, supplierMaterial } = entry;
+        const values = calculateStockAdjustmentValues({ supplierMaterial, newStock });
+        const adjustmentId = randomUUID();
+        const detailId = randomUUID();
+        const movementId = randomUUID();
+        adjustments.push({ id: adjustmentId, referenceNumber: references[index],
+            type: STOCK_ADJUSTMENT_TYPES.INCREASE, reasonId, observations, status: STOCK_ADJUSTMENT_STATUS_NAMES.APPLIED,
+            appliedAt: now, createdById: userId, approvedById: userId });
+        details.push({ id: detailId, stockAdjustmentId: adjustmentId, materialId, supplierId,
+            materialName: supplierMaterial.material.name,
+            previousStock: values.previousStock, newStock: values.newStock, difference: values.difference,
+            previousConvertedQuantity: values.previousConvertedQuantity, newConvertedQuantity: values.newConvertedQuantity,
+            convertedDifference: values.convertedDifference });
+        movements.push({ id: movementId, type: INVENTORY_MOVEMENT_TYPES.ADJUSTMENT, stockAdjustmentId: adjustmentId });
+        movementDetails.push({ movementId, ...buildInventoryMovementDetail({ materialId, supplierId,
+            stockAdjustmentDetailId: detailId, quantity: values.difference,
+            previousStock: values.previousStock, newStock: values.newStock }) });
+        changes.push({ materialId, supplierId, quantityChange: values.difference, convertedQuantityChange: values.convertedDifference });
+    });
+    await tx.stockAdjustment.createMany({ data: adjustments });
+    await tx.stockAdjustmentDetail.createMany({ data: details });
+    await tx.inventoryMovement.createMany({ data: movements });
+    await tx.movementDetail.createMany({ data: movementDetails });
+    const balances = await updateSupplierMaterialStocks({ tx, changes });
+    if (balances.length !== entries.length) throw new RecordVersionConflictError();
+    return references;
 };

@@ -3,7 +3,6 @@ import { findPage } from '../../../repository/paginationRepository.js';
 import { isAppError } from '../../../errors/AppError.js';
 import {
     WasteAlreadyExists,
-    WasteMaterialInvalid,
     WasteNotFound,
     WasteStockAdjustmentDatabaseError,
     WasteStockEntryDatabaseError,
@@ -16,15 +15,12 @@ import { registerWasteStockEntry } from './wasteStockEntryService.js';
 import { createServiceLogger, getModelLogContext, logServiceError, logServiceInfo } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findSupplierMaterialByIds } from '../materials/supplierMaterialService.js';
-import { SupplierInactiveConflict } from '../../../errors/warehouse/supplierError.js';
-import { prepareWasteMeasurements } from './wasteHelpers.js';
+import { assertWasteMaterialReference, prepareWasteMeasurements } from './wasteHelpers.js';
 import { lockWasteStock } from '../../../repository/warehouse/stockLockRepository.js';
 import {
-    MATERIAL_TYPES,
     WASTE_IMMUTABLE_FIELDS,
     WASTE_OPERATION_ACTIONS
 } from '../../../shared/constants/inventory.js';
-import { isSquareMeterUnitMeasure } from '../../../shared/inventory/wasteMeasurements.js';
 
 import { assertRecordVersion, updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { executeWasteOperation, markWasteOperationRejected } from './wasteOperationService.js';
@@ -178,14 +174,8 @@ export const createWaste = async ({
                     supplierId: wasteDto.supplierId
                 });
 
-                if (offer.supplier?.isActive === false) throw new SupplierInactiveConflict();
-                if (!offer.isActive) throw new WasteNotFound();
-
+                assertWasteMaterialReference(offer);
                 const material = offer.material;
-                // El origen de una merma es un material de superficie, no un consumible.
-                if (material.type !== MATERIAL_TYPES.MATERIAL || !isSquareMeterUnitMeasure(material.unitMeasure)) {
-                    throw new WasteMaterialInvalid();
-                }
                 assertPieceQuantity({ quantity: wasteDto.minStock, item: material });
                 assertPieceQuantity({ quantity: wasteDto.initialQuantity, item: material });
                 const coneWeightKg = wasteDto.coneWeightKg;

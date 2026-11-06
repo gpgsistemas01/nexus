@@ -6,16 +6,18 @@ import { prisma } from './lib/prisma.js';
 import { logger } from './utils/logger.js';
 import { initSocket } from './utils/socketUtils.js';
 import { registerServerLifecycle } from './utils/serverLifecycle.js';
+import { startInventoryImportCleanup } from './services/warehouse/imports/inventoryImportCleanup.js';
 
 let ready = false;
 const app = createApp({ isReady: () => ready });
 const server = http.createServer(app);
 const io = new Server(server);
 initSocket(io);
+const stopImportCleanup = startInventoryImportCleanup();
 
 const shutdown = registerServerLifecycle({
     server, io, prisma, logger,
-    setReady: value => { ready = value; }
+    setReady: value => { ready = value; }, beforeDisconnect: stopImportCleanup
 });
 
 server.on('error', err => {

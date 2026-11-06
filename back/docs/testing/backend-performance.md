@@ -1,5 +1,22 @@
 # Medición de rendimiento del backend
 
+## Importación de inventario
+
+`npm run test:performance:imports` aplica migraciones a una base desechable terminada
+en `_performance_test`. Prepara datos propios, compara consultas normales con seis
+lotes de 100 filas (alta/actualización de Materiales, Consumibles y Mermas) y limpia
+sus registros. Las altas tienen stock positivo para incluir documentos y folios.
+
+Los clientes de consulta e importación se ejecutan en procesos separados del servidor.
+Se descartan cinco consultas de calentamiento; dos lectores consultan durante cinco
+segundos. El p50/p95 de carga mixta usa sólo muestras iniciadas mientras se importaba.
+Informa tiempo de vista previa/confirmación, retardo del event loop y RSS máximo del
+proceso, que incluye sus workers. Comprueba que los seis recibos quedaron confirmados.
+
+Conservar el JSON de stdout en el artefacto de la revisión o CI; no versionar resultados
+de una corrida. Comparar condiciones equivalentes y repetir si cambia la implementación,
+el volumen o los recursos. PostgreSQL local no representa la latencia de Render ni un SLA.
+
 Ejecuta estos comandos desde `back/` (`cd back` desde la raíz del repositorio);
 las rutas de scripts y resultados son relativas a esa carpeta.
 

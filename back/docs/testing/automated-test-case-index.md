@@ -1,5 +1,22 @@
 # Registro selectivo de casos de prueba automatizados
 
+## Importación de inventario
+
+| Diseño | Requisito / riesgo | Nivel y técnica | Condición observable | Casos |
+| --- | --- | --- | --- | --- |
+| `DP-IMP-001` | `RF-IMP-001/003`: archivo, acceso y retención | Unitario e integración HTTP/Prisma; fronteras 100/101 filas y 2 MiB, particiones recurso/modo/permiso, transiciones DRAFT → CANCELED/EXPIRED | Autorizar antes del parser; rechazar contenido incompatible; informar filas sin cambiar stock; limpiar JSON al descartar/vencer y conservar recibos. | `CP-INT-IMP-001`, `inventoryWorkbookTest.js` |
+| `DP-IMP-002` | `RF-IMP-002`: escritura parcial, versiones y duplicación | Integración; decisiones alta/edición/sin cambios, versiones vigente/vieja y transiciones confirmación/repetición/carrera/fallo | Stock, conversiones, historia y folios coinciden con formularios. Datos compartidos se escriben una vez. Conflicto no aplica filas; misma clave devuelve recibo. Fallo del recibo revierte todo. Otra importación ocupada responde 429. | `CP-INT-IMP-002` |
+
+| Caso | Precondiciones y datos | Acción | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- |
+| `CP-INT-IMP-001` | PostgreSQL aislado, cuenta administradora y cuenta sin permisos; proveedores/catálogos privados. Libro de una fila y variantes PIEZA=1.5, 2 MiB+1 y multipart con campo extra. | Consultar/cargar sin permiso, validar sin confirmar, descargar errores y descartar/vencer borradores. | 401/403 antes de analizar, 404 a lote ajeno; 413 por tamaño. Captura inválida no crea artículos. Descarte/limpieza elimina JSON temporal y conserva recibos. | Cerrar requests y limpiar sólo IDs propios. |
+| `CP-INT-IMP-002` | Material 2×3 y dos proveedores con stock inicial 2 y 3; Rollo 2×10, cono 1, total 5 y referencia 11 kg. | Confirmar altas/actualizaciones, repetir clave y competir; editar después de validar; inyectar fallo del recibo. | Un material compartido, conversiones 12/18 y dos ajustes; Rollo 2×4, neto 4 kg, cantidad 2 y conversión 16. Reintento no duplica. Versiones viejas y otra clave producen 409; bloqueo global produce 429. Fallo tardío conserva DRAFT y revierte artículos, stock, historia y contador. | Retirar trigger de fallo en finally y limpiar datos propios. |
+
+Fuente: [integración HTTP/Prisma](../../tests/integration/controllers/inventoryImportControllerDbTest.js)
+y [fronteras XLSX](../../tests/unit/services/warehouse/inventoryWorkbookTest.js).
+La [medición](backend-performance.md#importación-de-inventario) añade carga de seis
+lotes de 100 filas, sin sustituir los oráculos de persistencia.
+
 Ejecuta los comandos npm desde `back/`. Las rutas de pruebas y evidencias de
 esta guía son relativas a esa carpeta.
 
