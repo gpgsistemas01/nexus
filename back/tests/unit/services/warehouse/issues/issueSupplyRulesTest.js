@@ -6,6 +6,13 @@ const current = { quantity: 2, convertedQuantity: 200, suppliedQuantity: null, i
 const requested = { isSupplied: true, projectConvertedQuantity: 250, quantityToSupply: 0.5, expectedSuppliedQuantity: 0 };
 
 describe('surtido por entregas y cantidad de proyecto independiente', () => {
+    it.each(['material', 'waste'])('valida el surtido de PIEZA con la presentación persistida de %s', relation => {
+        const persisted = { ...current, [relation]: { presentation: { name: 'PIEZA' } } };
+        expect(() => resolveIssueSupplyChange({ current: persisted, requested }))
+            .toThrow(expect.objectContaining({ code: 'INVENTORY_PIECE_QUANTITY_REQUIRED' }));
+        expect(resolveIssueSupplyChange({ current: persisted, requested: { ...requested, quantityToSupply: 1 } }))
+            .toMatchObject({ quantityToSupply: 1, data: { suppliedQuantity: 1, projectConvertedQuantity: 250 } });
+    });
     it('descuenta sólo la entrega y conserva el proyecto y su diferencia negativa', () => {
         const change = resolveIssueSupplyChange({ current, requested });
         expect(change).toEqual({ quantityToSupply: 0.5, data: {

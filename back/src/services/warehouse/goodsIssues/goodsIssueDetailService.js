@@ -34,6 +34,7 @@ const supplyGoodsIssue = async ({ id, goodsIssueDto, type }) => getDb().$transac
                 select: {
                     id: true,
                     materialId: true,
+                    material: { select: { presentation: { select: { name: true } } } },
                     supplierId: true,
                     materialName: true,
                     maxUnitCost: true,

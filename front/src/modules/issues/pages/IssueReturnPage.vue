@@ -24,6 +24,7 @@ const form = useIssueReturn({
 <template>
     <IssueReturnForm
         :name="detail.name"
+        :presentation="detail.presentation"
         :supplied="detail.suppliedQuantity"
         :returned="detail.returnedQuantity"
         :available="form.availableQuantity"

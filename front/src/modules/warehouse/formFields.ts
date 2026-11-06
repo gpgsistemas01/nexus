@@ -1,4 +1,5 @@
 import { isRollPresentation } from '@nexus/waste-measurements';
+import { isPiecePresentation } from '@nexus/piece-quantity';
 import { isRecord } from '../../shared/utils/isRecord.js';
 import { numberText, convertedQuantityText } from '../../shared/utils/formatNumbers.js';
 import type { EditorTarget, InventoryField, InventoryResource } from './inventory.js';
@@ -9,6 +10,7 @@ export interface InventoryFieldSpec {
     name: InventoryField;
     label: string;
     type?: 'number' | 'lookup' | 'checkbox' | 'textarea';
+    step?: number;
     isReadOnly?: boolean;
     isDisabled?: boolean;
     displayValue?: string;
@@ -33,6 +35,7 @@ export const inventorySections = (
     preview: ReturnType<typeof previewWaste>,
     options: {
         template?: LookupItem;
+        presentationName?: string;
         usesMeasurements: boolean;
         hasSupplier: boolean;
         creationContext?: 'goodsReceipt';
@@ -52,6 +55,11 @@ export const inventorySections = (
     const unit = isRecord(template?.unitMeasure)
         ? String(template.unitMeasure.symbol || template.unitMeasure.name || '')
         : '';
+    const quantityStep = isPiecePresentation(
+        isCreating ? (options.presentationName ?? presentation) : row?.presentation,
+    )
+        ? 1
+        : undefined;
     const sections: InventoryFormSection[] = [];
     if (action === 'delete') return sections;
 
@@ -241,6 +249,7 @@ export const inventorySections = (
                           name: 'minStock' as const,
                           label: 'Stock mínimo',
                           type: 'number' as const,
+                          step: quantityStep,
                           isReadOnly: isStock,
                       },
                   ]
@@ -309,6 +318,7 @@ export const inventorySections = (
                               ? 'Cantidad inicial'
                               : 'Nuevo stock',
                     type: 'number',
+                    step: quantityStep,
                 },
                 { name: 'observations', label: 'Observaciones', type: 'textarea', isWide: true },
             ],

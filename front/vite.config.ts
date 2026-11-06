@@ -28,6 +28,9 @@ export default defineConfig(({ mode }) => {
                 '@nexus/numbers': fileURLToPath(
                     new URL('../back/src/shared/utils/numberUtils.js', import.meta.url),
                 ),
+                '@nexus/piece-quantity': fileURLToPath(
+                    new URL('../back/src/shared/inventory/pieceQuantity.js', import.meta.url),
+                ),
                 '@nexus/issue-header-rules': fileURLToPath(
                     new URL(
                         '../back/src/public/js/application/warehouse/issues/issueHeaderRules.js',

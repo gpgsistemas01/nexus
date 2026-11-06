@@ -3,11 +3,15 @@
 Un contrato define los datos, eventos y resultados que dos colaboradores intercambian
 y aceptan. Las vistas relacionadas describen su estructura y ejecución.
 
+La [API del backend](../../../../back/docs/architecture/openapi/api-contract.md)
+define los campos admitidos, restricciones y respuestas HTTP. Esta colección
+documenta cómo Vue construye esos datos y los intercambios internos de la interfaz.
+
 ## Interfaces de intercambio
 
 | Referencia | Contenido propietario |
 | --- | --- |
-| [HTTP del cliente](client-contracts.md) | Endpoints consumidos, parámetros, respuestas, confirmaciones, metadatos, errores y archivos. |
+| [HTTP del cliente](client-contracts.md) | Mappers, endpoints consumidos, confirmaciones, errores y descargas de Vue. |
 | [Formularios, eventos y callbacks](form-and-event-contracts.md) | Props, intenciones, resultados de guardado y comunicación entre componentes y composables. |
 
 ## Modelos relacionados

@@ -2,6 +2,7 @@
 import { VRow, VCol } from 'vuetify/components/VGrid';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VBtn } from 'vuetify/components/VBtn';
+import { isPiecePresentation } from '@nexus/piece-quantity';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
 import type { LookupItem, LookupState } from '../../../shared/lookup.js';
 
@@ -56,8 +57,8 @@ const emit = defineEmits<{
                 <VTextField
                     label="Cantidad"
                     type="number"
-                    :min="minimum"
-                    step="0.01"
+                    :min="isPiecePresentation(presentation) ? 1 : minimum"
+                    :step="isPiecePresentation(presentation) ? 1 : 0.01"
                     :model-value="values.quantity"
                     :error-messages="errors.quantity"
                     :disabled="isDisabled"

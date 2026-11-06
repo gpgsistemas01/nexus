@@ -1,5 +1,6 @@
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { useForm } from 'vee-validate';
+import { getPieceQuantityError } from '@nexus/piece-quantity';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { ApiError, isFieldValidationError } from '../../../shared/http/apiError.js';
 import { inventoryService } from '../services/inventoryService.js';
@@ -84,7 +85,14 @@ export const useInventoryEditor = (options: {
                         rule(
                             (validationData.value as Record<string, unknown>)[field],
                             validationData.value,
-                        ) || true,
+                        ) ||
+                        (['minStock', 'newStock', 'initialQuantity', 'quantity'].includes(field)
+                            ? getPieceQuantityError(
+                                  (validationData.value as Record<string, unknown>)[field],
+                                  selection.presentationName.value,
+                              )
+                            : null) ||
+                        true,
                 ]),
             ),
         ),
@@ -130,11 +138,11 @@ export const useInventoryEditor = (options: {
     );
     const validationData = computed(() => ({
         ...form.values,
+        presentationName: selection.presentationName.value,
         ...(resource === 'wastes' && isCreating.value
             ? {
                   base: preview.value.base,
                   height: preview.value.height,
-                  presentationName: preview.value.isRoll ? 'ROLLO' : '',
               }
             : {}),
     }));
@@ -274,6 +282,7 @@ export const useInventoryEditor = (options: {
         lookups: selection.lookups,
         preview,
         selectedTemplate: selection.selectedTemplate,
+        presentationName: selection.presentationName,
         selectedSupplier: selection.selectedSupplier,
         selectCreatedSupplier,
         usesMeasurements: selection.usesMeasurements,

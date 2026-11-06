@@ -13,41 +13,41 @@ cada archivo individual.
 
 ```mermaid
 flowchart LR
-    constants["constants (11 módulos)"] --> shared["shared (12 módulos)"]
+    constants["constants (11 módulos)"] --> shared["shared (13 módulos)"]
     controllers["controllers (45 módulos)"] --> dtos["dtos (12 módulos)"]
     controllers["controllers (45 módulos)"] --> errors["errors (22 módulos)"]
     controllers["controllers (45 módulos)"] --> messages["messages (2 módulos)"]
     controllers["controllers (45 módulos)"] --> services["services (69 módulos)"]
-    controllers["controllers (45 módulos)"] --> shared["shared (12 módulos)"]
+    controllers["controllers (45 módulos)"] --> shared["shared (13 módulos)"]
     controllers["controllers (45 módulos)"] --> utils["utils (15 módulos)"]
-    dtos["dtos (12 módulos)"] --> shared["shared (12 módulos)"]
+    dtos["dtos (12 módulos)"] --> shared["shared (13 módulos)"]
     errors["errors (22 módulos)"] --> messages["messages (2 módulos)"]
-    errors["errors (22 módulos)"] --> shared["shared (12 módulos)"]
+    errors["errors (22 módulos)"] --> shared["shared (13 módulos)"]
     middleware["middleware (4 módulos)"] --> messages["messages (2 módulos)"]
     middleware["middleware (4 módulos)"] --> services["services (69 módulos)"]
     middleware["middleware (4 módulos)"] --> utils["utils (15 módulos)"]
-    public["public (211 módulos)"] --> shared["shared (12 módulos)"]
+    public["public (211 módulos)"] --> shared["shared (13 módulos)"]
     repository["repository (8 módulos)"] --> constants["constants (11 módulos)"]
     repository["repository (8 módulos)"] --> errors["errors (22 módulos)"]
     repository["repository (8 módulos)"] --> lib["lib (3 módulos)"]
-    repository["repository (8 módulos)"] --> shared["shared (12 módulos)"]
+    repository["repository (8 módulos)"] --> shared["shared (13 módulos)"]
     routes["routes (48 módulos)"] --> controllers["controllers (45 módulos)"]
     routes["routes (48 módulos)"] --> middleware["middleware (4 módulos)"]
-    routes["routes (48 módulos)"] --> shared["shared (12 módulos)"]
+    routes["routes (48 módulos)"] --> shared["shared (13 módulos)"]
     routes["routes (48 módulos)"] --> validators["validators (16 módulos)"]
     services["services (69 módulos)"] --> constants["constants (11 módulos)"]
     services["services (69 módulos)"] --> dtos["dtos (12 módulos)"]
     services["services (69 módulos)"] --> errors["errors (22 módulos)"]
     services["services (69 módulos)"] --> repository["repository (8 módulos)"]
-    services["services (69 módulos)"] --> shared["shared (12 módulos)"]
+    services["services (69 módulos)"] --> shared["shared (13 módulos)"]
     services["services (69 módulos)"] --> utils["utils (15 módulos)"]
     utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
     utils["utils (15 módulos)"] --> errors["errors (22 módulos)"]
     utils["utils (15 módulos)"] --> services["services (69 módulos)"]
-    utils["utils (15 módulos)"] --> shared["shared (12 módulos)"]
+    utils["utils (15 módulos)"] --> shared["shared (13 módulos)"]
     validators["validators (16 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (16 módulos)"] --> messages["messages (2 módulos)"]
-    validators["validators (16 módulos)"] --> shared["shared (12 módulos)"]
+    validators["validators (16 módulos)"] --> shared["shared (13 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. Los recursos EJS, CSS y el esquema Prisma se
@@ -260,7 +260,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/inventory/movementQueryService.js`](../../../../src/services/inventory/movementQueryService.js) | `findAllConsumableMovements`, `findAllMaterialMovements`, `findAllWasteMovements` |
 | [`src/services/inventory/movementService.js`](../../../../src/services/inventory/movementService.js) | `applyInventoryMovement`, `createInventoryMovement` |
 | [`src/services/inventory/reportService.js`](../../../../src/services/inventory/reportService.js) | `findMovementReportRows` |
-| [`src/services/inventory/stockHelpers.js`](../../../../src/services/inventory/stockHelpers.js) | `assertSufficientStock`, `calculateConvertedQuantity`, `hasDimensions` |
+| [`src/services/inventory/stockHelpers.js`](../../../../src/services/inventory/stockHelpers.js) | `assertPieceQuantity`, `assertSufficientStock`, `calculateConvertedQuantity`, `hasDimensions` |
 | [`src/services/jwtService.js`](../../../../src/services/jwtService.js) | `generateAccessToken`, `generateRefreshToken`, `verifyAccessToken`, `verifyRefreshToken`, `verifyToken` |
 | [`src/services/sales/clientService.js`](../../../../src/services/sales/clientService.js) | `createClient`, `findAllClients`, `findClientById`, `updateClient` |
 | [`src/services/sales/reportService.js`](../../../../src/services/sales/reportService.js) | `findClientReportRows` |

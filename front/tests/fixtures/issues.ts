@@ -51,28 +51,29 @@ export const issue = {
   fulfillmentStatus: { name: 'Pendiente' },
   details: [issueDetail],
 };
-export const issueFor = (resource: 'materials' | 'consumables' | 'wastes') => ({
-  ...structuredClone(issue),
-  type: resource === 'consumables' ? 'CONSUMABLE' : 'MATERIAL',
-  details:
-    resource === 'wastes'
-      ? [
-          {
-            ...issueDetail,
-            wasteId: waste.id,
-            materialName: waste.name,
-            waste,
-            material: undefined,
-            suppliedQuantity: '0',
-          },
-        ]
-      : [
-          {
-            ...issueDetail,
-            material: {
-              ...issueDetail.material,
-              type: resource === 'consumables' ? 'CONSUMABLE' : 'MATERIAL',
+export const issueFor = (resource: 'materials' | 'consumables' | 'wastes') =>
+  structuredClone({
+    ...issue,
+    type: resource === 'consumables' ? 'CONSUMABLE' : 'MATERIAL',
+    details:
+      resource === 'wastes'
+        ? [
+            {
+              ...issueDetail,
+              wasteId: waste.id,
+              materialName: waste.name,
+              waste,
+              material: undefined,
+              suppliedQuantity: '0',
             },
-          },
-        ],
-});
+          ]
+        : [
+            {
+              ...issueDetail,
+              material: {
+                ...issueDetail.material,
+                type: resource === 'consumables' ? 'CONSUMABLE' : 'MATERIAL',
+              },
+            },
+          ],
+  });

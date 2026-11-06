@@ -1,4 +1,11 @@
 import { AppError } from "../AppError.js";
+import { PIECE_QUANTITY_MESSAGE } from '../../shared/inventory/pieceQuantity.js';
+
+export class InventoryPieceQuantityConflict extends AppError {
+    constructor() {
+        super(PIECE_QUANTITY_MESSAGE, 'INVENTORY_PIECE_QUANTITY_REQUIRED', 409);
+    }
+}
 
 export class GoodsIssueInsufficientStock extends AppError {
 

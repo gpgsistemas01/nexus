@@ -23,6 +23,8 @@ const { values, errors, message, isSubmitting, isConflicted } = editor;
 <template>
     <PurchaseCorrectionForm
         :context="detail.name"
+        :presentation="detail.presentation"
+        :quantity-limit="Number(detail.quantity)"
         :totals="editor.totals.value"
         :values="values"
         :errors="errors"

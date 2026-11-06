@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
 import { resolveDatabaseUrl } from '../../../src/lib/databaseUrl.js';
 
@@ -445,6 +446,42 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             expect(emitted).toEqual([before[resource].counter + 1, before[resource].counter + 2, before[resource].counter + 3]);
             expect((await getIssueCounter(prefix)).counter).toBe(before[resource].counter + 3);
         }
+    });
+
+    it.each(['material', 'consumable'])('PIEZA en %s protege solicitud, surtido y devolución con la presentación persistida', async resource => {
+        await withPiecePresentation({ prisma, model: 'material', id: ids[resource] }, async () => {
+            const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
+            await prisma.supplierMaterial.update({ where, data: { currentStock: 10, convertedQuantity: 10, maxUnitCost: 10, isActive: true } });
+            const beforeCount = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
+            const invalid = await request(app).post(issuePath(resource)).send({ ...header(), details: [{ ...detail(resource), quantity: 1.5, presentation: { name: 'ROLLO' } }] }).expect(409);
+            expect(invalid.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(beforeCount);
+            const created = (await createIssue(resource).expect(200)).body.goodsIssue;
+            const line = created.details[0];
+            const supply = quantityToSupply => request(app).patch(`${issuePath(resource)}/${created.id}/details`).send({ details: [{ id: line.id, isSupplied: true, quantityToSupply, expectedSuppliedQuantity: 0, projectConvertedQuantity: 2 }] });
+            const rejectedSupply = await supply(0.5).expect(409);
+            expect(rejectedSupply.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            expect(Number((await prisma.goodsIssueDetail.findUnique({ where: { id: line.id } })).suppliedQuantity)).toBe(0);
+            expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(10);
+            expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: created.id } })).toBe(0);
+            await supply(2).expect(200);
+            const returning = returnQuantity => request(app).patch(`${issuePath(resource)}/${created.id}/details/${line.id}/returns`).send({ returnQuantity });
+            const rejectedReturn = await returning(0.5).expect(409);
+            expect(rejectedReturn.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            expect(Number((await prisma.goodsIssueDetail.findUnique({ where: { id: line.id } })).returnedQuantity)).toBe(0);
+            expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(8);
+            expect(await prisma.goodsIssueReturn.count({ where: { goodsIssueId: created.id } })).toBe(0);
+            const returned = (await returning(1).expect(200)).body.goodsIssueReturn;
+            expect(Number(returned.currentTotalReturnedQuantity)).toBe(0);
+            expect(Number(returned.newTotalReturnedQuantity)).toBe(1);
+            expect(returned.detail.id).toBe(line.id);
+            expect(returned).not.toHaveProperty('returnQuantity');
+            await returning(1).expect(200);
+            const saved = await prisma.goodsIssue.findUnique({ where: { id: created.id }, include: { fulfillmentStatus: true, details: true } });
+            expect(saved.fulfillmentStatus.name).toBe('Cancelado');
+            expect(Number(saved.details[0].returnedQuantity)).toBe(2);
+            expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(10);
+        });
     });
 
     it.each(['material', 'consumable'])('revierte el contador de %s cuando falla la escritura posterior del documento', async resource => {

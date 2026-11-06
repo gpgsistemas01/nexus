@@ -207,6 +207,10 @@ estados se conserva y el manual puede publicarse. Una falla del servicio, del co
 o del recorrido que impida preparar la captura continúa pendiente. En `demo` se
 requieren todos los ejemplos configurados.
 
+Las capturas `25a`, `25b` y `25c` muestran devoluciones registradas en Materiales,
+Consumibles y Mermas con saldo todavía entregado. Puede ser un renglón devuelto
+por completo y otro con saldo; no se exige una devolución parcial del mismo renglón.
+
 Si no hay cuentas con credenciales completas, termina sin abrir el navegador ni
 exportar documentos. Las cuentas omitidas conservan sus archivos anteriores;
 esta ejecución no actualiza sus capturas ni sus manuales.
@@ -284,7 +288,7 @@ modificado o buscar de nuevo ejemplos antes marcados como `unavailable`.
 | Tabla vacía | Puede servir para consulta. Para editar, preparar un registro existente. |
 | El documento no aparece primero | La preparación recorre las páginas y abre el folio encontrado después de recibir la búsqueda. También busca detalles disponibles en páginas posteriores para surtir o devolver. |
 | `ejemplo sin datos` | No impide publicar. La explicación del estado permanece y la imagen se incluye cuando hay un ejemplo disponible. No crear operaciones para obtenerla. |
-| Devolución registrada | El ejemplo puede mostrar un renglón devuelto completo y otro con saldo entregado; no exige una devolución parcial dentro del mismo renglón. |
+| `ejemplo opcional omitido; la búsqueda anterior no encontró datos` | No hay una captura verificada de ese ejemplo en esta edición. La reanudación reutiliza el resultado anterior sin volver a consultar. Para buscar después de preparar datos nuevos, consulte `--fresh` en [Comandos](../development/00-commands.md#capturas-y-manuales-por-cuenta). |
 | `Test timeout of 180000ms` y navegador cerrado | Actualizar el recorrido: el límite ahora se calcula por cuenta y cada imagen tiene su propio tiempo. Repetir el comando para recuperar las pendientes. |
 | Falta una opción | Revisar dependencias, registros activos y permisos. Para pesos se necesita un material de referencia ROLLO. |
 | Falta devolución | Comprobar permiso de Almacén y salida surtida existente; no se surte automáticamente. |

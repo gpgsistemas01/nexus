@@ -15,6 +15,7 @@ import IssueReturnPage from './IssueReturnPage.vue';
 const props = defineProps<{ resource: IssueResource; target: IssueTarget }>();
 const emit = defineEmits<{
     saved: [result: MutationConfirmation];
+    detailSaved: [result: MutationConfirmation];
     close: [];
     reload: [];
     createClient: [request: LookupCreation];
@@ -146,7 +147,10 @@ const openReturnDialog = (line: IssueDetail) => {
         :resource="resource"
         :document="issueDocument"
         :detail="returnDetail"
-        @saved="emit('saved', $event)"
+        @saved="
+            returnDetail = undefined;
+            emit('detailSaved', $event);
+        "
         @close="returnDetail = undefined"
         @denied="onDenied"
     />

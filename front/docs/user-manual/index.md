@@ -11,6 +11,7 @@
 Esta guía enseña las tareas de Nexus paso a paso. Cada cuenta recibe una edición
 con su usuario, áreas y roles, y sólo los procedimientos que puede realizar.
 Los nombres en **negritas** corresponden a controles de la pantalla.
+Las capturas muestran ejemplos; sus folios y cantidades pueden variar.
 
 ## Preparación
 

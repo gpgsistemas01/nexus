@@ -4,7 +4,7 @@ import { apiClient } from '../../../../src/shared/http/apiClient.js';
 import { mockHttpAdapter } from '../../../helpers/httpAdapter.js';
 import { mountComposable } from '../../../helpers/mountComposable.js';
 import { issueFor, issue, issueDetailId, issueId } from '../../../fixtures/issues.js';
-import { material, ids, pageOf } from '../../../fixtures/inventory.js';
+import { material, ids, pageOf, waste } from '../../../fixtures/inventory.js';
 import { issueService } from '../../../../src/modules/issues/services/issueService.js';
 import { issueLookupService } from '../../../../src/modules/issues/services/issueLookupService.js';
 import {
@@ -29,6 +29,9 @@ import { initialRecordQuery } from '../../../../src/shared/list.js';
 import { useIssueEditor } from '../../../../src/modules/issues/composables/useIssueEditor.js';
 import { useIssueReturn } from '../../../../src/modules/issues/composables/useIssueReturn.js';
 import { useIssueActions } from '../../../../src/modules/issues/composables/useIssueActions.js';
+import { useIssueLineEntry } from '../../../../src/modules/issues/composables/useIssueLineEntry.js';
+
+vi.mock('../../../../src/shared/ui/feedback.js', () => ({ showSuccess: vi.fn() }));
 
 const signal = () => new AbortController().signal;
 const document = () => normalizeIssueDocument(issue, 'materials');
@@ -37,6 +40,157 @@ const originalAdapter = apiClient.http.defaults.adapter;
 afterEach(() => {
   vi.restoreAllMocks();
   apiClient.http.defaults.adapter = originalAdapter;
+});
+
+it.each(['materials', 'consumables', 'wastes'] as const)(
+  'solicitar, surtir y devolver PIEZA en %s rechaza fracciones sin escribir',
+  async (resource) => {
+    vi.spyOn(issueLookupService, 'list').mockResolvedValue(pageOf([]));
+    const doc = normalizeIssueDocument(issueFor(resource), resource);
+    doc.details[0]!.presentation = 'PIEZA';
+    const item = mapIssueItemOption(
+      resource === 'wastes'
+        ? {
+            ...waste,
+            presentation: { id: ids.presentation, name: 'PIEZA' },
+          }
+        : {
+            ...material,
+            material: {
+              ...material.material,
+              type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
+              presentation: { ...material.material.presentation, name: 'PIEZA' },
+            },
+          },
+      resource,
+    );
+    const added = vi.fn();
+    const entry = mountComposable(() =>
+      useIssueLineEntry({ resource, isDisabled: () => false, canRead: () => true, onAdd: added }),
+    );
+    entry.value.selected.value = item;
+    entry.value.update('itemId', item.id);
+    entry.value.update('quantity', '1.5');
+    await entry.value.add();
+    expect(added).not.toHaveBeenCalled();
+    expect(entry.value.errors.value.quantity).toMatch(/enteras/);
+    entry.value.update('quantity', '2');
+    await entry.value.add();
+    expect(added).toHaveBeenCalledWith(expect.objectContaining({ quantity: 2 }));
+    entry.wrapper.unmount();
+
+    const save = vi.spyOn(issueService, 'save').mockResolvedValue(confirmation);
+    const supply = mountComposable(() =>
+      useIssueEditor({
+        resource,
+        target: { mode: 'supply', document: doc },
+        has: () => true,
+        onSaved: vi.fn(),
+        onDenied: vi.fn(),
+      }),
+    );
+    supply.value.updateDetailSupply(issueDetailId, {
+      isSupplied: true,
+      quantityToSupply: '0.5',
+      projectConvertedQuantity: '2.5',
+    });
+    await supply.value.submit();
+    expect(save).not.toHaveBeenCalled();
+    expect(supply.value.errors.value.details).toMatch(/enteras/);
+    supply.value.updateDetailSupply(issueDetailId, { quantityToSupply: '1' });
+    await supply.value.submit();
+    expect(save).toHaveBeenCalledOnce();
+    supply.wrapper.unmount();
+
+    const send = vi.spyOn(issueService, 'returnDetail').mockResolvedValue(confirmation);
+    const returning = mountComposable(() =>
+      useIssueReturn({
+        resource,
+        document: doc,
+        detail: { ...doc.details[0]!, suppliedQuantity: 2 },
+        onSaved: vi.fn(),
+        onDenied: vi.fn(),
+      }),
+    );
+    returning.value.update('returnQuantity', '0.5');
+    await returning.value.submit();
+    expect(send).not.toHaveBeenCalled();
+    expect(returning.value.errors.value.returnQuantity).toMatch(/enteras/);
+    expect(returning.value.values.returnQuantity).toBe('0.5');
+    returning.value.update('returnQuantity', '1');
+    await returning.value.submit();
+    expect(send).toHaveBeenCalledOnce();
+    returning.wrapper.unmount();
+  },
+);
+
+it.each([false, true])(
+  'devolver refresca la salida y conserva el modal con sólo consulta=%s',
+  async (isCanceled) => {
+    const initial = { ...document(), fulfillmentStatus: 'Surtido' };
+    const updated = {
+      ...initial,
+      fulfillmentStatus: isCanceled ? 'Cancelado' : 'Surtido',
+      status: isCanceled ? 'Cancelada' : 'Aprobada',
+      details: initial.details.map((row) => ({
+        ...row,
+        suppliedQuantity: 2,
+        returnedQuantity: isCanceled ? 2 : 1,
+        isCanceled,
+      })),
+    };
+    const get = vi
+      .spyOn(issueService, 'get')
+      .mockResolvedValueOnce(initial)
+      .mockResolvedValue(updated);
+    const reload = vi.fn();
+    const { value, wrapper } = mountComposable(() =>
+      useIssueActions({
+        resource: 'materials',
+        canManage: () => true,
+        canSupply: () => true,
+        canRead: () => true,
+        reload,
+        onError: vi.fn(),
+      }),
+    );
+    await value.open(initial, 'return');
+    await value.handleDetailSaved(confirmation);
+    expect(value.editor.value?.mode).toBe(isCanceled ? 'view' : 'return');
+    expect(value.editor.value?.document).toEqual(updated);
+    expect(get).toHaveBeenCalledTimes(2);
+    expect(reload).toHaveBeenCalledOnce();
+    wrapper.unmount();
+  },
+);
+
+it('una devolución confirmada con lectura fallida no deja saldos viejos y permite recuperar sólo la consulta', async () => {
+  const initial = { ...document(), fulfillmentStatus: 'Surtido' };
+  const updated = { ...initial, fulfillmentStatus: 'Cancelado', status: 'Cancelada' };
+  vi.spyOn(issueService, 'get')
+    .mockResolvedValueOnce(initial)
+    .mockRejectedValueOnce(new Error('Sin conexión'))
+    .mockResolvedValue(updated);
+  const reload = vi.fn();
+  const { value, wrapper } = mountComposable(() =>
+    useIssueActions({
+      resource: 'materials',
+      canManage: () => true,
+      canSupply: () => true,
+      canRead: () => true,
+      reload,
+      onError: vi.fn(),
+    }),
+  );
+  await value.open(initial, 'return');
+  await value.handleDetailSaved(confirmation);
+  expect(value.editor.value).toBeNull();
+  expect(value.readError.value).toBe('Sin conexión');
+  await value.retry();
+  expect(value.editor.value?.mode).toBe('view');
+  expect(value.editor.value?.document).toEqual(updated);
+  expect(reload).toHaveBeenCalledOnce();
+  wrapper.unmount();
 });
 describe('salidas Vue: contratos y modos', () => {
   it.each(['materials', 'consumables'] as const)(

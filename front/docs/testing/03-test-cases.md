@@ -21,6 +21,7 @@ explica las herramientas, archivos y credenciales de cada nivel.
 | [CP-VUE-SESSION-002-01](cases/cp-vue-session-002-01.md) | recuperar un refresh con 502. | DP-VUE-SESSION-002 |
 | [CP-VUE-CAT-002-01](cases/cp-vue-cat-002-01.md) | conflicto de versión en un catálogo. | DP-VUE-CAT-002 |
 | [CP-VUE-COM-003-01](cases/cp-vue-com-003-01.md) | confirmar una corrección de compra. | DP-VUE-COM-003 |
+| [CP-VUE-QTY-001-01](cases/cp-vue-qty-001-01.md) | cantidades enteras de PIEZA sin redondeo ni envío inválido. | DP-VUE-QTY-001 |
 | [CP-VUE-ISS-002-01](cases/cp-vue-iss-002-01.md) | surtir un detalle seleccionado. | DP-VUE-ISS-002 |
 | [CP-VUE-ISS-002-02](cases/cp-vue-iss-002-02.md) | devolución por la interfaz. | DP-VUE-ISS-002 |
 | [CP-VUE-ISS-002-03](cases/cp-vue-iss-002-03.md) | precisión y reintento de devolución. | DP-VUE-ISS-002 |

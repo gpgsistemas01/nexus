@@ -79,7 +79,7 @@ const update = (value: string | boolean) => {
         :disabled="isDisabled"
         :error-messages="error"
         :hint="field.hint"
-        :step="field.type === 'number' ? 'any' : undefined"
+        :step="field.type === 'number' ? (field.step ?? 'any') : undefined"
         @update:model-value="update($event ?? '')"
         @blur="!field.isReadOnly && emit('blur')"
     />

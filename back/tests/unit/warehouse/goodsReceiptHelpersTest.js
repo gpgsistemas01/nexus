@@ -6,13 +6,20 @@ vi.mock('../../../src/services/warehouse/materials/materialService.js', () => ({
     }))
 }));
 
-import { buildGoodsReceiptDetails } from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
+import { buildGoodsReceiptDetails, calculateGoodsReceiptDetail } from '../../../src/services/warehouse/goodsReceipts/goodsReceiptHelpers.js';
 import {
     cancelGoodsReceiptDetailAndTotals,
     createGoodsReceiptDetailsAndUpdateTotals
 } from '../../../src/services/warehouse/goodsReceipts/goodsReceiptTotalsService.js';
 
 describe('cancelGoodsReceiptDetailAndTotals', () => {
+    it('rechaza fracciones de piezas al calcular alta o corrección y conserva costos y medidas decimales', () => {
+        const material = { id: 'piece', name: 'Pieza', presentation: { name: 'PIEZA' }, base: 1.25, height: 1 };
+        expect(() => calculateGoodsReceiptDetail({ material, detail: { quantity: 1.5, costPerUnitType: 1.25 } }))
+            .toThrow(expect.objectContaining({ code: 'INVENTORY_PIECE_QUANTITY_REQUIRED' }));
+        expect(calculateGoodsReceiptDetail({ material, detail: { quantity: 2, costPerUnitType: 1.25 } }))
+            .toMatchObject({ quantity: 2, costPerUnitType: 1.25, convertedQuantity: 2.5, netPurchaseAmount: 2.5 });
+    });
     it('devuelve material y catálogos anidados para refrescar la tabla de compras', async () => {
         const update = vi.fn().mockResolvedValue({ id: 'receipt-id' });
         const tx = {

@@ -33,11 +33,13 @@ Guarde el alta auxiliar y continúe la compra con el registro seleccionado.
 
 ![Corrección de una partida registrada.](images/21-purchase-correction.png)
 
-La corrección recalcula cantidades y totales de toda la compra con sus partidas
-activas. Cambiar sólo el costo conserva la existencia; cambiar la cantidad ajusta su diferencia.
+La corrección recalcula la compra con sus partidas activas. Cambiar sólo el costo
+conserva la existencia; reducir la cantidad ajusta la diferencia. La cantidad
+correcta no puede superar la registrada. Tras corregir o cancelar una partida,
+la compra se muestra actualizada.
 
-Una compra utilizada puede impedir la reversión. Revise el aviso antes de repetir.
-Cancelar la confirmación no cambia el documento ni el inventario.
+Si la compra ya se utilizó, su reversión puede rechazarse. Cancelar la confirmación
+no modifica datos.
 <!-- manual:end -->
 
 ## Consultar una compra
@@ -47,8 +49,8 @@ Cancelar la confirmación no cambia el documento ni el inventario.
 | Situación | Qué muestra la compra |
 | --- | --- |
 | Confirmada | Tiene partidas activas. |
-| Partidas activas y canceladas | Conserva ambas; los totales vigentes incluyen sólo las activas. |
-| Cancelada | Todas canceladas; conserva totales históricos. Sólo consulta. |
+| Partidas activas y canceladas | Sólo las activas integran los totales. |
+| Cancelada | Totales históricos. Sólo consulta. |
 
 Las partidas canceladas se conservan sin botones de acción.
 

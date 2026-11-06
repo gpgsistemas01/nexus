@@ -6,6 +6,15 @@ servicio. Un DTO no contiene autorización ni reemplaza validadores o reglas de 
 Se reutiliza uno existente cuando dos endpoints aceptan el mismo contrato; no se fuerza
 si una mutación especializada necesita campos o semántica diferentes.
 
+La [regla de cantidades PIEZA](../../../../../src/shared/inventory/pieceQuantity.js)
+es una función pública compartida con Vue. Los servicios reutilizan
+`assertPieceQuantity` después de leer la presentación del artículo; el DTO no
+acepta una presentación enviada para sustituir esa consulta. La comprobación
+se ejecuta dentro de los servicios y las transacciones existentes.
+Los [contratos HTTP](../../../openapi/api-contract.md) pertenecen al backend;
+los [mappers de Vue](../../../../../../front/docs/architecture/contracts/client-contracts.md)
+documentan la selección de campos del formulario.
+
 En catálogos, el servicio resuelve primero la configuración confiable y llama al
 DTO puro `createCatalogEntryDto` para seleccionar y normalizar campos propios;
 el DTO no conoce HTTP ni Prisma. La normalización no sustituye la validación del

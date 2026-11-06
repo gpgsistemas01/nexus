@@ -177,7 +177,9 @@ for (const account of accounts.filter(({ id }: { id: string }) => selected.inclu
       const progress = `[${account.id}] ${index + 1}/${manifest.images.length} ${filename}`;
       const destination = path.join(root, 'images', filename);
       if (isUnavailableExample(filename, captures[filename], mode)) {
-        console.log(`${progress}: ejemplo sin datos (conservado)`);
+        console.log(
+          `${progress}: ejemplo opcional omitido; la búsqueda anterior no encontró datos. ${captures[filename]!.reason}`,
+        );
         continue;
       }
       if (

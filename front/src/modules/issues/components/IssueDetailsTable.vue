@@ -4,6 +4,7 @@ import { VDataTable } from 'vuetify/components/VDataTable';
 import { VCheckbox } from 'vuetify/components/VCheckbox';
 import { VTextField } from 'vuetify/components/VTextField';
 import { mdiUndoVariant } from '@mdi/js';
+import { isPiecePresentation } from '@nexus/piece-quantity';
 import type { DataTableHeader } from 'vuetify';
 import TableFrame from '../../../shared/components/TableFrame.vue';
 import TableAction from '../../../shared/components/TableAction.vue';
@@ -120,8 +121,8 @@ const projectValue = (item: IssueDetail) =>
                 <VTextField
                     :aria-label="`Cantidad a surtir: ${item.name}`"
                     type="number"
-                    min="0.01"
-                    step="0.01"
+                    :min="isPiecePresentation(item.presentation) ? 1 : 0.01"
+                    :step="isPiecePresentation(item.presentation) ? 1 : 0.01"
                     :max="getIssuePendingQuantity(item)"
                     :model-value="item.quantityToSupply"
                     :hint="`Pendiente: ${numberText(getIssuePendingQuantity(item))} ${item.presentation}`"

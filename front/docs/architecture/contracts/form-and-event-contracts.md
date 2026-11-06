@@ -68,7 +68,8 @@ El nombre `saved` no define un payload común a todos los módulos.
 | [DirectoryEditorPage](../../../src/modules/directory/pages/DirectoryEditorPage.vue) | `saved(entry?: DirectoryEntry)` | El consumidor comprueba la entrada opcional; el alta contextual la adapta a una opción. |
 | [InventoryEditorPage](../../../src/modules/warehouse/pages/InventoryEditorPage.vue) | `saved(created?: LookupItem)` | El alta de artículo desde Compra devuelve la opción; las operaciones ordinarias no requieren ese resultado. |
 | [PurchaseEditorPage](../../../src/modules/purchases/pages/PurchaseEditorPage.vue) y [PurchaseCorrectionPage](../../../src/modules/purchases/pages/PurchaseCorrectionPage.vue) | `saved(confirmation: MutationConfirmation)` | El coordinador de Compras consume la confirmación. |
-| [IssueEditorPage](../../../src/modules/issues/pages/IssueEditorPage.vue) e [IssueReturnPage](../../../src/modules/issues/pages/IssueReturnPage.vue) | `saved(result: MutationConfirmation)` | La devolución reenvía su resultado a través del editor de Salidas. |
+| [IssueEditorPage](../../../src/modules/issues/pages/IssueEditorPage.vue) | `saved(result: MutationConfirmation)` / `detailSaved(result: MutationConfirmation)` | `saved` cierra el documento guardado. `detailSaved` corresponde a una devolución: refresca el listado y vuelve a leer la salida; mantiene devolución si queda saldo o abre consulta al quedar cancelada. |
+| [IssueReturnPage](../../../src/modules/issues/pages/IssueReturnPage.vue) | `saved(result: MutationConfirmation)` | El editor cierra el secundario y emite `detailSaved` hacia la página de Salidas. |
 | [LoginPage](../../../src/modules/auth/pages/LoginPage.vue) | Callback `onSuccess()` de `useLoginForm` | El contenedor resuelve la navegación; no utiliza un evento `saved`. |
 
 ## Callbacks de composición

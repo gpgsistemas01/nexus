@@ -419,9 +419,27 @@
           "CONSUMABLE"
         ],
         "description": "Tipo persistido de las salidas de materiales y consumibles; no aplica a salidas de merma."
+      },
+      "requesterName": {
+        "type": "string"
+      },
+      "advisorName": {
+        "type": "string"
+      },
+      "clientName": {
+        "type": "string"
+      },
+      "departmentName": {
+        "type": "string"
+      },
+      "status": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "fulfillmentStatus": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
       }
     },
-    "additionalProperties": false,
+    "additionalProperties": true,
     "required": [
       "id",
       "referenceNumber"
@@ -435,7 +453,11 @@
         "format": "uuid"
       },
       "quantity": {
-        "type": "number"
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
       },
       "isSupplied": {
         "type": "boolean"
@@ -443,8 +465,10 @@
       "projectConvertedQuantity": {
         "type": [
           "number",
+          "string",
           "null"
-        ]
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
       },
       "materialId": {
         "type": [
@@ -459,9 +483,70 @@
           "null"
         ],
         "format": "uuid"
+      },
+      "convertedQuantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "returnedQuantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "suppliedQuantity": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "convertedQuantityDifference": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "maxUnitCost": {
+        "type": [
+          "number",
+          "string",
+          "null"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "materialName": {
+        "type": "string"
+      },
+      "supplierId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "format": "uuid"
+      },
+      "fulfillmentStatus": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "material": {
+        "type": "object",
+        "description": "Material o consumible con presentation y unitMeasure.",
+        "additionalProperties": true
+      },
+      "waste": {
+        "type": "object",
+        "description": "Merma con presentation y unitMeasure.",
+        "additionalProperties": true
       }
     },
-    "additionalProperties": false,
+    "additionalProperties": true,
     "required": [
       "id",
       "quantity"
@@ -516,9 +601,39 @@
         "items": {
           "$ref": "../openapi.json#/components/schemas/GoodsReceiptDetail"
         }
+      },
+      "supplierName": {
+        "type": "string"
+      },
+      "receivedByName": {
+        "type": "string"
+      },
+      "status": {
+        "$ref": "../openapi.json#/components/schemas/NamedCatalog"
+      },
+      "totalQuantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "totalNetPurchaseAmount": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "totalGrossPurchaseAmount": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
       }
     },
-    "additionalProperties": false,
+    "additionalProperties": true,
     "required": [
       "id",
       "referenceNumber",
@@ -537,22 +652,71 @@
         "format": "uuid"
       },
       "quantity": {
-        "type": "number"
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
       },
       "costPerUnitType": {
-        "type": "number"
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
       },
-      "isCancelled": {
-        "type": "boolean"
+      "materialName": {
+        "type": "string"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "ACTIVE",
+          "CANCELED"
+        ]
+      },
+      "convertedQuantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "conversionUnitCost": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "netPurchaseAmount": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "grossPurchaseAmount": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "material": {
+        "type": "object",
+        "description": "Artículo con sus relaciones presentation y unitMeasure.",
+        "additionalProperties": true
       }
     },
-    "additionalProperties": false,
+    "additionalProperties": true,
     "required": [
       "id",
       "materialId",
       "quantity",
       "costPerUnitType"
-    ]
+    ],
+    "description": "Partida de compra. La cancelación se expresa en status; no devuelve isCancelled."
   },
   "Return": {
     "type": "object",
@@ -561,21 +725,37 @@
         "type": "string",
         "format": "uuid"
       },
-      "returnQuantity": {
-        "type": "number"
-      },
       "observations": {
         "type": [
           "string",
           "null"
         ]
+      },
+      "currentTotalReturnedQuantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "newTotalReturnedQuantity": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "description": "Decimal persistido; puede recibirse como texto JSON."
+      },
+      "detail": {
+        "$ref": "../openapi.json#/components/schemas/IssueDetail"
       }
     },
-    "additionalProperties": false,
+    "additionalProperties": true,
     "required": [
       "id",
-      "returnQuantity"
-    ]
+      "currentTotalReturnedQuantity",
+      "newTotalReturnedQuantity"
+    ],
+    "description": "Registro de devolución con acumulados anterior y posterior. returnQuantity pertenece al request; la respuesta incluye el detalle actualizado y los vínculos del registro."
   },
   "SupplierRequest": {
     "type": "object",
@@ -652,7 +832,7 @@
         "minimum": 0,
         "exclusiveMaximum": 1000000000000,
         "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
         "multipleOf": 0.01
       },
       "maxUnitCost": {
@@ -708,7 +888,7 @@
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED."
       },
       "reasonId": {
         "type": "string",
@@ -783,7 +963,7 @@
         "minimum": 0,
         "exclusiveMaximum": 1000000000000,
         "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
         "multipleOf": 0.01
       },
       "maxUnitCost": {
@@ -806,7 +986,7 @@
           "string"
         ],
         "minimum": 0,
-        "description": "Cantidad inicial de unidades de merma. Si es positiva se guarda en WasteStockEntry.quantity y se suma al saldo; cero no genera entrada.",
+        "description": "Cantidad inicial de unidades de merma. Si es positiva se guarda en WasteStockEntry.quantity y se suma al saldo; cero no genera entrada. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
         "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000
@@ -886,7 +1066,7 @@
         "minimum": 0,
         "exclusiveMaximum": 1000000000000,
         "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
         "multipleOf": 0.01
       },
       "maxUnitCost": {
@@ -927,7 +1107,7 @@
           "string"
         ],
         "minimum": 0,
-        "description": "Existencia final deseada tras el ajuste; corresponde a WasteStockAdjustmentDetail.newStock. No es una cantidad a sumar.",
+        "description": "Existencia final deseada tras el ajuste; corresponde a WasteStockAdjustmentDetail.newStock. No es una cantidad a sumar. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
         "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000
@@ -1067,7 +1247,7 @@
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000,
-              "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+              "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED."
             }
           },
           "additionalProperties": false,
@@ -1147,7 +1327,7 @@
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000,
-              "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+              "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED."
             }
           },
           "additionalProperties": false,
@@ -1206,7 +1386,7 @@
               "exclusiveMaximum": 100000000,
               "multipleOf": 0.01,
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
-              "description": "Cantidad f\u00edsica de esta entrega, en la presentaci\u00f3n del art\u00edculo, no mayor que el saldo pendiente. Si se omite junto con expectedSuppliedQuantity, se entrega todo el pendiente por compatibilidad."
+              "description": "Cantidad física de esta entrega, en la presentación del artículo, no mayor que el saldo pendiente. Si se omite junto con expectedSuppliedQuantity, se entrega todo el pendiente por compatibilidad. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED."
             },
             "expectedSuppliedQuantity": {
               "type": "number",
@@ -1249,7 +1429,7 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED."
       },
       "observations": {
         "type": "string",
@@ -1307,7 +1487,7 @@
                 "string"
               ],
               "minimum": 1,
-              "description": "Cantidad por presentaci\u00f3n, al menos uno; hasta 8 enteros y 2 decimales.",
+              "description": "Cantidad por presentación, al menos uno; hasta 8 enteros y 2 decimales. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000
@@ -1354,7 +1534,7 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED. No puede superar la cantidad vigente del detalle."
       },
       "costPerUnitType": {
         "type": [
@@ -1631,7 +1811,7 @@
         "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED."
       },
       "observations": {
         "description": "Nota opcional del documento individual de entrada de merma vinculado al movimiento ENTRY.",
@@ -1811,7 +1991,7 @@
                 "string"
               ],
               "minimum": 1,
-              "description": "Cantidad por presentaci\u00f3n, al menos uno; hasta 8 enteros y 2 decimales.",
+              "description": "Cantidad por presentación, al menos uno; hasta 8 enteros y 2 decimales. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
               "pattern": "^\\d{1,8}(\\.\\d{1,2})?$",
               "multipleOf": 0.01,
               "exclusiveMaximum": 100000000
@@ -1899,7 +2079,7 @@
         "minimum": 0,
         "exclusiveMaximum": 1000000000000,
         "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
         "multipleOf": 0.01
       },
       "maxUnitCost": {
@@ -1925,7 +2105,7 @@
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED."
       },
       "observations": {
         "type": "string",
@@ -1997,7 +2177,7 @@
         "minimum": 0,
         "exclusiveMaximum": 1000000000000,
         "pattern": "^(?:|\\d{1,12}(\\.\\d{1,2})?)$",
-        "description": "Opcional; n\u00famero decimal no negativo con hasta 12 enteros y 2 decimales. Vac\u00edo o null se omite al normalizar. Se comprueba tambi\u00e9n el rango despu\u00e9s de convertir a Number.",
+        "description": "Opcional; número decimal no negativo con hasta 12 enteros y 2 decimales. Vacío o null se omite al normalizar. Se comprueba también el rango después de convertir a Number. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED.",
         "multipleOf": 0.01
       },
       "maxUnitCost": {
@@ -2023,7 +2203,7 @@
         "multipleOf": 0.01,
         "exclusiveMaximum": 100000000,
         "minimum": 0,
-        "description": "Hasta 8 enteros y 2 decimales; se convierte a n\u00famero en el validador."
+        "description": "Hasta 8 enteros y 2 decimales; se convierte a número en el validador. Si la presentación persistida es PIEZA/PIEZAS, exige un entero; una fracción responde 409 INVENTORY_PIECE_QUANTITY_REQUIRED."
       },
       "observations": {
         "type": "string",

@@ -1,6 +1,7 @@
 import { RecordVersionConflictError } from '../../../errors/concurrencyError.js';
 import { IssueSupplyQuantityConflict } from '../../../errors/warehouse/issueSupplyError.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
+import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 
 const FLOAT_EPSILON = 0.000001;
 
@@ -22,7 +23,9 @@ export const resolveIssueSupplyChange = ({ current, requested }) => {
         || Math.abs(requested.expectedSuppliedQuantity - suppliedQuantity) > FLOAT_EPSILON
     )) throw new RecordVersionConflictError();
 
-    const quantityToSupply = hasQuantity ? normalizeDecimal(requested.quantityToSupply) : pendingQuantity;
+    const requestedQuantity = hasQuantity ? requested.quantityToSupply : pendingQuantity;
+    assertPieceQuantity({ quantity: requestedQuantity, item: current.material ?? current.waste });
+    const quantityToSupply = normalizeDecimal(requestedQuantity);
     if (!Number.isFinite(quantityToSupply) || quantityToSupply <= FLOAT_EPSILON
         || quantityToSupply > pendingQuantity + FLOAT_EPSILON) {
         throw new IssueSupplyQuantityConflict();

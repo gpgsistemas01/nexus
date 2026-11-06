@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { readExcelReport } from '../../helpers/readExcelReport.js';
+import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
 const ids = {};
@@ -209,6 +210,37 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(await prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } })).toBe(beforeCount);
         expect(await prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } })).toEqual(beforeStocks);
         expect(await prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } })).toBe(beforeMovements);
+    });
+
+    it.each(['material', 'consumable'])('PIEZA en %s rechaza altas/correcciones fraccionarias sin cambiar stock ni historia', async resource => {
+        await withPiecePresentation({ prisma, model: 'material', id: ids[resource] }, async () => {
+            const snapshot = () => prisma.$transaction([
+                prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } }),
+                prisma.goodsReceipt.findUnique({ where: { id: receipts[resource].id }, include: { details: true } }),
+                prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } }),
+                prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } }),
+                prisma.goodsReceiptDetailChange.count({ where: { goodsReceiptId: receipts[resource].id } })
+            ]);
+            const before = await snapshot();
+            const invalid = await request(app).post(path(resource)).send({
+                ...purchaseBody(resource), details: [{ materialId: ids[resource], quantity: 1.5, costPerUnitType: 1.25, presentation: { name: 'ROLLO' } }]
+            }).expect(409);
+            expect(invalid.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            const correction = await request(app).patch(`${path(resource)}/${receipts[resource].id}/details/${receipts[resource].details[0].id}/corrections`)
+                .send({ quantity: 1.5, costPerUnitType: 10 }).expect(409);
+            expect(correction.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            expect(await snapshot()).toEqual(before);
+
+            const response = await request(app).post(path(resource)).send({
+                ...purchaseBody(resource), details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 1.25 }]
+            }).expect(200);
+            const saved = await prisma.goodsReceipt.findUnique({ where: { id: response.body.goodsReceipt.id }, include: { details: true } });
+            expect(Number(saved.details[0].quantity)).toBe(2);
+            expect(Number(saved.details[0].costPerUnitType)).toBe(1.25);
+            expect(Number(saved.totalNetPurchaseAmount)).toBe(2.5);
+            expect(response.body.goodsReceipt.details[0].status).toBe('ACTIVE');
+            expect(response.body.goodsReceipt.details[0]).not.toHaveProperty('isCancelled');
+        });
     });
 
     it('exporta compras a través del límite de lote y conserva fórmulas y resúmenes reales', async () => {

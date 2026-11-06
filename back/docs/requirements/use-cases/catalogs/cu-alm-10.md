@@ -13,12 +13,6 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** Alta desde una plantilla material-proveedor.<br>2. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-MER-011` a `RF-MER-013`, `RF-CAT-015`, `RF-MER-001`, `RF-MER-002`, `RF-MER-004`, `RF-MER-006` a `RF-MER-009`, `RN-020` a `RN-023`. |
 
-El alta calcula el neto conforme a `RF-MER-011` y el largo proporcional a la muestra
-conforme a `RF-MER-012` y `RF-MER-013`. Guarda la muestra en la merma sin modificar
-los pesos históricos de material/proveedor.
+El alta calcula neto y largo con los pesos del rollo completo, sobrante y cono. Conserva esos pesos y las medidas finales en la merma; sampleLengthM y sampleNetWeightKg quedan nulos en altas nuevas.
 
-La cantidad inicial positiva se registra mediante un documento de entrada `EME` y
-su movimiento, conservando saldo anterior cero y saldo final igual a lo capturado.
-Todo se confirma en una transacción. Con cantidad cero se crea únicamente la merma,
-sin documento, movimiento ni consumo de folio. El alta no solicita motivo de ajuste;
-las correcciones de saldo corresponden a `CU-ALM-12` y generan `AME`.
+Los ajustes posteriores de saldo corresponden a `CU-ALM-12` y generan `AME`.

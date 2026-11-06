@@ -36,7 +36,7 @@ const updateWasteIssueDetailsTransaction = async ({ id, wasteIssueDto }) => getD
                     id: true,
                     wasteId: true,
                     materialName: true,
-                    waste: { select: { maxUnitCost: true } },
+                    waste: { select: { maxUnitCost: true, presentation: { select: { name: true } } } },
                     quantity: true,
                     convertedQuantity: true,
                     suppliedQuantity: true,

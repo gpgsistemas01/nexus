@@ -66,7 +66,7 @@ fuente de verdad.
 | Cantidad inicial de merma | Unidades con las que se registra una nueva merma. | Etiqueta **Cantidad inicial**, campo `initialQuantity`. Con valor positivo genera la primera entrada desde saldo cero; no es el saldo final de un ajuste. |
 | Cantidad a agregar de merma | Unidades adicionales que ingresan a una merma existente. | Etiqueta **Cantidad a agregar**, campo `quantity`. Se suman al stock actual; el nuevo stock se calcula. |
 | Stock mínimo | Umbral de referencia configurado para señalar que una existencia es baja. | No es stock disponible, reserva ni límite máximo; modificarlo no mueve inventario. La interfaz también lo presenta como **Stock Mínimo**. |
-| Costo unitario máximo | Mayor costo por unidad convertida registrado para la oferta de un material y proveedor; también puede conservarse como dato propio de una merma. | La interfaz también usa **Costo Máximo** o **Costo máximo unitario**. No es el costo por presentación de un renglón ni el importe total de una compra. |
+| Costo unitario máximo | Costo por unidad convertida configurado en Almacén para la oferta de material/proveedor o para una merma; las compras no lo recalculan. | La interfaz también usa **Costo Máximo** o **Costo máximo unitario**. No es el costo por presentación de un renglón ni el importe total de una compra. |
 | Merma | Recurso reutilizable o residual con proveedor, presentación, unidad, dimensiones, costos y existencias propios. | En código aparece como `Waste`. El material de origen queda vinculado mediante una relación persistente; merma tampoco significa eliminación física ni salida de merma. |
 | Identidad de merma | Combinación de proveedor, nombre, base, altura y pesos que permite reconocer una merma ya registrada. | Presentación y unidad se copian de la plantilla al crearla y no sustituyen esa combinación. Stock, costo máximo, mínimo y estado activo tampoco forman parte de la identidad. |
 | Cliente | Organización o contexto comercial receptor de una salida. Puede tener un asesor asociado. | No es lo mismo que proyecto. |
@@ -176,4 +176,4 @@ registrados. Se obtiene restando el peso del cono al peso total con cono. Se
 conserva para la identidad por nombre, proveedor, medidas y pesos al agregar existencias.
 Un valor ausente significa desconocido.
 
-El **cono de referencia** es una medida de la oferta del material y proveedor. El **cono utilizado** es el valor guardado en la merma: precargado desde esa referencia y editable al registrar. La **longitud estimada** resulta de la proporción de peso neto con una muestra del mismo material; se distingue del largo medido.
+El **cono utilizado** es la tara guardada en la merma; se aplica al total del sobrante y al del rollo completo capturados en el alta. El **cono de referencia** de la oferta se conserva como dato histórico. La **longitud estimada** usa los pesos capturados; los campos de muestra antiguos permanecen consultables.

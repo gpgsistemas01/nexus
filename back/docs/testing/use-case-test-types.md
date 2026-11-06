@@ -242,3 +242,10 @@ La consulta HTTP por id de ambas variantes conserva observaciones después
 de editar, verificada con Prisma en `goodsReceiptContextDbTest.js`; el listado
 conserva esas observaciones, incluidas las nulas, y omite sólo los detalles. El navegador simulado no sustituye esa
 integración ni demuestra autorización o stock persistido.
+
+### Cantidades PIEZA
+
+`CP-INT-QTY-001` amplía las integraciones de inventario, compras y salidas:
+rechaza fracciones con la presentación persistida, comprueba ausencia de efectos
+parciales y admite enteros con costos decimales. El diseño y los datos están en
+[el registro selectivo](automated-test-case-index.md#cantidades-enteras-por-presentación).

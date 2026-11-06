@@ -1,6 +1,8 @@
 import { computed } from 'vue';
 import { useForm } from 'vee-validate';
 import { goodsReceiptCorrectionValidation } from '@nexus/form-validation';
+import { getPieceQuantityError } from '@nexus/piece-quantity';
+import { errorMessages } from '@nexus/api-messages';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { useRecordSave } from '../../../shared/composables/useRecordSave.js';
 import { confirmAction } from '../../../shared/ui/feedback.js';
@@ -26,7 +28,15 @@ export const usePurchaseCorrection = (options: {
         validationSchema: Object.fromEntries(
             Object.entries(goodsReceiptCorrectionValidation).map(([field, rule]) => [
                 field,
-                (value: unknown) => rule(value) || true,
+                (value: unknown) =>
+                    rule(value) ||
+                    (field === 'quantity'
+                        ? getPieceQuantityError(value, options.detail.presentation) ||
+                          (Number(value) > Number(options.detail.quantity)
+                              ? errorMessages.GOODS_RECEIPT_CORRECTION_QUANTITY_CONFLICT
+                              : null)
+                        : null) ||
+                    true,
             ]),
         ),
     });

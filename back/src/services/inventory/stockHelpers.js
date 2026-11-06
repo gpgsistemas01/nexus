@@ -1,6 +1,13 @@
-import { GoodsIssueInsufficientStock } from '../../errors/inventory/stockError.js';
+import { GoodsIssueInsufficientStock, InventoryPieceQuantityConflict } from '../../errors/inventory/stockError.js';
+import { getPieceQuantityError } from '../../shared/inventory/pieceQuantity.js';
 import { toNumber } from '../../utils/formattersUtils.js';
 import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
+
+export const assertPieceQuantity = ({ quantity, item }) => {
+    if (getPieceQuantityError(quantity, item?.presentation?.name)) {
+        throw new InventoryPieceQuantityConflict();
+    }
+};
 
 export const hasDimensions = ({ base, height } = {}) => (
     (toNumber(base) || 0) > 0 &&

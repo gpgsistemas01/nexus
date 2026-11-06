@@ -197,6 +197,7 @@ onMounted(() => {
         :resource="resource"
         :target="editor"
         @saved="actions.handleSaved"
+        @detail-saved="actions.handleDetailSaved"
         @close="actions.close"
         @reload="
             actions.close();

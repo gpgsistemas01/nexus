@@ -46,6 +46,12 @@ visual del formulario en un estado persistido del documento.
 
 ## Límites de interpretación
 
+Las cantidades físicas y el stock mínimo de artículos con presentación
+PIEZA/PIEZAS son enteros. La restricción se comprueba con el catálogo persistido
+en altas, ajustes, compras, solicitudes, surtidos, entradas y devoluciones.
+Una fracción se rechaza sin redondearla; costos, medidas y conversión conservan
+su precisión. Consultar no modifica cantidades históricas.
+
 1. La tabla describe capacidades del producto, no personas autorizadas. La política de
    roles y departamentos se consulta en
    [usuarios y permisos](../../architecture/views/logical/02-identity-access-and-audit.md).

@@ -44,6 +44,8 @@ sequenceDiagram
     box Coordinación
     participant Page@{ "type": "control" } as IssueReturn<br/>Page.vue
     participant Parent@{ "type": "control" } as IssueEditor<br/>Page.vue
+    participant Screen@{ "type": "control" } as Issue<br/>Page.vue
+    participant Actions@{ "type": "control" } as useIssue<br/>Actions.ts
     participant Return@{ "type": "control" } as useIssue<br/>Return.ts
     participant Record@{ "type": "control" } as useRecord<br/>Form.ts
     participant Save@{ "type": "control" } as useRecord<br/>Save.ts
@@ -53,7 +55,7 @@ sequenceDiagram
     end
     Save->>Record: nowrap: operation(controller.signal)
     Record->>Return: nowrap: operation(values, signal)
-    Return->>Service: nowrap: issueService.returnDetail({ resource:<br/>options.resource, documentId:<br/>options.document.id, detailId:<br/>options.detail.id, payload: {<br/>returnQuantity: Number(<br/>values.returnQuantity), observations:<br/>values.observations.trim() }, signal })
+    Return->>Service: nowrap: issueService.returnDetail({ resource, documentId,<br/>detailId, payload, signal })
     alt nowrap: try
         Service-->>Return: nowrap: MutationConfirmation
         Return-->>Record: nowrap: result
@@ -61,7 +63,10 @@ sequenceDiagram
         opt nowrap: !controller.signal.aborted
             Save->>Page: nowrap: options.onSaved(result)
             Page->>Parent: nowrap: emit('saved', result)
-            Parent->>Parent: nowrap: emit('saved', $event)
+            Parent->>Parent: nowrap: returnDetail = undefined
+            Parent->>Screen: nowrap: emit('detailSaved', result)
+            Screen->>Actions: nowrap: handleDetailSaved(result)
+            Actions->>Actions: nowrap: loadEditor({ row: document,<br/>mode: 'return', afterReturn: true })
         end
     else nowrap: catch(cause)
         Service-->>Return: nowrap: throw ApiError
@@ -74,6 +79,10 @@ sequenceDiagram
     end
 ```
 
+La lectura posterior conserva devolución si queda saldo o abre consulta al quedar
+cancelada. Si falla, cierra el documento anterior y permite reintentar sólo la
+consulta. No se vuelve a enviar la devolución.
+
 ## Fuentes de los participantes
 
 [IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue),
@@ -83,6 +92,8 @@ sequenceDiagram
 [useRecordSave.ts](../../../../../src/shared/composables/useRecordSave.ts),
 [issueRules.ts](../../../../../src/modules/issues/issueRules.ts),
 [IssueEditorPage.vue](../../../../../src/modules/issues/pages/IssueEditorPage.vue),
+[IssuePage.vue](../../../../../src/modules/issues/pages/IssuePage.vue),
+[useIssueActions.ts](../../../../../src/modules/issues/composables/useIssueActions.ts),
 [issueService.ts](../../../../../src/modules/issues/services/issueService.ts).
 
 ## Secuencias relacionadas

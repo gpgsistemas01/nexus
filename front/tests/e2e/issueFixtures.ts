@@ -112,8 +112,16 @@ export const mockIssues = async (
           ? 'Surtido'
           : 'Surtido parcial';
       }
-      if (url.pathname.endsWith('/returns'))
-        doc.details[0]!.returnedQuantity = String(data.returnQuantity);
+      if (url.pathname.endsWith('/returns')) {
+        const line = doc.details.find((detail) => url.pathname.includes(`/details/${detail.id}/`))!;
+        line.returnedQuantity = String(Number(line.returnedQuantity) + Number(data.returnQuantity));
+        if (Number(line.returnedQuantity) >= Number(line.suppliedQuantity))
+          line.fulfillmentStatus.name = 'Cancelado';
+        if (doc.details.every((detail) => detail.fulfillmentStatus.name === 'Cancelado')) {
+          doc.fulfillmentStatus.name = 'Cancelado';
+          doc.status.name = 'Cancelada';
+        }
+      }
       const code =
         resource === 'wastes'
           ? req.method() === 'POST'
@@ -132,5 +140,5 @@ export const mockIssues = async (
       body: 'mock-excel',
     });
   });
-  return { reads, reports, writes };
+  return { reads, reports, writes, docs };
 };

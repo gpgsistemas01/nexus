@@ -3,6 +3,7 @@ import { calculateGoodsReceiptDetailAmounts } from '../../../shared/inventory/go
 import { findMaterialsSnapshot } from "../materials/materialService.js";
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 import { GoodsReceiptNotFound } from "../../../errors/warehouse/goodsReceiptError.js";
+import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 
 export const buildGoodsReceiptContextWhere = (type = null) => {
     if (type === null) return {};
@@ -50,11 +51,15 @@ export const buildGoodsReceiptDetails = async (details, { tx = null, supplierId 
     });
 };
 
-export const calculateGoodsReceiptDetail = ({ material, detail }) => ({
-    materialId: material.id,
-    materialName: material.name,
-    ...calculateGoodsReceiptDetailAmounts({ ...detail, base: material.base, height: material.height })
-});
+export const calculateGoodsReceiptDetail = ({ material, detail }) => {
+    assertPieceQuantity({ quantity: detail.quantity, item: material });
+
+    return {
+        materialId: material.id,
+        materialName: material.name,
+        ...calculateGoodsReceiptDetailAmounts({ ...detail, base: material.base, height: material.height })
+    };
+};
 
 export const calculateGoodsReceiptTotals = (details = [], { includeCanceled = false } = {}) => details.reduce((acc, detail) => {
     if (!includeCanceled && detail.status === 'CANCELED') return acc;

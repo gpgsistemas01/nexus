@@ -69,6 +69,8 @@ lo previsto con la cantidad convertida. El descuento de stock usa **Cantidad a s
 
 Una devolución parcial conserva el detalle surtido. La devolución total lo cancela;
 cuando todos se cancelan, se cancela la salida. No hay otra acción de cancelación.
+Al confirmar, se cierra la devolución y vuelve a mostrarse la salida actualizada.
+Puede devolver otro renglón con saldo; si la salida queda cancelada, sólo admite consulta.
 No se devuelve mientras la salida siga en **Surtido parcial**.
 <!-- manual:end -->
 
@@ -80,9 +82,9 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 
 ![Consumibles con surtido parcial y saldo pendiente.](images/24b-issue-partial.png)
 
-![Materiales con devolución parcial registrada.](images/25a-issue-partial-return.png)
+![Materiales con devolución registrada y saldo entregado.](images/25a-issue-partial-return.png)
 
-![Consumibles con devolución parcial registrada.](images/25b-issue-partial-return.png)
+![Consumibles con devolución registrada y saldo entregado.](images/25b-issue-partial-return.png)
 
 ![Salida de materiales cancelada por devolución total.](images/25d-issue-canceled.png)
 
@@ -92,7 +94,7 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 <!-- manual:any waste:issues-page-view -->
 ![Merma con surtido parcial y saldo pendiente.](images/24c-issue-partial.png)
 
-![Merma con devolución parcial registrada.](images/25c-issue-partial-return.png)
+![Merma con devolución registrada y saldo entregado.](images/25c-issue-partial-return.png)
 
 ![Salida de merma cancelada por devolución total.](images/25f-issue-canceled.png)
 <!-- manual:end -->

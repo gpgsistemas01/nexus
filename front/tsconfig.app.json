@@ -32,6 +32,7 @@
         "allowJs": true,
         "checkJs": false,
         "paths": {
+            "@nexus/piece-quantity": ["../back/src/shared/inventory/pieceQuantity.js"],
             "@nexus/input-validation": ["../back/src/shared/constants/inputValidation.js"],
             "@nexus/login-validation": [
                 "../back/src/public/js/utils/validations/loginValidation.js"

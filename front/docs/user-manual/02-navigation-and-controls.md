@@ -82,3 +82,7 @@ consulta no se pueden cambiar.
 **Guardar** registra un alta; **Actualizar** guarda una edición. Espere la respuesta
 sin repetir el envío. **Cerrar** o **Regresar** abandona los cambios sin guardar.
 Si aparece un conflicto, siga [Errores y recuperación](15-errors-and-recovery.md).
+
+Si la presentación es **PIEZA**, capture cantidades y stock mínimo enteros:
+por ejemplo, **2**, no **2.5**. Corrija la fracción indicada; el sistema no la redondea.
+Los costos, medidas y cantidades convertidas conservan su precisión.

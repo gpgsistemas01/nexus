@@ -4,7 +4,7 @@ import { MaterialInactiveConflict, MaterialNotFound } from "../../../errors/ware
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
 import { GoodsIssueMissingMaxUnitCost } from "../../../errors/inventory/stockError.js";
 import { buildStockKey } from '../../../utils/formattersUtils.js';
-import { calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
+import { assertPieceQuantity, calculateConvertedQuantity } from "../../inventory/stockHelpers.js";
 import { findSupplierMaterialsSnapshot } from "../materials/supplierMaterialService.js";
 
 export const buildGoodsIssueContextWhere = (type = MATERIAL_TYPES.MATERIAL) => {
@@ -57,6 +57,8 @@ export const buildGoodsIssueDetails = async ({
         if (!sp.supplier.isActive) throw new SupplierInactiveConflict();
 
         if (presentationId && sp.material.presentation?.id !== presentationId) throw new MaterialNotFound();
+
+        assertPieceQuantity({ quantity, item: sp.material });
 
         const { name, base, height } = sp.material;
         const { maxUnitCost } = sp;

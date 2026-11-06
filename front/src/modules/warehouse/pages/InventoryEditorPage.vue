@@ -39,6 +39,7 @@ const { values, errors, message, isSubmitting, isPending, isConflicted, lookups,
 const sections = computed(() =>
     inventorySections(props.resource, props.target, preview.value, {
         template: editor.selectedTemplate.value,
+        presentationName: editor.presentationName.value,
         usesMeasurements: editor.usesMeasurements.value,
         hasSupplier: !!values.supplierId,
         creationContext: props.creationContext,

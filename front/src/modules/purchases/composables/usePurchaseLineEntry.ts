@@ -1,6 +1,8 @@
 import { computed, onBeforeUnmount } from 'vue';
 import { useForm } from 'vee-validate';
 import { addGoodsReceiptMaterialValidation } from '@nexus/form-validation';
+import { getPieceQuantityError } from '@nexus/piece-quantity';
+import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
 import { useFormInteraction } from '../../../shared/composables/useFormInteraction.js';
 import { useRemoteLookup } from '../../../shared/composables/useRemoteLookup.js';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
@@ -28,7 +30,12 @@ export const usePurchaseLineEntry = (options: {
         validationSchema: Object.fromEntries(
             Object.entries(rules).map(([field, rule]) => [
                 field,
-                (value: unknown) => rule(value) || true,
+                (value: unknown) =>
+                    rule(value) ||
+                    (field === 'quantity'
+                        ? getPieceQuantityError(value, getLookupPresentation(item.value))
+                        : null) ||
+                    true,
             ]),
         ),
     });

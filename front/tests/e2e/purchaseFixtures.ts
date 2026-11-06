@@ -3,6 +3,7 @@ import { mockWarehouse } from './warehouseFixtures.js';
 import { purchase, purchaseItem, purchasePermissions } from '../fixtures/purchases.js';
 import { pageOf } from '../fixtures/inventory.js';
 import { personData, supplierData } from '../fixtures/records.js';
+import { calculateGoodsReceiptDetailAmounts } from '../../../back/src/shared/inventory/goodsReceiptCalculations.js';
 
 export const mockPurchases = async (
   page: Page,
@@ -75,14 +76,19 @@ export const mockPurchases = async (
       current.details[0]!.status = 'CANCELED';
       current.status.name = 'Cancelada';
     } else if (url.pathname.endsWith('/corrections')) {
-      current.details[0]!.quantity = String(data!.quantity);
-      current.details[0]!.costPerUnitType = String(data!.costPerUnitType);
-      const net = Number(data!.quantity) * Number(data!.costPerUnitType);
-      current.details[0]!.netPurchaseAmount = String(net);
-      current.details[0]!.grossPurchaseAmount = String(net * 1.16);
-      current.totalQuantity = String(data!.quantity);
-      current.totalNetPurchaseAmount = String(net);
-      current.totalGrossPurchaseAmount = String(net * 1.16);
+      const amounts = calculateGoodsReceiptDetailAmounts({
+        quantity: Number(data!.quantity),
+        costPerUnitType: Number(data!.costPerUnitType),
+        base: current.details[0]!.material.base,
+        height: current.details[0]!.material.height,
+      });
+      Object.assign(
+        current.details[0]!,
+        Object.fromEntries(Object.entries(amounts).map(([key, value]) => [key, String(value)])),
+      );
+      current.totalQuantity = String(amounts.quantity);
+      current.totalNetPurchaseAmount = String(amounts.netPurchaseAmount);
+      current.totalGrossPurchaseAmount = String(amounts.grossPurchaseAmount);
     } else if (req.method() === 'PATCH') {
       current = { ...current, ...data } as typeof current;
     }
@@ -100,5 +106,5 @@ export const mockPurchases = async (
       body: 'mock-excel',
     });
   });
-  return { reads, reports, writes };
+  return { reads, reports, writes, document: current };
 };

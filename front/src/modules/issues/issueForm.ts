@@ -1,4 +1,5 @@
 import { formatDateTimeInputInTimeZone } from '@nexus/date-time';
+import { getPieceQuantityError } from '@nexus/piece-quantity';
 import {
     goodsIssueValidation,
     wasteIssueValidation,
@@ -53,7 +54,9 @@ export const createIssueValidationSchema = (options: {
                 if (!details.length) return 'Seleccione al menos un detalle pendiente por surtir.';
 
                 for (const detail of details) {
-                    const quantityError = validateIssueSupplyQuantity(detail.quantityToSupply);
+                    const quantityError =
+                        validateIssueSupplyQuantity(detail.quantityToSupply) ||
+                        getPieceQuantityError(detail.quantityToSupply, detail.presentation);
                     if (quantityError) return `${detail.name}: Cantidad a surtir: ${quantityError}`;
 
                     if (Number(detail.quantityToSupply) > getIssuePendingQuantity(detail))

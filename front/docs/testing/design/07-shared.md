@@ -119,6 +119,17 @@ Las capturas de compra mixta se retiraron por duplicar la explicación de estado
 `purchases.spec.ts` conserva su caso funcional: una compra con partidas activas y
 canceladas sólo ofrece acciones en las activas.
 
+## Cantidades por presentación
+
+| ID de diseño | Riesgo y técnica | Condición observable | Fuentes |
+| --- | --- | --- | --- |
+| `DP-VUE-QTY-001` | Fracciones de PIEZA que alteran inventario o redondeo silencioso; particiones por presentación, recurso y operación. | Cantidad `1.5` conserva la captura y muestra error sin enviar; un entero permite continuar y el costo admite decimales. Cubre alta de partidas, corrección, solicitud, surtido, devolución, mínimo y ajuste. ROLLO conserva sus fracciones. | [CP-VUE-QTY-001-01](../cases/cp-vue-qty-001-01.md), `purchaseTest.ts`, `issueTest.ts`, `inventoryFormTest.ts`, `purchases.spec.ts` e `issues.spec.ts`. |
+
+Las devoluciones también cubren saldo restante → devolución disponible y
+saldo cero → consulta. Un error del GET posterior cierra la captura vieja y
+reintenta la lectura, sin otra escritura; el guardado del documento sigue cerrando
+el formulario principal. La persistencia se verifica por separado en el backend.
+
 ## Referencia de contratos TypeScript
 
 | Riesgo | Nivel y técnica | Condición y fuente ejecutable |

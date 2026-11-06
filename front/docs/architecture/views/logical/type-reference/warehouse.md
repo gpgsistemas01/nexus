@@ -191,13 +191,14 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryFieldSpec
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 8, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 9, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `name` | `name: InventoryField;` |
 | `label` | `label: string;` |
 | `type` | `type?: 'number' \| 'lookup' \| 'checkbox' \| 'textarea';` |
+| `step` | `step?: number;` |
 | `isReadOnly` | `isReadOnly?: boolean;` |
 | `isDisabled` | `isDisabled?: boolean;` |
 | `displayValue` | `displayValue?: string;` |
@@ -210,7 +211,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventorySummaryItem
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 18, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 20, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -219,7 +220,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryFormSection
 
-**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 22, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/formFields.ts](../../../../../src/modules/warehouse/formFields.ts) · línea 24, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

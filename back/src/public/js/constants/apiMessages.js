@@ -2,8 +2,10 @@ import { successCodeMessages } from '../../../shared/constants/apiSuccessCodes.j
 import { AUTH_FIELD_LIMITS } from '../../../shared/constants/auth.js';
 import { FORM_FIELD_LIMITS } from '../../../shared/constants/inputValidation.js';
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from '../../../shared/messages/goodsReceiptMessages.js';
+import { PIECE_QUANTITY_MESSAGE } from '../../../shared/inventory/pieceQuantity.js';
 
 export const errorMessages = {
+    INVENTORY_PIECE_QUANTITY_REQUIRED: PIECE_QUANTITY_MESSAGE,
     ISSUE_SUPPLY_QUANTITY_CONFLICT: 'La cantidad a surtir debe ser positiva y no superar el saldo pendiente del detalle.',
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',
     DATABASE_TABLE_MISSING: 'Falta una tabla requerida en la base de datos. Contacta a soporte.',

@@ -5,6 +5,7 @@ import { createServiceLogger, logServiceError } from "../../../utils/logger.js";
 import { PRISMA_ERROR_CODES } from "../../../constants/prisma.js";
 import { findUniqueSupplier } from "../supplierService.js";
 import { SupplierInactiveConflict } from "../../../errors/warehouse/supplierError.js";
+import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialHelpers');
@@ -24,12 +25,14 @@ export const prepareMaterialData = async ({ tx, materialDto, materialId = null }
 
     // La transacción comparte una conexión: cada consulta debe terminar antes de enviar la siguiente.
     await findUniqueUnitMeasure({ tx, id: unitMeasureId });
-    await findUniquePresentation({ tx, id: presentationId });
+    const presentation = await findUniquePresentation({ tx, id: presentationId });
     const supplier = await findUniqueSupplier({ tx, id: supplierId });
 
     assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 
     if (supplier?.isActive === false) throw new SupplierInactiveConflict();
+
+    assertPieceQuantity({ quantity: rest.minStock, item: { presentation } });
 
     return {
         rest,

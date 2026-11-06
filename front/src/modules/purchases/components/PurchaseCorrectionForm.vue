@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
+import { isPiecePresentation } from '@nexus/piece-quantity';
 import PurchaseTotals from './PurchaseTotals.vue';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 
 defineProps<{
     context: string;
+    presentation: string;
+    quantityLimit: number;
     totals: { quantity: number; net: number; gross: number } | null;
     values: { quantity: string; costPerUnitType: string };
     errors: Partial<Record<'quantity' | 'costPerUnitType', string>>;
@@ -41,8 +44,9 @@ const emit = defineEmits<{
         <VTextField
             label="Cantidad correcta"
             type="number"
-            min="0.01"
-            step="0.01"
+            :min="isPiecePresentation(presentation) ? 1 : 0.01"
+            :max="quantityLimit"
+            :step="isPiecePresentation(presentation) ? 1 : 0.01"
             :model-value="values.quantity"
             :error-messages="errors.quantity"
             :disabled="isSubmitting"

@@ -71,6 +71,12 @@ Los contratos de [Salidas](../../logical/class-and-type-models/08-issues.md#modo
 y [Compras](../../logical/class-and-type-models/07-purchases.md#datos-y-modos)
 precisan los datos admitidos por modo.
 
+El guardado del documento usa `saved` y cierra el editor. Las operaciones por
+renglón mantienen el contexto: Compras vuelve a leer tras corregir/cancelar;
+Salidas usa `detailSaved` tras devolver. Ambos coordinadores reutilizan
+`useDocumentRead`; la lectura actualizada decide si permite continuar o queda
+en consulta. Un fallo al refrescar no repite la escritura confirmada.
+
 ## Secuencia de guardado confirmado
 
 **Identificador:** `DIA-VUE-DOC-002`. **Pregunta:** ¿qué evidencia permite cerrar el

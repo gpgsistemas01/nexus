@@ -12,6 +12,7 @@ import { executeServiceOperation } from '../../../serviceErrorHandler.js';
 import { applyWasteMovement } from '../../wastes/wasteMovementService.js';
 import { INVENTORY_MOVEMENT_TYPES } from '../../../../constants/inventory.js';
 import { findWasteIssueFulfillmentStatusIds } from '../wasteIssueFulfillmentService.js';
+import { assertPieceQuantity } from '../../../inventory/stockHelpers.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteIssues.wasteIssueReturnService');
 
@@ -19,13 +20,15 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
     await lockWasteIssue({ tx, id });
     const detail = await tx.wasteIssueDetail.findFirst({
         where: { id: detailId, wasteIssueId: id },
-        include: { wasteIssue: { include: { fulfillmentStatus: true } } }
+        include: { wasteIssue: { include: { fulfillmentStatus: true } }, waste: { select: { presentation: { select: { name: true } } } } }
     });
 
     if (!detail) throw new WasteIssueDetailNotFound();
     if (detail.wasteIssue.fulfillmentStatus.name !== FULFILLMENT_STATUS_NAMES.COMPLETE) {
         throw new WasteIssueReturnStatusConflict();
     }
+
+    assertPieceQuantity({ quantity: returnDto.returnQuantity, item: detail.waste });
 
     const returnedQuantity = Number(detail.returnedQuantity);
     const suppliedQuantity = Number(detail.suppliedQuantity);

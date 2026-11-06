@@ -1,4 +1,6 @@
 import { computed } from 'vue';
+import { getPieceQuantityError } from '@nexus/piece-quantity';
+import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
 import { useForm } from 'vee-validate';
 import {
     addGoodsIssueMaterialValidation,
@@ -35,7 +37,9 @@ export const useIssueLineEntry = (options: {
             quantity: (value: string) =>
                 (options.resource === 'wastes'
                     ? addWasteIssueDetailValidation.quantity(value)
-                    : addGoodsIssueMaterialValidation.quantity(value)) || true,
+                    : addGoodsIssueMaterialValidation.quantity(value)) ||
+                getPieceQuantityError(value, getLookupPresentation(selected.value)) ||
+                true,
         },
     });
     form.defineField('itemId', { validateOnModelUpdate: false });

@@ -186,6 +186,79 @@ const editor = (target: PurchaseTarget = { action: 'create' }) => {
   return { state, wrapper, request, saved };
 };
 
+it.each(['materials', 'consumables'] as const)(
+  'agregar PIEZA en %s rechaza fracciones y conserva el costo decimal',
+  async (resource) => {
+    vi.spyOn(purchaseLookupService, 'list').mockResolvedValue(pageOf([]));
+    const added = vi.fn();
+    const { state, wrapper } = harness(() =>
+      usePurchaseLineEntry({
+        resource,
+        supplier: { id: ids.supplier, title: 'Proveedor', data: {} },
+        canRead: true,
+        isDisabled: () => false,
+        onAdded: added,
+      }),
+    );
+    state.selectCreatedItem(
+      mapPurchaseItemOption(
+        {
+          ...purchaseItem,
+          material: {
+            ...purchaseItem.material,
+            type: resource === 'materials' ? 'MATERIAL' : 'CONSUMABLE',
+            base: null,
+            height: null,
+            presentation: { ...purchaseItem.material.presentation, name: 'PIEZA' },
+          },
+        },
+        resource,
+      ),
+    );
+    state.update('quantity', '1.5');
+    state.update('costPerUnitType', '1.25');
+    await state.add();
+    expect(added).not.toHaveBeenCalled();
+    expect(state.errors.value.quantity).toMatch(/enteras/);
+    expect(state.values.quantity).toBe('1.5');
+    state.update('quantity', '2');
+    await state.add();
+    expect(added).toHaveBeenCalledWith(
+      expect.objectContaining({ quantity: 2, costPerUnitType: 1.25, convertedQuantity: 2 }),
+    );
+    wrapper.unmount();
+  },
+);
+
+it('corregir PIEZA conserva la fracción capturada y exige un entero antes de confirmar', async () => {
+  const doc = document();
+  doc.details[0]!.presentation = 'PIEZA';
+  const request = vi.spyOn(purchaseService, 'changeDetail').mockResolvedValue(confirmation);
+  const { state, wrapper } = harness(() =>
+    usePurchaseCorrection({
+      resource: 'materials',
+      document: doc,
+      detail: doc.details[0]!,
+      onSaved: vi.fn(),
+      onDenied: vi.fn(),
+    }),
+  );
+  state.update('quantity', '1.5');
+  await state.submit();
+  expect(state.errors.value.quantity).toMatch(/enteras/);
+  expect(state.values.quantity).toBe('1.5');
+  expect(request).not.toHaveBeenCalled();
+  expect(confirmAction).not.toHaveBeenCalled();
+  state.update('quantity', '3');
+  await state.submit();
+  expect(state.errors.value.quantity).toMatch(/no exceder/);
+  expect(request).not.toHaveBeenCalled();
+  state.update('quantity', '1');
+  await state.submit();
+  expect(request).toHaveBeenCalledOnce();
+  wrapper.unmount();
+});
+
 describe('compras Vue: contratos y captura (DP-VUE-COM-001)', () => {
   it.each([
     ['Confirmada', ['ACTIVE', 'CANCELED'], { quantity: 2, net: 200, gross: 232 }],

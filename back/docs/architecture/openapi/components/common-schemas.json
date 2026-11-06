@@ -50,11 +50,12 @@
         "type": "string"
       }
     },
-    "additionalProperties": false,
+    "additionalProperties": true,
     "required": [
       "id",
       "name"
-    ]
+    ],
+    "description": "Identidad y nombre de catálogo o estado; puede incluir metadatos persistidos de auditoría."
   },
   "NamedCatalogList": {
     "type": "object",

@@ -41,6 +41,35 @@ afterEach(() => {
   localStorage.clear();
 });
 
+it.each(['materials', 'consumables', 'wastes'] as const)(
+  'stock y mínimo de PIEZA en %s exigen enteros y conservan las versiones',
+  async (resource) => {
+    for (const action of ['stock', 'edit'] as const) {
+      const row = normalizeInventoryRow(resource === 'wastes' ? waste : material);
+      row.presentation = 'PIEZA';
+      const { editor, request, wrapper } = openEditor(resource, { action, row });
+      const field = action === 'stock' ? 'newStock' : 'minStock';
+      if (action === 'stock') editor.update('reasonId', ids.reason);
+      editor.update(field, '1.5');
+      await editor.submit();
+      expect(request).not.toHaveBeenCalled();
+      expect(editor.errors.value[field]).toMatch(/enteras/);
+      expect(editor.values[field]).toBe('1.5');
+      editor.update(field, '2');
+      await editor.submit();
+      expect(request).toHaveBeenCalledWith(
+        resource,
+        action,
+        expect.objectContaining({ [field]: 2, expectedVersion: row.version }),
+        row.entityId,
+        expect.any(AbortSignal),
+      );
+      wrapper.unmount();
+      vi.restoreAllMocks();
+    }
+  },
+);
+
 describe('captura Vue de inventario: contratos y reintentos (DP-VUE-WH-002/003)', () => {
   it.each(['materials', 'consumables'] as const)(
     'selecciona proveedor creado en %s sin perder captura ni depender de la página remota',

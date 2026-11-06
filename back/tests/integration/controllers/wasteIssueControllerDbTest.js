@@ -3,6 +3,7 @@ import request from 'supertest';
 
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
 const ids = {};
@@ -429,6 +430,38 @@ describe('waste issue controller database integration', () => {
         data: { isActive: true }
       });
     }
+  });
+
+  it('PIEZA en merma rechaza fracciones al solicitar, surtir y devolver sin efectos parciales', async () => {
+    await withPiecePresentation({ prisma, model: 'waste', id: ids.waste }, async () => {
+      await prisma.waste.update({ where: { id: ids.waste }, data: { currentStock: 10, convertedQuantity: 20, maxUnitCost: 10, isActive: true } });
+      const body = quantity => ({ requesterId: ids.requester, advisorId: ids.advisor, clientId: ids.client, departmentId: ids.department, projectNumber: 'PR-200', requestDate: '2026-08-11T13:00:00.000Z', details: [{ wasteId: ids.waste, quantity }] });
+      const beforeCount = await prisma.wasteIssue.count({ where: { departmentId: ids.department } });
+      const invalid = await request(app).post('/waste-issues').send(body(0.5)).expect(409);
+      expect(invalid.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+      expect(await prisma.wasteIssue.count({ where: { departmentId: ids.department } })).toBe(beforeCount);
+      const created = (await request(app).post('/waste-issues').send(body(2)).expect(201)).body.wasteIssue;
+      const line = created.details[0];
+      const supply = quantityToSupply => request(app).patch(`/waste-issues/${created.id}/details`).send({ details: [{ id: line.id, isSupplied: true, quantityToSupply, expectedSuppliedQuantity: 0, projectConvertedQuantity: 4 }] });
+      expect((await supply(0.5).expect(409)).body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+      expect(Number((await prisma.wasteIssueDetail.findUnique({ where: { id: line.id } })).suppliedQuantity)).toBe(0);
+      expect(await prisma.wasteMovement.count({ where: { wasteIssueId: created.id } })).toBe(0);
+      expect(Number((await prisma.waste.findUnique({ where: { id: ids.waste } })).currentStock)).toBe(10);
+      await supply(2).expect(200);
+      const returning = returnQuantity => request(app).patch(`/waste-issues/${created.id}/details/${line.id}/returns`).send({ returnQuantity });
+      expect((await returning(0.5).expect(409)).body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+      expect(Number((await prisma.wasteIssueDetail.findUnique({ where: { id: line.id } })).returnedQuantity)).toBe(0);
+      expect(Number((await prisma.waste.findUnique({ where: { id: ids.waste } })).currentStock)).toBe(8);
+      expect(await prisma.wasteIssueReturn.count({ where: { wasteIssueId: created.id } })).toBe(0);
+      const returned = (await returning(2).expect(200)).body.wasteIssueReturn;
+      expect(Number(returned.currentTotalReturnedQuantity)).toBe(0);
+      expect(Number(returned.newTotalReturnedQuantity)).toBe(2);
+      expect(returned.detail.id).toBe(line.id);
+      expect(returned).not.toHaveProperty('returnQuantity');
+      const saved = await prisma.wasteIssue.findUnique({ where: { id: created.id }, include: { fulfillmentStatus: true } });
+      expect(saved.fulfillmentStatus.name).toBe('Cancelado');
+      expect(Number((await prisma.waste.findUnique({ where: { id: ids.waste } })).currentStock)).toBe(10);
+    });
   });
 
   it('rechaza stock insuficiente y revierte toda la transacción', async () => {

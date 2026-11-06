@@ -1,7 +1,8 @@
 # Contrato de la API
 
-[OpenAPI](openapi.json) detalla cada operación. Esta guía resume las condiciones
-compartidas; el [inicio rápido](01-consumption.md) muestra cómo consumirlas.
+[OpenAPI](openapi.json) define campos, formatos y respuestas HTTP. Esta guía recoge
+las reglas que dependen del estado o del inventario consultado. La adaptación de
+formularios pertenece a los [contratos de Vue](../../../../front/docs/architecture/contracts/index.md).
 
 ## Reglas contractuales complementarias
 
@@ -14,9 +15,8 @@ compartidas; el [inicio rápido](01-consumption.md) muestra cómo consumirlas.
 | `POST /api/auth/refresh` | Cookie `refreshToken`; no requiere access token válido. | `200`, texto `OK` y cookies renovadas. |
 
 Las cookies son `HttpOnly`, `SameSite=Lax` y `Secure` en producción. Los tokens no
-se devuelven en JSON. La API no publica `/api/auth/logout`; el
-[cierre web](../views/development/frontend-technical-documentation/04-authentication-code.md#rutas-web-de-sesión)
-pertenece a la interfaz EJS.
+se devuelven en JSON. El cierre usa `POST /cerrar-sesion`, una ruta web que también
+consume Vue; no existe `/api/auth/logout`.
 
 Login admite 1–50 caracteres por credencial: recorta el usuario y conserva la
 contraseña exacta, sin aplicar la política de creación de claves. Datos inválidos
@@ -48,6 +48,7 @@ recorren todos los resultados admitidos, sin el límite de una página.
 | `401` / `403` | Sesión inválida o permiso insuficiente, según la operación. |
 | `404` y código del recurso | Registro no disponible para ese contexto; no divulga datos. |
 | `409` y código de dominio | Conflicto de estado, identidad, versión o clave. Revisar antes de repetir. |
+| `409 INVENTORY_PIECE_QUANTITY_REQUIRED` | Cantidad fraccionaria para presentación PIEZA/PIEZAS. Corregir el valor; el servidor no lo redondea. |
 | `500 SERVER_ERROR` | Fallo interno; el detalle técnico queda en el servidor. |
 | `503 DATABASE_TABLE_MISSING` / `DATABASE_COLUMN_MISSING` | El despliegue requiere revisar migraciones. |
 | `503 PRISMA_CLIENT_OUT_OF_SYNC` | El despliegue requiere regenerar Prisma. |
@@ -90,18 +91,47 @@ edición de encabezado rechazan configuración ausente o valor diferente.
 | Históricos y conversiones | Pueden conservar 6 decimales; no se redondean retroactivamente. |
 | Largo calculado de merma | Se redondea a 2 decimales. |
 
-Un decimal adicional se rechaza, no se redondea. Stock inicial, mínimo, ajuste y
-costo máximo admiten cero; mínimo vacío/nulo se omite. Entradas, devoluciones y
+Un decimal adicional se rechaza, no se redondea. Stock inicial, mínimo y ajuste
+admiten cero; mínimo vacío/nulo se omite. El costo máximo admite cero sólo en el alta
+inicial; editar o utilizar el inventario requiere un costo positivo. Entradas, devoluciones y
 medidas son positivas; los detalles de compra/salida de material o consumible
 exigen cantidad por presentación desde 1.
 
+**PIEZA/PIEZAS:** stock mínimo, stock inicial, ajustes y cantidades de compra,
+corrección, solicitud, surtido, entrada y devolución deben ser enteros. La API
+obtiene la presentación de la base de datos; una etiqueta enviada por el cliente
+no cambia la regla. Costos, medidas y cantidades convertidas admiten sus decimales.
+No se modifican ni redondean registros históricos al consultarlos.
+
 Rollo recibe total completo con cono, total sobrante y un cono compartido; los
 pesos totales superan al cono, que admite cero. El origen debe ser material en m².
-Guarda neto y medidas finales; los campos históricos de muestra conservan seis
-decimales, pero las altas nuevas los dejan nulos y sólo usan la muestra para calcular.
+Guarda los pesos, el neto y las medidas finales. `sampleLengthM` y
+`sampleNetWeightKg` se conservan en históricos y quedan nulos en altas nuevas;
+la referencia actual es el peso del rollo completo capturado en la merma.
 Los esquemas precisan propiedades y límites.
 
 ### Contextos de compras y salidas
+
+| Operación | Cuerpo de captura |
+| --- | --- |
+| Alta / edición de compra | `supplierId`, `receivedById`, `isInvoiced`, `invoice` cuando corresponde, `receptionDate`, `observations` y detalles con `materialId`, `quantity`, `costPerUnitType`. En edición, `details` es opcional y sólo agrega partidas. |
+| Corregir compra | `quantity` positiva, hasta la cantidad registrada, y `costPerUnitType` positivo. Debe cambiar al menos uno. |
+| Cancelar partida de compra | Sin cuerpo. El documento y la partida se identifican en la ruta. |
+| Alta / edición de solicitud | Encabezado con cliente, asesor, área, solicitante, proyecto, fecha y observaciones. Los detalles usan `materialId` + `supplierId` o `wasteId`, y `quantity`. |
+| Editar encabezado de salida | Sólo los campos del encabezado; sin `details`. |
+| Surtir | Detalles con `id`, `isSupplied`, `projectConvertedQuantity` y el par `quantityToSupply` / `expectedSuppliedQuantity`. Véase [Entregas](#entregas-de-salidas). |
+| Devolver | `returnQuantity`; `observations` es opcional. La cantidad debe ser positiva y no superar el saldo entregado. |
+
+Los esquemas `*Request` de [OpenAPI](openapi.json) precisan campos obligatorios y
+opcionales. Folios, estados de documentos, movimientos, importes y saldos resultantes los calcula
+el servidor; no se aceptan como instrucciones del cliente. `newStock` es la excepción
+de captura: indica el saldo objetivo de un ajuste y el servidor calcula su diferencia.
+
+En lectura, los decimales persistidos pueden ser cadenas JSON. Una partida de compra
+devuelve `status: ACTIVE | CANCELED`, no `isCancelled`. La devolución responde con
+`goodsIssueReturn` o `wasteIssueReturn`, sus acumulados `currentTotalReturnedQuantity`
+y `newTotalReturnedQuantity`, el detalle actualizado y `code`; `returnQuantity` es
+un campo del request. Vue confirma el código y consulta otra vez el documento.
 
 La ruta fija materiales o consumibles; cuerpo y query no cambian el contexto.
 Consultas, reportes y escrituras verifican cabecera y detalles del mismo tipo,

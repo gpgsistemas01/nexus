@@ -25,6 +25,7 @@ import { findInitialStockAdjustmentReason } from "../reasonService.js";
 import { MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
 
 import { updateVersionedRecord } from '../../../repository/versionRepository.js';
+import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 
 const serviceLogger = createServiceLogger('warehouse.materials.materialService');
 
@@ -92,6 +93,7 @@ const DEFAULT_MATERIAL_SNAPSHOT_SELECT = {
     type: true,
     name: true,
     minStock: true,
+    presentation: { select: { name: true } },
     base: true,
     height: true
 };
@@ -250,6 +252,7 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
                 select: {
                     id: true,
                     presentationId: true,
+                    presentation: { select: { name: true } },
                     unitMeasureId: true,
                     base: true,
                     height: true,
@@ -258,6 +261,7 @@ export const updateMaterial = async (materialDto, id, { type = null } = {}) => {
             });
 
             if (!currentMaterial) throw new MaterialNotFound();
+            assertPieceQuantity({ quantity: materialData.minStock, item: currentMaterial });
             assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 
             const existingMaterial = await tx.material.findFirst({

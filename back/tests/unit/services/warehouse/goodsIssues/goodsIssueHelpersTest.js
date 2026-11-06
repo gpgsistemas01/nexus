@@ -39,6 +39,14 @@ describe('buildGoodsIssueDetails', () => {
         findSupplierMaterialsSnapshot.mockResolvedValue([supplierMaterial]);
     });
 
+    it.each(['MATERIAL', 'CONSUMABLE'])('rechaza fracciones de PIEZA en %s aunque el request declare ROLLO', async type => {
+        findSupplierMaterialsSnapshot.mockResolvedValue([{
+            ...supplierMaterial, material: { ...supplierMaterial.material, type, presentation: { name: 'PIEZA' } }
+        }]);
+        await expect(buildGoodsIssueDetails({ details: [{ ...detail, quantity: 1.5, presentation: { name: 'ROLLO' } }], type }))
+            .rejects.toMatchObject({ code: 'INVENTORY_PIECE_QUANTITY_REQUIRED' });
+    });
+
     it.each([
         ['material', { isActive: false }, 'MATERIAL_INACTIVE_CONFLICT'],
         ['proveedor', { supplier: { ...supplierMaterial.supplier, isActive: false } }, 'SUPPLIER_INACTIVE_CONFLICT']

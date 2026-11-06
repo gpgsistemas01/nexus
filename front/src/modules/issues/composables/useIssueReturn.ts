@@ -1,5 +1,6 @@
 import { useForm } from 'vee-validate';
 import { issueReturnValidation } from '@nexus/form-validation';
+import { getPieceQuantityError } from '@nexus/piece-quantity';
 import { useRecordForm } from '../../../shared/composables/useRecordForm.js';
 import { issueService } from '../services/issueService.js';
 import { getIssueReturnableQuantity } from '../issueRules.js';
@@ -20,6 +21,7 @@ export const useIssueReturn = (options: {
         validationSchema: {
             returnQuantity: (value: string) =>
                 issueReturnValidation.returnQuantity(value) ||
+                getPieceQuantityError(value, options.detail.presentation) ||
                 (Number(value) > availableQuantity
                     ? 'La cantidad no puede exceder lo disponible para devolver.'
                     : true),

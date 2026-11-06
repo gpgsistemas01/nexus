@@ -5,6 +5,48 @@ import { ids } from '../fixtures/inventory.js';
 import { personData } from '../fixtures/records.js';
 import { purchaseItem } from '../fixtures/purchases.js';
 
+test('compras: corregir PIEZA valida cantidad entera y límite sin cerrar la consulta tras guardar', async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  const { writes, document } = await mockPurchases(page);
+  document.details[0]!.material.presentation.name = 'PIEZA';
+  await page.goto('/compras/materiales');
+  await page.getByRole('button', { name: 'Ver compra', exact: true }).first().click();
+  const main = page.getByRole('dialog', { name: 'Ver compra - Folio COM-001', exact: true });
+  await main.getByRole('button', { name: 'Corregir detalle', exact: true }).click();
+  const detail = page.getByRole('dialog', { name: 'Corregir detalle de compra', exact: true });
+  const quantity = detail.getByLabel('Cantidad correcta', { exact: true });
+  await expect(quantity).toHaveAttribute('step', '1');
+  await expect(quantity).toHaveAttribute('max', '2');
+  await quantity.fill('1.5');
+  await detail.getByRole('button', { name: 'Corregir detalle', exact: true }).click();
+  await expect(
+    detail.getByText(/Las cantidades con presentación PIEZA deben ser enteras/),
+  ).toBeVisible();
+  await quantity.fill('3');
+  await detail.getByRole('button', { name: 'Corregir detalle', exact: true }).click();
+  await expect(detail.getByText(/no exceder la cantidad registrada/)).toBeVisible();
+  expect(writes).toHaveLength(0);
+  await quantity.fill('1');
+  await detail.getByLabel('Costo por presentación correcto', { exact: true }).fill('1.25');
+  await detail.getByRole('button', { name: 'Corregir detalle', exact: true }).click();
+  await page
+    .getByRole('dialog', { name: '¿Corregir detalle de compra?', exact: true })
+    .getByRole('button', { name: 'Corregir detalle', exact: true })
+    .click();
+  await expect(detail).toBeHidden();
+  await expect(main).toBeVisible();
+  await expect(main.getByLabel('Totales de compra')).toContainText('$1.45');
+  expect(writes).toHaveLength(1);
+  expect(writes[0]!.data).toEqual({ quantity: 1, costPerUnitType: 1.25 });
+  await main.getByLabel('Totales de compra').scrollIntoViewIfNeeded();
+  await main.screenshot({
+    path: test.info().outputPath('piece-correction-confirmed.png'),
+    animations: 'disabled',
+  });
+});
+
 for (const [path, title, item] of [
   ['materiales', 'Materiales', 'Material'],
   ['consumibles', 'Consumibles', 'Consumible'],

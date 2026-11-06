@@ -17,7 +17,7 @@ export const findReceiptDetailForChange = ({ tx, goodsReceiptId, detailId, type 
         },
         include: {
             goodsReceipt: true,
-            material: true
+            material: { include: { presentation: true } }
         }
     })
 );

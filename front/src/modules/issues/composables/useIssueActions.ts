@@ -25,7 +25,8 @@ export const useIssueActions = (options: {
         canOpen: () => options.canRead(),
         reload: options.reload,
     });
-    let lastRequestedEditor: { row: IssueRow; mode: IssueOpenMode } | undefined;
+    type ReadTarget = { row: IssueRow; mode: IssueOpenMode; afterReturn?: boolean };
+    let lastRequestedEditor: ReadTarget | undefined;
 
     const close = () => {
         reader.close();
@@ -33,19 +34,22 @@ export const useIssueActions = (options: {
         lastRequestedEditor = undefined;
     };
 
-    const open = async (row: IssueRow, mode: IssueOpenMode) => {
+    const loadEditor = async (target: ReadTarget) => {
         if (!options.canRead()) return;
 
-        lastRequestedEditor = { row, mode };
+        const { row, mode, afterReturn } = target;
+        lastRequestedEditor = target;
         const document = await reader.load(row.id);
         if (!document) return;
 
         const resolved =
-            mode === 'edit'
-                ? options.canManage()
-                    ? resolveIssueEditMode(document)
-                    : 'view'
-                : mode;
+            afterReturn && (!canReturnIssue(document) || !options.canSupply())
+                ? 'view'
+                : mode === 'edit'
+                  ? options.canManage()
+                      ? resolveIssueEditMode(document)
+                      : 'view'
+                  : mode;
 
         if (
             (resolved === 'supply' && (!options.canSupply() || !canSupplyIssue(document))) ||
@@ -60,6 +64,8 @@ export const useIssueActions = (options: {
         editorState.openEditor({ mode: resolved, document });
     };
 
+    const open = (row: IssueRow, mode: IssueOpenMode) => loadEditor({ row, mode });
+
     const create = () => {
         if (!options.canManage()) return;
 
@@ -68,13 +74,22 @@ export const useIssueActions = (options: {
         editorState.openEditor({ mode: 'create' });
     };
 
-    const retry = () =>
-        lastRequestedEditor ? open(lastRequestedEditor.row, lastRequestedEditor.mode) : undefined;
+    const retry = () => (lastRequestedEditor ? loadEditor(lastRequestedEditor) : undefined);
 
     const handleSaved = (result: MutationConfirmation) => {
         close();
         void options.reload();
         void showSuccess(result.message);
+    };
+
+    const handleDetailSaved = async (result: MutationConfirmation) => {
+        const document = editorState.editor.value?.document;
+        if (!document) return;
+
+        editorState.closeEditor();
+        void options.reload();
+        void showSuccess(result.message);
+        await loadEditor({ row: document, mode: 'return', afterReturn: true });
     };
 
     return {
@@ -87,5 +102,6 @@ export const useIssueActions = (options: {
         cancelRead: reader.close,
         retry,
         handleSaved,
+        handleDetailSaved,
     };
 };

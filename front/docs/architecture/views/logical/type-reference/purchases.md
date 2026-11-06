@@ -6,11 +6,13 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseCorrectionForm.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseCorrectionForm.vue](../../../../../src/modules/purchases/components/PurchaseCorrectionForm.vue) · línea 6, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseCorrectionForm.vue](../../../../../src/modules/purchases/components/PurchaseCorrectionForm.vue) · línea 7, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `context` | `context: string;` |
+| `presentation` | `presentation: string;` |
+| `quantityLimit` | `quantityLimit: number;` |
 | `totals` | `totals: { quantity: number; net: number; gross: number } \| null;` |
 | `values` | `values: { quantity: string; costPerUnitType: string };` |
 | `errors` | `errors: Partial<Record<'quantity' \| 'costPerUnitType', string>>;` |
@@ -20,7 +22,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseCorrectionForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseCorrectionForm.vue](../../../../../src/modules/purchases/components/PurchaseCorrectionForm.vue) · línea 15, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseCorrectionForm.vue](../../../../../src/modules/purchases/components/PurchaseCorrectionForm.vue) · línea 18, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -162,7 +164,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineProps
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 8, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 9, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -183,7 +185,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## PurchaseLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 19, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/purchases/components/PurchaseLineEntryForm.vue](../../../../../src/modules/purchases/components/PurchaseLineEntryForm.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -237,7 +239,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## Field
 
-**Fuente:** [src/modules/purchases/composables/usePurchaseCorrection.ts](../../../../../src/modules/purchases/composables/usePurchaseCorrection.ts) · línea 19, columna 5. **Declaración:** type.
+**Fuente:** [src/modules/purchases/composables/usePurchaseCorrection.ts](../../../../../src/modules/purchases/composables/usePurchaseCorrection.ts) · línea 21, columna 5. **Declaración:** type.
 
 **Definición completa:**
 
@@ -247,7 +249,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## Field
 
-**Fuente:** [src/modules/purchases/composables/usePurchaseLineEntry.ts](../../../../../src/modules/purchases/composables/usePurchaseLineEntry.ts) · línea 19, columna 5. **Declaración:** type.
+**Fuente:** [src/modules/purchases/composables/usePurchaseLineEntry.ts](../../../../../src/modules/purchases/composables/usePurchaseLineEntry.ts) · línea 21, columna 5. **Declaración:** type.
 
 **Definición completa:**
 

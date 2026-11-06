@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
+import { isPiecePresentation } from '@nexus/piece-quantity';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
 
 defineProps<{
     name: string;
+    presentation: string;
     supplied: number;
     returned: number;
     available: number;
@@ -42,9 +44,9 @@ const emit = defineEmits<{
         <VTextField
             label="Cantidad a devolver"
             type="number"
-            min="0.01"
+            :min="isPiecePresentation(presentation) ? 1 : 0.01"
             :max="available"
-            step="0.01"
+            :step="isPiecePresentation(presentation) ? 1 : 0.01"
             :model-value="values.returnQuantity"
             :error-messages="errors.returnQuantity"
             :disabled="isSubmitting"

@@ -1,6 +1,7 @@
 import { computed, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
+import { getLookupPresentation } from '../../../shared/utils/getLookupPresentation.js';
 import { useRemoteOptions } from './useRemoteOptions.js';
 import { unitUsesMeasurements } from '../formModel.js';
 import type { LookupItem } from '../../../shared/lookup.js';
@@ -51,6 +52,16 @@ export const useInventorySelection = (options: {
     );
     const selectedTemplate = useSelectedOption(templates.items, () => String(values.materialId));
     const selectedUnit = useSelectedOption(units.items, () => String(values.unitMeasureId));
+    const selectedPresentation = useSelectedOption(presentations.items, () =>
+        String(values.presentationId),
+    );
+    const presentationName = computed(() => {
+        if (!isCreating) return target.row?.presentation ?? '';
+
+        if (resource !== 'wastes') return String(selectedPresentation.value?.data.name ?? '');
+
+        return getLookupPresentation(selectedTemplate.value);
+    });
     const lookupMap = {
         supplierId: suppliers,
         presentationId: presentations,
@@ -117,6 +128,7 @@ export const useInventorySelection = (options: {
         lookups,
         selectedSupplier,
         selectedTemplate,
+        presentationName,
         usesMeasurements,
         refreshSuppliers,
         searchLookup: (field: InventoryField, search: string) =>

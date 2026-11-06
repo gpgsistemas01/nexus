@@ -9,7 +9,7 @@ import {
 } from '../../../errors/warehouse/wasteIssueError.js';
 import { GOODS_ISSUE_STATUS_NAMES } from '../../../constants/warehouseStatuses.js';
 import { resolveIssueHeaderData } from '../issues/issueHeaderService.js';
-import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { assertPieceQuantity, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 
 const normalizeWasteIssueDetailResponse = detail => ({
     ...detail,
@@ -69,21 +69,25 @@ export const resolveWasteIssueHeaderData = async ({ tx, dto }) => {
     });
 };
 
-const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) => ({
-    materialName: waste.name,
-    quantity: detail.quantity,
-    convertedQuantity: calculateConvertedQuantity({
+const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) => {
+    assertPieceQuantity({ quantity: detail.quantity, item: waste });
+
+    return {
+        materialName: waste.name,
         quantity: detail.quantity,
-        base: waste.base,
-        height: waste.height
-    }),
-    waste: {
-        connect: { id: waste.id }
-    },
-    fulfillmentStatus: {
-        connect: { id: fulfillmentStatusId }
-    }
-});
+        convertedQuantity: calculateConvertedQuantity({
+            quantity: detail.quantity,
+            base: waste.base,
+            height: waste.height
+        }),
+        waste: {
+            connect: { id: waste.id }
+        },
+        fulfillmentStatus: {
+            connect: { id: fulfillmentStatusId }
+        }
+    };
+};
 
 export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId }) => {
 
@@ -95,7 +99,7 @@ export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId 
 
     const wastes = await tx.waste.findMany({
         where: { id: { in: [...uniqueIds] }, isActive: true },
-        select: { id: true, name: true, base: true, height: true, maxUnitCost: true }
+        select: { id: true, name: true, base: true, height: true, maxUnitCost: true, presentation: { select: { name: true } } }
     });
 
     if (wastes.length !== uniqueIds.size) {

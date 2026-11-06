@@ -6,7 +6,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 18, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 19, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -22,7 +22,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueDetailsTable.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 24, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueDetailsTable.vue](../../../../../src/modules/issues/components/IssueDetailsTable.vue) · línea 25, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -131,7 +131,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueLineEntryForm.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueLineEntryForm.vue](../../../../../src/modules/issues/components/IssueLineEntryForm.vue) · línea 8, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueLineEntryForm.vue](../../../../../src/modules/issues/components/IssueLineEntryForm.vue) · línea 9, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -151,7 +151,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueLineEntryForm.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueLineEntryForm.vue](../../../../../src/modules/issues/components/IssueLineEntryForm.vue) · línea 18, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueLineEntryForm.vue](../../../../../src/modules/issues/components/IssueLineEntryForm.vue) · línea 19, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -164,11 +164,12 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueReturnForm.defineProps
 
-**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 7, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 8, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `name` | `name: string;` |
+| `presentation` | `presentation: string;` |
 | `supplied` | `supplied: number;` |
 | `returned` | `returned: number;` |
 | `available` | `available: number;` |
@@ -180,7 +181,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## IssueReturnForm.defineEmits
 
-**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 18, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/issues/components/IssueReturnForm.vue](../../../../../src/modules/issues/components/IssueReturnForm.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -224,6 +225,21 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | dependency | [IssueQuery](../../../../../src/modules/issues/issue.ts) | `query` |
 | dependency | [IssueRow](../../../../../src/modules/issues/issue.ts) | `open` |
 | dependency | [IssueOpenMode](../../../../../src/modules/issues/issue.ts) | `open` |
+
+## ReadTarget
+
+**Fuente:** [src/modules/issues/composables/useIssueActions.ts](../../../../../src/modules/issues/composables/useIssueActions.ts) · línea 28, columna 5. **Declaración:** type.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `row` | `row: IssueRow;` |
+| `mode` | `mode: IssueOpenMode;` |
+| `afterReturn` | `afterReturn?: boolean` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| association | [IssueRow](../../../../../src/modules/issues/issue.ts) | `row` |
+| dependency | [IssueOpenMode](../../../../../src/modules/issues/issue.ts) | `mode` |
 
 ## IssueResource
 
@@ -504,6 +520,7 @@ RecordQuery & IssueFilters
 | Miembro | Firma completa |
 | --- | --- |
 | `saved` | `saved: [result: MutationConfirmation];` |
+| `detailSaved` | `detailSaved: [result: MutationConfirmation];` |
 | `close` | `close: [];` |
 | `reload` | `reload: [];` |
 | `createClient` | `createClient: [request: LookupCreation];` |
@@ -511,6 +528,7 @@ RecordQuery & IssueFilters
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `saved` |
+| dependency | [MutationConfirmation](../../../../../src/shared/http/recordContract.ts) | `detailSaved` |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createClient` |
 
 ## IssueLineEntryPage.defineProps

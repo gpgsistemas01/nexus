@@ -5,7 +5,7 @@ import {
 } from "../document/referenceNumberService.js";
 import { toNumber } from '../../utils/formattersUtils.js';
 import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
-import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
+import { assertPieceQuantity, assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { findSupplierMaterialByIds } from "./materials/supplierMaterialService.js";
 import { adjustSupplierMaterialStock } from "./materials/supplierMaterialStockService.js";
 import { lockSupplierMaterialStock } from "../../repository/warehouse/stockLockRepository.js";
@@ -63,6 +63,7 @@ const calculateStockAdjustmentValues = ({
     height = null
 }) => {
 
+    assertPieceQuantity({ quantity: newStock, item: supplierMaterial.material });
     const previousStock = toNumber(supplierMaterial.currentStock) || 0;
     const difference = normalizeDecimal(newStock - previousStock);
     const previousConvertedQuantity = toNumber(supplierMaterial.convertedQuantity) || 0;

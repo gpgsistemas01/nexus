@@ -140,4 +140,4 @@ registrados. Se obtiene restando el peso del cono al peso total con cono. Se
 conserva para la identidad por nombre, proveedor, medidas y pesos al agregar existencias.
 Un valor ausente significa desconocido.
 
-El **cono de referencia** es una medida de la oferta del material y proveedor. El **cono utilizado** es el valor guardado en la merma: precargado desde esa referencia y editable al registrar. La **longitud estimada** resulta de la proporción de peso neto con una muestra del mismo material; se distingue del largo medido.
+El **cono utilizado** es la tara que se captura al registrar la merma y se aplica tanto al peso del sobrante como al del rollo completo. La **longitud estimada** se calcula con esa referencia y se distingue del largo medido. Los registros anteriores conservan sus referencias históricas.

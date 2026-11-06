@@ -2,9 +2,10 @@
 
 ## Propósito y frontera
 
-Esta referencia define solicitudes, respuestas y errores de `shared/http` y los
-servicios/mappers. Los intercambios internos de la interfaz están en [Formularios y
-eventos](form-and-event-contracts.md).
+La [API del backend](../../../../back/docs/architecture/openapi/api-contract.md)
+define el contrato HTTP y [OpenAPI](../../../../back/docs/architecture/openapi/openapi.json)
+declara sus esquemas. Aquí se documenta cómo los servicios y mappers de Vue los
+consumen. Los eventos internos están en [Formularios y eventos](form-and-event-contracts.md).
 
 `shared/http/apiClient` es el punto HTTP compartido. Los servicios codifican los IDs
 de ruta y construyen filtros mediante URLSearchParams/adaptadores compartidos.
@@ -70,6 +71,27 @@ guardar. Abrir una consulta no reserva inventario ni autoriza una escritura futu
 ## Escrituras y confirmación
 
 Construir el payload por recurso y operación, sin reenviar la fila completa.
+
+| Captura de Vue | Decisión del mapper o servicio |
+| --- | --- |
+| Compra nueva | Envía encabezado y detalles con `materialId`, `quantity` y `costPerUnitType`. Normaliza la factura a mayúsculas; la omite si es remisión. |
+| Edición de compra | Conserva el proveedor registrado y envía sólo detalles `isNew`; si no hay nuevos, omite `details`. |
+| Corrección / cancelación de compra | Corrección envía `quantity` y `costPerUnitType`; la cantidad no supera la registrada. Cancelación no envía cuerpo. |
+| Solicitud de salida | Materiales/Consumibles envían `materialId`, `supplierId` y `quantity` por detalle; Mermas, `wasteId` y `quantity`. La edición de encabezado omite detalles. |
+| Surtido | Envía sólo detalles pendientes seleccionados: `id`, `isSupplied`, `quantityToSupply`, `expectedSuppliedQuantity` y `projectConvertedQuantity`. |
+| Devolución | Envía `returnQuantity` y observaciones recortadas. Después confirma con `code` y vuelve a consultar el documento por ID. |
+| Inventario | El alta desde compra añade `creationContext: 'goodsReceipt'` y omite stock/costo máximo. Ediciones y ajustes conservan las versiones leídas; altas y entradas de merma conservan su `operationId`. |
+
+Los IDs de documento y detalle van en la URL, no se reemplazan por el ID del artículo.
+Vue no envía folios, estados de documentos ni totales calculados como datos de captura.
+`newStock` indica el saldo objetivo del ajuste; la API calcula la diferencia y los movimientos.
+La validación de PIEZA usa la [regla compartida](../../../../back/src/shared/inventory/pieceQuantity.js);
+el backend la comprueba con la presentación persistida, independientemente de lo enviado.
+
+Fuentes: [Compras](../../../src/modules/purchases/mappers/purchaseRequestMapper.ts),
+[Salidas](../../../src/modules/issues/mappers/issueRequestMapper.ts),
+[Inventario](../../../src/modules/warehouse/formModel.ts) y sus servicios.
+
 `confirmMutation` exige el código de éxito esperado; sólo entonces se muestra su mensaje
 del catálogo público, como texto.
 

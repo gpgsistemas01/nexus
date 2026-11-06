@@ -5,6 +5,68 @@ import { issuePermissions, issueDetailId, departmentId, issueFor } from '../fixt
 import { ids, pageOf, user } from '../fixtures/inventory.js';
 import { clientData, personData } from '../fixtures/records.js';
 
+for (const [path, resource] of [
+  ['materiales', 'materials'],
+  ['consumibles', 'consumables'],
+  ['mermas', 'wastes'],
+] as const) {
+  test(`salidas ${path}: PIEZA y devoluciones conservan el documento actualizado hasta quedar cancelado`, async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    const { writes, docs } = await mockIssues(page, undefined, 'Surtido');
+    const line = docs[resource].details[0]!;
+    if (line.material) line.material.presentation.name = 'PIEZA';
+    else if ('waste' in line) line.waste.presentation.name = 'PIEZA';
+    await page.goto(`/salidas/${path}`);
+    await page.getByRole('button', { name: 'Devolver material surtido', exact: true }).click();
+    const main = page.getByRole('dialog', {
+      name: /^Devolver salida( de merma)? - Folio SAL-001$/,
+    });
+    await main.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
+    const detail = page.getByRole('dialog', { name: 'Devolver detalle de salida', exact: true });
+    await expect(detail.getByLabel('Cantidad a devolver', { exact: true })).toHaveAttribute(
+      'step',
+      '1',
+    );
+    await detail.getByLabel('Cantidad a devolver', { exact: true }).fill('0.5');
+    await detail.getByRole('button', { name: 'Devolver', exact: true }).click();
+    await expect(
+      detail.getByText(/Las cantidades con presentación PIEZA deben ser enteras/),
+    ).toBeVisible();
+    expect(writes).toHaveLength(0);
+    await detail.getByLabel('Cantidad a devolver', { exact: true }).fill('1');
+    await detail.getByRole('button', { name: 'Devolver', exact: true }).click();
+    await expect(detail).toBeHidden();
+    await expect(main).toBeVisible();
+    await expect(
+      main.getByRole('button', { name: 'Devolver detalle de salida', exact: true }),
+    ).toBeEnabled();
+    await main.getByRole('button', { name: 'Devolver detalle de salida', exact: true }).click();
+    await detail.getByLabel('Cantidad a devolver', { exact: true }).fill('1');
+    await detail.getByRole('button', { name: 'Devolver', exact: true }).click();
+    await expect(detail).toBeHidden();
+    const read = page.getByRole('dialog', {
+      name: /^Consultar salida( de merma)? - Folio SAL-001$/,
+    });
+    await expect(read).toBeVisible();
+    await expect(read.getByRole('cell', { name: 'Cancelado', exact: true })).toBeVisible();
+    await expect(
+      read.getByRole('button', { name: 'Devolver detalle de salida', exact: true }),
+    ).toHaveCount(0);
+    expect(writes).toHaveLength(2);
+    expect(writes.map((write) => write.data)).toEqual([
+      { returnQuantity: 1, observations: '' },
+      { returnQuantity: 1, observations: '' },
+    ]);
+    await read.getByRole('cell', { name: 'Cancelado', exact: true }).scrollIntoViewIfNeeded();
+    await read.screenshot({
+      path: test.info().outputPath('piece-return-confirmed.png'),
+      animations: 'disabled',
+    });
+  });
+}
+
 for (const [path, resource, title, label] of [
   ['materiales', 'materials', 'Salidas de materiales', 'Material'],
   ['consumibles', 'consumables', 'Salidas de consumibles', 'Consumible'],
