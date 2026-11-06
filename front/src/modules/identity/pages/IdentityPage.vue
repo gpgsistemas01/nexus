@@ -1,0 +1,206 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue';
+import { VCol } from 'vuetify/components/VGrid';
+import { VBtn } from 'vuetify/components/VBtn';
+import { VAlert } from 'vuetify/components/VAlert';
+import { PERMISSIONS } from '@nexus/permissions';
+import RecordListPanel from '../../../shared/components/RecordListPanel.vue';
+import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
+import { usePageAccess } from '../../../app/composables/usePageAccess.js';
+import { useListEditor } from '../../../shared/composables/useListEditor.js';
+import { useListSearch } from '../../../shared/composables/useListSearch.js';
+import { usePagedList } from '../../../shared/composables/usePagedList.js';
+import { useOrganizationOptions } from '../../../shared/composables/useOrganizationOptions.js';
+import { useSelectedOption } from '../../../shared/composables/useSelectedOption.js';
+import { useReportScope } from '../../../shared/composables/useReportScope.js';
+import ReportScopeDialog from '../../../shared/components/ReportScopeDialog.vue';
+import { initialRecordQuery } from '../../../shared/list.js';
+import { IDENTITY_CONFIG } from '../identity.js';
+import type { IdentityResource, IdentityEntry, IdentityTarget } from '../identity.js';
+import { identityService } from '../services/identityService.js';
+import type { IdentityQuery } from '../identity.js';
+import IdentityTable from '../components/IdentityTable.vue';
+import PersonEditorPage from './PersonEditorPage.vue';
+import UserEditorPage from './UserEditorPage.vue';
+
+const props = defineProps<{ resource: IdentityResource }>();
+const config = IDENTITY_CONFIG[props.resource];
+const { session, has, onDenied, onError } = usePageAccess();
+
+const canRead = computed(() => has(config.read));
+const canWrite = computed(() => has(config.write));
+const canExport = computed(() => has(config.report));
+
+const list = usePagedList<IdentityQuery, IdentityEntry>({
+    initialQuery: { ...initialRecordQuery(), department: '', role: '' },
+    canLoad: () => canRead.value,
+    request: (query, signal) => identityService.list(props.resource, query, signal),
+    errorMessage: 'No se pudo cargar el listado.',
+    onError,
+});
+const { rows, total, isLoading, error, query } = list;
+const filters = useOrganizationOptions(
+    props.resource === 'persons' ? session.user.value!.permissions : [],
+);
+const options = filters.state;
+const departmentId = ref('');
+const roleId = ref('');
+const selectedDepartment = useSelectedOption(filters.departments.items, () => departmentId.value);
+const selectedRole = useSelectedOption(filters.roles.items, () => roleId.value);
+const report = useReportScope({
+    kind: 'filtered',
+    canExport: () => canExport.value && !query.role,
+    filename: `reporte_${props.resource === 'persons' ? 'personas' : 'usuarios'}`,
+    request: (_, signal) => identityService.export(props.resource, { ...query }, signal),
+    onDenied,
+});
+const { isExporting, exportError, isReportOpen, reportValues } = report;
+
+const { search, applySearch, clearSearch } = useListSearch(list, () => ({
+    department: selectedDepartment.value?.title ?? '',
+    role: selectedRole.value?.title ?? '',
+}));
+const { editor, openEditor, closeEditor, reloadEditor, onSaved } = useListEditor<IdentityTarget>({
+    canOpen: (target) =>
+        canWrite.value && (target.action !== 'password' || props.resource === 'users'),
+    reload: list.load,
+    savedMessage: 'El registro se guardó correctamente.',
+});
+
+const clear = () => {
+    departmentId.value = '';
+    roleId.value = '';
+    clearSearch({ department: '', role: '' });
+};
+
+onMounted(() => {
+    document.title = `Nexus | ${config.title}`;
+});
+</script>
+
+<template>
+    <RecordListPanel
+        v-model:search="search"
+        :title="config.title"
+        :title-id="`identity-${resource}-title`"
+        :total="total"
+        :is-loading="isLoading"
+        :error="error"
+        :show-count="canRead"
+        :has-active-filters="!!departmentId || !!roleId"
+        @search="applySearch"
+        @clear="clear"
+        @refresh="list.load"
+    >
+        <template #actions>
+            <VBtn
+                v-if="canExport"
+                variant="outlined"
+                :disabled="!!query.role"
+                :loading="isExporting"
+                @click="report.openReport()"
+            >
+                Exportar Excel
+            </VBtn>
+            <VBtn
+                v-if="canWrite"
+                prepend-icon="$plus"
+                color="primary"
+                @click="openEditor({ action: 'create' })"
+            >
+                {{ config.createLabel }}
+            </VBtn>
+        </template>
+        <template
+            v-if="
+                resource === 'persons' &&
+                canRead &&
+                (has(PERMISSIONS.DEPARTMENTS_READ) || has(PERMISSIONS.ROLES_READ))
+            "
+            #filters
+        >
+            <VCol
+                v-if="has(PERMISSIONS.DEPARTMENTS_READ)"
+                cols="12"
+                md="6"
+            >
+                <RemoteSelect
+                    v-model="departmentId"
+                    label="Filtrar por área"
+                    :state="options.departments"
+                    @search="filters.departments.updateSearch"
+                    @more="filters.departments.loadMore"
+                    @retry="filters.departments.retry"
+                />
+            </VCol>
+            <VCol
+                v-if="has(PERMISSIONS.ROLES_READ)"
+                cols="12"
+                md="6"
+            >
+                <RemoteSelect
+                    v-model="roleId"
+                    label="Filtrar por rol"
+                    :state="options.roles"
+                    @search="filters.roles.updateSearch"
+                    @more="filters.roles.loadMore"
+                    @retry="filters.roles.retry"
+                />
+            </VCol>
+        </template>
+        <template #messages>
+            <VAlert
+                v-if="query.role && canExport"
+                type="info"
+                class="mb-4"
+            >
+                Limpia el filtro de rol para exportar las responsabilidades por área.
+            </VAlert>
+        </template>
+        <IdentityTable
+            v-if="canRead"
+            :resource="resource"
+            :rows="rows"
+            :total="total"
+            :query="query"
+            :is-loading="isLoading"
+            :can-edit="canWrite"
+            @query="list.applyQuery"
+            @edit="openEditor({ action: 'edit', row: $event })"
+            @password="openEditor({ action: 'password', row: $event })"
+        />
+        <VAlert
+            v-else
+            type="info"
+        >
+            Tu cuenta no tiene permiso para consultar este listado.
+        </VAlert>
+    </RecordListPanel>
+    <ReportScopeDialog
+        v-if="isReportOpen"
+        kind="filtered"
+        :values="reportValues"
+        :is-submitting="isExporting"
+        :error="exportError"
+        @submit="report.exportReport"
+        @close="isReportOpen = false"
+    />
+    <PersonEditorPage
+        v-if="editor && resource === 'persons' && editor.action !== 'password'"
+        :target="editor"
+        :permissions="session.user.value!.permissions"
+        @saved="onSaved"
+        @close="closeEditor"
+        @reload="reloadEditor"
+        @denied="onDenied"
+    />
+    <UserEditorPage
+        v-if="editor && resource === 'users'"
+        :target="editor"
+        :permissions="session.user.value!.permissions"
+        @saved="onSaved"
+        @close="closeEditor"
+        @reload="reloadEditor"
+        @denied="onDenied"
+    />
+</template>

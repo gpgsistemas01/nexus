@@ -17,11 +17,16 @@ describe('validadores del CRUD de materiales', () => {
       'isActive',
       'maxUnitCost'
     ]);
-    expect(materialValidation).toMatchObject(materialEditValidation);
     expect(materialCreateValidation).toMatchObject(materialValidation);
     expect(materialCreateValidation.newStock).toBe(materialStockValidation.newStock);
     expect(materialCreateValidation.observations).toBe(materialStockValidation.observations);
     expect(materialStockValidation.supplierId).toBe(materialEditValidation.supplierId);
+  });
+
+  it('acepta costo cero en alta y exige costo positivo en edición', () => {
+    expect(materialCreateValidation.maxUnitCost(0)).toBeNull();
+    expect(materialEditValidation.maxUnitCost(0)).toEqual(expect.any(String));
+    expect(materialEditValidation.maxUnitCost('0.000001')).toBeNull();
   });
 
   it('requiere el proveedor asociado al ajustar el stock de un material', () => {

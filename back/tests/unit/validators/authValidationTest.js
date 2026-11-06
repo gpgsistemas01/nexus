@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { validationResult } from 'express-validator';
 import { loginValidation } from '../../../src/validators/forms/authValidations.js';
 import { validatePassword } from '../../../src/validators/fields/fieldsValidator.js';
-import { loginValidation as frontendLoginValidation, userValidation } from '../../../src/public/js/utils/validations/validators.js';
+import { loginValidation as frontendLoginValidation } from '../../../src/public/js/utils/validations/loginValidation.js';
+import { userValidation } from '../../../src/public/js/utils/validations/validators.js';
 import { validateFields } from '../../../src/public/js/utils/formUtils.js';
 
 describe('contrato de captura de login distinto de la política de altas (DP-VAL-002)', () => {

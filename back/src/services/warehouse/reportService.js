@@ -197,6 +197,7 @@ export const findWasteIssueReportRows = async function* ({
     clientId = '',
     departmentId = '',
     personId = '',
+    accesses = [],
     orderBy = 'referenceNumber',
     orderDir = 'desc'
 } = {}) {
@@ -212,6 +213,7 @@ export const findWasteIssueReportRows = async function* ({
             clientId,
             departmentId,
             personId,
+            accesses,
             orderBy,
             orderDir
         }

@@ -5,6 +5,7 @@ import {
     FORM_FIELD_LIMITS,
     ISO_DATE_TIME_PATTERN,
     PERSON_NAME_PATTERN,
+    PROJECT_NUMBER_PATTERN,
     TEXT_INPUT_PATTERN,
     UUID_V4_PATTERN
 } from '../../shared/constants/inputValidation.js';
@@ -114,7 +115,8 @@ export const validateProjectNumber = (fieldName) => {
     return requireValue(body(fieldName), errors.REQUIRED)
         .isString().withMessage(errors.INVALID_TYPE).bail()
         .trim()
-        .isLength({ max: FORM_FIELD_LIMITS.PROJECT_NUMBER }).withMessage(errors.TOO_LONG)
+        .isLength({ max: FORM_FIELD_LIMITS.PROJECT_NUMBER }).withMessage(errors.TOO_LONG).bail()
+        .matches(PROJECT_NUMBER_PATTERN).withMessage(errors.INVALID_FORMAT)
 }
 
 const hasValue = value => value !== undefined && value !== null && value !== '';
@@ -259,6 +261,23 @@ export const validateIssueProjectQuantityDetailsEdition =
                 const isSupplied = isSuppliedRaw === 'true' ? true
                     : isSuppliedRaw === 'false' ? false : isSuppliedRaw;
 
+                if (Object.hasOwn(detail, 'quantityToSupply') || Object.hasOwn(detail, 'expectedSuppliedQuantity')) {
+                    const rawSupply = detail.quantityToSupply;
+                    const supply = typeof rawSupply === 'number' || typeof rawSupply === 'string'
+                        ? Number(rawSupply) : NaN;
+                    if (!Number.isFinite(supply) || supply <= 0
+                        || !DECIMAL_INPUT_FORMAT.pattern.test(String(rawSupply))) {
+                        errors[detailId] ??= {};
+                        errors[detailId].quantityToSupply = errorMap.details.INVALID_FORMAT_QUANTITY;
+                    }
+                    if (typeof detail.expectedSuppliedQuantity !== 'number'
+                        || !Number.isFinite(detail.expectedSuppliedQuantity)
+                        || detail.expectedSuppliedQuantity < 0) {
+                        errors[detailId] ??= {};
+                        errors[detailId].expectedSuppliedQuantity = errorMap.details.INVALID_FORMAT_QUANTITY;
+                    }
+                }
+
                 if (rawQuantity === undefined || rawQuantity === null || rawQuantity === '') {
 
                     if (!errors[detailId]) errors[detailId] = {};
@@ -295,18 +314,11 @@ export const validateIssueProjectQuantityDetailsEdition =
         .customSanitizer(details => details.map(detail => ({
             ...detail,
             projectConvertedQuantity: Number(detail.projectConvertedQuantity),
+            ...(detail.quantityToSupply !== undefined && {
+                quantityToSupply: Number(detail.quantityToSupply)
+            }),
             isSupplied: detail.isSupplied === true || detail.isSupplied === 'true'
         })))
-;
-
-export const validateArrayOfUUIDs = ({ fieldName }) =>
-    body(fieldName)
-        .isArray({ min: 1 }).withMessage(errorMap[fieldName].REQUIRED)
-        .custom(
-            arr => Array.isArray(arr) && arr.every(
-                id => uuidV4Regex.test(id)
-            )
-        ).withMessage(errorMap[fieldName].INVALID_FORMAT)
 ;
 
 export const validateWeightCapture = ({

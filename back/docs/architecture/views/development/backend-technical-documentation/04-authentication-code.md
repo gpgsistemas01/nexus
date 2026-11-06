@@ -33,7 +33,7 @@ flowchart TB
 | routes/api · authApiRoute.js | `src/routes/api/authApiRoute.js` |
 | controllers/api · authController.js | `src/controllers/api/authController.js` |
 | middleware · authMiddleware.js | `src/middleware/authMiddleware.js` |
-| services · authService.js · jwtService.js · y colaboradores | `src/services/authService.js`<br/>`src/services/jwtService.js`<br/>`src/services/roleService.js` |
+| services · authService.js · jwtService.js | `src/services/authService.js`<br/>`src/services/jwtService.js` |
 | Colaboradores de dominio · userService.js | `src/services/admin/userService.js` |
 | Validadores · authValidations.js | `src/validators/forms/authValidations.js` |
 | baseRepository.js · getDb(tx) | `src/repository/baseRepository.js` |

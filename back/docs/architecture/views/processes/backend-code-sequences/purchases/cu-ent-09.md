@@ -25,7 +25,6 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `DTO` | control | [`goodsReceiptDTO.js`](../../../../../../src/dtos/goodsReceiptDTO.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
-| `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Invoice` | control | [`goodsReceiptInvoiceService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) |
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
 | `Formatter` | control | [`formattersUtils.js`](../../../../../../src/utils/formattersUtils.js) |
@@ -167,7 +166,6 @@ sequenceDiagram
     participant Helpers@{ "type": "control" } as goodsReceiptHelpers.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Inventory@{ "type": "control" } as movementService.js
-    participant Costs@{ "type": "control" } as supplierMaterialService.js
     participant Invoice@{ "type": "control" } as goodsReceiptInvoiceService.js
 
     participant FileBaseRepository@{ "type": "control" } as baseRepository.js
@@ -191,9 +189,6 @@ sequenceDiagram
             end
         end
         Prisma-->>Core: commit y compra actualizada
-        opt Se agregaron detalles
-            Core->>Costs: updateMaterialUnitCostIfHigher({ supplierId, materialId, conversionUnitCost })
-        end
         Core-->>Facade: updateGoodsReceipt(): Promise[GoodsReceipt]
     else Error de dominio o persistencia
         Core-->>Facade: error — rollback si falló la transacción

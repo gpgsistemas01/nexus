@@ -1,8 +1,4 @@
-export const ROLE_NAMES = Object.freeze({
-    SYSTEM_ADMIN: 'Administrador del sistema',
-    COORDINATOR: 'Coordinador',
-    DIRECTOR: 'Director'
-});
+
 
 export const ROLE_KEYS = Object.freeze({
     SYSTEM_ADMIN: 'system_admin',

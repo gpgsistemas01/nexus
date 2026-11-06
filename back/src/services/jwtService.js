@@ -6,18 +6,10 @@ const serviceLogger = createServiceLogger('jwtService');
 
 const JWT_SECRET_ACCESS = process.env.JWT_SECRET_ACCESS;
 const JWT_SECRET_REFRESH = process.env.JWT_SECRET_REFRESH;
-const JWT_SECRET_ONE_TIME = process.env.JWT_SECRET_ONE_TIME;
 
 export const generateAccessToken = (payload) => {
 
     return jwt.sign(payload, JWT_SECRET_ACCESS, { expiresIn: '1h' });
-}
-
-export const generateOneTimeToken = (id, purpose) => {
-
-    const payload = { id, purpose };
-
-    return jwt.sign(payload, JWT_SECRET_ONE_TIME, { expiresIn: '15m' });
 }
 
 export const generateRefreshToken = (payload) => {
@@ -43,5 +35,3 @@ export const verifyToken = (token, secretAccess) => {
 export const verifyRefreshToken = (token) => verifyToken(token, JWT_SECRET_REFRESH);
 
 export const verifyAccessToken = (token) => verifyToken(token, JWT_SECRET_ACCESS);
-
-export const verifyOneTimeToken = (token) => verifyToken(token, JWT_SECRET_ONE_TIME);

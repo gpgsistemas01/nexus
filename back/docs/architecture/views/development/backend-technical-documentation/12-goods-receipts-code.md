@@ -40,14 +40,22 @@ flowchart TB
 
 `goodsReceiptHelpers.js` conserva preparación y cálculos; `goodsReceiptTotalsService.js`
 concentra las escrituras de detalles y totales. Edición, corrección y cancelación
-bloquean la compra antes de consultar su estado. Los movimientos por diferencia y las
-actualizaciones de costos reciben el mismo `tx`; un fallo de auditoría o costo revierte
-también los efectos de inventario. Agregar detalles suma sólo líneas activas.
+bloquean la compra antes de consultar su estado. Los movimientos por diferencia y la
+auditoría reciben el mismo `tx`; un fallo revierte también los efectos de inventario.
+Compras guarda el costo por presentación y los importes del documento, pero no escribe
+`SupplierMaterial.maxUnitCost`: ese valor se administra desde Almacén. Alta, detalles
+nuevos, correcciones y cancelaciones no calculan máximos ni promedios de otras compras.
+Agregar detalles suma sólo líneas activas.
 La corrección reutiliza el material ya consultado para calcular importes, sin cargarlo
 otra vez. `updateManyAndReturn` entrega el detalle actualizado y una sola lectura de
 cantidades, importes y estados permite calcular los totales, incluso al cancelar la
 última línea. Al agregar detalles, las relaciones de respuesta se consultan una vez,
 después de actualizar los totales.
+
+Una compra totalmente cancelada conserva en el encabezado la suma histórica de sus
+partidas; los reportes excluyen documentos y detalles cancelados. No se necesita una
+migración para poner estos totales en cero ni recalcular costos de inventario: se
+conservaría menos información sin mejorar el cálculo operativo.
 
 ### Datos, resultados y efectos del módulo
 
@@ -84,3 +92,11 @@ Los reportes y la infraestructura transversal se localizan en el
 según el `type` fijado por su servicio específico. El contador anual y la compra
 se guardan con el mismo `tx`; las series son independientes y un error dentro
 de la transacción revierte también el incremento del contador.
+
+### Lectura para edición en Vue
+
+`goodsReceiptService` devuelve `observations` como campo del encabezado tanto
+en listado como por id, incluido `null` cuando no hay texto. `includeDetails`
+sólo controla la relación de partidas; no altera los campos del encabezado.
+La consulta por id recupera además los detalles para editar y conservar el
+documento completo, sin cambiar las reglas de escritura.

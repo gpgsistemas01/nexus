@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import XLSX from 'xlsx';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { readExcelReport } from '../../helpers/readExcelReport.js';
+import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
 const ids = {};
@@ -93,8 +94,10 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(response.body.data.map(receipt => receipt.id)).toEqual([receipts[resource].id]);
         expect(response.body.recordsFiltered).toBe(1);
         expect(response.body.data[0]).not.toHaveProperty('details');
+        expect(response.body.data[0].observations).toBeNull();
         const detail = await request(app).get(`${path(resource)}/${receipts[resource].id}`).expect(200);
         expect(detail.body.goodsReceipt.details.map(row => row.materialId)).toEqual([ids[resource]]);
+        expect(detail.body.goodsReceipt.observations).toBeNull();
         const other = resource === 'material' ? 'consumable' : 'material';
         await request(app).get(`${path(resource)}/${receipts[other].id}`).expect(404);
         await request(app).get(`${path(resource)}/${receipts.mixed.id}`).expect(404);
@@ -104,10 +107,23 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
 
     it.each(['material', 'consumable'])('permite editar una compra homogénea de %s', async resource => {
         const receipt = receipts[resource];
+        const beforeCounters = await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['CMA', 'CCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        });
         await request(app).patch(`${path(resource)}/${receipt.id}`).send({
             supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-07T00:00:00.000Z', observations: 'Contexto correcto', details: []
         }).expect(200);
         expect((await prisma.goodsReceipt.findUnique({ where: { id: receipt.id } })).observations).toBe('Contexto correcto');
+        const detail = await request(app).get(`${path(resource)}/${receipt.id}`).expect(200);
+        expect(detail.body.goodsReceipt.observations).toBe('Contexto correcto');
+        expect(detail.body.goodsReceipt.referenceNumber).toBe(receipt.referenceNumber);
+        const list = await request(app).get(path(resource)).query({ supplierId: ids.supplier }).expect(200);
+        const row = list.body.data.find(item => item.id === receipt.id);
+        expect(row.observations).toBe('Contexto correcto');
+        expect(row).not.toHaveProperty('details');
+        expect(await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['CMA', 'CCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        })).toEqual(beforeCounters);
     });
 
     it.each(['mixed', 'empty', 'consumable'])('rechaza editar %s desde materiales y conserva la cabecera', async key => {
@@ -133,6 +149,25 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
     const purchaseBody = resource => ({
         supplierId: ids.supplier, receivedById: ids.person, receptionDate: '2026-10-12T12:00:00.000Z',
         details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 10 }]
+    });
+
+    it.each(['material', 'consumable'])('comprar %s conserva el costo de almacén, incluso si aún no se capturó', async resource => {
+        const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
+        try {
+            for (const maxUnitCost of [10, null]) {
+                await prisma.supplierMaterial.update({ where, data: { maxUnitCost } });
+                const response = await request(app).post(path(resource)).send({
+                    ...purchaseBody(resource), maxUnitCost: 999,
+                    details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 100, maxUnitCost: 999 }]
+                }).expect(200);
+                const saved = await prisma.goodsReceiptDetail.findMany({ where: { goodsReceiptId: response.body.goodsReceipt.id } });
+                expect(Number(saved[0].costPerUnitType)).toBe(100);
+                const offer = await prisma.supplierMaterial.findUnique({ where });
+                expect(offer.maxUnitCost === null ? null : Number(offer.maxUnitCost)).toBe(maxUnitCost);
+            }
+        } finally {
+            await prisma.supplierMaterial.update({ where, data: { maxUnitCost: 10 } });
+        }
     });
     const getCounter = prefix => prisma.referenceNumberCounter.findUnique({
         where: { prefix_year: { prefix, year: new Date().getFullYear() } }
@@ -177,6 +212,37 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
         expect(await prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } })).toBe(beforeMovements);
     });
 
+    it.each(['material', 'consumable'])('PIEZA en %s rechaza altas/correcciones fraccionarias sin cambiar stock ni historia', async resource => {
+        await withPiecePresentation({ prisma, model: 'material', id: ids[resource] }, async () => {
+            const snapshot = () => prisma.$transaction([
+                prisma.supplierMaterial.findMany({ where: { supplierId: ids.supplier }, orderBy: { materialId: 'asc' } }),
+                prisma.goodsReceipt.findUnique({ where: { id: receipts[resource].id }, include: { details: true } }),
+                prisma.goodsReceipt.count({ where: { supplierId: ids.supplier } }),
+                prisma.inventoryMovement.count({ where: { goodsReceipt: { supplierId: ids.supplier } } }),
+                prisma.goodsReceiptDetailChange.count({ where: { goodsReceiptId: receipts[resource].id } })
+            ]);
+            const before = await snapshot();
+            const invalid = await request(app).post(path(resource)).send({
+                ...purchaseBody(resource), details: [{ materialId: ids[resource], quantity: 1.5, costPerUnitType: 1.25, presentation: { name: 'ROLLO' } }]
+            }).expect(409);
+            expect(invalid.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            const correction = await request(app).patch(`${path(resource)}/${receipts[resource].id}/details/${receipts[resource].details[0].id}/corrections`)
+                .send({ quantity: 1.5, costPerUnitType: 10 }).expect(409);
+            expect(correction.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            expect(await snapshot()).toEqual(before);
+
+            const response = await request(app).post(path(resource)).send({
+                ...purchaseBody(resource), details: [{ materialId: ids[resource], quantity: 2, costPerUnitType: 1.25 }]
+            }).expect(200);
+            const saved = await prisma.goodsReceipt.findUnique({ where: { id: response.body.goodsReceipt.id }, include: { details: true } });
+            expect(Number(saved.details[0].quantity)).toBe(2);
+            expect(Number(saved.details[0].costPerUnitType)).toBe(1.25);
+            expect(Number(saved.totalNetPurchaseAmount)).toBe(2.5);
+            expect(response.body.goodsReceipt.details[0].status).toBe('ACTIVE');
+            expect(response.body.goodsReceipt.details[0]).not.toHaveProperty('isCancelled');
+        });
+    });
+
     it('exporta compras a través del límite de lote y conserva fórmulas y resúmenes reales', async () => {
         const prefix = `RCB-${suffix}`;
         const rows = Array.from({ length: 251 }, (_, index) => ({
@@ -198,16 +264,14 @@ describe('compras con contexto coherente en cabecera y detalles', () => {
                 res.on('data', chunk => chunks.push(chunk));
                 res.on('end', () => callback(null, Buffer.concat(chunks)));
             }).expect(200);
-        const workbook = XLSX.read(response.body, { type: 'buffer' });
-        const sheet = workbook.Sheets['Compras materiales'];
-        const values = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const { sheet, rows: values } = await readExcelReport(response.body, 'Compras materiales');
         expect(values.filter(row => String(row[0]).startsWith(prefix))).toHaveLength(251);
         expect(new Set(values.filter(row => String(row[0]).startsWith(prefix)).map(row => row[0])).size).toBe(251);
-        expect(sheet.O252).toMatchObject({ f: 'I252*N252', v: 10 });
-        expect(sheet.P252).toMatchObject({ f: 'O252*1.16', v: 11.6 });
-        expect(sheet.B257.v).toBe(2510);
-        expect(sheet.D262.v).toBe(2510);
-        expect(sheet.E262.v).toBe(251);
+        expect(sheet.getCell('O252').value).toEqual({ formula: 'I252*N252', result: 10 });
+        expect(sheet.getCell('P252').value).toEqual({ formula: 'O252*1.16', result: 11.6 });
+        expect(sheet.getCell('B257').value).toBe(2510);
+        expect(sheet.getCell('D262').value).toBe(2510);
+        expect(sheet.getCell('E262').value).toBe(251);
     });
 
 });

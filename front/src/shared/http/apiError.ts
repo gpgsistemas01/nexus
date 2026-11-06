@@ -1,0 +1,80 @@
+import axios from 'axios';
+import { errorMessages, getErrorMessage } from '@nexus/api-messages';
+import { isRecord } from '../utils/isRecord.js';
+
+export class ApiError extends Error {
+    constructor(
+        message: string,
+        public status = 0,
+        public code = '',
+        public fieldErrors: Record<string, string> = {},
+        public meta: Record<string, unknown> = {},
+    ) {
+        super(message);
+        this.name = 'ApiError';
+    }
+}
+
+export const isFieldValidationError = (cause: unknown, fields: readonly string[]) =>
+    cause instanceof ApiError &&
+    [400, 422].includes(cause.status) &&
+    Object.keys(cause.fieldErrors).length > 0 &&
+    Object.keys(cause.fieldErrors).every((field) => fields.includes(field));
+
+const knownMessage = (data: Record<string, unknown>) =>
+    typeof data.code === 'string' && Object.hasOwn(errorMessages, data.code)
+        ? String(getErrorMessage(data))
+        : undefined;
+
+export const normalizeApiError = async (cause: unknown): Promise<ApiError> => {
+    if (cause instanceof ApiError) return cause;
+
+    if (!axios.isAxiosError(cause) || !cause.response) {
+        return new ApiError(
+            'No fue posible conectar. Revisa tu conexión e inténtalo de nuevo.',
+            0,
+            'NETWORK_ERROR',
+        );
+    }
+
+    const status = cause.response.status;
+    let data: unknown = cause.response.data;
+
+    if (data instanceof Blob) {
+        try {
+            data = JSON.parse(await data.text());
+        } catch {
+            data = null;
+        }
+    }
+
+    const body = isRecord(data) ? data : {};
+    const fields: Record<string, string> = {};
+
+    if (isRecord(body.errors)) {
+        for (const [field, detail] of Object.entries(body.errors)) {
+            if (!isRecord(detail)) continue;
+
+            const message = knownMessage(detail);
+            if (message) fields[field] = message;
+        }
+    }
+
+    const fallback =
+        status === 401
+            ? 'Tu sesión terminó. Vuelve a iniciar sesión.'
+            : status === 403
+              ? 'No tienes permiso para realizar esta operación.'
+              : status === 404 || status === 410
+                ? 'El registro o la consulta ya no están disponibles.'
+                : status === 429
+                  ? 'Demasiadas solicitudes. Espera antes de reintentar.'
+                  : 'No se pudo completar la operación. Inténtalo de nuevo.';
+    return new ApiError(
+        knownMessage(body) ?? fallback,
+        status,
+        typeof body.code === 'string' ? body.code : '',
+        fields,
+        isRecord(body.meta) ? body.meta : {},
+    );
+};

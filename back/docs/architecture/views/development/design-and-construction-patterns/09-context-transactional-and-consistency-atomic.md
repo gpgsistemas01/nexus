@@ -20,7 +20,7 @@ La prueba de integración debe demostrar tanto el efecto completo como el rollba
 
 **Identificador:** `DIA-PAT-TX-001`. **Pregunta:** ¿qué operaciones comparten `tx` y
 qué efecto queda después del commit? **Fuente:** `goodsReceiptService.createGoodsReceipt`,
-`referenceNumberService`, `inventory/movementService` y `supplierMaterialService`.
+`referenceNumberService` e `inventory/movementService`.
 Las flechas dentro de la transacción expresan coordinación en orden; su contorno indica
 el límite de atomicidad, no un proceso independiente.
 
@@ -31,16 +31,16 @@ flowchart TB
     subgraph transaction["Mismo tx · escrituras coordinadas"]
         reference["generateYearlyReferenceNumber<br/>recibe tx"] --> document["tx.goodsReceipt.create<br/>encabezado + createMany de detalles"]
         document --> movement["applyInventoryMovement<br/>recibe tx y detalles<br/>existencias + movimiento"]
-        movement --> costs["updateMaterialUnitCostIfHigher<br/>recibe el mismo tx"]
     end
-    costs --> commit["Resolver callback<br/>commit confirmado"]
+    movement --> commit["Resolver callback<br/>commit confirmado"]
     transaction -. error propagado .-> rollback["Rollback de escrituras<br/>sin resultado exitoso"]
     commit --> result["Devolver entrada al controller<br/>publicación posterior al éxito del servicio"]
 ```
 
 Las comprobaciones y la preparación anteriores a `$transaction` no quedan protegidas
-por su rollback. Las escrituras de costos de la compra sí participan en el mismo
-callback que documento, existencias y movimiento. Si fallan, se revierte la operación.
+por su rollback. Los importes documentales de la compra participan en el mismo
+callback que documento, existencias y movimiento. El costo máximo de almacén se
+administra por separado y no se recalcula al comprar, corregir o cancelar.
 Dentro del callback se usa `tx` directamente o se propaga a sus colaboradores.
 
 ## Protección de escrituras concurrentes

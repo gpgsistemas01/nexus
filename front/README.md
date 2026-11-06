@@ -1,0 +1,146 @@
+# Nexus · Frontend
+
+Cliente web de Nexus para inventario, compras, salidas y movimientos. Incluye
+catálogos, Personas, Usuarios, Clientes y Proveedores según los permisos de la
+cuenta. Utiliza Vue 3, TypeScript, Composition API y Vite.
+
+## Comandos para desarrolladores
+
+Consulta [Comandos para desarrollo](docs/development/00-commands.md) para iniciar
+el sistema, acceder desde el móvil, ejecutar pruebas, migraciones, capturas y
+publicaciones. La guía indica la carpeta de ejecución y las opciones de recuperación.
+
+## Inicio rápido
+
+Sigue los pasos en orden para iniciar Vue y la API en tu equipo. Ejecuta todos los
+comandos desde la **raíz del repositorio**, la carpeta que contiene `front/` y
+`back/`. Conserva ambas carpetas: Vue utiliza módulos públicos de `back/` al compilar.
+
+### 1. Comprobar las herramientas
+
+Necesitas Node.js y npm instalados, PostgreSQL funcionando y una base de desarrollo
+creada. Para ingresar también necesitas una cuenta de Nexus habilitada en esa base;
+solicítala al responsable del entorno si todavía no tienes una.
+
+```bash
+node --version
+npm --version
+```
+
+Usa Node 24 desde `24.15.0`, Node 22 desde `22.22.2` o Node 26 desde `26.12.1`,
+dentro de su rama. Los rangos vigentes están en los manifiestos de
+[front](package.json) y [back](../back/package.json).
+
+### 2. Instalar las dependencias
+
+```bash
+npm --prefix back ci --include=dev
+npm --prefix front ci --include=dev
+```
+
+Espera a que cada comando termine correctamente. La raíz no tiene `package.json`;
+`--prefix` indica en qué aplicación se ejecuta npm.
+
+### 3. Configurar la conexión y la sesión
+
+Crea **`back/.env`**, junto a `back/package.json`, con `NODE_ENV` de desarrollo,
+`DATABASE_URL` de tu base y los secretos independientes `JWT_SECRET_ACCESS`
+y `JWT_SECRET_REFRESH`. `PORT` es opcional y vale 3000.
+Si ya tienes el archivo configurado, conserva sus valores.
+
+La base, el usuario y la contraseña de PostgreSQL deben existir antes de continuar.
+Usa dos secretos distintos. Guarda esta configuración en `back/.env`; las variables
+`VITE_*` del frontend son públicas y no admiten estos secretos.
+
+Con la API en el puerto 3000, Vue funciona con su configuración predeterminada.
+Para otro puerto, prepara [front/.env.local](docs/development/01-getting-started.md#configurar-frontenvlocal-para-vue)
+y ajusta `BACKEND_PROXY_TARGET` al origen real de la API.
+
+### 4. Preparar la base y generar Prisma
+
+Para la primera preparación o si hay migraciones pendientes, comprueba que
+`back/.env` apunta a tu **base de desarrollo** y ejecuta:
+
+```bash
+npm --prefix back run db:migrate
+```
+
+Este comando aplica el esquema y genera el cliente Prisma. Si la base ya está
+actualizada y sólo falta regenerar ese cliente, usa `npm --prefix back run db:generate`.
+Estos comandos no crean una cuenta de Nexus.
+
+### 5. Iniciar la API en la primera terminal
+
+```bash
+npm --prefix back run dev
+```
+
+Espera el mensaje **Servidor escuchando en puerto 3000** y deja esa terminal
+abierta. Si cambiaste `PORT`, el mensaje mostrará ese otro puerto. Resuelve cualquier
+error de arranque antes de continuar.
+
+### 6. Iniciar Vue en una segunda terminal
+
+Abre otra terminal en la **misma raíz del repositorio** y ejecuta:
+
+```bash
+npm --prefix front run dev
+```
+
+Deja ambas terminales abiertas. Vite muestra la dirección del frontend y usa el
+puerto 5173; si está ocupado, informa del conflicto.
+
+### 7. Abrir e ingresar
+
+Abre **http://localhost:5173/inicio-sesion**, escribe las credenciales de tu cuenta
+y comprueba que se abre una página autorizada. Para detener el sistema, pulsa
+Ctrl+C en cada terminal.
+
+En los siguientes arranques, repite los pasos 5, 6 y 7. Si descargaste cambios de
+dependencias o del esquema, prepara primero lo que corresponda en los pasos 2 y 4.
+La [guía de inicio](docs/development/01-getting-started.md) amplía la configuración;
+el [diagnóstico por síntoma](docs/development/01-getting-started.md#diagnóstico-por-síntoma)
+explica los errores de imports, Prisma, puertos y proxy.
+
+## Comprobación y compilación
+
+Desde la raíz:
+
+```bash
+npm --prefix front run check
+```
+
+Este comando comprueba formato, ESLint, pruebas unitarias y compilación con tipos.
+Produce `front/dist/`; no ejecuta pruebas de navegador ni de sistema. Los comandos
+individuales están en [Comandos para desarrollo](docs/development/00-commands.md).
+El despliegue se prepara con la [guía de compilación y publicación](docs/development/03-build-and-deployment.md).
+
+## Documentación
+
+El [índice de documentación Vue](docs/index.md) permite localizar requisitos,
+reglas y excepciones, arquitectura, pruebas, manuales y procedimientos de publicación.
+
+Las fuentes documentales se versionan en `front/docs`. Sus herramientas y resultados
+permanecen fuera de `public/`, `dist/` y la imagen de producción.
+
+### Capturas y manuales por cuenta
+
+Estas herramientas son sólo para desarrollo local. Playwright y su Chromium se
+instalan en el equipo de desarrollo y quedan fuera de la imagen final de producción.
+
+Prepara `front/manual.accounts.local.json` y `front/.env.manual.local` con la
+[guía por cuenta](docs/governance/07-manual-accounts-and-files.md). Mantén la API
+funcionando; el comando inicia Vite si hace falta o reutiliza el que ya esté activo.
+Elige desde la raíz:
+
+| Resultado | Comando |
+| --- | --- |
+| Sólo capturas por cuenta | `npm --prefix front run docs:screenshots -- --all` |
+| Capturas y manuales Word/PDF por cuenta | `npm --prefix front run docs:manuals -- --all` |
+
+Ambos leen los mismos archivos locales y detectan áreas, roles y permisos al
+ingresar. Las cuentas sin usuario o sin contraseña se informan como omitidas y
+se continúa con las completas. Cada entrada del JSON identifica una cuenta y su
+carpeta de imágenes en
+`front/docs/user-manual/accounts/<cuenta>/images/`. Usa `--profile <id>` en lugar de `--all`
+para procesar una sola cuenta; `--help` muestra las opciones.

@@ -1,4 +1,4 @@
-import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock } from '../../../errors/inventory/stockError.js';
+import { GoodsIssueInexistentStock, GoodsIssueInsufficientStock, GoodsIssueMissingMaxUnitCost } from '../../../errors/inventory/stockError.js';
 import { buildStockKey } from '../../../utils/formattersUtils.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
 import { updateSupplierMaterialStocks } from '../../../repository/warehouse/stockUpdateRepository.js';
@@ -10,6 +10,7 @@ export const findSupplierMaterialsForStockMovement = ({ tx, where }) => tx.suppl
     select: {
         materialId: true,
         supplierId: true,
+        maxUnitCost: true,
         material: { select: { base: true, height: true, name: true } },
         supplier: { select: { tradeName: true } }
     }
@@ -35,6 +36,9 @@ export const updateSupplierMaterialStock = async ({
     const changes = Array.from(grouped, ([key, quantity]) => {
         const offer = supplierMaterialsByKey.get(key);
         if (!offer) throw new GoodsIssueInexistentStock(buildStockErrorMeta());
+        if (isIssue && !(Number(offer.maxUnitCost) > 0)) {
+            throw new GoodsIssueMissingMaxUnitCost(buildStockErrorMeta(offer));
+        }
 
         const quantityChange = isIssue ? -quantity : quantity;
         return {

@@ -1,4 +1,4 @@
-import { successCodeMessages } from '../../messages/codeMessages.js';
+import { successCodeMessages } from '../../shared/constants/apiSuccessCodes.js';
 import { errorMessages, successMessages } from '../../messages/messages.js';
 import { redirectWithFlash } from '../../utils/flashUtils.js';
 import { clearAuthCookies, setAuthCookies } from '../../utils/cookiesUtils.js';

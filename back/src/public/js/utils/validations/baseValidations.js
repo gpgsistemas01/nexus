@@ -117,12 +117,3 @@ export const includeUppercase = (value, fieldName) => {
 
     return null;
 };
-
-export const isNumberphone = (value) => {
-
-    const regex = /^(\+52\s?)?(\d{2,3}[- ]?\d{3}[- ]?\d{4})$/;
-
-    if (!regex.test(value)) return 'El teléfono es inválido';
-
-    return null;
-}

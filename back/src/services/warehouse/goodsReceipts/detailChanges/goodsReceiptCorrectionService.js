@@ -16,7 +16,6 @@ import {
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
 import { normalizeDecimal } from '../../../../shared/utils/numberUtils.js';
-import { recalculateMaterialUnitCosts } from '../../materials/supplierMaterialService.js';
 import { calculateGoodsReceiptDetail } from '../goodsReceiptHelpers.js';
 import { correctGoodsReceiptDetailAndTotals } from '../goodsReceiptTotalsService.js';
 import {
@@ -103,12 +102,6 @@ export const correctGoodsReceiptDetailLine = async ({
                 goodsReceiptId: id,
                 goodsReceiptDetailId: detailId,
                 changedById: userId
-            });
-
-            await recalculateMaterialUnitCosts({
-                tx,
-                supplierId: updatedReceipt.supplierId,
-                materialIds: [updatedDetail.materialId]
             });
 
             return {

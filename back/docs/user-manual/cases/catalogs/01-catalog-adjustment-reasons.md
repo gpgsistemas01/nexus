@@ -1,6 +1,6 @@
 # Motivos de ajuste
 
-**Propósito.** Consultar, crear y editar el catálogo de motivos de ajuste que configura los flujos del sistema.
+**Propósito.** Consultar, crear y editar el catálogo de motivos de ajuste que configura los flujos de Nexus.
 
 **Ruta en el menú:** **Menú principal → Catálogos auxiliares → Motivos de ajuste**.
 

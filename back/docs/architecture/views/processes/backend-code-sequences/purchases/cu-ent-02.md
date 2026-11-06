@@ -30,7 +30,6 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `DTO` | control | [`goodsReceiptDTO.js`](../../../../../../src/dtos/goodsReceiptDTO.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
-| `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Invoice` | control | [`goodsReceiptInvoiceService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
@@ -212,7 +211,6 @@ sequenceDiagram
     participant Core@{ "type": "control" } as goodsReceiptService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Inventory@{ "type": "control" } as movementService.js
-    participant Costs@{ "type": "control" } as supplierMaterialService.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
 
     Facade->>Core: createGoodsReceipt({ goodsReceiptDto, type: MATERIAL })
@@ -228,12 +226,11 @@ sequenceDiagram
             Core->>Inventory: applyInventoryMovement({ tx, movementType: ENTRY, details })
     Note over Inventory: Preparación y escrituras ampliadas en los detalles de inventario
             Note over Inventory,Prisma: applyInventoryMovement también actualiza stock con el mismo tx
-            Core->>Costs: updateMaterialUnitCostIfHigher({ tx, supplierId, details })
     end
         Prisma-->>Core: commit y compra creada
         Core-->>Facade: createGoodsReceipt(): Promise[GoodsReceipt]
     else Error de dominio o persistencia
-        Note over Core,Prisma: Documento, existencias, movimiento y costos comparten rollback
+        Note over Core,Prisma: Documento, existencias y movimiento comparten rollback
         Core-->>Facade: error — rollback si falló el callback transaccional
     end
     deactivate Core

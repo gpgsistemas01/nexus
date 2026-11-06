@@ -3,6 +3,7 @@ import { body } from 'express-validator';
 import { errorMap } from '../../messages/codeMessages.js';
 import {
     validatePositiveNumberOptional,
+    validatePositiveNumber,
     validateNumberRequiredWhenOtherPresent,
     validateNumber,
     validateText,
@@ -29,7 +30,7 @@ const materialDataValidation = [
 
 export const materialEditValidation = [
     ...materialDataValidation,
-    validateNumber('maxUnitCost', { format: MONEY_INPUT_FORMAT }),
+    validatePositiveNumber('maxUnitCost', { format: MONEY_INPUT_FORMAT }),
     validateRecordVersion(),
     validateRecordVersion('expectedMaterialVersion')
 ];

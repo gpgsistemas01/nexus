@@ -1,0 +1,61 @@
+{
+    "extends": "@vue/tsconfig/tsconfig.dom.json",
+    "include": [
+        "env.d.ts",
+        "src/**/*.ts",
+        "src/**/*.vue",
+        "../back/src/public/js/utils/validations/loginValidation.js",
+        "../back/src/public/js/utils/validations/baseValidations.js",
+        "../back/src/public/js/constants/apiMessages.js",
+        "../back/src/shared/constants/auth.js",
+        "../back/src/shared/constants/inputValidation.js",
+        "../back/src/shared/messages/goodsReceiptMessages.js",
+        "../back/src/public/js/utils/validations/validators.js",
+        "../back/src/public/js/utils/validations/fieldValidations.js",
+        "../back/src/shared/constants/inventory.js",
+        "../back/src/shared/constants/permissions.js",
+        "../back/src/shared/inventory/wasteMeasurements.js",
+        "../back/src/shared/validation/weightValidations.js",
+        "../back/src/shared/utils/numberUtils.js",
+        "../back/src/shared/constants/catalogs.js",
+        "../back/src/shared/inventory/goodsReceiptCalculations.js",
+        "../back/src/public/js/utils/timeZone.js",
+        "../back/src/shared/constants/apiSuccessCodes.js",
+        "../back/src/public/js/application/warehouse/issues/issueHeaderRules.js",
+        "../back/src/public/js/constants/fulfillmentStatuses.js",
+        "../back/src/public/js/utils/formatters.js"
+    ],
+    "compilerOptions": {
+        "composite": true,
+        "noEmit": true,
+        "strict": true,
+        "allowJs": true,
+        "checkJs": false,
+        "paths": {
+            "@nexus/piece-quantity": ["../back/src/shared/inventory/pieceQuantity.js"],
+            "@nexus/input-validation": ["../back/src/shared/constants/inputValidation.js"],
+            "@nexus/login-validation": [
+                "../back/src/public/js/utils/validations/loginValidation.js"
+            ],
+            "@nexus/api-messages": ["../back/src/public/js/constants/apiMessages.js"],
+            "@nexus/waste-measurements": ["../back/src/shared/inventory/wasteMeasurements.js"],
+            "@nexus/permissions": ["../back/src/shared/constants/permissions.js"],
+            "@nexus/catalogs": ["../back/src/shared/constants/catalogs.js"],
+            "@nexus/form-validation": ["../back/src/public/js/utils/validations/validators.js"],
+            "@nexus/purchase-calculations": [
+                "../back/src/shared/inventory/goodsReceiptCalculations.js"
+            ],
+            "@nexus/date-time": ["../back/src/public/js/utils/timeZone.js"],
+            "@nexus/api-success-codes": ["../back/src/shared/constants/apiSuccessCodes.js"],
+            "@nexus/issue-header-rules": [
+                "../back/src/public/js/application/warehouse/issues/issueHeaderRules.js"
+            ],
+            "@nexus/issue-statuses": ["../back/src/public/js/constants/fulfillmentStatuses.js"],
+            "@nexus/numbers": ["../back/src/shared/utils/numberUtils.js"]
+        },
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "types": ["vite/client"],
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo"
+    }
+}

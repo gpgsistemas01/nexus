@@ -6,6 +6,21 @@ servicio. Un DTO no contiene autorización ni reemplaza validadores o reglas de 
 Se reutiliza uno existente cuando dos endpoints aceptan el mismo contrato; no se fuerza
 si una mutación especializada necesita campos o semántica diferentes.
 
+La [regla de cantidades PIEZA](../../../../../src/shared/inventory/pieceQuantity.js)
+es una función pública compartida con Vue. Los servicios reutilizan
+`assertPieceQuantity` después de leer la presentación del artículo; el DTO no
+acepta una presentación enviada para sustituir esa consulta. La comprobación
+se ejecuta dentro de los servicios y las transacciones existentes.
+Los [contratos HTTP](../../../openapi/api-contract.md) pertenecen al backend;
+los [mappers de Vue](../../../../../../front/docs/architecture/contracts/client-contracts.md)
+documentan la selección de campos del formulario.
+
+En catálogos, el servicio resuelve primero la configuración confiable y llama al
+DTO puro `createCatalogEntryDto` para seleccionar y normalizar campos propios;
+el DTO no conoce HTTP ni Prisma. La normalización no sustituye la validación del
+middleware ni las invariantes del servicio. El [estándar de seguridad](../../../coding-standards/09-errors-security-audit-and-logging.md#qué-significa-sanitizar-en-este-proyecto)
+distingue además el escape de salida y la sanitización de contenido HTML.
+
 La autorización se construye como una tabla inmutable: una clave de `PERMISSIONS` apunta
 a roles y departamentos en `AUTHORIZATION_POLICIES`. `createPolicy` congela la
 configuración y `getGrantedPermissions` la evalúa para los accesos de la sesión. Es una
@@ -83,18 +98,20 @@ orden temporal de todas las peticiones.
 
 ```mermaid
 flowchart TB
-    policy["permissions.js<br/>PERMISSIONS + AUTHORIZATION_POLICIES<br/>createPolicy: roles y departamentos inmutables"] --> server["getAuthorizationPolicy(permission)<br/>createAuthorizeMiddleware"]
-    accesses["getLoggedUser<br/>usuario vigente + user.accesses"] --> server
-    server --> test{"¿Algún acceso satisface<br/>rol Y departamento de la política?"}
-    test -->|Sí| next["Establecer req.user y ejecutar next<br/>controller autorizado"]
-    test -->|No| deny["Rechazar acceso<br/>respuesta API o redirección web"]
-    policy --> granted["getGrantedPermissions(accesses)<br/>permisos calculados del usuario"]
+    policy["constants/permissions.js<br/>AUTHORIZATION_POLICIES<br/>roles y departamentos inmutables"] --> granted["getGrantedPermissions(accesses)<br/>rol Y departamento de un mismo acceso"]
+    accesses["getLoggedUser<br/>usuario y accesos vigentes de base de datos"]
     accesses --> granted
-    granted --> presentation["EJS / UI<br/>mostrar acciones permitidas"]
+    granted --> current["loadAuthenticatedUser<br/>req.user.permissions"]
+    current --> server["createAuthorizeMiddleware(permission)<br/>comprobar permiso de la ruta"]
+    server --> test{"¿El permiso pertenece<br/>a req.user.permissions?"}
+    test -->|Sí| next["Ejecutar next<br/>controller autorizado"]
+    test -->|No| deny["Rechazar acceso<br/>respuesta API o redirección web"]
+    current --> presentation["UI<br/>mostrar acciones permitidas"]
 ```
 
-La ruta fija el permiso de la operación. El middleware consulta la política y vuelve a
-comprobar los accesos del usuario vigente; no autoriza por la visibilidad del botón ni
-confía únicamente en una lista enviada al navegador. El mismo registro alimenta
-`getGrantedPermissions`, evitando mantener una segunda definición de roles y áreas.
+La ruta fija el permiso de la operación. Al cargar al usuario vigente, el servidor
+calcula sus permisos con `getGrantedPermissions` y el registro de políticas.
+El middleware comprueba ese resultado en `req.user.permissions`; la presentación
+utiliza los permisos obtenidos por la sesión. El mismo registro conserva la
+definición de roles y áreas para ambos consumidores.
 El resultado es política declarativa evaluada por funciones comunes, sin jerarquía GoF.

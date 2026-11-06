@@ -1,4 +1,11 @@
 import { AppError } from "../AppError.js";
+import { PIECE_QUANTITY_MESSAGE } from '../../shared/inventory/pieceQuantity.js';
+
+export class InventoryPieceQuantityConflict extends AppError {
+    constructor() {
+        super(PIECE_QUANTITY_MESSAGE, 'INVENTORY_PIECE_QUANTITY_REQUIRED', 409);
+    }
+}
 
 export class GoodsIssueInsufficientStock extends AppError {
 
@@ -62,8 +69,10 @@ export class GoodsIssueInexistentStock extends AppError {
 export class GoodsIssueMissingMaxUnitCost extends AppError {
 
     constructor ({ materialName, height, base, supplierName }) {
+        const dimensions = base != null && height != null ? ` (${ base } x ${ height })` : '';
+        const supplier = supplierName ? `, proveedor: ${ supplierName }` : '';
         super(
-            `No se puede realizar la salida porque el material no tiene costo unitario máximo configurado: ${ materialName } (${ base } x ${ height }) y proveedor: ${ supplierName }`,
+            `Configure un costo unitario máximo mayor que cero en Almacén antes de usar: ${ materialName }${ dimensions }${ supplier }.`,
             'GOODS_ISSUE_MISSING_MAX_UNIT_COST',
             409
         );

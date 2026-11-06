@@ -7,6 +7,7 @@ import { ROLE_KEYS } from '../../../src/constants/roles.js';
 describe('políticas funcionales de acceso', () => {
     const operationalDepartments = [
         DEPARTMENT_KEYS.PRINTING,
+        DEPARTMENT_KEYS.ROUTER,
         DEPARTMENT_KEYS.WORKSHOP_3D,
         DEPARTMENT_KEYS.PT_TRAFFIC,
         DEPARTMENT_KEYS.INSTALLATIONS,
@@ -86,16 +87,29 @@ describe('políticas funcionales de acceso', () => {
             [{
                 roleKey: ROLE_KEYS.COORDINATOR,
                 departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+            }],
+            [{
+                roleKey: ROLE_KEYS.AUXILIARY,
+                departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
             }]
         ])('concede consulta de todas las salidas por política: %o', (access) => {
-            expect(hasDataScope([access], DATA_SCOPES.GOODS_ISSUES_READ_ALL)).toBe(true);
+            expect(hasDataScope([access], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)).toBe(true);
         });
 
-        it('no amplía la consulta de salidas a coordinadores de otras áreas', () => {
-            expect(hasDataScope(
-                [{ roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.PRINTING }],
-                DATA_SCOPES.GOODS_ISSUES_READ_ALL
-            )).toBe(false);
+        it.each(operationalDepartments.flatMap(department => [ROLE_KEYS.COORDINATOR, ROLE_KEYS.OPERATOR, ROLE_KEYS.AUXILIARY].map(role => [department, role])))(
+            'limita las salidas a las áreas asignadas para %s / %s', (departmentKey, roleKey) => {
+                expect(hasDataScope(
+                    [{ roleKey, departmentKey }],
+                    DATA_SCOPES.ISSUES_ALL_DEPARTMENTS
+                )).toBe(false);
+            }
+        );
+
+        it('no combina un auxiliar operativo con una asignación no autorizada de Almacén', () => {
+            expect(hasDataScope([
+                { roleKey: ROLE_KEYS.AUXILIARY, departmentKey: DEPARTMENT_KEYS.PRINTING },
+                { roleKey: ROLE_KEYS.SALES_ADVISOR, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }
+            ], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)).toBe(false);
         });
 
         it('deriva el contexto informativo desde las asignaciones', () => {
@@ -167,7 +181,8 @@ describe('políticas funcionales de acceso', () => {
         for (const permission of [
             PERMISSIONS.MATERIALS_ADJUST_STOCK, PERMISSIONS.WASTES_ADJUST_STOCK,
             PERMISSIONS.CATALOGS_MANAGE, PERMISSIONS.USERS_MANAGE,
-            PERMISSIONS.MOVEMENTS_READ, PERMISSIONS.SUPPLIERS_UPDATE
+            PERMISSIONS.MOVEMENTS_READ, PERMISSIONS.SUPPLIERS_UPDATE,
+            PERMISSIONS.CLIENTS_PAGE_VIEW, PERMISSIONS.SUPPLIERS_PAGE_VIEW
         ]) {
             expect(permissions.includes(permission)).toBe(isSystemAdmin);
         }
@@ -192,15 +207,19 @@ describe('políticas funcionales de acceso', () => {
         expect(permissions).not.toContain(PERMISSIONS.MATERIALS_ADJUST_STOCK);
     });
 
-    it('permite al personal de almacén abrir las consultas de clientes y proveedores', () => {
-        const permissions = getGrantedPermissions([{
-            roleKey: ROLE_KEYS.WAREHOUSE_KEEPER,
-            departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
-        }]);
+    it.each([ROLE_KEYS.WAREHOUSE_KEEPER, ROLE_KEYS.AUXILIARY, ROLE_KEYS.COORDINATOR])(
+        'conserva altas contextuales para Almacén con rol %s sin conceder páginas independientes', roleKey => {
+            const permissions = getGrantedPermissions([{
+                roleKey,
+                departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY
+            }]);
 
-        expect(permissions).toEqual(expect.arrayContaining([
-            PERMISSIONS.CLIENTS_PAGE_VIEW,
-            PERMISSIONS.SUPPLIERS_PAGE_VIEW
-        ]));
-    });
+            expect(permissions).toEqual(expect.arrayContaining([
+                PERMISSIONS.CLIENTS_READ, PERMISSIONS.CLIENTS_CREATE,
+                PERMISSIONS.SUPPLIERS_READ, PERMISSIONS.SUPPLIERS_MANAGE
+            ]));
+            expect(permissions).not.toContain(PERMISSIONS.CLIENTS_PAGE_VIEW);
+            expect(permissions).not.toContain(PERMISSIONS.SUPPLIERS_PAGE_VIEW);
+        }
+    );
 });

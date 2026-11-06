@@ -7,7 +7,7 @@ describe('existencias de la relación material–proveedor', () => {
     const balances = await updateSupplierMaterialStock({
       tx: { $queryRaw: queryRaw }, movementType: 'ISSUE',
       grouped: new Map([['material:supplier', 1]]),
-      supplierMaterialsByKey: new Map([['material:supplier', { materialId: 'material', supplierId: 'supplier', material: { base: null, height: null } }]])
+      supplierMaterialsByKey: new Map([['material:supplier', { materialId: 'material', supplierId: 'supplier', maxUnitCost: 10, material: { base: null, height: null } }]])
     });
     expect(balances.get('material:supplier')).toEqual({ previousStock: 1, newStock: 0 });
     expect(queryRaw.mock.calls[0][0].values).toEqual(['material', 'supplier', -1, -1]);
@@ -17,7 +17,16 @@ describe('existencias de la relación material–proveedor', () => {
     await expect(updateSupplierMaterialStock({
       tx: { $queryRaw: vi.fn().mockResolvedValue([]) }, movementType: 'ISSUE',
       grouped: new Map([['material:supplier', 4]]),
-      supplierMaterialsByKey: new Map([['material:supplier', { materialId: 'material', supplierId: 'supplier', material: { name: 'Lona', base: 1.5, height: 20 } }]])
+      supplierMaterialsByKey: new Map([['material:supplier', { materialId: 'material', supplierId: 'supplier', maxUnitCost: 10, material: { name: 'Lona', base: 1.5, height: 20 } }]])
     })).rejects.toMatchObject({ code: 'GOODS_ISSUE_INSUFFICIENT_STOCK', statusCode: 409, meta: { materialId: 'material', supplierId: 'supplier', requestedQuantity: 4 } });
+  });
+
+  it.each([null, 0])('rechaza surtir cuando el costo actual de almacén es %j sin cambiar stock', async maxUnitCost => {
+    const queryRaw = vi.fn();
+    await expect(updateSupplierMaterialStock({
+      tx: { $queryRaw: queryRaw }, movementType: 'ISSUE', grouped: new Map([['material:supplier', 1]]),
+      supplierMaterialsByKey: new Map([['material:supplier', { materialId: 'material', supplierId: 'supplier', maxUnitCost, material: { name: 'Lona' } }]])
+    })).rejects.toMatchObject({ code: 'GOODS_ISSUE_MISSING_MAX_UNIT_COST' });
+    expect(queryRaw).not.toHaveBeenCalled();
   });
 });

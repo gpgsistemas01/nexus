@@ -1,5 +1,6 @@
 import { findClientReportRows } from "../../../services/sales/reportService.js";
 import { sendExcelReport } from "../../../utils/reportExcelUtils.js";
+import { buildClientReportData } from '../../../utils/reports/salesReportExcel.js';
 import { getDataTableOrder, getDataTableSearch } from "../../../utils/requestQueryUtils.js";
 
 const CLIENT_SHEET_NAME = 'Clientes';
@@ -20,14 +21,9 @@ export const exportClientReport = async (req, res) => {
         orderDir
     });
 
-    const data = async function* () {
-        yield ['Nombre'];
-        for await (const row of rows) yield [row.name];
-    };
-
     return sendExcelReport({
         res,
-        data: data(),
+        data: buildClientReportData(rows),
         sheetName: CLIENT_SHEET_NAME,
         filename: CLIENT_FILENAME
     });

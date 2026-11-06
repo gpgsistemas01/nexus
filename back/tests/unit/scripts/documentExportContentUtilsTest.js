@@ -8,10 +8,40 @@ import {
     externalDocumentLinkLabel,
     getHeadingTitle,
     prepareManualEntry,
-    prepareManualImages
+    prepareManualImages,
+    prepareSectionEntry
 } from '../../../scripts/documentExportContentUtils.js';
 
 describe('documentExportContentUtils', () => {
+    it.each(['\n', '\r\n'])('limita la entrada temática a título y datos generales con saltos %j', (newline) => {
+        const content = [
+            '# Documentación del frontend Vue',
+            '',
+            '## Datos generales del documento',
+            '',
+            '| Versión | Sistema | Estado | Fecha | Responsable |',
+            '| --- | --- | --- | --- | --- |',
+            '| 1.9 | 1.0.0 | En revisión | 2026-10-30 | Equipo Nexus |',
+            '',
+            '## Organización de toda la colección',
+            'Contenido ajeno a la sección seleccionada.'
+        ].join(newline);
+
+        const entry = prepareSectionEntry(content, 'Arquitectura y diseño del frontend Vue');
+
+        expect(entry).toMatch(/^# Arquitectura y diseño del frontend Vue\n/);
+        expect(entry).toContain('## Datos generales del documento');
+        expect(entry).toContain('| 1.9 | 1.0.0 | En revisión | 2026-10-30 | Equipo Nexus |');
+        expect(entry).not.toContain('Organización de toda la colección');
+        expect(entry).not.toContain('Contenido ajeno');
+        expect(entry).not.toContain('\r');
+    });
+
+    it('rechaza una entrada temática sin metadatos para no publicar una portada incompleta', () => {
+        expect(() => prepareSectionEntry('# Documento\n\n## Propósito\nTexto.', 'Arquitectura'))
+            .toThrow('La entrada temática no contiene datos generales del documento.');
+    });
+
     it('genera anclas compatibles con marcadores de documentos', () => {
         const anchor = documentExportAnchor(
             'docs/user-manual/error-messages.md',

@@ -13,6 +13,4 @@
 | Postcondiciones (éxito y fallo) | 1. **Éxito:** El nombre y stock mínimo compartidos se reflejan en todas las ofertas del material; el costo máximo y el estado cambian sólo en la oferta seleccionada.<br>2. **Éxito al desactivar:** la oferta conserva la identidad del material, relaciones, stock e historia; queda excluida de operaciones nuevas, pero los detalles de salidas ya comprometidos pueden terminar de surtirse.<br>3. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
 | Requisitos relacionados | `RF-CAT-007`, `RN-023`, `RN-024`, `RN-027`, `RN-030` a `RN-032`. |
 
-Para material de Rollo, el mismo formulario permite mantener el peso predeterminado del
-cono y el peso total del rollo completo por proveedor. Los datos se consultan en altas
-de merma; su modificación no cambia existencias ni mermas ya registradas.
+Los pesos de referencia de la oferta son históricos y se conservan en esta edición.

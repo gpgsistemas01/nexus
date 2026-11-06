@@ -32,6 +32,17 @@ export class WasteIssueWasteUnavailableConflict extends AppError {
     }
 }
 
+export class WasteIssueMissingMaxUnitCost extends AppError {
+    constructor({ materialName }) {
+        super(
+            `Configure un costo unitario máximo mayor que cero en Almacén antes de usar la merma: ${ materialName }.`,
+            errorMap.wasteIssue.MISSING_MAX_UNIT_COST,
+            409
+        );
+        this.meta = { materialName };
+    }
+}
+
 export class WasteIssueFulfillmentStatusNotFound extends AppError {
     constructor() {
         super('No se encontraron los estados de surtido requeridos.', errorMap.wasteIssue.FULFILLMENT_STATUS_NOT_FOUND, 500);

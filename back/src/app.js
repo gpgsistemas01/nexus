@@ -24,6 +24,7 @@ import { normalizeDatabaseError } from './errors/databaseError.js';
 import { appConfig } from './config/appConfig.js';
 import { getAuthTokenInfo } from './middleware/authMiddleware.js';
 import { auditWrites } from './middleware/auditMiddleware.js';
+import { serializeScriptData } from './utils/scriptDataUtils.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -37,6 +38,7 @@ const uploadRoute = '/upload';
 
 app.set('views', viewsDir);
 app.set('view engine', 'ejs');
+app.locals.serializeScriptData = serializeScriptData;
 
 app.use(expressEjsLayouts);
 app.set('layout', 'layout/base');

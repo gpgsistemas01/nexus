@@ -14,6 +14,10 @@ esta interfaz.
 | --- | --- |
 | Validar todos los paquetes sin generar archivos | `npm run docs:export -- --check` |
 | Validar un paquete | `npm run docs:export -- <paquete> --check` |
+| Validar fuentes del manual Vue sin exigir capturas locales | `npm run docs:export -- manual-vue manual-usuario --check-sources` |
+| Validar sólo la documentación Vue | `npm run docs:export -- arquitectura frontend-vue --check` |
+| Publicar las fuentes Vue en DOCX y PDF | `npm run docs:export -- arquitectura frontend-vue ambos` |
+| Publicar sólo el contrato API en DOCX y PDF, junto con OpenAPI | `npm run docs:export -- arquitectura contrato-api ambos` |
 | Generar toda la entrega en DOCX y PDF | `npm run docs:export` |
 | Generar un paquete y formato concretos | `npm run docs:export -- <paquete> <docx\|pdf\|ambos>` |
 
@@ -47,6 +51,11 @@ admitidos son `docx`, `pdf` y `ambos`; `pdf` y
 intención de forma explícita. Markdown permanece como fuente navegable y por eso no se genera una
 copia HTML equivalente.
 
+`--check` exige las imágenes referenciadas. `--check-sources` valida fuentes,
+enlaces y declaraciones de imagen sin exigir los PNG generados por separado;
+es un modo de comprobación que no publica archivos. La exportación normal
+siempre exige las imágenes de la publicación seleccionada.
+
 Los manuales se dividen por los destinos visibles del menú: cada inventario, compra y salida conserva su contexto de materiales, consumibles o mermas. Las colecciones técnicas conservan su organización por grupo funcional. Las
 capturas de consultas y exportaciones se incluyen en el grupo del caso de uso al que dan evidencia;
 no se genera un grupo genérico de reportes.
@@ -56,6 +65,19 @@ genera el contrato autocontenido `build/docs/openapi/openapi.json`. Se entrega s
 del DOCX o PDF porque está destinado a validadores, generadores de clientes y
 visualizadores; dividirlo por formato de respuesta no aporta documentos adicionales al
 lector.
+
+## Mantenimiento del contrato API
+
+`npm run docs:check` comprueba referencias, IDs, grupos, parámetros, seguridad y
+respuestas OpenAPI; compara las operaciones con el mapa de rutas.
+`npm run docs:api:lint` añade las reglas recomendadas de Redocly y
+`npm run docs:api:bundle` genera el JSON autocontenido. La correspondencia con los
+datos reales se verifica con validadores, DTO, controladores y pruebas.
+
+Al cambiar una operación, actualice su definición en `docs/architecture/openapi/`,
+los esquemas reutilizados y las pruebas relacionadas. El
+[contrato HTTP](../../architecture/openapi/api-contract.md) mantiene las reglas
+compartidas de consumo.
 
 ## Capturas del manual
 
@@ -79,3 +101,16 @@ desde un punto y la preparación de las sesiones se detallan en
 [Actualizar las capturas del manual](08-update-the-screenshots-of-the-manual.md#reanudación-y-capturas-selectivas).
 `--missing`, `--fresh`, la selección por identificador y la reanudación desde un punto son
 alternativas excluyentes.
+
+## Fuentes y publicación propias de Vue
+
+El frontend conserva documentación completa en `front/docs`, incluida su
+especificación, casos, estándar, plan de pruebas y modelos generales/aplicados de
+patrones. Desde la raíz se valida con `npm --prefix front run docs:check` y se
+publica con `npm --prefix front run docs:export -- ambos`.
+Una selección exclusiva `arquitectura frontend-vue` escribe DOCX/PDF y caché en
+`front/build/docs`. Las demás selecciones y publicaciones combinadas conservan
+`back/build/docs`. Compartir el motor no mueve ni elimina fuentes del backend.
+Los comandos frontend comprueban además que la referencia generada corresponda
+al código; su [guía propia](../../../../front/docs/governance/02-generation-and-publication.md)
+explica herramientas, formatos y exclusión de producción.

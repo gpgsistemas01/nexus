@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { consumableValidation, materialValidation } from '../../../src/validators/forms/materialValidations.js';
 import { validate } from '../../../src/middleware/validatorMiddleware.js';
 
@@ -89,6 +90,22 @@ describe('registro de materiales con y sin medidas', () => {
     expect(Number(saved.material.height)).toBe(3);
     expect(Number(saved.currentStock)).toBe(7);
     expect(Number(saved.convertedQuantity)).toBe(42);
+  });
+
+  it.each(['materials', 'consumables'])('PIEZA en %s rechaza stock inicial y mínimo fraccionarios sin crear artículo ni ajuste', async resource => {
+    await withPiecePresentation({ prisma }, async presentationId => {
+      const snapshot = () => prisma.$transaction([
+        prisma.material.count({ where: { supplierMaterials: { some: { supplierId: ids.supplier } } } }),
+        prisma.supplierMaterial.count({ where: { supplierId: ids.supplier } }),
+        prisma.stockAdjustment.count(), prisma.inventoryMovement.count()
+      ]);
+      const before = await snapshot();
+      for (const [field, value] of [['newStock', 1.5], ['minStock', 0.5]]) {
+        const response = await request(app).post(`/${resource}`).send({ ...body(`piece-${field}`), presentationId, [field]: value }).expect(409);
+        expect(response.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+        expect(await snapshot()).toEqual(before);
+      }
+    });
   });
 
   it('convierte la captura y persiste stock cero, dos decimales de mínimo y seis de costo', async () => {

@@ -7,7 +7,7 @@ Nexus es una aplicación web de control operativo de materiales, consumibles y m
 
 ## Entender las responsabilidades
 
-| Parte del sistema | Responsabilidad | Qué revisar al cambiarla |
+| Parte de Nexus | Responsabilidad | Qué revisar al cambiarla |
 | --- | --- | --- |
 | Rutas web y controladores web | Autorizar la página y preparar sus datos para las plantillas EJS | Menú, permiso de página, contexto y composición de la pantalla |
 | Página y componentes del navegador | Mostrar datos, recoger entradas y coordinar formularios y peticiones | Estado local, callbacks, controles compartidos y presentación de errores |

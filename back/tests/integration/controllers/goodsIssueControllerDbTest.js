@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
 import { resolveDatabaseUrl } from '../../../src/lib/databaseUrl.js';
 
@@ -145,6 +146,25 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
                 maxUnitCost: 10, fulfillmentStatusId: details[0].fulfillmentStatusId
             })) }
         } });
+    });
+
+    it.each(['material', 'consumable'])('rechaza %s sin costo y no confía en el costo enviado', async resource => {
+        const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
+        const beforeCount = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
+        try {
+            for (const maxUnitCost of [null, 0]) {
+                await prisma.supplierMaterial.update({ where, data: { maxUnitCost } });
+                const before = await prisma.supplierMaterial.findUnique({ where });
+                const response = await request(app).post(issuePath(resource)).send({
+                    ...header(), details: [{ ...detail(resource), maxUnitCost: 999 }]
+                }).expect(409);
+                expect(response.body.code).toBe('GOODS_ISSUE_MISSING_MAX_UNIT_COST');
+                expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(beforeCount);
+                expect(await prisma.supplierMaterial.findUnique({ where })).toEqual(before);
+            }
+        } finally {
+            await prisma.supplierMaterial.update({ where, data: { maxUnitCost: 10 } });
+        }
     });
 
     afterAll(cleanCreatedRecords);
@@ -347,6 +367,9 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
     it.each(['material', 'consumable'])('permite editar, surtir y devolver dentro de %s', async inventoryResource => {
         const created = await createIssue(inventoryResource).expect(200);
         const issue = created.body.goodsIssue;
+        const beforeCounters = await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['SMA', 'SCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        });
         const edited = await request(app).patch(`${issuePath(inventoryResource)}/${issue.id}`)
             .send({ ...header(), observations: 'Editada en su contexto', details: [detail(inventoryResource)] }).expect(200);
         const detailId = edited.body.goodsIssue.details[0].id;
@@ -363,7 +386,54 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
         expect(Number(persisted.suppliedQuantity)).toBe(2);
         expect(Number(persisted.returnedQuantity)).toBe(1);
         expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: issue.id } })).toBe(2);
+        expect((await prisma.goodsIssue.findUnique({ where: { id: issue.id } })).referenceNumber).toBe(issue.referenceNumber);
+        expect(await prisma.referenceNumberCounter.findMany({
+            where: { prefix: { in: ['SMA', 'SCO'] } }, orderBy: [{ prefix: 'asc' }, { year: 'asc' }]
+        })).toEqual(beforeCounters);
     });
+    it.each(['material', 'consumable'])('surte %s por entregas, conserva diferencias negativas y evita duplicados concurrentes', async resource => {
+        const created = await createIssue(resource).expect(200);
+        const issue = created.body.goodsIssue;
+        const line = issue.details[0];
+        const endpoint = `${issuePath(resource)}/${issue.id}/details`;
+        const where = { supplierId_materialId: { materialId: ids[resource], supplierId: ids.supplier } };
+        const initialStock = Number((await prisma.supplierMaterial.findUnique({ where })).currentStock);
+        const projectQuantity = Number(line.convertedQuantity) + 1;
+        const supply = (quantityToSupply, expectedSuppliedQuantity) => request(app).patch(endpoint).send({
+            details: [{ id: line.id, isSupplied: true, projectConvertedQuantity: projectQuantity,
+                quantityToSupply, expectedSuppliedQuantity }]
+        });
+
+        const first = await supply(0.5, 0).expect(200);
+        expect(first.body.goodsIssue.fulfillmentStatus.name).toBe('Surtido parcial');
+        let persisted = await prisma.goodsIssueDetail.findUnique({ where: { id: line.id } });
+        expect(Number(persisted.suppliedQuantity)).toBe(0.5);
+        expect(persisted.isSupplied).toBe(false);
+        expect(Number(persisted.projectConvertedQuantity)).toBe(projectQuantity);
+        expect(Number(persisted.convertedQuantityDifference)).toBe(-1);
+        expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(initialStock - 0.5);
+
+        expect((await supply(0.5, 0).expect(409)).body.code).toBe('RECORD_VERSION_CONFLICT');
+        expect((await supply(2, 0.5).expect(409)).body.code).toBe('ISSUE_SUPPLY_QUANTITY_CONFLICT');
+        expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: issue.id } })).toBe(1);
+
+        const concurrent = await Promise.all([supply(0.5, 0.5), supply(0.5, 0.5)]);
+        expect(concurrent.map(response => response.status).sort()).toEqual([200, 409]);
+        persisted = await prisma.goodsIssueDetail.findUnique({ where: { id: line.id } });
+        expect(Number(persisted.suppliedQuantity)).toBe(1);
+        expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(initialStock - 1);
+
+        const completed = await supply(1, 1).expect(200);
+        expect(completed.body.goodsIssue.fulfillmentStatus.name).toBe('Surtido');
+        persisted = await prisma.goodsIssueDetail.findUnique({ where: { id: line.id } });
+        expect(persisted.isSupplied).toBe(true);
+        expect(Number(persisted.suppliedQuantity)).toBe(2);
+        expect(Number(persisted.projectConvertedQuantity)).toBe(projectQuantity);
+        expect(Number(persisted.convertedQuantityDifference)).toBe(-1);
+        expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(initialStock - 2);
+        expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: issue.id } })).toBe(3);
+    });
+
     it('genera consecutivos independientes por tipo incluso con altas concurrentes', async () => {
         const before = { material: await getIssueCounter('SMA'), consumable: await getIssueCounter('SCO') };
         const resources = ['material', 'consumable', 'material', 'consumable', 'material', 'consumable'];
@@ -376,6 +446,42 @@ describe('aislamiento HTTP y persistencia de salidas de materiales y consumibles
             expect(emitted).toEqual([before[resource].counter + 1, before[resource].counter + 2, before[resource].counter + 3]);
             expect((await getIssueCounter(prefix)).counter).toBe(before[resource].counter + 3);
         }
+    });
+
+    it.each(['material', 'consumable'])('PIEZA en %s protege solicitud, surtido y devolución con la presentación persistida', async resource => {
+        await withPiecePresentation({ prisma, model: 'material', id: ids[resource] }, async () => {
+            const where = { supplierId_materialId: { supplierId: ids.supplier, materialId: ids[resource] } };
+            await prisma.supplierMaterial.update({ where, data: { currentStock: 10, convertedQuantity: 10, maxUnitCost: 10, isActive: true } });
+            const beforeCount = await prisma.goodsIssue.count({ where: { departmentId: ids.department } });
+            const invalid = await request(app).post(issuePath(resource)).send({ ...header(), details: [{ ...detail(resource), quantity: 1.5, presentation: { name: 'ROLLO' } }] }).expect(409);
+            expect(invalid.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            expect(await prisma.goodsIssue.count({ where: { departmentId: ids.department } })).toBe(beforeCount);
+            const created = (await createIssue(resource).expect(200)).body.goodsIssue;
+            const line = created.details[0];
+            const supply = quantityToSupply => request(app).patch(`${issuePath(resource)}/${created.id}/details`).send({ details: [{ id: line.id, isSupplied: true, quantityToSupply, expectedSuppliedQuantity: 0, projectConvertedQuantity: 2 }] });
+            const rejectedSupply = await supply(0.5).expect(409);
+            expect(rejectedSupply.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            expect(Number((await prisma.goodsIssueDetail.findUnique({ where: { id: line.id } })).suppliedQuantity)).toBe(0);
+            expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(10);
+            expect(await prisma.inventoryMovement.count({ where: { goodsIssueId: created.id } })).toBe(0);
+            await supply(2).expect(200);
+            const returning = returnQuantity => request(app).patch(`${issuePath(resource)}/${created.id}/details/${line.id}/returns`).send({ returnQuantity });
+            const rejectedReturn = await returning(0.5).expect(409);
+            expect(rejectedReturn.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+            expect(Number((await prisma.goodsIssueDetail.findUnique({ where: { id: line.id } })).returnedQuantity)).toBe(0);
+            expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(8);
+            expect(await prisma.goodsIssueReturn.count({ where: { goodsIssueId: created.id } })).toBe(0);
+            const returned = (await returning(1).expect(200)).body.goodsIssueReturn;
+            expect(Number(returned.currentTotalReturnedQuantity)).toBe(0);
+            expect(Number(returned.newTotalReturnedQuantity)).toBe(1);
+            expect(returned.detail.id).toBe(line.id);
+            expect(returned).not.toHaveProperty('returnQuantity');
+            await returning(1).expect(200);
+            const saved = await prisma.goodsIssue.findUnique({ where: { id: created.id }, include: { fulfillmentStatus: true, details: true } });
+            expect(saved.fulfillmentStatus.name).toBe('Cancelado');
+            expect(Number(saved.details[0].returnedQuantity)).toBe(2);
+            expect(Number((await prisma.supplierMaterial.findUnique({ where })).currentStock)).toBe(10);
+        });
     });
 
     it.each(['material', 'consumable'])('revierte el contador de %s cuando falla la escritura posterior del documento', async resource => {

@@ -28,7 +28,6 @@ import {
     calculateGoodsReceiptTotals,
     GOODS_RECEIPT_DETAIL_INCLUDE
 } from "./goodsReceiptHelpers.js";
-import { updateMaterialUnitCostIfHigher } from "../materials/supplierMaterialService.js";
 import { isAppError } from "../../../errors/AppError.js";
 import { buildDateRangeFilter } from "../../../utils/requestQueryUtils.js";
 import { GOODS_RECEIPT_STATUS_NAMES } from "../../../constants/warehouseStatuses.js";
@@ -116,6 +115,7 @@ export const findAllGoodsReceipts = async ({
             orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             select: {
                 referenceNumber: true,
+                observations: true,
                 invoice: true,
                 isInvoiced: true,
                 receivedById: true,
@@ -226,7 +226,6 @@ export const createGoodsReceipt = async ({ goodsReceiptDto, type = null }) => {
                 movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
             });
 
-            await updateMaterialUnitCostIfHigher({ tx, supplierId: goodsReceipt.supplierId, details: goodsReceipt.details });
             return goodsReceipt;
         });
 
@@ -343,8 +342,6 @@ export const updateGoodsReceipt = async ({ id, goodsReceiptDto, type = null }) =
                 })),
                 movementType: INVENTORY_MOVEMENT_TYPES.ENTRY
             });
-
-            await updateMaterialUnitCostIfHigher({ tx, supplierId: updatedReceipt.supplierId, details: createdDetails });
 
             return updatedReceipt;
         });

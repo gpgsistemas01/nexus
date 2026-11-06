@@ -125,7 +125,7 @@ entre casos; compartir servicios de inventario, persistencia o consulta tampoco 
 por sí solo una relación UML.
 
 El actor principal inicia el objetivo, pero no obtiene autorización por aparecer aquí.
-En cada ficha, **Nexus** identifica al sistema como participante interno; no se modela
+En cada ficha, **Nexus** identifica al participante interno; no se modela
 como actor externo ni inicia el caso por sí mismo.
 El **Administrador del sistema** hereda las funciones del Personal de almacén
 mediante generalización y tiene asociaciones adicionales con sus casos exclusivos. **Dirección** no se atribuye como

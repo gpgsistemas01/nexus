@@ -1,0 +1,111 @@
+# Salidas: modelo de casos de uso
+
+[Índice y notación del modelo](index.md#alcance-y-notación).
+
+La [jerarquía común de actores](01-access.md#autenticación) conserva la participación heredada del Administrador del sistema.
+
+Las relaciones de alta auxiliar se detallan en [Altas desde selectores](09-contextual-creation.md).
+
+## Salidas de materiales
+
+**Identificador:** `DIA-VUE-CU-020`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
+
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+**Lectura visual:** [actores, objetivos y relaciones](../../architecture/views/diagram-reading.md#casos-de-uso).
+
+```mermaid
+usecase-beta
+%%{init: {"layout": "dagre"}}%%
+direction LR
+    actor operational("Usuario de área operativa")
+    actor warehouse("Personal de almacén")
+
+    systemBoundary issuePackage1["Nexus · Salidas de materiales"]
+        ucMaterialIssueQuery("CU-SAL-01 Consultar")
+        ucMaterialIssueCreate("CU-SAL-02 Crear")
+        ucMaterialIssueHeader("CU-SAL-03 Editar encabezado")
+        ucMaterialIssueDetails("CU-SAL-04 Editar detalles")
+        ucMaterialSupply("CU-SAL-05 Surtir")
+        ucMaterialReturn("CU-SAL-06 Devolver")
+        ucMaterialIssueReport("CU-SAL-07 Generar reporte")
+    end
+
+    warehouse -- ucMaterialIssueQuery
+    operational -- ucMaterialIssueQuery
+
+    ucMaterialIssueQuery -- ucMaterialIssueCreate
+    ucMaterialIssueQuery -- ucMaterialIssueHeader
+    ucMaterialIssueQuery -- ucMaterialIssueDetails
+    ucMaterialIssueQuery -- ucMaterialSupply
+    ucMaterialIssueQuery -- ucMaterialReturn
+    ucMaterialIssueQuery -- ucMaterialIssueReport
+```
+
+## Salidas de mermas
+
+**Identificador:** `DIA-VUE-CU-021`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
+
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+```mermaid
+usecase-beta
+%%{init: {"layout": "dagre"}}%%
+direction LR
+    actor operational("Usuario de área operativa")
+    actor warehouse("Personal de almacén")
+
+    systemBoundary issuePackage2["Nexus · Salidas de mermas"]
+        ucWasteIssueQuery("CU-SAL-08 Consultar")
+        ucWasteIssueCreate("CU-SAL-09 Crear")
+        ucWasteIssueHeader("CU-SAL-10 Editar encabezado")
+        ucWasteIssueDetails("CU-SAL-11 Editar detalles")
+        ucWasteSupply("CU-SAL-12 Surtir")
+        ucWasteReturn("CU-SAL-13 Devolver")
+        ucWasteIssueReport("CU-SAL-14 Generar reporte")
+    end
+
+    warehouse -- ucWasteIssueQuery
+    operational -- ucWasteIssueQuery
+
+    ucWasteIssueQuery -- ucWasteIssueCreate
+    ucWasteIssueQuery -- ucWasteIssueHeader
+    ucWasteIssueQuery -- ucWasteIssueDetails
+    ucWasteIssueQuery -- ucWasteSupply
+    ucWasteIssueQuery -- ucWasteReturn
+    ucWasteIssueQuery -- ucWasteIssueReport
+```
+
+## Salidas de consumibles
+
+**Identificador:** `DIA-VUE-CU-022`. **Pregunta:** ¿Qué operaciones parten de la consulta y qué actores específicos participan?
+
+**Fuente:** fichas CU del catálogo local y permisos públicos del recurso.
+
+```mermaid
+usecase-beta
+%%{init: {"layout": "dagre"}}%%
+direction LR
+    actor operational("Usuario de área operativa")
+    actor warehouse("Personal de almacén")
+
+    systemBoundary issuePackage3["Nexus · Salidas de consumibles"]
+        ucConsumableIssueQuery("CU-SAL-15 Consultar")
+        ucConsumableIssueCreate("CU-SAL-16 Crear")
+        ucConsumableIssueHeader("CU-SAL-17 Editar encabezado")
+        ucConsumableIssueDetails("CU-SAL-18 Editar detalles")
+        ucConsumableSupply("CU-SAL-19 Surtir")
+        ucConsumableReturn("CU-SAL-20 Devolver")
+        ucConsumableIssueReport("CU-SAL-21 Generar reporte")
+    end
+
+    warehouse -- ucConsumableIssueQuery
+    operational -- ucConsumableIssueQuery
+
+    ucConsumableIssueQuery -- ucConsumableIssueCreate
+    ucConsumableIssueQuery -- ucConsumableIssueHeader
+    ucConsumableIssueQuery -- ucConsumableIssueDetails
+    ucConsumableIssueQuery -- ucConsumableSupply
+    ucConsumableIssueQuery -- ucConsumableReturn
+    ucConsumableIssueQuery -- ucConsumableIssueReport
+```

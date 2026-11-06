@@ -1,4 +1,4 @@
-import { successCodeMessages } from '../../../messages/codeMessages.js';
+import { successCodeMessages } from '../../../shared/constants/apiSuccessCodes.js';
 import {
     addWasteStock,
     createWaste,

@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Type-check and test artifacts
+*.tsbuildinfo
+build/
+coverage/
+
+# Browser test artifacts
+test-results/
+playwright-report/
+
+# Credenciales y configuración local de los manuales por cuenta
+.env.manual.local
+manual.accounts.local.json
+
+# Ediciones locales por cuenta: fuentes filtradas, capturas y estado de publicación
+/docs/user-manual/accounts/
+
+# Capturas de referencia: se generan y revisan por separado
+/docs/user-manual/images/

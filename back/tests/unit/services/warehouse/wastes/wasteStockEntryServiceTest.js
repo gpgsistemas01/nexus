@@ -30,6 +30,14 @@ describe('documento de entrada de existencia de merma', () => {
     });
   });
 
+  it('rechaza una entrada fraccionaria de piezas antes de generar folio o movimiento', async () => {
+    await expect(registerWasteStockEntry({
+      tx: {}, waste: { id: 'waste-1', presentation: { name: 'PIEZA' } }, quantity: 0.5
+    })).rejects.toMatchObject({ code: 'INVENTORY_PIECE_QUANTITY_REQUIRED' });
+    expect(generateYearlyReferenceNumber).not.toHaveBeenCalled();
+    expect(applyWasteMovement).not.toHaveBeenCalled();
+  });
+
   it('conserva folio, actor, captura, saldos de la merma y vínculo al movimiento', async () => {
     const create = vi.fn().mockResolvedValue({ id: 'entry-1' });
     const tx = { wasteStockEntry: { create } };

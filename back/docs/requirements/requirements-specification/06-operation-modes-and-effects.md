@@ -19,7 +19,7 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 | Contexto / acción | Modo y estado requerido | Datos que pueden cambiar | Efectos que no deben confundirse con edición |
 | --- | --- | --- | --- |
 | Material o consumible / crear | `create`; no existe la oferta de proveedor | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna sólo para material; consumible sin dimensiones; stock mínimo, costo máximo, estado de la oferta, existencia inicial y observaciones | crea o reutiliza la identidad compartida y crea la oferta; una oferta repetida se rechaza sin modificar stock ni costo |
-| Material o consumible / crear desde compra | `create`; formulario invocado desde una compra y no existe la oferta de proveedor | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna sólo para material; consumible sin dimensiones; stock mínimo y estado de la oferta | reutiliza el alta del artículo con contexto de compra; crea la oferta con existencia cero y sin costo máximo, no genera ajuste inicial y deja que el detalle establezca costo y existencia sólo al confirmar la compra |
+| Material o consumible / crear desde compra | `create`; formulario invocado desde una compra y no existe la oferta de proveedor | nombre, proveedor, presentación, unidad, ambas dimensiones o ninguna sólo para material; consumible sin dimensiones; stock mínimo y estado de la oferta | reutiliza el alta del artículo con contexto de compra; crea la oferta con existencia cero y sin costo máximo, no genera ajuste inicial; la compra establece su costo documental y la existencia al confirmarse, y el costo máximo se completa después desde Almacén |
 | Material o consumible / editar | `edit`; relación existente | nombre y stock mínimo compartidos; costo máximo y estado de la oferta seleccionada | proveedor, presentación, unidad y dimensiones permanecen bloqueados; un nombre que produzca otra identidad se rechaza y no cambia existencia |
 | Material o consumible / ajustar | `edit-stock`; relación existente y actor autorizado | proveedor asociado conservado desde la fila, nueva existencia total, motivo y observaciones | crea ajuste y movimiento; no permite elegir otro proveedor, no cambia identidad ni interpreta la cantidad como incremento |
 | Merma / crear | `create`; no existe la combinación de nombre, proveedor, dimensiones y pesos | proveedor, material de referencia, nombre, base, altura, stock mínimo, costo máximo, estado, existencia inicial, observaciones y, para Rollo, cono precargado editable y total; dimensiones automáticas con pesos | crea la merma y, con cantidad positiva, una entrada EME con movimiento; cantidad cero no crea documento ni consume folio; una identidad repetida se rechaza sin sumar stock |
@@ -34,7 +34,7 @@ y exige stock, pero no vuelve a seleccionar el recurso ni crea otra relación.
 | Salida de material, consumible o merma / crear | `create`; documento nuevo | cliente, asesor, área, solicitante, número de proyecto, fecha de solicitud, observaciones y detalles solicitados | no descuenta stock mientras el detalle no se surta |
 | Salida de material, consumible o merma / editar completa | `edit`; salida pendiente | encabezado y detalles nuevos o cantidades todavía no surtidas | no reescribe cantidades ya surtidas o devueltas |
 | Salida de material, consumible o merma / editar encabezado | `edit-header`; salida no cancelada que ya no está pendiente | cliente, asesor, área, solicitante, número de proyecto, fecha de solicitud y observaciones | los detalles permanecen en sólo lectura y no cambia inventario |
-| Salida de material, consumible o merma / surtir | `edit-detail`; detalle con cantidad pendiente; la salida puede estar pendiente o parcialmente surtida | selección del detalle y cantidad de proyecto a surtir | el encabezado permanece bloqueado; reduce existencia y crea movimiento atómicamente |
+| Salida de material, consumible o merma / surtir | `edit-detail`; detalle con cantidad pendiente; la salida puede estar pendiente o parcialmente surtida | selección del detalle, cantidad de entrega y cantidad de proyecto | descuenta la entrega y acumula lo surtido; completa al cubrir lo solicitado. La cantidad de proyecto se conserva, incluso con diferencia negativa; encabezado bloqueado, movimiento y saldo atómicos |
 | Salida de material, consumible o merma / devolver | `return`; salida con cumplimiento Surtido y detalle con cantidad surtida disponible | cantidad devuelta y observaciones de devolución | encabezado y detalles originales permanecen bloqueados; incrementa existencia y crea movimiento inverso |
 | Salida de material, consumible o merma / consultar | `view`; salida cancelada | ninguno | formulario y detalles permanecen en sólo lectura |
 
@@ -45,6 +45,12 @@ modo para hacer verificable qué puede modificar el operador, sin convertir el e
 visual del formulario en un estado persistido del documento.
 
 ## Límites de interpretación
+
+Las cantidades físicas y el stock mínimo de artículos con presentación
+PIEZA/PIEZAS son enteros. La restricción se comprueba con el catálogo persistido
+en altas, ajustes, compras, solicitudes, surtidos, entradas y devoluciones.
+Una fracción se rechaza sin redondearla; costos, medidas y conversión conservan
+su precisión. Consultar no modifica cantidades históricas.
 
 1. La tabla describe capacidades del producto, no personas autorizadas. La política de
    roles y departamentos se consulta en

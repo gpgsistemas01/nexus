@@ -4,7 +4,7 @@ import {
     generateYearlyReferenceNumber,
     throwIfReferenceNumberAlreadyExists
 } from '../../document/referenceNumberService.js';
-import { calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { assertPieceQuantity, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { applyWasteMovement } from './wasteMovementService.js';
 
 export const registerWasteStockEntry = async ({
@@ -17,6 +17,7 @@ export const registerWasteStockEntry = async ({
     let referenceNumber = null;
 
     try {
+        assertPieceQuantity({ quantity, item: waste });
         referenceNumber = await generateYearlyReferenceNumber({
             type: DOCUMENT_REFERENCE_TYPES.WASTE_STOCK_ENTRY,
             tx

@@ -3,11 +3,11 @@
 | Participante | Responsabilidad |
 | --- | --- |
 | Personal de almacén (área Almacén y proveduría) | Mantener los catálogos operativos autorizados y ejecutar entradas, salidas y devoluciones. No ajusta existencias mediante la acción administrativa. |
-| Usuario de área operativa (Impresión, Taller 3D, PT/Tráfico, Instalaciones o Acabados) | Consultar inventario y crear o editar solicitudes de salida de materiales, consumibles y merma con un rol autorizado. No modifica inventario ni realiza surtidos o devoluciones por este acceso. |
+| Usuario de área operativa (Impresión, Taller 3D (Taller/Herrería), Router, PT/Tráfico, Instalaciones o Acabados) | Consultar inventario y crear o editar solicitudes de salida de materiales, consumibles y merma con un rol autorizado. No modifica inventario ni realiza surtidos o devoluciones por este acceso. |
 | Solicitante o aprobador | Persona que participa como dato del documento cuando corresponde; no implica una cuenta, acceso ni un flujo de aprobación disponible. |
-| Administrador del sistema (área Sistemas) | Ejecutar todas las capacidades vigentes, incluida la administración de clientes, personas, usuarios y accesos, siempre con autorización comprobada en el servidor. Ventas no accede al sistema. |
+| Administrador del sistema (área Sistemas) | Ejecutar todas las capacidades vigentes, incluida la administración de clientes, personas, usuarios y accesos, siempre con autorización comprobada en el servidor. Ventas no accede a Nexus. |
 | Dirección | Parte interesada de supervisión; sus casos de uso y alcance autorizado permanecen pendientes de definición. |
-| Nexus (sistema) | Comprobar accesos y reglas, confirmar operaciones sin cambios parciales, asignar folios, conservar historia y notificar actualizaciones. La auditoría tiene el alcance configurado, no cobertura exhaustiva; el sistema no es actor externo. |
+| Nexus (sistema) | Comprobar accesos y reglas, confirmar operaciones sin cambios parciales, asignar folios, conservar historia y notificar actualizaciones. La auditoría tiene el alcance configurado, no cobertura exhaustiva; Nexus no es actor externo. |
 
 Los nombres de actor expresan responsabilidades, no conceden acceso por sí mismos. La
 autorización efectiva se calcula con las asignaciones de usuario, rol y departamento
@@ -29,4 +29,4 @@ administrador. Esta generalización funcional no sustituye la comprobación de p
 Solicitantes, aprobadores, asesores, receptores y proveedores
 pueden participar en un documento sin convertirse por ello en actores con acceso. Las
 lecturas auxiliares para selectores tampoco conceden mantenimiento del catálogo ni
-sustituyen los controles de acceso del sistema.
+sustituyen los controles de acceso de Nexus.

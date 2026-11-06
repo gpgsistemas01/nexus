@@ -14,6 +14,20 @@ describe('requestQueryUtils', () => {
     expect(getDataTablePaging({ start: '-10', length: 'invalid' })).toEqual({ skip: 0, take: 10 });
   });
 
+  it.each([
+    [{ start: '0', length: '0' }, { skip: 0, take: 0 }],
+    [{ start: '20', length: '100' }, { skip: 20, take: 100 }],
+    [{ start: '20', length: '101' }, { skip: 20, take: 100 }],
+    [{ start: '20', length: '1000000' }, { skip: 20, take: 100 }],
+    [{ start: '2147483647', length: '20' }, { skip: 2147483647, take: 20 }],
+    [{ start: '2147483648', length: '20' }, { skip: 0, take: 20 }],
+    [{ start: '2.5', length: '20abc' }, { skip: 0, take: 10 }],
+    [{ start: ['20', '30'], length: ['20', '30'] }, { skip: 0, take: 10 }],
+    [{ start: '99999999999999999999', length: '99999999999999999999' }, { skip: 0, take: 10 }]
+  ])('normaliza tamaños y offsets antes de construir una consulta: %o', (query, expected) => {
+    expect(getDataTablePaging(query)).toEqual(expected);
+  });
+
   it('lee términos de búsqueda desde los formatos soportados por DataTables', () => {
     expect(getDataTableSearch({ search: 'directo' })).toBe('directo');
     expect(getDataTableSearch({ search: { value: 'anidado' } })).toBe('anidado');

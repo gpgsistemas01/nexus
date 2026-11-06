@@ -1,7 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 
+import { ROLE_KEYS } from '../../../src/constants/roles.js';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 
 const suffix = Math.random().toString(36).slice(2, 8);
 const ids = {};
@@ -20,7 +22,7 @@ const cleanCreatedRecords = async () => {
   await prisma.wasteMovementDetail.deleteMany({ where: { movementId: { in: movements.map(({ id }) => id) } } });
   await prisma.wasteMovement.deleteMany({ where: { id: { in: movements.map(({ id }) => id) } } });
   await prisma.wasteIssue.deleteMany({ where: { id: { in: issueIds } } });
-  await prisma.waste.deleteMany({ where: { id: { in: [ids.waste, ids.secondWaste].filter(Boolean) } } });
+  await prisma.waste.deleteMany({ where: { id: { in: [ids.waste, ids.secondWaste, ids.partialWaste].filter(Boolean) } } });
   await prisma.supplierMaterial.deleteMany({ where: { id: ids.supplierMaterial } });
   await prisma.material.deleteMany({ where: { id: ids.material } });
   await prisma.supplier.deleteMany({ where: { id: ids.supplier } });
@@ -40,7 +42,7 @@ describe('waste issue controller database integration', () => {
     prisma = prismaModule.prisma;
     app = createControllerTestApp({
       registerRoutes: router => {
-        router.use((req, _res, next) => { req.user = { id: ids.user }; next(); });
+        router.use((req, _res, next) => { req.user = { id: ids.user, accesses: [{ roleKey: ROLE_KEYS.SYSTEM_ADMIN }] }; next(); });
         router.get('/waste-issues/:id', controller.getWasteIssue);
         router.get('/waste-issues', controller.getAllWasteIssues);
         router.get('/waste-movements', movementController.getAllWasteMovements);
@@ -114,6 +116,26 @@ describe('waste issue controller database integration', () => {
   });
 
   afterAll(cleanCreatedRecords);
+
+  it('rechaza merma sin costo y descarta el costo manipulado sin crear documentos ni descontar stock', async () => {
+    const beforeCount = await prisma.wasteIssue.count({ where: { createdById: ids.user } });
+    try {
+      for (const maxUnitCost of [null, 0]) {
+        await prisma.waste.update({ where: { id: ids.waste }, data: { maxUnitCost } });
+        const before = await prisma.waste.findUnique({ where: { id: ids.waste } });
+        const response = await request(app).post('/waste-issues').send({
+          requesterId: ids.requester, advisorId: ids.advisor, clientId: ids.client, departmentId: ids.department,
+          projectNumber: 'SIN-COSTO', requestDate: '2026-08-11T12:30:00.000Z',
+          details: [{ wasteId: ids.waste, quantity: 2, maxUnitCost: 999 }]
+        }).expect(409);
+        expect(response.body.code).toBe('WASTE_ISSUE_MISSING_MAX_UNIT_COST');
+        expect(await prisma.wasteIssue.count({ where: { createdById: ids.user } })).toBe(beforeCount);
+        expect(await prisma.waste.findUnique({ where: { id: ids.waste } })).toEqual(before);
+      }
+    } finally {
+      await prisma.waste.update({ where: { id: ids.waste }, data: { maxUnitCost: 25 } });
+    }
+  });
 
   it('crea y surte una salida por HTTP, persiste estados, stock y movimiento', async () => {
     const created = await request(app).post('/waste-issues').send({
@@ -312,6 +334,49 @@ describe('waste issue controller database integration', () => {
     })).toBe(1);
   });
 
+  it('surte una merma en varias entregas sin duplicar saldos ni corregir una diferencia negativa', async () => {
+    const waste = await prisma.waste.create({ data: {
+      name: `IT WasteIssue parcial ${suffix}`, supplierId: ids.supplier,
+      presentationId: ids.presentation, unitMeasureId: ids.unit,
+      base: 1, height: 2, maxUnitCost: 25, currentStock: 10, convertedQuantity: 20
+    } });
+    ids.partialWaste = waste.id;
+    const created = await request(app).post('/waste-issues').send({
+      requesterId: ids.requester, advisorId: ids.advisor, clientId: ids.client,
+      departmentId: ids.department, projectNumber: 'PR-PARCIAL', requestDate: '2026-08-11T12:30:00.000Z',
+      details: [{ wasteId: waste.id, quantity: 2 }]
+    }).expect(201);
+    const issueId = created.body.wasteIssue.id;
+    const detailId = created.body.wasteIssue.details[0].id;
+    const supply = (quantityToSupply, expectedSuppliedQuantity) => request(app).patch(`/waste-issues/${issueId}/details`).send({
+      details: [{ id: detailId, isSupplied: true, projectConvertedQuantity: 5, quantityToSupply, expectedSuppliedQuantity }]
+    });
+
+    const first = await supply(0.5, 0).expect(200);
+    expect(first.body.wasteIssue.fulfillmentStatus.name).toBe('Surtido parcial');
+    expect(first.body.wasteIssue.details[0]).toMatchObject({
+      suppliedQuantity: '0.5', isSupplied: false, projectConvertedQuantity: '5', convertedQuantityDifference: '-1'
+    });
+    expect(Number((await prisma.waste.findUnique({ where: { id: waste.id } })).currentStock)).toBe(9.5);
+    expect((await supply(0.5, 0).expect(409)).body.code).toBe('RECORD_VERSION_CONFLICT');
+    expect((await supply(2, 0.5).expect(409)).body.code).toBe('ISSUE_SUPPLY_QUANTITY_CONFLICT');
+    expect(await prisma.wasteMovement.count({ where: { wasteIssueId: issueId } })).toBe(1);
+
+    const concurrent = await Promise.all([supply(0.5, 0.5), supply(0.5, 0.5)]);
+    expect(concurrent.map(response => response.status).sort()).toEqual([200, 409]);
+    const completed = await supply(1, 1).expect(200);
+    expect(completed.body.wasteIssue.fulfillmentStatus.name).toBe('Surtido');
+    const persisted = await prisma.wasteIssueDetail.findUnique({ where: { id: detailId } });
+    expect(Number(persisted.suppliedQuantity)).toBe(2);
+    expect(persisted.isSupplied).toBe(true);
+    expect(Number(persisted.projectConvertedQuantity)).toBe(5);
+    expect(Number(persisted.convertedQuantityDifference)).toBe(-1);
+    const finalStock = await prisma.waste.findUnique({ where: { id: waste.id } });
+    expect(Number(finalStock.currentStock)).toBe(8);
+    expect(Number(finalStock.convertedQuantity)).toBe(16);
+    expect(await prisma.wasteMovement.count({ where: { wasteIssueId: issueId } })).toBe(3);
+  });
+
   it('permite completar una salida parcial aunque la merma se desactive después de solicitarla', async () => {
     const created = await request(app).post('/waste-issues').send({
       requesterId: ids.requester,
@@ -365,6 +430,38 @@ describe('waste issue controller database integration', () => {
         data: { isActive: true }
       });
     }
+  });
+
+  it('PIEZA en merma rechaza fracciones al solicitar, surtir y devolver sin efectos parciales', async () => {
+    await withPiecePresentation({ prisma, model: 'waste', id: ids.waste }, async () => {
+      await prisma.waste.update({ where: { id: ids.waste }, data: { currentStock: 10, convertedQuantity: 20, maxUnitCost: 10, isActive: true } });
+      const body = quantity => ({ requesterId: ids.requester, advisorId: ids.advisor, clientId: ids.client, departmentId: ids.department, projectNumber: 'PR-200', requestDate: '2026-08-11T13:00:00.000Z', details: [{ wasteId: ids.waste, quantity }] });
+      const beforeCount = await prisma.wasteIssue.count({ where: { departmentId: ids.department } });
+      const invalid = await request(app).post('/waste-issues').send(body(0.5)).expect(409);
+      expect(invalid.body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+      expect(await prisma.wasteIssue.count({ where: { departmentId: ids.department } })).toBe(beforeCount);
+      const created = (await request(app).post('/waste-issues').send(body(2)).expect(201)).body.wasteIssue;
+      const line = created.details[0];
+      const supply = quantityToSupply => request(app).patch(`/waste-issues/${created.id}/details`).send({ details: [{ id: line.id, isSupplied: true, quantityToSupply, expectedSuppliedQuantity: 0, projectConvertedQuantity: 4 }] });
+      expect((await supply(0.5).expect(409)).body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+      expect(Number((await prisma.wasteIssueDetail.findUnique({ where: { id: line.id } })).suppliedQuantity)).toBe(0);
+      expect(await prisma.wasteMovement.count({ where: { wasteIssueId: created.id } })).toBe(0);
+      expect(Number((await prisma.waste.findUnique({ where: { id: ids.waste } })).currentStock)).toBe(10);
+      await supply(2).expect(200);
+      const returning = returnQuantity => request(app).patch(`/waste-issues/${created.id}/details/${line.id}/returns`).send({ returnQuantity });
+      expect((await returning(0.5).expect(409)).body.code).toBe('INVENTORY_PIECE_QUANTITY_REQUIRED');
+      expect(Number((await prisma.wasteIssueDetail.findUnique({ where: { id: line.id } })).returnedQuantity)).toBe(0);
+      expect(Number((await prisma.waste.findUnique({ where: { id: ids.waste } })).currentStock)).toBe(8);
+      expect(await prisma.wasteIssueReturn.count({ where: { wasteIssueId: created.id } })).toBe(0);
+      const returned = (await returning(2).expect(200)).body.wasteIssueReturn;
+      expect(Number(returned.currentTotalReturnedQuantity)).toBe(0);
+      expect(Number(returned.newTotalReturnedQuantity)).toBe(2);
+      expect(returned.detail.id).toBe(line.id);
+      expect(returned).not.toHaveProperty('returnQuantity');
+      const saved = await prisma.wasteIssue.findUnique({ where: { id: created.id }, include: { fulfillmentStatus: true } });
+      expect(saved.fulfillmentStatus.name).toBe('Cancelado');
+      expect(Number((await prisma.waste.findUnique({ where: { id: ids.waste } })).currentStock)).toBe(10);
+    });
   });
 
   it('rechaza stock insuficiente y revierte toda la transacción', async () => {

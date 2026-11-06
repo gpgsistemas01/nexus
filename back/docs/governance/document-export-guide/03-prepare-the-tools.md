@@ -17,7 +17,7 @@ no sustituyen la instalación requerida por este proyecto. `npm run docs:export`
 
 1. Desde la carpeta `back/`, instala la versión de Node.js indicada en `package.json`
    y ejecuta `npm ci`.
-2. Instala [Pandoc](https://pandoc.org/installing.html) en el sistema donde está abierta la
+2. Instala [Pandoc](https://pandoc.org/installing.html) en el equipo donde está abierta la
    terminal de Visual Studio Code y comprueba `pandoc --version`:
    - **Windows:** descarga y ejecuta el instalador oficial de Pandoc; después cierra y vuelve a
      abrir la terminal integrada. Windows no utiliza `sudo`.

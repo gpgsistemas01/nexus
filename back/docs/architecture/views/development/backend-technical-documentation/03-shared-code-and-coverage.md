@@ -64,6 +64,15 @@ Los listados reutilizan `repository/paginationRepository.js`: el servicio conser
 filtros, proyección y permisos; `findPage` coordina filas y conteos independientes.
 Cuando el alcance total coincide con el filtro se comparte un conteo. Las exportaciones
 pueden solicitar `includeCounts: false` sin alterar los resultados de los listados.
+
+`getDataTablePaging` acota las páginas HTTP a 100 registros y rechaza coerciones de
+arrays, fracciones y sufijos. El contrato de normalización está en
+[paginación de listados](../../../openapi/api-contract.md#paginación-de-listados).
+`findBatches` usa tamaños internos positivos y cursores por id: si un bloque no
+aporta id final o no avanza, falla antes de emitirlo. Así no repite filas sin límite
+ni completa silenciosamente una exportación incompleta. Conserva memoria por bloque,
+orden estable y cancelación; no mantiene una colección de todos los ids exportados.
+
 En cada petición protegida, el middleware de token llama una sola vez a
 `getLoggedUser` y conserva el resultado en `req.user` para autorización y controllers,
 incluido `/api/auth/me`. No se cachean permisos entre peticiones; la consulta carga
@@ -111,10 +120,16 @@ Los reportes conservan permiso, consulta y columnas propios. `reportExcelUtils` 
 construye/envía Excel a partir de la configuración recibida. Usa el escritor por
 streaming de ExcelJS: confirma cada fila, escribe un temporal privado y lo descarga
 al completar el archivo. `createFormulaCell` conserva fórmula y resultado calculado;
-el temporal se limpia también ante errores o cancelaciones. No crea otro cliente de
+la cabecera común usa negrita, ajuste de texto, anchos acotados y primera fila inmóvil.
+Todas las áreas usan el mismo flujo: controller normaliza filtros, servicio consulta,
+constructor de `utils/reports/{admin,sales,warehouse}ReportExcel.js` entrega filas
+asíncronas y `sendExcelReport` escribe y descarga. Encabezados y fórmulas pertenecen
+al constructor, también en reportes de usuarios, personas, clientes y proveedores.
+El nombre común es `reporte_<recurso>_MM_AAAA.xlsx`.
+El temporal se limpia también ante errores o cancelaciones. No crea otro cliente de
 base de datos ni workers. El inventario se consulta mediante `findBatches` en
 `paginationRepository`, con bloques de 5.000 y orden estable por campo e id; el servicio
-conserva filtros y conversión de cantidades, mientras el controller produce las
+conserva filtros y conversión de cantidades, mientras el constructor produce las
 columnas de forma progresiva. Los servicios de reportes de cada área reutilizan
 `findBatches` y las consultas de dominio, con conteos desactivados y cursores internos.
 Usuarios, personas y clientes también entregan filas progresivamente, manteniendo

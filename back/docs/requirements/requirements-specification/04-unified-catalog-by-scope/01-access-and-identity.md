@@ -7,7 +7,7 @@ Consultar un catálogo auxiliar no concede su administración.
 | ID | Requisito y criterio de aceptación | Estado | Evidencia principal |
 | --- | --- | --- | --- |
 | RF-AUT-001 | Una cuenta habilitada debe poder iniciar sesión con credenciales válidas; rechazar credenciales o una cuenta no habilitada no debe crear una sesión autenticada. | Implementado | `src/routes/api/authApiRoute.js`, `src/routes/web/auth/loginWebRoute.js` |
-| RF-AUT-002 | El sistema debe renovar el acceso cuando la credencial de renovación sea válida y la cuenta continúe habilitada; una renovación rechazada debe conducir al cierre del acceso en ese navegador. | Implementado | `src/routes/web/auth/refreshWebRoute.js` |
+| RF-AUT-002 | Nexus debe renovar el acceso cuando la credencial de renovación sea válida y la cuenta continúe habilitada; una renovación rechazada debe conducir al cierre del acceso en ese navegador. | Implementado | `src/routes/web/auth/refreshWebRoute.js` |
 | RF-AUT-003 | El usuario debe poder cerrar su sesión en el navegador y volver a la página de acceso; para consultar contenido protegido deberá disponer nuevamente de una sesión válida. | Implementado | `src/routes/web/auth/logoutWebRoute.js` |
 | RF-IAM-001 | El Administrador del sistema del área Sistemas debe poder consultar usuarios y sus asignaciones de rol y departamento sin exponer contraseñas. | Implementado | `src/routes/api/admin/userApiRoute.js`, `src/controllers/api/admin/userController.js` |
 | RF-IAM-002 | Personal de almacén o el Administrador del sistema deben poder consultar personas y sus responsabilidades de rol y área sin concederles acceso implícito. | Implementado | `src/routes/api/admin/personApiRoute.js`, `src/views/pages/admin/persons` |

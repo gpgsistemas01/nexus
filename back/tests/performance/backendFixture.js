@@ -28,7 +28,7 @@ export const createBackendFixture = async ({ prisma, count }) => {
   const materialData = Array.from({ length: count }, (_, index) => ({ id: randomUUID(), name: `Perf ${String(index).padStart(6, '0')} ${suffix}`, presentationId: presentation.id, unitMeasureId: unit.id, ...(index % 2 ? {} : { base: 1, height: 1 }), type: index % 2 ? 'CONSUMABLE' : 'MATERIAL' }));
   await chunk(materialData, prisma.material);
   await chunk(materialData.map(item => ({ materialId: item.id, supplierId: supplier.id, currentStock: initialStock, convertedQuantity: initialStock, maxUnitCost: 10 })), prisma.supplierMaterial);
-  const wasteData = materialData.map(({ id, type, ...item }) => ({ ...item, id: randomUUID(), supplierId: supplier.id, base: 1, height: 1, currentStock: initialStock, convertedQuantity: initialStock }));
+  const wasteData = materialData.map(({ id, type, ...item }) => ({ ...item, id: randomUUID(), supplierId: supplier.id, base: 1, height: 1, currentStock: initialStock, convertedQuantity: initialStock, maxUnitCost: 10 }));
   await chunk(wasteData, prisma.waste);
   const header = { requestDate: new Date(), projectNumber: suffix, departmentId: department.id, departmentName: suffix,
     requesterId: person.id, requesterName: suffix, advisorId: person.id, advisorName: suffix, clientId: client.id,

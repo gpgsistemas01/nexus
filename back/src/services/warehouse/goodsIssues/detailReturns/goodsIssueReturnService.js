@@ -18,6 +18,7 @@ import { resolveIssueFulfillmentStatus } from '../../issues/issueFulfillmentRule
 import { buildGoodsIssueContextWhere } from '../goodsIssueHelpers.js';
 import { GOODS_ISSUE_DETAIL_SELECT } from '../goodsIssueDetailSelect.js';
 import { resolveGoodsIssueDetailFulfillmentStatusName } from '../goodsIssueFulfillmentRules.js';
+import { assertPieceQuantity } from '../../../inventory/stockHelpers.js';
 
 const FLOAT_EPSILON = 0.000001;
 const serviceLogger = createServiceLogger('warehouse.goodsIssues.goodsIssueReturnService');
@@ -34,13 +35,15 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, 
             });
             const detail = await tx.goodsIssueDetail.findFirst({
                 where: { id: detailId, goodsIssueId: id, goodsIssue: buildGoodsIssueContextWhere(type) },
-                include: { goodsIssue: { include: { fulfillmentStatus: true } } }
+                include: { goodsIssue: { include: { fulfillmentStatus: true } }, material: { select: { presentation: { select: { name: true } } } } }
             });
 
             if (!detail) throw new GoodsIssueDetailNotFound();
             if (detail.goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.COMPLETE) {
                 throw new GoodsIssueReturnStatusConflict();
             }
+
+            assertPieceQuantity({ quantity: requestedReturnQuantityInput, item: detail.material });
 
             const totalSuppliedQuantity = normalizeDecimal(detail.suppliedQuantity ?? 0);
             const currentTotalReturnedQuantity = normalizeDecimal(detail.returnedQuantity ?? 0);

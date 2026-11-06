@@ -86,7 +86,7 @@ export const buildInventoryReportData = async function* (rows) {
     ];
 };
 
-export const buildGoodsReceiptReportData = async function* (rows, { isConsumableReport, monthlyReport }) {
+export const buildGoodsReceiptReportData = async function* (rows, { isConsumableReport = false, monthlyReport = false } = {}) {
     const inventoryLabel = isConsumableReport ? 'Consumible' : 'Material';
     const summary = createMonthlyGoodsReceiptSummary();
     let index = 0;
@@ -183,41 +183,45 @@ export const buildGoodsReceiptReportData = async function* (rows, { isConsumable
     ];
 };
 
-export const buildWasteReportData = async (rows) => {
+export const buildWasteReportData = async function* (rows) {
     const summary = createWasteReportSummary();
     for await (const row of rows) summary.add(row);
     const { rows: summaryRows, totals } = summary.finish();
 
-    return [
-        [
-            'Proveedor',
-            'Material',
-            'Ancho',
-            'Largo',
-            'Total de mermas',
-            'Total m²',
-            'Peso neto total de rollos (kg)'
-        ],
-
-        ...summaryRows.map(row => [
-            row.supplier,
-            row.name,
-            row.width,
-            row.length,
-            row.wasteQuantity,
-            row.squareMeters,
-            row.weightStatus === 'unknown' ? 'Sin peso capturado' : row.totalWeightKg
-        ]),
-        [
-            'Total',
-            '',
-            '',
-            '',
-            createColumnTotalFormula('E', 2, summaryRows.length, totals.wasteQuantity),
-            createColumnTotalFormula('F', 2, summaryRows.length, totals.squareMeters),
-            totals.weightStatus === 'unknown' ? 'Sin peso capturado' : totals.weightStatus === 'complete'
-                ? createColumnTotalFormula('G', 2, summaryRows.length, totals.totalWeightKg)
-                : null
-        ]
+    yield [
+        'Proveedor',
+        'Material',
+        'Ancho',
+        'Largo',
+        'Total de mermas',
+        'Total m²',
+        'Peso neto total de rollos (kg)'
     ];
+
+    for (const row of summaryRows) yield [
+        row.supplier,
+        row.name,
+        row.width,
+        row.length,
+        row.wasteQuantity,
+        row.squareMeters,
+        row.weightStatus === 'unknown' ? 'Sin peso capturado' : row.totalWeightKg
+    ];
+
+    yield [
+        'Total',
+        '',
+        '',
+        '',
+        createColumnTotalFormula('E', 2, summaryRows.length, totals.wasteQuantity),
+        createColumnTotalFormula('F', 2, summaryRows.length, totals.squareMeters),
+        totals.weightStatus === 'unknown' ? 'Sin peso capturado' : totals.weightStatus === 'complete'
+            ? createColumnTotalFormula('G', 2, summaryRows.length, totals.totalWeightKg)
+            : null
+    ];
+};
+
+export const buildSupplierReportData = async function* (rows) {
+    yield ['Nombre comercial', 'Razón social', 'Estatus'];
+    for await (const row of rows) yield [row.tradeName, row.legalName, row.isActive ? 'Activo' : 'Inactivo'];
 };

@@ -5,7 +5,7 @@ import {
 } from "../document/referenceNumberService.js";
 import { toNumber } from '../../utils/formattersUtils.js';
 import { normalizeDecimal } from '../../shared/utils/numberUtils.js';
-import { assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
+import { assertPieceQuantity, assertSufficientStock, calculateConvertedQuantity } from "../inventory/stockHelpers.js";
 import { findSupplierMaterialByIds } from "./materials/supplierMaterialService.js";
 import { adjustSupplierMaterialStock } from "./materials/supplierMaterialStockService.js";
 import { lockSupplierMaterialStock } from "../../repository/warehouse/stockLockRepository.js";
@@ -63,6 +63,7 @@ const calculateStockAdjustmentValues = ({
     height = null
 }) => {
 
+    assertPieceQuantity({ quantity: newStock, item: supplierMaterial.material });
     const previousStock = toNumber(supplierMaterial.currentStock) || 0;
     const difference = normalizeDecimal(newStock - previousStock);
     const previousConvertedQuantity = toNumber(supplierMaterial.convertedQuantity) || 0;
@@ -231,54 +232,4 @@ export const createStockAdjustment = async ({
         throwIfReferenceNumberAlreadyExists({ err, referenceNumber });
         throw err;
     }
-};
-
-export const createStockAdjustmentByQuantityChange = async ({
-    tx = null,
-    materialId,
-    supplierId,
-    reasonId,
-    observations,
-    quantityChange,
-    userId,
-    base = null,
-    height = null,
-    goodsIssueId = null,
-    goodsIssueDetailId = null,
-    goodsReceiptId = null,
-    goodsReceiptDetailId = null,
-    returnAdjustment = false
-}) => {
-
-    const execute = async (transaction) => {
-        await lockSupplierMaterialStock({ tx: transaction, materialId, supplierId });
-        const supplierMaterial = await findSupplierMaterialByIds({
-            tx: transaction,
-            materialId,
-            supplierId
-        });
-        const newStock = normalizeDecimal((toNumber(supplierMaterial.currentStock) || 0) + Number(quantityChange));
-
-        return createStockAdjustment({
-            tx: transaction,
-            materialId,
-            supplierId,
-            reasonId,
-            observations,
-            newStock,
-            userId,
-            base,
-            height,
-            goodsIssueId,
-            goodsIssueDetailId,
-            goodsReceiptId,
-            goodsReceiptDetailId,
-            returnAdjustment,
-            supplierMaterial
-        });
-    };
-
-    if (tx) return execute(tx);
-
-    return getDb().$transaction(execute);
 };

@@ -39,6 +39,14 @@ describe('buildGoodsIssueDetails', () => {
         findSupplierMaterialsSnapshot.mockResolvedValue([supplierMaterial]);
     });
 
+    it.each(['MATERIAL', 'CONSUMABLE'])('rechaza fracciones de PIEZA en %s aunque el request declare ROLLO', async type => {
+        findSupplierMaterialsSnapshot.mockResolvedValue([{
+            ...supplierMaterial, material: { ...supplierMaterial.material, type, presentation: { name: 'PIEZA' } }
+        }]);
+        await expect(buildGoodsIssueDetails({ details: [{ ...detail, quantity: 1.5, presentation: { name: 'ROLLO' } }], type }))
+            .rejects.toMatchObject({ code: 'INVENTORY_PIECE_QUANTITY_REQUIRED' });
+    });
+
     it.each([
         ['material', { isActive: false }, 'MATERIAL_INACTIVE_CONFLICT'],
         ['proveedor', { supplier: { ...supplierMaterial.supplier, isActive: false } }, 'SUPPLIER_INACTIVE_CONFLICT']
@@ -69,6 +77,21 @@ describe('buildGoodsIssueDetails', () => {
         }]);
         await expect(buildGoodsIssueDetails({ details: [detail], type: 'CONSUMABLE' }))
             .resolves.toHaveLength(1);
+    });
+
+    it.each(['MATERIAL', 'CONSUMABLE'])('rechaza costos ausentes o no positivos en %s y conserva el costo de almacén', async type => {
+        for (const maxUnitCost of [null, undefined, 0, '0.000000', -1]) {
+            findSupplierMaterialsSnapshot.mockResolvedValue([{
+                ...supplierMaterial, maxUnitCost, material: { ...supplierMaterial.material, type }
+            }]);
+            await expect(buildGoodsIssueDetails({ details: [{ ...detail, maxUnitCost: 99 }], type }))
+                .rejects.toMatchObject({ code: 'GOODS_ISSUE_MISSING_MAX_UNIT_COST', statusCode: 409 });
+        }
+        findSupplierMaterialsSnapshot.mockResolvedValue([{
+            ...supplierMaterial, maxUnitCost: '0.000001', material: { ...supplierMaterial.material, type }
+        }]);
+        await expect(buildGoodsIssueDetails({ details: [{ ...detail, maxUnitCost: 99 }], type }))
+            .resolves.toEqual([expect.objectContaining({ maxUnitCost: '0.000001' })]);
     });
 
     it('construye el detalle cuando material y proveedor están activos', async () => {

@@ -72,3 +72,9 @@ Los reportes y la infraestructura transversal se localizan en el
 [capítulo 3](03-shared-code-and-coverage.md); el orden de llamadas está en
 [procesos](../../processes/backend-code-sequences/index.md).
 
+La edición de encabezado conserva el bloqueo del documento y consulta su estado de
+documento y surtido antes de resolver participantes. `assertIssueNotCanceled`, de
+`issues/issueFulfillmentRules.js`, se reutiliza entre materiales, consumibles y merma;
+una salida cancelada responde `409 ISSUE_CANCELED_CONFLICT` también ante una petición
+HTTP directa, sin modificar encabezado, detalles ni existencias. Los estados pendientes,
+parciales y surtidos conservan sus posibilidades de edición de encabezado.

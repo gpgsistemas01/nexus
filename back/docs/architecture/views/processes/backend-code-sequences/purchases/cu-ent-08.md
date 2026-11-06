@@ -30,7 +30,6 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `Socket` | control | [`socketUtils.js`](../../../../../../src/utils/socketUtils.js) |
 | `DTO` | control | [`goodsReceiptDTO.js`](../../../../../../src/dtos/goodsReceiptDTO.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
-| `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `Invoice` | control | [`goodsReceiptInvoiceService.js`](../../../../../../src/services/warehouse/goodsReceipts/goodsReceiptInvoiceService.js) |
 | `Reference` | control | [`referenceNumberService.js`](../../../../../../src/services/document/referenceNumberService.js) |
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
@@ -212,7 +211,6 @@ sequenceDiagram
     participant Core@{ "type": "control" } as goodsReceiptService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Inventory@{ "type": "control" } as movementService.js
-    participant Costs@{ "type": "control" } as supplierMaterialService.js
     participant Reference@{ "type": "control" } as referenceNumberService.js
 
     Facade->>Core: createGoodsReceipt({ goodsReceiptDto, type: CONSUMABLE })
@@ -229,11 +227,10 @@ sequenceDiagram
     Note over Inventory: Preparación y escrituras ampliadas en los detalles de inventario
             Note over Inventory,Prisma: applyInventoryMovement también actualiza stock con el mismo tx
     end
+        Note over Core: El costo máximo se administra en Almacén y no cambia al confirmar compras
         Prisma-->>Core: commit y compra creada
-        Core->>Costs: updateMaterialUnitCostIfHigher({ supplierId: result.supplierId, details: result.details }) tras commit
         Core-->>Facade: createGoodsReceipt(): Promise[GoodsReceipt]
     else Error de dominio o persistencia
-        Note over Core,Prisma: Un error al actualizar costo después del commit no revierte la compra
         Core-->>Facade: error — rollback si falló el callback transaccional
     end
     deactivate Core

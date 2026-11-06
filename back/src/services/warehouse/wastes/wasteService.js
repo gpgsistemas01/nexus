@@ -28,6 +28,7 @@ import { isSquareMeterUnitMeasure } from '../../../shared/inventory/wasteMeasure
 
 import { assertRecordVersion, updateVersionedRecord } from '../../../repository/versionRepository.js';
 import { executeWasteOperation, markWasteOperationRejected } from './wasteOperationService.js';
+import { assertPieceQuantity } from '../../inventory/stockHelpers.js';
 
 const serviceLogger = createServiceLogger('warehouse.wasteService');
 
@@ -185,6 +186,8 @@ export const createWaste = async ({
                 if (material.type !== MATERIAL_TYPES.MATERIAL || !isSquareMeterUnitMeasure(material.unitMeasure)) {
                     throw new WasteMaterialInvalid();
                 }
+                assertPieceQuantity({ quantity: wasteDto.minStock, item: material });
+                assertPieceQuantity({ quantity: wasteDto.initialQuantity, item: material });
                 const coneWeightKg = wasteDto.coneWeightKg;
                 const { base, height, weightKg } = prepareWasteMeasurements({ wasteDto, offer });
                 identity = { supplierId: wasteDto.supplierId, name: wasteDto.name, base, height, coneWeightKg: coneWeightKg ?? null, totalWeightKg: wasteDto.totalWeightKg ?? null };
@@ -263,6 +266,8 @@ export const updateWaste = async ({
         const waste = await getDb().$transaction(async (tx) => {
 
             const currentWaste = await findWasteById({ tx, id });
+
+            assertPieceQuantity({ quantity: wasteDto.minStock, item: currentWaste });
 
             if (WASTE_IMMUTABLE_FIELDS.some(field => Object.prototype.hasOwnProperty.call(wasteDto, field))) throw new WasteWeightReadOnly();
 

@@ -20,3 +20,13 @@ export const createIssueDetailsDto = (
     quantity: detail.quantity,
     ...mapAdditionalFields(detail)
 }));
+
+export const createIssueSupplyDetailsDto = (details = []) => details.map(detail => ({
+    id: detail.id,
+    isSupplied: detail.isSupplied,
+    projectConvertedQuantity: detail.projectConvertedQuantity,
+    ...(detail.quantityToSupply !== undefined && {
+        quantityToSupply: detail.quantityToSupply,
+        expectedSuppliedQuantity: detail.expectedSuppliedQuantity
+    })
+}));

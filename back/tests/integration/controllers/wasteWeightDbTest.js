@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import { randomUUID } from 'node:crypto';
-import XLSX from 'xlsx';
 
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
+import { readExcelReport } from '../../helpers/readExcelReport.js';
 import { wasteValidation, wasteEditValidation, wasteStockAdditionValidation, wasteStockAdjustmentValidation } from '../../../src/validators/forms/wasteValidations.js';
 import { validate } from '../../../src/middleware/validatorMiddleware.js';
 
@@ -280,12 +280,11 @@ describe('peso unitario de merma de rollo', () => {
             const chunks = []; res.on('data', chunk => chunks.push(chunk));
             res.on('end', () => callback(null, Buffer.concat(chunks)));
         }).expect(200);
-        const workbook = XLSX.read(response.body, { type: 'buffer' });
-        const rows = XLSX.utils.sheet_to_json(workbook.Sheets.Mermas, { header: 1 });
+        const { sheet, rows } = await readExcelReport(response.body, 'Mermas');
         expect(rows[0][6]).toBe('Peso neto total de rollos (kg)');
         const group = rows.find(row => row[1] === roll.name);
         expect(group[6]).toBe(21.15);
-        expect(workbook.Sheets.Mermas[`G${rows.length}`].f).toMatch(/^SUM/);
+        expect(sheet.getCell(`G${rows.length}`).formula).toMatch(/^SUM/);
         expect(await prisma.waste.findMany({ where: { supplierId: ids.supplier }, orderBy: { id: 'asc' } })).toEqual(before);
     });
 
@@ -307,8 +306,7 @@ describe('peso unitario de merma de rollo', () => {
             const chunks = []; res.on('data', chunk => chunks.push(chunk));
             res.on('end', () => callback(null, Buffer.concat(chunks)));
         }).expect(200);
-        const workbook = XLSX.read(response.body, { type: 'buffer' });
-        const rows = XLSX.utils.sheet_to_json(workbook.Sheets.Mermas, { header: 1 });
+        const { rows } = await readExcelReport(response.body, 'Mermas');
         expect(rows.find(row => row[1] === roll.name)[6]).toBe('Sin peso capturado');
         expect(rows.at(-1)[6]).toBe('Sin peso capturado');
     });

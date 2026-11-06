@@ -1,0 +1,20 @@
+# `CU-ENT-04` — Corregir material de una compra
+
+| Sección | Información relevante |
+| --- | --- |
+| Identificador | `CU-ENT-04` |
+| Nombre | Corregir material de una compra. |
+| Actor | Personal de almacén o Administrador del sistema. |
+| Disparador | Detecta una diferencia en un material de una compra y abre la corrección del detalle. |
+| Precondiciones | 1. El actor inició sesión.<br>2. El actor cuenta con el permiso operativo.<br>3. La compra y el detalle existen.<br>4. El detalle se encuentra en un estado que admite corrección. |
+| Flujo principal | 1. **Actor:** abre la compra en consulta y selecciona **Corregir detalle** sobre un material activo **(ver E1)**.<br>2. **Nexus:** abre el formulario con la cantidad y costo actuales y las estimaciones de totales de la corrección.<br>3. **Actor:** captura **Cantidad correcta** y **Costo por presentación correcto** y pulsa **Corregir detalle** **(ver A1)**.<br>4. **Nexus:** valida la captura y que exista una diferencia; muestra la confirmación **¿Corregir detalle de compra?** con el efecto de la operación.<br>5. **Actor:** pulsa **Corregir detalle** en la confirmación **(ver A2)**.<br>6. **Nexus:** comprueba que la cantidad corregida no supere la recibida y que el costo sea positivo **(ver A3)**; revisa estado y existencia para revertir una reducción **(ver E2)**; conserva los valores anteriores y corregidos y actualiza los importes. Si reduce cantidad, ajusta existencia y registra el movimiento; si sólo cambia costo, conserva cantidades y no genera movimiento de inventario. Confirma la corrección y actualiza la compra **(ver EOP)**. |
+| Flujos alternativos | **A1 — Datos inválidos o sin cambios (después del paso 3):**<br>1. **Nexus:** señala la cantidad o costo inválidos, o que debe modificarse alguno; conserva el formulario sin mostrar la confirmación ni guardar cambios.<br>2. **Actor:** corrige los datos y pulsa **Corregir detalle**; continúa en el paso 4 del flujo principal.<br>**A2 — Cancelar la confirmación (en el paso 5):**<br>1. **Actor:** pulsa **Cancelar** en la confirmación.<br>2. **Nexus:** cierra sólo el aviso, conserva la captura de corrección y no modifica la compra; continúa en el paso 3 del flujo principal.<br>**A3 — Corrección rechazada por los datos vigentes (durante el paso 6):**<br>1. **Nexus:** explica el rechazo y conserva los datos de corrección sin actualizar compra, existencias ni importes.<br>2. **Actor:** corrige la captura y pulsa **Corregir detalle**; continúa en el paso 4 del flujo principal para revisar y confirmar de nuevo. |
+| Excepciones | **E1 — Acceso rechazado (después del paso 1 o durante el paso 6):**<br>1. **Nexus:** rechaza la solicitud, comunica el motivo y no presenta información ni ejecuta cambios fuera de la autorización del actor; termina el caso de uso.<br>**E2 — Existencia insuficiente para reducir la recepción (durante el paso 6):**<br>1. **Nexus:** informa que la existencia vigente no permite revertir la reducción y rechaza la corrección; conserva detalle, cantidades, costos e historia sin cambios parciales; termina el caso de uso.<br>**EOP — Operación no confirmada (durante el paso 6):**<br>1. **Nexus:** comunica que no pudo confirmar el resultado y no anuncia éxito; conserva la captura cuando el formulario sigue disponible. Termina el caso de uso. |
+| Postcondiciones (éxito y fallo) | 1. **Éxito:** El detalle conserva la cantidad o el costo corregido.<br>2. **Éxito:** La existencia refleja la reducción autorizada de cantidad; una corrección sólo de costo la conserva.<br>3. **Éxito:** Los totales reflejan la corrección y se genera movimiento de inventario sólo cuando disminuye la cantidad.<br>4. **Éxito:** El historial conserva los valores anteriores, los corregidos y el actor de la corrección.<br>5. **Fallo:** Un rechazo no debe producir cambios parciales ni exponer información no autorizada. |
+| Requisitos relacionados | `RF-REC-002`, `RN-002`, `RN-005`, `RN-012`. |
+
+Familia: [objetivos y realización](index.md).
+
+## Diagramas de realización
+
+- [Compra: corrección de un detalle](../../../architecture/views/processes/06-purchases/03-purchase-correction.md).

@@ -10,13 +10,14 @@ import {
 } from '../../document/referenceNumberService.js';
 import { toNumber } from '../../../utils/formattersUtils.js';
 import { normalizeDecimal } from '../../../shared/utils/numberUtils.js';
-import { assertSufficientStock, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
+import { assertPieceQuantity, assertSufficientStock, calculateConvertedQuantity } from '../../inventory/stockHelpers.js';
 import { createWasteMovement } from './wasteMovementService.js';
 
 const calculateWasteStockAdjustmentValues = ({
     waste,
     newStock
 }) => {
+    assertPieceQuantity({ quantity: newStock, item: waste });
     const adjustedPreviousStock = normalizeDecimal(toNumber(waste.currentStock) || 0);
     const adjustedNewStock = normalizeDecimal(toNumber(newStock) || 0);
     const difference = normalizeDecimal(adjustedNewStock - adjustedPreviousStock);

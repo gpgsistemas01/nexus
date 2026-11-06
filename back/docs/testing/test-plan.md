@@ -1,13 +1,18 @@
 # Plan de pruebas
 
-Los comandos de validación se ejecutan desde `back/` (`cd back` desde la raíz).
-Las rutas `tests/`, `src/` y `docs/` son relativas a esa carpeta.
-
 ## Datos generales del documento
 
 | Versión documental | Versión del sistema | Estado | Fecha | Responsable |
 | --- | --- | --- | --- | --- |
-| 1.2 | 1.0.0 | En revisión | 2026-10-20 | Equipo Nexus |
+| 1.4 | 1.0.0 | En revisión | 2026-10-26 | Equipo Nexus |
+
+Los comandos de validación se ejecutan desde `back/` (`cd back` desde la raíz).
+Las rutas `tests/`, `src/` y `docs/` son relativas a esa carpeta.
+
+La suite del frontend Vue se mantiene en `front/tests/` y se ejecuta desde `front/`,
+con Vitest, Vue Test Utils y Playwright/Chromium. Su alcance y diseño de casos están en la
+[documentación de pruebas del frontend](../../../front/docs/testing/index.md). Las rutas y
+comandos del resto de este documento corresponden al backend salvo indicación expresa.
 
 ## Objetivo y alcance
 
@@ -87,7 +92,7 @@ Cada caso que requiere ficha documental registra al menos los datos de entrada y
 resultado esperado que permiten
 decidir objetivamente si pasa. En operaciones de escritura, los datos de prueba deben
 identificar los valores que se intentan registrar y el resultado esperado debe indicar
-tanto la respuesta que devuelve el sistema como los datos que deben quedar persistidos
+tanto la respuesta que devuelve Nexus como los datos que deben quedar persistidos
 o la ausencia de escritura. No basta con anotar «registro correcto» o únicamente el
 código HTTP. Los valores sensibles se reemplazan por fixtures o referencias
 reproducibles; no se copian credenciales ni datos personales reales.
@@ -157,10 +162,23 @@ módulo; los contextos añaden evidencia sólo cuando tienen decisiones o contra
 
 Las pruebas de `tests/integration/migrations` verifican restricciones, conservación
 histórica y rollback en PostgreSQL; no se confunden con preparar el esquema de las
-integraciones HTTP. Las unitarias de herramientas y del adaptador transaccional protegen
+integraciones HTTP. La cadena completa se comprueba desde una base desechable vacía
+y con sus filas retiradas antes de cada paso. Las correcciones de registros se prueban
+además con ausencia parcial, identidades modificadas y datos ya transformados.
+Repetir `prisma migrate deploy` debe reconocer el historial aplicado; no se exige
+que cada cambio estructural pueda ejecutarse dos veces como SQL suelto.
+Las unitarias de herramientas y del adaptador transaccional protegen
 sus contratos de soporte; `npm run docs:check` valida documentación. No constituyen
-niveles funcionales nuevos. Actualmente no existe una suite automatizada de sistema,
-navegador o aceptación; cuando se requiera, se registra de forma separada.
+niveles funcionales nuevos. El backend no tiene una suite propia de navegador.
+Vue conserva sus recorridos Playwright en `front/tests/e2e`, con diseño, fichas y
+límites en la [colección de pruebas del cliente](../../../front/docs/testing/index.md).
+Ejecutan Chromium contra Vite e interceptan la API; no equivalen a una suite de
+sistema contra Express/PostgreSQL real ni a aceptación del usuario. Por separado,
+`front/tests/system` ejecuta un representante con los routers reales, JWT y base
+aislada: login, alta persistida de cliente, tres reportes XLSX, renovación y cierre.
+Su [preparación y limpieza](../../../front/docs/testing/05-system-tests.md) no cambia
+la base habitual. `CP-VUE-SYS-001-01` complementa las integraciones backend y no
+acredita todos los CU ni la aceptación del usuario.
 
 ### Técnicas de diseño
 
@@ -232,7 +250,8 @@ el estado persistido con Prisma, y cubre al menos una regla de rechazo relevante
 flujos entre dominios se demuestran en la integración propietaria en lugar de duplicar
 la misma prueba unitaria. `npm run test:integration` valida que la URL de pruebas sea
 distinta de `DATABASE_URL`, aplica las migraciones y genera el cliente antes de ejecutar
-Vitest.
+Vitest. Migraciones, generación y Vitest reciben explícitamente `NODE_ENV=test`,
+aunque la terminal o el archivo local declaren otro entorno.
 
 ## Cobertura prioritaria
 
@@ -244,7 +263,7 @@ Vitest.
 | Salidas de material | Mantener `goodsIssueControllerDbTest.js` y `warehouseConcurrencyControllerDbTest.js`: contexto, surtido, devolución parcial, concurrencia y rollback; completar fronteras de devolución. |
 | Entradas de compra | Mantener `goodsReceiptContextDbTest.js` y `warehouseConcurrencyControllerDbTest.js`: aislamiento, alta, edición, corrección, cancelación, folios y fallos; ampliar sólo la regla afectada. |
 | Personas y usuarios | Incorporar persistencia de relaciones de rol y departamento. |
-| Autorización por contexto | Mantener casos unitarios positivos y negativos por combinación rol/departamento; ventas permanece sin permisos del sistema. |
+| Autorización por contexto | Mantener casos unitarios positivos y negativos por combinación rol/departamento; ventas permanece sin permisos de Nexus. |
 | Auditoría de escrituras | Incorporar unitarias de clasificación/sanitizado y middleware, más integración que distinga respuesta exitosa, fallida y persistencia best effort. |
 | Ajustes, requisiciones y proyectos | Probar únicamente cuando exista el CRUD accesible desde controller. |
 | Reportes y movimientos | Cubrir consultas, permisos, filtros y datos exportados. |
@@ -275,6 +294,7 @@ No se versionan esos reportes en `docs`.
 
 ## Referencias
 
+- [ISO/IEC/IEEE 29119-2:2021](https://www.iso.org/standard/79428.html): procesos de pruebas; adaptación selectiva del plan.
 - [ISO/IEC/IEEE 29119-3:2021](https://www.iso.org/standard/79429.html): documentación de pruebas; adaptación selectiva a diseño, caso y ejecución.
 - [ISO/IEC/IEEE 29119-4:2021](https://www.iso.org/standard/79430.html): técnicas de diseño.
 - [ISTQB CTFL 4.0.1](https://istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf), apartados 1.4, 4.2 y 5.2: trazabilidad, técnicas y priorización por riesgo.

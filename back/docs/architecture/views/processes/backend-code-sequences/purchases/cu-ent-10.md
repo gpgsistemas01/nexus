@@ -26,7 +26,6 @@ uno tiene un nodo propio, aunque no ejecute una delegación durante la petición
 | `DTO` | control | [`goodsReceiptDTO.js`](../../../../../../src/dtos/goodsReceiptDTO.js) |
 | `Change` | control | [`goodsReceiptDetailChangeService.js`](../../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js) |
 | `Reason` | control | [`reasonService.js`](../../../../../../src/services/warehouse/reasonService.js) |
-| `Costs` | control | [`supplierMaterialService.js`](../../../../../../src/services/warehouse/materials/supplierMaterialService.js) |
 | `ErrorHandler` | control | [`app.js`](../../../../../../src/app.js) |
 | `ValidationRules` | control | [`goodsReceiptValidations.js`](../../../../../../src/validators/forms/goodsReceiptValidations.js) |
 | `Numbers` | control | [`numberUtils.js`](../../../../../../src/shared/utils/numberUtils.js) |
@@ -178,7 +177,6 @@ sequenceDiagram
     participant Inventory@{ "type": "control" } as movementService.js
     participant Change@{ "type": "control" } as goodsReceiptDetailChangeService.js
     participant Reason@{ "type": "control" } as reasonService.js
-    participant Costs@{ "type": "control" } as supplierMaterialService.js
 
     participant Formatter@{ "type": "control" } as formattersUtils.js
 
@@ -210,7 +208,6 @@ sequenceDiagram
             end
             Core->>Totals: correctGoodsReceiptDetailAndTotals({ tx, goodsReceiptId: id, detailId, ... })
             Core->>Change: createGoodsReceiptDetailChange({ tx, changedById: userId, ... })
-            Core->>Costs: recalculateMaterialUnitCosts({ tx, supplierId, materialIds })
         end
         Prisma-->>Core: commit de detalle, totales, trazabilidad y stock
         Core-->>Facade: correctGoodsReceiptDetailLine(): Promise[{ updatedDetail, updatedReceipt, detailChange, movement }]

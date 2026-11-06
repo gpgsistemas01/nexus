@@ -15,6 +15,7 @@ const monthYearFormatter = new Intl.DateTimeFormat('en-US', {
     year: 'numeric'
 });
 
+// Compatibilidad: sólo normaliza vacíos de primer nivel; no escapa HTML ni valida entradas.
 export const sanitizeEmptyStrings = (obj) => {
   return Object.fromEntries(
     Object.entries(obj).map(([key, value]) => [
@@ -80,27 +81,6 @@ export const getReportMonthDateRange = (reportMonth = '') => {
         year
     };
 };
-
-export const cleanSearchTerm = (search) => {
-
-  const cleaned = search.trim();
-  let codeSearch = search;
-  let nameSearch = search;
-
-  if (cleaned.includes('-')) {
-
-    const parts = cleaned.split('-').map(part => part.trim());
-    codeSearch = parts[0];
-    nameSearch = parts.slice(1).join('-');
-  }
-
-  return { codeSearch, nameSearch };
-};
-
-export const hasMaterialDimensions = (material = {}) => (
-    Number(material.base || 0) > 0 &&
-    Number(material.height || 0) > 0
-);
 
 export const buildStockKey = (materialId, supplierId) =>
     `${materialId}:${supplierId}`;

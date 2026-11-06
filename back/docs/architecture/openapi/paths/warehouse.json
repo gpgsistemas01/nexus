@@ -30,7 +30,39 @@
         "503": {
           "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Consumibles"
+      ],
+      "summary": "Consultar consumibles",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseConsumables",
@@ -58,6 +90,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -69,7 +107,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Consumibles"
+      ],
+      "summary": "Crear consumible"
     }
   },
   "/api/warehouse/materials": {
@@ -99,8 +141,46 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Materiales"
+      ],
+      "summary": "Consultar materiales",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name, 1=base, 2=height, 4=minStock. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              4
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseMaterials",
@@ -128,6 +208,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -139,7 +225,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Materiales"
+      ],
+      "summary": "Crear material"
     }
   },
   "/api/warehouse/materials/{id}": {
@@ -177,7 +267,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -185,6 +275,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -205,9 +298,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Materiales"
+      ],
+      "summary": "Editar material"
     },
     "delete": {
       "operationId": "deleteWarehouseMaterialsId",
@@ -240,7 +338,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -248,6 +346,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "parameters": [
@@ -258,9 +359,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Materiales"
+      ],
+      "summary": "Eliminar material"
     }
   },
   "/api/warehouse/materials/{id}/stock": {
@@ -298,7 +404,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -306,6 +412,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -326,9 +435,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Materiales"
+      ],
+      "summary": "Ajustar existencias de material"
     }
   },
   "/api/warehouse/wastes/material-templates": {
@@ -359,8 +473,29 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Mermas"
+      ],
+      "summary": "Consultar materiales de referencia para merma",
+      "parameters": [
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        }
+      ]
     }
   },
   "/api/warehouse/wastes": {
@@ -390,8 +525,43 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Mermas"
+      ],
+      "summary": "Consultar mermas",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseWastes",
@@ -423,6 +593,12 @@
         },
         "409": {
           "$ref": "../openapi.json#/components/responses/WriteConflict"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -434,7 +610,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Mermas"
+      ],
+      "summary": "Crear merma"
     }
   },
   "/api/warehouse/wastes/{id}": {
@@ -472,7 +652,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -480,6 +660,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -500,9 +683,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Mermas"
+      ],
+      "summary": "Editar merma"
     }
   },
   "/api/warehouse/wastes/{id}/stock": {
@@ -515,7 +703,7 @@
       ],
       "responses": {
         "200": {
-          "description": "Ajuste guardado. La implementaci\u00f3n actual devuelve \u00fanicamente el c\u00f3digo de \u00e9xito: el callback transaccional de updateWasteStock no retorna la entidad. El pendiente est\u00e1 descrito en CU-ALM-12.",
+          "description": "Ajuste confirmado. La respuesta contiene s\u00f3lo code; consulte el listado para obtener la existencia vigente.",
           "content": {
             "application/json": {
               "schema": {
@@ -549,7 +737,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -557,6 +745,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -577,10 +768,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
-      "description": "Corrige el saldo total mediante newStock, la existencia final deseada, y registra un ajuste AME. No suma una cantidad incremental."
+      "description": "Corrige el saldo total mediante newStock, la existencia final deseada, y registra un ajuste AME. No suma una cantidad incremental.",
+      "tags": [
+        "Mermas"
+      ],
+      "summary": "Ajustar existencias de merma"
     }
   },
   "/api/warehouse/waste-issues": {
@@ -610,9 +806,67 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": " Devuelve cabeceras sin details; los modales consultan GET /{id}."
+      "description": "Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
+      "tags": [
+        "Salidas de mermas"
+      ],
+      "summary": "Consultar salidas de mermas",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName, 6=observations. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/FulfillmentStatusId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ObservationsSearch"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ClientId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/DepartmentId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseWasteIssues",
@@ -640,6 +894,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -651,7 +911,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Salidas de mermas"
+      ],
+      "summary": "Crear salida de mermas"
     }
   },
   "/api/warehouse/waste-issues/{id}": {
@@ -686,7 +950,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -694,6 +958,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -714,9 +981,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Salidas de mermas"
+      ],
+      "summary": "Editar salida de mermas"
     },
     "get": {
       "operationId": "getWarehouseWasteIssue",
@@ -733,7 +1005,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
       "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
@@ -767,8 +1040,15 @@
         },
         "404": {
           "description": "Documento inexistente o fuera del contexto autorizado."
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Salidas de mermas"
+      ],
+      "summary": "Consultar salida de mermas"
     }
   },
   "/api/warehouse/waste-issues/{id}/header": {
@@ -803,7 +1083,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -811,6 +1091,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -831,9 +1114,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Salidas de mermas"
+      ],
+      "summary": "Editar encabezado de salida de mermas"
     }
   },
   "/api/warehouse/waste-issues/{id}/details": {
@@ -868,7 +1156,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -876,6 +1164,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -896,9 +1187,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Salidas de mermas"
+      ],
+      "summary": "Surtir detalles de salida de mermas"
     }
   },
   "/api/warehouse/waste-issues/{id}/details/{detailId}/returns": {
@@ -933,7 +1229,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -941,6 +1237,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -961,7 +1260,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         },
         {
           "name": "detailId",
@@ -970,9 +1270,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del detalle."
         }
-      ]
+      ],
+      "tags": [
+        "Salidas de mermas"
+      ],
+      "summary": "Devolver un detalle de salida de mermas"
     }
   },
   "/api/warehouse/suppliers": {
@@ -1002,8 +1307,45 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Proveedores"
+      ],
+      "summary": "Consultar proveedores",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=tradeName, 1=legalName, 2=isActive. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OnlyActive"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseSuppliers",
@@ -1031,6 +1373,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -1042,7 +1390,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Proveedores"
+      ],
+      "summary": "Crear proveedor"
     }
   },
   "/api/warehouse/suppliers/{id}": {
@@ -1080,7 +1432,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1088,6 +1440,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1108,9 +1463,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Proveedores"
+      ],
+      "summary": "Editar proveedor"
     }
   },
   "/api/warehouse/goods-issues/materials": {
@@ -1140,9 +1500,66 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; los modales consultan GET /{id}."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
+      "tags": [
+        "Salidas de materiales"
+      ],
+      "summary": "Consultar salidas de materiales",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/FulfillmentStatusId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ObservationsSearch"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ClientId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/DepartmentId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseMaterialGoodsIssues",
@@ -1170,6 +1587,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -1182,7 +1605,11 @@
           }
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de materiales"
+      ],
+      "summary": "Crear salida de materiales"
     }
   },
   "/api/warehouse/goods-issues/consumables": {
@@ -1212,9 +1639,66 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; los modales consultan GET /{id}."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404. Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
+      "tags": [
+        "Salidas de consumibles"
+      ],
+      "summary": "Consultar salidas de consumibles",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/FulfillmentStatusId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ObservationsSearch"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ClientId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/DepartmentId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseConsumableGoodsIssues",
@@ -1242,6 +1726,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -1254,7 +1744,11 @@
           }
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de consumibles"
+      ],
+      "summary": "Crear salida de consumibles"
     }
   },
   "/api/warehouse/goods-issues/materials/{id}": {
@@ -1289,7 +1783,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1297,6 +1791,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1317,10 +1814,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de materiales"
+      ],
+      "summary": "Editar salida de materiales"
     },
     "get": {
       "operationId": "getApiWarehouseGoodsIssuesMaterialsDetail",
@@ -1337,7 +1839,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
       "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
@@ -1371,8 +1874,15 @@
         },
         "404": {
           "description": "Documento inexistente o fuera del contexto autorizado."
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Salidas de materiales"
+      ],
+      "summary": "Consultar salida de materiales"
     }
   },
   "/api/warehouse/goods-issues/consumables/{id}": {
@@ -1407,7 +1917,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1415,6 +1925,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1435,10 +1948,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de consumibles"
+      ],
+      "summary": "Editar salida de consumibles"
     },
     "get": {
       "operationId": "getApiWarehouseGoodsIssuesConsumablesDetail",
@@ -1455,7 +1973,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
       "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
@@ -1489,8 +2008,15 @@
         },
         "404": {
           "description": "Documento inexistente o fuera del contexto autorizado."
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Salidas de consumibles"
+      ],
+      "summary": "Consultar salida de consumibles"
     }
   },
   "/api/warehouse/goods-issues/materials/{id}/header": {
@@ -1525,7 +2051,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1533,6 +2059,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1553,10 +2082,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de materiales"
+      ],
+      "summary": "Editar encabezado de salida de materiales"
     }
   },
   "/api/warehouse/goods-issues/consumables/{id}/header": {
@@ -1591,7 +2125,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1599,6 +2133,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1619,10 +2156,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de consumibles"
+      ],
+      "summary": "Editar encabezado de salida de consumibles"
     }
   },
   "/api/warehouse/goods-issues/materials/{id}/details": {
@@ -1657,7 +2199,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1665,6 +2207,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1685,10 +2230,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de materiales"
+      ],
+      "summary": "Surtir detalles de salida de materiales"
     }
   },
   "/api/warehouse/goods-issues/consumables/{id}/details": {
@@ -1723,7 +2273,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1731,6 +2281,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1751,10 +2304,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de consumibles"
+      ],
+      "summary": "Surtir detalles de salida de consumibles"
     }
   },
   "/api/warehouse/goods-issues/materials/{id}/details/{detailId}/returns": {
@@ -1789,7 +2347,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1797,6 +2355,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1817,7 +2378,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         },
         {
           "name": "detailId",
@@ -1826,10 +2388,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del detalle."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de materiales"
+      ],
+      "summary": "Devolver un detalle de salida de materiales"
     }
   },
   "/api/warehouse/goods-issues/consumables/{id}/details/{detailId}/returns": {
@@ -1864,7 +2431,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -1872,6 +2439,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -1892,7 +2462,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         },
         {
           "name": "detailId",
@@ -1901,10 +2472,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del detalle."
         }
       ],
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de consumibles"
+      ],
+      "summary": "Devolver un detalle de salida de consumibles"
     }
   },
   "/api/warehouse/reports/inventory/excel": {
@@ -1935,8 +2511,43 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Inventario"
+      ],
+      "summary": "Exportar inventario a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name, 1=base, 2=height, 4=minStock. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              4
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/InventoryScope"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MaterialType"
+        }
+      ]
     }
   },
   "/api/warehouse/reports/goods-issues/materials/excel": {
@@ -1967,9 +2578,66 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de materiales. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de materiales"
+      ],
+      "summary": "Exportar salidas de materiales a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/FulfillmentStatusId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ObservationsSearch"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ClientId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/DepartmentId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MonthlyReport"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ReportMonth"
+        }
+      ]
     }
   },
   "/api/warehouse/reports/goods-issues/consumables/excel": {
@@ -2000,9 +2668,66 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404."
+      "description": "Opera exclusivamente en el contexto de consumibles. El servidor fija el tipo desde la ruta; no puede cambiarse mediante el cuerpo ni los par\u00e1metros de consulta. Los documentos o detalles del contexto contrario se rechazan con 404.",
+      "tags": [
+        "Salidas de consumibles"
+      ],
+      "summary": "Exportar salidas de consumibles a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/FulfillmentStatusId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ObservationsSearch"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ClientId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/DepartmentId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MonthlyReport"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ReportMonth"
+        }
+      ]
     }
   },
   "/api/warehouse/reports/waste-issues/excel": {
@@ -2033,8 +2758,65 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Salidas de mermas"
+      ],
+      "summary": "Exportar salidas de mermas a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=requestDate, 2=departmentName, 3=projectNumber, 4=clientName. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/FulfillmentStatusId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ObservationsSearch"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ClientId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/DepartmentId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MonthlyReport"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ReportMonth"
+        }
+      ]
     }
   },
   "/api/warehouse/reports/wastes/excel": {
@@ -2065,8 +2847,40 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Mermas"
+      ],
+      "summary": "Exportar mermas a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/InventoryScope"
+        }
+      ]
     }
   },
   "/api/warehouse/reports/suppliers/excel": {
@@ -2097,8 +2911,35 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Proveedores"
+      ],
+      "summary": "Exportar proveedores a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=tradeName, 1=legalName. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ]
     }
   },
   "/api/warehouse/unit-measures": {
@@ -2128,8 +2969,40 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Consultar registros de cat\u00e1logo",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ]
     }
   },
   "/api/warehouse/presentations": {
@@ -2159,8 +3032,40 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Consultar registros de cat\u00e1logo",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ]
     }
   },
   "/api/warehouse/reasons": {
@@ -2190,8 +3095,40 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Consultar registros de cat\u00e1logo",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ]
     }
   },
   "/api/warehouse/fulfillment-statuses": {
@@ -2221,8 +3158,40 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Cat\u00e1logos"
+      ],
+      "summary": "Consultar registros de cat\u00e1logo",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=name. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        }
+      ]
     }
   },
   "/api/warehouse/wastes/{id}/stock-additions": {
@@ -2260,7 +3229,7 @@
           "$ref": "../openapi.json#/components/responses/WriteConflict"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2268,6 +3237,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -2288,10 +3260,15 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
-      "description": "Suma quantity al saldo actual mediante una entrada EME; conserva cantidad, saldos, actor y observaciones. Exige operationId; el recibo, la merma, la entrada y sus movimientos se confirman juntos. Repetir clave/captura recupera la respuesta original; otra captura con esa clave responde 409."
+      "description": "Suma quantity al saldo actual mediante una entrada EME; conserva cantidad, saldos, actor y observaciones. Exige operationId; el recibo, la merma, la entrada y sus movimientos se confirman juntos. Repetir clave/captura recupera la respuesta original; otra captura con esa clave responde 409.",
+      "tags": [
+        "Mermas"
+      ],
+      "summary": "Agregar existencias a una merma"
     }
   },
   "/api/warehouse/consumables/{id}": {
@@ -2329,7 +3306,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2337,6 +3314,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -2357,9 +3337,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Consumibles"
+      ],
+      "summary": "Editar consumible"
     },
     "delete": {
       "operationId": "deleteWarehouseConsumablesId",
@@ -2392,7 +3377,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2400,6 +3385,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "parameters": [
@@ -2410,9 +3398,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Consumibles"
+      ],
+      "summary": "Eliminar consumible"
     }
   },
   "/api/warehouse/consumables/{id}/stock": {
@@ -2450,7 +3443,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2458,6 +3451,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -2478,9 +3474,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Consumibles"
+      ],
+      "summary": "Ajustar existencias de consumible"
     }
   },
   "/api/warehouse/goods-receipts/materials": {
@@ -2510,9 +3511,56 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": " Devuelve cabeceras sin details; los modales consultan GET /{id}."
+      "description": "Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
+      "tags": [
+        "Compras de materiales"
+      ],
+      "summary": "Consultar compras de materiales",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseGoodsReceiptsMaterials",
@@ -2540,6 +3588,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -2551,7 +3605,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Compras de materiales"
+      ],
+      "summary": "Crear compra de materiales"
     }
   },
   "/api/warehouse/goods-receipts/consumables": {
@@ -2581,9 +3639,56 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
-      "description": " Devuelve cabeceras sin details; los modales consultan GET /{id}."
+      "description": "Devuelve cabeceras sin details; consulte GET /{id} para obtener los detalles.",
+      "tags": [
+        "Compras de consumibles"
+      ],
+      "summary": "Consultar compras de consumibles",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Start"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Length"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        }
+      ]
     },
     "post": {
       "operationId": "postWarehouseGoodsReceiptsConsumables",
@@ -2611,6 +3716,12 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
+        },
+        "400": {
+          "$ref": "../openapi.json#/components/responses/ValidationError"
         }
       },
       "requestBody": {
@@ -2622,7 +3733,11 @@
             }
           }
         }
-      }
+      },
+      "tags": [
+        "Compras de consumibles"
+      ],
+      "summary": "Crear compra de consumibles"
     }
   },
   "/api/warehouse/goods-receipts/materials/{id}": {
@@ -2657,7 +3772,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2665,6 +3780,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -2685,9 +3803,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Compras de materiales"
+      ],
+      "summary": "Editar compra de materiales"
     },
     "get": {
       "operationId": "getApiWarehouseGoodsReceiptsMaterialsDetail",
@@ -2704,7 +3827,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
       "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
@@ -2738,8 +3862,15 @@
         },
         "404": {
           "description": "Documento inexistente o fuera del contexto autorizado."
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Compras de materiales"
+      ],
+      "summary": "Consultar compra de materiales"
     }
   },
   "/api/warehouse/goods-receipts/consumables/{id}": {
@@ -2774,7 +3905,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2782,6 +3913,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -2802,9 +3936,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
-      ]
+      ],
+      "tags": [
+        "Compras de consumibles"
+      ],
+      "summary": "Editar compra de consumibles"
     },
     "get": {
       "operationId": "getApiWarehouseGoodsReceiptsConsumablesDetail",
@@ -2821,7 +3960,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         }
       ],
       "description": "Carga un documento y sus detalles con el mismo alcance de tipo y \u00e1rea que su listado. Un id fuera de contexto responde 404.",
@@ -2855,8 +3995,15 @@
         },
         "404": {
           "description": "Documento inexistente o fuera del contexto autorizado."
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Compras de consumibles"
+      ],
+      "summary": "Consultar compra de consumibles"
     }
   },
   "/api/warehouse/goods-receipts/materials/{id}/details/{detailId}/corrections": {
@@ -2891,7 +4038,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2899,6 +4046,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -2919,7 +4069,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         },
         {
           "name": "detailId",
@@ -2928,9 +4079,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del detalle."
         }
-      ]
+      ],
+      "tags": [
+        "Compras de materiales"
+      ],
+      "summary": "Corregir un detalle de compra de materiales"
     }
   },
   "/api/warehouse/goods-receipts/consumables/{id}/details/{detailId}/corrections": {
@@ -2965,7 +4121,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -2973,6 +4129,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "requestBody": {
@@ -2993,7 +4152,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         },
         {
           "name": "detailId",
@@ -3002,9 +4162,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del detalle."
         }
-      ]
+      ],
+      "tags": [
+        "Compras de consumibles"
+      ],
+      "summary": "Corregir un detalle de compra de consumibles"
     }
   },
   "/api/warehouse/goods-receipts/materials/{id}/details/{detailId}/cancel": {
@@ -3039,7 +4204,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -3047,6 +4212,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "parameters": [
@@ -3057,7 +4225,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         },
         {
           "name": "detailId",
@@ -3066,9 +4235,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del detalle."
         }
-      ]
+      ],
+      "tags": [
+        "Compras de materiales"
+      ],
+      "summary": "Cancelar un detalle de compra de materiales"
     }
   },
   "/api/warehouse/goods-receipts/consumables/{id}/details/{detailId}/cancel": {
@@ -3103,7 +4277,7 @@
           "$ref": "../openapi.json#/components/responses/ValidationError"
         },
         "404": {
-          "description": "El registro o la partida no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
+          "description": "El registro o el detalle no est\u00e1 disponible en el contexto solicitado. Conserva el c\u00f3digo del dominio.",
           "content": {
             "application/json": {
               "schema": {
@@ -3111,6 +4285,9 @@
               }
             }
           }
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
       },
       "parameters": [
@@ -3121,7 +4298,8 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del registro."
         },
         {
           "name": "detailId",
@@ -3130,9 +4308,14 @@
           "schema": {
             "type": "string",
             "format": "uuid"
-          }
+          },
+          "description": "UUID del detalle."
         }
-      ]
+      ],
+      "tags": [
+        "Compras de consumibles"
+      ],
+      "summary": "Cancelar un detalle de compra de consumibles"
     }
   },
   "/api/warehouse/reports/goods-receipts/materials/excel": {
@@ -3163,8 +4346,55 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Compras de materiales"
+      ],
+      "summary": "Exportar compras de materiales a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MonthlyReport"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ReportMonth"
+        }
+      ]
     }
   },
   "/api/warehouse/reports/goods-receipts/consumables/excel": {
@@ -3195,8 +4425,55 @@
         },
         "500": {
           "$ref": "../openapi.json#/components/responses/ServerError"
+        },
+        "503": {
+          "$ref": "../openapi.json#/components/responses/DatabaseSchemaUnavailable"
         }
-      }
+      },
+      "tags": [
+        "Compras de consumibles"
+      ],
+      "summary": "Exportar compras de consumibles a Excel",
+      "parameters": [
+        {
+          "name": "order[0][column]",
+          "in": "query",
+          "description": "\u00cdndice de orden: 0=referenceNumber, 1=receptionDate, 2=supplierName, 3=invoice. Otros \u00edndices usan la primera columna admitida.",
+          "schema": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/Search"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/OrderDirection"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/StartDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/EndDate"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/SupplierId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/PersonId"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/MonthlyReport"
+        },
+        {
+          "$ref": "../openapi.json#/components/parameters/ReportMonth"
+        }
+      ]
     }
   }
 }

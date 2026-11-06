@@ -23,7 +23,7 @@ correspondiente es `/app`.
 - [Ejecución](#ejecución)
 - [Scripts disponibles](#scripts-disponibles)
 - [Publicación de documentos y capturas](#publicación-de-documentos-y-capturas)
-- [Rutas](#rutas)
+- [Rutas principales](#rutas-principales)
 - [Pruebas automatizadas](#pruebas-automatizadas)
 - [Convenciones de desarrollo](#convenciones-de-desarrollo)
 - [Docker](#docker)
@@ -60,7 +60,7 @@ que aún no tienen un flujo accesible completo.
 - **Tiempo real:** Socket.IO.
 - **Logs:** Pino y Pino HTTP.
 - **Pruebas:** Vitest y Supertest.
-- **Utilidades:** bcrypt, jsonwebtoken, cookie-parser, ioredis, xlsx.
+- **Utilidades:** bcrypt, jsonwebtoken, cookie-parser y ExcelJS.
 
 ## Arquitectura del proyecto
 
@@ -94,7 +94,7 @@ La aplicación usa una separación por capas: las rutas delegan en controladores
 Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` componen
 los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
 con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
-incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en el
+incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en la
 [descripción de arquitectura y construcción](docs/architecture/views/index.md).
 
 ## Documentación
@@ -105,15 +105,26 @@ fuente de verdad. El mapa de rutas y dependencias se genera desde el código; el
 el diccionario técnico se derivan de Prisma; los diagramas de diseño se mantienen de
 forma curada. CI comprueba que el contenido generado esté actualizado.
 
+- Para consumir la API, consulta su [documentación independiente](docs/architecture/openapi/index.md), el [contrato HTTP](docs/architecture/openapi/api-contract.md)
+  y la [especificación OpenAPI](docs/architecture/openapi/openapi.json).
+- Para modificar el servidor, consulta la
+  [documentación técnica del backend](docs/architecture/views/development/backend-technical-documentation/index.md)
+  y sus [responsabilidades por capa](docs/architecture/views/development/code-structure/index.md).
+- La [documentación de la interfaz EJS](docs/architecture/views/development/frontend-technical-documentation/index.md)
+  describe sus pantallas y controles visuales.
+
 ## Requisitos
 
-- Node.js `>=22 <25`.
+- Node.js `^22.13.0 || ^24.14.1 || ^26.12.1`; Node 26 se comprueba en CI junto con Node 24.
 - npm.
 - PostgreSQL disponible para desarrollo y, opcionalmente, otra base aislada para pruebas.
 
 ## Configuración inicial
 
 Ejecuta los comandos npm desde `back/` (`cd back` desde la raíz del repositorio).
+Si actualizas una copia anterior a la separación de carpetas, revisa primero
+[archivos locales ignorados y cambio de estructura](../README.md#archivos-locales-ignorados-y-cambio-de-estructura):
+Git no mueve el `.env`, las dependencias ni el cliente Prisma generado de tu equipo.
 
 1. Instalar dependencias:
 
@@ -136,34 +147,79 @@ Ejecuta los comandos npm desde `back/` (`cd back` desde la raíz del repositorio
    npm run dev
    ```
 
+### Dependencias y actualizaciones
+
+Se actualizan dotenv 18, EJS 7 y Vitest 5 con su
+proveedor V8 de la misma versión. Prisma conserva la versión estable 7.10.1 en
+CLI, cliente y adaptador; una etiqueta `latest` con `8.0.0-rc` no representa una
+versión estable para producción.
+
+`npm run dev` usa Nodemon con vigilancia limitada a `src/` y `.env` en
+[`nodemon.json`](nodemon.json). Las cargas de dependencias, incluidas las de Prisma
+en la primera consulta, no reinician el proceso ni interrumpen el proxy de Vue.
+Las vistas se leen de nuevo en desarrollo sin reinicio. Después de generar el
+cliente Prisma con `npm run db:generate`, reinicia la API. La versión de Nodemon
+queda fijada en el manifiesto y el lockfile.
+
+ExcelJS conserva su última versión estable oficial, 4.4.0. Un override limitado a
+`exceljs → uuid@11` evita la versión vulnerable 8 manteniendo la API CommonJS `v4`
+que consume ExcelJS. Las pruebas de reportes comprueban las descargas y fórmulas.
+No se aplica un override global de UUID ni `npm audit fix --force`.
+
+El lector SheetJS `xlsx@0.18.5` se retira de las pruebas. `read-excel-file` verifica
+los valores guardados con un lector independiente; ExcelJS permite inspeccionar
+las fórmulas. Se mantienen las comprobaciones de ceros, decimales, filas, orden,
+concurrencia y ausencia de cambios en BD. ExcelJS aún puede traer paquetes con
+avisos de obsolescencia: actualizar las dependencias directas y pasar `npm audit`
+no implica que todas sus dependencias transitivas estén mantenidas.
+
+Vitest 5 limpia mocks por defecto. La configuración unitaria fija `clearMocks: false`
+para conservar las llamadas observadas durante el registro de rutas; las suites
+mantienen su limpieza explícita entre casos. Se conservan las mismas aserciones.
+
+Después de descargar los cambios, detén el servidor y ejecuta desde la raíz
+`npm --prefix back ci --include=dev`, `npm --prefix back run db:generate` y
+`npm --prefix back run dev`. Las dependencias se instalan por aplicación; Git no
+actualiza `node_modules` ni genera el cliente Prisma.
+
+### Avisos al actualizar Node y npm
+
+`EBADENGINE` con `package: nexus@1.0.0` y `required: >=22 <25` indica que la copia
+local conserva el contrato anterior a Node 26. La configuración actual admite
+Node 26 desde 26.12.1; sincroniza `package.json` y `package-lock.json` con la rama
+actualizada. El rango declarado no instala Node ni cambia la imagen Docker.
+
+npm 11.20 puede avisar de scripts de instalación aún no registrados en
+`allowScripts`. El proyecto revisó y registró únicamente `bcrypt@6.0.0` (preparación
+del módulo nativo), `prisma@7.10.1` (comprobación de requisitos) y
+`@prisma/engines@7.10.1` (preparación de motores). La advertencia no prueba por sí
+sola que los scripts hayan sido omitidos o que la instalación haya fallado.
+
+Desde `back/`, para revisar la política con una versión de npm que la admita:
+
+```bash
+npm install-scripts ls
+```
+
+En una copia anterior que tenga esas mismas versiones, el registro selectivo se
+realiza con `npm install-scripts approve bcrypt prisma @prisma/engines`. El comando
+guarda las versiones instaladas en `package.json`; no ejecuta los scripts. Después
+de revisar un cambio de versión, actualiza sus entradas con el mismo comando y
+reinstala con `npm ci`, o usa `npm rebuild bcrypt prisma @prisma/engines` para volver
+a ejecutar los scripts sobre una instalación existente. Genera finalmente el
+cliente con `npm run db:generate`. No apruebes paquetes adicionales sin revisar su
+procedencia, versión y scripts.
+
+`npm update` respeta los rangos de versiones declarados y no garantiza corregir
+todos los avisos de seguridad. Consulta `npm audit` para identificar el paquete
+propietario; no uses `npm audit fix --force` como sustituto de una migración revisada.
+
 ## Variables de entorno
 
 La aplicación carga variables con `dotenv/config.js`. En desarrollo, define la
 configuración en un archivo `.env` local; en despliegues, utiliza el gestor de secretos
 de la plataforma. El archivo `.env` está excluido por `.gitignore` y nunca debe contener
 valores destinados a versionarse.
-
-```env
-# Aplicación
-PORT=3000
-NODE_ENV=development
-
-# Base de datos
-DATABASE_URL="postgresql://nexus_app:password@pooler.example.com:6543/nexus"
-DIRECT_URL="postgresql://nexus_migrator:password@localhost:5432/nexus"
-DATABASE_TEST_URL="postgresql://nexus_test_app:password@pooler.example.com:6543/nexus_test"
-DIRECT_TEST_URL="postgresql://nexus_test_migrator:password@localhost:5432/nexus_test"
-
-# Autenticación / seguridad
-JWT_SECRET_ACCESS="cambiar-en-produccion"
-JWT_SECRET_REFRESH="cambiar-en-produccion"
-JWT_SECRET_ONE_TIME="cambiar-en-produccion"
-
-# Logs
-LOG_LEVEL="info"
-```
-
-> Ajusta los nombres/secretos según el ambiente real. No subas archivos `.env` con credenciales al repositorio.
 
 | Variable | Obligatoria | Uso |
 | --- | --- | --- |
@@ -173,12 +229,28 @@ LOG_LEVEL="info"
 | `DIRECT_TEST_URL` | No | Conexión directa para migrar la base de pruebas; si falta se usa `DATABASE_TEST_URL`. |
 | `JWT_SECRET_ACCESS` | Sí | Firma tokens de acceso con vigencia de una hora. |
 | `JWT_SECRET_REFRESH` | Sí | Firma tokens de renovación con vigencia de siete días. |
-| `JWT_SECRET_ONE_TIME` | Sí | Firma tokens de un solo uso con vigencia de quince minutos. |
 | `PORT` | No | Puerto HTTP; el valor predeterminado es `3000`. |
 | `NODE_ENV` | No en local | Selecciona la base de pruebas cuando vale `test`; la imagen Docker lo fija en `production`. |
 | `LOG_LEVEL` | No | Nivel de Pino. Acepta `fatal`, `error`, `warn`, `info`, `debug`, `trace` o `silent`; el predeterminado es `warn`. |
 
 ## Base de datos, usuarios y permisos
+
+La migración de datos `20261103000000_reclassify_six_confirmed_consumables`
+reclasifica PLAYO, HULE BURBUJA, PAPEL KRAFT, MALLA VERDE y las dos KOLA LOKA
+(2000 y 1200) revisadas contra `LISTA CONSUMIBLES.pdf` y el respaldo del
+27 de octubre de 2026. Usa los seis IDs confirmados y valida nombre, SKU,
+presentación/unidad PIEZA y ausencia de medidas antes de cambiar `MATERIAL`
+a `CONSUMABLE`. Omite registros ausentes, modificados o ya reclasificados;
+no incluye tornillos ni ventosas. Conserva existencias, relaciones y documentos
+históricos; el trigger existente incrementa la versión del material.
+No requiere cambios en `schema.prisma`, porque solo corrige datos.
+Se aplica con `npm run db:migrate` junto con las demás migraciones pendientes.
+
+La migración incremental `20261103010000_reclassify_screw_and_suction_cup`
+incorpora los dos registros confirmados posteriormente: `TORNILLO DE PLASTICO`
+(`TOR-PLA-1`) y `VENTOSA MEDIANA` (`VEN-MED-1`). Conserva sus nombres y demás
+campos; solo cambia el tipo a `CONSUMABLE` y el trigger incrementa la versión.
+Usa las mismas guardas de identidad y no modifica la migración anterior.
 
 Prisma selecciona la URL según el entorno: `DATABASE_URL` para la aplicación,
 `DATABASE_TEST_URL` para pruebas y las variantes `DIRECT_*` para migraciones cuando
@@ -200,7 +272,7 @@ npm run dev
 
 El servidor escucha en `PORT` o en `3000` por defecto y se publica en `0.0.0.0`.
 
-### Producción/local sin nodemon
+### Producción/local sin recarga automática
 
 ```bash
 npm start
@@ -208,10 +280,13 @@ npm start
 
 ## Scripts disponibles
 
+La [consulta de comandos para desarrolladores](../front/docs/development/00-commands.md)
+reúne API, Vue, base de datos, pruebas, capturas y publicación desde la raíz.
+
 | Script | Descripción |
 | --- | --- |
 | `npm start` | Ejecuta `node src/app.js`. |
-| `npm run dev` | Ejecuta la aplicación con Nodemon. |
+| `npm run dev` | Reinicia con Nodemon sólo por cambios de código o `.env`; excluye dependencias y archivos generados. |
 | `npm run db:migrate` | Aplica migraciones pendientes con Prisma; usa `DIRECT_URL` automáticamente cuando está definida. |
 | `npm run db:generate` | Genera el cliente Prisma. |
 | `npm test` | Ejecuta las pruebas unitarias y auxiliares; excluye `tests/integration`. |
@@ -264,30 +339,10 @@ reduce el ancho disponible.
 
 ### API REST
 
-Todas las rutas API cuelgan de `/api` y esperan `Content-Type: application/json` salvo endpoints especializados:
-
-- `/api/auth`
-- `/api/sales/clients`
-- `/api/sales/reports`
-- `/api/warehouse/consumables`
-- `/api/warehouse/materials`
-- `/api/warehouse/wastes`
-- `/api/warehouse/suppliers`
-- `/api/warehouse/goods-receipts/materials`
-- `/api/warehouse/goods-receipts/consumables`
-- `/api/warehouse/goods-issues`
-- `/api/warehouse/notifications`
-- `/api/warehouse/reports`
-- `/api/warehouse/unit-measures`
-- `/api/warehouse/presentations`
-- `/api/warehouse/reasons`
-- `/api/warehouse/fulfillment-statuses`
-- `/api/admin/users`
-- `/api/admin/roles`
-- `/api/admin/departments`
-- `/api/admin/persons` (`/api/admin/profiles` se conserva como alias de compatibilidad)
-- `/api/admin/movements`
-- `/api/admin/reports`
+Las operaciones bajo `/api` están documentadas en el
+[contrato HTTP y OpenAPI](docs/architecture/openapi/api-contract.md).
+Consulta esa referencia para métodos, rutas, permisos, cuerpos y respuestas;
+los controles visuales de las páginas se explican en la documentación de la interfaz.
 
 ## Pruebas automatizadas
 
@@ -403,11 +458,6 @@ Migraciones Prisma verificadas correctamente.
 ```
 
 Define ambas variables en el entorno de despliegue, sin incluirlas como argumentos de build ni guardarlas dentro de la imagen:
-
-```env
-DATABASE_URL="postgresql://usuario:password@pooler.example.com:6543/nexus"
-DIRECT_URL="postgresql://usuario:password@db.example.com:5432/nexus"
-```
 
 Para levantar el entorno con Docker Compose:
 
