@@ -13,12 +13,9 @@ import {
 import cookieParser from 'cookie-parser';
 
 import express from 'express';
-import http from 'node:http';
 import expressEjsLayouts from 'express-ejs-layouts';
-import { Server } from 'socket.io';
 import { publicDir, sharedDir, viewsDir } from './utils/pathsUtils.js';
 import { errorMap } from './messages/codeMessages.js';
-import { initSocket } from './utils/socketUtils.js';
 import { isAppError } from './errors/AppError.js';
 import { normalizeDatabaseError } from './errors/databaseError.js';
 import { appConfig } from './config/appConfig.js';
@@ -26,116 +23,108 @@ import { getAuthTokenInfo } from './middleware/authMiddleware.js';
 import { auditWrites } from './middleware/auditMiddleware.js';
 import { serializeScriptData } from './utils/scriptDataUtils.js';
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
-initSocket(io);
+export const createApp = ({ isReady = () => true } = {}) => {
+    const app = express();
+    app.locals.isReady = isReady;
 
-const rootRoute = '/';
-const apiRoute = '/api';
-const textRoute = '/text';
-const uploadRoute = '/upload';
+    const rootRoute = '/';
+    const apiRoute = '/api';
+    const textRoute = '/text';
+    const uploadRoute = '/upload';
 
-app.set('views', viewsDir);
-app.set('view engine', 'ejs');
-app.locals.serializeScriptData = serializeScriptData;
+    app.set('views', viewsDir);
+    app.set('view engine', 'ejs');
+    app.locals.serializeScriptData = serializeScriptData;
 
-app.use(expressEjsLayouts);
-app.set('layout', 'layout/base');
-app.set('layout extractStyles', true);
-app.set('layout extractScripts', true);
+    app.use(expressEjsLayouts);
+    app.set('layout', 'layout/base');
+    app.set('layout extractStyles', true);
+    app.set('layout extractScripts', true);
 
-app.use(rootRoute, express.static(publicDir));
-app.use('/shared', express.static(sharedDir));
+    app.use(rootRoute, express.static(publicDir));
+    app.use('/shared', express.static(sharedDir));
 
-app.use(apiRoute, express.json());
-app.use(textRoute, express.text({ type: 'text/plain' }));
-app.use(cookieParser());
-// app.use(express.urlencoded({ extended: true }));
+    app.use(apiRoute, express.json());
+    app.use(textRoute, express.text({ type: 'text/plain' }));
+    app.use(cookieParser());
+    // app.use(express.urlencoded({ extended: true }));
 
-app.use(pinoLogger);
-app.use(auditWrites);
+    app.use(pinoLogger);
+    app.use(auditWrites);
 
-//middleware
-app.use(apiRoute, checkTypeContentJson);
-app.use(uploadRoute, checkTypeContentFile);
-app.use(textRoute, checkContentTypePlainText);
+    //middleware
+    app.use(apiRoute, checkTypeContentJson);
+    app.use(uploadRoute, checkTypeContentFile);
+    app.use(textRoute, checkContentTypePlainText);
 
-app.use((req, res, next) => {
-    res.locals.appName = appConfig.name;
-    res.locals.flash = req.cookies.flash || null;
-    res.locals.hasPermission = hasPermission;
-    res.clearCookie('flash');
-    next();
-});
+    app.use((req, res, next) => {
+        res.locals.appName = appConfig.name;
+        res.locals.flash = req.cookies.flash || null;
+        res.locals.hasPermission = hasPermission;
+        res.clearCookie('flash');
+        next();
+    });
 
-registerWebRoutes(app);
-app.get('/error/404', (req, res) => {
-    const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
+    registerWebRoutes(app);
+    app.get('/error/404', (req, res) => {
+        const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
 
-    return res.status(404).render('pages/error/notFound/notFoundPage', { homeHref });
-});
+        return res.status(404).render('pages/error/notFound/notFoundPage', { homeHref });
+    });
 
-registerApiRoutes(app, { apiPrefix: apiRoute });
+    registerApiRoutes(app, { apiPrefix: apiRoute });
 
-app.use((req, res, next) => {
-    if (req.path.startsWith(apiRoute) || !req.accepts('html')) {
-        return res.status(404).json({ message: 'Ruta no encontrada.' });
-    }
+    app.use((req, res, next) => {
+        if (req.path.startsWith(apiRoute) || !req.accepts('html')) {
+            return res.status(404).json({ message: 'Ruta no encontrada.' });
+        }
 
-    const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
+        const homeHref = getAuthTokenInfo(req, res) ? '/almacen/materiales' : '/inicio-sesion';
 
-    return res.status(404).render('pages/error/notFound/notFoundPage', { homeHref });
-});
+        return res.status(404).render('pages/error/notFound/notFoundPage', { homeHref });
+    });
 
-app.use((err, req, res, next) => {
+    app.use((err, req, res, next) => {
 
-    if (res.headersSent || res.destroyed) {
-        logger.error({ err, ...getRequestLogContext(req) }, 'La respuesta se interrumpió');
-        return next(err);
-    }
+        if (res.headersSent || res.destroyed) {
+            logger.error({ err, ...getRequestLogContext(req) }, 'La respuesta se interrumpió');
+            return next(err);
+        }
 
-    const responseError = isAppError(err) ? err : normalizeDatabaseError(err);
+        const responseError = isAppError(err) ? err : normalizeDatabaseError(err);
 
-    if (isAppError(responseError)) {
-        if (responseError !== err) logger.error(
+        if (isAppError(responseError)) {
+            if (responseError !== err) logger.error(
+                {
+                    err,
+                    ...getRequestLogContext(req),
+                    method: req.method,
+                    code: responseError.code
+                },
+                'Esquema de base de datos desactualizado'
+            );
+
+            return res.status(responseError.statusCode).json({
+                code: responseError.code,
+                message: responseError.message,
+                meta: responseError.meta
+            });
+        }
+
+        logger.error(
             {
                 err,
                 ...getRequestLogContext(req),
-                method: req.method,
-                code: responseError.code
+                method: req.method
             },
-            'Esquema de base de datos desactualizado'
+            'Error no controlado'
         );
 
-        return res.status(responseError.statusCode).json({
-            code: responseError.code,
-            message: responseError.message,
-            meta: responseError.meta
+        res.status(500).json({
+            code: errorMap.message.SERVER_ERROR,
+            message: 'Error interno del servidor.'
         });
-    }
-
-    logger.error(
-        {
-            err,
-            ...getRequestLogContext(req),
-            method: req.method
-        },
-        'Error no controlado'
-    );
-
-    res.status(500).json({
-        code: errorMap.message.SERVER_ERROR,
-        message: 'Error interno del servidor.'
     });
-});
 
-const PORT = process.env.PORT || 3000;
-
-server.listen(PORT, "0.0.0.0", () => {
-    console.log(`Servidor escuchando en puerto ${PORT}`);
-});
-
-process.on('warning', (warning) => {
-    logger.warn({ warning }, 'Warning detectado');
-});
+    return app;
+};

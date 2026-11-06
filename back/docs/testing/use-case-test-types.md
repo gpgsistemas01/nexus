@@ -249,3 +249,11 @@ integración ni demuestra autorización o stock persistido.
 rechaza fracciones con la presentación persistida, comprueba ausencia de efectos
 parciales y admite enteros con costos decimales. El diseño y los datos están en
 [el registro selectivo](automated-test-case-index.md#cantidades-enteras-por-presentación).
+
+### Seguridad del canal de avisos
+
+`socketUtilsTest.js` (`CP-UNIT-RUN-002`) complementa los casos de consulta de
+inventario y movimientos: verifica sesión al conectar y permisos actuales antes
+de cada aviso. Es evidencia unitaria del canal, sin demostrar persistencia ni
+recorrido de navegador. `cookiesUtilsTest.js` mantiene la cobertura existente de
+cookies de alta y borrado en producción y desarrollo.

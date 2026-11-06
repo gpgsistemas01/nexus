@@ -17,34 +17,36 @@ flowchart LR
     controllers["controllers (45 módulos)"] --> dtos["dtos (12 módulos)"]
     controllers["controllers (45 módulos)"] --> errors["errors (22 módulos)"]
     controllers["controllers (45 módulos)"] --> messages["messages (2 módulos)"]
-    controllers["controllers (45 módulos)"] --> services["services (69 módulos)"]
+    controllers["controllers (45 módulos)"] --> services["services (70 módulos)"]
     controllers["controllers (45 módulos)"] --> shared["shared (13 módulos)"]
-    controllers["controllers (45 módulos)"] --> utils["utils (15 módulos)"]
+    controllers["controllers (45 módulos)"] --> utils["utils (16 módulos)"]
     dtos["dtos (12 módulos)"] --> shared["shared (13 módulos)"]
     errors["errors (22 módulos)"] --> messages["messages (2 módulos)"]
     errors["errors (22 módulos)"] --> shared["shared (13 módulos)"]
     middleware["middleware (4 módulos)"] --> messages["messages (2 módulos)"]
-    middleware["middleware (4 módulos)"] --> services["services (69 módulos)"]
-    middleware["middleware (4 módulos)"] --> utils["utils (15 módulos)"]
+    middleware["middleware (4 módulos)"] --> services["services (70 módulos)"]
+    middleware["middleware (4 módulos)"] --> utils["utils (16 módulos)"]
     public["public (211 módulos)"] --> shared["shared (13 módulos)"]
     repository["repository (8 módulos)"] --> constants["constants (11 módulos)"]
     repository["repository (8 módulos)"] --> errors["errors (22 módulos)"]
     repository["repository (8 módulos)"] --> lib["lib (3 módulos)"]
     repository["repository (8 módulos)"] --> shared["shared (13 módulos)"]
-    routes["routes (48 módulos)"] --> controllers["controllers (45 módulos)"]
-    routes["routes (48 módulos)"] --> middleware["middleware (4 módulos)"]
-    routes["routes (48 módulos)"] --> shared["shared (13 módulos)"]
-    routes["routes (48 módulos)"] --> validators["validators (16 módulos)"]
-    services["services (69 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (69 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (69 módulos)"] --> errors["errors (22 módulos)"]
-    services["services (69 módulos)"] --> repository["repository (8 módulos)"]
-    services["services (69 módulos)"] --> shared["shared (13 módulos)"]
-    services["services (69 módulos)"] --> utils["utils (15 módulos)"]
-    utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
-    utils["utils (15 módulos)"] --> errors["errors (22 módulos)"]
-    utils["utils (15 módulos)"] --> services["services (69 módulos)"]
-    utils["utils (15 módulos)"] --> shared["shared (13 módulos)"]
+    routes["routes (49 módulos)"] --> controllers["controllers (45 módulos)"]
+    routes["routes (49 módulos)"] --> middleware["middleware (4 módulos)"]
+    routes["routes (49 módulos)"] --> services["services (70 módulos)"]
+    routes["routes (49 módulos)"] --> shared["shared (13 módulos)"]
+    routes["routes (49 módulos)"] --> validators["validators (16 módulos)"]
+    services["services (70 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (70 módulos)"] --> dtos["dtos (12 módulos)"]
+    services["services (70 módulos)"] --> errors["errors (22 módulos)"]
+    services["services (70 módulos)"] --> lib["lib (3 módulos)"]
+    services["services (70 módulos)"] --> repository["repository (8 módulos)"]
+    services["services (70 módulos)"] --> shared["shared (13 módulos)"]
+    services["services (70 módulos)"] --> utils["utils (16 módulos)"]
+    utils["utils (16 módulos)"] --> constants["constants (11 módulos)"]
+    utils["utils (16 módulos)"] --> errors["errors (22 módulos)"]
+    utils["utils (16 módulos)"] --> services["services (70 módulos)"]
+    utils["utils (16 módulos)"] --> shared["shared (13 módulos)"]
     validators["validators (16 módulos)"] --> constants["constants (11 módulos)"]
     validators["validators (16 módulos)"] --> messages["messages (2 módulos)"]
     validators["validators (16 módulos)"] --> shared["shared (13 módulos)"]
@@ -151,10 +153,12 @@ flowchart LR
 | `POST` | `/api/admin/catalogs/:catalog` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 | `PUT` | `/api/admin/catalogs/:catalog/:id` | [`src/routes/api/admin/catalogApiRoute.js`](../../../../src/routes/api/admin/catalogApiRoute.js) |
 
-## Rutas web (24)
+## Rutas web (26)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
+| `GET` | `/health/live` | [`src/routes/web/healthWebRoute.js`](../../../../src/routes/web/healthWebRoute.js) |
+| `GET` | `/health/ready` | [`src/routes/web/healthWebRoute.js`](../../../../src/routes/web/healthWebRoute.js) |
 | `GET` | `/` | [`src/routes/web/homeWebRoute.js`](../../../../src/routes/web/homeWebRoute.js) |
 | `GET` | `/inicio-sesion` | [`src/routes/web/auth/loginWebRoute.js`](../../../../src/routes/web/auth/loginWebRoute.js) |
 | `GET` | `/revocar-sesion` | [`src/routes/web/auth/refreshWebRoute.js`](../../../../src/routes/web/auth/refreshWebRoute.js) |
@@ -255,6 +259,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/audit/auditService.js`](../../../../src/services/audit/auditService.js) | `isAuditWriteRequest`, `persistWriteAudit` |
 | [`src/services/authService.js`](../../../../src/services/authService.js) | `getNewRefreshToken`, `loginUser` |
 | [`src/services/document/referenceNumberService.js`](../../../../src/services/document/referenceNumberService.js) | `generateYearlyReferenceNumber`, `incrementNonYearlyReferenceNumberCounter`, `throwIfReferenceNumberAlreadyExists` |
+| [`src/services/healthService.js`](../../../../src/services/healthService.js) | `checkDatabaseReady` |
 | [`src/services/inventory/materialIdentity.js`](../../../../src/services/inventory/materialIdentity.js) | `getMaterialIdentityWidth` |
 | [`src/services/inventory/movementHelpers.js`](../../../../src/services/inventory/movementHelpers.js) | `buildInventoryMovementDetail`, `buildStockUpdateSummary` |
 | [`src/services/inventory/movementQueryService.js`](../../../../src/services/inventory/movementQueryService.js) | `findAllConsumableMovements`, `findAllMaterialMovements`, `findAllWasteMovements` |

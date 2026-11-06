@@ -1,3 +1,4 @@
+import healthWebRoutes from './healthWebRoute.js';
 import homeWebRoutes from './homeWebRoute.js';
 import loginWebRoutes from './auth/loginWebRoute.js';
 import refreshWebRoutes from './auth/refreshWebRoute.js';
@@ -16,6 +17,7 @@ import movementWebRoutes from './admin/movementWebRoute.js';
 import catalogWebRoutes from './admin/catalogWebRoute.js';
 
 const WEB_ROUTES = [
+    ['/health', healthWebRoutes],
     ['/', homeWebRoutes],
     ['/inicio-sesion', loginWebRoutes],
     ['/revocar-sesion', refreshWebRoutes],

@@ -133,3 +133,8 @@ acciones de cada consulta, aunque sus routers estén agrupados por dominio en
 
 La persistencia y el recorrido del peso se consultan en
 [datos de merma](data-and-persistence/index.md#peso-unitario-de-merma-de-rollo).
+
+La autenticación y autorización del canal de avisos se definen en
+[identidad y acceso](02-identity-access-and-audit.md#cookies-y-canal-de-notificaciones).
+El [publicador de inventario](../development/design-and-construction-patterns/10-publication-of-events-of-inventory.md#autenticación-permisos-y-fallo-de-entrega)
+explica la selección por permiso, su ejecución asíncrona y sus límites de entrega.

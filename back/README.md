@@ -92,8 +92,8 @@ scripts/                    # Scripts auxiliares de verificación
 La aplicación usa una separación por capas: las rutas delegan en controladores, los controladores coordinan validación/entrada y los servicios concentran la lógica de negocio. Prisma se crea desde `src/lib/prisma.js`, usando la URL resuelta por `src/lib/databaseUrl.js`.
 
 Los registros centrales `src/routes/api/index.js` y `src/routes/web/index.js` componen
-los routers por dominio y evitan que `src/app.js` mezcle el arranque de infraestructura
-con el catálogo de endpoints. Las convenciones equivalentes entre backend y frontend,
+los routers por dominio. `src/app.js` exporta `createApp()` sin abrir puertos;
+`src/server.js` crea HTTP y Socket.IO, escucha y coordina el cierre del proceso. Las convenciones equivalentes entre backend y frontend,
 incluyendo reutilización de componentes y ubicación de pruebas CRUD, se detallan en la
 [descripción de arquitectura y construcción](docs/architecture/views/index.md).
 
@@ -285,7 +285,7 @@ reúne API, Vue, base de datos, pruebas, capturas y publicación desde la raíz.
 
 | Script | Descripción |
 | --- | --- |
-| `npm start` | Ejecuta `node src/app.js`. |
+| `npm start` | Ejecuta `node src/server.js`. |
 | `npm run dev` | Reinicia con Nodemon sólo por cambios de código o `.env`; excluye dependencias y archivos generados. |
 | `npm run db:migrate` | Aplica migraciones pendientes con Prisma; usa `DIRECT_URL` automáticamente cuando está definida. |
 | `npm run db:generate` | Genera el cliente Prisma. |
@@ -472,7 +472,7 @@ docker compose logs app
 docker compose exec app ./node_modules/.bin/prisma migrate status
 ```
 
-`migrate status` usa igualmente `DIRECT_URL` a través de `prisma.config.ts`. Un despliegue correcto muestra el mensaje `Database schema is up to date!`; además, el proceso `node src/app.js` estará activo. Si la conexión directa o una migración falla, el entrypoint termina antes de ejecutar `npm start` y Docker registra el error de Prisma.
+`migrate status` usa igualmente `DIRECT_URL` a través de `prisma.config.ts`. Un despliegue correcto muestra el mensaje `Database schema is up to date!`; además, el proceso `node src/server.js` estará activo. Si la conexión directa o una migración falla, el entrypoint termina antes de ejecutar `npm start` y Docker registra el error de Prisma.
 
 `RUN_MIGRATIONS` acepta únicamente `true` o `false` y su valor predeterminado es `true`. Se puede desactivar cuando la plataforma ejecuta las migraciones en un *release job* separado:
 
@@ -485,3 +485,26 @@ docker run --rm \
 ```
 
 En despliegues con varias réplicas se recomienda ejecutar una sola instancia como *release job* con `RUN_MIGRATIONS=true` y configurar las réplicas de la aplicación con `RUN_MIGRATIONS=false`. Nunca publiques el puerto directo de PostgreSQL en Internet; `DIRECT_URL` debe llegar al servidor por la red privada del proveedor.
+
+### Salud y cierre del servidor
+
+`GET /health/live` devuelve `200 {"status":"ok"}` mientras HTTP atiende.
+`GET /health/ready` devuelve `200 {"status":"ready"}` sólo si el proceso acepta
+tráfico y PostgreSQL responde a `SELECT 1` en dos segundos; devuelve
+`503 {"status":"unavailable"}` ante fallo, espera agotada o cierre. Ambas rutas
+son públicas, no exponen detalles de conexión y usan `Cache-Control: no-store`.
+Configura la comprobación de disponibilidad del proveedor en `/health/ready`.
+
+Con `SIGTERM` o `SIGINT` se marca el proceso como no disponible, se dejan de aceptar
+conexiones, se cierran sockets y se espera a las peticiones HTTP en curso antes de
+desconectar Prisma. El plazo máximo es diez segundos; agotarlo termina con código 1.
+La imagen ejecuta Node directamente para que reciba las señales del contenedor.
+En Compose, el período de gracia es de quince segundos.
+
+Las cookies de sesión usan `Secure` en `NODE_ENV=production`; la publicación debe
+servirse por HTTPS. Socket.IO exige la cookie `accessToken` y una cuenta activa,
+y revalida identidad y permisos antes de cada aviso. Las notificaciones de inventario
+requieren `materials:read` o `wastes:read`, y las de movimientos `movements:read`.
+Un token vencido requiere renovar la sesión HTTP y reconectar Socket.IO.
+El emisor actual opera dentro de una instancia; varias réplicas requerirían un
+adaptador y una estrategia de distribución de eventos, fuera de este cambio.

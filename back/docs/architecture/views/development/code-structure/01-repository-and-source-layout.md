@@ -14,13 +14,14 @@ del repositorio y apuntan al backend. Los comandos npm se ejecutan desde `back/`
 ## Mapa general de implementación
 
 **Identificador:** `DIA-COD-ORG-001`. **Pregunta:** ¿cómo se distribuye la implementación
-entre servidor, navegador y artefactos de persistencia? **Fuente:** `src/app.js`,
+entre servidor, navegador y artefactos de persistencia? **Fuente:** `src/server.js`, `src/app.js`,
 `src/routes/{api,web}/index.js`, `src/lib/prisma.js`, `prisma/schema.prisma` y `package.json`.
 **Leyenda:** flechas rotuladas por su relación; los nodos agrupan carpetas reales.
 
 ```mermaid
 flowchart TB
-    app["src/app.js<br/>Express · HTTP · Socket.IO"]
+    server["src/server.js<br/>HTTP · Socket.IO · ciclo de vida"]
+    server -->|construye con createApp| app["src/app.js<br/>configuración Express"]
     app -->|registra| transport["routes / controllers<br/>API JSON · páginas EJS"]
     transport -->|delegan API| services["src/services<br/>reglas y consultas por dominio"]
     transport -->|renderizan| templates["src/views<br/>layout · pages · shared"]
@@ -43,7 +44,8 @@ amplían en [backend](03-backend-domains-and-dependencies.md) y
 
 | Ubicación | Responsabilidad y modo de mantenimiento |
 | --- | --- |
-| `src/app.js`, `src/routes`, `src/controllers` | Arranque, montaje, entrada HTTP y salida JSON/EJS. |
+| `src/server.js`, `src/utils/serverLifecycle.js` | Escucha HTTP, inicialización de Socket.IO y cierre del proceso. |
+| `src/app.js`, `src/routes`, `src/controllers` | Fábrica Express sin escucha, montaje, entrada HTTP y salida JSON/EJS. |
 | `src/services` | Servicios por dominio y colaboradores de inventario, documentos, auditoría y autenticación. |
 | `src/repository`, `src/lib` | Selección del cliente/`tx`, construcción de Prisma y selección de URL. Existe un selector base; las consultas se escriben en servicios, no en un repository por entidad. |
 | `src/views`, `src/public` | Plantillas y activos servidos. `pages` compone; `application` adapta operaciones; `services` transporta; `ui` y `plugins` gestionan presentación. |

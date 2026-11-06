@@ -16,7 +16,7 @@ Las capas de código se mantienen en la [vista lógica](../logical/01-components
 | Render y Supabase | Decisión operativa registrada en el `README.md` | Es la topología vigente documentada; el repositorio no verifica la configuración activa del proveedor. |
 | Imagen de aplicación | `../Dockerfile` (raíz del repositorio) | Node.js 22, generación de Prisma durante la construcción y ejecución con el usuario `node`. |
 | Arranque del contenedor | `docker-entrypoint.sh` | Fuerza producción y, por defecto, aplica migraciones antes de iniciar la aplicación. |
-| Servidor y puerto | `src/app.js` | Express y Socket.IO comparten un servidor HTTP que escucha en `0.0.0.0`, con `PORT` o 3000 por defecto. |
+| Servidor y puerto | `src/server.js`; fábrica Express en `src/app.js` | Express y Socket.IO comparten un servidor HTTP que escucha en `0.0.0.0`, con `PORT` o 3000 por defecto. |
 | Conexiones a PostgreSQL | `src/lib/prisma.js`, `src/lib/databaseUrl.js` y `prisma.config.ts` | La aplicación usa `DATABASE_URL`; el CLI prefiere `DIRECT_URL`. |
 | Ejecución en un host | `../docker-compose.yml` (raíz del repositorio) | Reproduce el contenedor de aplicación; no crea PostgreSQL ni configura Render. |
 
@@ -216,3 +216,27 @@ Mermaid no representa aquí conectores y puertos UML nativos. No especifican can
 de réplicas, alta disponibilidad, redes privadas ni un mecanismo de despliegue que
 no esté documentado. Una configuración versionada o una verificación del proveedor
 es necesaria para convertir la topología objetivo en vigente.
+
+## Disponibilidad y ciclo de vida
+
+`src/server.js` es el punto de entrada de npm y de la imagen Docker (Node directo).
+`createApp()` construye Express sin escuchar ni crear Socket.IO. Las rutas públicas
+`/health/live` y `/health/ready`, registradas por el router web de salud, comprueban
+respectivamente el proceso y la disponibilidad de PostgreSQL. Readiness usa `SELECT 1`,
+espera hasta dos segundos y comparte una consulta pendiente para evitar acumulación.
+No comprueba migraciones ni garantiza la disponibilidad de todas las operaciones.
+Ambas respuestas evitan caché y no revelan detalles internos; readiness devuelve 503
+cuando la base no responde o el proceso está cerrando.
+
+SIGTERM/SIGINT inician un cierre idempotente: retirar disponibilidad, cerrar la escucha
+y Socket.IO, drenar HTTP y desconectar Prisma. El límite de diez segundos fuerza
+salida con código 1 si no termina; Compose concede quince segundos. Las conexiones
+de tiempo real deben reconectar después de un despliegue. La configuración remota
+del proveedor debe apuntar su health check a `/health/ready`; no se cambia desde aquí.
+
+Los avisos de inventario dejan de ser globales: se autentica la cookie de acceso al
+conectar y se consulta nuevamente la cuenta y sus permisos antes de emitir a cada
+socket local. Inventario exige el permiso de lectura de su contexto y movimientos
+exige `movements:read`. Un fallo de notificación se registra sin convertir una
+escritura confirmada en error. Esta distribución es de una sola instancia y añade
+una lectura de permisos por conexión y aviso; debe medirse antes de escalar.

@@ -101,3 +101,13 @@ activaciones, un archivo por línea de vida, ausencia de archivos duplicados y c
 También comprueba que todos los archivos de la tabla aparezcan en una figura y que
 las flechas de composición correspondan a imports/reexports existentes en el código. El renderizado y la exportación verifican legibilidad; estos
 controles no equivalen a ejecutar todos los caminos del código.
+
+## Avisos posteriores a una escritura
+
+En las secuencias de inventario, la llamada del controller a
+`emitInventoryUpdated` inicia una notificación asíncrona después del servicio.
+La respuesta HTTP no espera la consulta de permisos ni la entrega al socket.
+Los rechazos del servicio conservan su ruta de error; un fallo posterior del
+aviso no implica rollback de una escritura confirmada. El
+[contrato del publicador](../development/design-and-construction-patterns/10-publication-of-events-of-inventory.md#autenticación-permisos-y-fallo-de-entrega)
+define autenticación, selección de receptores y tratamiento de fallos.
