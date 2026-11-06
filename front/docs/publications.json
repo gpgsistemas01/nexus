@@ -104,6 +104,12 @@
             "title": "Construcción y despliegue",
             "sources": ["development/03-build-and-deployment.md"]
         },
+        "propuestas": {
+            "title": "Propuestas de ampliación",
+            "entry": "development/05-inventory-excel-import-proposal.md",
+            "includeInComplete": false,
+            "sources": ["development/05-inventory-excel-import-proposal.md"]
+        },
         "manual": {
             "title": "Manual de usuario",
             "entry": "user-manual/index.md",

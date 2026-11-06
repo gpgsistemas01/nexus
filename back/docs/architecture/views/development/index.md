@@ -68,3 +68,9 @@ Las tablas de notación, decisiones o cobertura aportan otra pregunta y sólo se
 cuando no reproducen esa misma lista.
 
 Para comenzar a contribuir, consulte la [guía de incorporación](developer-onboarding.md).
+
+## Propuestas de ampliación
+
+La [importación de inventario por Excel](inventory-excel-import-proposal.md) define
+plantillas, contratos, reutilización, confirmación y retención de archivos.
+Es una propuesta pendiente de implementación; no amplía las rutas vigentes.

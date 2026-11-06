@@ -9,6 +9,7 @@
 | Publicar en Render | [Web Service Docker](03-build-and-deployment.md#render-conservar-la-api-y-publicar-vue) o [Static Site](03-build-and-deployment.md#render-static-site-rutas-y-api). |
 | Resolver `Not Found` o un login con `200` vacío | [Diagnóstico del despliegue](03-build-and-deployment.md#diagnóstico-del-despliegue). |
 | Revisar un cambio | [Comprobaciones por tipo de cambio](04-change-review.md). |
+| Revisar la futura importación de inventario | [Propuesta Excel: altas, actualizaciones y archivos](05-inventory-excel-import-proposal.md). |
 
 El [README](../../README.md) ofrece el inicio rápido. Para entender la implementación,
 consulta la [incorporación al código](../architecture/views/development/developer-onboarding.md).
