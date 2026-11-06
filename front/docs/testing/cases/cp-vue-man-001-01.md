@@ -17,6 +17,9 @@ completitud de los artefactos. Es una prueba de la herramienta documental.
 
 [manualProfilesTest.ts](../../../tests/unit/tooling/manualProfilesTest.ts) comprueba
 selección, configuración, secretos locales y rechazo de publicaciones incompletas.
+La exportación también rechaza capítulos fuera del acceso e imágenes ajenas a la
+selección o carpeta del perfil. Una captura ausente o modificada exige verificarla
+con la misma cuenta, aunque otro perfil tenga un PNG con ese nombre.
 Los capítulos con LF, CRLF o saltos mezclados conservan el filtrado por permisos;
 las ediciones de Sistemas y Almacén conservan las mismas fuentes y referencias a capturas.
 Una directiva inválida identifica capítulo y línea e impide publicar fuentes.

@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('../../../../../src/utils/socketUtils.js', () => ({ emitInventoryUpdated: vi.fn() }));
 import request from 'supertest';
 
 import { createControllerTestApp } from '../../../../helpers/controllerTestHarness.js';

@@ -296,6 +296,7 @@ modificado o buscar de nuevo ejemplos antes marcados como `unavailable`.
 | Intenta escribir datos de negocio | Corregir la automatización; no habilitar el envío para obtener una imagen. |
 | Cambió el acceso | Autenticar de nuevo y regenerar la edición. |
 | Cambió un PNG | Recapturar; la imagen alterada no se publica como verificada. |
+| Capítulo o imagen ajenos a la selección | Regenerar la edición con esa cuenta. La exportación contrasta los permisos y sólo admite capturas verificadas de su carpeta. No copiar archivos entre cuentas. |
 | Falla Word/PDF | Revisar Pandoc/LibreOffice y código de salida. Una versión anterior no acredita la ejecución actual. |
 
 ## 10. Revisar y distribuir

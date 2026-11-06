@@ -45,6 +45,8 @@ pruebas](test-plan.md).
 | --- | --- | --- | --- | --- |
 | `DP-QTY-001` | Fracciones de PIEZA, presentación manipulada o efectos parciales en inventario/documentos. | Unitario e integración HTTP/Prisma; particiones por presentación y operación, transiciones pendiente → surtido → devolución. | La regla usa el catálogo persistido, rechaza fracciones sin redondear y conserva costos/conversión decimales. Representantes de alta de inventario, compra/corrección y solicitud/surtido/devolución de los tres recursos comprueban rollback y saldos. | `CP-INT-QTY-001`; `pieceQuantityTest.js`, `goodsReceiptHelpersTest.js`, `issueSupplyRulesTest.js`. |
 | `DP-CONS-001` | Reclasificación fuera de los ocho materiales autorizados o pérdida parcial ante duplicados. | Integración de migración; particiones identidad confirmada/modificada/ausente/otro ID/ya consumible y decisiones colisión/repetición. | La primera migración cambia seis IDs y la incremental solo tornillo y ventosa; conservan nombres y demás campos, incrementan versión y omiten identidades modificadas. Catálogo vacío y repetición sin cambios; colisión de identidad revierte toda la sentencia. | `CP-INT-CONS-001`: `tests/integration/migrations/confirmedConsumablesDbTest.js`. |
+| `DP-RUN-001` | Cookies sin Secure en producción y avisos a conexiones no autorizadas. | Unitario HTTP y colaboradores aislados; particiones de entorno/sesión y decisiones contexto/permiso; transición activo→inactivo/token vencido. | Producción agrega Secure al alta y borrado. Sesión ausente/inválida o cuenta inactiva rechaza conexión; cada aviso respeta permisos actuales. | `CP-UNIT-RUN-001`, `CP-UNIT-RUN-002`. |
+| `DP-RUN-002` | Tráfico a proceso no disponible y peticiones interrumpidas por cierre inmediato. | Unitario HTTP y ciclo de vida; decisiones proceso/base y transiciones disponible→cerrando→cerrado/plazo agotado. | Readiness devuelve 503 ante fallo/plazo/cierre; no acumula consultas. HTTP y sockets terminan antes de desconectar Prisma; señales repetidas no duplican cierre; timeout fuerza salida 1. | `CP-UNIT-RUN-003`. |
 | `DP-MER-005` | `CU-ALM-10/12/13`: confusión de cantidad/saldo, datos omitidos, doble incremento o documento vacío. | Unitario e integración; particiones cero/positivo/ausente/fuera de rango y decisiones alta/entrada/ajuste/fallo. | Alta con `initialQuantity=3`: una entrada `EME`, saldo anterior `0`, nuevo `3`, movimiento ENTRY y ningún ajuste. Cantidad `0`: sin documento, movimiento ni consumo de folio. Cantidad ausente/fuera de rango: error por campo y sin escrituras. `minStock` e `isActive` conservan la captura. Formulario/DTO separan cantidad inicial, adición y saldo final. Agregar stock usa la misma serie; ajustar conserva AME. Un fallo del documento revierte merma, saldo, movimiento y contador. | `CP-UNIT-ALM-001`, `CP-UNIT-ALM-010`, `CP-INT-MER-004`. |
 | `DP-HIS-002` | Folios de merma inconsistentes o pérdida de historia/consecutivos durante migración. | Integración; equivalencia por serie/año/formato y decisiones colisión/sin documentos/vacío. | AJU-MER → AME y ENT-MER → EME en documentos y referencias de movimientos; mínimo seis dígitos, sufijos largos conservados, campos/relaciones intactos y contadores máximos preservados. Colisión: rollback de todas las series. Repetir la migración no cambia el resultado. | `CP-INT-DOC-001`. |
 | `DP-AUT-001` | `RF-ISS-001/004/005/006`, `RF-WST-001/002/004/005/007`: acceso operativo bloqueado o ampliado a escrituras de inventario. | Unitario e integración; tabla de decisiones por área, rol, sesión y operación. | Impresión, Taller 3D (Taller/Herrería), Router, PT/Tráfico, Instalaciones y Acabados con rol operativo: abrir páginas, crear/editar salidas y consultar inventario/proveedores. Sin sesión: `401`; rol no admitido: `403`. En esas seis áreas no se conceden stock, surtido, devoluciones, costos ni administración. Almacén y Sistemas conservan la gestión por rol; los permisos de varias asignaciones se acumulan. Cada asignación debe contener rol y área admitidos juntos. | `CP-UNIT-AUT-001`, `CP-INT-AUT-001`. |
@@ -239,3 +241,29 @@ Fuentes: `materialControllerDbTest.js`, `goodsReceiptContextDbTest.js`,
 `goodsIssueControllerDbTest.js` y `wasteIssueControllerDbTest.js`. Los controladores
 usan servicios y PostgreSQL reales; la autorización se comprueba en sus suites
 propias. Los formularios Vue se verifican en su [diseño de cantidades](../../../front/docs/testing/design/07-shared.md#cantidades-por-presentación).
+
+## Visor del contrato API
+
+| ID de diseño | Riesgo y técnica | Condición observable | Fuente |
+| --- | --- | --- | --- |
+| `DP-API-DOCS-001` | Contrato duplicado, recursos relativos rotos o exposición en producción; particiones desarrollo/producción y HTML/JSON/assets. | La aplicación registrada sirve Swagger UI y el mismo contrato OpenAPI autocontenido. La URL sin barra redirige; producción devuelve 404 para interfaz, contrato y recursos. El visor usa cookies del mismo origen y no persiste autorización. | `apiDocsWebRouteTest.js`; `openApiContractUtilsTest.js`. |
+
+| ID de caso | Precondiciones y datos | Acción | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- |
+| `CP-HTTP-DOCS-001` | Aplicación Express real con Prisma sustituido; entornos development/production; contrato curado. | Consultar `/api-docs`, `/api-docs/`, contrato JSON, inicializador JS y CSS. | Desarrollo sirve la interfaz, redirige a la URL con barra y publica el contrato validado actual; producción responde 404 para todos sus recursos. Ningún request documental accede a datos. | Restaurar variables de entorno y cerrar los servidores HTTP de Supertest. |
+
+`apiDocsWebRouteTest.js` usa `createApp` real con Prisma sustituido; los requests
+documentales no acceden a datos. La revisión de navegador comprueba carga del
+contrato y login/consulta con cookies de prueba mediante una API simulada.
+Esta evidencia no sustituye las pruebas de autorización HTTP/Prisma del proyecto.
+
+## Casos de seguridad y operación del runtime
+
+| ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- | --- |
+| `CP-UNIT-RUN-001` | Express aislado, sin persistencia. | Entornos production/development/test; tokens ficticios. | `tests/unit/utils/cookiesUtilsTest.js`: emitir alta y borrado por HTTP. | Dos cookies; Secure sólo en producción, SameSite=Lax, HttpOnly en alta y expiración en borrado. | Restaurar entorno. |
+| `CP-UNIT-RUN-002` | Verificador JWT y consulta de usuario sustituidos. | Cookie ausente/vencida/válida; cuenta inactiva; permisos materials:read, wastes:read, movements:read o ninguno. | `tests/unit/utils/socketUtilsTest.js`: conectar y notificar; cambiar permisos/cuenta/token tras conectar; comprobar handshake y recepción sobre polling Socket.IO real con consulta de usuario sustituida. | Rechazo genérico sin detalles; sólo eventos autorizados; desconexión ante sesión inválida; fallo de consulta no rechaza escritura confirmada. | Restablecer dobles. |
+| `CP-UNIT-RUN-003` | Router real con consulta sustituida; servidor y proceso simulados para cierre. | Base accesible/fallida/bloqueada; disponibilidad true/false; SIGTERM/SIGINT; plazo agotado. | `tests/unit/runtime/healthTest.js`, `tests/unit/runtime/appTest.js`, `tests/unit/utils/serverLifecycleTest.js`. | Live 200 sin DB; ready 200 o 503 sin secretos ni caché; una consulta pendiente compartida; drenar HTTP y sockets antes de Prisma, cierre único y salida 1 al agotar plazo. | Resolver promesas y restaurar temporizadores. |
+
+Estas unitarias no demuestran persistencia real, propagación de señales del proveedor
+ni un recorrido completo de navegador; la integración HTTP/Prisma conserva su suite.

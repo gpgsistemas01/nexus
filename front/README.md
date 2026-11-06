@@ -10,6 +10,13 @@ Consulta [Comandos para desarrollo](docs/development/00-commands.md) para inicia
 el sistema, acceder desde el móvil, ejecutar pruebas, migraciones, capturas y
 publicaciones. La guía indica la carpeta de ejecución y las opciones de recuperación.
 
+## Despliegue en Render
+
+Consulta la [guía de despliegue](docs/development/03-build-and-deployment.md#consulta-rápida)
+para publicar con Docker o Static Site, conectar la API y comprobar la rama activa.
+El [diagnóstico](docs/development/03-build-and-deployment.md#diagnóstico-del-despliegue)
+explica el `Not Found` al recargar y el login con respuesta `200` vacía o HTML.
+
 ## Inicio rápido
 
 Sigue los pasos en orden para iniciar Vue y la API en tu equipo. Ejecuta todos los
@@ -113,7 +120,6 @@ npm --prefix front run check
 Este comando comprueba formato, ESLint, pruebas unitarias y compilación con tipos.
 Produce `front/dist/`; no ejecuta pruebas de navegador ni de sistema. Los comandos
 individuales están en [Comandos para desarrollo](docs/development/00-commands.md).
-El despliegue se prepara con la [guía de compilación y publicación](docs/development/03-build-and-deployment.md).
 
 ## Documentación
 

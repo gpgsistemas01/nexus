@@ -27,3 +27,17 @@ administrables se montan bajo `admin/catalogs`, mientras las lecturas para selec
 permanecen en sus áreas. Los reportes se registran en el contexto del recurso; no forman
 un dominio funcional separado. La URL de una página puede diferir de la carpeta de su
 router: el índice de registro determina su montaje efectivo.
+
+## Construcción y rutas de operación
+
+`src/app.js` exporta `createApp({ isReady })`: configura middleware, routers,
+estáticos, vistas y errores, sin abrir puertos. `src/server.js` crea el servidor
+HTTP y Socket.IO sobre esa aplicación y coordina el cierre. Construir la fábrica
+en pruebas no inicia el proceso de producción.
+
+El registro web también monta `healthWebRoute.js` bajo `/health`. Sus respuestas
+son JSON públicos de operación, no pantallas ni casos de uso del negocio.
+Las comprobaciones de vida/disponibilidad y sus límites se definen en la
+[vista física](../../physical/01-system-runtime-and-deployment.md#disponibilidad-y-ciclo-de-vida).
+El inventario generado incluye esas rutas; el contrato OpenAPI conserva su
+alcance de operaciones bajo `/api`.

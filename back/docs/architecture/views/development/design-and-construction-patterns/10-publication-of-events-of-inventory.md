@@ -48,3 +48,31 @@ actualizadas se obtienen mediante otra consulta, no se reconstruyen desde el eve
 Si Socket.IO no está inicializado o el contexto no existe, el publicador retorna sin
 emitir. La notificación no acredita entrega, autorización de la nueva consulta ni
 persistencia de eventos.
+
+## Autenticación, permisos y fallo de entrega
+
+`src/server.js` inicializa el canal con `initSocket`. La conexión requiere la
+cookie de acceso válida y una cuenta activa resuelta por `getLoggedUser`; se
+rechaza con `UNAUTHORIZED` sin revelar detalles internos. Antes de cada aviso,
+el publicador vuelve a comprobar el token y a consultar la cuenta con sus
+permisos actuales. No reutiliza indefinidamente los permisos de la conexión.
+
+| Aviso | Permiso requerido |
+| --- | --- |
+| `materials:updated` | `materials:read` |
+| `wastes:updated` | `wastes:read` |
+| `material-movements:updated`, `waste-movements:updated` | `movements:read` |
+
+El gráfico anterior representa canales posibles: cada socket recibe sólo los
+avisos autorizados de la instancia local. Si vence el token o se desactiva la
+cuenta, se desconecta al intentar notificar. Un cambio de permisos se aplica
+en el siguiente aviso. Renovar la sesión HTTP requiere reconectar el canal
+con la cookie vigente. El alcance de los registros continúa protegido por la
+consulta HTTP posterior.
+
+El publicador es asíncrono. Los controllers actuales inician el aviso después
+del servicio sin esperar su entrega para responder. Un fallo al consultar
+permisos o emitir se registra y omite ese aviso; no revierte una mutación
+confirmada ni la convierte en una respuesta de escritura fallida. No hay cola,
+reintentos durables ni coordinación entre réplicas. La lectura por socket y
+aviso añade carga de base de datos; debe medirse antes de escalar.

@@ -1,7 +1,9 @@
+import healthWebRoutes from './healthWebRoute.js';
 import homeWebRoutes from './homeWebRoute.js';
 import loginWebRoutes from './auth/loginWebRoute.js';
 import refreshWebRoutes from './auth/refreshWebRoute.js';
 import logoutWebRoutes from './auth/logoutWebRoute.js';
+import apiDocsWebRoutes from './apiDocsWebRoute.js';
 import materialWebRoutes from './warehouse/materialWebRoute.js';
 import consumableWebRoutes from './warehouse/consumableWebRoute.js';
 import wasteWebRoutes from './warehouse/wasteWebRoute.js';
@@ -16,10 +18,12 @@ import movementWebRoutes from './admin/movementWebRoute.js';
 import catalogWebRoutes from './admin/catalogWebRoute.js';
 
 const WEB_ROUTES = [
+    ['/health', healthWebRoutes],
     ['/', homeWebRoutes],
     ['/inicio-sesion', loginWebRoutes],
     ['/revocar-sesion', refreshWebRoutes],
     ['/cerrar-sesion', logoutWebRoutes],
+    ['/api-docs', apiDocsWebRoutes],
     ['/almacen/materiales', materialWebRoutes],
     ['/almacen/consumibles', consumableWebRoutes],
     ['/almacen/mermas', wasteWebRoutes],

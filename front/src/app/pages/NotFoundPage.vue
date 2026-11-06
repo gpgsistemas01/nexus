@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import { mdiMapMarkerQuestionOutline } from '@mdi/js';
+import AppStatusPage from '../components/AppStatusPage.vue';
 </script>
 
 <template>
-    <main class="not-found">
-        <h1>Página no encontrada</h1>
-        <p>La dirección que abriste no corresponde a una página de Nexus.</p>
-        <RouterLink :to="{ name: 'login' }">Volver al inicio</RouterLink>
-    </main>
+    <AppStatusPage
+        code="404"
+        :icon="mdiMapMarkerQuestionOutline"
+        title="Página no encontrada"
+        description="La dirección que abriste no corresponde a una página de Nexus. Revisa el enlace o vuelve al inicio para continuar."
+    >
+        <template #actions>
+            <RouterLink
+                class="status-action status-action--primary"
+                :to="{ name: 'login' }"
+            >
+                Volver al inicio
+            </RouterLink>
+        </template>
+    </AppStatusPage>
 </template>
-
-<style scoped>
-.not-found {
-    padding: 48px 24px;
-}
-
-p {
-    margin-bottom: 24px;
-}
-</style>

@@ -102,7 +102,7 @@ const startApplication = () => {
 
     const port = baseURL.port || '80';
     console.log(`Nexus no está disponible en ${ baseURL.origin }; iniciando una instancia temporal.`);
-    return spawn(process.execPath, ['src/app.js'], {
+    return spawn(process.execPath, ['src/server.js'], {
         env: { ...process.env, PORT: port },
         stdio: 'inherit'
     });

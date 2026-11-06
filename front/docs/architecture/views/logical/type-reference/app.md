@@ -29,6 +29,18 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `navigate` | `navigate: [];` |
 | `expand` | `expand: []` |
 
+## AppStatusPage.defineProps
+
+**Fuente:** [src/app/components/AppStatusPage.vue](../../../../../src/app/components/AppStatusPage.vue) · línea 2, columna 13. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `code` | `code: string;` |
+| `icon` | `icon: string;` |
+| `title` | `title: string;` |
+| `description` | `description: string;` |
+| `notice` | `notice?: string;` |
+
 ## NavigationLink
 
 **Fuente:** [src/app/navigation.ts](../../../../../src/app/navigation.ts) · línea 32, columna 1. **Declaración:** interface.
@@ -56,7 +68,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## AccessErrorPage.defineProps
 
-**Fuente:** [src/app/pages/AccessErrorPage.vue](../../../../../src/app/pages/AccessErrorPage.vue) · línea 6, columna 13. **Declaración:** SFC contract.
+**Fuente:** [src/app/pages/AccessErrorPage.vue](../../../../../src/app/pages/AccessErrorPage.vue) · línea 8, columna 13. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

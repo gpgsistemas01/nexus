@@ -108,6 +108,11 @@ reales de `RemoteSelect`, incluidos filtros y altas contextuales con API simulad
 
 ## Preparación y recuperación de capturas del manual
 
+`manualProfilesTest.ts` comprueba la publicación de los quince perfiles de
+referencia con sus propias selecciones. Añade rechazos de capítulos sin permiso,
+imágenes no seleccionadas, rutas de otra cuenta, capturas ausentes y huellas
+modificadas. La disponibilidad de un PNG en otro perfil no completa el seleccionado.
+
 | ID de diseño | Riesgo y técnica | Condición observable | Fuentes |
 | --- | --- | --- | --- |
 | `DP-VUE-MAN-001` | Omitir registros posteriores o capturar una fila anterior; particiones por estado y fronteras de paginación. | Una página corta avanza por filas recibidas. Compras canceladas y salidas parciales/con devolución se encuentran después de veinte registros; la búsqueda diferida abre el ID del folio elegido. | `manualPreparationTest.ts` y `manualCapture.spec.ts`. |

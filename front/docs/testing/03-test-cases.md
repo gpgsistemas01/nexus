@@ -39,6 +39,7 @@ explica las herramientas, archivos y credenciales de cada nivel.
 | [CP-VUE-SEC-001-01](cases/cp-vue-sec-001-01.md) | texto hostil en confirmación y error. | DP-VUE-SEC-001 |
 | [CP-VUE-WH-002-01](cases/cp-vue-wh-002-01.md) | rechazo de edición con versión original. | DP-VUE-WH-002 |
 | [CP-VUE-MAN-001-01](cases/cp-vue-man-001-01.md) | selección y capturas del manual por acceso. | DP-VUE-MAN-001 |
+| [CP-VUE-STATUS-001-01](cases/cp-vue-status-001-01.md) | fallback móvil y recuperación del arranque. | DP-VUE-STATUS-001 |
 
 ## Reproducción y resultados
 

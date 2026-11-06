@@ -14,6 +14,7 @@ Los comandos se ejecutan desde `back/`.
 | Iniciar sesión y hacer una petición | [Inicio rápido](01-consumption.md). |
 | Revisar errores, límites y reintentos | [Contrato HTTP](api-contract.md). |
 | Ver operaciones, parámetros y esquemas | [OpenAPI 3.1](openapi.json). |
+| Explorar y probar la API en desarrollo | [Swagger UI](02-maintenance.md#swagger-ui-en-desarrollo). |
 | Validar o publicar el contrato | [Mantenimiento](02-maintenance.md). |
 
 OpenAPI conserva el detalle por operación en [Sesión](paths/auth.json),

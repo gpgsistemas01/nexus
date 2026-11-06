@@ -73,7 +73,11 @@ export const filterManualContent = (content, permissions) => {
     return result.join('\n').replace(/\n{3,}/g, '\n\n');
 };
 
+export const imageReferences = (content) =>
+    [...content.matchAll(/!\[[^\]\r\n]*\]\(([^)\r\n]+)\)/g)].map((match) => match[1]);
+
 export const imageNames = (content) =>
-    [...content.matchAll(/!\[[^\]]+\]\((?:\.\.\/)?images\/([a-z0-9-]+\.png)\)/g)].map(
-        (match) => match[1],
-    );
+    imageReferences(content).flatMap((reference) => {
+        const match = /^(?:\.\.\/)?images\/([a-z0-9-]+\.png)$/.exec(reference);
+        return match ? [match[1]] : [];
+    });

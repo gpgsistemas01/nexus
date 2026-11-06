@@ -139,3 +139,16 @@ Administrador del sistema en Sistemas. Almacén conserva `clients:read`,
 registrar desde los formularios operativos autorizados. El permiso de alta no
 concede `clients:page-view` ni `suppliers:page-view`; después del alta contextual,
 el formulario de origen selecciona el registro confirmado y conserva la captura.
+
+## Cookies y canal de notificaciones
+
+Las cookies de acceso y renovación llevan `HttpOnly`, `SameSite=Lax` y `Secure`
+en producción; su borrado conserva las opciones de alcance y seguridad.
+Socket.IO acepta conexiones sólo con `accessToken` válido y cuenta activa obtenida
+mediante `getLoggedUser`. Antes de cada aviso se revalida token, cuenta y permisos
+actuales. Los eventos `materials:updated` y `wastes:updated` requieren respectivamente
+`materials:read` y `wastes:read`; ambos eventos de movimientos requieren
+`movements:read`, igual que sus rutas HTTP. No se envían registros ni costos.
+Un token vencido o una cuenta desactivada se desconecta al intentar notificar;
+una reducción de permisos elimina los avisos correspondientes. La conexión no
+sustituye la autorización de las consultas HTTP posteriores.

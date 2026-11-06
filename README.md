@@ -8,6 +8,9 @@ Proveedores tienen interfaz Vue con acceso según los permisos de la cuenta.
 
 **Desarrolladores:** [comandos de inicio, pruebas, base de datos, capturas y publicación](front/docs/development/00-commands.md).
 
+**Despliegue en Render:** [configuración de Vue y conexión a la API](front/docs/development/03-build-and-deployment.md#consulta-rápida)
+y [diagnóstico de rutas y login](front/docs/development/03-build-and-deployment.md#diagnóstico-del-despliegue).
+
 ```text
 back/                 # Express, EJS, Prisma, pruebas y documentación
 front/                # Vue 3 + Vite, login, Almacén, Movimientos, Identidad y Directorio

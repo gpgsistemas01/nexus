@@ -12,6 +12,8 @@ Los errores junto a un campo se corrigen directamente en ese campo.
 | Falta una opción en el selector. | Busque el nombre y revise la selección previa, por ejemplo el proveedor. | Puede seleccionar el registro correcto. |
 | La tabla está vacía. | Limpie filtros, revise contexto y fechas, y vuelva a buscar. | La consulta general muestra los registros esperados o confirma que no existen. |
 | La consulta informa un error de carga. | Compruebe conexión y pulse **Reintentar**. | Se muestran los datos. |
+| Aparece Página no encontrada. | Revise el enlace o pulse **Volver al inicio**. | Se abre el acceso a Nexus. |
+| Aparece No se pudo cargar la aplicación. | Compruebe conexión y pulse **Volver a intentar**. | Se carga la página; si persiste, solicite soporte. |
 | Aparece Acceso no permitido. | Solicite revisión de permisos para esa función. | La persona autorizada puede entrar con su propia cuenta. |
 | La sesión sigue sin poder comprobarse tras los reintentos automáticos. | Restablezca conexión y use **Volver a comprobar el acceso**; ingrese de nuevo si se solicita. | Se abre una página autorizada. |
 | El registro cambió durante la edición. | Siga **Conflictos de edición**, abajo. | Puede revisar y guardar la corrección vigente. |
