@@ -9,27 +9,18 @@ RUN --mount=type=secret,id=proxy_ca \
       NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca npm ci; \
     else npm ci; fi
 
-COPY front/index.html front/vite.config.ts front/vitest.config.ts front/playwright.config.ts front/env.d.ts front/tsconfig*.json ./
-COPY front/public ./public
-COPY front/src ./src
-# Sólo módulos públicos compartidos; no se copia el código privado de Express.
-COPY back/src/public/js/utils/validations/loginValidation.js back/src/public/js/utils/validations/baseValidations.js back/src/public/js/utils/validations/validators.js back/src/public/js/utils/validations/fieldValidations.js /app/back/src/public/js/utils/validations/
-COPY back/src/public/js/utils/timeZone.js /app/back/src/public/js/utils/
-COPY back/src/public/js/constants/apiMessages.js /app/back/src/public/js/constants/
-COPY back/src/shared/constants/apiSuccessCodes.js back/src/shared/constants/catalogs.js back/src/shared/constants/auth.js back/src/shared/constants/inputValidation.js back/src/shared/constants/inventory.js back/src/shared/constants/permissions.js /app/back/src/shared/constants/
-COPY back/src/shared/messages/goodsReceiptMessages.js /app/back/src/shared/messages/
-COPY back/src/shared/inventory/wasteMeasurements.js back/src/shared/inventory/goodsReceiptCalculations.js /app/back/src/shared/inventory/
-COPY back/src/shared/validation/weightValidations.js /app/back/src/shared/validation/
-COPY back/src/shared/utils/numberUtils.js /app/back/src/shared/utils/
-COPY back/src/public/js/application/warehouse/issues/issueHeaderRules.js /app/back/src/public/js/application/warehouse/issues/
-COPY back/src/public/js/utils/formatters.js /app/back/src/public/js/utils/
-COPY back/src/public/js/constants/fulfillmentStatuses.js /app/back/src/public/js/constants/
+# Dockerfile.dockerignore permite sólo Vue y sus módulos públicos compartidos.
+COPY front/ ./
+COPY back/src/ /app/back/src/
 ARG VITE_LOGIN_LOGO_URL=""
-RUN npm run build
+# La imagen valida la aplicación; los tipos de pruebas y herramientas se comprueban en CI.
+RUN npm exec -- vue-tsc --build tsconfig.app.json && npm run build-only
 
 FROM nginx:stable-alpine AS runtime
 
-ENV BACKEND_UPSTREAM=http://backend:3000
+ENV BACKEND_UPSTREAM=http://backend:3000 \
+    PORT=80 \
+    NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
 COPY front/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=build /app/front/dist /usr/share/nginx/html
 

@@ -100,6 +100,42 @@ acceso público documentado. Las opciones de cifrado, pooler y red de la conexi�
 PostgreSQL dependen de las URLs y de la configuración del proveedor, que debe
 comprobarse en el entorno desplegado.
 
+### Configurar el servicio API en Render
+
+Conserva el servicio existente si apunta a este repositorio y su despliegue está
+sano. Publicar Vue no requiere cambiar sus rutas, secretos ni base de datos.
+
+| Campo | Configuración de esta imagen |
+| --- | --- |
+| Runtime | Docker. |
+| Root Directory | Vacío. |
+| Dockerfile Path | `./Dockerfile`. |
+| Docker Build Context Directory | `.`. |
+| Docker Command | Sin sobrescribir; ejecuta el entrypoint y `npm start`. |
+| Rama | La elegida para publicar; debe contener la versión compatible con Vue. |
+| Build Filters, si se usan | `back/**`, `Dockerfile` y `.dockerignore`. |
+| Health Check Path | Vacío usa la comprobación TCP de Render. `/api/auth/me` puede responder 401 y no sirve como health check. |
+
+La imagen usa el `PORT` de Render y fuerza `NODE_ENV=production`. Mantén
+`DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET_ACCESS` y `JWT_SECRET_REFRESH` en las
+variables del servicio. Cambiar los secretos JWT invalida sesiones; no es un paso
+necesario para conectar Vue.
+
+El entrypoint aplica migraciones con `DIRECT_URL` por defecto. Si Render ya tiene
+un **Pre-Deploy Command** para migrar, utiliza una sola fase de migración y arranca
+con `RUN_MIGRATIONS=false` después de su éxito. No ejecutes migraciones durante
+la construcción de la imagen. El [arranque](#arranque-y-migraciones) y las
+[cuentas PostgreSQL](02-postgresql-runtime-and-migration-roles.md) precisan el flujo.
+
+En Supabase, comprueba la compatibilidad IPv4 desde Render. Un host directo que
+sólo resuelve IPv6 puede fallar aunque funcione localmente. Para `DIRECT_URL`,
+utiliza una conexión directa accesible o el pooler en modo **sesión**, puerto 5432;
+el pooler transaccional no sustituye la conexión de migración. Mantén ambos destinos
+en la misma base. Véase [Render y Supabase](https://render.com/articles/how-to-connect-a-render-service-to-supabase-postgres).
+
+La publicación y el proxy de Vue se configuran en la
+[guía del frontend](../../../../../front/docs/development/03-build-and-deployment.md#render-conservar-la-api-y-publicar-vue).
+
 ## Arranque y migraciones
 
 El contenedor ejecuta `docker-entrypoint.sh` con `NODE_ENV=production`. Si

@@ -124,3 +124,5 @@ necesarias para la publicación elegida.
 | Consultar logs API | `docker compose logs app` |
 
 Consulta [proxy y alojamiento](03-build-and-deployment.md) para conectar los contenedores.
+La [configuración de Render](03-build-and-deployment.md#render-conservar-la-api-y-publicar-vue)
+indica cómo reutilizar el backend y publicar la imagen Vue.
