@@ -19,6 +19,9 @@ y [fronteras XLSX](../../tests/unit/services/warehouse/inventoryWorkbookTest.js)
 `DP-IMP-001` incluye el informe de una sola hoja con sus cuatro columnas y valores
 coincidentes con la vista previa. Un nombre iniciado en `=` permanece como texto;
 el informe no se acepta como plantilla de carga. Descargarlo conserva el borrador.
+También contrasta las seis plantillas de SheetKit con el lector anterior: estilos,
+listas, encabezado inmóvil y nueva carga después de editar. Rechaza fechas,
+errores, fórmulas, texto enriquecido y coordenadas fuera del rango permitido.
 La [medición](backend-performance.md#importación-de-inventario) añade carga de seis
 lotes de 100 filas, sin sustituir los oráculos de persistencia.
 
@@ -54,7 +57,7 @@ todas las integraciones.
 
 | Suite | Ambiente | Comando |
 | --- | --- | --- |
-| Unitaria | Node.js 22, 24 o 26 según `engines`, y Vitest, sin base de datos real; dependencias externas simuladas cuando corresponde. CI comprueba Node 24 y 26. | `npm run test:unit` |
+| Unitaria | Node.js 24 o 26 según `engines`, y Vitest, sin base de datos real; dependencias externas simuladas cuando corresponde. CI comprueba ambas versiones. | `npm run test:unit` |
 | Integración | `NODE_ENV=test`, PostgreSQL aislado en `DATABASE_TEST_URL`, migraciones aplicadas y ejecución serial. La URL debe ser distinta de `DATABASE_URL`. | `npm run test:integration` |
 
 Los resultados de cada ejecución se conservan en CI o en la solicitud de cambio. La

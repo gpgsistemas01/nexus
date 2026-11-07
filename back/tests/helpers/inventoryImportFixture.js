@@ -6,6 +6,13 @@ import { PERMISSIONS } from '../../src/shared/constants/permissions.js';
 import { ROLE_KEYS } from '../../src/constants/roles.js';
 import { DEPARTMENT_KEYS } from '../../src/constants/departments.js';
 
+export const writeInventoryWorkbook = async workbook => {
+    // XLSX puede omitir sheetFormatPr. ExcelJS pierde su valor por defecto al leerlo
+    // y luego escribiría un sheetFormatPr inválido sin defaultRowHeight.
+    for (const sheet of workbook.worksheets) sheet.properties.defaultRowHeight ??= 15;
+    return Buffer.from(await workbook.xlsx.writeBuffer());
+};
+
 export const inventoryWorkbook = async ({ resource = 'materials', mode = 'create', rows, alter }) => {
     const workbook = new ExcelJS.Workbook();
     const config = getImportConfig(resource, mode);
@@ -18,7 +25,7 @@ export const inventoryWorkbook = async ({ resource = 'materials', mode = 'create
     instructions.getCell('B3').value = mode;
     workbook.addWorksheet('Catalogos');
     alter?.(workbook);
-    return Buffer.from(await workbook.xlsx.writeBuffer());
+    return writeInventoryWorkbook(workbook);
 };
 
 export const createInventoryImportFixture = async prisma => {

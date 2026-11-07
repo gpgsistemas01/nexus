@@ -4,6 +4,14 @@ Consulta rápida para Vue, API, pruebas y documentación. Todos los comandos de 
 página se ejecutan desde la **raíz del repositorio**. Los manifiestos de
 [Vue](../../package.json) y [Express](../../../back/package.json) son la fuente de los scripts.
 
+## Comprobar Node
+
+Usa **Node 24 LTS**, desde 24.14.1, para ejecutar ambas aplicaciones.
+Comprueba `node -v` y `npm -v`. Si todavía aparece Node 22, instala Node 24 desde
+[nodejs.org](https://nodejs.org/), abre una terminal nueva y repite la comprobación
+antes de instalar las dependencias. `npm ci` no actualiza Node.
+Docker y Render usan su propia versión; consulta [despliegue](03-build-and-deployment.md).
+
 ## Iniciar el sistema y acceder desde la red local
 
 | Acción | Comando |

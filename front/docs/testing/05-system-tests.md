@@ -3,8 +3,9 @@
 ## Alcance y propietarios
 
 `tests/e2e` usa API simulada; `tests/system`, Vue, Express y PostgreSQL reales, sin
-interceptar la API ni simular autenticación. Prisma y ExcelJS se ejecutan sólo en Node de
-pruebas; no entran en `front/src` ni en el bundle.
+interceptar la API ni simular autenticación. La API genera los XLSX con SheetKit;
+ExcelJS, como dependencia de desarrollo, los verifica con un motor distinto.
+Prisma y esos motores se ejecutan en Node; no entran en `front/src` ni en el bundle.
 
 | Archivo | Responsabilidad |
 | --- | --- |

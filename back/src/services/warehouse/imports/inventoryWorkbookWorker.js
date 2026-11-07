@@ -1,6 +1,7 @@
 import { parentPort, workerData } from 'node:worker_threads';
-import ExcelJS from 'exceljs';
+import { Workbook, isResourceLimitError } from '@sheetkit/node';
 import unzipper from 'unzipper';
+import { createSpreadsheet, spreadsheetColumn } from '../../../utils/spreadsheetUtils.js';
 import { INVENTORY_IMPORT_FORMAT, INVENTORY_IMPORT_LIMITS as limits } from '../../../shared/constants/inventoryImport.js';
 
 const fail = kind => { const error = new Error(kind); error.kind = kind; throw error; };
@@ -31,47 +32,65 @@ const read = async ({ bytes, config }) => {
         }
         if (inspect && /macroEnabled|vbaProject|oleObject|TargetMode\s*=\s*["']External["']/i.test(Buffer.concat(chunks).toString('utf8'))) fail('FILE');
     }
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(buffer);
-    if (workbook.worksheets.length !== 3
-        || !['Datos', 'Instrucciones', 'Catalogos'].every(name => workbook.getWorksheet(name))) fail('FILE');
-    const instructions = workbook.getWorksheet('Instrucciones');
-    if (instructions.getCell('B1').value !== INVENTORY_IMPORT_FORMAT
-        || instructions.getCell('B2').value !== config.resource
-        || instructions.getCell('B3').value !== config.mode) fail('FILE');
-    const sheet = workbook.getWorksheet('Datos');
-    if (sheet.rowCount > 1001 || sheet.columnCount > config.columns.length) fail('LIMIT');
-    const headers = config.columns.map(([header]) => header);
-    if (!headers.every((header, index) => sheet.getRow(1).getCell(index + 1).value === header)) fail('FILE');
-    const rows = [];
-    sheet.eachRow((row, rowNumber) => {
-        if (rowNumber === 1) return;
-        const values = config.columns.map((_, index) => scalar(row.getCell(index + 1).value));
-        if (values.every(value => value === '')) return;
-        if (rows.length >= limits.maxRows) fail('LIMIT');
-        rows.push({ row: rowNumber, values: Object.fromEntries(config.columns.map(([, key], index) => [key, values[index]])) });
+    const workbook = await Workbook.openBuffer(buffer, {
+        maxOuterInputBytes: limits.maxBytes, maxUnzipSize: limits.maxUncompressedBytes,
+        maxXmlPartBytes: limits.maxUncompressedBytes, maxZipEntries: limits.maxZipEntries,
+        readMode: 'eager'
     });
+    if (workbook.sheetNames.length !== 3
+        || !['Datos', 'Instrucciones', 'Catalogos'].every(name => workbook.sheetNames.includes(name))) fail('FILE');
+    const readCell = (sheet, cell) => {
+        const value = workbook.getCellValue(sheet, cell);
+        if (typeof value === 'string' && (workbook.getCellRichText(sheet, cell) || workbook.getCellHyperlink(sheet, cell))) fail('FILE');
+        return scalar(value);
+    };
+    if (readCell('Instrucciones', 'B1') !== INVENTORY_IMPORT_FORMAT
+        || readCell('Instrucciones', 'B2') !== config.resource
+        || readCell('Instrucciones', 'B3') !== config.mode) fail('FILE');
+    const columns = config.columns.map((_, index) => spreadsheetColumn(index + 1));
+    if (!config.columns.every(([header], index) => readCell('Datos', `${columns[index]}1`) === header)) fail('FILE');
+    const rows = [];
+    const traversal = { limits: { maxRows: 1001, maxColumns: config.columns.length + 1,
+        maxCells: 1001 * (config.columns.length + 1), maxOutputBytes: limits.maxUncompressedBytes } };
+    for (const row of workbook.getRowsIterator('Datos', traversal)) {
+        if (row.row > 1001 || row.cells.some(cell => !columns.includes(cell.column))) fail('LIMIT');
+        if (row.row === 1) continue;
+        const cells = new Map(row.cells.map(cell => [cell.column, cell]));
+        const values = columns.map(column => {
+            const cell = cells.get(column);
+            if (cell && !['empty', 'string', 'number', 'boolean'].includes(cell.valueType)) fail('FILE');
+            return readCell('Datos', `${column}${row.row}`);
+        });
+        if (values.every(value => value === '')) continue;
+        if (rows.length >= limits.maxRows) fail('LIMIT');
+        rows.push({ row: row.row, values: Object.fromEntries(config.columns.map(([, key], index) => [key, values[index]])) });
+    }
     if (!rows.length) fail('FILE');
     return rows;
 };
 
 const createDataWorkbook = (columns, rows) => {
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Datos', { views: [{ state: 'frozen', ySplit: 1 }] });
-    sheet.columns = columns.map(([header, key]) => ({ header, width: key === 'materialId' ? 80 : header.startsWith('id_') ? 40 : 25 }));
-    sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF174A5B' } };
-    sheet.getRow(1).height = 32;
-    sheet.getRow(1).alignment = { wrapText: true, vertical: 'middle' };
-    for (const row of rows) sheet.addRow(columns.map(([, key]) => row[key] ?? ''));
-    return { workbook, sheet };
+    const workbook = createSpreadsheet('Datos');
+    workbook.setPanes('Datos', 'A2');
+    const headerStyle = workbook.addStyle({ font: { bold: true, color: '#FFFFFF' },
+        fill: { pattern: 'solid', fgColor: '#174A5B' }, alignment: { wrapText: true, vertical: 'center' } });
+    columns.forEach(([header, key], index) => {
+        const column = spreadsheetColumn(index + 1);
+        workbook.setColWidth('Datos', column, key === 'materialId' ? 80 : header.startsWith('id_') ? 40 : 25);
+        workbook.setCellStyle('Datos', `${column}1`, headerStyle);
+    });
+    workbook.setRowValues('Datos', 1, 'A', columns.map(([header]) => header));
+    workbook.setRowHeight('Datos', 1, 32);
+    rows.forEach((row, index) => workbook.setRowValues('Datos', index + 2, 'A', columns.map(([, key]) => row[key] ?? '')));
+    return workbook;
 };
 
 const template = async ({ config, rows = [], catalogs }) => {
-    const { workbook, sheet } = createDataWorkbook(config.columns, rows);
-    const instructions = workbook.addWorksheet('Instrucciones');
-    instructions.columns = [{ width: 32 }, { width: 110 }];
-    for (const row of [
+    const workbook = createDataWorkbook(config.columns, rows);
+    workbook.newSheet('Instrucciones');
+    workbook.setColWidth('Instrucciones', 'A', 32);
+    workbook.setColWidth('Instrucciones', 'B', 110);
+    const instructions = [
         ['Formato', INVENTORY_IMPORT_FORMAT], ['Recurso', config.resource], ['Operacion', config.mode],
         ['Límites', 'Hasta 100 filas y 2 MiB. Conserva hojas, encabezados, identificadores y versiones.'],
         ['Identificadores', 'Altas: el sistema genera los IDs nuevos. Actualización: descarga los registros actuales y conserva sus IDs y versiones en las columnas grises.'],
@@ -83,48 +102,49 @@ const template = async ({ config, rows = [], catalogs }) => {
         ['Actualización', 'Nombre y mínimo se comparten entre proveedores. Costo y activo corresponden a cada proveedor. Un vacío no borra datos.'],
         ['Confirmación', 'Validar sólo genera una vista previa. Confirmar aplica todas las filas válidas juntas; si alguna falla, no se aplica ninguna.'],
         ['Archivos', 'El servidor descarta el XLSX después del análisis. El original de tu equipo permanece bajo tu control.']
-    ]) instructions.addRow(row);
-    instructions.eachRow(row => { row.alignment = { wrapText: true, vertical: 'top' }; row.height = 40; });
-    const lookups = workbook.addWorksheet('Catalogos');
-    lookups.columns = [
-        { header: 'proveedor_codigo', width: 20 }, { header: 'proveedor', width: 45 },
-        { header: 'presentacion', width: 25 }, { header: 'unidad', width: 35 },
-        { header: 'material_referencia', width: 100 }
     ];
+    const textStyle = workbook.addStyle({ alignment: { wrapText: true, vertical: 'top' } });
+    instructions.forEach((row, index) => {
+        workbook.setRowValues('Instrucciones', index + 1, 'A', row);
+        workbook.setRowHeight('Instrucciones', index + 1, 40);
+        for (const column of ['A', 'B']) workbook.setCellStyle('Instrucciones', `${column}${index + 1}`, textStyle);
+    });
+    workbook.newSheet('Catalogos');
+    workbook.setRowValues('Catalogos', 1, 'A', ['proveedor_codigo', 'proveedor', 'presentacion', 'unidad', 'material_referencia']);
+    [20, 45, 25, 35, 100].forEach((width, index) => workbook.setColWidth('Catalogos', spreadsheetColumn(index + 1), width));
     const count = Math.max(catalogs.suppliers.length, catalogs.presentations.length, catalogs.units.length, catalogs.materials.length);
-    for (let index = 0; index < count; index++) lookups.addRow([
+    for (let index = 0; index < count; index++) workbook.setRowValues('Catalogos', index + 2, 'A', [
         catalogs.suppliers[index]?.code, catalogs.suppliers[index]?.tradeName,
         catalogs.presentations[index]?.name, catalogs.units[index], catalogs.materials[index]
-    ]);
+    ].map(value => value ?? null));
     const lists = { supplierCode: ['A', catalogs.suppliers.length], presentationName: ['C', catalogs.presentations.length],
         unitLabel: ['D', catalogs.units.length], materialId: ['E', catalogs.materials.length] };
+    const identityStyle = workbook.addStyle({ fill: { pattern: 'solid', fgColor: '#E7EDF0' } });
     for (let index = 0; index < config.columns.length; index++) {
         const key = config.columns[index][1];
-        for (let number = 2; number <= limits.maxRows + 1; number++) {
-            const cell = sheet.getRow(number).getCell(index + 1);
-            if (key === 'isActive') cell.dataValidation = { type: 'list', allowBlank: false, formulae: ['"SI,NO"'] };
-            const list = lists[key];
-            if (list?.[1]) cell.dataValidation = { type: 'list', allowBlank: false,
-                formulae: [`'Catalogos'!$${list[0]}$2:$${list[0]}$${list[1] + 1}`] };
-            if (key.startsWith('expected') || key === 'id' || key === 'supplierId') {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE7EDF0' } };
-            }
+        const column = spreadsheetColumn(index + 1);
+        const sqref = `${column}2:${column}${limits.maxRows + 1}`;
+        if (key === 'isActive') workbook.addDataValidation('Datos', { sqref, validationType: 'list', allowBlank: false, formula1: '"SI,NO"' });
+        const list = lists[key];
+        if (list?.[1]) workbook.addDataValidation('Datos', { sqref, validationType: 'list', allowBlank: false,
+            formula1: `'Catalogos'!$${list[0]}$2:$${list[0]}$${list[1] + 1}` });
+        if (key.startsWith('expected') || key === 'id' || key === 'supplierId') {
+            for (let row = 2; row <= limits.maxRows + 1; row++) workbook.setCellStyle('Datos', `${column}${row}`, identityStyle);
         }
     }
-    const buffer = await workbook.xlsx.writeBuffer();
-    return new Uint8Array(buffer);
+    return new Uint8Array(await workbook.writeBuffer());
 };
 
 const errors = async ({ rows }) => {
     const columns = [['fila', 'row'], ['nombre', 'name'], ['columna', 'column'], ['mensaje', 'message']];
-    const { workbook, sheet } = createDataWorkbook(columns, rows);
-    sheet.getColumn(4).width = 90;
-    sheet.eachRow((row, number) => {
-        if (number === 1) return;
-        row.alignment = { wrapText: true, vertical: 'top' };
-        row.height = 60;
+    const workbook = createDataWorkbook(columns, rows);
+    workbook.setColWidth('Datos', 'D', 90);
+    const textStyle = workbook.addStyle({ alignment: { wrapText: true, vertical: 'top' } });
+    rows.forEach((_row, index) => {
+        workbook.setRowHeight('Datos', index + 2, 60);
+        for (let column = 1; column <= columns.length; column++) workbook.setCellStyle('Datos', `${spreadsheetColumn(column)}${index + 2}`, textStyle);
     });
-    return new Uint8Array(await workbook.xlsx.writeBuffer());
+    return new Uint8Array(await workbook.writeBuffer());
 };
 
 try {
@@ -133,5 +153,5 @@ try {
     const result = await actions[workerData.action](workerData);
     parentPort.postMessage({ result });
 } catch (error) {
-    parentPort.postMessage({ error: { kind: error.kind ?? 'FILE' } });
+    parentPort.postMessage({ error: { kind: isResourceLimitError(error) ? 'LIMIT' : error.kind ?? 'FILE' } });
 }

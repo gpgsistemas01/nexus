@@ -95,7 +95,7 @@ condicionado por estado no puede borrar una confirmación que ganó la carrera.
 | --- | --- |
 | Tamaño | 2 MiB, 100 filas, 600 caracteres por celda; ZIP de hasta 16 MiB descomprimidos y 200 entradas. |
 | Contenido | Rechaza fórmulas, macros, vínculos externos, objetos de celda y hojas/encabezados incompatibles. |
-| CPU | ExcelJS se ejecuta en un worker temporal con límite de memoria y 10 s de análisis/generación. |
+| CPU | SheetKit se ejecuta en un worker temporal con 10 s de análisis/generación. Los límites de entrada y descompresión acotan el libro; el límite V8 del worker no limita la memoria nativa de Rust. |
 | Admisión | Una vista previa y un trabajo XLSX por proceso; una confirmación de importación por base. Otra solicitud recibe `429` y puede reintentarse. |
 | Bloqueos | Espera de 1,5 s y transacción de hasta 30 s; las consultas normales no usan la puerta de importación. |
 | XLSX | Sólo memoria; se liberan referencias tras analizarlo y ante error. No se crea un archivo en disco ni se necesita un disco de Render. |
@@ -123,18 +123,13 @@ se conservan en el JSON del borrador hasta su descarte, confirmación o vencimie
 no se conserva el XLSX descargado. Los reportes generales de otros módulos usan un
 archivo temporal para escritura por flujo y lo eliminan en `finally` tras envío o error.
 
-Se conserva **ExcelJS**: ya permite leer las plantillas, generar sus listas/estilos
-y escribir los reportes generales por flujo en `reportExcelUtils`. Sólo se incluye
-en el backend. `unzipper` comprueba el ZIP antes de cargarlo; `read-excel-file` es una
-dependencia de pruebas que contrasta los valores con un lector independiente.
+**SheetKit `@sheetkit/node@1.0.1`** procesa plantillas, errores y reportes generales
+en el backend. `spreadsheetUtils` comparte la creación del libro y la conversión
+de columnas. Requiere Node 24; `unzipper` conserva la inspección previa del ZIP.
+Los límites, contratos, validaciones del dominio y recibos permanecen en sus capas.
 
-| Alternativa | Encaje y costo de sustituirla |
-| --- | --- |
-| SheetJS (`xlsx`) | Permite leer y escribir libros. Requiere comprobar las funciones de la edición elegida para listas, estilos y salida progresiva; no es un reemplazo directo de las APIs usadas. |
-| `read-excel-file` + `write-excel-file` | Separan lectura y escritura. Requieren dos adaptadores y comprobar catálogos, validaciones de celdas y reportes por flujo. |
-| CSV | Útil para tablas simples; no conserva hojas, listas ni tipos/formatos de la plantilla actual. |
-
-No hay una mejora de rendimiento medida que justifique el cambio de biblioteca.
-Antes de sustituirla, comparar con los mismos archivos: plantillas de los tres
-recursos/modos, celdas rechazadas, informe de errores y reporte extenso. Medir tiempo,
-memoria y consultas normales bajo carga; conservar los límites, cancelación y recibos.
+ExcelJS queda como dependencia de desarrollo para generar fixtures anteriores y
+comprobar estructura, estilos y fórmulas; `read-excel-file` contrasta sus valores.
+Las seis variantes de plantilla se descargan, editan con el motor anterior y
+vuelven a analizar con SheetKit. La [decisión del motor](excel-library-decision.md)
+registra alternativas y criterios para futuras actualizaciones.

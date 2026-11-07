@@ -30,8 +30,12 @@ describe('generación progresiva de reportes Excel', () => {
   beforeAll(async () => {
     const os = await vi.importActual('node:os');
     paths.root = await mkdtemp(join(os.tmpdir(), 'nexus-report-tests-'));
+    for (const name of ['TMPDIR', 'TEMP', 'TMP']) vi.stubEnv(name, paths.root);
   });
-  afterAll(async () => rm(paths.root, { recursive: true, force: true }));
+  afterAll(async () => {
+    vi.unstubAllEnvs();
+    await rm(paths.root, { recursive: true, force: true });
+  });
 
   it('conserva fórmulas, resultados en cero, texto, decimales y encabezados HTTP', async () => {
     const data = [
@@ -55,7 +59,7 @@ describe('generación progresiva de reportes Excel', () => {
     expect(rows[2]).toEqual(['México', null, 0, false, 1.234567]);
     expect(data[1][2]).toEqual({ formula: 'A2+B2', result: 5 });
     expect(sheet.views[0]).toMatchObject({ state: 'frozen', ySplit: 1 });
-    expect(sheet.getRow(1).font).toMatchObject({ bold: true });
+    expect(sheet.getCell('A1').font).toMatchObject({ bold: true });
     expect(sheet.getColumn(1).width).toBeGreaterThanOrEqual(14);
     expect(await readdir(paths.root)).toEqual([]);
   });

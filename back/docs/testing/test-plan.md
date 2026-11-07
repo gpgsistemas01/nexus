@@ -231,7 +231,7 @@ por Git y se guardan como evidencia de ejecución, sin versionarlos en `docs`.
 
 ### Ambiente de pruebas e integración con base de datos
 
-Las unitarias se ejecutan con Node.js 22–24 y Vitest, sin una base real. Las integraciones
+Las unitarias se ejecutan con Node.js 24 o 26 y Vitest, sin una base real. Las integraciones
 usan `NODE_ENV=test`, se ejecutan de forma serial y trabajan contra PostgreSQL mediante
 `DATABASE_TEST_URL`, que debe ser distinta de `DATABASE_URL`.
 Los scripts establecen el entorno con `cross-env` para conservar este flujo en Windows

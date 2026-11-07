@@ -101,6 +101,11 @@ de Vite. Los secretos de sesión y PostgreSQL se mantienen en el servicio API.
 La [configuración del backend](../../../back/docs/architecture/views/physical/01-system-runtime-and-deployment.md#configurar-el-servicio-api-en-render)
 precisa sus rutas y migraciones.
 
+La imagen API usa Node 24. Si el backend existente usa runtime **Node** en lugar
+de Docker, configura `NODE_VERSION=24.19.0` o una versión 24 compatible con sus
+`engines` antes de desplegar SheetKit. Instalar Node en el equipo local no cambia
+la versión de Render.
+
 Si habilitas filtros de construcción, incluye `front/**`, `back/src/shared/**`
 y `back/src/public/js/**` en Vue. Los cambios en reglas públicas deben recompilar
 el cliente aunque el archivo modificado esté en `back/`.

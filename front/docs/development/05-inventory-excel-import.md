@@ -70,7 +70,8 @@ antes de mostrar éxito. Un `200` incompleto no confirma la importación.
 Los límites públicos se comparten por `@nexus/inventory-imports`: 2 MiB y 100 filas.
 El navegador comprueba tamaño/extensión; Express valida el contenido y las reglas.
 Las plantillas de actualización se descargan por páginas y sus catálogos se acotan.
-No se carga ExcelJS ni se analiza el libro en el navegador.
+SheetKit analiza el libro en el backend; Vue sólo transmite el archivo y muestra
+la vista previa.
 
 ## Recuperación y archivos
 

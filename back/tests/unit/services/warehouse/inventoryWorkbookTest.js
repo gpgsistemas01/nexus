@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { deflateRawSync } from 'node:zlib';
-import { inventoryWorkbook } from '../../../helpers/inventoryImportFixture.js';
+import { inventoryWorkbook, writeInventoryWorkbook } from '../../../helpers/inventoryImportFixture.js';
 import { getImportConfig } from '../../../../src/services/warehouse/imports/inventoryImportConfig.js';
 import { processInventoryWorkbook } from '../../../../src/services/warehouse/imports/inventoryWorkbookService.js';
 import { readExcelReport } from '../../../helpers/readExcelReport.js';
@@ -37,6 +37,8 @@ describe('fronteras y contenido del libro de inventario', () => {
         ['modo', book => { book.getWorksheet('Instrucciones').getCell('B3').value = 'update'; }],
         ['hoja extra', book => { book.addWorksheet('Oculta'); }],
         ['texto enriquecido', book => { book.getWorksheet('Datos').getCell('A2').value = { richText: [{ text: 'Material' }] }; }],
+        ['fecha', book => { book.getWorksheet('Datos').getCell('A2').value = new Date('2026-01-01T00:00:00Z'); }],
+        ['error de celda', book => { book.getWorksheet('Datos').getCell('A2').value = { error: '#DIV/0!' }; }],
     ])('rechaza %s sin interpretar su contenido', async (_name, alter) => {
         await expect(read(await inventoryWorkbook({ rows: [{ name: 'Material' }], alter })))
             .rejects.toMatchObject({ code: 'INVENTORY_IMPORT_FILE' });
@@ -46,6 +48,45 @@ describe('fronteras y contenido del libro de inventario', () => {
         await expect(read(Buffer.from('esto no es XLSX'))).rejects.toMatchObject({ code: 'INVENTORY_IMPORT_FILE' });
         await expect(read(Buffer.alloc(2 * 1024 * 1024 + 1))).rejects.toMatchObject({ code: 'INVENTORY_IMPORT_LIMIT' });
     });
+    it.each([
+        ['fila fuera del rango', book => { book.getWorksheet('Datos').getCell('A1002').value = 'Fuera'; }],
+        ['columna adicional', book => { book.getWorksheet('Datos').getRow(2).getCell(config.columns.length + 1).value = 'Fuera'; }]
+    ])('limita %s sin expandir coordenadas vacías', async (_name, alter) => {
+        await expect(read(await inventoryWorkbook({ rows: [{ name: 'Material' }], alter })))
+            .rejects.toMatchObject({ code: 'INVENTORY_IMPORT_LIMIT' });
+    });
+    it.each(['materials', 'consumables', 'wastes'].flatMap(resource => ['create', 'update'].map(mode => ({ resource, mode }))))(
+        'genera una plantilla $resource/$mode compatible con el lector anterior', async ({ resource, mode }) => {
+            const { workbook } = await readExcelReport(Buffer.from(await processInventoryWorkbook({
+                action: 'template', config: getImportConfig(resource, mode), catalogs: {
+                    suppliers: [{ code: 'PRO-001', tradeName: 'Proveedor' }],
+                    presentations: [{ name: 'Pieza' }, { name: 'Rollo' }], units: ['pza · Pieza'],
+                    materials: ['11111111-1111-4111-8111-111111111111 | Material | 2 × 3 | Pieza']
+                }
+            })));
+            expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(['Datos', 'Instrucciones', 'Catalogos']);
+            const data = workbook.getWorksheet('Datos');
+            expect(data.views[0]).toMatchObject({ state: 'frozen', ySplit: 1 });
+            expect(data.getCell('A1').font).toMatchObject({ bold: true });
+            expect(data.getCell('A1').fill.fgColor.argb).toBe('FF174A5B');
+            expect(workbook.getWorksheet('Instrucciones').getCell('B2').value).toBe(resource);
+            expect(workbook.getWorksheet('Instrucciones').getCell('B3').value).toBe(mode);
+            const columns = getImportConfig(resource, mode).columns;
+            const active = columns.findIndex(([, key]) => key === 'isActive') + 1;
+            expect(data.getRow(2).getCell(active).dataValidation).toMatchObject({ type: 'list', formulae: ['"SI,NO"'] });
+            if (mode === 'update') expect(data.getCell('A2').fill.fgColor.argb).toBe('FFE7EDF0');
+            else {
+                const supplier = columns.findIndex(([, key]) => key === 'supplierCode') + 1;
+                expect(data.getRow(2).getCell(supplier).dataValidation.formulae).toEqual(["'Catalogos'!$A$2:$A$2"]);
+            }
+            const name = columns.findIndex(([, key]) => key === 'name') + 1;
+            data.getRow(2).getCell(name).value = 'Captura editada';
+            const parsed = await processInventoryWorkbook({ action: 'read', config: getImportConfig(resource, mode),
+                bytes: await writeInventoryWorkbook(workbook) });
+            expect(parsed).toHaveLength(1);
+            expect(parsed[0]).toMatchObject({ row: 2, values: { name: 'Captura editada' } });
+        }
+    );
     it('limita los bytes realmente descomprimidos aunque la cabecera ZIP declare menos', async () => {
         const name = Buffer.from('oversized.xml');
         const compressed = deflateRawSync(Buffer.alloc(16 * 1024 * 1024 + 1, 'x'));

@@ -6,12 +6,12 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
+    "@sheetkit/node": "1.0.1",
     "bcrypt": "^6.0.0",
     "busboy": "1.6.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^18.0.8",
     "ejs": "^7.0.2",
-    "exceljs": "^4.4.0",
     "express": "^5.3.0",
     "express-ejs-layouts": "^2.5.1",
     "express-validator": "^7.3.2",
@@ -62,6 +62,7 @@
   "devDependencies": {
     "@vitest/coverage-v8": "5.0.5",
     "cross-env": "10.1.0",
+    "exceljs": "4.4.0",
     "nodemon": "3.1.11",
     "read-excel-file": "^9.3.12",
     "supertest": "^7.3.1",
@@ -69,7 +70,7 @@
     "vitest": "5.0.5"
   },
   "engines": {
-    "node": "^22.13.0 || ^24.14.1 || ^26.12.1"
+    "node": "^24.14.1 || ^26.12.1"
   },
   "allowScripts": {
     "bcrypt@6.0.0": true,

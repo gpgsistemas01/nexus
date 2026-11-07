@@ -1,4 +1,4 @@
-import 'dotenv/config.js';
+import 'dotenv/config';
 import { getRequestLogContext, logger, pinoLogger } from './utils/logger.js';
 import { hasPermission } from './shared/constants/permissions.js';
 

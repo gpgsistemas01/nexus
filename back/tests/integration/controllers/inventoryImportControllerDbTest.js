@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import ExcelJS from 'exceljs';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
-import { createInventoryImportFixture, inventoryWorkbook } from '../../helpers/inventoryImportFixture.js';
+import { createInventoryImportFixture, inventoryWorkbook, writeInventoryWorkbook } from '../../helpers/inventoryImportFixture.js';
 import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
 import { readExcelReport } from '../../helpers/readExcelReport.js';
 import { getImportConfig } from '../../../src/services/warehouse/imports/inventoryImportConfig.js';
@@ -276,7 +276,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         const name = fixture.row('Plantilla editada').name;
         sheet.getCell('E2').value = name;
         const response = await request(app).post('/materials/preview?mode=update').set('Cookie', cookie)
-            .attach('file', Buffer.from(await workbook.xlsx.writeBuffer()), 'actualizar.xlsx').expect(200);
+            .attach('file', await writeInventoryWorkbook(workbook), 'actualizar.xlsx').expect(200);
         const batch = response.body.batch;
         expect(batch.preview.summary).toMatchObject({ updates: 1, errors: 0 });
         expect(batch.preview.rows[0]).toMatchObject({ id: offer.materialId, before: { name: offer.material.name }, after: { name } });
@@ -357,7 +357,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(columns.map(([header]) => header)).not.toContain('id_merma');
         workbook.getWorksheet('Datos').getRow(2).values = columns.map(([, key]) => data[key] ?? '');
         const response = await request(app).post('/wastes/preview').set('Cookie', cookie)
-            .attach('file', Buffer.from(await workbook.xlsx.writeBuffer()), 'mermas.xlsx').expect(200);
+            .attach('file', await writeInventoryWorkbook(workbook), 'mermas.xlsx').expect(200);
         const batch = response.body.batch;
         expect(batch.preview.summary).toMatchObject({ creates: 1, errors: 0 });
         const confirmed = await confirm(batch).expect(200);

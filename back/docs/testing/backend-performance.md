@@ -116,10 +116,10 @@ y no cambia el cliente Prisma ni el logging de producción.
 ## Generación de Excel y carga mixta de Node.js
 
 El generador compartido `utils/reportExcelUtils.js` usa
-[`ExcelJS.stream.xlsx.WorkbookWriter`](https://github.com/exceljs/exceljs#streaming-xlsx).
-Admite arrays o iterables asíncronos, confirma cada fila y evita construir un buffer
-completo del XLSX. Deshabilita la tabla global de cadenas compartidas y usa compresión
-ZIP de nivel 1; por ello el tamaño del archivo también forma parte de la comparación.
+[SheetKit](https://github.com/nebu1eto/sheetkit) con `newStreamWriter`.
+Admite arrays o iterables asíncronos y vacía filas al temporal XML nativo, con
+cadenas en línea. Guarda el XLSX terminado sin construir un buffer completo en JS;
+tiempo, memoria, espacio temporal y tamaño final forman parte de la comparación.
 Las fórmulas se construyen con `createFormulaCell`, que entrega la expresión y su
 resultado calculado; se comprueban también resultados cero y decimales.
 
@@ -129,19 +129,19 @@ una consulta, incluso después de haber preparado algunas filas. Se limpia el ar
 al terminar la transferencia, al fallar o al cancelar el cliente; la cancelación
 interrumpe el consumo del iterable y evita pedir bloques nuevos. Una consulta Prisma
 ya enviada puede terminar; no se afirma que la cancelación HTTP aborte el SQL activo.
-Los fallos tras comenzar la transferencia se delegan al manejo HTTP para cerrar la
+El guardado nativo ya iniciado puede terminar antes de liberar la hoja; se comprueba
+la cancelación antes y después y se omite la descarga. Los fallos tras comenzar la transferencia se delegan al manejo HTTP para cerrar la
 conexión, sin intentar añadir JSON al archivo. El temporal no es una cola persistente:
 una terminación forzada del proceso puede impedir su limpieza normal.
 
-El despliegue de Compose usa `/tmp` como tmpfs de 64 MB. El espacio de los temporales
-se carga a ese recurso y puede contabilizarse como memoria del contenedor aunque no
-aparezca en el RSS del proceso. La compresión reduce su tamaño, pero no elimina el
-límite: hay que comprobar espacio y concurrencia con los archivos reales. No se añade
-un límite arbitrario de filas ni se cambia la configuración de despliegue en esta prueba.
+El despliegue de Compose usa `/tmp` como tmpfs de 256 MiB. Además del XLSX comprimido
+hay un temporal XML sin comprimir; la hoja se retira en `finally` para liberarlo sin
+esperar al recolector JS. Su uso puede contabilizarse como memoria del contenedor
+aunque no aparezca en el RSS. Comprobar espacio y concurrencia con datos reales.
 
-Se cede el event loop cada 250 filas y se espera al drenaje del destino cuando está
-saturado. La generación sigue usando el hilo principal; estas pausas no ejecutan el
-cálculo en paralelo. No se incorpora un pool de workers. Los controladores conservan
+Se cede el event loop cada 250 filas. La producción de filas y sus cálculos siguen
+en el hilo principal; el guardado asíncrono lo realiza el motor nativo. No se incorpora
+un pool de workers ni otro cliente Prisma. Los controladores conservan
 las columnas y permisos existentes. Inventario, compras, salidas, movimientos,
 proveedores, usuarios, personas y clientes se consultan por bloques. read-excel-file verifica los valores con un lector independiente y ExcelJS inspecciona las fórmulas en
 las pruebas, sin formar parte de las dependencias de producción.

@@ -6,6 +6,10 @@ admitida por los manifiestos de [front](../../package.json) y
 [back](../../../back/package.json). Para ingresar necesitas una cuenta activa en
 la base del entorno.
 
+Para trabajar con ambas aplicaciones usa Node 24 LTS desde 24.14.1: el motor
+Excel del backend requiere Node 24. La [consulta de comandos](00-commands.md#comprobar-node)
+indica cómo comprobarlo y actualizar el equipo.
+
 La [consulta rápida de comandos](00-commands.md) reúne inicio, pruebas, capturas
 y publicación para desarrolladores.
 
