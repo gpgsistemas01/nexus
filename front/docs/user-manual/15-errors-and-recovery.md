@@ -38,9 +38,12 @@ Un costo vacío o cero impide guardar la edición.
 ## Una salida antigua entregada sigue pendiente
 
 Anote el folio y solicite su regularización al responsable de Almacén.
-**Surtir** registra una entrega y descuenta stock; repetir una entrega ya realizada
-puede descontarla dos veces. El cierre histórico sin movimiento aún no está disponible.
-El saldo actual puede corregirse con **Ajustar stock**, con un conteo físico y sus permisos.
+No vuelva a usar **Surtir** para una entrega ya realizada: puede descontar el stock dos veces.
+
+<!-- manual:any materials:adjust-stock wastes:adjust-stock -->
+Para corregir el saldo, compruebe el conteo físico y use **Ajustar stock**.
+El ajuste no cierra la salida pendiente.
+<!-- manual:end -->
 <!-- manual:end -->
 
 ## Conflictos de edición

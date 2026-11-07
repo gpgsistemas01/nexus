@@ -2,6 +2,7 @@ import { successCodeMessages } from '@nexus/api-success-codes';
 import { INVENTORY_IMPORT_LIMITS } from '@nexus/inventory-imports';
 import { UUID_V4_PATTERN } from '@nexus/input-validation';
 import { apiClient } from '../../../shared/http/apiClient.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { requestExcel } from '../../../shared/http/requestExcel.js';
 import { confirmMutation, readRecord } from '../../../shared/http/recordContract.js';
@@ -13,7 +14,7 @@ import type {
     PendingInventoryImport,
 } from '../inventoryImport.js';
 
-const base = '/api/warehouse/inventory-imports';
+const base = API_PATHS.inventoryImports;
 
 const invalid = () =>
     new ApiError('No se pudo leer la importación. Revisa su estado antes de reintentar.');

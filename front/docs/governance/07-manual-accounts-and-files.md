@@ -18,6 +18,9 @@ front/
 El JSON identifica las ediciones; `.env.manual.local` reúne sus usuarios y
 contraseñas. Ambos son locales, ignorados por Git y excluidos del despliegue.
 Los comandos siguientes se ejecutan desde **`front/`** (`cd front` desde la raíz).
+Desde la raíz, use `npm --prefix front run ...`; la
+[consulta de comandos](../development/00-commands.md#capturas-y-manuales-por-cuenta)
+reúne las variantes por cuenta, formato y reanudación.
 
 ## 1. Elegir el tipo de generación
 

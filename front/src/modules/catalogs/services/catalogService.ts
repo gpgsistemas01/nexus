@@ -1,5 +1,7 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
+import { pageParams } from '../../../shared/http/pageParams.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
@@ -31,12 +33,8 @@ const normalizeEntry = (value: unknown, catalog: CatalogName): CatalogEntry => {
 
 export const catalogService = {
     async list(catalog: CatalogName, query: CatalogQuery, signal?: AbortSignal) {
-        const params = new URLSearchParams({
-            start: String((query.page - 1) * query.length),
-            length: String(query.length),
-            search: query.search,
-        });
-        const result = await requestPage(`/api/admin/catalogs/${catalog}?${params}`, signal);
+        const params = pageParams(query);
+        const result = await requestPage(`${API_PATHS.catalogs}/${catalog}?${params}`, signal);
         return { ...result, data: result.data.map((value) => normalizeEntry(value, catalog)) };
     },
     async save(
@@ -46,7 +44,7 @@ export const catalogService = {
         signal?: AbortSignal,
     ) {
         const result = await apiClient.request<{ code: string; data: unknown }>(
-            `/api/admin/catalogs/${catalog}${target.action === 'edit' ? `/${encodeURIComponent(target.row.id)}` : ''}`,
+            `${API_PATHS.catalogs}/${catalog}${target.action === 'edit' ? `/${encodeURIComponent(target.row.id)}` : ''}`,
             {
                 method: target.action === 'edit' ? 'PUT' : 'POST',
                 data: payload,

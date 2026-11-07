@@ -1,6 +1,7 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { errorMessages } from '@nexus/api-messages';
 import { apiClient } from '../../../shared/http/apiClient.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { LOGIN_MESSAGES } from '../loginMessages.js';
 import type { LoginCredentials, LoginFieldErrors } from '../login.js';
@@ -20,7 +21,7 @@ export const loginRequest = async (
     signal?: AbortSignal,
 ): Promise<void> => {
     try {
-        const data = await apiClient.request<{ code: string }>('/api/auth/login', {
+        const data = await apiClient.request<{ code: string }>(API_PATHS.auth.login, {
             method: 'POST',
             data: { name: credentials.name.trim(), password: credentials.password },
             signal,

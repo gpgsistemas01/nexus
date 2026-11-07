@@ -3,11 +3,23 @@ import { deflateRawSync } from 'node:zlib';
 import { inventoryWorkbook } from '../../../helpers/inventoryImportFixture.js';
 import { getImportConfig } from '../../../../src/services/warehouse/imports/inventoryImportConfig.js';
 import { processInventoryWorkbook } from '../../../../src/services/warehouse/imports/inventoryWorkbookService.js';
+import { readExcelReport } from '../../../helpers/readExcelReport.js';
 
 const config = getImportConfig('materials', 'create');
 const catalogs = { suppliers: [], presentations: [], units: [], materials: [] };
 const read = bytes => processInventoryWorkbook({ action: 'read', config, bytes });
 describe('fronteras y contenido del libro de inventario', () => {
+    it('el informe de errores contiene sólo sus columnas y conserva nombres como texto', async () => {
+        const rows = [{ row: 3, name: '=1+1', column: 'cantidad_inicial', message: 'Usa unidades enteras.' },
+            { row: 4, name: 'Lona', column: 'nombre', message: 'El registro está repetido.' }];
+        const bytes = await processInventoryWorkbook({ action: 'errors', rows });
+        const report = await readExcelReport(Buffer.from(bytes));
+        expect(report.workbook.worksheets.map(sheet => sheet.name)).toEqual(['Datos']);
+        expect(report.rows).toEqual([['fila', 'nombre', 'columna', 'mensaje'],
+            ...rows.map(row => [row.row, row.name, row.column, row.message])]);
+        expect(report.sheet.getCell('B2').value).toBe('=1+1');
+        await expect(read(bytes)).rejects.toMatchObject({ code: 'INVENTORY_IMPORT_FILE' });
+    });
     it('admite 100 filas, ignora vacías y conserva tipos de las celdas', async () => {
         const rows = Array.from({ length: 100 }, (_, index) => ({ name: `Material ${index}`, maxUnitCost: 12.123456, isActive: true }));
         const parsed = await read(await inventoryWorkbook({ rows: [{}, ...rows] }));

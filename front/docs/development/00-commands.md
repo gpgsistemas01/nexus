@@ -104,7 +104,9 @@ La API debe estar activa; la herramienta prepara Vue. El recorrido sólo consult
 | Capturas de todas las cuentas | `npm --prefix front run docs:screenshots -- --all` |
 | Capturas de una cuenta | `npm --prefix front run docs:screenshots -- --profile cuenta-01` |
 | Capturas y Word/PDF de todas las cuentas | `npm --prefix front run docs:manuals -- --all` |
+| Capturas y PDF de una cuenta | `npm --prefix front run docs:manuals -- --profile cuenta-01 --format pdf` |
 | Rehacer las capturas de una cuenta | `npm --prefix front run docs:screenshots -- --profile cuenta-01 --fresh` |
+| Rehacer las capturas de todas las cuentas | `npm --prefix front run docs:screenshots -- --all --fresh` |
 | Ver opciones | `npm --prefix front run docs:manuals -- --help` |
 | Capturas generales con datos ficticios | `npm --prefix front run docs:screenshots:reference` |
 | Word/PDF del manual general | `npm --prefix front run docs:manual:reference -- ambos` |
@@ -114,6 +116,15 @@ comando, cada cuenta conserva las completas de su revisión vigente y genera só
 las faltantes o pendientes. `--missing` conserva este comportamiento; no es
 necesario agregarlo. `--fresh` rehace el conjunto seleccionado.
 `docs:manual` es alias de `docs:manuals`.
+
+Desde `front/`, omite `--prefix front`. Los archivos de cuentas y credenciales se
+resuelven desde `front/` en ambos casos. Los comandos de `back/` corresponden al
+manual EJS. El manual general `:reference` reúne funciones de referencia; para
+entregar un manual a un usuario, selecciona su cuenta con los comandos anteriores.
+
+Manuales y capturas usan los permisos de `/api/auth/me`. Un cambio de usuario o
+acceso invalida sus imágenes anteriores. La publicación exige todos los capítulos
+y capturas de esa selección, sin duplicados ni archivos de otra cuenta.
 
 En `dev`, un ejemplo histórico sin datos se registra y no impide publicar el
 manual; las capturas de acciones siguen siendo obligatorias. `--fresh` vuelve a

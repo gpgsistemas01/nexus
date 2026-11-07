@@ -1,8 +1,9 @@
 import axios, { CanceledError } from 'axios';
 import type { AxiosAdapter, AxiosRequestConfig } from 'axios';
 import { ApiError, normalizeApiError } from './apiError.js';
-import { recoverConnection, SESSION_REFRESH_PATH } from './connectionRecovery.js';
+import { recoverConnection } from './connectionRecovery.js';
 import type { RecoverableRequest } from './connectionRecovery.js';
+import { API_PATHS } from './apiPaths.js';
 import { isRecord } from '../utils/isRecord.js';
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
@@ -39,7 +40,7 @@ export const createApiClient = (adapter?: AxiosAdapter) => {
 
             original.hasRetried = true;
             refresh ??= http
-                .post(SESSION_REFRESH_PATH, {}, { requiresAuth: false } as ApiRequestConfig)
+                .post(API_PATHS.auth.refresh, {}, { requiresAuth: false } as ApiRequestConfig)
                 .finally(() => {
                     refresh = null;
                 });

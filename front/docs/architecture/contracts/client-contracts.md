@@ -7,10 +7,20 @@ define el contrato HTTP y [OpenAPI](../../../../back/docs/architecture/openapi/o
 declara sus esquemas. Aquí se documenta cómo los servicios y mappers de Vue los
 consumen. Los eventos internos están en [Formularios y eventos](form-and-event-contracts.md).
 
-`shared/http/apiClient` es el punto HTTP compartido. Los servicios codifican los IDs
-de ruta y construyen filtros mediante URLSearchParams/adaptadores compartidos.
+`shared/http/apiClient` es el punto HTTP compartido. `shared/http/apiPaths` concentra
+las rutas consumidas; varios módulos usan la misma ruta para personas, proveedores
+o inventario. Los servicios codifican los IDs de ruta y construyen filtros mediante
+URLSearchParams. `pageParams` comparte paginación y búsqueda; `lookupParams` fija
+20 opciones por página y `recordParams` añade el orden del listado.
 `/salidas/materiales` es una ruta de navegación;
 `/api/warehouse/goods-issues/materials` es un endpoint de datos.
+
+Las rutas de API son relativas al mismo origen. La conexión al backend se configura
+en el [proxy o despliegue](../../development/03-build-and-deployment.md), sin repetir
+hosts en servicios. Axios serializa los objetos como JSON; al subir `FormData`, el
+navegador asigna el límite multipart. Los servicios conservan `signal`, el método y
+el payload de su operación. El timeout común es 15 s; vista previa y confirmación de
+importación usan 45 s. `requestExcel` solicita y valida el Blob de las descargas.
 
 Los selectores y filtros de área de Salidas consultan
 `GET /api/admin/departments?context=issues`. La respuesta contiene las áreas

@@ -38,6 +38,8 @@ describe('contrato de importación y recuperación', () => {
     expect((transport.mock.calls[0]![0].data as FormData).get('file')).toBe(file);
     const pending = { id: batch.id, expectedVersion: batch.version, operationId: ids.offer };
     await inventoryImportService.confirm(pending, new AbortController().signal);
+    expect(transport.mock.calls[1]![0].headers.get('Content-Type')).toBe('application/json');
+    expect(transport.mock.calls.every(([config]) => config.timeout === 45000)).toBe(true);
     expect(JSON.parse(transport.mock.calls[1]![0].data as string)).toEqual({
       expectedVersion: 0,
       operationId: ids.offer,

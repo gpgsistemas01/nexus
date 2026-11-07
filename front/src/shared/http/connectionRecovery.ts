@@ -1,7 +1,7 @@
 import { CanceledError } from 'axios';
+import { API_PATHS } from './apiPaths.js';
 import type { AxiosError, GenericAbortSignal, InternalAxiosRequestConfig } from 'axios';
 
-export const SESSION_REFRESH_PATH = '/api/auth/refresh';
 const RETRY_DELAYS = [500, 1000];
 
 export interface RecoverableRequest extends InternalAxiosRequestConfig {
@@ -38,7 +38,7 @@ export const recoverConnection = async (
     const canRepeat =
         method === 'get' ||
         method === 'head' ||
-        (method === 'post' && request.url === SESSION_REFRESH_PATH);
+        (method === 'post' && request.url === API_PATHS.auth.refresh);
     const isTransient = cause.response
         ? [502, 503, 504].includes(cause.response.status)
         : ['ERR_NETWORK', 'ECONNABORTED', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED'].includes(

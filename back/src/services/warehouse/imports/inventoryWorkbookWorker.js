@@ -55,15 +55,20 @@ const read = async ({ bytes, config }) => {
     return rows;
 };
 
-const template = async ({ config, rows = [], catalogs }) => {
+const createDataWorkbook = (columns, rows) => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Datos', { views: [{ state: 'frozen', ySplit: 1 }] });
-    sheet.columns = config.columns.map(([header, key]) => ({ header, width: key === 'materialId' ? 80 : header.startsWith('id_') ? 40 : 25 }));
+    sheet.columns = columns.map(([header, key]) => ({ header, width: key === 'materialId' ? 80 : header.startsWith('id_') ? 40 : 25 }));
     sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
     sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF174A5B' } };
     sheet.getRow(1).height = 32;
     sheet.getRow(1).alignment = { wrapText: true, vertical: 'middle' };
-    for (const row of rows) sheet.addRow(config.columns.map(([, key]) => row[key] ?? ''));
+    for (const row of rows) sheet.addRow(columns.map(([, key]) => row[key] ?? ''));
+    return { workbook, sheet };
+};
+
+const template = async ({ config, rows = [], catalogs }) => {
+    const { workbook, sheet } = createDataWorkbook(config.columns, rows);
     const instructions = workbook.addWorksheet('Instrucciones');
     instructions.columns = [{ width: 32 }, { width: 110 }];
     for (const row of [
@@ -110,8 +115,22 @@ const template = async ({ config, rows = [], catalogs }) => {
     return new Uint8Array(buffer);
 };
 
+const errors = async ({ rows }) => {
+    const columns = [['fila', 'row'], ['nombre', 'name'], ['columna', 'column'], ['mensaje', 'message']];
+    const { workbook, sheet } = createDataWorkbook(columns, rows);
+    sheet.getColumn(4).width = 90;
+    sheet.eachRow((row, number) => {
+        if (number === 1) return;
+        row.alignment = { wrapText: true, vertical: 'top' };
+        row.height = 60;
+    });
+    return new Uint8Array(await workbook.xlsx.writeBuffer());
+};
+
 try {
-    const result = workerData.action === 'read' ? await read(workerData) : await template(workerData);
+    const actions = { read, template, errors };
+    if (!Object.hasOwn(actions, workerData.action)) fail('FILE');
+    const result = await actions[workerData.action](workerData);
     parentPort.postMessage({ result });
 } catch (error) {
     parentPort.postMessage({ error: { kind: error.kind ?? 'FILE' } });

@@ -654,15 +654,16 @@ string | number | boolean | null
 
 ## InventoryLookupRequest
 
-**Fuente:** [src/modules/warehouse/services/inventoryCatalogService.ts](../../../../../src/modules/warehouse/services/inventoryCatalogService.ts) · línea 6, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/services/inventoryCatalogService.ts](../../../../../src/modules/warehouse/services/inventoryCatalogService.ts) · línea 9, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupQuery`.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `path` | `path: string;` |
+| `path` | `path: InventoryCatalogPath;` |
 | `supplierId` | `supplierId?: string;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | inheritance | [LookupQuery](../../../../../src/shared/lookup.ts) | `extends` |
+| dependency | [InventoryCatalogPath](../../../../../src/shared/http/apiPaths.ts) | `path` |

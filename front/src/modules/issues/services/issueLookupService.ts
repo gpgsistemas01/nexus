@@ -1,4 +1,6 @@
 import { requestPage } from '../../../shared/http/pageRequest.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
+import { lookupParams } from '../../../shared/http/pageParams.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { mapIssueItemOption } from '../mappers/issueResponseMapper.js';
 import type { IssueResource, IssueLookup } from '../issue.js';
@@ -12,12 +14,8 @@ interface IssueLookupRequest extends LookupQuery {
 
 export const issueLookupService = {
     async list(query: IssueLookupRequest, signal: AbortSignal) {
-        const { kind, resource, search, page } = query;
-        const params = new URLSearchParams({
-            search,
-            start: String((page - 1) * 20),
-            length: '20',
-        });
+        const { kind, resource } = query;
+        const params = lookupParams(query);
         if (kind === 'departments') params.set('context', 'issues');
 
         for (const [key, value] of Object.entries(query.filters ?? {})) {
@@ -26,11 +24,11 @@ export const issueLookupService = {
         }
 
         const path = {
-            clients: '/api/sales/clients',
-            departments: '/api/admin/departments',
-            persons: '/api/admin/persons',
-            statuses: '/api/warehouse/fulfillment-statuses',
-            items: `/api/warehouse/${resource}`,
+            clients: API_PATHS.directory.clients,
+            departments: API_PATHS.organization.departments,
+            persons: API_PATHS.identity.persons,
+            statuses: API_PATHS.fulfillmentStatuses,
+            items: API_PATHS.inventory[resource],
         }[kind];
         const result = await requestPage(`${path}?${params}`, signal);
         return {

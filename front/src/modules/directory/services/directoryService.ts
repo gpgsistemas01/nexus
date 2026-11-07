@@ -10,7 +10,7 @@ import {
     confirmMutation,
 } from '../../../shared/http/recordContract.js';
 import { requestExcel } from '../../../shared/http/requestExcel.js';
-import { DIRECTORY_CONFIG } from '../directory.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import type { DirectoryEntry, DirectoryResource, DirectoryTarget } from '../directory.js';
 
@@ -40,7 +40,7 @@ const normalizeEntry = (resource: DirectoryResource, value: unknown): DirectoryE
 export const directoryService = {
     async list(resource: DirectoryResource, query: RecordQuery, signal?: AbortSignal) {
         const result = await requestPage(
-            `${DIRECTORY_CONFIG[resource].path}?${recordParams(query)}`,
+            `${API_PATHS.directory[resource]}?${recordParams(query)}`,
             signal,
         );
         return { ...result, data: result.data.map((value) => normalizeEntry(resource, value)) };
@@ -52,7 +52,7 @@ export const directoryService = {
         signal: AbortSignal,
     ) {
         const result = await apiClient.request(
-            `${DIRECTORY_CONFIG[resource].path}${target.action === 'edit' ? `/${encodeURIComponent(target.row.id)}` : ''}`,
+            `${API_PATHS.directory[resource]}${target.action === 'edit' ? `/${encodeURIComponent(target.row.id)}` : ''}`,
             {
                 method: target.action === 'edit' ? 'PUT' : 'POST',
                 data: payload,
@@ -67,7 +67,7 @@ export const directoryService = {
     },
     export(resource: DirectoryResource, query: RecordQuery, signal: AbortSignal) {
         return requestExcel(
-            `${DIRECTORY_CONFIG[resource].reportPath}?${recordParams(query, { paginate: false })}`,
+            `${API_PATHS.reports.directory[resource]}?${recordParams(query, { paginate: false })}`,
             signal,
         );
     },

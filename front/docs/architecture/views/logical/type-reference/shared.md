@@ -424,7 +424,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## ApiRequestConfig
 
-**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 8, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 9, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends AxiosRequestConfig`.
 
@@ -434,7 +434,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## RetriableRequest
 
-**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 11, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/http/apiClient.ts](../../../../../src/shared/http/apiClient.ts) · línea 12, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends RecoverableRequest`.
 
@@ -460,6 +460,16 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 | `code` | `public code = ''` |
 | `fieldErrors` | `public fieldErrors: Record<string, string> = {}` |
 | `meta` | `public meta: Record<string, unknown> = {}` |
+
+## InventoryCatalogPath
+
+**Fuente:** [src/shared/http/apiPaths.ts](../../../../../src/shared/http/apiPaths.ts) · línea 81, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+keyof typeof API_PATHS.inventoryCatalogs
+```
 
 ## RecoverableRequest
 
@@ -600,7 +610,7 @@ Record<OrganizationResource, LookupState>
 
 ## OrganizationLookupRequest
 
-**Fuente:** [src/shared/services/organizationService.ts](../../../../../src/shared/services/organizationService.ts) · línea 5, columna 1. **Declaración:** interface.
+**Fuente:** [src/shared/services/organizationService.ts](../../../../../src/shared/services/organizationService.ts) · línea 7, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupQuery`.
 

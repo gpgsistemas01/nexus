@@ -1,4 +1,6 @@
 import { requestPage } from '../../../shared/http/pageRequest.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
+import { lookupParams } from '../../../shared/http/pageParams.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { mapPurchaseItemOption } from '../mappers/purchaseResponseMapper.js';
 import type { LookupItem, LookupQuery } from '../../../shared/lookup.js';
@@ -13,12 +15,8 @@ interface PurchaseLookupRequest extends LookupQuery {
 
 export const purchaseLookupService = {
     async list(query: PurchaseLookupRequest, signal: AbortSignal) {
-        const { kind, resource, search, page } = query;
-        const params = new URLSearchParams({
-            search,
-            start: String((page - 1) * 20),
-            length: '20',
-        });
+        const { kind, resource } = query;
+        const params = lookupParams(query);
         if (kind === 'suppliers' && query.capture) params.set('onlyActive', 'true');
 
         if (kind === 'persons') {
@@ -30,8 +28,10 @@ export const purchaseLookupService = {
 
         const path =
             kind === 'persons'
-                ? '/api/admin/persons'
-                : `/api/warehouse/${kind === 'items' ? resource : kind}`;
+                ? API_PATHS.identity.persons
+                : kind === 'items'
+                  ? API_PATHS.inventory[resource]
+                  : API_PATHS.directory.suppliers;
         const result = await requestPage(`${path}?${params}`, signal);
         return {
             ...result,

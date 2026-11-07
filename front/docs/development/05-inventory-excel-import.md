@@ -11,9 +11,8 @@ recuperación entre los tres módulos.
 | Crear registros | Descargar una plantilla de altas vacía. El servidor genera el ID del registro nuevo. Elegir proveedor, presentación y unidad en las listas; para merma, seleccionar la opción completa del material de referencia, que ya incluye su ID. |
 | Actualizar datos | Descargar los registros actuales con IDs y versiones, modificar los campos habilitados y volver a subir ese archivo. Conservar las columnas grises; una fila sin ID produce error y no se convierte en un alta. |
 
-Cada archivo tiene un solo modo. Para altas y ediciones, usar dos plantillas.
-La edición se dirige por ID, de modo que cambiar el nombre conserva el mismo registro.
-Las plantillas se descargan dentro de **Importar Excel**; **Exportar Excel** genera reportes de consulta.
+Cada archivo tiene un solo modo. Cambiar el nombre en una edición conserva el registro.
+**Importar Excel** descarga las plantillas; **Exportar Excel**, reportes de consulta.
 
 ## Recorrido
 
@@ -25,13 +24,13 @@ Las plantillas se descargan dentro de **Importar Excel**; **Exportar Excel** gen
    cambios, errores y advertencias. Se muestran diez filas por página, en tarjetas
    adaptadas al móvil.
 5. Corregir el archivo si hay errores; **Descartar borrador** permite subirlo de nuevo.
-   **Descargar errores** genera una lista de fila, columna y mensaje.
+   **Descargar errores** genera una sola hoja con fila, nombre, columna y mensaje.
 6. Pulsar **Confirmar importación**. El recibo confirma el resultado; el modal permanece
    abierto para revisarlo y ofrece **Otro archivo**.
 
-La actualización admite nombre, mínimo, costo y activo. Conserva IDs y versiones;
-no cambia existencias, dimensiones, unidades, presentación ni pesos. Nombre y mínimo
-afectan al material compartido entre proveedores. Las altas duplicadas se rechazan.
+La actualización admite nombre, mínimo, costo y activo; conserva existencias,
+dimensiones, unidades, presentación y pesos. Nombre y mínimo afectan al material
+compartido entre proveedores.
 Pieza exige enteros; un alta sin costo muestra advertencia y no puede usarse en salidas
 hasta configurar un costo positivo en Almacén.
 
@@ -50,12 +49,10 @@ Un mismo material con otro proveedor puede crear esa relación sin duplicar el m
 
 Si una fila está repetida o tiene errores, **no se aplica ninguna fila**. La vista
 previa señala fila/columna y, para repetidos internos, la primera fila coincidente.
-**Descargar errores** entrega el detalle. Corregir o retirar los repetidos, descartar
-el borrador y volver a validar; confirmar después de revisar todo el lote.
+Corregir o retirar los repetidos, descartar el borrador y volver a validar.
 Las filas sin cambios de una actualización se omiten al confirmar.
 
-Validar todavía no guarda inventario. Un duplicado surgido entre validación y
-confirmación también bloquea el lote completo y obliga a revisar el archivo.
+Un duplicado surgido después de validar también bloquea el lote completo.
 
 ## Código y transporte
 
@@ -83,9 +80,11 @@ la respuesta, **Revisar y reintentar confirmación** consulta el mismo lote: rec
 su recibo si terminó o repite la misma confirmación si sigue pendiente. No crea otra
 importación. **Descartar borrador** queda condicionado por el estado del servidor.
 
-El XLSX se descarta en el servidor después del análisis; el borrador privado vence en
-24 horas y se limpia periódicamente. El recibo confirmado permanece en la base.
-El original y las descargas del equipo del usuario no se eliminan automáticamente.
+El archivo subido y el Excel de errores sólo existen en memoria durante su procesamiento
+o envío; no dejan copias en disco del servidor. El borrador de datos/errores vence en
+24 horas; confirmar, descartar o limpiar su vencimiento elimina el contenido temporal.
+El recibo confirmado permanece en la base. El usuario decide cuándo borrar su original
+y sus descargas locales.
 
 El [backend](../../../back/docs/architecture/views/development/inventory-excel-import.md)
 documenta atomicidad, permisos, limpieza y límites de ejecución. El contrato HTTP

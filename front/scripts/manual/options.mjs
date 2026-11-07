@@ -3,10 +3,11 @@ import { parseManualMode } from './environment.mjs';
 
 export const MANUAL_HELP = `Capturas y manuales por cuenta: sólo desarrollo local
 
-Desde front/:
-  npm run docs:screenshots -- --all
-  npm run docs:manuals -- --all --format ambos
-  npm run docs:manuals -- --profile cuenta-01 --missing
+Desde la raíz del repositorio:
+  npm --prefix front run docs:screenshots -- --all
+  npm --prefix front run docs:manuals -- --all --format ambos
+  npm --prefix front run docs:manuals -- --profile cuenta-01 --format pdf
+Desde front/, omita --prefix front.
 
 El modo predeterminado es dev. Lee manual.accounts.local.json y .env.manual.local.
 La dirección de Vue debe ser local y NODE_ENV no puede ser production.
@@ -15,14 +16,15 @@ Cada cuenta inicia sesión para detectar sus áreas, roles y permisos.
 Las cuentas sin usuario o contraseña se omiten, sin detener las demás.
 Las capturas quedan en docs/user-manual/accounts/<cuenta>/images/.
 Word y PDF quedan en build/docs/{docx,pdf}/manuales-vue/<cuenta>/.
-El primer uso captura todo; las siguientes ejecuciones completan las faltantes.
+El primer uso captura todo; repetir el comando completa las faltantes por cuenta.
+Manuales y capturas usan los permisos de la sesión y las imágenes de esa cuenta.
 
 Opciones:
   --all                     Cuentas del JSON con credenciales completas.
   --profile <id>            Una cuenta del JSON.
   --capture-only            Sólo fuentes y capturas, sin exportar Word/PDF.
-  --missing                 Reanudar capturas pendientes o desactualizadas.
-  --fresh                   Volver a capturar todo desde el inicio.
+  --missing                 Reanudar faltantes (ya es el comportamiento predeterminado).
+  --fresh                   Rehacer las capturas de las cuentas seleccionadas.
   --format docx|pdf|ambos    Formato de publicación; predeterminado: ambos.
   --accounts <archivo>      Configuración de cuentas; rutas relativas a front/.
   --env-file <archivo>      Credenciales locales; rutas relativas a front/.

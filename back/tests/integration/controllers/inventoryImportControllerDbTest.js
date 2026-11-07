@@ -7,6 +7,7 @@ import ExcelJS from 'exceljs';
 import { createControllerTestApp } from '../../helpers/controllerTestHarness.js';
 import { createInventoryImportFixture, inventoryWorkbook } from '../../helpers/inventoryImportFixture.js';
 import { withPiecePresentation } from '../../helpers/withPiecePresentation.js';
+import { readExcelReport } from '../../helpers/readExcelReport.js';
 import { getImportConfig } from '../../../src/services/warehouse/imports/inventoryImportConfig.js';
 
 let prisma, app, fixture, cookie, deniedCookie, previousSecret;
@@ -134,7 +135,17 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
             expect(batch.preview.rows[1].errors[0].message).toContain('enteras');
             await confirm(batch).expect(400);
             expect(await savedOffer(fixture.row('Válido').name)).toBeNull();
-            await request(app).get(`/${batch.id}/errors/excel`).set('Cookie', cookie).expect(200).expect('Content-Type', /spreadsheetml/);
+            const response = await request(app).get(`/${batch.id}/errors/excel`).set('Cookie', cookie)
+                .buffer(true).parse((res, done) => {
+                    const chunks = [];
+                    res.on('data', chunk => chunks.push(chunk));
+                    res.on('end', () => done(null, Buffer.concat(chunks)));
+                }).expect(200).expect('Content-Type', /spreadsheetml/).expect('Cache-Control', 'no-store');
+            const report = await readExcelReport(response.body);
+            expect(report.workbook.worksheets.map(sheet => sheet.name)).toEqual(['Datos']);
+            expect(report.rows).toEqual([['fila', 'nombre', 'columna', 'mensaje'],
+                ...batch.preview.rows.flatMap(row => row.errors.map(error => [row.row, row.name, error.column, error.message]))]);
+            expect((await prisma.inventoryImport.findUnique({ where: { id: batch.id } })).status).toBe('DRAFT');
         });
     });
 

@@ -56,7 +56,7 @@ Prefijo: `/api/warehouse/inventory-imports`. Recursos: `materials`, `consumables
 | `POST /:id/confirm` | JSON `{ expectedVersion, operationId }`; confirma el borrador del servidor y devuelve su recibo. |
 | `GET /:id` | `{ batch }` con vista previa vigente o resultado confirmado. |
 | `DELETE /:id` | Descarta el borrador y elimina su contenido temporal. |
-| `GET /:id/errors/excel` | Informe de errores por fila/columna. No es una plantilla para reimportar. |
+| `GET /:id/errors/excel` | Una hoja `Datos` con fila, nombre, columna y mensaje. No es una plantilla para reimportar. |
 
 Todas requieren lectura y escritura del recurso y `inventory:costs-read`.
 Consumibles usa los permisos de Materiales. Un lote sólo es accesible por su creador
@@ -101,8 +101,40 @@ condicionado por estado no puede borrar una confirmación que ganó la carrera.
 | XLSX | Sólo memoria; se liberan referencias tras analizarlo y ante error. No se crea un archivo en disco ni se necesita un disco de Render. |
 | Borrador | Vence a las 24 h. Confirmación y descarte eliminan payload/vista previa inmediatamente. La limpieza de vencidos procesa hasta 100 cada cinco minutos y se detiene antes de desconectar Prisma. |
 | Recibo | Conserva actor, fechas, hash, resumen e IDs/cambios. Su retención sigue la política de historia pendiente de acuerdo. |
-| Descargas | Plantillas e informes se generan en memoria. Los archivos del equipo del usuario permanecen bajo su control. |
+| Descargas | Plantillas y Excel de errores se generan en memoria y se envían como adjuntos. No se guardan en disco; no requieren un borrado de archivo en el servidor. El usuario administra sus copias locales. |
 
 La [medición reproducible](../../../testing/backend-performance.md#importación-de-inventario)
 compara consultas normales con seis lotes de 100 filas. Sus resultados locales no
 establecen un SLA. Los comandos están en la sección de desarrollo de Vue y en esa guía.
+
+## Código necesario y biblioteca XLSX
+
+| Unidad | Motivo para conservarla |
+| --- | --- |
+| Upload y worker | Acotar archivo, descompresión y tiempo; liberar el trabajo al cancelar y evitar analizar XLSX en el hilo HTTP. |
+| Contexto y validación | Resolver catálogos por lote y reutilizar DTO, validadores, cantidades y medidas del dominio. |
+| Escritura y repository | Agrupar operaciones en una transacción, conservar versiones y generar historia sin una consulta por celda. |
+| Borrador, recibo y limpieza | Revisar antes de escribir, recuperar una confirmación incierta y eliminar contenido temporal. |
+| Plantilla | Generar hojas, catálogos, listas desplegables y referencias de edición. |
+
+La plantilla y el informe de errores comparten la hoja y encabezados. El informe
+sólo genera sus cuatro columnas; omite instrucciones y catálogos vacíos. Los errores
+se conservan en el JSON del borrador hasta su descarte, confirmación o vencimiento;
+no se conserva el XLSX descargado. Los reportes generales de otros módulos usan un
+archivo temporal para escritura por flujo y lo eliminan en `finally` tras envío o error.
+
+Se conserva **ExcelJS**: ya permite leer las plantillas, generar sus listas/estilos
+y escribir los reportes generales por flujo en `reportExcelUtils`. Sólo se incluye
+en el backend. `unzipper` comprueba el ZIP antes de cargarlo; `read-excel-file` es una
+dependencia de pruebas que contrasta los valores con un lector independiente.
+
+| Alternativa | Encaje y costo de sustituirla |
+| --- | --- |
+| SheetJS (`xlsx`) | Permite leer y escribir libros. Requiere comprobar las funciones de la edición elegida para listas, estilos y salida progresiva; no es un reemplazo directo de las APIs usadas. |
+| `read-excel-file` + `write-excel-file` | Separan lectura y escritura. Requieren dos adaptadores y comprobar catálogos, validaciones de celdas y reportes por flujo. |
+| CSV | Útil para tablas simples; no conserva hojas, listas ni tipos/formatos de la plantilla actual. |
+
+No hay una mejora de rendimiento medida que justifique el cambio de biblioteca.
+Antes de sustituirla, comparar con los mismos archivos: plantillas de los tres
+recursos/modos, celdas rechazadas, informe de errores y reporte extenso. Medir tiempo,
+memoria y consultas normales bajo carga; conservar los límites, cancelación y recibos.

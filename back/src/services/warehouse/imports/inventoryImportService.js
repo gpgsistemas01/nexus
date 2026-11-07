@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { Prisma } from '../../../../generated/prisma/client.ts';
 import { getDb } from '../../../repository/baseRepository.js';
-import { AppError } from '../../../errors/AppError.js';
 import { OperationKeyConflictError, RecordVersionConflictError } from '../../../errors/concurrencyError.js';
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { INVENTORY_IMPORT_LIMITS as limits } from '../../../shared/constants/inventoryImport.js';
@@ -114,7 +113,6 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
     } catch (error) {
         if (error.code === 'P2002' || error.meta?.code === '23505') throw new InventoryImportError('CONFLICT');
         if (error.code === 'P2028' || ['55P03', '57014', '40P01'].includes(error.meta?.code)) throw new InventoryImportError('BUSY');
-        if (error instanceof AppError) throw error;
         throw error;
     }
 };
@@ -126,7 +124,5 @@ export const getInventoryImportErrors = async ({ id, user, signal }) => {
         row: row.row, name: row.name, column: error.column, message: error.message
     })));
     if (!rows.length) throw new InventoryImportError('VALIDATION');
-    return processInventoryWorkbook({ action: 'template', config: { resource: batch.resource, mode: 'errors',
-        columns: [['fila', 'row'], ['nombre', 'name'], ['columna', 'column'], ['mensaje', 'message']] }, rows,
-        catalogs: { suppliers: [], presentations: [], units: [], materials: [] } }, signal);
+    return processInventoryWorkbook({ action: 'errors', rows }, signal);
 };

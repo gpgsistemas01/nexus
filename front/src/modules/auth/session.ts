@@ -2,6 +2,7 @@ import { inject, readonly, shallowRef } from 'vue';
 import type { InjectionKey } from 'vue';
 import { isRecord } from '../../shared/utils/isRecord.js';
 import { apiClient } from '../../shared/http/apiClient.js';
+import { API_PATHS } from '../../shared/http/apiPaths.js';
 
 export interface SessionUser {
     id: string;
@@ -15,7 +16,7 @@ export const createAuthSession = (request = apiClient.request) => {
     let loading: Promise<SessionUser> | null = null;
 
     const load = async () => {
-        loading ??= request<{ user: unknown }>('/api/auth/me')
+        loading ??= request<{ user: unknown }>(API_PATHS.auth.me)
             .then((data) => {
                 if (
                     !isRecord(data.user) ||

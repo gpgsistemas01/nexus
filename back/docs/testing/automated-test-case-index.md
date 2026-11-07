@@ -16,6 +16,9 @@
 
 Fuente: [integración HTTP/Prisma](../../tests/integration/controllers/inventoryImportControllerDbTest.js)
 y [fronteras XLSX](../../tests/unit/services/warehouse/inventoryWorkbookTest.js).
+`DP-IMP-001` incluye el informe de una sola hoja con sus cuatro columnas y valores
+coincidentes con la vista previa. Un nombre iniciado en `=` permanece como texto;
+el informe no se acepta como plantilla de carga. Descargarlo conserva el borrador.
 La [medición](backend-performance.md#importación-de-inventario) añade carga de seis
 lotes de 100 filas, sin sustituir los oráculos de persistencia.
 

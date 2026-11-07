@@ -1,11 +1,14 @@
 import type { InventoryQuery } from '../inventory.js';
+import { recordParams } from '../../../shared/http/recordParams.js';
 
-export const inventoryParams = (query: Partial<InventoryQuery>) =>
-    new URLSearchParams({
-        start: String(((query.page ?? 1) - 1) * (query.length ?? 10)),
-        length: String(query.length ?? 10),
+export const inventoryParams = (query: Partial<InventoryQuery>) => {
+    const params = recordParams({
+        page: query.page ?? 1,
+        length: query.length ?? 10,
         search: query.search ?? '',
-        supplierId: query.supplierId ?? '',
-        'order[0][column]': String(query.orderColumn ?? 0),
-        'order[0][dir]': query.direction ?? 'asc',
+        orderColumn: query.orderColumn ?? 0,
+        direction: query.direction ?? 'asc',
     });
+    params.set('supplierId', query.supplierId ?? '');
+    return params;
+};

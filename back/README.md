@@ -307,6 +307,10 @@ reúne API, Vue, base de datos, pruebas, capturas y publicación desde la raíz.
 
 ## Publicación de documentos y capturas
 
+Los manuales por cuenta de **Vue** se generan desde `front/`; consulte sus
+[comandos](../front/docs/development/00-commands.md#capturas-y-manuales-por-cuenta).
+Los comandos de capturas de este backend corresponden a la interfaz EJS.
+
 Estos procesos no forman parte del arranque normal de Nexus y requieren herramientas distintas:
 
 - la **exportación** usa las dependencias instaladas por `npm ci` y Pandoc; prepara Mermaid CLI
