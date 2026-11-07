@@ -5,23 +5,25 @@ const { emitInventoryUpdated, updateGoodsReceipt } = vi.hoisted(() => ({
   updateGoodsReceipt: vi.fn()
 }));
 
-vi.mock('../../../../../src/services/warehouse/goodsReceipts/goodsReceiptService.js', () => ({
-  createGoodsReceipt: vi.fn(),
-  findAllGoodsReceipts: vi.fn(),
-  updateGoodsReceipt
+vi.mock('../../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js', () => ({
+  createMaterialGoodsReceipt: vi.fn(),
+  findAllMaterialGoodsReceipts: vi.fn(),
+  updateMaterialGoodsReceipt: updateGoodsReceipt,
+  cancelMaterialGoodsReceiptDetailLine: vi.fn(),
+  correctMaterialGoodsReceiptDetailLine: vi.fn()
 }));
 
-vi.mock('../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js', () => ({
-  cancelGoodsReceiptDetailLine: vi.fn()
-}));
-
-vi.mock('../../../../../src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js', () => ({
-  correctGoodsReceiptDetailLine: vi.fn()
+vi.mock('../../../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js', () => ({
+  createConsumableGoodsReceipt: vi.fn(),
+  findAllConsumableGoodsReceipts: vi.fn(),
+  updateConsumableGoodsReceipt: vi.fn(),
+  cancelConsumableGoodsReceiptDetailLine: vi.fn(),
+  correctConsumableGoodsReceiptDetailLine: vi.fn()
 }));
 
 vi.mock('../../../../../src/utils/socketUtils.js', () => ({ emitInventoryUpdated }));
 
-import { editGoodsReceiptHeader } from '../../../../../src/controllers/api/warehouse/goodsReceiptController.js';
+import { editMaterialGoodsReceipt } from '../../../../../src/controllers/api/warehouse/goodsReceiptController.js';
 
 describe('actualización CRUD de entradas de compra', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -46,7 +48,7 @@ describe('actualización CRUD de entradas de compra', () => {
 
     updateGoodsReceipt.mockResolvedValue(goodsReceipt);
 
-    await editGoodsReceiptHeader(req, res);
+    await editMaterialGoodsReceipt(req, res);
 
     expect(updateGoodsReceipt).toHaveBeenCalledWith({
       id: 'receipt-1',

@@ -16,7 +16,9 @@ describe('manual screenshot inventory', () => {
     const output = listInventory();
 
     expect(output).toContain('| 1 | almacen | `CAP-AUT-01-LOGIN-ALMACEN` |');
-    expect(output).toContain('| 149 | sistemas | `CAP-ERR-404-NOT-FOUND-SISTEMAS` |');
+    expect(output).toContain('| 90 | almacen | `CAP-ENT-CON-01-LIST-ALMACEN` |');
+    expect(output).toContain('| 101 | sistemas | `CAP-REP-ENT-CON-06-EXPORT-SISTEMAS` |');
+    expect(output).toContain('| 161 | sistemas | `CAP-ERR-404-NOT-FOUND-SISTEMAS` |');
   });
 
   it.each(['almacen', 'sistemas'])('limits the inventory to the %s area', area => {

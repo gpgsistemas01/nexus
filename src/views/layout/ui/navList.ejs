@@ -21,7 +21,14 @@ const items = [
             createNavLink({ content: 'Mermas', icon: 'fa-solid fa-recycle', href: '/almacen/mermas', permission: 'wastes:page-view' })
         ]
     },
-    createNavLink({ content: 'Compras', icon: 'fa-solid fa-file-invoice-dollar', href: '/compras', permission: 'goods:receipts-page-view' }),
+    {
+        content: 'Compras',
+        icon: 'fa-solid fa-file-invoice-dollar',
+        children: [
+            createNavLink({ content: 'Materiales', icon: 'fa-solid fa-boxes-stacked', href: '/compras/materiales', permission: 'goods:receipts-page-view' }),
+            createNavLink({ content: 'Consumibles', icon: 'fa-solid fa-box', href: '/compras/consumibles', permission: 'goods:receipts-page-view' })
+        ]
+    },
     {
         content: 'Salidas',
         icon: 'fa-solid fa-right-from-bracket',

@@ -52,6 +52,60 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
         }));
     });
 
+    it('conserva los totales históricos cuando se cancela el último detalle activo', async () => {
+        const update = vi.fn().mockResolvedValue({ id: 'receipt-id' });
+        const tx = {
+            goodsReceiptDetail: {
+                updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+                findUnique: vi.fn().mockResolvedValue({ id: 'detail-id' }),
+                findMany: vi.fn().mockResolvedValue([])
+            },
+            goodsReceipt: { update }
+        };
+
+        await cancelGoodsReceiptDetailAndTotals({
+            tx,
+            goodsReceiptId: 'receipt-id',
+            detailId: 'detail-id'
+        });
+
+        expect(update).toHaveBeenCalledWith(expect.objectContaining({
+            data: {
+                status: { connect: { name: 'Cancelada' } }
+            }
+        }));
+    });
+
+    it('recalcula los totales con los detalles que permanecen activos', async () => {
+        const update = vi.fn().mockResolvedValue({ id: 'receipt-id' });
+        const tx = {
+            goodsReceiptDetail: {
+                updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+                findUnique: vi.fn().mockResolvedValue({ id: 'detail-id' }),
+                findMany: vi.fn().mockResolvedValue([{
+                    quantity: 2,
+                    netPurchaseAmount: 20,
+                    grossPurchaseAmount: 23.2
+                }])
+            },
+            goodsReceipt: { update }
+        };
+
+        await cancelGoodsReceiptDetailAndTotals({
+            tx,
+            goodsReceiptId: 'receipt-id',
+            detailId: 'detail-id'
+        });
+
+        expect(update).toHaveBeenCalledWith(expect.objectContaining({
+            data: {
+                totalQuantity: 2,
+                totalNetPurchaseAmount: 20,
+                totalGrossPurchaseAmount: 23.2
+            }
+        }));
+    });
+
     it('conserva las relaciones al agregar detalles a una compra existente', async () => {
         const update = vi.fn().mockResolvedValue({ id: 'receipt-id' });
         const tx = {
@@ -111,6 +165,25 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
             supplierId: 'supplier-id',
             details: [{ materialId: 'material-id', quantity: 1, costPerUnitType: 10 }]
         })).rejects.toMatchObject({ code: 'MATERIAL_INACTIVE_CONFLICT' });
+    });
+
+    it('rechaza detalles de un tipo distinto al contexto de compra', async () => {
+        const tx = {
+            material: {
+                findMany: vi.fn().mockResolvedValue([{
+                    id: 'consumable-id',
+                    type: 'CONSUMABLE',
+                    name: 'Consumible',
+                    isActive: true,
+                    base: null,
+                    height: null
+                }])
+            }
+        };
+
+        await expect(buildGoodsReceiptDetails([
+            { materialId: 'consumable-id', quantity: 1, costPerUnitType: 10 }
+        ], { tx, type: 'MATERIAL' })).rejects.toMatchObject({ code: 'MATERIAL_NOT_FOUND' });
     });
 
     it('permite calcular una corrección histórica aunque el material esté inactivo', async () => {

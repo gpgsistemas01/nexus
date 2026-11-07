@@ -13,11 +13,12 @@ export const GOODS_RECEIPT_DETAIL_STATUS = Object.freeze({
     CANCELED: 'CANCELED'
 });
 
-export const findReceiptDetailForChange = ({ tx, goodsReceiptId, detailId }) => (
+export const findReceiptDetailForChange = ({ tx, goodsReceiptId, detailId, type = null }) => (
     tx.goodsReceiptDetail.findFirst({
         where: {
             id: detailId,
-            goodsReceiptId
+            goodsReceiptId,
+            ...(type && { goodsReceipt: { type } })
         },
         include: {
             goodsReceipt: true,

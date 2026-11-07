@@ -897,240 +897,6 @@
       ]
     }
   },
-  "/api/warehouse/goods-receipts": {
-    "get": {
-      "operationId": "getWarehouseGoodsReceipts",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Respuesta correcta.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../openapi.json#/components/schemas/GoodsReceiptList"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "../openapi.json#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "../openapi.json#/components/responses/Forbidden"
-        },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        }
-      }
-    },
-    "post": {
-      "operationId": "postWarehouseGoodsReceipts",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Respuesta correcta.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "../openapi.json#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "../openapi.json#/components/responses/Forbidden"
-        },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        }
-      },
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../openapi.json#/components/schemas/GoodsReceiptRequest"
-            }
-          }
-        }
-      }
-    }
-  },
-  "/api/warehouse/goods-receipts/{id}": {
-    "patch": {
-      "operationId": "patchWarehouseGoodsReceiptsId",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Respuesta correcta.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "../openapi.json#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "../openapi.json#/components/responses/Forbidden"
-        },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        }
-      },
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../openapi.json#/components/schemas/GoodsReceiptRequest"
-            }
-          }
-        }
-      },
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      ]
-    }
-  },
-  "/api/warehouse/goods-receipts/{id}/details/{detailId}/corrections": {
-    "patch": {
-      "operationId": "patchWarehouseGoodsReceiptsIdDetailsDetailidCorrections",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Respuesta correcta.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "../openapi.json#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "../openapi.json#/components/responses/Forbidden"
-        },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        }
-      },
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "../openapi.json#/components/schemas/GoodsReceiptCorrectionRequest"
-            }
-          }
-        }
-      },
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        {
-          "name": "detailId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      ]
-    }
-  },
-  "/api/warehouse/goods-receipts/{id}/details/{detailId}/cancel": {
-    "patch": {
-      "operationId": "patchWarehouseGoodsReceiptsIdDetailsDetailidCancel",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Respuesta correcta.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "../openapi.json#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "../openapi.json#/components/responses/Forbidden"
-        },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        }
-      },
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        {
-          "name": "detailId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      ]
-    }
-  },
   "/api/warehouse/goods-issues": {
     "get": {
       "operationId": "getWarehouseGoodsIssues",
@@ -1485,38 +1251,6 @@
   "/api/warehouse/reports/waste-issues/excel": {
     "get": {
       "operationId": "getWarehouseReportsWasteIssuesExcel",
-      "security": [
-        {
-          "cookieAuth": []
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Respuesta correcta.",
-          "content": {
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
-              "schema": {
-                "type": "string",
-                "format": "binary"
-              }
-            }
-          }
-        },
-        "401": {
-          "$ref": "../openapi.json#/components/responses/Unauthorized"
-        },
-        "403": {
-          "$ref": "../openapi.json#/components/responses/Forbidden"
-        },
-        "500": {
-          "$ref": "../openapi.json#/components/responses/ServerError"
-        }
-      }
-    }
-  },
-  "/api/warehouse/reports/goods-receipts/excel": {
-    "get": {
-      "operationId": "getWarehouseReportsGoodsReceiptsExcel",
       "security": [
         {
           "cookieAuth": []
@@ -1931,6 +1665,538 @@
           }
         }
       ]
+    }
+  },
+  "/api/warehouse/goods-receipts/materials": {
+    "get": {
+      "operationId": "getWarehouseGoodsReceiptsMaterials",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptList"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "postWarehouseGoodsReceiptsMaterials",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/GoodsReceiptRequest"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/warehouse/goods-receipts/consumables": {
+    "get": {
+      "operationId": "getWarehouseGoodsReceiptsConsumables",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptList"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    },
+    "post": {
+      "operationId": "postWarehouseGoodsReceiptsConsumables",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/GoodsReceiptRequest"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/warehouse/goods-receipts/materials/{id}": {
+    "patch": {
+      "operationId": "patchWarehouseGoodsReceiptsIdMaterials",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/GoodsReceiptRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    }
+  },
+  "/api/warehouse/goods-receipts/consumables/{id}": {
+    "patch": {
+      "operationId": "patchWarehouseGoodsReceiptsIdConsumables",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/GoodsReceiptRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    }
+  },
+  "/api/warehouse/goods-receipts/materials/{id}/details/{detailId}/corrections": {
+    "patch": {
+      "operationId": "patchWarehouseGoodsReceiptsIdDetailsDetailidCorrectionsMaterials",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/GoodsReceiptCorrectionRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "detailId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    }
+  },
+  "/api/warehouse/goods-receipts/consumables/{id}/details/{detailId}/corrections": {
+    "patch": {
+      "operationId": "patchWarehouseGoodsReceiptsIdDetailsDetailidCorrectionsConsumables",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../openapi.json#/components/schemas/GoodsReceiptCorrectionRequest"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "detailId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    }
+  },
+  "/api/warehouse/goods-receipts/materials/{id}/details/{detailId}/cancel": {
+    "patch": {
+      "operationId": "patchWarehouseGoodsReceiptsIdDetailsDetailidCancelMaterials",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "detailId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    }
+  },
+  "/api/warehouse/goods-receipts/consumables/{id}/details/{detailId}/cancel": {
+    "patch": {
+      "operationId": "patchWarehouseGoodsReceiptsIdDetailsDetailidCancelConsumables",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../openapi.json#/components/schemas/GoodsReceiptResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "detailId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ]
+    }
+  },
+  "/api/warehouse/reports/goods-receipts/materials/excel": {
+    "get": {
+      "operationId": "getWarehouseReportsGoodsReceiptsExcelMaterials",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
+    }
+  },
+  "/api/warehouse/reports/goods-receipts/consumables/excel": {
+    "get": {
+      "operationId": "getWarehouseReportsGoodsReceiptsExcelConsumables",
+      "security": [
+        {
+          "cookieAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Respuesta correcta.",
+          "content": {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../openapi.json#/components/responses/Unauthorized"
+        },
+        "403": {
+          "$ref": "../openapi.json#/components/responses/Forbidden"
+        },
+        "500": {
+          "$ref": "../openapi.json#/components/responses/ServerError"
+        }
+      }
     }
   }
 }

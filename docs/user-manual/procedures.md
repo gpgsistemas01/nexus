@@ -29,7 +29,7 @@ Seleccione el grupo correspondiente a la tarea que necesita completar:
 - [Autenticación y navegación](cases/authentication/index.md): iniciar sesión y recuperarse de una página no encontrada.
 - [Identidad y acceso](cases/identity-access/index.md): administrar personas, accesos, usuarios y contraseñas.
 - [Catálogos e inventario](cases/catalogs/index.md): consultar y mantener materiales, proveedores, clientes y mermas.
-- [Compras de material](cases/purchases/index.md): registrar, editar, corregir y exportar compras.
+- [Compras de materiales y consumibles](cases/purchases/index.md): registrar, editar, corregir, cancelar y exportar cada contexto.
 - [Salidas de material y merma](cases/issues/index.md): registrar, surtir, devolver y exportar salidas.
 - [Exportaciones desde consultas](cases/reports/index.md): exportar inventarios y movimientos desde su consulta correspondiente.
 

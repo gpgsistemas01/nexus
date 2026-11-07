@@ -19,7 +19,7 @@ sequenceDiagram
     Application->>Request: getAllGoodsReceiptsRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: consulta GET /api/warehouse/goods-receipts
+    HTTP->>Transport: consulta GET /api/warehouse/goods-receipts/materials
     Transport-->>HTTP: HTTP 2xx { code, data }
     HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
     Request-->>Application: getAllGoodsReceiptsRequest(): Promise[AxiosResponse]

@@ -1,14 +1,17 @@
-# Casos: Compras de material
+# Casos: Compras de materiales y consumibles
 
 Cada procedimiento identifica sus casos de uso, controles, errores posibles y captura de referencia.
 
 ## Capítulos
 
-### Compras
+### Compras de materiales
 
 **Propósito.** Consultar, registrar, editar y corregir compras, además de delimitar reportes.
 
-**Ruta en el menú:** **Menú principal → Compras**.
+**Ruta en el menú:** **Menú principal → Compras → Materiales**.
+
+Este recorrido sólo presenta materiales. El flujo de consumibles se documenta por
+separado porque constituye un objetivo visible distinto para almacén.
 
 <a id="CAP-ENT-00-NAVIGATION"></a>
 ![CAP-ENT-00-NAVIGATION: acceso a compras desde el menú principal](../../images/purchases/00-access-menu-main.png)
@@ -34,3 +37,18 @@ consulta. Abrir o editar el encabezado no cambia esos estados.
 4. [4. CAP-ENT-04-CORRECT — Correccion detalle](04-cap-ent-04-correct.md)
 5. [5. CAP-REP-ENT-05-EXPORT — Exportar reporte](05-cap-rep-ent-05-export.md)
 6. [6. CAP-ENT-06-VIEW — Consultar compra cancelada](06-cap-ent-06-view.md)
+
+### Compras de consumibles
+
+**Ruta en el menú:** **Menú principal → Compras → Consumibles**.
+
+El recorrido reutiliza los controles y reglas de compra, pero mantiene separado el
+listado, el selector, el alta contextual, las correcciones, cancelaciones y la
+exportación.
+
+7. [7. CAP-ENT-CON-01-LIST — Listado de compras de consumibles](07-cap-ent-con-01-list.md)
+8. [8. CAP-ENT-CON-02-CREATE — Registrar compra de consumibles](08-cap-ent-con-02-create.md)
+9. [9. CAP-ENT-CON-03-EDIT — Editar compra de consumibles](09-cap-ent-con-03-edit.md)
+10. [10. CAP-ENT-CON-04-CORRECT — Corregir consumible](10-cap-ent-con-04-correct.md)
+11. [11. CAP-ENT-CON-05-CANCEL — Cancelar consumible](11-cap-ent-con-05-cancel.md)
+12. [12. CAP-REP-ENT-CON-06-EXPORT — Exportar compras de consumibles](12-cap-rep-ent-con-06-export.md)

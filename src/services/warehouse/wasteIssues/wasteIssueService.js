@@ -8,6 +8,7 @@ import {
     WasteIssueClientAdvisorConflict,
     WasteIssueDetailNotFound,
     WasteIssueNotFound,
+    WasteIssueMissingMaxUnitCost,
     WasteIssueProjectNumberConflict,
     WasteIssueRequesterNotFound,
     WasteIssueCreateDatabaseError,
@@ -104,7 +105,7 @@ const createWasteIssueDetailSnapshot = ({ waste, detail, fulfillmentStatusId }) 
     }
 });
 
-const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId }) => {
+export const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId }) => {
 
     const uniqueIds = new Set(details.map(detail => detail.wasteId));
 
@@ -127,11 +128,19 @@ const buildWasteIssueDetails = async ({ tx, details, fulfillmentStatusId }) => {
 
     const byId = new Map(wastes.map(waste => [waste.id, waste]));
 
-    return details.map(detail => createWasteIssueDetailSnapshot({
-        waste: byId.get(detail.wasteId),
-        detail,
-        fulfillmentStatusId
-    }));
+    return details.map(detail => {
+        const waste = byId.get(detail.wasteId);
+
+        if (waste.maxUnitCost === null || waste.maxUnitCost === undefined) {
+            throw new WasteIssueMissingMaxUnitCost({ materialName: waste.name });
+        }
+
+        return createWasteIssueDetailSnapshot({
+            waste,
+            detail,
+            fulfillmentStatusId
+        });
+    });
 };
 
 export const findAllWasteIssues = async ({

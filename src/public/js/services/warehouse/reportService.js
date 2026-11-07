@@ -1,4 +1,5 @@
 import { apiRequest } from "../axiosInstanceApi.js";
+import { INVENTORY_RESOURCES } from '../../constants/inventory.js';
 
 export const exportWarehouseReportRequest = async (params = {}) =>
     apiRequest({
@@ -24,10 +25,10 @@ export const exportWasteIssueReportRequest = async (params = {}) =>
         params
     });
 
-export const exportGoodsReceiptReportRequest = async (params = {}) =>
+export const exportGoodsReceiptReportRequest = async ({ resource, ...params } = {}) =>
     apiRequest({
         method: 'get',
-        url: '/api/warehouse/reports/goods-receipts/excel',
+        url: `/api/warehouse/reports/goods-receipts/${ resource === INVENTORY_RESOURCES.CONSUMABLE ? 'consumables' : 'materials' }/excel`,
         responseType: 'blob',
         params
     });

@@ -11,3 +11,14 @@ Este capítulo forma parte del [catálogo de secuencias del código frontend](..
 - [`CU-ENT-04` — Corregir material de una compra](cu-ent-04.md)
 - [`CU-ENT-05` — Cancelar material de una compra](cu-ent-05.md)
 - [`CU-ENT-06` — Generar reporte de compras de material](cu-ent-06.md)
+
+- [`CU-ENT-07` — Consultar compras de consumible](cu-ent-07.md)
+- [`CU-ENT-08` — Crear compra de consumible](cu-ent-08.md)
+- [`CU-ENT-09` — Editar compra de consumible](cu-ent-09.md)
+- [`CU-ENT-10` — Corregir consumible de una compra](cu-ent-10.md)
+- [`CU-ENT-11` — Cancelar consumible de una compra](cu-ent-11.md)
+- [`CU-ENT-12` — Generar reporte de compras de consumible](cu-ent-12.md)
+
+Cada `CU-*` conserva su ficha para que la trazabilidad y el endpoint sean visibles, pero
+las fichas instancian los patrones frontend `FE-P*` y los mismos módulos compartidos. El
+recurso cambia a `consumable`; el patrón de interacción no se duplica conceptualmente.

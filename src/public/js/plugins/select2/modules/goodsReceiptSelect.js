@@ -8,6 +8,7 @@ import { setupMaterialSelect, toggleMaterialOption } from "../domains/material.j
 import { initPersonSelect, togglePersonOption } from "../domains/person.js";
 import { setupSupplierSelect, toggleSupplierOption } from "../domains/supplier.js";
 import { INPUT_SELECTORS, MODAL_SELECTORS, SELECT_SELECTORS } from "../../../constants/selectors.js";
+import { goodsReceiptContext } from '../../../pages/warehouse/goodsReceipts/goodsReceiptContext.js';
 
 const modalSelector = MODAL_SELECTORS.GOODS_RECEIPT;
 const materialSelector = SELECT_SELECTORS.MATERIAL;
@@ -94,7 +95,8 @@ export const initGoodsReceiptFormSelect2 = () => {
         modalSelector,
         supplierSelector,
         materialSelector,
-        creationContext: 'goodsReceipt'
+        creationContext: 'goodsReceipt',
+        resource: goodsReceiptContext.resource
     });
 };
 

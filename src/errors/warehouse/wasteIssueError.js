@@ -13,6 +13,16 @@ export class WasteIssueStockConflict extends AppError {
     }
 }
 
+export class WasteIssueMissingMaxUnitCost extends AppError {
+    constructor({ materialName }) {
+        super(
+            `No se puede usar la merma porque no tiene costo unitario máximo configurado: ${ materialName }. Registre el costo desde el módulo de almacén.`,
+            'WASTE_ISSUE_MISSING_MAX_UNIT_COST',
+            409
+        );
+    }
+}
+
 export class WasteIssueStateConflict extends AppError {
     constructor(message = 'La salida de merma no puede modificarse en su estado actual.') {
         super(message, 'WASTE_ISSUE_STATE_CONFLICT', 409);

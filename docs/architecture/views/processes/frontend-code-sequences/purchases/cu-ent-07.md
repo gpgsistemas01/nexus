@@ -1,0 +1,37 @@
+<a id="cu-ent-07"></a>
+# `CU-ENT-07` — Consultar compras de consumible
+
+> Esta secuencia usa la ruta y la fachada específicas de consumibles; los componentes con nombres históricos de material pertenecen al núcleo compartido de inventario.
+
+**Patrones:** `FE-P02`, `FE-P04`.
+
+```mermaid
+sequenceDiagram
+    actor Initiator as Personal de almacén
+    participant Browser as Navegador
+    participant View as src/views/pages/warehouse/goodsReceipts/goodsReceiptsPage.ejs
+    participant Application as src/public/js/application/warehouse/goodsReceipts/goodsReceipts.js
+    participant Request as src/public/js/services/warehouse/goodsReceiptService.js
+    participant HTTP as src/public/js/services/axiosInstanceApi.js
+    participant Transport@{ "type": "control" } as src/routes/api/warehouse/goodsReceiptApiRoute.js<br/>src/controllers/api/warehouse/goodsReceiptController.js
+
+    Initiator->>Browser: inicia CU-ENT-07 — Consultar compras de material
+    Browser->>View: goodsReceiptsPage.ejs y su DataTable cargan compras
+    View->>Application: getAllGoodsReceipts({ params })
+    Application->>Request: getAllGoodsReceiptsRequest({ params })
+    activate Application
+    Request->>HTTP: apiRequest({ method: 'get', url, params })
+    HTTP->>Transport: consulta GET /api/warehouse/goods-receipts/consumables
+    Transport-->>HTTP: HTTP 2xx { code, data }
+    HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
+    Request-->>Application: getAllGoodsReceiptsRequest(): Promise[AxiosResponse]
+    alt Respuesta exitosa
+        Application-->>View: getAllGoodsReceipts(): Promise[AxiosResponse]
+        View-->>Browser: DOM o DataTable actualizado con response.data
+    else Respuesta rechazada
+        Application-->>View: throw { status: number, data: Object | null, message: string, raw: Error }
+        View-->>Browser: formulario o filtros conservados, mensaje visible
+    end
+    deactivate Application
+```
+

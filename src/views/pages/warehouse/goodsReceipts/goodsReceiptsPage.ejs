@@ -101,7 +101,7 @@
     ]
 }) %>
 
-<%- include('../../../shared/tables/mainTable', { title: 'Registro de Compras' }) %>
+<%- include('../../../shared/tables/mainTable', { title: `Compras de ${ inventoryResource === 'consumable' ? 'Consumibles' : 'Materiales' }` }) %>
 
 <%- include('../../../shared/inventory/inventoryCrudModal', { modalConfig }) %>
 
@@ -114,6 +114,6 @@
 <%- include('./corrections/correctionModal') %>
 
 <%- contentFor('title') %>
-Compras
+Compras de <%= inventoryResource === 'consumable' ? 'Consumibles' : 'Materiales' %>
 <%- contentFor('layoutType') %>
 site

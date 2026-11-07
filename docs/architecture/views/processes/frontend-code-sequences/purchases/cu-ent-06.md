@@ -22,7 +22,7 @@ sequenceDiagram
     Application->>Request: exportGoodsReceiptReportRequest({ params })
     activate Application
     Request->>HTTP: apiRequest({ method: 'get', url, params })
-    HTTP->>Transport: descarga GET /api/warehouse/reports/goods-receipts/excel
+    HTTP->>Transport: descarga GET /api/warehouse/reports/goods-receipts/materials/excel
     Transport-->>HTTP: HTTP 2xx { code, data }
     HTTP-->>Request: apiRequest(): Promise[AxiosResponse]
     Request-->>Application: exportGoodsReceiptReportRequest(): Promise[AxiosResponse]

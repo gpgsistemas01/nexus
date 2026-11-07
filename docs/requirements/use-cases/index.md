@@ -174,7 +174,7 @@ trazabilidad técnica; un identificador retirado no se reasigna a un objetivo di
 | `IDA` | Identidad y acceso | Personas, cuentas, credenciales y asignaciones de acceso. |
 | `ALM` | Almacén | Materiales, mermas, existencias, movimientos y reportes operativos del almacén. |
 | `CAT` | Catálogos | Recursos comerciales y contextuales reutilizados por documentos. |
-| `ENT` | Compras de material | Consulta, registro, edición, corrección y cancelación de compras recibidas. |
+| `ENT` | Compras de materiales y consumibles | Consulta, registro, edición, corrección, cancelación y reporte de ambos contextos de compra. |
 | `SAL` | Salidas de material y de merma | Consulta, creación, edición, surtimiento y devolución de materiales o mermas. |
 
 #### Criterio de agrupación vigente
@@ -196,7 +196,7 @@ como listas planas difíciles de revisar.
 | `IDA` | Personas; usuarios y credenciales; sus consultas y reportes. | `CU-IDA-01` a `CU-IDA-09` |
 | `ALM` | Materiales, consumibles y mermas; inventarios y movimientos del almacén. | `CU-ALM-01` a `CU-ALM-22` |
 | `CAT` | Proveedores; clientes; catálogos auxiliares y reportes complementarios. | `CU-CAT-01` a `CU-CAT-26` |
-| `ENT` | Compras de material y su reporte. | `CU-ENT-01` a `CU-ENT-06` |
+| `ENT` | Compras de materiales, consumibles y sus reportes. | `CU-ENT-01` a `CU-ENT-12` |
 | `SAL` | Salidas de material y merma con sus reportes. | `CU-SAL-01` a `CU-SAL-14` |
 
 Las familias internas son ayudas visuales, no nuevos grupos funcionales, permisos ni
@@ -221,7 +221,7 @@ conjunto; el cambio de identificador no modifica el alcance funcional del caso.
 - [IDA — Identidad y acceso](identity-access/index.md)
 - [ALM — Almacén](catalogs/index.md)
 - [CAT — Catálogos](catalogs/index.md)
-- [ENT — Compras de material](purchases/index.md)
+- [ENT — Compras de materiales y consumibles](purchases/index.md)
 - [SAL — Salidas de material y de merma](issues/index.md)
 
 ## Relación entre familias y reutilización

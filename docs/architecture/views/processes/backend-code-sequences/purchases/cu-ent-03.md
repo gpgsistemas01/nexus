@@ -11,10 +11,10 @@ sequenceDiagram
     participant Validator as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
     participant ReceiptDto as goodsReceiptDto: Object<br/>src/dtos/goodsReceiptDTO.js
-    participant Domain as src/services/warehouse/goodsReceipts/goodsReceiptService.js
+    participant Domain as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
     participant ErrorHandler as src/app.js
 
-    Client->>Route: PATCH /api/warehouse/goods-receipts/:id
+    Client->>Route: PATCH /api/warehouse/goods-receipts/materials/:id
     Route->>Auth: verifyApiTokenRequired(req, res, next)
     Auth->>Validator: goodsReceiptHeaderValidation[] y validate(req, res, next)
     Validator->>Auth: authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE)(req, res, next)
@@ -25,14 +25,14 @@ sequenceDiagram
     else PERMISSIONS.GOODS_RECEIPTS_MANAGE denegado
         Auth-->>Client: HTTP 403 { code, message }
     else Pipeline aceptado
-        Route->>Controller: editGoodsReceiptHeader(req, res)
+        Route->>Controller: editMaterialGoodsReceipt(req, res)
         activate Controller
         Controller->>ReceiptDto: createGoodsReceiptDtoForEdit(req.body)
         ReceiptDto-->>Controller: createGoodsReceiptDtoForEdit(): Object (goodsReceiptDto)
-        Controller->>Domain: goodsReceiptService.updateGoodsReceipt({ id: req.params.id, goodsReceiptDto }) conserva detalles persistidos y actualiza encabezado permitido
+        Controller->>Domain: materialGoodsReceiptService.updateMaterialGoodsReceipt({ id: req.params.id, goodsReceiptDto }) conserva detalles persistidos y actualiza encabezado permitido
         activate Domain
         alt Servicio resuelto
-            Domain-->>Controller: goodsReceiptService.updateGoodsReceipt(): Promise[GoodsReceipt]
+            Domain-->>Controller: materialGoodsReceiptService.updateMaterialGoodsReceipt(): Promise[GoodsReceipt]
             Controller-->>Client: HTTP 2xx { code, data }
         else AppError propagado
             Domain-->>Controller: throw AppError { code, message, meta, statusCode }

@@ -1,11 +1,13 @@
 import { SELECT2_EVENT_NAMES } from '../../../constants/events.js';
 import { openMaterialModal } from "../../../pages/warehouse/materials/materialModal.js";
 import { getAllMaterials } from '../../../application/warehouse/materials/materials.js';
+import { getAllConsumables } from '../../../application/warehouse/consumables/consumables.js';
 import { buildPaginatedSelectParams, initDomainSelect2, initFilterSelect2, runAfterSelect2Close, toggleSelectOption } from "../baseSelect.js";
 import { setMdbWrapperInputValue } from '../../mdb/baseInstance.js';
 import { mapSelectMaterialData, parseInventorySelectJson } from "../../../utils/warehouseInventoryUtils.js";
 import { FILTER_SELECTORS, INPUT_SELECTORS } from "../../../constants/selectors.js";
 import { updatePresentationDisplay } from '../../../ui/inventory/inventorySelectUI.js';
+import { INVENTORY_RESOURCES } from '../../../constants/inventory.js';
 
 const wrapperSelector = INPUT_SELECTORS.PRESENTATION_DISPLAY;
 const materialSelector = FILTER_SELECTORS.MATERIAL;
@@ -37,12 +39,13 @@ const initMaterialSelect = ({
     modalSelector,
     supplierSelector,
     baseSelector,
-    allowCreate = true
+    allowCreate = true,
+    resource = INVENTORY_RESOURCES.MATERIAL
 }) => initDomainSelect2({
     selector: baseSelector,
     containerSelector: modalSelector,
-    get: getAllMaterials,
-    placeholder: 'Buscar material...',
+    get: resource === INVENTORY_RESOURCES.CONSUMABLE ? getAllConsumables : getAllMaterials,
+    placeholder: resource === INVENTORY_RESOURCES.CONSUMABLE ? 'Buscar consumible...' : 'Buscar material...',
     mapOption: mapSelectMaterialData,
     data: (params) => buildPaginatedSelectParams(params, {
         additionalParams: {
@@ -52,14 +55,15 @@ const initMaterialSelect = ({
         }
     }),
     allowCreate,
-    newTagLabel: 'Nuevo material'
+    newTagLabel: resource === INVENTORY_RESOURCES.CONSUMABLE ? 'Nuevo consumible' : 'Nuevo material'
 });
 
 const attachMaterialHandler = ({
     modalSelector,
     baseSelector,
     supplierSelector,
-    creationContext
+    creationContext,
+    resource
 }) => {
 
     $(baseSelector).off(SELECT2_EVENT_NAMES.SELECT).on(SELECT2_EVENT_NAMES.SELECT, (e) => {
@@ -76,6 +80,7 @@ const attachMaterialHandler = ({
                 selector: baseSelector,
                 action: () => openMaterialModal({
                     creationContext,
+                    resource,
                     data: {
                         name,
                         supplier: {
@@ -128,7 +133,8 @@ export const setupMaterialSelect = ({
     supplierSelector = null,
     materialSelector,
     allowCreate = true,
-    creationContext = null
+    creationContext = null,
+    resource = INVENTORY_RESOURCES.MATERIAL
 }) => {
 
     const baseSelector = `${ modalSelector } ${ materialSelector }`;
@@ -137,13 +143,15 @@ export const setupMaterialSelect = ({
         modalSelector,
         supplierSelector,
         baseSelector,
-        allowCreate
+        allowCreate,
+        resource
     });
 
     attachMaterialHandler({
         modalSelector,
         baseSelector,
         supplierSelector,
-        creationContext
+        creationContext,
+        resource
     });
 };

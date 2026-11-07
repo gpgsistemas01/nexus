@@ -8,16 +8,16 @@ sequenceDiagram
     participant Client as Cliente HTTP / web
     participant Route as src/routes/api/warehouse/goodsReceiptApiRoute.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
-    participant Domain as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCancellationService.js
+    participant Domain as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
     participant ErrorHandler as src/app.js
 
-    Client->>Route: PATCH /api/warehouse/goods-receipts/:id/details/:detailId/cancel
-    Route->>Controller: cancelGoodsReceiptDetail(req, res)
+    Client->>Route: PATCH /api/warehouse/goods-receipts/materials/:id/details/:detailId/cancel
+    Route->>Controller: cancelMaterialGoodsReceiptDetail(req, res)
     activate Controller
-    Controller->>Domain: cancelGoodsReceiptDetailLine({ id: req.params.id, detailId: req.params.detailId, userId: req.user.id }) revierte stock/movimiento y conserva historial
+    Controller->>Domain: cancelMaterialGoodsReceiptDetailLine({ id: req.params.id, detailId: req.params.detailId, userId: req.user.id }) revierte stock/movimiento y conserva historial
     activate Domain
     alt Servicio resuelto
-        Domain-->>Controller: cancelGoodsReceiptDetailLine(): Promise[{ updatedDetail: GoodsReceiptDetail, updatedReceipt: GoodsReceipt, detailChange: GoodsReceiptDetailChange, movement: Object }]
+        Domain-->>Controller: cancelMaterialGoodsReceiptDetailLine(): Promise[{ updatedDetail: GoodsReceiptDetail, updatedReceipt: GoodsReceipt, detailChange: GoodsReceiptDetailChange, movement: Object }]
         Controller-->>Client: HTTP 2xx { code, data }
     else AppError propagado
         Domain-->>Controller: throw AppError { code, message, meta, statusCode }

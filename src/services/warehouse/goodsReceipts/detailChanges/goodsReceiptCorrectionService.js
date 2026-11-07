@@ -13,7 +13,6 @@ import {
 import { getDb } from '../../../../repository/baseRepository.js';
 import { createServiceLogger, getModelLogContext, logServiceError } from '../../../../utils/logger.js';
 import { normalizeDecimal } from '../../../../utils/formattersUtils.js';
-import { recalculateMaterialUnitCosts } from '../../materials/supplierMaterialService.js';
 import { buildGoodsReceiptDetails, correctGoodsReceiptDetailAndTotals } from '../goodsReceiptHelpers.js';
 import {
     createGoodsReceiptDetailChange,
@@ -29,13 +28,14 @@ export const correctGoodsReceiptDetailLine = async ({
     id,
     detailId,
     correctionDto,
-    userId
+    userId,
+    type = null
 }) => {
     const { quantity, costPerUnitType } = correctionDto;
 
     try {
         const result = await getDb().$transaction(async (tx) => {
-            const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId });
+            const currentDetail = await findReceiptDetailForChange({ tx, goodsReceiptId: id, detailId, type });
 
             if (!currentDetail) throw new GoodsReceiptNotFound();
             if (currentDetail.status === GOODS_RECEIPT_DETAIL_STATUS.CANCELED) {
@@ -101,11 +101,6 @@ export const correctGoodsReceiptDetailLine = async ({
                 detailChange,
                 movement
             };
-        });
-
-        await recalculateMaterialUnitCosts({
-            supplierId: result.updatedReceipt.supplierId,
-            materialIds: [result.updatedDetail.materialId]
         });
 
         return result;

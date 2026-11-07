@@ -2,8 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const {
   buildMonthlyGoodsReceiptSummary,
+  findConsumableGoodsReceiptReportRows,
   findGoodsIssueReportRows,
-  findGoodsReceiptReportRows,
+  findMaterialGoodsReceiptReportRows,
   findWasteReportRows,
   buildWasteReportSummary,
   createFormulaCell,
@@ -11,8 +12,9 @@ const {
   getReportMonthDateRange
 } = vi.hoisted(() => ({
   buildMonthlyGoodsReceiptSummary: vi.fn(),
+  findConsumableGoodsReceiptReportRows: vi.fn(),
   findGoodsIssueReportRows: vi.fn(),
-  findGoodsReceiptReportRows: vi.fn(),
+  findMaterialGoodsReceiptReportRows: vi.fn(),
   findWasteReportRows: vi.fn(),
   buildWasteReportSummary: vi.fn(),
   createFormulaCell: vi.fn((formula, value) => ({ f: formula, t: 'n', v: value })),
@@ -24,11 +26,18 @@ vi.mock('../../../../../src/services/warehouse/reportService.js', () => ({
   buildMonthlyGoodsReceiptSummary,
   buildWasteReportSummary,
   findGoodsIssueReportRows,
-  findGoodsReceiptReportRows,
   findSupplierReportRows: vi.fn(),
   findWarehouseReportRows: vi.fn(),
   findWasteIssueReportRows: vi.fn(),
   findWasteReportRows
+}));
+
+vi.mock('../../../../../src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js', () => ({
+  findMaterialGoodsReceiptReportRows
+}));
+
+vi.mock('../../../../../src/services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js', () => ({
+  findConsumableGoodsReceiptReportRows
 }));
 
 vi.mock('../../../../../src/utils/requestQueryUtils.js', () => ({
@@ -45,7 +54,8 @@ vi.mock('../../../../../src/utils/reportExcelUtils.js', () => ({ createFormulaCe
 
 import {
   exportGoodsIssueReportExcel,
-  exportGoodsReceiptReportExcel,
+  exportConsumableGoodsReceiptReportExcel,
+  exportMaterialGoodsReceiptReportExcel,
   exportWasteReportExcel
 } from '../../../../../src/controllers/api/warehouse/reportController.js';
 
@@ -108,7 +118,7 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
   });
 
   it('exporta importes de compra y sus resúmenes como fórmulas', async () => {
-    findGoodsReceiptReportRows.mockResolvedValue([{
+    findMaterialGoodsReceiptReportRows.mockResolvedValue([{
       quantity: 2,
       convertedQuantity: 4,
       conversionUnitCost: 25,
@@ -135,7 +145,7 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
       materialTotals: { squareMeters: 4, costPerSquareMeter: 25, netPurchaseAmount: 100, quantity: 2 }
     });
 
-    await exportGoodsReceiptReportExcel({ query: {} }, {});
+    await exportMaterialGoodsReceiptReportExcel({ query: {} }, {});
 
     const { data } = sendExcelReport.mock.calls[0][0];
     expect(data[1].slice(12)).toEqual([
@@ -150,6 +160,28 @@ describe('fórmulas de datos dependientes en reportes operativos', () => {
       { f: 'IFERROR(B6/B7*100,0)', t: 'n', v: 100 }
     ]);
     expect(data[10][2]).toEqual({ f: 'IFERROR(D11/B11,0)', t: 'n', v: 25 });
+  });
+
+  it('delimita y rotula el reporte de compras de consumibles', async () => {
+    findConsumableGoodsReceiptReportRows.mockResolvedValue([]);
+    buildMonthlyGoodsReceiptSummary.mockReturnValue({
+      supplierRows: [],
+      materialRows: [],
+      supplierTotals: {},
+      materialTotals: {}
+    });
+
+    await exportConsumableGoodsReceiptReportExcel({ query: {} }, {});
+
+    expect(findConsumableGoodsReceiptReportRows).toHaveBeenCalledWith(expect.objectContaining({}));
+    expect(sendExcelReport).toHaveBeenCalledWith(expect.objectContaining({
+      sheetName: 'Compras consumibles',
+      filename: 'reporte_compras_consumibles',
+      data: expect.arrayContaining([
+        expect.arrayContaining(['Consumible']),
+        ['Resumen del reporte por consumible']
+      ])
+    }));
   });
 });
 

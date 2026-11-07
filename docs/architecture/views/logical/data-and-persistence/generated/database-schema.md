@@ -169,6 +169,7 @@ erDiagram
         Decimal totalQuantity
         Decimal totalNetPurchaseAmount
         Decimal totalGrossPurchaseAmount
+        MaterialType type
         DateTime createdAt
         DateTime updatedAt
     }

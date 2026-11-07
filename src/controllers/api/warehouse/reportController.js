@@ -1,4 +1,6 @@
-import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findGoodsIssueReportRows, findGoodsReceiptReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
+import { buildMonthlyGoodsReceiptSummary, buildWasteReportSummary, findGoodsIssueReportRows, findSupplierReportRows, findWarehouseReportRows, findWasteIssueReportRows, findWasteReportRows } from "../../../services/warehouse/reportService.js";
+import { findMaterialGoodsReceiptReportRows } from '../../../services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js';
+import { findConsumableGoodsReceiptReportRows } from '../../../services/warehouse/goodsReceipts/consumables/consumableGoodsReceiptService.js';
 import { getDataTableOrder, getDataTableSearch, isMonthlyReportQuery } from "../../../utils/requestQueryUtils.js";
 import { getReportMonthDateRange } from "../../../utils/formattersUtils.js";
 import { createFormulaCell, sendExcelReport } from "../../../utils/reportExcelUtils.js";
@@ -171,7 +173,7 @@ export const exportWasteIssueReportExcel = async (req, res) => {
     });
 };
 
-export const exportGoodsReceiptReportExcel = async (req, res) => {
+const exportGoodsReceiptReportExcel = async ({ req, res, materialType, findGoodsReceiptReportRows }) => {
 
     const columns = ['referenceNumber', 'receptionDate', 'supplierName', 'invoice', null];
     const { orderBy, orderDir } = getDataTableOrder({
@@ -182,6 +184,8 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
 
     const monthlyReport = isMonthlyReportQuery(req.query);
     const monthDateRange = monthlyReport ? getReportMonthDateRange(req.query.reportMonth) : {};
+    const isConsumableReport = materialType === MATERIAL_TYPES.CONSUMABLE;
+    const inventoryLabel = isConsumableReport ? 'Consumible' : 'Material';
 
     const rows = await findGoodsReceiptReportRows({
         search: monthlyReport ? '' : getDataTableSearch(req.query),
@@ -200,7 +204,7 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
             'Recibió',
             'Proveedor',
             'N° Factura',
-            'Material',
+            inventoryLabel,
             'Base',
             'Altura',
             'Cantidad de compra',
@@ -266,8 +270,8 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
             createColumnTotalFormula('E', supplierFirstRow, supplierRows.length, supplierTotals.monthlyPercentage)
         ],
         [],
-        [`Resumen ${ summaryScope } por material`],
-        ['Material', 'Total m² comprados', 'Costo por m²', 'Costo total s/ IVA', 'Cantidad total de material'],
+        [`Resumen ${ summaryScope } por ${ isConsumableReport ? 'consumible' : 'material' }`],
+        [inventoryLabel, 'Cantidad convertida', 'Costo unitario de conversión', 'Costo total s/ IVA', `Cantidad total de ${ isConsumableReport ? 'consumible' : 'material' }`],
         ...materialRows.map((row, index) => {
             const excelRow = materialFirstRow + index;
 
@@ -291,10 +295,24 @@ export const exportGoodsReceiptReportExcel = async (req, res) => {
     return sendExcelReport({
         res,
         data,
-        sheetName: GOODS_RECEIPT_SHEET_NAME,
-        filename: GOODS_RECEIPT_FILENAME
+        sheetName: `${ GOODS_RECEIPT_SHEET_NAME } ${ isConsumableReport ? 'consumibles' : 'materiales' }`,
+        filename: `${ GOODS_RECEIPT_FILENAME }_${ isConsumableReport ? 'consumibles' : 'materiales' }`
     });
 };
+
+export const exportMaterialGoodsReceiptReportExcel = (req, res) => exportGoodsReceiptReportExcel({
+    req,
+    res,
+    materialType: MATERIAL_TYPES.MATERIAL,
+    findGoodsReceiptReportRows: findMaterialGoodsReceiptReportRows
+});
+
+export const exportConsumableGoodsReceiptReportExcel = (req, res) => exportGoodsReceiptReportExcel({
+    req,
+    res,
+    materialType: MATERIAL_TYPES.CONSUMABLE,
+    findGoodsReceiptReportRows: findConsumableGoodsReceiptReportRows
+});
 
 
 export const exportWasteReportExcel = async (req, res) => {

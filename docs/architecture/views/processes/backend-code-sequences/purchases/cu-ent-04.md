@@ -11,14 +11,14 @@ sequenceDiagram
     participant Validator as src/validators/forms/goodsReceiptValidations.js<br/>src/middleware/validatorMiddleware.js
     participant Controller@{ "type": "control" } as src/controllers/api/warehouse/goodsReceiptController.js
     participant CorrectionDto as correctionDto: Object<br/>src/dtos/goodsReceiptDTO.js
-    participant Service as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptCorrectionService.js
+    participant Service as src/services/warehouse/goodsReceipts/materials/materialGoodsReceiptService.js
     participant Change as src/services/warehouse/goodsReceipts/detailChanges/goodsReceiptDetailChangeService.js
     participant Reason as src/services/warehouse/reasonService.js
     participant Inventory as src/services/inventory/movementService.js
     participant Prisma@{ "type": "database" } as Prisma / PostgreSQL
     participant Socket as src/utils/socketUtils.js
 
-    Client->>Router: PATCH /api/warehouse/goods-receipts/:id/details/:detailId/corrections + accessToken
+    Client->>Router: PATCH /api/warehouse/goods-receipts/materials/:id/details/:detailId/corrections + accessToken
     Router->>Auth: verifyApiTokenRequired(req, res, next)
     Auth->>Validator: goodsReceiptCorrectionValidation[] y validate(req, res, next)
     Validator->>Auth: authorizeUserApi(PERMISSIONS.GOODS_RECEIPTS_MANAGE)(req, res, next)
@@ -32,7 +32,7 @@ sequenceDiagram
         Router->>Controller: correctGoodsReceiptDetail(req, res)
         Controller->>CorrectionDto: createGoodsReceiptDtoForCorrection(req.body)
         CorrectionDto-->>Controller: createGoodsReceiptDtoForCorrection(): Object (correctionDto)
-        Controller->>Service: correctGoodsReceiptDetailLine({ id, detailId, correctionDto, userId })
+        Controller->>Service: correctMaterialGoodsReceiptDetailLine({ id, detailId, correctionDto, userId })
         Service->>Prisma: getDb().$transaction(async tx => ...)
         Service->>Change: findReceiptDetailForChange({ tx, goodsReceiptId, detailId })
         Service->>Reason: findGoodsReceiptDetailChangeReason({ changeType, tx })
@@ -41,7 +41,7 @@ sequenceDiagram
         Service->>Change: createGoodsReceiptDetailChange({ tx, previousDetail, correctedDetail, userId })
         alt Commit confirmado
             Prisma-->>Service: $transaction(): Promise[{ goodsReceipt: GoodsReceipt, correction: GoodsReceiptCorrection }]
-            Service-->>Controller: correctGoodsReceiptDetailLine(): Promise[{ goodsReceipt: GoodsReceipt, correction: GoodsReceiptCorrection }]
+            Service-->>Controller: correctMaterialGoodsReceiptDetailLine(): Promise[{ goodsReceipt: GoodsReceipt, correction: GoodsReceiptCorrection }]
             Controller->>Socket: emitInventoryUpdated()
             Controller-->>Client: 200 { goodsReceipt, correction, code }
         else Detalle, motivo o persistencia rechazados
