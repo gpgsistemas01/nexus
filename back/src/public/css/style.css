@@ -627,7 +627,7 @@ table.dataTable.datatable-table {
   border-radius: 0.5rem;
   border-spacing: 0;
   min-width: 100%;
-  overflow: hidden;
+  overflow: clip;
   width: 100%;
 }
 
@@ -866,6 +866,18 @@ table.dataTable > tbody > tr.child td.child {
 
   .datatable-responsive-detail-list {
     grid-template-columns: 1fr;
+  }
+
+  .datatable-responsive-wrapper .datatable-table .datatable-action-column {
+    min-width: 3.5rem;
+    padding-inline: 0.35rem;
+    width: 3.5rem;
+  }
+
+  .datatable-responsive-wrapper .datatable-action-column .table-action-btn {
+    height: 2.75rem;
+    margin: 0.125rem;
+    width: 2.75rem;
   }
 }
 
@@ -2242,6 +2254,25 @@ body section {
 :is(.datatable-table td, .datatable-responsive-detail-value):has(.table-action-btn) {
   text-align: center;
   white-space: nowrap;
+}
+
+.datatable-responsive-wrapper .datatable-table .datatable-action-column {
+  position: sticky;
+  right: 0;
+}
+
+.datatable-responsive-wrapper .datatable-table thead .datatable-action-column {
+  z-index: 3;
+}
+
+.datatable-responsive-wrapper .datatable-table tbody .datatable-action-column {
+  background-color: var(--mdb-body-bg, #fff);
+  box-shadow: -0.35rem 0 0.55rem -0.5rem rgba(0, 0, 0, 0.55);
+  z-index: 2;
+}
+
+.datatable-responsive-wrapper .datatable-table tbody tr:hover .datatable-action-column {
+  background-color: var(--datatable-row-hover, #f4fbf7);
 }
 
 /* login page styles */

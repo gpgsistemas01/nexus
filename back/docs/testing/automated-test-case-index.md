@@ -1,5 +1,19 @@
 # Registro selectivo de casos de prueba automatizados
 
+## Totales al cancelar compras
+
+| Diseño | Requisito / riesgo | Nivel y técnica | Condición observable | Casos |
+| --- | --- | --- | --- | --- |
+| `DP-REC-001` | `RF-REC-008`: reincorporar partidas canceladas al cancelar la última o perder totales históricos. | Unitario e integración HTTP/Prisma; transiciones con/sin partidas activas y particiones de historia disponible/ausente. | Con partidas activas se suman sólo sus importes; la última cancelación conserva el encabezado anterior. La migración repara desde la última cancelación sin alterar contexto, folio, partidas ni historia; conserva documentos sin evidencia y revierte toda la reparación ante fallo. | `CP-INT-REC-001`, `goodsReceiptHelpersTest.js`. |
+
+| Caso | Precondiciones y datos | Acción | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- |
+| `CP-INT-REC-001` | PostgreSQL aislado. Compra de dos partidas de 2 unidades, 20 netos y 23.2 brutos cada una. Migración con compras activas, canceladas, consumibles, sin auditoría y vacías; cancelaciones de distinta/igual fecha y un snapshot inválido. | Cancelar ambas partidas consecutivamente por HTTP; ejecutar la migración y repetirla; provocar una restricción fallida en la reparación histórica. | Primera cancelación: 2/20/23.2. Última: conserva esos totales, estado Cancelada, dos auditorías y stock revertido una vez por partida. La reparación no suma partidas canceladas, usa sólo la última cancelación y conserva documentos sin evidencia. Repetición sin cambios y fallo sin efectos parciales. | Fixtures propias y tablas temporales por conexión. |
+
+Fuentes: `tests/integration/controllers/warehouseConcurrencyControllerDbTest.js`,
+`tests/integration/migrations/goodsReceiptCancellationTotalsDbTest.js` y
+`tests/unit/warehouse/goodsReceiptHelpersTest.js`.
+
 ## Importación de inventario
 
 | Diseño | Requisito / riesgo | Nivel y técnica | Condición observable | Casos |

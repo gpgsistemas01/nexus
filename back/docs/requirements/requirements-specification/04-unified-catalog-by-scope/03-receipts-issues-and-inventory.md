@@ -66,8 +66,12 @@ a Almacén y administración.
   conserva el costo máximo de cada oferta. El costo por presentación de la compra es
   independiente; no alimenta un máximo histórico ni un promedio del inventario.
 - **Totales cancelados:** mientras queden partidas activas se suman sólo sus importes.
-  Al cancelar la última, el encabezado conserva la suma histórica para consulta;
+  Al cancelar la última, el encabezado conserva los totales inmediatamente anteriores
+  a esa cancelación para consulta, sin reincorporar partidas canceladas previamente;
   documentos y partidas cancelados se excluyen de reportes operativos.
+  La migración incremental `20261108000000_preserve_goods_receipt_cancellation_totals`
+  repara saldos activos y recupera los cancelados desde la última auditoría de
+  cancelación. Si no existe esa evidencia, conserva el encabezado existente.
 
 - **CA-RF-REC-007-1:** la entrada tiene al menos un detalle y todos pertenecen al
   contexto correspondiente. Un documento vacío, mixto o de otro contexto se rechaza

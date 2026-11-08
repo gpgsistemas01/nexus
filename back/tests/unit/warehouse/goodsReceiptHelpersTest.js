@@ -58,6 +58,30 @@ describe('cancelGoodsReceiptDetailAndTotals', () => {
         }));
     });
 
+    it.each([
+        { status: 'CANCELED', expectedTotals: {} },
+        { status: 'ACTIVE', expectedTotals: { totalQuantity: 2, totalNetPurchaseAmount: 20, totalGrossPurchaseAmount: 23.2 } }
+    ])('conserva el último saldo del encabezado si no quedan partidas activas ($status)', async ({ status, expectedTotals }) => {
+        const update = vi.fn().mockResolvedValue({ id: 'receipt-id' });
+        const tx = {
+            goodsReceiptDetail: {
+                updateManyAndReturn: vi.fn().mockResolvedValue([{ id: 'detail-id' }]),
+                findMany: vi.fn().mockResolvedValue([
+                    { status: 'CANCELED', quantity: 5, netPurchaseAmount: 50, grossPurchaseAmount: 58 },
+                    { status, quantity: 2, netPurchaseAmount: 20, grossPurchaseAmount: 23.2 }
+                ])
+            },
+            goodsReceipt: { update }
+        };
+
+        await cancelGoodsReceiptDetailAndTotals({ tx, goodsReceiptId: 'receipt-id', detailId: 'detail-id' });
+
+        expect(update.mock.calls[0][0].data).toEqual({
+            ...expectedTotals,
+            ...(status === 'CANCELED' && { status: { connect: { name: 'Cancelada' } } })
+        });
+    });
+
     it('conserva las relaciones al agregar detalles a una compra existente', async () => {
         const update = vi.fn().mockResolvedValue({ id: 'receipt-id' });
         const tx = {

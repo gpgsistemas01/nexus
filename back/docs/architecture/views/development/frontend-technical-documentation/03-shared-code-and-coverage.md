@@ -106,6 +106,12 @@ describe esa coordinación, incluido el login público con `requiresAuth: false`
 
 ## Infraestructura de presentación y transporte
 
+Las tablas EJS conservan el identificador y las acciones como columnas prioritarias
+del detalle responsive. `normalizeColumns` añade `datatable-action-column` a las
+acciones sin retirar sus clases previas; el estilo compartido las fija a la derecha
+durante el desplazamiento horizontal. En móvil sus botones tienen un área de
+2.75 rem por lado y los datos secundarios permanecen en el detalle expandible.
+
 | Código | Contrato y cobertura |
 | --- | --- |
 | `application/createCrudApplication.js`, `warehouse/issues/createIssueApplication.js` | Closures y adaptación de mutaciones; los configuradores están en los mapas por módulo. Las [colaboraciones de helpers CRUD](../../processes/shared-runtime-behavior/03-crud-helper-collaborations.md) amplían una vez las llamadas compartidas y sus efectos. |

@@ -372,6 +372,25 @@ describe('consistencia de operaciones simultáneas de almacén', () => {
     expect(Number(offer.maxUnitCost)).toBe(10);
   });
 
+  it('cancelar la última partida conserva los totales previos sin reincorporar partidas canceladas', async () => {
+    const receipt = await createReceipt();
+    await request(app).patch(`/receipts/${receipt.id}/details/${receipt.details[0].id}/cancel`).expect(200);
+    const before = await prisma.goodsReceipt.findUnique({ where: { id: receipt.id } });
+    expect(Number(before.totalQuantity)).toBe(2);
+    expect(Number(before.totalNetPurchaseAmount)).toBe(20);
+
+    await request(app).patch(`/receipts/${receipt.id}/details/${receipt.details[1].id}/cancel`).expect(200);
+
+    const saved = await prisma.goodsReceipt.findUnique({ where: { id: receipt.id }, include: { details: true, status: true } });
+    expect(saved.status.name).toBe('Cancelada');
+    for (const field of ['totalQuantity', 'totalNetPurchaseAmount', 'totalGrossPurchaseAmount']) {
+      expect(saved[field]).toEqual(before[field]);
+    }
+    expect(saved.details.every(detail => detail.status === 'CANCELED')).toBe(true);
+    expect(await prisma.goodsReceiptDetailChange.count({ where: { goodsReceiptId: receipt.id } })).toBe(2);
+    for (const detail of receipt.details) expect(await stock('goods', { id: detail.materialId })).toEqual([18, 18]);
+  });
+
   it('agregar un detalle mientras se cancela el último conserva el estado de la compra', async () => {
     const receipt = await createReceipt(1);
     const item = await createStock();

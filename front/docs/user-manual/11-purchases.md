@@ -60,7 +60,9 @@ Las partidas canceladas se conservan sin botones de acción.
 
 ![Compra de consumibles cancelada con totales históricos.](images/20d-purchase-canceled.png)
 
-Los totales históricos de una compra cancelada no representan existencia vigente
+Los totales de una compra cancelada conservan el saldo que había inmediatamente
+antes de cancelar su última partida, sin sumar de nuevo las partidas canceladas antes.
+No representan existencia vigente
 ni se suman en los reportes de compras activas.
 
 <!-- manual:any warehouse:reports-read -->
