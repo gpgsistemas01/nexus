@@ -1,28 +1,10 @@
 # 6. Flujo general de exportación
 
-Para generar la entrega completa:
+Revise primero el documento propietario y sus fuentes. Ejecute `docs:check` en la
+aplicación afectada, valide la colección con `--check-sources` y genere el formato
+elegido con `docs:export`. Compruebe diagramas, tablas, figuras y recortes en DOCX/PDF.
+La validación de fuentes no demuestra que una imagen requerida exista.
 
-1. Complete la [preparación de herramientas](03-prepare-the-tools.md).
-2. Desde la carpeta `back/`, valide todas las fuentes, enlaces e imágenes sin generar archivos:
-
-   ```bash
-   npm run docs:export -- --check
-   ```
-
-3. Corrija cualquier referencia ausente y genere todos los DOCX y PDF:
-
-   ```bash
-   npm run docs:export
-   ```
-
-4. Revise el DOCX creado en `build/docs/docx/` y, si eligió PDF, el archivo convertido en
-   `build/docs/pdf/`. La portada se genera automáticamente y se conservan ambos formatos. El
-   exportador comprueba el estado de LibreOffice y valida que cada resultado tenga encabezado y
-   cierre PDF; una salida ausente, truncada o con otro contenido se elimina y hace fallar el
-   comando en vez de anunciarse como documento generado.
-
-Antes debe comprobar también que las capturas requeridas por los dos manuales ya existan y estén
-aprobadas. Actualizarlas es una acción independiente de la exportación. Para regenerar sólo un
-documento técnico durante la revisión, use
-`npm run docs:export -- <paquete> <seccion> <docx|pdf|ambos>`. Si omite la sección, se reconstruye
-el paquete completo. `manuales` siempre reconstruye todos los manuales y `todos` toda la entrega.
+Los manuales por cuenta se preparan desde `front/` y requieren las capturas propias
+vigentes; el [flujo Vue](../../../../front/docs/governance/06-manuals-by-access.md)
+concentra su publicación y recuperación.

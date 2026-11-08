@@ -137,36 +137,10 @@ sus filtros y columnas. La guía de rendimiento documenta cómo medir ambas etap
 `reportController.js` de cada área como los controllers específicos de reportes de
 compras y salidas, enumerados en el registro anterior.
 
-## Transporte web y plantillas
+## Rutas del proceso
 
-`registerWebRoutes` monta páginas y redirecciones. Los controllers web preparan
-`res.render`; los imports de servicios, si existen, conservan una responsabilidad
-explícita de sesión. El router raíz resuelve redirección directamente, sin un
-controller de portada independiente.
-
-| Router web | Dependencia de controller o middleware propia |
-| --- | --- |
-| `admin/catalogWebRoute.js` | `src/controllers/web/admin/`<br/>`catalogController.js`<br/>`src/middleware/authMiddleware.js` |
-| `admin/movementWebRoute.js` | `src/controllers/web/admin/`<br/>`movementController.js`<br/>`src/middleware/authMiddleware.js` |
-| `admin/personWebRoute.js` | `src/controllers/web/admin/`<br/>`personController.js`<br/>`src/middleware/authMiddleware.js` |
-| `admin/userWebRoute.js` | `src/controllers/web/admin/`<br/>`userController.js`<br/>`src/middleware/authMiddleware.js` |
-| `auth/loginWebRoute.js` | `src/controllers/web/authController.js` |
-| `auth/logoutWebRoute.js` | `src/controllers/web/authController.js` |
-| `auth/refreshWebRoute.js` | `src/controllers/web/authController.js` |
-| `homeWebRoute.js` | `src/middleware/authMiddleware.js` |
-| `sales/clientWebRoute.js` | `src/controllers/web/sales/`<br/>`clientController.js`<br/>`src/middleware/authMiddleware.js` |
-| `warehouse/consumableWebRoute.js` | `src/controllers/web/warehouse/`<br/>`consumableController.js`<br/>`src/middleware/authMiddleware.js` |
-| `warehouse/goodsIssues/`<br/>`goodsIssueWebRoute.js` | `src/controllers/web/warehouse/goodsIssues/`<br/>`goodsIssueController.js`<br/>`src/middleware/authMiddleware.js` |
-| `warehouse/goodsReceipts/`<br/>`goodsReceiptWebRoute.js` | `src/controllers/web/warehouse/`<br/>`goodsReceipts/goodsReceiptController.js`<br/>`src/middleware/authMiddleware.js` |
-| `warehouse/materialWebRoute.js` | `src/controllers/web/warehouse/`<br/>`materialController.js`<br/>`src/middleware/authMiddleware.js` |
-| `warehouse/supplierWebRoute.js` | `src/controllers/web/warehouse/`<br/>`supplierController.js`<br/>`src/middleware/authMiddleware.js` |
-| `warehouse/wasteIssueWebRoute.js` | `src/controllers/web/warehouse/`<br/>`wasteIssueController.js`<br/>`src/middleware/authMiddleware.js` |
-| `warehouse/wasteWebRoute.js` | `src/controllers/web/warehouse/`<br/>`wasteController.js`<br/>`src/middleware/authMiddleware.js` |
-
-Las plantillas propietarias están en `src/views/pages/{admin,sales,warehouse,home}`;
-los parciales y layout se componen desde `src/views/shared` y `src/views/layout`.
-La [referencia frontend](../frontend-technical-documentation/index.md) identifica los
-módulos del navegador servidos con cada familia de pantallas.
+`src/routes/system` registra salud, Swagger de desarrollo y cierre de sesión.
+La presentación se implementa en Vue y consume la API.
 
 ## Inventario y referencias documentales compartidos
 

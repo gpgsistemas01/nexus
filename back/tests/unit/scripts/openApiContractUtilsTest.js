@@ -87,7 +87,7 @@ describe('comprobación del contrato OpenAPI', () => {
     expect(() => validateOpenApiContract(contract)).toThrow(message);
   });
 
-  it('impide incorporar una ruta web EJS al contrato API', () => {
+  it('impide incorporar una ruta operativa externa al contrato API', () => {
     const contract = createContract();
     contract.paths['/cerrar-sesion'] = contract.paths['/api/records/{id}'];
     delete contract.paths['/api/records/{id}'];

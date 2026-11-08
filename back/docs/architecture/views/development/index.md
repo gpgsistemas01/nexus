@@ -10,7 +10,7 @@ capacidades y trazabilidad a [lógica](../logical/index.md).
 | Nivel | Fuente propietaria | Pregunta y contenido |
 | --- | --- | --- |
 | 1. Conjunto del software | [Organización e integración del código](code-structure/index.md) | ¿Cómo se distribuyen servidor, navegador y persistencia? Estructura del repositorio, registros HTTP, fronteras y Prisma. |
-| 2. Implementación de un módulo | Referencias técnicas de [backend](backend-technical-documentation/index.md) y [EJS](frontend-technical-documentation/index.md) | ¿Qué archivos lo implementan? Imports, configuración, contratos y particularidades del recurso. |
+| 2. Implementación de un módulo | Referencias técnicas de [backend](backend-technical-documentation/index.md) y [Vue](../../../../../front/docs/architecture/views/development/code-structure.md) | ¿Qué archivos lo implementan? Imports, configuración, contratos y particularidades del recurso. |
 | 3. Decisión compartida | [Patrones de diseño y construcción](design-and-construction-patterns/index.md) | ¿Por qué se elige esta solución? Problema, decisión, aplicación, variantes y límites. |
 | 4. Mecanismo reutilizable | [Reutilización y refactorización](reuse-and-refactoring/index.md) | ¿Qué núcleo se comparte y qué configura cada consumidor? Contratos de extensión e impacto de una extracción. |
 | Evidencia técnica | [Mapa generado](code-map.md) | Inventario de rutas, imports y símbolos derivado de `src`. |
@@ -30,7 +30,7 @@ Una misma implementación tiene una fuente de detalle y enlaces desde las demás
 
 Por ejemplo, Catálogos se localiza en las referencias de
 [backend](backend-technical-documentation/16-catalogs-code.md) y
-[frontend](frontend-technical-documentation/16-catalogs-code.md). El
+[frontend](../../../../../front/docs/architecture/views/development/code-structure.md). El
 [patrón de registro con lista blanca](design-and-construction-patterns/08-catalog-registry-and-allowlist.md)
 explica por qué comparte configuración, y la
 [factory CRUD](reuse-and-refactoring/02-browser-applications-and-requests.md) explica
@@ -40,7 +40,6 @@ el núcleo reutilizado por su aplicación del navegador.
 development/
 ├── code-structure/                   # Organización general, fronteras e integración Prisma
 ├── backend-technical-documentation/  # Implementación y contratos de módulos del servidor
-├── frontend-technical-documentation/ # Implementación y contratos de EJS y sus módulos de navegador
 ├── design-and-construction-patterns/ # Decisiones compartidas y sus límites
 ├── reuse-and-refactoring/            # Núcleos, configuradores y contratos de extensión
 └── code-map.md                       # Evidencia generada

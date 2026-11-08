@@ -24,7 +24,7 @@ colaboradores que cambian o prueban el recorrido del caso.
 ### Relación con la documentación técnica
 
 Esta colección es la fuente canónica del recorrido ruta → controller → servicio → persistencia o
-efecto. La [guía visual de secuencias](../index.md#lectura-y-estructura-de-secuencias) define notación,
+efecto. La [guía visual de secuencias](../index.md) define notación,
 activaciones, fragmentos y tabla de trazabilidad.
 
 ### Regla de identificación y lectura

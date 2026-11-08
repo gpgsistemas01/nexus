@@ -23,6 +23,6 @@ OpenAPI conserva el detalle por operación en [Sesión](paths/auth.json),
 [importaciones de inventario](paths/inventory-imports.json) documentan plantillas,
 multipart, confirmación y recuperación. El contrato HTTP reúne las reglas comunes.
 
-La [interfaz EJS](../views/development/frontend-technical-documentation/index.md)
+La [interfaz Vue](../../../../front/docs/architecture/views/development/code-structure.md)
 y la [implementación del servidor](../views/development/backend-technical-documentation/index.md)
 tienen referencias propias.

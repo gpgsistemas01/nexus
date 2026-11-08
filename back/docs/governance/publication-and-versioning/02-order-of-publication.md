@@ -30,7 +30,7 @@ Los manuales por actor conservan su propia entrada. Cada actor recibe un documen
 ensambla `overview.md`, `procedures.md`, la matriz de validación y el catálogo de errores una sola
 vez; los documentos modulares no duplican esos anexos y conservan la portada del actor. Sus
 documentos siguen los módulos y destinos
-visibles de `src/views/layout/ui/navList.ejs` y filtran los procedimientos según los permisos del
+visibles de `../front/src/shared` y filtran los procedimientos según los permisos del
 área; la carpeta técnica donde vive un caso no determina el nombre ni el alcance del entregable.
 Las exportaciones y sus secuencias pertenecen al módulo que inicia la consulta, por lo que no se
 publica un documento independiente de reportes sin recorrido propio en la navegación.

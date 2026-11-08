@@ -12,12 +12,7 @@ de uso y `pages` compone comportamiento visual. Esto se parece a MVC en algunos 
 pero no se declara un MVC estricto: los servicios de dominio, DTO, JavaScript del
 navegador y eventos no encajan en tres componentes únicos.
 
-La correspondencia MVC útil es parcial: EJS y los módulos de UI son la **Vista**;
-routers/controllers Express cumplen la entrada del **Controlador**; Prisma y los
-servicios administran estado y reglas que, en conjunto, se aproximan al **Modelo**.
-Nexus aplica por ello un **MVC web extendido dentro de una arquitectura por capas**, no
-un segundo patrón arquitectónico que sustituya al monolito modular. No falta crear una
-clase `Model` ni trasladar reglas a controllers para «completar» MVC.
+Vue implementa la presentación; Express adapta HTTP y coordina los servicios de dominio.
 
 **Regla de construcción:** un recurso nuevo conserva el mismo dominio y nombre a través
 de sus capas. No se crea una carpeta horizontal nueva sólo para una operación CRUD.

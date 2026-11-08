@@ -23,6 +23,7 @@ el límite multipart real. Las respuestas simuladas no demuestran persistencia.
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
 | `DP-VUE-TABLE-001` | Orden incorrecto al compartir tablas | Unitario; particiones por mapa y transición de recurso | `tableQueryTest.ts`: conserva índices discontinuos de inventario, traduce página/tamaño/sentido, descarta una columna exclusiva de proveedor al cambiar a cliente y conserva Fecha descendente del historial. | [tableQueryTest.ts](../../../tests/unit/shared/composables/tableQueryTest.ts) |
+| `DP-VUE-TABLE-003` | Acciones inaccesibles al desplazar el listado o controles táctiles demasiado pequeños. | Navegador; fronteras de 390/960 px y desplazamiento inicial/intermedio/final. | `tableActions.spec.ts` abre y cierra la edición mediante clic en coordenadas visibles después de cada desplazamiento; en móvil el control mide al menos 44 px por lado. | `tests/e2e/tableActions.spec.ts`. |
 | `DP-VUE-LIST-002` | Limpieza compartida pierde filtros, tamaño u orden | Unitario; transición aplicada → borrador → limpio | `listInteractionTest.ts`: limpia texto aplicado y borrador, reinicia filtros y página, conserva tamaño y sentido. | [listInteractionTest.ts](../../../tests/unit/shared/composables/listInteractionTest.ts) |
 
 Las pruebas de navegador cubren `RecordListPanel`, `ListFilters`, `TableFrame`, `TableAction` y

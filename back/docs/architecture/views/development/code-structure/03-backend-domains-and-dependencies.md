@@ -1,7 +1,6 @@
 # 3. Backend: dominios y dependencias
 
-El backend distribuye el transporte en `routes/api`, `routes/web`, `controllers/api`
-y `controllers/web`. Los registros HTTP están en el [capítulo 2](02-http-entry-points.md).
+El backend distribuye el transporte en `routes/api`, `routes/system` y `controllers/api`. Los registros HTTP están en el [capítulo 2](02-http-entry-points.md).
 El mapa siguiente amplía `src/services`, donde se encuentran reglas, consultas y
 transacciones. Incluye las áreas funcionales y los colaboradores que atraviesan esas
 áreas y permite localizar las variantes de materiales, consumibles y mermas.

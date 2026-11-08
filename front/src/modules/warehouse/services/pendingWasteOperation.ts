@@ -9,7 +9,7 @@ export const createPendingWasteOperation = (
     id = '',
     storage: Storage = localStorage,
 ) => {
-    // Misma identidad que EJS: una captura pendiente se puede recuperar desde ambas interfaces.
+    // La identidad estable permite recuperar una captura pendiente después de recargar Vue.
     const key = `nexus:waste-operation:${userId}:${action}:${id}`;
 
     const read = (): InventoryPayload | null => {

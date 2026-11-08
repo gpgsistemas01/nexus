@@ -19,7 +19,6 @@ flowchart TB
     api["catalogApiRoute.js"] --> controller["controllers/api/admin<br/>catalogController.js"]
     api --> auth["authMiddleware.js<br/>permissions.js"]
     api --> validators["catalogValidations.js<br/>validatorMiddleware.js"]
-    web["catalogWebRoute.js"] --> webController["controllers/web/admin<br/>catalogController.js"]
     web --> auth
     controller --> service["catalogService.js<br/>consulta · creación · edición"]
     webController --> service
@@ -31,8 +30,8 @@ flowchart TB
 | Responsabilidad | Archivos bajo `src/` |
 | --- | --- |
 | Registro permitido | `constants/catalogs.js` |
-| Transporte API y web | `routes/api/admin/catalogApiRoute.js`<br/>`routes/web/admin/catalogWebRoute.js` |
-| Contrato JSON y renderizado | `controllers/api/admin/`<br/>`catalogController.js`<br/>`controllers/web/admin/`<br/>`catalogController.js` |
+| Transporte API | `routes/api/admin/catalogApiRoute.js` |
+| Contrato JSON | `controllers/api/admin/`<br/>`catalogController.js` |
 | Selección y normalización de campos | `dtos/catalogDTO.js` |
 | Resolución, invariantes y persistencia | `services/admin/catalogService.js`<br/>`repository/baseRepository.js` |
 | Validación y acceso | `validators/forms/catalogValidations.js`<br/>`middleware/validatorMiddleware.js`<br/>`middleware/authMiddleware.js`<br/>`constants/permissions.js` |
@@ -70,7 +69,7 @@ en el servicio, sin confundirlos con unidades UTF-16.
 | Listado | El controller obtiene paginación/búsqueda; `findAllCatalogEntries` ordena por nombre y devuelve `data`, `recordsTotal` y `recordsFiltered`. Incluye activos e inactivos. |
 | Escrituras | Devuelven `data` y código de éxito. Desactivar/reactivar es editar `isActive`; el servicio no implementa borrado físico ni una operación separada de desactivación. |
 | Errores | `CatalogNotFound` rechaza claves ajenas al registro; `CatalogValidationError` rechaza datos inválidos. En edición, `P2025` y `P2023` se traducen a `CatalogEntryNotFound`; otros errores se propagan. |
-| Página y metadata | `/catalogos/:catalog` exige cookie de sesión y `catalogs:manage`. `getManagedCatalog` entrega nombre, campos, longitudes y etiquetas al controller web; omite `model`. La configuración del navegador se detalla en la [referencia frontend](../frontend-technical-documentation/16-catalogs-code.md). |
+| Página y metadata | `/catalogos/:catalog` exige cookie de sesión y `catalogs:manage`. `getManagedCatalog` entrega nombre, campos, longitudes y etiquetas al controller web; omite `model`. La configuración del navegador se detalla en la [referencia frontend](../../../../../../front/docs/architecture/views/development/code-structure.md). |
 
 Los nombres de roles y áreas participan en `constants/permissions.js`; crear o renombrar
 un registro no modifica esas políticas. Los nombres de estados se usan mediante

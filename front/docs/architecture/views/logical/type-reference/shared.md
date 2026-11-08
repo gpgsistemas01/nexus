@@ -268,7 +268,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## ServerTable.defineProps
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 8, columna 17. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 9, columna 17. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -284,7 +284,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## ServerTable.defineEmits
 
-**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 21, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/shared/components/ServerTable.vue](../../../../../src/shared/components/ServerTable.vue) · línea 22, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |

@@ -25,7 +25,7 @@ export default defineConfig({
         {
             command: 'node src/server.js',
             cwd: '../back',
-            url: 'http://127.0.0.1:3107/inicio-sesion',
+            url: 'http://127.0.0.1:3107/health/ready',
             env: { PORT: '3107', NODE_ENV: 'test' },
             reuseExistingServer: false,
         },

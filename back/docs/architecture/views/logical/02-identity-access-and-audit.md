@@ -98,7 +98,7 @@ La consulta `material-templates` contiene costos para registrar merma y exige
 | Regla del recurso y alcance de datos | El servidor aplica los filtros y restricciones del caso; devuelve el error correspondiente sin conceder acceso adicional. |
 
 El login y la renovación comprueban la cuenta y sus asignaciones. El detalle del
-acceso web se mantiene en la [vista de escenarios](../scenarios/web-navigation-and-screen-catalog/02-map-visual-of-navigation.md).
+acceso web se mantiene en la [vista de escenarios](../../../../../front/docs/architecture/views/scenarios/navigation-and-screens.md).
 
 ## Presentación y alcance
 

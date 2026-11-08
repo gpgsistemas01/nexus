@@ -107,7 +107,7 @@ de Docker, configura `NODE_VERSION=24.19.0` o una versión 24 compatible con sus
 la versión de Render.
 
 Si habilitas filtros de construcción, incluye `front/**`, `back/src/shared/**`
-y `back/src/public/js/**` en Vue. Los cambios en reglas públicas deben recompilar
+en Vue. Los cambios en reglas públicas deben recompilar
 el cliente aunque el archivo modificado esté en `back/`.
 
 Publica primero una versión compatible de la API y después Vue. Comprueba login,

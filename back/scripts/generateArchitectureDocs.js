@@ -14,7 +14,7 @@ const OUTPUTS = {
 const CHECK = process.argv.includes('--check');
 const SOURCE_AREAS = [
     'config', 'constants', 'controllers', 'dtos', 'errors', 'lib', 'messages',
-    'middleware', 'public', 'repository', 'routes', 'services', 'shared', 'utils', 'validators', 'views'
+    'middleware', 'repository', 'routes', 'services', 'shared', 'utils', 'validators'
 ];
 const DATABASE_AREAS = [
     ['Identidad, acceso y auditoría', ['Department', 'Role', 'User', 'Person', 'UserRoleDepartment', 'PersonRoleDepartment', 'CriticalWriteAudit']],
@@ -25,8 +25,7 @@ const DATABASE_AREAS = [
 ];
 const USE_CASE_DOCUMENTS = {
     catalog: path.join(ROOT, 'docs/requirements/use-cases'),
-    backendDiagrams: path.join(ROOT, 'docs/architecture/views/processes/backend-code-sequences'),
-    frontendDiagrams: path.join(ROOT, 'docs/architecture/views/processes/frontend-code-sequences')
+    backendDiagrams: path.join(ROOT, 'docs/architecture/views/processes/backend-code-sequences')
 };
 
 const readDocumentSource = async (documentPath, isNestedCollection = false) => {
@@ -113,7 +112,6 @@ const EXTERNAL_SEQUENCE_PARTICIPANTS = new Set([
     'Respuesta Express',
     'Runtime Express'
 ]);
-const SOURCE_PATH_PATTERN = /src\/[A-Za-z0-9_./-]+\.(?:ejs|js)/g;
 
 const validateUseCaseDiagramCoverage = async () => {
     const sources = new Map(await Promise.all(
@@ -129,22 +127,16 @@ const validateUseCaseDiagramCoverage = async () => {
             .map((match) => [match[1], match[2]])
     );
     const permittedActors = new Map();
-    const expectedActors = new Map(
-        [...normalizeLineEndings(sources.get('catalog'))
-            .matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — .+\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)]
-            .map(([, id, body]) => {
-                const declaredActor = body.match(/^\| Actor \| (.*?) \|$/m)?.[1] ?? '';
-                const actors = [
-                    ['Usuario registrado', 'user'],
-                    ['Personal de almacén', 'warehouse'],
-                    ['Administrador del sistema', 'admin']
-                ].filter(([label]) => declaredActor.includes(label)).map(([, alias]) => alias);
-                permittedActors.set(id, actors);
-                const actor = actors[0] === 'user' ? 'Usuario registrado'
-                    : actors[0] === 'warehouse' ? 'Personal de almacén' : 'Administrador del sistema';
-                return [id, actor];
-            })
-    );
+    for (const [, id, body] of normalizeLineEndings(sources.get('catalog'))
+        .matchAll(/^#{1,6} `(CU-[A-Z]+-\d+)` — .+\n([\s\S]*?)(?=^#{1,6} `CU-|(?![\s\S]))/gm)) {
+        const declaredActor = body.match(/^\| Actor \| (.*?) \|$/m)?.[1] ?? '';
+        const actors = [
+            ['Usuario registrado', 'user'],
+            ['Personal de almacén', 'warehouse'],
+            ['Administrador del sistema', 'admin']
+        ].filter(([label]) => declaredActor.includes(label)).map(([, alias]) => alias);
+        permittedActors.set(id, actors);
+    }
     const failures = [];
     const sourceFilePaths = await walk(path.join(ROOT, 'src'));
     const sourceFiles = new Set(sourceFilePaths
@@ -248,9 +240,9 @@ const validateUseCaseDiagramCoverage = async () => {
     }
     validateIds('diagramas de casos de uso', diagramCaseIds);
 
-    for (const side of ['backend', 'frontend']) {
+    for (const side of ['backend']) {
         const source = sources.get(`${side}Diagrams`);
-        const patternPrefix = side === 'backend' ? 'BE' : 'FE';
+        const patternPrefix = 'BE';
         const appliedPatterns = new Set(
             [...source.matchAll(new RegExp(`\\b${patternPrefix}-P\\d{2}\\b`, 'g'))]
                 .map((match) => match[0])
@@ -310,15 +302,7 @@ const validateUseCaseDiagramCoverage = async () => {
                 failures.push(`diagramas ${side}: ${id}: ${error}`);
             }
             const visualActors = [...sequence.matchAll(/^\s*actor\s+([^\s@]+)(?:@\{[^}]+\})?\s+as\s+(.+)$/gm)];
-            if (side === 'frontend') {
-                if (visualActors.length !== 1 || visualActors[0]?.[2] !== expectedActors.get(id)) {
-                    failures.push(`diagramas frontend: ${id} debe iniciar con la figura actor de ${expectedActors.get(id)}`);
-                }
-                const actorAlias = visualActors[0]?.[1];
-                if (!actorAlias || !new RegExp(`^\\s*${actorAlias}->>Browser:\\s+inicia ${id} — `, 'm').test(sequence)) {
-                    failures.push(`diagramas frontend: ${id} no enlaza visualmente al actor con Navegador`);
-                }
-            } else if (visualActors.length) {
+            if (visualActors.length) {
                 failures.push(`diagramas backend: ${id} duplica al actor humano fuera de la frontera HTTP`);
             }
             if (side === 'backend' && !/^\s*(?:actor|participant)\s+\S+(?:@\{[^}]+\})?\s+as\s+(?:Navegador|Cliente HTTP \/ web)$/m.test(sequence)) {
@@ -349,23 +333,14 @@ const validateUseCaseDiagramCoverage = async () => {
             if (sequence.includes('Variables de frontera:')) {
                 failures.push(`diagramas ${side}: ${id} transcribe variables de frontera que pertenecen al código enlazado`);
             }
-            if (!/^\s*(?:alt|break)\s+/m.test(sequence)
-                || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback|INVALID_AUTH|FORBIDDEN)\b/i.test(sequence)) {
+            // El cierre de sesión sólo elimina cookies: es idempotente y no ejecuta reglas de dominio.
+            if (id !== 'CU-AUT-02' && (!/^\s*(?:alt|break)\s+/m.test(sequence)
+                || !/-->>.*\b(?:error|rechazad[oa]|conflict|invalid|rollback|INVALID_AUTH|FORBIDDEN)\b/i.test(sequence))) {
                 failures.push(`diagramas ${side}: ${id} no representa el error devuelto con una respuesta discontinua dentro de alt/else o break`);
             }
             const tracedParticipants = [...participantSourceMap.values()].filter((paths) => paths.length);
             if (tracedParticipants.length < 2) {
                 failures.push(`diagramas ${side}: ${id} no traza al menos dos participantes a archivos src/`);
-            }
-            if (side === 'frontend' && sequence.includes('/api/')
-                && !participantSourceMap.get('HTTP')?.includes('src/public/js/services/axiosInstanceApi.js')) {
-                failures.push(`diagramas frontend: ${id} no identifica el cliente HTTP compartido axiosInstanceApi.js`);
-            }
-            if (side === 'frontend' && [...participantSourceMap.values()].some((paths) => (
-                paths.some((sourcePath) => sourcePath.startsWith('src/public/js/application/'))
-                && paths.some((sourcePath) => sourcePath.startsWith('src/public/js/services/'))
-            ))) {
-                failures.push(`diagramas frontend: ${id} agrupa aplicación y request sin identificar sus archivos como participantes separados`);
             }
             if (new RegExp(`(?:BE|FE)-P\\d{2}`).test(sequence)) {
                 failures.push(`diagramas ${side}: ${id} repite el índice de patrones dentro de Mermaid`);
@@ -456,15 +431,7 @@ const validateUseCaseDiagramCoverage = async () => {
                     failures.push(`diagramas backend: ${id} omite validatorMiddleware.validate antes de ${controllerCall}`);
                 }
             }
-            if (side === 'frontend') {
-                const participantSources = [...participantSourceMap.values()].flat();
-                const ownsFormValidation = participantSources.some((sourcePath) => (
-                    sourceContents.get(sourcePath)?.includes('validateFields(')
-                ));
-                if (ownsFormValidation && !sequence.includes('validateFields(')) {
-                    failures.push(`diagramas frontend: ${id} omite validateFields ejecutado por un participante del formulario`);
-                }
-            }
+
         }
     }
 
@@ -513,7 +480,7 @@ const parseMounts = async (kind) => {
         [...source.matchAll(/import\s+(\w+)\s+from\s+'([^']+)'/g)]
             .map((match) => [match[1], path.resolve(path.dirname(indexPath), match[2])])
     );
-    const constant = kind === 'api' ? 'API_ROUTES' : 'WEB_ROUTES';
+    const constant = kind === 'api' ? 'API_ROUTES' : 'SYSTEM_ROUTES';
     const block = source.match(new RegExp(`const ${constant} = \\[([\\s\\S]*?)\\n\\];`))?.[1] ?? '';
 
     return [...block.matchAll(/\['([^']+)',\s*(\w+)\]/g)].map((match) => ({
@@ -594,9 +561,9 @@ const moduleExportsTable = (modules) => [
 
 const generateCodeMap = async () => {
     const sourceFiles = (await walk(path.join(ROOT, 'src'))).filter((file) => file.endsWith('.js'));
-    const [apiRoutes, webRoutes, dependencies, controllerModules, serviceModules] = await Promise.all([
+    const [apiRoutes, systemRoutes, dependencies, controllerModules, serviceModules] = await Promise.all([
         getRoutes('api'),
-        getRoutes('web'),
+        getRoutes('system'),
         getLayerDependencies(sourceFiles),
         getModuleExports(sourceFiles, 'controllers'),
         getModuleExports(sourceFiles, 'services')
@@ -625,7 +592,7 @@ flowchart LR
 ${dependencies.map(([from, to]) => `    ${from}["${from} (${counts.get(from)} módulos)"] --> ${to}["${to} (${counts.get(to)} módulos)"]`).join('\n')}
 \`\`\`
 
-> Alcance: módulos JavaScript bajo \`src/\`. Los recursos EJS, CSS y el esquema Prisma se
+> Alcance: módulos JavaScript bajo \`src/\`. La interfaz Vue y el esquema Prisma se
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
@@ -633,14 +600,14 @@ ${dependencies.map(([from, to]) => `    ${from}["${from} (${counts.get(from)} m�
 
 ${table(apiRoutes)}
 
-## Rutas web (${webRoutes.length})
+## Rutas del proceso (${systemRoutes.length})
 
-${table(webRoutes)}
+${table(systemRoutes)}
 
 ## Símbolos exportados por controladores
 
 Este inventario enumera los nombres públicos declarados por los módulos bajo
-\`src/controllers\`. Permite localizar el adaptador HTTP o web sin inferir su propósito
+\`src/controllers\`. Permite localizar el adaptador HTTP sin inferir su propósito
 desde el nombre. La responsabilidad, entrada, salida y servicio coordinado se explican
 en la [documentación técnica del backend](backend-technical-documentation/index.md)
 cuando el flujo necesita una vista curada.

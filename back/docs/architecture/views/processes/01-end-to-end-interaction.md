@@ -1,19 +1,14 @@
-# 1. Recorrido extremo a extremo de una interacción
+# Interacción de extremo a extremo
 
-El recorrido se lee enlazando las dos realizaciones del mismo caso. Para consultar
-proveedores, empieza en [frontend `CU-CAT-01`](frontend-code-sequences/catalogs/cu-cat-01.md#cu-cat-01)
-y continúa en [backend `CU-CAT-01`](backend-code-sequences/catalogs/cu-cat-01.md#cu-cat-01).
+El navegador carga la aplicación Vue. Vue Router resuelve el destino y la sesión;
+el transporte del cliente envía las operaciones a Express. La API valida token,
+permisos y captura, y el controller delega en el servicio del dominio. El servicio
+resuelve estado y pertenencia y ejecuta documento, partidas, stock e historia con
+un único contexto transaccional. La respuesta HTTP devuelve datos o un código público.
 
-La primera secuencia identifica el módulo de entrada, el adaptador de tabla, el núcleo
-DataTable, la aplicación, el request y el cliente HTTP. La flecha `GET /api/warehouse/suppliers`
-llega al router que constituye la frontera de la segunda secuencia. Desde allí se siguen
-los archivos de autenticación, controller y servicio hasta la persistencia, y después
-la respuesta vuelve al callback AJAX que actualiza la tabla.
+Una descarga se prepara en el servidor y el cliente libera el Blob después de
+entregarlo al usuario. Las notificaciones Socket.IO autorizadas se emiten después
+de confirmar las escrituras. La auditoría observa la finalización de la respuesta.
 
-Cada participante técnico de esas secuencias corresponde a un archivo. La plantilla
-EJS aporta el HTML antes de ejecutar el módulo JavaScript; no comparte su línea de vida.
-El navegador y la base de datos son límites externos. La estructura general permanece
-en el [diagrama de componentes](../logical/01-components-and-reuse.md#componentes-y-conexión-entre-frontend-y-backend),
-y el contrato de los intercambios permanece en la documentación API y en OpenAPI.
-Así se conserva el recorrido completo mediante referencias a sus fuentes, sin añadir
-una tercera secuencia de capas agrupadas que repita ambos casos.
+Los detalles temporales pertenecen a las [secuencias backend](backend-code-sequences/index.md)
+y a los [procesos Vue](../../../../../front/docs/architecture/views/processes/index.md).

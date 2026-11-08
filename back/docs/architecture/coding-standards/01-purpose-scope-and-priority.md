@@ -7,7 +7,7 @@ no crear estándares parciales o contradictorios. `AGENTS.md` contiene las instr
 de trabajo del repositorio; ante una discrepancia, prevalecen sus restricciones.
 
 El estándar aplica a JavaScript/TypeScript del servidor y navegador, componentes Vue,
-EJS, pruebas, scripts y configuración mantenida por el proyecto. Prisma, SQL y Markdown conservan además las
+contratos compartidos, pruebas, scripts y configuración mantenida por el proyecto. Prisma, SQL y Markdown conservan además las
 convenciones propias de su lenguaje. Se aplica al código nuevo y a las líneas que se
 modifican; no autoriza reformatear módulos ajenos al cambio ni mezclar una corrección
 funcional con una reescritura general.

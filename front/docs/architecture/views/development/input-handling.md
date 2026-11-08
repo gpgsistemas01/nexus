@@ -9,24 +9,24 @@ las solicitudes.
 | Alias y fuente | Uso |
 | --- | --- |
 | [@nexus/numbers](../../../../../back/src/shared/utils/numberUtils.js) | Redondeo y normalización decimal. |
-| [@nexus/issue-header-rules](../../../../../back/src/public/js/application/warehouse/issues/issueHeaderRules.js) | Cliente interno, asesores y proyecto sugerido por área. |
-| [@nexus/issue-statuses](../../../../../back/src/public/js/constants/fulfillmentStatuses.js) | Estados utilizados al presentar acciones de Salidas. |
-| [@nexus/login-validation](../../../../../back/src/public/js/utils/validations/loginValidation.js) | Reglas de usuario y contraseña de acceso. |
+| [@nexus/issue-header-rules](../../../../../back/src/shared/inventory/issueHeaderRules.js) | Cliente interno, asesores y proyecto sugerido por área. |
+| [@nexus/issue-statuses](../../../../../back/src/shared/constants/fulfillmentStatuses.js) | Estados utilizados al presentar acciones de Salidas. |
+| [@nexus/login-validation](../../../../../back/src/shared/validation/loginValidation.js) | Reglas de usuario y contraseña de acceso. |
 | [@nexus/purchase-calculations](../../../../../back/src/shared/inventory/goodsReceiptCalculations.js) | Cantidades, costos e importes de la vista previa de Compras. |
-| [@nexus/date-time](../../../../../back/src/public/js/utils/timeZone.js) | Conversión y presentación de fechas. |
-| [@nexus/form-validation](../../../../../back/src/public/js/utils/validations/validators.js) | Esquemas de captura de Inventario, Identidad, Directorio, Catálogos, Compras y Salidas. |
+| [@nexus/date-time](../../../../../back/src/shared/utils/timeZone.js) | Conversión y presentación de fechas. |
+| [@nexus/form-validation](../../../../../back/src/shared/validation/validators.js) | Esquemas de captura de Inventario, Identidad, Directorio, Catálogos, Compras y Salidas. |
 | [@nexus/waste-measurements](../../../../../back/src/shared/inventory/wasteMeasurements.js) | Pesos, largo y orientación de la vista previa de Merma. |
 | [@nexus/catalogs](../../../../../back/src/shared/constants/catalogs.js) | Recursos administrables, campos, etiquetas y longitudes. |
 | [@nexus/permissions](../../../../../back/src/shared/constants/permissions.js) | Identificadores y consulta de permisos recibidos. |
 | [@nexus/api-success-codes](../../../../../back/src/shared/constants/apiSuccessCodes.js) | Códigos de confirmación de operaciones. |
-| [@nexus/api-messages](../../../../../back/src/public/js/constants/apiMessages.js) | Mensajes y traducción de códigos. |
+| [@nexus/api-messages](../../../../../back/src/shared/messages/apiMessages.js) | Mensajes y traducción de códigos. |
 
 Los validadores de formulario utilizan estas fuentes de apoyo:
 
 | Fuente | Reglas |
 | --- | --- |
-| [baseValidations](../../../../../back/src/public/js/utils/validations/baseValidations.js) | Campos requeridos, tipos y longitudes. |
-| [fieldValidations](../../../../../back/src/public/js/utils/validations/fieldValidations.js) | Texto, UUID v4, fechas, booleanos y precisión. |
+| [baseValidations](../../../../../back/src/shared/validation/baseValidations.js) | Campos requeridos, tipos y longitudes. |
+| [fieldValidations](../../../../../back/src/shared/validation/fieldValidations.js) | Texto, UUID v4, fechas, booleanos y precisión. |
 | [weightValidations](../../../../../back/src/shared/validation/weightValidations.js) | Límites de pesos y relación entre total y cono. |
 | [inputValidation](../../../../../back/src/shared/constants/inputValidation.js) y [auth](../../../../../back/src/shared/constants/auth.js) | Límites y constantes de captura. |
 

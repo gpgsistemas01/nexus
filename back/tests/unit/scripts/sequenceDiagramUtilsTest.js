@@ -113,17 +113,17 @@ describe('estructura de secuencias Mermaid', () => {
 
 | Alias | Rol visual | Archivos de implementación |
 | --- | --- | --- |
-| \`View\` | boundary | \`src/public/js/pages/form.js\` |
-| \`App\` | control | \`src/public/js/application/app.js\`<br/>\`src/public/js/application/core.js\` |
+| \`View\` | boundary | \`src/shared/components/Form.vue\` |
+| \`App\` | control | \`src/modules/warehouse/services/inventoryService.ts\`<br/>\`src/shared/http/apiClient.ts\` |
 | \`Unknown\` | control | \`src/ghost.js\` |
 
 ## Secuencia de implementación
 `;
         const sources = getSequenceParticipantSources(body, sequence);
         expect(sources.get('App')).toEqual([
-            'src/public/js/application/app.js', 'src/public/js/application/core.js'
+            'src/modules/warehouse/services/inventoryService.ts', 'src/shared/http/apiClient.ts'
         ]);
-        expect(sources.get('View')).toEqual(['src/public/js/pages/form.js']);
+        expect(sources.get('View')).toEqual(['src/shared/components/Form.vue']);
         expect(sources.has('Unknown')).toBe(false);
     });
 

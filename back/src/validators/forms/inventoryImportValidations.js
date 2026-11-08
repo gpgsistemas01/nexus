@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator';
 import { materialValidation, consumableValidation, materialEditValidation } from './materialValidations.js';
 import { wasteValidation, wasteEditValidation } from './wasteValidations.js';
-import { errorMessages } from '../../public/js/constants/apiMessages.js';
+import { errorMessages } from '../../shared/messages/apiMessages.js';
 
 // Adapta una fila a las mismas cadenas de captura de los formularios HTTP, sin consultar datos.
 export const validateInventoryImportRow = async ({ resource, mode, body }) => {

@@ -35,23 +35,14 @@ export default defineConfig(({ mode }) => {
                     new URL('../back/src/shared/inventory/pieceQuantity.js', import.meta.url),
                 ),
                 '@nexus/issue-header-rules': fileURLToPath(
-                    new URL(
-                        '../back/src/public/js/application/warehouse/issues/issueHeaderRules.js',
-                        import.meta.url,
-                    ),
+                    new URL('../back/src/shared/inventory/issueHeaderRules.js', import.meta.url),
                 ),
                 '@nexus/issue-statuses': fileURLToPath(
-                    new URL(
-                        '../back/src/public/js/constants/fulfillmentStatuses.js',
-                        import.meta.url,
-                    ),
+                    new URL('../back/src/shared/constants/fulfillmentStatuses.js', import.meta.url),
                 ),
 
                 '@nexus/login-validation': fileURLToPath(
-                    new URL(
-                        '../back/src/public/js/utils/validations/loginValidation.js',
-                        import.meta.url,
-                    ),
+                    new URL('../back/src/shared/validation/loginValidation.js', import.meta.url),
                 ),
                 '@nexus/purchase-calculations': fileURLToPath(
                     new URL(
@@ -60,13 +51,10 @@ export default defineConfig(({ mode }) => {
                     ),
                 ),
                 '@nexus/date-time': fileURLToPath(
-                    new URL('../back/src/public/js/utils/timeZone.js', import.meta.url),
+                    new URL('../back/src/shared/utils/timeZone.js', import.meta.url),
                 ),
                 '@nexus/form-validation': fileURLToPath(
-                    new URL(
-                        '../back/src/public/js/utils/validations/validators.js',
-                        import.meta.url,
-                    ),
+                    new URL('../back/src/shared/validation/validators.js', import.meta.url),
                 ),
                 '@nexus/waste-measurements': fileURLToPath(
                     new URL('../back/src/shared/inventory/wasteMeasurements.js', import.meta.url),
@@ -81,7 +69,7 @@ export default defineConfig(({ mode }) => {
                     new URL('../back/src/shared/constants/apiSuccessCodes.js', import.meta.url),
                 ),
                 '@nexus/api-messages': fileURLToPath(
-                    new URL('../back/src/public/js/constants/apiMessages.js', import.meta.url),
+                    new URL('../back/src/shared/messages/apiMessages.js', import.meta.url),
                 ),
             },
         },

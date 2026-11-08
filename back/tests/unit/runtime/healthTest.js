@@ -4,7 +4,7 @@ import request from 'supertest';
 const { query } = vi.hoisted(() => ({ query: vi.fn() }));
 vi.mock('../../../src/lib/prisma.js', () => ({ prisma: { $queryRaw: query } }));
 const { checkDatabaseReady } = await import('../../../src/services/healthService.js');
-const { default: healthRouter } = await import('../../../src/routes/web/healthWebRoute.js');
+const { default: healthRouter } = await import('../../../src/routes/system/healthRoute.js');
 let app;
 let ready;
 beforeEach(() => {

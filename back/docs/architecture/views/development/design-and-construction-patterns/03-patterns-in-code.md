@@ -67,28 +67,20 @@ no constituye otra etapa local entre DTO y servicio.
 
 ### Factories y composición sobre herencia
 
-**Identificador:** `DIA-PAT-CON-001`. **Pregunta:** ¿qué se configura para crear una
-variante sin duplicar el flujo común?
+**Identificador:** `DIA-PAT-CON-001`. **Pregunta:** ¿cómo se configura el transporte de cada contexto?
 
 ```mermaid
 flowchart TB
-    configurator["application/warehouse/materials/materials.js<br/>requests · dataKeys · additionalMutations"] --> factory["application/createCrudApplication.js<br/>createCrudApplication"]
-    configurator --> request["services/warehouse/materialService.js"]
-    factory --> list["createApplicationList<br/>closure de consulta"]
-    factory --> mutation["createApplicationMutation<br/>closure de mutación"]
-    mutation --> response["utils/responseUtils.js<br/>createSuccessResponseFromRequest"]
-    page["pages/warehouse/materials/materialForm.js"] --> configurator
+    materials["materialGoodsReceiptController.js"] --> handlers["goodsReceiptHandlers.js<br/>handlers configurables"]
+    materials --> services["materialGoodsReceiptService.js<br/>fachada por contexto"]
+    consumables["consumableGoodsReceiptController.js"] --> handlers
+    consumables --> consumableServices["consumableGoodsReceiptService.js<br/>fachada por contexto"]
+    services --> core["goodsReceiptService.js<br/>núcleo transaccional"]
+    consumableServices --> core
 ```
 
-El mapa distingue el configurador, las factories, los closures y la adaptación de
-respuesta. La implementación tiene dos momentos: al evaluar el módulo se inyectan requests y se crean *closures* inmutables; al
-interactuar la página se usa una referencia de dominio que conserva esa configuración.
-El ejemplo se puede recorrer en
-[`createCrudApplication.js`](../../../../../src/public/js/application/createCrudApplication.js),
-[`materials.js`](../../../../../src/public/js/application/warehouse/materials/materials.js),
-[`materialService.js`](../../../../../src/public/js/services/warehouse/materialService.js) y
-[`materialForm.js`](../../../../../src/public/js/pages/warehouse/materials/materialForm.js). Los
-demás consumidores reutilizan la misma construcción con su propia tabla `requests`.
+Los controllers inyectan las funciones del contexto en handlers compartidos. Las
+fachadas fijan el tipo y delegan en el servicio común, conservando reglas y transacciones.
 
 ### Transacción, eventos y auditoría
 

@@ -1,6 +1,6 @@
 # Reglas generales del proyecto
 
-La aplicación existente vive en `back/`; el frontend Vue 3 con Vite vive en `front/`.
+La API Express vive en `back/`; el frontend Vue 3 con Vite vive en `front/`.
 Los comandos npm del frontend se ejecutan desde `front/`. Las rutas `src/`, `prisma/`, `scripts/`,
 `tests/`, `docs/` y los comandos npm de esta guía se interpretan desde `back/`.
 La automatización `.github/workflows/ci.yml`, Dockerfile y Docker Compose viven
@@ -20,13 +20,13 @@ en la raíz del repositorio.
 
 ## Arquitectura y responsabilidades
 
-- Mantén las rutas agrupadas por dominio en `src/routes/web` y `src/routes/api`; registra routers nuevos en el `index.js` correspondiente, no directamente en `src/app.js`.
+- Mantén las rutas agrupadas por dominio en `src/routes/system` y `src/routes/api`; registra routers nuevos en el `index.js` correspondiente, no directamente en `src/app.js`.
 - Los controllers traducen HTTP y delegan; los servicios concentran reglas de negocio y transacciones; los repositories encapsulan consultas reutilizables; los DTOs normalizan contratos y los validators validan entradas.
 - Los validadores del formulario comprueban los campos y metadatos enviados en `body`, y pasan por `validate` antes del controller. Los identificadores de ruta se pasan al servicio, que resuelve el registro, su pertenencia y su estado; no se mezclan `param()` ni comprobaciones de existencia en los validadores del formulario. Eliminaciones y cancelaciones sin datos de captura no requieren un validador vacío. Reutiliza la traducción compartida de errores de base de datos para un UUID mal formado.
 - Reutiliza `AppError`, los errores de dominio, los mensajes y las constantes existentes. No inventes formatos de respuesta o manejo de errores por endpoint.
 - En escrituras compuestas, usa una sola transacción y propaga `tx` a todas las operaciones relacionadas; no mezcles el cliente Prisma global con el transaccional.
 - Mantén autenticación y autorización en el servidor, evita registrar secretos o datos sensibles y usa el logger del proyecto en lugar de `console.log` en código de aplicación.
-- Trata `src/public` y `src/shared` servido en `/shared` como código público. Antes de compartir una regla, distingue su confidencialidad de su compatibilidad técnica: ser una función pura no permite publicar fórmulas propietarias, secretos ni políticas internas que deban permanecer privadas. Conserva esas reglas exclusivamente en el backend.
+- Trata `src/shared`, compilado por Vue, como código público. Antes de compartir una regla, distingue su confidencialidad de su compatibilidad técnica: ser una función pura no permite publicar fórmulas propietarias, secretos ni políticas internas que deban permanecer privadas. Conserva esas reglas exclusivamente en el backend.
 - Los cálculos del navegador son una vista previa. El backend valida las entradas, resuelve identidad, permisos y estado desde fuentes confiables, y calcula los valores derivados que persiste; no confía en totales, saldos, roles ni resultados calculados enviados por el cliente. Sigue el contrato del recurso para descartar o rechazar esos campos.
 
 ## Base de datos y migraciones
@@ -38,14 +38,12 @@ en la raíz del repositorio.
 - Las altas y entradas HTTP de merma conservan `operationId` en los reintentos; recibo, stock y documentos se confirman en una sola transacción. Deshabilitar submit no sustituye esa garantía.
 - No modifiques migraciones ya aplicadas para representar un cambio nuevo; agrega una migración incremental.
 
-## EJS
+## Frontend Vue
 
-- No elimines, muevas ni vuelvas a agregar innecesariamente la última línea de un archivo EJS.
-- Conserva exactamente el estado del fin de archivo de cada EJS: si originalmente no termina con salto de línea, no lo agregues; si lo tiene, no lo elimines. Compruébalo en el diff para evitar que la última línea aparezca eliminada y agregada sin un cambio real.
-- Conserva los cierres y llamadas a `contentFor`, salvo que la tarea requiera cambiarlos.
-- Modifica sólo la sección necesaria y revisa el inicio y el final de cada EJS modificado.
-- Reutiliza parciales de `src/views/shared` y módulos compartidos de `src/public/js` antes de duplicar markup, validaciones, requests o manipulación del DOM.
-- Al cambiar una interfaz visible, revisa también permisos, estados responsivos, selectores compartidos y la documentación o capturas del manual que describan ese flujo.
+- La interfaz vive exclusivamente en `front/`; consulta `front/AGENTS.md`.
+- Reutiliza componentes, composables y transporte existentes del cliente.
+- Los contratos públicos se mantienen en `back/src/shared` y se compilan con Vite.
+- Al cambiar una interfaz visible, revisa permisos, estados responsivos y su manual Vue.
 
 ## Pruebas
 
@@ -56,7 +54,7 @@ en la raíz del repositorio.
 - Conserva cobertura independiente cuando cambie el contrato observado, como cálculo puro, payload del formulario y persistencia. Concentra matrices extensas en unitarias y usa representantes en integración sin perder rechazos ni ausencia de efectos parciales.
 - Justifica retiros por regla obsoleta, duplicidad demostrada o bajo riesgo sin evidencia adicional; registra qué cobertura permanece y qué limitación se acepta. No retires migraciones históricas sólo porque el alta actual cambió.
 - Documenta selectivamente integraciones y reglas críticas con los formatos `DP-*` y `CP-*` del plan; actualiza la matriz funcional afectada. Guarda resultados `EP-*` en CI o en la revisión del cambio, sin duplicar cada `it` ni versionar resultados de corridas.
-- Prueba estados y datos relevantes del formulario; evita fijar HTML, clases CSS, llamadas privadas o delegaciones triviales. Los dobles de Select2/MDB no demuestran un recorrido de navegador.
+- Prueba estados y datos relevantes del formulario; evita fijar HTML, clases CSS, llamadas privadas o delegaciones triviales. Los dobles de componentes no demuestran un recorrido de navegador.
 - En CRUD, valida el comportamiento CRUD correspondiente y reutiliza *factories*, *fixtures*, *helpers* y *mocks* existentes.
 - Usa `npm run test:unit` para la suite sin base de datos y `npm run test:integration` para integración HTTP/Prisma; no uses `test:watch` en validaciones no interactivas.
 - Mide cobertura con `npm run test:coverage` y `npm run test:coverage:integration` cuando se necesite identificar brechas; conserva sus reportes separados y no deduzcas suficiencia de pruebas de un porcentaje. Los reportes se guardan como evidencia, no se versionan.
@@ -109,7 +107,7 @@ en la raíz del repositorio.
 
 1. Revisa el diff y descarta cambios accidentales.
 2. Comprueba imports, exports y referencias.
-3. Revisa las últimas líneas de los EJS modificados.
+3. Comprueba los estados y la interacción de los componentes Vue afectados.
 4. Ejecuta primero las pruebas específicas y después `npm run test:unit`; para cambios de persistencia o HTTP ejecuta también `npm run test:integration` con una base aislada.
 5. Ejecuta `npm run docs:check`; si falla por cambios intencionales en rutas, imports o Prisma, regenera con `npm run docs:architecture` y vuelve a comprobar.
 6. Confirma que documentación y patrones existentes permanecen sincronizados.

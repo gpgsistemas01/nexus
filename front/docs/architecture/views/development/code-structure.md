@@ -23,7 +23,9 @@ el recurso temporal. `requestExcel` valida el Blob; la sesión y errores siguen 
 `reportParams` comparte filtros, periodos, orden y eliminación de paginación.
 
 `ServerTable` activa la presentación móvil de Vuetify por debajo de `sm`: cada fila
-apila sus campos. `TableFrame` contiene los listados y las tablas de detalle conservan
+apila sus campos. Las columnas de acciones permanecen fijas a la derecha durante el desplazamiento
+horizontal. `TableAction` ofrece un área táctil de 2.75 rem por lado en móvil.
+`TableFrame` contiene los listados y las tablas de detalle conservan
 su desplazamiento horizontal para revisar y capturar partidas. `EditorDialog`
 aprovecha el ancho disponible y distribuye campos mediante la cuadrícula compartida.
 

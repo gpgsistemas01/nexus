@@ -4,8 +4,6 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
-import { prepareManualNarration, prepareManualSource } from './manualPublicationContent.js';
-import { MANUALS } from './manualPublicationConfig.js';
 import { bundleOpenApiContract } from './openApiContractUtils.js';
 import { getDocumentExportRequest, getDocumentOutputPlan } from './documentExportFormats.js';
 import { getFigureSizeAttribute, getPngDimensions } from './documentExportImageUtils.js';
@@ -15,7 +13,6 @@ import {
     mapMarkdownProse,
     externalDocumentAnchorFragment,
     externalDocumentLinkLabel,
-    prepareManualEntry,
     prepareSectionEntry
 } from './documentExportContentUtils.js';
 import { removeDocumentOutput } from './documentOutputUtils.js';
@@ -86,7 +83,7 @@ const frontendSectionParts = requestedPublication === 'arquitectura'
         ]))
     : {};
 const PUBLICATIONS = Object.freeze({
-    ...(requestedPublication === 'manual-vue' ? {
+    ...{
         'manual-vue': {
             directory: frontendManualProfile ? `manuales-vue/${frontendManualProfile}` : 'manuales-vue',
             parts: {
@@ -97,7 +94,7 @@ const PUBLICATIONS = Object.freeze({
                 })
             }
         }
-    } : {}),
+    },
     requisitos: {
         directory: 'requisitos',
         parts: {
@@ -133,7 +130,7 @@ const PUBLICATIONS = Object.freeze({
                 'docs/architecture/views/index.md',
                 'docs/architecture/views/scenarios/index.md',
                 'docs/requirements/domain-and-use-cases/02-current-use-cases.md',
-                ...getDirectoryDocuments('docs/architecture/views/scenarios/web-navigation-and-screen-catalog'),
+                '../front/docs/architecture/views/scenarios/index.md',
                 'docs/architecture/views/processes/index.md',
                 'docs/architecture/views/processes/01-end-to-end-interaction.md',
                 'docs/architecture/views/logical/index.md',
@@ -163,10 +160,7 @@ const PUBLICATIONS = Object.freeze({
                 'docs/architecture/views/development/code-structure/06-prisma-and-persistence.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/backend-technical-documentation')
             ]),
-            frontend: packagePart(ARCHITECTURE_ENTRY, [
-                'docs/architecture/views/development/index.md',
-                ...getDirectoryDocuments('docs/architecture/views/development/frontend-technical-documentation')
-            ]),
+            frontend: frontendCatalog.completeSources.map(frontendSource),
             'frontend-vue': frontendCatalog.completeSources.map(frontendSource),
             ...frontendSectionParts,
             'comportamiento-transversal': packagePart(ARCHITECTURE_ENTRY, [
@@ -182,7 +176,7 @@ const PUBLICATIONS = Object.freeze({
             estandar: packagePart(ARCHITECTURE_ENTRY, [
                 ...getDirectoryDocuments('docs/architecture/coding-standards')
             ]),
-            ...Object.fromEntries(sequenceGroups.flatMap((group) => ['backend', 'frontend'].map((side) => [
+            ...Object.fromEntries(sequenceGroups.flatMap((group) => ['backend'].map((side) => [
                 `secuencias-${side}-${group}`,
                 packagePart(ARCHITECTURE_ENTRY, getCollectionDocuments(
                     `docs/architecture/views/processes/${side}-code-sequences`,
@@ -210,8 +204,7 @@ const outputPlan = getDocumentOutputPlan(requestedFormat);
 const positionalArgumentCount = process.argv.slice(2)
     .filter((argument) => argument !== '--check' && argument !== '--check-sources').length;
 let pdfConverter = process.env.DOCS_PDF_CONVERTER;
-const manualNames = Object.keys(MANUALS);
-const publicationNames = [...manualNames, ...Object.keys(PUBLICATIONS)];
+const publicationNames = Object.keys(PUBLICATIONS);
 const selectablePublicationNames = ['manuales', ...Object.keys(PUBLICATIONS)];
 const mermaidBlock = /^```mermaid\r?\n([\s\S]*?)^```\r?$/gm;
 const externalLink = /^(?:https?:|mailto:)/;
@@ -377,7 +370,7 @@ const preparePublicationSource = (content, source, output) => {
     const titledContent = source === '../front/docs/index.md' && section
         ? prepareSectionEntry(content, `${section.title} del frontend Vue`)
         : content;
-    return prepareManualSource(titledContent, source, output);
+    return titledContent;
 };
 
 const selectedDefinition = PUBLICATIONS[requestedPublication];
@@ -396,9 +389,9 @@ if ((requestedPublication !== 'todos' && !selectablePublicationNames.includes(re
 
 const requestedPublications = requestedPublication === 'todos'
     ? publicationNames
-    : requestedPublication === 'manuales' ? manualNames : [requestedPublication];
+    : requestedPublication === 'manuales' ? ['manual-vue'] : [requestedPublication];
 const publicationParts = requestedPublications.flatMap((publication) => {
-    const definition = MANUALS[publication] ?? PUBLICATIONS[publication];
+    const definition = PUBLICATIONS[publication];
     const parts = requestedDocument
         ? [[requestedDocument, definition.parts[requestedDocument]]]
         : Object.entries(definition.parts);
@@ -552,9 +545,7 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
     const sourceContent = preparePublicationSource(
         await readFile(path.join(ROOT, source), 'utf8'), source, currentOutput
     );
-    const content = source.startsWith('docs/user-manual/actors/')
-        ? prepareManualEntry(sourceContent, currentOutput)
-        : sourceContent;
+    const content = sourceContent;
     const blocks = [...content.matchAll(mermaidBlock)];
     if (blocks.length && !mermaidPrepared) {
         try {
@@ -581,9 +572,6 @@ const prepareSource = async (source, publicationSources, firstFigureNumber, curr
         /(!\[[^\]]*\]\()([^) ]+)/g,
         (reference, prefix, image) => `${prefix}${path.resolve(ROOT, path.dirname(source), image)}`
     ));
-    if (currentOutput.startsWith(`manuales${path.sep}`)) {
-        renderedContent = prepareManualNarration(renderedContent);
-    }
     for (const match of blocks) {
         const diagram = normalizeMermaidSource(match[1]);
         const id = getMermaidImageId(diagram);

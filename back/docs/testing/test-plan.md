@@ -207,13 +207,12 @@ resultados sirven para identificar brechas y priorizarlas por el riesgo del mód
 
 | Suite | Comando | Alcance | Reporte HTML |
 | --- | --- | --- | --- |
-| Unitaria | `npm run test:coverage` | JavaScript de `src`, incluidos frontend y módulos compartidos. | `coverage/unit/index.html` |
-| Integración | `npm run test:coverage:integration` | JavaScript de `src` excepto `src/public`; incluye módulos compartidos usados por el servidor. | `coverage/integration/index.html` |
+| Unitaria | `npm run test:coverage` | JavaScript de `src`, incluidos contratos públicos compartidos. | `coverage/unit/index.html` |
+| Integración | `npm run test:coverage:integration` | JavaScript de `src`, incluidos módulos compartidos usados por el servidor. | `coverage/integration/index.html` |
 
 Ambas configuraciones incluyen archivos no ejecutados dentro de su alcance para no
-limitar el porcentaje a los módulos importados por las pruebas. La exclusión de
-`src/public` en integración corresponde a su contrato HTTP/Prisma: esa suite no ejecuta
-el navegador. Las plantillas EJS, SQL, el cliente Prisma generado y las herramientas de
+limitar el porcentaje a los módulos importados por las pruebas. La integración comprueba el contrato HTTP/Prisma y no ejecuta el navegador.
+SQL, el cliente Prisma generado y las herramientas de
 `scripts` no forman parte de estos porcentajes de aplicación; conservan las pruebas
 funcionales o auxiliares que correspondan.
 
