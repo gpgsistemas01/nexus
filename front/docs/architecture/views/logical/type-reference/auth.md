@@ -116,7 +116,7 @@ Partial<Record<LoginField, string>>
 
 ## LoginRequestError
 
-**Fuente:** [src/modules/auth/services/authService.ts](../../../../../src/modules/auth/services/authService.ts) · línea 8, columna 1. **Declaración:** class.
+**Fuente:** [src/modules/auth/services/authService.ts](../../../../../src/modules/auth/services/authService.ts) · línea 9, columna 1. **Declaración:** class.
 
 **Extensión/implementación:** `extends Error`.
 
@@ -132,7 +132,7 @@ Partial<Record<LoginField, string>>
 
 ## SessionUser
 
-**Fuente:** [src/modules/auth/session.ts](../../../../../src/modules/auth/session.ts) · línea 6, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/auth/session.ts](../../../../../src/modules/auth/session.ts) · línea 7, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -143,7 +143,7 @@ Partial<Record<LoginField, string>>
 
 ## AuthSession
 
-**Fuente:** [src/modules/auth/session.ts](../../../../../src/modules/auth/session.ts) · línea 58, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/auth/session.ts](../../../../../src/modules/auth/session.ts) · línea 59, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

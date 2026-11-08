@@ -6,6 +6,17 @@ El servicio prepara la solicitud y valida la respuesta; el mapper transforma el 
 modelo de tabla o formulario. `apiClient` transporta HTTP y recupera la sesión. Cada
 responsabilidad tiene un propietario.
 
+| Colaborador compartido | Responsabilidad |
+| --- | --- |
+| `API_PATHS` | Rutas de recursos y reportes. Las mismas direcciones sirven a listados, formularios y selectores. |
+| `pageParams`, `lookupParams`, `recordParams` | Paginación, búsqueda y orden; el servicio añade los filtros de su operación. |
+| `apiClient` | Única instancia Axios, timeout, cancelación, recuperación de conexión, renovación y normalización de errores. |
+| `requestPage`, `requestExcel` | Validar el sobre paginado o el archivo descargado antes de entregarlo al servicio. |
+
+Los métodos, payloads y mappers siguen en su dominio: una devolución y una edición
+de compra tienen contratos distintos. La API de Express/OpenAPI define esos contratos;
+el catálogo de rutas sólo localiza lo que consume Vue.
+
 ## Modelo general de adaptación de una lectura
 
 **Identificador:** `DIA-VUE-GEN-003`. **Pregunta:** ¿cómo convertir una respuesta

@@ -462,18 +462,44 @@ it.each(['almacen-auxiliar', 'almacen-coordinador'])(
 );
 
 it.each(['almacen-auxiliar', 'almacen-coordinador', 'impresion-operador'])(
-  'el índice de %s explica el alcance de consulta y registro en Salidas',
+  'el índice de %s explica el alcance de consulta en Salidas',
   async (id) => {
     const root = await manualRoot();
     const profile = DEMO_PROFILES.find((candidate) => candidate.id === id)!;
     const manifest = await prepareManual(root, { ...profile, mode: 'demo' }, demoSession(profile));
     const index = await readFile(path.join(manifest.root, 'sources/index.md'), 'utf8');
-    expect(index).toContain('Materiales, Consumibles y Mermas');
     expect(index).toContain(
       id.startsWith('almacen-')
-        ? 'puede consultar y registrar documentos para todas las áreas'
-        : 'sólo puede consultar y registrar solicitudes para las áreas asignadas',
+        ? 'Puede consultar las salidas de todas las áreas'
+        : 'Sólo puede consultar las salidas de las áreas asignadas',
     );
+  },
+);
+
+it.each(['goods:issues-page-view', 'waste:issues-page-view'])(
+  'una cuenta de sólo consulta %s no recibe instrucciones ni capturas para registrar o surtir',
+  async (permission) => {
+    const root = await manualRoot();
+    const manifest = await prepareManual(
+      root,
+      { id: 'consulta', label: 'Administración', mode: 'dev' },
+      { id: 'lector', permissions: [permission], accesses: [] },
+    );
+    const content = (
+      await Promise.all(
+        manifest.sources.map((file: string) =>
+          readFile(path.join(manifest.root, 'sources', file), 'utf8'),
+        ),
+      )
+    ).join('\n');
+    expect(manifest.sources).toContain('12-issues.md');
+    expect(content).toContain('Sólo puede consultar las salidas');
+    expect(content).not.toContain('puede consultar y registrar');
+    expect(content).not.toContain('## Registrar');
+    expect(content).not.toContain('## Surtir');
+    expect(manifest.images).not.toContain('23-issue-create.png');
+    expect(manifest.images).not.toContain('24-issue-supply.png');
+    expect(manifest.images).not.toContain('25-issue-return.png');
   },
 );
 
@@ -866,9 +892,10 @@ it('conserva los ejemplos sin datos al reanudar y no repite su búsqueda hasta -
 
 it('rechaza una referencia de imagen omitida que todavía está en las fuentes publicables', async () => {
   const { root, manifest } = await publicationWithoutExamples();
+  const source = path.join(manifest.root, 'sources/11-purchases.md');
   await writeFile(
-    path.join(manifest.root, 'sources/11-purchases.md'),
-    '![Ejemplo](../images/20c-purchase-canceled.png)\n',
+    source,
+    (await readFile(source, 'utf8')) + '\n![Ejemplo](../images/20c-purchase-canceled.png)\n',
   );
   await expect(loadManualPublication(root, 'lector')).rejects.toThrow('referencia sin captura');
 });
@@ -933,6 +960,54 @@ it('rechaza un capítulo anterior que ya no corresponde a los permisos del usuar
   await expect(loadManualPublication(root, 'lector')).rejects.toThrow(
     'El capítulo 08-users.md no corresponde al acceso',
   );
+});
+
+it.each(['omitido', 'repetido'])(
+  'rechaza un capítulo permitido %s en la publicación',
+  async (change) => {
+    const { root, manifest, captures } = await publicationWithoutExamples();
+    const sources =
+      change === 'omitido'
+        ? manifest.sources.filter((file: string) => file !== '11-purchases.md')
+        : [...manifest.sources, '11-purchases.md'];
+    await writeFile(
+      path.join(manifest.root, 'manifest.json'),
+      JSON.stringify({ ...manifest, status: 'ready', sources, captures }),
+    );
+    await expect(loadManualPublication(root, 'lector')).rejects.toThrow('selección de capítulos');
+  },
+);
+
+it.each(['omitida', 'repetida'])(
+  'rechaza una captura requerida %s aunque se retire también su referencia',
+  async (change) => {
+    const { root, manifest, captures } = await publicationWithoutExamples();
+    const image = '20-purchase-view.png';
+    const source = path.join(manifest.root, 'sources/11-purchases.md');
+    await writeFile(
+      source,
+      (await readFile(source, 'utf8')).replace(/^!.*20-purchase-view\.png.*$/gm, ''),
+    );
+    const images =
+      change === 'omitida'
+        ? manifest.images.filter((name: string) => name !== image)
+        : [...manifest.images, image];
+    await writeFile(
+      path.join(manifest.root, 'manifest.json'),
+      JSON.stringify({ ...manifest, status: 'ready', images, captures }),
+    );
+    await expect(loadManualPublication(root, 'lector')).rejects.toThrow('selección de capturas');
+  },
+);
+
+it('rechaza una captura completa que se retiró del contenido del manual', async () => {
+  const { root, manifest } = await publicationWithoutExamples();
+  const source = path.join(manifest.root, 'sources/11-purchases.md');
+  await writeFile(
+    source,
+    (await readFile(source, 'utf8')).replace(/^!.*20-purchase-view\.png.*$/gm, ''),
+  );
+  await expect(loadManualPublication(root, 'lector')).rejects.toThrow('falta en el contenido');
 });
 
 it('rechaza imágenes de acciones sin permiso aunque se agreguen al manifiesto', async () => {

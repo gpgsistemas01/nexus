@@ -6,6 +6,31 @@ Abra **Almacén → Materiales**. **Tabla de Existencias** muestra material, pro
 presentación, unidad y stock. Las columnas agrupadas distinguen dimensiones y conversión.
 Busque y filtre para localizar el registro correcto.
 
+<!-- manual:all materials:read materials:write inventory:costs-read -->
+## Importar materiales o consumibles desde Excel
+
+1. En el módulo correspondiente, pulse **Importar Excel** y elija **Crear registros** o **Actualizar datos**.
+2. Pulse **Descargar plantilla**. Para actualizar, use los filtros y la página de 100 registros que necesite.
+3. Complete el archivo sin cambiar hojas, encabezados, identificadores ni versiones.
+4. Seleccione el `.xlsx` y pulse **Validar archivo**. Revise cambios, cantidades y errores.
+5. Si hay errores, descárguelos, pulse **Descartar borrador**, corrija el original y vuelva a validarlo.
+6. Pulse **Confirmar importación** y espere el recibo. Use **Otro archivo** para continuar.
+
+En altas, el sistema genera los IDs. Para editar, descargue **Actualizar datos**,
+cambie los campos permitidos y vuelva a subir el archivo conservando IDs y versiones.
+Use archivos separados para altas y ediciones.
+
+Un duplicado o error bloquea **todo el archivo**: todavía no se guarda ninguna fila.
+**Descargar errores** indica cuáles corregir o retirar antes de volver a validar.
+
+Máximo: 100 filas y 2 MiB. Actualizar cambia nombre, mínimo, costo y activo; conserva
+existencias y medidas. Nombre y mínimo se comparten entre proveedores. Pieza exige
+enteros. Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo.
+Si se pierde la respuesta, vuelva a **Importar Excel** y pulse **Revisar y reintentar
+confirmación**. No suba otra alta para repetirla. El borrador vence en 24 h; el archivo
+de su equipo permanece bajo su control.
+<!-- manual:end -->
+
 ![Tabla de existencias de materiales con filtros y acciones.](images/03-materials-list.png)
 
 ![Vista de materiales adaptada a un teléfono.](images/03a-material-mobile.png)

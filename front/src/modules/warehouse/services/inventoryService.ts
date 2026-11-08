@@ -1,5 +1,6 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
 import { normalizeInventoryRow } from '../mappers/inventoryMapper.js';
@@ -17,7 +18,7 @@ import { isRecord } from '../../../shared/utils/isRecord.js';
 export const inventoryService = {
     async list(resource: InventoryResource, query: InventoryQuery, signal?: AbortSignal) {
         const page = await requestPage(
-            `/api/warehouse/${resource}?${inventoryParams(query)}`,
+            `${API_PATHS.inventory[resource]}?${inventoryParams(query)}`,
             signal,
         );
         return { ...page, data: page.data.map(normalizeInventoryRow) };
@@ -40,10 +41,9 @@ export const inventoryService = {
                   ? 'POST'
                   : 'PATCH';
         const result = await apiClient.request<{ code: string; material?: unknown }>(
-            `/api/warehouse/${resource}${suffix}`,
+            `${API_PATHS.inventory[resource]}${suffix}`,
             {
                 method,
-                headers: { 'Content-Type': 'application/json' },
                 ...(action !== 'delete' ? { data: payload } : {}),
                 signal,
             },

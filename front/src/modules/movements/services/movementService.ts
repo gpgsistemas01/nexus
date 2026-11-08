@@ -2,6 +2,8 @@ import { reportParams } from '../../../shared/report.js';
 import type { ReportScope } from '../../../shared/report.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
+import { lookupParams } from '../../../shared/http/pageParams.js';
 import { recordParams } from '../../../shared/http/recordParams.js';
 import { readText } from '../../../shared/http/recordContract.js';
 import { requestExcel } from '../../../shared/http/requestExcel.js';
@@ -60,7 +62,7 @@ const movementParams = (resource: MovementResource, query: MovementQuery) => {
 export const movementService = {
     async list(resource: MovementResource, query: MovementQuery, signal: AbortSignal) {
         const result = await requestPage(
-            `/api/admin/movements/${resource}?${movementParams(resource, query)}`,
+            `${API_PATHS.movements[resource]}?${movementParams(resource, query)}`,
             signal,
         );
         return { ...result, data: result.data.map(normalizeRow) };
@@ -72,7 +74,7 @@ export const movementService = {
         signal: AbortSignal,
     ) {
         const params = reportParams(movementParams(resource, query), report);
-        return requestExcel(`/api/admin/reports/movements/${resource}/excel?${params}`, signal);
+        return requestExcel(`${API_PATHS.reports.movements[resource]}?${params}`, signal);
     },
     async lookup(
         resource: MovementResource | 'suppliers',
@@ -81,14 +83,13 @@ export const movementService = {
         supplierId: string,
         signal: AbortSignal,
     ) {
-        const params = new URLSearchParams({
-            search,
-            start: String((page - 1) * 20),
-            length: '20',
-        });
+        const params = lookupParams({ search, page });
         if (resource !== 'suppliers') params.set('supplierId', supplierId);
 
-        const result = await requestPage(`/api/warehouse/${resource}?${params}`, signal);
+        const result = await requestPage(
+            `${resource === 'suppliers' ? API_PATHS.directory.suppliers : API_PATHS.inventory[resource]}?${params}`,
+            signal,
+        );
         return {
             ...result,
             data: result.data.map((row): LookupItem => {

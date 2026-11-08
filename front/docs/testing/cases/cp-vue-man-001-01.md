@@ -2,7 +2,7 @@
 
 ## Diseño y trazabilidad
 
-DP-VUE-MAN-001; riesgo de entregar instrucciones o imágenes de una función no
+DP-VUE-MAN-001 y DP-VUE-MAN-005; riesgo de entregar instrucciones o imágenes de una función no
 permitida, mezclar cuentas o registrar una operación para preparar una captura.
 Tabla de decisiones por área, rol, permiso de tarea, estado del documento y
 completitud de los artefactos. Es una prueba de la herramienta documental.
@@ -17,6 +17,8 @@ completitud de los artefactos. Es una prueba de la herramienta documental.
 
 [manualProfilesTest.ts](../../../tests/unit/tooling/manualProfilesTest.ts) comprueba
 selección, configuración, secretos locales y rechazo de publicaciones incompletas.
+Incluye capítulos/capturas omitidos o duplicados, imágenes completas retiradas del
+contenido y cuentas de sólo consulta: el índice y sus imágenes conservan ese alcance.
 La exportación también rechaza capítulos fuera del acceso e imágenes ajenas a la
 selección o carpeta del perfil. Una captura ausente o modificada exige verificarla
 con la misma cuenta, aunque otro perfil tenga un PNG con ese nombre.

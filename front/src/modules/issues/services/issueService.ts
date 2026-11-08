@@ -1,5 +1,6 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { recordParams } from '../../../shared/http/recordParams.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
@@ -8,11 +9,6 @@ import { reportParams } from '../../../shared/report.js';
 import type { ReportScope } from '../../../shared/report.js';
 import type { IssueResource, IssueQuery, IssueWriteTarget } from '../issue.js';
 import { normalizeIssueDocument, normalizeIssueRow } from '../mappers/issueResponseMapper.js';
-
-const getIssueEndpoint = (resource: IssueResource) =>
-    resource === 'wastes'
-        ? '/api/warehouse/waste-issues'
-        : `/api/warehouse/goods-issues/${resource}`;
 
 const buildIssueQueryParams = (query: IssueQuery) => {
     const params = recordParams(query);
@@ -42,14 +38,14 @@ const ISSUE_SUCCESS_CODES = {
 export const issueService = {
     async list(resource: IssueResource, query: IssueQuery, signal: AbortSignal) {
         const result = await requestPage(
-            `${getIssueEndpoint(resource)}?${buildIssueQueryParams(query)}`,
+            `${API_PATHS.issues[resource]}?${buildIssueQueryParams(query)}`,
             signal,
         );
         return { ...result, data: result.data.map((row) => normalizeIssueRow(row, resource)) };
     },
     async get(resource: IssueResource, id: string, signal: AbortSignal) {
         const result = await apiClient.request<Record<string, unknown>>(
-            `${getIssueEndpoint(resource)}/${encodeURIComponent(id)}`,
+            `${API_PATHS.issues[resource]}/${encodeURIComponent(id)}`,
             { signal },
         );
         const document = normalizeIssueDocument(
@@ -73,7 +69,7 @@ export const issueService = {
         const section =
             target.mode === 'header' ? '/header' : target.mode === 'supply' ? '/details' : '';
         const response = await apiClient.request(
-            `${getIssueEndpoint(resource)}${documentPath}${section}`,
+            `${API_PATHS.issues[resource]}${documentPath}${section}`,
             { method: isCreating ? 'POST' : 'PATCH', data: payload, signal },
         );
         return confirmMutation(
@@ -92,7 +88,7 @@ export const issueService = {
     }) {
         const { resource, documentId, detailId, payload, signal } = options;
         const response = await apiClient.request(
-            `${getIssueEndpoint(resource)}/${encodeURIComponent(documentId)}/details/${encodeURIComponent(detailId)}/returns`,
+            `${API_PATHS.issues[resource]}/${encodeURIComponent(documentId)}/details/${encodeURIComponent(detailId)}/returns`,
             { method: 'PATCH', data: payload, signal },
         );
         return confirmMutation(
@@ -102,7 +98,6 @@ export const issueService = {
     },
     export(resource: IssueResource, query: IssueQuery, scope: ReportScope, signal: AbortSignal) {
         const params = reportParams(buildIssueQueryParams(query), scope);
-        const path = resource === 'wastes' ? 'waste-issues' : `goods-issues/${resource}`;
-        return requestExcel(`/api/warehouse/reports/${path}/excel?${params}`, signal);
+        return requestExcel(`${API_PATHS.reports.issues[resource]}?${params}`, signal);
     },
 };

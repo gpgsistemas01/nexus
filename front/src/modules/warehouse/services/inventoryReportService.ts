@@ -1,4 +1,5 @@
 import { requestExcel } from '../../../shared/http/requestExcel.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { inventoryParams } from './inventoryPageRequest.js';
 import type { InventoryQuery, InventoryResource } from '../inventory.js';
 
@@ -14,9 +15,6 @@ export const inventoryReportService = {
         if (resource !== 'wastes')
             params.set('type', resource === 'consumables' ? 'CONSUMABLE' : 'MATERIAL');
 
-        return requestExcel(
-            `/api/warehouse/reports/${resource === 'wastes' ? 'wastes' : 'inventory'}/excel?${params}`,
-            signal,
-        );
+        return requestExcel(`${API_PATHS.reports.inventory[resource]}?${params}`, signal);
     },
 };

@@ -230,6 +230,21 @@
     },
     "/api/admin/reports/movements/consumables/excel": {
       "$ref": "./paths/admin.json#/~1api~1admin~1reports~1movements~1consumables~1excel"
+    },
+    "/api/warehouse/inventory-imports/{resource}/template": {
+      "$ref": "./paths/inventory-imports.json#/~1api~1warehouse~1inventory-imports~1{resource}~1template"
+    },
+    "/api/warehouse/inventory-imports/{resource}/preview": {
+      "$ref": "./paths/inventory-imports.json#/~1api~1warehouse~1inventory-imports~1{resource}~1preview"
+    },
+    "/api/warehouse/inventory-imports/{id}/confirm": {
+      "$ref": "./paths/inventory-imports.json#/~1api~1warehouse~1inventory-imports~1{id}~1confirm"
+    },
+    "/api/warehouse/inventory-imports/{id}": {
+      "$ref": "./paths/inventory-imports.json#/~1api~1warehouse~1inventory-imports~1{id}"
+    },
+    "/api/warehouse/inventory-imports/{id}/errors/excel": {
+      "$ref": "./paths/inventory-imports.json#/~1api~1warehouse~1inventory-imports~1{id}~1errors~1excel"
     }
   },
   "components": {
@@ -494,6 +509,24 @@
       },
       "GoodsReceiptMaterialCreateRequest": {
         "$ref": "./components/warehouse-schemas.json#/GoodsReceiptMaterialCreateRequest"
+      },
+      "InventoryImportSummary": {
+        "$ref": "./components/inventory-import-schemas.json#/InventoryImportSummary"
+      },
+      "InventoryImportRow": {
+        "$ref": "./components/inventory-import-schemas.json#/InventoryImportRow"
+      },
+      "InventoryImportData": {
+        "$ref": "./components/inventory-import-schemas.json#/InventoryImportData"
+      },
+      "InventoryImportBatch": {
+        "$ref": "./components/inventory-import-schemas.json#/InventoryImportBatch"
+      },
+      "InventoryImportResponse": {
+        "$ref": "./components/inventory-import-schemas.json#/InventoryImportResponse"
+      },
+      "InventoryImportConfirmRequest": {
+        "$ref": "./components/inventory-import-schemas.json#/InventoryImportConfirmRequest"
       }
     },
     "parameters": {
@@ -650,6 +683,10 @@
     {
       "name": "Movimientos",
       "description": "Operaciones de movimientos."
+    },
+    {
+      "name": "Importaciones de inventario",
+      "description": "Plantillas, validaci\u00f3n, confirmaci\u00f3n at\u00f3mica y recuperaci\u00f3n de lotes XLSX de Almac\u00e9n."
     }
   ]
 }

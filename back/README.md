@@ -60,7 +60,7 @@ que aún no tienen un flujo accesible completo.
 - **Tiempo real:** Socket.IO.
 - **Logs:** Pino y Pino HTTP.
 - **Pruebas:** Vitest y Supertest.
-- **Utilidades:** bcrypt, jsonwebtoken, cookie-parser y ExcelJS.
+- **Utilidades:** bcrypt, jsonwebtoken, cookie-parser y SheetKit.
 
 ## Arquitectura del proyecto
 
@@ -117,7 +117,7 @@ forma curada. CI comprueba que el contenido generado esté actualizado.
 
 ## Requisitos
 
-- Node.js `^22.13.0 || ^24.14.1 || ^26.12.1`; Node 26 se comprueba en CI junto con Node 24.
+- Node.js `^24.14.1 || ^26.12.1`; se recomienda Node 24 LTS. CI comprueba 24 y 26.
 - npm.
 - PostgreSQL disponible para desarrollo y, opcionalmente, otra base aislada para pruebas.
 
@@ -163,17 +163,15 @@ Las vistas se leen de nuevo en desarrollo sin reinicio. Después de generar el
 cliente Prisma con `npm run db:generate`, reinicia la API. La versión de Nodemon
 queda fijada en el manifiesto y el lockfile.
 
-ExcelJS conserva su última versión estable oficial, 4.4.0. Un override limitado a
-`exceljs → uuid@11` evita la versión vulnerable 8 manteniendo la API CommonJS `v4`
-que consume ExcelJS. Las pruebas de reportes comprueban las descargas y fórmulas.
-No se aplica un override global de UUID ni `npm audit fix --force`.
+SheetKit `@sheetkit/node@1.0.1` genera y lee los XLSX en producción; requiere
+Node 24 y un binario nativo para la plataforma. Conserva las dependencias
+opcionales al instalar. La [decisión del motor Excel](docs/architecture/views/development/excel-library-decision.md)
+explica alternativas, límites y criterios de actualización.
 
-El lector SheetJS `xlsx@0.18.5` se retira de las pruebas. `read-excel-file` verifica
-los valores guardados con un lector independiente; ExcelJS permite inspeccionar
-las fórmulas. Se mantienen las comprobaciones de ceros, decimales, filas, orden,
-concurrencia y ausencia de cambios en BD. ExcelJS aún puede traer paquetes con
-avisos de obsolescencia: actualizar las dependencias directas y pasar `npm audit`
-no implica que todas sus dependencias transitivas estén mantenidas.
+ExcelJS 4.4.0 queda sólo en desarrollo para producir archivos anteriores e
+inspeccionar fórmulas y estilos; `read-excel-file` contrasta los valores con otro
+lector. El override `exceljs → uuid@11` se limita a esa dependencia de pruebas.
+Las descargas comprueban ceros, decimales, orden, concurrencia y limpieza temporal.
 
 Vitest 5 limpia mocks por defecto. La configuración unitaria fija `clearMocks: false`
 para conservar las llamadas observadas durante el registro de rutas; las suites
@@ -186,10 +184,12 @@ actualiza `node_modules` ni genera el cliente Prisma.
 
 ### Avisos al actualizar Node y npm
 
-`EBADENGINE` con `package: nexus@1.0.0` y `required: >=22 <25` indica que la copia
-local conserva el contrato anterior a Node 26. La configuración actual admite
-Node 26 desde 26.12.1; sincroniza `package.json` y `package-lock.json` con la rama
-actualizada. El rango declarado no instala Node ni cambia la imagen Docker.
+El backend requiere Node 24 desde 24.14.1 o Node 26 desde 26.12.1. Node 22 ya no
+cumple el contrato de SheetKit. Instala Node 24 LTS, abre una terminal nueva y
+comprueba `node -v` antes de ejecutar `npm ci`. Instalar Node sólo actualiza el
+equipo; `npm ci` instala paquetes, y Docker/Render usan su propia configuración.
+La imagen del backend usa Node 24. En Render con runtime Node, revisa también
+`NODE_VERSION`, según la [guía de despliegue](docs/architecture/views/physical/01-system-runtime-and-deployment.md).
 
 npm 11.20 puede avisar de scripts de instalación aún no registrados en
 `allowScripts`. El proyecto revisó y registró únicamente `bcrypt@6.0.0` (preparación
@@ -306,6 +306,10 @@ reúne API, Vue, base de datos, pruebas, capturas y publicación desde la raíz.
 | `npm run docs:screenshots -- --area <almacen\|sistemas>` | Comprueba o inicia Nexus, genera en Chromium las capturas del área y detiene la instancia temporal al terminar. |
 
 ## Publicación de documentos y capturas
+
+Los manuales por cuenta de **Vue** se generan desde `front/`; consulte sus
+[comandos](../front/docs/development/00-commands.md#capturas-y-manuales-por-cuenta).
+Los comandos de capturas de este backend corresponden a la interfaz EJS.
 
 Estos procesos no forman parte del arranque normal de Nexus y requieren herramientas distintas:
 

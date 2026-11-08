@@ -1,5 +1,30 @@
 # Registro selectivo de casos de prueba automatizados
 
+## Importación de inventario
+
+| Diseño | Requisito / riesgo | Nivel y técnica | Condición observable | Casos |
+| --- | --- | --- | --- | --- |
+| `DP-IMP-001` | `RF-IMP-001/003`: archivo, acceso y retención | Unitario e integración HTTP/Prisma; fronteras 100/101 filas y 2 MiB, particiones recurso/modo/permiso, transiciones DRAFT → CANCELED/EXPIRED | Autorizar antes del parser; rechazar contenido incompatible; informar filas sin cambiar stock; limpiar JSON al descartar/vencer y conservar recibos. | `CP-INT-IMP-001`, `inventoryWorkbookTest.js` |
+| `DP-IMP-002` | `RF-IMP-002`: escritura parcial, versiones y duplicación | Integración; decisiones alta/edición/sin cambios, versiones vigente/vieja y transiciones confirmación/repetición/carrera/fallo | Stock, conversiones, historia y folios coinciden con formularios. Datos compartidos se escriben una vez. Conflicto no aplica filas; misma clave devuelve recibo. Fallo del recibo revierte todo. Otra importación ocupada responde 429. | `CP-INT-IMP-002` |
+| `DP-IMP-003` | `RF-IMP-001/002`: confundir alta con edición o aplicar sólo parte de un archivo repetido | Integración HTTP/Prisma; particiones por recurso y duplicado interno/existente, transiciones descarga → edición → carga y validación → alta rival → conflicto | IDs nuevos generados por servidor; ID de referencia elegido del catálogo. Descargar y renombrar conserva el ID del destino. Edición sin ID se rechaza. Un duplicado, aun posterior a validar, bloquea todas las filas y conserva stock, historia, folios y recibos previos. | `CP-INT-IMP-003` |
+
+| Caso | Precondiciones y datos | Acción | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- |
+| `CP-INT-IMP-001` | PostgreSQL aislado, cuenta administradora y cuenta sin permisos; proveedores/catálogos privados. Libro de una fila y variantes PIEZA=1.5, 2 MiB+1 y multipart con campo extra. | Consultar/cargar sin permiso, validar sin confirmar, descargar errores y descartar/vencer borradores. | 401/403 antes de analizar, 404 a lote ajeno; 413 por tamaño. Captura inválida no crea artículos. Descarte/limpieza elimina JSON temporal y conserva recibos. | Cerrar requests y limpiar sólo IDs propios. |
+| `CP-INT-IMP-002` | Material 2×3 y dos proveedores con stock inicial 2 y 3; Rollo 2×10, cono 1, total 5 y referencia 11 kg. | Confirmar altas/actualizaciones, repetir clave y competir; editar después de validar; inyectar fallo del recibo. | Un material compartido, conversiones 12/18 y dos ajustes; Rollo 2×4, neto 4 kg, cantidad 2 y conversión 16. Reintento no duplica. Versiones viejas y otra clave producen 409; bloqueo global produce 429. Fallo tardío conserva DRAFT y revierte artículos, stock, historia y contador. | Retirar trigger de fallo en finally y limpiar datos propios. |
+| `CP-INT-IMP-003` | Fixture privada de cada recurso: dos filas válidas y una repetida con otra cantidad inicial; variante con una fila nueva y otra ya registrada. Plantillas reales de actualización y referencia de merma. | Validar/confirmar duplicados; crear un rival tras validar; descargar, editar nombre y subir; omitir ID de edición o elegir referencia del catálogo. | Repetidos: 400 sin cambiar registros, stock, historia, folios ni recibos; se indica la primera fila coincidente. Rival tardío: 409 y ninguna fila aplicada. Editar conserva ID y saldo; faltar ID no crea un alta. La referencia elegida del catálogo genera una merma con ID nuevo. | Hooks del archivo limpian sólo IDs propios en PostgreSQL aislado. |
+
+Fuente: [integración HTTP/Prisma](../../tests/integration/controllers/inventoryImportControllerDbTest.js)
+y [fronteras XLSX](../../tests/unit/services/warehouse/inventoryWorkbookTest.js).
+`DP-IMP-001` incluye el informe de una sola hoja con sus cuatro columnas y valores
+coincidentes con la vista previa. Un nombre iniciado en `=` permanece como texto;
+el informe no se acepta como plantilla de carga. Descargarlo conserva el borrador.
+También contrasta las seis plantillas de SheetKit con el lector anterior: estilos,
+listas, encabezado inmóvil y nueva carga después de editar. Rechaza fechas,
+errores, fórmulas, texto enriquecido y coordenadas fuera del rango permitido.
+La [medición](backend-performance.md#importación-de-inventario) añade carga de seis
+lotes de 100 filas, sin sustituir los oráculos de persistencia.
+
 Ejecuta los comandos npm desde `back/`. Las rutas de pruebas y evidencias de
 esta guía son relativas a esa carpeta.
 
@@ -32,7 +57,7 @@ todas las integraciones.
 
 | Suite | Ambiente | Comando |
 | --- | --- | --- |
-| Unitaria | Node.js 22, 24 o 26 según `engines`, y Vitest, sin base de datos real; dependencias externas simuladas cuando corresponde. CI comprueba Node 24 y 26. | `npm run test:unit` |
+| Unitaria | Node.js 24 o 26 según `engines`, y Vitest, sin base de datos real; dependencias externas simuladas cuando corresponde. CI comprueba ambas versiones. | `npm run test:unit` |
 | Integración | `NODE_ENV=test`, PostgreSQL aislado en `DATABASE_TEST_URL`, migraciones aplicadas y ejecución serial. La URL debe ser distinta de `DATABASE_URL`. | `npm run test:integration` |
 
 Los resultados de cada ejecución se conservan en CI o en la solicitud de cambio. La

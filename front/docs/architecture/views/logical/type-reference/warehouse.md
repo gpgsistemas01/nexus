@@ -118,6 +118,61 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `retry` | `retry: [];` |
 | `create` | `create: [search: string];` |
 
+## InventoryImportDialog.defineProps
+
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 16, columna 27. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `resource` | `resource: InventoryResource;` |
+| `mode` | `mode: InventoryImportMode;` |
+| `batch` | `batch: InventoryImportBatch \| null;` |
+| `file` | `file: File \| null;` |
+| `isWorking` | `isWorking: boolean;` |
+| `isDownloading` | `isDownloading: boolean;` |
+| `canConfirm` | `canConfirm: boolean;` |
+| `recoveryRequired` | `recoveryRequired: boolean;` |
+| `error` | `error: string;` |
+| `downloadError` | `downloadError: string;` |
+| `suppliers` | `suppliers: LookupState;` |
+| `supplierId` | `supplierId: string;` |
+| `search` | `search: string;` |
+| `templatePage` | `templatePage: number;` |
+| `canReadSuppliers` | `canReadSuppliers: boolean;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
+| dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
+| association | [InventoryImportBatch](../../../../../src/modules/warehouse/inventoryImport.ts) | `batch` |
+| association | [LookupState](../../../../../src/shared/lookup.ts) | `suppliers` |
+
+## InventoryImportDialog.defineEmits
+
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 33, columna 26. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `mode` | `mode: [value: InventoryImportMode];` |
+| `file` | `file: [value: File \| null];` |
+| `prepare` | `prepare: [];` |
+| `confirm` | `confirm: [];` |
+| `recover` | `recover: [];` |
+| `discard` | `discard: [];` |
+| `close` | `close: [];` |
+| `template` | `template: [];` |
+| `errors` | `errors: [];` |
+| `supplier` | `supplier: [value: string];` |
+| `search` | `search: [value: string];` |
+| `templatePage` | `templatePage: [value: number];` |
+| `searchSuppliers` | `searchSuppliers: [value: string];` |
+| `moreSuppliers` | `moreSuppliers: [];` |
+| `retrySuppliers` | `retrySuppliers: [];` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
+
 ## InventoryRowActions.defineProps
 
 **Fuente:** [src/modules/warehouse/components/InventoryRowActions.vue](../../../../../src/modules/warehouse/components/InventoryRowActions.vue) · línea 5, columna 13. **Declaración:** SFC contract.
@@ -420,6 +475,94 @@ keyof InventoryValues
 Record<string, string | number | boolean | null>
 ```
 
+## InventoryImportMode
+
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 3, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+'create' | 'update'
+```
+
+## ImportValue
+
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 4, columna 1. **Declaración:** type.
+
+**Definición completa:**
+
+```typescript
+string | number | boolean | null
+```
+
+## InventoryImportRow
+
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 5, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `row` | `row: number;` |
+| `id` | `id: string \| null;` |
+| `name` | `name: string;` |
+| `action` | `action: 'create' \| 'update' \| 'unchanged' \| 'error';` |
+| `before` | `before: Record<string, ImportValue> \| null;` |
+| `after` | `after: Record<string, ImportValue> \| null;` |
+| `details` | `details: Record<string, ImportValue>;` |
+| `errors` | `errors: { column: string; message: string; code: string }[];` |
+| `warnings` | `warnings: string[];` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [ImportValue](../../../../../src/modules/warehouse/inventoryImport.ts) | `before` |
+| dependency | [ImportValue](../../../../../src/modules/warehouse/inventoryImport.ts) | `after` |
+| dependency | [ImportValue](../../../../../src/modules/warehouse/inventoryImport.ts) | `details` |
+
+## InventoryImportPreview
+
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 16, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `summary` | `summary: { total: number; creates: number; updates: number; unchanged: number; errors: number };` |
+| `rows` | `rows: InventoryImportRow[];` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| association | [InventoryImportRow](../../../../../src/modules/warehouse/inventoryImport.ts) | `rows` |
+
+## InventoryImportBatch
+
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 20, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `id` | `id: string;` |
+| `version` | `version: number;` |
+| `resource` | `resource: InventoryResource;` |
+| `mode` | `mode: InventoryImportMode;` |
+| `status` | `status: 'DRAFT' \| 'COMPLETED' \| 'CANCELED' \| 'EXPIRED';` |
+| `filename` | `filename: string;` |
+| `expiresAt` | `expiresAt: string;` |
+| `preview` | `preview: InventoryImportPreview \| null;` |
+| `result` | `result: InventoryImportPreview \| null;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
+| dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
+| association | [InventoryImportPreview](../../../../../src/modules/warehouse/inventoryImport.ts) | `preview` |
+| association | [InventoryImportPreview](../../../../../src/modules/warehouse/inventoryImport.ts) | `result` |
+
+## PendingInventoryImport
+
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 31, columna 1. **Declaración:** interface.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `id` | `id: string;` |
+| `expectedVersion` | `expectedVersion: number;` |
+| `operationId` | `operationId: string;` |
+
 ## InventoryEditorPage.defineProps
 
 **Fuente:** [src/modules/warehouse/pages/InventoryEditorPage.vue](../../../../../src/modules/warehouse/pages/InventoryEditorPage.vue) · línea 10, columna 27. **Declaración:** SFC contract.
@@ -459,6 +602,32 @@ Record<string, string | number | boolean | null>
 | dependency | [StockAdditionTarget](../../../../../src/modules/warehouse/inventory.ts) | `addStock` |
 | dependency | [LookupCreation](../../../../../src/shared/lookup.ts) | `createSupplier` |
 
+## InventoryImportPage.defineProps
+
+**Fuente:** [src/modules/warehouse/pages/InventoryImportPage.vue](../../../../../src/modules/warehouse/pages/InventoryImportPage.vue) · línea 8, columna 27. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `resource` | `resource: InventoryResource;` |
+| `userId` | `userId: string;` |
+| `canReadSuppliers` | `canReadSuppliers: boolean;` |
+| `initialSupplierId` | `initialSupplierId: string;` |
+| `initialSearch` | `initialSearch: string;` |
+
+| Relación | Destino | Origen de la referencia |
+| --- | --- | --- |
+| dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
+
+## InventoryImportPage.defineEmits
+
+**Fuente:** [src/modules/warehouse/pages/InventoryImportPage.vue](../../../../../src/modules/warehouse/pages/InventoryImportPage.vue) · línea 15, columna 26. **Declaración:** SFC contract.
+
+| Miembro | Firma completa |
+| --- | --- |
+| `close` | `close: [];` |
+| `saved` | `saved: [];` |
+| `unauthorized` | `unauthorized: []` |
+
 ## InventoryPage.defineProps
 
 **Fuente:** [src/modules/warehouse/pages/InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue) · línea 18, columna 27. **Declaración:** SFC contract.
@@ -473,7 +642,7 @@ Record<string, string | number | boolean | null>
 
 ## InventoryPage.defineEmits
 
-**Fuente:** [src/modules/warehouse/pages/InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue) · línea 19, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/pages/InventoryPage.vue](../../../../../src/modules/warehouse/pages/InventoryPage.vue) · línea 20, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -485,15 +654,16 @@ Record<string, string | number | boolean | null>
 
 ## InventoryLookupRequest
 
-**Fuente:** [src/modules/warehouse/services/inventoryCatalogService.ts](../../../../../src/modules/warehouse/services/inventoryCatalogService.ts) · línea 6, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/services/inventoryCatalogService.ts](../../../../../src/modules/warehouse/services/inventoryCatalogService.ts) · línea 9, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupQuery`.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `path` | `path: string;` |
+| `path` | `path: InventoryCatalogPath;` |
 | `supplierId` | `supplierId?: string;` |
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
 | inheritance | [LookupQuery](../../../../../src/shared/lookup.ts) | `extends` |
+| dependency | [InventoryCatalogPath](../../../../../src/shared/http/apiPaths.ts) | `path` |

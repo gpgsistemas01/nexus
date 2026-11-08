@@ -5,6 +5,14 @@ import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from '../../../shared/me
 import { PIECE_QUANTITY_MESSAGE } from '../../../shared/inventory/pieceQuantity.js';
 
 export const errorMessages = {
+    INVENTORY_IMPORT_FILE: 'Utiliza una plantilla XLSX válida del módulo y operación seleccionados, sin fórmulas ni macros.',
+    INVENTORY_IMPORT_LIMIT: 'El archivo admite hasta 100 filas, 2 MiB y celdas de 600 caracteres. Divide la carga si supera los límites.',
+    INVENTORY_IMPORT_BUSY: 'Se está procesando otra importación. Espera un momento y vuelve a intentar.',
+    INVENTORY_IMPORT_VALIDATION: 'Corrige las filas señaladas antes de confirmar la importación.',
+    INVENTORY_IMPORT_EXPIRED: 'La vista previa venció. Vuelve a cargar el archivo para validarlo.',
+    INVENTORY_IMPORT_NOT_FOUND: 'La importación no existe o no pertenece a tu cuenta.',
+    INVENTORY_IMPORT_STATE: 'La importación ya no está pendiente de confirmación.',
+    INVENTORY_IMPORT_CONFLICT: 'Los datos cambiaron o la clave corresponde a otra confirmación. Revisa el resultado y valida una nueva plantilla.',
     INVENTORY_PIECE_QUANTITY_REQUIRED: PIECE_QUANTITY_MESSAGE,
     ISSUE_SUPPLY_QUANTITY_CONFLICT: 'La cantidad a surtir debe ser positiva y no superar el saldo pendiente del detalle.',
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',

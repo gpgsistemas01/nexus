@@ -23,7 +23,7 @@ export default defineConfig({
     },
     webServer: [
         {
-            command: 'node src/app.js',
+            command: 'node src/server.js',
             cwd: '../back',
             url: 'http://127.0.0.1:3107/inicio-sesion',
             env: { PORT: '3107', NODE_ENV: 'test' },

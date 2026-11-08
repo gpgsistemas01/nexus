@@ -22,6 +22,7 @@ los resultados de la API. Los campos y efectos por acción están en los
 | RF-VUE-012 | El cliente debe permitir registrar opciones desde los selectores autorizados y volver al formulario de origen. | Debe admitir proveedor desde Materiales, Consumibles o Compras; artículo desde Compras; y cliente desde Salidas. Debe precargar el texto y seleccionar sólo el registro confirmado, conservando la captura principal. |
 | RF-VUE-013 | El cliente debe permitir exportar reportes con el alcance elegido. | Debe enviar los filtros admitidos por el reporte o el mes cuando esa opción exista, omitiendo paginación. Un fallo debe permitir reintentar; una respuesta inválida no debe anunciarse como Excel válido. |
 | RF-VUE-014 | El cliente debe permitir cerrar la sesión mediante el servidor y volver al login. | Tras confirmar el cierre, debe dejar de presentar los módulos protegidos. Las cookies y la revocación deben seguir el contrato del servidor. |
+| RF-VUE-015 | El cliente debe permitir importar altas y actualizaciones de inventario por XLSX con lectura, escritura y lectura de costos. | Debe descargar la plantilla, enviar un único archivo de hasta 2 MiB y 100 filas, mostrar errores y cambios paginados y confirmar sólo un borrador válido. La actualización conserva IDs/versiones y no modifica stock. Ante una respuesta incierta debe recuperar el mismo lote/clave; el navegador sólo conserva esa referencia, separada por cuenta y recurso. |
 
 ## Requisitos de datos
 

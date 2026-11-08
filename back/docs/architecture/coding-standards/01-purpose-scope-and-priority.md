@@ -21,8 +21,8 @@ Si dos reglas parecen competir, se aplica esta prioridad:
 
 ## Entorno y aplicación
 
-- Usar Node.js 22–24 y módulos ES, conforme a `package.json`; CI usa Node.js 24 y la
-  imagen de producción Node.js 22. Verificar la compatibilidad al añadir una API.
+- Usar Node.js 24 o 26 y módulos ES, conforme a `package.json`; CI comprueba ambas
+  versiones y la imagen de producción usa Node.js 24. Verificar la compatibilidad al añadir una API.
 - Instalar desde `package-lock.json` con `npm ci`. Una dependencia nueva actualiza
   manifiesto y lockfile en el mismo cambio y debe resolver una necesidad concreta.
 - Los archivos generados, dependencias y salidas de exportación se mantienen mediante

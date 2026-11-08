@@ -1,5 +1,6 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
 import { recordParams } from '../../../shared/http/recordParams.js';
 import { confirmMutation } from '../../../shared/http/recordContract.js';
@@ -17,9 +18,6 @@ import type {
     PurchaseDetailChange,
 } from '../purchase.js';
 
-const getPurchaseEndpoint = (resource: PurchaseResource) =>
-    `/api/warehouse/goods-receipts/${resource}`;
-
 const buildPurchaseQueryParams = (query: PurchaseQuery) => {
     const params = recordParams(query);
     for (const key of ['supplierId', 'personId', 'startDate', 'endDate'] as const)
@@ -30,14 +28,14 @@ const buildPurchaseQueryParams = (query: PurchaseQuery) => {
 export const purchaseService = {
     async list(resource: PurchaseResource, query: PurchaseQuery, signal: AbortSignal) {
         const result = await requestPage(
-            `${getPurchaseEndpoint(resource)}?${buildPurchaseQueryParams(query)}`,
+            `${API_PATHS.purchases[resource]}?${buildPurchaseQueryParams(query)}`,
             signal,
         );
         return { ...result, data: result.data.map((row) => normalizePurchaseRow(row, resource)) };
     },
     async get(resource: PurchaseResource, id: string, signal: AbortSignal) {
         const result = await apiClient.request<{ goodsReceipt: unknown }>(
-            `${getPurchaseEndpoint(resource)}/${encodeURIComponent(id)}`,
+            `${API_PATHS.purchases[resource]}/${encodeURIComponent(id)}`,
             { signal },
         );
         const document = normalizePurchaseDocument(result.goodsReceipt, resource);
@@ -56,7 +54,7 @@ export const purchaseService = {
         const documentPath =
             target.action === 'edit' ? `/${encodeURIComponent(target.document.id)}` : '';
         const response = await apiClient.request(
-            `${getPurchaseEndpoint(resource)}${documentPath}`,
+            `${API_PATHS.purchases[resource]}${documentPath}`,
             { method: target.action === 'edit' ? 'PATCH' : 'POST', data: payload, signal },
         );
         return confirmMutation(
@@ -80,7 +78,7 @@ export const purchaseService = {
                 ? { quantity: change.quantity, costPerUnitType: change.costPerUnitType }
                 : undefined;
         const response = await apiClient.request(
-            `${getPurchaseEndpoint(resource)}/${encodeURIComponent(documentId)}/details/${encodeURIComponent(detailId)}/${actionPath}`,
+            `${API_PATHS.purchases[resource]}/${encodeURIComponent(documentId)}/details/${encodeURIComponent(detailId)}/${actionPath}`,
             { method: 'PATCH', ...(data ? { data } : {}), signal },
         );
         return confirmMutation(response, successCodeMessages.UPDATED_GOODS_RECEIPT);
@@ -92,9 +90,6 @@ export const purchaseService = {
         signal: AbortSignal,
     ) {
         const params = reportParams(buildPurchaseQueryParams(query), scope);
-        return requestExcel(
-            `/api/warehouse/reports/goods-receipts/${resource}/excel?${params}`,
-            signal,
-        );
+        return requestExcel(`${API_PATHS.reports.purchases[resource]}?${params}`, signal);
     },
 };

@@ -124,8 +124,8 @@ export const prepareManual = async (frontRoot, profile, session) => {
     const scope = !chapters.some((chapter) => chapter.file === '12-issues.md')
         ? ''
         : hasDataScope(session.accesses ?? [], DATA_SCOPES.ISSUES_ALL_DEPARTMENTS)
-          ? 'En Salidas de Materiales, Consumibles y Mermas puede consultar y registrar documentos para todas las áreas.'
-          : 'En Salidas de Materiales, Consumibles y Mermas sólo puede consultar y registrar solicitudes para las áreas asignadas a su cuenta.';
+          ? 'Puede consultar las salidas de todas las áreas.'
+          : 'Sólo puede consultar las salidas de las áreas asignadas a su cuenta.';
     const accessRows = [
         ...new Set(
             (session.accesses ?? []).map(
@@ -241,6 +241,23 @@ export const loadManualPublication = async (frontRoot, id) => {
             path.relative(path.resolve(frontRoot, '../back'), source).split(path.sep).join('/'),
         );
     }
+    const selectedSources = new Set(manifest.sources);
+    if (
+        selectedSources.size !== manifest.sources.length ||
+        selectedSources.size !== allowedSources.size ||
+        [...allowedSources].some((source) => !selectedSources.has(source))
+    )
+        throw new Error(
+            `La selección de capítulos de ${id} está incompleta o repetida; regenere el manual.`,
+        );
+    if (
+        selectedImages.size !== manifest.images.length ||
+        selectedImages.size !== allowedImages.size ||
+        [...allowedImages].some((image) => !selectedImages.has(image))
+    )
+        throw new Error(
+            `La selección de capturas de ${id} está incompleta o repetida; regenere el manual.`,
+        );
     for (const image of manifest.images) {
         if (!/^[a-z0-9-]+\.png$/.test(image)) throw new Error('Imagen de manual inválida.');
         if (isUnavailableExample(image, manifest.captures?.[image], manifest.mode)) {
@@ -248,6 +265,8 @@ export const loadManualPublication = async (frontRoot, id) => {
                 throw new Error(`El ejemplo ${image} conserva una referencia sin captura.`);
             continue;
         }
+        if (!referencedImages.has(image))
+            throw new Error(`La captura ${image} falta en el contenido del manual ${id}.`);
         if (manifest.captures?.[image]?.status !== 'complete')
             throw new Error(`La captura ${image} debe volver a verificarse.`);
         const bytes = await readFile(path.join(root, 'images', image)).catch((cause) => {

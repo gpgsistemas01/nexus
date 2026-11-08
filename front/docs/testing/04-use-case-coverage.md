@@ -13,6 +13,7 @@ interacción; persistencia y archivos reales requieren las pruebas de sistema in
 
 | Requisito | Evidencia o forma de revisión |
 | --- | --- |
+| `RF-VUE-015` | [Importación unitaria](../../tests/unit/modules/warehouse/inventoryImportTest.ts) y [Chromium/móvil](../../tests/e2e/inventoryImport.spec.ts); persistencia, rollback e idempotencia en [HTTP/Prisma](../../../back/tests/integration/controllers/inventoryImportControllerDbTest.js). |
 | `RF-VUE-001` | [Formulario de login](../../tests/unit/modules/auth/composables/useLoginFormTest.ts) y [login en navegador](../../tests/e2e/login.spec.ts). |
 | `RF-VUE-002` | [Cliente HTTP](../../tests/unit/shared/http/apiClientTest.ts), [recuperación de sesión](../../tests/e2e/sessionRecovery.spec.ts) y [sistema](../../tests/system/application.spec.ts). |
 | `RF-VUE-003` | [Router](../../tests/unit/app/routerTest.ts), [acceso a páginas](../../tests/unit/app/pageAccessTest.ts), [fallbacks](../../tests/e2e/fallbacks.spec.ts) y [navegación en Salidas](../../tests/e2e/issues.spec.ts). |

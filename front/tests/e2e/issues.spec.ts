@@ -468,7 +468,7 @@ test('salidas: filtros aplicados y Excel; modal usable en móvil', async ({ page
   const dialog = page.getByRole('dialog', { name: 'Registrar salida de merma', exact: true });
   await expect(dialog.getByRole('button', { name: 'Guardar', exact: true })).toBeVisible();
   await page.screenshot({
-    path: '../work/issues-mobile.png',
+    path: test.info().outputPath('issues-mobile.png'),
     fullPage: true,
     animations: 'disabled',
   });
@@ -496,7 +496,7 @@ test('salidas: el menú agrupa las tres rutas Vue y conserva navegación compact
     page.getByRole('heading', { name: 'Tabla de Salidas de consumibles', exact: true }),
   ).toBeVisible();
   await page.screenshot({
-    path: '../work/issues-desktop.png',
+    path: test.info().outputPath('issues-desktop.png'),
     fullPage: true,
     animations: 'disabled',
   });

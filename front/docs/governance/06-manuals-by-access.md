@@ -12,6 +12,11 @@ los comandos de generación rechazan el entorno de producción.
 Cada cuenta recibe su edición, identificada con el usuario y sus áreas y roles.
 El índice agrupa inicio, tareas permitidas y ayuda. Las fuentes se comparten en
 `docs/user-manual`; no se copian para mantener una versión por rol.
+Las capturas se seleccionan desde esos mismos capítulos filtrados. Publicar exige
+la selección completa, sin capítulos o imágenes repetidos ni referencias retiradas.
+Los ejemplos históricos sin datos conservan su excepción documentada; una captura
+de una acción disponible sigue siendo obligatoria. El índice describe el alcance
+de consulta; las instrucciones para registrar, surtir o devolver requieren su permiso.
 La configuración, ejecución y recuperación se explican en el
 [procedimiento por cuenta](07-manual-accounts-and-files.md).
 

@@ -613,7 +613,7 @@ RecordQuery & IssueFilters
 
 ## IssueLookupRequest
 
-**Fuente:** [src/modules/issues/services/issueLookupService.ts](../../../../../src/modules/issues/services/issueLookupService.ts) · línea 7, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/issues/services/issueLookupService.ts](../../../../../src/modules/issues/services/issueLookupService.ts) · línea 9, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupQuery`.
 

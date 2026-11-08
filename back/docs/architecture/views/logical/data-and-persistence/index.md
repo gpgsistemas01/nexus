@@ -20,6 +20,13 @@ a la [vista física](../../physical/index.md).
 
 ## Lectura del ER
 
+`InventoryImport` guarda borradores privados y recibos de lotes de los tres tipos
+de inventario. El payload y la vista previa son temporales; el resultado confirmado
+permanece para recuperar reintentos. Su FK al actor admite `SET NULL` al retirar la
+cuenta. La unicidad de actor/clave impide reutilizar una confirmación en otro lote.
+El [flujo de importación](../../development/inventory-excel-import.md) define
+permisos, transacción y limpieza.
+
 Las líneas unen tablas, no filas individuales de atributos. Su etiqueta identifica
 la FK del dependiente y la clave que referencia; la tabla final da ambos nombres
 completos. `PK` significa clave primaria, `FK` clave foránea y `UK` unicidad individual.

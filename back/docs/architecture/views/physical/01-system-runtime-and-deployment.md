@@ -14,7 +14,7 @@ Las capas de código se mantienen en la [vista lógica](../logical/01-components
 | Aspecto | Fuente | Qué permite afirmar |
 | --- | --- | --- |
 | Render y Supabase | Decisión operativa registrada en el `README.md` | Es la topología vigente documentada; el repositorio no verifica la configuración activa del proveedor. |
-| Imagen de aplicación | `../Dockerfile` (raíz del repositorio) | Node.js 22, generación de Prisma durante la construcción y ejecución con el usuario `node`. |
+| Imagen de aplicación | `../Dockerfile` (raíz del repositorio) | Node.js 24, generación de Prisma durante la construcción y ejecución con el usuario `node`. |
 | Arranque del contenedor | `docker-entrypoint.sh` | Fuerza producción y, por defecto, aplica migraciones antes de iniciar la aplicación. |
 | Servidor y puerto | `src/server.js`; fábrica Express en `src/app.js` | Express y Socket.IO comparten un servidor HTTP que escucha en `0.0.0.0`, con `PORT` o 3000 por defecto. |
 | Conexiones a PostgreSQL | `src/lib/prisma.js`, `src/lib/databaseUrl.js` y `prisma.config.ts` | La aplicación usa `DATABASE_URL`; el CLI prefiere `DIRECT_URL`. |
@@ -82,8 +82,8 @@ flowchart TB
     browser["Navegador del usuario"]
     subgraph render["«node» Render · servicio web"]
         endpoint["Acceso público HTTPS"]
-        subgraph container["«executionEnvironment» Contenedor Nexus"]
-            application["Node.js 22<br/>Express y Socket.IO<br/>PORT o 3000"]
+        subgraph container["«executionEnvironment»<br/>Contenedor Nexus"]
+            application["Node.js 24<br/>Express y Socket.IO<br/>PORT o 3000"]
         end
         endpoint -->|"Tráfico al puerto de la aplicación"| application
     end
@@ -120,6 +120,10 @@ La imagen usa el `PORT` de Render y fuerza `NODE_ENV=production`. Mantén
 `DATABASE_URL`, `DIRECT_URL`, `JWT_SECRET_ACCESS` y `JWT_SECRET_REFRESH` en las
 variables del servicio. Cambiar los secretos JWT invalida sesiones; no es un paso
 necesario para conectar Vue.
+
+Esta imagen usa Node 24. Si conservas un servicio con runtime Node, configura
+`NODE_VERSION=24.19.0` o una versión compatible con `back/package.json`; Node 22
+no ejecuta el motor SheetKit. Instalar Node localmente no modifica Render.
 
 El entrypoint aplica migraciones con `DIRECT_URL` por defecto. Si Render ya tiene
 un **Pre-Deploy Command** para migrar, utiliza una sola fase de migración y arranca
@@ -174,10 +178,10 @@ a Compose; no se deben atribuir automáticamente al servicio administrado de Ren
 Si se cambia el puerto interno, también debe revisarse el mapeo de Compose.
 
 Los reportes XLSX usan ese directorio temporal durante la generación y la descarga.
-Compose limita `/tmp` a 64 MB mediante tmpfs; su uso puede contabilizarse como memoria
-del contenedor aunque no aparezca en el RSS de Node.js. Los temporales se eliminan
-al terminar, fallar o cancelar la petición. El dimensionamiento debe considerar el
-tamaño de los archivos y las descargas simultáneas, conforme a la
+Compose limita `/tmp` a 256 MiB mediante tmpfs; su uso puede contabilizarse como memoria
+del contenedor aunque no aparezca en el RSS de Node.js. SheetKit utiliza XML temporal
+sin comprimir además del XLSX terminado. Ambos se eliminan al terminar, fallar o
+cancelar la petición. El dimensionamiento debe considerar datos y descargas simultáneas, conforme a la
 [guía de rendimiento](../../../testing/backend-performance.md).
 
 Este archivo no crea una base local, no termina TLS y no configura copias de

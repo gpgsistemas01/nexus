@@ -1,5 +1,16 @@
 # Diseño de pruebas: Contratos y componentes transversales
 
+## Transporte y rutas compartidas
+
+La revisión de `API_PATHS` y los parámetros reutiliza los contratos ejecutables de
+cada servicio. `purchaseTest.ts` comprueba búsqueda con `&`, `+`, `%`, `/`, `#` y
+acentos sin alterar filtros, página ni señal. `inventoryImportTest.ts` distingue
+multipart de JSON y conserva el timeout específico. `apiClientTest.ts` comprueba
+renovación concurrente, cancelación y ausencia de repetición automática de escrituras.
+Los recorridos `lookupLoading.spec.ts`, `sessionRecovery.spec.ts` e
+`inventoryImport.spec.ts` verifican sus consumidores en Chromium; la subida comprueba
+el límite multipart real. Las respuestas simuladas no demuestran persistencia.
+
 ## Formularios de registro
 
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
@@ -119,6 +130,7 @@ modificadas. La disponibilidad de un PNG en otro perfil no completa el seleccion
 | `DP-VUE-MAN-002` | Bloquearse con el primer detalle surtido o sin saldo; transiciones consulta → página posterior → selección. | Surtido y devolución recorren documentos y detalles hasta encontrar una opción disponible. La cantidad de muestra respeta un pendiente menor que uno; no se envían escrituras. Cada imagen tiene límite propio y conserva el estado de recuperación. | `manualCapture.spec.ts`, `profileManuals.spec.ts` y `manualProfilesTest.ts`. |
 | `DP-VUE-MAN-003` | Exigir operaciones históricas para ilustrar acciones o publicar referencias rotas; particiones acción/ejemplo y dev/demo. | Corregir funciona con una partida activa sin historial de cancelaciones. Ningún perfil solicita capturas de compra mixta; la tabla conserva su explicación. El surtido conserva la referencia existente o usa el total convertido del detalle como borrador. La devolución por documento admite un renglón cancelado y otro con saldo. Los ejemplos sin datos no omiten capturas de acciones; sus referencias se retiran y la tabla permanece. | `manualCapture.spec.ts` y `manualProfilesTest.ts`. |
 | `DP-VUE-MAN-004` | Continuar con consultas huérfanas tras un límite o saturar la preparación; transiciones consulta → cancelación → captura siguiente. | La página se cierra y la tarea termina antes de continuar en la misma cuenta. Las consultas se limitan a cuatro simultáneas y sus lotes terminan antes de devolver un resultado o error; un fallo del servicio no se presenta como falta de datos. | `manualCaptureRunTest.ts`, `manualPreparationTest.ts` y `manualCapture.spec.ts`. |
+| `DP-VUE-MAN-005` | Publicar una selección parcial o atribuir escritura a consulta; particiones por permiso y conjunto completo/omitido/repetido. | Los capítulos y capturas coinciden con la selección de la sesión. Retirar un capítulo, captura o referencia requerida bloquea la publicación; los ejemplos sin datos conservan su excepción. Consulta no recibe instrucciones, imágenes ni alcance de escritura. | `manualProfilesTest.ts`; `CP-VUE-MAN-001-01`. |
 
 Las capturas de compra mixta se retiraron por duplicar la explicación de estados.
 `purchases.spec.ts` conserva su caso funcional: una compra con partidas activas y

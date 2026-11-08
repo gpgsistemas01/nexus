@@ -1,5 +1,5 @@
 export const registerServerLifecycle = ({
-    server, io, prisma, logger, setReady, processRef = process, timeoutMs = 10000
+    server, io, prisma, logger, setReady, processRef = process, timeoutMs = 10000, beforeDisconnect = async () => {}
 }) => {
     let shutdownPromise;
 
@@ -25,6 +25,7 @@ export const registerServerLifecycle = ({
                 });
                 const socketsClosed = new Promise(resolve => io.close(resolve));
                 await Promise.all([httpClosed, socketsClosed]);
+                await beforeDisconnect();
                 await prisma.$disconnect();
                 logger.info('Cierre del servidor completado');
             } catch (err) {

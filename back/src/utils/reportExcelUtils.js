@@ -1,10 +1,8 @@
 import { mkdtemp, rm } from 'node:fs/promises';
-import { once } from 'node:events';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { finished } from 'node:stream/promises';
 import { setImmediate } from 'node:timers/promises';
-import ExcelJS from 'exceljs';
+import { createSpreadsheet } from './spreadsheetUtils.js';
 import { getMexicoMonthYearParts } from './formattersUtils.js';
 
 const ROW_YIELD_INTERVAL = 250;
@@ -26,57 +24,41 @@ export const createFormulaCell = (formula, value = 0) => ({
 const writeWorkbookFile = async ({ filePath, sheetName, data, abortController }) => {
     const { signal } = abortController;
     signal.throwIfAborted();
-    const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({
-        filename: filePath,
-        useStyles: true,
-        useSharedStrings: false,
-        zip: { zlib: { level: 1 } }
-    });
-    const closed = finished(workbook.stream, { cleanup: true }).catch(error => abortController.abort(error));
-    workbook.zip.once('error', error => abortController.abort(error));
-    const failure = Promise.withResolvers();
-    const onAbort = () => failure.reject(signal.reason);
-    signal.addEventListener('abort', onAbort, { once: true });
-
-    const writing = async () => {
-        const worksheet = workbook.addWorksheet(sheetName, {
-            views: [{ state: 'frozen', ySplit: 1 }]
-        });
+    const placeholder = sheetName === 'Sheet1' ? 'Datos' : 'Sheet1';
+    const workbook = createSpreadsheet(placeholder);
+    const worksheet = workbook.newStreamWriter(sheetName);
+    worksheet.setFreezePanes('A2');
+    const headerStyle = workbook.addStyle({ font: { bold: true }, alignment: { vertical: 'center', wrapText: true } });
+    let applied = false;
+    try {
         let rowCount = 0;
         for await (const row of data) {
             signal.throwIfAborted();
             if (rowCount === 0) {
-                worksheet.columns = row.map(label => ({ width: Math.min(40, Math.max(14, String(label ?? '').length + 4)) }));
+                row.forEach((label, index) => worksheet.setColWidth(index + 1, Math.min(40, Math.max(14, String(label ?? '').length + 4))));
             }
-            const worksheetRow = worksheet.addRow(row);
+            const values = row.map(value => value && typeof value === 'object' && typeof value.formula === 'string'
+                ? { type: 'formula', formula: value.formula, result: { valueType: 'number', numberValue: value.result } }
+                : value ?? null);
             if (rowCount === 0) {
-                worksheetRow.font = { bold: true };
-                worksheetRow.alignment = { vertical: 'middle', wrapText: true };
-                worksheetRow.height = 32;
-            }
-            worksheetRow.commit();
-            // Ceder el loop permite vaciar las colas de escritura sin retener todas las filas.
+                worksheet.writeRowWithStyle(1, values, headerStyle);
+            } else worksheet.writeRow(rowCount + 1, values);
+            // Las filas se vacían al temporal nativo; ceder el loop permite atender otras solicitudes.
             if (++rowCount % ROW_YIELD_INTERVAL === 0) {
                 await setImmediate(undefined, { signal });
-                if (workbook.stream.writableNeedDrain) await once(workbook.stream, 'drain', { signal });
             }
         }
         signal.throwIfAborted();
-        worksheet.commit();
-        await workbook.commit();
-    };
-    try {
-        await Promise.race([writing(), failure.promise]);
-        await closed;
+        workbook.applyStreamWriter(worksheet);
+        applied = true;
+        workbook.deleteSheet(placeholder);
+        await workbook.save(filePath);
         signal.throwIfAborted();
-    } catch (error) {
-        abortController.abort(error);
-        workbook.zip.abort();
-        workbook.stream.destroy();
-        await closed;
-        throw error;
     } finally {
-        signal.removeEventListener('abort', onAbort);
+        // Transferir y retirar la hoja libera el temporal nativo sin esperar al recolector de JS.
+        if (!applied) workbook.applyStreamWriter(worksheet);
+        if (workbook.sheetNames.length === 1) workbook.newSheet(placeholder);
+        workbook.deleteSheet(sheetName);
     }
 };
 

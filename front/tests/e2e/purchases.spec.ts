@@ -424,7 +424,7 @@ test('compras: altas rápidas reutilizan editores y seleccionan registros fuera 
   await dialog
     .getByRole('heading', { name: 'Datos de la compra', exact: true })
     .scrollIntoViewIfNeeded();
-  await page.screenshot({ path: '../work/purchases-desktop.png', fullPage: true });
+  await page.screenshot({ path: test.info().outputPath('purchases-desktop.png'), fullPage: true });
 });
 
 test('compras: acceso, menú Vue y diálogo móvil sin desbordamiento global', async ({ page }) => {
@@ -454,7 +454,7 @@ test('compras: acceso, menú Vue y diálogo móvil sin desbordamiento global', a
     );
   }
   expect(reads.length).toBeGreaterThan(0);
-  await page.screenshot({ path: '../work/purchases-mobile.png', fullPage: true });
+  await page.screenshot({ path: test.info().outputPath('purchases-mobile.png'), fullPage: true });
   await mockPurchases(page, ['materials:read']);
   await page.goto('/compras/materiales');
   await expect(

@@ -1,5 +1,15 @@
 # Cobertura automatizada relevante por caso de uso
 
+## Importaciones de inventario
+
+`RF-IMP-001/002/003` añade importación por lotes a las altas y ediciones de Almacén.
+`inventoryImportControllerDbTest.js` cubre permisos, stock inicial, mermas, datos
+compartidos, versiones, recibos, rollback y limpieza. `inventoryWorkbookTest.js`
+comprueba contenido y límites del libro. Los diseños/casos `DP-IMP-*` y `CP-INT-IMP-*`
+están en el [registro selectivo](automated-test-case-index.md#importación-de-inventario).
+La [interfaz Vue](../../../front/tests/e2e/inventoryImport.spec.ts) comprueba interacción
+y móvil con API simulada; no sustituye la persistencia de esa integración.
+
 ## Alcance y criterio
 
 Este documento resume únicamente las pruebas automatizadas que aportan evidencia

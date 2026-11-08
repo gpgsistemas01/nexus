@@ -592,7 +592,7 @@ Exclude<PurchaseTarget, { action: 'view' }>
 
 ## PurchaseLookupRequest
 
-**Fuente:** [src/modules/purchases/services/purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts) · línea 7, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/purchases/services/purchaseLookupService.ts](../../../../../src/modules/purchases/services/purchaseLookupService.ts) · línea 9, columna 1. **Declaración:** interface.
 
 **Extensión/implementación:** `extends LookupQuery`.
 

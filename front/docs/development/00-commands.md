@@ -4,6 +4,14 @@ Consulta rápida para Vue, API, pruebas y documentación. Todos los comandos de 
 página se ejecutan desde la **raíz del repositorio**. Los manifiestos de
 [Vue](../../package.json) y [Express](../../../back/package.json) son la fuente de los scripts.
 
+## Comprobar Node
+
+Usa **Node 24 LTS**, desde 24.14.1, para ejecutar ambas aplicaciones.
+Comprueba `node -v` y `npm -v`. Si todavía aparece Node 22, instala Node 24 desde
+[nodejs.org](https://nodejs.org/), abre una terminal nueva y repite la comprobación
+antes de instalar las dependencias. `npm ci` no actualiza Node.
+Docker y Render usan su propia versión; consulta [despliegue](03-build-and-deployment.md).
+
 ## Iniciar el sistema y acceder desde la red local
 
 | Acción | Comando |
@@ -45,6 +53,16 @@ durante el primer acceso a Prisma. Después de regenerar Prisma, reinicia la API
 | Revisar `front/dist/` | `npm --prefix front run preview` |
 
 ## Pruebas
+
+Para medir la importación, prepare `DATABASE_TEST_URL` y `DIRECT_TEST_URL` con una
+base **desechable** terminada en `_performance_test`, distinta de la habitual, y ejecute:
+
+```sh
+npm --prefix back run test:performance:imports
+```
+
+Compara consultas simultáneas con seis lotes de 100 filas. El detalle y los límites
+están en la [guía de rendimiento](../../../back/docs/testing/backend-performance.md#importación-de-inventario).
 
 | Acción | Comando |
 | --- | --- |
@@ -94,7 +112,9 @@ La API debe estar activa; la herramienta prepara Vue. El recorrido sólo consult
 | Capturas de todas las cuentas | `npm --prefix front run docs:screenshots -- --all` |
 | Capturas de una cuenta | `npm --prefix front run docs:screenshots -- --profile cuenta-01` |
 | Capturas y Word/PDF de todas las cuentas | `npm --prefix front run docs:manuals -- --all` |
+| Capturas y PDF de una cuenta | `npm --prefix front run docs:manuals -- --profile cuenta-01 --format pdf` |
 | Rehacer las capturas de una cuenta | `npm --prefix front run docs:screenshots -- --profile cuenta-01 --fresh` |
+| Rehacer las capturas de todas las cuentas | `npm --prefix front run docs:screenshots -- --all --fresh` |
 | Ver opciones | `npm --prefix front run docs:manuals -- --help` |
 | Capturas generales con datos ficticios | `npm --prefix front run docs:screenshots:reference` |
 | Word/PDF del manual general | `npm --prefix front run docs:manual:reference -- ambos` |
@@ -104,6 +124,15 @@ comando, cada cuenta conserva las completas de su revisión vigente y genera só
 las faltantes o pendientes. `--missing` conserva este comportamiento; no es
 necesario agregarlo. `--fresh` rehace el conjunto seleccionado.
 `docs:manual` es alias de `docs:manuals`.
+
+Desde `front/`, omite `--prefix front`. Los archivos de cuentas y credenciales se
+resuelven desde `front/` en ambos casos. Los comandos de `back/` corresponden al
+manual EJS. El manual general `:reference` reúne funciones de referencia; para
+entregar un manual a un usuario, selecciona su cuenta con los comandos anteriores.
+
+Manuales y capturas usan los permisos de `/api/auth/me`. Un cambio de usuario o
+acceso invalida sus imágenes anteriores. La publicación exige todos los capítulos
+y capturas de esa selección, sin duplicados ni archivos de otra cuenta.
 
 En `dev`, un ejemplo histórico sin datos se registra y no impide publicar el
 manual; las capturas de acciones siguen siendo obligatorias. `--fresh` vuelve a

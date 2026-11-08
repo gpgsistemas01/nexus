@@ -49,6 +49,31 @@ model User {
   wasteStockEntries             WasteStockEntry[]
   criticalWriteAudits           CriticalWriteAudit[]
   wasteIssues                   WasteIssue[]
+  inventoryImports              InventoryImport[]
+}
+
+model InventoryImport {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  version     Int       @default(0)
+  userId      String?   @db.Uuid
+  resource    String    @db.VarChar(16)
+  mode        String    @db.VarChar(8)
+  status      String    @default("DRAFT") @db.VarChar(16)
+  filename    String    @db.VarChar(120)
+  fileHash    String    @db.VarChar(64)
+  payload     Json?
+  preview     Json?
+  result      Json?
+  operationId String?   @db.Uuid
+  commandHash String?   @db.VarChar(64)
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, operationId])
+  @@index([status, expiresAt, id])
+  @@index([userId, createdAt])
 }
 
 model CriticalWriteAudit {

@@ -16,6 +16,7 @@ explica las herramientas, archivos y credenciales de cada nivel.
 
 | Caso | Objetivo | Diseño |
 | --- | --- | --- |
+| [CP-VUE-IMP-001-01](cases/cp-vue-imp-001-01.md) | importar y recuperar el mismo lote sin otra alta. | DP-VUE-IMP-001 |
 | [CP-VUE-AUT-001](cases/cp-vue-aut-001.md) | captura de login y credencial histórica. | DP-VUE-AUTH-002 |
 | [CP-VUE-SESSION-001-01](cases/cp-vue-session-001-01.md) | renovación transparente. | DP-VUE-SESSION-001 |
 | [CP-VUE-SESSION-002-01](cases/cp-vue-session-002-01.md) | recuperar un refresh con 502. | DP-VUE-SESSION-002 |

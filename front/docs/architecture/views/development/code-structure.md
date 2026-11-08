@@ -4,6 +4,14 @@ El código se organiza en aplicación, módulos de negocio y colaboradores compa
 [guía de incorporación](developer-onboarding.md) recorre una edición para mostrar cómo
 encontrarlos.
 
+## Transporte compartido
+
+Las rutas HTTP viven en `shared/http/apiPaths.ts`; los servicios las reutilizan
+sin construir hosts ni configurar otra instancia de Axios. `apiClient` concentra
+timeout, sesión y errores. `pageParams`, `lookupParams` y `recordParams` comparten
+la consulta paginada; cada dominio añade sus filtros y valida su respuesta. El
+[contrato HTTP](../../contracts/client-contracts.md) precisa JSON, multipart y Blob.
+
 ## Reportes y tablas adaptables
 
 Todas las páginas de inventario, identidad, directorio, compras, salidas y movimientos

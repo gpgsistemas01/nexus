@@ -121,7 +121,7 @@ it.each([
     apiClient.http.defaults.adapter = mockHttpAdapter((config) => {
       const url = new URL(config.url!, 'http://test');
       expect(url.pathname).toBe(endpoint);
-      expect(url.searchParams.get('search')).toBe('Registro A');
+      expect(url.searchParams.get('search')).toBe('Acero & onlyActive=false + 50% / #á');
       expect(url.searchParams.get('start')).toBe('20');
       expect(url.searchParams.get('length')).toBe('20');
       expect(url.searchParams.get('onlyActive')).toBe(
@@ -141,7 +141,7 @@ it.each([
       {
         kind,
         resource,
-        search: 'Registro A',
+        search: 'Acero & onlyActive=false + 50% / #á',
         page: 2,
         ...(kind === 'suppliers' ? { capture } : {}),
         ...(kind === 'items' ? { supplierId: ids.supplier } : {}),

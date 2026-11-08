@@ -158,6 +158,8 @@ const PUBLICATIONS = Object.freeze({
             ]),
             backend: packagePart(ARCHITECTURE_ENTRY, [
                 'docs/architecture/views/development/index.md',
+                'docs/architecture/views/development/inventory-excel-import.md',
+                'docs/architecture/views/development/excel-library-decision.md',
                 'docs/architecture/views/development/code-structure/06-prisma-and-persistence.md',
                 ...getDirectoryDocuments('docs/architecture/views/development/backend-technical-documentation')
             ]),

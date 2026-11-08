@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim AS deps
+FROM node:24-bookworm-slim AS deps
 
 WORKDIR /app
 
@@ -14,14 +14,14 @@ FROM deps AS build
 COPY back/ .
 RUN npx prisma generate
 
-FROM node:22-bookworm-slim AS prod-deps
+FROM node:24-bookworm-slim AS prod-deps
 
 WORKDIR /app
 
 COPY back/package*.json ./
 RUN npm ci --omit=dev
 
-FROM node:22-bookworm-slim
+FROM node:24-bookworm-slim
 
 ENV NODE_ENV=production \
     HOME=/tmp \

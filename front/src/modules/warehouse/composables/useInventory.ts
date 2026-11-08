@@ -27,12 +27,15 @@ export const useInventory = (
         canExport: permits(PERMISSIONS.WAREHOUSE_REPORTS_READ),
     };
     const editor = shallowRef<EditorTarget | null>(null);
+    const isImportOpen = shallowRef(false);
     const removal = useInventoryRemoval({ resource, onSaved: () => onSaved(), onUnauthorized });
     const list = useInventoryList({
         resource,
         canRead: permissions.canRead,
         canReadSuppliers: permits(PERMISSIONS.SUPPLIERS_READ),
-        isPaused: computed(() => editor.value !== null || removal.isConfirming.value),
+        isPaused: computed(
+            () => editor.value !== null || removal.isConfirming.value || isImportOpen.value,
+        ),
         onUnauthorized,
     });
     const report = useInventoryReport({
@@ -65,5 +68,5 @@ export const useInventory = (
         void list.load();
     };
 
-    return { config, permissions, editor, ...list, ...report, openEditor, onSaved };
+    return { config, permissions, editor, isImportOpen, ...list, ...report, openEditor, onSaved };
 };

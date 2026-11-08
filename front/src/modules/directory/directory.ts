@@ -24,8 +24,6 @@ export const DIRECTORY_CONFIG = {
         create: PERMISSIONS.CLIENTS_CREATE,
         update: PERMISSIONS.CLIENTS_UPDATE,
         report: PERMISSIONS.CLIENT_REPORTS_READ,
-        path: '/api/sales/clients',
-        reportPath: '/api/sales/reports/clients/excel',
     },
     suppliers: {
         title: 'Proveedores',
@@ -35,8 +33,6 @@ export const DIRECTORY_CONFIG = {
         create: PERMISSIONS.SUPPLIERS_MANAGE,
         update: PERMISSIONS.SUPPLIERS_UPDATE,
         report: PERMISSIONS.SUPPLIER_REPORTS_READ,
-        path: '/api/warehouse/suppliers',
-        reportPath: '/api/warehouse/reports/suppliers/excel',
     },
 } as const;
 

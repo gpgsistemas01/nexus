@@ -22,6 +22,9 @@ export default defineConfig(({ mode }) => {
         },
         resolve: {
             alias: {
+                '@nexus/inventory-imports': fileURLToPath(
+                    new URL('../back/src/shared/constants/inventoryImport.js', import.meta.url),
+                ),
                 '@nexus/input-validation': fileURLToPath(
                     new URL('../back/src/shared/constants/inputValidation.js', import.meta.url),
                 ),

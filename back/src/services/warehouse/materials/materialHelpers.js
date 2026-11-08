@@ -19,14 +19,14 @@ export const assertMaterialRollReference = ({ referenceConeWeightKg, referenceRo
     }
 };
 
-export const prepareMaterialData = async ({ tx, materialDto, materialId = null }) => {
+export const prepareMaterialData = async ({ tx, materialDto, materialId = null, context = null }) => {
 
     const { presentationId, unitMeasureId, supplierId, maxUnitCost, isActive, referenceConeWeightKg, referenceRollTotalWeightKg, ...rest } = materialDto;
 
     // La transacción comparte una conexión: cada consulta debe terminar antes de enviar la siguiente.
-    await findUniqueUnitMeasure({ tx, id: unitMeasureId });
-    const presentation = await findUniquePresentation({ tx, id: presentationId });
-    const supplier = await findUniqueSupplier({ tx, id: supplierId });
+    if (!context?.units?.get(unitMeasureId)) await findUniqueUnitMeasure({ tx, id: unitMeasureId });
+    const presentation = context?.presentations?.get(presentationId) ?? await findUniquePresentation({ tx, id: presentationId });
+    const supplier = context?.suppliers?.get(supplierId) ?? await findUniqueSupplier({ tx, id: supplierId });
 
     assertMaterialRollReference({ referenceConeWeightKg, referenceRollTotalWeightKg });
 

@@ -1,5 +1,6 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
 import { apiClient } from '../../../shared/http/apiClient.js';
+import { API_PATHS } from '../../../shared/http/apiPaths.js';
 import { ApiError } from '../../../shared/http/apiError.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
 import { requestPage } from '../../../shared/http/pageRequest.js';
@@ -73,7 +74,7 @@ const paramsFor = (resource: IdentityResource, query: IdentityQuery, paginate = 
 export const identityService = {
     async list(resource: IdentityResource, query: IdentityQuery, signal?: AbortSignal) {
         const result = await requestPage(
-            `/api/admin/${resource}?${paramsFor(resource, query)}`,
+            `${API_PATHS.identity[resource]}?${paramsFor(resource, query)}`,
             signal,
         );
         return { ...result, data: result.data.map((value) => normalizeEntry(resource, value)) };
@@ -88,7 +89,7 @@ export const identityService = {
             target.action === 'create'
                 ? ''
                 : `/${encodeURIComponent(target.row.id)}${target.action === 'password' ? '/password' : ''}`;
-        const result = await apiClient.request(`/api/admin/${resource}${suffix}`, {
+        const result = await apiClient.request(`${API_PATHS.identity[resource]}${suffix}`, {
             method: target.action === 'create' ? 'POST' : resource === 'persons' ? 'PUT' : 'PATCH',
             data: payload,
             signal,
@@ -107,7 +108,7 @@ export const identityService = {
         }
 
         return requestExcel(
-            `/api/admin/reports/${resource}/excel?${paramsFor(resource, query, false)}`,
+            `${API_PATHS.reports.identity[resource]}?${paramsFor(resource, query, false)}`,
             signal,
         );
     },
