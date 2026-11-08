@@ -463,7 +463,7 @@ Pick<RecordQuery, 'direction'> & { orderColumn?: number }
 
 ## InventoryCatalogPath
 
-**Fuente:** [src/shared/http/apiPaths.ts](../../../../../src/shared/http/apiPaths.ts) · línea 81, columna 1. **Declaración:** type.
+**Fuente:** [src/shared/http/apiPaths.ts](../../../../../src/shared/http/apiPaths.ts) · línea 82, columna 1. **Declaración:** type.
 
 **Definición completa:**
 

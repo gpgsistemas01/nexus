@@ -339,6 +339,7 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
+| `historicalDeliveryBatchId` | `String?` | No | FK | — | `@db.Uuid` |
 | `type` | `MaterialType` | Sí | — | `MATERIAL` | — |
 | `referenceNumber` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `approvedDate` | `DateTime?` | No | — | — | — |
@@ -364,6 +365,7 @@ usuarios y responsables se mantiene en el
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |
+| `historicalDeliveryBatch` | `HistoricalDeliveryBatch` | `historicalDeliveryBatchId` | Cero o uno |
 | `department` | `Department` | `departmentId` | Exactamente uno |
 | `approver` | `Person` | `approverId` | Cero o uno |
 | `requester` | `Person` | `requesterId` | Exactamente uno |
@@ -572,6 +574,7 @@ usuarios y responsables se mantiene en el
 | Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
 | --- | --- | --- | --- | --- | --- |
 | `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
+| `historicalDeliveryBatchId` | `String?` | No | FK | — | `@db.Uuid` |
 | `referenceNumber` | `String` | Sí | UK | — | `@db.VarChar(50)` |
 | `requestDate` | `DateTime` | Sí | — | — | — |
 | `observations` | `String?` | No | — | — | `@db.VarChar(500)` |
@@ -592,6 +595,7 @@ usuarios y responsables se mantiene en el
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |
+| `historicalDeliveryBatch` | `HistoricalDeliveryBatch` | `historicalDeliveryBatchId` | Cero o uno |
 | `createdBy` | `User` | `createdById` | Exactamente uno |
 | `department` | `Department` | `departmentId` | Exactamente uno |
 | `requester` | `Person` | `requesterId` | Exactamente uno |
@@ -771,7 +775,7 @@ usuarios y responsables se mantiene en el
 | `wasteStockAdjustment` | `WasteStockAdjustment` | `wasteStockAdjustmentId` | Exactamente uno |
 | `waste` | `Waste` | `wasteId` | Exactamente uno |
 
-## Importaciones de inventario
+## Importaciones y conciliación de inventario
 
 ### `InventoryImport`
 
@@ -793,6 +797,25 @@ usuarios y responsables se mantiene en el
 | `expiresAt` | `DateTime` | Sí | — | — | — |
 | `createdAt` | `DateTime` | Sí | — | `now()` | — |
 | `completedAt` | `DateTime?` | No | — | — | — |
+
+| Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
+| --- | --- | --- | --- |
+| `user` | `User` | `userId` | Cero o uno |
+
+### `HistoricalDeliveryBatch`
+
+| Campo | Tipo Prisma | Obligatorio | Claves | Predeterminado | Reglas Prisma/BD |
+| --- | --- | --- | --- | --- | --- |
+| `id` | `String` | Sí | PK | `dbgenerated("gen_random_uuid()")` | `@db.Uuid` |
+| `userId` | `String?` | No | FK | — | `@db.Uuid` |
+| `operationId` | `String` | Sí | — | — | `@db.Uuid` |
+| `resource` | `String` | Sí | — | — | `@db.VarChar(16)` |
+| `commandHash` | `String` | Sí | — | — | `@db.VarChar(64)` |
+| `cutoffDate` | `DateTime` | Sí | — | — | — |
+| `deliveredAt` | `DateTime?` | No | — | — | — |
+| `reason` | `String` | Sí | — | — | `@db.VarChar(500)` |
+| `result` | `Json` | Sí | — | — | — |
+| `createdAt` | `DateTime` | Sí | — | `now()` | — |
 
 | Relación Prisma | Destino | Campos FK | Cardinalidad desde este modelo |
 | --- | --- | --- | --- |

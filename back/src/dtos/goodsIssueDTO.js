@@ -26,6 +26,7 @@ export const createGoodsIssueHeaderDtoForEdit = (body = {}) => createIssueHeader
 
 
 export const createGoodsIssueDtoForReturn = (body = {}) => ({
+    ...(body.physicalReturnConfirmed === true && { physicalReturnConfirmed: true }),
     returnQuantity: body.returnQuantity,
     ...(Object.prototype.hasOwnProperty.call(body, 'observations') ? { observations: body.observations.trim() } : {})
 });

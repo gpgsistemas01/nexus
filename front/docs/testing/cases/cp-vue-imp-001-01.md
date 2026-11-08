@@ -18,3 +18,9 @@ comprueba controles, recarga, permisos y ausencia de desbordamiento a 320 px.
 La API simulada no prueba stock; la
 [integración HTTP/Prisma](../../../../back/tests/integration/controllers/inventoryImportControllerDbTest.js)
 comprueba recibos, movimientos, versiones y rollback reales.
+
+La variante de archivo único muestra tres filas: Alta de Lona, Editar costo 10→15
+y Ajustar stock 2→0. Una sola carga y confirmación devuelve las tres. La plantilla
+mixta permite operación por fila, conserva las columnas de IDs/versiones y comparte
+recuperación con contratos anteriores. El permiso de ajuste permite importar conteos
+sin lectura de costos; sin escritura/costos ni ajuste, el botón permanece oculto.

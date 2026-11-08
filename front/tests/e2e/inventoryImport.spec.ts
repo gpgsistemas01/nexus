@@ -3,6 +3,79 @@ import { chooseOption, mockWarehouse } from './warehouseFixtures.js';
 import { inventoryImportDraft } from '../fixtures/inventoryImport.js';
 import { ids, user } from '../fixtures/inventory.js';
 
+test('un solo archivo muestra alta, edición y conteo y se confirma en una sola solicitud', async ({
+  page,
+}) => {
+  await mockWarehouse(page);
+  const batch = inventoryImportDraft();
+  batch.mode = 'mixed';
+  batch.preview!.summary = { total: 3, creates: 1, updates: 2, unchanged: 0, errors: 0 };
+  batch.preview!.rows.push(
+    {
+      row: 3,
+      id: ids.offer,
+      name: 'Consumible editado',
+      action: 'update',
+      before: { maxUnitCost: 10 },
+      after: { maxUnitCost: 15 },
+      details: { operation: 'update' },
+      errors: [],
+      warnings: [],
+    },
+    {
+      row: 4,
+      id: ids.reason,
+      name: 'Artículo contado',
+      action: 'update',
+      before: { currentStock: 2 },
+      after: { currentStock: 0 },
+      details: {
+        operation: 'adjust',
+        difference: -2,
+        reason: 'Conteo físico',
+        observations: 'Conteo comprobado',
+      },
+      errors: [],
+      warnings: [],
+    },
+  );
+  let uploads = 0;
+  const writes: unknown[] = [];
+  await page.route('**/api/warehouse/inventory-imports/**', (route) => {
+    if (route.request().url().includes('/preview?mode=mixed')) {
+      uploads++;
+      return route.fulfill({ json: { code: 'INVENTORY_IMPORT_PREVIEW', batch } });
+    }
+    writes.push(route.request().postDataJSON());
+    return route.fulfill({
+      json: {
+        code: 'INVENTORY_IMPORT_COMPLETED',
+        batch: { ...batch, status: 'COMPLETED', preview: null, result: batch.preview },
+      },
+    });
+  });
+  await page.goto('/almacen/materiales');
+  await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Importar Excel de materiales', exact: true });
+  await expect(dialog.getByText('Usa un solo archivo.', { exact: false })).toBeVisible();
+  await dialog.locator('input[type=file]').setInputFiles({
+    name: 'inventario.xlsx',
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    buffer: Buffer.from('fixture: archivo mixto'),
+  });
+  await dialog.getByRole('button', { name: 'Validar archivo', exact: true }).click();
+  await expect(dialog.getByText('Consumible editado', { exact: false })).toBeVisible();
+  await expect(dialog.getByText('Artículo contado', { exact: false })).toBeVisible();
+  await expect(dialog.getByText('Ajustar', { exact: true })).toBeVisible();
+  await expect(dialog.getByText('2 → 0', { exact: false })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Confirmar importación', exact: true }).click();
+  await expect(
+    dialog.getByText('Importación confirmada. El inventario se actualizó.'),
+  ).toBeVisible();
+  expect(uploads).toBe(1);
+  expect(writes).toHaveLength(1);
+});
+
 test('plantillas: actualización de consumibles y altas de merma con proveedor', async ({
   page,
 }) => {
@@ -19,12 +92,6 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
   ] as const) {
     await page.goto(`/almacen/${path}`);
     await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
-    if (update) {
-      const operation = page.getByRole('combobox', { name: 'Operación', exact: true });
-      await operation.focus();
-      await operation.press('Enter');
-      await page.getByRole('option', { name: 'Actualizar datos', exact: true }).click();
-    }
     await chooseOption(page, 'Proveedor de la plantilla', 'Proveedor Central');
     if (update) {
       await page
@@ -42,7 +109,7 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
       page.getByRole('button', { name: 'Descargar plantilla', exact: true }).click(),
     ]);
     const params = new URL((await requested).url()).searchParams;
-    expect(params.get('mode')).toBe(update ? 'update' : 'create');
+    expect(params.get('mode')).toBe('mixed');
     expect(params.get('supplierId')).toBe(ids.supplier);
     expect(params.get('page')).toBe(update ? '2' : '1');
     if (update) expect(params.get('search')).toBe('Lona');
@@ -53,6 +120,7 @@ test('plantillas: actualización de consumibles y altas de merma con proveedor',
 test('importación: revisa el stock y confirma en escritorio y móvil', async ({ page }) => {
   await mockWarehouse(page);
   const batch = inventoryImportDraft();
+  batch.mode = 'mixed';
   const writes: Record<string, unknown>[] = [];
   await page.route('**/api/warehouse/inventory-imports/**', (route) => {
     if (route.request().url().includes('/preview')) {
@@ -106,6 +174,7 @@ test('recupera la confirmación tras perder la respuesta y recargar sin enviar o
 }) => {
   await mockWarehouse(page);
   const batch = inventoryImportDraft();
+  batch.mode = 'mixed';
   let confirmations = 0;
   await page.route('**/api/warehouse/inventory-imports/**', (route) => {
     if (route.request().url().includes('/preview'))
@@ -148,6 +217,7 @@ test('los errores bloquean el lote y el permiso de costos controla el acceso al 
 }) => {
   await mockWarehouse(page);
   const batch = inventoryImportDraft();
+  batch.mode = 'mixed';
   batch.preview!.summary.errors = 1;
   batch.preview!.rows[0]!.action = 'error';
   batch.preview!.rows[0]!.errors = [
@@ -157,7 +227,7 @@ test('los errores bloquean el lote y el permiso de costos controla el acceso al 
       message: 'Las cantidades con presentación PIEZA deben ser enteras.',
     },
   ];
-  await page.route('**/api/warehouse/inventory-imports/materials/preview?mode=create', (route) =>
+  await page.route('**/api/warehouse/inventory-imports/materials/preview?mode=mixed', (route) =>
     route.fulfill({ json: { code: 'INVENTORY_IMPORT_PREVIEW', batch } }),
   );
   await page.goto('/almacen/materiales');
@@ -179,7 +249,9 @@ test('los errores bloquean el lote y el permiso de costos controla el acceso al 
   ).toHaveCount(0);
   await mockWarehouse(
     page,
-    user.permissions.filter((permission) => permission !== 'inventory:costs-read'),
+    user.permissions.filter(
+      (permission) => !['inventory:costs-read', 'materials:adjust-stock'].includes(permission),
+    ),
   );
   await page.reload();
   await expect(
@@ -193,6 +265,7 @@ test('un duplicado informa el bloqueo completo y permite descargar los errores',
 }) => {
   await mockWarehouse(page);
   const batch = inventoryImportDraft();
+  batch.mode = 'mixed';
   const original = batch.preview!.rows[0]!;
   batch.preview!.summary = { total: 2, creates: 1, updates: 0, unchanged: 0, errors: 1 };
   batch.preview!.rows.push({
@@ -223,9 +296,7 @@ test('un duplicado informa el bloqueo completo y permite descargar los errores',
   await page.goto('/almacen/materiales');
   await page.getByRole('button', { name: 'Importar Excel', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Importar Excel de materiales', exact: true });
-  await expect(
-    dialog.getByText('El sistema genera los IDs de las altas.', { exact: false }),
-  ).toBeVisible();
+  await expect(dialog.getByText('Usa un solo archivo.', { exact: false })).toBeVisible();
   await dialog.locator('input[type=file]').setInputFiles({
     name: 'materiales.xlsx',
     mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

@@ -99,6 +99,28 @@ Los ejemplos visuales siguientes se incluyen cuando existen documentos disponibl
 ![Salida de merma cancelada por devolución total.](images/25f-issue-canceled.png)
 <!-- manual:end -->
 
+<!-- manual:any issues:reconcile -->
+## Registrar entregas históricas ya realizadas
+
+1. Conciliar primero el inventario mediante un conteo físico actual en Almacén.
+2. Pulsar **Registrar entregas históricas** en el inventario de salidas correspondiente.
+3. Capturar fecha/hora de corte (Ciudad de México) y buscar folio o proyecto.
+4. Revisar cantidades ya registradas/devueltas y pendientes por registrar. Seleccionar
+   sólo documentos entregados completamente; hasta 100 por página y lote.
+5. Capturar motivo/evidencia y, sólo si se conoce, fecha real de entrega.
+6. Declarar que todas las partidas pendientes seleccionadas se entregaron antes del corte.
+7. Pulsar **Registrar entregas seleccionadas** y conservar el recibo.
+
+Completa sólo lo que faltaba registrar. Conserva devoluciones y no vuelve a descontar
+stock ni genera movimientos. Consulta y Excel identifican la procedencia histórica;
+costos y datos de proyecto históricos quedan sin verificar.
+Si cambia un documento, volver a buscar/revisar. Si se pierde la respuesta, reabrir
+y pulsar **Revisar y reintentar registro**; conserva captura y clave originales.
+
+Una devolución posterior exige confirmar que el material está entrando físicamente
+al almacén ahora. No registrar como devolución material que ya se incluyó en el conteo.
+<!-- manual:end -->
+
 <!-- manual:any warehouse:reports-read -->
 ## Exportar
 

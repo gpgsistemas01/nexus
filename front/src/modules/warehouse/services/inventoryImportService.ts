@@ -39,7 +39,7 @@ const readBatch = (
         (expected.resource !== undefined && batch.resource !== expected.resource) ||
         (expected.mode !== undefined && batch.mode !== expected.mode) ||
         !['materials', 'consumables', 'wastes'].includes(String(batch.resource)) ||
-        !['create', 'update'].includes(String(batch.mode)) ||
+        !['create', 'update', 'adjust', 'mixed'].includes(String(batch.mode)) ||
         !['DRAFT', 'COMPLETED', 'CANCELED', 'EXPIRED'].includes(String(batch.status)) ||
         typeof batch.filename !== 'string' ||
         typeof batch.expiresAt !== 'string'

@@ -1,6 +1,8 @@
 # Importación de inventario por Excel
 
-Almacén importa altas y actualizaciones de Materiales, Consumibles y Mermas.
+Almacén importa altas, ediciones y conteos en un único archivo por inventario.
+Cada fila indica Alta, Editar, Ajustar, Editar y ajustar o Conservar. Aplica a
+Materiales, Consumibles y Mermas.
 El [procedimiento y cliente Vue](../../../../../front/docs/development/05-inventory-excel-import.md)
 pertenecen a `front/`; los contratos HTTP están en [OpenAPI](../../openapi/index.md).
 
@@ -31,7 +33,8 @@ a catálogos se resuelven por código de proveedor, presentación y unidad; en m
 la opción seleccionada del catálogo contiene el ID del material de origen.
 La actualización se descarga con IDs y versiones y se vuelve a subir conservándolos.
 Se identifica el destino por ID, por lo que editar el nombre no crea otro artículo.
-Una fila de actualización sin ID se rechaza; los dos modos usan plantillas distintas.
+Una edición o ajuste sin ID se rechaza. El archivo mixto conserva una sola fila por
+destino; Editar y ajustar combina datos y conteo sin refrescar las versiones originales.
 
 Materiales y consumibles comparan su identidad de nombre, tipo, presentación, unidad
 y dimensiones, y verifican la relación con el proveedor. Una relación nueva puede
@@ -47,7 +50,7 @@ y no deja efectos parciales. Las filas sin cambios de una edición se omiten al 
 ## Flujo HTTP y permisos
 
 Prefijo: `/api/warehouse/inventory-imports`. Recursos: `materials`, `consumables`,
-`wastes`. Modos: `create`, `update`.
+`wastes`. La interfaz usa `mixed`; `create`, `update` y `adjust` conservan contratos recuperables.
 
 | Ruta | Resultado |
 | --- | --- |
@@ -58,9 +61,12 @@ Prefijo: `/api/warehouse/inventory-imports`. Recursos: `materials`, `consumables
 | `DELETE /:id` | Descarta el borrador y elimina su contenido temporal. |
 | `GET /:id/errors/excel` | Una hoja `Datos` con fila, nombre, columna y mensaje. No es una plantilla para reimportar. |
 
-Todas requieren lectura y escritura del recurso y `inventory:costs-read`.
+Alta/edición requiere lectura, escritura y `inventory:costs-read`; conteo requiere
+lectura y ajuste. El modo mixto autoriza cada operación antes de leer datos privados.
 Consumibles usa los permisos de Materiales. Un lote sólo es accesible por su creador
 mientras conserva esos permisos. La autorización precede al parser multipart.
+Si un lote mixto contiene precios, pierde acceso quien ya no tenga lectura de costos;
+un lote formado sólo por conteos sigue recuperable con lectura y ajuste.
 Las rutas JSON existentes conservan su transporte.
 
 ## Reglas y confirmación
@@ -133,3 +139,18 @@ comprobar estructura, estilos y fórmulas; `read-excel-file` contrasta sus valor
 Las seis variantes de plantilla se descargan, editan con el motor anterior y
 vuelven a analizar con SheetKit. La [decisión del motor](excel-library-decision.md)
 registra alternativas y criterios para futuras actualizaciones.
+
+## Archivo mixto y conteo físico
+
+`inventoryMixedImportService` agrupa las filas por operación y reutiliza validadores,
+DTO, catálogos y cálculos existentes. Editar y ajustar se valida en ambos contratos y
+se presenta como una fila. Detecta repetidos, identidades y datos compartidos entre
+operaciones. Las referencias de altas y saldos de conteo se bloquean antes de escribir;
+los datos compartidos se actualizan una vez y los conteos usan el saldo protegido.
+
+La plantilla incluye registros actuales inicialmente Conservar, columnas de captura,
+stock de referencia y `stock_contado_o_inicial` vacío. El conteo interpreta cero como
+saldo final válido y rechaza vacío. Ajustar genera AJU/AME, conversiones e historia;
+no actualiza costo, nombre ni dimensiones por sí mismo. Un fallo del recibo revierte
+altas, ediciones, ajustes, movimientos y folios. El [flujo de conciliación](inventory-reconciliation.md)
+explica la secuencia con entregas antiguas sin otro descuento.

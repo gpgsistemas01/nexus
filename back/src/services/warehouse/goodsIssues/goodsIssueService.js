@@ -14,6 +14,7 @@ import { createServiceLogger, getModelLogContext, logServiceInfo } from "../../.
 
 import { getDb } from "../../../repository/baseRepository.js";
 import { lockGoodsIssue } from "../../../repository/warehouse/documentLockRepository.js";
+import { HISTORICAL_DELIVERY_SELECT } from '../issues/historicalDeliverySelect.js';
 import {
     generateYearlyReferenceNumber,
     throwIfReferenceNumberAlreadyExists
@@ -110,6 +111,7 @@ export const findAllGoodsIssues = async ({
             where,
             orderBy: [{ [orderBy]: orderDir }, { id: 'asc' }],
             include: {
+                historicalDeliveryBatch: { select: HISTORICAL_DELIVERY_SELECT },
                 status: true,
                 fulfillmentStatus: true,
                 details: includeDetails && {

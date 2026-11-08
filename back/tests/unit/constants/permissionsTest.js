@@ -5,6 +5,22 @@ import { DEPARTMENT_KEYS } from '../../../src/constants/departments.js';
 import { ROLE_KEYS } from '../../../src/constants/roles.js';
 
 describe('políticas funcionales de acceso', () => {
+    it.each([
+        [ROLE_KEYS.SYSTEM_ADMIN, DEPARTMENT_KEYS.SYSTEMS, true],
+        [ROLE_KEYS.COORDINATOR, DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, true],
+        [ROLE_KEYS.AUXILIARY, DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, false],
+        [ROLE_KEYS.WAREHOUSE_KEEPER, DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, false],
+        [ROLE_KEYS.COORDINATOR, DEPARTMENT_KEYS.SYSTEMS, false],
+        [ROLE_KEYS.SYSTEM_ADMIN, DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY, false]
+    ])('reconocimiento histórico según asignación %s / %s = %s', (roleKey, departmentKey, expected) => {
+        expect(getGrantedPermissions([{ roleKey, departmentKey }]).includes(PERMISSIONS.ISSUES_RECONCILE)).toBe(expected);
+    });
+    it('no mezcla rol y área entre asignaciones para regularizar', () => {
+        expect(getGrantedPermissions([
+            { roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.SYSTEMS },
+            { roleKey: ROLE_KEYS.AUXILIARY, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }
+        ])).not.toContain(PERMISSIONS.ISSUES_RECONCILE);
+    });
     const operationalDepartments = [
         DEPARTMENT_KEYS.PRINTING,
         DEPARTMENT_KEYS.ROUTER,

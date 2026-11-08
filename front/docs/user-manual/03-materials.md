@@ -6,19 +6,22 @@ Abra **Almacén → Materiales**. **Tabla de Existencias** muestra material, pro
 presentación, unidad y stock. Las columnas agrupadas distinguen dimensiones y conversión.
 Busque y filtre para localizar el registro correcto.
 
-<!-- manual:all materials:read materials:write inventory:costs-read -->
+<!-- manual:any materials:write materials:adjust-stock -->
 ## Importar materiales o consumibles desde Excel
 
-1. En el módulo correspondiente, pulse **Importar Excel** y elija **Crear registros** o **Actualizar datos**.
-2. Pulse **Descargar plantilla**. Para actualizar, use los filtros y la página de 100 registros que necesite.
-3. Complete el archivo sin cambiar hojas, encabezados, identificadores ni versiones.
+1. En el módulo correspondiente, pulse **Importar Excel** para trabajar con un archivo único.
+2. Filtre proveedor/nombre y página; pulse **Descargar plantilla**. Sus filas existentes empiezan en Conservar.
+3. Elija por fila Alta, Editar, Ajustar, Editar y ajustar o Conservar. Complete los datos sin cambiar hojas, encabezados ni IDs/versiones de registros existentes.
 4. Seleccione el `.xlsx` y pulse **Validar archivo**. Revise cambios, cantidades y errores.
 5. Si hay errores, descárguelos, pulse **Descartar borrador**, corrija el original y vuelva a validarlo.
 6. Pulse **Confirmar importación** y espere el recibo. Use **Otro archivo** para continuar.
 
-En altas, el sistema genera los IDs. Para editar, descargue **Actualizar datos**,
-cambie los campos permitidos y vuelva a subir el archivo conservando IDs y versiones.
-Use archivos separados para altas y ediciones.
+Use un archivo por inventario y mezcle sus altas, ediciones y ajustes. En Alta, el ID
+queda vacío y el servidor lo genera. Para Editar/Ajustar conserve los IDs/versiones.
+Editar deja el stock vacío; Ajustar/Editar y ajustar captura el saldo físico final
+en `stock_contado_o_inicial`, con motivo y observaciones. Cero es válido y vacío se
+rechaza. Para Alta esa columna es existencia inicial. Conservar no aplica cambios.
+Una fila por destino; si necesita datos y stock, elija Editar y ajustar.
 
 Un duplicado o error bloquea **todo el archivo**: todavía no se guarda ninguna fila.
 **Descargar errores** indica cuáles corregir o retirar antes de volver a validar.

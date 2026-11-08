@@ -194,7 +194,9 @@
       "mode": {
         "enum": [
           "create",
-          "update"
+          "update",
+          "adjust",
+          "mixed"
         ]
       },
       "status": {

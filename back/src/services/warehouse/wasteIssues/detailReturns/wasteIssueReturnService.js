@@ -1,4 +1,5 @@
 import { lockWasteIssue } from '../../../../repository/warehouse/documentLockRepository.js';
+import { assertHistoricalPhysicalReturn } from '../../issues/historicalReturnRules.js';
 import { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../../../../constants/warehouseStatuses.js';
 import {
     WasteIssueDetailNotFound,
@@ -24,6 +25,7 @@ const returnWasteIssueDetailTransaction = ({ id, detailId, returnDto, userId }) 
     });
 
     if (!detail) throw new WasteIssueDetailNotFound();
+    assertHistoricalPhysicalReturn({ issue: detail.wasteIssue, returnDto });
     if (detail.wasteIssue.fulfillmentStatus.name !== FULFILLMENT_STATUS_NAMES.COMPLETE) {
         throw new WasteIssueReturnStatusConflict();
     }

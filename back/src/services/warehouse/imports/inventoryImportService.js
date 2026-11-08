@@ -6,6 +6,8 @@ import { OperationKeyConflictError, RecordVersionConflictError } from '../../../
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { INVENTORY_IMPORT_LIMITS as limits } from '../../../shared/constants/inventoryImport.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
+import { PERMISSIONS } from '../../../shared/constants/permissions.js';
+import { AppError } from '../../../errors/AppError.js';
 import { writeInventoryImport } from './inventoryImportWriteService.js';
 import { authorizeInventoryImport } from './inventoryImportConfig.js';
 import { processInventoryWorkbook } from './inventoryWorkbookService.js';
@@ -22,6 +24,11 @@ const owned = async ({ id, user, db = getDb() }) => {
     const batch = await db.inventoryImport.findFirst({ where: { id, userId: user.id } });
     if (!batch) throw new InventoryImportError('NOT_FOUND');
     authorizeInventoryImport(user, batch.resource, batch.mode);
+    const visibleRows = batch.preview?.rows ?? batch.result?.rows ?? [];
+    if (batch.mode === 'mixed' && !user.permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ)
+        && visibleRows.some(row => Object.hasOwn(row.before ?? {}, 'maxUnitCost') || Object.hasOwn(row.after ?? {}, 'maxUnitCost'))) {
+        throw new AppError('No tiene permiso para consultar los costos de esta importación.', 'FORBIDDEN', 403);
+    }
     return batch;
 };
 
@@ -39,7 +46,7 @@ export const previewInventoryImport = async ({ user, resource, mode, filename, b
     const fileHash = hash(buffer);
     const rows = await processInventoryWorkbook({ action: 'read', config, bytes: buffer }, signal);
     signal?.throwIfAborted();
-    const validated = await validateInventoryImportRows({ db: getDb(), config, rows });
+    const validated = await validateInventoryImportRows({ db: getDb(), config, rows, user });
     signal?.throwIfAborted();
     const preview = { summary: validated.summary, rows: validated.rows.map(publicRow) };
     const payload = validated.summary.errors ? undefined : json(validated.rows.map(row => ({
@@ -88,7 +95,7 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
             if (!gate.allowed) throw new InventoryImportError('BUSY');
             const config = authorizeInventoryImport(user, batch.resource, batch.mode);
             const rows = batch.payload.map(row => ({ row: row.row, values: { ...row.dto, ...(row.id && { id: row.id }) } }));
-            const validated = await validateInventoryImportRows({ db: tx, config, rows });
+            const validated = await validateInventoryImportRows({ db: tx, config, rows, user });
             if (validated.summary.errors) throw new InventoryImportError('CONFLICT', { rows: validated.rows.filter(row => row.errors.length).map(publicRow) });
             for (let index = 0; index < validated.rows.length; index++) {
                 const current = validated.rows[index];
@@ -99,7 +106,7 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
             }
             const saved = await writeInventoryImport({ tx, config, rows: validated.rows, context: validated.context, userId: user.id });
             const changes = validated.rows.map(row => ({ ...publicRow(row), id: saved.get(row.row) ?? row.id,
-                supplierId: row.dto.supplierId ?? validated.context.wastes.get(row.id)?.supplierId ?? null }));
+                supplierId: row.dto.supplierId ?? validated.context.wastes?.get(row.id)?.supplierId ?? null }));
             const result = json({ summary: validated.summary, rows: changes });
             const persisted = await tx.inventoryImport.update({ where: { id, version: expectedVersion }, data: {
                 status: 'COMPLETED', operationId, commandHash, completedAt: new Date(), result,

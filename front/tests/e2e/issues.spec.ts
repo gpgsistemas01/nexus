@@ -234,7 +234,9 @@ for (const [path, label] of [
       [1, 1],
     ] as const) {
       await page.getByRole('button', { name: 'Surtir detalle', exact: true }).click();
-      const dialog = page.getByRole('dialog');
+      const dialog = page.getByRole('dialog', {
+        name: /^Surtir salida( de merma)? - Folio SAL-001$/,
+      });
       await dialog.getByRole('checkbox', { name: `Surtir: ${label}`, exact: true }).check();
       await dialog
         .getByRole('spinbutton', { name: `Cantidad de proyecto: ${label}`, exact: true })

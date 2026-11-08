@@ -1,9 +1,15 @@
 # 5. Mermas
 
-<!-- manual:all wastes:read wastes:write inventory:costs-read -->
+<!-- manual:any wastes:write wastes:adjust-stock -->
 ## Importar desde Excel
 
-1. Pulse **Importar Excel** y elija **Crear registros** o **Actualizar datos**.
+Indique Alta, Editar, Ajustar, Editar y ajustar o Conservar en cada fila. Los registros
+existentes conservan IDs/versiones; las altas dejan el ID vacío.
+`stock_contado_o_inicial` es cantidad inicial en Alta y saldo físico final en Ajustar
+o Editar y ajustar. Cero contado es válido; vacío se rechaza. Ajustar exige motivo
+y observaciones. Editar conserva stock; Conservar no aplica cambios.
+
+1. Pulse **Importar Excel** para descargar un único archivo de altas, ediciones y ajustes.
 2. Para altas, seleccione proveedor y descargue la plantilla con sus materiales de referencia en m².
 3. Capture los datos; en Rollo use cono, merma con cono y rollo completo con cono, en kg. El sistema calcula las medidas.
 4. Seleccione el archivo y pulse **Validar archivo**. Revise cantidad inicial, cambios y errores.
@@ -11,8 +17,8 @@
 6. Pulse **Confirmar importación** y espere el recibo.
 
 El ID de la nueva merma lo genera el sistema. Seleccione el material de referencia
-de la lista del Excel; la opción ya incluye su ID. Para editar, descargue
-**Actualizar datos** y vuelva a subirlo conservando IDs y versiones.
+de la lista del Excel; la opción ya incluye su ID. Para editar, cambie la operación
+de la fila descargada a **Editar** o **Editar y ajustar** y conserve IDs/versiones.
 
 Si una fila está repetida o es inválida, **no se aplica ninguna fila**. Descargue
 los errores, corrija o retire los repetidos y vuelva a validar. Un alta repetida no suma stock.

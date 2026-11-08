@@ -76,6 +76,9 @@ Incluye límites de ejecución, confirmación atómica y limpieza de borradores.
 La [decisión del motor Excel](excel-library-decision.md) explica la selección
 de SheetKit, sus requisitos y los criterios de actualización.
 
-La [conciliación de inventario y entregas históricas](inventory-reconciliation-proposal.md)
-propone ampliar ese flujo con conteos y un cierre documental sin otro descuento
-de existencias. Estas dos ampliaciones todavía no están implementadas.
+La [conciliación de inventario y entregas históricas](inventory-reconciliation.md)
+implementa el conteo físico por Excel y el registro por lote de entregas ya realizadas
+sin otro descuento de existencias.
+
+La [revisión de implementación del hilo](thread-implementation-review.md) distingue
+las capacidades existentes, las brechas encontradas y sus implementaciones verificables.

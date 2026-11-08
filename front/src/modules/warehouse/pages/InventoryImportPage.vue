@@ -23,6 +23,7 @@ const suppliers = useRemoteOptions(
 const state = useInventoryImport({
     resource: props.resource,
     userId: props.userId,
+    initialMode: 'mixed',
     onSaved: () => emit('saved'),
     onUnauthorized: () => emit('unauthorized'),
 });
@@ -59,7 +60,6 @@ const download = () =>
         :template-page="templatePage"
         :suppliers="suppliers.state.value"
         :can-read-suppliers="canReadSuppliers"
-        @mode="mode = $event"
         @file="state.selectFile"
         @prepare="state.prepare"
         @confirm="state.confirm"

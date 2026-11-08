@@ -85,7 +85,7 @@ export const loadInventoryImportContext = async ({ db, config, rows }) => {
     const pairs = [];
     for (const row of values) {
         const supplierId = row.supplierId || context.supplierCodes.get(importKey(row.supplierCode))?.id;
-        let materialId = config.mode === 'update' ? importReferenceId(row.id) : importReferenceId(row.materialId);
+        let materialId = config.mode !== 'create' ? importReferenceId(row.id) : importReferenceId(row.materialId);
         if (config.mode === 'create' && config.resource !== 'wastes') {
             const presentationId = row.presentationId || context.presentationNames.get(importKey(row.presentationName))?.id;
             const unitMeasureId = row.unitMeasureId || context.unitLabels.get(importKey(row.unitLabel))?.id;
@@ -100,12 +100,16 @@ export const loadInventoryImportContext = async ({ db, config, rows }) => {
         } });
         for (const row of offers) context.offers.set(`${row.materialId}:${row.supplierId}`, row);
     }
-    if (config.resource === 'wastes' && config.mode === 'update') {
+    if (config.resource === 'wastes' && config.mode !== 'create') {
         const wastes = await db.waste.findMany({ where: { id: { in: ids(values.map(row => row.id)) } },
             include: { presentation: true, unitMeasure: true, supplier: true } });
         for (const row of wastes) {
             context.wastes.set(row.id, row);
         }
+    }
+    if (config.mode === 'adjust') {
+        const reasons = await db.stockAdjustmentReason.findMany({ where: { id: { in: ids(values.map(row => row.reasonId)) }, isActive: true } });
+        context.reasons = new Map(reasons.map(row => [row.id, row]));
     }
     return context;
 };

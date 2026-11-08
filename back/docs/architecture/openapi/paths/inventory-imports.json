@@ -5,8 +5,8 @@
       "tags": [
         "Importaciones de inventario"
       ],
-      "summary": "Descargar plantilla de altas o actualizaci\u00f3n",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Formato NEXUS_INVENTORY_V1. Hojas Datos, Instrucciones y Catalogos (m\u00e1ximo 500 opciones). Actualizaci\u00f3n incluye IDs, versiones y s\u00f3lo nombre, m\u00ednimo, costo y activo; no importa stock ni cambia dimensiones/pesos. Mermas Rollo calcula sus medidas desde los pesos y el material de referencia. Las altas generan el ID del nuevo registro en el servidor; las referencias se eligen del cat\u00e1logo. Para editar, descargar la plantilla con IDs/versiones, modificar campos habilitados y subir el mismo archivo. Una fila sin ID en actualizaci\u00f3n se rechaza y no crea un registro.",
+      "summary": "Descargar archivo único para altas, ediciones y conteos",
+      "description": "La interfaz usa mode=mixed: operacion por fila Alta, Editar, Ajustar, Editar y ajustar o Conservar. Hasta 100 filas y 2 MiB. Registros actuales con IDs/versiones originales, saldos de referencia y stock_contado_o_inicial vacío. Alta usa existencia inicial y genera ID; editar conserva stock/identidad; ajuste reemplaza el saldo por el conteo físico final y exige motivo activo y observaciones. Cero es válido, vacío de conteo se rechaza. Conservar no cambia datos. Un destino ocupa una fila. Alta/edición requiere lectura, escritura y inventory:costs-read; conteo requiere lectura y ajuste del recurso. Mixto autoriza cada operación antes de leer costos. Un error bloquea todo el archivo. create/update/adjust conservan recuperación de contratos anteriores. Catálogos hasta 500 opciones; merma usa material de referencia existente y proveedor filtrado.",
       "security": [
         {
           "cookieAuth": []
@@ -33,7 +33,9 @@
             "type": "string",
             "enum": [
               "create",
-              "update"
+              "update",
+              "adjust",
+              "mixed"
             ],
             "default": "create"
           }
@@ -45,7 +47,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "description": "Obligatorio para la plantilla de alta de mermas. En actualizaci\u00f3n delimita las relaciones del proveedor."
+          "description": "Obligatorio para la plantilla de alta de mermas. En actualización delimita las relaciones del proveedor."
         },
         {
           "name": "search",
@@ -64,7 +66,7 @@
             "maximum": 999,
             "default": 1
           },
-          "description": "Actualizaci\u00f3n: 100 filas por p\u00e1gina, orden estable por nombre e identificador."
+          "description": "Actualización: 100 filas por página, orden estable por nombre e identificador."
         }
       ],
       "responses": {
@@ -80,7 +82,7 @@
           }
         },
         "400": {
-          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "description": "Archivo o captura inválida; revisar fila/columna de la vista previa.",
           "content": {
             "application/json": {
               "schema": {
@@ -100,7 +102,7 @@
           }
         },
         "409": {
-          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "description": "Conflicto de versión, identidad, estado o clave de operación; no se aplica parcialmente el lote.",
           "content": {
             "application/json": {
               "schema": {
@@ -120,7 +122,7 @@
           }
         },
         "413": {
-          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "description": "Se excedió un límite de archivo, filas o tiempo de análisis.",
           "content": {
             "application/json": {
               "schema": {
@@ -130,7 +132,7 @@
           }
         },
         "429": {
-          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "description": "Hay otro trabajo de importación o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
           "content": {
             "application/json": {
               "schema": {
@@ -161,7 +163,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Validar archivo sin cambiar el inventario",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Un \u00fanico campo file .xlsx, hasta 2 MiB y 100 filas. Rechaza f\u00f3rmulas, macros, libros corruptos y encabezados o modo distintos. Devuelve errores por fila sin aplicar ninguna. Borrador privado por 24 horas; XLSX descartado tras el an\u00e1lisis. Detecta repetidos por identidad dentro del archivo y contra la base. Un solo duplicado o error bloquea todo el lote, incluidas las filas v\u00e1lidas. Los repetidos internos indican la primera fila coincidente; el informe de errores identifica filas y columnas.",
+      "description": "Autoriza antes del multipart; analiza un único file XLSX mediante SheetKit en worker. mode=mixed mezcla operaciones por fila y valida cada permiso, duplicados, versiones, identidad y conteo final sin modificar inventario. Vista previa temporal por cuenta, hasta 100 filas y 2 MiB. Un error bloquea la confirmación de todo el archivo.",
       "security": [
         {
           "cookieAuth": []
@@ -188,7 +190,9 @@
             "type": "string",
             "enum": [
               "create",
-              "update"
+              "update",
+              "adjust",
+              "mixed"
             ],
             "default": "create"
           }
@@ -206,7 +210,7 @@
           }
         },
         "400": {
-          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "description": "Archivo o captura inválida; revisar fila/columna de la vista previa.",
           "content": {
             "application/json": {
               "schema": {
@@ -226,7 +230,7 @@
           }
         },
         "409": {
-          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "description": "Conflicto de versión, identidad, estado o clave de operación; no se aplica parcialmente el lote.",
           "content": {
             "application/json": {
               "schema": {
@@ -246,7 +250,7 @@
           }
         },
         "413": {
-          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "description": "Se excedió un límite de archivo, filas o tiempo de análisis.",
           "content": {
             "application/json": {
               "schema": {
@@ -256,7 +260,7 @@
           }
         },
         "429": {
-          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "description": "Hay otro trabajo de importación o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
           "content": {
             "application/json": {
               "schema": {
@@ -306,7 +310,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Confirmar todas las filas del borrador",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Revalida permisos, cat\u00e1logos, identidad y versiones. Una \u00fanica transacci\u00f3n guarda registros, stock inicial, movimientos, folios y recibo. Mismo operationId y expectedVersion devuelve el recibo confirmado, incluso despu\u00e9s de reiniciar; otra clave para el mismo lote confirmado produce 409. No enviar filas ni totales desde el cliente. Un duplicado surgido despu\u00e9s de la vista previa produce 409 sin aplicar ninguna fila. Las filas sin cambios de una actualizaci\u00f3n se omiten.",
+      "description": "Requiere sesión, lectura y escritura del módulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes sólo son accesibles por su creador mientras conserva estos permisos. Revalida permisos, catálogos, identidad y versiones. Una única transacción guarda registros, stock inicial, movimientos, folios y recibo. Mismo operationId y expectedVersion devuelve el recibo confirmado, incluso después de reiniciar; otra clave para el mismo lote confirmado produce 409. No enviar filas ni totales desde el cliente. Un duplicado surgido después de la vista previa produce 409 sin aplicar ninguna fila. Las filas sin cambios de una actualización se omiten.",
       "security": [
         {
           "cookieAuth": []
@@ -335,7 +339,7 @@
           }
         },
         "400": {
-          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "description": "Archivo o captura inválida; revisar fila/columna de la vista previa.",
           "content": {
             "application/json": {
               "schema": {
@@ -355,7 +359,7 @@
           }
         },
         "409": {
-          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "description": "Conflicto de versión, identidad, estado o clave de operación; no se aplica parcialmente el lote.",
           "content": {
             "application/json": {
               "schema": {
@@ -375,7 +379,7 @@
           }
         },
         "413": {
-          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "description": "Se excedió un límite de archivo, filas o tiempo de análisis.",
           "content": {
             "application/json": {
               "schema": {
@@ -385,7 +389,7 @@
           }
         },
         "429": {
-          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "description": "Hay otro trabajo de importación o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
           "content": {
             "application/json": {
               "schema": {
@@ -425,8 +429,8 @@
       "tags": [
         "Importaciones de inventario"
       ],
-      "summary": "Consultar vista previa o recibo de una importaci\u00f3n propia",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Un DRAFT consultado tras una desconexi\u00f3n no demuestra rollback: repetir la confirmaci\u00f3n con el mismo operationId/expectedVersion. Un EXPIRED oculta su contenido aunque la limpieza f\u00edsica siga pendiente.",
+      "summary": "Consultar vista previa o recibo de una importación propia",
+      "description": "Requiere sesión, lectura y escritura del módulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes sólo son accesibles por su creador mientras conserva estos permisos. Un DRAFT consultado tras una desconexión no demuestra rollback: repetir la confirmación con el mismo operationId/expectedVersion. Un EXPIRED oculta su contenido aunque la limpieza física siga pendiente.",
       "security": [
         {
           "cookieAuth": []
@@ -455,7 +459,7 @@
           }
         },
         "400": {
-          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "description": "Archivo o captura inválida; revisar fila/columna de la vista previa.",
           "content": {
             "application/json": {
               "schema": {
@@ -475,7 +479,7 @@
           }
         },
         "409": {
-          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "description": "Conflicto de versión, identidad, estado o clave de operación; no se aplica parcialmente el lote.",
           "content": {
             "application/json": {
               "schema": {
@@ -495,7 +499,7 @@
           }
         },
         "413": {
-          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "description": "Se excedió un límite de archivo, filas o tiempo de análisis.",
           "content": {
             "application/json": {
               "schema": {
@@ -505,7 +509,7 @@
           }
         },
         "429": {
-          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "description": "Hay otro trabajo de importación o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
           "content": {
             "application/json": {
               "schema": {
@@ -534,7 +538,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Descartar un borrador sin confirmar",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Elimina el contenido temporal y marca CANCELED. No revierte un lote COMPLETED. Si hay una confirmaci\u00f3n en curso, la condici\u00f3n de estado y el bloqueo impiden descartarla como si no se hubiera aplicado.",
+      "description": "Requiere sesión, lectura y escritura del módulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes sólo son accesibles por su creador mientras conserva estos permisos. Elimina el contenido temporal y marca CANCELED. No revierte un lote COMPLETED. Si hay una confirmación en curso, la condición de estado y el bloqueo impiden descartarla como si no se hubiera aplicado.",
       "security": [
         {
           "cookieAuth": []
@@ -563,7 +567,7 @@
           }
         },
         "400": {
-          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "description": "Archivo o captura inválida; revisar fila/columna de la vista previa.",
           "content": {
             "application/json": {
               "schema": {
@@ -583,7 +587,7 @@
           }
         },
         "409": {
-          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "description": "Conflicto de versión, identidad, estado o clave de operación; no se aplica parcialmente el lote.",
           "content": {
             "application/json": {
               "schema": {
@@ -603,7 +607,7 @@
           }
         },
         "413": {
-          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "description": "Se excedió un límite de archivo, filas o tiempo de análisis.",
           "content": {
             "application/json": {
               "schema": {
@@ -613,7 +617,7 @@
           }
         },
         "429": {
-          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "description": "Hay otro trabajo de importación o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
           "content": {
             "application/json": {
               "schema": {
@@ -644,7 +648,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Descargar errores de la vista previa",
-      "description": "Requiere sesi\u00f3n, lectura y escritura del m\u00f3dulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes s\u00f3lo son accesibles por su creador mientras conserva estos permisos. Disponible para un DRAFT propio, vigente y con errores. Columnas fila, nombre, columna y mensaje. Es un informe de revisi\u00f3n; no se puede reimportar como plantilla.",
+      "description": "Requiere sesión, lectura y escritura del módulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes sólo son accesibles por su creador mientras conserva estos permisos. Disponible para un DRAFT propio, vigente y con errores. Columnas fila, nombre, columna y mensaje. Es un informe de revisión; no se puede reimportar como plantilla.",
       "security": [
         {
           "cookieAuth": []
@@ -674,7 +678,7 @@
           }
         },
         "400": {
-          "description": "Archivo o captura inv\u00e1lida; revisar fila/columna de la vista previa.",
+          "description": "Archivo o captura inválida; revisar fila/columna de la vista previa.",
           "content": {
             "application/json": {
               "schema": {
@@ -694,7 +698,7 @@
           }
         },
         "409": {
-          "description": "Conflicto de versi\u00f3n, identidad, estado o clave de operaci\u00f3n; no se aplica parcialmente el lote.",
+          "description": "Conflicto de versión, identidad, estado o clave de operación; no se aplica parcialmente el lote.",
           "content": {
             "application/json": {
               "schema": {
@@ -714,7 +718,7 @@
           }
         },
         "413": {
-          "description": "Se excedi\u00f3 un l\u00edmite de archivo, filas o tiempo de an\u00e1lisis.",
+          "description": "Se excedió un límite de archivo, filas o tiempo de análisis.",
           "content": {
             "application/json": {
               "schema": {
@@ -724,7 +728,7 @@
           }
         },
         "429": {
-          "description": "Hay otro trabajo de importaci\u00f3n o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
+          "description": "Hay otro trabajo de importación o no se pudo adquirir el bloqueo a tiempo. Reintentar con la misma clave.",
           "content": {
             "application/json": {
               "schema": {

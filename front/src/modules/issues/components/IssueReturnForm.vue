@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { VTextField } from 'vuetify/components/VTextField';
 import { VTextarea } from 'vuetify/components/VTextarea';
+import { VCheckbox } from 'vuetify/components/VCheckbox';
+import { VAlert } from 'vuetify/components/VAlert';
 import { isPiecePresentation } from '@nexus/piece-quantity';
 import RecordEditorDialog from '../../../shared/components/RecordEditorDialog.vue';
 import { numberText } from '../../../shared/utils/formatNumbers.js';
@@ -16,6 +18,9 @@ defineProps<{
     message: string;
     isSubmitting: boolean;
     isConflicted: boolean;
+    isHistorical?: boolean;
+    physicalReturnConfirmed?: boolean;
+    physicalReturnError?: string;
 }>();
 const emit = defineEmits<{
     update: [field: 'returnQuantity' | 'observations', value: string];
@@ -23,6 +28,7 @@ const emit = defineEmits<{
     submit: [];
     close: [];
     reload: [];
+    confirmPhysicalReturn: [value: boolean];
 }>();
 </script>
 
@@ -41,6 +47,23 @@ const emit = defineEmits<{
         @reload="emit('reload')"
     >
         <h3>Devolución del detalle</h3>
+        <VAlert
+            v-if="isHistorical"
+            type="info"
+            variant="tonal"
+            class="mb-4"
+        >
+            Esta salida fue regularizada por entrega histórica. Registra únicamente material que
+            entra físicamente al almacén ahora.
+        </VAlert>
+        <VCheckbox
+            v-if="isHistorical"
+            :model-value="physicalReturnConfirmed"
+            label="Confirmo que esta cantidad está entrando físicamente al almacén ahora."
+            :error-messages="physicalReturnError"
+            :disabled="isSubmitting"
+            @update:model-value="emit('confirmPhysicalReturn', $event === true)"
+        />
         <VTextField
             label="Cantidad a devolver"
             type="number"

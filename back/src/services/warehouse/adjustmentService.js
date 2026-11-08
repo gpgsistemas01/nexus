@@ -60,7 +60,7 @@ const createStockAdjustmentMovement = async ({
     });
 };
 
-const calculateStockAdjustmentValues = ({
+export const calculateStockAdjustmentValues = ({
     supplierMaterial,
     newStock,
     base = null,
@@ -238,7 +238,7 @@ export const createStockAdjustment = async ({
     }
 };
 
-export const createInitialMaterialStockBatch = async ({ tx, entries, userId, reasonId }) => {
+export const createMaterialStockAdjustmentsBatch = async ({ tx, entries, userId, reasonId }) => {
     if (!entries.length) return [];
     const references = await reserveYearlyReferenceNumbers({ type: DOCUMENT_REFERENCE_TYPES.STOCK_ADJUSTMENT, tx, count: entries.length });
     const adjustments = [];
@@ -254,7 +254,8 @@ export const createInitialMaterialStockBatch = async ({ tx, entries, userId, rea
         const detailId = randomUUID();
         const movementId = randomUUID();
         adjustments.push({ id: adjustmentId, referenceNumber: references[index],
-            type: STOCK_ADJUSTMENT_TYPES.INCREASE, reasonId, observations, status: STOCK_ADJUSTMENT_STATUS_NAMES.APPLIED,
+            type: values.difference >= 0 ? STOCK_ADJUSTMENT_TYPES.INCREASE : STOCK_ADJUSTMENT_TYPES.DECREASE,
+            reasonId: entry.reasonId ?? reasonId, observations, status: STOCK_ADJUSTMENT_STATUS_NAMES.APPLIED,
             appliedAt: now, createdById: userId, approvedById: userId });
         details.push({ id: detailId, stockAdjustmentId: adjustmentId, materialId, supplierId,
             materialName: supplierMaterial.material.name,
@@ -275,3 +276,5 @@ export const createInitialMaterialStockBatch = async ({ tx, entries, userId, rea
     if (balances.length !== entries.length) throw new RecordVersionConflictError();
     return references;
 };
+
+export const createInitialMaterialStockBatch = createMaterialStockAdjustmentsBatch;

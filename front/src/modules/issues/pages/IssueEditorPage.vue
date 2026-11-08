@@ -106,6 +106,7 @@ const openReturnDialog = (line: IssueDetail) => {
 <template>
     <IssueEditor
         :title="title"
+        :historical-delivery="issueDocument?.historicalDelivery"
         :values="editor.values"
         :errors="editor.errors.value"
         :message="editor.message.value"

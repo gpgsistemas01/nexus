@@ -3,6 +3,30 @@ import { RecordVersionConflictError } from '../../errors/concurrencyError.js';
 
 const requireEveryRow = (rows, count) => { if (rows.length !== count) throw new RecordVersionConflictError(); };
 
+export const lockInventoryStockCount = async ({ tx, context }) => {
+    const materials = new Map([...context.offers.values()].map(offer => [offer.material.id, offer.material]));
+    const presentations = new Map([...materials.values(), ...context.wastes.values()].map(item => [item.presentation.id, item.presentation]));
+    const sources = [
+        ['StockAdjustmentReason', [...context.reasons.values()], false],
+        ['Presentation', [...presentations.values()], false],
+        ['Material', [...materials.values()], false],
+        ['SupplierMaterial', [...context.offers.values()], true],
+        ['Waste', [...context.wastes.values()], true]
+    ];
+    for (const [table, records, write] of sources) {
+        if (!records.length) continue;
+        const values = records.map(row => Prisma.sql`(${row.id}::uuid, ${row.version}::int)`);
+        const locked = await tx.$queryRaw(Prisma.sql`
+            WITH source(id, version) AS (VALUES ${Prisma.join(values)})
+            SELECT item."id" FROM ${Prisma.raw(`"${table}"`)} item JOIN source
+                ON item."id" = source.id AND item."version" = source.version
+            ORDER BY ${Prisma.raw(table === 'SupplierMaterial' ? 'item."materialId", item."supplierId"' : 'item."id"')}
+            ${Prisma.raw(write ? 'FOR UPDATE' : 'FOR SHARE')} OF item
+        `);
+        requireEveryRow(locked, records.length);
+    }
+};
+
 export const lockInventoryImportReferences = async ({ tx, context }) => {
     // Los nombres de tabla son constantes internas; los IDs y versiones siempre se parametrizan.
     const materials = new Map([...context.identities.values(), ...[...context.offers.values()].map(offer => offer.material)].map(item => [item.id, item]));

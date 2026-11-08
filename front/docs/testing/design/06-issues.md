@@ -19,3 +19,9 @@ de salidas, devoluciones y concurrencia con base aislada.
 ninguno de los tres recursos. El composable conserva partidas canceladas y ya
 surtidas incluso ante una llamada directa a quitar; retirar una pendiente
 conserva el historial y el documento original.
+
+## Entregas históricas
+
+| Diseño | Requisito / riesgo | Nivel y técnica | Condición observable | Casos |
+| --- | --- | --- | --- | --- |
+| `DP-VUE-ISS-006` | `RF-VUE-010`, `RF-ISS-009`: duplicación por desconexión o declarar una entrega sin revisión | Unitario/transporte y Chromium; decisiones de permiso/declaración y transición selección → confirmación incierta → recarga → recibo | Hasta 100 seleccionadas con revisión original, corte y motivo. Declaración obligatoria; sin permiso no hay acción. Reintento conserva comando/clave y recupera recibo; cambio de filtros limpia selección. Procedencia visible y devolución histórica exige entrada física actual. | [CP-VUE-ISS-006-01](../cases/cp-vue-iss-006-01.md) |

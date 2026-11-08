@@ -16,7 +16,7 @@ export const useIssueReturn = (options: {
 }) => {
     const availableQuantity = getIssueReturnableQuantity(options.detail);
     const form = useForm({
-        initialValues: { returnQuantity: '', observations: '' },
+        initialValues: { returnQuantity: '', observations: '', physicalReturnConfirmed: false },
         validateOnMount: false,
         validationSchema: {
             returnQuantity: (value: string) =>
@@ -26,10 +26,15 @@ export const useIssueReturn = (options: {
                     ? 'La cantidad no puede exceder lo disponible para devolver.'
                     : true),
             observations: (value: string) => issueReturnValidation.observations(value) || true,
+            physicalReturnConfirmed: (value: boolean) =>
+                !options.document.historicalDelivery ||
+                value === true ||
+                'Confirma la entrada física actual al almacén.',
         },
     });
     form.defineField('returnQuantity', { validateOnModelUpdate: false });
     form.defineField('observations', { validateOnModelUpdate: false });
+    form.defineField('physicalReturnConfirmed', { validateOnModelUpdate: false });
     const record = useRecordForm(form, {
         onSaved: options.onSaved,
         onDenied: options.onDenied,
@@ -42,6 +47,9 @@ export const useIssueReturn = (options: {
             payload: {
                 returnQuantity: Number(values.returnQuantity),
                 observations: values.observations.trim(),
+                ...(options.document.historicalDelivery && {
+                    physicalReturnConfirmed: values.physicalReturnConfirmed,
+                }),
             },
             signal,
         }),

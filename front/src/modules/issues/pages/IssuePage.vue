@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VAlert } from 'vuetify/components/VAlert';
 import { PERMISSIONS } from '@nexus/permissions';
@@ -31,6 +31,9 @@ const { session, has, onDenied, onError } = usePageAccess();
 const canManage = computed(() => has(config.managePermission));
 const canSupply = computed(() => has(config.supplyPermission));
 const canExport = computed(() => has(PERMISSIONS.WAREHOUSE_REPORTS_READ));
+const canReconcile = computed(() => has(PERMISSIONS.ISSUES_RECONCILE));
+const isHistoricalOpen = ref(false);
+const HistoricalDeliveryPage = defineAsyncComponent(() => import('./HistoricalDeliveryPage.vue'));
 const showDepartment = computed(
     () =>
         session.user.value?.organization?.isWarehouse === true ||
@@ -100,6 +103,7 @@ useVisibleRefresh({
     lastAttemptAt: () => lastAttemptAt,
     canRefresh: () =>
         canManage.value &&
+        !isHistoricalOpen.value &&
         !editor.value &&
         !isReading.value &&
         !readError.value &&
@@ -143,6 +147,13 @@ onMounted(() => {
         @refresh="list.load"
     >
         <template #actions>
+            <VBtn
+                v-if="canReconcile"
+                variant="outlined"
+                @click="isHistoricalOpen = true"
+            >
+                Registrar entregas históricas
+            </VBtn>
             <VBtn
                 v-if="canExport"
                 variant="outlined"
@@ -217,5 +228,13 @@ onMounted(() => {
         @month="setReportMonth"
         @submit="exportReport"
         @close="isReportOpen = false"
+    />
+    <HistoricalDeliveryPage
+        v-if="isHistoricalOpen && canReconcile"
+        :resource="resource"
+        :user-id="session.user.value!.id"
+        @close="isHistoricalOpen = false"
+        @saved="list.load()"
+        @unauthorized="onDenied(401)"
     />
 </template>

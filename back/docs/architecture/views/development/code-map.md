@@ -14,53 +14,53 @@ cada archivo individual.
 ```mermaid
 flowchart LR
     constants["constants (11 módulos)"] --> shared["shared (23 módulos)"]
-    controllers["controllers (33 módulos)"] --> dtos["dtos (12 módulos)"]
-    controllers["controllers (33 módulos)"] --> errors["errors (23 módulos)"]
-    controllers["controllers (33 módulos)"] --> messages["messages (1 módulos)"]
-    controllers["controllers (33 módulos)"] --> middleware["middleware (5 módulos)"]
-    controllers["controllers (33 módulos)"] --> services["services (79 módulos)"]
-    controllers["controllers (33 módulos)"] --> shared["shared (23 módulos)"]
-    controllers["controllers (33 módulos)"] --> utils["utils (15 módulos)"]
+    controllers["controllers (34 módulos)"] --> dtos["dtos (12 módulos)"]
+    controllers["controllers (34 módulos)"] --> errors["errors (23 módulos)"]
+    controllers["controllers (34 módulos)"] --> messages["messages (1 módulos)"]
+    controllers["controllers (34 módulos)"] --> middleware["middleware (5 módulos)"]
+    controllers["controllers (34 módulos)"] --> services["services (84 módulos)"]
+    controllers["controllers (34 módulos)"] --> shared["shared (23 módulos)"]
+    controllers["controllers (34 módulos)"] --> utils["utils (15 módulos)"]
     dtos["dtos (12 módulos)"] --> shared["shared (23 módulos)"]
     errors["errors (23 módulos)"] --> messages["messages (1 módulos)"]
     errors["errors (23 módulos)"] --> shared["shared (23 módulos)"]
     middleware["middleware (5 módulos)"] --> errors["errors (23 módulos)"]
     middleware["middleware (5 módulos)"] --> messages["messages (1 módulos)"]
-    middleware["middleware (5 módulos)"] --> services["services (79 módulos)"]
+    middleware["middleware (5 módulos)"] --> services["services (84 módulos)"]
     middleware["middleware (5 módulos)"] --> shared["shared (23 módulos)"]
     middleware["middleware (5 módulos)"] --> utils["utils (15 módulos)"]
-    repository["repository (9 módulos)"] --> constants["constants (11 módulos)"]
-    repository["repository (9 módulos)"] --> errors["errors (23 módulos)"]
-    repository["repository (9 módulos)"] --> lib["lib (3 módulos)"]
-    repository["repository (9 módulos)"] --> shared["shared (23 módulos)"]
-    routes["routes (36 módulos)"] --> controllers["controllers (33 módulos)"]
-    routes["routes (36 módulos)"] --> middleware["middleware (5 módulos)"]
-    routes["routes (36 módulos)"] --> services["services (79 módulos)"]
-    routes["routes (36 módulos)"] --> shared["shared (23 módulos)"]
-    routes["routes (36 módulos)"] --> utils["utils (15 módulos)"]
-    routes["routes (36 módulos)"] --> validators["validators (17 módulos)"]
-    services["services (79 módulos)"] --> constants["constants (11 módulos)"]
-    services["services (79 módulos)"] --> dtos["dtos (12 módulos)"]
-    services["services (79 módulos)"] --> errors["errors (23 módulos)"]
-    services["services (79 módulos)"] --> lib["lib (3 módulos)"]
-    services["services (79 módulos)"] --> repository["repository (9 módulos)"]
-    services["services (79 módulos)"] --> shared["shared (23 módulos)"]
-    services["services (79 módulos)"] --> utils["utils (15 módulos)"]
-    services["services (79 módulos)"] --> validators["validators (17 módulos)"]
+    repository["repository (10 módulos)"] --> constants["constants (11 módulos)"]
+    repository["repository (10 módulos)"] --> errors["errors (23 módulos)"]
+    repository["repository (10 módulos)"] --> lib["lib (3 módulos)"]
+    repository["repository (10 módulos)"] --> shared["shared (23 módulos)"]
+    routes["routes (37 módulos)"] --> controllers["controllers (34 módulos)"]
+    routes["routes (37 módulos)"] --> middleware["middleware (5 módulos)"]
+    routes["routes (37 módulos)"] --> services["services (84 módulos)"]
+    routes["routes (37 módulos)"] --> shared["shared (23 módulos)"]
+    routes["routes (37 módulos)"] --> utils["utils (15 módulos)"]
+    routes["routes (37 módulos)"] --> validators["validators (18 módulos)"]
+    services["services (84 módulos)"] --> constants["constants (11 módulos)"]
+    services["services (84 módulos)"] --> dtos["dtos (12 módulos)"]
+    services["services (84 módulos)"] --> errors["errors (23 módulos)"]
+    services["services (84 módulos)"] --> lib["lib (3 módulos)"]
+    services["services (84 módulos)"] --> repository["repository (10 módulos)"]
+    services["services (84 módulos)"] --> shared["shared (23 módulos)"]
+    services["services (84 módulos)"] --> utils["utils (15 módulos)"]
+    services["services (84 módulos)"] --> validators["validators (18 módulos)"]
     utils["utils (15 módulos)"] --> constants["constants (11 módulos)"]
     utils["utils (15 módulos)"] --> errors["errors (23 módulos)"]
-    utils["utils (15 módulos)"] --> services["services (79 módulos)"]
+    utils["utils (15 módulos)"] --> services["services (84 módulos)"]
     utils["utils (15 módulos)"] --> shared["shared (23 módulos)"]
-    validators["validators (17 módulos)"] --> constants["constants (11 módulos)"]
-    validators["validators (17 módulos)"] --> messages["messages (1 módulos)"]
-    validators["validators (17 módulos)"] --> shared["shared (23 módulos)"]
+    validators["validators (18 módulos)"] --> constants["constants (11 módulos)"]
+    validators["validators (18 módulos)"] --> messages["messages (1 módulos)"]
+    validators["validators (18 módulos)"] --> shared["shared (23 módulos)"]
 ```
 
 > Alcance: módulos JavaScript bajo `src/`. La interfaz Vue y el esquema Prisma se
 > explican en la documentación curada, porque una lista automática no describe sus
 > decisiones de diseño.
 
-## Endpoints API (98)
+## Endpoints API (100)
 
 | Método | Ruta | Definición |
 | --- | --- | --- |
@@ -70,6 +70,8 @@ flowchart LR
 | `GET` | `/api/warehouse/inventory-imports/:id` | [`src/routes/api/warehouse/inventoryImportApiRoute.js`](../../../../src/routes/api/warehouse/inventoryImportApiRoute.js) |
 | `DELETE` | `/api/warehouse/inventory-imports/:id` | [`src/routes/api/warehouse/inventoryImportApiRoute.js`](../../../../src/routes/api/warehouse/inventoryImportApiRoute.js) |
 | `GET` | `/api/warehouse/inventory-imports/:id/errors/excel` | [`src/routes/api/warehouse/inventoryImportApiRoute.js`](../../../../src/routes/api/warehouse/inventoryImportApiRoute.js) |
+| `GET` | `/api/warehouse/historical-deliveries/:resource/preview` | [`src/routes/api/warehouse/historicalDeliveryApiRoute.js`](../../../../src/routes/api/warehouse/historicalDeliveryApiRoute.js) |
+| `POST` | `/api/warehouse/historical-deliveries/:resource/confirm` | [`src/routes/api/warehouse/historicalDeliveryApiRoute.js`](../../../../src/routes/api/warehouse/historicalDeliveryApiRoute.js) |
 | `POST` | `/api/auth/login` | [`src/routes/api/authApiRoute.js`](../../../../src/routes/api/authApiRoute.js) |
 | `GET` | `/api/auth/me` | [`src/routes/api/authApiRoute.js`](../../../../src/routes/api/authApiRoute.js) |
 | `POST` | `/api/auth/refresh` | [`src/routes/api/authApiRoute.js`](../../../../src/routes/api/authApiRoute.js) |
@@ -207,6 +209,7 @@ cuando el flujo necesita una vista curada.
 | [`src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js`](../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptController.js) | `cancelMaterialGoodsReceiptDetail`, `correctMaterialGoodsReceiptDetail`, `editMaterialGoodsReceipt`, `getAllMaterialGoodsReceipts`, `getMaterialGoodsReceipt`, `registerMaterialGoodsReceipt` |
 | [`src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js`](../../../../src/controllers/api/warehouse/goodsReceipts/materials/materialGoodsReceiptReportController.js) | `exportMaterialGoodsReceiptReportExcel` |
 | [`src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js`](../../../../src/controllers/api/warehouse/goodsReceipts/shared/goodsReceiptHandlers.js) | `buildCancellationHandler`, `buildCorrectionHandler`, `buildEditHandler`, `buildListHandler`, `buildReadHandler`, `buildRegisterHandler` |
+| [`src/controllers/api/warehouse/historicalDeliveryController.js`](../../../../src/controllers/api/warehouse/historicalDeliveryController.js) | `confirmHistoricalDeliveryBatch`, `previewHistoricalDeliveryBatch` |
 | [`src/controllers/api/warehouse/inventoryImportController.js`](../../../../src/controllers/api/warehouse/inventoryImportController.js) | `applyInventoryImport`, `discardInventoryImport`, `exportInventoryImportErrors`, `getInventoryImportTemplate`, `prepareInventoryImport`, `readInventoryImport` |
 | [`src/controllers/api/warehouse/materialController.js`](../../../../src/controllers/api/warehouse/materialController.js) | `editMaterial`, `editMaterialStock`, `getAllMaterials`, `registerMaterial`, `removeMaterial` |
 | [`src/controllers/api/warehouse/presentationController.js`](../../../../src/controllers/api/warehouse/presentationController.js) | `getAllPresentations` |
@@ -247,7 +250,7 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/sales/clientService.js`](../../../../src/services/sales/clientService.js) | `createClient`, `findAllClients`, `findClientById`, `updateClient` |
 | [`src/services/sales/reportService.js`](../../../../src/services/sales/reportService.js) | `findClientReportRows` |
 | [`src/services/serviceErrorHandler.js`](../../../../src/services/serviceErrorHandler.js) | `executeServiceOperation`, `handleServiceError` |
-| [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `createInitialMaterialStockBatch`, `createStockAdjustment` |
+| [`src/services/warehouse/adjustmentService.js`](../../../../src/services/warehouse/adjustmentService.js) | `calculateStockAdjustmentValues`, `createInitialMaterialStockBatch`, `createMaterialStockAdjustmentsBatch`, `createStockAdjustment` |
 | [`src/services/warehouse/consumables/consumableService.js`](../../../../src/services/warehouse/consumables/consumableService.js) | `createConsumable`, `deleteConsumable`, `findAllConsumables`, `updateConsumable`, `updateConsumableStock` |
 | [`src/services/warehouse/fulfillmentStatusService.js`](../../../../src/services/warehouse/fulfillmentStatusService.js) | `findAllFulfillmentStatuses`, `findFulfillmentStatusIdByName`, `findFulfillmentStatusIdsByName` |
 | [`src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js`](../../../../src/services/warehouse/goodsIssues/consumables/consumableGoodsIssueService.js) | `createConsumableGoodsIssue`, `findAllConsumableGoodsIssues`, `findConsumableGoodsIssueReportRows`, `returnConsumableGoodsIssueDetail`, `updateConsumableGoodsIssue`, `updateConsumableGoodsIssueDetails`, `updateConsumableGoodsIssueHeader` |
@@ -276,7 +279,12 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/imports/inventoryImportTemplateService.js`](../../../../src/services/warehouse/imports/inventoryImportTemplateService.js) | `createInventoryImportTemplate` |
 | [`src/services/warehouse/imports/inventoryImportValidationService.js`](../../../../src/services/warehouse/imports/inventoryImportValidationService.js) | `validateInventoryImportRows` |
 | [`src/services/warehouse/imports/inventoryImportWriteService.js`](../../../../src/services/warehouse/imports/inventoryImportWriteService.js) | `writeInventoryImport` |
+| [`src/services/warehouse/imports/inventoryMixedImportService.js`](../../../../src/services/warehouse/imports/inventoryMixedImportService.js) | `validateMixedInventoryImport` |
+| [`src/services/warehouse/imports/inventoryStockCountValidationService.js`](../../../../src/services/warehouse/imports/inventoryStockCountValidationService.js) | `validateInventoryStockCountRows` |
 | [`src/services/warehouse/imports/inventoryWorkbookService.js`](../../../../src/services/warehouse/imports/inventoryWorkbookService.js) | `processInventoryWorkbook` |
+| [`src/services/warehouse/issues/historicalDeliverySelect.js`](../../../../src/services/warehouse/issues/historicalDeliverySelect.js) | `HISTORICAL_DELIVERY_SELECT` |
+| [`src/services/warehouse/issues/historicalDeliveryService.js`](../../../../src/services/warehouse/issues/historicalDeliveryService.js) | `confirmHistoricalDeliveries`, `previewHistoricalDeliveries` |
+| [`src/services/warehouse/issues/historicalReturnRules.js`](../../../../src/services/warehouse/issues/historicalReturnRules.js) | `assertHistoricalPhysicalReturn` |
 | [`src/services/warehouse/issues/issueAccessService.js`](../../../../src/services/warehouse/issues/issueAccessService.js) | `assertIssueDepartmentAccess`, `buildIssueDepartmentWhere` |
 | [`src/services/warehouse/issues/issueFulfillmentRules.js`](../../../../src/services/warehouse/issues/issueFulfillmentRules.js) | `assertIssueNotCanceled`, `resolveIssueDetailFulfillmentStatus`, `resolveIssueFulfillmentStatus` |
 | [`src/services/warehouse/issues/issueHeaderService.js`](../../../../src/services/warehouse/issues/issueHeaderService.js) | `resolveIssueHeaderData` |
@@ -302,5 +310,5 @@ sólo cuando aportan información que el código no expresa por sí mismo.
 | [`src/services/warehouse/wastes/wasteOperationService.js`](../../../../src/services/warehouse/wastes/wasteOperationService.js) | `executeWasteOperation`, `markWasteOperationRejected` |
 | [`src/services/warehouse/wastes/wasteReportSummary.js`](../../../../src/services/warehouse/wastes/wasteReportSummary.js) | `buildWasteReportSummary`, `createWasteReportSummary` |
 | [`src/services/warehouse/wastes/wasteService.js`](../../../../src/services/warehouse/wastes/wasteService.js) | `addWasteStock`, `createWaste`, `findAllWastes`, `updateWaste`, `updateWasteStock` |
-| [`src/services/warehouse/wastes/wasteStockAdjustmentService.js`](../../../../src/services/warehouse/wastes/wasteStockAdjustmentService.js) | `registerWasteStockAdjustment` |
+| [`src/services/warehouse/wastes/wasteStockAdjustmentService.js`](../../../../src/services/warehouse/wastes/wasteStockAdjustmentService.js) | `calculateWasteStockAdjustmentValues`, `registerWasteStockAdjustment`, `registerWasteStockAdjustmentsBatch` |
 | [`src/services/warehouse/wastes/wasteStockEntryService.js`](../../../../src/services/warehouse/wastes/wasteStockEntryService.js) | `registerWasteStockEntriesBatch`, `registerWasteStockEntry` |

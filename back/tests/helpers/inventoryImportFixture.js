@@ -58,9 +58,12 @@ export const createInventoryImportFixture = async prisma => {
         const adjustments = await prisma.stockAdjustment.findMany({ where: { createdById: user.id }, select: { id: true } });
         const adjustmentIds = adjustments.map(item => item.id);
         const wasteEntries = await prisma.wasteStockEntry.findMany({ where: { createdById: user.id }, select: { wasteMovementId: true } });
-        const movementIds = wasteEntries.map(item => item.wasteMovementId);
+        const wasteAdjustments = await prisma.wasteStockAdjustment.findMany({ where: { createdById: user.id }, select: { id: true, wasteMovementId: true } });
+        const movementIds = [...wasteEntries, ...wasteAdjustments].map(item => item.wasteMovementId);
         await prisma.wasteStockEntry.deleteMany({ where: { createdById: user.id } });
         await prisma.wasteMovementDetail.deleteMany({ where: { movementId: { in: movementIds } } });
+        await prisma.wasteStockAdjustmentDetail.deleteMany({ where: { wasteStockAdjustmentId: { in: wasteAdjustments.map(item => item.id) } } });
+        await prisma.wasteStockAdjustment.deleteMany({ where: { id: { in: wasteAdjustments.map(item => item.id) } } });
         await prisma.wasteMovement.deleteMany({ where: { id: { in: movementIds } } });
         await prisma.waste.deleteMany({ where: { supplierId: { in: supplierIds } } });
         await prisma.movementDetail.deleteMany({ where: { supplierId: { in: supplierIds } } });

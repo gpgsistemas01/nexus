@@ -9,11 +9,11 @@ stock mínimo, presentación y unidad de medida. Lea la unidad para interpretar 
 También puede consultar el costo unitario.
 <!-- manual:end -->
 
-<!-- manual:all materials:read materials:write inventory:costs-read -->
+<!-- manual:any materials:write materials:adjust-stock -->
 ## Importar desde Excel
 
 Pulse **Importar Excel** y siga el [procedimiento de materiales y consumibles](03-materials.md#importar-materiales-o-consumibles-desde-excel).
-La plantilla de consumibles no incluye dimensiones.
+El mismo archivo mezcla altas, ediciones y conteos; la plantilla de consumibles no incluye dimensiones.
 <!-- manual:end -->
 
 ![Listado de consumibles y sus existencias.](images/06-consumables-list.png)

@@ -7,6 +7,8 @@ import { assertWasteMaterialReference, prepareWasteMeasurements } from '../waste
 import { createMaterialDtoForRegister, createMaterialDtoForEdit } from '../../../dtos/materialDTO.js';
 import { createWasteDtoForRegister, createWasteDtoForEdit } from '../../../dtos/wasteDTO.js';
 import { loadInventoryImportContext, importKey, importReferenceId, materialImportIdentity, wasteImportIdentity } from './inventoryImportContext.js';
+import { validateInventoryStockCountRows } from './inventoryStockCountValidationService.js';
+import { validateMixedInventoryImport } from './inventoryMixedImportService.js';
 
 const snapshot = (item, material = item) => ({
     name: material.name, minStock: Number(material.minStock),
@@ -16,8 +18,10 @@ const editable = dto => ({ name: dto.name, minStock: dto.minStock ?? 0, maxUnitC
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const issue = (field, message, code = 'INVENTORY_IMPORT_VALIDATION') => ({ field, message, code });
 
-export const validateInventoryImportRows = async ({ db, config, rows }) => {
+export const validateInventoryImportRows = async ({ db, config, rows, user }) => {
+    if (config.mode === 'mixed') return validateMixedInventoryImport({ db, config, rows, user, validate: validateInventoryImportRows });
     const context = await loadInventoryImportContext({ db, config, rows });
+    if (config.mode === 'adjust') return validateInventoryStockCountRows({ config, rows, context });
     const results = [];
     const targets = new Map();
     const shared = new Map();

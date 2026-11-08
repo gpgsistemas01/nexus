@@ -58,6 +58,10 @@ const operationalAccessPolicy = createPolicy({
 });
 
 export const AUTHORIZATION_POLICIES = Object.freeze({
+    [PERMISSIONS.ISSUES_RECONCILE]: createAccessConditions([
+        { roleKey: ROLE_KEYS.SYSTEM_ADMIN, departmentKey: DEPARTMENT_KEYS.SYSTEMS },
+        { roleKey: ROLE_KEYS.COORDINATOR, departmentKey: DEPARTMENT_KEYS.WAREHOUSE_AND_SUPPLY }
+    ]),
     [PERMISSIONS.CATALOGS_MANAGE]: createPolicy({
         roles: [ROLE_KEYS.SYSTEM_ADMIN],
         departments: [DEPARTMENT_KEYS.SYSTEMS]
@@ -300,7 +304,7 @@ export const getOrganizationContext = (accesses = []) => Object.fromEntries(
 );
 
 export const getGrantedPermissions = (accesses = []) => Object.entries(AUTHORIZATION_POLICIES)
-    .filter(([, policy]) => accesses.some(access => (
+    .filter(([, policy]) => Array.isArray(policy) ? matchesAccessConditions(accesses, policy) : accesses.some(access => (
         policy.departmentKeys.includes(access.departmentKey)
         && policy.roleKeys.includes(access.roleKey)
     )))

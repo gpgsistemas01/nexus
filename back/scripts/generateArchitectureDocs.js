@@ -21,7 +21,7 @@ const DATABASE_AREAS = [
     ['Catálogos y relaciones comerciales', ['Status', 'FulfillmentStatus', 'Project', 'Client', 'Supplier', 'Material', 'UnitMeasure', 'Presentation', 'SupplierMaterial', 'ReferenceNumberCounter']],
     ['Compras e inventario de materiales', ['GoodsReceipt', 'GoodsReceiptDetail', 'GoodsReceiptDetailChange', 'GoodsIssue', 'GoodsIssueDetail', 'GoodsIssueReturn', 'InventoryMovement', 'MovementDetail', 'StockAdjustment', 'StockAdjustmentDetail', 'StockAdjustmentReason']],
     ['Mermas e inventario de merma', ['Waste', 'WasteIssue', 'WasteIssueDetail', 'WasteIssueReturn', 'WasteMovement', 'WasteMovementDetail', 'WasteStockEntry', 'WasteOperation', 'WasteStockAdjustment', 'WasteStockAdjustmentDetail']],
-    ['Importaciones de inventario', ['InventoryImport']]
+    ['Importaciones y conciliación de inventario', ['InventoryImport', 'HistoricalDeliveryBatch']]
 ];
 const USE_CASE_DOCUMENTS = {
     catalog: path.join(ROOT, 'docs/requirements/use-cases'),

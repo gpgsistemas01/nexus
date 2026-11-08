@@ -1,4 +1,5 @@
 import { lockGoodsIssue } from '../../../../repository/warehouse/documentLockRepository.js';
+import { assertHistoricalPhysicalReturn } from '../../issues/historicalReturnRules.js';
 import {
     GoodsIssueDetailNotFound,
     GoodsIssueReturnDatabaseError,
@@ -39,6 +40,7 @@ export const returnGoodsIssueDetail = async ({ id, detailId, returnDto, userId, 
             });
 
             if (!detail) throw new GoodsIssueDetailNotFound();
+            assertHistoricalPhysicalReturn({ issue: detail.goodsIssue, returnDto });
             if (detail.goodsIssue.fulfillmentStatus?.name !== FULFILLMENT_STATUS_NAMES.COMPLETE) {
                 throw new GoodsIssueReturnStatusConflict();
             }

@@ -120,7 +120,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryImportDialog.defineProps
 
-**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 16, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 15, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -149,11 +149,10 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryImportDialog.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 33, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 32, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
-| `mode` | `mode: [value: InventoryImportMode];` |
 | `file` | `file: [value: File \| null];` |
 | `prepare` | `prepare: [];` |
 | `confirm` | `confirm: [];` |
@@ -168,10 +167,6 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | `searchSuppliers` | `searchSuppliers: [value: string];` |
 | `moreSuppliers` | `moreSuppliers: [];` |
 | `retrySuppliers` | `retrySuppliers: [];` |
-
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
 
 ## InventoryRowActions.defineProps
 
@@ -482,7 +477,7 @@ Record<string, string | number | boolean | null>
 **Definición completa:**
 
 ```typescript
-'create' | 'update'
+'create' | 'update' | 'adjust' | 'mixed'
 ```
 
 ## ImportValue

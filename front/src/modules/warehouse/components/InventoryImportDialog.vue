@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { VAlert } from 'vuetify/components/VAlert';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VFileInput } from 'vuetify/components/VFileInput';
-import { VSelect } from 'vuetify/components/VSelect';
 import { VTextField } from 'vuetify/components/VTextField';
 import { VPagination } from 'vuetify/components/VPagination';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
@@ -31,7 +30,6 @@ const props = defineProps<{
     canReadSuppliers: boolean;
 }>();
 const emit = defineEmits<{
-    mode: [value: InventoryImportMode];
     file: [value: File | null];
     prepare: [];
     confirm: [];
@@ -48,6 +46,12 @@ const emit = defineEmits<{
     retrySuppliers: [];
 }>();
 const page = ref(1);
+watch(
+    () => props.batch?.id,
+    () => {
+        page.value = 1;
+    },
+);
 const preview = computed(() => props.batch?.result ?? props.batch?.preview);
 const rows = computed(
     () => preview.value?.rows.slice((page.value - 1) * 10, page.value * 10) ?? [],
@@ -58,6 +62,13 @@ const actions = {
     update: 'Actualizar',
     unchanged: 'Sin cambios',
     error: 'Corregir',
+};
+const operationLabels: Record<string, string> = {
+    create: 'Alta',
+    update: 'Editar',
+    adjust: 'Ajustar',
+    'update-adjust': 'Editar y ajustar',
+    skip: 'Conservar',
 };
 
 const text = (value: ImportValue | undefined) =>
@@ -115,21 +126,15 @@ const locked = computed(() => props.isWorking || props.isDownloading);
             </VBtn>
         </VAlert>
         <template v-if="!batch && !recoveryRequired">
-            <VSelect
-                :model-value="mode"
-                label="Operación"
-                :items="[
-                    { title: 'Crear registros', value: 'create' },
-                    { title: 'Actualizar datos', value: 'update' },
-                ]"
-                :disabled="locked"
-                @update:model-value="emit('mode', $event)"
-            />
             <p class="mb-4">
                 {{
-                    mode === 'create'
-                        ? 'El sistema genera los IDs de las altas. Descarga la plantilla y usa las opciones de Catálogos.'
-                        : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
+                    mode === 'mixed'
+                        ? 'Usa un solo archivo. En cada fila elige Alta, Editar, Ajustar, Editar y ajustar o Conservar. Las altas no llevan ID; los registros existentes conservan sus IDs y versiones. Captura el stock inicial en las altas o el saldo físico final en los ajustes, con motivo y observaciones. Los permisos se validan para cada operación.'
+                        : mode === 'create'
+                          ? 'El sistema genera los IDs de las altas. Descarga la plantilla y usa las opciones de Catálogos.'
+                          : mode === 'adjust'
+                            ? 'Descarga una plantilla actual y captura el stock físico final por presentación, motivo y observaciones. Cero es válido; vacío se rechaza. El saldo contado reemplaza el stock. Conserva las columnas grises y evita movimientos durante el conteo.'
+                            : 'Descarga los registros con sus IDs y versiones. Edita nombre, mínimo, costo o activo y vuelve a subir el archivo sin cambiar las columnas grises. El stock se maneja por separado.'
                 }}
             </p>
             <p class="mb-4">
@@ -156,7 +161,7 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                     @update:model-value="emit('search', $event)"
                 />
                 <VTextField
-                    v-if="mode === 'update'"
+                    v-if="mode !== 'create'"
                     :model-value="templatePage"
                     label="Página de la plantilla (100 filas)"
                     type="number"
@@ -277,7 +282,13 @@ const locked = computed(() => props.isWorking || props.isDownloading);
                                 :key="key"
                             >
                                 <dt>{{ IMPORT_FIELD_LABELS[key] }}</dt>
-                                <dd>{{ text(value) }}</dd>
+                                <dd>
+                                    {{
+                                        key === 'operation'
+                                            ? (operationLabels[String(value)] ?? text(value))
+                                            : text(value)
+                                    }}
+                                </dd>
                             </template>
                             <template
                                 v-for="(value, key) in row.after"

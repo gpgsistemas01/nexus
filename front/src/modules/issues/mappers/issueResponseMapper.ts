@@ -5,6 +5,7 @@ import { isRecord } from '../../../shared/utils/isRecord.js';
 import { ISSUE_CONFIG } from '../issueConfig.js';
 import type { IssueDocument, IssueRow, IssueDetail, IssueResource } from '../issue.js';
 import type { LookupItem } from '../../../shared/lookup.js';
+import type { HistoricalDeliveryEvidence } from '../historicalDelivery.js';
 
 const createInvalidResponseError = () =>
     new ApiError('El servidor devolvió una salida incompleta. Actualiza la consulta.');
@@ -56,12 +57,34 @@ export const normalizeIssueRow = (value: unknown, resource: IssueResource): Issu
 
     return {
         ...header,
+        ...(value.historicalDeliveryBatch != null && {
+            historicalDelivery: readHistoricalEvidence(value.historicalDeliveryBatch),
+        }),
         id: value.id,
         requestDate,
         observations: value.observations ?? '',
         status: readText(readOptionalRelation(value.status), 'name'),
         fulfillmentStatus: readText(readOptionalRelation(value.fulfillmentStatus), 'name'),
     };
+};
+
+const readHistoricalEvidence = (value: unknown): HistoricalDeliveryEvidence => {
+    if (
+        !isRecord(value) ||
+        typeof value.id !== 'string' ||
+        typeof value.reason !== 'string' ||
+        typeof value.cutoffDate !== 'string' ||
+        !Number.isFinite(Date.parse(value.cutoffDate)) ||
+        typeof value.createdAt !== 'string' ||
+        !Number.isFinite(Date.parse(value.createdAt)) ||
+        (value.deliveredAt !== null &&
+            (typeof value.deliveredAt !== 'string' ||
+                !Number.isFinite(Date.parse(value.deliveredAt)))) ||
+        (value.user !== null && (!isRecord(value.user) || typeof value.user.name !== 'string'))
+    )
+        throw createInvalidResponseError();
+
+    return value as unknown as HistoricalDeliveryEvidence;
 };
 
 const normalizeIssueDetail = (value: unknown, resource: IssueResource): IssueDetail => {

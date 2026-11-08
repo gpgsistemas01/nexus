@@ -26,7 +26,11 @@ const ISSUE_REPORT_HEADERS = [
     'Unidad de conversión',
     'Cantidad de proyecto',
     'Diferencia',
-    'Estado del detalle'
+    'Estado del detalle',
+    'Regularización histórica',
+    'Motivo de regularización',
+    'Fecha de registro histórico',
+    'Verificación histórica'
 ];
 
 export const buildIssueReportData = async function* (rows, { baseHeader = 'Base', heightHeader = 'Altura' } = {}) {
@@ -51,8 +55,13 @@ export const buildIssueReportData = async function* (rows, { baseHeader = 'Base'
             row.convertedQuantity,
             row.convertedUnitMeasureName,
             row.projectConvertedQuantity,
-            createFormulaCell(`O${ index + 2 }-Q${ index + 2 }`, row.convertedQuantityDifference),
-            row.detailFulfillmentStatusName
+            row.historicalDeliveryReference && row.convertedQuantityDifference == null
+                ? '' : createFormulaCell(`O${ index + 2 }-Q${ index + 2 }`, row.convertedQuantityDifference),
+            row.detailFulfillmentStatusName,
+            row.historicalDeliveryReference ?? '',
+            row.historicalDeliveryReason ?? '',
+            row.historicalDeliveryRegisteredAt ?? '',
+            row.historicalDeliveryNote ?? ''
         ];
         index++;
     }

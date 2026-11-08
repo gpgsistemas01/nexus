@@ -87,9 +87,13 @@ const mapIssueDetailRow = ({ issue, detail, material, supplier, requestDate }) =
     presentationName: material?.presentation?.name,
     convertedQuantity: toNumber(detail.convertedQuantity),
     convertedUnitMeasureName: material?.unitMeasure?.symbol || material?.unitMeasure?.name,
-    projectConvertedQuantity: toNumber(detail.projectConvertedQuantity),
-    convertedQuantityDifference: toNumber(detail.convertedQuantityDifference),
-    detailFulfillmentStatusName: detail.fulfillmentStatus?.name
+    projectConvertedQuantity: issue.historicalDeliveryBatch && detail.projectConvertedQuantity == null ? null : toNumber(detail.projectConvertedQuantity),
+    convertedQuantityDifference: issue.historicalDeliveryBatch && detail.convertedQuantityDifference == null ? null : toNumber(detail.convertedQuantityDifference),
+    detailFulfillmentStatusName: detail.fulfillmentStatus?.name,
+    historicalDeliveryReference: issue.historicalDeliveryBatch?.id ?? '',
+    historicalDeliveryReason: issue.historicalDeliveryBatch?.reason ?? '',
+    historicalDeliveryRegisteredAt: issue.historicalDeliveryBatch ? formatDateLongWithTime(issue.historicalDeliveryBatch.createdAt) : '',
+    historicalDeliveryNote: issue.historicalDeliveryBatch ? 'Entrega histórica: costo y cantidad de proyecto sin verificar; sin descuento de stock.' : ''
 });
 
 const mapGoodsIssueDetailRows = function* (goodsIssues = [], { supplierId = '', materialId = '' } = {}) {
@@ -114,7 +118,7 @@ const mapWasteIssueDetailRows = function* (wasteIssues = []) {
             yield mapIssueDetailRow({
                 issue,
                 detail,
-                material: { name: detail.waste?.name, base: detail.waste?.base, height: detail.waste?.height },
+                material: detail.waste,
                 supplier: detail.waste?.supplier,
                 requestDate
             });

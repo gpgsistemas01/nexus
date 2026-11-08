@@ -22,11 +22,15 @@ Fuentes: `tests/integration/controllers/warehouseConcurrencyControllerDbTest.js`
 | `DP-IMP-002` | `RF-IMP-002`: escritura parcial, versiones y duplicación | Integración; decisiones alta/edición/sin cambios, versiones vigente/vieja y transiciones confirmación/repetición/carrera/fallo | Stock, conversiones, historia y folios coinciden con formularios. Datos compartidos se escriben una vez. Conflicto no aplica filas; misma clave devuelve recibo. Fallo del recibo revierte todo. Otra importación ocupada responde 429. | `CP-INT-IMP-002` |
 | `DP-IMP-003` | `RF-IMP-001/002`: confundir alta con edición o aplicar sólo parte de un archivo repetido | Integración HTTP/Prisma; particiones por recurso y duplicado interno/existente, transiciones descarga → edición → carga y validación → alta rival → conflicto | IDs nuevos generados por servidor; ID de referencia elegido del catálogo. Descargar y renombrar conserva el ID del destino. Edición sin ID se rechaza. Un duplicado, aun posterior a validar, bloquea todas las filas y conserva stock, historia, folios y recibos previos. | `CP-INT-IMP-003` |
 
+| `DP-IMP-004` | `RF-IMP-001/002`, `RF-ADJ-001/002`: confundir conteo con entrada o separar parcialmente el archivo mixto | Unitario y HTTP/Prisma; particiones alta/edición/conteo/combinado/conservar, cero/vacío/fracción y versiones vigentes/viejas | Un archivo aplica todos sus efectos o ninguno; conteo reemplaza saldo y genera AJU/AME, sin duplicación. Datos compartidos se editan una vez incluso entre Editar y Editar y ajustar. Falta de permiso no consulta costos; perder lectura de costos protege borradores/recibos con precios sin bloquear conteos puros. | `CP-INT-IMP-004` |
+
 | Caso | Precondiciones y datos | Acción | Resultado esperado | Limpieza |
 | --- | --- | --- | --- | --- |
 | `CP-INT-IMP-001` | PostgreSQL aislado, cuenta administradora y cuenta sin permisos; proveedores/catálogos privados. Libro de una fila y variantes PIEZA=1.5, 2 MiB+1 y multipart con campo extra. | Consultar/cargar sin permiso, validar sin confirmar, descargar errores y descartar/vencer borradores. | 401/403 antes de analizar, 404 a lote ajeno; 413 por tamaño. Captura inválida no crea artículos. Descarte/limpieza elimina JSON temporal y conserva recibos. | Cerrar requests y limpiar sólo IDs propios. |
 | `CP-INT-IMP-002` | Material 2×3 y dos proveedores con stock inicial 2 y 3; Rollo 2×10, cono 1, total 5 y referencia 11 kg. | Confirmar altas/actualizaciones, repetir clave y competir; editar después de validar; inyectar fallo del recibo. | Un material compartido, conversiones 12/18 y dos ajustes; Rollo 2×4, neto 4 kg, cantidad 2 y conversión 16. Reintento no duplica. Versiones viejas y otra clave producen 409; bloqueo global produce 429. Fallo tardío conserva DRAFT y revierte artículos, stock, historia y contador. | Retirar trigger de fallo en finally y limpiar datos propios. |
 | `CP-INT-IMP-003` | Fixture privada de cada recurso: dos filas válidas y una repetida con otra cantidad inicial; variante con una fila nueva y otra ya registrada. Plantillas reales de actualización y referencia de merma. | Validar/confirmar duplicados; crear un rival tras validar; descargar, editar nombre y subir; omitir ID de edición o elegir referencia del catálogo. | Repetidos: 400 sin cambiar registros, stock, historia, folios ni recibos; se indica la primera fila coincidente. Rival tardío: 409 y ninguna fila aplicada. Editar conserva ID y saldo; faltar ID no crea un alta. La referencia elegida del catálogo genera una merma con ID nuevo. | Hooks del archivo limpian sólo IDs propios en PostgreSQL aislado. |
+
+| `CP-INT-IMP-004` | Material 2×3 con saldo 2, costo 10 y dos proveedores; merma con saldo 4. Archivo con dos altas, una edición y conteo final cero/7. | Validar/confirmar archivo mixto; repetir; duplicar destino entre operaciones; mover stock tras validar; fallar la escritura final del recibo. | Altas con ID nuevo; stock final exacto, conversiones 0/42, costo editado y folios AJU/AME. Una fila por destino y versiones originales. Repetir conserva recibo. Error o fallo tardío revierte altas, datos, stock, movimientos, folios y recibo. | Hooks propios y trigger retirado en finally. |
 
 Fuente: [integración HTTP/Prisma](../../tests/integration/controllers/inventoryImportControllerDbTest.js)
 y [fronteras XLSX](../../tests/unit/services/warehouse/inventoryWorkbookTest.js).
@@ -304,3 +308,17 @@ Esta evidencia no sustituye las pruebas de autorización HTTP/Prisma del proyect
 
 Estas unitarias no demuestran persistencia real, propagación de señales del proveedor
 ni un recorrido completo de navegador; la integración HTTP/Prisma conserva su suite.
+
+## Reconocimiento de entregas históricas
+
+| Diseño | Requisito / riesgo | Nivel y técnica | Condición observable | Casos |
+| --- | --- | --- | --- | --- |
+| `DP-ISS-009` | `RF-ISS-009`: descontar dos veces, afirmar datos desconocidos o cerrar entregas rivales | HTTP/Prisma y permisos unitarios; decisiones por rol/área, pendiente/parcial/cancelada, corte y revisión, fronteras 100/101 y transiciones confirmación/repetición/carrera/fallo | Sólo completa pendientes declarados; stock y movimientos permanecen idénticos. Evidencia y recibo atómicos; desconocidos no se rellenan. El surtido normal y reconocimiento se serializan. Devolución posterior exige entrada física actual. | `CP-INT-ISS-009` |
+
+| Caso | Precondiciones y datos | Acción | Resultado esperado | Limpieza |
+| --- | --- | --- | --- | --- |
+| `CP-INT-ISS-009` | Tres inventarios con stock cero; solicitudes de 5, pendientes o parciales con 2 registradas/1 devuelta y costos/proyecto desconocidos. | Reconocer por HTTP; repetir clave; alterar rol/costo/saldo enviados; cancelar tras leer; competir con surtido; fallar una actualización tardía. Reconocer 100 y rechazar 101. Devolver sin/con declaración física. | Reconoce 5/3, conserva devolución 1 y desconocidos. Stock, versiones y movimientos idénticos al reconocer. Mismo recibo y ninguna repetición. 401/403/404/409/400 según condición, sin efectos parciales; fallo revierte documentos/recibo. Sólo una devolución física confirmada aumenta stock. | Retirar trigger en finally y eliminar sólo documentos, recibos y catálogos de la fixture privada. |
+
+Fuentes: `tests/integration/controllers/historicalDeliveryControllerDbTest.js`,
+`tests/unit/constants/permissionsTest.js`, `tests/unit/services/warehouse/inventoryStockCountTest.js`
+y `tests/unit/services/warehouse/inventoryImportPolicyTest.js`.

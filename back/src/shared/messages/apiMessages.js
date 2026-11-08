@@ -5,6 +5,10 @@ import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMess
 import { PIECE_QUANTITY_MESSAGE } from '../inventory/pieceQuantity.js';
 
 export const errorMessages = {
+    HISTORICAL_DELIVERY_VALIDATION: 'Revisa el corte, motivo y selección de salidas. Debes declarar su entrega física completa antes del corte.',
+    HISTORICAL_DELIVERY_CONFLICT: 'La salida ya cambió o no tiene pendientes elegibles. Actualiza la búsqueda y revisa los folios.',
+    HISTORICAL_DELIVERY_BUSY: 'Otra operación está modificando estas salidas. Reintenta conservando la misma clave.',
+    HISTORICAL_PHYSICAL_RETURN_REQUIRED: 'Confirma que la devolución corresponde a material que está entrando físicamente al almacén ahora.',
     INVENTORY_IMPORT_FILE: 'Utiliza una plantilla XLSX válida del módulo y operación seleccionados, sin fórmulas ni macros.',
     INVENTORY_IMPORT_LIMIT: 'El archivo admite hasta 100 filas, 2 MiB y celdas de 600 caracteres. Divide la carga si supera los límites.',
     INVENTORY_IMPORT_BUSY: 'Se está procesando otra importación. Espera un momento y vuelve a intentar.',

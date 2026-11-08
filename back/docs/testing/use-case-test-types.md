@@ -2,7 +2,9 @@
 
 ## Importaciones de inventario
 
-`RF-IMP-001/002/003` añade importación por lotes a las altas y ediciones de Almacén.
+`RF-IMP-001/002/003` añade un archivo mixto de altas, ediciones y conteos de Almacén.
+`RF-ISS-009` añade reconocimiento histórico por lote sin movimientos, con evidencia
+HTTP/Prisma en `historicalDeliveryControllerDbTest.js` y cliente/navegador en Vue.
 `inventoryImportControllerDbTest.js` cubre permisos, stock inicial, mermas, datos
 compartidos, versiones, recibos, rollback y limpieza. `inventoryWorkbookTest.js`
 comprueba contenido y límites del libro. Los diseños/casos `DP-IMP-*` y `CP-INT-IMP-*`

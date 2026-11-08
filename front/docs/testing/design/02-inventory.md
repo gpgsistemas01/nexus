@@ -62,3 +62,10 @@ Los casos `apiClientTest.ts` mantienen renovación única, límite de un reinten
 rechazo público sin refresh, errores de red sin repetición de escritura y cancelación.
 `inventoryReportTest.ts` conserva por separado los parámetros del reporte y el
 rechazo de HTML presentado como Excel.
+
+## Archivo único y conteo final
+
+`DP-VUE-IMP-001` cubre `RF-VUE-015` ampliado: una carga mixta presenta alta, edición
+y conteo cero y confirma en una solicitud. El stock anterior/final es visible y no
+se suman conteos. Pruebas HTTP/Prisma comprueban permiso por fila, identidad,
+versiones, datos compartidos y rollback; Chromium no simula esa evidencia persistente.

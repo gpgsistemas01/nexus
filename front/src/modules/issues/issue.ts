@@ -1,9 +1,11 @@
 import type { LookupItem, LookupState } from '../../shared/lookup.js';
 import type { RecordQuery } from '../../shared/list.js';
+import type { HistoricalDeliveryEvidence } from './historicalDelivery.js';
 
 export type IssueResource = 'materials' | 'consumables' | 'wastes';
 export type IssueMode = 'create' | 'edit' | 'header' | 'view' | 'supply' | 'return';
 export interface IssueRow {
+    historicalDelivery?: HistoricalDeliveryEvidence;
     id: string;
     referenceNumber: string;
     requestDate: string;

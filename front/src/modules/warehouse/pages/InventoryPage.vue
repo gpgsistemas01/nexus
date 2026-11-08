@@ -92,7 +92,10 @@ onMounted(() => {
     >
         <template #actions>
             <VBtn
-                v-if="permissions.canRead && permissions.canWrite && permissions.canReadCosts"
+                v-if="
+                    permissions.canRead &&
+                    ((permissions.canWrite && permissions.canReadCosts) || permissions.canAdjust)
+                "
                 variant="outlined"
                 @click="isImportOpen = true"
             >

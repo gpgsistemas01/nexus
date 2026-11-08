@@ -15,10 +15,11 @@ import type {
 export const useInventoryImport = (options: {
     resource: InventoryResource;
     userId: string;
+    initialMode?: InventoryImportMode;
     onSaved: () => void;
     onUnauthorized: () => void;
 }) => {
-    const mode = ref<InventoryImportMode>('create');
+    const mode = ref<InventoryImportMode>(options.initialMode ?? 'create');
     const batch = shallowRef<InventoryImportBatch | null>(null);
     const file = shallowRef<File | null>(null);
     const isWorking = ref(false);
@@ -168,6 +169,7 @@ export const useInventoryImport = (options: {
             pending.value = null;
             recoveryRequired.value = false;
             batch.value = null;
+            mode.value = options.initialMode ?? 'create';
             file.value = null;
         });
 

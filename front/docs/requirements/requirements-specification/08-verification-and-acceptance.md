@@ -6,7 +6,7 @@
 
 | Criterio | Condición y resultado esperado |
 | --- | --- |
-| `CA-RF-VUE-015-1` | Con los tres permisos requeridos, descargar una plantilla y validar hasta 100 filas/2 MiB. Mostrar cantidad inicial y diferencias por fila; errores impiden confirmar todo el lote. Actualizar conserva IDs/versiones y no cambia stock. La vista no desborda a 320 px. |
+| `CA-RF-VUE-015-1` | Con permiso para la operación de cada fila, descargar un archivo mixto y validar hasta 100 filas/2 MiB. Mostrar alta, edición y conteo final en la misma vista; errores bloquean todo el archivo. Editar conserva stock; Ajustar y Editar y ajustar conservan versiones originales y exigen motivo/observaciones. Cero es válido y vacío se rechaza. La vista no desborda a 320 px. |
 | `CA-RF-VUE-015-2` | Perder la respuesta y recargar conserva sólo la referencia por cuenta/recurso. Recuperar devuelve el recibo o repite la misma clave sin otra alta. Una respuesta incompleta con HTTP 200 no anuncia éxito. |
 
 Estas condiciones concretan los [requisitos del cliente](client-specification.md).

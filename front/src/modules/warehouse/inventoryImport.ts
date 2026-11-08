@@ -1,6 +1,6 @@
 import type { InventoryResource } from './inventory.js';
 
-export type InventoryImportMode = 'create' | 'update';
+export type InventoryImportMode = 'create' | 'update' | 'adjust' | 'mixed';
 export type ImportValue = string | number | boolean | null;
 export interface InventoryImportRow {
     row: number;
@@ -52,4 +52,10 @@ export const IMPORT_FIELD_LABELS: Record<string, string> = {
     referenceRollTotalWeightKg: 'Rollo completo con cono (kg)',
     weightKg: 'Peso neto (kg)',
     observations: 'Observaciones',
+    currentStock: 'Stock por presentación',
+    convertedQuantity: 'Cantidad convertida',
+    difference: 'Diferencia de stock',
+    reason: 'Motivo',
+    adjustmentReference: 'Folio del ajuste',
+    operation: 'Operación de la fila',
 };
