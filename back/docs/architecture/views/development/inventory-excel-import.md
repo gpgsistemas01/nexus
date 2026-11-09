@@ -69,6 +69,9 @@ y no deja efectos parciales. Las filas sin cambios de una edición se omiten al 
 Prefijo: `/api/warehouse/inventory-imports`. Recursos: `materials`, `consumables`,
 `wastes`. La captura admite `create`, `update` y `adjust`. Cada descarga incluye su
 modo en el archivo y en el nombre; un XLSX de otra operación o módulo se rechaza.
+La restricción `InventoryImport_mode_check` admite únicamente esas tres operaciones.
+La migración `20261109000000_single_operation_inventory_import` conserva los datos y
+se detiene ante un modo no admitido, sin convertir ni borrar registros.
 
 | Ruta | Resultado |
 | --- | --- |
@@ -83,11 +86,6 @@ Alta/edición requiere lectura, escritura y `inventory:costs-read`; conteo requi
 lectura y ajuste. Los permisos se comprueban para la operación de todo el archivo.
 Consumibles usa los permisos de Materiales. Un lote sólo es accesible por su creador
 mientras conserva esos permisos. La autorización precede al parser multipart.
-Los comprobantes mixtos anteriores siguen consultables y pueden recuperar una
-confirmación completada con la misma clave. Sus precios permanecen protegidos por
-el permiso de costos; un conteo puro sigue consultable con lectura y ajuste. Los
-borradores mixtos anteriores devuelven `INVENTORY_IMPORT_MODE_RETIRED` al confirmar:
-se descartan y recrean con una operación. No se eliminan comprobantes históricos.
 Las rutas JSON existentes conservan su transporte.
 
 ## Reglas y confirmación
@@ -165,7 +163,9 @@ registra alternativas y criterios para futuras actualizaciones.
 
 `inventoryImportConfig` concentra modos admitidos, columnas editables/referencias y
 permisos. Las constantes públicas reúnen modos, etiquetas, estados, acciones y
-límites. La configuración de columnas del reporte se reutiliza en las plantillas;
+límites de captura. La configuración de descompresión, ZIP, catálogos y timeout del
+worker, junto con el marcador del formato XLSX, pertenece al módulo privado
+`src/constants/inventoryImport.js`. La configuración de columnas del reporte se reutiliza en las plantillas;
 la traducción de campo a encabezado es común a la edición y al conteo.
 Se retiró el agrupador de operaciones por fila y su escritura recursiva.
 

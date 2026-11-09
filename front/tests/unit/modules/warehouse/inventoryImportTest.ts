@@ -19,6 +19,25 @@ afterEach(() => {
 });
 
 describe('contrato de importación y recuperación', () => {
+  it.each(['DRAFT', 'COMPLETED'])(
+    'rechaza respuestas %s con una operación fuera de las tres admitidas',
+    async (status) => {
+      const batch = draft();
+      apiClient.http.defaults.adapter = mockHttpAdapter(() => ({
+        data: {
+          batch: {
+            ...batch,
+            mode: 'mixed',
+            status,
+            ...(status === 'COMPLETED' ? { preview: null, result: batch.preview } : {}),
+          },
+        },
+      }));
+      await expect(
+        inventoryImportService.get(batch.id, new AbortController().signal),
+      ).rejects.toThrow('leer la importación');
+    },
+  );
   it('vincula todo el archivo a una operación y retira el archivo al cambiarla antes de validar', async () => {
     const batch = { ...draft(), mode: 'update' as const };
     const preview = vi.spyOn(inventoryImportService, 'preview').mockResolvedValue(batch);

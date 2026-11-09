@@ -26,4 +26,4 @@ operación en los parámetros y nombre de descarga. Un archivo incompatible mues
 el rechazo sin confirmación. Un operador de ajuste sin lectura de costos sólo ve
 Ajustar existencias; sin escritura/costos ni ajuste, el botón permanece oculto.
 La integración contrasta columnas del reporte, IDs/versiones, conservación del destino,
-conteo real y recuperación de comprobantes mixtos anteriores.
+conteo real y recuperación de la misma confirmación.

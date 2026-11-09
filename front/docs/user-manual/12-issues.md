@@ -26,8 +26,23 @@ Si falta un cliente, use **Registrar cliente «nombre»** en el selector y conti
 
 ## Editar
 
-Pulse **Editar salida**, cambie los campos habilitados y confirme **Actualizar**.
-Los detalles se editan mientras no haya surtidos; después puede quedar habilitado sólo el encabezado.
+Pulse **Editar salida**, revise el estado y confirme los cambios con **Actualizar**.
+
+| Situación | Campos habilitados | Datos que se conservan |
+| --- | --- | --- |
+| Pendiente, sin entregas | Cliente, Asesor, Área, Solicitante, Número de proyecto, Fecha y hora de solicitud y Observaciones; puede agregar o retirar partidas. | Folio; presentación, unidad y medidas de cada artículo. Los totales se calculan. |
+| Surtido parcial o Surtido, sin cancelación | Cliente, Asesor, Área, Solicitante, Número de proyecto, Fecha y hora de solicitud y Observaciones, con las condiciones de selección indicadas abajo. | Partidas, cantidades solicitadas, surtidas y devueltas; esta edición no entrega ni devuelve inventario. |
+| Cancelada | Ninguno: sólo consulta. | Encabezado y detalles históricos. |
+
+Para corregir una cantidad mientras la salida sigue pendiente, retire la partida
+y agréguela con la cantidad correcta. Revise las sumas si repite artículo y proveedor.
+Después de una entrega no se modifican las partidas desde la edición.
+
+Si la cuenta sólo tiene un área disponible, se conserva seleccionada. Para **GPG
+INTERNO**, el sistema propone el proyecto del área; conserve ese valor, ya que
+la validación exige que corresponda al área elegida. Cliente, área
+y permisos delimitan los selectores de asesor y solicitante; revise esas selecciones
+si cambia un dato del encabezado.
 <!-- manual:end -->
 
 ## Consultar y distinguir estados
@@ -48,6 +63,9 @@ Las partidas canceladas se conservan sin botones de acción.
 <!-- manual:any goods:issue-details-manage waste:issues-supply -->
 ## Surtir
 
+En esta operación el encabezado y la solicitud original son de consulta. Se habilitan
+la selección de partidas, **Cantidad a surtir** y **Cantidad de proyecto**.
+
 1. Pulse **Surtir detalle** y marque las partidas que entregará.
 2. Capture **Cantidad a surtir** sin superar el saldo pendiente.
 3. Capture **Cantidad de proyecto**, que expresa el total del detalle para el proyecto.
@@ -60,6 +78,9 @@ La cantidad de proyecto se expresa en la unidad de conversión y sirve para comp
 lo previsto con la cantidad convertida. El descuento de stock usa **Cantidad a surtir**.
 
 ## Devolver una entrega
+
+La devolución sólo captura la cantidad a devolver y sus observaciones para la partida
+seleccionada. No modifica cliente, proyecto, artículo ni la cantidad solicitada.
 
 1. En una salida **Surtida**, pulse **Devolver material surtido**.
 2. Elija **Devolver detalle de salida** y compruebe el saldo retornable.

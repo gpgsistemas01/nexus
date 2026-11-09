@@ -2,7 +2,6 @@ import {
     INVENTORY_IMPORT_LIMITS,
     INVENTORY_IMPORT_MODES as modes,
     INVENTORY_IMPORT_STATUSES as statuses,
-    LEGACY_INVENTORY_IMPORT_MODE,
 } from '@nexus/inventory-imports';
 import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
 import { ApiError } from '../../../shared/http/apiError.js';
@@ -10,20 +9,19 @@ import { createUuid } from '../../../shared/utils/createUuid.js';
 import { useFileExport } from '../../../shared/composables/useFileExport.js';
 import { inventoryImportService } from '../services/inventoryImportService.js';
 import { pendingInventoryImport } from '../services/pendingInventoryImport.js';
-import { isInventoryImportOperation } from '../inventoryImport.js';
+import { isInventoryImportMode } from '../inventoryImport.js';
 import type { InventoryResource } from '../inventory.js';
 import type {
     InventoryImportBatch,
     InventoryImportMode,
-    InventoryImportOperation,
     PendingInventoryImport,
 } from '../inventoryImport.js';
 
 export const useInventoryImport = (options: {
     resource: InventoryResource;
     userId: string;
-    initialMode?: InventoryImportOperation;
-    availableModes?: () => readonly InventoryImportOperation[];
+    initialMode?: InventoryImportMode;
+    availableModes?: () => readonly InventoryImportMode[];
     onSaved: () => void;
     onUnauthorized: () => void;
 }) => {
@@ -108,7 +106,7 @@ export const useInventoryImport = (options: {
 
     const selectMode = (value: unknown) => {
         if (
-            !isInventoryImportOperation(value) ||
+            !isInventoryImportMode(value) ||
             !availableModes.value.includes(value) ||
             value === mode.value ||
             isWorking.value ||
@@ -133,7 +131,7 @@ export const useInventoryImport = (options: {
             batch.value ||
             recoveryRequired.value ||
             template.isExporting.value ||
-            !isInventoryImportOperation(operation) ||
+            !isInventoryImportMode(operation) ||
             !availableModes.value.includes(operation)
         )
             return Promise.resolve();
@@ -155,7 +153,6 @@ export const useInventoryImport = (options: {
                 !batch.value?.preview ||
                 batch.value.preview.summary.errors ||
                 batch.value.status !== statuses.DRAFT ||
-                batch.value.mode === LEGACY_INVENTORY_IMPORT_MODE ||
                 recoveryRequired.value
             )
                 return;
@@ -225,11 +222,11 @@ export const useInventoryImport = (options: {
             !batch.value &&
             !isWorking.value &&
             !recoveryRequired.value &&
-            isInventoryImportOperation(mode.value) &&
+            isInventoryImportMode(mode.value) &&
             availableModes.value.includes(mode.value),
         filename: () => `plantilla_${options.resource}_${mode.value}`,
         request: (query, signal) => {
-            if (!isInventoryImportOperation(mode.value))
+            if (!isInventoryImportMode(mode.value))
                 throw new Error('Selecciona una operación vigente.');
 
             return inventoryImportService.template(options.resource, mode.value, query, signal);
@@ -251,7 +248,6 @@ export const useInventoryImport = (options: {
             batch.value?.status === statuses.DRAFT &&
             !!batch.value.preview &&
             !batch.value.preview.summary.errors &&
-            batch.value.mode !== LEGACY_INVENTORY_IMPORT_MODE &&
             !recoveryRequired.value,
     );
     onBeforeUnmount(() => {

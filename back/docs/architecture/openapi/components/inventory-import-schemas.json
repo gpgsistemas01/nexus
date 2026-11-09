@@ -195,10 +195,9 @@
         "enum": [
           "create",
           "update",
-          "adjust",
-          "mixed"
+          "adjust"
         ],
-        "description": "Operación de todo el archivo. mixed sólo identifica borradores o comprobantes anteriores; se rechaza para nuevas cargas y no se confirman borradores mixtos."
+        "description": "Operación de todo el archivo: Alta, Editar datos o Ajustar existencias."
       },
       "status": {
         "enum": [

@@ -32,9 +32,12 @@ Si aparece un duplicado, revise el registro encontrado.
 ## Editar o desactivar
 
 1. Localice el registro y abra su acción de edición.
-2. Corrija los campos habilitados.
+2. Cambie **Nombre**, **Activo** y, sólo en Unidades de medida, **Símbolo**.
 3. Si deja de utilizarse para nuevas capturas, desmarque **Activo**.
 4. Pulse **Actualizar** y compruebe el resultado.
+
+La edición conserva el mismo registro y sus relaciones; no crea otro catálogo
+ni reasigna la unidad o presentación de los artículos existentes.
 
 Desactivar retira el registro de nuevas selecciones y conserva los documentos que ya lo usan.
 

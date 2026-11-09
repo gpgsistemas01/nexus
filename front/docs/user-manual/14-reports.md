@@ -7,7 +7,7 @@
 3. Revise el alcance y confirme **Descargar Excel**.
 4. Abra el archivo `.xlsx` y compruebe su contenido.
 
-Todos los módulos usan este recorrido. El nombre incluye mes y año de descarga.
+Los módulos con **Exportar Excel** usan este recorrido. El nombre incluye mes y año de descarga.
 Cerrar el diálogo sin confirmar no genera un archivo.
 
 <!-- manual:any warehouse:reports-read -->
@@ -46,3 +46,15 @@ En **Personas**, quite el filtro por rol para habilitar la descarga. Puede filtr
 
 Lea el aviso, revise la conexión y vuelva a pulsar **Descargar Excel**.
 El diálogo conserva la selección. Descargar otra vez no modifica inventario.
+
+## Distinguir el tipo de archivo
+
+| Archivo | Uso |
+| --- | --- |
+| Reporte de **Exportar Excel** | Consultar o compartir los resultados y totales del alcance elegido. No modifica registros ni es una plantilla de importación. |
+| Plantilla de **Importar Excel**, cuando tiene acceso | Preparar una operación sobre el inventario indicado; incluye las columnas de referencia y la captura necesaria. |
+| Informe de **Descargar errores** | Localizar filas y columnas que debe corregir en el archivo de captura; no se importa como una plantilla. |
+
+Los reportes de Compras, Salidas, Personas, Usuarios, Directorio y Movimientos no
+permiten importar cambios desde esas pantallas. Conserve los originales y sus copias
+según el [manejo de archivos en su equipo](02-navigation-and-controls.md#archivos-en-su-equipo).

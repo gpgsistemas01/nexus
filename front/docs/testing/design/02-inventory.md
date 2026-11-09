@@ -76,6 +76,6 @@ HTTP/Prisma comprueba columnas de consulta e IDs, identidad, versiones, datos
 compartidos, rollback y ausencia de efectos de archivos incompatibles. Chromium
 no sustituye esa evidencia persistente.
 
-Los casos de captura mixta se retiraron al quedar obsoleta la elección por fila.
-Permanecen recuperación de comprobantes anteriores, rechazo/descarte de sus
-borradores y atomicidad independiente de altas, ediciones y conteos.
+La captura, consulta y recuperación admiten exclusivamente las tres operaciones del
+selector. Se conservan los casos de atomicidad independiente de altas, ediciones
+y conteos, y el rechazo de operaciones no admitidas.

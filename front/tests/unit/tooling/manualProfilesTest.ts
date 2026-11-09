@@ -26,6 +26,33 @@ import { APP_NAVIGATION_GROUPS } from '../../../src/app/navigation.js';
 
 const temporary: string[] = [];
 
+it.each([
+  ['03-materials.md', 'materials'],
+  ['04-consumables.md', 'materials'],
+  ['05-wastes.md', 'wastes'],
+])(
+  'la importación de %s se documenta sólo para lectura y la operación autorizada',
+  async (file, resource) => {
+    const source = await readFile(path.resolve('docs/user-manual', file), 'utf8');
+    const read = `${resource}:read`;
+    const write = `${resource}:write`;
+    const adjust = `${resource}:adjust-stock`;
+    const costs = 'inventory:costs-read';
+    const decisions: [string[], boolean][] = [
+      [[read, write, costs], true],
+      [[read, adjust], true],
+      [[read], false],
+      [[read, write], false],
+      [[write, costs], false],
+      [[read, costs], false],
+    ];
+    for (const [permissions, available] of decisions) {
+      const content = filterManualContent(source, permissions);
+      expect(/^## Importar/m.test(content), permissions.join(', ')).toBe(available);
+    }
+  },
+);
+
 it('conserva capturas posteriores completas aunque otra pendiente falle de nuevo', () => {
   const previous = {
     revision: 'cuenta-a-vigente',

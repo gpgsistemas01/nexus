@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import ExcelJS from 'exceljs';
 import { getImportConfig } from '../../src/services/warehouse/imports/inventoryImportConfig.js';
-import { INVENTORY_IMPORT_FORMAT } from '../../src/shared/constants/inventoryImport.js';
+import { INVENTORY_IMPORT_FORMAT } from '../../src/constants/inventoryImport.js';
 import { PERMISSIONS } from '../../src/shared/constants/permissions.js';
 import { ROLE_KEYS } from '../../src/constants/roles.js';
 import { DEPARTMENT_KEYS } from '../../src/constants/departments.js';

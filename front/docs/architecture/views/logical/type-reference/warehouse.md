@@ -120,13 +120,13 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 ## InventoryImportDialog.defineProps
 
-**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 27, columna 27. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 21, columna 27. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `resource` | `resource: InventoryResource;` |
 | `mode` | `mode: InventoryImportMode;` |
-| `availableModes` | `availableModes: readonly InventoryImportOperation[];` |
+| `availableModes` | `availableModes: readonly InventoryImportMode[];` |
 | `batch` | `batch: InventoryImportBatch \| null;` |
 | `file` | `file: File \| null;` |
 | `isWorking` | `isWorking: boolean;` |
@@ -145,18 +145,18 @@ Generado con `npm run docs:generate`. No editar manualmente.
 | --- | --- | --- |
 | dependency | [InventoryResource](../../../../../src/modules/warehouse/inventory.ts) | `resource` |
 | dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
-| dependency | [InventoryImportOperation](../../../../../src/modules/warehouse/inventoryImport.ts) | `availableModes` |
+| dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `availableModes` |
 | association | [InventoryImportBatch](../../../../../src/modules/warehouse/inventoryImport.ts) | `batch` |
 | association | [LookupState](../../../../../src/shared/lookup.ts) | `suppliers` |
 
 ## InventoryImportDialog.defineEmits
 
-**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 45, columna 26. **Declaración:** SFC contract.
+**Fuente:** [src/modules/warehouse/components/InventoryImportDialog.vue](../../../../../src/modules/warehouse/components/InventoryImportDialog.vue) · línea 39, columna 26. **Declaración:** SFC contract.
 
 | Miembro | Firma completa |
 | --- | --- |
 | `file` | `file: [value: File \| null];` |
-| `mode` | `mode: [value: InventoryImportOperation];` |
+| `mode` | `mode: [value: InventoryImportMode];` |
 | `prepare` | `prepare: [];` |
 | `confirm` | `confirm: [];` |
 | `recover` | `recover: [];` |
@@ -173,7 +173,7 @@ Generado con `npm run docs:generate`. No editar manualmente.
 
 | Relación | Destino | Origen de la referencia |
 | --- | --- | --- |
-| dependency | [InventoryImportOperation](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
+| dependency | [InventoryImportMode](../../../../../src/modules/warehouse/inventoryImport.ts) | `mode` |
 
 ## InventoryRowActions.defineProps
 
@@ -477,9 +477,9 @@ keyof InventoryValues
 Record<string, string | number | boolean | null>
 ```
 
-## InventoryImportOperation
+## InventoryImportMode
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 9, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 8, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -487,23 +487,9 @@ Record<string, string | number | boolean | null>
 (typeof INVENTORY_IMPORT_MODES)[keyof typeof INVENTORY_IMPORT_MODES]
 ```
 
-## InventoryImportMode
-
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 11, columna 1. **Declaración:** type.
-
-**Definición completa:**
-
-```typescript
-InventoryImportOperation | typeof LEGACY_INVENTORY_IMPORT_MODE
-```
-
-| Relación | Destino | Origen de la referencia |
-| --- | --- | --- |
-| dependency | [InventoryImportOperation](../../../../../src/modules/warehouse/inventoryImport.ts) | `type` |
-
 ## ImportValue
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 16, columna 1. **Declaración:** type.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 14, columna 1. **Declaración:** type.
 
 **Definición completa:**
 
@@ -513,7 +499,7 @@ string | number | boolean | null
 
 ## InventoryImportRow
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 17, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 15, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -535,7 +521,7 @@ string | number | boolean | null
 
 ## InventoryImportPreview
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 28, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 26, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -548,7 +534,7 @@ string | number | boolean | null
 
 ## InventoryImportBatch
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 32, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 30, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |
@@ -571,7 +557,7 @@ string | number | boolean | null
 
 ## PendingInventoryImport
 
-**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 43, columna 1. **Declaración:** interface.
+**Fuente:** [src/modules/warehouse/inventoryImport.ts](../../../../../src/modules/warehouse/inventoryImport.ts) · línea 41, columna 1. **Declaración:** interface.
 
 | Miembro | Firma completa |
 | --- | --- |

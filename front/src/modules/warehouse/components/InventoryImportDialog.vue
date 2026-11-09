@@ -10,24 +10,18 @@ import {
     INVENTORY_IMPORT_MODES as modes,
     INVENTORY_IMPORT_MODE_LABELS,
     INVENTORY_IMPORT_LIMITS as limits,
-    LEGACY_INVENTORY_IMPORT_MODE,
 } from '@nexus/inventory-imports';
 import EditorDialog from '../../../shared/components/EditorDialog.vue';
 import RemoteSelect from '../../../shared/components/RemoteSelect.vue';
-import { IMPORT_FIELD_LABELS, isInventoryImportOperation } from '../inventoryImport.js';
-import type {
-    ImportValue,
-    InventoryImportBatch,
-    InventoryImportMode,
-    InventoryImportOperation,
-} from '../inventoryImport.js';
+import { IMPORT_FIELD_LABELS, isInventoryImportMode } from '../inventoryImport.js';
+import type { ImportValue, InventoryImportBatch, InventoryImportMode } from '../inventoryImport.js';
 import type { InventoryResource } from '../inventory.js';
 import type { LookupState } from '../../../shared/lookup.js';
 
 const props = defineProps<{
     resource: InventoryResource;
     mode: InventoryImportMode;
-    availableModes: readonly InventoryImportOperation[];
+    availableModes: readonly InventoryImportMode[];
     batch: InventoryImportBatch | null;
     file: File | null;
     isWorking: boolean;
@@ -44,7 +38,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
     file: [value: File | null];
-    mode: [value: InventoryImportOperation];
+    mode: [value: InventoryImportMode];
     prepare: [];
     confirm: [];
     recover: [];
@@ -73,11 +67,7 @@ const modeOptions = computed(() =>
         title: INVENTORY_IMPORT_MODE_LABELS[value],
     })),
 );
-const modeLabel = computed(() =>
-    props.mode === LEGACY_INVENTORY_IMPORT_MODE
-        ? 'Operaciones mixtas (formato anterior)'
-        : INVENTORY_IMPORT_MODE_LABELS[props.mode],
-);
+const modeLabel = computed(() => INVENTORY_IMPORT_MODE_LABELS[props.mode]);
 const rows = computed(
     () => preview.value?.rows.slice((page.value - 1) * 10, page.value * 10) ?? [],
 );
@@ -87,13 +77,6 @@ const actions = {
     update: 'Actualizar',
     unchanged: 'Sin cambios',
     error: 'Corregir',
-};
-const operationLabels: Record<string, string> = {
-    create: 'Alta',
-    update: 'Editar',
-    adjust: 'Ajustar',
-    'update-adjust': 'Editar y ajustar',
-    skip: 'Conservar',
 };
 
 const text = (value: ImportValue | undefined) =>
@@ -113,7 +96,7 @@ const details = (value: Record<string, ImportValue>) =>
 const locked = computed(() => props.isWorking || props.isDownloading);
 
 const selectMode = (value: unknown) => {
-    if (isInventoryImportOperation(value)) emit('mode', value);
+    if (isInventoryImportMode(value)) emit('mode', value);
 };
 </script>
 
@@ -241,8 +224,8 @@ const selectMode = (value: unknown) => {
                 "
             />
             <p class="retention-note">
-                El servidor descarta el archivo después del análisis. El borrador vence en 24 horas.
-                El original de tu equipo permanece bajo tu control.
+                El servidor descarta el archivo después del análisis. El borrador vence en
+                {{ limits.draftHours }} horas. El original de tu equipo permanece bajo tu control.
             </p>
         </template>
         <template v-if="batch">
@@ -251,15 +234,6 @@ const selectMode = (value: unknown) => {
                 <strong>{{ modeLabel }}</strong>
             </p>
             <p class="retention-note mb-3">Referencia: {{ batch.id }}</p>
-            <VAlert
-                v-if="batch.mode === LEGACY_INVENTORY_IMPORT_MODE && batch.status === 'DRAFT'"
-                type="warning"
-                variant="tonal"
-                class="mb-4"
-            >
-                Este borrador mezcla operaciones y ya no puede confirmarse. Descártalo y descarga
-                una plantilla para una sola operación.
-            </VAlert>
             <VAlert
                 v-if="batch.status === 'COMPLETED'"
                 type="success"
@@ -332,11 +306,7 @@ const selectMode = (value: unknown) => {
                             >
                                 <dt>{{ IMPORT_FIELD_LABELS[key] }}</dt>
                                 <dd>
-                                    {{
-                                        key === 'operation'
-                                            ? (operationLabels[String(value)] ?? text(value))
-                                            : text(value)
-                                    }}
+                                    {{ text(value) }}
                                 </dd>
                             </template>
                             <template

@@ -92,3 +92,9 @@ particiones de host, puerto, modo y protocolo.
 Registrar ambiente, revisión, fecha, comando, código de salida y artefactos como
 evidencia EP conforme al [plan](../01-test-plan.md). No versionar resultados de una
 corrida ni credenciales en esta ficha.
+
+La variante de autorización `DP-VUE-MAN-004` filtra las fuentes reales de los tres
+inventarios con lectura/escritura/costos, lectura/ajuste y sus particiones de rechazo.
+El procedimiento de importación sólo aparece cuando la cuenta puede utilizarlo;
+los bloques de cada operación conservan sus permisos. `manualProfilesTest.ts` ejecuta
+esta tabla de decisión sin crear ni modificar registros de inventario.

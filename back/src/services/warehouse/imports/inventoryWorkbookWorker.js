@@ -2,7 +2,8 @@ import { parentPort, workerData } from 'node:worker_threads';
 import { Workbook, isResourceLimitError } from '@sheetkit/node';
 import unzipper from 'unzipper';
 import { createSpreadsheet, spreadsheetColumn } from '../../../utils/spreadsheetUtils.js';
-import { INVENTORY_IMPORT_FORMAT, INVENTORY_IMPORT_LIMITS as limits,
+import { INVENTORY_IMPORT_FORMAT, INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
+import { INVENTORY_IMPORT_LIMITS as limits,
     INVENTORY_IMPORT_MODE_LABELS } from '../../../shared/constants/inventoryImport.js';
 
 const fail = kind => { const error = new Error(kind); error.kind = kind; throw error; };
@@ -18,8 +19,8 @@ const read = async ({ bytes, config }) => {
     const buffer = Buffer.from(bytes);
     if (!buffer.length || buffer.length > limits.maxBytes) fail('LIMIT');
     const zip = await unzipper.Open.buffer(buffer);
-    if (zip.files.length > limits.maxZipEntries
-        || zip.files.reduce((sum, file) => sum + file.uncompressedSize, 0) > limits.maxUncompressedBytes) fail('LIMIT');
+    if (zip.files.length > processing.maxZipEntries
+        || zip.files.reduce((sum, file) => sum + file.uncompressedSize, 0) > processing.maxUncompressedBytes) fail('LIMIT');
     if (zip.files.some(file => /vbaProject|externalLinks|embeddings|activeX/i.test(file.path))) fail('FILE');
     // Comprobar el tamaño real al inflar: la cabecera ZIP recibida no es una fuente confiable.
     let expanded = 0;
@@ -28,14 +29,14 @@ const read = async ({ bytes, config }) => {
         const chunks = [];
         for await (const chunk of file.stream()) {
             expanded += chunk.length;
-            if (expanded > limits.maxUncompressedBytes) fail('LIMIT');
+            if (expanded > processing.maxUncompressedBytes) fail('LIMIT');
             if (inspect) chunks.push(chunk);
         }
         if (inspect && /macroEnabled|vbaProject|oleObject|TargetMode\s*=\s*["']External["']/i.test(Buffer.concat(chunks).toString('utf8'))) fail('FILE');
     }
     const workbook = await Workbook.openBuffer(buffer, {
-        maxOuterInputBytes: limits.maxBytes, maxUnzipSize: limits.maxUncompressedBytes,
-        maxXmlPartBytes: limits.maxUncompressedBytes, maxZipEntries: limits.maxZipEntries,
+        maxOuterInputBytes: limits.maxBytes, maxUnzipSize: processing.maxUncompressedBytes,
+        maxXmlPartBytes: processing.maxUncompressedBytes, maxZipEntries: processing.maxZipEntries,
         readMode: 'eager'
     });
     if (workbook.sheetNames.length !== 3
@@ -52,7 +53,7 @@ const read = async ({ bytes, config }) => {
     if (!config.columns.every(([header], index) => readCell('Datos', `${columns[index]}1`) === header)) fail('FILE');
     const rows = [];
     const traversal = { limits: { maxRows: 1001, maxColumns: config.columns.length + 1,
-        maxCells: 1001 * (config.columns.length + 1), maxOutputBytes: limits.maxUncompressedBytes } };
+        maxCells: 1001 * (config.columns.length + 1), maxOutputBytes: processing.maxUncompressedBytes } };
     for (const row of workbook.getRowsIterator('Datos', traversal)) {
         if (row.row > 1001 || row.cells.some(cell => !columns.includes(cell.column))) fail('LIMIT');
         if (row.row === 1) continue;

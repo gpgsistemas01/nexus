@@ -1,6 +1,7 @@
 import { successCodeMessages } from '../constants/apiSuccessCodes.js';
 import { AUTH_FIELD_LIMITS } from '../constants/auth.js';
 import { FORM_FIELD_LIMITS } from '../constants/inputValidation.js';
+import { INVENTORY_IMPORT_LIMITS } from '../constants/inventoryImport.js';
 import { buildGoodsReceiptInvoiceAlreadyExistsMessage } from './goodsReceiptMessages.js';
 import { PIECE_QUANTITY_MESSAGE } from '../inventory/pieceQuantity.js';
 
@@ -10,14 +11,13 @@ export const errorMessages = {
     HISTORICAL_DELIVERY_BUSY: 'Otra operación está modificando estas salidas. Reintenta conservando la misma clave.',
     HISTORICAL_PHYSICAL_RETURN_REQUIRED: 'Confirma que la devolución corresponde a material que está entrando físicamente al almacén ahora.',
     INVENTORY_IMPORT_FILE: 'Utiliza una plantilla XLSX válida del módulo y operación seleccionados, sin fórmulas ni macros.',
-    INVENTORY_IMPORT_LIMIT: 'El archivo admite hasta 100 filas, 2 MiB y celdas de 600 caracteres. Divide la carga si supera los límites.',
+    INVENTORY_IMPORT_LIMIT: `El archivo admite hasta ${INVENTORY_IMPORT_LIMITS.maxRows} filas, ${INVENTORY_IMPORT_LIMITS.maxBytes / (1024 * 1024)} MiB y celdas de ${INVENTORY_IMPORT_LIMITS.maxCellLength} caracteres. Divide la carga si supera los límites.`,
     INVENTORY_IMPORT_BUSY: 'Se está procesando otra importación. Espera un momento y vuelve a intentar.',
     INVENTORY_IMPORT_VALIDATION: 'Corrige las filas señaladas antes de confirmar la importación.',
     INVENTORY_IMPORT_EXPIRED: 'La vista previa venció. Vuelve a cargar el archivo para validarlo.',
     INVENTORY_IMPORT_NOT_FOUND: 'La importación no existe o no pertenece a tu cuenta.',
     INVENTORY_IMPORT_STATE: 'La importación ya no está pendiente de confirmación.',
     INVENTORY_IMPORT_CONFLICT: 'Los datos cambiaron o la clave corresponde a otra confirmación. Revisa el resultado y valida una nueva plantilla.',
-    INVENTORY_IMPORT_MODE_RETIRED: 'Este borrador mezcla operaciones y ya no puede confirmarse. Descártalo y descarga una plantilla para Alta, Editar datos o Ajustar existencias.',
     INVENTORY_PIECE_QUANTITY_REQUIRED: PIECE_QUANTITY_MESSAGE,
     ISSUE_SUPPLY_QUANTITY_CONFLICT: 'La cantidad a surtir debe ser positiva y no superar el saldo pendiente del detalle.',
     RECORD_ID_INVALID: 'El identificador del registro no es válido.',

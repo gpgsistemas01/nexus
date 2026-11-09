@@ -78,7 +78,7 @@ model InventoryImport {
   version     Int       @default(0)
   userId      String?   @db.Uuid
   resource    String    @db.VarChar(16)
-  /// mixed: altas, edición y conteo por fila en un archivo; create/update/adjust: contratos anteriores recuperables.
+  /// Una operación para todo el archivo: create, update o adjust.
   mode        String    @db.VarChar(8)
   status      String    @default("DRAFT") @db.VarChar(16)
   filename    String    @db.VarChar(120)

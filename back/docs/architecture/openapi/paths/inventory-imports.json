@@ -162,7 +162,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Validar archivo sin cambiar el inventario",
-      "description": "Autoriza la operación seleccionada para todo el archivo antes del multipart. Analiza un único XLSX con SheetKit en worker y comprueba formato V2, módulo, operación, encabezados, permisos, duplicados, versiones, identidad y conteo final. No deduce la operación por fila o por nombre. Un error bloquea todo el archivo sin modificar inventario. Hasta 100 filas/2 MiB. mode=mixed se rechaza para nuevas cargas.",
+      "description": "Autoriza la operación seleccionada para todo el archivo antes del multipart. Analiza un único XLSX con SheetKit en worker y comprueba formato V2, módulo, operación, encabezados, permisos, duplicados, versiones, identidad y conteo final. No deduce la operación por fila o por nombre. Un error bloquea todo el archivo sin modificar inventario. Hasta 100 filas/2 MiB.",
       "security": [
         {
           "cookieAuth": []
@@ -308,7 +308,7 @@
         "Importaciones de inventario"
       ],
       "summary": "Confirmar todas las filas del borrador",
-      "description": "Requiere sesión, lectura y escritura del módulo y inventory:costs-read. Materiales y Consumibles usan materials:read/materials:write; Mermas usa wastes:read/wastes:write. Los lotes sólo son accesibles por su creador mientras conserva estos permisos. Revalida permisos, catálogos, identidad y versiones. Una única transacción guarda registros, stock inicial, movimientos, folios y recibo. Mismo operationId y expectedVersion devuelve el recibo confirmado, incluso después de reiniciar; otra clave para el mismo lote confirmado produce 409. No enviar filas ni totales desde el cliente. Un duplicado surgido después de la vista previa produce 409 sin aplicar ninguna fila. Las filas sin cambios de una actualización se omiten. Los comprobantes mixtos anteriores conservan lectura y repetición exacta. Un borrador mixto anterior devuelve 409 INVENTORY_IMPORT_MODE_RETIRED y debe descartarse y recrearse para una operación.",
+      "description": "Autoriza la operación del archivo y a su creador. Alta/edición requieren lectura, escritura e inventory:costs-read; ajuste requiere lectura y permiso de ajuste del recurso. Revalida permisos, catálogos, identidad y versiones. Una única transacción guarda filas, stock, conversiones, movimientos, folios y recibo según la operación. Repetir operationId y expectedVersion devuelve el mismo recibo sin duplicar efectos; otra clave para un lote completado produce 409. No enviar filas ni totales desde el cliente. Un conflicto o duplicado bloquea todo el archivo; filas sin cambios se omiten.",
       "security": [
         {
           "cookieAuth": []

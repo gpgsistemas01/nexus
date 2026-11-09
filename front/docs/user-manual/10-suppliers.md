@@ -41,8 +41,11 @@ campos y guarde. Compruebe el proveedor en el listado.
 ## Editar y desactivar
 
 1. Localice el proveedor y pulse **Editar registro**.
-2. Compruebe la identidad de la empresa, corrija los campos o desmarque **Activo**.
+2. Cambie **Razón social**, **Nombre comercial** o **Activo**, según corresponda.
 3. Pulse **Actualizar** y revise el resultado.
+
+El código del proveedor se conserva; no se captura desde esta edición. Los cambios
+no modifican existencias, costos ni partidas de compras o salidas.
 
 Desactivar conserva el historial. Edite los datos de la misma empresa; no los
 sustituya por los de otro proveedor. Ante un conflicto, siga

@@ -2,7 +2,7 @@ import { PERMISSIONS } from '../../../shared/constants/permissions.js';
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { AppError } from '../../../errors/AppError.js';
 import { INVENTORY_COLLECTIONS as resources, MATERIAL_TYPES } from '../../../shared/constants/inventory.js';
-import { INVENTORY_IMPORT_MODES as modes, LEGACY_INVENTORY_IMPORT_MODE } from '../../../shared/constants/inventoryImport.js';
+import { INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
 import { errorMap } from '../../../messages/codeMessages.js';
 import { errorMessages } from '../../../shared/messages/apiMessages.js';
 import { INVENTORY_SPREADSHEET_COLUMNS } from '../../../constants/inventorySpreadsheet.js';
@@ -52,18 +52,5 @@ export const authorizeInventoryImport = (user, resource, mode = modes.CREATE) =>
     if (!required.every(permission => user?.permissions?.includes(permission))) {
         throw forbidden();
     }
-    return config;
-};
-
-export const authorizeSavedInventoryImport = (user, batch) => {
-    if (batch.mode !== LEGACY_INVENTORY_IMPORT_MODE) return authorizeInventoryImport(user, batch.resource, batch.mode);
-
-    const config = getImportConfig(batch.resource);
-    const permissions = user?.permissions ?? [];
-    const canEdit = [config.write, PERMISSIONS.INVENTORY_COSTS_READ].every(permission => permissions.includes(permission));
-    const rows = batch.preview?.rows ?? batch.result?.rows ?? [];
-    const hasCosts = rows.some(row => Object.hasOwn(row.before ?? {}, 'maxUnitCost') || Object.hasOwn(row.after ?? {}, 'maxUnitCost'));
-    if (!permissions.includes(config.read) || (!canEdit && !permissions.includes(config.adjust))
-        || (hasCosts && !permissions.includes(PERMISSIONS.INVENTORY_COSTS_READ))) throw forbidden();
     return config;
 };

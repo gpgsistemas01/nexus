@@ -7,10 +7,10 @@ import { OperationKeyConflictError, RecordVersionConflictError } from '../../../
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { isDatabaseContentionError } from '../../../errors/databaseError.js';
 import { PRISMA_ERROR_CODES } from '../../../constants/prisma.js';
-import { INVENTORY_IMPORT_LIMITS as limits, INVENTORY_IMPORT_STATUSES as statuses, LEGACY_INVENTORY_IMPORT_MODE } from '../../../shared/constants/inventoryImport.js';
+import { INVENTORY_IMPORT_LIMITS as limits, INVENTORY_IMPORT_STATUSES as statuses } from '../../../shared/constants/inventoryImport.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { writeInventoryImport } from './inventoryImportWriteService.js';
-import { authorizeInventoryImport, authorizeSavedInventoryImport } from './inventoryImportConfig.js';
+import { authorizeInventoryImport } from './inventoryImportConfig.js';
 import { processInventoryWorkbook } from './inventoryWorkbookService.js';
 import { validateInventoryImportRows } from './inventoryImportValidationService.js';
 import { createServiceLogger, logServiceInfo } from '../../../utils/logger.js';
@@ -24,7 +24,7 @@ const owned = async ({ id, user, db = getDb() }) => {
     if (!UUID_V4_PATTERN.test(id ?? '')) throw new InventoryImportError('NOT_FOUND');
     const batch = await db.inventoryImport.findFirst({ where: { id, userId: user.id } });
     if (!batch) throw new InventoryImportError('NOT_FOUND');
-    authorizeSavedInventoryImport(user, batch);
+    authorizeInventoryImport(user, batch.resource, batch.mode);
     return batch;
 };
 
@@ -85,7 +85,6 @@ export const confirmInventoryImport = async ({ id, user, expectedVersion, operat
             }
             if (batch.status !== statuses.DRAFT) throw new InventoryImportError('STATE');
             if (batch.expiresAt <= new Date()) throw new InventoryImportError('EXPIRED');
-            if (batch.mode === LEGACY_INVENTORY_IMPORT_MODE) throw new InventoryImportError('MODE_RETIRED');
             if (batch.version !== expectedVersion) throw new RecordVersionConflictError();
             if (!Array.isArray(batch.payload) || batch.preview?.summary?.errors) throw new InventoryImportError('VALIDATION');
             if (!await tryLockInventoryImportConfirmation({ tx })) throw new InventoryImportError('BUSY');

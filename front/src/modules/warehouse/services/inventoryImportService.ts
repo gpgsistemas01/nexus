@@ -1,8 +1,6 @@
 import { successCodeMessages } from '@nexus/api-success-codes';
 import {
     INVENTORY_IMPORT_LIMITS,
-    INVENTORY_IMPORT_MODES,
-    LEGACY_INVENTORY_IMPORT_MODE,
     INVENTORY_IMPORT_STATUSES,
     INVENTORY_IMPORT_ROW_ACTIONS,
 } from '@nexus/inventory-imports';
@@ -13,11 +11,11 @@ import { ApiError } from '../../../shared/http/apiError.js';
 import { requestExcel } from '../../../shared/http/requestExcel.js';
 import { confirmMutation, readRecord } from '../../../shared/http/recordContract.js';
 import { isRecord } from '../../../shared/utils/isRecord.js';
+import { isInventoryImportMode } from '../inventoryImport.js';
 import type { InventoryResource } from '../inventory.js';
 import type {
     InventoryImportBatch,
     InventoryImportMode,
-    InventoryImportOperation,
     PendingInventoryImport,
 } from '../inventoryImport.js';
 
@@ -46,9 +44,7 @@ const readBatch = (
         (expected.resource !== undefined && batch.resource !== expected.resource) ||
         (expected.mode !== undefined && batch.mode !== expected.mode) ||
         !['materials', 'consumables', 'wastes'].includes(String(batch.resource)) ||
-        ![...Object.values(INVENTORY_IMPORT_MODES), LEGACY_INVENTORY_IMPORT_MODE].some(
-            (mode) => mode === batch.mode,
-        ) ||
+        !isInventoryImportMode(batch.mode) ||
         !Object.values(INVENTORY_IMPORT_STATUSES).some((status) => status === batch.status) ||
         typeof batch.filename !== 'string' ||
         typeof batch.expiresAt !== 'string'
@@ -112,7 +108,7 @@ const readBatch = (
 export const inventoryImportService = {
     template(
         resource: InventoryResource,
-        mode: InventoryImportOperation,
+        mode: InventoryImportMode,
         query: { supplierId: string; search: string; page: number },
         signal: AbortSignal,
     ) {
@@ -127,7 +123,7 @@ export const inventoryImportService = {
     },
     async preview(
         resource: InventoryResource,
-        mode: InventoryImportOperation,
+        mode: InventoryImportMode,
         file: File,
         signal: AbortSignal,
     ) {

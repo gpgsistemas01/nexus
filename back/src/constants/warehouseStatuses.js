@@ -1,16 +1,2 @@
-export const FULFILLMENT_STATUS_NAMES = Object.freeze({
-    PENDING: 'Pendiente',
-    PARTIAL: 'Surtido parcial',
-    COMPLETE: 'Surtido',
-    CANCELED: 'Cancelado'
-});
-
-export const GOODS_ISSUE_STATUS_NAMES = Object.freeze({
-    APPROVED: 'Aprobada',
-    CANCELED: 'Cancelada'
-});
-
-export const GOODS_RECEIPT_STATUS_NAMES = Object.freeze({
-    CONFIRMED: 'Confirmada',
-    CANCELED: 'Cancelada'
-});
+export { FULFILLMENT_STATUS_NAMES, GOODS_ISSUE_STATUS_NAMES } from '../shared/constants/fulfillmentStatuses.js';
+export { GOODS_RECEIPT_STATUS_NAMES } from '../shared/constants/goodsReceiptStatuses.js';

@@ -22,6 +22,12 @@ export default defineConfig(({ mode }) => {
         },
         resolve: {
             alias: {
+                '@nexus/purchase-statuses': fileURLToPath(
+                    new URL(
+                        '../back/src/shared/constants/goodsReceiptStatuses.js',
+                        import.meta.url,
+                    ),
+                ),
                 '@nexus/historical-deliveries': fileURLToPath(
                     new URL('../back/src/shared/constants/historicalDelivery.js', import.meta.url),
                 ),

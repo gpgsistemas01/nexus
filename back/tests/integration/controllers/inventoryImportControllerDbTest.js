@@ -96,7 +96,7 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(adjustment.type).toBe('DECREASE');
     });
 
-    it.each(['materials', 'consumables', 'wastes'])('rechaza nuevas plantillas y cargas mixtas de %s antes de analizar el archivo', async resource => {
+    it.each(['materials', 'consumables', 'wastes'])('rechaza una operación no admitida para %s antes de analizar el archivo', async resource => {
         const before = await inventorySnapshot();
         const drafts = await prisma.inventoryImport.count({ where: { userId: fixture.user.id } });
         await request(app).get(`/${resource}/template`).query({ mode: 'mixed' }).set('Cookie', cookie)
@@ -120,30 +120,6 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         }
         expect(await inventorySnapshot()).toEqual(before);
         expect(await prisma.inventoryImport.count({ where: { userId: fixture.user.id } })).toBe(drafts);
-    });
-
-    it('conserva y repite un comprobante mixto anterior sin aplicar otra vez sus efectos', async () => {
-        const batch = await preview([fixture.row('Comprobante anterior')]);
-        const operationId = randomUUID();
-        const completed = await confirm(batch, operationId).expect(200);
-        await prisma.inventoryImport.update({ where: { id: batch.id }, data: { mode: 'mixed' } });
-        const before = await inventorySnapshot();
-        const read = await request(app).get(`/${batch.id}`).set('Cookie', cookie).expect(200);
-        expect(read.body.batch).toMatchObject({ mode: 'mixed', status: 'COMPLETED', result: completed.body.batch.result });
-        await confirm(batch, operationId).expect(200);
-        await confirm(batch).expect(409).expect(({ body }) => expect(body.code).toBe('OPERATION_KEY_CONFLICT'));
-        expect(await inventorySnapshot()).toEqual(before);
-    });
-
-    it('un borrador mixto anterior se puede consultar y descartar, pero nunca confirmar', async () => {
-        const batch = await preview([fixture.row('Borrador anterior')]);
-        await prisma.inventoryImport.update({ where: { id: batch.id }, data: { mode: 'mixed' } });
-        const before = await inventorySnapshot();
-        await request(app).get(`/${batch.id}`).set('Cookie', cookie).expect(200);
-        await confirm(batch).expect(409).expect(({ body }) => expect(body.code).toBe('INVENTORY_IMPORT_MODE_RETIRED'));
-        expect(await inventorySnapshot()).toEqual(before);
-        await request(app).delete(`/${batch.id}`).set('Cookie', cookie).expect(200);
-        expect(await prisma.inventoryImport.findUnique({ where: { id: batch.id } })).toMatchObject({ status: 'CANCELED', payload: null, preview: null });
     });
 
     it('usa la misma estructura de consulta al editar y contar merma en archivos separados con IDs originales', async () => {
@@ -232,11 +208,10 @@ describe('importación XLSX: permisos, estados y persistencia atómica', () => {
         expect(sheet.getCell(2, headers.indexOf('Stock actual') + 1).value).toBe(2);
     });
 
-    it('al perder lectura de costos, protege precios en comprobantes anteriores sin bloquear conteos puros', async () => {
+    it('al perder lectura de costos, protege las ediciones sin bloquear los conteos', async () => {
         const offer = await seedOffer('Permisos recuperables');
         const editing = await preview([{ ...updateRow(offer), maxUnitCost: 17 }], 'materials', 'update');
         const counting = await preview([await countRow(offer, 3)], 'materials', 'adjust');
-        await prisma.inventoryImport.updateMany({ where: { id: { in: [editing.id, counting.id] } }, data: { mode: 'mixed' } });
         const user = { ...fixture.user, permissions: [PERMISSIONS.MATERIALS_READ, PERMISSIONS.MATERIALS_ADJUST_STOCK] };
         const { getInventoryImport } = await import('../../../src/services/warehouse/imports/inventoryImportService.js');
         await expect(getInventoryImport({ id: editing.id, user })).rejects.toMatchObject({ statusCode: 403 });

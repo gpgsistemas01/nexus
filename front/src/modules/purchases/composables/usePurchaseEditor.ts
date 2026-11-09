@@ -1,3 +1,4 @@
+import { GOODS_RECEIPT_STATUS_NAMES } from '@nexus/purchase-statuses';
 import { computed, watch } from 'vue';
 import { useForm } from 'vee-validate';
 import { PERMISSIONS } from '@nexus/permissions';
@@ -109,7 +110,7 @@ export const usePurchaseEditor = (options: {
 
     const totals = computed(() =>
         calculatePurchaseTotals([...(document?.details ?? []), ...form.values.details], {
-            includeCanceled: document?.status === 'Cancelada',
+            includeCanceled: document?.status === GOODS_RECEIPT_STATUS_NAMES.CANCELED,
         }),
     );
     const target = options.target;

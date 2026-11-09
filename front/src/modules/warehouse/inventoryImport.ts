@@ -3,14 +3,12 @@ import {
     INVENTORY_IMPORT_MODES,
     INVENTORY_IMPORT_STATUSES,
     INVENTORY_IMPORT_ROW_ACTIONS,
-    LEGACY_INVENTORY_IMPORT_MODE,
 } from '@nexus/inventory-imports';
 
-export type InventoryImportOperation =
+export type InventoryImportMode =
     (typeof INVENTORY_IMPORT_MODES)[keyof typeof INVENTORY_IMPORT_MODES];
-export type InventoryImportMode = InventoryImportOperation | typeof LEGACY_INVENTORY_IMPORT_MODE;
 
-export const isInventoryImportOperation = (value: unknown): value is InventoryImportOperation =>
+export const isInventoryImportMode = (value: unknown): value is InventoryImportMode =>
     Object.values(INVENTORY_IMPORT_MODES).some((mode) => mode === value);
 
 export type ImportValue = string | number | boolean | null;
@@ -69,5 +67,4 @@ export const IMPORT_FIELD_LABELS: Record<string, string> = {
     difference: 'Diferencia de stock',
     reason: 'Motivo',
     adjustmentReference: 'Folio del ajuste',
-    operation: 'Operación de la fila',
 };

@@ -25,6 +25,7 @@
         "../back/src/shared/constants/apiSuccessCodes.js",
         "../back/src/shared/inventory/issueHeaderRules.js",
         "../back/src/shared/constants/fulfillmentStatuses.js",
+        "../back/src/shared/constants/goodsReceiptStatuses.js",
         "../back/src/shared/utils/formatters.js"
     ],
     "compilerOptions": {
@@ -34,6 +35,7 @@
         "allowJs": true,
         "checkJs": false,
         "paths": {
+            "@nexus/purchase-statuses": ["../back/src/shared/constants/goodsReceiptStatuses.js"],
             "@nexus/historical-deliveries": ["../back/src/shared/constants/historicalDelivery.js"],
             "@nexus/inventory-imports": ["../back/src/shared/constants/inventoryImport.js"],
             "@nexus/piece-quantity": ["../back/src/shared/inventory/pieceQuantity.js"],

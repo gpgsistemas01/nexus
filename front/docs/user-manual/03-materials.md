@@ -6,43 +6,91 @@ Abra **Almacén → Materiales**. **Tabla de Existencias** muestra material, pro
 presentación, unidad y stock. Las columnas agrupadas distinguen dimensiones y conversión.
 Busque y filtre para localizar el registro correcto.
 
+<!-- manual:all materials:read -->
+<!-- manual:any inventory:costs-read materials:adjust-stock -->
 <!-- manual:any materials:write materials:adjust-stock -->
 ## Importar materiales o consumibles desde Excel
 
-1. En el módulo correspondiente, pulse **Importar Excel**.
-2. En **Operación del archivo**, elija **Alta**, **Editar datos** o **Ajustar existencias**. Todas las filas harán esa operación.
-3. Filtre proveedor/nombre y página; pulse **Descargar plantilla**.
-4. Complete los campos de captura sin cambiar hojas, encabezados ni columnas grises.
-5. Seleccione la misma operación y el `.xlsx`; pulse **Validar archivo** y revise cambios, cantidades y errores.
-6. Si hay errores, descárguelos, pulse **Descartar borrador**, corrija el original y vuelva a validarlo.
-7. Pulse **Confirmar importación** y espere el recibo. Use **Otro archivo** para continuar.
+Use **Importar Excel** para trabajar por lotes de hasta **100 filas y 2 MiB**.
+El archivo representa una sola operación. El selector muestra las opciones permitidas
+para su cuenta; no se elige una operación diferente en cada fila.
 
-Las columnas iniciales tienen los mismos nombres y orden que el reporte de consulta:
-Proveedor, Material, Base, Altura, Stock actual, Stock mínimo, Presentación,
-Conversión, Unidad y Costo unitario. El ajuste omite el costo. Al final se añaden
-Activo, IDs/versiones y los campos propios de la operación. Para cargar cambios use
-la plantilla operativa; el Excel de consulta conserva su función de reporte.
+<!-- manual:all materials:write inventory:costs-read -->
+**Alta:** capture los datos del artículo, proveedor del catálogo, **Cantidad inicial**
+y observaciones. El sistema genera los IDs nuevos; Stock actual y Conversión
+son referencias.
 
-En Alta seleccione el proveedor del catálogo y capture **Cantidad inicial**. El
-sistema genera el ID nuevo. Para Editar datos y Ajustar existencias, la descarga
-incluye IDs/versiones automáticamente según su permiso, sin exigir ser administrador.
-Consérvelos: permiten cambiar el nombre sin crear otro artículo. En ajuste, capture
-el saldo físico final en **Stock contado**, motivo y observaciones. Cero es válido y
-vacío se rechaza. Stock actual y Conversión son referencias.
+**Editar datos:** cambie **Material**, **Stock mínimo**, **Costo unitario** y **Activo**.
+Se conservan IDs/versiones, proveedor, presentación, unidad, medidas y existencias.
+<!-- manual:end -->
 
-Un archivo tiene una operación. Para editar y ajustar, complete primero una operación
-y descargue una plantilla actual para la siguiente. Cambiar de operación retira el
-archivo seleccionado; un Excel de otra operación se rechaza.
+<!-- manual:any materials:adjust-stock -->
 
-Un duplicado o error bloquea **todo el archivo**: todavía no se guarda ninguna fila.
-**Descargar errores** indica cuáles corregir o retirar antes de volver a validar.
+**Ajustar existencias:** capture **Stock contado**, **Motivo** y **Observaciones**.
+Se conservan IDs/versiones y datos del artículo; el saldo final reemplaza la
+existencia anterior.
+<!-- manual:end -->
 
-Máximo: 100 filas y 2 MiB. Actualizar cambia nombre, mínimo, costo y activo; conserva
-existencias y medidas. Nombre y mínimo se comparten entre proveedores. Pieza exige
-enteros. Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo.
-Si se pierde la respuesta, vuelva a **Importar Excel** y pulse **Revisar y reintentar
-confirmación**. No suba otra alta para repetirla. El borrador vence en 24 h; el archivo
-de su equipo permanece bajo su control.
+1. Abra el inventario correspondiente y pulse **Importar Excel**.
+2. En **Operación del archivo**, elija la operación que realizará todo el archivo.
+3. Filtre proveedor/nombre y página; pulse **Descargar plantilla**. Cada página contiene hasta 100 registros existentes.
+4. Guarde una copia del archivo descargado y complete únicamente las columnas de captura de esa operación.
+5. Conserve las hojas **Datos**, **Instrucciones** y **Catalogos**, sus encabezados y las columnas grises de referencia.
+6. Seleccione la misma operación, elija el `.xlsx` y pulse **Validar archivo**.
+7. Revise todas las páginas de la vista previa: filas nuevas, cambios, datos anteriores/finales, advertencias y errores. Validar todavía no modifica inventario.
+8. Si hay errores, use **Descargar errores**, corrija el archivo de captura, pulse **Descartar borrador** y vuelva a validarlo. El informe de errores sirve para revisar; no se vuelve a importar.
+9. Pulse **Confirmar importación** una sola vez y espere el resultado. Conserve su referencia y compruebe el inventario. **Otro archivo** inicia una operación distinta.
+
+La plantilla mantiene las columnas y el orden del reporte de consulta y añade
+IDs/versiones y campos de captura. El ajuste omite el costo. El Excel obtenido con
+**Exportar Excel** es un reporte: para importar descargue la plantilla de la operación.
+Los consumibles mantienen Base y Altura como referencias vacías; no capture dimensiones.
+
+En **Activo**, use **SI** o **NO**. Capture números con punto decimal y sin símbolos
+de moneda; no cambie IDs ni versiones. Si supera 100 filas, prepare archivos separados
+y revise que los grupos no repitan registros.
+
+Los IDs/versiones se incluyen automáticamente para quien tiene el permiso operativo;
+consérvelos aunque cambie el nombre. No dependen de ser administrador. Use las opciones
+completas de los catálogos, incluido el código del proveedor. Retire de **Datos** las
+filas que no quiera procesar, sin borrar ni renombrar encabezados.
+
+<!-- manual:all materials:write inventory:costs-read -->
+Las altas llevan **Cantidad inicial**. Nombre y mínimo se comparten entre proveedores;
+costo y Activo corresponden a la relación con el proveedor. Pieza exige enteros.
+Un alta sin costo no podrá usarse en salidas hasta configurar un costo positivo.
+<!-- manual:end -->
+
+<!-- manual:any materials:adjust-stock -->
+En **Stock contado**, cero significa que comprobó que no hay existencias; vacío no
+es un conteo y bloquea el archivo. Retire las filas que aún no haya contado. Capture
+el saldo físico final por presentación, con motivo y observaciones, y evite movimientos
+durante el conteo. Si también necesita editar datos, complete una operación y descargue
+una plantilla actual para la siguiente.
+<!-- manual:end -->
+
+Un duplicado, error o versión desactualizada bloquea **todo el archivo**. Ante datos
+cambiados, descargue una plantilla actual y revise sus correcciones antes de volver
+a capturarlas. Cambiar la operación retira el archivo seleccionado. Use siempre
+la plantilla actual de la operación seleccionada.
+
+### Manejo y recuperación del archivo
+
+Suba el `.xlsx` directamente, sin comprimirlo en otro ZIP. No use CSV, macros,
+fórmulas ni enlaces externos; pegue valores en las celdas de captura. Cambiar la
+extensión de un archivo no lo convierte en una plantilla válida.
+
+El servidor descarta el archivo después del análisis. La vista previa y sus errores
+se eliminan al confirmar, descartar o vencer el borrador, que dura 24 horas. El recibo
+confirmado se conserva; anote la referencia que muestra la pantalla. Nexus no borra el original ni las descargas de su equipo.
+Conserve la copia de trabajo y el resultado hasta comprobar la operación; administre
+sus copias según el [manejo de archivos locales](02-navigation-and-controls.md#archivos-en-su-equipo).
+
+Si se pierde la respuesta al confirmar, reabra **Importar Excel** y pulse **Revisar y
+reintentar confirmación**. Esa acción comprueba el mismo envío. No vuelva a cargar el
+archivo ni cree otra alta mientras el resultado sea incierto.
+<!-- manual:end -->
+<!-- manual:end -->
 <!-- manual:end -->
 
 ![Tabla de existencias de materiales con filtros y acciones.](images/03-materials-list.png)
@@ -83,11 +131,12 @@ la existencia; el costo máximo se configura en **Almacén**. No duplique la ent
 ## Editar datos
 
 1. Localice el registro y pulse **Editar**.
-2. Revise los datos cargados y modifique únicamente los campos habilitados.
+2. Cambie **Nombre**, **Stock mínimo**, **Costo máximo unitario** o **Activo**, según corresponda.
 3. Pulse **Guardar** y compruebe el registro actualizado.
 
-Proveedor, presentación, unidad y medidas son de consulta. Editar conserva el
-saldo. Si necesita cambiar la identidad del artículo, consulte al responsable del inventario.
+Proveedor, presentación, unidad y medidas son de consulta. El stock y su conversión
+se conservan: no se capturan desde esta edición. Nombre y mínimo se comparten entre
+los proveedores del material; costo y Activo afectan la oferta seleccionada. Si necesita cambiar la identidad del artículo, consulte al responsable del inventario.
 <!-- manual:end -->
 
 <!-- manual:any materials:adjust-stock -->

@@ -34,8 +34,6 @@ presentación. **Stock contado** empieza vacío: vacío se rechaza y cero es vá
 Motivo activo y observaciones son obligatorios. Las referencias no reemplazan datos
 del servidor. Un mismo destino sólo ocupa una fila. Nombre y mínimo son comunes
 entre proveedores. Alta captura **Cantidad inicial** y el servidor genera los IDs.
-Los comprobantes mixtos anteriores conservan consulta y repetición exacta; un borrador
-mixto anterior debe descartarse y recrearse con una operación.
 
 La vista previa muestra anterior, final y diferencia. Un duplicado, permiso ausente,
 captura inválida o versión vieja bloquea el archivo completo. Confirmar revalida el
@@ -44,7 +42,7 @@ una vez; stock, conversiones, AJU/AME, movimientos, folios y recibo se guardan e
 transacción. Repetir la clave devuelve el mismo resultado. Filas iguales no crean ajustes.
 
 Lectura más ajuste autoriza conteo sin lectura de costos; alta/edición requieren
-lectura, escritura y `inventory:costs-read`. El modo mixto verifica cada operación
+lectura, escritura y `inventory:costs-read`. La operación del archivo se autoriza
 antes de leer datos privados. No permite cambiar dimensiones ni presentación en edición.
 Las altas usan los catálogos y reglas vigentes; merma necesita una referencia ya existente.
 
@@ -84,7 +82,7 @@ No se habilita otra regularización mientras el resultado permanezca incierto.
 Fuentes ejecutables: `inventoryImportControllerDbTest.js`, `historicalDeliveryControllerDbTest.js`,
 `inventoryStockCountTest.js`, `historicalDeliveryTest.ts` y los recorridos Chromium de
 importación y entregas históricas. Cubren saldo cero, Pieza fraccionaria, vacío,
-repetidos, operación/archivo incompatibles, recuperación de comprobantes anteriores, versión vieja, fallo tardío, repetición y carreras con surtido.
+repetidos, operación/archivo incompatibles, versión vieja, fallo tardío, repetición y carreras con surtido.
 
 Las constantes compartidas de regularización reúnen límites de documentos, búsqueda,
 página, motivo, revisión y códigos de error. Se reutiliza el límite de observaciones

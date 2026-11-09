@@ -35,6 +35,20 @@ La referencia ficticia conserva el inventario completo de ejemplos.
 | Sus tareas | Capítulos por módulo y bloques de acciones filtrados por permiso. |
 | Ayuda y consulta | Recuperación y glosario, también filtrados. |
 
+En cada edición, enumerar los campos de captura y los de consulta, así como las
+condiciones por estado, selección previa o permiso. No sustituir esa información
+por «modifique los campos habilitados». Distinguir editar, corregir una partida,
+ajustar existencias, surtir, devolver y consultar un documento cancelado. Si un
+valor sugerido permanece editable, explicar su regla sin describirlo como bloqueado.
+
+La importación debe describir la operación del archivo, descarga de la plantilla,
+columnas de captura/referencia, IDs/versiones, límites, validación y confirmación,
+errores y recuperación. Explicar qué conserva el servidor y qué copias administra
+el usuario. Distinguir reporte, plantilla operativa e informe de errores.
+La edición por cuenta sólo incluye importación cuando se cumplen lectura y ajuste,
+o lectura/escritura/costos para la operación correspondiente. Se reutilizan las
+directivas existentes; las operaciones de la cuenta mantienen sus propios bloques.
+
 Los bloques `manual:any` y `manual:all` deben abarcar título, pasos, notas e imágenes
 de la acción. Las referencias a reportes y ajustes se filtran también fuera de su capítulo.
 

@@ -103,10 +103,6 @@ la respuesta, **Revisar y reintentar confirmación** consulta el mismo lote: rec
 su recibo si terminó o repite la misma confirmación si sigue pendiente. No crea otra
 importación. **Descartar borrador** queda condicionado por el estado del servidor.
 
-Los comprobantes confirmados con el formato mixto anterior siguen recuperables.
-Un borrador mixto anterior debe descartarse y recrearse con una operación; no se
-confirma ni transforma automáticamente.
-
 El archivo subido y el Excel de errores sólo existen en memoria durante su procesamiento
 o envío; no dejan copias en disco del servidor. El borrador de datos/errores vence en
 24 horas; confirmar, descartar o limpiar su vencimiento elimina el contenido temporal.

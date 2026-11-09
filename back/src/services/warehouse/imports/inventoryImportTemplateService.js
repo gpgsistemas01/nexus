@@ -1,6 +1,7 @@
 import { getDb } from '../../../repository/baseRepository.js';
 import { UUID_V4_PATTERN } from '../../../shared/constants/inputValidation.js';
 import { INVENTORY_IMPORT_LIMITS as limits, INVENTORY_IMPORT_MODES as modes } from '../../../shared/constants/inventoryImport.js';
+import { INVENTORY_IMPORT_PROCESSING_LIMITS as processing } from '../../../constants/inventoryImport.js';
 import { InventoryImportError } from '../../../errors/warehouse/inventoryImportError.js';
 import { findWasteMaterialTemplates } from '../wastes/wasteMaterialService.js';
 import { authorizeInventoryImport, importUnitLabel } from './inventoryImportConfig.js';
@@ -54,21 +55,21 @@ export const createInventoryImportTemplate = async ({ user, resource, mode, quer
         if (!rows.length) throw new InventoryImportError('VALIDATION', { hint: 'No hay registros en esa página de la consulta.' });
         if (config.mode === modes.ADJUST) {
             catalogs.reasons = (await db.stockAdjustmentReason.findMany({ where: { isActive: true },
-                orderBy: { name: 'asc' }, take: limits.maxCatalogRows })).map(item => `${item.id} | ${item.name}`);
+                orderBy: { name: 'asc' }, take: processing.maxCatalogRows })).map(item => `${item.id} | ${item.name}`);
         }
     }
     if (config.mode === modes.CREATE) {
         catalogs.suppliers = await db.supplier.findMany({ where: { isActive: true, ...(supplierId && { id: supplierId }) },
-            orderBy: { code: 'asc' }, take: limits.maxCatalogRows, select: { code: true, tradeName: true } });
+            orderBy: { code: 'asc' }, take: processing.maxCatalogRows, select: { code: true, tradeName: true } });
         if (resource === 'wastes') {
             if (!supplierId) throw new InventoryImportError('VALIDATION', { hint: 'Selecciona un proveedor para descargar la plantilla de mermas.' });
             if (supplierId) {
-                const references = await findWasteMaterialTemplates({ supplierId, search, take: limits.maxCatalogRows });
+                const references = await findWasteMaterialTemplates({ supplierId, search, take: processing.maxCatalogRows });
                 catalogs.materials = references.data.map(material => `${material.id} | ${material.name} | ${material.base ?? ''} × ${material.height ?? ''} | ${material.presentation.name}`);
             }
         } else {
-            catalogs.presentations = await db.presentation.findMany({ where: { isActive: true }, orderBy: { name: 'asc' }, take: limits.maxCatalogRows, select: { name: true } });
-            catalogs.units = (await db.unitMeasure.findMany({ where: { isActive: true }, orderBy: { name: 'asc' }, take: limits.maxCatalogRows, select: { name: true, symbol: true } })).map(importUnitLabel);
+            catalogs.presentations = await db.presentation.findMany({ where: { isActive: true }, orderBy: { name: 'asc' }, take: processing.maxCatalogRows, select: { name: true } });
+            catalogs.units = (await db.unitMeasure.findMany({ where: { isActive: true }, orderBy: { name: 'asc' }, take: processing.maxCatalogRows, select: { name: true, symbol: true } })).map(importUnitLabel);
         }
     }
     return processInventoryWorkbook({ action: 'template', config, rows, catalogs }, signal);
