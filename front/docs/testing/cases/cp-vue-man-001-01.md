@@ -7,6 +7,13 @@ permitida, mezclar cuentas o registrar una operación para preparar una captura.
 Tabla de decisiones por área, rol, permiso de tarea, estado del documento y
 completitud de los artefactos. Es una prueba de la herramienta documental.
 
+Los doce perfiles operativos deben seleccionar sólo Materiales, Consumibles,
+Mermas y Salidas como capítulos de tareas, sin procedimientos de altas comerciales
+ni Detalles de peso. La interfaz se comprueba por separado en
+`operationalAccess.spec.ts`: navegación, tablas y selectores sin acciones ajenas.
+La integración HTTP/Prisma del servidor verifica el rechazo de escrituras; las
+capturas y los dobles del navegador no sustituyen esa evidencia persistente.
+
 ## Especificación del caso y datos
 
 | ID de caso | Precondiciones y estado inicial | Datos de prueba | Acción / pasos | Resultado esperado | Limpieza |

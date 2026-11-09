@@ -33,14 +33,23 @@ La configuración, ejecución y recuperación se explican en el
 | `pt-coordinador`, `pt-operador` | PT/TRÁFICO. |
 | `instalaciones-coordinador`, `instalaciones-instalador` | Instalaciones; el segundo rol es Instalador. |
 
-Los perfiles operativos consultan Almacén y consultan o registran solicitudes
-para sus áreas autorizadas. No reciben instrucciones de surtido, devolución,
-modificación de inventario, costos, compras ni administración. El recorrido
-comprueba también una salida surtida para verificar la ausencia de devolución.
+Los perfiles operativos, incluidos sus coordinadores, sólo acceden a los grupos
+Almacén y Salidas. En Almacén consultan la tabla con búsqueda, filtros, orden,
+paginación y actualización, sin botones de gestión, importación, exportación,
+costos ni Detalles de peso. En Salidas consultan y registran solicitudes para sus
+áreas autorizadas; no crean clientes ni proveedores ni realizan surtidos o
+devoluciones. Su manual indica solicitar los registros faltantes a Almacén.
+El recorrido comprueba también una salida surtida para verificar la ausencia de devolución.
 
-Auxiliar y Coordinador de Almacén tienen los mismos permisos funcionales para
-Materiales, Consumibles y Mermas. Las restricciones por estado de cada documento
-siguen aplicándose. El índice de cada edición indica su alcance detectado.
+El alta auxiliar de proveedores corresponde a Nuevo material, Nuevo consumible y
+Nueva compra, con permisos de registro y lectura. No se extiende a filtros,
+importación, Mermas o Salidas; esos selectores usan registros existentes.
+
+Auxiliar y Coordinador de Almacén gestionan inventario, compras y salidas. La
+regularización de entregas históricas exige su permiso específico y distingue al
+Coordinador. Las restricciones por estado de cada documento siguen aplicándose.
+El índice de cada edición indica su alcance detectado y las cuentas con varias
+asignaciones conservan la unión de sus permisos.
 
 ## Responsabilidades de la herramienta
 

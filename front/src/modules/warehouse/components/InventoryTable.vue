@@ -40,6 +40,11 @@ const { sortBy, changesFromOptions } = useTableQuery(
     () => INVENTORY_SORT_COLUMNS,
 );
 const details = ref<InventoryRow | null>(null);
+const canViewWeightDetails = computed(
+    () =>
+        props.resource === 'wastes' &&
+        (props.permissions.canWrite || props.permissions.canAdjust || props.permissions.canAdd),
+);
 
 const rowProps = ({ item }: { item: InventoryRow }) => ({
     class: Number(item.currentStock) < Number(item.minStock) ? 'low-stock' : '',
@@ -69,7 +74,7 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
                     <span>{{ item.supplierName }}</span>
                 </div>
                 <VBtn
-                    v-if="resource === 'wastes'"
+                    v-if="canViewWeightDetails"
                     size="x-small"
                     variant="text"
                     @click="details = item"
@@ -119,6 +124,7 @@ const rowProps = ({ item }: { item: InventoryRow }) => ({
             </template>
         </ServerTable>
         <VDialog
+            v-if="canViewWeightDetails"
             :model-value="details !== null"
             max-width="480"
             @update:model-value="!$event && (details = null)"

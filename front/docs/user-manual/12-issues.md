@@ -20,7 +20,11 @@ Repetir artículo y proveedor suma su cantidad; otro proveedor crea una partida 
 Materiales y consumibles requieren al menos una unidad; merma admite cantidades positivas menores.
 Solicitar no descuenta inventario.
 
-<!-- manual:any clients:create -->
+Seleccione un cliente y artículos con proveedor ya registrado. Si su cuenta pertenece
+a un área operativa y falta un registro, solicite el alta al responsable de Almacén.
+Salidas no ofrece alta de proveedores.
+
+<!-- manual:all clients:create clients:read -->
 Si falta un cliente, use **Registrar cliente «nombre»** en el selector y continúe después del alta.
 <!-- manual:end -->
 

@@ -242,9 +242,15 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
         expect((await stockSnapshot()).slice(0, 2)).toEqual(before.slice(0, 2));
     });
 
-    it('rechaza surtido, devoluciones y cambios de inventario sin efectos persistidos', async () => {
-        const { cookie } = sessions[areas[0]];
+    it.each(['IMPRESIÓN', 'printingCoordinator'])('%s rechaza surtido, devoluciones, cambios de inventario y altas comerciales sin efectos persistidos', async sessionKey => {
+        const { cookie } = sessions[sessionKey];
         const before = await stockSnapshot();
+        const rejectedName = `IT Access Rejected ${suffix} ${sessionKey}`;
+        const directorySnapshot = () => Promise.all([
+            prisma.client.count({ where: { name: rejectedName } }),
+            prisma.supplier.count({ where: { tradeName: rejectedName } })
+        ]);
+        const beforeDirectory = await directorySnapshot();
         for (const resource of ['materials', 'consumables', 'wastes']) {
             const path = issuePath(resource);
             const model = resource === 'wastes' ? prisma.wasteIssue : prisma.goodsIssue;
@@ -281,7 +287,10 @@ describe('acceso operativo a salidas e inventario con sesión y políticas reale
         await request(app).get('/api/warehouse/reports/inventory/excel').set('Cookie', cookie).expect(403);
         await request(app).post(`/api/warehouse/wastes/${ids.waste}/stock-additions`).set('Cookie', cookie).send({ operationId: randomUUID(), quantity: 1 }).expect(403);
         await request(app).post('/api/warehouse/suppliers').set('Cookie', cookie)
-            .send({ legalName: 'Proveedor rechazado', tradeName: 'Proveedor rechazado', isActive: true }).expect(403);
+            .send({ legalName: rejectedName, tradeName: rejectedName, isActive: true }).expect(403);
+        await request(app).post('/api/sales/clients').set('Cookie', cookie)
+            .send({ name: rejectedName, isActive: true }).expect(403);
+        expect(await directorySnapshot()).toEqual(beforeDirectory);
         expect(await stockSnapshot()).toEqual(before);
     });
 

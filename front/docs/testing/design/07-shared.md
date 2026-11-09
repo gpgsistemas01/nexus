@@ -97,6 +97,17 @@ describe la colaboración que comprueban estas pruebas.
 
 ## Altas contextuales desde selectores
 
+Los filtros y la importación sólo seleccionan proveedores existentes. El alta se
+conserva en Nuevo material, Nuevo consumible y Nueva compra para cuentas autorizadas;
+Mermas requiere un origen existente y Salidas no registra proveedores. El recorrido
+`operationalAccess.spec.ts` contrasta un Coordinador de Impresión y un Instalador:
+sólo Almacén/Salidas, tablas sin acciones ni costos, búsqueda de registros inexistentes
+sin alta comercial y selección de un cliente existente sin escrituras. La variante de
+gestión conserva Detalles de peso. Salidas pendientes y surtidas no ofrecen surtido
+ni devolución, tampoco dentro de la consulta de una entrega. La matriz del servidor cubre las seis áreas y la
+integración `operationalAccessDbTest.js` verifica 403 y ausencia de registros de clientes
+y proveedores para Operador y Coordinador.
+
 | ID de diseño | Requisito / riesgo | Nivel y técnica | Condición que se cubrirá | Casos asociados |
 | --- | --- | --- | --- | --- |
 | `DP-VUE-SEL-001` | RF-VUE-012; selección contextual | `CU-CAT-02/06`, `CU-ALM-02/18`, soporte de `CU-ENT-02/08` y Salidas; navegador y unitario. Particiones por consumidor/permiso, coincidencia/ausencia y transiciones abrir → cancelar/error/reintentar/guardar. | `selectCreation.spec.ts` representa proveedor en Materiales/Consumibles y Compras, artículo en ambas Compras y cliente en las tres Salidas. Comprueba precarga, retorno, captura conservada, contratos de compra, teclado y exclusión de alta en filtros/catálogos/merma o sin permiso. `inventoryFormTest.ts` añade proveedor inactivo, selección fuera de la página remota y respuesta tras desmontaje. Fichas `CP-VUE-SEL-001-01/02/03`. | [CP-VUE-SEL-001-01](../cases/cp-vue-sel-001-01.md); [CP-VUE-SEL-001-02](../cases/cp-vue-sel-001-02.md); [CP-VUE-SEL-001-03](../cases/cp-vue-sel-001-03.md) |

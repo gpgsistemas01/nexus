@@ -11,6 +11,32 @@ teléfono, también puede cerrarlo con **Cerrar menú**.
 
 Puede guardar la dirección de una página como favorito.
 
+### Áreas operativas: Almacén y Salidas
+
+Las cuentas asignadas únicamente a Impresión, Router, Taller/Herrería (TALLER 3D),
+PT/TRÁFICO, Instalaciones o Acabados trabajan sólo en **Almacén** y **Salidas**.
+Esto aplica también a sus coordinadores; ser coordinador de un área operativa
+no concede las funciones de Almacén.
+
+| Sección | Qué puede hacer el área operativa |
+| --- | --- |
+| Almacén: Materiales, Consumibles y Mermas | Consultar la tabla, buscar, filtrar, ordenar, recorrer páginas y actualizar la consulta. |
+| Salidas: Materiales, Consumibles y Mermas | Consultar, registrar y editar solicitudes de sus áreas asignadas, según el estado del documento. |
+
+En Almacén no hay acciones de alta, edición, eliminación, entrada o ajuste de
+existencias, importación ni exportación. Tampoco se muestran costos ni el botón
+**Detalles de peso** de Mermas.
+
+En Salidas se seleccionan clientes y artículos con proveedores existentes. Las áreas
+operativas no registran clientes ni proveedores, no surten ni registran devoluciones.
+Si falta un registro o necesita corregir el inventario, solicítelo al responsable de
+Almacén. Compras, Directorio, Identidad y acceso, Movimientos, Catálogos y Reportes
+no forman parte de ese acceso operativo.
+
+Almacén y Sistemas tienen funciones propias. Si una cuenta tiene además una
+asignación autorizada en esas áreas, su menú y su manual reúnen los permisos de
+todas sus asignaciones activas.
+
 ![Menú expandido con los grupos y páginas disponibles para la cuenta.](images/02-navigation.png)
 
 ## Buscar y recorrer una tabla
