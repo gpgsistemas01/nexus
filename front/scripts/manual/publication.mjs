@@ -190,10 +190,12 @@ export const finalizeManualSources = async (manifest, captures) => {
     }
 };
 
-export const loadManualPublication = async (frontRoot, id) => {
+export const loadManualPublication = async (frontRoot, id, { mode } = {}) => {
     if (!validProfileId(id)) throw new Error('Identificador de manual inválido.');
     const root = await prepareManualDirectory(frontRoot, id);
     const manifest = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
+    if (mode !== undefined && manifest.mode !== mode)
+        throw new Error(`Las capturas de ${id} no corresponden al modo ${mode}.`);
     if (
         manifest.id !== id ||
         manifest.status !== 'ready' ||

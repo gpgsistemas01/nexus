@@ -38,6 +38,7 @@ npm run docs:export -- inicio ambos
 npm run docs:export -- arquitectura pdf
 npm run docs:export -- pruebas docx
 npm run docs:export -- completo ambos
+npm run docs:screenshots -- --all
 npm run docs:manuals -- --all
 ```
 
@@ -46,14 +47,17 @@ Desde la raíz se usa `npm --prefix front run` antes del nombre del script.
 `docs:check` comprueba su vigencia, catálogo, enlaces y recursos del documento
 técnico, además de las referencias declaradas del manual. Las capturas se generan
 y revisan por separado; la exportación comprueba que estén presentes antes de
-publicar. Estos comandos no requieren Pandoc. La
+publicar. `docs:generate` y `docs:check` no requieren Pandoc. La
 [consulta de comandos](../development/00-commands.md) reúne los flujos de desarrollo.
 
 `docs:export -- [seccion] [docx|pdf|ambos]` selecciona contenido y formato.
 Sin sección, o con `completo`, reúne la colección; por ejemplo,
 `docs:export -- ambos`. Una selección desconocida se rechaza antes de publicar.
 
-`docs:manuals` genera una edición por cuenta configurada, con sus áreas y roles.
+`docs:screenshots` prepara las imágenes y fuentes por cuenta, con sus áreas y roles.
+Después, `docs:manuals` exporta Word/PDF desde esas capturas verificadas, sin ejecutar
+Playwright, iniciar servicios ni leer credenciales. Una captura pendiente bloquea
+la exportación y debe resolverse con el comando de capturas.
 La preparación se concentra en el [procedimiento por cuenta](07-manual-accounts-and-files.md).
 `docs:manual:reference -- ambos` reúne todas las tareas en una referencia para mantenimiento.
 

@@ -5,23 +5,24 @@ import {
   createManualWebServer,
 } from '../../../scripts/manual/environment.mjs';
 
-it('usa cuentas y credenciales locales por defecto, sin seleccionar demostraciones', () => {
-  expect(parseManualOptions(['--all'])).toMatchObject({
+it('exporta cuentas configuradas sin opciones de navegador ni credenciales', () => {
+  const options = parseManualOptions(['export', '--all']);
+  expect(options).toMatchObject({
+    command: 'export',
     mode: 'dev',
     accounts: 'manual.accounts.local.json',
-    'env-file': '.env.manual.local',
     all: true,
     format: 'ambos',
-    'capture-only': false,
-    missing: true,
-    fresh: false,
   });
+  expect(options).not.toHaveProperty('env-file');
+  expect(options).not.toHaveProperty('missing');
+  expect(options).not.toHaveProperty('fresh');
 });
 
 it('permite capturar una cuenta y reanudar usando sus archivos seleccionados', () => {
   expect(
     parseManualOptions([
-      '--capture-only',
+      'capture',
       '--profile',
       'cuenta-01',
       '--missing',
@@ -36,20 +37,26 @@ it('permite capturar una cuenta y reanudar usando sus archivos seleccionados', (
     all: false,
     accounts: 'cuentas.local.json',
     'env-file': '.env.cuentas.local',
-    'capture-only': true,
+    command: 'capture',
     missing: true,
   });
 });
 
-it('sólo utiliza datos ficticios cuando se solicita el modo demo', () => {
-  expect(parseManualOptions(['--mode', 'demo', '--all']).mode).toBe('demo');
-});
+it.each(['capture', 'export'])(
+  'sólo utiliza datos ficticios en %s al solicitar demo',
+  (command) => {
+    expect(parseManualOptions([command, '--mode', 'demo', '--all']).mode).toBe('demo');
+  },
+);
 
 it.each([['--all'], ['--profile', 'cuenta-01']])(
   'recupera faltantes por defecto: %j',
   (...args) => {
-    expect(parseManualOptions(args).missing).toBe(true);
-    expect(parseManualOptions([...args, '--fresh'])).toMatchObject({ missing: false, fresh: true });
+    expect(parseManualOptions(['capture', ...args])).toMatchObject({ missing: true });
+    expect(parseManualOptions(['capture', ...args, '--fresh'])).toMatchObject({
+      missing: false,
+      fresh: true,
+    });
   },
 );
 
@@ -91,26 +98,35 @@ it('un origen HTTPS local requiere su servicio TLS ya configurado', () => {
 });
 
 it.each(['docx', 'pdf', 'ambos'])('admite publicar el formato %s', (format) => {
-  expect(parseManualOptions(['--all', '--format', format]).format).toBe(format);
+  expect(parseManualOptions(['export', '--all', '--format', format])).toMatchObject({ format });
 });
 
 it.each([
   [],
-  ['--all', '--profile', 'cuenta-01'],
-  ['--all', '--missing', '--fresh'],
-  ['--profile', '../otra-cuenta'],
-  ['--profile', ''],
-  ['--all', '--mode', 'otro'],
-  ['--all', '--mode', 'live'],
-  ['--all', '--format', 'html'],
-  ['--env-file', '--all'],
-  ['--profile'],
-  ['--desconocida'],
+  ['--all'],
+  ['export', '--all', '--profile', 'cuenta-01'],
+  ['capture', '--all', '--missing', '--fresh'],
+  ['export', '--all', '--fresh'],
+  ['export', '--all', '--missing'],
+  ['export', '--all', '--env-file', '.env.manual.local'],
+  ['capture', '--all', '--format', 'pdf'],
+  ['export', '--all', '--capture-only'],
+  ['export', '--profile', '../otra-cuenta'],
+  ['export', '--profile', ''],
+  ['export', '--all', '--mode', 'otro'],
+  ['export', '--all', '--mode', 'live'],
+  ['export', '--all', '--format', 'html'],
+  ['capture', '--env-file', '--all'],
+  ['export', '--profile'],
+  ['export', '--desconocida'],
   ['ambos'],
 ])('rechaza opciones ambiguas o incompletas: %j', (...args) => {
   expect(() => parseManualOptions(args)).toThrow();
 });
 
-it('permite consultar la ayuda sin cuentas ni credenciales', () => {
-  expect(parseManualOptions(['--help'])).toMatchObject({ help: true, all: false });
-});
+it.each([['--help'], ['capture', '--help'], ['export', '--help']])(
+  'consulta ayuda sin cuentas: %j',
+  (...args) => {
+    expect(parseManualOptions(args)).toMatchObject({ help: true });
+  },
+);
